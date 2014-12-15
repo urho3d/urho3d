@@ -129,62 +129,33 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const String& defines)
 ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
 {
     StringHash definesHash(defines);
-    
-    if (type == VS)
+    HashMap<StringHash, SharedPtr<ShaderVariation> > & variations(type == VS ? vsVariations_ : psVariations_);
+    HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = variations.Find(definesHash);
+    if (i == variations.End())
     {
-        HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = vsVariations_.Find(definesHash);
-        if (i == vsVariations_.End())
-        {
-            // If shader not found, normalize the defines (to prevent duplicates) and check again. In that case make an alias
-            // so that further queries are faster
-            String normalizedDefines = NormalizeDefines(defines);
-            StringHash normalizedHash(normalizedDefines);
-            
-            i = vsVariations_.Find(normalizedHash);
-            if (i != vsVariations_.End())
-                vsVariations_.Insert(MakePair(definesHash, i->second_));
-            else
-            {
-                // No shader variation found. Create new
-                i = vsVariations_.Insert(MakePair(normalizedHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, VS))));
-                if (definesHash != normalizedHash)
-                    vsVariations_.Insert(MakePair(definesHash, i->second_));
-                
-                i->second_->SetName(GetFileName(GetName()));
-                i->second_->SetDefines(normalizedDefines);
-                ++numVariations_;
-                RefreshMemoryUse();
-            }
-        }
+        // If shader not found, normalize the defines (to prevent duplicates) and check again. In that case make an alias
+        // so that further queries are faster
+        String normalizedDefines = NormalizeDefines(defines);
+        StringHash normalizedHash(normalizedDefines);
         
-        return i->second_;
-    }
-    else
-    {
-        HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = psVariations_.Find(definesHash);
-        if (i == psVariations_.End())
+        i = variations.Find(normalizedHash);
+        if (i != variations.End())
+            variations.Insert(MakePair(definesHash, i->second_));
+        else
         {
-            String normalizedDefines = NormalizeDefines(defines);
-            StringHash normalizedHash(normalizedDefines);
-            
-            i = psVariations_.Find(normalizedHash);
-            if (i != psVariations_.End())
-                psVariations_.Insert(MakePair(definesHash, i->second_));
-            else
-            {
-                i = psVariations_.Insert(MakePair(normalizedHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, PS))));
-                if (definesHash != normalizedHash)
-                    psVariations_.Insert(MakePair(definesHash, i->second_));
-                
-                i->second_->SetName(GetFileName(GetName()));
-                i->second_->SetDefines(normalizedDefines);
-                ++numVariations_;
-                RefreshMemoryUse();
-            }
+            // No shader variation found. Create new
+            i = variations.Insert(MakePair(normalizedHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, type))));
+            if (definesHash != normalizedHash)
+                variations.Insert(MakePair(definesHash, i->second_));
+
+            i->second_->SetName(GetFileName(GetName()));
+            i->second_->SetDefines(normalizedDefines);
+            ++numVariations_;
+            RefreshMemoryUse();
         }
-        
-        return i->second_;
     }
+
+    return i->second_;
 }
 
 bool Shader::ProcessSource(String& code, Deserializer& source)
