@@ -59,7 +59,7 @@ if (DOXYGEN_FOUND)
     # 2) ScriptAPI.dox and LuaScriptAPI.dox always get refreshed first before the 'doc' target is being built (similar to VS-only PRE_BUILD custom command)
     if (TARGET ScriptCompiler AND NOT CMAKE_CROSSCOMPILING)
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ScriptAPI.dox
-            COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/ScriptCompiler -dumpapi ScriptAPI.dox AngelScriptAPI.h
+            COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/ScriptCompiler -dumpapi ${CMAKE_SOURCE_DIR} ScriptAPI.dox AngelScriptAPI.h
             DEPENDS Urho3D ScriptCompiler
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             COMMENT "Dumping AngelScript API to ScriptAPI.dox")

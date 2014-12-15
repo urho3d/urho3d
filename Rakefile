@@ -51,7 +51,7 @@ task :scaffolding do
   end
 end
 
-# Usage: rake cmake [prefix_path=..] [fix_scm] (only intended to be used by lazy man =), e.g. rake cmake android URHO3D_LIB_TYPE=SHARED; rake cmake clean android
+# Usage: rake cmake [prefix_path=..] [fix_scm] (only intended to be used by lazy man =), e.g. rake cmake clean android; rake cmake android URHO3D_LIB_TYPE=SHARED
 desc 'Invoke cmake shell script with the build tree location predetermined based on the target platform'
 task :cmake do
   prefix_path = ENV['prefix_path'] || '..'
@@ -78,7 +78,7 @@ task :cmake do
   system "./#{script} #{prefix_path}/#{platform}-Build #{build_options}" or abort
 end
 
-# Usage: rake make [prefix_path=..] [num_jobs=8] (only intended to be used by lazy man =), e.g. rake make android
+# Usage: rake make [prefix_path=..] [num_jobs=8] (only intended to be used by lazy man =), e.g. rake make android, rake make android doc
 desc 'Invoke make command in the build tree location predetermined based on the target platform'
 task :make do
   prefix_path = ENV['prefix_path'] || '..'
@@ -92,7 +92,7 @@ task :make do
     when 'android', 'ios', 'mingw', 'rpi'
       platform = option
     else
-      build_options = "#{build_options} -#{option}" unless /(?:prefix_path|num_jobs)=.*/ =~ option
+      build_options = "#{build_options} #{option}" unless /(?:prefix_path|num_jobs)=.*/ =~ option
     end
   }
   system "cd #{prefix_path}/#{platform}-Build && make #{build_options}" or abort
@@ -343,18 +343,15 @@ EOF
 end
 
 def makefile_ci
-  if ENV['WINDOWS']
+  if ENV['WINDOWS'] && ENV['CI']
     # MinGW package on Ubuntu 12.04 LTS does not come with d3dcompiler.h file which is required by our CI build with URHO3D_OPENGL=0.
     # Temporarily workaround the problem by downloading the missing header from Ubuntu 14.04 LTS source package.
-    if ENV['URHO3D_OPENGL'] && ENV['CI'] then
+    if ENV['URHO3D_OPENGL']
       system "sudo wget -P $(echo |$MINGW_PREFIX-gcc -v -E - 2>&1 |grep -B 1 'End of search list' |head -1) http://bazaar.launchpad.net/~ubuntu-branches/ubuntu/trusty/mingw-w64/trusty/download/package-import%40ubuntu.com-20130624192537-vzn12bb7qd5w3iy8/d3dcompiler.h-20120402093420-bk10a737hzitlkgj-65/d3dcompiler.h" or abort 'Failed to download d3dcompiler.h header'
     end
     # LuaJIT on MinGW build is not possible on Ubuntu 12.04 LTS as its GCC cross-compiler version is too old. Fallback to use Lua library instead.
     jit = ''
     amalg = ''
-#    # Lua on MinGW build requires tolua++ tool to be built natively first
-#    system "MINGW_PREFIX= ./cmake_generic.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA=1 -DURHO3D_TOOLS=0" or abort 'Failed to configure native build for tolua++ target'
-#    system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
   elsif ENV['ANDROID'] && ENV['ABI'] == 'arm64-v8a'
     # The upstream LuaJIT library does not support this Android ABI at the moment, fallback to use Lua library instead
     jit = ''
@@ -363,26 +360,9 @@ def makefile_ci
     jit = 'JIT'
     amalg = '-DURHO3D_LUAJIT_AMALG=1'
   end
-# Temporarily not using any build options that require native tool building
-#  system "./cmake_generic.sh ../Build -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
-  system "./cmake_generic.sh ../Build -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
-  if ENV['ANDROID']
-    if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
+  system "./cmake_generic.sh ../Build -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
+  if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
       android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
-    end
-#    # LuaJIT on Android build requires tolua++ and buildvm-android tools to be built natively first
-#    system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
-#    if !jit.empty?
-#      system "cd Build/ThirdParty/Lua#{jit}/generated/buildvm-android-#{ENV['ABI']} && make -j$NUMJOBS" or abort 'Failed to build buildvm-android tool'
-#    end
-#    # Reconfigure Android build one more time now that we have the tools built
-#    system './cmake_generic.sh' or abort 'Failed to reconfigure Urho3D library for Android build'
-#  elsif ENV['RPI']
-#    # LuaJIT on Raspberry Pi build requires tolua++ and buildvm-raspi tools to be built natively first
-#    system "cd Build/ThirdParty/toluapp/src/bin && make -j$NUMJOBS" or abort 'Failed to build tolua++ tool'
-#    system "cd Build/ThirdParty/LuaJIT/generated/buildvm-raspi && make -j$NUMJOBS" or abort 'Failed to build buildvm-raspi tool'
-#    # Reconfigure Raspberry Pi build one more time now that we have the tools built
-#    system './cmake_generic.sh' or abort 'Failed to reconfigure Urho3D library for Raspberry Pi build'
   end
   if $testing == 1
     test = '&& make test'
@@ -392,9 +372,7 @@ def makefile_ci
   system "cd ../Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "../Build/generated/UsingSourceAndBuildTrees"
-# Temporarily not using any build options that require native tool building
-#  system "export URHO3D_HOME=`pwd` URHO3D_BUILD_TREE=../.. && cd ../Build/generated/UsingSourceAndBuildTrees && echo '\nExternal project using Urho3D source and build trees' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
-  system "export URHO3D_HOME=`pwd` URHO3D_BUILD_TREE=../.. && cd ../Build/generated/UsingSourceAndBuildTrees && echo '\nExternal project using Urho3D source and build trees' && ./cmake_generic.sh . #{$build_options} -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
+  system "export URHO3D_HOME=`pwd` URHO3D_BUILD_TREE=../.. && cd ../Build/generated/UsingSourceAndBuildTrees && echo '\nExternal project using Urho3D source and build trees' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
   # Make, deploy, and test run Android APK in an Android (virtual) device
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']
     system "echo '\nTest deploying and running Urho3D Samples APK...' && cd ../Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
@@ -492,22 +470,16 @@ def xcode_ci
     jit = ''
     amalg = ''
     deployment_target = "-DIPHONEOS_DEPLOYMENT_TARGET=#{ENV['DEPLOYMENT_TARGET']}"
-#    # Lua on IOS build requires tolua++ tool to be built natively first
-#    system "./cmake_macosx.sh -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA=1 -DURHO3D_TOOLS=0" or abort 'Failed to configure native build for tolua++ target'
-#    xcode_build(0, 'Build/Urho3D.xcodeproj', 'tolua++') or abort 'Failed to build tolua++ tool'
   else
     jit = 'JIT'
     amalg = '-DURHO3D_LUAJIT_AMALG=1'
     deployment_target = "-DCMAKE_OSX_DEPLOYMENT_TARGET=#{ENV['DEPLOYMENT_TARGET']}"
   end
-# Temporarily not using any build options that require native tool building
-#  system "./cmake_macosx.sh ../Build -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
-  system "./cmake_macosx.sh ../Build -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
+  system "./cmake_macosx.sh ../Build -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
   xcode_build(ENV['IOS'], "../Build/Urho3D.xcodeproj") or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library
   scaffolding "../Build/generated/UsingSourceAndBuildTrees"
-#  system "export URHO3D_HOME=`pwd` URHO3D_BUILD_TREE=../.. && cd ../Build/generated/UsingSourceAndBuildTrees && echo '\nExternal project using Urho3D source and build trees' && ./cmake_macosx.sh . -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
-  system "export URHO3D_HOME=`pwd` URHO3D_BUILD_TREE=../.. && cd ../Build/generated/UsingSourceAndBuildTrees && echo '\nExternal project using Urho3D source and build trees' && ./cmake_macosx.sh . -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
+  system "export URHO3D_HOME=`pwd` URHO3D_BUILD_TREE=../.. && cd ../Build/generated/UsingSourceAndBuildTrees && echo '\nExternal project using Urho3D source and build trees' && ./cmake_macosx.sh . -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
   xcode_build(ENV['IOS'], "../Build/generated/UsingSourceAndBuildTrees/Scaffolding.xcodeproj") or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
 end
 

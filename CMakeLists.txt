@@ -29,11 +29,14 @@ cmake_minimum_required (VERSION 2.8.6)
 if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
     if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
-        cmake_policy (SET CMP0022 NEW) # INTERFACE_LINK_LIBRARIES defines the link interface
+        # INTERFACE_LINK_LIBRARIES defines the link interface
+        cmake_policy (SET CMP0022 NEW)
     endif ()
     if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-        cmake_policy (SET CMP0026 OLD) # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
-        cmake_policy (SET CMP0042 NEW) # MACOSX_RPATH is enabled by default
+        # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
+        cmake_policy (SET CMP0026 OLD)
+        # MACOSX_RPATH is enabled by default
+        cmake_policy (SET CMP0042 NEW)
     endif ()
 endif ()
 
@@ -44,10 +47,13 @@ set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 include (Urho3D-CMake-common)
 
 # Setup SDK install destinations
-if (CMAKE_HOST_WIN32)
-    # CMake already automatically appends "Urho3D" to CMAKE_INSTALL_PREFIX on Windows platform
+if (WIN32)
     set (SCRIPT_EXT .bat)
 else ()
+    set (SCRIPT_EXT .sh)
+endif ()
+if (NOT CMAKE_HOST_WIN32)
+    # CMake already automatically appends "Urho3D" to CMAKE_INSTALL_PREFIX on Windows platform
     set (PATH_SUFFIX /Urho3D)
     if (URHO3D_64BIT)
         if (NOT CMAKE_CROSSCOMPILING AND EXISTS /usr/lib64)
@@ -59,7 +65,6 @@ else ()
         # Use 'ios' arch subdirectory to differentiate, in case both Mac OS X and iOS build are installed at the same destination
         set (LIB_SUFFIX ${LIB_SUFFIX}/ios)
     endif ()
-    set (SCRIPT_EXT .sh)
 endif ()
 set (DEST_INCLUDE_DIR include${PATH_SUFFIX})
 set (DEST_SHARE_DIR share${PATH_SUFFIX})
@@ -70,7 +75,7 @@ if (ANDROID)
     set (DEST_RUNTIME_DIR ${DEST_RUNTIME_DIR}/${ANDROID_NDK_ABI_NAME})
     set (DEST_LIBRARY_DIR ${DEST_LIBRARY_DIR}/${ANDROID_NDK_ABI_NAME})
 endif ()
-set (SYSROOT ${ANDROID_TOOLCHAIN_ROOT} ${RPI_SYSROOT} ${MINGW_SYSROOT})       # SYSROOT is empty for native build
+set (SYSROOT ${ANDROID_TOOLCHAIN_ROOT} ${RPI_SYSROOT} ${MINGW_SYSROOT})         # SYSROOT is empty for native build
 string (REPLACE "${SYSROOT}" "" DEST_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})    # Our CMAKE_INSTALL_PREFIX is rooted, use DEST_INSTALL_PREFIX for the non-rooted version
 set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 set (DEST_PERMISSIONS FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ DIRECTORY_PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)

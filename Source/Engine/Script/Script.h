@@ -71,7 +71,7 @@ public:
     /// Set whether to execute engine console commands as script code.
     void SetExecuteConsoleCommands(bool enable);
     /// Print the whole script API (all registered classes, methods and properties) to the log. No-ops when URHO3D_LOGGING not defined.
-    void DumpAPI(DumpMode mode= DOXYGEN);
+    void DumpAPI(DumpMode mode= DOXYGEN, const String& sourceTree = String::EMPTY);
     /// Log a message from the script engine.
     void MessageCallback(const asSMessageInfo* msg);
     /// Handle a script exception.

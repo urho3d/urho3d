@@ -149,52 +149,31 @@ endif ()
 # Urho3D only builds static LuaJIT library
 
 # Makefile: Make targets
-# These host tools must be built natively and would be used when cross-compiling
+set (WARNING "# This is a generated file. DO NOT EDIT!")
+configure_file (CMakeLists.txt-minilua.in ${CMAKE_CURRENT_BINARY_DIR}/generated/minilua/CMakeLists.txt @ONLY)
+configure_file (CMakeLists.txt-buildvm.in ${CMAKE_CURRENT_BINARY_DIR}/generated/buildvm/CMakeLists.txt @ONLY)
+# The host tool must be built natively
 if (CMAKE_CROSSCOMPILING OR IOS)
-    # Cross-compiling
-    If (IOS)
-        set (BUILDVM_X buildvm-ios)
-    elseif (ANDROID)
-        set (BUILDVM_X buildvm-android-${ANDROID_NDK_ABI_NAME})
-    elseif (RPI)
-        set (BUILDVM_X buildvm-raspi)
+    # Store the target architecture information for later use when cross-compiling 'buildvm' host tool
+    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/generated/buildvm/TARGET_TESTARCH.txt ${TARGET_TESTARCH})
+
+    if (IOS)
+        set (TARGET_SYS iOS)
+    elseif (ANDROID OR RPI)
+        set (TARGET_SYS Linux)
     elseif (MINGW)
-        set (BUILDVM_X buildvm-mingw)
-    else ()
-        message (FATAL_ERROR "Unsupported cross-compiling target") 
+        set (TARGET_SYS Windows)
     endif ()
-    execute_process (COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/${BUILDVM_X} RESULT_VARIABLE BUILDVM_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
-    if (NOT BUILDVM_EXIT_CODE EQUAL 1)
-        file (WRITE ${CMAKE_BINARY_DIR}/Bin/tool/${BUILDVM_X}-arch.txt ${TARGET_TESTARCH})
-        message (FATAL_ERROR
-            "The configuration cannot be done now because the target-specific '${BUILDVM_X}' tool has not been built yet. "
-            "However, the specific target architecture information is now saved. "
-            "Reconfigure the desktop native build to incorporate the saved information by calling the respective batch/shell script for native build (it might be the same script as this one). "
-            "Then run make or the equivalent command to actually build the missing tool natively. "
-            "Finally, after the tool is built, come back to call this batch/shell script again to complete this configuration.")
-    endif ()
+
+    # When cross-compiling, build the host tool as external project
+    include (ExternalProject)
+    ExternalProject_Add(buildvm
+        SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated/buildvm
+        CMAKE_ARGS -DTARGET_SYS=${TARGET_SYS} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/Bin/tool
+    )
 else ()
-    # Not cross-compiling
-    set (WARNING "# This is a generated file. DO NOT EDIT!")
-    
-    # minilua
-    configure_file (CMakeLists.txt-minilua.in ${CMAKE_CURRENT_BINARY_DIR}/generated/minilua/CMakeLists.txt @ONLY)
-    add_subdirectory (${CMAKE_CURRENT_BINARY_DIR}/generated/minilua generated/minilua)
-    
-    # buildvm
-    configure_file (CMakeLists.txt-buildvm.in ${CMAKE_CURRENT_BINARY_DIR}/generated/buildvm/CMakeLists.txt @ONLY)
+    # Otherwise, build it internally as per normal
     add_subdirectory (${CMAKE_CURRENT_BINARY_DIR}/generated/buildvm generated/buildvm)
-    set (BUILDVM_DEP buildvm)
-    set (BUILDVM_X buildvm)
-    
-    # Also build variants for the supported target architectures
-    file (GLOB VARIANT_ARCHS ${CMAKE_BINARY_DIR}/Bin/tool/buildvm-*-arch.txt)
-    foreach (VARIANT_ARCH ${VARIANT_ARCHS})
-        string (REGEX REPLACE "^.*buildvm(-.*)-arch\\.txt$" \\1 VARIANT ${VARIANT_ARCH})
-        file (READ ${VARIANT_ARCH} TARGET_TESTARCH)
-        configure_file (CMakeLists.txt-buildvm.in ${CMAKE_CURRENT_BINARY_DIR}/generated/buildvm${VARIANT}/CMakeLists.txt @ONLY)
-        add_subdirectory (${CMAKE_CURRENT_BINARY_DIR}/generated/buildvm${VARIANT} generated/buildvm${VARIANT})
-    endforeach ()
 endif ()
 
 # Add definitions specific for target C Compiler 
@@ -213,8 +192,8 @@ macro (generate_source name mode)
     set (GEN_SRC ${CMAKE_CURRENT_BINARY_DIR}/generated/${name})
     set (GEN_SRCS ${GEN_SRCS} ${GEN_SRC})
     add_custom_command (OUTPUT ${GEN_SRC}
-        COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/${BUILDVM_X} -m ${mode} -o ${GEN_SRC} ${ARGN}
-        DEPENDS ${BUILDVM_DEP} ${ARGN}
+        COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/buildvm -m ${mode} -o ${GEN_SRC} ${ARGN}
+        DEPENDS buildvm ${ARGN}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating buildvm output: ${name}")
 endmacro ()
@@ -284,23 +263,26 @@ if (NOT IOS)
 
     # Define dependency libs
     set (LINK_LIBS_ONLY LuaJIT)
+    if (NOT MSVC)
+        set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} m)
+    endif ()
 
     # Setup target
     setup_executable (NODEPS)
     adjust_target_name ()   # Adjust to intended target output name
 
     # Define post build steps
-    set (LUAJIT_DEP_DIR ${CMAKE_BINARY_DIR}/Bin/Data/LuaScripts/jit)
+    set (LUAJIT_DEP_DIR ${CMAKE_BINARY_DIR}/Bin/jit)
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/src/jit ${LUAJIT_DEP_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/generated/vmdef.lua ${LUAJIT_DEP_DIR}
         COMMENT "Copying dependency files for luajit standalone executable")
 
     # Install dependency files required by luajit
-    install (DIRECTORY ${LUAJIT_DEP_DIR} DESTINATION ${DEST_RUNTIME_DIR}/Data/LuaScripts ${DEST_PERMISSIONS})
+    install (DIRECTORY ${LUAJIT_DEP_DIR} DESTINATION ${DEST_RUNTIME_DIR} ${DEST_PERMISSIONS})
 endif ()
 
-# Add Data/LuaScripts directory into the LuaJIT module search path
-set (LUA_RDIR Data/LuaScripts/)     # Relative directory
-set (LUA_IDIR ${CMAKE_INSTALL_PREFIX}/${DEST_RUNTIME_DIR}/Data/LuaScripts/)     # Installation directory
+# Add directory containing the dependency files into the LuaJIT module search path
+set (LUA_RDIR ./)     # Relative directory
+set (LUA_IDIR ${CMAKE_INSTALL_PREFIX}/${DEST_RUNTIME_DIR}/)     # Installation directory
 add_definitions (-DLUA_RDIR="${LUA_RDIR}" -DLUA_IDIR="${LUA_IDIR}")

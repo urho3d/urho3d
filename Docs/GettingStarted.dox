@@ -94,8 +94,8 @@ Note that Eclipse requires CDT plugin to build C/C++ project. When using generat
 
 If using MinGW to compile, DirectX headers may need to be acquired separately. They can be copied to the MinGW installation eg. from the following package: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz These will be missing some of the headers related to shader compilation, so a MinGW build will use OpenGL by default. To build in Direct3D9 mode, the MinGW-w64 port is necessary: http://mingw-w64.sourceforge.net/. Using it, Direct3D9 can be enabled with the "-DURHO3D_OPENGL=0" build option.
 
-After the build is complete, the programs can be run from the Bin subdirectory in the build tree. These include the Urho3D player application, which can run application scripts, the tools, and C++ sample applications if they have been enabled. In order to run the Urho3D executables successfully, you must do one of the following first:
-- Copy both the Bin/Data and Bin/CoreData directories to the Bin subdirectory in the build tree.
+After the build is complete, the programs can be run from the Bin subdirectory in the build tree. These include the Urho3D player application, which can run application scripts, the tools, and C++ sample applications if they have been enabled. Unless your build tree location is also the same as the Urho3D project source tree, in order to run the Urho3D executables successfully, you must do one of the following first:
+- Copy both the Bin/Data and Bin/CoreData directories in the source tree to the Bin subdirectory in the build tree.
 - Instead of copying, just create symbolic links in the build tree pointing to the above two directories.
 - Or even better, set and export URHO3D_PREFIX_PATH variable in your host environment. The prefix variable must be set to an absolute path which contains the Data and CoreData subdirectories.      
 
@@ -341,7 +341,7 @@ The physical project root directory is also now the logical project source tree 
 
 \section UsingLibraryFromProjectSourceAndBuildTrees From Urho3D project source tree and build tree
 
-This section assumes that you have already successfully build a static or shared library in the Urho3D project (separately from your own project). In order to find Urho3D library in Urho3D project library output directory in its build tree, specify an environment variable called "URHO3D_BUILD_TREE" which points to the Urho3D project build tree itself. Then also specify another environment variable called "URHO3D_HOME" which points to the Urho3D project source tree where the Urho3D headers and CMake modules can be found.
+This section assumes that you have already successfully build a static or shared library in the Urho3D project (separately from your own project). In order to find the Urho3D headers and its CMake modules, specify an environment variable called "URHO3D_HOME" which points to the Urho3D project root directory (aka Urho3D source tree). Then also specify another environment variable called "URHO3D_BUILD_TREE" which points to the location of the Urho3D build tree (if it is different than the Urho3D source tree) in order to find the Urho3D library in its build tree.
 
 In your own project root directory, create a main CMakeLists.txt file and add the following lines: (replace MyProjectName and MyExecutableName with the actual names you want)
 

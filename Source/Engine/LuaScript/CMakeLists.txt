@@ -28,15 +28,17 @@ if (NOT URHO3D_SAFE_LUA)
     add_definitions (-DTOLUA_RELEASE)
 endif ()
 
-# The host tool must be built natively and would be used when cross-compiling
+# The host tool must be built natively
 if (CMAKE_CROSSCOMPILING OR IOS)
-    execute_process (COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/tolua++ -v RESULT_VARIABLE TOLUA_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
-    if (NOT TOLUA_EXIT_CODE EQUAL 0)
-        message (WARNING "For cross-compiling build to be successful, the 'tolua++' tool must be built natively first and present in the 'Bin' folder." )
-    endif ()
+    # When cross-compiling, build the host tool as external project
+    include (ExternalProject)
+    ExternalProject_Add(tolua++
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
+        CMAKE_ARGS -DJIT=${JIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/Bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}
+    )
 else ()
+    # Otherwise, build it internally as per normal
     add_subdirectory (../../ThirdParty/toluapp/src/bin ../../ThirdParty/toluapp/src/bin)
-    set (TOLUADEP tolua++)
 endif ()
 
 # Define generated source files
@@ -71,7 +73,7 @@ foreach (API_PKG_FILE ${API_PKG_FILES})
     file (GLOB PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/${API}/*.pkg)
     add_custom_command (OUTPUT ${GEN_CPP_FILE} 
         COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/tolua++ -L ToCppHook.lua -o ${CMAKE_CURRENT_BINARY_DIR}/${GEN_CPP_FILE} ${NAME}
-        DEPENDS ${TOLUADEP} ${API_PKG_FILE} ${PKG_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/ToCppHook.lua
+        DEPENDS tolua++ ${API_PKG_FILE} ${PKG_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/ToCppHook.lua
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/pkgs
         COMMENT "Generating tolua++ API binding on the fly for ${API}")
 endforeach ()
@@ -84,7 +86,7 @@ install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
 set (LIBS ../../ThirdParty/Lua${JIT}/src)
 set (LINK_LIBS_ONLY toluapp)
 set (INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Navigation ../Resource ../Scene ../UI
-    ../../ThirdParty/SDL/include ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Engine)
+    ../../ThirdParty/SDL/include ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Source/Engine)
 
 if (URHO3D_NAVIGATION)
     set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Navigation)

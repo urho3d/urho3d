@@ -29,11 +29,11 @@
 #  URHO3D_LIBRARIES_DBG
 #
 #
-# For Urho3D project, the Urho3D library "source tree" and "build tree" paths are already known.
+# For internal Urho3D project, the Urho3D library "source tree" and "build tree" paths are already known.
 #
 # For external project that attempts to use the Urho3D source and build trees:
 #   1) Set the URHO3D_HOME environment variable to poin to the location of Urho3D "source tree"
-#   2) Set the URHO3D_BUILD_TREE environment variable to point to the location of Urho3D "build tree"
+#   2) Optionally, set the URHO3D_BUILD_TREE environment variable to point to the location of Urho3D "build tree" (if it differs from "source tree")
 # This module would not assume the location of the build tree anymore as in the previous versions.
 #
 # For external project that attempts to use the installed Urho3D SDK:
@@ -67,12 +67,15 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
     set (IS_INTERNAL 1)
 elseif (NOT URHO3D_HOME AND DEFINED ENV{URHO3D_HOME})
     # The URHO3D_HOME variable should point to Urho3D's source tree, even when Urho3D is being used in an external project which has its own source tree
-    if (NOT DEFINED ENV{URHO3D_BUILD_TREE})
-        message (FATAL_ERROR "Could not determine the Urho3D build tree location. Use URHO3D_BUILD_TREE environment variable to specify the location of the build tree.")
-    endif ()
     file (TO_CMAKE_PATH "$ENV{URHO3D_HOME}" URHO3D_HOME)
     set (URHO3D_HOME ${URHO3D_HOME} CACHE PATH "Path to Urho3D source tree")
-    file (TO_CMAKE_PATH "$ENV{URHO3D_BUILD_TREE}" URHO3D_BUILD_TREE)
+    if (DEFINED ENV{URHO3D_BUILD_TREE})
+        # Out-of-source build tree
+        file (TO_CMAKE_PATH "$ENV{URHO3D_BUILD_TREE}" URHO3D_BUILD_TREE)
+    else ()
+        # Assume to be non-out-source build tree
+        set (URHO3D_BUILD_TREE ${URHO3D_HOME})
+    endif ()
     set (URHO3D_BUILD_TREE ${URHO3D_BUILD_TREE} CACHE PATH "Path to Urho3D build tree")
 endif ()
 

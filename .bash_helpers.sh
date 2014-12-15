@@ -20,6 +20,9 @@
 # THE SOFTWARE.
 #
 
+# Detect markers in the build tree
+if [ -f $BUILD/.fix-scm ]; then FIX_SCM=1; fi
+
 # Define helpers
 post_cmake() {
     if [ $ECLIPSE ]; then
@@ -59,12 +62,15 @@ post_cmake() {
                         -r "/projectDescription/buildSpec/buildCommandNew" -v "buildCommand" \
                         $BUILD/.project
                 done
+            fi
 
-            elif [ $FIX_SCM ]; then
+            if [ $FIX_SCM ]; then
                 # Copy the Eclipse project setting files to Source tree in order to fix it so that Eclipse's SCM feature works again
                 echo -- post_cmake: Move Eclipse project setting files to $SOURCE and fix them to reenable Eclipse SCM feature
                 # Leave the original copy in the build tree
                 for f in .project .cproject; do cp $BUILD/$f $SOURCE; done
+                # Set a marker in the build tree that Eclipse project has been fixed
+                touch $BUILD/.fix-scm
 
                 #
                 # Replace [Source directory] linked resource to [Build] instead

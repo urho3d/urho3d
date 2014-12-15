@@ -53,11 +53,12 @@ int main(int argc, char** argv)
     #endif
 
     bool dumpApiMode = false;
+    String sourceTree;
     String outputFile;
 
     if (arguments.Size() < 1)
         ErrorExit("Usage: ScriptCompiler <input file> [resource path for includes]\n"
-                  "       ScriptCompiler -dumpapi <Doxygen output file> [C header output file]");
+                  "       ScriptCompiler -dumpapi <source tree> <Doxygen output file> [C header output file]");
     else
     {
         if (arguments[0] != "-dumpapi")
@@ -65,8 +66,13 @@ int main(int argc, char** argv)
         else
         {
             dumpApiMode = true;
-            if (arguments.Size() > 1)
-                outputFile = arguments[1];
+            if (arguments.Size() > 2)
+            {
+                sourceTree = arguments[1];
+                outputFile = arguments[2];
+            }
+            else
+                ErrorExit("Usage: ScriptCompiler -dumpapi <source tree> <Doxygen output file> [C header output file]");
         }
     }
 
@@ -82,6 +88,8 @@ int main(int argc, char** argv)
         engineParameters["Headless"] = true;
         engineParameters["WorkerThreads"] = false;
         engineParameters["LogName"] = String::EMPTY;
+        engineParameters["ResourcePaths"] = String::EMPTY;
+        engineParameters["AutoloadPaths"] = String::EMPTY;
         engine->Initialize(engineParameters);
     #ifdef URHO3D_LUA
         context->RegisterSubsystem(new LuaScript(context));
@@ -130,14 +138,14 @@ int main(int argc, char** argv)
             log->Open(outputFile);
         }
         // If without output file, dump to stdout instead
-        context->GetSubsystem<Script>()->DumpAPI(DOXYGEN);
+        context->GetSubsystem<Script>()->DumpAPI(DOXYGEN, sourceTree);
 
         // Only dump API as C Header when an output file name is explicitly given
-        if (arguments.Size() > 2)
+        if (arguments.Size() > 3)
         {
-            outputFile = arguments[2];
+            outputFile = arguments[3];
             log->Open(outputFile);
-            context->GetSubsystem<Script>()->DumpAPI(C_HEADER);
+            context->GetSubsystem<Script>()->DumpAPI(C_HEADER, sourceTree);
         }
     }
 

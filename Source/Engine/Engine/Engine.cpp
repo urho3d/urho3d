@@ -369,9 +369,12 @@ bool Engine::Initialize(const VariantMap& parameters)
 
     // In debug mode, check now that all factory created objects can be created without crashing
     #ifdef _DEBUG
-    const HashMap<StringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
-    for (HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
-        SharedPtr<Object> object = i->second_->CreateObject();
+    if (!resourcePaths.Empty())
+    {
+        const HashMap<StringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
+        for (HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
+            SharedPtr<Object> object = i->second_->CreateObject();
+    }
     #endif
 
     frameTimer_.Reset();
