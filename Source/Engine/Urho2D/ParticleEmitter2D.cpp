@@ -74,59 +74,6 @@ void ParticleEmitter2D::OnSetEnabled()
     }
 }
 
-void ParticleEmitter2D::Update(const FrameInfo& frame)
-{
-    if (!effect_)
-        return;
-
-    float timeStep = frame.timeStep_;
-    Vector3 worldPosition = GetNode()->GetWorldPosition();
-    float worldScale = GetNode()->GetWorldScale().x_ * PIXEL_SIZE;
-
-    boundingBoxMinPoint_ = Vector3(M_INFINITY, M_INFINITY, 0.0f);
-    boundingBoxMaxPoint_ = Vector3(-M_INFINITY, -M_INFINITY, 0.0f);
-
-    int particleIndex = 0;
-    while (particleIndex < numParticles_)
-    {
-        Particle2D& particle = particles_[particleIndex];
-        if (particle.timeToLive_ > 0.0f)
-        {
-            UpdateParticle(particle, timeStep, worldPosition, worldScale);
-            ++particleIndex;
-        }
-        else
-        {
-            if (particleIndex != numParticles_ - 1)
-                particles_[particleIndex] = particles_[numParticles_ - 1];
-            --numParticles_;
-        }
-    }
-
-    if (emissionTime_ >= 0.0f)
-    {
-        float worldAngle = GetNode()->GetWorldRotation().RollAngle();
-
-        float timeBetweenParticles = effect_->GetParticleLifeSpan() / particles_.Size();
-        emitParticleTime_ += timeStep;
-
-        while (emitParticleTime_ > 0.0f)
-        {
-            if (EmitParticle(worldPosition, worldAngle, worldScale))
-                UpdateParticle(particles_[numParticles_ - 1], emitParticleTime_, worldPosition, worldScale);
-
-            emitParticleTime_ -= timeBetweenParticles;
-        }
-
-        if (emissionTime_ > 0.0f)
-            emissionTime_ = Max(0.0f, emissionTime_ - timeStep);
-    }
-
-    verticesDirty_ = true;
-    OnMarkedDirty(node_);
-
-}
-
 void ParticleEmitter2D::SetEffect(ParticleEffect2D* model)
 {
     if (model == effect_)
@@ -274,7 +221,61 @@ void ParticleEmitter2D::UpdateVertices()
 
 void ParticleEmitter2D::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    MarkForUpdate();
+    using namespace ScenePostUpdate;
+    float timeStep = eventData[P_TIMESTEP].GetFloat();
+    Update(timeStep);
+}
+
+void ParticleEmitter2D::Update(float timeStep)
+{
+    if (!effect_)
+        return;
+
+    Vector3 worldPosition = GetNode()->GetWorldPosition();
+    float worldScale = GetNode()->GetWorldScale().x_ * PIXEL_SIZE;
+
+    boundingBoxMinPoint_ = Vector3(M_INFINITY, M_INFINITY, 0.0f);
+    boundingBoxMaxPoint_ = Vector3(-M_INFINITY, -M_INFINITY, 0.0f);
+
+    int particleIndex = 0;
+    while (particleIndex < numParticles_)
+    {
+        Particle2D& particle = particles_[particleIndex];
+        if (particle.timeToLive_ > 0.0f)
+        {
+            UpdateParticle(particle, timeStep, worldPosition, worldScale);
+            ++particleIndex;
+        }
+        else
+        {
+            if (particleIndex != numParticles_ - 1)
+                particles_[particleIndex] = particles_[numParticles_ - 1];
+            --numParticles_;
+        }
+    }
+
+    if (emissionTime_ >= 0.0f)
+    {
+        float worldAngle = GetNode()->GetWorldRotation().RollAngle();
+
+        float timeBetweenParticles = effect_->GetParticleLifeSpan() / particles_.Size();
+        emitParticleTime_ += timeStep;
+
+        while (emitParticleTime_ > 0.0f)
+        {
+            if (EmitParticle(worldPosition, worldAngle, worldScale))
+                UpdateParticle(particles_[numParticles_ - 1], emitParticleTime_, worldPosition, worldScale);
+
+            emitParticleTime_ -= timeBetweenParticles;
+        }
+
+        if (emissionTime_ > 0.0f)
+            emissionTime_ = Max(0.0f, emissionTime_ - timeStep);
+    }
+
+    verticesDirty_ = true;
+
+    OnMarkedDirty(node_);
 }
 
 bool ParticleEmitter2D::EmitParticle(const Vector3& worldPosition, float worldAngle, float worldScale)
