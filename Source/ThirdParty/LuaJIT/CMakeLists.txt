@@ -169,7 +169,7 @@ if (CMAKE_CROSSCOMPILING OR IOS)
     include (ExternalProject)
     ExternalProject_Add(buildvm
         SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated/buildvm
-        CMAKE_ARGS -DTARGET_SYS=${TARGET_SYS} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/Bin/tool
+        CMAKE_ARGS -DTARGET_SYS=${TARGET_SYS} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/Bin/tool -DURHO3D_64BIT=${URHO3D_64BIT}
     )
 else ()
     # Otherwise, build it internally as per normal

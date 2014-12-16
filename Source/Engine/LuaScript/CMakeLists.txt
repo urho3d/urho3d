@@ -32,9 +32,13 @@ endif ()
 if (CMAKE_CROSSCOMPILING OR IOS)
     # When cross-compiling, build the host tool as external project
     include (ExternalProject)
+    if (IOS)
+        # For iOS target, its host is MacOSX; Workaround a known CMake/Xcode generator bug which prevents it from installing binaries correctly
+        set (OSX_HOST -DCMAKE_OSX_SYSROOT=macosx -DIPHONEOS_DEPLOYMENT_TARGET= BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")            
+    endif ()
     ExternalProject_Add(tolua++
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
-        CMAKE_ARGS -DJIT=${JIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/Bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}
+        CMAKE_ARGS -DJIT=${JIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/Bin/tool -DURHO3D_64BIT=${URHO3D_64BIT} -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${OSX_HOST}
     )
 else ()
     # Otherwise, build it internally as per normal

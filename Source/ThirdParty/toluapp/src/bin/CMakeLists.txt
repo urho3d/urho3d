@@ -42,7 +42,7 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     endif ()
 
     # Set CMake modules search path
-    set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/../../../../../CMake/Modules)
+    set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/CMake/Modules)
 
     # Include Urho3D Cmake common module
     include (Urho3D-CMake-common)

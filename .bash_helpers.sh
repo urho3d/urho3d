@@ -106,7 +106,7 @@ post_cmake() {
             sed -i '' 's/\/Contents\/MacOS//g' $BUILD/CMakeScripts/XCODE_DEPEND_HELPER.make
         fi
 
-        # Temporary fix: known CMake bug (still exists in 2.8.12)
+        # Temporary fix: known CMake bug (still exists in 3.0.2)
         if [ -e $BUILD/CMakeScripts/install_postBuildPhase.makeDebug ]; then
             # Due to a bug in the CMake/Xcode generator that prevents iOS targets (library and bundle) to be installed correctly
             # (see http://public.kitware.com/Bug/bug_relationship_graph.php?bug_id=12506&graph=dependency),
