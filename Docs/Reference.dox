@@ -2248,40 +2248,49 @@ Attribute animation supports three different wrap modes:
 - WM_ONCE: Play once mode, when the animation is finished, it will be removed from the object.
 - WM_CLAMP: Clamp mode, when the animation is finished, it will keep the last key frame's value.
 
-The playback speed (default 1.0f or "original speed") of an animation, as well as the animation's wrap mode can be adjusted on the fly.
+The playback speed (default 1 or "original speed") of an animation, as well as the animation's wrap mode can be adjusted on the fly.
 
-The ObjectAnimation class can be used to group together multiple value animations that affect different attributes. For example when the user wants to apply position and color animation for light, the following code can be used:
+The ObjectAnimation class can be used to group together multiple value animations that affect different attributes. For example when the user wants to apply position and color animation for a light, the following code can be used. Note that the object animation is attached to the light's scene node, so a special syntax is needed to refer to the light component's attribute.
+
 \code
-// Create object animation.
+// Create light animation
 SharedPtr<ObjectAnimation> lightAnimation(new ObjectAnimation(context_));
 
-// Create position animation
+// Create light position animation
 SharedPtr<ValueAnimation> positionAnimation(new ValueAnimation(context_));
-positionAnimation->SetKeyFrame(0.0f, Vector3::ZERO);
-positionAnimation->SetKeyFrame(1.0f, Vector3(1.0f, 1.0f, 1.0f));
-positionAnimation->SetKeyFrame(4.0f, Vector3::ZERO);
-// Add position animation
-lightAnimation->AddAttributeAnimation("Position", positionAnimation, WM_LOOP); 
+// Use spline interpolation method
+positionAnimation->SetInterpolationMethod(IM_SPLINE);
+// Set spline tension
+positionAnimation->SetSplineTension(0.7f);
+positionAnimation->SetKeyFrame(0.0f, Vector3(-30.0f, 5.0f, -30.0f));
+positionAnimation->SetKeyFrame(1.0f, Vector3( 30.0f, 5.0f, -30.0f));
+positionAnimation->SetKeyFrame(2.0f, Vector3( 30.0f, 5.0f,  30.0f));
+positionAnimation->SetKeyFrame(3.0f, Vector3(-30.0f, 5.0f,  30.0f));
+positionAnimation->SetKeyFrame(4.0f, Vector3(-30.0f, 5.0f, -30.0f));
+// Set position animation
+lightAnimation->AddAttributeAnimation("Position", positionAnimation);
 
-// Create color animation
+// Create light color animation
 SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
 colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
+colorAnimation->SetKeyFrame(1.0f, Color::RED);
 colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
+colorAnimation->SetKeyFrame(3.0f, Color::GREEN);
 colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
-// Add color animation
-lightAnimation->AddAttributeAnimation("Color", colorAnimation, WM_LOOP); 
+// Set Light component's color animation
+lightAnimation->AddAttributeAnimation("@Light/Color", colorAnimation);
 
-// Apply object animation to light
-light->SetObjectAnimation(lightAnimation);
+// Apply light animation to light node
+lightNode->SetObjectAnimation(lightAnimation);
 \endcode
 
 %Object animations can also be loaded from file, like:
 \code
 ObjectAnimation * lightAnimation = cache->GetResource<ObjectAnimation>("Scene/LightAnimation.xml");
-light-> SetObjectAnimation (lightAnimation);
+lightNode->SetObjectAnimation (lightAnimation);
 \endcode
 
-Attribute animation uses linear interpolation for floating point types (like float, Vector2, Vector3 etc), and no interpolation for integer and non-numeric types (like int, bool).
+Attribute animation uses either linear or spline interpolation for floating point types (like float, Vector2, Vector3 etc), and no interpolation for integer and non-numeric types (like int, bool).
 
 \section AttributeAnimation_Classes Attribute animation classes
 
