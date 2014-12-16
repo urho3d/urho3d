@@ -38,7 +38,7 @@ const float PIXEL_SIZE = 0.01f;
 extern const char* blendModeNames[];
 
 Drawable2D::Drawable2D(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),
+    Drawable(context, DRAWABLE_GEOMETRY2D),
     layer_(0),
     orderInLayer_(0),
     blendMode_(BLEND_ALPHA),
@@ -59,6 +59,16 @@ void Drawable2D::RegisterObject(Context* context)
     COPY_BASE_ATTRIBUTES(Drawable);
 }
 
+void Drawable2D::OnSetEnabled()
+{
+    bool enabled = IsEnabledEffective();
+
+    if (enabled && renderer_)
+        renderer_->AddDrawable(this);
+    else if (!enabled && renderer_)
+        renderer_->RemoveDrawable(this);
+}
+
 void Drawable2D::SetLayer(int layer)
 {
     if (layer == layer_)
@@ -67,6 +77,9 @@ void Drawable2D::SetLayer(int layer)
     layer_ = layer;
 
     OnLayerChanged();
+
+    if (renderer_)
+        renderer_->MarkOrderDirty();
 
     MarkNetworkUpdate();
 }
@@ -80,6 +93,9 @@ void Drawable2D::SetOrderInLayer(int orderInLayer)
     
     OnLayerChanged();
 
+    if (renderer_)
+        renderer_->MarkOrderDirty();
+
     MarkNetworkUpdate();
 }
 
@@ -92,7 +108,9 @@ void Drawable2D::SetTexture(Texture2D* texture)
 
     verticesDirty_ = true;
     material_ = 0;
-    
+    if (renderer_)
+        renderer_->MarkMaterialDirty(this);
+
     OnMarkedDirty(node_);
 
     MarkNetworkUpdate();
@@ -105,6 +123,8 @@ void Drawable2D::SetBlendMode(BlendMode blendMode)
 
     blendMode_ = blendMode;
     material_ = 0;
+    if (renderer_)
+        renderer_->MarkMaterialDirty(this);
 
     OnBlendModeChanged();
 
@@ -118,6 +138,9 @@ void Drawable2D::SetCustomMaterial(Material* customMaterial)
 
     customMaterial_ = customMaterial;
     material_ = 0;
+    if (renderer_)
+        renderer_->MarkMaterialDirty(this);
+
     MarkNetworkUpdate();
 }
 
@@ -150,13 +173,24 @@ const Vector<Vertex2D>& Drawable2D::GetVertices()
 
 void Drawable2D::OnNodeSet(Node* node)
 {
-    Drawable::OnNodeSet(node);
+    // Do not call Drawable::OnNodeSet(node)
 
     if (node)
     {
         Scene* scene = GetScene();
         if (scene)
-            scene->GetOrCreateComponent<Renderer2D>();
+        {
+            renderer_ = scene->GetOrCreateComponent<Renderer2D>();
+            if (IsEnabledEffective())
+                renderer_->AddDrawable(this);
+        }
+
+        node->AddListener(this);
+    }
+    else
+    {
+        if (renderer_)
+            renderer_->RemoveDrawable(this);
     }
 }
 

@@ -45,6 +45,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    /// Process octree raycast. May be called from a worker thread.
+    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateBatches(const FrameInfo& frame);
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
@@ -52,6 +54,14 @@ public:
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
 
+    /// Add Drawable2D.
+    void AddDrawable(Drawable2D* drawable);
+    /// Remove Drawable2D.
+    void RemoveDrawable(Drawable2D* drawable);
+    /// Mark material dirty.
+    void MarkMaterialDirty(Drawable2D* drawable);
+    /// Mark order dirty.
+    void MarkOrderDirty(){ orderDirty_ = true; }
     /// Check visibility.
     bool CheckVisibility(Drawable2D* drawable) const;
 
@@ -75,6 +85,10 @@ private:
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// Drawables.
     PODVector<Drawable2D*> drawables_;
+    /// Material dirty drawables.
+    PODVector<Drawable2D*> materialDirtyDrawables_;
+    /// Order dirty.
+    bool orderDirty_;
     /// Materials.
     Vector<SharedPtr<Material> > materials_;
     /// Geometries.
