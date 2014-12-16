@@ -61,6 +61,9 @@ public:
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled();
+
     /// Set layer.
     void SetLayer(int layer);
     /// Set order in layer.
@@ -124,6 +127,8 @@ protected:
     bool verticesDirty_;
     /// Material.
     SharedPtr<Material> material_;
+    /// Renderer2D.
+    WeakPtr<Renderer2D> renderer_;
     /// Test visible.
     bool visibility_;
 };

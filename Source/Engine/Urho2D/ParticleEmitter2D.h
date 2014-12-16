@@ -87,9 +87,7 @@ public:
 
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
-    /// Update before octree reinsertion. is called from a worker thread.
-    virtual void Update(const FrameInfo& frame);
-
+    
     /// Set particle effect.
     void SetEffect(ParticleEffect2D* effect);
     /// Set sprite.
@@ -122,6 +120,8 @@ private:
     virtual void UpdateVertices();
     /// Handle scene post update.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
+    /// Update.
+    void Update(float timeStep);
     /// Emit particle.
     bool EmitParticle(const Vector3& worldPosition, float worldAngle, float worldScale);
     /// Update particle.
