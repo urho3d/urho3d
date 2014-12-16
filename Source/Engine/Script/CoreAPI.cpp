@@ -253,6 +253,20 @@ static void ConstructVariantPtr(RefCounted* value, Variant* ptr)
     new(ptr) Variant(value);
 }
 
+static void ConstructVariantScriptObject(asIScriptObject* value, Variant* ptr)
+{
+    if (value)
+    {
+        asIObjectType* scriptObjectInterface = value->GetEngine()->GetObjectTypeByName("ScriptObject");
+        if (value->GetObjectType()->Implements(scriptObjectInterface))
+            new(ptr) Variant(value);
+        else
+            new(ptr) Variant();
+    }
+    else
+        new(ptr) Variant();
+}
+
 static void ConstructVariantMatrix3(const Matrix3& value, Variant* ptr)
 {
     new(ptr) Variant(value);
@@ -301,6 +315,19 @@ static bool VariantEqualsVariantVector(CScriptArray* value, Variant* ptr)
 static CScriptArray* VariantGetVariantVector(Variant* ptr)
 {
     return VectorToArray<Variant>(ptr->GetVariantVector(), "Array<Variant>");
+}
+
+static asIScriptObject* VariantGetScriptObject(Variant* ptr)
+{
+    asIScriptObject* object = static_cast<asIScriptObject*>(ptr->GetVoidPtr());
+    if (!object)
+        return 0;
+
+    asIObjectType* scriptObjectInterface = object->GetEngine()->GetObjectTypeByName("ScriptObject");
+    if (!object->GetObjectType()->Implements(scriptObjectInterface))
+        return 0;
+
+    return object;
 }
 
 static void ConstructVariantMap(VariantMap* ptr)
@@ -430,6 +457,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const IntRect&in)", asFUNCTION(ConstructVariantIntRect), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", asFUNCTION(ConstructVariantIntVector2), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(RefCounted@+)", asFUNCTION(ConstructVariantPtr), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(ScriptObject@+)", asFUNCTION(ConstructVariantScriptObject), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Matrix3&in)", asFUNCTION(ConstructVariantMatrix3), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Matrix3x4&in)", asFUNCTION(ConstructVariantMatrix3x4), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Matrix4&in)", asFUNCTION(ConstructVariantMatrix4), asCALL_CDECL_OBJLAST);
@@ -456,6 +484,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const IntRect&in)", asMETHODPR(Variant, operator =, (const IntRect&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const IntVector2&in)", asMETHODPR(Variant, operator =, (const IntVector2&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(RefCounted@+)", asMETHODPR(Variant, operator =, (RefCounted*), Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(ScriptObject@+)", asMETHODPR(Variant, operator =, (void*), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Matrix3&in)", asMETHODPR(Variant, operator =, (const Matrix3&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Matrix3x4&in)", asMETHODPR(Variant, operator =, (const Matrix3x4&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Matrix4&in)", asMETHODPR(Variant, operator =, (const Matrix4&), Variant&), asCALL_THISCALL);
@@ -478,6 +507,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "bool opEquals(const IntRect&in) const", asMETHODPR(Variant, operator ==, (const IntRect&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const IntVector2&in) const", asMETHODPR(Variant, operator ==, (const IntVector2&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(RefCounted@+) const", asMETHODPR(Variant, operator ==, (RefCounted*) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(ScriptObject@+) const", asMETHODPR(Variant, operator ==, (void*) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Matrix3&in) const", asMETHODPR(Variant, operator ==, (const Matrix3&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Matrix3x4&in) const", asMETHODPR(Variant, operator ==, (const Matrix3x4&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Matrix4&in) const", asMETHODPR(Variant, operator ==, (const Matrix4&) const, bool), asCALL_THISCALL);
@@ -499,6 +529,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "const IntRect& GetIntRect() const", asMETHOD(Variant, GetIntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "const IntVector2& GetIntVector2() const", asMETHOD(Variant, GetIntVector2), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "RefCounted@+ GetPtr() const", asMETHOD(Variant, GetPtr), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "ScriptObject@+ GetScriptObject() const", asFUNCTION(VariantGetScriptObject), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "const Matrix3& GetMatrix3() const", asMETHOD(Variant, GetMatrix3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "const Matrix3x4& GetMatrix3x4() const", asMETHOD(Variant, GetMatrix3x4), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "const Matrix4& GetMatrix4() const", asMETHOD(Variant, GetMatrix4), asCALL_THISCALL);

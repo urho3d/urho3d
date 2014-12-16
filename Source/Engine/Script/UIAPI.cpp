@@ -154,18 +154,25 @@ static void RegisterCursor(asIScriptEngine* engine)
 {
     engine->RegisterEnum("CursorShape");
     engine->RegisterEnumValue("CursorShape", "CS_NORMAL", CS_NORMAL);
+    engine->RegisterEnumValue("CursorShape", "CS_IBEAM", CS_IBEAM);
+    engine->RegisterEnumValue("CursorShape", "CS_CROSS", CS_CROSS);
     engine->RegisterEnumValue("CursorShape", "CS_RESIZEVERTICAL", CS_RESIZEVERTICAL);
     engine->RegisterEnumValue("CursorShape", "CS_RESIZEDIAGONAL_TOPRIGHT", CS_RESIZEDIAGONAL_TOPRIGHT);
     engine->RegisterEnumValue("CursorShape", "CS_RESIZEHORIZONTAL", CS_RESIZEHORIZONTAL);
     engine->RegisterEnumValue("CursorShape", "CS_RESIZEDIAGONAL_TOPLEFT", CS_RESIZEDIAGONAL_TOPLEFT);
+    engine->RegisterEnumValue("CursorShape", "CS_RESIZE_ALL", CS_RESIZE_ALL);
     engine->RegisterEnumValue("CursorShape", "CS_ACCEPTDROP", CS_ACCEPTDROP);
     engine->RegisterEnumValue("CursorShape", "CS_REJECTDROP", CS_REJECTDROP);
     engine->RegisterEnumValue("CursorShape", "CS_BUSY", CS_BUSY);
+    engine->RegisterEnumValue("CursorShape", "CS_BUSY_ARROW", CS_BUSY_ARROW);
 
     RegisterBorderImage<Cursor>(engine, "Cursor");
-    engine->RegisterObjectMethod("Cursor", "void DefineShape(CursorShape, Texture@+, const IntRect&in, const IntVector2&in)", asMETHOD(Cursor, DefineShape), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Cursor", "void set_shape(CursorShape)", asMETHOD(Cursor, SetShape), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Cursor", "CursorShape get_shape() const", asMETHOD(Cursor, GetShape), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "void DefineShape(const String&in, Texture@+, const IntRect&in, const IntVector2&in)", asMETHODPR(Cursor, DefineShape, (CursorShape, Image*, const IntRect&, const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "void DefineShape(CursorShape, Texture@+, const IntRect&in, const IntVector2&in)", asMETHODPR(Cursor, DefineShape, (const String&, Image*, const IntRect&, const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "void SetShape(const String&in)", asMETHODPR(Cursor, SetShape, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "void SetShape(CursorShape)", asMETHODPR(Cursor, SetShape, (CursorShape), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "void set_shape(const String&in)", asMETHODPR(Cursor, SetShape, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "const String& get_shape() const", asMETHOD(Cursor, GetShape), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "void set_useSystemShapes(bool)", asMETHOD(Cursor, SetUseSystemShapes), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "bool get_useSystemShapes() const", asMETHOD(Cursor, GetUseSystemShapes), asCALL_THISCALL);
 }

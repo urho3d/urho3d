@@ -39,7 +39,7 @@ static const int STREAM_BUFFER_LENGTH = 100;
 class URHO3D_API SoundSource : public Component
 {
     OBJECT(SoundSource);
-
+    
 public:
     /// Construct.
     SoundSource(Context* context);
@@ -47,7 +47,7 @@ public:
     virtual ~SoundSource();
     /// Register object factory.
     static void RegisterObject(Context* context);
-
+    
     /// Play a sound.
     void Play(Sound* sound);
     /// Play a sound with specified frequency.
@@ -61,7 +61,7 @@ public:
     /// Stop playback.
     void Stop();
     /// Set sound type, determines the master gain group.
-    void SetSoundType(SoundType type);
+    void SetSoundType(const String& type);
     /// Set frequency.
     void SetFrequency(float frequency);
     /// Set gain. 0.0 is silence, 1.0 is full volume.
@@ -74,13 +74,13 @@ public:
     void SetAutoRemove(bool enable);
     /// Set new playback position.
     void SetPlayPosition(signed char* pos);
-
+    
     /// Return sound.
     Sound* GetSound() const { return sound_; }
     /// Return playback position.
     volatile signed char* GetPlayPosition() const { return position_; }
     /// Return sound type, determines the master gain group.
-    SoundType GetSoundType() const { return soundType_; }
+    String GetSoundType() const { return soundType_; }
     /// Return playback time position.
     float GetTimePosition() const { return timePosition_; }
     /// Return frequency.
@@ -95,12 +95,14 @@ public:
     bool GetAutoRemove() const { return autoRemove_; }
     /// Return whether is playing.
     bool IsPlaying() const;
-
+    
     /// Update the sound source. Perform subclass specific operations. Called by Audio.
     virtual void Update(float timeStep);
     /// Mix sound source output to a 32-bit clipping buffer. Called by Audio.
     void Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolation);
-
+    /// Update the effective master gain. Called internally and by Audio when the master gain changes.
+    void UpdateMasterGain();
+    
     /// Set sound attribute.
     void SetSoundAttr(const ResourceRef& value);
     /// Set sound position attribute.
@@ -111,12 +113,14 @@ public:
     void SetPlayingAttr(bool value);
     /// Return sound position attribute.
     int GetPositionAttr() const;
-
+    
 protected:
     /// Audio subsystem.
     WeakPtr<Audio> audio_;
     /// SoundSource type, determines the master gain group.
-    SoundType soundType_;
+    String soundType_;
+    /// SoundSource type hash.
+    StringHash soundTypeHash_;
     /// Frequency.
     float frequency_;
     /// Gain.
@@ -127,9 +131,11 @@ protected:
     float panning_;
     /// Autoremove timer.
     float autoRemoveTimer_;
+    /// Effective master gain.
+    float masterGain_;
     /// Autoremove flag.
     bool autoRemove_;
-
+    
 private:
     /// Play a sound without locking the audio mutex. Called internally.
     void PlayLockless(Sound* sound);
@@ -159,7 +165,7 @@ private:
     void MixZeroVolume(Sound* sound, unsigned samples, int mixRate);
     /// Advance playback pointer to simulate audio playback in headless mode.
     void MixNull(float timeStep);
-
+    
     /// Sound that is being played.
     SharedPtr<Sound> sound_;
     /// Sound stream that is being played.

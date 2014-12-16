@@ -159,8 +159,10 @@ void LineEdit::OnDragMove(const IntVector2& position, const IntVector2& screenPo
 
 bool LineEdit::OnDragDropTest(UIElement* source)
 {
-    if (source)
+    if (source && editable_)
     {
+        if (source->GetVars().Contains(VAR_DRAGDROPCONTENT))
+            return true;
         StringHash sourceType = source->GetType();
         return sourceType == LineEdit::GetTypeStatic() || sourceType == Text::GetTypeStatic();
     }

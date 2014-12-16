@@ -251,6 +251,28 @@
                 <element style="ListRow">
                     <attribute name="Layout Spacing" value="8" />
                     <element type="Text">
+                        <attribute name="Text" value="Render path" />
+                        <attribute name="Min Size" value="88 17" />
+                        <attribute name="Max Size" value="88 17" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="RenderPathNameEdit" />
+                     </element>
+                    <element type="Button">
+                        <attribute name="Name" value="PickRenderPathButton" />
+                        <attribute name="Min Size" value="36 17" />
+                        <attribute name="Max Size" value="36 17" />
+                        <attribute name="Layout Mode" value="Vertical" />
+                        <attribute name="Layout Border" value="1 1 1 1" />
+                        <element type="Text">
+                            <attribute name="Text" value="Pick" />
+                            <attribute name="Text Alignment" value="Center" />
+                        </element>
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
                         <attribute name="Text" value="Texture quality" />
                     </element>
                     <element type="DropDownList">

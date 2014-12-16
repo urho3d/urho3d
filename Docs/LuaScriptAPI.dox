@@ -460,7 +460,7 @@ Methods:
 - bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true)
 - bool Play()
 - void Stop()
-- void SetMasterGain(SoundType type, float gain)
+- void SetMasterGain(const String type, float gain)
 - void SetListener(SoundListener* listener)
 - void StopSound(Sound* sound)
 - unsigned GetSampleSize() const
@@ -469,12 +469,12 @@ Methods:
 - bool IsStereo() const
 - bool IsPlaying() const
 - bool IsInitialized() const
-- float GetMasterGain(SoundType type) const
+- bool HasMasterGain(const String type) const
+- float GetMasterGain(const String type) const
 - SoundListener* GetListener() const
 - const PODVector<SoundSource*>& GetSoundSources() const
 - void AddSoundSource(SoundSource* soundSource)
 - void RemoveSoundSource(SoundSource* soundSource)
-- float GetSoundSourceMasterGain(SoundType type) const
 - void MixOutput(void* dest, unsigned samples)
 
 Properties:
@@ -1569,15 +1569,17 @@ Methods:
 - Cursor() (GC)
 - Cursor* new()
 - void delete()
+- void DefineShape(const String shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot)
 - void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot)
 - void SetShape(CursorShape shape)
+- void SetShape(const String shape)
 - void SetUseSystemShapes(bool enable)
-- CursorShape GetShape() const
+- String GetShape() const
 - bool GetUseSystemShapes() const
 
 Properties:
 
-- CursorShape shape
+- String shape
 - bool useSystemShapes
 
 <a name="Class_CustomGeometry"></a>
@@ -4879,14 +4881,14 @@ Methods:
 - void Play(Sound* sound, float frequency, float gain)
 - void Play(Sound* sound, float frequency, float gain, float panning)
 - void Stop()
-- void SetSoundType(SoundType type)
+- void SetSoundType(const String type)
 - void SetFrequency(float frequency)
 - void SetGain(float gain)
 - void SetAttenuation(float attenuation)
 - void SetPanning(float panning)
 - void SetAutoRemove(bool enable)
 - Sound* GetSound() const
-- SoundType GetSoundType() const
+- String GetSoundType() const
 - float GetTimePosition() const
 - float GetFrequency() const
 - float GetGain() const
@@ -4898,7 +4900,7 @@ Methods:
 Properties:
 
 - Sound* sound (readonly)
-- SoundType soundType
+- String soundType
 - float timePosition (readonly)
 - float frequency
 - float gain
@@ -6780,13 +6782,17 @@ Properties:
 ### CursorShape
 
 - int CS_NORMAL
+- int CS_IBEAM
+- int CS_CROSS
 - int CS_RESIZEVERTICAL
 - int CS_RESIZEDIAGONAL_TOPRIGHT
 - int CS_RESIZEHORIZONTAL
 - int CS_RESIZEDIAGONAL_TOPLEFT
+- int CS_RESIZE_ALL
 - int CS_ACCEPTDROP
 - int CS_REJECTDROP
 - int CS_BUSY
+- int CS_BUSY_ARROW
 - int CS_MAX_SHAPES
 
 ### EmitterType
@@ -6995,15 +7001,6 @@ Properties:
 - int SHAPE_TRIANGLEMESH
 - int SHAPE_CONVEXHULL
 - int SHAPE_TERRAIN
-
-### SoundType
-
-- int SOUND_EFFECT
-- int SOUND_AMBIENT
-- int SOUND_VOICE
-- int SOUND_MUSIC
-- int SOUND_MASTER
-- int MAX_SOUND_TYPES
 
 ### StencilOp
 
@@ -7743,6 +7740,11 @@ Properties:
 - int SHADOWQUALITY_HIGH_24BIT
 - int SHADOWQUALITY_LOW_16BIT
 - int SHADOWQUALITY_LOW_24BIT
+- String SOUND_AMBIENT
+- String SOUND_EFFECT
+- String SOUND_MASTER
+- String SOUND_MUSIC
+- String SOUND_VOICE
 - unsigned VO_DISABLE_OCCLUSION
 - unsigned VO_DISABLE_SHADOWS
 - unsigned VO_LOW_MATERIAL_QUALITY

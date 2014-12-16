@@ -1,21 +1,17 @@
 $#include "Audio.h"
 
-enum SoundType
-{
-    SOUND_EFFECT,
-    SOUND_AMBIENT,
-    SOUND_VOICE,
-    SOUND_MUSIC,
-    SOUND_MASTER,
-    MAX_SOUND_TYPES
-};
+static const String SOUND_MASTER;
+static const String SOUND_EFFECT;
+static const String SOUND_AMBIENT;
+static const String SOUND_VOICE;
+static const String SOUND_MUSIC;
 
 class Audio : public Object
 {
     bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true);
     bool Play();
     void Stop();
-    void SetMasterGain(SoundType type, float gain);
+    void SetMasterGain(const String type, float gain);
     void SetListener(SoundListener* listener);
     void StopSound(Sound* sound);
 
@@ -25,13 +21,14 @@ class Audio : public Object
     bool IsStereo() const;
     bool IsPlaying() const;
     bool IsInitialized() const;
-    float GetMasterGain(SoundType type) const;
+    bool HasMasterGain(const String type) const;
+    float GetMasterGain(const String type) const;
     SoundListener* GetListener() const;
     const PODVector<SoundSource*>& GetSoundSources() const;
 
     void AddSoundSource(SoundSource* soundSource);
     void RemoveSoundSource(SoundSource* soundSource);
-    float GetSoundSourceMasterGain(SoundType type) const;
+
     void MixOutput(void *dest, unsigned samples);
 
     tolua_readonly tolua_property__get_set unsigned sampleSize;

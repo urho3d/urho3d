@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<element type="Window">
+	<attribute name="Name" value="SoundTypeWindow" />
+	<attribute name="Max Size" value="300 2147483647" />
+	<attribute name="Layout Mode" value="Vertical" />
+	<attribute name="Layout Spacing" value="4" />
+	<attribute name="Layout Border" value="6 6 6 6" />
+	<attribute name="Resize Border" value="6 6 6 6" />
+	<attribute name="Is Movable" value="true" />
+	<attribute name="Is Resizable" value="true" />
+	<element>
+		<attribute name="Max Size" value="2147483647 16" />
+		<attribute name="Layout Mode" value="Horizontal" />
+		<element type="Text">
+			<attribute name="Text" value="Sound Type editor" />
+		</element>
+		<element type="Button" style="CloseButton">
+			<attribute name="Name" value="CloseButton" />
+		</element>
+	</element>
+	<element type="BorderImage" style="EditorDivider" />
+	<element type="Text">
+		<attribute name="Text" value="Defaults" />
+	</element>
+	<element type="ListView" style="PanelView">
+		<attribute name="Name" value="DefaultsContainer" />
+		<attribute name="Min Size" value="0 60" />
+		<element type="BorderImage" internal="true" style="none">
+			<element internal="true" style="none">
+				<element style="ListRow">
+					<attribute name="Name" value="Master" />
+					<attribute name="Layout Spacing" value="10" />
+					<element type="Text">
+						<attribute name="Text" value="Master" />
+					</element>
+					<element type="LineEdit">
+						<attribute name="Name" value="MasterValue" />
+						<attribute name="Min Size" value="100 0" />
+						<attribute name="Max Size" value="2147483647 20" />
+						<attribute name="Max Length" value="4" />
+					</element>
+				</element>
+			</element>
+		</element>
+	</element>
+	<element type="BorderImage" style="EditorDivider" />
+	<element type="Text">
+		<attribute name="Text" value="User" />
+	</element>
+	<element type="ListView" style="PanelView">
+		<attribute name="Name" value="UserContainer" />
+		<attribute name="Min Size" value="0 60" />
+		<element type="BorderImage" internal="true" style="none">
+			<element internal="true" style="none">
+            </element>
+		</element>
+	</element>
+    <element>
+        <attribute name="Max Size" value="2147483647 30" />   
+        <attribute name="Layout Mode" value="Horizontal" />
+        <element type="LineEdit">
+            <attribute name="Name" value="Key" />
+            <attribute name="Min Size" value="100 20" />
+            <attribute name="Max Size" value="2147483647 20" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="Gain" />
+            <attribute name="Min Size" value="100 20" />
+            <attribute name="Max Size" value="2147483647 20" />
+        </element>
+		<element type="Button" >
+			<attribute name="Name" value="AddButton" />
+            <attribute name="Min Size" value="0 20" />
+            <attribute name="Max Size" value="2147483647 20" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <element type="Text">
+                <attribute name="Text" value="Add" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+		</element>
+    </element>
+</element>

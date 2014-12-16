@@ -70,6 +70,7 @@ Script::Script(Context* context) :
     RegisterArray(scriptEngine_);
     RegisterString(scriptEngine_);
     RegisterDictionary(scriptEngine_);
+    RegisterScriptInterfaceAPI(scriptEngine_);
 
     // Register the rest of the script API
     RegisterMathAPI(scriptEngine_);

@@ -22,18 +22,15 @@
 
 #pragma once
 
+#include "Str.h"
+
 namespace Urho3D
 {
 
-/// SoundSource type enumeration for master gain control.
-enum SoundType
-{
-    SOUND_EFFECT = 0,
-    SOUND_AMBIENT,
-    SOUND_VOICE,
-    SOUND_MUSIC,
-    SOUND_MASTER,
-    MAX_SOUND_TYPES
-};
-
+/// SoundSource type defaults
+static const String SOUND_MASTER = "Master";
+static const String SOUND_EFFECT = "Effect";
+static const String SOUND_AMBIENT = "Ambient";
+static const String SOUND_VOICE = "Voice";
+static const String SOUND_MUSIC = "Music";
 }

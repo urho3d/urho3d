@@ -1509,14 +1509,9 @@ To hear pseudo-3D positional sounds, a SoundListener component must exist in a s
 
 The output is software mixed for an unlimited amount of simultaneous sounds. Ogg Vorbis sounds are decoded on the fly, and decoding them can be memory- and CPU-intensive, so WAV files are recommended when a large number of short sound effects need to be played.
 
-For purposes of volume control, each SoundSource is classified into one of four categories:
+For purposes of volume control, each SoundSource can be classified into a user defined group which is multiplied with a master category and the individual SoundSource gain set using \ref SoundSource::SetGain "SetGain()" for the final volume level.
 
-- %Sound effects
-- Ambient
-- Music
-- Voice
-
-A master gain category also exists that affects the final output level. To control the category volumes, use \ref Audio::SetMasterGain "SetMasterGain()".
+To control the category volumes, use \ref Audio::SetMasterGain "SetMasterGain()", which defines the category if it didn't already exist.
 
 The SoundSource components support automatic removal from the node they belong to, once playback is finished. To use, call \ref SoundSource::SetAutoRemove "SetAutoRemove()" on them. This may be useful when a game object plays several "fire and forget" sound effects.
 
@@ -1752,6 +1747,79 @@ For FreeType fonts, it is possible to adjust the positioning of the font glyphs.
 Sprites are a special kind of %UI element that allow subpixel (float) positioning and scaling, as well as rotation, while the other elements use integer positioning for pixel-perfect display. Sprites can be used to implement rotating HUD elements such as minimaps or speedometer needles.
 
 Due to the free transformability, sprites can not be reliably queried with \ref UI::GetElementAt "GetElementAt()". Also, only other sprites should be parented to sprites, as the other elements do not support scaling and rotation.
+
+\section UI_Cursor_Shapes Cursor Shapes
+
+Urho3D supports custom Cursor Shapes defined from an \ref Image.
+
+The Shape can be an OS default from the \ref CursorShape "CursorShape" enum, which are automatically switched to and from by the \ref UI "UI" subsystem, but can be manually switched to using \ref Cursor::SetShape "Cursor::SetShape(CursorShape)".
+
+Alternatively they can be defined using a name in String format to identify it, which can only be manually switched to and from using \ref Cursor::SetShape "Cursor::SetShape(const String&)".
+
+There are a number of reserved names that are used for the OS defaults:
+    - Normal
+    - IBeam
+    - Cross
+    - ResizeVertical
+    - ResizeDiagonalTopRight
+    - ResizeHorizontal
+    - ResizeDiagonalTopLeft
+    - ResizeAll
+    - AcceptDrop
+    - RejectDrop
+    - Busy
+    - BusyArrow
+	
+Cursor Shapes can be define in a number of different ways:
+
+XML:
+\code
+	<element type="Cursor">
+		<attribute name="Shapes">
+			<variant type="VariantVector" >
+				<variant type="String" value="Normal" />
+				<variant type="ResourceRef" value="Image;Textures/UI.png" />
+				<variant type="IntRect" value="0 0 12 24" />
+				<variant type="IntVector2" value="0 0" />
+			</variant>  
+			<variant type="VariantVector" >
+				<variant type="String" value="Custom" />
+				<variant type="ResourceRef" value="Image;Textures/UI.png" />
+				<variant type="IntRect" value="12 0 12 36" />
+				<variant type="IntVector2" value="0 0" />
+			</variant>  
+		</atrribute>
+	</element>
+\endcode
+
+C++:
+\code
+    UI* ui = GetSubsystem<UI>();
+    ResourceCache* rc = GetSubsystem<ResourceCache>();
+
+    Cursor* cursor = new Cursor(context_);
+    Image* image = rc->GetResource<Image>("Textures/UI.png");
+    if (image)
+	{
+        cursor->DefineShape(CS_NORMAL, image, IntRect(0, 0, 12, 24), IntVector2(0, 0));
+		cursor->DefineShape("Custom", image, IntRect(12, 0, 12, 36), IntVector2(0, 0));
+	}
+
+    ui->SetCursor(cursor);
+\endcode
+
+Angelcode:
+\code
+	Cursor@ cursor = new Cursor();
+	Image@ image = cache.GetResource("Image", "Textures/UI.png");
+	if (image !is null)
+	{
+		cursor.DefineShape(CS_NORMAL, image, IntRect(0, 0, 12, 24), IntVector2(0, 0));
+		cursor.DefineShape("Custom", image, IntRect(12, 0, 12, 36), IntVector2(0, 0));
+	}
+		
+	ui.SetCursor(cursor);
+\endcode
 
 \page Urho2D Urho2D
 In order to make 2D games in Urho3D, the Urho2D sublibrary is provided. Urho2D includes 2D graphics and 2D physics.

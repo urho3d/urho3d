@@ -73,6 +73,11 @@ void UpdateEditorSettingsDialog()
     DropDownList@ pickModeEdit = settingsDialog.GetChild("PickModeEdit", true);
     pickModeEdit.selection = pickMode;
 
+    LineEdit@ renderPathNameEdit = settingsDialog.GetChild("RenderPathNameEdit", true);
+    renderPathNameEdit.text = renderPathName;
+
+    Button@ pickRenderPathButton = settingsDialog.GetChild("PickRenderPathButton", true);
+
     DropDownList@ textureQualityEdit = settingsDialog.GetChild("TextureQualityEdit", true);
     textureQualityEdit.selection = renderer.textureQuality;
 
@@ -126,6 +131,8 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(importOptionsEdit, "TextChanged", "EditImportOptions");
         SubscribeToEvent(importOptionsEdit, "TextFinished", "EditImportOptions");
         SubscribeToEvent(pickModeEdit, "ItemSelected", "EditPickMode");
+        SubscribeToEvent(renderPathNameEdit, "TextFinished", "EditRenderPathName");
+        SubscribeToEvent(pickRenderPathButton, "Released", "PickRenderPath");
         SubscribeToEvent(textureQualityEdit, "ItemSelected", "EditTextureQuality");
         SubscribeToEvent(materialQualityEdit, "ItemSelected", "EditMaterialQuality");
         SubscribeToEvent(shadowResolutionEdit, "ItemSelected", "EditShadowResolution");
@@ -281,6 +288,26 @@ void EditPickMode(StringHash eventType, VariantMap& eventData)
 {
     DropDownList@ edit = eventData["Element"].GetPtr();
     pickMode = edit.selection;
+}
+
+void EditRenderPathName(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ edit = eventData["Element"].GetPtr();
+    SetRenderPath(edit.text);
+}
+
+void PickRenderPath(StringHash eventType, VariantMap& eventData)
+{
+    CreateFileSelector("Load render path", "Load", "Cancel", uiRenderPathPath, uiRenderPathFilters, uiRenderPathFilter);
+    SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadRenderPath");
+}
+
+void HandleLoadRenderPath(StringHash eventType, VariantMap& eventData)
+{
+    CloseFileSelector(uiRenderPathFilter, uiRenderPathPath);
+    SetRenderPath(GetResourceNameFromFullName(ExtractFileName(eventData)));
+    LineEdit@ renderPathNameEdit = settingsDialog.GetChild("RenderPathNameEdit", true);
+    renderPathNameEdit.text = renderPathName;
 }
 
 void EditTextureQuality(StringHash eventType, VariantMap& eventData)

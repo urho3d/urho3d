@@ -94,6 +94,7 @@ void InitMaterialPreview()
     materialPreview = materialWindow.GetChild("MaterialPreview", true);
     materialPreview.SetFixedHeight(100);
     materialPreview.SetView(previewScene, camera);
+    materialPreview.viewport.renderPath = renderPath;
     materialPreview.autoUpdate = false;
 
     SubscribeToEvent(materialPreview, "DragMove", "RotateMaterialPreview");
@@ -156,12 +157,12 @@ void RefreshMaterialTechniques(bool fullUpdate = true)
         for (uint i = 0; i < editMaterial.numTechniques; ++i)
         {
             TechniqueEntry entry = editMaterial.techniqueEntries[i];
-    
+
             UIElement@ container = UIElement();
             container.SetLayout(LM_HORIZONTAL, 4);
             container.SetFixedHeight(ATTR_HEIGHT);
             list.AddItem(container);
-        
+
             LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, i, 0);
             nameEdit.name = "TechniqueNameEdit" + String(i);
 
@@ -169,7 +170,7 @@ void RefreshMaterialTechniques(bool fullUpdate = true)
             SubscribeToEvent(pickButton, "Released", "PickMaterialTechnique");
             Button@ openButton = CreateResourcePickerButton(container, null, i, 0, "Open");
             SubscribeToEvent(openButton, "Released", "OpenResource");
-    
+
             if (entry.technique !is null)
                 nameEdit.text = entry.technique.name;
 
@@ -179,7 +180,7 @@ void RefreshMaterialTechniques(bool fullUpdate = true)
             container2.SetLayout(LM_HORIZONTAL, 4);
             container2.SetFixedHeight(ATTR_HEIGHT);
             list.AddItem(container2);
-    
+
             Text@ text = container2.CreateChild("Text");
             text.style = "EditorAttributeText";
             text.text = "Quality";
@@ -187,7 +188,7 @@ void RefreshMaterialTechniques(bool fullUpdate = true)
             attrEdit.text = String(entry.qualityLevel);
             SubscribeToEvent(attrEdit, "TextChanged", "EditTechniqueQuality");
             SubscribeToEvent(attrEdit, "TextFinished", "EditTechniqueQuality");
-    
+
             text = container2.CreateChild("Text");
             text.style = "EditorAttributeText";
             text.text = "LOD Distance";
@@ -218,19 +219,19 @@ void RefreshMaterialTextures(bool fullUpdate = true)
     {
         ListView@ list = materialWindow.GetChild("TextureList", true);
         list.RemoveAllItems();
-    
+
         for (uint i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
         {
             String tuName = GetTextureUnitName(TextureUnit(i));
             tuName[0] = ToUpper(tuName[0]);
 
             UIElement@ parent = CreateAttributeEditorParentWithSeparatedLabel(list, "Unit " + i + " " + tuName, i, 0, false);
-            
+
             UIElement@ container = UIElement();
             container.SetLayout(LM_HORIZONTAL, 4, IntRect(10, 0, 4, 0));
             container.SetFixedHeight(ATTR_HEIGHT);
             parent.AddChild(container);
-    
+
             LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, i, 0);
             nameEdit.name = "TextureNameEdit" + String(i);
 

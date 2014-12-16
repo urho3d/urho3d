@@ -91,20 +91,12 @@ namespace Urho3D
 
 #define GET_IP_SAMPLE_RIGHT() (((((int)pos[3] - (int)pos[1]) * fractPos) / 65536) + (int)pos[1])
 
-static const char* typeNames[] =
-{
-    "Effect",
-    "Ambient",
-    "Voice",
-    "Music",
-    0
-};
-
 static const float AUTOREMOVE_DELAY = 0.25f;
 
 static const int STREAM_SAFETY_SAMPLES = 4;
 
 extern const char* AUDIO_CATEGORY;
+
 
 SoundSource::SoundSource(Context* context) :
     Component(context),
@@ -124,6 +116,8 @@ SoundSource::SoundSource(Context* context) :
 
     if (audio_)
         audio_->AddSoundSource(this);
+    
+    UpdateMasterGain();
 }
 
 SoundSource::~SoundSource()
@@ -138,7 +132,7 @@ void SoundSource::RegisterObject(Context* context)
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Sound", GetSoundAttr, SetSoundAttr, ResourceRef, ResourceRef(Sound::GetTypeStatic()), AM_DEFAULT);
-    ENUM_ATTRIBUTE("Sound Type", soundType_, typeNames, SOUND_EFFECT, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Type", GetSoundType, SetSoundType, String, SOUND_EFFECT, AM_DEFAULT);
     ATTRIBUTE("Frequency", float, frequency_, 0.0f, AM_DEFAULT);
     ATTRIBUTE("Gain", float, gain_, 1.0f, AM_DEFAULT);
     ATTRIBUTE("Attenuation", float, attenuation_, 1.0f, AM_DEFAULT);
@@ -235,12 +229,15 @@ void SoundSource::Stop()
     MarkNetworkUpdate();
 }
 
-void SoundSource::SetSoundType(SoundType type)
+void SoundSource::SetSoundType(const String& type)
 {
-    if (type == SOUND_MASTER || type >= MAX_SOUND_TYPES)
+    if (type == SOUND_MASTER)
         return;
 
     soundType_ = type;
+    soundTypeHash_ = StringHash(type);
+    UpdateMasterGain();
+    
     MarkNetworkUpdate();
 }
 
@@ -413,6 +410,12 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
         timePosition_ = ((float)(int)(size_t)(position_ - sound_->GetStart())) / (sound_->GetSampleSize() * sound_->GetFrequency());
 }
 
+void SoundSource::UpdateMasterGain()
+{
+    if (audio_)
+        masterGain_ = audio_->GetSoundSourceMasterGain(soundType_);
+}
+
 void SoundSource::SetSoundAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -552,7 +555,7 @@ void SoundSource::SetPlayPositionLockless(signed char* pos)
 
 void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-    float totalGain = audio_->GetSoundSourceMasterGain(soundType_) * attenuation_ * gain_;
+    float totalGain = masterGain_ * attenuation_ * gain_;
     int vol = (int)(256.0f * totalGain + 0.5f);
     if (!vol)
     {
@@ -619,13 +622,12 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
             position_ = pos;
         }
     }
-
     fractPosition_ = fractPos;
 }
 
 void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-    float totalGain = audio_->GetSoundSourceMasterGain(soundType_) * attenuation_ * gain_;
+    float totalGain = masterGain_ * attenuation_ * gain_;
     int leftVol = (int)((-panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
     int rightVol = (int)((panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
     if (!leftVol && !rightVol)
@@ -707,7 +709,7 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
 
 void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-    float totalGain = audio_->GetSoundSourceMasterGain(soundType_) * attenuation_ * gain_;
+    float totalGain = masterGain_ * attenuation_ * gain_;
     int vol = (int)(256.0f * totalGain + 0.5f);
     if (!vol)
     {
@@ -780,7 +782,7 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
 
 void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-    float totalGain = audio_->GetSoundSourceMasterGain(soundType_) * attenuation_ * gain_;
+    float totalGain = masterGain_ * attenuation_ * gain_;
     int leftVol = (int)((-panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
     int rightVol = (int)((panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
     if (!leftVol && !rightVol)
@@ -866,7 +868,7 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
 
 void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-    float totalGain = audio_->GetSoundSourceMasterGain(soundType_) * attenuation_ * gain_;
+    float totalGain = masterGain_ * attenuation_ * gain_;
     int vol = (int)(256.0f * totalGain + 0.5f);
     if (!vol)
     {
@@ -943,7 +945,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
 
 void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-    float totalGain = audio_->GetSoundSourceMasterGain(soundType_) * attenuation_ * gain_;
+    float totalGain = masterGain_ * attenuation_ * gain_;
     int vol = (int)(256.0f * totalGain + 0.5f);
     if (!vol)
     {
@@ -1024,7 +1026,7 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
 
 void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-    float totalGain = audio_->GetSoundSourceMasterGain(soundType_) * attenuation_ * gain_;
+    float totalGain = masterGain_ * attenuation_ * gain_;
     int vol = (int)(256.0f * totalGain + 0.5f);
     if (!vol)
     {
@@ -1101,7 +1103,7 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
 
 void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples, int mixRate)
 {
-    float totalGain = audio_->GetSoundSourceMasterGain(soundType_) * attenuation_ * gain_;
+    float totalGain = masterGain_ * attenuation_ * gain_;
     int vol = (int)(256.0f * totalGain + 0.5f);
     if (!vol)
     {

@@ -34,18 +34,21 @@ Array<String> uiElementFilters = {"*.xml"};
 Array<String> uiAllFilters = {"*.*"};
 Array<String> uiScriptFilters = {"*.as", "*.*"};
 Array<String> uiParticleFilters = {"*.xml"};
+Array<String> uiRenderPathFilters = {"*.xml"};
 uint uiSceneFilter = 0;
 uint uiElementFilter = 0;
 uint uiNodeFilter = 0;
 uint uiImportFilter = 0;
 uint uiScriptFilter = 0;
 uint uiParticleFilter = 0;
+uint uiRenderPathFilter = 0;
 String uiScenePath = fileSystem.programDir + "Data/Scenes";
 String uiElementPath = fileSystem.programDir + "Data/UI";
 String uiNodePath = fileSystem.programDir + "Data/Objects";
 String uiImportPath;
 String uiScriptPath = fileSystem.programDir + "Data/Scripts";
 String uiParticlePath = fileSystem.programDir + "Data/Particles";
+String uiRenderPathPath = fileSystem.programDir + "CoreData/RenderPaths";
 Array<String> uiRecentScenes;
 String screenshotDir = fileSystem.programDir + "Screenshots";
 
@@ -77,6 +80,7 @@ void CreateUI()
     CreateMaterialEditor();
     CreateParticleEffectEditor();
     CreateSpawnEditor();
+    CreateSoundTypeEditor();
     CreateStatsBar();
     CreateConsole();
     CreateDebugHud();
@@ -417,6 +421,7 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Material editor", @ShowMaterialEditor));
         popup.AddChild(CreateMenuItem("Particle editor", @ShowParticleEffectEditor));
         popup.AddChild(CreateMenuItem("Spawn editor", @ShowSpawnEditor));
+        popup.AddChild(CreateMenuItem("Sound Type editor", @ShowSoundTypeEditor));
         popup.AddChild(CreateMenuItem("Editor settings", @ShowEditorSettingsDialog));
         popup.AddChild(CreateMenuItem("Editor preferences", @ShowEditorPreferencesDialog));
         CreateChildDivider(popup);
