@@ -7330,8 +7330,8 @@ Properties:
 - unsigned DEFAULT_ZONEMASK
 - unsigned DRAWABLE_ANY
 - unsigned DRAWABLE_GEOMETRY
+- unsigned DRAWABLE_GEOMETRY2D
 - unsigned DRAWABLE_LIGHT
-- unsigned DRAWABLE_RENDERER2D
 - unsigned DRAWABLE_ZONE
 - unsigned FIRST_LOCAL_ID
 - unsigned FIRST_REPLICATED_ID
