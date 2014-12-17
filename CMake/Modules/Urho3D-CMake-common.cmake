@@ -64,7 +64,7 @@ if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the i
     endif ()
 endif ()
 if (ANDROID OR RPI)
-    # This build option is not available on Android and Raspberry-Pi platforms as its value is preset by the toolchain being used in the build
+    # This build option is not available on Android and Raspberry-Pi platforms as its value is preset by the chosen toolchain in the build tree
     set (URHO3D_64BIT ${URHO3D_DEFAULT_64BIT})
 else ()
     option (URHO3D_64BIT "Enable 64-bit build" ${URHO3D_DEFAULT_64BIT})

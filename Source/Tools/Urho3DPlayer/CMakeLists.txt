@@ -41,6 +41,10 @@ endif ()
 
 # Symlink/copy helper shell scripts or batch files to invoke Urho3DPlayer
 if (NOT IOS AND NOT ANDROID)
+    if (APPLE)
+        # For some reason CMake is late to create this output directory when on Apple
+        file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Bin)
+    endif ()
     foreach (FILE Editor NinjaSnowWar)
         create_symlink (${CMAKE_SOURCE_DIR}/Bin/${FILE}${SCRIPT_EXT} ${CMAKE_BINARY_DIR}/Bin/${FILE}${SCRIPT_EXT} FALLBACK_TO_COPY)
     endforeach ()

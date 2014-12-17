@@ -41,7 +41,7 @@ A number of build options can be defined explicitly when invoking the above cmak
 |RPI                  |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only)|
 |WIN32                |0|Configure project using MinGW cross-compiler toolchain (cmake_generic.sh only)|
 |IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only); use cmake_ios.sh as shortcut|
-|URHO3D_64BIT         |*|Enable 64bit build, on MSVC default to 0, on other compilers the default is set based on the installed toolchain on host system|
+|URHO3D_64BIT         |*|Enable 64bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system|
 |URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
 |URHO3D_LUA           |0|Enable Lua scripting support|
 |URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)|

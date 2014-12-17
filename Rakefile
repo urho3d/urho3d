@@ -61,9 +61,9 @@ task :cmake do
   ARGV.each { |option|
     task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
     case option
-    when 'cmake'
+    when 'cmake', 'generic'
       # do nothing
-    when 'clean', 'codeblocks', 'eclipse', 'generic', 'macosx'
+    when 'clean', 'codeblocks', 'eclipse', 'macosx'
       script = "cmake_#{option}.sh" unless script == 'cmake_clean.sh'
     when 'android', 'ios', 'mingw', 'rpi'
       platform = option
@@ -78,24 +78,39 @@ task :cmake do
   system "./#{script} #{prefix_path}/#{platform}-Build #{build_options}" or abort
 end
 
-# Usage: rake make [prefix_path=..] [num_jobs=8] (only intended to be used by lazy man =), e.g. rake make android, rake make android doc
+# Usage: rake make [prefix_path=..] [numjobs=8] (only intended to be used by lazy man =), e.g. rake make android, rake make android doc
 desc 'Invoke make command in the build tree location predetermined based on the target platform'
 task :make do
   prefix_path = ENV['prefix_path'] || '..'
-  build_options = '-j' + (ENV['num_jobs'] || '8')
+  numjobs = '-j' + (ENV['numjobs'] || '8')
   platform = 'native'
+  cmake_build_options = ''
+  build_options = ''
   ARGV.each { |option|
     task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
     case option
-    when 'make'
+    when 'codeblocks', 'eclipse', 'generic', 'macosx', 'make'
       # do nothing
     when 'android', 'ios', 'mingw', 'rpi'
       platform = option
+    when 'clean_first'
+      cmake_build_options = "#{cmake_build_options} --clean-first"
     else
-      build_options = "#{build_options} #{option}" unless /(?:prefix_path|num_jobs)=.*/ =~ option
+      if /(?:config|target)=.*/ =~ option
+        cmake_build_options = "#{cmake_build_options} --#{option.gsub(/=/, ' ')}"
+      elsif /(?:prefix_path|numjobs)=.*/ !~ option
+        build_options = "#{build_options} #{/=/ =~ option ? '-' + option.gsub(/=/, ' ') : option}"
+      end
     end
   }
-  system "cd #{prefix_path}/#{platform}-Build && make #{build_options}" or abort
+  if Dir.glob("#{prefix_path}/#{platform}-Build/*.xcodeproj").empty?
+    build_options = "#{numjobs}#{build_options}"
+    filter = ''
+  else
+    build_options.gsub!(/ ([^=]+)=(\w+)/, ' -\1 \2')
+    filter = '|xcpretty'
+  end
+  system "cd #{prefix_path}/#{platform}-Build && cmake --build . #{cmake_build_options} -- #{build_options} #{filter}" or abort
 end
 
 # Usage: rake android [parameter='--es pickedLibrary Urho3DPlayer'] [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='sleep 30'] [api=19] [abi=armeabi-v7a] [avd=test_#{api}_#{abi}] [retries=10] [retry_interval=10]
