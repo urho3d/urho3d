@@ -105,18 +105,22 @@ void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
     if (tmxFile == tmxFile_)
         return;
 
-    if (tmxFile_)
-    {
-        for (unsigned i = 0; i < layers_.Size(); ++i)
-            layers_[i]->GetNode()->Remove();
-        layers_.Clear();
-    }
+    if (rootNode_)
+        rootNode_->RemoveAllChildren();
+
+    layers_.Clear();
 
     tmxFile_ = tmxFile;
     if (!tmxFile_)
         return;
 
     info_ = tmxFile_->GetInfo();
+
+    if (!rootNode_)
+    {
+        rootNode_ = GetNode()->CreateChild("_root_", LOCAL);
+        rootNode_->SetTemporary(true);
+    }
 
     unsigned numLayers = tmxFile_->GetNumLayers();
     layers_.Resize(numLayers);
@@ -125,10 +129,10 @@ void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
     {
         const TmxLayer2D* tmxLayer = tmxFile_->GetLayer(i);
 
-        SharedPtr<Node> layerNode(GetNode()->CreateChild(tmxLayer->GetName(), LOCAL));
+        Node* layerNode(rootNode_->CreateChild(tmxLayer->GetName(), LOCAL));
         layerNode->SetTemporary(true);
 
-        SharedPtr<TileMapLayer2D> layer(layerNode->CreateComponent<TileMapLayer2D>());
+        TileMapLayer2D* layer = layerNode->CreateComponent<TileMapLayer2D>();
         layer->Initialize(this, tmxLayer);
         layer->SetDrawOrder(i * 10);
 
@@ -174,8 +178,11 @@ void TileMap2D::OnNodeSet(Node* node)
 {
     if (!node)
     {
-        for (unsigned i = 0; i < layers_.Size(); ++i)
-            layers_[i]->GetNode()->Remove();
+        if (rootNode_)
+            rootNode_->Remove();
+
+        rootNode_ = 0;
+        layers_.Clear();
     }
 }
 
