@@ -127,7 +127,7 @@ void Constraint2D::OnNodeSet(Node* node)
     if (node)
     {
         Scene* scene = GetScene();
-        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
+        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>(REPLICATED, 0, true);
 
         ownerBody_ = node->GetComponent<RigidBody2D>();
         if (!ownerBody_)

@@ -694,13 +694,21 @@ Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
     return newComponent;
 }
 
-Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode, unsigned id)
+Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode, unsigned id, bool pushFront)
 {
     Component* oldComponent = GetComponent(type);
     if (oldComponent)
         return oldComponent;
     else
-        return CreateComponent(type, mode, id);
+    {
+        SharedPtr<Component> newComponent(CreateComponent(type, mode, id));
+        if (pushFront)
+        {
+            components_.Remove(newComponent);
+            components_.Insert(0, newComponent);
+        }
+        return newComponent;
+    }
 }
 
 Component* Node::CloneComponent(Component* component, unsigned id)

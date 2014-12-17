@@ -477,9 +477,9 @@ static Component* NodeCreateComponent(const String& typeName, CreateMode mode, u
     return ptr->CreateComponent(typeName, mode, id);
 }
 
-static Component* NodeGetOrCreateComponent(const String& typeName, CreateMode mode, unsigned id, Node* ptr)
+static Component* NodeGetOrCreateComponent(const String& typeName, CreateMode mode, unsigned id, bool pushFront, Node* ptr)
 {
-    return ptr->GetOrCreateComponent(typeName, mode, id);
+    return ptr->GetOrCreateComponent(typeName, mode, id, pushFront);
 }
 
 static void NodeRemoveComponent(const String& typeName, Node* ptr)
@@ -635,7 +635,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void RemoveChildren(bool, bool, bool)", asMETHOD(T, RemoveChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Remove()", asMETHOD(T, Remove), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Component@+ CreateComponent(const String&in, CreateMode mode = REPLICATED, uint id = 0)", asFUNCTION(NodeCreateComponent), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(const String&in, CreateMode mode = REPLICATED, uint id = 0)", asFUNCTION(NodeGetOrCreateComponent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(const String&in, CreateMode mode = REPLICATED, uint id = 0, bool pushFront = false)", asFUNCTION(NodeGetOrCreateComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Component@+ CloneComponent(Component@+, uint id = 0)", asMETHODPR(T, CloneComponent, (Component*, unsigned), Component*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Component@+ CloneComponent(Component@+, CreateMode, uint id = 0)", asMETHODPR(T, CloneComponent, (Component*, CreateMode, unsigned), Component*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveComponent(Component@+)", asMETHODPR(T, RemoveComponent, (Component*), void), asCALL_THISCALL);

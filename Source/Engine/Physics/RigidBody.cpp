@@ -917,7 +917,7 @@ void RigidBody::OnNodeSet(Node* node)
             if (scene == node)
                 LOGWARNING(GetTypeName() + " should not be created to the root scene node");
 
-            physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
+            physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>(REPLICATED, 0, true);
             physicsWorld_->AddRigidBody(this);
 
             AddBodyToWorld();

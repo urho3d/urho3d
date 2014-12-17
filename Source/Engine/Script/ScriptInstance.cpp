@@ -639,7 +639,7 @@ void ScriptInstance::UpdateEventSubscription()
 #ifdef URHO3D_PHYSICS
             if (methods_[METHOD_FIXEDUPDATE] || methods_[METHOD_FIXEDPOSTUPDATE])
             {
-                PhysicsWorld* world = scene->GetOrCreateComponent<PhysicsWorld>();
+                PhysicsWorld* world = scene->GetOrCreateComponent<PhysicsWorld>(REPLICATED, 0, true);
                 if (world)
                 {
                     if (methods_[METHOD_FIXEDUPDATE])

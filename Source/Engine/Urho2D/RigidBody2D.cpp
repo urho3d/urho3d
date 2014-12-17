@@ -478,7 +478,7 @@ void RigidBody2D::OnNodeSet(Node* node)
     {
         node->AddListener(this);
         Scene* scene = GetScene();
-        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
+        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>(REPLICATED, 0, true);
 
         CreateBody();
         physicsWorld_->AddRigidBody(this);
