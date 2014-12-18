@@ -315,8 +315,8 @@ set (DASM_FLAGS ${DASM_XFLAGS} ${DASM_AFLAGS})
 if (CMAKE_CROSSCOMPILING OR IOS)
     # Escape the variables
     foreach (ESCAPED_VAR HOST_XCFLAGS TARGET_ARCH DASM_FLAGS DASM_ARCH)
-        string (REGEX REPLACE -D +D ${ESCAPED_VAR} "${${ESCAPED_VAR}}")
-        string (REGEX REPLACE ";" , ${ESCAPED_VAR} "${${ESCAPED_VAR}}")
+        string (REPLACE -D +D ${ESCAPED_VAR} "${${ESCAPED_VAR}}")
+        string (REPLACE ";" , ${ESCAPED_VAR} "${${ESCAPED_VAR}}")
     endforeach ()
     # When cross-compiling, build the host tool as external project
     include (ExternalProject)
