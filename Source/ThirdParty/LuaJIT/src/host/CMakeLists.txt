@@ -20,12 +20,10 @@
 # THE SOFTWARE.
 #
 
-@WARNING@
-
 if (CMAKE_PROJECT_NAME STREQUAL ExternalProject-tolua++)
     # Do not install the buildvm host tool from tolua++ external project because it is built for targetting host system itself
-    # We only want to keep the buildvm host tool which targets a cross-compiling target (the one built from internal LuaJIT CMake-target) 
-    set (DEST_RUNTIME_DIR "")
+    # We only want to keep the buildvm host tool which is built for cross-compiling target (the one built from internal LuaJIT CMake-target)
+    set (DEST_RUNTIME_DIR "")   # In this particular case, it is not equivalent to unset() the variable
 elseif (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set project name
     project (ExternalProject-buildvm)
@@ -48,33 +46,32 @@ elseif (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     endif ()
 
     # Set CMake modules search path
-    set (CMAKE_MODULE_PATH @CMAKE_SOURCE_DIR@/CMake/Modules)
+    set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/CMake/Modules)
 
     # Include Urho3D Cmake common module
     include (Urho3D-CMake-common)
+
+    # Unescape the variables
+    foreach (ESCAPED_VAR HOST_XCFLAGS TARGET_ARCH DASM_FLAGS DASM_ARCH)
+        string (REGEX REPLACE \\+D -D ${ESCAPED_VAR} ${${ESCAPED_VAR}})
+        string (REGEX REPLACE , ";" ${ESCAPED_VAR} ${${ESCAPED_VAR}})
+    endforeach ()
 endif ()
 
 # Add dependency target
-add_subdirectory (../minilua ../minilua)
+add_subdirectory (minilua)
 
 # Define target name
 set (TARGET_NAME buildvm)
 
-# Read the target architecture information
-if (NOT TARGET_TESTARCH)
-    file (READ TARGET_TESTARCH.txt TARGET_TESTARCH)
-endif ()
-
 # Add definitions specific for host C compiler
-if (NOT BAKED_CMAKE_SOURCE_DIR)
-    set (BAKED_CMAKE_SOURCE_DIR @CMAKE_SOURCE_DIR@)
-endif ()
-include (@CMAKE_CURRENT_SOURCE_DIR@/DetectTargetArchitecture.cmake)
 add_definitions (${HOST_XCFLAGS} ${TARGET_ARCH})
 
 # Define generated source files
 set (GEN_ARCH_H ${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h)
+set (DASM_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../dynasm)
 set (DASM ${DASM_DIR}/dynasm.lua)
+set (DASM_DASC ${CMAKE_CURRENT_SOURCE_DIR}/../vm_${DASM_ARCH}.dasc)
 file (GLOB DASM_LUA ${DASM_DIR}/*.lua)
 add_custom_command (OUTPUT ${GEN_ARCH_H}
     COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/minilua ${DASM} ${DASM_FLAGS} -o ${GEN_ARCH_H} ${DASM_DASC}
@@ -83,11 +80,11 @@ add_custom_command (OUTPUT ${GEN_ARCH_H}
     COMMENT "Generating buildvm arch header file")
 
 # Define source files
-file (GLOB C_FILES @CMAKE_CURRENT_SOURCE_DIR@/src/host/buildvm*.c)
+file (GLOB C_FILES buildvm*.c)
 set (SOURCE_FILES ${C_FILES} ${GEN_ARCH_H})
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR} @CMAKE_CURRENT_SOURCE_DIR@/src)
+set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR} ..)
 
 # All tools must be natively built and output to Bin/tool subdir to differentiate them from platform-specific binaries in the Bin directory
 set_output_directories (${CMAKE_BINARY_DIR}/Bin/tool RUNTIME PDB)

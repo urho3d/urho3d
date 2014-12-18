@@ -48,8 +48,8 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     include (Urho3D-CMake-common)
 
     # Add dependency targets
-    add_subdirectory (../../../../ThirdParty/Lua${JIT} ../../../../ThirdParty/Lua${JIT})
-    add_subdirectory (../../../../ThirdParty/toluapp/src/lib ../../../../ThirdParty/toluapp/src/lib)
+    add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/Lua${JIT} host/Lua${JIT})
+    add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/lib host/toluapp)
 endif ()
 
 # Define target name

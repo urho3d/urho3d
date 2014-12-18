@@ -21,7 +21,7 @@
 #
 
 # Based on src/Makefile from http://luajit.org
-# The cross-compiling logic is ported to CMake as verbatim as possible although currently Urho3D does not support all of them
+# The cross-compiling logic is ported to CMake as faithful as possible although currently Urho3D does not support all target archs supported by LuaJIT
 
 # Makefile: Compiler options
 if (NOT MSVC)
@@ -139,41 +139,194 @@ else ()
     execute_process (COMMAND egrep -V RESULT_VARIABLE EGREP_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)    
     if (EGREP_EXIT_CODE EQUAL 0)
         execute_process (COMMAND ${CMAKE_C_COMPILER} ${TARGET_TCFLAGS} -E ${CMAKE_CURRENT_SOURCE_DIR}/src/lj_arch.h -dM
-            COMMAND egrep "LJ_|MIPSEL|__SSE__" OUTPUT_VARIABLE TARGET_TESTARCH ERROR_QUIET)
+            COMMAND egrep "LJ_|MIPSEL|__SSE2__" OUTPUT_VARIABLE TARGET_TESTARCH ERROR_QUIET)
     else ()
         execute_process (COMMAND ${CMAKE_C_COMPILER} ${TARGET_TCFLAGS} -E ${CMAKE_CURRENT_SOURCE_DIR}/src/lj_arch.h -dM OUTPUT_VARIABLE TARGET_TESTARCH ERROR_QUIET)
     endif ()
 endif ()
 
+# Macro for finding a substring in TARGET_TESTARCH variable
+macro (find_string find_regex output_var)
+    if (NOT DEFINED ${output_var})
+        message (STATUS "Finding value for LuaJIT:${output_var}")
+        string (REGEX MATCH ${find_regex} matched ${TARGET_TESTARCH})
+        if (matched)
+            string (REGEX MATCH "\\(.*\\)" captured ${find_regex})
+            if (captured) 
+                string (REGEX REPLACE ${find_regex} \\1 matched ${matched})
+            endif ()
+
+            # Special case handling to cater for URHO3D_64BIT build option
+            if (${output_var} STREQUAL TARGET_LJARCH)
+                string (TOLOWER ${matched} matched)
+                if (matched STREQUAL x64 AND NOT URHO3D_64BIT)
+                    set (matched x86)
+                endif ()
+            elseif (${output_var} STREQUAL ARCH_BITS)
+                if (matched EQUAL 64 AND NOT URHO3D_64BIT)
+                    set (matched 32)
+                endif ()
+            endif ()
+
+            set (${output_var} ${matched} CACHE INTERNAL "LUAJIT INTERNAL - ${output_var}")
+            message (STATUS "Finding value for LuaJIT:${output_var} - found (${matched})")
+        else ()
+            set (${output_var} 0 CACHE INTERNAL "LUAJIT INTERNAL - ${output_var}")
+            message (STATUS "Finding value for LuaJIT:${output_var} - not found")
+        endif ()
+    endif ()
+endmacro ()
+
+find_string ("LJ_TARGET_(X64|X86|ARM|PPC|PPCSPE|MIPS) 1" TARGET_LJARCH)
+if (NOT TARGET_LJARCH)
+    message (FATAL_ERROR "Unsupported target architecture")
+endif ()
+if (TARGET_LJARCH STREQUAL mips)
+    find_string ("MIPSEL (1)" MIPSEL)
+    if (MIPSEL)
+        set (TARGET_ARCH ${TARGET_ARCH} -D__MIPSEL__=1)
+    endif ()
+endif ()
+
+find_string ("LJ_TARGET_PS3 (1)" PS3)
+if (PS3)
+    set (TARGET_SYS PS3)
+    set (TARGET_ARCH ${TARGET_ARCH} -D__CELLOS_LV2__)
+    add_definitions (-DLUAJIT_USE_SYSMALLOC)
+endif ()
+
+find_string ("LJ_NO_UNWIND (1)" NO_UNWIND)
+if (NO_UNWIND)
+    set (TARGET_ARCH ${TARGET_ARCH} -DLUAJIT_NO_UNWIND)
+endif ()
+
+set (TARGET_ARCH ${TARGET_ARCH} -DLUAJIT_TARGET=LUAJIT_ARCH_${TARGET_LJARCH})
+
+# Makefile: System detection
+if (CMAKE_HOST_WIN32)
+    set (HOST_SYS Windows)
+else ()
+    execute_process (COMMAND uname -s OUTPUT_VARIABLE HOST_SYS ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif ()
+if (IOS)
+    set (TARGET_SYS iOS)
+elseif (ANDROID OR RPI)
+    set (TARGET_SYS Linux)
+elseif (MINGW)
+    set (TARGET_SYS Windows)
+elseif (NOT TARGET_SYS)
+    set (TARGET_SYS ${HOST_SYS})
+endif ()
+if (NOT HOST_SYST STREQUAL TARGET_SYS)
+    if (TARGET_SYS STREQUAL Windows)
+        set (HOST_XCFLAGS ${HOST_XCFLAGS} -malign-double -DLUAJIT_OS=LUAJIT_OS_WINDOWS)
+    elseif (TARGET_SYS STREQUAL Linux)
+        set (HOST_XCFLAGS ${HOST_XCFLAGS} -DLUAJIT_OS=LUAJIT_OS_LINUX)
+    elseif (TARGET_SYS MATCHES Darwin|iOS)
+        set (HOST_XCFLAGS ${HOST_XCFLAGS} -DLUAJIT_OS=LUAJIT_OS_OSX)
+    else ()
+        set (HOST_XCFLAGS ${HOST_XCFLAGS} -DLUAJIT_OS=LUAJIT_OS_OTHER)
+    endif ()
+endif ()
+
+# Makefile: Files and pathnames
+if (NOT BAKED_CMAKE_SOURCE_DIR)
+    set (BAKED_CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR})
+endif ()
+set (DASM_ARCH ${TARGET_LJARCH})
+
+# Below regex is a workaround for "LJ_ARCH_BITS (.*?)\\n" as CMake does not understand non-greedy quantifier
+find_string ("LJ_ARCH_BITS ([^\\n]*)" ARCH_BITS)
+if (ARCH_BITS EQUAL 64)
+    set (DASM_AFLAGS ${DASM_AFLAGS} -D P64)
+endif ()
+
+find_string ("LJ_HASJIT (1)" HASJIT)
+if (HASJIT)
+    set (DASM_AFLAGS ${DASM_AFLAGS} -D JIT)
+endif ()
+
+find_string ("LJ_HASFFI (1)" HASFFI)
+if (HASFFI)
+    set (DASM_AFLAGS ${DASM_AFLAGS} -D FFI)
+endif ()
+
+find_string ("LJ_DUALNUM (1)" DUALNUM)
+if (DUALNUM)
+    set (DASM_AFLAGS ${DASM_AFLAGS} -D DUALNUM)
+endif ()
+
+find_string ("LJ_ARCH_HASFPU (1)" ARCH_HASFPU)
+if (ARCH_HASFPU)
+    set (DASM_AFLAGS ${DASM_AFLAGS} -D FPU)
+endif ()
+set (TARGET_ARCH ${TARGET_ARCH} -DLJ_ARCH_HASFPU=${ARCH_HASFPU})
+
+find_string ("LJ_ABI_SOFTFP (1)" ABI_SOFTFP)
+if (NOT ABI_SOFTFP)
+    set (DASM_AFLAGS ${DASM_AFLAGS} -D HFABI)
+endif ()
+set (TARGET_ARCH ${TARGET_ARCH} -DLJ_ABI_SOFTFP=${ABI_SOFTFP})
+
+# Below regex is a workaround for "LJ_ARCH_VERSION (.*?)\\n" as CMake does not understand non-greedy quantifier
+find_string ("LJ_ARCH_VERSION ([^\\n]*)" ARCH_VERSION)
+set (DASM_AFLAGS ${DASM_AFLAGS} -D VER=${ARCH_VERSION})
+
+if (TARGET_SYS STREQUAL Windows)
+    set (DASM_AFLAGS ${DASM_AFLAGS} -D WIN)
+endif ()
+
+if (TARGET_LJARCH STREQUAL x86)
+    find_string ("__SSE2__ (1)" SSE2)
+    if (SSE2)
+        set (DASM_AFLAGS ${DASM_AFLAGS} -D SSE)
+    endif ()
+elseif (TARGET_LJARCH STREQUAL x64)
+    set (DASM_ARCH x86)
+elseif (TARGET_LJARCH STREQUAL arm)
+    if (TARGET_SYS STREQUAL iOS)
+        set (DASM_AFLAGS ${DASM_AFLAGS} -D IOS)
+    endif ()
+elseif (TARGET_LJARCH STREQUAL ppc)
+    find_string ("LJ_ARCH_SQRT (1)" ARCH_SQRT)
+    if (ARCH_SQRT)
+        set (DASM_AFLAGS ${DASM_AFLAGS} -D SQRT)
+    endif ()
+    find_string ("LJ_ARCH_ROUND (1)" ARCH_ROUND)
+    if (ARCH_ROUND)
+        set (DASM_AFLAGS ${DASM_AFLAGS} -D ROUND)
+    endif ()
+    find_string ("LJ_ARCH_PPC64 (1)" ARCH_PPC64)
+    if (ARCH_PPC64)
+        set (DASM_AFLAGS ${DASM_AFLAGS} -D GPR64)
+    endif ()
+    if (TARGET_SYS STREQUAL PS3)
+        set (DASM_AFLAGS ${DASM_AFLAGS} -D PPE -D TOC)
+    endif ()
+endif ()
+
+set (DASM_FLAGS ${DASM_XFLAGS} ${DASM_AFLAGS})
+
 # Makefile: Build mode handling
 # Urho3D only builds static LuaJIT library
 
 # Makefile: Make targets
-set (WARNING "# This is a generated file. DO NOT EDIT!")
-configure_file (CMakeLists.txt-minilua.in ${CMAKE_CURRENT_BINARY_DIR}/generated/minilua/CMakeLists.txt @ONLY)
-configure_file (CMakeLists.txt-buildvm.in ${CMAKE_CURRENT_BINARY_DIR}/generated/buildvm/CMakeLists.txt @ONLY)
 # The host tool must be built natively
 if (CMAKE_CROSSCOMPILING OR IOS)
-    # Store the target architecture information for later use when cross-compiling 'buildvm' host tool
-    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/generated/buildvm/TARGET_TESTARCH.txt ${TARGET_TESTARCH})
-
-    if (IOS)
-        set (TARGET_SYS iOS)
-    elseif (ANDROID OR RPI)
-        set (TARGET_SYS Linux)
-    elseif (MINGW)
-        set (TARGET_SYS Windows)
-    endif ()
-
+    # Escape the variables
+    foreach (ESCAPED_VAR HOST_XCFLAGS TARGET_ARCH DASM_FLAGS DASM_ARCH)
+        string (REGEX REPLACE -D +D ${ESCAPED_VAR} "${${ESCAPED_VAR}}")
+        string (REGEX REPLACE ";" , ${ESCAPED_VAR} "${${ESCAPED_VAR}}")
+    endforeach ()
     # When cross-compiling, build the host tool as external project
     include (ExternalProject)
     ExternalProject_Add(buildvm
-        SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated/buildvm
-        CMAKE_ARGS -DTARGET_SYS=${TARGET_SYS} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/Bin/tool -DURHO3D_64BIT=${URHO3D_64BIT}
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/host
+        CMAKE_ARGS -DURHO3D_64BIT=${URHO3D_64BIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/Bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DHOST_XCFLAGS=${HOST_XCFLAGS} -DTARGET_ARCH=${TARGET_ARCH} -DDASM_FLAGS=${DASM_FLAGS} -DDASM_ARCH=${DASM_ARCH}
     )
 else ()
     # Otherwise, build it internally as per normal
-    add_subdirectory (${CMAKE_CURRENT_BINARY_DIR}/generated/buildvm generated/buildvm)
+    add_subdirectory (src/host)
 endif ()
 
 # Add definitions specific for target C Compiler 
@@ -206,11 +359,7 @@ if (WIN32)
 else ()
     set (LJVM_BOUT lj_vm.s)
     enable_language (ASM)
-    if (TARGET_LJARCH STREQUAL x64)
-        set (CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -m64")
-    else ()
-        set (CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -m32")
-    endif ()
+    set (CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} ${DASH_MBIT}")
     if (APPLE)
         set (LJVM_MODE machasm)
     else ()

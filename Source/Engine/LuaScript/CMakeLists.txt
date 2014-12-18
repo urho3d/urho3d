@@ -38,7 +38,7 @@ if (CMAKE_CROSSCOMPILING OR IOS)
     endif ()
     ExternalProject_Add(tolua++
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
-        CMAKE_ARGS -DJIT=${JIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/Bin/tool -DURHO3D_64BIT=${URHO3D_64BIT} -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${OSX_HOST}
+        CMAKE_ARGS -DJIT=${JIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/Bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${OSX_HOST}
     )
 else ()
     # Otherwise, build it internally as per normal

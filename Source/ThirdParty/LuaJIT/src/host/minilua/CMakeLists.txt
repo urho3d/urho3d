@@ -20,13 +20,11 @@
 # THE SOFTWARE.
 #
 
-@WARNING@
-
 # Define target name
 set (TARGET_NAME minilua)
 
 # Define source files
-set (SOURCE_FILES @CMAKE_CURRENT_SOURCE_DIR@/src/host/minilua.c)
+set (SOURCE_FILES ../minilua.c)
 
 # Define dependency libs
 if (NOT MSVC)
