@@ -55,7 +55,7 @@ end
 desc 'Invoke cmake shell script with the build tree location predetermined based on the target platform'
 task :cmake do
   prefix_path = ENV['prefix_path'] || '..'
-  script = 'cmake_generic.sh'
+  script = 'cmake_generic'
   platform = 'native'
   build_options = ''
   ARGV.each { |option|
@@ -63,19 +63,19 @@ task :cmake do
     case option
     when 'cmake', 'generic'
       # do nothing
-    when 'clean', 'codeblocks', 'eclipse', 'macosx'
-      script = "cmake_#{option}.sh" unless script == 'cmake_clean.sh'
+    when 'clean', 'codeblocks', 'eclipse', 'macosx', 'vs2008', 'vs2010', 'vs2012', 'vs2013'
+      script = "cmake_#{option}" unless script == 'cmake_clean'
     when 'android', 'ios', 'mingw', 'rpi'
       platform = option
-      build_options = "#{build_options} -D#{option == 'mingw' ? 'WIN32' : option.upcase}=1" unless script == 'cmake_clean.sh'
-      script = 'cmake_macosx.sh' if option == 'ios'
+      build_options = "#{build_options} -D#{option == 'mingw' ? 'WIN32' : option.upcase}=1" unless script == 'cmake_clean'
+      script = 'cmake_macosx' if option == 'ios'
     when 'fix_scm'
-      build_options = "#{build_options} --fix-scm" if script == 'cmake_eclipse.sh'
+      build_options = "#{build_options} --fix-scm" if script == 'cmake_eclipse'
     else
-      build_options = "#{build_options} -D#{option}" unless /prefix_path=.*/ =~ option || script == 'cmake_clean.sh'
+      build_options = "#{build_options} -D#{option}" unless /prefix_path=.*/ =~ option || script == 'cmake_clean'
     end
   }
-  system "./#{script} #{prefix_path}/#{platform}-Build #{build_options}" or abort
+  system "./#{script}#{ENV['OS'] ? '.bat' : '.sh'} #{prefix_path}/#{platform}-Build #{build_options}" or abort
 end
 
 # Usage: rake make [prefix_path=..] [numjobs=8] (only intended to be used by lazy man =), e.g. rake make android, rake make android doc
@@ -89,7 +89,7 @@ task :make do
   ARGV.each { |option|
     task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
     case option
-    when 'codeblocks', 'eclipse', 'generic', 'macosx', 'make'
+    when 'codeblocks', 'eclipse', 'generic', 'macosx', 'make', 'vs2008', 'vs2010', 'vs2012', 'vs2013'
       # do nothing
     when 'android', 'ios', 'mingw', 'rpi'
       platform = option
@@ -103,12 +103,14 @@ task :make do
       end
     end
   }
-  if Dir.glob("#{prefix_path}/#{platform}-Build/*.xcodeproj").empty?
-    build_options = "#{numjobs}#{build_options}"
-    filter = ''
-  else
+  if !Dir.glob("#{prefix_path}/#{platform}-Build/*.xcodeproj").empty?
     build_options.gsub!(/ ([^=]+)=(\w+)/, ' -\1 \2')
     filter = '|xcpretty'
+  elsif !Dir.glob("#{prefix_path}/#{platform}-Build/*.sln").empty?
+    filter = ''
+  else
+    build_options = "#{numjobs}#{build_options}"
+    filter = ''
   end
   system "cd #{prefix_path}/#{platform}-Build && cmake --build . #{cmake_build_options} -- #{build_options} #{filter}" or abort
 end
