@@ -196,7 +196,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         Vector<String> headerFiles;
         String path = AddTrailingSlash(sourceTree);
         if (!path.Empty())
-            path.Append("Source/Engine/");
+            path.Append("Source/Urho3D/");
         
         fileSystem->ScanDir(headerFiles, path, "*.h", SCAN_FILES, true);
         if (!headerFiles.Empty())

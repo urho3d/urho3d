@@ -90,7 +90,7 @@ install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
 set (LIBS ../../ThirdParty/Lua${JIT}/src)
 set (LINK_LIBS_ONLY toluapp)
 set (INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Navigation ../Resource ../Scene ../UI
-    ../../ThirdParty/SDL/include ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Source/Engine)
+    ../../ThirdParty/SDL/include ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Source/Urho3D)
 
 if (URHO3D_NAVIGATION)
     set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Navigation)
