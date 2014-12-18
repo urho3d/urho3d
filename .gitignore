@@ -44,7 +44,7 @@ Android/local.properties
 Android/proguard-project.txt
 
 # Android non out-of-source build and output directories
-Android/Engine
+Android/Urho3D
 Android/ThirdParty
 Android/libs
 

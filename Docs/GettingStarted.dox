@@ -467,7 +467,7 @@ On Windows host system, this task requires privilege to create symlinks by using
 \page Structure Overall structure
 
 The Urho3D engine compiles into one library. Conceptually it consists of several "sublibraries" that represent different subsystems or functionality. Each of these resides in a subdirectory
-under the Source/Engine directory:
+under the Source/Urho3D directory:
 
 - Container. Provides STL replacement classes and shared pointers.
 - Math. Provides vector, quaternion & matrix types and geometric shapes used in intersection tests.

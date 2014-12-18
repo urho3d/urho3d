@@ -545,7 +545,7 @@ macro (setup_target)
     include_directories (${LIBS} ${INCLUDE_DIRS_ONLY})
     # Link libraries
     define_dependency_libs (${TARGET_NAME})
-    string (REGEX REPLACE \\.\\./|ThirdParty/|Engine/|Extras/|/include|/src "" STRIP_LIBS "${LIBS};${LINK_LIBS_ONLY}")
+    string (REGEX REPLACE \\.\\./|ThirdParty/|Urho3D/|Extras/|/include|/src "" STRIP_LIBS "${LIBS};${LINK_LIBS_ONLY}")
     target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${STRIP_LIBS})
 
     # CMake does not support IPHONEOS_DEPLOYMENT_TARGET the same manner as it supports CMAKE_OSX_DEPLOYMENT_TARGET
@@ -767,14 +767,14 @@ macro (define_dependency_libs TARGET)
         endif ()
     endif ()
 
-    # Engine/LuaJIT external dependency
+    # Urho3D/LuaJIT external dependency
     if (URHO3D_LUAJIT AND ${TARGET} MATCHES LuaJIT|Urho3D)
         if (NOT WIN32)
             list (APPEND LINK_LIBS_ONLY dl m)
         endif ()
     endif ()
 
-    # Engine external dependency
+    # Urho3D external dependency
     if (${TARGET} STREQUAL Urho3D)
         # Core
         if (WIN32)

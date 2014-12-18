@@ -199,8 +199,8 @@ task :ci_site_update do
     # Supply GIT credentials and push API documentation to urho3d/Urho3D.git (the push may not be successful if remote master has already diverged)
     system 'pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git add Docs/*API*'
     if system("git commit -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'") && !ENV['PACKAGE_UPLOAD']
-      bump_soversion 'Source/Engine/.soversion' or abort 'Failed to bump soversion'
-      system "git add Source/Engine/.soversion && git commit --amend -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'" or abort 'Failed to stage .soversion file'
+      bump_soversion 'Source/Urho3D/.soversion' or abort 'Failed to bump soversion'
+      system "git add Source/Urho3D/.soversion && git commit --amend -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'" or abort 'Failed to stage .soversion file'
     end
     system "git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
   end

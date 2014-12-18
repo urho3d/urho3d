@@ -60,7 +60,7 @@ if (URHO3D_ANGELSCRIPT)
 endif ()
 
 if (URHO3D_LUA)
-    add_subdirectory (Engine/LuaScript)
+    add_subdirectory (Urho3D/LuaScript)
     add_subdirectory (ThirdParty/Lua${JIT})
     add_subdirectory (ThirdParty/toluapp/src/lib)
 endif ()
@@ -93,7 +93,7 @@ if (NOT IOS AND NOT ANDROID AND NOT RPI)
 endif ()
 
 # Urho3D game engine library
-add_subdirectory (Engine)
+add_subdirectory (Urho3D)
 
 # Urho3D tools
 add_subdirectory (Tools)

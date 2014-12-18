@@ -2176,7 +2176,7 @@ A remote event consists of its event type (name hash), a flag that tells whether
 
 To send a remote event to a Connection, use its \ref Connection::SendRemoteEvent "SendRemoteEvent()" function. To broadcast remote events to several connections at once (server only), use Network's \ref Network::BroadcastRemoteEvent "BroadcastRemoteEvent()" function.
 
-For safety, allowed remote event types must be registered. See \ref Network::RegisterRemoteEvent "RegisterRemoteEvent()". The registration affects only receiving events; sending whatever event is always allowed. There is a fixed blacklist of event types defined in Source/Engine/Network/Network.cpp that pose a security risk and are never allowed to be registered for reception; for example E_CONSOLECOMMAND.
+For safety, allowed remote event types must be registered. See \ref Network::RegisterRemoteEvent "RegisterRemoteEvent()". The registration affects only receiving events; sending whatever event is always allowed. There is a fixed blacklist of event types defined in Source/Urho3D/Network/Network.cpp that pose a security risk and are never allowed to be registered for reception; for example E_CONSOLECOMMAND.
 
 Like with ordinary events, in script remote event types are strings instead of name hashes for convenience.
 
