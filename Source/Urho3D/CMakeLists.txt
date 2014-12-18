@@ -30,8 +30,8 @@ endif ()
 # Define generated source files
 add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrho3DRevision.cmake
-    DEPENDS ${STATIC_LIBRARY_TARGETS} ${PROJECT_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    DEPENDS ${STATIC_LIBRARY_TARGETS} ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
 
 # Define generated object files
