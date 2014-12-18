@@ -39,7 +39,7 @@ void ImportModel(const String&in fileName)
     if (applyMaterialList)
         args.Push("-l");
 
-    if (fileSystem.SystemRun(fileSystem.programDir + "AssetImporter", args) == 0)
+    if (fileSystem.SystemRun(fileSystem.programDir + "tool/AssetImporter", args) == 0)
     {
         Node@ newNode = editorScene.CreateChild(GetFileName(fileName));
         StaticModel@ newModel = newNode.CreateComponent("StaticModel");
@@ -81,7 +81,7 @@ void ImportScene(const String&in fileName)
             args.Push(options[i]);
         if (applyMaterialList)
             args.Push("-l");
-        if (fileSystem.SystemRun(fileSystem.programDir + "AssetImporter", args) == 0)
+        if (fileSystem.SystemRun(fileSystem.programDir + "tool/AssetImporter", args) == 0)
         {
             skipMruScene = true; // set to avoid adding tempscene to mru
             LoadScene(tempSceneName);
@@ -415,7 +415,7 @@ void ConvertModel(const String&in modelName, const String&in filePath, Array<Str
         args.Push("\"" + xmlFileName + "\"");
         args.Push("\"" + outFileName + "\"");
         args.Push("-a");
-        fileSystem.SystemRun(fileSystem.programDir + "OgreImporter", args);
+        fileSystem.SystemRun(fileSystem.programDir + "tool/OgreImporter", args);
     }
 
     convertedModels.Push(modelName);
