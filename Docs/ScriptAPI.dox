@@ -361,6 +361,14 @@ namespace Urho3D
 - %Scene : Scene pointer
 - %TimeStep : float
 
+### AttributeAnimationAdded
+- %ObjectAnimation : Object animation pointer
+- %AttributeAnimationName : String
+
+### AttributeAnimationRemoved
+- %ObjectAnimation : Object animation pointer
+- %AttributeAnimationName : String
+
 ### ScenePostUpdate
 - %Scene : Scene pointer
 - %TimeStep : float
