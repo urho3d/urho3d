@@ -56,11 +56,21 @@ bool Sprite2D::BeginLoad(Deserializer& source)
     if (GetName().Empty())
         SetName(source.GetName());
     
-    loadTexture_ = new Texture2D(context_);
-    loadTexture_->SetName(GetName());
+    // Reload
+    if (texture_)
+        loadTexture_ = texture_;
+    else
+    {
+        loadTexture_ = new Texture2D(context_);
+        loadTexture_->SetName(GetName());
+    }
     // In case we're async loading, only call BeginLoad() for the texture (load image but do not upload to GPU)
     if (!loadTexture_->BeginLoad(source))
     {
+        // Reload failed
+        if (loadTexture_ == texture_)
+            texture_.Reset();
+
         loadTexture_.Reset();
         return false;
     }
@@ -79,6 +89,12 @@ bool Sprite2D::EndLoad()
         
         if (texture_)
             SetRectangle(IntRect(0, 0, texture_->GetWidth(), texture_->GetHeight()));
+    }
+    else
+    {
+        // Reload failed
+        if (loadTexture_ == texture_)
+            texture_.Reset();
     }
 
     loadTexture_.Reset();
