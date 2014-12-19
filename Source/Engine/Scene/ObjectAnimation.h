@@ -69,10 +69,14 @@ public:
     float GetAttributeAnimationSpeed(const String& name) const;
     /// Return all attribute animations infos.
     const HashMap<String, SharedPtr<ValueAnimationInfo> >& GetAttributeAnimationInfos() const { return attributeAnimationInfos_; }
-
-private:
     /// Return attribute animation info by name.
     ValueAnimationInfo* GetAttributeAnimationInfo(const String& name) const;
+
+private:
+    /// Send attribute animation added event.
+    void SendAttributeAniamtionAddedEvent(const String& name);
+    /// Send attribute animation remove event.
+    void SendAttributeAniamtionRemovedEvent(const String& name);
 
     /// Name to attribute animation info mapping.
     HashMap<String, SharedPtr<ValueAnimationInfo> > attributeAnimationInfos_;

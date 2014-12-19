@@ -26,6 +26,7 @@
 #include "Log.h"
 #include "ObjectAnimation.h"
 #include "ResourceCache.h"
+#include "SceneEvents.h"
 #include "ValueAnimation.h"
 #include "XMLElement.h"
 
@@ -161,12 +162,20 @@ void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation)
         return;
 
     if (objectAnimation_)
+    {
         OnObjectAnimationRemoved(objectAnimation_);
+        UnsubscribeFromEvent(objectAnimation_, E_ATTRIBUTEANIMATIONADDED);
+        UnsubscribeFromEvent(objectAnimation_, E_ATTRIBUTEANIMATIONREMOVED);
+    }
 
     objectAnimation_ = objectAnimation;
 
     if (objectAnimation_)
+    {
         OnObjectAnimationAdded(objectAnimation_);
+        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONADDED, HANDLER(Animatable, HandleAttributeAnimationAdded));
+        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONREMOVED, HANDLER(Animatable, HandleAttributeAnimationRemoved));
+    }
 }
 
 void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed)
@@ -357,6 +366,32 @@ AttributeAnimationInfo* Animatable::GetAttributeAnimationInfo(const String& name
         return i->second_;
 
     return 0;
+}
+
+void Animatable::HandleAttributeAnimationAdded(StringHash eventType, VariantMap& eventData)
+{
+    if (!objectAnimation_)
+        return;
+
+    using namespace AttributeAnimationAdded;
+    const String& name =eventData[P_ATTRIBUTEANIMATIONNAME].GetString();
+
+    ValueAnimationInfo* info = objectAnimation_->GetAttributeAnimationInfo(name);
+    if (!info)
+        return;
+
+    SetObjectAttributeAnimation(name, info->GetAnimation(), info->GetWrapMode(), info->GetSpeed());
+}
+
+void Animatable::HandleAttributeAnimationRemoved(StringHash eventType, VariantMap& eventData)
+{
+    if (!objectAnimation_)
+        return;
+
+    using namespace AttributeAnimationRemoved;
+    const String& name = eventData[P_ATTRIBUTEANIMATIONNAME].GetString();
+
+    SetObjectAttributeAnimation(name, 0, WM_LOOP, 1.0f);
 }
 
 }

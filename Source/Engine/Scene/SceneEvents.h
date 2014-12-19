@@ -72,6 +72,20 @@ EVENT(E_ATTRIBUTEANIMATIONUPDATE, AttributeAnimationUpdate)
     PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
+/// Attribute animation added to object animation.
+EVENT(E_ATTRIBUTEANIMATIONADDED, AttributeAnimationAdded)
+{
+    PARAM(P_OBJECTANIMATION, ObjectAnimation);               // Object animation pointer
+    PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String
+}
+
+/// Attribute animation removed from object animation.
+EVENT(E_ATTRIBUTEANIMATIONREMOVED, AttributeAnimationRemoved)
+{
+    PARAM(P_OBJECTANIMATION, ObjectAnimation);               // Object animation pointer
+    PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String
+}
+
 /// Variable timestep scene post-update.
 EVENT(E_SCENEPOSTUPDATE, ScenePostUpdate)
 {
