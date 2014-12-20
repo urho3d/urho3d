@@ -134,7 +134,7 @@ else ()
         if (ANDROID)
             set (URHO3D_LIB_SEARCH_PATH ${URHO3D_BUILD_TREE}/libs/${ANDROID_NDK_ABI_NAME})
         else ()
-            set (URHO3D_LIB_SEARCH_PATH ${URHO3D_BUILD_TREE}/Lib)
+            set (URHO3D_LIB_SEARCH_PATH ${URHO3D_BUILD_TREE}/lib)
         endif ()
         # Only perform a non-rooted search in the specified path
         find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

@@ -56,8 +56,8 @@ if (NOT CMAKE_HOST_WIN32)
     # CMake already automatically appends "Urho3D" to CMAKE_INSTALL_PREFIX on Windows platform
     set (PATH_SUFFIX /Urho3D)
     if (URHO3D_64BIT)
-        if (NOT CMAKE_CROSSCOMPILING AND EXISTS /usr/lib64)
-            # Probably target system is a RedHat-based distro
+        if (EXISTS /usr/lib64)
+            # Probably host system is a RedHat-based distro
             set (LIB_SUFFIX 64)
         endif ()
     endif ()
@@ -67,6 +67,7 @@ if (NOT CMAKE_HOST_WIN32)
     endif ()
 endif ()
 set (DEST_INCLUDE_DIR include${PATH_SUFFIX})
+file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR})
 set (DEST_SHARE_DIR share${PATH_SUFFIX})
 set (DEST_RUNTIME_DIR ${DEST_SHARE_DIR}/Bin)
 # Note: ${PATH_SUFFIX} for library could be removed if the extra path is not desirable, but if so then the RPATH setting below needs to be adjusted accordingly

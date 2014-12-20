@@ -157,11 +157,11 @@ source_group(Dynamics\\Joints FILES ${BOX2D_Joints_SRCS} ${BOX2D_Joints_HDRS})
 source_group(Include FILES ${BOX2D_General_HDRS})
 source_group(Rope FILES ${BOX2D_Rope_SRCS} ${BOX2D_Rope_HDRS})
 
-# Install dependency for Engine/Urho2D/PhysicsWorld2D.h and Engine/Urho2D/RigidBody2D.h
-install (DIRECTORY Box2D DESTINATION ${DEST_INCLUDE_DIR} ${DEST_PERMISSIONS} FILES_MATCHING PATTERN *.h)
-
 # Define dependency libs
 set (INCLUDE_DIRS_ONLY .)
 
 # Setup target
 setup_library ()
+
+# Install dependency for Engine/Urho2D/PhysicsWorld2D.h and Engine/Urho2D/RigidBody2D.h
+install_header_files (DIRECTORY Box2D DESTINATION ${DEST_INCLUDE_DIR} FILES_MATCHING PATTERN *.h)

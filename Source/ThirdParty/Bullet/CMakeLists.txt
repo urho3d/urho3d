@@ -17,12 +17,12 @@ file (GLOB H_FILES *.h src/BulletCollision/BroadphaseCollision/*.h
     src/BulletDynamics/Featherstone/*.h src/BulletDynamics/MLCPSolvers/*.h
     src/LinearMath/*.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
-# Install dependency for Engine/Physics/PhysicsWorld.h and Engine/Physics/RigidBody.h
-install (DIRECTORY src/LinearMath DESTINATION ${DEST_INCLUDE_DIR}/Bullet ${DEST_PERMISSIONS} FILES_MATCHING PATTERN *.h)
-set (INSTALL_INCLUDE_DIRS ${INSTALL_INCLUDE_DIRS} Bullet PARENT_SCOPE)
 
 # Define dependency libs
 set (INCLUDE_DIRS_ONLY src)
 
 # Setup target
 setup_library ()
+
+# Install dependency for Engine/Physics/PhysicsWorld.h and Engine/Physics/RigidBody.h
+install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/Bullet FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant

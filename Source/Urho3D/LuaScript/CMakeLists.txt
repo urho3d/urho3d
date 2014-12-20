@@ -84,7 +84,6 @@ endforeach ()
 
 # Define source files
 define_source_files (EXTRA_CPP_FILES ${GEN_CPP_FILES})
-install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
 
 # Define dependency libs
 set (LIBS ../../ThirdParty/Lua${JIT}/src)
@@ -110,3 +109,6 @@ endif ()
 
 # Setup target
 setup_library ()
+
+# Install dependency for Engine
+install_header_files (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})

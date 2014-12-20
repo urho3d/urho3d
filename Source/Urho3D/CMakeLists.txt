@@ -85,14 +85,12 @@ endif ()
 
 foreach (SOURCE ${SOURCES})
     add_subdirectory (${SOURCE})
-    install (DIRECTORY ${SOURCE}/ DESTINATION ${DEST_INCLUDE_DIR} ${DEST_PERMISSIONS} FILES_MATCHING PATTERN *.h)    # Note: the trailing slash is significant
     source_group ("Source Files\\${SOURCE}" FILES ${${SOURCE}_CPP_FILES})
     source_group ("Header Files\\${SOURCE}" FILES ${${SOURCE}_H_FILES})
     list (APPEND ENGINE_SOURCE_FILES ${${SOURCE}_CPP_FILES} ${${SOURCE}_H_FILES})
     list (APPEND ENGINE_INCLUDE_DIRS_ONLY ${SOURCE})
 endforeach ()
 define_source_files (EXTRA_CPP_FILES ${ENGINE_SOURCE_FILES} EXTRA_H_FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h PCH)
-install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
 list (APPEND SOURCE_FILES ${ALL_OBJ_FILES})
 set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 
@@ -107,7 +105,7 @@ list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR} ../ThirdParty/SDL/inc
 if (ANDROID)
     set (OUTPUT_PATH ${ANDROID_LIBRARY_OUTPUT_PATH})
 else ()
-    set (OUTPUT_PATH ${CMAKE_BINARY_DIR}/Lib)
+    set (OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 endif ()
 set_output_directories (${OUTPUT_PATH} ARCHIVE LIBRARY)
  
@@ -214,7 +212,13 @@ if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_EXPORTS_LIB_TYPE OR ${CMAKE_CURRENT_SOUR
     file (READ ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h EXPORT_DEFINE)
     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
 endif ()
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_DIR})
+
+# Install dependency for Engine
+foreach (SOURCE ${SOURCES})
+    install_header_files (DIRECTORY ${SOURCE}/ DESTINATION ${DEST_INCLUDE_DIR} FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
+endforeach ()
+install_header_files (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
+install_header_files (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_DIR})
 
 # Generate platform specific pkg-config file for the benefit of Urho3D library users via SDK without CMake
 if (NOT IOS)
@@ -234,7 +238,7 @@ if (NOT IOS)
         endif ()
     endif ()
     if (MSVC)
-        # todo: Add a post build command to adjust the LIB_NAME when in Debug configuration
+        # todo: Add a post build command to adjust the LIB_NAME when in Debug configuration (CMake/VS generator is multi-config)
         set (DASH /)
         set (LIB_DIR "/LIBPATH:\"\${libdir}\"")
         string (REPLACE ";" ".lib\" \"" URHO3D_LIBS "\"${LIB_NAME};${LINK_LIBS_ONLY}.lib\"")
@@ -249,7 +253,7 @@ if (NOT IOS)
         string (REPLACE ";" "\" ${DASH}I\"" GLOBAL_INCLUDE_DIRS "${DASH}I\"${GLOBAL_INCLUDE_DIRS}\"")
         string (REPLACE "${SYSROOT}" "" GLOBAL_INCLUDE_DIRS ${GLOBAL_INCLUDE_DIRS})
     endif ()
-    string (REPLACE ";" "\" ${DASH}I\"\${includedir}/" ENGINE_INCLUDE_DIRS "${DASH}I\"\${includedir};${INSTALL_INCLUDE_DIRS}\"")
+    set (ENGINE_INCLUDE_DIRS "${DASH}I\"\${includedir}${PATH_SUFFIX}\" ${DASH}I\"\${includedir}\"")
     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc @ONLY)
     if (ANDROID)
         set (RENAME RENAME Urho3D-${ANDROID_NDK_ABI_NAME}.pc)
