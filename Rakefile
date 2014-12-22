@@ -387,7 +387,7 @@ def makefile_ci
   system "export URHO3D_HOME=../.. && cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
   puts "\nInstalling Urho3D SDK...\n"
   # Create a new project on the fly that uses newly installed Urho3D SDK
-  install_destination = ENV['LINUX'] || ENV['OSX'] ? 'DESTDIR=~ && export URHO3D_HOME=~/usr/local' : ''
+  install_destination = ENV['LINUX'] || ENV['WINDOWS'] || ENV['OSX'] ? 'DESTDIR=~ && export URHO3D_HOME=~/usr/local' : ''
   scaffolding "../Build/generated/UsingSDK"
   system "cd ../Build && make -j$NUMJOBS install >/dev/null #{install_destination} && cd ../Build/generated/UsingSDK && echo '\nExternal project referencing Urho3D SDK' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
   # Make, deploy, and test run Android APK in an Android (virtual) device

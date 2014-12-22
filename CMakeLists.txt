@@ -131,7 +131,7 @@ if (NOT DEFINED ENV{RELEASE_TAG})
 endif ()
 include (CPack)
 
-# Setup SDL-like include dir in the build tree
+# Setup SDK-like include dir in the build tree
 foreach (DIR Direct3D9 OpenGL SDL)
     file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/${DIR})
 endforeach ()
