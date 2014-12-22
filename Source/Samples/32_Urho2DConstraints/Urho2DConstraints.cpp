@@ -20,45 +20,46 @@
 // THE SOFTWARE.
 //
 
-#include "Camera.h"
-#include "CollisionBox2D.h"
-#include "CollisionCircle2D.h"
-#include "CollisionEdge2D.h"
-#include "CollisionPolygon2D.h"
-#include "ConstraintDistance2D.h"
-#include "ConstraintFriction2D.h"
-#include "ConstraintGear2D.h"
-#include "ConstraintMotor2D.h"
-#include "ConstraintMouse2D.h"
-#include "ConstraintPrismatic2D.h"
-#include "ConstraintPulley2D.h"
-#include "ConstraintRevolute2D.h"
-#include "ConstraintRope2D.h"
-#include "ConstraintWeld2D.h"
-#include "ConstraintWheel2D.h"
-#include "CoreEvents.h"
-#include "DebugNew.h"
-#include "DebugRenderer.h"
-#include "Drawable2D.h"
-#include "Engine.h"
-#include "FileSystem.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "Octree.h"
-#include "PhysicsWorld2D.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "RigidBody2D.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "Sprite2D.h"
-#include "StaticSprite2D.h"
-#include "Text.h"
-#include "Text3D.h"
+#include <Urho3D/Camera.h>
+#include <Urho3D/CollisionBox2D.h>
+#include <Urho3D/CollisionCircle2D.h>
+#include <Urho3D/CollisionEdge2D.h>
+#include <Urho3D/CollisionPolygon2D.h>
+#include <Urho3D/ConstraintDistance2D.h>
+#include <Urho3D/ConstraintFriction2D.h>
+#include <Urho3D/ConstraintGear2D.h>
+#include <Urho3D/ConstraintMotor2D.h>
+#include <Urho3D/ConstraintMouse2D.h>
+#include <Urho3D/ConstraintPrismatic2D.h>
+#include <Urho3D/ConstraintPulley2D.h>
+#include <Urho3D/ConstraintRevolute2D.h>
+#include <Urho3D/ConstraintRope2D.h>
+#include <Urho3D/ConstraintWeld2D.h>
+#include <Urho3D/ConstraintWheel2D.h>
+#include <Urho3D/CoreEvents.h>
+#include <Urho3D/DebugNew.h>
+#include <Urho3D/DebugRenderer.h>
+#include <Urho3D/Drawable2D.h>
+#include <Urho3D/Engine.h>
+#include <Urho3D/FileSystem.h>
+#include <Urho3D/Font.h>
+#include <Urho3D/Graphics.h>
+#include <Urho3D/Input.h>
+#include <Urho3D/Octree.h>
+#include <Urho3D/PhysicsWorld2D.h>
+#include <Urho3D/Renderer.h>
+#include <Urho3D/ResourceCache.h>
+#include <Urho3D/RigidBody2D.h>
+#include <Urho3D/Scene.h>
+#include <Urho3D/SceneEvents.h>
+#include <Urho3D/Sprite2D.h>
+#include <Urho3D/StaticSprite2D.h>
+#include <Urho3D/Text.h>
+#include <Urho3D/Text3D.h>
+#include <Urho3D/Vector.h>
+#include <Urho3D/Zone.h>
+
 #include "Urho2DConstraints.h"
-#include "Vector.h"
-#include "Zone.h"
 
 DEFINE_APPLICATION_MAIN(Urho2DConstraints)
 

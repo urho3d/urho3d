@@ -20,31 +20,31 @@
 // THE SOFTWARE.
 //
 
-#include "Animation.h"
-#include "AnimatedModel.h"
-#include "AnimationState.h"
-#include "Camera.h"
-#include "CoreEvents.h"
-#include "DebugRenderer.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "Light.h"
-#include "Material.h"
-#include "Model.h"
-#include "Mover.h"
-#include "Octree.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "Text.h"
-#include "UI.h"
-#include "Zone.h"
+#include <Urho3D/Animation.h>
+#include <Urho3D/AnimatedModel.h>
+#include <Urho3D/AnimationState.h>
+#include <Urho3D/Camera.h>
+#include <Urho3D/CoreEvents.h>
+#include <Urho3D/DebugRenderer.h>
+#include <Urho3D/Engine.h>
+#include <Urho3D/Font.h>
+#include <Urho3D/Graphics.h>
+#include <Urho3D/Input.h>
+#include <Urho3D/Light.h>
+#include <Urho3D/Material.h>
+#include <Urho3D/Model.h>
+#include <Urho3D/Octree.h>
+#include <Urho3D/Renderer.h>
+#include <Urho3D/ResourceCache.h>
+#include <Urho3D/Scene.h>
+#include <Urho3D/Text.h>
+#include <Urho3D/UI.h>
+#include <Urho3D/Zone.h>
 
+#include "Mover.h"
 #include "SkeletalAnimation.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(SkeletalAnimation)
 

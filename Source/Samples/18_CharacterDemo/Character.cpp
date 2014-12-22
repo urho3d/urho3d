@@ -20,15 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "AnimationController.h"
+#include <Urho3D/AnimationController.h>
+#include <Urho3D/Context.h>
+#include <Urho3D/MemoryBuffer.h>
+#include <Urho3D/PhysicsEvents.h>
+#include <Urho3D/PhysicsWorld.h>
+#include <Urho3D/RigidBody.h>
+#include <Urho3D/Scene.h>
+#include <Urho3D/SceneEvents.h>
+
 #include "Character.h"
-#include "Context.h"
-#include "MemoryBuffer.h"
-#include "PhysicsEvents.h"
-#include "PhysicsWorld.h"
-#include "RigidBody.h"
-#include "Scene.h"
-#include "SceneEvents.h"
 
 Character::Character(Context* context) :
     LogicComponent(context),

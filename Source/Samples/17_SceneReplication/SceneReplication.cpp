@@ -20,41 +20,41 @@
 // THE SOFTWARE.
 //
 
-#include "Button.h"
-#include "Camera.h"
-#include "CollisionShape.h"
-#include "Connection.h"
-#include "Controls.h"
-#include "CoreEvents.h"
-#include "Cursor.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "Light.h"
-#include "LineEdit.h"
-#include "Log.h"
-#include "Material.h"
-#include "Model.h"
-#include "Network.h"
-#include "NetworkEvents.h"
-#include "Octree.h"
-#include "PhysicsEvents.h"
-#include "PhysicsWorld.h"
-#include "Renderer.h"
-#include "RigidBody.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "StaticModel.h"
-#include "Text.h"
-#include "UI.h"
-#include "UIEvents.h"
-#include "XMLFile.h"
-#include "Zone.h"
+#include <Urho3D/Button.h>
+#include <Urho3D/Camera.h>
+#include <Urho3D/CollisionShape.h>
+#include <Urho3D/Connection.h>
+#include <Urho3D/Controls.h>
+#include <Urho3D/CoreEvents.h>
+#include <Urho3D/Cursor.h>
+#include <Urho3D/Engine.h>
+#include <Urho3D/Font.h>
+#include <Urho3D/Graphics.h>
+#include <Urho3D/Input.h>
+#include <Urho3D/Light.h>
+#include <Urho3D/LineEdit.h>
+#include <Urho3D/Log.h>
+#include <Urho3D/Material.h>
+#include <Urho3D/Model.h>
+#include <Urho3D/Network.h>
+#include <Urho3D/NetworkEvents.h>
+#include <Urho3D/Octree.h>
+#include <Urho3D/PhysicsEvents.h>
+#include <Urho3D/PhysicsWorld.h>
+#include <Urho3D/Renderer.h>
+#include <Urho3D/RigidBody.h>
+#include <Urho3D/ResourceCache.h>
+#include <Urho3D/Scene.h>
+#include <Urho3D/StaticModel.h>
+#include <Urho3D/Text.h>
+#include <Urho3D/UI.h>
+#include <Urho3D/UIEvents.h>
+#include <Urho3D/XMLFile.h>
+#include <Urho3D/Zone.h>
 
 #include "SceneReplication.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 // UDP port we will use
 static const unsigned short SERVER_PORT = 2345;

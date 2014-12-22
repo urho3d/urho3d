@@ -20,24 +20,24 @@
 // THE SOFTWARE.
 //
 
-#include "Audio.h"
-#include "Button.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Input.h"
-#include "Log.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "Slider.h"
-#include "Sound.h"
-#include "SoundSource.h"
-#include "Text.h"
-#include "UI.h"
-#include "UIEvents.h"
+#include <Urho3D/Audio.h>
+#include <Urho3D/Button.h>
+#include <Urho3D/Engine.h>
+#include <Urho3D/Font.h>
+#include <Urho3D/Input.h>
+#include <Urho3D/Log.h>
+#include <Urho3D/ResourceCache.h>
+#include <Urho3D/Scene.h>
+#include <Urho3D/Slider.h>
+#include <Urho3D/Sound.h>
+#include <Urho3D/SoundSource.h>
+#include <Urho3D/Text.h>
+#include <Urho3D/UI.h>
+#include <Urho3D/UIEvents.h>
 
 #include "SoundEffects.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 // Custom variable identifier for storing sound effect name within the UI element
 static const StringHash VAR_SOUNDRESOURCE("SoundResource");

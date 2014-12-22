@@ -20,25 +20,25 @@
 // THE SOFTWARE.
 //
 
-#include "Context.h"
-#include "Engine.h"
-#include "File.h"
-#include "FileSystem.h"
-#include "Log.h"
-#include "ProcessUtils.h"
-#include "ResourceCache.h"
-#include "Script.h"
-#include "ScriptFile.h"
+#include <Urho3D/Context.h>
+#include <Urho3D/Engine.h>
+#include <Urho3D/File.h>
+#include <Urho3D/FileSystem.h>
+#include <Urho3D/Log.h>
+#include <Urho3D/ProcessUtils.h>
+#include <Urho3D/ResourceCache.h>
+#include <Urho3D/Script.h>
+#include <Urho3D/ScriptFile.h>
 
 #ifdef URHO3D_LUA
-#include "LuaScript.h"
+#include <Urho3D/LuaScript.h>
 #endif
 
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 using namespace Urho3D;
 

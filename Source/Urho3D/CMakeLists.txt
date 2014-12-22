@@ -98,8 +98,8 @@ set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 foreach (LIST_NAME LIBS INCLUDE_DIRS_ONLY LINK_LIBS_ONLY)
     set_list (${LIST_NAME} ENGINE_${LIST_NAME} REMOVE_DUPLICATE)
 endforeach ()
-# Add include directories to find the export header and SDL header
-list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR} ../ThirdParty/SDL/include)
+# Add include directories to find the export header and headers from exported SDKs
+list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR})
 
 # Setup library output path
 if (ANDROID)
@@ -253,7 +253,7 @@ if (NOT IOS)
         string (REPLACE ";" "\" ${DASH}I\"" GLOBAL_INCLUDE_DIRS "${DASH}I\"${GLOBAL_INCLUDE_DIRS}\"")
         string (REPLACE "${SYSROOT}" "" GLOBAL_INCLUDE_DIRS ${GLOBAL_INCLUDE_DIRS})
     endif ()
-    set (ENGINE_INCLUDE_DIRS "${DASH}I\"\${includedir}${PATH_SUFFIX}\" ${DASH}I\"\${includedir}\"")
+    set (ENGINE_INCLUDE_DIRS "${DASH}I\"\${includedir}/${PATH_SUFFIX}\" ${DASH}I\"\${includedir}\"")
     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc @ONLY)
     if (ANDROID)
         set (RENAME RENAME Urho3D-${ANDROID_NDK_ABI_NAME}.pc)

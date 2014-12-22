@@ -20,29 +20,15 @@
 // THE SOFTWARE.
 //
 
+#include <Urho3D/Button.h>
+#include <Urho3D/CoreEvents.h>
+#include <Urho3D/Font.h>
+#include <Urho3D/Text.h>
+#include <Urho3D/UIEvents.h>
+
 #include "UIDrag.h"
 
-#include "Camera.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "Octree.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "Zone.h"
-#include "Drawable2D.h"
-#include "Log.h"
-
-#include "UIEvents.h"
-#include "Text.h"
-#include "UIElement.h"
-#include "Button.h"
-
-#include "DebugNew.h"
-#include "Log.h"
+#include <Urho3D/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(UIDrag)
 

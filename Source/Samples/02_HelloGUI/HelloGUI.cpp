@@ -20,26 +20,26 @@
 // THE SOFTWARE.
 //
 
-#include "Button.h"
-#include "BorderImage.h"
-#include "CheckBox.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "LineEdit.h"
-#include "ResourceCache.h"
-#include "Text.h"
-#include "Texture2D.h"
-#include "ToolTip.h"
-#include "UI.h"
-#include "UIElement.h"
-#include "UIEvents.h"
-#include "Window.h"
+#include <Urho3D/Button.h>
+#include <Urho3D/BorderImage.h>
+#include <Urho3D/CheckBox.h>
+#include <Urho3D/CoreEvents.h>
+#include <Urho3D/Engine.h>
+#include <Urho3D/Graphics.h>
+#include <Urho3D/Input.h>
+#include <Urho3D/LineEdit.h>
+#include <Urho3D/ResourceCache.h>
+#include <Urho3D/Text.h>
+#include <Urho3D/Texture2D.h>
+#include <Urho3D/ToolTip.h>
+#include <Urho3D/UI.h>
+#include <Urho3D/UIElement.h>
+#include <Urho3D/UIEvents.h>
+#include <Urho3D/Window.h>
 
 #include "HelloGUI.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(HelloGUI)
 

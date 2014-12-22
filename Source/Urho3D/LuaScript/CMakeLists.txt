@@ -89,7 +89,7 @@ define_source_files (EXTRA_CPP_FILES ${GEN_CPP_FILES})
 set (LIBS ../../ThirdParty/Lua${JIT}/src)
 set (LINK_LIBS_ONLY toluapp)
 set (INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Navigation ../Resource ../Scene ../UI
-    ../../ThirdParty/SDL/include ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Source/Urho3D)
+    ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR})
 
 if (URHO3D_NAVIGATION)
     set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Navigation)

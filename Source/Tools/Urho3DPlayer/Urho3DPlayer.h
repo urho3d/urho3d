@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Application.h"
+#include <Urho3D/Application.h>
 
 using namespace Urho3D;
 

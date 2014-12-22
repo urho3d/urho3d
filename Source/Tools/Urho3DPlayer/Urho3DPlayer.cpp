@@ -20,26 +20,26 @@
 // THE SOFTWARE.
 //
 
-#include "Engine.h"
-#include "FileSystem.h"
-#include "Log.h"
-#include "Main.h"
-#include "ProcessUtils.h"
-#include "ResourceCache.h"
-#include "ResourceEvents.h"
+#include <Urho3D/Engine.h>
+#include <Urho3D/FileSystem.h>
+#include <Urho3D/Log.h>
+#include <Urho3D/Main.h>
+#include <Urho3D/ProcessUtils.h>
+#include <Urho3D/ResourceCache.h>
+#include <Urho3D/ResourceEvents.h>
 
 #ifdef URHO3D_ANGELSCRIPT
-#include "ScriptFile.h"
-#include "Script.h"
+#include <Urho3D/ScriptFile.h>
+#include <Urho3D/Script.h>
 #endif
 
 #ifdef URHO3D_LUA
-#include "LuaScript.h"
+#include <Urho3D/LuaScript.h>
 #endif
 
 #include "Urho3DPlayer.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(Urho3DPlayer);
 

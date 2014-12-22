@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Controls.h"
-#include "LogicComponent.h"
+#include <Urho3D/Controls.h>
+#include <Urho3D/LogicComponent.h>
 
 namespace Urho3D
 {

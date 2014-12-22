@@ -119,6 +119,9 @@ set (INCLUDE_DIRS_ONLY include)
 # Setup target
 setup_library ()
 
-# Install dependency for SDL_android_main.c, D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h
-install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/SDL FILES_MATCHING PATTERN *.h)     # Note: the trailing slash is significant
-install_header_files (FILES src/main/android/SDL_android_main.c DESTINATION ${DEST_INCLUDE_DIR})    # Intentionally install this C file in include dir
+# Install dependency for D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h
+install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
+# Install dependency for SDL_android_main.c
+install_header_files (DIRECTORY src/main/android DESTINATION ${DEST_INCLUDE_DIR}/SDL)
+install_header_files (FILES src/SDL_internal.h DESTINATION ${DEST_INCLUDE_DIR}/SDL)
+install_header_files (DIRECTORY src/dynapi DESTINATION ${DEST_INCLUDE_DIR}/SDL FILES_MATCHING PATTERN *.h)

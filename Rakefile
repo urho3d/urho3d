@@ -42,13 +42,16 @@ task :scaffolding do
   scaffolding(abs_path, project, target)
   abs_path = Pathname.new(abs_path).realpath
   puts "\nNew project created in #{abs_path}\n\n"
-  puts "To build the new project, you may need to first set and export either 'URHO3D_HOME' and 'URHO3D_BUILD_TREE'; or 'CMAKE_PREFIX_PATH' environment variable"
-  puts "Please see http://urho3d.github.io/documentation/HEAD/_using_library.html for more detail. For example of using Urho3D source and build trees directly:\n\n"
+  puts "To build the new project, you may need to first set and export 'URHO3D_HOME' to point to your Urho3D build tree or your custom Urho3D SDK installation location."
+  puts "Please see http://urho3d.github.io/documentation/HEAD/_using_library.html for more detail. For example:\n\n"
   if ENV['OS']
-    puts "set URHO3D_HOME=#{Dir.pwd}\nset URHO3D_BUILD_TREE=/path/to/your/build/tree\ncd #{abs_path}\ncmake_vs2013.bat -DURHO3D_64BIT=1 -DURHO3D_LUAJIT=1\n\n"
+    puts "set URHO3D_HOME=/path/to/Urho3D/build/tree\ncd #{abs_path}\nrake cmake URHO3D_64BIT=1 URHO3D_LUAJIT=1\nrake make\n\n"
+    puts "Alternatively you can call one of the batch files directly, such as, cmake_vs2013.bat ../native-Build -DURHO3D_64BIT=1 -DURHO3D_LUAJIT=1 and build using VS IDE"
   else
-    puts "export URHO3D_HOME=#{Dir.pwd} URHO3D_BUILD_TREE=/path/to/your/build/tree\ncd #{abs_path}\n./cmake_generic.sh -DURHO3D_LUAJIT=1\ncd Build\nmake\n\n"
+    puts "export URHO3D_HOME=/path/to/Urho3D/build/tree\ncd #{abs_path}\nrake cmake URHO3D_LUAJIT=1\nrake make\n\n"
+    puts "Alternatively you can call one of the shell scripts directly, such as, ./cmake_generic.sh ../native-Build -DURHO3D_LUAJIT=1 && cd ../native-Build && make"
   end
+  puts "to get a similar result as the last two rake tasks above.\n\n"
 end
 
 # Usage: rake cmake [prefix_path=..] [fix_scm] (only intended to be used by lazy man =), e.g. rake cmake clean android; rake cmake android URHO3D_LIB_TYPE=SHARED
@@ -104,7 +107,6 @@ task :make do
     end
   }
   if !Dir.glob("#{prefix_path}/#{platform}-Build/*.xcodeproj").empty?
-    build_options.gsub!(/ ([^=]+)=(\w+)/, ' -\1 \2')
     filter = '|xcpretty'
   elsif !Dir.glob("#{prefix_path}/#{platform}-Build/*.sln").empty?
     filter = ''
@@ -202,7 +204,7 @@ task :ci_site_update do
       bump_soversion 'Source/Urho3D/.soversion' or abort 'Failed to bump soversion'
       system "git add Source/Urho3D/.soversion && git commit --amend -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'" or abort 'Failed to stage .soversion file'
     end
-    system "git push origin HEAD:master -q >/dev/null 2>&1" or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
+    system 'git push origin HEAD:master -q >/dev/null 2>&1' or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
   end
 end
 
@@ -230,9 +232,9 @@ task :ci_package_upload do
   unless ENV['SITE_UPDATE']
     system 'echo Generate documentation'
     if ENV['XCODE']
-      xcode_build(ENV['IOS'], "../Build/Urho3D.xcodeproj", 'doc', '>/dev/null') or abort 'Failed to generate documentation'
+      xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj', 'doc', '>/dev/null') or abort 'Failed to generate documentation'
     else
-      system "cd ../Build && make -j$NUMJOBS doc >/dev/null" or abort 'Failed to generate documentation'
+      system 'cd ../Build && make -j$NUMJOBS doc >/dev/null' or abort 'Failed to generate documentation'
     end
   end
   # Make the package
@@ -245,17 +247,17 @@ task :ci_package_upload do
     if !ENV['CI_START_TIME'] || elapsed_time < 15 # minutes
       # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
       system 'echo Rebuild Urho3D library as Mach-O universal binary'
-      xcode_build(0, "../Build/Urho3D.xcodeproj", 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
+      xcode_build(0, '../Build/Urho3D.xcodeproj', 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
     end
     # There is a bug in CMake/CPack that causes the 'package' target failed to build for IOS platform, workaround by calling cpack directly
-    system "cd ../Build && cpack -G TGZ 2>/dev/null" or abort 'Failed to make binary package'
+    system 'cd ../Build && cpack -G TGZ 2>/dev/null' or abort 'Failed to make binary package'
   elsif ENV['XCODE']
-    xcode_build(ENV['IOS'], "../Build/Urho3D.xcodeproj", 'package') or abort 'Failed to make binary package'
+    xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj', 'package') or abort 'Failed to make binary package'
   else
     if ENV['ANDROID'] && !ENV['NO_SDK_SYSIMG']
-      system "cd ../Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
+      system "cd ../Build && android update project -p . -t $(android list target |grep android-$API |cut -d ' ' -f2) && ant debug" or abort 'Failed to make Urho3D Samples APK'
     end
-    system "cd ../Build && make package" or abort 'Failed to make binary package'
+    system 'cd ../Build && make package' or abort 'Failed to make binary package'
   end
   # Determine the upload location
   setup_digital_keys
@@ -318,13 +320,10 @@ if (COMMAND cmake_policy)
 endif ()
 
 # Set CMake modules search path
-if (NOT CMAKE_HOST_WIN32)
-    set (MODULE_PATH_SUFFIX Urho3D/)
-endif ()
 set (CMAKE_MODULE_PATH
-    $ENV{URHO3D_HOME}/CMake/Modules
-    $ENV{CMAKE_PREFIX_PATH}/share/${MODULE_PATH_SUFFIX}CMake/Modules
-    ${CMAKE_INSTALL_PREFIX}/share/${MODULE_PATH_SUFFIX}CMake/Modules
+    CMake/Modules
+    $ENV{URHO3D_HOME}/share/Urho3D/CMake/Modules
+    ${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules
     CACHE PATH \"Path to Urho3D-specific CMake modules\")
 
 # Include Urho3D CMake common module
@@ -353,9 +352,9 @@ endif ()
 EOF
   # TODO: Rewrite in pure Ruby when it supports symlink creation on Windows platform
   if ENV['OS']
-    system("@echo off && mkdir #{dir}\\Bin && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* #{dir} >nul && (for %f in (*.bat Rakefile) do mklink #{dir}\\%f %cd%\\%f >nul) && (for %d in (CoreData,Data) do mklink /D #{dir}\\Bin\\%d %cd%\\Bin\\%d >nul)") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
+    system("@echo off && mkdir #{dir}\\Bin && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* #{dir} >nul && (for %f in (*.bat Rakefile) do mklink #{dir}\\%f %cd%\\%f >nul) && mklink /D #{dir}\\CMake %cd%\\CMake && (for %d in (CoreData,Data) do mklink /D #{dir}\\Bin\\%d %cd%\\Bin\\%d >nul)") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
   else
-    system("bash -c \"mkdir -p #{dir}/Bin && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* #{dir} && for f in {.,}*.sh Rakefile; do ln -sf `pwd`/\\$f #{dir}; done && ln -sf `pwd`/Bin/{Core,}Data #{dir}/Bin\"") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
+    system("bash -c \"mkdir -p #{dir}/Bin && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* #{dir} && for f in {.,}*.sh Rakefile CMake; do ln -sf `pwd`/\\$f #{dir}; done && ln -sf `pwd`/Bin/{Core,}Data #{dir}/Bin\"") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
   end
 end
 
@@ -381,15 +380,16 @@ def makefile_ci
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
       android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
   end
-  if $testing == 1
-    test = '&& make test'
-  else
-    test = ''
-  end
+  test = $testing == 1 ? '&& make test' : ''
   system "cd ../Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
-  # Create a new project on the fly that uses newly built Urho3D library
-  scaffolding "../Build/generated/UsingSourceAndBuildTrees"
-  system "export URHO3D_HOME=`pwd` URHO3D_BUILD_TREE=../.. && cd ../Build/generated/UsingSourceAndBuildTrees && echo '\nExternal project using Urho3D source and build trees' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
+  # Create a new project on the fly that uses newly built Urho3D library in the build tree
+  scaffolding "../Build/generated/UsingBuildTree"
+  system "export URHO3D_HOME=../.. && cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
+  puts "\nInstalling Urho3D SDK...\n"
+  # Create a new project on the fly that uses newly installed Urho3D SDK
+  install_destination = ENV['LINUX'] || ENV['OSX'] ? 'DESTDIR=~ && export URHO3D_HOME=~/usr/local' : ''
+  scaffolding "../Build/generated/UsingSDK"
+  system "cd ../Build && make -j$NUMJOBS install >/dev/null #{install_destination} && cd ../Build/generated/UsingSDK && echo '\nExternal project referencing Urho3D SDK' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
   # Make, deploy, and test run Android APK in an Android (virtual) device
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']
     system "echo '\nTest deploying and running Urho3D Samples APK...' && cd ../Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
@@ -493,11 +493,17 @@ def xcode_ci
     deployment_target = "-DCMAKE_OSX_DEPLOYMENT_TARGET=#{ENV['DEPLOYMENT_TARGET']}"
   end
   system "./cmake_macosx.sh ../Build -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
-  xcode_build(ENV['IOS'], "../Build/Urho3D.xcodeproj") or abort 'Failed to build or test Urho3D library'
-  # Create a new project on the fly that uses newly built Urho3D library
-  scaffolding "../Build/generated/UsingSourceAndBuildTrees"
-  system "export URHO3D_HOME=`pwd` URHO3D_BUILD_TREE=../.. && cd ../Build/generated/UsingSourceAndBuildTrees && echo '\nExternal project using Urho3D source and build trees' && ./cmake_macosx.sh . -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
-  xcode_build(ENV['IOS'], "../Build/generated/UsingSourceAndBuildTrees/Scaffolding.xcodeproj") or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
+  xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj') or abort 'Failed to build or test Urho3D library'
+  # Create a new project on the fly that uses newly built Urho3D library in the build tree
+  scaffolding "../Build/generated/UsingBuildTree"
+  system "export URHO3D_HOME=../.. && cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_macosx.sh . -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
+  xcode_build(ENV['IOS'], '../Build/generated/UsingBuildTree/Scaffolding.xcodeproj') or abort 'Failed to build/test temporary project using Urho3D as external library'
+  puts "\nInstalling Urho3 SDK...\n"
+  # Create a new project on the fly that uses newly installed Urho3D SDK
+  scaffolding "../Build/generated/UsingSDK"
+  xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj', 'install', '>/dev/null') or abort 'Failed to install Urho3D SDK'
+  system "export URHO3D_HOME=~/usr/local && cd ../Build/generated/UsingSDK && echo '\nExternal project referencing Urho3D SDK' && ./cmake_macosx.sh . -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
+  xcode_build(ENV['IOS'], '../Build/generated/UsingSDK/Scaffolding.xcodeproj') or abort 'Failed to build/test temporary project using Urho3D as external library'
 end
 
 def xcode_build(ios, project, target = 'ALL_BUILD', extras = '')
@@ -550,11 +556,11 @@ end
 
 def setup_digital_keys
   system 'mkdir -p ~/.ssh && chmod 700 ~/.ssh' or abort 'Failed to create ~/.ssh directory'
-  system "cat <<EOF >>~/.ssh/known_hosts
+  system 'cat <<EOF >>~/.ssh/known_hosts
 frs.sourceforge.net,216.34.181.57 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA2uifHZbNexw6cXbyg1JnzDitL5VhYs0E65Hk/tLAPmcmm5GuiGeUoI/B0eUSNFsbqzwgwrttjnzKMKiGLN5CWVmlN1IXGGAfLYsQwK6wAu7kYFzkqP4jcwc5Jr9UPRpJdYIK733tSEmzab4qc5Oq8izKQKIaxXNe7FgmL15HjSpatFt9w/ot/CHS78FUAr3j3RwekHCm/jhPeqhlMAgC+jUgNJbFt3DlhDaRMa0NYamVzmX8D47rtmBbEDU3ld6AezWBPUR5Lh7ODOwlfVI58NAf/aYNlmvl2TZiauBCTa7OPYSyXJnIPbQXg6YQlDknNCr0K769EjeIlAfY87Z4tw==
-EOF" or abort 'Failed to append frs.sourceforge.net server public key to known_hosts'
+EOF' or abort 'Failed to append frs.sourceforge.net server public key to known_hosts'
   # Workaround travis encryption key size limitation. Rather than using the solution in their FAQ (using AES to encrypt/decrypt the file and check in the encrypted file into repo), our solution is more pragmatic. The private key below is incomplete. Only the missing portion is encrypted. Much less secure than the original 2048-bit RSA has to offer but good enough for our case. 
-  system "cat <<EOF >~/.ssh/id_rsa
+  system 'cat <<EOF >~/.ssh/id_rsa
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEAnZGzFEypdXKY3KDT0Q3NLY4Bv74yKgJ4LIgbXothx8w4CfM0
 VeWBL/AE2iRISEWGB07LruM9y+U/wt58WlCVu001GuJuvXwWenlljsvH8qQlErYi
@@ -582,7 +588,7 @@ cl9eTLchxLGr15b5SOeNrQ1TCO4qZM3M6Wgv+bRI0h2JW+c0ABpTIBzehOvXcwZq
 32a54xZxlsBw8T5P4BDy40OR7fu+6miUfL+WxUdII4fD3grlIPw6bpNE0bCDykv5
 RLq28S11hDrKf/ZetXNuIprfTlhl6ISBy+oWQibhXmFZSxEiXNV6hCQ=
 -----END RSA PRIVATE KEY-----
-EOF" or abort 'Failed to create user private key to id_rsa'
+EOF' or abort 'Failed to create user private key to id_rsa'
   system 'chmod 600 ~/.ssh/id_rsa' or abort 'Failed to change id_rsa file permission'
 end
 

@@ -163,5 +163,5 @@ set (INCLUDE_DIRS_ONLY .)
 # Setup target
 setup_library ()
 
-# Install dependency for Engine/Urho2D/PhysicsWorld2D.h and Engine/Urho2D/RigidBody2D.h
+# Install dependency for Urho3D/Urho2D/PhysicsWorld2D.h and Urho3D/Urho2D/RigidBody2D.h
 install_header_files (DIRECTORY Box2D DESTINATION ${DEST_INCLUDE_DIR} FILES_MATCHING PATTERN *.h)

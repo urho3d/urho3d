@@ -52,30 +52,24 @@ if (WIN32)
 else ()
     set (SCRIPT_EXT .sh)
 endif ()
-if (NOT CMAKE_HOST_WIN32)
-    # CMake already automatically appends "Urho3D" to CMAKE_INSTALL_PREFIX on Windows platform
-    set (PATH_SUFFIX /Urho3D)
-    if (URHO3D_64BIT)
-        if (EXISTS /usr/lib64)
-            # Probably host system is a RedHat-based distro
-            set (LIB_SUFFIX 64)
-        endif ()
-    endif ()
-    if (IOS)
-        # Use 'ios' arch subdirectory to differentiate, in case both Mac OS X and iOS build are installed at the same destination
-        set (LIB_SUFFIX ${LIB_SUFFIX}/ios)
+set (PATH_SUFFIX Urho3D)
+if (IOS)
+    # Use 'ios' arch subdirectory to differentiate, in case both Mac OS X and iOS build are installed at the same destination
+    set (LIB_SUFFIX ios)
+elseif (ANDROID)
+    set (LIB_SUFFIX s/${ANDROID_NDK_ABI_NAME})
+elseif (URHO3D_64BIT)
+    if (NOT CMAKE_HOST_WIN32 AND EXISTS /usr/lib64)
+        # Probably host system is a RedHat-based distro
+        set (LIB_SUFFIX 64)
     endif ()
 endif ()
-set (DEST_INCLUDE_DIR include${PATH_SUFFIX})
-file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR})
-set (DEST_SHARE_DIR share${PATH_SUFFIX})
+set (DEST_INCLUDE_DIR include/${PATH_SUFFIX})
+set (DEST_SHARE_DIR share/${PATH_SUFFIX})
 set (DEST_RUNTIME_DIR ${DEST_SHARE_DIR}/Bin)
-# Note: ${PATH_SUFFIX} for library could be removed if the extra path is not desirable, but if so then the RPATH setting below needs to be adjusted accordingly
-set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})
-if (ANDROID)
-    set (DEST_RUNTIME_DIR ${DEST_RUNTIME_DIR}/${ANDROID_NDK_ABI_NAME})
-    set (DEST_LIBRARY_DIR ${DEST_LIBRARY_DIR}/${ANDROID_NDK_ABI_NAME})
-endif ()
+# Note: ${PATH_SUFFIX} for library could be removed if the extra path is not desired, but if so then the RPATH setting in Source's CMakeLists.txt needs to be adjusted accordingly
+set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/${PATH_SUFFIX})
+# TODO: Refactor to use CMAKE_SYSROOT variable instead of our own SYSROOT variable when CMake minimum version is upgraded to 3.0.x
 set (SYSROOT ${ANDROID_TOOLCHAIN_ROOT} ${RPI_SYSROOT} ${MINGW_SYSROOT})         # SYSROOT is empty for native build
 string (REPLACE "${SYSROOT}" "" DEST_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})    # Our CMAKE_INSTALL_PREFIX is rooted, use DEST_INSTALL_PREFIX for the non-rooted version
 set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
@@ -136,6 +130,11 @@ if (NOT DEFINED ENV{RELEASE_TAG})
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-snapshot)
 endif ()
 include (CPack)
+
+# Setup SDL-like include dir in the build tree
+foreach (DIR Direct3D9 OpenGL SDL)
+    file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/${DIR})
+endforeach ()
 
 # Urho3D source
 add_subdirectory (Source)

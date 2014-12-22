@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "Animation.h"
-#include "BoundingBox.h"
-#include "Graphics.h"
-#include "Serializer.h"
-#include "Matrix3x4.h"
+#include <Urho3D/Animation.h>
+#include <Urho3D/BoundingBox.h>
+#include <Urho3D/Graphics.h>
+#include <Urho3D/Serializer.h>
+#include <Urho3D/Matrix3x4.h>
 
 using namespace Urho3D;
 

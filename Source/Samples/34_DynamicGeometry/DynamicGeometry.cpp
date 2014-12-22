@@ -20,31 +20,31 @@
 // THE SOFTWARE.
 //
 
-#include "Camera.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Geometry.h"
-#include "Graphics.h"
-#include "IndexBuffer.h"
-#include "Input.h"
-#include "Light.h"
-#include "Log.h"
-#include "Model.h"
-#include "Octree.h"
-#include "Profiler.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "StaticModel.h"
-#include "Text.h"
-#include "VertexBuffer.h"
-#include "UI.h"
-#include "Zone.h"
+#include <Urho3D/Camera.h>
+#include <Urho3D/CoreEvents.h>
+#include <Urho3D/Engine.h>
+#include <Urho3D/Font.h>
+#include <Urho3D/Geometry.h>
+#include <Urho3D/Graphics.h>
+#include <Urho3D/IndexBuffer.h>
+#include <Urho3D/Input.h>
+#include <Urho3D/Light.h>
+#include <Urho3D/Log.h>
+#include <Urho3D/Model.h>
+#include <Urho3D/Octree.h>
+#include <Urho3D/Profiler.h>
+#include <Urho3D/Renderer.h>
+#include <Urho3D/ResourceCache.h>
+#include <Urho3D/Scene.h>
+#include <Urho3D/StaticModel.h>
+#include <Urho3D/Text.h>
+#include <Urho3D/VertexBuffer.h>
+#include <Urho3D/UI.h>
+#include <Urho3D/Zone.h>
 
 #include "DynamicGeometry.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(DynamicGeometry)
 

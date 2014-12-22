@@ -20,36 +20,36 @@
 // THE SOFTWARE.
 //
 
-#include "AnimatedModel.h"
-#include "AnimationController.h"
-#include "Camera.h"
-#include "CollisionShape.h"
-#include "Controls.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "FileSystem.h"
-#include "Font.h"
-#include "Input.h"
-#include "Light.h"
-#include "Material.h"
-#include "Model.h"
-#include "Octree.h"
-#include "PhysicsWorld.h"
-#include "ProcessUtils.h"
-#include "Renderer.h"
-#include "RigidBody.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "StaticModel.h"
-#include "Text.h"
-#include "UI.h"
-#include "Zone.h"
+#include <Urho3D/AnimatedModel.h>
+#include <Urho3D/AnimationController.h>
+#include <Urho3D/Camera.h>
+#include <Urho3D/CollisionShape.h>
+#include <Urho3D/Controls.h>
+#include <Urho3D/CoreEvents.h>
+#include <Urho3D/Engine.h>
+#include <Urho3D/FileSystem.h>
+#include <Urho3D/Font.h>
+#include <Urho3D/Input.h>
+#include <Urho3D/Light.h>
+#include <Urho3D/Material.h>
+#include <Urho3D/Model.h>
+#include <Urho3D/Octree.h>
+#include <Urho3D/PhysicsWorld.h>
+#include <Urho3D/ProcessUtils.h>
+#include <Urho3D/Renderer.h>
+#include <Urho3D/RigidBody.h>
+#include <Urho3D/ResourceCache.h>
+#include <Urho3D/Scene.h>
+#include <Urho3D/StaticModel.h>
+#include <Urho3D/Text.h>
+#include <Urho3D/UI.h>
+#include <Urho3D/Zone.h>
 
 #include "Character.h"
 #include "CharacterDemo.h"
 #include "Touch.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(CharacterDemo)
 

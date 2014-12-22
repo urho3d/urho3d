@@ -20,17 +20,18 @@
 // THE SOFTWARE.
 //
 
-#include "CollisionShape.h"
-#include "Constraint.h"
-#include "Context.h"
-#include "Material.h"
-#include "Model.h"
-#include "PhysicsEvents.h"
-#include "PhysicsWorld.h"
-#include "ResourceCache.h"
-#include "RigidBody.h"
-#include "Scene.h"
-#include "StaticModel.h"
+#include <Urho3D/CollisionShape.h>
+#include <Urho3D/Constraint.h>
+#include <Urho3D/Context.h>
+#include <Urho3D/Material.h>
+#include <Urho3D/Model.h>
+#include <Urho3D/PhysicsEvents.h>
+#include <Urho3D/PhysicsWorld.h>
+#include <Urho3D/ResourceCache.h>
+#include <Urho3D/RigidBody.h>
+#include <Urho3D/Scene.h>
+#include <Urho3D/StaticModel.h>
+
 #include "Vehicle.h"
 
 Vehicle::Vehicle(Context* context) :

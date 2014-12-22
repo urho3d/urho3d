@@ -20,25 +20,25 @@
 // THE SOFTWARE.
 //
 
-#include "Application.h"
-#include "Camera.h"
-#include "Console.h"
-#include "Cursor.h"
-#include "DebugHud.h"
-#include "Engine.h"
-#include "FileSystem.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "InputEvents.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "Sprite.h"
-#include "Texture2D.h"
-#include "Timer.h"
-#include "UI.h"
-#include "XMLFile.h"
+#include <Urho3D/Application.h>
+#include <Urho3D/Camera.h>
+#include <Urho3D/Console.h>
+#include <Urho3D/Cursor.h>
+#include <Urho3D/DebugHud.h>
+#include <Urho3D/Engine.h>
+#include <Urho3D/FileSystem.h>
+#include <Urho3D/Graphics.h>
+#include <Urho3D/Input.h>
+#include <Urho3D/InputEvents.h>
+#include <Urho3D/Renderer.h>
+#include <Urho3D/ResourceCache.h>
+#include <Urho3D/Scene.h>
+#include <Urho3D/SceneEvents.h>
+#include <Urho3D/Sprite.h>
+#include <Urho3D/Texture2D.h>
+#include <Urho3D/Timer.h>
+#include <Urho3D/UI.h>
+#include <Urho3D/XMLFile.h>
 
 Sample::Sample(Context* context) :
     Application(context),

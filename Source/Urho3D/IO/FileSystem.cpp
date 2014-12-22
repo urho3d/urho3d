@@ -31,7 +31,7 @@
 #include "Log.h"
 #include "Thread.h"
 
-#include <SDL_filesystem.h>
+#include <SDL/SDL_filesystem.h>
 
 #include <cstdio>
 #include <cstring>

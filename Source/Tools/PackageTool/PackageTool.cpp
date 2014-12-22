@@ -20,11 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "Context.h"
-#include "ArrayPtr.h"
-#include "File.h"
-#include "FileSystem.h"
-#include "ProcessUtils.h"
+#include <Urho3D/Context.h>
+#include <Urho3D/ArrayPtr.h>
+#include <Urho3D/File.h>
+#include <Urho3D/FileSystem.h>
+#include <Urho3D/ProcessUtils.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -35,7 +35,7 @@
 #include <lz4.h>
 #include <lz4hc.h>
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 using namespace Urho3D;
 

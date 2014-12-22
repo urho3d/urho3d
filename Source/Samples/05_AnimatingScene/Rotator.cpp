@@ -20,11 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include "Rotator.h"
-#include "Scene.h"
-#include "SceneEvents.h"
+#include <Urho3D/Scene.h>
+#include <Urho3D/SceneEvents.h>
 
-#include "DebugNew.h"
+#include "Rotator.h"
+
+#include <Urho3D/DebugNew.h>
 
 Rotator::Rotator(Context* context) :
     LogicComponent(context),

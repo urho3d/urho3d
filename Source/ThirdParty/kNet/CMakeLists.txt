@@ -65,5 +65,5 @@ set (INCLUDE_DIRS_ONLY include)
 # Setup target
 setup_library ()
 
-# Install dependency for Engine/Network/Connection.h and Engine/Network/Network.h
+# Install dependency for Urho3D/Network/Connection.h and Urho3D/Network/Network.h
 install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/kNet FILES_MATCHING PATTERN *.h *.inl)     # Note: the trailing slash is significant

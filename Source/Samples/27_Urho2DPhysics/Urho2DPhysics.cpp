@@ -20,29 +20,30 @@
 // THE SOFTWARE.
 //
 
-#include "Camera.h"
-#include "CollisionBox2D.h"
-#include "CollisionCircle2D.h"
-#include "CoreEvents.h"
-#include "DebugRenderer.h"
-#include "Drawable2D.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "Octree.h"
-#include "PhysicsWorld2D.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "RigidBody2D.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "Sprite2D.h"
-#include "StaticSprite2D.h"
-#include "Text.h"
+#include <Urho3D/Camera.h>
+#include <Urho3D/CollisionBox2D.h>
+#include <Urho3D/CollisionCircle2D.h>
+#include <Urho3D/CoreEvents.h>
+#include <Urho3D/DebugRenderer.h>
+#include <Urho3D/Drawable2D.h>
+#include <Urho3D/Engine.h>
+#include <Urho3D/Font.h>
+#include <Urho3D/Graphics.h>
+#include <Urho3D/Input.h>
+#include <Urho3D/Octree.h>
+#include <Urho3D/PhysicsWorld2D.h>
+#include <Urho3D/Renderer.h>
+#include <Urho3D/ResourceCache.h>
+#include <Urho3D/RigidBody2D.h>
+#include <Urho3D/Scene.h>
+#include <Urho3D/SceneEvents.h>
+#include <Urho3D/Sprite2D.h>
+#include <Urho3D/StaticSprite2D.h>
+#include <Urho3D/Text.h>
+
 #include "Urho2DPhysics.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(Urho2DPhysics)
 

@@ -655,28 +655,6 @@ macro (setup_ios_linker_flags LINKER_FLAGS)
     set (${LINKER_FLAGS} "${${LINKER_FLAGS}} -framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
 endmacro ()
 
-# Macro for adding SDL native init function on Android platform
-macro (add_android_native_init)
-    # This source file could not be added when building SDL static library because it needs SDL_Main() which is not yet available at library building time
-    # The SDL_Main() is defined by Android application that could be resided in other CMake projects outside of Urho3D CMake project which makes things a little bit complicated
-    if (URHO3D_HOME)
-        # Search using project source directory which for sure is not rooted
-        find_file (ANDROID_MAIN_C_PATH SDL_android_main.c PATHS ${URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android DOC "Path to SDL_android_main.c" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
-    else ()
-        # Search using Urho3D SDK installation location which could be rooted
-        find_file (ANDROID_MAIN_C_PATH SDL_android_main.c PATH_SUFFIXES ${PATH_SUFFIX} DOC "Path to SDL_android_main.c")
-    endif ()
-    mark_as_advanced (ANDROID_MAIN_C_PATH)  # Hide it from cmake-gui in non-advanced mode
-    if (ANDROID_MAIN_C_PATH)
-        list (APPEND SOURCE_FILES ${ANDROID_MAIN_C_PATH})
-    else ()
-        message (FATAL_ERROR
-            "Could not find SDL_android_main.c source file in default SDK installation location or Urho3D project root tree. "
-            "For searching in a non-default Urho3D SDK installation, use 'CMAKE_PREFIX_PATH' environment variable to specify the prefix path of the installation location. "
-            "For searching in a source tree of Urho3D project, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory.")
-    endif ()
-endmacro ()
-
 # Macro for setting up an executable target with resources to copy
 macro (setup_main_executable)
     # Define resource files
@@ -687,8 +665,16 @@ macro (setup_main_executable)
     endif ()
 
     if (ANDROID)
-        # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES} 
-        add_android_native_init ()
+        # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES}
+        find_file (ANDROID_MAIN_C_PATH SDL_android_main.c HINTS ${URHO3D_HOME}/include/${PATH_SUFFIX}/SDL/android PATH_SUFFIXES ${PATH_SUFFIX} DOC "Path to SDL_android_main.c" NO_CMAKE_FIND_ROOT_PATH)
+        mark_as_advanced (ANDROID_MAIN_C_PATH)  # Hide it from cmake-gui in non-advanced mode
+        if (ANDROID_MAIN_C_PATH)
+            list (APPEND SOURCE_FILES ${ANDROID_MAIN_C_PATH})
+        else ()
+            message (FATAL_ERROR
+                "Could not find SDL_android_main.c source file in the Urho3D build tree or SDK installation. "
+                "Please reconfigure and rebuild your Urho3D build tree; or reinstall the SDK.")
+        endif ()
         # Setup shared library output path
         set_output_directories (${ANDROID_LIBRARY_OUTPUT_PATH} LIBRARY)
         # Setup target as main shared library
@@ -952,10 +938,6 @@ macro (install_header_files)
                 endif ()
                 file (GLOB_RECURSE NAMES ${GLOBBING_EXPRESSION})
                 foreach (NAME ${NAMES})
-                    get_filename_component (PATH ${NAME} PATH)
-                    if (PATH AND NOT EXISTS ${ARG_DESTINATION}/${PATH})
-                        file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${ARG_DESTINATION}/${PATH})
-                    endif ()
                     create_symlink (${INSTALL_SOURCE}${NAME} ${ARG_DESTINATION}/${NAME} FALLBACK_TO_COPY)
                 endforeach ()
             else ()

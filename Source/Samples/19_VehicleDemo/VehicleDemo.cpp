@@ -20,34 +20,34 @@
 // THE SOFTWARE.
 //
 
-#include "Camera.h"
-#include "CollisionShape.h"
-#include "Constraint.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "FileSystem.h"
-#include "Font.h"
-#include "Input.h"
-#include "Light.h"
-#include "Material.h"
-#include "Model.h"
-#include "Octree.h"
-#include "PhysicsWorld.h"
-#include "ProcessUtils.h"
-#include "Renderer.h"
-#include "RigidBody.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "StaticModel.h"
-#include "Terrain.h"
-#include "Text.h"
-#include "UI.h"
-#include "Vehicle.h"
-#include "Zone.h"
+#include <Urho3D/Camera.h>
+#include <Urho3D/CollisionShape.h>
+#include <Urho3D/Constraint.h>
+#include <Urho3D/CoreEvents.h>
+#include <Urho3D/Engine.h>
+#include <Urho3D/FileSystem.h>
+#include <Urho3D/Font.h>
+#include <Urho3D/Input.h>
+#include <Urho3D/Light.h>
+#include <Urho3D/Material.h>
+#include <Urho3D/Model.h>
+#include <Urho3D/Octree.h>
+#include <Urho3D/PhysicsWorld.h>
+#include <Urho3D/ProcessUtils.h>
+#include <Urho3D/Renderer.h>
+#include <Urho3D/RigidBody.h>
+#include <Urho3D/ResourceCache.h>
+#include <Urho3D/Scene.h>
+#include <Urho3D/StaticModel.h>
+#include <Urho3D/Terrain.h>
+#include <Urho3D/Text.h>
+#include <Urho3D/UI.h>
+#include <Urho3D/Zone.h>
 
+#include "Vehicle.h"
 #include "VehicleDemo.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 const float CAMERA_DISTANCE = 10.0f;
 

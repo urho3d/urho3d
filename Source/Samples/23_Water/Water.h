@@ -22,7 +22,8 @@
 
 #pragma once
 
-#include "Plane.h"
+#include <Urho3D/Plane.h>
+
 #include "Sample.h"
 
 namespace Urho3D

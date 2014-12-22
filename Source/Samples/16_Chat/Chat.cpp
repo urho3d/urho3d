@@ -20,30 +20,30 @@
 // THE SOFTWARE.
 //
 
-#include "Audio.h"
-#include "Button.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "IOEvents.h"
-#include "LineEdit.h"
-#include "Log.h"
-#include "MemoryBuffer.h"
-#include "Network.h"
-#include "NetworkEvents.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "Sound.h"
-#include "Text.h"
-#include "UI.h"
-#include "UIEvents.h"
-#include "VectorBuffer.h"
-#include "Zone.h"
+#include <Urho3D/Audio.h>
+#include <Urho3D/Button.h>
+#include <Urho3D/Engine.h>
+#include <Urho3D/Font.h>
+#include <Urho3D/Graphics.h>
+#include <Urho3D/Input.h>
+#include <Urho3D/IOEvents.h>
+#include <Urho3D/LineEdit.h>
+#include <Urho3D/Log.h>
+#include <Urho3D/MemoryBuffer.h>
+#include <Urho3D/Network.h>
+#include <Urho3D/NetworkEvents.h>
+#include <Urho3D/ResourceCache.h>
+#include <Urho3D/Scene.h>
+#include <Urho3D/Sound.h>
+#include <Urho3D/Text.h>
+#include <Urho3D/UI.h>
+#include <Urho3D/UIEvents.h>
+#include <Urho3D/VectorBuffer.h>
+#include <Urho3D/Zone.h>
 
 #include "Chat.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 // Undefine Windows macro, as our Connection class has a function called SendMessage
 #ifdef SendMessage

@@ -20,10 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "Controls.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "Renderer.h"
+#include <Urho3D/Controls.h>
+#include <Urho3D/Graphics.h>
+#include <Urho3D/Input.h>
+#include <Urho3D/Renderer.h>
 
 #include "Character.h"
 #include "Touch.h"
