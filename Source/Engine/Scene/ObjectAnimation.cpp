@@ -135,7 +135,7 @@ void ObjectAnimation::AddAttributeAnimation(const String& name, ValueAnimation* 
     attributeAnimation->SetOwner(this);
     attributeAnimationInfos_[name] = new ValueAnimationInfo(attributeAnimation, wrapMode, speed);
 
-    SendAttributeAniamtionAddedEvent(name);
+    SendAttributeAnimationAddedEvent(name);
 }
 
 void ObjectAnimation::RemoveAttributeAnimation(const String& name)
@@ -143,7 +143,7 @@ void ObjectAnimation::RemoveAttributeAnimation(const String& name)
     HashMap<String, SharedPtr<ValueAnimationInfo> >::Iterator i = attributeAnimationInfos_.Find(name);
     if (i != attributeAnimationInfos_.End())
     {
-        SendAttributeAniamtionRemovedEvent(name);
+        SendAttributeAnimationRemovedEvent(name);
 
         i->second_->GetAnimation()->SetOwner(0);
         attributeAnimationInfos_.Erase(i);
@@ -159,7 +159,7 @@ void ObjectAnimation::RemoveAttributeAnimation(ValueAnimation* attributeAnimatio
     {
         if (i->second_->GetAnimation() == attributeAnimation)
         {
-            SendAttributeAniamtionRemovedEvent(i->first_);
+            SendAttributeAnimationRemovedEvent(i->first_);
 
             attributeAnimation->SetOwner(0);
             attributeAnimationInfos_.Erase(i);
@@ -194,7 +194,7 @@ ValueAnimationInfo* ObjectAnimation::GetAttributeAnimationInfo(const String& nam
     return 0;
 }
 
-void ObjectAnimation::SendAttributeAniamtionAddedEvent(const String& name)
+void ObjectAnimation::SendAttributeAnimationAddedEvent(const String& name)
 {
     using namespace AttributeAnimationAdded;
     VariantMap& eventData = GetEventDataMap();
@@ -203,7 +203,7 @@ void ObjectAnimation::SendAttributeAniamtionAddedEvent(const String& name)
     SendEvent(E_ATTRIBUTEANIMATIONADDED, eventData);
 }
 
-void ObjectAnimation::SendAttributeAniamtionRemovedEvent(const String& name)
+void ObjectAnimation::SendAttributeAnimationRemovedEvent(const String& name)
 {
     using namespace AttributeAnimationRemoved;
     VariantMap& eventData = GetEventDataMap();

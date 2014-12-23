@@ -74,9 +74,9 @@ public:
 
 private:
     /// Send attribute animation added event.
-    void SendAttributeAniamtionAddedEvent(const String& name);
+    void SendAttributeAnimationAddedEvent(const String& name);
     /// Send attribute animation remove event.
-    void SendAttributeAniamtionRemovedEvent(const String& name);
+    void SendAttributeAnimationRemovedEvent(const String& name);
 
     /// Name to attribute animation info mapping.
     HashMap<String, SharedPtr<ValueAnimationInfo> > attributeAnimationInfos_;
