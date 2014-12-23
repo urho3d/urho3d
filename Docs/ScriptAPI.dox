@@ -11172,7 +11172,7 @@ Properties:
 - Variant[] attributes
 - StringHash baseType // readonly
 - String category // readonly
-- int drawOrder // writeonly
+- int drawOrder
 - bool enabled
 - bool enabledEffective // readonly
 - int height // readonly
@@ -11184,7 +11184,6 @@ Properties:
 - uint numObjects // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
-- int rrawOrder // readonly
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly

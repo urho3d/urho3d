@@ -10396,7 +10396,6 @@ Array<Variant> attributes;
 StringHash baseType;
 /* readonly */
 String category;
-/* writeonly */
 int drawOrder;
 bool enabled;
 /* readonly */
@@ -10418,8 +10417,6 @@ uint numObjects;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
-/* readonly */
-int rrawOrder;
 bool temporary;
 /* readonly */
 StringHash type;
