@@ -180,6 +180,8 @@ public:
     void SetSizeAdd(float sizeAdd);
     /// Set particle size multiplicative modifier.
     void SetSizeMul(float sizeMul);
+    /// Set rotation to its direction
+    void SetRotateToDirection(bool enable);
 
     /// Add a color frame sorted in the correct position based on time.
     void AddColorTime(const Color& color, const float time);
@@ -269,6 +271,8 @@ public:
     float GetSizeAdd() const { return sizeAdd_; }
     /// Return particle size multiplicative modifier.
     float GetSizeMul() const { return sizeMul_; }
+    /// Return whether start rotation faces its direction
+    bool IsRotateToDirection() const { return rotateToDirection_; }
     /// Return all color animation frames.
     const Vector<ColorFrame>& GetColorFrames() const { return colorFrames_; }
     /// Return number of color animation frames.
@@ -361,6 +365,8 @@ private:
     float sizeAdd_;
     /// Particle size multiplicative parameter.
     float sizeMul_;
+    /// Set start rotation to its direction
+    bool rotateToDirection_;
     /// Particle color animation frames.
     Vector<ColorFrame> colorFrames_;
     /// Texture animation frames.

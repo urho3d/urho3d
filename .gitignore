@@ -72,3 +72,4 @@ configure*
 *.log
 *.bak
 Thumbs.db
+/.project

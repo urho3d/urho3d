@@ -77,7 +77,8 @@ ParticleEffect::ParticleEffect(Context* context) :
     rotationSpeedMin_(0.0f),
     rotationSpeedMax_(0.0f),
     sizeAdd_(0.0f),
-    sizeMul_(1.0f)
+    sizeMul_(1.0f),
+    rotateToDirection_(false)
 {
 }
 
@@ -140,6 +141,7 @@ bool ParticleEffect::BeginLoad(Deserializer& source)
     sizeMul_ = 1.0f;
     colorFrames_.Clear();
     textureFrames_.Clear();
+    rotateToDirection_ = false;
 
     if (rootElem.HasChild("material"))
     {
@@ -277,6 +279,9 @@ bool ParticleEffect::BeginLoad(Deserializer& source)
         SetTextureFrames(animations);
     }
 
+    if (rootElem.HasChild("rotatedirection"))
+    	rotateToDirection_ = rootElem.GetChild("rotatedirection").GetBool("enable");
+
     return true;
 }
 
@@ -326,6 +331,8 @@ bool ParticleEffect::Load(const XMLElement& source)
     sizeMul_ = 1.0f;
     colorFrames_.Clear();
     textureFrames_.Clear();
+    rotateToDirection_ = false;
+
 
     if (source.IsNull())
     {
@@ -557,6 +564,9 @@ bool ParticleEffect::Save(XMLElement& dest) const
     childElem.SetFloat("add", sizeAdd_);
     childElem.SetFloat("mul", sizeMul_);
 
+    childElem = dest.CreateChild("rotatedirection");
+    childElem.SetBool("enable", rotateToDirection_);
+
     if (colorFrames_.Size() == 1)
     {
         childElem = dest.CreateChild("color");
@@ -727,6 +737,11 @@ void ParticleEffect::SetSizeAdd(float sizeAdd)
 void ParticleEffect::SetSizeMul(float sizeMul)
 {
     sizeMul_ = sizeMul;
+}
+
+void ParticleEffect::SetRotateToDirection(bool enable)
+{
+	rotateToDirection_ = enable;
 }
 
 void ParticleEffect::AddColorTime(const Color& color, const float time)

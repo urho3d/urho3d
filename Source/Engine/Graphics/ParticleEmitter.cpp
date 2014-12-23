@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#include "Camera.h"
 #include "Context.h"
 #include "ParticleEffect.h"
 #include "ParticleEmitter.h"
@@ -31,6 +32,8 @@
 #include "SceneEvents.h"
 
 #include "DebugNew.h"
+
+#include "ProcessUtils.h"
 
 namespace Urho3D
 {
@@ -145,7 +148,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
         while (emissionTimer_ > 0.0f && counter)
         {
             emissionTimer_ -= Lerp(intervalMin, intervalMax, Random(1.0f));
-            if (EmitNewParticle())
+            if (EmitNewParticle(frame))
             {
                 --counter;
                 needCommit = true;
@@ -419,7 +422,7 @@ void ParticleEmitter::OnNodeSet(Node* node)
     }
 }
 
-bool ParticleEmitter::EmitNewParticle()
+bool ParticleEmitter::EmitNewParticle(const FrameInfo& frame)
 {
     unsigned index = GetFreeParticle();
     if (index == M_MAX_UNSIGNED)
@@ -480,7 +483,32 @@ bool ParticleEmitter::EmitNewParticle()
     billboard.size_ = particles_[index].size_;
     const Vector<TextureFrame>& textureFrames_ = effect_->GetTextureFrames();
     billboard.uv_ = textureFrames_.Size() ? textureFrames_[0].uv_ : Rect::POSITIVE;
-    billboard.rotation_ = effect_->GetRandomRotation();
+
+    if (effect_->IsRotateToDirection())
+    {
+    	Matrix4 viwProj = frame.camera_->GetProjection() * frame.camera_->GetView();
+
+    	Vector3 pos1 = viwProj * startPos;
+    	Vector3 pos2 = viwProj * (startPos + startDir);
+    	//get direction in projection space
+    	Vector3 dirParticle = pos2 - pos1;
+    	dirParticle.Normalize();
+
+    	// vector::right is 0 degree
+    	float angle = dirParticle.Angle(Vector3::RIGHT);
+
+    	bool up = dirParticle.DotProduct(Vector3::UP) > 0;
+    	if (up){
+    		angle *= -1;
+    	}
+    	billboard.rotation_ = angle;
+
+    }
+    else
+    {
+    	billboard.rotation_ = effect_->GetRandomRotation();
+    }
+
     const Vector<ColorFrame>& colorFrames_ = effect_->GetColorFrames();
     billboard.color_ = colorFrames_[0].color_;
     billboard.enabled_ = true;

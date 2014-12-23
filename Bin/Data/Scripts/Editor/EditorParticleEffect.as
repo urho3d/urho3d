@@ -113,6 +113,7 @@ void CreateParticleEffectEditor()
 
     SubscribeToEvent(particleEffectWindow.GetChild("EmitterShape", true), "ItemSelected", "EditParticleEffectEmitterShape");
     SubscribeToEvent(particleEffectWindow.GetChild("Scaled", true), "Toggled", "EditParticleEffectScaled");
+    SubscribeToEvent(particleEffectWindow.GetChild("RotateDirection", true), "Toggled", "EditParticleEffectRotationDirection");
     SubscribeToEvent(particleEffectWindow.GetChild("Sorted", true), "Toggled", "EditParticleEffectSorted");
     SubscribeToEvent(particleEffectWindow.GetChild("Relative", true), "Toggled", "EditParticleEffectRelative");
 
@@ -709,6 +710,28 @@ void PickEditParticleEffectMaterialDone(StringHash eventType, VariantMap& eventD
     @resourcePicker = null;
 }
 
+void EditParticleEffectRotationDirection(StringHash eventType, VariantMap& eventData)
+{
+
+    if (inParticleEffectRefresh)
+        return;
+
+    if (editParticleEffect is null)
+        return;
+
+    if (particleEffectEmitter is null)
+        return;
+
+    BeginParticleEffectEdit();
+
+    CheckBox@ element = eventData["Element"].GetPtr();
+
+    editParticleEffect.rotateDirection = element.checked;
+    particleEffectEmitter.ApplyEffect();
+
+    EndParticleEffectEdit();
+
+}
 void EditParticleEffectScaled(StringHash eventType, VariantMap& eventData)
 {
     if (inParticleEffectRefresh)
