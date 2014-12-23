@@ -43,18 +43,19 @@ void CreateScene()
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.orthographic = true;
     camera.orthoSize = graphics.height * PIXEL_SIZE;
+    camera.zoom = 1.0f * Min(graphics.width / 1280.0f, graphics.height / 800.0f); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.0) is set for full visibility at 1280x800 resolution)
 
     // Get tmx file
     TmxFile2D@ tmxFile = cache.GetResource("TmxFile2D", "Urho2D/isometric_grass_and_water.tmx");
-    if (tmxFile == null)
+    if (tmxFile is null)
         return;
-    
+
     Node@ tileMapNode = scene_.CreateChild("TileMap");
     tileMapNode.position = Vector3(0.0f, 0.0f, -1.0f);
 
     TileMap2D@ tileMap = tileMapNode.CreateComponent("TileMap2D");
     tileMap.tmxFile = tmxFile;
-    
+
     // Set camera's position;
     TileMapInfo2D@ info = tileMap.info;
     float x = info.mapWidth * 0.5f;

@@ -38,7 +38,7 @@ void CreateScene()
     camera = cameraNode.CreateComponent("Camera");
     camera.orthographic = true;
     camera.orthoSize = graphics.height * PIXEL_SIZE;
-    camera.zoom = 1.2f;
+    camera.zoom = 1.2f * Min(graphics.width / 1280.0f, graphics.height / 800.0f); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.2) is set for full visibility at 1280x800 resolution)
     renderer.viewports[0] = Viewport(scene_, camera);
     renderer.defaultZone.fogColor = Color(0.1f, 0.1f, 0.1f); // Set background color for the scene
 
