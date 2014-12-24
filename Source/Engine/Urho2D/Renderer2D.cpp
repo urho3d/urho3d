@@ -217,8 +217,7 @@ void Renderer2D::RemoveDrawable(Drawable2D* drawable)
 
 void Renderer2D::MarkMaterialDirty(Drawable2D* drawable)
 {
-    if (!materialDirtyDrawables_.Contains(drawable))
-        materialDirtyDrawables_.Push(drawable);
+    materialDirtyDrawables_.Push(drawable);
 }
 
 bool Renderer2D::CheckVisibility(Drawable2D* drawable) const
