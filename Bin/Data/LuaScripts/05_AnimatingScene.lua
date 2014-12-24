@@ -115,7 +115,6 @@ function MoveCamera(timeStep)
     cameraNode.rotation = Quaternion(pitch, yaw, 0.0)
 
     -- Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    local delta = MOVE_SPEED * timeStep
     if input:GetKeyDown(KEY_W) then
         cameraNode:Translate(Vector3(0.0, 0.0, 1.0) * MOVE_SPEED * timeStep)
     end
