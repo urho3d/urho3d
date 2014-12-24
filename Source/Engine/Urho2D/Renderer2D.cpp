@@ -199,11 +199,8 @@ void Renderer2D::AddDrawable(Drawable2D* drawable)
     if (!drawable)
         return;
 
-    if (!drawables_.Contains(drawable))
-        drawables_.Push(drawable);
-
-    if (!materialDirtyDrawables_.Contains(drawable))
-        materialDirtyDrawables_.Push(drawable);
+    drawables_.Push(drawable);
+    materialDirtyDrawables_.Push(drawable);
 
     orderDirty_ = true;
 }
@@ -432,11 +429,8 @@ Material* Renderer2D::CreateMaterial(Texture2D* texture, BlendMode blendMode)
     Pass* pass = tech->CreatePass(PASS_ALPHA);
     pass->SetBlendMode(blendMode);
 
-    pass->SetVertexShader("Basic");
-    pass->SetVertexShaderDefines("DIFFMAP VERTEXCOLOR");
-
-    pass->SetPixelShader("Basic");
-    pass->SetPixelShaderDefines("DIFFMAP VERTEXCOLOR");
+    pass->SetVertexShader("Urho2D");
+    pass->SetPixelShader("Urho2D");
 
     pass->SetDepthWrite(false);
 

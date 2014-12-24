@@ -138,7 +138,7 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
 
 Tile2D* TmxTileLayer2D::GetTile(int x, int y) const
 {
-    if (x < 0 || x > width_ || y < 0 || y > height_)
+    if (x < 0 || x >= width_ || y < 0 || y >= height_)
         return 0;
 
     return tiles_[y * width_ + x];
