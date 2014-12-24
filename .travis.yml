@@ -69,6 +69,6 @@ install:
 script: rake ci
 after_success:
   - if [ $SITE_UPDATE_ON_MASTER_COMMIT ]; then rake ci_site_update; fi && if [ $SITE_UPDATE ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_rebase; fi
-  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
+  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; if [ $LINUX ] && [ ! "$URHO3D_64BIT" == "0" ]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi
 
 # vi: set ts=2 sw=2 expandtab:

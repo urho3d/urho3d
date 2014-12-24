@@ -257,6 +257,9 @@ task :ci_package_upload do
     if ENV['ANDROID'] && !ENV['NO_SDK_SYSIMG']
       system "cd ../Build && android update project -p . -t $(android list target |grep android-$API |cut -d ' ' -f2) && ant debug" or abort 'Failed to make Urho3D Samples APK'
     end
+    if ENV['URHO3D_USE_LIB64_RPM']
+      system "cd ../Build && cmake . -DURHO3D_USE_LIB64_RPM=#{ENV['URHO3D_USE_LIB64_RPM']}" or abort 'Failed to reconfigure to generate 64-bit RPM package'
+    end
     system 'cd ../Build && make package' or abort 'Failed to make binary package'
   end
   # Determine the upload location
@@ -320,11 +323,7 @@ if (COMMAND cmake_policy)
 endif ()
 
 # Set CMake modules search path
-set (CMAKE_MODULE_PATH
-    CMake/Modules
-    $ENV{URHO3D_HOME}/share/Urho3D/CMake/Modules
-    ${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules
-    CACHE PATH \"Path to Urho3D-specific CMake modules\")
+set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
 # Include Urho3D CMake common module
 include (Urho3D-CMake-common)
@@ -387,7 +386,7 @@ def makefile_ci
   system "export URHO3D_HOME=../.. && cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
   puts "\nInstalling Urho3D SDK...\n"
   # Create a new project on the fly that uses newly installed Urho3D SDK
-  install_destination = ENV['LINUX'] || ENV['WINDOWS'] || ENV['OSX'] ? "DESTDIR=~ && export URHO3D_HOME=~#{ENV['WINDOWS'] ? '/usr/${MINGW_PREFIX}' : ''}/usr/local" : ''
+  install_destination = ENV['LINUX'] || ENV['WINDOWS'] || ENV['OSX'] ? "DESTDIR=~ && export URHO3D_HOME=#{ENV['WINDOWS'] ? `find ~/usr/${MINGW_PREFIX##*/} -type d -name local`.chomp : '~/usr/local'}" : ''
   scaffolding "../Build/generated/UsingSDK"
   system "cd ../Build && make -j$NUMJOBS install >/dev/null #{install_destination} && cd ../Build/generated/UsingSDK && echo '\nExternal project referencing Urho3D SDK' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
   # Make, deploy, and test run Android APK in an Android (virtual) device

@@ -67,6 +67,8 @@ A number of build options can be defined explicitly when invoking the above cmak
 |URHO3D_STATIC_RUNTIME|0|Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
 |URHO3D_LIB_TYPE      |*|Specify Urho3D library type, possible values are STATIC (\*default) and SHARED|
 |URHO3D_SCP_TO_TARGET |-|Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
+|URHO3D_USE_LIB64_RPM |0|Enable 64-bit RPM CPack generator using /usr/lib64 and disable all other generators (Debian-based host only)|
+|URHO3D_USE_LIB_DEB   |0|Enable 64-bit DEB CPack generator using /usr/lib and disable all other generators (Redhat-based host only)|
 |CMAKE_BUILD_TYPE     |*|Specify CMake build configuration (single-configuration generator only), possible values are Release (\*default), RelWithDebInfo, and Debug|
 |CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify Mac OS X deployment target (OSX build only); default to current running OS X if not specified|
 |IPHONEOS_DEPLOYMENT_TARGET|-|Specify iPhone OS deployment target (iOS build only); default to latest installed iOS SDK if not specified|
@@ -344,10 +346,6 @@ The physical project root directory is also now the logical project source tree 
 
 You may also want to copy (or symlink) the batch files or shell script files from Urho3D project root directory (or from Urho3D SDK installation) to your project root directory. The *.bat or *.sh scripts work together with the Urho3D CMake module to configure and generate your initial project build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are now supported. Note that when you invoke one the *.bat or *.sh script for your project, you can also pass most of the \ref Build_Options "build options" supported by Urho3D project. In fact, you probably have to pass the similar build options that you use when building the Urho3D library to avoid any conflict.
 
-\section UsingLibraryFromProjectBuildTree From Urho3D project build tree
-
-This section assumes that you have already successfully build a static or shared library in the Urho3D project (separately from your own project). In order to find the Urho3D headers and library this way, specify an environment variable called "URHO3D_HOME" which points to the Urho3D project build tree that you configured earlier to build Urho3D project. Note that this is not the Urho3D project root directory (unless Urho3D build tree location is the same as Urho3D project root directory).
-
 In your own project root directory, create a main CMakeLists.txt file and add the following lines: (replace MyProjectName and MyExecutableName with the actual names you want)
 
 \code
@@ -372,9 +370,7 @@ if (COMMAND cmake_policy)
 endif ()
 
 # Set CMake modules search path
-set (CMAKE_MODULE_PATH
-    CMake/Modules
-    CACHE PATH "Path to Urho3D-specific CMake modules")
+set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
 # Include Urho3D Cmake common module
 include (Urho3D-CMake-common)
@@ -397,6 +393,8 @@ The CMAKE_MODULE_PATH is setup so that CMake can find the Urho3D-specific CMake 
 
 When both Urho3D static and shared library are built and available in the Urho3D project's library output directory in its build tree, the FindUrho3D.cmake module has precedence to first select static library type over over shared library type. However, you can use URHO3D_LIB_TYPE build option to explicitly specify which Urho3D library type to be selected. When linking statically against Urho3D static library, Urho3D-CMake-common.cmake module automatically set "URHO3D_STATIC_DEFINE" compiler define for your project. This compiler define is crucial for static linking, especially on MSVC.
 
+As described earlier there are two approaches on how to find the Urho3D library. The FindUrho3D.cmake module is designed not only able to find Urho3D library from the Urho3D SDK installation, but also from any Urho3D project build tree directly. When searching in Urho3D SDK installed in a system-wide default location then no additional variable need to be set. When searching in a non-default SDK installation or when searching in any Urho3D project build tree then the actual location need to be provided via URHO3D_HOME environment variable (set in the host system) or CMake variable (set in the above CMakeLists.txt before calling find_package command).
+
 The define_source_files() and setup_main_executable() are Urho3D-specific macros. The define_source_file() macro is a shorthand to glob all the source files in the current directory. It is equivalent to these commands:
 
 \code
@@ -407,21 +405,7 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 The setup_main_executable() macro then uses SOURCE_FILES and TARGET_NAME variables to setup a new CMake target that would work on ALL platforms supported by Urho3D. Make sure both your project name and target name are not called 'Urho3D', as this name is reserved for Urho3D project only.
 
-\section FromSDK From Urho3D SDK installation
-
-This section assumes that you have already installed Urho3D SDK into your system. If you have installed the SDK in a non-default location then you need to use "URHO3D_HOME" environment variable to specify the prefix path of the non-default installation location.
-
-In your own project root directory, create a main CMakeLists.txt file similar to the first approach but change the CMake module search path setup to read as follows:
-
-\code
-# Set CMake modules search path
-set (CMAKE_MODULE_PATH
-    $ENV{URHO3D_HOME}/share/Urho3D/CMake/Modules
-    ${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules
-    CACHE PATH "Path to Urho3D-specific CMake modules")
-\endcode
-
-\subsection FromSDKWithPkgConfig Using pkg-config instead of CMake
+\section FromSDKWithPkgConfig Using pkg-config instead of CMake
 
 If for some reason you could not use CMake in your project, you could configure your project to compile and link against Urho3D library from SDK installation using 'pkg-config' tool with the help of 'Urho3D.pc' configuration file (which is installed as part of the SDK installation). If the Urho3D SDK is being installed into a local location (such as /usr/local) or a non-default location, then most likely you would need to specify PKG_CONFIG_PATH environment variable to point to the location of the configuration file for this to work. The 'Urho3D.pc' file contains important information on how to configure your compiler and linker correctly. You can use that information as a reference to configure your own project even when you do not use 'pkg-config' tool.
 
