@@ -245,7 +245,7 @@ static void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
     while (start != end)
     {
         Drawable2D* drawable = *start++;
-        if (renderer->CheckVisibility(drawable) && drawable->GetMaterial() && drawable->GetVertices().Size())
+        if (renderer->CheckVisibility(drawable) && drawable->GetVertices().Size())
             drawable->SetVisibility(true);
         else
             drawable->SetVisibility(false);
