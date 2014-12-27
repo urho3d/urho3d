@@ -93,13 +93,13 @@ void Urho2DSpriterAnimation::CreateScene()
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
     camera->SetZoom(1.5f * Min((float)graphics->GetWidth() / 1280.0f, (float)graphics->GetHeight() / 800.0f)); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.5) is set for full visibility at 1280x800 resolution)
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();  
     AnimationSet2D* animationSet = cache->GetResource<AnimationSet2D>("Urho2D/imp/imp.scml");
     if (!animationSet)
         return;
 
     spriteNode_ = scene_->CreateChild("SpriterAnimation");
-    spriteNode_->SetPosition(Vector3(-1.4f, 2.0f, 0.0f));
+    spriteNode_->SetPosition(Vector3(0.0f, 2.0f, 0.0f));
 
     AnimatedSprite2D* animatedSprite = spriteNode_->CreateComponent<AnimatedSprite2D>();
     animatedSprite->SetAnimation(animationSet, animationNames[animationIndex_]);

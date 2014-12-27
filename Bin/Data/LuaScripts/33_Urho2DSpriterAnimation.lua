@@ -8,7 +8,7 @@ require "LuaScripts/Utilities/Sample"
 
 local spriteNode = nil
 local animationIndex = 0
-local animationNames =
+local animationNames = 
 {
     "idle",
     "run",
@@ -61,7 +61,7 @@ function CreateScene()
     end
 
     spriteNode = scene_:CreateChild("SpriterAnimation")
-    spriteNode.position = Vector3(-1.4, 2.0, 0.0)
+    spriteNode.position = Vector3(0.0, 2.0, 0.0)
 
     local animatedSprite = spriteNode:CreateComponent("AnimatedSprite2D")
     animatedSprite:SetAnimation(animationSet, animationNames[animationIndex + 1])

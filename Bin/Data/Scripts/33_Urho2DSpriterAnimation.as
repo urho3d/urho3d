@@ -9,7 +9,7 @@
 Node@ spriteNode;
 int animationIndex = 0;
 
-Array<String> animationNames =
+Array<String> animationNames = 
 {
     "idle",
     "run",
@@ -64,7 +64,7 @@ void CreateScene()
         return;
 
     spriteNode = scene_.CreateChild("SpriterAnimation");
-    spriteNode.position = Vector3(-1.4f, 2.0f, 0.0f);
+    spriteNode.position = Vector3(0.0f, 2.0f, 0.0f);
 
     AnimatedSprite2D@ animatedSprite = spriteNode.CreateComponent("AnimatedSprite2D");
     animatedSprite.SetAnimation(animationSet, animationNames[animationIndex]);
