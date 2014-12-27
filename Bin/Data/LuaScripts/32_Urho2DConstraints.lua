@@ -236,8 +236,8 @@ function CreateScene()
     constraintPulley.otherBody = ballNode:GetComponent("RigidBody2D") -- Constrain ball to box
     constraintPulley.ownerBodyAnchor = boxNode.position2D
     constraintPulley.otherBodyAnchor = ballNode.position2D
-    constraintPulley.ownerBodyGroundAnchor = Vector2(boxNode.position.x, boxNode.position.y + 1)
-    constraintPulley.otherBodyGroundAnchor = Vector2(ballNode.position.x, ballNode.position.y + 1)
+    constraintPulley.ownerBodyGroundAnchor = boxNode.position2D + Vector2(0, 1)
+    constraintPulley.otherBodyGroundAnchor = ballNode.position2D + Vector2(0, 1)
     constraintPulley.ratio = 1 -- Weight ratio between ownerBody and otherBody
 
     -- Create a ConstraintRevolute2D

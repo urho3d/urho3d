@@ -118,8 +118,8 @@ void CreateScene()
 
     ConstraintDistance2D@ constraintDistance = boxDistanceNode.CreateComponent("ConstraintDistance2D"); // Apply ConstraintDistance2D to box
     constraintDistance.otherBody = ballDistanceBody; // Constrain ball to box
-    constraintDistance.ownerBodyAnchor = Vector2(boxDistanceNode.position.x, boxDistanceNode.position.y);
-    constraintDistance.otherBodyAnchor = Vector2(ballDistanceNode.position.x, ballDistanceNode.position.y);
+    constraintDistance.ownerBodyAnchor = boxDistanceNode.position2D;
+    constraintDistance.otherBodyAnchor = ballDistanceNode.position2D;
     // Make the constraint soft (comment to make it rigid, which is its basic behavior)
     constraintDistance.frequencyHz = 4.0f;
     constraintDistance.dampingRatio = 0.5f;
@@ -133,8 +133,8 @@ void CreateScene()
 
     ConstraintFriction2D@ constraintFriction = boxFrictionNode.CreateComponent("ConstraintFriction2D"); // Apply ConstraintDistance2D to box
     constraintFriction.otherBody = ballFrictionNode.GetComponent("RigidBody2D"); // Constraint ball to box
-    //constraintFriction.ownerBodyAnchor = Vector2(boxNode.position.x, boxNode.position.y);
-    //constraintFriction.otherBodyAnchor = Vector2(ballNode.position.x, ballNode.position.y);
+    //constraintFriction.ownerBodyAnchor = boxNode.position2D;
+    //constraintFriction.otherBodyAnchor = ballNode.position2D;
     //constraintFriction.maxForce = 10.0f; // ballBody.mass * gravity
     //constraintDistance.maxTorque = 10.0f; // ballBody.mass * radius * gravity
 
@@ -153,10 +153,10 @@ void CreateScene()
 
     ConstraintRevolute2D@ gear1 = baseNode.CreateComponent("ConstraintRevolute2D"); // Apply constraint to baseBox
     gear1.otherBody = ball1Body; // Constrain ball1 to baseBox
-    gear1.anchor = Vector2(ball1Node.position.x, ball1Node.position.y);
+    gear1.anchor = ball1Node.position2D;
     ConstraintRevolute2D@ gear2 = baseNode.CreateComponent("ConstraintRevolute2D"); // Apply constraint to baseBox
     gear2.otherBody = ball2Body; // Constrain ball2 to baseBox
-    gear2.anchor = Vector2(ball2Node.position.x, ball2Node.position.y);
+    gear2.anchor = ball2Node.position2D;
 
     ConstraintGear2D@ constraintGear = ball1Node.CreateComponent("ConstraintGear2D"); // Apply constraint to ball1
     constraintGear.otherBody = ball2Body; // Constrain ball2 to ball1
@@ -180,7 +180,7 @@ void CreateScene()
 
     ConstraintWheel2D@ wheel1 = car.CreateComponent("ConstraintWheel2D");
     wheel1.otherBody = ball1WheelNode.GetComponent("RigidBody2D");
-    wheel1.anchor = Vector2(ball1WheelNode.position.x, ball1WheelNode.position.y);
+    wheel1.anchor = ball1WheelNode.position2D;
     wheel1.axis = Vector2(0.0f, 1.0f);
     wheel1.maxMotorTorque = 20.0f;
     wheel1.frequencyHz = 4.0f;
@@ -188,7 +188,7 @@ void CreateScene()
 
     ConstraintWheel2D@ wheel2 = car.CreateComponent("ConstraintWheel2D");
     wheel2.otherBody = ball2WheelNode.GetComponent("RigidBody2D");
-    wheel2.anchor = Vector2(ball2WheelNode.position.x, ball2WheelNode.position.y);
+    wheel2.anchor = ball2WheelNode.position2D;
     wheel2.axis = Vector2(0.0f, 1.0f);
     wheel2.maxMotorTorque = 10.0f;
     wheel2.frequencyHz = 4.0f;
@@ -243,10 +243,10 @@ void CreateScene()
 
     ConstraintPulley2D@ constraintPulley = boxPulleyNode.CreateComponent("ConstraintPulley2D"); // Apply constraint to box
     constraintPulley.otherBody = ballPulleyNode.GetComponent("RigidBody2D"); // Constrain ball to box
-    constraintPulley.ownerBodyAnchor = Vector2(boxPulleyNode.position.x, boxPulleyNode.position.y);
-    constraintPulley.otherBodyAnchor = Vector2(ballPulleyNode.position.x, ballPulleyNode.position.y);
-    constraintPulley.ownerBodyGroundAnchor = Vector2(boxPulleyNode.position.x, boxPulleyNode.position.y + 1);
-    constraintPulley.otherBodyGroundAnchor = Vector2(ballPulleyNode.position.x, ballPulleyNode.position.y + 1);
+    constraintPulley.ownerBodyAnchor = boxPulleyNode.position2D;
+    constraintPulley.otherBodyAnchor = ballPulleyNode.position2D;
+    constraintPulley.ownerBodyGroundAnchor = boxPulleyNode.position2D + Vector2(0.0f, 1.0f);
+    constraintPulley.otherBodyGroundAnchor = ballPulleyNode.position2D + Vector2(0.0f, 1.0f);
     constraintPulley.ratio = 1.0; // Weight ratio between ownerBody and otherBody
 
     // Create a ConstraintRevolute2D
@@ -292,7 +292,7 @@ void CreateScene()
 
     ConstraintWeld2D@ constraintWeld = boxWeldNode.CreateComponent("ConstraintWeld2D");
     constraintWeld.otherBody = ballWeldNode.GetComponent("RigidBody2D"); // Constrain ball to box
-    constraintWeld.anchor = Vector2(boxWeldNode.position.x, boxWeldNode.position.y);
+    constraintWeld.anchor = boxWeldNode.position2D;
     constraintWeld.frequencyHz = 4.0f;
     constraintWeld.dampingRatio = 0.5f;
 
@@ -305,7 +305,7 @@ void CreateScene()
 
     ConstraintWheel2D@ constraintWheel = boxWheelNode.CreateComponent("ConstraintWheel2D");
     constraintWheel.otherBody = ballWheelNode.GetComponent("RigidBody2D"); // Constrain ball to box
-    constraintWheel.anchor = Vector2(ballWheelNode.position.x, ballWheelNode.position.y);
+    constraintWheel.anchor = ballWheelNode.position2D;
     constraintWheel.axis = Vector2(0.0f, 1.0f);
     constraintWheel.enableMotor = true;
     constraintWheel.maxMotorTorque = 1.0f;
