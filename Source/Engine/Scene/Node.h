@@ -203,7 +203,7 @@ public:
     /// Create a component to this node (with specified ID if provided).
     Component* CreateComponent(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
     /// Create a component to this node if it does not exist already.
-    Component* GetOrCreateComponent(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0, bool pushFront = false);
+    Component* GetOrCreateComponent(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
     /// Clone a component from another node using its create mode. Return the clone if successful or null on failure.
     Component* CloneComponent(Component* component, unsigned id = 0);
     /// Clone a component from another node and specify the create mode. Return the clone if successful or null on failure.
@@ -231,7 +231,7 @@ public:
     /// Template version of creating a component.
     template <class T> T* CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
     /// Template version of getting or creating a component.
-    template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0, bool pushFront = false);
+    template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
     /// Template version of removing a component.
     template <class T> void RemoveComponent();
 
@@ -540,7 +540,7 @@ private:
 };
 
 template <class T> T* Node::CreateComponent(CreateMode mode, unsigned id) { return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode, id)); }
-template <class T> T* Node::GetOrCreateComponent(CreateMode mode, unsigned id, bool pushFront) { return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic(), mode, id, pushFront)); }
+template <class T> T* Node::GetOrCreateComponent(CreateMode mode, unsigned id) { return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic(), mode, id)); }
 template <class T> void Node::RemoveComponent() { RemoveComponent(T::GetTypeStatic()); }
 template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive) const { GetChildrenWithComponent(dest, T::GetTypeStatic(), recursive); }
 template <class T> T* Node::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }

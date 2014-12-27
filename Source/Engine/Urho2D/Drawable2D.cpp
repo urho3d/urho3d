@@ -182,7 +182,7 @@ void Drawable2D::OnNodeSet(Node* node)
         Scene* scene = GetScene();
         if (scene)
         {
-            renderer_ = scene->GetOrCreateComponent<Renderer2D>(REPLICATED, 0, true);
+            renderer_ = scene->GetOrCreateComponent<Renderer2D>();
             if (IsEnabledEffective())
                 renderer_->AddDrawable(this);
         }
