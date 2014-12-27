@@ -191,8 +191,8 @@ function MoveCamera(timeStep)
 end
 
 function PaintDecal()
-    local result, hitPos, hitDrawable = Raycast(250.0)
-    if result then
+    local hitPos, hitDrawable = Raycast(250.0)
+    if hitDrawable ~= nil then
         -- Check if target scene node already has a DecalSet component. If not, create now
         local targetNode = hitDrawable:GetNode()
         local decal = targetNode:GetComponent("DecalSet")
@@ -215,7 +215,7 @@ function Raycast(maxDistance)
     local pos = ui.cursorPosition
     -- Check the cursor is visible and there is no UI element in front of the cursor
     if (not ui.cursor.visible) or (ui:GetElementAt(pos, true) ~= nil) then
-        return false, nil, nil
+        return nil, nil
     end
 
     local camera = cameraNode:GetComponent("Camera")
@@ -224,13 +224,10 @@ function Raycast(maxDistance)
     local octree = scene_:GetComponent("Octree")
     local result = octree:RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY)
     if result.drawable ~= nil then
-        -- Calculate hit position in world space
-        hitPos = cameraRay.origin + cameraRay.direction * result.distance
-        hitDrawable = result.drawable
-        return true, hitPos, hitDrawable
+        return result.position, result.drawable
     end
 
-    return false, nil, nil
+    return nil, nil
 end
 
 function HandleUpdate(eventType, eventData)

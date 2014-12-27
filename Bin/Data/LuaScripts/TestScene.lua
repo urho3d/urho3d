@@ -389,7 +389,6 @@ function HandleMouseButtonDown(eventType, eventData)
                 local cameraRay = camera:GetScreenRay(pos.x / graphics:GetWidth(), pos.y / graphics:GetHeight())
                 local result = testScene:GetComponent("Octree"):RaycastSingle(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY)
                 if result.drawable ~= nil then
-                    local rayHitPos = cameraRay.origin + cameraRay.direction * result.distance
                     local decal = result.drawable:GetNode():GetComponent("DecalSet")
                     if decal == nil then
                         decal = result.drawable:GetNode():CreateComponent("DecalSet")
@@ -400,7 +399,7 @@ function HandleMouseButtonDown(eventType, eventData)
                             decal.maxIndices = 4096
                         end
                     end
-                    decal:AddDecal(result.drawable, rayHitPos, cameraNode:GetWorldRotation(), 0.5, 1.0, 1.0, Vector2(0, 0), Vector2(1, 1))
+                    decal:AddDecal(result.drawable, result.position, cameraNode:GetWorldRotation(), 0.5, 1.0, 1.0, Vector2(0, 0), Vector2(1, 1))
                 end
             end
         end
