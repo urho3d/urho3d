@@ -1429,7 +1429,7 @@ void SaveParticleEffectAs()
     String lastPath = resourcePicker.lastPath;
     if (lastPath.empty)
         lastPath = sceneResourcePath;
-    CreateFileSelector("Save material as", "Save", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
+    CreateFileSelector("Save particle effect as", "Save", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
     SubscribeToEvent(uiFileSelector, "FileSelected", "SaveParticleEffectAsDone");
 }
 
