@@ -35,8 +35,7 @@ set "SOURCE=%~dp0"
 
 :: Detect CMake toolchains directory if it is not provided explicitly
 if "%TOOLCHAINS%" == "" set "TOOLCHAINS=%SOURCE%/CMake/Toolchains"
-if not exist "%TOOLCHAINS%" if exist "%URHO3D_HOME%/CMake/Toolchains" set "TOOLCHAINS=%URHO3D_HOME%/CMake/Toolchains"
-if not exist "%TOOLCHAINS%" if exist "%CMAKE_PREFIX_PATH%/share/Urho3D/CMake/Toolchains" set "TOOLCHAINS=%CMAKE_PREFIX_PATH%/share/Urho3D/CMake/Toolchains"
+if not exist "%TOOLCHAINS%" if exist "%URHO3D_HOME%/share/Urho3D/CMake/Toolchains" set "TOOLCHAINS=%URHO3D_HOME%/share/Urho3D/CMake/Toolchains"
 :: BEWARE that the TOOLCHAINS variable leaks to caller's environment!
 
 :: Default to native generator and toolchain if none is specified explicitly

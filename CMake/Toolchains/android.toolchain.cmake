@@ -645,7 +645,7 @@ if( BUILD_WITH_ANDROID_NDK )
  endif()
  if( NOT __availableToolchains )
   file( GLOB __availableToolchainsLst RELATIVE "${ANDROID_NDK_TOOLCHAINS_PATH}" "${ANDROID_NDK_TOOLCHAINS_PATH}/*" )
-  # Urho3D: bug fix
+  # Urho3D: bug fix - remove redundant if check which prevented the sort to take place
   list(SORT __availableToolchainsLst) # we need clang to go after gcc
   __LIST_FILTER( __availableToolchainsLst "^[.]" )
   __LIST_FILTER( __availableToolchainsLst "llvm" )
@@ -1508,8 +1508,14 @@ endif()
 
 # global includes and link directories
 include_directories( SYSTEM "${ANDROID_SYSROOT}/usr/include" ${ANDROID_STL_INCLUDE_DIRS} )
-get_filename_component(__android_install_path "${CMAKE_INSTALL_PREFIX}/libs/${ANDROID_NDK_ABI_NAME}" ABSOLUTE) # avoid CMP0015 policy warning
-link_directories( "${__android_install_path}" )
+# Urho3D: bug fix - the global link directories setup below is an error because:
+# 1) At this point of the script the CMAKE_INSTALL_PREFIX variable may not be defined yet when the build tree is being configured initially
+#    This variable is initialized by the toolchain later, so only during the second CMake configure step onward then below setup becomes valid
+# 2) User may actually install a version of a library there but intended to use another version of the library elsewhere for a particular build tree
+#    Commented out to force user to be more specific on which library to use via target_link_libraries() command
+#
+#get_filename_component(__android_install_path "${CMAKE_INSTALL_PREFIX}/libs/${ANDROID_NDK_ABI_NAME}" ABSOLUTE) # avoid CMP0015 policy warning
+#link_directories( "${__android_install_path}" )
 
 # detect if need link crtbegin_so.o explicitly
 if( NOT DEFINED ANDROID_EXPLICIT_CRT_LINK )
@@ -1551,7 +1557,8 @@ endif()
 # setup output directories
 # Urho3D: Prefer binary dir over source dir, which is anyway equal to source dir when not using out-of-source build tree
 set( LIBRARY_OUTPUT_PATH_ROOT ${CMAKE_BINARY_DIR} CACHE PATH "root for library output, set this to change where android libs are installed to" )
-set( CMAKE_INSTALL_PREFIX "${ANDROID_TOOLCHAIN_ROOT}/user" CACHE STRING "path for installing" )
+# Urho3D: Do not prepend ${ANDROID_TOOLCHAIN_ROOT} to prefix dir on user behalf, let user specify that via DESTDIR; revert CMAKE_INSTALL_PREFIX to CMake's default
+#set( CMAKE_INSTALL_PREFIX "${ANDROID_TOOLCHAIN_ROOT}/user" CACHE STRING "path for installing" )
 
 if(NOT _CMAKE_IN_TRY_COMPILE)
  if( EXISTS "${CMAKE_SOURCE_DIR}/jni/CMakeLists.txt" )
@@ -1582,7 +1589,8 @@ set( ANDROID True )
 set( BUILD_ANDROID True )
 
 # where is the target environment
-set( CMAKE_FIND_ROOT_PATH "${ANDROID_TOOLCHAIN_ROOT}/bin" "${ANDROID_TOOLCHAIN_ROOT}/${ANDROID_TOOLCHAIN_MACHINE_NAME}" "${ANDROID_SYSROOT}" "${CMAKE_INSTALL_PREFIX}" "${CMAKE_INSTALL_PREFIX}/share" )
+# Urho3D: bug fix - should just add paths that look like a system root
+set( CMAKE_FIND_ROOT_PATH ${ANDROID_TOOLCHAIN_ROOT} ${ANDROID_TOOLCHAIN_ROOT}/${ANDROID_TOOLCHAIN_MACHINE_NAME} ${ANDROID_SYSROOT} )
 
 # only search for libraries and includes in the ndk toolchain
 set( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY )

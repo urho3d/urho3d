@@ -53,15 +53,14 @@ else ()
     set (SCRIPT_EXT .sh)
 endif ()
 set (PATH_SUFFIX Urho3D)
-if (IOS)
-    # Use 'ios' arch subdirectory to differentiate, in case both Mac OS X and iOS build are installed at the same destination
-    set (LIB_SUFFIX ios)
-elseif (ANDROID)
+if (ANDROID)
+    # For Android platform, install to a path similar to ANDROID_LIBRARY_OUTPUT_PATH variable, e.g. libs/armeabi-v7a
     set (LIB_SUFFIX s/${ANDROID_NDK_ABI_NAME})
 elseif (URHO3D_64BIT)
     if (EXISTS /usr/lib64)
         set (HAS_LIB64 TRUE)
     endif ()
+    # Install to 'lib64' when one of these conditions is true
     if (WIN32 OR URHO3D_USE_LIB64_RPM OR (HAS_LIB64 AND NOT URHO3D_USE_LIB_DEB))
         set (LIB_SUFFIX 64)
     endif ()
@@ -69,11 +68,10 @@ endif ()
 set (DEST_INCLUDE_DIR include/${PATH_SUFFIX})
 set (DEST_SHARE_DIR share/${PATH_SUFFIX})
 set (DEST_RUNTIME_DIR ${DEST_SHARE_DIR}/Bin)
-# Note: ${PATH_SUFFIX} for library could be removed if the extra path is not desired, but if so then the RPATH setting in Source's CMakeLists.txt needs to be adjusted accordingly
+# Note to package maintainer: ${PATH_SUFFIX} for library could be removed if the extra path is not desired, but if so then the RPATH setting in Source's CMakeLists.txt needs to be adjusted accordingly
 set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/${PATH_SUFFIX})
-# TODO: Refactor to use CMAKE_SYSROOT variable instead of our own SYSROOT variable when CMake minimum version is upgraded to 3.0.x
-set (SYSROOT ${ANDROID_TOOLCHAIN_ROOT} ${RPI_SYSROOT} ${MINGW_SYSROOT})         # SYSROOT is empty for native build
-string (REPLACE "${SYSROOT}" "" DEST_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})    # Our CMAKE_INSTALL_PREFIX is rooted, use DEST_INSTALL_PREFIX for the non-rooted version
+# TODO: Investigate the implication of using CMAKE_SYSROOT variable (available since 3.0.0) instead of our own SYSROOT variable
+set (SYSROOT ${ANDROID_TOOLCHAIN_ROOT} ${RPI_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYSROOT} CACHE PATH "Path to system root of the cross-compiling target")  # SYSROOT is empty for native build
 set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 set (DEST_PERMISSIONS FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ DIRECTORY_PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 # Install application launcher scripts
@@ -129,7 +127,8 @@ elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
             set (CPACK_GENERATOR DEB)
         endif ()
     endif ()
-    set (CPACK_PACKAGING_INSTALL_PREFIX ${DEST_INSTALL_PREFIX})
+    # Note to package maintainer: comment out below line to revert the prefix from '/usr/local' (default for CMAKE_INSTALL_PREFIX) to '/usr' (default for CPACK_PACKAGING_INSTALL_PREFIX)
+    set (CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 endif ()
 if (URHO3D_64BIT)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-64bit)

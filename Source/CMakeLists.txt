@@ -28,7 +28,7 @@ if (HAVE_STDINT_H)
 endif ()
 
 # Setup RPATH settings
-if (NOT WIN32 AND NOT ANDROID)
+if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS)
     # Add RPATH entries when building
     set (CMAKE_SKIP_BUILD_RPATH FALSE)
     # But don't set them yet in the build tree

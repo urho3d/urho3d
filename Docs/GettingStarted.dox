@@ -69,12 +69,18 @@ A number of build options can be defined explicitly when invoking the above cmak
 |URHO3D_SCP_TO_TARGET |-|Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
 |URHO3D_USE_LIB64_RPM |0|Enable 64-bit RPM CPack generator using /usr/lib64 and disable all other generators (Debian-based host only)|
 |URHO3D_USE_LIB_DEB   |0|Enable 64-bit DEB CPack generator using /usr/lib and disable all other generators (Redhat-based host only)|
+|URHO3D_HOME          |-|Path to Urho3D build tree or SDK installation location (external project only)|
 |CMAKE_BUILD_TYPE     |*|Specify CMake build configuration (single-configuration generator only), possible values are Release (\*default), RelWithDebInfo, and Debug|
+|CMAKE_INSTALL_PREFIX |*|Install path prefix, prepended onto install directories; default to 'c:/Program Files' on Windows host and '/usr/local' on all other non-Windows hosts|
 |CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify Mac OS X deployment target (OSX build only); default to current running OS X if not specified|
 |IPHONEOS_DEPLOYMENT_TARGET|-|Specify iPhone OS deployment target (iOS build only); default to latest installed iOS SDK if not specified|
 |ANDROID_ABI          |*|Specify target ABI (Android build only), possible values are arm64-v8a, armeabi, armeabi-v6 with VFP, armeabi-v7a (\*default), armeabi-v7a with NEON, armeabi-v7a with VFPV3, mips, mips64, x86, and x86_64|
 |ANDROID_NATIVE_API_LEVEL|*|Specify target API level (Android build only), possible values depends on installed NDK version, default to API level 12 on 32-bit ABIs, default to API level 21 on 64-bit ABIs|
 |ANDROID_NDK_GDB      |0|Enable ndk-gdb support (Android Debug build only)|
+|MINGW_PREFIX         |-|Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)|
+|MINGW_SYSROOT        |-|Path to MinGW system root (MinGW cross-compiling build only)|
+|RPI_PREFIX           |-|Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)|
+|RPI_SYSROOT          |-|Path to Raspberry Pi system root (RPI cross-compiling build only)|
 
 Note that the specified build option values are cached by CMake. The cached values will be used by CMake in the subsequent invocation. That is, the same build options are not required to be specified again and again. But once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly resetting it. That is, simply by not passing the corresponding build option would not work. One way to revert all the build options to their default values is by clearing the CMake cache by calling cmake_clean.bat or cmake_clean.sh.
 
@@ -145,7 +151,7 @@ To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run"
 
 For native build on Raspberry Pi itself, use the similar process for \ref Building_Native "Linux native build" described above.
 
-For cross-compiling build on an Linux host system, firstly set the RPI_TOOL environment variable to point to your Raspberry Pi Cross-Compiling tool where all the arm-linux-gnueabihf-* executables are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. Secondly, set the RPI_ROOT environment variable to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. You are recommended to download the Raspbian system root with Urho3D prerequisite software installed from https://github.com/urho3d/rpi-sysroot. You can just download from the "strip" branch to cut down the download time and size.
+For cross-compiling build on an Linux host system, firstly set the RPI_PREFIX environment variable or build option to point to your Raspberry Pi Cross-Compiling tool are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. Secondly, set the RPI_SYSROOT environment variable or build option to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. You are recommended to download the Raspbian system root with Urho3D prerequisite software installed from https://github.com/urho3d/rpi-sysroot. You can just download from the "strip" branch to cut down the download time and size.
 
 Execute cmake_raspi.sh then go to the build tree to execute make command. After the build is complete, the ARM executables can be found in the build tree's "Bin" subdirectory.
 
@@ -157,7 +163,7 @@ It is possible to cross-compile Urho3D for Windows using a Linux host system. Th
 
 To cross-compile, the MinGW toolchain (compiler, linker and w32api) needs to be installed on the system. You will also need the DirectX header files, those can be downloaded and installed from the following packet: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz.
 
-For activating the MinGW toolchain, and to allow it to find the correct compiler, the MINGW_PREFIX environment variable needs to be set. This variable should be set to the prefix of the compiler name, e.g. /usr/bin/x86_64-w64-mingw32 where it would be used to find /usr/bin/x86_64-w64-mingw32-gcc and /usr/bin/x86_64-w64-mingw32-g++, etc. Optionally you can also set MINGW_ROOT environment variable to point to your MinGW system root, if it is not installed in a normal expected location.
+For activating the MinGW toolchain, and to allow it to find the correct compiler, the MINGW_PREFIX environment variable needs to be set. This variable should be set to the prefix of the compiler name, e.g. /usr/bin/x86_64-w64-mingw32 where it would be used to find /usr/bin/x86_64-w64-mingw32-gcc and /usr/bin/x86_64-w64-mingw32-g++, etc. Optionally you can also set MINGW_SYSROOT environment variable or build option to point to your MinGW system root, if it is not installed in a normal expected location.
 
 Execute cmake_mingw.sh then go to the build tree to execute make command. After the build is complete, the Windows executables can be found in the build tree's "Bin" subdirectory.
 
@@ -393,7 +399,7 @@ The CMAKE_MODULE_PATH is setup so that CMake can find the Urho3D-specific CMake 
 
 When both Urho3D static and shared library are built and available in the Urho3D project's library output directory in its build tree, the FindUrho3D.cmake module has precedence to first select static library type over over shared library type. However, you can use URHO3D_LIB_TYPE build option to explicitly specify which Urho3D library type to be selected. When linking statically against Urho3D static library, Urho3D-CMake-common.cmake module automatically set "URHO3D_STATIC_DEFINE" compiler define for your project. This compiler define is crucial for static linking, especially on MSVC.
 
-As described earlier there are two approaches on how to find the Urho3D library. The FindUrho3D.cmake module is designed not only able to find Urho3D library from the Urho3D SDK installation, but also from any Urho3D project build tree directly. When searching in Urho3D SDK installed in a system-wide default location then no additional variable need to be set. When searching in a non-default SDK installation or when searching in any Urho3D project build tree then the actual location need to be provided via URHO3D_HOME environment variable (set in the host system) or CMake variable (set in the above CMakeLists.txt before calling find_package command).
+As described earlier there are two approaches on how to find the Urho3D library. The FindUrho3D.cmake module is designed not only able to find Urho3D library from the Urho3D SDK installation, but also from any Urho3D project build tree directly. When searching in Urho3D SDK installed in a system-wide default location then no additional variable need to be set. When searching in a non-default SDK installation or when searching in any Urho3D project build tree then the actual location need to be provided via URHO3D_HOME environment variable (set in the host system) or URHO3D_HOME build option (set using -D at command line).
 
 The define_source_files() and setup_main_executable() are Urho3D-specific macros. The define_source_file() macro is a shorthand to glob all the source files in the current directory. It is equivalent to these commands:
 
@@ -424,15 +430,15 @@ c++ -c Urho3DPlayer.cpp `pkg-config --cflags Urho3D`
 c++ -o Urho3DPlayer Urho3DPlayer.o `pkg-config --libs Urho3D`
 
 # To cross-compile and link for Raspberry Pi platform
-export CC=${RPI_TOOL}/arm-linux-gnueabihf-c++
-export PKG_CONFIG_SYSROOT_DIR=${RPI_ROOT}
-export PKG_CONFIG_PATH=${RPI_ROOT}/usr/local/lib/pkgconfig
+export CC=${RPI_PREFIX}-c++
+export PKG_CONFIG_SYSROOT_DIR=${RPI_SYSROOT}
+export PKG_CONFIG_PATH=${RPI_SYSROOT}/usr/local/lib/pkgconfig
 $CC -o Urho3DPlayer Urho3DPlayer.cpp `pkg-config --cflags --libs Urho3D`
 
 # To cross-compile and link for Windows platform using MinGW cross-compiler (in Debug configuration)
 export CC=${MINGW_PREFIX}-c++
-export PKG_CONFIG_SYSROOT_DIR=${MINGW_ROOT}
-export PKG_CONFIG_PATH=${MINGW_ROOT}/usr/local/lib/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=${MINGW_SYSROOT}
+export PKG_CONFIG_PATH=${MINGW_SYSROOT}/usr/local/lib/pkgconfig
 $CC -o Urho3DPlayer_d.exe Urho3DPlayer.cpp `pkg-config --variable CFLAGS_DEBUG Urho3D` `pkg-config --cflags --libs Urho3D`
 \endcode
 

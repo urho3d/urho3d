@@ -25,15 +25,15 @@
 #  URHO3D_FOUND
 #  URHO3D_INCLUDE_DIRS
 #  URHO3D_LIBRARIES
-#  URHO3D_LIBRARIES_REL
-#  URHO3D_LIBRARIES_DBG
+#  URHO3D_LIBRARIES_REL (WIN32 only)
+#  URHO3D_LIBRARIES_DBG (WIN32 Only)
 #
 #
 # For internal Urho3D project, the Urho3D "build tree" path is already known.
 #
 # For external project that attempts to use the Urho3D build tree or installed Urho3D SDK,
-# use URHO3D_HOME environment variable to specify the path (not needed when the path is a system-wide default location).
-# When setting URHO3D_HOME environment variable, it should be set to a parent directory containing both the "include" or "lib" subdirectories.
+# use URHO3D_HOME environment variable or build option to specify the path (not needed when the path is a system-wide default location).
+# When setting URHO3D_HOME variable, it should be set to a parent directory containing both the "include" or "lib" subdirectories.
 # For example: set URHO3D_HOME=/home/john/usr/local, if the SDK is installed using DESTDIR=/home/john and CMAKE_INSTALL_PREFIX=/usr/local
 #
 
@@ -61,47 +61,53 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
     set (URHO3D_LIBRARIES Urho3D)
     set (FOUND_MESSAGE "Found Urho3D: as CMake target")
 else ()
-    # Library location would be searched (based on URHO3D_HOME variable if provided)
+    # Library location would be searched (based on URHO3D_HOME variable if provided and in system-wide default location)
     if (NOT URHO3D_HOME AND DEFINED ENV{URHO3D_HOME})
         file (TO_CMAKE_PATH "$ENV{URHO3D_HOME}" URHO3D_HOME)
     endif ()
+    # URHO3D_HOME variable should be an absolute path, so use a non-rooted search even when we are cross-compiling
     if (URHO3D_HOME)
         list (APPEND CMAKE_PREFIX_PATH ${URHO3D_HOME})
         set (SEARCH_OPT NO_CMAKE_FIND_ROOT_PATH)
     endif ()
-    set (URHO3D_LIB_NAMES Urho3D)
-    if (IOS)
-        set (CMAKE_LIBRARY_ARCHITECTURE ios)
-    elseif (ANDROID)
-        set (URHO3D_LIB_SEARCH_HINT HINTS ${URHO3D_HOME}/libs/${ANDROID_NDK_ABI_NAME})
+    # For Android platform, search in path similar to ANDROID_LIBRARY_OUTPUT_PATH variable
+    if (ANDROID)
+        if (URHO3D_HOME)
+            set (URHO3D_LIB_SEARCH_HINT HINTS ${URHO3D_HOME}/libs/${ANDROID_NDK_ABI_NAME})
+        else ()
+            set (URHO3D_LIB_SEARCH_HINT HINTS /usr/local/libs/${ANDROID_NDK_ABI_NAME})
+        endif ()
     endif ()
     if (NOT URHO3D_64BIT)
+        # For 32-bit, force to search in 'lib' path even when the host system defaulted to use 'lib64'
         set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS FALSE)
     elseif (WIN32)
+        # For 64-bit, force to search in 'lib64' path even when the Windows platform is not defaulted to use it
         set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)
     endif ()
     find_path (URHO3D_INCLUDE_DIRS Urho3D.h PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT})
-    find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT})
+    find_library (URHO3D_LIBRARIES NAMES Urho3D ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT})
     if (WIN32)
-        find_library (URHO3D_LIBRARIES_DBG NAMES ${URHO3D_LIB_NAMES}_d ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT})
-    endif ()
-    if (URHO3D_INCLUDE_DIRS)
-        get_filename_component (PATH ${URHO3D_INCLUDE_DIRS} PATH)
-        list (APPEND URHO3D_INCLUDE_DIRS ${PATH})
-        if (NOT URHO3D_HOME)
-            # URHO3D_HOME is not set when using SDK installed on system-wide default location, so set it now
-            get_filename_component (PATH ${PATH} PATH)
-            set (URHO3D_HOME ${PATH})
-        endif ()
-    endif ()
-    if (WIN32)
+        # For Windows platform, give a second chance to search for a debug version of the library
+        find_library (URHO3D_LIBRARIES_DBG NAMES Urho3D_d ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT})
+        # If both the non-debug and debug version of the libraries are found then use them both
         set (URHO3D_LIBRARIES_REL ${URHO3D_LIBRARIES})
+        # Otherwise, URHO3D_LIBRARIES variable should have the path to either one of the version
         if (URHO3D_LIBRARIES)
             if (URHO3D_LIBRARIES_DBG)
                 list (APPEND URHO3D_LIBRARIES ${URHO3D_LIBRARIES_DBG})
             endif ()
         else ()
             set (URHO3D_LIBRARIES ${URHO3D_LIBRARIES_DBG})
+        endif ()
+    endif ()
+    if (URHO3D_INCLUDE_DIRS)
+        get_filename_component (PATH ${URHO3D_INCLUDE_DIRS} PATH)
+        list (APPEND URHO3D_INCLUDE_DIRS ${PATH})   # Note: variable change to list context after this
+        if (NOT URHO3D_HOME)
+            # URHO3D_HOME is not set when using SDK installed on system-wide default location, so set it now
+            get_filename_component (PATH ${PATH} PATH)
+            set (URHO3D_HOME ${PATH})
         endif ()
     endif ()
 endif ()
@@ -113,11 +119,14 @@ if (URHO3D_INCLUDE_DIRS AND URHO3D_LIBRARIES)
     endif ()
     include (FindPackageMessage)
     FIND_PACKAGE_MESSAGE (Urho3D ${FOUND_MESSAGE} "[${URHO3D_LIBRARIES}][${URHO3D_INCLUDE_DIRS}]")
-    set (URHO3D_HOME ${URHO3D_HOME} CACHE PATH "Path to Urho3D build tree or SDK installation location")
+    set (URHO3D_HOME ${URHO3D_HOME} CACHE PATH "Path to Urho3D build tree or SDK installation location (external project only)" FORCE)
 elseif (Urho3D_FIND_REQUIRED)
+    if (ANDROID)
+        set (NOT_FOUND_MESSAGE "For Android platform, double check if you have specified to use the same ANDROID_ABI as the Urho3D library in the build tree or SDK.")
+    endif ()
     message (FATAL_ERROR
         "Could not find Urho3D library in Urho3D build tree or SDK installation. "
-        "Use URHO3D_HOME environment variable to specify the location of the build tree or SDK installation.")
+        "Use URHO3D_HOME environment variable or build option to specify the location of the build tree or SDK installation. ${NOT_FOUND_MESSAGE}")
 endif ()
 
-mark_as_advanced (URHO3D_INCLUDE_DIRS URHO3D_LIBRARIES URHO3D_HOME)
+mark_as_advanced (URHO3D_INCLUDE_DIRS URHO3D_LIBRARIES URHO3D_LIBRARIES_REL URHO3D_LIBRARIES_DBG URHO3D_HOME)

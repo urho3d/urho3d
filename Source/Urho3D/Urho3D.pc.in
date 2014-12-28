@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 #
 
-prefix=@DEST_INSTALL_PREFIX@
+prefix=@CMAKE_INSTALL_PREFIX@
 exec_prefix=${prefix}
 libdir=${exec_prefix}/@DEST_LIBRARY_DIR@
 includedir=${prefix}/include

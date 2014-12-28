@@ -24,6 +24,7 @@ cmake_minimum_required (VERSION 2.6.3)
 
 if (CMAKE_TOOLCHAIN_FILE)
     # Reference toolchain variable to suppress "unused variable" warning
+    mark_as_advanced (CMAKE_TOOLCHAIN_FILE)
 endif ()
 
 # this one is important
@@ -32,39 +33,38 @@ set (CMAKE_SYSTEM_NAME Linux)
 set (CMAKE_SYSTEM_VERSION 1)
 
 # specify the cross compiler
-file (TO_CMAKE_PATH "$ENV{RPI_TOOL}" RPI_TOOL)
-if (NOT EXISTS ${RPI_TOOL}/arm-linux-gnueabihf-gcc)
-    message (FATAL_ERROR "Could not find Raspberry Pi cross compilation tool. "
-        "Use RPI_TOOL environment variable to specify the location of the toolchain.")
+if (NOT RPI_PREFIX AND DEFINED ENV{RPI_PREFIX})
+    file (TO_CMAKE_PATH $ENV{RPI_PREFIX} RPI_PREFIX)
 endif ()
-set (CMAKE_C_COMPILER   ${RPI_TOOL}/arm-linux-gnueabihf-gcc     CACHE PATH "C compiler")
-set (CMAKE_CXX_COMPILER ${RPI_TOOL}/arm-linux-gnueabihf-c++     CACHE PATH "C++ compiler")
-set (CMAKE_ASM_COMPILER ${RPI_TOOL}/arm-linux-gnueabihf-gcc     CACHE PATH "assembler")
-set (CMAKE_STRIP        ${RPI_TOOL}/arm-linux-gnueabihf-strip   CACHE PATH "strip")
-set (CMAKE_AR           ${RPI_TOOL}/arm-linux-gnueabihf-ar      CACHE PATH "archive")
-set (CMAKE_LINKER       ${RPI_TOOL}/arm-linux-gnueabihf-ld      CACHE PATH "linker")
-set (CMAKE_NM           ${RPI_TOOL}/arm-linux-gnueabihf-nm      CACHE PATH "nm")
-set (CMAKE_OBJCOPY      ${RPI_TOOL}/arm-linux-gnueabihf-objcopy CACHE PATH "objcopy")
-set (CMAKE_OBJDUMP      ${RPI_TOOL}/arm-linux-gnueabihf-objdump CACHE PATH "objdump")
-set (CMAKE_RANLIB       ${RPI_TOOL}/arm-linux-gnueabihf-ranlib  CACHE PATH "ranlib")
+if (NOT EXISTS ${RPI_PREFIX}-gcc)
+    message (FATAL_ERROR "Could not find Raspberry Pi cross compilation tool. "
+        "Use RPI_PREFIX environment variable or build option to specify the location of the toolchain.")
+endif ()
+set (CMAKE_C_COMPILER   ${RPI_PREFIX}-gcc     CACHE PATH "C compiler")
+set (CMAKE_CXX_COMPILER ${RPI_PREFIX}-c++     CACHE PATH "C++ compiler")
+set (CMAKE_STRIP        ${RPI_PREFIX}-strip   CACHE PATH "strip")
+set (CMAKE_AR           ${RPI_PREFIX}-ar      CACHE PATH "archive")
+set (CMAKE_LINKER       ${RPI_PREFIX}-ld      CACHE PATH "linker")
+set (CMAKE_NM           ${RPI_PREFIX}-nm      CACHE PATH "nm")
+set (CMAKE_OBJCOPY      ${RPI_PREFIX}-objcopy CACHE PATH "objcopy")
+set (CMAKE_OBJDUMP      ${RPI_PREFIX}-objdump CACHE PATH "objdump")
+set (CMAKE_RANLIB       ${RPI_PREFIX}-ranlib  CACHE PATH "ranlib")
 
 # specify the system root
-if (NOT BCM_VC_INCLUDE_DIRS)
-    # Keep invalidating the cache until we found the BCM library and its include directory which hopefully also mean we have found the correct SYSROOT
-    unset (RPI_SYSROOT CACHE)
-    unset (CMAKE_INSTALL_PREFIX CACHE)
-    file (TO_CMAKE_PATH "$ENV{RPI_ROOT}" RPI_ROOT)
-    if (NOT EXISTS ${RPI_ROOT})
-        message (FATAL_ERROR "Could not find Raspberry Pi system root. "
-            "Use RPI_ROOT environment variable to specify the location of system root.")
+if (NOT RPI_SYSROOT OR NOT BCM_VC_INCLUDE_DIRS OR NOT BCM_VC_LIBRARIES)
+    if (DEFINED ENV{RPI_SYSROOT})
+        file (TO_CMAKE_PATH $ENV{RPI_SYSROOT} RPI_SYSROOT)
     endif ()
-    set (RPI_SYSROOT ${RPI_ROOT} CACHE PATH "Path to Raspberry Pi SYSROOT")
-    mark_as_advanced (RPI_SYSROOT CMAKE_TOOLCHAIN_FILE)
-    set (CMAKE_FIND_ROOT_PATH ${RPI_SYSROOT})
-    set (CMAKE_INSTALL_PREFIX "${RPI_SYSROOT}/usr/local" CACHE PATH "Install path prefix, prepended onto install directories.")
+    if (NOT EXISTS ${RPI_SYSROOT})
+        message (FATAL_ERROR "Could not find Raspberry Pi system root. "
+            "Use RPI_SYSROOT environment variable or build option to specify the location of system root.")
+    endif ()
+    set (RPI_PREFIX ${RPI_PREFIX} CACHE STRING "Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)" FORCE)
+    set (RPI_SYSROOT ${RPI_SYSROOT} CACHE PATH "Path to Raspberry Pi system root (RPI cross-compiling build only)" FORCE)
 endif ()
+set (CMAKE_FIND_ROOT_PATH ${RPI_SYSROOT})
 
 # only search programs, libraries, and headers in the target directories
-set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
+set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
