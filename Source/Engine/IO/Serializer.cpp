@@ -131,7 +131,7 @@ bool Serializer::WritePackedQuaternion(const Quaternion& value)
     coords[1] = (short)(Clamp(norm.x_, -1.0f, 1.0f) * q + 0.5f);
     coords[2] = (short)(Clamp(norm.y_, -1.0f, 1.0f) * q + 0.5f);
     coords[3] = (short)(Clamp(norm.z_, -1.0f, 1.0f) * q + 0.5f);
-    return Write(&coords[0], sizeof coords) == sizeof value;
+    return Write(&coords[0], sizeof coords) == sizeof coords;
 }
 
 bool Serializer::WriteMatrix3(const Matrix3& value)
