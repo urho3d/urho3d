@@ -173,9 +173,23 @@ Quaternion Deserializer::ReadQuaternion()
 
 Quaternion Deserializer::ReadPackedQuaternion()
 {
-    short coords[4];
-    Read(coords, sizeof coords);
-    Quaternion ret(coords[0] * invQ, coords[1] * invQ, coords[2] * invQ, coords[3] * invQ);
+    float quat[4];
+    uint32_t coords;
+    Read(&coords, sizeof coords);
+    
+    int offset = coords>>30;
+    float sum = 0;
+    
+    //unpack the values
+    for(int i = 0; i < 3; i++) {
+        float unpacked = (((coords>>i*10)&1023) - r) * invR;
+        sum += unpacked*unpacked;
+        quat[(offset+i+1)%4] = unpacked;
+    }
+    
+    //calculate the missing value from the others
+    quat[offset] = sqrt(1.0f - sum);
+    Quaternion ret(quat[0], quat[1], quat[2], quat[3]);
     ret.Normalize();
     return ret;
 }

@@ -124,14 +124,42 @@ bool Serializer::WriteQuaternion(const Quaternion& value)
 
 bool Serializer::WritePackedQuaternion(const Quaternion& value)
 {
-    short coords[4];
+    float quat_f[4];
+    int quat[4];
+    uint max = 0;
+    uint32_t coords = 0;
+    
     Quaternion norm = value.Normalized();
-
-    coords[0] = (short)(Clamp(norm.w_, -1.0f, 1.0f) * q + 0.5f);
-    coords[1] = (short)(Clamp(norm.x_, -1.0f, 1.0f) * q + 0.5f);
-    coords[2] = (short)(Clamp(norm.y_, -1.0f, 1.0f) * q + 0.5f);
-    coords[3] = (short)(Clamp(norm.z_, -1.0f, 1.0f) * q + 0.5f);
-    return Write(&coords[0], sizeof coords) == sizeof coords;
+    
+    quat_f[0] = norm.w_;
+    quat_f[1] = norm.x_;
+    quat_f[2] = norm.y_;
+    quat_f[3] = norm.z_;
+    
+    for(int i = 1; i < 4; i++) {
+        if(Abs(quat_f[i]) > Abs(quat_f[max]))max = i;
+    }
+    
+    //ensure that the max value of the quaternion is always positive
+    if(quat_f[max] < 0) {
+        for(int i = 0; i < 4; i++) {
+            quat_f[i]*=-1.0f;
+        }
+    }
+    
+    quat[0] = (int)(Clamp(quat_f[0], -1.0f, 1.0f) * r + r + 0.5f);
+    quat[1] = (int)(Clamp(quat_f[1], -1.0f, 1.0f) * r + r + 0.5f);
+    quat[2] = (int)(Clamp(quat_f[2], -1.0f, 1.0f) * r + r + 0.5f);
+    quat[3] = (int)(Clamp(quat_f[3], -1.0f, 1.0f) * r + r + 0.5f);
+    
+    //pack all but the max value into the integer
+    for(int i = 0; i < 3; i++) {
+        coords |= quat[(max + i + 1) % 4]<<(i*10);
+    }
+    
+    //pack the index of the max value into the integer
+    coords |= max << 30;
+    return Write(&coords, sizeof coords) == sizeof coords;
 }
 
 bool Serializer::WriteMatrix3(const Matrix3& value)
