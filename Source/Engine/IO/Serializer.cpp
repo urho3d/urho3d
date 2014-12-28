@@ -128,7 +128,7 @@ bool Serializer::WritePackedQuaternion(const Quaternion& value)
 {
     float quat_f[4];
     int quat[4];
-    uint max = 0;
+    int max = 0;
     uint32_t coords = 0;
     
     Quaternion norm = value.Normalized();
