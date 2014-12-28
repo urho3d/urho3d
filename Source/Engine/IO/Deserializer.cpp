@@ -24,6 +24,7 @@
 #include "Deserializer.h"
 
 #include "DebugNew.h"
+#include "stdint.h"
 
 namespace Urho3D
 {
