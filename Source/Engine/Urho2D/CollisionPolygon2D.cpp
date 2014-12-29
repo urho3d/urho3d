@@ -23,7 +23,9 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "CollisionPolygon2D.h"
+#include "MemoryBuffer.h"
 #include "PhysicsUtils2D.h"
+#include "VectorBuffer.h"
 
 #include "DebugNew.h"
 
@@ -46,6 +48,7 @@ void CollisionPolygon2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<CollisionPolygon2D>(URHO2D_CATEGORY);
     COPY_BASE_ATTRIBUTES(CollisionShape2D);
+    MIXED_ACCESSOR_ATTRIBUTE("Vertices", GetVerticesAttr, SetVerticesAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE);
 }
 
 void CollisionPolygon2D::SetVertexCount(unsigned count)
@@ -73,6 +76,30 @@ void CollisionPolygon2D::SetVertices(const PODVector<Vector2>& vertices)
 
     MarkNetworkUpdate();
     RecreateFixture();
+}
+
+void CollisionPolygon2D::SetVerticesAttr(const PODVector<unsigned char>& value)
+{
+    if (value.Empty())
+        return;
+
+    PODVector<Vector2> vertices;
+
+    MemoryBuffer buffer(value);
+    while (!buffer.IsEof())
+        vertices.Push(buffer.ReadVector2());
+
+    SetVertices(vertices);
+}
+
+PODVector<unsigned char> CollisionPolygon2D::GetVerticesAttr() const
+{
+    VectorBuffer ret;
+
+    for (unsigned i = 0; i < vertices_.Size(); ++i)
+        ret.WriteVector2(vertices_[i]);
+
+    return ret.GetBuffer();
 }
 
 void CollisionPolygon2D::ApplyNodeWorldScale()

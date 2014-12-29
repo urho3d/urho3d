@@ -54,6 +54,11 @@ public:
     /// Return vertices.
     const PODVector<Vector2>& GetVertices() const { return vertices_; }
 
+    /// Set vertices attribute.
+    void SetVerticesAttr(const PODVector<unsigned char>& value);
+    /// Return vertices attribute.
+    PODVector<unsigned char> GetVerticesAttr() const;
+
 private:
     /// Apply node world scale.
     virtual void ApplyNodeWorldScale();
