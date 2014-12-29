@@ -876,6 +876,7 @@ namespace Urho3D
 - %Density : float
 - %Friction : float
 - %Restitution : float
+- %Vertices : Buffer
 
 ### CollisionCircle2D
 - %Radius : float
