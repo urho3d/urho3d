@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<element type="Window">
+	<attribute name="Position" value="100 100" />
+	<attribute name="Size" value="180 120" />
+	<element type="Button">
+		<attribute name="Name" value="ToggleLight1" />
+		<attribute name="Position" value="20 20" />
+		<attribute name="Size" value="140 30" />
+		<element type="Text">
+			<attribute name="Horiz Alignment" value="Center" />
+			<attribute name="Vert Alignment" value="Center" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Text" value="Toggle light 1" />
+		</element>
+	</element>
+	<element type="Button">
+		<attribute name="Name" value="ToggleLight2" />
+		<attribute name="Position" value="20 70" />
+		<attribute name="Size" value="140 30" />
+		<element type="Text">
+			<attribute name="Horiz Alignment" value="Center" />
+			<attribute name="Vert Alignment" value="Center" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Text" value="Toggle light 2" />
+		</element>
+	</element>
+</element>
