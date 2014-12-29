@@ -47,6 +47,8 @@ public:
     void SetVertex(unsigned index, const Vector2& vertex);
     /// Set vertices.
     void SetVertices(const PODVector<Vector2>& vertices);
+    /// Set vertices attribute.
+    void SetVerticesAttr(const PODVector<unsigned char>& value);
 
     /// Return loop.
     bool GetLoop() const { return loop_; }
@@ -56,6 +58,8 @@ public:
     const Vector2& GetVertex(unsigned index) const { return (index < vertices_.Size()) ? vertices_[index] : Vector2::ZERO; }
     /// Return vertices.
     const PODVector<Vector2>& GetVertices() const { return vertices_; }
+    /// Return vertices attribute.
+    PODVector<unsigned char> GetVerticesAttr() const;
 
 private:
     /// Apply node world scale.

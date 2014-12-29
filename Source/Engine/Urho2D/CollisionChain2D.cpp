@@ -23,7 +23,9 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "CollisionChain2D.h"
+#include "MemoryBuffer.h"
 #include "PhysicsUtils2D.h"
+#include "VectorBuffer.h"
 
 #include "DebugNew.h"
 
@@ -46,6 +48,7 @@ void CollisionChain2D::RegisterObject(Context* context)
     context->RegisterFactory<CollisionChain2D>();
     ACCESSOR_ATTRIBUTE("Loop", GetLoop, SetLoop, bool, false, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(CollisionShape2D);
+    MIXED_ACCESSOR_ATTRIBUTE("Vertices", GetVerticesAttr, SetVerticesAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE);
 }
 
 void CollisionChain2D::SetLoop(bool loop)
@@ -84,6 +87,30 @@ void CollisionChain2D::SetVertices(const PODVector<Vector2>& vertices)
 
     MarkNetworkUpdate();
     RecreateFixture();
+}
+
+void CollisionChain2D::SetVerticesAttr(const PODVector<unsigned char>& value)
+{
+    if (value.Empty())
+        return;
+
+    PODVector<Vector2> vertices;
+
+    MemoryBuffer buffer(value);
+    while (!buffer.IsEof())
+        vertices.Push(buffer.ReadVector2());
+
+    SetVertices(vertices);
+}
+
+PODVector<unsigned char> CollisionChain2D::GetVerticesAttr() const
+{
+    VectorBuffer ret;
+
+    for (unsigned i = 0; i < vertices_.Size(); ++i)
+        ret.WriteVector2(vertices_[i]);
+
+    return ret.GetBuffer();
 }
 
 void CollisionChain2D::ApplyNodeWorldScale()
