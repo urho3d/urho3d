@@ -65,7 +65,8 @@ void CommentOutFunction(String& code, const String& signature)
 
 Shader::Shader(Context* context) :
     Resource(context),
-    timeStamp_(0)
+    timeStamp_(0),
+    numVariations_(0)
 {
     RefreshMemoryUse();
 }
