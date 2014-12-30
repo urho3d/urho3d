@@ -91,11 +91,11 @@ if (URHO3D_NAVIGATION)
 endif ()
 
 if (URHO3D_NETWORK)
-    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Network ../../ThirdParty/kNet/include)
+    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Network ../../ThirdParty/kNet/include ../../ThirdParty/kNet/include/kNet)
 endif ()
 
 if (URHO3D_PHYSICS)
-    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Physics ../../ThirdParty/Bullet/src)
+    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Physics ../../ThirdParty/Bullet/src ../../ThirdParty/Bullet/src/Bullet)
 endif ()
 
 if (URHO3D_URHO2D)

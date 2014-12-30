@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#include "../../../include/SDL_keyboard.h"
+#include "../../../include/SDL/SDL_keyboard.h"
 
 extern void BE_InitOSKeymap();
 extern SDL_Scancode BE_GetScancodeFromBeKey(int32 bkey);

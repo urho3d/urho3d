@@ -26,7 +26,7 @@
 #include "Image.h"
 #include "Texture.h"
 
-#include <SDL_mouse.h>
+#include <SDL/SDL_mouse.h>
 
 namespace Urho3D
 {
