@@ -41,7 +41,7 @@ EVENT(E_PHYSICSPOSTSTEP2D, PhysicsPostStep2D)
     PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
-/// Physics begin contract.
+/// Physics begin contact.
 EVENT(E_PHYSICSBEGINCONTACT2D, PhysicsBeginContact2D)
 {
     PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
@@ -51,7 +51,7 @@ EVENT(E_PHYSICSBEGINCONTACT2D, PhysicsBeginContact2D)
     PARAM(P_NODEB, NodeB);                  // Node pointer
 }
 
-/// Physics end contract.
+/// Physics end contact.
 EVENT(E_PHYSICSENDCONTACT2D, PhysicsEndContact2D)
 {
     PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
