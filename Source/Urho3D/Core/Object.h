@@ -58,11 +58,11 @@ public:
     virtual ~Object();
     
     /// Return type hash.
-    virtual StringHash GetType() const = 0;
+    virtual Urho3D::StringHash GetType() const = 0;
     /// Return base class type hash.
-    virtual StringHash GetBaseType() const = 0;
+    virtual Urho3D::StringHash GetBaseType() const = 0;
     /// Return type name.
-    virtual const String& GetTypeName() const = 0;
+    virtual const Urho3D::String& GetTypeName() const = 0;
     /// Handle event.
     virtual void OnEvent(Object* sender, StringHash eventType, VariantMap& eventData);
     

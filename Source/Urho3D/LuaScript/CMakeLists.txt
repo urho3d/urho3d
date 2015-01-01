@@ -33,7 +33,7 @@ if (CMAKE_CROSSCOMPILING OR IOS)
     # When cross-compiling, build the host tool as external project
     include (ExternalProject)
     if (IOS)
-        # For iOS target, its host is MacOSX; Workaround a known CMake/Xcode generator bug which prevents it from installing binaries correctly
+        # For iOS target, its host is MacOSX; Also workaround a known CMake/Xcode generator bug which prevents it from installing binaries correctly
         set (OSX_HOST -DCMAKE_OSX_SYSROOT=macosx BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
     endif ()
     ExternalProject_Add(tolua++
@@ -48,27 +48,14 @@ endif ()
 # Define generated source files
 file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 file (GLOB API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/*.pkg)
-
-# Remove NavigationLuaAPI.pkg
-if (NOT URHO3D_NAVIGATION)
-    list (REMOVE_ITEM API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/NavigationLuaAPI.pkg)
-endif ()
-
-# Remove NetworkLuaAPI.pkg
-if (NOT URHO3D_NETWORK)
-    list (REMOVE_ITEM API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/NetworkLuaAPI.pkg)
-endif ()
-
-# Remove PhysicsLuaAPI.pkg
-if (NOT URHO3D_PHYSICS)
-    list (REMOVE_ITEM API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/PhysicsLuaAPI.pkg)
-endif ()
-
-# Remove Urho2DLuaAPI.pkg
-if (NOT URHO3D_URHO2D)
-    list (REMOVE_ITEM API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/Urho2DLuaAPI.pkg)
-endif ()
-
+foreach (DIR Navigation Network Physics Urho2D)
+    string (TOUPPER URHO3D_${DIR} OPT)
+    if (${OPT})
+        list (APPEND INCLUDE_DIRS_ONLY ../${DIR})
+    else ()
+        list (REMOVE_ITEM API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/${DIR}LuaAPI.pkg)
+    endif ()
+endforeach ()
 foreach (API_PKG_FILE ${API_PKG_FILES})
     get_filename_component (NAME ${API_PKG_FILE} NAME)
     string (REGEX REPLACE LuaAPI\\.pkg$ "" API ${NAME})
@@ -88,27 +75,33 @@ define_source_files (EXTRA_CPP_FILES ${GEN_CPP_FILES})
 # Define dependency libs
 set (LIBS ../../ThirdParty/Lua${JIT}/src)
 set (LINK_LIBS_ONLY toluapp)
-set (INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Navigation ../Resource ../Scene ../UI
-    ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR})
-
-if (URHO3D_NAVIGATION)
-    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Navigation)
-endif ()
-
-if (URHO3D_NETWORK)
-    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Network ../../ThirdParty/kNet/include)
-endif ()
-
-if (URHO3D_PHYSICS)
-    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Physics ../../ThirdParty/Bullet/src)
-endif ()
-
-if (URHO3D_URHO2D)
-    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../Urho2D ../../ThirdParty/Box2D)
+list (APPEND INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Resource ../Scene ../UI
+    ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Source/Urho3D ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
+if (MSVC)
+    # MSVC compiler does not handle quoted include pathspec with relative path (used in Graphics/Direct3D9/*.h) the same way as GCC and Clang
+    # Following header search paths must be added in order to make MSVC resolves "../" back to one of the directory which contains the header file being searched
+    foreach (DIR container core graphics math resource)
+        list (APPEND INCLUDE_DIRS_ONLY ${DIR}/workaround)
+    endforeach ()
 endif ()
 
 # Setup target
 setup_library ()
+if (CMAKE_HOST_WIN32 AND NOT URHO3D_MKLINK)
+    # When falling back to file copy on Windows host system then LuaScript depends on some thirdparty libs to be built first
+    # as the thirdparty lib's headers are only copied to the build tree in their corresponding post-build steps
+    set (DEPS SDL)
+    if (URHO3D_NETWORK)
+        list (APPEND DEPS kNet)
+    endif ()
+    if (URHO3D_PHYSICS)
+        list (APPEND DEPS Bullet)
+    endif ()
+    if (URHO3D_URHO2D)
+        list (APPEND DEPS Box2D)
+    endif ()
+    add_dependencies (${TARGET_NAME} ${DEPS})
+endif ()
 
 # Install dependency for Engine
 install_header_files (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})

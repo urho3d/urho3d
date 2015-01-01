@@ -45,8 +45,8 @@ task :scaffolding do
   puts "You may need to first set 'URHO3D_HOME' environment variable or use 'URHO3D_HOME' build option to point to your Urho3D build tree or your custom Urho3D SDK installation location."
   puts "Please see http://urho3d.github.io/documentation/HEAD/_using_library.html for more detail. For example:\n\n"
   if ENV['OS']
-    puts "set \"URHO3D_HOME=/path/to/Urho3D/build-tree/or/SDK\"\ncd #{abs_path}\nrake cmake URHO3D_64BIT=1 URHO3D_LUAJIT=1\nrake make\n\n"
-    puts "Alternatively you can call one of the batch files directly, such as, cmake_generic.bat ../native-Build -DURHO3D_64BIT=1 -DURHO3D_LUAJIT=1 and build using VS IDE"
+    puts "set \"URHO3D_HOME=/path/to/Urho3D/build-tree/or/SDK\"\ncd #{abs_path}\nrake cmake URHO3D_LUAJIT=1\nrake make\n\n"
+    puts "Alternatively you can call one of the batch files directly, such as, cmake_generic.bat ../native-Build -DURHO3D_LUAJIT=1 and build using VS IDE"
   else
     puts "export URHO3D_HOME=/path/to/Urho3D/build-tree/or/SDK\ncd #{abs_path}\nrake cmake URHO3D_LUAJIT=1\nrake make\n\n"
     puts "Alternatively you can call one of the shell scripts directly, such as, ./cmake_generic.sh ../native-Build -DURHO3D_LUAJIT=1 && cd ../native-Build && make"

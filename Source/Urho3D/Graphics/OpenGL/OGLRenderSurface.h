@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "GraphicsDefs.h"
-#include "Viewport.h"
+#include "../GraphicsDefs.h"
+#include "../Viewport.h"
 
 namespace Urho3D
 {

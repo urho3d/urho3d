@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Ptr.h"
+#include "../Ptr.h"
 
 namespace Urho3D
 {

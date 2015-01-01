@@ -57,7 +57,12 @@ set (PATH_SUFFIX Urho3D)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
     # Library location is already known to be in the build tree
     set (URHO3D_HOME ${CMAKE_BINARY_DIR})
-    set (URHO3D_INCLUDE_DIRS ${URHO3D_HOME}/include/${PATH_SUFFIX} ${URHO3D_HOME}/include)
+    set (URHO3D_INCLUDE_DIRS ${URHO3D_HOME}/include ${URHO3D_HOME}/include/${PATH_SUFFIX}/ThirdParty)
+    if (URHO3D_PHYSICS)
+        # Bullet library depends on its own include dir to be added in the header search path
+        # This is more practical than patching its header files in many places to make them work with relative path
+        list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_HOME}/include/${PATH_SUFFIX}/ThirdParty/Bullet)
+    endif ()
     set (URHO3D_LIBRARIES Urho3D)
     set (FOUND_MESSAGE "Found Urho3D: as CMake target")
 else ()
@@ -103,7 +108,10 @@ else ()
     endif ()
     if (URHO3D_INCLUDE_DIRS)
         get_filename_component (PATH ${URHO3D_INCLUDE_DIRS} PATH)
-        list (APPEND URHO3D_INCLUDE_DIRS ${PATH})   # Note: variable change to list context after this
+        set (URHO3D_INCLUDE_DIRS ${PATH} ${URHO3D_INCLUDE_DIRS}/ThirdParty)
+        if (URHO3D_PHYSICS)
+            list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_INCLUDE_DIRS}/ThirdParty/Bullet)
+        endif ()
         if (NOT URHO3D_HOME)
             # URHO3D_HOME is not set when using SDK installed on system-wide default location, so set it now
             get_filename_component (PATH ${PATH} PATH)

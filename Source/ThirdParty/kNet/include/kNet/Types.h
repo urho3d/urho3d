@@ -16,8 +16,6 @@
 /** @file Types.h
 	@brief Provides platform-independent fixed size types. */
 
-// Modified by Yao Wei Tjong for Urho3D
-
 // Preprocessor macro for suppressing unused formal parameter warnings while still showing the variable name in Doxygen documentation.
 #if defined(DOXYGEN) // DOXYGEN is a special define used when Doxygen is run.
 #define UNUSED(x) x
@@ -27,8 +25,7 @@
 
 #ifndef KNET_NO_FIXEDWIDTH_TYPES
 
-// Urho3D: use relative path
-#include "../kNetBuildConfig.h"
+#include "kNetBuildConfig.h"
 
 #ifdef __MINGW32__
 #include <stdint.h>

@@ -40,19 +40,19 @@
 #include "Terrain.h"
 #include "VertexBuffer.h"
 
-#include <BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
-#include <BulletCollision/CollisionShapes/btBoxShape.h>
-#include <BulletCollision/CollisionShapes/btCapsuleShape.h>
-#include <BulletCollision/CollisionShapes/btCompoundShape.h>
-#include <BulletCollision/CollisionShapes/btConeShape.h>
-#include <BulletCollision/CollisionShapes/btConvexHullShape.h>
-#include <BulletCollision/CollisionShapes/btCylinderShape.h>
-#include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
-#include <BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h>
-#include <BulletCollision/CollisionShapes/btSphereShape.h>
-#include <BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h>
-#include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
-#include <BulletCollision/CollisionShapes/btStaticPlaneShape.h>
+#include <Bullet/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
+#include <Bullet/BulletCollision/CollisionShapes/btBoxShape.h>
+#include <Bullet/BulletCollision/CollisionShapes/btCapsuleShape.h>
+#include <Bullet/BulletCollision/CollisionShapes/btCompoundShape.h>
+#include <Bullet/BulletCollision/CollisionShapes/btConeShape.h>
+#include <Bullet/BulletCollision/CollisionShapes/btConvexHullShape.h>
+#include <Bullet/BulletCollision/CollisionShapes/btCylinderShape.h>
+#include <Bullet/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
+#include <Bullet/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h>
+#include <Bullet/BulletCollision/CollisionShapes/btSphereShape.h>
+#include <Bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h>
+#include <Bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
+#include <Bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h>
 #include <hull.h>
 
 namespace Urho3D

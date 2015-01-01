@@ -23,6 +23,7 @@
 @echo off
 
 :: Determine source tree and build tree
+set "SOURCE=%~dp0"
 set "BUILD="
 if "%~1" == "" goto :continue
 set "ARG1=%~1"
@@ -31,7 +32,6 @@ set "BUILD=%~1"
 shift
 :continue
 if "%BUILD%" == "" if exist "%cd%\CMakeCache.txt" (set "BUILD=%cd%") else (goto :error)
-set "SOURCE=%~dp0"
 
 :: Detect CMake toolchains directory if it is not provided explicitly
 if "%TOOLCHAINS%" == "" set "TOOLCHAINS=%SOURCE%/CMake/Toolchains"
@@ -54,9 +54,7 @@ if not "%~1" == "" (
 )
 
 :: Create project with the chosen CMake generator and toolchain
-echo on
 cmake -E make_directory %BUILD% && cmake -E chdir %BUILD% cmake %OPTS% %* %SOURCE%
-@echo off
 
 goto :eof
 :error

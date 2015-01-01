@@ -145,8 +145,8 @@ endif ()
 include (CPack)
 
 # Setup SDK-like include dir in the build tree
-foreach (DIR Direct3D9 OpenGL SDL)
-    file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/${DIR})
+foreach (DIR Direct3D9 OpenGL ThirdParty/SDL ThirdParty/kNet/win32)
+    file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/${DIR})    # CMake creates parent directories as needed automatically
 endforeach ()
 
 # Urho3D source

@@ -66,23 +66,12 @@ set (SOURCES Audio Container Core Engine Graphics Input IO Math Resource Scene U
 if (URHO3D_ANGELSCRIPT)
     list (APPEND SOURCES Script)
 endif ()
-
-if (URHO3D_NETWORK)
-    list (APPEND SOURCES Network)
-endif ()
-
-if (URHO3D_NAVIGATION)
-    list (APPEND SOURCES Navigation)
-endif ()
-
-if (URHO3D_PHYSICS)
-    list (APPEND SOURCES Physics)
-endif ()
-
-if (URHO3D_URHO2D)
-    list (APPEND SOURCES Urho2D)
-endif ()
-
+foreach (DIR Navigation Network Physics Urho2D)
+    string (TOUPPER URHO3D_${DIR} OPT)
+    if (${OPT})
+        list (APPEND SOURCES ${DIR})
+    endif ()
+endforeach ()
 foreach (SOURCE ${SOURCES})
     add_subdirectory (${SOURCE})
     source_group ("Source Files\\${SOURCE}" FILES ${${SOURCE}_CPP_FILES})
@@ -90,6 +79,13 @@ foreach (SOURCE ${SOURCES})
     list (APPEND ENGINE_SOURCE_FILES ${${SOURCE}_CPP_FILES} ${${SOURCE}_H_FILES})
     list (APPEND ENGINE_INCLUDE_DIRS_ONLY ${SOURCE})
 endforeach ()
+if (MSVC)
+    # MSVC compiler does not handle quoted include pathspec with relative path (used in Graphics/Direct3D9/*.h) the same way as GCC and Clang
+    # Following header search paths must be added in order to make MSVC resolves "../" back to one of the directory which contains the header file being searched
+    foreach (DIR container core graphics math resource)
+        list (APPEND ENGINE_INCLUDE_DIRS_ONLY ${DIR}/workaround)
+    endforeach ()
+endif ()
 define_source_files (EXTRA_CPP_FILES ${ENGINE_SOURCE_FILES} EXTRA_H_FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h PCH)
 list (APPEND SOURCE_FILES ${ALL_OBJ_FILES})
 set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
@@ -99,7 +95,12 @@ foreach (LIST_NAME LIBS INCLUDE_DIRS_ONLY LINK_LIBS_ONLY)
     set_list (${LIST_NAME} ENGINE_${LIST_NAME} REMOVE_DUPLICATE)
 endforeach ()
 # Add include directories to find the export header and headers from exported SDKs
-list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR})
+list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
+if (URHO3D_PHYSICS)
+    # Bullet library depends on its own include dir to be added in the header search path
+    # This is more practical than patching its header files in many places to make them work with relative path
+    list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Bullet)
+endif ()
 
 # Setup library output path
 if (ANDROID)
@@ -252,7 +253,7 @@ if (GLOBAL_INCLUDE_DIRS)
     string (REPLACE ";" "\" ${DASH}I\"" GLOBAL_INCLUDE_DIRS "${DASH}I\"${GLOBAL_INCLUDE_DIRS}\"")
     string (REPLACE "${SYSROOT}" "" GLOBAL_INCLUDE_DIRS ${GLOBAL_INCLUDE_DIRS})
 endif ()
-set (ENGINE_INCLUDE_DIRS "${DASH}I\"\${includedir}/${PATH_SUFFIX}\" ${DASH}I\"\${includedir}\"")
+set (ENGINE_INCLUDE_DIRS "${DASH}I\"\${includedir}\" ${DASH}I\"\${includedir}/${PATH_SUFFIX}/ThirdParty\"")
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc @ONLY)
 if (ANDROID)
     set (RENAME RENAME Urho3D-${ANDROID_NDK_ABI_NAME}.pc)

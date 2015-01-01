@@ -32,7 +32,7 @@
 #include "ScriptFile.h"
 #include "ScriptInstance.h"
 
-#include <angelscript.h>
+#include <AngelScript/angelscript.h>
 #include <cstring>
 
 #include "DebugNew.h"

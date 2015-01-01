@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Color.h"
+#include "../Color.h"
 
 #include <d3d9.h>
 #include <SDL/SDL.h>
