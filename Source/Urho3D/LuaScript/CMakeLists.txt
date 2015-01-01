@@ -75,15 +75,15 @@ define_source_files (EXTRA_CPP_FILES ${GEN_CPP_FILES})
 # Define dependency libs
 set (LIBS ../../ThirdParty/Lua${JIT}/src)
 set (LINK_LIBS_ONLY toluapp)
-list (APPEND INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Resource ../Scene ../UI
-    ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Source/Urho3D ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 if (MSVC)
     # MSVC compiler does not handle quoted include pathspec with relative path (used in Graphics/Direct3D9/*.h) the same way as GCC and Clang
     # Following header search paths must be added in order to make MSVC resolves "../" back to one of the directory which contains the header file being searched
-    foreach (DIR container core graphics math resource)
-        list (APPEND INCLUDE_DIRS_ONLY ${DIR}/workaround)
+    foreach (DIR Container Core Graphics Math Resource)
+        list (APPEND INCLUDE_DIRS_ONLY ../${DIR}/workaround)
     endforeach ()
 endif ()
+list (APPEND INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Resource ../Scene ../UI
+    ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Source/Urho3D ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 
 # Setup target
 setup_library ()

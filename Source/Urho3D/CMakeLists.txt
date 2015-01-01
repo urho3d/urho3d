@@ -82,7 +82,7 @@ endforeach ()
 if (MSVC)
     # MSVC compiler does not handle quoted include pathspec with relative path (used in Graphics/Direct3D9/*.h) the same way as GCC and Clang
     # Following header search paths must be added in order to make MSVC resolves "../" back to one of the directory which contains the header file being searched
-    foreach (DIR container core graphics math resource)
+    foreach (DIR Container Core Graphics Math Resource)
         list (APPEND ENGINE_INCLUDE_DIRS_ONLY ${DIR}/workaround)
     endforeach ()
 endif ()
