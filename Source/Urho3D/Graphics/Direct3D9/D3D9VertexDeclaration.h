@@ -24,7 +24,7 @@
 
 #include "../GraphicsDefs.h"
 #include "../Container/RefCounted.h"
-#include "../Vector.h"
+#include "../Container/Vector.h"
 
 #include <d3d9.h>
 

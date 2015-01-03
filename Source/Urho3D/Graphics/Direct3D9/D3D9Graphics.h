@@ -24,7 +24,7 @@
 
 #include "../Container/ArrayPtr.h"
 #include "../Math/Color.h"
-#include "../HashSet.h"
+#include "../Container/HashSet.h"
 #include "../Resource/Image.h"
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
