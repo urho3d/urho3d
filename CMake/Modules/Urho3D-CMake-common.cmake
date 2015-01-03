@@ -905,7 +905,7 @@ macro (define_source_files)
                 string (REGEX REPLACE ";${PATTERN};" ";;" H_FILES_WITH_SENTINEL "${H_FILES_WITH_SENTINEL}")
             endforeach ()
         endforeach ()
-        set (CPP_FILES ${CPP_FILES_WITH_SENTINEL})      # Convert strings back to lists, the sentinel is harmless
+        set (CPP_FILES ${CPP_FILES_WITH_SENTINEL})      # Convert strings back to lists, extra sentinels are harmless
         set (H_FILES ${H_FILES_WITH_SENTINEL})
     endif ()
     list (APPEND CPP_FILES ${ARG_EXTRA_CPP_FILES})

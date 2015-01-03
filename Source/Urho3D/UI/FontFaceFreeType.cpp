@@ -32,7 +32,7 @@
 #include "../Graphics/Texture2D.h"
 #include "../UI/UI.h"
 
-#include <freetype/config/ftheader.h>
+#include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_TRUETYPE_TABLES_H
 
