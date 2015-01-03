@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "MathDefs.h"
-#include "Str.h"
+#include "../Math/MathDefs.h"
+#include "../Container/Str.h"
 
 namespace Urho3D
 {

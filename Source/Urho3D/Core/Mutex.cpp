@@ -20,8 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Mutex.h"
+#include "../Precompiled.h"
+#include "../Core/Mutex.h"
 
 #ifdef WIN32
 #include <windows.h>
@@ -29,7 +29,7 @@
 #include <pthread.h>
 #endif
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "Drawable.h"
-#include "List.h"
-#include "Mutex.h"
-#include "OctreeQuery.h"
+#include "../Graphics/Drawable.h"
+#include "../Container/List.h"
+#include "../Core/Mutex.h"
+#include "../Graphics/OctreeQuery.h"
 
 namespace Urho3D
 {

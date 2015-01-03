@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Mutex.h"
-#include "Object.h"
+#include "../Core/Mutex.h"
+#include "../Core/Object.h"
 
 class asIObjectType;
 class asIScriptContext;

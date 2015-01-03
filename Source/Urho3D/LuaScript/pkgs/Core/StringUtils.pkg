@@ -1,4 +1,4 @@
-$#include "StringUtils.h"
+$#include "../Core/StringUtils.h"
 
 bool ToBool(const String source);
 float ToFloat(const String source);

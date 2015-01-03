@@ -1,4 +1,4 @@
-$#include "Image.h"
+$#include "../Resource/Image.h"
 
 enum CompressedFormat
 {

@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "Matrix3x4.h"
-#include "Animatable.h"
-#include "VectorBuffer.h"
+#include "../Math/Matrix3x4.h"
+#include "../Scene/Animatable.h"
+#include "../IO/VectorBuffer.h"
 
 namespace Urho3D
 {

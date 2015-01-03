@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <Urho3D/CollisionShape.h>
-#include <Urho3D/Constraint.h>
+#include <Urho3D/Physics/CollisionShape.h>
+#include <Urho3D/Physics/Constraint.h>
 
 using namespace Urho3D;
 

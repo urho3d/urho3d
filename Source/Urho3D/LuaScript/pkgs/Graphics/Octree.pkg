@@ -1,4 +1,4 @@
-$#include "Octree.h"
+$#include "../Graphics/Octree.h"
 
 class Octree : public Component
 {    

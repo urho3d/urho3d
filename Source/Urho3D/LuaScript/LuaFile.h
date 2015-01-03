@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "ArrayPtr.h"
-#include "Resource.h"
+#include "../Container/ArrayPtr.h"
+#include "../Resource/Resource.h"
 
 struct lua_State;
 

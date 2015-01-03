@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Component.h"
-#include "ScriptEventListener.h"
+#include "../Scene/Component.h"
+#include "../Script/ScriptEventListener.h"
 
 class asIScriptFunction;
 class asIScriptObject;

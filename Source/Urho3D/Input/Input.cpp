@@ -20,29 +20,29 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "CoreEvents.h"
-#include "FileSystem.h"
-#include "Graphics.h"
-#include "GraphicsEvents.h"
-#include "GraphicsImpl.h"
-#include "Input.h"
-#include "Log.h"
-#include "Mutex.h"
-#include "ProcessUtils.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "RWOpsWrapper.h"
-#include "StringUtils.h"
-#include "Text.h"
-#include "UI.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Core/CoreEvents.h"
+#include "../IO/FileSystem.h"
+#include "../Graphics/Graphics.h"
+#include "../Graphics/GraphicsEvents.h"
+#include "../Graphics/GraphicsImpl.h"
+#include "../Input/Input.h"
+#include "../IO/Log.h"
+#include "../Core/Mutex.h"
+#include "../Core/ProcessUtils.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../IO/RWOpsWrapper.h"
+#include "../Core/StringUtils.h"
+#include "../UI/Text.h"
+#include "../UI/UI.h"
 
 #include <cstring>
 
 #include <SDL/SDL.h>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char *name);
 

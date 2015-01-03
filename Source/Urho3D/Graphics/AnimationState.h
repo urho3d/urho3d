@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "HashMap.h"
-#include "Ptr.h"
+#include "../Container/HashMap.h"
+#include "../Container/Ptr.h"
 
 namespace Urho3D
 {

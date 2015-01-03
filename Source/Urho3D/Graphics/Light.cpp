@@ -20,20 +20,20 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Camera.h"
-#include "Context.h"
-#include "DebugRenderer.h"
-#include "Graphics.h"
-#include "Light.h"
-#include "Node.h"
-#include "OctreeQuery.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "Texture2D.h"
-#include "TextureCube.h"
+#include "../Precompiled.h"
+#include "../Graphics/Camera.h"
+#include "../Core/Context.h"
+#include "../Graphics/DebugRenderer.h"
+#include "../Graphics/Graphics.h"
+#include "../Graphics/Light.h"
+#include "../Scene/Node.h"
+#include "../Graphics/OctreeQuery.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../Graphics/Texture2D.h"
+#include "../Graphics/TextureCube.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

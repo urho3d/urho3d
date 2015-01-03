@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "AudioDefs.h"
-#include "Component.h"
+#include "../Audio/AudioDefs.h"
+#include "../Scene/Component.h"
 
 namespace Urho3D
 {

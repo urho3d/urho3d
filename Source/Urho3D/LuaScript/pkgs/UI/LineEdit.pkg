@@ -1,4 +1,4 @@
-$#include "LineEdit.h"
+$#include "../UI/LineEdit.h"
 
 class LineEdit : public BorderImage
 {

@@ -1,4 +1,4 @@
-$#include "ConstraintDistance2D.h"
+$#include "../Urho2D/ConstraintDistance2D.h"
 
 class ConstraintDistance2D : Constraint2D
 {

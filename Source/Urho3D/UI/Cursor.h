@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "BorderImage.h"
-#include "Image.h"
-#include "Texture.h"
+#include "../UI/BorderImage.h"
+#include "../Resource/Image.h"
+#include "../Graphics/Texture.h"
 
 #include <SDL/SDL_mouse.h>
 

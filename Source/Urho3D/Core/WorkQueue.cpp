@@ -20,14 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "CoreEvents.h"
-#include "Log.h"
-#include "ProcessUtils.h"
-#include "Profiler.h"
-#include "Thread.h"
-#include "Timer.h"
-#include "WorkQueue.h"
+#include "../Precompiled.h"
+#include "../Core/CoreEvents.h"
+#include "../IO/Log.h"
+#include "../Core/ProcessUtils.h"
+#include "../Core/Profiler.h"
+#include "../Core/Thread.h"
+#include "../Core/Timer.h"
+#include "../Core/WorkQueue.h"
 
 namespace Urho3D
 {

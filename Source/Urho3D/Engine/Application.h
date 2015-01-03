@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "Context.h"
-#include "Main.h"
-#include "Object.h"
+#include "../Core/Context.h"
+#include "../Core/Main.h"
+#include "../Core/Object.h"
 
 namespace Urho3D
 {

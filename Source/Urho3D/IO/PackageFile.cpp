@@ -20,10 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "File.h"
-#include "Log.h"
-#include "PackageFile.h"
+#include "../Precompiled.h"
+#include "../IO/File.h"
+#include "../IO/Log.h"
+#include "../IO/PackageFile.h"
 
 namespace Urho3D
 {

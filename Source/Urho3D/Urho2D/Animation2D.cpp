@@ -20,13 +20,13 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Animation2D.h"
-#include "AnimationSet2D.h"
-#include "Log.h"
-#include "Sprite2D.h"
+#include "../Precompiled.h"
+#include "../Urho2D/Animation2D.h"
+#include "../Urho2D/AnimationSet2D.h"
+#include "../IO/Log.h"
+#include "../Urho2D/Sprite2D.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

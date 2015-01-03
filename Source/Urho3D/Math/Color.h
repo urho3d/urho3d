@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Vector4.h"
+#include "../Math/Vector4.h"
 
 // Defined by Windows headers
 #undef TRANSPARENT

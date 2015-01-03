@@ -20,10 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "CoreEvents.h"
-#include "Profiler.h"
-#include "Timer.h"
+#include "../Precompiled.h"
+#include "../Core/CoreEvents.h"
+#include "../Core/Profiler.h"
+#include "../Core/Timer.h"
 
 #include <ctime>
 
@@ -35,7 +35,7 @@
 #include <unistd.h>
 #endif
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

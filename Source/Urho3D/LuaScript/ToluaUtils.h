@@ -22,16 +22,16 @@
 
 #pragma once
 
-#include "Context.h"
-#include "OctreeQuery.h"
+#include "../Core/Context.h"
+#include "../Graphics/OctreeQuery.h"
 #ifdef URHO3D_PHYSICS
-#include "PhysicsWorld.h"
+#include "../Physics/PhysicsWorld.h"
 #endif
 #ifdef URHO3D_URHO2D
-#include "PhysicsWorld2D.h"
+#include "../Urho2D/PhysicsWorld2D.h"
 #endif
-#include "Vector2.h"
-#include "Vector3.h"
+#include "../Math/Vector2.h"
+#include "../Math/Vector3.h"
 
 struct lua_State;
 

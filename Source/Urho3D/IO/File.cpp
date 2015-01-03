@@ -20,18 +20,18 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "File.h"
-#include "FileSystem.h"
-#include "Log.h"
-#include "MemoryBuffer.h"
-#include "PackageFile.h"
-#include "Profiler.h"
+#include "../Precompiled.h"
+#include "../IO/File.h"
+#include "../IO/FileSystem.h"
+#include "../IO/Log.h"
+#include "../IO/MemoryBuffer.h"
+#include "../IO/PackageFile.h"
+#include "../Core/Profiler.h"
 
 #include <cstdio>
-#include <lz4.h>
+#include <LZ4/lz4.h>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

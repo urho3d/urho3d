@@ -20,17 +20,17 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "FileSystem.h"
-#include "Log.h"
-#include "ParticleEffect2D.h"
-#include "ResourceCache.h"
-#include "StringUtils.h"
-#include "Sprite2D.h"
-#include "XMLFile.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../IO/FileSystem.h"
+#include "../IO/Log.h"
+#include "../Urho2D/ParticleEffect2D.h"
+#include "../Resource/ResourceCache.h"
+#include "../Core/StringUtils.h"
+#include "../Urho2D/Sprite2D.h"
+#include "../Resource/XMLFile.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

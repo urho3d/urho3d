@@ -20,13 +20,13 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "MathDefs.h"
-#include "StringHash.h"
+#include "../Precompiled.h"
+#include "../Math/MathDefs.h"
+#include "../Math/StringHash.h"
 
 #include <cstdio>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

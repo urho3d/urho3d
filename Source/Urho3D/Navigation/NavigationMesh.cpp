@@ -20,33 +20,33 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
 #ifdef URHO3D_PHYSICS
-#include "CollisionShape.h"
+#include "../Physics/CollisionShape.h"
 #endif
-#include "Context.h"
-#include "DebugRenderer.h"
-#include "Drawable.h"
-#include "Geometry.h"
-#include "Log.h"
-#include "MemoryBuffer.h"
-#include "Model.h"
-#include "Navigable.h"
-#include "NavigationMesh.h"
-#include "OffMeshConnection.h"
-#include "Profiler.h"
-#include "Scene.h"
-#include "StaticModel.h"
-#include "TerrainPatch.h"
-#include "VectorBuffer.h"
+#include "../Core/Context.h"
+#include "../Graphics/DebugRenderer.h"
+#include "../Graphics/Drawable.h"
+#include "../Graphics/Geometry.h"
+#include "../IO/Log.h"
+#include "../IO/MemoryBuffer.h"
+#include "../Graphics/Model.h"
+#include "../Navigation/Navigable.h"
+#include "../Navigation/NavigationMesh.h"
+#include "../Navigation/OffMeshConnection.h"
+#include "../Core/Profiler.h"
+#include "../Scene/Scene.h"
+#include "../Graphics/StaticModel.h"
+#include "../Graphics/TerrainPatch.h"
+#include "../IO/VectorBuffer.h"
 
 #include <cfloat>
-#include <DetourNavMesh.h>
-#include <DetourNavMeshBuilder.h>
-#include <DetourNavMeshQuery.h>
-#include <Recast.h>
+#include <Detour/DetourNavMesh.h>
+#include <Detour/DetourNavMeshBuilder.h>
+#include <Detour/DetourNavMeshQuery.h>
+#include <Recast/Recast.h>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

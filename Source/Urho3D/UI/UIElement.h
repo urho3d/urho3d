@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "Animatable.h"
-#include "UIBatch.h"
-#include "Vector2.h"
-#include "XMLFile.h"
+#include "../Scene/Animatable.h"
+#include "../UI/UIBatch.h"
+#include "../Math/Vector2.h"
+#include "../Resource/XMLFile.h"
 
 namespace Urho3D
 {

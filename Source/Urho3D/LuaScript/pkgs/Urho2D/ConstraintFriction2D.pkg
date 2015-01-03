@@ -1,4 +1,4 @@
-$#include "ConstraintFriction2D.h"
+$#include "../Urho2D/ConstraintFriction2D.h"
 
 class ConstraintFriction2D : Constraint2D
 {

@@ -20,34 +20,34 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Camera.h>
-#include <Urho3D/CollisionShape.h>
-#include <Urho3D/CoreEvents.h>
-#include <Urho3D/DebugRenderer.h>
-#include <Urho3D/Engine.h>
-#include <Urho3D/File.h>
-#include <Urho3D/FileSystem.h>
-#include <Urho3D/Font.h>
-#include <Urho3D/Graphics.h>
-#include <Urho3D/Input.h>
-#include <Urho3D/Light.h>
-#include <Urho3D/Material.h>
-#include <Urho3D/Model.h>
-#include <Urho3D/Octree.h>
-#include <Urho3D/PhysicsWorld.h>
-#include <Urho3D/Renderer.h>
-#include <Urho3D/ResourceCache.h>
-#include <Urho3D/RigidBody.h>
-#include <Urho3D/Scene.h>
-#include <Urho3D/Skybox.h>
-#include <Urho3D/StaticModel.h>
-#include <Urho3D/Text.h>
-#include <Urho3D/UI.h>
-#include <Urho3D/Zone.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Physics/CollisionShape.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Graphics/DebugRenderer.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Graphics/Light.h>
+#include <Urho3D/Graphics/Material.h>
+#include <Urho3D/Graphics/Model.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Physics/PhysicsWorld.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Physics/RigidBody.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Graphics/Skybox.h>
+#include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/UI.h>
+#include <Urho3D/Graphics/Zone.h>
 
 #include "Physics.h"
 
-#include <Urho3D/DebugNew.h>
+#include <Urho3D/Container/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(Physics)
 

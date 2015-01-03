@@ -20,14 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Graphics.h"
-#include "Matrix3x4.h"
-#include "ShaderVariation.h"
-#include "Texture.h"
-#include "UIElement.h"
+#include "../Precompiled.h"
+#include "../Graphics/Graphics.h"
+#include "../Math/Matrix3x4.h"
+#include "../Graphics/ShaderVariation.h"
+#include "../Graphics/Texture.h"
+#include "../UI/UIElement.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

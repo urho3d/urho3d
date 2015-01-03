@@ -1,4 +1,4 @@
-$#include "ConstraintRope2D.h"
+$#include "../Urho2D/ConstraintRope2D.h"
 
 class ConstraintRope2D : Constraint2D
 {

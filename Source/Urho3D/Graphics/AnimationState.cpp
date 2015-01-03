@@ -20,16 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "AnimatedModel.h"
-#include "Animation.h"
-#include "AnimationState.h"
-#include "Deserializer.h"
-#include "DrawableEvents.h"
-#include "Log.h"
-#include "Serializer.h"
+#include "../Precompiled.h"
+#include "../Graphics/AnimatedModel.h"
+#include "../Graphics/Animation.h"
+#include "../Graphics/AnimationState.h"
+#include "../IO/Deserializer.h"
+#include "../Graphics/DrawableEvents.h"
+#include "../IO/Log.h"
+#include "../IO/Serializer.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

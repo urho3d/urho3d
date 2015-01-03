@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Component.h"
-#include "VectorBuffer.h"
+#include "../Scene/Component.h"
+#include "../IO/VectorBuffer.h"
 
 #include <Bullet/LinearMath/btMotionState.h>
 

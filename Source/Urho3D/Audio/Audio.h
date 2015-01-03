@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "ArrayPtr.h"
-#include "AudioDefs.h"
-#include "Mutex.h"
-#include "Object.h"
+#include "../Container/ArrayPtr.h"
+#include "../Audio/AudioDefs.h"
+#include "../Core/Mutex.h"
+#include "../Core/Object.h"
 
 namespace Urho3D
 {

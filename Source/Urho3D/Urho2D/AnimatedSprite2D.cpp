@@ -20,18 +20,18 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "AnimatedSprite2D.h"
-#include "Animation2D.h"
-#include "AnimationSet2D.h"
-#include "Context.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "Sprite2D.h"
-#include "StaticSprite2D.h"
+#include "../Precompiled.h"
+#include "../Urho2D/AnimatedSprite2D.h"
+#include "../Urho2D/Animation2D.h"
+#include "../Urho2D/AnimationSet2D.h"
+#include "../Core/Context.h"
+#include "../Resource/ResourceCache.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SceneEvents.h"
+#include "../Urho2D/Sprite2D.h"
+#include "../Urho2D/StaticSprite2D.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

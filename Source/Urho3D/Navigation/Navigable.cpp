@@ -20,11 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Navigable.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Navigation/Navigable.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

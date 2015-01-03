@@ -20,10 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Deserializer.h"
+#include "../Precompiled.h"
+#include "../IO/Deserializer.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

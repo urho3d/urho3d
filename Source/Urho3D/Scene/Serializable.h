@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Attribute.h"
-#include "Object.h"
+#include "../Core/Attribute.h"
+#include "../Core/Object.h"
 
 #include <cstddef>
 

@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "Quaternion.h"
-#include "Resource.h"
-#include "Ptr.h"
-#include "Vector3.h"
+#include "../Math/Quaternion.h"
+#include "../Resource/Resource.h"
+#include "../Container/Ptr.h"
+#include "../Math/Vector3.h"
 
 namespace Urho3D
 {

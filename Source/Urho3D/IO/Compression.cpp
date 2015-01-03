@@ -20,15 +20,15 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "ArrayPtr.h"
-#include "Compression.h"
-#include "Deserializer.h"
-#include "Serializer.h"
-#include "VectorBuffer.h"
+#include "../Precompiled.h"
+#include "../Container/ArrayPtr.h"
+#include "../IO/Compression.h"
+#include "../IO/Deserializer.h"
+#include "../IO/Serializer.h"
+#include "../IO/VectorBuffer.h"
 
-#include <lz4.h>
-#include <lz4hc.h>
+#include <LZ4/lz4.h>
+#include <LZ4/lz4hc.h>
 
 namespace Urho3D
 {

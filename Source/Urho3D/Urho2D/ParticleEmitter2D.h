@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Drawable2D.h"
+#include "../Urho2D/Drawable2D.h"
 
 namespace Urho3D
 {

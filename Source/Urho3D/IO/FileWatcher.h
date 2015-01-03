@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "List.h"
-#include "Mutex.h"
-#include "Object.h"
-#include "Thread.h"
-#include "Timer.h"
+#include "../Container/List.h"
+#include "../Core/Mutex.h"
+#include "../Core/Object.h"
+#include "../Core/Thread.h"
+#include "../Core/Timer.h"
 
 namespace Urho3D
 {

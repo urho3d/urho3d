@@ -20,22 +20,22 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Decompress.h"
-#include "File.h"
-#include "FileSystem.h"
-#include "Log.h"
-#include "Profiler.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Resource/Decompress.h"
+#include "../IO/File.h"
+#include "../IO/FileSystem.h"
+#include "../IO/Log.h"
+#include "../Core/Profiler.h"
 
 #include <cstdlib>
 #include <cstring>
-#include <stb_image.h>
-#include <stb_image_write.h>
-#include <jo_jpeg.h>
+#include <STB/stb_image.h>
+#include <STB/stb_image_write.h>
+#include <JO/jo_jpeg.h>
 #include <SDL/SDL_surface.h>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 extern "C" unsigned char *stbi_write_png_to_mem(unsigned char *pixels, int stride_bytes, int x, int y, int n, int *out_len);
 

@@ -1,4 +1,4 @@
-$#include "ObjectAnimation.h"
+$#include "../Scene/ObjectAnimation.h"
 
 enum WrapMode
 {

@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "Urho3D.h"
-#include "HashMap.h"
-#include "Str.h"
+#include "../Urho3D.h"
+#include "../Container/HashMap.h"
+#include "../Container/Str.h"
 
 #include <AngelScript/angelscript.h>
 

@@ -20,8 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Frustum.h"
+#include "../Precompiled.h"
+#include "../Math/Frustum.h"
 
 namespace Urho3D
 {

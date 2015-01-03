@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "BorderImage.h"
+#include "../UI/BorderImage.h"
 
 namespace Urho3D
 {

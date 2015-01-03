@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Window.h"
+#include "../UI/Window.h"
 
 namespace Urho3D
 {

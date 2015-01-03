@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Ptr.h"
-#include "Variant.h"
+#include "../Container/Ptr.h"
+#include "../Core/Variant.h"
 
 namespace Urho3D
 {

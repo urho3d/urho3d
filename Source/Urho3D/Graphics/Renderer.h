@@ -22,12 +22,12 @@
 
 #pragma once
 
-#include "Batch.h"
-#include "Color.h"
-#include "Drawable.h"
-#include "HashSet.h"
-#include "Mutex.h"
-#include "Viewport.h"
+#include "../Graphics/Batch.h"
+#include "../Math/Color.h"
+#include "../Graphics/Drawable.h"
+#include "../Container/HashSet.h"
+#include "../Core/Mutex.h"
+#include "../Graphics/Viewport.h"
 
 namespace Urho3D
 {

@@ -20,14 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Log.h"
-#include "XMLFile.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../IO/Log.h"
+#include "../Resource/XMLFile.h"
 
-#include <pugixml.hpp>
+#include <PugiXml/pugixml.hpp>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

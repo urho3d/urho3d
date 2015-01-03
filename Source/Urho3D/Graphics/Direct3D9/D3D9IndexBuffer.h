@@ -23,9 +23,9 @@
 #pragma once
 
 #include "../GPUObject.h"
-#include "../Object.h"
+#include "../Core/Object.h"
 #include "../GraphicsDefs.h"
-#include "../ArrayPtr.h"
+#include "../Container/ArrayPtr.h"
 
 namespace Urho3D
 {

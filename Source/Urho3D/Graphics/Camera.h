@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "Frustum.h"
-#include "Component.h"
-#include "GraphicsDefs.h"
-#include "Ray.h"
+#include "../Math/Frustum.h"
+#include "../Scene/Component.h"
+#include "../Graphics/GraphicsDefs.h"
+#include "../Math/Ray.h"
 
 namespace Urho3D
 {

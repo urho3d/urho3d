@@ -20,9 +20,9 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Log.h"
-#include "Spline.h"
+#include "../Precompiled.h"
+#include "../IO/Log.h"
+#include "../Core/Spline.h"
 
 namespace Urho3D
 {

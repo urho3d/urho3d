@@ -20,12 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Log.h"
-#include "Thread.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../IO/Log.h"
+#include "../Core/Thread.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

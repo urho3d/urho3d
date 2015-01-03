@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "Object.h"
-#include "Cursor.h"
-#include "UIBatch.h"
+#include "../Core/Object.h"
+#include "../UI/Cursor.h"
+#include "../UI/UIBatch.h"
 
 namespace Urho3D
 {

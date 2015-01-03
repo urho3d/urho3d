@@ -1,4 +1,4 @@
-$#include "TextureCube.h"
+$#include "../Graphics/TextureCube.h"
 
 class TextureCube : public Texture
 {

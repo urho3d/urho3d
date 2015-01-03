@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Resource.h"
-#include "JSONValue.h"
+#include "../Resource/Resource.h"
+#include "../Resource/JSONValue.h"
 
 namespace rapidjson
 {

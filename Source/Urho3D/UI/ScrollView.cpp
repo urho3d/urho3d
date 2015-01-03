@@ -20,17 +20,17 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "BorderImage.h"
-#include "InputEvents.h"
-#include "ScrollBar.h"
-#include "ScrollView.h"
-#include "Slider.h"
-#include "UI.h"
-#include "UIEvents.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../UI/BorderImage.h"
+#include "../Input/InputEvents.h"
+#include "../UI/ScrollBar.h"
+#include "../UI/ScrollView.h"
+#include "../UI/Slider.h"
+#include "../UI/UI.h"
+#include "../UI/UIEvents.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

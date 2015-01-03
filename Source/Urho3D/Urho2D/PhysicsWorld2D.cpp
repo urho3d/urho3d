@@ -20,22 +20,22 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "DebugRenderer.h"
-#include "Graphics.h"
-#include "Log.h"
-#include "PhysicsEvents2D.h"
-#include "PhysicsUtils2D.h"
-#include "PhysicsWorld2D.h"
-#include "Profiler.h"
-#include "Renderer.h"
-#include "RigidBody2D.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "Viewport.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Graphics/DebugRenderer.h"
+#include "../Graphics/Graphics.h"
+#include "../IO/Log.h"
+#include "../Urho2D/PhysicsEvents2D.h"
+#include "../Urho2D/PhysicsUtils2D.h"
+#include "../Urho2D/PhysicsWorld2D.h"
+#include "../Core/Profiler.h"
+#include "../Graphics/Renderer.h"
+#include "../Urho2D/RigidBody2D.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SceneEvents.h"
+#include "../Graphics/Viewport.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

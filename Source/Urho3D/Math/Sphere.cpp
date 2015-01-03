@@ -20,9 +20,9 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Frustum.h"
-#include "Polyhedron.h"
+#include "../Precompiled.h"
+#include "../Math/Frustum.h"
+#include "../Math/Polyhedron.h"
 
 namespace Urho3D
 {

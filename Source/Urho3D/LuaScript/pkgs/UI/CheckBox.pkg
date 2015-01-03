@@ -1,4 +1,4 @@
-$#include "CheckBox.h"
+$#include "../UI/CheckBox.h"
 
 class CheckBox : public BorderImage
 {

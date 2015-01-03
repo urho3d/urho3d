@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "Color.h"
-#include "GraphicsDefs.h"
-#include "Rect.h"
+#include "../Math/Color.h"
+#include "../Graphics/GraphicsDefs.h"
+#include "../Math/Rect.h"
 
 namespace Urho3D
 {

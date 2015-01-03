@@ -20,12 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "CollisionEdge2D.h"
-#include "PhysicsUtils2D.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Urho2D/CollisionEdge2D.h"
+#include "../Urho2D/PhysicsUtils2D.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

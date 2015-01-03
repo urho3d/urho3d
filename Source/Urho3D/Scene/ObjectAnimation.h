@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "AnimationDefs.h"
-#include "Resource.h"
+#include "../Scene/AnimationDefs.h"
+#include "../Resource/Resource.h"
 
 namespace Urho3D
 {

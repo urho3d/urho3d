@@ -1,4 +1,4 @@
-$#include "Constraint.h"
+$#include "../Physics/Constraint.h"
 
 enum ConstraintType
 {

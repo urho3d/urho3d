@@ -20,13 +20,13 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "SmoothedTransform.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SceneEvents.h"
+#include "../Scene/SmoothedTransform.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

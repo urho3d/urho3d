@@ -1,4 +1,4 @@
-$#include "ScrollView.h"
+$#include "../UI/ScrollView.h"
 
 class ScrollView : public UIElement
 {

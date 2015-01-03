@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include "Component.h"
-#include "DebugRenderer.h"
-#include "MathDefs.h"
-#include "Node.h"
-#include "Ptr.h"
-#include "Variant.h"
-#include "Vector.h"
-#include "Vector3.h"
-#include "Spline.h"
+#include "../Scene/Component.h"
+#include "../Graphics/DebugRenderer.h"
+#include "../Math/MathDefs.h"
+#include "../Scene/Node.h"
+#include "../Container/Ptr.h"
+#include "../Core/Variant.h"
+#include "../Container/Vector.h"
+#include "../Math/Vector3.h"
+#include "../Core/Spline.h"
 
 namespace Urho3D
 {

@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "StaticModel.h"
+#include "../Graphics/StaticModel.h"
 
 namespace Urho3D
 {

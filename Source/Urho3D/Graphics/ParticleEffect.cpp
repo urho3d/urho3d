@@ -20,15 +20,15 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Log.h"
-#include "Material.h"
-#include "ParticleEffect.h"
-#include "ResourceCache.h"
-#include "XMLFile.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../IO/Log.h"
+#include "../Graphics/Material.h"
+#include "../Graphics/ParticleEffect.h"
+#include "../Resource/ResourceCache.h"
+#include "../Resource/XMLFile.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

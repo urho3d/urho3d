@@ -1,4 +1,4 @@
-$#include "BorderImage.h"
+$#include "../UI/BorderImage.h"
 
 enum BlendMode{};
 

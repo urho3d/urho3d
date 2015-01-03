@@ -20,25 +20,25 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "DrawableEvents.h"
-#include "Geometry.h"
-#include "Image.h"
-#include "IndexBuffer.h"
-#include "Log.h"
-#include "Material.h"
-#include "Node.h"
-#include "Octree.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "ResourceEvents.h"
-#include "Scene.h"
-#include "Terrain.h"
-#include "TerrainPatch.h"
-#include "VertexBuffer.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Graphics/DrawableEvents.h"
+#include "../Graphics/Geometry.h"
+#include "../Resource/Image.h"
+#include "../Graphics/IndexBuffer.h"
+#include "../IO/Log.h"
+#include "../Graphics/Material.h"
+#include "../Scene/Node.h"
+#include "../Graphics/Octree.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../Resource/ResourceEvents.h"
+#include "../Scene/Scene.h"
+#include "../Graphics/Terrain.h"
+#include "../Graphics/TerrainPatch.h"
+#include "../Graphics/VertexBuffer.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

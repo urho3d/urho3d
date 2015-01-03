@@ -1,4 +1,4 @@
-$#include "Skeleton.h"
+$#include "../Graphics/Skeleton.h"
 
 struct Bone
 {

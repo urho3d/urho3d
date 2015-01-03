@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../Image.h"
+#include "../Resource/Image.h"
 #include "../RenderSurface.h"
-#include "../Ptr.h"
+#include "../Container/Ptr.h"
 #include "../Texture.h"
 
 namespace Urho3D

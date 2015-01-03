@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "ArrayPtr.h"
-#include "List.h"
-#include "Mutex.h"
-#include "Pair.h"
-#include "SoundStream.h"
+#include "../Container/ArrayPtr.h"
+#include "../Container/List.h"
+#include "../Core/Mutex.h"
+#include "../Container/Pair.h"
+#include "../Audio/SoundStream.h"
 
 namespace Urho3D
 {

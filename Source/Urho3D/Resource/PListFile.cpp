@@ -20,15 +20,15 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Deserializer.h"
-#include "Log.h"
-#include "PListFile.h"
-#include "XMLFile.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../IO/Deserializer.h"
+#include "../IO/Log.h"
+#include "../Resource/PListFile.h"
+#include "../Resource/XMLFile.h"
 #include <stdio.h>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

@@ -1,4 +1,4 @@
-$#include "Polyhedron.h"
+$#include "../Math/Polyhedron.h"
 
 class Polyhedron
 {

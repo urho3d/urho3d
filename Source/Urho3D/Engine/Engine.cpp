@@ -20,42 +20,42 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Audio.h"
-#include "Console.h"
-#include "Context.h"
-#include "CoreEvents.h"
-#include "DebugHud.h"
-#include "Engine.h"
-#include "FileSystem.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "InputEvents.h"
-#include "Log.h"
+#include "../Precompiled.h"
+#include "../Audio/Audio.h"
+#include "../Engine/Console.h"
+#include "../Core/Context.h"
+#include "../Core/CoreEvents.h"
+#include "../Engine/DebugHud.h"
+#include "../Engine/Engine.h"
+#include "../IO/FileSystem.h"
+#include "../Graphics/Graphics.h"
+#include "../Input/Input.h"
+#include "../Input/InputEvents.h"
+#include "../IO/Log.h"
 #ifdef URHO3D_NAVIGATION
-#include "NavigationMesh.h"
+#include "../Navigation/NavigationMesh.h"
 #endif
 #ifdef URHO3D_NETWORK
-#include "Network.h"
+#include "../Network/Network.h"
 #endif
-#include "PackageFile.h"
+#include "../IO/PackageFile.h"
 #ifdef URHO3D_PHYSICS
-#include "PhysicsWorld.h"
+#include "../Physics/PhysicsWorld.h"
 #endif
-#include "ProcessUtils.h"
-#include "Profiler.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "UI.h"
+#include "../Core/ProcessUtils.h"
+#include "../Core/Profiler.h"
+#include "../Graphics/Renderer.h"
+#include "../Resource/ResourceCache.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SceneEvents.h"
+#include "../UI/UI.h"
 #ifdef URHO3D_URHO2D
-#include "Urho2D.h"
+#include "../Urho2D/Urho2D.h"
 #endif
-#include "WorkQueue.h"
-#include "XMLFile.h"
+#include "../Core/WorkQueue.h"
+#include "../Resource/XMLFile.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 // From dbgint.h

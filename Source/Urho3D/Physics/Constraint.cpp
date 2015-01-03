@@ -20,16 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "DebugRenderer.h"
-#include "Constraint.h"
-#include "Log.h"
-#include "PhysicsUtils.h"
-#include "PhysicsWorld.h"
-#include "Profiler.h"
-#include "RigidBody.h"
-#include "Scene.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Graphics/DebugRenderer.h"
+#include "../Physics/Constraint.h"
+#include "../IO/Log.h"
+#include "../Physics/PhysicsUtils.h"
+#include "../Physics/PhysicsWorld.h"
+#include "../Core/Profiler.h"
+#include "../Physics/RigidBody.h"
+#include "../Scene/Scene.h"
 
 #include <Bullet/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h>
 #include <Bullet/BulletDynamics/ConstraintSolver/btHingeConstraint.h>

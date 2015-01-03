@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "../ArrayPtr.h"
+#include "../Container/ArrayPtr.h"
 #include "../GPUObject.h"
 #include "../GraphicsDefs.h"
-#include "../RefCounted.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {

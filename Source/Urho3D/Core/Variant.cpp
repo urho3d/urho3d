@@ -20,8 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "StringUtils.h"
+#include "../Precompiled.h"
+#include "../Core/StringUtils.h"
 
 #include <cstring>
 

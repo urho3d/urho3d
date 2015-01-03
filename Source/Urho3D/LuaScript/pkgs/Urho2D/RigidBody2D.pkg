@@ -1,4 +1,4 @@
-$#include "RigidBody2D.h"
+$#include "../Urho2D/RigidBody2D.h"
 
 enum BodyType2D
 {

@@ -20,11 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "HashBase.h"
-#include "ListBase.h"
-#include "Str.h"
-#include "VectorBase.h"
+#include "../Precompiled.h"
+#include "../Container/HashBase.h"
+#include "../Container/ListBase.h"
+#include "../Container/Str.h"
+#include "../Container/VectorBase.h"
 
 namespace Urho3D
 {

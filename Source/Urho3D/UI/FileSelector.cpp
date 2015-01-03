@@ -20,23 +20,23 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "DropDownList.h"
-#include "File.h"
-#include "FileSelector.h"
-#include "FileSystem.h"
-#include "InputEvents.h"
-#include "LineEdit.h"
-#include "ListView.h"
-#include "Text.h"
-#include "UI.h"
-#include "UIEvents.h"
-#include "Window.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../UI/DropDownList.h"
+#include "../IO/File.h"
+#include "../UI/FileSelector.h"
+#include "../IO/FileSystem.h"
+#include "../Input/InputEvents.h"
+#include "../UI/LineEdit.h"
+#include "../UI/ListView.h"
+#include "../UI/Text.h"
+#include "../UI/UI.h"
+#include "../UI/UIEvents.h"
+#include "../UI/Window.h"
 
-#include "Sort.h"
+#include "../Container/Sort.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

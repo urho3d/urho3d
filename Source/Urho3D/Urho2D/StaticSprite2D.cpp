@@ -20,14 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Scene.h"
-#include "Sprite2D.h"
-#include "StaticSprite2D.h"
-#include "Texture2D.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Scene/Scene.h"
+#include "../Urho2D/Sprite2D.h"
+#include "../Urho2D/StaticSprite2D.h"
+#include "../Graphics/Texture2D.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

@@ -20,12 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "RefCounted.h"
+#include "../Precompiled.h"
+#include "../Container/RefCounted.h"
 
 #include <cassert>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

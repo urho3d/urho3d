@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "BoundingBox.h"
-#include "ArrayPtr.h"
-#include "Component.h"
-#include "Quaternion.h"
+#include "../Math/BoundingBox.h"
+#include "../Container/ArrayPtr.h"
+#include "../Scene/Component.h"
+#include "../Math/Quaternion.h"
 
 class btBvhTriangleMeshShape;
 class btCollisionShape;

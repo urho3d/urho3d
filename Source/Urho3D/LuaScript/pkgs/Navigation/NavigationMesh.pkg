@@ -1,4 +1,4 @@
-$#include "NavigationMesh.h"
+$#include "../Navigation/NavigationMesh.h"
 
 struct NavigationGeometryInfo
 {

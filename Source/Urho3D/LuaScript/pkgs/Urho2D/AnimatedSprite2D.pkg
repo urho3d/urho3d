@@ -1,4 +1,4 @@
-$#include "AnimatedSprite2D.h"
+$#include "../Urho2D/AnimatedSprite2D.h"
 
 enum LoopMode2D
 {

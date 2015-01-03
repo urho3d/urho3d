@@ -20,25 +20,25 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "CollisionShape.h"
-#include "Context.h"
-#include "CustomGeometry.h"
-#include "DebugRenderer.h"
-#include "DrawableEvents.h"
-#include "Geometry.h"
-#include "IndexBuffer.h"
-#include "Log.h"
-#include "Model.h"
-#include "PhysicsUtils.h"
-#include "PhysicsWorld.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "ResourceEvents.h"
-#include "RigidBody.h"
-#include "Scene.h"
-#include "Terrain.h"
-#include "VertexBuffer.h"
+#include "../Precompiled.h"
+#include "../Physics/CollisionShape.h"
+#include "../Core/Context.h"
+#include "../Graphics/CustomGeometry.h"
+#include "../Graphics/DebugRenderer.h"
+#include "../Graphics/DrawableEvents.h"
+#include "../Graphics/Geometry.h"
+#include "../Graphics/IndexBuffer.h"
+#include "../IO/Log.h"
+#include "../Graphics/Model.h"
+#include "../Physics/PhysicsUtils.h"
+#include "../Physics/PhysicsWorld.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../Resource/ResourceEvents.h"
+#include "../Physics/RigidBody.h"
+#include "../Scene/Scene.h"
+#include "../Graphics/Terrain.h"
+#include "../Graphics/VertexBuffer.h"
 
 #include <Bullet/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
 #include <Bullet/BulletCollision/CollisionShapes/btBoxShape.h>
@@ -53,7 +53,7 @@
 #include <Bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h>
 #include <Bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <Bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h>
-#include <hull.h>
+#include <StanHull/hull.h>
 
 namespace Urho3D
 {

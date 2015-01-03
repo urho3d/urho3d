@@ -20,28 +20,28 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Camera.h>
-#include <Urho3D/CollisionBox2D.h>
-#include <Urho3D/CollisionEdge2D.h>
-#include <Urho3D/ConstraintRevolute2D.h>
-#include <Urho3D/ConstraintRope2D.h>
-#include <Urho3D/CoreEvents.h>
-#include <Urho3D/DebugRenderer.h>
-#include <Urho3D/Engine.h>
-#include <Urho3D/Font.h>
-#include <Urho3D/Graphics.h>
-#include <Urho3D/Input.h>
-#include <Urho3D/Octree.h>
-#include <Urho3D/PhysicsWorld2D.h>
-#include <Urho3D/Renderer.h>
-#include <Urho3D/RigidBody2D.h>
-#include <Urho3D/Scene.h>
-#include <Urho3D/SceneEvents.h>
-#include <Urho3D/Text.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Urho2D/CollisionBox2D.h>
+#include <Urho3D/Urho2D/CollisionEdge2D.h>
+#include <Urho3D/Urho2D/ConstraintRevolute2D.h>
+#include <Urho3D/Urho2D/ConstraintRope2D.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Graphics/DebugRenderer.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Urho2D/PhysicsWorld2D.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Urho2D/RigidBody2D.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Scene/SceneEvents.h>
+#include <Urho3D/UI/Text.h>
 
 #include "Urho2DPhysicsRope.h"
 
-#include <Urho3D/DebugNew.h>
+#include <Urho3D/Container/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(Urho2DPhysicsRope)
 

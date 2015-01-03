@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Object.h"
+#include "../Core/Object.h"
 
 class asILockableSharedBool;
 class asIScriptFunction;

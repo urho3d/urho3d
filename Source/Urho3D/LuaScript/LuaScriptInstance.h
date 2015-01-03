@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Component.h"
+#include "../Scene/Component.h"
 
 struct lua_State;
 

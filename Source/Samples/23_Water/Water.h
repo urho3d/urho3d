@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <Urho3D/Plane.h>
+#include <Urho3D/Math/Plane.h>
 
 #include "Sample.h"
 

@@ -20,12 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "BoundingBox.h"
-#include "Frustum.h"
-#include "Plane.h"
-#include "Ray.h"
-#include "Sphere.h"
+#include "../Precompiled.h"
+#include "../Math/BoundingBox.h"
+#include "../Math/Frustum.h"
+#include "../Math/Plane.h"
+#include "../Math/Ray.h"
+#include "../Math/Sphere.h"
 
 namespace Urho3D
 {

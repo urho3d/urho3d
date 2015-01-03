@@ -22,12 +22,12 @@
 
 #pragma once
 
-#include "BoundingBox.h"
-#include "Component.h"
-#include "HashSet.h"
-#include "Sphere.h"
-#include "Vector3.h"
-#include "VectorBuffer.h"
+#include "../Math/BoundingBox.h"
+#include "../Scene/Component.h"
+#include "../Container/HashSet.h"
+#include "../Math/Sphere.h"
+#include "../Math/Vector3.h"
+#include "../IO/VectorBuffer.h"
 
 #include <Bullet/LinearMath/btIDebugDraw.h>
 

@@ -20,10 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Mutex.h"
-#include "ProcessUtils.h"
-#include "MathDefs.h"
+#include "../Precompiled.h"
+#include "../Core/Mutex.h"
+#include "../Core/ProcessUtils.h"
+#include "../Math/MathDefs.h"
 
 #include <cstdio>
 #include <fcntl.h>
@@ -35,7 +35,7 @@
 #if defined(IOS)
 #include <mach/mach_host.h>
 #elif !defined(ANDROID) && !defined(RPI)
-#include <libcpuid.h>
+#include <LibCpuId/libcpuid.h>
 #endif
 
 #ifdef WIN32
@@ -73,7 +73,7 @@ inline void SetFPUState(unsigned control)
 }
 #endif
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

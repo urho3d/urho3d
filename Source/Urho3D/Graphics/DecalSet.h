@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "Drawable.h"
-#include "Frustum.h"
-#include "List.h"
-#include "Skeleton.h"
+#include "../Graphics/Drawable.h"
+#include "../Math/Frustum.h"
+#include "../Container/List.h"
+#include "../Graphics/Skeleton.h"
 
 namespace Urho3D
 {

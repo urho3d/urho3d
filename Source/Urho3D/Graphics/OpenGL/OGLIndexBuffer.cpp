@@ -20,16 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Graphics.h"
-#include "GraphicsImpl.h"
-#include "IndexBuffer.h"
-#include "Log.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Graphics/Graphics.h"
+#include "../Graphics/GraphicsImpl.h"
+#include "../Graphics/IndexBuffer.h"
+#include "../IO/Log.h"
 
 #include <cstring>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

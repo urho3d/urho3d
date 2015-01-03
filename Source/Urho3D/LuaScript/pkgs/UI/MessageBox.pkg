@@ -1,4 +1,4 @@
-$#include "MessageBox.h"
+$#include "../UI/MessageBox.h"
 
 class MessageBox : public Object
 {

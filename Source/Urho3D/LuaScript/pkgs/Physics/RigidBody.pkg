@@ -1,4 +1,4 @@
-$#include "RigidBody.h"
+$#include "../Physics/RigidBody.h"
 
 enum CollisionEventMode
 {

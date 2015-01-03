@@ -20,9 +20,9 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Tangent.h"
-#include "Vector4.h"
+#include "../Precompiled.h"
+#include "../Graphics/Tangent.h"
+#include "../Math/Vector4.h"
 
 namespace Urho3D
 {

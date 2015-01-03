@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "ArrayPtr.h"
-#include "BoundingBox.h"
-#include "Component.h"
-#include "HashSet.h"
-#include "Matrix3x4.h"
+#include "../Container/ArrayPtr.h"
+#include "../Math/BoundingBox.h"
+#include "../Scene/Component.h"
+#include "../Container/HashSet.h"
+#include "../Math/Matrix3x4.h"
 
 class dtNavMesh;
 class dtNavMeshQuery;

@@ -20,25 +20,25 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/AnimatedSprite2D.h>
-#include <Urho3D/AnimationSet2D.h>
-#include <Urho3D/Camera.h>
-#include <Urho3D/CoreEvents.h>
-#include <Urho3D/Drawable2D.h>
-#include <Urho3D/Engine.h>
-#include <Urho3D/Font.h>
-#include <Urho3D/Graphics.h>
-#include <Urho3D/Input.h>
-#include <Urho3D/Octree.h>
-#include <Urho3D/Renderer.h>
-#include <Urho3D/ResourceCache.h>
-#include <Urho3D/Scene.h>
-#include <Urho3D/Text.h>
-#include <Urho3D/Zone.h>
+#include <Urho3D/Urho2D/AnimatedSprite2D.h>
+#include <Urho3D/Urho2D/AnimationSet2D.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Urho2D/Drawable2D.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/Graphics/Zone.h>
 
 #include "Urho2DSpriterAnimation.h"
 
-#include <Urho3D/DebugNew.h>
+#include <Urho3D/Container/DebugNew.h>
 
 static const char* animationNames[] =
 {

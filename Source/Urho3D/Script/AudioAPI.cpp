@@ -20,12 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "APITemplates.h"
-#include "Audio.h"
-#include "Sound.h"
-#include "SoundListener.h"
-#include "SoundSource3D.h"
+#include "../Precompiled.h"
+#include "../Script/APITemplates.h"
+#include "../Audio/Audio.h"
+#include "../Audio/Sound.h"
+#include "../Audio/SoundListener.h"
+#include "../Audio/SoundSource3D.h"
 
 namespace Urho3D
 {

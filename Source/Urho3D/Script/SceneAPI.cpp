@@ -20,17 +20,17 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "APITemplates.h"
-#include "Animatable.h"
-#include "DebugRenderer.h"
-#include "ObjectAnimation.h"
-#include "PackageFile.h"
-#include "Scene.h"
-#include "SmoothedTransform.h"
-#include "Sort.h"
-#include "SplinePath.h"
-#include "ValueAnimation.h"
+#include "../Precompiled.h"
+#include "../Script/APITemplates.h"
+#include "../Scene/Animatable.h"
+#include "../Graphics/DebugRenderer.h"
+#include "../Scene/ObjectAnimation.h"
+#include "../IO/PackageFile.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SmoothedTransform.h"
+#include "../Container/Sort.h"
+#include "../Scene/SplinePath.h"
+#include "../Scene/ValueAnimation.h"
 
 namespace Urho3D
 {

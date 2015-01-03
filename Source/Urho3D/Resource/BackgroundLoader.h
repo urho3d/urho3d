@@ -22,13 +22,13 @@
 
 #pragma once
 
-#include "HashMap.h"
-#include "HashSet.h"
-#include "Mutex.h"
-#include "Ptr.h"
-#include "RefCounted.h"
-#include "StringHash.h"
-#include "Thread.h"
+#include "../Container/HashMap.h"
+#include "../Container/HashSet.h"
+#include "../Core/Mutex.h"
+#include "../Container/Ptr.h"
+#include "../Container/RefCounted.h"
+#include "../Math/StringHash.h"
+#include "../Core/Thread.h"
 
 namespace Urho3D
 {

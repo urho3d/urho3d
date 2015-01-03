@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "ArrayPtr.h"
-#include "HashSet.h"
-#include "Resource.h"
-#include "ScriptEventListener.h"
+#include "../Container/ArrayPtr.h"
+#include "../Container/HashSet.h"
+#include "../Resource/Resource.h"
+#include "../Script/ScriptEventListener.h"
 
 class asIObjectType;
 class asIScriptContext;

@@ -1,4 +1,4 @@
-$#include "UI.h"
+$#include "../UI/UI.h"
 
 class UI : public Object
 {

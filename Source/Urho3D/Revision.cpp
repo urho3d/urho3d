@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
 #include "Revision.h"
 #include "librevision.h"
 

@@ -20,20 +20,20 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "ArrayPtr.h"
-#include "Context.h"
-#include "Deserializer.h"
-#include "JSONFile.h"
-#include "Log.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "Serializer.h"
+#include "../Precompiled.h"
+#include "../Container/ArrayPtr.h"
+#include "../Core/Context.h"
+#include "../IO/Deserializer.h"
+#include "../Resource/JSONFile.h"
+#include "../IO/Log.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../IO/Serializer.h"
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 using namespace rapidjson;
 

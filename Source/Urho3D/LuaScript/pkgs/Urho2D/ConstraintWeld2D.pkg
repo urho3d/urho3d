@@ -1,4 +1,4 @@
-$#include "ConstraintWeld2D.h"
+$#include "../Urho2D/ConstraintWeld2D.h"
 
 class  ConstraintWeld2D : Constraint2D
 {

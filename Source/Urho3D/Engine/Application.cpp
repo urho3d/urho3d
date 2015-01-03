@@ -20,20 +20,20 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Application.h"
-#include "Engine.h"
+#include "../Precompiled.h"
+#include "../Engine/Application.h"
+#include "../Engine/Engine.h"
 #ifdef IOS
-#include "Graphics.h"
-#include "GraphicsImpl.h"
+#include "../Graphics/Graphics.h"
+#include "../Graphics/GraphicsImpl.h"
 #endif
-#include "IOEvents.h"
-#include "Log.h"
-#include "ProcessUtils.h"
+#include "../IO/IOEvents.h"
+#include "../IO/Log.h"
+#include "../Core/ProcessUtils.h"
 
 #include <exception>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

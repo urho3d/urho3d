@@ -1,4 +1,4 @@
-$#include "Sphere.h"
+$#include "../Math/Sphere.h"
 
 class Sphere
 {

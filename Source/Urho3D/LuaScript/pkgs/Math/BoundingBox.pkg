@@ -1,4 +1,4 @@
-$#include "BoundingBox.h"
+$#include "../Math/BoundingBox.h"
 
 class BoundingBox
 {

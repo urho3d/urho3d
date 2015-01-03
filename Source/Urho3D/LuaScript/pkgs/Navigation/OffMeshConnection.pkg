@@ -1,4 +1,4 @@
-$#include "OffMeshConnection.h"
+$#include "../Navigation/OffMeshConnection.h"
 
 class OffMeshConnection : public Component
 {

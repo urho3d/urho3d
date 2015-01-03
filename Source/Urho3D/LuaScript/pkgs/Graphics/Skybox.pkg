@@ -1,4 +1,4 @@
-$#include "Skybox.h"
+$#include "../Graphics/Skybox.h"
 
 class Skybox : public StaticModel
 {

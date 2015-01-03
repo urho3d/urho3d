@@ -20,22 +20,22 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "CoreEvents.h"
-#include "FileSystem.h"
-#include "Log.h"
-#include "MemoryBuffer.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "Script.h"
-#include "ScriptFile.h"
-#include "ScriptInstance.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Core/CoreEvents.h"
+#include "../IO/FileSystem.h"
+#include "../IO/Log.h"
+#include "../IO/MemoryBuffer.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../Script/Script.h"
+#include "../Script/ScriptFile.h"
+#include "../Script/ScriptInstance.h"
 
 #include <AngelScript/angelscript.h>
 #include <cstring>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

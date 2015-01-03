@@ -20,14 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
 #ifdef URHO3D_PHYSICS
-#include "APITemplates.h"
-#include "CollisionShape.h"
-#include "Constraint.h"
-#include "PhysicsWorld.h"
-#include "RigidBody.h"
-#include "Scene.h"
+#include "../Script/APITemplates.h"
+#include "../Physics/CollisionShape.h"
+#include "../Physics/Constraint.h"
+#include "../Physics/PhysicsWorld.h"
+#include "../Physics/RigidBody.h"
+#include "../Scene/Scene.h"
 
 namespace Urho3D
 {

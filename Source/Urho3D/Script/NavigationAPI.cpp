@@ -20,12 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
 #ifdef URHO3D_NAVIGATION
-#include "APITemplates.h"
-#include "Navigable.h"
-#include "NavigationMesh.h"
-#include "OffMeshConnection.h"
+#include "../Script/APITemplates.h"
+#include "../Navigation/Navigable.h"
+#include "../Navigation/NavigationMesh.h"
+#include "../Navigation/OffMeshConnection.h"
 
 namespace Urho3D
 {

@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "ArrayPtr.h"
-#include "Deserializer.h"
-#include "Serializer.h"
-#include "Object.h"
+#include "../Container/ArrayPtr.h"
+#include "../IO/Deserializer.h"
+#include "../IO/Serializer.h"
+#include "../Core/Object.h"
 
 #ifdef ANDROID
 #include <SDL/SDL_rwops.h>

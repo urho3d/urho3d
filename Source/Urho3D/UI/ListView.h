@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "ScrollView.h"
+#include "../UI/ScrollView.h"
 
 namespace Urho3D
 {

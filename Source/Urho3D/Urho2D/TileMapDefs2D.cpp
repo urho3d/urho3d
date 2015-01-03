@@ -20,11 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "TileMapDefs2D.h"
-#include "XMLElement.h"
+#include "../Precompiled.h"
+#include "../Urho2D/TileMapDefs2D.h"
+#include "../Resource/XMLElement.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

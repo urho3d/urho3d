@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "HashSet.h"
-#include "Object.h"
-#include "XMLFile.h"
+#include "../Container/HashSet.h"
+#include "../Core/Object.h"
+#include "../Resource/XMLFile.h"
 
 namespace Urho3D
 {

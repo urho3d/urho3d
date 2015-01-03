@@ -20,21 +20,21 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Component.h"
-#include "Context.h"
-#include "Log.h"
-#include "MemoryBuffer.h"
-#include "ObjectAnimation.h"
-#include "Profiler.h"
-#include "ReplicationState.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "SmoothedTransform.h"
-#include "UnknownComponent.h"
-#include "XMLFile.h"
+#include "../Precompiled.h"
+#include "../Scene/Component.h"
+#include "../Core/Context.h"
+#include "../IO/Log.h"
+#include "../IO/MemoryBuffer.h"
+#include "../Scene/ObjectAnimation.h"
+#include "../Core/Profiler.h"
+#include "../Scene/ReplicationState.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SceneEvents.h"
+#include "../Scene/SmoothedTransform.h"
+#include "../Scene/UnknownComponent.h"
+#include "../Resource/XMLFile.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

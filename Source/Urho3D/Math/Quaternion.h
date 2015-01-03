@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Matrix3.h"
+#include "../Math/Matrix3.h"
 
 namespace Urho3D
 {

@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "GraphicsDefs.h"
-#include "HashTable.h"
-#include "Resource.h"
+#include "../Graphics/GraphicsDefs.h"
+#include "../Container/HashTable.h"
+#include "../Resource/Resource.h"
 
 namespace Urho3D
 {

@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Context.h"
-#include "Object.h"
+#include "../Core/Context.h"
+#include "../Core/Object.h"
 
 struct lua_State;
 

@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Component.h"
+#include "../Scene/Component.h"
 #include <Box2D/Box2D.h>
 
 namespace Urho3D

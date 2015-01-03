@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "ProcessUtils.h"
+#include "../Core/ProcessUtils.h"
 
 #ifdef WIN32
-#include "MiniDump.h"
+#include "../Core/MiniDump.h"
 #include <windows.h>
 #ifdef _MSC_VER
 #include <crtdbg.h>

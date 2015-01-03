@@ -22,13 +22,13 @@
 
 #pragma once
 
-#include "Color.h"
-#include "HashMap.h"
-#include "Matrix3.h"
-#include "Matrix3x4.h"
-#include "Ptr.h"
-#include "Rect.h"
-#include "StringHash.h"
+#include "../Math/Color.h"
+#include "../Container/HashMap.h"
+#include "../Math/Matrix3.h"
+#include "../Math/Matrix3x4.h"
+#include "../Container/Ptr.h"
+#include "../Math/Rect.h"
+#include "../Math/StringHash.h"
 
 namespace Urho3D
 {

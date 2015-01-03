@@ -1,4 +1,4 @@
-$#include "Navigable.h"
+$#include "../Navigation/Navigable.h"
 
 class Navigable : public Component
 {

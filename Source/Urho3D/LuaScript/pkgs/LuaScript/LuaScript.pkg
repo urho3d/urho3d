@@ -1,4 +1,4 @@
-$#include "LuaScript.h"
+$#include "../LuaScript/LuaScript.h"
 
 void LuaScriptSendEvent @ SendEvent(const String eventName, VariantMap& eventData);
 void LuaScriptSubscribeToEvent @ SubscribeToEvent(const String eventName, void* functionOrFunctionName);

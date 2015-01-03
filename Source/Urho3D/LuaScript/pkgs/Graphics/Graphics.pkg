@@ -1,5 +1,5 @@
-$#include "File.h"
-$#include "Graphics.h"
+$#include "../IO/File.h"
+$#include "../Graphics/Graphics.h"
 
 class Graphics : public Object
 {

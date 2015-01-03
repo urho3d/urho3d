@@ -1,8 +1,8 @@
-$#include "File.h"
-$#include "LuaFile.h"
-$#include "LuaScriptInstance.h"
-$#include "Node.h"
-$#include "ResourceCache.h"
+$#include "../IO/File.h"
+$#include "../LuaScript/LuaFile.h"
+$#include "../LuaScript/LuaScriptInstance.h"
+$#include "../Scene/Node.h"
+$#include "../Resource/ResourceCache.h"
 
 enum CreateMode
 {

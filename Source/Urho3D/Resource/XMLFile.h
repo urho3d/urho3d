@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Resource.h"
-#include "XMLElement.h"
+#include "../Resource/Resource.h"
+#include "../Resource/XMLElement.h"
 
 namespace pugi
 {

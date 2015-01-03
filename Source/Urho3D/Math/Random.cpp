@@ -20,8 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Random.h"
+#include "../Precompiled.h"
+#include "../Math/Random.h"
 
 namespace Urho3D
 {

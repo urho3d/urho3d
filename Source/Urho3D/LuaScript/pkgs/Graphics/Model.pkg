@@ -1,4 +1,4 @@
-$#include "Model.h"
+$#include "../Graphics/Model.h"
 
 class Model : public Resource
 {

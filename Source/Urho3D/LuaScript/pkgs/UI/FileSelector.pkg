@@ -1,4 +1,4 @@
-$#include "FileSelector.h"
+$#include "../UI/FileSelector.h"
 
 struct FileSelectorEntry
 {

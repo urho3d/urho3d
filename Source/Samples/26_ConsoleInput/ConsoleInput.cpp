@@ -20,20 +20,20 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Button.h>
-#include <Urho3D/Console.h>
-#include <Urho3D/CoreEvents.h>
-#include <Urho3D/Engine.h>
-#include <Urho3D/EngineEvents.h>
-#include <Urho3D/Input.h>
-#include <Urho3D/Log.h>
-#include <Urho3D/ProcessUtils.h>
-#include <Urho3D/Random.h>
-#include <Urho3D/Timer.h>
+#include <Urho3D/UI/Button.h>
+#include <Urho3D/Engine/Console.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Engine/EngineEvents.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/IO/Log.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Math/Random.h>
+#include <Urho3D/Core/Timer.h>
 
 #include "ConsoleInput.h"
 
-#include <Urho3D/DebugNew.h>
+#include <Urho3D/Container/DebugNew.h>
 
 // Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(ConsoleInput)

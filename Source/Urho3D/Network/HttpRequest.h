@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "ArrayPtr.h"
-#include "Deserializer.h"
-#include "Mutex.h"
-#include "RefCounted.h"
-#include "Thread.h"
+#include "../Container/ArrayPtr.h"
+#include "../IO/Deserializer.h"
+#include "../Core/Mutex.h"
+#include "../Container/RefCounted.h"
+#include "../Core/Thread.h"
 
 namespace Urho3D
 {

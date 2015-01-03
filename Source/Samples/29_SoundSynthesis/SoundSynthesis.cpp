@@ -20,20 +20,20 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/BufferedSoundStream.h>
-#include <Urho3D/CoreEvents.h>
-#include <Urho3D/Engine.h>
-#include <Urho3D/Font.h>
-#include <Urho3D/Input.h>
-#include <Urho3D/Log.h>
-#include <Urho3D/Node.h>
-#include <Urho3D/SoundSource.h>
-#include <Urho3D/Text.h>
-#include <Urho3D/UI.h>
+#include <Urho3D/Audio/BufferedSoundStream.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/IO/Log.h>
+#include <Urho3D/Scene/Node.h>
+#include <Urho3D/Audio/SoundSource.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/UI.h>
 
 #include "SoundSynthesis.h"
 
-#include <Urho3D/DebugNew.h>
+#include <Urho3D/Container/DebugNew.h>
 
 // Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(SoundSynthesis)

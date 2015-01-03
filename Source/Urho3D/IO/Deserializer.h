@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "BoundingBox.h"
-#include "Rect.h"
-#include "Variant.h"
+#include "../Math/BoundingBox.h"
+#include "../Math/Rect.h"
+#include "../Core/Variant.h"
 
 namespace Urho3D
 {

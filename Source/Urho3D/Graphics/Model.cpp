@@ -20,21 +20,21 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Deserializer.h"
-#include "Geometry.h"
-#include "IndexBuffer.h"
-#include "Log.h"
-#include "Model.h"
-#include "Profiler.h"
-#include "Graphics.h"
-#include "Serializer.h"
-#include "VertexBuffer.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../IO/Deserializer.h"
+#include "../Graphics/Geometry.h"
+#include "../Graphics/IndexBuffer.h"
+#include "../IO/Log.h"
+#include "../Graphics/Model.h"
+#include "../Core/Profiler.h"
+#include "../Graphics/Graphics.h"
+#include "../IO/Serializer.h"
+#include "../Graphics/VertexBuffer.h"
 
 #include <cstring>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

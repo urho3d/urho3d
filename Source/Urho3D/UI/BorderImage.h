@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "GraphicsDefs.h"
-#include "UIElement.h"
+#include "../Graphics/GraphicsDefs.h"
+#include "../UI/UIElement.h"
 
 namespace Urho3D
 {

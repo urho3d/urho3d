@@ -20,9 +20,9 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Color.h"
-#include "Str.h"
+#include "../Precompiled.h"
+#include "../Math/Color.h"
+#include "../Container/Str.h"
 
 #include <cstdio>
 

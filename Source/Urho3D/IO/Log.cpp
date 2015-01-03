@@ -20,16 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "CoreEvents.h"
-#include "File.h"
-#include "IOEvents.h"
-#include "Log.h"
-#include "Mutex.h"
-#include "ProcessUtils.h"
-#include "Thread.h"
-#include "Timer.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Core/CoreEvents.h"
+#include "../IO/File.h"
+#include "../IO/IOEvents.h"
+#include "../IO/Log.h"
+#include "../Core/Mutex.h"
+#include "../Core/ProcessUtils.h"
+#include "../Core/Thread.h"
+#include "../Core/Timer.h"
 
 #include <cstdio>
 
@@ -40,7 +40,7 @@
 extern "C" void SDL_IOS_LogMessage(const char* message);
 #endif
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

@@ -1,4 +1,4 @@
-$#include "Vector2.h"
+$#include "../Math/Vector2.h"
 
 class Vector2
 {

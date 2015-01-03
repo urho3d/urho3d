@@ -1,4 +1,4 @@
-$#include "Spline.h"
+$#include "../Core/Spline.h"
 
 enum InterpolationMode
 {

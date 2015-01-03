@@ -20,12 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "BoundingBox.h"
-#include "Serializer.h"
-#include "Variant.h"
+#include "../Precompiled.h"
+#include "../Math/BoundingBox.h"
+#include "../IO/Serializer.h"
+#include "../Core/Variant.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

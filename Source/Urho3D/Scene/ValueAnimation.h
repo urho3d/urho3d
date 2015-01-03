@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Resource.h"
-#include "Variant.h"
+#include "../Resource/Resource.h"
+#include "../Core/Variant.h"
 
 namespace Urho3D
 {

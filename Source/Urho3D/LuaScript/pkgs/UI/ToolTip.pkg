@@ -1,4 +1,4 @@
-$#include "ToolTip.h"
+$#include "../UI/ToolTip.h"
 
 class ToolTip : public UIElement
 {

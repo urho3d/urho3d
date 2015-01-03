@@ -20,13 +20,13 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "ConstraintRope2D.h"
-#include "Context.h"
-#include "PhysicsUtils2D.h"
-#include "RigidBody2D.h"
+#include "../Precompiled.h"
+#include "../Urho2D/ConstraintRope2D.h"
+#include "../Core/Context.h"
+#include "../Urho2D/PhysicsUtils2D.h"
+#include "../Urho2D/RigidBody2D.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

@@ -20,14 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/AnimationController.h>
-#include <Urho3D/Context.h>
-#include <Urho3D/MemoryBuffer.h>
-#include <Urho3D/PhysicsEvents.h>
-#include <Urho3D/PhysicsWorld.h>
-#include <Urho3D/RigidBody.h>
-#include <Urho3D/Scene.h>
-#include <Urho3D/SceneEvents.h>
+#include <Urho3D/Graphics/AnimationController.h>
+#include <Urho3D/Core/Context.h>
+#include <Urho3D/IO/MemoryBuffer.h>
+#include <Urho3D/Physics/PhysicsEvents.h>
+#include <Urho3D/Physics/PhysicsWorld.h>
+#include <Urho3D/Physics/RigidBody.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Scene/SceneEvents.h>
 
 #include "Character.h"
 

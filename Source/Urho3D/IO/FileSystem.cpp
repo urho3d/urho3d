@@ -20,16 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "ArrayPtr.h"
-#include "Context.h"
-#include "CoreEvents.h"
-#include "EngineEvents.h"
-#include "File.h"
-#include "FileSystem.h"
-#include "IOEvents.h"
-#include "Log.h"
-#include "Thread.h"
+#include "../Precompiled.h"
+#include "../Container/ArrayPtr.h"
+#include "../Core/Context.h"
+#include "../Core/CoreEvents.h"
+#include "../Engine/EngineEvents.h"
+#include "../IO/File.h"
+#include "../IO/FileSystem.h"
+#include "../IO/IOEvents.h"
+#include "../IO/Log.h"
+#include "../Core/Thread.h"
 
 #include <SDL/SDL_filesystem.h>
 
@@ -68,7 +68,7 @@ extern "C" const char* SDL_IOS_GetResourceDir();
 extern "C" const char* SDL_IOS_GetDocumentsDir();
 #endif
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

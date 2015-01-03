@@ -20,9 +20,9 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "APITemplates.h"
-#include "Input.h"
+#include "../Precompiled.h"
+#include "../Script/APITemplates.h"
+#include "../Input/Input.h"
 
 namespace Urho3D
 {

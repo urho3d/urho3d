@@ -1,4 +1,4 @@
-$#include "AnimationSet2D.h"
+$#include "../Urho2D/AnimationSet2D.h"
 
 class AnimationSet2D : Resource
 {

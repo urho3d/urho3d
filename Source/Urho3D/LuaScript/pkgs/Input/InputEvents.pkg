@@ -1,4 +1,4 @@
-$#include "InputEvents.h"
+$#include "../Input/InputEvents.h"
 
 static const int MOUSEB_LEFT;
 static const int MOUSEB_MIDDLE;

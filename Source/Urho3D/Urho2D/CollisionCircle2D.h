@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "CollisionShape2D.h"
+#include "../Urho2D/CollisionShape2D.h"
 
 namespace Urho3D
 {

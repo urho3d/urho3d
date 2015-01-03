@@ -1,4 +1,4 @@
-$#include "StringHash.h"
+$#include "../Math/StringHash.h"
 
 class StringHash
 {

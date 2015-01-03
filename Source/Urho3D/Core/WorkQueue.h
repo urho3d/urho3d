@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "List.h"
-#include "Mutex.h"
-#include "Object.h"
+#include "../Container/List.h"
+#include "../Core/Mutex.h"
+#include "../Core/Object.h"
 
 namespace Urho3D
 {

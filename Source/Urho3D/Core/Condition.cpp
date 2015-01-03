@@ -20,8 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Condition.h"
+#include "../Precompiled.h"
+#include "../Core/Condition.h"
 
 #ifdef WIN32
 #include <windows.h>

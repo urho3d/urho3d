@@ -20,24 +20,24 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "BackgroundLoader.h"
-#include "Context.h"
-#include "CoreEvents.h"
-#include "FileSystem.h"
-#include "FileWatcher.h"
-#include "Image.h"
-#include "JSONFile.h"
-#include "Log.h"
-#include "PackageFile.h"
-#include "PListFile.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "ResourceEvents.h"
-#include "WorkQueue.h"
-#include "XMLFile.h"
+#include "../Precompiled.h"
+#include "../Resource/BackgroundLoader.h"
+#include "../Core/Context.h"
+#include "../Core/CoreEvents.h"
+#include "../IO/FileSystem.h"
+#include "../IO/FileWatcher.h"
+#include "../Resource/Image.h"
+#include "../Resource/JSONFile.h"
+#include "../IO/Log.h"
+#include "../IO/PackageFile.h"
+#include "../Resource/PListFile.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../Resource/ResourceEvents.h"
+#include "../Core/WorkQueue.h"
+#include "../Resource/XMLFile.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

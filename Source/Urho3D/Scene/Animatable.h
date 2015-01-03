@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "HashSet.h"
-#include "Serializable.h"
-#include "ValueAnimationInfo.h"
+#include "../Container/HashSet.h"
+#include "../Scene/Serializable.h"
+#include "../Scene/ValueAnimationInfo.h"
 
 namespace Urho3D
 {

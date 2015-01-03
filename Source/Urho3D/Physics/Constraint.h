@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Component.h"
-#include "Vector3.h"
+#include "../Scene/Component.h"
+#include "../Math/Vector3.h"
 
 class btTypedConstraint;
 

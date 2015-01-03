@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "FontFace.h"
+#include "../UI/FontFace.h"
 
 namespace Urho3D
 {

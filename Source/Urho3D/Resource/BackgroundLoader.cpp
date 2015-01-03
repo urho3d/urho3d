@@ -20,16 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "BackgroundLoader.h"
-#include "Context.h"
-#include "Log.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "ResourceEvents.h"
-#include "Timer.h"
+#include "../Precompiled.h"
+#include "../Resource/BackgroundLoader.h"
+#include "../Core/Context.h"
+#include "../IO/Log.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../Resource/ResourceEvents.h"
+#include "../Core/Timer.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

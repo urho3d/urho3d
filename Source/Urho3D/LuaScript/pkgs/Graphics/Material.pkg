@@ -1,4 +1,4 @@
-$#include "Material.h"
+$#include "../Graphics/Material.h"
 
 enum CullMode {};
 enum WrapMode {};

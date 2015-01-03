@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Animatable.h"
+#include "../Scene/Animatable.h"
 
 namespace Urho3D
 {

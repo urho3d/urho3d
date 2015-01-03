@@ -20,14 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/AnimatedModel.h>
-#include <Urho3D/AnimationState.h>
-#include <Urho3D/Scene.h>
-#include <Urho3D/SceneEvents.h>
+#include <Urho3D/Graphics/AnimatedModel.h>
+#include <Urho3D/Graphics/AnimationState.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Scene/SceneEvents.h>
 
 #include "Mover.h"
 
-#include <Urho3D/DebugNew.h>
+#include <Urho3D/Container/DebugNew.h>
 
 Mover::Mover(Context* context) :
     LogicComponent(context),

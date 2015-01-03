@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "HashBase.h"
-#include "Sort.h"
+#include "../Container/HashBase.h"
+#include "../Container/Sort.h"
 
 #include <cassert>
 

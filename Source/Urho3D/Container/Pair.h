@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Hash.h"
+#include "../Container/Hash.h"
 
 namespace Urho3D
 {

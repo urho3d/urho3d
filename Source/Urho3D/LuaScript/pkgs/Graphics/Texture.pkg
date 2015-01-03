@@ -1,4 +1,4 @@
-$#include "Texture.h"
+$#include "../Graphics/Texture.h"
 
 class Texture : public Resource
 {

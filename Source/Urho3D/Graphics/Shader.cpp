@@ -20,20 +20,20 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Deserializer.h"
-#include "FileSystem.h"
-#include "Graphics.h"
-#include "Log.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "Shader.h"
-#include "ShaderVariation.h"
-#include "Sort.h"
-#include "XMLFile.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../IO/Deserializer.h"
+#include "../IO/FileSystem.h"
+#include "../Graphics/Graphics.h"
+#include "../IO/Log.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../Graphics/Shader.h"
+#include "../Graphics/ShaderVariation.h"
+#include "../Container/Sort.h"
+#include "../Resource/XMLFile.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

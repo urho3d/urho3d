@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "File.h"
-#include "HashSet.h"
-#include "List.h"
-#include "Mutex.h"
-#include "Resource.h"
+#include "../IO/File.h"
+#include "../Container/HashSet.h"
+#include "../Container/List.h"
+#include "../Core/Mutex.h"
+#include "../Resource/Resource.h"
 
 namespace Urho3D
 {

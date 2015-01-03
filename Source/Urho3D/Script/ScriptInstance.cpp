@@ -20,26 +20,26 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Log.h"
-#include "MemoryBuffer.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../IO/Log.h"
+#include "../IO/MemoryBuffer.h"
 #ifdef URHO3D_PHYSICS
-#include "PhysicsEvents.h"
-#include "PhysicsWorld.h"
+#include "../Physics/PhysicsEvents.h"
+#include "../Physics/PhysicsWorld.h"
 #endif
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "ResourceEvents.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "Script.h"
-#include "ScriptFile.h"
-#include "ScriptInstance.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../Resource/ResourceEvents.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SceneEvents.h"
+#include "../Script/Script.h"
+#include "../Script/ScriptFile.h"
+#include "../Script/ScriptInstance.h"
 
 #include <AngelScript/angelscript.h>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

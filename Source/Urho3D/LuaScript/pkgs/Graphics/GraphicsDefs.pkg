@@ -1,4 +1,4 @@
-$#include "GraphicsDefs.h"
+$#include "../Graphics/GraphicsDefs.h"
 
 enum PrimitiveType
 {

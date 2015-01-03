@@ -20,19 +20,19 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Camera.h"
-#include "Context.h"
-#include "Font.h"
-#include "Geometry.h"
-#include "Log.h"
-#include "Material.h"
-#include "Node.h"
-#include "ResourceCache.h"
-#include "Technique.h"
-#include "Text.h"
-#include "Text3D.h"
-#include "VertexBuffer.h"
+#include "../Precompiled.h"
+#include "../Graphics/Camera.h"
+#include "../Core/Context.h"
+#include "../UI/Font.h"
+#include "../Graphics/Geometry.h"
+#include "../IO/Log.h"
+#include "../Graphics/Material.h"
+#include "../Scene/Node.h"
+#include "../Resource/ResourceCache.h"
+#include "../Graphics/Technique.h"
+#include "../UI/Text.h"
+#include "../UI/Text3D.h"
+#include "../Graphics/VertexBuffer.h"
 
 namespace Urho3D
 {

@@ -20,13 +20,13 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "BorderImage.h"
-#include "Context.h"
-#include "ResourceCache.h"
-#include "Texture2D.h"
+#include "../Precompiled.h"
+#include "../UI/BorderImage.h"
+#include "../Core/Context.h"
+#include "../Resource/ResourceCache.h"
+#include "../Graphics/Texture2D.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

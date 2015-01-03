@@ -22,22 +22,22 @@
 
 #pragma once
 
-#include "Addons.h"
-#include "Animatable.h"
-#include "BorderImage.h"
-#include "Context.h"
-#include "Drawable.h"
-#include "File.h"
-#include "HashSet.h"
-#include "Log.h"
-#include "Node.h"
-#include "Resource.h"
-#include "Script.h"
-#include "ScriptInstance.h"
-#include "Sort.h"
-#include "SoundSource.h"
-#include "StaticModel.h"
-#include "Texture.h"
+#include "../Script/Addons.h"
+#include "../Scene/Animatable.h"
+#include "../UI/BorderImage.h"
+#include "../Core/Context.h"
+#include "../Graphics/Drawable.h"
+#include "../IO/File.h"
+#include "../Container/HashSet.h"
+#include "../IO/Log.h"
+#include "../Scene/Node.h"
+#include "../Resource/Resource.h"
+#include "../Script/Script.h"
+#include "../Script/ScriptInstance.h"
+#include "../Container/Sort.h"
+#include "../Audio/SoundSource.h"
+#include "../Graphics/StaticModel.h"
+#include "../Graphics/Texture.h"
 
 #include <AngelScript/angelscript.h>
 #include <cstring>

@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Quaternion.h"
-#include "Vector4.h"
+#include "../Math/Quaternion.h"
+#include "../Math/Vector4.h"
 
 namespace Urho3D
 {

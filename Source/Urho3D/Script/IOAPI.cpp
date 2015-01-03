@@ -20,14 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "APITemplates.h"
-#include "Compression.h"
-#include "FileSystem.h"
-#include "Log.h"
-#include "PackageFile.h"
-#include "ProcessUtils.h"
-#include "VectorBuffer.h"
+#include "../Precompiled.h"
+#include "../Script/APITemplates.h"
+#include "../IO/Compression.h"
+#include "../IO/FileSystem.h"
+#include "../IO/Log.h"
+#include "../IO/PackageFile.h"
+#include "../Core/ProcessUtils.h"
+#include "../IO/VectorBuffer.h"
 
 namespace Urho3D
 {

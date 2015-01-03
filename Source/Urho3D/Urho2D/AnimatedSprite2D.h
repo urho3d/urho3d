@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Animation2D.h"
-#include "StaticSprite2D.h"
+#include "../Urho2D/Animation2D.h"
+#include "../Urho2D/StaticSprite2D.h"
 
 /// Loop mode.
 enum LoopMode2D

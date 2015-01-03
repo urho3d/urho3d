@@ -1,4 +1,4 @@
-$#include "Drawable2D.h"
+$#include "../Urho2D/Drawable2D.h"
 
 enum BlendMode {};
 

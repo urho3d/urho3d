@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Constraint2D.h"
+#include "../Urho2D/Constraint2D.h"
 
 namespace Urho3D
 {

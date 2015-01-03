@@ -20,20 +20,20 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "FileSystem.h"
-#include "Log.h"
-#include "OggVorbisSoundStream.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "Sound.h"
-#include "XMLFile.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../IO/FileSystem.h"
+#include "../IO/Log.h"
+#include "../Audio/OggVorbisSoundStream.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../Audio/Sound.h"
+#include "../Resource/XMLFile.h"
 
 #include <cstring>
-#include <stb_vorbis.h>
+#include <STB/stb_vorbis.h>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

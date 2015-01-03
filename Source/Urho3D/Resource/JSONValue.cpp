@@ -20,14 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Log.h"
-#include "JSONFile.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../IO/Log.h"
+#include "../Resource/JSONFile.h"
 
 #include <rapidjson/document.h>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 using namespace rapidjson;
 

@@ -20,17 +20,17 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/CoreEvents.h>
-#include <Urho3D/Engine.h>
-#include <Urho3D/Graphics.h>
-#include <Urho3D/ResourceCache.h>
-#include <Urho3D/Sprite.h>
-#include <Urho3D/Texture2D.h>
-#include <Urho3D/UI.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/UI/Sprite.h>
+#include <Urho3D/Graphics/Texture2D.h>
+#include <Urho3D/UI/UI.h>
 
 #include "Sprites.h"
 
-#include <Urho3D/DebugNew.h>
+#include <Urho3D/Container/DebugNew.h>
 
 // Number of sprites to draw
 static const unsigned NUM_SPRITES = 100;

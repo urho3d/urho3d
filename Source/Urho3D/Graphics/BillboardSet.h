@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "Color.h"
-#include "Drawable.h"
-#include "Matrix3x4.h"
-#include "Rect.h"
-#include "VectorBuffer.h"
+#include "../Math/Color.h"
+#include "../Graphics/Drawable.h"
+#include "../Math/Matrix3x4.h"
+#include "../Math/Rect.h"
+#include "../IO/VectorBuffer.h"
 
 namespace Urho3D
 {

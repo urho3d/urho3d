@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "Str.h"
-#include "Thread.h"
-#include "Timer.h"
+#include "../Container/Str.h"
+#include "../Core/Thread.h"
+#include "../Core/Timer.h"
 
 namespace Urho3D
 {

@@ -1,4 +1,4 @@
-$#include "XMLFile.h"
+$#include "../Resource/XMLFile.h"
 
 class XMLFile : public Resource
 {

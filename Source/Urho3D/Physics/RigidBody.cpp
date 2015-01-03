@@ -20,21 +20,21 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "CollisionShape.h"
-#include "Constraint.h"
-#include "Context.h"
-#include "Log.h"
-#include "MemoryBuffer.h"
-#include "PhysicsUtils.h"
-#include "PhysicsWorld.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "ResourceEvents.h"
-#include "RigidBody.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "SmoothedTransform.h"
+#include "../Precompiled.h"
+#include "../Physics/CollisionShape.h"
+#include "../Physics/Constraint.h"
+#include "../Core/Context.h"
+#include "../IO/Log.h"
+#include "../IO/MemoryBuffer.h"
+#include "../Physics/PhysicsUtils.h"
+#include "../Physics/PhysicsWorld.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../Resource/ResourceEvents.h"
+#include "../Physics/RigidBody.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SceneEvents.h"
+#include "../Scene/SmoothedTransform.h"
 
 #include <Bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <Bullet/BulletDynamics/Dynamics/btRigidBody.h>

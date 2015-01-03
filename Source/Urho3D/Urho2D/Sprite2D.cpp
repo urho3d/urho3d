@@ -20,15 +20,15 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Deserializer.h"
-#include "ResourceCache.h"
-#include "Sprite2D.h"
-#include "SpriteSheet2D.h"
-#include "Texture2D.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../IO/Deserializer.h"
+#include "../Resource/ResourceCache.h"
+#include "../Urho2D/Sprite2D.h"
+#include "../Urho2D/SpriteSheet2D.h"
+#include "../Graphics/Texture2D.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

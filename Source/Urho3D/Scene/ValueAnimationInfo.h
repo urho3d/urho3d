@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "AnimationDefs.h"
-#include "RefCounted.h"
+#include "../Scene/AnimationDefs.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {

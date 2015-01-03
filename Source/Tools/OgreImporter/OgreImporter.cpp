@@ -20,14 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Context.h>
-#include <Urho3D/File.h>
-#include <Urho3D/FileSystem.h>
-#include <Urho3D/HashSet.h>
-#include <Urho3D/ProcessUtils.h>
-#include <Urho3D/Sort.h>
-#include <Urho3D/Tangent.h>
-#include <Urho3D/XMLFile.h>
+#include <Urho3D/Core/Context.h>
+#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/Container/HashSet.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Container/Sort.h>
+#include <Urho3D/Graphics/Tangent.h>
+#include <Urho3D/Resource/XMLFile.h>
 
 #include "OgreImporterUtils.h"
 
@@ -38,7 +38,7 @@
 #include <cstddef>
 #include <cstring>
 
-#include <Urho3D/DebugNew.h>
+#include <Urho3D/Container/DebugNew.h>
 
 static const int VERTEX_CACHE_SIZE = 32;
 

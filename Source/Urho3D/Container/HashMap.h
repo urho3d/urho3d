@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "HashBase.h"
-#include "Pair.h"
-#include "Sort.h"
-#include "Vector.h"
+#include "../Container/HashBase.h"
+#include "../Container/Pair.h"
+#include "../Container/Sort.h"
+#include "../Container/Vector.h"
 
 #include <cassert>
 

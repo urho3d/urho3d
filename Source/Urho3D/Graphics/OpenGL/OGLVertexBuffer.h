@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "../ArrayPtr.h"
+#include "../Container/ArrayPtr.h"
 #include "../GPUObject.h"
 #include "../GraphicsDefs.h"
 

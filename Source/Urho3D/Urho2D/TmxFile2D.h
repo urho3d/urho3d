@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Resource.h"
-#include "TileMapDefs2D.h"
+#include "../Resource/Resource.h"
+#include "../Urho2D/TileMapDefs2D.h"
 
 namespace Urho3D
 {

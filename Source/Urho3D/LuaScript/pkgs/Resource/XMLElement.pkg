@@ -1,4 +1,4 @@
-$#include "XMLElement.h"
+$#include "../Resource/XMLElement.h"
 
 class XMLElement
 {

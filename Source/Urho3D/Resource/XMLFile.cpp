@@ -20,21 +20,21 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "ArrayPtr.h"
-#include "Context.h"
-#include "Deserializer.h"
-#include "Log.h"
-#include "MemoryBuffer.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "Serializer.h"
-#include "VectorBuffer.h"
-#include "XMLFile.h"
+#include "../Precompiled.h"
+#include "../Container/ArrayPtr.h"
+#include "../Core/Context.h"
+#include "../IO/Deserializer.h"
+#include "../IO/Log.h"
+#include "../IO/MemoryBuffer.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../IO/Serializer.h"
+#include "../IO/VectorBuffer.h"
+#include "../Resource/XMLFile.h"
 
-#include <pugixml.hpp>
+#include <PugiXml/pugixml.hpp>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

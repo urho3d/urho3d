@@ -1,4 +1,4 @@
-$#include "Controls.h"
+$#include "../Network/Controls.h"
 
 class Controls
 {

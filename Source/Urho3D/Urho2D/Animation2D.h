@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "Ptr.h"
-#include "RefCounted.h"
-#include "Vector2.h"
+#include "../Container/Ptr.h"
+#include "../Container/RefCounted.h"
+#include "../Math/Vector2.h"
 
 namespace Urho3D
 {

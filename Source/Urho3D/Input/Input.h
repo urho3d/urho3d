@@ -22,13 +22,13 @@
 
 #pragma once
 
-#include "HashSet.h"
-#include "InputEvents.h"
-#include "Mutex.h"
-#include "Object.h"
-#include "List.h"
+#include "../Container/HashSet.h"
+#include "../Input/InputEvents.h"
+#include "../Core/Mutex.h"
+#include "../Core/Object.h"
+#include "../Container/List.h"
 
-#include "Cursor.h"
+#include "../UI/Cursor.h"
 
 namespace Urho3D
 {

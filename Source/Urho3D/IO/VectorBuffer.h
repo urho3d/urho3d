@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Deserializer.h"
-#include "Serializer.h"
+#include "../IO/Deserializer.h"
+#include "../IO/Serializer.h"
 
 namespace Urho3D
 {

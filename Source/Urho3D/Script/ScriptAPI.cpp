@@ -20,11 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "APITemplates.h"
-#include "ResourceCache.h"
-#include "ScriptAPI.h"
-#include "ScriptFile.h"
+#include "../Precompiled.h"
+#include "../Script/APITemplates.h"
+#include "../Resource/ResourceCache.h"
+#include "../Script/ScriptAPI.h"
+#include "../Script/ScriptFile.h"
 
 namespace Urho3D
 {

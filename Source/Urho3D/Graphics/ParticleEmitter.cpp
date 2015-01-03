@@ -20,17 +20,17 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "ParticleEffect.h"
-#include "ParticleEmitter.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "ResourceEvents.h"
-#include "Scene.h"
-#include "SceneEvents.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Graphics/ParticleEffect.h"
+#include "../Graphics/ParticleEmitter.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../Resource/ResourceEvents.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SceneEvents.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

@@ -24,7 +24,7 @@
 
 #include "../GPUObject.h"
 #include "../GraphicsDefs.h"
-#include "../ArrayPtr.h"
+#include "../Container/ArrayPtr.h"
 
 namespace Urho3D
 {

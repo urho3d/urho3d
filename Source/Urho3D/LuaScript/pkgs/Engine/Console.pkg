@@ -1,4 +1,4 @@
-$#include "Console.h"
+$#include "../Engine/Console.h"
 
 class Console : public Object
 {

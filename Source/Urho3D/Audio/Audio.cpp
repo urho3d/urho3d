@@ -20,21 +20,21 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Audio.h"
-#include "Context.h"
-#include "CoreEvents.h"
-#include "Log.h"
-#include "Mutex.h"
-#include "ProcessUtils.h"
-#include "Profiler.h"
-#include "Sound.h"
-#include "SoundListener.h"
-#include "SoundSource3D.h"
+#include "../Precompiled.h"
+#include "../Audio/Audio.h"
+#include "../Core/Context.h"
+#include "../Core/CoreEvents.h"
+#include "../IO/Log.h"
+#include "../Core/Mutex.h"
+#include "../Core/ProcessUtils.h"
+#include "../Core/Profiler.h"
+#include "../Audio/Sound.h"
+#include "../Audio/SoundListener.h"
+#include "../Audio/SoundSource3D.h"
 
 #include <SDL/SDL.h>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

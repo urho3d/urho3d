@@ -20,13 +20,13 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "DebugRenderer.h"
-#include "OffMeshConnection.h"
-#include "Scene.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Graphics/DebugRenderer.h"
+#include "../Navigation/OffMeshConnection.h"
+#include "../Scene/Scene.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

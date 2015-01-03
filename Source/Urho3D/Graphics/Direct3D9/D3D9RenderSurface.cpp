@@ -20,17 +20,17 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Camera.h"
-#include "Graphics.h"
-#include "GraphicsImpl.h"
-#include "Log.h"
-#include "Renderer.h"
-#include "RenderSurface.h"
-#include "Scene.h"
-#include "Texture.h"
+#include "../Precompiled.h"
+#include "../Graphics/Camera.h"
+#include "../Graphics/Graphics.h"
+#include "../Graphics/GraphicsImpl.h"
+#include "../IO/Log.h"
+#include "../Graphics/Renderer.h"
+#include "../Graphics/RenderSurface.h"
+#include "../Scene/Scene.h"
+#include "../Graphics/Texture.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

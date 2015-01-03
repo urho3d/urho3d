@@ -20,23 +20,23 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "AnimatedModel.h"
-#include "Batch.h"
-#include "Camera.h"
-#include "Context.h"
-#include "FileSystem.h"
-#include "Geometry.h"
-#include "Log.h"
-#include "Material.h"
-#include "Model.h"
-#include "OcclusionBuffer.h"
-#include "OctreeQuery.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "ResourceEvents.h"
+#include "../Precompiled.h"
+#include "../Graphics/AnimatedModel.h"
+#include "../Graphics/Batch.h"
+#include "../Graphics/Camera.h"
+#include "../Core/Context.h"
+#include "../IO/FileSystem.h"
+#include "../Graphics/Geometry.h"
+#include "../IO/Log.h"
+#include "../Graphics/Material.h"
+#include "../Graphics/Model.h"
+#include "../Graphics/OcclusionBuffer.h"
+#include "../Graphics/OctreeQuery.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../Resource/ResourceEvents.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

@@ -1,4 +1,4 @@
-$#include "CollisionEdge2D.h"
+$#include "../Urho2D/CollisionEdge2D.h"
 
 class CollisionEdge2D : CollisionShape2D
 {

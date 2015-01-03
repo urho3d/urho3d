@@ -20,24 +20,24 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Batch.h"
-#include "BillboardSet.h"
-#include "Camera.h"
-#include "Context.h"
-#include "Geometry.h"
-#include "Graphics.h"
-#include "IndexBuffer.h"
-#include "Material.h"
-#include "MemoryBuffer.h"
-#include "Node.h"
-#include "OctreeQuery.h"
-#include "Profiler.h"
-#include "ResourceCache.h"
-#include "Sort.h"
-#include "VertexBuffer.h"
+#include "../Precompiled.h"
+#include "../Graphics/Batch.h"
+#include "../Graphics/BillboardSet.h"
+#include "../Graphics/Camera.h"
+#include "../Core/Context.h"
+#include "../Graphics/Geometry.h"
+#include "../Graphics/Graphics.h"
+#include "../Graphics/IndexBuffer.h"
+#include "../Graphics/Material.h"
+#include "../IO/MemoryBuffer.h"
+#include "../Scene/Node.h"
+#include "../Graphics/OctreeQuery.h"
+#include "../Core/Profiler.h"
+#include "../Resource/ResourceCache.h"
+#include "../Container/Sort.h"
+#include "../Graphics/VertexBuffer.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

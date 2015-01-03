@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "ArrayPtr.h"
-#include "Frustum.h"
-#include "Object.h"
-#include "GraphicsDefs.h"
-#include "Timer.h"
+#include "../Container/ArrayPtr.h"
+#include "../Math/Frustum.h"
+#include "../Core/Object.h"
+#include "../Graphics/GraphicsDefs.h"
+#include "../Core/Timer.h"
 
 namespace Urho3D
 {

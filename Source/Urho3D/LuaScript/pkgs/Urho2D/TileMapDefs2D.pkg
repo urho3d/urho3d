@@ -1,4 +1,4 @@
-$#include "TileMapDefs2D.h"
+$#include "../Urho2D/TileMapDefs2D.h"
 
 enum Orientation2D
 {

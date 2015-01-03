@@ -20,12 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "APITemplates.h"
-#include "Color.h"
-#include "Frustum.h"
-#include "Polyhedron.h"
-#include "Ray.h"
+#include "../Precompiled.h"
+#include "../Script/APITemplates.h"
+#include "../Math/Color.h"
+#include "../Math/Frustum.h"
+#include "../Math/Polyhedron.h"
+#include "../Math/Ray.h"
 
 #include <AngelScript/angelscript.h>
 

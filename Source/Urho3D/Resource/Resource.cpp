@@ -20,10 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Log.h"
-#include "Profiler.h"
-#include "Resource.h"
+#include "../Precompiled.h"
+#include "../IO/Log.h"
+#include "../Core/Profiler.h"
+#include "../Resource/Resource.h"
 
 namespace Urho3D
 {

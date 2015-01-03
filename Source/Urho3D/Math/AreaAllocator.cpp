@@ -20,8 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "AreaAllocator.h"
+#include "../Precompiled.h"
+#include "../Math/AreaAllocator.h"
 
 namespace Urho3D
 {

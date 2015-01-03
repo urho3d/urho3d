@@ -1,4 +1,4 @@
-$#include "SplinePath.h"
+$#include "../Scene/SplinePath.h"
 
 class SplinePath : public Component
 {

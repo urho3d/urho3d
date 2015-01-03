@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../Color.h"
-#include "../HashMap.h"
-#include "../Timer.h"
+#include "../Math/Color.h"
+#include "../Container/HashMap.h"
+#include "../Core/Timer.h"
 
 #if defined(ANDROID) || defined (RPI)
 #include <GLES2/gl2.h>
@@ -33,7 +33,7 @@
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #else
-#include <glew.h>
+#include <GLEW/glew.h>
 #endif
 
 #ifndef GL_COMPRESSED_RGBA_S3TC_DXT1_EXT

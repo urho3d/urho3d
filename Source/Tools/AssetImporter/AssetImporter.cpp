@@ -20,34 +20,34 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/AnimatedModel.h>
-#include <Urho3D/Animation.h>
-#include <Urho3D/Context.h>
-#include <Urho3D/DebugRenderer.h>
-#include <Urho3D/File.h>
-#include <Urho3D/FileSystem.h>
-#include <Urho3D/Geometry.h>
-#include <Urho3D/Graphics.h>
-#include <Urho3D/IndexBuffer.h>
-#include <Urho3D/Light.h>
-#include <Urho3D/Material.h>
-#include <Urho3D/Model.h>
-#include <Urho3D/Octree.h>
+#include <Urho3D/Graphics/AnimatedModel.h>
+#include <Urho3D/Graphics/Animation.h>
+#include <Urho3D/Core/Context.h>
+#include <Urho3D/Graphics/DebugRenderer.h>
+#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/Graphics/Geometry.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Graphics/IndexBuffer.h>
+#include <Urho3D/Graphics/Light.h>
+#include <Urho3D/Graphics/Material.h>
+#include <Urho3D/Graphics/Model.h>
+#include <Urho3D/Graphics/Octree.h>
 #ifdef URHO3D_PHYSICS
-#include <Urho3D/PhysicsWorld.h>
+#include <Urho3D/Physics/PhysicsWorld.h>
 #endif
-#include <Urho3D/ProcessUtils.h>
-#include <Urho3D/Quaternion.h>
-#include <Urho3D/ResourceCache.h>
-#include <Urho3D/Scene.h>
-#include <Urho3D/StringUtils.h>
-#include <Urho3D/Vector3.h>
-#include <Urho3D/VertexBuffer.h>
-#include <Urho3D/WorkQueue.h>
-#include <Urho3D/XMLFile.h>
-#include <Urho3D/Zone.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Math/Quaternion.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Core/StringUtils.h>
+#include <Urho3D/Math/Vector3.h>
+#include <Urho3D/Graphics/VertexBuffer.h>
+#include <Urho3D/Core/WorkQueue.h>
+#include <Urho3D/Resource/XMLFile.h>
+#include <Urho3D/Graphics/Zone.h>
 
-#include <Urho3D/Sort.h>
+#include <Urho3D/Container/Sort.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -60,7 +60,7 @@
 
 #include <cstring>
 
-#include <Urho3D/DebugNew.h>
+#include <Urho3D/Container/DebugNew.h>
 
 using namespace Urho3D;
 

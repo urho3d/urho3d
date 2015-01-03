@@ -21,19 +21,19 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Camera.h"
-#include "Context.h"
-#include "DebugRenderer.h"
-#include "Log.h"
-#include "Material.h"
-#include "Octree.h"
-#include "Renderer.h"
-#include "Scene.h"
-#include "Sort.h"
-#include "Zone.h"
+#include "../Precompiled.h"
+#include "../Graphics/Camera.h"
+#include "../Core/Context.h"
+#include "../Graphics/DebugRenderer.h"
+#include "../IO/Log.h"
+#include "../Graphics/Material.h"
+#include "../Graphics/Octree.h"
+#include "../Graphics/Renderer.h"
+#include "../Scene/Scene.h"
+#include "../Container/Sort.h"
+#include "../Graphics/Zone.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

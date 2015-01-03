@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Variant.h"
+#include "../Core/Variant.h"
 
 namespace Urho3D
 {

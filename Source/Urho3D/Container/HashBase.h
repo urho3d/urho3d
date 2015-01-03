@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "Urho3D.h"
-#include "Allocator.h"
-#include "Hash.h"
-#include "Swap.h"
+#include "../Urho3D.h"
+#include "../Container/Allocator.h"
+#include "../Container/Hash.h"
+#include "../Container/Swap.h"
 
 namespace Urho3D
 {

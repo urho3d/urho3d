@@ -1,4 +1,4 @@
-$#include "Terrain.h"
+$#include "../Graphics/Terrain.h"
 
 class Terrain : public Component
 {

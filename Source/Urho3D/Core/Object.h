@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "LinkedList.h"
-#include "Variant.h"
+#include "../Container/LinkedList.h"
+#include "../Core/Variant.h"
 
 namespace Urho3D
 {

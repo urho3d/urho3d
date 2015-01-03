@@ -1,4 +1,4 @@
-$#include "ValueAnimation.h"
+$#include "../Scene/ValueAnimation.h"
 
 enum InterpMethod
 {

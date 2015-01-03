@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Object.h"
-#include "Timer.h"
+#include "../Core/Object.h"
+#include "../Core/Timer.h"
 
 namespace Urho3D
 {

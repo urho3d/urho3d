@@ -20,26 +20,26 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "CoreEvents.h"
-#include "EngineEvents.h"
-#include "FileSystem.h"
-#include "HttpRequest.h"
-#include "InputEvents.h"
-#include "IOEvents.h"
-#include "Log.h"
-#include "MemoryBuffer.h"
-#include "Network.h"
-#include "NetworkEvents.h"
-#include "NetworkPriority.h"
-#include "Profiler.h"
-#include "Protocol.h"
-#include "Scene.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Core/CoreEvents.h"
+#include "../Engine/EngineEvents.h"
+#include "../IO/FileSystem.h"
+#include "../Network/HttpRequest.h"
+#include "../Input/InputEvents.h"
+#include "../IO/IOEvents.h"
+#include "../IO/Log.h"
+#include "../IO/MemoryBuffer.h"
+#include "../Network/Network.h"
+#include "../Network/NetworkEvents.h"
+#include "../Network/NetworkPriority.h"
+#include "../Core/Profiler.h"
+#include "../Network/Protocol.h"
+#include "../Scene/Scene.h"
 
 #include <kNet/kNet.h>
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

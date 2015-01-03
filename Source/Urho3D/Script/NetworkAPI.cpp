@@ -20,14 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
 #ifdef URHO3D_NETWORK
-#include "APITemplates.h"
-#include "Controls.h"
-#include "HttpRequest.h"
-#include "Network.h"
-#include "NetworkPriority.h"
-#include "Protocol.h"
+#include "../Script/APITemplates.h"
+#include "../Network/Controls.h"
+#include "../Network/HttpRequest.h"
+#include "../Network/Network.h"
+#include "../Network/NetworkPriority.h"
+#include "../Network/Protocol.h"
 
 namespace Urho3D
 {

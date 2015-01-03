@@ -20,11 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "ToolTip.h"
-#include "Context.h"
-#include "Timer.h"
-#include "UI.h"
+#include "../Precompiled.h"
+#include "../UI/ToolTip.h"
+#include "../Core/Context.h"
+#include "../Core/Timer.h"
+#include "../UI/UI.h"
 
 namespace Urho3D
 {

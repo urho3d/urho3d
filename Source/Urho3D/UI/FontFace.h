@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "AreaAllocator.h"
-#include "ArrayPtr.h"
-#include "List.h"
+#include "../Math/AreaAllocator.h"
+#include "../Container/ArrayPtr.h"
+#include "../Container/List.h"
 
 namespace Urho3D
 {

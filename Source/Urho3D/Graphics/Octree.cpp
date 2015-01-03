@@ -20,21 +20,21 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "CoreEvents.h"
-#include "DebugRenderer.h"
-#include "Graphics.h"
-#include "Log.h"
-#include "Profiler.h"
-#include "Octree.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "Sort.h"
-#include "Timer.h"
-#include "WorkQueue.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Core/CoreEvents.h"
+#include "../Graphics/DebugRenderer.h"
+#include "../Graphics/Graphics.h"
+#include "../IO/Log.h"
+#include "../Core/Profiler.h"
+#include "../Graphics/Octree.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SceneEvents.h"
+#include "../Container/Sort.h"
+#include "../Core/Timer.h"
+#include "../Core/WorkQueue.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:4355)

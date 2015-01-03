@@ -20,25 +20,25 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Camera.h"
-#include "Geometry.h"
-#include "Graphics.h"
-#include "GraphicsImpl.h"
-#include "Material.h"
-#include "Node.h"
-#include "Renderer.h"
-#include "Profiler.h"
-#include "Scene.h"
-#include "ShaderVariation.h"
-#include "Sort.h"
-#include "Technique.h"
-#include "Texture2D.h"
-#include "VertexBuffer.h"
-#include "View.h"
-#include "Zone.h"
+#include "../Precompiled.h"
+#include "../Graphics/Camera.h"
+#include "../Graphics/Geometry.h"
+#include "../Graphics/Graphics.h"
+#include "../Graphics/GraphicsImpl.h"
+#include "../Graphics/Material.h"
+#include "../Scene/Node.h"
+#include "../Graphics/Renderer.h"
+#include "../Core/Profiler.h"
+#include "../Scene/Scene.h"
+#include "../Graphics/ShaderVariation.h"
+#include "../Container/Sort.h"
+#include "../Graphics/Technique.h"
+#include "../Graphics/Texture2D.h"
+#include "../Graphics/VertexBuffer.h"
+#include "../Graphics/View.h"
+#include "../Graphics/Zone.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

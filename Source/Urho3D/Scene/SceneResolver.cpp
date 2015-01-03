@@ -20,14 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Component.h"
-#include "HashSet.h"
-#include "SceneResolver.h"
-#include "Log.h"
-#include "Node.h"
+#include "../Precompiled.h"
+#include "../Scene/Component.h"
+#include "../Container/HashSet.h"
+#include "../Scene/SceneResolver.h"
+#include "../IO/Log.h"
+#include "../Scene/Node.h"
 
-#include "DebugNew.h"
+#include "../Container/DebugNew.h"
 
 namespace Urho3D
 {

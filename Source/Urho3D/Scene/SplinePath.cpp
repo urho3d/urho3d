@@ -20,11 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Context.h"
-#include "Log.h"
-#include "Scene.h"
-#include "SplinePath.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../IO/Log.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SplinePath.h"
 
 namespace Urho3D
 {

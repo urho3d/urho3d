@@ -24,8 +24,8 @@
 
 #include "../GPUObject.h"
 #include "../GraphicsDefs.h"
-#include "../HashMap.h"
-#include "../RefCounted.h"
+#include "../Container/HashMap.h"
+#include "../Container/RefCounted.h"
 
 namespace Urho3D
 {

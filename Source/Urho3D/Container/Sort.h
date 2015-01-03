@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Swap.h"
-#include "VectorBase.h"
+#include "../Container/Swap.h"
+#include "../Container/VectorBase.h"
 
 namespace Urho3D
 {

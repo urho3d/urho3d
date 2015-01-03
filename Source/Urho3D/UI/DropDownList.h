@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Menu.h"
+#include "../UI/Menu.h"
 
 namespace Urho3D
 {

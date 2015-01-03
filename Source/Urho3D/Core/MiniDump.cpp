@@ -20,11 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
 
 #if defined(_MSC_VER) && defined(URHO3D_MINIDUMPS)
 
-#include "ProcessUtils.h"
+#include "../Core/ProcessUtils.h"
 
 #include <cstdio>
 #include <io.h>

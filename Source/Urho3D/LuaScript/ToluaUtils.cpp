@@ -20,11 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Object.h"
-#include "Ptr.h"
-#include "tolua++.h"
-#include "ToluaUtils.h"
+#include "../Precompiled.h"
+#include "../Core/Object.h"
+#include "../Container/Ptr.h"
+
+#include <toluapp/tolua++.h>
+#include "../LuaScript/ToluaUtils.h"
 
 const char* tolua_tourho3dstring(lua_State* L, int narg, const char* str)
 {
