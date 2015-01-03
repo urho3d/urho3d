@@ -24,13 +24,13 @@
 set (TARGET_NAME Lua)
 
 # Define source files
-file (GLOB C_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.c)
-list (REMOVE_ITEM C_FILES src/lua.c src/luac.c)
-file (GLOB H_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.h)
-set (SOURCE_FILES ${C_FILES} ${H_FILES})
+define_source_files (GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS src/*.h EXCLUDE_PATTERNS src/lua.c src/luac.c)
 
 # Setup target
 setup_library ()
+
+# Install headers for building the Urho3D library
+install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/Lua FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)  # Note: the trailing slash is significant
 
 # Setup additional Lua standalone targets (these targets can be transfered and executed on an embedded device, such as Raspberry Pi and Android)
 if (NOT IOS)

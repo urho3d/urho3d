@@ -21,13 +21,10 @@
 #
 
 # Define target name
-set (TARGET_NAME LZ4)
-
-# Define source files
-define_source_files (GLOB_CPP_PATTERNS *.c)
+set (TARGET_NAME rapidjson)
 
 # Setup target
-setup_library ()
+add_custom_target(${TARGET_NAME} ALL COMMENT "Dummy target just so that its post-build step can install headers to the build tree")
 
 # Install headers for building the Urho3D library
-install_header_files (DIRECTORY ./ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/LZ4 FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)  # Note: the trailing slash is significant
+install_header_files (DIRECTORY include/rapidjson/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/rapidjson FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)  # Note: the trailing slash is significant

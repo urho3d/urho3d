@@ -34,6 +34,49 @@ add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
 
+if (URHO3D_LUA)
+    # The host tool must be built natively
+    if (CMAKE_CROSSCOMPILING OR IOS)
+        # When cross-compiling, build the host tool as external project
+        include (ExternalProject)
+        if (IOS)
+            # For iOS target, its host is MacOSX; Also workaround a known CMake/Xcode generator bug which prevents it from installing binaries correctly
+            set (OSX_HOST -DCMAKE_OSX_SYSROOT=macosx BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
+        endif ()
+        ExternalProject_Add(tolua++
+            SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
+            CMAKE_ARGS -DJIT=${JIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/Bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${OSX_HOST}
+        )
+    else ()
+        # Otherwise, build it internally as per normal
+        add_subdirectory (../ThirdParty/toluapp/src/bin ../ThirdParty/toluapp/src/bin)
+    endif ()
+
+    # Use the host tool to generate source files for tolua++ API binding
+    file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
+    file (GLOB API_PKG_FILES LuaScript/pkgs/*.pkg)
+    foreach (DIR Navigation Network Physics Urho2D)
+        string (TOUPPER URHO3D_${DIR} OPT)
+        if (NOT ${OPT})
+            list (REMOVE_ITEM API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/${DIR}LuaAPI.pkg)
+        endif ()
+    endforeach ()
+    foreach (API_PKG_FILE ${API_PKG_FILES})
+        get_filename_component (NAME ${API_PKG_FILE} NAME)
+        string (REGEX REPLACE LuaAPI\\.pkg$ "" DIR ${NAME})
+        set (GEN_CPP_FILE generated/${DIR}LuaAPI.cpp)
+        list (APPEND GEN_CPP_FILES ${GEN_CPP_FILE})
+        file (GLOB PKG_FILES LuaScript/pkgs/${DIR}/*.pkg)
+        add_custom_command (OUTPUT ${GEN_CPP_FILE}
+            COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/tolua++ -L ToCppHook.lua -o ${CMAKE_CURRENT_BINARY_DIR}/${GEN_CPP_FILE} ${NAME}
+            DEPENDS tolua++ ${API_PKG_FILE} ${PKG_FILES} LuaScript/pkgs/ToCppHook.lua
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/LuaScript/pkgs
+            COMMENT "Generating tolua++ DIR binding on the fly for ${DIR}")
+    endforeach ()
+else ()
+    list (APPEND EXCLUDED_SOURCE_DIRS LuaScript)
+endif ()
+
 # Define generated object files
 # This is a hack as it relies on internal working of CMake
 if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have force_load/whole_archive equivalent
@@ -62,44 +105,40 @@ if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have forc
 endif ()
 
 # Define source files
-set (SOURCES Audio Container Core Engine Graphics Input IO Math Resource Scene UI)
-if (URHO3D_ANGELSCRIPT)
-    list (APPEND SOURCES Script)
+if (NOT URHO3D_ANGELSCRIPT)
+    list (APPEND EXCLUDED_SOURCE_DIRS Script)
 endif ()
 foreach (DIR Navigation Network Physics Urho2D)
     string (TOUPPER URHO3D_${DIR} OPT)
-    if (${OPT})
-        list (APPEND SOURCES ${DIR})
+    if (NOT ${OPT})
+        list (APPEND EXCLUDED_SOURCE_DIRS ${DIR})
     endif ()
 endforeach ()
-foreach (SOURCE ${SOURCES})
-    add_subdirectory (${SOURCE})
-    source_group ("Source Files\\${SOURCE}" FILES ${${SOURCE}_CPP_FILES})
-    source_group ("Header Files\\${SOURCE}" FILES ${${SOURCE}_H_FILES})
-    list (APPEND ENGINE_SOURCE_FILES ${${SOURCE}_CPP_FILES} ${${SOURCE}_H_FILES})
-    list (APPEND ENGINE_INCLUDE_DIRS_ONLY ${SOURCE})
-endforeach ()
-if (MSVC)
-    # MSVC compiler does not handle quoted include pathspec with relative path (used in Graphics/Direct3D9/*.h) the same way as GCC and Clang
-    # Following header search paths must be added in order to make MSVC resolves "../" back to one of the directory which contains the header file being searched
-    foreach (DIR Container Core Graphics Math Resource)
-        list (APPEND ENGINE_INCLUDE_DIRS_ONLY ${DIR}/workaround)
-    endforeach ()
+if (URHO3D_OPENGL)
+    # Exclude the opposite source directory
+    list (APPEND EXCLUDED_SOURCE_DIRS Graphics/Direct3D9)
+else ()
+    list (APPEND EXCLUDED_SOURCE_DIRS Graphics/OpenGL)
 endif ()
-define_source_files (EXTRA_CPP_FILES ${ENGINE_SOURCE_FILES} EXTRA_H_FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h PCH)
+if (APPLE AND NOT IOS)
+    set (GLOB_OBJC_PATTERN *.m)     # Should only pick up MacFileWatcher.m for MacOSX platform at the moment
+endif ()
+string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
+define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} EXTRA_CPP_FILES ${GEN_CPP_FILES} EXTRA_H_FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h RECURSE GROUP PCH)
 list (APPEND SOURCE_FILES ${ALL_OBJ_FILES})
 set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 
 # Define dependency libs
-foreach (LIST_NAME LIBS INCLUDE_DIRS_ONLY LINK_LIBS_ONLY)
-    set_list (${LIST_NAME} ENGINE_${LIST_NAME} REMOVE_DUPLICATE)
-endforeach ()
-# Add include directories to find the export header and headers from exported SDKs
-list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
+# Add include directories to find the export header and installed headers from thirdparty libs
+set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 if (URHO3D_PHYSICS)
     # Bullet library depends on its own include dir to be added in the header search path
     # This is more practical than patching its header files in many places to make them work with relative path
     list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Bullet)
+endif ()
+if (URHO3D_LUA)
+    # ditto for Lua/LuaJIT
+    list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Lua${JIT})
 endif ()
 
 # Setup library output path
@@ -204,22 +243,19 @@ endif ()
 # end todo
 
 # Generate platform specific export header file automatically
-if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_EXPORTS_LIB_TYPE OR ${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in IS_NEWER_THAN ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
+if (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in IS_NEWER_THAN ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
     set_target_properties (${TARGET_NAME} PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
     generate_export_header (${TARGET_NAME} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h)
-    set (URHO3D_EXPORTS_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE INTERNAL "Lib type when Urho3D export header was last generated")
-
-    # Append Urho3D license notice to the export header file
     file (READ ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h EXPORT_DEFINE)
+    if (MSVC)
+        string (REPLACE "#define URHO3D_API_H" "#define URHO3D_API_H\n\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)" EXPORT_DEFINE ${EXPORT_DEFINE})
+    endif ()
     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
 endif ()
 
-# Install dependency for Engine
-foreach (SOURCE ${SOURCES})
-    install_header_files (DIRECTORY ${SOURCE}/ DESTINATION ${DEST_INCLUDE_DIR} FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
-endforeach ()
-install_header_files (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
-install_header_files (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_DIR})
+# Install headers for using the Urho3D library
+install_header_files (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${DEST_INCLUDE_DIR} FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
+install_header_files (FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_DIR})
 
 # Generate platform specific pkg-config file for the benefit of Urho3D library users via SDK without CMake
 get_directory_property (URHO3D_COMPILE_DEFINITIONS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMPILE_DEFINITIONS)

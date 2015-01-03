@@ -236,6 +236,10 @@ if (URHO3D_LUAJIT)
 endif ()
 if (URHO3D_LUA)
     add_definitions (-DURHO3D_LUA)
+    # Optionally enable Lua / C++ wrapper safety checks
+    if (NOT URHO3D_SAFE_LUA)
+        add_definitions (-DTOLUA_RELEASE)
+    endif ()
 endif ()
 
 # Add definition for Navigation
@@ -384,9 +388,6 @@ else ()
     endif ()
 endif ()
 
-# Include CMake builtin module for building shared library support
-include (GenerateExportHeader)
-
 # Macro for setting common output directories
 macro (set_output_directories OUTPUT_PATH)
     foreach (TYPE ${ARGN})
@@ -471,6 +472,9 @@ if (ANDROID)
         endif ()
     endforeach ()
 endif ()
+
+# Include CMake builtin module for building shared library support
+include (GenerateExportHeader)
 
 # Override builtin macro and function to suit our need, always generate header file regardless of target type...
 macro (_DO_SET_MACRO_VALUES TARGET_LIBRARY)
@@ -865,16 +869,18 @@ macro (set_list TO_LIST FROM_LIST)
 endmacro ()
 
 # Macro for defining source files with optional arguments as follows:
-#  GROUP <value> - Group source files into a sub-group folder in VS and Xcode (only works in curent scope context)
 #  GLOB_CPP_PATTERNS <list> - Use the provided globbing patterns for CPP_FILES instead of the default *.cpp
 #  GLOB_H_PATTERNS <list> - Use the provided globbing patterns for H_FILES instead of the default *.h
+#  EXCLUDE_PATTERNS <list> - Use the provided patterns for excluding matched source files
 #  EXTRA_CPP_FILES <list> - Include the provided list of files into CPP_FILES result
 #  EXTRA_H_FILES <list> - Include the provided list of files into H_FILES result
 #  PCH - Enable precompiled header on the defined source files
 #  PARENT_SCOPE - Glob source files in current directory but set the result in parent-scope's variable ${DIR}_CPP_FILES and ${DIR}_H_FILES instead
+#  RECURSE - Option to glob recursively
+#  GROUP - Option to group source files based on its relative path to the corresponding parent directory (only works when PARENT_SCOPE option is not in use)
 macro (define_source_files)
     # Parse the arguments
-    cmake_parse_arguments (ARG "PCH;PARENT_SCOPE" "GROUP" "EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS" ${ARGN})
+    cmake_parse_arguments (ARG "PCH;PARENT_SCOPE;RECURSE;GROUP" "" "EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS;EXCLUDE_PATTERNS" ${ARGN})
 
     # Source files are defined by globbing source files in current source directory and also by including the extra source files if provided
     if (NOT ARG_GLOB_CPP_PATTERNS)
@@ -883,8 +889,25 @@ macro (define_source_files)
     if (NOT ARG_GLOB_H_PATTERNS)
         set (ARG_GLOB_H_PATTERNS *.h)
     endif ()
-    file (GLOB CPP_FILES ${ARG_GLOB_CPP_PATTERNS})
-    file (GLOB H_FILES ${ARG_GLOB_H_PATTERNS})
+    if (ARG_RECURSE)
+        set (ARG_RECURSE _RECURSE)
+    else ()
+        unset (ARG_RECURSE)
+    endif ()
+    file (GLOB${ARG_RECURSE} CPP_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${ARG_GLOB_CPP_PATTERNS})
+    file (GLOB${ARG_RECURSE} H_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${ARG_GLOB_H_PATTERNS})
+    if (ARG_EXCLUDE_PATTERNS)
+        set (CPP_FILES_WITH_SENTINEL ";${CPP_FILES};")  # Stringify the lists
+        set (H_FILES_WITH_SENTINEL ";${H_FILES};")
+        foreach (PATTERN ${ARG_EXCLUDE_PATTERNS})
+            foreach (LOOP RANGE 1)
+                string (REGEX REPLACE ";${PATTERN};" ";;" CPP_FILES_WITH_SENTINEL "${CPP_FILES_WITH_SENTINEL}")
+                string (REGEX REPLACE ";${PATTERN};" ";;" H_FILES_WITH_SENTINEL "${H_FILES_WITH_SENTINEL}")
+            endforeach ()
+        endforeach ()
+        set (CPP_FILES ${CPP_FILES_WITH_SENTINEL})      # Convert strings back to lists, the sentinel is harmless
+        set (H_FILES ${H_FILES_WITH_SENTINEL})
+    endif ()
     list (APPEND CPP_FILES ${ARG_EXTRA_CPP_FILES})
     list (APPEND H_FILES ${ARG_EXTRA_H_FILES})
     set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
@@ -896,26 +919,40 @@ macro (define_source_files)
     
     # Optionally accumulate source files at parent scope
     if (ARG_PARENT_SCOPE)
-        get_filename_component (DIR_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-        set (${DIR_NAME}_CPP_FILES ${CPP_FILES} PARENT_SCOPE)
-        set (${DIR_NAME}_H_FILES ${H_FILES} PARENT_SCOPE)
-    # Optionally put source files into further sub-group (only works for current scope due to CMake limitation)
+        get_filename_component (NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+        set (${NAME}_CPP_FILES ${CPP_FILES} PARENT_SCOPE)
+        set (${NAME}_H_FILES ${H_FILES} PARENT_SCOPE)
+    # Optionally put source files into further sub-group (only works when PARENT_SCOPE option is not in use)
     elseif (ARG_GROUP)
-        source_group ("Source Files\\${ARG_GROUP}" FILES ${CPP_FILES})
-        source_group ("Header Files\\${ARG_GROUP}" FILES ${H_FILES})
+        foreach (CPP_FILE ${CPP_FILES})
+            get_filename_component (PATH ${CPP_FILE} PATH)
+            if (PATH)
+                string (REPLACE / \\ PATH ${PATH})
+                source_group ("Source Files\\${PATH}" FILES ${CPP_FILE})
+            endif ()
+        endforeach ()
+        foreach (H_FILE ${H_FILES})
+            get_filename_component (PATH ${H_FILE} PATH)
+            if (PATH)
+                string (REPLACE / \\ PATH ${PATH})
+                source_group ("Header Files\\${PATH}" FILES ${H_FILE})
+            endif ()
+        endforeach ()
     endif ()
 endmacro ()
 
 # Macro for setting up header files installation for the SDK and the build tree (only support subset of install command arguments)
-# FILES <list> - File list to be installed
-# DIRECTORY <list> - Directory list to be installed
-# FILES_MATCHING - Option to perform file pattern matching on DIRECTORY list
-# USE_FILE_SYMLINK - Option to use file symlinks on the matched files found in the DIRECTORY list
-# PATTERN <list> - Pattern list to be used in file pattern matching option
-# DESTINATION <value> - Destination to be installed to
+#  FILES <list> - File list to be installed
+#  DIRECTORY <list> - Directory list to be installed
+#  FILES_MATCHING - Option to perform file pattern matching on DIRECTORY list
+#  USE_FILE_SYMLINK - Option to use file symlinks on the matched files found in the DIRECTORY list
+#  BUILD_TREE_ONLY - Option to install the header files into the build tree only
+#  PATTERN <list> - Pattern list to be used in file pattern matching option
+#  BASE <value> - An absolute base path to be prepended to the destination path when installing to build tree, default to build tree
+#  DESTINATION <value> - A relative destination path to be installed to
 macro (install_header_files)
-    # Parse the arguments for the underlying install command
-    cmake_parse_arguments (ARG "FILES_MATCHING;USE_FILE_SYMLINK" "DESTINATION" "FILES;DIRECTORY;PATTERN" ${ARGN})
+    # Parse the arguments for the underlying install command for the SDK
+    cmake_parse_arguments (ARG "FILES_MATCHING;USE_FILE_SYMLINK;BUILD_TREE_ONLY" "BASE;DESTINATION" "FILES;DIRECTORY;PATTERN" ${ARGN})
     unset (INSTALL_MATCHING)
     if (ARG_FILES)
         set (INSTALL_TYPE FILES)
@@ -927,6 +964,7 @@ macro (install_header_files)
         set (INSTALL_PERMISSIONS ${DEST_PERMISSIONS})
         if (ARG_FILES_MATCHING)
             set (INSTALL_MATCHING FILES_MATCHING)
+            # Our macro supports PATTERN <list> but CMake's install command does not, so convert the list to: PATTERN <value1> PATTERN <value2> ...
             foreach (PATTERN ${ARG_PATTERN})
                 list (APPEND INSTALL_MATCHING PATTERN ${PATTERN})
             endforeach ()
@@ -937,15 +975,22 @@ macro (install_header_files)
     if (NOT ARG_DESTINATION)
         message (FATAL_ERROR "Couldn't setup install command because the install destination is not specified.")
     endif ()
-    install (${INSTALL_TYPE} ${INSTALL_SOURCES} DESTINATION ${ARG_DESTINATION} ${INSTALL_PERMISSIONS} ${INSTALL_MATCHING})
+    if (NOT ARG_BUILD_TREE_ONLY)
+        install (${INSTALL_TYPE} ${INSTALL_SOURCES} DESTINATION ${ARG_DESTINATION} ${INSTALL_PERMISSIONS} ${INSTALL_MATCHING})
+    endif ()
 
     # Reparse the arguments for the create_symlink macro to "install" the header files in the build tree
+    if (NOT ARG_BASE)
+        set (ARG_BASE ${CMAKE_BINARY_DIR})  # Use build tree as base path
+    endif ()
     foreach (INSTALL_SOURCE ${INSTALL_SOURCES})
         if (NOT IS_ABSOLUTE ${INSTALL_SOURCE})
             set (INSTALL_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/${INSTALL_SOURCE})
         endif ()
         if (INSTALL_SOURCE MATCHES /$)
+            # Source is a directory
             if (ARG_USE_FILE_SYMLINK)
+                # Use file symlink for each individual files in the source directory
                 set (GLOBBING_EXPRESSION RELATIVE ${INSTALL_SOURCE})
                 if (ARG_FILES_MATCHING)
                     foreach (PATTERN ${ARG_PATTERN})
@@ -956,12 +1001,19 @@ macro (install_header_files)
                 endif ()
                 file (GLOB_RECURSE NAMES ${GLOBBING_EXPRESSION})
                 foreach (NAME ${NAMES})
+                    get_filename_component (PATH ${ARG_DESTINATION}/${NAME} PATH)
+                    # Recreate the source directory structure in the destination path
+                    if (NOT EXISTS ${ARG_BASE}/${PATH})
+                        file (MAKE_DIRECTORY ${ARG_BASE}/${PATH})
+                    endif ()
                     create_symlink (${INSTALL_SOURCE}${NAME} ${ARG_DESTINATION}/${NAME} FALLBACK_TO_COPY)
                 endforeach ()
             else ()
+                # Use a single symlink pointing to the source directory
                 create_symlink (${INSTALL_SOURCE} ${ARG_DESTINATION} FALLBACK_TO_COPY)
             endif ()
         else ()
+            # Source is a file (it could also be actually a directory to be treated as a "file", i.e. for creating symlink pointing to the directory)
             get_filename_component (NAME ${INSTALL_SOURCE} NAME)
             create_symlink (${INSTALL_SOURCE} ${ARG_DESTINATION}/${NAME} FALLBACK_TO_COPY)
         endif ()

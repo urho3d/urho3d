@@ -51,7 +51,7 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS)
 endif ()
 
 # Add targets
-foreach (TARGET FreeType JO LZ4 PugiXml SDL StanHull STB)
+foreach (TARGET FreeType JO LZ4 PugiXml rapidjson SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
 
@@ -60,7 +60,6 @@ if (URHO3D_ANGELSCRIPT)
 endif ()
 
 if (URHO3D_LUA)
-    add_subdirectory (Urho3D/LuaScript)
     add_subdirectory (ThirdParty/Lua${JIT})
     add_subdirectory (ThirdParty/toluapp/src/lib)
 endif ()
