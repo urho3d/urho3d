@@ -20,23 +20,23 @@
 // THE SOFTWARE.
 //
 
-#include "Button.h"
-#include "Camera.h"
-#include "CoreEvents.h"
-#include "Cursor.h"
-#include "Engine.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "UI.h"
-#include "UIEvents.h"
-#include "XMLFile.h"
-#include "Zone.h"
+#include <Urho3D/UI/Button.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/UI/Cursor.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/UI/UI.h>
+#include <Urho3D/UI/UIEvents.h>
+#include <Urho3D/Resource/XMLFile.h>
+#include <Urho3D/Graphics/Zone.h>
 
 #include "SceneAndUILoad.h"
 
-#include "DebugNew.h"
+#include <Urho3D/Container/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(SceneAndUILoad)
 
