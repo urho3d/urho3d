@@ -124,13 +124,18 @@ if (APPLE AND NOT IOS)
     set (GLOB_OBJC_PATTERN *.m)     # Should only pick up MacFileWatcher.m for MacOSX platform at the moment
 endif ()
 string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
-define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} EXTRA_CPP_FILES ${GEN_CPP_FILES} EXTRA_H_FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h RECURSE GROUP PCH)
-list (APPEND SOURCE_FILES ${ALL_OBJ_FILES})
+define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} EXTRA_H_FILES librevision.h RECURSE GROUP PCH)
+list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${ALL_OBJ_FILES})
 set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 
 # Define dependency libs
-# Add include directories to find the export header and installed headers from thirdparty libs
-set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
+if (MSVC)
+    # MSVC compiler does not handle quoted include pathspec with relative path the same way as GCC and Clang
+    # Following header search paths must be added in order to make MSVC resolves "../" back to ${CMAKE_CURRENT_SOURCE_DIR}
+    set (MSVC_WORKAROUND MSVC-WORKAROUND)
+endif ()
+# Add include directories to find the precompiled header, export header, and installed headers from thirdparty libs
+set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR} ${MSVC_WORKAROUND} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 if (URHO3D_PHYSICS)
     # Bullet library depends on its own include dir to be added in the header search path
     # This is more practical than patching its header files in many places to make them work with relative path
