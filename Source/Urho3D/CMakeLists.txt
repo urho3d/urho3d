@@ -131,7 +131,7 @@ set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 # Define dependency libs
 if (MSVC)
     # MSVC compiler does not handle quoted include pathspec with relative path the same way as GCC and Clang
-    # Following header search paths must be added in order to make MSVC resolves "../" back to ${CMAKE_CURRENT_SOURCE_DIR}
+    # Following header search path must be added in order to make MSVC resolves "../" back to ${CMAKE_CURRENT_SOURCE_DIR}
     set (MSVC_WORKAROUND MSVC-WORKAROUND)
 endif ()
 # Add include directories to find the precompiled header, export header, and installed headers from thirdparty libs

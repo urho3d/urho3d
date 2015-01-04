@@ -21,19 +21,19 @@
 //
 
 #include "Precompiled.h"
-#include "../Core/Context.h"
-#include "../IO/FileSystem.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/GraphicsEvents.h"
-#include "../Graphics/GraphicsImpl.h"
-#include "../IO/Log.h"
-#include "../Core/Profiler.h"
-#include "../Graphics/Renderer.h"
-#include "../Resource/ResourceCache.h"
-#include "../Graphics/TextureCube.h"
-#include "../Resource/XMLFile.h"
+#include "../../Core/Context.h"
+#include "../../IO/FileSystem.h"
+#include "../../Graphics/Graphics.h"
+#include "../../Graphics/GraphicsEvents.h"
+#include "../../Graphics/GraphicsImpl.h"
+#include "../../IO/Log.h"
+#include "../../Core/Profiler.h"
+#include "../../Graphics/Renderer.h"
+#include "../../Resource/ResourceCache.h"
+#include "../../Graphics/TextureCube.h"
+#include "../../Resource/XMLFile.h"
 
-#include "../Container/DebugNew.h"
+#include "../../Container/DebugNew.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:4355)

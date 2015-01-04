@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include "../Container/ArrayPtr.h"
-#include "../Math/Color.h"
-#include "../Container/HashSet.h"
-#include "../Resource/Image.h"
-#include "../Core/Mutex.h"
-#include "../Core/Object.h"
-#include "../Math/Plane.h"
-#include "../Math/Rect.h"
-#include "../GraphicsDefs.h"
+#include "../../Container/ArrayPtr.h"
+#include "../../Math/Color.h"
+#include "../../Container/HashSet.h"
+#include "../../Resource/Image.h"
+#include "../../Core/Mutex.h"
+#include "../../Core/Object.h"
+#include "../../Math/Plane.h"
+#include "../../Math/Rect.h"
+#include "../../Graphics/GraphicsDefs.h"
 
 namespace Urho3D
 {

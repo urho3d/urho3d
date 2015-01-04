@@ -21,16 +21,16 @@
 //
 
 #include "Precompiled.h"
-#include "../Graphics/Camera.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/GraphicsImpl.h"
-#include "../IO/Log.h"
-#include "../Graphics/Renderer.h"
-#include "../Graphics/RenderSurface.h"
-#include "../Scene/Scene.h"
-#include "../Graphics/Texture.h"
+#include "../../Graphics/Camera.h"
+#include "../../Graphics/Graphics.h"
+#include "../../Graphics/GraphicsImpl.h"
+#include "../../IO/Log.h"
+#include "../../Graphics/Renderer.h"
+#include "../../Graphics/RenderSurface.h"
+#include "../../Scene/Scene.h"
+#include "../../Graphics/Texture.h"
 
-#include "../Container/DebugNew.h"
+#include "../../Container/DebugNew.h"
 
 #ifdef GL_ES_VERSION_2_0
 #define GL_RENDERBUFFER_EXT GL_RENDERBUFFER

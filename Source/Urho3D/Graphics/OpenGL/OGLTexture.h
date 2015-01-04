@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "../Math/Color.h"
-#include "../GPUObject.h"
-#include "../GraphicsDefs.h"
-#include "../Resource/Resource.h"
+#include "../../Math/Color.h"
+#include "../../Graphics/GPUObject.h"
+#include "../../Graphics/GraphicsDefs.h"
+#include "../../Resource/Resource.h"
 
 namespace Urho3D
 {

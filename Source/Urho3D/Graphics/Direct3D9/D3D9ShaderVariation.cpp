@@ -21,20 +21,20 @@
 //
 
 #include "Precompiled.h"
-#include "../IO/File.h"
-#include "../IO/FileSystem.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/GraphicsImpl.h"
-#include "../IO/Log.h"
-#include "../Resource/ResourceCache.h"
-#include "../Graphics/Shader.h"
-#include "../Graphics/ShaderVariation.h"
+#include "../../IO/File.h"
+#include "../../IO/FileSystem.h"
+#include "../../Graphics/Graphics.h"
+#include "../../Graphics/GraphicsImpl.h"
+#include "../../IO/Log.h"
+#include "../../Resource/ResourceCache.h"
+#include "../../Graphics/Shader.h"
+#include "../../Graphics/ShaderVariation.h"
 
 #include <windows.h>
 #include <d3dcompiler.h>
 #include <MojoShader/mojoshader.h>
 
-#include "../Container/DebugNew.h"
+#include "../../Container/DebugNew.h"
 
 namespace Urho3D
 {

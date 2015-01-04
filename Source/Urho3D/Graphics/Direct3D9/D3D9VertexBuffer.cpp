@@ -21,12 +21,12 @@
 //
 
 #include "Precompiled.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/GraphicsImpl.h"
-#include "../IO/Log.h"
-#include "../Graphics/VertexBuffer.h"
+#include "../../Graphics/Graphics.h"
+#include "../../Graphics/GraphicsImpl.h"
+#include "../../IO/Log.h"
+#include "../../Graphics/VertexBuffer.h"
 
-#include "../Container/DebugNew.h"
+#include "../../Container/DebugNew.h"
 
 namespace Urho3D
 {

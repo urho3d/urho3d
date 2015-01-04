@@ -21,20 +21,20 @@
 //
 
 #include "Precompiled.h"
-#include "../Core/Context.h"
-#include "../IO/FileSystem.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/GraphicsEvents.h"
-#include "../Graphics/GraphicsImpl.h"
-#include "../Resource/Image.h"
-#include "../IO/Log.h"
-#include "../Core/Profiler.h"
-#include "../Graphics/Renderer.h"
-#include "../Resource/ResourceCache.h"
-#include "../Graphics/Texture2D.h"
-#include "../Resource/XMLFile.h"
+#include "../../Core/Context.h"
+#include "../../IO/FileSystem.h"
+#include "../../Graphics/Graphics.h"
+#include "../../Graphics/GraphicsEvents.h"
+#include "../../Graphics/GraphicsImpl.h"
+#include "../../Resource/Image.h"
+#include "../../IO/Log.h"
+#include "../../Core/Profiler.h"
+#include "../../Graphics/Renderer.h"
+#include "../../Resource/ResourceCache.h"
+#include "../../Graphics/Texture2D.h"
+#include "../../Resource/XMLFile.h"
 
-#include "../Container/DebugNew.h"
+#include "../../Container/DebugNew.h"
 
 namespace Urho3D
 {

@@ -21,17 +21,17 @@
 //
 
 #include "Precompiled.h"
-#include "../IO/FileSystem.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/GraphicsImpl.h"
-#include "../Graphics/Material.h"
-#include "../Core/Profiler.h"
-#include "../Resource/ResourceCache.h"
-#include "../Core/StringUtils.h"
-#include "../Graphics/Texture.h"
-#include "../Resource/XMLFile.h"
+#include "../../IO/FileSystem.h"
+#include "../../Graphics/Graphics.h"
+#include "../../Graphics/GraphicsImpl.h"
+#include "../../Graphics/Material.h"
+#include "../../Core/Profiler.h"
+#include "../../Resource/ResourceCache.h"
+#include "../../Core/StringUtils.h"
+#include "../../Graphics/Texture.h"
+#include "../../Resource/XMLFile.h"
 
-#include "../Container/DebugNew.h"
+#include "../../Container/DebugNew.h"
 
 namespace Urho3D
 {

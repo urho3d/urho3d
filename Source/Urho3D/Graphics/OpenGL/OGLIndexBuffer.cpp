@@ -21,15 +21,15 @@
 //
 
 #include "Precompiled.h"
-#include "../Core/Context.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/GraphicsImpl.h"
-#include "../Graphics/IndexBuffer.h"
-#include "../IO/Log.h"
+#include "../../Core/Context.h"
+#include "../../Graphics/Graphics.h"
+#include "../../Graphics/GraphicsImpl.h"
+#include "../../Graphics/IndexBuffer.h"
+#include "../../IO/Log.h"
 
 #include <cstring>
 
-#include "../Container/DebugNew.h"
+#include "../../Container/DebugNew.h"
 
 namespace Urho3D
 {
