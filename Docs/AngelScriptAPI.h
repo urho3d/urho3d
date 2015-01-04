@@ -7180,7 +7180,8 @@ class ResourceCache
 {
 // Methods:
 bool AddManualResource(Resource);
-void AddPackageFile(PackageFile, uint = M_MAX_UNSIGNED);
+bool AddPackageFile(PackageFile, uint = M_MAX_UNSIGNED);
+bool AddPackageFile(const String&, uint = M_MAX_UNSIGNED);
 bool AddResourceDir(const String&, uint = M_MAX_UNSIGNED);
 bool BackgroundLoadResource(const String&, const String&, bool = true);
 bool Exists(const String&) const;
@@ -7643,7 +7644,7 @@ Vector3 worldUp;
 class Script
 {
 // Methods:
-void DumpAPI(DumpMode = DOXYGEN);
+void DumpAPI(DumpMode = DOXYGEN, const String& = String ( ));
 bool Execute(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
