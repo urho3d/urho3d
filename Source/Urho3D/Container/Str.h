@@ -505,6 +505,14 @@ inline String operator + (const char* lhs, const String& rhs)
     return ret;
 }
 
+/// Add a string to a wide char C string.
+inline String operator + (const wchar_t* lhs, const String& rhs)
+{
+    String ret(lhs);
+    ret += rhs;
+    return ret;
+}
+
 /// Wide character string. Only meant for converting from String and passing to the operating system where necessary.
 class URHO3D_API WString
 {
