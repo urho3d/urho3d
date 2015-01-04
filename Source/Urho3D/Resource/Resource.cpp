@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "Precompiled.h"
 #include "../IO/Log.h"
 #include "../Core/Profiler.h"
 #include "../Resource/Resource.h"

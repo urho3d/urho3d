@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "Precompiled.h"
 #include "../Resource/BackgroundLoader.h"
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"

@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "Precompiled.h"
 #include "../Resource/Decompress.h"
 
 // DXT decompression based on the Squish library, modified for Urho3D

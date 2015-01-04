@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "Precompiled.h"
 #include "../IO/Log.h"
 #include "../Scene/LogicComponent.h"
 #ifdef URHO3D_PHYSICS

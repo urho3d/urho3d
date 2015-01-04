@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "Precompiled.h"
 #include "../Graphics/Batch.h"
 #include "../Graphics/BillboardSet.h"
 #include "../Graphics/Camera.h"

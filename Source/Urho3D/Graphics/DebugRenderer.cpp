@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "Precompiled.h"
 
 #include "../Graphics/AnimatedModel.h"
 #include "../Graphics/Camera.h"

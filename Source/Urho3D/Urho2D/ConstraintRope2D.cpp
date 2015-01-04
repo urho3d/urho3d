@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "Precompiled.h"
 #include "../Urho2D/ConstraintRope2D.h"
 #include "../Core/Context.h"
 #include "../Urho2D/PhysicsUtils2D.h"

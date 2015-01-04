@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "Precompiled.h"
 #include "../Script/APITemplates.h"
 #include "../Math/Color.h"
 #include "../Math/Frustum.h"
