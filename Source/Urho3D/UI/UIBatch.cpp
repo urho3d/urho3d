@@ -27,7 +27,7 @@
 #include "../Graphics/Texture.h"
 #include "../UI/UIElement.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

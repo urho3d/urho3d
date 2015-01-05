@@ -32,7 +32,7 @@
 #include <stb_image.h>
 #include <stb_image_write.h>
 
-#include <Urho3D/Container/DebugNew.h>
+#include <Urho3D/DebugNew.h>
 
 using namespace Urho3D;
 

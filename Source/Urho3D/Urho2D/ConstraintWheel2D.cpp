@@ -26,7 +26,7 @@
 #include "../Urho2D/PhysicsUtils2D.h"
 #include "../Urho2D/RigidBody2D.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

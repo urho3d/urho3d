@@ -25,7 +25,7 @@
 
 #include "Rotator.h"
 
-#include <Urho3D/Container/DebugNew.h>
+#include <Urho3D/DebugNew.h>
 
 Rotator::Rotator(Context* context) :
     LogicComponent(context),

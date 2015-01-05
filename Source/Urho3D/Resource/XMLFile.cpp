@@ -34,7 +34,7 @@
 
 #include <PugiXml/pugixml.hpp>
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

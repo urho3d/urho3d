@@ -29,7 +29,7 @@
 #include "../Resource/ResourceEvents.h"
 #include "../Core/Timer.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

@@ -42,7 +42,7 @@
 
 #include <SDL/SDL.h>
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char *name);
 

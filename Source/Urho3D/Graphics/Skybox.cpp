@@ -27,7 +27,7 @@
 #include "../Scene/Node.h"
 #include "../Graphics/Skybox.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

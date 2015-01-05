@@ -43,7 +43,7 @@
 
 #include "Chat.h"
 
-#include <Urho3D/Container/DebugNew.h>
+#include <Urho3D/DebugNew.h>
 
 // Undefine Windows macro, as our Connection class has a function called SendMessage
 #ifdef SendMessage

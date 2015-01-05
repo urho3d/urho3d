@@ -34,7 +34,7 @@
 #include <d3dcompiler.h>
 #include <MojoShader/mojoshader.h>
 
-#include "../../Container/DebugNew.h"
+#include "../../DebugNew.h"
 
 namespace Urho3D
 {

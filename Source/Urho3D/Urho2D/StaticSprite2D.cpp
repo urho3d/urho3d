@@ -27,7 +27,7 @@
 #include "../Urho2D/StaticSprite2D.h"
 #include "../Graphics/Texture2D.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

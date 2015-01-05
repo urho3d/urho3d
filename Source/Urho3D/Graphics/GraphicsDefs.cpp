@@ -24,7 +24,7 @@
 #include "../Math/StringHash.h"
 #include "../Math/Vector3.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

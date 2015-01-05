@@ -39,7 +39,7 @@
 
 #include "Urho2DSprite.h"
 
-#include <Urho3D/Container/DebugNew.h>
+#include <Urho3D/DebugNew.h>
 
 // Number of static sprites to draw
 static const unsigned NUM_SPRITES = 200;

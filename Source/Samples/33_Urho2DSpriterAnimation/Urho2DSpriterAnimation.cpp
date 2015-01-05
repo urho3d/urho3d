@@ -38,7 +38,7 @@
 
 #include "Urho2DSpriterAnimation.h"
 
-#include <Urho3D/Container/DebugNew.h>
+#include <Urho3D/DebugNew.h>
 
 static const char* animationNames[] =
 {

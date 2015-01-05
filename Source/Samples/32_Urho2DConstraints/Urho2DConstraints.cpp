@@ -37,7 +37,7 @@
 #include <Urho3D/Urho2D/ConstraintWeld2D.h>
 #include <Urho3D/Urho2D/ConstraintWheel2D.h>
 #include <Urho3D/Core/CoreEvents.h>
-#include <Urho3D/Container/DebugNew.h>
+#include <Urho3D/DebugNew.h>
 #include <Urho3D/Graphics/DebugRenderer.h>
 #include <Urho3D/Urho2D/Drawable2D.h>
 #include <Urho3D/Engine/Engine.h>

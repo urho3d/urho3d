@@ -36,7 +36,7 @@
 #include FT_FREETYPE_H
 #include FT_TRUETYPE_TABLES_H
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

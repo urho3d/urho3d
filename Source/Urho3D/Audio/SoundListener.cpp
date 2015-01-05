@@ -24,7 +24,7 @@
 #include "../Core/Context.h"
 #include "../Audio/SoundListener.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

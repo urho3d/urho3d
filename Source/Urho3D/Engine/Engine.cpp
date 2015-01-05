@@ -55,7 +55,7 @@
 #include "../Core/WorkQueue.h"
 #include "../Resource/XMLFile.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 // From dbgint.h

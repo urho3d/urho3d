@@ -29,7 +29,7 @@
 #include "../Urho2D/RigidBody2D.h"
 #include "../Scene/Scene.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

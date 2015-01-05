@@ -38,7 +38,7 @@
 #include <cstddef>
 #include <cstring>
 
-#include <Urho3D/Container/DebugNew.h>
+#include <Urho3D/DebugNew.h>
 
 static const int VERTEX_CACHE_SIZE = 32;
 

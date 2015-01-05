@@ -68,7 +68,7 @@ extern "C" const char* SDL_IOS_GetResourceDir();
 extern "C" const char* SDL_IOS_GetDocumentsDir();
 #endif
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

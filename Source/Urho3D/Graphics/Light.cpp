@@ -33,7 +33,7 @@
 #include "../Graphics/Texture2D.h"
 #include "../Graphics/TextureCube.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

@@ -30,7 +30,7 @@
 #include "../../Scene/Scene.h"
 #include "../../Graphics/Texture.h"
 
-#include "../../Container/DebugNew.h"
+#include "../../DebugNew.h"
 
 #ifdef GL_ES_VERSION_2_0
 #define GL_RENDERBUFFER_EXT GL_RENDERBUFFER

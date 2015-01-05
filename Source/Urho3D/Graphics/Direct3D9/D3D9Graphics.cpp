@@ -60,7 +60,7 @@
 
 #include <SDL/SDL_syswm.h>
 
-#include "../../Container/DebugNew.h"
+#include "../../DebugNew.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:4355)

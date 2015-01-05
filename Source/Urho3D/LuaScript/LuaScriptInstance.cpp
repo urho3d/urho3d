@@ -42,7 +42,7 @@
 #include <toluapp/tolua++.h>
 #include "../LuaScript/ToluaUtils.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

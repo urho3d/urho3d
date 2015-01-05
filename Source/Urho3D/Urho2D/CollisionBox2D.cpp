@@ -25,7 +25,7 @@
 #include "../Urho2D/CollisionBox2D.h"
 #include "../Urho2D/PhysicsUtils2D.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

@@ -27,7 +27,7 @@
 
 #include "Mover.h"
 
-#include <Urho3D/Container/DebugNew.h>
+#include <Urho3D/DebugNew.h>
 
 Mover::Mover(Context* context) :
     LogicComponent(context),

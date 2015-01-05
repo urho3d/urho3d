@@ -33,7 +33,7 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 using namespace rapidjson;
 

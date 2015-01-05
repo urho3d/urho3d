@@ -28,7 +28,7 @@
 #include "../UI/UIEvents.h"
 #include "../UI/Window.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

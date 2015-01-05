@@ -43,7 +43,7 @@
 
 #include "LuaIntegration.h"
 
-#include <Urho3D/Container/DebugNew.h>
+#include <Urho3D/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(LuaIntegration)
 

@@ -23,7 +23,7 @@
 #include "Precompiled.h"
 #include "../Network/Controls.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

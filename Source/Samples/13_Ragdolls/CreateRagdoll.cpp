@@ -28,7 +28,7 @@
 
 #include "CreateRagdoll.h"
 
-#include <Urho3D/Container/DebugNew.h>
+#include <Urho3D/DebugNew.h>
 
 CreateRagdoll::CreateRagdoll(Context* context) :
     Component(context)

@@ -38,7 +38,7 @@
 #include <windows.h>
 #endif
 
-#include <Urho3D/Container/DebugNew.h>
+#include <Urho3D/DebugNew.h>
 
 using namespace Urho3D;
 

@@ -47,7 +47,7 @@
 #include "Vehicle.h"
 #include "VehicleDemo.h"
 
-#include <Urho3D/Container/DebugNew.h>
+#include <Urho3D/DebugNew.h>
 
 const float CAMERA_DISTANCE = 10.0f;
 

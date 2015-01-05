@@ -28,7 +28,7 @@
 #include "../IO/Log.h"
 #include "../Graphics/Texture2D.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

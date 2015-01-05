@@ -30,7 +30,7 @@
 #include "../Urho2D/TmxFile2D.h"
 #include "../Resource/XMLFile.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

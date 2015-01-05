@@ -57,7 +57,7 @@
 
 #include <SDL/SDL.h>
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 #define TOUCHID_MASK(id) (1 << id)
 

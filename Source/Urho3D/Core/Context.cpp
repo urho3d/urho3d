@@ -24,7 +24,7 @@
 #include "../Core/Context.h"
 #include "../Core/Thread.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

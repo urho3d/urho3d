@@ -40,7 +40,7 @@
 extern "C" void SDL_IOS_LogMessage(const char* message);
 #endif
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

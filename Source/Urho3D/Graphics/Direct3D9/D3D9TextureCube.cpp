@@ -33,7 +33,7 @@
 #include "../../Graphics/TextureCube.h"
 #include "../../Resource/XMLFile.h"
 
-#include "../../Container/DebugNew.h"
+#include "../../DebugNew.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:4355)

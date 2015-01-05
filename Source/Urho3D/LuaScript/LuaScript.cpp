@@ -42,7 +42,7 @@ extern "C"
 #include <toluapp/tolua++.h>
 #include "../LuaScript/ToluaUtils.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 extern int tolua_AudioLuaAPI_open(lua_State*);
 extern int tolua_CoreLuaAPI_open(lua_State*);

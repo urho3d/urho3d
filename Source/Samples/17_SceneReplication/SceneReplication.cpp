@@ -54,7 +54,7 @@
 
 #include "SceneReplication.h"
 
-#include <Urho3D/Container/DebugNew.h>
+#include <Urho3D/DebugNew.h>
 
 // UDP port we will use
 static const unsigned short SERVER_PORT = 2345;

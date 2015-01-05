@@ -46,7 +46,7 @@
 #include "../Graphics/View.h"
 #include "../Core/WorkQueue.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

@@ -33,7 +33,7 @@
 
 #include "SoundSynthesis.h"
 
-#include <Urho3D/Container/DebugNew.h>
+#include <Urho3D/DebugNew.h>
 
 // Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(SoundSynthesis)

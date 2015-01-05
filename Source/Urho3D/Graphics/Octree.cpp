@@ -34,7 +34,7 @@
 #include "../Core/Timer.h"
 #include "../Core/WorkQueue.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:4355)

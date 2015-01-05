@@ -26,7 +26,7 @@
 #include "../IO/Log.h"
 #include "../Urho2D/Sprite2D.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {

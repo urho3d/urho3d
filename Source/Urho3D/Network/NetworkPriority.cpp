@@ -24,7 +24,7 @@
 #include "../Core/Context.h"
 #include "../Network/NetworkPriority.h"
 
-#include "../Container/DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {
