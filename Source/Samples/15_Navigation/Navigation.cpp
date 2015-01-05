@@ -384,7 +384,7 @@ void Navigation::FollowPath(float timeStep)
         jackNode_->Translate(Vector3::FORWARD * move);
 
         // Remove waypoint if reached it
-        if ((jackNode_->GetPosition() - nextWaypoint).Length() < 0.1f)
+        if (distance < 0.1f)
             currentPath_.Erase(0);
     }
 }

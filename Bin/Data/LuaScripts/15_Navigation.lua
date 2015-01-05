@@ -318,7 +318,7 @@ function FollowPath(timeStep)
         jackNode:Translate(Vector3(0.0, 0.0, 1.0) * move)
 
         -- Remove waypoint if reached it
-        if (jackNode.position - nextWaypoint):Length() < 0.1 then
+        if distance < 0.1 then
             table.remove(currentPath, 1)
         end
     end

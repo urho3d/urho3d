@@ -325,7 +325,7 @@ void FollowPath(float timeStep)
         jackNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * move);
 
         // Remove waypoint if reached it
-        if ((jackNode.position - nextWaypoint).length < 0.1)
+        if (distance < 0.1)
             currentPath.Erase(0);
     }
 }
