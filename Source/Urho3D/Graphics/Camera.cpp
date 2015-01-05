@@ -92,7 +92,7 @@ void Camera::RegisterObject(Context* context)
     ENUM_ATTRIBUTE("Fill Mode", fillMode_, fillModeNames, FILL_SOLID, AM_DEFAULT);
     ATTRIBUTE("Auto Aspect Ratio", bool, autoAspectRatio_, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Orthographic", IsOrthographic, SetOrthographic, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Orthographic Size", GetOrthoSize, SetOrthoSize, float, DEFAULT_ORTHOSIZE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Orthographic Size", GetOrthoSize, SetOrthoSizeAttr, float, DEFAULT_ORTHOSIZE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Zoom", GetZoom, SetZoom, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
@@ -597,6 +597,14 @@ const Matrix3x4& Camera::GetView() const
 void Camera::SetAspectRatioInternal(float aspectRatio)
 {
     aspectRatio_ = aspectRatio;
+    frustumDirty_ = true;
+    projectionDirty_ = true;
+    MarkNetworkUpdate();
+}
+
+void Camera::SetOrthoSizeAttr(float orthoSize)
+{
+    orthoSize_ = orthoSize;
     frustumDirty_ = true;
     projectionDirty_ = true;
     MarkNetworkUpdate();

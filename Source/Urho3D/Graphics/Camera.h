@@ -172,6 +172,8 @@ public:
 
     /// Set aspect ratio without disabling the "auto aspect ratio" mode. Called internally by View.
     void SetAspectRatioInternal(float aspectRatio);
+    /// Set orthographic size attribute without forcing the aspect ratio.
+    void SetOrthoSizeAttr(float orthoSize);
     /// Set reflection plane attribute.
     void SetReflectionPlaneAttr(const Vector4& value);
     /// Return reflection plane attribute.
