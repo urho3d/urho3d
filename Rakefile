@@ -297,7 +297,7 @@ EOF" or abort 'Failed to create release directory remotely'
     system 'rsync -e ssh -az Readme.txt License.txt urho-travis-ci@frs.sourceforge.net:/home/frs/project/$TRAVIS_REPO_SLUG' or abort 'Failed to sync readme and license files'
   end
   # Upload the package
-  system "scp ../Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload binary package'
+  system "scp ../Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir} && rm ../Build/Urho3D-*" or abort 'Failed to upload binary package'
 end
 
 def scaffolding(dir, project = 'Scaffolding', target = 'Main')
