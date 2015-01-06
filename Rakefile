@@ -229,7 +229,12 @@ task :ci_package_upload do
     $testing = 0
   end
   # Generate the documentation if necessary
-  unless ENV['SITE_UPDATE']
+  if ENV['SITE_UPDATE']
+    if File.exist?('.site_updated')
+      # Skip if site is already updated before
+      ENV['SITE_UPDATE'] = nil
+    end
+  else
     system 'echo Generate documentation'
     if ENV['XCODE']
       xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj', 'doc', '>/dev/null') or abort 'Failed to generate documentation'
@@ -295,6 +300,8 @@ EOF" or abort 'Failed to create release directory remotely'
     # Sync readme and license files, just in case they are updated in the repo
     system 'for f in Readme.txt License.txt; do mtime=$(git log --format=%ai -n1 $f); touch -d "$mtime" $f; done' or abort 'Failed to acquire file modified time'
     system 'rsync -e ssh -az Readme.txt License.txt urho-travis-ci@frs.sourceforge.net:/home/frs/project/$TRAVIS_REPO_SLUG' or abort 'Failed to sync readme and license files'
+    # Mark that the site has been updated
+    File.open('.site_updated', 'w') {}
   end
   # Upload the package
   system "scp ../Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir} && rm ../Build/Urho3D-*" or abort 'Failed to upload binary package'
