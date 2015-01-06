@@ -315,9 +315,6 @@ function printDescriptions(filename, directory)
   local classScope = nil
   local description = nil
   local sourceEnginePath = curDir.path .. curDir.separator .. ".." .. curDir.separator .. ".." .. curDir.separator
-  if directory ~= nil then
-    sourceEnginePath = sourceEnginePath .. directory .. curDir.separator
-  end
   for line in io.lines(sourceEnginePath .. filename) do
     line = line:gsub("%c", "")
     -- Entering Class
