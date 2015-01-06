@@ -135,7 +135,9 @@ if (MSVC)
     set (MSVC_WORKAROUND MSVC-WORKAROUND)
 endif ()
 # Add include directories to find the precompiled header, export header, and installed headers from thirdparty libs
-set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR} ${MSVC_WORKAROUND} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
+# Hack: the ${CMAKE_CURRENT_SOURCE_DIR}/generated is added so that "../Urho3D.h" include path could be resolved back to CMAKE_CURRENT_BINARY_DIR where this generated header is located
+#       the "../Urho3D.h" relative path is preferred over "Urho3D.h" because we want to avoid adding "include/Urho3D" into the search path when *using* the library
+set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR} ${MSVC_WORKAROUND} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/generated ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 if (URHO3D_PHYSICS)
     # Bullet library depends on its own include dir to be added in the header search path
     # This is more practical than patching its header files in many places to make them work with relative path

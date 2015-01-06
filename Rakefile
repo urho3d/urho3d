@@ -72,6 +72,7 @@ task :cmake do
       platform = option
       build_options = "#{build_options} -D#{option == 'mingw' ? 'WIN32' : option.upcase}=1" unless script == 'cmake_clean'
       script = 'cmake_macosx' if option == 'ios'
+      script = 'cmake_mingw' if option == 'mingw' && ENV['OS']
     when 'fix_scm'
       build_options = "#{build_options} --fix-scm" if script == 'cmake_eclipse'
     else
