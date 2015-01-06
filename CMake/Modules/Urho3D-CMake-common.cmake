@@ -465,7 +465,9 @@ if (ANDROID)
     endif ()
     # Create symbolic links in the build tree
     foreach (I CoreData Data)
-        create_symlink (../../Bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
+        if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Android/assets/${I})
+            create_symlink (${CMAKE_SOURCE_DIR}/Bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
+        endif ()
     endforeach ()
     foreach (I AndroidManifest.xml build.xml src res assets jni)
         if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
@@ -689,7 +691,9 @@ macro (setup_main_executable)
 
     if (ANDROID)
         # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES}
-        find_file (ANDROID_MAIN_C_PATH SDL_android_main.c HINTS ${URHO3D_HOME}/include/${PATH_SUFFIX}/ThirdParty/SDL/android PATH_SUFFIXES ${PATH_SUFFIX} DOC "Path to SDL_android_main.c" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+        find_file (ANDROID_MAIN_C_PATH SDL_android_main.c
+            HINTS ${URHO3D_HOME}/include/${PATH_SUFFIX}/ThirdParty/SDL/android ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
+            DOC "Path to SDL_android_main.c" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
         mark_as_advanced (ANDROID_MAIN_C_PATH)  # Hide it from cmake-gui in non-advanced mode
         if (ANDROID_MAIN_C_PATH)
             list (APPEND SOURCE_FILES ${ANDROID_MAIN_C_PATH})
