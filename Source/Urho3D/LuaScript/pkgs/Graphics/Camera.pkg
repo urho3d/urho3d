@@ -1,4 +1,4 @@
-$#include "../Graphics/Camera.h"
+$#include "Graphics/Camera.h"
 
 enum FillMode {};
 

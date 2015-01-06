@@ -1,4 +1,4 @@
-$#include "../Graphics/OctreeQuery.h"
+$#include "Graphics/OctreeQuery.h"
 
 struct OctreeQueryResult
 {

@@ -1,4 +1,4 @@
-$#include "../Graphics/Drawable.h"
+$#include "Graphics/Drawable.h"
 
 static const unsigned DRAWABLE_GEOMETRY;
 static const unsigned DRAWABLE_LIGHT;

@@ -1,5 +1,5 @@
-$#include "../Core/Variant.h"
-$#include "../IO/VectorBuffer.h"
+$#include "Core/Variant.h"
+$#include "IO/VectorBuffer.h"
 
 enum VariantType
 {

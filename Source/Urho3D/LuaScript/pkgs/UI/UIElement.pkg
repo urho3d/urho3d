@@ -1,5 +1,5 @@
-$#include "../IO/File.h"
-$#include "../UI/UIElement.h"
+$#include "IO/File.h"
+$#include "UI/UIElement.h"
 
 enum HorizontalAlignment
 {

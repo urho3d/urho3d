@@ -1,4 +1,4 @@
-$#include "../UI/Slider.h"
+$#include "UI/Slider.h"
 
 class Slider : public BorderImage
 {

@@ -1,4 +1,4 @@
-$#include "../Graphics/CustomGeometry.h"
+$#include "Graphics/CustomGeometry.h"
 
 struct CustomGeometryVertex
 {

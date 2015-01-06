@@ -1,4 +1,4 @@
-$#include "../Urho2D/TileMapLayer2D.h"
+$#include "Urho2D/TileMapLayer2D.h"
 
 class TileMapLayer2D : Component
 {

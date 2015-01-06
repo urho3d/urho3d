@@ -1,4 +1,4 @@
-$#include "../Urho2D/ParticleEffect2D.h"
+$#include "Urho2D/ParticleEffect2D.h"
 
 enum EmitterType2D
 {

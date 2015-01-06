@@ -1,4 +1,4 @@
-$#include "../Urho2D/ConstraintRevolute2D.h"
+$#include "Urho2D/ConstraintRevolute2D.h"
 
 class ConstraintRevolute2D : Constraint2D
 {

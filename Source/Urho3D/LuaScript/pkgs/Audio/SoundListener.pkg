@@ -1,4 +1,4 @@
-$#include "../Audio/SoundListener.h"
+$#include "Audio/SoundListener.h"
 
 class SoundListener : public Component
 {

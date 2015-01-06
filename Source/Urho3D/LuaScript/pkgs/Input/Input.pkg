@@ -1,5 +1,5 @@
-$#include "../IO/File.h"
-$#include "../Input/Input.h"
+$#include "IO/File.h"
+$#include "Input/Input.h"
 
 enum MouseMode
 {

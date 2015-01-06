@@ -1,4 +1,4 @@
-$#include "../Urho2D/ParticleEmitter2D.h"
+$#include "Urho2D/ParticleEmitter2D.h"
 
 class ParticleEmitter2D : public Drawable2D
 {    

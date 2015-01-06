@@ -1,4 +1,4 @@
-$#include "../UI/Text.h"
+$#include "UI/Text.h"
 
 enum TextEffect
 {

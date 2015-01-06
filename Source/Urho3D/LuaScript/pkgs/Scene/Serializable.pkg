@@ -1,4 +1,4 @@
-$#include "../Scene/Serializable.h"
+$#include "Scene/Serializable.h"
 
 class Serializable : public Object
 {

@@ -1,4 +1,4 @@
-$#include "../UI/View3D.h"
+$#include "UI/View3D.h"
 
 class View3D : public Window
 {

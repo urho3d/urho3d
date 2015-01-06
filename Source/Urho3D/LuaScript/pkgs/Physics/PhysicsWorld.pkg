@@ -1,4 +1,4 @@
-$#include "../Physics/PhysicsWorld.h"
+$#include "Physics/PhysicsWorld.h"
 
 struct PhysicsRaycastResult
 {

@@ -1,4 +1,4 @@
-$#include "../Math/Quaternion.h"
+$#include "Math/Quaternion.h"
 
 class Quaternion
 {

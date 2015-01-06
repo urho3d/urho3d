@@ -1,4 +1,4 @@
-$#include "../Graphics/Technique.h"
+$#include "Graphics/Technique.h"
 
 enum PassLightingMode
 {

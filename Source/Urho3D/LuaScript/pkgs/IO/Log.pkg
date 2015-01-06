@@ -1,4 +1,4 @@
-$#include "../IO/Log.h"
+$#include "IO/Log.h"
 
 static const int LOG_DEBUG;
 static const int LOG_INFO;

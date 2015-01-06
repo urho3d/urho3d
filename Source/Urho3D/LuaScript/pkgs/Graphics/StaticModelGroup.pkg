@@ -1,4 +1,4 @@
-$#include "../Graphics/StaticModelGroup.h"
+$#include "Graphics/StaticModelGroup.h"
 
 class StaticModelGroup : public StaticModel
 {

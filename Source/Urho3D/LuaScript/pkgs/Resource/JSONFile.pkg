@@ -1,4 +1,4 @@
-$#include "../Resource/JSONFile.h"
+$#include "Resource/JSONFile.h"
 
 enum JSONValueType {};
 

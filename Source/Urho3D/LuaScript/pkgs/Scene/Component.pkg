@@ -1,4 +1,4 @@
-$#include "../Scene/Component.h"
+$#include "Scene/Component.h"
 
 class Component : public Animatable
 {

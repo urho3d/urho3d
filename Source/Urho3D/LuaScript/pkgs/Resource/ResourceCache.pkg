@@ -1,4 +1,4 @@
-$#include "../Resource/ResourceCache.h"
+$#include "Resource/ResourceCache.h"
 
 class ResourceCache
 {    

@@ -1,4 +1,4 @@
-$#include "../Graphics/AnimationController.h"
+$#include "Graphics/AnimationController.h"
 
 struct AnimationControl
 {

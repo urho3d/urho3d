@@ -1,4 +1,4 @@
-$#include "../Graphics/AnimationState.h"
+$#include "Graphics/AnimationState.h"
 
 class AnimationState
 {

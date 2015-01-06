@@ -1,5 +1,5 @@
-$#include "../IO/File.h"
-$#include "../Resource/Resource.h"
+$#include "IO/File.h"
+$#include "Resource/Resource.h"
 
 class Resource
 {

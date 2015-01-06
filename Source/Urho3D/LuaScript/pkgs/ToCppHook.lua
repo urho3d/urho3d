@@ -91,7 +91,7 @@ function post_output_hook(package)
 
 #include "Precompiled.h"
 #include <toluapp/tolua++.h>
-#include "../LuaScript/ToluaUtils.h"
+#include "LuaScript/ToluaUtils.h"
 
 #if __clang__
 #pragma clang diagnostic push

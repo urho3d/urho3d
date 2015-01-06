@@ -1,4 +1,4 @@
-$#include "../Engine/DebugHud.h"
+$#include "Engine/DebugHud.h"
 
 static const unsigned DEBUGHUD_SHOW_NONE;
 static const unsigned DEBUGHUD_SHOW_STATS;

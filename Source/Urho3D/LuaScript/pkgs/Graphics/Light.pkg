@@ -1,4 +1,4 @@
-$#include "../Graphics/Light.h"
+$#include "Graphics/Light.h"
 
 enum LightType
 {

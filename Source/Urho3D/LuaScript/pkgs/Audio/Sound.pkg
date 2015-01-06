@@ -1,5 +1,5 @@
-$#include "../IO/File.h"
-$#include "../Audio/Sound.h"
+$#include "IO/File.h"
+$#include "Audio/Sound.h"
 
 class Sound : public Resource
 {

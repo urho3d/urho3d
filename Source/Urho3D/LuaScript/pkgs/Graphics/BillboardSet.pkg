@@ -1,4 +1,4 @@
-$#include "../Graphics/BillboardSet.h"
+$#include "Graphics/BillboardSet.h"
 
 struct Billboard
 {

@@ -1,4 +1,4 @@
-$#include "../Graphics/RenderSurface.h"
+$#include "Graphics/RenderSurface.h"
 
 class RenderSurface
 {

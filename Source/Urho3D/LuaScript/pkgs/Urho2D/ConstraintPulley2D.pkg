@@ -1,4 +1,4 @@
-$#include "../Urho2D/ConstraintPulley2D.h"
+$#include "Urho2D/ConstraintPulley2D.h"
 
 class ConstraintPulley2D : Constraint2D
 {

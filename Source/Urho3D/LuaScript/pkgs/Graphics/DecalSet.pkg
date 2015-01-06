@@ -1,4 +1,4 @@
-$#include "../Graphics/DecalSet.h"
+$#include "Graphics/DecalSet.h"
 
 class DecalSet : public Drawable
 {

@@ -1,4 +1,4 @@
-$#include "../Physics/CollisionShape.h"
+$#include "Physics/CollisionShape.h"
 
 enum ShapeType
 {

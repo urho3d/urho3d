@@ -1,4 +1,4 @@
-$#include "../Audio/SoundSource.h"
+$#include "Audio/SoundSource.h"
 
 class SoundSource : public Component
 {

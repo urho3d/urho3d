@@ -1,4 +1,4 @@
-$#include "../Math/Color.h"
+$#include "Math/Color.h"
 
 class Color
 {

@@ -1,4 +1,4 @@
-$#include "../IO/VectorBuffer.h"
+$#include "IO/VectorBuffer.h"
 
 class VectorBuffer
 {

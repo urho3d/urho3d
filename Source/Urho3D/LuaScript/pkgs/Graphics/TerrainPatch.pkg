@@ -1,4 +1,4 @@
-$#include "../Graphics/TerrainPatch.h"
+$#include "Graphics/TerrainPatch.h"
 
 class TerrainPatch : public Drawable
 {

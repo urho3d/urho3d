@@ -1,4 +1,4 @@
-$#include "../Graphics/ParticleEmitter.h"
+$#include "Graphics/ParticleEmitter.h"
 
 class ParticleEmitter : public BillboardSet
 {

@@ -1,4 +1,4 @@
-$#include "../Graphics/DebugRenderer.h"
+$#include "Graphics/DebugRenderer.h"
 
 class DebugRenderer : public Component
 {

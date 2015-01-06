@@ -1,4 +1,4 @@
-$#include "../UI/Cursor.h"
+$#include "UI/Cursor.h"
 
 enum CursorShape
 {

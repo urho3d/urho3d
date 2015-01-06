@@ -1,4 +1,4 @@
-$#include "../Audio/Audio.h"
+$#include "Audio/Audio.h"
 
 static const String SOUND_MASTER;
 static const String SOUND_EFFECT;

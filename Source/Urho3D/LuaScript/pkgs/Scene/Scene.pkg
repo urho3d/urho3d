@@ -1,4 +1,4 @@
-$#include "../Scene/Scene.h"
+$#include "Scene/Scene.h"
 
 static const unsigned FIRST_REPLICATED_ID;
 static const unsigned LAST_REPLICATED_ID;

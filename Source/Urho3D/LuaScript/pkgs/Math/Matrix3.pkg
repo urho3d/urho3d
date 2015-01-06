@@ -1,4 +1,4 @@
-$#include "../Math/Matrix3.h"
+$#include "Math/Matrix3.h"
 
 class Matrix3
 {

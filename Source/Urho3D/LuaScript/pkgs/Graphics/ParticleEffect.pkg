@@ -1,4 +1,4 @@
-$#include "../Graphics/ParticleEffect.h"
+$#include "Graphics/ParticleEffect.h"
 
 enum EmitterType
 {

@@ -1,4 +1,4 @@
-$#include "../Urho2D/StaticSprite2D.h"
+$#include "Urho2D/StaticSprite2D.h"
 
 class StaticSprite2D : public Drawable2D
 {    

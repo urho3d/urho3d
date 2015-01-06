@@ -1,4 +1,4 @@
-$#include "../Network/NetworkPriority.h"
+$#include "Network/NetworkPriority.h"
 
 class NetworkPriority : public Component
 {

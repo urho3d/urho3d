@@ -1,4 +1,4 @@
-$#include "../UI/Text3D.h"
+$#include "UI/Text3D.h"
 
 // Duplicated here from GraphicsDefs.pkg to so that enum is bound correctly to Text3D
 enum FaceCameraMode

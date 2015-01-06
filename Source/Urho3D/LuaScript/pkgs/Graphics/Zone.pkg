@@ -1,4 +1,4 @@
-$#include "../Graphics/Zone.h"
+$#include "Graphics/Zone.h"
 
 class Zone : public Drawable
 {

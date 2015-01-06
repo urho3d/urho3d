@@ -1,4 +1,4 @@
-$#include "../Math/Rect.h"
+$#include "Math/Rect.h"
 
 class Rect
 {

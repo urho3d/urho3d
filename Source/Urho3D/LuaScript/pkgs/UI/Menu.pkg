@@ -1,4 +1,4 @@
-$#include "../UI/Menu.h"
+$#include "UI/Menu.h"
 
 class Menu : public Button
 {

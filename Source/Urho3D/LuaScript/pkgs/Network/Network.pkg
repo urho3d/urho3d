@@ -1,4 +1,4 @@
-$#include "../Network/Network.h"
+$#include "Network/Network.h"
 
 class Network
 {

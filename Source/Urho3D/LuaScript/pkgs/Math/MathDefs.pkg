@@ -1,4 +1,4 @@
-$#include "../Math/MathDefs.h"
+$#include "Math/MathDefs.h"
 
 static const float M_PI;
 static const float M_HALF_PI;

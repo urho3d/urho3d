@@ -1,4 +1,4 @@
-$#include "../UI/Sprite.h"
+$#include "UI/Sprite.h"
 
 enum BlendMode{};
 

@@ -1,4 +1,4 @@
-$#include "../LuaScript/LuaScriptInstance.h"
+$#include "LuaScript/LuaScriptInstance.h"
 
 class LuaScriptInstance : public Component
 {
