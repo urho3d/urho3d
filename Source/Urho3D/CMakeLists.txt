@@ -30,7 +30,7 @@ endif ()
 # Define generated source files
 add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrho3DRevision.cmake
-    DEPENDS ${STATIC_LIBRARY_TARGETS} ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake
+    DEPENDS ${STATIC_LIBRARY_TARGETS} rapidjson ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
 
@@ -129,15 +129,10 @@ list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${ALL_OBJ_FILES})
 set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 
 # Define dependency libs
-if (MSVC)
-    # MSVC compiler does not handle quoted include pathspec with relative path the same way as GCC and Clang
-    # Following header search path must be added in order to make MSVC resolves "../" back to ${CMAKE_CURRENT_SOURCE_DIR}
-    set (MSVC_WORKAROUND MSVC-WORKAROUND)
-endif ()
 # Add include directories to find the precompiled header, export header, and installed headers from thirdparty libs
 # Hack: the ${CMAKE_CURRENT_SOURCE_DIR}/generated is added so that "../Urho3D.h" include path could be resolved back to CMAKE_CURRENT_BINARY_DIR where this generated header is located
 #       the "../Urho3D.h" relative path is preferred over "Urho3D.h" because we want to avoid adding "include/Urho3D" into the search path when *using* the library
-set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR} ${MSVC_WORKAROUND} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/generated ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
+set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/generated ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 if (URHO3D_PHYSICS)
     # Bullet library depends on its own include dir to be added in the header search path
     # This is more practical than patching its header files in many places to make them work with relative path
@@ -170,7 +165,7 @@ if (NOT ANDROID)
 endif ()
 install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
 if (NOT GIT_EXIT_CODE EQUAL 0)
-    add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
+    add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS} rapidjson)
 endif ()
 
 # Setup dependency frameworks and libraries
