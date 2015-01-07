@@ -234,7 +234,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         if (!success)
         {
-            LOGERRORF("Failed to add resource path %s", resourcePaths[i].CString());
+            LOGERRORF("Failed to add resource path '%s', check the documentation on how to set the 'resource prefix path'", resourcePaths[i].CString());
             return false;
         }
     }
@@ -247,12 +247,12 @@ bool Engine::Initialize(const VariantMap& parameters)
         {
             if (!cache->AddPackageFile(packageName))
             {
-                LOGERRORF("Failed to add resource package %s", resourcePackages[i].CString());
+                LOGERRORF("Failed to add resource package '%s', check the documentation on how to set the 'resource prefix path'", resourcePackages[i].CString());
                 return false;
             }
         }
         else
-            LOGDEBUGF("Skip specified resource package %s as it does not exist", resourcePackages[i].CString());
+            LOGDEBUGF("Skip specified resource package '%s' as it does not exist, check the documentation on how to set the 'resource prefix path'", resourcePackages[i].CString());
     }
     
     // Add auto load folders. Prioritize these (if exist) before the default folders
@@ -276,7 +276,7 @@ bool Engine::Initialize(const VariantMap& parameters)
                 String autoResourceDir = autoLoadPath + "/" + dir;
                 if (!cache->AddResourceDir(autoResourceDir, 0))
                 {
-                    LOGERRORF("Failed to add resource directory %s in autoload path %s", dir.CString(), autoLoadPaths[i].CString());
+                    LOGERRORF("Failed to add resource directory '%s' in autoload path %s, check the documentation on how to set the 'resource prefix path'", dir.CString(), autoLoadPaths[i].CString());
                     return false;
                 }
             }
@@ -293,13 +293,13 @@ bool Engine::Initialize(const VariantMap& parameters)
                 String autoPackageName = autoLoadPath + "/" + pak;
                 if (!cache->AddPackageFile(autoPackageName, 0))
                 {
-                    LOGERRORF("Failed to add package file %s in autoload path %s", pak.CString(), autoLoadPaths[i].CString());
+                    LOGERRORF("Failed to add package file '%s' in autoload path %s, check the documentation on how to set the 'resource prefix path'", pak.CString(), autoLoadPaths[i].CString());
                     return false;
                 }
             }
         }
         else
-            LOGDEBUGF("Skipped autoload path %s as it does not exist", autoLoadPaths[i].CString());
+            LOGDEBUGF("Skipped autoload path '%s' as it does not exist, check the documentation on how to set the 'resource prefix path'", autoLoadPaths[i].CString());
     }
 
     // Initialize graphics & audio output

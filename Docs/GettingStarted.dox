@@ -39,7 +39,7 @@ As this is a cross-platform project, we have provided a number of build scripts 
 The basic usage as follows:
 
 \verbatim
-Usage: <script-name> /path/to/build-tree [build-option] [build-option] ...
+<script-name> /path/to/build-tree [build-options]
 \endverbatim
 
 Where the <script-name> is one of the provided build script. The /path/to/build-tree is where CMake will be generating the build tree for the project. Both out-of-source build tree and non out-of-source build tree path are now supported. The build options are described in detail in the \ref Build_Options "next section" below.
@@ -47,7 +47,7 @@ Where the <script-name> is one of the provided build script. The /path/to/build-
 After the build tree has been generated, you can use the build script again to reconfigure it by passing different build options. You can do so as the basic usage above; or by first change the working directory to the already generated build tree and use the following syntax:
 
 \verbatim
-Usage: <script-name> [build-option] [build-option] ...
+<script-name> [build-options]
 \endverbatim
 
 Naturally you have to specify a fully qualified path to the build script for this to work. Alternatively, you can add the path to the Urho3D project root to the PATH environment variable in order to make the build scripts available everywhere.
@@ -127,7 +127,7 @@ If using MinGW to compile, DirectX headers may need to be acquired separately. T
 After the build is complete, the programs can be run from the Bin subdirectory in the build tree. These include the Urho3D player application, which can run application scripts, the tools, and C++ sample applications if they have been enabled. Unless your build tree location is also the same as the Urho3D project source tree, in order to run the Urho3D executables successfully, you must do one of the following first:
 - Copy both the Bin/Data and Bin/CoreData directories in the source tree to the Bin subdirectory in the build tree.
 - Instead of copying, just create symbolic links in the build tree pointing to the above two directories.
-- Or even better, set and export URHO3D_PREFIX_PATH variable in your host environment. The prefix variable must be set to an absolute path which contains the Data and CoreData subdirectories.      
+- Or even better, use the 'resource prefix path' \ref Running_Commandline engine parameter by setting URHO3D_PREFIX_PATH variable in your host environment. The prefix variable must be set to an absolute path which contains the Data and CoreData subdirectories.      
 
 To run the Urho3D player application from the Visual Studio debugger, set the Urho3DPlayer project as the startup project and enter its relative path and filename into Properties -> Debugging -> Command: ../../../Bin/Urho3DPlayer.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will likely be hidden. To actually make the Urho3DPlayer application do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments:
 
@@ -369,9 +369,9 @@ F2          Toggle debug HUD
 
 \page UsingLibrary Using Urho3D as external library
 
-This page shows how to create a new C++ project linking against Urho3D library as external library. There are two approaches to do this. The first approach uses Urho3D library directly from the Urho3D project build tree. The second approach uses Urho3D SDK installation. It is imperative to clean the CMake cache when changing from one approach to the other. In fact, you also need to clean the cache when you change the path in the URHO3D_HOME environment variable.
+This page shows how to create a new C++ project linking against Urho3D library as external library. There are two approaches to do this. The first approach uses Urho3D library directly from the Urho3D project build tree. The second approach uses Urho3D SDK installation. It is imperative to clean the CMake cache when changing from one approach to the other. You should also clean the cache when you change the path in the URHO3D_HOME environment variable.
 
-First of all, structure your project similar to Urho3D project as below, although this is not mandatory:
+First of all, structure your project similar to Urho3D project as below. Although this is not mandatory, it should increase the chance the CMake modules designed for Urho3D project work out of the box for your project too.
 
 \code
 PROJECT_ROOT/
@@ -389,9 +389,9 @@ PROJECT_ROOT/
  └ *.bat or *.sh
 \endcode
 
-The physical project root directory is also the logical project source tree in CMake terminology where your project main CMakeLists.txt should reside. The Bin directory should contain the Data and CoreData resource subdirs. Unless you intend to configure to use your project root directory as your project build tree as well, all the executables will not be actually generated in this Bin directory. The executables will always be generated in the Bin directory of the project build tree (which is now fully user defined). Therefore, in order to run the executable in the build tree's Bin directory, you need to copy (or symlink) the resource directories (Data and CoreData) from your source tree to your build tree. Alternatively, you can use URHO3D_PREFIX_PATH environment variable to point to a prefix path containing the resource dirs. Urho3D engine automatically uses this prefix path when obtaining resources. By default the engine uses the program executable path.
+The physical project root directory is also the logical project source tree in CMake terminology where your project main CMakeLists.txt should reside. The Bin directory should contain the Data and CoreData resource subdirs. Unless you intend to configure to use your project root directory as your project build tree as well, all the executables will not be actually generated in this Bin directory. The executables will always be generated in the Bin directory of the project build tree (which is now fully user defined). Therefore, in order to run the executable in the build tree's Bin directory, you need to copy (or symlink) the resource directories (Data and CoreData) from your source tree to your build tree. Alternatively, you can use URHO3D_PREFIX_PATH environment variable to point to a prefix path containing the resource dirs. Urho3D engine uses the specified prefix path if this environment variable is defined when trying to obtain resources. By default the engine uses the program executable path instead.
 
-You may also want to copy (or symlink) the batch files or shell script files from Urho3D project root directory (or from Urho3D SDK installation) to your project root directory. The build scripts work together with the Urho3D CMake module to configure and generate your initial project build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are now supported. Note that when you invoke one the build scripts for your project, you can also pass most of the \ref Build_Options "build options" supported by Urho3D project. In fact, you probably have to pass the similar build options that you use when building the Urho3D library to avoid any conflict.
+You may also want to copy (or symlink) the build scripts from Urho3D project root directory (or from Urho3D SDK installation) to your project root directory. Alternatively, you can add the project root directory into the PATH environment variable in your host system in order to make the build scripts available everwhere. The build scripts work together with the Urho3D CMake modules to configure and generate your initial project build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are supported. Note that when you configure your project (either via one of the build script or via cmake-gui), you can also pass most of the \ref Build_Options "build options" supported by Urho3D project. In fact, you probably have to pass a compatible build options with the Urho3D library that you intend to use to avoid any conflict.
 
 In your own project root directory, create a main CMakeLists.txt file and add the following lines: (replace MyProjectName and MyExecutableName with the actual names you want)
 
@@ -438,9 +438,9 @@ setup_main_executable ()
 
 The CMAKE_MODULE_PATH is setup so that CMake can find the Urho3D-specific CMake modules provided by Urho3D project inside your own project. The Urho3D-CMake-common.cmake is the module where all the reusable commands and macros are defined. It also gives your project cross-platform build capability similar to Urho3D project.
 
-When both Urho3D static and shared library are built and available in the Urho3D project's library output directory in its build tree, the FindUrho3D.cmake module has precedence to first select static library type over over shared library type. However, you can use URHO3D_LIB_TYPE build option to explicitly specify which Urho3D library type to be selected. When linking statically against Urho3D static library, Urho3D-CMake-common.cmake module automatically set "URHO3D_STATIC_DEFINE" compiler define for your project. This compiler define is crucial for static linking, especially on MSVC.
+When both Urho3D static and shared library are built and available in the Urho3D project's library output directory in its build tree, the FindUrho3D.cmake module has precedence to first select static library type over over shared library type. However, you can use URHO3D_LIB_TYPE build option to explicitly specify which Urho3D library type to be selected. When linking statically against Urho3D static library, Urho3D-CMake-common.cmake module automatically set "URHO3D_STATIC_DEFINE" compiler define for your project. This compiler define is crucial for static linking, especially on MSVC. If you do not use our CMake modules to configure your project then you have to ensure you manually set this compiler define in your project.
 
-As described earlier there are two approaches on how to find the Urho3D library. The FindUrho3D.cmake module is designed not only able to find Urho3D library from the Urho3D SDK installation, but also from any Urho3D project build tree directly. When searching in Urho3D SDK installed in a system-wide default location then no additional variable need to be set. When searching in a non-default SDK installation or when searching in any Urho3D project build tree then the actual location need to be provided via URHO3D_HOME environment variable (set in the host system) or URHO3D_HOME build option (set using -D at command line).
+As described earlier there are two approaches on how to find the Urho3D library. The FindUrho3D.cmake module is designed not only able to find Urho3D library from the Urho3D SDK installation, but also from any Urho3D project build tree directly. When searching in Urho3D SDK installed in a system-wide default location then no additional variable need to be set. When searching in a non-default SDK installation or when searching in any Urho3D project build tree then the actual location need to be provided via URHO3D_HOME environment variable (set in the host system) or URHO3D_HOME build option (set using -D at command line or in cmake-gui).
 
 The define_source_files() and setup_main_executable() are Urho3D-specific macros. The define_source_file() macro is a shorthand to glob all the source files in the current directory. It is equivalent to these commands:
 
@@ -487,7 +487,7 @@ $CC -o Urho3DPlayer_d.exe Urho3DPlayer.cpp `pkg-config --variable CFLAGS_DEBUG U
 
 With [Rake](https://rubygems.org/gems/rake) ruby gem installed, you can quickly setup all the above by simply using the 'scaffolding' rake task.
 \verbatim
-Usage: rake scaffolding dir=/path/to/new/project/root [project=Scaffolding] [target=Main]
+rake scaffolding dir=/path/to/new/project/root [project=Scaffolding] [target=Main]
 \endverbatim
 
 As its name implies, this task just creates a basic project structure for your new project. You may also pass optional "project" and "target" parameters besides the "dir" parameter. Otherwise, you will get the default project name (Scaffolding) and target name (Main) in the main CMakeLists.txt. This task copies the Urho3DPlayer.cpp and Urho3DPlayer.h as placeholders for the source files. Normally, you should replace these two files with your own project source files before invoking one of the build scripts.
