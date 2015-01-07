@@ -27,7 +27,7 @@ set (TARGET_NAME Civetweb)
 define_source_files (GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS include/*.h)
 
 # Define include directory
-set (INCLUDE_DIRS_ONLY include)
+set (INCLUDE_DIRS include)
 
 # Setup target
 setup_library ()

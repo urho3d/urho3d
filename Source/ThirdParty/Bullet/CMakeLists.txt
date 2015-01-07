@@ -41,7 +41,7 @@ file (GLOB H_FILES *.h src/BulletCollision/BroadphaseCollision/*.h
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY src)
+set (INCLUDE_DIRS src)
 
 # Setup target
 setup_library ()

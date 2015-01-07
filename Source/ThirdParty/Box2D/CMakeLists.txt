@@ -180,7 +180,7 @@ source_group(Include FILES ${BOX2D_General_HDRS})
 source_group(Rope FILES ${BOX2D_Rope_SRCS} ${BOX2D_Rope_HDRS})
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY .)
+set (INCLUDE_DIRS .)
 
 # Setup target
 setup_library ()

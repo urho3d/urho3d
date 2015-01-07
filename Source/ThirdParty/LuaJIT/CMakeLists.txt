@@ -395,7 +395,7 @@ endif ()
 set (SOURCE_FILES ${LJCORE_C} ${GEN_SRCS})
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR}/generated)
+set (INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
 # Setup target
 setup_library ()
@@ -412,9 +412,9 @@ if (NOT IOS)
     set (SOURCE_FILES src/luajit.c)
 
     # Define dependency libs
-    set (LINK_LIBS_ONLY LuaJIT)
+    set (LIBS LuaJIT)
     if (NOT MSVC)
-        set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} m)
+        set (LIBS ${LIBS} m)
     endif ()
 
     # Setup target

@@ -27,7 +27,7 @@ set (TARGET_NAME RampGenerator)
 define_source_files ()
 
 # Define dependency libs
-set (LIBS ../../ThirdParty/STB)
+set (LIBS STB)
 
 # Setup target
 setup_executable ()

@@ -114,7 +114,7 @@ set_source_files_properties (${SYS_C_FILES} PROPERTIES LANGUAGE C)
 set (SOURCE_FILES ${C_FILES} ${SYS_C_FILES} ${H_FILES})
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY include)
+set (INCLUDE_DIRS include)
 
 # Setup target
 setup_library ()

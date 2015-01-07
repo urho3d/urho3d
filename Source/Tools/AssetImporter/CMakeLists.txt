@@ -28,7 +28,8 @@ define_source_files ()
 
 # Define dependency libs
 add_subdirectory (../../ThirdParty/Assimp ../../ThirdParty/Assimp)
-set (LIBS ../../ThirdParty/Assimp/include)
+set (LIBS Assimp)
+set (INCLUDE_DIRS ../../ThirdParty/Assimp/include)
 
 # Setup target
 if (APPLE)

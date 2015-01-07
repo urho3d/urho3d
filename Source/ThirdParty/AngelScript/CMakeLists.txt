@@ -52,7 +52,7 @@ endif ()
 set (SOURCE_FILES ${CPP_FILES} ${ASM_FILES} ${H_FILES})
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY include)
+set (INCLUDE_DIRS include)
 
 # Setup target
 setup_library ()

@@ -41,9 +41,9 @@ if (NOT IOS)
     set (SOURCE_FILES src/lua.c)
 
     # Define dependency libs
-    set (LINK_LIBS_ONLY Lua)
+    set (LIBS Lua)
     if (NOT MSVC)
-        list (APPEND LINK_LIBS_ONLY m)
+        list (APPEND LIBS m)
     endif ()
 
     # Setup target

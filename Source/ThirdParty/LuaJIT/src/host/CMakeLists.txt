@@ -84,7 +84,7 @@ file (GLOB C_FILES buildvm*.c)
 set (SOURCE_FILES ${C_FILES} ${GEN_ARCH_H})
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR} ..)
+set (INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR} ..)
 
 # All tools must be natively built and output to Bin/tool subdir to differentiate them from platform-specific binaries in the Bin directory
 set_output_directories (${CMAKE_BINARY_DIR}/Bin/tool RUNTIME PDB)

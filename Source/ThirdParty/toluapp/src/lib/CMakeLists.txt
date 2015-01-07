@@ -27,7 +27,7 @@ set (TARGET_NAME toluapp)
 define_source_files (GLOB_CPP_PATTERNS *.c)
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY ../../include ../../../Lua${JIT}/src)
+set (INCLUDE_DIRS ../../include ../../../Lua${JIT}/src)
 
 # Setup target
 setup_library ()

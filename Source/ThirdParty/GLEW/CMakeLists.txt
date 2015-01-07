@@ -27,7 +27,7 @@ set (TARGET_NAME GLEW)
 define_source_files (GLOB_CPP_PATTERNS *.c)
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY .)
+set (INCLUDE_DIRS .)
 
 # Setup target
 setup_library ()

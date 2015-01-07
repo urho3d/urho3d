@@ -27,7 +27,7 @@ set (TARGET_NAME PackageTool)
 define_source_files ()
 
 # Define dependency libs
-set (LIBS ../../ThirdParty/LZ4)
+set (LIBS LZ4)
 
 # Setup target
 if (APPLE)

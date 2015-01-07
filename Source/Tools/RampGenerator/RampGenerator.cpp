@@ -29,8 +29,8 @@
 #include <windows.h>
 #endif
 
-#include <stb_image.h>
-#include <stb_image_write.h>
+#include <STB/stb_image.h>
+#include <STB/stb_image_write.h>
 
 #include <Urho3D/DebugNew.h>
 

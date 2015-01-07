@@ -134,15 +134,15 @@ set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 # Add include directories to find the precompiled header, export header, and installed headers from thirdparty libs
 # Hack: the ${CMAKE_CURRENT_SOURCE_DIR}/generated is added so that "../Urho3D.h" include path could be resolved back to CMAKE_CURRENT_BINARY_DIR where this generated header is located
 #       the "../Urho3D.h" relative path is preferred over "Urho3D.h" because we want to avoid adding "include/Urho3D" into the search path when *using* the library
-set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/generated ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
+set (INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/generated ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 if (URHO3D_PHYSICS)
     # Bullet library depends on its own include dir to be added in the header search path
     # This is more practical than patching its header files in many places to make them work with relative path
-    list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Bullet)
+    list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Bullet)
 endif ()
 if (URHO3D_LUA)
     # ditto for Lua/LuaJIT
-    list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Lua${JIT})
+    list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Lua${JIT})
 endif ()
 
 # Setup library output path
@@ -283,11 +283,11 @@ if (MSVC)
     # todo: Add a post build command to adjust the LIB_NAME when in Debug configuration (CMake/VS generator is multi-config)
     set (DASH /)
     set (LIB_DIR "/LIBPATH:\"\${libdir}\"")
-    string (REPLACE ";" ".lib\" \"" URHO3D_LIBS "\"${LIB_NAME};${LINK_LIBS_ONLY}.lib\"")
+    string (REPLACE ";" ".lib\" \"" URHO3D_LIBS "\"${LIB_NAME};${LIBS}.lib\"")
 else ()
     set (DASH -)
     set (LIB_DIR "-L\"\${libdir}\"")
-    string (REPLACE ";" " -l" URHO3D_LIBS "-l${LIB_NAME};${LINK_LIBS_ONLY}")
+    string (REPLACE ";" " -l" URHO3D_LIBS "-l${LIB_NAME};${LIBS}")
 endif ()
 string (REPLACE ";" " ${DASH}D" URHO3D_COMPILE_DEFINITIONS ";${URHO3D_COMPILE_DEFINITIONS}")
 get_directory_property (GLOBAL_INCLUDE_DIRS DIRECTORY ${CMAKE_SOURCE_DIR} INCLUDE_DIRECTORIES)

@@ -60,7 +60,7 @@ endif ()
 set (SOURCE_FILES ${kNetSourceFiles} ${kNetHeaderFiles})
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY include)
+set (INCLUDE_DIRS include)
 
 # Setup target
 setup_library ()

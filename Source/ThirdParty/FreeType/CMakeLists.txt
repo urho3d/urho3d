@@ -74,7 +74,7 @@ set (SOURCE_FILES
     src/winfonts/winfnt.c)
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY include)
+set (INCLUDE_DIRS include)
 
 # Setup target
 setup_library ()

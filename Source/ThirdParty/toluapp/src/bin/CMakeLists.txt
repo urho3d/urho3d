@@ -61,12 +61,11 @@ file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
-set (LIBS ../../../../ThirdParty/Lua${JIT}/src)
-set (LINK_LIBS_ONLY toluapp)
+set (LIBS toluapp Lua${JIT})
 if (NOT MSVC)
-    set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} m)
+    list (APPEND LIBS m)
 endif ()
-set (INCLUDE_DIRS_ONLY ../../include)
+set (INCLUDE_DIRS ../../include ../../../../ThirdParty/Lua${JIT}/src)
 
 # All tools must be natively built and output to Bin/tool subdir to differentiate them from platform-specific binaries in the Bin directory
 set_output_directories (${CMAKE_BINARY_DIR}/Bin/tool RUNTIME PDB)

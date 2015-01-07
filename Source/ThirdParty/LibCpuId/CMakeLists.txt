@@ -38,7 +38,7 @@ define_source_files (GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS src/*.h)
 list (APPEND SOURCE_FILES ${ASM_FILES})
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY src)
+set (INCLUDE_DIRS src)
 
 # Setup target
 setup_library ()

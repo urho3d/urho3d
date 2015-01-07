@@ -28,7 +28,7 @@ set (SOURCE_FILES ../minilua.c)
 
 # Define dependency libs
 if (NOT MSVC)
-    set (LINK_LIBS_ONLY m)
+    set (LIBS m)
 endif ()
 
 # All tools must be natively built and output to Bin/tool subdir to differentiate them from platform-specific binaries in the Bin directory
