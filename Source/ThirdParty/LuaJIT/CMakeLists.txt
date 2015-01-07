@@ -414,7 +414,7 @@ if (NOT IOS)
     # Define dependency libs
     set (LIBS LuaJIT)
     if (NOT MSVC)
-        set (LIBS ${LIBS} m)
+        list (APPEND LIBS m)
     endif ()
 
     # Setup target
