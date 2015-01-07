@@ -571,7 +571,7 @@ void PhysicsWorld2D::GetRigidBodies(PODVector<RigidBody2D*>& results, const Rect
     AabbQueryCallback callback(results, collisionMask);
 
     b2AABB b2Aabb;
-	Vector2 delta(M_EPSILON, M_EPSILON);
+    Vector2 delta(M_EPSILON, M_EPSILON);
     b2Aabb.lowerBound = ToB2Vec2(aabb.min_ - delta);
     b2Aabb.upperBound = ToB2Vec2(aabb.max_ + delta);
 
