@@ -375,15 +375,12 @@ First of all, structure your project similar to Urho3D project as below. Althoug
 
 \code
 PROJECT_ROOT/
- ├ Android/
  ├ Bin/
  │  ├ Data/
  │  └ CoreData/
  ├ CMake/
  │  ├ Modules/
  │  └ Toolchains/
- ├ Docs/
- ├ Source/
  ├ CMakeListst.txt
  ├ *.cpp and *.h
  └ *.bat or *.sh
