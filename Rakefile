@@ -54,8 +54,14 @@ task :scaffolding do
   puts "to get a similar result as the last two rake tasks above.\n\n"
 end
 
-# Usage: rake cmake [fix_scm] [<generator>] [<platform>] [<option>=<value> [<option>=<value>]], e.g. rake cmake clean android; rake cmake android URHO3D_LIB_TYPE=SHARED
-desc 'Invoke cmake shell script with the build tree location predetermined based on the target platform'
+# Usage: rake cmake [fix_scm] [<generator>] [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree]
+# e.g.: rake cmake clean android; or rake cmake android URHO3D_LIB_TYPE=SHARED; or rake cmake ios URHO3D_LUA=1 build_tree=~/ios-Build
+#
+# To avoid repeating the customized build tree locations, you can set and export them as environment variables.
+# e.g.: export native_build_tree=~/custom-native-Build android_build_tree=~/custom-android-Build mingw_build_tree=~/custom-mingw-Build rpi_build_tree=~/custom-rpi-Build
+#       rake cmake rpi URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 && rake make rpi
+#       The RPI build tree will be generated in the ~/custom-rpi-Build and then build from there
+desc 'Invoke one of the build scripts with the build tree location predetermined based on the target platform'
 task :cmake do
   script = 'cmake_generic'
   platform = 'native'
@@ -82,8 +88,9 @@ task :cmake do
   system "./#{script}#{ENV['OS'] ? '.bat' : '.sh'} #{build_tree} #{build_options}" or abort
 end
 
-# Usage: rake make [numjobs=8] [<platform>] [<option>=<value> [<option>=<value>]], e.g. rake make android, rake make android doc
-desc 'Invoke make command in the build tree location predetermined based on the target platform'
+# Usage: rake make [numjobs=8] [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree]
+# e.g.: rake make android; or rake make android doc; or rake make ios config=Debug target=Urho3D_universal sdk=iphonesimulator build_tree=~/ios-Build
+desc 'Build the generated project in its corresponding build tree'
 task :make do
   numjobs = '-j' + (ENV['numjobs'] || '8')
   platform = 'native'
