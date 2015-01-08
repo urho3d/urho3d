@@ -54,10 +54,9 @@ task :scaffolding do
   puts "to get a similar result as the last two rake tasks above.\n\n"
 end
 
-# Usage: rake cmake [prefix_path=..] [fix_scm] (only intended to be used by lazy man =), e.g. rake cmake clean android; rake cmake android URHO3D_LIB_TYPE=SHARED
+# Usage: rake cmake [fix_scm] [<generator>] [<platform>] [<option>=<value> [<option>=<value>]], e.g. rake cmake clean android; rake cmake android URHO3D_LIB_TYPE=SHARED
 desc 'Invoke cmake shell script with the build tree location predetermined based on the target platform'
 task :cmake do
-  prefix_path = ENV['prefix_path'] || '..'
   script = 'cmake_generic'
   platform = 'native'
   build_options = ''
@@ -76,16 +75,16 @@ task :cmake do
     when 'fix_scm'
       build_options = "#{build_options} --fix-scm" if script == 'cmake_eclipse'
     else
-      build_options = "#{build_options} -D#{option}" unless /prefix_path=.*/ =~ option || script == 'cmake_clean'
+      build_options = "#{build_options} -D#{option}" unless /build_tree=.*/ =~ option || script == 'cmake_clean'
     end
   }
-  system "./#{script}#{ENV['OS'] ? '.bat' : '.sh'} #{prefix_path}/#{platform}-Build #{build_options}" or abort
+  build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
+  system "./#{script}#{ENV['OS'] ? '.bat' : '.sh'} #{build_tree} #{build_options}" or abort
 end
 
-# Usage: rake make [prefix_path=..] [numjobs=8] (only intended to be used by lazy man =), e.g. rake make android, rake make android doc
+# Usage: rake make [numjobs=8] [<platform>] [<option>=<value> [<option>=<value>]], e.g. rake make android, rake make android doc
 desc 'Invoke make command in the build tree location predetermined based on the target platform'
 task :make do
-  prefix_path = ENV['prefix_path'] || '..'
   numjobs = '-j' + (ENV['numjobs'] || '8')
   platform = 'native'
   cmake_build_options = ''
@@ -102,20 +101,21 @@ task :make do
     else
       if /(?:config|target)=.*/ =~ option
         cmake_build_options = "#{cmake_build_options} --#{option.gsub(/=/, ' ')}"
-      elsif /(?:prefix_path|numjobs)=.*/ !~ option
+      elsif /(?:build_tree|numjobs)=.*/ !~ option
         build_options = "#{build_options} #{/=/ =~ option ? '-' + option.gsub(/=/, ' ') : option}"
       end
     end
   }
-  if !Dir.glob("#{prefix_path}/#{platform}-Build/*.xcodeproj").empty?
+  build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
+  if !Dir.glob("#{build_tree}/*.xcodeproj").empty?
     filter = '|xcpretty'
-  elsif !Dir.glob("#{prefix_path}/#{platform}-Build/*.sln").empty?
+  elsif !Dir.glob("#{build_tree}/*.sln").empty?
     filter = ''
   else
     build_options = "#{numjobs}#{build_options}"
     filter = ''
   end
-  system "cd #{prefix_path}/#{platform}-Build && cmake --build . #{cmake_build_options} -- #{build_options} #{filter}" or abort
+  system "cd #{build_tree} && cmake --build . #{cmake_build_options} -- #{build_options} #{filter}" or abort
 end
 
 # Usage: rake android [parameter='--es pickedLibrary Urho3DPlayer'] [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='sleep 30'] [api=19] [abi=armeabi-v7a] [avd=test_#{api}_#{abi}] [retries=10] [retry_interval=10]
