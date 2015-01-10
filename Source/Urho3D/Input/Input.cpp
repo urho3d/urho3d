@@ -159,9 +159,8 @@ void Input::Update()
     }
 
     // Check and handle SDL events
-    SDL_PumpEvents();
     SDL_Event evt;
-    while (SDL_PeepEvents(&evt, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT) > 0)
+    while (SDL_PollEvent(&evt))
         HandleSDLEvent(&evt);
 
     if (mouseVisible_ && mouseMode_ == MM_WRAP)
