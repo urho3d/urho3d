@@ -5888,6 +5888,7 @@ Properties:
 - uint numBatches // readonly
 - uint numPrimitives // readonly
 - String orientations
+- bool readableDepthSupport // readonly
 - int refs // readonly
 - bool resizable // readonly
 - IntVector2[]@ resolutions // readonly
@@ -8288,6 +8289,7 @@ Properties:
 - float clearDepth
 - uint clearFlags
 - uint clearStencil
+- String depthStencilName
 - bool enabled
 - bool markToStencil
 - String metadata
@@ -12959,6 +12961,7 @@ Properties:
 - uint GetRGFloat16Format()
 - uint GetRGFloat32Format()
 - uint GetRandomSeed()
+- uint GetReadableDepthFormat()
 - String GetTextureUnitName(TextureUnit)
 - bool IsAbsolutePath(const String&)
 - bool IsAlpha(uint)

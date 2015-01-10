@@ -4280,6 +4280,8 @@ uint numBatches;
 uint numPrimitives;
 String orientations;
 /* readonly */
+bool readableDepthSupport;
+/* readonly */
 int refs;
 /* readonly */
 bool resizable;
@@ -7023,6 +7025,7 @@ Color clearColor;
 float clearDepth;
 uint clearFlags;
 uint clearStencil;
+String depthStencilName;
 bool enabled;
 bool markToStencil;
 String metadata;
@@ -12359,6 +12362,7 @@ uint GetRGBFormat();
 uint GetRGFloat16Format();
 uint GetRGFloat32Format();
 uint GetRandomSeed();
+uint GetReadableDepthFormat();
 String GetTextureUnitName(TextureUnit);
 bool IsAbsolutePath(const String&);
 bool IsAlpha(uint);
