@@ -4184,6 +4184,7 @@ Methods:
 - void SetShaderParameter(const String name, const Variant& value)
 - unsigned GetNumRenderTargets() const
 - unsigned GetNumCommands() const
+- RenderPathCommand* GetCommand(unsigned index)
 - const Variant& GetShaderParameter(const String name) const
 
 <a name="Class_RenderPathCommand"></a>
@@ -5779,9 +5780,6 @@ Methods:
 - void SetFocusElement(UIElement* element, bool byKey = false)
 - bool SetModalElement(UIElement* modalElement, bool enable)
 - void Clear()
-- void Update(float timeStep)
-- void RenderUpdate()
-- void Render()
 - void DebugDraw(UIElement* element)
 - UIElement* LoadLayout(File* source, XMLFile* styleFile = 0)
 - UIElement* LoadLayout(const String fileName, XMLFile* styleFile = 0)
@@ -7037,6 +7035,7 @@ Properties:
 - int CMD_QUAD
 - int CMD_FORWARDLIGHTS
 - int CMD_LIGHTVOLUMES
+- int CMD_RENDERUI
 
 ### RenderSurfaceUpdateMode
 
