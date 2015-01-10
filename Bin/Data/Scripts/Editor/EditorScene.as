@@ -355,9 +355,6 @@ Node@ LoadNode(const String&in fileName, Node@ parent = null)
 
     ui.cursor.shape = CS_BUSY;
 
-    // Before instantiating, add object's resource path if necessary
-    SetResourcePath(GetPath(fileName), true, true);
-
     Ray cameraRay = camera.GetScreenRay(0.5, 0.5); // Get ray at view center
     Vector3 position, normal;
     GetSpawnPosition(cameraRay, newNodeDistance, position, normal, 0, true);
