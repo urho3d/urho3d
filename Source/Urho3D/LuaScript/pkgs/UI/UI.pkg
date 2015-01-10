@@ -6,9 +6,6 @@ class UI : public Object
     void SetFocusElement(UIElement* element, bool byKey = false);
     bool SetModalElement(UIElement* modalElement, bool enable);
     void Clear();
-    void Update(float timeStep);
-    void RenderUpdate();
-    void Render();
     void DebugDraw(UIElement* element);
     tolua_outside UIElement* UILoadLayout @ LoadLayout(File* source, XMLFile* styleFile = 0);
     tolua_outside UIElement* UILoadLayout @ LoadLayout(const String fileName, XMLFile* styleFile = 0);

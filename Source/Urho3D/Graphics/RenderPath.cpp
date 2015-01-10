@@ -41,6 +41,7 @@ static const char* commandTypeNames[] =
     "quad",
     "forwardlights",
     "lightvolumes",
+    "renderui",
     0
 };
 

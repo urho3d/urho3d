@@ -42,7 +42,8 @@ enum RenderCommandType
     CMD_SCENEPASS,
     CMD_QUAD,
     CMD_FORWARDLIGHTS,
-    CMD_LIGHTVOLUMES
+    CMD_LIGHTVOLUMES,
+    CMD_RENDERUI
 };
 
 /// Rendering path sorting modes.

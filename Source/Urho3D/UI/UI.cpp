@@ -392,6 +392,8 @@ void UI::RenderUpdate()
 
     PROFILE(GetUIBatches);
 
+    uiRendered_ = false;
+
     // If the OS cursor is visible, do not render the UI's own cursor
     bool osCursorVisible = GetSubsystem<Input>()->IsMouseVisible();
 
@@ -417,8 +419,12 @@ void UI::RenderUpdate()
     }
 }
 
-void UI::Render()
+void UI::Render(bool resetRenderTargets)
 {
+    // Perform the default render only if not rendered yet
+    if (resetRenderTargets && uiRendered_)
+        return;
+
     PROFILE(RenderUI);
 
     // If the OS cursor is visible, apply its shape now if changed
@@ -430,15 +436,17 @@ void UI::Render()
     SetVertexData(debugVertexBuffer_, debugVertexData_);
 
     // Render non-modal batches
-    Render(vertexBuffer_, batches_, 0, nonModalBatchSize_);
+    Render(resetRenderTargets, vertexBuffer_, batches_, 0, nonModalBatchSize_);
     // Render debug draw
-    Render(debugVertexBuffer_, debugDrawBatches_, 0, debugDrawBatches_.Size());
+    Render(resetRenderTargets, debugVertexBuffer_, debugDrawBatches_, 0, debugDrawBatches_.Size());
     // Render modal batches
-    Render(vertexBuffer_, batches_, nonModalBatchSize_, batches_.Size());
+    Render(resetRenderTargets, vertexBuffer_, batches_, nonModalBatchSize_, batches_.Size());
 
     // Clear the debug draw batches and data
     debugDrawBatches_.Clear();
     debugVertexData_.Clear();
+
+    uiRendered_ = true;
 }
 
 void UI::DebugDraw(UIElement* element)
@@ -729,7 +737,7 @@ void UI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
     dest->SetData(&vertexData[0]);
 }
 
-void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
+void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
 {
     // Engine does not render when window is closed or device is lost
     assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
@@ -758,7 +766,8 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     graphics_->SetDrawAntialiased(false);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
-    graphics_->ResetRenderTargets();
+    if (resetRenderTargets)
+        graphics_->ResetRenderTargets();
     graphics_->SetVertexBuffer(buffer);
 
     ShaderVariation* noTextureVS = graphics_->GetShader(VS, "Basic", "VERTEXCOLOR");
