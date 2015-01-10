@@ -281,6 +281,8 @@ public:
     bool GetDeferredSupport() const { return deferredSupport_; }
     /// Return whether shadow map depth compare is done in hardware.
     bool GetHardwareShadowSupport() const { return hardwareShadowSupport_; }
+    /// Return whether a readable hardware depth format is available.
+    bool GetReadableDepthSupport() const { return GetReadableDepthFormat() != 0; }
     /// Return whether stream offset is supported.
     bool GetStreamOffsetSupport() const { return streamOffsetSupport_; }
     /// Return whether sRGB conversion on texture sampling is supported.
@@ -421,6 +423,8 @@ public:
     static unsigned GetLinearDepthFormat();
     /// Return the API-specific hardware depth-stencil texture format.
     static unsigned GetDepthStencilFormat();
+    /// Return the API-specific readable hardware depth format, or 0 if not supported.
+    static unsigned GetReadableDepthFormat();
     /// Return the API-specific texture format from a textual description, for example "rgb".
     static unsigned GetFormat(const String& formatName);
     

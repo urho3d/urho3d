@@ -738,6 +738,11 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["RenderPath"] = "RenderPaths/Prepass.xml";
             else if (argument == "deferred")
                 ret["RenderPath"] = "RenderPaths/Deferred.xml";
+            else if (argument == "renderpath" && !value.Empty())
+            {
+                ret["RenderPath"] = "RenderPaths/" + value;
+                ++i;
+            }
             else if (argument == "noshadows")
                 ret["Shadows"] = false;
             else if (argument == "lqshadows")

@@ -283,6 +283,8 @@ private:
     RenderSurface* currentRenderTarget_;
     /// Texture containing the latest viewport texture.
     Texture2D* currentViewportTexture_;
+    /// Dummy texture for D3D9 depth only rendering.
+    Texture2D* depthOnlyDummyTexture_;
     /// Viewport rectangle.
     IntRect viewRect_;
     /// Viewport size.

@@ -943,7 +943,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
 
 Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool filtered, bool srgb, unsigned persistentKey)
 {
-    bool depthStencil = (format == Graphics::GetDepthStencilFormat());
+    bool depthStencil = (format == Graphics::GetDepthStencilFormat()) || (format == Graphics::GetReadableDepthFormat());
     if (depthStencil)
     {
         filtered = false;

@@ -50,13 +50,30 @@ class Graphics : public Object
     bool GetLightPrepassSupport() const;
     bool GetDeferredSupport() const;
     bool GetHardwareShadowSupport() const;
+    bool GetReadableDepthSupport() const;
     bool GetStreamOffsetSupport() const;
     bool GetSRGBSupport() const;
     bool GetSRGBWriteSupport() const;
     IntVector2 GetDesktopResolution() const;
-    
+
+    static unsigned GetAlphaFormat();
+    static unsigned GetLuminanceFormat();
+    static unsigned GetLuminanceAlphaFormat();
     static unsigned GetRGBFormat();
-    
+    static unsigned GetRGBAFormat();
+    static unsigned GetRGBA16Format();
+    static unsigned GetRGBAFloat16Format();
+    static unsigned GetRGBAFloat32Format();
+    static unsigned GetRG16Format();
+    static unsigned GetRGFloat16Format();
+    static unsigned GetRGFloat32Format();
+    static unsigned GetFloat16Format();
+    static unsigned GetFloat32Format();
+    static unsigned GetLinearDepthFormat();
+    static unsigned GetDepthStencilFormat();
+    static unsigned GetReadableDepthFormat();
+    static unsigned GetFormat(const String formatName);
+
     tolua_readonly tolua_property__is_set bool initialized;
     tolua_property__get_set String windowTitle;
     tolua_property__get_set IntVector2 windowPosition;
@@ -82,6 +99,7 @@ class Graphics : public Object
     tolua_readonly tolua_property__get_set bool lightPrepassSupport;
     tolua_readonly tolua_property__get_set bool deferredSupport;
     tolua_readonly tolua_property__get_set bool hardwareShadowSupport;
+    tolua_readonly tolua_property__get_set bool readableDepthSupport;
     tolua_readonly tolua_property__get_set bool streamOffsetSupport;
     tolua_readonly tolua_property__get_set bool sRGBSupport;
     tolua_readonly tolua_property__get_set bool sRGBWriteSupport;

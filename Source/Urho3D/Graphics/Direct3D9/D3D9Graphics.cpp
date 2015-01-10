@@ -242,7 +242,7 @@ static HWND GetWindowHandle(SDL_Window* window)
     return sysInfo.info.win.window;
 }
 
-static unsigned depthStencilFormat = D3DFMT_D24S8;
+static unsigned readableDepthFormat = 0;
 
 Graphics::Graphics(Context* context) :
     Object(context),
@@ -2429,7 +2429,12 @@ unsigned Graphics::GetLinearDepthFormat()
 
 unsigned Graphics::GetDepthStencilFormat()
 {
-    return depthStencilFormat;
+    return D3DFMT_D24S8;
+}
+
+unsigned Graphics::GetReadableDepthFormat()
+{
+    return readableDepthFormat;
 }
 
 unsigned Graphics::GetFormat(const String& formatName)
@@ -2466,6 +2471,8 @@ unsigned Graphics::GetFormat(const String& formatName)
         return GetLinearDepthFormat();
     if (nameLower == "d24s8")
         return GetDepthStencilFormat();
+    if (nameLower == "readabledepth" || nameLower == "hwdepth")
+        return GetReadableDepthFormat();
     
     return GetRGBFormat();
 }
@@ -2609,7 +2616,7 @@ void Graphics::CheckFeatureSupport()
     hardwareShadowSupport_ = false;
     streamOffsetSupport_ = false;
     hasSM3_ = false;
-    depthStencilFormat = D3DFMT_D24S8;
+    readableDepthFormat = 0;
     
     // Check hardware shadow map support: prefer NVIDIA style hardware depth compared shadow maps if available
     shadowMapFormat_ = D3DFMT_D16;
@@ -2648,6 +2655,11 @@ void Graphics::CheckFeatureSupport()
             impl_->adapterIdentifier_.DriverVersion.QuadPart <= 0x0007000f000a05d0ULL)
             hardwareShadowSupport_ = false;
     }
+
+    // Check for readable depth (INTZ hack)
+    D3DFORMAT intZFormat = (D3DFORMAT)MAKEFOURCC('I', 'N', 'T', 'Z');
+    if (impl_->CheckFormatSupport(intZFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE))
+        readableDepthFormat = intZFormat;
     
     // Check for dummy color rendertarget format used with hardware shadow maps
     dummyColorFormat_ = D3DFMT_A8R8G8B8;

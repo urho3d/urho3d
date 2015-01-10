@@ -1,5 +1,53 @@
 $#include "Graphics/RenderPath.h"
 
+enum RenderCommandType
+{
+    CMD_NONE = 0,
+    CMD_CLEAR,
+    CMD_SCENEPASS,
+    CMD_QUAD,
+    CMD_FORWARDLIGHTS,
+    CMD_LIGHTVOLUMES
+};
+
+struct RenderPathCommand
+{
+    RenderPathCommand();
+    
+    void Load(const XMLElement& element);
+    void SetTextureName(TextureUnit unit, const String name);
+    void SetShaderParameter(const String name, const Variant& value);
+    void RemoveShaderParameter(const String name);
+    void SetNumOutputs(unsigned num);
+    void SetOutputName(unsigned index, const String& name);
+    void SetDepthStencilName(const String name);
+
+    const String GetTextureName(TextureUnit unit) const;
+    const Variant& GetShaderParameter(const String& name) const;
+    unsigned GetNumOutputs() const;
+    const String GetOutputName(unsigned index) const;
+    const String GetDepthStencilName() const;
+
+    String tag_ @ tag;
+    RenderCommandType type_ @ type;
+    RenderCommandSortMode sortMode_ @ sortMode;
+    String pass_ @ pass;
+    String metadata_ @ metadata;
+    String vertexShaderName_ @ vertexShaderName;
+    String pixelShaderName_ @ pixelShaderName;
+    String vertexShaderDefines_ @ vertexShaderDefines;
+    String pixelShaderDefines_ @ pixelShaderDefines;
+    unsigned clearFlags_ @ clearFlags;
+    Color clearColor_ @ clearColor;
+    float clearDepth_ @ clearDepth;
+    unsigned clearStencil_ @ clearStencil;
+    bool enabled_ @ enabled;
+    bool useFogColor_ @ useFogColor;
+    bool markToStencil_ @ markToStencil;
+    bool useLitBase_ @ useLitBase;
+    bool vertexLights_ @ vertexLights;
+};
+
 class RenderPath
 {
     // SharedPtr<RenderPath> Clone();

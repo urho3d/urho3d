@@ -43,6 +43,7 @@ uniform mat4 cZone;
 uniform vec3 cAmbientColor;
 uniform vec3 cCameraPosPS;
 uniform float cDeltaTimePS;
+uniform vec4 cDepthReconstruct;
 uniform float cElapsedTimePS;
 uniform vec4 cFogParams;
 uniform vec3 cFogColor;

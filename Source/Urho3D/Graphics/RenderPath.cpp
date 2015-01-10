@@ -172,6 +172,8 @@ void RenderPathCommand::Load(const XMLElement& element)
     outputNames_.Push("viewport");
     if (element.HasAttribute("output"))
         outputNames_[0] = element.GetAttribute("output");
+    if (element.HasAttribute("depthstencil"))
+        depthStencilName_ = element.GetAttribute("depthstencil");
     // Check for defining multiple outputs
     XMLElement outputElem = element.GetChild("output");
     while (outputElem)
@@ -230,6 +232,11 @@ void RenderPathCommand::SetOutputName(unsigned index, const String& name)
         outputNames_[index] = name;
     else if (index == outputNames_.Size() && index < MAX_RENDERTARGETS)
         outputNames_.Push(name);
+}
+
+void RenderPathCommand::SetDepthStencilName(const String& name)
+{
+    depthStencilName_ = name;
 }
 
 const String& RenderPathCommand::GetTextureName(TextureUnit unit) const

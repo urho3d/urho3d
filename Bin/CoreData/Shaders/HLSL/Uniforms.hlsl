@@ -33,6 +33,7 @@ uniform float4x4 cLightMatrices[4];
 uniform float3 cAmbientColor;
 uniform float3 cCameraPosPS;
 uniform float cDeltaTimePS;
+uniform float4 cDepthReconstruct;
 uniform float cElapsedTimePS;
 uniform float4 cFogParams;
 uniform float3 cFogColor;

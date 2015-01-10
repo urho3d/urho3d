@@ -567,9 +567,9 @@ void View::Render()
     IntRect viewport = (currentRenderTarget_ == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
         rtSizeNow.y_);
     graphics_->SetViewport(viewport);
-    
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetClipPlane(false);
+    graphics_->SetColorWrite(true);
     graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
@@ -661,6 +661,10 @@ void View::SetCameraShaderParameters(Camera* camera, bool setProjection, bool ov
         depthMode.w_ = 1.0f / camera->GetFarClip();
     
     graphics_->SetShaderParameter(VSP_DEPTHMODE, depthMode);
+
+    Vector4 depthReconstruct(farClip / (farClip - nearClip), -nearClip / (farClip - nearClip), camera->IsOrthographic() ? 1.0f :
+        0.0f, camera->IsOrthographic() ? 0.0f : 1.0f);
+    graphics_->SetShaderParameter(PSP_DEPTHRECONSTRUCT, depthReconstruct);
     
     Vector3 nearVector, farVector;
     camera->GetFrustumSize(nearVector, farVector);
@@ -1570,7 +1574,9 @@ void View::ExecuteRenderPathCommands()
 void View::SetRenderTargets(RenderPathCommand& command)
 {
     unsigned index = 0;
-    
+    bool useColorWrite = true;
+    bool useCustomDepth = false;
+
     while (index < command.outputNames_.Size())
     {
         if (!command.outputNames_[index].Compare("viewport", false))
@@ -1581,7 +1587,25 @@ void View::SetRenderTargets(RenderPathCommand& command)
             if (renderTargets_.Contains(nameHash))
             {
                 Texture2D* texture = renderTargets_[nameHash];
-                graphics_->SetRenderTarget(index, texture);
+                // Check for depth only rendering (by specifying a depth texture as the sole output)
+                if (!index && command.outputNames_.Size() == 1 && texture && texture->GetFormat() == 
+                    Graphics::GetReadableDepthFormat() || texture->GetFormat() == Graphics::GetDepthStencilFormat())
+                {
+                    useColorWrite = false;
+                    useCustomDepth = true;
+                    #ifndef URHO3D_OPENGL
+                    // On D3D actual depth-only rendering is illegal, we need a color rendertarget
+                    if (!depthOnlyDummyTexture_)
+                    {
+                        depthOnlyDummyTexture_ = renderer_->GetScreenBuffer(texture->GetWidth(), texture->GetHeight(),
+                            graphics_->GetDummyColorFormat(), false, false);
+                    }
+                    #endif
+                    graphics_->SetRenderTarget(0, depthOnlyDummyTexture_); 
+                    graphics_->SetDepthStencil(texture);
+                }
+                else
+                    graphics_->SetRenderTarget(index, texture);
             }
             else
                 graphics_->SetRenderTarget(0, (RenderSurface*)0);
@@ -1596,15 +1620,26 @@ void View::SetRenderTargets(RenderPathCommand& command)
         ++index;
     }
     
+    if (command.depthStencilName_.Length())
+    {
+        Texture2D* depthTexture = renderTargets_[StringHash(command.depthStencilName_)];
+        if (depthTexture)
+        {
+            useCustomDepth = true;
+            graphics_->SetDepthStencil(depthTexture);
+        }
+    }
+
     // When rendering to the final destination rendertarget, use the actual viewport. Otherwise texture rendertargets will be
     // viewport-sized, so they should use their full size as the viewport
     IntVector2 rtSizeNow = graphics_->GetRenderTargetDimensions();
     IntRect viewport = (graphics_->GetRenderTarget(0) == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
         rtSizeNow.y_);
     
-    graphics_->SetDepthStencil(GetDepthStencil(graphics_->GetRenderTarget(0)));
+    if (!useCustomDepth)
+        graphics_->SetDepthStencil(GetDepthStencil(graphics_->GetRenderTarget(0)));
     graphics_->SetViewport(viewport);
-    graphics_->SetColorWrite(true);
+    graphics_->SetColorWrite(useColorWrite);
 }
 
 void View::SetTextures(RenderPathCommand& command)
@@ -1777,6 +1812,7 @@ void View::AllocateScreenBuffers()
 {
     bool needSubstitute = false;
     unsigned numViewportTextures = 0;
+    depthOnlyDummyTexture_ = 0;
 
     #ifdef URHO3D_OPENGL
     // Due to FBO limitations, in OpenGL deferred modes need to render to texture first and then blit to the backbuffer
@@ -1784,6 +1820,22 @@ void View::AllocateScreenBuffers()
     if ((deferred_ && !renderTarget_) || (deferredAmbient_ && renderTarget_ && renderTarget_->GetParentTexture()->GetFormat() !=
         Graphics::GetRGBAFormat()))
         needSubstitute = true;
+    // Also need substitute if rendering to backbuffer using a custom (readable) depth buffer
+    if (!renderTarget_ && !needSubstitute)
+    {
+        for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
+        {
+            const RenderPathCommand& command = renderPath_->commands_[i];
+            if (!IsNecessary(command))
+                continue;
+            if (command.depthStencilName_.Length() && command.outputNames_.Size() && !command.outputNames_[0].Compare("viewport",
+                false))
+            {
+                needSubstitute = true;
+                break;
+            }
+        }
+    }
     #endif
     // If backbuffer is antialiased when using deferred rendering, need to reserve a buffer
     if (deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1)
@@ -1794,7 +1846,7 @@ void View::AllocateScreenBuffers()
     {
         if (deferred_)
             needSubstitute = true;
-        else
+        else if (!needSubstitute)
         {
             // Check also if using MRT without deferred rendering and rendering to the viewport and another texture
             for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)

@@ -45,4 +45,9 @@ float3 DecodeNormal(float4 normalInput)
         return normalInput.rgb * 2.0 - 1.0;
     #endif
 }
+
+float ReconstructDepth(float hwDepth)
+{
+    return dot(float2(hwDepth, cDepthReconstruct.y / (hwDepth - cDepthReconstruct.x)), cDepthReconstruct.zw);
+}
 #endif

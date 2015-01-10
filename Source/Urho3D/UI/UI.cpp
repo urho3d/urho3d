@@ -751,10 +751,12 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     projection.m33_ = 1.0f;
 
     graphics_->ClearParameterSources();
+    graphics_->SetColorWrite(true);
     graphics_->SetCullMode(CULL_CCW);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
     graphics_->SetDrawAntialiased(false);
+    graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
     graphics_->ResetRenderTargets();
     graphics_->SetVertexBuffer(buffer);

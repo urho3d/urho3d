@@ -285,6 +285,7 @@ extern StringHash VSP_VERTEXLIGHTS;
 extern StringHash PSP_AMBIENTCOLOR;
 extern StringHash PSP_CAMERAPOS;
 extern StringHash PSP_DELTATIME;
+extern StringHash PSP_DEPTHRECONSTRUCT;
 extern StringHash PSP_ELAPSEDTIME;
 extern StringHash PSP_FOGCOLOR;
 extern StringHash PSP_FOGPARAMS;

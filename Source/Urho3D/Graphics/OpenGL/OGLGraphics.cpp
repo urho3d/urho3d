@@ -171,6 +171,7 @@ static const unsigned MAX_FRAMEBUFFER_AGE = 2000;
 
 #ifdef GL_ES_VERSION_2_0
 static unsigned glesDepthStencilFormat = GL_DEPTH_COMPONENT16;
+static unsigned glesReadableDepthFormat = GL_DEPTH_COMPONENT;
 #endif
 
 bool CheckExtension(String& extensions, const String& name)
@@ -2589,6 +2590,15 @@ unsigned Graphics::GetDepthStencilFormat()
     #endif
 }
 
+unsigned Graphics::GetReadableDepthFormat()
+{
+    #ifndef GL_ES_VERSION_2_0
+    return GL_DEPTH_COMPONENT24;
+    #else
+    return glesReadableDepthFormat;
+    #endif
+}
+
 unsigned Graphics::GetFormat(const String& formatName)
 {
     String nameLower = formatName.ToLower().Trimmed();
@@ -2623,6 +2633,8 @@ unsigned Graphics::GetFormat(const String& formatName)
         return GetLinearDepthFormat();
     if (nameLower == "d24s8")
         return GetDepthStencilFormat();
+    if (nameLower == "readabledepth" || nameLower == "hwdepth")
+        return GetReadableDepthFormat();
     
     return GetRGBFormat();
 }
@@ -2676,6 +2688,7 @@ void Graphics::CheckFeatureSupport(String& extensions)
     {
         shadowMapFormat_ = 0;
         hiresShadowMapFormat_ = 0;
+        glesReadableDepthFormat = 0;
     }
     else
     {

@@ -54,6 +54,7 @@ StringHash VSP_VERTEXLIGHTS("VertexLights");
 StringHash PSP_AMBIENTCOLOR("AmbientColor");
 StringHash PSP_CAMERAPOS("CameraPosPS");
 StringHash PSP_DELTATIME("DeltaTimePS");
+StringHash PSP_DEPTHRECONSTRUCT("DepthReconstruct");
 StringHash PSP_ELAPSEDTIME("ElapsedTimePS");
 StringHash PSP_FOGCOLOR("FogColor");
 StringHash PSP_FOGPARAMS("FogParams");

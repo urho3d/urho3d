@@ -108,6 +108,7 @@ void Urho3DPlayer::Setup()
             "-portrait    Use portrait orientations (iOS only)\n"
             "-prepass     Use light pre-pass rendering\n"
             "-deferred    Use deferred rendering\n"
+            "-renderpath <name> Use the named renderpath from the RenderPaths resource directory\n"
             "-lqshadows   Use low-quality (1-sample) shadow filtering\n"
             "-noshadows   Disable shadow rendering\n"
             "-nolimit     Disable frame limiter\n"
