@@ -76,6 +76,7 @@ class RenderPath
 
     unsigned GetNumRenderTargets() const;
     unsigned GetNumCommands() const;
+    RenderPathCommand* GetCommand(unsigned index); 
     const Variant& GetShaderParameter(const String name) const;
 };
 
