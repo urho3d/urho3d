@@ -116,6 +116,8 @@ void SetResourcePath(String newPath, bool usePreferredDir = true, bool additive 
 {
     if (newPath.empty)
         return;
+    if (!IsAbsolutePath(newPath))
+        newPath = fileSystem.currentDir + newPath;
 
     if (usePreferredDir)
         newPath = AddTrailingSlash(cache.GetPreferredResourceDir(newPath));
@@ -137,6 +139,17 @@ void SetResourcePath(String newPath, bool usePreferredDir = true, bool additive 
 
         if (!sceneResourcePath.empty && !isDefaultResourcePath)
             cache.RemoveResourceDir(sceneResourcePath);
+    }
+    else
+    {
+        // If additive (path of a loaded prefab) check that the new path isn't already part of an old path
+        Array<String>@ resourceDirs = cache.resourceDirs;
+
+        for (uint i = 0; i < resourceDirs.length; ++i)
+        {
+            if (newPath.StartsWith(resourceDirs[i], false))
+                return;
+        }
     }
 
     // Add resource path as first priority so that it takes precedence over the default data paths
