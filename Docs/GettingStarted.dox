@@ -280,6 +280,7 @@ The engine can be configured using the following command line options.
 -portrait    Use portrait orientations (iOS only)
 -prepass     Use light pre-pass rendering
 -deferred    Use deferred rendering
+-renderpath <name> Use the named renderpath (must enter full resource name)
 -lqshadows   Use low-quality (1-sample) shadow filtering
 -noshadows   Disable shadow rendering
 -nolimit     Disable frame limiter

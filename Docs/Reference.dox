@@ -1077,6 +1077,7 @@ Vertex shader uniforms:
 - float cNearClip: camera's near clip distance
 - float cFarClip: camera's far clip distance
 - float cDeltaTime: the timestep of the current frame
+- float4 cDepthMode: parameters for calculating a linear depth value between 0-1 to pass to the pixel shader in an interpolator.
 - float cElapsedTime: scene's elapsed time value. Can be used to implement animating materials
 - float4x3 cModel: the world transform matrix of the object being rendered
 - float4x4 cViewProj: the camera's concatenated view and projection matrices
@@ -1086,6 +1087,7 @@ Pixel shader uniforms:
 
 - float3 cAmbientColor: ambient color for a zone with no ambient gradient
 - float3 cCameraPosPS: camera's world position
+- float4 cDepthReconstruct: parameters for reconstructing a linear depth value between 0-1 from a nonlinear hardware depth texture sample.
 - float cDeltaTimePS: the timestep of the current frame
 - float cElapsedTimePS: scene's elapsed time value
 - float3 cFogColor: the zone's fog color
@@ -1151,7 +1153,7 @@ Note that the used shader variations will vary with graphics settings, for examp
 
 The render path consists of rendertarget definitions and commands. The commands are executed in order to yield the rendering result. Each command outputs either to the destination rendertarget & viewport (default if output definition is omitted), or one of the named rendertargets. MRT output is also possible.
 
-A rendertarget's size can be either absolute or multiply or divide the destination viewport size. The multiplier or divisor does not need to be an integer number. Furthermore, a rendertarget can be declared "persistent" so that it will not be mixed with other rendertargets of the same size and format, and its contents can be assumed to be available also on subsequent frames. For examples of rendertarget definitions, see the postprocess renderpath definitions in the Bin/Data/PostProcess directory.
+A rendertarget's size can be either absolute or multiply or divide the destination viewport size. The multiplier or divisor does not need to be an integer number. Furthermore, a rendertarget can be declared "persistent" so that it will not be mixed with other rendertargets of the same size and format, and its contents can be assumed to be available also on subsequent frames.
 
 The available commands are:
 
@@ -1170,26 +1172,61 @@ The render path XML definition looks like this:
 \code
 <renderpath>
     <rendertarget name="RTName" tag="TagName" enabled="true|false" size="x y"|sizedivisor="x y"|sizemultiplier="x y"
-        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth" filter="true|false" srgb="true|false" persistent="true|false" />
-    <command type="clear" tag="TagName" enabled="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" />
-    <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" >
+        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth|readabledepth" filter="true|false" srgb="true|false" persistent="true|false" />
+    <command type="clear" tag="TagName" enabled="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" depthstencil="DSName" />
+    <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" depthstencil="DSName">
         <output index="0" name="RTName1" />
         <output index="1" name="RTName2" />
         <output index="2" name="RTName3" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
     </command>
-    <command type="quad" vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" output="viewport|RTName" />
+    <command type="quad" vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" output="viewport|RTName" depthstencil="DSName" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
         <parameter name="ParameterName" value="x y z w" />
     </command>
-    <command type="forwardlights" pass="PassName" uselitbase="true|false" output="viewport|RTName" />
-    <command type="lightvolumes"  vs="VertexShaderName" ps="PixelShaderName" output="viewport|RTName" />
+    <command type="forwardlights" pass="PassName" uselitbase="true|false" output="viewport|RTName" depthstencil="DSName" />
+    <command type="lightvolumes"  vs="VertexShaderName" ps="PixelShaderName" output="viewport|RTName" depthstencil="DSName" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
     </command>
 </renderpath>
 \endcode
 
-Note the special "lineardepth" format available for rendertargets. This is intended for storing scene depth in deferred rendering. It will be D3DFMT_R32F on Direct3D9, but RGBA on OpenGL, due to the limitation of all color buffers having to be the same format. The shader include file Samplers.glsl in Bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB.
+For examples of renderpath definitions, see the default forward, deferred and light pre-pass renderpaths in the Bin/CoreData/RenderPaths directory, and the postprocess renderpath definitions in the Bin/Data/PostProcess directory.
+
+\section RenderPaths_Depth Depth-stencil handling and reading scene depth
+
+Normally needed depth-stencil surfaces are automatically allocated when the render path is executed.
+
+The special "lineardepth" (synonym "depth") format is intended for storing scene depth in deferred rendering. It is not an actual hardware depth-stencil texture, but will be D3DFMT_R32F on Direct3D9 and RGBA on OpenGL, due to the limitation of all color buffers having to be the same format. The shader include file Samplers.glsl in Bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB. Writing depth manually to a rendertarget, while using a non-readable depth-stencil surface ensures best compatibility and prevents any conflicts from using both depth test and manual depth sampling at the same time.
+
+There is also a possibility to define a readable hardware depth texture, and instruct the render path to use it instead. Availability for this must first be checked with the function \ref Graphics::GetReadableDepthSupport "GetReadableDepthSupport()". On Direct3D9 this will use the INTZ "hack" format. To define a readable depth-stencil texture, use the format "readabledepth" (synonym "hwdepth") and set it as the depth-stencil by using the "depthstencil" attribute in render path commands. Note that you must set it in every command where you want to use it, otherwise an automatically allocated depth-stencil will be used. Note also that the existence of a stencil channel is not guaranteed, so stencil masking optimizations for lights normally used by the Renderer & View classes will be disabled.
+
+In the special case of a depth-only rendering pass you can set the readable depth texture directly as the "output" and don't need to specify the "depthstencil" attribute at all.
+
+After the readable depth texture has been filled, it can be bound to a texture unit in any subsequent commands. Pixel shaders should use the ReconstructDepth() helper function to reconstruct a linear depth value between 0-1 from the nonlinear hardware depth value. When the readable depth texture is bound for sampling, depth write is automatically disabled, as both modifying and sampling the depth would be undefined.
+
+An example render path for readable hardware depth exists in Bin/CoreData/RenderPaths/ForwardHWDepth.xml:
+
+\code
+<renderpath>
+    <rendertarget name="depth" sizedivisor="1 1" format="readabledepth" />
+    <command type="clear" depth="1.0" output="depth" />
+    <command type="scenepass" pass="depth" output="depth" />
+    <command type="clear" color="fog" depthstencil="depth" />
+    <command type="scenepass" pass="base" vertexlights="true" metadata="base" depthstencil="depth" />
+    <command type="forwardlights" pass="light" depthstencil="depth" />
+    <command type="scenepass" pass="postopaque" depthstencil="depth" />
+    <command type="scenepass" pass="refract" depthstencil="depth">
+        <texture unit="environment" name="viewport" />
+    </command>
+    <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" depthstencil="depth"  />
+    <command type="scenepass" pass="postalpha" sort="backtofront" depthstencil="depth" />
+</renderpath>
+\endcode
+
+The render path starts by allocating a readable depth-stencil texture the same size as the destination viewport, clearing its depth, then rendering a depth-only pass to it. Next the destination color rendertarget is cleared normally, while the readable depth texture is used as the depth-stencil for that and all subsequent commands. Any command after the depth render pass could now bind the depth texture to an unit for sampling, for example for smooth particle or SSAO effects.
+
+The ForwardDepth.xml render path does the same, but using a linear depth rendertarget instead of a hardware depth texture. The advantage is better compatibility (guaranteed to work without checking \ref Graphics::GetReadableDepthSupport "GetReadableDepthSupport()") but it has worse performance as it will fill the hardware depth-stencil twice.
 
 \section RenderPaths_ForwardLighting Forward lighting special considerations
 

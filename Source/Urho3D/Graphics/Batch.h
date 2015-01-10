@@ -72,9 +72,9 @@ struct Batch
     /// Calculate state sorting key, which consists of base pass flag, light, pass and geometry.
     void CalculateSortKey();
     /// Prepare for rendering.
-    void Prepare(View* view, bool setModelTransform = true) const;
+    void Prepare(View* view, bool setModelTransform, bool allowDepthWrite) const;
     /// Prepare and draw.
-    void Draw(View* view) const;
+    void Draw(View* view, bool allowDepthWrite) const;
     
     /// State sorting key.
     unsigned long long sortKey_;
@@ -168,7 +168,7 @@ struct BatchGroup : public Batch
     /// Pre-set the instance transforms. Buffer must be big enough to hold all transforms.
     void SetTransforms(void* lockedData, unsigned& freeIndex);
     /// Prepare and draw.
-    void Draw(View* view) const;
+    void Draw(View* view, bool allowDepthWrite) const;
     
     /// Instance data.
     PODVector<InstanceData> instances_;
@@ -229,7 +229,7 @@ public:
     /// Pre-set instance transforms of all groups. The vertex buffer must be big enough to hold all transforms.
     void SetTransforms(void* lockedData, unsigned& freeIndex);
     /// Draw.
-    void Draw(View* view, bool markToStencil = false, bool usingLightOptimization = false) const;
+    void Draw(View* view, bool markToStencil, bool usingLightOptimization, bool allowDepthWrite) const;
     /// Return the combined amount of instances.
     unsigned GetNumInstances() const;
     /// Return whether the batch group is empty.

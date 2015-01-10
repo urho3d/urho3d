@@ -170,8 +170,8 @@ private:
     void ExecuteRenderPathCommands();
     /// Set rendertargets for current render command.
     void SetRenderTargets(RenderPathCommand& command);
-    /// Set textures for current render command.
-    void SetTextures(RenderPathCommand& command);
+    /// Set textures for current render command. Return whether depth write is allowed (depth-stencil not bound as a texture.)
+    bool SetTextures(RenderPathCommand& command);
     /// Perform a quad rendering command.
     void RenderQuad(RenderPathCommand& command);
     /// Check if a command is enabled and has content to render. To be called only after render update has completed for the frame.
@@ -317,6 +317,8 @@ private:
     bool useLitBase_;
     /// Has scene passes flag. If no scene passes, view can be defined without a valid scene or camera to only perform quad rendering.
     bool hasScenePasses_;
+    /// Whether is using a custom readable depth texture.
+    bool usingCustomDepth_;
     /// Draw debug geometry flag. Copied from the viewport.
     bool drawDebug_;
     /// Renderpath.

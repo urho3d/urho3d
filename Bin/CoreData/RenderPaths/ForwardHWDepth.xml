@@ -1,5 +1,5 @@
 <renderpath>
-    <rendertarget name="depth" sizedivisor="1 1" format="hwdepth" />
+    <rendertarget name="depth" sizedivisor="1 1" format="readabledepth" />
     <command type="clear" depth="1.0" output="depth" />
     <command type="scenepass" pass="depth" output="depth" />
     <command type="clear" color="fog" depthstencil="depth" />
@@ -11,7 +11,4 @@
     </command>
     <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" depthstencil="depth"  />
     <command type="scenepass" pass="postalpha" sort="backtofront" depthstencil="depth" />
-    <command type="quad" vs="GreyScaleDepth" ps="GreyScaleDepth">
-        <texture unit="depth" name="depth" />
-    </command>
 </renderpath>
