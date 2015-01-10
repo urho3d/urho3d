@@ -409,29 +409,6 @@ int Light::GetNumShadowSplits() const
     return ret;
 }
 
-Matrix3x4 Light::GetDirLightTransform(Camera* camera, bool getNearQuad)
-{
-    if (!camera)
-        return Matrix3x4::IDENTITY;
-
-    Vector3 nearVector, farVector;
-    camera->GetFrustumSize(nearVector, farVector);
-    float nearClip = camera->GetNearClip();
-    float farClip = camera->GetFarClip();
-
-    float distance = getNearQuad ? nearClip : farClip;
-    if (!camera->IsOrthographic())
-        farVector *= (distance / farClip);
-    else
-        farVector.z_ *= (distance / farClip);
-
-    // Set an epsilon from clip planes due to possible inaccuracy
-    /// \todo Rather set an identity projection matrix
-    farVector.z_ = Clamp(farVector.z_, (1.0f + M_LARGE_EPSILON) * nearClip, (1.0f - M_LARGE_EPSILON) * farClip);
-
-    return  Matrix3x4(Vector3(0.0f, 0.0f, farVector.z_), Quaternion::IDENTITY, Vector3(farVector.x_, farVector.y_, 1.0f));
-}
-
 const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
 {
     if (!node_)
@@ -440,8 +417,16 @@ const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
     switch (lightType_)
     {
     case LIGHT_DIRECTIONAL:
-        volumeTransform_ = GetDirLightTransform(camera);
-        break;
+        {
+            Matrix3x4 quadTransform;
+            Vector3 near, far;
+            // Position the directional light quad in halfway between far & near planes to prevent depth clipping
+            camera->GetFrustumSize(near, far);
+            quadTransform.SetTranslation(Vector3(0.0f, 0.0f, (camera->GetNearClip() + camera->GetFarClip()) * 0.5f));
+            quadTransform.SetScale(Vector3(far.x_, far.y_, 1.0f)); // Will be oversized, but doesn't matter (gets frustum clipped)
+            volumeTransform_ = camera->GetEffectiveWorldTransform() * quadTransform;
+            break;
+        }
 
     case LIGHT_SPOT:
         {

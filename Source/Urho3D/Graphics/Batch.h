@@ -64,7 +64,6 @@ struct Batch
         numWorldTransforms_(rhs.numWorldTransforms_),
         lightQueue_(0),
         geometryType_(rhs.geometryType_),
-        overrideView_(rhs.overrideView_),
         isBase_(false)
     {
     }
@@ -102,8 +101,6 @@ struct Batch
     ShaderVariation* pixelShader_;
     /// %Geometry type.
     GeometryType geometryType_;
-    /// Override view transform flag. When set, the camera's view transform is replaced with an identity matrix.
-    bool overrideView_;
     /// Base batch flag. This tells to draw the object fully without light optimizations.
     bool isBase_;
     /// 8-bit light mask for stencil marking in deferred rendering.

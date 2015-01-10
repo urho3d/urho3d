@@ -45,8 +45,7 @@ SourceBatch::SourceBatch() :
     geometry_(0),
     worldTransform_(&Matrix3x4::IDENTITY),
     numWorldTransforms_(1),
-    geometryType_(GEOM_STATIC),
-    overrideView_(false)
+    geometryType_(GEOM_STATIC)
 {
 }
 

@@ -94,8 +94,6 @@ struct SourceBatch
     unsigned numWorldTransforms_;
     /// %Geometry type.
     GeometryType geometryType_;
-    /// Override view transform flag.
-    bool overrideView_;
 };
 
 /// Base class for visible components.

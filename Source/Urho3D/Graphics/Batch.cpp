@@ -215,9 +215,9 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
         view->SetGlobalShaderParameters();
     
     // Set camera shader parameters
-    unsigned cameraHash = overrideView_ ? (unsigned)(size_t)camera_ + 4 : (unsigned)(size_t)camera_;
+    unsigned cameraHash = (unsigned)(size_t)camera_;
     if (graphics->NeedParameterUpdate(SP_CAMERA, reinterpret_cast<void*>(cameraHash)))
-        view->SetCameraShaderParameters(camera_, true, overrideView_);
+        view->SetCameraShaderParameters(camera_, true);
     
     // Set viewport shader parameters
     IntRect viewport = graphics->GetViewport();

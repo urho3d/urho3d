@@ -643,7 +643,7 @@ void View::SetGlobalShaderParameters()
     }
 }
 
-void View::SetCameraShaderParameters(Camera* camera, bool setProjection, bool overrideView)
+void View::SetCameraShaderParameters(Camera* camera, bool setProjection)
 {
     if (!camera)
         return;
@@ -695,10 +695,7 @@ void View::SetCameraShaderParameters(Camera* camera, bool setProjection, bool ov
         projection.m23_ += projection.m33_ * constantBias;
         #endif
         
-        if (overrideView)
-            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
-        else
-            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * camera->GetView());
+        graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * camera->GetView());
     }
 }
 
@@ -1057,7 +1054,6 @@ void View::GetBatches()
                     volumeBatch.geometryType_ = GEOM_STATIC;
                     volumeBatch.worldTransform_ = &light->GetVolumeTransform(camera_);
                     volumeBatch.numWorldTransforms_ = 1;
-                    volumeBatch.overrideView_ = light->GetLightType() == LIGHT_DIRECTIONAL;
                     volumeBatch.camera_ = camera_;
                     volumeBatch.lightQueue_ = &lightQueue;
                     volumeBatch.distance_ = light->GetDistance();
@@ -1735,7 +1731,7 @@ void View::RenderQuad(RenderPathCommand& command)
         graphics_->SetShaderParameter(k->first_, k->second_);
     
     SetGlobalShaderParameters();
-    SetCameraShaderParameters(camera_, false, false);
+    SetCameraShaderParameters(camera_, false);
     
     // During renderpath commands the G-Buffer or viewport texture is assumed to always be viewport-sized
     IntRect viewport = graphics_->GetViewport();
@@ -2753,7 +2749,7 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
         batch.material_ = renderer_->GetDefaultMaterial();
     
     // Convert to instanced if possible
-    if (allowInstancing && batch.geometryType_ == GEOM_STATIC && batch.geometry_->GetIndexBuffer() && !batch.overrideView_)
+    if (allowInstancing && batch.geometryType_ == GEOM_STATIC && batch.geometry_->GetIndexBuffer())
         batch.geometryType_ = GEOM_INSTANCED;
     
     if (batch.geometryType_ == GEOM_INSTANCED)

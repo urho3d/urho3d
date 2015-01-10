@@ -259,8 +259,6 @@ public:
     void SetIntensitySortValue(const BoundingBox& box);
     /// Set light queue used for this light. Called by View.
     void SetLightQueue(LightBatchQueue* queue);
-    /// Return directional light quad transform for either near or far split.
-    Matrix3x4 GetDirLightTransform(Camera* camera, bool getNearQuad = false);
     /// Return light volume model transform.
     const Matrix3x4& GetVolumeTransform(Camera* camera);
     /// Return light queue. Called by View.

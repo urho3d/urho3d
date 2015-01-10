@@ -153,7 +153,7 @@ public:
     /// Set global (per-frame) shader parameters. Called by Batch and internally by View.
     void SetGlobalShaderParameters();
     /// Set camera-specific shader parameters. Called by Batch and internally by View.
-    void SetCameraShaderParameters(Camera* camera, bool setProjectionMatrix, bool overrideView);
+    void SetCameraShaderParameters(Camera* camera, bool setProjectionMatrix);
     /// Set G-buffer offset and inverse size shader parameters. Called by Batch and internally by View.
     void SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& viewRect);
     
