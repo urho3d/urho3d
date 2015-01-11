@@ -244,7 +244,7 @@ static void RegisterTileMapDefs2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TileMapObject2D", "int get_tileGid() const", asMETHOD(TileMapObject2D, GetTileGid), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapObject2D", "Sprite2D@+ get_tileSprite() const", asMETHOD(TileMapObject2D, GetTileSprite), asCALL_THISCALL);
     engine->RegisterObjectMethod("TileMapObject2D", "bool HasProperty(const String&in) const", asMETHOD(TileMapObject2D, HasProperty), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TileMapObject2D", "const String& GetProperty(const String&in) const", asMETHOD(TileMapObject2D, HasProperty), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TileMapObject2D", "const String& GetProperty(const String&in) const", asMETHOD(TileMapObject2D, GetProperty), asCALL_THISCALL);
 }
 
 static void RegisterTmxFile2D(asIScriptEngine* engine)
