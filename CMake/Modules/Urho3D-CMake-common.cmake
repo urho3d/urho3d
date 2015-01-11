@@ -765,16 +765,16 @@ if (IOS)
         # Due to a bug in the CMake/Xcode generator (prior to version 2.8.12) where it has wrongly assumed the IOS bundle structure to be the same as MacOSX bundle structure,
         # below temporary fix is required in order to solve the auto-linking issue when dependent libraries are changed
         add_custom_target (FIX_DEPEND_HELPER ALL
-            if [ ${CMAKE_BINARY_DIR}/CMakeScripts/XCODE_DEPEND_HELPER.make -nt ${CMAKE_BINARY_DIR}/CMakeScripts/.fixed-depend-helper ]\; then sed -i '' 's/\/Contents\/MacOS//g' ${CMAKE_BINARY_DIR}/CMakeScripts/XCODE_DEPEND_HELPER.make\; touch ${CMAKE_BINARY_DIR}/CMakeScripts/.fixed-depend-helper\; fi
-            COMMENT "Checking if the CMake/Xcode depend helper scripts need to be fixed")
+            sed -i '' 's/\/Contents\/MacOS//g' ${CMAKE_BINARY_DIR}/CMakeScripts/XCODE_DEPEND_HELPER.make
+            COMMENT "Fixing CMake/Xcode depend helper scripts")
     endif ()
 
     # Due to a bug in the CMake/Xcode generator (still exists in 3.1) that prevents iOS targets (library and bundle) to be installed correctly
     # (see http://public.kitware.com/Bug/bug_relationship_graph.php?bug_id=12506&graph=dependency),
     # below temporary fix is required to work around the bug
     add_custom_target (FIX_INSTALL ALL
-        if [ ${CMAKE_BINARY_DIR}/CMakeScripts/install_postBuildPhase.makeDebug -nt ${CMAKE_BINARY_DIR}/CMakeScripts/.fixed-install ]\; then sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' ${CMAKE_BINARY_DIR}/CMakeScripts/install_postBuildPhase.make*\; touch ${CMAKE_BINARY_DIR}/CMakeScripts/.fixed-install\; fi
-        COMMENT "Checking if the CMake/Xcode install scripts need to be fixed")
+        sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' ${CMAKE_BINARY_DIR}/CMakeScripts/install_postBuildPhase.make*
+        COMMENT "Fixing CMake/Xcode install scripts")
 endif ()
 
 # Macro for adjusting target output name by dropping _suffix from the target name
