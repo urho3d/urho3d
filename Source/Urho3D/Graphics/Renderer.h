@@ -313,7 +313,7 @@ public:
     /// Choose shaders for a forward rendering batch.
     void SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows = true);
     /// Choose shaders for a deferred light volume batch.
-    void SetLightVolumeBatchShaders(Batch& batch, const String& vsName, const String& psName);
+    void SetLightVolumeBatchShaders(Batch& batch, const String& vsName, const String& psName, const String& vsDefines, const String& psDefines);
     /// Set cull mode while taking possible projection flipping into account.
     void SetCullMode(CullMode mode, Camera* camera);
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.

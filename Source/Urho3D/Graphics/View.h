@@ -317,8 +317,8 @@ private:
     bool useLitBase_;
     /// Has scene passes flag. If no scene passes, view can be defined without a valid scene or camera to only perform quad rendering.
     bool hasScenePasses_;
-    /// Whether is using a custom readable depth texture.
-    bool usingCustomDepth_;
+    /// Whether is using a custom readable depth texture without a stencil channel.
+    bool noStencil_;
     /// Draw debug geometry flag. Copied from the viewport.
     bool drawDebug_;
     /// Renderpath.
@@ -365,10 +365,8 @@ private:
     StringHash litBasePassName_;
     /// Hash of the litalpha pass.
     StringHash litAlphaPassName_;
-    /// Name of light volume vertex shader.
-    String lightVolumeVSName_;
-    /// Name of light volume pixel shader.
-    String lightVolumePSName_;
+    /// Pointer to the light volume command if any.
+    const RenderPathCommand* lightVolumeCommand_;
 };
 
 }

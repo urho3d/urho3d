@@ -179,9 +179,9 @@ static const char* shadowVariations[] =
     "",
     ""
     #else
-    "LQSHADOW SHADOWCMP",
-    "LQSHADOW",
-    "SHADOWCMP",
+    "LQSHADOW SHADOWCMP ",
+    "LQSHADOW ",
+    "SHADOWCMP ",
     ""
     #endif
 };
@@ -1164,7 +1164,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
     }
 }
 
-void Renderer::SetLightVolumeBatchShaders(Batch& batch, const String& vsName, const String& psName)
+void Renderer::SetLightVolumeBatchShaders(Batch& batch, const String& vsName, const String& psName, const String& vsDefines, const String& psDefines)
 {
     assert(deferredLightPSVariations_.Size());
     
@@ -1202,8 +1202,15 @@ void Renderer::SetLightVolumeBatchShaders(Batch& batch, const String& vsName, co
         psi += DLPS_ORTHO;
     }
     
-    batch.vertexShader_ = graphics_->GetShader(VS, vsName, deferredLightVSVariations[vsi]);
-    batch.pixelShader_ = graphics_->GetShader(PS, psName, deferredLightPSVariations_[psi]);
+    if (vsDefines.Length())
+        batch.vertexShader_ = graphics_->GetShader(VS, vsName, deferredLightVSVariations[vsi] + vsDefines);
+    else
+        batch.vertexShader_ = graphics_->GetShader(VS, vsName, deferredLightVSVariations[vsi]);
+
+    if (psDefines.Length())
+        batch.pixelShader_ = graphics_->GetShader(PS, psName, deferredLightPSVariations_[psi] + psDefines);
+    else
+        batch.pixelShader_ = graphics_->GetShader(PS, psName, deferredLightPSVariations_[psi]);
 }
 
 void Renderer::SetCullMode(CullMode mode, Camera* camera)
@@ -1266,7 +1273,6 @@ void Renderer::OptimizeLightByScissor(Light* light, Camera* camera)
 
 void Renderer::OptimizeLightByStencil(Light* light, Camera* camera)
 {
-    #ifndef GL_ES_VERSION_2_0
     if (light)
     {
         LightType type = light->GetLightType();
@@ -1332,7 +1338,6 @@ void Renderer::OptimizeLightByStencil(Light* light, Camera* camera)
     }
     else
         graphics_->SetStencilTest(false);
-    #endif
 }
 
 const Rect& Renderer::GetLightScissor(Light* light, Camera* camera)
@@ -1466,7 +1471,7 @@ void Renderer::LoadShaders()
         if (i & DLPS_SHADOW)
             deferredLightPSVariations_[i] += shadowVariations[shadows];
         if (i & DLPS_ORTHO)
-            deferredLightPSVariations_[i] += "ORTHO";
+            deferredLightPSVariations_[i] += "ORTHO ";
     }
     
     shadersDirty_ = false;

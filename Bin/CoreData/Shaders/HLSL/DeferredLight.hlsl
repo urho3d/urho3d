@@ -48,27 +48,31 @@ void PS(
 {
     // If rendering a directional light quad, optimize out the w divide
     #ifdef DIRLIGHT
+        float depth = Sample(sDepthBuffer, iScreenPos).r;
+        #ifdef HWDEPTH
+            depth = ReconstructDepth(depth);
+        #endif
         #ifdef ORTHO
-            float depth = Sample(sDepthBuffer, iScreenPos).r;
             float3 worldPos = lerp(iNearRay, iFarRay, depth);
         #else
-            float depth = Sample(sDepthBuffer, iScreenPos).r;
             float3 worldPos = iFarRay * depth;
         #endif
         float4 albedoInput = Sample(sAlbedoBuffer, iScreenPos);
         float4 normalInput = Sample(sNormalBuffer, iScreenPos);
     #else
+        float depth = tex2Dproj(sDepthBuffer, iScreenPos).r;
+        #ifdef HWDEPTH
+            depth = ReconstructDepth(depth);
+        #endif
         #ifdef ORTHO
-            float depth = tex2Dproj(sDepthBuffer, iScreenPos).r;
             float3 worldPos = lerp(iNearRay, iFarRay, depth) / iScreenPos.w;
         #else
-            float depth = tex2Dproj(sDepthBuffer, iScreenPos).r;
             float3 worldPos = iFarRay * depth / iScreenPos.w;
         #endif
         float4 albedoInput = tex2Dproj(sAlbedoBuffer, iScreenPos);
         float4 normalInput = tex2Dproj(sNormalBuffer, iScreenPos);
     #endif
-
+    
     float3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
     float4 projWorldPos = float4(worldPos, 1.0);
     float3 lightColor;

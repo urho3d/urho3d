@@ -319,11 +319,18 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     
     drawDebug_ = viewport->GetDrawDebug();
     hasScenePasses_ = false;
+    lightVolumeCommand_ = 0;
     
     // Make sure that all necessary batch queues exist
     scenePasses_.Clear();
 
-    usingCustomDepth_ = false;
+    noStencil_ = false;
+    #ifdef URHO3D_OPENGL
+    #ifdef GL_ES_VERSION_2_0
+    // On OpenGL ES we assume a stencil is not available or would not give a good performance, and disable light stencil
+    // optimizations in any case
+    noStencil_ = true;
+    #else
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
@@ -331,11 +338,14 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             continue;
         if (command.depthStencilName_.Length())
         {
-            // Using a readable depth texture will disable automatic stencil use, as can't guarantee a stencil channel is available
-            usingCustomDepth_ = true;
+            // Using a readable depth texture will disable light stencil optimizations on OpenGL, as for compatibility reasons
+            // we are using a depth format without stencil channel
+            noStencil_ = true;
             break;
         }
     }
+    #endif
+    #endif
 
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
@@ -350,7 +360,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             ScenePassInfo info;
             info.pass_ = command.pass_;
             info.allowInstancing_ = command.sortMode_ != SORT_BACKTOFRONT;
-            info.markToStencil_ = !usingCustomDepth_ && command.markToStencil_;
+            info.markToStencil_ = !noStencil_ && command.markToStencil_;
             info.vertexLights_ = command.vertexLights_;
             
             // Check scenepass metadata for defining custom passes which interact with lighting
@@ -437,8 +447,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         }
         else if (command.type_ == CMD_LIGHTVOLUMES)
         {
-            lightVolumeVSName_ = command.vertexShaderName_;
-            lightVolumePSName_ = command.pixelShaderName_;
+            lightVolumeCommand_ = &command;
             deferred_ = true;
         }
         else if (command.type_ == CMD_FORWARDLIGHTS)
@@ -1061,7 +1070,9 @@ void View::GetBatches()
                     volumeBatch.material_ = 0;
                     volumeBatch.pass_ = 0;
                     volumeBatch.zone_ = 0;
-                    renderer_->SetLightVolumeBatchShaders(volumeBatch, lightVolumeVSName_, lightVolumePSName_);
+                    renderer_->SetLightVolumeBatchShaders(volumeBatch, lightVolumeCommand_->vertexShaderName_,
+                        lightVolumeCommand_->pixelShaderName_, lightVolumeCommand_->vertexShaderDefines_,
+                        lightVolumeCommand_->pixelShaderDefines_);
                     lightQueue.volumeBatches_.Push(volumeBatch);
                 }
             }
@@ -1532,7 +1543,7 @@ void View::ExecuteRenderPathCommands()
                         if (!i->litBatches_.IsEmpty())
                         {
                             renderer_->OptimizeLightByScissor(i->light_, camera_);
-                            if (!usingCustomDepth_)
+                            if (!noStencil_)
                                 renderer_->OptimizeLightByStencil(i->light_, camera_);
                             i->litBatches_.Draw(this, false, true, allowDepthWrite);
                         }
@@ -2891,7 +2902,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
     }
     
     graphics_->SetScissorTest(false);
-    if (!usingCustomDepth_)
+    if (!noStencil_)
         graphics_->SetStencilTest(true, CMP_NOTEQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0, light->GetLightMask());
     else
         graphics_->SetStencilTest(false);
