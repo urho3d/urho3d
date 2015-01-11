@@ -758,25 +758,6 @@ macro (setup_main_executable)
     endif ()
 endmacro ()
 
-# Post-CMake fixes for iOS project
-if (IOS)
-    # TODO: can be removed when CMake minimum required has reached 2.8.12
-    if (CMAKE_VERSION VERSION_LESS 2.8.12)
-        # Due to a bug in the CMake/Xcode generator (prior to version 2.8.12) where it has wrongly assumed the IOS bundle structure to be the same as MacOSX bundle structure,
-        # below temporary fix is required in order to solve the auto-linking issue when dependent libraries are changed
-        add_custom_target (FIX_DEPEND_HELPER ALL
-            sed -i '' 's/\/Contents\/MacOS//g' ${CMAKE_BINARY_DIR}/CMakeScripts/XCODE_DEPEND_HELPER.make
-            COMMENT "Fixing CMake/Xcode depend helper scripts")
-    endif ()
-
-    # Due to a bug in the CMake/Xcode generator (still exists in 3.1) that prevents iOS targets (library and bundle) to be installed correctly
-    # (see http://public.kitware.com/Bug/bug_relationship_graph.php?bug_id=12506&graph=dependency),
-    # below temporary fix is required to work around the bug
-    add_custom_target (FIX_INSTALL ALL
-        sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' ${CMAKE_BINARY_DIR}/CMakeScripts/install_postBuildPhase.make*
-        COMMENT "Fixing CMake/Xcode install scripts")
-endif ()
-
 # Macro for adjusting target output name by dropping _suffix from the target name
 macro (adjust_target_name)
     string (REGEX REPLACE _.*$ "" OUTPUT_NAME ${TARGET_NAME})
@@ -1042,3 +1023,21 @@ macro (install_header_files)
         endif ()
     endforeach ()
 endmacro ()
+
+# Post-CMake fixes
+if (IOS)
+    # TODO: can be removed when CMake minimum required has reached 2.8.12
+    if (CMAKE_VERSION VERSION_LESS 2.8.12)
+	# Due to a bug in the CMake/Xcode generator (prior to version 2.8.12) where it has wrongly assumed the IOS bundle structure to be the same as MacOSX bundle structure,
+	# below temporary fix is required in order to solve the auto-linking issue when dependent libraries are changed
+	list (APPEND POST_CMAKE_FIXES COMMAND sed -i '' 's/\/Contents\/MacOS//g' ${CMAKE_BINARY_DIR}/CMakeScripts/XCODE_DEPEND_HELPER.make || exit 0)
+    endif ()
+
+    # Due to a bug in the CMake/Xcode generator (still exists in 3.1) that prevents iOS targets (library and bundle) to be installed correctly
+    # (see http://public.kitware.com/Bug/bug_relationship_graph.php?bug_id=12506&graph=dependency),
+    # below temporary fix is required to work around the bug
+    list (APPEND POST_CMAKE_FIXES COMMAND sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' ${CMAKE_BINARY_DIR}/CMakeScripts/install_postBuildPhase.make* || exit 0)
+endif ()
+if (POST_CMAKE_FIXES)
+    add_custom_target (POST_CMAKE_FIXES ALL ${POST_CMAKE_FIXES} COMMENT "Applying post-cmake fixes")
+endif ()
