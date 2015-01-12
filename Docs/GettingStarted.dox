@@ -112,8 +112,9 @@ Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
 
 -# Run CMake in the root directory (which is also CMake's source tree) with your preferred generator and toolchain specified to generate the build tree. You can use cmake-gui or the provided batch files or shell scripts on the respective host system. All the batch files and shell scripts expect the build tree location to be passed as the first argument, or to execute them in the build tree itself when reconfiguring the existing build tree.\n
     - Windows: cmake_vs20xx.bat, cmake_mingw.bat, or cmake_generic.bat\n
-    - Linux: cmake_eclipse.sh, cmake_codeblocks.sh, or cmake_generic.sh\n
     - Mac OS X: cmake_macosx.sh or cmake_generic.sh\n
+    - Linux: cmake_eclipse.sh, cmake_codeblocks.sh, or cmake_generic.sh\n
+    - Raspberry Pi: cmake_rpi.sh, cmake_eclipse.sh, cmake_codeblocks.sh, or cmake_generic.sh\n
 -# Use the IDE of your choice to open the CMake's generated project file or solution file in the build tree. Change the build configuration (Debug/Release) and then build all the targets.\n
     - Visual Studio: open Urho3D.sln\n
     - Xcode: open Urho3D.xcodeproj\n
@@ -179,7 +180,7 @@ To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run"
 
 \section Building_RaspberryPi Raspberry Pi build process
 
-For native build on Raspberry Pi itself, use the similar process for \ref Building_Native "Linux native build" described above.
+For native build on Raspberry Pi itself, use the similar process for \ref Building_Native "Native build process" described above.
 
 For cross-compiling build on an Linux host system, firstly set the RPI_PREFIX environment variable or build option to point to your Raspberry Pi Cross-Compiling tool are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. Secondly, set the RPI_SYSROOT environment variable or build option to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. You are recommended to download the Raspbian system root with Urho3D prerequisite software installed from https://github.com/urho3d/rpi-sysroot. You can just download from the "strip" branch to cut down the download time and size.
 
@@ -484,6 +485,7 @@ $CC -o Urho3DPlayer_d.exe Urho3DPlayer.cpp `pkg-config --variable CFLAGS_DEBUG U
 \section Scaffolding Project scaffolding
 
 With [Rake](https://rubygems.org/gems/rake) ruby gem installed, you can quickly setup all the above by simply using the 'scaffolding' rake task.
+
 \verbatim
 rake scaffolding dir=/path/to/new/project/root [project=Scaffolding] [target=Main]
 \endverbatim
@@ -493,6 +495,21 @@ As its name implies, this task just creates a basic project structure for your n
 On Windows host system, this task requires privilege to create symlinks by using mklink command. The task would fail when the Windows user account does not have that privilege. We strongly advise you not to use "Administrator" account just for this purpose. Instead, grant your "normal" user account to have the privilege correctly.
 
 WARNING: As of this writing, this rake scaffolding task does not yet create a complete new project suitable for Android platform. You need to supply the missing bits manually yourself for now.
+
+The Ruby and Rake are not prerequisite software components for building Urho3D and your projects. However, if you are reading this section this far and that your host system actually already has them installed then you can take advantage of them by utilising the 'rake cmake' and 'rake make' tasks. The former configures and generates the build tree (by invoking one of our build scripts under the hood) and the latter builds the project in the generated build tree (by invoking 'cmake --build' command which in turns calls the respective build tools, such as 'make' or 'xcodebuild', or 'MSBuild.exe') at the convenient of your finger tips in a command line interface.
+
+\verbatim
+rake cmake [fix_scm] [<generator>] [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree]
+rake make [numjobs=8] [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree]
+\endverbatim
+
+The default <generator> when not specified is 'generic', which let CMake to detect and choose what generator is available in the host to use. The possible values are: 'codeblocks', 'eclipse', 'macosx', 'vs2008', 'vs2010', 'vs2012', 'vs2013'.
+
+The default <platform> when not specified is 'native'. The possible values are: 'android', 'ios', 'mingw', 'rpi'. Naturally this influences the compiler toolchain being used in the generated build tree.
+
+When using the 'rake cmake' task, the <option>=\<value> pairs are optional build options supported by our build scripts as usual. However, the format here does not expect a leading '-D' for each pair. When using the 'rake make' task, the <option>=\<value> pairs are optional build options supported by the respective build tools. For example on iOS platform using 'xcodebuild' build tool, one could pass the '-sdk' option as follows: 'rake make ios sdk=iphonesimulator'. Note the absense of leading '-' character in the example. To build a specific built-in target in the project, use the 'target=built-in-target-name' option, e.g. 'rake make target=install'. In a multi-config project, such as Xcode project or VS solution, use the 'config=configuration-to-use' option to choose which build configuration to use, e.g. 'rake make vs2013 config=Release'.
+
+Use the 'build_tree=/path/to/build-tree' option to set the path to the desired build tree location. When not specified then the build tree would be defaulted to '../<platform>-Build', relative to Urho3D or your project root. To avoid repeating the customized build tree locations for each platform, you can set and export them as environment variables, e.g.: export native_build_tree=~/custom-native-Build android_build_tree=~/custom-android-Build mingw_build_tree=~/custom-mingw-Build rpi_build_tree=~/custom-rpi-Build. The <platform_>build_tree option takes precedence over normal build_tree option.
 
 \page Structure Overall structure
 

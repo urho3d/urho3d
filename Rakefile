@@ -89,7 +89,7 @@ task :cmake do
 end
 
 # Usage: rake make [numjobs=8] [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree]
-# e.g.: rake make android; or rake make android doc; or rake make ios config=Debug target=Urho3D_universal sdk=iphonesimulator build_tree=~/ios-Build
+# e.g.: rake make android; or rake make android doc; or rake make ios config=Debug sdk=iphonesimulator build_tree=~/ios-Build
 desc 'Build the generated project in its corresponding build tree'
 task :make do
   numjobs = '-j' + (ENV['numjobs'] || '8')
@@ -399,8 +399,9 @@ def makefile_ci
   # Create a new project on the fly that uses newly built Urho3D library in the build tree
   scaffolding "../Build/generated/UsingBuildTree"
   system "cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_generic.sh . #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
-  puts "\nInstalling Urho3D SDK...\n"
-  system 'cd ../Build && make -j$NUMJOBS install DESTDIR=~ >/dev/null' or abort 'Failed to install Urho3D SDK'
+  ENV['DESTDIR'] = ENV['HOME'] || Dir.home
+  puts "\nInstalling Urho3D SDK to #{ENV['DESTDIR']}/usr/local...\n"  # The default CMAKE_INSTALL_PREFIX is /usr/local
+  system 'cd ../Build && make -j$NUMJOBS install >/dev/null' or abort 'Failed to install Urho3D SDK'
   # Create a new project on the fly that uses newly installed Urho3D SDK
   scaffolding "../Build/generated/UsingSDK"
   system "export URHO3D_HOME=~/usr/local && cd ../Build/generated/UsingSDK && echo '\nExternal project referencing Urho3D SDK' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
@@ -512,8 +513,8 @@ def xcode_ci
   scaffolding "../Build/generated/UsingBuildTree"
   system "cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_macosx.sh . -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
   xcode_build(ENV['IOS'], '../Build/generated/UsingBuildTree/Scaffolding.xcodeproj') or abort 'Failed to build/test temporary project using Urho3D as external library'
-  puts "\nInstalling Urho3D SDK...\n"
   ENV['DESTDIR'] = ENV['HOME'] || Dir.home
+  puts "\nInstalling Urho3D SDK to #{ENV['DESTDIR']}/usr/local...\n"  # The default CMAKE_INSTALL_PREFIX is /usr/local
   xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj', 'install', '>/dev/null') or abort 'Failed to install Urho3D SDK'
   # Create a new project on the fly that uses newly installed Urho3D SDK
   scaffolding "../Build/generated/UsingSDK"
