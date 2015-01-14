@@ -684,6 +684,7 @@ macro (setup_main_executable)
     # Define resource files
     if (XCODE)
         set (RESOURCE_FILES ${CMAKE_SOURCE_DIR}/Bin/CoreData ${CMAKE_SOURCE_DIR}/Bin/Data)
+        source_group (Resources FILES ${RESOURCE_FILES})
         set_source_files_properties (${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
         list (APPEND SOURCE_FILES ${RESOURCE_FILES})
     endif ()
