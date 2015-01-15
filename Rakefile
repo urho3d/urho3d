@@ -54,7 +54,7 @@ task :scaffolding do
   puts "to get a similar result as the last two rake tasks above.\n\n"
 end
 
-# Usage: rake cmake [fix_scm] [<generator>] [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree]
+# Usage: rake cmake [<generator>] [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [fix_scm]
 # e.g.: rake cmake clean android; or rake cmake android URHO3D_LIB_TYPE=SHARED; or rake cmake ios URHO3D_LUA=1 build_tree=~/ios-Build
 #
 # To avoid repeating the customized build tree locations, you can set and export them as environment variables.
@@ -88,7 +88,7 @@ task :cmake do
   system "./#{script}#{ENV['OS'] ? '.bat' : '.sh'} #{build_tree} #{build_options}" or abort
 end
 
-# Usage: rake make [numjobs=8] [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree]
+# Usage: rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [numjobs=8] [clean_first] [unfilter]
 # e.g.: rake make android; or rake make android doc; or rake make ios config=Debug sdk=iphonesimulator build_tree=~/ios-Build
 desc 'Build the generated project in its corresponding build tree'
 task :make do
@@ -96,6 +96,7 @@ task :make do
   platform = 'native'
   cmake_build_options = ''
   build_options = ''
+  unfilter = false
   ARGV.each { |option|
     task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
     case option
@@ -105,6 +106,8 @@ task :make do
       platform = option
     when 'clean_first'
       cmake_build_options = "#{cmake_build_options} --clean-first"
+    when 'unfilter'
+      unfilter = true
     else
       if /(?:config|target)=.*/ =~ option
         cmake_build_options = "#{cmake_build_options} --#{option.gsub(/=/, ' ')}"
@@ -115,7 +118,7 @@ task :make do
   }
   build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
   if !Dir.glob("#{build_tree}/*.xcodeproj").empty?
-    filter = '|xcpretty'
+    filter = !unfilter && system('xcpretty -v >/dev/null 2>&1') ? '|xcpretty -c && exit ${PIPESTATUS[0]}' : ''
   elsif !Dir.glob("#{build_tree}/*.sln").empty?
     filter = ''
   else

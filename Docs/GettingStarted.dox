@@ -32,6 +32,8 @@ To run Urho3D, the minimum system requirements are:
 
 SSE requirement can be eliminated by disabling the use of SSE instruction set, see URHO3D_SSE build option below.
 
+CMake is required to configure and generate the Urho3D project build tree. The minimum required version is 2.8.6. However, it is recommended to use the latest CMake version avaiable out there, especially when targeting Mac OS X and iOS platforms using the latest Xcode version available. Apple is known to change the internal working of Xcode with little regards to other third party development tools.
+
 \section Build_Scripts Build scripts
 
 As this is a cross-platform project, we have provided a number of build scripts for the most common use cases. The shell scripts end with extension *.sh are meant for building Urho3D project in a Unix-like host system (Linux, Mac, and even Raspberry Pi), while the batch files end with *.bat are meant for Windows host system only. They only provide a convenient way to invoke CMake to process our CMakeLists.txt files. Their usage is not a must as you can also invoke CMake to do the same via cmake-gui or via your IDE when your IDE supports that.
@@ -94,8 +96,8 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_HOME          |-|Path to Urho3D build tree or SDK installation location (external project only)|
 |CMAKE_BUILD_TYPE     |*|Specify CMake build configuration (single-configuration generator only), possible values are Release (\*default), RelWithDebInfo, and Debug|
 |CMAKE_INSTALL_PREFIX |*|Install path prefix, prepended onto install directories; default to 'c:/Program Files/Urho3D' on Windows host and '/usr/local' on all other non-Windows hosts|
-|CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify Mac OS X deployment target (OSX build only); default to current running OS X if not specified|
-|IPHONEOS_DEPLOYMENT_TARGET|-|Specify iPhone OS deployment target (iOS build only); default to latest installed iOS SDK if not specified|
+|CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify Mac OS X deployment target (OSX build only); default to current running OS X if not specified, the minimum supported target is 10.5 due to constraint from SDL library|
+|IPHONEOS_DEPLOYMENT_TARGET|-|Specify iPhone OS deployment target (iOS build only); default to latest installed iOS SDK if not specified, the minimum spported target is 3.0 due to constraint from SDL library|
 |ANDROID_ABI          |*|Specify target ABI (Android build only), possible values are arm64-v8a, armeabi, armeabi-v6 with VFP, armeabi-v7a (\*default), armeabi-v7a with NEON, armeabi-v7a with VFPV3, mips, mips64, x86, and x86_64|
 |ANDROID_NATIVE_API_LEVEL|*|Specify target API level (Android build only), possible values depends on installed NDK version, default to API level 12 on 32-bit ABIs, default to API level 21 on 64-bit ABIs|
 |ANDROID_NDK_GDB      |0|Enable ndk-gdb support (Android Debug build only)|
@@ -498,20 +500,23 @@ WARNING: As of this writing, this rake scaffolding task does not yet create a co
 
 The Ruby and Rake are not prerequisite software components for building Urho3D and your projects. However, if you are reading this section this far and that your host system actually already has them installed then you can take advantage of them by utilising the 'rake cmake' and 'rake make' tasks. The former configures and generates the build tree (by invoking one of our build scripts under the hood) and the latter builds the project in the generated build tree (by invoking 'cmake --build' command which in turns calls the respective build tools, such as 'make' or 'xcodebuild', or 'MSBuild.exe') at the convenient of your finger tips in a command line interface.
 
+To configure and generate:
 \verbatim
-rake cmake [fix_scm] [<generator>] [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree]
+rake cmake [<generator>] [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [fix_scm]
 \endverbatim
+
+To build:
 \verbatim
-rake make [numjobs=8] [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree]
+rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [numjobs=8] [clean_first] [unfilter]
 \endverbatim
 
 The default <generator> when not specified is 'generic', which let CMake to detect and choose what generator is available in the host to use. The possible values are: 'codeblocks', 'eclipse', 'macosx', 'vs2008', 'vs2010', 'vs2012', 'vs2013'.
 
 The default <platform> when not specified is 'native'. The possible values are: 'android', 'ios', 'mingw', 'rpi'. Naturally this influences the compiler toolchain being used in the generated build tree.
 
-When using the 'rake cmake' task, the <option>=\<value> pairs are optional build options supported by our build scripts as usual. However, the format here does not expect a leading '-D' for each pair. When using the 'rake make' task, the <option>=\<value> pairs are optional build options supported by the respective build tools. For example on iOS platform using 'xcodebuild' build tool, one could pass the '-sdk' option as follows: 'rake make ios sdk=iphonesimulator'. Note the absense of leading '-' character in the example. To build a specific built-in target in the project, use the 'target' option, e.g. 'rake make target=install'. In a multi-config project, such as Xcode project or VS solution, use the 'config' option to choose which build configuration to use, e.g. 'rake make config=Release'.
+When using the 'rake cmake' task, the <option>=\<value> pairs are optional build options supported by our build scripts as usual. However, the format here does not expect a leading '-D' for each pair. When using the 'rake make' task, the <option>=\<value> pairs are optional build options supported by the respective build tools. For example on iOS platform using 'xcodebuild' build tool, one could pass the '-sdk' option as follows: 'rake make ios sdk=iphonesimulator'. Note the absense of leading '-' character in the example. To build a specific built-in target in the project, use the 'target' option, e.g. 'rake make target=install'. In a multi-config project, such as Xcode project or VS solution, use the 'config' option to choose which build configuration to use, e.g. 'rake make config=Release'. For Xcode project building using 'rake make' task, you may optional install the 'xcpretty' filter to address the verbosity of the 'xcodebuild' tool from its standard output stream. On the other hand, pass the 'unfiter' option to get the output from 'xcodebuild' tool unfiltered regardless. You can pass the 'clean_first' option to perform a clean build. The 'numjobs' option is only applicable for 'make' tool where it defaults to 8 when not specified explicitly.
 
-Use the 'build_tree' option to set the path to the desired build tree location. When not specified then the build tree location would be defaulted to '../<platform>-Build', relative to the project root. To avoid repeating the customized build tree locations for each platform, you can set and export them as environment variables. The '<platform_>build_tree' option takes precedence over normal 'build_tree' option. For example with these commands below, the RPI build tree will be generated in the ~/custom-rpi-Build and then build from there.
+Use the 'build_tree' option to set the path to the desired build tree location. When not specified then the build tree location would be defaulted to '../<platform>-Build', relative to the project root. To avoid repeating the customized build tree locations for each platform, you can set and export them as environment variables. The '<platform_>build_tree' option takes precedence over normal 'build_tree' option. For example with these commands below, the RPI build tree will be generated in the ~/custom-rpi-Build and then build from there. You can in fact set and export any other key/value pair build options as environment variables to avoid repeating yourself when invoking any of our Rake tasks.
 
 \verbatim
 export native_build_tree=~/custom-native-Build android_build_tree=~/custom-android-Build mingw_build_tree=~/custom-mingw-Build rpi_build_tree=~/custom-rpi-Build
