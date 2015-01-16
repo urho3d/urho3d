@@ -202,7 +202,7 @@ bool Engine::Initialize(const VariantMap& parameters)
     String defaultPrefixPath(AddTrailingSlash(getenv("URHO3D_PREFIX_PATH")));
     if (defaultPrefixPath.Empty())
         defaultPrefixPath = fileSystem->GetProgramDir();
-    String resourcePrefixPath = GetParameter(parameters, "ResourcePrefixPath", defaultPrefixPath).GetString();
+    String resourcePrefixPath = AddTrailingSlash(GetParameter(parameters, "ResourcePrefixPath", defaultPrefixPath).GetString());
     Vector<String> resourcePaths = GetParameter(parameters, "ResourcePaths", "Data;CoreData").GetString().Split(';');
     Vector<String> resourcePackages = GetParameter(parameters, "ResourcePackages").GetString().Split(';');
     Vector<String> autoLoadPaths = GetParameter(parameters, "AutoloadPaths", "Autoload").GetString().Split(';');
