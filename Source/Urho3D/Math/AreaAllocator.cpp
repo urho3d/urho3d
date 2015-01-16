@@ -33,7 +33,7 @@ AreaAllocator::AreaAllocator()
 
 AreaAllocator::AreaAllocator(int width, int height, bool fastMode)
 {
-    Reset(width, height, fastMode);
+    Reset(width, height, width, height, fastMode);
 }
 
 AreaAllocator::AreaAllocator(int width, int height, int maxWidth, int maxHeight, bool fastMode)
