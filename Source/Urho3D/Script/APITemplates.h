@@ -30,6 +30,7 @@
 #include "../IO/File.h"
 #include "../Container/HashSet.h"
 #include "../IO/Log.h"
+#include "../IO/VectorBuffer.h"
 #include "../Scene/Node.h"
 #include "../Resource/Resource.h"
 #include "../Script/Script.h"
@@ -231,6 +232,12 @@ template <class T> unsigned SerializerWrite(CScriptArray* arr, T* ptr)
     return bytesToWrite ? ptr->Write(arr->At(0), bytesToWrite) : 0;
 }
 
+/// Template function for writing a VectorBuffer to a serializer.
+template <class T> bool SerializerWriteVectorBuffer(VectorBuffer* src, T* ptr)
+{
+    return ptr->Write(src->GetData(), src->GetSize()) == src->GetSize();
+}
+
 /// Template function for registering a class derived from Serializer.
 template <class T> void RegisterSerializer(asIScriptEngine* engine, const char* className)
 {
@@ -261,18 +268,25 @@ template <class T> void RegisterSerializer(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "bool WriteStringHash(const StringHash&in)", asMETHODPR(T, WriteStringHash, (const StringHash&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteVariant(const Variant&in)", asMETHODPR(T, WriteVariant, (const Variant&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteVariantMap(const VariantMap&in)", asMETHODPR(T, WriteVariantMap, (const VariantMap&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool WriteVectorBuffer(const VectorBuffer&in)", asFUNCTION(SerializerWriteVectorBuffer<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool WriteVLE(uint)", asMETHODPR(T, WriteVLE, (unsigned), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteNetID(uint)", asMETHODPR(T, WriteNetID, (unsigned), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteLine(const String&in)", asMETHODPR(T, WriteLine, (const String&), bool), asCALL_THISCALL);
 }
 
-/// Template function for reading from a serializer into an array.
+/// Template function for reading from a deserializer into an array.
 template <class T> CScriptArray* DeserializerRead(unsigned size, T* ptr)
 {
     PODVector<unsigned char> vector(size);
     unsigned bytesRead = size ? ptr->Read(&vector[0], size) : 0;
     vector.Resize(bytesRead);
     return VectorToArray(vector, "Array<uint8>");
+}
+
+/// Template function for reading from a deserializer into a VectorBuffer.
+template <class T> VectorBuffer DeserializerReadVectorBuffer(unsigned size, T* ptr)
+{
+    return VectorBuffer(*ptr, size);
 }
 
 /// Template function for registering a class derived from Deserializer.
@@ -305,6 +319,7 @@ template <class T> void RegisterDeserializer(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "StringHash ReadStringHash()", asMETHODPR(T, ReadStringHash, (), StringHash), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Variant ReadVariant()", asMETHODPR(T, ReadVariant, (), Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VariantMap ReadVariantMap()", asMETHODPR(T, ReadVariantMap, (), VariantMap), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "VectorBuffer ReadVectorBuffer(uint)", asFUNCTION(DeserializerReadVectorBuffer<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "uint ReadVLE()", asMETHODPR(T, ReadVLE, (), unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint ReadNetID()", asMETHODPR(T, ReadNetID, (), unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "String ReadLine()", asMETHODPR(T, ReadLine, (), String), asCALL_THISCALL);

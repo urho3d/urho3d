@@ -27,7 +27,6 @@
 #include "../IO/Log.h"
 #include "../IO/PackageFile.h"
 #include "../Core/ProcessUtils.h"
-#include "../IO/VectorBuffer.h"
 
 namespace Urho3D
 {
@@ -282,6 +281,7 @@ static void RegisterSerialization(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint SCAN_DIRS", (void*)&SCAN_DIRS);
     engine->RegisterGlobalProperty("const uint SCAN_HIDDEN", (void*)&SCAN_HIDDEN);
 
+    engine->RegisterObjectType("VectorBuffer", sizeof(VectorBuffer), asOBJ_VALUE | asOBJ_APP_CLASS_CDK);
     engine->RegisterObjectType("Serializer", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Serializer", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Serializer", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
@@ -303,7 +303,6 @@ static void RegisterSerialization(asIScriptEngine* engine)
     RegisterSerializer<File>(engine, "File");
     RegisterDeserializer<File>(engine, "File");
 
-    engine->RegisterObjectType("VectorBuffer", sizeof(VectorBuffer), asOBJ_VALUE | asOBJ_APP_CLASS_CDK);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", asFUNCTION(ConstructVectorBufferCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Deserializer@+, uint)", asFUNCTION(ConstructVectorBufferFromStream), asCALL_CDECL_OBJLAST);
