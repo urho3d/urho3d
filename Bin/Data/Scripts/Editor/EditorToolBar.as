@@ -9,10 +9,10 @@ void CreateToolBar()
 {
     toolBar = BorderImage("ToolBar");
     toolBar.style = "EditorToolBar";
+    toolBar.vars["NoUIFade"] = true;
     toolBar.SetLayout(LM_HORIZONTAL);
     toolBar.layoutSpacing = 4;
-    toolBar.layoutBorder = IntRect(8, 4, 4, 8);
-    toolBar.opacity = uiMaxOpacity;
+    toolBar.layoutBorder = IntRect(4, 4, 4, 8);
     toolBar.SetFixedSize(graphics.width, 42);
     toolBar.SetPosition(0, uiMenuBar.height);
     ui.root.AddChild(toolBar);

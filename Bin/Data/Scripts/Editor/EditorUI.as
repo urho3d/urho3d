@@ -106,7 +106,7 @@ void ResizeUI()
     secondaryToolBar.SetFixedHeight(graphics.height);
 
     // Relayout stats bar
-    Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
+    Font@ font = cache.GetResource("Font", "Fonts/SourceSansPro-Light.otf");
     if (graphics.width >= 1200)
     {
         SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
@@ -278,9 +278,9 @@ void CreateMenuBar()
     uiMenuBar = BorderImage("MenuBar");
     ui.root.AddChild(uiMenuBar);
     uiMenuBar.enabled = true;
+    uiMenuBar.vars["NoUIFade"] = true;
     uiMenuBar.style = "EditorMenuBar";
     uiMenuBar.SetLayout(LM_HORIZONTAL);
-    uiMenuBar.opacity = uiMaxOpacity;
     uiMenuBar.SetFixedWidth(graphics.width);
 
     {
@@ -1114,7 +1114,16 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             }
         }
     }
-
+    // be able to take screen shots with modals open
+    else if (key == KEY_F11)
+    {
+        Image@ screenshot = Image();
+        graphics.TakeScreenShot(screenshot);
+        if (!fileSystem.DirExists(screenshotDir))
+            fileSystem.CreateDir(screenshotDir);
+        screenshot.SavePNG(screenshotDir + "/Screenshot_" +
+                time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
+    }   
     // Ignore other keys when UI has a modal element
     else if (ui.HasModalElement())
         return;
@@ -1127,15 +1136,6 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         TogglePhysicsDebug();
     else if (key == KEY_F4)
         ToggleOctreeDebug();
-    else if (key == KEY_F11)
-    {
-        Image@ screenshot = Image();
-        graphics.TakeScreenShot(screenshot);
-        if (!fileSystem.DirExists(screenshotDir))
-            fileSystem.CreateDir(screenshotDir);
-        screenshot.SavePNG(screenshotDir + "/Screenshot_" +
-                time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
-    }   
     else if (key == KEY_KP_1 && ui.focusElement is null) // Front view
     {
         Vector3 pos = cameraNode.position;
@@ -1233,7 +1233,7 @@ void FadeUI(bool fade = true)
     for (uint i = 0; i < children.length; ++i)
     {
         // Texts, popup&modal windows (which are anyway only in ui.modalRoot), and editorUIElement are excluded
-        if (children[i].type != TEXT_TYPE && children[i] !is editorUIElement)
+        if (children[i].type != TEXT_TYPE && children[i].vars["NoUIFade"].GetBool() != true)
             children[i].opacity = opacity;
     }
 }
@@ -1424,7 +1424,7 @@ Menu@ CreateContextMenuItem(String text, String handler)
     Menu@ menu = Menu();
     menu.defaultStyle = uiStyle;
     menu.style = AUTO_STYLE;
-    menu.SetLayout(LM_HORIZONTAL, 0, IntRect(8, 2, 8, 2));
+    menu.SetLayout(LM_HORIZONTAL, 0, IntRect(8, 1, 8, 1));
     Text@ menuText = Text();
     menuText.style = "EditorMenuText";
     menu.AddChild(menuText);

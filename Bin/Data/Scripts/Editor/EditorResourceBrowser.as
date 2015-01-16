@@ -207,7 +207,7 @@ void CreateResourceBrowserUI()
 
     int height = Min(ui.root.height / 4, 300);
     browserWindow.SetSize(900, height);
-    browserWindow.SetPosition(35, ui.root.height - height - 25);
+    browserWindow.SetPosition(34, ui.root.height - height - 32);
 
     CloseContextMenu();
     ui.root.AddChild(browserWindow);

@@ -27,6 +27,7 @@ void CreateRootUIElement()
 {
     // Create a root UIElement only once here, do not confuse this with ui.root itself
     editorUIElement = ui.root.CreateChild("UIElement");
+    editorUIElement.vars["NoUIFade"] = true;
     editorUIElement.name = "UI";
     editorUIElement.SetSize(graphics.width, graphics.height);
     editorUIElement.traversalMode = TM_DEPTH_FIRST;     // This is needed for root-like element to prevent artifacts
