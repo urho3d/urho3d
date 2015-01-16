@@ -77,13 +77,25 @@ void AnimatedSprite2D::OnSetEnabled()
 {
     StaticSprite2D::OnSetEnabled();
 
+    bool enabled = IsEnabledEffective();
+
     Scene* scene = GetScene();
     if (scene)
     {
-        if (IsEnabledEffective())
+        if (enabled)
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimatedSprite2D, HandleScenePostUpdate));
         else
             UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
+    }
+
+    for (unsigned i = 0; i < trackNodes_.Size(); ++i)
+    {
+        if (!trackNodes_[i])
+            continue;
+
+        StaticSprite2D* staticSprite = trackNodes_[i]->GetComponent<StaticSprite2D>();
+        if (staticSprite)
+            staticSprite->SetEnabled(enabled);
     }
 }
 
@@ -218,7 +230,8 @@ void AnimatedSprite2D::OnLayerChanged()
             continue;
 
         StaticSprite2D* staticSprite = trackNodes_[i]->GetComponent<StaticSprite2D>();
-        staticSprite->SetLayer(layer_);
+        if (staticSprite)
+            staticSprite->SetLayer(layer_);
     }
 }
 

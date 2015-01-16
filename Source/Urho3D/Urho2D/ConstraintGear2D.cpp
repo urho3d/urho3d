@@ -44,6 +44,7 @@ void ConstraintGear2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ConstraintGear2D>();
 
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Ratio", GetRatio, SetRatio, float, 0.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Constraint2D);
 }
