@@ -980,7 +980,7 @@ macro (install_header_files)
     if (NOT ARG_DESTINATION)
         message (FATAL_ERROR "Couldn't setup install command because the install destination is not specified.")
     endif ()
-    if (NOT ARG_BUILD_TREE_ONLY)
+    if (NOT ARG_BUILD_TREE_ONLY AND DEST_INCLUDE_DIR)
         install (${INSTALL_TYPE} ${INSTALL_SOURCES} DESTINATION ${ARG_DESTINATION} ${INSTALL_PERMISSIONS} ${INSTALL_MATCHING})
     endif ()
 
