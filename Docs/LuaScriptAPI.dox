@@ -4404,6 +4404,7 @@ Methods:
 - Resource* GetResource(const String type, const String name, bool sendEventOnFailure = true)
 - bool BackgroundLoadResource(const String type, const String name, bool sendEventOnFailure = true)
 - unsigned GetNumBackgroundLoadResources() const
+- const Vector<String>& GetResourceDirs() const
 - bool Exists(const String name) const
 - unsigned GetMemoryBudget(StringHash type) const
 - unsigned GetMemoryUse(StringHash type) const
@@ -4424,6 +4425,7 @@ Properties:
 - bool returnFailedResources
 - bool searchPackagesFirst
 - unsigned numBackgroundLoadResources (readonly)
+- Vector<String>& resourceDirs (readonly)
 - int finishBackgroundResourcesMs
 
 <a name="Class_ResourceRef"></a>
