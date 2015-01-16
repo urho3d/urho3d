@@ -3517,6 +3517,7 @@ VariantMap ReadVariantMap();
 Vector2 ReadVector2();
 Vector3 ReadVector3();
 Vector4 ReadVector4();
+VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
 
 // Properties:
@@ -4006,6 +4007,7 @@ VariantMap ReadVariantMap();
 Vector2 ReadVector2();
 Vector3 ReadVector3();
 Vector4 ReadVector4();
+VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 uint Write(Array<uint8>);
@@ -4038,6 +4040,7 @@ bool WriteVariantMap(const VariantMap&);
 bool WriteVector2(const Vector2&);
 bool WriteVector3(const Vector3&);
 bool WriteVector4(const Vector4&);
+bool WriteVectorBuffer(const VectorBuffer&);
 
 // Properties:
 /* readonly */
@@ -4345,6 +4348,7 @@ VariantMap ReadVariantMap();
 Vector2 ReadVector2();
 Vector3 ReadVector3();
 Vector4 ReadVector4();
+VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
 
 // Properties:
@@ -8231,6 +8235,7 @@ bool WriteVariantMap(const VariantMap&);
 bool WriteVector2(const Vector2&);
 bool WriteVector3(const Vector3&);
 bool WriteVector4(const Vector4&);
+bool WriteVectorBuffer(const VectorBuffer&);
 };
 
 class Skeleton
@@ -11146,6 +11151,7 @@ VariantMap ReadVariantMap();
 Vector2 ReadVector2();
 Vector3 ReadVector3();
 Vector4 ReadVector4();
+VectorBuffer ReadVectorBuffer(uint);
 void Resize(uint);
 uint Seek(uint);
 void SetData(Deserializer, uint);
@@ -11179,6 +11185,7 @@ bool WriteVariantMap(const VariantMap&);
 bool WriteVector2(const Vector2&);
 bool WriteVector3(const Vector3&);
 bool WriteVector4(const Vector4&);
+bool WriteVectorBuffer(const VectorBuffer&);
 
 // Properties:
 /* readonly */

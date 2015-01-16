@@ -668,6 +668,7 @@ namespace Urho3D
 - %Animation %States : VariantVector
 
 ### AnimatedSprite2D
+- %Is %Enabled : bool
 - %Flip X : bool
 - %Flip Y : bool
 - %Color : Color
@@ -856,6 +857,7 @@ namespace Urho3D
 - %Checked %Image %Offset : IntVector2
 
 ### CollisionBox2D
+- %Is %Enabled : bool
 - %Size : Vector2
 - %Center : Vector2
 - %Angle : float
@@ -868,6 +870,7 @@ namespace Urho3D
 - %Restitution : float
 
 ### CollisionChain2D
+- %Is %Enabled : bool
 - %Loop : bool
 - %Trigger : bool
 - %Category %Bits : int
@@ -879,6 +882,7 @@ namespace Urho3D
 - %Vertices : Buffer
 
 ### CollisionCircle2D
+- %Is %Enabled : bool
 - %Radius : float
 - %Center : Vector2
 - %Trigger : bool
@@ -890,6 +894,7 @@ namespace Urho3D
 - %Restitution : float
 
 ### CollisionEdge2D
+- %Is %Enabled : bool
 - %Vertex 1 : Vector2
 - %Vertex 2 : Vector2
 - %Trigger : bool
@@ -901,6 +906,7 @@ namespace Urho3D
 - %Restitution : float
 
 ### CollisionPolygon2D
+- %Is %Enabled : bool
 - %Trigger : bool
 - %Category %Bits : int
 - %Mask %Bits : int
@@ -936,6 +942,7 @@ namespace Urho3D
 - %Disable %Collision : bool
 
 ### ConstraintDistance2D
+- %Is %Enabled : bool
 - %Owner %Body %Anchor : Vector2
 - %Other %Body %Anchor : Vector2
 - %Frequency %Hz : float
@@ -943,16 +950,19 @@ namespace Urho3D
 - %Collide %Connected : bool
 
 ### ConstraintFriction2D
+- %Is %Enabled : bool
 - %Anchor : Vector2
 - %Max %Force : float
 - %Max %Torque : float
 - %Collide %Connected : bool
 
 ### ConstraintGear2D
+- %Is %Enabled : bool
 - %Ratio : float
 - %Collide %Connected : bool
 
 ### ConstraintMotor2D
+- %Is %Enabled : bool
 - %Linear %Offset : Vector2
 - %Angular %Offset : float
 - %Max %Force : float
@@ -961,6 +971,7 @@ namespace Urho3D
 - %Collide %Connected : bool
 
 ### ConstraintMouse2D
+- %Is %Enabled : bool
 - %Target : Vector2
 - %Max %Force : float
 - %Frequency %Hz : float
@@ -968,6 +979,7 @@ namespace Urho3D
 - %Collide %Connected : bool
 
 ### ConstraintPrismatic2D
+- %Is %Enabled : bool
 - %Anchor : Vector2
 - %Axis : Vector2
 - %Enable %Limit : bool
@@ -979,6 +991,7 @@ namespace Urho3D
 - %Collide %Connected : bool
 
 ### ConstraintPulley2D
+- %Is %Enabled : bool
 - %Owner %Body %Ground %Anchor : Vector2
 - %Other %Body %Ground %Anchor : Vector2
 - %Owner %Body %Anchor : Vector2
@@ -987,6 +1000,7 @@ namespace Urho3D
 - %Collide %Connected : bool
 
 ### ConstraintRevolute2D
+- %Is %Enabled : bool
 - %Anchor : Vector2
 - %Enable %Limit : bool
 - %Lower %Angle : float
@@ -997,18 +1011,21 @@ namespace Urho3D
 - %Collide %Connected : bool
 
 ### ConstraintRope2D
+- %Is %Enabled : bool
 - %Owner %Body %Anchor : Vector2
 - %Other %Body %Anchor : Vector2
 - %Max %Length : float
 - %Collide %Connected : bool
 
 ### ConstraintWeld2D
+- %Is %Enabled : bool
 - %Anchor : Vector2
 - %Frequency %Hz : float
 - %Damping %Ratio : float
 - %Collide %Connected : bool
 
 ### ConstraintWheel2D
+- %Is %Enabled : bool
 - %Anchor : Vector2
 - %Axis : Vector2
 - %Enable %Motor : bool
@@ -1381,6 +1398,7 @@ namespace Urho3D
 - %Serialize %Particles : bool
 
 ### ParticleEmitter2D
+- %Is %Enabled : bool
 - %Particle %Effect : ResourceRef
 - %Sprite : ResourceRef
 - %Layer : int
@@ -1444,6 +1462,7 @@ namespace Urho3D
 - %Gravity %Override : Vector3
 
 ### RigidBody2D
+- %Is %Enabled : bool
 - %Body %Type : int
 - %Mass : float
 - %Inertia : float
@@ -1714,6 +1733,7 @@ namespace Urho3D
 - %Instance %Nodes : VariantVector
 
 ### StaticSprite2D
+- %Is %Enabled : bool
 - %Sprite : ResourceRef
 - %Flip X : bool
 - %Flip Y : bool
@@ -1815,6 +1835,7 @@ namespace Urho3D
 - %Effect %Depth %Bias : float
 
 ### TileMap2D
+- %Is %Enabled : bool
 - %Tmx %File : ResourceRef
 
 ### ToolTip
@@ -5237,6 +5258,7 @@ Methods:
 - Vector2 ReadVector2()
 - Vector3 ReadVector3()
 - Vector4 ReadVector4()
+- VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
 
 Properties:
@@ -5661,6 +5683,7 @@ Methods:
 - Vector2 ReadVector2()
 - Vector3 ReadVector3()
 - Vector4 ReadVector4()
+- VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - uint Write(uint8[]@)
@@ -5693,6 +5716,7 @@ Methods:
 - bool WriteVector2(const Vector2&)
 - bool WriteVector3(const Vector3&)
 - bool WriteVector4(const Vector4&)
+- bool WriteVectorBuffer(const VectorBuffer&)
 
 Properties:
 
@@ -5942,6 +5966,7 @@ Methods:
 - Vector2 ReadVector2()
 - Vector3 ReadVector3()
 - Vector4 ReadVector4()
+- VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
 
 Properties:
@@ -9337,6 +9362,7 @@ Methods:
 - bool WriteVector2(const Vector2&)
 - bool WriteVector3(const Vector3&)
 - bool WriteVector4(const Vector4&)
+- bool WriteVectorBuffer(const VectorBuffer&)
 
 <a name="Class_Skeleton"></a>
 
@@ -11832,6 +11858,7 @@ Methods:
 - Vector2 ReadVector2()
 - Vector3 ReadVector3()
 - Vector4 ReadVector4()
+- VectorBuffer ReadVectorBuffer(uint)
 - void Resize(uint)
 - uint Seek(uint)
 - void SetData(Deserializer@, uint)
@@ -11865,6 +11892,7 @@ Methods:
 - bool WriteVector2(const Vector2&)
 - bool WriteVector3(const Vector3&)
 - bool WriteVector4(const Vector4&)
+- bool WriteVectorBuffer(const VectorBuffer&)
 
 Properties:
 
