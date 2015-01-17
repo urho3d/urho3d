@@ -876,12 +876,16 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
             {
                 if (browserFile.extension == "xml")
                 {
-                    ParticleEffect2D@ effect = cache.GetResource("ParticleEffect2D", browserFile.resourceKey);
+                    Resource@ effect = cache.GetResource("ParticleEffect2D", browserFile.resourceKey);
                     if (effect is null)
                         return;
 
-                    ParticleEmitter2D@ emitter = targetNode.CreateComponent("ParticleEmitter2D");
-                    emitter.effect = effect;
+                    ResourceRef effectRef;
+                    effectRef.type = effect.type;
+                    effectRef.name = effect.name;
+
+                    Component@ emitter = targetNode.CreateComponent("ParticleEmitter2D");
+                    emitter.SetAttribute("Particle Effect", Variant(effectRef));
                     createdComponent = emitter;
                 }
             }
