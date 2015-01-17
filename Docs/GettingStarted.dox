@@ -89,6 +89,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_TEST_TIME_OUT |5|Number of seconds to test run the executables (when testing support is enabled only)|
 |URHO3D_OPENGL        |0|Use OpenGL instead of Direct3D (Windows platform only)|
 |URHO3D_STATIC_RUNTIME|0|Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
+|URHO3D_MACOSX_BUNDLE |0|Use MACOSX_BUNDLE when setting up Mac OS X executable targets (Xcode native build only)|
 |URHO3D_LIB_TYPE      |*|Specify Urho3D library type, possible values are STATIC (\*default) and SHARED|
 |URHO3D_SCP_TO_TARGET |-|Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
 |URHO3D_USE_LIB64_RPM |0|Enable 64-bit RPM CPack generator using /usr/lib64 and disable all other generators (Debian-based host only, which uses /usr/lib by default)|
@@ -131,6 +132,8 @@ After the build is complete, the programs can be run from the Bin subdirectory i
 - Copy both the Bin/Data and Bin/CoreData directories in the source tree to the Bin subdirectory in the build tree.
 - Instead of copying, just create symbolic links in the build tree pointing to the above two directories.
 - Or even better, use the 'resource prefix path' \ref Running_Commandline engine parameter by setting URHO3D_PREFIX_PATH variable in your host environment. The prefix variable must be set to an absolute path which contains the Data and CoreData subdirectories.      
+
+The Mac OS X executables can be built with all the resources bundled into a single app directory. In order to enable this, set the URHO3D_MACOSX_BUNDLE build option when configuring the build tree for the Mac OS X platform. The bundled app can be launched just by double-clicking from the Finder without worrying about setting the 'resource prefix path'. This is because the URHO3D_PREFIX_PATH environment variable has been set internally to point to the resources directory that is already bundled in the app. Note, however, if you do not launch the app via the Apple "Launch Services" (such as when you are debugging or by calling the executable directly inside the bundled app directory via CLI) then you still need to set the 'resource prefix path' manually as described in previous paragraph.
 
 To run the Urho3D player application from the Visual Studio debugger, set the Urho3DPlayer project as the startup project and enter its relative path and filename into Properties -> Debugging -> Command: ../../../Bin/Urho3DPlayer.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will likely be hidden. To actually make the Urho3DPlayer application do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments:
 

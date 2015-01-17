@@ -144,6 +144,25 @@ if (NOT DEFINED ENV{RELEASE_TAG})
 endif ()
 include (CPack)
 
+# Setup MacOSX and iOS bundle variables
+if (IOS OR URHO3D_MACOSX_BUNDLE)
+    if (NOT MACOSX_BUNDLE_ICON_FILE)
+        set (MACOSX_BUNDLE_ICON_FILE UrhoIcon)
+    endif ()
+    if (NOT MACOSX_BUNDLE_BUNDLE_VERSION)
+        set (MACOSX_BUNDLE_BUNDLE_VERSION ${URHO3D_VERSION})
+    endif ()
+    if (NOT MACOSX_BUNDLE_LONG_VERSION_STRING)
+        set (MACOSX_BUNDLE_LONG_VERSION_STRING ${URHO3D_VERSION})
+    endif ()
+    if (NOT MACOSX_BUNDLE_SHORT_VERSION_STRING)
+        set (MACOSX_BUNDLE_SHORT_VERSION_STRING ${URHO3D_VERSION})
+    endif ()
+    if (NOT MACOSX_BUNDLE_COPYRIGHT)
+        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2014 the Urho3D project.")
+    endif ()
+endif ()
+
 # Setup SDK-like include dir in the build tree for building the Urho3D library
 file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 

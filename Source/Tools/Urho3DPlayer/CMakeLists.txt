@@ -27,7 +27,7 @@ set (TARGET_NAME Urho3DPlayer)
 define_source_files ()
 
 # Setup target with resource copying
-setup_main_executable ()
+setup_main_executable (NOBUNDLE)
 
 # Setup test cases
 if (URHO3D_ANGELSCRIPT)
