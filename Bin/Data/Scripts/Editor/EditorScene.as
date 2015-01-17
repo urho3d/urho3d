@@ -1083,12 +1083,15 @@ void CreateModelWithStaticModel(String filepath, Node@ parent)
 {
     if (parent is null)
         return;
+    /// \todo should be able to specify the createmode
+    if (parent is editorScene)
+        parent = CreateNode(REPLICATED);
 
     Model@ model = cache.GetResource("Model", filepath);
     if (model is null)
         return;
 
-    StaticModel@ staticModel = cast<StaticModel>(editNode.CreateComponent("StaticModel"));
+    StaticModel@ staticModel = parent.GetOrCreateComponent("StaticModel");
     staticModel.model = model;
     CreateLoadedComponent(staticModel);
 }
@@ -1097,12 +1100,15 @@ void CreateModelWithAnimatedModel(String filepath, Node@ parent)
 {
     if (parent is null)
         return;
+    /// \todo should be able to specify the createmode
+    if (parent is editorScene)
+        parent = CreateNode(REPLICATED);
 
     Model@ model = cache.GetResource("Model", filepath);
     if (model is null)
         return;
 
-    AnimatedModel@ animatedModel = cast<StaticModel>(editNode.CreateComponent("AnimatedModel"));
+    AnimatedModel@ animatedModel = parent.GetOrCreateComponent("AnimatedModel");
     animatedModel.model = model;
     CreateLoadedComponent(animatedModel);
 }

@@ -844,8 +844,6 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
             if (targetNode is null)
                 return;
 
-            // editNode = targetNode;
-
             if (type == RESOURCE_TYPE_PREFAB)
             {
                 LoadNode(browserFile.GetFullPath(), targetNode);
