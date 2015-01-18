@@ -668,9 +668,9 @@ macro (setup_executable)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
             COMMENT "Scp-ing ${TARGET_NAME} executable to target system")
     endif ()
-    if (DEST_RUNTIME_DIR)
+    if (DEST_RUNTIME_DIR AND DEST_BUNDLE_DIR)
         # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
-        install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_RUNTIME_DIR})
+        install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_BUNDLE_DIR})
     endif ()
 endmacro ()
 
@@ -721,6 +721,9 @@ macro (setup_main_executable)
         # Setup target as main shared library
         define_dependency_libs (Urho3D)
         setup_library (SHARED)
+        if (DEST_LIBRARY_DIR)
+            install (TARGETS ${TARGET_NAME} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
+        endif ()
         # Copy other dependent shared libraries to Android library output path
         foreach (FILE ${ABSOLUTE_PATH_LIBS})
             get_filename_component (EXT ${FILE} EXT)

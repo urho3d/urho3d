@@ -67,7 +67,8 @@ elseif (URHO3D_64BIT)
 endif ()
 set (DEST_INCLUDE_DIR include/${PATH_SUFFIX})
 set (DEST_SHARE_DIR share/${PATH_SUFFIX})
-set (DEST_RUNTIME_DIR ${DEST_SHARE_DIR}/bin)
+set (DEST_RUNTIME_DIR bin)
+set (DEST_BUNDLE_DIR ${DEST_SHARE_DIR}/Applications)
 # Note to package maintainer: ${PATH_SUFFIX} for library could be removed if the extra path is not desired, but if so then the RPATH setting in Source's CMakeLists.txt needs to be adjusted accordingly
 set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/${PATH_SUFFIX})
 # TODO: Investigate the implication of using CMAKE_SYSROOT variable (available since 3.0.0) instead of our own SYSROOT variable
