@@ -668,7 +668,7 @@ macro (setup_executable)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
             COMMENT "Scp-ing ${TARGET_NAME} executable to target system")
     endif ()
-    if (DEST_RUNTIME_DIR AND DEST_BUNDLE_DIR)
+    if (DEST_RUNTIME_DIR)
         # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
         install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_BUNDLE_DIR})
     endif ()
