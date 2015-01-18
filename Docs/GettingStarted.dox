@@ -131,9 +131,9 @@ If using MinGW to compile, DirectX headers may need to be acquired separately. T
 After the build is complete, the programs can be run from the Bin subdirectory in the build tree. These include the Urho3D player application, which can run application scripts, the tools, and C++ sample applications if they have been enabled. Unless your build tree location is also the same as the Urho3D project source tree, in order to run the Urho3D executables successfully, you must do one of the following first:
 - Copy both the Bin/Data and Bin/CoreData directories in the source tree to the Bin subdirectory in the build tree.
 - Instead of copying, just create symbolic links in the build tree pointing to the above two directories.
-- Or even better, use the 'resource prefix path' \ref Running_Commandline engine parameter by setting URHO3D_PREFIX_PATH variable in your host environment. The prefix variable must be set to an absolute path which contains the Data and CoreData subdirectories.      
+- Or even better, use the 'resource prefix path' \ref Running_Commandline "engine parameter" by setting URHO3D_PREFIX_PATH variable in your host environment. The prefix variable must be set to an absolute path which contains the Data and CoreData subdirectories.      
 
-The Mac OS X executables can be built with all the resources bundled into a single app directory. In order to enable this, set the URHO3D_MACOSX_BUNDLE build option when configuring the build tree for the Mac OS X platform. The bundled app can be launched just by double-clicking from the Finder without worrying about setting the 'resource prefix path'. This is because the URHO3D_PREFIX_PATH environment variable has been set internally to point to the resources directory that is already bundled in the app. Note, however, if you do not launch the app via the Apple "Launch Services" (such as when you are debugging or by calling the executable directly inside the bundled app directory via CLI) then you still need to set the 'resource prefix path' manually as described in previous paragraph.
+The Mac OS X executables can be built with all the resources bundled into a single app directory. In order to enable this, set the URHO3D_MACOSX_BUNDLE build option when configuring the build tree for the Mac OS X platform. The bundled app can be launched just by double-clicking from the Finder without worrying about setting the 'resource prefix path'. This is because the URHO3D_PREFIX_PATH environment variable has been set internally to point to the resources directory that is already bundled in the app. Note, however, if you do not launch the app via the Apple "Launch Services" (such as when you are debugging or by calling the executable directly inside the bundled app directory via CLI) then you still need to set the 'resource prefix path' manually as described in the previous paragraph.
 
 To run the Urho3D player application from the Visual Studio debugger, set the Urho3DPlayer project as the startup project and enter its relative path and filename into Properties -> Debugging -> Command: ../../../Bin/Urho3DPlayer.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will likely be hidden. To actually make the Urho3DPlayer application do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments:
 
@@ -169,7 +169,7 @@ For a release build, use the "ant release" command instead of "ant debug" and fo
 
 By default the Android package for Urho3D is com.googlecode.urho3d. For a real application you must replace this with your own package name. The Urho3D activity subclasses the SDLActivity from org.libsdl.app package, whose name (or the JNI code from SDL library) does not have to be changed.
 
-Note that the native code is built by default for armeabi-v7a ABI. To make your program compatible also with old Android devices, build also an armeabi version by reconfiguring the build tree again with the build option "-DANDROID_ABI=armeabi" added, then execute make again in the build directory. Similarly, the native code can be built using 64-bit ABI by changing the value of this build option. See \ref Build_Options "Build options" for all the possible values. Note that CMake doesn't allow changing of its compiler settings in an existing build tree, so before reconfiguring to use an incompatible ANDROID_ABI most likely you need to clean the CMake cache first.
+Note that the native code is built by default for armeabi-v7a ABI. To make your program compatible also with old Android devices, build also an armeabi version by reconfiguring the build tree again with the build option "-DANDROID_ABI=armeabi" added, then execute make again in the build directory. Similarly, the native code can be built using 64-bit ABI by changing the value of this build option. See \ref Build_Options for all the possible values. Note that CMake doesn't allow changing of its compiler settings in an existing build tree, so before reconfiguring to use an incompatible ANDROID_ABI most likely you need to clean the CMake cache first.
 
 You can also build and deploy using Eclipse IDE with ADT plugin. To do that, execute cmake_eclipse.sh with "-DANDROID=1" build option set. Import "Existing Android Code into Workspace" from the CMake generated Eclipse project file in the build tree. Switch Eclipse IDE to use Java Perspective. Update project properties to choose the desired Android API target. Choose "Run" to let ADT automatically build and deploy the application to Android (virtual) device.
 
@@ -224,7 +224,7 @@ DESTDIR=$(grep SYSROOT CMakeCache.txt |cut -d'=' -f2) make install
 
 Note that SYSROOT variable is empty when the build tree is not setup for cross-compiling.
 
-Refer to \ref UsingLibrary "Using Urho3D as external library" on how to setup your own project to use Urho3D as external library.
+Refer to \ref UsingLibrary on how to setup your own project to use Urho3D as external library.
 
 Urho3D should be built as a shared library if your application consists of multiple modules (main executable + other shared libraries) that all link to Urho3D. The reason for this is that Urho3D contains a few sensitive static data values, such as the main thread's ID, which will not work properly if they are duplicated due to multiple static linkage.
 
@@ -250,7 +250,7 @@ Urho3DPlayer <scriptfilename> [options]
 
 The scripting language supported by default is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Bin/Data or Bin/CoreData subdirectories so that Urho3DPlayer can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame.
 
-Lua language support can optionally be built in, see \ref Build_Options "Build options".
+Lua language support can optionally be built in, see \ref Build_Options.
 
 On Android and iOS the command line can not be entered, so it is instead read from the file Bin/Data/CommandLine.txt. By default the NinjaSnowWar example will be run.
 
@@ -346,7 +346,7 @@ NinjaSnowWar also supports client/server multiplayer. To start the server, run t
 
 The second larger example is a scene and %UI layout editor application written in script. To start, run Editor.bat or Editor.sh, or use the command Urho3DPlayer Scripts/Editor.as
 
-For details on how to use the editor, see \ref EditorInstructions "Editor instructions."
+For details on how to use the editor, see \ref EditorInstructions.
 
 \section Examples_Samples Sample applications
 
@@ -393,7 +393,7 @@ PROJECT_ROOT/
  └ *.bat or *.sh
 \endcode
 
-The physical project root directory is also the logical project source tree in CMake terminology where your project main CMakeLists.txt should reside. The 'Bin' directory should contain the 'Data' and 'CoreData' resource subdirs for your own assets. You may want to copy (or symlink) the 'CMake' subdir from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/CMake') to your project root directory. You may also want to copy (or symlink) the build scripts from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/Scripts') to your project root directory. Alternatively, you can add the Urho3D project root directory into the PATH environment variable in your host system in order to make the build scripts available everwhere. The build scripts work together with the Urho3D CMake modules to configure and generate your initial project build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are supported. Note that when you configure your project (either via one of the build script or via cmake-gui), you can also pass most of the \ref Build_Options "build options" supported by Urho3D project. In fact, you probably have to pass a compatible build options with the Urho3D library that you intend to use to avoid any conflict.
+The physical project root directory is also the logical project source tree in CMake terminology where your project main CMakeLists.txt should reside. The 'Bin' directory should contain the 'Data' and 'CoreData' resource subdirs for your own assets. You may want to copy (or symlink) the 'CMake' subdir from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/CMake') to your project root directory. You may also want to copy (or symlink) the build scripts from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/Scripts') to your project root directory. Alternatively, you can add the Urho3D project root directory into the PATH environment variable in your host system in order to make the build scripts available everwhere. The build scripts work together with the Urho3D CMake modules to configure and generate your initial project build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are supported. Note that when you configure your project (either via one of the build script or via cmake-gui), you can also pass most of the \ref Build_Options supported by Urho3D project. In fact, you probably have to pass a compatible build options with the Urho3D library that you intend to use to avoid any conflict.
 
 In your own project root directory, create a main CMakeLists.txt file and add the following lines: (replace MyProjectName and MyExecutableName with the actual names you want)
 

@@ -690,7 +690,7 @@ endmacro ()
 #  WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL - see CMake help on add_executable command
 macro (setup_main_executable)
     # Parse extra arguments
-    cmake_parse_arguments (ARG "NOBUNDLE" "" "" ${ARGN})
+    cmake_parse_arguments (ARG "NOBUNDLE;MACOSX_BUNDLE" "" "" ${ARGN})
 
     # Define resource files
     if (XCODE)
@@ -757,7 +757,7 @@ macro (setup_main_executable)
             list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY 1,2 MACOSX_BUNDLE_INFO_PLIST iOSBundleInfo.plist.template)
             setup_ios_linker_flags (CMAKE_EXE_LINKER_FLAGS)
         elseif (APPLE)
-            if (URHO3D_MACOSX_BUNDLE AND NOT ARG_NOBUNDLE)
+            if ((URHO3D_MACOSX_BUNDLE OR ARG_MACOSX_BUNDLE) AND NOT ARG_NOBUNDLE)
                 set (EXE_TYPE MACOSX_BUNDLE)
                 list (APPEND TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
             endif ()
