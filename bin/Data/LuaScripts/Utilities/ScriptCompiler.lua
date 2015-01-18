@@ -3,7 +3,7 @@
 
 
 -- Set root folder containing lua files to convert
-local rootFolder = "Data/LuaScripts/" -- Starting from Bin folder
+local rootFolder = "Data/LuaScripts/" -- Starting from bin folder
 if not fileSystem:DirExists(rootFolder) then log:Write(LOG_WARNING, "Cannot find " .. rootFolder) return end -- Ensure that rootFolder exists
 
 -- Get lua files recursively

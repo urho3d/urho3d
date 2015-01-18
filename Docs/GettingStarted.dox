@@ -128,14 +128,14 @@ Note that Eclipse requires CDT plugin to build C/C++ project. When using generat
 
 If using MinGW to compile, DirectX headers may need to be acquired separately. They can be copied to the MinGW installation eg. from the following package: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz These will be missing some of the headers related to shader compilation, so a MinGW build will use OpenGL by default. To build in Direct3D9 mode, the MinGW-w64 port is necessary: http://mingw-w64.sourceforge.net/. Using it, Direct3D9 can be enabled with the "-DURHO3D_OPENGL=0" build option.
 
-After the build is complete, the programs can be run from the Bin subdirectory in the build tree. These include the Urho3D player application, which can run application scripts, the tools, and C++ sample applications if they have been enabled. Unless your build tree location is also the same as the Urho3D project source tree, in order to run the Urho3D executables successfully, you must do one of the following first:
-- Copy both the Bin/Data and Bin/CoreData directories in the source tree to the Bin subdirectory in the build tree.
+After the build is complete, the programs can be run from the bin subdirectory in the build tree. These include the Urho3D player application, which can run application scripts, the tools, and C++ sample applications if they have been enabled. Unless your build tree location is also the same as the Urho3D project source tree, in order to run the Urho3D executables successfully, you must do one of the following first:
+- Copy both the bin/Data and bin/CoreData directories in the source tree to the bin subdirectory in the build tree.
 - Instead of copying, just create symbolic links in the build tree pointing to the above two directories.
 - Or even better, use the 'resource prefix path' \ref Running_Commandline "engine parameter" by setting URHO3D_PREFIX_PATH variable in your host environment. The prefix variable must be set to an absolute path which contains the Data and CoreData subdirectories.      
 
 The Mac OS X executables can be built with all the resources bundled into a single app directory. In order to enable this, set the URHO3D_MACOSX_BUNDLE build option when configuring the build tree for the Mac OS X platform. The bundled app can be launched just by double-clicking from the Finder without worrying about setting the 'resource prefix path'. This is because the URHO3D_PREFIX_PATH environment variable has been set internally to point to the resources directory that is already bundled in the app. Note, however, if you do not launch the app via the Apple "Launch Services" (such as when you are debugging or by calling the executable directly inside the bundled app directory via CLI) then you still need to set the 'resource prefix path' manually as described in the previous paragraph.
 
-To run the Urho3D player application from the Visual Studio debugger, set the Urho3DPlayer project as the startup project and enter its relative path and filename into Properties -> Debugging -> Command: ../../../Bin/Urho3DPlayer.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will likely be hidden. To actually make the Urho3DPlayer application do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments:
+To run the Urho3D player application from the Visual Studio debugger, set the Urho3DPlayer project as the startup project and enter its relative path and filename into Properties -> Debugging -> Command: ../../../bin/Urho3DPlayer.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will likely be hidden. To actually make the Urho3DPlayer application do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments:
 
 \verbatim
 Scripts/NinjaSnowWar.as -w
@@ -149,7 +149,7 @@ CMake caches some internal variables to speed up the subsequent invocation of th
 
 \section Building_Android Android build process
 
-First, if you are building under Windows host without MKLINK support then copy Bin/Data and Bin/CoreData directories to the Android/assets directory (you can use the provided batch file CopyData.bat). This step is not necessary for Windows host with MKLINK support and other non-Windows host systems.
+First, if you are building under Windows host without MKLINK support then copy bin/Data and bin/CoreData directories to the Android/assets directory (you can use the provided batch file CopyData.bat). This step is not necessary for Windows host with MKLINK support and other non-Windows host systems.
 
 Set the ANDROID_NDK environment variable to point to your Android NDK. On Windows, ensure that make.exe from the Android NDK is included in the path and is executable from the command line.
 
@@ -179,7 +179,7 @@ Run cmake_ios.sh. This generates an Xcode project named Urho3D.xcodeproj.
 
 Open the Xcode project and check the properties for the Urho3D project (topmost in the Project Navigator.) In Architectures -> Base SDK, choose your iOS SDK (CMake would automatically select latest iOS when generating the Xcode project). In Code Signing, enter your developer identity as necessary. Also ensure you have changed the built-in target to ALL_BUILD to build all the targets.
 
-The Urho3DPlayer target will actually build the application bundle and copy resources from Bin/Data and Bin/CoreData directories. Edit its build scheme to choose debug or release mode.
+The Urho3DPlayer target will actually build the application bundle and copy resources from bin/Data and bin/CoreData directories. Edit its build scheme to choose debug or release mode.
 
 To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run" destination setting to "iPhone Simulator" or "iPad Simulator", and executable to "Urho3DPlayer.app".
 
@@ -189,7 +189,7 @@ For native build on Raspberry Pi itself, use the similar process for \ref Buildi
 
 For cross-compiling build on an Linux host system, firstly set the RPI_PREFIX environment variable or build option to point to your Raspberry Pi Cross-Compiling tool are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. Secondly, set the RPI_SYSROOT environment variable or build option to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. You are recommended to download the Raspbian system root with Urho3D prerequisite software installed from https://github.com/urho3d/rpi-sysroot. You can just download from the "strip" branch to cut down the download time and size.
 
-Execute cmake_raspi.sh then go to the build tree to execute make command. After the build is complete, the ARM executables can be found in the build tree's "Bin" subdirectory.
+Execute cmake_raspi.sh then go to the build tree to execute make command. After the build is complete, the ARM executables can be found in the build tree's "bin" subdirectory.
 
 You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclipse IDE. To do that, execute cmake_eclipse.sh with "-DRPI=1" build option set. Import the CMake generated Eclipse project in the build tree into Eclipse's workspace. Build the project as usual. Optionally, use the "URHO3D_SCP_TO_TARGET" build option to automatically deploy the ARM executables to target Raspberry Pi device as part of build process; or configure Eclipse to perform a "download to target path" in the Run/Debug configuration for C/C++ Remote %Application. Either way, you have to configure the Run/Debug configuration to let it know how to reach your target Raspberry Pi device.
 
@@ -201,7 +201,7 @@ To cross-compile, the MinGW toolchain (compiler, linker and w32api) needs to be 
 
 For activating the MinGW toolchain, and to allow it to find the correct compiler, the MINGW_PREFIX environment variable needs to be set. This variable should be set to the prefix of the compiler name, e.g. /usr/bin/x86_64-w64-mingw32 where it would be used to find /usr/bin/x86_64-w64-mingw32-gcc and /usr/bin/x86_64-w64-mingw32-g++, etc. Optionally you can also set MINGW_SYSROOT environment variable or build option to point to your MinGW system root, if it is not installed in a normal expected location.
 
-Execute cmake_mingw.sh then go to the build tree to execute make command. After the build is complete, the Windows executables can be found in the build tree's "Bin" subdirectory.
+Execute cmake_mingw.sh then go to the build tree to execute make command. After the build is complete, the Windows executables can be found in the build tree's "bin" subdirectory.
 
 \section Building_64bit Native 64bit build
 
@@ -236,23 +236,23 @@ The prerequisites are Doxygen and Graphviz. Tools to dump the \ref ScriptAPI "An
 
 \section Building_Shaders Compiling Direct3D shaders
 
-When building with the Windows 8 SDK, copy d3dcompiler_46.dll from "C:\Program Files (x86)\Windows Kits\8.0\bin\x86" to build tree's "Bin" directory so that Urho3D executables will run correctly.
+When building with the Windows 8 SDK, copy d3dcompiler_46.dll from "C:\Program Files (x86)\Windows Kits\8.0\bin\x86" to build tree's "bin" directory so that Urho3D executables will run correctly.
 
 Note that you can also force an OpenGL mode build on Windows platform by using the "URHO3D_OPENGL" build option in the table below; OpenGL does not depend on a separate shader compiler DLL.
 
 \page Running Running Urho3D player application
 
-The Urho3D player application in the Bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic, and therefore must be supplied with the name of the application script file it should run:
+The Urho3D player application in the bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic, and therefore must be supplied with the name of the application script file it should run:
 
 \verbatim
 Urho3DPlayer <scriptfilename> [options]
 \endverbatim
 
-The scripting language supported by default is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Bin/Data or Bin/CoreData subdirectories so that Urho3DPlayer can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame.
+The scripting language supported by default is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the bin/Data or bin/CoreData subdirectories so that Urho3DPlayer can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame.
 
 Lua language support can optionally be built in, see \ref Build_Options.
 
-On Android and iOS the command line can not be entered, so it is instead read from the file Bin/Data/CommandLine.txt. By default the NinjaSnowWar example will be run.
+On Android and iOS the command line can not be entered, so it is instead read from the file bin/Data/CommandLine.txt. By default the NinjaSnowWar example will be run.
 
 \section Running_Commandline Command line options
 
@@ -323,7 +323,7 @@ The examples included with Urho3D consist of two larger applications built in An
 
 \section Examples_NinjaSnowWar NinjaSnowWar
 
-The first of the larger examples is a third-person action game. To start, run NinjaSnowWar.bat or NinjaSnowWar.sh in the Bin directory, or use the command Urho3DPlayer Scripts/NinjaSnowWar.as
+The first of the larger examples is a third-person action game. To start, run NinjaSnowWar.bat or NinjaSnowWar.sh in the bin directory, or use the command Urho3DPlayer Scripts/NinjaSnowWar.as
 
 Key and mouse controls:
 
@@ -352,9 +352,9 @@ For details on how to use the editor, see \ref EditorInstructions.
 
 The sample applications start from the very simple (a "Hello World" program) and progress to demonstrate more complex engine features. The code is heavily commented and should be easy to follow for learning. The applications display on-screen instructions when run.
 
-The AngelScript and Lua versions reside in the Bin/Data/Scripts and Bin/Data/LuaScripts directories. %Batch files to run each of them are not provided due to their large amount: instead run the player application with the script file name as the parameter, for example Urho3DPlayer Scripts/01_HelloWorld.as
+The AngelScript and Lua versions reside in the bin/Data/Scripts and bin/Data/LuaScripts directories. %Batch files to run each of them are not provided due to their large amount: instead run the player application with the script file name as the parameter, for example Urho3DPlayer Scripts/01_HelloWorld.as
 
-The C++ versions need to be explicitly enabled in the build with the CMake option -DURHO3D_SAMPLES=1. When enabled, the executables will be produced into the Bin directory and can be run from there. Their source code is in the Source/Samples directory.
+The C++ versions need to be explicitly enabled in the build with the CMake option -DURHO3D_SAMPLES=1. When enabled, the executables will be produced into the bin directory and can be run from there. Their source code is in the Source/Samples directory.
 
 The samples provide the following common key controls:
 
@@ -382,7 +382,7 @@ First of all, structure your project similar to Urho3D project as below. Althoug
 
 \code
 PROJECT_ROOT/
- ├ Bin/
+ ├ bin/
  │  ├ Data/
  │  └ CoreData/
  ├ CMake/
@@ -393,7 +393,7 @@ PROJECT_ROOT/
  └ *.bat or *.sh
 \endcode
 
-The physical project root directory is also the logical project source tree in CMake terminology where your project main CMakeLists.txt should reside. The 'Bin' directory should contain the 'Data' and 'CoreData' resource subdirs for your own assets. You may want to copy (or symlink) the 'CMake' subdir from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/CMake') to your project root directory. You may also want to copy (or symlink) the build scripts from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/Scripts') to your project root directory. Alternatively, you can add the Urho3D project root directory into the PATH environment variable in your host system in order to make the build scripts available everwhere. The build scripts work together with the Urho3D CMake modules to configure and generate your initial project build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are supported. Note that when you configure your project (either via one of the build script or via cmake-gui), you can also pass most of the \ref Build_Options supported by Urho3D project. In fact, you probably have to pass a compatible build options with the Urho3D library that you intend to use to avoid any conflict.
+The physical project root directory is also the logical project source tree in CMake terminology where your project main CMakeLists.txt should reside. The 'bin' directory should contain the 'Data' and 'CoreData' resource subdirs for your own assets. You may want to copy (or symlink) the 'CMake' subdir from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/CMake') to your project root directory. You may also want to copy (or symlink) the build scripts from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/Scripts') to your project root directory. Alternatively, you can add the Urho3D project root directory into the PATH environment variable in your host system in order to make the build scripts available everwhere. The build scripts work together with the Urho3D CMake modules to configure and generate your initial project build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are supported. Note that when you configure your project (either via one of the build script or via cmake-gui), you can also pass most of the \ref Build_Options supported by Urho3D project. In fact, you probably have to pass a compatible build options with the Urho3D library that you intend to use to avoid any conflict.
 
 In your own project root directory, create a main CMakeLists.txt file and add the following lines: (replace MyProjectName and MyExecutableName with the actual names you want)
 
@@ -612,7 +612,7 @@ For more details related to the C++ coding style, see also \ref CodingConvention
 
 \page EditorInstructions Editor instructions
 
-The Urho3D editor is a script application that can be run with the Urho3D player application. To start, execute any of these commands: (in the Bin directory) Editor.bat, Editor.sh or Urho3DPlayer Scripts/Editor.as
+The Urho3D editor is a script application that can be run with the Urho3D player application. To start, execute any of these commands: (in the bin directory) Editor.bat, Editor.sh or Urho3DPlayer Scripts/Editor.as
 
 All the \ref Running_Commandline "command line options" supported by Urho3D player application are available for Editor as well. Additionally, Editor also supports the following command line options:
 
@@ -620,7 +620,7 @@ All the \ref Running_Commandline "command line options" supported by Urho3D play
 -scene </path/to/scene.xml>     Load a scene after starting up
 \endverbatim
 
-Hint: to get more content to look at, run the Physics sample application (Bin/Data/Scripts/11_Physics.as), and press F5. This saves a scene file called Physics.xml into the Data/Scenes subdirectory, which can be loaded in the editor. Scenes utilized by the NinjaSnowWar and SceneAndUILoad examples also exist in the Data/Scenes subdirectory, and the NinjaSnowWar object "prefabs" are in the Data/Objects subdirectory.
+Hint: to get more content to look at, run the Physics sample application (bin/Data/Scripts/11_Physics.as), and press F5. This saves a scene file called Physics.xml into the Data/Scenes subdirectory, which can be loaded in the editor. Scenes utilized by the NinjaSnowWar and SceneAndUILoad examples also exist in the Data/Scenes subdirectory, and the NinjaSnowWar object "prefabs" are in the Data/Objects subdirectory.
 
 \section EditorInstructions_Controls Controls
 
@@ -710,7 +710,7 @@ Components of same type can be multi-edited. Where attribute values differ, the 
 
 In addition to whole scenes, single scene nodes including all their components and child nodes can be loaded and saved (%File -> Load node, %File -> Save node as.) These can act as "prefabs" for speeding up scene construction. To save a node, it needs first to be selected in the hierarchy window.
 
-Primitive geometries (boxes, spheres, cylinders) can be instantiated from the Create menu. Note that these are just ordinary model files in the Bin/Data/Models directory; their Blender format source files are in the SourceAssets directory.
+Primitive geometries (boxes, spheres, cylinders) can be instantiated from the Create menu. Note that these are just ordinary model files in the bin/Data/Models directory; their Blender format source files are in the SourceAssets directory.
 
 Additionally a resource browser is available to access the contents of resource directories. Whenever the editor is opened or a scene is loaded the resource browser scans for resources. If at anytime the resources change the reload button can be pressed at the top-right of the resource browser and the resource browser will rescan. Two methods are provided to find resources. A tree view of the folders and a search bar. The search box utilizes a simple string substring of the filename. Resources can also be filtered by type by opening the filter panel which is toggled by the small filter icon.  There are lots of contextual options for each resource type such as dragging a resource into the hierarchy view, a LineEdit, or in the viewport.  A right click context menu on a resource in the browser will give additional options per resource type.
 

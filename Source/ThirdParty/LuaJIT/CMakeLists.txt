@@ -322,7 +322,7 @@ if (CMAKE_CROSSCOMPILING OR IOS)
     include (ExternalProject)
     ExternalProject_Add(buildvm
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/host
-        CMAKE_ARGS -DURHO3D_64BIT=${URHO3D_64BIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/Bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DHOST_XCFLAGS=${HOST_XCFLAGS} -DTARGET_ARCH=${TARGET_ARCH} -DDASM_FLAGS=${DASM_FLAGS} -DDASM_ARCH=${DASM_ARCH}
+        CMAKE_ARGS -DURHO3D_64BIT=${URHO3D_64BIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DHOST_XCFLAGS=${HOST_XCFLAGS} -DTARGET_ARCH=${TARGET_ARCH} -DDASM_FLAGS=${DASM_FLAGS} -DDASM_ARCH=${DASM_ARCH}
     )
 else ()
     # Otherwise, build it internally as per normal
@@ -345,7 +345,7 @@ macro (generate_source name mode)
     set (GEN_SRC ${CMAKE_CURRENT_BINARY_DIR}/generated/${name})
     set (GEN_SRCS ${GEN_SRCS} ${GEN_SRC})
     add_custom_command (OUTPUT ${GEN_SRC}
-        COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/buildvm -m ${mode} -o ${GEN_SRC} ${ARGN}
+        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/buildvm -m ${mode} -o ${GEN_SRC} ${ARGN}
         DEPENDS buildvm ${ARGN}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating buildvm output: ${name}")
@@ -422,7 +422,7 @@ if (NOT IOS)
     adjust_target_name ()   # Adjust to intended target output name
 
     # Define post build steps
-    set (LUAJIT_DEP_DIR ${CMAKE_BINARY_DIR}/Bin/jit)
+    set (LUAJIT_DEP_DIR ${CMAKE_BINARY_DIR}/bin/jit)
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/src/jit ${LUAJIT_DEP_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/generated/vmdef.lua ${LUAJIT_DEP_DIR}

@@ -74,7 +74,7 @@ set (DASM ${DASM_DIR}/dynasm.lua)
 set (DASM_DASC ${CMAKE_CURRENT_SOURCE_DIR}/../vm_${DASM_ARCH}.dasc)
 file (GLOB DASM_LUA ${DASM_DIR}/*.lua)
 add_custom_command (OUTPUT ${GEN_ARCH_H}
-    COMMAND ${CMAKE_BINARY_DIR}/Bin/tool/minilua ${DASM} ${DASM_FLAGS} -o ${GEN_ARCH_H} ${DASM_DASC}
+    COMMAND ${CMAKE_BINARY_DIR}/bin/tool/minilua ${DASM} ${DASM_FLAGS} -o ${GEN_ARCH_H} ${DASM_DASC}
     DEPENDS minilua ${DASM_LUA} ${DASM_DASC}
     WORKING_DIRECTORY ${DASM_DIR}
     COMMENT "Generating buildvm arch header file")
@@ -86,8 +86,8 @@ set (SOURCE_FILES ${C_FILES} ${GEN_ARCH_H})
 # Define dependency libs
 set (INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR} ..)
 
-# All tools must be natively built and output to Bin/tool subdir to differentiate them from platform-specific binaries in the Bin directory
-set_output_directories (${CMAKE_BINARY_DIR}/Bin/tool RUNTIME PDB)
+# All tools must be natively built and output to bin/tool subdir to differentiate them from platform-specific binaries in the bin directory
+set_output_directories (${CMAKE_BINARY_DIR}/bin/tool RUNTIME PDB)
 
 # Setup target
 setup_executable (NODEPS)

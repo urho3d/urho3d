@@ -67,7 +67,7 @@ elseif (URHO3D_64BIT)
 endif ()
 set (DEST_INCLUDE_DIR include/${PATH_SUFFIX})
 set (DEST_SHARE_DIR share/${PATH_SUFFIX})
-set (DEST_RUNTIME_DIR ${DEST_SHARE_DIR}/Bin)
+set (DEST_RUNTIME_DIR ${DEST_SHARE_DIR}/bin)
 # Note to package maintainer: ${PATH_SUFFIX} for library could be removed if the extra path is not desired, but if so then the RPATH setting in Source's CMakeLists.txt needs to be adjusted accordingly
 set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/${PATH_SUFFIX})
 # TODO: Investigate the implication of using CMAKE_SYSROOT variable (available since 3.0.0) instead of our own SYSROOT variable
@@ -75,10 +75,10 @@ set (SYSROOT ${ANDROID_TOOLCHAIN_ROOT} ${RPI_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYS
 set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 set (DEST_PERMISSIONS FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ DIRECTORY_PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 # Install application launcher scripts
-file (GLOB APP_SCRIPTS ${CMAKE_SOURCE_DIR}/Bin/*${SCRIPT_EXT})
+file (GLOB APP_SCRIPTS ${CMAKE_SOURCE_DIR}/bin/*${SCRIPT_EXT})
 install (FILES ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR} PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)   # 755
 # Install resource directories required by applications built with Urho3D library
-install (DIRECTORY ${CMAKE_SOURCE_DIR}/Bin/CoreData ${CMAKE_SOURCE_DIR}/Bin/Data DESTINATION ${DEST_RUNTIME_DIR} ${DEST_PERMISSIONS})
+install (DIRECTORY ${CMAKE_SOURCE_DIR}/bin/CoreData ${CMAKE_SOURCE_DIR}/bin/Data DESTINATION ${DEST_RUNTIME_DIR} ${DEST_PERMISSIONS})
 # Install CMake modules and toolchains provided by and for Urho3D
 install (DIRECTORY ${CMAKE_SOURCE_DIR}/CMake/ DESTINATION ${DEST_SHARE_DIR}/CMake ${DEST_PERMISSIONS})    # Note: the trailing slash is significant
 # Install CMake build scripts

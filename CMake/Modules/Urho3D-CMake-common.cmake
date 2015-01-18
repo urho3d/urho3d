@@ -407,7 +407,7 @@ macro (set_output_directories OUTPUT_PATH)
 endmacro ()
 
 # Set common binary output directory for all platforms
-set_output_directories (${CMAKE_BINARY_DIR}/Bin RUNTIME PDB)
+set_output_directories (${CMAKE_BINARY_DIR}/bin RUNTIME PDB)
 
 # Macro for setting symbolic link on platform that supports it
 macro (create_symlink SOURCE DESTINATION)
@@ -473,7 +473,7 @@ if (ANDROID)
     # Create symbolic links in the build tree
     foreach (I CoreData Data)
         if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Android/assets/${I})
-            create_symlink (${CMAKE_SOURCE_DIR}/Bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
+            create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
         endif ()
     endforeach ()
     foreach (I AndroidManifest.xml build.xml src res assets jni)
@@ -694,9 +694,9 @@ macro (setup_main_executable)
 
     # Define resource files
     if (XCODE)
-        set (RESOURCE_FILES ${CMAKE_SOURCE_DIR}/Bin/CoreData ${CMAKE_SOURCE_DIR}/Bin/Data ${CMAKE_SOURCE_DIR}/Bin/Data/Textures/UrhoIcon.icns)
+        set (RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/CoreData ${CMAKE_SOURCE_DIR}/bin/Data ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.icns)
         if (IOS)
-            list (APPEND RESOURCE_FILES ${CMAKE_SOURCE_DIR}/Bin/Data/Textures/UrhoIcon.png)
+            list (APPEND RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.png)
         endif ()
         source_group (Resources FILES ${RESOURCE_FILES})
         set_source_files_properties (${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)

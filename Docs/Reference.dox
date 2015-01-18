@@ -150,7 +150,7 @@ The full list of supported parameters, their datatypes and default values:
 - Multisample (int) Hardware multisampling level. Default 1 (no multisampling.)
 - Orientations (string) Space-separated list of allowed orientations. Effective only on iOS. All possible values are "LandscapeLeft", "LandscapeRight", "Portrait" and "PortraitUpsideDown". Default "LandscapeLeft LandscapeRight".
 - DumpShaders (string) Filename to dump used shader variations to for precaching.
-- %RenderPath (string) Default renderpath resource name. Default empty, which causes forward rendering (Bin/CoreData/RenderPaths/Forward.xml) to be used.
+- %RenderPath (string) Default renderpath resource name. Default empty, which causes forward rendering (bin/CoreData/RenderPaths/Forward.xml) to be used.
 - Shadows (bool) Shadow rendering enable. Default true.
 - LowQualityShadows (bool) Low-quality (1 sample) shadow mode. Default false.
 - MaterialQuality (int) %Material quality level. Default 2 (high)
@@ -323,7 +323,7 @@ Just loading or saving whole scenes is not flexible enough for eg. games where n
 - In the editor, by selecting the node in the hierarchy window and choosing "Save node as" from the "File" menu.
 - Using the "node" command in AssetImporter, which will save the scene node hierarchy and any models contained in the input asset (eg. a Collada file)
 
-To instantiate the saved node into a scene, call \ref Scene::Instantiate "Instantiate()" or \ref Scene::InstantiateXML "InstantiateXML()" depending on the format. The node will be created as a child of the Scene but can be freely reparented after that. Position and rotation for placing the node need to be specified. The NinjaSnowWar example uses XML format for its object prefabs; these exist in the Bin/Data/Objects directory.
+To instantiate the saved node into a scene, call \ref Scene::Instantiate "Instantiate()" or \ref Scene::InstantiateXML "InstantiateXML()" depending on the format. The node will be created as a child of the Scene but can be freely reparented after that. Position and rotation for placing the node need to be specified. The NinjaSnowWar example uses XML format for its object prefabs; these exist in the bin/Data/Objects directory.
 
 \section SceneModel_FurtherInformation Further information
 
@@ -662,7 +662,7 @@ The binding of Urho3D C++ classes is accomplished with the tolua++ library, whic
 
 As seen above from the event handling examples, VariantMap handling has some differences to both C++ and AngelScript. To get a value, supply its key name as a string. To get a pointer to an object, supply first the object type, then the key name.
 
-For the rest of the functions and classes, see the generated \ref LuaScriptAPI "Lua script API reference". Also, look at the Lua counterparts of the sample applications in the Bin/Data/LuaScripts directory and compare them to the C++ and AngelScript versions to familiarize yourself with how things are done on the Lua side.
+For the rest of the functions and classes, see the generated \ref LuaScriptAPI "Lua script API reference". Also, look at the Lua counterparts of the sample applications in the bin/Data/LuaScripts directory and compare them to the C++ and AngelScript versions to familiarize yourself with how things are done on the Lua side.
 
 \section LuaScripting_Allocation Object allocation & Lua garbage collection
 
@@ -732,7 +732,7 @@ By default there is one viewport, but the amount can be increased with the funct
 
 Viewports can also be defined for rendertarget textures. See \ref AuxiliaryViews "Auxiliary views" for details.
 
-Each viewport defines a command sequence for rendering the scene, the \ref RenderPaths "render path". By default there exist forward, light pre-pass and deferred render paths in the Bin/CoreData/RenderPaths directory, see \ref Renderer::SetDefaultRenderPath "SetDefaultRenderPath()" to set the default for new viewports. If not overridden from the command line, forward rendering is the default. Deferred rendering modes will be advantageous once there is a large number of per-pixel lights affecting each object, but their disadvantages are the lack of hardware multisampling and inability to choose the lighting model per material. In place of multisample antialiasing, a FXAA post-processing edge filter can be used, see the MultipleViewports sample application (Bin/Data/Scripts/09_MultipleViewports.as) for an example of how to use.
+Each viewport defines a command sequence for rendering the scene, the \ref RenderPaths "render path". By default there exist forward, light pre-pass and deferred render paths in the bin/CoreData/RenderPaths directory, see \ref Renderer::SetDefaultRenderPath "SetDefaultRenderPath()" to set the default for new viewports. If not overridden from the command line, forward rendering is the default. Deferred rendering modes will be advantageous once there is a large number of per-pixel lights affecting each object, but their disadvantages are the lack of hardware multisampling and inability to choose the lighting model per material. In place of multisample antialiasing, a FXAA post-processing edge filter can be used, see the MultipleViewports sample application (bin/Data/Scripts/09_MultipleViewports.as) for an example of how to use.
 
 The steps for rendering each viewport on each frame are roughly the following:
 
@@ -867,7 +867,7 @@ These differences need to be observed when using the low-level rendering functio
 
 - Modifying an index buffer on OpenGL will similarly cause the existing index buffer assignment to be lost. Therefore, always set the vertex and index buffers before rendering.
 
-- %Shader resources are stored in different locations depending on the API: Bin/CoreData/Shaders/HLSL for Direct3D9, and Bin/CoreData/Shaders/GLSL for OpenGL.
+- %Shader resources are stored in different locations depending on the API: bin/CoreData/Shaders/HLSL for Direct3D9, and bin/CoreData/Shaders/GLSL for OpenGL.
 
 - To ensure similar UV addressing for render-to-texture viewports on both APIs, on OpenGL texture viewports will be rendered upside down.
 
@@ -893,7 +893,7 @@ OpenGL ES 2.0 has further limitations:
 
 \page Materials Materials
 
-Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. Default and example materials exist in the Bin/CoreData/Materials & Bin/Data/Materials subdirectories, and techniques exist in the Bin/CoreData/Techniques subdirectory.
+Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. Default and example materials exist in the bin/CoreData/Materials & bin/Data/Materials subdirectories, and techniques exist in the bin/CoreData/Techniques subdirectory.
 
 A material defines the textures, shader parameters and culling mode to use, and refers to one or several techniques. A technique defines the actual rendering passes, the shaders to use in each, and all other rendering states such as depth test, depth write, and blending.
 
@@ -960,7 +960,7 @@ The sRGB flag controls both whether the texture should be sampled with sRGB to l
 
 Using cube map textures requires an XML file to define the cube map face textures or layout. In this case the XML file *is* the texture resource name in material scripts or in LoadResource() calls.
 
-Individual face textures are defined in the XML like this: (see Bin/Data/Textures/Skybox.xml for an example)
+Individual face textures are defined in the XML like this: (see bin/Data/Textures/Skybox.xml for an example)
 
 \code
 <cubemap>
@@ -1193,13 +1193,13 @@ The render path XML definition looks like this:
 </renderpath>
 \endcode
 
-For examples of renderpath definitions, see the default forward, deferred and light pre-pass renderpaths in the Bin/CoreData/RenderPaths directory, and the postprocess renderpath definitions in the Bin/Data/PostProcess directory.
+For examples of renderpath definitions, see the default forward, deferred and light pre-pass renderpaths in the bin/CoreData/RenderPaths directory, and the postprocess renderpath definitions in the bin/Data/PostProcess directory.
 
 \section RenderPaths_Depth Depth-stencil handling and reading scene depth
 
 Normally needed depth-stencil surfaces are automatically allocated when the render path is executed.
 
-The special "lineardepth" (synonym "depth") format is intended for storing scene depth in deferred rendering. It is not an actual hardware depth-stencil texture, but will be D3DFMT_R32F on Direct3D9 and RGBA on OpenGL, due to the limitation of all color buffers having to be the same format. The shader include file Samplers.glsl in Bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB. Writing depth manually to a rendertarget, while using a non-readable depth-stencil surface ensures best compatibility and prevents any conflicts from using both depth test and manual depth sampling at the same time.
+The special "lineardepth" (synonym "depth") format is intended for storing scene depth in deferred rendering. It is not an actual hardware depth-stencil texture, but will be D3DFMT_R32F on Direct3D9 and RGBA on OpenGL, due to the limitation of all color buffers having to be the same format. The shader include file Samplers.glsl in bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB. Writing depth manually to a rendertarget, while using a non-readable depth-stencil surface ensures best compatibility and prevents any conflicts from using both depth test and manual depth sampling at the same time.
 
 There is also a possibility to define a readable hardware depth texture, and instruct the render path to use it instead. Availability for this must first be checked with the function \ref Graphics::GetReadableDepthSupport "GetReadableDepthSupport()". On Direct3D9 this will use the INTZ "hack" format. To define a readable depth-stencil texture, use the format "readabledepth" (synonym "hwdepth") and set it as the depth-stencil by using the "depthstencil" attribute in render path commands. Note that you must set it in every command where you want to use it, otherwise an automatically allocated depth-stencil will be used. Note also that the existence of a stencil channel is not guaranteed, so stencil masking optimizations for lights normally used by the Renderer & View classes will be disabled.
 
@@ -1207,7 +1207,7 @@ In the special case of a depth-only rendering pass you can set the readable dept
 
 After the readable depth texture has been filled, it can be bound to a texture unit in any subsequent commands. Pixel shaders should use the ReconstructDepth() helper function to reconstruct a linear depth value between 0-1 from the nonlinear hardware depth value. When the readable depth texture is bound for sampling, depth write is automatically disabled, as both modifying and sampling the depth would be undefined.
 
-An example render path for readable hardware depth exists in Bin/CoreData/RenderPaths/ForwardHWDepth.xml:
+An example render path for readable hardware depth exists in bin/CoreData/RenderPaths/ForwardHWDepth.xml:
 
 \code
 <renderpath>
@@ -1341,7 +1341,7 @@ By default an Animation is played back by using all the available bone tracks. H
 
 Animations can be accompanied with trigger data that contains timestamped Variant data to be interpreted by the application. This trigger data is in XML format next to the animation file itself. When an animation contains triggers, the AnimatedModel's scene node sends the E_ANIMATIONTRIGGER event each time a trigger point is crossed. The event data contains the timestamp, the animation name, and the variant data. Triggers will fire when the animation is advanced using \ref AnimationState::AddTime "AddTime()", but not when setting the absolute animation time position.
 
-The trigger data definition is below. Either normalized (0 = animation start, 1 = animation end) or non-normalized (time in seconds) timestamps can be used. See Bin/Data/Models/Ninja_Walk.xml and Bin/Data/Models/Ninja_Stealth.xml for examples; NinjaSnowWar implements footstep particle effects using animation triggers.
+The trigger data definition is below. Either normalized (0 = animation start, 1 = animation end) or non-normalized (time in seconds) timestamps can be used. See bin/Data/Models/Ninja_Walk.xml and bin/Data/Models/Ninja_Stealth.xml for examples; NinjaSnowWar implements footstep particle effects using animation triggers.
 
 \code
 <animation>
@@ -1684,7 +1684,7 @@ The navigation mesh generation must be triggered manually by calling \ref Naviga
 
 To query for a path between start and end points on the navigation mesh, call \ref NavigationMesh::FindPath "FindPath()".
 
-For a demonstration of the navigation capabilities, check the related sample application (Bin/Data/Scripts/15_Navigation.as), which features partial navigation mesh rebuilds (objects can be created and deleted) and querying paths.
+For a demonstration of the navigation capabilities, check the related sample application (bin/Data/Scripts/15_Navigation.as), which features partial navigation mesh rebuilds (objects can be created and deleted) and querying paths.
 
 
 \page UI User interface
@@ -1730,13 +1730,13 @@ The absolute pixel rects interact poorly with the Renderer's texture quality set
 
 \section UI_Defining Defining UI elements in XML
 
-User interface elements derive from Serializable, so they can be serialized to/from XML using their attributes. There are two distinct use cases for %UI definition files: either defining just the %UI element style and leaving the actual position and dimensions to be filled in later, or fully defining an %UI element layout. The default element style definitions, used for example by the editor and the debug console, are in the file Bin/Data/UI/DefaultStyle.xml.
+User interface elements derive from Serializable, so they can be serialized to/from XML using their attributes. There are two distinct use cases for %UI definition files: either defining just the %UI element style and leaving the actual position and dimensions to be filled in later, or fully defining an %UI element layout. The default element style definitions, used for example by the editor and the debug console, are in the file bin/Data/UI/DefaultStyle.xml.
 
 The function \ref UI::LoadLayout "LoadLayout()" in UI will take an XML file and instantiate the elements defined in it. To be valid XML, there should be one root-level %UI element. An optional style XML file can be specified; the idea is to first read the element's style from that file, then fill in the rest from the actual layout XML file. This way the layout file can be relatively simple, as the majority of the data is already defined.
 
 Note that a style can not be easily applied recursively to the loaded elements afterward. Therefore remember to specify the style file already when loading, or alternatively \ref UIElement::SetDefaultStyle "assign a default style file" to the %UI root element, which will then be picked up by all loaded layouts. This works because the %UI subsystem searches the style file by going up the parental chain starting from target parent %UI element. The search stops immediately when a style file is found or when it has reached the root element. Also note that Urho3D does not limit the number of style files being used at the same time in an application. You may have different style file set along the %UI parental hierarchy, if your application needs that.
 
-See the elements' C++ code for all supported attributes, and look at the editor's user interface layouts in the Bin/Data/UI directory for examples. You can also use the Editor application to create %UI layouts. The serialization format is similar to scene XML serialization, with three important differences:
+See the elements' C++ code for all supported attributes, and look at the editor's user interface layouts in the bin/Data/UI directory for examples. You can also use the Editor application to create %UI layouts. The serialization format is similar to scene XML serialization, with three important differences:
 
 1) The element type to instantiate, and the style to use for it can be set separately. For example the following element definition
 
@@ -1920,7 +1920,7 @@ You can chose from animated sprites, 2D particle emitters and static sprites.
 \section Urho2D_Animated Animated sprites
 
 Workflow for creating animated sprites in Urho2D relies on Spriter (c).
-Spriter is a crossplatform tool for creating 2D animations. It comes both as an almost fully featured free version and a more advanced 'pro' version. Free version is available at http://www.brashmonkey.com/spriter.htm. To get started, scml files from Bin/Data/Urho2D folder can be loaded in Spriter. Note that although currently Spriter doesn't support spritesheets/texture atlases, Urho2D does: you just have to use the same name for your scml file and your spritesheet's xml file (see \ref SpriteSheet2D below for details on how to generate this file). Example 33_Urho2DSpriterAnimation is a good demonstration of this feature (scml file and xml spritesheet are both named 'imp' to instruct Urho2D to use the atlas instead of the individual files). You could remove every image files in the 'imp' folder and just keep 'imp_all.png' to test it out. However, keep your individual image files as they are still required if you want to later edit your scml project in Spriter.
+Spriter is a crossplatform tool for creating 2D animations. It comes both as an almost fully featured free version and a more advanced 'pro' version. Free version is available at http://www.brashmonkey.com/spriter.htm. To get started, scml files from bin/Data/Urho2D folder can be loaded in Spriter. Note that although currently Spriter doesn't support spritesheets/texture atlases, Urho2D does: you just have to use the same name for your scml file and your spritesheet's xml file (see \ref SpriteSheet2D below for details on how to generate this file). Example 33_Urho2DSpriterAnimation is a good demonstration of this feature (scml file and xml spritesheet are both named 'imp' to instruct Urho2D to use the atlas instead of the individual files). You could remove every image files in the 'imp' folder and just keep 'imp_all.png' to test it out. However, keep your individual image files as they are still required if you want to later edit your scml project in Spriter.
 
 
 A *.scml file is loaded using AnimationSet2D class (Resource) and rendered using AnimatedSprite2D class (Drawable component):
@@ -1939,7 +1939,7 @@ For a demonstration, check examples 33_Urho2DSpriterAnimation and 24_Urho2DSprit
 A 2D particle emitter is built from a *.pex file (a format used by many 2D engines).
 A *.pex file is loaded using ParticleEffect2D class (Resource) and rendered using AnimatedSprite2D class (Drawable component):
 
-- ParticleEffect2D: a *.pex file defining the behavior and texture of a 2D particle (ParticleEmitter2D). For an example, see Bin/Data/Urho2D/greenspiral.pex
+- ParticleEffect2D: a *.pex file defining the behavior and texture of a 2D particle (ParticleEmitter2D). For an example, see bin/Data/Urho2D/greenspiral.pex
 - ParticleEmitter2D: used to display a ParticleEffect2D. Equivalent to a 3D ParticleEmitter.
 
 For a demonstration, check example 25_Urho2DParticle.
@@ -1957,7 +1957,7 @@ Spritesheets can be created using tools like ShoeBox (http://renderhjs.net/shoeb
 These tools will generate an image file and a xml file mapping coordinates and size for each individual image. Note that Urho2D uses same xml file format as Sparrow/Starling engines.
 
 You can assign a material to an image by creating a xml parameter file named as the image and located in the same folder.
-For example, to make the box sprite (Bin/Data/Urho2D/Box.png) nearest filtered, create a file Box.xml next to it, with the following content:
+For example, to make the box sprite (bin/Data/Urho2D/Box.png) nearest filtered, create a file Box.xml next to it, with the following content:
 
 \code
 <texture>
@@ -2429,7 +2429,7 @@ Options:
 
 When PackageTool runs, it will go inside the source directory, then look for subdirectories and any files. Paths inside the package will by default be relative to the source directory, but if an extra path prefix is desired, it can be specified by the optional basepath argument.
 
-For example, this would convert all the resource files inside the Urho3D Data directory into a package called Data.pak (execute the command from the Bin directory)
+For example, this would convert all the resource files inside the Urho3D Data directory into a package called Data.pak (execute the command from the bin directory)
 
 \verbatim
 PackageTool Data Data.pak
@@ -2461,7 +2461,7 @@ ScriptCompiler -dumpapi <Doxygen output file> [C header output file]
 
 \endverbatim
 
-The output files are saved with the extension .asc (compiled AngelScript.) Binary files are not automatically loaded instead of the text format (.as) script files, instead resource requests and resource references in objects need to point to the compiled files. In a final build of an application it may be convenient to simply replace the text format script files with the compiled scripts.
+The output files are saved with the extension .asc (compiled AngelScript.) binary files are not automatically loaded instead of the text format (.as) script files, instead resource requests and resource references in objects need to point to the compiled files. In a final build of an application it may be convenient to simply replace the text format script files with the compiled scripts.
 
 The script API dump mode can be used to replace the 'ScriptAPI.dox' file in the 'Docs' directory. If the output file name is not provided then the script API would be dumped to standard output (console) instead.
 
@@ -2478,7 +2478,7 @@ Note that \ref FileSystem::ScanDir "ScanDir()" function may return filenames in 
 
 Urho3D tries to use existing file formats whenever possible, and define custom file formats only when absolutely necessary. Currently used custom file formats are:
 
-\section FileFormats_Model Binary model format (.mdl)
+\section FileFormats_Model binary model format (.mdl)
 
 \verbatim
 Model geometry and vertex morph data
@@ -2565,7 +2565,7 @@ Geometry center data
 
 \endverbatim
 
-\section FileFormats_Animation Binary animation format (.ani)
+\section FileFormats_Animation binary animation format (.ani)
 
 \verbatim
 byte[4]    Identifier "UANI"
@@ -2683,7 +2683,7 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 
 - Unless impossible due to missing bindings (see above) new examples should be implemented in all of C++, AngelScript and Lua.
 
-- For new Component or UIElement subclasses, \ref Serialization "attributes" should exist for serialization, network replication and editing. The classes should be possible to create from within the editor; check the component category and supply icons for them as necessary (see the files Bin/Data/Textures/EditorIcons.png and Bin/Data/UI/EditorIcons.xml.)
+- For new Component or UIElement subclasses, \ref Serialization "attributes" should exist for serialization, network replication and editing. The classes should be possible to create from within the editor; check the component category and supply icons for them as necessary (see the files bin/Data/Textures/EditorIcons.png and bin/Data/UI/EditorIcons.xml.)
 
 - If the classes inherit attribute definitions from other classes, make sure that they are registered in the correct order on engine initialization.
 
