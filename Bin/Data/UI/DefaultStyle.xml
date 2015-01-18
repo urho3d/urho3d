@@ -10,6 +10,9 @@
         <attribute name="Hover Image Offset" value="0 16" />
         <attribute name="Pressed Child Offset" value="-1 1" />
     </element>
+    <element type="ToggledButton" style="Button" auto="false">
+        <attribute name="Image Rect" value="160 64 176 80" />
+    </element>
     <element type="CheckBox" style="BorderImage">
         <attribute name="Min Size" value="16 16" />
         <attribute name="Max Size" value="16 16" />
