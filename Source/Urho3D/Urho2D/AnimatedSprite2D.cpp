@@ -358,16 +358,16 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
     currentTime_ += timeStep * speed_;
 
     float time;
-    float animtationLength = animation_->GetLength();
+    float animationLength = animation_->GetLength();
 
     if (looped_)
     {
-        time = fmodf(currentTime_, animtationLength);
+        time = fmodf(currentTime_, animationLength);
         if (time < 0.0f)
             time += animation_->GetLength();
     }
     else
-        time = Clamp(currentTime_, 0.0f, animtationLength);
+        time = Clamp(currentTime_, 0.0f, animationLength);
 
     for (unsigned i = 0; i < numTracks_; ++i)
     {
