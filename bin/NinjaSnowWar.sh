@@ -10,4 +10,5 @@
 #   Start the server with "./NinjaSnowWar.sh -w -server"
 #   Start the client on the same host with "./NinjaSnowWar.sh -w -nobgm -address `hostname`"
 #
-$(dirname $0)/Urho3DPlayer Scripts/NinjaSnowWar.as $@
+if [ -d $(dirname $0)/../share/Urho3D/Resources ]; then OPT1="-pp ../share/Urho3D/Resources"; fi
+$(dirname $0)/Urho3DPlayer Scripts/NinjaSnowWar.as $OPT1 $@

@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-if [ $# -eq 0 ]
-then
-    $(dirname $0)/Urho3DPlayer Scripts/Editor.as -w -s
-else
-    $(dirname $0)/Urho3DPlayer Scripts/Editor.as $@
-fi
+if [ -d $(dirname $0)/../share/Urho3D/Resources ]; then OPT1="-pp ../share/Urho3D/Resources"; fi
+if [ $# -eq 0 ]; then OPT2="-w -s"; fi
+$(dirname $0)/Urho3DPlayer Scripts/Editor.as $OPT1 $OPT2 $@

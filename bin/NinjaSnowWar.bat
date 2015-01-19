@@ -11,4 +11,5 @@
 ::
 @echo off
 if exist "%~dp0Urho3DPlayer.exe" (set "DEBUG=") else (set "DEBUG=_d")
-"%~dp0Urho3DPlayer%DEBUG%" Scripts/NinjaSnowWar.as %*
+if exist "%~dp0..\share\Urho3D\Resources" (set "OPT1=-pp ..\share\Urho3D\Resources") else (set "OPT1=")
+"%~dp0Urho3DPlayer%DEBUG%" Scripts/NinjaSnowWar.as %OPT1% %*
