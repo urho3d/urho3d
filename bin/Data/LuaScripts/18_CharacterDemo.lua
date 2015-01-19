@@ -333,17 +333,11 @@ function Character:Start()
 end
 
 function Character:Load(deserializer)
-    self.onGround = deserializer:ReadBool()
-    self.okToJump = deserializer:ReadBool()
-    self.inAirTimer = deserializer:ReadFloat()
     self.controls.yaw = deserializer:ReadFloat()
     self.controls.pitch = deserializer:ReadFloat()
 end
 
 function Character:Save(serializer)
-    serializer:WriteBool(self.onGround)
-    serializer:WriteBool(self.okToJump)
-    serializer:WriteFloat(self.inAirTimer)
     serializer:WriteFloat(self.controls.yaw)
     serializer:WriteFloat(self.controls.pitch)
 end
