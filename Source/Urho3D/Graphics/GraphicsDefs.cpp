@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#include "../Graphics/GraphicsDefs.h"
 #include "../Math/StringHash.h"
 #include "../Math/Vector3.h"
 
@@ -29,65 +30,65 @@
 namespace Urho3D
 {
 
-StringHash VSP_AMBIENTSTARTCOLOR("AmbientStartColor");
-StringHash VSP_AMBIENTENDCOLOR("AmbientEndColor");
-StringHash VSP_BILLBOARDROT("BillboardRot");
-StringHash VSP_CAMERAPOS("CameraPos");
-StringHash VSP_CAMERAROT("CameraRot");
-StringHash VSP_NEARCLIP("NearClip");
-StringHash VSP_FARCLIP("FarClip");
-StringHash VSP_DEPTHMODE("DepthMode");
-StringHash VSP_DELTATIME("DeltaTime");
-StringHash VSP_ELAPSEDTIME("ElapsedTime");
-StringHash VSP_FRUSTUMSIZE("FrustumSize");
-StringHash VSP_GBUFFEROFFSETS("GBufferOffsets");
-StringHash VSP_LIGHTDIR("LightDir");
-StringHash VSP_LIGHTPOS("LightPos");
-StringHash VSP_MODEL("Model");
-StringHash VSP_VIEWPROJ("ViewProj");
-StringHash VSP_UOFFSET("UOffset");
-StringHash VSP_VOFFSET("VOffset");
-StringHash VSP_ZONE("Zone");
-StringHash VSP_LIGHTMATRICES("LightMatrices");
-StringHash VSP_SKINMATRICES("SkinMatrices");
-StringHash VSP_VERTEXLIGHTS("VertexLights");
-StringHash PSP_AMBIENTCOLOR("AmbientColor");
-StringHash PSP_CAMERAPOS("CameraPosPS");
-StringHash PSP_DELTATIME("DeltaTimePS");
-StringHash PSP_DEPTHRECONSTRUCT("DepthReconstruct");
-StringHash PSP_ELAPSEDTIME("ElapsedTimePS");
-StringHash PSP_FOGCOLOR("FogColor");
-StringHash PSP_FOGPARAMS("FogParams");
-StringHash PSP_GBUFFERINVSIZE("GBufferInvSize");
-StringHash PSP_LIGHTCOLOR("LightColor");
-StringHash PSP_LIGHTDIR("LightDirPS");
-StringHash PSP_LIGHTPOS("LightPosPS");
-StringHash PSP_MATDIFFCOLOR("MatDiffColor");
-StringHash PSP_MATEMISSIVECOLOR("MatEmissiveColor");
-StringHash PSP_MATENVMAPECOLOR("MatEnvMapColor");
-StringHash PSP_MATSPECCOLOR("MatSpecColor");
-StringHash PSP_NEARCLIP("NearClipPS");
-StringHash PSP_FARCLIP("FarClipPS");
-StringHash PSP_SHADOWCUBEADJUST("ShadowCubeAdjust");
-StringHash PSP_SHADOWDEPTHFADE("ShadowDepthFade");
-StringHash PSP_SHADOWINTENSITY("ShadowIntensity");
-StringHash PSP_SHADOWMAPINVSIZE("ShadowMapInvSize");
-StringHash PSP_SHADOWSPLITS("ShadowSplits");
-StringHash PSP_LIGHTMATRICES("LightMatricesPS");
+URHO3D_API const StringHash VSP_AMBIENTSTARTCOLOR("AmbientStartColor");
+URHO3D_API const StringHash VSP_AMBIENTENDCOLOR("AmbientEndColor");
+URHO3D_API const StringHash VSP_BILLBOARDROT("BillboardRot");
+URHO3D_API const StringHash VSP_CAMERAPOS("CameraPos");
+URHO3D_API const StringHash VSP_CAMERAROT("CameraRot");
+URHO3D_API const StringHash VSP_NEARCLIP("NearClip");
+URHO3D_API const StringHash VSP_FARCLIP("FarClip");
+URHO3D_API const StringHash VSP_DEPTHMODE("DepthMode");
+URHO3D_API const StringHash VSP_DELTATIME("DeltaTime");
+URHO3D_API const StringHash VSP_ELAPSEDTIME("ElapsedTime");
+URHO3D_API const StringHash VSP_FRUSTUMSIZE("FrustumSize");
+URHO3D_API const StringHash VSP_GBUFFEROFFSETS("GBufferOffsets");
+URHO3D_API const StringHash VSP_LIGHTDIR("LightDir");
+URHO3D_API const StringHash VSP_LIGHTPOS("LightPos");
+URHO3D_API const StringHash VSP_MODEL("Model");
+URHO3D_API const StringHash VSP_VIEWPROJ("ViewProj");
+URHO3D_API const StringHash VSP_UOFFSET("UOffset");
+URHO3D_API const StringHash VSP_VOFFSET("VOffset");
+URHO3D_API const StringHash VSP_ZONE("Zone");
+URHO3D_API const StringHash VSP_LIGHTMATRICES("LightMatrices");
+URHO3D_API const StringHash VSP_SKINMATRICES("SkinMatrices");
+URHO3D_API const StringHash VSP_VERTEXLIGHTS("VertexLights");
+URHO3D_API const StringHash PSP_AMBIENTCOLOR("AmbientColor");
+URHO3D_API const StringHash PSP_CAMERAPOS("CameraPosPS");
+URHO3D_API const StringHash PSP_DELTATIME("DeltaTimePS");
+URHO3D_API const StringHash PSP_DEPTHRECONSTRUCT("DepthReconstruct");
+URHO3D_API const StringHash PSP_ELAPSEDTIME("ElapsedTimePS");
+URHO3D_API const StringHash PSP_FOGCOLOR("FogColor");
+URHO3D_API const StringHash PSP_FOGPARAMS("FogParams");
+URHO3D_API const StringHash PSP_GBUFFERINVSIZE("GBufferInvSize");
+URHO3D_API const StringHash PSP_LIGHTCOLOR("LightColor");
+URHO3D_API const StringHash PSP_LIGHTDIR("LightDirPS");
+URHO3D_API const StringHash PSP_LIGHTPOS("LightPosPS");
+URHO3D_API const StringHash PSP_MATDIFFCOLOR("MatDiffColor");
+URHO3D_API const StringHash PSP_MATEMISSIVECOLOR("MatEmissiveColor");
+URHO3D_API const StringHash PSP_MATENVMAPECOLOR("MatEnvMapColor");
+URHO3D_API const StringHash PSP_MATSPECCOLOR("MatSpecColor");
+URHO3D_API const StringHash PSP_NEARCLIP("NearClipPS");
+URHO3D_API const StringHash PSP_FARCLIP("FarClipPS");
+URHO3D_API const StringHash PSP_SHADOWCUBEADJUST("ShadowCubeAdjust");
+URHO3D_API const StringHash PSP_SHADOWDEPTHFADE("ShadowDepthFade");
+URHO3D_API const StringHash PSP_SHADOWINTENSITY("ShadowIntensity");
+URHO3D_API const StringHash PSP_SHADOWMAPINVSIZE("ShadowMapInvSize");
+URHO3D_API const StringHash PSP_SHADOWSPLITS("ShadowSplits");
+URHO3D_API const StringHash PSP_LIGHTMATRICES("LightMatricesPS");
 
-StringHash PASS_BASE("base");
-StringHash PASS_LITBASE("litbase");
-StringHash PASS_LIGHT("light");
-StringHash PASS_ALPHA("alpha");
-StringHash PASS_LITALPHA("litalpha");
-StringHash PASS_SHADOW("shadow");
-StringHash PASS_DEFERRED("deferred");
-StringHash PASS_PREPASS("prepass");
-StringHash PASS_MATERIAL("material");
-StringHash PASS_POSTOPAQUE("postopaque");
-StringHash PASS_REFRACT("refract");
-StringHash PASS_POSTALPHA("postalpha");
+URHO3D_API const StringHash PASS_BASE("base");
+URHO3D_API const StringHash PASS_LITBASE("litbase");
+URHO3D_API const StringHash PASS_LIGHT("light");
+URHO3D_API const StringHash PASS_ALPHA("alpha");
+URHO3D_API const StringHash PASS_LITALPHA("litalpha");
+URHO3D_API const StringHash PASS_SHADOW("shadow");
+URHO3D_API const StringHash PASS_DEFERRED("deferred");
+URHO3D_API const StringHash PASS_PREPASS("prepass");
+URHO3D_API const StringHash PASS_MATERIAL("material");
+URHO3D_API const StringHash PASS_POSTOPAQUE("postopaque");
+URHO3D_API const StringHash PASS_REFRACT("refract");
+URHO3D_API const StringHash PASS_POSTALPHA("postalpha");
 
-Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+URHO3D_API const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
 
 }
