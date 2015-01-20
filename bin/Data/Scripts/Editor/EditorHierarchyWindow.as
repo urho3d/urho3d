@@ -1560,6 +1560,18 @@ bool SelectAll()
     return false;
 }
 
+bool DeselectAll()
+{
+    if (CheckHierarchyWindowFocus())
+    {
+        BeginSelectionModify();
+        hierarchyList.ClearSelection();
+        EndSelectionModify();
+        return true;
+    }
+    return false;
+}
+
 bool ResetToDefault()
 {
     if (CheckHierarchyWindowFocus())

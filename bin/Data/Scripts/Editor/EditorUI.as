@@ -327,6 +327,7 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Paste", @Paste, 'V', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Delete", @Delete, KEY_DELETE, QUAL_ANY));
         popup.AddChild(CreateMenuItem("Select all", @SelectAll, 'A', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Deselect all", @DeselectAll, 'A', QUAL_SHIFT | QUAL_CTRL));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Reset to default", @ResetToDefault));
         CreateChildDivider(popup);
