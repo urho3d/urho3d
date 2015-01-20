@@ -1139,33 +1139,36 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     }   
     else if (key == KEY_KP_1 && ui.focusElement is null) // Front view
     {
-        Vector3 pos = cameraNode.position;
-        pos.z = -pos.length * viewDirection;
-        pos.x = 0;
-        pos.y = 0;
-        cameraNode.position = pos;
+        Vector3 center = Vector3(0,0,0);
+        if (selectedNodes.length > 0 || selectedComponents.length > 0)
+            center = SelectedNodesCenterPoint();
+            
+        Vector3 pos = cameraNode.worldPosition - center;
+        cameraNode.worldPosition = center - Vector3(0.0, 0.0, pos.length * viewDirection);
         cameraNode.direction = Vector3(0, 0, viewDirection);
         ReacquireCameraYawPitch();
     }
 
     else if (key == KEY_KP_3 && ui.focusElement is null) // Side view
     {
-        Vector3 pos = cameraNode.position;
-        pos.x = pos.length * viewDirection;
-        pos.y = 0;
-        pos.z = 0;
-        cameraNode.position = pos;
+        Vector3 center = Vector3(0,0,0);
+        if (selectedNodes.length > 0 || selectedComponents.length > 0)
+            center = SelectedNodesCenterPoint();
+            
+        Vector3 pos = cameraNode.worldPosition - center;
+        cameraNode.worldPosition = center - Vector3(pos.length * -viewDirection, 0.0, 0.0);
         cameraNode.direction = Vector3(-viewDirection, 0, 0);
         ReacquireCameraYawPitch();
     }
 
     else if (key == KEY_KP_7 && ui.focusElement is null) // Top view
     {
-        Vector3 pos = cameraNode.position;
-        pos.y = pos.length * viewDirection;
-        pos.x = 0;
-        pos.z = 0;
-        cameraNode.position = pos;
+        Vector3 center = Vector3(0,0,0);
+        if (selectedNodes.length > 0 || selectedComponents.length > 0)
+            center = SelectedNodesCenterPoint();
+            
+        Vector3 pos = cameraNode.worldPosition - center;
+        cameraNode.worldPosition = center - Vector3(0.0, pos.length * -viewDirection, 0.0);
         cameraNode.direction = Vector3(0, -viewDirection, 0);
         ReacquireCameraYawPitch();
     }
