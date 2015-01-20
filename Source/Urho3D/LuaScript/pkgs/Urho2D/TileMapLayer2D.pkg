@@ -7,8 +7,8 @@ class TileMapLayer2D : Component
 
     int GetDrawOrder() const;
     bool IsVisible() const;
-    bool HasProperty(const String& name) const;
-    const String& GetProperty(const String& name) const;
+    bool HasProperty(const String name) const;
+    const String GetProperty(const String name) const;
     TileMapLayerType2D GetLayerType() const;
 
     int GetWidth() const;

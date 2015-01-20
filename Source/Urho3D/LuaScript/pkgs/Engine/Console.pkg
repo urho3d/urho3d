@@ -6,7 +6,7 @@ class Console : public Object
     void SetVisible(bool enable);
     void Toggle();
     void SetAutoVisibleOnError(bool enable);
-    void SetCommandInterpreter(const String& interpreter);
+    void SetCommandInterpreter(const String interpreter);
     void SetNumBufferedRows(unsigned rows);
     void SetNumRows(unsigned rows);
     void SetNumHistoryRows(unsigned rows);
@@ -19,7 +19,7 @@ class Console : public Object
     Button* GetCloseButton() const;
     bool IsVisible() const;
     bool IsAutoVisibleOnError() const;
-    const String& GetCommandInterpreter() const;
+    const String GetCommandInterpreter() const;
     unsigned GetNumBufferedRows() const;
     unsigned GetNumRows() const;
     void CopySelectedRows() const;

@@ -42,16 +42,16 @@ enum TileMapObjectType2D
 
 class PropertySet2D
 {
-    bool HasProperty(const String& name) const;
-    const String& GetProperty(const String& name) const;
+    bool HasProperty(const String name) const;
+    const String GetProperty(const String name) const;
 };
 
 class Tile2D
 {
     int GetGid() const;
     Sprite2D* GetSprite() const;
-    bool HasProperty(const String& name) const;
-    const String& GetProperty(const String& name) const;
+    bool HasProperty(const String name) const;
+    const String GetProperty(const String name) const;
 
     tolua_readonly tolua_property__get_set int gid;
     tolua_readonly tolua_property__get_set Sprite2D* sprite;
@@ -68,8 +68,8 @@ class TileMapObject2D
     const Vector2& GetPoint(unsigned index) const;
     int GetTileGid() const;
     Sprite2D* GetTileSprite() const;
-    bool HasProperty(const String& name) const;
-    const String& GetProperty(const String& name) const;
+    bool HasProperty(const String name) const;
+    const String GetProperty(const String name) const;
 
     tolua_readonly tolua_property__get_set TileMapObjectType2D objectType;
     tolua_readonly tolua_property__get_set String name;
