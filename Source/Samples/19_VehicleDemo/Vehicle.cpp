@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include <Urho3D/Urho3D.h>
+
 #include <Urho3D/Physics/CollisionShape.h>
 #include <Urho3D/Physics/Constraint.h>
 #include <Urho3D/Core/Context.h>

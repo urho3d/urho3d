@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include <Urho3D/Urho3D.h>
+
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Urho2D/CollisionBox2D.h>
 #include <Urho3D/Urho2D/CollisionEdge2D.h>

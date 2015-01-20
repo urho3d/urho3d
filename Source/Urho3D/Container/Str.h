@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "../Urho3D.h"
 #include "../Container/Vector.h"
 
 #include <cstring>

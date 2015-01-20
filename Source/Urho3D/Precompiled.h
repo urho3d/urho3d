@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "Urho3D.h"
+
 #include "Container/HashMap.h"
 #include "Container/HashSet.h"
 #include "Container/Sort.h"

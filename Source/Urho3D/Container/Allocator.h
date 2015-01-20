@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include "../Urho3D.h"
-
 #include <new>
 
 namespace Urho3D

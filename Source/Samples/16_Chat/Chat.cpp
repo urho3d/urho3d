@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include <Urho3D/Urho3D.h>
+
 #include <Urho3D/Audio/Audio.h>
 #include <Urho3D/UI/Button.h>
 #include <Urho3D/Engine/Engine.h>

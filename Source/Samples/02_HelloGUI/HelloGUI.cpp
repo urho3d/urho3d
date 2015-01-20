@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include <Urho3D/Urho3D.h>
+
 #include <Urho3D/UI/Button.h>
 #include <Urho3D/UI/BorderImage.h>
 #include <Urho3D/UI/CheckBox.h>

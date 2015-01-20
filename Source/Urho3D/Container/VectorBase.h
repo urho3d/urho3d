@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "../Urho3D.h"
 #include "../Container/Swap.h"
 
 namespace Urho3D

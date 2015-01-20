@@ -53,6 +53,7 @@ if (URHO3D_LUA)
     endif ()
 
     # Use the host tool to generate source files for tolua++ API binding
+    file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
     file (GLOB API_PKG_FILES LuaScript/pkgs/*.pkg)
     foreach (DIR Navigation Network Physics Urho2D)
         string (TOUPPER URHO3D_${DIR} OPT)
@@ -131,10 +132,7 @@ set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 
 # Define dependency libs
 # Add include directories to find the precompiled header, export header, and installed headers from thirdparty libs
-# Hack: the ${CMAKE_CURRENT_SOURCE_DIR}/generated is added so that "../Urho3D.h" include path could be resolved back to CMAKE_CURRENT_BINARY_DIR where this generated header is located
-#       the "../Urho3D.h" relative path is preferred over "Urho3D.h" because we want to avoid adding "include/Urho3D" into the search path when *using* the library
-file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-set (INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/generated ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
+set (INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 if (URHO3D_PHYSICS)
     # Bullet library depends on its own include dir to be added in the header search path
     # This is more practical than patching its header files in many places to make them work with relative path

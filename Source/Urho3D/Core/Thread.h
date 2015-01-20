@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include "../Urho3D.h"
-
 #ifndef WIN32
 #include <pthread.h>
 typedef pthread_t ThreadID;
