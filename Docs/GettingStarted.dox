@@ -252,7 +252,7 @@ The scripting language supported by default is AngelScript (http://www.angelcode
 
 Lua language support can optionally be built in, see \ref Build_Options.
 
-On Android and iOS the command line can not be entered, so it is instead read from the file bin/Data/CommandLine.txt. By default the NinjaSnowWar example will be run.
+If Urho3DPlayer is given no command line arguments at all, it will read the command line from the file bin/Data/CommandLine.txt. This is primarily intended for mobile platforms, where the command line can not be entered. By default the NinjaSnowWar example will be run.
 
 \section Running_Commandline Command line options
 
