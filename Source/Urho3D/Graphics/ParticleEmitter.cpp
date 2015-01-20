@@ -206,6 +206,8 @@ void ParticleEmitter::Update(const FrameInfo& frame)
             if (sizeAdd != 0.0f || sizeMul != 1.0f)
             {
                 particle.scale_ += lastTimeStep_ * sizeAdd;
+                if (particle.scale_ < 0.0f)
+                    particle.scale_ = 0.0f;
                 if (sizeMul != 1.0f)
                     particle.scale_ *= (lastTimeStep_ * (sizeMul - 1.0f)) + 1.0f;
                 billboard.size_ = particle.size_ * particle.scale_;
