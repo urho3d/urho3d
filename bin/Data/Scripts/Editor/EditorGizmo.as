@@ -181,12 +181,12 @@ void ResizeGizmo()
     if (gizmo is null || !gizmo.enabled)
         return;
 
-    float scale = 0.1;
+    float scale = 0.1 / camera.zoom;
 
     if (camera.orthographic)
         scale *= camera.orthoSize;
     else
-        scale *= (camera.view.Inverse() * gizmoNode.position).z;
+        scale *= (camera.view * gizmoNode.position).z;
 
     gizmoNode.scale = Vector3(scale, scale, scale);
 }
