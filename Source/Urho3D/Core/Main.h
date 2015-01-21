@@ -24,7 +24,7 @@
 
 #include "../Core/ProcessUtils.h"
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(URHO3D_WIN32_CONSOLE)
 #include "../Core/MiniDump.h"
 #include <windows.h>
 #ifdef _MSC_VER
@@ -35,7 +35,7 @@
 // Define a platform-specific main function, which in turn executes the user-defined function
 
 // MSVC debug mode: use memory leak reporting
-#if defined(_MSC_VER) && defined(_DEBUG)
+#if defined(_MSC_VER) && defined(_DEBUG) && !defined(URHO3D_WIN32_CONSOLE)
 #define DEFINE_MAIN(function) \
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd) \
 { \
@@ -44,7 +44,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     return function; \
 }
 // MSVC release mode: write minidump on crash
-#elif defined(_MSC_VER) && defined(URHO3D_MINIDUMPS)
+#elif defined(_MSC_VER) && defined(URHO3D_MINIDUMPS) && !defined(URHO3D_WIN32_CONSOLE)
 #define DEFINE_MAIN(function) \
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd) \
 { \
@@ -60,7 +60,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     return exitCode; \
 }
 // Other Win32 or minidumps disabled: just execute the function
-#elif defined(WIN32)
+#elif defined(WIN32) && !defined(URHO3D_WIN32_CONSOLE)
 #define DEFINE_MAIN(function) \
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd) \
 { \

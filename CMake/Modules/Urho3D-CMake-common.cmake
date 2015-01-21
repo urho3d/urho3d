@@ -135,6 +135,7 @@ if (CMAKE_HOST_WIN32 AND NOT DEFINED URHO3D_MKLINK)
     set (URHO3D_MKLINK ${URHO3D_MKLINK} CACHE INTERNAL "MKLINK capability on the Windows host system")
 endif ()
 cmake_dependent_option (URHO3D_STATIC_RUNTIME "Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)" FALSE "MSVC" FALSE)
+cmake_dependent_option (URHO3D_WIN32_CONSOLE "Use console main() as entry point when setting up Windows executable targets (Windows platform only)" FALSE "WIN32" FALSE)
 cmake_dependent_option (URHO3D_MACOSX_BUNDLE "Use MACOSX_BUNDLE when setting up Mac OS X executable targets (Xcode native build only)" FALSE "XCODE AND NOT IOS" FALSE)
 set (URHO3D_LIB_TYPE STATIC CACHE STRING "Specify Urho3D library type, possible values are STATIC (default) and SHARED")
 if (CMAKE_CROSSCOMPILING AND NOT ANDROID)
@@ -190,6 +191,12 @@ if (MSVC)
         set (RELEASE_RUNTIME "")
         set (DEBUG_RUNTIME "")
     endif ()
+endif ()
+
+# By default Windows platform setups main executable as Windows application with WinMain() as entry point
+# this build option overrides the default to set the main executable as console application with main() as entry point instead
+if (URHO3D_WIN32_CONSOLE)
+    add_definitions (-DURHO3D_WIN32_CONSOLE)
 endif ()
 
 # Enable file watcher support for automatic resource reloads by default.
@@ -690,7 +697,7 @@ endmacro ()
 #  WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL - see CMake help on add_executable command
 macro (setup_main_executable)
     # Parse extra arguments
-    cmake_parse_arguments (ARG "NOBUNDLE;MACOSX_BUNDLE" "" "" ${ARGN})
+    cmake_parse_arguments (ARG "NOBUNDLE;MACOSX_BUNDLE;WIN32" "" "" ${ARGN})
 
     # Define resource files
     if (XCODE)
@@ -753,7 +760,9 @@ macro (setup_main_executable)
         # Setup target as executable
         unset (TARGET_PROPERTIES)
         if (WIN32)
-            set (EXE_TYPE WIN32)
+            if (NOT URHO3D_WIN32_CONSOLE OR ARG_WIN32)
+                set (EXE_TYPE WIN32)
+            endif ()
             list (APPEND TARGET_PROPERTIES DEBUG_POSTFIX _d)
         elseif (IOS)
             set (EXE_TYPE MACOSX_BUNDLE)
