@@ -8883,9 +8883,8 @@ Properties:
 Methods:
 
 - void ClearDelayedExecute(const String& = String ( ))
-- void DelayedExecute(float, bool, const String&)
-- void DelayedExecute(float, bool, const String&, const Variant[]@)
-- bool Execute(const String&, const Variant[]@)
+- void DelayedExecute(float, bool, const String&, const Variant[]@ = null)
+- bool Execute(const String&, const Variant[]@ = null)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -8914,11 +8913,9 @@ Methods:
 - void ApplyAttributes()
 - void ClearDelayedExecute(const String& = String ( ))
 - bool CreateObject(ScriptFile@, const String&)
-- void DelayedExecute(float, bool, const String&)
-- void DelayedExecute(float, bool, const String&, const Variant[]@)
+- void DelayedExecute(float, bool, const String&, const Variant[]@ = null)
 - void DrawDebugGeometry(DebugRenderer@, bool)
-- bool Execute(const String&)
-- bool Execute(const String&, const Variant[]@)
+- bool Execute(const String&, const Variant[]@ = null)
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
@@ -12955,8 +12952,7 @@ Properties:
 - float Cos(float)
 - uint CountSetBits(uint)
 - VectorBuffer DecompressVectorBuffer(VectorBuffer&)
-- void DelayedExecute(float, bool, const String&)
-- void DelayedExecute(float, bool, const String&, const Variant[]@)
+- void DelayedExecute(float, bool, const String&, const Variant[]@ = null)
 - bool Equals(float, float)
 - void ErrorDialog(const String&, const String&)
 - float Floor(float)
