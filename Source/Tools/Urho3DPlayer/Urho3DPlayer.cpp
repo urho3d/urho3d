@@ -71,14 +71,8 @@ void Urho3DPlayer::Setup()
     // Check for script file name
     const Vector<String>& arguments = GetArguments();
     String scriptFileName;
-    for (unsigned i = 0; i < arguments.Size(); ++i)
-    {
-        if (arguments[i][0] != '-')
-        {
-            scriptFileName_ = GetInternalPath(arguments[i]);
-            break;
-        }
-    }
+    if (arguments.Size() && arguments[0][0] != '-')
+        scriptFileName_ = GetInternalPath(arguments[0]);
 
     // Show usage if not found
     if (scriptFileName_.Empty())
