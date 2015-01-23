@@ -2,6 +2,7 @@ $#include "Urho2D/TileMapLayer2D.h"
 
 class TileMapLayer2D : Component
 {
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     void SetDrawOrder(int drawOrder);
     void SetVisible(bool visible);
 
