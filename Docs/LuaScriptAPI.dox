@@ -5624,6 +5624,7 @@ Properties:
 
 Methods:
 
+- void DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 - void SetTmxFile(TmxFile2D* tmxFile)
 - TmxFile2D* GetTmxFile() const
 - const TileMapInfo2D& GetInfo() const
@@ -5662,6 +5663,7 @@ Properties:
 
 Methods:
 
+- void DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 - void SetDrawOrder(int drawOrder)
 - void SetVisible(bool visible)
 - int GetDrawOrder() const
