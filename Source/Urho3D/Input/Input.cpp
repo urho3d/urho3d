@@ -1725,6 +1725,14 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         lastMousePosition_ = center;
     }
 
+    // Resize screen joysticks to new screen size
+    for (HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)
+    {
+        UIElement* screenjoystick = i->second_.screenJoystick_;
+        if (screenjoystick)
+            screenjoystick->SetSize(graphics_->GetWidth(), graphics_->GetHeight());
+    }
+    
     focusedThisFrame_ = true;
 
     // After setting a new screen mode we should not be minimized
