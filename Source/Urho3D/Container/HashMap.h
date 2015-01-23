@@ -36,6 +36,9 @@ namespace Urho3D
 template <class T, class U> class HashMap : public HashBase
 {
 public:
+    typedef T T;
+    typedef U U;
+
     /// Hash map key-value pair with const key.
     class KeyValue
     {
