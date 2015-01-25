@@ -61,11 +61,6 @@ else ()
         endif ()
         include_directories (${X11_INCLUDE_DIRS})  
 
-        if (NOT DEFINED HAVE_CONST_XEXT_ADDDISPLAY)
-            message (STATUS "Following tests check whether X11 library installed in this system uses _Xconst in below functions")
-            message (STATUS "A failed test result simply means the installed X11 library does not use _Xconst")
-            message (STATUS "It is OK to proceed to build Urho3D regardless of the test result")
-        endif ()
         include (CheckCSourceCompiles)
         set  (CMAKE_REQUIRED_LIBRARIES ${X11_LIB} ${X11_LIB})
         check_c_source_compiles ("

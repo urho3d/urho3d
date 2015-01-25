@@ -77,6 +77,15 @@ else ()
     list (APPEND EXCLUDED_SOURCE_DIRS LuaScript)
 endif ()
 
+# Generate platform specific export header file
+include (GenerateExportHeader)
+if (MSVC)
+    set (PRE_EXPORT_HEADER "\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)\n")
+endif ()
+generate_export_header (${TARGET_NAME} ${URHO3D_LIB_TYPE} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h.new)
+execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
+file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new)
+
 # Define generated object files
 # This is a hack as it relies on internal working of CMake
 if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have force_load/whole_archive equivalent
@@ -104,6 +113,7 @@ if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have forc
             unset (OBJ_FILES)
         endif ()
     endforeach ()
+    set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 endif ()
 
 # Define source files
@@ -126,13 +136,12 @@ if (APPLE AND NOT IOS)
     set (GLOB_OBJC_PATTERN *.m)     # Should only pick up MacFileWatcher.m for MacOSX platform at the moment
 endif ()
 string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
-define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} EXTRA_H_FILES librevision.h RECURSE GROUP PCH)
+define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} EXTRA_H_FILES librevision.h Urho3D.h RECURSE GROUP PCH)
 list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${ALL_OBJ_FILES})
-set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 
 # Define dependency libs
 # Add include directories to find the precompiled header, export header, and installed headers from thirdparty libs
-set (INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
+set (INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 if (URHO3D_PHYSICS)
     # Bullet library depends on its own include dir to be added in the header search path
     # This is more practical than patching its header files in many places to make them work with relative path
@@ -246,17 +255,6 @@ if (CMAKE_VERSION VERSION_LESS 2.8.12)
 endif ()
 # end todo
 
-# Generate platform specific export header file automatically
-if (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in IS_NEWER_THAN ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
-    set_target_properties (${TARGET_NAME} PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
-    generate_export_header (${TARGET_NAME} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h)
-    file (READ ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h EXPORT_DEFINE)
-    if (MSVC)
-        string (REPLACE "#define URHO3D_API_H" "#define URHO3D_API_H\n\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)" EXPORT_DEFINE ${EXPORT_DEFINE})
-    endif ()
-    configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
-endif ()
-
 # Install headers for using the Urho3D library
 install_header_files (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${DEST_INCLUDE_DIR} FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
 install_header_files (FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_DIR})
@@ -268,7 +266,7 @@ if (ABSOLUTE_PATH_LIBS)
     string (REPLACE ";" "\" \"" URHO3D_ABS_PATH_LIBS "\"${ABSOLUTE_PATH_LIBS}\"")   # Note: need to always "stringify" a variable in list context for replace to work correctly, besides the list could be empty
     string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" URHO3D_ABS_PATH_LIBS "${URHO3D_ABS_PATH_LIBS}")
 endif ()
-set (LIB_NAME Urho3D)
+set (LIB_NAME ${TARGET_NAME})
 if (MINGW)
     if (CMAKE_BUILD_TYPE STREQUAL Debug)
         set (LIB_NAME ${LIB_NAME}_d)
@@ -294,6 +292,15 @@ if (GLOBAL_INCLUDE_DIRS)
     string (REPLACE "${SYSROOT}" "" GLOBAL_INCLUDE_DIRS ${GLOBAL_INCLUDE_DIRS})
 endif ()
 set (ENGINE_INCLUDE_DIRS "${DASH}I\"\${includedir}\" ${DASH}I\"\${includedir}/${PATH_SUFFIX}/ThirdParty\"")
+if (URHO3D_PHYSICS)
+    # Bullet library depends on its own include dir to be added in the header search path
+    # This is more practical than patching its header files in many places to make them work with relative path
+    set (ENGINE_INCLUDE_DIRS "${ENGINE_INCLUDE_DIRS} ${DASH}I\"\${includedir}/${PATH_SUFFIX}/ThirdParty/Bullet\"")
+endif ()
+if (URHO3D_LUA)
+    # ditto for Lua/LuaJIT
+    set (ENGINE_INCLUDE_DIRS "${ENGINE_INCLUDE_DIRS} ${DASH}I\"\${includedir}/${PATH_SUFFIX}/ThirdParty/Lua${JIT}\"")
+endif ()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc @ONLY)
 if (ANDROID)
     set (RENAME RENAME Urho3D-${ANDROID_NDK_ABI_NAME}.pc)
@@ -303,7 +310,11 @@ install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc DESTINATION ${DEST_PKGCONFI
 # Setup the compiler flags for building shared library (do this here so that it does not interfere with the pkg-config file generation above)
 if (URHO3D_LIB_TYPE STREQUAL SHARED)
     # Hide the symbols that are not explicitly marked for export
-    add_compiler_export_flags ()
+    if (CMAKE_VERSION VERSION_LESS 2.8.12)
+        add_compiler_export_flags ()    # todo: Remove this deprecated function once CMake minimum version is 2.8.12
+    else ()
+        set_target_properties (${TARGET_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1)
+    endif ()
     # Use PIC on platforms that support it (shared library type has this property set to true by default, so we only have to deal with those static ones that the shared library links against)
     set_target_properties (${STATIC_LIBRARY_TARGETS} PROPERTIES POSITION_INDEPENDENT_CODE true)
     if (NOT MSVC AND NOT (CMAKE_CROSSCOMPILING AND MINGW) AND CMAKE_VERSION VERSION_LESS 2.8.9)  # todo: Remove this when CMake minimum version is 2.8.9

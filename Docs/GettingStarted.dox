@@ -32,13 +32,13 @@ To run Urho3D, the minimum system requirements are:
 
 SSE requirement can be eliminated by disabling the use of SSE instruction set, see URHO3D_SSE build option below.
 
-CMake is required to configure and generate the Urho3D project build tree. The minimum required version is 2.8.6. However, it is recommended to use the latest CMake version avaiable out there, especially when targeting Mac OS X and iOS platforms using the latest Xcode version available. Apple is known to change the internal working of Xcode with little regards to other third party development tools.
+CMake is required to configure and generate the Urho3D project build tree. The minimum required version is 2.8.6. However, it is recommended to use the latest CMake version avaiable out there, especially when targeting Mac OS X and iOS platforms using the latest Xcode version available. This is because Apple is known to change the internal working of Xcode with little regards to other third party build tools, such as CMake.
 
 \section Build_Scripts Build scripts
 
 As this is a cross-platform project, we have provided a number of build scripts for the most common use cases. The shell scripts end with extension *.sh are meant for building Urho3D project in a Unix-like host system (Linux, Mac, and even Raspberry Pi), while the batch files end with *.bat are meant for Windows host system only. They only provide a convenient way to invoke CMake to process our CMakeLists.txt files. Their usage is not a must as you can also invoke CMake to do the same via cmake-gui or via your IDE when your IDE supports that.
 
-The basic usage as follows:
+The basic usage is as follows:
 
 \verbatim
 <script-name> /path/to/build-tree [build-options]
@@ -381,10 +381,10 @@ F2          Toggle debug HUD
 
 This page shows how to create a new C++ project linking against Urho3D library as external library. There are two approaches to do this. The first approach uses Urho3D library directly from the Urho3D project build tree. The second approach uses Urho3D SDK installation. It is imperative to clean the CMake cache when changing from one approach to the other. You should also clean the cache when you change the path in the URHO3D_HOME environment variable.
 
-First of all, structure your project similar to Urho3D project as below. Although this is not mandatory, it should increase the chance the CMake modules designed for Urho3D project work out of the box for your project too.
+First of all, structure your project similar to Urho3D project as below. Although this is not mandatory, it should increase the chance the CMake modules designed for Urho3D project also works out of the box for your project too. CMake and our CMake modules are case-sensitive. It is recommended that your project adheres to the same naming convention as Urho3D project uses, even when the filesystem in your host system is not case-sensitive.
 
 \code
-PROJECT_ROOT/
+<PROJECT_ROOT>/
  ├ bin/
  │  ├ Data/
  │  └ CoreData/
@@ -522,12 +522,16 @@ The default <platform> when not specified is 'native'. The possible values are: 
 
 When using the 'rake cmake' task, the <option>=\<value> pairs are optional build options supported by our build scripts as usual. However, the format here does not expect a leading '-D' for each pair. When using the 'rake make' task, the <option>=\<value> pairs are optional build options supported by the respective build tools. For example on iOS platform using 'xcodebuild' build tool, one could pass the '-sdk' option as follows: 'rake make ios sdk=iphonesimulator'. Note the absense of leading '-' character in the example. To build a specific built-in target in the project, use the 'target' option, e.g. 'rake make target=install'. In a multi-config project, such as Xcode project or VS solution, use the 'config' option to choose which build configuration to use, e.g. 'rake make config=Release'. For Xcode project building using 'rake make' task, you may optional install the 'xcpretty' filter to address the verbosity of the 'xcodebuild' tool from its standard output stream. On the other hand, pass the 'unfiter' option to get the output from 'xcodebuild' tool unfiltered regardless. You can pass the 'clean_first' option to perform a clean build. The 'numjobs' option is only applicable for 'make' tool where it defaults to 8 when not specified explicitly.
 
-Use the 'build_tree' option to set the path to the desired build tree location. When not specified then the build tree location would be defaulted to '../<platform>-Build', relative to the project root. To avoid repeating the customized build tree locations for each platform, you can set and export them as environment variables. The '<platform_>build_tree' option takes precedence over normal 'build_tree' option. For example with these commands below, the RPI build tree will be generated in the ~/custom-rpi-Build and then build from there. You can in fact set and export any other key/value pair build options as environment variables to avoid repeating yourself when invoking any of our Rake tasks.
+Use the 'build_tree' option to set the path to the desired build tree location. When not specified then the build tree location would be defaulted to '../<platform>-Build', relative to the project root. To avoid repeating the customized build tree locations for each platform, you can set and export them as environment variables. The '<platform_>build_tree' option takes precedence over normal 'build_tree' option. For example with these commands below, the native and RPI build tree will be generated in the ~/custom-native-Build and ~/custom-rpi-Build, respectively, and then build from there.
 
-\verbatim
-export native_build_tree=~/custom-native-Build android_build_tree=~/custom-android-Build mingw_build_tree=~/custom-mingw-Build rpi_build_tree=~/custom-rpi-Build
-rake cmake rpi URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 && rake make rpi
-\endverbatim
+\code
+export native_build_tree=~/custom-native-Build rpi_build_tree=~/custom-rpi-Build
+rake cmake URHO3D_LUAJIT=1 && rake make
+rake cmake rpi URHO3D_LUAJIT=1 && rake make rpi
+\endcode
+
+You can in fact set and export any other key/value pair build options as environment variables to avoid repeating yourself when invoking any of our Rake tasks.
+
 
 \page Structure Overall structure
 

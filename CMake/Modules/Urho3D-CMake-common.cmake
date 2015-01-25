@@ -26,6 +26,7 @@ set (DOC_STRING "Choose the build configuration, possible options are: ${URHO3D_
 if (CMAKE_CONFIGURATION_TYPES)
     # For multi-configurations generator, such as VS and Xcode
     set (CMAKE_CONFIGURATION_TYPES ${URHO3D_BUILD_CONFIGURATIONS} CACHE STRING "${DOC_STRING}" FORCE)
+    unset (CMAKE_BUILD_TYPE)
 else ()
     # For single-configuration generator, such as Unix Makefile generator
     if (CMAKE_BUILD_TYPE STREQUAL "")
@@ -456,140 +457,73 @@ macro (create_symlink SOURCE DESTINATION)
     endif ()
 endmacro ()
 
-# Set common project structure for Android platform
-if (ANDROID)
-    # Enable Android ndk-gdb
-    if (ANDROID_NDK_GDB)
-        set (NDK_GDB_SOLIB_PATH ${CMAKE_BINARY_DIR}/obj/local/${ANDROID_NDK_ABI_NAME}/)
-        file (MAKE_DIRECTORY ${NDK_GDB_SOLIB_PATH})
-        set (NDK_GDB_JNI ${CMAKE_BINARY_DIR}/jni)
-        set (NDK_GDB_MK "# This is a generated file. DO NOT EDIT!\n\nAPP_ABI := ${ANDROID_NDK_ABI_NAME}\n")
-        foreach (MK Android.mk Application.mk)
-            if (NOT EXISTS ${NDK_GDB_JNI}/${MK})
-                file (WRITE ${NDK_GDB_JNI}/${MK} ${NDK_GDB_MK})
-            endif ()
-        endforeach ()
-        get_directory_property (INCLUDE_DIRECTORIES DIRECTORY ${PROJECT_SOURCE_DIR} INCLUDE_DIRECTORIES)
-        string (REPLACE ";" " " INCLUDE_DIRECTORIES "${INCLUDE_DIRECTORIES}")   # Note: need to always "stringify" a variable in list context for replace to work correctly
-        set (NDK_GDB_SETUP "# This is a generated file. DO NOT EDIT!\n\nset solib-search-path ${NDK_GDB_SOLIB_PATH}\ndirectory ${INCLUDE_DIRECTORIES}\n")
-        file (WRITE ${ANDROID_LIBRARY_OUTPUT_PATH}/gdb.setup ${NDK_GDB_SETUP})
-        file (COPY ${ANDROID_NDK}/prebuilt/android-${ANDROID_ARCH_NAME}/gdbserver/gdbserver DESTINATION ${ANDROID_LIBRARY_OUTPUT_PATH})
-    else ()
-        file (REMOVE ${ANDROID_LIBRARY_OUTPUT_PATH}/gdbserver)
-    endif ()
-    # Create symbolic links in the build tree
-    foreach (I CoreData Data)
-        if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Android/assets/${I})
-            create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
-        endif ()
-    endforeach ()
-    foreach (I AndroidManifest.xml build.xml src res assets jni)
-        if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
-            create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
-        endif ()
-    endforeach ()
-endif ()
-
-# Include CMake builtin module for building shared library support
-include (GenerateExportHeader)
-
-# Override builtin macro and function to suit our need, always generate header file regardless of target type...
-macro (_DO_SET_MACRO_VALUES TARGET_LIBRARY)
-    set (DEFINE_DEPRECATED)
-    set (DEFINE_EXPORT)
-    set (DEFINE_IMPORT)
-    set (DEFINE_NO_EXPORT)
-
-    if (COMPILER_HAS_DEPRECATED_ATTR)
-        set (DEFINE_DEPRECATED "__attribute__ ((__deprecated__))")
-    elseif (COMPILER_HAS_DEPRECATED)
-        set (DEFINE_DEPRECATED "__declspec(deprecated)")
-    endif ()
-
-    get_property (type TARGET ${TARGET_LIBRARY} PROPERTY TYPE)
-
-    if (type MATCHES "STATIC|SHARED")
-        if (WIN32)
-            set (DEFINE_EXPORT "__declspec(dllexport)")
-            set (DEFINE_IMPORT "__declspec(dllimport)")
-        elseif (COMPILER_HAS_HIDDEN_VISIBILITY AND USE_COMPILER_HIDDEN_VISIBILITY)
-            set (DEFINE_EXPORT "__attribute__((visibility(\"default\")))")
-            set (DEFINE_IMPORT "__attribute__((visibility(\"default\")))")
-            set (DEFINE_NO_EXPORT "__attribute__((visibility(\"hidden\")))")
-        endif ()
-    endif ()
-endmacro ()
-# ... except, when target is a module library type
-function (GENERATE_EXPORT_HEADER TARGET_LIBRARY)
-    get_property (type TARGET ${TARGET_LIBRARY} PROPERTY TYPE)
-    if (${type} MATCHES MODULE)
-        message (WARNING "This macro should not be used with libraries of type MODULE")
-        return ()
-    endif ()
-    _test_compiler_hidden_visibility ()
-    _test_compiler_has_deprecated ()
-    _do_set_macro_values (${TARGET_LIBRARY})
-    _do_generate_export_header (${TARGET_LIBRARY} ${ARGN})
-endfunction ()
-
-# Override builtin function to suit our need, takes care of C flags as well as CXX flags
-function (add_compiler_export_flags)
-    if (NOT ANDROID AND NOT MSVC AND NOT DEFINED USE_COMPILER_HIDDEN_VISIBILITY AND NOT DEFINED COMPILER_HAS_DEPRECATED)
-        message (STATUS "Following tests check whether compiler installed in this system has export/import and deprecated attributes support")
-        message (STATUS "CMake will generate a suitable export header file for this system based on the test result")
-        message (STATUS "It is OK to proceed to build Urho3D regardless of the test result")
-    endif ()
-    _test_compiler_hidden_visibility ()
-    _test_compiler_has_deprecated ()
-
-    if (NOT (USE_COMPILER_HIDDEN_VISIBILITY AND COMPILER_HAS_HIDDEN_VISIBILITY))
-        # Just return if there are no flags to add.
-        return ()
-    endif ()
-
-    set (EXTRA_FLAGS "-fvisibility=hidden")
-    # Either return the extra flags needed in the supplied argument, or to the
-    # CMAKE_C_FLAGS if no argument is supplied.
-    if (ARGV1)
-        set (${ARGV1} "${EXTRA_FLAGS}" PARENT_SCOPE)
-    else ()
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_FLAGS}" PARENT_SCOPE)
-    endif ()
-
-    if (COMPILER_HAS_HIDDEN_INLINE_VISIBILITY)
-        set (EXTRA_FLAGS "${EXTRA_FLAGS} -fvisibility-inlines-hidden")
-    endif ()
-
-    # Either return the extra flags needed in the supplied argument, or to the
-    # CMAKE_CXX_FLAGS if no argument is supplied.
-    if (ARGV0)
-        set (${ARGV0} "${EXTRA_FLAGS}" PARENT_SCOPE)
-    else ()
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_FLAGS}" PARENT_SCOPE)
-    endif ()
-endfunction ()
-
 # Macro for precompiled headers
 macro (enable_pch)
     if (MSVC)
         foreach (FILE ${SOURCE_FILES})
             if (FILE MATCHES \\.cpp$)
                 if (FILE MATCHES Precompiled\\.cpp$)
-                    set_source_files_properties (${FILE} PROPERTIES COMPILE_FLAGS "/YcPrecompiled.h")
+                    # Precompiling header file
+                    set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "/YcPrecompiled.h")
                 else ()
-                    set_source_files_properties (${FILE} PROPERTIES COMPILE_FLAGS "/YuPrecompiled.h")
+                    # Use the precompiled header file
+                    set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "/YuPrecompiled.h /FIPrecompiled.h")
                 endif ()
             endif ()
         endforeach ()
     else ()
-        # TODO: to enable usage of precompiled header in GCC, for now just make sure the correct Precompiled.h is found in the search
-        foreach (FILE ${SOURCE_FILES})
-            if (FILE MATCHES Precompiled\\.h$)
-                get_filename_component (PATH ${FILE} PATH)
-                include_directories (${PATH})
-                break ()
+        if (TARGET_NAME)
+            # Determine the precompiled header output filename
+            if (CMAKE_COMPILER_IS_GNUCXX)
+                # GNU g++
+                set (PCH_FILENAME Precompiled.h.gch)
+            else ()
+                # Clang
+                set (PCH_FILENAME Precompiled.h.pch)
             endif ()
-        endforeach ()
+            if (TARGET ${TARGET_NAME})
+                # Cache the compiler flags setup for the current scope so far
+                get_directory_property (COMPILE_DEFINITIONS COMPILE_DEFINITIONS)
+                get_directory_property (INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
+                get_target_property (TYPE ${TARGET_NAME} TYPE)
+                if (TYPE MATCHES SHARED)
+                    string (MAKE_C_IDENTIFIER ${TARGET_NAME}_EXPORTS EXPORT_IMPORT_CONDITION)
+                    list (APPEND COMPILE_DEFINITIONS ${EXPORT_IMPORT_CONDITION})
+                    set (PIC -fPIC)
+                endif ()
+                string (REPLACE ";" " -D" COMPILE_DEFINITIONS "-D${COMPILE_DEFINITIONS}")
+                string (REPLACE ";" " -I" INCLUDE_DIRECTORIES "-I${INCLUDE_DIRECTORIES}")
+                file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
+                foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})
+                    string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
+                    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp.new "${COMPILE_DEFINITIONS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPERCASE_CONFIG}} ${PIC} ${INCLUDE_DIRECTORIES}")
+                    execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp)
+                    file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp.new)
+                    # Make sure the precompiled headers are not stale
+                    add_custom_command (OUTPUT ${PCH_FILENAME}-${CONFIG}-trigger
+                        COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp -x c++-header -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${CMAKE_CURRENT_SOURCE_DIR}/Precompiled.h
+                        COMMAND ${CMAKE_COMMAND} -E touch ${PCH_FILENAME}-${CONFIG}-trigger
+                        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp Precompiled.h
+                        COMMENT "Precompiling header file for ${CONFIG} configuration")
+                endforeach ()
+                # Use the precompiled header file
+                set_property (SOURCE ${SOURCE_FILES} APPEND_STRING PROPERTY COMPILE_FLAGS "-include Precompiled.h")
+            else ()
+                # The target has not been created yet, so set an internal variable to come back here again later
+                set (${TARGET_NAME}_ENABLE_PCH 1)
+                # But proceed to add the dummy source file(s) to trigger the custom command output rule
+                if (CMAKE_CONFIGURATION_TYPES)
+                    # Multi-config, trigger all rules
+                    foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES})
+                        list (APPEND TRIGGERS ${PCH_FILENAME}-${CONFIG}-trigger)
+                    endforeach ()
+                else ()
+                    # Single-config, just trigger the corresponding rule matching the current build configuration
+                    set (TRIGGERS ${PCH_FILENAME}-${CMAKE_BUILD_TYPE}-trigger)
+                endif ()
+                list (APPEND SOURCE_FILES ${TRIGGERS})
+            endif ()
+        endif ()
     endif ()
 endmacro ()
 
@@ -600,6 +534,10 @@ macro (setup_target)
     # Link libraries
     define_dependency_libs (${TARGET_NAME})
     target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${LIBS})
+    # Enable PCH if requested
+    if (${TARGET_NAME}_ENABLE_PCH)
+        enable_pch ()
+    endif ()
 
     # CMake does not support IPHONEOS_DEPLOYMENT_TARGET the same manner as it supports CMAKE_OSX_DEPLOYMENT_TARGET
     # The iOS deployment target is set using the corresponding Xcode attribute as target property instead
@@ -646,14 +584,13 @@ macro (setup_library)
                 set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
             endif ()
         endif ()
-        if (URHO3D_LIB_TYPE STREQUAL SHARED)
-            set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_EXPORTS)
-        endif ()
     elseif (URHO3D_SCP_TO_TARGET)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
             COMMENT "Scp-ing ${TARGET_NAME} library to target system")
     endif ()
 endmacro ()
+
+include(CMakeParseArguments)
 
 # Macro for setting up an executable target
 #  NODEPS - setup executable target without defining Urho3D dependency libraries
@@ -1059,13 +996,47 @@ macro (install_header_files)
     endforeach ()
 endmacro ()
 
+# Set common project structure for Android platform
+if (ANDROID)
+    # Enable Android ndk-gdb
+    if (ANDROID_NDK_GDB)
+        set (NDK_GDB_SOLIB_PATH ${CMAKE_BINARY_DIR}/obj/local/${ANDROID_NDK_ABI_NAME}/)
+        file (MAKE_DIRECTORY ${NDK_GDB_SOLIB_PATH})
+        set (NDK_GDB_JNI ${CMAKE_BINARY_DIR}/jni)
+        set (NDK_GDB_MK "# This is a generated file. DO NOT EDIT!\n\nAPP_ABI := ${ANDROID_NDK_ABI_NAME}\n")
+        foreach (MK Android.mk Application.mk)
+            if (NOT EXISTS ${NDK_GDB_JNI}/${MK})
+                file (WRITE ${NDK_GDB_JNI}/${MK} ${NDK_GDB_MK})
+            endif ()
+        endforeach ()
+        get_directory_property (INCLUDE_DIRECTORIES DIRECTORY ${PROJECT_SOURCE_DIR} INCLUDE_DIRECTORIES)
+        string (REPLACE ";" " " INCLUDE_DIRECTORIES "${INCLUDE_DIRECTORIES}")   # Note: need to always "stringify" a variable in list context for replace to work correctly
+        set (NDK_GDB_SETUP "# This is a generated file. DO NOT EDIT!\n\nset solib-search-path ${NDK_GDB_SOLIB_PATH}\ndirectory ${INCLUDE_DIRECTORIES}\n")
+        file (WRITE ${ANDROID_LIBRARY_OUTPUT_PATH}/gdb.setup ${NDK_GDB_SETUP})
+        file (COPY ${ANDROID_NDK}/prebuilt/android-${ANDROID_ARCH_NAME}/gdbserver/gdbserver DESTINATION ${ANDROID_LIBRARY_OUTPUT_PATH})
+    else ()
+        file (REMOVE ${ANDROID_LIBRARY_OUTPUT_PATH}/gdbserver)
+    endif ()
+    # Create symbolic links in the build tree
+    foreach (I CoreData Data)
+        if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Android/assets/${I})
+            create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
+        endif ()
+    endforeach ()
+    foreach (I AndroidManifest.xml build.xml src res assets jni)
+        if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
+            create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
+        endif ()
+    endforeach ()
+endif ()
+
 # Post-CMake fixes
 if (IOS)
     # TODO: can be removed when CMake minimum required has reached 2.8.12
     if (CMAKE_VERSION VERSION_LESS 2.8.12)
-	# Due to a bug in the CMake/Xcode generator (prior to version 2.8.12) where it has wrongly assumed the IOS bundle structure to be the same as MacOSX bundle structure,
-	# below temporary fix is required in order to solve the auto-linking issue when dependent libraries are changed
-	list (APPEND POST_CMAKE_FIXES COMMAND sed -i '' 's/\/Contents\/MacOS//g' ${CMAKE_BINARY_DIR}/CMakeScripts/XCODE_DEPEND_HELPER.make || exit 0)
+        # Due to a bug in the CMake/Xcode generator (prior to version 2.8.12) where it has wrongly assumed the IOS bundle structure to be the same as MacOSX bundle structure,
+        # below temporary fix is required in order to solve the auto-linking issue when dependent libraries are changed
+        list (APPEND POST_CMAKE_FIXES COMMAND sed -i '' 's/\/Contents\/MacOS//g' ${CMAKE_BINARY_DIR}/CMakeScripts/XCODE_DEPEND_HELPER.make || exit 0)
     endif ()
 
     # Due to a bug in the CMake/Xcode generator (still exists in 3.1) that prevents iOS targets (library and bundle) to be installed correctly
