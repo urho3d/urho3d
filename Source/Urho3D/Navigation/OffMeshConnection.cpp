@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Core/Context.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Navigation/OffMeshConnection.h"

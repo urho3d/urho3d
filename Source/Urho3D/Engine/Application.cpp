@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Engine/Application.h"
 #include "../Engine/Engine.h"
 #ifdef IOS

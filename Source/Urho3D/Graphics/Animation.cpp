@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Graphics/Animation.h"
 #include "../Core/Context.h"
 #include "../IO/Deserializer.h"

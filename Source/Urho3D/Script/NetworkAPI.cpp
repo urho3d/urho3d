@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #ifdef URHO3D_NETWORK
 #include "../Script/APITemplates.h"
 #include "../Network/Controls.h"

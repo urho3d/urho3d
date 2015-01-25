@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Container/ArrayPtr.h"
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"

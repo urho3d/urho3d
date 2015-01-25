@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Math/Matrix3x4.h"
 
 #include <cstdio>

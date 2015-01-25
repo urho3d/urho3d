@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../UI/CheckBox.h"
 #include "../Core/Context.h"
 #include "../Input/InputEvents.h"

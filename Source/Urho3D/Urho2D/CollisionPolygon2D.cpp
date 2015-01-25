@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Core/Context.h"
 #include "../Urho2D/CollisionPolygon2D.h"
 #include "../IO/MemoryBuffer.h"

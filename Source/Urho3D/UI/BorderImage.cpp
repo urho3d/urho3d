@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../UI/BorderImage.h"
 #include "../Core/Context.h"
 #include "../Resource/ResourceCache.h"

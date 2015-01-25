@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Math/BoundingBox.h"
 #include "../Math/Frustum.h"
 #include "../Math/Plane.h"

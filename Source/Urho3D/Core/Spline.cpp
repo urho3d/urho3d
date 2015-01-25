@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../IO/Log.h"
 #include "../Core/Spline.h"
 

@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #ifdef URHO3D_PHYSICS
 #include "../Script/APITemplates.h"
 #include "../Physics/CollisionShape.h"

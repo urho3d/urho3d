@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Urho2D/TileMapDefs2D.h"
 #include "../Resource/XMLElement.h"
 

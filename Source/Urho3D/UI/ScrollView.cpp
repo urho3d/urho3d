@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Core/Context.h"
 #include "../UI/BorderImage.h"
 #include "../Input/InputEvents.h"

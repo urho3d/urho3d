@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../UI/ToolTip.h"
 #include "../Core/Context.h"
 #include "../Core/Timer.h"

@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Urho2D/CollisionShape2D.h"
 #include "../Urho2D/Constraint2D.h"
 #include "../Core/Context.h"

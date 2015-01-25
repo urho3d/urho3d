@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #ifdef URHO3D_URHO2D
 #include "../Urho2D/AnimatedSprite2D.h"
 #include "../Urho2D/Animation2D.h"

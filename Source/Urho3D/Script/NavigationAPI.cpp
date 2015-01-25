@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #ifdef URHO3D_NAVIGATION
 #include "../Script/APITemplates.h"
 #include "../Navigation/Navigable.h"

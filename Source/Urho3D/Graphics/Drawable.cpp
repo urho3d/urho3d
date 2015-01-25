@@ -21,7 +21,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Graphics/Camera.h"
 #include "../Core/Context.h"
 #include "../Graphics/DebugRenderer.h"

@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Graphics/GraphicsDefs.h"
 #include "../Math/StringHash.h"
 #include "../Math/Vector3.h"

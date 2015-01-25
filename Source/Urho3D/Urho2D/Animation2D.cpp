@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Urho2D/Animation2D.h"
 #include "../Urho2D/AnimationSet2D.h"
 #include "../IO/Log.h"
