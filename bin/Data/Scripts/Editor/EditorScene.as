@@ -653,7 +653,7 @@ bool ScenePaste(bool pasteRoot = false, bool duplication = false)
     {
         XMLElement rootElem = sceneCopyBuffer[i].root;
         String mode = rootElem.name;
-        if (mode == "component")
+        if (mode == "component" && editNode !is null)
         {
             // If this is the root node, do not allow to create duplicate scene-global components
             if (editNode is editorScene && CheckForExistingGlobalComponent(editNode, rootElem.GetAttribute("type")))
@@ -685,7 +685,7 @@ bool ScenePaste(bool pasteRoot = false, bool duplication = false)
                 // If we are duplicating, paste into the selected nodes parent
                 if (duplication)
                 {
-                    if (editNode.parent !is null)
+                    if (editNode !is null && editNode.parent !is null)
                         newNode = editNode.parent.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
                     else
                         newNode = editorScene.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
