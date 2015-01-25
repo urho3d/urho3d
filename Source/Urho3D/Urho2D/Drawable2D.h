@@ -90,10 +90,6 @@ public:
     void SetMaterial(Material* material);
     /// Return custom material or material (called by Renderer2D).
     Material* GetMaterial() const;
-    /// Set visibility (called by Renderer2D).
-    void SetVisibility(bool visibility) { visibility_ = visibility; }
-    /// Return visibility (called by Renderer2D).
-    bool GetVisibility() const { return visibility_; }
     /// Return all vertices (called by Renderer2D).
     const Vector<Vertex2D>& GetVertices();
 
@@ -129,8 +125,6 @@ protected:
     SharedPtr<Material> material_;
     /// Renderer2D.
     WeakPtr<Renderer2D> renderer_;
-    /// Test visible.
-    bool visibility_;
 };
 
 }

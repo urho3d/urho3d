@@ -37,6 +37,7 @@
 #include "../Graphics/Technique.h"
 #include "../Graphics/Texture2D.h"
 #include "../Graphics/VertexBuffer.h"
+#include "../Graphics/View.h"
 #include "../Core/WorkQueue.h"
 
 #include "../DebugNew.h"
@@ -173,7 +174,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
         {
             for (unsigned d = 0; d < drawables_.Size(); ++d)
             {
-                if (!drawables_[d]->GetVisibility() || drawables_[d]->GetVertices().Empty())
+                if (!drawables_[d]->IsInView(frame) || drawables_[d]->GetVertices().Empty())
                     continue;
 
                 const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
@@ -246,9 +247,7 @@ static void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
     {
         Drawable2D* drawable = *start++;
         if (renderer->CheckVisibility(drawable) && drawable->GetVertices().Size())
-            drawable->SetVisibility(true);
-        else
-            drawable->SetVisibility(false);
+            drawable->MarkInView(*renderer->frame_);
     }
 }
 
@@ -260,6 +259,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     // Check that we are updating the correct scene
     if (scene != eventData[P_SCENE].GetPtr())
         return;
+    frame_ = const_cast<FrameInfo*>(&static_cast<View*>(eventData[P_VIEW].GetPtr())->GetFrameInfo());
 
     PROFILE(UpdateRenderer2D);
 
@@ -322,7 +322,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     vertexCount_ = 0;
     for (unsigned i = 0; i < drawables_.Size(); ++i)
     {
-        if (drawables_[i]->GetVisibility())
+        if (drawables_[i]->IsInView(*frame_))
             vertexCount_ += drawables_[i]->GetVertices().Size();
     }
     indexCount_ = vertexCount_ / 4 * 6;
@@ -338,7 +338,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
 
     for (unsigned d = 0; d < drawables_.Size(); ++d)
     {
-        if (!drawables_[d]->GetVisibility())
+        if (!drawables_[d]->IsInView(*frame_))
             continue;
 
         Material* usedMaterial = drawables_[d]->GetMaterial();

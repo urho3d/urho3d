@@ -67,6 +67,7 @@ EVENT(E_ENDRENDERING, EndRendering)
 /// Update of a view started.
 EVENT(E_BEGINVIEWUPDATE, BeginViewUpdate)
 {
+    PARAM(P_VIEW, View);                    // View pointer
     PARAM(P_TEXTURE, Texture);              // Texture pointer
     PARAM(P_SURFACE, Surface);              // RenderSurface pointer
     PARAM(P_SCENE, Scene);                  // Scene pointer
@@ -76,6 +77,7 @@ EVENT(E_BEGINVIEWUPDATE, BeginViewUpdate)
 /// Update of a view ended.
 EVENT(E_ENDVIEWUPDATE, EndViewUpdate)
 {
+    PARAM(P_VIEW, View);                    // View pointer
     PARAM(P_TEXTURE, Texture);              // Texture pointer
     PARAM(P_SURFACE, Surface);              // RenderSurface pointer
     PARAM(P_SCENE, Scene);                  // Scene pointer
@@ -85,6 +87,7 @@ EVENT(E_ENDVIEWUPDATE, EndViewUpdate)
 /// Render of a view started.
 EVENT(E_BEGINVIEWRENDER, BeginViewRender)
 {
+    PARAM(P_VIEW, View);                    // View pointer
     PARAM(P_TEXTURE, Texture);              // Texture pointer
     PARAM(P_SURFACE, Surface);              // RenderSurface pointer
     PARAM(P_SCENE, Scene);                  // Scene pointer
@@ -94,6 +97,7 @@ EVENT(E_BEGINVIEWRENDER, BeginViewRender)
 /// Render of a view ended.
 EVENT(E_ENDVIEWRENDER, EndViewRender)
 {
+    PARAM(P_VIEW, View);                    // View pointer
     PARAM(P_TEXTURE, Texture);              // Texture pointer
     PARAM(P_SURFACE, Surface);              // RenderSurface pointer
     PARAM(P_SCENE, Scene);                  // Scene pointer

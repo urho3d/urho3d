@@ -31,11 +31,14 @@ class Drawable2D;
 class IndexBuffer;
 class Material;
 class VertexBuffer;
+struct FrameInfo;
 
 /// 2D renderer components.
 class URHO3D_API Renderer2D : public Drawable
 {
     OBJECT(Renderer2D);
+
+    friend void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex);
 
 public:
     /// Construct.
@@ -93,6 +96,8 @@ private:
     Vector<SharedPtr<Material> > materials_;
     /// Geometries.
     Vector<SharedPtr<Geometry> > geometries_;
+    /// View frameinfo for current frame. Valid only inside HandleBeginViewUpdate().
+    FrameInfo* frame_;
     /// Frustum for current frame.
     const Frustum* frustum_;
     /// Frustum bounding box for current frame.

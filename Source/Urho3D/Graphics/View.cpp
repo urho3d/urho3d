@@ -26,6 +26,7 @@
 #include "../IO/FileSystem.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
+#include "../Graphics/GraphicsEvents.h"
 #include "../Graphics/GraphicsImpl.h"
 #include "../IO/Log.h"
 #include "../Graphics/Material.h"
@@ -509,6 +510,16 @@ void View::Update(const FrameInfo& frame)
     frame_.frameNumber_ = frame.frameNumber_;
     frame_.viewSize_ = viewSize_;
     
+    using namespace BeginViewUpdate;
+
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_VIEW] = this;
+    eventData[P_SURFACE] = renderTarget_;
+    eventData[P_TEXTURE] = (renderTarget_ ? renderTarget_->GetParentTexture() : 0);
+    eventData[P_SCENE] = scene_;
+    eventData[P_CAMERA] = camera_;
+    SendEvent(E_BEGINVIEWUPDATE, eventData);
+
     int maxSortedInstances = renderer_->GetMaxSortedInstances();
     
     // Clear buffers, geometry, light, occluder & batch list
@@ -522,14 +533,19 @@ void View::Update(const FrameInfo& frame)
         i->second_.Clear(maxSortedInstances);
     
     if (hasScenePasses_ && (!camera_ || !octree_))
+    {
+        SendEvent(E_ENDVIEWUPDATE, eventData);
         return;
-    
+    }
+
     // Set automatic aspect ratio if required
     if (camera_ && camera_->GetAutoAspectRatio())
         camera_->SetAspectRatioInternal((float)frame_.viewSize_.x_ / (float)frame_.viewSize_.y_);
     
     GetDrawables();
     GetBatches();
+
+    SendEvent(E_ENDVIEWUPDATE, eventData);
 }
 
 void View::Render()
