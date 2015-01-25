@@ -504,7 +504,7 @@ macro (enable_pch)
                     file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp.new)
                     # Make sure the precompiled headers are not stale
                     add_custom_command (OUTPUT ${PCH_FILENAME}-${CONFIG}-trigger
-                        COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp -x c++-header -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${CMAKE_CURRENT_SOURCE_DIR}/Precompiled.h
+                        COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp -c -x c++-header -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${CMAKE_CURRENT_SOURCE_DIR}/Precompiled.h
                         COMMAND ${CMAKE_COMMAND} -E touch ${PCH_FILENAME}-${CONFIG}-trigger
                         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp Precompiled.h
                         COMMENT "Precompiling header file for ${CONFIG} configuration")
