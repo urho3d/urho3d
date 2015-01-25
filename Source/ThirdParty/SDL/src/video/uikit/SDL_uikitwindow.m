@@ -53,9 +53,13 @@
     [super layoutSubviews];
 
     // Forcibly set window frame based on screen bounds, which follow the orientation on iOS 8
+    // Note: we compile this hack only when the version define exists (iOS SDK 8.1); Urho3D compiled
+    // on earlier iOS SDK's did not need this behavior, even when running on an iOS 8 device
+#ifdef NSFoundationVersionNumber_iOS_7_1
     if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1) {
         self.frame = self.screen.bounds;
     }
+#endif
 }
 @end
 
