@@ -458,6 +458,7 @@ macro (create_symlink SOURCE DESTINATION)
 endmacro ()
 
 # Macro for precompiled headers
+include (GenerateExportHeader)
 macro (enable_pch)
     if (MSVC)
         foreach (FILE ${SOURCE_FILES})
@@ -609,8 +610,6 @@ macro (setup_library)
             COMMENT "Scp-ing ${TARGET_NAME} library to target system")
     endif ()
 endmacro ()
-
-include(CMakeParseArguments)
 
 # Macro for setting up an executable target
 #  NODEPS - setup executable target without defining Urho3D dependency libraries

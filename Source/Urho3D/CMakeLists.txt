@@ -78,7 +78,6 @@ else ()
 endif ()
 
 # Generate platform specific export header file
-include (GenerateExportHeader)
 if (MSVC)
     set (PRE_EXPORT_HEADER "\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)\n")
 endif ()
