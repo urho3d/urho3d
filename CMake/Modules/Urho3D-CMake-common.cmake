@@ -457,82 +457,104 @@ macro (create_symlink SOURCE DESTINATION)
     endif ()
 endmacro ()
 
-# Macro for precompiled headers
 include (GenerateExportHeader)
-macro (enable_pch)
-    if (MSVC)
-        foreach (FILE ${SOURCE_FILES})
-            if (FILE MATCHES \\.cpp$)
-                if (FILE MATCHES Precompiled\\.cpp$)
-                    # Precompiling header file
-                    set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "/YcPrecompiled.h")
-                else ()
-                    # Use the precompiled header file
-                    set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "/YuPrecompiled.h /FIPrecompiled.h")
-                endif ()
-            endif ()
-        endforeach ()
+
+# Macro for precompiled headers (On MSVC, the dummy C++ implementation file for precompiling the header file would be generated if not already exists)
+macro (enable_pch HEADER_FILENAME FORCE_INCLUDE)
+    set (${TARGET_NAME}_HEADER_FILENAME ${HEADER_FILENAME})
+    set (${TARGET_NAME}_FORCE_INCLUDE ${FORCE_INCLUDE})
+
+    # Determine the precompiled header output filename
+    if (CMAKE_COMPILER_IS_GNUCXX)
+        # GNU g++
+        set (PCH_FILENAME ${HEADER_FILENAME}.gch)
     else ()
-        if (TARGET_NAME)
-            # Determine the precompiled header output filename
-            if (CMAKE_COMPILER_IS_GNUCXX)
-                # GNU g++
-                set (PCH_FILENAME Precompiled.h.gch)
-            else ()
-                # Clang
-                set (PCH_FILENAME Precompiled.h.pch)
+        # Clang or MSVC
+        set (PCH_FILENAME ${HEADER_FILENAME}.pch)
+    endif ()
+
+    if (MSVC)
+        get_filename_component (NAME_WE ${HEADER_FILENAME} NAME_WE)
+        if (TARGET_NAME AND TARGET ${TARGET_NAME})
+            if (${FORCE_INCLUDE})
+                set (CXX_FLAGS /FI${HEADER_FILENAME})
             endif ()
-            if (TARGET ${TARGET_NAME})
-                # Cache the compiler flags setup for the current scope so far
-                get_directory_property (COMPILE_DEFINITIONS COMPILE_DEFINITIONS)
-                get_directory_property (INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
-                get_target_property (TYPE ${TARGET_NAME} TYPE)
-                if (TYPE MATCHES SHARED)
-                    set (EXPORT_IMPORT_CONDITION ${TARGET_NAME}_EXPORTS)
-                    if (NOT CMAKE_VERSION VERSION_LESS 2.8.12)
-                        string (MAKE_C_IDENTIFIER ${EXPORT_IMPORT_CONDITION} EXPORT_IMPORT_CONDITION)
+            foreach (FILE ${SOURCE_FILES})
+                if (FILE MATCHES \\.cpp$)
+                    if (FILE MATCHES ${NAME_WE}\\.cpp$)
+                        # Precompiling header file
+                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "/Fp$(IntDir)${PCH_FILENAME} /Yc${HEADER_FILENAME}")
+                    else ()
+                        # Use the precompiled header file
+                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "/Fp$(IntDir)${PCH_FILENAME} /Yu${HEADER_FILENAME} ${CXX_FLAGS}")
                     endif ()
-                    list (APPEND COMPILE_DEFINITIONS ${EXPORT_IMPORT_CONDITION})
-                    # todo: replace the usage of this deprecated function (since CMake 2.8.12) later
-                    add_compiler_export_flags (COMPILER_EXPORT_FLAGS)
-                    set (COMPILER_EXPORT_FLAGS "${COMPILER_EXPORT_FLAGS} -fPIC")
                 endif ()
-                string (REPLACE ";" " -D" COMPILE_DEFINITIONS "-D${COMPILE_DEFINITIONS}")
-                string (REPLACE ";" " -I" INCLUDE_DIRECTORIES "-I${INCLUDE_DIRECTORIES}")
-                file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
-                foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})
-                    string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
-                    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp.new "${COMPILE_DEFINITIONS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES}")
-                    execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp)
-                    file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp.new)
-                    # Make sure the precompiled headers are not stale
-                    add_custom_command (OUTPUT ${PCH_FILENAME}-${CONFIG}-trigger
-                        COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp -c -x c++-header -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${CMAKE_CURRENT_SOURCE_DIR}/Precompiled.h
-                        COMMAND ${CMAKE_COMMAND} -E touch ${PCH_FILENAME}-${CONFIG}-trigger
-                        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/Precompiled.h.${CONFIG}.rsp Precompiled.h
-                        COMMENT "Precompiling header file for ${CONFIG} configuration")
-                endforeach ()
-                # Use the precompiled header file
-                foreach (FILE ${SOURCE_FILES})
-                    if (FILE MATCHES \\.cpp$)
-                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "-include Precompiled.h")
-                    endif ()
+            endforeach ()
+        else ()
+            # The target has not been created yet, so set an internal variable to come back here again later
+            set (${TARGET_NAME}_ENABLE_PCH 1)
+            # But proceed to add the dummy C++ implementation file if necessary
+            set (CXX_FILENAME ${NAME_WE}.cpp)
+            list (FIND SOURCE_FILES ${CXX_FILENAME} CXX_FILENAME_FOUND)
+            if (CXX_FILENAME_FOUND STREQUAL -1)
+                file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${CXX_FILENAME} "// This is a generated file. DO NOT EDIT!\n\n#include \"${HEADER_FILENAME}\"")
+                list (APPEND SOURCE_FILES ${CXX_FILENAME})
+            endif ()
+        endif ()
+    else ()
+        if (TARGET_NAME AND TARGET ${TARGET_NAME})
+            # Cache the compiler flags setup for the current scope so far
+            get_directory_property (COMPILE_DEFINITIONS COMPILE_DEFINITIONS)
+            get_directory_property (INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
+            get_target_property (TYPE ${TARGET_NAME} TYPE)
+            if (TYPE MATCHES SHARED)
+                set (EXPORT_IMPORT_CONDITION ${TARGET_NAME}_EXPORTS)
+                if (NOT CMAKE_VERSION VERSION_LESS 2.8.12)
+                    string (MAKE_C_IDENTIFIER ${EXPORT_IMPORT_CONDITION} EXPORT_IMPORT_CONDITION)
+                endif ()
+                list (APPEND COMPILE_DEFINITIONS ${EXPORT_IMPORT_CONDITION})
+                # todo: replace the usage of this deprecated function (since CMake 2.8.12) later
+                add_compiler_export_flags (COMPILER_EXPORT_FLAGS)
+                set (COMPILER_EXPORT_FLAGS "${COMPILER_EXPORT_FLAGS} -fPIC")
+            endif ()
+            string (REPLACE ";" " -D" COMPILE_DEFINITIONS "-D${COMPILE_DEFINITIONS}")
+            string (REPLACE ";" " -I" INCLUDE_DIRECTORIES "-I${INCLUDE_DIRECTORIES}")
+            file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
+            foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})
+                string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
+                file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp.new "${COMPILE_DEFINITIONS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES}")
+                execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp)
+                file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp.new)
+                # Make sure the precompiled headers are not stale
+                add_custom_command (OUTPUT ${PCH_FILENAME}-${CONFIG}-trigger
+                    COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp -c -x c++-header -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_FILENAME}
+                    COMMAND ${CMAKE_COMMAND} -E touch ${PCH_FILENAME}-${CONFIG}-trigger
+                    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp ${HEADER_FILENAME}
+                    COMMENT "Precompiling header file '${HEADER_FILENAME}' for ${CONFIG} configuration")
+            endforeach ()
+            # Use the precompiled header file
+            if (${FORCE_INCLUDE})
+                set (CXX_FLAGS "-include ${HEADER_FILENAME}")
+            endif ()
+            foreach (FILE ${SOURCE_FILES})
+                if (FILE MATCHES \\.cpp$)
+                    set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS ${CXX_FLAGS})
+                endif ()
+            endforeach ()
+        else ()
+            # The target has not been created yet, so set an internal variable to come back here again later
+            set (${TARGET_NAME}_ENABLE_PCH 1)
+            # But proceed to add the dummy source file(s) to trigger the custom command output rule
+            if (CMAKE_CONFIGURATION_TYPES)
+                # Multi-config, trigger all rules
+                foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES})
+                    list (APPEND TRIGGERS ${PCH_FILENAME}-${CONFIG}-trigger)
                 endforeach ()
             else ()
-                # The target has not been created yet, so set an internal variable to come back here again later
-                set (${TARGET_NAME}_ENABLE_PCH 1)
-                # But proceed to add the dummy source file(s) to trigger the custom command output rule
-                if (CMAKE_CONFIGURATION_TYPES)
-                    # Multi-config, trigger all rules
-                    foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES})
-                        list (APPEND TRIGGERS ${PCH_FILENAME}-${CONFIG}-trigger)
-                    endforeach ()
-                else ()
-                    # Single-config, just trigger the corresponding rule matching the current build configuration
-                    set (TRIGGERS ${PCH_FILENAME}-${CMAKE_BUILD_TYPE}-trigger)
-                endif ()
-                list (APPEND SOURCE_FILES ${TRIGGERS})
+                # Single-config, just trigger the corresponding rule matching the current build configuration
+                set (TRIGGERS ${PCH_FILENAME}-${CMAKE_BUILD_TYPE}-trigger)
             endif ()
+            list (APPEND SOURCE_FILES ${TRIGGERS})
         endif ()
     endif ()
 endmacro ()
@@ -546,7 +568,7 @@ macro (setup_target)
     target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${LIBS})
     # Enable PCH if requested
     if (${TARGET_NAME}_ENABLE_PCH)
-        enable_pch ()
+        enable_pch (${${TARGET_NAME}_HEADER_FILENAME} ${${TARGET_NAME}_FORCE_INCLUDE})
     endif ()
 
     # CMake does not support IPHONEOS_DEPLOYMENT_TARGET the same manner as it supports CMAKE_OSX_DEPLOYMENT_TARGET
@@ -868,13 +890,14 @@ endmacro ()
 #  EXCLUDE_PATTERNS <list> - Use the provided patterns for excluding matched source files
 #  EXTRA_CPP_FILES <list> - Include the provided list of files into CPP_FILES result
 #  EXTRA_H_FILES <list> - Include the provided list of files into H_FILES result
-#  PCH - Enable precompiled header on the defined source files
+#  PCH <value> - Enable precompiled header support on the defined source files using the specified header file
+#  FORCE_INCLUDE - Option to use force-include the precompiled header file to all the defined source files
 #  PARENT_SCOPE - Glob source files in current directory but set the result in parent-scope's variable ${DIR}_CPP_FILES and ${DIR}_H_FILES instead
 #  RECURSE - Option to glob recursively
 #  GROUP - Option to group source files based on its relative path to the corresponding parent directory (only works when PARENT_SCOPE option is not in use)
 macro (define_source_files)
     # Parse the arguments
-    cmake_parse_arguments (ARG "PCH;PARENT_SCOPE;RECURSE;GROUP" "" "EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS;EXCLUDE_PATTERNS" ${ARGN})
+    cmake_parse_arguments (ARG "FORCE_INCLUDE;PARENT_SCOPE;RECURSE;GROUP" "PCH" "EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS;EXCLUDE_PATTERNS" ${ARGN})
 
     # Source files are defined by globbing source files in current source directory and also by including the extra source files if provided
     if (NOT ARG_GLOB_CPP_PATTERNS)
@@ -908,7 +931,7 @@ macro (define_source_files)
     
     # Optionally enable PCH
     if (ARG_PCH)
-        enable_pch ()
+        enable_pch (${ARG_PCH} ${ARG_FORCE_INCLUDE})
     endif ()
     
     # Optionally accumulate source files at parent scope
