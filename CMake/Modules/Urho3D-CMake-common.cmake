@@ -492,8 +492,9 @@ macro (enable_pch)
                         string (MAKE_C_IDENTIFIER ${EXPORT_IMPORT_CONDITION} EXPORT_IMPORT_CONDITION)
                     endif ()
                     list (APPEND COMPILE_DEFINITIONS ${EXPORT_IMPORT_CONDITION})
-                    # Below is a hack as it assumes the compiler is modern enough to support these flags
-                    set (COMPILER_EXPORT_FLAGS "-fPIC -fvisibility=hidden -fvisibility-inlines-hidden")
+                    # todo: replace the usage of this deprecated function (since CMake 2.8.12) later
+                    add_compiler_export_flags (COMPILER_EXPORT_FLAGS)
+                    set (COMPILER_EXPORT_FLAGS "${COMPILER_EXPORT_FLAGS} -fPIC")
                 endif ()
                 string (REPLACE ";" " -D" COMPILE_DEFINITIONS "-D${COMPILE_DEFINITIONS}")
                 string (REPLACE ";" " -I" INCLUDE_DIRECTORIES "-I${INCLUDE_DIRECTORIES}")
@@ -575,15 +576,26 @@ macro (check_source_files)
 endmacro ()
 
 # Macro for setting up a library target
+#  STATIC/SHARED/MODULE/EXCLUDE_FROM_ALL - see CMake help on add_library() command
 macro (setup_library)
     check_source_files ()
     add_library (${TARGET_NAME} ${ARGN} ${SOURCE_FILES})
     setup_target ()
 
+    # Setup the compiler flags for building shared library
+    get_target_property (LIB_TYPE ${TARGET_NAME} TYPE)
+    if (LIB_TYPE MATCHES SHARED)
+        # Hide the symbols that are not explicitly marked for export
+        if (CMAKE_VERSION VERSION_LESS 2.8.12)
+            add_compiler_export_flags ()    # todo: Remove this deprecated function once CMake minimum version is 2.8.12
+        else ()
+            set_target_properties (${TARGET_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1)
+        endif ()
+    endif ()
+
     if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
         if (NOT ${TARGET_NAME} STREQUAL Urho3D)
             # Only interested in static library type, i.e. exclude shared and module library types
-            get_target_property (LIB_TYPE ${TARGET_NAME} TYPE)
             if (LIB_TYPE MATCHES STATIC)
                 set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
             endif ()
@@ -598,7 +610,7 @@ include(CMakeParseArguments)
 
 # Macro for setting up an executable target
 #  NODEPS - setup executable target without defining Urho3D dependency libraries
-#  WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL - see CMake help on add_executable command
+#  WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL - see CMake help on add_executable() command
 macro (setup_executable)
     # Parse extra arguments
     cmake_parse_arguments (ARG "NODEPS" "" "" ${ARGN})
@@ -635,7 +647,7 @@ endmacro ()
 # Macro for setting up an executable target with resources to copy
 #  NODEPS - setup executable target without defining Urho3D dependency libraries
 #  NOBUNDLE - do not use MACOSX_BUNDLE even when URHO3D_MACOSX_BUNDLE build option is enabled
-#  WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL - see CMake help on add_executable command
+#  WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL - see CMake help on add_executable() command
 macro (setup_main_executable)
     # Parse extra arguments
     cmake_parse_arguments (ARG "NOBUNDLE;MACOSX_BUNDLE;WIN32" "" "" ${ARGN})

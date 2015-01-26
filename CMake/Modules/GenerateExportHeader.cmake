@@ -348,11 +348,8 @@ macro(_DO_GENERATE_EXPORT_HEADER TARGET_LIBRARY)
 
   set(INCLUDE_GUARD_NAME "${EXPORT_MACRO_NAME}_H")
 
-  get_target_property(EXPORT_IMPORT_CONDITION ${TARGET_LIBRARY} DEFINE_SYMBOL)
-  
-  if(NOT EXPORT_IMPORT_CONDITION)
-    set(EXPORT_IMPORT_CONDITION ${TARGET_LIBRARY}_EXPORTS)
-  endif()
+  # Urho3D: Our revised version does not depend on the target to be added first, so always derive the variable value from target name instead
+  set(EXPORT_IMPORT_CONDITION ${TARGET_LIBRARY}_EXPORTS)
   #string(MAKE_C_IDENTIFIER ${EXPORT_IMPORT_CONDITION} EXPORT_IMPORT_CONDITION)
 
   configure_file("${_GENERATE_EXPORT_HEADER_MODULE_DIR}/exportheader.cmake.in"

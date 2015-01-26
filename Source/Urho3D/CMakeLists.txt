@@ -254,6 +254,13 @@ if (CMAKE_VERSION VERSION_LESS 2.8.12)
     endif ()
 endif ()
 # end todo
+# Use PIC on platforms that support it (shared library type has this property set to true by default, so we only have to deal with those static ones that the shared library links against)
+if (URHO3D_LIB_TYPE STREQUAL SHARED)
+    set_target_properties (${STATIC_LIBRARY_TARGETS} PROPERTIES POSITION_INDEPENDENT_CODE true)
+    if (NOT MSVC AND NOT (CMAKE_CROSSCOMPILING AND MINGW) AND CMAKE_VERSION VERSION_LESS 2.8.9)  # todo: Remove this when CMake minimum version is 2.8.9
+        set_property (TARGET ${STATIC_LIBRARY_TARGETS} APPEND PROPERTY COMPILE_FLAGS -fPIC)
+    endif ()
+endif ()
 
 # Install headers for using the Urho3D library
 install_header_files (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${DEST_INCLUDE_DIR} FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
@@ -301,26 +308,16 @@ if (URHO3D_LUA)
     # ditto for Lua/LuaJIT
     set (ENGINE_INCLUDE_DIRS "${ENGINE_INCLUDE_DIRS} ${DASH}I\"\${includedir}/${PATH_SUFFIX}/ThirdParty/Lua${JIT}\"")
 endif ()
+if (CMAKE_VERSION VERSION_LESS 2.8.12)  # todo: Remove this regex replacement when CMake minimum version is 2.8.12, use @CMAKE_CXX_FLAGS@ directly in Urho3D.pc.in file
+    string (REGEX REPLACE " -fvisibility[^ ]+" "" CLEANED_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})   # Remove visibility compiler options that are only used for building the library
+else ()
+    set (CLEANED_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+endif ()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc @ONLY)
 if (ANDROID)
     set (RENAME RENAME Urho3D-${ANDROID_NDK_ABI_NAME}.pc)
 endif ()
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc DESTINATION ${DEST_PKGCONFIG_DIR} ${RENAME})
-
-# Setup the compiler flags for building shared library (do this here so that it does not interfere with the pkg-config file generation above)
-if (URHO3D_LIB_TYPE STREQUAL SHARED)
-    # Hide the symbols that are not explicitly marked for export
-    if (CMAKE_VERSION VERSION_LESS 2.8.12)
-        add_compiler_export_flags ()    # todo: Remove this deprecated function once CMake minimum version is 2.8.12
-    else ()
-        set_target_properties (${TARGET_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1)
-    endif ()
-    # Use PIC on platforms that support it (shared library type has this property set to true by default, so we only have to deal with those static ones that the shared library links against)
-    set_target_properties (${STATIC_LIBRARY_TARGETS} PROPERTIES POSITION_INDEPENDENT_CODE true)
-    if (NOT MSVC AND NOT (CMAKE_CROSSCOMPILING AND MINGW) AND CMAKE_VERSION VERSION_LESS 2.8.9)  # todo: Remove this when CMake minimum version is 2.8.9
-        set_property (TARGET ${STATIC_LIBRARY_TARGETS} APPEND PROPERTY COMPILE_FLAGS -fPIC)
-    endif ()
-endif ()
 
 # Define post build steps
 if (ANDROID_NDK_GDB)
