@@ -512,7 +512,11 @@ macro (enable_pch)
                         COMMENT "Precompiling header file for ${CONFIG} configuration")
                 endforeach ()
                 # Use the precompiled header file
-                set_property (SOURCE ${SOURCE_FILES} APPEND_STRING PROPERTY COMPILE_FLAGS "-include Precompiled.h")
+                foreach (FILE ${SOURCE_FILES})
+                    if (FILE MATCHES \\.cpp$)
+                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "-include Precompiled.h")
+                    endif ()
+                endforeach ()
             else ()
                 # The target has not been created yet, so set an internal variable to come back here again later
                 set (${TARGET_NAME}_ENABLE_PCH 1)
