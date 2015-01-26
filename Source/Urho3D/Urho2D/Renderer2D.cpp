@@ -53,9 +53,9 @@ Renderer2D::Renderer2D(Context* context) :
     vertexBuffer_(new VertexBuffer(context_)),
     orderDirty_(true),
     frustum_(0),
-    indexCount_(0),
-    vertexCount_(0)
+    geometryCount_(0)
 {
+    frame_.frameNumber_ = 0;
     SubscribeToEvent(E_BEGINVIEWUPDATE, HANDLER(Renderer2D, HandleBeginViewUpdate));
 }
 
@@ -115,15 +115,18 @@ void Renderer2D::UpdateBatches(const FrameInfo& frame)
 
 void Renderer2D::UpdateGeometry(const FrameInfo& frame)
 {
+    unsigned& vertexCount = vertexCount_[frame.camera_];
+    unsigned& indexCount = indexCount_[frame.camera_];
+
     // Fill index buffer
-    if (indexBuffer_->GetIndexCount() < indexCount_ || indexBuffer_->IsDataLost())
+    if (indexBuffer_->GetIndexCount() < indexCount || indexBuffer_->IsDataLost())
     {
-        bool largeIndices = vertexCount_ > 0xffff;
-        indexBuffer_->SetSize(indexCount_, largeIndices);
-        void* buffer = indexBuffer_->Lock(0, indexCount_, true);
+        bool largeIndices = vertexCount > 0xffff;
+        indexBuffer_->SetSize(indexCount, largeIndices);
+        void* buffer = indexBuffer_->Lock(0, indexCount, true);
         if (buffer)
         {
-            unsigned quadCount = indexCount_ / 6;
+            unsigned quadCount = indexCount / 6;
             if (largeIndices)
             {
                 unsigned* dest = reinterpret_cast<unsigned*>(buffer);
@@ -164,12 +167,12 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
         }
     }
 
-    if (vertexBuffer_->GetVertexCount() < vertexCount_)
-        vertexBuffer_->SetSize(vertexCount_, MASK_VERTEX2D);
+    if (vertexBuffer_->GetVertexCount() < vertexCount)
+        vertexBuffer_->SetSize(vertexCount, MASK_VERTEX2D);
 
-    if (vertexCount_)
+    if (vertexCount)
     {
-        Vertex2D* dest = reinterpret_cast<Vertex2D*>(vertexBuffer_->Lock(0, vertexCount_, true));
+        Vertex2D* dest = reinterpret_cast<Vertex2D*>(vertexBuffer_->Lock(0, vertexCount, true));
         if (dest)
         {
             for (unsigned d = 0; d < drawables_.Size(); ++d)
@@ -259,7 +262,11 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     // Check that we are updating the correct scene
     if (scene != eventData[P_SCENE].GetPtr())
         return;
+    unsigned lastFrameNumber = frame_.frameNumber_;
     frame_ = static_cast<View*>(eventData[P_VIEW].GetPtr())->GetFrameInfo();
+    // Reset geometry use when new frame started
+    if (frame_.frameNumber_ != lastFrameNumber)
+        geometryCount_ = 0;
 
     PROFILE(UpdateRenderer2D);
 
@@ -319,22 +326,20 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
         queue->Complete(M_MAX_UNSIGNED);
     }
 
-    vertexCount_ = 0;
-    for (unsigned i = 0; i < drawables_.Size(); ++i)
-    {
-        if (drawables_[i]->IsInView(frame_))
-            vertexCount_ += drawables_[i]->GetVertices().Size();
-    }
-    indexCount_ = vertexCount_ / 4 * 6;
-
-    // Go through the drawables to form geometries & batches, but upload the actual vertex data later
-    materials_.Clear();
-
+    // Go through the drawables to form geometries & batches and calculate the total vertex / index count,
+    // but upload the actual vertex data later. The idea is that the View class copies our batch vector to
+    // its internal data structures, so we can reuse the batches for each view, provided that unique Geometry
+    // objects are used for each view to specify the draw ranges
+    batches_.Clear();
     Material* material = 0;
     unsigned iStart = 0;
     unsigned iCount = 0;
     unsigned vStart = 0;
     unsigned vCount = 0;
+    unsigned& vTotal = vertexCount_[frame_.camera_];
+    unsigned& iTotal = indexCount_[frame_.camera_];
+    vTotal = 0;
+    iTotal = 0;
 
     for (unsigned d = 0; d < drawables_.Size(); ++d)
     {
@@ -344,6 +349,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
         Material* usedMaterial = drawables_[d]->GetMaterial();
         const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
 
+        // When new material encountered, finish the current batch and start new
         if (material != usedMaterial)
         {
             if (material)
@@ -358,23 +364,16 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
             material = usedMaterial;
         }
 
-        iCount += vertices.Size() / 4 * 6;
+        unsigned indices = vertices.Size() / 4 * 6;
+        iCount += indices;
+        iTotal += indices;
         vCount += vertices.Size();
+        vTotal += vertices.Size();
     }
 
-    if (material)
+    // Add the final batch if necessary
+    if (material && vCount)
         AddBatch(material, iStart, iCount, vStart, vCount);
-
-    // Now the amount of batches is known. Build the part of source batches that are sensitive to threading issues
-    // (material & geometry pointers)
-    unsigned count = materials_.Size();
-    batches_.Resize(count);
-
-    for (unsigned i = 0; i < count; ++i)
-    {
-        batches_[i].material_ = materials_[i];
-        batches_[i].geometry_ = geometries_[i];
-    }
 }
 
 void Renderer2D::GetDrawables(PODVector<Drawable2D*>& dest, Node* node)
@@ -446,10 +445,8 @@ void Renderer2D::AddBatch(Material* material, unsigned indexStart, unsigned inde
     if (!material || indexCount == 0 || vertexCount == 0)
         return;
 
-    materials_.Push(SharedPtr<Material>(material));
-
-    unsigned batchSize = materials_.Size();
-    if (geometries_.Size() < batchSize)
+    // Allocate new geometry if necessary
+    if (geometries_.Size() <= geometryCount_)
     {
         SharedPtr<Geometry> geometry(new Geometry(context_));
         geometry->SetIndexBuffer(indexBuffer_);
@@ -457,7 +454,14 @@ void Renderer2D::AddBatch(Material* material, unsigned indexStart, unsigned inde
         geometries_.Push(geometry);
     }
 
-    geometries_[batchSize - 1]->SetDrawRange(TRIANGLE_LIST, indexStart, indexCount, vertexStart, vertexCount, false);
+    geometries_[geometryCount_]->SetDrawRange(TRIANGLE_LIST, indexStart, indexCount, vertexStart, vertexCount, false);
+
+    batches_.Resize(batches_.Size() + 1);
+    SourceBatch& batch = batches_.Back();
+    batch.geometry_ = geometries_[geometryCount_];
+    batch.material_ = material;
+
+    ++geometryCount_;
 }
 
 }
