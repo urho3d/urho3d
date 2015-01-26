@@ -460,11 +460,11 @@ endmacro ()
 include (GenerateExportHeader)
 
 # Macro for precompiled headers (On MSVC, the dummy C++ implementation file for precompiling the header file would be generated if not already exists)
-macro (enable_pch HEADER_FILENAME FORCE_INCLUDE)
-    set (${TARGET_NAME}_HEADER_FILENAME ${HEADER_FILENAME})
-    set (${TARGET_NAME}_FORCE_INCLUDE ${FORCE_INCLUDE})
+macro (enable_pch HEADER_PATHNAME)
+    set (${TARGET_NAME}_HEADER_PATHNAME ${HEADER_PATHNAME})
 
     # Determine the precompiled header output filename
+    get_filename_component (HEADER_FILENAME ${HEADER_PATHNAME} NAME)
     if (CMAKE_COMPILER_IS_GNUCXX)
         # GNU g++
         set (PCH_FILENAME ${HEADER_FILENAME}.gch)
@@ -476,9 +476,6 @@ macro (enable_pch HEADER_FILENAME FORCE_INCLUDE)
     if (MSVC)
         get_filename_component (NAME_WE ${HEADER_FILENAME} NAME_WE)
         if (TARGET_NAME AND TARGET ${TARGET_NAME})
-            if (${FORCE_INCLUDE})
-                set (CXX_FLAGS /FI${HEADER_FILENAME})
-            endif ()
             foreach (FILE ${SOURCE_FILES})
                 if (FILE MATCHES \\.cpp$)
                     if (FILE MATCHES ${NAME_WE}\\.cpp$)
@@ -486,7 +483,7 @@ macro (enable_pch HEADER_FILENAME FORCE_INCLUDE)
                         set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "/Fp$(IntDir)${PCH_FILENAME} /Yc${HEADER_FILENAME}")
                     else ()
                         # Use the precompiled header file
-                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "/Fp$(IntDir)${PCH_FILENAME} /Yu${HEADER_FILENAME} ${CXX_FLAGS}")
+                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "/Fp$(IntDir)${PCH_FILENAME} /Yu${HEADER_FILENAME} /FI${HEADER_FILENAME}")
                     endif ()
                 endif ()
             endforeach ()
@@ -495,7 +492,11 @@ macro (enable_pch HEADER_FILENAME FORCE_INCLUDE)
             set (${TARGET_NAME}_ENABLE_PCH 1)
             # But proceed to add the dummy C++ implementation file if necessary
             set (CXX_FILENAME ${NAME_WE}.cpp)
-            list (FIND SOURCE_FILES ${CXX_FILENAME} CXX_FILENAME_FOUND)
+            get_filename_component (PATH ${HEADER_PATHNAME} PATH)
+            if (PATH)
+                set (PATH ${PATH}/)
+            endif ()
+            list (FIND SOURCE_FILES ${PATH}${CXX_FILENAME} CXX_FILENAME_FOUND)
             if (CXX_FILENAME_FOUND STREQUAL -1)
                 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${CXX_FILENAME} "// This is a generated file. DO NOT EDIT!\n\n#include \"${HEADER_FILENAME}\"")
                 list (APPEND SOURCE_FILES ${CXX_FILENAME})
@@ -527,18 +528,15 @@ macro (enable_pch HEADER_FILENAME FORCE_INCLUDE)
                 file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp.new)
                 # Make sure the precompiled headers are not stale
                 add_custom_command (OUTPUT ${PCH_FILENAME}-${CONFIG}-trigger
-                    COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp -c -x c++-header -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_FILENAME}
+                    COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp -c -x c++-header -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME}
                     COMMAND ${CMAKE_COMMAND} -E touch ${PCH_FILENAME}-${CONFIG}-trigger
-                    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp ${HEADER_FILENAME}
+                    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp ${HEADER_PATHNAME}
                     COMMENT "Precompiling header file '${HEADER_FILENAME}' for ${CONFIG} configuration")
             endforeach ()
             # Use the precompiled header file
-            if (${FORCE_INCLUDE})
-                set (CXX_FLAGS "-include ${HEADER_FILENAME}")
-            endif ()
             foreach (FILE ${SOURCE_FILES})
                 if (FILE MATCHES \\.cpp$)
-                    set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS ${CXX_FLAGS})
+                    set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "-include ${HEADER_FILENAME}")
                 endif ()
             endforeach ()
         else ()
@@ -568,7 +566,7 @@ macro (setup_target)
     target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${LIBS})
     # Enable PCH if requested
     if (${TARGET_NAME}_ENABLE_PCH)
-        enable_pch (${${TARGET_NAME}_HEADER_FILENAME} ${${TARGET_NAME}_FORCE_INCLUDE})
+        enable_pch (${${TARGET_NAME}_HEADER_PATHNAME})
     endif ()
 
     # CMake does not support IPHONEOS_DEPLOYMENT_TARGET the same manner as it supports CMAKE_OSX_DEPLOYMENT_TARGET
@@ -891,13 +889,12 @@ endmacro ()
 #  EXTRA_CPP_FILES <list> - Include the provided list of files into CPP_FILES result
 #  EXTRA_H_FILES <list> - Include the provided list of files into H_FILES result
 #  PCH <value> - Enable precompiled header support on the defined source files using the specified header file
-#  FORCE_INCLUDE - Option to use force-include the precompiled header file to all the defined source files
 #  PARENT_SCOPE - Glob source files in current directory but set the result in parent-scope's variable ${DIR}_CPP_FILES and ${DIR}_H_FILES instead
 #  RECURSE - Option to glob recursively
 #  GROUP - Option to group source files based on its relative path to the corresponding parent directory (only works when PARENT_SCOPE option is not in use)
 macro (define_source_files)
     # Parse the arguments
-    cmake_parse_arguments (ARG "FORCE_INCLUDE;PARENT_SCOPE;RECURSE;GROUP" "PCH" "EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS;EXCLUDE_PATTERNS" ${ARGN})
+    cmake_parse_arguments (ARG "PARENT_SCOPE;RECURSE;GROUP" "PCH" "EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS;EXCLUDE_PATTERNS" ${ARGN})
 
     # Source files are defined by globbing source files in current source directory and also by including the extra source files if provided
     if (NOT ARG_GLOB_CPP_PATTERNS)
@@ -931,7 +928,7 @@ macro (define_source_files)
     
     # Optionally enable PCH
     if (ARG_PCH)
-        enable_pch (${ARG_PCH} ${ARG_FORCE_INCLUDE})
+        enable_pch (${ARG_PCH})
     endif ()
     
     # Optionally accumulate source files at parent scope
