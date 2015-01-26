@@ -67,24 +67,28 @@ namespace Urho3D
 ### EndRendering
 
 ### BeginViewUpdate
+- %View : View pointer
 - %Texture : Texture pointer
 - %Surface : RenderSurface pointer
 - %Scene : Scene pointer
 - %Camera : Camera pointer
 
 ### EndViewUpdate
+- %View : View pointer
 - %Texture : Texture pointer
 - %Surface : RenderSurface pointer
 - %Scene : Scene pointer
 - %Camera : Camera pointer
 
 ### BeginViewRender
+- %View : View pointer
 - %Texture : Texture pointer
 - %Surface : RenderSurface pointer
 - %Scene : Scene pointer
 - %Camera : Camera pointer
 
 ### EndViewRender
+- %View : View pointer
 - %Texture : Texture pointer
 - %Surface : RenderSurface pointer
 - %Scene : Scene pointer
