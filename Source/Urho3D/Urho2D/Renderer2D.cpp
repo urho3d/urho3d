@@ -237,7 +237,7 @@ void Renderer2D::OnWorldBoundingBoxUpdate()
     worldBoundingBox_ = boundingBox_;
 }
 
-static void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
+void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
 {
     Renderer2D* renderer = reinterpret_cast<Renderer2D*>(item->aux_);
     Drawable2D** start = reinterpret_cast<Drawable2D**>(item->start_);
@@ -247,7 +247,7 @@ static void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
     {
         Drawable2D* drawable = *start++;
         if (renderer->CheckVisibility(drawable) && drawable->GetVertices().Size())
-            drawable->MarkInView(*renderer->frame_);
+            drawable->MarkInView(renderer->frame_);
     }
 }
 
@@ -259,7 +259,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     // Check that we are updating the correct scene
     if (scene != eventData[P_SCENE].GetPtr())
         return;
-    frame_ = const_cast<FrameInfo*>(&static_cast<View*>(eventData[P_VIEW].GetPtr())->GetFrameInfo());
+    frame_ = static_cast<View*>(eventData[P_VIEW].GetPtr())->GetFrameInfo();
 
     PROFILE(UpdateRenderer2D);
 
@@ -322,7 +322,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     vertexCount_ = 0;
     for (unsigned i = 0; i < drawables_.Size(); ++i)
     {
-        if (drawables_[i]->IsInView(*frame_))
+        if (drawables_[i]->IsInView(frame_))
             vertexCount_ += drawables_[i]->GetVertices().Size();
     }
     indexCount_ = vertexCount_ / 4 * 6;
@@ -338,7 +338,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
 
     for (unsigned d = 0; d < drawables_.Size(); ++d)
     {
-        if (!drawables_[d]->IsInView(*frame_))
+        if (!drawables_[d]->IsInView(frame_))
             continue;
 
         Material* usedMaterial = drawables_[d]->GetMaterial();

@@ -96,8 +96,8 @@ private:
     Vector<SharedPtr<Material> > materials_;
     /// Geometries.
     Vector<SharedPtr<Geometry> > geometries_;
-    /// View frameinfo for current frame. Valid only inside HandleBeginViewUpdate().
-    FrameInfo* frame_;
+    /// View frameinfo for current frame.
+    FrameInfo frame_;
     /// Frustum for current frame.
     const Frustum* frustum_;
     /// Frustum bounding box for current frame.
