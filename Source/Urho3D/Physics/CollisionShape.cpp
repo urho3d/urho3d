@@ -305,7 +305,7 @@ ConvexData::~ConvexData()
 {
 }
 
-HeightfieldData::HeightfieldData(Terrain* terrain) :
+HeightfieldData::HeightfieldData(Terrain* terrain, unsigned lodLevel) :
     heightData_(terrain->GetHeightData()),
     spacing_(terrain->GetSpacing()),
     size_(terrain->GetNumVertices()),
@@ -314,6 +314,39 @@ HeightfieldData::HeightfieldData(Terrain* terrain) :
 {
     if (heightData_)
     {
+        if (lodLevel > 0)
+        {
+            IntVector2 lodSize = size_;
+            Vector3 lodSpacing = spacing_;
+            unsigned skip = 1;
+
+            for (unsigned i = 0; i < lodLevel; ++i)
+            {
+                skip *= 2;
+                lodSpacing.x_ *= 2.0f;
+                lodSpacing.z_ *= 2.0f;
+                int rX = lodSize.x_ & 1;
+                int rY = lodSize.y_ & 1;
+                lodSize.x_ >>= 1;
+                lodSize.y_ >>= 1;
+                lodSize.x_ += rX;
+                lodSize.y_ += rY;
+                if (lodSize.x_ <= 2 || lodSize.y_ <= 2)
+                    break;
+            }
+            
+            SharedArrayPtr<float> lodHeightData(new float[lodSize.x_ * lodSize.y_]);
+            for (int y = 0, dY = 0; y < size_.y_ && dY < lodSize.y_; y += skip, ++dY)
+            {
+                for (int x = 0, dX = 0; x < size_.x_ && dX < lodSize.x_; x += skip, ++dX)
+                    lodHeightData[dY * lodSize.x_ + dX] = heightData_[y * size_.x_ + x];
+            }
+
+            size_ = lodSize;
+            spacing_ = lodSpacing;
+            heightData_ = lodHeightData;
+        }
+
         unsigned points = size_.x_ * size_.y_;
         float* data = heightData_.Get();
 
@@ -662,7 +695,7 @@ void CollisionShape::SetCustomConvexHull(CustomGeometry* custom, const Vector3& 
     MarkNetworkUpdate();
 }
 
-void CollisionShape::SetTerrain()
+void CollisionShape::SetTerrain(unsigned lodLevel)
 {
     Terrain* terrain = GetComponent<Terrain>();
     if (!terrain)
@@ -675,6 +708,7 @@ void CollisionShape::SetTerrain()
         UnsubscribeFromEvent(model_, E_RELOADFINISHED);
 
     shapeType_ = SHAPE_TERRAIN;
+    lodLevel_ = lodLevel;
 
     UpdateShape();
     NotifyRigidBody();
@@ -1066,7 +1100,7 @@ void CollisionShape::UpdateShape()
                 Terrain* terrain = GetComponent<Terrain>();
                 if (terrain && terrain->GetHeightData())
                 {
-                    geometry_ = new HeightfieldData(terrain);
+                    geometry_ = new HeightfieldData(terrain, lodLevel_);
                     HeightfieldData* heightfield = static_cast<HeightfieldData*>(geometry_.Get());
 
                     shape_ = new btHeightfieldTerrainShape(heightfield->size_.x_, heightfield->size_.y_,

@@ -25,7 +25,7 @@ class CollisionShape : public Component
     void SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     void SetConvexHull(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    void SetTerrain();
+    void SetTerrain(unsigned lodLevel = 0);
     void SetShapeType(ShapeType type);
     void SetSize(const Vector3& size);
     void SetPosition(const Vector3& position);

@@ -109,11 +109,11 @@ struct ConvexData : public CollisionGeometryData
 struct HeightfieldData : public CollisionGeometryData
 {
     /// Construct from a terrain.
-    HeightfieldData(Terrain* terrain);
+    HeightfieldData(Terrain* terrain, unsigned lodLevel);
     /// Destruct. Free geometry data.
     ~HeightfieldData();
 
-    /// Height data.
+    /// Height data. On LOD level 0 the original height data will be used.
     SharedArrayPtr<float> heightData_;
     /// Vertex spacing.
     Vector3 spacing_;
@@ -168,7 +168,7 @@ public:
     /// Set as a convex hull from CustomGeometry.
     void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a terrain. Only works if the same scene node contains a Terrain component.
-    void SetTerrain();
+    void SetTerrain(unsigned lodLevel = 0);
     /// Set shape type.
     void SetShapeType(ShapeType type);
     /// Set shape size.
