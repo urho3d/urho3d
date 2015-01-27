@@ -527,14 +527,21 @@ macro (enable_pch HEADER_PATHNAME)
             # Make sure the precompiled headers are not stale by creating custom rules to re-compile the header as necessary
             file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
             foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
+                # Generate *.rsp containing configuration specific compiler flags
                 string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
-                file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES}")
+                file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES} -c -x c++-header")
                 execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp)
                 file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new)
-                add_custom_command (OUTPUT ${PCH_FILENAME}-${CONFIG}-pch-trigger
-                    COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -c -x c++-header -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME}
-                    COMMAND ${CMAKE_COMMAND} -E touch ${PCH_FILENAME}-${CONFIG}-pch-trigger
-                    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp ${HEADER_PATHNAME}
+                # Determine the dependency list
+                execute_process (COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -MTdeps -MM -o ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME})
+                file (STRINGS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps DEPS)
+                string (REPLACE deps: "" DEPS ${DEPS})  # Input variable without quotes is intentional
+                string (REPLACE " " "" DEPS "${DEPS}")  # Input variable with quotes is intentional
+                # Create the rule that depends on the included headers
+                add_custom_command (OUTPUT ${HEADER_FILENAME}.${CONFIG}.pch.trigger
+                    COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME}
+                    COMMAND ${CMAKE_COMMAND} -E touch ${HEADER_FILENAME}.${CONFIG}.pch.trigger
+                    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp ${DEPS}
                     COMMENT "Precompiling header file '${HEADER_FILENAME}' for ${CONFIG} configuration")
             endforeach ()
             # Use the precompiled header file
@@ -553,11 +560,11 @@ macro (enable_pch HEADER_PATHNAME)
             if (CMAKE_CONFIGURATION_TYPES)
                 # Multi-config, trigger all rules and let the compiler to choose which precompiled header is suitable to use
                 foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES})
-                    list (APPEND TRIGGERS ${PCH_FILENAME}-${CONFIG}-pch-trigger)
+                    list (APPEND TRIGGERS ${HEADER_FILENAME}.${CONFIG}.pch.trigger)
                 endforeach ()
             else ()
                 # Single-config, just trigger the corresponding rule matching the current build configuration
-                set (TRIGGERS ${PCH_FILENAME}-${CMAKE_BUILD_TYPE}-pch-trigger)
+                set (TRIGGERS ${HEADER_FILENAME}.${CMAKE_BUILD_TYPE}.pch.trigger)
             endif ()
             list (APPEND SOURCE_FILES ${TRIGGERS})
         endif ()

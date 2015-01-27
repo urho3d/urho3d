@@ -60,8 +60,7 @@ install_manifest.txt
 # Precompiled header files (in case of non out-of-source)
 *.gch/
 *.pch/
-*.pch.rsp
-*-pch-trigger
+*.pch.*
 
 # Misc.
 configure*
