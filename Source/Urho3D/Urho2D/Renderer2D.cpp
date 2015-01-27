@@ -215,12 +215,24 @@ void Renderer2D::RemoveDrawable(Drawable2D* drawable)
         return;
 
     drawables_.Remove(drawable);
+
+    // Drawable may be on the dirty list multiple times; remove all instances
+    for (;;)
+    {
+        PODVector<Drawable2D*>::Iterator i = materialDirtyDrawables_.Find(drawable);
+        if (i != materialDirtyDrawables_.End())
+            materialDirtyDrawables_.Erase(i);
+        else
+            break;
+    }
+
     materialDirtyDrawables_.Remove(drawable);
     orderDirty_ = true;
 }
 
 void Renderer2D::MarkMaterialDirty(Drawable2D* drawable)
 {
+    // Note: this may cause the drawable to appear on the dirty list multiple times
     materialDirtyDrawables_.Push(drawable);
 }
 
