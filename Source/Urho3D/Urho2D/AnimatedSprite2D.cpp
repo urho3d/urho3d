@@ -465,8 +465,6 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
             }
         }
     }
-
-    MarkForUpdate();
 }
 
 void AnimatedSprite2D::CalculateTimelineWorldTransform(unsigned index)
