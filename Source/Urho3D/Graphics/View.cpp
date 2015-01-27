@@ -518,7 +518,7 @@ void View::Update(const FrameInfo& frame)
     eventData[P_TEXTURE] = (renderTarget_ ? renderTarget_->GetParentTexture() : 0);
     eventData[P_SCENE] = scene_;
     eventData[P_CAMERA] = camera_;
-    SendEvent(E_BEGINVIEWUPDATE, eventData);
+    renderer_->SendEvent(E_BEGINVIEWUPDATE, eventData);
 
     int maxSortedInstances = renderer_->GetMaxSortedInstances();
     
@@ -534,7 +534,7 @@ void View::Update(const FrameInfo& frame)
     
     if (hasScenePasses_ && (!camera_ || !octree_))
     {
-        SendEvent(E_ENDVIEWUPDATE, eventData);
+        renderer_->SendEvent(E_ENDVIEWUPDATE, eventData);
         return;
     }
 
@@ -545,7 +545,7 @@ void View::Update(const FrameInfo& frame)
     GetDrawables();
     GetBatches();
 
-    SendEvent(E_ENDVIEWUPDATE, eventData);
+    renderer_->SendEvent(E_ENDVIEWUPDATE, eventData);
 }
 
 void View::Render()
