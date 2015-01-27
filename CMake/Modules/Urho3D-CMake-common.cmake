@@ -459,7 +459,7 @@ endmacro ()
 
 include (GenerateExportHeader)
 
-# Macro for precompiled headers (On MSVC, the dummy C++ implementation file for precompiling the header file would be generated if not already exists)
+# Macro for precompiling header (On MSVC, the dummy C++ implementation file for precompiling the header file would be generated if not already exists)
 macro (enable_pch HEADER_PATHNAME)
     set (${TARGET_NAME}_HEADER_PATHNAME ${HEADER_PATHNAME})
 
@@ -483,7 +483,10 @@ macro (enable_pch HEADER_PATHNAME)
                         set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "/Fp$(IntDir)${PCH_FILENAME} /Yc${HEADER_FILENAME}")
                     else ()
                         # Use the precompiled header file
-                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "/Fp$(IntDir)${PCH_FILENAME} /Yu${HEADER_FILENAME} /FI${HEADER_FILENAME}")
+                        get_property (NO_PCH SOURCE ${FILE} PROPERTY NO_PCH)
+                        if (NOT NO_PCH)
+                            set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "/Fp$(IntDir)${PCH_FILENAME} /Yu${HEADER_FILENAME} /FI${HEADER_FILENAME}")
+                        endif ()
                     endif ()
                 endif ()
             endforeach ()
@@ -503,6 +506,7 @@ macro (enable_pch HEADER_PATHNAME)
             endif ()
         endif ()
     else ()
+        # GCC or Clang
         if (TARGET_NAME AND TARGET ${TARGET_NAME})
             # Cache the compiler flags setup for the current scope so far
             get_directory_property (COMPILE_DEFINITIONS COMPILE_DEFINITIONS)
@@ -520,23 +524,26 @@ macro (enable_pch HEADER_PATHNAME)
             endif ()
             string (REPLACE ";" " -D" COMPILE_DEFINITIONS "-D${COMPILE_DEFINITIONS}")
             string (REPLACE ";" " -I" INCLUDE_DIRECTORIES "-I${INCLUDE_DIRECTORIES}")
+            # Make sure the precompiled headers are not stale by creating custom rules to re-compile the header as necessary
             file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
-            foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})
+            foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
                 string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
-                file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp.new "${COMPILE_DEFINITIONS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES}")
-                execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp)
-                file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp.new)
-                # Make sure the precompiled headers are not stale
-                add_custom_command (OUTPUT ${PCH_FILENAME}-${CONFIG}-trigger
-                    COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp -c -x c++-header -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME}
-                    COMMAND ${CMAKE_COMMAND} -E touch ${PCH_FILENAME}-${CONFIG}-trigger
-                    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.rsp ${HEADER_PATHNAME}
+                file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES}")
+                execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp)
+                file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new)
+                add_custom_command (OUTPUT ${PCH_FILENAME}-${CONFIG}-pch-trigger
+                    COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -c -x c++-header -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME}
+                    COMMAND ${CMAKE_COMMAND} -E touch ${PCH_FILENAME}-${CONFIG}-pch-trigger
+                    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp ${HEADER_PATHNAME}
                     COMMENT "Precompiling header file '${HEADER_FILENAME}' for ${CONFIG} configuration")
             endforeach ()
             # Use the precompiled header file
             foreach (FILE ${SOURCE_FILES})
                 if (FILE MATCHES \\.cpp$)
-                    set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "-include ${HEADER_FILENAME}")
+                    get_property (NO_PCH SOURCE ${FILE} PROPERTY NO_PCH)
+                    if (NOT NO_PCH)
+                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "-include ${HEADER_FILENAME}")
+                    endif ()
                 endif ()
             endforeach ()
         else ()
@@ -544,13 +551,13 @@ macro (enable_pch HEADER_PATHNAME)
             set (${TARGET_NAME}_ENABLE_PCH 1)
             # But proceed to add the dummy source file(s) to trigger the custom command output rule
             if (CMAKE_CONFIGURATION_TYPES)
-                # Multi-config, trigger all rules
+                # Multi-config, trigger all rules and let the compiler to choose which precompiled header is suitable to use
                 foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES})
-                    list (APPEND TRIGGERS ${PCH_FILENAME}-${CONFIG}-trigger)
+                    list (APPEND TRIGGERS ${PCH_FILENAME}-${CONFIG}-pch-trigger)
                 endforeach ()
             else ()
                 # Single-config, just trigger the corresponding rule matching the current build configuration
-                set (TRIGGERS ${PCH_FILENAME}-${CMAKE_BUILD_TYPE}-trigger)
+                set (TRIGGERS ${PCH_FILENAME}-${CMAKE_BUILD_TYPE}-pch-trigger)
             endif ()
             list (APPEND SOURCE_FILES ${TRIGGERS})
         endif ()

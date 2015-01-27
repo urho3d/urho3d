@@ -1218,7 +1218,8 @@ foreach( lang C CXX ASM )
 endforeach()
 
 # flags and definitions
-remove_definitions( -DANDROID )
+# Urho3D: comment out redundant command which actually may interfere with compile definition cache generation when enabling PCH
+#remove_definitions( -DANDROID )
 add_definitions( -DANDROID )
 
 if( ANDROID_SYSROOT MATCHES "[ ;\"]" )

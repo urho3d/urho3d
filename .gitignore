@@ -57,8 +57,11 @@ Makefile
 cmake_install.cmake
 install_manifest.txt
 
-# GCC PCH files
-*.gch
+# Precompiled header files (in case of non out-of-source)
+*.gch/
+*.pch/
+*.pch.rsp
+*-pch-trigger
 
 # Misc.
 configure*

@@ -717,5 +717,8 @@ SET( CONTRIB_FILES
 
 set (TARGET_NAME Assimp)
 list (APPEND SOURCE_FILES ${CONTRIB_FILES} ${PUBLIC_HEADERS} ${COMPILER_HEADERS})
+
+set_source_files_properties (contrib/clipper/clipper.cpp contrib/irrXML/irrXML.cpp PROPERTIES NO_PCH TRUE)
 enable_pch (code/AssimpPCH.h)
+
 setup_library ()
