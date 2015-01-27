@@ -226,7 +226,6 @@ void Renderer2D::RemoveDrawable(Drawable2D* drawable)
             break;
     }
 
-    materialDirtyDrawables_.Remove(drawable);
     orderDirty_ = true;
 }
 
