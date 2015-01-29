@@ -199,6 +199,7 @@ void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetFlip(bool, bool);
 
 // Properties:
+float alpha;
 String animation;
 bool animationEnabled;
 AnimationSet2D animationSet;
@@ -222,6 +223,7 @@ bool enabled;
 bool enabledEffective;
 bool flipX;
 bool flipY;
+Vector2 hotSpot;
 /* readonly */
 uint id;
 /* readonly */
@@ -251,6 +253,7 @@ Texture2D texture;
 StringHash type;
 /* readonly */
 String typeName;
+bool useHotSpot;
 uint viewMask;
 /* readonly */
 int weakRefs;
@@ -9366,6 +9369,7 @@ void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetFlip(bool, bool);
 
 // Properties:
+float alpha;
 bool animationEnabled;
 /* readonly */
 Array<Variant> attributeDefaults;
@@ -9387,6 +9391,7 @@ bool enabled;
 bool enabledEffective;
 bool flipX;
 bool flipY;
+Vector2 hotSpot;
 /* readonly */
 uint id;
 /* readonly */
@@ -9414,6 +9419,7 @@ Texture2D texture;
 StringHash type;
 /* readonly */
 String typeName;
+bool useHotSpot;
 uint viewMask;
 /* readonly */
 int weakRefs;

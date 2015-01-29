@@ -2405,6 +2405,7 @@ Methods:
 
 Properties:
 
+- float alpha
 - String animation
 - bool animationEnabled
 - AnimationSet2D@ animationSet
@@ -2422,6 +2423,7 @@ Properties:
 - bool enabledEffective // readonly
 - bool flipX
 - bool flipY
+- Vector2 hotSpot
 - uint id // readonly
 - bool inView // readonly
 - int layer
@@ -2444,6 +2446,7 @@ Properties:
 - Texture2D@ texture
 - StringHash type // readonly
 - String typeName // readonly
+- bool useHotSpot
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
@@ -10341,6 +10344,7 @@ Methods:
 
 Properties:
 
+- float alpha
 - bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
@@ -10356,6 +10360,7 @@ Properties:
 - bool enabledEffective // readonly
 - bool flipX
 - bool flipY
+- Vector2 hotSpot
 - uint id // readonly
 - bool inView // readonly
 - int layer
@@ -10376,6 +10381,7 @@ Properties:
 - Texture2D@ texture
 - StringHash type // readonly
 - String typeName // readonly
+- bool useHotSpot
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
