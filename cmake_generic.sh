@@ -22,17 +22,17 @@
 #
 
 # Determine source tree and build tree
-if [ $1 ] && [[ ! $1 =~ ^- ]]; then BUILD=$1; shift; elif [ -f $(pwd)/CMakeCache.txt ]; then BUILD=$(pwd); else echo An error has occured, build tree has to be provided as the first argument OR call this script in a build tree itself; exit 1; fi
+if [ "$1" ] && [[ ! "$1" =~ ^- ]]; then BUILD=$1; shift; elif [ -f $(pwd)/CMakeCache.txt ]; then BUILD=$(pwd); else echo An error has occured, build tree has to be provided as the first argument OR call this script in a build tree itself; exit 1; fi
 SOURCE=$(dirname $0)
 if [ "$SOURCE" == "." ]; then SOURCE=$(pwd); fi
 if [ "$BUILD" == "." ]; then BUILD=$(pwd); fi
 
 # Define helpers
-. $SOURCE/.bash_helpers.sh
+. "$SOURCE"/.bash_helpers.sh
 
 # Detect CMake toolchains directory if it is not provided explicitly
 [ "$TOOLCHAINS" == "" ] && TOOLCHAINS=$SOURCE/CMake/Toolchains
-[ ! -d $TOOLCHAINS -a -d $URHO3D_HOME/share/Urho3D/CMake/Toolchains ] && TOOLCHAINS=$URHO3D_HOME/share/Urho3D/CMake/Toolchains
+[ ! -d "$TOOLCHAINS" -a -d $URHO3D_HOME/share/Urho3D/CMake/Toolchains ] && TOOLCHAINS=$URHO3D_HOME/share/Urho3D/CMake/Toolchains
 
 # Default to native generator and toolchain if none is specified explicitly
 IFS=#
@@ -61,7 +61,7 @@ for a in $@; do
 done
 
 # Create project with the chosen CMake generator and toolchain
-cmake -E make_directory $BUILD && cmake -E chdir $BUILD cmake $OPTS $@ $SOURCE && post_cmake
+cmake -E make_directory "$BUILD" && cmake -E chdir "$BUILD" cmake $OPTS $@ "$SOURCE" && post_cmake
 unset IFS
 
 # vi: set ts=4 sw=4 expandtab:

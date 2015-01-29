@@ -513,14 +513,14 @@ macro (enable_pch HEADER_PATHNAME)
             get_directory_property (INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
             get_target_property (TYPE ${TARGET_NAME} TYPE)
             if (TYPE MATCHES SHARED)
-                set (EXPORT_IMPORT_CONDITION ${TARGET_NAME}_EXPORTS)
-                if (NOT CMAKE_VERSION VERSION_LESS 2.8.12)
-                    string (MAKE_C_IDENTIFIER ${EXPORT_IMPORT_CONDITION} EXPORT_IMPORT_CONDITION)
-                endif ()
-                list (APPEND COMPILE_DEFINITIONS ${EXPORT_IMPORT_CONDITION})
-                # todo: replace the usage of this deprecated function (since CMake 2.8.12) later
+                list (APPEND COMPILE_DEFINITIONS ${TARGET_NAME}_EXPORTS)
+                # todo: Reevaluate the replacement of this deprecated function (since CMake 2.8.12) when the CMake minimum required version is set to 2.8.12
+                # At the moment it seems using the function is the "only way" to get the export flags into a CMake variable
+                # Additionally, CMake implementation of 'VISIBILITY_INLINES_HIDDEN' has a bug (tested in 2.8.12.2) that it erroneously sets the flag for C compiler too
                 add_compiler_export_flags (COMPILER_EXPORT_FLAGS)
-                set (COMPILER_EXPORT_FLAGS "${COMPILER_EXPORT_FLAGS} -fPIC")
+                if (NOT ANDROID)    # To cater for Android/CMake toolchain which already adds -fPIC flags into the CMake C and CXX compiler flags
+                    set (COMPILER_EXPORT_FLAGS "${COMPILER_EXPORT_FLAGS} -fPIC")
+                endif ()
             endif ()
             string (REPLACE ";" " -D" COMPILE_DEFINITIONS "-D${COMPILE_DEFINITIONS}")
             string (REPLACE ";" " -I" INCLUDE_DIRECTORIES "-I${INCLUDE_DIRECTORIES}")
@@ -535,8 +535,7 @@ macro (enable_pch HEADER_PATHNAME)
                 # Determine the dependency list
                 execute_process (COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -MTdeps -MM -o ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME})
                 file (STRINGS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps DEPS)
-                string (REPLACE deps: "" DEPS ${DEPS})  # Input variable without quotes is intentional
-                string (REPLACE " " "" DEPS "${DEPS}")  # Input variable with quotes is intentional
+                string (REGEX REPLACE "^deps: *| *\\; +" ";" DEPS ${DEPS})
                 # Create the rule that depends on the included headers
                 add_custom_command (OUTPUT ${HEADER_FILENAME}.${CONFIG}.pch.trigger
                     COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME}
@@ -625,11 +624,7 @@ macro (setup_library)
     get_target_property (LIB_TYPE ${TARGET_NAME} TYPE)
     if (LIB_TYPE MATCHES SHARED)
         # Hide the symbols that are not explicitly marked for export
-        if (CMAKE_VERSION VERSION_LESS 2.8.12)
-            add_compiler_export_flags ()    # todo: Remove this deprecated function once CMake minimum version is 2.8.12
-        else ()
-            set_target_properties (${TARGET_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1)
-        endif ()
+        add_compiler_export_flags ()
     endif ()
 
     if (CMAKE_PROJECT_NAME STREQUAL Urho3D)

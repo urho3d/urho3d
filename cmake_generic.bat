@@ -41,7 +41,7 @@ if not exist "%TOOLCHAINS%" if exist "%URHO3D_HOME%/share/Urho3D/CMake/Toolchain
 :: Default to native generator and toolchain if none is specified explicitly
 set "OPTS="
 set "arch="
-if exist "%BUILD%\CMakeCache.txt" for /F "eol=/ delims=:= tokens=1-3" %%i in (%BUILD%\CMakeCache.txt) do if "%%i" == "URHO3D_64BIT" if "%%k" == "1" set "arch= Win64"
+if exist "%BUILD%\CMakeCache.txt" for /F "eol=/ delims=:= tokens=1-3" %%i in ("%BUILD%"\CMakeCache.txt) do if "%%i" == "URHO3D_64BIT" if "%%k" == "1" set "arch= Win64"
 :loop
 if not "%~1" == "" (
     if "%~1" == "-DANDROID" if "%~2" == "1" set "OPTS=-G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=%TOOLCHAINS%\android.toolchain.cmake"
@@ -54,7 +54,7 @@ if not "%~1" == "" (
 )
 
 :: Create project with the chosen CMake generator and toolchain
-cmake -E make_directory %BUILD% && cmake -E chdir %BUILD% cmake %OPTS% %* %SOURCE%
+cmake -E make_directory "%BUILD%" && cmake -E chdir "%BUILD%" cmake %OPTS% %* "%SOURCE%"
 
 goto :eof
 :error

@@ -22,8 +22,8 @@
 #
 
 # Clean the CMake cache and CMake generated files in the build tree
-if [ $1 ] && [ -f $1/CMakeCache.txt ]; then BUILD=$1; elif [ -f $(pwd)/CMakeCache.txt ]; then BUILD=$(pwd); else echo An error has occured, build tree has to be provided as the first argument OR call this script in a build tree itself; exit 1; fi
-rm -rf $BUILD/{CMakeCache.txt,CMakeFiles}
-touch $BUILD/CMakeCache.txt
+if [ "$1" ] && [ -f "$1"/CMakeCache.txt ]; then BUILD=$1; elif [ -f $(pwd)/CMakeCache.txt ]; then BUILD=$(pwd); else echo An error has occured, build tree has to be provided as the first argument OR call this script in a build tree itself; exit 1; fi
+rm -rf "$BUILD"/{CMakeCache.txt,CMakeFiles}
+touch "$BUILD"/CMakeCache.txt
 
 # vi: set ts=4 sw=4 expandtab:
