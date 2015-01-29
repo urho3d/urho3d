@@ -107,6 +107,16 @@ void StaticSprite2D::SetColor(const Color& color)
     MarkNetworkUpdate();
 }
 
+void StaticSprite2D::SetAlpha(float alpha)
+{
+    if (alpha == color_.a_)
+        return;
+
+    color_.a_ = alpha;
+    verticesDirty_ = true;
+    MarkNetworkUpdate();
+}
+
 void StaticSprite2D::SetUseHotSpot(bool useHotSpot)
 {
     if (useHotSpot == useHotSpot_)

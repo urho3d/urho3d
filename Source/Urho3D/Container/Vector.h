@@ -35,6 +35,7 @@ namespace Urho3D
 template <class T> class Vector : public VectorBase
 {
 public:
+    typedef T ValueType;
     typedef RandomAccessIterator<T> Iterator;
     typedef RandomAccessConstIterator<T> ConstIterator;
     
@@ -458,6 +459,7 @@ private:
 template <class T> class PODVector : public VectorBase
 {
 public:
+    typedef T ValueType;
     typedef RandomAccessIterator<T> Iterator;
     typedef RandomAccessConstIterator<T> ConstIterator;
     

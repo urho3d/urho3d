@@ -121,6 +121,12 @@ template <class T> void RegisterStaticSprite2D(asIScriptEngine* engine, const ch
     engine->RegisterObjectMethod(className, "bool get_flipY() const", asMETHOD(T, GetFlipY), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_color(const Color&in)", asMETHOD(T, SetColor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Color& get_color() const", asMETHOD(T, GetColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_alpha(float)", asMETHOD(T, SetAlpha), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_alpha() const", asMETHOD(T, GetAlpha), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_useHotSpot(bool)", asMETHOD(T, SetUseHotSpot), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_useHotSpot() const", asMETHOD(T, GetUseHotSpot), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_hotSpot(const Vector2&in)", asMETHOD(T, SetHotSpot), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Vector2& get_hotSpot() const", asMETHOD(T, GetHotSpot), asCALL_THISCALL);
 }
 
 static void RegisterStaticSprite2D(asIScriptEngine* engine)

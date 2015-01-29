@@ -458,6 +458,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
                 {
                     staticSprite->SetOrderInLayer(orderInLayer_ + nodeInfo.value.zIndex_);
                     staticSprite->SetSprite(nodeInfo.value.sprite_);
+                    staticSprite->SetAlpha(nodeInfo.value.alpha_);
                     staticSprite->SetUseHotSpot(nodeInfo.value.useHotSpot_);
                     staticSprite->SetHotSpot(nodeInfo.value.hotSpot_);
                 }

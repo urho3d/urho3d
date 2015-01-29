@@ -52,6 +52,8 @@ public:
     void SetFlipY(bool flipY);
     /// Set color.
     void SetColor(const Color& color);
+    /// Set alpha.
+    void SetAlpha(float alpha);
     /// Set use hot spot.
     void SetUseHotSpot(bool useHotSpot);
     /// Set hot spot.
@@ -65,6 +67,8 @@ public:
     bool GetFlipY() const { return flipY_; }
     /// Return color.
     const Color& GetColor() const { return color_; }
+    /// Return alpha.
+    float GetAlpha() const { return color_.a_; }
     /// Return use hot spot.
     bool GetUseHotSpot() const { return useHotSpot_; }
     /// Return hot spot.
