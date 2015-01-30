@@ -460,9 +460,9 @@ endmacro ()
 include (GenerateExportHeader)
 
 # Macro for precompiling header (On MSVC, the dummy C++ implementation file for precompiling the header file would be generated if not already exists)
+# This macro should be called before the CMake target has been added
+# Typically, user should indirectly call this macro by using the 'PCH' option when calling define_source_file() macro
 macro (enable_pch HEADER_PATHNAME)
-    set (${TARGET_NAME}_HEADER_PATHNAME ${HEADER_PATHNAME})
-
     # Determine the precompiled header output filename
     get_filename_component (HEADER_FILENAME ${HEADER_PATHNAME} NAME)
     if (CMAKE_COMPILER_IS_GNUCXX)
@@ -475,7 +475,7 @@ macro (enable_pch HEADER_PATHNAME)
 
     if (MSVC)
         get_filename_component (NAME_WE ${HEADER_FILENAME} NAME_WE)
-        if (TARGET_NAME AND TARGET ${TARGET_NAME})
+        if (TARGET ${TARGET_NAME})
             foreach (FILE ${SOURCE_FILES})
                 if (FILE MATCHES \\.cpp$)
                     if (FILE MATCHES ${NAME_WE}\\.cpp$)
@@ -490,9 +490,10 @@ macro (enable_pch HEADER_PATHNAME)
                     endif ()
                 endif ()
             endforeach ()
+            unset (${TARGET_NAME}_HEADER_PATHNAME)
         else ()
             # The target has not been created yet, so set an internal variable to come back here again later
-            set (${TARGET_NAME}_ENABLE_PCH 1)
+            set (${TARGET_NAME}_HEADER_PATHNAME ${HEADER_PATHNAME})
             # But proceed to add the dummy C++ implementation file if necessary
             set (CXX_FILENAME ${NAME_WE}.cpp)
             get_filename_component (PATH ${HEADER_PATHNAME} PATH)
@@ -507,7 +508,7 @@ macro (enable_pch HEADER_PATHNAME)
         endif ()
     else ()
         # GCC or Clang
-        if (TARGET_NAME AND TARGET ${TARGET_NAME})
+        if (TARGET ${TARGET_NAME})
             # Cache the compiler flags setup for the current scope so far
             get_directory_property (COMPILE_DEFINITIONS COMPILE_DEFINITIONS)
             get_directory_property (INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
@@ -552,9 +553,10 @@ macro (enable_pch HEADER_PATHNAME)
                     endif ()
                 endif ()
             endforeach ()
+            unset (${TARGET_NAME}_HEADER_PATHNAME)
         else ()
             # The target has not been created yet, so set an internal variable to come back here again later
-            set (${TARGET_NAME}_ENABLE_PCH 1)
+            set (${TARGET_NAME}_HEADER_PATHNAME ${HEADER_PATHNAME})
             # But proceed to add the dummy source file(s) to trigger the custom command output rule
             if (CMAKE_CONFIGURATION_TYPES)
                 # Multi-config, trigger all rules and let the compiler to choose which precompiled header is suitable to use
@@ -578,7 +580,7 @@ macro (setup_target)
     define_dependency_libs (${TARGET_NAME})
     target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${LIBS})
     # Enable PCH if requested
-    if (${TARGET_NAME}_ENABLE_PCH)
+    if (${TARGET_NAME}_HEADER_PATHNAME)
         enable_pch (${${TARGET_NAME}_HEADER_PATHNAME})
     endif ()
 
