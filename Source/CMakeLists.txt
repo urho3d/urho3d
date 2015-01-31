@@ -155,9 +155,21 @@ if (NOT WIN32 AND NOT ANDROID)
 endif ()
 
 # Add targets
-foreach (TARGET FreeType JO LZ4 PugiXml SDL StanHull STB)
+#foreach (TARGET FreeType JO LZ4 PugiXml SDL StanHull STB)
+#    add_subdirectory (ThirdParty/${TARGET})
+#endforeach ()
+#set (THIRDPARTY_TARGETS FreeType JO LZ4 PugiXml STB Duktape)
+set (THIRDPARTY_TARGETS FreeType JO LZ4 PugiXml StanHull STB)
+
+if (NOT EMSCRIPTEN)
+    #set (THIRDPARTY_TARGETS ${THIRDPARTY_TARGETS} TurboBadger SDL)
+    set (THIRDPARTY_TARGETS ${THIRDPARTY_TARGETS} SDL)
+endif()
+
+foreach (TARGET ${THIRDPARTY_TARGETS})
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
+
 
 if (URHO3D_ANGELSCRIPT)
     add_subdirectory (ThirdParty/AngelScript)
@@ -187,7 +199,7 @@ if (URHO3D_URHO2D)
     add_subdirectory (ThirdParty/Box2D)
 endif ()
 
-if (NOT IOS AND NOT ANDROID AND NOT RASPI)
+if (NOT IOS AND NOT ANDROID AND NOT RASPI AND NOT EMSCRIPTEN)
     if (URHO3D_OPENGL)
         add_subdirectory (ThirdParty/GLEW)
     else ()
