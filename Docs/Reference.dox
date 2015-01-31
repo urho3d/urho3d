@@ -1869,94 +1869,76 @@ Angelcode:
 In order to make 2D games in Urho3D, the Urho2D sublibrary is provided. Urho2D includes 2D graphics and 2D physics.
 
 A typical 2D game setup would consist of the following:
-	- Create an orthographic camera
-	- Create some sprites
-	- Use physics and constraints to interact with the scene
+    - Create an orthographic camera
+    - Create some sprites
+    - Use physics and constraints to interact with the scene
 
 \section Urho2D_Orthographic Orthographic camera
 In order to use Urho2D we need to set camera to orthographic mode first; it can be done with following code:
 
 C++:
 \code
-    // Create camera node
-    Node* cameraNode = scene_->CreateChild("Camera");
-
-    // Create camera
-    Camera* camera = cameraNode->CreateComponent<Camera>();
-    // Set camera orthographic
-    camera->SetOrthographic(true);
-    // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
-\endcode 
+    Node* cameraNode = scene_->CreateChild("Camera"); // Create camera node
+    Camera* camera = cameraNode->CreateComponent<Camera>(); // Create camera
+    camera->SetOrthographic(true); // Set camera orthographic
+    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE); // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+\endcode
 
 AngelScript:
 \code
-    // Create camera node
-    Node@ cameraNode = scene_.CreateChild("Camera");
-
-    // Create camera
-    Camera@ camera = cameraNode.CreateComponent("Camera");
-    // Set camera orthographic
-    camera.orthographic = true;
-    // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera.orthoSize = graphics.height * PIXEL_SIZE;
-\endcode 
+    Node@ cameraNode = scene_.CreateChild("Camera"); // Create camera node
+    Camera@ camera = cameraNode.CreateComponent("Camera"); // Create camera
+    camera.orthographic = true; // Set camera orthographic
+    camera.orthoSize = graphics.height * PIXEL_SIZE; // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+\endcode
 
 Lua:
 \code
-    -- Create camera node
-    cameraNode = scene_:CreateChild("Camera")
-
-    -- Create camera
-    local camera = cameraNode:CreateComponent("Camera")
-    -- Set camera orthographic
-    camera.orthographic = true
-    -- Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera.orthoSize = graphics.height * PIXEL_SIZE
-\endcode 
+    cameraNode = scene_:CreateChild("Camera") -- Create camera node
+    local camera = cameraNode:CreateComponent("Camera") -- Create camera
+    camera.orthographic = true -- Set camera orthographic
+    camera.orthoSize = graphics.height * PIXEL_SIZE -- Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+\endcode
 
 To zoom in/out, use \ref Camera::SetZoom "SetZoom()".
 
 \section Urho2D_Sprites Sprites
-Urho2D provides a handful of classes for loading/drawing the kind of sprite required by your game.
-You can chose from animated sprites, 2D particle emitters and static sprites.
+Urho2D provides a handful of classes for loading/drawing the kind of sprite required by your game. You can chose from animated sprites, 2D particle emitters and static sprites.
 
 \section Urho2D_Animated Animated sprites
 
-Workflow for creating animated sprites in Urho2D relies on Spriter (c).
-Spriter is a crossplatform tool for creating 2D animations. It comes both as an almost fully featured free version and a more advanced 'pro' version. Free version is available at http://www.brashmonkey.com/spriter.htm. To get started, scml files from bin/Data/Urho2D folder can be loaded in Spriter. Note that although currently Spriter doesn't support spritesheets/texture atlases, Urho2D does: you just have to use the same name for your scml file and your spritesheet's xml file (see \ref SpriteSheet2D below for details on how to generate this file). Example 33_Urho2DSpriterAnimation is a good demonstration of this feature (scml file and xml spritesheet are both named 'imp' to instruct Urho2D to use the atlas instead of the individual files). You could remove every image files in the 'imp' folder and just keep 'imp_all.png' to test it out. However, keep your individual image files as they are still required if you want to later edit your scml project in Spriter.
-
+Workflow for creating animated sprites in Urho2D relies on Spriter (c). Spriter is a crossplatform tool for creating 2D animations. It comes both as an almost fully featured free version and a more advanced 'pro' version. Free version is available at http://www.brashmonkey.com/spriter.htm. To get started, scml files from Bin/Data/Urho2D folder can be loaded in Spriter. Note that although currently Spriter doesn't support spritesheets/texture atlases, Urho2D does: you just have to use the same name for your scml file and your spritesheet's xml file (see \ref Urho2D_Static_Sprites "Static sprites" below for details on how to generate this file). Example 33_Urho2DSpriterAnimation is a good demonstration of this feature (scml file and xml spritesheet are both named 'imp' to instruct Urho2D to use the atlas instead of the individual files). You could remove every image files in the 'imp' folder and just keep 'imp_all.png' to test it out. However, keep your individual image files as they are still required if you want to later edit your scml project in Spriter.
 
 A *.scml file is loaded using AnimationSet2D class (Resource) and rendered using AnimatedSprite2D class (Drawable component):
 
 - AnimationSet2D: a Spriter *.scml file including one or more animations.
-Each Spriter animation (Animation2D) contained in an AnimationSet2D can be accessed by its index and by its name (\ref AnimationSet2D::GetAnimation "GetAnimation()").
+Each Spriter animation (Animation2D) contained in an AnimationSet2D can be accessed by its index and by its name (using \ref AnimationSet2D::GetAnimation "GetAnimation()").
 
-- AnimatedSprite2D: used to display a Spriter animation (Animation2D from an AnimationSet2D). Equivalent to a 3D AnimatedModel. Animation2D animations inside the AnimationSet2D are accessed by their name (String) using \ref AnimatedSprite2D::SetAnimation "SetAnimation()". Playback animation speed can be controlled using \ref AnimatedSprite2D::SetSpeed "SetSpeed()". Loop mode can be controlled using \ref AnimatedSprite2D::SetLoopMode "SetLoopMode()" (you can use the default value set in Spriter or make the animation repeat or clamp).
-One interesting feature is the ability to flip/mirror animations on both axes, using \ref AnimatedSprite2D::SetFlip "SetFlip()", \ref AnimatedSprite2D::SetFlipX "SetFlipX()" or \ref AnimatedSprite2D::SetFlipY "SetFlipY()". Once flipped, the animation remains in that state until boolean state is restored to false. It is recommended to build your sprites centered in Spriter if you want to easily flip their animations (otherwise sprite position will seem to diverge).
+- AnimatedSprite2D: component used to display a Spriter animation (Animation2D) from an AnimationSet2D. Equivalent to a 3D AnimatedModel. Animation2D animations inside the AnimationSet2D are accessed by their name (%String) using \ref AnimatedSprite2D::SetAnimation "SetAnimation()". Playback animation speed can be controlled using \ref AnimatedSprite2D::SetSpeed "SetSpeed()". Loop mode can be controlled using \ref AnimatedSprite2D::SetLoopMode "SetLoopMode()". You can use the default value set in Spriter (LM_DEFAULT) or make the animation repeat (LM_FORCE_LOOPED) or clamp (LM_FORCE_CLAMPED).
+One interesting feature is the ability to flip/mirror animations on both axes, using \ref AnimatedSprite2D::SetFlip "SetFlip()", \ref AnimatedSprite2D::SetFlipX "SetFlipX()" or \ref AnimatedSprite2D::SetFlipY "SetFlipY()". Once flipped, the animation remains in that state until boolean state is restored to false. It is recommended to build your sprites centered in Spriter if you want to easily flip their animations and avoid using offsets for position and collision shapes.
 
-- Animation2D (RefCounted): a Spriter animation from an AnimationSet2D.
+- Animation2D (RefCounted): a Spriter animation from an AnimationSet2D. It allows readonly access to a given scml's animation name (\ref Animation2D::GetName "GetName()"), length (\ref Animation2D::GetLength "GetLength()") and loop state (\ref Animation2D::IsLooped "IsLooped()").
 
 For a demonstration, check examples 33_Urho2DSpriterAnimation and 24_Urho2DSprite.
 
 \section Urho2D_Particle Particle emitters
 A 2D particle emitter is built from a *.pex file (a format used by many 2D engines).
-A *.pex file is loaded using ParticleEffect2D class (Resource) and rendered using AnimatedSprite2D class (Drawable component):
+A *.pex file is loaded using ParticleEffect2D class (Resource) and rendered using ParticleEmitter2D class (Drawable component):
 
-- ParticleEffect2D: a *.pex file defining the behavior and texture of a 2D particle (ParticleEmitter2D). For an example, see bin/Data/Urho2D/greenspiral.pex
+- ParticleEffect2D: a *.pex file defining the behavior and texture of a 2D particle (ParticleEmitter2D). For an example, see Bin/Data/Urho2D/greenspiral.pex
 - ParticleEmitter2D: used to display a ParticleEffect2D. Equivalent to a 3D ParticleEmitter.
 
 For a demonstration, check example 25_Urho2DParticle.
 
-ParticleEditor2D tool (https://github.com/aster2013/ParticleEditor2D) can be used to easily create pex files.
+'ParticleEditor2D' tool (https://github.com/aster2013/ParticleEditor2D) can be used to easily create pex files. And to get you started, many elaborate pex samples under friendly licenses are available on the web, mostly on Github (check ParticlePanda, Citrus %Engine, %Particle Designer, Flambe, Starling, CBL...)
 
 \section Urho2D_Static_Sprites Static sprites
 Static sprites are built from single image files or from spritesheets/texture atlases.
 Single image files are loaded using Sprite2D class (Resource) and spritesheets/texture atlases are loaded using SpriteSheet2D class (Resource).
 Both are rendered using StaticSprite2D class (Drawable component):
-- StaticSprite2D: used to display a Sprite2D. Equivalent to a 3D StaticModel.
 - Sprite2D: an image defined with texture, texture rectangle and hot spot.
 - SpriteSheet2D: a texture atlas image (that packs multiple Sprite2D images).
+- StaticSprite2D: used to display a Sprite2D. Equivalent to a 3D StaticModel.
 Spritesheets can be created using tools like ShoeBox (http://renderhjs.net/shoebox/), darkFunction Editor (http://darkfunction.com/editor/), SpriteHelper (http://www.gamedevhelper.com/spriteHelper2Info.php), TexturePacker (http://www.codeandweb.com/texturepacker), ...
 These tools will generate an image file and a xml file mapping coordinates and size for each individual image. Note that Urho2D uses same xml file format as Sparrow/Starling engines.
 
@@ -1967,63 +1949,143 @@ For example, to make the box sprite (bin/Data/Urho2D/Box.png) nearest filtered, 
 <texture>
     <filter mode="nearest" />
 </texture>
-\endcode 
+\endcode
 
 The full list of texture parameters is documented \ref Materials "here".
 
-\section Urho2D_Physics Physics
-Physics in Urho2D uses Box2D. You can refer to Box2D manual at http://box2d.org/manual.pdf for full reference (just substitute "joints" for "constraints").
-- PhysicsWorld2D: implements 2D physics simulation. Mandatory for 2D physics components such as RigidBody2D, CollisionShape2D or Constraint2D.
+To control sprite opacity, use \ref StaticSprite2D::SetAlpha() "SetAlpha()" (you can also tweak the color alpha using \ref StaticSprite2D::SetColor "SetColor()".)
 
-\section Urho2D_Rigidbodies_Components Rigid bodies components
-- RigidBody2D: a 2D physics object instance.
-Available BodyType2Ds are:
-- BT_STATIC: A static body does not move under simulation and behaves as if it has infinite mass. Internally, Box2D stores zero for the mass and the inverse mass. Static bodies can be moved manually by the user. A static body has zero velocity. Static bodies do not collide with other static or kinematic bodies.
-- BT_DYNAMIC: A dynamic body is fully simulated. It can be moved manually by the user, but normally they move according to forces. A dynamic body can collide with all body types. A dynamic body always has finite, non-zero mass. If you try to set the mass of a dynamic body to zero, it will automatically acquire a mass of one kilogram.
-- BT_KINEMATIC: A kinematic body moves under simulation according to its velocity. Kinematic bodies do not respond to forces. They can be moved manually by the user, but normally a kinematic body is moved by setting its velocity. A kinematic body behaves as if it has infinite mass, however, Box2D stores zero for the mass and the inverse mass. Kinematic bodies do not collide with other static or kinematic bodies.
-
-You should establish the body type at creation, using \ref RigidBody2D::SetBodyType "SetBodyType()", because changing the body type later is expensive.
-
-\section Urho2D_Collision_Shapes_Components Collision shapes components
-Use \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to display the shapes.
-- CollisionShape2D: base class for 2D physics collision shapes.
-- CollisionBox2D: defines 2D physics collision box.
-- CollisionCircle2D: defines 2D physics collision circle. Circle shapes have a position (\ref CollisionCircle2D::SetCenter "SetCenter()") and radius (\ref CollisionCircle2D::SetRadius "SetRadius()"). Circles are solid, you cannot make a hollow circle using the circle shape.
-- CollisionEdge2D: defines 2D physics collision edge. Edge shapes are line segments defined by 2 vertices (\ref CollisionEdge2D::SetVertex1 "SetVertex1()" and \ref CollisionEdge2D::SetVertex2 "SetVertex2()" or globaly \ref CollisionEdge2D::SetVertices "SetVertices()"). They are provided to assist in making a free-form static environment for your game. A major limitation of edge shapes is that they can collide with circles and polygons but not with themselves. The collision algorithms used by Box2D require that at least one of two colliding shapes have volume. Edge shapes have no volume, so edge-edge collision is not possible.
-- CollisionChain2D: defines 2D physics collision chain. The chain shape provides an efficient way to connect many edges together (\ref CollisionChain2D::SetVertices "SetVertices()") to construct your static game worlds. You can connect chains together using ghost vertices. Self-intersection of chain shapes is not supported.
-- CollisionPolygon2D: defines 2D physics collision polygon. Polygon shapes are solid convex polygons. A polygon is convex when all line segments connecting two points in the interior do not cross any edge of the polygon. A polygon must have 3 or more vertices (\ref CollisionPolygon2D::SetVertices "SetVertices()"). Polygons vertices are stored with a counter clockwise winding.
-
-Important: collision shapes must match your textures in order to be accurate. You can use tools like Physics Body Editor (https://code.google.com/p/box2d-editor/), RUBE (https://www.iforce2d.net/rube/), LevelHelper (http://www.gamedevhelper.com/levelhelper/), PhysicsEditor (http://www.codeandweb.com/physicseditor), ... to help you.
-Other interesting tool is BisonKick (https://bisonkick.com/app/518195d06927101d38a83b66/).
-
-\section Urho2D_Constraints_Components Constraints components
-Apply a constraint to a node (called 'ownerBody') and use \ref Constraint::SetOtherBody "SetOtherBody()" to set the other node's body to be constrained to the ownerBody.
-Use \ref Constraint2D::SetCollideConnected "SetCollideConnected()" to switch collision on/off between the bodies.
-Use \ref PhysicsWorld2D::SetDrawJoint "SetDrawJoint()" in combination with \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to display the joints.
-See 32_Urho2DConstraints sample for detailed examples and to help selecting the appropriate constraint.
-- Constraint2D: base class for 2D physics constraints.
-- ConstraintDistance2D: defines 2D physics distance constraint. The distance between two anchor points (\ref ConstraintDistance2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintDistance2D::SetOtherBodyAnchor "SetOtherBodyAnchor()") on two bodies is kept constant. The constraint can also be made soft, like a spring-damper connection. Softness is achieved by tuning frequency (\ref ConstraintDistance2D::SetFrequencyHz "SetFrequencyHz()" is below half of the timestep) and damping ratio (\ref ConstraintDistance2D::SetDampingRatio "SetDampingRatio()").
-- ConstraintFriction2D: defines 2D physics friction constraint. This constraint is used for top-down friction. It provides 2D translational friction (\ref ConstraintFriction2D::SetMaxForce "SetMaxForce()") and angular friction (\ref ConstraintFriction2D::SetMaxTorque "SetMaxTorque()").
-- ConstraintGear2D: defines 2D physics gear constraint. Used to create sophisticated mechanisms and saves from using compound shapes. This constraint can only connect ConstraintRevolute2Ds and/or ConstraintPrismatic2Ds (\ref ConstraintGear2D::SetOwnerConstraint "SetOwnerConstraint()" and \ref ConstraintGear2D::SetOtherConstraint "SetOtherConstraint()"). Like the pulley ratio, you can specify a gear ratio (\ref ConstraintGear2D::SetRatio "SetRatio()"). However, in this case the gear ratio can be negative.
-- ConstraintMotor2D: defines 2D physics motor constraint. This constraint lets you control the motion of a body by specifying target position (\ref ConstraintMotor2D::SetLinearOffset "SetLinearOffset()") and rotation offsets (\ref ConstraintMotor2D::SetAngularOffset "SetAngularOffset()"). You can set the maximum motor force (\ref ConstraintMotor2D::SetMaxForce "SetMaxForce()") and torque (\ref ConstraintMotor2D::SetMaxTorque "SetMaxTorque()") that will be applied to reach the target position and rotation. If the body is blocked, it will stop and the contact forces will be proportional to the maximum motor force and torque.
-- ConstraintMouse2D: defines 2D physics mouse constraint. Used to manipulate bodies with the mouse, this constraint is almost used in every Box2D tutorial available on the net, to allow interacting with the 2D scene. It attempts to drive a point on a body towards the current position of the cursor. There is no restriction on rotation. This constraint has a target point, maximum force, frequency, and damping ratio. The target point (\ref ConstraintMouse2D::SetTarget "SetTarget()") initially coincides with the body’s anchor point. The maximum force (\ref ConstraintMouse2D::SetMaxForce "SetMaxForce()") is used to prevent violent reactions when multiple dynamic bodies interact. You can make this as large as you like. The frequency (\ref ConstraintMouse2D::SetFrequencyHz "SetFrequencyHz()") and damping ratio (\ref ConstraintMouse2D::SetDampingRatio "SetDampingRatio()") are used to create a spring/damper effect similar to the ConstraintDistance2D. Many users have tried to adapt the ConstraintMouse2D for game play. Users often want to achieve precise positioning and instantaneous response. The ConstraintMouse2D doesn’t work very well in that context. You may wish to consider using kinematic bodies instead.
-- ConstraintPrismatic2D: defines 2D physics prismatic constraint. This constraint allows for relative translation of two bodies along a specified axis (\ref ConstraintPrismatic2D::SetAxis "SetAxis()"). There's no rotation applied. This constraint definition is similar to ConstraintRevolute2D description; just substitute translation for angle and force for torque.
-- ConstraintPulley2D: defines 2D physics pulley constraint. The pulley connects two bodies to ground (\ref ConstraintPulley2D::SetOwnerBodyGroundAnchor "SetOwnerBodyGroundAnchor()" and \ref ConstraintPulley2D::SetOtherBodyGroundAnchor "SetOtherBodyGroundAnchor()") and to each other (\ref ConstraintPulley2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintPulley2D::SetOtherBodyAnchor "SetOtherBodyAnchor()"). As one body goes up, the other goes down. You can supply a ratio (\ref ConstraintPulley2D::SetRatio "SetRatio()") that simulates a block and tackle. This causes one side of the pulley to extend faster than the other. At the same time the constraint force is smaller on one side than the other. You can use this to create mechanical leverage.
-- ConstraintRevolute2D: defines 2D physics revolute constraint. This constraint forces two bodies to share a common hinge anchor point (\ref ConstraintRevolute2D::SetAnchor "SetAnchor()"). You can control the relative rotation of the two bodies (the constraint angle) using a limit and/or a motor. A limit (\ref ConstraintRevolute2D::SetEnableLimit "SetEnableLimit()") forces the joint angle to remain between a lower (\ref ConstraintRevolute2D::SetLowerAngle "SetLowerAngle()") and upper (\ref ConstraintRevolute2D::SetUpperAngle "SetUpperAngle()") bound. The limit will apply as much torque as needed to make this happen. The limit range should include zero, otherwise the constraint will lurch when the simulation begins. A motor (\ref ConstraintRevolute2D::SetEnableMotor "SetEnableMotor()") allows you to specify the constraint speed (the time derivative of the angle). The speed (\ref ConstraintRevolute2D::SetMotorSpeed "SetMotorSpeed()") can be negative or positive. When the maximum torque (\ref ConstraintRevolute2D::SetMaxMotorTorque "SetMaxMotorTorque()") is exceeded, the joint will slow down and can even reverse. You can use a motor to simulate friction. Just set the joint speed to zero, and set the maximum torque to some small, but significant value. The motor will try to prevent the constraint from rotating, but will yield to a significant load.
-- ConstraintRope2D: defines 2D physics rope constraint. This constraint restricts the maximum distance (\ref ConstraintRope2D::SetMaxLength "SetMaxLength()") between two points (\ref ConstraintRope2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintRope2D::SetOtherBodyAnchor "SetOtherBodyAnchor()"). This can be useful to prevent chains of bodies from stretching, even under high load.
-- ConstraintWeld2D: defines 2D physics weld constraint. This constraint attempts to constrain all relative motion between two bodies.
-- ConstraintWheel2D: defines 2D physics wheel constraint. This constraint restricts a point on bodyB (\ref ConstraintWheel2D::SetAnchor() "SetAnchor()") to a line on bodyA (\ref ConstraintWheel2D::SetAxis "SetAxis()"). It also provides a suspension spring.
+By default, sprite hotspot is centered, but you can choose another hotspot if need be: use \ref StaticSprite2D::SetUseHotSpot "SetUseHotSpot()" and \ref StaticSprite2D::SetHotSpot "SetHotSpot()".
 
 \section Urho2D_Background_and_Layers Background and layers
-To set the background color for the scene, use \ref Renderer::GetDefaultZone "GetDefaultZone()".fogColor
+To set the background color for the scene, use \ref Renderer::GetDefaultZone "GetDefaultZone()" and \ref Zone::SetFogColor "SetFogColor()".
 
-You can use different layers in order to simulate perspective. In this case you can use \ref Drawable2D::SetLayer "SetLayer()" and \ref Drawable2D::SetOrderInLayer "SetOrderInLayer()" to organise your sprites and arrange thir display order.
+You can use different layers in order to simulate perspective. In this case you can use \ref Drawable2D::SetLayer "SetLayer()" and \ref Drawable2D::SetOrderInLayer "SetOrderInLayer()" to organise your sprites and arrange their display order.
 
 Finally, note that you can easily mix both 2D and 3D resources. 3D assets' position need to be slightly offset on the Z axis (z=1 is enough), Camera's position needs to be slightly offset (on the Z axis) from 3D assets' max girth and a Light is required.
 
+\section Urho2D_Physics Physics
+Urho2D implements rigid body physics simulation using the Box2D library. You can refer to Box2D manual at http://box2d.org/manual.pdf for full reference.
+PhysicsWorld2D class implements 2D physics simulation in Urho3D and is mandatory for 2D physics components such as RigidBody2D, CollisionShape2D or Constraint2D.
+
+\section Urho2D_Rigidbodies_Components Rigid bodies components
+RigidBody2D is the base class for 2D physics object instance.
+
+Available rigid bodies (BodyType2D) are:
+- BT_STATIC: a static body does not move under simulation and behaves as if it has infinite mass. Internally, Box2D stores zero for the mass and the inverse mass. Static bodies can be moved manually by the user. A static body has zero velocity. Static bodies do not collide with other static or kinematic bodies.
+- BT_DYNAMIC: a dynamic body is fully simulated. It can be moved manually by the user, but normally it moves according to forces. A dynamic body can collide with all body types. A dynamic body always has finite, non-zero mass. If you try to set the mass of a dynamic body to zero, it will automatically acquire a mass of one kilogram.
+- BT_KINEMATIC: a kinematic body moves under simulation according to its velocity. Kinematic bodies do not respond to forces. They can be moved manually by the user, but normally a kinematic body is moved by setting its velocity. A kinematic body behaves as if it has infinite mass, however, Box2D stores zero for the mass and the inverse mass. Kinematic bodies do not collide with other static or kinematic bodies.
+
+You should establish the body type at creation, using \ref RigidBody2D::SetBodyType "SetBodyType()", because changing the body type later is expensive.
+
+Rigid bodies can be moved/rotated by applying forces and impulses:
+- linear force (progressive/gradual):
+    - \ref RigidBody2D::ApplyForce "ApplyForce()"
+    - \ref RigidBody2D::ApplyForceToCenter "ApplyForceToCenter()" (same as ApplyForce, the world point where to apply the force is set to center of mass, which prevents the body from rotating/spinning)
+- linear or angular impulse (brutal/immediate):
+    - \ref RigidBody2D::ApplyLinearImpulse "ApplyLinearImpulse()"
+    - \ref RigidBody2D::ApplyAngularImpulse "ApplyAngularImpulse()"
+- torque (angular force):
+    - \ref RigidBody2D::ApplyTorque "ApplyTorque()"
+
+ApplyForce() and ApplyLinearImpulse() take two parameters: the direction of the force and where to apply it. Note that in order to improve performance, you can request the body to sleep by setting 'wake' parameter to false.
+
+You can also directly set the linear or angular velocity of the body using \ref RigidBody2D::SetLinearVelocity "SetLinearVelocity()" or \ref RigidBody2D::SetAngularVelocity "SetAngularVelocity()". And you can get current velocity using \ref RigidBody2D::GetLinearVelocity "GetLinearVelocity()" or \ref RigidBody2D::GetAngularVelocity "GetAngularVelocity()".
+
+To 'manually' move or rotate a body, simply translate or rotate the node to which it belongs to.
+
+\section Urho2D_Collision_Shapes_Components Collision shapes components
+Check Box2D manual - Chapter 4 Collision Module and Chapter 7 Fixtures for full reference.
+
+\subsection Urho2D_Collision_Shapes_Shapes Shapes
+- CollisionBox2D: defines 2D physics collision box. Box shapes have an optional position offset (\ref CollisionBox2D::SetCenter "SetCenter()"), width and height size (\ref CollisionBox2D::SetSize "SetSize()") and a rotation angle expressed in degrees (\ref CollisionBox2D::SetAngle "SetAngle()".). Boxes are solid, so if you need a hollow box shape then create one from a CollisionChain2D shape.
+- Circle shapes <=> CollisionCircle2D: defines 2D physics collision circle. Circle shapes have an optional position offset (\ref CollisionCircle2D::SetCenter "SetCenter()") and a radius (\ref CollisionCircle2D::SetRadius "SetRadius()"). Circles are solid, you cannot make a hollow circle using the circle shape.
+- Polygon shapes <=> CollisionPolygon2D: defines 2D physics collision polygon. Polygon shapes are solid convex polygons. A polygon is convex when all line segments connecting two points in the interior do not cross any edge of the polygon. A polygon must have 3 or more vertices (\ref CollisionPolygon2D::SetVertices "SetVertices()"). Polygons vertices winding doesn't matter.
+- Edge shapes <=> CollisionEdge2D: defines 2D physics collision edge. Edge shapes are line segments defined by 2 vertices (\ref CollisionEdge2D::SetVertex1 "SetVertex1()" and \ref CollisionEdge2D::SetVertex2 "SetVertex2()" or globaly \ref CollisionEdge2D::SetVertices "SetVertices()"). They are provided to assist in making a free-form static environment for your game. A major limitation of edge shapes is that they can collide with circles and polygons but not with themselves. The collision algorithms used by Box2D require that at least one of two colliding shapes have volume. Edge shapes have no volume, so edge-edge collision is not possible.
+- Chain shapes <=> CollisionChain2D: defines 2D physics collision chain. The chain shape provides an efficient way to connect many edges together (\ref CollisionChain2D::SetVertices "SetVertices()") to construct your static game worlds. You can connect chains together using ghost vertices. Self-intersection of chain shapes is not supported.
+
+Important: collision shapes must match your textures in order to be accurate. You can use Tiled's objects to create your shapes (see \ref Urho2D_TMX_Objects "Tile map objects"). Or you can use tools like Physics Body Editor (https://code.google.com/p/box2d-editor/), RUBE (https://www.iforce2d.net/rube/), LevelHelper (http://www.gamedevhelper.com/levelhelper/), PhysicsEditor (http://www.codeandweb.com/physicseditor), ... to help you. Other interesting tool is BisonKick (https://bisonkick.com/app/518195d06927101d38a83b66/).
+
+Use \ref PhysicsWorld2D::SetDrawShape "SetDrawShape()" in combination with \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to toggle shapes visibility.
+
+\subsection Urho2D_Collision_Shapes_Fixtures Fixtures
+Box2D fixtures are implemented through the CollisionShape2D base class for 2D physics collision shapes. Common parameters shared by every collision shape include:
+- Density: \ref CollisionShape2D::SetDensity "SetDensity()" and \ref CollisionShape2D::GetDensity "GetDensity()"
+- Friction: \ref CollisionShape2D::SetFriction "SetFriction()" and \ref CollisionShape2D::GetFriction "GetFriction()"
+- Restitution (bounciness): \ref CollisionShape2D::SetRestitution "SetRestitution()" and \ref CollisionShape2D::GetRestitution "GetRestitution()"
+
+CollisionShape2D class also provides readonly acces to these properties:
+- Mass: \ref CollisionShape2D::GetMass "GetMass()"
+- Inertia: \ref CollisionShape2D::GetInertia "GetInertia()"
+- Center of mass: \ref CollisionShape2D::GetMassCenter "GetMassCenter()"
+
+\subsection Urho2D_Collision_Shapes_Filtering Collision filtering
+Box2D supports collision filtering (restricting which other objects to collide with) using categories and groups:
+- Collision categories:
+    - First assign the collision shape to a category, using \ref CollisionShape2D::SetCategoryBits "SetCategoryBits()". Sixteen categories are available.
+    - Then you can specify what other categories the given collision shape can collide with, using \ref CollisionShape2D::SetMaskBits "SetMaskBits()".
+- Collision groups: positive and negative indices assigned using \ref CollisionShape2D::SetGroupIndex "SetGroupIndex()". All collision shapes within the same group index either always collide (positive index) or never collide (negative index).
+
+Note that:
+- collision group has higher precedence than collision category
+- a collision shape on a static body can only collide with a dynamic body
+- a collision shape on a kinematic body can only collide with a dynamic body
+- collision shapes on the same body never collide with each other
+
+\subsection Urho2D_Collision_Shapes_Sensors Sensors
+A collision shape can be set to \ref CollisionShape2D::SetTrigger "trigger mode" to only report collisions without actually applying collision forces. This can be used to implement trigger areas. Note that:
+- a sensor can be triggered only by dynamic bodies (BT_DYNAMIC)
+- \ref Urho2D_Physics_Queries "physics queries" don't report triggers. To get notified when a sensor is triggered or cease to be triggered, subscribe to E_PHYSICSBEGINCONTACT2D and E_PHYSICSENDCONTACT2D \ref Urho2D_Physics_Events "physics events".
+
+\section Urho2D_Constraints_Components Constraints components
+Constraints ('joints' in Box2D terminology) are used to constrain bodies to an anchor point or between themselves. Apply a constraint to a node (called 'ownerBody') and use \ref Constraint::SetOtherBody "SetOtherBody()" to set the other node's body to be constrained to the ownerBody.
+
+See 32_Urho2DConstraints sample for detailed examples and to help selecting the appropriate constraint. Following are the available constraints classes, with the indication of the corresponding 'joint' in Box2D manual (see Chapter 8 Joints):
+- Constraint2D: base class for 2D physics constraints.
+- Distance joint <=> ConstraintDistance2D: defines 2D physics distance constraint. The distance between two anchor points (\ref ConstraintDistance2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintDistance2D::SetOtherBodyAnchor "SetOtherBodyAnchor()") on two bodies is kept constant. The constraint can also be made soft, like a spring-damper connection. Softness is achieved by tuning frequency (\ref ConstraintDistance2D::SetFrequencyHz "SetFrequencyHz()" is below half of the timestep) and damping ratio (\ref ConstraintDistance2D::SetDampingRatio "SetDampingRatio()").
+- Revolute joint <=> ConstraintRevolute2D: defines 2D physics revolute constraint. This constraint forces two bodies to share a common hinge anchor point (\ref ConstraintRevolute2D::SetAnchor "SetAnchor()"). You can control the relative rotation of the two bodies (the constraint angle) using a limit and/or a motor. A limit (\ref ConstraintRevolute2D::SetEnableLimit "SetEnableLimit()") forces the joint angle to remain between a lower (\ref ConstraintRevolute2D::SetLowerAngle "SetLowerAngle()") and upper (\ref ConstraintRevolute2D::SetUpperAngle "SetUpperAngle()") bound. The limit will apply as much torque as needed to make this happen. The limit range should include zero, otherwise the constraint will lurch when the simulation begins. A motor (\ref ConstraintRevolute2D::SetEnableMotor "SetEnableMotor()") allows you to specify the constraint speed (the time derivative of the angle). The speed (\ref ConstraintRevolute2D::SetMotorSpeed "SetMotorSpeed()") can be negative or positive. When the maximum torque (\ref ConstraintRevolute2D::SetMaxMotorTorque "SetMaxMotorTorque()") is exceeded, the joint will slow down and can even reverse. You can use a motor to simulate friction. Just set the joint speed to zero, and set the maximum torque to some small, but significant value. The motor will try to prevent the constraint from rotating, but will yield to a significant load.
+- Prismatic joint <=> ConstraintPrismatic2D: defines 2D physics prismatic constraint. This constraint allows for relative translation of two bodies along a specified axis (\ref ConstraintPrismatic2D::SetAxis "SetAxis()"). There's no rotation applied. This constraint definition is similar to ConstraintRevolute2D description; just substitute translation for angle and force for torque.
+- Pulley joint <=> ConstraintPulley2D: defines 2D physics pulley constraint. The pulley connects two bodies to ground (\ref ConstraintPulley2D::SetOwnerBodyGroundAnchor "SetOwnerBodyGroundAnchor()" and \ref ConstraintPulley2D::SetOtherBodyGroundAnchor "SetOtherBodyGroundAnchor()") and to each other (\ref ConstraintPulley2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintPulley2D::SetOtherBodyAnchor "SetOtherBodyAnchor()"). As one body goes up, the other goes down. You can supply a ratio (\ref ConstraintPulley2D::SetRatio "SetRatio()") that simulates a block and tackle. This causes one side of the pulley to extend faster than the other. At the same time the constraint force is smaller on one side than the other. You can use this to create mechanical leverage.
+- Gear joint <=> ConstraintGear2D: defines 2D physics gear constraint. Used to create sophisticated mechanisms and saves from using compound shapes. This constraint can only connect ConstraintRevolute2Ds and/or ConstraintPrismatic2Ds (\ref ConstraintGear2D::SetOwnerConstraint "SetOwnerConstraint()" and \ref ConstraintGear2D::SetOtherConstraint "SetOtherConstraint()"). Like the pulley ratio, you can specify a gear ratio (\ref ConstraintGear2D::SetRatio "SetRatio()"). However, in this case the gear ratio can be negative.
+- Mouse joint <=> ConstraintMouse2D: defines 2D physics mouse constraint. Used to manipulate bodies with the mouse, this constraint is almost used in every Box2D tutorial available on the net, to allow interacting with the 2D scene. It attempts to drive a point on a body towards the current position of the cursor. There is no restriction on rotation. This constraint has a target point, maximum force, frequency, and damping ratio. The target point (\ref ConstraintMouse2D::SetTarget "SetTarget()") initially coincides with the body’s anchor point. The maximum force (\ref ConstraintMouse2D::SetMaxForce "SetMaxForce()") is used to prevent violent reactions when multiple dynamic bodies interact. You can make this as large as you like. The frequency (\ref ConstraintMouse2D::SetFrequencyHz "SetFrequencyHz()") and damping ratio (\ref ConstraintMouse2D::SetDampingRatio "SetDampingRatio()") are used to create a spring/damper effect similar to the ConstraintDistance2D. Many users have tried to adapt the ConstraintMouse2D for game play. Users often want to achieve precise positioning and instantaneous response. The ConstraintMouse2D doesn’t work very well in that context. You may wish to consider using kinematic bodies instead.
+- Wheel joint <=> ConstraintWheel2D: defines 2D physics wheel constraint. This constraint restricts a point on bodyB (\ref ConstraintWheel2D::SetAnchor() "SetAnchor()") to a line on bodyA (\ref ConstraintWheel2D::SetAxis "SetAxis()"). It also provides a suspension spring.
+- Weld joint <=> ConstraintWeld2D: defines 2D physics weld constraint. This constraint attempts to constrain all relative motion between two bodies.
+- Rope joint <=> ConstraintRope2D: defines 2D physics rope constraint. This constraint restricts the maximum distance (\ref ConstraintRope2D::SetMaxLength "SetMaxLength()") between two points (\ref ConstraintRope2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintRope2D::SetOtherBodyAnchor "SetOtherBodyAnchor()"). This can be useful to prevent chains of bodies from stretching, even under high load.
+- Friction joint <=> ConstraintFriction2D: defines 2D physics friction constraint. This constraint is used for top-down friction. It provides 2D translational friction (\ref ConstraintFriction2D::SetMaxForce "SetMaxForce()") and angular friction (\ref ConstraintFriction2D::SetMaxTorque "SetMaxTorque()").
+- Motor joint <=> ConstraintMotor2D: defines 2D physics motor constraint. This constraint lets you control the motion of a body by specifying target position (\ref ConstraintMotor2D::SetLinearOffset "SetLinearOffset()") and rotation offsets (\ref ConstraintMotor2D::SetAngularOffset "SetAngularOffset()"). You can set the maximum motor force (\ref ConstraintMotor2D::SetMaxForce "SetMaxForce()") and torque (\ref ConstraintMotor2D::SetMaxTorque "SetMaxTorque()") that will be applied to reach the target position and rotation. If the body is blocked, it will stop and the contact forces will be proportional to the maximum motor force and torque.
+
+Collision between bodies connected by a constraint can be enabled/disabled using \ref Constraint2D::SetCollideConnected "SetCollideConnected()".
+
+Use \ref PhysicsWorld2D::SetDrawJoint "SetDrawJoint()" in combination with \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to toggle joints visibility.
+
+\section Urho2D_Physics_Queries Physics queries
+The following queries into the physics world are provided:
+
+\subsection Urho2D_Physics_Queries_Unary Unary geometric queries (queries on a single shape)
+- Shape point test: test if a point is inside a given plain shape and returns the body if true. Use \ref PhysicsWorld2D::GetRigidBody() "GetRigidBody()". Point can be a Vector2 world position, or more conveniently you can pass screen coordinates when performing the test from an input (mouse, joystick, touch). Note that only plain shapes are supported, this test is not applicable to \ref CollisionChain2D and \ref CollisionEdge2D shapes.
+- Shape ray cast: returns the body, distance, point of intersection (position) and normal vector for the first shape hit by the ray. Use \ref PhysicsWorld2D::RaycastSingle "RaycastSingle()".
+
+\subsection Urho2D_Physics_Queries_Binary Binary functions
+- Overlap between 2 shapes: not implemented
+- Contact manifolds (contact points for overlaping shapes): not implemented
+- Distance between 2 shapes: not implemented
+- %Time of impact (time when 2 moving shapes collide): not implemented
+
+\subsection Urho2D_Physics_Queries_World World queries (see Box2D manual - Chapter 10 World Class)
+- AABB queries: return the bodies overlaping with the given rectangle. See \ref PhysicsWorld2D::GetRigidBodies "GetRigidBodies()".
+- %Ray casts: return the body, distance, point of intersection (position) and normal vector for every shape hit by the ray. See \ref PhysicsWorld2D::Raycast "Raycast()".
+
+\section Urho2D_Physics_Events Physics events
+
+Contact listener (see Box2D manual, Chapter 9 Contacts) enables a given node to report contacts through events. Available events are:
+- E_PHYSICSBEGINCONTACT2D ("PhysicsBeginContact2D" in script): called when 2 collision shapes begin to overlap
+- E_PHYSICSENDCONTACT2D ("PhysicsEndContact2D" in script): called when 2 collision shapes cease to overlap
+- E_PHYSICSPRESTEP2D ("Physics2DPreStep2D" in script): called after collision detection, but before collision resolution. This allows to disable the contact if need be (for example on a one-sided platform). Currently ineffective (only reports PhysicsWorld2D and time step)
+- E_PHYSICSPOSTSTEP2D ("PhysicsPostStep2D" in script): used to gather collision impulse results. Currentlly ineffective (only reports PhysicsWorld2D and time step)
+
 \section Urho2D_TileMap Tile maps
 
-Tile maps workflow relies on the tmx file format, which is the native format of Tiled, a free app available at http://www.mapeditor.org/. It is strongly recommended to only use the latest stable release (currently 0.9.1). Do not use daily builds or older revisions, otherwise results may be unpredictable.
+Tile maps workflow relies on the tmx file format, which is the native format of Tiled, a free app available at http://www.mapeditor.org/. It is strongly recommended to use stable release 0.9.1. Do not use daily builds or other newer/older stable revisions, otherwise results may be unpredictable.
 
 Check example 36_Urho2DTileMap for a basic demonstration.
 
@@ -2037,7 +2099,6 @@ You just have to create a \ref TileMap2D "TileMap2D" component inside a node and
 C++:
 \code
 SharedPtr<Node> tileMapNode(scene_->CreateChild("TileMap")); // Create a standard Urho3D node
-tileMapNode->SetPosition(Vector3(0.0f, 0.0f, -1.0f));
 TileMap2D* tileMap = tileMapNode->CreateComponent<TileMap2D>(); // Create the TileMap2D component
 tileMap->SetTmxFile(cache->GetResource<TmxFile2D>("Urho2D/isometric_grass_and_water.tmx")); // Assign tmx resource file to component
 \endcode
@@ -2045,7 +2106,6 @@ tileMap->SetTmxFile(cache->GetResource<TmxFile2D>("Urho2D/isometric_grass_and_wa
 AngelScript:
 \code
 Node@ tileMapNode = scene_.CreateChild("TileMap"); // Create a standard Urho3D node
-tileMapNode.position = Vector3(0.0f, 0.0f, -1.0f);
 TileMap2D@ tileMap = tileMapNode.CreateComponent("TileMap2D"); // Create the TileMap2D component
 tileMap.tmxFile = cache.GetResource("TmxFile2D", "Urho2D/isometric_grass_and_water.tmx"); // Assign the tmx resource file to component
 \endcode
@@ -2053,57 +2113,86 @@ tileMap.tmxFile = cache.GetResource("TmxFile2D", "Urho2D/isometric_grass_and_wat
 Lua:
 \code
 local tileMapNode = scene_:CreateChild("TileMap") -- Create a standard Urho3D node
-tileMapNode.position = Vector3(0, 0, -1)
 local tileMap = tileMapNode:CreateComponent("TileMap2D") -- Create the TileMap2D component
 tileMap.tmxFile = cache:GetResource("TmxFile2D", "Urho2D/isometric_grass_and_water.tmx") -- Assign tmx resource file to component
 \endcode
 
-Note that currently only XML Layer Format is supported (Base64 and CSV are not). In Tiled, go to Maps > Map Properties to set 'Layer Format' to 'XML'.
+Note that:
+- currently only XML Layer Format is supported (Base64 and CSV are not). In Tiled, go to Maps > Properties to set 'Layer Format' to 'XML'.
+- if 'seams' between tiles are obvious then you should make your tilesets images nearest filtered (see \ref Urho2D_Static_Sprites "Static sprites" section above.)
 
 \subsection Urho2D_TMX_maps TMX tile maps
 
 Once a tmx file is loaded in Urho, use \ref TileMap2D::GetInfo "GetInfo()" to access the map properties through \ref TileMapInfo2D class.
 
 A map is defined by its:
-- orientation: Urho2D supports both orthogonal (flat) and isometric (strict iso 2.5D and staggered iso) tile maps. Orientation can be retrieved with \ref TileMapInfo2D::orientation_ "orientation_" attribute (returns 0 for ortho, 1 for iso and 2 for staggered).
-- width and height expressed as a number of tiles in the map:  use \ref TileMapInfo2D::width_ "width_" and \ref TileMapInfo2D::height_ "height_" attributes to access these values
+- orientation: Urho2D supports both orthogonal (flat) and isometric (strict iso 2.5D and staggered iso) tile maps. Orientation can be retrieved with \ref TileMapInfo2D::orientation_ "orientation_" attribute (O_ORTHOGONAL for ortho, O_ISOMETRIC for iso and O_STAGGERED for staggered)
+- width and height expressed as a number of tiles in the map: use \ref TileMapInfo2D::width_ "width_" and \ref TileMapInfo2D::height_ "height_" attributes to access these values
 - width and height expressed in Urho2D space: use \ref TileMapInfo2D::GetMapWidth "GetMapWidth()" and \ref TileMapInfo2D::GetMapHeight "GetMapHeight()" to access these values which are useful to set the camera's position for example
-- tile width and tile height as the size in pixels of the tiles in the map (expressed a percentage): use \ref TileMapInfo2D::tileWidth_ "tileWidth_" and \ref TileMapInfo2D::tileHeight_ "tileHeight_" attributes to access these values
+- tile width and tile height as the size in pixels of the tiles in the map (equates to Tiled width/height * PIXEL_SIZE): use \ref TileMapInfo2D::tileWidth_ "tileWidth_" and \ref TileMapInfo2D::tileHeight_ "tileHeight_" attributes to access these values
 
 Two convenient functions are provided to convert Tiled index to/from Urho2D space:
-- \ref TileMapInfo2D::TileIndexToPosition "TileIndexToPosition()" to convert tile index to Urho position
-- \ref TileMapInfo2D::PositionToTileIndex "PositionToTileIndex()" to convert Urho position to tile index (returns false if position is outside of the map) 
+- \ref TileMap2D::TileIndexToPosition "TileIndexToPosition()" to convert tile index to Urho position
+- \ref TileMap2D::PositionToTileIndex "PositionToTileIndex()" to convert Urho position to tile index (returns false if position is outside of the map)
+
+You can display debug geometry for the whole tile map using \ref TileMap2D::DrawDebugGeometry "DrawDebugGeometry()".
+
+\subsection Urho2D_TMX_Tileset TMX tile map tilesets and tiles
+
+A tile map is built from fixed-size sprites ('tiles', accessible from the Tile2D class) belonging to one or more 'tilesets' (=spritesheets). Each tile is characterized by its:
+- grid ID (ID in the tileset, from top-left to bottom-right): use \ref Tile2D::GetGid "GetGid()"
+- sprite/image (Sprite2D): use \ref Tile2D::GetSprite "GetSprite()"
+- property: use \ref Tile2D::HasProperty "HasProperty()" and \ref Tile2D::GetProperty "GetProperty()"
+
+Tiles from a tileset can only be accessed from one of the layers they are 'stamped' onto, using \ref TileMapLayer2D::GetTile "GetTile()" (see next section).
 
 \subsection Urho2D_TMX_layers TMX tile map layers
 
-A tile map is composed of a mix of ordered \ref TileMapLayer2D "layers".
+A tile map is composed of a mix of ordered \ref TileMapLayer2D "layers". The number of layers contained in the tmx file is retrieved using \ref TileMap2D::GetNumLayers "GetNumLayers()".
 
-Accessing layers : from a \ref TileMap2D "TileMap2D component", layers are accessed by their index from bottom to top using \ref TileMap2D::GetLayer "GetLayer()" function.  \ref TileMap2D::GetNumLayers "GetNumLayers()" returns the number of layers contained in the tmx file. \ref TileMapLayer2D::GetLayerType "GetLayerType()" returns the type of layer (Tile, Object or Image).
+Accessing layers : from a \ref TileMap2D "TileMap2D component", layers are accessed by their index from bottom (0) to top using \ref TileMap2D::GetLayer "GetLayer()" function.
 
 A layer is characterized by its:
 - name: currently not accessible
 - width and height expressed as a number of tiles: use \ref TileMapLayer2D::GetWidth "GetWidth()" and \ref TileMapLayer2D::GetHeight "GetHeight()" to access these values
+- type: retrieved using \ref TileMapLayer2D::GetLayerType "GetLayerType()" (returns the type of layer, a TileMapLayerType2D: Tile=LT_TILE_LAYER, %Object=LT_OBJECT_GROUP, %Image=LT_IMAGE_LAYER and Invalid=LT_INVALID)
+- custom properties : use \ref TileMapLayer2D::HasProperty "HasProperty()" and \ref TileMapLayer2D::GetProperty "GetProperty()" to check/access these values
 
-Layer visibility can be toggled using \ref TileMapLayer2D::SetVisible "SetVisible()"  (and visibility state can be accessed with \ref TileMapLayer2D::IsVisible "IsVisible()")
+Layer visibility can be toggled using \ref TileMapLayer2D::SetVisible "SetVisible()"  (and visibility state can be accessed with \ref TileMapLayer2D::IsVisible "IsVisible()"). Currently layer opacity is not implemented. Use \ref TileMapLayer2D::DrawDebugGeometry "DrawDebugGeometry()" to display debug geometry for a given layer.
+
+By default, first tile map layer is drawn on scene layer 0 and subsequent layers are drawn in a 10 scene layers step. For example, if your tile map has 3 layers:
+- bottom layer is drawn on layer 0
+- middle layer is on layer 10
+- top layer is on layer 20
+
+You can override this default layering order by using \ref TileMapLayer2D::SetDrawOrder "SetDrawOrder()", and you can retrieve the order using \ref TileMapLayer2D::GetDrawOrder "GetDrawOrder()".
+
+You can access a given tile node or tileset's tile (Tile2D) by its index (tile index is displayed at the bottom-left in Tiled and can be retrieved from position using \ref TileMap2D::PositionToTileIndex "PositionToTileIndex()"):
+- to access a tile node, which enables access to the StaticSprite2D component, for example to remove it or replace it, use \ref TileMapLayer2D::GetTileNode "GetTileNode()"
+- to access a tileset's Tile2D tile, which enables access to the Sprite2D resource, gid and custom properties (as mentioned \ref Urho2D_TMX_Tileset "above"), use \ref TileMapLayer2D::GetTile "GetTile()"
+
+An %Image layer node or an %Object layer node are accessible using \ref TileMapLayer2D::GetImageNode "GetImageNode()" and \ref TileMapLayer2D::GetObjectNode "GetObjectNode()".
 
 \subsection Urho2D_TMX_Objects TMX tile map objects
 
 Tiled \ref TileMapObject2D "objects" are wire shapes (Rectangle, Ellipse, Polygon, Polyline) and sprites (Tile) that are freely positionable in the tile map.
 
+IMPORTANT: make sure that 'Rectangle' and 'Ellipse' objects' size is not zero, otherwise your whole scene won't render and you won't have any clue to debug (this is due to the fact that 'width' and 'height' fields are not saved in the tmx file when their value is zero).
+
 Accessing Tiled objects : from a \ref TileMapLayer2D "TileMapLayer2D layer", objects are accessed by their index using \ref TileMapLayer2D::GetObject "GetObject()". \ref TileMapLayer2D::GetNumObjects "GetNumObjects()" returns the number of objects contained in the object layer (tile and image layers will return 0 as they don't hold objects).
 
-Use \ref TileMapObject2D::GetObjectType "GetObjectType()" to get the nature (TileMapObjectType2D) of the selected object.
+Use \ref TileMapObject2D::GetObjectType "GetObjectType()" to get the nature of the selected object (TileMapObjectType2D: OT_RECTANGLE for Rectangle, OT_ELLIPSE for Ellipse, OT_POLYGON for Polygon, OT_POLYLINE for PolyLine, OT_TILE for Tile and OT_INVALID if not a valid object).
 
 Objects' properties (Name and Type) can be accessed using respectively \ref TileMapObject2D::GetName "GetName()" and \ref TileMapObject2D::GetType "GetType()". Type can be useful to flag categories of objects in Tiled.
 
-Except Tile, object layers are not visible. They can be used:
+Except Tile, objects are not visible (although you can display them for debugging purpose using DrawDebugGeometry() at the level of the tile map or a given layer, as mentioned previously). They can be used:
 - to easily design polygon sprites and Box2D shapes using the object's vertices: use \ref TileMapObject2D::GetNumPoints "GetNumPoints()" to get the number of vertices and \ref TileMapObject2D::GetPoint "GetPoint()" to iterate through the vertices
 - as placeholders to easily set the position and size of entities in the world, using \ref TileMapObject2D::GetPosition "GetPosition()" and \ref TileMapObject2D::GetSize "GetSize()"
 - to display Tile objects as sprites
 - to create a background from Tile sprites
 - etc.
 
-Additionaly \ref Sprite2D "Sprite2D" resource from a Tile object is retrieved using \ref TileMapObject2D::GetTileSprite "GetTileSprite()".
+Additionaly Sprite2D resource from a Tile object is retrieved using \ref TileMapObject2D::GetTileSprite "GetTileSprite()".
 
 If need be you can access the grid id (relative to the tilesets used) of a Tile object using \ref TileMapObject2D::GetTileGid "GetTileGid()".
 
