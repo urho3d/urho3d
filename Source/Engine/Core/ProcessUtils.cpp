@@ -47,7 +47,7 @@
 
 #if defined(_MSC_VER)
 #include <float.h>
-#elif !defined(ANDROID) && !defined(IOS) && !defined(RASPI)
+#elif !defined(ANDROID) && !defined(IOS) && !defined(RASPI) && !defined(EMSCRIPTEN)
 // From http://stereopsis.com/FPU.html
 
 #define FPU_CW_PREC_MASK        0x0300
@@ -91,7 +91,7 @@ static void GetCPUData(host_basic_info_data_t* data)
     infoCount = HOST_BASIC_INFO_COUNT;
     host_info(mach_host_self(), HOST_BASIC_INFO, (host_info_t)data, &infoCount);
 }
-#elif !defined(ANDROID) && !defined(RASPI)
+#elif !defined(ANDROID) && !defined(RASPI) && !defined(EMSCRIPTEN)
 static void GetCPUData(struct cpu_id_t* data)
 {
     if (cpu_identify(0, data) < 0)
@@ -104,7 +104,7 @@ static void GetCPUData(struct cpu_id_t* data)
 
 void InitFPU()
 {
-    #if !defined(URHO3D_LUAJIT) && !defined(ANDROID) && !defined(IOS) && !defined(RASPI) && !defined(__x86_64__) && !defined(_M_AMD64)
+    #if !defined(URHO3D_LUAJIT) && !defined(ANDROID) && !defined(IOS) && !defined(RASPI) && !defined(__x86_64__) && !defined(_M_AMD64) && !defined(EMSCRIPTEN)
     // Make sure FPU is in round-to-nearest, single precision mode
     // This ensures Direct3D and OpenGL behave similarly, and all threads behave similarly
     #ifdef _MSC_VER
@@ -393,7 +393,7 @@ unsigned GetNumPhysicalCPUs()
     #endif
     #elif defined(ANDROID)
     return GetAndroidCPUCount();
-    #elif !defined(ANDROID) && !defined(RASPI)
+    #elif !defined(ANDROID) && !defined(RASPI) && !defined(EMSCRIPTEN)
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_cores;
@@ -415,7 +415,7 @@ unsigned GetNumLogicalCPUs()
     #endif
     #elif defined(ANDROID)
     return GetAndroidCPUCount();
-    #elif !defined(ANDROID) && !defined(RASPI)
+    #elif !defined(ANDROID) && !defined(RASPI) && !defined(EMSCRIPTEN)
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_logical_cpus;

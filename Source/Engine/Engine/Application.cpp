@@ -46,6 +46,19 @@ void RunFrame(void* data)
     instance->GetSubsystem<Engine>()->RunFrame();
 }
 #endif
+
+#if defined(EMSCRIPTEN)
+#include <emscripten.h>
+// REVISIT: it seems there should only be one instance of Application
+// and it's needed here as there's no way to pass it along with a callback
+// for emscripten_set_main_loop() so just store a static pointer here for now
+static Application *emInstance = 0;
+void RunFrame()
+{
+    if (emInstance)
+        emInstance->GetSubsystem<Engine>()->RunFrame();
+}
+#endif
     
 Application::Application(Context* context) :
     Object(context),
@@ -62,12 +75,14 @@ Application::Application(Context* context) :
 
 int Application::Run()
 {
+#if !defined(EMSCRIPTEN) // TODO: do we really need to do this?
     try
     {
+#endif
         Setup();
         if (exitCode_)
             return exitCode_;
-
+		
         if (!engine_->Initialize(engineParameters_))
         {
             ErrorExit();
@@ -78,8 +93,8 @@ int Application::Run()
         if (exitCode_)
             return exitCode_;
 
-        // Platforms other than iOS run a blocking main loop
-        #ifndef IOS
+        // Platforms other than iOS and EMSCRIPTEN run a blocking main loop
+        #if !defined(IOS) && !defined(EMSCRIPTEN)
         while (!engine_->IsExiting())
             engine_->RunFrame();
 
@@ -87,16 +102,25 @@ int Application::Run()
         // iOS will setup a timer for running animation frames so eg. Game Center can run. In this case we do not
         // support calling the Stop() function, as the application will never stop manually
         #else
+        #if defined(IOS)
         SDL_iPhoneSetAnimationCallback(GetSubsystem<Graphics>()->GetImpl()->GetWindow(), 1, &RunFrame, this);
+        #else
+        // EMSCRIPTEN
+        emInstance = this; 
+        emscripten_set_main_loop(RunFrame, 0, 1);
+	
+        #endif
         #endif
         
         return exitCode_;
+#if !defined(EMSCRIPTEN)
     }
     catch (std::bad_alloc&)
     {
         ErrorDialog(GetTypeName(), "An out-of-memory error occurred. The application will now exit.");
         return EXIT_FAILURE;
     }
+#endif
 }
 
 void Application::ErrorExit(const String& message)

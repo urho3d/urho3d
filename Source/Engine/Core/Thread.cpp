@@ -46,7 +46,11 @@ void* ThreadFunctionStatic(void* data)
 {
     Thread* thread = static_cast<Thread*>(data);
     thread->ThreadFunction();
+#ifdef EMSCRIPTEN
+// note: emscripten doesn't have this function but doesn't use threading anyway
+// so #ifdef it out to prevent linker warnings
     pthread_exit((void*)0);
+#endif
     return 0;
 }
 #endif
@@ -73,7 +77,10 @@ bool Thread::Run()
     shouldRun_ = true;
     #ifdef WIN32
     handle_ = CreateThread(0, 0, ThreadFunctionStatic, this, 0, 0);
-    #else
+//    #else
+    #elif !defined(EMSCRIPTEN)
+// note: emscripten doesn't have this function but doesn't use
+// threading anyway so #ifdef it out to prevent linker warnings
     handle_ = new pthread_t;
     pthread_attr_t type;
     pthread_attr_init(&type);
@@ -93,7 +100,10 @@ void Thread::Stop()
     #ifdef WIN32
     WaitForSingleObject((HANDLE)handle_, INFINITE);
     CloseHandle((HANDLE)handle_);
-    #else
+//    #else
+    #elif !defined(EMSCRIPTEN)
+ // note: emscripten doesn't have this function but doesn't use
+ // threading anyway so #ifdef it out to prevent linker warnings
     pthread_t* thread = (pthread_t*)handle_;
     if (thread)
         pthread_join(*thread, 0);
@@ -108,7 +118,7 @@ void Thread::SetPriority(int priority)
     if (handle_)
         SetThreadPriority((HANDLE)handle_, priority);
     #endif
-    #if defined(__linux__) && !defined(ANDROID)
+    #if defined(__linux__) && !defined(ANDROID) && !defined(EMSCRIPTEN)
     pthread_t* thread = (pthread_t*)handle_;
     if (thread)
         pthread_setschedprio(*thread, priority);

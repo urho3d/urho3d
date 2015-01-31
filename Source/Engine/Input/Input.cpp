@@ -107,7 +107,11 @@ Input::Input(Context* context) :
     mouseMoveWheel_(0),
     windowID_(0),
     toggleFullscreen_(true),
+#if defined(EMSCRIPTEN) // TODO: properly implement relative mouse motion with emscripten
+    mouseVisible_(true),
+#else
     mouseVisible_(false),
+#endif
     lastMouseVisible_(false),
     mouseGrabbed_(false),
     mouseMode_(MM_ABSOLUTE),
@@ -723,14 +727,21 @@ unsigned Input::LoadGestures(Deserializer& source)
     return SDL_LoadDollarTemplates(-1, wrapper.GetRWOps());
 }
 
+
 bool Input::RemoveGesture(unsigned gestureID)
 {
+#if defined(EMSCRIPTEN)
+    return false;
+#else
     return SDL_RemoveDollarTemplate(gestureID) != 0;
+#endif
 }
 
 void Input::RemoveAllGestures()
 {
+#if !defined(EMSCRIPTEN)
     SDL_RemoveAllDollarTemplates();
+#endif
 }
 
 SDL_JoystickID Input::OpenJoystick(unsigned index)
@@ -1250,11 +1261,19 @@ void Input::HandleSDLEvent(void* sdlEvent)
     {
     case SDL_KEYDOWN:
         // Convert to uppercase to match Win32 virtual key codes
+#if defined (EMSCRIPTEN)
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, 0, true);
+#else
         SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.raw, true);
+#endif
         break;
 
     case SDL_KEYUP:
+#if defined(EMSCRIPTEN)
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, 0, false);
+#else
         SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.raw, false);
+#endif
         break;
 
     case SDL_TEXTINPUT:
