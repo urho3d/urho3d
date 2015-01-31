@@ -310,6 +310,7 @@ void Graphics::SetWindowPosition(int x, int y)
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 {
     PROFILE(SetScreenMode);
+LOGINFO("Graphics::SetMode()");
 
     bool maximize = false;
     
@@ -322,8 +323,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         fullscreen = false;
 
     multiSample = Clamp(multiSample, 1, 16);
+bool isInitialized = IsInitialized();
+LOGINFO(isInitialized ? "isInitialized == true" : "isInitialized == false");
+
     
-    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
+    //if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
+    if (isInitialized && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
         vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
         return true;
     
@@ -353,6 +358,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             height = 768;
         }
     }
+
     
     // Check fullscreen mode validity (desktop only). Use a closest match if not found
     #if !defined(ANDROID) && !defined(IOS) && !defined(RPI)
@@ -442,9 +448,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
                 impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
             else
             {
+#if !defined(EMSCRIPTEN)
                 if (!impl_->window_)
                     impl_->window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
                 fullscreen = false;
+#endif
             }
             
             if (impl_->window_)
