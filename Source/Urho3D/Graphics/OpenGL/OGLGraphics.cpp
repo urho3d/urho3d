@@ -1401,7 +1401,7 @@ bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* sourc
         return false;
 }
 
-bool Graphics::HasShaderParameter(ShaderType type, StringHash param)
+bool Graphics::HasShaderParameter(StringHash param)
 {
     return shaderProgram_ && shaderProgram_->HasParameter(param);
 }

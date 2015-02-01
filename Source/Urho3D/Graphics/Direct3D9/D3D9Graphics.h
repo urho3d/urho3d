@@ -154,12 +154,10 @@ public:
     void SetShaderParameter(StringHash param, const Matrix3x4& matrix);
     /// Set shader constant from a variant. Supported variant types: bool, float, vector2, vector3, vector4, color.
     void SetShaderParameter(StringHash param, const Variant& value);
-    /// Register a shader parameter globally. Called by Shader.
-    void RegisterShaderParameter(StringHash param, const ShaderParameter& definition);
     /// Check whether a shader parameter group needs update. Does not actually check whether parameters exist in the shaders.
     bool NeedParameterUpdate(ShaderParameterGroup group, const void* source);
     /// Check whether a shader parameter exists on the currently set shaders.
-    bool HasShaderParameter(ShaderType type, StringHash param);
+    bool HasShaderParameter(StringHash param);
     /// Check whether the current pixel shader uses a texture unit.
     bool HasTextureUnit(TextureUnit unit);
     /// Clear remembered shader parameter source group.
@@ -392,7 +390,9 @@ public:
     void FreeScratchBuffer(void* buffer);
     /// Clean up too large scratch buffers.
     void CleanupScratchBuffers();
-    
+    /// Clean up shader parameters when a shader variation is released or destroyed.
+    void CleanupShaderParameters(ShaderVariation* variation);
+
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
     /// Return the API-specific luminance texture format.
@@ -536,8 +536,6 @@ private:
     ShaderVariation* vertexShader_;
     /// Pixel shader in use.
     ShaderVariation* pixelShader_;
-    /// All known shader parameters.
-    HashMap<StringHash, ShaderParameter> shaderParameters_;
     /// Textures in use.
     Texture* textures_[MAX_TEXTURE_UNITS];
     /// Texture unit mappings.
@@ -592,6 +590,10 @@ private:
     bool drawAntialiased_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
+    /// Shader parameters for all vertex/pixel shader combinations.
+    HashMap<Pair<ShaderVariation*, ShaderVariation*>, HashMap<StringHash, Pair<ShaderType, unsigned> > > shaderParameters_;
+    /// Current active shader parameters.
+    HashMap<StringHash, Pair<ShaderType, unsigned> >* currentShaderParameters_;
     /// Remembered shader parameter sources.
     const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS];
     /// Base directory for shaders.

@@ -295,7 +295,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
     // Set light-related shader parameters
     if (lightQueue_)
     {
-        if (graphics->NeedParameterUpdate(SP_VERTEXLIGHTS, lightQueue_) && graphics->HasShaderParameter(VS, VSP_VERTEXLIGHTS))
+        if (graphics->NeedParameterUpdate(SP_VERTEXLIGHTS, lightQueue_) && graphics->HasShaderParameter(VSP_VERTEXLIGHTS))
         {
             Vector4 vertexLights[MAX_VERTEX_LIGHTS * 3];
             const PODVector<Light*>& lights = lightQueue_->vertexLights_;
@@ -363,7 +363,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
         float atten = 1.0f / Max(light->GetRange(), M_EPSILON);
         graphics->SetShaderParameter(VSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition(), atten));
         
-        if (graphics->HasShaderParameter(VS, VSP_LIGHTMATRICES))
+        if (graphics->HasShaderParameter(VSP_LIGHTMATRICES))
         {
             switch (light->GetLightType())
             {
@@ -421,7 +421,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
         graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4((isLightVolume ? (lightNode->GetWorldPosition() -
             cameraEffectivePos) : lightNode->GetWorldPosition()), atten));
         
-        if (graphics->HasShaderParameter(PS, PSP_LIGHTMATRICES))
+        if (graphics->HasShaderParameter(PSP_LIGHTMATRICES))
         {
             switch (light->GetLightType())
             {
