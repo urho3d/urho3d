@@ -144,7 +144,7 @@ bool ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
 bool ResourceCache::AddPackageFile(const String& fileName, unsigned priority)
 {
     SharedPtr<PackageFile> package(new PackageFile(context_));
-    return package->Open(fileName) && AddPackageFile(fileName);
+    return package->Open(fileName) && AddPackageFile(package);
 }
 
 bool ResourceCache::AddManualResource(Resource* resource)
