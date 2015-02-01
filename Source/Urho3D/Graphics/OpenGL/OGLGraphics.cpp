@@ -1474,8 +1474,12 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             if (glType != textureTypes_[index])
             {
                 if (textureTypes_[index])
+                {
+                    if (textures_[index])
+                        glBindTexture(textureTypes_[index], 0);
                     glDisable(textureTypes_[index]);
-                
+                }
+
                 glEnable(glType);
                 textureTypes_[index] = glType;
             }
