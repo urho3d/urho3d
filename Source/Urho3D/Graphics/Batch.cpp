@@ -548,7 +548,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
     // Set material-specific shader parameters and textures
     if (material_)
     {
-        if (graphics->NeedParameterUpdate(SP_MATERIAL, material_))
+        if (graphics->NeedParameterUpdate(SP_MATERIAL, (const void*)material_->GetShaderParameterHash()))
         {
             const HashMap<StringHash, MaterialShaderParameter>& parameters = material_->GetShaderParameters();
             for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)

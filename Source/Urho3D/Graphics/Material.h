@@ -191,6 +191,8 @@ public:
     Scene* GetScene() const;
     /// Return the last non-null texture unit + 1. Used as an optimization when applying the material to render state.
     unsigned GetNumUsedTextureUnits() const { return numUsedTextureUnits_; }
+    /// Return shader parameter hash value. Used as an optimization to avoid setting shader parameters unnecessarily.
+    unsigned GetShaderParameterHash() const { return shaderParameterHash_; }
 
     /// Return name for texture unit.
     static String GetTextureUnitName(TextureUnit unit);
@@ -202,6 +204,8 @@ private:
     void CheckOcclusion();
     /// Reset to defaults.
     void ResetToDefaults();
+    /// Recalculate shader parameter hash.
+    void RefreshShaderParameterHash();
     /// Recalculate the memory used by the material.
     void RefreshMemoryUse();
     /// Return shader parameter animation info.
@@ -210,7 +214,7 @@ private:
     void UpdateEventSubscription();
     /// Update shader parameter animations.
     void HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData);
-
+    
     /// Techniques.
     Vector<TechniqueEntry> techniques_;
     /// Textures.
@@ -229,12 +233,16 @@ private:
     unsigned auxViewFrameNumber_;
     /// Number of maximum non-null texture unit + 1.
     unsigned numUsedTextureUnits_;
+    /// Shader parameter hash value.
+    unsigned shaderParameterHash_;
     /// Render occlusion flag.
     bool occlusion_;
     /// Specular lighting flag.
     bool specular_;
     /// Flag for whether is subscribed to animation updates.
     bool subscribed_;
+    /// Flag to suppress parameter hash and memory use recalculation when setting multiple shader parameters (loading or resetting the material.)
+    bool batchedParameterUpdate_;
     /// XML file used while loading.
     SharedPtr<XMLFile> loadXMLFile_;
     /// Associated scene for shader parameter animation updates.

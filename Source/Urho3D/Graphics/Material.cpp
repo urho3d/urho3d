@@ -25,6 +25,7 @@
 #include "../IO/FileSystem.h"
 #include "../Graphics/Graphics.h"
 #include "../IO/Log.h"
+#include "../IO/VectorBuffer.h"
 #include "../Graphics/Material.h"
 #include "../Math/Matrix3x4.h"
 #include "../Core/Profiler.h"
@@ -153,9 +154,11 @@ Material::Material(Context* context) :
     Resource(context),
     auxViewFrameNumber_(0),
     numUsedTextureUnits_(0),
+    shaderParameterHash_(0),
     occlusion_(true),
     specular_(false),
-    subscribed_(false)
+    subscribed_(false),
+    batchedParameterUpdate_(false)
 {
     ResetToDefaults();
 }
@@ -298,6 +301,7 @@ bool Material::Load(const XMLElement& source)
         textureElem = textureElem.GetNext("texture");
     }
 
+    batchedParameterUpdate_ = true;
     XMLElement parameterElem = source.GetChild("parameter");
     while (parameterElem)
     {
@@ -305,6 +309,7 @@ bool Material::Load(const XMLElement& source)
         SetShaderParameter(name, ParseShaderParameterValue(parameterElem.GetAttribute("value")));
         parameterElem = parameterElem.GetNext("parameter");
     }
+    batchedParameterUpdate_ = false;
 
     XMLElement parameterAnimationElem = source.GetChild("parameteranimation");
     while (parameterAnimationElem)
@@ -346,6 +351,7 @@ bool Material::Load(const XMLElement& source)
     if (depthBiasElem)
         SetDepthBias(BiasParameters(depthBiasElem.GetFloat("constant"), depthBiasElem.GetFloat("slopescaled")));
 
+    RefreshShaderParameterHash();
     RefreshMemoryUse();
     CheckOcclusion();
     return true;
@@ -461,7 +467,11 @@ void Material::SetShaderParameter(const String& name, const Variant& value)
         }
     }
 
-    RefreshMemoryUse();
+    if (!batchedParameterUpdate_)
+    {
+        RefreshShaderParameterHash();
+        RefreshMemoryUse();
+    }
 }
 
 void Material::SetShaderParameterAnimation(const String& name, ValueAnimation* animation, WrapMode wrapMode, float speed)
@@ -595,6 +605,7 @@ void Material::RemoveShaderParameter(const String& name)
     if (nameHash == PSP_MATSPECCOLOR)
         specular_ = false;
 
+    RefreshShaderParameterHash();
     RefreshMemoryUse();
 }
 
@@ -729,20 +740,38 @@ void Material::ResetToDefaults()
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         textures_[i] = 0;
 
+    batchedParameterUpdate_ = true;
     shaderParameters_.Clear();
-
     SetShaderParameter("UOffset", Vector4(1.0f, 0.0f, 0.0f, 0.0f));
     SetShaderParameter("VOffset", Vector4(0.0f, 1.0f, 0.0f, 0.0f));
     SetShaderParameter("MatDiffColor", Vector4::ONE);
     SetShaderParameter("MatEmissiveColor", Vector3::ZERO);
     SetShaderParameter("MatEnvMapColor", Vector3::ONE);
     SetShaderParameter("MatSpecColor", Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+    batchedParameterUpdate_ = false;
 
     cullMode_ = CULL_CCW;
     shadowCullMode_ = CULL_CCW;
     depthBias_ = BiasParameters(0.0f, 0.0f);
 
+    RefreshShaderParameterHash();
     RefreshMemoryUse();
+}
+
+void Material::RefreshShaderParameterHash()
+{
+    VectorBuffer temp;
+    for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = shaderParameters_.Begin(); i != shaderParameters_.End(); ++i)
+    {
+        temp.WriteStringHash(i->first_);
+        temp.WriteVariant(i->second_.value_);
+    }
+
+    shaderParameterHash_ = 0;
+    const unsigned char* data = temp.GetData();
+    unsigned dataSize = temp.GetSize();
+    for (unsigned i = 0; i < dataSize; ++i)
+        shaderParameterHash_ = SDBMHash(shaderParameterHash_, data[i]);
 }
 
 void Material::RefreshMemoryUse()
