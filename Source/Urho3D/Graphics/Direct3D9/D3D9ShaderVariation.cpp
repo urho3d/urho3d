@@ -189,7 +189,7 @@ bool ShaderVariation::LoadByteCode(PODVector<unsigned>& byteCode, const String& 
         unsigned regCount = file->ReadUByte();
 
         ShaderParameter parameter(type_, name, reg, regCount);
-        parameters_.Insert(MakePair(StringHash(name), parameter));
+        parameters_[StringHash(name)] = parameter;
     }
     
     unsigned numTextureUnits = file->ReadUInt();
@@ -350,7 +350,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
         else
         {
             ShaderParameter newParam(type_, name, reg, regCount);
-            parameters_.Insert(MakePair(StringHash(name), newParam));
+            parameters_[StringHash(name)] = newParam;
         }
     }
     
