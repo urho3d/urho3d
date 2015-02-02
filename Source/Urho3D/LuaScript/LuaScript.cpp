@@ -164,7 +164,7 @@ void LuaScript::AddEventHandler(Object* sender, const String& eventName, int fun
         return;
 
     WeakPtr<LuaFunction> function = GetFunction(functionIndex);
-    if (!function)
+    if (function)
         eventInvoker_->AddEventHandler(sender, eventName, function);
 }
 
@@ -174,7 +174,7 @@ void LuaScript::AddEventHandler(Object* sender, const String& eventName, const S
         return;
 
     WeakPtr<LuaFunction> function = GetFunction(functionName);
-    if (!function)
+    if (function)
         eventInvoker_->AddEventHandler(sender, eventName, function);
 }
 
@@ -203,7 +203,7 @@ void LuaScript::RemoveEventHandler(Object* sender, const String& eventName, int 
         return;
 
     WeakPtr<LuaFunction> function = GetFunction(functionIndex);
-    if (!function)
+    if (function)
         eventInvoker_->RemoveEventHandler(sender, eventName, function);
 }
 
@@ -213,7 +213,7 @@ void LuaScript::RemoveEventHandler(Object* sender, const String& eventName, cons
         return;
 
     WeakPtr<LuaFunction> function = GetFunction(functionName);
-    if (!function)
+    if (function)
         eventInvoker_->RemoveEventHandler(sender, eventName, function);
 }
 
