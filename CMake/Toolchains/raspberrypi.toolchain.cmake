@@ -29,7 +29,7 @@ endif ()
 
 # this one is important
 set (CMAKE_SYSTEM_NAME Linux)
-#this one not so much
+# this one not so much
 set (CMAKE_SYSTEM_VERSION 1)
 
 # specify the cross compiler

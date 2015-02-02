@@ -29,7 +29,7 @@ endif ()
 
 # this one is important
 set (CMAKE_SYSTEM_NAME Windows)
-#this one not so much
+# this one not so much
 set (CMAKE_SYSTEM_PROCESSOR x86)
 
 # specify the cross compiler
@@ -59,7 +59,7 @@ if (NOT MINGW_SYSROOT)
         get_filename_component (NAME ${MINGW_PREFIX} NAME)
         if (EXISTS /usr/${NAME}/sys-root)
             # Redhat based system
-            set (MINGW_SYSROOT /usr/${NAME}/sys-root)
+            set (MINGW_SYSROOT /usr/${NAME}/sys-root/mingw)
         else ()
             # Debian based system
             set (MINGW_SYSROOT /usr/${NAME})
