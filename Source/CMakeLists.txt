@@ -51,18 +51,7 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS)
 endif ()
 
 # Add targets
-#foreach (TARGET FreeType JO LZ4 PugiXml SDL StanHull STB)
-#    add_subdirectory (ThirdParty/${TARGET})
-#endforeach ()
-#set (THIRDPARTY_TARGETS FreeType JO LZ4 PugiXml STB Duktape)
-set (THIRDPARTY_TARGETS FreeType JO LZ4 PugiXml rapidjson StanHull STB)
-
-if (NOT EMSCRIPTEN)
-    #set (THIRDPARTY_TARGETS ${THIRDPARTY_TARGETS} TurboBadger SDL)
-    set (THIRDPARTY_TARGETS ${THIRDPARTY_TARGETS} SDL)
-endif()
-
-foreach (TARGET ${THIRDPARTY_TARGETS})
+foreach (TARGET FreeType JO LZ4 PugiXml rapidjson SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
 
@@ -116,7 +105,7 @@ if (URHO3D_SAMPLES)
 endif ()
 
 # Urho3D extras
-# Do not build extras for iOS and Android
-if (NOT IOS AND NOT ANDROID AND URHO3D_EXTRAS)
+# Do not build extras for iOS, Android, and Emscripten
+if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN AND URHO3D_EXTRAS)
     add_subdirectory (Extras)
 endif ()

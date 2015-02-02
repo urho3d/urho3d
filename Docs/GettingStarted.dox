@@ -66,12 +66,12 @@ A number of build options can be defined when invoking the build scripts or when
 |WIN32                |0|Configure project using MinGW cross-compiler toolchain (cmake_generic.sh only); also applicable when cross-compiling 64-bit Windows platform|
 |IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only)|
 |URHO3D_64BIT         |*|Enable 64bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system|
-|URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
-|URHO3D_LUA           |0|Enable Lua scripting support|
-|URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)|
+|URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support (non Emscripten only)|
+|URHO3D_LUA           |0|Enable Lua scripting support (non Emscripten only)|
+|URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options) (non Emscripten only)|
 |URHO3D_LUAJIT_AMALG  |0|Enable LuaJIT amalgamated build (LuaJIT only)|
-|URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (when Lua scripting support is enabled only)|
-|URHO3D_NETWORK       |1|Enable Networking support|
+|URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)|
+|URHO3D_NETWORK       |1|Enable Networking support (non Emscripten only)|
 |URHO3D_PHYSICS       |1|Enable Physics support|
 |URHO3D_NAVIGATION    |1|Enable Navigation support|
 |URHO3D_URHO2D        |1|Enable 2D rendering & physics support|
@@ -80,7 +80,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_EXTRAS        |0|Build extras (native and RPI only)|
 |URHO3D_DOCS          |0|Generate documentation as part of normal build (the 'doc' builtin target can be used to generate documentation regardless of this option's value)|
 |URHO3D_DOCS_QUIET    |0|Generate documentation as part of normal build, suppress generation process from sending anything to stdout|
-|URHO3D_SSE           |1|Enable SSE instruction set|
+|URHO3D_SSE           |1|Enable SSE instruction set (non Emscripten only)|
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
 |URHO3D_PROFILING     |1|Enable profiling support|

@@ -1260,7 +1260,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_KEYDOWN:
         // Convert to uppercase to match Win32 virtual key codes
 #if defined (EMSCRIPTEN)
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.unknown, true);
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, 0, true);
 #else
         SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.raw, true);
 #endif
@@ -1268,7 +1268,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
     case SDL_KEYUP:
 #if defined(EMSCRIPTEN)
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.unknown, false);
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, 0, false);
 #else
         SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.raw, false);
 #endif
@@ -1750,7 +1750,7 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         if (screenjoystick)
             screenjoystick->SetSize(graphics_->GetWidth(), graphics_->GetHeight());
     }
-    
+
     focusedThisFrame_ = true;
 
     // After setting a new screen mode we should not be minimized

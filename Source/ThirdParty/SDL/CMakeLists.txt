@@ -1,10 +1,42 @@
+#
+# Copyright (c) 2008-2015 the Urho3D project.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
 # Define target name
 set (TARGET_NAME SDL)
+
+# Install headers for building and using the Urho3D library (install dependency for D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h)
+install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
+
+if (EMSCRIPTEN)
+    # Emscripten has SDL2 port pre-built, so just create a dummy target
+    add_custom_target(${TARGET_NAME} ALL)   # Dummy target just so that its post-build step can install headers to the build tree
+    set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
+    return ()
+endif ()
 
 # Define source files
 file (GLOB C_FILES
     src/*.c src/atomic/*.c src/audio/*.c src/audio/disk/*.c src/audio/dummy/*.c src/cpuinfo/*.c src/events/*.c src/file/*.c
-    src/haptic/*.c src/joystick/*.c src/libm/*.c src/power/*.c src/stdlib/*.c 
+    src/haptic/*.c src/joystick/*.c src/libm/*.c src/power/*.c src/stdlib/*.c
     src/thread/*.c src/timer/*.c src/video/*.c src/video/dummy/*.c
 )
 
@@ -48,18 +80,18 @@ elseif (ANDROID)
         src/thread/pthread/*.c src/timer/unix/*.c src/video/android/*.c src/haptic/dummy/*.c src/filesystem/dummy/*.c
     )
 else ()
-    # On Linux, make sure development libraries exist, and use their include file directories  
+    # On Linux, make sure development libraries exist, and use their include file directories
     if (RPI)
         file (GLOB VIDEO_DRIVER_C_FILES src/video/raspberry/*.c src/core/linux/*.c)
     else ()
         find_package (OpenGL REQUIRED)
         include_directories (${OpenGL_INCLUDE_DIRS})
-        
+
         find_package (X11 REQUIRED)
         if (NOT X11_Xrandr_FOUND)
             message (FATAL_ERROR "Could not find XRandR (libxrandr-dev)")
         endif ()
-        include_directories (${X11_INCLUDE_DIRS})  
+        include_directories (${X11_INCLUDE_DIRS})
 
         include (CheckCSourceCompiles)
         set  (CMAKE_REQUIRED_LIBRARIES ${X11_LIB} ${X11_LIB})
@@ -81,7 +113,7 @@ else ()
             add_definitions (-DSDL_VIDEO_DRIVER_X11_CONST_PARAM_XDATA32)
         endif ()
         set (CMAKE_REQUIRED_LIBRARIES)
-        
+
         file (GLOB VIDEO_DRIVER_C_FILES src/video/x11/*.c)
     endif ()
     find_package (ALSA REQUIRED)
@@ -114,8 +146,6 @@ set (INCLUDE_DIRS include)
 # Setup target
 setup_library ()
 
-# Install headers for building and using the Urho3D library (install dependency for D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h)
-install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
 # Install dependency for SDL_android_main.c
 if (ANDROID)
     install_header_files (DIRECTORY src/main/android DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL)
