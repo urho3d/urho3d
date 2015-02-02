@@ -21,6 +21,7 @@
 
 #include "kNet/DebugMemoryLeakCheck.h"
 
+#include "kNet/VLEPacker.h"
 #include "kNet/DataDeserializer.h"
 #include "kNet/NetException.h"
 
@@ -301,7 +302,7 @@ void DataDeserializer::SkipBits(int numBits)
 
 std::string DataDeserializer::ReadString()
 {
-	u32 length = (iter ? GetDynamicElemCount() : Read<u8>());
+	u32 length = (iter ? GetDynamicElemCount() : ReadVLE<VLE8_16_32>());
 	if (BitsLeft() < length*8)
 		throw NetException("Not enough bytes left in DataDeserializer::ReadString!");
 

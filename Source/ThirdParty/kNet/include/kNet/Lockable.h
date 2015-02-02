@@ -20,7 +20,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/thread.hpp>
 #elif defined(WIN32)
-#include <windows.h>
+#include <Windows.h>
 #else
 #include <pthread.h>
 #endif

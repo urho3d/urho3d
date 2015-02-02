@@ -217,7 +217,7 @@ endif ()
 
 # If not on Windows platform, enable Unix mode for kNet library and OpenGL graphic back-end
 if (NOT WIN32)
-    add_definitions (-DUNIX)
+    add_definitions (-DKNET_UNIX)
     set (URHO3D_OPENGL 1)
 endif ()
 

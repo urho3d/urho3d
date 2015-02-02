@@ -34,7 +34,6 @@ if (WIN32)
    add_definitions (-D_CRT_SECURE_NO_WARNINGS)
    add_definitions (-DKNET_MEMORY_LEAK_CHECK)
 elseif (UNIX)
-   list (REMOVE_ITEM kNetSourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/src/Clock.cpp)
    file (GLOB kNetUnixSourceFiles src/unix/*.cpp)
    file (GLOB kNetUnixHeaderFiles include/*.h include/kNet/*.h include/kNet/unix/*.h)
 
@@ -45,7 +44,7 @@ elseif (UNIX)
    list (APPEND kNetSourceFiles ${kNetUnixSourceFiles})
    list (APPEND kNetHeaderFiles ${kNetUnixHeaderFiles})
 
-   add_definitions (-DUNIX)
+   add_definitions (-DKNET_UNIX)
 endif ()
 
 # Urho3D: set DEBUG_CPP_NAME only on Windows, Xcode project file can not be opened if this is included

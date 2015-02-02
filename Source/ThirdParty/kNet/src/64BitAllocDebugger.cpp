@@ -21,7 +21,7 @@
 #ifdef _WIN64
 #include "kNet/64BitAllocDebugger.h"
 #include <stdio.h>
-#include <windows.h>
+#include <Windows.h>
 #include <vector>
 
 BottomMemoryAllocator::BottomMemoryAllocator()

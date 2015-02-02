@@ -32,7 +32,11 @@ public:
 	/// Called whenever an element in the MaxHeap is moved around.
 	/// @param element The element that was moved around.
 	/// @param newIndex The new index of the element.
-	void IndexUpdated(const T &element, int newIndex) {}
+	void IndexUpdated(const T &element, int newIndex)
+	{
+		MARK_UNUSED(element);
+		MARK_UNUSED(newIndex);
+	}
 };
 
 /** Implements a max heap data structure, see http://en.wikipedia.org/wiki/Binary_heap.
@@ -101,7 +105,7 @@ public:
 	int LowestPriorityIndex() const;
 
 	/// How many elements are in the queue total.
-	int Size() const { return data.size(); }
+	int Size() const { return (int)data.size(); }
 
 	/// As the underlying data structure is an array, you can use this to preallocate space.
 	void Reserve(int size) { data.reserve(size); }
@@ -159,9 +163,9 @@ void MaxHeap<T, PriorityCmp, EqualCmp, LookupNotify, AllocT>::Insert(const T &va
 {
 	// New element is added to the end of the array.
 	data.push_back(value);
-	notify.IndexUpdated(data.back(), data.size()-1);
+	notify.IndexUpdated(data.back(), (int)data.size()-1);
 	// We need to fix the heap by MaxHeapifying all the way to the top.
-	KeyIncreased(data.size()-1);
+	KeyIncreased((int)data.size()-1);
 }
 
 template<typename T, typename PriorityCmp, typename EqualCmp, typename LookupNotify, typename AllocT>
@@ -179,7 +183,7 @@ void MaxHeap<T, PriorityCmp, EqualCmp, LookupNotify, AllocT>::KeyIncreased(int i
 template<typename T, typename PriorityCmp, typename EqualCmp, typename LookupNotify, typename AllocT>
 void MaxHeap<T, PriorityCmp, EqualCmp, LookupNotify, AllocT>::PopFront()
 {
-	std::swap(data[0], data[data.size()-1]);
+	std::swap(data[0], data[(int)data.size()-1]);
 	data.pop_back();
 	MaxHeapify(0);
 }

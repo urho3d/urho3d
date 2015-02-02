@@ -16,12 +16,11 @@
 /** @file EventArray.h
 	@brief The class \ref kNet::EventArray EventArray. Allows listening to multiple events at once.*/
 
-// Urho3D: added include file
-#ifdef UNIX
+#include <vector>
+
+#if defined(KNET_UNIX) || defined(ANDROID)
 #include <sys/select.h>
 #endif
-
-#include <vector>
 
 #include "Event.h"
 
@@ -64,7 +63,7 @@ private:
 #ifdef WIN32
 	WSAEVENT events[maxEvents]; 
 
-#elif defined(UNIX) || defined(ANDROID)
+#elif defined(KNET_UNIX) || defined(ANDROID)
 	fd_set readfds;
 	fd_set writefds;
 	int nfds;

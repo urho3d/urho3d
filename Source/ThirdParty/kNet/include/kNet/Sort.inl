@@ -16,6 +16,14 @@
 /** @file Sort.inl
 	@brief Implementations of template functions for sorting algorithms. */
 
+#ifdef __GNUC__
+/// If a variable or a function definition is labelled with this directive, the compiler should not emit a warning even if it is unused
+/// in the code.
+#define DONT_WARN_UNUSED __attribute__((unused))
+#else
+#define DONT_WARN_UNUSED
+#endif
+
 #include <utility>
 
 namespace kNet
@@ -325,11 +333,11 @@ void CocktailSort(T *list, int numItems, CmpFunc &cmp)
 namespace
 {
 /// Gives the index of the parent of the element at index i, or 0 if i==0 (i is the root)
-inline int HeapParent(int i) { return (i+1)/2-1; }
+inline int DONT_WARN_UNUSED HeapParent(int i) { return (i+1)/2-1; }
 /// Gives the left child of the element at index i. Note that this will address out-of-bounds if there is no child.
-inline int HeapLeftChild(int i) { return i*2+1; }
+inline int DONT_WARN_UNUSED HeapLeftChild(int i) { return i*2+1; }
 /// Gives the right child of the element at index i. Note that this will address out-of-bounds if there is no child.
-inline int HeapRightChild(int i) { return i*2+2; }
+inline int DONT_WARN_UNUSED HeapRightChild(int i) { return i*2+2; }
 
 /** MaxHeapifies one node of the heap at index i and recursively calls itself to MaxHeapify the child nodes,
 	so that all child nodes also satisfy the MaxHeap property.

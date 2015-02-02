@@ -22,11 +22,11 @@
 #include <set>
 
 #include "kNetBuildConfig.h"
-#include "Socket.h"
 #include "WaitFreeQueue.h"
 #include "NetworkSimulator.h"
 #include "LockFreePoolAllocator.h"
 #include "Lockable.h"
+#include "Socket.h"
 #include "IMessageHandler.h"
 #include "BasicSerializedDataTypes.h"
 #include "Datagram.h"
@@ -501,9 +501,6 @@ protected:
 	/// Posted when the application has pushed us some messages to handle.
 	Event eventMsgsOutAvailable; // [main and worker thread]
 
-	void operator=(const MessageConnection &); ///< Noncopyable, N/I.
-	MessageConnection(const MessageConnection &); ///< Noncopyable, N/I.
-
 	float rtt; ///< The currently estimated round-trip time, in milliseconds. [main and worker thread]
 	tick_t lastHeardTime; ///< The tick since last successful receive from the socket. [main and worker thread]
 	float packetsInPerSec; ///< The average number of datagrams we are receiving/second. [main and worker thread]
@@ -563,6 +560,10 @@ protected:
 	explicit MessageConnection(Network *owner, NetworkServer *ownerServer, Socket *socket, ConnectionState startingState);
 
 	virtual bool HandleMessage(packet_id_t /*packetID*/, message_id_t /*messageID*/, const char * /*data*/, size_t /*numBytes*/) { return false; } // [main thread]
+
+private:
+	void operator=(const MessageConnection &); ///< Noncopyable, N/I.
+	MessageConnection(const MessageConnection &); ///< Noncopyable, N/I.
 };
 
 template<typename SerializableData>

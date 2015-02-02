@@ -16,7 +16,7 @@
 /** @file DebugMemoryLeakCheck.h
 	@brief Provides overloads of operators new and delete for tracking memory leaks. */
 
-#if defined(_MSC_VER) && defined(_DEBUG) && defined(KNET_MEMORY_LEAK_CHECK)
+#if defined (WIN32) && defined(_DEBUG) && defined(KNET_MEMORY_LEAK_CHECK)
 
 #include <new>
 #include <crtdbg.h>
@@ -51,7 +51,7 @@ __forceinline static void operator delete[](void *ptr, const char *, int)
 	_free_dbg(ptr, _NORMAL_BLOCK);
 }
 
-__forceinline static void *operator new(size_t size)
+__forceinline void *operator new(size_t size)
 {
 #ifdef DEBUG_CPP_NAME
 	return _malloc_dbg(size, _NORMAL_BLOCK, DEBUG_CPP_NAME, 1);
@@ -60,7 +60,7 @@ __forceinline static void *operator new(size_t size)
 #endif
 }
 
-__forceinline static void *operator new[](size_t size)
+__forceinline void *operator new[](size_t size)
 {
 #ifdef DEBUG_CPP_NAME
 	return _malloc_dbg(size, _NORMAL_BLOCK, DEBUG_CPP_NAME " new[]", 1);
@@ -69,12 +69,12 @@ __forceinline static void *operator new[](size_t size)
 #endif
 }
 
-__forceinline static void operator delete(void *ptr)
+__forceinline void operator delete(void *ptr)
 {
 	_free_dbg(ptr, _NORMAL_BLOCK);
 }
 
-__forceinline static void operator delete[](void *ptr)
+__forceinline void operator delete[](void *ptr)
 {
 	_free_dbg(ptr, _NORMAL_BLOCK);
 }

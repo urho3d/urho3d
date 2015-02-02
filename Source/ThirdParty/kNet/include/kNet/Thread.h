@@ -23,7 +23,7 @@
 #else
 
 #ifdef WIN32
-#include <windows.h>
+#include <Windows.h>
 #else
 #include <pthread.h>
 #endif
@@ -39,7 +39,6 @@ typedef void (*ThreadEntryFunc)(void *threadStartData);
 
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
-#include "kNetBuildConfig.h"
 #include "SharedPtr.h"
 
 namespace kNet
