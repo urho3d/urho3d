@@ -593,7 +593,10 @@ void LuaScript::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     }
 
     // Collect garbage
-    lua_gc(luaState_, LUA_GCCOLLECT, 0);
+    {
+        PROFILE(CollectLuaGarbage);
+        lua_gc(luaState_, LUA_GCCOLLECT, 0);
+    }
 }
 
 void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
