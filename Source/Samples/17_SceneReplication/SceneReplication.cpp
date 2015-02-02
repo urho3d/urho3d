@@ -26,7 +26,7 @@
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Physics/CollisionShape.h>
 #include <Urho3D/Network/Connection.h>
-#include <Urho3D/Network/Controls.h>
+#include <Urho3D/Input/Controls.h>
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/UI/Cursor.h>
 #include <Urho3D/Engine/Engine.h>

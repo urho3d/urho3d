@@ -1260,7 +1260,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_KEYDOWN:
         // Convert to uppercase to match Win32 virtual key codes
 #if defined (EMSCRIPTEN)
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, 0, true);
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.unknown, true);
 #else
         SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.raw, true);
 #endif
@@ -1268,7 +1268,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
     case SDL_KEYUP:
 #if defined(EMSCRIPTEN)
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, 0, false);
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.unknown, false);
 #else
         SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.raw, false);
 #endif

@@ -83,7 +83,7 @@ endif()
 
 if ("${CMAKE_AR}" STREQUAL "")
 #	set(CMAKE_AR "${EMSCRIPTEN_ROOT_PATH}/emar${EMCC_SUFFIX}" CACHE FILEPATH "Emscripten ar")
-	set(CMAKE_AR "/usr/bin/ar" CACHE FILEPATH "Emscripten ar")
+	set(CMAKE_AR "ar" CACHE FILEPATH "Emscripten ar")
 endif()
 
 if ("${CMAKE_RANLIB}" STREQUAL "")

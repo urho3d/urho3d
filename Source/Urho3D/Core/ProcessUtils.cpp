@@ -33,7 +33,7 @@
 
 #if defined(IOS)
 #include <mach/mach_host.h>
-#elif !defined(ANDROID) && !defined(RPI)
+#elif !defined(ANDROID) && !defined(RPI) && !defined(EMSCRIPTEN)
 #include <LibCpuId/libcpuid.h>
 #endif
 

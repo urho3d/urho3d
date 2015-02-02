@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <Urho3D/Network/Controls.h>
+#include <Urho3D/Input/Controls.h>
 #include <Urho3D/Scene/LogicComponent.h>
 
 namespace Urho3D
