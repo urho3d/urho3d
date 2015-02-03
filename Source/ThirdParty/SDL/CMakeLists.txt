@@ -23,13 +23,11 @@
 # Define target name
 set (TARGET_NAME SDL)
 
-# Install headers for building and using the Urho3D library (install dependency for D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h)
-install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
-
 if (EMSCRIPTEN)
-    # Emscripten has SDL2 port pre-built, so just create a dummy target
-    add_custom_target(${TARGET_NAME} ALL)   # Dummy target just so that its post-build step can install headers to the build tree
+    # Emscripten has SDL2 port pre-built, so just create a dummy target just so that its post-build step can install headers to the build tree
+    add_custom_target (${TARGET_NAME} ALL)
     set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
+    install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
     return ()
 endif ()
 
@@ -146,6 +144,8 @@ set (INCLUDE_DIRS include)
 # Setup target
 setup_library ()
 
+# Install headers for building and using the Urho3D library (install dependency for D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h)
+install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
 # Install dependency for SDL_android_main.c
 if (ANDROID)
     install_header_files (DIRECTORY src/main/android DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL)

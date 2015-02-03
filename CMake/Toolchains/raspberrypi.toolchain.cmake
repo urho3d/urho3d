@@ -64,7 +64,7 @@ if (NOT RPI_SYSROOT OR NOT BCM_VC_INCLUDE_DIRS OR NOT BCM_VC_LIBRARIES)
 endif ()
 set (CMAKE_FIND_ROOT_PATH ${RPI_SYSROOT})
 
-# only search programs, libraries, and headers in the target directories
+# only search libraries, and headers in the target directories
 set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)

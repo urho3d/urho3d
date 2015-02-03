@@ -28,7 +28,9 @@ find_package (Urho3D REQUIRED)
 include_directories (${URHO3D_INCLUDE_DIRS})
 
 # Urho3DPlayer target is rather special, although it is here, it is not a tool because it builds into platform-specific binary
-add_subdirectory (Urho3DPlayer)
+if (NOT EMSCRIPTEN)
+    add_subdirectory (Urho3DPlayer)
+endif ()
 
 # Do not build tools for iOS, Android, and Emscripten regardless of the URHO3D_TOOLS build option
 if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN AND URHO3D_TOOLS)

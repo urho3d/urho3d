@@ -20,6 +20,8 @@
 # THE SOFTWARE.
 #
 
+# Based on cmake/Modules/Platform/Emscripten.cmake from https://github.com/kripken/emscripten
+
 cmake_minimum_required (VERSION 2.6.3)
 
 if (CMAKE_TOOLCHAIN_FILE)
@@ -62,11 +64,10 @@ if (NOT EMSCRIPTEN_SYSROOT)
 endif ()
 set (CMAKE_FIND_ROOT_PATH ${EMSCRIPTEN_SYSROOT})
 
-# only search programs, libraries, and headers in the target directories
+# only search libraries, and headers in the target directories
 set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-set (CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
 # Don't do compiler autodetection, since we are cross-compiling.
 include (CMakeForceCompiler)
