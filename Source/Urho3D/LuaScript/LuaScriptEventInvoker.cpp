@@ -130,24 +130,37 @@ void LuaScriptEventInvoker::HandleLuaScriptEvent(StringHash eventType, VariantMa
     if (i == eventTypeToLuaFunctionVectorMap.End())
         return;
 
-    bool ret;
-    LuaFunctionVector& luaFunctionVector = i->second_;
-    for (unsigned i = 0; i < luaFunctionVector.Size(); ++i)
+    // Create a copy
+    LuaFunctionVector luaFunctionVector = i->second_;
+
+    if (instance_)
     {
-        WeakPtr<LuaFunction>& function = luaFunctionVector[i];
-        if (!function)
-            continue;
+        instance_->AddRef();
 
-        if (instance_)
-            ret = function->BeginCall(instance_);
-        else
-            ret = function->BeginCall();
-
-        if (ret)
+        for (unsigned i = 0; i < luaFunctionVector.Size(); ++i)
         {
-            function->PushUserType(eventType, "StringHash");
-            function->PushUserType(eventData, "VariantMap");
-            function->EndCall();
+            WeakPtr<LuaFunction>& function = luaFunctionVector[i];
+            if (function && function->BeginCall(instance_))
+            {
+                function->PushUserType(eventType, "StringHash");
+                function->PushUserType(eventData, "VariantMap");
+                function->EndCall();
+            }
+        }
+        
+        instance_->ReleaseRef();
+    }
+    else
+    {
+        for (unsigned i = 0; i < luaFunctionVector.Size(); ++i)
+        {
+            WeakPtr<LuaFunction>& function = luaFunctionVector[i];
+            if (function && function->BeginCall())
+            {
+                function->PushUserType(eventType, "StringHash");
+                function->PushUserType(eventData, "VariantMap");
+                function->EndCall();
+            }
         }
     }
 }
