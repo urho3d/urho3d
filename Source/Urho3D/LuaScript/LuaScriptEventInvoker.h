@@ -43,13 +43,13 @@ public:
     virtual ~LuaScriptEventInvoker();
 
     /// Add a scripted event handler.
-    void AddEventHandler(Object* sender, const String& eventName, WeakPtr<LuaFunction> function);
+    void AddEventHandler(Object* sender, const StringHash& eventType, WeakPtr<LuaFunction> function);
     /// Remove a scripted event handler.
-    void RemoveEventHandler(Object* sender, const String& eventName, WeakPtr<LuaFunction> function);
+    void RemoveEventHandler(Object* sender, const StringHash& eventType, WeakPtr<LuaFunction> function);
     /// Remove all scripted event handlers.
     void RemoveAllEventHandlers(Object* sender);
     /// Remove all scripted event handlers, except those listed.
-    void RemoveEventHandlersExcept(const Vector<String>& exceptionNames);
+    void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptionTypes);
 
 private:
     /// Handle script event in Lua script.

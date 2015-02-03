@@ -45,11 +45,9 @@ LuaScriptEventInvoker::~LuaScriptEventInvoker()
 {
 }
 
-void LuaScriptEventInvoker::AddEventHandler(Object* sender, const String& eventName, WeakPtr<LuaFunction> function)
+void LuaScriptEventInvoker::AddEventHandler(Object* sender, const StringHash& eventType, WeakPtr<LuaFunction> function)
 {
     EventTypeToLuaFunctionVectorMap& eventTypeToFunctionVectorMap = GetEventTypeToLuaFunctionVectorMap(sender);
-
-    StringHash eventType(eventName);
     EventTypeToLuaFunctionVectorMap::Iterator i = eventTypeToFunctionVectorMap.Find(eventType);
 
     if (i == eventTypeToFunctionVectorMap.End())
@@ -68,11 +66,9 @@ void LuaScriptEventInvoker::AddEventHandler(Object* sender, const String& eventN
     }
 }
 
-void LuaScriptEventInvoker::RemoveEventHandler(Object* sender, const String& eventName, WeakPtr<LuaFunction> function)
+void LuaScriptEventInvoker::RemoveEventHandler(Object* sender, const StringHash& eventType, WeakPtr<LuaFunction> function)
 {
     EventTypeToLuaFunctionVectorMap& eventTypeToLuaFunctionVectorMap = GetEventTypeToLuaFunctionVectorMap(sender);
-
-    StringHash eventType(eventName);
     EventTypeToLuaFunctionVectorMap::Iterator i = eventTypeToLuaFunctionVectorMap.Find(eventType);
     if (i == eventTypeToLuaFunctionVectorMap.End())
         return;
@@ -108,16 +104,10 @@ void LuaScriptEventInvoker::RemoveAllEventHandlers(Object* sender)
     }
 }
 
-void LuaScriptEventInvoker::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
+void LuaScriptEventInvoker::RemoveEventHandlersExcept(const PODVector<StringHash>& exceptionTypes)
 {
-    PODVector<StringHash> exceptionTypes(exceptionNames.Size());
     for (unsigned i = 0; i < exceptionTypes.Size(); ++i)
-    {
-        StringHash eventType(exceptionNames[i]);
-        exceptionTypes[i] = eventType;
-
-        eventTypeToLuaFunctionVectorMap.Erase(eventType);
-    }
+        eventTypeToLuaFunctionVectorMap.Erase(exceptionTypes[i]);
 
     UnsubscribeFromAllEventsExcept(exceptionTypes, false);
 }

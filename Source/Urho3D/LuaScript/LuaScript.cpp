@@ -228,6 +228,7 @@ void LuaScript::RemoveEventHandler(Object* sender, const String& eventName)
 
     eventInvoker_->RemoveEventHandler(sender, eventName, WeakPtr<LuaFunction>());
 }
+
 void LuaScript::RemoveEventHandlers(Object* sender)
 {
     if (!sender)
@@ -240,9 +241,14 @@ void LuaScript::RemoveAllEventHandlers()
 {
     eventInvoker_->RemoveAllEventHandlers(0);
 }
+
 void LuaScript::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
 {
-    eventInvoker_->RemoveEventHandlersExcept(exceptionNames);
+    PODVector<StringHash> exceptionTypes(exceptionNames.Size());
+    for (unsigned i = 0; i < exceptionTypes.Size(); ++i)
+        exceptionTypes[i] = StringHash(exceptionNames[i]);
+
+    eventInvoker_->RemoveEventHandlersExcept(exceptionTypes);
 }
 
 bool LuaScript::ExecuteFile(const String& fileName)

@@ -384,9 +384,14 @@ void LuaScriptInstance::RemoveAllEventHandlers()
 {
     eventInvoker_->RemoveAllEventHandlers(0);
 }
+
 void LuaScriptInstance::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
 {
-    eventInvoker_->RemoveEventHandlersExcept(exceptionNames);
+    PODVector<StringHash> exceptionTypes(exceptionNames.Size());
+    for (unsigned i = 0; i < exceptionTypes.Size(); ++i)
+        exceptionTypes[i] = StringHash(exceptionNames[i]);
+
+    eventInvoker_->RemoveEventHandlersExcept(exceptionTypes);
 }
 
 bool LuaScriptInstance::CreateObject(const String& scriptObjectType)
