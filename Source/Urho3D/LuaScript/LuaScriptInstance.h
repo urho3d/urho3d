@@ -117,8 +117,8 @@ public:
     /// Set script network serialization attribute by calling a script function.
     void SetScriptNetworkDataAttr(const PODVector<unsigned char>& data);
 
-	/// Return script file.
-	LuaFile* GetScriptFile() const;
+    /// Return script file.
+    LuaFile* GetScriptFile() const;
     /// Return script object type.
     const String& GetScriptObjectType() const { return scriptObjectType_; }
     /// Return script object ref.
@@ -130,10 +130,10 @@ public:
     /// Return script object's funcition.
     WeakPtr<LuaFunction> GetScriptObjectFunction(const String& functionName) const;
 
-	/// Set script file attribute.
-	void SetScriptFileAttr(const ResourceRef& value);
-	/// Return script file attribute.
-	ResourceRef GetScriptFileAttr() const;
+    /// Set script file attribute.
+    void SetScriptFileAttr(const ResourceRef& value);
+    /// Return script file attribute.
+    ResourceRef GetScriptFileAttr() const;
 
 protected:
     /// Handle node transform being dirtied.
@@ -168,10 +168,10 @@ private:
     /// Event invoker.
     SharedPtr<LuaScriptEventInvoker> eventInvoker_;
     /// Script file.
-	SharedPtr<LuaFile> scriptFile_;
-	/// Script object type.
-	String scriptObjectType_;
-	/// Attributes, including script object variables.
+    SharedPtr<LuaFile> scriptFile_;
+    /// Script object type.
+    String scriptObjectType_;
+    /// Attributes, including script object variables.
     Vector<AttributeInfo> attributeInfos_;
     /// Script object ref.
     int scriptObjectRef_;

@@ -27,6 +27,7 @@
 namespace Urho3D
 {
 
+class EventHandlerCommand;
 class LuaFunction;
 class LuaScriptInstance;
 
@@ -54,10 +55,8 @@ public:
 private:
     /// Handle script event in Lua script.
     void HandleLuaScriptEvent(StringHash eventType, VariantMap& eventData);
-
     typedef Vector<WeakPtr<LuaFunction> > LuaFunctionVector;
     typedef HashMap<StringHash, LuaFunctionVector> EventTypeToLuaFunctionVectorMap;
-    
     /// Return event type to Lua function vector map.
     EventTypeToLuaFunctionVectorMap& GetEventTypeToLuaFunctionVectorMap(Object* sender)
     {
@@ -66,9 +65,15 @@ private:
 
         return senderEventTypeToLuaFunctionVectorMap[sender];
     }
+    /// Execute then destory command.
+    void ExecuteThenDestroyCommand(EventHandlerCommand* command);
 
     /// Lua script instance.
     LuaScriptInstance* instance_;
+    /// Invoking.
+    bool invoking_;
+    /// Event handler commands.
+    PODVector<EventHandlerCommand*> eventHandlerCommands_;
     /// Event type to Lua function vector map.
     EventTypeToLuaFunctionVectorMap eventTypeToLuaFunctionVectorMap;
     /// Event type to Lua function vector map for specific sender.

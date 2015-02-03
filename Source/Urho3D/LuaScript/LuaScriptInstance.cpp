@@ -396,7 +396,7 @@ void LuaScriptInstance::RemoveEventHandlersExcept(const Vector<String>& exceptio
 
 bool LuaScriptInstance::CreateObject(const String& scriptObjectType)
 {
-	SetScriptFile(0);
+    SetScriptFile(0);
     SetScriptObjectType(scriptObjectType);
     return scriptObjectRef_ != LUA_REFNIL;
 }
@@ -410,13 +410,13 @@ bool LuaScriptInstance::CreateObject(LuaFile* scriptFile, const String& scriptOb
 
 void LuaScriptInstance::SetScriptFile(LuaFile* scriptFile)
 {
-	if (scriptFile == scriptFile_)
-		return;
+    if (scriptFile == scriptFile_)
+        return;
 
-	scriptFile_ = scriptFile;
+    scriptFile_ = scriptFile;
 
-	if (!scriptFile_)
-		return;
+    if (!scriptFile_)
+        return;
 
     if (!scriptFile_->LoadAndExecute(luaState_))
         LOGERROR("Execute Lua file failed: " + scriptFile_->GetName());
@@ -478,7 +478,7 @@ void LuaScriptInstance::SetScriptNetworkDataAttr(const PODVector<unsigned char>&
 
 LuaFile* LuaScriptInstance::GetScriptFile() const
 {
-	return scriptFile_;
+    return scriptFile_;
 }
 
 PODVector<unsigned char> LuaScriptInstance::GetScriptDataAttr() const
