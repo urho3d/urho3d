@@ -24,6 +24,7 @@
 
 #include "../Core/Context.h"
 #include "../Core/Object.h"
+#include "../LuaScript/LuaScriptEventListener.h"
 
 struct lua_State;
 
@@ -33,10 +34,11 @@ namespace Urho3D
 extern const char* LOGIC_CATEGORY;
 
 class LuaFunction;
+class LuaScriptEventInvoker;
 class Scene;
 
 /// Lua script subsystem.
-class URHO3D_API LuaScript : public Object
+class URHO3D_API LuaScript : public Object, public LuaScriptEventListener
 {
     OBJECT(LuaScript);
 
@@ -46,39 +48,41 @@ public:
     /// Destruct.
     ~LuaScript();
 
+    /// Add a scripted event handler by function.
+    virtual void AddEventHandler(const String& eventName, int functionIndex);
+    /// Add a scripted event handler by function name.
+    virtual void AddEventHandler(const String& eventName, const String& functionName);
+    /// Add a scripted event handler by function for a specific sender.
+    virtual void AddEventHandler(Object* sender, const String& eventName, int functionIndex);
+    /// Add a scripted event handler by function name for a specific sender.
+    virtual void AddEventHandler(Object* sender, const String& eventName, const String& functionName);
+    /// Remove a scripted event handler by function.
+    virtual void RemoveEventHandler(const String& eventName, int functionIndex);
+    /// Remove a scripted event handler by function name.
+    virtual void RemoveEventHandler(const String& eventName, const String& functionName);
+    /// Remove a scripted event handler.
+    virtual void RemoveEventHandler(const String& eventName);
+    /// Remove a scripted event handler for a specific sender by function.
+    virtual void RemoveEventHandler(Object* sender, const String& eventName, int functionIndex);
+    /// Remove a scripted event handler for a specific sender by function name.
+    virtual void RemoveEventHandler(Object* sender, const String& eventName, const String& functionName);
+    /// Remove a scripted event handler for a specific sender.
+    virtual void RemoveEventHandler(Object* sender, const String& eventName);
+    /// Remove all scripted event handlers for a specific sender.
+    virtual void RemoveEventHandlers(Object* sender);
+    /// Remove all scripted event handlers.
+    virtual void RemoveAllEventHandlers();
+    /// Remove all scripted event handlers, except those listed.
+    virtual void RemoveEventHandlersExcept(const Vector<String>& exceptionNames);
+
     /// Execute script file. Return true if successful.
     bool ExecuteFile(const String& fileName);
     /// Execute script string. Return true if successful.
     bool ExecuteString(const String& string);
     /// Execute script function.
     bool ExecuteFunction(const String& functionName);
-    /// Script send event.
-    void ScriptSendEvent(const String& eventName, VariantMap& eventData);
-    /// Script subscribe to an event that can by send by any sender.
-    void ScriptSubscribeToEvent(const String& eventName, int functionIndex);
-    /// Script subscribe to an event that can by send by any sender.
-    void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
-    /// Script unsubscribe from an event.
-    void ScriptUnsubscribeFromEvent(const String& eventName);
-    /// Script unsubscribe from an event.
-    void ScriptUnsubscribeFromEvent(const String& eventName, int functionIndex);
-    /// Script unsubscribe from an event.
-    void ScriptUnsubscribeFromEvent(const String& eventName, const String& functionName);
-    /// Script unsubscribe from all events.
-    void ScriptUnsubscribeFromAllEvents();
-    /// Script subscribe to a specific sender's event.
-    void ScriptSubscribeToEvent(void* sender, const String& eventName, int functionIndex);
-    /// Script subscribe to a specific sender's event.
-    void ScriptSubscribeToEvent(void* sender, const String& eventName, const String& functionName);
-    /// Script unsubscribe from a specific sender's event.
-    void ScriptUnsubscribeFromEvent(void* sender, const String& eventName);
-    /// Script unsubscribe from a specific sender's event.
-    void ScriptUnsubscribeFromEvent(void* sender, const String& eventName, int functionIndex);
-    /// Script unsubscribe from a specific sender's event.
-    void ScriptUnsubscribeFromEvent(void* sender, const String& eventName, const String& functionName);
-
-    /// Script unsubscribe from a specific sender's all events.
-    void ScriptUnsubscribeFromEvents(void* sender);
+    /// Send event.
+    void SendEvent(const String& eventName, VariantMap& eventData);
     /// Set whether to execute engine console commands as script code.
     void SetExecuteConsoleCommands(bool enable);
 
@@ -96,10 +100,6 @@ private:
     void RegisterLoader();
     /// Replace print.
     void ReplacePrint();
-    /// Handle event.
-    void HandleEvent(StringHash eventType, VariantMap& eventData);
-    /// Handle object event.
-    void HandleObjectEvent(StringHash eventType, VariantMap& eventData);
     /// Handle post update.
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle a console command event.
@@ -116,22 +116,16 @@ private:
 
     /// Lua state.
     lua_State* luaState_;
+    /// Event invoker.
+    SharedPtr<LuaScriptEventInvoker> eventInvoker_;
     /// Coroutine update function.
     WeakPtr<LuaFunction> coroutineUpdate_;
+    /// Flag for executing engine console commands as script code. Default to true.
+    bool executeConsoleCommands_;
     /// Function pointer to function map.
     HashMap<const void*, SharedPtr<LuaFunction> > functionPointerToFunctionMap_;
     /// Function name to function map.
     HashMap<String, SharedPtr<LuaFunction> > functionNameToFunctionMap_;
-    /// Typedef Lua function vector.
-    typedef Vector<WeakPtr<LuaFunction> > LuaFunctionVector;
-    /// Event handle functions.
-    HashMap<StringHash, LuaFunctionVector> eventHandleFunctions_;
-    /// Object event handle functions.
-    HashMap<Object*, HashMap<StringHash, LuaFunctionVector> > objectHandleFunctions_;
-    /// Internally used events, which should not be unsubscribed from.
-    PODVector<StringHash> internalEvents_;
-    /// Flag for executing engine console commands as script code. Default to true.
-    bool executeConsoleCommands_;
 };
 
 /// Register Lua script library objects.

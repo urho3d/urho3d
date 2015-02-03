@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "../LuaScript/LuaScriptEventListener.h"
 #include "../Scene/Component.h"
 
 struct lua_State;
@@ -32,6 +33,7 @@ namespace Urho3D
 class LuaFile;
 class LuaFunction;
 class LuaScript;
+class LuaScriptEventInvoker;
 
 /// Lua Script object methods.
 enum LuaScriptObjectMethod
@@ -52,7 +54,7 @@ enum LuaScriptObjectMethod
 };
 
 /// Lua script object component.
-class URHO3D_API LuaScriptInstance : public Component
+class URHO3D_API LuaScriptInstance : public Component, public LuaScriptEventListener
 {
     OBJECT(LuaScriptInstance);
 
@@ -75,6 +77,33 @@ public:
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
 
+    /// Add a scripted event handler by function.
+    virtual void AddEventHandler(const String& eventName, int functionIndex);
+    /// Add a scripted event handler by function name.
+    virtual void AddEventHandler(const String& eventName, const String& functionName);
+    /// Add a scripted event handler by function for a specific sender.
+    virtual void AddEventHandler(Object* sender, const String& eventName, int functionIndex);
+    /// Add a scripted event handler by function name for a specific sender.
+    virtual void AddEventHandler(Object* sender, const String& eventName, const String& functionName);
+    /// Remove a scripted event handler by function.
+    virtual void RemoveEventHandler(const String& eventName, int functionIndex);
+    /// Remove a scripted event handler by function name.
+    virtual void RemoveEventHandler(const String& eventName, const String& functionName);
+    /// Remove a scripted event handler.
+    virtual void RemoveEventHandler(const String& eventName);
+    /// Remove a scripted event handler for a specific sender by function.
+    virtual void RemoveEventHandler(Object* sender, const String& eventName, int functionIndex);
+    /// Remove a scripted event handler for a specific sender by function name.
+    virtual void RemoveEventHandler(Object* sender, const String& eventName, const String& functionName);
+    /// Remove a scripted event handler for a specific sender.
+    virtual void RemoveEventHandler(Object* sender, const String& eventName);
+    /// Remove all scripted event handlers for a specific sender.
+    virtual void RemoveEventHandlers(Object* sender);
+    /// Remove all scripted event handlers.
+    virtual void RemoveAllEventHandlers();
+    /// Remove all scripted event handlers, except those listed.
+    virtual void RemoveEventHandlersExcept(const Vector<String>& exceptionNames);
+
     /// Create script object. Return true if successful.
     bool CreateObject(const String& scriptObjectType);
     /// Create script object. Return true if successful.
@@ -87,22 +116,6 @@ public:
     void SetScriptDataAttr(const PODVector<unsigned char>& data);
     /// Set script network serialization attribute by calling a script function.
     void SetScriptNetworkDataAttr(const PODVector<unsigned char>& data);
-    /// Script subscribe to an event that can by send by any sender.
-    void ScriptSubscribeToEvent(const String& eventName, int functionIndex);
-    /// Script subscribe to an event that can by send by any sender.
-    void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
-    /// Script unsubscribe from an event.
-    void ScriptUnsubscribeFromEvent(const String& eventName);
-    /// Script unsubscribe from all events.
-    void ScriptUnsubscribeFromAllEvents();
-    /// Script subscribe to a specific sender's event.
-    void ScriptSubscribeToEvent(void* sender, const String& eventName, int functionIndex);
-    /// Script subscribe to a specific sender's event.
-    void ScriptSubscribeToEvent(void* sender, const String& eventName, const String& functionName);
-    /// Script unsubscribe from a specific sender's event.
-    void ScriptUnsubscribeFromEvent(void* sender, const String& eventName);
-    /// Script unsubscribe from a specific sender's all events.
-    void ScriptUnsubscribeFromEvents(void* sender);
 
 	/// Return script file.
 	LuaFile* GetScriptFile() const;
@@ -145,10 +158,6 @@ private:
     /// Handle the physics post update event.
     void HandlePostFixedUpdate(StringHash eventType, VariantMap& eventData);
 #endif
-    /// Handle event.
-    void HandleEvent(StringHash eventType, VariantMap& eventData);
-    /// Handle a specific sender's event.
-    void HandleObjectEvent(StringHash eventType, VariantMap& eventData);
     /// Release the script object.
     void ReleaseObject();
 
@@ -156,6 +165,8 @@ private:
     LuaScript* luaScript_;
     /// Lua state.
     lua_State* luaState_;
+    /// Event invoker.
+    SharedPtr<LuaScriptEventInvoker> eventInvoker_;
     /// Script file.
 	SharedPtr<LuaFile> scriptFile_;
 	/// Script object type.
@@ -166,10 +177,6 @@ private:
     int scriptObjectRef_;
     /// Script object method.
     WeakPtr<LuaFunction> scriptObjectMethods_[MAX_LUA_SCRIPT_OBJECT_METHODS];
-    /// Event type to function map.
-    HashMap<StringHash, WeakPtr<LuaFunction> > eventTypeToFunctionMap_;
-    /// Object to event type to function map.
-    HashMap<Object*, HashMap<StringHash, WeakPtr<LuaFunction> > > objectToEventTypeToFunctionMap_;
 };
 
 }
