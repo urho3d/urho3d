@@ -67,7 +67,7 @@ function Start()
     StartGame()
 
     -- Randomize from system clock
-    SetRandomSeed(time:GetSystemTime())
+    SetRandomSeed(Time:GetSystemTime())
 end
 
 function HandleConsoleCommand(eventType, eventData)
