@@ -416,15 +416,11 @@ WeakPtr<LuaFunction> LuaScript::GetFunction(const String& functionName, bool sil
 
     SharedPtr<LuaFunction> function;
     if (PushScriptFunction(functionName, silentIfNotFound))
-    {
-        int ref = luaL_ref(luaState_, LUA_REGISTRYINDEX);
-        function = new LuaFunction(luaState_, ref);
-    }
+        function = GetFunction(-1);
 
     lua_settop(luaState_, top);
 
     functionNameToFunctionMap_[functionName] = function;
-
     return WeakPtr<LuaFunction>(function);
 }
 
