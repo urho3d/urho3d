@@ -468,6 +468,8 @@ include (GenerateExportHeader)
 # This macro should be called before the CMake target has been added
 # Typically, user should indirectly call this macro by using the 'PCH' option when calling define_source_file() macro
 macro (enable_pch HEADER_PATHNAME)
+    message (STATUS ${HEADER_PATHNAME})
+
     # Determine the precompiled header output filename
     get_filename_component (HEADER_FILENAME ${HEADER_PATHNAME} NAME)
     if (CMAKE_COMPILER_IS_GNUCXX)
@@ -513,6 +515,7 @@ macro (enable_pch HEADER_PATHNAME)
         endif ()
     else ()
         # GCC or Clang
+        message (STATUS "GCC/Clang")
         if (TARGET ${TARGET_NAME})
             # Cache the compiler flags setup for the current scope so far
             get_directory_property (COMPILE_DEFINITIONS COMPILE_DEFINITIONS)
@@ -533,20 +536,29 @@ macro (enable_pch HEADER_PATHNAME)
             # Make sure the precompiled headers are not stale by creating custom rules to re-compile the header as necessary
             file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
             foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
+                message(STATUS ${CONFIG})
                 # Generate *.rsp containing configuration specific compiler flags
                 string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
+                message(STATUS "Writing file: ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new")
                 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES} -c -x c++-header")
+                message(STATUS "Executing process: ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp")
                 execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp)
                 file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new)
                 # Determine the dependency list
+                message(STATUS "Executing process: ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -MTdeps -MM -o ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME}")
                 execute_process (COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -MTdeps -MM -o ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME} RESULT_VARIABLE CXX_COMPILER_EXIT_CODE)
                 if (NOT CXX_COMPILER_EXIT_CODE EQUAL 0)
                     message (FATAL_ERROR "The configured compiler toolchain in the build tree is not able to handle all the compiler flags required to build the project. "
                         "Please kindly update your compiler toolchain to its latest version. If you are using MinGW then make sure it is MinGW-W64 instead of MinGW-W32 or TDM-GCC (Code::Blocks default). "
                         "However, if you think there is something wrong with the compiler flags being used then please file a bug report to the project devs.")
                 endif ()
+                message(STATUS "Result: ${DEPS_RESULT}")
+                message(STATUS "Output: ${DEPS_OUT}")
+                message(STATUS "Reading file: ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps")
                 file (STRINGS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps DEPS)
+                message(STATUS "Dependencies read: ${DEPS}")
                 string (REGEX REPLACE "^deps: *| *\\; +" ";" DEPS ${DEPS})
+                message(STATUS "Dependencies regex: ${DEPS}")
                 # Create the rule that depends on the included headers
                 add_custom_command (OUTPUT ${HEADER_FILENAME}.${CONFIG}.pch.trigger
                     COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME}

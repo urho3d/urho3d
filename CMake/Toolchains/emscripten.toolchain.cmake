@@ -42,11 +42,18 @@ if (NOT EXISTS ${EMSCRIPTEN_ROOT_PATH}/emcc)
     message (FATAL_ERROR "Could not find Emscripten cross compilation tool. "
         "Use EMSCRIPTEN_ROOT_PATH environment variable or build option to specify the location of the toolchain.")
 endif ()
-set (CMAKE_C_COMPILER   ${EMSCRIPTEN_ROOT_PATH}/emcc     CACHE PATH "C compiler")
-set (CMAKE_CXX_COMPILER ${EMSCRIPTEN_ROOT_PATH}/em++     CACHE PATH "C++ compiler")
-set (CMAKE_AR           /usr/bin/ar     CACHE PATH "archive")
-#todo:YWT: set (CMAKE_AR           ${EMSCRIPTEN_ROOT_PATH}/emar     CACHE PATH "archive")
-set (CMAKE_RANLIB       ${EMSCRIPTEN_ROOT_PATH}/emranlib CACHE PATH "ranlib")
+
+if (CMAKE_HOST_WIN32)
+    set(EMCC_SUFFIX ".bat")
+else()
+    set(EMCC_SUFFIX "")
+endif()
+
+set (CMAKE_C_COMPILER   ${EMSCRIPTEN_ROOT_PATH}/emcc${EMCC_SUFFIX}     CACHE PATH "C compiler")
+set (CMAKE_CXX_COMPILER ${EMSCRIPTEN_ROOT_PATH}/em++${EMCC_SUFFIX}     CACHE PATH "C++ compiler")
+set (CMAKE_AR           ar     CACHE PATH "archive")
+#todo:YWT: set (CMAKE_AR           ${EMSCRIPTEN_ROOT_PATH}/emar${EMCC_SUFFIX}     CACHE PATH "archive")
+set (CMAKE_RANLIB       ${EMSCRIPTEN_ROOT_PATH}/emranlib${EMCC_SUFFIX} CACHE PATH "ranlib")
 
 # specify the system root
 if (NOT EMSCRIPTEN_SYSROOT)
