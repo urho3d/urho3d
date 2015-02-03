@@ -2842,11 +2842,14 @@ Methods:
 - void SetScriptFile(LuaFile* scriptFile)
 - void SetScriptObjectType(const String scriptObjectType)
 - void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
-- void UnsubscribeFromEvent(const String eventName)
-- void UnsubscribeFromAllEvents()
 - void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
-- void UnsubscribeFromEvent(void* sender, const String eventName)
-- void UnsubscribeFromEvents(void* sender)
+- void UnsubscribeFromEvent(const String eventName, void* functionOrFunctionName)
+- void UnsubscribeFromEvent(const String eventName)
+- void UnsubscribeFromEvent(Object* sender, const String eventName, void* functionOrFunctionName)
+- void UnsubscribeFromEvent(Object* sender, const String eventName)
+- void UnsubscribeFromEvents(Object* sender)
+- void UnsubscribeFromAllEvents()
+- void UnsubscribeFromAllEventsExcept(const Vector<String>& exceptionNames)
 - LuaFile* GetScriptFile() const
 - const String GetScriptObjectType() const
 
@@ -7310,11 +7313,11 @@ Properties:
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
+- float Random(float range)
 - float Random()
 - float Random(float min, float max)
-- float Random(float range)
-- int RandomInt(int min, int max)
 - int RandomInt(int range)
+- int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
@@ -7348,10 +7351,12 @@ Properties:
 - Vector3 ToVector3(const String source)
 - Vector4 ToVector4(const String source, bool allowMissingCoords = false)
 - void UnsubscribeFromAllEvents()
-- void UnsubscribeFromEvent(void* sender, const String eventName, void* functionOrFunctionName)
+- void UnsubscribeFromAllEventsExcept(const Vector<String>& exceptionNames)
 - void UnsubscribeFromEvent(const String eventName)
+- void UnsubscribeFromEvent(Object* sender, const String eventName, void* functionOrFunctionName)
 - void UnsubscribeFromEvent(const String eventName, void* functionOrFunctionName)
-- void UnsubscribeFromEvents(void* sender)
+- void UnsubscribeFromEvent(Object* sender, const String eventName)
+- void UnsubscribeFromEvents(Object* sender)
 
 
 \section LuaScriptAPI_GlobalProperties Global properties
