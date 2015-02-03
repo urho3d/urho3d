@@ -16,6 +16,8 @@
 /** @file Thread.h
 	@brief The Thread class. Implements threading either using Boost, native Win32 or pthreads constructs. */
 
+// Modified by Lasse Oorni for Urho3D
+
 #include <string>
 
 #ifdef KNET_USE_BOOST
@@ -23,7 +25,8 @@
 #else
 
 #ifdef WIN32
-#include <Windows.h>
+// Urho3D: windows.h in lowercase to fix MinGW cross-compiling on a case-sensitive system
+#include <windows.h>
 #else
 #include <pthread.h>
 #endif

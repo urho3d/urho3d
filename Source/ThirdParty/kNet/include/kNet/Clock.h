@@ -16,8 +16,11 @@
 /** @file Clock.h
 	@brief The Clock class. Supplies timing facilities. */
 
+// Modifed by Lasse Oorni for Urho3D
+
 #ifdef WIN32
-#include <Windows.h>
+// Urho3D: windows.h in lowercase to fix MinGW cross-compiling on a case-sensitive system
+#include <windows.h>
 #endif
 
 namespace kNet
