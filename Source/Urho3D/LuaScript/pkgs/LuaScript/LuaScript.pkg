@@ -40,9 +40,9 @@ static bool tolua_isfunctionorurho3dstring(lua_State* L, int lo, int def, tolua_
 static int tolua_LuaScriptLuaAPI_SubscribeToEvent(lua_State* tolua_S)
 {
     int args = lua_gettop(tolua_S);
-
-#ifndef TOLUA_RELEASE    
     tolua_Error tolua_err;
+
+#ifndef TOLUA_RELEASE
     if (args == 2)
     {   
         // SubscribeToEvent(const String eventName, void* functionOrFunctionName);
@@ -112,8 +112,9 @@ static int tolua_LuaScriptLuaAPI_SubscribeToEvent01(lua_State* tolua_S)
 static int tolua_LuaScriptLuaAPI_UnsubscribeFromEvent(lua_State* tolua_S)
 {
     int args = lua_gettop(tolua_S);
-#ifndef TOLUA_RELEASE    
     tolua_Error tolua_err;
+    
+#ifndef TOLUA_RELEASE
     if (args == 1)
     {
         // UnsubscribeFromEvent(const String eventName);

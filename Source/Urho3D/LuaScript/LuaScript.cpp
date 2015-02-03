@@ -135,6 +135,9 @@ LuaScript::LuaScript(Context* context) :
 
 LuaScript::~LuaScript()
 {
+    functionPointerToFunctionMap_.Clear();
+    functionNameToFunctionMap_.Clear();
+    
     lua_State* luaState = luaState_;
     luaState_ = 0;
 
