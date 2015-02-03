@@ -128,47 +128,6 @@ private:
     HashMap<String, SharedPtr<LuaFunction> > functionNameToFunctionMap_;
 };
 
-class LuaScriptEventInvoker : public Object
-{
-    OBJECT(LuaScriptEventInvoker);
-
-public:
-    /// Construct.
-    LuaScriptEventInvoker(Context* context);
-    /// Destruct.
-    virtual ~LuaScriptEventInvoker();
-
-    /// Add a scripted event handler.
-    void AddEventHandler(Object* sender, const String& eventName, WeakPtr<LuaFunction> function);
-    /// Remove a scripted event handler.
-    void RemoveEventHandler(Object* sender, const String& eventName, WeakPtr<LuaFunction> function);
-    /// Remove all scripted event handlers.
-    void RemoveAllEventHandlers(Object* sender);
-    /// Remove all scripted event handlers, except those listed.
-    void RemoveEventHandlersExcept(const Vector<String>& exceptionNames);
-
-private:
-    /// Handle script event in Lua script.
-    void HandleLuaScriptEvent(StringHash eventType, VariantMap& eventData);
-
-    typedef Vector<WeakPtr<LuaFunction> > LuaFunctionVector;
-    typedef HashMap<StringHash, LuaFunctionVector> EventTypeToLuaFunctionVectorMap;
-    
-    /// Return event type to Lua function vector map.
-    EventTypeToLuaFunctionVectorMap& GetEventTypeToLuaFunctionVectorMap(Object* sender)
-    {
-        if (!sender)
-            return eventTypeToLuaFunctionVectorMap;
-
-        return senderEventTypeToLuaFunctionVectorMap[sender];
-    }
-
-    /// Event type to Lua function vector map.
-    EventTypeToLuaFunctionVectorMap eventTypeToLuaFunctionVectorMap;
-    /// Event type to Lua function vector map for specific sender.
-    HashMap<Object*, EventTypeToLuaFunctionVectorMap> senderEventTypeToLuaFunctionVectorMap;
-};
-
 /// Register Lua script library objects.
 void URHO3D_API RegisterLuaScriptLibrary(Context* context);
 
