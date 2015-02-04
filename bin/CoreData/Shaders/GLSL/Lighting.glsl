@@ -113,7 +113,7 @@ float GetSpecular(vec3 normal, vec3 eyeVec, vec3 lightDir, float specularPower)
 
 float GetIntensity(vec3 color)
 {
-    return dot(color, vec3(0.333));
+    return dot(color, vec3(0.299, 0.587, 0.114));
 }
 
 #ifdef SHADOW
