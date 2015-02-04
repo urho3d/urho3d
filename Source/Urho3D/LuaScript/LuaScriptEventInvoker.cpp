@@ -188,25 +188,23 @@ void LuaScriptEventInvoker::HandleLuaScriptEvent(StringHash eventType, VariantMa
     if (i == eventTypeToLuaFunctionVectorMap.End())
         return;
 
+    SharedPtr<LuaScriptInstance> instance(instance_);
+    
     invoking_ = true;
-
+    
     LuaFunctionVector& luaFunctionVector = i->second_;
-    if (instance_)
+    if (instance)
     {
-        instance_->AddRef();
-
         for (unsigned i = 0; i < luaFunctionVector.Size(); ++i)
         {
             WeakPtr<LuaFunction>& function = luaFunctionVector[i];
-            if (function && function->BeginCall(instance_))
+            if (function && function->BeginCall(instance))
             {
                 function->PushUserType(eventType, "StringHash");
                 function->PushUserType(eventData, "VariantMap");
                 function->EndCall();
             }
         }
-        
-        instance_->ReleaseRef();
     }
     else
     {
