@@ -187,8 +187,8 @@ desc 'Update site documentation to GitHub Pages'
 task :ci_site_update do
   # Pull or clone
   system 'cd ../doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../doc-Build' or abort 'Failed to pull/clone'
-  # Update credits from Readme.txt to about.md
-  system "ruby -lne 'BEGIN { credits = false }; puts $_ if credits; credits = true if /bugfixes by:/; credits = false if /^$/' Readme.txt |ruby -i -le 'credits = STDIN.read; puts ARGF.read.gsub(/(?<=bugfixes by\n).*?(?=##)/m, credits)' ../doc-Build/about.md" or abort 'Failed to update credits'
+  # Update credits from Readme.md to about.md
+  system "ruby -lne 'BEGIN { credits = false }; puts $_ if credits; credits = true if /bugfixes by:/; credits = false if /^$/' Readme.md |ruby -i -le 'credits = STDIN.read; puts ARGF.read.gsub(/(?<=bugfixes by\n).*?(?=##)/m, credits)' ../doc-Build/about.md" or abort 'Failed to update credits'
   # Setup doxygen to use minimal theme
   system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' ../Build/Docs/Doxyfile" or abort 'Failed to setup doxygen configuration file'
   system 'cp ../doc-Build/_includes/Doxygen/minimal-* ../Build/Docs' or abort 'Failed to copy minimal-themed template'
@@ -309,8 +309,8 @@ EOF" or abort 'Failed to create release directory remotely'
     # Upload the source package
     system "scp Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload source package'
     # Sync readme and license files, just in case they are updated in the repo
-    system 'for f in Readme.txt License.txt; do mtime=$(git log --format=%ai -n1 $f); touch -d "$mtime" $f; done' or abort 'Failed to acquire file modified time'
-    system 'rsync -e ssh -az Readme.txt License.txt urho-travis-ci@frs.sourceforge.net:/home/frs/project/$TRAVIS_REPO_SLUG' or abort 'Failed to sync readme and license files'
+    system 'for f in Readme.md License.txt; do mtime=$(git log --format=%ai -n1 $f); touch -d "$mtime" $f; done' or abort 'Failed to acquire file modified time'
+    system 'rsync -e ssh -az Readme.md License.txt urho-travis-ci@frs.sourceforge.net:/home/frs/project/$TRAVIS_REPO_SLUG' or abort 'Failed to sync readme and license files'
     # Mark that the site has been updated
     File.open('.site_updated', 'w') {}
   end
