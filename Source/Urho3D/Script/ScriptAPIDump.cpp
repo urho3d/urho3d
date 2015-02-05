@@ -56,6 +56,20 @@ struct PropertyInfo
     bool indexed_;
 };
 
+/// Header information for dumping events.
+struct HeaderFile
+{
+    /// Full path to header file.
+    String fileName;
+    /// Event section name.
+    String sectionName;
+};
+
+bool CompareHeaderFiles(const HeaderFile& lhs, const HeaderFile& rhs)
+{
+    return lhs.sectionName < rhs.sectionName;
+}
+
 void ExtractPropertyInfo(const String& functionName, const String& declaration, Vector<PropertyInfo>& propertyInfos)
 {
     String propertyName = functionName.Substring(4);
@@ -192,48 +206,58 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         Log::WriteRaw("namespace Urho3D\n{\n\n/**\n");
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
-        Vector<String> headerFiles;
+        Vector<String> headerFileNames;
         String path = AddTrailingSlash(sourceTree);
         if (!path.Empty())
             path.Append("Source/Urho3D/");
         
-        fileSystem->ScanDir(headerFiles, path, "*.h", SCAN_FILES, true);
+        fileSystem->ScanDir(headerFileNames, path, "*.h", SCAN_FILES, true);
+
+        /// \hack Rename any Events2D to 2DEvents to work with the event category creation correctly (currently PhysicsEvents2D)
+        Vector<HeaderFile> headerFiles;
+        for (unsigned i = 0; i < headerFileNames.Size(); ++i)
+        {
+            HeaderFile entry;
+            entry.fileName = headerFileNames[i];
+            entry.sectionName = GetFileNameAndExtension(entry.fileName).Replaced("Events2D", "2DEvents");
+            if (entry.sectionName.EndsWith("Events.h"))
+                headerFiles.Push(entry);
+        }
+
         if (!headerFiles.Empty())
         {
             Log::WriteRaw("\n\\page EventList Event list\n");
-            Sort(headerFiles.Begin(), headerFiles.End());
+            Sort(headerFiles.Begin(), headerFiles.End(), CompareHeaderFiles);
 
             for (unsigned i = 0; i < headerFiles.Size(); ++i)
             {
-                if (headerFiles[i].EndsWith("Events.h"))
+                SharedPtr<File> file(new File(context_, path + headerFiles[i].fileName, FILE_READ));
+                if (!file->IsOpen())
+                    continue;
+                
+                const String& sectionName = headerFiles[i].sectionName;
+                unsigned start = sectionName.Find('/') + 1;
+                unsigned end = sectionName.Find("Events.h");
+                Log::WriteRaw("\n## %" + sectionName.Substring(start, end - start) + " events\n");
+                    
+                while (!file->IsEof())
                 {
-                    SharedPtr<File> file(new File(context_, path + headerFiles[i], FILE_READ));
-                    if (!file->IsOpen())
-                        continue;
-                    
-                    unsigned start = headerFiles[i].Find('/') + 1;
-                    unsigned end = headerFiles[i].Find("Events.h");
-                    Log::WriteRaw("\n## %" + headerFiles[i].Substring(start, end - start) + " events\n");
-                    
-                    while (!file->IsEof())
+                    String line = file->ReadLine();
+                    if (line.StartsWith("EVENT"))
                     {
-                        String line = file->ReadLine();
-                        if (line.StartsWith("EVENT"))
+                        Vector<String> parts = line.Split(',');
+                        if (parts.Size() == 2)
+                            Log::WriteRaw("\n### " + parts[1].Substring(0, parts[1].Length() - 1).Trimmed() + "\n");
+                    }
+                    if (line.Contains("PARAM"))
+                    {
+                        Vector<String> parts = line.Split(',');
+                        if (parts.Size() == 2)
                         {
-                            Vector<String> parts = line.Split(',');
-                            if (parts.Size() == 2)
-                                Log::WriteRaw("\n### " + parts[1].Substring(0, parts[1].Length() - 1).Trimmed() + "\n");
-                        }
-                        if (line.Contains("PARAM"))
-                        {
-                            Vector<String> parts = line.Split(',');
-                            if (parts.Size() == 2)
-                            {
-                                String paramName = parts[1].Substring(0, parts[1].Find(')')).Trimmed();
-                                String paramType = parts[1].Substring(parts[1].Find("// ") + 3);
-                                if (!paramName.Empty() && !paramType.Empty())
-                                    Log::WriteRaw("- %" + paramName + " : " + paramType + "\n");
-                            }
+                            String paramName = parts[1].Substring(0, parts[1].Find(')')).Trimmed();
+                            String paramType = parts[1].Substring(parts[1].Find("// ") + 3);
+                            if (!paramName.Empty() && !paramType.Empty())
+                                Log::WriteRaw("- %" + paramName + " : " + paramType + "\n");
                         }
                     }
                 }

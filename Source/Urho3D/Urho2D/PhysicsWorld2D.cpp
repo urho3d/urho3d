@@ -223,7 +223,7 @@ void PhysicsWorld2D::DrawTransform(const b2Transform& xf)
 
 void PhysicsWorld2D::Update(float timeStep)
 {
-    using namespace Physics2DPreStep2D;
+    using namespace PhysicsPreStep2D;
 
     VariantMap& eventData = GetEventDataMap();
     eventData[P_WORLD] = this;

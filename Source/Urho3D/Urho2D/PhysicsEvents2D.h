@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 /// Physics world is about to be stepped.
-EVENT(E_PHYSICSPRESTEP2D, Physics2DPreStep2D)
+EVENT(E_PHYSICSPRESTEP2D, PhysicsPreStep2D)
 {
     PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
     PARAM(P_TIMESTEP, TimeStep);            // float
