@@ -56,16 +56,8 @@ public:
     virtual void AddEventHandler(Object* sender, const String& eventName, int functionIndex);
     /// Add a scripted event handler by function name for a specific sender.
     virtual void AddEventHandler(Object* sender, const String& eventName, const String& functionName);
-    /// Remove a scripted event handler by function.
-    virtual void RemoveEventHandler(const String& eventName, int functionIndex);
-    /// Remove a scripted event handler by function name.
-    virtual void RemoveEventHandler(const String& eventName, const String& functionName);
     /// Remove a scripted event handler.
     virtual void RemoveEventHandler(const String& eventName);
-    /// Remove a scripted event handler for a specific sender by function.
-    virtual void RemoveEventHandler(Object* sender, const String& eventName, int functionIndex);
-    /// Remove a scripted event handler for a specific sender by function name.
-    virtual void RemoveEventHandler(Object* sender, const String& eventName, const String& functionName);
     /// Remove a scripted event handler for a specific sender.
     virtual void RemoveEventHandler(Object* sender, const String& eventName);
     /// Remove all scripted event handlers for a specific sender.
@@ -89,9 +81,9 @@ public:
     /// Return Lua state.
     lua_State* GetState() const { return luaState_; }
     /// Return Lua function by function stack index.
-    WeakPtr<LuaFunction> GetFunction(int functionIndex);
+    LuaFunction* GetFunction(int functionIndex);
     /// Return Lua function by function name.
-    WeakPtr<LuaFunction> GetFunction(const String& functionName, bool silentIfNotfound = false);
+    LuaFunction* GetFunction(const String& functionName, bool silentIfNotfound = false);
     /// Return whether is executing engine console commands as script code.
     bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
 
@@ -119,7 +111,7 @@ private:
     /// Event invoker.
     SharedPtr<LuaScriptEventInvoker> eventInvoker_;
     /// Coroutine update function.
-    WeakPtr<LuaFunction> coroutineUpdate_;
+    LuaFunction* coroutineUpdate_;
     /// Flag for executing engine console commands as script code. Default to true.
     bool executeConsoleCommands_;
     /// Function pointer to function map.

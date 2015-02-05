@@ -31,7 +31,7 @@ namespace Urho3D
 class URHO3D_API LuaScriptEventListener
 {
 public:
-    /// Destruct
+    /// Destruct.
     virtual ~LuaScriptEventListener() {};
 
     /// Add a scripted event handler by function.
@@ -42,16 +42,8 @@ public:
     virtual void AddEventHandler(Object* sender, const String& eventName, int functionIndex) = 0;
     /// Add a scripted event handler by function name for a specific sender.
     virtual void AddEventHandler(Object* sender, const String& eventName, const String& functionName) = 0;
-    /// Remove a scripted event handler by function.
-    virtual void RemoveEventHandler(const String& eventName, int functionIndex) = 0;
-    /// Remove a scripted event handler by function name.
-    virtual void RemoveEventHandler(const String& eventName, const String& functionName) = 0;
     /// Remove a scripted event handler.
     virtual void RemoveEventHandler(const String& eventName) = 0;
-    /// Remove a scripted event handler for a specific sender by function.
-    virtual void RemoveEventHandler(Object* sender, const String& eventName, int functionIndex) = 0;
-    /// Remove a scripted event handler for a specific sender by function name.
-    virtual void RemoveEventHandler(Object* sender, const String& eventName, const String& functionName) = 0;
     /// Remove a scripted event handler for a specific sender.
     virtual void RemoveEventHandler(Object* sender, const String& eventName) = 0;
     /// Remove all scripted event handlers for a specific sender.

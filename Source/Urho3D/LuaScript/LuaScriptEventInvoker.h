@@ -27,7 +27,6 @@
 namespace Urho3D
 {
 
-class EventHandlerCommand;
 class LuaFunction;
 class LuaScriptInstance;
 
@@ -44,40 +43,14 @@ public:
     virtual ~LuaScriptEventInvoker();
 
     /// Add a scripted event handler.
-    void AddEventHandler(Object* sender, const StringHash& eventType, WeakPtr<LuaFunction> function);
-    /// Remove a scripted event handler.
-    void RemoveEventHandler(Object* sender, const StringHash& eventType, WeakPtr<LuaFunction> function);
-    /// Remove all scripted event handlers.
-    void RemoveAllEventHandlers(Object* sender);
-    /// Remove all scripted event handlers, except those listed.
-    void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptionTypes);
+    void AddEventHandler(Object* sender, const StringHash& eventType, LuaFunction* function);
 
 private:
     /// Handle script event in Lua script.
     void HandleLuaScriptEvent(StringHash eventType, VariantMap& eventData);
-    typedef Vector<WeakPtr<LuaFunction> > LuaFunctionVector;
-    typedef HashMap<StringHash, LuaFunctionVector> EventTypeToLuaFunctionVectorMap;
-    /// Return event type to Lua function vector map.
-    EventTypeToLuaFunctionVectorMap& GetEventTypeToLuaFunctionVectorMap(Object* sender)
-    {
-        if (!sender)
-            return eventTypeToLuaFunctionVectorMap;
-
-        return senderEventTypeToLuaFunctionVectorMap[sender];
-    }
-    /// Execute then destory command.
-    void ExecuteThenDestroyCommand(EventHandlerCommand* command);
-
+    
     /// Lua script instance.
-    LuaScriptInstance* instance_;
-    /// Invoking.
-    bool invoking_;
-    /// Event handler commands.
-    PODVector<EventHandlerCommand*> eventHandlerCommands_;
-    /// Event type to Lua function vector map.
-    EventTypeToLuaFunctionVectorMap eventTypeToLuaFunctionVectorMap;
-    /// Event type to Lua function vector map for specific sender.
-    HashMap<Object*, EventTypeToLuaFunctionVectorMap> senderEventTypeToLuaFunctionVectorMap;
+    WeakPtr<LuaScriptInstance> instance_;
 };
 
 }

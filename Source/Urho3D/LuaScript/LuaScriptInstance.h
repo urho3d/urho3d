@@ -85,16 +85,8 @@ public:
     virtual void AddEventHandler(Object* sender, const String& eventName, int functionIndex);
     /// Add a scripted event handler by function name for a specific sender.
     virtual void AddEventHandler(Object* sender, const String& eventName, const String& functionName);
-    /// Remove a scripted event handler by function.
-    virtual void RemoveEventHandler(const String& eventName, int functionIndex);
-    /// Remove a scripted event handler by function name.
-    virtual void RemoveEventHandler(const String& eventName, const String& functionName);
     /// Remove a scripted event handler.
     virtual void RemoveEventHandler(const String& eventName);
-    /// Remove a scripted event handler for a specific sender by function.
-    virtual void RemoveEventHandler(Object* sender, const String& eventName, int functionIndex);
-    /// Remove a scripted event handler for a specific sender by function name.
-    virtual void RemoveEventHandler(Object* sender, const String& eventName, const String& functionName);
     /// Remove a scripted event handler for a specific sender.
     virtual void RemoveEventHandler(Object* sender, const String& eventName);
     /// Remove all scripted event handlers for a specific sender.
@@ -128,7 +120,7 @@ public:
     /// Get script network serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptNetworkDataAttr() const;
     /// Return script object's funcition.
-    WeakPtr<LuaFunction> GetScriptObjectFunction(const String& functionName) const;
+    LuaFunction* GetScriptObjectFunction(const String& functionName) const;
 
     /// Set script file attribute.
     void SetScriptFileAttr(const ResourceRef& value);
@@ -176,7 +168,7 @@ private:
     /// Script object ref.
     int scriptObjectRef_;
     /// Script object method.
-    WeakPtr<LuaFunction> scriptObjectMethods_[MAX_LUA_SCRIPT_OBJECT_METHODS];
+    LuaFunction* scriptObjectMethods_[MAX_LUA_SCRIPT_OBJECT_METHODS];
 };
 
 }

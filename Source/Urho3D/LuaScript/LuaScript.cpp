@@ -150,14 +150,14 @@ LuaScript::~LuaScript()
 
 void LuaScript::AddEventHandler(const String& eventName, int functionIndex)
 {
-    WeakPtr<LuaFunction> function = GetFunction(functionIndex);
+    LuaFunction* function = GetFunction(functionIndex);
     if (function)
         eventInvoker_->AddEventHandler(0, eventName, function);
 }
 
 void LuaScript::AddEventHandler(const String& eventName, const String& functionName)
 {
-    WeakPtr<LuaFunction> function = GetFunction(functionName);
+    LuaFunction* function = GetFunction(functionName);
     if (function)
         eventInvoker_->AddEventHandler(0, eventName, function);
 }
@@ -167,7 +167,7 @@ void LuaScript::AddEventHandler(Object* sender, const String& eventName, int fun
     if (!sender)
         return;
 
-    WeakPtr<LuaFunction> function = GetFunction(functionIndex);
+    LuaFunction* function = GetFunction(functionIndex);
     if (function)
         eventInvoker_->AddEventHandler(sender, eventName, function);
 }
@@ -177,48 +177,14 @@ void LuaScript::AddEventHandler(Object* sender, const String& eventName, const S
     if (!sender)
         return;
 
-    WeakPtr<LuaFunction> function = GetFunction(functionName);
+    LuaFunction* function = GetFunction(functionName);
     if (function)
         eventInvoker_->AddEventHandler(sender, eventName, function);
 }
 
-void LuaScript::RemoveEventHandler(const String& eventName, int functionIndex)
-{
-    WeakPtr<LuaFunction> function = GetFunction(functionIndex);
-    if (function)
-        eventInvoker_->RemoveEventHandler(0, eventName, function);
-}
-
-void LuaScript::RemoveEventHandler(const String& eventName, const String& functionName)
-{
-    WeakPtr<LuaFunction> function = GetFunction(functionName);
-    if (function)
-        eventInvoker_->RemoveEventHandler(0, eventName, function);
-}
-
 void LuaScript::RemoveEventHandler(const String& eventName)
 {
-    eventInvoker_->RemoveEventHandler(0, eventName, WeakPtr<LuaFunction>());
-}
-
-void LuaScript::RemoveEventHandler(Object* sender, const String& eventName, int functionIndex)
-{
-    if (!sender)
-        return;
-
-    WeakPtr<LuaFunction> function = GetFunction(functionIndex);
-    if (function)
-        eventInvoker_->RemoveEventHandler(sender, eventName, function);
-}
-
-void LuaScript::RemoveEventHandler(Object* sender, const String& eventName, const String& functionName)
-{
-    if (!sender)
-        return;
-
-    WeakPtr<LuaFunction> function = GetFunction(functionName);
-    if (function)
-        eventInvoker_->RemoveEventHandler(sender, eventName, function);
+    eventInvoker_->UnsubscribeFromEvent(eventName);
 }
 
 void LuaScript::RemoveEventHandler(Object* sender, const String& eventName)
@@ -226,7 +192,7 @@ void LuaScript::RemoveEventHandler(Object* sender, const String& eventName)
     if (!sender)
         return;
 
-    eventInvoker_->RemoveEventHandler(sender, eventName, WeakPtr<LuaFunction>());
+    eventInvoker_->UnsubscribeFromEvent(sender, eventName);
 }
 
 void LuaScript::RemoveEventHandlers(Object* sender)
@@ -234,12 +200,12 @@ void LuaScript::RemoveEventHandlers(Object* sender)
     if (!sender)
         return;
 
-    eventInvoker_->RemoveAllEventHandlers(sender);
+    eventInvoker_->UnsubscribeFromEvents(sender);
 }
 
 void LuaScript::RemoveAllEventHandlers()
 {
-    eventInvoker_->RemoveAllEventHandlers(0);
+    eventInvoker_->UnsubscribeFromAllEvents();
 }
 
 void LuaScript::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
@@ -248,7 +214,7 @@ void LuaScript::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
     for (unsigned i = 0; i < exceptionTypes.Size(); ++i)
         exceptionTypes[i] = StringHash(exceptionNames[i]);
 
-    eventInvoker_->RemoveEventHandlersExcept(exceptionTypes);
+    eventInvoker_->UnsubscribeFromAllEventsExcept(exceptionTypes, true);
 }
 
 bool LuaScript::ExecuteFile(const String& fileName)
@@ -279,7 +245,7 @@ bool LuaScript::ExecuteString(const String& string)
 
 bool LuaScript::ExecuteFunction(const String& functionName)
 {
-    WeakPtr<LuaFunction> function = GetFunction(functionName);
+    LuaFunction* function = GetFunction(functionName);
     return function && function->BeginCall() && function->EndCall();
 }
 
@@ -387,18 +353,18 @@ int LuaScript::Print(lua_State *L)
     return 0;
 }
 
-WeakPtr<LuaFunction> LuaScript::GetFunction(int functionIndex)
+LuaFunction* LuaScript::GetFunction(int functionIndex)
 {
     if (!lua_isfunction(luaState_, functionIndex))
-        return WeakPtr<LuaFunction>();
+        return 0;
 
     const void* functionPointer = lua_topointer(luaState_, functionIndex);
     if (!functionPointer)
-        return WeakPtr<LuaFunction>();
+        return 0;
 
     HashMap<const void*, SharedPtr<LuaFunction> >::Iterator i = functionPointerToFunctionMap_.Find(functionPointer);
     if (i != functionPointerToFunctionMap_.End())
-        return WeakPtr<LuaFunction>(i->second_);
+        return i->second_;
 
     lua_pushvalue(luaState_, functionIndex);
     int functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
@@ -406,17 +372,17 @@ WeakPtr<LuaFunction> LuaScript::GetFunction(int functionIndex)
     SharedPtr<LuaFunction> function(new LuaFunction(luaState_, functionRef, false));
     functionPointerToFunctionMap_[functionPointer] = function;
 
-    return WeakPtr<LuaFunction>(function);
+    return function;
 }
 
-WeakPtr<LuaFunction> LuaScript::GetFunction(const String& functionName, bool silentIfNotFound)
+LuaFunction* LuaScript::GetFunction(const String& functionName, bool silentIfNotFound)
 {
     if (!luaState_)
-        return WeakPtr<LuaFunction>();
+        return 0;
 
     HashMap<String, SharedPtr<LuaFunction> >::Iterator i = functionNameToFunctionMap_.Find(functionName);
     if (i != functionNameToFunctionMap_.End())
-        return WeakPtr<LuaFunction>(i->second_);
+        return i->second_;
 
     int top = lua_gettop(luaState_);
 
@@ -427,7 +393,7 @@ WeakPtr<LuaFunction> LuaScript::GetFunction(const String& functionName, bool sil
     lua_settop(luaState_, top);
 
     functionNameToFunctionMap_[functionName] = function;
-    return WeakPtr<LuaFunction>(function);
+    return function;
 }
 
 void LuaScript::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
@@ -442,7 +408,7 @@ void LuaScript::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 
     // Collect garbage
     {
-        PROFILE(CollectLuaGarbage);
+        PROFILE(LuaCollectGarbage);
         lua_gc(luaState_, LUA_GCCOLLECT, 0);
     }
 }
