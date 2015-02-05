@@ -289,8 +289,6 @@ void LuaScriptInstance::OnSetEnabled()
         UnsubscribeFromScriptMethodEvents();
 }
 
-
-
 void LuaScriptInstance::AddEventHandler(const String& eventName, int functionIndex)
 {
     LuaFunction* function = luaScript_->GetFunction(functionIndex);

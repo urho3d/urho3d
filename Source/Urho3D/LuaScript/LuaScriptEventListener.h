@@ -31,7 +31,7 @@ namespace Urho3D
 class URHO3D_API LuaScriptEventListener
 {
 public:
-    /// Destruct
+    /// Destruct.
     virtual ~LuaScriptEventListener() {};
 
     /// Add a scripted event handler by function.

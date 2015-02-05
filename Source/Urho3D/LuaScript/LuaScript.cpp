@@ -408,7 +408,7 @@ void LuaScript::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 
     // Collect garbage
     {
-        PROFILE(CollectLuaGarbage);
+        PROFILE(LuaCollectGarbage);
         lua_gc(luaState_, LUA_GCCOLLECT, 0);
     }
 }
