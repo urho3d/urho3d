@@ -182,43 +182,9 @@ void LuaScript::AddEventHandler(Object* sender, const String& eventName, const S
         eventInvoker_->AddEventHandler(sender, eventName, function);
 }
 
-void LuaScript::RemoveEventHandler(const String& eventName, int functionIndex)
-{
-    WeakPtr<LuaFunction> function = GetFunction(functionIndex);
-    if (function)
-        eventInvoker_->RemoveEventHandler(0, eventName, function);
-}
-
-void LuaScript::RemoveEventHandler(const String& eventName, const String& functionName)
-{
-    WeakPtr<LuaFunction> function = GetFunction(functionName);
-    if (function)
-        eventInvoker_->RemoveEventHandler(0, eventName, function);
-}
-
 void LuaScript::RemoveEventHandler(const String& eventName)
 {
-    eventInvoker_->RemoveEventHandler(0, eventName, WeakPtr<LuaFunction>());
-}
-
-void LuaScript::RemoveEventHandler(Object* sender, const String& eventName, int functionIndex)
-{
-    if (!sender)
-        return;
-
-    WeakPtr<LuaFunction> function = GetFunction(functionIndex);
-    if (function)
-        eventInvoker_->RemoveEventHandler(sender, eventName, function);
-}
-
-void LuaScript::RemoveEventHandler(Object* sender, const String& eventName, const String& functionName)
-{
-    if (!sender)
-        return;
-
-    WeakPtr<LuaFunction> function = GetFunction(functionName);
-    if (function)
-        eventInvoker_->RemoveEventHandler(sender, eventName, function);
+    eventInvoker_->UnsubscribeFromEvent(eventName);
 }
 
 void LuaScript::RemoveEventHandler(Object* sender, const String& eventName)
@@ -226,7 +192,7 @@ void LuaScript::RemoveEventHandler(Object* sender, const String& eventName)
     if (!sender)
         return;
 
-    eventInvoker_->RemoveEventHandler(sender, eventName, WeakPtr<LuaFunction>());
+    eventInvoker_->UnsubscribeFromEvent(sender, eventName);
 }
 
 void LuaScript::RemoveEventHandlers(Object* sender)
@@ -234,12 +200,12 @@ void LuaScript::RemoveEventHandlers(Object* sender)
     if (!sender)
         return;
 
-    eventInvoker_->RemoveAllEventHandlers(sender);
+    eventInvoker_->UnsubscribeFromEvents(sender);
 }
 
 void LuaScript::RemoveAllEventHandlers()
 {
-    eventInvoker_->RemoveAllEventHandlers(0);
+    eventInvoker_->UnsubscribeFromAllEvents();
 }
 
 void LuaScript::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
@@ -248,7 +214,7 @@ void LuaScript::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
     for (unsigned i = 0; i < exceptionTypes.Size(); ++i)
         exceptionTypes[i] = StringHash(exceptionNames[i]);
 
-    eventInvoker_->RemoveEventHandlersExcept(exceptionTypes);
+    eventInvoker_->UnsubscribeFromAllEventsExcept(exceptionTypes, true);
 }
 
 bool LuaScript::ExecuteFile(const String& fileName)

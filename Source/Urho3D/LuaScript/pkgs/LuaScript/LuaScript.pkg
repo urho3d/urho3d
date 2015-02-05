@@ -3,10 +3,7 @@ $#include "LuaScript/LuaScript.h"
 void LuaScriptAddEventHandler @ SubscribeToEvent(const String eventName, void* functionOrFunctionName);
 void LuaScriptAddEventHandler @ SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName);
 
-void LuaScriptRemoveEventHandler @ UnsubscribeFromEvent(const String eventName, void* functionOrFunctionName);
 void LuaScriptRemoveEventHandler @ UnsubscribeFromEvent(const String eventName);
-
-void LuaScriptRemoveEventHandler @ UnsubscribeFromEvent(Object* sender, const String eventName, void* functionOrFunctionName);
 void LuaScriptRemoveEventHandler @ UnsubscribeFromEvent(Object* sender, const String eventName);
 
 void LuaScriptRemoveEventHandlers @ UnsubscribeFromEvents(Object* sender);
@@ -123,28 +120,10 @@ static int tolua_LuaScriptLuaAPI_UnsubscribeFromEvent(lua_State* tolua_S)
     }
     else if (args == 2)
     {
-        // UnsubscribeFromEvent(const String eventName, void* functionOrFunctionName);
-        if (tolua_isurho3dstring(tolua_S,1,0,&tolua_err))
-        {
-            if (!tolua_isfunctionorurho3dstring(tolua_S,2,0,&tolua_err))
-                goto tolua_lerror;
-        }
         // UnsubscribeFromEvent(Object* sender, const String eventName);
-        else if (tolua_isuserdata(tolua_S,1,0,&tolua_err))
-        {
-            if (!tolua_isurho3dstring(tolua_S,2,0,&tolua_err))
-                goto tolua_lerror;
-        }
-        else
-            goto tolua_lerror;
-    }
-    else if (args == 3)
-    {
-        // UnsubscribeFromEvent(Object* sender, const String eventName, void* functionOrFunctionName);
         if (!tolua_isuserdata(tolua_S,1,0,&tolua_err) ||
-            !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
-            !tolua_isfunctionorurho3dstring(tolua_S,3,0,&tolua_err))
-            goto tolua_lerror;
+            !tolua_isurho3dstring(tolua_S,2,0,&tolua_err))
+                goto tolua_lerror;
     }
     else
         goto tolua_lerror;
@@ -158,38 +137,10 @@ static int tolua_LuaScriptLuaAPI_UnsubscribeFromEvent(lua_State* tolua_S)
     }
     else if (args == 2)
     {
-        // UnsubscribeFromEvent(const String eventName, void* functionOrFunctionName);
-        if (tolua_isurho3dstring(tolua_S,1,0,&tolua_err))
-        {
-            const String eventName = ((const String)  tolua_tourho3dstring(tolua_S,1,0));
-            if (lua_isfunction(tolua_S, 2))
-                LuaScriptRemoveEventHandler(eventName, 2);
-            else
-            {
-                const String functionName = (const String)tolua_tourho3dstring(tolua_S,2,0);
-                LuaScriptRemoveEventHandler(eventName, functionName);
-            }
-        }
         // UnsubscribeFromEvent(Object* sender, const String eventName);
-        else if (tolua_isuserdata(tolua_S,1,0,&tolua_err))
-        {
-            Object* sender = ((Object*)  tolua_touserdata(tolua_S,1,0));
-            const String eventName = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
-            LuaScriptRemoveEventHandler(sender, eventName);
-        }
-    }
-    else if (args == 3)
-    {
-        // UnsubscribeFromEvent(Object* sender, const String eventName, void* functionOrFunctionName);
         Object* sender = ((Object*)  tolua_touserdata(tolua_S,1,0));
         const String eventName = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
-        if (lua_isfunction(tolua_S,3))
-            LuaScriptRemoveEventHandler(sender,eventName,3);
-        else
-        {
-            const String functionName = (const String)tolua_tourho3dstring(tolua_S,3,0);
-            LuaScriptRemoveEventHandler(sender,eventName,functionName);
-        }
+        LuaScriptRemoveEventHandler(sender, eventName);
     }
 
     return 0;
@@ -213,15 +164,4 @@ static int tolua_LuaScriptLuaAPI_UnsubscribeFromEvent01(lua_State* tolua_S)
     return tolua_LuaScriptLuaAPI_UnsubscribeFromEvent(tolua_S);
 }
 
-#define TOLUA_DISABLE_tolua_LuaScriptLuaAPI_UnsubscribeFromEvent02
-static int tolua_LuaScriptLuaAPI_UnsubscribeFromEvent02(lua_State* tolua_S)
-{
-    return tolua_LuaScriptLuaAPI_UnsubscribeFromEvent(tolua_S);
-}
-
-#define TOLUA_DISABLE_tolua_LuaScriptLuaAPI_UnsubscribeFromEvent03
-static int tolua_LuaScriptLuaAPI_UnsubscribeFromEvent03(lua_State* tolua_S)
-{
-    return tolua_LuaScriptLuaAPI_UnsubscribeFromEvent(tolua_S);
-}
 $}

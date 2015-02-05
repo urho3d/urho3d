@@ -29,59 +29,14 @@
 namespace Urho3D
 {
 
-class EventHandlerCommand
-{
-public:
-    EventHandlerCommand(int type) : type_(type) { }
-    virtual ~EventHandlerCommand() { }
-    int type_;
-};
-
-struct AddOrRemoveEventHandlerCommand : public EventHandlerCommand
-{
-    enum { Type = 1 };
-    AddOrRemoveEventHandlerCommand(bool add, Object* sender, const StringHash& eventType, WeakPtr<LuaFunction> function) : 
-        EventHandlerCommand(Type), add_(add), sender_(sender), eventType_(eventType), function_(function)
-    {
-    }
-
-    bool add_;
-    Object* sender_;
-    StringHash eventType_;
-    WeakPtr<LuaFunction> function_;
-};
-
-struct RemoveAllEventHandlersCommand : public EventHandlerCommand
-{    
-    enum { Type = 2 };
-    RemoveAllEventHandlersCommand(Object* sender) : EventHandlerCommand(Type), sender_(sender)
-    {
-    }
-
-    Object* sender_;
-};
-
-struct RemoveEventHandlersExceptCommand : public EventHandlerCommand
-{
-
-    enum { Type = 3 };
-    RemoveEventHandlersExceptCommand(const PODVector<StringHash>& exceptionTypes) : EventHandlerCommand(Type), exceptionTypes_(exceptionTypes)
-    {
-    }
-    PODVector<StringHash> exceptionTypes_;
-};
-
 LuaScriptEventInvoker::LuaScriptEventInvoker(Context* context) : 
-    Object(context), 
-    instance_(0),
-    invoking_(false)
+    Object(context)
 {
 }
 
 LuaScriptEventInvoker::LuaScriptEventInvoker(LuaScriptInstance* instance) : 
     Object(instance->GetContext()), 
-    instance_(instance),
-    invoking_(false)
+    instance_(instance)
 {
 }
 
@@ -89,181 +44,43 @@ LuaScriptEventInvoker::~LuaScriptEventInvoker()
 {
 }
 
-void LuaScriptEventInvoker::AddEventHandler(Object* sender, const StringHash& eventType, WeakPtr<LuaFunction> function)
+void LuaScriptEventInvoker::AddEventHandler(Object* sender, const StringHash& eventType, LuaFunction* function)
 {
-    if (invoking_)
-    {
-        eventHandlerCommands_.Push(new AddOrRemoveEventHandlerCommand(true, sender, eventType, function));
+    if (!function)
         return;
-    }
 
-    EventTypeToLuaFunctionVectorMap& eventTypeToFunctionVectorMap = GetEventTypeToLuaFunctionVectorMap(sender);
-    EventTypeToLuaFunctionVectorMap::Iterator i = eventTypeToFunctionVectorMap.Find(eventType);
-
-    if (i == eventTypeToFunctionVectorMap.End())
-    {
-        eventTypeToFunctionVectorMap[eventType].Push(function);
-        
-        if (!sender)
-            SubscribeToEvent(eventType, HANDLER(LuaScriptEventInvoker, HandleLuaScriptEvent));
-        else
-            SubscribeToEvent(sender, eventType, HANDLER(LuaScriptEventInvoker, HandleLuaScriptEvent));
-    }
+    if (sender)
+        SubscribeToEvent(sender, eventType, HANDLER_USERDATA(LuaScriptEventInvoker, HandleLuaScriptEvent, function));
     else
-    {
-        if (!i->second_.Contains(function))
-            i->second_.Push(function);
-    }
-}
-
-void LuaScriptEventInvoker::RemoveEventHandler(Object* sender, const StringHash& eventType, WeakPtr<LuaFunction> function)
-{
-    if (invoking_)
-    {
-        eventHandlerCommands_.Push(new AddOrRemoveEventHandlerCommand(false, sender, eventType, function));
-        return;
-    }
-
-    EventTypeToLuaFunctionVectorMap& eventTypeToLuaFunctionVectorMap = GetEventTypeToLuaFunctionVectorMap(sender);
-    EventTypeToLuaFunctionVectorMap::Iterator i = eventTypeToLuaFunctionVectorMap.Find(eventType);
-    if (i == eventTypeToLuaFunctionVectorMap.End())
-        return;
-
-    if (function)
-        i->second_.Remove(function);
-    else
-        i->second_.Clear();
-    
-    if (i->second_.Empty())
-    {
-        eventTypeToLuaFunctionVectorMap.Erase(i);
-
-        if (!sender)
-            UnsubscribeFromEvent(eventType);
-        else
-            UnsubscribeFromEvent(sender, eventType);
-    }
-}
-
-void LuaScriptEventInvoker::RemoveAllEventHandlers(Object* sender)
-{
-    if (invoking_)
-    {
-        eventHandlerCommands_.Push(new RemoveAllEventHandlersCommand(sender));
-        return;
-    }
-
-    if (!sender)
-    {
-        UnsubscribeFromAllEvents();
-        eventTypeToLuaFunctionVectorMap.Clear();
-        senderEventTypeToLuaFunctionVectorMap.Clear();
-    }
-    else
-    {
-        UnsubscribeFromEvents(sender);
-        senderEventTypeToLuaFunctionVectorMap.Erase(sender);
-    }
-}
-
-void LuaScriptEventInvoker::RemoveEventHandlersExcept(const PODVector<StringHash>& exceptionTypes)
-{
-    if (invoking_)
-    {
-        eventHandlerCommands_.Push(new RemoveEventHandlersExceptCommand(exceptionTypes));
-        return;
-    }
-
-    for (unsigned i = 0; i < exceptionTypes.Size(); ++i)
-        eventTypeToLuaFunctionVectorMap.Erase(exceptionTypes[i]);
-
-    UnsubscribeFromAllEventsExcept(exceptionTypes, false);
+        SubscribeToEvent(eventType, HANDLER_USERDATA(LuaScriptEventInvoker, HandleLuaScriptEvent, function));
 }
 
 void LuaScriptEventInvoker::HandleLuaScriptEvent(StringHash eventType, VariantMap& eventData)
 {
-    Object* sender = GetEventHandler()->GetSender();
-    EventTypeToLuaFunctionVectorMap& eventTypeToLuaFunctionVectorMap = GetEventTypeToLuaFunctionVectorMap(sender);
-    EventTypeToLuaFunctionVectorMap::Iterator i = eventTypeToLuaFunctionVectorMap.Find(eventType);
-    if (i == eventTypeToLuaFunctionVectorMap.End())
+    LuaFunction* function = static_cast<LuaFunction*>(GetEventHandler()->GetUserData());
+    if (!function)
         return;
 
+    // Keep instance alive during invoking
     SharedPtr<LuaScriptInstance> instance(instance_);
-    
-    invoking_ = true;
-    
-    LuaFunctionVector& luaFunctionVector = i->second_;
     if (instance)
     {
-        for (unsigned i = 0; i < luaFunctionVector.Size(); ++i)
+        if (function->BeginCall(instance))
         {
-            WeakPtr<LuaFunction>& function = luaFunctionVector[i];
-            if (function && function->BeginCall(instance))
-            {
-                function->PushUserType(eventType, "StringHash");
-                function->PushUserType(eventData, "VariantMap");
-                function->EndCall();
-            }
+            function->PushUserType(eventType, "StringHash");
+            function->PushUserType(eventData, "VariantMap");
+            function->EndCall();
         }
     }
     else
     {
-        for (unsigned i = 0; i < luaFunctionVector.Size(); ++i)
+        if (function->BeginCall())
         {
-            WeakPtr<LuaFunction>& function = luaFunctionVector[i];
-            if (function && function->BeginCall())
-            {
-                function->PushUserType(eventType, "StringHash");
-                function->PushUserType(eventData, "VariantMap");
-                function->EndCall();
-            }
+            function->PushUserType(eventType, "StringHash");
+            function->PushUserType(eventData, "VariantMap");
+            function->EndCall();
         }
     }
-
-    invoking_ = false;
-
-    if (!eventHandlerCommands_.Empty())
-    {
-        for (unsigned i = 0; i < eventHandlerCommands_.Size(); ++i)
-            ExecuteThenDestroyCommand(eventHandlerCommands_[i]);
-
-        eventHandlerCommands_.Clear();
-    }
-}
-
-void LuaScriptEventInvoker::ExecuteThenDestroyCommand(EventHandlerCommand* command)
-{
-    if (!command)
-        return;
-
-    switch (command->type_)
-    {
-    case AddOrRemoveEventHandlerCommand::Type:
-        {
-            AddOrRemoveEventHandlerCommand* theCommand = (AddOrRemoveEventHandlerCommand*)command;
-            if (theCommand->add_)
-                AddEventHandler(theCommand->sender_, theCommand->eventType_, theCommand->function_);
-            else
-                RemoveEventHandler(theCommand->sender_, theCommand->eventType_, theCommand->function_);
-        }
-        break;
-
-    case RemoveAllEventHandlersCommand::Type:
-        {
-            RemoveAllEventHandlersCommand* theCommand = (RemoveAllEventHandlersCommand*)command;
-            RemoveAllEventHandlers(theCommand->sender_);
-        }
-        break;
-
-    case RemoveEventHandlersExceptCommand::Type:
-        {
-            RemoveEventHandlersExceptCommand* theCommand = (RemoveEventHandlersExceptCommand*)command;
-            RemoveEventHandlersExcept(theCommand->exceptionTypes_);
-        }
-        break;
-    }
-
-    delete command;
 }
 
 }
