@@ -81,9 +81,9 @@ public:
     /// Return Lua state.
     lua_State* GetState() const { return luaState_; }
     /// Return Lua function by function stack index.
-    WeakPtr<LuaFunction> GetFunction(int functionIndex);
+    LuaFunction* GetFunction(int functionIndex);
     /// Return Lua function by function name.
-    WeakPtr<LuaFunction> GetFunction(const String& functionName, bool silentIfNotfound = false);
+    LuaFunction* GetFunction(const String& functionName, bool silentIfNotfound = false);
     /// Return whether is executing engine console commands as script code.
     bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
 
@@ -111,7 +111,7 @@ private:
     /// Event invoker.
     SharedPtr<LuaScriptEventInvoker> eventInvoker_;
     /// Coroutine update function.
-    WeakPtr<LuaFunction> coroutineUpdate_;
+    LuaFunction* coroutineUpdate_;
     /// Flag for executing engine console commands as script code. Default to true.
     bool executeConsoleCommands_;
     /// Function pointer to function map.

@@ -120,7 +120,7 @@ public:
     /// Get script network serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptNetworkDataAttr() const;
     /// Return script object's funcition.
-    WeakPtr<LuaFunction> GetScriptObjectFunction(const String& functionName) const;
+    LuaFunction* GetScriptObjectFunction(const String& functionName) const;
 
     /// Set script file attribute.
     void SetScriptFileAttr(const ResourceRef& value);
@@ -168,7 +168,7 @@ private:
     /// Script object ref.
     int scriptObjectRef_;
     /// Script object method.
-    WeakPtr<LuaFunction> scriptObjectMethods_[MAX_LUA_SCRIPT_OBJECT_METHODS];
+    LuaFunction* scriptObjectMethods_[MAX_LUA_SCRIPT_OBJECT_METHODS];
 };
 
 }
