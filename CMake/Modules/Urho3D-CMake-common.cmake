@@ -573,6 +573,12 @@ macro (enable_pch HEADER_PATHNAME)
                 set (TRIGGERS ${HEADER_FILENAME}.${CMAKE_BUILD_TYPE}.pch.trigger)
             endif ()
             list (APPEND SOURCE_FILES ${TRIGGERS})
+            # Ninja-build specific
+            if (CMAKE_GENERATOR STREQUAL Ninja)
+                # The precompiled header is always generated in the current binary dir,
+                # but Ninja project is not able to find it without adding the binary dir to the include search path
+                list (APPEND INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR})
+            endif ()
         endif ()
     endif ()
 endmacro ()

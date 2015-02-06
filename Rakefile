@@ -71,7 +71,7 @@ task :cmake do
     case option
     when 'cmake', 'generic'
       # do nothing
-    when 'clean', 'codeblocks', 'eclipse', 'macosx', 'vs2008', 'vs2010', 'vs2012', 'vs2013'
+    when 'clean', 'codeblocks', 'eclipse', 'macosx', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013'
       script = "cmake_#{option}" unless script == 'cmake_clean'
     when 'android', 'ios', 'mingw', 'rpi'
       platform = option
@@ -100,7 +100,7 @@ task :make do
   ARGV.each { |option|
     task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
     case option
-    when 'codeblocks', 'eclipse', 'generic', 'macosx', 'make', 'vs2008', 'vs2010', 'vs2012', 'vs2013'
+    when 'codeblocks', 'eclipse', 'generic', 'macosx', 'make', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013'
       # do nothing
     when 'android', 'ios', 'mingw', 'rpi'
       platform = option

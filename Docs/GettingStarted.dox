@@ -54,7 +54,7 @@ After the build tree has been generated, you can use the build script again to r
 
 Naturally you have to specify a fully qualified path to the build script for this to work. Alternatively, you can add the path to the Urho3D project root to the PATH environment variable in order to make the build scripts available everywhere.
 
-Our CMakeLists.txt files are designed to work with most of the generators supported by CMake: Makefile, Xcode, VS, and even Ninja. Though we do not use the latter in any of our build scripts explicitly. Which build script to use is determined by which CMake generator (and toolchain) you intend to use in your build tree. For native build, you can just use cmake_generic.sh or cmake_generic.bat to let CMake to detect and decide which generator to use automatically. CMake should default to use "Unix Makefiles" generator on Linux and Mac host systems and it should default to use 32-bit "Visual Studio" generator on Windows host system when it is installed.
+Our CMakeLists.txt files are designed to work with most of the generators supported by CMake: Makefile, Xcode, VS, and even Ninja. Which build script to use is determined by which CMake generator (and toolchain) you intend to use in your build tree. For native build, you can just use cmake_generic.sh or cmake_generic.bat to let CMake to detect and decide which generator to use automatically. CMake should default to use "Unix Makefiles" generator on Linux and Mac host systems and it should default to use 32-bit "Visual Studio" generator on Windows host system when it is installed.
 
 \section Build_Options Build options
 
@@ -115,10 +115,10 @@ Note that the specified build option values are cached by CMake after the initia
 Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
 
 -# Run CMake in the root directory (which is also CMake's source tree) with your preferred generator and toolchain specified to generate the build tree. You can use cmake-gui or the provided batch files or shell scripts on the respective host system. All the batch files and shell scripts expect the build tree location to be passed as the first argument, or to execute them in the build tree itself when reconfiguring the existing build tree.\n
-    - Windows: cmake_vs20xx.bat, cmake_mingw.bat, or cmake_generic.bat\n
-    - Mac OS X: cmake_macosx.sh or cmake_generic.sh\n
-    - Linux: cmake_eclipse.sh, cmake_codeblocks.sh, or cmake_generic.sh\n
-    - Raspberry Pi: cmake_rpi.sh, cmake_eclipse.sh, cmake_codeblocks.sh, or cmake_generic.sh\n
+    - Windows: cmake_vs20xx.bat, cmake_mingw.bat, cmake_codeblock.bat, cmake_ninja.bat, or cmake_generic.bat\n
+    - Mac OS X: cmake_macosx.sh, cmake_codeblocks.sh, cmake_ninja.sh, or cmake_generic.sh\n
+    - Linux: cmake_eclipse.sh, cmake_codeblocks.sh, cmake_ninja.sh, or cmake_generic.sh\n
+    - Raspberry Pi: cmake_rpi.sh, cmake_eclipse.sh, cmake_codeblocks.sh, cmake_ninja.sh, or cmake_generic.sh\n
 -# Use the IDE of your choice to open the CMake's generated project file or solution file in the build tree. Change the build configuration (Debug/Release) and change the built-in target to ALL_BUILD to build all the targets.\n
     - Visual Studio: open Urho3D.sln\n
     - Xcode: open Urho3D.xcodeproj\n
@@ -132,7 +132,7 @@ If using MinGW to compile, DirectX headers may need to be acquired separately. T
 After the build is complete, the programs can be run from the bin subdirectory in the build tree. These include the Urho3D player application, which can run application scripts, the tools, and C++ sample applications if they have been enabled. Unless your build tree location is also the same as the Urho3D project source tree, in order to run the Urho3D executables successfully, you must do one of the following first:
 - Copy both the bin/Data and bin/CoreData directories in the source tree to the bin subdirectory in the build tree.
 - Instead of copying, just create symbolic links in the build tree pointing to the above two directories.
-- Or even better, use the 'resource prefix path' \ref Running_Commandline "engine parameter" by setting URHO3D_PREFIX_PATH variable in your host environment. The prefix variable must be set to an absolute path which contains the Data and CoreData subdirectories.      
+- Or even better, use the 'resource prefix path' \ref Running_Commandline "engine parameter" by setting URHO3D_PREFIX_PATH variable in your host environment. The prefix variable must be set to an absolute path which contains the Data and CoreData subdirectories.
 
 The Mac OS X executables can be built with all the resources bundled into a single app directory. In order to enable this, set the URHO3D_MACOSX_BUNDLE build option when configuring the build tree for the Mac OS X platform. The bundled app can be launched just by double-clicking from the Finder without worrying about setting the 'resource prefix path'. This is because the URHO3D_PREFIX_PATH environment variable has been set internally to point to the resources directory that is already bundled in the app. Note, however, if you do not launch the app via the Apple "Launch Services" (such as when you are debugging or by calling the executable directly inside the bundled app directory via CLI) then you still need to set the 'resource prefix path' manually as described in the previous paragraph.
 
