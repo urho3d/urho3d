@@ -20,14 +20,98 @@
 # THE SOFTWARE.
 #
 
+if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
+    # Set project name
+    project (ExternalProject-PackageTool)
+
+    # Set minimum version
+    cmake_minimum_required (VERSION 2.8.6)
+
+    if (COMMAND cmake_policy)
+        cmake_policy (SET CMP0003 NEW)
+        if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
+            # INTERFACE_LINK_LIBRARIES defines the link interface
+            cmake_policy (SET CMP0022 NEW)
+        endif ()
+        if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
+            # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
+            cmake_policy (SET CMP0026 OLD)
+            # MACOSX_RPATH is enabled by default
+            cmake_policy (SET CMP0042 NEW)
+        endif ()
+    endif ()
+
+    # Set CMake modules search path
+    set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/CMake/Modules)
+
+    # Include Urho3D Cmake common module
+    include (Urho3D-CMake-common)
+
+    # Define additional source files
+    set (MINI_URHO_CPP_FILES
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Container/Allocator.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Container/HashBase.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Container/RefCounted.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Container/Str.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Container/VectorBase.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Context.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Mutex.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Object.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/ProcessUtils.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Profiler.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/StringUtils.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Thread.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Timer.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Variant.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/IO/Deserializer.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/IO/File.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/IO/FileSystem.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/IO/Log.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/IO/MemoryBuffer.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/IO/PackageFile.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/IO/Serializer.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Color.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Matrix3.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Matrix3x4.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Matrix4.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Quaternion.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Rect.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/StringHash.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Vector2.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Vector3.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Vector4.cpp
+    )
+
+    # MSVC does not do cross-compiling at the moment, so only force include using GCC/Clang approach
+    set_property (SOURCE ${MINI_URHO_CPP_FILES} APPEND_STRING PROPERTY COMPILE_FLAGS "-include Urho3D.h")
+
+    # Check existence of stdint.h for LibCpuId
+    include (CheckIncludeFiles)
+    CHECK_INCLUDE_FILES (stdint.h HAVE_STDINT_H)
+    if (HAVE_STDINT_H)
+        add_definitions (-DHAVE_STDINT_H)
+    endif ()
+
+    # Setup SDK-like include dir in the build tree for building the mini-urho
+    set (DEST_INCLUDE_DIR include/Urho3D)
+    file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
+
+    # Add dependency targets
+    add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/LibCpuId host/LibCpuId)
+    add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/LZ4 host/LZ4)
+    add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL host/SDL)
+    set (INCLUDE_DIRS ${BAKED_CMAKE_BINARY_DIR}/include/Urho3D ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
+    set (LIBS LibCpuId SDL)
+endif ()
+
 # Define target name
 set (TARGET_NAME PackageTool)
 
 # Define source files
-define_source_files ()
+define_source_files (EXTRA_CPP_FILES ${MINI_URHO_CPP_FILES})
 
 # Define dependency libs
-set (LIBS LZ4)
+list (APPEND LIBS LZ4)
 
 # Setup target
 if (APPLE)

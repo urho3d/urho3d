@@ -42,18 +42,13 @@ if (NOT EXISTS ${EMSCRIPTEN_ROOT_PATH}/emcc)
     message (FATAL_ERROR "Could not find Emscripten cross compilation tool. "
         "Use EMSCRIPTEN_ROOT_PATH environment variable or build option to specify the location of the toolchain.")
 endif ()
-
 if (CMAKE_HOST_WIN32)
-    set(EMCC_SUFFIX ".bat")
-else()
-    set(EMCC_SUFFIX "")
-endif()
-
-set (CMAKE_C_COMPILER   ${EMSCRIPTEN_ROOT_PATH}/emcc${EMCC_SUFFIX}     CACHE PATH "C compiler")
-set (CMAKE_CXX_COMPILER ${EMSCRIPTEN_ROOT_PATH}/em++${EMCC_SUFFIX}     CACHE PATH "C++ compiler")
-set (CMAKE_AR           ar     CACHE PATH "archive")
-#todo:YWT: set (CMAKE_AR           ${EMSCRIPTEN_ROOT_PATH}/emar${EMCC_SUFFIX}     CACHE PATH "archive")
-set (CMAKE_RANLIB       ${EMSCRIPTEN_ROOT_PATH}/emranlib${EMCC_SUFFIX} CACHE PATH "ranlib")
+    set (TOOL_EXT .bat)
+endif ()
+set (CMAKE_C_COMPILER   ${EMSCRIPTEN_ROOT_PATH}/emcc${TOOL_EXT}     CACHE PATH "C compiler")
+set (CMAKE_CXX_COMPILER ${EMSCRIPTEN_ROOT_PATH}/em++${TOOL_EXT}     CACHE PATH "C++ compiler")
+set (CMAKE_AR           ${EMSCRIPTEN_ROOT_PATH}/emar${TOOL_EXT}     CACHE PATH "archive")
+set (CMAKE_RANLIB       ${EMSCRIPTEN_ROOT_PATH}/emranlib${TOOL_EXT} CACHE PATH "ranlib")
 
 # specify the system root
 if (NOT EMSCRIPTEN_SYSROOT)
@@ -107,25 +102,13 @@ set (CMAKE_DL_LIBS)
 # to abort if linking results in any undefined symbols. The CMake detection mechanism depends on the undefined symbol error to be raised.
 set (CMAKE_REQUIRED_FLAGS "-s ERROR_ON_UNDEFINED_SYMBOLS=1")
 
-# We would prefer to specify a standard set of Clang+Emscripten-friendly common convention for suffix files, especially for CMake executable files,
-# but if these are adjusted, ${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake will fail, since it depends on being able to compile output files with predefined names.
-#set (CMAKE_LINK_LIBRARY_SUFFIX "")
-#set (CMAKE_STATIC_LIBRARY_PREFIX "")
-#set (CMAKE_STATIC_LIBRARY_SUFFIX .bc)
-#set (CMAKE_SHARED_LIBRARY_PREFIX "")
-#set (CMAKE_SHARED_LIBRARY_SUFFIX .bc)
-set (CMAKE_EXECUTABLE_SUFFIX .js)
-#set (CMAKE_FIND_LIBRARY_PREFIXES "")
-#set (CMAKE_FIND_LIBRARY_SUFFIXES .bc)
-
 # Use response files on Windows host
 if (CMAKE_HOST_WIN32)
     foreach (lang C CXX)
         foreach (cat LIBRARIES OBJECTS INCLUDES)
             set (CMAKE_${lang}_USE_RESPONSE_FILE_FOR_${cat} 1)
         endforeach ()
-        set (CMAKE_${lang}_RESPONSE_FILE_LINK_FLAG @)
-        set (CMAKE_${lang}_CREATE_STATIC_LIBRARY <CMAKE_AR> rc <TARGET> <LINK_FLAGS> <OBJECTS>)
+        set (CMAKE_${lang}_CREATE_STATIC_LIBRARY "<CMAKE_AR> cr <TARGET> <LINK_FLAGS> <OBJECTS>")
     endforeach ()
 endif ()
 

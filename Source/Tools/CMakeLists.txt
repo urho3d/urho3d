@@ -32,10 +32,25 @@ if (NOT EMSCRIPTEN)
     add_subdirectory (Urho3DPlayer)
 endif ()
 
+# Build PackageTool using host compiler toolchain
+if ((CMAKE_CROSSCOMPILING OR IOS) AND URHO3D_PACKAGING)
+    # When cross-compiling, build the host tool as external project
+    include (ExternalProject)
+    if (IOS)
+        # For iOS target, its host is MacOSX; Also workaround a known CMake/Xcode generator bug which prevents it from installing binaries correctly
+        set (OSX_HOST -DCMAKE_OSX_SYSROOT=macosx BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
+    endif ()
+    ExternalProject_Add(PackageTool
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Tools/PackageTool
+        CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DBAKED_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} ${OSX_HOST}
+    )
+endif ()
+
+# All tools must be natively built and output to bin/tool subdir to differentiate them from platform-specific binaries in the bin directory
+set_output_directories (${CMAKE_BINARY_DIR}/bin/tool RUNTIME PDB)
+
 # Do not build tools for iOS, Android, and Emscripten regardless of the URHO3D_TOOLS build option
 if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN AND URHO3D_TOOLS)
-    # All tools must be natively built and output to bin/tool subdir to differentiate them from platform-specific binaries in the bin directory
-    set_output_directories (${CMAKE_BINARY_DIR}/bin/tool RUNTIME PDB)
     # Urho3D tools
     add_subdirectory (AssetImporter)
     add_subdirectory (OgreImporter)
@@ -45,4 +60,7 @@ if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN AND URHO3D_TOOLS)
     if (URHO3D_ANGELSCRIPT)
         add_subdirectory (ScriptCompiler)
     endif ()
+elseif ((NOT CMAKE_CROSSCOMPILING AND NOT IOS) AND URHO3D_PACKAGING)
+    # PackageTool target is required but we are not cross-compiling, so build it as per normal
+    add_subdirectory (PackageTool)
 endif ()

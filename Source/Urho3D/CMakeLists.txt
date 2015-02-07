@@ -158,10 +158,10 @@ else ()
     set (OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 endif ()
 set_output_directories (${OUTPUT_PATH} ARCHIVE LIBRARY)
- 
+
 # Setup target
 setup_library (${URHO3D_LIB_TYPE})
-if (NOT ANDROID)
+if (NOT ANDROID AND NOT EMSCRIPTEN)
     file (READ .soversion SOVERSION)
     string (STRIP ${SOVERSION} SOVERSION)
     string (REGEX MATCH "([^.]+)\\.([^.]+)\\.(.+)" MATCHED ${SOVERSION})
@@ -216,14 +216,45 @@ if (NOT XCODE AND NOT MSVC)
     if (NOT APPLE)
         set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--no-whole-archive)
     endif ()
-    if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)    # GCC ar does not take archives directly as input like Apple libtool, however, it can be scripted to do so
+    if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
         if (APPLE)
+            # Apple libtool takes archives directly as input
             add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                 COMMAND mv $<TARGET_FILE:${TARGET_NAME}>{,.engine}
                 COMMAND libtool -static $<TARGET_FILE:${TARGET_NAME}>.engine ${ARCHIVES} -o $<TARGET_FILE:${TARGET_NAME}>
                 COMMAND rm $<TARGET_FILE:${TARGET_NAME}>.engine
                 COMMENT "Merging all archives into a single static library using libtool")
+        elseif (EMSCRIPTEN)
+            # Emscripten emar (llvm-ar) neither takes archives directly as input nor supports MRI-style script, so do it the hard way by first extracting the object (bitcode) files and appending them to final archive
+            if (CMAKE_HOST_WIN32)
+                add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E remove_directory archives
+                    COMMAND ${CMAKE_COMMAND} -E echo "Merging all archives into a single static library using emar.bat")
+                foreach (ARCHIVE ${ARCHIVES})
+                    # Merge per library because Window cmd shell does not handle long argument list
+                    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory archives)
+                    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                        COMMAND ${CMAKE_AR} x ${ARCHIVE}
+                        COMMAND ${CMAKE_COMMAND} -E echo_append "\\\"${CMAKE_AR}\\\"" q $<TARGET_FILE:${TARGET_NAME}>" " >merge.bat
+                        COMMAND for /F %%i in ('dir /B') do ${CMAKE_COMMAND} -E echo_append %%i" " >>merge.bat
+                        COMMAND merge.bat WORKING_DIRECTORY archives)
+                    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E remove_directory archives)
+                endforeach ()
+                add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_RANLIB} $<TARGET_FILE:${TARGET_NAME}>)
+            else ()
+                add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E remove_directory archives
+                    COMMAND ${CMAKE_COMMAND} -E make_directory archives COMMENT "Merging all archives into a single static library using emar")
+                foreach (ARCHIVE ${ARCHIVES})
+                    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_AR} x ${ARCHIVE} WORKING_DIRECTORY archives)
+                endforeach ()
+                add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_AR} q $<TARGET_FILE:${TARGET_NAME}> `ls -1` WORKING_DIRECTORY archives)
+                add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                    COMMAND ${CMAKE_RANLIB} $<TARGET_FILE:${TARGET_NAME}>
+                    COMMAND ${CMAKE_COMMAND} -E remove_directory archives)
+            endif ()
         else ()
+            # GCC ar does not take archives directly as input like Apple libtool, however, it can be scripted to do so
             add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:${TARGET_NAME}> $<TARGET_FILE:${TARGET_NAME}>.engine
                 COMMAND echo CREATE $<TARGET_FILE:${TARGET_NAME}> >script.ar
