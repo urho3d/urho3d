@@ -58,8 +58,6 @@ enum Intersection
 
 /// Check whether two floating point values are equal within accuracy.
 inline bool Equals(float lhs, float rhs) { return lhs + M_EPSILON >= rhs && lhs - M_EPSILON <= rhs; }
-/// Check whether a floating point value is NaN.
-inline bool IsNaN(float value) { return value != value; }
 /// Linear interpolation between two float values.
 inline float Lerp(float lhs, float rhs, float t) { return lhs * (1.0f - t) + rhs * t; }
 /// Return the smaller of two floats.
@@ -70,6 +68,18 @@ inline float Max(float lhs, float rhs) { return lhs > rhs ? lhs : rhs; }
 inline float Abs(float value) { return value >= 0.0f ? value : -value; }
 /// Return the sign of a float (-1, 0 or 1.)
 inline float Sign(float value) { return value > 0.0f ? 1.0f : (value < 0.0f ? -1.0f : 0.0f); }
+
+/// Check whether a floating point value is NaN.
+/// Use a workaround for GCC, see https://github.com/urho3d/Urho3D/issues/655
+#ifndef __GNUC__
+inline bool IsNaN(float value) { return value != value; }
+#else
+inline bool IsNaN(float value)
+{
+    unsigned u = *(unsigned*)(&value);
+    return (u & 0x7fffffff) > 0x7f800000;
+}
+#endif
 
 /// Clamp a float to a range.
 inline float Clamp(float value, float min, float max)
