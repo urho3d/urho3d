@@ -37,8 +37,11 @@
 namespace Urho3D
 {
 
-#ifdef IOS
-// Code for supporting SDL_iPhoneSetAnimationCallback
+#if defined(IOS) || defined(EMSCRIPTEN)
+// Code for supporting SDL_iPhoneSetAnimationCallback() and emscripten_set_main_loop_arg()
+#if defined(EMSCRIPTEN)
+#include <emscripten.h>
+#endif
 void RunFrame(void* data)
 {
     Application* instance = reinterpret_cast<Application*>(data);
@@ -46,19 +49,6 @@ void RunFrame(void* data)
 }
 #endif
 
-#if defined(EMSCRIPTEN)
-#include <emscripten.h>
-// REVISIT: it seems there should only be one instance of Application
-// and it's needed here as there's no way to pass it along with a callback
-// for emscripten_set_main_loop() so just store a static pointer here for now
-static Application *emInstance = 0;
-void RunFrame()
-{
-    if (emInstance)
-        emInstance->GetSubsystem<Engine>()->RunFrame();
-}
-#endif
-    
 Application::Application(Context* context) :
     Object(context),
     exitCode_(EXIT_SUCCESS)
@@ -67,7 +57,7 @@ Application::Application(Context* context) :
 
     // Create the Engine, but do not initialize it yet. Subsystems except Graphics & Renderer are registered at this point
     engine_ = new Engine(context);
-    
+
     // Subscribe to log messages so that can show errors if ErrorExit() is called with empty message
     SubscribeToEvent(E_LOGMESSAGE, HANDLER(Application, HandleLogMessage));
 }
@@ -81,7 +71,7 @@ int Application::Run()
         Setup();
         if (exitCode_)
             return exitCode_;
-		
+
         if (!engine_->Initialize(engineParameters_))
         {
             ErrorExit();
@@ -103,14 +93,11 @@ int Application::Run()
         #else
         #if defined(IOS)
         SDL_iPhoneSetAnimationCallback(GetSubsystem<Graphics>()->GetImpl()->GetWindow(), 1, &RunFrame, this);
-        #else
-        // EMSCRIPTEN
-        emInstance = this; 
-        emscripten_set_main_loop(RunFrame, 0, 1);
-	
+        #elif defined(EMSCRIPTEN)
+        emscripten_set_main_loop_arg(RunFrame, this, 0, 1);
         #endif
         #endif
-        
+
         return exitCode_;
 #if !defined(EMSCRIPTEN)
     }
@@ -142,7 +129,7 @@ void Application::ErrorExit(const String& message)
 void Application::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 {
     using namespace LogMessage;
-    
+
     if (eventData[P_LEVEL].GetInt() == LOG_ERROR)
     {
         // Strip the timestamp if necessary
@@ -150,7 +137,7 @@ void Application::HandleLogMessage(StringHash eventType, VariantMap& eventData)
         unsigned bracketPos = error.Find(']');
         if (bracketPos != String::NPOS)
             error = error.Substring(bracketPos + 2);
-        
+
         startupErrors_ += error + "\n";
     }
 }

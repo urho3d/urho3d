@@ -270,7 +270,7 @@ String GetConsoleInput()
     // When we are running automated tests, reading the console may block. Just return empty in that case
     return ret;
     #endif
-    
+
     #ifdef WIN32
     HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
     HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -348,6 +348,8 @@ String GetPlatform()
     return "Mac OS X";
     #elif defined(RPI)
     return "Raspberry Pi";
+    #elif defined(EMSCRIPTEN)
+    return "HTML5";
     #elif defined(__linux__)
     return "Linux";
     #else

@@ -43,6 +43,7 @@
 #ifdef EMSCRIPTEN
 #include <emscripten/html5.h>
 #endif
+
 #include "../DebugNew.h"
 
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char *name);
@@ -85,9 +86,9 @@ UIElement* TouchState::GetTouchedElement()
  * Mouse Input:
  * - The OS mouse cursor position can't be set.
  * - The mouse can be trapped within play area via 'PointerLock API', which requires a request and interaction between the user and browser.
- *   - To request mouse lock, call SetMouseMode(MM_RELATIVE). The E_MOUSEMODECHANGED event will be sent if/when the user confirms the request.
- *   - The user can press 'escape' key and browser will force user out of pointer lock. Urho will send the E_MOUSEMODECHANGED event.
- *   - SetMouseMode(MM_ABSOLUTE) will leave pointer lock.
+ * - To request mouse lock, call SetMouseMode(MM_RELATIVE). The E_MOUSEMODECHANGED event will be sent if/when the user confirms the request.
+ * - The user can press 'escape' key and browser will force user out of pointer lock. Urho will send the E_MOUSEMODECHANGED event.
+ * - SetMouseMode(MM_ABSOLUTE) will leave pointer lock.
  * - MM_WRAP is unsupported.
  *
  * Touch Input:
@@ -109,22 +110,15 @@ public:
     /// Send request to user to gain pointer lock.
     void RequestPointerLock();
     void ExitPointerLock();
-
-private:
-    /// Instance of Input subsystem that constructed this instance.
-    Input* inputInst;
 };
 
 EmscriptenInput::EmscriptenInput(Input* inputInst)
 {
-    inputInst = inputInst;
-    emscripten_set_pointerlockchange_callback(
-        NULL, (void*)inputInst, false, EmscriptenInput::PointerLockCallback);
+    emscripten_set_pointerlockchange_callback(NULL, (void*)inputInst, false, EmscriptenInput::PointerLockCallback);
 
     // Handle focus changes:
     emscripten_set_blur_callback(NULL, (void*)inputInst, false, EmscriptenInput::LoseFocus);
     emscripten_set_focus_callback(NULL, (void*)inputInst, false, EmscriptenInput::GainFocus);
-
 }
 
 void EmscriptenInput::RequestPointerLock()
@@ -220,7 +214,7 @@ Input::Input(Context* context) :
     SubscribeToEvent(E_SCREENMODE, HANDLER(Input, HandleScreenMode));
 
     #ifdef EMSCRIPTEN
-    emscriptenInput = new EmscriptenInput(this);
+    emscriptenInput_ = new EmscriptenInput(this);
     #endif
 
     // Try to initialize right now, but skip if screen mode is not yet set
@@ -230,7 +224,8 @@ Input::Input(Context* context) :
 Input::~Input()
 {
     #ifdef EMSCRIPTEN
-    delete emscriptenInput;
+    delete emscriptenInput_;
+    emscriptenInput_ = 0;
     #endif
 }
 
@@ -518,7 +513,7 @@ void Input::SetMouseMode(MouseMode mode)
             ResetMouseVisible();
 
             #ifdef EMSCRIPTEN
-            emscriptenInput->ExitPointerLock();
+            emscriptenInput_->ExitPointerLock();
             #endif
 
             SDL_SetWindowGrab(window, SDL_FALSE);
@@ -558,7 +553,7 @@ void Input::SetMouseMode(MouseMode mode)
                 #else
                 // Defer mouse mode change to PointerLock callback
                 mouseMode_ = previousMode;
-                emscriptenInput->RequestPointerLock();
+                emscriptenInput_->RequestPointerLock();
                 #endif
 
             }

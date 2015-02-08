@@ -370,7 +370,7 @@ private:
     bool initialized_;
 #ifdef EMSCRIPTEN
     /// Emscripten Input glue instance
-    EmscriptenInput* emscriptenInput;
+    EmscriptenInput* emscriptenInput_;
 #endif
 };
 

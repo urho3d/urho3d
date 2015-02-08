@@ -83,7 +83,7 @@ Engine::Engine(Context* context) :
     timeStep_(0.0f),
     timeStepSmoothing_(2),
     minFps_(10),
-#if defined(ANDROID) || defined(IOS) || defined(RPI) || defined(EMSCRIPTEN)
+    #if defined(ANDROID) || defined(IOS) || defined(RPI) || defined(EMSCRIPTEN)
     maxFps_(60),
     maxInactiveFps_(10),
     pauseMinimized_(true),
@@ -128,7 +128,7 @@ Engine::Engine(Context* context) :
 #ifdef URHO3D_PHYSICS
     RegisterPhysicsLibrary(context_);
 #endif
-    
+
 #ifdef URHO3D_NAVIGATION
     RegisterNavigationLibrary(context_);
 #endif
@@ -254,7 +254,7 @@ bool Engine::Initialize(const VariantMap& parameters)
         else
             LOGDEBUGF("Skip specified resource package '%s' as it does not exist, check the documentation on how to set the 'resource prefix path'", resourcePackages[i].CString());
     }
-    
+
     // Add auto load folders. Prioritize these (if exist) before the default folders
     for (unsigned i = 0; i < autoLoadPaths.Size(); ++i)
     {
@@ -343,7 +343,7 @@ bool Engine::Initialize(const VariantMap& parameters)
         renderer->SetTextureQuality(GetParameter(parameters, "TextureQuality", QUALITY_HIGH).GetInt());
         renderer->SetTextureFilterMode((TextureFilterMode)GetParameter(parameters, "TextureFilterMode", FILTER_TRILINEAR).GetInt());
         renderer->SetTextureAnisotropy(GetParameter(parameters, "TextureAnisotropy", 4).GetInt());
-        
+
         if (GetParameter(parameters, "Sound", true).GetBool())
         {
             GetSubsystem<Audio>()->SetMode(
@@ -523,12 +523,12 @@ void Engine::DumpResources(bool dumpFileName)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     const HashMap<StringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
     LOGRAW("\n");
-    
+
     if (dumpFileName)
     {
         LOGRAW("Used resources:\n");
     }
-    
+
     for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
         i != resourceGroups.End(); ++i)
     {
