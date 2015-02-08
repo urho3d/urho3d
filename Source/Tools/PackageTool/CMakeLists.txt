@@ -83,7 +83,7 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     )
 
     # MSVC does not do cross-compiling at the moment, so only force include using GCC/Clang approach
-    set_property (SOURCE ${MINI_URHO_CPP_FILES} APPEND_STRING PROPERTY COMPILE_FLAGS "-include Urho3D.h")
+    set_property (SOURCE ${MINI_URHO_CPP_FILES} APPEND_STRING PROPERTY COMPILE_FLAGS " -include Urho3D.h")  # Need a leading space for appending
 
     # Check existence of stdint.h for LibCpuId
     include (CheckIncludeFiles)
@@ -100,7 +100,7 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/LibCpuId host/LibCpuId)
     add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/LZ4 host/LZ4)
     add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL host/SDL)
-    set (INCLUDE_DIRS ${BAKED_CMAKE_BINARY_DIR}/include/Urho3D ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
+    set (INCLUDE_DIRS ${BAKED_CMAKE_BINARY_DIR}/include ${BAKED_CMAKE_BINARY_DIR}/include/Urho3D ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
     set (LIBS LibCpuId SDL)
 endif ()
 
