@@ -83,7 +83,7 @@ Engine::Engine(Context* context) :
     timeStep_(0.0f),
     timeStepSmoothing_(2),
     minFps_(10),
-    #if defined(ANDROID) || defined(IOS) || defined(RPI)
+#if defined(ANDROID) || defined(IOS) || defined(RPI) || defined(EMSCRIPTEN)
     maxFps_(60),
     maxInactiveFps_(10),
     pauseMinimized_(true),

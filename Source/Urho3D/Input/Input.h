@@ -120,9 +120,16 @@ struct JoystickState
     PODVector<int> hats_;
 };
 
+#ifdef EMSCRIPTEN
+class EmscriptenInput;
+#endif
+
 /// %Input subsystem. Converts operating system window messages to input state and events.
 class URHO3D_API Input : public Object
 {
+    #ifdef EMSCRIPTEN
+    friend class EmscriptenInput;
+    #endif
     OBJECT(Input);
 
 public:
@@ -138,7 +145,7 @@ public:
     /// Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window. Mouse visiblility event can be suppressed-- this also recalls any unsuppressed SetMouseVisible which can be returned by ResetMouseVisible().
     void SetMouseVisible(bool enable, bool suppressEvent = false);
     /// Reset last mouse visibilty that was not suppressed in SetMouseVisible.
-    void ResetMouseVisible() { SetMouseVisible(lastMouseVisible_, true); }
+    void ResetMouseVisible();
     /// Set whether the mouse is currently being grabbed by an operation.
     void SetMouseGrabbed(bool grab);
     /// Set the mouse mode.
@@ -288,6 +295,10 @@ private:
     void SetMouseButton(int button, bool newState);
     /// Handle a key change.
     void SetKey(int key, int scancode, unsigned raw, bool newState);
+    #ifdef EMSCRIPTEN
+    void SetMouseVisibleEmscripten(bool enable);
+    void SetMouseModeEmscripten(MouseMode mode);
+    #endif
     /// Handle mousewheel change.
     void SetMouseWheel(int delta);
     /// Internal function to set the mouse cursor position.
@@ -357,6 +368,10 @@ private:
     bool suppressNextMouseMove_;
     /// Initialized flag.
     bool initialized_;
+#ifdef EMSCRIPTEN
+    /// Emscripten Input glue instance
+    EmscriptenInput* emscriptenInput;
+#endif
 };
 
 }
