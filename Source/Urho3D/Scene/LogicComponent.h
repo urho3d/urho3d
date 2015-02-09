@@ -52,7 +52,7 @@ class URHO3D_API LogicComponent : public Component
     virtual void Start() {}
     /// Called before the first update. At this point all other components of the node should exist. Will also be called if update events are not wanted; in that case the event is immediately unsubscribed afterward.
     virtual void DelayedStart() {}
-    /// Called when the component is detached from a scene node, usually on destruction.
+    /// Called when the component is detached from a scene node, usually on destruction. Note that you will no longer have access to the node and scene at that point.
     virtual void Stop() {}
     /// Called on scene update, variable timestep.
     virtual void Update(float timeStep);

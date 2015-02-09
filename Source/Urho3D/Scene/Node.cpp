@@ -1777,8 +1777,6 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
 
 void Node::RemoveComponent(Vector<SharedPtr<Component> >::Iterator i)
 {
-    WeakPtr<Component> componentWeak(*i);
-
     // Send node change event. Do not send when already being destroyed
     if (Refs() > 0 && scene_)
     {
@@ -1795,11 +1793,8 @@ void Node::RemoveComponent(Vector<SharedPtr<Component> >::Iterator i)
     RemoveListener(*i);
     if (scene_)
         scene_->ComponentRemoved(*i);
+    (*i)->SetNode(0);
     components_.Erase(i);
-
-    // If the component is still referenced elsewhere, reset its node pointer now
-    if (componentWeak)
-        componentWeak->SetNode(0);
 }
 
 void Node::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData)
