@@ -369,8 +369,12 @@ private:
     /// Initialized flag.
     bool initialized_;
 #ifdef EMSCRIPTEN
-    /// Emscripten Input glue instance
+    /// Emscripten Input glue instance.
     EmscriptenInput* emscriptenInput_;
+    /// Flag used to detect mouse jump when exiting pointer lock.
+    bool emscriptenExitingPointerLock_;
+    /// Flag used to detect mouse jump on initial mouse click when entering pointer lock.
+    bool emscriptenEnteredPointerLock_;
 #endif
 };
 

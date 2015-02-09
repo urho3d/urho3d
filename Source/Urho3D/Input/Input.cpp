@@ -87,6 +87,7 @@ UIElement* TouchState::GetTouchedElement()
  * - The OS mouse cursor position can't be set.
  * - The mouse can be trapped within play area via 'PointerLock API', which requires a request and interaction between the user and browser.
  * - To request mouse lock, call SetMouseMode(MM_RELATIVE). The E_MOUSEMODECHANGED event will be sent if/when the user confirms the request.
+ * NOTE: The request must be initiated by the user (eg: on mouse button down/up, key down/up).
  * - The user can press 'escape' key and browser will force user out of pointer lock. Urho will send the E_MOUSEMODECHANGED event.
  * - SetMouseMode(MM_ABSOLUTE) will leave pointer lock.
  * - MM_WRAP is unsupported.
@@ -110,10 +111,15 @@ public:
     /// Send request to user to gain pointer lock.
     void RequestPointerLock();
     void ExitPointerLock();
+
+private:
+    /// Instance of Input subsystem that constructed this instance.
+    Input* inputInst_;
 };
 
 EmscriptenInput::EmscriptenInput(Input* inputInst)
 {
+    inputInst_ = inputInst;
     emscripten_set_pointerlockchange_callback(NULL, (void*)inputInst, false, EmscriptenInput::PointerLockCallback);
 
     // Handle focus changes:
@@ -128,6 +134,7 @@ void EmscriptenInput::RequestPointerLock()
 
 void EmscriptenInput::ExitPointerLock()
 {
+    inputInst_->emscriptenExitingPointerLock_ = true;
     emscripten_exit_pointerlock();
 }
 
@@ -137,13 +144,12 @@ EM_BOOL EmscriptenInput::PointerLockCallback(int eventType, const EmscriptenPoin
     if (keyEvent->isActive > 0)
     {
         // Pointer Lock is now active
-        inputInst->SetMouseVisibleEmscripten(false);
+        inputInst->emscriptenEnteredPointerLock_ = true;
         inputInst->SetMouseModeEmscripten(MM_RELATIVE);
     }
     else
     {
         // Pointer Lock is now inactive
-        inputInst->SetMouseVisibleEmscripten(true);
         inputInst->SetMouseModeEmscripten(MM_ABSOLUTE);
     }
     return 1;
@@ -200,6 +206,10 @@ Input::Input(Context* context) :
     lastMouseVisible_(false),
     mouseGrabbed_(false),
     mouseMode_(MM_ABSOLUTE),
+#ifdef EMSCRIPTEN
+    emscriptenExitingPointerLock_(false),
+    emscriptenEnteredPointerLock_(false),
+#endif
     lastVisibleMousePosition_(MOUSE_POSITION_OFFSCREEN),
     touchEmulation_(false),
     inputFocus_(false),
@@ -325,6 +335,16 @@ void Input::Update()
     #else
     if (!window)
         return;
+
+    if (emscriptenExitingPointerLock_)
+    {
+        // Suppress mouse jump when exiting Pointer Lock
+        IntVector2 mousePosition = GetMousePosition();
+        mouseMove_ = IntVector2::ZERO;
+        lastMousePosition_ = lastVisibleMousePosition_;
+        emscriptenExitingPointerLock_ = false;
+        return;
+    }
     #endif
 
     // Check for relative mode mouse move
@@ -485,6 +505,15 @@ void Input::SetMouseVisibleEmscripten(bool enable)
 void Input::SetMouseModeEmscripten(MouseMode mode)
 {
     mouseMode_ = mode;
+
+    if (mode == MM_RELATIVE)
+    {
+        SetMouseVisibleEmscripten(false);
+    }
+    else
+    {
+        ResetMouseVisible();
+    }
     suppressNextMouseMove_ = true;
 
     VariantMap& eventData = GetEventDataMap();
@@ -509,10 +538,10 @@ void Input::SetMouseMode(MouseMode mode)
         // Handle changing away from previous mode
         if (previousMode == MM_RELATIVE)
         {
+            #ifndef EMSCRIPTEN
             /// \todo Use SDL_SetRelativeMouseMode() for MM_RELATIVE mode
             ResetMouseVisible();
-
-            #ifdef EMSCRIPTEN
+            #else
             emscriptenInput_->ExitPointerLock();
             #endif
 
@@ -1329,6 +1358,18 @@ void Input::SetMouseButton(int button, bool newState)
     {
         if (!inputFocus_ && newState && button == MOUSEB_LEFT)
             focusedThisFrame_ = true;
+    }
+#endif
+
+#ifdef EMSCRIPTEN
+    if (emscriptenEnteredPointerLock_)
+    {
+        // Suppress mouse jump on initial Pointer Lock
+        IntVector2 mousePosition = GetMousePosition();
+        lastMousePosition_ = mousePosition;
+        mouseMove_ = IntVector2::ZERO;
+        suppressNextMouseMove_ = true;
+        emscriptenEnteredPointerLock_ = false;
     }
 #endif
 
