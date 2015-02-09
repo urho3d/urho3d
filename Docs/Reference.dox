@@ -2542,6 +2542,26 @@ RampGenerator <output file> <width> <power> [dimensions]
 
 The output is saved in PNG format. The power parameter is fed into the pow() function to determine ramp shape; higher value gives more brightness and more abrupt fade at the edge.
 
+\section Tools_SpritePacker SpritePacker
+
+Takes a series of images and packs them into a single texture and creates a sprite sheet xml file.
+
+Usage:
+\verbatim
+SpritePacker -options <input file> <input file> <output png file>
+Options:
+    -h Shows this help message.
+    -px Adds x pixels of padding per image to width.
+    -py Adds y pixels of padding per image to height.
+    -ox Adds x pixels to the horizontal position per image.
+    -oy Adds y pixels to the horizontal position per image.
+    -frameHeight Sets a fixed height for image and centers within frame.
+    -frameWidth Sets a fixed width for image and centers within frame.
+    -trim Trims excess transparent space from individual images offsets by frame size.
+    -xml 'path' Generates an SpriteSheet xml file at path.
+    -debug Draws allocation boxes on sprite.
+\endverbatim
+
 \section Tools_ScriptCompiler ScriptCompiler
 
 Compiles AngelScript file(s) to binary bytecode for faster loading. Can also dump the %Script API in Doxygen format.

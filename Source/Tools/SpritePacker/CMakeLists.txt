@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2014 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,27 +20,13 @@
 # THE SOFTWARE.
 #
 
-# Set project name
-project (Urho3D-Tools)
+# Define target name
+set (TARGET_NAME SpritePacker)
 
-# Find Urho3D library
-find_package (Urho3D REQUIRED)
-include_directories (${URHO3D_INCLUDE_DIRS})
+# Define source files
+define_source_files ()
 
-# Urho3DPlayer target is rather special, although it is here, it is not a tool because it builds into platform-specific binary
-add_subdirectory (Urho3DPlayer)
+include_directories(../../ThirdParty/STB)
 
-# Do not build tools for iOS and Android regardless of the URHO3D_TOOLS build option
-if (NOT IOS AND NOT ANDROID AND URHO3D_TOOLS)
-    # All tools must be natively built and output to bin/tool subdir to differentiate them from platform-specific binaries in the bin directory
-    set_output_directories (${CMAKE_BINARY_DIR}/bin/tool RUNTIME PDB)
-    # Urho3D tools
-    add_subdirectory (AssetImporter)
-    add_subdirectory (OgreImporter)
-    add_subdirectory (PackageTool)
-    add_subdirectory (RampGenerator)
-    add_subdirectory (SpritePacker)
-    if (URHO3D_ANGELSCRIPT)
-        add_subdirectory (ScriptCompiler)
-    endif ()
-endif ()
+# Setup target
+setup_executable ()
