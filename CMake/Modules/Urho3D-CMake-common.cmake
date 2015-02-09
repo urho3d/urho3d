@@ -705,7 +705,7 @@ macro (setup_ios_linker_flags LINKER_FLAGS)
     set (${LINKER_FLAGS} "${${LINKER_FLAGS}} -framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
 endmacro ()
 
-# Macro for setting up linker flags for Emscripten cross-compiling build
+# Macro for setting up linker flags for Emscripten build
 macro (setup_emscripten_linker_flags LINKER_FLAGS)
     if (EMSCRIPTEN_ALLOW_MEMORY_GROWTH)
         set (MEMORY_LINKER_FLAGS "-s ALLOW_MEMORY_GROWTH=1")
@@ -734,16 +734,20 @@ macro (setup_main_executable)
         endforeach ()
     endif ()
     if (URHO3D_PACKAGING AND RESOURCE_DIRS)
+        # Populate all the variables required by resource packaging
         foreach (DIR ${RESOURCE_DIRS})
             get_filename_component (NAME ${DIR} NAME)
             set (NAME ${NAME}.pak)
-            set (PATHNAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${NAME})
-            list (APPEND RESOURCE_PAKS ${PATHNAME})
-            list (APPEND PACKAGING_COMMANDS COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tool/PackageTool ${DIR} ${PATHNAME} -c -q)
+            set (RESOURCE_${DIR}_PATHNAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${NAME})
+            list (APPEND RESOURCE_PAKS ${RESOURCE_${DIR}_PATHNAME})
             if (EMSCRIPTEN)
-                set (PRELOAD_FLAGS "${PRELOAD_FLAGS} --preload-file ${PATHNAME}@/${NAME}")
+                set (PRELOAD_FLAGS "${PRELOAD_FLAGS} --preload-file ${RESOURCE_${DIR}_PATHNAME}@/${NAME}")
             endif ()
         endforeach ()
+        set (PACKAGING_DEP DEPENDS PackageTool)
+        set (PACKAGING_COMMENT " and packaging")
+        # The *.pak will be generated during build time, suppress error during CMake configuration/generation time
+        set_property (SOURCE ${RESOURCE_PAKS} PROPERTY GENERATED TRUE)
     endif ()
     if (XCODE)
         if (NOT RESOURCE_FILES)
@@ -849,48 +853,43 @@ macro (setup_main_executable)
         endif ()
     endif ()
 
-    # Define a custom output command to generate the resource paks on the fly
-    if (URHO3D_PACKAGING AND RESOURCE_PAKS)
-        add_custom_command (OUTPUT ${RESOURCE_PAKS}
-            COMMAND ${PACKAGING_COMMANDS}
-            DEPENDS PackageTool ${RESOURCE_DIRS}
-            COMMENT "Packaging resource directories")
-    endif ()
-
-    # Define a custom target to check for resource modification
+    # Define a custom target for resource modification checking and resource packaging (if enabled)
     if ((EXE_TYPE STREQUAL MACOSX_BUNDLE OR URHO3D_PACKAGING) AND RESOURCE_DIRS)
         # Share a same custom target that checks for a same resource dirs list
         foreach (DIR ${RESOURCE_DIRS})
             string (MD5 MD5 ${DIR})
             set (MD5ALL ${MD5ALL}${MD5})
             if (CMAKE_HOST_WIN32)
-                # On Windows host, always assumes there are changes so resource dirs would be repackaged in each build
-                list (APPEND COMMANDS COMMAND ${CMAKE_COMMAND} -E touch ${DIR})
+                # On Windows host, always assumes there are changes so resource dirs would be repackaged in each build, however, still make sure the *.pak timestamp is not altered unnecessarily
+                if (URHO3D_PACKAGING)
+                    set (PACKAGING_COMMAND && echo Packaging ${DIR}... && ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tool/PackageTool ${DIR} ${RESOURCE_${DIR}_PATHNAME}.new -c -q && ${CMAKE_COMMAND} -E copy_if_different ${RESOURCE_${DIR}_PATHNAME}.new ${RESOURCE_${DIR}_PATHNAME} && ${CMAKE_COMMAND} -E remove ${RESOURCE_${DIR}_PATHNAME}.new)
+                endif ()
+                list (APPEND COMMANDS COMMAND ${CMAKE_COMMAND} -E touch ${DIR} ${PACKAGING_COMMAND})
             else ()
-                # On Unix-like hosts, detect the changes in the resource directory recursively so they are only repackaged or rebundled smartly
-                list (APPEND COMMANDS COMMAND echo Checking ${DIR}... && \(\( `find ${DIR} -newer ${DIR} |wc -l` \)\) && touch -cm ${DIR} || true)
+                # On Unix-like hosts, detect the changes in the resource directory recursively so they are only repackaged and/or rebundled (Xcode only) as necessary
+                if (URHO3D_PACKAGING)
+                    set (PACKAGING_COMMAND && echo Packaging ${DIR}... && ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tool/PackageTool ${DIR} ${RESOURCE_${DIR}_PATHNAME} -c -q)
+                    # Below output command generates the output when it is not yet exists: if [ ! -e ${${RESOURCE_${DIR}_PATHNAME} ]; then ${PACKAGING_COMMAND}; fi
+                    # Alas, it cannot be done as concisely because of a known CMake bug (http://www.cmake.org/Bug/view.php?id=9317) in its handling of bash '[' operator
+                    set (OUTPUT_COMMAND ls -1 ${RESOURCE_${DIR}_PATHNAME} >/dev/null 2>&1 || \( true ${PACKAGING_COMMAND} \))
+                else ()
+                    set (OUTPUT_COMMAND true)   # Nothing to output
+                endif ()
+                list (APPEND COMMANDS COMMAND echo Checking ${DIR}... && \(\( `find ${DIR} -newer ${DIR} |wc -l` \)\) && touch -cm ${DIR} ${PACKAGING_COMMAND} || ${OUTPUT_COMMAND})
             endif ()
         endforeach ()
         string (MD5 MD5ALL ${MD5ALL})
         # Ensure the resource check is done before building the main executable target
-        if (RESOURCE_CHECK_${MD5ALL} AND NOT RESOURCE_CHECK_${MD5ALL} STREQUAL TARGET_NAME AND TARGET ${RESOURCE_CHECK_${MD5ALL}})
-            add_dependencies (${TARGET_NAME} ${RESOURCE_CHECK_${MD5ALL}})
-        else ()
+        if (NOT RESOURCE_CHECK_${MD5ALL} OR NOT TARGET ${RESOURCE_CHECK_${MD5ALL}})
             set (RESOURCE_CHECK RESOURCE_CHECK)
             while (TARGET ${RESOURCE_CHECK})
                 string (RANDOM RANDOM)
                 set (RESOURCE_CHECK RESOURCE_CHECK_${RANDOM})
             endwhile ()
-            add_custom_target (${RESOURCE_CHECK} ALL ${COMMANDS} COMMENT "Checking for changes in the resource directories")
-            add_dependencies (${TARGET_NAME} ${RESOURCE_CHECK})
-            if (URHO3D_PACKAGING)
-                # When resource packaging is enabled, use the first main executable target as dependency,
-                # so that resource packaging would not be triggered multiple times unnecessarily in a concurrent build
-                set (RESOURCE_CHECK_${MD5ALL} ${TARGET_NAME} CACHE INTERNAL "Resource check hash map")
-            else ()
-                set (RESOURCE_CHECK_${MD5ALL} ${RESOURCE_CHECK} CACHE INTERNAL "Resource check hash map")
-            endif ()
+            add_custom_target (${RESOURCE_CHECK} ALL ${COMMANDS} ${PACKAGING_DEP} COMMENT "Checking${PACKAGING_COMMENT} resource directories")
+            set (RESOURCE_CHECK_${MD5ALL} ${RESOURCE_CHECK} CACHE INTERNAL "Resource check hash map")
         endif ()
+        add_dependencies (${TARGET_NAME} ${RESOURCE_CHECK_${MD5ALL}})
     endif ()
 endmacro ()
 

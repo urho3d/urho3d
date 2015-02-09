@@ -44,8 +44,8 @@ namespace Urho3D
 #endif
 void RunFrame(void* data)
 {
-    Application* instance = reinterpret_cast<Application*>(data);
-    instance->GetSubsystem<Engine>()->RunFrame();
+    Engine* engine = reinterpret_cast<Engine*>(data);
+    engine->RunFrame();
 }
 #endif
 
@@ -92,9 +92,9 @@ int Application::Run()
         // support calling the Stop() function, as the application will never stop manually
         #else
         #if defined(IOS)
-        SDL_iPhoneSetAnimationCallback(GetSubsystem<Graphics>()->GetImpl()->GetWindow(), 1, &RunFrame, this);
+        SDL_iPhoneSetAnimationCallback(GetSubsystem<Graphics>()->GetImpl()->GetWindow(), 1, &RunFrame, engine_);
         #elif defined(EMSCRIPTEN)
-        emscripten_set_main_loop_arg(RunFrame, this, 0, 1);
+        emscripten_set_main_loop_arg(RunFrame, engine_, 0, 1);
         #endif
         #endif
 
