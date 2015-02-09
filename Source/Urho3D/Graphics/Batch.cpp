@@ -370,7 +370,8 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
             case LIGHT_DIRECTIONAL:
                 {
                     Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
-                    unsigned numSplits = lightQueue_->shadowSplits_.Size();
+                    unsigned numSplits = Min(MAX_CASCADE_SPLITS, (int)lightQueue_->shadowSplits_.Size());
+
                     for (unsigned i = 0; i < numSplits; ++i)
                         CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, Vector3::ZERO);
                     
@@ -428,7 +429,8 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
             case LIGHT_DIRECTIONAL:
                 {
                     Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
-                    unsigned numSplits = lightQueue_->shadowSplits_.Size();
+                    unsigned numSplits = Min(MAX_CASCADE_SPLITS, (int)lightQueue_->shadowSplits_.Size());
+
                     for (unsigned i = 0; i < numSplits; ++i)
                     {
                         CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, isLightVolume ? cameraEffectivePos :
