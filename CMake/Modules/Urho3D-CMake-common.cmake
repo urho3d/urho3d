@@ -643,7 +643,13 @@ macro (check_source_files)
 endmacro ()
 
 # Macro for setting up a library target
+# Macro arguments:
 #  STATIC/SHARED/MODULE/EXCLUDE_FROM_ALL - see CMake help on add_library() command
+# CMake variables:
+#  SOURCE_FILES - list of source files for the target
+#  INCLUDE_DIRS - list of directories for include search path
+#  LIBS - list of dependent libraries that are built internally in the project
+#  ABSOLUTE_PATH_LIBS - list of dependent libraries that are external to the project
 macro (setup_library)
     check_source_files ()
     add_library (${TARGET_NAME} ${ARGN} ${SOURCE_FILES})
@@ -670,8 +676,14 @@ macro (setup_library)
 endmacro ()
 
 # Macro for setting up an executable target
+# Macro arguments:
 #  NODEPS - setup executable target without defining Urho3D dependency libraries
 #  WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL - see CMake help on add_executable() command
+# CMake variables:
+#  SOURCE_FILES - list of source files for the target
+#  INCLUDE_DIRS - list of directories for include search path
+#  LIBS - list of dependent libraries that are built internally in the project
+#  ABSOLUTE_PATH_LIBS - list of dependent libraries that are external to the project
 macro (setup_executable)
     # Parse extra arguments
     cmake_parse_arguments (ARG "NODEPS" "" "" ${ARGN})
@@ -715,10 +727,18 @@ macro (setup_emscripten_linker_flags LINKER_FLAGS)
     set (${LINKER_FLAGS} "${${LINKER_FLAGS}} ${MEMORY_LINKER_FLAGS} -s USE_SDL=2")    # Urho3D uses SDL2 so set it here instead of in the toolchain which potentially could be reused in other projects not using SDL2
 endmacro ()
 
-# Macro for setting up an executable target with resources to copy
+# Macro for setting up an executable target with resources to copy/package/bundle/preload
+# Macro arguments:
 #  NODEPS - setup executable target without defining Urho3D dependency libraries
 #  NOBUNDLE - do not use MACOSX_BUNDLE even when URHO3D_MACOSX_BUNDLE build option is enabled
 #  WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL - see CMake help on add_executable() command
+# CMake variables:
+#  RESOURCE_DIRS - list of resource directories for the target (will be packaged into *.pak when URHO3D_PACKAGING build option is set)
+#  RESOURCE_FILES - list of additional resource files for the target (will not be packaged into *.pak in any case)
+#  SOURCE_FILES - list of source files for the target
+#  INCLUDE_DIRS - list of directories for include search path
+#  LIBS - list of dependent libraries that are built internally in the project
+#  ABSOLUTE_PATH_LIBS - list of dependent libraries that are external to the project
 macro (setup_main_executable)
     # Parse extra arguments
     cmake_parse_arguments (ARG "NOBUNDLE;MACOSX_BUNDLE;WIN32" "" "" ${ARGN})

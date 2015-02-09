@@ -105,7 +105,6 @@ if (URHO3D_SAMPLES)
 endif ()
 
 # Urho3D extras
-# Do not build extras for iOS, Android, and Emscripten
-if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN AND URHO3D_EXTRAS)
+if (URHO3D_EXTRAS)
     add_subdirectory (Extras)
 endif ()

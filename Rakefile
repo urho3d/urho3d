@@ -173,6 +173,7 @@ task :ci do
   $build_options = "#{$build_options} -DANDROID=#{ENV['ANDROID']}" if ENV['ANDROID']
   $build_options = "#{$build_options} -DRPI=#{ENV['RPI']}" if ENV['RPI']
   $build_options = "#{$build_options} -DWIN32=#{ENV['WINDOWS']}" if ENV['WINDOWS']
+  $build_options = "#{$build_options} -DEMSCRIPTEN=#{ENV['EMSCRIPTEN']}" if ENV['EMSCRIPTEN']
   if ENV['XCODE']
     # xcodebuild
     xcode_ci

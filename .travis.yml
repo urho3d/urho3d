@@ -1,0 +1,45 @@
+#
+# Copyright (c) 2008-2015 the Urho3D project.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
+language: objective-c
+env:
+  global:
+    - secure: AfoHc5tpnYoI2TVGUeE9Xdru+15pd5N4YzO7EWvwmMnrHtNO3retrmKOGpnIyfbP2BeWRTW/z+BI4G0RrfvubjHu2us4wRh6Jq8+UZohBBkM+ldTnyqYHX97q+6ScWBWZGg7dpthd1x/7fmds8dSRzustHUhI7RzPbWEMQH1DGI=
+    - NUMJOBS=3
+  matrix:
+    - URHO3D_LIB_TYPE=STATIC
+    - URHO3D_LIB_TYPE=SHARED
+matrix:
+  fast_finish: true
+before_install:
+# - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
+  - export COMMIT_MESSAGE=$(git log --format=%B -n1 $TRAVIS_COMMIT)
+  - if [ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
+  - pushd /usr/bin && sudo ln -sf python python2 && popd
+install:
+  - if [ $PACKAGE_UPLOAD ]; then travis_retry brew update >/dev/null && travis_retry brew install doxygen graphviz; fi
+  - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz && tar xfz emsdk-portable.tar.gz && rm emsdk-portable.tar.gz && cd emsdk_portable && ./emsdk update && ./emsdk install latest && ./emsdk activate latest && source ./emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
+script: rake ci
+after_success: if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
+
+# vi: set ts=2 sw=2 expandtab:

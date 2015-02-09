@@ -49,8 +49,7 @@ endif ()
 # All tools must be natively built and output to bin/tool subdir to differentiate them from platform-specific binaries in the bin directory
 set_output_directories (${CMAKE_BINARY_DIR}/bin/tool RUNTIME PDB)
 
-# Do not build tools for iOS, Android, and Emscripten regardless of the URHO3D_TOOLS build option
-if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN AND URHO3D_TOOLS)
+if (URHO3D_TOOLS)
     # Urho3D tools
     add_subdirectory (AssetImporter)
     add_subdirectory (OgreImporter)
