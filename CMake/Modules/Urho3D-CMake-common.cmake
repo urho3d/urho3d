@@ -646,7 +646,7 @@ endmacro ()
 # Macro arguments:
 #  STATIC/SHARED/MODULE/EXCLUDE_FROM_ALL - see CMake help on add_library() command
 # CMake variables:
-#  SOURCE_FILES - list of source files for the target
+#  SOURCE_FILES - list of source files
 #  INCLUDE_DIRS - list of directories for include search path
 #  LIBS - list of dependent libraries that are built internally in the project
 #  ABSOLUTE_PATH_LIBS - list of dependent libraries that are external to the project
@@ -680,7 +680,7 @@ endmacro ()
 #  NODEPS - setup executable target without defining Urho3D dependency libraries
 #  WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL - see CMake help on add_executable() command
 # CMake variables:
-#  SOURCE_FILES - list of source files for the target
+#  SOURCE_FILES - list of source files
 #  INCLUDE_DIRS - list of directories for include search path
 #  LIBS - list of dependent libraries that are built internally in the project
 #  ABSOLUTE_PATH_LIBS - list of dependent libraries that are external to the project
@@ -733,9 +733,9 @@ endmacro ()
 #  NOBUNDLE - do not use MACOSX_BUNDLE even when URHO3D_MACOSX_BUNDLE build option is enabled
 #  WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL - see CMake help on add_executable() command
 # CMake variables:
-#  RESOURCE_DIRS - list of resource directories for the target (will be packaged into *.pak when URHO3D_PACKAGING build option is set)
-#  RESOURCE_FILES - list of additional resource files for the target (will not be packaged into *.pak in any case)
-#  SOURCE_FILES - list of source files for the target
+#  RESOURCE_DIRS - list of resource directories (will be packaged into *.pak when URHO3D_PACKAGING build option is set)
+#  RESOURCE_FILES - list of additional resource files (will not be packaged into *.pak in any case)
+#  SOURCE_FILES - list of source files
 #  INCLUDE_DIRS - list of directories for include search path
 #  LIBS - list of dependent libraries that are built internally in the project
 #  ABSOLUTE_PATH_LIBS - list of dependent libraries that are external to the project
