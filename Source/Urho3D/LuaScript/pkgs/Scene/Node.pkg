@@ -22,7 +22,7 @@ class Node : public Animatable
     Node();
     virtual ~Node();
 
-    tolua_outside bool NodeSaveXML @ SaveXML(File* dest) const;
+    tolua_outside bool NodeSaveXML @ SaveXML(File* dest, const String indentation = "\t") const;
     void SetName(const String name);
     
     void SetPosition(const Vector3& position);
@@ -231,9 +231,9 @@ static int tolua_SceneLuaAPI_Node_new00_local(lua_State* tolua_S)
     return ToluaNewObjectGC<Node>(tolua_S);
 }
 
-static bool NodeSaveXML(const Node* node, File* file)
+static bool NodeSaveXML(const Node* node, File* file, const String& indentation)
 {
-    return file ? node->SaveXML(*file) : false;
+    return file ? node->SaveXML(*file, indentation) : false;
 }
 
 #define TOLUA_DISABLE_tolua_SceneLuaAPI_Node_CreateScriptObject00

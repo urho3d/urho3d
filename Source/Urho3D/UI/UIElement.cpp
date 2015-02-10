@@ -537,11 +537,11 @@ bool UIElement::LoadXML(Deserializer& source)
     return xml->Load(source) && LoadXML(xml->GetRoot());
 }
 
-bool UIElement::SaveXML(Serializer& dest) const
+bool UIElement::SaveXML(Serializer& dest, const String& indentation) const
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     XMLElement rootElem = xml->CreateRoot("element");
-    return SaveXML(rootElem) && xml->Save(dest);
+    return SaveXML(rootElem) && xml->Save(dest, indentation);
 }
 
 bool UIElement::FilterAttributes(XMLElement& dest) const

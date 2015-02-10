@@ -85,7 +85,7 @@ public:
     virtual void AddReplicationState(NodeReplicationState* state);
 
     /// Save to an XML file. Return true if successful.
-    bool SaveXML(Serializer& dest) const;
+    bool SaveXML(Serializer& dest, const String& indentation = "\t") const;
     /// Set name of the scene node. Names are not required to be unique.
     void SetName(const String& name);
     /// Set position in parent space. If the scene node is on the root level (is child of the scene itself), this is same as world space.

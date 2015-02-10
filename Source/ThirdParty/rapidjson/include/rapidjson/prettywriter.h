@@ -1,6 +1,8 @@
 #ifndef RAPIDJSON_PRETTYWRITER_H_
 #define RAPIDJSON_PRETTYWRITER_H_
 
+// Modified by Ali Kamarainen for Urho3D
+
 #include "writer.h"
 
 namespace rapidjson {

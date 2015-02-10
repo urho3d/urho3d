@@ -223,14 +223,14 @@ void Node::AddReplicationState(NodeReplicationState* state)
     networkState_->replicationStates_.Push(state);
 }
 
-bool Node::SaveXML(Serializer& dest) const
+bool Node::SaveXML(Serializer& dest, const String& indentation) const
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     XMLElement rootElem = xml->CreateRoot("node");
     if (!SaveXML(rootElem))
         return false;
 
-    return xml->Save(dest);
+    return xml->Save(dest, indentation);
 }
 
 void Node::SetName(const String& name)

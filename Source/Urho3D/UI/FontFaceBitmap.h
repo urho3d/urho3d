@@ -44,7 +44,7 @@ public:
     /// Load from existed font face, pack used glyphs into smallest texture size and smallest number of texture.
     bool Load(FontFace* fontFace, bool usedGlyphs);
     /// Save as a new bitmap font type in XML format. Return true if successful.
-    bool Save(Serializer& dest, int pontSize);
+    bool Save(Serializer& dest, int pointSize, const String& indentation = "\t");
 
 private:
     /// Convert graphics format to number of components.

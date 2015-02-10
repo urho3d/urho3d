@@ -22,9 +22,9 @@ class Scene : public Node
     tolua_outside bool SceneLoad @ Load(const String fileName);
     tolua_outside bool SceneSave @ Save(const String fileName) const;
     tolua_outside bool SceneLoadXML @ LoadXML(File* source);
-    tolua_outside bool SceneSaveXML @ SaveXML(File* dest) const;
+    tolua_outside bool SceneSaveXML @ SaveXML(File* dest, const String indentation = "\t") const;
     tolua_outside bool SceneLoadXML @ LoadXML(const String fileName);
-    tolua_outside bool SceneSaveXML @ SaveXML(const String fileName) const;
+    tolua_outside bool SceneSaveXML @ SaveXML(const String fileName, const String indentation = "\t") const;
     tolua_outside Node* SceneInstantiate @ Instantiate(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
     tolua_outside Node* SceneInstantiate @ Instantiate(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
     tolua_outside Node* SceneInstantiateXML @ InstantiateXML(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
@@ -133,9 +133,9 @@ static bool SceneLoadXML(Scene* scene, File* file)
     return file ? scene->LoadXML(*file) : false;
 }
 
-static bool SceneSaveXML(const Scene* scene, File* file)
+static bool SceneSaveXML(const Scene* scene, File* file, const String& indentation)
 {
-    return file ? scene->SaveXML(*file) : false;
+    return file ? scene->SaveXML(*file, indentation) : false;
 }
 
 static bool SceneLoadXML(Scene* scene, const String& fileName)
@@ -144,12 +144,12 @@ static bool SceneLoadXML(Scene* scene, const String& fileName)
     return file.IsOpen() && scene->LoadXML(file);
 }
 
-static bool SceneSaveXML(const Scene* scene, const String& fileName)
+static bool SceneSaveXML(const Scene* scene, const String& fileName, const String& indentation)
 {
     File file(scene->GetContext(), fileName, FILE_WRITE);
     if (!file.IsOpen())
         return false;
-    return scene->SaveXML(file);
+    return scene->SaveXML(file, indentation);
 }
 
 static bool SceneLoadAsync(Scene* scene, const String& fileName, LoadMode mode)

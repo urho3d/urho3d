@@ -64,9 +64,9 @@ class UIElement : public Animatable
     virtual const IntVector2& GetScreenPosition() const;
 
     bool LoadXML(Deserializer& source);
-    bool SaveXML(Serializer& dest) const;
+    bool SaveXML(Serializer& dest, const String indentation = "\t") const;
     tolua_outside bool UIElementLoadXML @ LoadXML(const String fileName);
-    tolua_outside bool UIElementSaveXML @ SaveXML(const String fileName) const;
+    tolua_outside bool UIElementSaveXML @ SaveXML(const String fileName, const String indentation = "\t") const;
 
     bool FilterAttributes(XMLElement& dest) const;
 
@@ -303,7 +303,7 @@ static bool UIElementLoadXML(UIElement* element, const String& fileName)
     return element->LoadXML(file);
 }
 
-static bool UIElementSaveXML(const UIElement* element, const String& fileName)
+static bool UIElementSaveXML(const UIElement* element, const String& fileName, const String& indentation)
 {
     if (!element)
         return false;
@@ -312,7 +312,7 @@ static bool UIElementSaveXML(const UIElement* element, const String& fileName)
     if (!file.Open(fileName, FILE_WRITE))
         return false;
 
-    return element->SaveXML(file);
+    return element->SaveXML(file, indentation);
 }
 
 #define GetStyle GetAppliedStyle

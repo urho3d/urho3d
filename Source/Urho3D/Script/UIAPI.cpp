@@ -45,26 +45,26 @@
 namespace Urho3D
 {
 
-static bool FontSaveXMLVectorBuffer(VectorBuffer& buffer, int pointSize, bool usedGlyphs, Font* ptr)
+static bool FontSaveXMLVectorBuffer(VectorBuffer& buffer, int pointSize, bool usedGlyphs, const String& indentation, Font* ptr)
 {
-    return ptr->SaveXML(buffer, pointSize, usedGlyphs);
+    return ptr->SaveXML(buffer, pointSize, usedGlyphs, indentation);
 }
 
-static bool FontSaveXML(const String& fileName, int pointSize, bool usedGlyphs, Font* ptr)
+static bool FontSaveXML(const String& fileName, int pointSize, bool usedGlyphs, const String& indentation, Font* ptr)
 {
     if (fileName.Empty())
         return false;
 
     File file(ptr->GetContext(), fileName, FILE_WRITE);
-    return ptr->SaveXML(file, pointSize, usedGlyphs);
+    return ptr->SaveXML(file, pointSize, usedGlyphs, indentation);
 }
 
 static void RegisterFont(asIScriptEngine* engine)
 {
     RegisterResource<Font>(engine, "Font");
-    engine->RegisterObjectMethod("Font", "bool SaveXML(File@+, int, bool arg2 = false)", asMETHOD(Font, SaveXML), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Font", "bool SaveXML(VectorBuffer&, int, bool arg2 = false)", asFUNCTION(FontSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Font", "bool SaveXML(const String&in, int, bool arg2 = false)", asFUNCTION(FontSaveXML), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Font", "bool SaveXML(File@+, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", asMETHOD(Font, SaveXML), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Font", "bool SaveXML(VectorBuffer&, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", asFUNCTION(FontSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Font", "bool SaveXML(const String&in, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", asFUNCTION(FontSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Font", "IntVector2 GetTotalGlyphOffset(int) const", asMETHOD(Font, GetTotalGlyphOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod("Font", "void set_absoluteGlyphOffset(const IntVector2&)", asMETHOD(Font, SetAbsoluteGlyphOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod("Font", "const IntVector2& get_absoluteGlyphOffset() const", asMETHOD(Font, GetAbsoluteGlyphOffset), asCALL_THISCALL);

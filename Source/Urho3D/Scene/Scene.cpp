@@ -216,7 +216,7 @@ bool Scene::LoadXML(Deserializer& source)
         return false;
 }
 
-bool Scene::SaveXML(Serializer& dest) const
+bool Scene::SaveXML(Serializer& dest, const String& indentation) const
 {
     PROFILE(SaveSceneXML);
 
@@ -229,7 +229,7 @@ bool Scene::SaveXML(Serializer& dest) const
     if (ptr)
         LOGINFO("Saving scene to " + ptr->GetName());
 
-    if (xml->Save(dest))
+    if (xml->Save(dest, indentation))
     {
         FinishSaving(&dest);
         return true;

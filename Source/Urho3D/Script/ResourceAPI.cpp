@@ -331,7 +331,7 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "Variant GetVariantValue(uint, VariantType type) const", asMETHODPR(JSONValue, GetVariantValue, (unsigned, VariantType) const, Variant), asCALL_THISCALL);
 }
 
-static bool JSONFileSave(File* file, const String &indendation, JSONFile* ptr)
+static bool JSONFileSave(File* file, const String& indendation, JSONFile* ptr)
 {
     return file && ptr->Save(*file, indendation);
 }
@@ -522,7 +522,7 @@ static XMLElement XMLFileGetRootDefault(XMLFile* ptr)
     return ptr->GetRoot();
 }
 
-static bool XMLFileSave(File* file, const String &indendation, XMLFile* ptr)
+static bool XMLFileSave(File* file, const String& indendation, XMLFile* ptr)
 {
     return file && ptr->Save(*file, indendation);
 }

@@ -50,10 +50,10 @@ public:
     
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
-    /// Save resource with default indentation (one tab). Return true if successful. Only supports saving to a File.
+    /// Save resource with default indentation (one tab). Return true if successful.
     virtual bool Save(Serializer& dest) const;
-    /// Save resource with user-defined indentation. Return true if successful. Only supports saving to a File.
-    bool Save(Serializer& dest, const String &indendation) const;
+    /// Save resource with user-defined indentation. Return true if successful.
+    bool Save(Serializer& dest, const String& indendation) const;
 
     /// Deserialize from a string. Return true if successful.
     bool FromString(const String& source);
@@ -65,7 +65,7 @@ public:
     /// Return the pugixml document.
     pugi::xml_document* GetDocument() const { return document_; }
     /// Serialize the XML content to a string.
-    String ToString(const String &indendation = "\t") const;
+    String ToString(const String& indendation = "\t") const;
 
     /// Patch the XMLFile with another XMLFile. Based on RFC 5261.
     void Patch(XMLFile* patchFile);

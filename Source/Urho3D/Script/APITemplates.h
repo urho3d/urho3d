@@ -897,12 +897,12 @@ static bool UIElementLoadChildXML(XMLFile* file, XMLFile* styleFile, UIElement* 
         return false;
 }
 
-static bool UIElementSaveXML(File* file, UIElement* ptr)
+static bool UIElementSaveXML(File* file, const String& indentation, UIElement* ptr)
 {
     return file && ptr->SaveXML(*file);
 }
 
-static bool UIElementSaveXMLVectorBuffer(VectorBuffer& buffer, UIElement* ptr)
+static bool UIElementSaveXMLVectorBuffer(VectorBuffer& buffer, const String& indentation, UIElement* ptr)
 {
     return ptr->SaveXML(buffer);
 }
@@ -979,8 +979,8 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool LoadXML(XMLFile@+, XMLFile@+)", asFUNCTIONPR(UIElementLoadXML, (XMLFile*, XMLFile*, UIElement*), bool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool LoadChildXML(const XMLElement&in, XMLFile@+ arg1 = null, bool arg2 = false)", asMETHOD(T, LoadChildXML), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool LoadChildXML(XMLFile@+, XMLFile@+ arg1 = null)", asFUNCTION(UIElementLoadChildXML), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "bool SaveXML(File@+)", asFUNCTION(UIElementSaveXML), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "bool SaveXML(VectorBuffer&)", asFUNCTION(UIElementSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool SaveXML(File@+, const String&in indentation = \"\t\")", asFUNCTION(UIElementSaveXML), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool SaveXML(VectorBuffer&, const String&in indentation = \"\t\")", asFUNCTION(UIElementSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool SetStyle(const XMLElement&in)", asMETHODPR(T, SetStyle, (const XMLElement&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SetStyle(const String&in, XMLFile@+ arg1 = null)", asMETHODPR(T, SetStyle, (const String&, XMLFile*), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SetStyleAuto(XMLFile@+ arg0 = null)", asMETHOD(T, SetStyleAuto), asCALL_THISCALL);

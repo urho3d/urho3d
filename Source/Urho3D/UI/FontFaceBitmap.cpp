@@ -261,7 +261,7 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
     return true;
 }
 
-bool FontFaceBitmap::Save(Serializer& dest, int pointSize)
+bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indentation)
 {
     Context* context = font_->GetContext();
 
@@ -337,7 +337,7 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize)
         }
     }
 
-    return xml->Save(dest);
+    return xml->Save(dest, indentation);
 }
 
 unsigned FontFaceBitmap::ConvertFormatToNumComponents(unsigned format)

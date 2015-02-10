@@ -86,7 +86,7 @@ bool JSONFile::Save(Serializer& dest) const
     return Save(dest, "\t");
 }
 
-bool JSONFile::Save(Serializer& dest, const String &indendation) const
+bool JSONFile::Save(Serializer& dest, const String& indendation) const
 {
     StringBuffer buffer;
     PrettyWriter<StringBuffer> writer(buffer, &(document_->GetAllocator()));
