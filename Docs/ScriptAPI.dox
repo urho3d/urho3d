@@ -2892,8 +2892,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -3089,8 +3089,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -3347,8 +3347,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -4882,8 +4882,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -5510,8 +5510,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -5860,9 +5860,9 @@ Methods:
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@, int, bool = false)
-- bool SaveXML(VectorBuffer&, int, bool = false)
-- bool SaveXML(const String&, int, bool = false)
+- bool SaveXML(File@, int, bool = false, const String& = "	")
+- bool SaveXML(VectorBuffer&, int, bool = false, const String& = "	")
+- bool SaveXML(const String&, int, bool = false, const String& = "	")
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -6180,6 +6180,7 @@ Methods:
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
+- bool Save(File@, const String&) const
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
@@ -6442,8 +6443,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -6625,8 +6626,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -6984,8 +6985,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -7436,8 +7437,8 @@ Methods:
 - void RotateAround2D(const Vector2&, float, TransformSpace = TS_LOCAL)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - void Scale(const Vector3&)
 - void Scale(float)
@@ -8785,8 +8786,8 @@ Methods:
 - void RotateAround2D(const Vector2&, float, TransformSpace = TS_LOCAL)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - void Scale(const Vector3&)
 - void Scale(float)
@@ -9042,8 +9043,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -9202,8 +9203,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -9524,8 +9525,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -10055,8 +10056,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
@@ -10710,8 +10711,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -11378,8 +11379,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -11591,8 +11592,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -11980,8 +11981,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -12187,8 +12188,8 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- bool SaveXML(File@)
-- bool SaveXML(VectorBuffer&)
+- bool SaveXML(File@, const String& = "	")
+- bool SaveXML(VectorBuffer&, const String& = "	")
 - bool SaveXML(XMLElement&) const
 - IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -12391,9 +12392,10 @@ Methods:
 - void Patch(XMLElement)
 - void Patch(XMLFile@)
 - bool Save(File@) const
+- bool Save(File@, const String&) const
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
-- String ToString() const
+- String ToString(const String& = String ( "	" )) const
 
 Properties:
 
