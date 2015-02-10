@@ -31,7 +31,8 @@ public:
 		\note The default indentation is 4 spaces.
 	*/
 	PrettyWriter& SetIndent(Ch indentChar, unsigned indentCharCount) {
-		RAPIDJSON_ASSERT(indentChar == ' ' || indentChar == '\t' || indentChar == '\n' || indentChar == '\r');
+		// Urho3D: in order to be consistent witht the XMLFile API, allow any character.
+		// RAPIDJSON_ASSERT(indentChar == ' ' || indentChar == '\t' || indentChar == '\n' || indentChar == '\r');
 		indentChar_ = indentChar;
 		indentCharCount_ = indentCharCount;
 		return *this;

@@ -331,11 +331,17 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "Variant GetVariantValue(uint, VariantType type) const", asMETHODPR(JSONValue, GetVariantValue, (unsigned, VariantType) const, Variant), asCALL_THISCALL);
 }
 
+static bool JSONFileSave(File* file, const String &indendation, JSONFile* ptr)
+{
+    return file && ptr->Save(*file, indendation);
+}
+
 static void RegisterJSONFile(asIScriptEngine* engine)
 {
     RegisterResource<JSONFile>(engine, "JSONFile");
     engine->RegisterObjectMethod("JSONFile", "JSONValue CreateRoot(JSONValueType valueType = JSON_ANY)", asMETHOD(JSONFile, CreateRoot), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONFile", "JSONValue GetRoot(JSONValueType valueType = JSON_ANY)", asMETHOD(JSONFile, GetRoot), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONFile", "bool Save(File@+, const String&in) const", asFUNCTION(JSONFileSave), asCALL_CDECL_OBJLAST);
 }
 
 static void ConstructXMLElement(XMLElement* ptr)
@@ -516,12 +522,18 @@ static XMLElement XMLFileGetRootDefault(XMLFile* ptr)
     return ptr->GetRoot();
 }
 
+static bool XMLFileSave(File* file, const String &indendation, XMLFile* ptr)
+{
+    return file && ptr->Save(*file, indendation);
+}
+
 static void RegisterXMLFile(asIScriptEngine* engine)
 {
     engine->RegisterObjectMethod("XMLFile", "bool FromString(const String&in)", asMETHOD(XMLFile, FromString), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLFile", "XMLElement CreateRoot(const String&in)", asMETHOD(XMLFile, CreateRoot), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLFile", "XMLElement GetRoot(const String&in name = String())", asMETHOD(XMLFile, GetRoot), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLFile", "String ToString() const", asMETHOD(XMLFile, ToString), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLFile", "bool Save(File@+, const String&in) const", asFUNCTION(XMLFileSave), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("XMLFile", "String ToString(const String&in = String(\"\t\")) const", asMETHOD(XMLFile, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLFile", "XMLElement get_root()", asFUNCTION(XMLFileGetRootDefault), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLFile", "void Patch(XMLFile@+)", asMETHODPR(XMLFile, Patch, (XMLFile*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLFile", "void Patch(XMLElement)", asMETHODPR(XMLFile, Patch, (XMLElement), void), asCALL_THISCALL);
