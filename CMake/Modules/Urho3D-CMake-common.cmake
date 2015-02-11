@@ -388,8 +388,6 @@ else ()
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
             # CMake does not treat Emscripten as a valid platform yet, certain platform-specific variables cannot be set in the
             # toolchain file as they get overwritten by CMake internally as per Linux platform default, so set them here for now
-            set (CMAKE_SHARED_LIBRARY_SUFFIX .bc)   # .bc instead of .so but leave the static archive as .a
-            string (REPLACE .so .bc CMAKE_FIND_LIBRARY_SUFFIXES "${CMAKE_FIND_LIBRARY_SUFFIXES}")   # Stringify for string replacement
             set (CMAKE_EXECUTABLE_SUFFIX .html)
         elseif (MINGW)
             # MinGW-specific setup

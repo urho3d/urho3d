@@ -28,7 +28,6 @@ env:
     - NUMJOBS=3
   matrix:
     - URHO3D_LIB_TYPE=STATIC
-    - URHO3D_LIB_TYPE=SHARED
 matrix:
   fast_finish: true
 before_install:
@@ -39,7 +38,7 @@ before_install:
   - pushd /usr/bin && sudo ln -sf python python2 && popd
 install:
   - if [ $PACKAGE_UPLOAD ]; then travis_retry brew update >/dev/null && travis_retry brew install doxygen graphviz; fi
-  - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz && tar xfz emsdk-portable.tar.gz && rm emsdk-portable.tar.gz && cd emsdk_portable && ./emsdk update >/dev/null && ./emsdk install latest >/dev/null && ./emsdk activate latest >/dev/null && source ./emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
+  - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz && tar xfz emsdk-portable.tar.gz && rm emsdk-portable.tar.gz && cd emsdk_portable && dummy=`./emsdk update && ./emsdk install latest && ./emsdk activate latest` && source ./emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
 script: rake ci
 after_success: if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
 
