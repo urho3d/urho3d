@@ -243,6 +243,8 @@ static HWND GetWindowHandle(SDL_Window* window)
 
 static unsigned readableDepthFormat = 0;
 
+const Vector2 Graphics::pixelUVOffset(0.5f, 0.5f);
+
 Graphics::Graphics(Context* context) :
     Object(context),
     impl_(new GraphicsImpl()),

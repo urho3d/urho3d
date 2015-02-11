@@ -735,8 +735,9 @@ void View::SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& 
     Vector4 bufferUVOffset(((float)viewRect.left_) / texWidth + widthRange,
         1.0f - (((float)viewRect.top_) / texHeight + heightRange), widthRange, heightRange);
     #else
-    Vector4 bufferUVOffset((0.5f + (float)viewRect.left_) / texWidth + widthRange,
-        (0.5f + (float)viewRect.top_) / texHeight + heightRange, widthRange, heightRange);
+    const Vector2& pixelUVOffset = Graphics::GetPixelUVOffset();
+    Vector4 bufferUVOffset((pixelUVOffset.x_ + (float)viewRect.left_) / texWidth + widthRange,
+        (pixelUVOffset.y_ + (float)viewRect.top_) / texHeight + heightRange, widthRange, heightRange);
     #endif
     graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
     
@@ -1788,12 +1789,9 @@ void View::RenderQuad(RenderPathCommand& command)
         float width = (float)renderTargets_[nameHash]->GetWidth();
         float height = (float)renderTargets_[nameHash]->GetHeight();
         
+        const Vector2& pixelUVOffset = Graphics::GetPixelUVOffset();
         graphics_->SetShaderParameter(invSizeName, Vector2(1.0f / width, 1.0f / height));
-        #ifdef URHO3D_OPENGL
-        graphics_->SetShaderParameter(offsetsName, Vector2::ZERO);
-        #else
-        graphics_->SetShaderParameter(offsetsName, Vector2(0.5f / width, 0.5f / height));
-        #endif
+        graphics_->SetShaderParameter(offsetsName, Vector2(pixelUVOffset.x_ / width, pixelUVOffset.y_ / height));
     }
     
     graphics_->SetBlendMode(BLEND_REPLACE);

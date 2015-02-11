@@ -427,7 +427,9 @@ public:
     static unsigned GetReadableDepthFormat();
     /// Return the API-specific texture format from a textual description, for example "rgb".
     static unsigned GetFormat(const String& formatName);
-    
+    /// Return UV offset required for pixel perfect rendering.
+    static const Vector2& GetPixelUVOffset() { return pixelUVOffset; }
+
 private:
     /// Create the application window.
     bool OpenWindow(int width, int height, bool resizable, bool borderless);
@@ -608,6 +610,9 @@ private:
     SharedPtr<ShaderPrecache> shaderPrecache_;
     /// Allowed screen orientations.
     String orientations_;
+
+    /// Pixel perfect UV offset.
+    static const Vector2 pixelUVOffset;
 };
 
 /// Register Graphics library objects.

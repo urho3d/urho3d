@@ -215,6 +215,9 @@ static void GetGLPrimitiveType(unsigned elementCount, PrimitiveType type, unsign
         break;
     }
 }
+
+const Vector2 Graphics::pixelUVOffset(0.0f, 0.0f);
+
 Graphics::Graphics(Context* context_) :
     Object(context_),
     impl_(new GraphicsImpl()),

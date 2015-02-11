@@ -691,6 +691,7 @@ void UI::Initialize()
     PROFILE(InitUI);
 
     graphics_ = graphics;
+    UIBatch::posAdjust = Vector3(Graphics::GetPixelUVOffset(), 0.0f);
 
     rootElement_->SetSize(graphics->GetWidth(), graphics->GetHeight());
     rootModalElement_->SetSize(rootElement_->GetSize());

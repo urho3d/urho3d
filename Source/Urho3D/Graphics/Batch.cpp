@@ -88,40 +88,39 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     float width = (float)shadowMap->GetWidth();
     float height = (float)shadowMap->GetHeight();
     
-    Vector2 offset(
+    Vector3 offset(
         (float)viewport.left_ / width,
-        (float)viewport.top_ / height
+        (float)viewport.top_ / height,
+        0.0f
     );
     
-    Vector2 scale(
+    Vector3 scale(
         0.5f * (float)viewport.Width() / width,
-        0.5f * (float)viewport.Height() / height
+        0.5f * (float)viewport.Height() / height,
+        1.0f
     );
-    
+
+    // Add pixel-perfect offset if needed by the graphics API
+    const Vector2& pixelUVOffset = Graphics::GetPixelUVOffset();
+    offset.x_ += scale.x_ + pixelUVOffset.x_ / width;
+    offset.y_ += scale.y_ + pixelUVOffset.y_ / height;
+
     #ifdef URHO3D_OPENGL
-    offset.x_ += scale.x_;
-    offset.y_ += scale.y_;
+    offset.z_ = 0.5f;
+    scale.z_ = 0.5f;
     offset.y_ = 1.0f - offset.y_;
+    #else
+    scale.y_ = -scale.y_;
+    #endif
+
     // If using 4 shadow samples, offset the position diagonally by half pixel
     if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
     {
         offset.x_ -= 0.5f / width;
         offset.y_ -= 0.5f / height;
     }
-    texAdjust.SetTranslation(Vector3(offset.x_, offset.y_, 0.5f));
-    texAdjust.SetScale(Vector3(scale.x_, scale.y_, 0.5f));
-    #else
-    offset.x_ += scale.x_ + 0.5f / width;
-    offset.y_ += scale.y_ + 0.5f / height;
-    if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
-    {
-        offset.x_ -= 0.5f / width;
-        offset.y_ -= 0.5f / height;
-    }
-    scale.y_ = -scale.y_;
-    texAdjust.SetTranslation(Vector3(offset.x_, offset.y_, 0.0f));
-    texAdjust.SetScale(Vector3(scale.x_, scale.y_, 1.0f));
-    #endif
+    texAdjust.SetTranslation(offset);
+    texAdjust.SetScale(scale);
     
     dest = texAdjust * shadowProj * shadowView * posAdjust;
 }

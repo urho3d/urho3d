@@ -63,7 +63,7 @@ public:
     
     /// Add or merge a batch.
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);
-    
+
     /// Element this batch represents.
     UIElement* element_;
     /// Blending mode.
@@ -84,6 +84,9 @@ public:
     unsigned vertexEnd_;
     /// Gradient flag.
     bool useGradient_;
+
+    /// Position adjustment vector for pixel-perfect rendering. Initialized by UI.
+    static Vector3 posAdjust;
 };
 
 }
