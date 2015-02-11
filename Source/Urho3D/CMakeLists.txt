@@ -74,7 +74,7 @@ if (URHO3D_LUA)
             COMMENT "Generating tolua++ DIR binding on the fly for ${DIR}")
     endforeach ()
 else ()
-    list (APPEND EXCLUDED_SOURCE_DIRS LuaScript)
+    list (APPEND EXCLUDED_SOURCE_DIRS LuaScript generated)
 endif ()
 
 # Generate platform specific export header file
