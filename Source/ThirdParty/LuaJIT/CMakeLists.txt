@@ -112,14 +112,14 @@ if (MSVC)
         set (MSVC_HASFFI 1)
     endif ()
     set (TARGET_TESTARCH "LJ_HASFFI ${MSVC_HASFFI}\n")
-    
+
     if (LUAJIT_DISABLE_JIT)
         set (MSVC_HASJIT 0)
     else ()
         set (MSVC_HASJIT 1)
     endif ()
     set (TARGET_TESTARCH "${TARGET_TESTARCH} LJ_HASJIT ${MSVC_HASJIT}\n")
-    
+
     if (URHO3D_64BIT)
         set (MSVC_ARCH_BITS 64)
         set (MSVC_TARGET_ARCH X64)
@@ -130,13 +130,13 @@ if (MSVC)
     set (TARGET_TESTARCH "${TARGET_TESTARCH} LJ_ARCH_BITS ${MSVC_ARCH_BITS}\n")
     set (TARGET_TESTARCH "${TARGET_TESTARCH} LJ_TARGET_${MSVC_TARGET_ARCH} 1\n")
 
-	# More assumptions
+    # More assumptions
     set (TARGET_TESTARCH "${TARGET_TESTARCH} LJ_ARCH_HASFPU 1\n")
     set (TARGET_TESTARCH "${TARGET_TESTARCH} LJ_ABI_SOFTFP 0\n")
 else ()
     get_directory_property (TARGET_TCFLAGS COMPILE_DEFINITIONS)
     string (REPLACE ";" ";-D" TARGET_TCFLAGS ";${TARGET_TCFLAGS}")
-    execute_process (COMMAND egrep -V RESULT_VARIABLE EGREP_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)    
+    execute_process (COMMAND egrep -V RESULT_VARIABLE EGREP_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
     if (EGREP_EXIT_CODE EQUAL 0)
         execute_process (COMMAND ${CMAKE_C_COMPILER} ${TARGET_TCFLAGS} -E ${CMAKE_CURRENT_SOURCE_DIR}/src/lj_arch.h -dM
             COMMAND egrep "LJ_|MIPSEL|__SSE2__" OUTPUT_VARIABLE TARGET_TESTARCH ERROR_QUIET)
@@ -152,7 +152,7 @@ macro (find_string find_regex output_var)
         string (REGEX MATCH ${find_regex} matched ${TARGET_TESTARCH})
         if (matched)
             string (REGEX MATCH "\\(.*\\)" captured ${find_regex})
-            if (captured) 
+            if (captured)
                 string (REGEX REPLACE ${find_regex} \\1 matched ${matched})
             endif ()
 
@@ -329,7 +329,7 @@ else ()
     add_subdirectory (src/host)
 endif ()
 
-# Add definitions specific for target C Compiler 
+# Add definitions specific for target C Compiler
 if (NOT MSVC)
     # Large file support
     add_definitions (-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE)
@@ -429,7 +429,7 @@ if (NOT IOS)
         COMMENT "Copying dependency files for luajit standalone executable")
 
     # Install dependency files required by luajit
-    install (DIRECTORY ${LUAJIT_DEP_DIR} DESTINATION ${DEST_RUNTIME_DIR} ${DEST_PERMISSIONS})
+    install (DIRECTORY ${LUAJIT_DEP_DIR} DESTINATION ${DEST_RUNTIME_DIR})
 endif ()
 
 # Add directory containing the dependency files into the LuaJIT module search path
