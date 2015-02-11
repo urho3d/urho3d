@@ -401,6 +401,10 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 asIScriptFunction* method = type->GetMethodByIndex(j);
                 String methodName(method->GetName());
                 String declaration(method->GetDeclaration());
+
+                // Recreate tab escape sequences
+                declaration.Replace("\t", "\\t");
+
                 if (methodName.Contains("get_") || methodName.Contains("set_"))
                     ExtractPropertyInfo(methodName, declaration, propertyInfos);
                 else
@@ -511,6 +515,9 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         asIScriptFunction* function = scriptEngine_->GetGlobalFunctionByIndex(i);
         String functionName(function->GetName());
         String declaration(function->GetDeclaration());
+
+        // Recreate tab escape sequences
+        declaration.Replace("\t", "\\t");
 
         if (functionName.Contains("set_") || functionName.Contains("get_"))
             ExtractPropertyInfo(functionName, declaration, globalPropertyInfos);
