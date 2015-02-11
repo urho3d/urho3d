@@ -69,9 +69,9 @@ float GetVertexLightVolumetric(int index, vec3 worldPos)
 vec4 GetShadowPos(int index, vec4 projWorldPos)
 {
     #if defined(DIRLIGHT)
-        return cLightMatrices[index] * projWorldPos;
+        return projWorldPos * cLightMatrices[index];
     #elif defined(SPOTLIGHT)
-        return cLightMatrices[1] * projWorldPos;
+        return projWorldPos * cLightMatrices[1];
     #else
         return vec4(projWorldPos.xyz - cLightPos.xyz, 1.0);
     #endif
@@ -215,13 +215,13 @@ float GetDirShadowDeferred(vec4 projWorldPos, float depth)
     vec4 shadowPos;
 
     if (depth < cShadowSplits.x)
-        shadowPos = cLightMatricesPS[0] * projWorldPos;
+        shadowPos = projWorldPos * cLightMatricesPS[0];
     else if (depth < cShadowSplits.y)
-        shadowPos = cLightMatricesPS[1] * projWorldPos;
+        shadowPos = projWorldPos * cLightMatricesPS[1];
     else if (depth < cShadowSplits.z)
-        shadowPos = cLightMatricesPS[2] * projWorldPos;
+        shadowPos = projWorldPos * cLightMatricesPS[2];
     else
-        shadowPos = cLightMatricesPS[3] * projWorldPos;
+        shadowPos = projWorldPos * cLightMatricesPS[3];
 
     return GetDirShadowFade(GetShadow(shadowPos), depth);
 }
@@ -250,7 +250,7 @@ float GetShadowDeferred(vec4 projWorldPos, float depth)
     #if defined(DIRLIGHT)
         return GetDirShadowDeferred(projWorldPos, depth);
     #elif defined(SPOTLIGHT)
-        vec4 shadowPos = cLightMatricesPS[1] * projWorldPos;
+        vec4 shadowPos = projWorldPos * cLightMatricesPS[1];
         return GetShadow(shadowPos);
     #else
         vec3 shadowPos = projWorldPos.xyz - cLightPosPS.xyz;

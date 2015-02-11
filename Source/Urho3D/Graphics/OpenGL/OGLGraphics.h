@@ -54,7 +54,6 @@ class VertexBuffer;
 typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
 
 static const unsigned NUM_SCREEN_BUFFERS = 2;
-static const unsigned NUM_TEMP_MATRICES = 8;
 
 /// CPU-side scratch buffer for vertex data updates.
 struct ScratchBuffer
@@ -604,10 +603,6 @@ private:
     HashMap<int, SharedPtr<Texture2D> > depthTextures_;
     /// Remembered shader parameter sources.
     const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS];
-    /// Temp matrices for transposing shader parameters.
-    Matrix3 tempMatrices3_[NUM_TEMP_MATRICES];
-    /// Temp matrices for transposing shader parameters.
-    Matrix4 tempMatrices4_[NUM_TEMP_MATRICES];
     /// Base directory for shaders.
     String shaderPath_;
     /// File extension for shaders.

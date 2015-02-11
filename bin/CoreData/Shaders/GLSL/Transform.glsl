@@ -47,7 +47,7 @@ vec2 GetTexCoord(vec2 texCoord)
 
 vec4 GetClipPos(vec3 worldPos)
 {
-    vec4 ret = cViewProj * vec4(worldPos, 1.0);
+    vec4 ret = vec4(worldPos, 1.0) * cViewProj;
     // While getting the clip coordinate, also automatically set gl_ClipVertex for user clip planes
     #ifndef GL_ES
     gl_ClipVertex = ret;
@@ -57,7 +57,7 @@ vec4 GetClipPos(vec3 worldPos)
 
 float GetZonePos(vec3 worldPos)
 {
-    return clamp((cZone * vec4(worldPos, 1.0)).z, 0.0, 1.0);
+    return clamp((vec4(worldPos, 1.0) * cZone).z, 0.0, 1.0);
 }
 
 float GetDepth(vec4 clipPos)
@@ -67,16 +67,14 @@ float GetDepth(vec4 clipPos)
 
 vec3 GetBillboardPos(vec4 iPos, vec2 iSize, mat4 modelMatrix)
 {
-    return (modelMatrix * iPos).xyz + cBillboardRot * vec3(iSize.x, iSize.y, 0.0);
+    return (iPos * modelMatrix).xyz + vec3(iSize.x, iSize.y, 0.0) * cBillboardRot;
 }
 
 vec3 GetBillboardNormal()
 {
-    return vec3(-cBillboardRot[2][0], -cBillboardRot[2][1], -cBillboardRot[2][2]);
+    return vec3(-cBillboardRot[0][2], -cBillboardRot[1][2], -cBillboardRot[2][2]);
 }
 
-// Note: the skinning/instancing model matrix is a transpose, so the matrix multiply order must be swapped
-// (see GetWorldPos(), GetWorldNormal() and GetWorldTangent() below)
 #if defined(SKINNED)
     #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices)
 #elif defined(INSTANCED)
@@ -87,33 +85,24 @@ vec3 GetBillboardNormal()
 
 vec3 GetWorldPos(mat4 modelMatrix)
 {
-    #if defined(SKINNED) || defined(INSTANCED)
-        return (iPos * modelMatrix).xyz;
-    #elif defined(BILLBOARD)
+    #if defined(BILLBOARD)
         return GetBillboardPos(iPos, iTexCoord2, modelMatrix);
     #else
-        return (modelMatrix * iPos).xyz;
+        return (iPos * modelMatrix).xyz;
     #endif
 }
 
 vec3 GetWorldNormal(mat4 modelMatrix)
 {
-    #if defined(SKINNED) || defined(INSTANCED)
-        return normalize(iNormal * GetNormalMatrix(modelMatrix));
-    #elif defined(BILLBOARD)
+    #if defined(BILLBOARD)
         return GetBillboardNormal();
     #else
-        return normalize(GetNormalMatrix(modelMatrix) * iNormal);
+        return normalize(iNormal * GetNormalMatrix(modelMatrix));
     #endif
 }
 
 vec3 GetWorldTangent(mat4 modelMatrix)
-{   
-    mat3 normalMatrix = GetNormalMatrix(modelMatrix);
-    #if defined(SKINNED) || defined(INSTANCED)
-        return normalize(iTangent.xyz * normalMatrix);
-    #else
-        return normalize(normalMatrix * iTangent.xyz);
-    #endif
+{
+    return normalize(iTangent.xyz * GetNormalMatrix(modelMatrix));
 }
 #endif

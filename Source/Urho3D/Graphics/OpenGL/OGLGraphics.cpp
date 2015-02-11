@@ -1189,15 +1189,11 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                 break;
 
             case GL_FLOAT_MAT3:
-                count = Min((int)count, (int)NUM_TEMP_MATRICES * 9);
-                Matrix3::BulkTranspose(&tempMatrices3_[0].m00_, data, count / 9);
-                glUniformMatrix3fv(info->location_, count / 9, GL_FALSE, tempMatrices3_[0].Data());
+                glUniformMatrix3fv(info->location_, count / 9, GL_FALSE, data);
                 break;
 
             case GL_FLOAT_MAT4:
-                count = Min((int)count, (int)NUM_TEMP_MATRICES * 16);
-                Matrix4::BulkTranspose(&tempMatrices4_[0].m00_, data, count / 16);
-                glUniformMatrix4fv(info->location_, count / 16, GL_FALSE, tempMatrices4_[0].Data());
+                glUniformMatrix4fv(info->location_, count / 16, GL_FALSE, data);
                 break;
             }
         }
@@ -1247,7 +1243,7 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
     {
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
-            glUniformMatrix3fv(info->location_, 1, GL_FALSE, matrix.Transpose().Data());
+            glUniformMatrix3fv(info->location_, 1, GL_FALSE, matrix.Data());
     }
 }
 
@@ -1283,7 +1279,7 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
     {
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
-            glUniformMatrix4fv(info->location_, 1, GL_FALSE, matrix.Transpose().Data());
+            glUniformMatrix4fv(info->location_, 1, GL_FALSE, matrix.Data());
     }
 }
 
@@ -1324,25 +1320,22 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
         {
-            float data[16];
-            data[0] = matrix.m00_;
-            data[1] = matrix.m10_;
-            data[2] = matrix.m20_;
-            data[3] = 0.0f;
-            data[4] = matrix.m01_;
-            data[5] = matrix.m11_;
-            data[6] = matrix.m21_;
-            data[7] = 0.0f;
-            data[8] = matrix.m02_;
-            data[9] = matrix.m12_;
-            data[10] = matrix.m22_;
-            data[11] = 0.0f;
-            data[12] = matrix.m03_;
-            data[13] = matrix.m13_;
-            data[14] = matrix.m23_;
-            data[15] = 1.0f;
+            // Expand to a full Matrix4
+            static Matrix4 fullMatrix;
+            fullMatrix.m00_ = matrix.m00_;
+            fullMatrix.m01_ = matrix.m01_;
+            fullMatrix.m02_ = matrix.m02_;
+            fullMatrix.m03_ = matrix.m03_;
+            fullMatrix.m10_ = matrix.m10_;
+            fullMatrix.m11_ = matrix.m11_;
+            fullMatrix.m12_ = matrix.m12_;
+            fullMatrix.m13_ = matrix.m13_;
+            fullMatrix.m20_ = matrix.m20_;
+            fullMatrix.m21_ = matrix.m21_;
+            fullMatrix.m22_ = matrix.m22_;
+            fullMatrix.m23_ = matrix.m23_;
 
-            glUniformMatrix4fv(info->location_, 1, GL_FALSE, data);
+            glUniformMatrix4fv(info->location_, 1, GL_FALSE, fullMatrix.Data());
         }
     }
 }
