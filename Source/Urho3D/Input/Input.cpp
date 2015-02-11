@@ -80,6 +80,8 @@ UIElement* TouchState::GetTouchedElement()
 }
 
 #ifdef EMSCRIPTEN
+#define EM_TRUE 1
+
 /// Glue between Urho Input and Emscripten HTML5
 /** HTML5 (Emscripten) is limited in the way it handles input. The EmscriptenInput class attempts to provide the glue between Urho3D Input behavior and HTML5, where SDL currently fails to do so.
  *
@@ -108,9 +110,12 @@ public:
     /// Static callback method for tracking gain focus event.
     static EM_BOOL GainFocus(int eventType, const EmscriptenFocusEvent* keyEvent, void* userData);
 
-    /// Send request to user to gain pointer lock.
+    /// Send request to user to gain pointer lock. This requires a user-browser interaction on the first call.
     void RequestPointerLock();
+    /// Send request to exit pointer lock. This has the benefit of not requiring the user-browser interaction on the next pointer lock request.
     void ExitPointerLock();
+    /// Returns whether the page is visible.
+    bool IsVisible();
 
 private:
     /// Instance of Input subsystem that constructed this instance.
@@ -138,10 +143,21 @@ void EmscriptenInput::ExitPointerLock()
     emscripten_exit_pointerlock();
 }
 
+bool EmscriptenInput::IsVisible()
+{
+    EmscriptenVisibilityChangeEvent visibilityStatus;
+    if (emscripten_get_visibility_status(&visibilityStatus) >= EMSCRIPTEN_RESULT_SUCCESS)
+        return visibilityStatus.hidden >= EM_TRUE ? false : true;
+
+    // Assume visible
+    LOGWARNING("Could not determine visibility status.");
+    return true;
+}
+
 EM_BOOL EmscriptenInput::PointerLockCallback(int eventType, const EmscriptenPointerlockChangeEvent* keyEvent, void* userData)
 {
     Input* inputInst = (Input*)userData;
-    if (keyEvent->isActive > 0)
+    if (keyEvent->isActive >= EM_TRUE)
     {
         // Pointer Lock is now active
         inputInst->emscriptenEnteredPointerLock_ = true;
@@ -152,7 +168,7 @@ EM_BOOL EmscriptenInput::PointerLockCallback(int eventType, const EmscriptenPoin
         // Pointer Lock is now inactive
         inputInst->SetMouseModeEmscripten(MM_ABSOLUTE);
     }
-    return 1;
+    return EM_TRUE;
 }
 
 EM_BOOL EmscriptenInput::LoseFocus(int eventType, const EmscriptenFocusEvent* keyEvent, void* userData)
@@ -160,7 +176,7 @@ EM_BOOL EmscriptenInput::LoseFocus(int eventType, const EmscriptenFocusEvent* ke
     Input* inputInst = (Input*)userData;
     if (eventType == EMSCRIPTEN_EVENT_BLUR)
         inputInst->LoseFocus();
-    return 1;
+    return EM_TRUE;
 }
 
 EM_BOOL EmscriptenInput::GainFocus(int eventType, const EmscriptenFocusEvent* keyEvent, void* userData)
@@ -168,7 +184,7 @@ EM_BOOL EmscriptenInput::GainFocus(int eventType, const EmscriptenFocusEvent* ke
     Input* inputInst = (Input*)userData;
     if (eventType == EMSCRIPTEN_EVENT_FOCUS)
         inputInst->GainFocus();
-    return 1;
+    return EM_TRUE;
 }
 #endif
 
@@ -266,10 +282,19 @@ void Input::Update()
     }
 
     // Check and handle SDL events
+
+    if (!inputFocus_)
+    {
+        // While there is no input focus, don't process key, mouse, touch or joystick events.
+        SDL_PumpEvents();
+        SDL_FlushEvents(SDL_KEYDOWN, SDL_MULTIGESTURE);
+    }
+
     SDL_Event evt;
     while (SDL_PollEvent(&evt))
         HandleSDLEvent(&evt);
 
+    // Check for focus change this frame
     SDL_Window* window = graphics_->GetImpl()->GetWindow();
     unsigned flags = window ? SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS) : 0;
 #ifndef EMSCRIPTEN
@@ -292,6 +317,7 @@ void Input::Update()
     else
         return;
 
+    // Handle mouse mode MM_WRAP
     if (mouseVisible_ && mouseMode_ == MM_WRAP)
     {
         IntVector2 mpos;
@@ -395,17 +421,6 @@ void Input::Update()
                 eventData[P_QUALIFIERS] = GetQualifiers();
                 SendEvent(E_MOUSEMOVE, eventData);
             }
-        }
-    }
-
-    if (mouseMode_ == MM_RELATIVE)
-    {
-        IntVector2 mousePosition = GetMousePosition();
-        IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-        if (mousePosition != center)
-        {
-            SetMousePosition(center);
-            lastMousePosition_ = center;
         }
     }
 }
@@ -1173,7 +1188,11 @@ void Input::Initialize()
 #ifndef EMSCRIPTEN
     focusedThisFrame_ = true;
 #else
-    GainFocus();
+    // Note: Page visibility and focus are slightly different, however we can't query last focus with Emscripten (1.29.0)
+    if (emscriptenInput_->IsVisible())
+        GainFocus();
+    else
+        LoseFocus();
 #endif
 
     ResetJoysticks();
