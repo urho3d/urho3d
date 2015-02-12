@@ -214,7 +214,7 @@ public:
         unsigned pos = dest - Begin();
         if (pos > size_)
             pos = size_;
-        unsigned length = static_cast<unsigned>(end - start);
+        unsigned length = (unsigned)(end - start);
         Resize(size_ + length, 0);
         MoveRange(pos + length, pos, size_ - pos - length);
         
@@ -231,7 +231,7 @@ public:
         unsigned pos = dest - Begin();
         if (pos > size_)
             pos = size_;
-        unsigned length = static_cast<unsigned>(end - start);
+        unsigned length = (unsigned)(end - start);
         Resize(size_ + length, 0);
         MoveRange(pos + length, pos, size_ - pos - length);
         
@@ -270,7 +270,7 @@ public:
         unsigned pos = start - Begin();
         if (pos >= size_)
             return End();
-        unsigned length = static_cast<unsigned>(end - start);
+        unsigned length = (unsigned)(end - start);
         Erase(pos, length);
         
         return Begin() + pos;
@@ -651,7 +651,7 @@ public:
         unsigned pos = dest - Begin();
         if (pos > size_)
             pos = size_;
-        unsigned length = static_cast<unsigned>(end - start);
+        unsigned length = (unsigned)(end - start);
         Resize(size_ + length);
         MoveRange(pos + length, pos, size_ - pos - length);
         CopyElements(Buffer() + pos, &(*start), length);
@@ -665,7 +665,7 @@ public:
         unsigned pos = dest - Begin();
         if (pos > size_)
             pos = size_;
-        unsigned length = static_cast<unsigned>(end - start);
+        unsigned length = (unsigned)(end - start);
         Resize(size_ + length);
         MoveRange(pos + length, pos, size_ - pos - length);
         
@@ -704,7 +704,7 @@ public:
         unsigned pos = start - Begin();
         if (pos >= size_)
             return End();
-        unsigned length = static_cast<unsigned>(end - start);
+        unsigned length = (unsigned)(end - start);
         Erase(pos, length);
         
         return Begin() + pos;
