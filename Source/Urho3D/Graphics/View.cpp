@@ -1938,7 +1938,7 @@ void View::AllocateScreenBuffers()
     }
     
     #ifdef URHO3D_OPENGL
-    if (deferred_ && !hdrRendering)
+    if (deferred_ && !renderer_->GetHDRRendering())
         format = Graphics::GetRGBAFormat();
     #endif
     
