@@ -394,7 +394,7 @@ unsigned GetNumPhysicalCPUs()
     #endif
     #elif defined(ANDROID)
     return GetAndroidCPUCount();
-    #elif !defined(ANDROID) && !defined(RPI) && !defined(EMSCRIPTEN)
+    #elif !defined(RPI) && !defined(EMSCRIPTEN)
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_cores;
@@ -416,7 +416,7 @@ unsigned GetNumLogicalCPUs()
     #endif
     #elif defined(ANDROID)
     return GetAndroidCPUCount();
-    #elif !defined(ANDROID) && !defined(RPI) && !defined(EMSCRIPTEN)
+    #elif !defined(RPI) && !defined(EMSCRIPTEN)
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_logical_cpus;
