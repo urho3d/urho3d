@@ -699,8 +699,8 @@ macro (setup_executable)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
             COMMENT "Scp-ing ${TARGET_NAME} executable to target system")
     endif ()
+    # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
     if (DEST_RUNTIME_DIR)
-        # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
         if (EMSCRIPTEN)
             # todo: Just use generator-expression when CMake minimum version is 3.0
             if (CMAKE_VERSION VERSION_LESS 3.0)
@@ -710,10 +710,10 @@ macro (setup_executable)
                 set (LOCATION $<TARGET_FILE_DIR:${TARGET_NAME}>)
             endif ()
             unset (FILES)
-            foreach (EXT data html html.mem js)
+            foreach (EXT data html html.map html.mem js)
                 list (APPEND FILES ${LOCATION}/${TARGET_NAME}.${EXT})
             endforeach ()
-            install (FILES ${FILES} DESTINATION ${DEST_BUNDLE_DIR})
+            install (FILES ${FILES} DESTINATION ${DEST_BUNDLE_DIR} OPTIONAL)    # We get html.map or html.mem depend on the build configuration
         else ()
             install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_BUNDLE_DIR})
         endif ()
