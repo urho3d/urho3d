@@ -1,9 +1,13 @@
-Urho3D - cross-platform 2D and 3D game engine
-=============================================
+#Urho3D
 
-http://urho3d.github.io/
+![Urho3D logo](bin/Data/Textures/LogoLarge.png)
 
-Licensed under the MIT license, see License.txt for details.
+**Urho3D** is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE and Horde3D.
+
+Main website: http://urho3d.github.io/
+
+##License
+Licensed under the MIT license, see [License.txt](License.txt) for details.
 
 ##Credits
 Urho3D development, contributions and bugfixes by:
