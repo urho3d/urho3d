@@ -216,13 +216,13 @@ For activating the MinGW toolchain, and to allow it to find the correct compiler
 
 Execute cmake_mingw.sh then go to the build tree to execute make command. After the build is complete, the Windows executables can be found in the build tree's "bin" subdirectory.
 
-\section Building_Emscripten Emscripten build process
+\section Building_Emscripten Emscripten build process (EXPERIMENTAL)
 
 > WHAT DOESN'T WORK:
->    - %Sound.
+>    - ~~%Sound.~~
 >    - %Terrain rendering.
 >    - Networking. Javascript can only use http and websockets protocols so it's not likely that kNet will ever function.
->    - Mouse locking.
+>    - ~~Mouse locking.~~
 >    - All the scripting support: AngelScript and Lua/LuaJIT.
 
 This section assumes you have already updated, installed, and activated the latest Emscripten (trans-)compiler toolchain on your host system as per described in http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html.
