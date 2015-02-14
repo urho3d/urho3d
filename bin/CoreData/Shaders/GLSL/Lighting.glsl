@@ -60,7 +60,7 @@ float GetVertexLightVolumetric(int index, vec3 worldPos)
 
 #ifdef SHADOW
 
-#if defined(DIRLIGHT) && !defined(GL_ES)
+#if defined(DIRLIGHT) && (!defined(GL_ES) || defined(WEBGL))
     #define NUMCASCADES 4
 #else
     #define NUMCASCADES 1
@@ -118,7 +118,7 @@ float GetIntensity(vec3 color)
 
 #ifdef SHADOW
 
-#if defined(DIRLIGHT) && !defined(GL_ES)
+#if defined(DIRLIGHT) && (!defined(GL_ES) || defined(WEBGL))
     #define NUMCASCADES 4
 #else
     #define NUMCASCADES 1
@@ -193,7 +193,7 @@ float GetDirShadowFade(float inLight, float depth)
     return min(inLight + max((depth - cShadowDepthFade.z) * cShadowDepthFade.w, 0.0), 1.0);
 }
 
-#ifndef GL_ES
+#if !defined(GL_ES) || defined(WEBGL)
 float GetDirShadow(const vec4 iShadowPos[NUMCASCADES], float depth)
 {
     vec4 shadowPos;
@@ -209,7 +209,14 @@ float GetDirShadow(const vec4 iShadowPos[NUMCASCADES], float depth)
         
     return GetDirShadowFade(GetShadow(shadowPos), depth);
 }
+#else
+float GetDirShadow(const vec4 iShadowPos[NUMCASCADES], float depth)
+{
+    return GetDirShadowFade(GetShadow(iShadowPos[0]), depth);
+}
+#endif
 
+#ifndef GL_ES
 float GetDirShadowDeferred(vec4 projWorldPos, float depth)
 {
     vec4 shadowPos;
@@ -224,11 +231,6 @@ float GetDirShadowDeferred(vec4 projWorldPos, float depth)
         shadowPos = cLightMatricesPS[3] * projWorldPos;
 
     return GetDirShadowFade(GetShadow(shadowPos), depth);
-}
-#else
-float GetDirShadow(const vec4 iShadowPos[NUMCASCADES], float depth)
-{
-    return GetDirShadowFade(GetShadow(iShadowPos[0]), depth);
 }
 #endif
 #endif

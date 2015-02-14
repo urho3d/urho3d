@@ -18,7 +18,7 @@ uniform mat4 cViewProj;
 uniform vec4 cUOffset;
 uniform vec4 cVOffset;
 uniform mat4 cZone;
-#ifndef GL_ES
+#if !defined(GL_ES) || defined(WEBGL)
     uniform mat4 cLightMatrices[4];
 #else
     uniform mat4 cLightMatrices[2];

@@ -30,8 +30,8 @@ namespace Urho3D
 
 class Vector3;
 
-/// Graphics capability support level. WebGL will at least for now also behave similarly as mobiles
-#if defined(ANDROID) || defined(IOS) || defined(RPI) || defined(EMSCRIPTEN)
+/// Graphics capability support level. WebGL also uses OpenGL ES, but is considered a desktop platform capability-wise
+#if defined(ANDROID) || defined(IOS) || defined(RPI)
 #define MOBILE_GRAPHICS
 #else
 #define DESKTOP_GRAPHICS
