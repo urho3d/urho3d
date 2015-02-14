@@ -2695,7 +2695,11 @@ void Graphics::CheckFeatureSupport(String& extensions)
         glesDepthStencilFormat = GL_DEPTH_COMPONENT24_OES;
     if (CheckExtension(extensions, "GL_OES_packed_depth_stencil"))
         glesDepthStencilFormat = GL_DEPTH24_STENCIL8_OES;
+    #ifdef EMSCRIPTEN
+    if (!CheckExtension(extensions, "WEBGL_depth_texture"))
+    #else
     if (!CheckExtension(extensions, "GL_OES_depth_texture"))
+    #endif
     {
         shadowMapFormat_ = 0;
         hiresShadowMapFormat_ = 0;
@@ -2710,6 +2714,10 @@ void Graphics::CheckFeatureSupport(String& extensions)
         #endif
         shadowMapFormat_ = GL_DEPTH_COMPONENT;
         hiresShadowMapFormat_ = 0;
+        // WebGL shadow map rendering seems to be extremely slow without an attached dummy color texture
+        #ifdef EMSCRIPTEN
+        dummyColorFormat_ = GetRGBAFormat();
+        #endif
     }
     #endif
 }

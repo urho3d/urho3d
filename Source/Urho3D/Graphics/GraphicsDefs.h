@@ -30,9 +30,8 @@ namespace Urho3D
 
 class Vector3;
 
-/// Graphics capability support level. Emscripten also uses OpenGL ES but will have higher capability than actual mobiles,
-/// so it is not included
-#if defined(ANDROID) || defined(IOS) || defined(RPI)
+/// Graphics capability support level. WebGL will at least for now also behave similarly as mobiles
+#if defined(ANDROID) || defined(IOS) || defined(RPI) || defined(EMSCRIPTEN)
 #define MOBILE_GRAPHICS
 #else
 #define DESKTOP_GRAPHICS
