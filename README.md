@@ -1,4 +1,4 @@
-![Urho3D logo](https://github.com/urho3d/Urho3D/blob/master/bin/Data/Textures/LogoLarge.png)
+![Urho3D logo](https://raw.githubusercontent.com/urho3d/Urho3D/master/bin/Data/Textures/LogoLarge.png)
 
 #Urho3D
 
