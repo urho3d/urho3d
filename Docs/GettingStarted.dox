@@ -219,7 +219,6 @@ Execute cmake_mingw.sh then go to the build tree to execute make command. After 
 \section Building_Emscripten Emscripten build process (EXPERIMENTAL)
 
 > WHAT DOESN'T WORK:
->    - %Terrain rendering.
 >    - Networking. Javascript can only use http and websockets protocols so it's not likely that kNet will ever function.
 >    - All the scripting support: AngelScript and Lua/LuaJIT.
 
