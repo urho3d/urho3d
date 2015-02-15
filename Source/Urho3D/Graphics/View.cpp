@@ -1725,9 +1725,11 @@ bool View::SetTextures(RenderPathCommand& command)
         if (GetExtension(command.textureNames_[i]) == ".xml")
         {
             // Assume 3D textures are only bound to the volume map unit, otherwise it's a cube texture
+            #ifdef DESKTOP_GRAPHICS
             if (i == TU_VOLUMEMAP)
                 texture = cache->GetResource<Texture3D>(command.textureNames_[i]);
             else
+            #endif
                 texture = cache->GetResource<TextureCube>(command.textureNames_[i]);
         }
         else
@@ -2740,12 +2742,11 @@ Technique* View::GetTechnique(Drawable* drawable, Material* material)
 
 void View::CheckMaterialForAuxView(Material* material)
 {
-    const SharedPtr<Texture>* textures = material->GetTextures();
-    unsigned numTextures = material->GetNumUsedTextureUnits();
+    const HashMap<TextureUnit, SharedPtr<Texture> >& textures = material->GetTextures();
 
-    for (unsigned i = 0; i < numTextures; ++i)
+    for (HashMap<TextureUnit, SharedPtr<Texture> >::ConstIterator i = textures.Begin(); i != textures.End(); ++i)
     {
-        Texture* texture = textures[i];
+        Texture* texture = i->second_.Get();
         if (texture && texture->GetUsage() == TEXTURE_RENDERTARGET)
         {
             // Have to check cube & 2D textures separately

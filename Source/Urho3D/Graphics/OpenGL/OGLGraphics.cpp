@@ -3032,7 +3032,9 @@ void Graphics::SetTextureUnitMappings()
 {
     textureUnits_["DiffMap"] = TU_DIFFUSE;
     textureUnits_["DiffCubeMap"] = TU_DIFFUSE;
+    textureUnits_["AlbedoBuffer"] = TU_ALBEDOBUFFER;
     textureUnits_["NormalMap"] = TU_NORMAL;
+    textureUnits_["NormalBuffer"] = TU_NORMALBUFFER;
     textureUnits_["SpecMap"] = TU_SPECULAR;
     textureUnits_["EmissiveMap"] = TU_EMISSIVE;
     textureUnits_["EnvMap"] = TU_ENVIRONMENT;
@@ -3041,15 +3043,15 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["LightSpotMap"] = TU_LIGHTSHAPE;
     textureUnits_["LightCubeMap"]  = TU_LIGHTSHAPE;
     textureUnits_["ShadowMap"] = TU_SHADOWMAP;
+    #ifdef DESKTOP_GRAPHICS
+    textureUnits_["VolumeMap"] = TU_VOLUMEMAP;
     textureUnits_["FaceSelectCubeMap"] = TU_FACESELECT;
     textureUnits_["IndirectionCubeMap"] = TU_INDIRECTION;
-    textureUnits_["AlbedoBuffer"] = TU_ALBEDOBUFFER;
-    textureUnits_["NormalBuffer"] = TU_NORMALBUFFER;
     textureUnits_["DepthBuffer"] = TU_DEPTHBUFFER;
     textureUnits_["LightBuffer"] = TU_LIGHTBUFFER;
-    textureUnits_["VolumeMap"] = TU_VOLUMEMAP;
     textureUnits_["ZoneCubeMap"] = TU_ZONE;
     textureUnits_["ZoneVolumeMap"] = TU_ZONE;
+    #endif
 }
 
 void RegisterGraphicsLibrary(Context* context)

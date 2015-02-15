@@ -278,23 +278,26 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     
     engine->RegisterEnum("TextureUnit");
     engine->RegisterEnumValue("TextureUnit", "TU_DIFFUSE", TU_DIFFUSE);
+    engine->RegisterEnumValue("TextureUnit", "TU_ALBEDOBUFFER", TU_ALBEDOBUFFER);
     engine->RegisterEnumValue("TextureUnit", "TU_NORMAL", TU_NORMAL);
+    engine->RegisterEnumValue("TextureUnit", "TU_NORMALBUFFER", TU_NORMALBUFFER);
     engine->RegisterEnumValue("TextureUnit", "TU_SPECULAR", TU_SPECULAR);
     engine->RegisterEnumValue("TextureUnit", "TU_EMISSIVE", TU_EMISSIVE);
     engine->RegisterEnumValue("TextureUnit", "TU_ENVIRONMENT", TU_ENVIRONMENT);
     engine->RegisterEnumValue("TextureUnit", "TU_LIGHTRAMP", TU_LIGHTRAMP);
     engine->RegisterEnumValue("TextureUnit", "TU_LIGHTSHAPE", TU_LIGHTSHAPE);
     engine->RegisterEnumValue("TextureUnit", "TU_SHADOWMAP", TU_SHADOWMAP);
+    #ifdef DESKTOP_GRAPHICS
+    engine->RegisterEnumValue("TextureUnit", "TU_CUSTOM1", TU_CUSTOM1);
+    engine->RegisterEnumValue("TextureUnit", "TU_CUSTOM2", TU_CUSTOM2);
+    engine->RegisterEnumValue("TextureUnit", "TU_VOLUMEMAP", TU_VOLUMEMAP);
     engine->RegisterEnumValue("TextureUnit", "TU_FACESELECT", TU_FACESELECT);
     engine->RegisterEnumValue("TextureUnit", "TU_INDIRECTION", TU_INDIRECTION);
-    engine->RegisterEnumValue("TextureUnit", "TU_ALBEDOBUFFER", TU_ALBEDOBUFFER);
-    engine->RegisterEnumValue("TextureUnit", "TU_NORMALBUFFER", TU_NORMALBUFFER);
     engine->RegisterEnumValue("TextureUnit", "TU_DEPTHBUFFER", TU_DEPTHBUFFER);
     engine->RegisterEnumValue("TextureUnit", "TU_LIGHTBUFFER", TU_LIGHTBUFFER);
-    engine->RegisterEnumValue("TextureUnit", "TU_VOLUMEMAP", TU_VOLUMEMAP);
     engine->RegisterEnumValue("TextureUnit", "TU_ZONE", TU_ZONE);
+    #endif
     engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
-    engine->RegisterEnumValue("TextureUnit", "MAX_NAMED_TEXTURE_UNITS", MAX_NAMED_TEXTURE_UNITS);
     engine->RegisterEnumValue("TextureUnit", "MAX_TEXTURE_UNITS", MAX_TEXTURE_UNITS);
     
     engine->RegisterObjectType("RenderTargetInfo", sizeof(RenderTargetInfo), asOBJ_VALUE | asOBJ_APP_CLASS_C);
@@ -688,7 +691,6 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "CullMode get_shadowCullMode() const", asMETHOD(Material, GetShadowCullMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_depthBias(const BiasParameters&in)", asMETHOD(Material, SetDepthBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "const BiasParameters& get_depthBias() const", asMETHOD(Material, GetDepthBias), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "uint get_numUsedTextureUnits() const", asMETHOD(Material, GetNumUsedTextureUnits), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_scene(Scene@+)", asMETHOD(Material, SetScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Scene@+ get_scene() const", asMETHOD(Material, GetScene), asCALL_THISCALL);
     

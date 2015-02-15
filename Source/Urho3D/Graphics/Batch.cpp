@@ -556,14 +556,11 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
                 graphics->SetShaderParameter(i->first_, i->second_.value_);
         }
         
-        const SharedPtr<Texture>* textures = material_->GetTextures();
-        unsigned numTextures = material_->GetNumUsedTextureUnits();
-
-        for (unsigned i = 0; i < numTextures; ++i)
+        const HashMap<TextureUnit, SharedPtr<Texture> >& textures = material_->GetTextures();
+        for (HashMap<TextureUnit, SharedPtr<Texture> >::ConstIterator i = textures.Begin(); i != textures.End(); ++i)
         {
-            TextureUnit unit = (TextureUnit)i;
-            if (textures[i] && graphics->HasTextureUnit(unit))
-                graphics->SetTexture(i, textures[i]);
+            if (graphics->HasTextureUnit(i->first_))
+                graphics->SetTexture(i->first_, i->second_.Get());
         }
     }
     
@@ -589,8 +586,10 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
     }
     
     // Set zone texture if necessary
+    #ifdef DESKTOP_GRAPHICS
     if (zone_ && graphics->HasTextureUnit(TU_ZONE))
         graphics->SetTexture(TU_ZONE, zone_->GetZoneTexture());
+    #endif
 }
 
 void Batch::Draw(View* view, bool allowDepthWrite) const
