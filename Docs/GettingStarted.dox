@@ -220,7 +220,7 @@ Execute cmake_mingw.sh then go to the build tree to execute make command. After 
 
 > WHAT DOESN'T WORK:
 >    - Networking. Javascript can only use http and websockets protocols so it's not likely that kNet will ever function.
->    - All the scripting support: AngelScript and Lua/LuaJIT.
+>    - AngelScript scripting support.
 
 This section assumes you have already updated, installed, and activated the latest Emscripten (trans-)compiler toolchain on your host system as per described in http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html.
 
