@@ -292,12 +292,6 @@ void Drawable::SetSortValue(float value)
     sortValue_ = value;
 }
 
-void Drawable::SetMinMaxZ(float minZ, float maxZ)
-{
-    minZ_ = minZ;
-    maxZ_ = maxZ;
-}
-
 void Drawable::MarkInView(const FrameInfo& frame)
 {
     if (frame.frameNumber_ != viewFrameNumber_)
@@ -306,7 +300,7 @@ void Drawable::MarkInView(const FrameInfo& frame)
         viewCameras_.Clear();
     }
     
-    viewCameras_.Insert(frame.camera_);
+    viewCameras_.Push(frame.camera_);
 }
 
 void Drawable::MarkInView(unsigned frameNumber, Camera* camera)
@@ -318,7 +312,7 @@ void Drawable::MarkInView(unsigned frameNumber, Camera* camera)
     }
     
     if (camera)
-        viewCameras_.Insert(camera);
+        viewCameras_.Push(camera);
 }
 
 void Drawable::LimitLights()

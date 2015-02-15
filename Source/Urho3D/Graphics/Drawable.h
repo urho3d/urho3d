@@ -25,7 +25,6 @@
 #include "../Math/BoundingBox.h"
 #include "../Scene/Component.h"
 #include "../Graphics/GraphicsDefs.h"
-#include "../Container/HashSet.h"
 
 namespace Urho3D
 {
@@ -199,7 +198,7 @@ public:
     /// Set sorting value.
     void SetSortValue(float value);
     /// Set view-space depth bounds.
-    void SetMinMaxZ(float minZ, float maxZ);
+    void SetMinMaxZ(float minZ, float maxZ) { minZ_ = minZ; maxZ_ = maxZ; }
     /// Mark in view.
     void MarkInView(const FrameInfo& frame);
     /// Mark in view of a specific camera. Specify null camera to update just the frame number.
@@ -336,8 +335,8 @@ protected:
     Zone* zone_;
     /// Zone inconclusive or dirtied flag.
     bool zoneDirty_;
-    /// Set of cameras from which is seen on the current frame.
-    HashSet<Camera*> viewCameras_;
+    /// List of cameras from which is seen on the current frame.
+    PODVector<Camera*> viewCameras_;
 };
 
 inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)

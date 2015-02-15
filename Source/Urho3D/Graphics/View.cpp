@@ -180,22 +180,18 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
     while (start != end)
     {
         Drawable* drawable = *start++;
-        bool batchesUpdated = false;
-        
-        // If draw distance non-zero, update and check it
-        float maxDistance = drawable->GetDrawDistance();
-        if (maxDistance > 0.0f)
-        {
-            drawable->UpdateBatches(view->frame_);
-            batchesUpdated = true;
-            if (drawable->GetDistance() > maxDistance)
-                continue;
-        }
-        
+
         if (!buffer || !drawable->IsOccludee() || buffer->IsVisible(drawable->GetWorldBoundingBox()))
         {
-            if (!batchesUpdated)
-                drawable->UpdateBatches(view->frame_);
+            drawable->UpdateBatches(view->frame_);
+            // If draw distance non-zero, update and check it
+            float maxDistance = drawable->GetDrawDistance();
+            if (maxDistance > 0.0f)
+            {
+                if (drawable->GetDistance() > maxDistance)
+                    continue;
+            }
+
             drawable->MarkInView(view->frame_);
             
             // For geometries, find zone, clear lights and calculate view space Z range
