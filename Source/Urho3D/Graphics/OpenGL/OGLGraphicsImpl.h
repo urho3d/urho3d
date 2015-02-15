@@ -26,7 +26,7 @@
 #include "../../Container/HashMap.h"
 #include "../../Core/Timer.h"
 
-#if defined(ANDROID) || defined (RPI)
+#if defined(ANDROID) || defined (RPI) || defined (EMSCRIPTEN)
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #elif defined(IOS)

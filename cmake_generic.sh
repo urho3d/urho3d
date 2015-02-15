@@ -57,6 +57,9 @@ for a in $@; do
         -DWIN32=1)
             WINDOWS=1 && OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/mingw.toolchain.cmake"
             ;;
+        -DEMSCRIPTEN=1)
+            EMSCRIPTEN=1 && OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/emscripten.toolchain.cmake"
+            ;;
     esac
 done
 

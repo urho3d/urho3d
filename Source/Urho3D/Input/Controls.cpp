@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#include "../Network/Controls.h"
+#include "../Input/Controls.h"
 
 #include "../DebugNew.h"
 

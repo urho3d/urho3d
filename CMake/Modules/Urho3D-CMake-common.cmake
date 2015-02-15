@@ -56,7 +56,7 @@ if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the i
     set (URHO3D_DEFAULT_64BIT ${URHO3D_DEFAULT_64BIT} CACHE INTERNAL "Default value for URHO3D_64BIT build option")
     # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
     # The other arm platform that Urho3D supports that is not Android is Raspberry Pi at the moment
-    if (NOT ANDROID)
+    if (NOT ANDROID AND NOT EMSCRIPTEN)
         string (REGEX MATCH "#define +__arm__ +1" matched "${PREDEFINED_MACROS}")
         if (matched)
             # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too on the Raspberry-Pi device itself
@@ -64,17 +64,17 @@ if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the i
         endif ()
     endif ()
 endif ()
-if (ANDROID OR RPI)
-    # This build option is not available on Android and Raspberry-Pi platforms as its value is preset by the chosen toolchain in the build tree
+if (ANDROID OR RPI OR EMSCRIPTEN)
+    # This build option is not available on Android, Raspberry-Pi, and Emscripten platforms as its value is preset by the chosen toolchain in the build tree
     set (URHO3D_64BIT ${URHO3D_DEFAULT_64BIT})
 else ()
     option (URHO3D_64BIT "Enable 64-bit build" ${URHO3D_DEFAULT_64BIT})
 endif ()
-option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE)
-option (URHO3D_LUA "Enable additional Lua scripting support")
-option (URHO3D_LUAJIT "Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)")
+cmake_dependent_option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE "NOT EMSCRIPTEN" FALSE)
+cmake_dependent_option (URHO3D_LUA "Enable additional Lua scripting support" FALSE "NOT EMSCRIPTEN" FALSE)
+cmake_dependent_option (URHO3D_LUAJIT "Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)" FALSE "NOT EMSCRIPTEN" FALSE)
 option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
-option (URHO3D_NETWORK "Enable networking support" TRUE)
+cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT EMSCRIPTEN" FALSE)
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
 option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
 if (MINGW AND NOT DEFINED URHO3D_SSE)
@@ -82,19 +82,20 @@ if (MINGW AND NOT DEFINED URHO3D_SSE)
     execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION ERROR_QUIET)
     if (GCC_VERSION VERSION_LESS 4.9.1)
         message (WARNING "Disabling SSE by default due to MinGW version. It is recommended to upgrade to MinGW with GCC >= 4.9.1. You can also try to re-enable SSE with CMake option -DURHO3D_SSE=1, but this may result in compile errors.")
+        set (URHO3D_DEFAULT_SSE FALSE)
     else ()
         set (URHO3D_DEFAULT_SSE TRUE)
     endif ()
 else ()
     set (URHO3D_DEFAULT_SSE TRUE)
 endif ()
-option (URHO3D_SSE "Enable SSE instruction set" ${URHO3D_DEFAULT_SSE})
+cmake_dependent_option (URHO3D_SSE "Enable SSE instruction set" ${URHO3D_DEFAULT_SSE} "NOT EMSCRIPTEN" FALSE)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
-    cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua scripting only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
+    cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
     option (URHO3D_SAMPLES "Build sample applications")
-    cmake_dependent_option (URHO3D_TOOLS "Build tools (native and RPI only)" TRUE "NOT IOS AND NOT ANDROID" FALSE)
-    cmake_dependent_option (URHO3D_EXTRAS "Build extras (native and RPI only)" FALSE "NOT IOS AND NOT ANDROID" FALSE)
+    cmake_dependent_option (URHO3D_TOOLS "Build tools (native and RPI only)" TRUE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
+    cmake_dependent_option (URHO3D_EXTRAS "Build extras (native and RPI only)" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     option (URHO3D_DOCS "Generate documentation as part of normal build")
     option (URHO3D_DOCS_QUIET "Generate documentation as part of normal build, suppress generation process from sending anything to stdout")
     cmake_dependent_option (URHO3D_MINIDUMPS "Enable minidumps on crash (VS only)" TRUE "MSVC" FALSE)
@@ -106,6 +107,7 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
 else ()
     set (URHO3D_HOME "" CACHE PATH "Path to Urho3D build tree or SDK installation location (external project only)")
 endif ()
+option (URHO3D_PACKAGING "Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0" ${EMSCRIPTEN})
 option (URHO3D_PROFILING "Enable profiling support" TRUE)
 option (URHO3D_LOGGING "Enable logging support" TRUE)
 option (URHO3D_TESTING "Enable testing support")
@@ -157,6 +159,12 @@ endif ()
 if (RPI AND CMAKE_CROSSCOMPILING)
     set (RPI_PREFIX "" CACHE STRING "Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)")
     set (RPI_SYSROOT "" CACHE PATH "Path to Raspberry Pi system root (RPI cross-compiling build only)")
+endif ()
+if (EMSCRIPTEN)     # CMAKE_CROSSCOMPILING is always true for Emscripten
+    set (EMSCRIPTEN_ROOT_PATH "" CACHE PATH "Root path to Emscripten cross-compiler tools (Emscripten cross-compiling build only)")
+    set (EMSCRIPTEN_SYSROOT "" CACHE PATH "Path to Emscripten system root (Emscripten cross-compiling build only)")
+    option (EMSCRIPTEN_ALLOW_MEMORY_GROWTH "Enable memory growing based on application demand (Emscripten cross-compiling build only)")
+    set (EMSCRIPTEN_TOTAL_MEMORY 268435456)  # This option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH=1
 endif ()
 # Constrain the build option values in cmake-gui, if applicable
 if (CMAKE_VERSION VERSION_GREATER 2.8 OR CMAKE_VERSION VERSION_EQUAL 2.8)
@@ -375,8 +383,15 @@ else ()
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DASH_MBIT}")
             set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${DASH_MBIT}")
         endif ()
-        # MinGW-specific setup
-        if (MINGW)
+        if (EMSCRIPTEN)
+            # Emscripten-specific setup
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
+            # CMake does not treat Emscripten as a valid platform yet, certain platform-specific variables cannot be set in the
+            # toolchain file as they get overwritten by CMake internally as per Linux platform default, so set them here for now
+            set (CMAKE_EXECUTABLE_SUFFIX .html)
+        elseif (MINGW)
+            # MinGW-specific setup
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static -static-libgcc -fno-keep-inline-dllexport")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libstdc++ -static-libgcc -fno-keep-inline-dllexport")
             set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static")
@@ -480,12 +495,12 @@ macro (enable_pch HEADER_PATHNAME)
                 if (FILE MATCHES \\.cpp$)
                     if (FILE MATCHES ${NAME_WE}\\.cpp$)
                         # Precompiling header file
-                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "/Fp$(IntDir)${PCH_FILENAME} /Yc${HEADER_FILENAME}")
+                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " /Fp$(IntDir)${PCH_FILENAME} /Yc${HEADER_FILENAME}")     # Need a leading space for appending
                     else ()
                         # Use the precompiled header file
                         get_property (NO_PCH SOURCE ${FILE} PROPERTY NO_PCH)
                         if (NOT NO_PCH)
-                            set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "/Fp$(IntDir)${PCH_FILENAME} /Yu${HEADER_FILENAME} /FI${HEADER_FILENAME}")
+                            set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " /Fp$(IntDir)${PCH_FILENAME} /Yu${HEADER_FILENAME} /FI${HEADER_FILENAME}")
                         endif ()
                     endif ()
                 endif ()
@@ -602,13 +617,13 @@ macro (setup_target)
     endif ()
 
     # Workaround CMake/Xcode generator bug where it always appends '/build' path element to SYMROOT attribute and as such the items in Products are always rendered as red as if they are not yet built
-    if (XCODE)
+    if (XCODE AND NOT CMAKE_PROJECT_NAME MATCHES ^ExternalProject-)
         file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/build)
         get_target_property (LOCATION ${TARGET_NAME} LOCATION)
         string (REGEX REPLACE "^.*\\$\\(CONFIGURATION\\)" $(CONFIGURATION) SYMLINK ${LOCATION})
         get_filename_component (DIRECTORY ${SYMLINK} PATH)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND mkdir -p ${DIRECTORY} && ln -s -f $<TARGET_FILE:${TARGET_NAME}> ${DIRECTORY}/$<TARGET_FILE_NAME:${TARGET_NAME}>
+            COMMAND mkdir -p ${DIRECTORY} && ln -sf $<TARGET_FILE:${TARGET_NAME}> ${DIRECTORY}/$<TARGET_FILE_NAME:${TARGET_NAME}>
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/build)
     endif ()
 endmacro ()
@@ -627,7 +642,13 @@ macro (check_source_files)
 endmacro ()
 
 # Macro for setting up a library target
+# Macro arguments:
 #  STATIC/SHARED/MODULE/EXCLUDE_FROM_ALL - see CMake help on add_library() command
+# CMake variables:
+#  SOURCE_FILES - list of source files
+#  INCLUDE_DIRS - list of directories for include search path
+#  LIBS - list of dependent libraries that are built internally in the project
+#  ABSOLUTE_PATH_LIBS - list of dependent libraries that are external to the project
 macro (setup_library)
     check_source_files ()
     add_library (${TARGET_NAME} ${ARGN} ${SOURCE_FILES})
@@ -654,8 +675,14 @@ macro (setup_library)
 endmacro ()
 
 # Macro for setting up an executable target
+# Macro arguments:
 #  NODEPS - setup executable target without defining Urho3D dependency libraries
 #  WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL - see CMake help on add_executable() command
+# CMake variables:
+#  SOURCE_FILES - list of source files
+#  INCLUDE_DIRS - list of directories for include search path
+#  LIBS - list of dependent libraries that are built internally in the project
+#  ABSOLUTE_PATH_LIBS - list of dependent libraries that are external to the project
 macro (setup_executable)
     # Parse extra arguments
     cmake_parse_arguments (ARG "NODEPS" "" "" ${ARGN})
@@ -673,9 +700,24 @@ macro (setup_executable)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
             COMMENT "Scp-ing ${TARGET_NAME} executable to target system")
     endif ()
+    # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
     if (DEST_RUNTIME_DIR)
-        # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
-        install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_BUNDLE_DIR})
+        if (EMSCRIPTEN)
+            # todo: Just use generator-expression when CMake minimum version is 3.0
+            if (CMAKE_VERSION VERSION_LESS 3.0)
+                get_target_property (LOCATION ${TARGET_NAME} LOCATION)
+                get_filename_component (LOCATION ${LOCATION} DIRECTORY)
+            else ()
+                set (LOCATION $<TARGET_FILE_DIR:${TARGET_NAME}>)
+            endif ()
+            unset (FILES)
+            foreach (EXT data html html.map html.mem js)
+                list (APPEND FILES ${LOCATION}/${TARGET_NAME}.${EXT})
+            endforeach ()
+            install (FILES ${FILES} DESTINATION ${DEST_BUNDLE_DIR} OPTIONAL)    # We get html.map or html.mem depend on the build configuration
+        else ()
+            install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_BUNDLE_DIR})
+        endif ()
     endif ()
 endmacro ()
 
@@ -689,26 +731,95 @@ macro (setup_ios_linker_flags LINKER_FLAGS)
     set (${LINKER_FLAGS} "${${LINKER_FLAGS}} -framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
 endmacro ()
 
-# Macro for setting up an executable target with resources to copy
+# Macro for setting up linker flags for Emscripten build
+macro (setup_emscripten_linker_flags LINKER_FLAGS)
+    if (EMSCRIPTEN_ALLOW_MEMORY_GROWTH)
+        set (MEMORY_LINKER_FLAGS "-s ALLOW_MEMORY_GROWTH=1")
+    else ()
+        set (MEMORY_LINKER_FLAGS "-s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY}")
+    endif ()
+    set (${LINKER_FLAGS} "${${LINKER_FLAGS}} ${MEMORY_LINKER_FLAGS} -s USE_SDL=2")    # Urho3D uses SDL2 so set it here instead of in the toolchain which potentially could be reused in other projects not using SDL2
+    set (${LINKER_FLAGS}_DEBUG -g4)     # Preserve LLVM debug information, show line number debug comments, and generate source maps
+endmacro ()
+
+# Macro for setting up an executable target with resources to copy/package/bundle/preload
+# Macro arguments:
 #  NODEPS - setup executable target without defining Urho3D dependency libraries
 #  NOBUNDLE - do not use MACOSX_BUNDLE even when URHO3D_MACOSX_BUNDLE build option is enabled
 #  WIN32/MACOSX_BUNDLE/EXCLUDE_FROM_ALL - see CMake help on add_executable() command
+# CMake variables:
+#  RESOURCE_DIRS - list of resource directories (will be packaged into *.pak when URHO3D_PACKAGING build option is set)
+#  RESOURCE_FILES - list of additional resource files (will not be packaged into *.pak in any case)
+#  SOURCE_FILES - list of source files
+#  INCLUDE_DIRS - list of directories for include search path
+#  LIBS - list of dependent libraries that are built internally in the project
+#  ABSOLUTE_PATH_LIBS - list of dependent libraries that are external to the project
 macro (setup_main_executable)
     # Parse extra arguments
     cmake_parse_arguments (ARG "NOBUNDLE;MACOSX_BUNDLE;WIN32" "" "" ${ARGN})
 
-    # Define resource files
-    if (XCODE)
-        set (RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/CoreData ${CMAKE_SOURCE_DIR}/bin/Data ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.icns)
-        if (IOS)
-            list (APPEND RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.png)
-        endif ()
-        source_group (Resources FILES ${RESOURCE_FILES})
-        set_source_files_properties (${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-        list (APPEND SOURCE_FILES ${RESOURCE_FILES})
+    # Define resources
+    if (NOT RESOURCE_DIRS)
+        # If the macro caller has not defined the resource dirs then set them based on Urho3D project convention
+        foreach (DIR ${CMAKE_SOURCE_DIR}/bin/CoreData ${CMAKE_SOURCE_DIR}/bin/Data)
+            # Do not assume external project always follows Urho3D project convention, so double check if this directory exists before using it
+            if (IS_DIRECTORY ${DIR})
+                list (APPEND RESOURCE_DIRS ${DIR})
+            endif ()
+        endforeach ()
     endif ()
+    if (URHO3D_PACKAGING AND RESOURCE_DIRS)
+        # Populate all the variables required by resource packaging
+        foreach (DIR ${RESOURCE_DIRS})
+            get_filename_component (NAME ${DIR} NAME)
+            set (NAME ${NAME}.pak)
+            set (RESOURCE_${DIR}_PATHNAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${NAME})
+            list (APPEND RESOURCE_PAKS ${RESOURCE_${DIR}_PATHNAME})
+            if (EMSCRIPTEN)
+                set (PRELOAD_FLAGS "${PRELOAD_FLAGS} --preload-file ${RESOURCE_${DIR}_PATHNAME}@/${NAME}")
+            endif ()
+        endforeach ()
+        # Urho3D project builds the PackageTool as required; external project uses PackageTool found in the Urho3D build tree or Urho3D SDK
+        find_program (PACKAGE_TOOL PackageTool HINTS ${CMAKE_BINARY_DIR}/bin/tool ${URHO3D_HOME}/bin/tool DOC "Path to PackageTool" NO_DEFAULT_PATH)
+        if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
+            set (PACKAGING_DEP DEPENDS PackageTool)
+        elseif (NOT PACKAGE_TOOL)
+            message (WARNING "PackageTool was not found in the Urho3D build tree or Urho3D SDK. Your project may not build successfully without this tool. "
+                "You may have to first rebuild the Urho3D in its build tree or reinstall Urho3D SDK to get this tool built or installed properly. "
+                "Alternatively, copy the PackageTool executable manually into bin/tool subdirectory in your own project build tree.")
+        endif ()
+        if (NOT PACKAGE_TOOL)
+            set (PACKAGE_TOOL ${CMAKE_BINARY_DIR}/bin/tool/PackageTool)
+        endif ()
+        set (PACKAGING_COMMENT " and packaging")
+        # The *.pak will be generated during build time, suppress error during CMake configuration/generation time
+        set_property (SOURCE ${RESOURCE_PAKS} PROPERTY GENERATED TRUE)
+    endif ()
+    if (XCODE)
+        if (NOT RESOURCE_FILES)
+            # Default app bundle icon
+            set (RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.icns)
+            if (IOS)
+                # Default app icon on the iOS home screen
+                list (APPEND RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.png)
+            endif ()
+        endif ()
+        # Group them together under 'Resources' in Xcode IDE
+        source_group (Resources FILES ${RESOURCE_DIRS} ${RESOURCE_PAKS} ${RESOURCE_FILES})
+        # But only use either paks or dirs
+        if (RESOURCE_PAKS)
+            set_source_files_properties (${RESOURCE_PAKS} ${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+        else ()
+            set_source_files_properties (${RESOURCE_DIRS} ${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+        endif ()
+    endif ()
+    list (APPEND SOURCE_FILES ${RESOURCE_DIRS} ${RESOURCE_PAKS} ${RESOURCE_FILES})
 
     if (ANDROID)
+        # todo: Fix this later - Android build tree has a hard-coded resource dirs symlinks
+        if (URHO3D_PACKAGING)
+            message (WARNING "Resource packaging is not fully supported for Android build currently.")
+        endif ()
         # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES}
         find_file (ANDROID_MAIN_C_PATH SDL_android_main.c
             HINTS ${URHO3D_HOME}/include/${PATH_SUFFIX}/ThirdParty/SDL/android ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
@@ -772,6 +883,15 @@ macro (setup_main_executable)
                 list (APPEND TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
             endif ()
             setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
+        elseif (EMSCRIPTEN)
+            setup_emscripten_linker_flags (CMAKE_EXE_LINKER_FLAGS)
+            if (RESOURCE_PAKS)
+                string (REPLACE ";" "\;" LINK_DEPENDS "${RESOURCE_PAKS}")       # Stringify for string replacement
+                list (APPEND TARGET_PROPERTIES LINK_DEPENDS "${LINK_DEPENDS}")  # Stringify with semicolons already escaped
+            endif ()
+            if (PRELOAD_FLAGS)
+                set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${PRELOAD_FLAGS}")
+            endif ()
         endif ()
         setup_executable (${EXE_TYPE} ${ARG_UNPARSED_ARGUMENTS})
         if (TARGET_PROPERTIES)
@@ -779,14 +899,41 @@ macro (setup_main_executable)
         endif ()
     endif ()
 
-    if (IOS)
-        # Define a custom target to check for resource modification
-        get_target_property (TARGET_LOC ${TARGET_NAME} LOCATION)
-        string (REGEX REPLACE /Contents/MacOS "" TARGET_LOC ${TARGET_LOC})    # The regex replacement is temporary workaround to correct the wrong location caused by CMake/Xcode generator bug
-        add_custom_target (RESOURCE_CHECK_${TARGET_NAME} ALL
-            \(\( `find ${RESOURCE_FILES} -newer ${TARGET_LOC} 2>/dev/null |wc -l` \)\) && touch -cm ${SOURCE_FILES} || exit 0
-            COMMENT "Checking for changes in the Resource folders")
-        add_dependencies (${TARGET_NAME} RESOURCE_CHECK_${TARGET_NAME})
+    # Define a custom target for resource modification checking and resource packaging (if enabled)
+    if ((EXE_TYPE STREQUAL MACOSX_BUNDLE OR URHO3D_PACKAGING) AND RESOURCE_DIRS)
+        # Share a same custom target that checks for a same resource dirs list
+        foreach (DIR ${RESOURCE_DIRS})
+            string (MD5 MD5 ${DIR})
+            set (MD5ALL ${MD5ALL}${MD5})
+            if (CMAKE_HOST_WIN32)
+                # On Windows host, always assumes there are changes so resource dirs would be repackaged in each build, however, still make sure the *.pak timestamp is not altered unnecessarily
+                if (URHO3D_PACKAGING)
+                    set (PACKAGING_COMMAND && echo Packaging ${DIR}... && ${PACKAGE_TOOL} ${DIR} ${RESOURCE_${DIR}_PATHNAME}.new -c -q && ${CMAKE_COMMAND} -E copy_if_different ${RESOURCE_${DIR}_PATHNAME}.new ${RESOURCE_${DIR}_PATHNAME} && ${CMAKE_COMMAND} -E remove ${RESOURCE_${DIR}_PATHNAME}.new)
+                endif ()
+                list (APPEND COMMANDS COMMAND ${CMAKE_COMMAND} -E touch ${DIR} ${PACKAGING_COMMAND})
+            else ()
+                # On Unix-like hosts, detect the changes in the resource directory recursively so they are only repackaged and/or rebundled (Xcode only) as necessary
+                if (URHO3D_PACKAGING)
+                    set (PACKAGING_COMMAND && echo Packaging ${DIR}... && ${PACKAGE_TOOL} ${DIR} ${RESOURCE_${DIR}_PATHNAME} -c -q)
+                    set (OUTPUT_COMMAND test -e ${RESOURCE_${DIR}_PATHNAME} || \( true ${PACKAGING_COMMAND} \))
+                else ()
+                    set (OUTPUT_COMMAND true)   # Nothing to output
+                endif ()
+                list (APPEND COMMANDS COMMAND echo Checking ${DIR}... && \(\( `find ${DIR} -newer ${DIR} |wc -l` \)\) && touch -cm ${DIR} ${PACKAGING_COMMAND} || ${OUTPUT_COMMAND})
+            endif ()
+        endforeach ()
+        string (MD5 MD5ALL ${MD5ALL})
+        # Ensure the resource check is done before building the main executable target
+        if (NOT RESOURCE_CHECK_${MD5ALL} OR NOT TARGET ${RESOURCE_CHECK_${MD5ALL}})
+            set (RESOURCE_CHECK RESOURCE_CHECK)
+            while (TARGET ${RESOURCE_CHECK})
+                string (RANDOM RANDOM)
+                set (RESOURCE_CHECK RESOURCE_CHECK_${RANDOM})
+            endwhile ()
+            add_custom_target (${RESOURCE_CHECK} ALL ${COMMANDS} ${PACKAGING_DEP} COMMENT "Checking${PACKAGING_COMMENT} resource directories")
+            set (RESOURCE_CHECK_${MD5ALL} ${RESOURCE_CHECK} CACHE INTERNAL "Resource check hash map")
+        endif ()
+        add_dependencies (${TARGET_NAME} ${RESOURCE_CHECK_${MD5ALL}})
     endif ()
 endmacro ()
 
@@ -810,7 +957,9 @@ macro (define_dependency_libs TARGET)
             list (APPEND LIBS dl log android)
         else ()
             # Linux
-            list (APPEND LIBS dl pthread rt)
+            if (NOT EMSCRIPTEN)
+                list (APPEND LIBS dl pthread rt)
+            endif ()
             if (RPI)
                 list (APPEND ABSOLUTE_PATH_LIBS ${BCM_VC_LIBRARIES})
             endif ()
@@ -821,14 +970,14 @@ macro (define_dependency_libs TARGET)
     if (${TARGET} MATCHES Civetweb|kNet|Urho3D)
         if (WIN32)
             list (APPEND LIBS ws2_32)
-        elseif (NOT ANDROID)
+        elseif (NOT ANDROID AND NOT EMSCRIPTEN)
             list (APPEND LIBS pthread)
         endif ()
     endif ()
 
     # Urho3D/LuaJIT external dependency
     if (URHO3D_LUAJIT AND ${TARGET} MATCHES LuaJIT|Urho3D)
-        if (NOT WIN32)
+        if (NOT WIN32 AND NOT EMSCRIPTEN)
             list (APPEND LIBS dl m)
         endif ()
     endif ()
@@ -841,7 +990,7 @@ macro (define_dependency_libs TARGET)
             if (URHO3D_MINIDUMPS)
                 list (APPEND LIBS dbghelp)
             endif ()
-        elseif (NOT ANDROID)
+        elseif (NOT ANDROID AND NOT EMSCRIPTEN)
             list (APPEND LIBS pthread)
         endif ()
 
@@ -987,74 +1136,74 @@ endmacro ()
 #  BASE <value> - An absolute base path to be prepended to the destination path when installing to build tree, default to build tree
 #  DESTINATION <value> - A relative destination path to be installed to
 macro (install_header_files)
-    # Parse the arguments for the underlying install command for the SDK
-    cmake_parse_arguments (ARG "FILES_MATCHING;USE_FILE_SYMLINK;BUILD_TREE_ONLY" "BASE;DESTINATION" "FILES;DIRECTORY;PATTERN" ${ARGN})
-    unset (INSTALL_MATCHING)
-    if (ARG_FILES)
-        set (INSTALL_TYPE FILES)
-        set (INSTALL_SOURCES ${ARG_FILES})
-        unset (INSTALL_PERMISSIONS)
-    elseif (ARG_DIRECTORY)
-        set (INSTALL_TYPE DIRECTORY)
-        set (INSTALL_SOURCES ${ARG_DIRECTORY})
-        set (INSTALL_PERMISSIONS ${DEST_PERMISSIONS})
-        if (ARG_FILES_MATCHING)
-            set (INSTALL_MATCHING FILES_MATCHING)
-            # Our macro supports PATTERN <list> but CMake's install command does not, so convert the list to: PATTERN <value1> PATTERN <value2> ...
-            foreach (PATTERN ${ARG_PATTERN})
-                list (APPEND INSTALL_MATCHING PATTERN ${PATTERN})
-            endforeach ()
-        endif ()
-    else ()
-        message (FATAL_ERROR "Couldn't setup install command because the install type is not specified.")
-    endif ()
-    if (NOT ARG_DESTINATION)
-        message (FATAL_ERROR "Couldn't setup install command because the install destination is not specified.")
-    endif ()
-    if (NOT ARG_BUILD_TREE_ONLY AND DEST_INCLUDE_DIR)
-        # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
-        install (${INSTALL_TYPE} ${INSTALL_SOURCES} DESTINATION ${ARG_DESTINATION} ${INSTALL_PERMISSIONS} ${INSTALL_MATCHING})
-    endif ()
-
-    # Reparse the arguments for the create_symlink macro to "install" the header files in the build tree
-    if (NOT ARG_BASE)
-        set (ARG_BASE ${CMAKE_BINARY_DIR})  # Use build tree as base path
-    endif ()
-    foreach (INSTALL_SOURCE ${INSTALL_SOURCES})
-        if (NOT IS_ABSOLUTE ${INSTALL_SOURCE})
-            set (INSTALL_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/${INSTALL_SOURCE})
-        endif ()
-        if (INSTALL_SOURCE MATCHES /$)
-            # Source is a directory
-            if (ARG_USE_FILE_SYMLINK)
-                # Use file symlink for each individual files in the source directory
-                set (GLOBBING_EXPRESSION RELATIVE ${INSTALL_SOURCE})
-                if (ARG_FILES_MATCHING)
-                    foreach (PATTERN ${ARG_PATTERN})
-                        list (APPEND GLOBBING_EXPRESSION ${INSTALL_SOURCE}${PATTERN})
-                    endforeach ()
-                else ()
-                    list (APPEND GLOBBING_EXPRESSION ${INSTALL_SOURCE}*)
-                endif ()
-                file (GLOB_RECURSE NAMES ${GLOBBING_EXPRESSION})
-                foreach (NAME ${NAMES})
-                    get_filename_component (PATH ${ARG_DESTINATION}/${NAME} PATH)
-                    # Recreate the source directory structure in the destination path
-                    if (NOT EXISTS ${ARG_BASE}/${PATH})
-                        file (MAKE_DIRECTORY ${ARG_BASE}/${PATH})
-                    endif ()
-                    create_symlink (${INSTALL_SOURCE}${NAME} ${ARG_DESTINATION}/${NAME} FALLBACK_TO_COPY)
+    # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
+    if (DEST_INCLUDE_DIR)
+        # Parse the arguments for the underlying install command for the SDK
+        cmake_parse_arguments (ARG "FILES_MATCHING;USE_FILE_SYMLINK;BUILD_TREE_ONLY" "BASE;DESTINATION" "FILES;DIRECTORY;PATTERN" ${ARGN})
+        unset (INSTALL_MATCHING)
+        if (ARG_FILES)
+            set (INSTALL_TYPE FILES)
+            set (INSTALL_SOURCES ${ARG_FILES})
+        elseif (ARG_DIRECTORY)
+            set (INSTALL_TYPE DIRECTORY)
+            set (INSTALL_SOURCES ${ARG_DIRECTORY})
+            if (ARG_FILES_MATCHING)
+                set (INSTALL_MATCHING FILES_MATCHING)
+                # Our macro supports PATTERN <list> but CMake's install command does not, so convert the list to: PATTERN <value1> PATTERN <value2> ...
+                foreach (PATTERN ${ARG_PATTERN})
+                    list (APPEND INSTALL_MATCHING PATTERN ${PATTERN})
                 endforeach ()
-            else ()
-                # Use a single symlink pointing to the source directory
-                create_symlink (${INSTALL_SOURCE} ${ARG_DESTINATION} FALLBACK_TO_COPY)
             endif ()
         else ()
-            # Source is a file (it could also be actually a directory to be treated as a "file", i.e. for creating symlink pointing to the directory)
-            get_filename_component (NAME ${INSTALL_SOURCE} NAME)
-            create_symlink (${INSTALL_SOURCE} ${ARG_DESTINATION}/${NAME} FALLBACK_TO_COPY)
+            message (FATAL_ERROR "Couldn't setup install command because the install type is not specified.")
         endif ()
-    endforeach ()
+        if (NOT ARG_DESTINATION)
+            message (FATAL_ERROR "Couldn't setup install command because the install destination is not specified.")
+        endif ()
+        if (NOT ARG_BUILD_TREE_ONLY AND NOT CMAKE_PROJECT_NAME MATCHES ^ExternalProject-)
+            install (${INSTALL_TYPE} ${INSTALL_SOURCES} DESTINATION ${ARG_DESTINATION} ${INSTALL_MATCHING})
+        endif ()
+
+        # Reparse the arguments for the create_symlink macro to "install" the header files in the build tree
+        if (NOT ARG_BASE)
+            set (ARG_BASE ${CMAKE_BINARY_DIR})  # Use build tree as base path
+        endif ()
+        foreach (INSTALL_SOURCE ${INSTALL_SOURCES})
+            if (NOT IS_ABSOLUTE ${INSTALL_SOURCE})
+                set (INSTALL_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/${INSTALL_SOURCE})
+            endif ()
+            if (INSTALL_SOURCE MATCHES /$)
+                # Source is a directory
+                if (ARG_USE_FILE_SYMLINK)
+                    # Use file symlink for each individual files in the source directory
+                    set (GLOBBING_EXPRESSION RELATIVE ${INSTALL_SOURCE})
+                    if (ARG_FILES_MATCHING)
+                        foreach (PATTERN ${ARG_PATTERN})
+                            list (APPEND GLOBBING_EXPRESSION ${INSTALL_SOURCE}${PATTERN})
+                        endforeach ()
+                    else ()
+                        list (APPEND GLOBBING_EXPRESSION ${INSTALL_SOURCE}*)
+                    endif ()
+                    file (GLOB_RECURSE NAMES ${GLOBBING_EXPRESSION})
+                    foreach (NAME ${NAMES})
+                        get_filename_component (PATH ${ARG_DESTINATION}/${NAME} PATH)
+                        # Recreate the source directory structure in the destination path
+                        if (NOT EXISTS ${ARG_BASE}/${PATH})
+                            file (MAKE_DIRECTORY ${ARG_BASE}/${PATH})
+                        endif ()
+                        create_symlink (${INSTALL_SOURCE}${NAME} ${ARG_DESTINATION}/${NAME} FALLBACK_TO_COPY)
+                    endforeach ()
+                else ()
+                    # Use a single symlink pointing to the source directory
+                    create_symlink (${INSTALL_SOURCE} ${ARG_DESTINATION} FALLBACK_TO_COPY)
+                endif ()
+            else ()
+                # Source is a file (it could also be actually a directory to be treated as a "file", i.e. for creating symlink pointing to the directory)
+                get_filename_component (NAME ${INSTALL_SOURCE} NAME)
+                create_symlink (${INSTALL_SOURCE} ${ARG_DESTINATION}/${NAME} FALLBACK_TO_COPY)
+            endif ()
+        endforeach ()
+    endif ()
 endmacro ()
 
 # Set common project structure for Android platform

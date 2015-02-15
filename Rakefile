@@ -73,7 +73,7 @@ task :cmake do
       # do nothing
     when 'clean', 'codeblocks', 'eclipse', 'macosx', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013'
       script = "cmake_#{option}" unless script == 'cmake_clean'
-    when 'android', 'ios', 'mingw', 'rpi'
+    when 'android', 'emscripten', 'ios', 'mingw', 'rpi'
       platform = option
       build_options = "#{build_options} -D#{option == 'mingw' ? 'WIN32' : option.upcase}=1" unless script == 'cmake_clean'
       script = 'cmake_macosx' if option == 'ios'
@@ -102,7 +102,7 @@ task :make do
     case option
     when 'codeblocks', 'eclipse', 'generic', 'macosx', 'make', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013'
       # do nothing
-    when 'android', 'ios', 'mingw', 'rpi'
+    when 'android', 'emscripten', 'ios', 'mingw', 'rpi'
       platform = option
     when 'clean_first'
       cmake_build_options = "#{cmake_build_options} --clean-first"
@@ -173,6 +173,7 @@ task :ci do
   $build_options = "#{$build_options} -DANDROID=#{ENV['ANDROID']}" if ENV['ANDROID']
   $build_options = "#{$build_options} -DRPI=#{ENV['RPI']}" if ENV['RPI']
   $build_options = "#{$build_options} -DWIN32=#{ENV['WINDOWS']}" if ENV['WINDOWS']
+  $build_options = "#{$build_options} -DEMSCRIPTEN=#{ENV['EMSCRIPTEN']}" if ENV['EMSCRIPTEN']
   if ENV['XCODE']
     # xcodebuild
     xcode_ci
@@ -225,7 +226,7 @@ task :ci_rebase do
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
   baseline = ENV['RELEASE_TAG'] || "origin/#{ENV['TRAVIS_BRANCH']}"
   enable = /\[ci rebase\]/ =~ ENV['COMMIT_MESSAGE']
-  [ 'Android-CI', 'RPI-CI', 'OSX-CI' ].each { |ci| ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git rebase #{baseline} #{ci_branch} && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; elif [ #{enable} ]; then git checkout -b #{ci_branch} #{ENV['TRAVIS_BRANCH']} && rm .travis.yml && wget -q https://raw.githubusercontent.com/#{ENV['TRAVIS_REPO_SLUG']}/#{ci}/.travis.yml && cat <<EOF >README.md && git add -A . && git commit -m 'For Travis CI - switch CI build to use #{ci.split('-').first} build environment.' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; fi
+  [ 'Android-CI', 'RPI-CI', 'Emscripten-CI', 'OSX-CI' ].each { |ci| ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git rebase #{baseline} #{ci_branch} && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; elif [ #{enable} ]; then git checkout -b #{ci_branch} #{ENV['TRAVIS_BRANCH']} && rm .travis.yml && wget -q https://raw.githubusercontent.com/#{ENV['TRAVIS_REPO_SLUG']}/#{ci}/.travis.yml && cat <<EOF >README.md && git add -A . && git commit -m 'For Travis CI - switch CI build to use #{ci.split('-').first} build environment.' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; fi
 This is a mirror branch which is constantly being \"rebased\" from #{ENV['TRAVIS_BRANCH']} branch. Please DO NOT checkout from this mirror branch! The purpose of this mirror branch is to perform CI build using #{ci.split('-').first} build environment on Travis-CI.org. See #{ENV['TRAVIS_BRANCH']} branch for CI build result using Ubuntu Linux build environment.
 
 [![Build Status](https://travis-ci.org/#{ENV['TRAVIS_REPO_SLUG']}.png?branch=#{ci_branch})](https://travis-ci.org/#{ENV['TRAVIS_REPO_SLUG']}?branch=#{ci_branch})
@@ -401,7 +402,7 @@ def makefile_ci
   system "cd ../Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
   # Create a new project on the fly that uses newly built Urho3D library in the build tree
   scaffolding "../Build/generated/UsingBuildTree"
-  system "cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_generic.sh . #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
+  system "cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_generic.sh . #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
   ENV['DESTDIR'] = ENV['HOME'] || Dir.home
   puts "\nInstalling Urho3D SDK to #{ENV['DESTDIR']}/usr/local...\n"  # The default CMAKE_INSTALL_PREFIX is /usr/local
   system 'cd ../Build && make -j$NUMJOBS install >/dev/null' or abort 'Failed to install Urho3D SDK'
@@ -578,7 +579,7 @@ def setup_digital_keys
   system 'cat <<EOF >>~/.ssh/known_hosts
 frs.sourceforge.net,216.34.181.57 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA2uifHZbNexw6cXbyg1JnzDitL5VhYs0E65Hk/tLAPmcmm5GuiGeUoI/B0eUSNFsbqzwgwrttjnzKMKiGLN5CWVmlN1IXGGAfLYsQwK6wAu7kYFzkqP4jcwc5Jr9UPRpJdYIK733tSEmzab4qc5Oq8izKQKIaxXNe7FgmL15HjSpatFt9w/ot/CHS78FUAr3j3RwekHCm/jhPeqhlMAgC+jUgNJbFt3DlhDaRMa0NYamVzmX8D47rtmBbEDU3ld6AezWBPUR5Lh7ODOwlfVI58NAf/aYNlmvl2TZiauBCTa7OPYSyXJnIPbQXg6YQlDknNCr0K769EjeIlAfY87Z4tw==
 EOF' or abort 'Failed to append frs.sourceforge.net server public key to known_hosts'
-  # Workaround travis encryption key size limitation. Rather than using the solution in their FAQ (using AES to encrypt/decrypt the file and check in the encrypted file into repo), our solution is more pragmatic. The private key below is incomplete. Only the missing portion is encrypted. Much less secure than the original 2048-bit RSA has to offer but good enough for our case. 
+  # Workaround travis encryption key size limitation. Rather than using the solution in their FAQ (using AES to encrypt/decrypt the file and check in the encrypted file into repo), our solution is more pragmatic. The private key below is incomplete. Only the missing portion is encrypted. Much less secure than the original 2048-bit RSA has to offer but good enough for our case.
   system 'cat <<EOF >~/.ssh/id_rsa
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEAnZGzFEypdXKY3KDT0Q3NLY4Bv74yKgJ4LIgbXothx8w4CfM0

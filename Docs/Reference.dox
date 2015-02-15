@@ -2518,6 +2518,8 @@ PackageTool <directory to process> <package name> [basepath] [options]
 
 Options:
 -c      Enable package file LZ4 compression
+-q      Enable quiet mode
+
 \endverbatim
 
 When PackageTool runs, it will go inside the source directory, then look for subdirectories and any files. Paths inside the package will by default be relative to the source directory, but if an extra path prefix is desired, it can be specified by the optional basepath argument.
@@ -2528,7 +2530,7 @@ For example, this would convert all the resource files inside the Urho3D Data di
 PackageTool Data Data.pak
 \endverbatim
 
-The -c option enables LZ4 compression on the files.
+The -c option enables LZ4 compression on the files. The -q option enables the operation to be performed without sending output to the standard output stream.
 
 \section Tools_RampGenerator RampGenerator
 

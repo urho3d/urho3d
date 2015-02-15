@@ -1,4 +1,4 @@
-$#include "Network/Controls.h"
+$#include "Input/Controls.h"
 
 class Controls
 {

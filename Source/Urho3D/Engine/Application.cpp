@@ -37,15 +37,18 @@
 namespace Urho3D
 {
 
-#ifdef IOS
-// Code for supporting SDL_iPhoneSetAnimationCallback
+#if defined(IOS) || defined(EMSCRIPTEN)
+// Code for supporting SDL_iPhoneSetAnimationCallback() and emscripten_set_main_loop_arg()
+#if defined(EMSCRIPTEN)
+#include <emscripten.h>
+#endif
 void RunFrame(void* data)
 {
-    Application* instance = reinterpret_cast<Application*>(data);
-    instance->GetSubsystem<Engine>()->RunFrame();
+    Engine* engine = reinterpret_cast<Engine*>(data);
+    engine->RunFrame();
 }
 #endif
-    
+
 Application::Application(Context* context) :
     Object(context),
     exitCode_(EXIT_SUCCESS)
@@ -54,13 +57,16 @@ Application::Application(Context* context) :
 
     // Create the Engine, but do not initialize it yet. Subsystems except Graphics & Renderer are registered at this point
     engine_ = new Engine(context);
-    
+
     // Subscribe to log messages so that can show errors if ErrorExit() is called with empty message
     SubscribeToEvent(E_LOGMESSAGE, HANDLER(Application, HandleLogMessage));
 }
 
 int Application::Run()
 {
+    // Emscripten-specific: C++ exceptions are turned off by default in -O1 (and above), unless '-s DISABLE_EXCEPTION_CATCHING=0' flag is set
+    // Urho3D build configuration uses -O3 (Release), -O2 (RelWithDebInfo), and -O0 (Debug)
+    // Thus, the try-catch block below should be optimised out except in Debug build configuration
     try
     {
         Setup();
@@ -77,8 +83,8 @@ int Application::Run()
         if (exitCode_)
             return exitCode_;
 
-        // Platforms other than iOS run a blocking main loop
-        #ifndef IOS
+        // Platforms other than iOS and EMSCRIPTEN run a blocking main loop
+        #if !defined(IOS) && !defined(EMSCRIPTEN)
         while (!engine_->IsExiting())
             engine_->RunFrame();
 
@@ -86,9 +92,13 @@ int Application::Run()
         // iOS will setup a timer for running animation frames so eg. Game Center can run. In this case we do not
         // support calling the Stop() function, as the application will never stop manually
         #else
-        SDL_iPhoneSetAnimationCallback(GetSubsystem<Graphics>()->GetImpl()->GetWindow(), 1, &RunFrame, this);
+        #if defined(IOS)
+        SDL_iPhoneSetAnimationCallback(GetSubsystem<Graphics>()->GetImpl()->GetWindow(), 1, &RunFrame, engine_);
+        #elif defined(EMSCRIPTEN)
+        emscripten_set_main_loop_arg(RunFrame, engine_, 0, 1);
         #endif
-        
+        #endif
+
         return exitCode_;
     }
     catch (std::bad_alloc&)
@@ -118,7 +128,7 @@ void Application::ErrorExit(const String& message)
 void Application::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 {
     using namespace LogMessage;
-    
+
     if (eventData[P_LEVEL].GetInt() == LOG_ERROR)
     {
         // Strip the timestamp if necessary
@@ -126,7 +136,7 @@ void Application::HandleLogMessage(StringHash eventType, VariantMap& eventData)
         unsigned bracketPos = error.Find(']');
         if (bracketPos != String::NPOS)
             error = error.Substring(bracketPos + 2);
-        
+
         startupErrors_ += error + "\n";
     }
 }

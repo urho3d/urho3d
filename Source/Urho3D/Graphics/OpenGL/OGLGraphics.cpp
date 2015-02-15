@@ -313,6 +313,7 @@ void Graphics::SetWindowPosition(int x, int y)
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 {
     PROFILE(SetScreenMode);
+LOGINFO("Graphics::SetMode()");
 
     bool maximize = false;
     
@@ -325,8 +326,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         fullscreen = false;
 
     multiSample = Clamp(multiSample, 1, 16);
+bool isInitialized = IsInitialized();
+LOGINFO(isInitialized ? "isInitialized == true" : "isInitialized == false");
+
     
-    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
+    //if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
+    if (isInitialized && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
         vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
         return true;
     
@@ -356,6 +361,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             height = 768;
         }
     }
+
     
     // Check fullscreen mode validity (desktop only). Use a closest match if not found
     #if !defined(ANDROID) && !defined(IOS) && !defined(RPI)
@@ -445,9 +451,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
                 impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
             else
             {
+#if !defined(EMSCRIPTEN)
                 if (!impl_->window_)
                     impl_->window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
                 fullscreen = false;
+#endif
             }
             
             if (impl_->window_)
@@ -2683,7 +2691,11 @@ void Graphics::CheckFeatureSupport(String& extensions)
         glesDepthStencilFormat = GL_DEPTH_COMPONENT24_OES;
     if (CheckExtension(extensions, "GL_OES_packed_depth_stencil"))
         glesDepthStencilFormat = GL_DEPTH24_STENCIL8_OES;
+    #ifdef EMSCRIPTEN
+    if (!CheckExtension(extensions, "WEBGL_depth_texture"))
+    #else
     if (!CheckExtension(extensions, "GL_OES_depth_texture"))
+    #endif
     {
         shadowMapFormat_ = 0;
         hiresShadowMapFormat_ = 0;
@@ -2698,6 +2710,10 @@ void Graphics::CheckFeatureSupport(String& extensions)
         #endif
         shadowMapFormat_ = GL_DEPTH_COMPONENT;
         hiresShadowMapFormat_ = 0;
+        // WebGL shadow map rendering seems to be extremely slow without an attached dummy color texture
+        #ifdef EMSCRIPTEN
+        dummyColorFormat_ = GetRGBAFormat();
+        #endif
     }
     #endif
 }

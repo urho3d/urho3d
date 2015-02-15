@@ -148,6 +148,9 @@ bool ShaderVariation::Create()
     if (type_ == VS)
         shaderCode += "#define RPI\n";
     #endif
+    #ifdef EMSCRIPTEN
+    shaderCode += "#define WEBGL\n";
+    #endif
 
     // When version define found, do not insert it a second time
     if (verEnd > 0)

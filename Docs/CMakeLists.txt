@@ -105,10 +105,10 @@ endif ()
 
 # Make sure html output directory exists and not empty
 file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/html/Readme.txt "If URHO3D_DOCS build option is not set then use 'make doc' command to re-generate Urho3D documentation before calling 'make install', alternatively use the 'doc' and 'install' built-in targets in an IDE, respectively")
-    
+
 # Currently it is not possible to make built-in 'install' target to depend on 'doc' in CMake, therefore 'make doc' command need to be invoked manually before 'make install' in order to install the SDK with complete documentation
-# Unless, URHO3D_DOCS build option is set in which case the custom 'doc' target is part of the default 'all' target which in turn the 'install' target depends on, so a single 'make install' alone is suffice to install everything 
-install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/ DESTINATION ${DEST_SHARE_DIR}/Docs ${DEST_PERMISSIONS})
+# Unless, URHO3D_DOCS build option is set in which case the custom 'doc' target is part of the default 'all' target which in turn the 'install' target depends on, so a single 'make install' alone is suffice to install everything
+install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/ DESTINATION ${DEST_SHARE_DIR}/Docs)
 
 # Define post build steps
 if (CMAKE_EXTRA_GENERATOR MATCHES Eclipse AND NOT CMAKE_HOST_WIN32)

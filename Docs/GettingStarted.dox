@@ -18,6 +18,8 @@ Although all required third-party libraries are included as source code, there a
 
 - For Android, the Android SDK and Android NDK (minimum API level 12) need to be installed.
 
+- For Emscripten, the Emscripten SDK need to be installed.
+
 To run Urho3D, the minimum system requirements are:
 
 - Windows: CPU with SSE instructions support, Windows XP or newer, DirectX 9.0c, GPU with %Shader %Model 2 support (%Shader %Model 3 recommended.)
@@ -29,6 +31,8 @@ To run Urho3D, the minimum system requirements are:
 - Android: OS version 2.3 or newer, OpenGL ES 2.0 capable GPU.
 
 - iOS: OpenGL ES 2.0 capable GPU.
+
+- Emscripten: modern browsers with fast JavaScript engine and HTML5 and WebGL support.
 
 SSE requirement can be eliminated by disabling the use of SSE instruction set, see URHO3D_SSE build option below.
 
@@ -70,7 +74,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_LUA           |0|Enable Lua scripting support|
 |URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)|
 |URHO3D_LUAJIT_AMALG  |0|Enable LuaJIT amalgamated build (LuaJIT only)|
-|URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (when Lua scripting support is enabled only)|
+|URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)|
 |URHO3D_NETWORK       |1|Enable Networking support|
 |URHO3D_PHYSICS       |1|Enable Physics support|
 |URHO3D_NAVIGATION    |1|Enable Navigation support|
@@ -83,6 +87,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_SSE           |1|Enable SSE instruction set|
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
+|URHO3D_PACKAGING     |*|Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0|
 |URHO3D_PROFILING     |1|Enable profiling support|
 |URHO3D_LOGGING       |1|Enable logging support|
 |URHO3D_TESTING       |0|Enable testing support|
@@ -107,6 +112,10 @@ A number of build options can be defined when invoking the build scripts or when
 |MINGW_SYSROOT        |-|Path to MinGW system root (MinGW cross-compiling build only)|
 |RPI_PREFIX           |-|Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)|
 |RPI_SYSROOT          |-|Path to Raspberry Pi system root (RPI cross-compiling build only)|
+|EMSCRIPTEN_ROOT_PATH |-|Root path to Emscripten cross-compiler tools (Emscripten cross-compiling build only)|
+|EMSCRIPTEN_SYSROOT   |-|Path to Emscripten system root (Emscripten cross-compiling build only)|
+|EMSCRIPTEN_ALLOW_MEMORY_GROWTH|0|Enable memory growing based on application demand (Emscripten cross-compiling build only)|
+|EMSCRIPTEN_TOTAL_MEMORY|*|Specify the total size of memory to be used (Emscripten cross-compiling build only); default to 256MB, this option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH=1|
 
 Note that the specified build option values are cached by CMake after the initial configuration step. The cached values will be used by CMake in the subsequent configuration. The same build options are not required to be specified again and again. But once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly resetting it. That is, simply by not passing the corresponding build option would not revert it back to its default. One way to revert all the build options to their default values is by clearing the CMake cache by calling cmake_clean.bat or cmake_clean.sh.
 
@@ -132,7 +141,8 @@ If using MinGW to compile, DirectX headers may need to be acquired separately. T
 After the build is complete, the programs can be run from the bin subdirectory in the build tree. These include the Urho3D player application, which can run application scripts, the tools, and C++ sample applications if they have been enabled. Unless your build tree location is also the same as the Urho3D project source tree, in order to run the Urho3D executables successfully, you must do one of the following first:
 - Copy both the bin/Data and bin/CoreData directories in the source tree to the bin subdirectory in the build tree.
 - Instead of copying, just create symbolic links in the build tree pointing to the above two directories.
-- Or even better, use the 'resource prefix path' \ref Running_Commandline "engine parameter" by setting URHO3D_PREFIX_PATH variable in your host environment. The prefix variable must be set to an absolute path which contains the Data and CoreData subdirectories.
+- Or even better, use the 'resource prefix path' \ref Running_Commandline "engine parameter" by setting URHO3D_PREFIX_PATH variable in your host environment. The prefix variable must be set to an absolute path which contains the resource directories.
+- Or use the URHO3D_PACKAGING build option which would package the resource directories as *.pak files in the bin subdirectory in the build tree.
 
 The Mac OS X executables can be built with all the resources bundled into a single app directory. In order to enable this, set the URHO3D_MACOSX_BUNDLE build option when configuring the build tree for the Mac OS X platform. The bundled app can be launched just by double-clicking from the Finder without worrying about setting the 'resource prefix path'. This is because the URHO3D_PREFIX_PATH environment variable has been set internally to point to the resources directory that is already bundled in the app. Note, however, if you do not launch the app via the Apple "Launch Services" (such as when you are debugging or by calling the executable directly inside the bundled app directory via CLI) then you still need to set the 'resource prefix path' manually as described in the previous paragraph.
 
@@ -205,6 +215,20 @@ To cross-compile, the MinGW toolchain (compiler, linker and w32api) needs to be 
 For activating the MinGW toolchain, and to allow it to find the correct compiler, the MINGW_PREFIX environment variable needs to be set. This variable should be set to the prefix of the compiler name, e.g. /usr/bin/x86_64-w64-mingw32 where it would be used to find /usr/bin/x86_64-w64-mingw32-gcc and /usr/bin/x86_64-w64-mingw32-g++, etc. Optionally you can also set MINGW_SYSROOT environment variable or build option to point to your MinGW system root, if it is not installed in a normal expected location.
 
 Execute cmake_mingw.sh then go to the build tree to execute make command. After the build is complete, the Windows executables can be found in the build tree's "bin" subdirectory.
+
+\section Building_Emscripten Emscripten build process (EXPERIMENTAL)
+
+> WHAT DOESN'T WORK:
+>    - Networking. Javascript can only use http and websockets protocols so it's not likely that kNet will ever function.
+>    - All the scripting support: AngelScript and Lua/LuaJIT.
+
+This section assumes you have already updated, installed, and activated the latest Emscripten (trans-)compiler toolchain on your host system as per described in http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html.
+
+Set the EMSCRIPTEN_ROOT_PATH environment variable or build option to point to the root path of Emscripten cross-compiler tools. The Emscripten sysroot path will be derived from the root path, usually from 'system' subdir relative to the root path. However, you can optionally set the EMSCRIPTEN_SYSROOT environment variable or build option to point to another system root path.
+
+On Windows host, execute cmake_emscripten.bat. On OS X or Linux host, execute cmake_emscripten.sh. Then go to the build tree and execute the 'make' command to start the build as usual. You may want to set the URHO3D_SAMPLES build option to build all the samples.
+
+After the commands finish successfully, the HTMLs and its correspondng data files should have been generated in the build tree's "bin" subdirectory, from where it can be launched in a browser.
 
 \section Building_64bit Native 64bit build
 
@@ -684,6 +708,7 @@ F2                 - Toggle rendering debug geometry
 F3                 - Toggle physics debug geometry
 F4                 - Toggle octree debug geometry
 F11                - Captures a screenshot
+F12                - Toggle UI
 \endverbatim
 
 Press right mouse button in the 3D view if you want to defocus the active window without changing the object selection.

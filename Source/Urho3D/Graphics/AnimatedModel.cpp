@@ -135,7 +135,7 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
 {
     // If no bones or no bone-level testing, use the StaticModel test
     RayQueryLevel level = query.level_;
-    if (level < RAY_AABB || !skeleton_.GetNumBones())
+    if (level < RAY_TRIANGLE || !skeleton_.GetNumBones())
     {
         StaticModel::ProcessRayQuery(query, results);
         return;

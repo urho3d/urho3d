@@ -28,7 +28,7 @@ if (HAVE_STDINT_H)
 endif ()
 
 # Setup RPATH settings
-if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS)
+if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS AND NOT EMSCRIPTEN)
     # Add RPATH entries when building
     set (CMAKE_SKIP_BUILD_RPATH FALSE)
     # But don't set them yet in the build tree
@@ -82,7 +82,7 @@ if (URHO3D_URHO2D)
     add_subdirectory (ThirdParty/Box2D)
 endif ()
 
-if (NOT IOS AND NOT ANDROID AND NOT RPI)
+if (NOT IOS AND NOT ANDROID AND NOT RPI AND NOT EMSCRIPTEN)
     if (URHO3D_OPENGL)
         add_subdirectory (ThirdParty/GLEW)
     else ()
@@ -105,7 +105,6 @@ if (URHO3D_SAMPLES)
 endif ()
 
 # Urho3D extras
-# Do not build extras for iOS and Android
-if (NOT IOS AND NOT ANDROID AND URHO3D_EXTRAS)
+if (URHO3D_EXTRAS)
     add_subdirectory (Extras)
 endif ()

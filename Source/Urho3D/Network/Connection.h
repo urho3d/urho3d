@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "../Network/Controls.h"
+#include "../Input/Controls.h"
 #include "../Container/HashSet.h"
 #include "../Core/Object.h"
 #include "../Scene/ReplicationState.h"

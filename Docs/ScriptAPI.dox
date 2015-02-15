@@ -223,6 +223,9 @@ namespace Urho3D
 ### MouseVisibleChanged
 - %Visible : bool
 
+### MouseModeChanged
+- %Mode : MouseMode
+
 ### ExitRequested
 
 ## %Network events

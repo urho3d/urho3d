@@ -22,7 +22,6 @@
 
 #ifdef URHO3D_NETWORK
 #include "../Script/APITemplates.h"
-#include "../Network/Controls.h"
 #include "../Network/HttpRequest.h"
 #include "../Network/Network.h"
 #include "../Network/NetworkPriority.h"
@@ -30,38 +29,6 @@
 
 namespace Urho3D
 {
-
-static void ConstructControls(Controls* ptr)
-{
-    new(ptr) Controls();
-}
-
-static void ConstructControlsCopy(const Controls& controls, Controls* ptr)
-{
-    new(ptr) Controls(controls);
-}
-
-static void DestructControls(Controls* ptr)
-{
-    ptr->~Controls();
-}
-
-static void RegisterControls(asIScriptEngine* engine)
-{
-    engine->RegisterObjectType("Controls", sizeof(Controls), asOBJ_VALUE | asOBJ_APP_CLASS_CDK);
-    engine->RegisterObjectBehaviour("Controls", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructControls), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Controls", asBEHAVE_CONSTRUCT, "void f(const Controls&in)", asFUNCTION(ConstructControlsCopy), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Controls", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructControls), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Controls", "Controls& opAssign(const Controls&in)", asMETHOD(Controls, operator =), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Controls", "void Reset()", asMETHOD(Controls, Reset), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Controls", "void Set(uint, bool)", asMETHOD(Controls, Set), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Controls", "bool IsDown(uint) const", asMETHOD(Controls, IsDown), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Controls", "bool IsPressed(uint, const Controls&in) const", asMETHOD(Controls, IsPressed), asCALL_THISCALL);
-    engine->RegisterObjectProperty("Controls", "uint buttons", offsetof(Controls, buttons_));
-    engine->RegisterObjectProperty("Controls", "float yaw", offsetof(Controls, yaw_));
-    engine->RegisterObjectProperty("Controls", "float pitch", offsetof(Controls, pitch_));
-    engine->RegisterObjectProperty("Controls", "VariantMap extraData", offsetof(Controls, extraData_));
-}
 
 static void RegisterNetworkPriority(asIScriptEngine* engine)
 {
@@ -218,7 +185,6 @@ void RegisterNetwork(asIScriptEngine* engine)
 
 void RegisterNetworkAPI(asIScriptEngine* engine)
 {
-    RegisterControls(engine);
     RegisterNetworkPriority(engine);
     RegisterConnection(engine);
     RegisterHttpRequest(engine);

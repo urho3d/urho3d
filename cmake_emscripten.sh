@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 # Copyright (c) 2008-2015 the Urho3D project.
 #
@@ -20,12 +21,6 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME rapidjson)
+$(dirname $0)/cmake_generic.sh $@ -DEMSCRIPTEN=1
 
-# Setup target
-add_custom_target (${TARGET_NAME} ALL)   # Dummy target just so that its post-build step can install headers to the build tree
-set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
-
-# Install headers for building the Urho3D library
-install_header_files (DIRECTORY include/rapidjson/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/rapidjson FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)  # Note: the trailing slash is significant
+# vi: set ts=4 sw=4 expandtab:

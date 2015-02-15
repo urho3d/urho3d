@@ -27,5 +27,8 @@ project (Urho3D-Extras)
 find_package (Urho3D REQUIRED)
 include_directories (${URHO3D_INCLUDE_DIRS})
 
+# All tools must be natively built and output to bin/tool subdir to differentiate them from platform-specific binaries in the bin directory
+set_output_directories (${CMAKE_BINARY_DIR}/bin/tool RUNTIME PDB)
+
 # Urho3D extras
 add_subdirectory (OgreBatchConverter)

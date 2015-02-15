@@ -211,6 +211,12 @@ EVENT(E_MOUSEVISIBLECHANGED, MouseVisibleChanged)
     PARAM(P_VISIBLE, Visible);              // bool
 }
 
+/// Mouse mode changed.
+EVENT(E_MOUSEMODECHANGED, MouseModeChanged)
+{
+    PARAM(P_MODE, Mode);                    // MouseMode
+}
+
 /// Application exit requested.
 EVENT(E_EXITREQUESTED, ExitRequested)
 {
