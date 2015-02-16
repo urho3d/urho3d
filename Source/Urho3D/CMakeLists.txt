@@ -71,7 +71,7 @@ if (URHO3D_LUA)
             COMMAND ${CMAKE_BINARY_DIR}/bin/tool/tolua++ -L ToCppHook.lua -o ${CMAKE_CURRENT_BINARY_DIR}/${GEN_CPP_FILE} ${NAME}
             DEPENDS tolua++ ${API_PKG_FILE} ${PKG_FILES} LuaScript/pkgs/ToCppHook.lua
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/LuaScript/pkgs
-            COMMENT "Generating tolua++ DIR binding on the fly for ${DIR}")
+            COMMENT "Generating tolua++ API binding on the fly for ${DIR}")
     endforeach ()
 else ()
     list (APPEND EXCLUDED_SOURCE_DIRS LuaScript)
