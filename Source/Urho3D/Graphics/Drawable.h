@@ -248,9 +248,13 @@ public:
     // Add a per-pixel light affecting the object this frame.
     void AddLight(Light* light)
     {
-        if (lights_.Empty())
+        if (!firstLight_)
             firstLight_ = light;
-        lights_.Push(light);
+
+        // Need to store into the light list only if the per-pixel lights are being limited.
+        // Otherwise recording the first light is enough
+        if (maxLights_)
+            lights_.Push(light);
     }
 
     // Add a per-vertex light affecting the object this frame.
@@ -321,7 +325,7 @@ protected:
     float lodBias_;
     /// Base pass flags.
     unsigned basePassFlags_;
-    /// Maximum lights.
+    /// Maximum per-pixel lights.
     unsigned maxLights_;
     /// Octree octant.
     Octant* octant_;
