@@ -127,14 +127,14 @@ void StaticModel::UpdateBatches(const FrameInfo& frame)
     const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
     distance_ = frame.camera_->GetDistance(worldBoundingBox.Center());
 
-    if (batches_.Size() > 1)
+    if (batches_.Size() == 1)
+        batches_[0].distance_ = distance_;
+    else
     {
         const Matrix3x4& worldTransform = node_->GetWorldTransform();
         for (unsigned i = 0; i < batches_.Size(); ++i)
             batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * geometryData_[i].center_);
     }
-    else if (batches_.Size() == 1)
-        batches_[0].distance_ = distance_;
 
     float scale = worldBoundingBox.Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
