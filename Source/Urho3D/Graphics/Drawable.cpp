@@ -60,6 +60,9 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     occluder_(false),
     occludee_(true),
     updateQueued_(false),
+    zoneDirty_(false),
+    octant_(0),
+    zone_(0),
     viewMask_(DEFAULT_VIEWMASK),
     lightMask_(DEFAULT_LIGHTMASK),
     shadowMask_(DEFAULT_SHADOWMASK),
@@ -75,10 +78,7 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     lodBias_(1.0f),
     basePassFlags_(0),
     maxLights_(0),
-    octant_(0),
-    firstLight_(0),
-    zone_(0),
-    zoneDirty_(false)
+    firstLight_(0)
 {
 }
 
@@ -301,6 +301,11 @@ void Drawable::MarkInView(const FrameInfo& frame)
     }
     
     viewCameras_.Push(frame.camera_);
+
+    basePassFlags_ = 0;
+    firstLight_ = 0;
+    lights_.Clear();
+    vertexLights_.Clear();
 }
 
 void Drawable::MarkInView(unsigned frameNumber, Camera* camera)

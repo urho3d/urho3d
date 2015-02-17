@@ -204,22 +204,22 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
                 
                 const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
                 Vector3 center = geomBox.Center();
-                float viewCenterZ = viewZ.DotProduct(center) + viewMatrix.m23_;
                 Vector3 edge = geomBox.Size() * 0.5f;
-                float viewEdgeZ = absViewZ.DotProduct(edge);
-                float minZ = viewCenterZ - viewEdgeZ;
-                float maxZ = viewCenterZ + viewEdgeZ;
-                
-                drawable->SetMinMaxZ(viewCenterZ - viewEdgeZ, viewCenterZ + viewEdgeZ);
-                drawable->ClearLights();
-                
-                // Expand the scene bounding box and Z range (skybox not included because of infinite size) and store the drawawble
-                if (drawable->GetType() != Skybox::GetTypeStatic())
+
+                // Do not add "infinite" objects like skybox to prevent shadow map focusing behaving erroneously
+                if (edge.LengthSquared() < M_LARGE_VALUE * M_LARGE_VALUE)
                 {
+                    float viewCenterZ = viewZ.DotProduct(center) + viewMatrix.m23_;
+                    float viewEdgeZ = absViewZ.DotProduct(edge);
+                    float minZ = viewCenterZ - viewEdgeZ;
+                    float maxZ = viewCenterZ + viewEdgeZ;
+                    drawable->SetMinMaxZ(viewCenterZ - viewEdgeZ, viewCenterZ + viewEdgeZ);
                     result.minZ_ = Min(result.minZ_, minZ);
                     result.maxZ_ = Max(result.maxZ_, maxZ);
                 }
-                
+                else
+                    drawable->SetMinMaxZ(M_LARGE_VALUE, M_LARGE_VALUE);
+
                 result.geometries_.Push(drawable);
             }
             else if (drawable->GetDrawableFlags() & DRAWABLE_LIGHT)
@@ -2305,26 +2305,16 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
             continue;
         
         // Check shadow distance
-        float maxShadowDistance = drawable->GetShadowDistance();
-        float drawDistance = drawable->GetDrawDistance();
-        bool batchesUpdated = drawable->IsInView(frame_, true);
-        if (drawDistance > 0.0f && (maxShadowDistance <= 0.0f || drawDistance < maxShadowDistance))
-            maxShadowDistance = drawDistance;
-        if (maxShadowDistance > 0.0f)
-        {
-            if (!batchesUpdated)
-            {
-                drawable->UpdateBatches(frame_);
-                batchesUpdated = true;
-            }
-            if (drawable->GetDistance() > maxShadowDistance)
-                continue;
-        }
-        
         // Note: as lights are processed threaded, it is possible a drawable's UpdateBatches() function is called several
         // times. However, this should not cause problems as no scene modification happens at this point.
-        if (!batchesUpdated)
+        if (!drawable->IsInView(frame_, true))
             drawable->UpdateBatches(frame_);
+        float maxShadowDistance = drawable->GetShadowDistance();
+        float drawDistance = drawable->GetDrawDistance();
+        if (drawDistance > 0.0f && (maxShadowDistance <= 0.0f || drawDistance < maxShadowDistance))
+            maxShadowDistance = drawDistance;
+        if (maxShadowDistance > 0.0f && drawable->GetDistance() > maxShadowDistance)
+            continue;
 
         // Project shadow caster bounding box to light view space for visibility check
         lightViewBox = drawable->GetWorldBoundingBox().Transformed(lightView);
@@ -2523,11 +2513,6 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
         for (unsigned i = 0; i < geometries_.Size(); ++i)
         {
             Drawable* drawable = geometries_[i];
-            
-            // Skip skyboxes as they have undefinedly large bounding box size
-            if (drawable->GetType() == Skybox::GetTypeStatic())
-                continue;
-            
             if (drawable->GetMinZ() <= farSplit && drawable->GetMaxZ() >= nearSplit &&
                 (GetLightMask(drawable) & light->GetLightMask()))
                 litGeometriesBox.Merge(drawable->GetWorldBoundingBox());

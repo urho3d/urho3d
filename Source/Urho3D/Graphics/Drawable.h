@@ -199,7 +199,7 @@ public:
     void SetSortValue(float value);
     /// Set view-space depth bounds.
     void SetMinMaxZ(float minZ, float maxZ) { minZ_ = minZ; maxZ_ = maxZ; }
-    /// Mark in view.
+    /// Mark in view. Also clear the light list.
     void MarkInView(const FrameInfo& frame);
     /// Mark in view of a specific camera. Specify null camera to update just the frame number.
     void MarkInView(unsigned frameNumber, Camera* camera);
@@ -236,15 +236,6 @@ public:
     /// Return the maximum view-space depth.
     float GetMaxZ() const { return maxZ_; }
     
-    // Clear the frame's light list.
-    void ClearLights()
-    {
-        basePassFlags_ = 0;
-        firstLight_ = 0;
-        lights_.Clear();
-        vertexLights_.Clear();
-    }
-
     // Add a per-pixel light affecting the object this frame.
     void AddLight(Light* light)
     {
@@ -297,6 +288,12 @@ protected:
     bool occludee_;
     /// Octree update queued flag.
     bool updateQueued_;
+    /// Zone inconclusive or dirtied flag.
+    bool zoneDirty_;
+    /// Octree octant.
+    Octant* octant_;
+    /// Current zone.
+    Zone* zone_;
     /// View mask.
     unsigned viewMask_;
     /// Light mask.
@@ -323,24 +320,18 @@ protected:
     float maxZ_;
     /// LOD bias.
     float lodBias_;
-    /// Base pass flags.
+    /// Base pass flags, bit per batch.
     unsigned basePassFlags_;
     /// Maximum per-pixel lights.
     unsigned maxLights_;
-    /// Octree octant.
-    Octant* octant_;
+    /// List of cameras from which is seen on the current frame.
+    PODVector<Camera*> viewCameras_;
     /// First per-pixel light added this frame.
     Light* firstLight_;
     /// Per-pixel lights affecting this drawable.
     PODVector<Light*> lights_;
     /// Per-vertex lights affecting this drawable.
     PODVector<Light*> vertexLights_;
-    /// Current zone.
-    Zone* zone_;
-    /// Zone inconclusive or dirtied flag.
-    bool zoneDirty_;
-    /// List of cameras from which is seen on the current frame.
-    PODVector<Camera*> viewCameras_;
 };
 
 inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)
