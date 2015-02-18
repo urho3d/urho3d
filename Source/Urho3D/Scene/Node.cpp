@@ -681,6 +681,11 @@ void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursiv
 
 Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
 {
+    // Do not attempt to create replicated components to local nodes, as that may lead to component ID overwrite
+    // as replicated components are synced over
+    if (id_ >= FIRST_LOCAL_ID && mode == REPLICATED)
+        mode = LOCAL;
+
     // Check that creation succeeds and that the object in fact is a component
     SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type));
     if (!newComponent)
@@ -1631,6 +1636,11 @@ void Node::SetEnabled(bool enable, bool recursive, bool storeSelf)
 
 Component* Node::SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id)
 {
+    // Do not attempt to create replicated components to local nodes, as that may lead to component ID overwrite
+    // as replicated components are synced over
+    if (id_ >= FIRST_LOCAL_ID && mode == REPLICATED)
+        mode = LOCAL;
+
     // First check if factory for type exists
     if (!context_->GetTypeName(type).Empty())
         return CreateComponent(type, mode, id);
