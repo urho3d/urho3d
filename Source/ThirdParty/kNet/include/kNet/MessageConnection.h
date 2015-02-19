@@ -24,7 +24,7 @@
 #include <set>
 
 #include "kNetBuildConfig.h"
-// Urho3D: include Socket.h first to make sure Windows.h / Winsock.h is not pulled in before Winsock2.h
+// Urho3D: include Socket.h first to make sure WS2Include.h is included before windows.h / winsock.h
 #include "Socket.h"
 #include "WaitFreeQueue.h"
 #include "LockFreePoolAllocator.h"

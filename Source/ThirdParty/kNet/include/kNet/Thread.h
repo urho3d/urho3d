@@ -24,14 +24,15 @@
 #include <boost/thread.hpp>
 #else
 
+// Urho3D: include Event.h first to make sure WS2Include.h is included before windows.h / winsock.h
+#include "Event.h"
+
 #ifdef WIN32
 // Urho3D: windows.h in lowercase to fix MinGW cross-compiling on a case-sensitive system
 #include <windows.h>
 #else
 #include <pthread.h>
 #endif
-
-#include "Event.h"
 
 namespace kNet
 {
