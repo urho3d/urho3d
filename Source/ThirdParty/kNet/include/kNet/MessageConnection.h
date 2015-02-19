@@ -16,17 +16,20 @@
 /** @file MessageConnection.h
 	@brief The MessageConnection and ConnectionStatistics classes. */
 
+// Modified by Lasse Oorni for Urho3D
+
 #include <vector>
 #include <map>
 #include <utility>
 #include <set>
 
 #include "kNetBuildConfig.h"
+// Urho3D: include Socket.h first to make sure Windows.h / Winsock.h is not pulled in before Winsock2.h
+#include "Socket.h"
 #include "WaitFreeQueue.h"
-#include "NetworkSimulator.h"
 #include "LockFreePoolAllocator.h"
 #include "Lockable.h"
-#include "Socket.h"
+#include "NetworkSimulator.h"
 #include "IMessageHandler.h"
 #include "BasicSerializedDataTypes.h"
 #include "Datagram.h"
