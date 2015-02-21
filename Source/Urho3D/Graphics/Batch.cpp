@@ -294,7 +294,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
     // Set light-related shader parameters
     if (lightQueue_)
     {
-        if (graphics->NeedParameterUpdate(SP_VERTEXLIGHTS, lightQueue_) && graphics->HasShaderParameter(VSP_VERTEXLIGHTS))
+        if (lightQueue_->vertexLights_.Size() && graphics->NeedParameterUpdate(SP_VERTEXLIGHTS, lightQueue_) && graphics->HasShaderParameter(VSP_VERTEXLIGHTS))
         {
             Vector4 vertexLights[MAX_VERTEX_LIGHTS * 3];
             const PODVector<Light*>& lights = lightQueue_->vertexLights_;
@@ -341,8 +341,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
                 vertexLights[i * 3 + 2] = Vector4(vertexLightNode->GetWorldPosition(), invCutoff);
             }
             
-            if (lights.Size())
-                graphics->SetShaderParameter(VSP_VERTEXLIGHTS, vertexLights[0].Data(), lights.Size() * 3 * 4);
+            graphics->SetShaderParameter(VSP_VERTEXLIGHTS, vertexLights[0].Data(), lights.Size() * 3 * 4);
         }
     }
     

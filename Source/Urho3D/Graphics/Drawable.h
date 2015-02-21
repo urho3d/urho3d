@@ -206,7 +206,7 @@ public:
     /// Sort and limit per-pixel lights to maximum allowed. Convert extra lights into vertex lights.
     void LimitLights();
     /// Sort and limit per-vertex lights to maximum allowed.
-    void LimitVertexLights();
+    void LimitVertexLights(bool removeConvertedLights);
     /// Set base pass flag for a batch.
     void SetBasePass(unsigned batchIndex) { basePassFlags_ |= (1 << batchIndex); }
     /// Return octree octant.

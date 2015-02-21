@@ -556,7 +556,7 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
             float distance = lightRay.HitDistance(box);
             float normDistance = distance / range_;
             float att = Max(1.0f - normDistance * normDistance, M_EPSILON);
-            sortValue_ = 1.0f / (Max(color_.SumRGB(), 0.0f) * att + M_EPSILON);
+            sortValue_ = 1.0f / GetIntensityDivisor(att);
         }
         break;
     }

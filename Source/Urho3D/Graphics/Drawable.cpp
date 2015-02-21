@@ -336,13 +336,22 @@ void Drawable::LimitLights()
     lights_.Resize(maxLights_);
 }
 
-void Drawable::LimitVertexLights()
+void Drawable::LimitVertexLights(bool removeConvertedLights)
 {
+    if (removeConvertedLights)
+    {
+        for (unsigned i = vertexLights_.Size() - 1; i < vertexLights_.Size(); --i)
+        {
+            if (!vertexLights_[i]->GetPerVertex())
+                vertexLights_.Erase(i);
+        }
+    }
+
     if (vertexLights_.Size() <= MAX_VERTEX_LIGHTS)
         return;
 
     const BoundingBox& box = GetWorldBoundingBox();
-    for (unsigned i = vertexLights_.Size() - 1; i < vertexLights_.Size(); --i)
+    for (unsigned i = 0; i < vertexLights_.Size(); ++i)
         vertexLights_[i]->SetIntensitySortValue(box);
 
     Sort(vertexLights_.Begin(), vertexLights_.End(), CompareDrawables);

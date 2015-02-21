@@ -920,7 +920,6 @@ void View::GetBatches()
     threadedGeometries_.Clear();
     
     WorkQueue* queue = GetSubsystem<WorkQueue>();
-    PODVector<Light*> vertexLights;
     BatchQueue* alphaQueue = batchQueues_.Contains(alphaPassName_) ? &batchQueues_[alphaPassName_] : (BatchQueue*)0;
     
     // Process lit geometries and shadow casters for each light
@@ -1136,13 +1135,9 @@ void View::GetBatches()
             else if (type == UPDATE_WORKER_THREAD)
                 threadedGeometries_.Push(drawable);
             
-            Zone* zone = GetZone(drawable);
             const Vector<SourceBatch>& batches = drawable->GetBatches();
-            
-            const PODVector<Light*>& drawableVertexLights = drawable->GetVertexLights();
-            if (!drawableVertexLights.Empty())
-                drawable->LimitVertexLights();
-            
+            bool vertexLightsProcessed = false;
+
             for (unsigned j = 0; j < batches.Size(); ++j)
             {
                 const SourceBatch& srcBatch = batches[j];
@@ -1156,52 +1151,48 @@ void View::GetBatches()
                 if (!srcBatch.geometry_ || !srcBatch.numWorldTransforms_ || !tech)
                     continue;
                 
-                Batch destBatch(srcBatch);
-                destBatch.camera_ = camera_;
-                destBatch.zone_ = zone;
-                destBatch.isBase_ = true;
-                destBatch.pass_ = 0;
-                destBatch.lightMask_ = GetLightMask(drawable);
-                
                 // Check each of the scene passes
                 for (unsigned k = 0; k < scenePasses_.Size(); ++k)
                 {
                     ScenePassInfo& info = scenePasses_[k];
-                    destBatch.pass_ = tech->GetSupportedPass(info.pass_);
-                    if (!destBatch.pass_)
-                        continue;
-                    
                     // Skip forward base pass if the corresponding litbase pass already exists
                     if (info.pass_ == basePassName_ && j < 32 && drawable->HasBasePass(j))
                         continue;
+
+                    Pass* pass = tech->GetSupportedPass(info.pass_);
+                    if (!pass)
+                        continue;
                     
-                    if (info.vertexLights_ && !drawableVertexLights.Empty())
+                    Batch destBatch(srcBatch);
+                    destBatch.pass_ = pass;
+                    destBatch.camera_ = camera_;
+                    destBatch.zone_ = GetZone(drawable);
+                    destBatch.isBase_ = true;
+                    destBatch.lightMask_ = GetLightMask(drawable);
+
+                    if (info.vertexLights_)
                     {
-                        // For a deferred opaque batch, check if the vertex lights include converted per-pixel lights, and remove
-                        // them to prevent double-lighting
-                        if (deferred_ && destBatch.pass_->GetBlendMode() == BLEND_REPLACE)
+                        const PODVector<Light*>& drawableVertexLights = drawable->GetVertexLights();
+                        if (drawableVertexLights.Size() && !vertexLightsProcessed)
                         {
-                            vertexLights.Clear();
-                            for (unsigned i = 0; i < drawableVertexLights.Size(); ++i)
-                            {
-                                if (drawableVertexLights[i]->GetPerVertex())
-                                    vertexLights.Push(drawableVertexLights[i]);
-                            }
+                            // Limit vertex lights. If this is a deferred opaque batch, remove converted per-pixel lights,
+                            // as they will be rendered as light volumes in any case, and drawing them also as vertex lights
+                            // would result in double lighting
+                            drawable->LimitVertexLights(deferred_ && destBatch.pass_->GetBlendMode() == BLEND_REPLACE);
+                            vertexLightsProcessed = true;
                         }
-                        else
-                            vertexLights = drawableVertexLights;
-                        
-                        if (!vertexLights.Empty())
+
+                        if (drawableVertexLights.Size())
                         {
                             // Find a vertex light queue. If not found, create new
-                            unsigned long long hash = GetVertexLightQueueHash(vertexLights);
+                            unsigned long long hash = GetVertexLightQueueHash(drawableVertexLights);
                             HashMap<unsigned long long, LightBatchQueue>::Iterator i = vertexLightQueues_.Find(hash);
                             if (i == vertexLightQueues_.End())
                             {
                                 i = vertexLightQueues_.Insert(MakePair(hash, LightBatchQueue()));
                                 i->second_.light_ = 0;
                                 i->second_.shadowMap_ = 0;
-                                i->second_.vertexLights_ = vertexLights;
+                                i->second_.vertexLights_ = drawableVertexLights;
                             }
                             
                             destBatch.lightQueue_ = &(i->second_);
@@ -1211,7 +1202,7 @@ void View::GetBatches()
                         destBatch.lightQueue_ = 0;
                     
                     bool allowInstancing = info.allowInstancing_;
-                    if (allowInstancing && info.markToStencil_ && destBatch.lightMask_ != (zone->GetLightMask() & 0xff))
+                    if (allowInstancing && info.markToStencil_ && destBatch.lightMask_ != (destBatch.zone_->GetLightMask() & 0xff))
                         allowInstancing = false;
                     
                     AddBatchToQueue(*info.batchQueue_, destBatch, tech, allowInstancing);
