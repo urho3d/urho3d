@@ -982,6 +982,7 @@ void View::GetBatches()
                 LightBatchQueue& lightQueue = lightQueues_[usedLightQueues++];
                 light->SetLightQueue(&lightQueue);
                 lightQueue.light_ = light;
+                lightQueue.negative_ = light->IsNegative();
                 lightQueue.shadowMap_ = 0;
                 lightQueue.litBaseBatches_.Clear(maxSortedInstances);
                 lightQueue.litBatches_.Clear(maxSortedInstances);
@@ -1308,11 +1309,8 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
     Zone* zone = GetZone(drawable);
     const Vector<SourceBatch>& batches = drawable->GetBatches();
     
-    bool hasAmbientGradient = zone->GetAmbientGradient() && zone->GetAmbientStartColor() != zone->GetAmbientEndColor();
-    // Shadows on transparencies can only be rendered if shadow maps are not reused
-    bool allowTransparentShadows = !renderer_->GetReuseShadowMaps();
-    bool allowLitBase = useLitBase_ && !light->IsNegative() && light == drawable->GetFirstLight() &&
-        drawable->GetVertexLights().Empty() && !hasAmbientGradient;
+    bool allowLitBase = useLitBase_ && !lightQueue.negative_ && light == drawable->GetFirstLight() &&
+        drawable->GetVertexLights().Empty() && !zone->GetAmbientGradient();
     
     for (unsigned i = 0; i < batches.Size(); ++i)
     {
@@ -1369,8 +1367,9 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
         }
         else if (alphaQueue)
         {
-            // Transparent batches can not be instanced
-            AddBatchToQueue(*alphaQueue, destBatch, tech, false, allowTransparentShadows);
+            // Transparent batches can not be instanced, and shadows on transparencies can only be rendered if shadow maps are
+            // not reused
+            AddBatchToQueue(*alphaQueue, destBatch, tech, false, !renderer_->GetReuseShadowMaps());
         }
     }
 }
