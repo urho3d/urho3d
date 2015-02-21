@@ -1695,11 +1695,8 @@ void Renderer::CreateInstancingBuffer()
         return;
     }
     
-    // If must lock the buffer for each batch group, set a smaller size
-    unsigned defaultSize = graphics_->GetStreamOffsetSupport() ? INSTANCING_BUFFER_DEFAULT_SIZE : INSTANCING_BUFFER_DEFAULT_SIZE / 4;
-    
     instancingBuffer_ = new VertexBuffer(context_);
-    if (!instancingBuffer_->SetSize(defaultSize, INSTANCING_BUFFER_MASK, true))
+    if (!instancingBuffer_->SetSize(INSTANCING_BUFFER_DEFAULT_SIZE, INSTANCING_BUFFER_MASK, true))
     {
         instancingBuffer_.Reset();
         dynamicInstancing_ = false;

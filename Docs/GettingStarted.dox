@@ -22,7 +22,7 @@ Although all required third-party libraries are included as source code, there a
 
 To run Urho3D, the minimum system requirements are:
 
-- Windows: CPU with SSE instructions support, Windows XP or newer, DirectX 9.0c, GPU with %Shader %Model 2 support (%Shader %Model 3 recommended.)
+- Windows: CPU with SSE instructions support, Windows XP or newer, DirectX 9.0c, GPU with %Shader %Model 3 support.
 
 - Linux & Mac OS X: CPU with SSE instructions support, GPU with OpenGL 2.0 support, EXT_framebuffer_object and EXT_packed_depth_stencil extensions.
 
@@ -320,7 +320,6 @@ The engine can be configured using the following command line options.
 -nothreads   Disable worker threads
 -nosound     Disable sound output
 -noip        Disable sound mixing interpolation
--sm2         Force SM2.0 rendering
 -touch       Touch emulation on desktop platform
 \endverbatim
 

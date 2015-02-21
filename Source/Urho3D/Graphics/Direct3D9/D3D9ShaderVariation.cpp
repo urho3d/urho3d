@@ -66,13 +66,9 @@ bool ShaderVariation::Create()
     }
 
     // Check for up-to-date bytecode on disk
-    bool useSM3 = graphics_->GetSM3Support();
     String path, name, extension;
     SplitPath(owner_->GetName(), path, name, extension);
-    if (useSM3)
-        extension = type_ == VS ? ".vs3" : ".ps3";
-    else
-        extension = type_ == VS ? ".vs2" : ".ps2";
+    extension = type_ == VS ? ".vs3" : ".ps3";
     
     String binaryShaderName = path + "Cache/" + name + "_" + StringHash(defines_).ToString() + extension;
     PODVector<unsigned> byteCode;
@@ -231,32 +227,20 @@ bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
     const char* entryPoint = 0;
     const char* profile = 0;
     unsigned flags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
-    bool useSM3 = graphics_->GetSM3Support();
     
     if (type_ == VS)
     {
         entryPoint = "VS";
         defines.Push("COMPILEVS");
-        if (!useSM3)
-            profile = "vs_2_0";
-        else
-            profile = "vs_3_0";
+        profile = "vs_3_0";
     }
     else
     {
         entryPoint = "PS";
         defines.Push("COMPILEPS");
-        if (!useSM3)
-            profile = "ps_2_0";
-        else
-        {
-            profile = "ps_3_0";
-            flags |= D3DCOMPILE_PREFER_FLOW_CONTROL;
-        }
+        profile = "ps_3_0";
+        flags |= D3DCOMPILE_PREFER_FLOW_CONTROL;
     }
-    
-    if (useSM3)
-        defines.Push("SM3");
     
     // Collect defines into macros
     Vector<String> defineValues;
@@ -399,7 +383,7 @@ void ShaderVariation::SaveByteCode(const PODVector<unsigned>& byteCode, const St
     
     file->WriteFileID("USHD");
     file->WriteShort((unsigned short)type_);
-    file->WriteShort(graphics_->GetSM3Support() ? 3 : 2);
+    file->WriteShort(3);
 
     file->WriteUInt(parameters_.Size());
     for (HashMap<StringHash, ShaderParameter>::ConstIterator i = parameters_.Begin(); i != parameters_.End(); ++i)

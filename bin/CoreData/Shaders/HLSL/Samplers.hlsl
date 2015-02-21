@@ -22,12 +22,7 @@ sampler3D sZoneVolumeMap : register(S15);
 
 float4 Sample(sampler2D map, float2 texCoord)
 {
-    // Use tex2Dlod if available to avoid divergence and allow branching
-    #ifdef SM3
-        return tex2Dlod(map, float4(texCoord, 0.0, 0.0));
-    #else
-        return tex2D(map, texCoord);
-    #endif
+    return tex2Dlod(map, float4(texCoord, 0.0, 0.0));
 }
 
 float3 DecodeNormal(float4 normalInput)
@@ -35,11 +30,7 @@ float3 DecodeNormal(float4 normalInput)
     #ifdef PACKEDNORMAL
         float3 normal;
         normal.xy = normalInput.ag * 2.0 - 1.0;
-        #ifdef SM3
-            normal.z = sqrt(max(1.0 - dot(normal.xy, normal.xy), 0.0));
-        #else
-            normal.z = sqrt(1.0 - dot(normal.xy, normal.xy));
-        #endif
+        normal.z = sqrt(max(1.0 - dot(normal.xy, normal.xy), 0.0));
         return normal;
     #else
         return normalInput.rgb * 2.0 - 1.0;

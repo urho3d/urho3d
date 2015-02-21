@@ -52,9 +52,5 @@ uniform float4 cShadowDepthFade;
 uniform float2 cShadowIntensity;
 uniform float2 cShadowMapInvSize;
 uniform float4 cShadowSplits;
-#ifdef SM3
-    uniform float4x4 cLightMatricesPS[4];
-#else
-    uniform float4x4 cLightMatricesPS[3];
-#endif
+uniform float4x4 cLightMatricesPS[4];
 #endif

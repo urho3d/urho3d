@@ -58,8 +58,6 @@ public:
     void SetDepthWrite(bool enable);
     /// Set alpha masking hint. Completely opaque draw calls will be performed before alpha masked.
     void SetAlphaMask(bool enable);
-    /// Set whether requires %Shader %Model 3.
-    void SetIsSM3(bool enable);
     /// Set whether requires desktop level hardware.
     void SetIsDesktop(bool enable);
     /// Set vertex shader name.
@@ -89,8 +87,6 @@ public:
     bool GetDepthWrite() const { return depthWrite_; }
     /// Return alpha masking hint.
     bool GetAlphaMask() const { return alphaMask_; }
-    /// Return whether requires %Shader %Model 3.
-    bool IsSM3() const { return isSM3_; }
     /// Return whether requires desktop level hardware.
     bool IsDesktop() const { return isDesktop_; }
     /// Return vertex shader name.
@@ -121,8 +117,6 @@ private:
     bool depthWrite_;
     /// Alpha masking hint.
     bool alphaMask_;
-    /// Require %Shader %Model 3 flag.
-    bool isSM3_;
     /// Require desktop level hardware flag.
     bool isDesktop_;
     /// Vertex shader name.
@@ -157,8 +151,6 @@ public:
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
     
-    /// Set whether requires %Shader %Model 3.
-    void SetIsSM3(bool enable);
     /// Set whether requires desktop level hardware.
     void SetIsDesktop(bool enable);
     /// Create a new pass.
@@ -168,12 +160,10 @@ public:
     /// Reset shader pointers in all passes.
     void ReleaseShaders();
     
-    /// Return whether requires %Shader %Model 3.
-    bool IsSM3() const { return isSM3_; }
     /// Return whether requires desktop level hardware.
     bool IsDesktop() const { return isDesktop_; }
     /// Return whether technique is supported by the current hardware.
-    bool IsSupported() const { return (!isSM3_ || sm3Support_) && (!isDesktop_ || desktopSupport_); }
+    bool IsSupported() const { return !isDesktop_ || desktopSupport_; }
     /// Return whether has a pass.
     bool HasPass(StringHash type) const { return  passes_.Find(type.Value()) != 0; }
     
@@ -189,7 +179,7 @@ public:
     {
         SharedPtr<Pass>* passPtr = passes_.Find(type.Value());
         Pass* pass = passPtr ? passPtr->Get() : 0;
-        return pass && (!pass->IsSM3() || sm3Support_) && (!pass->IsDesktop() || desktopSupport_) ? pass : 0;
+        return pass && (!pass->IsDesktop() || desktopSupport_) ? pass : 0;
     }
     
     /// Return number of passes.
@@ -200,10 +190,6 @@ public:
     PODVector<Pass*> GetPasses() const;
 
 private:
-    /// Require %Shader %Model 3 flag.
-    bool isSM3_;
-    /// Cached %Shader %Model 3 support flag.
-    bool sm3Support_;
     /// Require desktop GPU flag.
     bool isDesktop_;
     /// Cached desktop GPU support flag.

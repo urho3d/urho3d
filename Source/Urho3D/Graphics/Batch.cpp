@@ -623,9 +623,9 @@ void BatchGroup::Draw(View* view, bool allowDepthWrite) const
     
     if (instances_.Size() && !geometry_->IsEmpty())
     {
-        // Draw as individual objects if instancing not supported
+        // Draw as individual objects if instancing not supported or could not fill the instancing buffer
         VertexBuffer* instanceBuffer = renderer->GetInstancingBuffer();
-        if (!instanceBuffer || geometryType_ != GEOM_INSTANCED)
+        if (!instanceBuffer || geometryType_ != GEOM_INSTANCED || startIndex_ == M_MAX_UNSIGNED)
         {
             Batch::Prepare(view, false, allowDepthWrite);
             
@@ -653,41 +653,10 @@ void BatchGroup::Draw(View* view, bool allowDepthWrite) const
             vertexBuffers.Push(SharedPtr<VertexBuffer>(instanceBuffer));
             elementMasks.Push(instanceBuffer->GetElementMask());
             
-            // No stream offset support, instancing buffer not pre-filled with transforms: have to fill now
-            if (startIndex_ == M_MAX_UNSIGNED)
-            {
-                unsigned startIndex = 0;
-                while (startIndex < instances_.Size())
-                {
-                    unsigned instances = instances_.Size() - startIndex;
-                    if (instances > instanceBuffer->GetVertexCount())
-                        instances = instanceBuffer->GetVertexCount();
-                    
-                    // Copy the transforms
-                    Matrix3x4* dest = (Matrix3x4*)instanceBuffer->Lock(0, instances, true);
-                    if (dest)
-                    {
-                        for (unsigned i = 0; i < instances; ++i)
-                            dest[i] = *instances_[i + startIndex].worldTransform_;
-                        instanceBuffer->Unlock();
-                        
-                        graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
-                        graphics->SetVertexBuffers(vertexBuffers, elementMasks);
-                        graphics->DrawInstanced(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(),
-                            geometry_->GetIndexCount(), geometry_->GetVertexStart(), geometry_->GetVertexCount(), instances);
-                    }
-                    
-                    startIndex += instances;
-                }
-            }
-            // Stream offset supported and instancing buffer has been already filled, so just draw
-            else
-            {
-                graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
-                graphics->SetVertexBuffers(vertexBuffers, elementMasks, startIndex_);
-                graphics->DrawInstanced(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
-                    geometry_->GetVertexStart(), geometry_->GetVertexCount(), instances_.Size());
-            }
+            graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
+            graphics->SetVertexBuffers(vertexBuffers, elementMasks, startIndex_);
+            graphics->DrawInstanced(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
+                geometry_->GetVertexStart(), geometry_->GetVertexCount(), instances_.Size());
             
             // Remove the instancing buffer & element mask now
             vertexBuffers.Pop();

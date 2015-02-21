@@ -557,9 +557,7 @@ void View::Render()
     // Forget parameter sources from the previous view
     graphics_->ClearParameterSources();
     
-    // If stream offset is supported, write all instance transforms to a single large buffer
-    // Else we must lock the instance buffer for each batch group
-    if (renderer_->GetDynamicInstancing() && graphics_->GetStreamOffsetSupport())
+    if (renderer_->GetDynamicInstancing() && graphics_->GetInstancingSupport())
         PrepareInstancingBuffer();
     
     // It is possible, though not recommended, that the same camera is used for multiple main views. Set automatic aspect ratio
@@ -2819,28 +2817,27 @@ void View::PrepareInstancingBuffer()
         totalInstances += i->litBatches_.GetNumInstances();
     }
     
-    // If fail to set buffer size, fall back to per-group locking
-    if (totalInstances && renderer_->ResizeInstancingBuffer(totalInstances))
+    if (!totalInstances || !renderer_->ResizeInstancingBuffer(totalInstances))
+        return;
+
+    VertexBuffer* instancingBuffer = renderer_->GetInstancingBuffer();
+    unsigned freeIndex = 0;
+    void* dest = instancingBuffer->Lock(0, totalInstances, true);
+    if (!dest)
+        return;
+    
+    for (HashMap<StringHash, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
+        i->second_.SetTransforms(dest, freeIndex);
+        
+    for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
     {
-        VertexBuffer* instancingBuffer = renderer_->GetInstancingBuffer();
-        unsigned freeIndex = 0;
-        void* dest = instancingBuffer->Lock(0, totalInstances, true);
-        if (!dest)
-            return;
-        
-        for (HashMap<StringHash, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
-            i->second_.SetTransforms(dest, freeIndex);
-        
-        for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
-        {
-            for (unsigned j = 0; j < i->shadowSplits_.Size(); ++j)
-                i->shadowSplits_[j].shadowBatches_.SetTransforms(dest, freeIndex);
-            i->litBaseBatches_.SetTransforms(dest, freeIndex);
-            i->litBatches_.SetTransforms(dest, freeIndex);
-        }
-        
-        instancingBuffer->Unlock();
+        for (unsigned j = 0; j < i->shadowSplits_.Size(); ++j)
+            i->shadowSplits_[j].shadowBatches_.SetTransforms(dest, freeIndex);
+        i->litBaseBatches_.SetTransforms(dest, freeIndex);
+        i->litBatches_.SetTransforms(dest, freeIndex);
     }
+    
+    instancingBuffer->Unlock();
 }
 
 void View::SetupLightVolumeBatch(Batch& batch)

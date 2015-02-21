@@ -77,7 +77,6 @@ Pass::Pass(StringHash type) :
     shadersLoadedFrameNumber_(0),
     depthWrite_(true),
     alphaMask_(false),
-    isSM3_(false),
     isDesktop_(false)
 {
     // Guess default lighting mode from pass name
@@ -114,11 +113,6 @@ void Pass::SetDepthWrite(bool enable)
 void Pass::SetAlphaMask(bool enable)
 {
     alphaMask_ = enable;
-}
-
-void Pass::SetIsSM3(bool enable)
-{
-    isSM3_ = enable;
 }
 
 void Pass::SetIsDesktop(bool enable)
@@ -163,13 +157,9 @@ void Pass::MarkShadersLoaded(unsigned frameNumber)
 
 Technique::Technique(Context* context) :
     Resource(context),
-    isSM3_(false),
     isDesktop_(false),
     numPasses_(0)
 {
-    Graphics* graphics = GetSubsystem<Graphics>();
-    sm3Support_ = graphics ? graphics->GetSM3Support() : true;
-    
     #ifdef DESKTOP_GRAPHICS
     desktopSupport_ = true;
     #else
@@ -198,8 +188,6 @@ bool Technique::BeginLoad(Deserializer& source)
         return false;
     
     XMLElement rootElem = xml->GetRoot();
-    if (rootElem.HasAttribute("sm3"))
-        isSM3_ = rootElem.GetBool("sm3");
     if (rootElem.HasAttribute("desktop"))
         isDesktop_ = rootElem.GetBool("desktop");
     
@@ -225,8 +213,6 @@ bool Technique::BeginLoad(Deserializer& source)
             
             Pass* newPass = CreatePass(nameHash);
             
-            if (passElem.HasAttribute("sm3"))
-                newPass->SetIsSM3(passElem.GetBool("sm3"));
             if (passElem.HasAttribute("desktop"))
                 newPass->SetIsDesktop(passElem.GetBool("desktop"));
             
@@ -289,11 +275,6 @@ bool Technique::BeginLoad(Deserializer& source)
     }
     
     return true;
-}
-
-void Technique::SetIsSM3(bool enable)
-{
-    isSM3_ = enable;
 }
 
 void Technique::SetIsDesktop(bool enable)

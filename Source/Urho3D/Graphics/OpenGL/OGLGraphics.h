@@ -221,8 +221,6 @@ public:
     void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies. No-op on OpenGL.
     void ResetStreamFrequencies();
-    /// Set force Shader Model 2 flag. No-op on OpenGL.
-    void SetForceSM2(bool enable);
     /// Begin dumping shader variation names to an XML file for precaching.
     void BeginDumpShaders(const String& fileName);
     /// End dumping shader variations names.
@@ -238,6 +236,8 @@ public:
     void* GetExternalWindow() const { return externalWindow_; }
     /// Return window title.
     const String& GetWindowTitle() const { return windowTitle_; }
+    /// Return graphics API name.
+    const String& GetApiName() const { return apiName_; }
     /// Return window position.
     IntVector2 GetWindowPosition() const;
     /// Return window width.
@@ -274,8 +274,6 @@ public:
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
     /// Return 24-bit shadow map depth texture format, or 0 if not supported.
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
-    /// Return whether Shader Model 3 is supported. Has no meaning on OpenGL, so is assumed to be true.
-    bool GetSM3Support() const { return true; }
     /// Return whether hardware instancing is supported.
     bool GetInstancingSupport() const { return instancingSupport_; }
     /// Return whether light pre-pass rendering is supported.
@@ -288,8 +286,6 @@ public:
     bool GetHardwareShadowSupport() const { return true; }
     /// Return whether a readable hardware depth format is available.
     bool GetReadableDepthSupport() const { return GetReadableDepthFormat() != 0; }
-    /// Return whether stream offset is supported. Always true on OpenGL.
-    bool GetStreamOffsetSupport() const { return true; }
     /// Return whether sRGB conversion on texture sampling is supported.
     bool GetSRGBSupport() const { return sRGBSupport_; }
     /// Return whether sRGB conversion on rendertarget writing is supported.
@@ -378,8 +374,6 @@ public:
     unsigned GetStreamFrequency(unsigned index) const;
     /// Return rendertarget width and height.
     IntVector2 GetRenderTargetDimensions() const;
-    /// Return force Shader Model 2 flag. Always false on OpenGL.
-    bool GetForceSM2() const { return false; }
 
     /// Window was resized through user interaction. Called by Input subsystem.
     void WindowResized();
@@ -615,6 +609,8 @@ private:
     SharedPtr<ShaderPrecache> shaderPrecache_;
     /// Allowed screen orientations.
     String orientations_;
+    /// Graphics API name.
+    String apiName_;
 
     /// Pixel perfect UV offset.
     static const Vector2 pixelUVOffset;

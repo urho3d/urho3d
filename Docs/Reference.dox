@@ -133,7 +133,6 @@ The full list of supported parameters, their datatypes and default values:
 - ResourcePaths (string) A semicolon-separated list of resource paths to use. If corresponding packages (ie. Data.pak for Data directory) exist they will be used instead. Default "Data;CoreData".
 - ResourcePackages (string) A semicolon-separated list of resource packages to use. Default empty.
 - AutoloadPaths (string) A semicolon-separated list of autoload paths to use. Any resource packages and subdirectories inside an autoload path will be added to the resource system. Default "Autoload".
-- ForceSM2 (bool) Whether to force %Shader %Model 2, effective in Direct3D9 mode only. Default false.
 - ExternalWindow (void ptr) External window handle to use instead of creating an application window. Default null.
 - WindowIcon (string) %Window icon image resource name. Default empty (use application default icon.)
 - WindowTitle (string) %Window title. Default "Urho3D".
@@ -713,18 +712,11 @@ Screen resolution, fullscreen/windowed, vertical sync and hardware multisampling
 
 When setting the initial screen mode, Graphics does a few checks:
 
-- For Direct3D9, the supported shader model is checked. 2 is minimum, but 3 will be used if available. For testing, SM2 can be forced by calling \ref Graphics::SetForceSM2 "SetForceSM2()" before setting the initial screen mode.
+- For Direct3D9, shader model 3.0 support is checked.
 - For OpenGL, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is checked for.
 - Is hardware instancing supported? This requires %Shader %Model 3 on Direct3D9 and the ARB_instanced_arrays extension on OpenGL.
 - Are hardware shadow maps supported? Both AMD & NVIDIA style shadow maps can be used. If neither are available, no shadows will be rendered.
 - Are light pre-pass and deferred rendering modes supported? These require sufficient multiple rendertarget support, and R32F texture format support.
-
-%Shader model 2 has the following limitations due to limited pixel shader instruction count:
-
-- Directional light shadows support a maximum of 3 cascade splits instead of 4.
-- Shadowed point lights do not support specular calculations in forward rendering.
-- Complex materials do not combine the ambient pass with the first forward light (lit base pass optimization.)
-- Complex forward rendered materials (eg. normal + specular map + alpha masking) combined with shadow mapping or height fog may not work.
 
 \section Rendering_Renderer Renderer
 
@@ -992,8 +984,8 @@ For the layout definitions, see http://www.cgtextures.com/content.php?action=tut
 A technique definition looks like this:
 
 \code
-<technique vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" sm3="false|true" desktop="false|true" >
-    <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow" sm3="false|true" desktop="false|true" >
+<technique vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" desktop="false|true" >
+    <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow" desktop="false|true" >
         vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4"
         lighting="unlit|pervertex|perpixel"
         blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha|subtract|subtractalpha"
@@ -1005,9 +997,7 @@ A technique definition looks like this:
 </technique>
 \endcode
 
-The "sm3" attribute in the technique root element allows the technique to specify it requires %Shader %Model 3 hardware. Omitting it is same as specifying false (works on both SM2 & 3.) The sm3 attribute can also be specified per pass, to disable for example a too complex lit base optimization pass on SM2.
-
-The "desktop" attribute in either technique or pass works similarly to allow requiring desktop hardware and excluding mobile devices.
+The "desktop" attribute in either technique or pass allows to specify it requires desktop graphics hardware (exclude mobile devices.) Omitting it is the same as specifying false.
 
 Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D9, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
 
@@ -1121,7 +1111,7 @@ vec3 worldPos = GetWorldPos(modelMatrix);
 gl_Position = GetClipPos(worldPos);
 \endcode
 
-On both Direct3D9 and OpenGL the vertex and pixel shaders are written into the same file, and the entrypoint functions must be called VS() and PS(). In OpenGL mode one of these is transformed to the main() function required by GLSL behind the scenes. When compiling a vertex shader, the compilation define "COMPILEVS" is always present, and likewise "COMPILEPS" when compiling a pixel shader. These are heavily used in the shader include files to prevent constructs that are illegal for the "wrong" type of shader, and to reduce compilation time. When compiling for %Shader %Model 3 on Direct3D9, the compilation define "SM3" is present: this can be used to separate code which would not compile on SM2.
+On both Direct3D9 and OpenGL the vertex and pixel shaders are written into the same file, and the entrypoint functions must be called VS() and PS(). In OpenGL mode one of these is transformed to the main() function required by GLSL behind the scenes. When compiling a vertex shader, the compilation define "COMPILEVS" is always present, and likewise "COMPILEPS" when compiling a pixel shader. These are heavily used in the shader include files to prevent constructs that are illegal for the "wrong" type of shader, and to reduce compilation time.
 
 The uniforms must be prefixed in a certain way so that the engine understands them:
 
@@ -2708,7 +2698,7 @@ Note: animations are stored using absolute bone transformations. Therefore only 
 byte[4]    Identifier "USHD"
 
 short      Shader type (0 = vertex, 1 = pixel)
-short      Shader model (2 or 3)
+short      Shader model (3)
 
 uint       Number of constant parameters
 

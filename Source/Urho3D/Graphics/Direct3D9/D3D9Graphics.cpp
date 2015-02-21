@@ -265,12 +265,9 @@ Graphics::Graphics(Context* context) :
     queryIssued_(false),
     lightPrepassSupport_(false),
     deferredSupport_(false),
-    hardwareShadowSupport_(false),
-    streamOffsetSupport_(false),
+    instancingSupport_(false),
     sRGBSupport_(false),
     sRGBWriteSupport_(false),
-    hasSM3_(false),
-    forceSM2_(false),
     numPrimitives_(0),
     numBatches_(0),
     maxScratchBufferRequest_(0),
@@ -278,7 +275,8 @@ Graphics::Graphics(Context* context) :
     currentShaderParameters_(0),
     shaderPath_("Shaders/HLSL/"),
     shaderExtension_(".hlsl"),
-    orientations_("LandscapeLeft LandscapeRight")
+    orientations_("LandscapeLeft LandscapeRight"),
+    apiName_("D3D9")
 {
     SetTextureUnitMappings();
     
@@ -1971,14 +1969,6 @@ void Graphics::ResetStreamFrequencies()
     }
 }
 
-void Graphics::SetForceSM2(bool enable)
-{
-    if (!IsInitialized())
-        forceSM2_ = enable;
-    else
-        LOGERROR("Force Shader Model 2 can not be changed after setting the initial screen mode");
-}
-
 void Graphics::BeginDumpShaders(const String& fileName)
 {
     shaderPrecache_ = new ShaderPrecache(context_, fileName);
@@ -2553,9 +2543,9 @@ bool Graphics::CreateInterface()
         return false;
     }
     
-    if (impl_->deviceCaps_.PixelShaderVersion < D3DPS_VERSION(2, 0))
+    if (impl_->deviceCaps_.PixelShaderVersion < D3DPS_VERSION(3, 0))
     {
-        LOGERROR("Shader model 2.0 display adapter is required");
+        LOGERROR("Shader model 3.0 display adapter is required");
         return false;
     }
     
@@ -2605,8 +2595,7 @@ void Graphics::CheckFeatureSupport()
     lightPrepassSupport_ = false;
     deferredSupport_ = false;
     hardwareShadowSupport_ = false;
-    streamOffsetSupport_ = false;
-    hasSM3_ = false;
+    instancingSupport_ = false;
     readableDepthFormat = 0;
     
     // Check hardware shadow map support: prefer NVIDIA style hardware depth compared shadow maps if available
@@ -2663,14 +2652,6 @@ void Graphics::CheckFeatureSupport()
         dummyColorFormat_ = D3DFMT_R5G6B5;
     else if (impl_->CheckFormatSupport(D3DFMT_A4R4G4B4, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
         dummyColorFormat_ = D3DFMT_A4R4G4B4;
-        
-    // Check for Shader Model 3
-    if (!forceSM2_)
-    {
-        if (impl_->deviceCaps_.VertexShaderVersion >= D3DVS_VERSION(3, 0) && impl_->deviceCaps_.PixelShaderVersion >=
-            D3DPS_VERSION(3, 0))
-            hasSM3_ = true;
-    }
     
     // Check for light prepass and deferred rendering support
     if (impl_->deviceCaps_.NumSimultaneousRTs >= 2 && impl_->CheckFormatSupport(D3DFMT_R32F, D3DUSAGE_RENDERTARGET,
@@ -2683,7 +2664,7 @@ void Graphics::CheckFeatureSupport()
     
     // Check for stream offset (needed for instancing)
     if (impl_->deviceCaps_.DevCaps2 & D3DDEVCAPS2_STREAMOFFSET)
-        streamOffsetSupport_ = true;
+        instancingSupport_ = true;
     
     // Check for sRGB read & write
     /// \todo Should be checked for each texture format separately

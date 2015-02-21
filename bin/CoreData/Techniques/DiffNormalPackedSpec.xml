@@ -1,6 +1,6 @@
 <technique vs="LitSolid" ps="LitSolid" psdefines="DIFFMAP">
     <pass name="base" />
-    <pass name="litbase" vsdefines="NORMALMAP" psdefines="AMBIENT NORMALMAP PACKEDNORMAL SPECMAP" sm3="true" />
+    <pass name="litbase" vsdefines="NORMALMAP" psdefines="AMBIENT NORMALMAP PACKEDNORMAL SPECMAP" />
     <pass name="light" vsdefines="NORMALMAP" psdefines="NORMALMAP PACKEDNORMAL SPECMAP" depthtest="equal" depthwrite="false" blend="add" />
     <pass name="prepass" vsdefines="NORMALMAP" psdefines="PREPASS NORMALMAP PACKEDNORMAL SPECMAP" />
     <pass name="material" psdefines="MATERIAL SPECMAP" depthtest="equal" depthwrite="false" />

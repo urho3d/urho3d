@@ -396,16 +396,7 @@ int Light::GetNumShadowSplits() const
         }
     }
 
-    ret = Min(ret, MAX_CASCADE_SPLITS);
-    // Shader Model 2 can only support 3 splits max. due to pixel shader instruction count limits
-    if (ret == 4)
-    {
-        Graphics* graphics = GetSubsystem<Graphics>();
-        if (graphics && !graphics->GetSM3Support())
-            --ret;
-    }
-
-    return ret;
+    return Min(ret, MAX_CASCADE_SPLITS);
 }
 
 const Matrix3x4& Light::GetVolumeTransform(Camera* camera)

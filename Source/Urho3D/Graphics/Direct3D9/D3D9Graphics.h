@@ -216,8 +216,6 @@ public:
     void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies.
     void ResetStreamFrequencies();
-    /// Set force Shader Model 2 flag. Only effective before setting the initial screen mode.
-    void SetForceSM2(bool enable);
     /// Begin dumping shader variation names to an XML file for precaching.
     void BeginDumpShaders(const String& fileName);
     /// End dumping shader variations names.
@@ -233,6 +231,8 @@ public:
     void* GetExternalWindow() const { return externalWindow_; }
     /// Return window title.
     const String& GetWindowTitle() const { return windowTitle_; }
+    /// Return graphics API name.
+    const String& GetApiName() const { return apiName_; }
     /// Return window position.
     IntVector2 GetWindowPosition() const;
     /// Return window width.
@@ -269,10 +269,8 @@ public:
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
     /// Return 24-bit shadow map depth texture format, or 0 if not supported.
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
-    /// Return whether Shader Model 3 is supported.
-    bool GetSM3Support() const { return hasSM3_; }
-    /// Return whether hardware instancing is supported.
-    bool GetInstancingSupport() const { return hasSM3_; }
+    /// Return whether hardware instancing is supported..
+    bool GetInstancingSupport() const { return instancingSupport_; }
     /// Return whether light pre-pass rendering is supported.
     bool GetLightPrepassSupport() const { return lightPrepassSupport_; }
     /// Return whether deferred rendering is supported.
@@ -281,8 +279,6 @@ public:
     bool GetHardwareShadowSupport() const { return hardwareShadowSupport_; }
     /// Return whether a readable hardware depth format is available.
     bool GetReadableDepthSupport() const { return GetReadableDepthFormat() != 0; }
-    /// Return whether stream offset is supported.
-    bool GetStreamOffsetSupport() const { return streamOffsetSupport_; }
     /// Return whether sRGB conversion on texture sampling is supported.
     bool GetSRGBSupport() const { return sRGBSupport_; }
     /// Return whether sRGB conversion on rendertarget writing is supported.
@@ -369,8 +365,6 @@ public:
     unsigned GetStreamFrequency(unsigned index) const;
     /// Return rendertarget width and height.
     IntVector2 GetRenderTargetDimensions() const;
-    /// Return force Shader Model 2 flag.
-    bool GetForceSM2() const { return forceSM2_; }
     
     /// Window was resized through user interaction. Called by Input subsystem.
     void WindowResized();
@@ -496,16 +490,12 @@ private:
     bool deferredSupport_;
     /// Hardware shadow map depth compare support flag.
     bool hardwareShadowSupport_;
-    /// Stream offset support flag.
-    bool streamOffsetSupport_;
+    /// Instancing support flag.
+    bool instancingSupport_;
     /// sRGB conversion on read support flag.
     bool sRGBSupport_;
     /// sRGB conversion on write support flag.
     bool sRGBWriteSupport_;
-    /// Shader Model 3 flag.
-    bool hasSM3_;
-    /// Force Shader Model 2 flag.
-    bool forceSM2_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.
@@ -610,6 +600,8 @@ private:
     SharedPtr<ShaderPrecache> shaderPrecache_;
     /// Allowed screen orientations.
     String orientations_;
+    /// Graphics API name.
+    String apiName_;
 
     /// Pixel perfect UV offset.
     static const Vector2 pixelUVOffset;

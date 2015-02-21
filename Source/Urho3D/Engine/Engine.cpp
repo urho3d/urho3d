@@ -310,7 +310,6 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         if (HasParameter(parameters, "ExternalWindow"))
             graphics->SetExternalWindow(GetParameter(parameters, "ExternalWindow").GetVoidPtr());
-        graphics->SetForceSM2(GetParameter(parameters, "ForceSM2", false).GetBool());
         graphics->SetWindowTitle(GetParameter(parameters, "WindowTitle", "Urho3D").GetString());
         graphics->SetWindowIcon(cache->GetResource<Image>(GetParameter(parameters, "WindowIcon", String::EMPTY).GetString()));
         graphics->SetFlushGPU(GetParameter(parameters, "FlushGPU", false).GetBool());
@@ -749,8 +748,6 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["LowQualityShadows"] = true;
             else if (argument == "nothreads")
                 ret["WorkerThreads"] = false;
-            else if (argument == "sm2")
-                ret["ForceSM2"] = true;
             else if (argument == "v")
                 ret["VSync"] = true;
             else if (argument == "t")

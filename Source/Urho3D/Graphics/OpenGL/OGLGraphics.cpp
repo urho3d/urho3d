@@ -252,7 +252,12 @@ Graphics::Graphics(Context* context_) :
     defaultTextureFilterMode_(FILTER_TRILINEAR),
     shaderPath_("Shaders/GLSL/"),
     shaderExtension_(".glsl"),
-    orientations_("LandscapeLeft LandscapeRight")
+    orientations_("LandscapeLeft LandscapeRight"),
+    #ifndef GL_ES_VERSION_2_0
+    apiName_("GL2")
+    #else
+    apiName_("GLES2")
+    #endif
 {
     SetTextureUnitMappings();
     ResetCachedState();
@@ -313,7 +318,6 @@ void Graphics::SetWindowPosition(int x, int y)
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 {
     PROFILE(SetScreenMode);
-LOGINFO("Graphics::SetMode()");
 
     bool maximize = false;
     
@@ -326,12 +330,8 @@ LOGINFO("Graphics::SetMode()");
         fullscreen = false;
 
     multiSample = Clamp(multiSample, 1, 16);
-bool isInitialized = IsInitialized();
-LOGINFO(isInitialized ? "isInitialized == true" : "isInitialized == false");
 
-    
-    //if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
-    if (isInitialized && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
+    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
         vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
         return true;
     
@@ -1952,10 +1952,6 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
         }
     }
     #endif
-}
-
-void Graphics::SetForceSM2(bool enable)
-{
 }
 
 void Graphics::BeginDumpShaders(const String& fileName)
