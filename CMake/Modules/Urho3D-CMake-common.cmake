@@ -126,6 +126,11 @@ elseif (WIN32)
     # Direct3D can be manually enabled with -DURHO3D_OPENGL=0, but it is likely to fail unless the MinGW-w64 distribution is used due to dependency to Direct3D headers and libs
     option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)" TRUE)
 endif ()
+if (WIN32)
+    # On Windows platform Direct3D11 can be optionally chosen
+    # Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
+    option (URHO3D_D3D11 "Use Direct3D11 instead of Direct3D9 (Windows platform only)")
+endif ()
 if (CMAKE_HOST_WIN32 AND NOT DEFINED URHO3D_MKLINK)
     # Test whether the host system is capable of setting up symbolic link
     execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
@@ -232,6 +237,11 @@ endif ()
 # Add definition for OpenGL
 if (URHO3D_OPENGL)
     add_definitions (-DURHO3D_OPENGL)
+endif ()
+
+# Add definition for Direct3D11
+if (URHO3D_D3D11)
+    add_definitions (-DURHO3D_D3D11)
 endif ()
 
 # Add definitions for GLEW

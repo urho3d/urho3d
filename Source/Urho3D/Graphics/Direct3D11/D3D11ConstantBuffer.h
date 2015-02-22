@@ -22,10 +22,30 @@
 
 #pragma once
 
-#if defined(URHO3D_OPENGL)
-#include "OpenGL/OGLTexture3D.h"
-#elif defined(URHO3D_D3D11)
-#include "Direct3D11/D3D11Texture3D.h"
-#else
-#include "Direct3D9/D3D9Texture3D.h"
-#endif
+#include "../../Graphics/GPUObject.h"
+#include "../../Graphics/GraphicsDefs.h"
+#include "../../Container/ArrayPtr.h"
+
+namespace Urho3D
+{
+
+/// Hardware constant buffer.
+class URHO3D_API ConstantBuffer : public Object, public GPUObject
+{
+    OBJECT(ConstantBuffer);
+    
+public:
+    /// Construct.
+    ConstantBuffer(Context* context);
+    /// Destruct.
+    virtual ~ConstantBuffer();
+    
+    /// Release buffer.
+    virtual void Release();
+    
+private:
+    /// Create buffer.
+    bool Create();
+};
+
+}

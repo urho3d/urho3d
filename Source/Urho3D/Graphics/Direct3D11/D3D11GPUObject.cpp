@@ -20,12 +20,32 @@
 // THE SOFTWARE.
 //
 
-#pragma once
+#include "../../Graphics/Graphics.h"
+#include "../../Graphics/GraphicsImpl.h"
+#include "../../Graphics/GPUObject.h"
 
-#if defined(URHO3D_OPENGL)
-#include "OpenGL/OGLTexture3D.h"
-#elif defined(URHO3D_D3D11)
-#include "Direct3D11/D3D11Texture3D.h"
-#else
-#include "Direct3D9/D3D9Texture3D.h"
-#endif
+#include "../../DebugNew.h"
+
+namespace Urho3D
+{
+
+GPUObject::GPUObject(Graphics* graphics) :
+    graphics_(graphics),
+    object_(0)
+{
+    if (graphics_)
+        graphics->AddGPUObject(this);
+}
+
+GPUObject::~GPUObject()
+{
+    if (graphics_)
+        graphics_->RemoveGPUObject(this);
+}
+
+Graphics* GPUObject::GetGraphics() const
+{
+    return graphics_;
+}
+
+}

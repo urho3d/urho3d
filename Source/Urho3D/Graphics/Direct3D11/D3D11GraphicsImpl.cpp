@@ -20,12 +20,27 @@
 // THE SOFTWARE.
 //
 
-#pragma once
+#include "../../Graphics/Graphics.h"
+#include "../../Graphics/GraphicsEvents.h"
+#include "../../Graphics/GraphicsImpl.h"
 
-#if defined(URHO3D_OPENGL)
-#include "OpenGL/OGLTexture3D.h"
-#elif defined(URHO3D_D3D11)
-#include "Direct3D11/D3D11Texture3D.h"
-#else
-#include "Direct3D9/D3D9Texture3D.h"
-#endif
+#include "../../DebugNew.h"
+
+namespace Urho3D
+{
+
+GraphicsImpl::GraphicsImpl() :
+    window_(0),
+    device_(0),
+    deviceContext_(0),
+    swapChain_(0),
+    defaultRenderTargetView_(0),
+    defaultDepthTexture_(0),
+    defaultDepthStencilView_(0),
+    depthStencilView_(0)
+{
+    for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+        renderTargetViews_[i] = 0;
+}
+
+}
