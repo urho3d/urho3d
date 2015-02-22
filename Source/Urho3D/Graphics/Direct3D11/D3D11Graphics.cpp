@@ -1263,10 +1263,6 @@ void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4
     /// \todo Not implemented
 }
 
-void Graphics::ResetStreamFrequencies()
-{
-}
-
 void Graphics::BeginDumpShaders(const String& fileName)
 {
     shaderPrecache_ = new ShaderPrecache(context_, fileName);

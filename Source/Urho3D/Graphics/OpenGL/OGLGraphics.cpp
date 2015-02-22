@@ -1909,14 +1909,6 @@ void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4
     #endif
 }
 
-void Graphics::SetStreamFrequency(unsigned index, unsigned frequency)
-{
-}
-
-void Graphics::ResetStreamFrequencies()
-{
-}
-
 void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef, unsigned compareMask, unsigned writeMask)
 {
     #ifndef GL_ES_VERSION_2_0
@@ -2139,11 +2131,6 @@ Texture* Graphics::GetTexture(unsigned index) const
 RenderSurface* Graphics::GetRenderTarget(unsigned index) const
 {
     return index < MAX_RENDERTARGETS ? renderTargets_[index] : 0;
-}
-
-unsigned Graphics::GetStreamFrequency(unsigned index) const
-{
-    return 0;
 }
 
 IntVector2 Graphics::GetRenderTargetDimensions() const

@@ -774,9 +774,6 @@ bool Graphics::BeginFrame()
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         SetTexture(i, 0);
     
-    // Cleanup stream frequencies from previous frame
-    ResetStreamFrequencies();
-    
     numPrimitives_ = 0;
     numBatches_ = 0;
     
@@ -1948,27 +1945,6 @@ void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4
     }
 }
 
-void Graphics::SetStreamFrequency(unsigned index, unsigned frequency)
-{
-    if (index < MAX_VERTEX_STREAMS && streamFrequencies_[index] != frequency)
-    {
-        impl_->device_->SetStreamSourceFreq(index, frequency);
-        streamFrequencies_[index] = frequency;
-    }
-}
-
-void Graphics::ResetStreamFrequencies()
-{
-    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
-    {
-        if (streamFrequencies_[i] != 1)
-        {
-            impl_->device_->SetStreamSourceFreq(i, 1);
-            streamFrequencies_[i] = 1;
-        }
-    }
-}
-
 void Graphics::BeginDumpShaders(const String& fileName)
 {
     shaderPrecache_ = new ShaderPrecache(context_, fileName);
@@ -2133,11 +2109,6 @@ Texture* Graphics::GetTexture(unsigned index) const
 RenderSurface* Graphics::GetRenderTarget(unsigned index) const
 {
     return index < MAX_RENDERTARGETS ? renderTargets_[index] : 0;
-}
-
-unsigned Graphics::GetStreamFrequency(unsigned index) const
-{
-    return index < MAX_VERTEX_STREAMS ? streamFrequencies_[index] : 0;
 }
 
 IntVector2 Graphics::GetRenderTargetDimensions() const
@@ -2456,6 +2427,27 @@ unsigned Graphics::GetFormat(const String& formatName)
         return GetReadableDepthFormat();
     
     return GetRGBFormat();
+}
+
+void Graphics::SetStreamFrequency(unsigned index, unsigned frequency)
+{
+    if (index < MAX_VERTEX_STREAMS && streamFrequencies_[index] != frequency)
+    {
+        impl_->device_->SetStreamSourceFreq(index, frequency);
+        streamFrequencies_[index] = frequency;
+    }
+}
+
+void Graphics::ResetStreamFrequencies()
+{
+    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
+    {
+        if (streamFrequencies_[i] != 1)
+        {
+            impl_->device_->SetStreamSourceFreq(i, 1);
+            streamFrequencies_[i] = 1;
+        }
+    }
 }
 
 bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless)
