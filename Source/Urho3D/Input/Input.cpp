@@ -414,6 +414,19 @@ void Input::Update()
             }
         }
     }
+
+    #ifndef EMSCRIPTEN
+    if (mouseMode_ == MM_RELATIVE)
+    {
+        IntVector2 mousePosition = GetMousePosition();
+        IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+        if (mousePosition != center)
+        {
+            SetMousePosition(center);
+            lastMousePosition_ = center;
+        }
+    }
+    #endif
 }
 
 void Input::SetMouseVisible(bool enable, bool suppressEvent)

@@ -386,8 +386,9 @@ def makefile_ci
     # LuaJIT on MinGW build is not possible on Ubuntu 12.04 LTS as its GCC cross-compiler version is too old. Fallback to use Lua library instead.
     jit = ''
     amalg = ''
-  elsif ENV['ANDROID'] && ENV['ABI'] == 'arm64-v8a'
-    # The upstream LuaJIT library does not support this Android ABI at the moment, fallback to use Lua library instead
+  elsif (ENV['ANDROID'] && ENV['ABI'] == 'arm64-v8a') || ENV['EMSCRIPTEN']
+    # The upstream LuaJIT library does not support this Android ABI at the moment; LuaJIT on Emscripten is not possible
+    # Fallback to use Lua library instead
     jit = ''
     amalg = ''
   else

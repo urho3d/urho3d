@@ -182,6 +182,7 @@ class ViewportContext
 
         SubscribeToEvent(settingsButton, "Released", "ToggleViewportSettingsWindow");
         SubscribeToEvent(settingsWindow.GetChild("ResetCamera", true), "Released", "ResetCamera");
+        SubscribeToEvent(settingsWindow.GetChild("CopyTransform", true), "Released", "HandleCopyTransformClicked");
         SubscribeToEvent(settingsWindow.GetChild("CloseButton", true), "Released", "CloseViewportSettingsWindow");
         SubscribeToEvent(settingsWindow.GetChild("Refresh", true), "Released", "UpdateSettingsUI");
         HandleResize();
@@ -250,6 +251,7 @@ class ViewportContext
         UpdateSettingsUI();
         /* settingsWindow.position = */
         settingsWindow.visible = true;
+        settingsWindow.BringToFront();
     }
 
     void CloseViewportSettingsWindow()
@@ -309,6 +311,14 @@ class ViewportContext
             camera.zoom = element.text.ToFloat();
         else if (element is cameraOrthoSize)
             camera.orthoSize = element.text.ToFloat();
+    }
+    void HandleCopyTransformClicked(StringHash eventType, VariantMap& eventData)
+    {
+        if (editNode !is null)
+        {
+            editNode.position = cameraNode.position;
+            editNode.rotation = cameraNode.rotation;
+        }
     }
 }
 
