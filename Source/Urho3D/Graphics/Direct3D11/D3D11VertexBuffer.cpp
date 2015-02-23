@@ -158,7 +158,15 @@ bool VertexBuffer::SetData(const void* data)
         }
         else
         {
-            /// \todo Implement using UpdateSubResource
+            D3D11_BOX destBox;
+            destBox.left = 0;
+            destBox.right = vertexCount_ * vertexSize_;
+            destBox.top = 0;
+            destBox.bottom = 1;
+            destBox.front = 0;
+            destBox.back = 1;
+
+            graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Buffer*)object_, 0, &destBox, data, 0, 0);
         }
     }
     
@@ -209,7 +217,15 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
         }
         else
         {
-            /// \todo Implement using UpdateSubResource
+            D3D11_BOX destBox;
+            destBox.left = start * vertexSize_;
+            destBox.right = destBox.left + count * vertexSize_;
+            destBox.top = 0;
+            destBox.bottom = 1;
+            destBox.front = 0;
+            destBox.back = 1;
+
+            graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Buffer*)object_, 0, &destBox, data, 0, 0);
         }
     }
 
@@ -352,7 +368,20 @@ bool VertexBuffer::Create()
     
     if (graphics_)
     {
-        /// \todo Implement
+        D3D11_BUFFER_DESC bufferDesc;
+        memset(&bufferDesc, 0, sizeof bufferDesc);
+        bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        bufferDesc.CPUAccessFlags = dynamic_ ? D3D11_CPU_ACCESS_WRITE : 0;
+        bufferDesc.Usage = dynamic_ ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
+        bufferDesc.ByteWidth = (unsigned)(vertexCount_ * vertexSize_);
+
+        graphics_->GetImpl()->GetDevice()->CreateBuffer(&bufferDesc, 0, (ID3D11Buffer**)&object_);
+
+        if (!object_)
+        {
+            LOGERROR("Failed to create vertex buffer");
+            return false;
+        }
     }
     
     return true;
@@ -372,7 +401,16 @@ void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
     
     if (object_)
     {
-        /// \todo Implement
+        D3D11_MAPPED_SUBRESOURCE mappedData;
+        mappedData.pData = 0;
+
+        graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Buffer*)object_, 0, discard ? D3D11_MAP_WRITE_DISCARD :
+            D3D11_MAP_WRITE, 0, &mappedData);
+        hwData = mappedData.pData;
+        if (!hwData)
+            LOGERROR("Failed to map vertex buffer");
+        else
+            lockState_ = LOCK_HARDWARE;
     }
     
     return hwData;
@@ -382,7 +420,7 @@ void VertexBuffer::UnmapBuffer()
 {
     if (object_ && lockState_ == LOCK_HARDWARE)
     {
-        /// \todo Implement
+        graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Buffer*)object_, 0);
         lockState_ = LOCK_NONE;
     }
 }

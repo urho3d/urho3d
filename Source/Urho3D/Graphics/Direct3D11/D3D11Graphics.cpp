@@ -73,6 +73,91 @@ extern "C" {
 namespace Urho3D
 {
 
+static const D3D11_COMPARISON_FUNC d3dCmpFunc[] =
+{
+    D3D11_COMPARISON_ALWAYS,
+    D3D11_COMPARISON_EQUAL,
+    D3D11_COMPARISON_NOT_EQUAL,
+    D3D11_COMPARISON_LESS,
+    D3D11_COMPARISON_LESS_EQUAL,
+    D3D11_COMPARISON_GREATER,
+    D3D11_COMPARISON_GREATER_EQUAL
+};
+
+static const DWORD d3dBlendEnable[] =
+{
+    FALSE,
+    TRUE,
+    TRUE,
+    TRUE,
+    TRUE,
+    TRUE,
+    TRUE,
+    TRUE
+};
+
+static const D3D11_BLEND d3dSrcBlend[] =
+{
+    D3D11_BLEND_ONE,
+    D3D11_BLEND_ONE,
+    D3D11_BLEND_DEST_COLOR,
+    D3D11_BLEND_SRC_ALPHA,
+    D3D11_BLEND_SRC_ALPHA,
+    D3D11_BLEND_ONE,
+    D3D11_BLEND_INV_DEST_ALPHA,
+    D3D11_BLEND_ONE,
+    D3D11_BLEND_SRC_ALPHA,
+};
+
+static const D3D11_BLEND d3dDestBlend[] =
+{
+    D3D11_BLEND_ZERO,
+    D3D11_BLEND_ONE,
+    D3D11_BLEND_ZERO,
+    D3D11_BLEND_INV_SRC_ALPHA,
+    D3D11_BLEND_ONE,
+    D3D11_BLEND_INV_SRC_ALPHA,
+    D3D11_BLEND_DEST_ALPHA,
+    D3D11_BLEND_ONE,
+    D3D11_BLEND_ONE
+};
+
+static const D3D11_BLEND_OP d3dBlendOp[] =
+{
+    D3D11_BLEND_OP_ADD,
+    D3D11_BLEND_OP_ADD,
+    D3D11_BLEND_OP_ADD,
+    D3D11_BLEND_OP_ADD,
+    D3D11_BLEND_OP_ADD,
+    D3D11_BLEND_OP_ADD,
+    D3D11_BLEND_OP_ADD,
+    D3D11_BLEND_OP_REV_SUBTRACT,
+    D3D11_BLEND_OP_REV_SUBTRACT
+};
+
+static const D3D11_STENCIL_OP d3dStencilOp[] =
+{
+    D3D11_STENCIL_OP_KEEP,
+    D3D11_STENCIL_OP_ZERO,
+    D3D11_STENCIL_OP_REPLACE,
+    D3D11_STENCIL_OP_INCR,
+    D3D11_STENCIL_OP_DECR
+};
+
+static const D3D11_CULL_MODE d3dCullMode[] =
+{
+    D3D11_CULL_NONE,
+    D3D11_CULL_BACK,
+    D3D11_CULL_FRONT
+};
+
+static const D3D11_FILL_MODE d3dFillMode[] =
+{
+    D3D11_FILL_SOLID,
+    D3D11_FILL_WIREFRAME,
+    D3D11_FILL_WIREFRAME // Point mode not supported
+};
+
 static unsigned GetD3DColor(const Color& color)
 {
     unsigned r = (unsigned)(Clamp(color.r_ * 255.0f, 0.0f, 255.0f));
@@ -164,6 +249,7 @@ Graphics::Graphics(Context* context) :
     apiName_("D3D11")
 {
     SetTextureUnitMappings();
+    ResetCachedState();
     
     // Initialize SDL now. Graphics should be the first SDL-using subsystem to be created
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_NOPARACHUTE);
@@ -185,6 +271,18 @@ Graphics::~Graphics()
 
     vertexDeclarations_.Clear();
     
+    for (HashMap<unsigned, ID3D11BlendState*>::Iterator i = impl_->blendStates_.Begin(); i != impl_->blendStates_.End(); ++i)
+        i->second_->Release();
+    impl_->blendStates_.Clear();
+    
+    for (HashMap<unsigned, ID3D11DepthStencilState*>::Iterator i = impl_->depthStates_.Begin(); i != impl_->depthStates_.End(); ++i)
+        i->second_->Release();
+    impl_->depthStates_.Clear();
+
+    for (HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Begin(); i != impl_->rasterizerStates_.End(); ++i)
+        i->second_->Release();
+    impl_->rasterizerStates_.Clear();
+
     if (impl_->defaultRenderTargetView_)
     {
         impl_->defaultRenderTargetView_->Release();
@@ -1060,7 +1158,6 @@ void Graphics::SetTextureAnisotropy(unsigned level)
         level = 1;
     
     /// \todo Implement
-    LOGERROR("SetTextureAnisotropy not implemented on D3D11");
 }
 
 void Graphics::SetBlendMode(BlendMode mode)
@@ -1254,6 +1351,7 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
         {
             stencilRef_ = stencilRef;
             stencilRefDirty_ = true;
+            depthStateDirty_ = true;
         }
     }
 }
@@ -2016,11 +2114,14 @@ void Graphics::ResetCachedState()
     rasterizerStateDirty_ = true;
     scissorRectDirty_ = true;
     stencilRefDirty_ = true;
+    blendStateHash_ = M_MAX_UNSIGNED;
+    depthStateHash_ = M_MAX_UNSIGNED;
+    rasterizerStateHash_ = M_MAX_UNSIGNED;
 }
 
 void Graphics::PrepareDraw()
 {
-    /// \todo Implement
+    /// \todo Implement the rest
 
     if (renderTargetsDirty_)
     {
@@ -2035,6 +2136,139 @@ void Graphics::PrepareDraw()
         
         impl_->deviceContext_->OMSetRenderTargets(MAX_RENDERTARGETS, &renderTargetViews[0], depthStencilView);
         renderTargetsDirty_ = false;
+    }
+
+    if (blendStateDirty_)
+    {
+        unsigned newBlendStateHash = (colorWrite_ ? 1 : 0) | (blendMode_ << 1);
+        if (newBlendStateHash != blendStateHash_)
+        {
+            HashMap<unsigned, ID3D11BlendState*>::Iterator i = impl_->blendStates_.Find(newBlendStateHash);
+            if (i == impl_->blendStates_.End())
+            {
+                PROFILE(CreateBlendState);
+
+                D3D11_BLEND_DESC stateDesc;
+                memset(&stateDesc, 0, sizeof stateDesc);
+                stateDesc.AlphaToCoverageEnable = false;
+                stateDesc.IndependentBlendEnable = false;
+                stateDesc.RenderTarget[0].BlendEnable = d3dBlendEnable[blendMode_];
+                stateDesc.RenderTarget[0].SrcBlend = d3dSrcBlend[blendMode_];
+                stateDesc.RenderTarget[0].DestBlend = d3dDestBlend[blendMode_];
+                stateDesc.RenderTarget[0].BlendOp = d3dBlendOp[blendMode_];
+                stateDesc.RenderTarget[0].SrcBlendAlpha = d3dSrcBlend[blendMode_];
+                stateDesc.RenderTarget[0].DestBlendAlpha = d3dDestBlend[blendMode_];
+                stateDesc.RenderTarget[0].BlendOpAlpha = d3dBlendOp[blendMode_];
+                stateDesc.RenderTarget[0].RenderTargetWriteMask = colorWrite_ ? D3D11_COLOR_WRITE_ENABLE_ALL : 0x0;
+
+                ID3D11BlendState* newBlendState = 0;
+                impl_->device_->CreateBlendState(&stateDesc, &newBlendState);
+                if (!newBlendState)
+                    LOGERROR("Failed to create blend state");
+
+                i = impl_->blendStates_.Insert(MakePair(newBlendStateHash, newBlendState));
+            }
+
+            impl_->deviceContext_->OMSetBlendState(i->second_, 0, M_MAX_UNSIGNED);
+            blendStateHash_ = newBlendStateHash;
+        }
+
+        blendStateDirty_ = false;
+    }
+
+    if (depthStateDirty_)
+    {
+        unsigned newDepthStateHash = (depthWrite_ ? 1 : 0) | (stencilTest_ ? 2 : 0) | (depthTestMode_ << 2) |
+            ((stencilCompareMask_ & 0xff) << 5) | ((stencilWriteMask_ & 0xff) << 13) | (stencilTestMode_ << 21) |
+            ((stencilFail_ + stencilZFail_ * 5 + stencilPass_ * 25) << 24);
+        if (newDepthStateHash != depthStateHash_ || stencilRefDirty_)
+        {
+            HashMap<unsigned, ID3D11DepthStencilState*>::Iterator i = impl_->depthStates_.Find(newDepthStateHash);
+            if (i == impl_->depthStates_.End())
+            {
+                PROFILE(CreateDepthState);
+
+                D3D11_DEPTH_STENCIL_DESC stateDesc;
+                memset(&stateDesc, 0, sizeof stateDesc);
+                stateDesc.DepthEnable = TRUE;
+                stateDesc.DepthWriteMask = depthWrite_ ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
+                stateDesc.DepthFunc = d3dCmpFunc[depthTestMode_];
+                stateDesc.StencilEnable = stencilTest_ ? TRUE : FALSE;
+                stateDesc.StencilReadMask = (unsigned char)stencilCompareMask_;
+                stateDesc.StencilWriteMask = (unsigned char)stencilWriteMask_;
+                stateDesc.FrontFace.StencilFailOp = d3dStencilOp[stencilFail_];
+                stateDesc.FrontFace.StencilDepthFailOp = d3dStencilOp[stencilZFail_];
+                stateDesc.FrontFace.StencilPassOp = d3dStencilOp[stencilPass_];
+                stateDesc.FrontFace.StencilFunc = d3dCmpFunc[stencilTestMode_];
+                stateDesc.BackFace.StencilFailOp = d3dStencilOp[stencilFail_];
+                stateDesc.BackFace.StencilDepthFailOp = d3dStencilOp[stencilZFail_];
+                stateDesc.BackFace.StencilPassOp = d3dStencilOp[stencilPass_];
+                stateDesc.BackFace.StencilFunc = d3dCmpFunc[stencilTestMode_];
+
+                ID3D11DepthStencilState* newDepthState = 0;
+                impl_->device_->CreateDepthStencilState(&stateDesc, &newDepthState);
+                if (!newDepthState)
+                    LOGERROR("Failed to create depth state");
+
+                i = impl_->depthStates_.Insert(MakePair(newDepthStateHash, newDepthState));
+            }
+
+            impl_->deviceContext_->OMSetDepthStencilState(i->second_, stencilRef_);
+            depthStateHash_ = newDepthStateHash;
+        }
+        
+        depthStateDirty_ = false;
+        stencilRefDirty_ = false;
+    }
+
+    if (rasterizerStateDirty_)
+    {
+        unsigned newRasterizerStateHash = (scissorTest_ ? 1 : 0) | (fillMode_ << 1) | (cullMode_ << 3) |
+            ((*((unsigned*)&constantDepthBias_) & 0x1fff) << 5) || ((*((unsigned*)&slopeScaledDepthBias_) & 0x1fff) << 18);
+        if (newRasterizerStateHash != rasterizerStateHash_)
+        {
+            HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Find(newRasterizerStateHash);
+            if (i == impl_->rasterizerStates_.End())
+            {
+                PROFILE(CreateRasterizerState);
+
+                D3D11_RASTERIZER_DESC stateDesc;
+                memset(&stateDesc, 0, sizeof stateDesc);
+                stateDesc.FillMode = d3dFillMode[fillMode_];
+                stateDesc.CullMode = d3dCullMode[cullMode_];
+                stateDesc.FrontCounterClockwise = FALSE;
+                stateDesc.DepthBias = (int)(16777216.0f * constantDepthBias_); /// \todo Verify that bias is same as on D3D9
+                stateDesc.DepthBiasClamp = M_INFINITY;
+                stateDesc.SlopeScaledDepthBias = slopeScaledDepthBias_;
+                stateDesc.DepthClipEnable = TRUE;
+                stateDesc.ScissorEnable = scissorTest_ ? TRUE : FALSE;
+                stateDesc.MultisampleEnable = TRUE;
+                stateDesc.AntialiasedLineEnable = FALSE;
+
+                ID3D11RasterizerState* newRasterizerState = 0;
+                impl_->device_->CreateRasterizerState(&stateDesc, &newRasterizerState);
+                if (!newRasterizerState)
+                    LOGERROR("Failed to create rasterizer state");
+
+                i = impl_->rasterizerStates_.Insert(MakePair(newRasterizerStateHash, newRasterizerState));
+            }
+
+            impl_->deviceContext_->RSSetState(i->second_);
+            rasterizerStateHash_ = newRasterizerStateHash;
+        }
+
+        rasterizerStateDirty_ = false;
+    }
+
+    if (scissorRectDirty_)
+    {
+        D3D11_RECT d3dRect;
+        d3dRect.left = scissorRect_.left_;
+        d3dRect.top = scissorRect_.top_;
+        d3dRect.right = scissorRect_.right_;
+        d3dRect.bottom = scissorRect_.bottom_;
+        impl_->deviceContext_->RSSetScissorRects(1, &d3dRect);
+        scissorRectDirty_ = false;
     }
 }
 

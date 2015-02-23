@@ -583,6 +583,12 @@ private:
     bool scissorRectDirty_;
     /// Stencil ref dirty flag.
     bool stencilRefDirty_;
+    /// Hash of current blend state.
+    unsigned blendStateHash_;
+    /// Hash of current depth state.
+    unsigned depthStateHash_;
+    /// Hash of current rasterizer state.
+    unsigned rasterizerStateHash_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
     /// Shader parameters for all vertex/pixel shader combinations.
