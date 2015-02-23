@@ -69,7 +69,7 @@ void View3D::OnResize()
     int width = GetWidth();
     int height = GetHeight();
     
-    if (width > 0 && height >> 0)
+    if (width > 0 && height > 0)
     {
         renderTexture_->SetSize(width, height, rttFormat_, TEXTURE_RENDERTARGET);
         depthTexture_->SetSize(width, height, Graphics::GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
