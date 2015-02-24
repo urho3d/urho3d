@@ -28,6 +28,7 @@
 #include "../../Resource/ResourceCache.h"
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/ShaderVariation.h"
+#include "../../Graphics/VertexBuffer.h"
 
 #include <windows.h>
 #include <d3dcompiler.h>
@@ -40,7 +41,8 @@ namespace Urho3D
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
     owner_(owner),
-    type_(type)
+    type_(type),
+    elementMask_(0)
 {
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         useTextureUnit_[i] = false;
@@ -134,6 +136,7 @@ void ShaderVariation::Release()
         useTextureUnit_[i] = false;
     parameters_.Clear();
     byteCode_.Clear();
+    elementMask_ = 0;
 }
 
 void ShaderVariation::SetName(const String& name)
@@ -175,6 +178,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
     /// \todo Check that shader type and model match
     unsigned short shaderType = file->ReadUShort();
     unsigned short shaderModel = file->ReadUShort();
+    elementMask_ = file->ReadUInt();
     
     unsigned numParameters = file->ReadUInt();
     for (unsigned i = 0; i < numParameters; ++i)
@@ -277,7 +281,6 @@ bool ShaderVariation::Compile()
     macros.Push(endMacro);
     
     // Compile using D3DCompile
-
     LPD3DBLOB shaderCode = 0;
     LPD3DBLOB errorMsgs = 0;
     
@@ -294,6 +297,7 @@ bool ShaderVariation::Compile()
         unsigned char* bufData = (unsigned char*)shaderCode->GetBufferPointer();
         unsigned bufSize = shaderCode->GetBufferSize();
         CopyStrippedCode(bufData, bufSize);
+        ParseParameters();
     }
 
     if (shaderCode)
@@ -306,7 +310,41 @@ bool ShaderVariation::Compile()
 
 void ShaderVariation::ParseParameters()
 {
-    /// \todo Implement
+    if (byteCode_.Empty())
+        return;
+
+    ID3D11ShaderReflection* reflection = nullptr;
+    D3D11_SHADER_DESC shaderDesc;
+    elementMask_ = 0;
+
+    D3DReflect(&byteCode_[0], byteCode_.Size(), IID_ID3D11ShaderReflection, (void**)&reflection);
+    if (!reflection)
+    {
+        LOGERROR("Failed to reflect vertex shader's input signature");
+        return;
+    }
+
+    reflection->GetDesc(&shaderDesc);
+
+    if (type_ == VS)
+    {
+        for (size_t i = 0; i < shaderDesc.InputParameters; ++i)
+        {
+            D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
+            reflection->GetInputParameterDesc((unsigned)i, &paramDesc);
+            for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
+            {
+                if (!String::Compare(paramDesc.SemanticName, VertexBuffer::elementSemantics[j], true) && paramDesc.SemanticIndex ==
+                    VertexBuffer::elementSemanticIndices[j])
+                {
+                    elementMask_ |= (1 << j);
+                    break;
+                }
+            }
+        }
+    }
+
+    reflection->Release();
 }
 
 void ShaderVariation::CopyStrippedCode(unsigned char* bufData, unsigned bufSize)
@@ -354,6 +392,7 @@ void ShaderVariation::SaveByteCode(const String& binaryShaderName)
     file->WriteFileID("USHD");
     file->WriteShort((unsigned short)type_);
     file->WriteShort(4);
+    file->WriteUInt(elementMask_);
 
     file->WriteUInt(parameters_.Size());
     for (HashMap<StringHash, ShaderParameter>::ConstIterator i = parameters_.Begin(); i != parameters_.End(); ++i)

@@ -638,10 +638,18 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
     if (!vertexCount)
         return;
     
+    PrepareDraw();
+
     unsigned primitiveCount;
     D3D_PRIMITIVE_TOPOLOGY d3dPrimitiveType;
     
     GetD3DPrimitiveType(vertexCount, type, primitiveCount, d3dPrimitiveType);
+    if (d3dPrimitiveType != primitiveType_)
+    {
+        impl_->deviceContext_->IASetPrimitiveTopology(d3dPrimitiveType);
+        primitiveType_ = d3dPrimitiveType;
+    }
+    impl_->deviceContext_->Draw(vertexCount, vertexStart);
 
     numPrimitives_ += primitiveCount;
     ++numBatches_;
@@ -652,10 +660,18 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     if (!indexCount)
         return;
     
+    PrepareDraw();
+
     unsigned primitiveCount;
     D3D_PRIMITIVE_TOPOLOGY d3dPrimitiveType;
     
     GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
+    if (d3dPrimitiveType != primitiveType_)
+    {
+        impl_->deviceContext_->IASetPrimitiveTopology(d3dPrimitiveType);
+        primitiveType_ = d3dPrimitiveType;
+    }
+    impl_->deviceContext_->DrawIndexed(indexCount, indexStart, 0);
 
     numPrimitives_ += primitiveCount;
     ++numBatches_;
@@ -671,6 +687,12 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     D3D_PRIMITIVE_TOPOLOGY d3dPrimitiveType;
     
     GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
+    if (d3dPrimitiveType != primitiveType_)
+    {
+        impl_->deviceContext_->IASetPrimitiveTopology(d3dPrimitiveType);
+        primitiveType_ = d3dPrimitiveType;
+    }
+    impl_->deviceContext_->DrawIndexedInstanced(indexCount, instanceCount, indexStart, 0, 0);
 
     numPrimitives_ += instanceCount * primitiveCount;
     ++numBatches_;
@@ -709,17 +731,22 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
         if (i < buffers.Size())
         {
             buffer = buffers[i];
-            elementMask = elementMasks[i];
-            if (buffer && buffer->GetElementMask() & MASK_INSTANCEMATRIX1)
-                offset = instanceOffset * buffer->GetVertexSize();
+            if (buffer)
+            {
+                elementMask = buffer->GetElementMask() & elementMasks[i];
+                if (elementMask & MASK_INSTANCEMATRIX1)
+                    offset = instanceOffset * buffer->GetVertexSize();
+            }
         }
 
-        if (buffer != vertexBuffers_[i] || offset != streamOffsets_[i] || elementMask != elementMasks_[i])
+        if (buffer != vertexBuffers_[i] || offset != impl_->vertexOffsets_[i] || elementMask != elementMasks_[i])
         {
             vertexBuffers_[i] = buffer;
             elementMasks_[i] = elementMask;
-            streamOffsets_[i] = offset;
-            inputLayoutDirty_ = true;
+            impl_->vertexBuffers_[i] = buffer ? (ID3D11Buffer*)buffer->GetGPUObject() : 0;
+            impl_->vertexSizes_[i] = buffer ? buffer->GetVertexSize() : 0;
+            impl_->vertexOffsets_[i] = offset;
+            vertexDeclarationDirty_ = true;
         }
     }
     
@@ -749,17 +776,22 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
         if (i < buffers.Size())
         {
             buffer = buffers[i];
-            elementMask = elementMasks[i];
-            if (buffer && buffer->GetElementMask() & MASK_INSTANCEMATRIX1)
-                offset = instanceOffset * buffer->GetVertexSize();
+            if (buffer)
+            {
+                elementMask = buffer->GetElementMask() & elementMasks[i];
+                if (elementMask & MASK_INSTANCEMATRIX1)
+                    offset = instanceOffset * buffer->GetVertexSize();
+            }
         }
         
-        if (buffer != vertexBuffers_[i] || offset != streamOffsets_[i] || elementMask != elementMasks_[i])
+        if (buffer != vertexBuffers_[i] || offset != impl_->vertexOffsets_[i] || elementMask != elementMasks_[i])
         {
             vertexBuffers_[i] = buffer;
             elementMasks_[i] = elementMask;
-            streamOffsets_[i] = offset;
-            inputLayoutDirty_ = true;
+            impl_->vertexBuffers_[i] = buffer ? (ID3D11Buffer*)buffer->GetGPUObject() : 0;
+            impl_->vertexSizes_[i] = buffer ? buffer->GetVertexSize() : 0;
+            impl_->vertexOffsets_[i] = offset;
+            vertexDeclarationDirty_ = true;
         }
     }
     
@@ -770,6 +802,14 @@ void Graphics::SetIndexBuffer(IndexBuffer* buffer)
 {
     if (buffer != indexBuffer_)
     {
+        if (buffer)
+        {
+            impl_->deviceContext_->IASetIndexBuffer((ID3D11Buffer*)buffer->GetGPUObject(), buffer->GetIndexSize() ==
+                sizeof(unsigned short) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0);
+        }
+        else
+            impl_->deviceContext_->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+
         indexBuffer_ = buffer;
     }
 }
@@ -801,7 +841,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         
         impl_->deviceContext_->VSSetShader((ID3D11VertexShader*)(vs ? vs->GetGPUObject() : 0), 0, 0);
         vertexShader_ = vs;
-        inputLayoutDirty_ = true;
+        vertexDeclarationDirty_ = true;
     }
     
     if (ps != pixelShader_)
@@ -1049,7 +1089,9 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             if (index > lastDirtyTexture_)
                 lastDirtyTexture_ = index;
         }
+
         textures_[index] = texture;
+        impl_->shaderResourceViews_[index] = texture ? (ID3D11ShaderResourceView*)texture->GetShaderResourceView() : 0;
         texturesDirty_ = true;
     }
 }
@@ -2072,14 +2114,17 @@ void Graphics::ResetCachedState()
     {
         vertexBuffers_[i] = 0;
         elementMasks_[i] = 0;
-        streamOffsets_[i] = 0;
+        impl_->vertexBuffers_[i] = 0;
+        impl_->vertexSizes_[i] = 0;
+        impl_->vertexOffsets_[i] = 0;
     }
     
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
         textures_[i] = 0;
+        impl_->shaderResourceViews_[i] = 0;
     }
-    
+
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
     {
         renderTargets_[i] = 0;
@@ -2091,7 +2136,8 @@ void Graphics::ResetCachedState()
     viewport_ = IntRect(0, 0, width_, height_);
     
     indexBuffer_ = 0;
-    vertexDeclaration_ = 0;
+    vertexDeclarationHash_ = 0;
+    primitiveType_ = 0;
     vertexShader_ = 0;
     pixelShader_ = 0;
     blendMode_ = BLEND_REPLACE;
@@ -2117,7 +2163,7 @@ void Graphics::ResetCachedState()
     drawAntialiased_ = true;
     renderTargetsDirty_ = true;
     texturesDirty_ = true;
-    inputLayoutDirty_ = true;
+    vertexDeclarationDirty_ = true;
     blendStateDirty_ = true;
     depthStateDirty_ = true;
     rasterizerStateDirty_ = true;
@@ -2131,38 +2177,56 @@ void Graphics::ResetCachedState()
 
 void Graphics::PrepareDraw()
 {
-    /// \todo Implement the rest
-
     if (renderTargetsDirty_)
     {
-        ID3D11RenderTargetView* renderTargetViews[MAX_RENDERTARGETS];
-        ID3D11DepthStencilView* depthStencilView = depthStencil_ ? (ID3D11DepthStencilView*)depthStencil_->GetRenderTargetView() : 0;
+        impl_->depthStencilView_ = depthStencil_ ? (ID3D11DepthStencilView*)depthStencil_->GetRenderTargetView() : impl_->defaultDepthStencilView_;
 
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-            renderTargetViews[i] = renderTargets_[i] ? (ID3D11RenderTargetView*)renderTargets_[i]->GetRenderTargetView() : 0;
+            impl_->renderTargetViews_[i] = renderTargets_[i] ? (ID3D11RenderTargetView*)renderTargets_[i]->GetRenderTargetView() : 0;
         // If rendertarget 0 is null and not doing depth-only rendering, render to the backbuffer
-        if (renderTargets_[0] && !depthStencil_)
-            renderTargetViews[0] = impl_->defaultRenderTargetView_;
+        if (!renderTargets_[0] && !depthStencil_)
+            impl_->renderTargetViews_[0] = impl_->defaultRenderTargetView_;
         
-        impl_->deviceContext_->OMSetRenderTargets(MAX_RENDERTARGETS, &renderTargetViews[0], depthStencilView);
+        impl_->deviceContext_->OMSetRenderTargets(MAX_RENDERTARGETS, &impl_->renderTargetViews_[0], impl_->depthStencilView_);
         renderTargetsDirty_ = false;
     }
 
     if (texturesDirty_ && firstDirtyTexture_ < MAX_TEXTURE_UNITS)
     {
-        static ID3D11ShaderResourceView* textureViews[MAX_TEXTURE_UNITS];
-
-        for (unsigned i = firstDirtyTexture_; i <= lastDirtyTexture_; ++i)
-            textureViews[i] = textures_[i] ? (ID3D11ShaderResourceView*)textures_[i]->GetShaderResourceView() : 0;
-        
         // Set same textures for both vertex & pixel shaders
         impl_->deviceContext_->VSSetShaderResources(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
-            &textureViews[firstDirtyTexture_]);
+            &impl_->shaderResourceViews_[firstDirtyTexture_]);
         impl_->deviceContext_->PSSetShaderResources(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
-            &textureViews[firstDirtyTexture_]);
+            &impl_->shaderResourceViews_[firstDirtyTexture_]);
 
         firstDirtyTexture_ = lastDirtyTexture_ = M_MAX_UNSIGNED;
         texturesDirty_ = false;
+    }
+
+    if (vertexDeclarationDirty_ && vertexShader_ && vertexShader_->GetByteCode().Size())
+    {
+        impl_->deviceContext_->IASetVertexBuffers(0, MAX_VERTEX_STREAMS, &impl_->vertexBuffers_[0], &impl_->vertexSizes_[0],
+            &impl_->vertexOffsets_[0]);
+
+        unsigned long long newVertexDeclarationHash = 0;
+        for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
+            newVertexDeclarationHash |= (unsigned long long)elementMasks_[i] << (i * 13);
+        newVertexDeclarationHash |= (unsigned long long)vertexShader_->GetElementMask() << 51;
+        if (newVertexDeclarationHash != vertexDeclarationHash_)
+        {
+            HashMap<unsigned long long, SharedPtr<VertexDeclaration> >::Iterator i = vertexDeclarations_.Find(newVertexDeclarationHash);
+            if (i == vertexDeclarations_.End())
+            {
+                SharedPtr<VertexDeclaration> newVertexDeclaration(new VertexDeclaration(this, vertexShader_, vertexBuffers_,
+                    elementMasks_));
+                i = vertexDeclarations_.Insert(MakePair(newVertexDeclarationHash, newVertexDeclaration));
+            }
+
+            impl_->deviceContext_->IASetInputLayout((ID3D11InputLayout*)i->second_->GetInputLayout());
+            vertexDeclarationHash_ = newVertexDeclarationHash;
+        }
+
+        vertexDeclarationDirty_ = false;
     }
 
     if (blendStateDirty_)

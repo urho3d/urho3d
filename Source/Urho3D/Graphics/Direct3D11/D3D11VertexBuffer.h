@@ -84,7 +84,13 @@ public:
     
     /// Vertex element sizes.
     static const unsigned elementSize[];
-    
+    /// Vertex element semantic names.
+    static const char* elementSemantics[];
+    /// Vertex element semantic indices.
+    static const unsigned elementSemanticIndices[];
+    /// Vertex element formats.
+    static const unsigned elementFormats[];
+
 private:
     /// Update offsets of vertex elements.
     void UpdateOffsets();

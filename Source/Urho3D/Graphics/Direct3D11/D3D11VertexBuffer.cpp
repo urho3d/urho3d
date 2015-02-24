@@ -47,6 +47,57 @@ const unsigned VertexBuffer::elementSize[] =
     4 * sizeof(float) // Instancematrix3
 };
 
+const char* VertexBuffer::elementSemantics[] =
+{
+    "POSITION",
+    "NORMAL",
+    "COLOR",
+    "TEXCOORD",
+    "TEXCOORD",
+    "TEXCOORD",
+    "TEXCOORD",
+    "TANGENT",
+    "BLENDWEIGHT",
+    "BLENDINDICES",
+    "TEXCOORD",
+    "TEXCOORD",
+    "TEXCOORD"
+};
+
+const unsigned VertexBuffer::elementSemanticIndices[] =
+{
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0,
+    0,
+    2,
+    3,
+    4
+};
+
+const unsigned VertexBuffer::elementFormats[] =
+{
+    DXGI_FORMAT_R32G32B32_FLOAT,
+    DXGI_FORMAT_R32G32B32_FLOAT,
+    DXGI_FORMAT_R8G8B8A8_UNORM,
+    DXGI_FORMAT_R32G32_FLOAT,
+    DXGI_FORMAT_R32G32_FLOAT,
+    DXGI_FORMAT_R32G32B32_FLOAT,
+    DXGI_FORMAT_R32G32B32_FLOAT,
+    DXGI_FORMAT_R32G32B32A32_FLOAT,
+    DXGI_FORMAT_R32G32B32A32_FLOAT,
+    DXGI_FORMAT_R8G8B8A8_UNORM,
+    DXGI_FORMAT_R32G32B32A32_FLOAT,
+    DXGI_FORMAT_R32G32B32A32_FLOAT,
+    DXGI_FORMAT_R32G32B32A32_FLOAT
+};
+
 VertexBuffer::VertexBuffer(Context* context) :
     Object(context),
     GPUObject(GetSubsystem<Graphics>()),

@@ -296,8 +296,6 @@ public:
     VertexBuffer* GetVertexBuffer(unsigned index) const;
     /// Return current index buffer.
     IndexBuffer* GetIndexBuffer() const { return indexBuffer_; }
-    /// Return current vertex declaration.
-    VertexDeclaration* GetVertexDeclaration() const { return vertexDeclaration_; }
     /// Return current vertex shader.
     ShaderVariation* GetVertexShader() const { return vertexShader_; }
     /// Return current pixel shader.
@@ -493,8 +491,6 @@ private:
     Vector<GPUObject*> gpuObjects_;
     /// Scratch buffers.
     Vector<ScratchBuffer> scratchBuffers_;
-    /// Vertex declarations.
-    HashMap<unsigned long long, SharedPtr<VertexDeclaration> > vertexDeclarations_;
     /// Shadow map dummy color texture format.
     unsigned dummyColorFormat_;
     /// Shadow map depth texture format.
@@ -505,12 +501,12 @@ private:
     VertexBuffer* vertexBuffers_[MAX_VERTEX_STREAMS];
     /// Element masks by vertex buffer.
     unsigned elementMasks_[MAX_VERTEX_STREAMS];
-    /// Stream offsets by vertex buffer.
-    unsigned streamOffsets_[MAX_VERTEX_STREAMS];
     /// Index buffer in use.
     IndexBuffer* indexBuffer_;
-    /// Vertex declaration in use.
-    VertexDeclaration* vertexDeclaration_;
+    /// Current vertex declaration hash.
+    unsigned long long vertexDeclarationHash_;
+    /// Current primitive type.
+    unsigned primitiveType_;
     /// Vertex shader in use.
     ShaderVariation* vertexShader_;
     /// Pixel shader in use.
@@ -571,8 +567,8 @@ private:
     bool renderTargetsDirty_;
     /// Textures dirty flag.
     bool texturesDirty_;
-    /// Input layout dirty flag.
-    bool inputLayoutDirty_;
+    /// Vertex declaration dirty flag.
+    bool vertexDeclarationDirty_;
     /// Blend state dirty flag.
     bool blendStateDirty_;
     /// Depth state dirty flag.
@@ -599,6 +595,8 @@ private:
     HashMap<Pair<ShaderVariation*, ShaderVariation*>, HashMap<StringHash, ShaderParameter> > shaderParameters_;
     /// Current active shader parameters.
     HashMap<StringHash, ShaderParameter>* currentShaderParameters_;
+    /// Vertex declarations.
+    HashMap<unsigned long long, SharedPtr<VertexDeclaration> > vertexDeclarations_;
     /// Remembered shader parameter sources.
     const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS];
     /// Base directory for shaders.

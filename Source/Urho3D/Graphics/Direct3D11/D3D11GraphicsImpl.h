@@ -75,6 +75,14 @@ private:
     HashMap<unsigned, ID3D11DepthStencilState*> depthStates_;
     /// Created rasterizer state objects.
     HashMap<unsigned, ID3D11RasterizerState*> rasterizerStates_;
+    /// Bound shader resource views.
+    ID3D11ShaderResourceView* shaderResourceViews_[MAX_TEXTURE_UNITS];
+    /// Bound vertex buffers.
+    ID3D11Buffer* vertexBuffers_[MAX_VERTEX_STREAMS];
+    /// Vertex sizes per buffer.
+    unsigned vertexSizes_[MAX_VERTEX_STREAMS];
+    /// Vertex stream offsets per buffer.
+    unsigned vertexOffsets_[MAX_VERTEX_STREAMS];
 };
 
 }

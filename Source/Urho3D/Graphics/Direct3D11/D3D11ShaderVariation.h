@@ -92,21 +92,22 @@ public:
     ShaderType GetShaderType() const { return type_; }
     /// Return shader name.
     const String& GetName() const { return name_; }
-    /// Return defines.
-    const String& GetDefines() const { return defines_; }
     /// Return full shader name.
     String GetFullName() const { return name_ + "(" + defines_ + ")"; }
-    /// Return compile error/warning string.
-    const String& GetCompilerOutput() const { return compilerOutput_; }
     /// Return whether uses a parameter.
     bool HasParameter(StringHash param) const { return parameters_.Contains(param); }
     /// Return whether uses a texture unit (only for pixel shaders.)
     bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
     /// Return all parameter definitions.
     const HashMap<StringHash, ShaderParameter>& GetParameters() const { return parameters_; }
+    /// Return vertex element mask.
+    unsigned GetElementMask() const { return elementMask_; }
     /// Return shader bytecode.
     const PODVector<unsigned char>& GetByteCode() const { return byteCode_; }
-    
+    /// Return defines.
+    const String& GetDefines() const { return defines_; }
+    /// Return compile error/warning string.
+    const String& GetCompilerOutput() const { return compilerOutput_; }
 private:
     /// Load bytecode from a file. Return true if successful.
     bool LoadByteCode(const String& binaryShaderName);
@@ -123,18 +124,20 @@ private:
     WeakPtr<Shader> owner_;
     /// Shader type.
     ShaderType type_;
-    /// Shader name.
-    String name_;
-    /// Defines to use in compiling.
-    String defines_;
-    /// Shader compile error string.
-    String compilerOutput_;
+    /// Vertex element mask for vertex shaders. Zero for pixel shaders.
+    unsigned elementMask_;
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> parameters_;
     /// Texture unit use flags.
     bool useTextureUnit_[MAX_TEXTURE_UNITS];
     /// Bytecode. Needed for inspecting the input signature and parameters.
     PODVector<unsigned char> byteCode_;
+    /// Shader name.
+    String name_;
+    /// Defines to use in compiling.
+    String defines_;
+    /// Shader compile error string.
+    String compilerOutput_;
 };
 
 }

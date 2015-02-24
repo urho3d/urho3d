@@ -26,8 +26,6 @@
 #include "../../Container/RefCounted.h"
 #include "../../Container/Vector.h"
 
-#include <d3d11.h>
-
 namespace Urho3D
 {
 
@@ -35,43 +33,21 @@ class Graphics;
 class ShaderVariation;
 class VertexBuffer;
 
-/// Element in the vertex declaration.
-struct VertexDeclarationElement
-{
-    /// Stream index.
-    unsigned stream_;
-    /// Element type.
-    VertexElement element_;
-    /// Element offset.
-    unsigned offset_;
-    /// Per-instance flag.
-    bool perInstance_;
-};
-
 /// Vertex declaration.
 class URHO3D_API VertexDeclaration : public RefCounted
 {
 public:
-    /// Construct with vertex element mask.
-    VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, unsigned elementMask);
     /// Construct with vertex buffers and element masks to base declaration on.
-    VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, const PODVector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks);
-    /// Construct with vertex buffers (shared pointer vector) and element masks to base declaration on.
-    VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks);
+    VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** buffers, unsigned* elementMasks);
     /// Destruct.
     ~VertexDeclaration();
     
-    /// Return Direct3D input layout corresponding to the declaration.
-    ID3D11InputLayout* GetInputLayout() const { return inputLayout_; }
+    /// Return input layout object corresponding to the declaration.
+    void* GetInputLayout() const { return inputLayout_; }
     
 private:
-    /// Create declaration.
-    void Create(Graphics* graphics, ShaderVariation* vertexShader, const PODVector<VertexDeclarationElement>& elements);
-    /// Release declaration.
-    void Release();
-    
-    /// Direct3D input layout.
-    ID3D11InputLayout* inputLayout_;
+    /// Input layout object.
+    void* inputLayout_;
 };
 
 }

@@ -25,136 +25,57 @@
 #include "../../Graphics/ShaderVariation.h"
 #include "../../Graphics/VertexBuffer.h"
 #include "../../Graphics/VertexDeclaration.h"
+#include "../../IO/Log.h"
 
 #include "../../DebugNew.h"
 
 namespace Urho3D
 {
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, unsigned elementMask) :
+VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** vertexBuffers, unsigned* elementMasks) :
     inputLayout_(0)
 {
-    PODVector<VertexDeclarationElement> elements;
-    unsigned offset = 0;
-    
-    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
-    {
-        VertexElement element = (VertexElement)i;
-        
-        if (elementMask & (1 << i))
-        {
-            VertexDeclarationElement newElement;
-            newElement.stream_ = 0;
-            newElement.element_ = element;
-            newElement.offset_ = offset;
-            offset += VertexBuffer::elementSize[i];
-            
-            elements.Push(newElement);
-        }
-    }
-    
-    Create(graphics, vertexShader, elements);
-}
+    PODVector<D3D11_INPUT_ELEMENT_DESC> elementDescs;
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, const PODVector<VertexBuffer*>& buffers,
-    const PODVector<unsigned>& elementMasks) :
-    inputLayout_(0)
-{
-    unsigned usedElementMask = 0;
-    PODVector<VertexDeclarationElement> elements;
-    
-    for (unsigned i = 0; i < buffers.Size(); ++i)
+    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
-        if (buffers[i])
+        if (vertexBuffers[i] && elementMasks[i])
         {
-            unsigned elementMask = elementMasks[i];
-            
-            if (elementMask == MASK_DEFAULT)
-                elementMask = buffers[i]->GetElementMask();
-            else
-            {
-                if ((buffers[i]->GetElementMask() & elementMask) != elementMask)
-                    return;
-            }
-            
             for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
             {
-                VertexElement element = (VertexElement)j;
-                
-                if (elementMask & (1 << j) && !(usedElementMask & (1 << j)))
+                if (elementMasks[i] & (1 << j))
                 {
-                    VertexDeclarationElement newElement;
-                    newElement.stream_ = i;
-                    newElement.element_ = element;
-                    newElement.offset_ = buffers[i]->GetElementOffset(element);
-                    usedElementMask |= 1 << j;
-                    
-                    elements.Push(newElement);
+                    D3D11_INPUT_ELEMENT_DESC newDesc;
+                    newDesc.SemanticName = VertexBuffer::elementSemantics[j];
+                    newDesc.SemanticIndex = VertexBuffer::elementSemanticIndices[j];
+                    newDesc.Format = (DXGI_FORMAT)VertexBuffer::elementFormats[j];
+                    newDesc.InputSlot = (unsigned)i;
+                    newDesc.AlignedByteOffset = vertexBuffers[i]->GetElementOffset((VertexElement)j);
+                    newDesc.InputSlotClass = (j >= ELEMENT_INSTANCEMATRIX1 && j <= ELEMENT_INSTANCEMATRIX3) ?
+                        D3D11_INPUT_PER_INSTANCE_DATA : D3D11_INPUT_PER_VERTEX_DATA;
+                    newDesc.InstanceDataStepRate = (j >= ELEMENT_INSTANCEMATRIX1 && j <= ELEMENT_INSTANCEMATRIX3) ? 1 : 0;
+                    elementDescs.Push(newDesc);
                 }
             }
         }
     }
-    
-    Create(graphics, vertexShader, elements);
-}
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, const Vector<SharedPtr<VertexBuffer> >& buffers,
-    const PODVector<unsigned>& elementMasks) :
-    inputLayout_(0)
-{
-    unsigned usedElementMask = 0;
-    PODVector<VertexDeclarationElement> elements;
-    
-    for (unsigned i = 0; i < buffers.Size(); ++i)
-    {
-        if (buffers[i])
-        {
-            unsigned elementMask = elementMasks[i];
-            
-            if (elementMask == MASK_DEFAULT)
-                elementMask = buffers[i]->GetElementMask();
-            else
-            {
-                if ((buffers[i]->GetElementMask() & elementMask) != elementMask)
-                    return;
-            }
-            
-            for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
-            {
-                VertexElement element = (VertexElement)j;
-                
-                if (elementMask & (1 << j) && !(usedElementMask & (1 << j)))
-                {
-                    VertexDeclarationElement newElement;
-                    newElement.stream_ = i;
-                    newElement.element_ = element;
-                    newElement.offset_ = buffers[i]->GetElementOffset(element);
-                    usedElementMask |= 1 << j;
-                    
-                    elements.Push(newElement);
-                }
-            }
-        }
-    }
-    
-    Create(graphics, vertexShader, elements);
+    ID3D11InputLayout* d3dInputLayout = 0;
+    const PODVector<unsigned char>& byteCode = vertexShader->GetByteCode();
+
+    graphics->GetImpl()->GetDevice()->CreateInputLayout(&elementDescs[0], (unsigned)elementDescs.Size(), &byteCode[0],
+        byteCode.Size(), &d3dInputLayout);
+    if (d3dInputLayout)
+        inputLayout_ = d3dInputLayout;
+    else
+        LOGERROR("Failed to create input layout");
 }
 
 VertexDeclaration::~VertexDeclaration()
 {
-    Release();
-}
-
-void VertexDeclaration::Create(Graphics* graphics, ShaderVariation* vertexShader, const PODVector<VertexDeclarationElement>& elements)
-{
-    /// \todo Implement
-}
-
-void VertexDeclaration::Release()
-{
     if (inputLayout_)
     {
-        inputLayout_->Release();
+        ((ID3D11InputLayout*)inputLayout_)->Release();
         inputLayout_ = 0;
     }
 }

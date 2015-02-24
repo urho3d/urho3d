@@ -295,8 +295,6 @@ public:
     VertexBuffer* GetVertexBuffer(unsigned index) const;
     /// Return current index buffer.
     IndexBuffer* GetIndexBuffer() const { return indexBuffer_; }
-    /// Return current vertex declaration.
-    VertexDeclaration* GetVertexDeclaration() const { return vertexDeclaration_; }
     /// Return current vertex shader.
     ShaderVariation* GetVertexShader() const { return vertexShader_; }
     /// Return current pixel shader.

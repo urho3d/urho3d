@@ -41,6 +41,16 @@ GraphicsImpl::GraphicsImpl() :
 {
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         renderTargetViews_[i] = 0;
+
+    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+        shaderResourceViews_[i] = 0;
+
+    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
+    {
+        vertexBuffers_[i] = 0;
+        vertexSizes_[i] = 0;
+        vertexOffsets_[i] = 0;
+    }
 }
 
 }
