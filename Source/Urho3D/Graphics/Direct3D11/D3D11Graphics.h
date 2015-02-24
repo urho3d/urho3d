@@ -589,6 +589,10 @@ private:
     unsigned depthStateHash_;
     /// Hash of current rasterizer state.
     unsigned rasterizerStateHash_;
+    /// First dirtied texture unit.
+    unsigned firstDirtyTexture_;
+    /// Last dirtied texture unit.
+    unsigned lastDirtyTexture_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
     /// Shader parameters for all vertex/pixel shader combinations.

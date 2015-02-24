@@ -70,31 +70,30 @@ bool ShaderVariation::Create()
     extension = type_ == VS ? ".vs4" : ".ps4";
     
     String binaryShaderName = path + "Cache/" + name + "_" + StringHash(defines_).ToString() + extension;
-    PODVector<unsigned> byteCode;
     
-    if (!LoadByteCode(byteCode, binaryShaderName))
+    if (!LoadByteCode(binaryShaderName))
     {
         // Compile shader if don't have valid bytecode
-        if (!Compile(byteCode))
+        if (!Compile())
             return false;
         // Save the bytecode after successful compile, but not if the source is from a package
         if (owner_->GetTimeStamp())
-            SaveByteCode(byteCode, binaryShaderName);
+            SaveByteCode(binaryShaderName);
     }
     
     // Then create shader from the bytecode
     ID3D11Device* device = graphics_->GetImpl()->GetDevice();
     if (type_ == VS)
     {
-        if (device && byteCode.Size())
-            device->CreateVertexShader(&byteCode[0], byteCode.Size(), 0, (ID3D11VertexShader**)&object_);
+        if (device && byteCode_.Size())
+            device->CreateVertexShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11VertexShader**)&object_);
         if (!object_)
             compilerOutput_ = "Could not create vertex shader";
     }
     else
     {
-        if (device && byteCode.Size())
-            device->CreatePixelShader(&byteCode[0], byteCode.Size(), 0, (ID3D11PixelShader**)&object_);
+        if (device && byteCode_.Size())
+            device->CreatePixelShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11PixelShader**)&object_);
         if (!object_)
             compilerOutput_ = "Could not create pixel shader";
     }
@@ -134,6 +133,7 @@ void ShaderVariation::Release()
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         useTextureUnit_[i] = false;
     parameters_.Clear();
+    byteCode_.Clear();
 }
 
 void ShaderVariation::SetName(const String& name)
@@ -151,7 +151,7 @@ Shader* ShaderVariation::GetOwner() const
     return owner_;
 }
 
-bool ShaderVariation::LoadByteCode(PODVector<unsigned>& byteCode, const String& binaryShaderName)
+bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
 {
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     if (!cache->Exists(binaryShaderName))
@@ -201,8 +201,8 @@ bool ShaderVariation::LoadByteCode(PODVector<unsigned>& byteCode, const String& 
     unsigned byteCodeSize = file->ReadUInt();
     if (byteCodeSize)
     {
-        byteCode.Resize(byteCodeSize >> 2);
-        file->Read(&byteCode[0], byteCodeSize);
+        byteCode_.Resize(byteCodeSize);
+        file->Read(&byteCode_[0], byteCodeSize);
         
         if (type_ == VS)
             LOGDEBUG("Loaded cached vertex shader " + GetFullName());
@@ -218,7 +218,7 @@ bool ShaderVariation::LoadByteCode(PODVector<unsigned>& byteCode, const String& 
     }
 }
 
-bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
+bool ShaderVariation::Compile()
 {
     const String& sourceCode = owner_->GetSourceCode(type_);
     Vector<String> defines = defines_.Split(' ');
@@ -293,8 +293,7 @@ bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
         
         unsigned char* bufData = (unsigned char*)shaderCode->GetBufferPointer();
         unsigned bufSize = shaderCode->GetBufferSize();
-        ParseParameters(bufData, bufSize);
-        CopyStrippedCode(byteCode, bufData, bufSize);
+        CopyStrippedCode(bufData, bufSize);
     }
 
     if (shaderCode)
@@ -302,20 +301,21 @@ bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
     if (errorMsgs)
         errorMsgs->Release();
     
-    return !byteCode.Empty();
+    return !byteCode_.Empty();
 }
 
-void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
+void ShaderVariation::ParseParameters()
 {
     /// \todo Implement
 }
 
-void ShaderVariation::CopyStrippedCode(PODVector<unsigned>& byteCode, unsigned char* bufData, unsigned bufSize)
+void ShaderVariation::CopyStrippedCode(unsigned char* bufData, unsigned bufSize)
 {
     unsigned const D3DSIO_COMMENT = 0xFFFE;
     unsigned* srcWords = (unsigned*)bufData;
     unsigned srcWordSize = bufSize >> 2;
-    
+    byteCode_.Clear();
+
     for (unsigned i = 0; i < srcWordSize; ++i)
     {
         unsigned opcode = srcWords[i] & 0xffff;
@@ -331,12 +331,13 @@ void ShaderVariation::CopyStrippedCode(PODVector<unsigned>& byteCode, unsigned c
         else
         {
             // Not a comment, copy the data
-            byteCode.Push(srcWords[i]);
+            byteCode_.Resize(byteCode_.Size() + sizeof(unsigned));
+            *((unsigned*)&byteCode_[byteCode_.Size() - 4]) = srcWords[i];
         }
     }
 }
 
-void ShaderVariation::SaveByteCode(const PODVector<unsigned>& byteCode, const String& binaryShaderName)
+void ShaderVariation::SaveByteCode(const String& binaryShaderName)
 {
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = owner_->GetSubsystem<FileSystem>();
@@ -379,10 +380,9 @@ void ShaderVariation::SaveByteCode(const PODVector<unsigned>& byteCode, const St
         }
     }
     
-    unsigned dataSize = byteCode.Size() << 2;
-    file->WriteUInt(dataSize);
-    if (dataSize)
-        file->Write(&byteCode[0], dataSize);
+    file->WriteUInt(byteCode_.Size());
+    if (byteCode_.Size())
+        file->Write(&byteCode_[0], byteCode_.Size());
 }
 
 }

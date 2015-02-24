@@ -102,11 +102,15 @@ public:
     void SetParameters(XMLFile* xml);
     /// Set additional parameters from an XML element.
     void SetParameters(const XMLElement& element);
+    /// Return shader resource view.
+    void* GetShaderResourceView() const { return shaderResourceView_; }
     
 protected:
     /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references.
     void CheckTextureBudget(StringHash type);
     
+    /// Shader resource view.
+    void* shaderResourceView_;
     /// Texture format.
     unsigned format_;
     /// Texture usage type.

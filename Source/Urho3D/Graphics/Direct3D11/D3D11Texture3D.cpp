@@ -158,6 +158,12 @@ void Texture3D::Release()
         
         ((ID3D11Resource*)object_)->Release();
         object_ = 0;
+
+        if (shaderResourceView_)
+        {
+            ((ID3D11ShaderResourceView*)shaderResourceView_)->Release();
+            shaderResourceView_ = 0;
+        }
     }
     else
     {

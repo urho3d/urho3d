@@ -1040,6 +1040,15 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     
     if (texture != textures_[index])
     {
+        if (firstDirtyTexture_ >= MAX_TEXTURE_UNITS)
+            firstDirtyTexture_ = lastDirtyTexture_ = index;
+        else
+        {
+            if (index < firstDirtyTexture_)
+                firstDirtyTexture_ = index;
+            if (index > lastDirtyTexture_)
+                lastDirtyTexture_ = index;
+        }
         textures_[index] = texture;
         texturesDirty_ = true;
     }
@@ -2117,6 +2126,7 @@ void Graphics::ResetCachedState()
     blendStateHash_ = M_MAX_UNSIGNED;
     depthStateHash_ = M_MAX_UNSIGNED;
     rasterizerStateHash_ = M_MAX_UNSIGNED;
+    firstDirtyTexture_ = lastDirtyTexture_ = M_MAX_UNSIGNED;
 }
 
 void Graphics::PrepareDraw()
@@ -2136,6 +2146,23 @@ void Graphics::PrepareDraw()
         
         impl_->deviceContext_->OMSetRenderTargets(MAX_RENDERTARGETS, &renderTargetViews[0], depthStencilView);
         renderTargetsDirty_ = false;
+    }
+
+    if (texturesDirty_ && firstDirtyTexture_ < MAX_TEXTURE_UNITS)
+    {
+        static ID3D11ShaderResourceView* textureViews[MAX_TEXTURE_UNITS];
+
+        for (unsigned i = firstDirtyTexture_; i <= lastDirtyTexture_; ++i)
+            textureViews[i] = textures_[i] ? (ID3D11ShaderResourceView*)textures_[i]->GetShaderResourceView() : 0;
+        
+        // Set same textures for both vertex & pixel shaders
+        impl_->deviceContext_->VSSetShaderResources(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
+            &textureViews[firstDirtyTexture_]);
+        impl_->deviceContext_->PSSetShaderResources(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
+            &textureViews[firstDirtyTexture_]);
+
+        firstDirtyTexture_ = lastDirtyTexture_ = M_MAX_UNSIGNED;
+        texturesDirty_ = false;
     }
 
     if (blendStateDirty_)

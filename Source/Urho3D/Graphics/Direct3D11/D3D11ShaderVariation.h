@@ -104,18 +104,20 @@ public:
     bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
     /// Return all parameter definitions.
     const HashMap<StringHash, ShaderParameter>& GetParameters() const { return parameters_; }
+    /// Return shader bytecode.
+    const PODVector<unsigned char>& GetByteCode() const { return byteCode_; }
     
 private:
     /// Load bytecode from a file. Return true if successful.
-    bool LoadByteCode(PODVector<unsigned>& byteCode, const String& binaryShaderName);
+    bool LoadByteCode(const String& binaryShaderName);
     /// Compile from source. Return true if successful.
-    bool Compile(PODVector<unsigned>& byteCode);
-    /// Inspect the constant parameters of the shader bytecode using MojoShader.
-    void ParseParameters(unsigned char* bufData, unsigned bufSize);
+    bool Compile();
     /// Strip comments from shader bytecode and store it.
-    void CopyStrippedCode(PODVector<unsigned>& byteCode, unsigned char* bufData, unsigned bufSize);
+    void CopyStrippedCode(unsigned char* bufData, unsigned bufSize);
+    /// Inspect the constant parameters and input layout (if applicable) from the shader bytecode.
+    void ParseParameters();
     /// Save bytecode to a file.
-    void SaveByteCode(const PODVector<unsigned>& byteCode, const String& binaryShaderName);
+    void SaveByteCode(const String& binaryShaderName);
     
     /// Shader this variation belongs to.
     WeakPtr<Shader> owner_;
@@ -131,6 +133,8 @@ private:
     HashMap<StringHash, ShaderParameter> parameters_;
     /// Texture unit use flags.
     bool useTextureUnit_[MAX_TEXTURE_UNITS];
+    /// Bytecode. Needed for inspecting the input signature and parameters.
+    PODVector<unsigned char> byteCode_;
 };
 
 }
