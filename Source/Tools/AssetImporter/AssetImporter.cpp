@@ -1415,7 +1415,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
                 break;
             case aiLightSource_SPOT:
                 outLight->SetLightType(LIGHT_SPOT);
-                outLight->SetFov(light->mAngleOuterCone * M_RADTODEG);
+                outLight->SetFov(light->mAngleOuterCone * 0.5f * M_RADTODEG);
                 break;
             case aiLightSource_POINT:
                 outLight->SetLightType(LIGHT_POINT);
