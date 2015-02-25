@@ -243,7 +243,7 @@ bool ShaderVariation::Compile()
         entryPoint = "PS";
         defines.Push("COMPILEPS");
         profile = "ps_4_0";
-        flags |= D3DCOMPILE_PREFER_FLOW_CONTROL;
+        flags |= D3DCOMPILE_PREFER_FLOW_CONTROL | D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
     }
     
     // Collect defines into macros
@@ -296,7 +296,8 @@ bool ShaderVariation::Compile()
         
         unsigned char* bufData = (unsigned char*)shaderCode->GetBufferPointer();
         unsigned bufSize = shaderCode->GetBufferSize();
-        CopyStrippedCode(bufData, bufSize);
+        byteCode_.Resize(bufSize);
+        memcpy(&byteCode_[0], bufData, bufSize);
         ParseParameters();
     }
 
@@ -315,7 +316,6 @@ void ShaderVariation::ParseParameters()
 
     ID3D11ShaderReflection* reflection = nullptr;
     D3D11_SHADER_DESC shaderDesc;
-    elementMask_ = 0;
 
     D3DReflect(&byteCode_[0], byteCode_.Size(), IID_ID3D11ShaderReflection, (void**)&reflection);
     if (!reflection)
@@ -328,7 +328,7 @@ void ShaderVariation::ParseParameters()
 
     if (type_ == VS)
     {
-        for (size_t i = 0; i < shaderDesc.InputParameters; ++i)
+        for (unsigned i = 0; i < shaderDesc.InputParameters; ++i)
         {
             D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
             reflection->GetInputParameterDesc((unsigned)i, &paramDesc);
@@ -344,35 +344,46 @@ void ShaderVariation::ParseParameters()
         }
     }
 
-    reflection->Release();
-}
+    HashMap<String, unsigned> cbRegisterMap;
 
-void ShaderVariation::CopyStrippedCode(unsigned char* bufData, unsigned bufSize)
-{
-    unsigned const D3DSIO_COMMENT = 0xFFFE;
-    unsigned* srcWords = (unsigned*)bufData;
-    unsigned srcWordSize = bufSize >> 2;
-    byteCode_.Clear();
-
-    for (unsigned i = 0; i < srcWordSize; ++i)
+    for (unsigned i = 0; i < shaderDesc.BoundResources; ++i)
     {
-        unsigned opcode = srcWords[i] & 0xffff;
-        unsigned paramLength = (srcWords[i] & 0x0f000000) >> 24;
-        unsigned commentLength = srcWords[i] >> 16;
-        
-        // For now, skip comment only at fixed position to prevent false positives
-        if (i == 1 && opcode == D3DSIO_COMMENT)
+        D3D11_SHADER_INPUT_BIND_DESC resourceDesc;
+        reflection->GetResourceBindingDesc(i, &resourceDesc);
+        String resourceName(resourceDesc.Name);
+        if (resourceDesc.Type == D3D_SIT_CBUFFER)
+            cbRegisterMap[resourceName] = resourceDesc.BindPoint;
+        else if (type_ == PS && resourceDesc.Type == D3D_SIT_TEXTURE && resourceDesc.BindPoint < MAX_TEXTURE_UNITS)
+            useTextureUnit_[resourceDesc.BindPoint] = true;
+    }
+
+    for (unsigned i = 0; i < shaderDesc.ConstantBuffers; ++i)
+    {
+        ID3D11ShaderReflectionConstantBuffer* cb = reflection->GetConstantBufferByIndex(i);
+        D3D11_SHADER_BUFFER_DESC cbDesc;
+        cb->GetDesc(&cbDesc);
+        unsigned cbRegister = cbRegisterMap[String(cbDesc.Name)];
+
+        for (unsigned j = 0; j < cbDesc.Variables; ++j)
         {
-            // Skip the comment
-            i += commentLength;
-        }
-        else
-        {
-            // Not a comment, copy the data
-            byteCode_.Resize(byteCode_.Size() + sizeof(unsigned));
-            *((unsigned*)&byteCode_[byteCode_.Size() - 4]) = srcWords[i];
+            ID3D11ShaderReflectionVariable* var = cb->GetVariableByIndex(j);
+            D3D11_SHADER_VARIABLE_DESC varDesc;
+            var->GetDesc(&varDesc);
+            String varName(varDesc.Name);
+            if (varName[0] == 'c')
+            {
+                varName = varName.Substring(1); // Strip the c to follow Urho3D constant naming convention
+                parameters_[varName] = ShaderParameter(type_, varName, cbRegister, varDesc.StartOffset, varDesc.Size);
+            }
         }
     }
+
+    if (type_ == PS)
+    {
+
+    }
+
+    reflection->Release();
 }
 
 void ShaderVariation::SaveByteCode(const String& binaryShaderName)

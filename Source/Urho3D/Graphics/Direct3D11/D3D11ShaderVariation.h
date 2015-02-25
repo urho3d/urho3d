@@ -113,8 +113,6 @@ private:
     bool LoadByteCode(const String& binaryShaderName);
     /// Compile from source. Return true if successful.
     bool Compile();
-    /// Strip comments from shader bytecode and store it.
-    void CopyStrippedCode(unsigned char* bufData, unsigned bufSize);
     /// Inspect the constant parameters and input layout (if applicable) from the shader bytecode.
     void ParseParameters();
     /// Save bytecode to a file.
