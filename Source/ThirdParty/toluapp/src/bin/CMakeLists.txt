@@ -56,9 +56,7 @@ endif ()
 set (TARGET_NAME tolua++)
 
 # Define source files
-file (GLOB CPP_FILES *.c)
-file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+define_source_files (GLOB_CPP_PATTERNS *.c)
 
 # Define dependency libs
 set (LIBS toluapp Lua${JIT})
