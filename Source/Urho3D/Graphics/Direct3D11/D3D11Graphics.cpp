@@ -1622,7 +1622,7 @@ void Graphics::WindowResized()
 
 void Graphics::WindowMoved()
 {
-    if (!impl_->device_ || !impl_->window_)
+    if (!impl_->device_ || !impl_->window_ || fullscreen_)
         return;
 
     int newX, newY;

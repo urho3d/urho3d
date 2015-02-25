@@ -361,7 +361,6 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         }
     }
 
-    
     // Check fullscreen mode validity (desktop only). Use a closest match if not found
     #if !defined(ANDROID) && !defined(IOS) && !defined(RPI)
     if (fullscreen)
@@ -554,7 +553,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     multiSample_ = multiSample;
     
     SDL_GetWindowSize(impl_->window_, &width_, &height_);
-    SDL_GetWindowPosition(impl_->window_, &position_.x_, &position_.y_);
+    if (!fullscreen)
+        SDL_GetWindowPosition(impl_->window_, &position_.x_, &position_.y_);
     
     // Reset rendertargets and viewport for the new screen mode
     ResetRenderTargets();
@@ -2167,7 +2167,7 @@ void Graphics::WindowResized()
 
 void Graphics::WindowMoved()
 {
-    if (!impl_->window_)
+    if (!impl_->window_ || fullscreen_)
         return;
 
     int newX, newY;
