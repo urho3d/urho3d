@@ -110,7 +110,7 @@ void ShaderVariation::Release()
         if (!graphics_)
             return;
         
-        graphics_->CleanupShaderParameters(this);
+        graphics_->CleanupShaderPrograms(this);
 
         if (type_ == VS)
         {

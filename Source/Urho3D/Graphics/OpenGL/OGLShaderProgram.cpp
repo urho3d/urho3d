@@ -50,7 +50,6 @@ void ShaderProgram::OnDeviceLost()
     
     if (graphics_ && graphics_->GetShaderProgram() == this)
         graphics_->SetShaders(0, 0);
-    
 
     linkerOutput_.Clear();
 }

@@ -248,7 +248,6 @@ Graphics::Graphics(Context* context_) :
     dummyColorFormat_(0),
     shadowMapFormat_(GL_DEPTH_COMPONENT16),
     hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
-    releasingGPUObjects_(false),
     defaultTextureFilterMode_(FILTER_TRILINEAR),
     shaderPath_("Shaders/GLSL/"),
     shaderExtension_(".glsl"),
@@ -1432,26 +1431,6 @@ void Graphics::ClearTransformSources()
     shaderParameterSources_[SP_OBJECTTRANSFORM] = (const void*)M_MAX_UNSIGNED;
 }
 
-void Graphics::CleanupShaderPrograms()
-{
-    // Ignore individual call from ShaderVariation instance when Graphics subsystem is in process of
-    // releasing all GPU objects or recreating GPU objects due device lost, because the Graphics subsystem
-    // will eventually erase all the shader programs afterward as part of the release process.
-    if (releasingGPUObjects_)
-        return;
-    
-    for (ShaderProgramMap::Iterator i = shaderPrograms_.Begin(); i != shaderPrograms_.End();)
-    {
-        ShaderVariation* vs = i->second_->GetVertexShader();
-        ShaderVariation* ps = i->second_->GetPixelShader();
-        
-        if (!vs || !ps || !vs->GetGPUObject() || !ps->GetGPUObject())
-            i = shaderPrograms_.Erase(i);
-        else
-            ++i;
-    }
-}
-
 void Graphics::SetTexture(unsigned index, Texture* texture)
 {
     if (index >= MAX_TEXTURE_UNITS)
@@ -2294,12 +2273,72 @@ void Graphics::CleanupScratchBuffers()
     maxScratchBufferRequest_ = 0;
 }
 
+void Graphics::CleanupRenderSurface(RenderSurface* surface)
+{
+    if (!surface)
+        return;
+
+    // Flush pending FBO changes first if any
+    CommitFramebuffer();
+
+    unsigned currentFbo = impl_->boundFbo_;
+
+    // Go through all FBOs and clean up the surface from them
+    for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin();
+        i != impl_->frameBuffers_.End(); ++i)
+    {
+        for (unsigned j = 0; j < MAX_RENDERTARGETS; ++j)
+        {
+            if (i->second_.colorAttachments_[j] == surface)
+            {
+                if (currentFbo != i->second_.fbo_)
+                {
+                    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, i->second_.fbo_);
+                    currentFbo = i->second_.fbo_;
+                }
+                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + j, GL_TEXTURE_2D, 0, 0);
+                i->second_.colorAttachments_[j] = 0;
+                // Mark drawbuffer bits to need recalculation
+                i->second_.drawBuffers_ = M_MAX_UNSIGNED;
+            }
+        }
+        if (i->second_.depthAttachment_ == surface)
+        {
+            if (currentFbo != i->second_.fbo_)
+            {
+                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, i->second_.fbo_);
+                currentFbo = i->second_.fbo_;
+            }
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+            i->second_.depthAttachment_ = 0;
+        }
+    }
+
+    // Restore previously bound FBO now if needed
+    if (currentFbo != impl_->boundFbo_)
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, impl_->boundFbo_);
+}
+
+void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
+{
+    for (ShaderProgramMap::Iterator i = shaderPrograms_.Begin(); i != shaderPrograms_.End();)
+    {
+        if (i->second_->GetVertexShader() == variation || i->second_->GetPixelShader() == variation)
+            i = shaderPrograms_.Erase(i);
+        else
+            ++i;
+    }
+
+    if (vertexShader_ == variation || pixelShader_ == variation)
+        shaderProgram_ = 0;
+}
+
+
 void Graphics::Release(bool clearGPUObjects, bool closeWindow)
 {
     if (!impl_->window_)
         return;
-    
-    releasingGPUObjects_ = true;
     
     {
         MutexLock lock(gpuObjectMutex_);
@@ -2307,6 +2346,9 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         if (clearGPUObjects)
         {
             // Shutting down: release all GPU objects that still exist
+            // Shader programs are also GPU objects; clear them first to avoid list modification during iteration
+            shaderPrograms_.Clear();
+
             for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
                 (*i)->Release();
             gpuObjects_.Clear();
@@ -2316,17 +2358,18 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
             // We are not shutting down, but recreating the context: mark GPU objects lost
             for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
                 (*i)->OnDeviceLost();
+                
+            // In this case clear shader programs last so that they do not attempt to delete their OpenGL program
+            // from a context that may no longer exist
+            shaderPrograms_.Clear();
 
             SendEvent(E_DEVICELOST);
         }
     }
-    
-    releasingGPUObjects_ = false;
-    
+
     CleanupFramebuffers(true);
     depthTextures_.Clear();
-    shaderPrograms_.Clear();
-    
+
     // End fullscreen mode first to counteract transition and getting stuck problems on OS X
     #if defined(__APPLE__) && !defined(IOS)
     if (closeWindow && fullscreen_ && !externalWindow_)
@@ -2413,53 +2456,6 @@ void Graphics::Minimize()
         return;
 
     SDL_MinimizeWindow(impl_->window_);
-}
-
-void Graphics::CleanupRenderSurface(RenderSurface* surface)
-{
-    if (!surface)
-        return;
-    
-    // Flush pending FBO changes first if any
-    CommitFramebuffer();
-    
-    unsigned currentFbo = impl_->boundFbo_;
-    
-    // Go through all FBOs and clean up the surface from them
-    for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin();
-        i != impl_->frameBuffers_.End(); ++i)
-    {
-        for (unsigned j = 0; j < MAX_RENDERTARGETS; ++j)
-        {
-            if (i->second_.colorAttachments_[j] == surface)
-            {
-                if (currentFbo != i->second_.fbo_)
-                {
-                    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, i->second_.fbo_);
-                    currentFbo = i->second_.fbo_;
-                }
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + j, GL_TEXTURE_2D, 0, 0);
-                i->second_.colorAttachments_[j] = 0;
-                // Mark drawbuffer bits to need recalculation
-                i->second_.drawBuffers_ = M_MAX_UNSIGNED;
-            }
-        }
-        if (i->second_.depthAttachment_ == surface)
-        {
-            if (currentFbo != i->second_.fbo_)
-            {
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, i->second_.fbo_);
-                currentFbo = i->second_.fbo_;
-            }
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
-            i->second_.depthAttachment_ = 0;
-        }
-    }
-    
-    // Restore previously bound FBO now if needed
-    if (currentFbo != impl_->boundFbo_)
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, impl_->boundFbo_);
 }
 
 void Graphics::MarkFBODirty()

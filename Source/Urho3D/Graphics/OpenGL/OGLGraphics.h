@@ -165,8 +165,6 @@ public:
     void ClearParameterSources();
     /// Clear remembered transform shader parameter sources.
     void ClearTransformSources();
-    /// Clean up unused shader programs.
-    void CleanupShaderPrograms();
     /// Set texture.
     void SetTexture(unsigned index, Texture* texture);
     /// Bind texture unit 0 for update. Called by Texture.
@@ -383,6 +381,10 @@ public:
     void FreeScratchBuffer(void* buffer);
     /// Clean up too large scratch buffers.
     void CleanupScratchBuffers();
+    /// Clean up a render surface from all FBOs.
+    void CleanupRenderSurface(RenderSurface* surface);
+    /// Clean up shader programs when a shader variation is released or destroyed.
+    void CleanupShaderPrograms(ShaderVariation* variation);
     /// Release/clear GPU objects and optionally close the window.
     void Release(bool clearGPUObjects, bool closeWindow);
     /// Restore GPU objects and reinitialize state. Requires an open window.
@@ -391,8 +393,6 @@ public:
     void Maximize();
     /// Minimize the Window.
     void Minimize();
-    /// Clean up a render surface from all FBOs.
-    void CleanupRenderSurface(RenderSurface* surface);
     /// Mark the FBO needing an update.
     void MarkFBODirty();
     
@@ -581,8 +581,6 @@ private:
     bool useClipPlane_;
     /// Draw antialiased mode flag.
     bool drawAntialiased_;
-    /// Releasing GPU objects flag.
-    bool releasingGPUObjects_;
     /// Last used instance data offset.
     unsigned lastInstanceOffset_;
     /// Default texture filtering mode.

@@ -43,6 +43,7 @@ class GraphicsImpl;
 class RenderSurface;
 class Shader;
 class ShaderPrecache;
+class ShaderProgram;
 class ShaderVariation;
 class Texture;
 class Texture2D;
@@ -53,6 +54,8 @@ class VertexBuffer;
 class VertexDeclaration;
 
 struct ShaderParameter;
+
+typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
 
 /// CPU-side scratch buffer for vertex data updates.
 struct ScratchBuffer
@@ -376,8 +379,8 @@ public:
     void FreeScratchBuffer(void* buffer);
     /// Clean up too large scratch buffers.
     void CleanupScratchBuffers();
-    /// Clean up shader parameters when a shader variation is released or destroyed.
-    void CleanupShaderParameters(ShaderVariation* variation);
+    /// Clean up shader programs when a shader variation is released or destroyed.
+    void CleanupShaderPrograms(ShaderVariation* variation);
 
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
@@ -578,10 +581,10 @@ private:
     bool drawAntialiased_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
-    /// Shader parameters for all vertex/pixel shader combinations.
-    HashMap<Pair<ShaderVariation*, ShaderVariation*>, HashMap<StringHash, Pair<ShaderType, unsigned> > > shaderParameters_;
-    /// Current active shader parameters.
-    HashMap<StringHash, Pair<ShaderType, unsigned> >* currentShaderParameters_;
+    /// Shader programs.
+    ShaderProgramMap shaderPrograms_;
+    /// Shader program in use.
+    ShaderProgram* shaderProgram_;
     /// Remembered shader parameter sources.
     const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS];
     /// Base directory for shaders.
