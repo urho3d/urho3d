@@ -1412,7 +1412,7 @@ void Graphics::ClearParameterSources()
 void Graphics::ClearTransformSources()
 {
     shaderParameterSources_[SP_CAMERA] = (const void*)M_MAX_UNSIGNED;
-    shaderParameterSources_[SP_OBJECTTRANSFORM] = (const void*)M_MAX_UNSIGNED;
+    shaderParameterSources_[SP_OBJECT] = (const void*)M_MAX_UNSIGNED;
 }
 
 void Graphics::SetTexture(unsigned index, Texture* texture)

@@ -218,17 +218,15 @@ enum ShaderType
     PS,
 };
 
-/// Shader parameter groups for determining need to update.
+/// Shader parameter groups for determining need to update. On APIs that support constant buffers, these correspond to different constant buffers.
 enum ShaderParameterGroup
 {
     SP_FRAME = 0,
     SP_CAMERA,
-    SP_VIEWPORT,
     SP_ZONE,
     SP_LIGHT,
-    SP_VERTEXLIGHTS,
     SP_MATERIAL,
-    SP_OBJECTTRANSFORM,
+    SP_OBJECT,
     MAX_SHADER_PARAMETER_GROUPS
 };
 
