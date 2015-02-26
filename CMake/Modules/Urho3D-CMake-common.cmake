@@ -387,6 +387,11 @@ else ()
             # Emscripten-specific setup
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
+            if (DEFINED ENV{CI})
+                # Our CI server is slow, so do not optimize and discard all debug info when test building in Debug configuration
+                set (CMAKE_C_FLAGS_DEBUG "-g0")
+                set (CMAKE_CXX_FLAGS_DEBUG "-g0")
+            endif ()
             # CMake does not treat Emscripten as a valid platform yet, certain platform-specific variables cannot be set in the
             # toolchain file as they get overwritten by CMake internally as per Linux platform default, so set them here for now
             set (CMAKE_EXECUTABLE_SUFFIX .html)
@@ -739,7 +744,9 @@ macro (setup_emscripten_linker_flags LINKER_FLAGS)
         set (MEMORY_LINKER_FLAGS "-s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY}")
     endif ()
     set (${LINKER_FLAGS} "${${LINKER_FLAGS}} ${MEMORY_LINKER_FLAGS} -s USE_SDL=2 -s ERROR_ON_UNDEFINED_SYMBOLS=1")    # Urho3D uses SDL2 so set it here instead of in the toolchain which potentially could be reused in other projects not using SDL2
-    set (${LINKER_FLAGS}_DEBUG -g4)     # Preserve LLVM debug information, show line number debug comments, and generate source maps
+    if (NOT DEFINED ENV{CI})
+        set (${LINKER_FLAGS}_DEBUG -g4)     # Preserve LLVM debug information, show line number debug comments, and generate source maps
+    endif ()
 endmacro ()
 
 # Macro for setting up an executable target with resources to copy/package/bundle/preload
