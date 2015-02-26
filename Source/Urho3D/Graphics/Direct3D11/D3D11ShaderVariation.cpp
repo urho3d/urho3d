@@ -46,6 +46,8 @@ ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
 {
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         useTextureUnit_[i] = false;
+    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
+        constantBufferSizes_[i] = 0;
 }
 
 ShaderVariation::~ShaderVariation()
@@ -110,7 +112,7 @@ void ShaderVariation::Release()
         if (!graphics_)
             return;
         
-        graphics_->CleanupShaderParameters(this);
+        graphics_->CleanUpShaderPrograms(this);
 
         if (type_ == VS)
         {
@@ -134,6 +136,8 @@ void ShaderVariation::Release()
     
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         useTextureUnit_[i] = false;
+    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
+        constantBufferSizes_[i] = 0;
     parameters_.Clear();
     byteCode_.Clear();
     elementMask_ = 0;
@@ -213,6 +217,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         else
             LOGDEBUG("Loaded cached pixel shader " + GetFullName());
         
+        CalculateConstantBufferSizes();
         return true;
     }
     else
@@ -299,6 +304,7 @@ bool ShaderVariation::Compile()
         byteCode_.Resize(bufSize);
         memcpy(&byteCode_[0], bufData, bufSize);
         ParseParameters();
+        CalculateConstantBufferSizes();
     }
 
     if (shaderCode)
@@ -314,7 +320,7 @@ void ShaderVariation::ParseParameters()
     if (byteCode_.Empty())
         return;
 
-    ID3D11ShaderReflection* reflection = nullptr;
+    ID3D11ShaderReflection* reflection = 0;
     D3D11_SHADER_DESC shaderDesc;
 
     D3DReflect(&byteCode_[0], byteCode_.Size(), IID_ID3D11ShaderReflection, (void**)&reflection);
@@ -433,6 +439,23 @@ void ShaderVariation::SaveByteCode(const String& binaryShaderName)
     file->WriteUInt(byteCode_.Size());
     if (byteCode_.Size())
         file->Write(&byteCode_[0], byteCode_.Size());
+}
+
+void ShaderVariation::CalculateConstantBufferSizes()
+{
+    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
+        constantBufferSizes_[i] = 0;
+    
+    for (HashMap<StringHash, ShaderParameter>::ConstIterator i = parameters_.Begin(); i != parameters_.End(); ++i)
+    {
+        if (i->second_.buffer_ < MAX_SHADER_PARAMETER_GROUPS)
+        {
+            unsigned oldSize = constantBufferSizes_[i->second_.buffer_];
+            unsigned paramEnd = i->second_.offset_ + i->second_.size_;
+            if (paramEnd > oldSize)
+                constantBufferSizes_[i->second_.buffer_] = paramEnd;
+        }
+    }
 }
 
 }

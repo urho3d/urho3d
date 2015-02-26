@@ -36,6 +36,7 @@
 namespace Urho3D
 {
 
+class ConstantBuffer;
 class File;
 class Image;
 class IndexBuffer;
@@ -44,6 +45,7 @@ class GraphicsImpl;
 class RenderSurface;
 class Shader;
 class ShaderPrecache;
+class ShaderProgram;
 class ShaderVariation;
 class Texture;
 class Texture2D;
@@ -71,6 +73,8 @@ struct ScratchBuffer
     /// Reserved flag.
     bool reserved_;
 };
+
+typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
 
 /// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
 class URHO3D_API Graphics : public Object
@@ -378,7 +382,9 @@ public:
     /// Clean up too large scratch buffers.
     void CleanupScratchBuffers();
     /// Clean up shader parameters when a shader variation is released or destroyed.
-    void CleanupShaderParameters(ShaderVariation* variation);
+    void CleanUpShaderPrograms(ShaderVariation* variation);
+    /// Get or create a constant buffer. Will be shared between shaders if possible.
+    ConstantBuffer* GetOrCreateConstantBuffer(ShaderType type, unsigned index, unsigned size);
 
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
@@ -591,12 +597,14 @@ private:
     unsigned lastDirtyTexture_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
-    /// Shader parameters for all vertex/pixel shader combinations.
-    HashMap<Pair<ShaderVariation*, ShaderVariation*>, HashMap<StringHash, ShaderParameter> > shaderParameters_;
-    /// Current active shader parameters.
-    HashMap<StringHash, ShaderParameter>* currentShaderParameters_;
     /// Vertex declarations.
     HashMap<unsigned long long, SharedPtr<VertexDeclaration> > vertexDeclarations_;
+    /// Constant buffers.
+    HashMap<unsigned, SharedPtr<ConstantBuffer> > constantBuffers_;
+    /// Shader programs.
+    ShaderProgramMap shaderPrograms_;
+    /// Shader program in use.
+    ShaderProgram* shaderProgram_;
     /// Remembered shader parameter sources.
     const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS];
     /// Base directory for shaders.

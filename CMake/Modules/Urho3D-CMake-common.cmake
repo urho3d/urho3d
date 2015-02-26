@@ -234,14 +234,18 @@ if (NOT WIN32)
     set (URHO3D_OPENGL 1)
 endif ()
 
+# Add definition for Direct3D11
+if (URHO3D_D3D11)
+    if (NOT WIN32)
+        message(FATAL_ERROR "Direct3D 11 can only be used on Windows platform")
+    endif ()
+    set (URHO3D_OPENGL 0)
+    add_definitions (-DURHO3D_D3D11)
+endif ()
+
 # Add definition for OpenGL
 if (URHO3D_OPENGL)
     add_definitions (-DURHO3D_OPENGL)
-endif ()
-
-# Add definition for Direct3D11
-if (URHO3D_D3D11)
-    add_definitions (-DURHO3D_D3D11)
 endif ()
 
 # Add definitions for GLEW

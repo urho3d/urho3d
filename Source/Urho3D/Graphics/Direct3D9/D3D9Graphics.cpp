@@ -2272,8 +2272,7 @@ void Graphics::CleanupScratchBuffers()
 
 void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
 {
-    for (ShaderProgramMap::Iterator i =
-        shaderPrograms_.Begin(); i != shaderPrograms_.End();)
+    for (ShaderProgramMap::Iterator i = shaderPrograms_.Begin(); i != shaderPrograms_.End();)
     {
         if (i->first_.first_ == variation || i->first_.second_ == variation)
             i = shaderPrograms_.Erase(i);

@@ -23,6 +23,8 @@
 #pragma once
 
 #include "../../Container/HashMap.h"
+#include "../../Graphics/ConstantBuffer.h"
+#include "../../Graphics/Graphics.h"
 #include "../../Graphics/ShaderVariation.h"
 
 namespace Urho3D
@@ -33,7 +35,7 @@ class ShaderProgram : public RefCounted
 {
 public:
     /// Construct.
-    ShaderProgram(ShaderVariation* vertexShader, ShaderVariation* pixelShader)
+    ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader)
     {
         const HashMap<StringHash, ShaderParameter>& vsParams = vertexShader->GetParameters();
         for (HashMap<StringHash, ShaderParameter>::ConstIterator i = vsParams.Begin(); i != vsParams.End(); ++i)
@@ -45,10 +47,33 @@ public:
 
         // Optimize shader parameter lookup by rehashing to next power of two
         parameters_.Rehash(NextPowerOfTwo(parameters_.Size()));
+
+        const unsigned* vsBufferSizes = vertexShader->GetConstantBufferSizes();
+        for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
+        {
+            if (vsBufferSizes[i])
+                vsConstantBuffers_[i] = graphics->GetOrCreateConstantBuffer(VS, i, vsBufferSizes[i]);
+        }
+
+        const unsigned* psBufferSizes = pixelShader->GetConstantBufferSizes();
+        for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
+        {
+            if (psBufferSizes[i])
+                psConstantBuffers_[i] = graphics->GetOrCreateConstantBuffer(PS, i, psBufferSizes[i]);
+        }
+    }
+
+    /// Destruct.
+    ~ShaderProgram()
+    {
     }
 
     /// Combined parameters from the vertex and pixel shader.
     HashMap<StringHash, ShaderParameter> parameters_;
+    /// Vertex shader constant buffers.
+    SharedPtr<ConstantBuffer> vsConstantBuffers_[MAX_SHADER_PARAMETER_GROUPS];
+    /// Pixel shader constant buffers.
+    SharedPtr<ConstantBuffer> psConstantBuffers_[MAX_SHADER_PARAMETER_GROUPS];
 };
 
 }

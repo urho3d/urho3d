@@ -108,6 +108,9 @@ public:
     const String& GetDefines() const { return defines_; }
     /// Return compile error/warning string.
     const String& GetCompilerOutput() const { return compilerOutput_; }
+    /// Return constant buffer data sizes.
+    const unsigned* GetConstantBufferSizes() const { return &constantBufferSizes_[0]; }
+
 private:
     /// Load bytecode from a file. Return true if successful.
     bool LoadByteCode(const String& binaryShaderName);
@@ -117,6 +120,8 @@ private:
     void ParseParameters();
     /// Save bytecode to a file.
     void SaveByteCode(const String& binaryShaderName);
+    /// Calculate constant buffer sizes from parameters.
+    void CalculateConstantBufferSizes();
     
     /// Shader this variation belongs to.
     WeakPtr<Shader> owner_;
@@ -128,6 +133,8 @@ private:
     HashMap<StringHash, ShaderParameter> parameters_;
     /// Texture unit use flags.
     bool useTextureUnit_[MAX_TEXTURE_UNITS];
+    /// Constant buffer sizes. 0 if a constant buffer slot is not in use.
+    unsigned constantBufferSizes_[MAX_SHADER_PARAMETER_GROUPS];
     /// Bytecode. Needed for inspecting the input signature and parameters.
     PODVector<unsigned char> byteCode_;
     /// Shader name.

@@ -51,6 +51,12 @@ GraphicsImpl::GraphicsImpl() :
         vertexSizes_[i] = 0;
         vertexOffsets_[i] = 0;
     }
+
+    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
+    {
+        constantBuffers_[VS][i] = 0;
+        constantBuffers_[PS][i] = 0;
+    }
 }
 
 }
