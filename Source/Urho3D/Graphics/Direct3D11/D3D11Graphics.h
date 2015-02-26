@@ -601,6 +601,8 @@ private:
     HashMap<unsigned long long, SharedPtr<VertexDeclaration> > vertexDeclarations_;
     /// Constant buffers.
     HashMap<unsigned, SharedPtr<ConstantBuffer> > constantBuffers_;
+    /// Currently dirty constant buffers.
+    PODVector<ConstantBuffer*> dirtyConstantBuffers_;
     /// Shader programs.
     ShaderProgramMap shaderPrograms_;
     /// Shader program in use.

@@ -235,7 +235,7 @@ bool ShaderVariation::Compile()
     // Set the entrypoint, profile and flags according to the shader being compiled
     const char* entryPoint = 0;
     const char* profile = 0;
-    unsigned flags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
+    unsigned flags = D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
     
     if (type_ == VS)
     {
@@ -248,7 +248,7 @@ bool ShaderVariation::Compile()
         entryPoint = "PS";
         defines.Push("COMPILEPS");
         profile = "ps_4_0";
-        flags |= D3DCOMPILE_PREFER_FLOW_CONTROL | D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
+        flags |= D3DCOMPILE_PREFER_FLOW_CONTROL;
     }
     
     // Collect defines into macros
