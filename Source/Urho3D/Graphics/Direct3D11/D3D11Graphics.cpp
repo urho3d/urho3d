@@ -686,6 +686,8 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     if (!indexCount || !instanceCount)
         return;
     
+    PrepareDraw();
+
     unsigned primitiveCount;
     D3D_PRIMITIVE_TOPOLOGY d3dPrimitiveType;
     
@@ -2049,6 +2051,8 @@ bool Graphics::CreateDevice(int width, int height, int multisample)
             LOGERROR("Failed to create D3D11 device");
             return false;
         }
+
+        CheckFeatureSupport();
     }
 
     // Create swap chain. Release old if necessary
