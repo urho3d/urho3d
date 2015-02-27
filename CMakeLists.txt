@@ -140,6 +140,8 @@ if (WIN32 AND NOT URHO3D_OPENGL)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-D3D)    # Stands for Direct 3D
 elseif (ANDROID AND X86)    # Take advantage of Android toolchain setting X86 variable to true for both 'x86' and 'x86_64' ABIs
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-IA)     # Stands for Intel Architecture
+elseif (RPI AND RPI_ABI MATCHES ^armeabi-v7a)
+    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-v7a)
 endif ()
 if (NOT DEFINED ENV{RELEASE_TAG})
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-snapshot)

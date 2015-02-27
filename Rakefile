@@ -172,6 +172,7 @@ task :ci do
   $build_options = "#{$build_options} -DANDROID_NATIVE_API_LEVEL=#{ENV['API']}" if ENV['API']
   $build_options = "#{$build_options} -DANDROID=#{ENV['ANDROID']}" if ENV['ANDROID']
   $build_options = "#{$build_options} -DRPI=#{ENV['RPI']}" if ENV['RPI']
+  $build_options = "#{$build_options} -DRPI_ABI=#{ENV['RPI_ABI']}" if ENV['RPI_ABI']
   $build_options = "#{$build_options} -DWIN32=#{ENV['WINDOWS']}" if ENV['WINDOWS']
   $build_options = "#{$build_options} -DEMSCRIPTEN=#{ENV['EMSCRIPTEN']}" if ENV['EMSCRIPTEN']
   if ENV['XCODE']
