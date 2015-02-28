@@ -155,19 +155,6 @@ enum ShaderType
     PS,
 };
 
-enum ShaderParameterGroup
-{
-    SP_FRAME = 0,
-    SP_CAMERA,
-    SP_VIEWPORT,
-    SP_ZONE,
-    SP_LIGHT,
-    SP_VERTEXLIGHTS,
-    SP_MATERIAL,
-    SP_OBJECTTRANSFORM,
-    MAX_SHADER_PARAMETER_GROUPS
-};
-
 // Texture unit numbering depends on graphics capability (mobile or desktop). Expose only the units we are sure of
 enum TextureUnit
 {
