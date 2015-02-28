@@ -272,6 +272,43 @@ void Texture::SetParameters(const XMLElement& element)
     }
 }
 
+SharedArrayPtr<unsigned char> Texture::ConvertRGBToRGBA(int width, int height, const unsigned char* data)
+{
+    if (!width || !height)
+        return SharedArrayPtr<unsigned char>();
+
+    SharedArrayPtr<unsigned char> ret(new unsigned char[width * height * 4]);
+    unsigned char* dest = ret.Get();
+
+    for (int i = 0; i < width * height; ++i)
+    {
+        dest[0] = data[0];
+        dest[1] = data[1];
+        dest[2] = data[2];
+        dest[3] = 255;
+        dest += 4;
+        data += 3;
+    }
+
+    return ret;
+}
+
+unsigned Texture::CheckMaxLevels(int width, int height, unsigned requestedLevels)
+{
+    unsigned maxLevels = 1;
+    while (width > 1 && height > 1)
+    {
+        ++maxLevels;
+        width >>= 1;
+        height >>= 1;
+    }
+
+    if (!requestedLevels || maxLevels < requestedLevels)
+        return maxLevels;
+    else
+        return requestedLevels;
+}
+
 void Texture::CheckTextureBudget(StringHash type)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();

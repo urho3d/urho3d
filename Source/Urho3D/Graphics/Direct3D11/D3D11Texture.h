@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "../../Container/ArrayPtr.h"
 #include "../../Math/Color.h"
 #include "../../Graphics/GPUObject.h"
 #include "../../Graphics/GraphicsDefs.h"
@@ -104,6 +105,11 @@ public:
     void SetParameters(const XMLElement& element);
     /// Return shader resource view.
     void* GetShaderResourceView() const { return shaderResourceView_; }
+    
+    /// Convert RGB data to RGBA for loading into a texture.
+    static SharedArrayPtr<unsigned char> ConvertRGBToRGBA(int width, int height, const unsigned char* data);
+    /// Check maximum allowed mip levels for a specific texture size.
+    static unsigned CheckMaxLevels(int width, int height, unsigned requestedLevels);
     
 protected:
     /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references.

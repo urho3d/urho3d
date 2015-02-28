@@ -192,16 +192,50 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         return false;
     }
     
-    if (IsCompressed())
-    {
-        height = (height + 3) >> 2;
-        y >>= 2;
-    }
-    
     unsigned char* src = (unsigned char*)data;
     unsigned rowSize = GetRowDataSize(width);
-    
-    /// \todo Implement
+    unsigned rowStart = GetRowDataSize(x);
+    unsigned subResource = D3D11CalcSubresource((unsigned)level, 0, (unsigned)levels_);
+
+    if (usage_ == TEXTURE_DYNAMIC)
+    {
+        if (IsCompressed())
+        {
+            height = (height + 3) >> 2;
+            y >>= 2;
+        }
+
+        D3D11_MAPPED_SUBRESOURCE mappedData;
+        mappedData.pData = 0;
+
+        graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
+            &mappedData);
+        if (mappedData.pData)
+        {
+            for (int row = 0; row < height; ++row)
+                memcpy((unsigned char*)mappedData.pData + (row + y) * mappedData.RowPitch + rowStart, src + row * rowSize, rowSize);
+            graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_, subResource);
+        }
+        else
+        {
+            LOGERROR("Failed to map texture for update");
+            return false;
+        }
+    }
+    else
+    {
+        D3D11_BOX destBox;
+        destBox.left = x;
+        destBox.right = x + width;
+        destBox.top = y;
+        destBox.bottom = y + height;
+        destBox.front = 0;
+        destBox.back = 1;
+
+        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)object_, subResource, &destBox, data,
+            rowSize, 0);
+    }
+
     return true;
 }
 
@@ -263,6 +297,14 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         
         for (unsigned i = 0; i < levels_; ++i)
         {
+            // D3D11 needs RGB data as 4-component
+            SharedArrayPtr<unsigned char> convertedData;
+            if (components == 3)
+            {
+                convertedData = ConvertRGBToRGBA(levelWidth, levelHeight, levelData);
+                levelData = convertedData;
+            }
+
             SetData(i, 0, 0, levelWidth, levelHeight, levelData);
             memoryUse += levelWidth * levelHeight * components;
             
@@ -363,7 +405,45 @@ bool Texture2D::Create()
     if (!graphics_ || !width_ || !height_)
         return false;
     
-    /// \todo Implement
+    levels_ = CheckMaxLevels(width_, height_, requestedLevels_);
+    
+    D3D11_TEXTURE2D_DESC textureDesc;
+    memset(&textureDesc, 0, sizeof textureDesc);
+    textureDesc.Width = width_;
+    textureDesc.Height = height_;
+    textureDesc.MipLevels = levels_;
+    textureDesc.ArraySize = 1;
+    textureDesc.Format = (DXGI_FORMAT)format_;
+    textureDesc.SampleDesc.Count = 1;
+    textureDesc.SampleDesc.Quality = 0;
+    textureDesc.Usage = usage_ == TEXTURE_DYNAMIC ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
+    textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    if (usage_ == TEXTURE_RENDERTARGET)
+        textureDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+    else if (usage_ == TEXTURE_DEPTHSTENCIL)
+        textureDesc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
+    textureDesc.CPUAccessFlags = usage_ == TEXTURE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
+
+    graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&object_);
+    if (!object_)
+    {
+        LOGERROR("Failed to create texture");
+        return false;
+    }
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDesc;
+    memset(&resourceViewDesc, 0, sizeof resourceViewDesc);
+    resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    resourceViewDesc.Texture2D.MipLevels = (unsigned)levels_;
+    resourceViewDesc.Texture2D.MostDetailedMip = 0;
+
+    graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &resourceViewDesc,
+        (ID3D11ShaderResourceView**)&shaderResourceView_);
+    if (!shaderResourceView_)
+    {
+        LOGERROR("Failed to create shader resource view for texture");
+        return false;
+    }
 
     return true;
 }
