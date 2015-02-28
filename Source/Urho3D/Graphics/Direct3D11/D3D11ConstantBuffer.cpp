@@ -67,6 +67,10 @@ bool ConstantBuffer::SetSize(unsigned size)
         return false;
     }
 
+    // Round up to next 16 bytes
+    size += 15;
+    size &= 0xfffffff0;
+
     size_ = size;
     dirty_ = false;
     shadowData_ = new unsigned char[size_];

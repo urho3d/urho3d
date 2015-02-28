@@ -895,6 +895,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             if (vsBuffer != impl_->constantBuffers_[VS][i])
             {
                 impl_->constantBuffers_[VS][i] = vsBuffer;
+                shaderParameterSources_[i] = (const void*)M_MAX_UNSIGNED;
                 vsBuffersChanged = true;
             }
 
@@ -903,6 +904,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             if (psBuffer != impl_->constantBuffers_[PS][i])
             {
                 impl_->constantBuffers_[PS][i] = psBuffer;
+                shaderParameterSources_[i] = (const void*)M_MAX_UNSIGNED;
                 psBuffersChanged = true;
             }
         }
@@ -911,9 +913,6 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             impl_->deviceContext_->VSSetConstantBuffers(0, MAX_SHADER_PARAMETER_GROUPS, &impl_->constantBuffers_[VS][0]);
         if (psBuffersChanged)
             impl_->deviceContext_->PSSetConstantBuffers(0, MAX_SHADER_PARAMETER_GROUPS, &impl_->constantBuffers_[PS][0]);
-
-        /// \todo When shaders use constant buffers properly, need only reset a parameter source when/if a buffer in slot changes
-        ClearParameterSources();
     }
     else
         shaderProgram_ = 0;

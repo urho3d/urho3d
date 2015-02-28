@@ -237,6 +237,8 @@ bool ShaderVariation::Compile()
     const char* profile = 0;
     unsigned flags = D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
     
+    defines.Push("D3D11");
+
     if (type_ == VS)
     {
         entryPoint = "VS";

@@ -29,6 +29,7 @@ float GetDepth(float4 clipPos)
     return dot(clipPos.zw, cDepthMode.zw);
 }
 
+#ifdef BILLBOARD
 float3 GetBillboardPos(float4 iPos, float2 iSize, float4x3 modelMatrix)
 {
     return mul(iPos, modelMatrix) + mul(float3(iSize.x, iSize.y, 0.0), cBillboardRot);
@@ -38,6 +39,7 @@ float3 GetBillboardNormal()
 {
     return float3(-cBillboardRot[2][0], -cBillboardRot[2][1], -cBillboardRot[2][2]);
 }
+#endif
 
 #if defined(SKINNED)
     #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices);
