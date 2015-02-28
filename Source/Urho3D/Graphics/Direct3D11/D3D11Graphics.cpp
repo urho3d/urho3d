@@ -2223,6 +2223,11 @@ bool Graphics::UpdateSwapChain(int width, int height)
         impl_->defaultDepthTexture_ = 0;
     }
 
+    impl_->depthStencilView_ = 0;
+    for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+        impl_->renderTargetViews_[i] = 0;
+    renderTargetsDirty_ = true;
+
     impl_->swapChain_->ResizeBuffers(1, width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 
     // Create default rendertarget view representing the backbuffer
