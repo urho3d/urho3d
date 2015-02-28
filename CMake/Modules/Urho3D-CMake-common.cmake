@@ -163,11 +163,12 @@ if (RPI)
             # We have no way to know for sure so just give all the available options to user
             list (APPEND RPI_SUPPORTED_ABIS armeabi-v7a "armeabi-v7a with NEON" "armeabi-v7a with VFPV4")
         else ()
+            # If not cross-compiling then we should be on the host system (device) itself, so below command is safe to be executed
             execute_process (COMMAND uname -m OUTPUT_VARIABLE HOST_MACHINE ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
             if (HOST_MACHINE MATCHES ^armv7)
-                set (RPI_SUPPORTED_ABIS armeabi-v6 armeabi-v7a "armeabi-v7a with NEON" "armeabi-v7a with VFPV4")
+                list (APPEND RPI_SUPPORTED_ABIS armeabi-v7a "armeabi-v7a with NEON" "armeabi-v7a with VFPV4")
                 if (NOT RPI_ABI)
-                    set (RPI_ABI armeabi-v7a)
+                    set (RPI_ABI armeabi-v7a)   # Set default to this specific target device
                 endif ()
             endif ()
         endif ()
