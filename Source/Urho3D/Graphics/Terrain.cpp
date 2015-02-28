@@ -59,7 +59,7 @@ inline void GrowUpdateRegion(IntRect& updateRegion, int x, int y)
     if (updateRegion.left_ < 0)
     {
         updateRegion.left_ = updateRegion.right_ = x;
-        updateRegion.top_ = updateRegion.bottom_ + y;
+        updateRegion.top_ = updateRegion.bottom_ = y;
     }
     else
     {
@@ -762,7 +762,7 @@ void Terrain::CreateGeometry()
         // If updating a region of the heightmap, check which patches change
         if (!updateAll)
         {
-            int lodExpand = 1 << numLodLevels_;
+            int lodExpand = 1 << (numLodLevels_ - 1);
             // Expand the right & bottom 1 pixel more, as patches share vertices at the edge
             updateRegion.left_ -= lodExpand;
             updateRegion.right_ += lodExpand + 1;
