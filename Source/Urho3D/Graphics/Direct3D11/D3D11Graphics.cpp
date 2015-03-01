@@ -501,6 +501,17 @@ void Graphics::SetSRGB(bool enable)
 void Graphics::SetFlushGPU(bool enable)
 {
     flushGPU_ = enable;
+    
+    if (impl_->device_)
+    {
+        IDXGIDevice1* dxgiDevice;
+        impl_->device_->QueryInterface(IID_IDXGIDevice1, (void **)&dxgiDevice);
+        if (dxgiDevice)
+        {
+            dxgiDevice->SetMaximumFrameLatency(enable ? 1 : 3);
+            dxgiDevice->Release();
+        }
+    }
 }
 
 void Graphics::SetOrientations(const String& orientations)
@@ -2176,6 +2187,8 @@ bool Graphics::CreateDevice(int width, int height, int multisample)
         }
 
         CheckFeatureSupport();
+        // Set the flush mode now as the device has been created
+        SetFlushGPU(flushGPU_);
     }
 
     // Create swap chain. Release old if necessary
