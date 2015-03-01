@@ -6,7 +6,9 @@
 #include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
-    float3 iNormal : NORMAL,
+    #ifndef BILLBOARD
+        float3 iNormal : NORMAL,
+    #endif
     float2 iTexCoord : TEXCOORD0,
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,

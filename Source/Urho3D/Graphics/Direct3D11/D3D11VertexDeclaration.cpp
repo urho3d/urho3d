@@ -71,7 +71,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertex
     if (d3dInputLayout)
         inputLayout_ = d3dInputLayout;
     else
-        LOGERROR("Failed to create input layout");
+        LOGERRORF("Failed to create input layout for shader %s element mask %d", vertexShader->GetFullName().CString(), vertexShader->GetElementMask());
 }
 
 VertexDeclaration::~VertexDeclaration()

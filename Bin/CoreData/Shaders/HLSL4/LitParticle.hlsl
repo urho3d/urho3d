@@ -5,7 +5,6 @@
 #include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
-    float3 iNormal : NORMAL,
     float2 iTexCoord : TEXCOORD0,
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
@@ -133,7 +132,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #endif
 
         #if defined(SPOTLIGHT)
-            lightColor = iSpotPos.w > 0.0 ? sLightSpotMap.Sample(sLightSpotMap, iSpotPos.xy / iSpotPos.w).rrr * cLightColor.rgb : 0.0;
+            lightColor = iSpotPos.w > 0.0 ? tLightSpotMap.Sample(sLightSpotMap, iSpotPos.xy / iSpotPos.w).rrr * cLightColor.rgb : 0.0;
         #elif defined(CUBEMASK)
             lightColor = tLightCubeMap.Sample(sLightCubeMap, iCubeMaskVec).rgb * cLightColor.rgb;
         #else
