@@ -35,9 +35,7 @@ if (NOT GIT_EXIT_CODE EQUAL 0)
 endif ()
 if (FILENAME)
     # Output complete revision number to a file
-    file (WRITE ${FILENAME}.new "const char* revision=\"${LIB_REVISION}\";\n")
-    execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${FILENAME}.new ${FILENAME})
-    file (REMOVE ${FILENAME}.new)
+    file (WRITE ${FILENAME} "const char* revision=\"${LIB_REVISION}\";\n")
 else ()
     # Output just major.minor.patch number to stdout
     string (REGEX MATCH "[^.]+\\.[^-]+" VERSION ${LIB_REVISION})            # Assume release tag always has major.minor format
