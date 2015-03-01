@@ -115,7 +115,7 @@ float GetDiffuseVolumetric(float3 worldPos)
 float GetSpecular(float3 normal, float3 eyeVec, float3 lightDir, float specularPower)
 {
     float3 halfVec = normalize(normalize(eyeVec) + lightDir);
-    return pow(dot(normal, halfVec), specularPower);
+    return saturate(pow(dot(normal, halfVec), specularPower));
 }
 
 float GetIntensity(float3 color)

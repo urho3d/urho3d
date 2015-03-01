@@ -99,7 +99,7 @@ public:
     /// Return data size in bytes for a pixel or block row.
     unsigned GetRowDataSize(int width) const;
     /// Return whether the parameters are dirty.
-    bool GetParametersDirty() const { return parametersDirty_; }
+    bool GetParametersDirty() const { return parametersDirty_ || !sampler_; }
 
     /// Set additional parameters from an XML file.
     void SetParameters(XMLFile* xml);
