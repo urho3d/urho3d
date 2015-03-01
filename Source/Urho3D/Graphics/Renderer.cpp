@@ -260,7 +260,6 @@ Renderer::Renderer(Context* context) :
     shadowQuality_(SHADOWQUALITY_HIGH_16BIT),
     maxShadowMaps_(1),
     minInstances_(2),
-    maxInstanceTriangles_(500),
     maxSortedInstances_(1000),
     maxOccluderTriangles_(5000),
     occlusionBufferSize_(256),
@@ -436,11 +435,6 @@ void Renderer::SetDynamicInstancing(bool enable)
 void Renderer::SetMinInstances(int instances)
 {
     minInstances_ = Max(instances, 2);
-}
-
-void Renderer::SetMaxInstanceTriangles(int triangles)
-{
-    maxInstanceTriangles_ = Max(triangles, 0);
 }
 
 void Renderer::SetMaxSortedInstances(int instances)
@@ -1059,10 +1053,8 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
     {
         bool heightFog = batch.zone_ && batch.zone_->GetHeightFog();
         
-        // If instancing is not supported, but was requested, or the object is too large to be instanced,
-        // choose static geometry vertex shader instead
-        if (batch.geometryType_ == GEOM_INSTANCED && (!GetDynamicInstancing() || batch.geometry_->GetIndexCount() >
-            (unsigned)maxInstanceTriangles_ * 3))
+        // If instancing is not supported, but was requested, choose static geometry vertex shader instead
+        if (batch.geometryType_ == GEOM_INSTANCED && !GetDynamicInstancing())
             batch.geometryType_ = GEOM_STATIC;
         
         if (batch.geometryType_ == GEOM_STATIC_NOINSTANCING)
