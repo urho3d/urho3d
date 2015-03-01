@@ -649,7 +649,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
 
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
 {
-    if (!vertexCount)
+    if (!vertexCount || !shaderProgram_)
         return;
     
     PrepareDraw();
@@ -671,7 +671,7 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
 
 void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount)
 {
-    if (!indexCount)
+    if (!vertexCount || !shaderProgram_)
         return;
     
     PrepareDraw();
@@ -694,7 +694,7 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
     unsigned instanceCount)
 {
-    if (!indexCount || !instanceCount)
+    if (!indexCount || !instanceCount || !shaderProgram_)
         return;
     
     PrepareDraw();
