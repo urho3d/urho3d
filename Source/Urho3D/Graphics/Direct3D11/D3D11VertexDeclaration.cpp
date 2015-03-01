@@ -60,6 +60,9 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertex
         }
     }
 
+    if (elementDescs.Empty())
+        return;
+
     ID3D11InputLayout* d3dInputLayout = 0;
     const PODVector<unsigned char>& byteCode = vertexShader->GetByteCode();
 

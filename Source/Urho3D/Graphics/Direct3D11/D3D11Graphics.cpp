@@ -266,7 +266,7 @@ Graphics::~Graphics()
         MutexLock lock(gpuObjectMutex_);
 
         // Release all GPU objects that still exist
-        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+        for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->Release();
         gpuObjects_.Clear();
     }
@@ -1238,6 +1238,12 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             texture = texture->GetBackupTexture();
     }
     
+    if (texture && texture->GetParametersDirty())
+    {
+        texture->UpdateParameters();
+        textures_[index] = 0; // Force reassign
+    }
+
     if (texture != textures_[index])
     {
         if (firstDirtyTexture_ >= MAX_TEXTURE_UNITS)
@@ -1252,13 +1258,39 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
 
         textures_[index] = texture;
         impl_->shaderResourceViews_[index] = texture ? (ID3D11ShaderResourceView*)texture->GetShaderResourceView() : 0;
+        impl_->samplers_[index] = texture ? (ID3D11SamplerState*)texture->GetSampler() : 0;
         texturesDirty_ = true;
     }
 }
 
 void Graphics::SetDefaultTextureFilterMode(TextureFilterMode mode)
 {
-    defaultTextureFilterMode_ = mode;
+    if (mode != defaultTextureFilterMode_)
+    {
+        defaultTextureFilterMode_ = mode;
+        SetTextureParametersDirty();
+    }
+}
+
+void Graphics::SetTextureAnisotropy(unsigned level)
+{
+    if (level != textureAnisotropy_)
+    {
+        textureAnisotropy_ = level;
+        SetTextureParametersDirty();
+    }
+}
+
+void Graphics::SetTextureParametersDirty()
+{
+    MutexLock lock(gpuObjectMutex_);
+
+    for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+    {
+        Texture* texture = dynamic_cast<Texture*>(*i);
+        if (texture)
+            texture->SetParametersDirty();
+    }
 }
 
 void Graphics::ResetRenderTargets()
@@ -1361,14 +1393,6 @@ void Graphics::SetViewport(const IntRect& rect)
     
     // Disable scissor test, needs to be re-enabled by the user
     SetScissorTest(false);
-}
-
-void Graphics::SetTextureAnisotropy(unsigned level)
-{
-    if (level < 1)
-        level = 1;
-    
-    /// \todo Implement
 }
 
 void Graphics::SetBlendMode(BlendMode mode)
@@ -2305,6 +2329,7 @@ void Graphics::ResetCachedState()
     {
         textures_[i] = 0;
         impl_->shaderResourceViews_[i] = 0;
+        impl_->samplers_[i] = 0;
     }
 
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
@@ -2386,8 +2411,12 @@ void Graphics::PrepareDraw()
         // Set same textures for both vertex & pixel shaders
         impl_->deviceContext_->VSSetShaderResources(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
             &impl_->shaderResourceViews_[firstDirtyTexture_]);
+        impl_->deviceContext_->VSSetSamplers(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
+            &impl_->samplers_[firstDirtyTexture_]);
         impl_->deviceContext_->PSSetShaderResources(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
             &impl_->shaderResourceViews_[firstDirtyTexture_]);
+        impl_->deviceContext_->PSSetSamplers(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
+            &impl_->samplers_[firstDirtyTexture_]);
 
         firstDirtyTexture_ = lastDirtyTexture_ = M_MAX_UNSIGNED;
         texturesDirty_ = false;
@@ -2401,19 +2430,24 @@ void Graphics::PrepareDraw()
         unsigned long long newVertexDeclarationHash = 0;
         for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
             newVertexDeclarationHash |= (unsigned long long)elementMasks_[i] << (i * 13);
-        newVertexDeclarationHash |= (unsigned long long)vertexShader_->GetElementMask() << 51;
-        if (newVertexDeclarationHash != vertexDeclarationHash_)
-        {
-            HashMap<unsigned long long, SharedPtr<VertexDeclaration> >::Iterator i = vertexDeclarations_.Find(newVertexDeclarationHash);
-            if (i == vertexDeclarations_.End())
-            {
-                SharedPtr<VertexDeclaration> newVertexDeclaration(new VertexDeclaration(this, vertexShader_, vertexBuffers_,
-                    elementMasks_));
-                i = vertexDeclarations_.Insert(MakePair(newVertexDeclarationHash, newVertexDeclaration));
-            }
 
-            impl_->deviceContext_->IASetInputLayout((ID3D11InputLayout*)i->second_->GetInputLayout());
-            vertexDeclarationHash_ = newVertexDeclarationHash;
+        // Do not create input layout if no vertex buffers / elements
+        if (newVertexDeclarationHash)
+        {
+            newVertexDeclarationHash |= (unsigned long long)vertexShader_->GetElementMask() << 51;
+            if (newVertexDeclarationHash != vertexDeclarationHash_)
+            {
+                HashMap<unsigned long long, SharedPtr<VertexDeclaration> >::Iterator i = vertexDeclarations_.Find(newVertexDeclarationHash);
+                if (i == vertexDeclarations_.End())
+                {
+                    SharedPtr<VertexDeclaration> newVertexDeclaration(new VertexDeclaration(this, vertexShader_, vertexBuffers_,
+                        elementMasks_));
+                    i = vertexDeclarations_.Insert(MakePair(newVertexDeclarationHash, newVertexDeclaration));
+                }
+    
+                impl_->deviceContext_->IASetInputLayout((ID3D11InputLayout*)i->second_->GetInputLayout());
+                vertexDeclarationHash_ = newVertexDeclarationHash;
+            }
         }
 
         vertexDeclarationDirty_ = false;

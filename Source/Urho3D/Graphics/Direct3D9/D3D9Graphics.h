@@ -502,7 +502,7 @@ private:
     /// Largest scratch buffer request this frame.
     unsigned maxScratchBufferRequest_;
     /// GPU objects.
-    Vector<GPUObject*> gpuObjects_;
+    PODVector<GPUObject*> gpuObjects_;
     /// Scratch buffers.
     Vector<ScratchBuffer> scratchBuffers_;
     /// Vertex declarations.

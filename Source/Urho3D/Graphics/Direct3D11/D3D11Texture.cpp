@@ -21,6 +21,7 @@
 //
 
 #include "../../IO/FileSystem.h"
+#include "../../IO/Log.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/Material.h"
@@ -54,10 +55,27 @@ static const char* filterModeNames[] =
     0
 };
 
+static const D3D11_FILTER d3dFilterMode[] =
+{
+    D3D11_FILTER_MIN_MAG_MIP_POINT,
+    D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT,
+    D3D11_FILTER_MIN_MAG_MIP_LINEAR,
+    D3D11_FILTER_ANISOTROPIC
+};
+
+static const D3D11_TEXTURE_ADDRESS_MODE d3dAddressMode[] = 
+{
+    D3D11_TEXTURE_ADDRESS_WRAP,
+    D3D11_TEXTURE_ADDRESS_MIRROR,
+    D3D11_TEXTURE_ADDRESS_CLAMP,
+    D3D11_TEXTURE_ADDRESS_BORDER
+};
+
 Texture::Texture(Context* context) :
     Resource(context),
     GPUObject(GetSubsystem<Graphics>()),
     shaderResourceView_(0),
+    sampler_(0),
     format_(DXGI_FORMAT_UNKNOWN),
     usage_(TEXTURE_STATIC),
     levels_(0),
@@ -66,7 +84,8 @@ Texture::Texture(Context* context) :
     height_(0),
     depth_(0),
     filterMode_(FILTER_DEFAULT),
-    sRGB_(false)
+    sRGB_(false),
+    parametersDirty_(true)
 {
     for (int i = 0; i < MAX_COORDS; ++i)
         addressMode_[i] = ADDRESS_WRAP;
@@ -89,16 +108,19 @@ void Texture::SetNumLevels(unsigned levels)
 void Texture::SetFilterMode(TextureFilterMode mode)
 {
     filterMode_ = mode;
+    parametersDirty_ = true;
 }
 
 void Texture::SetAddressMode(TextureCoordinate coord, TextureAddressMode mode)
 {
     addressMode_[coord] = mode;
+    parametersDirty_ = true;
 }
 
 void Texture::SetBorderColor(const Color& color)
 {
     borderColor_ = color;
+    parametersDirty_ = true;
 }
 
 void Texture::SetSRGB(bool enable)
@@ -107,6 +129,7 @@ void Texture::SetSRGB(bool enable)
         enable &= graphics_->GetSRGBSupport();
     
     sRGB_ = enable;
+    parametersDirty_ = true;
 }
 
 void Texture::SetBackupTexture(Texture* texture)
@@ -270,6 +293,43 @@ void Texture::SetParameters(const XMLElement& element)
         
         paramElem = paramElem.GetNext();
     }
+}
+
+void Texture::SetParametersDirty()
+{
+    parametersDirty_ = true;
+}
+
+void Texture::UpdateParameters()
+{
+    if (!parametersDirty_ || !object_)
+        return;
+
+    // Release old sampler
+    if (sampler_)
+    {
+        ((ID3D11SamplerState*)sampler_)->Release();
+        sampler_ = 0;
+    }
+
+    D3D11_SAMPLER_DESC samplerDesc;
+    memset(&samplerDesc, 0, sizeof samplerDesc);
+    samplerDesc.Filter = d3dFilterMode[filterMode_ != FILTER_DEFAULT ? filterMode_ : graphics_->GetDefaultTextureFilterMode()];
+    samplerDesc.AddressU = d3dAddressMode[addressMode_[0]];
+    samplerDesc.AddressV = d3dAddressMode[addressMode_[1]];
+    samplerDesc.AddressW = d3dAddressMode[addressMode_[2]];
+    samplerDesc.MaxAnisotropy = graphics_->GetTextureAnisotropy();
+    samplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
+    samplerDesc.MinLOD = -M_INFINITY;
+    samplerDesc.MaxLOD = M_INFINITY;
+    memcpy(&samplerDesc.BorderColor, borderColor_.Data(), 4 * sizeof(float));
+
+    graphics_->GetImpl()->GetDevice()->CreateSamplerState(&samplerDesc, (ID3D11SamplerState**)&sampler_);
+
+    if (!sampler_)
+        LOGERROR("Failed to create sampler state");
+
+    parametersDirty_ = false;
 }
 
 SharedArrayPtr<unsigned char> Texture::ConvertRGBToRGBA(int width, int height, const unsigned char* data)

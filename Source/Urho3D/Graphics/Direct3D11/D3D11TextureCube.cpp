@@ -256,6 +256,12 @@ void TextureCube::Release()
             ((ID3D11ShaderResourceView*)shaderResourceView_)->Release();
             shaderResourceView_ = 0;
         }
+
+        if (sampler_)
+        {
+            ((ID3D11SamplerState*)sampler_)->Release();
+            sampler_ = 0;
+        }
     }
 }
 

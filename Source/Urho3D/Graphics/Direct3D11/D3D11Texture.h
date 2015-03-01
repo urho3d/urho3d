@@ -98,13 +98,21 @@ public:
     unsigned GetDataSize(int width, int height, int depth) const;
     /// Return data size in bytes for a pixel or block row.
     unsigned GetRowDataSize(int width) const;
+    /// Return whether the parameters are dirty.
+    bool GetParametersDirty() const { return parametersDirty_; }
 
     /// Set additional parameters from an XML file.
     void SetParameters(XMLFile* xml);
     /// Set additional parameters from an XML element.
     void SetParameters(const XMLElement& element);
+    /// Mark parameters dirty. Called by Graphics.
+    void SetParametersDirty();
+    /// Create sampler state object after parameters have been changed. Called by Graphics when assigning the texture.
+    void UpdateParameters();
     /// Return shader resource view.
     void* GetShaderResourceView() const { return shaderResourceView_; }
+    /// Return sampler state object.
+    void* GetSampler() const { return sampler_; }
     
     /// Convert RGB data to RGBA for loading into a texture.
     static SharedArrayPtr<unsigned char> ConvertRGBToRGBA(int width, int height, const unsigned char* data);
@@ -117,6 +125,8 @@ protected:
     
     /// Shader resource view.
     void* shaderResourceView_;
+    /// Sampler state object.
+    void* sampler_;
     /// Texture format.
     unsigned format_;
     /// Texture usage type.
@@ -141,6 +151,8 @@ protected:
     Color borderColor_;
     /// sRGB sampling and writing mode flag.
     bool sRGB_;
+    /// Parameters dirty flag.
+    bool parametersDirty_;
     /// Backup texture.
     SharedPtr<Texture> backupTexture_;
 };

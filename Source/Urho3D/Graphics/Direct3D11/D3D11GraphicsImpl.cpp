@@ -43,7 +43,10 @@ GraphicsImpl::GraphicsImpl() :
         renderTargetViews_[i] = 0;
 
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+    {
         shaderResourceViews_[i] = 0;
+        samplers_[i] = 0;
+    }
 
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {

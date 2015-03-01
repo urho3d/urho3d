@@ -77,6 +77,8 @@ private:
     HashMap<unsigned, ID3D11RasterizerState*> rasterizerStates_;
     /// Bound shader resource views.
     ID3D11ShaderResourceView* shaderResourceViews_[MAX_TEXTURE_UNITS];
+    /// Bound sampler state objects.
+    ID3D11SamplerState* samplers_[MAX_TEXTURE_UNITS];
     /// Bound vertex buffers.
     ID3D11Buffer* vertexBuffers_[MAX_VERTEX_STREAMS];
     /// Bound constant buffers.

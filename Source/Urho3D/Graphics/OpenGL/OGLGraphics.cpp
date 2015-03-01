@@ -1530,7 +1530,7 @@ void Graphics::SetTextureParametersDirty()
 {
     MutexLock lock(gpuObjectMutex_);
     
-    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+    for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
     {
         Texture* texture = dynamic_cast<Texture*>(*i);
         if (texture)
@@ -2349,14 +2349,14 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
             // Shader programs are also GPU objects; clear them first to avoid list modification during iteration
             shaderPrograms_.Clear();
 
-            for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
                 (*i)->Release();
             gpuObjects_.Clear();
         }
         else
         {
             // We are not shutting down, but recreating the context: mark GPU objects lost
-            for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
                 (*i)->OnDeviceLost();
                 
             // In this case clear shader programs last so that they do not attempt to delete their OpenGL program
@@ -2435,7 +2435,7 @@ void Graphics::Restore()
     {
         MutexLock lock(gpuObjectMutex_);
         
-        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+        for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->OnDeviceReset();
     }
 

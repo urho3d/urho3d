@@ -113,13 +113,13 @@ void ConstantBuffer::SetVector3ArrayParameter(unsigned offset, unsigned rows, co
         return; // Would overflow the buffer
 
     float* dest = (float*)&shadowData_[offset];
-    float* src = (float*)data;
+    const float* src = (const float*)data;
 
     while (rows--)
     {
-        dest[0] = src[0];
-        dest[1] = src[1];
-        dest[2] = src[2];
+        *dest++ = *src++;
+        *dest++ = *src++;
+        *dest++ = *src++;
         ++dest; // Skip over the w coordinate
     }
 

@@ -177,6 +177,8 @@ public:
     void SetDefaultTextureFilterMode(TextureFilterMode mode);
     /// Set texture anisotropy.
     void SetTextureAnisotropy(unsigned level);
+    /// Dirty texture parameters of all textures (when global settings change.)
+    void SetTextureParametersDirty();
     /// Reset all rendertargets, depth-stencil surface and viewport.
     void ResetRenderTargets();
     /// Reset specific rendertarget.
@@ -494,7 +496,7 @@ private:
     /// Largest scratch buffer request this frame.
     unsigned maxScratchBufferRequest_;
     /// GPU objects.
-    Vector<GPUObject*> gpuObjects_;
+    PODVector<GPUObject*> gpuObjects_;
     /// Scratch buffers.
     Vector<ScratchBuffer> scratchBuffers_;
     /// Shadow map dummy color texture format.
