@@ -184,12 +184,6 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         return false;
     }
     
-    if (IsCompressed())
-    {
-        x &= ~3;
-        y &= ~3;
-    }
-    
     int levelWidth = GetLevelWidth(level);
     int levelHeight = GetLevelHeight(level);
     if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || width <= 0 || height <= 0)
@@ -198,6 +192,17 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         return false;
     }
     
+    // If compressed, align the update region on a block
+    if (IsCompressed())
+    {
+        x &= ~3;
+        y &= ~3;
+        width += 3;
+        width &= 0xfffffffc;
+        height += 3;
+        height &= 0xfffffffc;
+    }
+
     unsigned char* src = (unsigned char*)data;
     unsigned rowSize = GetRowDataSize(width);
     unsigned rowStart = GetRowDataSize(x);
