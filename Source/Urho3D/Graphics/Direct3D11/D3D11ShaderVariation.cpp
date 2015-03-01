@@ -235,7 +235,7 @@ bool ShaderVariation::Compile()
     // Set the entrypoint, profile and flags according to the shader being compiled
     const char* entryPoint = 0;
     const char* profile = 0;
-    unsigned flags = D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
+    unsigned flags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
     
     defines.Push("D3D11");
 
@@ -361,7 +361,7 @@ void ShaderVariation::ParseParameters()
         String resourceName(resourceDesc.Name);
         if (resourceDesc.Type == D3D_SIT_CBUFFER)
             cbRegisterMap[resourceName] = resourceDesc.BindPoint;
-        else if (type_ == PS && resourceDesc.Type == D3D_SIT_TEXTURE && resourceDesc.BindPoint < MAX_TEXTURE_UNITS)
+        else if (type_ == PS && resourceDesc.Type == D3D_SIT_SAMPLER && resourceDesc.BindPoint < MAX_TEXTURE_UNITS)
             useTextureUnit_[resourceDesc.BindPoint] = true;
     }
 
