@@ -2552,7 +2552,7 @@ void Graphics::PrepareDraw()
     if (rasterizerStateDirty_)
     {
         unsigned newRasterizerStateHash = (scissorTest_ ? 1 : 0) | (fillMode_ << 1) | (cullMode_ << 3) |
-            ((*((unsigned*)&constantDepthBias_) & 0x1fff) << 5) || ((*((unsigned*)&slopeScaledDepthBias_) & 0x1fff) << 18);
+            ((*((unsigned*)&constantDepthBias_) & 0x1fff) << 5) | ((*((unsigned*)&slopeScaledDepthBias_) & 0x1fff) << 18);
         if (newRasterizerStateHash != rasterizerStateHash_)
         {
             HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Find(newRasterizerStateHash);
