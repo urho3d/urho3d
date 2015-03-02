@@ -23,7 +23,7 @@ void VS(float4 iPos : POSITION,
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
     #endif
-    out float4 oPos : POSITION)
+    out float4 oPos : OUTPOSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
@@ -42,18 +42,18 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float4 iColor : COLOR0,
     #endif
     #ifdef PREPASS
-        out float4 oDepth : COLOR1,
+        out float4 oDepth : OUTCOLOR1,
     #endif
     #ifdef DEFERRED
-        out float4 oAlbedo : COLOR1,
-        out float4 oNormal : COLOR2,
-        out float4 oDepth : COLOR3,
+        out float4 oAlbedo : OUTCOLOR1,
+        out float4 oNormal : OUTCOLOR2,
+        out float4 oDepth : OUTCOLOR3,
     #endif
-    out float4 oColor : COLOR0)
+    out float4 oColor : OUTCOLOR0)
 {
     // Get material diffuse albedo
     #ifdef DIFFMAP
-        float4 diffColor = cMatDiffColor * tex2D(sDiffMap, iTexCoord);
+        float4 diffColor = cMatDiffColor * Sample2D(DiffMap, iTexCoord);
         #ifdef ALPHAMASK
             if (diffColor.a < 0.5)
                 discard;

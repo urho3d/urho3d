@@ -227,7 +227,6 @@ enum ShaderParameterGroup
     SP_LIGHT,
     SP_MATERIAL,
     SP_OBJECT,
-    SP_CUSTOM,
     MAX_SHADER_PARAMETER_GROUPS
 };
 

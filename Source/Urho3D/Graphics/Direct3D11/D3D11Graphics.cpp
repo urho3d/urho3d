@@ -245,7 +245,7 @@ Graphics::Graphics(Context* context) :
     maxScratchBufferRequest_(0),
     defaultTextureFilterMode_(FILTER_TRILINEAR),
     shaderProgram_(0),
-    shaderPath_("Shaders/HLSL4/"),
+    shaderPath_("Shaders/HLSL/"),
     shaderExtension_(".hlsl"),
     orientations_("LandscapeLeft LandscapeRight"),
     apiName_("D3D11")

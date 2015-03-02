@@ -97,7 +97,7 @@ float GetDiffuse(float3 normal, float3 worldPos, out float3 lightDir)
         float3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
         float lightDist = length(lightVec);
         lightDir = lightVec / lightDist;
-        return saturate(dot(normal, lightDir)) * tex1D(sLightRampMap, lightDist).r;
+        return saturate(dot(normal, lightDir)) * Sample2D(LightRampMap, float2(lightDist, 0.0)).r;
     #endif
 }
 
@@ -108,14 +108,14 @@ float GetDiffuseVolumetric(float3 worldPos)
     #else
         float3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
         float lightDist = length(lightVec);
-        return tex1D(sLightRampMap, lightDist).r;
+        return Sample2D(LightRampMap, float2(lightDist, 0.0)).r;
     #endif
 }
 
 float GetSpecular(float3 normal, float3 eyeVec, float3 lightDir, float specularPower)
 {
     float3 halfVec = normalize(normalize(eyeVec) + lightDir);
-    return pow(dot(normal, halfVec), specularPower);
+    return saturate(pow(dot(normal, halfVec), specularPower));
 }
 
 float GetIntensity(float3 color)

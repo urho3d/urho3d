@@ -86,7 +86,7 @@ void PS(
 
     #if defined(SPOTLIGHT)
         float4 spotPos = mul(projWorldPos, cLightMatricesPS[0]);
-        lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
+        lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rrr * cLightColor.rgb : 0.0;
     #elif defined(CUBEMASK)
         lightColor = texCUBE(sLightCubeMap, mul(worldPos - cLightPosPS.xyz, (float3x3)cLightMatricesPS[0])).rgb * cLightColor.rgb;
     #else

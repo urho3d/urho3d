@@ -1,4 +1,11 @@
 #ifdef COMPILEVS
+
+#ifdef D3D11
+#define OUTPOSITION SV_POSITION
+#else
+#define OUTPOSITION POSITION
+#endif
+
 #ifdef SKINNED
 float4x3 GetSkinMatrix(float4 blendWeights, int4 blendIndices)
 {
@@ -63,3 +70,20 @@ float3 GetBillboardNormal()
 
 #define GetWorldTangent(modelMatrix) normalize(mul(iTangent.xyz, (float3x3)modelMatrix))
 #endif
+
+#ifdef COMPILEPS
+
+#ifdef D3D11
+#define OUTCOLOR0 SV_TARGET
+#define OUTCOLOR1 SV_TARGET1
+#define OUTCOLOR2 SV_TARGET2
+#define OUTCOLOR3 SV_TARGET3
+#else
+#define OUTCOLOR0 COLOR0
+#define OUTCOLOR1 COLOR1
+#define OUTCOLOR2 COLOR2
+#define OUTCOLOR3 COLOR3
+#endif
+
+#endif
+
