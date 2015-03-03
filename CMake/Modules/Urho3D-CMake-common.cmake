@@ -1052,18 +1052,16 @@ macro (setup_main_executable)
 
     # Define a custom command for generating a shared data files (if enabled)
     if (EMSCRIPTEN_SHARE_DATA AND RESOURCE_PAKS)
-        if (NOT TARGET DATA_SHARE)
-            # When sharing a single data file, all main targets are assumed to use a same set of resource paks
-            foreach (FILE ${RESOURCE_PAKS})
-                get_filename_component (NAME ${FILE} NAME)
-                list (APPEND PAK_NAMES ${NAME})
-            endforeach ()
-            add_custom_command (OUTPUT ${SHARED_RESOURCE_JS}
-                COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache
-                DEPENDS RESOURCE_CHECK ${RESOURCE_PAKS}
-                WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-                COMMENT "Creating shared data files")
-        endif ()
+        # When sharing a single data file, all main targets are assumed to use a same set of resource paks
+        foreach (FILE ${RESOURCE_PAKS})
+            get_filename_component (NAME ${FILE} NAME)
+            list (APPEND PAK_NAMES ${NAME})
+        endforeach ()
+        add_custom_command (OUTPUT ${SHARED_RESOURCE_JS}
+            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS}.new --use-preload-cache && ${CMAKE_COMMAND} -E copy_if_different ${SHARED_RESOURCE_JS}.new ${SHARED_RESOURCE_JS} && ${CMAKE_COMMAND} -E remove ${SHARED_RESOURCE_JS}.new
+            DEPENDS RESOURCE_CHECK ${RESOURCE_PAKS}
+            WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+            COMMENT "Creating shared data files")
     endif ()
 endmacro ()
 
