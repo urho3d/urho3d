@@ -671,8 +671,9 @@ macro (setup_target)
     endif ()
     # Set additional linker dependencies (only work for Makefile-based generator according to CMake documentation)
     if (LINK_DEPENDS)
-        string (REPLACE ";" "\;" ESCAPED_LINK_DEPENDS "${LINK_DEPENDS}")        # Stringify for string replacement
-        list (APPEND TARGET_PROPERTIES LINK_DEPENDS "${ESCAPED_LINK_DEPENDS}")  # Stringify with semicolons already escaped
+        string (REPLACE ";" "\;" LINK_DEPENDS "${LINK_DEPENDS}")        # Stringify for string replacement
+        list (APPEND TARGET_PROPERTIES LINK_DEPENDS "${LINK_DEPENDS}")  # Stringify with semicolons already escaped
+        unset (LINK_DEPENDS)
     endif ()
     # CMake does not support IPHONEOS_DEPLOYMENT_TARGET the same manner as it supports CMAKE_OSX_DEPLOYMENT_TARGET
     # The iOS deployment target is set using the corresponding Xcode attribute as target property instead
@@ -821,7 +822,7 @@ macro (setup_emscripten_linker_flags LINKER_FLAGS)
         if (EMCC_OPTION)
             list (APPEND LINK_DEPENDS ${FILE})
             get_property (EMCC_FILE_ALIAS SOURCE ${FILE} PROPERTY EMCC_FILE_ALIAS)
-            set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --${EMCC_OPTION} ${FILE}${EMCC_FILE_ALIAS}")
+            set (${LINKER_FLAGS} "${${LINKER_FLAGS}} --${EMCC_OPTION} ${FILE}${EMCC_FILE_ALIAS}")
             list (APPEND EMCC_OPTIONS ${EMCC_OPTION})
             list (APPEND ${EMCC_OPTION}_FILES ${FILE})
         endif ()
@@ -901,6 +902,8 @@ macro (setup_main_executable)
             set (RESOURCE_${DIR}_PATHNAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${NAME})
             list (APPEND RESOURCE_PAKS ${RESOURCE_${DIR}_PATHNAME})
             if (EMSCRIPTEN)
+                # The *.pak will be generated during build time, set the GENERATED property to suppress error during CMake configuration/generation time
+                # Also set the custom EMCC property to preload the *.pak
                 set_source_files_properties (${RESOURCE_${DIR}_PATHNAME} PROPERTIES GENERATED TRUE EMCC_OPTION preload-file EMCC_FILE_ALIAS @/${NAME})
             endif ()
         endforeach ()
@@ -912,8 +915,6 @@ macro (setup_main_executable)
             set (PACKAGING_DEP DEPENDS PackageTool)
         endif ()
         set (PACKAGING_COMMENT " and packaging")
-        # The *.pak will be generated during build time, suppress error during CMake configuration/generation time
-        set_property (SOURCE ${RESOURCE_PAKS} PROPERTY GENERATED TRUE)
     endif ()
     if (XCODE)
         if (NOT RESOURCE_FILES)
