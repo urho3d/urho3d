@@ -49,6 +49,9 @@ set (CMAKE_C_COMPILER   ${EMSCRIPTEN_ROOT_PATH}/emcc${TOOL_EXT}     CACHE PATH "
 set (CMAKE_CXX_COMPILER ${EMSCRIPTEN_ROOT_PATH}/em++${TOOL_EXT}     CACHE PATH "C++ compiler")
 set (CMAKE_AR           ${EMSCRIPTEN_ROOT_PATH}/emar${TOOL_EXT}     CACHE PATH "archive")
 set (CMAKE_RANLIB       ${EMSCRIPTEN_ROOT_PATH}/emranlib${TOOL_EXT} CACHE PATH "ranlib")
+# Specific to Emscripten
+set (EMRUN              ${EMSCRIPTEN_ROOT_PATH}/emrun${TOOL_EXT}    CACHE PATH "emrun")
+set (EMPACKAGER         python ${EMSCRIPTEN_ROOT_PATH}/tools/file_packager.py CACHE PATH "file_packager.py")
 
 # specify the system root
 if (NOT EMSCRIPTEN_SYSROOT)

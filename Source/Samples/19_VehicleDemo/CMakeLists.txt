@@ -27,6 +27,9 @@ set (TARGET_NAME 19_VehicleDemo)
 define_source_files (EXTRA_H_FILES ${COMMON_SAMPLE_H_FILES})
 
 # Setup target with resource copying
+if (EMSCRIPTEN)
+    math (EXPR EMSCRIPTEN_TOTAL_MEMORY "64 * 1024 * 1024")     # Override the Urho3D default
+endif ()
 setup_main_executable ()
 
 # Setup test cases

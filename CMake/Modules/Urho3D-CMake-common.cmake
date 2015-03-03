@@ -197,6 +197,7 @@ if (EMSCRIPTEN)     # CMAKE_CROSSCOMPILING is always true for Emscripten
     set (EMSCRIPTEN_SYSROOT "" CACHE PATH "Path to Emscripten system root (Emscripten cross-compiling build only)")
     option (EMSCRIPTEN_ALLOW_MEMORY_GROWTH "Enable memory growing based on application demand (Emscripten cross-compiling build only)")
     math (EXPR EMSCRIPTEN_TOTAL_MEMORY "32 * 1024 * 1024")     # This option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH option is set
+    cmake_dependent_option (EMSCRIPTEN_SHARE_DATA "Enable sharing data file support (Emscripten cross-compiling build only)" FALSE "EMSCRIPTEN" FALSE)
 endif ()
 # Constrain the build option values in cmake-gui, if applicable
 if (CMAKE_VERSION VERSION_GREATER 2.8 OR CMAKE_VERSION VERSION_EQUAL 2.8)
@@ -821,16 +822,15 @@ macro (setup_emscripten_linker_flags LINKER_FLAGS)
         get_property (EMCC_OPTION SOURCE ${FILE} PROPERTY EMCC_OPTION)
         if (EMCC_OPTION)
             list (APPEND LINK_DEPENDS ${FILE})
-            get_property (EMCC_FILE_ALIAS SOURCE ${FILE} PROPERTY EMCC_FILE_ALIAS)
-            set (${LINKER_FLAGS} "${${LINKER_FLAGS}} --${EMCC_OPTION} ${FILE}${EMCC_FILE_ALIAS}")
-            list (APPEND EMCC_OPTIONS ${EMCC_OPTION})
-            list (APPEND ${EMCC_OPTION}_FILES ${FILE})
+            if (EMCC_OPTION STREQUAL embed-file OR EMCC_OPTION STREQUAL preload-file)
+                get_property (EMCC_FILE_ALIAS SOURCE ${FILE} PROPERTY EMCC_FILE_ALIAS)
+                get_property (EMCC_EXCLUDE_FILE SOURCE ${FILE} PROPERTY EMCC_EXCLUDE_FILE)
+                if (EMCC_EXCLUDE_FILE)
+                    set (EMCC_EXCLUDE_FILE " --exclude-file ${EMCC_EXCLUDE_FILE}")
+                endif ()
+            endif ()
+            set (${LINKER_FLAGS} "${${LINKER_FLAGS}} --${EMCC_OPTION} ${FILE}${EMCC_FILE_ALIAS}${EMCC_EXCLUDE_FILE}")
         endif ()
-    endforeach ()
-    # Group the additional source files based on its flags
-    remove_duplicate (EMCC_OPTIONS)
-    foreach (EMCC_OPTION ${EMCC_OPTIONS})
-        source_group (${EMCC_OPTION} ${EMCC_OPTION}_FILES)
     endforeach ()
 endmacro ()
 
@@ -898,13 +898,20 @@ macro (setup_main_executable)
         # Populate all the variables required by resource packaging
         foreach (DIR ${RESOURCE_DIRS})
             get_filename_component (NAME ${DIR} NAME)
-            set (NAME ${NAME}.pak)
-            set (RESOURCE_${DIR}_PATHNAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${NAME})
+            set (RESOURCE_${DIR}_PATHNAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${NAME}.pak)
             list (APPEND RESOURCE_PAKS ${RESOURCE_${DIR}_PATHNAME})
             if (EMSCRIPTEN)
-                # The *.pak will be generated during build time, set the GENERATED property to suppress error during CMake configuration/generation time
-                # Also set the custom EMCC property to preload the *.pak
-                set_source_files_properties (${RESOURCE_${DIR}_PATHNAME} PROPERTIES GENERATED TRUE EMCC_OPTION preload-file EMCC_FILE_ALIAS @/${NAME})
+                if (EMSCRIPTEN_SHARE_DATA)
+                    # Set the custom EMCC_OPTION property to peload the generated shared data
+                    if (NOT SHARED_RESOURCE_JS)   # Only need once
+                        set (SHARED_RESOURCE_JS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.js)
+                        list (APPEND SOURCE_FILES ${SHARED_RESOURCE_JS})
+                        set_source_files_properties (${SHARED_RESOURCE_JS} PROPERTIES GENERATED TRUE EMCC_OPTION pre-js)
+                    endif ()
+                else ()
+                    # Set the custom EMCC_OPTION property to preload the *.pak individually
+                    set_source_files_properties (${RESOURCE_${DIR}_PATHNAME} PROPERTIES EMCC_OPTION preload-file EMCC_FILE_ALIAS @/${NAME}.pak)
+                endif ()
             endif ()
         endforeach ()
         # Urho3D project builds the PackageTool as required; external project uses PackageTool found in the Urho3D build tree or Urho3D SDK
@@ -915,6 +922,8 @@ macro (setup_main_executable)
             set (PACKAGING_DEP DEPENDS PackageTool)
         endif ()
         set (PACKAGING_COMMENT " and packaging")
+        # The *.pak will be generated during build time, suppress error during CMake configuration/generation time
+        set_property (SOURCE ${RESOURCE_PAKS} PROPERTY GENERATED TRUE)
     endif ()
     if (XCODE)
         if (NOT RESOURCE_FILES)
@@ -1039,6 +1048,22 @@ macro (setup_main_executable)
             add_custom_target (${RESOURCE_CHECK_${MD5ALL}} ALL ${COMMANDS} ${PACKAGING_DEP} COMMENT "Checking${PACKAGING_COMMENT} resource directories")
         endif ()
         add_dependencies (${TARGET_NAME} ${RESOURCE_CHECK_${MD5ALL}})
+    endif ()
+
+    # Define a custom command for generating a shared data files (if enabled)
+    if (EMSCRIPTEN_SHARE_DATA AND RESOURCE_PAKS)
+        if (NOT TARGET DATA_SHARE)
+            # When sharing a single data file, all main targets are assumed to use a same set of resource paks
+            foreach (FILE ${RESOURCE_PAKS})
+                get_filename_component (NAME ${FILE} NAME)
+                list (APPEND PAK_NAMES ${NAME})
+            endforeach ()
+            add_custom_command (OUTPUT ${SHARED_RESOURCE_JS}
+                COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache
+                DEPENDS RESOURCE_CHECK ${RESOURCE_PAKS}
+                WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+                COMMENT "Creating shared data files")
+        endif ()
     endif ()
 endmacro ()
 
