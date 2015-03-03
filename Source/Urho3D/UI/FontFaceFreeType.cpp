@@ -164,7 +164,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
 
     int textureWidth = maxTextureSize;
     int textureHeight = maxTextureSize;
-    bool loadAllGlyphs = CanLoadAllGlyphs(numGlyphs, loadMode, textureWidth, textureHeight);
+    bool loadAllGlyphs = CanLoadAllGlyphs(numGlyphs, indexToCharMapping, loadMode, textureWidth, textureHeight);
 
     SharedPtr<Image> image(new Image(font_->GetContext()));
     image->SetSize(textureWidth, textureHeight, 1);
@@ -296,7 +296,7 @@ const FontGlyph* FontFaceFreeType::GetGlyph(unsigned c)
     return 0;
 }
 
-bool FontFaceFreeType::CanLoadAllGlyphs(unsigned numGlyphs, int loadMode, int& textureWidth, int& textureHeight) const
+bool FontFaceFreeType::CanLoadAllGlyphs(unsigned numGlyphs, HashMap<unsigned, unsigned>& indexToCharMapping, int loadMode, int& textureWidth, int& textureHeight) const
 {
     FT_Face face = (FT_Face)face_;
     FT_GlyphSlot slot = face->glyph;
@@ -304,7 +304,8 @@ bool FontFaceFreeType::CanLoadAllGlyphs(unsigned numGlyphs, int loadMode, int& t
 
     for (unsigned i = 0; i < numGlyphs; ++i)
     {
-        FT_Error error = FT_Load_Glyph(face, i, loadMode);
+        unsigned charCode = indexToCharMapping[i];
+        FT_Error error = FT_Load_Char(face, charCode, loadMode);
         if (!error)
         {
             int width = Max(slot->metrics.width >> 6, slot->bitmap.width);

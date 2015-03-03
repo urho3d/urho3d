@@ -48,7 +48,7 @@ public:
 
 private:
     /// Check can load all glyph in one texture, return true and texture size if can load.
-    bool CanLoadAllGlyphs(unsigned numGlyphs, int loadMode, int& textureWidth, int& textureHeight) const;
+    bool CanLoadAllGlyphs(unsigned numGlyphs, HashMap<unsigned, unsigned>& indexToCharMapping, int loadMode, int& textureWidth, int& textureHeight) const;
     /// Setup next texture.
     bool SetupNextTexture(int textureWidth, int textureHeight);
     /// Load char glyph.
