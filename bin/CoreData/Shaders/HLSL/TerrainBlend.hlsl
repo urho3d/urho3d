@@ -1,23 +1,35 @@
 #define CUSTOM_MATERIAL_CBUFFER
 
-#include "Uniforms.hlsl"
-#include "Samplers.hlsl"
-#include "Transform.hlsl"
-#include "ScreenPos.hlsl"
-#include "Lighting.hlsl"
-#include "Fog.hlsl"
-
-#ifdef COMPILEPS
-
 #ifndef D3D11
 
-sampler2D sWeightMap0 : register(S0);
-sampler2D sDetailMap1 : register(S1);
-sampler2D sDetailMap2 : register(S2);
-sampler2D sDetailMap3 : register(S3);
+// D3D9 uniforms and samplers
+#ifdef COMPILEVS
 uniform float2 cDetailTiling;
+#else
+sampler2D sWeightMap0 : register(s0);
+sampler2D sDetailMap1 : register(s1);
+sampler2D sDetailMap2 : register(s2);
+sampler2D sDetailMap3 : register(s3);
+#endif
 
 #else
+
+// D3D11 constant buffers and samplers
+#ifdef COMPILEVS
+cbuffer MaterialVS : register(b4)
+{
+    float4 cUOffset;
+    float4 cVOffset;
+    float2 cDetailTiling;
+}
+#else
+cbuffer MaterialPS : register(b4)
+{
+    float4 cMatDiffColor;
+    float3 cMatEmissiveColor;
+    float3 cMatEnvMapColor;
+    float4 cMatSpecColor;
+}
 
 Texture2D tWeightMap0 : register(t0);
 Texture2D tDetailMap1 : register(t1);
@@ -27,18 +39,16 @@ SamplerState sWeightMap0 : register(s0);
 SamplerState sDetailMap1 : register(s1);
 SamplerState sDetailMap2 : register(s2);
 SamplerState sDetailMap3 : register(s3);
-
-cbuffer MaterialPS : register(b4)
-{
-    float4 cMatDiffColor;
-    float3 cMatEmissiveColor;
-    float3 cMatEnvMapColor;
-    float4 cMatSpecColor;
-    float2 cDetailTiling;
-}
+#endif
 
 #endif
-#endif
+
+#include "Uniforms.hlsl"
+#include "Samplers.hlsl"
+#include "Transform.hlsl"
+#include "ScreenPos.hlsl"
+#include "Lighting.hlsl"
+#include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,

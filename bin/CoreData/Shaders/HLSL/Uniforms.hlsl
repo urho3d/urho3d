@@ -107,11 +107,13 @@ cbuffer LightVS : register(b3)
 #endif
 }
 
+#ifndef CUSTOM_MATERIAL_CBUFFER
 cbuffer MaterialVS : register(b4)
 {
     float4 cUOffset;
     float4 cVOffset;
 }
+#endif
 
 cbuffer ObjectVS : register(b5)
 {
