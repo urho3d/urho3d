@@ -27,7 +27,8 @@ sampler3D sZoneVolumeMap : register(s15);
 #define Sample2D(tex, uv) tex2D(s##tex, uv)
 #define Sample2DProj(tex, uv) tex2Dproj(s##tex, uv)
 #define Sample2DLod0(tex, uv) tex2Dlod(s##tex, float4(uv, 0.0, 0.0))
-#define SampleCube(tex, uv) texCUBE(S##tex, uv)
+#define SampleCube(tex, uv) texCUBE(s##tex, uv)
+#define SampleShadow(tex, uv) tex2Dproj(s##tex, uv)
 
 #else
 
@@ -67,7 +68,7 @@ SamplerState sEnvCubeMap : register(s4);
 SamplerState sLightRampMap : register(s8);
 SamplerState sLightSpotMap : register(s9);
 SamplerState sLightCubeMap : register(s9);
-SamplerState sShadowMap : register(s10);
+SamplerComparisonState sShadowMap : register(s10);
 SamplerState sFaceSelectCubeMap : register(s11);
 SamplerState sIndirectionCubeMap : register(s12);
 SamplerState sDepthBuffer : register(s13);
@@ -79,6 +80,7 @@ SamplerState sZoneVolumeMap : register(s15);
 #define Sample2DProj(tex, uv) t##tex.Sample(s##tex, uv.xy / uv.w)
 #define Sample2DLod0(tex, uv) t##tex.Sample(s##tex, uv)
 #define SampleCube(tex, uv) t##tex.Sample(s##tex, uv)
+#define SampleShadow(tex, uv) t##tex.SampleCmpLevelZero(s##tex, uv.xy, uv.z)
 
 #endif
 

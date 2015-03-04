@@ -275,15 +275,24 @@ Graphics::~Graphics()
     constantBuffers_.Clear();
     
     for (HashMap<unsigned, ID3D11BlendState*>::Iterator i = impl_->blendStates_.Begin(); i != impl_->blendStates_.End(); ++i)
-        i->second_->Release();
+    {
+        if (i->second_)
+            i->second_->Release();
+    }
     impl_->blendStates_.Clear();
     
     for (HashMap<unsigned, ID3D11DepthStencilState*>::Iterator i = impl_->depthStates_.Begin(); i != impl_->depthStates_.End(); ++i)
-        i->second_->Release();
+    {
+        if (i->second_)
+            i->second_->Release();
+    }
     impl_->depthStates_.Clear();
 
     for (HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Begin(); i != impl_->rasterizerStates_.End(); ++i)
-        i->second_->Release();
+    {
+        if (i->second_)
+            i->second_->Release();
+    }
     impl_->rasterizerStates_.Clear();
 
     if (impl_->defaultRenderTargetView_)
@@ -1373,6 +1382,8 @@ void Graphics::SetDepthStencil(Texture2D* texture)
         depthStencil = texture->GetRenderSurface();
     
     SetDepthStencil(depthStencil);
+    // Constant depth bias depends on the bitdepth
+    rasterizerStateDirty_ = true;
 }
 
 void Graphics::SetViewport(const IntRect& rect)
@@ -2551,8 +2562,13 @@ void Graphics::PrepareDraw()
 
     if (rasterizerStateDirty_)
     {
+        unsigned depthBits = 24;
+        if (depthStencil_ && depthStencil_->GetParentTexture()->GetFormat() == DXGI_FORMAT_R16_TYPELESS)
+            depthBits = 16;
+        int scaledDepthBias = (int)(constantDepthBias_ * (1 << depthBits));
+
         unsigned newRasterizerStateHash = (scissorTest_ ? 1 : 0) | (fillMode_ << 1) | (cullMode_ << 3) |
-            ((*((unsigned*)&constantDepthBias_) & 0x1fff) << 5) | ((*((unsigned*)&slopeScaledDepthBias_) & 0x1fff) << 18);
+            ((scaledDepthBias & 0x1fff) << 5) | ((*((unsigned*)&slopeScaledDepthBias_) & 0x1fff) << 18);
         if (newRasterizerStateHash != rasterizerStateHash_)
         {
             HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Find(newRasterizerStateHash);
@@ -2565,7 +2581,7 @@ void Graphics::PrepareDraw()
                 stateDesc.FillMode = d3dFillMode[fillMode_];
                 stateDesc.CullMode = d3dCullMode[cullMode_];
                 stateDesc.FrontCounterClockwise = FALSE;
-                stateDesc.DepthBias = (int)(16777216.0f * constantDepthBias_); /// \todo Verify that bias is same as on D3D9
+                stateDesc.DepthBias = scaledDepthBias;
                 stateDesc.DepthBiasClamp = M_INFINITY;
                 stateDesc.SlopeScaledDepthBias = slopeScaledDepthBias_;
                 stateDesc.DepthClipEnable = TRUE;

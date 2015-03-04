@@ -51,6 +51,8 @@ public:
     void SetFilterMode(TextureFilterMode filter);
     /// Set addressing mode by texture coordinate.
     void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
+    /// Set shadow compare mode.
+    void SetShadowCompare(bool enable);
     /// Set border color for border addressing mode.
     void SetBorderColor(const Color& color);
     /// Set sRGB sampling and writing mode.
@@ -76,6 +78,8 @@ public:
     TextureFilterMode GetFilterMode() const { return filterMode_; }
     /// Return addressing mode by texture coordinate.
     TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressMode_[coord]; }
+    /// Return whether shadow compare is enabled.
+    bool GetShadowCompare() const { return shadowCompare_; }
     /// Return border color.
     const Color& GetBorderColor() const { return borderColor_; }
     /// Return whether is using sRGB sampling and writing.
@@ -141,6 +145,8 @@ protected:
     int height_;
     /// Texture depth.
     int depth_;
+    /// Shadow compare mode.
+    bool shadowCompare_;
     /// Filtering mode.
     TextureFilterMode filterMode_;
     /// Addressing mode.

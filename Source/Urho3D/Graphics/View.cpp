@@ -2918,6 +2918,8 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         {
             multiplier = Max(queue.shadowSplits_[i].shadowCamera_->GetFarClip() / queue.shadowSplits_[0].shadowCamera_->GetFarClip(), 1.0f);
             multiplier = 1.0f + (multiplier - 1.0f) * queue.light_->GetShadowCascade().biasAutoAdjust_;
+            // Quantize multiplier to prevent creation of too many rasterizer states on D3D11
+            multiplier = (int)(multiplier * 10.0f) / 10.0f;
         }
         
         // Perform further modification of depth bias on OpenGL ES, as shadow calculations' precision is limited

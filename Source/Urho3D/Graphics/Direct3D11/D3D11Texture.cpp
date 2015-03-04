@@ -60,7 +60,11 @@ static const D3D11_FILTER d3dFilterMode[] =
     D3D11_FILTER_MIN_MAG_MIP_POINT,
     D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT,
     D3D11_FILTER_MIN_MAG_MIP_LINEAR,
-    D3D11_FILTER_ANISOTROPIC
+    D3D11_FILTER_ANISOTROPIC,
+    D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT,
+    D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT,
+    D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR,
+    D3D11_FILTER_COMPARISON_ANISOTROPIC
 };
 
 static const D3D11_TEXTURE_ADDRESS_MODE d3dAddressMode[] = 
@@ -83,6 +87,7 @@ Texture::Texture(Context* context) :
     width_(0),
     height_(0),
     depth_(0),
+    shadowCompare_(false),
     filterMode_(FILTER_DEFAULT),
     sRGB_(false),
     parametersDirty_(true)
@@ -114,6 +119,12 @@ void Texture::SetFilterMode(TextureFilterMode mode)
 void Texture::SetAddressMode(TextureCoordinate coord, TextureAddressMode mode)
 {
     addressMode_[coord] = mode;
+    parametersDirty_ = true;
+}
+
+void Texture::SetShadowCompare(bool enable)
+{
+    shadowCompare_ = enable;
     parametersDirty_ = true;
 }
 
@@ -314,7 +325,10 @@ void Texture::UpdateParameters()
 
     D3D11_SAMPLER_DESC samplerDesc;
     memset(&samplerDesc, 0, sizeof samplerDesc);
-    samplerDesc.Filter = d3dFilterMode[filterMode_ != FILTER_DEFAULT ? filterMode_ : graphics_->GetDefaultTextureFilterMode()];
+    unsigned filterModeIndex = filterMode_ != FILTER_DEFAULT ? filterMode_ : graphics_->GetDefaultTextureFilterMode();
+    if (shadowCompare_)
+        filterModeIndex += 4;
+    samplerDesc.Filter = d3dFilterMode[filterModeIndex];
     samplerDesc.AddressU = d3dAddressMode[addressMode_[0]];
     samplerDesc.AddressV = d3dAddressMode[addressMode_[1]];
     samplerDesc.AddressW = d3dAddressMode[addressMode_[2]];

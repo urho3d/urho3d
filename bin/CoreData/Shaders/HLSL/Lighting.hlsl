@@ -133,19 +133,27 @@ float GetIntensity(float3 color)
 
 float GetShadow(float4 shadowPos)
 {
+    #ifdef D3D11
+        shadowPos.xyz /= shadowPos.w;
+    #endif
+
     #ifndef LQSHADOW
         // Take four samples and average them
         // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
-        #ifndef POINTLIGHT
+        #if !defined(POINTLIGHT) && !defined(D3D11)
             float2 offsets = cShadowMapInvSize * shadowPos.w;
         #else
             float2 offsets = cShadowMapInvSize;
         #endif
+        float4 shadowPos2 = float4(shadowPos.x + offsets.x, shadowPos.yzw);
+        float4 shadowPos3 = float4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw);
+        float4 shadowPos4 = float4(shadowPos.xy + offsets.xy, shadowPos.zw);
+
         float4 inLight = float4(
-            tex2Dproj(sShadowMap, shadowPos).r,
-            tex2Dproj(sShadowMap, float4(shadowPos.x + offsets.x, shadowPos.yzw)).r,
-            tex2Dproj(sShadowMap, float4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r,
-            tex2Dproj(sShadowMap, float4(shadowPos.xy + offsets.xy, shadowPos.zw)).r
+            SampleShadow(ShadowMap, shadowPos).r,
+            SampleShadow(ShadowMap, shadowPos2).r,
+            SampleShadow(ShadowMap, shadowPos3).r,
+            SampleShadow(ShadowMap, shadowPos4).r
         );
         #ifndef SHADOWCMP
             return cShadowIntensity.y + dot(inLight, cShadowIntensity.x);
@@ -158,7 +166,7 @@ float GetShadow(float4 shadowPos)
         #endif
     #else
         // Take one sample
-        float inLight = tex2Dproj(sShadowMap, shadowPos).r;
+        float inLight = SampleShadow(ShadowMap, shadowPos).r;
         #ifndef SHADOWCMP
             return cShadowIntensity.y + cShadowIntensity.x * inLight;
         #else
@@ -174,7 +182,7 @@ float GetShadow(float4 shadowPos)
 #ifdef POINTLIGHT
 float GetPointShadow(float3 lightVec)
 {
-    float3 axis = texCUBE(sFaceSelectCubeMap, lightVec).rgb;
+    float3 axis = SampleCube(FaceSelectCubeMap, lightVec).rgb;
     float depth = abs(dot(lightVec, axis));
 
     // Expand the maximum component of the light vector to get full 0.0 - 1.0 UV range from the cube map,
@@ -184,7 +192,7 @@ float GetPointShadow(float3 lightVec)
     lightVec += factor * axis * lightVec;
 
     // Read the 2D UV coordinates, adjust according to shadow map size and add face offset
-    float4 indirectPos = texCUBE(sIndirectionCubeMap, lightVec);
+    float4 indirectPos = SampleCube(IndirectionCubeMap, lightVec);
     indirectPos.xy *= cShadowCubeAdjust.xy;
     indirectPos.xy += float2(cShadowCubeAdjust.z + indirectPos.z * 0.5, cShadowCubeAdjust.w + indirectPos.w);
 
