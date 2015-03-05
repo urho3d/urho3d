@@ -293,7 +293,7 @@ void Sound::SetLoop(unsigned repeatOffset, unsigned endOffset)
 
 void Sound::FixInterpolation()
 {
-    if (!data_)
+    if (!data_ || compressed_)
         return;
     
     // If looped, copy loop start to loop end. If oneshot, insert silence to end
