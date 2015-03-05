@@ -195,7 +195,7 @@ task :ci_site_update do
   unless release == 'HEAD'
     system "mkdir -p ../doc-Build/documentation/#{release}" or abort 'Failed to create directory for new document version'
     system "ruby -i -pe 'gsub(/HEAD/, %q{#{release}})' ../Build/Docs/minimal-header.html" or abort 'Failed to update document version in YAML Front Matter block'
-    append_new_release release, '../doc-Build/_data/urho3d.json' or abort 'Failed to add new release to document data file'
+    append_new_release release or abort 'Failed to add new release to document data file'
   end
   # Generate and sync doxygen pages
   system "cd ../Build && make -j$NUMJOBS doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' Docs/html/_*.html && rsync -a --delete Docs/html/ ../doc-Build/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
@@ -216,6 +216,19 @@ task :ci_site_update do
     end
     system 'git push origin HEAD:master -q >/dev/null 2>&1' or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
   end
+end
+
+# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake ci_emscripten_samples_update)
+desc 'Update Emscripten HTML5 samples to GitHub Pages'
+task :ci_emscripten_samples_update do
+  # Pull or clone
+  system 'cd ../doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../doc-Build' or abort 'Failed to pull/clone'
+  # Update Emscripten json data file
+  update_emscripten_data or abort 'Failed to update Emscripten json data file'
+  # Sync Emscripten samples
+  system "rsync -a --delete --exclude tool ../Build/bin/ ../doc-Build/samples" or abort 'Failed to rsync Emscripten samples'
+  # Supply GIT credentials and push the changes to urho3d/urho3d.github.io.git
+  system "cd ../doc-Build && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m \"Travis CI: Emscripten samples update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update Emscripten samples'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=... rake ci_rebase)
@@ -542,7 +555,7 @@ def xcode_ci
   xcode_build(ENV['IOS'], '../Build/generated/UsingSDK/Scaffolding.xcodeproj') or abort 'Failed to build/test temporary project using Urho3D as external library'
 end
 
-def xcode_build(ios, project, target = 'ALL_BUILD', extras = '')
+def xcode_build ios, project, target = 'ALL_BUILD', extras = ''
   sdk = ios.to_i == 1 ? '-sdk iphonesimulator' : ''
   # Use xcpretty to filter output from xcodebuild when building
   system "xcodebuild -project #{project} -target #{target} -configuration #{$configuration} #{sdk} |xcpretty -c #{extras} && exit ${PIPESTATUS[0]}" or return nil
@@ -553,15 +566,24 @@ def xcode_build(ios, project, target = 'ALL_BUILD', extras = '')
   return 0
 end
 
-def append_new_release release, filename
+def append_new_release release, filename = '../doc-Build/_data/urho3d.json'
   begin
     urho3d_hash = JSON.parse File.read filename
     unless urho3d_hash['releases'].last == release
       urho3d_hash['releases'] << release
     end
-    File.open filename, 'w' do |file|
-      file.puts urho3d_hash.to_json
-    end
+    File.open(filename, 'w') { |file| file.puts urho3d_hash.to_json }
+    return 0
+  rescue
+    nil
+  end
+end
+
+def update_emscripten_data dir = '../doc-Build/samples', filename = '../doc-Build/_data/emscripten.json'
+  begin
+    emscripten_hash = JSON.parse File.read filename
+    Dir.chdir(dir) { emscripten_hash['samples'] = Dir['*.html'].sort }
+    File.open(filename, 'w') { |file| file.puts emscripten_hash.to_json }
     return 0
   rescue
     nil
@@ -572,9 +594,7 @@ def bump_soversion filename
   begin
     version = File.read(filename).split '.'
     bump_version version, 2
-    File.open filename, 'w' do |file|
-      file.puts version.join '.'
-    end
+    File.open(filename, 'w') { |file| file.puts version.join '.' }
     return 0
   rescue
     nil

@@ -900,18 +900,9 @@ macro (setup_main_executable)
             get_filename_component (NAME ${DIR} NAME)
             set (RESOURCE_${DIR}_PATHNAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${NAME}.pak)
             list (APPEND RESOURCE_PAKS ${RESOURCE_${DIR}_PATHNAME})
-            if (EMSCRIPTEN)
-                if (EMSCRIPTEN_SHARE_DATA)
-                    # Set the custom EMCC_OPTION property to peload the generated shared data
-                    if (NOT SHARED_RESOURCE_JS)   # Only need once
-                        set (SHARED_RESOURCE_JS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.js)
-                        list (APPEND SOURCE_FILES ${SHARED_RESOURCE_JS})
-                        set_source_files_properties (${SHARED_RESOURCE_JS} PROPERTIES GENERATED TRUE EMCC_OPTION pre-js)
-                    endif ()
-                else ()
-                    # Set the custom EMCC_OPTION property to preload the *.pak individually
-                    set_source_files_properties (${RESOURCE_${DIR}_PATHNAME} PROPERTIES EMCC_OPTION preload-file EMCC_FILE_ALIAS @/${NAME}.pak)
-                endif ()
+            if (EMSCRIPTEN AND NOT EMSCRIPTEN_SHARE_DATA)
+                # Set the custom EMCC_OPTION property to preload the *.pak individually
+                set_source_files_properties (${RESOURCE_${DIR}_PATHNAME} PROPERTIES EMCC_OPTION preload-file EMCC_FILE_ALIAS "@/${NAME}.pak --use-preload-cache")
             endif ()
         endforeach ()
         # Urho3D project builds the PackageTool as required; external project uses PackageTool found in the Urho3D build tree or Urho3D SDK
@@ -922,8 +913,29 @@ macro (setup_main_executable)
             set (PACKAGING_DEP DEPENDS PackageTool)
         endif ()
         set (PACKAGING_COMMENT " and packaging")
-        # The *.pak will be generated during build time, suppress error during CMake configuration/generation time
         set_property (SOURCE ${RESOURCE_PAKS} PROPERTY GENERATED TRUE)
+        if (EMSCRIPTEN)
+            # Check if shell-file is already added in source files list
+            foreach (FILE ${SOURCE_FILES})
+                get_property (EMCC_OPTION SOURCE ${FILE} PROPERTY EMCC_OPTION)
+                if (EMCC_OPTION STREQUAL shell-file)
+                    set (SHELL_HTML_FOUND TRUE)
+                    break ()
+                endif ()
+            endforeach ()
+            if (NOT SHELL_HTML_FOUND)
+                # Use custom Urho3D shell.html
+                set (SHELL_HTML ${CMAKE_BINARY_DIR}/Source/shell.html)
+                list (APPEND SOURCE_FILES ${SHELL_HTML})
+                set_source_files_properties (${SHELL_HTML} PROPERTIES EMCC_OPTION shell-file)
+            endif ()
+            # Set the custom EMCC_OPTION property to peload the generated shared data file
+            if (EMSCRIPTEN_SHARE_DATA)
+                set (SHARED_RESOURCE_JS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.js)
+                list (APPEND SOURCE_FILES ${SHARED_RESOURCE_JS} ${SHARED_RESOURCE_JS}.data)
+                set_source_files_properties (${SHARED_RESOURCE_JS} PROPERTIES GENERATED TRUE EMCC_OPTION pre-js)
+            endif ()
+        endif ()
     endif ()
     if (XCODE)
         if (NOT RESOURCE_FILES)
@@ -1050,18 +1062,18 @@ macro (setup_main_executable)
         add_dependencies (${TARGET_NAME} ${RESOURCE_CHECK_${MD5ALL}})
     endif ()
 
-    # Define a custom command for generating a shared data files (if enabled)
+    # Define a custom command for generating a shared data file (if enabled)
     if (EMSCRIPTEN_SHARE_DATA AND RESOURCE_PAKS)
         # When sharing a single data file, all main targets are assumed to use a same set of resource paks
         foreach (FILE ${RESOURCE_PAKS})
             get_filename_component (NAME ${FILE} NAME)
             list (APPEND PAK_NAMES ${NAME})
         endforeach ()
-        add_custom_command (OUTPUT ${SHARED_RESOURCE_JS}
-            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS}.new --use-preload-cache && ${CMAKE_COMMAND} -E copy_if_different ${SHARED_RESOURCE_JS}.new ${SHARED_RESOURCE_JS} && ${CMAKE_COMMAND} -E remove ${SHARED_RESOURCE_JS}.new
+        add_custom_command (OUTPUT ${SHARED_RESOURCE_JS}.data
+            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache
             DEPENDS RESOURCE_CHECK ${RESOURCE_PAKS}
             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-            COMMENT "Creating shared data files")
+            COMMENT "Generating shared data file")
     endif ()
 endmacro ()
 
@@ -1334,7 +1346,7 @@ macro (install_header_files)
     endif ()
 endmacro ()
 
-# Set common project structure for Android platform
+# Set common project structure for some platforms
 if (ANDROID)
     # Enable Android ndk-gdb
     if (ANDROID_NDK_GDB)
@@ -1366,6 +1378,14 @@ if (ANDROID)
             create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
         endif ()
     endforeach ()
+elseif (EMSCRIPTEN)
+    # Create Urho3D custom HTML shell that also embeds our own project logo
+    if (NOT EXISTS ${CMAKE_BINARY_DIR}/Source/shell.html)
+        file (READ ${EMSCRIPTEN_ROOT_PATH}/src/shell.html SHELL_HTML)
+        string (REPLACE "<!doctype html>" "<!-- This is a generated file. DO NOT EDIT!-->\n\n<!doctype html>" SHELL_HTML "${SHELL_HTML}")     # Stringify to preserve semicolons
+        string (REPLACE "<body>" "<body>\n\n<a href=\"http://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"http://urho3d.github.io/assets/images/logo.png\" alt=\"link to http://urho3d.github.io\" height=\"80\" width=\"320\" /></a>\n" SHELL_HTML "${SHELL_HTML}")
+        file (WRITE ${CMAKE_BINARY_DIR}/Source/shell.html "${SHELL_HTML}")
+    endif ()
 endif ()
 
 # Post-CMake fixes
