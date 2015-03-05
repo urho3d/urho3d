@@ -122,7 +122,11 @@ public:
     static SharedArrayPtr<unsigned char> ConvertRGBToRGBA(int width, int height, const unsigned char* data);
     /// Check maximum allowed mip levels for a specific texture size.
     static unsigned CheckMaxLevels(int width, int height, unsigned requestedLevels);
-    
+    /// Return the shader resource view format corresponding to a texture format. Handles conversion of typeless depth texture formats.
+    static unsigned GetSRVFormat(unsigned format);
+    /// Return the depth-stencil view format corresponding to a texture format. Handles conversion of typeless depth texture formats.
+    static unsigned GetDSVFormat(unsigned format);
+
 protected:
     /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references.
     void CheckTextureBudget(StringHash type);

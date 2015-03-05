@@ -383,6 +383,30 @@ unsigned Texture::CheckMaxLevels(int width, int height, unsigned requestedLevels
         return requestedLevels;
 }
 
+unsigned Texture::GetSRVFormat(unsigned format)
+{
+    if (format == DXGI_FORMAT_R24G8_TYPELESS)
+        return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+    else if (format == DXGI_FORMAT_R16_TYPELESS)
+        return DXGI_FORMAT_R16_UNORM;
+    else if (format == DXGI_FORMAT_R32_TYPELESS)
+        return DXGI_FORMAT_R32_FLOAT;
+    else
+        return format;
+}
+
+unsigned Texture::GetDSVFormat(unsigned format)
+{
+    if (format == DXGI_FORMAT_R24G8_TYPELESS)
+        return DXGI_FORMAT_D24_UNORM_S8_UINT;
+    else if (format == DXGI_FORMAT_R16_TYPELESS)
+        return DXGI_FORMAT_D16_UNORM;
+    else if (format == DXGI_FORMAT_R32_TYPELESS)
+        return DXGI_FORMAT_D32_FLOAT;
+    else
+        return format;
+}
+
 void Texture::CheckTextureBudget(StringHash type)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();

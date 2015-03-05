@@ -444,20 +444,9 @@ bool Texture2D::Create()
 
     D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDesc;
     memset(&resourceViewDesc, 0, sizeof resourceViewDesc);
-    if (usage_ != TEXTURE_DEPTHSTENCIL)
-        resourceViewDesc.Format = textureDesc.Format;
-    else
-    {
-        if (textureDesc.Format == DXGI_FORMAT_R24G8_TYPELESS)
-            resourceViewDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-        else if (textureDesc.Format == DXGI_FORMAT_R16_TYPELESS)
-            resourceViewDesc.Format = DXGI_FORMAT_R16_UNORM;
-        else if (textureDesc.Format == DXGI_FORMAT_R32_TYPELESS)
-            resourceViewDesc.Format = DXGI_FORMAT_R32_FLOAT;
-    }
+    resourceViewDesc.Format = (DXGI_FORMAT)GetSRVFormat(textureDesc.Format);
     resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     resourceViewDesc.Texture2D.MipLevels = (unsigned)levels_;
-    resourceViewDesc.Texture2D.MostDetailedMip = 0;
 
     graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &resourceViewDesc,
         (ID3D11ShaderResourceView**)&shaderResourceView_);
@@ -491,12 +480,7 @@ bool Texture2D::Create()
 
         D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
         memset(&depthStencilViewDesc, 0, sizeof depthStencilViewDesc);
-        if (textureDesc.Format == DXGI_FORMAT_R24G8_TYPELESS)
-            depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        else if (textureDesc.Format == DXGI_FORMAT_R16_TYPELESS)
-            depthStencilViewDesc.Format = DXGI_FORMAT_D16_UNORM;
-        else if (textureDesc.Format == DXGI_FORMAT_R32_TYPELESS)
-            depthStencilViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+        depthStencilViewDesc.Format = (DXGI_FORMAT)GetDSVFormat(textureDesc.Format);
         depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
         graphics_->GetImpl()->GetDevice()->CreateDepthStencilView((ID3D11Resource*)object_, &depthStencilViewDesc,

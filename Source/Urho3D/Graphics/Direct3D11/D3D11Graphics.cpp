@@ -2432,11 +2432,7 @@ void Graphics::PrepareDraw()
 
     if (texturesDirty_ && firstDirtyTexture_ < MAX_TEXTURE_UNITS)
     {
-        // Set same textures for both vertex & pixel shaders
-        impl_->deviceContext_->VSSetShaderResources(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
-            &impl_->shaderResourceViews_[firstDirtyTexture_]);
-        impl_->deviceContext_->VSSetSamplers(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
-            &impl_->samplers_[firstDirtyTexture_]);
+        /// \todo Research how to best implement vertex texture fetch in an unified way between D3D9, D3D11 and OpenGL. For now only set PS textures to save API calls
         impl_->deviceContext_->PSSetShaderResources(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
             &impl_->shaderResourceViews_[firstDirtyTexture_]);
         impl_->deviceContext_->PSSetSamplers(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,

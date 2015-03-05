@@ -263,7 +263,7 @@ void PS(
             // Add light pre-pass accumulation result
             // Lights are accumulated at half intensity. Bring back to full intensity now
             float4 lightInput = 2.0 * Sample2DProj(LightBuffer, iScreenPos);
-            float3 lightSpecColor = lightInput.a * (lightInput.rgb / GetIntensity(lightInput.rgb));
+            float3 lightSpecColor = lightInput.a * lightInput.rgb / max(GetIntensity(lightInput.rgb), 0.001);
 
             finalColor += lightInput.rgb * diffColor.rgb + lightSpecColor * specColor;
         #endif

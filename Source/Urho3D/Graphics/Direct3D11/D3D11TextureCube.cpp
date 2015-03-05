@@ -330,12 +330,6 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         return false;
     }
     
-    if (IsCompressed())
-    {
-        x &= ~3;
-        y &= ~3;
-    }
-    
     int levelWidth = GetLevelWidth(level);
     int levelHeight = GetLevelHeight(level);
     if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || width <= 0 || height <= 0)
@@ -343,17 +337,62 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         LOGERROR("Illegal dimensions for setting data");
         return false;
     }
-    
+
+    // If compressed, align the update region on a block
     if (IsCompressed())
     {
-        height = (height + 3) >> 2;
-        y >>= 2;
+        x &= ~3;
+        y &= ~3;
+        width += 3;
+        width &= 0xfffffffc;
+        height += 3;
+        height &= 0xfffffffc;
     }
-    
+
     unsigned char* src = (unsigned char*)data;
     unsigned rowSize = GetRowDataSize(width);
-    
-    /// \todo Implement
+    unsigned rowStart = GetRowDataSize(x);
+    unsigned subResource = D3D11CalcSubresource((unsigned)level, (unsigned)face, (unsigned)levels_);
+
+    if (usage_ == TEXTURE_DYNAMIC)
+    {
+        if (IsCompressed())
+        {
+            height = (height + 3) >> 2;
+            y >>= 2;
+        }
+
+        D3D11_MAPPED_SUBRESOURCE mappedData;
+        mappedData.pData = 0;
+
+        graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
+            &mappedData);
+        if (mappedData.pData)
+        {
+            for (int row = 0; row < height; ++row)
+                memcpy((unsigned char*)mappedData.pData + (row + y) * mappedData.RowPitch + rowStart, src + row * rowSize, rowSize);
+            graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_, subResource);
+        }
+        else
+        {
+            LOGERROR("Failed to map texture for update");
+            return false;
+        }
+    }
+    else
+    {
+        D3D11_BOX destBox;
+        destBox.left = x;
+        destBox.right = x + width;
+        destBox.top = y;
+        destBox.bottom = y + height;
+        destBox.front = 0;
+        destBox.back = 1;
+
+        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)object_, subResource, &destBox, data,
+            rowSize, 0);
+    }
+
     return true;
 }
 
@@ -447,6 +486,14 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
         
         for (unsigned i = 0; i < levels_; ++i)
         {
+            // D3D11 needs RGB data as 4-component
+            SharedArrayPtr<unsigned char> convertedData;
+            if (components == 3)
+            {
+                convertedData = ConvertRGBToRGBA(levelWidth, levelHeight, levelData);
+                levelData = convertedData;
+            }
+
             SetData(face, i, 0, 0, levelWidth, levelHeight, levelData);
             memoryUse += levelWidth * levelHeight * components;
             
@@ -582,7 +629,71 @@ bool TextureCube::Create()
     if (!graphics_ || !width_ || !height_)
         return false;
     
-    /// \todo Implement
+    levels_ = CheckMaxLevels(width_, height_, requestedLevels_);
+
+    D3D11_TEXTURE2D_DESC textureDesc;
+    memset(&textureDesc, 0, sizeof textureDesc);
+    textureDesc.Width = width_;
+    textureDesc.Height = height_;
+    textureDesc.MipLevels = levels_;
+    textureDesc.ArraySize = MAX_CUBEMAP_FACES;
+    textureDesc.Format = (DXGI_FORMAT)format_;
+    textureDesc.SampleDesc.Count = 1;
+    textureDesc.SampleDesc.Quality = 0;
+    textureDesc.Usage = usage_ == TEXTURE_DYNAMIC ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
+    textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    if (usage_ == TEXTURE_RENDERTARGET)
+        textureDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+    else if (usage_ == TEXTURE_DEPTHSTENCIL)
+        textureDesc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
+    textureDesc.CPUAccessFlags = usage_ == TEXTURE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
+    textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
+
+    graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&object_);
+    if (!object_)
+    {
+        LOGERROR("Failed to create texture");
+        return false;
+    }
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDesc;
+    memset(&resourceViewDesc, 0, sizeof resourceViewDesc);
+    resourceViewDesc.Format = (DXGI_FORMAT)GetSRVFormat(textureDesc.Format);
+    resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+    resourceViewDesc.Texture2D.MipLevels = (unsigned)levels_;
+
+    graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &resourceViewDesc,
+        (ID3D11ShaderResourceView**)&shaderResourceView_);
+    if (!shaderResourceView_)
+    {
+        LOGERROR("Failed to create shader resource view for texture");
+        return false;
+    }
+
+    if (usage_ == TEXTURE_RENDERTARGET)
+    {
+        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+        {
+            renderSurfaces_[i] = new RenderSurface(this);
+
+            D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+            memset(&renderTargetViewDesc, 0, sizeof renderTargetViewDesc);
+            renderTargetViewDesc.Format = textureDesc.Format;
+            renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+            renderTargetViewDesc.Texture2DArray.ArraySize = 1;
+            renderTargetViewDesc.Texture2DArray.FirstArraySlice = i;
+            renderTargetViewDesc.Texture2DArray.MipSlice = 0;
+
+            graphics_->GetImpl()->GetDevice()->CreateRenderTargetView((ID3D11Resource*)object_, &renderTargetViewDesc,
+                (ID3D11RenderTargetView**)&renderSurfaces_[i]->renderTargetView_);
+
+            if (!renderSurfaces_[i]->renderTargetView_)
+            {
+                LOGERROR("Failed to create rendertarget view for texture");
+                return false;
+            }
+        }
+    }
 
     return true;
 }
