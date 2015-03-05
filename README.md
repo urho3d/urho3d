@@ -99,7 +99,7 @@ Urho3D uses the following third-party libraries:
 - LZ4 (http://code.google.com/p/lz4/)
 - MojoShader (http://icculus.org/mojoshader/)
 - Open Asset Import Library (http://assimp.sourceforge.net/)
-- pugixml 1.0 (http://pugixml.org/)
+- pugixml 1.5 (http://pugixml.org/)
 - rapidjson 0.11 (https://code.google.com/p/rapidjson/)
 - Recast/Detour (https://github.com/memononen/recastnavigation/)
 - SDL 2.0.3 (http://www.libsdl.org/)

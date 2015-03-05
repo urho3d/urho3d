@@ -412,15 +412,17 @@ def makefile_ci
   end
   test = $testing == 1 ? '&& make test' : ''
   system "cd ../Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
-  # Create a new project on the fly that uses newly built Urho3D library in the build tree
-  scaffolding "../Build/generated/UsingBuildTree"
-  system "cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_generic.sh . #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
-  ENV['DESTDIR'] = ENV['HOME'] || Dir.home
-  puts "\nInstalling Urho3D SDK to #{ENV['DESTDIR']}/usr/local...\n"  # The default CMAKE_INSTALL_PREFIX is /usr/local
-  system 'cd ../Build && make -j$NUMJOBS install >/dev/null' or abort 'Failed to install Urho3D SDK'
-  # Create a new project on the fly that uses newly installed Urho3D SDK
-  scaffolding "../Build/generated/UsingSDK"
-  system "export URHO3D_HOME=~/usr/local && cd ../Build/generated/UsingSDK && echo '\nExternal project referencing Urho3D SDK' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
+  unless ENV['CI'] && ENV['EMSCRIPTEN'] && ENV['PACKAGE_UPLOAD']   # Skip scaffolding test when packaging for Emscripten
+    # Create a new project on the fly that uses newly built Urho3D library in the build tree
+    scaffolding "../Build/generated/UsingBuildTree"
+    system "cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_generic.sh . #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
+    ENV['DESTDIR'] = ENV['HOME'] || Dir.home
+    puts "\nInstalling Urho3D SDK to #{ENV['DESTDIR']}/usr/local...\n"  # The default CMAKE_INSTALL_PREFIX is /usr/local
+    system 'cd ../Build && make -j$NUMJOBS install >/dev/null' or abort 'Failed to install Urho3D SDK'
+    # Create a new project on the fly that uses newly installed Urho3D SDK
+    scaffolding "../Build/generated/UsingSDK"
+    system "export URHO3D_HOME=~/usr/local && cd ../Build/generated/UsingSDK && echo '\nExternal project referencing Urho3D SDK' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
+  end
   # Make, deploy, and test run Android APK in an Android (virtual) device
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']
     system "echo '\nTest deploying and running Urho3D Samples APK...' && cd ../Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
@@ -543,16 +545,18 @@ def xcode_ci
   end
   system "./cmake_macosx.sh ../Build -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
   xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj') or abort 'Failed to build or test Urho3D library'
-  # Create a new project on the fly that uses newly built Urho3D library in the build tree
-  scaffolding "../Build/generated/UsingBuildTree"
-  system "cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_macosx.sh . -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
-  xcode_build(ENV['IOS'], '../Build/generated/UsingBuildTree/Scaffolding.xcodeproj') or abort 'Failed to build/test temporary project using Urho3D as external library'
-  ENV['DESTDIR'] = ENV['HOME'] || Dir.home
-  wait_for_block("\nInstalling Urho3D SDK to #{ENV['DESTDIR']}/usr/local...") { Thread.current[:exit_code] = xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj', 'install', '>/dev/null') } or abort 'Failed to install Urho3D SDK'
-  # Create a new project on the fly that uses newly installed Urho3D SDK
-  scaffolding "../Build/generated/UsingSDK"
-  system "export URHO3D_HOME=~/usr/local && cd ../Build/generated/UsingSDK && echo '\nExternal project referencing Urho3D SDK' && ./cmake_macosx.sh . -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
-  xcode_build(ENV['IOS'], '../Build/generated/UsingSDK/Scaffolding.xcodeproj') or abort 'Failed to build/test temporary project using Urho3D as external library'
+  unless ENV['CI'] && ENV['IOS'] && ENV['PACKAGE_UPLOAD']   # Skip scaffolding test when packaging for iOS
+    # Create a new project on the fly that uses newly built Urho3D library in the build tree
+    scaffolding "../Build/generated/UsingBuildTree"
+    system "cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_macosx.sh . -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
+    xcode_build(ENV['IOS'], '../Build/generated/UsingBuildTree/Scaffolding.xcodeproj') or abort 'Failed to build/test temporary project using Urho3D as external library'
+    ENV['DESTDIR'] = ENV['HOME'] || Dir.home
+    wait_for_block("\nInstalling Urho3D SDK to #{ENV['DESTDIR']}/usr/local...") { Thread.current[:exit_code] = xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj', 'install', '>/dev/null') } or abort 'Failed to install Urho3D SDK'
+    # Create a new project on the fly that uses newly installed Urho3D SDK
+    scaffolding "../Build/generated/UsingSDK"
+    system "export URHO3D_HOME=~/usr/local && cd ../Build/generated/UsingSDK && echo '\nExternal project referencing Urho3D SDK' && ./cmake_macosx.sh . -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
+    xcode_build(ENV['IOS'], '../Build/generated/UsingSDK/Scaffolding.xcodeproj') or abort 'Failed to build/test temporary project using Urho3D as external library'
+  end
 end
 
 def xcode_build ios, project, target = 'ALL_BUILD', extras = ''
