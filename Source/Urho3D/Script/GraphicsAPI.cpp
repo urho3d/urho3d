@@ -301,7 +301,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("RenderTargetInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructRenderTargetInfo), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("RenderTargetInfo", asBEHAVE_CONSTRUCT, "void f(const RenderTargetInfo&in)", asFUNCTION(ConstructRenderTargetInfoCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("RenderTargetInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructRenderTargetInfo), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("RenderTargetInfo", "RenderTargetInfo& opAssign(const RenderTargetInfo&in)", asMETHOD(RenderTargetInfo, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderTargetInfo", "RenderTargetInfo& opAssign(const RenderTargetInfo&in)", asMETHODPR(RenderTargetInfo, operator =, (const RenderTargetInfo&), RenderTargetInfo&), asCALL_THISCALL);
     engine->RegisterObjectProperty("RenderTargetInfo", "String name", offsetof(RenderTargetInfo, name_));
     engine->RegisterObjectProperty("RenderTargetInfo", "String tag", offsetof(RenderTargetInfo, tag_));
     engine->RegisterObjectProperty("RenderTargetInfo", "uint format", offsetof(RenderTargetInfo, format_));
@@ -317,7 +317,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("RenderPathCommand", asBEHAVE_CONSTRUCT, "void f(const RenderPathCommand&in)", asFUNCTION(ConstructRenderPathCommandCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("RenderPathCommand", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructRenderPathCommand), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("RenderPathCommand", "void RemoveShaderParameter(const String&in)", asMETHOD(RenderPathCommand, RemoveShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPathCommand", "RenderPathCommand& opAssign(const RenderPathCommand&in)", asMETHOD(RenderPathCommand, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "RenderPathCommand& opAssign(const RenderPathCommand&in)", asMETHODPR(RenderPathCommand, operator =, (const RenderPathCommand&), RenderPathCommand&), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "void set_textureNames(TextureUnit, const String&in)", asMETHOD(RenderPathCommand, SetTextureName), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "const String& get_textureNames(TextureUnit) const", asMETHOD(RenderPathCommand, GetTextureName), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "void set_shaderParameters(const String&in, const Variant&in)", asMETHOD(RenderPathCommand, SetShaderParameter), asCALL_THISCALL);
