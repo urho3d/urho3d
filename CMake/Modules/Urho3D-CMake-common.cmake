@@ -823,7 +823,7 @@ macro (setup_emscripten_linker_flags LINKER_FLAGS)
         set (${LINKER_FLAGS}_DEBUG -g4)     # Preserve LLVM debug information, show line number debug comments, and generate source maps
     endif ()
     if (URHO3D_TESTING)
-        set (${LINKER_FLAGS}_DEBUG --emrun) # Inject code into the generated Module object to enable capture of stdout, stderr and exit()
+        set (${LINKER_FLAGS} "${${LINKER_FLAGS}} --emrun")  # Inject code into the generated Module object to enable capture of stdout, stderr and exit()
     endif ()
     # Pass additional source files to linker with the supported flags, such as: js-library, pre-js, post-js, embed-file, preload-file, shell-file
     foreach (FILE ${SOURCE_FILES})
