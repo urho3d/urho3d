@@ -54,6 +54,10 @@
 #include "../Core/WorkQueue.h"
 #include "../Resource/XMLFile.h"
 
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+#endif
+
 #include "../DebugNew.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)
@@ -888,6 +892,9 @@ void Engine::DoExit()
         graphics->Close();
 
     exiting_ = true;
+    #ifdef EMSCRIPTEN
+    emscripten_force_exit(EXIT_SUCCESS);    // Some how this is required to signal emrun to stop
+    #endif
 }
 
 }

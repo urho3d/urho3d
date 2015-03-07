@@ -71,7 +71,7 @@ task :cmake do
     case option
     when 'cmake', 'generic'
       # do nothing
-    when 'clean', 'codeblocks', 'eclipse', 'macosx', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013'
+    when 'clean', 'codeblocks', 'eclipse', 'macosx', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013', 'vs2015'
       script = "cmake_#{option}" unless script == 'cmake_clean'
     when 'android', 'emscripten', 'ios', 'mingw', 'rpi'
       platform = option
@@ -100,7 +100,7 @@ task :make do
   ARGV.each { |option|
     task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
     case option
-    when 'codeblocks', 'eclipse', 'generic', 'macosx', 'make', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013'
+    when 'codeblocks', 'eclipse', 'generic', 'macosx', 'make', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013', 'vs2015'
       # do nothing
     when 'android', 'emscripten', 'ios', 'mingw', 'rpi'
       platform = option
@@ -169,7 +169,7 @@ task :ci do
   $build_options = "-DWIN32=#{ENV['WINDOWS']}" if ENV['WINDOWS']
   $build_options = "#{$build_options} -DANDROID_ABI=#{ENV['ABI']}" if ENV['ABI']
   $build_options = "#{$build_options} -DANDROID_NATIVE_API_LEVEL=#{ENV['API']}" if ENV['API']
-  ['URHO3D_64BIT', 'URHO3D_OPENGL', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA'].each { |var|
+  ['URHO3D_64BIT', 'URHO3D_OPENGL', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'URHO3D_TEST_TIMEOUT'].each { |var|
     $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var]
   }
   if ENV['XCODE']
@@ -373,10 +373,10 @@ setup_main_executable ()
 
 # Setup test cases
 if (URHO3D_ANGELSCRIPT)
-    add_test (NAME ExternalLibAS COMMAND ${TARGET_NAME} Scripts/12_PhysicsStressTest.as -w -timeout ${URHO3D_TEST_TIME_OUT})
+    setup_test (NAME ExternalLibAS OPTIONS Scripts/12_PhysicsStressTest.as -w)
 endif ()
 if (URHO3D_LUA)
-    add_test (NAME ExternalLibLua COMMAND ${TARGET_NAME} LuaScripts/12_PhysicsStressTest.lua -w -timeout ${URHO3D_TEST_TIME_OUT})
+    setup_test (NAME ExternalLibLua OPTIONS LuaScripts/12_PhysicsStressTest.lua -w)
 endif ()
 EOF
   # TODO: Rewrite in pure Ruby when it supports symlink creation on Windows platform

@@ -33,4 +33,4 @@ endif ()
 setup_main_executable ()
 
 # Setup test cases
-add_test (NAME ${TARGET_NAME} COMMAND ${TARGET_NAME} -timeout ${URHO3D_TEST_TIME_OUT})
+setup_test ()

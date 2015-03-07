@@ -31,12 +31,12 @@ setup_main_executable (NOBUNDLE)
 
 # Setup test cases
 if (URHO3D_ANGELSCRIPT)
-    add_test (NAME Editor COMMAND ${TARGET_NAME} Scripts/Editor.as -w -timeout ${URHO3D_TEST_TIME_OUT})
-    add_test (NAME NinjaSnowWar COMMAND ${TARGET_NAME} Scripts/NinjaSnowWar.as -w -timeout ${URHO3D_TEST_TIME_OUT})
-    add_test (NAME SpritesAS COMMAND ${TARGET_NAME} Scripts/03_Sprites.as -w -timeout ${URHO3D_TEST_TIME_OUT})
+    setup_test (NAME Editor OPTIONS Scripts/Editor.as -w)
+    setup_test (NAME NinjaSnowWar OPTIONS Scripts/NinjaSnowWar.as -w)
+    setup_test (NAME SpritesAS OPTIONS Scripts/03_Sprites.as -w)
 endif ()
 if (URHO3D_LUA)
-    add_test (NAME SpritesLua COMMAND ${TARGET_NAME} LuaScripts/03_Sprites.lua -w -timeout ${URHO3D_TEST_TIME_OUT})
+    setup_test (NAME SpritesLua OPTIONS LuaScripts/03_Sprites.lua -w)
 endif ()
 
 # Symlink/copy helper shell scripts or batch files to invoke Urho3DPlayer
