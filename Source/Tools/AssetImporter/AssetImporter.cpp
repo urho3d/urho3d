@@ -1367,7 +1367,10 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
     else
     {
         // If not saving as a prefab, associate the root node with the scene first to prevent unnecessary creation of a root
-        nodeMapping[rootNode_] = outScene;
+        // However do not do that if the root node does not have an identity matrix, or itself contains a model
+        // (models at the Urho scene root are not preferable)
+        if (ToMatrix3x4(rootNode_->mTransformation).Equals(Matrix3x4::IDENTITY) && !scene.nodes_.Contains(rootNode_))
+           nodeMapping[rootNode_] = outScene;
     }
 
     // If is allowed to export empty nodes, export the full Assimp node hierarchy first
