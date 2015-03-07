@@ -44,8 +44,7 @@ namespace Urho3D
 #endif
 void RunFrame(void* data)
 {
-    Engine* engine = reinterpret_cast<Engine*>(data);
-    engine->RunFrame();
+    static_cast<Engine*>(data)->RunFrame();
 }
 #endif
 

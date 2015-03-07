@@ -70,9 +70,9 @@ private:
 
 FontFaceFreeType::FontFaceFreeType(Font* font) :
 FontFace(font),
-    face_(0)
+    face_(0), 
+    loadMode_(FT_LOAD_DEFAULT)
 {
-
 }
 
 FontFaceFreeType::~FontFaceFreeType()
@@ -87,10 +87,12 @@ FontFaceFreeType::~FontFaceFreeType()
 bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize)
 {
     Context* context = font_->GetContext();
+
     // Create & initialize FreeType library if it does not exist yet
     FreeTypeLibrary* freeType = font_->GetSubsystem<FreeTypeLibrary>();
     if (!freeType)
         context->RegisterSubsystem(freeType = new FreeTypeLibrary(context));
+
     // Ensure the FreeType library is kept alive as long as TTF font resources exist
     freeType_ = freeType;
 
@@ -129,22 +131,25 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
 
     face_ = face;
 
-    FT_UInt glyphIndex;
-    unsigned numGlyphs = 0;
-    HashMap<unsigned, unsigned> indexToCharMapping;
+    unsigned numGlyphs = face->num_glyphs;
+    LOGDEBUGF("Font face %s (%dpt) has %d glyphs", GetFileName(font_->GetName()).CString(), pointSize, numGlyphs);
+    
+    PODVector<unsigned> charCodes(numGlyphs);
+    for (unsigned i = 0; i < numGlyphs; ++i)
+        charCodes[i] = 0;
 
+    FT_UInt glyphIndex;
     FT_ULong charCode = FT_Get_First_Char(face, &glyphIndex);
     while (glyphIndex != 0)
     {
-        numGlyphs = Max((int)glyphIndex + 1, (int)numGlyphs);
-        indexToCharMapping[glyphIndex] = charCode;
+        if (glyphIndex < numGlyphs)
+            charCodes[glyphIndex] = charCode;
+
         charCode = FT_Get_Next_Char(face, charCode, &glyphIndex);
     }
 
-    LOGDEBUGF("Font face %s (%dpt) has %d glyphs", GetFileName(font_->GetName()).CString(), pointSize, numGlyphs);
-
     // Load each of the glyphs to see the sizes & store other information
-    int loadMode = ui->GetForceAutoHint() ? FT_LOAD_FORCE_AUTOHINT : FT_LOAD_DEFAULT;
+    loadMode_ = ui->GetForceAutoHint() ? FT_LOAD_FORCE_AUTOHINT : FT_LOAD_DEFAULT;
     ascender_ = face->size->metrics.ascender >> 6;
     int descender = face->size->metrics.descender >> 6;
 
@@ -164,7 +169,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
 
     int textureWidth = maxTextureSize;
     int textureHeight = maxTextureSize;
-    bool loadAllGlyphs = CanLoadAllGlyphs(numGlyphs, loadMode, textureWidth, textureHeight);
+    bool loadAllGlyphs = CanLoadAllGlyphs(charCodes, textureWidth, textureHeight);
 
     SharedPtr<Image> image(new Image(font_->GetContext()));
     image->SetSize(textureWidth, textureHeight, 1);
@@ -174,7 +179,10 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
 
     for (unsigned i = 0; i < numGlyphs; ++i)
     {
-        unsigned charCode = indexToCharMapping[i];
+        unsigned charCode = charCodes[i];
+        if (charCode == 0)
+            continue;
+        
         if (!loadAllGlyphs && (charCode > 0xff))
             break;
 
@@ -194,9 +202,9 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     {
         // Read kerning manually to be more efficient and avoid out of memory crash when use large font file, for example there
         // are 29354 glyphs in msyh.ttf
-        FT_ULong tag = FT_MAKE_TAG('k', 'e', 'r', 'n');
+        FT_ULong tagKern = FT_MAKE_TAG('k', 'e', 'r', 'n');
         FT_ULong kerningTableSize = 0;
-        FT_Error error = FT_Load_Sfnt_Table(face, tag, 0, NULL, &kerningTableSize);
+        FT_Error error = FT_Load_Sfnt_Table(face, tagKern, 0, NULL, &kerningTableSize);
         if (error)
         {
             LOGERROR("Could not get kerning table length");
@@ -204,7 +212,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
         }
 
         SharedArrayPtr<unsigned char> kerningTable(new unsigned char[kerningTableSize]);
-        error = FT_Load_Sfnt_Table(face, tag, 0, kerningTable, &kerningTableSize);
+        error = FT_Load_Sfnt_Table(face, tagKern, 0, kerningTable, &kerningTableSize);
         if (error)
         {
             LOGERROR("Could not load kerning table");
@@ -238,15 +246,13 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
                         unsigned rightIndex = deserializer.ReadUShort();
                         short amount = (short)(deserializer.ReadShort() >> 6);
 
-                        HashMap<unsigned, unsigned>::ConstIterator leftIter = indexToCharMapping.Find(leftIndex);
-                        HashMap<unsigned, unsigned>::ConstIterator rightIter = indexToCharMapping.Find(rightIndex);
-                        if (leftIter != indexToCharMapping.End() && rightIter != indexToCharMapping.End())
+                        unsigned leftCharCode = leftIndex < numGlyphs ? charCodes[leftIndex] : 0;
+                        unsigned rightCharCode = rightIndex < numGlyphs ? charCodes[rightIndex] : 0;
+                        if (leftCharCode != 0 && rightCharCode != 0)
                         {
-                            unsigned value = (leftIter->second_ << 16) + rightIter->second_;
+                            unsigned value = (leftCharCode << 16) + rightCharCode;
                             kerningMapping_[value] = amount;
                         }
-                        else
-                            LOGWARNING("Out of range glyph index in kerning information");
                     }
                 }
                 else
@@ -296,15 +302,20 @@ const FontGlyph* FontFaceFreeType::GetGlyph(unsigned c)
     return 0;
 }
 
-bool FontFaceFreeType::CanLoadAllGlyphs(unsigned numGlyphs, int loadMode, int& textureWidth, int& textureHeight) const
+bool FontFaceFreeType::CanLoadAllGlyphs(const PODVector<unsigned>& charCodes, int& textureWidth, int& textureHeight) const
 {
     FT_Face face = (FT_Face)face_;
     FT_GlyphSlot slot = face->glyph;
     AreaAllocator allocator(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, textureWidth, textureHeight);
 
+    unsigned numGlyphs = charCodes.Size();
     for (unsigned i = 0; i < numGlyphs; ++i)
     {
-        FT_Error error = FT_Load_Glyph(face, i, loadMode);
+        unsigned charCode = charCodes[i];
+        if (charCode == 0)
+            continue;
+
+        FT_Error error = FT_Load_Char(face, charCode, loadMode_);
         if (!error)
         {
             int width = Max(slot->metrics.width >> 6, slot->bitmap.width);
@@ -347,11 +358,8 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
     FT_Face face = (FT_Face)face_;
     FT_GlyphSlot slot = face->glyph;
 
-    UI* ui = font_->GetSubsystem<UI>();
-    int loadMode = ui->GetForceAutoHint() ? FT_LOAD_FORCE_AUTOHINT : FT_LOAD_DEFAULT;
-
     FontGlyph fontGlyph;
-    FT_Error error = FT_Load_Char(face, charCode, loadMode);
+    FT_Error error = FT_Load_Char(face, charCode, loadMode_);
     if (!error)
     {
         // Note: position within texture will be filled later
@@ -366,8 +374,7 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
             int x, y;
             if (!allocator_.Allocate(fontGlyph.width_ + 1, fontGlyph.height_ + 1, x, y))
             {
-                int textureSize = ui->GetMaxFontTextureSize();
-                if (!SetupNextTexture(textureSize, textureSize))
+                if (!SetupNextTexture(allocator_.GetWidth(), allocator_.GetHeight()))
                     return false;
 
                 if (!allocator_.Allocate(fontGlyph.width_ + 1, fontGlyph.height_ + 1, x, y))
@@ -443,7 +450,5 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
 
     return true;
 }
-
-
 
 }

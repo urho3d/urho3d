@@ -175,8 +175,6 @@ private:
     bool SetHeightMapInternal(Image* image, bool recreateNow);
     /// Handle heightmap image reload finished.
     void HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData);
-    /// Mark patch(es) dirty based on location. Used when checking the heightmap image for changes.
-    void MarkPatchesDirty(PODVector<bool>& dirtyPatches, int x, int z);
 
     /// Shared index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;

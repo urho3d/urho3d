@@ -113,6 +113,7 @@ bool noHierarchy_ = false;
 bool noMaterials_ = false;
 bool noTextures_ = false;
 bool noMaterialDiffuseColor_ = false;
+bool noEmptyNodes_ = false;
 bool saveMaterialList_ = false;
 bool includeNonSkinningBones_ = false;
 bool verboseLog_ = false;
@@ -144,6 +145,7 @@ void BuildAndSaveAnimations(OutModel* model = 0);
 
 void ExportScene(const String& outName, bool asPrefab);
 void CollectSceneModels(OutScene& scene, aiNode* node);
+void CreateHierarchy(Scene* scene, aiNode* srcNode, HashMap<aiNode*, Node*>& nodeMapping);
 Node* CreateSceneNode(Scene* scene, aiNode* srcNode, HashMap<aiNode*, Node*>& nodeMapping);
 void BuildAndSaveScene(OutScene& scene, bool asPrefab);
 
@@ -228,6 +230,7 @@ void Run(const Vector<String>& arguments)
             "-ns         Do not create subdirectories for resources\n"
             "-nz         Do not create a zone and a directional light (scene mode only)\n"
             "-nf         Do not fix infacing normals\n"
+            "-ne         Do not save empty nodes (scene mode only)\n"
             "-p <path>   Set path for scene resources. Default is output file path\n"
             "-r <name>   Use the named scene node as root node\n"
             "-f <freq>   Animation tick frequency to use if unspecified. Default 4800\n"
@@ -312,6 +315,10 @@ void Run(const Vector<String>& arguments)
 
                 case 'h':
                     noHierarchy_ = true;
+                    break;
+
+                case 'e':
+                    noEmptyNodes_ = true;
                     break;
 
                 case 's':
@@ -1258,6 +1265,13 @@ void CollectSceneModels(OutScene& scene, aiNode* node)
         CollectSceneModels(scene, node->mChildren[i]);
 }
 
+void CreateHierarchy(Scene* scene, aiNode* srcNode, HashMap<aiNode*, Node*>& nodeMapping)
+{
+    CreateSceneNode(scene, srcNode, nodeMapping);
+    for (unsigned i = 0; i < srcNode->mNumChildren; ++i)
+        CreateHierarchy(scene, srcNode->mChildren[i], nodeMapping);
+}
+
 Node* CreateSceneNode(Scene* scene, aiNode* srcNode, HashMap<aiNode*, Node*>& nodeMapping)
 {
     if (nodeMapping.Contains(srcNode))
@@ -1346,10 +1360,23 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
     ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
 
     HashMap<aiNode*, Node*> nodeMapping;
+
     Node* outRootNode = 0;
-    if (asPrefab || !noHierarchy_)
+    if (asPrefab)
         outRootNode = CreateSceneNode(outScene, rootNode_, nodeMapping);
-    
+    else
+    {
+        // If not saving as a prefab, associate the root node with the scene first to prevent unnecessary creation of a root
+        // However do not do that if the root node does not have an identity matrix, or itself contains a model
+        // (models at the Urho scene root are not preferable)
+        if (ToMatrix3x4(rootNode_->mTransformation).Equals(Matrix3x4::IDENTITY) && !scene.nodes_.Contains(rootNode_))
+           nodeMapping[rootNode_] = outScene;
+    }
+
+    // If is allowed to export empty nodes, export the full Assimp node hierarchy first
+    if (!noHierarchy_ && !noEmptyNodes_)
+        CreateHierarchy(outScene, rootNode_, nodeMapping);
+
     // Create geometry nodes
     for (unsigned i = 0; i < scene.nodes_.Size(); ++i)
     {
@@ -1415,7 +1442,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
                 break;
             case aiLightSource_SPOT:
                 outLight->SetLightType(LIGHT_SPOT);
-                outLight->SetFov(light->mAngleOuterCone * M_RADTODEG);
+                outLight->SetFov(light->mAngleOuterCone * 0.5f * M_RADTODEG);
                 break;
             case aiLightSource_POINT:
                 outLight->SetLightType(LIGHT_POINT);

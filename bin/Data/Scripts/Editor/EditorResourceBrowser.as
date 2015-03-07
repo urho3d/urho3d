@@ -1217,6 +1217,10 @@ bool GetBinaryType(String path, StringHash &out fileType, bool useCache = false)
 
 bool GetXmlType(String path, StringHash &out fileType, bool useCache = false)
 {
+    String extension = GetExtension(path);
+    if (extension == ".txt" || extension == ".json" || extension == ".icns")
+        return false;
+
     String name;
     if (useCache)
     {

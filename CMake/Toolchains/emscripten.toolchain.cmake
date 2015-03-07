@@ -49,6 +49,9 @@ set (CMAKE_C_COMPILER   ${EMSCRIPTEN_ROOT_PATH}/emcc${TOOL_EXT}     CACHE PATH "
 set (CMAKE_CXX_COMPILER ${EMSCRIPTEN_ROOT_PATH}/em++${TOOL_EXT}     CACHE PATH "C++ compiler")
 set (CMAKE_AR           ${EMSCRIPTEN_ROOT_PATH}/emar${TOOL_EXT}     CACHE PATH "archive")
 set (CMAKE_RANLIB       ${EMSCRIPTEN_ROOT_PATH}/emranlib${TOOL_EXT} CACHE PATH "ranlib")
+# Specific to Emscripten
+set (EMRUN              ${EMSCRIPTEN_ROOT_PATH}/emrun${TOOL_EXT}    CACHE PATH "emrun")
+set (EMPACKAGER         python ${EMSCRIPTEN_ROOT_PATH}/tools/file_packager.py CACHE PATH "file_packager.py")
 
 # specify the system root
 if (NOT EMSCRIPTEN_SYSROOT)
@@ -71,36 +74,17 @@ set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-# Don't do compiler autodetection, since we are cross-compiling.
-include (CMakeForceCompiler)
-CMAKE_FORCE_C_COMPILER ("${CMAKE_C_COMPILER}" Clang)
-CMAKE_FORCE_CXX_COMPILER ("${CMAKE_CXX_COMPILER}" Clang)
+# Since currently CMake does not able to identify Emscripten cross compiler, so set the compiler identification explicitly
+# However, don't force it so the rest of the compiler checks are still being performed
+set (CMAKE_C_COMPILER_ID_RUN TRUE)
+set (CMAKE_C_COMPILER_ID Clang)
+set (CMAKE_CXX_COMPILER_ID_RUN TRUE)
+set (CMAKE_CXX_COMPILER_ID Clang)
 
-# Hardwire support for cmake-2.8/Modules/CMakeBackwardsCompatibilityC.cmake without having CMake to try complex things
-# to autodetect these:
-set (CMAKE_SKIP_COMPATIBILITY_TESTS 1)
-set (CMAKE_SIZEOF_CHAR 1)
-set (CMAKE_SIZEOF_UNSIGNED_SHORT 2)
-set (CMAKE_SIZEOF_SHORT 2)
-set (CMAKE_SIZEOF_INT 4)
-set (CMAKE_SIZEOF_UNSIGNED_LONG 4)
-set (CMAKE_SIZEOF_UNSIGNED_INT 4)
-set (CMAKE_SIZEOF_LONG 4)
-set (CMAKE_SIZEOF_VOID_P 4)
-set (CMAKE_SIZEOF_FLOAT 4)
-set (CMAKE_SIZEOF_DOUBLE 8)
-set (CMAKE_C_SIZEOF_DATA_PTR 4)
-set (CMAKE_CXX_SIZEOF_DATA_PTR 4)
-set (CMAKE_HAVE_LIMITS_H 1)
-set (CMAKE_HAVE_UNISTD_H 1)
-set (CMAKE_HAVE_PTHREAD_H 1)
-set (CMAKE_HAVE_SYS_PRCTL_H 1)
-set (CMAKE_WORDS_BIGENDIAN 0)
-set (CMAKE_DL_LIBS)
-
-# In order for check_function_exists() detection to work, we must signal it to pass an additional flag, which causes the compilation
-# to abort if linking results in any undefined symbols. The CMake detection mechanism depends on the undefined symbol error to be raised.
-set (CMAKE_REQUIRED_FLAGS "-s ERROR_ON_UNDEFINED_SYMBOLS=1")
+# Set additional linker flags to consider unresolved symbols as an error
+set (CMAKE_EXE_LINKER_FLAGS "-s ERROR_ON_UNDEFINED_SYMBOLS=1")
+# Set required compiler flags for internal CMake various check_xxx() macros which rely on the error to occur for the check to be performed correctly
+set (CMAKE_REQUIRED_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
 
 # Use response files on Windows host
 if (CMAKE_HOST_WIN32)

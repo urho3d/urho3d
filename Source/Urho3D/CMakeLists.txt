@@ -45,7 +45,7 @@ if (URHO3D_LUA)
         endif ()
         ExternalProject_Add(tolua++
             SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
-            CMAKE_ARGS -DJIT=${JIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${OSX_HOST}
+            CMAKE_ARGS -DURHO3D_LUAJIT=${URHO3D_LUAJIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${OSX_HOST}
         )
     else ()
         # Otherwise, build it internally as per normal
@@ -177,9 +177,6 @@ if (NOT ANDROID AND NOT EMSCRIPTEN)
     endif ()
 endif ()
 install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
-if (NOT GIT_EXIT_CODE EQUAL 0)
-    add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
-endif ()
 
 # Setup dependency frameworks and libraries
 if (APPLE)

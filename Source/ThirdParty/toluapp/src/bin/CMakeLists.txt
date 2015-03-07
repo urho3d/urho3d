@@ -56,9 +56,7 @@ endif ()
 set (TARGET_NAME tolua++)
 
 # Define source files
-file (GLOB CPP_FILES *.c)
-file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+define_source_files (GLOB_CPP_PATTERNS *.c)
 
 # Define dependency libs
 set (LIBS toluapp Lua${JIT})
@@ -71,7 +69,7 @@ set (INCLUDE_DIRS ../../include ../../../../ThirdParty/Lua${JIT}/src)
 set_output_directories (${CMAKE_BINARY_DIR}/bin/tool RUNTIME PDB)
 
 # Setup target
-if (URHO3D_LUAJIT AND URHO3D_64BIT AND APPLE AND NOT IOS)
+if (APPLE)
     setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
 endif ()
 setup_executable (NODEPS)

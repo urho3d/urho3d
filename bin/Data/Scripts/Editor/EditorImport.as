@@ -55,6 +55,8 @@ void ImportModel(const String&in fileName)
 
         FocusNode(newNode);
     }
+    else
+        log.Error("Failed to execute AssetImporter to import model");
 }
 
 void ImportScene(const String&in fileName)
@@ -88,6 +90,8 @@ void ImportScene(const String&in fileName)
             fileSystem.Delete(tempSceneName);
             UpdateWindowTitle();
         }
+        else
+            log.Error("Failed to execute AssetImporter to import scene");
     }
 }
 

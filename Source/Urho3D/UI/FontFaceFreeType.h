@@ -48,7 +48,7 @@ public:
 
 private:
     /// Check can load all glyph in one texture, return true and texture size if can load.
-    bool CanLoadAllGlyphs(unsigned numGlyphs, int loadMode, int& textureWidth, int& textureHeight) const;
+    bool CanLoadAllGlyphs(const PODVector<unsigned>& charCodes, int& textureWidth, int& textureHeight) const;
     /// Setup next texture.
     bool SetupNextTexture(int textureWidth, int textureHeight);
     /// Load char glyph.
@@ -58,10 +58,12 @@ private:
     SharedPtr<FreeTypeLibrary> freeType_;
     /// FreeType face. Non-null after creation only in dynamic mode.
     void* face_;
-    /// Has mutable glyph.
-    bool hasMutableGlyph_;
+    /// Load mode.
+    int loadMode_;
     /// Ascender.
     int ascender_;
+    /// Has mutable glyph.
+    bool hasMutableGlyph_;
     /// Glyph area allocator.
     AreaAllocator allocator_;
 };
