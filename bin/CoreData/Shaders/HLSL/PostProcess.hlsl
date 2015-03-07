@@ -9,7 +9,11 @@ float2 Noise(float2 coord)
 }
 
 // Adapted: http://callumhay.blogspot.com/2010/09/gaussian-blur-shader-glsl.html
+#ifndef D3D11
 float4 GaussianBlur(int blurKernelSize, float2 blurDir, float2 blurRadius, float sigma, sampler2D texSampler, float2 texCoord)
+#else
+float4 GaussianBlur(int blurKernelSize, float2 blurDir, float2 blurRadius, float sigma, Texture2D tex, SamplerState texSampler, float2 texCoord)
+#endif
 {
     const int blurKernelHalfSize = blurKernelSize / 2;
 
@@ -23,14 +27,24 @@ float4 GaussianBlur(int blurKernelSize, float2 blurDir, float2 blurRadius, float
     float4 avgValue = float4(0.0, 0.0, 0.0, 0.0);
     float gaussCoeffSum = 0.0;
 
+    #ifndef D3D11
     avgValue += tex2D(texSampler, texCoord) * gaussCoeff.x;
+    #else
+    avgValue += tex.Sample(texSampler, texCoord) * gaussCoeff.x;
+    #endif
+
     gaussCoeffSum += gaussCoeff.x;
     gaussCoeff.xy *= gaussCoeff.yz;
 
     for (int i = 1; i <= blurKernelHalfSize; i++)
     {
+        #ifndef D3D11
         avgValue += tex2D(texSampler, texCoord - i * blurVec) * gaussCoeff.x;
         avgValue += tex2D(texSampler, texCoord + i * blurVec) * gaussCoeff.x;
+        #else
+        avgValue += tex.Sample(texSampler, texCoord - i * blurVec) * gaussCoeff.x;
+        avgValue += tex.Sample(texSampler, texCoord + i * blurVec) * gaussCoeff.x;
+        #endif
 
         gaussCoeffSum += 2.0 * gaussCoeff.x;
         gaussCoeff.xy *= gaussCoeff.yz;

@@ -145,7 +145,7 @@ The full list of supported parameters, their datatypes and default values:
 - Borderless (bool) Whether to create the window as borderless. Default false.
 - TripleBuffer (bool) Whether to use triple-buffering. Default false.
 - VSync (bool) Whether to wait for vertical sync when presenting rendering window contents. Default false.
-- FlushGPU (bool) Whether to flush GPU command buffer each frame for less input latency. Effective only on Direct3D9. Default false.
+- FlushGPU (bool) Whether to flush GPU command buffer each frame (D3D9) or limit the amount of buffered frames (D3D11) for less input latency. Ineffective on OpenGL. Default false.
 - Multisample (int) Hardware multisampling level. Default 1 (no multisampling.)
 - Orientations (string) Space-separated list of allowed orientations. Effective only on iOS. All possible values are "LandscapeLeft", "LandscapeRight", "Portrait" and "PortraitUpsideDown". Default "LandscapeLeft LandscapeRight".
 - DumpShaders (string) Filename to dump used shader variations to for precaching.
@@ -713,8 +713,7 @@ Screen resolution, fullscreen/windowed, vertical sync and hardware multisampling
 When setting the initial screen mode, Graphics does a few checks:
 
 - For Direct3D9, shader model 3.0 support is checked.
-- For OpenGL, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is checked for.
-- Is hardware instancing supported? This requires %Shader %Model 3 on Direct3D9 and the ARB_instanced_arrays extension on OpenGL.
+- For OpenGL, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is checked for. The ARB_instanced_arrays is not required, but will enable hardware instancing support when present.
 - Are hardware shadow maps supported? Both AMD & NVIDIA style shadow maps can be used. If neither are available, no shadows will be rendered.
 - Are light pre-pass and deferred rendering modes supported? These require sufficient multiple rendertarget support, and R32F texture format support.
 
@@ -797,7 +796,7 @@ See also \ref Materials "Materials", \ref Shaders "Shaders", \ref Lights "Lights
 
 See \ref RenderingModes "Rendering modes" for detailed discussion on the forward, light pre-pass and deferred rendering modes.
 
-See \ref APIDifferences "Differences between Direct3D9 and OpenGL" for what to watch out for when using the low-level rendering functionality directly.
+See \ref APIDifferences "Differences between Direct3D and OpenGL" for what to watch out for when using the low-level rendering functionality directly.
 
 
 \page RenderingModes Rendering modes
@@ -847,23 +846,23 @@ Forward rendering makes it possible to use hardware multisampling and different 
 Finally note that due to OpenGL framebuffer object limitations an extra framebuffer blit has to happen at the end in both light pre-pass and deferred rendering, which costs some performance. Also, because multiple rendertargets on OpenGL must have the same format, an R32F texture can not be used for linear depth, but instead 24-bit depth is manually encoded and decoded into RGB channels.
 
 
-\page APIDifferences Differences between Direct3D9 and OpenGL
+\page APIDifferences Differences between Direct3D and OpenGL
 
 These differences need to be observed when using the low-level rendering functionality directly. The high-level rendering architecture, including the Renderer and UI subsystems and the Drawable subclasses already handle most of them transparently to the user.
 
-- The post-projection depth range is (0,1) for Direct3D9 and (-1,1) for OpenGL. The Camera can be queried either for an API-specific or API-independent (Direct3D9 convention) projection matrix.
+- The post-projection depth range is (0,1) for Direct3D and (-1,1) for OpenGL. The Camera can be queried either for an API-specific or API-independent (Direct3D convention) projection matrix.
 
-- To render with 1:1 texel-to-pixel mapping, on Direct3D9 UV coordinates have to be shifted a half-pixel to the right and down, or alternatively vertex positions can be shifted a half-pixel left and up.
+- To render with 1:1 texel-to-pixel mapping, on Direct3D9 UV coordinates have to be shifted a half-pixel to the right and down, or alternatively vertex positions can be shifted a half-pixel left and up. The required shift can be queried with the function \ref Graphics::GetPixelUVOffset "GetPixelUVOffset()".
 
-- On Direct3D9 the depth-stencil surface can be equal or larger in size than the color rendertarget. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the backbuffer depth-stencil surface when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth-stencil surfaces on demand whenever a texture is set as a color rendertarget, and a null depth-stencil is specified.
+- On Direct3D the depth-stencil surface can be equal or larger in size than the color rendertarget. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the backbuffer depth-stencil surface when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth-stencil surfaces on demand whenever a texture is set as a color rendertarget, and a null depth-stencil is specified.
 
-- On Direct3D9 the viewport will be reset to full size when the first color rendertarget is changed. On OpenGL this does not happen. To ensure correct operation on both APIs, always use this sequence: first set the rendertargets, then the depth-stencil surface and finally the viewport.
+- On Direct3D9 the viewport will be reset to full size when the first color rendertarget is changed. On OpenGL & Direct3D11 this does not happen. To ensure correct operation on both APIs, always use this sequence: first set the rendertargets, then the depth-stencil surface and finally the viewport.
 
 - On OpenGL modifying a texture will cause it to be momentarily set on the first texture unit. If another texture was set there, the assignment will be lost. Graphics performs a check to not assign textures redundantly, so it is safe and recommended to always set all needed textures before rendering.
 
 - Modifying an index buffer on OpenGL will similarly cause the existing index buffer assignment to be lost. Therefore, always set the vertex and index buffers before rendering.
 
-- %Shader resources are stored in different locations depending on the API: bin/CoreData/Shaders/HLSL for Direct3D9, and bin/CoreData/Shaders/GLSL for OpenGL.
+- %Shader resources are stored in different locations depending on the API: bin/CoreData/Shaders/HLSL for Direct3D, and bin/CoreData/Shaders/GLSL for OpenGL.
 
 - To ensure similar UV addressing for render-to-texture viewports on both APIs, on OpenGL texture viewports will be rendered upside down.
 
@@ -999,7 +998,7 @@ A technique definition looks like this:
 
 The "desktop" attribute in either technique or pass allows to specify it requires desktop graphics hardware (exclude mobile devices.) Omitting it is the same as specifying false.
 
-Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D9, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
+Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
 
 Shaders and their compilation defines can be specified on both the technique and pass level. If a pass does not override the default shaders specified on the technique level, it still can specify additional compilation defines to be used. However, if a pass overrides the shaders, then the technique-level defines are not used.
 
@@ -1035,7 +1034,7 @@ Urho3D uses an ubershader-like approach: permutations of each shader will be bui
 
 The building of these permutations happens on demand: technique and renderpath definition files both refer to shaders and the compilation defines to use with them. In addition the engine will add inbuilt defines related to geometry type and lighting. It is not generally possible to enumerate beforehand all the possible permutations that can be built out of a single shader.
 
-On Direct3D9 compiled shader bytecode is saved to disk in a "Cache" subdirectory next to the shader source code, so that the possibly time-consuming compile can be skipped on the next time the shader permutation is needed. On OpenGL such mechanism is not available.
+On Direct3D compiled shader bytecode is saved to disk in a "Cache" subdirectory next to the shader source code, so that the possibly time-consuming compile can be skipped on the next time the shader permutation is needed. On OpenGL such mechanism is not available.
 
 \section Shaders_InbuiltDefines Inbuilt compilation defines
 
@@ -1091,7 +1090,7 @@ Pixel shader uniforms:
 
 \section Shaders_Writing Writing shaders
 
-Shaders must be written separately for HLSL (Direct3D9) and GLSL (OpenGL). The built-in shaders try to implement the same functionality on both shader languages as closely as possible.
+Shaders must be written separately for HLSL (Direct3D) and GLSL (OpenGL). The built-in shaders try to implement the same functionality on both shader languages as closely as possible.
 
 To get started with writing your own shaders, start with studying the most basic examples possible: the Basic, Shadow & Unlit shaders. Note the shader include files which bring common functionality, for example Uniforms.hlsl, Samplers.hlsl & Transform.hlsl for HLSL shaders.
 
@@ -1111,7 +1110,7 @@ vec3 worldPos = GetWorldPos(modelMatrix);
 gl_Position = GetClipPos(worldPos);
 \endcode
 
-On both Direct3D9 and OpenGL the vertex and pixel shaders are written into the same file, and the entrypoint functions must be called VS() and PS(). In OpenGL mode one of these is transformed to the main() function required by GLSL behind the scenes. When compiling a vertex shader, the compilation define "COMPILEVS" is always present, and likewise "COMPILEPS" when compiling a pixel shader. These are heavily used in the shader include files to prevent constructs that are illegal for the "wrong" type of shader, and to reduce compilation time.
+On both Direct3D and OpenGL the vertex and pixel shaders are written into the same file, and the entrypoint functions must be called VS() and PS(). In OpenGL mode one of these is transformed to the main() function required by GLSL behind the scenes. When compiling a vertex shader, the compilation define "COMPILEVS" is always present, and likewise "COMPILEPS" when compiling a pixel shader. These are heavily used in the shader include files to prevent constructs that are illegal for the "wrong" type of shader, and to reduce compilation time.
 
 The uniforms must be prefixed in a certain way so that the engine understands them:
 
@@ -1127,13 +1126,13 @@ uniform sampler2D sDetailMap2;
 uniform sampler2D sDetailMap3;
 \endcode
 
-\section Shaders_Migration Migration of old shaders
+\section Shaders_D3D11 Direct3D9 and Direct3D11 differences
 
-In Urho3D V1.3 and before an XML description file was used for shaders, which would enumerate the compilation defines used by shaders into named "options" or "variations".
-The shader would then be referred to with these option names, for example a pixel shader LitSolid_Diff would use the LitSolid source code and the define DIFFMAP. To convert to the
-current system, look up the defines from the description files and add them directly to the technique or renderpath XML descriptions ("vsdefines" or "psdefines" attributes). Also make sure the shader references ("vs" and "ps" attributes) are just the bare shader names with no underscore or option names attached. Finally, delete the shader XML description files.
+Direct3D9 and Direct3D11 share the same HLSL shader code. Macros and some conditional code are used to hide the API differences where possible. When shaders are compiled for Direct3D11, the define D3D11 is present, and the following details need to be observed:
 
-GLSL shaders in V1.3 and before used separate .vert and .frag files for the vertex and pixel shader source code. Now these are combined into .glsl files that include both shaders. Include files are likewise merged into .glsl files instead of separate vertex and pixel shader includes. To merge your shader code, append the pixel shader source into the vertex shader source file without the varyings definition (which should already be in the vertex shader code). Merge and fix include statements: change the file extension to .glsl. Note that some include files depend on each other so it is safest to always include Uniforms.glsl and Samplers.glsl first. Finally change the file extension of the vertex shader source file from .vert to .glsl and delete the .frag file. If you have pieces of pixel shader code (for example additional functions or variables) that produce errors when included in the vertex shader compile, wrap these with #ifdef COMPILEPS, and vice versa for vertex shader code.
+- Uniforms are organized into constant buffers. See the file Uniforms.hlsl for the built-in uniforms. See TerrainBlend.hlsl for an example of defining your own uniforms into the "custom" constant buffer slot.
+- Both textures and samplers are defined for each texture unit. The macros in Samplers.hlsl (Sample2D, SampleCube etc.) can be used to write code that works on both APIs. These take the texture unit name without the 's' prefix.
+- Vertex shader output position and pixel shader output color need to use the SV_POSITION and SV_TARGET semantics. The macros OUTPOSITION and OUTCOLOR0-3 can be used to select the correct semantic on both APIs. In the vertex shader, the output position should be specified last, as otherwise other interpolator outputs may not function correctly.
 
 \section Shaders_Precaching Shader precaching
 
@@ -2692,7 +2691,7 @@ uint       Number of tracks
 
 Note: animations are stored using absolute bone transformations. Therefore only lerp-blending between animations is supported; additive pose modification is not.
 
-\section FileFormats_Shader Direct3D9 binary shader format (.vs2, .ps2, .vs3, .ps3)
+\section FileFormats_Shader Direct3D9 binary shader format (.vs3, .ps3)
 
 \verbatim
 byte[4]    Identifier "USHD"
@@ -2706,6 +2705,33 @@ uint       Number of constant parameters
     cstring    Parameter name
     byte       Register index
     byte       Number of registers
+
+uint       Number of texture units
+
+    For each texture unit:
+    cstring    Texture unit name
+    byte       Sampler index
+
+uint       Bytecode size
+byte[]     Bytecode
+\endverbatim
+
+\section FileFormats_Shader Direct3D11 binary shader format (.vs4, .ps4)
+
+\verbatim
+byte[4]    Identifier "USHD"
+
+short      Shader type (0 = vertex, 1 = pixel)
+short      Shader model (4)
+uint       Vertex element mask (0 for pixel shaders)
+
+uint       Number of constant parameters
+
+    For each constant parameter:
+    cstring    Parameter name
+    byte       CBuffer index
+    uint       Start byte offset in CBuffer
+    uint       Byte size
 
 uint       Number of texture units
 

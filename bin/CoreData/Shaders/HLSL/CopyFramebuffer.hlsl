@@ -5,7 +5,7 @@
 
 void VS(float4 iPos : POSITION,
     out float2 oScreenPos : TEXCOORD0,
-    out float4 oPos : POSITION)
+    out float4 oPos : OUTPOSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
@@ -14,7 +14,7 @@ void VS(float4 iPos : POSITION,
 }
 
 void PS(float2 iScreenPos : TEXCOORD0,
-    out float4 oColor : COLOR0)
+    out float4 oColor : OUTCOLOR0)
 {
-    oColor = tex2D(sDiffMap, iScreenPos);
+    oColor = Sample2D(DiffMap, iScreenPos);
 }

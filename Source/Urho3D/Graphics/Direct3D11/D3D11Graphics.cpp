@@ -30,6 +30,7 @@
 #include "../../Graphics/DebugRenderer.h"
 #include "../../Graphics/DecalSet.h"
 #include "../../IO/File.h"
+#include "../../Graphics/Geometry.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsEvents.h"
 #include "../../Graphics/GraphicsImpl.h"
@@ -41,6 +42,7 @@
 #include "../../Graphics/ParticleEmitter.h"
 #include "../../Core/ProcessUtils.h"
 #include "../../Core/Profiler.h"
+#include "../../Graphics/Renderer.h"
 #include "../../Resource/ResourceCache.h"
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/ShaderPrecache.h"
@@ -611,18 +613,55 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
 {
     PrepareDraw();
 
-    /// \todo Unlike D3D9, will always clear whole rendertarget. Implement limited clear manually by rendering a quad?
-    if ((flags & CLEAR_COLOR) && impl_->renderTargetViews_[0])
-        impl_->deviceContext_->ClearRenderTargetView(impl_->renderTargetViews_[0], color.Data());
-
-    if ((flags & (CLEAR_DEPTH | CLEAR_STENCIL)) && impl_->depthStencilView_)
+    IntVector2 rtSize = GetRenderTargetDimensions();
+    
+    // D3D11 clear always clears the whole target regardless of viewport or scissor test settings
+    // Emulate partial clear by rendering a quad
+    if (!viewport_.left_ && !viewport_.top_ && viewport_.right_ == rtSize.x_ && viewport_.bottom_ == rtSize.y_)
     {
-        unsigned depthClearFlags = 0;
-        if (flags & CLEAR_DEPTH)
-            depthClearFlags |= D3D11_CLEAR_DEPTH;
-        if (flags & CLEAR_STENCIL)
-            depthClearFlags |= D3D11_CLEAR_STENCIL;
-        impl_->deviceContext_->ClearDepthStencilView(impl_->depthStencilView_, depthClearFlags, depth, stencil);
+        if ((flags & CLEAR_COLOR) && impl_->renderTargetViews_[0])
+            impl_->deviceContext_->ClearRenderTargetView(impl_->renderTargetViews_[0], color.Data());
+        
+        if ((flags & (CLEAR_DEPTH | CLEAR_STENCIL)) && impl_->depthStencilView_)
+        {
+            unsigned depthClearFlags = 0;
+            if (flags & CLEAR_DEPTH)
+                depthClearFlags |= D3D11_CLEAR_DEPTH;
+            if (flags & CLEAR_STENCIL)
+                depthClearFlags |= D3D11_CLEAR_STENCIL;
+            impl_->deviceContext_->ClearDepthStencilView(impl_->depthStencilView_, depthClearFlags, depth, stencil);
+        }
+    }
+    else
+    {
+        Renderer* renderer = GetSubsystem<Renderer>();
+        if (!renderer)
+            return;
+
+        Geometry* geometry = renderer->GetQuadGeometry();
+
+        Matrix3x4 model = Matrix3x4::IDENTITY;
+        Matrix4 projection = Matrix4::IDENTITY;
+        model.m23_ = Clamp(depth, 0.0f, 1.0f);
+
+        SetColorWrite((flags & CLEAR_COLOR) != 0);
+        SetCullMode(CULL_NONE);
+        SetDepthTest(CMP_ALWAYS);
+        SetDepthWrite((flags & CLEAR_DEPTH) != 0);
+        SetFillMode(FILL_SOLID);
+        SetScissorTest(false);
+        SetStencilTest((flags & CLEAR_STENCIL) != 0, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, stencil);
+        SetShaders(GetShader(VS, "ClearFramebuffer"), GetShader(PS, "ClearFramebuffer"));
+        SetShaderParameter(VSP_MODEL, model);
+        SetShaderParameter(VSP_VIEWPROJ, projection);
+        SetShaderParameter(PSP_MATDIFFCOLOR, color);
+
+        geometry->Draw(this);
+        
+        SetColorWrite(true);
+        SetDepthWrite(true);
+        SetStencilTest(false);
+        ClearParameterSources();
     }
 }
 
@@ -651,9 +690,26 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     destRect.right = destination->GetWidth();
     destRect.bottom = destination->GetHeight();
     
-    /// \todo Implement
-    LOGERROR("ResolveToTexture not implemented on D3D11");
-    return false;
+    ID3D11Resource* source = 0;
+    bool resolve = false;
+
+    if (renderTargets_[0])
+        source = (ID3D11Resource*)renderTargets_[0]->GetParentTexture()->GetGPUObject();
+    else
+    {
+        impl_->defaultRenderTargetView_->GetResource(&source);
+        resolve = multiSample_ > 1;
+    }
+
+    if (!resolve)
+        impl_->deviceContext_->CopyResource((ID3D11Resource*)destination->GetGPUObject(), source);
+    else
+    {
+        impl_->deviceContext_->ResolveSubresource((ID3D11Resource*)destination->GetGPUObject(), 0, source, 0, (DXGI_FORMAT)
+            destination->GetFormat());
+    }
+
+    return true;
 }
 
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)

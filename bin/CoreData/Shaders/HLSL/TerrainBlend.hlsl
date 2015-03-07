@@ -1,4 +1,9 @@
-#define CUSTOM_MATERIAL_CBUFFER
+#include "Uniforms.hlsl"
+#include "Samplers.hlsl"
+#include "Transform.hlsl"
+#include "ScreenPos.hlsl"
+#include "Lighting.hlsl"
+#include "Fog.hlsl"
 
 #ifndef D3D11
 
@@ -16,21 +21,11 @@ sampler2D sDetailMap3 : register(s3);
 
 // D3D11 constant buffers and samplers
 #ifdef COMPILEVS
-cbuffer MaterialVS : register(b4)
+cbuffer CustomVS : register(b6)
 {
-    float4 cUOffset;
-    float4 cVOffset;
     float2 cDetailTiling;
 }
 #else
-cbuffer MaterialPS : register(b4)
-{
-    float4 cMatDiffColor;
-    float3 cMatEmissiveColor;
-    float3 cMatEnvMapColor;
-    float4 cMatSpecColor;
-}
-
 Texture2D tWeightMap0 : register(t0);
 Texture2D tDetailMap1 : register(t1);
 Texture2D tDetailMap2 : register(t2);
@@ -42,13 +37,6 @@ SamplerState sDetailMap3 : register(s3);
 #endif
 
 #endif
-
-#include "Uniforms.hlsl"
-#include "Samplers.hlsl"
-#include "Transform.hlsl"
-#include "ScreenPos.hlsl"
-#include "Lighting.hlsl"
-#include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
