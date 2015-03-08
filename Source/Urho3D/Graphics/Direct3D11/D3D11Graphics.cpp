@@ -551,9 +551,82 @@ void Graphics::Close()
 
 bool Graphics::TakeScreenShot(Image& destImage)
 {
-    /// \todo Implement
-    LOGERROR("TakeScreenShot not implemented on D3D11");
-    return false;
+    PROFILE(TakeScreenShot);
+
+    if (!impl_->device_)
+        return false;
+
+    D3D11_TEXTURE2D_DESC textureDesc;
+    memset(&textureDesc, 0, sizeof textureDesc);
+    textureDesc.Width = width_;
+    textureDesc.Height = height_;
+    textureDesc.MipLevels = 1;
+    textureDesc.ArraySize = 1;
+    textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    textureDesc.SampleDesc.Count = 1;
+    textureDesc.SampleDesc.Quality = 0;
+    textureDesc.Usage = D3D11_USAGE_STAGING;
+    textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+
+    ID3D11Texture2D* stagingTexture = 0;
+    impl_->device_->CreateTexture2D(&textureDesc, 0, &stagingTexture);
+    if (!stagingTexture)
+    {
+        LOGERROR("Could not create staging texture for screenshot");
+        return false;
+    }
+
+    ID3D11Resource* source = 0;
+    impl_->defaultRenderTargetView_->GetResource(&source);
+
+    if (multiSample_ > 1)
+    {
+        // If backbuffer is multisampled, need another DEFAULT usage texture to resolve the data to first
+        textureDesc.Usage = D3D11_USAGE_DEFAULT;
+        textureDesc.CPUAccessFlags = 0;
+        ID3D11Texture2D* resolveTexture = 0;
+
+        impl_->device_->CreateTexture2D(&textureDesc, 0, &resolveTexture);
+        if (!resolveTexture)
+        {
+            LOGERROR("Could not create intermediate texture for multisampled screenshot");
+            stagingTexture->Release();
+            return false;
+        }
+
+        impl_->deviceContext_->ResolveSubresource(resolveTexture, 0, source, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+        impl_->deviceContext_->CopyResource(stagingTexture, resolveTexture);
+        resolveTexture->Release();
+    }
+    else
+        impl_->deviceContext_->CopyResource(stagingTexture, source);
+
+    source->Release();
+
+    D3D11_MAPPED_SUBRESOURCE mappedData;
+    mappedData.pData = 0;
+    impl_->deviceContext_->Map(stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
+
+    destImage.SetSize(width_, height_, 3);
+    unsigned char* destData = destImage.GetData();
+    if (mappedData.pData)
+    {
+        for (int y = 0; y < height_; ++y)
+        {
+            unsigned char* src = (unsigned char*)mappedData.pData + y * mappedData.RowPitch;
+            for (int x = 0; x < width_; ++x)
+            {
+                *destData++ = *src++;
+                *destData++ = *src++;
+                *destData++ = *src++;
+                ++src;
+            }
+        }
+    }
+
+    impl_->deviceContext_->Unmap(stagingTexture, 0);
+    stagingTexture->Release();
+    return true;
 }
 
 bool Graphics::BeginFrame()
@@ -695,6 +768,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     
     ID3D11Resource* source = 0;
     bool resolve = false;
+    bool needRelease = false;
 
     if (renderTargets_[0])
         source = (ID3D11Resource*)renderTargets_[0]->GetParentTexture()->GetGPUObject();
@@ -702,6 +776,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     {
         impl_->defaultRenderTargetView_->GetResource(&source);
         resolve = multiSample_ > 1;
+        needRelease = true;
     }
 
     if (!resolve)
@@ -711,6 +786,9 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
         impl_->deviceContext_->ResolveSubresource((ID3D11Resource*)destination->GetGPUObject(), 0, source, 0, (DXGI_FORMAT)
             destination->GetFormat());
     }
+
+    if (needRelease)
+        source->Release();
 
     return true;
 }
