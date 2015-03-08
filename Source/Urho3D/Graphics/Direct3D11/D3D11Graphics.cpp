@@ -411,7 +411,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     if (borderless)
         fullscreen = false;
     
-    multiSample = Clamp(multiSample, 1, 16);
+    // Check that multisample level is supported
+    PODVector<int> multiSampleLevels = GetMultiSampleLevels();
+    if (!multiSampleLevels.Contains(multiSample))
+        multiSample = 1;
     
     // If nothing changes, do not reset the device
     if (width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
@@ -897,6 +900,16 @@ void Graphics::SetIndexBuffer(IndexBuffer* buffer)
 
 void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
 {
+    // Switch to the clip plane variations if necessary
+    /// \todo Causes overhead and string manipulation per drawcall
+    if (useClipPlane_)
+    {
+        if (vs)
+            vs = vs->GetOwner()->GetVariation(VS, vs->GetDefines() + " CLIPPLANE");
+        if (ps)
+            ps = ps->GetOwner()->GetVariation(PS, ps->GetDefines() + " CLIPPLANE");
+    }
+
     if (vs == vertexShader_ && ps == pixelShader_)
         return;
     
@@ -996,6 +1009,10 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     // Store shader combination if shader dumping in progress
     if (shaderPrecache_)
         shaderPrecache_->StoreShaders(vertexShader_, pixelShader_);
+
+    // Update clip plane parameter if necessary
+    if (useClipPlane_)
+        SetShaderParameter(VSP_CLIPPLANE, clipPlane_);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
@@ -1671,7 +1688,14 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
 
 void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4& view, const Matrix4& projection)
 {
-    /// \todo Not implemented
+    useClipPlane_ = enable;
+
+    if (enable)
+    {
+        Matrix4 viewProj = projection * view;
+        clipPlane_ = clipPlane.Transformed(viewProj).ToVector4();
+        SetShaderParameter(VSP_CLIPPLANE, clipPlane_);
+    }
 }
 
 void Graphics::BeginDumpShaders(const String& fileName)
@@ -1741,7 +1765,6 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     ret.Push(2);
     ret.Push(4);
     ret.Push(8);
-    ret.Push(16);
 
     return ret;
 }

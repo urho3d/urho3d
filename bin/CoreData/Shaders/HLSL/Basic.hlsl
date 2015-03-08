@@ -23,11 +23,18 @@ void VS(float4 iPos : POSITION,
     #ifdef DIFFMAP
         out float2 oTexCoord : TEXCOORD0,
     #endif
+    #if defined(D3D11) && defined(CLIPPLANE)
+        out float oClip : SV_CLIPDISTANCE0,
+    #endif
     out float4 oPos : OUTPOSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
+
+    #if defined(D3D11) && defined(CLIPPLANE)
+        oClip = dot(oPos, cClipPlane);
+    #endif
 
     #ifdef VERTEXCOLOR
         oColor = iColor;
@@ -44,6 +51,9 @@ void PS(
     #if defined(DIFFMAP) || defined(ALPHAMAP)
         float2 iTexCoord : TEXCOORD0,
     #endif
+    #if defined(D3D11) && defined(CLIPPLANE)
+        float iClip : SV_CLIPDISTANCE0,
+    #endif    
     out float4 oColor : OUTCOLOR0)
 {
     float4 diffColor = cMatDiffColor;

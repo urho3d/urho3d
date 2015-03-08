@@ -22,6 +22,6 @@ void PS(float4 iColor : COLOR0,
         out float4 oColor : OUTCOLOR0)
 {
     float4 diffColor = cMatDiffColor * iColor;
-    float4 diffInput = Sample2D(sDiffMap, iTexCoord);
+    float4 diffInput = Sample2D(DiffMap, iTexCoord);
     oColor = diffColor * diffInput;
 }

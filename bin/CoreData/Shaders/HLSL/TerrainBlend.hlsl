@@ -69,6 +69,9 @@ void VS(float4 iPos : POSITION,
         out float3 oVertexLight : TEXCOORD4,
         out float4 oScreenPos : TEXCOORD5,
     #endif
+    #if defined(D3D11) && defined(CLIPPLANE)
+        out float oClip : SV_CLIPDISTANCE0,
+    #endif
     out float4 oPos : OUTPOSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
@@ -78,6 +81,10 @@ void VS(float4 iPos : POSITION,
     oWorldPos = float4(worldPos, GetDepth(oPos));
     oTexCoord = GetTexCoord(iTexCoord);
     oDetailTexCoord = cDetailTiling * oTexCoord;
+
+    #if defined(D3D11) && defined(CLIPPLANE)
+        oClip = dot(oPos, cClipPlane);
+    #endif
 
     #ifdef PERPIXEL
         // Per-pixel forward lighting
@@ -126,6 +133,9 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #else
         float3 iVertexLight : TEXCOORD4,
         float4 iScreenPos : TEXCOORD5,
+    #endif
+    #if defined(D3D11) && defined(CLIPPLANE)
+        float iClip : SV_CLIPDISTANCE0,
     #endif
     #ifdef PREPASS
         out float4 oDepth : OUTCOLOR1,

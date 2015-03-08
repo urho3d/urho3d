@@ -87,6 +87,7 @@ cbuffer CameraVS : register(b1)
     float3 cFrustumSize;
     float4 cGBufferOffsets;
     float4x4 cViewProj;
+    float4 cClipPlane;
 }
 
 cbuffer ZoneVS : register(b2)

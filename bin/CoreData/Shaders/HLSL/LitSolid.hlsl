@@ -54,6 +54,9 @@ void VS(float4 iPos : POSITION,
             out float2 oTexCoord2 : TEXCOORD7,
         #endif
     #endif
+    #if defined(D3D11) && defined(CLIPPLANE)
+        out float oClip : SV_CLIPDISTANCE0,
+    #endif
     out float4 oPos : OUTPOSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
@@ -61,6 +64,10 @@ void VS(float4 iPos : POSITION,
     oPos = GetClipPos(worldPos);
     oNormal = GetWorldNormal(modelMatrix);
     oWorldPos = float4(worldPos, GetDepth(oPos));
+    
+    #if defined(D3D11) && defined(CLIPPLANE)
+        oClip = dot(oPos, cClipPlane);
+    #endif
 
     #ifdef NORMALMAP
         float3 tangent = GetWorldTangent(modelMatrix);
@@ -140,6 +147,9 @@ void PS(
         #if defined(LIGHTMAP) || defined(AO)
             float2 iTexCoord2 : TEXCOORD7,
         #endif
+    #endif
+    #if defined(D3D11) && defined(CLIPPLANE)
+        float iClip : SV_CLIPDISTANCE0,
     #endif
     #ifdef PREPASS
         out float4 oDepth : OUTCOLOR1,

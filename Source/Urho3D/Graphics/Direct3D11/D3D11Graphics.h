@@ -565,6 +565,8 @@ private:
     unsigned stencilCompareMask_;
     /// Stencil write bitmask.
     unsigned stencilWriteMask_;
+    /// Current custom clip plane in post-projection space.
+    Vector4 clipPlane_;
     /// Stencil test enable flag.
     bool stencilTest_;
     /// Custom clip plane enable flag.
