@@ -78,12 +78,20 @@ float3 Uncharted2Tonemap(float3 x)
    return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
 }
 
+#ifndef D3D11
 float3 ColorCorrection(float3 color, sampler3D lut)
+#else
+float3 ColorCorrection(float3 color, Texture3D lut, SamplerState lutSampler)
+#endif
 {
     float lutSize = 16.0;
     float scale = (lutSize - 1.0) / lutSize;
     float offset = 1.0 / (2.0 * lutSize);
-    return tex3D(lut, clamp(color, 0.0, 1.0) * scale + offset).rgb;
+    #ifndef D3D11
+        return tex3D(lut, clamp(color, 0.0, 1.0) * scale + offset).rgb;
+    #else
+        return lut.Sample(lutSampler, clamp(color, 0.0, 1.0) * scale + offset).rgb;
+    #endif
 }
 
 static const float Gamma = 2.2;

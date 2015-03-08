@@ -367,6 +367,27 @@ SharedArrayPtr<unsigned char> Texture::ConvertRGBToRGBA(int width, int height, c
     return ret;
 }
 
+SharedArrayPtr<unsigned char> Texture::ConvertRGBToRGBA(int width, int height, int depth, const unsigned char* data)
+{
+    if (!width || !height || !depth)
+        return SharedArrayPtr<unsigned char>();
+
+    SharedArrayPtr<unsigned char> ret(new unsigned char[width * height * depth * 4]);
+    unsigned char* dest = ret.Get();
+
+    for (int i = 0; i < width * height * depth; ++i)
+    {
+        dest[0] = data[0];
+        dest[1] = data[1];
+        dest[2] = data[2];
+        dest[3] = 255;
+        dest += 4;
+        data += 3;
+    }
+
+    return ret;
+}
+
 unsigned Texture::CheckMaxLevels(int width, int height, unsigned requestedLevels)
 {
     unsigned maxLevels = 1;
@@ -382,6 +403,24 @@ unsigned Texture::CheckMaxLevels(int width, int height, unsigned requestedLevels
     else
         return requestedLevels;
 }
+
+unsigned Texture::CheckMaxLevels(int width, int height, int depth, unsigned requestedLevels)
+{
+    unsigned maxLevels = 1;
+    while (width > 1 && height > 1 && depth > 1)
+    {
+        ++maxLevels;
+        width >>= 1;
+        height >>= 1;
+        depth >>= 1;
+    }
+
+    if (!requestedLevels || maxLevels < requestedLevels)
+        return maxLevels;
+    else
+        return requestedLevels;
+}
+
 
 unsigned Texture::GetSRVFormat(unsigned format)
 {

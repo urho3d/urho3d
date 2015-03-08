@@ -120,8 +120,12 @@ public:
     
     /// Convert RGB data to RGBA for loading into a texture.
     static SharedArrayPtr<unsigned char> ConvertRGBToRGBA(int width, int height, const unsigned char* data);
+    /// Convert RGB data to RGBA for loading into a 3D texture.
+    static SharedArrayPtr<unsigned char> ConvertRGBToRGBA(int width, int height, int depth, const unsigned char* data);
     /// Check maximum allowed mip levels for a specific texture size.
     static unsigned CheckMaxLevels(int width, int height, unsigned requestedLevels);
+    /// Check maximum allowed mip levels for a specific 3D texture size.
+    static unsigned CheckMaxLevels(int width, int height, int depth, unsigned requestedLevels);
     /// Return the shader resource view format corresponding to a texture format. Handles conversion of typeless depth texture formats.
     static unsigned GetSRVFormat(unsigned format);
     /// Return the depth-stencil view format corresponding to a texture format. Handles conversion of typeless depth texture formats.
