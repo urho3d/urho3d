@@ -909,6 +909,16 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
             impl_->vertexSizes_[i] = buffer ? buffer->GetVertexSize() : 0;
             impl_->vertexOffsets_[i] = offset;
             vertexDeclarationDirty_ = true;
+
+            if (firstDirtyVB_ == M_MAX_UNSIGNED)
+                firstDirtyVB_ = lastDirtyVB_ = i;
+            else
+            {
+                if (i < firstDirtyVB_)
+                    firstDirtyVB_ = i;
+                if (i > lastDirtyVB_)
+                    lastDirtyVB_ = i;
+            }
         }
     }
     
@@ -954,6 +964,16 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
             impl_->vertexSizes_[i] = buffer ? buffer->GetVertexSize() : 0;
             impl_->vertexOffsets_[i] = offset;
             vertexDeclarationDirty_ = true;
+
+            if (firstDirtyVB_ == M_MAX_UNSIGNED)
+                firstDirtyVB_ = lastDirtyVB_ = i;
+            else
+            {
+                if (i < firstDirtyVB_)
+                    firstDirtyVB_ = i;
+                if (i > lastDirtyVB_)
+                    lastDirtyVB_ = i;
+            }
         }
     }
     
@@ -1417,7 +1437,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
 
     if (texture != textures_[index])
     {
-        if (firstDirtyTexture_ >= MAX_TEXTURE_UNITS)
+        if (firstDirtyTexture_ == M_MAX_UNSIGNED)
             firstDirtyTexture_ = lastDirtyTexture_ = index;
         else
         {
@@ -2568,6 +2588,7 @@ void Graphics::ResetCachedState()
     depthStateHash_ = M_MAX_UNSIGNED;
     rasterizerStateHash_ = M_MAX_UNSIGNED;
     firstDirtyTexture_ = lastDirtyTexture_ = M_MAX_UNSIGNED;
+    firstDirtyVB_ = lastDirtyVB_ = M_MAX_UNSIGNED;
     dirtyConstantBuffers_.Clear();
 }
 
@@ -2587,7 +2608,7 @@ void Graphics::PrepareDraw()
         renderTargetsDirty_ = false;
     }
 
-    if (texturesDirty_ && firstDirtyTexture_ < MAX_TEXTURE_UNITS)
+    if (texturesDirty_ && firstDirtyTexture_ < M_MAX_UNSIGNED)
     {
         /// \todo Research how to best implement vertex texture fetch in an unified way between D3D9, D3D11 and OpenGL. For now only set PS textures to save API calls
         impl_->deviceContext_->PSSetShaderResources(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
@@ -2601,8 +2622,13 @@ void Graphics::PrepareDraw()
 
     if (vertexDeclarationDirty_ && vertexShader_ && vertexShader_->GetByteCode().Size())
     {
-        impl_->deviceContext_->IASetVertexBuffers(0, MAX_VERTEX_STREAMS, &impl_->vertexBuffers_[0], &impl_->vertexSizes_[0],
-            &impl_->vertexOffsets_[0]);
+        if (firstDirtyVB_ < M_MAX_UNSIGNED)
+        {
+            impl_->deviceContext_->IASetVertexBuffers(firstDirtyVB_, lastDirtyVB_ - firstDirtyVB_ + 1, &impl_->vertexBuffers_
+                [firstDirtyVB_], &impl_->vertexSizes_[firstDirtyVB_], &impl_->vertexOffsets_[firstDirtyVB_]);
+
+            firstDirtyVB_ = lastDirtyVB_ = M_MAX_UNSIGNED;
+        }
 
         unsigned long long newVertexDeclarationHash = 0;
         for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)

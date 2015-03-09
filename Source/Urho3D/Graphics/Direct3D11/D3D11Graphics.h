@@ -599,6 +599,10 @@ private:
     unsigned firstDirtyTexture_;
     /// Last dirtied texture unit.
     unsigned lastDirtyTexture_;
+    /// First dirtied vertex buffer.
+    unsigned firstDirtyVB_;
+    /// Last dirtied vertex buffer.
+    unsigned lastDirtyVB_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
     /// Vertex declarations.
