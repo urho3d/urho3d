@@ -341,6 +341,7 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Rebuild navigation data", @SceneRebuildNavigation));
+        popup.AddChild(CreateMenuItem("Add children to SM-group", @SceneAddChildrenStaticModelGroup));
         FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
     }

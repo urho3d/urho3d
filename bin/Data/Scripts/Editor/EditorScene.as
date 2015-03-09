@@ -1013,6 +1013,34 @@ bool SceneRebuildNavigation()
     return success;
 }
 
+bool SceneAddChildrenStaticModelGroup()
+{
+    StaticModelGroup@ smg = cast<StaticModelGroup>(editComponents.length > 0 ? editComponents[0] : null);
+    if (smg is null && editNode !is null)
+        smg = editNode.GetComponent("StaticModelGroup");
+
+    if (smg is null)
+    {
+        MessageBox("Must have a StaticModelGroup component selected.");
+        return false;
+    }
+
+    uint attrIndex = GetAttributeIndex(smg, "Instance Nodes");
+    Variant oldValue = smg.attributes[attrIndex];
+
+    Array<Node@> children = smg.node.GetChildren(true);
+    for (uint i = 0; i < children.length; ++i)
+        smg.AddInstanceNode(children[i]);
+
+    EditAttributeAction action;
+    action.Define(smg, attrIndex, oldValue);;
+    SaveEditAction(action);
+    SetSceneModified();
+    FocusComponent(smg);
+    
+    return true;
+}
+
 void AssignMaterial(StaticModel@ model, String materialPath)
 {
     Material@ material = cache.GetResource("Material", materialPath);
