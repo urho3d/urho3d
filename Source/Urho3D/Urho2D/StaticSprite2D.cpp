@@ -69,7 +69,6 @@ void StaticSprite2D::SetSprite(Sprite2D* sprite)
     if (sprite)
         verticesDirty_ = true;
 
-
     SetTexture(sprite_ ? sprite_->GetTexture() : 0);
 }
 

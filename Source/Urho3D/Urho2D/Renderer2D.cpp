@@ -77,7 +77,7 @@ static inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)
 
     Material* lhsUsedMaterial = lhs->GetMaterial();
     Material* rhsUsedMaterial = rhs->GetMaterial();
-    if (lhsUsedMaterial != rhsUsedMaterial)
+    if (lhsUsedMaterial && rhsUsedMaterial && lhsUsedMaterial != rhsUsedMaterial)
         return lhsUsedMaterial->GetNameHash() < rhsUsedMaterial->GetNameHash();
 
     return lhs->GetID() < rhs->GetID();
