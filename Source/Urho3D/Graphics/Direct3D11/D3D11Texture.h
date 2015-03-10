@@ -130,6 +130,8 @@ public:
     static unsigned GetSRVFormat(unsigned format);
     /// Return the depth-stencil view format corresponding to a texture format. Handles conversion of typeless depth texture formats.
     static unsigned GetDSVFormat(unsigned format);
+    /// Convert format to sRGB.
+    static unsigned GetSRGBFormat(unsigned format);
 
 protected:
     /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references.

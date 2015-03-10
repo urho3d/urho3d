@@ -494,7 +494,7 @@ bool Texture3D::Create()
     textureDesc.Height = height_;
     textureDesc.Depth = depth_;
     textureDesc.MipLevels = levels_;
-    textureDesc.Format = (DXGI_FORMAT)format_;
+    textureDesc.Format = (DXGI_FORMAT)(sRGB_ ? GetSRGBFormat(format_) : format_);
     textureDesc.Usage = usage_ == TEXTURE_DYNAMIC ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
     textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     textureDesc.CPUAccessFlags = usage_ == TEXTURE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;

@@ -424,7 +424,7 @@ bool Texture2D::Create()
     textureDesc.Height = height_;
     textureDesc.MipLevels = levels_;
     textureDesc.ArraySize = 1;
-    textureDesc.Format = (DXGI_FORMAT)format_;
+    textureDesc.Format = (DXGI_FORMAT)(sRGB_ ? GetSRGBFormat(format_) : format_);
     textureDesc.SampleDesc.Count = 1;
     textureDesc.SampleDesc.Quality = 0;
     textureDesc.Usage = usage_ == TEXTURE_DYNAMIC ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;

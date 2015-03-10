@@ -139,8 +139,8 @@ void Texture::SetSRGB(bool enable)
     if (graphics_)
         enable &= graphics_->GetSRGBSupport();
     
+    // Note: on D3D11 sRGB only affects the texture before creation
     sRGB_ = enable;
-    parametersDirty_ = true;
 }
 
 void Texture::SetBackupTexture(Texture* texture)
@@ -442,6 +442,20 @@ unsigned Texture::GetDSVFormat(unsigned format)
         return DXGI_FORMAT_D16_UNORM;
     else if (format == DXGI_FORMAT_R32_TYPELESS)
         return DXGI_FORMAT_D32_FLOAT;
+    else
+        return format;
+}
+
+unsigned Texture::GetSRGBFormat(unsigned format)
+{
+    if (format == DXGI_FORMAT_R8G8B8A8_UNORM)
+        return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    else if (format == DXGI_FORMAT_BC1_UNORM)
+        return DXGI_FORMAT_BC1_UNORM_SRGB;
+    else if (format == DXGI_FORMAT_BC2_UNORM)
+        return DXGI_FORMAT_BC2_UNORM_SRGB;
+    else if (format == DXGI_FORMAT_BC3_UNORM)
+        return DXGI_FORMAT_BC3_UNORM_SRGB;
     else
         return format;
 }

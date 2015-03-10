@@ -637,7 +637,7 @@ bool TextureCube::Create()
     textureDesc.Height = height_;
     textureDesc.MipLevels = levels_;
     textureDesc.ArraySize = MAX_CUBEMAP_FACES;
-    textureDesc.Format = (DXGI_FORMAT)format_;
+    textureDesc.Format = (DXGI_FORMAT)(sRGB_ ? GetSRGBFormat(format_) : format_);
     textureDesc.SampleDesc.Count = 1;
     textureDesc.SampleDesc.Quality = 0;
     textureDesc.Usage = usage_ == TEXTURE_DYNAMIC ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
