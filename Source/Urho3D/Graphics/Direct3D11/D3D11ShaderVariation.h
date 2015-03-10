@@ -117,7 +117,7 @@ private:
     /// Compile from source. Return true if successful.
     bool Compile();
     /// Inspect the constant parameters and input layout (if applicable) from the shader bytecode.
-    void ParseParameters();
+    void ParseParameters(unsigned char* bufData, unsigned bufSize);
     /// Save bytecode to a file.
     void SaveByteCode(const String& binaryShaderName);
     /// Calculate constant buffer sizes from parameters.

@@ -288,8 +288,8 @@ bool ShaderVariation::Compile()
     macros.Push(endMacro);
     
     // Compile using D3DCompile
-    LPD3DBLOB shaderCode = 0;
-    LPD3DBLOB errorMsgs = 0;
+    ID3DBlob* shaderCode = 0;
+    ID3DBlob* errorMsgs = 0;
     
     if (FAILED(D3DCompile(sourceCode.CString(), sourceCode.Length(), owner_->GetName().CString(), &macros.Front(), 0,
         entryPoint, profile, flags, 0, &shaderCode, &errorMsgs)))
@@ -303,10 +303,17 @@ bool ShaderVariation::Compile()
         
         unsigned char* bufData = (unsigned char*)shaderCode->GetBufferPointer();
         unsigned bufSize = shaderCode->GetBufferSize();
-        byteCode_.Resize(bufSize);
-        memcpy(&byteCode_[0], bufData, bufSize);
-        ParseParameters();
+        // Use the original bytecode to reflect the parameters
+        ParseParameters(bufData, bufSize);
         CalculateConstantBufferSizes();
+
+        // Then strip everything not necessary to use the shader
+        ID3DBlob* strippedCode = 0;
+        D3DStripShader(bufData, bufSize, D3DCOMPILER_STRIP_REFLECTION_DATA | D3DCOMPILER_STRIP_DEBUG_INFO |
+            D3DCOMPILER_STRIP_TEST_BLOBS | D3DCOMPILER_STRIP_PRIVATE_DATA, &strippedCode);
+        byteCode_.Resize(strippedCode->GetBufferSize());
+        memcpy(&byteCode_[0], strippedCode->GetBufferPointer(), byteCode_.Size());
+        strippedCode->Release();
     }
 
     if (shaderCode)
@@ -317,15 +324,12 @@ bool ShaderVariation::Compile()
     return !byteCode_.Empty();
 }
 
-void ShaderVariation::ParseParameters()
+void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
 {
-    if (byteCode_.Empty())
-        return;
-
     ID3D11ShaderReflection* reflection = 0;
     D3D11_SHADER_DESC shaderDesc;
 
-    D3DReflect(&byteCode_[0], byteCode_.Size(), IID_ID3D11ShaderReflection, (void**)&reflection);
+    D3DReflect(bufData, bufSize, IID_ID3D11ShaderReflection, (void**)&reflection);
     if (!reflection)
     {
         LOGERROR("Failed to reflect vertex shader's input signature");
@@ -384,11 +388,6 @@ void ShaderVariation::ParseParameters()
                 parameters_[varName] = ShaderParameter(type_, varName, cbRegister, varDesc.StartOffset, varDesc.Size);
             }
         }
-    }
-
-    if (type_ == PS)
-    {
-
     }
 
     reflection->Release();
