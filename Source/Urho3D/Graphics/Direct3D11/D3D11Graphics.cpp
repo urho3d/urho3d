@@ -887,27 +887,36 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
         VertexBuffer* buffer = 0;
-        unsigned offset = 0;
-        unsigned elementMask = 0;
+        bool changed = false;
 
-        if (i < buffers.Size())
+        buffer = i < buffers.Size() ? buffers[i] : 0;
+        if (buffer)
         {
-            buffer = buffers[i];
-            if (buffer)
+            unsigned elementMask = buffer->GetElementMask() & elementMasks[i];
+            unsigned offset = (elementMask & MASK_INSTANCEMATRIX1) ? instanceOffset * buffer->GetVertexSize() : 0;
+
+            if (buffer != vertexBuffers_[i] || elementMask != elementMasks_[i] || offset != impl_->vertexOffsets_[i])
             {
-                elementMask = buffer->GetElementMask() & elementMasks[i];
-                if (elementMask & MASK_INSTANCEMATRIX1)
-                    offset = instanceOffset * buffer->GetVertexSize();
+                vertexBuffers_[i] = buffer;
+                elementMasks_[i] = elementMask;
+                impl_->vertexBuffers_[i] = (ID3D11Buffer*)buffer->GetGPUObject();
+                impl_->vertexSizes_[i] = buffer->GetVertexSize();
+                impl_->vertexOffsets_[i] = offset;
+                changed = true;
             }
         }
-
-        if (buffer != vertexBuffers_[i] || offset != impl_->vertexOffsets_[i] || elementMask != elementMasks_[i])
+        else if (vertexBuffers_[i])
         {
-            vertexBuffers_[i] = buffer;
-            elementMasks_[i] = elementMask;
-            impl_->vertexBuffers_[i] = buffer ? (ID3D11Buffer*)buffer->GetGPUObject() : 0;
-            impl_->vertexSizes_[i] = buffer ? buffer->GetVertexSize() : 0;
-            impl_->vertexOffsets_[i] = offset;
+            vertexBuffers_[i] = 0;
+            elementMasks_[i] = 0;
+            impl_->vertexBuffers_[i] = 0;
+            impl_->vertexSizes_[i] = 0;
+            impl_->vertexOffsets_[i] = 0;
+            changed = true;
+        }
+
+        if (changed)
+        {
             vertexDeclarationDirty_ = true;
 
             if (firstDirtyVB_ == M_MAX_UNSIGNED)
@@ -942,27 +951,36 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
         VertexBuffer* buffer = 0;
-        unsigned offset = 0;
-        unsigned elementMask = 0;
-        
-        if (i < buffers.Size())
+        bool changed = false;
+
+        buffer = i < buffers.Size() ? buffers[i].Get() : 0;
+        if (buffer)
         {
-            buffer = buffers[i];
-            if (buffer)
+            unsigned elementMask = buffer->GetElementMask() & elementMasks[i];
+            unsigned offset = (elementMask & MASK_INSTANCEMATRIX1) ? instanceOffset * buffer->GetVertexSize() : 0;
+
+            if (buffer != vertexBuffers_[i] || elementMask != elementMasks_[i] || offset != impl_->vertexOffsets_[i])
             {
-                elementMask = buffer->GetElementMask() & elementMasks[i];
-                if (elementMask & MASK_INSTANCEMATRIX1)
-                    offset = instanceOffset * buffer->GetVertexSize();
+                vertexBuffers_[i] = buffer;
+                elementMasks_[i] = elementMask;
+                impl_->vertexBuffers_[i] = (ID3D11Buffer*)buffer->GetGPUObject();
+                impl_->vertexSizes_[i] = buffer->GetVertexSize();
+                impl_->vertexOffsets_[i] = offset;
+                changed = true;
             }
         }
-        
-        if (buffer != vertexBuffers_[i] || offset != impl_->vertexOffsets_[i] || elementMask != elementMasks_[i])
+        else if (vertexBuffers_[i])
         {
-            vertexBuffers_[i] = buffer;
-            elementMasks_[i] = elementMask;
-            impl_->vertexBuffers_[i] = buffer ? (ID3D11Buffer*)buffer->GetGPUObject() : 0;
-            impl_->vertexSizes_[i] = buffer ? buffer->GetVertexSize() : 0;
-            impl_->vertexOffsets_[i] = offset;
+            vertexBuffers_[i] = 0;
+            elementMasks_[i] = 0;
+            impl_->vertexBuffers_[i] = 0;
+            impl_->vertexSizes_[i] = 0;
+            impl_->vertexOffsets_[i] = 0;
+            changed = true;
+        }
+
+        if (changed)
+        {
             vertexDeclarationDirty_ = true;
 
             if (firstDirtyVB_ == M_MAX_UNSIGNED)

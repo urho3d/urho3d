@@ -327,7 +327,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
                     Matrix4 shadowMatrices[2];
 
                     CalculateSpotMatrix(shadowMatrices[0], light, Vector3::ZERO);
-                    bool isShadowed = shadowMap && graphics->HasTextureUnit(TU_SHADOWMAP);
+                    bool isShadowed = shadowMap && pixelShader_->HasTextureUnit(TU_SHADOWMAP);
                     if (isShadowed)
                         CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, Vector3::ZERO);
 
@@ -554,7 +554,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
         const HashMap<TextureUnit, SharedPtr<Texture> >& textures = material_->GetTextures();
         for (HashMap<TextureUnit, SharedPtr<Texture> >::ConstIterator i = textures.Begin(); i != textures.End(); ++i)
         {
-            if (graphics->HasTextureUnit(i->first_))
+            if (pixelShader_->HasTextureUnit(i->first_))
                 graphics->SetTexture(i->first_, i->second_.Get());
         }
     }
