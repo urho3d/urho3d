@@ -65,7 +65,7 @@ struct LightQueryResult
     unsigned shadowCasterBegin_[MAX_LIGHT_SPLITS];
     /// Shadow caster end indices.
     unsigned shadowCasterEnd_[MAX_LIGHT_SPLITS];
-    /// Combined bounding box of shadow casters in light view or projection space.
+    /// Combined bounding box of shadow casters in light projection space. Only used for focused spot lights.
     BoundingBox shadowCasterBox_[MAX_LIGHT_SPLITS];
     /// Shadow camera near splits (directional lights only.)
     float shadowNearSplits_[MAX_LIGHT_SPLITS];

@@ -2311,10 +2311,8 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
         
         if (IsShadowCasterVisible(drawable, lightViewBox, shadowCamera, lightView, lightViewFrustum, lightViewFrustumBox))
         {
-            // Merge to shadow caster bounding box and add to the list
-            if (type == LIGHT_DIRECTIONAL)
-                query.shadowCasterBox_[splitIndex].Merge(lightViewBox);
-            else
+            // Merge to shadow caster bounding box (only needed for focused spot lights) and add to the list
+            if (type == LIGHT_SPOT && light->GetShadowFocus().focus_)
             {
                 lightProjBox = lightViewBox.Projected(lightProj);
                 query.shadowCasterBox_[splitIndex].Merge(lightProjBox);
@@ -2555,22 +2553,19 @@ void View::FinalizeShadowCamera(Camera* shadowCamera, Light* light, const IntRec
         QuantizeDirLightShadowCamera(shadowCamera, light, shadowViewport, shadowBox);
     }
     
-    if (type == LIGHT_SPOT)
+    if (type == LIGHT_SPOT && parameters.focus_)
     {
-        if (parameters.focus_)
-        {
-            float viewSizeX = Max(Abs(shadowCasterBox.min_.x_), Abs(shadowCasterBox.max_.x_));
-            float viewSizeY = Max(Abs(shadowCasterBox.min_.y_), Abs(shadowCasterBox.max_.y_));
-            float viewSize = Max(viewSizeX, viewSizeY);
-            // Scale the quantization parameters, because view size is in projection space (-1.0 - 1.0)
-            float invOrthoSize = 1.0f / shadowCamera->GetOrthoSize();
-            float quantize = parameters.quantize_ * invOrthoSize;
-            float minView = parameters.minView_ * invOrthoSize;
+        float viewSizeX = Max(Abs(shadowCasterBox.min_.x_), Abs(shadowCasterBox.max_.x_));
+        float viewSizeY = Max(Abs(shadowCasterBox.min_.y_), Abs(shadowCasterBox.max_.y_));
+        float viewSize = Max(viewSizeX, viewSizeY);
+        // Scale the quantization parameters, because view size is in projection space (-1.0 - 1.0)
+        float invOrthoSize = 1.0f / shadowCamera->GetOrthoSize();
+        float quantize = parameters.quantize_ * invOrthoSize;
+        float minView = parameters.minView_ * invOrthoSize;
             
-            viewSize = Max(ceilf(viewSize / quantize) * quantize, minView);
-            if (viewSize < 1.0f)
-                shadowCamera->SetZoom(1.0f / viewSize);
-        }
+        viewSize = Max(ceilf(viewSize / quantize) * quantize, minView);
+        if (viewSize < 1.0f)
+            shadowCamera->SetZoom(1.0f / viewSize);
     }
     
     // Perform a finalization step for all lights: ensure zoom out of 2 pixels to eliminate border filtering issues
