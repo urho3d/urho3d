@@ -1746,20 +1746,6 @@ void Graphics::SetDepthWrite(bool enable)
     }
 }
 
-void Graphics::SetDrawAntialiased(bool enable)
-{
-    if (enable != drawAntialiased_)
-    {
-        #ifndef GL_ES_VERSION_2_0
-        if (enable)
-            glEnable(GL_MULTISAMPLE);
-        else
-            glDisable(GL_MULTISAMPLE);
-        #endif
-        drawAntialiased_ = enable;
-    }
-}
-
 void Graphics::SetFillMode(FillMode mode)
 {
     #ifndef GL_ES_VERSION_2_0
@@ -2990,7 +2976,6 @@ void Graphics::ResetCachedState()
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
     useClipPlane_ = false;
-    drawAntialiased_ = true;
     lastInstanceOffset_ = 0;
     impl_->activeTexture_ = 0;
     impl_->enabledAttributes_ = 0;

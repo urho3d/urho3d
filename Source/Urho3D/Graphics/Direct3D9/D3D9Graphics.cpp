@@ -940,7 +940,7 @@ void Graphics::SetVertexBuffer(VertexBuffer* buffer)
 bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const PODVector<unsigned>&
     elementMasks, unsigned instanceOffset)
 {
-   if (buffers.Size() > MAX_VERTEX_STREAMS)
+    if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
         LOGERROR("Too many vertex buffers");
         return false;
@@ -1014,7 +1014,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
 bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>&
     elementMasks, unsigned instanceOffset)
 {
-   if (buffers.Size() > MAX_VERTEX_STREAMS)
+    if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
         LOGERROR("Too many vertex buffers");
         return false;
@@ -1743,15 +1743,6 @@ void Graphics::SetDepthWrite(bool enable)
     {
         impl_->device_->SetRenderState(D3DRS_ZWRITEENABLE, enable ? TRUE : FALSE);
         depthWrite_ = enable;
-    }
-}
-
-void Graphics::SetDrawAntialiased(bool enable)
-{
-    if (enable != drawAntialiased_)
-    {
-        impl_->device_->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, enable ? TRUE : FALSE);
-        drawAntialiased_ = enable;
     }
 }
 
@@ -2761,7 +2752,6 @@ void Graphics::ResetCachedState()
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
     useClipPlane_ = false;
-    drawAntialiased_ = true;
     impl_->blendEnable_ = FALSE;
     impl_->srcBlend_ = D3DBLEND_ONE;
     impl_->destBlend_ = D3DBLEND_ZERO;

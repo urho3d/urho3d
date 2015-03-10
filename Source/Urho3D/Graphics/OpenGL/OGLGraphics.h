@@ -203,8 +203,6 @@ public:
     void SetDepthTest(CompareMode mode);
     /// Set depth write on/off.
     void SetDepthWrite(bool enable);
-    /// Set antialiased drawing mode on/off. Default is on if the backbuffer is multisampled. Has no effect when backbuffer is not multisampled.
-    void SetDrawAntialiased(bool enable);
     /// Set polygon fill mode.
     void SetFillMode(FillMode mode);
     /// Set scissor test.
@@ -338,8 +336,6 @@ public:
     CompareMode GetDepthTest() const { return depthTestMode_; }
     /// Return whether depth write is enabled.
     bool GetDepthWrite() const { return depthWrite_; }
-    /// Return whether antialiased drawing mode is enabled.
-    bool GetDrawAntialiased() const { return drawAntialiased_; }
     /// Return polygon fill mode.
     FillMode GetFillMode() const { return fillMode_; }
     /// Return whether stencil test is enabled.
@@ -579,8 +575,6 @@ private:
     bool stencilTest_;
     /// Custom clip plane enable flag.
     bool useClipPlane_;
-    /// Draw antialiased mode flag.
-    bool drawAntialiased_;
     /// Last used instance data offset.
     unsigned lastInstanceOffset_;
     /// Default texture filtering mode.

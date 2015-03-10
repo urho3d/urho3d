@@ -873,7 +873,7 @@ void Graphics::SetVertexBuffer(VertexBuffer* buffer)
 bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const PODVector<unsigned>&
     elementMasks, unsigned instanceOffset)
 {
-   if (buffers.Size() > MAX_VERTEX_STREAMS)
+    if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
         LOGERROR("Too many vertex buffers");
         return false;
@@ -928,7 +928,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
 bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>&
     elementMasks, unsigned instanceOffset)
 {
-   if (buffers.Size() > MAX_VERTEX_STREAMS)
+    if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
         LOGERROR("Too many vertex buffers");
         return false;
@@ -1641,11 +1641,6 @@ void Graphics::SetDepthWrite(bool enable)
         depthWrite_ = enable;
         depthStateDirty_ = true;
     }
-}
-
-void Graphics::SetDrawAntialiased(bool enable)
-{
-    /// \todo Not implemented
 }
 
 void Graphics::SetFillMode(FillMode mode)
@@ -2575,7 +2570,6 @@ void Graphics::ResetCachedState()
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
     useClipPlane_ = false;
-    drawAntialiased_ = true;
     renderTargetsDirty_ = true;
     texturesDirty_ = true;
     vertexDeclarationDirty_ = true;

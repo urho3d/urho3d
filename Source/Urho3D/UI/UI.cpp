@@ -763,7 +763,6 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
     graphics_->SetCullMode(CULL_CCW);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
-    graphics_->SetDrawAntialiased(false);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
     if (resetRenderTargets)
