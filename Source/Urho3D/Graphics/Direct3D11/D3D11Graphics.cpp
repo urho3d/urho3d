@@ -509,7 +509,17 @@ bool Graphics::SetMode(int width, int height)
 
 void Graphics::SetSRGB(bool enable)
 {
-    sRGB_ = enable && sRGBWriteSupport_;
+    bool newEnable = enable && sRGBWriteSupport_;
+    if (newEnable != sRGB_)
+    {
+        sRGB_ = newEnable;
+        if (impl_->swapChain_)
+        {
+            // Recreate swap chain for the new backbuffer format
+            CreateDevice(width_, height_, multiSample_);
+            UpdateSwapChain(width_, height_);
+        }
+    }
 }
 
 void Graphics::SetFlushGPU(bool enable)
@@ -1542,8 +1552,6 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
             }
         }
     }
-    
-    /// \todo Set SRGB write mode
 }
 
 void Graphics::SetRenderTarget(unsigned index, Texture2D* texture)
@@ -2404,7 +2412,7 @@ bool Graphics::CreateDevice(int width, int height, int multisample)
     swapChainDesc.BufferCount = 1;
     swapChainDesc.BufferDesc.Width = width;
     swapChainDesc.BufferDesc.Height = height;
-    swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    swapChainDesc.BufferDesc.Format = sRGB_ ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapChainDesc.OutputWindow = GetWindowHandle(impl_->window_);
     swapChainDesc.SampleDesc.Count = multisample;
