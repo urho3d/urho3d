@@ -783,6 +783,9 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     return (0);
                 }
             }
+            // Urho3D: prevent alert bell sounds from Alt key combinations
+            if ((wParam & 0xFFF0) == SC_KEYMENU)
+                returnCode = 1;
         }
         break;
 #endif /* System has screensaver support */
