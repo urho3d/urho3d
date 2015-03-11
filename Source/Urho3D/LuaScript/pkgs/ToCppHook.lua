@@ -96,7 +96,7 @@ function post_output_hook(package)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-function"
 #endif]])
-    if _extra_parameters["IS_BUILDING_URHO3D"] then
+    if _extra_parameters["Urho3D"] then
         replace([[<Urho3D/LuaScript/ToluaUtils.h>]], [["LuaScript/ToluaUtils.h"]])
     end
 
