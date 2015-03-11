@@ -327,7 +327,10 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
 
             // Create StaticSprite2D component
             if (track.hasSprite_)
+            {
                 staticSprite = trackNode->CreateComponent<StaticSprite2D>();
+                staticSprite->SetEnabled(IsEnabledEffective());
+            }
         }
 
         if (staticSprite)
