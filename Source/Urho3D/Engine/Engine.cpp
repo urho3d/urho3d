@@ -54,7 +54,7 @@
 #include "../Core/WorkQueue.h"
 #include "../Resource/XMLFile.h"
 
-#ifdef EMSCRIPTEN
+#if defined(EMSCRIPTEN) && defined(URHO3D_TESTING)
 #include <emscripten.h>
 #endif
 
@@ -892,7 +892,7 @@ void Engine::DoExit()
         graphics->Close();
 
     exiting_ = true;
-    #ifdef EMSCRIPTEN
+    #if defined(EMSCRIPTEN) && defined(URHO3D_TESTING)
     emscripten_force_exit(EXIT_SUCCESS);    // Some how this is required to signal emrun to stop
     #endif
 }
