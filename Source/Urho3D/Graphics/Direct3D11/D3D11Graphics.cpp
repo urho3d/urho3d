@@ -411,11 +411,6 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     if (borderless)
         fullscreen = false;
     
-    // Check that multisample level is supported
-    PODVector<int> multiSampleLevels = GetMultiSampleLevels();
-    if (!multiSampleLevels.Contains(multiSample))
-        multiSample = 1;
-    
     // If nothing changes, do not reset the device
     if (width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
         vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
@@ -689,8 +684,6 @@ void Graphics::EndFrame()
         impl_->swapChain_->Present(vsync_ ? 1 : 0, 0);
     }
     
-    /// \todo Implement render-ahead control (D3D9 uses query to sync every frame)
-
     // Clean up too large scratch buffers
     CleanupScratchBuffers();
 }
@@ -1879,11 +1872,19 @@ PODVector<IntVector2> Graphics::GetResolutions() const
 PODVector<int> Graphics::GetMultiSampleLevels() const
 {
     PODVector<int> ret;
-    /// \todo Implement properly
     ret.Push(1);
-    ret.Push(2);
-    ret.Push(4);
-    ret.Push(8);
+
+    if (impl_->device_)
+    {
+        for (unsigned i = 2; i <= 16; ++i)
+        {
+            unsigned levels = 0;
+            impl_->device_->CheckMultisampleQualityLevels(sRGB_ ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM,
+                i, &levels);
+            if (levels)
+                ret.Push(i);
+        }
+    }
 
     return ret;
 }
@@ -2371,7 +2372,7 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
     }
 }
 
-bool Graphics::CreateDevice(int width, int height, int multisample)
+bool Graphics::CreateDevice(int width, int height, int multiSample)
 {
     // Device needs only to be created once
     if (!impl_->device_)
@@ -2400,6 +2401,11 @@ bool Graphics::CreateDevice(int width, int height, int multisample)
         SetFlushGPU(flushGPU_);
     }
 
+    // Check that multisample level is supported
+    PODVector<int> multiSampleLevels = GetMultiSampleLevels();
+    if (!multiSampleLevels.Contains(multiSample))
+        multiSample = 1;
+
     // Create swap chain. Release old if necessary
     if (impl_->swapChain_)
     {
@@ -2415,8 +2421,8 @@ bool Graphics::CreateDevice(int width, int height, int multisample)
     swapChainDesc.BufferDesc.Format = sRGB_ ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapChainDesc.OutputWindow = GetWindowHandle(impl_->window_);
-    swapChainDesc.SampleDesc.Count = multisample;
-    swapChainDesc.SampleDesc.Quality = multisample > 1 ? 0xffffffff : 0;
+    swapChainDesc.SampleDesc.Count = multiSample;
+    swapChainDesc.SampleDesc.Quality = multiSample > 1 ? 0xffffffff : 0;
     swapChainDesc.Windowed = TRUE;
     swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
@@ -2437,7 +2443,7 @@ bool Graphics::CreateDevice(int width, int height, int multisample)
 
     if (impl_->swapChain_)
     {
-        multiSample_ = multisample;
+        multiSample_ = multiSample;
         return true;
     }
     else

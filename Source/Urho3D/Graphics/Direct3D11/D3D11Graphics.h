@@ -429,7 +429,7 @@ private:
     /// Adjust the window for new resolution and fullscreen mode.
     void AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless);
     /// Create the D3D11 device and swap chain. Requires an open window. Can also be called again to recreate swap chain. Return true on success.
-    bool CreateDevice(int width, int height, int multisample);
+    bool CreateDevice(int width, int height, int multiSample);
     /// Update swap chain state for a new mode and create views for the backbuffer & default depth buffer. Return true on success.
     bool UpdateSwapChain(int width, int height);
     /// Check supported rendering features.
