@@ -1134,6 +1134,7 @@ Direct3D9 and Direct3D11 share the same HLSL shader code. Macros and some condit
 - Both textures and samplers are defined for each texture unit. The macros in Samplers.hlsl (Sample2D, SampleCube etc.) can be used to write code that works on both APIs. These take the texture unit name without the 's' prefix.
 - Vertex shader output position and pixel shader output color need to use the SV_POSITION and SV_TARGET semantics. The macros OUTPOSITION and OUTCOLOR0-3 can be used to select the correct semantic on both APIs. In the vertex shader, the output position should be specified last, as otherwise other interpolator outputs may not function correctly.
 - On Direct3D11 the clip plane coordinate must be calculated manually. This is indicated by the CLIPPLANE compilation define, which is added automatically by the Graphics class. See for example the LitSolid.hlsl shader.
+- Direct3D11 does not support luminance and luminance-alpha texture formats, but rather use the R and RG channels. Therefore be prepared to perform swizzling in the texture reads as appropriate.
 
 \section Shaders_Precaching Shader precaching
 

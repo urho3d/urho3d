@@ -142,7 +142,7 @@ void PS()
         #endif
     
         #if defined(SPOTLIGHT)
-            lightColor = vSpotPos.w > 0.0 ? texture2DProj(sLightSpotMap, vSpotPos).rrr * cLightColor.rgb : vec3(0.0, 0.0, 0.0);
+            lightColor = vSpotPos.w > 0.0 ? texture2DProj(sLightSpotMap, vSpotPos).rgb * cLightColor.rgb : vec3(0.0, 0.0, 0.0);
         #elif defined(CUBEMASK)
             lightColor = textureCube(sLightCubeMap, vCubeMaskVec).rgb * cLightColor.rgb;
         #else
