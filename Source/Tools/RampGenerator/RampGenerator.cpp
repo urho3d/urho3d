@@ -93,13 +93,13 @@ void Run(const Vector<String>& arguments)
     
     if (dimensions == 2)
     {
-        SharedArrayPtr<unsigned char> data(new unsigned char[width * width]);
+        SharedArrayPtr<unsigned char> data(new unsigned char[width * width * 3]);
         
         for (int y = 0; y < width; ++y)
         {
             for (int x = 0; x < width; ++x)
             {
-                unsigned i = y * width + x;
+                unsigned i = (y * width + x) * 3;
                 
                 float halfWidth = width * 0.5f;
                 float xf = (x - halfWidth + 0.5f) / (halfWidth - 0.5f);
@@ -109,18 +109,29 @@ void Run(const Vector<String>& arguments)
                     dist = 1.0f;
                 
                 data[i] = (unsigned char)((1.0f - pow(dist, power)) * 255.0f);
+                data[i + 1] = data[i];
+                data[i + 2] = data[i];
             }
         }
         
         // Ensure the border is completely black
         for (int x = 0; x < width; ++x)
         {
-            data[x] = 0;
-            data[(width - 1) * width + x] = 0;
-            data[x * width] = 0;
-            data[x * width + (width - 1)] = 0;
+            data[x * 3] = 0;
+            data[x * 3 + 1] = 0;
+            data[x * 3 + 2] = 0;
+            data[((width - 1) * width + x) * 3] = 0;
+            data[((width - 1) * width + x) * 3 + 1] = 0;
+            data[((width - 1) * width + x) * 3 + 2] = 0;
+            data[x * width * 3] = 0;
+            data[x * width * 3 + 1] = 0;
+            data[x * width * 3 + 2] = 0;
+            data[(x * width + (width - 1)) * 3] = 0;
+            data[(x * width + (width - 1)) * 3 + 1] = 0;
+            data[(x * width + (width - 1)) * 3 + 2] = 0;
         }
         
-        stbi_write_png(arguments[0].CString(), width, width, 1, data.Get(), 0);
+        // Save as RGB to allow Direct3D11 shaders to sample monochrome and color spot textures similarly
+        stbi_write_png(arguments[0].CString(), width, width, 3, data.Get(), 0);
     }
 }
