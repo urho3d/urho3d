@@ -81,7 +81,7 @@ bool Texture2D::BeginLoad(Deserializer& source)
 bool Texture2D::EndLoad()
 {
     // In headless mode, do not actually load the texture, just return success
-    if (!graphics_ || graphics_->IsDeviceLost())
+    if (!graphics_)
         return true;
     
     // If over the texture budget, see if materials can be freed to allow textures to be freed
@@ -206,7 +206,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     unsigned char* src = (unsigned char*)data;
     unsigned rowSize = GetRowDataSize(width);
     unsigned rowStart = GetRowDataSize(x);
-    unsigned subResource = D3D11CalcSubresource((unsigned)level, 0, (unsigned)levels_);
+    unsigned subResource = D3D11CalcSubresource(level, 0, levels_);
 
     if (usage_ == TEXTURE_DYNAMIC)
     {
@@ -396,17 +396,60 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         return false;
     }
     
-    if (graphics_->IsDeviceLost())
-    {
-        LOGWARNING("Getting texture data while device is lost");
-        return false;
-    }
-    
     int levelWidth = GetLevelWidth(level);
     int levelHeight = GetLevelHeight(level);
     
-    /// \todo Implement
-    return true;
+    D3D11_TEXTURE2D_DESC textureDesc;
+    memset(&textureDesc, 0, sizeof textureDesc);
+    textureDesc.Width = levelWidth;
+    textureDesc.Height = levelHeight;
+    textureDesc.MipLevels = 1;
+    textureDesc.ArraySize = 1;
+    textureDesc.Format = (DXGI_FORMAT)format_;
+    textureDesc.SampleDesc.Count = 1;
+    textureDesc.SampleDesc.Quality = 0;
+    textureDesc.Usage = D3D11_USAGE_STAGING;
+    textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+
+    ID3D11Texture2D* stagingTexture = 0;
+    graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, &stagingTexture);
+    if (!stagingTexture)
+    {
+        LOGERROR("Failed to create staging texture for GetData");
+        return false;
+    }
+
+    unsigned srcSubResource = D3D11CalcSubresource(level, 0, levels_);
+    D3D11_BOX srcBox;
+    srcBox.left = 0;
+    srcBox.right = levelWidth;
+    srcBox.top = 0;
+    srcBox.bottom = levelHeight;
+    srcBox.front = 0;
+    srcBox.back = 1;
+    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_,
+        srcSubResource, &srcBox);
+    
+    D3D11_MAPPED_SUBRESOURCE mappedData;
+    mappedData.pData = 0;
+    unsigned rowSize = GetRowDataSize(levelWidth);
+    unsigned numRows = IsCompressed() ? (levelHeight + 3) >> 2 : levelHeight;
+
+    graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
+    if (mappedData.pData)
+    {
+        for (unsigned row = 0; row < numRows; ++row)
+            memcpy((unsigned char*)dest + row * rowSize, (unsigned char*)mappedData.pData + row * mappedData.RowPitch, rowSize);
+        graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)stagingTexture, 0);
+        stagingTexture->Release();
+        return true;
+    }
+    else
+    {
+        LOGERROR("Failed to map staging texture for GetData");
+        stagingTexture->Release();
+        return false;
+    }
 }
 
 bool Texture2D::Create()

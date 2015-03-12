@@ -125,7 +125,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
 bool Texture3D::EndLoad()
 {
     // In headless mode, do not actually load the texture, just return success
-    if (!graphics_ || graphics_->IsDeviceLost())
+    if (!graphics_)
         return true;
     
     // If over the texture budget, see if materials can be freed to allow textures to be freed
@@ -253,7 +253,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     unsigned char* src = (unsigned char*)data;
     unsigned rowSize = GetRowDataSize(width);
     unsigned rowStart = GetRowDataSize(x);
-    unsigned subResource = D3D11CalcSubresource((unsigned)level, 0, (unsigned)levels_);
+    unsigned subResource = D3D11CalcSubresource(level, 0, levels_);
 
     if (usage_ == TEXTURE_DYNAMIC)
     {
@@ -455,12 +455,6 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     if (level >= levels_)
     {
         LOGERROR("Illegal mip level for getting data");
-        return false;
-    }
-    
-    if (graphics_->IsDeviceLost())
-    {
-        LOGWARNING("Getting texture data while device is lost");
         return false;
     }
     

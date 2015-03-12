@@ -627,11 +627,16 @@ bool Graphics::TakeScreenShot(Image& destImage)
                 ++src;
             }
         }
+        impl_->deviceContext_->Unmap(stagingTexture, 0);
+        stagingTexture->Release();
+        return true;
     }
-
-    impl_->deviceContext_->Unmap(stagingTexture, 0);
-    stagingTexture->Release();
-    return true;
+    else
+    {
+        LOGERROR("Could not map staging texture for screenshot");
+        stagingTexture->Release();
+        return false;
+    }
 }
 
 bool Graphics::BeginFrame()
