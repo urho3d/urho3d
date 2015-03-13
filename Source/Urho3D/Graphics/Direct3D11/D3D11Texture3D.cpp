@@ -462,15 +462,61 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     int levelHeight = GetLevelHeight(level);
     int levelDepth = GetLevelDepth(level);
     
-    int height = levelHeight;
-    if (IsCompressed())
-        height = (height + 3) >> 2;
-    
-    unsigned char* destPtr = (unsigned char*)dest;
-    unsigned rowSize = GetRowDataSize(levelWidth);
+    D3D11_TEXTURE3D_DESC textureDesc;
+    memset(&textureDesc, 0, sizeof textureDesc);
+    textureDesc.Width = levelWidth;
+    textureDesc.Height = levelHeight;
+    textureDesc.Depth = levelDepth;
+    textureDesc.MipLevels = 1;
+    textureDesc.Format = (DXGI_FORMAT)format_;
+    textureDesc.Usage = D3D11_USAGE_STAGING;
+    textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
-    /// \todo Implement
-    return true;
+    ID3D11Texture3D* stagingTexture = 0;
+    graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, &stagingTexture);
+    if (!stagingTexture)
+    {
+        LOGERROR("Failed to create staging texture for GetData");
+        return false;
+    }
+
+    unsigned srcSubResource = D3D11CalcSubresource(level, 0, levels_);
+    D3D11_BOX srcBox;
+    srcBox.left = 0;
+    srcBox.right = levelWidth;
+    srcBox.top = 0;
+    srcBox.bottom = levelHeight;
+    srcBox.front = 0;
+    srcBox.back = levelDepth;
+    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_,
+        srcSubResource, &srcBox);
+
+    D3D11_MAPPED_SUBRESOURCE mappedData;
+    mappedData.pData = 0;
+    unsigned rowSize = GetRowDataSize(levelWidth);
+    unsigned numRows = IsCompressed() ? (levelHeight + 3) >> 2 : levelHeight;
+
+    graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
+    if (mappedData.pData)
+    {
+        for (unsigned page = 0; page < levelDepth; ++page)
+        {
+            for (unsigned row = 0; row < numRows; ++row)
+            {
+                memcpy((unsigned char*)dest + (page * numRows + row) * rowSize, (unsigned char*)mappedData.pData + page *
+                    mappedData.DepthPitch + row * mappedData.RowPitch, rowSize);
+            }
+        }
+        graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)stagingTexture, 0);
+        stagingTexture->Release();
+        return true;
+    }
+    else
+    {
+        LOGERROR("Failed to map staging texture for GetData");
+        stagingTexture->Release();
+        return false;
+    }
 }
 
 bool Texture3D::Create()

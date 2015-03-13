@@ -2204,7 +2204,7 @@ unsigned Graphics::GetLuminanceFormat()
 
 unsigned Graphics::GetLuminanceAlphaFormat()
 {
-    /// \todo Not correct
+    // Note: not same sampling behavior as on D3D9; need to sample the RG channels
     return DXGI_FORMAT_R8G8_UNORM;
 }
 
