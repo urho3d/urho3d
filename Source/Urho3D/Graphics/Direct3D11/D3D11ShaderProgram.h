@@ -31,23 +31,13 @@ namespace Urho3D
 {
 
 /// Combined information for specific vertex and pixel shaders.
-class ShaderProgram : public RefCounted
+class URHO3D_API ShaderProgram : public RefCounted
 {
 public:
     /// Construct.
     ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader)
     {
-        const HashMap<StringHash, ShaderParameter>& vsParams = vertexShader->GetParameters();
-        for (HashMap<StringHash, ShaderParameter>::ConstIterator i = vsParams.Begin(); i != vsParams.End(); ++i)
-            parameters_[i->first_] = i->second_;
-
-        const HashMap<StringHash, ShaderParameter>& psParams = pixelShader->GetParameters();
-        for (HashMap<StringHash, ShaderParameter>::ConstIterator i = psParams.Begin(); i != psParams.End(); ++i)
-            parameters_[i->first_] = i->second_;
-
-        // Optimize shader parameter lookup by rehashing to next power of two
-        parameters_.Rehash(NextPowerOfTwo(parameters_.Size()));
-
+        // Create needed constant buffers
         const unsigned* vsBufferSizes = vertexShader->GetConstantBufferSizes();
         for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
         {
@@ -61,6 +51,25 @@ public:
             if (psBufferSizes[i])
                 psConstantBuffers_[i] = graphics->GetOrCreateConstantBuffer(PS, i, psBufferSizes[i]);
         }
+
+        // Copy parameters. Add direct links to constant buffers.
+        const HashMap<StringHash, ShaderParameter>& vsParams = vertexShader->GetParameters();
+        for (HashMap<StringHash, ShaderParameter>::ConstIterator i = vsParams.Begin(); i != vsParams.End(); ++i)
+        {
+            parameters_[i->first_] = i->second_;
+            parameters_[i->first_].bufferPtr_ = vsConstantBuffers_[i->second_.buffer_].Get();
+        }
+
+        const HashMap<StringHash, ShaderParameter>& psParams = pixelShader->GetParameters();
+        for (HashMap<StringHash, ShaderParameter>::ConstIterator i = psParams.Begin(); i != psParams.End(); ++i)
+        {
+            parameters_[i->first_] = i->second_;
+            parameters_[i->first_].bufferPtr_ = psConstantBuffers_[i->second_.buffer_].Get();
+        }
+
+        // Optimize shader parameter lookup by rehashing to next power of two
+        parameters_.Rehash(NextPowerOfTwo(parameters_.Size()));
+
     }
 
     /// Destruct.

@@ -499,7 +499,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
     if (mappedData.pData)
     {
-        for (unsigned page = 0; page < levelDepth; ++page)
+        for (int page = 0; page < levelDepth; ++page)
         {
             for (unsigned row = 0; row < numRows; ++row)
             {

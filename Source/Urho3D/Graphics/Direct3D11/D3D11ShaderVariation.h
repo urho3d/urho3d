@@ -31,6 +31,7 @@
 namespace Urho3D
 {
 
+class ConstantBuffer;
 class Shader;
 
 /// %Shader parameter definition.
@@ -41,17 +42,19 @@ struct ShaderParameter
         type_(VS),
         buffer_(0),
         offset_(0),
-        size_(0)
+        size_(0),
+        bufferPtr_(0)
     {
     }
     
     /// Construct with parameters.
-    ShaderParameter(ShaderType type, const String& name, unsigned buffer, unsigned offset, unsigned size) :
+    ShaderParameter(ShaderType type, const String& name, unsigned buffer, unsigned offset, unsigned size, ConstantBuffer* ptr = 0) :
         type_(type),
         name_(name),
         buffer_(buffer),
         offset_(offset),
-        size_(size)
+        size_(size),
+        bufferPtr_(ptr)
     {
     }
     
@@ -63,8 +66,10 @@ struct ShaderParameter
     unsigned buffer_;
     /// Offset in constant buffer.
     unsigned offset_;
-    /// Size of parameter in bytes
+    /// Size of parameter in bytes.
     unsigned size_;
+    /// Constant buffer pointer. Defined only in shader programs.
+    ConstantBuffer* bufferPtr_;
 };
 
 /// Vertex or pixel shader on the GPU.

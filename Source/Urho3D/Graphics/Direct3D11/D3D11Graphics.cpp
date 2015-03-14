@@ -1145,20 +1145,10 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
     if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
 
-    if (i->second_.type_ == VS)
-    {
-        ConstantBuffer* buffer = shaderProgram_->vsConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, count * sizeof(float), data);
-    }
-    else
-    {
-        ConstantBuffer* buffer = shaderProgram_->psConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, count * sizeof(float), data);
-    }
+    ConstantBuffer* buffer = i->second_.bufferPtr_;
+    if (!buffer->IsDirty())
+        dirtyConstantBuffers_.Push(buffer);
+    buffer->SetParameter(i->second_.offset_, count * sizeof(float), data);
 }
 
 void Graphics::SetShaderParameter(StringHash param, float value)
@@ -1167,20 +1157,10 @@ void Graphics::SetShaderParameter(StringHash param, float value)
     if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
 
-    if (i->second_.type_ == VS)
-    {
-        ConstantBuffer* buffer = shaderProgram_->vsConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(float), &value);
-    }
-    else
-    {
-        ConstantBuffer* buffer = shaderProgram_->psConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(float), &value);
-    }
+    ConstantBuffer* buffer = i->second_.bufferPtr_;
+    if (!buffer->IsDirty())
+        dirtyConstantBuffers_.Push(buffer);
+    buffer->SetParameter(i->second_.offset_, sizeof(float), &value);
 }
 
 void Graphics::SetShaderParameter(StringHash param, bool value)
@@ -1189,20 +1169,10 @@ void Graphics::SetShaderParameter(StringHash param, bool value)
     if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
 
-    if (i->second_.type_ == VS)
-    {
-        ConstantBuffer* buffer = shaderProgram_->vsConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(bool), &value);
-    }
-    else
-    {
-        ConstantBuffer* buffer = shaderProgram_->psConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(bool), &value);
-    }
+    ConstantBuffer* buffer = i->second_.bufferPtr_;
+    if (!buffer->IsDirty())
+        dirtyConstantBuffers_.Push(buffer);
+    buffer->SetParameter(i->second_.offset_, sizeof(bool), &value);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Color& color)
@@ -1211,20 +1181,10 @@ void Graphics::SetShaderParameter(StringHash param, const Color& color)
     if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
 
-    if (i->second_.type_ == VS)
-    {
-        ConstantBuffer* buffer = shaderProgram_->vsConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(Color), &color);
-    }
-    else
-    {
-        ConstantBuffer* buffer = shaderProgram_->psConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(Color), &color);
-    }
+    ConstantBuffer* buffer = i->second_.bufferPtr_;
+    if (!buffer->IsDirty())
+        dirtyConstantBuffers_.Push(buffer);
+    buffer->SetParameter(i->second_.offset_, sizeof(Color), &color);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Vector2& vector)
@@ -1233,20 +1193,10 @@ void Graphics::SetShaderParameter(StringHash param, const Vector2& vector)
     if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
 
-    if (i->second_.type_ == VS)
-    {
-        ConstantBuffer* buffer = shaderProgram_->vsConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(Vector2), &vector);
-    }
-    else
-    {
-        ConstantBuffer* buffer = shaderProgram_->psConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(Vector2), &vector);
-    }
+    ConstantBuffer* buffer = i->second_.bufferPtr_;
+    if (!buffer->IsDirty())
+        dirtyConstantBuffers_.Push(buffer);
+    buffer->SetParameter(i->second_.offset_, sizeof(Vector2), &vector);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
@@ -1255,20 +1205,10 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
     if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
 
-    if (i->second_.type_ == VS)
-    {
-        ConstantBuffer* buffer = shaderProgram_->vsConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetVector3ArrayParameter(i->second_.offset_, 3, &matrix);
-    }
-    else
-    {
-        ConstantBuffer* buffer = shaderProgram_->psConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetVector3ArrayParameter(i->second_.offset_, 3, &matrix);
-    }
+    ConstantBuffer* buffer = i->second_.bufferPtr_;
+    if (!buffer->IsDirty())
+        dirtyConstantBuffers_.Push(buffer);
+    buffer->SetVector3ArrayParameter(i->second_.offset_, 3, &matrix);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
@@ -1277,20 +1217,10 @@ void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
     if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
 
-    if (i->second_.type_ == VS)
-    {
-        ConstantBuffer* buffer = shaderProgram_->vsConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(Vector3), &vector);
-    }
-    else
-    {
-        ConstantBuffer* buffer = shaderProgram_->psConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(Vector3), &vector);
-    }
+    ConstantBuffer* buffer = i->second_.bufferPtr_;
+    if (!buffer->IsDirty())
+        dirtyConstantBuffers_.Push(buffer);
+    buffer->SetParameter(i->second_.offset_, sizeof(Vector3), &vector);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
@@ -1299,20 +1229,10 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
     if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
 
-    if (i->second_.type_ == VS)
-    {
-        ConstantBuffer* buffer = shaderProgram_->vsConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(Matrix4), &matrix);
-    }
-    else
-    {
-        ConstantBuffer* buffer = shaderProgram_->psConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(Matrix4), &matrix);
-    }
+    ConstantBuffer* buffer = i->second_.bufferPtr_;
+    if (!buffer->IsDirty())
+        dirtyConstantBuffers_.Push(buffer);
+    buffer->SetParameter(i->second_.offset_, sizeof(Matrix4), &matrix);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
@@ -1321,20 +1241,10 @@ void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
     if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
 
-    if (i->second_.type_ == VS)
-    {
-        ConstantBuffer* buffer = shaderProgram_->vsConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(Vector4), &vector);
-    }
-    else
-    {
-        ConstantBuffer* buffer = shaderProgram_->psConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(Vector4), &vector);
-    }
+    ConstantBuffer* buffer = i->second_.bufferPtr_;
+    if (!buffer->IsDirty())
+        dirtyConstantBuffers_.Push(buffer);
+    buffer->SetParameter(i->second_.offset_, sizeof(Vector4), &vector);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
@@ -1343,20 +1253,10 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
     if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
 
-    if (i->second_.type_ == VS)
-    {
-        ConstantBuffer* buffer = shaderProgram_->vsConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(Matrix3x4), &matrix);
-    }
-    else
-    {
-        ConstantBuffer* buffer = shaderProgram_->psConstantBuffers_[i->second_.buffer_];
-        if (!buffer->IsDirty())
-            dirtyConstantBuffers_.Push(buffer);
-        buffer->SetParameter(i->second_.offset_, sizeof(Matrix3x4), &matrix);
-    }
+    ConstantBuffer* buffer = i->second_.bufferPtr_;
+    if (!buffer->IsDirty())
+        dirtyConstantBuffers_.Push(buffer);
+    buffer->SetParameter(i->second_.offset_, sizeof(Matrix3x4), &matrix);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Variant& value)
