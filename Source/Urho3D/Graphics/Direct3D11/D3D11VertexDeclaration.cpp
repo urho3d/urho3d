@@ -37,6 +37,8 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertex
 {
     PODVector<D3D11_INPUT_ELEMENT_DESC> elementDescs;
 
+    unsigned vbElementMask = 0;
+
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
         if (vertexBuffers[i] && elementMasks[i])
@@ -55,6 +57,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertex
                         D3D11_INPUT_PER_INSTANCE_DATA : D3D11_INPUT_PER_VERTEX_DATA;
                     newDesc.InstanceDataStepRate = (j >= ELEMENT_INSTANCEMATRIX1 && j <= ELEMENT_INSTANCEMATRIX3) ? 1 : 0;
                     elementDescs.Push(newDesc);
+                    vbElementMask |= 1 << j;
                 }
             }
         }
@@ -71,7 +74,8 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertex
     if (d3dInputLayout)
         inputLayout_ = d3dInputLayout;
     else
-        LOGERRORF("Failed to create input layout for shader %s element mask %d", vertexShader->GetFullName().CString(), vertexShader->GetElementMask());
+        LOGERRORF("Failed to create input layout for shader %s, missing element mask %d",
+            vertexShader->GetFullName().CString(), vertexShader->GetElementMask() & ~vbElementMask);
 }
 
 VertexDeclaration::~VertexDeclaration()
