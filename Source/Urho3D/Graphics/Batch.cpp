@@ -182,8 +182,6 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
     // Set pass / material-specific renderstates
     if (pass_ && material_)
     {
-        bool isShadowPass = pass_->GetType() == PASS_SHADOW;
-        
         BlendMode blend = pass_->GetBlendMode();
         // Turn additive blending into subtract if the light is negative
         if (light && light->IsNegative())
@@ -193,14 +191,16 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
             else if (blend == BLEND_ADDALPHA)
                 blend = BLEND_SUBTRACTALPHA;
         }
-        
         graphics->SetBlendMode(blend);
+
+        bool isShadowPass = pass_->GetIndex() == Technique::shadowPassIndex;
         renderer->SetCullMode(isShadowPass ? material_->GetShadowCullMode() : material_->GetCullMode(), camera_);
         if (!isShadowPass)
         {
             const BiasParameters& depthBias = material_->GetDepthBias();
             graphics->SetDepthBias(depthBias.constantBias_, depthBias.slopeScaledBias_);
         }
+
         graphics->SetDepthTest(pass_->GetDepthTestMode());
         graphics->SetDepthWrite(pass_->GetDepthWrite() && allowDepthWrite);
     }

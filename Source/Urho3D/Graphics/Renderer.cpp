@@ -1044,7 +1044,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
     {
         // First release all previous shaders, then load
         pass->ReleaseShaders();
-        LoadPassShaders(tech, pass->GetType());
+        LoadPassShaders(pass);
     }
     
     // Make sure shaders are loaded now
@@ -1457,12 +1457,8 @@ void Renderer::LoadShaders()
     shadersDirty_ = false;
 }
 
-void Renderer::LoadPassShaders(Technique* tech, StringHash type)
+void Renderer::LoadPassShaders(Pass* pass)
 {
-    Pass* pass = tech->GetPass(type);
-    if (!pass)
-        return;
-    
     PROFILE(LoadPassShaders);
     
     unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);

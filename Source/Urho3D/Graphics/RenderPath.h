@@ -146,6 +146,8 @@ struct RenderPathCommand
     RenderCommandSortMode sortMode_;
     /// Scene pass name.
     String pass_;
+    /// Scene pass index. Filled by View.
+    unsigned passIndex_;
     /// Command/pass metadata.
     String metadata_;
     /// Vertex shader name.

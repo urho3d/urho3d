@@ -20,13 +20,13 @@ class Pass : public RefCounted
 
 class Technique : public Resource
 {
-    bool HasPass(const StringHash type) const;
-    Pass* GetPass(const StringHash type) const;
-    Pass* GetSupportedPass(const StringHash type) const;
+    bool HasPass(const String type) const;
+    Pass* GetPass(const String type) const;
+    Pass* GetSupportedPass(const String type) const;
     bool IsSupported() const;
     bool IsDesktop() const;
     unsigned GetNumPasses() const;
-    tolua_outside const Vector<StringHash>& TechniqueGetPassTypes @ GetPassTypes() const;
+    tolua_outside const Vector<String>& TechniqueGetPassNames @ GetPassTypes() const;
     tolua_outside const PODVector<Pass*>& TechniqueGetPasses @ GetPasses() const;
 
     tolua_readonly tolua_property__is_set bool supported;
@@ -35,9 +35,9 @@ class Technique : public Resource
 };
 
 ${
-static const Vector<StringHash>& TechniqueGetPassTypes(const Technique* technique)
+static const Vector<String>& TechniqueGetPassNames(const Technique* technique)
 {
-    static Vector<StringHash> vector = technique->GetPassTypes();
+    static Vector<String> vector = technique->GetPassNames();
     return vector;
 }
 

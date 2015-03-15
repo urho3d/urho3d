@@ -322,20 +322,6 @@ extern URHO3D_API const StringHash PSP_SHADOWMAPINVSIZE;
 extern URHO3D_API const StringHash PSP_SHADOWSPLITS;
 extern URHO3D_API const StringHash PSP_LIGHTMATRICES;
 
-// Inbuilt pass types
-extern URHO3D_API const StringHash PASS_BASE;
-extern URHO3D_API const StringHash PASS_LITBASE;
-extern URHO3D_API const StringHash PASS_LIGHT;
-extern URHO3D_API const StringHash PASS_ALPHA;
-extern URHO3D_API const StringHash PASS_LITALPHA;
-extern URHO3D_API const StringHash PASS_SHADOW;
-extern URHO3D_API const StringHash PASS_DEFERRED;
-extern URHO3D_API const StringHash PASS_PREPASS;
-extern URHO3D_API const StringHash PASS_MATERIAL;
-extern URHO3D_API const StringHash PASS_POSTOPAQUE;
-extern URHO3D_API const StringHash PASS_REFRACT;
-extern URHO3D_API const StringHash PASS_POSTALPHA;
-
 // Scale calculation from bounding box diagonal.
 extern URHO3D_API const Vector3 DOT_SCALE;
 

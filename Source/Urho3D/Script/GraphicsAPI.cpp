@@ -517,9 +517,9 @@ static void ConstructTechniqueEntry(TechniqueEntry* ptr)
     new(ptr) TechniqueEntry();
 }
 
-static CScriptArray* TechniqueGetPassTypes(const Technique& technique)
+static CScriptArray* TechniqueGetPassNames(const Technique& technique)
 {
-    return VectorToArray<StringHash>(technique.GetPassTypes(), "Array<StringHash>");
+    return VectorToArray<String>(technique.GetPassNames(), "Array<String>");
 }
 
 static CScriptArray* TechniqueGetPasses(const Technique& technique)
@@ -634,16 +634,16 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pass", "const String& get_pixelShaderDefines() const", asMETHOD(Pass, GetPixelShaderDefines), asCALL_THISCALL);
     
     RegisterResource<Technique>(engine, "Technique");
-    engine->RegisterObjectMethod("Technique", "Pass@+ CreatePass(StringHash)", asMETHOD(Technique, CreatePass), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "void RemovePass(StringHash)", asMETHOD(Technique, RemovePass), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "bool HasPass(StringHash) const", asMETHOD(Technique, HasPass), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "Pass@+ GetPass(StringHash)", asMETHOD(Technique, GetPass), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "Pass@+ GetSupportedPass(StringHash)", asMETHOD(Technique, GetSupportedPass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "Pass@+ CreatePass(const String&in)", asMETHOD(Technique, CreatePass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "void RemovePass(const String&in)", asMETHOD(Technique, RemovePass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "bool HasPass(const String&in) const", asMETHODPR(Technique, HasPass, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "Pass@+ GetPass(const String&in)", asMETHODPR(Technique, GetPass, (const String&) const, Pass*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "Pass@+ GetSupportedPass(const String&in)", asMETHODPR(Technique, GetSupportedPass, (const String&) const, Pass*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "bool get_supported() const", asMETHOD(Technique, IsSupported), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "void set_desktop(bool)", asMETHOD(Technique, SetIsDesktop), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "bool get_desktop() const", asMETHOD(Technique, IsDesktop), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "uint get_numPasses() const", asMETHOD(Technique, GetNumPasses), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Technique", "Array<StringHash>@ get_passTypes() const", asFUNCTION(TechniqueGetPassTypes), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Technique", "Array<String>@ get_passNames() const", asFUNCTION(TechniqueGetPassNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Technique", "Array<Pass@>@ get_passes() const", asFUNCTION(TechniqueGetPasses), asCALL_CDECL_OBJLAST);
     
     engine->RegisterObjectType("TechniqueEntry", sizeof(TechniqueEntry), asOBJ_VALUE | asOBJ_APP_CLASS_CD);
@@ -665,6 +665,7 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "void RemoveShaderParameter(const String&in)", asMETHOD(Material, RemoveShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void SortTechniques()", asMETHOD(Material, SortTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Material@ Clone(const String&in cloneName = String()) const", asFUNCTION(MaterialClone), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Material", "Pass@+ GetPass(uint, const String&in)", asMETHOD(Material, GetPass), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_numTechniques(uint)", asMETHOD(Material, SetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "uint get_numTechniques() const", asMETHOD(Material, GetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Technique@+ get_techniques(uint)", asMETHOD(Material, GetTechnique), asCALL_THISCALL);

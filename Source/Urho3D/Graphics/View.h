@@ -78,8 +78,8 @@ struct LightQueryResult
 /// Scene render pass info.
 struct ScenePassInfo
 {
-    /// Pass name hash.
-    StringHash pass_;
+    /// Pass index.
+    unsigned passIndex_;
     /// Allow instancing flag.
     bool allowInstancing_;
     /// Mark to stencil flag.
@@ -354,20 +354,20 @@ private:
     Vector<LightBatchQueue> lightQueues_;
     /// Per-vertex light queues.
     HashMap<unsigned long long, LightBatchQueue> vertexLightQueues_;
-    /// Batch queues.
-    HashMap<StringHash, BatchQueue> batchQueues_;
-    /// Hash of the GBuffer pass, or null if none.
-    StringHash gBufferPassName_;
-    /// Hash of the opaque forward base pass.
-    StringHash basePassName_;
-    /// Hash of the alpha pass.
-    StringHash alphaPassName_;
-    /// Hash of the forward light pass.
-    StringHash lightPassName_;
-    /// Hash of the litbase pass.
-    StringHash litBasePassName_;
-    /// Hash of the litalpha pass.
-    StringHash litAlphaPassName_;
+    /// Batch queues by pass index.
+    HashMap<unsigned, BatchQueue> batchQueues_;
+    /// Index of the GBuffer pass.
+    unsigned gBufferPassIndex_;
+    /// Index of the opaque forward base pass.
+    unsigned basePassIndex_;
+    /// Index of the alpha pass.
+    unsigned alphaPassIndex_;
+    /// Index of the forward light pass.
+    unsigned lightPassIndex_;
+    /// Index of the litbase pass.
+    unsigned litBasePassIndex_;
+    /// Index of the litalpha pass.
+    unsigned litAlphaPassIndex_;
     /// Pointer to the light volume command if any.
     const RenderPathCommand* lightVolumeCommand_;
 };

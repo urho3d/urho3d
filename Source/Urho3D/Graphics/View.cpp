@@ -313,6 +313,14 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     if (!renderPath_)
         return false;
     
+    // Set default passes
+    gBufferPassIndex_ = M_MAX_UNSIGNED;
+    basePassIndex_ = Technique::GetPassIndex("base");
+    alphaPassIndex_ = Technique::GetPassIndex("alpha");
+    lightPassIndex_ = Technique::GetPassIndex("light");
+    litBasePassIndex_ = Technique::GetPassIndex("litbase");
+    litAlphaPassIndex_ = Technique::GetPassIndex("litalpha");
+
     drawDebug_ = viewport->GetDrawDebug();
     hasScenePasses_ = false;
     lightVolumeCommand_ = 0;
@@ -345,7 +353,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
 
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
-        const RenderPathCommand& command = renderPath_->commands_[i];
+        RenderPathCommand& command = renderPath_->commands_[i];
         if (!command.enabled_)
             continue;
         
@@ -354,7 +362,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             hasScenePasses_ = true;
             
             ScenePassInfo info;
-            info.pass_ = command.pass_;
+            info.passIndex_ = command.passIndex_ = Technique::GetPassIndex(command.pass_);
             info.allowInstancing_ = command.sortMode_ != SORT_BACKTOFRONT;
             info.markToStencil_ = !noStencil_ && command.markToStencil_;
             info.vertexLights_ = command.vertexLights_;
@@ -363,31 +371,30 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             if (!command.metadata_.Empty())
             {
                 if (command.metadata_ == "gbuffer")
-                    gBufferPassName_ = command.pass_;
+                    gBufferPassIndex_ = command.passIndex_;
                 else if (command.metadata_ == "base" && command.pass_ != "base")
                 {
-                    basePassName_ = command.pass_;
-                    litBasePassName_ = "lit" + command.pass_;
+                    basePassIndex_ = command.passIndex_;
+                    litBasePassIndex_ = Technique::GetPassIndex("lit" + command.pass_);
                 }
                 else if (command.metadata_ == "alpha" && command.pass_ != "alpha")
                 {
-                    alphaPassName_ = command.pass_;
-                    litAlphaPassName_ = "lit" + command.pass_;
+                    alphaPassIndex_ = command.passIndex_;
+                    litAlphaPassIndex_ = Technique::GetPassIndex("lit" + command.pass_);
                 }
             }
             
-            HashMap<StringHash, BatchQueue>::Iterator j = batchQueues_.Find(command.pass_);
+            HashMap<unsigned, BatchQueue>::Iterator j = batchQueues_.Find(info.passIndex_);
             if (j == batchQueues_.End())
-                j = batchQueues_.Insert(Pair<StringHash, BatchQueue>(command.pass_, BatchQueue()));
+                j = batchQueues_.Insert(Pair<unsigned, BatchQueue>(info.passIndex_, BatchQueue()));
             info.batchQueue_ = &j->second_;
             
             scenePasses_.Push(info);
         }
         // Allow a custom forward light pass
         else if (command.type_ == CMD_FORWARDLIGHTS && !command.pass_.Empty())
-            lightPassName_ = command.pass_;
+            lightPassIndex_ = command.passIndex_ = Technique::GetPassIndex(command.pass_);
     }
-    
     
     scene_ = viewport->GetScene();
     camera_ = viewport->GetCamera();
@@ -416,13 +423,6 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     
     cameraNode_ = camera_ ? camera_->GetNode() : (Node*)0;
     renderTarget_ = renderTarget;
-    
-    gBufferPassName_ = StringHash();
-    basePassName_  = PASS_BASE;
-    alphaPassName_ = PASS_ALPHA;
-    lightPassName_ = PASS_LIGHT;
-    litBasePassName_ = PASS_LITBASE;
-    litAlphaPassName_ = PASS_LITALPHA;
     
     // Go through commands to check for deferred rendering and other flags
     deferred_ = false;
@@ -524,7 +524,7 @@ void View::Update(const FrameInfo& frame)
     zones_.Clear();
     occluders_.Clear();
     vertexLightQueues_.Clear();
-    for (HashMap<StringHash, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
+    for (HashMap<unsigned, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
         i->second_.Clear(maxSortedInstances);
     
     if (hasScenePasses_ && (!camera_ || !octree_))
@@ -917,7 +917,7 @@ void View::GetBatches()
     threadedGeometries_.Clear();
     
     WorkQueue* queue = GetSubsystem<WorkQueue>();
-    BatchQueue* alphaQueue = batchQueues_.Contains(alphaPassName_) ? &batchQueues_[alphaPassName_] : (BatchQueue*)0;
+    BatchQueue* alphaQueue = batchQueues_.Contains(alphaPassIndex_) ? &batchQueues_[alphaPassIndex_] : (BatchQueue*)0;
     
     // Process lit geometries and shadow casters for each light
     {
@@ -1036,7 +1036,7 @@ void View::GetBatches()
                             if (!srcBatch.geometry_ || !srcBatch.numWorldTransforms_ || !tech)
                                 continue;
                             
-                            Pass* pass = tech->GetSupportedPass(PASS_SHADOW);
+                            Pass* pass = tech->GetSupportedPass(Technique::shadowPassIndex);
                             // Skip if material has no shadow pass
                             if (!pass)
                                 continue;
@@ -1154,10 +1154,10 @@ void View::GetBatches()
                 {
                     ScenePassInfo& info = scenePasses_[k];
                     // Skip forward base pass if the corresponding litbase pass already exists
-                    if (info.pass_ == basePassName_ && j < 32 && drawable->HasBasePass(j))
+                    if (info.passIndex_ == basePassIndex_ && j < 32 && drawable->HasBasePass(j))
                         continue;
 
-                    Pass* pass = tech->GetSupportedPass(info.pass_);
+                    Pass* pass = tech->GetSupportedPass(info.passIndex_);
                     if (!pass)
                         continue;
                     
@@ -1229,7 +1229,7 @@ void View::UpdateGeometries()
                 SharedPtr<WorkItem> item = queue->GetFreeItem();
                 item->priority_ = M_MAX_UNSIGNED;
                 item->workFunction_ = command.sortMode_ == SORT_FRONTTOBACK ? SortBatchQueueFrontToBackWork : SortBatchQueueBackToFrontWork;
-                item->start_ = &batchQueues_[command.pass_];
+                item->start_ = &batchQueues_[command.passIndex_];
                 queue->AddWorkItem(item);
             }
         }
@@ -1318,7 +1318,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
             continue;
         
         // Do not create pixel lit forward passes for materials that render into the G-buffer
-        if (gBufferPassName_.Value() && tech->HasPass(gBufferPassName_))
+        if (gBufferPassIndex_ != M_MAX_UNSIGNED && tech->HasPass(gBufferPassIndex_))
             continue;
         
         Batch destBatch(srcBatch);
@@ -1328,22 +1328,22 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
         // Also vertex lighting or ambient gradient require the non-lit base pass, so skip in those cases
         if (i < 32 && allowLitBase)
         {
-            destBatch.pass_ = tech->GetSupportedPass(litBasePassName_);
+            destBatch.pass_ = tech->GetSupportedPass(litBasePassIndex_);
             if (destBatch.pass_)
             {
                 destBatch.isBase_ = true;
                 drawable->SetBasePass(i);
             }
             else
-                destBatch.pass_ = tech->GetSupportedPass(lightPassName_);
+                destBatch.pass_ = tech->GetSupportedPass(lightPassIndex_);
         }
         else
-            destBatch.pass_ = tech->GetSupportedPass(lightPassName_);
+            destBatch.pass_ = tech->GetSupportedPass(lightPassIndex_);
         
         // If no lit pass, check for lit alpha
         if (!destBatch.pass_)
         {
-            destBatch.pass_ = tech->GetSupportedPass(litAlphaPassName_);
+            destBatch.pass_ = tech->GetSupportedPass(litAlphaPassIndex_);
             isLitAlpha = true;
         }
         
@@ -1496,15 +1496,17 @@ void View::ExecuteRenderPathCommands()
                 break;
                 
             case CMD_SCENEPASS:
-                if (!batchQueues_[command.pass_].IsEmpty())
                 {
-                    PROFILE(RenderScenePass);
+                    if (!batchQueues_[command.passIndex_].IsEmpty())
+                    {
+                        PROFILE(RenderScenePass);
                     
-                    SetRenderTargets(command);
-                    bool allowDepthWrite = SetTextures(command);
-                    graphics_->SetFillMode(camera_->GetFillMode());
-                    graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
-                    batchQueues_[command.pass_].Draw(this, command.markToStencil_, false, allowDepthWrite);
+                        SetRenderTargets(command);
+                        bool allowDepthWrite = SetTextures(command);
+                        graphics_->SetFillMode(camera_->GetFillMode());
+                        graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
+                        batchQueues_[command.passIndex_].Draw(this, command.markToStencil_, false, allowDepthWrite);
+                    }
                 }
                 break;
                 
@@ -1797,7 +1799,7 @@ void View::RenderQuad(RenderPathCommand& command)
 bool View::IsNecessary(const RenderPathCommand& command)
 {
     return command.enabled_ && command.outputNames_.Size() && (command.type_ != CMD_SCENEPASS ||
-        !batchQueues_[command.pass_].IsEmpty());
+        !batchQueues_[command.passIndex_].IsEmpty());
 }
 
 bool View::CheckViewportRead(const RenderPathCommand& command)
@@ -2803,7 +2805,7 @@ void View::PrepareInstancingBuffer()
     
     unsigned totalInstances = 0;
     
-    for (HashMap<StringHash, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
+    for (HashMap<unsigned, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
         totalInstances += i->second_.GetNumInstances();
     
     for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
@@ -2823,7 +2825,7 @@ void View::PrepareInstancingBuffer()
     if (!dest)
         return;
     
-    for (HashMap<StringHash, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
+    for (HashMap<unsigned, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
         i->second_.SetTransforms(dest, freeIndex);
         
     for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)

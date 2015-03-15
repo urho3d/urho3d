@@ -165,8 +165,8 @@ public:
     const TechniqueEntry& GetTechniqueEntry(unsigned index) const;
     /// Return technique by index.
     Technique* GetTechnique(unsigned index) const;
-    /// Return pass by technique index and pass type.
-    Pass* GetPass(unsigned index, StringHash passType) const;
+    /// Return pass by technique index and pass name.
+    Pass* GetPass(unsigned index, const String& passName) const;
     /// Return texture by unit.
     Texture* GetTexture(TextureUnit unit) const;
    /// Return all textures.
