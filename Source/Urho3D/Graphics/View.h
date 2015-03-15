@@ -164,6 +164,12 @@ private:
     void GetDrawables();
     /// Construct batches from the drawable objects.
     void GetBatches();
+    /// Get lit geometries and shadowcasters for visible lights.
+    void ProcessLights();
+    /// Get batches from lit geometries and shadowcasters.
+    void GetLightBatches();
+    /// Get unlit batches.
+    void GetBaseBatches();
     /// Update geometries and sort batches.
     void UpdateGeometries();
     /// Get pixel lit batches for a certain light and drawable.
