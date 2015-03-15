@@ -90,14 +90,15 @@ function post_output_hook(package)
 //
 
 #include <toluapp/tolua++.h>
-#include <Urho3D/LuaScript/ToluaUtils.h>
+#include "LuaScript/ToluaUtils.h"
 
 #if __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-function"
 #endif]])
-    if _extra_parameters["Urho3D"] then
-        replace([[<Urho3D/LuaScript/ToluaUtils.h>]], [["LuaScript/ToluaUtils.h"]])
+    if not _extra_parameters["Urho3D"] then
+        replace([[#include "LuaScript/ToluaUtils.h"]], [[#include <Urho3D/Urho3D.h>
+#include <Urho3D/LuaScript/ToluaUtils.h>]])
     end
 
     WRITE(result)
