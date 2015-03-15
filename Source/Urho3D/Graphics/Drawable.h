@@ -201,8 +201,8 @@ public:
     void SetMinMaxZ(float minZ, float maxZ) { minZ_ = minZ; maxZ_ = maxZ; }
     /// Mark in view. Also clear the light list.
     void MarkInView(const FrameInfo& frame);
-    /// Mark in view of a specific camera. Specify null camera to update just the frame number.
-    void MarkInView(unsigned frameNumber, Camera* camera);
+    /// Mark in view without specifying a camera. Used for shadow casters.
+    void MarkInView(unsigned frameNumber);
     /// Sort and limit per-pixel lights to maximum allowed. Convert extra lights into vertex lights.
     void LimitLights();
     /// Sort and limit per-vertex lights to maximum allowed.

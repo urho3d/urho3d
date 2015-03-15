@@ -297,10 +297,11 @@ void Drawable::MarkInView(const FrameInfo& frame)
     if (frame.frameNumber_ != viewFrameNumber_)
     {
         viewFrameNumber_ = frame.frameNumber_;
-        viewCameras_.Clear();
+        viewCameras_.Resize(1);
+        viewCameras_[0] = frame.camera_;
     }
-    
-    viewCameras_.Push(frame.camera_);
+    else
+        viewCameras_.Push(frame.camera_);
 
     basePassFlags_ = 0;
     firstLight_ = 0;
@@ -308,16 +309,13 @@ void Drawable::MarkInView(const FrameInfo& frame)
     vertexLights_.Clear();
 }
 
-void Drawable::MarkInView(unsigned frameNumber, Camera* camera)
+void Drawable::MarkInView(unsigned frameNumber)
 {
     if (frameNumber != viewFrameNumber_)
     {
         viewFrameNumber_ = frameNumber;
         viewCameras_.Clear();
     }
-    
-    if (camera)
-        viewCameras_.Push(camera);
 }
 
 void Drawable::LimitLights()

@@ -1025,7 +1025,7 @@ void View::GetLightBatches()
                         // If drawable is not in actual view frustum, mark it in view here and check its geometry update type
                         if (!drawable->IsInView(frame_, true))
                         {
-                            drawable->MarkInView(frame_.frameNumber_, 0);
+                            drawable->MarkInView(frame_.frameNumber_);
                             UpdateGeometryType type = drawable->GetUpdateGeometryType();
                             if (type == UPDATE_MAIN_THREAD)
                                 nonThreadedGeometries_.Push(drawable);
