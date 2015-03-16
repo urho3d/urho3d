@@ -1505,15 +1505,16 @@ void View::ExecuteRenderPathCommands()
                 
             case CMD_SCENEPASS:
                 {
-                    if (!batchQueues_[command.passIndex_].IsEmpty())
+                    BatchQueue& queue = batchQueues_[command.passIndex_];
+                    if (!queue.IsEmpty())
                     {
                         PROFILE(RenderScenePass);
-                    
+                        
                         SetRenderTargets(command);
                         bool allowDepthWrite = SetTextures(command);
                         graphics_->SetFillMode(camera_->GetFillMode());
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
-                        batchQueues_[command.passIndex_].Draw(this, command.markToStencil_, false, allowDepthWrite);
+                        queue.Draw(this, command.markToStencil_, false, allowDepthWrite);
                     }
                 }
                 break;
