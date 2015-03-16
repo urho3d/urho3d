@@ -428,6 +428,8 @@ public:
     static unsigned GetFormat(const String& formatName);
     /// Return UV offset required for pixel perfect rendering.
     static const Vector2& GetPixelUVOffset() { return pixelUVOffset; }
+    /// Return whether is using an OpenGL 3 context.
+    static bool GetGL3Support() { return gl3Support; }
 
 private:
     /// Create the application window icon.
@@ -600,6 +602,10 @@ private:
 
     /// Pixel perfect UV offset.
     static const Vector2 pixelUVOffset;
+    /// Flag for OpenGL 3 support.
+    static bool gl3Support;
+    /// Flag for OpenGL 3 support tested.
+    static bool gl3SupportTested;
 };
 
 /// Register Graphics library objects.

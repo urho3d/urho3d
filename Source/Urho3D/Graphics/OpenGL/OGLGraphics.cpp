@@ -217,6 +217,8 @@ static void GetGLPrimitiveType(unsigned elementCount, PrimitiveType type, unsign
 }
 
 const Vector2 Graphics::pixelUVOffset(0.0f, 0.0f);
+bool Graphics::gl3Support = false;
+bool Graphics::gl3SupportTested = false;
 
 Graphics::Graphics(Context* context_) :
     Object(context_),
@@ -362,7 +364,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     }
 
     // Check fullscreen mode validity (desktop only). Use a closest match if not found
-    #if !defined(ANDROID) && !defined(IOS) && !defined(RPI)
+    #ifdef DESKTOP_GRAPHICS
     if (fullscreen)
     {
         PODVector<IntVector2> resolutions = GetResolutions();
@@ -403,6 +405,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         #endif
 
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
         #ifndef GL_ES_VERSION_2_0
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
@@ -415,10 +418,38 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
 
         SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-        #endif
+
+        // Test GL3 support first. Use a separate window for this because we may not be able to choose window pixel format
+        // several times
+        if (!gl3SupportTested)
+        {
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+            SDL_Window* dummyWindow = SDL_CreateWindow(windowTitle_.CString(), 0, 0, 1, 1, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+            SDL_GLContext dummyContext = SDL_GL_CreateContext(dummyWindow);
+            if (dummyContext)
+            {
+                gl3Support = true;
+                apiName_ = "GL3";
+                SDL_GL_DeleteContext(dummyContext);
+            }
+            else
+            {
+                // Failed to create 3.1 context, fall back to 2.0 with extensions
+                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+                SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
+            }
+            SDL_DestroyWindow(dummyWindow);
+            gl3SupportTested = true;
+        }
+        #else
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-        
+        #endif
+
         if (multiSample > 1)
         {
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
@@ -449,11 +480,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
                 impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
             else
             {
-#if !defined(EMSCRIPTEN)
+                #ifndef EMSCRIPTEN
                 if (!impl_->window_)
                     impl_->window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
                 fullscreen = false;
-#endif
+                #endif
             }
             
             if (impl_->window_)
@@ -494,6 +525,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         
         // If OpenGL extensions not yet initialized, initialize now
         #ifndef GL_ES_VERSION_2_0
+        // Work around GLEW failure to check extensions properly from a GL3 context
+        glewExperimental = GL_TRUE;
         GLenum err = glewInit();
         if (GLEW_OK != err)
         {
@@ -502,25 +535,50 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             return false;
         }
         
-        if (!GLEW_VERSION_2_0)
+        if (!gl3Support)
         {
-            LOGERROR("OpenGL 2.0 is required");
-            Release(true, true);
-            return false;
+            if (!GLEW_VERSION_2_0)
+            {
+                LOGERROR("OpenGL 2.0 is required");
+                Release(true, true);
+                return false;
+            }
+
+            if (!GLEW_EXT_framebuffer_object || !GLEW_EXT_packed_depth_stencil)
+            {
+                LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
+                Release(true, true);
+                return false;
+            }
+
+            instancingSupport_ = GLEW_ARB_instanced_arrays != 0;
+            dxtTextureSupport_ = GLEW_EXT_texture_compression_s3tc != 0;
+            anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
+            sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
+            sRGBWriteSupport_ = GLEW_EXT_framebuffer_sRGB != 0;
         }
-        
-        if (!GLEW_EXT_framebuffer_object || !GLEW_EXT_packed_depth_stencil)
+        else
         {
-            LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
-            Release(true, true);
-            return false;
+            if (!GLEW_VERSION_3_2)
+            {
+                LOGERROR("OpenGL version mismatch: 3.2 context successfully requested from SDL, but version check failed");
+                Release(true, true);
+                return false;
+            }
+
+            // Create and bind a vertex array object that will stay in use throughout
+            /// \todo Investigate performance gain of using multiple VAO's
+            unsigned vertexArrayObject;
+            glGenVertexArrays(1, &vertexArrayObject);
+            glBindVertexArray(vertexArrayObject);
+
+            // Work around GLEW failure to check extensions properly from a GL3 context
+            instancingSupport_ = true;
+            dxtTextureSupport_ = true;
+            anisotropySupport_ = true;
+            sRGBSupport_ = true;
+            sRGBWriteSupport_ = true;
         }
-        
-        instancingSupport_ = GLEW_ARB_instanced_arrays != 0;
-        dxtTextureSupport_ = GLEW_EXT_texture_compression_s3tc != 0;
-        anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
-        sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
-        sRGBWriteSupport_ = GLEW_EXT_framebuffer_sRGB != 0;
         
         // Set up instancing divisors if supported
         if (instancingSupport_)
@@ -2451,16 +2509,31 @@ void Graphics::MarkFBODirty()
 
 unsigned Graphics::GetAlphaFormat()
 {
+    #ifndef GL_ES_VERSION_2_0
+    // Alpha format is deprecated on OpenGL 3+
+    if (gl3Support)
+        return GL_R8;
+    #endif
     return GL_ALPHA;
 }
 
 unsigned Graphics::GetLuminanceFormat()
 {
+    #ifndef GL_ES_VERSION_2_0
+    // Luminance format is deprecated on OpenGL 3+
+    if (gl3Support)
+        return GL_R8;
+    #endif
     return GL_LUMINANCE;
 }
 
 unsigned Graphics::GetLuminanceAlphaFormat()
 {
+    #ifndef GL_ES_VERSION_2_0
+    // Luminance alpha format is deprecated on OpenGL 3+
+    if (gl3Support)
+        return GL_RG8;
+    #endif
     return GL_LUMINANCE_ALPHA;
 }
 

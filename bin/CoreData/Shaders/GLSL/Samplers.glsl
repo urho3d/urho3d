@@ -24,6 +24,12 @@ uniform samplerCube sLightCubeMap;
     uniform sampler2D sShadowMap;
 #endif
 
+#ifdef GL3
+#define texture2D texture
+#define texture2DProj textureProj
+#define textureCube texture
+#endif
+
 vec3 DecodeNormal(vec4 normalInput)
 {
     #ifdef PACKEDNORMAL

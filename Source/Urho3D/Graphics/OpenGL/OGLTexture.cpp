@@ -314,6 +314,12 @@ unsigned Texture::GetRowDataSize(int width) const
         return width * 4;
         
     #ifndef GL_ES_VERSION_2_0
+    case GL_R8:
+        return width;
+
+    case GL_RG8:
+        return width * 2;
+
     case GL_RGBA16:
         return width * 8;
         
@@ -358,7 +364,9 @@ unsigned Texture::GetExternalFormat(unsigned format)
         return GL_LUMINANCE;
     else if (format == GL_SLUMINANCE_ALPHA_EXT)
         return GL_LUMINANCE_ALPHA;
-    else if (format == GL_RG16 || format == GL_RG16F || format == GL_RG32F)
+    else if (format == GL_R8)
+        return GL_RED;
+    else if (format == GL_RG8 || format == GL_RG16 || format == GL_RG16F || format == GL_RG32F)
         return GL_RG;
     else if (format == GL_RGBA16 || format == GL_RGBA16F_ARB || format == GL_RGBA32F_ARB || format == GL_SRGB_ALPHA_EXT)
         return GL_RGBA;

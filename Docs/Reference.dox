@@ -713,7 +713,7 @@ Screen resolution, fullscreen/windowed, vertical sync and hardware multisampling
 When setting the initial screen mode, Graphics does a few checks:
 
 - For Direct3D9, shader model 3.0 support is checked.
-- For OpenGL, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is checked for. The ARB_instanced_arrays is not required, but will enable hardware instancing support when present.
+- For OpenGL, version 3.2+ support is checked for first and used if available. As a fallback, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is checked for. The ARB_instanced_arrays extension is also checked for but not required; it will enable hardware instancing support when present.
 - Are hardware shadow maps supported? Both AMD & NVIDIA style shadow maps can be used. If neither are available, no shadows will be rendered.
 - Are light pre-pass and deferred rendering modes supported? These require sufficient multiple rendertarget support, and R32F texture format support.
 
@@ -1126,9 +1126,9 @@ uniform sampler2D sDetailMap2;
 uniform sampler2D sDetailMap3;
 \endcode
 
-\section Shaders_D3D11 Direct3D9 and Direct3D11 differences
+\section Shaders_API API differences
 
-Direct3D9 and Direct3D11 share the same HLSL shader code. Macros and some conditional code are used to hide the API differences where possible. When shaders are compiled for Direct3D11, the define D3D11 is present, and the following details need to be observed:
+Direct3D9 and Direct3D11 share the same HLSL shader code, and likewise OpenGL 2, OpenGL 3, OpenGL ES 2 and WebGL share the same GLSL code. Macros and some conditional code are used to hide the API differences where possible. When shaders are compiled for Direct3D11, the define D3D11 is present, and the following details need to be observed:
 
 - Uniforms are organized into constant buffers. See the file Uniforms.hlsl for the built-in uniforms. See TerrainBlend.hlsl for an example of defining your own uniforms into the "custom" constant buffer slot.
 - Both textures and samplers are defined for each texture unit. The macros in Samplers.hlsl (Sample2D, SampleCube etc.) can be used to write code that works on both APIs. These take the texture unit name without the 's' prefix.
@@ -1136,6 +1136,12 @@ Direct3D9 and Direct3D11 share the same HLSL shader code. Macros and some condit
 - On Direct3D11 the clip plane coordinate must be calculated manually. This is indicated by the CLIPPLANE compilation define, which is added automatically by the Graphics class. See for example the LitSolid.hlsl shader.
 - Direct3D11 does not support luminance and luminance-alpha texture formats, but rather uses the R and RG channels. Therefore be prepared to perform swizzling in the texture reads as appropriate.
 - Direct3D11 will fail to render if the vertex shader refers to vertex elements that don't exist in the vertex buffers.
+
+For OpenGL, the define GL3 is present when shaders are being compiled for OpenGL 3+, the define GL_ES is present for OpenGL ES 2, WEBGL define is present for WebGL and RPI define is present for the Raspberry Pi. Observe the following differences:
+
+- On OpenGL 3 GLSL version 150 will be used if the shader source code does not define the version. The texture sampling functions are different but are worked around with defines in the file Samplers.glsl.
+- On OpenGL 3 luminance, alpha and luminance-alpha texture formats are deprecated, and are replaced with R and RG formats. Therefore be prepared to perform swizzling in the texture reads as appropriate.
+- On OpenGL ES 2 precision qualifiers need to be used.
 
 \section Shaders_Precaching Shader precaching
 

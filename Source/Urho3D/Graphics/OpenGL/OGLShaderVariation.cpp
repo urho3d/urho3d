@@ -121,6 +121,9 @@ bool ShaderVariation::Create()
             shaderCode += versionDefine + "\n";
         }
     }
+    // Force GLSL version 150 if no version define and GL3 is being used
+    if (!verEnd && Graphics::GetGL3Support())
+        shaderCode += "#version 150\n";
 
     // Distinguish between VS and PS compile in case the shader code wants to include/omit different things
     shaderCode += type_ == VS ? "#define COMPILEVS\n" : "#define COMPILEPS\n";
@@ -148,6 +151,8 @@ bool ShaderVariation::Create()
     #ifdef EMSCRIPTEN
     shaderCode += "#define WEBGL\n";
     #endif
+    if (Graphics::GetGL3Support())
+        shaderCode += "#define GL3\n";
 
     // When version define found, do not insert it a second time
     if (verEnd > 0)
