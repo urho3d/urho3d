@@ -44,20 +44,30 @@ vec3 DecodeNormal(vec4 normalInput)
 
 vec3 EncodeDepth(float depth)
 {
-    vec3 ret;
-    depth *= 255.0;
-    ret.x = floor(depth);
-    depth = (depth - ret.x) * 255.0;
-    ret.y = floor(depth);
-    ret.z = (depth - ret.y);
-    ret.xy *= 1.0 / 255.0;
-    return ret;
+    #ifndef GL3
+        vec3 ret;
+        depth *= 255.0;
+        ret.x = floor(depth);
+        depth = (depth - ret.x) * 255.0;
+        ret.y = floor(depth);
+        ret.z = (depth - ret.y);
+        ret.xy *= 1.0 / 255.0;
+        return ret;
+    #else
+        // OpenGL 3 can use different MRT formats, so no need for encoding
+        return vec3(depth, 0.0, 0.0);
+    #endif
 }
 
 float DecodeDepth(vec3 depth)
 {
-    const vec3 dotValues = vec3(1.0, 1.0 / 255.0, 1.0 / (255.0 * 255.0));
-    return dot(depth, dotValues);
+    #ifndef GL3
+        const vec3 dotValues = vec3(1.0, 1.0 / 255.0, 1.0 / (255.0 * 255.0));
+        return dot(depth, dotValues);
+    #else
+        // OpenGL 3 can use different MRT formats, so no need for encoding
+        return depth.r;
+    #endif
 }
 
 float ReconstructDepth(float hwDepth)

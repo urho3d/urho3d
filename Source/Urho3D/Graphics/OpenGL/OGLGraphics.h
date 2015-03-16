@@ -559,6 +559,8 @@ private:
     IntRect scissorRect_;
     /// Scissor test enable flag.
     bool scissorTest_;
+    /// Current custom clip plane in post-projection space.
+    Vector4 clipPlane_;
     /// Stencil test compare mode.
     CompareMode stencilTestMode_;
     /// Stencil operation on pass.

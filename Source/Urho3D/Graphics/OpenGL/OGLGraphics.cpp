@@ -1222,6 +1222,9 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         }
     }
     
+    // Update the clip plane uniform on GL3
+    if (gl3Support)
+        SetShaderParameter(VSP_CLIPPLANE, useClipPlane_ ? clipPlane_ : Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 
     // Store shader combination if shader dumping in progress
     if (shaderPrecache_)
@@ -1913,21 +1916,25 @@ void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4
             glEnable(GL_CLIP_PLANE0);
         else
             glDisable(GL_CLIP_PLANE0);
+
         useClipPlane_ = enable;
     }
     
     if (enable)
     {
         Matrix4 viewProj = projection * view;
-        Vector4 planeVec =  clipPlane.Transformed(viewProj).ToVector4();
+        clipPlane_ =  clipPlane.Transformed(viewProj).ToVector4();
         
-        GLdouble planeData[4];
-        planeData[0] = planeVec.x_;
-        planeData[1] = planeVec.y_;
-        planeData[2] = planeVec.z_;
-        planeData[3] = planeVec.w_;
-        
-        glClipPlane(GL_CLIP_PLANE0, &planeData[0]);
+        if (!gl3Support)
+        {
+            GLdouble planeData[4];
+            planeData[0] = clipPlane_.x_;
+            planeData[1] = clipPlane_.y_;
+            planeData[2] = clipPlane_.z_;
+            planeData[3] = clipPlane_.w_;
+            
+            glClipPlane(GL_CLIP_PLANE0, &planeData[0]);
+        }
     }
     #endif
 }
@@ -2621,8 +2628,13 @@ unsigned Graphics::GetFloat32Format()
 
 unsigned Graphics::GetLinearDepthFormat()
 {
-    // OpenGL FBO specs state that color attachments must have the same format; therefore must encode linear depth to RGBA
-    // manually if not using a readable hardware depth texture
+#ifndef GL_ES_VERSION_2_0
+    // OpenGL 3 can use different color attachment formats
+    if (gl3Support)
+        return GL_R32F;
+#endif
+    // OpenGL 2 requires color attachments to have the same format, therefore encode deferred depth to RGBA manually
+    // if not using a readable hardware depth texture
     return GL_RGBA;
 }
 

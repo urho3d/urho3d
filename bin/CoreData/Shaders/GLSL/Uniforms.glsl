@@ -33,6 +33,9 @@ uniform mat4 cZone;
 #ifdef NUMVERTEXLIGHTS
     uniform vec4 cVertexLights[4*3];
 #endif
+#ifdef GL3
+    uniform vec4 cClipPlane;
+#endif
 #endif
 
 #ifdef COMPILEPS
