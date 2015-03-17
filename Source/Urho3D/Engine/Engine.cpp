@@ -322,6 +322,11 @@ bool Engine::Initialize(const VariantMap& parameters)
         if (HasParameter(parameters, "WindowPositionX") && HasParameter(parameters, "WindowPositionY"))
             graphics->SetWindowPosition(GetParameter(parameters, "WindowPositionX").GetInt(), GetParameter(parameters, "WindowPositionY").GetInt());
 
+        #ifdef URHO3D_OPENGL
+        if (HasParameter(parameters, "ForceGL2"))
+            graphics->SetForceGL2(GetParameter(parameters, "ForceGL2").GetBool());
+        #endif
+
         if (!graphics->SetMode(
             GetParameter(parameters, "WindowWidth", 0).GetInt(),
             GetParameter(parameters, "WindowHeight", 0).GetInt(),
@@ -727,6 +732,8 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["FrameLimiter"] = false;
             else if (argument == "flushgpu")
                 ret["FlushGPU"] = true;
+            else if (argument == "gl2")
+                ret["ForceGL2"] = true;
             else if (argument == "landscape")
                 ret["Orientations"] = "LandscapeLeft LandscapeRight " + ret["Orientations"].GetString();
             else if (argument == "portrait")

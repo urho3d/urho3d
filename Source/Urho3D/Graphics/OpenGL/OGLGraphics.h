@@ -101,6 +101,8 @@ public:
     void SetSRGB(bool enable);
     /// Set whether to flush the GPU command buffer to prevent multiple frames being queued and uneven frame timesteps. Not yet implemented on OpenGL.
     void SetFlushGPU(bool enable);
+    /// Set forced use of OpenGL 2 even if OpenGL 3 is available. Must be called before setting the screen mode for the first time. Default false.
+    void SetForceGL2(bool enable);
     /// Set allowed screen orientations as a space-separated list of "LandscapeLeft", "LandscapeRight", "Portrait" and "PortraitUpsideDown". Affects currently only iOS platform.
     void SetOrientations(const String& orientations);
     /// Toggle between full screen and windowed mode. Return true if successful.
@@ -252,6 +254,8 @@ public:
     bool GetSRGB() const { return sRGB_; }
     /// Return whether the GPU command buffer is flushed each frame. Not yet implemented on OpenGL.
     bool GetFlushGPU() const { return false; }
+    /// Return whether OpenGL 2 use is forced.
+    bool GetForceGL2() const { return forceGL2_; }
     /// Return allowed screen orientations.
     const String& GetOrientations() const { return orientations_; }
     /// Return whether device is lost, and can not yet render.
@@ -477,6 +481,8 @@ private:
     bool tripleBuffer_;
     /// sRGB conversion on write flag for the main window.
     bool sRGB_;
+    /// Force OpenGL 2 use flag.
+    bool forceGL2_;
     /// Instancing support flag.
     bool instancingSupport_;
     /// Light prepass support flag.

@@ -235,6 +235,7 @@ Graphics::Graphics(Context* context_) :
     vsync_(false),
     tripleBuffer_(false),
     sRGB_(false),
+    forceGL2_(false),
     instancingSupport_(false),
     lightPrepassSupport_(false),
     deferredSupport_(false),
@@ -419,7 +420,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
         SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-        // Test GL3 support first. Use a separate window for this because we may not be able to choose window pixel format
+        // Test OpenGL 3 support first. Use a separate window for this because we may not be able to choose window pixel format
         // several times
         if (!gl3SupportTested)
         {
@@ -428,7 +429,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
             SDL_Window* dummyWindow = SDL_CreateWindow(windowTitle_.CString(), 0, 0, 1, 1, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
-            SDL_GLContext dummyContext = SDL_GL_CreateContext(dummyWindow);
+            SDL_GLContext dummyContext = forceGL2_ ? 0 : SDL_GL_CreateContext(dummyWindow);
             if (dummyContext)
             {
                 gl3Support = true;
@@ -437,7 +438,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             }
             else
             {
-                // Failed to create 3.1 context, fall back to 2.0 with extensions
+                // Failed to create OpenGL 3 context, fall back to 2.0 with extensions
                 SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
                 SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
                 SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
@@ -666,6 +667,17 @@ void Graphics::SetSRGB(bool enable)
 
 void Graphics::SetFlushGPU(bool enable)
 {
+}
+
+void Graphics::SetForceGL2(bool enable)
+{
+    if (IsInitialized())
+    {
+        LOGERROR("OpenGL 2 can only be forced before setting the initial screen mode");
+        return;
+    }
+
+    forceGL2_ = enable;
 }
 
 void Graphics::SetOrientations(const String& orientations)
