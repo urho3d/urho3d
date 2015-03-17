@@ -442,14 +442,26 @@ private:
     void CheckFeatureSupport(String& extensions);
     /// Select FBO and commit changes.
     void CommitFramebuffer();
-    /// Check FBO completeness.
-    bool CheckFramebuffer();
     /// Cleanup unused and unbound FBO's.
     void CleanupFramebuffers(bool force = false);
     /// Reset cached rendering state.
     void ResetCachedState();
     /// Initialize texture unit mappings.
     void SetTextureUnitMappings();
+    /// Create a framebuffer using either extension or core functionality.
+    unsigned CreateFramebuffer();
+    /// Delete a framebuffer using either extension or core functionality.
+    void DeleteFramebuffer(unsigned fbo);
+    /// Bind a framebuffer using either extension or core functionality.
+    void BindFramebuffer(unsigned fbo);
+    /// Bind a framebuffer color attachment using either extension or core functionality.
+    void BindColorAttachment(unsigned index, unsigned target, unsigned object);
+    /// Bind a framebuffer depth attachment using either extension or core functionality.
+    void BindDepthAttachment(unsigned object, bool isRenderBuffer);
+    /// Bind a framebuffer stencil attachment using either extension or core functionality.
+    void BindStencilAttachment(unsigned object, bool isRenderBuffer);
+    /// Check FBO completeness using either extension or core functionality.
+    bool CheckFramebuffer();
     
     /// Mutex for accessing the GPU objects vector from several threads.
     Mutex gpuObjectMutex_;

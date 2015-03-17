@@ -65,19 +65,7 @@
 
 #ifdef GL_ES_VERSION_2_0
 #define GL_DEPTH_COMPONENT24 GL_DEPTH_COMPONENT24_OES
-#define GL_FRAMEBUFFER_EXT GL_FRAMEBUFFER
-#define GL_RENDERBUFFER_EXT GL_RENDERBUFFER
-#define GL_COLOR_ATTACHMENT0_EXT GL_COLOR_ATTACHMENT0
-#define GL_DEPTH_ATTACHMENT_EXT GL_DEPTH_ATTACHMENT
-#define GL_STENCIL_ATTACHMENT_EXT GL_STENCIL_ATTACHMENT
-#define GL_FRAMEBUFFER_COMPLETE_EXT GL_FRAMEBUFFER_COMPLETE
 #define glClearDepth glClearDepthf
-#define glBindFramebufferEXT glBindFramebuffer
-#define glFramebufferTexture2DEXT glFramebufferTexture2D
-#define glFramebufferRenderbufferEXT glFramebufferRenderbuffer
-#define glGenFramebuffersEXT glGenFramebuffers
-#define glDeleteFramebuffersEXT glDeleteFramebuffers
-#define glCheckFramebufferStatusEXT glCheckFramebufferStatus
 #endif
 
 #ifdef WIN32
@@ -2356,10 +2344,10 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
             {
                 if (currentFbo != i->second_.fbo_)
                 {
-                    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, i->second_.fbo_);
+                    BindFramebuffer(i->second_.fbo_);
                     currentFbo = i->second_.fbo_;
                 }
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + j, GL_TEXTURE_2D, 0, 0);
+                BindColorAttachment(j, GL_TEXTURE_2D, 0);
                 i->second_.colorAttachments_[j] = 0;
                 // Mark drawbuffer bits to need recalculation
                 i->second_.drawBuffers_ = M_MAX_UNSIGNED;
@@ -2369,18 +2357,18 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
         {
             if (currentFbo != i->second_.fbo_)
             {
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, i->second_.fbo_);
+                BindFramebuffer(i->second_.fbo_);
                 currentFbo = i->second_.fbo_;
             }
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+            BindDepthAttachment(0, false);
+            BindStencilAttachment(0, false);
             i->second_.depthAttachment_ = 0;
         }
     }
 
     // Restore previously bound FBO now if needed
     if (currentFbo != impl_->boundFbo_)
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, impl_->boundFbo_);
+        BindFramebuffer(impl_->boundFbo_);
 }
 
 void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
@@ -2730,9 +2718,12 @@ void Graphics::CheckFeatureSupport(String& extensions)
     int numSupportedRTs = 1;
     
     #ifndef GL_ES_VERSION_2_0
-    glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
-    
-    // If hardware depth is not supported, must support 2 rendertargets for light pre-pass, and 4 for deferred
+    if (!gl3Support)
+        glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
+    else
+        glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &numSupportedRTs);
+
+    // Must support 2 rendertargets for light pre-pass, and 4 for deferred
     if (numSupportedRTs >= 2)
         lightPrepassSupport_ = true;
     if (numSupportedRTs >= 4)
@@ -2805,7 +2796,7 @@ void Graphics::CommitFramebuffer()
     {
         if (impl_->boundFbo_ != impl_->systemFbo_)
         {
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, impl_->systemFbo_);
+            BindFramebuffer(impl_->systemFbo_);
             impl_->boundFbo_ = impl_->systemFbo_;
         }
         
@@ -2842,7 +2833,7 @@ void Graphics::CommitFramebuffer()
     if (i == impl_->frameBuffers_.End())
     {
         FrameBufferObject newFbo;
-        glGenFramebuffersEXT(1, &newFbo.fbo_);
+        newFbo.fbo_ = CreateFramebuffer();
         i = impl_->frameBuffers_.Insert(MakePair(fboKey, newFbo));
     }
     
@@ -2850,7 +2841,7 @@ void Graphics::CommitFramebuffer()
     
     if (impl_->boundFbo_ != i->second_.fbo_)
     {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, i->second_.fbo_);
+        BindFramebuffer(i->second_.fbo_);
         impl_->boundFbo_ = i->second_.fbo_;
     }
     
@@ -2883,7 +2874,12 @@ void Graphics::CommitFramebuffer()
             for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
             {
                 if (renderTargets_[i])
-                    drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0_EXT + i;
+                {
+                    if (!gl3Support)
+                        drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0_EXT + i;
+                    else
+                        drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0 + i;
+                }
             }
             glDrawBuffers(drawBufferCount, (const GLenum*)drawBufferIds);
         }
@@ -2908,8 +2904,7 @@ void Graphics::CommitFramebuffer()
             
             if (i->second_.colorAttachments_[j] != renderTargets_[j])
             {
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + j, renderTargets_[j]->GetTarget(),
-                    texture->GetGPUObject(), 0);
+                BindColorAttachment(j, renderTargets_[j]->GetTarget(), texture->GetGPUObject());
                 i->second_.colorAttachments_[j] = renderTargets_[j];
             }
         }
@@ -2917,7 +2912,7 @@ void Graphics::CommitFramebuffer()
         {
             if (i->second_.colorAttachments_[j])
             {
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + j, GL_TEXTURE_2D, 0, 0);
+                BindColorAttachment(j, GL_TEXTURE_2D, 0);
                 i->second_.colorAttachments_[j] = 0;
             }
         }
@@ -2945,15 +2940,8 @@ void Graphics::CommitFramebuffer()
 
             if (i->second_.depthAttachment_ != depthStencil_)
             {
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, texture->GetGPUObject(), 0);
-                if (hasStencil)
-                {
-                    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D,
-                        texture->GetGPUObject(), 0);
-                }
-                else
-                    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
-                
+                BindDepthAttachment(texture->GetGPUObject(), false);
+                BindStencilAttachment(hasStencil ? texture->GetGPUObject() : 0, false);
                 i->second_.depthAttachment_ = depthStencil_;
             }
         }
@@ -2961,15 +2949,8 @@ void Graphics::CommitFramebuffer()
         {
             if (i->second_.depthAttachment_ != depthStencil_)
             {
-                glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, renderBufferID);
-                if (hasStencil)
-                {
-                    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT,
-                        renderBufferID);
-                }
-                else
-                    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
-                
+                BindDepthAttachment(renderBufferID, true);
+                BindStencilAttachment(hasStencil ? renderBufferID : 0, true);
                 i->second_.depthAttachment_ = depthStencil_;
             }
         }
@@ -2978,8 +2959,8 @@ void Graphics::CommitFramebuffer()
     {
         if (i->second_.depthAttachment_)
         {
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+            BindDepthAttachment(0, false);
+            BindStencilAttachment(0, false);
             i->second_.depthAttachment_ = 0;
         }
     }
@@ -3001,11 +2982,6 @@ void Graphics::CommitFramebuffer()
     #endif
 }
 
-bool Graphics::CheckFramebuffer()
-{
-    return glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT;
-}
-
 void Graphics::CleanupFramebuffers(bool force)
 {
     if (!IsDeviceLost())
@@ -3016,7 +2992,7 @@ void Graphics::CleanupFramebuffers(bool force)
             if (i->second_.fbo_ != impl_->boundFbo_ && (force || i->second_.useTimer_.GetMSec(false) >
                 MAX_FRAMEBUFFER_AGE))
             {
-                glDeleteFramebuffersEXT(1, &i->second_.fbo_);
+                DeleteFramebuffer(i->second_.fbo_);
                 i = impl_->frameBuffers_.Erase(i);
             }
             else
@@ -3113,6 +3089,104 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["ZoneCubeMap"] = TU_ZONE;
     textureUnits_["ZoneVolumeMap"] = TU_ZONE;
     #endif
+}
+
+unsigned Graphics::CreateFramebuffer()
+{
+    unsigned newFbo = 0;
+#ifndef GL_ES_VERSION_2_0
+    if (!gl3Support)
+        glGenFramebuffersEXT(1, &newFbo);
+    else
+#endif
+        glGenFramebuffers(1, &newFbo);
+    return newFbo;
+}
+
+void Graphics::DeleteFramebuffer(unsigned fbo)
+{
+#ifndef GL_ES_VERSION_2_0
+    if (!gl3Support)
+        glDeleteFramebuffersEXT(1, &fbo);
+    else
+#endif
+        glDeleteFramebuffers(1, &fbo);
+}
+
+void Graphics::BindFramebuffer(unsigned fbo)
+{
+#ifndef GL_ES_VERSION_2_0
+    if (!gl3Support)
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+    else
+#endif
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+}
+
+void Graphics::BindColorAttachment(unsigned index, unsigned target, unsigned object)
+{
+#ifndef GL_ES_VERSION_2_0
+    if (!gl3Support)
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + index, target, object, 0);
+    else
+#endif
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, target, object, 0);
+}
+
+void Graphics::BindDepthAttachment(unsigned object, bool isRenderBuffer)
+{
+    if (!object)
+        isRenderBuffer = false;
+
+#ifndef GL_ES_VERSION_2_0
+    if (!gl3Support)
+    {
+        if (!isRenderBuffer)
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, object, 0);
+        else
+            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, object);
+    }
+    else
+#endif
+    {
+        if (!isRenderBuffer)
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, object, 0);
+        else
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, object);
+    }
+}
+
+void Graphics::BindStencilAttachment(unsigned object, bool isRenderBuffer)
+{
+    if (!object)
+        isRenderBuffer = false;
+
+#ifndef GL_ES_VERSION_2_0
+    if (!gl3Support)
+    {
+        if (!isRenderBuffer)
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, object, 0);
+        else
+            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, object);
+    }
+    else
+#endif
+    {
+        if (!isRenderBuffer)
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D, object, 0);
+        else
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, object);
+    }
+}
+
+bool Graphics::CheckFramebuffer()
+{
+#ifndef GL_ES_VERSION_2_0
+    if (!gl3Support)
+        return glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT;
+    else
+#endif
+        return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
 void RegisterGraphicsLibrary(Context* context)
