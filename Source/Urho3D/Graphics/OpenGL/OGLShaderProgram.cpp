@@ -208,7 +208,7 @@ bool ShaderProgram::Link()
             int dataSize;
             glGetActiveUniformBlockiv(object_, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &dataSize);
             if (!dataSize)
-                return 0;
+                continue;
 
             unsigned bindingIndex = group;
             // Vertex shader constant buffer bindings occupy slots starting from zero to maximum supported, pixel shader bindings

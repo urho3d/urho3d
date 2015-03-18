@@ -1227,7 +1227,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             ConstantBuffer* buffer = constantBuffers[i].Get();
             if (buffer != currentConstantBuffers_[i])
             {
-                glBindBufferBase(GL_UNIFORM_BUFFER, i, buffer->GetGPUObject());
+                glBindBufferBase(GL_UNIFORM_BUFFER, i, buffer ? buffer->GetGPUObject() : 0);
                 shaderParameterSources_[i % MAX_SHADER_PARAMETER_GROUPS] = (const void*)M_MAX_UNSIGNED;
                 currentConstantBuffers_[i] = buffer;
             }
