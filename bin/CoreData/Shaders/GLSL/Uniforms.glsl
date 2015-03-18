@@ -1,4 +1,8 @@
-#ifndef GL3
+// Use constant buffers if available. Comment out to revert to individual uniforms
+// which may be faster also on OpenGL 3
+#define USE_CBUFFERS
+
+#if !defined(GL3) || !defined(USE_CBUFFERS)
 
 // OpenGL 2 uniforms (no constant buffers)
 
@@ -38,6 +42,9 @@ uniform mat4 cZone;
 #endif
 #ifdef NUMVERTEXLIGHTS
     uniform vec4 cVertexLights[4*3];
+#endif
+#ifdef GL3
+uniform vec4 cClipPlane;
 #endif
 #endif
 

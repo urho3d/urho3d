@@ -1218,14 +1218,9 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     }
     
     // Update the clip plane uniform on GL3, and set constant buffers
-    bool clearAllParameterGroups = true;
-
     #ifndef GL_ES_VERSION_2_0
     if (gl3Support && shaderProgram_)
     {
-        // When using OpenGL 3, only clear the parameter groups that change their buffer binding
-        clearAllParameterGroups = false;
-
         const SharedPtr<ConstantBuffer>* constantBuffers = shaderProgram_->GetConstantBuffers();
         for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS * 2; ++i)
         {
@@ -1242,7 +1237,8 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     }
     #endif
     
-    if (clearAllParameterGroups)
+    // If shader has uniforms outside constant buffers, reset all parameter sources now, as those uniforms are per-program
+    if (shaderProgram_ && shaderProgram_->HasIndividualUniforms())
         ClearParameterSources();
 
     // Store shader combination if shader dumping in progress

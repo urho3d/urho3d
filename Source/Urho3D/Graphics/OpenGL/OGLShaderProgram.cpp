@@ -45,7 +45,8 @@ const char* shaderParameterGroups[] = {
 ShaderProgram::ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader) :
     GPUObject(graphics),
     vertexShader_(vertexShader),
-    pixelShader_(pixelShader)
+    pixelShader_(pixelShader),
+    individualUniforms_(false)
 {
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         useTextureUnit_[i] = false;
@@ -89,6 +90,7 @@ void ShaderProgram::Release()
             useTextureUnit_[i] = false;
         for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
             constantBuffers_[i].Reset();
+        individualUniforms_ = false;
     }
 }
 
@@ -223,6 +225,7 @@ bool ShaderProgram::Link()
     #endif
 
     // Check for shader parameters and texture units
+    individualUniforms_ = false;
     for (int i = 0; i < uniformCount; ++i)
     {
         unsigned type;
@@ -261,11 +264,13 @@ bool ShaderProgram::Link()
                 if (blockIndex >= 0)
                 {
                     newParam.location_ = blockOffset;
-                    newParam.buffer_ = blockToBinding[blockIndex];
-                    newParam.bufferPtr_ = constantBuffers_[newParam.buffer_];
+                    newParam.bufferPtr_ = constantBuffers_[blockToBinding[blockIndex]];
                 }
             }
             #endif
+
+            if (!newParam.bufferPtr_)
+                individualUniforms_ = true;
 
             if (newParam.location_ >= 0)
                 shaderParameters_[StringHash(paramName)] = newParam;
