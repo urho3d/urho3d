@@ -179,6 +179,9 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
     Light* light = lightQueue_ ? lightQueue_->light_ : 0;
     Texture2D* shadowMap = lightQueue_ ? lightQueue_->shadowMap_ : 0;
 
+    // Set shaders first. The available shader parameters and their register/uniform positions depend on the currently set shaders
+    graphics->SetShaders(vertexShader_, pixelShader_);
+
     // Set pass / material-specific renderstates
     if (pass_ && material_)
     {
@@ -204,9 +207,6 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
         graphics->SetDepthTest(pass_->GetDepthTestMode());
         graphics->SetDepthWrite(pass_->GetDepthWrite() && allowDepthWrite);
     }
-    
-    // Set shaders first. The available shader parameters and their register/uniform positions depend on the currently set shaders
-    graphics->SetShaders(vertexShader_, pixelShader_);
     
     // Set global (per-frame) shader parameters
     if (graphics->NeedParameterUpdate(SP_FRAME, (void*)0))
