@@ -398,6 +398,10 @@ public:
     void Minimize();
     /// Mark the FBO needing an update.
     void MarkFBODirty();
+    /// Bind a VBO, avoiding redundant operation.
+    void SetVBO(unsigned object);
+    /// Bind a UBO, avoiding redundant operation.
+    void SetUBO(unsigned object);
     
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();

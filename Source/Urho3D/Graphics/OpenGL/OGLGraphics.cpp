@@ -590,7 +590,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     
     // Store the system FBO on IOS now
     #ifdef IOS
-    glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&impl_->systemFbo_);
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&impl_->systemFBO_);
     #endif
     
     fullscreen_ = fullscreen;
@@ -957,7 +957,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
         if (!buffer || !buffer->GetGPUObject())
             continue;
         
-        glBindBuffer(GL_ARRAY_BUFFER, buffer->GetGPUObject());
+        SetVBO(buffer->GetGPUObject());
         unsigned vertexSize = buffer->GetVertexSize();
         
         for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
@@ -1055,7 +1055,7 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
         if (!buffer || !buffer->GetGPUObject())
             continue;
         
-        glBindBuffer(GL_ARRAY_BUFFER, buffer->GetGPUObject());
+        SetVBO(buffer->GetGPUObject());
         unsigned vertexSize = buffer->GetVertexSize();
         
         for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
@@ -1227,7 +1227,10 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             ConstantBuffer* buffer = constantBuffers[i].Get();
             if (buffer != currentConstantBuffers_[i])
             {
-                glBindBufferBase(GL_UNIFORM_BUFFER, i, buffer ? buffer->GetGPUObject() : 0);
+                unsigned object = buffer ? buffer->GetGPUObject() : 0;
+                glBindBufferBase(GL_UNIFORM_BUFFER, i, object);
+                // Calling glBindBufferBase also affects the generic buffer binding point
+                impl_->boundUBO_ = object;
                 shaderParameterSources_[i % MAX_SHADER_PARAMETER_GROUPS] = (const void*)M_MAX_UNSIGNED;
                 currentConstantBuffers_[i] = buffer;
             }
@@ -2424,7 +2427,7 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
     // Flush pending FBO changes first if any
     PrepareDraw();
 
-    unsigned currentFbo = impl_->boundFbo_;
+    unsigned currentFBO = impl_->boundFBO_;
 
     // Go through all FBOs and clean up the surface from them
     for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin();
@@ -2434,10 +2437,10 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
         {
             if (i->second_.colorAttachments_[j] == surface)
             {
-                if (currentFbo != i->second_.fbo_)
+                if (currentFBO != i->second_.fbo_)
                 {
                     BindFramebuffer(i->second_.fbo_);
-                    currentFbo = i->second_.fbo_;
+                    currentFBO = i->second_.fbo_;
                 }
                 BindColorAttachment(j, GL_TEXTURE_2D, 0);
                 i->second_.colorAttachments_[j] = 0;
@@ -2447,10 +2450,10 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
         }
         if (i->second_.depthAttachment_ == surface)
         {
-            if (currentFbo != i->second_.fbo_)
+            if (currentFBO != i->second_.fbo_)
             {
                 BindFramebuffer(i->second_.fbo_);
-                currentFbo = i->second_.fbo_;
+                currentFBO = i->second_.fbo_;
             }
             BindDepthAttachment(0, false);
             BindStencilAttachment(0, false);
@@ -2459,8 +2462,8 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
     }
 
     // Restore previously bound FBO now if needed
-    if (currentFbo != impl_->boundFbo_)
-        BindFramebuffer(impl_->boundFbo_);
+    if (currentFBO != impl_->boundFBO_)
+        BindFramebuffer(impl_->boundFBO_);
 }
 
 void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
@@ -2574,7 +2577,7 @@ void Graphics::Restore()
     {
         impl_->context_ = SDL_GL_CreateContext(impl_->window_);
         #ifdef IOS
-        glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&impl_->systemFbo_);
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&impl_->systemFBO_);
         #endif
         
         ResetCachedState();
@@ -2615,6 +2618,28 @@ void Graphics::Minimize()
 void Graphics::MarkFBODirty()
 {
     impl_->fboDirty_ = true;
+}
+
+void Graphics::SetVBO(unsigned object)
+{
+    if (impl_->boundVBO_ != object)
+    {
+        if (object)
+            glBindBuffer(GL_ARRAY_BUFFER, object);
+        impl_->boundVBO_ = object;
+    }
+}
+
+void Graphics::SetUBO(unsigned object)
+{
+    #ifndef GL_ES_VERSION_2_0
+    if (impl_->boundUBO_ != object)
+    {
+        if (object)
+            glBindBuffer(GL_UNIFORM_BUFFER, object);
+        impl_->boundUBO_ = object;
+    }
+    #endif
 }
 
 unsigned Graphics::GetAlphaFormat()
@@ -2905,10 +2930,10 @@ void Graphics::PrepareDraw()
     
         if (noFbo)
         {
-            if (impl_->boundFbo_ != impl_->systemFbo_)
+            if (impl_->boundFBO_ != impl_->systemFBO_)
             {
-                BindFramebuffer(impl_->systemFbo_);
-                impl_->boundFbo_ = impl_->systemFbo_;
+                BindFramebuffer(impl_->systemFBO_);
+                impl_->boundFBO_ = impl_->systemFBO_;
             }
         
             #ifndef GL_ES_VERSION_2_0
@@ -2950,10 +2975,10 @@ void Graphics::PrepareDraw()
     
         i->second_.useTimer_.Reset();
     
-        if (impl_->boundFbo_ != i->second_.fbo_)
+        if (impl_->boundFBO_ != i->second_.fbo_)
         {
             BindFramebuffer(i->second_.fbo_);
-            impl_->boundFbo_ = i->second_.fbo_;
+            impl_->boundFBO_ = i->second_.fbo_;
         }
     
         #ifndef GL_ES_VERSION_2_0
@@ -3101,7 +3126,7 @@ void Graphics::CleanupFramebuffers(bool force)
         for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin();
             i != impl_->frameBuffers_.End();)
         {
-            if (i->second_.fbo_ != impl_->boundFbo_ && (force || i->second_.useTimer_.GetMSec(false) >
+            if (i->second_.fbo_ != impl_->boundFBO_ && (force || i->second_.useTimer_.GetMSec(false) >
                 MAX_FRAMEBUFFER_AGE))
             {
                 DeleteFramebuffer(i->second_.fbo_);
@@ -3113,7 +3138,7 @@ void Graphics::CleanupFramebuffers(bool force)
     }
     else
     {
-        impl_->boundFbo_ = 0;
+        impl_->boundFBO_ = 0;
         impl_->frameBuffers_.Clear();
     }
 }
@@ -3164,7 +3189,9 @@ void Graphics::ResetCachedState()
     lastInstanceOffset_ = 0;
     impl_->activeTexture_ = 0;
     impl_->enabledAttributes_ = 0;
-    impl_->boundFbo_ = impl_->systemFbo_;
+    impl_->boundFBO_ = impl_->systemFBO_;
+    impl_->boundVBO_ = 0;
+    impl_->boundUBO_ = 0;
     impl_->sRGBWrite_ = false;
     
     // Set initial state to match Direct3D

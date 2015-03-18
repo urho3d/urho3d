@@ -106,13 +106,17 @@ private:
     /// SDL OpenGL context.
     SDL_GLContext context_;
     /// IOS system framebuffer handle.
-    unsigned systemFbo_;
+    unsigned systemFBO_;
     /// Active texture unit.
     unsigned activeTexture_;
     /// Vertex attributes in use.
     unsigned enabledAttributes_;
     /// Currently bound frame buffer object.
-    unsigned boundFbo_;
+    unsigned boundFBO_;
+    /// Currently bound vertex buffer object.
+    unsigned boundVBO_;
+    /// Currently bound uniform buffer object.
+    unsigned boundUBO_;
     /// Current pixel format.
     int pixelFormat_;
     /// Map for FBO's per resolution and format.
