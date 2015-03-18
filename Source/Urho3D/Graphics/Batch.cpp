@@ -340,11 +340,11 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
                     Matrix4 lightVecRot(lightNode->GetWorldRotation().RotationMatrix());
                     // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
                     // the next parameter
-#ifdef URHO3D_OPENGL
+                    #ifdef URHO3D_OPENGL
                     graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 16);
-#else
+                    #else
                     graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 12);
-#endif
+                    #endif
                 }
                 break;
                 }
@@ -404,11 +404,11 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
                     Matrix4 lightVecRot(lightNode->GetWorldRotation().RotationMatrix());
                     // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
                     // the next parameter
-#ifdef URHO3D_OPENGL
+                    #ifdef URHO3D_OPENGL
                     graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 16);
-#else
+                    #else
                     graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 12);
-#endif
+                    #endif
                 }
                 break;
                 }
@@ -423,17 +423,17 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
                     unsigned faceHeight = shadowMap->GetHeight() / 3;
                     float width = (float)shadowMap->GetWidth();
                     float height = (float)shadowMap->GetHeight();
-#ifdef URHO3D_OPENGL
+                    #ifdef URHO3D_OPENGL
                     float mulX = (float)(faceWidth - 3) / width;
                     float mulY = (float)(faceHeight - 3) / height;
                     float addX = 1.5f / width;
                     float addY = 1.5f / height;
-#else
+                    #else
                     float mulX = (float)(faceWidth - 4) / width;
                     float mulY = (float)(faceHeight - 4) / height;
                     float addX = 2.5f / width;
                     float addY = 2.5f / height;
-#endif
+                    #endif
                     // If using 4 shadow samples, offset the position diagonally by half pixel
                     if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
                     {
