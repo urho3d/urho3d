@@ -25,6 +25,7 @@
 #include "../../Graphics/AnimationController.h"
 #include "../../Graphics/BillboardSet.h"
 #include "../../Graphics/Camera.h"
+#include "../../Graphics/ConstantBuffer.h"
 #include "../../Core/Context.h"
 #include "../../Graphics/CustomGeometry.h"
 #include "../../Graphics/DebugRenderer.h"
@@ -754,8 +755,7 @@ void Graphics::EndFrame()
 
 void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned stencil)
 {
-    if (impl_->fboDirty_)
-        CommitFramebuffer();
+    PrepareDraw();
     
     #ifdef GL_ES_VERSION_2_0
     flags &= ~CLEAR_STENCIL;
@@ -838,8 +838,7 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
     if (!vertexCount)
         return;
     
-    if (impl_->fboDirty_)
-        CommitFramebuffer();
+    PrepareDraw();
     
     unsigned primitiveCount;
     GLenum glPrimitiveType;
@@ -856,8 +855,7 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject())
         return;
     
-    if (impl_->fboDirty_)
-        CommitFramebuffer();
+    PrepareDraw();
     
     unsigned indexSize = indexBuffer_->GetIndexSize();
     unsigned primitiveCount;
@@ -879,8 +877,7 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject() || !instancingSupport_)
         return;
     
-    if (impl_->fboDirty_)
-        CommitFramebuffer();
+    PrepareDraw();
     
     unsigned indexSize = indexBuffer_->GetIndexSize();
     unsigned primitiveCount;
@@ -1127,8 +1124,6 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     if (vs == vertexShader_ && ps == pixelShader_)
         return;
     
-    ClearParameterSources();
-
     // Compile the shaders now if not yet compiled. If already attempted, do not retry
     if (vs && !vs->GetGPUObject())
     {
@@ -1222,9 +1217,33 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         }
     }
     
-    // Update the clip plane uniform on GL3
-    if (gl3Support)
+    // Update the clip plane uniform on GL3, and set constant buffers
+    bool clearAllParameterGroups = true;
+
+    #ifndef GL_ES_VERSION_2_0
+    if (gl3Support && shaderProgram_)
+    {
+        // When using OpenGL 3, only clear the parameter groups that change their buffer binding
+        clearAllParameterGroups = false;
+
+        const SharedPtr<ConstantBuffer>* constantBuffers = shaderProgram_->GetConstantBuffers();
+        for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS * 2; ++i)
+        {
+            ConstantBuffer* buffer = constantBuffers[i].Get();
+            if (buffer != currentConstantBuffers_[i])
+            {
+                glBindBufferBase(GL_UNIFORM_BUFFER, i, buffer->GetGPUObject());
+                shaderParameterSources_[i % MAX_SHADER_PARAMETER_GROUPS] = (const void*)M_MAX_UNSIGNED;
+                currentConstantBuffers_[i] = buffer;
+            }
+        }
+
         SetShaderParameter(VSP_CLIPPLANE, useClipPlane_ ? clipPlane_ : Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+    }
+    #endif
+    
+    if (clearAllParameterGroups)
+        ClearParameterSources();
 
     // Store shader combination if shader dumping in progress
     if (shaderPrecache_)
@@ -1238,6 +1257,15 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
         {
+            if (info->bufferPtr_)
+            {
+                ConstantBuffer* buffer = info->bufferPtr_;
+                if (!buffer->IsDirty())
+                    dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->location_, count * sizeof(float), data);
+                return;
+            }
+
             switch (info->type_)
             {
             case GL_FLOAT:
@@ -1274,7 +1302,18 @@ void Graphics::SetShaderParameter(StringHash param, float value)
     {
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
+        {
+            if (info->bufferPtr_)
+            {
+                ConstantBuffer* buffer = info->bufferPtr_;
+                if (!buffer->IsDirty())
+                    dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->location_, sizeof(float), &value);
+                return;
+            }
+
             glUniform1fv(info->location_, 1, &value);
+        }
     }
 }
 
@@ -1290,6 +1329,15 @@ void Graphics::SetShaderParameter(StringHash param, const Vector2& vector)
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
         {
+            if (info->bufferPtr_)
+            {
+                ConstantBuffer* buffer = info->bufferPtr_;
+                if (!buffer->IsDirty())
+                    dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->location_, sizeof(Vector2), &vector);
+                return;
+            }
+
             // Check the uniform type to avoid mismatch
             switch (info->type_)
             {
@@ -1311,7 +1359,18 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
     {
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
+        {
+            if (info->bufferPtr_)
+            {
+                ConstantBuffer* buffer = info->bufferPtr_;
+                if (!buffer->IsDirty())
+                    dirtyConstantBuffers_.Push(buffer);
+                buffer->SetVector3ArrayParameter(info->location_, 3, &matrix);
+                return;
+            }
+
             glUniformMatrix3fv(info->location_, 1, GL_FALSE, matrix.Data());
+        }
     }
 }
 
@@ -1322,6 +1381,15 @@ void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
         {
+            if (info->bufferPtr_)
+            {
+                ConstantBuffer* buffer = info->bufferPtr_;
+                if (!buffer->IsDirty())
+                    dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->location_, sizeof(Vector3), &vector);
+                return;
+            }
+
             // Check the uniform type to avoid mismatch
             switch (info->type_)
             {
@@ -1347,7 +1415,18 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
     {
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
+        {
+            if (info->bufferPtr_)
+            {
+                ConstantBuffer* buffer = info->bufferPtr_;
+                if (!buffer->IsDirty())
+                    dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->location_, sizeof(Matrix4), &matrix);
+                return;
+            }
+
             glUniformMatrix4fv(info->location_, 1, GL_FALSE, matrix.Data());
+        }
     }
 }
 
@@ -1358,6 +1437,15 @@ void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
         const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
         {
+            if (info->bufferPtr_)
+            {
+                ConstantBuffer* buffer = info->bufferPtr_;
+                if (!buffer->IsDirty())
+                    dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->location_, sizeof(Vector4), &vector);
+                return;
+            }
+
             // Check the uniform type to avoid mismatch
             switch (info->type_)
             {
@@ -1402,6 +1490,15 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
             fullMatrix.m21_ = matrix.m21_;
             fullMatrix.m22_ = matrix.m22_;
             fullMatrix.m23_ = matrix.m23_;
+
+            if (info->bufferPtr_)
+            {
+                ConstantBuffer* buffer = info->bufferPtr_;
+                if (!buffer->IsDirty())
+                    dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->location_, sizeof(Matrix4), &fullMatrix);
+                return;
+            }
 
             glUniformMatrix4fv(info->location_, 1, GL_FALSE, fullMatrix.Data());
         }
@@ -1696,8 +1793,7 @@ void Graphics::SetDepthStencil(Texture2D* texture)
 
 void Graphics::SetViewport(const IntRect& rect)
 {
-    if (impl_->fboDirty_)
-        CommitFramebuffer();
+    PrepareDraw();
     
     IntVector2 rtSize = GetRenderTargetDimensions();
     
@@ -2330,7 +2426,7 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
         return;
 
     // Flush pending FBO changes first if any
-    CommitFramebuffer();
+    PrepareDraw();
 
     unsigned currentFbo = impl_->boundFbo_;
 
@@ -2385,6 +2481,17 @@ void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
         shaderProgram_ = 0;
 }
 
+ConstantBuffer* Graphics::GetOrCreateConstantBuffer(unsigned bindingIndex, unsigned size)
+{
+    unsigned key = (bindingIndex << 16) | size;
+    HashMap<unsigned, SharedPtr<ConstantBuffer> >::Iterator i = constantBuffers_.Find(key);
+    if (i == constantBuffers_.End())
+    {
+        i = constantBuffers_.Insert(MakePair(key, SharedPtr<ConstantBuffer>(new ConstantBuffer(context_))));
+        i->second_->SetSize(size);
+    }
+    return i->second_.Get();
+}
 
 void Graphics::Release(bool clearGPUObjects, bool closeWindow)
 {
@@ -2628,11 +2735,11 @@ unsigned Graphics::GetFloat32Format()
 
 unsigned Graphics::GetLinearDepthFormat()
 {
-#ifndef GL_ES_VERSION_2_0
+    #ifndef GL_ES_VERSION_2_0
     // OpenGL 3 can use different color attachment formats
     if (gl3Support)
         return GL_R32F;
-#endif
+    #endif
     // OpenGL 2 requires color attachments to have the same format, therefore encode deferred depth to RGBA manually
     // if not using a readable hardware depth texture
     return GL_RGBA;
@@ -2771,40 +2878,213 @@ void Graphics::CheckFeatureSupport(String& extensions)
     #endif
 }
 
-void Graphics::CommitFramebuffer()
+void Graphics::PrepareDraw()
 {
-    if (!impl_->fboDirty_)
-        return;
-    
-    impl_->fboDirty_ = false;
-    
-    // First check if no framebuffer is needed. In that case simply return to backbuffer rendering
-    bool noFbo = !depthStencil_;
-    if (noFbo)
+    #ifndef GL_ES_VERSION_2_0
+    if (gl3Support)
     {
+        for (PODVector<ConstantBuffer*>::Iterator i = dirtyConstantBuffers_.Begin(); i != dirtyConstantBuffers_.End(); ++i)
+            (*i)->Apply();
+        dirtyConstantBuffers_.Clear();
+    }
+    #endif
+
+    if (impl_->fboDirty_)
+    {
+        impl_->fboDirty_ = false;
+    
+        // First check if no framebuffer is needed. In that case simply return to backbuffer rendering
+        bool noFbo = !depthStencil_;
+        if (noFbo)
+        {
+            for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+            {
+                if (renderTargets_[i])
+                {
+                    noFbo = false;
+                    break;
+                }
+            }
+        }
+    
+        if (noFbo)
+        {
+            if (impl_->boundFbo_ != impl_->systemFbo_)
+            {
+                BindFramebuffer(impl_->systemFbo_);
+                impl_->boundFbo_ = impl_->systemFbo_;
+            }
+        
+            #ifndef GL_ES_VERSION_2_0
+            // Disable/enable sRGB write
+            if (sRGBWriteSupport_)
+            {
+                bool sRGBWrite = sRGB_;
+                if (sRGBWrite != impl_->sRGBWrite_)
+                {
+                    if (sRGBWrite)
+                        glEnable(GL_FRAMEBUFFER_SRGB_EXT);
+                    else
+                        glDisable(GL_FRAMEBUFFER_SRGB_EXT);
+                    impl_->sRGBWrite_ = sRGBWrite;
+                }
+            }
+            #endif
+        
+            return;
+        }
+    
+        // Search for a new framebuffer based on format & size, or create new
+        IntVector2 rtSize = Graphics::GetRenderTargetDimensions();
+        unsigned format = 0;
+        if (renderTargets_[0])
+            format = renderTargets_[0]->GetParentTexture()->GetFormat();
+        else if (depthStencil_)
+            format = depthStencil_->GetParentTexture()->GetFormat();
+    
+        unsigned long long fboKey = (rtSize.x_ << 16 | rtSize.y_) | (((unsigned long long)format) << 32);
+    
+        HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Find(fboKey);
+        if (i == impl_->frameBuffers_.End())
+        {
+            FrameBufferObject newFbo;
+            newFbo.fbo_ = CreateFramebuffer();
+            i = impl_->frameBuffers_.Insert(MakePair(fboKey, newFbo));
+        }
+    
+        i->second_.useTimer_.Reset();
+    
+        if (impl_->boundFbo_ != i->second_.fbo_)
+        {
+            BindFramebuffer(i->second_.fbo_);
+            impl_->boundFbo_ = i->second_.fbo_;
+        }
+    
+        #ifndef GL_ES_VERSION_2_0
+        // Setup readbuffers & drawbuffers if needed
+        if (i->second_.readBuffers_ != GL_NONE)
+        {
+            glReadBuffer(GL_NONE);
+            i->second_.readBuffers_ = GL_NONE;
+        }
+    
+        // Calculate the bit combination of non-zero color rendertargets to first check if the combination changed
+        unsigned newDrawBuffers = 0;
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         {
             if (renderTargets_[i])
+                newDrawBuffers |= 1 << i;
+        }
+    
+        if (newDrawBuffers != i->second_.drawBuffers_)
+        {
+            // Check for no color rendertargets (depth rendering only)
+            if (!newDrawBuffers)
+                glDrawBuffer(GL_NONE);
+            else
             {
-                noFbo = false;
-                break;
+                int drawBufferIds[MAX_RENDERTARGETS];
+                unsigned drawBufferCount = 0;
+            
+                for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+                {
+                    if (renderTargets_[i])
+                    {
+                        if (!gl3Support)
+                            drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0_EXT + i;
+                        else
+                            drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0 + i;
+                    }
+                }
+                glDrawBuffers(drawBufferCount, (const GLenum*)drawBufferIds);
+            }
+        
+            i->second_.drawBuffers_ = newDrawBuffers;
+        }
+        #endif
+    
+        for (unsigned j = 0; j < MAX_RENDERTARGETS; ++j)
+        {
+            if (renderTargets_[j])
+            {
+                Texture* texture = renderTargets_[j]->GetParentTexture();
+            
+                // If texture's parameters are dirty, update before attaching
+                if (texture->GetParametersDirty())
+                {
+                    SetTextureForUpdate(texture);
+                    texture->UpdateParameters();
+                    SetTexture(0, 0);
+                }
+            
+                if (i->second_.colorAttachments_[j] != renderTargets_[j])
+                {
+                    BindColorAttachment(j, renderTargets_[j]->GetTarget(), texture->GetGPUObject());
+                    i->second_.colorAttachments_[j] = renderTargets_[j];
+                }
+            }
+            else
+            {
+                if (i->second_.colorAttachments_[j])
+                {
+                    BindColorAttachment(j, GL_TEXTURE_2D, 0);
+                    i->second_.colorAttachments_[j] = 0;
+                }
             }
         }
-    }
     
-    if (noFbo)
-    {
-        if (impl_->boundFbo_ != impl_->systemFbo_)
+        if (depthStencil_)
         {
-            BindFramebuffer(impl_->systemFbo_);
-            impl_->boundFbo_ = impl_->systemFbo_;
+            // Bind either a renderbuffer or a depth texture, depending on what is available
+            Texture* texture = depthStencil_->GetParentTexture();
+            #ifndef GL_ES_VERSION_2_0
+            bool hasStencil = texture->GetFormat() == GL_DEPTH24_STENCIL8_EXT;
+            #else
+            bool hasStencil = texture->GetFormat() == GL_DEPTH24_STENCIL8_OES;
+            #endif
+            unsigned renderBufferID = depthStencil_->GetRenderBuffer();
+            if (!renderBufferID)
+            {
+                // If texture's parameters are dirty, update before attaching
+                if (texture->GetParametersDirty())
+                {
+                    SetTextureForUpdate(texture);
+                    texture->UpdateParameters();
+                    SetTexture(0, 0);
+                }
+
+                if (i->second_.depthAttachment_ != depthStencil_)
+                {
+                    BindDepthAttachment(texture->GetGPUObject(), false);
+                    BindStencilAttachment(hasStencil ? texture->GetGPUObject() : 0, false);
+                    i->second_.depthAttachment_ = depthStencil_;
+                }
+            }
+            else
+            {
+                if (i->second_.depthAttachment_ != depthStencil_)
+                {
+                    BindDepthAttachment(renderBufferID, true);
+                    BindStencilAttachment(hasStencil ? renderBufferID : 0, true);
+                    i->second_.depthAttachment_ = depthStencil_;
+                }
+            }
         }
-        
+        else
+        {
+            if (i->second_.depthAttachment_)
+            {
+                BindDepthAttachment(0, false);
+                BindStencilAttachment(0, false);
+                i->second_.depthAttachment_ = 0;
+            }
+        }
+    
         #ifndef GL_ES_VERSION_2_0
         // Disable/enable sRGB write
         if (sRGBWriteSupport_)
         {
-            bool sRGBWrite = sRGB_;
+            bool sRGBWrite = renderTargets_[0] ? renderTargets_[0]->GetParentTexture()->GetSRGB() : sRGB_;
             if (sRGBWrite != impl_->sRGBWrite_)
             {
                 if (sRGBWrite)
@@ -2815,171 +3095,7 @@ void Graphics::CommitFramebuffer()
             }
         }
         #endif
-        
-        return;
     }
-    
-    // Search for a new framebuffer based on format & size, or create new
-    IntVector2 rtSize = Graphics::GetRenderTargetDimensions();
-    unsigned format = 0;
-    if (renderTargets_[0])
-        format = renderTargets_[0]->GetParentTexture()->GetFormat();
-    else if (depthStencil_)
-        format = depthStencil_->GetParentTexture()->GetFormat();
-    
-    unsigned long long fboKey = (rtSize.x_ << 16 | rtSize.y_) | (((unsigned long long)format) << 32);
-    
-    HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Find(fboKey);
-    if (i == impl_->frameBuffers_.End())
-    {
-        FrameBufferObject newFbo;
-        newFbo.fbo_ = CreateFramebuffer();
-        i = impl_->frameBuffers_.Insert(MakePair(fboKey, newFbo));
-    }
-    
-    i->second_.useTimer_.Reset();
-    
-    if (impl_->boundFbo_ != i->second_.fbo_)
-    {
-        BindFramebuffer(i->second_.fbo_);
-        impl_->boundFbo_ = i->second_.fbo_;
-    }
-    
-    #ifndef GL_ES_VERSION_2_0
-    // Setup readbuffers & drawbuffers if needed
-    if (i->second_.readBuffers_ != GL_NONE)
-    {
-        glReadBuffer(GL_NONE);
-        i->second_.readBuffers_ = GL_NONE;
-    }
-    
-    // Calculate the bit combination of non-zero color rendertargets to first check if the combination changed
-    unsigned newDrawBuffers = 0;
-    for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-    {
-        if (renderTargets_[i])
-            newDrawBuffers |= 1 << i;
-    }
-    
-    if (newDrawBuffers != i->second_.drawBuffers_)
-    {
-        // Check for no color rendertargets (depth rendering only)
-        if (!newDrawBuffers)
-            glDrawBuffer(GL_NONE);
-        else
-        {
-            int drawBufferIds[MAX_RENDERTARGETS];
-            unsigned drawBufferCount = 0;
-            
-            for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-            {
-                if (renderTargets_[i])
-                {
-                    if (!gl3Support)
-                        drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0_EXT + i;
-                    else
-                        drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0 + i;
-                }
-            }
-            glDrawBuffers(drawBufferCount, (const GLenum*)drawBufferIds);
-        }
-        
-        i->second_.drawBuffers_ = newDrawBuffers;
-    }
-    #endif
-    
-    for (unsigned j = 0; j < MAX_RENDERTARGETS; ++j)
-    {
-        if (renderTargets_[j])
-        {
-            Texture* texture = renderTargets_[j]->GetParentTexture();
-            
-            // If texture's parameters are dirty, update before attaching
-            if (texture->GetParametersDirty())
-            {
-                SetTextureForUpdate(texture);
-                texture->UpdateParameters();
-                SetTexture(0, 0);
-            }
-            
-            if (i->second_.colorAttachments_[j] != renderTargets_[j])
-            {
-                BindColorAttachment(j, renderTargets_[j]->GetTarget(), texture->GetGPUObject());
-                i->second_.colorAttachments_[j] = renderTargets_[j];
-            }
-        }
-        else
-        {
-            if (i->second_.colorAttachments_[j])
-            {
-                BindColorAttachment(j, GL_TEXTURE_2D, 0);
-                i->second_.colorAttachments_[j] = 0;
-            }
-        }
-    }
-    
-    if (depthStencil_)
-    {
-        // Bind either a renderbuffer or a depth texture, depending on what is available
-        Texture* texture = depthStencil_->GetParentTexture();
-        #ifndef GL_ES_VERSION_2_0
-        bool hasStencil = texture->GetFormat() == GL_DEPTH24_STENCIL8_EXT;
-        #else
-        bool hasStencil = texture->GetFormat() == GL_DEPTH24_STENCIL8_OES;
-        #endif
-        unsigned renderBufferID = depthStencil_->GetRenderBuffer();
-        if (!renderBufferID)
-        {
-            // If texture's parameters are dirty, update before attaching
-            if (texture->GetParametersDirty())
-            {
-                SetTextureForUpdate(texture);
-                texture->UpdateParameters();
-                SetTexture(0, 0);
-            }
-
-            if (i->second_.depthAttachment_ != depthStencil_)
-            {
-                BindDepthAttachment(texture->GetGPUObject(), false);
-                BindStencilAttachment(hasStencil ? texture->GetGPUObject() : 0, false);
-                i->second_.depthAttachment_ = depthStencil_;
-            }
-        }
-        else
-        {
-            if (i->second_.depthAttachment_ != depthStencil_)
-            {
-                BindDepthAttachment(renderBufferID, true);
-                BindStencilAttachment(hasStencil ? renderBufferID : 0, true);
-                i->second_.depthAttachment_ = depthStencil_;
-            }
-        }
-    }
-    else
-    {
-        if (i->second_.depthAttachment_)
-        {
-            BindDepthAttachment(0, false);
-            BindStencilAttachment(0, false);
-            i->second_.depthAttachment_ = 0;
-        }
-    }
-    
-    #ifndef GL_ES_VERSION_2_0
-    // Disable/enable sRGB write
-    if (sRGBWriteSupport_)
-    {
-        bool sRGBWrite = renderTargets_[0] ? renderTargets_[0]->GetParentTexture()->GetSRGB() : sRGB_;
-        if (sRGBWrite != impl_->sRGBWrite_)
-        {
-            if (sRGBWrite)
-                glEnable(GL_FRAMEBUFFER_SRGB_EXT);
-            else
-                glDisable(GL_FRAMEBUFFER_SRGB_EXT);
-            impl_->sRGBWrite_ = sRGBWrite;
-        }
-    }
-    #endif
 }
 
 void Graphics::CleanupFramebuffers(bool force)
@@ -3063,6 +3179,10 @@ void Graphics::ResetCachedState()
         SetDepthTest(CMP_LESSEQUAL);
         SetDepthWrite(true);
     }
+
+    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS * 2; ++i)
+        currentConstantBuffers_[i] = 0;
+    dirtyConstantBuffers_.Clear();
 }
 
 void Graphics::SetTextureUnitMappings()

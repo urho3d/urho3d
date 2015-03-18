@@ -20,15 +20,27 @@
 // THE SOFTWARE.
 //
 
+#include "../../Graphics/ConstantBuffer.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/ShaderProgram.h"
 #include "../../Graphics/ShaderVariation.h"
+#include "../../IO/Log.h"
 
 #include "../../DebugNew.h"
 
 namespace Urho3D
 {
+
+const char* shaderParameterGroups[] = {
+    "frame",
+    "camera",
+    "zone",
+    "light",
+    "material",
+    "object",
+    "custom"
+};
 
 ShaderProgram::ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader) :
     GPUObject(graphics),
@@ -75,6 +87,8 @@ void ShaderProgram::Release()
         
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
             useTextureUnit_[i] = false;
+        for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
+            constantBuffers_[i].Reset();
     }
 }
 
@@ -139,6 +153,75 @@ bool ShaderProgram::Link()
     glUseProgram(object_);
     glGetProgramiv(object_, GL_ACTIVE_UNIFORMS, &uniformCount);
     
+    // Check for constant buffers
+    #ifndef GL_ES_VERSION_2_0
+    HashMap<unsigned, unsigned> blockToBinding;
+
+    if (Graphics::GetGL3Support())
+    {
+        int numUniformBlocks = 0;
+
+        glGetProgramiv(object_, GL_ACTIVE_UNIFORM_BLOCKS, &numUniformBlocks);
+        for (int i = 0; i < numUniformBlocks; ++i)
+        {
+            int nameLength;
+            glGetActiveUniformBlockName(object_, i, MAX_PARAMETER_NAME_LENGTH, &nameLength, uniformName);
+
+            String name(uniformName, nameLength);
+
+            unsigned blockIndex = glGetUniformBlockIndex(object_, name.CString());
+            unsigned group = M_MAX_UNSIGNED;
+
+            // Try to recognize the use of the buffer from its name
+            for (unsigned j = 0; j < MAX_SHADER_PARAMETER_GROUPS; ++j)
+            {
+                if (name.Contains(shaderParameterGroups[j], false))
+                {
+                    group = j;
+                    break;
+                }
+            }
+
+            // If name is not recognized, search for a digit in the name and use that as the group index
+            if (group == M_MAX_UNSIGNED)
+            {
+                for (unsigned j = 1; j < name.Length(); ++j)
+                {
+                    if (name[j] >= '0' && name[j] <= '5')
+                    {
+                        group = name[j] - '0';
+                        break;
+                    }
+                }
+            }
+
+            if (group >= MAX_SHADER_PARAMETER_GROUPS)
+            {
+                LOGWARNING("Skipping unrecognized uniform block " + name + " in shader program " + vertexShader_->GetFullName() +
+                    " " + pixelShader_->GetFullName());
+                continue;
+            }
+
+            // Find total constant buffer data size
+            int dataSize;
+            glGetActiveUniformBlockiv(object_, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &dataSize);
+            if (!dataSize)
+                return 0;
+
+            unsigned bindingIndex = group;
+            // Vertex shader constant buffer bindings occupy slots starting from zero to maximum supported, pixel shader bindings
+            // from that point onward
+            if (name.Contains("PS", false))
+                bindingIndex += MAX_SHADER_PARAMETER_GROUPS;
+
+            glUniformBlockBinding(object_, blockIndex, bindingIndex);
+            blockToBinding[blockIndex] = bindingIndex;
+
+            constantBuffers_[bindingIndex] = graphics_->GetOrCreateConstantBuffer(bindingIndex, dataSize);
+        }
+    }
+    #endif
+
     // Check for shader parameters and texture units
     for (int i = 0; i < uniformCount; ++i)
     {
@@ -147,10 +230,6 @@ bool ShaderProgram::Link()
         
         glGetActiveUniform(object_, i, MAX_PARAMETER_NAME_LENGTH, 0, &count, &type, uniformName);
         int location = glGetUniformLocation(object_, uniformName);
-        
-        // Skip inbuilt or disabled uniforms
-        if (location < 0)
-            continue;
         
         // Check for array index included in the name and strip it
         String name(uniformName);
@@ -166,14 +245,32 @@ bool ShaderProgram::Link()
         
         if (name[0] == 'c')
         {
-            // Store the constant uniform mapping
+            // Store constant uniform
             String paramName = name.Substring(1);
             ShaderParameter newParam;
-            newParam.location_ = location;
             newParam.type_ = type;
-            shaderParameters_[StringHash(paramName)] = newParam;
+            newParam.location_ = location;
+
+            #ifndef GL_ES_VERSION_2_0
+            // If running OpenGL 3, the uniform may be inside a constant buffer
+            if (newParam.location_ < 0 && Graphics::GetGL3Support())
+            {
+                int blockIndex, blockOffset;
+                glGetActiveUniformsiv(object_, 1, (const GLuint*)&i, GL_UNIFORM_BLOCK_INDEX, &blockIndex);
+                glGetActiveUniformsiv(object_, 1, (const GLuint*)&i, GL_UNIFORM_OFFSET, &blockOffset);
+                if (blockIndex >= 0)
+                {
+                    newParam.location_ = blockOffset;
+                    newParam.buffer_ = blockToBinding[blockIndex];
+                    newParam.bufferPtr_ = constantBuffers_[newParam.buffer_];
+                }
+            }
+            #endif
+
+            if (newParam.location_ >= 0)
+                shaderParameters_[StringHash(paramName)] = newParam;
         }
-        else if (name[0] == 's')
+        else if (location >= 0 && name[0] == 's')
         {
             // Set the samplers here so that they do not have to be set later
             int unit = graphics_->GetTextureUnit(name.Substring(1));

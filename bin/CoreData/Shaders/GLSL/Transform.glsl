@@ -74,6 +74,7 @@ float GetDepth(vec4 clipPos)
     return dot(clipPos.zw, cDepthMode.zw);
 }
 
+#ifdef BILLBOARD
 vec3 GetBillboardPos(vec4 iPos, vec2 iSize, mat4 modelMatrix)
 {
     return (iPos * modelMatrix).xyz + vec3(iSize.x, iSize.y, 0.0) * cBillboardRot;
@@ -83,6 +84,7 @@ vec3 GetBillboardNormal()
 {
     return vec3(-cBillboardRot[0][2], -cBillboardRot[1][2], -cBillboardRot[2][2]);
 }
+#endif
 
 #if defined(SKINNED)
     #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices)

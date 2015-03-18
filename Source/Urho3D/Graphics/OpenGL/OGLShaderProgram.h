@@ -30,16 +30,28 @@
 namespace Urho3D
 {
 
+class ConstantBuffer;
 class Graphics;
 class ShaderVariation;
 
 /// %Shader parameter definition.
 struct ShaderParameter
 {
-    /// Uniform location.
+    /// Construct with defaults.
+    ShaderParameter() :
+        buffer_(M_MAX_UNSIGNED),
+        bufferPtr_(0)
+    {
+    }
+
+    /// Uniform location or byte offset in constant buffer.
     int location_;
     /// Element type.
     unsigned type_;
+    /// Constant buffer binding index. M_MAX_UNSIGNED if is a free-standing uniform.
+    unsigned buffer_;
+    /// Constant buffer pointer.
+    ConstantBuffer* bufferPtr_;
 };
 
 /// Linked shader program on the GPU.
@@ -71,6 +83,8 @@ public:
     const ShaderParameter* GetParameter(StringHash param) const;
     /// Return linker output.
     const String& GetLinkerOutput() const { return linkerOutput_; }
+    /// Return all constant buffers.
+    const SharedPtr<ConstantBuffer>* GetConstantBuffers() const { return &constantBuffers_[0]; }
     
 private:
     /// Vertex shader.
@@ -81,6 +95,8 @@ private:
     HashMap<StringHash, ShaderParameter> shaderParameters_;
     /// Texture unit use.
     bool useTextureUnit_[MAX_TEXTURE_UNITS];
+    /// Constant buffers by binding index.
+    SharedPtr<ConstantBuffer> constantBuffers_[MAX_SHADER_PARAMETER_GROUPS * 2];
     /// Shader link error string.
     String linkerOutput_;
 };

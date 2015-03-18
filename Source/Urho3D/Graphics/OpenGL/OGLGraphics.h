@@ -34,6 +34,7 @@
 namespace Urho3D
 {
 
+class ConstantBuffer;
 class File;
 class Image;
 class IndexBuffer;
@@ -385,6 +386,8 @@ public:
     void CleanupRenderSurface(RenderSurface* surface);
     /// Clean up shader programs when a shader variation is released or destroyed.
     void CleanupShaderPrograms(ShaderVariation* variation);
+    /// Reserve a constant buffer.
+    ConstantBuffer* GetOrCreateConstantBuffer(unsigned bindingIndex, unsigned size);
     /// Release/clear GPU objects and optionally close the window.
     void Release(bool clearGPUObjects, bool closeWindow);
     /// Restore GPU objects and reinitialize state. Requires an open window.
@@ -440,8 +443,8 @@ private:
     void CreateWindowIcon();
     /// Check supported rendering features.
     void CheckFeatureSupport(String& extensions);
-    /// Select FBO and commit changes.
-    void CommitFramebuffer();
+    /// Prepare for draw call. Update constant buffers and setup the FBO.
+    void PrepareDraw();
     /// Cleanup unused and unbound FBO's.
     void CleanupFramebuffers(bool force = false);
     /// Reset cached rendering state.
@@ -549,6 +552,12 @@ private:
     unsigned textureTypes_[MAX_TEXTURE_UNITS];
     /// Texture unit mappings.
     HashMap<String, TextureUnit> textureUnits_;
+    /// All constant buffers.
+    HashMap<unsigned, SharedPtr<ConstantBuffer> > constantBuffers_;
+    /// Currently bound constant buffers.
+    ConstantBuffer* currentConstantBuffers_[MAX_SHADER_PARAMETER_GROUPS * 2];
+    /// Dirty constant buffers.
+    PODVector<ConstantBuffer*> dirtyConstantBuffers_;
     /// Rendertargets in use.
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
     /// Depth-stencil surface in use.
