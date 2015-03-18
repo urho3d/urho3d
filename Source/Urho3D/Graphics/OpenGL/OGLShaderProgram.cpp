@@ -42,14 +42,19 @@ const char* shaderParameterGroups[] = {
     "custom"
 };
 
+unsigned ShaderProgram::globalFrameNumber = 0;
+const void* ShaderProgram::globalParameterSources[MAX_SHADER_PARAMETER_GROUPS];
+
 ShaderProgram::ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader) :
     GPUObject(graphics),
     vertexShader_(vertexShader),
     pixelShader_(pixelShader),
-    individualUniforms_(false)
+    frameNumber_(0)
 {
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         useTextureUnit_[i] = false;
+    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
+        parameterSources_[i] = (const void*)M_MAX_UNSIGNED;
 }
 
 ShaderProgram::~ShaderProgram()
@@ -90,7 +95,6 @@ void ShaderProgram::Release()
             useTextureUnit_[i] = false;
         for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
             constantBuffers_[i].Reset();
-        individualUniforms_ = false;
     }
 }
 
@@ -225,7 +229,6 @@ bool ShaderProgram::Link()
     #endif
 
     // Check for shader parameters and texture units
-    individualUniforms_ = false;
     for (int i = 0; i < uniformCount; ++i)
     {
         unsigned type;
@@ -268,9 +271,6 @@ bool ShaderProgram::Link()
                 }
             }
             #endif
-
-            if (!newParam.bufferPtr_)
-                individualUniforms_ = true;
 
             if (newParam.location_ >= 0)
                 shaderParameters_[StringHash(paramName)] = newParam;
@@ -328,6 +328,79 @@ const ShaderParameter* ShaderProgram::GetParameter(StringHash param) const
         return &i->second_;
     else
         return 0;
+}
+
+bool ShaderProgram::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
+{
+    // If global framenumber has changed, invalidate all per-program parameter sources now
+    if (globalFrameNumber != frameNumber_)
+    {
+        for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
+            parameterSources_[i] = (const void*)M_MAX_UNSIGNED;
+        frameNumber_ = globalFrameNumber;
+    }
+
+    // The shader program may use a mixture of constant buffers and individual uniforms even in the same group
+    #ifndef GL_ES_VERSION_2_0
+    bool useBuffer = constantBuffers_[group].Get() || constantBuffers_[group + MAX_SHADER_PARAMETER_GROUPS].Get();
+    bool useIndividual = !constantBuffers_[group].Get() || !constantBuffers_[group + MAX_SHADER_PARAMETER_GROUPS].Get();
+    bool needUpdate = false;
+
+    if (useBuffer && globalParameterSources[group] != source)
+    {
+        globalParameterSources[group] = source;
+        needUpdate = true;
+    }
+
+    if (useIndividual && parameterSources_[group] != source)
+    {
+        parameterSources_[group] = source;
+        needUpdate = true;
+    }
+
+    return needUpdate;
+    #else
+    if (parameterSources_[group] != source)
+    {
+        parameterSources_[group] = source;
+        return true;
+    }
+    else
+        return false;
+    #endif
+}
+
+void ShaderProgram::ClearParameterSource(ShaderParameterGroup group)
+{
+    // The shader program may use a mixture of constant buffers and individual uniforms even in the same group
+    #ifndef GL_ES_VERSION_2_0
+    bool useBuffer = constantBuffers_[group].Get() || constantBuffers_[group + MAX_SHADER_PARAMETER_GROUPS].Get();
+    bool useIndividual = !constantBuffers_[group].Get() || !constantBuffers_[group + MAX_SHADER_PARAMETER_GROUPS].Get();
+
+    if (useBuffer)
+        globalParameterSources[group] = (const void*)M_MAX_UNSIGNED;
+    if (useIndividual)
+        parameterSources_[group] = (const void*)M_MAX_UNSIGNED;
+    #else
+    parameterSources_[group] = (const void*)M_MAX_UNSIGNED;
+    #endif
+}
+
+void ShaderProgram::ClearParameterSources()
+{
+    ++globalFrameNumber;
+    if (!globalFrameNumber)
+        ++globalFrameNumber;
+
+    #ifndef GL_ES_VERSION_2_0
+    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
+        globalParameterSources[i] = (const void*)M_MAX_UNSIGNED;
+    #endif
+}
+
+void ShaderProgram::ClearGlobalParameterSource(ShaderParameterGroup group)
+{
+    globalParameterSources[group] = (const void*)M_MAX_UNSIGNED;
 }
 
 }

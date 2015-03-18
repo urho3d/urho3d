@@ -1231,8 +1231,8 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 glBindBufferBase(GL_UNIFORM_BUFFER, i, object);
                 // Calling glBindBufferBase also affects the generic buffer binding point
                 impl_->boundUBO_ = object;
-                shaderParameterSources_[i % MAX_SHADER_PARAMETER_GROUPS] = (const void*)M_MAX_UNSIGNED;
                 currentConstantBuffers_[i] = buffer;
+                ShaderProgram::ClearGlobalParameterSource((ShaderParameterGroup)(i % MAX_SHADER_PARAMETER_GROUPS));
             }
         }
 
@@ -1240,10 +1240,6 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     }
     #endif
     
-    // If shader has uniforms outside constant buffers, reset all parameter sources now, as those uniforms are per-program
-    if (shaderProgram_ && shaderProgram_->HasIndividualUniforms())
-        ClearParameterSources();
-
     // Store shader combination if shader dumping in progress
     if (shaderPrecache_)
         shaderPrecache_->StoreShaders(vertexShader_, pixelShader_);
@@ -1552,13 +1548,7 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 
 bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
 {
-    if ((unsigned)(size_t)shaderParameterSources_[group] == M_MAX_UNSIGNED || shaderParameterSources_[group] != source)
-    {
-        shaderParameterSources_[group] = source;
-        return true;
-    }
-    else
-        return false;
+    return shaderProgram_ ? shaderProgram_->NeedParameterUpdate(group, source) : false;
 }
 
 bool Graphics::HasShaderParameter(StringHash param)
@@ -1573,19 +1563,22 @@ bool Graphics::HasTextureUnit(TextureUnit unit)
 
 void Graphics::ClearParameterSource(ShaderParameterGroup group)
 {
-    shaderParameterSources_[group] = (const void*)M_MAX_UNSIGNED;
+    if (shaderProgram_)
+        shaderProgram_->ClearParameterSource(group);
 }
 
 void Graphics::ClearParameterSources()
 {
-    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-        shaderParameterSources_[i] = (const void*)M_MAX_UNSIGNED;
+    ShaderProgram::ClearParameterSources();
 }
 
 void Graphics::ClearTransformSources()
 {
-    shaderParameterSources_[SP_CAMERA] = (const void*)M_MAX_UNSIGNED;
-    shaderParameterSources_[SP_OBJECT] = (const void*)M_MAX_UNSIGNED;
+    if (shaderProgram_)
+    {
+        shaderProgram_->ClearParameterSource(SP_CAMERA);
+        shaderProgram_->ClearParameterSource(SP_OBJECT);
+    }
 }
 
 void Graphics::SetTexture(unsigned index, Texture* texture)
@@ -1880,7 +1873,8 @@ void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
         
         constantDepthBias_ = constantBias;
         slopeScaledDepthBias_ = slopeScaledBias;
-        shaderParameterSources_[SP_CAMERA] = (const void*)M_MAX_UNSIGNED;
+        // Force update of the projection matrix shader parameter
+        ClearParameterSource(SP_CAMERA);
     }
 }
 

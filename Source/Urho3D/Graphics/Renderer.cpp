@@ -655,7 +655,6 @@ void Renderer::Render()
     
     graphics_->SetDefaultTextureFilterMode(textureFilterMode_);
     graphics_->SetTextureAnisotropy(textureAnisotropy_);
-    graphics_->ClearParameterSources();
     
     // If no views, just clear the screen
     if (views_.Empty())
