@@ -67,8 +67,6 @@ void ConstantBuffer::OnDeviceReset()
 
 bool ConstantBuffer::SetSize(unsigned size)
 {
-    Release();
-
     if (!size)
     {
         LOGERROR("Can not create zero-sized constant buffer");
@@ -87,7 +85,8 @@ bool ConstantBuffer::SetSize(unsigned size)
     if (graphics_)
     {
         #ifndef GL_ES_VERSION_2_0
-        glGenBuffers(1, &object_);
+        if (!object_)
+            glGenBuffers(1, &object_);
         glBindBuffer(GL_UNIFORM_BUFFER, object_);
         glBufferData(GL_UNIFORM_BUFFER, size_, shadowData_.Get(), GL_DYNAMIC_DRAW);
         #endif

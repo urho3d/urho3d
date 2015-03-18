@@ -1053,7 +1053,6 @@ void View::GetLightBatches()
                             destBatch.pass_ = pass;
                             destBatch.camera_ = shadowCamera;
                             destBatch.zone_ = zone;
-                            destBatch.lightQueue_ = &lightQueue;
                             
                             AddBatchToQueue(shadowQueue.shadowBatches_, destBatch, tech);
                         }
