@@ -83,7 +83,7 @@ public:
     void BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Set network update FPS.
     void SetUpdateFps(int fps);
-    /// Set simulated latency in milliseconds. This adds a delay to sent packets (both client and server.)
+    /// Set simulated latency in milliseconds. This adds a fixed delay before sending each packet.
     void SetSimulatedLatency(int ms);
     /// Set simulated packet loss probability between 0.0 - 1.0.
     void SetSimulatedPacketLoss(float probability);

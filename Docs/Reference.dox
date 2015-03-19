@@ -2342,7 +2342,7 @@ In addition to UDP messaging, the network subsystem allows to make HTTP requests
 
 \section Network_Simulation Network conditions simulation
 
-The Network subsystem is able to add send delay to packets and to simulate packet loss. See \ref Network::SetSimulatedLatency "SetSimulatedLatency()" and \ref Network::SetSimulatedPacketLoss "SetSimultedPacketLoss".
+The Network subsystem can optionally add delay to sending packets, as well as simulate packet loss. See \ref Network::SetSimulatedLatency "SetSimulatedLatency()" and \ref Network::SetSimulatedPacketLoss "SetSimulatedPacketLoss()".
 
 \page Multithreading Multithreading
 
