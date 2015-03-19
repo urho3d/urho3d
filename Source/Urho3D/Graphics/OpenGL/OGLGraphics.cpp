@@ -207,7 +207,6 @@ static void GetGLPrimitiveType(unsigned elementCount, PrimitiveType type, unsign
 
 const Vector2 Graphics::pixelUVOffset(0.0f, 0.0f);
 bool Graphics::gl3Support = false;
-bool Graphics::gl3SupportTested = false;
 
 Graphics::Graphics(Context* context_) :
     Object(context_),
@@ -409,31 +408,17 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
         SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-        // Test OpenGL 3 support first. Use a separate window for this because we may not be able to choose window pixel format
-        // several times
-        if (!gl3SupportTested)
+        if (!forceGL2_)
         {
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-            SDL_Window* dummyWindow = SDL_CreateWindow(windowTitle_.CString(), 0, 0, 1, 1, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
-            SDL_GLContext dummyContext = forceGL2_ ? 0 : SDL_GL_CreateContext(dummyWindow);
-            if (dummyContext)
-            {
-                gl3Support = true;
-                apiName_ = "GL3";
-                SDL_GL_DeleteContext(dummyContext);
-            }
-            else
-            {
-                // Failed to create OpenGL 3 context, fall back to 2.0 with extensions
-                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-                SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
-            }
-            SDL_DestroyWindow(dummyWindow);
-            gl3SupportTested = true;
+        }
+        else
+        {
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
         }
         #else
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
@@ -524,37 +509,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             Release(true, true);
             return false;
         }
-        
-        if (!gl3Support)
-        {
-            if (!GLEW_VERSION_2_0)
-            {
-                LOGERROR("OpenGL 2.0 is required");
-                Release(true, true);
-                return false;
-            }
 
-            if (!GLEW_EXT_framebuffer_object || !GLEW_EXT_packed_depth_stencil)
-            {
-                LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
-                Release(true, true);
-                return false;
-            }
-
-            instancingSupport_ = GLEW_ARB_instanced_arrays != 0;
-            dxtTextureSupport_ = GLEW_EXT_texture_compression_s3tc != 0;
-            anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
-            sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
-            sRGBWriteSupport_ = GLEW_EXT_framebuffer_sRGB != 0;
-        }
-        else
+        if (!forceGL2_ && GLEW_VERSION_3_2)
         {
-            if (!GLEW_VERSION_3_2)
-            {
-                LOGERROR("OpenGL version mismatch: 3.2 context successfully requested from SDL, but version check failed");
-                Release(true, true);
-                return false;
-            }
+            gl3Support = true;
+            apiName_ = "GL3";
 
             // Create and bind a vertex array object that will stay in use throughout
             /// \todo Investigate performance gain of using multiple VAO's
@@ -568,6 +527,30 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             anisotropySupport_ = true;
             sRGBSupport_ = true;
             sRGBWriteSupport_ = true;
+        }
+        else if (GLEW_VERSION_2_0)
+        {
+            if (!GLEW_EXT_framebuffer_object || !GLEW_EXT_packed_depth_stencil)
+            {
+                LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
+                Release(true, true);
+                return false;
+            }
+
+            gl3Support = false;
+            apiName_ = "GL2";
+
+            instancingSupport_ = GLEW_ARB_instanced_arrays != 0;
+            dxtTextureSupport_ = GLEW_EXT_texture_compression_s3tc != 0;
+            anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
+            sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
+            sRGBWriteSupport_ = GLEW_EXT_framebuffer_sRGB != 0;
+        }
+        else
+        {
+            LOGERROR("OpenGL 2.0 is required");
+            Release(true, true);
+            return false;
         }
         
         // Set up instancing divisors if supported

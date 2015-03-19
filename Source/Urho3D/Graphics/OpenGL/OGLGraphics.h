@@ -635,8 +635,6 @@ private:
     static const Vector2 pixelUVOffset;
     /// Flag for OpenGL 3 support.
     static bool gl3Support;
-    /// Flag for OpenGL 3 support tested.
-    static bool gl3SupportTested;
 };
 
 /// Register Graphics library objects.
