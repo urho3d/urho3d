@@ -83,6 +83,10 @@ public:
     void BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Set network update FPS.
     void SetUpdateFps(int fps);
+    /// Set simulated latency in milliseconds. This adds a delay to sent packets (both client and server.)
+    void SetSimulatedLatency(int ms);
+    /// Set simulated packet loss probability between 0.0 - 1.0.
+    void SetSimulatedPacketLoss(float probability);
     /// Register a remote event as allowed to be received. There is also a fixed blacklist of events that can not be allowed in any case, such as ConsoleCommand.
     void RegisterRemoteEvent(StringHash eventType);
     /// Unregister a remote event as allowed to received.
@@ -98,6 +102,10 @@ public:
 
     /// Return network update FPS.
     int GetUpdateFps() const { return updateFps_; }
+    /// Return simulated latency in milliseconds.
+    int GetSimulatedLatency() const { return simulatedLatency_; }
+    /// Return simulated packet loss probability.
+    float GetSimulatedPacketLoss() const { return simulatedPacketLoss_; }
     /// Return a client or server connection by kNet MessageConnection, or null if none exist.
     Connection* GetConnection(kNet::MessageConnection* connection) const;
     /// Return the connection to the server. Null if not connected.
@@ -125,6 +133,8 @@ private:
     void OnServerConnected();
     /// Handle server disconnection.
     void OnServerDisconnected();
+    /// Reconfigure network simulator parameters on all existing connections.
+    void ConfigureNetworkSimulator();
     
     /// kNet instance.
     kNet::Network* network_;
@@ -140,6 +150,10 @@ private:
     HashSet<Scene*> networkScenes_;
     /// Update FPS.
     int updateFps_;
+    /// Simulated latency (send delay) in milliseconds.
+    int simulatedLatency_;
+    /// Simulated packet loss probability between 0.0 - 1.0.
+    float simulatedPacketLoss_;
     /// Update time interval.
     float updateInterval_;
     /// Update time accumulator.

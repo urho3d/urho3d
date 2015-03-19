@@ -20,6 +20,8 @@ class Network
     void BroadcastRemoteEvent(Node* node, const String eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     
     void SetUpdateFps(int fps);
+    void SetSimulatedLatency(int ms);
+    void SetSimulatedPacketLoss(float loss);
     
     void RegisterRemoteEvent(StringHash eventType);
     void RegisterRemoteEvent(const String eventType);
@@ -35,6 +37,8 @@ class Network
     tolua_outside HttpRequest* NetworkMakeHttpRequest @ MakeHttpRequest(const String url, const String verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String postData = String::EMPTY);
     
     int GetUpdateFps() const;
+    int GetSimulatedLatency() const;
+    float GetSimulatedPacketLoss() const;
     Connection* GetServerConnection() const;
     
     bool IsServerRunning() const;
@@ -43,6 +47,8 @@ class Network
     const String GetPackageCacheDir() const;
     
     tolua_property__get_set int updateFps;
+    tolua_property__get_set int simulatedLatency;
+    tolua_property__get_set float simulatedPacketLoss;
     tolua_readonly tolua_property__get_set Connection* serverConnection;
     tolua_readonly tolua_property__is_set bool serverRunning;
     tolua_property__get_set String packageCacheDir;

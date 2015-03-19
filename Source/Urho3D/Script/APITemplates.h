@@ -443,6 +443,8 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "void RemoveInstanceDefault()", asMETHOD(T, RemoveInstanceDefault), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Variant GetAttribute(const String&in) const", asMETHODPR(T, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Variant GetAttributeDefault(const String&in) const", asMETHODPR(T, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetInterceptNetworkUpdate(const String&in, bool)", asMETHODPR(T, SetInterceptNetworkUpdate, (const String&, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool GetInterceptNetworkUpdate(const String&in) const", asMETHODPR(T, GetInterceptNetworkUpdate, (const String&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numAttributes() const", asMETHODPR(T, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool set_attributes(uint, const Variant&in) const", asMETHODPR(T, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Variant get_attributes(uint) const", asMETHODPR(T, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);

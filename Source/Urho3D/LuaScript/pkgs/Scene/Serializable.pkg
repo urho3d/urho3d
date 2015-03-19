@@ -4,6 +4,8 @@ class Serializable : public Object
 {
     void SetTemporary(bool enable);
     bool IsTemporary() const;
-    
+    void SetInterceptNetworkUpdate(const String attributeName, bool enable);
+    bool GetInterceptNetworkUpdate(const String attributeName);
+
     tolua_property__is_set bool temporary;
 };

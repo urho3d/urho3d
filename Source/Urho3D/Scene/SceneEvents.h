@@ -170,4 +170,14 @@ EVENT(E_TEMPORARYCHANGED, TemporaryChanged)
     PARAM(P_SERIALIZABLE, Serializable);    // Serializable pointer
 }
 
+/// A network attribute update from the server has been intercepted.
+EVENT(E_INTERCEPTNETWORKUPDATE, InterceptNetworkUpdate)
+{
+    PARAM(P_SERIALIZABLE, Serializable);    // Serializable pointer
+    PARAM(P_TIMESTAMP, TimeStamp);          // unsigned (0-255)
+    PARAM(P_INDEX, Index);                  // unsigned
+    PARAM(P_NAME, Name);                    // String
+    PARAM(P_VALUE, Value);                  // Variant
+}
+
 }

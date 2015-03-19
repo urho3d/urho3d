@@ -157,6 +157,8 @@ public:
     Scene* GetScene() const;
     /// Return the client controls of this connection.
     const Controls& GetControls() const { return controls_; }
+    /// Return the controls timestamp, sent from client to server along each control update.
+    unsigned char GetTimeStamp() const { return timeStamp_; }
     /// Return the observer position sent by the client for interest management.
     const Vector3& GetPosition() const { return position_; }
     /// Return the observer rotation sent by the client for interest management.
@@ -186,8 +188,13 @@ public:
     /// Trigger client connection to download a package file from the server. Can be used to download additional resource packages when client is already joined in a scene. The package must have been added as a requirement to the scene the client is joined in, or else the eventual download will fail.
     void SendPackageToClient(PackageFile* package);
 
+    /// Set network simulation parameters. Called by Network.
+    void ConfigureNetworkSimulator(int latencyMs, float packetLoss);
+
     /// Current controls.
     Controls controls_;
+    /// Controls timestamp. Incremented after each sent update.
+    unsigned char timeStamp_;
     /// Identity map.
     VariantMap identity_;
     

@@ -80,6 +80,7 @@ static void RegisterConnection(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Connection", "const Quaternion& get_rotation() const", asMETHOD(Connection, GetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "void SendPackageToClient(PackageFile@+)", asMETHOD(Connection, SendPackageToClient), asCALL_THISCALL);
     engine->RegisterObjectProperty("Connection", "Controls controls", offsetof(Connection, controls_));
+    engine->RegisterObjectProperty("Connection", "uint8 timeStamp", offsetof(Connection, timeStamp_));
     engine->RegisterObjectProperty("Connection", "VariantMap identity", offsetof(Connection, identity_));
     
     // Register SetOwner/GetOwner now
@@ -175,6 +176,10 @@ void RegisterNetwork(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Network", "void SendPackageToClients(Scene@+, PackageFile@+)", asMETHOD(Network, SendPackageToClients), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void set_updateFps(int)", asMETHOD(Network, SetUpdateFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "int get_updateFps() const", asMETHOD(Network, GetUpdateFps), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void set_simulatedLatency(int)", asMETHOD(Network, SetSimulatedLatency), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "int get_simulatedLatency() const", asMETHOD(Network, GetSimulatedLatency), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void set_simulatedPacketLoss(float)", asMETHOD(Network, SetSimulatedPacketLoss), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "float get_simulatedPacketLoss() const", asMETHOD(Network, GetSimulatedPacketLoss), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void set_packageCacheDir(const String&in)", asMETHOD(Network, SetPackageCacheDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "const String& get_packageCacheDir() const", asMETHOD(Network, GetPackageCacheDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool get_serverRunning() const", asMETHOD(Network, IsServerRunning), asCALL_THISCALL);

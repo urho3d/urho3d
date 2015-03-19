@@ -61,6 +61,7 @@ PackageUpload::PackageUpload() :
 
 Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection) :
     Object(context),
+    timeStamp_(0),
     connection_(connection),
     sendMode_(OPSM_NONE),
     isClient_(isClient),
@@ -271,11 +272,14 @@ void Connection::SendClientUpdate()
     msg_.WriteFloat(controls_.yaw_);
     msg_.WriteFloat(controls_.pitch_);
     msg_.WriteVariantMap(controls_.extraData_);
+    msg_.WriteUByte(timeStamp_);
     if (sendMode_ >= OPSM_POSITION)
         msg_.WriteVector3(position_);
     if (sendMode_ >= OPSM_POSITION_ROTATION)
         msg_.WritePackedQuaternion(rotation_);
     SendMessage(MSG_CONTROLS, false, false, msg_, CONTROLS_CONTENT_ID);
+
+    ++timeStamp_;
 }
 
 void Connection::SendRemoteEvents()
@@ -373,8 +377,8 @@ void Connection::ProcessPendingLatestData()
         {
             MemoryBuffer msg(current->second_);
             msg.ReadNetID(); // Skip the component ID
-            component->ReadLatestDataUpdate(msg);
-            component->ApplyAttributes();
+            if (component->ReadLatestDataUpdate(msg))
+                component->ApplyAttributes();
             componentLatestData_.Erase(current);
         }
     }
@@ -680,8 +684,8 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             Component* component = scene_->GetComponent(componentID);
             if (component)
             {
-                component->ReadLatestDataUpdate(msg);
-                component->ApplyAttributes();
+                if (component->ReadLatestDataUpdate(msg))
+                    component->ApplyAttributes();
             }
             else
             {
@@ -879,6 +883,8 @@ void Connection::ProcessControls(int msgID, MemoryBuffer& msg)
     newControls.extraData_ = msg.ReadVariantMap();
     
     SetControls(newControls);
+    timeStamp_ = msg.ReadUByte();
+
     // Client may or may not send observer position & rotation for interest management
     if (!msg.IsEof())
         position_ = msg.ReadVector3();
@@ -1011,6 +1017,42 @@ float Connection::GetDownloadProgress() const
     return 1.0f;
 }
 
+void Connection::SendPackageToClient(PackageFile* package)
+{
+    if (!scene_)
+        return;
+
+    if (!IsClient())
+    {
+        LOGERROR("SendPackageToClient can be called on the server only");
+        return;
+    }
+    if (!package)
+    {
+        LOGERROR("Null package specified for SendPackageToClient");
+        return;
+    }
+
+    msg_.Clear();
+
+    String filename = GetFileNameAndExtension(package->GetName());
+    msg_.WriteString(filename);
+    msg_.WriteUInt(package->GetTotalSize());
+    msg_.WriteUInt(package->GetChecksum());
+    SendMessage(MSG_PACKAGEINFO, true, true, msg_);
+}
+
+void Connection::ConfigureNetworkSimulator(int latencyMs, float packetLoss)
+{
+    if (connection_)
+    {
+        kNet::NetworkSimulator& simulator = connection_->NetworkSendSimulator();
+        simulator.enabled = latencyMs > 0 || packetLoss > 0.0f;
+        simulator.constantPacketSendDelay = (float)latencyMs;
+        simulator.packetLossRate = packetLoss;
+    }
+}
+
 void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData)
 {
     sceneLoaded_ = true;
@@ -1081,7 +1123,7 @@ void Connection::ProcessNewNode(Node* node)
     node->AddReplicationState(&nodeState);
     
     // Write node's attributes
-    node->WriteInitialDeltaUpdate(msg_);
+    node->WriteInitialDeltaUpdate(msg_, timeStamp_);
     
     // Write node's user variables
     const VariantMap& vars = node->GetVars();
@@ -1110,7 +1152,7 @@ void Connection::ProcessNewNode(Node* node)
         
         msg_.WriteStringHash(component->GetType());
         msg_.WriteNetID(component->GetID());
-        component->WriteInitialDeltaUpdate(msg_);
+        component->WriteInitialDeltaUpdate(msg_, timeStamp_);
     }
     
     SendMessage(MSG_CREATENODE, true, true, msg_);
@@ -1161,7 +1203,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
         {
             msg_.Clear();
             msg_.WriteNetID(node->GetID());
-            node->WriteLatestDataUpdate(msg_);
+            node->WriteLatestDataUpdate(msg_, timeStamp_);
             
             SendMessage(MSG_NODELATESTDATA, true, false, msg_, node->GetID());
         }
@@ -1171,7 +1213,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
         {
             msg_.Clear();
             msg_.WriteNetID(node->GetID());
-            node->WriteDeltaUpdate(msg_, nodeState.dirtyAttributes_);
+            node->WriteDeltaUpdate(msg_, nodeState.dirtyAttributes_, timeStamp_);
             
             // Write changed variables
             msg_.WriteVLE(nodeState.dirtyVars_.Size());
@@ -1239,7 +1281,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                 {
                     msg_.Clear();
                     msg_.WriteNetID(component->GetID());
-                    component->WriteLatestDataUpdate(msg_);
+                    component->WriteLatestDataUpdate(msg_, timeStamp_);
                     
                     SendMessage(MSG_COMPONENTLATESTDATA, true, false, msg_, component->GetID());
                 }
@@ -1249,7 +1291,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                 {
                     msg_.Clear();
                     msg_.WriteNetID(component->GetID());
-                    component->WriteDeltaUpdate(msg_, componentState.dirtyAttributes_);
+                    component->WriteDeltaUpdate(msg_, componentState.dirtyAttributes_, timeStamp_);
                     
                     SendMessage(MSG_COMPONENTDELTAUPDATE, true, true, msg_);
                     
@@ -1284,7 +1326,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                 msg_.WriteNetID(node->GetID());
                 msg_.WriteStringHash(component->GetType());
                 msg_.WriteNetID(component->GetID());
-                component->WriteInitialDeltaUpdate(msg_);
+                component->WriteInitialDeltaUpdate(msg_, timeStamp_);
                 
                 SendMessage(MSG_CREATECOMPONENT, true, true, msg_);
             }
@@ -1449,31 +1491,6 @@ void Connection::OnPackagesReady()
         if (!success)
             OnSceneLoadFailed();
     }
-}
-
-void Connection::SendPackageToClient(PackageFile* package)
-{
-    if (!scene_)
-        return;
-
-    if (!IsClient())
-    {
-        LOGERROR("SendPackageToClient can be called on the server only");
-        return;
-    }
-    if (!package)
-    {
-        LOGERROR("Null package specified for SendPackageToClient");
-        return;
-    }
-    
-    msg_.Clear();
-
-    String filename = GetFileNameAndExtension(package->GetName());
-    msg_.WriteString(filename);
-    msg_.WriteUInt(package->GetTotalSize());
-    msg_.WriteUInt(package->GetChecksum());
-    SendMessage(MSG_PACKAGEINFO, true, true, msg_);
 }
 
 void Connection::ProcessPackageInfo(int msgID, MemoryBuffer& msg)

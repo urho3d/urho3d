@@ -34,6 +34,24 @@
 namespace Urho3D
 {
 
+static unsigned RemapAttributeIndex(const Vector<AttributeInfo>* attributes, const AttributeInfo& netAttr, unsigned netAttrIndex)
+{
+    if (!attributes)
+        return netAttrIndex; // Could not remap
+
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        // Compare either the accessor or offset to avoid name string compare
+        if (attr.accessor_.Get() && attr.accessor_.Get() == netAttr.accessor_.Get())
+            return i;
+        else if (!attr.accessor_.Get() && attr.offset_ == netAttr.offset_)
+            return i;
+    }
+
+    return netAttrIndex; // Could not remap
+}
+
 Serializable::Serializable(Context* context) :
     Object(context),
     networkState_(0),
@@ -519,6 +537,28 @@ void Serializable::SetTemporary(bool enable)
     }
 }
 
+void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable)
+{
+    const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
+    if (!attributes)
+        return;
+
+    AllocateNetworkState();
+
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (!attr.name_.Compare(attributeName, true))
+        {
+            if (enable)
+                networkState_->interceptMask_ |= 1ULL << i;
+            else
+                networkState_->interceptMask_ &= ~(1ULL << i);
+            break;
+        }
+    }
+}
+
 void Serializable::AllocateNetworkState()
 {
     if (!networkState_)
@@ -529,7 +569,7 @@ void Serializable::AllocateNetworkState()
     }
 }
 
-void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
+void Serializable::WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp)
 {
     if (!networkState_)
     {
@@ -553,6 +593,7 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
     }
 
     // First write the change bitfield, then attribute data for non-default attributes
+    dest.WriteUByte(timeStamp);
     dest.Write(attributeBits.data_, (numAttributes + 7) >> 3);
 
     for (unsigned i = 0; i < numAttributes; ++i)
@@ -562,7 +603,7 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
     }
 }
 
-void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits)
+void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp)
 {
     if (!networkState_)
     {
@@ -578,6 +619,7 @@ void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attribute
 
     // First write the change bitfield, then attribute data for changed attributes
     // Note: the attribute bits should not contain LATESTDATA attributes
+    dest.WriteUByte(timeStamp);
     dest.Write(attributeBits.data_, (numAttributes + 7) >> 3);
 
     for (unsigned i = 0; i < numAttributes; ++i)
@@ -587,7 +629,7 @@ void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attribute
     }
 }
 
-void Serializable::WriteLatestDataUpdate(Serializer& dest)
+void Serializable::WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp)
 {
     if (!networkState_)
     {
@@ -601,6 +643,8 @@ void Serializable::WriteLatestDataUpdate(Serializer& dest)
 
     unsigned numAttributes = attributes->Size();
 
+    dest.WriteUByte(timeStamp);
+
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributes->At(i).mode_ & AM_LATESTDATA)
@@ -608,15 +652,18 @@ void Serializable::WriteLatestDataUpdate(Serializer& dest)
     }
 }
 
-void Serializable::ReadDeltaUpdate(Deserializer& source)
+bool Serializable::ReadDeltaUpdate(Deserializer& source)
 {
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
     if (!attributes)
-        return;
+        return false;
 
     unsigned numAttributes = attributes->Size();
     DirtyBits attributeBits;
+    bool changed = false;
 
+    unsigned long long interceptMask = networkState_ ? networkState_->interceptMask_ : 0;
+    unsigned char timeStamp = source.ReadUByte();
     source.Read(attributeBits.data_, (numAttributes + 7) >> 3);
 
     for (unsigned i = 0; i < numAttributes && !source.IsEof(); ++i)
@@ -624,25 +671,67 @@ void Serializable::ReadDeltaUpdate(Deserializer& source)
         if (attributeBits.IsSet(i))
         {
             const AttributeInfo& attr = attributes->At(i);
-            OnSetAttribute(attr, source.ReadVariant(attr.type_));
+            if (!(interceptMask & (1ULL << i)))
+            {
+                OnSetAttribute(attr, source.ReadVariant(attr.type_));
+                changed = true;
+            }
+            else
+            {
+                using namespace InterceptNetworkUpdate;
+
+                VariantMap& eventData = GetEventDataMap();
+                eventData[P_SERIALIZABLE] = this;
+                eventData[P_TIMESTAMP] = (unsigned)timeStamp;
+                eventData[P_INDEX] = RemapAttributeIndex(GetAttributes(), attr, i);
+                eventData[P_NAME] = attr.name_;
+                eventData[P_VALUE] = source.ReadVariant(attr.type_);
+                SendEvent(E_INTERCEPTNETWORKUPDATE, eventData);
+            }
         }
     }
+
+    return changed;
 }
 
-void Serializable::ReadLatestDataUpdate(Deserializer& source)
+bool Serializable::ReadLatestDataUpdate(Deserializer& source)
 {
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
     if (!attributes)
-        return;
+        return false;
 
     unsigned numAttributes = attributes->Size();
+    bool changed = false;
+
+    unsigned long long interceptMask = networkState_ ? networkState_->interceptMask_ : 0;
+    unsigned char timeStamp = source.ReadUByte();
 
     for (unsigned i = 0; i < numAttributes && !source.IsEof(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
         if (attr.mode_ & AM_LATESTDATA)
-            OnSetAttribute(attr, source.ReadVariant(attr.type_));
+        {
+            if (!(interceptMask & (1ULL << i)))
+            {
+                OnSetAttribute(attr, source.ReadVariant(attr.type_));
+                changed = true;
+            }
+            else
+            {
+                using namespace InterceptNetworkUpdate;
+
+                VariantMap& eventData = GetEventDataMap();
+                eventData[P_SERIALIZABLE] = this;
+                eventData[P_TIMESTAMP] = (unsigned)timeStamp;
+                eventData[P_INDEX] = RemapAttributeIndex(GetAttributes(), attr, i);
+                eventData[P_NAME] = attr.name_;
+                eventData[P_VALUE] = source.ReadVariant(attr.type_);
+                SendEvent(E_INTERCEPTNETWORKUPDATE, eventData);
+            }
+        }
     }
+
+    return changed;
 }
 
 Variant Serializable::GetAttribute(unsigned index) const
@@ -742,6 +831,24 @@ unsigned Serializable::GetNumNetworkAttributes() const
     const Vector<AttributeInfo>* attributes = networkState_ ? networkState_->attributes_ :
         context_->GetNetworkAttributes(GetType());
     return attributes ? attributes->Size() : 0;
+}
+
+bool Serializable::GetInterceptNetworkUpdate(const String& attributeName) const
+{
+    const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
+    if (!attributes)
+        return false;
+
+    unsigned long long interceptMask = networkState_ ? networkState_->interceptMask_ : 0;
+
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (!attr.name_.Compare(attributeName, true))
+            return interceptMask & (1ULL << i) ? true : false;
+    }
+
+    return false;
 }
 
 void Serializable::SetInstanceDefault(const String& name, const Variant& defaultValue)

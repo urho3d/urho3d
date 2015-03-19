@@ -2267,8 +2267,6 @@ There are some things to watch out for:
 
 - Nodes have the concept of the \ref Node::SetOwner "owner connection" (for example the player that is controlling a specific game object), which can be set in server code. This property is not replicated to the client. Messages or remote events can be used instead to tell the players what object they control.
 
-- At least for now, there is no built-in client-side prediction.
-
 \section Network_InterestManagement Interest management
 
 %Scene replication includes a simple, distance-based interest management mechanism for reducing bandwidth use. To use, create the NetworkPriority component to a Node you wish to apply interest management to. The component can be created as local, as it is not important to the clients.
@@ -2290,7 +2288,20 @@ The Controls structure is used to send controls information from the client to t
 
 It is up to the client code to ensure they are kept up-to-date, by calling \ref Connection::SetControls "SetControls()" on the server connection. The event E_NETWORKUPDDATE will be sent to remind of the impending update, and the event E_NETWORKUPDATESENT will be sent after the update. The controls can then be inspected on the server side by calling \ref Connection::GetControls "GetControls()".
 
-The controls update message also includes the client's observer position for interest management.
+The controls update message also includes a running 8-bit timestamp, see \ref Connection::GetTimeStamp "GetTimeStamp()", and the client's observer position / rotation for interest management. To conserve bandwidth, the position and rotation values are left out if they have never been assigned.
+
+\section Network_ClientPrediction Client-side prediction
+
+Urho3D does not implement built-in client-side prediction for player controllable objects due to the difficulty of rewinding and resimulating a generic physics simulation. However, when not using
+physics for player movement, it is possible to intercept the authoritative network updates from the server and build a prediction system on the application level.
+
+By calling \ref Serializable::SetInterceptNetworkUpdate "SetInterceptNetworkUpdate()" the update of an individual networked attribute is redirected to send an event (E_INTERCEPTNETWORKUPDATE) instead of applying the attribute value directly. This should be called on the client for the node or component that is to be predicted. For example to redirect a Node's position update:
+
+\code
+node->SetInterceptNetworkUpdate("Network Position", true);
+\endcode
+
+The event includes the attribute name, index, new value as a Variant, and the latest 8-bit controls timestamp that the server has seen from the client. Typically, the event handler would store the value that arrived from the server and set an internal "update arrived" flag, which the application logic update code could use later on the same frame, by taking the server-sent value and replaying any user input on top of it. The timestamp value can be used to estimate how many client controls packets have been sent during the roundtrip time, and how much input needs to be replayed.
 
 \section Network_Messages Raw network messages
 
@@ -2328,6 +2339,10 @@ Connection@ remoteSender = eventData["Connection"].GetPtr();
 \section Network_HttpRequests HTTP requests
 
 In addition to UDP messaging, the network subsystem allows to make HTTP requests. Use the \ref Network::MakeHttpRequest "MakeHttpRequest()" function for this. You can specify the URL, the verb to use (default GET if empty), optional headers and optional post data. The HttpRequest object that is returned acts like a Deserializer, and you can read the response data in suitably sized chunks. After the whole response is read, the connection closes. The connection can also be closed early by allowing the request object to expire.
+
+\section Network_Simulation Network conditions simulation
+
+The Network subsystem is able to add send delay to packets and to simulate packet loss. See \ref Network::SetSimulatedLatency "SetSimulatedLatency()" and \ref Network::SetSimulatedPacketLoss "SetSimultedPacketLoss".
 
 \page Multithreading Multithreading
 

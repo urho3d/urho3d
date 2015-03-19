@@ -83,18 +83,20 @@ public:
     void RemoveInstanceDefault();
     /// Set temporary flag. Temporary objects will not be saved.
     void SetTemporary(bool enable);
+    /// Enable interception of an attribute from network updates. Intercepted attributes are sent as events instead of applying directly. This can be used to implement client side prediction.
+    void SetInterceptNetworkUpdate(const String& attributeName, bool enable);
     /// Allocate network attribute state.
     void AllocateNetworkState();
     /// Write initial delta network update.
-    void WriteInitialDeltaUpdate(Serializer& dest);
+    void WriteInitialDeltaUpdate(Serializer& dest, unsigned char timeStamp);
     /// Write a delta network update according to dirty attribute bits.
-    void WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits);
+    void WriteDeltaUpdate(Serializer& dest, const DirtyBits& attributeBits, unsigned char timeStamp);
     /// Write a latest data network update.
-    void WriteLatestDataUpdate(Serializer& dest);
-    /// Read and apply a network delta update.
-    void ReadDeltaUpdate(Deserializer& source);
-    /// Read and apply a network latest data update.
-    void ReadLatestDataUpdate(Deserializer& source);
+    void WriteLatestDataUpdate(Serializer& dest, unsigned char timeStamp);
+    /// Read and apply a network delta update. Return true if attributes were changed.
+    bool ReadDeltaUpdate(Deserializer& source);
+    /// Read and apply a network latest data update. Return true if attributes were changed.
+    bool ReadLatestDataUpdate(Deserializer& source);
 
     /// Return attribute value by index. Return empty if illegal index.
     Variant GetAttribute(unsigned index) const;
@@ -110,6 +112,10 @@ public:
     unsigned GetNumNetworkAttributes() const;
     /// Return whether is temporary.
     bool IsTemporary() const { return temporary_; }
+    /// Return whether an attribute's network updates are being intercepted.
+    bool GetInterceptNetworkUpdate(const String& attributeName) const;
+    /// Return the network attribute state, if allocated.
+    NetworkState* GetNetworkState() const { return networkState_; }
 
 protected:
     /// Network attribute state.

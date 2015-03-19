@@ -28,10 +28,11 @@ class Connection : public Object
     void SetLogStatistics(bool enable);
     void Disconnect(int waitMSec = 0);
     void SendPackageToClient(PackageFile* package);
-    
+
     VariantMap& GetIdentity();
     Scene* GetScene() const;
     const Controls& GetControls() const;
+    unsigned char GetTimeStamp() const;
     const Vector3& GetPosition() const;
     const Quaternion& GetRotation() const;
     bool IsClient() const;
@@ -45,10 +46,11 @@ class Connection : public Object
     unsigned GetNumDownloads() const;
     const String GetDownloadName() const;
     float GetDownloadProgress() const;
-    
+
     tolua_property__get_set VariantMap& identity;
     tolua_property__get_set Scene* scene;
     tolua_property__get_set Controls& controls;
+    tolua_readonly tolua_property__get_set unsigned char timeStamp;
     tolua_property__get_set Vector3& position;
     tolua_property__get_set Quaternion& rotation;
     tolua_readonly tolua_property__is_set bool client;
