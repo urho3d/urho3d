@@ -217,7 +217,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
     IntRect viewport = graphics->GetViewport();
     IntVector2 viewSize = IntVector2(viewport.Width(), viewport.Height());
     unsigned viewportHash = viewSize.x_ | (viewSize.y_ << 16);
-    if (graphics->NeedParameterUpdate(SP_CAMERA, reinterpret_cast<void*>(cameraHash + viewportHash)))
+    if (graphics->NeedParameterUpdate(SP_CAMERA, reinterpret_cast<const void*>(cameraHash + viewportHash)))
     {
         view->SetCameraShaderParameters(camera_, true);
         // During renderpath commands the G-Buffer or viewport texture is assumed to always be viewport-sized
@@ -252,7 +252,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
     unsigned zoneHash = (unsigned)(size_t)zone_;
     if (overrideFogColorToBlack)
         zoneHash += 0x80000000;
-    if (zone_ && graphics->NeedParameterUpdate(SP_ZONE, reinterpret_cast<void*>(zoneHash)))
+    if (zone_ && graphics->NeedParameterUpdate(SP_ZONE, reinterpret_cast<const void*>(zoneHash)))
     {
         graphics->SetShaderParameter(VSP_AMBIENTSTARTCOLOR, zone_->GetAmbientStartColor());
         graphics->SetShaderParameter(VSP_AMBIENTENDCOLOR, zone_->GetAmbientEndColor().ToVector4() - zone_->GetAmbientStartColor().ToVector4());
@@ -544,7 +544,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
     // Set material-specific shader parameters and textures
     if (material_)
     {
-        if (graphics->NeedParameterUpdate(SP_MATERIAL, (const void*)material_->GetShaderParameterHash()))
+        if (graphics->NeedParameterUpdate(SP_MATERIAL, reinterpret_cast<const void*>(material_->GetShaderParameterHash())))
         {
             const HashMap<StringHash, MaterialShaderParameter>& parameters = material_->GetShaderParameters();
             for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
