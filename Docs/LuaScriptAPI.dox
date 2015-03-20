@@ -1129,6 +1129,7 @@ Methods:
 - VariantMap& GetIdentity()
 - Scene* GetScene() const
 - const Controls& GetControls() const
+- char GetTimeStamp() const
 - const Vector3& GetPosition() const
 - const Quaternion& GetRotation() const
 - bool IsClient() const
@@ -1148,6 +1149,7 @@ Properties:
 - VariantMap& identity
 - Scene* scene
 - Controls& controls
+- char timeStamp (readonly)
 - Vector3& position
 - Quaternion& rotation
 - bool client (readonly)
@@ -3267,6 +3269,8 @@ Methods:
 - void BroadcastRemoteEvent(Node* node, const String eventType, bool inOrder)
 - void BroadcastRemoteEvent(Node* node, const String eventType, bool inOrder, const VariantMap& eventData)
 - void SetUpdateFps(int fps)
+- void SetSimulatedLatency(int ms)
+- void SetSimulatedPacketLoss(float loss)
 - void RegisterRemoteEvent(StringHash eventType)
 - void RegisterRemoteEvent(const String eventType)
 - void UnregisterRemoteEvent(StringHash eventType)
@@ -3277,6 +3281,8 @@ Methods:
 - HttpRequest* MakeHttpRequest(const String url, const String verb = String::EMPTY)
 - HttpRequest* MakeHttpRequest(const String url, const String verb, const Vector<String>& headers, const String postData = String::EMPTY)
 - int GetUpdateFps() const
+- int GetSimulatedLatency() const
+- float GetSimulatedPacketLoss() const
 - Connection* GetServerConnection() const
 - bool IsServerRunning() const
 - bool CheckRemoteEvent(StringHash eventType) const
@@ -3285,6 +3291,8 @@ Methods:
 Properties:
 
 - int updateFps
+- int simulatedLatency
+- float simulatedPacketLoss
 - Connection* serverConnection (readonly)
 - bool serverRunning (readonly)
 - String packageCacheDir
@@ -4799,6 +4807,8 @@ Methods:
 
 - void SetTemporary(bool enable)
 - bool IsTemporary() const
+- void SetInterceptNetworkUpdate(const String attributeName, bool enable)
+- bool GetInterceptNetworkUpdate(const String attributeName)
 
 Properties:
 
