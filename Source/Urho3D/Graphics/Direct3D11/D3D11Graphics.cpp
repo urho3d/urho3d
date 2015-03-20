@@ -945,65 +945,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
 bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>&
     elementMasks, unsigned instanceOffset)
 {
-    if (buffers.Size() > MAX_VERTEX_STREAMS)
-    {
-        LOGERROR("Too many vertex buffers");
-        return false;
-    }
-    if (buffers.Size() != elementMasks.Size())
-    {
-        LOGERROR("Amount of element masks and vertex buffers does not match");
-        return false;
-    }
-    
-    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
-    {
-        VertexBuffer* buffer = 0;
-        bool changed = false;
-
-        buffer = i < buffers.Size() ? buffers[i].Get() : 0;
-        if (buffer)
-        {
-            unsigned elementMask = buffer->GetElementMask() & elementMasks[i];
-            unsigned offset = (elementMask & MASK_INSTANCEMATRIX1) ? instanceOffset * buffer->GetVertexSize() : 0;
-
-            if (buffer != vertexBuffers_[i] || elementMask != elementMasks_[i] || offset != impl_->vertexOffsets_[i])
-            {
-                vertexBuffers_[i] = buffer;
-                elementMasks_[i] = elementMask;
-                impl_->vertexBuffers_[i] = (ID3D11Buffer*)buffer->GetGPUObject();
-                impl_->vertexSizes_[i] = buffer->GetVertexSize();
-                impl_->vertexOffsets_[i] = offset;
-                changed = true;
-            }
-        }
-        else if (vertexBuffers_[i])
-        {
-            vertexBuffers_[i] = 0;
-            elementMasks_[i] = 0;
-            impl_->vertexBuffers_[i] = 0;
-            impl_->vertexSizes_[i] = 0;
-            impl_->vertexOffsets_[i] = 0;
-            changed = true;
-        }
-
-        if (changed)
-        {
-            vertexDeclarationDirty_ = true;
-
-            if (firstDirtyVB_ == M_MAX_UNSIGNED)
-                firstDirtyVB_ = lastDirtyVB_ = i;
-            else
-            {
-                if (i < firstDirtyVB_)
-                    firstDirtyVB_ = i;
-                if (i > lastDirtyVB_)
-                    lastDirtyVB_ = i;
-            }
-        }
-    }
-    
-    return true;
+    return SetVertexBuffers(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), elementMasks, instanceOffset);
 }
 
 void Graphics::SetIndexBuffer(IndexBuffer* buffer)

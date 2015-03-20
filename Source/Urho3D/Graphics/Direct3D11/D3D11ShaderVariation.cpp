@@ -310,7 +310,7 @@ bool ShaderVariation::Compile()
         // Then strip everything not necessary to use the shader
         ID3DBlob* strippedCode = 0;
         D3DStripShader(bufData, bufSize, D3DCOMPILER_STRIP_REFLECTION_DATA | D3DCOMPILER_STRIP_DEBUG_INFO |
-            D3DCOMPILER_STRIP_TEST_BLOBS | D3DCOMPILER_STRIP_PRIVATE_DATA, &strippedCode);
+            D3DCOMPILER_STRIP_TEST_BLOBS, &strippedCode);
         byteCode_.Resize(strippedCode->GetBufferSize());
         memcpy(&byteCode_[0], strippedCode->GetBufferPointer(), byteCode_.Size());
         strippedCode->Release();

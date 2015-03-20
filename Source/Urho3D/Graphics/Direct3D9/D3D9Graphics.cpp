@@ -1014,73 +1014,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
 bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>&
     elementMasks, unsigned instanceOffset)
 {
-    if (buffers.Size() > MAX_VERTEX_STREAMS)
-    {
-        LOGERROR("Too many vertex buffers");
-        return false;
-    }
-    if (buffers.Size() != elementMasks.Size())
-    {
-        LOGERROR("Amount of element masks and vertex buffers does not match");
-        return false;
-    }
-    
-    unsigned long long hash = 0;
-    for (unsigned i = 0; i < buffers.Size(); ++i)
-    {
-        if (!buffers[i])
-            continue;
-        
-        hash |= buffers[i]->GetBufferHash(i, elementMasks[i]);
-    }
-    
-    if (hash)
-    {
-        if (!vertexDeclarations_.Contains(hash))
-        {
-            SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers, elementMasks));
-            if (!newDeclaration->GetDeclaration())
-            {
-                LOGERROR("Failed to create vertex declaration");
-                return false;
-            }
-            
-            vertexDeclarations_[hash] = newDeclaration;
-        }
-        
-        VertexDeclaration* declaration = vertexDeclarations_[hash];
-        if (declaration != vertexDeclaration_)
-        {
-            impl_->device_->SetVertexDeclaration(declaration->GetDeclaration());
-            vertexDeclaration_ = declaration;
-        }
-    }
-    
-    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
-    {
-        VertexBuffer* buffer = 0;
-        unsigned offset = 0;
-        
-        if (i < buffers.Size())
-        {
-            buffer = buffers[i];
-            if (buffer && buffer->GetElementMask() & MASK_INSTANCEMATRIX1)
-                offset = instanceOffset * buffer->GetVertexSize();
-        }
-        
-        if (buffer != vertexBuffers_[i] || offset != streamOffsets_[i])
-        {
-            if (buffer)
-                impl_->device_->SetStreamSource(i, (IDirect3DVertexBuffer9*)buffer->GetGPUObject(), offset, buffer->GetVertexSize());
-            else
-                impl_->device_->SetStreamSource(i, 0, 0, 0);
-            
-            vertexBuffers_[i] = buffer;
-            streamOffsets_[i] = offset;
-        }
-    }
-    
-    return true;
+    return SetVertexBuffers(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), elementMasks, instanceOffset);
 }
 
 void Graphics::SetIndexBuffer(IndexBuffer* buffer)
