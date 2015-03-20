@@ -449,8 +449,8 @@ private:
     void CheckFeatureSupport(String& extensions);
     /// Prepare for draw call. Update constant buffers and setup the FBO.
     void PrepareDraw();
-    /// Cleanup unused and unbound FBO's.
-    void CleanupFramebuffers(bool force = false);
+    /// Clean up all framebuffers. Called when destroying the context.
+    void CleanupFramebuffers();
     /// Reset cached rendering state.
     void ResetCachedState();
     /// Initialize texture unit mappings.

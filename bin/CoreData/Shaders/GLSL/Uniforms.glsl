@@ -1,6 +1,5 @@
-// Use constant buffers if available. Comment out to revert to individual uniforms
-// which may be faster also on OpenGL 3
-#define USE_CBUFFERS
+// Use of constant buffers on OpenGL 3 commented out for now as it seems to be slower in practice
+//#define USE_CBUFFERS
 
 #if !defined(GL3) || !defined(USE_CBUFFERS)
 

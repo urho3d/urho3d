@@ -155,8 +155,6 @@ static const unsigned glVertexAttrIndex[] =
     0, 1, 2, 3, 4, 8, 9, 5, 6, 7, 10, 11, 12
 };
 
-static const unsigned MAX_FRAMEBUFFER_AGE = 2000;
-
 #ifdef GL_ES_VERSION_2_0
 static unsigned glesDepthStencilFormat = GL_DEPTH_COMPONENT16;
 static unsigned glesReadableDepthFormat = GL_DEPTH_COMPONENT;
@@ -517,7 +515,6 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             apiName_ = "GL3";
 
             // Create and bind a vertex array object that will stay in use throughout
-            /// \todo Investigate performance gain of using multiple VAO's
             unsigned vertexArrayObject;
             glGenVertexArrays(1, &vertexArrayObject);
             glBindVertexArray(vertexArrayObject);
@@ -555,7 +552,13 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         }
         
         // Set up instancing divisors if supported
-        if (instancingSupport_)
+        if (gl3Support)
+        {
+            glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX1, 1);
+            glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX2, 1);
+            glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX3, 1);
+        }
+        else if (instancingSupport_)
         {
             glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX1, 1);
             glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX2, 1);
@@ -732,8 +735,7 @@ void Graphics::EndFrame()
     
     SDL_GL_SwapWindow(impl_->window_);
     
-    // Clean up FBO's that have not been used for a long time, and too large scratch buffers
-    CleanupFramebuffers();
+    // Clean up too large scratch buffers
     CleanupScratchBuffers();
 }
 
@@ -846,11 +848,9 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     GLenum glPrimitiveType;
     
     GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
-    if (indexSize == sizeof(unsigned short))
-        glDrawElements(glPrimitiveType, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
-    else
-        glDrawElements(glPrimitiveType, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
-    
+    GLenum indexType = indexSize == sizeof(unsigned short) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+    glDrawElements(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
+
     numPrimitives_ += primitiveCount;
     ++numBatches_;
 }
@@ -868,15 +868,16 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     GLenum glPrimitiveType;
     
     GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
-    if (indexSize == sizeof(unsigned short))
+    GLenum indexType = indexSize == sizeof(unsigned short) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+    if (gl3Support)
     {
-        glDrawElementsInstancedARB(glPrimitiveType, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
+        glDrawElementsInstanced(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
             instanceCount);
     }
     else
     {
-        glDrawElementsInstancedARB(glPrimitiveType, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
-            instanceCount);
+        glDrawElementsInstancedARB(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart *
+            indexSize), instanceCount);
     }
     
     numPrimitives_ += instanceCount * primitiveCount;
@@ -1003,11 +1004,7 @@ void Graphics::SetIndexBuffer(IndexBuffer* buffer)
     if (indexBuffer_ == buffer)
         return;
     
-    if (buffer)
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer->GetGPUObject());
-    else
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer ? buffer->GetGPUObject() : 0);
     indexBuffer_ = buffer;
 }
 
@@ -1502,10 +1499,12 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
                 {
                     if (textures_[index])
                         glBindTexture(textureTypes_[index], 0);
-                    glDisable(textureTypes_[index]);
+                    if (!gl3Support)
+                        glDisable(textureTypes_[index]);
                 }
 
-                glEnable(glType);
+                if (!gl3Support)
+                    glEnable(glType);
                 textureTypes_[index] = glType;
             }
             
@@ -2410,7 +2409,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         }
     }
 
-    CleanupFramebuffers(true);
+    CleanupFramebuffers();
     depthTextures_.Clear();
 
     // End fullscreen mode first to counteract transition and getting stuck problems on OS X
@@ -2872,8 +2871,6 @@ void Graphics::PrepareDraw()
             i = impl_->frameBuffers_.Insert(MakePair(fboKey, newFbo));
         }
     
-        i->second_.useTimer_.Reset();
-    
         if (impl_->boundFBO_ != i->second_.fbo_)
         {
             BindFramebuffer(i->second_.fbo_);
@@ -3018,28 +3015,17 @@ void Graphics::PrepareDraw()
     }
 }
 
-void Graphics::CleanupFramebuffers(bool force)
+void Graphics::CleanupFramebuffers()
 {
     if (!IsDeviceLost())
     {
-        for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin();
-            i != impl_->frameBuffers_.End();)
-        {
-            if (i->second_.fbo_ != impl_->boundFBO_ && (force || i->second_.useTimer_.GetMSec(false) >
-                MAX_FRAMEBUFFER_AGE))
-            {
-                DeleteFramebuffer(i->second_.fbo_);
-                i = impl_->frameBuffers_.Erase(i);
-            }
-            else
-                ++i;
-        }
+        for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin(); i !=
+            impl_->frameBuffers_.End(); ++i)
+            DeleteFramebuffer(i->second_.fbo_);
     }
-    else
-    {
-        impl_->boundFBO_ = 0;
-        impl_->frameBuffers_.Clear();
-    }
+
+    impl_->boundFBO_ = 0;
+    impl_->frameBuffers_.Clear();
 }
 
 void Graphics::ResetCachedState()

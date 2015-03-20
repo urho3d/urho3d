@@ -85,8 +85,6 @@ struct FrameBufferObject
     unsigned readBuffers_;
     /// Draw buffer bits.
     unsigned drawBuffers_;
-    /// Use timer for cleaning up.
-    Timer useTimer_;
 };
 
 /// %Graphics subsystem implementation. Holds API-specific objects.
