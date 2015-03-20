@@ -321,20 +321,21 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     multiSample = Clamp(multiSample, 1, 16);
     
-    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
-        vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
+    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && 
+        resizable == resizable_ && vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
         return true;
     
     // If only vsync changes, do not destroy/recreate the context
-    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
-        tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && vsync != vsync_)
+    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ &&
+        resizable == resizable_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && vsync != vsync_)
     {
         SDL_GL_SetSwapInterval(vsync ? 1 : 0);
         vsync_ = vsync;
         return true;
     }
     
-    // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. If zero in fullscreen, use desktop mode
+    // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. 
+    // If zero in fullscreen, use desktop mode
     if (!width || !height)
     {
         if (fullscreen || borderless)
@@ -2553,6 +2554,19 @@ void Graphics::Restore()
     if (!impl_->context_)
     {
         impl_->context_ = SDL_GL_CreateContext(impl_->window_);
+
+        #ifndef GL_ES_VERSION_2_0
+        // If we're trying to use OpenGL 3, but context creation fails, retry with 2
+        if (!forceGL2_ && !impl_->context_)
+        {
+            forceGL2_ = true;
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
+            impl_->context_ = SDL_GL_CreateContext(impl_->window_);
+        }
+        #endif
+
         #ifdef IOS
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&impl_->systemFBO_);
         #endif
