@@ -1935,7 +1935,8 @@ void View::AllocateScreenBuffers()
     }
     
     #ifdef URHO3D_OPENGL
-    if (deferred_ && !renderer_->GetHDRRendering())
+    // On OpenGL 2 ensure that all MRT buffers are RGBA in deferred rendering
+    if (deferred_ && !renderer_->GetHDRRendering() && !Graphics::GetGL3Support())
         format = Graphics::GetRGBAFormat();
     #endif
     
