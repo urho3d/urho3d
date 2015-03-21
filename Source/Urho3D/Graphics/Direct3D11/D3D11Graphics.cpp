@@ -2483,7 +2483,11 @@ void Graphics::PrepareDraw()
 
     if (texturesDirty_ && firstDirtyTexture_ < M_MAX_UNSIGNED)
     {
-        /// \todo Research how to best implement vertex texture fetch in an unified way between D3D9, D3D11 and OpenGL. For now only set PS textures to save API calls
+        // Set also VS textures to enable vertex texture fetch to work the same way as on OpenGL
+        impl_->deviceContext_->VSSetShaderResources(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
+            &impl_->shaderResourceViews_[firstDirtyTexture_]);
+        impl_->deviceContext_->VSSetSamplers(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
+            &impl_->samplers_[firstDirtyTexture_]);
         impl_->deviceContext_->PSSetShaderResources(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
             &impl_->shaderResourceViews_[firstDirtyTexture_]);
         impl_->deviceContext_->PSSetSamplers(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
