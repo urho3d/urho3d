@@ -145,7 +145,7 @@ The full list of supported parameters, their datatypes and default values:
 - Borderless (bool) Whether to create the window as borderless. Default false.
 - TripleBuffer (bool) Whether to use triple-buffering. Default false.
 - VSync (bool) Whether to wait for vertical sync when presenting rendering window contents. Default false.
-- FlushGPU (bool) Whether to flush GPU command buffer each frame (D3D9) or limit the amount of buffered frames (D3D11) for less input latency. Ineffective on OpenGL. Default false.
+- FlushGPU (bool) Whether to flush GPU command buffer each frame (Direct3D9) or limit the amount of buffered frames (Direct3D11) for less input latency. Ineffective on OpenGL. Default false.
 - ForceGL2 (bool) When true, forces OpenGL 2 use even if OpenGL 3 is available. No effect on Direct3D or mobile builds. Default false.
 - Multisample (int) Hardware multisampling level. Default 1 (no multisampling.)
 - Orientations (string) Space-separated list of allowed orientations. Effective only on iOS. All possible values are "LandscapeLeft", "LandscapeRight", "Portrait" and "PortraitUpsideDown". Default "LandscapeLeft LandscapeRight".

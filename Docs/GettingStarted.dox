@@ -8,7 +8,7 @@ namespace Urho3D
 
 Although all required third-party libraries are included as source code, there are system-level dependencies that must be satisfied before Urho3D can be built successfully:
 
-- For Windows, the June 2010 DirectX SDK needs to be installed.
+- For Windows, the June 2010 DirectX SDK needs to be installed. This is not necessary if building on Visual Studio 2012 or newer, which install the Windows SDK with the necessary DirectX files.
 
 - For Linux, the following development packages need to be installed: libx11-dev, libxrandr-dev, libasound2-dev on Debian-based distros; libX11-devel, libXrandr-devel, alsa-lib-devel on RedHat-based distros. Also install the package libgl1-mesa-dev (Debian) or mesa-libGL-devel (RH) if your GPU driver does not include OpenGL headers & libs, but in most of the case it usually does and has better performance than Mesa's OpenGL implementation. Building as 32-bit on a 64-bit system requires installing also the 32-bit versions of the development libraries.
 
@@ -93,7 +93,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_TESTING       |0|Enable testing support|
 |URHO3D_TEST_TIMEOUT  |*|Number of seconds to test run the executables (when testing support is enabled only), default to 15 on Emscripten platform and 5 on other platforms|
 |URHO3D_OPENGL        |0|Use OpenGL instead of Direct3D (Windows platform only)|
-|URHO3D_D3D11         |0|Use Direct3D11 instead of Direct3D9 (Windows platform only)|
+|URHO3D_D3D11         |0|Use Direct3D11 instead of Direct3D9 (Windows platform only). Overrides URHO3D_OPENGL option.|
 |URHO3D_STATIC_RUNTIME|0|Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
 |URHO3D_WIN32_CONSOLE |0|Use console main() as entry point when setting up Windows executable targets (Windows platform only)|
 |URHO3D_MACOSX_BUNDLE |0|Use MACOSX_BUNDLE when setting up Mac OS X executable targets (Xcode native build only)|
@@ -139,7 +139,7 @@ Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
 
 Note that Eclipse requires CDT plugin to build C/C++ project. When using generator backed by Unix Makefiles, you can also execute make command directly in the build tree to build the project.
 
-If using MinGW to compile, DirectX headers may need to be acquired separately. They can be copied to the MinGW installation eg. from the following package: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz These will be missing some of the headers related to shader compilation, so a MinGW build will use OpenGL by default. To build in Direct3D9 mode, the MinGW-w64 port is necessary: http://mingw-w64.sourceforge.net/. Using it, Direct3D9 can be enabled with the "-DURHO3D_OPENGL=0" build option.
+If using MinGW to compile, DirectX headers may need to be acquired separately. They can be copied to the MinGW installation eg. from the following package: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz These will be missing some of the headers related to shader compilation, so a MinGW build will use OpenGL by default. To build in Direct3D mode, the MinGW-w64 port is necessary: http://mingw-w64.sourceforge.net/. Using it, Direct3D can be enabled with the "-DURHO3D_OPENGL=0" build option.
 
 After the build is complete, the programs can be run from the bin subdirectory in the build tree. These include the Urho3D player application, which can run application scripts, the tools, and C++ sample applications if they have been enabled. Unless your build tree location is also the same as the Urho3D project source tree, in order to run the Urho3D executables successfully, you must do one of the following first:
 - Copy both the bin/Data and bin/CoreData directories in the source tree to the bin subdirectory in the build tree.
@@ -271,9 +271,9 @@ The prerequisites are Doxygen and Graphviz. Tools to dump the \ref ScriptAPI "An
 
 \section Building_Shaders Compiling Direct3D shaders
 
-When building with the Windows 8 SDK, copy d3dcompiler_46.dll from "C:\Program Files (x86)\Windows Kits\8.0\bin\x86" to build tree's "bin" directory so that Urho3D executables will run correctly.
+When building for Direct3D9 with the Windows 8 SDK (Visual Studio 2012+), copy d3dcompiler_46.dll from "C:\Program Files (x86)\Windows Kits\8.0\bin\x86" to build tree's "bin" directory so that Urho3D executables will run correctly. When building for Direct3D11, copy d3dcompiler_47.dll from "C:\Program Files (x86)\Windows Kits\8.1\bin\x86" to the "bin" directory. In both cases, if compiling Urho3D as 64-bit, copy from the "bin\x64" directory instead.
 
-Note that you can also force an OpenGL mode build on Windows platform by using the "URHO3D_OPENGL" build option in the table below; OpenGL does not depend on a separate shader compiler DLL.
+Note that you can also force an OpenGL mode build on Windows platform by using the "URHO3D_OPENGL" build option in the table above; OpenGL does not depend on a separate shader compiler DLL.
 
 \page Running Running Urho3D player application
 
