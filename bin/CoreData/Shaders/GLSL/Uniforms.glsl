@@ -33,11 +33,7 @@ uniform mat4 cZone;
     uniform mat4 cLightMatrices[2];
 #endif
 #ifdef SKINNED
-    #ifdef RPI
-        uniform vec4 cSkinMatrices[32*3];
-    #else
-        uniform vec4 cSkinMatrices[64*3];
-    #endif
+    uniform vec4 cSkinMatrices[MAXBONES*3];
 #endif
 #ifdef NUMVERTEXLIGHTS
     uniform vec4 cVertexLights[4*3];
@@ -138,7 +134,7 @@ uniform ObjectVS
     mat3 cBillboardRot;
 #endif
 #ifdef SKINNED
-    uniform vec4 cSkinMatrices[64*3];
+    uniform vec4 cSkinMatrices[MAXBONES*3];
 #endif
 };
 

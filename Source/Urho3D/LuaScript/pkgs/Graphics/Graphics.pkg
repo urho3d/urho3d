@@ -72,6 +72,7 @@ class Graphics : public Object
     static unsigned GetDepthStencilFormat();
     static unsigned GetReadableDepthFormat();
     static unsigned GetFormat(const String formatName);
+    static unsigned GetMaxBones();
 
     tolua_readonly tolua_property__is_set bool initialized;
     tolua_property__get_set String windowTitle;

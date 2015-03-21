@@ -1127,9 +1127,11 @@ uniform sampler2D sDetailMap2;
 uniform sampler2D sDetailMap3;
 \endcode
 
+The maximum number of bones supported for hardware skinning depends on the graphics API and is relayed to the shader code in the MAXBONES compilation define. Typically the maximum is 64, but is reduced to 32 on the Raspberry PI, and increased to 128 on Direct3D 11 & OpenGL 3. See also \ref Graphics::GetMaxBones "GetMaxBones()".
+
 \section Shaders_API API differences
 
-Direct3D9 and Direct3D11 share the same HLSL shader code, and likewise OpenGL 2, OpenGL 3, OpenGL ES 2 and WebGL share the same GLSL code. Macros and some conditional code are used to hide the API differences where possible. 
+Direct3D9 and Direct3D11 share the same HLSL shader code, and likewise OpenGL 2, OpenGL 3, OpenGL ES 2 and WebGL share the same GLSL code. Macros and some conditional code are used to hide the API differences where possible.
 
 When HLSL shaders are compiled for Direct3D11, the define D3D11 is present, and the following details need to be observed:
 
@@ -2467,6 +2469,7 @@ Options:
 -ns         Do not create subdirectories for resources
 -nz         Do not create a zone and a directional light (scene mode only)
 -nf         Do not fix infacing normals
+-mb <x>     Maximum number of bones per submesh. Default 64
 -p <path>   Set path for scene resources. Default is output file path
 -r <name>   Use the named scene node as root node\n"
 -f <freq>   Animation tick frequency to use if unspecified. Default 4800
@@ -2504,6 +2507,7 @@ Options:
 -r      Output only rotations from animations
 -s      Split each submesh into own vertex buffer
 -t      Generate tangents
+-mb <x> Maximum number of bones per submesh, default 64
 \endverbatim
 
 Note: outputting only bone rotations may help when using an animation in a different model, but if bone position changes have been used for effect, the animation may become less lively. Unpredictable mutilations might result from using an animation in a model not originally intended for, as Urho3D does not specifically attempt to retarget animations.

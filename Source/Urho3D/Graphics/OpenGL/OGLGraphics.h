@@ -439,6 +439,8 @@ public:
     static unsigned GetFormat(const String& formatName);
     /// Return UV offset required for pixel perfect rendering.
     static const Vector2& GetPixelUVOffset() { return pixelUVOffset; }
+    /// Return maximum number of supported bones for skinning.
+    static unsigned GetMaxBones();
     /// Return whether is using an OpenGL 3 context.
     static bool GetGL3Support() { return gl3Support; }
 

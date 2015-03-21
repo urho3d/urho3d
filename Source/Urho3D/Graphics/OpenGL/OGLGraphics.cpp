@@ -2086,6 +2086,15 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
     }
 }
 
+unsigned Graphics::GetMaxBones()
+{
+    #ifdef RPI
+    return 32;
+    #else
+    return gl3Support ? 128 : 64;
+    #endif
+}
+
 ShaderVariation* Graphics::GetShader(ShaderType type, const String& name, const String& defines) const
 {
     return GetShader(type, name.CString(), defines.CString());

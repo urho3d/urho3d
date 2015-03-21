@@ -27,7 +27,7 @@ uniform float4 cUOffset;
 uniform float4 cVOffset;
 uniform float4x3 cZone;
 #ifdef SKINNED
-    uniform float4x3 cSkinMatrices[64];
+    uniform float4x3 cSkinMatrices[MAXBONES];
 #endif
 #ifdef NUMVERTEXLIGHTS
     uniform float4 cVertexLights[4*3];
@@ -123,7 +123,7 @@ cbuffer ObjectVS : register(b5)
     float3x3 cBillboardRot;
 #endif
 #ifdef SKINNED
-    uniform float4x3 cSkinMatrices[64];
+    uniform float4x3 cSkinMatrices[MAXBONES];
 #endif
 }
 #endif

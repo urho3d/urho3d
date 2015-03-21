@@ -122,6 +122,7 @@ bool noOverwriteMaterial_ = false;
 bool noOverwriteTexture_ = false;
 bool noOverwriteNewerTexture_ = false;
 bool checkUniqueModel_ = true;
+unsigned maxBones_ = 64;
 Vector<String> nonSkinningBoneIncludes_;
 Vector<String> nonSkinningBoneExcludes_;
 
@@ -231,6 +232,7 @@ void Run(const Vector<String>& arguments)
             "-nz         Do not create a zone and a directional light (scene mode only)\n"
             "-nf         Do not fix infacing normals\n"
             "-ne         Do not save empty nodes (scene mode only)\n"
+            "-mb <x>     Maximum number of bones per submesh. Default 64\n"
             "-p <path>   Set path for scene resources. Default is output file path\n"
             "-r <name>   Use the named scene node as root node\n"
             "-f <freq>   Animation tick frequency to use if unspecified. Default 4800\n"
@@ -337,6 +339,13 @@ void Run(const Vector<String>& arguments)
                     flags &= ~aiProcess_FixInfacingNormals;
                     break;
                 }
+            }
+            else if (argument == "mb" && !value.Empty())
+            {
+                maxBones_ = ToUInt(value);
+                if (maxBones_ < 1)
+                    maxBones_ = 1;
+                ++i;
             }
             else if (argument == "p" && !value.Empty())
             {
@@ -905,7 +914,7 @@ void BuildAndSaveModel(OutModel& model)
         outModel->SetNumGeometryLodLevels(destGeomIndex, 1);
         outModel->SetGeometry(destGeomIndex, 0, geom);
         outModel->SetGeometryCenter(destGeomIndex, center);
-        if (model.bones_.Size() > MAX_SKIN_MATRICES)
+        if (model.bones_.Size() > maxBones_)
             allBoneMappings.Push(boneMappings);
         
         startVertexOffset += mesh->mNumVertices;
@@ -966,7 +975,7 @@ void BuildAndSaveModel(OutModel& model)
         }
         
         outModel->SetSkeleton(skeleton);
-        if (model.bones_.Size() > MAX_SKIN_MATRICES)
+        if (model.bones_.Size() > maxBones_)
             outModel->SetGeometryBoneMappings(allBoneMappings);
     }
     
@@ -1892,13 +1901,13 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
     boneMappings.Clear();
     
     // If model has more bones than can fit vertex shader parameters, write the per-geometry mappings
-    if (model.bones_.Size() > MAX_SKIN_MATRICES)
+    if (model.bones_.Size() > maxBones_)
     {
-        if (mesh->mNumBones > MAX_SKIN_MATRICES)
+        if (mesh->mNumBones > maxBones_)
         {
             ErrorExit(
-                "Geometry (submesh) has over 64 bone influences. Try splitting to more submeshes\n"
-                "that each stay at 64 bones or below."
+                "Geometry (submesh) has over " + String(maxBones_) + " bone influences. Try splitting to more submeshes\n"
+                "that each stay at " + String(maxBones_) + " bones or below."
             );
         }
         boneMappings.Resize(mesh->mNumBones);

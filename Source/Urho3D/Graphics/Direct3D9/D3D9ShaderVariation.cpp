@@ -241,6 +241,8 @@ bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
         profile = "ps_3_0";
         flags |= D3DCOMPILE_PREFER_FLOW_CONTROL;
     }
+
+    defines.Push("MAXBONES=" + String(Graphics::GetMaxBones()));
     
     // Collect defines into macros
     Vector<String> defineValues;

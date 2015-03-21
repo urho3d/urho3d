@@ -1865,9 +1865,10 @@ void View::AllocateScreenBuffers()
 
     #ifdef URHO3D_OPENGL
     // Due to FBO limitations, in OpenGL deferred modes need to render to texture first and then blit to the backbuffer
-    // Also, if rendering to a texture with full deferred rendering, it must be RGBA to comply with the rest of the buffers.
-    if ((deferred_ && !renderTarget_) || (deferredAmbient_ && renderTarget_ && renderTarget_->GetParentTexture()->GetFormat() !=
-        Graphics::GetRGBAFormat()))
+    // Also, if rendering to a texture with full deferred rendering, it must be RGBA to comply with the rest of the buffers,
+    // unless using OpenGL 3
+    if ((deferred_ && !renderTarget_) || (!Graphics::GetGL3Support() && deferredAmbient_ && renderTarget_ && 
+        renderTarget_->GetParentTexture()->GetFormat() != Graphics::GetRGBAFormat()))
         needSubstitute = true;
     // Also need substitute if rendering to backbuffer using a custom (readable) depth buffer
     if (!renderTarget_ && !needSubstitute)
