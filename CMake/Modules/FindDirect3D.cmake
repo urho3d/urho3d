@@ -96,7 +96,7 @@ else ()
             message (STATUS "DirectX SDK search skipped for MSVC 2012 and greater when using Direct3D 11")
         endif ()
     else ()
-        message (STATUS "DirectX SDK search skipped for MinGW. It is assumed that MinGW itself comes with the necessary headers & libraries for Direct3D")
+        message (STATUS "DirectX SDK search skipped for MinGW. It is assumed that MinGW itself comes with the necessary headers & libraries")
     endif ()
 endif ()
 
