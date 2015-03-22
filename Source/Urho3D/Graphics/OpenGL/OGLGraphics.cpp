@@ -499,8 +499,6 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         
         // If OpenGL extensions not yet initialized, initialize now
         #ifndef GL_ES_VERSION_2_0
-        // Work around GLEW failure to check extensions properly from a GL3 context
-        glewExperimental = GL_TRUE;
         GLenum err = glewInit();
         if (GLEW_OK != err)
         {
