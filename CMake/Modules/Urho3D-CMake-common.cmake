@@ -334,7 +334,10 @@ endif ()
 # Find DirectX SDK include & library directories for Visual Studio. It is also possible to compile
 # without if a recent Windows SDK is installed. The SDK is not searched for with MinGW as it is
 # incompatible; rather, it is assumed that MinGW itself comes with the necessary headers & libraries.
-if (WIN32 AND NOT URHO3D_OPENGL)
+# Note that when building for OpenGL, any libraries are not used, but the include directory may
+# be necessary for DirectInput & DirectSound headers, if those are not present in the compiler's own
+# default includes.
+if (WIN32)
     find_package (Direct3D)
     if (DIRECT3D_FOUND)
         include_directories (${DIRECT3D_INCLUDE_DIRS})

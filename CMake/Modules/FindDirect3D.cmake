@@ -75,7 +75,7 @@ else ()
     if (MSVC)
         message (STATUS "DirectX SDK not found. This is not fatal if a recent Windows SDK is installed")
     else ()
-        message (STATUS "DirectX SDK is not being searched for MinGW. It is assumed that MinGW itself comes with the necessary headers & libraries for Direct3D")
+        message (STATUS "DirectX SDK search skipped for MinGW. It is assumed that MinGW itself comes with the necessary headers & libraries")
     endif ()
 endif ()
 
