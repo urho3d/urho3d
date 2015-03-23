@@ -440,9 +440,15 @@ bool Texture2D::Create()
     unsigned dataType = GetDataType(format_);
     
     // Create a renderbuffer instead of a texture if depth texture is not properly supported, or if this will be a packed
-    // depth stencil texture
+    // depth stencil surface. Exception on Intel GPU's on Windows: always create depth textures on OpenGL 3 to work
+    // around a driver bug
     #ifndef GL_ES_VERSION_2_0
-    if (format == Graphics::GetDepthStencilFormat())
+    #ifdef WIN32
+    bool depthStencilWorkaround = Graphics::GetGL3Support() && Graphics::IsIntelGPU();
+    #else
+    bool depthStencilWorkaround = false;
+    #endif
+    if (!depthStencilWorkaround && format == Graphics::GetDepthStencilFormat())
     #else
     if (format == GL_DEPTH_COMPONENT16 || format == GL_DEPTH_COMPONENT24_OES || format == GL_DEPTH24_STENCIL8_OES ||
         (format == GL_DEPTH_COMPONENT && !graphics_->GetShadowMapFormat()))
