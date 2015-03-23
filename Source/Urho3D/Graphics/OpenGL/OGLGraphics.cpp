@@ -205,7 +205,6 @@ static void GetGLPrimitiveType(unsigned elementCount, PrimitiveType type, unsign
 
 const Vector2 Graphics::pixelUVOffset(0.0f, 0.0f);
 bool Graphics::gl3Support = false;
-bool Graphics::intelGPU = false;
 
 Graphics::Graphics(Context* context_) :
     Object(context_),
@@ -2763,15 +2762,12 @@ void Graphics::CheckFeatureSupport(String& extensions)
     if (numSupportedRTs >= 4)
         deferredSupport_ = true;
     
+    #if defined(__APPLE__) && !defined(IOS)
+    // On OS X check for an Intel driver and use shadow map RGBA dummy color textures, because mixing
+    // depth-only FBO rendering and backbuffer rendering will bug, resulting in a black screen in full
+    // screen mode, and incomplete shadow maps in windowed mode
     String renderer((const char*)glGetString(GL_RENDERER));
     if (renderer.Contains("Intel", false))
-        intelGPU = true;
-
-    #if defined(__APPLE__) && !defined(IOS)
-    // On OS X Intel drivers need to use shadow map RGBA dummy color textures, because mixing depth-
-    // only FBO rendering and backbuffer rendering will bug, resulting in a black screen in full screen
-    // mode, and incomplete shadow maps in windowed mode
-    if (intelGPU)
         dummyColorFormat_ = GetRGBAFormat();
     #endif
     

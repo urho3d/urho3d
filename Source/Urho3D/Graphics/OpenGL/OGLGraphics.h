@@ -443,8 +443,6 @@ public:
     static unsigned GetMaxBones();
     /// Return whether is using an OpenGL 3 context.
     static bool GetGL3Support() { return gl3Support; }
-    /// Return whether is using an Intel GPU. These need some specific workarounds.
-    static bool IsIntelGPU() { return intelGPU; }
 
 private:
     /// Create the application window icon.
@@ -639,8 +637,6 @@ private:
     static const Vector2 pixelUVOffset;
     /// Flag for OpenGL 3 support.
     static bool gl3Support;
-    /// Flag for Intel GPU.
-    static bool intelGPU;
 };
 
 /// Register Graphics library objects.
