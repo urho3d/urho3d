@@ -423,7 +423,7 @@ First of all, structure your project similar to Urho3D project as below. Althoug
  ├ CMake/
  │  ├ Modules/
  │  └ Toolchains/
- ├ CMakeListst.txt
+ ├ CMakeLists.txt
  ├ *.cpp and *.h
  └ *.bat or *.sh
 \endcode
