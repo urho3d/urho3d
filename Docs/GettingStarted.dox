@@ -479,7 +479,7 @@ When both Urho3D static and shared library are built and available in the Urho3D
 
 As described earlier there are two approaches on how to find the Urho3D library. The FindUrho3D.cmake module is designed not only able to find Urho3D library from the Urho3D SDK installation, but also from any Urho3D project build tree directly. When searching in Urho3D SDK installed in a system-wide default location then no additional variable need to be set. When searching in a non-default SDK installation or when searching in any Urho3D project build tree then the actual location need to be provided via URHO3D_HOME environment variable (set in the host system) or URHO3D_HOME build option (set using -D at command line or in cmake-gui).
 
-The define_source_files() and setup_main_executable() are Urho3D-specific macros. The define_source_file() macro is a shorthand to glob all the source files in the current directory. It is equivalent to these commands:
+The define_source_files() and setup_main_executable() are Urho3D-specific macros. The define_source_files() macro is a shorthand to glob all the source files in the current directory. It is equivalent to these commands:
 
 \code
 file (GLOB CPP_FILES *.cpp)
