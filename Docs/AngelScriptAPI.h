@@ -4326,6 +4326,8 @@ bool ToggleFullscreen();
 
 // Properties:
 /* readonly */
+String apiName;
+/* readonly */
 StringHash baseType;
 /* readonly */
 bool borderless;
@@ -4338,7 +4340,6 @@ IntVector2 desktopResolution;
 /* readonly */
 bool deviceLost;
 bool flushGPU;
-bool forceSM2;
 /* readonly */
 bool fullscreen;
 /* readonly */
@@ -4373,8 +4374,6 @@ bool sRGB;
 bool sRGBSupport;
 /* readonly */
 bool sRGBWriteSupport;
-/* readonly */
-bool sm3Support;
 /* readonly */
 bool tripleBuffer;
 /* readonly */
@@ -5370,6 +5369,7 @@ class Material
 {
 // Methods:
 Material Clone(const String& = String ( )) const;
+Pass GetPass(uint, const String&);
 ValueAnimation GetShaderParameterAnimation(const String&) const;
 float GetShaderParameterAnimationSpeed(const String&) const;
 WrapMode GetShaderParameterAnimationWrapMode(const String&) const;
@@ -5400,8 +5400,6 @@ BiasParameters depthBias;
 uint memoryUse;
 String name;
 uint numTechniques;
-/* readonly */
-uint numUsedTextureUnits;
 /* readonly */
 bool occlusion;
 /* readonly */
@@ -6745,7 +6743,6 @@ String pixelShader;
 String pixelShaderDefines;
 /* readonly */
 int refs;
-bool sm3;
 String vertexShader;
 String vertexShaderDefines;
 /* readonly */
@@ -7221,7 +7218,6 @@ bool drawShadows;
 bool dynamicInstancing;
 bool hdrRendering;
 int materialQuality;
-int maxInstanceTriangles;
 int maxOccluderTriangles;
 int maxShadowMaps;
 int maxSortedInstances;
@@ -9641,13 +9637,13 @@ uint value;
 class Technique
 {
 // Methods:
-Pass CreatePass(StringHash);
-Pass GetPass(StringHash);
-Pass GetSupportedPass(StringHash);
-bool HasPass(StringHash) const;
+Pass CreatePass(const String&);
+Pass GetPass(const String&);
+Pass GetSupportedPass(const String&);
+bool HasPass(const String&) const;
 bool Load(File);
 bool Load(VectorBuffer&);
-void RemovePass(StringHash);
+void RemovePass(const String&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -9664,12 +9660,11 @@ String name;
 /* readonly */
 uint numPasses;
 /* readonly */
-Array<StringHash> passTypes;
+Array<String> passNames;
 /* readonly */
 Array<Pass> passes;
 /* readonly */
 int refs;
-bool sm3;
 /* readonly */
 bool supported;
 /* readonly */
@@ -12389,23 +12384,24 @@ FILTER_DEFAULT,
 enum TextureUnit
 {
 TU_DIFFUSE,
+TU_ALBEDOBUFFER,
 TU_NORMAL,
+TU_NORMALBUFFER,
 TU_SPECULAR,
 TU_EMISSIVE,
 TU_ENVIRONMENT,
 TU_LIGHTRAMP,
 TU_LIGHTSHAPE,
 TU_SHADOWMAP,
+TU_CUSTOM1,
+TU_CUSTOM2,
+TU_VOLUMEMAP,
 TU_FACESELECT,
 TU_INDIRECTION,
-TU_ALBEDOBUFFER,
-TU_NORMALBUFFER,
 TU_DEPTHBUFFER,
 TU_LIGHTBUFFER,
-TU_VOLUMEMAP,
 TU_ZONE,
 MAX_MATERIAL_TEXTURE_UNITS,
-MAX_NAMED_TEXTURE_UNITS,
 MAX_TEXTURE_UNITS,
 };
 
@@ -12519,8 +12515,10 @@ uint GetFloat16Format();
 uint GetFloat32Format();
 uint GetFormat(const String&);
 String GetInternalPath(const String&);
+uint GetLinearDepthFormat();
 uint GetLuminanceAlphaFormat();
 uint GetLuminanceFormat();
+uint GetMaxBones();
 uint GetNumLogicalCPUs();
 uint GetNumPhysicalCPUs();
 Array<String> GetObjectCategories();

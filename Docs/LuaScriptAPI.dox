@@ -2216,6 +2216,7 @@ Methods:
 - bool IsInitialized() const
 - void* GetExternalWindow() const
 - const String GetWindowTitle() const
+- const String GetApiName() const
 - IntVector2 GetWindowPosition() const
 - int GetWidth() const
 - int GetHeight() const
@@ -2234,13 +2235,11 @@ Methods:
 - unsigned GetDummyColorFormat() const
 - unsigned GetShadowMapFormat() const
 - unsigned GetHiresShadowMapFormat() const
-- bool GetSM3Support() const
 - bool GetInstancingSupport() const
 - bool GetLightPrepassSupport() const
 - bool GetDeferredSupport() const
 - bool GetHardwareShadowSupport() const
 - bool GetReadableDepthSupport() const
-- bool GetStreamOffsetSupport() const
 - bool GetSRGBSupport() const
 - bool GetSRGBWriteSupport() const
 - IntVector2 GetDesktopResolution() const
@@ -2261,11 +2260,13 @@ Methods:
 - unsigned GetDepthStencilFormat()
 - unsigned GetReadableDepthFormat()
 - unsigned GetFormat(const String formatName)
+- unsigned GetMaxBones()
 
 Properties:
 
 - bool initialized (readonly)
 - String windowTitle
+- String apiName (readonly)
 - IntVector2 windowPosition
 - int width (readonly)
 - int height (readonly)
@@ -2284,13 +2285,11 @@ Properties:
 - unsigned dummyColorFormat (readonly)
 - unsigned shadowMapFormat (readonly)
 - unsigned hiresShadowMapFormat (readonly)
-- bool SM3Support (readonly)
 - bool instancingSupport (readonly)
 - bool lightPrepassSupport (readonly)
 - bool deferredSupport (readonly)
 - bool hardwareShadowSupport (readonly)
 - bool readableDepthSupport (readonly)
-- bool streamOffsetSupport (readonly)
 - bool sRGBSupport (readonly)
 - bool sRGBWriteSupport (readonly)
 - IntVector2 desktopResolution (readonly)
@@ -2887,8 +2886,7 @@ Methods:
 - void MarkForAuxView(unsigned frameNumber)
 - unsigned GetNumTechniques() const
 - Technique* GetTechnique(unsigned index) const
-- Pass* GetPass(unsigned index, StringHash passType) const
-- Pass* GetPass(unsigned index, const String passType) const
+- Pass* GetPass(unsigned index, const String passName) const
 - Texture* GetTexture(TextureUnit unit) const
 - ValueAnimation* GetShaderParameterAnimation(const String name) const
 - WrapMode GetShaderParameterAnimationWrapMode(const String name) const
@@ -2896,8 +2894,6 @@ Methods:
 - CullMode GetCullMode() const
 - CullMode GetShadowCullMode() const
 - const BiasParameters& GetDepthBias() const
-- unsigned GetAuxViewFrameNumber() const
-- unsigned GetNumUsedTextureUnits() const
 - bool GetOcclusion() const
 - bool GetSpecular() const
 - Scene* GetScene() const
@@ -2906,8 +2902,6 @@ Properties:
 
 - CullMode cullMode (readonly)
 - CullMode shadowCullMode (readonly)
-- unsigned auxViewFrameNumber (readonly)
-- unsigned numUsedTextureUnits (readonly)
 - bool occlusion (readonly)
 - bool specular (readonly)
 - Scene* scene
@@ -3774,14 +3768,12 @@ Properties:
 
 Methods:
 
-- bool IsSM3() const
 - bool IsDesktop() const
 - const String GetVertexShader() const
 - const String GetPixelShader() const
 
 Properties:
 
-- bool SM3 (readonly)
 - bool desktop (readonly)
 - const String vertexShader (readonly)
 - const String pixelShader (readonly)
@@ -4299,7 +4291,6 @@ Methods:
 - void SetMaxShadowMaps(int shadowMaps)
 - void SetDynamicInstancing(bool enable)
 - void SetMinInstances(int instances)
-- void SetMaxInstanceTriangles(int triangles)
 - void SetMaxSortedInstances(int instances)
 - void SetMaxOccluderTriangles(int triangles)
 - void SetOcclusionBufferSize(int size)
@@ -4323,7 +4314,6 @@ Methods:
 - int GetMaxShadowMaps() const
 - bool GetDynamicInstancing() const
 - int GetMinInstances() const
-- int GetMaxInstanceTriangles() const
 - int GetMaxSortedInstances() const
 - int GetMaxOccluderTriangles() const
 - int GetOcclusionBufferSize() const
@@ -4360,7 +4350,6 @@ Properties:
 - int maxShadowMaps
 - bool dynamicInstancing
 - int minInstances
-- int maxInstanceTriangles
 - int maxSortedInstances
 - int maxOccluderTriangles
 - int occlusionBufferSize
@@ -5286,20 +5275,18 @@ Properties:
 
 Methods:
 
-- bool HasPass(const StringHash type) const
-- Pass* GetPass(const StringHash type) const
-- Pass* GetSupportedPass(const StringHash type) const
+- bool HasPass(const String type) const
+- Pass* GetPass(const String type) const
+- Pass* GetSupportedPass(const String type) const
 - bool IsSupported() const
-- bool IsSM3() const
 - bool IsDesktop() const
 - unsigned GetNumPasses() const
-- const Vector<StringHash>& GetPassTypes() const
+- const Vector<String>& GetPassTypes() const
 - const PODVector<Pass*>& GetPasses() const
 
 Properties:
 
 - bool supported (readonly)
-- bool SM3 (readonly)
 - bool desktop (readonly)
 - unsigned numPasses (readonly)
 
@@ -7069,18 +7056,6 @@ Properties:
 - int SURFACE_UPDATEVISIBLE
 - int SURFACE_UPDATEALWAYS
 
-### ShaderParameterGroup
-
-- int SP_FRAME
-- int SP_CAMERA
-- int SP_VIEWPORT
-- int SP_ZONE
-- int SP_LIGHT
-- int SP_VERTEXLIGHTS
-- int SP_MATERIAL
-- int SP_OBJECTTRANSFORM
-- int MAX_SHADER_PARAMETER_GROUPS
-
 ### ShaderType
 
 - int VS
@@ -7145,18 +7120,6 @@ Properties:
 - int TU_SPECULAR
 - int TU_EMISSIVE
 - int TU_ENVIRONMENT
-- int MAX_MATERIAL_TEXTURE_UNITS
-- int TU_LIGHTRAMP
-- int TU_LIGHTSHAPE
-- int TU_SHADOWMAP
-- int TU_FACESELECT
-- int TU_INDIRECTION
-- int TU_DEPTHBUFFER
-- int TU_LIGHTBUFFER
-- int TU_VOLUMEMAP
-- int TU_ZONE
-- int MAX_NAMED_TEXTURE_UNITS
-- int MAX_TEXTURE_UNITS
 
 ### TextureUsage
 

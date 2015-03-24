@@ -6009,6 +6009,7 @@ Methods:
 
 Properties:
 
+- String apiName // readonly
 - StringHash baseType // readonly
 - bool borderless // readonly
 - String category // readonly
@@ -6016,7 +6017,6 @@ Properties:
 - IntVector2 desktopResolution // readonly
 - bool deviceLost // readonly
 - bool flushGPU
-- bool forceSM2
 - bool fullscreen // readonly
 - bool hardwareShadowSupport // readonly
 - int height // readonly
@@ -6035,7 +6035,6 @@ Properties:
 - bool sRGB
 - bool sRGBSupport // readonly
 - bool sRGBWriteSupport // readonly
-- bool sm3Support // readonly
 - bool tripleBuffer // readonly
 - StringHash type // readonly
 - String typeName // readonly
@@ -6884,6 +6883,7 @@ Properties:
 Methods:
 
 - Material@ Clone(const String& = String ( )) const
+- Pass@ GetPass(uint, const String&)
 - ValueAnimation@ GetShaderParameterAnimation(const String&) const
 - float GetShaderParameterAnimationSpeed(const String&) const
 - WrapMode GetShaderParameterAnimationWrapMode(const String&) const
@@ -6912,7 +6912,6 @@ Properties:
 - uint memoryUse // readonly
 - String name
 - uint numTechniques
-- uint numUsedTextureUnits // readonly
 - bool occlusion // readonly
 - int refs // readonly
 - Scene@ scene
@@ -8081,7 +8080,6 @@ Properties:
 - String pixelShader
 - String pixelShaderDefines
 - int refs // readonly
-- bool sm3
 - String vertexShader
 - String vertexShaderDefines
 - int weakRefs // readonly
@@ -8541,7 +8539,6 @@ Properties:
 - bool dynamicInstancing
 - bool hdrRendering
 - int materialQuality
-- int maxInstanceTriangles
 - int maxOccluderTriangles
 - int maxShadowMaps
 - int maxSortedInstances
@@ -10639,13 +10636,13 @@ Properties:
 
 Methods:
 
-- Pass@ CreatePass(StringHash)
-- Pass@ GetPass(StringHash)
-- Pass@ GetSupportedPass(StringHash)
-- bool HasPass(StringHash) const
+- Pass@ CreatePass(const String&)
+- Pass@ GetPass(const String&)
+- Pass@ GetSupportedPass(const String&)
+- bool HasPass(const String&) const
 - bool Load(File@)
 - bool Load(VectorBuffer&)
-- void RemovePass(StringHash)
+- void RemovePass(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -10658,10 +10655,9 @@ Properties:
 - uint memoryUse // readonly
 - String name
 - uint numPasses // readonly
-- StringHash[]@ passTypes // readonly
+- String[]@ passNames // readonly
 - Pass@[]@ passes // readonly
 - int refs // readonly
-- bool sm3
 - bool supported // readonly
 - StringHash type // readonly
 - String typeName // readonly
@@ -13048,23 +13044,24 @@ Properties:
 ### TextureUnit
 
 - TU_DIFFUSE
+- TU_ALBEDOBUFFER
 - TU_NORMAL
+- TU_NORMALBUFFER
 - TU_SPECULAR
 - TU_EMISSIVE
 - TU_ENVIRONMENT
 - TU_LIGHTRAMP
 - TU_LIGHTSHAPE
 - TU_SHADOWMAP
+- TU_CUSTOM1
+- TU_CUSTOM2
+- TU_VOLUMEMAP
 - TU_FACESELECT
 - TU_INDIRECTION
-- TU_ALBEDOBUFFER
-- TU_NORMALBUFFER
 - TU_DEPTHBUFFER
 - TU_LIGHTBUFFER
-- TU_VOLUMEMAP
 - TU_ZONE
 - MAX_MATERIAL_TEXTURE_UNITS
-- MAX_NAMED_TEXTURE_UNITS
 - MAX_TEXTURE_UNITS
 
 
@@ -13177,8 +13174,10 @@ Properties:
 - uint GetFloat32Format()
 - uint GetFormat(const String&)
 - String GetInternalPath(const String&)
+- uint GetLinearDepthFormat()
 - uint GetLuminanceAlphaFormat()
 - uint GetLuminanceFormat()
+- uint GetMaxBones()
 - uint GetNumLogicalCPUs()
 - uint GetNumPhysicalCPUs()
 - String[]@ GetObjectCategories()
