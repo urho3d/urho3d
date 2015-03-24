@@ -260,7 +260,6 @@ Renderer::Renderer(Context* context) :
     shadowQuality_(SHADOWQUALITY_HIGH_16BIT),
     maxShadowMaps_(1),
     minInstances_(2),
-    maxInstanceTriangles_(500),
     maxSortedInstances_(1000),
     maxOccluderTriangles_(5000),
     occlusionBufferSize_(256),
@@ -436,11 +435,6 @@ void Renderer::SetDynamicInstancing(bool enable)
 void Renderer::SetMinInstances(int instances)
 {
     minInstances_ = Max(instances, 2);
-}
-
-void Renderer::SetMaxInstanceTriangles(int triangles)
-{
-    maxInstanceTriangles_ = Max(triangles, 0);
 }
 
 void Renderer::SetMaxSortedInstances(int instances)
@@ -661,7 +655,6 @@ void Renderer::Render()
     
     graphics_->SetDefaultTextureFilterMode(textureFilterMode_);
     graphics_->SetTextureAnisotropy(textureAnisotropy_);
-    graphics_->ClearParameterSources();
     
     // If no views, just clear the screen
     if (views_.Empty())
@@ -891,13 +884,12 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         }
         else
         {
-            #ifdef URHO3D_OPENGL
             #ifndef GL_ES_VERSION_2_0
-            // OpenGL (desktop): shadow compare mode needs to be specifically enabled for the shadow map
+            // OpenGL (desktop) and D3D11: shadow compare mode needs to be specifically enabled for the shadow map
             newShadowMap->SetFilterMode(FILTER_BILINEAR);
             newShadowMap->SetShadowCompare(true);
             #endif
-            #else
+            #ifndef URHO3D_OPENGL
             // Direct3D9: when shadow compare must be done manually, use nearest filtering so that the filtering of point lights
             // and other shadowed lights matches
             newShadowMap->SetFilterMode(graphics_->GetHardwareShadowSupport() ? FILTER_BILINEAR : FILTER_NEAREST);
@@ -1051,7 +1043,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
     {
         // First release all previous shaders, then load
         pass->ReleaseShaders();
-        LoadPassShaders(tech, pass->GetType());
+        LoadPassShaders(pass);
     }
     
     // Make sure shaders are loaded now
@@ -1059,10 +1051,8 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
     {
         bool heightFog = batch.zone_ && batch.zone_->GetHeightFog();
         
-        // If instancing is not supported, but was requested, or the object is too large to be instanced,
-        // choose static geometry vertex shader instead
-        if (batch.geometryType_ == GEOM_INSTANCED && (!GetDynamicInstancing() || batch.geometry_->GetIndexCount() >
-            (unsigned)maxInstanceTriangles_ * 3))
+        // If instancing is not supported, but was requested, choose static geometry vertex shader instead
+        if (batch.geometryType_ == GEOM_INSTANCED && !GetDynamicInstancing())
             batch.geometryType_ = GEOM_STATIC;
         
         if (batch.geometryType_ == GEOM_STATIC_NOINSTANCING)
@@ -1466,12 +1456,8 @@ void Renderer::LoadShaders()
     shadersDirty_ = false;
 }
 
-void Renderer::LoadPassShaders(Technique* tech, StringHash type)
+void Renderer::LoadPassShaders(Pass* pass)
 {
-    Pass* pass = tech->GetPass(type);
-    if (!pass)
-        return;
-    
     PROFILE(LoadPassShaders);
     
     unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
@@ -1695,11 +1681,8 @@ void Renderer::CreateInstancingBuffer()
         return;
     }
     
-    // If must lock the buffer for each batch group, set a smaller size
-    unsigned defaultSize = graphics_->GetStreamOffsetSupport() ? INSTANCING_BUFFER_DEFAULT_SIZE : INSTANCING_BUFFER_DEFAULT_SIZE / 4;
-    
     instancingBuffer_ = new VertexBuffer(context_);
-    if (!instancingBuffer_->SetSize(defaultSize, INSTANCING_BUFFER_MASK, true))
+    if (!instancingBuffer_->SetSize(INSTANCING_BUFFER_DEFAULT_SIZE, INSTANCING_BUFFER_MASK, true))
     {
         instancingBuffer_.Reset();
         dynamicInstancing_ = false;

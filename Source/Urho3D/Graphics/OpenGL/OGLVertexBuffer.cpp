@@ -154,6 +154,7 @@ void VertexBuffer::Release()
                     graphics_->SetVertexBuffer(0);
             }
             
+            graphics_->SetVBO(0);
             glDeleteBuffers(1, &object_);
         }
         
@@ -217,7 +218,7 @@ bool VertexBuffer::SetData(const void* data)
     {
         if (!graphics_->IsDeviceLost())
         {
-            glBindBuffer(GL_ARRAY_BUFFER, object_);
+            graphics_->SetVBO(object_);
             glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         }
         else
@@ -264,7 +265,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     {
         if (!graphics_->IsDeviceLost())
         {
-            glBindBuffer(GL_ARRAY_BUFFER, object_);
+            graphics_->SetVBO(object_);
             if (!discard || start != 0)
                 glBufferSubData(GL_ARRAY_BUFFER, start * vertexSize_, count * vertexSize_, data);
             else
@@ -409,7 +410,7 @@ bool VertexBuffer::Create()
             return false;
         }
         
-        glBindBuffer(GL_ARRAY_BUFFER, object_);
+        graphics_->SetVBO(object_);
         glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
     

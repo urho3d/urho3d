@@ -522,7 +522,7 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
             {
                 Material* material = new Material(context_);
                 Technique* tech = new Technique(context_);
-                Pass* pass = tech->CreatePass(PASS_ALPHA);
+                Pass* pass = tech->CreatePass("alpha");
                 pass->SetVertexShader("Text");
                 pass->SetPixelShader("Text");
 

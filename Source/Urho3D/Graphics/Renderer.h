@@ -191,8 +191,6 @@ public:
     void SetDynamicInstancing(bool enable);
     /// Set minimum number of instances required in a batch group to render as instanced.
     void SetMinInstances(int instances);
-    /// Set maximum number of triangles per object for instancing.
-    void SetMaxInstanceTriangles(int triangles);
     /// Set maximum number of sorted instances per batch group. If exceeded, instances are rendered unsorted.
     void SetMaxSortedInstances(int instances);
     /// Set maximum number of occluder trianges.
@@ -240,8 +238,6 @@ public:
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
     /// Return minimum number of instances required in a batch group to render as instanced.
     int GetMinInstances() const { return minInstances_; }
-    /// Return maximum number of triangles per object for instancing.
-    int GetMaxInstanceTriangles() const { return maxInstanceTriangles_; }
     /// Return maximum number of sorted instances per batch group.
     int GetMaxSortedInstances() const { return maxSortedInstances_; }
     /// Return maximum number of occluder triangles.
@@ -335,7 +331,7 @@ private:
     /// Reload shaders.
     void LoadShaders();
     /// Reload shaders for a material pass.
-    void LoadPassShaders(Technique* tech, StringHash passType);
+    void LoadPassShaders(Pass* pass);
     /// Release shaders used in materials.
     void ReleaseMaterialShaders();
     /// Reload textures.
@@ -439,8 +435,6 @@ private:
     int maxShadowMaps_;
     /// Minimum number of instances required in a batch group to render as instanced.
     int minInstances_;
-    /// Maximum triangles per object for instancing.
-    int maxInstanceTriangles_;
     /// Maximum sorted instances per batch group.
     int maxSortedInstances_;
     /// Maximum occluder triangles.

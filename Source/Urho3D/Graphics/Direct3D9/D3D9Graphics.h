@@ -43,6 +43,7 @@ class GraphicsImpl;
 class RenderSurface;
 class Shader;
 class ShaderPrecache;
+class ShaderProgram;
 class ShaderVariation;
 class Texture;
 class Texture2D;
@@ -53,6 +54,8 @@ class VertexBuffer;
 class VertexDeclaration;
 
 struct ShaderParameter;
+
+typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
 
 /// CPU-side scratch buffer for vertex data updates.
 struct ScratchBuffer
@@ -200,8 +203,6 @@ public:
     void SetDepthTest(CompareMode mode);
     /// Set depth write on/off.
     void SetDepthWrite(bool enable);
-    /// Set antialiased drawing mode on/off. Default is on if the backbuffer is multisampled. Has no effect when backbuffer is not multisampled.
-    void SetDrawAntialiased(bool enable);
     /// Set polygon fill mode.
     void SetFillMode(FillMode mode);
     /// Set scissor test.
@@ -212,12 +213,6 @@ public:
     void SetStencilTest(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned compareMask = M_MAX_UNSIGNED, unsigned writeMask = M_MAX_UNSIGNED);
     /// Set a custom clipping plane. The plane is specified in world space, but is dependent on the view and projection matrices.
     void SetClipPlane(bool enable, const Plane& clipPlane = Plane::UP, const Matrix3x4& view = Matrix3x4::IDENTITY, const Matrix4& projection = Matrix4::IDENTITY);
-    /// Set vertex buffer stream frequency.
-    void SetStreamFrequency(unsigned index, unsigned frequency);
-    /// Reset stream frequencies.
-    void ResetStreamFrequencies();
-    /// Set force Shader Model 2 flag. Only effective before setting the initial screen mode.
-    void SetForceSM2(bool enable);
     /// Begin dumping shader variation names to an XML file for precaching.
     void BeginDumpShaders(const String& fileName);
     /// End dumping shader variations names.
@@ -233,6 +228,8 @@ public:
     void* GetExternalWindow() const { return externalWindow_; }
     /// Return window title.
     const String& GetWindowTitle() const { return windowTitle_; }
+    /// Return graphics API name.
+    const String& GetApiName() const { return apiName_; }
     /// Return window position.
     IntVector2 GetWindowPosition() const;
     /// Return window width.
@@ -269,10 +266,8 @@ public:
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
     /// Return 24-bit shadow map depth texture format, or 0 if not supported.
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
-    /// Return whether Shader Model 3 is supported.
-    bool GetSM3Support() const { return hasSM3_; }
-    /// Return whether hardware instancing is supported.
-    bool GetInstancingSupport() const { return hasSM3_; }
+    /// Return whether hardware instancing is supported..
+    bool GetInstancingSupport() const { return instancingSupport_; }
     /// Return whether light pre-pass rendering is supported.
     bool GetLightPrepassSupport() const { return lightPrepassSupport_; }
     /// Return whether deferred rendering is supported.
@@ -281,8 +276,6 @@ public:
     bool GetHardwareShadowSupport() const { return hardwareShadowSupport_; }
     /// Return whether a readable hardware depth format is available.
     bool GetReadableDepthSupport() const { return GetReadableDepthFormat() != 0; }
-    /// Return whether stream offset is supported.
-    bool GetStreamOffsetSupport() const { return streamOffsetSupport_; }
     /// Return whether sRGB conversion on texture sampling is supported.
     bool GetSRGBSupport() const { return sRGBSupport_; }
     /// Return whether sRGB conversion on rendertarget writing is supported.
@@ -303,8 +296,6 @@ public:
     VertexBuffer* GetVertexBuffer(unsigned index) const;
     /// Return current index buffer.
     IndexBuffer* GetIndexBuffer() const { return indexBuffer_; }
-    /// Return current vertex declaration.
-    VertexDeclaration* GetVertexDeclaration() const { return vertexDeclaration_; }
     /// Return current vertex shader.
     ShaderVariation* GetVertexShader() const { return vertexShader_; }
     /// Return current pixel shader.
@@ -339,8 +330,6 @@ public:
     CompareMode GetDepthTest() const { return depthTestMode_; }
     /// Return whether depth write is enabled.
     bool GetDepthWrite() const { return depthWrite_; }
-    /// Return whether antialiased drawing mode is enabled.
-    bool GetDrawAntialiased() const { return drawAntialiased_; }
     /// Return polygon fill mode.
     FillMode GetFillMode() const { return fillMode_; }
     /// Return whether stencil test is enabled.
@@ -365,12 +354,8 @@ public:
     unsigned GetStencilWriteMask() const { return stencilWriteMask_; }
     /// Return whether a custom clipping plane is in use.
     bool GetUseClipPlane() const { return useClipPlane_; }
-    /// Return stream frequency by vertex buffer index.
-    unsigned GetStreamFrequency(unsigned index) const;
     /// Return rendertarget width and height.
     IntVector2 GetRenderTargetDimensions() const;
-    /// Return force Shader Model 2 flag.
-    bool GetForceSM2() const { return forceSM2_; }
     
     /// Window was resized through user interaction. Called by Input subsystem.
     void WindowResized();
@@ -390,8 +375,8 @@ public:
     void FreeScratchBuffer(void* buffer);
     /// Clean up too large scratch buffers.
     void CleanupScratchBuffers();
-    /// Clean up shader parameters when a shader variation is released or destroyed.
-    void CleanupShaderParameters(ShaderVariation* variation);
+    /// Clean up shader programs when a shader variation is released or destroyed.
+    void CleanupShaderPrograms(ShaderVariation* variation);
 
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
@@ -427,8 +412,16 @@ public:
     static unsigned GetReadableDepthFormat();
     /// Return the API-specific texture format from a textual description, for example "rgb".
     static unsigned GetFormat(const String& formatName);
-    
+    /// Return UV offset required for pixel perfect rendering.
+    static const Vector2& GetPixelUVOffset() { return pixelUVOffset; }
+    /// Return maximum number of supported bones for skinning.
+    static unsigned GetMaxBones() { return 64; }
+
 private:
+    /// Set vertex buffer stream frequency.
+    void SetStreamFrequency(unsigned index, unsigned frequency);
+    /// Reset stream frequencies.
+    void ResetStreamFrequencies();
     /// Create the application window.
     bool OpenWindow(int width, int height, bool resizable, bool borderless);
     /// Create the application window icon.
@@ -494,16 +487,12 @@ private:
     bool deferredSupport_;
     /// Hardware shadow map depth compare support flag.
     bool hardwareShadowSupport_;
-    /// Stream offset support flag.
-    bool streamOffsetSupport_;
+    /// Instancing support flag.
+    bool instancingSupport_;
     /// sRGB conversion on read support flag.
     bool sRGBSupport_;
     /// sRGB conversion on write support flag.
     bool sRGBWriteSupport_;
-    /// Shader Model 3 flag.
-    bool hasSM3_;
-    /// Force Shader Model 2 flag.
-    bool forceSM2_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.
@@ -511,7 +500,7 @@ private:
     /// Largest scratch buffer request this frame.
     unsigned maxScratchBufferRequest_;
     /// GPU objects.
-    Vector<GPUObject*> gpuObjects_;
+    PODVector<GPUObject*> gpuObjects_;
     /// Scratch buffers.
     Vector<ScratchBuffer> scratchBuffers_;
     /// Vertex declarations.
@@ -586,14 +575,12 @@ private:
     bool stencilTest_;
     /// Custom clip plane enable flag.
     bool useClipPlane_;
-    /// Draw antialiased mode flag.
-    bool drawAntialiased_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
-    /// Shader parameters for all vertex/pixel shader combinations.
-    HashMap<Pair<ShaderVariation*, ShaderVariation*>, HashMap<StringHash, Pair<ShaderType, unsigned> > > shaderParameters_;
-    /// Current active shader parameters.
-    HashMap<StringHash, Pair<ShaderType, unsigned> >* currentShaderParameters_;
+    /// Shader programs.
+    ShaderProgramMap shaderPrograms_;
+    /// Shader program in use.
+    ShaderProgram* shaderProgram_;
     /// Remembered shader parameter sources.
     const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS];
     /// Base directory for shaders.
@@ -608,6 +595,11 @@ private:
     SharedPtr<ShaderPrecache> shaderPrecache_;
     /// Allowed screen orientations.
     String orientations_;
+    /// Graphics API name.
+    String apiName_;
+
+    /// Pixel perfect UV offset.
+    static const Vector2 pixelUVOffset;
 };
 
 /// Register Graphics library objects.

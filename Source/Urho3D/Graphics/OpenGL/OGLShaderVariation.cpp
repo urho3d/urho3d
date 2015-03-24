@@ -49,9 +49,6 @@ void ShaderVariation::OnDeviceLost()
     GPUObject::OnDeviceLost();
 
     compilerOutput_.Clear();
-    
-    if (graphics_)
-        graphics_->CleanupShaderPrograms();
 }
 
 void ShaderVariation::Release()
@@ -78,7 +75,7 @@ void ShaderVariation::Release()
         }
         
         object_ = 0;
-        graphics_->CleanupShaderPrograms();
+        graphics_->CleanupShaderPrograms(this);
     }
     
     compilerOutput_.Clear();
@@ -124,10 +121,16 @@ bool ShaderVariation::Create()
             shaderCode += versionDefine + "\n";
         }
     }
+    // Force GLSL version 150 if no version define and GL3 is being used
+    if (!verEnd && Graphics::GetGL3Support())
+        shaderCode += "#version 150\n";
 
     // Distinguish between VS and PS compile in case the shader code wants to include/omit different things
     shaderCode += type_ == VS ? "#define COMPILEVS\n" : "#define COMPILEPS\n";
-    
+
+    // Add define for the maximum number of supported bones
+    shaderCode += "#define MAXBONES " + String(Graphics::GetMaxBones()) + "\n";
+
     // Prepend the defines to the shader code
     Vector<String> defineVec = defines_.Split(' ');
     for (unsigned i = 0; i < defineVec.Size(); ++i)
@@ -151,6 +154,8 @@ bool ShaderVariation::Create()
     #ifdef EMSCRIPTEN
     shaderCode += "#define WEBGL\n";
     #endif
+    if (Graphics::GetGL3Support())
+        shaderCode += "#define GL3\n";
 
     // When version define found, do not insert it a second time
     if (verEnd > 0)

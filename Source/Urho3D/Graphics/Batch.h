@@ -271,6 +271,8 @@ struct LightBatchQueue
 {
     /// Per-pixel light.
     Light* light_;
+    /// Light negative flag.
+    bool negative_;
     /// Shadow map depth texture.
     Texture2D* shadowMap_;
     /// Lit geometry draw calls, base (replace blend mode)

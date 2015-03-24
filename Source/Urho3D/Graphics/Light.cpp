@@ -396,16 +396,7 @@ int Light::GetNumShadowSplits() const
         }
     }
 
-    ret = Min(ret, MAX_CASCADE_SPLITS);
-    // Shader Model 2 can only support 3 splits max. due to pixel shader instruction count limits
-    if (ret == 4)
-    {
-        Graphics* graphics = GetSubsystem<Graphics>();
-        if (graphics && !graphics->GetSM3Support())
-            --ret;
-    }
-
-    return ret;
+    return Min(ret, MAX_CASCADE_SPLITS);
 }
 
 const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
@@ -556,7 +547,7 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
             float distance = lightRay.HitDistance(box);
             float normDistance = distance / range_;
             float att = Max(1.0f - normDistance * normDistance, M_EPSILON);
-            sortValue_ = 1.0f / (Max(color_.SumRGB(), 0.0f) * att + M_EPSILON);
+            sortValue_ = 1.0f / GetIntensityDivisor(att);
         }
         break;
     }

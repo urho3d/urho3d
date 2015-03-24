@@ -3,8 +3,8 @@
 #include "Transform.hlsl"
 
 void VS(float4 iPos : POSITION,
-    out float4 oPos : POSITION,
-    out float3 oTexCoord : TEXCOORD0)
+    out float3 oTexCoord : TEXCOORD0,
+    out float4 oPos : OUTPOSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
@@ -15,7 +15,7 @@ void VS(float4 iPos : POSITION,
 }
 
 void PS(float3 iTexCoord : TEXCOORD0,
-    out float4 oColor : COLOR0)
+    out float4 oColor : OUTCOLOR0)
 {
-    oColor = cMatDiffColor * texCUBE(sDiffCubeMap, iTexCoord);
+    oColor = cMatDiffColor * SampleCube(DiffCubeMap, iTexCoord);
 }

@@ -5,7 +5,9 @@
 #include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
-    float3 iNormal : NORMAL,
+    #ifndef BILLBOARD
+        float3 iNormal : NORMAL,
+    #endif
     float2 iTexCoord : TEXCOORD0,
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
@@ -38,13 +40,20 @@ void VS(float4 iPos : POSITION,
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
     #endif
-    out float4 oPos : POSITION)
+    #if defined(D3D11) && defined(CLIPPLANE)
+        out float oClip : SV_CLIPDISTANCE0,
+    #endif
+    out float4 oPos : OUTPOSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
     oTexCoord = GetTexCoord(iTexCoord);
     oWorldPos = float4(worldPos, GetDepth(oPos));
+
+    #if defined(D3D11) && defined(CLIPPLANE)
+        oClip = dot(oPos, cClipPlane);
+    #endif
 
     #ifdef VERTEXCOLOR
         oColor = iColor;
@@ -96,11 +105,14 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
     #endif
-    out float4 oColor : COLOR0)
+    #if defined(D3D11) && defined(CLIPPLANE)
+        float iClip : SV_CLIPDISTANCE0,
+    #endif
+    out float4 oColor : OUTCOLOR0)
 {
     // Get material diffuse albedo
     #ifdef DIFFMAP
-        float4 diffInput = tex2D(sDiffMap, iTexCoord);
+        float4 diffInput = Sample2D(DiffMap, iTexCoord);
         #ifdef ALPHAMASK
             if (diffInput.a < 0.5)
                 discard;
@@ -133,7 +145,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #endif
 
         #if defined(SPOTLIGHT)
-            lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
+            lightColor = iSpotPos.w > 0.0 ? Sample2DProj(LightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
         #elif defined(CUBEMASK)
             lightColor = texCUBE(sLightCubeMap, iCubeMaskVec).rgb * cLightColor.rgb;
         #else

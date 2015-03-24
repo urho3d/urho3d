@@ -218,17 +218,16 @@ enum ShaderType
     PS,
 };
 
-/// Shader parameter groups for determining need to update.
+/// Shader parameter groups for determining need to update. On APIs that support constant buffers, these correspond to different constant buffers.
 enum ShaderParameterGroup
 {
     SP_FRAME = 0,
     SP_CAMERA,
-    SP_VIEWPORT,
     SP_ZONE,
     SP_LIGHT,
-    SP_VERTEXLIGHTS,
     SP_MATERIAL,
-    SP_OBJECTTRANSFORM,
+    SP_OBJECT,
+    SP_CUSTOM,
     MAX_SHADER_PARAMETER_GROUPS
 };
 
@@ -242,18 +241,27 @@ enum TextureUnit
     TU_SPECULAR = 2,
     TU_EMISSIVE = 3,
     TU_ENVIRONMENT = 4,
-    MAX_MATERIAL_TEXTURE_UNITS = 5,
+#ifdef DESKTOP_GRAPHICS
+    TU_VOLUMEMAP = 5,
+    TU_CUSTOM1 = 6,
+    TU_CUSTOM2 = 7,
+    TU_LIGHTRAMP = 8,
+    TU_LIGHTSHAPE = 9,
+    TU_SHADOWMAP = 10,
+    TU_FACESELECT = 11,
+    TU_INDIRECTION = 12,
+    TU_DEPTHBUFFER = 13,
+    TU_LIGHTBUFFER = 14,
+    TU_ZONE = 15,
+    MAX_MATERIAL_TEXTURE_UNITS = 8,
+    MAX_TEXTURE_UNITS = 16
+#else
     TU_LIGHTRAMP = 5,
     TU_LIGHTSHAPE = 6,
     TU_SHADOWMAP = 7,
-    TU_FACESELECT = 8,
-    TU_INDIRECTION = 9,
-    TU_DEPTHBUFFER = 10,
-    TU_LIGHTBUFFER = 11,
-    TU_VOLUMEMAP = 12,
-    TU_ZONE = 13,
-    MAX_NAMED_TEXTURE_UNITS = 14,
-    MAX_TEXTURE_UNITS = 16
+    MAX_MATERIAL_TEXTURE_UNITS = 5,
+    MAX_TEXTURE_UNITS = 8
+#endif
 };
 
 /// Billboard camera facing modes.
@@ -272,6 +280,7 @@ extern URHO3D_API const StringHash VSP_AMBIENTENDCOLOR;
 extern URHO3D_API const StringHash VSP_BILLBOARDROT;
 extern URHO3D_API const StringHash VSP_CAMERAPOS;
 extern URHO3D_API const StringHash VSP_CAMERAROT;
+extern URHO3D_API const StringHash VSP_CLIPPLANE;
 extern URHO3D_API const StringHash VSP_NEARCLIP;
 extern URHO3D_API const StringHash VSP_FARCLIP;
 extern URHO3D_API const StringHash VSP_DEPTHMODE;
@@ -313,20 +322,6 @@ extern URHO3D_API const StringHash PSP_SHADOWMAPINVSIZE;
 extern URHO3D_API const StringHash PSP_SHADOWSPLITS;
 extern URHO3D_API const StringHash PSP_LIGHTMATRICES;
 
-// Inbuilt pass types
-extern URHO3D_API const StringHash PASS_BASE;
-extern URHO3D_API const StringHash PASS_LITBASE;
-extern URHO3D_API const StringHash PASS_LIGHT;
-extern URHO3D_API const StringHash PASS_ALPHA;
-extern URHO3D_API const StringHash PASS_LITALPHA;
-extern URHO3D_API const StringHash PASS_SHADOW;
-extern URHO3D_API const StringHash PASS_DEFERRED;
-extern URHO3D_API const StringHash PASS_PREPASS;
-extern URHO3D_API const StringHash PASS_MATERIAL;
-extern URHO3D_API const StringHash PASS_POSTOPAQUE;
-extern URHO3D_API const StringHash PASS_REFRACT;
-extern URHO3D_API const StringHash PASS_POSTALPHA;
-
 // Scale calculation from bounding box diagonal.
 extern URHO3D_API const Vector3 DOT_SCALE;
 
@@ -363,7 +358,6 @@ static const unsigned NO_ELEMENT = 0xffffffff;
 
 static const int MAX_RENDERTARGETS = 4;
 static const int MAX_VERTEX_STREAMS = 4;
-static const int MAX_SKIN_MATRICES = 64;
 static const int MAX_CONSTANT_REGISTERS = 256;
 
 static const int BITS_PER_COMPONENT = 8;

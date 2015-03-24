@@ -5,17 +5,38 @@
 #include "Lighting.hlsl"
 #include "Fog.hlsl"
 
-// When rendering a shadowed point light, disable specular calculations on Shader Model 2 to avoid exceeding the instruction limit
-#if !defined(SM3) && defined(SHADOW) && defined(POINTLIGHT)
-    #undef SPECULAR
+#ifndef D3D11
+
+// D3D9 uniforms and samplers
+#ifdef COMPILEVS
+uniform float2 cDetailTiling;
+#else
+sampler2D sWeightMap0 : register(s0);
+sampler2D sDetailMap1 : register(s1);
+sampler2D sDetailMap2 : register(s2);
+sampler2D sDetailMap3 : register(s3);
 #endif
 
-sampler2D sWeightMap0 : register(S0);
-sampler2D sDetailMap1 : register(S1);
-sampler2D sDetailMap2 : register(S2);
-sampler2D sDetailMap3 : register(S3);
+#else
 
-uniform float2 cDetailTiling;
+// D3D11 constant buffers and samplers
+#ifdef COMPILEVS
+cbuffer CustomVS : register(b6)
+{
+    float2 cDetailTiling;
+}
+#else
+Texture2D tWeightMap0 : register(t0);
+Texture2D tDetailMap1 : register(t1);
+Texture2D tDetailMap2 : register(t2);
+Texture2D tDetailMap3 : register(t3);
+SamplerState sWeightMap0 : register(s0);
+SamplerState sDetailMap1 : register(s1);
+SamplerState sDetailMap2 : register(s2);
+SamplerState sDetailMap3 : register(s3);
+#endif
+
+#endif
 
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
@@ -48,7 +69,10 @@ void VS(float4 iPos : POSITION,
         out float3 oVertexLight : TEXCOORD4,
         out float4 oScreenPos : TEXCOORD5,
     #endif
-    out float4 oPos : POSITION)
+    #if defined(D3D11) && defined(CLIPPLANE)
+        out float oClip : SV_CLIPDISTANCE0,
+    #endif
+    out float4 oPos : OUTPOSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
@@ -57,6 +81,10 @@ void VS(float4 iPos : POSITION,
     oWorldPos = float4(worldPos, GetDepth(oPos));
     oTexCoord = GetTexCoord(iTexCoord);
     oDetailTexCoord = cDetailTiling * oTexCoord;
+
+    #if defined(D3D11) && defined(CLIPPLANE)
+        oClip = dot(oPos, cClipPlane);
+    #endif
 
     #ifdef PERPIXEL
         // Per-pixel forward lighting
@@ -106,24 +134,27 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float3 iVertexLight : TEXCOORD4,
         float4 iScreenPos : TEXCOORD5,
     #endif
+    #if defined(D3D11) && defined(CLIPPLANE)
+        float iClip : SV_CLIPDISTANCE0,
+    #endif
     #ifdef PREPASS
-        out float4 oDepth : COLOR1,
+        out float4 oDepth : OUTCOLOR1,
     #endif
     #ifdef DEFERRED
-        out float4 oAlbedo : COLOR1,
-        out float4 oNormal : COLOR2,
-        out float4 oDepth : COLOR3,
+        out float4 oAlbedo : OUTCOLOR1,
+        out float4 oNormal : OUTCOLOR2,
+        out float4 oDepth : OUTCOLOR3,
     #endif
-    out float4 oColor : COLOR0)
+    out float4 oColor : OUTCOLOR0)
 {
     // Get material diffuse albedo
-    float3 weights = tex2D(sWeightMap0, iTexCoord).rgb;
+    float3 weights = Sample2D(WeightMap0, iTexCoord).rgb;
     float sumWeights = weights.r + weights.g + weights.b;
     weights /= sumWeights;
     float4 diffColor = cMatDiffColor * (
-        weights.r * tex2D(sDetailMap1, iDetailTexCoord) +
-        weights.g * tex2D(sDetailMap2, iDetailTexCoord) +
-        weights.b * tex2D(sDetailMap3, iDetailTexCoord)
+        weights.r * Sample2D(DetailMap1, iDetailTexCoord) +
+        weights.g * Sample2D(DetailMap2, iDetailTexCoord) +
+        weights.b * Sample2D(DetailMap3, iDetailTexCoord)
     );
 
     // Get material specular albedo
@@ -152,9 +183,9 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #endif
     
         #if defined(SPOTLIGHT)
-            lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
+            lightColor = iSpotPos.w > 0.0 ? Sample2DProj(LightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
         #elif defined(CUBEMASK)
-            lightColor = texCUBE(sLightCubeMap, iCubeMaskVec).rgb * cLightColor.rgb;
+            lightColor = SampleCube(LightCubeMap, iCubeMaskVec).rgb * cLightColor.rgb;
         #else
             lightColor = cLightColor.rgb;
         #endif
@@ -197,7 +228,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #ifdef MATERIAL
             // Add light pre-pass accumulation result
             // Lights are accumulated at half intensity. Bring back to full intensity now
-            float4 lightInput = 2.0 * tex2Dproj(sLightBuffer, iScreenPos);
+            float4 lightInput = 2.0 * Sample2DProj(LightBuffer, iScreenPos);
             float3 lightSpecColor = lightInput.a * (lightInput.rgb / GetIntensity(lightInput.rgb));
 
             finalColor += lightInput.rgb * diffColor.rgb + lightSpecColor * specColor;

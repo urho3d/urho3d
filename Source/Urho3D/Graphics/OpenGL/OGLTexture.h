@@ -50,7 +50,7 @@ public:
     void SetFilterMode(TextureFilterMode filter);
     /// Set addressing mode by texture coordinate.
     void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
-    /// Set shadow compare mode, OpenGL only.
+    /// Set shadow compare mode.
     void SetShadowCompare(bool enable);
     /// Set border color for border addressing mode.
     void SetBorderColor(const Color& color);
@@ -85,7 +85,7 @@ public:
     TextureFilterMode GetFilterMode() const { return filterMode_; }
     /// Return addressing mode by texture coordinate.
     TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressMode_[coord]; }
-    /// Return whether shadow compare is enabled, OpenGL only.
+    /// Return whether shadow compare is enabled.
     bool GetShadowCompare() const { return shadowCompare_; }
      /// Return border color.
     const Color& GetBorderColor() const { return borderColor_; }
@@ -143,7 +143,7 @@ protected:
     int height_;
     /// Texture depth.
     int depth_;
-    /// Shadow compare mode, OpenGL only.
+    /// Shadow compare mode.
     bool shadowCompare_;
     /// Parameters dirty flag.
     bool parametersDirty_;

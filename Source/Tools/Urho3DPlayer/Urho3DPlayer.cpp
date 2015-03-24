@@ -100,7 +100,8 @@ void Urho3DPlayer::Setup()
             "-tq <level>  Texture quality level, default 2 (high)\n"
             "-tf <level>  Texture filter mode, default 2 (trilinear)\n"
             "-af <level>  Texture anisotropy level, default 4. Also sets anisotropic filter mode\n"
-            "-flushgpu    Flush GPU command queue each frame. Effective only on Direct3D9\n"
+            "-gl2         Force OpenGL 2 use even if OpenGL 3 is available\n"
+            "-flushgpu    Flush GPU command queue each frame. Effective only on Direct3D\n"
             "-borderless  Borderless window mode\n"
             "-headless    Headless mode. No application window will be created\n"
             "-landscape   Use landscape orientations (iOS only, default)\n"
@@ -114,7 +115,6 @@ void Urho3DPlayer::Setup()
             "-nothreads   Disable worker threads\n"
             "-nosound     Disable sound output\n"
             "-noip        Disable sound mixing interpolation\n"
-            "-sm2         Force SM2.0 rendering\n"
             "-touch       Touch emulation on desktop platform\n"
             #endif
         );

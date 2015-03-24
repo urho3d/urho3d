@@ -913,7 +913,7 @@ bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blen
 
             if (!found)
             {
-                if (bones_.Size() >= MAX_SKIN_MATRICES)
+                if (bones_.Size() >= Graphics::GetMaxBones())
                 {
                     LOGWARNING("Maximum skinned decal bone count reached");
                     return false;

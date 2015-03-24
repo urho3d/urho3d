@@ -9,7 +9,11 @@ float2 Noise(float2 coord)
 }
 
 // Adapted: http://callumhay.blogspot.com/2010/09/gaussian-blur-shader-glsl.html
+#ifndef D3D11
 float4 GaussianBlur(int blurKernelSize, float2 blurDir, float2 blurRadius, float sigma, sampler2D texSampler, float2 texCoord)
+#else
+float4 GaussianBlur(int blurKernelSize, float2 blurDir, float2 blurRadius, float sigma, Texture2D tex, SamplerState texSampler, float2 texCoord)
+#endif
 {
     const int blurKernelHalfSize = blurKernelSize / 2;
 
@@ -23,14 +27,24 @@ float4 GaussianBlur(int blurKernelSize, float2 blurDir, float2 blurRadius, float
     float4 avgValue = float4(0.0, 0.0, 0.0, 0.0);
     float gaussCoeffSum = 0.0;
 
+    #ifndef D3D11
     avgValue += tex2D(texSampler, texCoord) * gaussCoeff.x;
+    #else
+    avgValue += tex.Sample(texSampler, texCoord) * gaussCoeff.x;
+    #endif
+
     gaussCoeffSum += gaussCoeff.x;
     gaussCoeff.xy *= gaussCoeff.yz;
 
     for (int i = 1; i <= blurKernelHalfSize; i++)
     {
+        #ifndef D3D11
         avgValue += tex2D(texSampler, texCoord - i * blurVec) * gaussCoeff.x;
         avgValue += tex2D(texSampler, texCoord + i * blurVec) * gaussCoeff.x;
+        #else
+        avgValue += tex.Sample(texSampler, texCoord - i * blurVec) * gaussCoeff.x;
+        avgValue += tex.Sample(texSampler, texCoord + i * blurVec) * gaussCoeff.x;
+        #endif
 
         gaussCoeffSum += 2.0 * gaussCoeff.x;
         gaussCoeff.xy *= gaussCoeff.yz;
@@ -64,12 +78,20 @@ float3 Uncharted2Tonemap(float3 x)
    return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
 }
 
+#ifndef D3D11
 float3 ColorCorrection(float3 color, sampler3D lut)
+#else
+float3 ColorCorrection(float3 color, Texture3D lut, SamplerState lutSampler)
+#endif
 {
     float lutSize = 16.0;
     float scale = (lutSize - 1.0) / lutSize;
     float offset = 1.0 / (2.0 * lutSize);
-    return tex3D(lut, clamp(color, 0.0, 1.0) * scale + offset).rgb;
+    #ifndef D3D11
+        return tex3D(lut, clamp(color, 0.0, 1.0) * scale + offset).rgb;
+    #else
+        return lut.Sample(lutSampler, clamp(color, 0.0, 1.0) * scale + offset).rgb;
+    #endif
 }
 
 static const float Gamma = 2.2;

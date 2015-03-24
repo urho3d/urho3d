@@ -434,7 +434,7 @@ Material* Renderer2D::CreateMaterial(Texture2D* texture, BlendMode blendMode)
         material->SetName(blendModeNames[blendMode]);
 
     Technique* tech = new Technique(context_);
-    Pass* pass = tech->CreatePass(PASS_ALPHA);
+    Pass* pass = tech->CreatePass("alpha");
     pass->SetBlendMode(blendMode);
 
     pass->SetVertexShader("Urho2D");

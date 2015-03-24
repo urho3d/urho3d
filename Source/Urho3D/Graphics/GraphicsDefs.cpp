@@ -34,6 +34,7 @@ extern URHO3D_API const StringHash VSP_AMBIENTENDCOLOR("AmbientEndColor");
 extern URHO3D_API const StringHash VSP_BILLBOARDROT("BillboardRot");
 extern URHO3D_API const StringHash VSP_CAMERAPOS("CameraPos");
 extern URHO3D_API const StringHash VSP_CAMERAROT("CameraRot");
+extern URHO3D_API const StringHash VSP_CLIPPLANE("ClipPlane");
 extern URHO3D_API const StringHash VSP_NEARCLIP("NearClip");
 extern URHO3D_API const StringHash VSP_FARCLIP("FarClip");
 extern URHO3D_API const StringHash VSP_DEPTHMODE("DepthMode");
@@ -74,19 +75,6 @@ extern URHO3D_API const StringHash PSP_SHADOWINTENSITY("ShadowIntensity");
 extern URHO3D_API const StringHash PSP_SHADOWMAPINVSIZE("ShadowMapInvSize");
 extern URHO3D_API const StringHash PSP_SHADOWSPLITS("ShadowSplits");
 extern URHO3D_API const StringHash PSP_LIGHTMATRICES("LightMatricesPS");
-
-extern URHO3D_API const StringHash PASS_BASE("base");
-extern URHO3D_API const StringHash PASS_LITBASE("litbase");
-extern URHO3D_API const StringHash PASS_LIGHT("light");
-extern URHO3D_API const StringHash PASS_ALPHA("alpha");
-extern URHO3D_API const StringHash PASS_LITALPHA("litalpha");
-extern URHO3D_API const StringHash PASS_SHADOW("shadow");
-extern URHO3D_API const StringHash PASS_DEFERRED("deferred");
-extern URHO3D_API const StringHash PASS_PREPASS("prepass");
-extern URHO3D_API const StringHash PASS_MATERIAL("material");
-extern URHO3D_API const StringHash PASS_POSTOPAQUE("postopaque");
-extern URHO3D_API const StringHash PASS_REFRACT("refract");
-extern URHO3D_API const StringHash PASS_POSTALPHA("postalpha");
 
 extern URHO3D_API const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
 

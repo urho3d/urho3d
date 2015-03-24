@@ -314,7 +314,6 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         if (HasParameter(parameters, "ExternalWindow"))
             graphics->SetExternalWindow(GetParameter(parameters, "ExternalWindow").GetVoidPtr());
-        graphics->SetForceSM2(GetParameter(parameters, "ForceSM2", false).GetBool());
         graphics->SetWindowTitle(GetParameter(parameters, "WindowTitle", "Urho3D").GetString());
         graphics->SetWindowIcon(cache->GetResource<Image>(GetParameter(parameters, "WindowIcon", String::EMPTY).GetString()));
         graphics->SetFlushGPU(GetParameter(parameters, "FlushGPU", false).GetBool());
@@ -322,6 +321,11 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         if (HasParameter(parameters, "WindowPositionX") && HasParameter(parameters, "WindowPositionY"))
             graphics->SetWindowPosition(GetParameter(parameters, "WindowPositionX").GetInt(), GetParameter(parameters, "WindowPositionY").GetInt());
+
+        #ifdef URHO3D_OPENGL
+        if (HasParameter(parameters, "ForceGL2"))
+            graphics->SetForceGL2(GetParameter(parameters, "ForceGL2").GetBool());
+        #endif
 
         if (!graphics->SetMode(
             GetParameter(parameters, "WindowWidth", 0).GetInt(),
@@ -728,6 +732,8 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["FrameLimiter"] = false;
             else if (argument == "flushgpu")
                 ret["FlushGPU"] = true;
+            else if (argument == "gl2")
+                ret["ForceGL2"] = true;
             else if (argument == "landscape")
                 ret["Orientations"] = "LandscapeLeft LandscapeRight " + ret["Orientations"].GetString();
             else if (argument == "portrait")
@@ -753,8 +759,6 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["LowQualityShadows"] = true;
             else if (argument == "nothreads")
                 ret["WorkerThreads"] = false;
-            else if (argument == "sm2")
-                ret["ForceSM2"] = true;
             else if (argument == "v")
                 ret["VSync"] = true;
             else if (argument == "t")

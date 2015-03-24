@@ -27,6 +27,7 @@ class Graphics : public Object
     bool IsInitialized() const;
     void* GetExternalWindow() const;
     const String GetWindowTitle() const;
+    const String GetApiName() const;
     IntVector2 GetWindowPosition() const;
     int GetWidth() const;
     int GetHeight() const;
@@ -45,13 +46,11 @@ class Graphics : public Object
     unsigned GetDummyColorFormat() const;
     unsigned GetShadowMapFormat() const;
     unsigned GetHiresShadowMapFormat() const;
-    bool GetSM3Support() const;
     bool GetInstancingSupport() const;
     bool GetLightPrepassSupport() const;
     bool GetDeferredSupport() const;
     bool GetHardwareShadowSupport() const;
     bool GetReadableDepthSupport() const;
-    bool GetStreamOffsetSupport() const;
     bool GetSRGBSupport() const;
     bool GetSRGBWriteSupport() const;
     IntVector2 GetDesktopResolution() const;
@@ -73,9 +72,11 @@ class Graphics : public Object
     static unsigned GetDepthStencilFormat();
     static unsigned GetReadableDepthFormat();
     static unsigned GetFormat(const String formatName);
+    static unsigned GetMaxBones();
 
     tolua_readonly tolua_property__is_set bool initialized;
     tolua_property__get_set String windowTitle;
+    tolua_readonly tolua_property__get_set String apiName;
     tolua_property__get_set IntVector2 windowPosition;
     tolua_readonly tolua_property__get_set int width;
     tolua_readonly tolua_property__get_set int height;
@@ -94,13 +95,11 @@ class Graphics : public Object
     tolua_readonly tolua_property__get_set unsigned dummyColorFormat;
     tolua_readonly tolua_property__get_set unsigned shadowMapFormat;
     tolua_readonly tolua_property__get_set unsigned hiresShadowMapFormat;
-    tolua_readonly tolua_property__get_set bool SM3Support;
     tolua_readonly tolua_property__get_set bool instancingSupport;
     tolua_readonly tolua_property__get_set bool lightPrepassSupport;
     tolua_readonly tolua_property__get_set bool deferredSupport;
     tolua_readonly tolua_property__get_set bool hardwareShadowSupport;
     tolua_readonly tolua_property__get_set bool readableDepthSupport;
-    tolua_readonly tolua_property__get_set bool streamOffsetSupport;
     tolua_readonly tolua_property__get_set bool sRGBSupport;
     tolua_readonly tolua_property__get_set bool sRGBWriteSupport;
     tolua_readonly tolua_property__get_set IntVector2 desktopResolution;

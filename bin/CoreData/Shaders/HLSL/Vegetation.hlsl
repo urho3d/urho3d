@@ -57,7 +57,10 @@ void VS(float4 iPos : POSITION,
             out float2 oTexCoord2 : TEXCOORD7,
         #endif
     #endif
-    out float4 oPos : POSITION)
+    #if defined(D3D11) && defined(CLIPPLANE)
+        out float oClip : SV_CLIPDISTANCE0,
+    #endif
+    out float4 oPos : OUTPOSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
@@ -72,6 +75,10 @@ void VS(float4 iPos : POSITION,
     oNormal = GetWorldNormal(modelMatrix);
     oWorldPos = float4(worldPos, GetDepth(oPos));
 
+    #if defined(D3D11) && defined(CLIPPLANE)
+        oClip = dot(oPos, cClipPlane);
+    #endif
+    
     #ifdef NORMALMAP
         float3 tangent = GetWorldTangent(modelMatrix);
         float3 bitangent = cross(tangent, oNormal) * iTangent.w;

@@ -23,7 +23,10 @@ void VS(float4 iPos : POSITION,
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
     #endif
-    out float4 oPos : POSITION)
+    #if defined(D3D11) && defined(CLIPPLANE)
+        out float oClip : SV_CLIPDISTANCE0,
+    #endif
+    out float4 oPos : OUTPOSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
@@ -31,6 +34,10 @@ void VS(float4 iPos : POSITION,
     oTexCoord = GetTexCoord(iTexCoord);
     oWorldPos = float4(worldPos, GetDepth(oPos));
 
+    #if defined(D3D11) && defined(CLIPPLANE)
+        oClip = dot(oPos, cClipPlane);
+    #endif
+    
     #ifdef VERTEXCOLOR
         oColor = iColor;
     #endif
@@ -41,19 +48,22 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
     #endif
+    #if defined(D3D11) && defined(CLIPPLANE)
+        float iClip : SV_CLIPDISTANCE0,
+    #endif
     #ifdef PREPASS
-        out float4 oDepth : COLOR1,
+        out float4 oDepth : OUTCOLOR1,
     #endif
     #ifdef DEFERRED
-        out float4 oAlbedo : COLOR1,
-        out float4 oNormal : COLOR2,
-        out float4 oDepth : COLOR3,
+        out float4 oAlbedo : OUTCOLOR1,
+        out float4 oNormal : OUTCOLOR2,
+        out float4 oDepth : OUTCOLOR3,
     #endif
-    out float4 oColor : COLOR0)
+    out float4 oColor : OUTCOLOR0)
 {
     // Get material diffuse albedo
     #ifdef DIFFMAP
-        float4 diffColor = cMatDiffColor * tex2D(sDiffMap, iTexCoord);
+        float4 diffColor = cMatDiffColor * Sample2D(DiffMap, iTexCoord);
         #ifdef ALPHAMASK
             if (diffColor.a < 0.5)
                 discard;

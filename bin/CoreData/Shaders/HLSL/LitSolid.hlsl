@@ -5,13 +5,10 @@
 #include "Lighting.hlsl"
 #include "Fog.hlsl"
 
-// When rendering a shadowed point light, disable specular calculations on Shader Model 2 to avoid exceeding the instruction limit
-#if !defined(SM3) && defined(SHADOW) && defined(POINTLIGHT)
-    #undef SPECULAR
-#endif
-
 void VS(float4 iPos : POSITION,
-    float3 iNormal : NORMAL,
+    #ifndef BILLBOARD
+        float3 iNormal : NORMAL,
+    #endif
     float2 iTexCoord : TEXCOORD0,
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
@@ -57,13 +54,20 @@ void VS(float4 iPos : POSITION,
             out float2 oTexCoord2 : TEXCOORD7,
         #endif
     #endif
-    out float4 oPos : POSITION)
+    #if defined(D3D11) && defined(CLIPPLANE)
+        out float oClip : SV_CLIPDISTANCE0,
+    #endif
+    out float4 oPos : OUTPOSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
     oNormal = GetWorldNormal(modelMatrix);
     oWorldPos = float4(worldPos, GetDepth(oPos));
+    
+    #if defined(D3D11) && defined(CLIPPLANE)
+        oClip = dot(oPos, cClipPlane);
+    #endif
 
     #ifdef NORMALMAP
         float3 tangent = GetWorldTangent(modelMatrix);
@@ -144,19 +148,22 @@ void PS(
             float2 iTexCoord2 : TEXCOORD7,
         #endif
     #endif
+    #if defined(D3D11) && defined(CLIPPLANE)
+        float iClip : SV_CLIPDISTANCE0,
+    #endif
     #ifdef PREPASS
-        out float4 oDepth : COLOR1,
+        out float4 oDepth : OUTCOLOR1,
     #endif
     #ifdef DEFERRED
-        out float4 oAlbedo : COLOR1,
-        out float4 oNormal : COLOR2,
-        out float4 oDepth : COLOR3,
+        out float4 oAlbedo : OUTCOLOR1,
+        out float4 oNormal : OUTCOLOR2,
+        out float4 oDepth : OUTCOLOR3,
     #endif
-    out float4 oColor : COLOR0)
+    out float4 oColor : OUTCOLOR0)
 {
     // Get material diffuse albedo
     #ifdef DIFFMAP
-        float4 diffInput = tex2D(sDiffMap, iTexCoord.xy);
+        float4 diffInput = Sample2D(DiffMap, iTexCoord.xy);
         #ifdef ALPHAMASK
             if (diffInput.a < 0.5)
                 discard;
@@ -168,7 +175,7 @@ void PS(
 
     // Get material specular albedo
     #ifdef SPECMAP
-        float3 specColor = cMatSpecColor.rgb * tex2D(sSpecMap, iTexCoord.xy).rgb;
+        float3 specColor = cMatSpecColor.rgb * Sample2D(SpecMap, iTexCoord.xy).rgb;
     #else
         float3 specColor = cMatSpecColor.rgb;
     #endif
@@ -176,12 +183,7 @@ void PS(
     // Get normal
     #ifdef NORMALMAP
         float3x3 tbn = float3x3(iTangent.xyz, float3(iTexCoord.zw, iTangent.w), iNormal);
-        // We may be running low on instructions on Shader Model 2, so skip normalize if necessary
-        #if defined(SM3) || !defined(SHADOW) || !defined(SPECULAR)
-            float3 normal = normalize(mul(DecodeNormal(tex2D(sNormalMap, iTexCoord.xy)), tbn));
-        #else
-            float3 normal = mul(DecodeNormal(tex2D(sNormalMap, iTexCoord.xy)), tbn);
-        #endif
+        float3 normal = normalize(mul(DecodeNormal(Sample2D(NormalMap, iTexCoord.xy)), tbn));
     #else
         float3 normal = normalize(iNormal);
     #endif
@@ -206,9 +208,9 @@ void PS(
         #endif
 
         #if defined(SPOTLIGHT)
-            lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
+            lightColor = iSpotPos.w > 0.0 ? Sample2DProj(LightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
         #elif defined(CUBEMASK)
-            lightColor = texCUBE(sLightCubeMap, iCubeMaskVec).rgb * cLightColor.rgb;
+            lightColor = SampleCube(LightCubeMap, iCubeMaskVec).rgb * cLightColor.rgb;
         #else
             lightColor = cLightColor.rgb;
         #endif
@@ -241,16 +243,16 @@ void PS(
         float3 finalColor = iVertexLight * diffColor.rgb;
         #ifdef AO
             // If using AO, the vertex light ambient is black, calculate occluded ambient here
-            finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
+            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
         #endif
         #ifdef ENVCUBEMAP
-            finalColor += cMatEnvMapColor * texCUBE(sEnvCubeMap, reflect(iReflectionVec, normal)).rgb;
+            finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
         #endif
         #ifdef LIGHTMAP
-            finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * diffColor.rgb;
+            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * diffColor.rgb;
         #endif
         #ifdef EMISSIVEMAP
-            finalColor += cMatEmissiveColor * tex2D(sEmissiveMap, iTexCoord.xy).rgb;
+            finalColor += cMatEmissiveColor * Sample2D(EmissiveMap, iTexCoord.xy).rgb;
         #else
             finalColor += cMatEmissiveColor;
         #endif
@@ -264,26 +266,26 @@ void PS(
         float3 finalColor = iVertexLight * diffColor.rgb;
         #ifdef AO
             // If using AO, the vertex light ambient is black, calculate occluded ambient here
-            finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
+            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
         #endif
 
         #ifdef MATERIAL
             // Add light pre-pass accumulation result
             // Lights are accumulated at half intensity. Bring back to full intensity now
-            float4 lightInput = 2.0 * tex2Dproj(sLightBuffer, iScreenPos);
-            float3 lightSpecColor = lightInput.a * (lightInput.rgb / GetIntensity(lightInput.rgb));
+            float4 lightInput = 2.0 * Sample2DProj(LightBuffer, iScreenPos);
+            float3 lightSpecColor = lightInput.a * lightInput.rgb / max(GetIntensity(lightInput.rgb), 0.001);
 
             finalColor += lightInput.rgb * diffColor.rgb + lightSpecColor * specColor;
         #endif
 
         #ifdef ENVCUBEMAP
-            finalColor += cMatEnvMapColor * texCUBE(sEnvCubeMap, reflect(iReflectionVec, normal)).rgb;
+            finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
         #endif
         #ifdef LIGHTMAP
-            finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * diffColor.rgb;
+            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * diffColor.rgb;
         #endif
         #ifdef EMISSIVEMAP
-            finalColor += cMatEmissiveColor * tex2D(sEmissiveMap, iTexCoord.xy).rgb;
+            finalColor += cMatEmissiveColor * Sample2D(EmissiveMap, iTexCoord.xy).rgb;
         #else
             finalColor += cMatEmissiveColor;
         #endif

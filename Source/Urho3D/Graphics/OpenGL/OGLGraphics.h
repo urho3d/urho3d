@@ -34,6 +34,7 @@
 namespace Urho3D
 {
 
+class ConstantBuffer;
 class File;
 class Image;
 class IndexBuffer;
@@ -54,7 +55,6 @@ class VertexBuffer;
 typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
 
 static const unsigned NUM_SCREEN_BUFFERS = 2;
-static const unsigned NUM_TEMP_MATRICES = 8;
 
 /// CPU-side scratch buffer for vertex data updates.
 struct ScratchBuffer
@@ -102,6 +102,8 @@ public:
     void SetSRGB(bool enable);
     /// Set whether to flush the GPU command buffer to prevent multiple frames being queued and uneven frame timesteps. Not yet implemented on OpenGL.
     void SetFlushGPU(bool enable);
+    /// Set forced use of OpenGL 2 even if OpenGL 3 is available. Must be called before setting the screen mode for the first time. Default false.
+    void SetForceGL2(bool enable);
     /// Set allowed screen orientations as a space-separated list of "LandscapeLeft", "LandscapeRight", "Portrait" and "PortraitUpsideDown". Affects currently only iOS platform.
     void SetOrientations(const String& orientations);
     /// Toggle between full screen and windowed mode. Return true if successful.
@@ -166,8 +168,6 @@ public:
     void ClearParameterSources();
     /// Clear remembered transform shader parameter sources.
     void ClearTransformSources();
-    /// Clean up unused shader programs.
-    void CleanupShaderPrograms();
     /// Set texture.
     void SetTexture(unsigned index, Texture* texture);
     /// Bind texture unit 0 for update. Called by Texture.
@@ -206,8 +206,6 @@ public:
     void SetDepthTest(CompareMode mode);
     /// Set depth write on/off.
     void SetDepthWrite(bool enable);
-    /// Set antialiased drawing mode on/off. Default is on if the backbuffer is multisampled. Has no effect when backbuffer is not multisampled.
-    void SetDrawAntialiased(bool enable);
     /// Set polygon fill mode.
     void SetFillMode(FillMode mode);
     /// Set scissor test.
@@ -218,12 +216,6 @@ public:
     void SetStencilTest(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned compareMask = M_MAX_UNSIGNED, unsigned writeMask = M_MAX_UNSIGNED);
     /// Set a custom clipping plane. The plane is specified in world space, but is dependent on the view and projection matrices.
     void SetClipPlane(bool enable, const Plane& clipPlane = Plane::UP, const Matrix3x4& view = Matrix3x4::IDENTITY, const Matrix4& projection = Matrix4::IDENTITY);
-    /// Set vertex buffer stream frequency. No-op on OpenGL.
-    void SetStreamFrequency(unsigned index, unsigned frequency);
-    /// Reset stream frequencies. No-op on OpenGL.
-    void ResetStreamFrequencies();
-    /// Set force Shader Model 2 flag. No-op on OpenGL.
-    void SetForceSM2(bool enable);
     /// Begin dumping shader variation names to an XML file for precaching.
     void BeginDumpShaders(const String& fileName);
     /// End dumping shader variations names.
@@ -239,6 +231,8 @@ public:
     void* GetExternalWindow() const { return externalWindow_; }
     /// Return window title.
     const String& GetWindowTitle() const { return windowTitle_; }
+    /// Return graphics API name.
+    const String& GetApiName() const { return apiName_; }
     /// Return window position.
     IntVector2 GetWindowPosition() const;
     /// Return window width.
@@ -261,6 +255,8 @@ public:
     bool GetSRGB() const { return sRGB_; }
     /// Return whether the GPU command buffer is flushed each frame. Not yet implemented on OpenGL.
     bool GetFlushGPU() const { return false; }
+    /// Return whether OpenGL 2 use is forced.
+    bool GetForceGL2() const { return forceGL2_; }
     /// Return allowed screen orientations.
     const String& GetOrientations() const { return orientations_; }
     /// Return whether device is lost, and can not yet render.
@@ -275,8 +271,6 @@ public:
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
     /// Return 24-bit shadow map depth texture format, or 0 if not supported.
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
-    /// Return whether Shader Model 3 is supported. Has no meaning on OpenGL, so is assumed to be true.
-    bool GetSM3Support() const { return true; }
     /// Return whether hardware instancing is supported.
     bool GetInstancingSupport() const { return instancingSupport_; }
     /// Return whether light pre-pass rendering is supported.
@@ -289,8 +283,6 @@ public:
     bool GetHardwareShadowSupport() const { return true; }
     /// Return whether a readable hardware depth format is available.
     bool GetReadableDepthSupport() const { return GetReadableDepthFormat() != 0; }
-    /// Return whether stream offset is supported. Always true on OpenGL.
-    bool GetStreamOffsetSupport() const { return true; }
     /// Return whether sRGB conversion on texture sampling is supported.
     bool GetSRGBSupport() const { return sRGBSupport_; }
     /// Return whether sRGB conversion on rendertarget writing is supported.
@@ -349,8 +341,6 @@ public:
     CompareMode GetDepthTest() const { return depthTestMode_; }
     /// Return whether depth write is enabled.
     bool GetDepthWrite() const { return depthWrite_; }
-    /// Return whether antialiased drawing mode is enabled.
-    bool GetDrawAntialiased() const { return drawAntialiased_; }
     /// Return polygon fill mode.
     FillMode GetFillMode() const { return fillMode_; }
     /// Return whether stencil test is enabled.
@@ -375,12 +365,8 @@ public:
     unsigned GetStencilWriteMask() const { return stencilWriteMask_; }
     /// Return whether a custom clipping plane is in use.
     bool GetUseClipPlane() const { return useClipPlane_; }
-    /// Return stream frequency by vertex buffer index. Always returns 0 on OpenGL.
-    unsigned GetStreamFrequency(unsigned index) const;
     /// Return rendertarget width and height.
     IntVector2 GetRenderTargetDimensions() const;
-    /// Return force Shader Model 2 flag. Always false on OpenGL.
-    bool GetForceSM2() const { return false; }
 
     /// Window was resized through user interaction. Called by Input subsystem.
     void WindowResized();
@@ -396,6 +382,12 @@ public:
     void FreeScratchBuffer(void* buffer);
     /// Clean up too large scratch buffers.
     void CleanupScratchBuffers();
+    /// Clean up a render surface from all FBOs.
+    void CleanupRenderSurface(RenderSurface* surface);
+    /// Clean up shader programs when a shader variation is released or destroyed.
+    void CleanupShaderPrograms(ShaderVariation* variation);
+    /// Reserve a constant buffer.
+    ConstantBuffer* GetOrCreateConstantBuffer(unsigned bindingIndex, unsigned size);
     /// Release/clear GPU objects and optionally close the window.
     void Release(bool clearGPUObjects, bool closeWindow);
     /// Restore GPU objects and reinitialize state. Requires an open window.
@@ -404,10 +396,12 @@ public:
     void Maximize();
     /// Minimize the Window.
     void Minimize();
-    /// Clean up a render surface from all FBOs.
-    void CleanupRenderSurface(RenderSurface* surface);
     /// Mark the FBO needing an update.
     void MarkFBODirty();
+    /// Bind a VBO, avoiding redundant operation.
+    void SetVBO(unsigned object);
+    /// Bind a UBO, avoiding redundant operation.
+    void SetUBO(unsigned object);
     
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();
@@ -443,22 +437,40 @@ public:
     static unsigned GetReadableDepthFormat();
     /// Return the API-specific texture format from a textual description, for example "rgb".
     static unsigned GetFormat(const String& formatName);
-    
+    /// Return UV offset required for pixel perfect rendering.
+    static const Vector2& GetPixelUVOffset() { return pixelUVOffset; }
+    /// Return maximum number of supported bones for skinning.
+    static unsigned GetMaxBones();
+    /// Return whether is using an OpenGL 3 context.
+    static bool GetGL3Support() { return gl3Support; }
+
 private:
     /// Create the application window icon.
     void CreateWindowIcon();
     /// Check supported rendering features.
     void CheckFeatureSupport(String& extensions);
-    /// Select FBO and commit changes.
-    void CommitFramebuffer();
-    /// Check FBO completeness.
-    bool CheckFramebuffer();
-    /// Cleanup unused and unbound FBO's.
-    void CleanupFramebuffers(bool force = false);
+    /// Prepare for draw call. Update constant buffers and setup the FBO.
+    void PrepareDraw();
+    /// Clean up all framebuffers. Called when destroying the context.
+    void CleanupFramebuffers();
     /// Reset cached rendering state.
     void ResetCachedState();
     /// Initialize texture unit mappings.
     void SetTextureUnitMappings();
+    /// Create a framebuffer using either extension or core functionality.
+    unsigned CreateFramebuffer();
+    /// Delete a framebuffer using either extension or core functionality.
+    void DeleteFramebuffer(unsigned fbo);
+    /// Bind a framebuffer using either extension or core functionality.
+    void BindFramebuffer(unsigned fbo);
+    /// Bind a framebuffer color attachment using either extension or core functionality.
+    void BindColorAttachment(unsigned index, unsigned target, unsigned object);
+    /// Bind a framebuffer depth attachment using either extension or core functionality.
+    void BindDepthAttachment(unsigned object, bool isRenderBuffer);
+    /// Bind a framebuffer stencil attachment using either extension or core functionality.
+    void BindStencilAttachment(unsigned object, bool isRenderBuffer);
+    /// Check FBO completeness using either extension or core functionality.
+    bool CheckFramebuffer();
     
     /// Mutex for accessing the GPU objects vector from several threads.
     Mutex gpuObjectMutex_;
@@ -490,6 +502,8 @@ private:
     bool tripleBuffer_;
     /// sRGB conversion on write flag for the main window.
     bool sRGB_;
+    /// Force OpenGL 2 use flag.
+    bool forceGL2_;
     /// Instancing support flag.
     bool instancingSupport_;
     /// Light prepass support flag.
@@ -515,7 +529,7 @@ private:
     /// Largest scratch buffer request this frame.
     unsigned maxScratchBufferRequest_;
     /// GPU objects.
-    Vector<GPUObject*> gpuObjects_;
+    PODVector<GPUObject*> gpuObjects_;
     /// Scratch buffers.
     Vector<ScratchBuffer> scratchBuffers_;
     /// Shadow map dummy color texture format.
@@ -544,6 +558,12 @@ private:
     unsigned textureTypes_[MAX_TEXTURE_UNITS];
     /// Texture unit mappings.
     HashMap<String, TextureUnit> textureUnits_;
+    /// All constant buffers.
+    HashMap<unsigned, SharedPtr<ConstantBuffer> > constantBuffers_;
+    /// Currently bound constant buffers.
+    ConstantBuffer* currentConstantBuffers_[MAX_SHADER_PARAMETER_GROUPS * 2];
+    /// Dirty constant buffers.
+    PODVector<ConstantBuffer*> dirtyConstantBuffers_;
     /// Rendertargets in use.
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
     /// Depth-stencil surface in use.
@@ -572,6 +592,8 @@ private:
     IntRect scissorRect_;
     /// Scissor test enable flag.
     bool scissorTest_;
+    /// Current custom clip plane in post-projection space.
+    Vector4 clipPlane_;
     /// Stencil test compare mode.
     CompareMode stencilTestMode_;
     /// Stencil operation on pass.
@@ -590,22 +612,12 @@ private:
     bool stencilTest_;
     /// Custom clip plane enable flag.
     bool useClipPlane_;
-    /// Draw antialiased mode flag.
-    bool drawAntialiased_;
-    /// Releasing GPU objects flag.
-    bool releasingGPUObjects_;
     /// Last used instance data offset.
     unsigned lastInstanceOffset_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
     /// Map for additional depth textures, to emulate Direct3D9 ability to mix render texture and backbuffer rendering.
     HashMap<int, SharedPtr<Texture2D> > depthTextures_;
-    /// Remembered shader parameter sources.
-    const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS];
-    /// Temp matrices for transposing shader parameters.
-    Matrix3 tempMatrices3_[NUM_TEMP_MATRICES];
-    /// Temp matrices for transposing shader parameters.
-    Matrix4 tempMatrices4_[NUM_TEMP_MATRICES];
     /// Base directory for shaders.
     String shaderPath_;
     /// File extension for shaders.
@@ -618,6 +630,13 @@ private:
     SharedPtr<ShaderPrecache> shaderPrecache_;
     /// Allowed screen orientations.
     String orientations_;
+    /// Graphics API name.
+    String apiName_;
+
+    /// Pixel perfect UV offset.
+    static const Vector2 pixelUVOffset;
+    /// Flag for OpenGL 3 support.
+    static bool gl3Support;
 };
 
 /// Register Graphics library objects.

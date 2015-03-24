@@ -69,11 +69,11 @@ void VS()
 
         #ifdef SPOTLIGHT
             // Spotlight projection: transform from world space to projector texture coordinates
-            vSpotPos = cLightMatrices[0] * projWorldPos;
+            vSpotPos = projWorldPos * cLightMatrices[0];
         #endif
     
         #ifdef POINTLIGHT
-            vCubeMaskVec = mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz) * (worldPos - cLightPos.xyz);
+            vCubeMaskVec = (worldPos - cLightPos.xyz) * mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz);
         #endif
     #else
         // Ambient & per-vertex lighting

@@ -60,6 +60,9 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     occluder_(false),
     occludee_(true),
     updateQueued_(false),
+    zoneDirty_(false),
+    octant_(0),
+    zone_(0),
     viewMask_(DEFAULT_VIEWMASK),
     lightMask_(DEFAULT_LIGHTMASK),
     shadowMask_(DEFAULT_SHADOWMASK),
@@ -75,10 +78,7 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     lodBias_(1.0f),
     basePassFlags_(0),
     maxLights_(0),
-    octant_(0),
-    firstLight_(0),
-    zone_(0),
-    zoneDirty_(false)
+    firstLight_(0)
 {
 }
 
@@ -292,33 +292,30 @@ void Drawable::SetSortValue(float value)
     sortValue_ = value;
 }
 
-void Drawable::SetMinMaxZ(float minZ, float maxZ)
-{
-    minZ_ = minZ;
-    maxZ_ = maxZ;
-}
-
 void Drawable::MarkInView(const FrameInfo& frame)
 {
     if (frame.frameNumber_ != viewFrameNumber_)
     {
         viewFrameNumber_ = frame.frameNumber_;
-        viewCameras_.Clear();
+        viewCameras_.Resize(1);
+        viewCameras_[0] = frame.camera_;
     }
-    
-    viewCameras_.Insert(frame.camera_);
+    else
+        viewCameras_.Push(frame.camera_);
+
+    basePassFlags_ = 0;
+    firstLight_ = 0;
+    lights_.Clear();
+    vertexLights_.Clear();
 }
 
-void Drawable::MarkInView(unsigned frameNumber, Camera* camera)
+void Drawable::MarkInView(unsigned frameNumber)
 {
     if (frameNumber != viewFrameNumber_)
     {
         viewFrameNumber_ = frameNumber;
         viewCameras_.Clear();
     }
-    
-    if (camera)
-        viewCameras_.Insert(camera);
 }
 
 void Drawable::LimitLights()
@@ -337,13 +334,22 @@ void Drawable::LimitLights()
     lights_.Resize(maxLights_);
 }
 
-void Drawable::LimitVertexLights()
+void Drawable::LimitVertexLights(bool removeConvertedLights)
 {
+    if (removeConvertedLights)
+    {
+        for (unsigned i = vertexLights_.Size() - 1; i < vertexLights_.Size(); --i)
+        {
+            if (!vertexLights_[i]->GetPerVertex())
+                vertexLights_.Erase(i);
+        }
+    }
+
     if (vertexLights_.Size() <= MAX_VERTEX_LIGHTS)
         return;
 
     const BoundingBox& box = GetWorldBoundingBox();
-    for (unsigned i = vertexLights_.Size() - 1; i < vertexLights_.Size(); --i)
+    for (unsigned i = 0; i < vertexLights_.Size(); ++i)
         vertexLights_[i]->SetIntensitySortValue(box);
 
     Sort(vertexLights_.Begin(), vertexLights_.End(), CompareDrawables);

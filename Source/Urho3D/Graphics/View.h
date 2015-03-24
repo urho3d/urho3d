@@ -65,7 +65,7 @@ struct LightQueryResult
     unsigned shadowCasterBegin_[MAX_LIGHT_SPLITS];
     /// Shadow caster end indices.
     unsigned shadowCasterEnd_[MAX_LIGHT_SPLITS];
-    /// Combined bounding box of shadow casters in light view or projection space.
+    /// Combined bounding box of shadow casters in light projection space. Only used for focused spot lights.
     BoundingBox shadowCasterBox_[MAX_LIGHT_SPLITS];
     /// Shadow camera near splits (directional lights only.)
     float shadowNearSplits_[MAX_LIGHT_SPLITS];
@@ -78,8 +78,8 @@ struct LightQueryResult
 /// Scene render pass info.
 struct ScenePassInfo
 {
-    /// Pass name hash.
-    StringHash pass_;
+    /// Pass index.
+    unsigned passIndex_;
     /// Allow instancing flag.
     bool allowInstancing_;
     /// Mark to stencil flag.
@@ -164,6 +164,12 @@ private:
     void GetDrawables();
     /// Construct batches from the drawable objects.
     void GetBatches();
+    /// Get lit geometries and shadowcasters for visible lights.
+    void ProcessLights();
+    /// Get batches from lit geometries and shadowcasters.
+    void GetLightBatches();
+    /// Get unlit batches.
+    void GetBaseBatches();
     /// Update geometries and sort batches.
     void UpdateGeometries();
     /// Get pixel lit batches for a certain light and drawable.
@@ -341,6 +347,7 @@ private:
     PODVector<Drawable*> occluders_;
     /// Lights.
     PODVector<Light*> lights_;
+    
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;
     /// Rendertargets defined by the renderpath.
@@ -353,20 +360,20 @@ private:
     Vector<LightBatchQueue> lightQueues_;
     /// Per-vertex light queues.
     HashMap<unsigned long long, LightBatchQueue> vertexLightQueues_;
-    /// Batch queues.
-    HashMap<StringHash, BatchQueue> batchQueues_;
-    /// Hash of the GBuffer pass, or null if none.
-    StringHash gBufferPassName_;
-    /// Hash of the opaque forward base pass.
-    StringHash basePassName_;
-    /// Hash of the alpha pass.
-    StringHash alphaPassName_;
-    /// Hash of the forward light pass.
-    StringHash lightPassName_;
-    /// Hash of the litbase pass.
-    StringHash litBasePassName_;
-    /// Hash of the litalpha pass.
-    StringHash litAlphaPassName_;
+    /// Batch queues by pass index.
+    HashMap<unsigned, BatchQueue> batchQueues_;
+    /// Index of the GBuffer pass.
+    unsigned gBufferPassIndex_;
+    /// Index of the opaque forward base pass.
+    unsigned basePassIndex_;
+    /// Index of the alpha pass.
+    unsigned alphaPassIndex_;
+    /// Index of the forward light pass.
+    unsigned lightPassIndex_;
+    /// Index of the litbase pass.
+    unsigned litBasePassIndex_;
+    /// Index of the litalpha pass.
+    unsigned litAlphaPassIndex_;
     /// Pointer to the light volume command if any.
     const RenderPathCommand* lightVolumeCommand_;
 };

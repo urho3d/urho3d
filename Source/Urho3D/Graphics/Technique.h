@@ -23,7 +23,6 @@
 #pragma once
 
 #include "../Graphics/GraphicsDefs.h"
-#include "../Container/HashTable.h"
 #include "../Resource/Resource.h"
 
 namespace Urho3D
@@ -44,7 +43,7 @@ class URHO3D_API Pass : public RefCounted
 {
 public:
     /// Construct.
-    Pass(StringHash type);
+    Pass(const String& passName);
     /// Destruct.
     ~Pass();
     
@@ -58,8 +57,6 @@ public:
     void SetDepthWrite(bool enable);
     /// Set alpha masking hint. Completely opaque draw calls will be performed before alpha masked.
     void SetAlphaMask(bool enable);
-    /// Set whether requires %Shader %Model 3.
-    void SetIsSM3(bool enable);
     /// Set whether requires desktop level hardware.
     void SetIsDesktop(bool enable);
     /// Set vertex shader name.
@@ -75,8 +72,10 @@ public:
     /// Mark shaders loaded this frame.
     void MarkShadersLoaded(unsigned frameNumber);
     
-    /// Return pass type.
-    const StringHash& GetType() const { return type_; }
+    /// Return pass name.
+    const String& GetName() const { return name_; }
+    /// Return pass index. This is used for optimal render-time pass queries that avoid map lookups.
+    unsigned GetIndex() const { return index_; }
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
     /// Return depth compare mode.
@@ -89,8 +88,6 @@ public:
     bool GetDepthWrite() const { return depthWrite_; }
     /// Return alpha masking hint.
     bool GetAlphaMask() const { return alphaMask_; }
-    /// Return whether requires %Shader %Model 3.
-    bool IsSM3() const { return isSM3_; }
     /// Return whether requires desktop level hardware.
     bool IsDesktop() const { return isDesktop_; }
     /// Return vertex shader name.
@@ -107,8 +104,8 @@ public:
     Vector<SharedPtr<ShaderVariation> >& GetPixelShaders() { return pixelShaders_; }
     
 private:
-    /// Pass type.
-    StringHash type_;
+    /// Pass index.
+    unsigned index_;
     /// Blend mode.
     BlendMode blendMode_;
     /// Depth compare mode.
@@ -121,8 +118,6 @@ private:
     bool depthWrite_;
     /// Alpha masking hint.
     bool alphaMask_;
-    /// Require %Shader %Model 3 flag.
-    bool isSM3_;
     /// Require desktop level hardware flag.
     bool isDesktop_;
     /// Vertex shader name.
@@ -137,6 +132,8 @@ private:
     Vector<SharedPtr<ShaderVariation> > vertexShaders_;
     /// Pixel shaders.
     Vector<SharedPtr<ShaderVariation> > pixelShaders_;
+    /// Pass name.
+    String name_;
 };
 
 /// %Material technique. Consists of several passes.
@@ -157,61 +154,75 @@ public:
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
     
-    /// Set whether requires %Shader %Model 3.
-    void SetIsSM3(bool enable);
     /// Set whether requires desktop level hardware.
     void SetIsDesktop(bool enable);
     /// Create a new pass.
-    Pass* CreatePass(StringHash type);
+    Pass* CreatePass(const String& passName);
     /// Remove a pass.
-    void RemovePass(StringHash type);
+    void RemovePass(const String& passName);
     /// Reset shader pointers in all passes.
     void ReleaseShaders();
     
-    /// Return whether requires %Shader %Model 3.
-    bool IsSM3() const { return isSM3_; }
     /// Return whether requires desktop level hardware.
     bool IsDesktop() const { return isDesktop_; }
     /// Return whether technique is supported by the current hardware.
-    bool IsSupported() const { return (!isSM3_ || sm3Support_) && (!isDesktop_ || desktopSupport_); }
+    bool IsSupported() const { return !isDesktop_ || desktopSupport_; }
     /// Return whether has a pass.
-    bool HasPass(StringHash type) const { return  passes_.Find(type.Value()) != 0; }
-    
+    bool HasPass(unsigned passIndex) const { return passIndex < passes_.Size() && passes_[passIndex].Get() != 0; }
+    /// Return whether has a pass by name. This overload should not be called in time-critical rendering loops; use a pre-acquired pass index instead.
+    bool HasPass(const String& passName) const;
     /// Return a pass, or null if not found.
-    Pass* GetPass(StringHash type) const
-    {
-        SharedPtr<Pass>* passPtr = passes_.Find(type.Value());
-        return passPtr ? passPtr->Get() : 0;
-    }
+    Pass* GetPass(unsigned passIndex) const { return passIndex < passes_.Size() ? passes_[passIndex].Get() : 0; }
+    /// Return a pass by name, or null if not found. This overload should not be called in time-critical rendering loops; use a pre-acquired pass index instead.
+    Pass* GetPass(const String& passName) const;
     
     /// Return a pass that is supported for rendering, or null if not found.
-    Pass* GetSupportedPass(StringHash type) const
+    Pass* GetSupportedPass(unsigned passIndex) const
     {
-        SharedPtr<Pass>* passPtr = passes_.Find(type.Value());
-        Pass* pass = passPtr ? passPtr->Get() : 0;
-        return pass && (!pass->IsSM3() || sm3Support_) && (!pass->IsDesktop() || desktopSupport_) ? pass : 0;
+        Pass* pass = passIndex < passes_.Size() ? passes_[passIndex].Get() : 0;
+        return pass && (!pass->IsDesktop() || desktopSupport_) ? pass : 0;
     }
+
+    /// Return a supported pass by name. This overload should not be called in time-critical rendering loops; use a pre-acquired pass index instead.
+    Pass* GetSupportedPass(const String& passName) const;
     
     /// Return number of passes.
-    unsigned GetNumPasses() const { return numPasses_; }
-    /// Return all the pass types in the hash table. The returned collection is not guaranteed to be in the same order as the hash table insertion order.
-    Vector<StringHash> GetPassTypes() const;
-    /// Return all the passes in the hash table. The returned collection is not guaranteed to be in the same order as the hash table insertion order.
+    unsigned GetNumPasses() const;
+    /// Return all pass names.
+    Vector<String> GetPassNames() const;
+    /// Return all passes.
     PODVector<Pass*> GetPasses() const;
 
+    /// Return a pass type index by name. Allocate new if not used yet.
+    static unsigned GetPassIndex(const String& passName);
+
+    /// Index for base pass. Initialized once GetPassIndex() has been called for the first time.
+    static unsigned basePassIndex;
+    /// Index for alpha pass. Initialized once GetPassIndex() has been called for the first time.
+    static unsigned alphaPassIndex;
+    /// Index for prepass material pass. Initialized once GetPassIndex() has been called for the first time.
+    static unsigned materialPassIndex;
+    /// Index for deferred G-buffer pass. Initialized once GetPassIndex() has been called for the first time.
+    static unsigned deferredPassIndex;
+    /// Index for per-pixel light pass. Initialized once GetPassIndex() has been called for the first time.
+    static unsigned lightPassIndex;
+    /// Index for lit base pass. Initialized once GetPassIndex() has been called for the first time.
+    static unsigned litBasePassIndex;
+    /// Index for lit alpha pass. Initialized once GetPassIndex() has been called for the first time.
+    static unsigned litAlphaPassIndex;
+    /// Index for shadow pass. Initialized once GetPassIndex() has been called for the first time.
+    static unsigned shadowPassIndex;
+
 private:
-    /// Require %Shader %Model 3 flag.
-    bool isSM3_;
-    /// Cached %Shader %Model 3 support flag.
-    bool sm3Support_;
     /// Require desktop GPU flag.
     bool isDesktop_;
     /// Cached desktop GPU support flag.
     bool desktopSupport_;
     /// Passes.
-    HashTable<SharedPtr<Pass>, 16> passes_;
-    /// Number of passes.
-    unsigned numPasses_;
+    Vector<SharedPtr<Pass> > passes_;
+
+    /// Pass index assignments.
+    static HashMap<String, unsigned> passIndices;
 };
 
 }
