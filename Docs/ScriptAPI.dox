@@ -1990,7 +1990,6 @@ namespace Urho3D
 - %Is %Resizable : bool
 - %Fixed %Width %Resizing : bool
 - %Fixed %Height %Resizing : bool
-- %Is %Modal : bool
 - %Modal %Shade %Color : Color
 - %Modal %Frame %Color : Color
 - %Modal %Frame %Size : IntVector2
@@ -2041,7 +2040,6 @@ namespace Urho3D
 - %Is %Resizable : bool
 - %Fixed %Width %Resizing : bool
 - %Fixed %Height %Resizing : bool
-- %Is %Modal : bool
 - %Modal %Shade %Color : Color
 - %Modal %Frame %Color : Color
 - %Modal %Frame %Size : IntVector2
