@@ -27,6 +27,7 @@ uniform samplerCube sLightCubeMap;
 #ifdef GL3
 #define texture2D texture
 #define texture2DProj textureProj
+#define texture3D texture
 #define textureCube texture
 #endif
 
