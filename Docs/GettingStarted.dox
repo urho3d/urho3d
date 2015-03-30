@@ -93,7 +93,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_TESTING       |0|Enable testing support|
 |URHO3D_TEST_TIMEOUT  |*|Number of seconds to test run the executables (when testing support is enabled only), default to 10 on Emscripten platform and 5 on other platforms|
 |URHO3D_OPENGL        |0|Use OpenGL instead of Direct3D (Windows platform only)|
-|URHO3D_D3D11         |0|Use Direct3D11 instead of Direct3D9 (Windows platform only). Overrides URHO3D_OPENGL option.|
+|URHO3D_D3D11         |0|Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option|
 |URHO3D_STATIC_RUNTIME|0|Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
 |URHO3D_WIN32_CONSOLE |0|Use console main() as entry point when setting up Windows executable targets (Windows platform only)|
 |URHO3D_MACOSX_BUNDLE |0|Use MACOSX_BUNDLE when setting up Mac OS X executable targets (Xcode native build only)|

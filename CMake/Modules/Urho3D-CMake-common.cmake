@@ -129,17 +129,16 @@ endif ()
 if (MSVC)
     # On MSVC compiler, default to false (i.e. prefers Direct3D)
     # OpenGL can be manually enabled with -DURHO3D_OPENGL=1, but Windows graphics card drivers are usually better optimized for Direct3D
-    option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)")
-elseif (WIN32)
+    set (DEFAULT_OPENGL FALSE)
+else ()
     # On non-MSVC compiler on Windows platform, default to true to enable use of OpenGL instead of Direct3D
     # Direct3D can be manually enabled with -DURHO3D_OPENGL=0, but it is likely to fail unless the MinGW-w64 distribution is used due to dependency to Direct3D headers and libs
-    option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)" TRUE)
+    set (DEFAULT_OPENGL TRUE)
 endif ()
-if (WIN32)
-    # On Windows platform Direct3D11 can be optionally chosen
-    # Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
-    option (URHO3D_D3D11 "Use Direct3D11 instead of Direct3D9 (Windows platform only)")
-endif ()
+cmake_dependent_option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)" ${DEFAULT_OPENGL} "WIN32" TRUE)      # Force the variable to TRUE when not WIN32
+# On Windows platform Direct3D11 can be optionally chosen
+# Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
+cmake_dependent_option (URHO3D_D3D11 "Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option" FALSE "WIN32" FALSE)
 if (CMAKE_HOST_WIN32 AND NOT DEFINED URHO3D_MKLINK)
     # Test whether the host system is capable of setting up symbolic link
     execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
@@ -273,17 +272,13 @@ if (URHO3D_LOGGING)
     add_definitions (-DURHO3D_LOGGING)
 endif ()
 
-# If not on Windows platform, enable Unix mode for kNet library and OpenGL graphic back-end
+# If not on Windows platform, enable Unix mode for kNet library
 if (NOT WIN32)
     add_definitions (-DKNET_UNIX)
-    set (URHO3D_OPENGL 1)
 endif ()
 
 # Add definition for Direct3D11
 if (URHO3D_D3D11)
-    if (NOT WIN32)
-        message(FATAL_ERROR "Direct3D 11 can only be used on Windows platform")
-    endif ()
     set (URHO3D_OPENGL 0)
     add_definitions (-DURHO3D_D3D11)
 endif ()
