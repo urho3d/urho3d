@@ -121,7 +121,9 @@ if (URHO3D_TESTING)
     set (URHO3D_TEST_TIMEOUT ${DEFAULT_TIMEOUT} CACHE STRING "Number of seconds to test run the executables (when testing support is enabled only), default to 10 on Emscripten platform and 5 on other platforms")
 else ()
     unset (URHO3D_TEST_TIMEOUT CACHE)
-    unset (EMSCRIPTEN_EMRUN_BROWSER CACHE)
+    if (EMSCRIPTEN_EMRUN_BROWSER)   # Suppress unused variable warning at the same time
+        unset (EMSCRIPTEN_EMRUN_BROWSER CACHE)
+    endif ()
 endif ()
 # The URHO3D_OPENGL option is not defined on non-Windows platforms as they should always use OpenGL
 if (MSVC)
@@ -460,6 +462,8 @@ else ()
             # Emscripten-specific setup
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
+            set (CMAKE_C_FLAGS_RELEASE "-Oz")
+            set (CMAKE_CXX_FLAGS_RELEASE "-Oz")
             if (DEFINED ENV{CI})
                 # Our CI server is slow, so do not optimize and discard all debug info when test building in Debug configuration
                 set (CMAKE_C_FLAGS_DEBUG "-g0")
@@ -836,10 +840,10 @@ macro (setup_emscripten_linker_flags LINKER_FLAGS)
     else ()
         set (MEMORY_LINKER_FLAGS "-s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY}")
     endif ()
-    set (${LINKER_FLAGS} "${${LINKER_FLAGS}} ${MEMORY_LINKER_FLAGS} -s USE_SDL=2 -s NO_EXIT_RUNTIME=1")    # Urho3D uses SDL2 so set it here instead of in the toolchain which potentially could be reused in other projects not using SDL2
-    set (${LINKER_FLAGS}_RELEASE "-s AGGRESSIVE_VARIABLE_ELIMINATION=1")     # Remove variables to make the -O3 regalloc easier
+    set (${LINKER_FLAGS} "${${LINKER_FLAGS}} ${MEMORY_LINKER_FLAGS} -s USE_SDL=2 -s NO_EXIT_RUNTIME=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1")
+    set (${LINKER_FLAGS}_RELEASE "${${LINKER_FLAGS}_RELEASE} -O3 -s AGGRESSIVE_VARIABLE_ELIMINATION=1")     # Remove variables to make the -O3 regalloc easier
     if (NOT DEFINED ENV{CI})
-        set (${LINKER_FLAGS}_DEBUG -g4)     # Preserve LLVM debug information, show line number debug comments, and generate source maps
+        set (${LINKER_FLAGS}_DEBUG "${${LINKER_FLAGS}_DEBUG} -g4")     # Preserve LLVM debug information, show line number debug comments, and generate source maps
     endif ()
     if (URHO3D_TESTING)
         set (${LINKER_FLAGS} "${${LINKER_FLAGS}} --emrun")  # Inject code into the generated Module object to enable capture of stdout, stderr and exit()
@@ -849,6 +853,8 @@ macro (setup_emscripten_linker_flags LINKER_FLAGS)
         get_property (EMCC_OPTION SOURCE ${FILE} PROPERTY EMCC_OPTION)
         if (EMCC_OPTION)
             list (APPEND LINK_DEPENDS ${FILE})
+            unset (EMCC_FILE_ALIAS)
+            unset (EMCC_EXCLUDE_FILE)
             if (EMCC_OPTION STREQUAL embed-file OR EMCC_OPTION STREQUAL preload-file)
                 get_property (EMCC_FILE_ALIAS SOURCE ${FILE} PROPERTY EMCC_FILE_ALIAS)
                 get_property (EMCC_EXCLUDE_FILE SOURCE ${FILE} PROPERTY EMCC_EXCLUDE_FILE)
