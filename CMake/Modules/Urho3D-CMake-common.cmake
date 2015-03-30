@@ -1109,8 +1109,10 @@ endmacro ()
 
 # Macro for adjusting target output name by dropping _suffix from the target name
 macro (adjust_target_name)
-    string (REGEX REPLACE _.*$ "" OUTPUT_NAME ${TARGET_NAME})
-    set_target_properties (${TARGET_NAME} PROPERTIES OUTPUT_NAME ${OUTPUT_NAME})
+    if (TARGET_NAME MATCHES _.*$)
+        string (REGEX REPLACE _.*$ "" OUTPUT_NAME ${TARGET_NAME})
+        set_target_properties (${TARGET_NAME} PROPERTIES OUTPUT_NAME ${OUTPUT_NAME})
+    endif ()
 endmacro ()
 
 # Macro for setting up a test case

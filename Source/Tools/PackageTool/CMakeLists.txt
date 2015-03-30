@@ -105,7 +105,10 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
 endif ()
 
 # Define target name
-set (TARGET_NAME PackageTool)
+if (TARGET PackageTool)     # The target name is already taken by host-tool external project, so use a postfix for the target-tool
+    set (POSTFIX _target)
+endif ()
+set (TARGET_NAME PackageTool${POSTFIX})
 
 # Define source files
 define_source_files (EXTRA_CPP_FILES ${MINI_URHO_CPP_FILES})
@@ -118,3 +121,4 @@ if (APPLE)
     setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
 endif ()
 setup_executable ()
+adjust_target_name ()   # Remove postfix from the executable/binary name
