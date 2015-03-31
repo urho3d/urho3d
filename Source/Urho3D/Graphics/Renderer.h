@@ -356,8 +356,6 @@ private:
     void ResetBuffers();
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
-    /// Handle graphics features (re)check event. Event only sent by D3D9Graphics class.
-    void HandleGraphicsFeatures(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     

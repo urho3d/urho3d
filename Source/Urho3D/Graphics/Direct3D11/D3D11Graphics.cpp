@@ -2385,8 +2385,6 @@ void Graphics::CheckFeatureSupport()
     dummyColorFormat_ = DXGI_FORMAT_UNKNOWN;
     sRGBSupport_ = true;
     sRGBWriteSupport_ = true;
-    
-    SendEvent(E_GRAPHICSFEATURES);
 }
 
 void Graphics::ResetCachedState()

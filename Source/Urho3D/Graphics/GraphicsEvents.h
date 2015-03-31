@@ -44,11 +44,6 @@ EVENT(E_WINDOWPOS, WindowPos)
     PARAM(P_Y, Y);                          // int
 }
 
-/// Graphics features checked.
-EVENT(E_GRAPHICSFEATURES, GraphicsFeatures)
-{
-}
-
 /// Request for queuing autoupdated rendersurfaces.
 EVENT(E_RENDERSURFACEUPDATE, RenderSurfaceUpdate)
 {

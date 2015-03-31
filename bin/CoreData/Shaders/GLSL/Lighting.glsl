@@ -136,21 +136,16 @@ float GetShadow(vec4 shadowPos)
                 vec2 offsets = cShadowMapInvSize;
             #endif
             #ifndef GL3
-                vec4 inLight = vec4(
-                    shadow2DProj(sShadowMap, shadowPos).r,
-                    shadow2DProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)).r,
-                    shadow2DProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r,
-                    shadow2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r
-                );
+                return cShadowIntensity.y + cShadowIntensity.x * (shadow2DProj(sShadowMap, shadowPos).r +
+                    shadow2DProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)).r +
+                    shadow2DProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r +
+                    shadow2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r);
             #else
-                vec4 inLight = vec4(
-                    textureProj(sShadowMap, shadowPos),
-                    textureProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)),
-                    textureProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)),
-                    textureProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw))
-                );
+                return cShadowIntensity.y + cShadowIntensity.x * (textureProj(sShadowMap, shadowPos) +
+                    textureProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)) +
+                    textureProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)) +
+                    textureProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)));
             #endif
-            return cShadowIntensity.y + dot(inLight, vec4(cShadowIntensity.x));
         #else
             // Take one sample
             #ifndef GL3

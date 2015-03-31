@@ -160,7 +160,9 @@ static unsigned glesDepthStencilFormat = GL_DEPTH_COMPONENT16;
 static unsigned glesReadableDepthFormat = GL_DEPTH_COMPONENT;
 #endif
 
-bool CheckExtension(String& extensions, const String& name)
+static String extensions;
+
+bool CheckExtension(const String& name)
 {
     if (extensions.Empty())
         extensions = (const char*)glGetString(GL_EXTENSIONS);
@@ -522,7 +524,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     Clear(CLEAR_COLOR);
     SDL_GL_SwapWindow(impl_->window_);
     
-    CheckFeatureSupport(extensions);
+    CheckFeatureSupport();
     
     #ifdef URHO3D_LOGGING
     String msg;
@@ -2417,6 +2419,9 @@ void Graphics::Restore()
             return;
         }
 
+        // Clear cached extensions string from the previous context
+        extensions.Clear();
+
         // Initialize OpenGL extensions library (desktop only)
         #ifndef GL_ES_VERSION_2_0
         GLenum err = glewInit();
@@ -2435,13 +2440,6 @@ void Graphics::Restore()
             unsigned vertexArrayObject;
             glGenVertexArrays(1, &vertexArrayObject);
             glBindVertexArray(vertexArrayObject);
-
-            // Work around GLEW failure to check extensions properly from a GL3 context
-            instancingSupport_ = true;
-            dxtTextureSupport_ = true;
-            anisotropySupport_ = true;
-            sRGBSupport_ = true;
-            sRGBWriteSupport_ = true;
         }
         else if (GLEW_VERSION_2_0)
         {
@@ -2453,37 +2451,12 @@ void Graphics::Restore()
 
             gl3Support = false;
             apiName_ = "GL2";
-
-            instancingSupport_ = GLEW_ARB_instanced_arrays != 0;
-            dxtTextureSupport_ = GLEW_EXT_texture_compression_s3tc != 0;
-            anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
-            sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
-            sRGBWriteSupport_ = GLEW_EXT_framebuffer_sRGB != 0;
         }
         else
         {
             LOGERROR("OpenGL 2.0 is required");
             return;
         }
-
-        // Set up instancing divisors if supported
-        if (gl3Support)
-        {
-            glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX1, 1);
-            glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX2, 1);
-            glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX3, 1);
-        }
-        else if (instancingSupport_)
-        {
-            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX1, 1);
-            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX2, 1);
-            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX3, 1);
-        }
-
-        #else
-        dxtTextureSupport_ = CheckExtension(extensions, "EXT_texture_compression_dxt1");
-        etcTextureSupport_ = CheckExtension(extensions, "OES_compressed_ETC1_RGB8_texture");
-        pvrtcTextureSupport_ = CheckExtension(extensions, "IMG_texture_compression_pvrtc");
         #endif
 
         // Set up texture data read/write alignment. It is important that this is done before uploading any texture data
@@ -2740,7 +2713,7 @@ void Graphics::CreateWindowIcon()
     }
 }
 
-void Graphics::CheckFeatureSupport(String& extensions)
+void Graphics::CheckFeatureSupport()
 {
     // Check supported features: light pre-pass, deferred rendering and hardware depth texture
     lightPrepassSupport_ = false;
@@ -2749,10 +2722,39 @@ void Graphics::CheckFeatureSupport(String& extensions)
     int numSupportedRTs = 1;
     
     #ifndef GL_ES_VERSION_2_0
-    if (!gl3Support)
-        glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
-    else
+    if (gl3Support)
+    {
+        // Work around GLEW failure to check extensions properly from a GL3 context
+        instancingSupport_ = true;
+        dxtTextureSupport_ = true;
+        anisotropySupport_ = true;
+        sRGBSupport_ = true;
+        sRGBWriteSupport_ = true;
+
+        glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX1, 1);
+        glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX2, 1);
+        glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX3, 1);
+
         glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &numSupportedRTs);
+    }
+    else
+    {
+        instancingSupport_ = GLEW_ARB_instanced_arrays != 0;
+        dxtTextureSupport_ = GLEW_EXT_texture_compression_s3tc != 0;
+        anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
+        sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
+        sRGBWriteSupport_ = GLEW_EXT_framebuffer_sRGB != 0;
+
+        // Set up instancing divisors if supported
+        if (instancingSupport_)
+        {
+            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX1, 1);
+            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX2, 1);
+            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX3, 1);
+        }
+
+        glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
+    }
 
     // Must support 2 rendertargets for light pre-pass, and 4 for deferred
     if (numSupportedRTs >= 2)
@@ -2770,15 +2772,20 @@ void Graphics::CheckFeatureSupport(String& extensions)
     #endif
     
     #else
+    // Check for supported compressed texture formats
+    dxtTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
+    etcTextureSupport_ = CheckExtension("OES_compressed_ETC1_RGB8_texture");
+    pvrtcTextureSupport_ = CheckExtension("IMG_texture_compression_pvrtc");
+
     // Check for best supported depth renderbuffer format for GLES2
-    if (CheckExtension(extensions, "GL_OES_depth24"))
+    if (CheckExtension("GL_OES_depth24"))
         glesDepthStencilFormat = GL_DEPTH_COMPONENT24_OES;
-    if (CheckExtension(extensions, "GL_OES_packed_depth_stencil"))
+    if (CheckExtension("GL_OES_packed_depth_stencil"))
         glesDepthStencilFormat = GL_DEPTH24_STENCIL8_OES;
     #ifdef EMSCRIPTEN
-    if (!CheckExtension(extensions, "WEBGL_depth_texture"))
+    if (!CheckExtension("WEBGL_depth_texture"))
     #else
-    if (!CheckExtension(extensions, "GL_OES_depth_texture"))
+    if (!CheckExtension("GL_OES_depth_texture"))
     #endif
     {
         shadowMapFormat_ = 0;
