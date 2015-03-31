@@ -88,11 +88,11 @@ task :cmake do
   system "./#{script}#{ENV['OS'] ? '.bat' : '.sh'} \"#{build_tree}\" #{build_options}" or abort
 end
 
-# Usage: rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [numjobs=8] [clean_first] [unfilter]
+# Usage: rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [numjobs=n] [clean_first] [unfilter]
 # e.g.: rake make android; or rake make android doc; or rake make ios config=Debug sdk=iphonesimulator build_tree=~/ios-Build
 desc 'Build the generated project in its corresponding build tree'
 task :make do
-  numjobs = '-j' + (ENV['numjobs'] || '8')
+  numjobs = ENV['numjobs'] || ''
   platform = 'native'
   cmake_build_options = ''
   build_options = ''
@@ -118,11 +118,32 @@ task :make do
   }
   build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
   if !Dir.glob("#{build_tree}/*.xcodeproj").empty?
+    # xcodebuild
+    if !numjobs.empty?
+      build_options = "-jobs #{numjobs}#{build_options}"
+    end
     filter = !unfilter && system('xcpretty -v >/dev/null 2>&1') ? '|xcpretty -c && exit ${PIPESTATUS[0]}' : ''
   elsif !Dir.glob("#{build_tree}/*.sln").empty?
-    filter = ''
+    # msbuild
+    numjobs = ":#{numjobs}" unless numjobs.empty?
+    build_options = "/maxcpucount#{numjobs}#{build_options}"
+    filter = unfilter ? '' : '/nologo /verbosity:minimal'
   else
-    build_options = "#{numjobs}#{build_options}"
+    # make
+    if numjobs.empty?
+      case RUBY_PLATFORM
+      when /linux/
+        numjobs = `grep -c processor /proc/cpuinfo`.chomp
+      when /darwin/
+        numjobs = `sysctl -n hw.logicalcpu`.chomp
+      when /win32|mingw|mswin/
+        require 'win32ole'
+        WIN32OLE.connect("winmgmts://").ExecQuery("select NumberOfLogicalProcessors from Win32_ComputerSystem").each { |out| numjobs = out.NumberOfLogicalProcessors }
+      else
+        numjobs = '1'
+      end
+    end
+    build_options = "-j#{numjobs}#{build_options}"
     filter = ''
   end
   system "cd \"#{build_tree}\" && cmake --build . #{cmake_build_options} -- #{build_options} #{filter}" or abort
@@ -169,7 +190,7 @@ task :ci do
   $build_options = "-DWIN32=#{ENV['WINDOWS']}" if ENV['WINDOWS']
   $build_options = "#{$build_options} -DANDROID_ABI=#{ENV['ABI']}" if ENV['ABI']
   $build_options = "#{$build_options} -DANDROID_NATIVE_API_LEVEL=#{ENV['API']}" if ENV['API']
-  ['URHO3D_64BIT', 'URHO3D_OPENGL', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
+  ['URHO3D_64BIT', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
     $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var]
   }
   if ENV['XCODE']
