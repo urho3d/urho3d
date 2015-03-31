@@ -58,8 +58,6 @@ namespace Urho3D
 - %X : int
 - %Y : int
 
-### GraphicsFeatures
-
 ### RenderSurfaceUpdate
 
 ### BeginRendering
