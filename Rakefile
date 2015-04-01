@@ -117,6 +117,7 @@ task :make do
     end
   }
   build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
+  use_ccache = ''
   if !Dir.glob("#{build_tree}/*.xcodeproj").empty?
     # xcodebuild
     if !numjobs.empty?
@@ -130,6 +131,7 @@ task :make do
     filter = unfilter ? '' : '/nologo /verbosity:minimal'
   else
     # make
+    use_ccache = 'CCACHE_SLOPPINESS=pch_defines,time_macros CCACHE_COMPRESS=1' if ENV['USE_CCACHE']
     if numjobs.empty?
       case RUBY_PLATFORM
       when /linux/
@@ -146,7 +148,7 @@ task :make do
     build_options = "-j#{numjobs}#{build_options}"
     filter = ''
   end
-  system "cd \"#{build_tree}\" && cmake --build . #{cmake_build_options} -- #{build_options} #{filter}" or abort
+  system "cd \"#{build_tree}\" && #{use_ccache} cmake --build . #{cmake_build_options} -- #{build_options} #{filter}" or abort
 end
 
 # Usage: rake android [parameter='--es pickedLibrary Urho3DPlayer'] [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='sleep 30'] [api=19] [abi=armeabi-v7a] [avd=test_#{api}_#{abi}] [retries=10] [retry_interval=10]
