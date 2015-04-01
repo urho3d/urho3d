@@ -217,6 +217,7 @@ Input::Input(Context* context) :
     minimized_(false),
     focusedThisFrame_(false),
     suppressNextMouseMove_(false),
+    inResize_(false),
     initialized_(false)
 {
     for (int i = 0; i < TOUCHID_MAX; i++)
@@ -409,7 +410,9 @@ void Input::Update()
     {
         IntVector2 mousePosition = GetMousePosition();
         IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-        if (mousePosition != center)
+        if (graphics_->GetExternalWindow())
+            lastMousePosition_ = mousePosition;
+        else if (mousePosition != center)
         {
             SetMousePosition(center);
             lastMousePosition_ = center;
@@ -1377,10 +1380,6 @@ void Input::SetMouseButton(int button, bool newState)
     }
 #endif
 
-    // If we do not have focus yet, do not react to the mouse button down
-    if (!graphics_->GetExternalWindow() && newState && !inputFocus_)
-        return;
-
     if (newState)
     {
         if (!(mouseButtonDown_ & button))
@@ -1407,10 +1406,6 @@ void Input::SetMouseButton(int button, bool newState)
 
 void Input::SetKey(int key, int scancode, unsigned raw, bool newState)
 {
-    // If we do not have focus yet, do not react to the key down
-    if (!graphics_->GetExternalWindow() && newState && !inputFocus_)
-        return;
-
     bool repeat = false;
 
     if (newState)
@@ -1453,10 +1448,6 @@ void Input::SetKey(int key, int scancode, unsigned raw, bool newState)
 
 void Input::SetMouseWheel(int delta)
 {
-    // If we do not have focus yet, do not react to the wheel
-    if (!graphics_->GetExternalWindow() && !inputFocus_)
-        return;
-
     if (delta)
     {
         mouseMoveWheel_ += delta;
@@ -1937,7 +1928,9 @@ void Input::HandleSDLEvent(void* sdlEvent)
             #endif
 
             case SDL_WINDOWEVENT_RESIZED:
+                inResize_ = true;
                 graphics_->WindowResized();
+                inResize_ = false;
                 break;
             case SDL_WINDOWEVENT_MOVED:
                 graphics_->WindowMoved();
@@ -1977,12 +1970,15 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     SDL_Window* window = graphics_->GetImpl()->GetWindow();
     windowID_ = SDL_GetWindowID(window);
 
-    if (!mouseVisible_)
+    // If screen mode happens due to mouse drag resize, do not recenter the mouse as that would lead to erratic window sizes
+    if (!mouseVisible_ && !inResize_)
     {
         IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
         SetMousePosition(center);
         lastMousePosition_ = center;
     }
+    else
+        lastMousePosition_ = GetMousePosition();
 
     // Resize screen joysticks to new screen size
     for (HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)

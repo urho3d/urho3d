@@ -366,6 +366,8 @@ private:
     bool focusedThisFrame_;
     /// Next mouse move suppress flag.
     bool suppressNextMouseMove_;
+    /// Handling a window resize event flag.
+    bool inResize_;
     /// Initialized flag.
     bool initialized_;
 #ifdef EMSCRIPTEN
