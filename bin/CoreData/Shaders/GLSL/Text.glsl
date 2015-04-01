@@ -54,6 +54,11 @@ void PS()
         gl_FragColor.a = vColor.a * smoothstep(0.5, 0.505, distance);
     }
 #else
-    gl_FragColor.a = vColor.a * texture2D(sDiffMap, vTexCoord).a;
+    // Non-SDF font will likely be monochrome, in which case the alpha channel will be on the R channel on OpenGL 3
+    #ifdef GL3
+        gl_FragColor.a = vColor.a * texture2D(sDiffMap, vTexCoord).r;
+    #else
+        gl_FragColor.a = vColor.a * texture2D(sDiffMap, vTexCoord).a;
+    #endif
 #endif
 }
