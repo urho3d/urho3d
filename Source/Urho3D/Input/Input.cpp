@@ -48,12 +48,6 @@
 
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char *name);
 
-// Require a click inside window before re-hiding mouse cursor on OSX, otherwise dragging the window
-// can be incorrectly interpreted as mouse movement inside the window
-#if defined(__APPLE__) && !defined(IOS)
-    #define REQUIRE_CLICK_TO_FOCUS
-#endif
-
 namespace Urho3D
 {
 
@@ -291,12 +285,7 @@ void Input::Update()
 #ifndef EMSCRIPTEN
     if (window)
     {
-#if defined(REQUIRE_CLICK_TO_FOCUS)
-        if (!inputFocus_ && (graphics_->GetFullscreen() || mouseVisible_) && flags == (SDL_WINDOW_INPUT_FOCUS |
-            SDL_WINDOW_MOUSE_FOCUS))
-#else
         if (!inputFocus_ && (flags & SDL_WINDOW_INPUT_FOCUS))
-#endif
             focusedThisFrame_ = true;
 
         if (focusedThisFrame_)
@@ -1376,14 +1365,6 @@ void Input::SendInputFocusEvent()
 
 void Input::SetMouseButton(int button, bool newState)
 {
-#ifdef REQUIRE_CLICK_TO_FOCUS
-    if (!mouseVisible_ && !graphics_->GetFullscreen())
-    {
-        if (!inputFocus_ && newState && button == MOUSEB_LEFT)
-            focusedThisFrame_ = true;
-    }
-#endif
-
 #ifdef EMSCRIPTEN
     if (emscriptenEnteredPointerLock_)
     {
