@@ -3037,12 +3037,17 @@ void Graphics::CleanupFramebuffers()
 {
     if (!IsDeviceLost())
     {
+        BindFramebuffer(impl_->systemFBO_);
+        impl_->boundFBO_ = impl_->systemFBO_;
+        impl_->fboDirty_ = true;
+
         for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin(); i !=
             impl_->frameBuffers_.End(); ++i)
             DeleteFramebuffer(i->second_.fbo_);
     }
+    else
+        impl_->boundFBO_ = 0;
 
-    impl_->boundFBO_ = 0;
     impl_->frameBuffers_.Clear();
 }
 
