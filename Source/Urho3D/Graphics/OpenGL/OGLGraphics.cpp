@@ -2116,7 +2116,8 @@ void Graphics::WindowResized()
     width_ = newWidth;
     height_ = newHeight;
     
-    // Reset rendertargets and viewport for the new screen size
+    // Reset rendertargets and viewport for the new screen size. Also clean up any FBO's, as they may be screen size dependent
+    CleanupFramebuffers();
     ResetRenderTargets();
     
     LOGDEBUGF("Window was resized to %dx%d", width_, height_);
