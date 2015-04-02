@@ -278,12 +278,12 @@ OpenGL does not depend on a separate shader compiler DLL.
 
 \section Using_ccache Using ccache
 
-ccache is a compiler cache software available on Linux and Mac OS X host systems. It speeds up the build by bypassing the actual compilation and reusing the result from previous compilation. In order for this to work correctly when building/using Urho3D library with GCC/Clang precompiled header enabled, the following environment variable must be set:
+ccache is a compiler cache software available on Linux and Mac OS X host systems. It speeds up the build by bypassing the actual compilation and reusing the result from previous compilation when the cache is hit. In order for this to work correctly when building/using Urho3D library with GCC/Clang precompiled header enabled, the following environment variable must be set:
 \verbatim
 CCACHE_SLOPPINESS=pch_defines,time_macros
 \endverbatim
 
-Failure to do so would cause the precompiled header cannot be used by ccache.
+Failure to do so would cause the precompiled header cannot be used by ccache. When ccache is setup correctly and with more hits than misses then even clean build can be done as fast as incremental build.
 
 \page Running Running Urho3D player application
 
