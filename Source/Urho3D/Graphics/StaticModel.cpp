@@ -86,6 +86,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
         Ray localRay = query.ray_.Transformed(inverse);
         float distance = localRay.HitDistance(boundingBox_);
         Vector3 normal = -query.ray_.direction_;
+        unsigned hitBatch = M_MAX_UNSIGNED;
 
         if (level == RAY_TRIANGLE && distance < query.maxDistance_)
         {
@@ -102,6 +103,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
                     {
                         distance = geometryDistance;
                         normal = (node_->GetWorldTransform() * Vector4(geometryNormal, 0.0f)).Normalized();
+                        hitBatch = i;
                     }
                 }
             }
@@ -115,7 +117,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
             result.distance_ = distance;
             result.drawable_ = this;
             result.node_ = node_;
-            result.subObject_ = M_MAX_UNSIGNED;
+            result.subObject_ = hitBatch;
             results.Push(result);
         }
         break;
