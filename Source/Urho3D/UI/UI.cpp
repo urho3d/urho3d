@@ -88,8 +88,6 @@ UI::UI(Context* context) :
     lastMouseButtons_(0),
     qualifiers_(0),
     maxFontTextureSize_(DEFAULT_FONT_TEXTURE_MAX_SIZE),
-    dragElementsCount_(0),
-    dragConfirmedCount_(0),
     initialized_(false),
     usingTouchInput_(false),
     #ifdef WIN32
@@ -105,7 +103,10 @@ UI::UI(Context* context) :
     #endif
     useMutableGlyphs_(false),
     forceAutoHint_(false),
-    nonModalBatchSize_(0)
+    uiRendered_(false),
+    nonModalBatchSize_(0),
+    dragElementsCount_(0),
+    dragConfirmedCount_(0)
 {
     rootElement_->SetTraversalMode(TM_DEPTH_FIRST);
     rootModalElement_->SetTraversalMode(TM_DEPTH_FIRST);

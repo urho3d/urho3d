@@ -123,7 +123,7 @@ void Network::HandleMessage(kNet::MessageConnection *source, kNet::packet_id_t p
     Connection* connection = GetConnection(source);
     if (connection)
     {
-        MemoryBuffer msg(data, numBytes);
+        MemoryBuffer msg(data, (unsigned)numBytes);
         if (connection->ProcessMessage(msgId, msg))
             return;
         
@@ -152,7 +152,7 @@ u32 Network::ComputeContentID(kNet::message_id_t msgId, const char* data, size_t
     case MSG_COMPONENTLATESTDATA:
         {
             // Return the node or component ID, which is first in the message
-            MemoryBuffer msg(data, numBytes);
+            MemoryBuffer msg(data, (unsigned)numBytes);
             return msg.ReadNetID();
         }
         

@@ -439,7 +439,7 @@ public:
         const char* ptr = str;
         while (*ptr)
             ++ptr;
-        return ptr - str;
+        return (unsigned)(ptr - str);
         #endif
     }
     

@@ -200,6 +200,7 @@ Input::Input(Context* context) :
     Object(context),
     mouseButtonDown_(0),
     mouseButtonPress_(0),
+    lastVisibleMousePosition_(MOUSE_POSITION_OFFSCREEN),
     mouseMoveWheel_(0),
     windowID_(0),
     toggleFullscreen_(true),
@@ -211,7 +212,6 @@ Input::Input(Context* context) :
     emscriptenExitingPointerLock_(false),
     emscriptenEnteredPointerLock_(false),
 #endif
-    lastVisibleMousePosition_(MOUSE_POSITION_OFFSCREEN),
     touchEmulation_(false),
     inputFocus_(false),
     minimized_(false),

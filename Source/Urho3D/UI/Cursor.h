@@ -80,12 +80,12 @@ struct URHO3D_API CursorShapeInfo
     IntRect imageRect_;
     /// Hotspot coordinates.
     IntVector2 hotSpot_;
-    /// System cursor index.
-    int systemCursor_;
     /// OS cursor.
     SDL_Cursor* osCursor_;
     /// Whether the OS cursor is system defined.
     bool systemDefined_;
+    /// System cursor index.
+    int systemCursor_;
 };
 
 /// Mouse cursor %UI element.

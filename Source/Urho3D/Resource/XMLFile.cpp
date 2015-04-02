@@ -52,7 +52,7 @@ public:
     /// Write bytes to output.
     void write(const void* data, size_t size)
     {
-        if (dest_.Write(data, size) != size)
+        if (dest_.Write(data, (unsigned)size) != size)
             success_ = false;
     }
 
@@ -156,7 +156,7 @@ bool XMLFile::FromString(const String& source)
 {
     if (source.Empty())
         return false;
-    
+
     MemoryBuffer buffer(source.CString(), source.Length());
     return Load(buffer);
 }

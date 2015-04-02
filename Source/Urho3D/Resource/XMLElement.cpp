@@ -920,7 +920,7 @@ XMLElement XPathResultSet::FirstResult()
 
 unsigned XPathResultSet::Size() const
 {
-    return resultSet_ ? resultSet_->size() : 0;
+    return resultSet_ ? (unsigned)resultSet_->size() : 0;
 }
 
 bool XPathResultSet::Empty() const
@@ -1069,7 +1069,7 @@ String XPathQuery::EvaluateToString(XMLElement element) const
 
     const pugi::xml_node& node = element.GetXPathNode() ? element.GetXPathNode()->node(): pugi::xml_node(element.GetNode());
     String result;
-    result.Reserve(query_->evaluate_string(0, 0, node));    // First call get the size
+    result.Reserve((unsigned)query_->evaluate_string(0, 0, node));    // First call get the size
     query_->evaluate_string(const_cast<pugi::char_t*>(result.CString()), result.Capacity(), node);  // Second call get the actual string
     return result;
 }

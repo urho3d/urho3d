@@ -64,7 +64,7 @@ template<> int ToluaIsVector<String>(lua_State* L, int lo, const char* type, int
 {
     if (lua_istable(L, lo))
     {
-        int length = lua_objlen(L, lo);
+        size_t length = lua_objlen(L, lo);
         for (int i = 1; i <= length; ++i)
         {
             lua_pushinteger(L, i);
@@ -100,7 +100,7 @@ template<> void* ToluaToVector<String>(lua_State* L, int narg, void* def)
     static Vector<String> result;
     result.Clear();
 
-    int length = lua_objlen(L, narg);
+    size_t length = lua_objlen(L, narg);
     for (int i = 1; i <= length; ++i)
     {
         lua_pushinteger(L, i);
@@ -149,7 +149,7 @@ template<> int ToluaIsPODVector<unsigned>(lua_State* L, int lo, const char* type
 {
     if (lua_istable(L, lo))
     {
-        int length = lua_objlen(L, lo);
+        size_t length = lua_objlen(L, lo);
         for (int i = 1; i <= length; ++i)
         {
             lua_pushinteger(L, i);
@@ -181,7 +181,7 @@ template<> int ToluaIsPODVector<Vector2>(lua_State* L, int lo, const char* type,
 {
     if (lua_istable(L, lo))
     {
-        int length = lua_objlen(L, lo);
+        size_t length = lua_objlen(L, lo);
         for (int i = 1; i <= length; ++i)
         {
             lua_pushinteger(L, i);
@@ -212,7 +212,7 @@ template<> void* ToluaToPODVector<unsigned>(lua_State* L, int narg, void* def)
     static PODVector<unsigned> result;
     result.Clear();
 
-    int length = lua_objlen(L, narg);
+    size_t length = lua_objlen(L, narg);
     for (int i = 1; i <= length; ++i)
     {
         lua_pushinteger(L, i);
@@ -243,7 +243,7 @@ template<> void* ToluaToPODVector<Vector2>(lua_State* L, int narg, void* def)
 
     tolua_Error tolua_err;
 
-    int length = lua_objlen(L, narg);
+    size_t length = lua_objlen(L, narg);
     for (int i = 1; i <= length; ++i)
     {
         lua_pushinteger(L, i);

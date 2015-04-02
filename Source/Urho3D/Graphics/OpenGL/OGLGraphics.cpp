@@ -137,7 +137,6 @@ static const unsigned glFillMode[] =
     GL_LINE,
     GL_POINT
 };
-#endif
 
 static const unsigned glStencilOps[] =
 {
@@ -147,6 +146,7 @@ static const unsigned glStencilOps[] =
     GL_INCR_WRAP,
     GL_DECR_WRAP
 };
+#endif
 
 // Remap vertex attributes on OpenGL so that all usually needed attributes including skinning fit to the first 8.
 // This avoids a skinning bug on GLES2 devices which only support 8.
@@ -2721,9 +2721,8 @@ void Graphics::CheckFeatureSupport()
     lightPrepassSupport_ = false;
     deferredSupport_ = false;
     
-    int numSupportedRTs = 1;
-    
     #ifndef GL_ES_VERSION_2_0
+    int numSupportedRTs = 1;
     if (gl3Support)
     {
         // Work around GLEW failure to check extensions properly from a GL3 context
