@@ -223,6 +223,7 @@ Input::Input(Context* context) :
     focusedThisFrame_(false),
     suppressNextMouseMove_(false),
     inResize_(false),
+    screenModeChanged_(false),
     initialized_(false)
 {
     for (int i = 0; i < TOUCHID_MAX; i++)
@@ -284,11 +285,14 @@ void Input::Update()
     {
         #ifdef REQUIRE_CLICK_TO_FOCUS
         // When using the "click to focus" mechanism, only focus automatically in fullscreen or non-hidden mouse mode
-        if (!inputFocus_ && (mouseVisible_ || graphics_->GetFullscreen()) && (flags & SDL_WINDOW_INPUT_FOCUS))
+        if (!inputFocus_ && (mouseVisible_ || graphics_->GetFullscreen() || screenModeChanged_) && (flags & SDL_WINDOW_INPUT_FOCUS))
         #else
         if (!inputFocus_ && (flags & SDL_WINDOW_INPUT_FOCUS))
         #endif
+        {
+            screenModeChanged_ = false;
             focusedThisFrame_ = true;
+        }
 
         if (focusedThisFrame_)
             GainFocus();
@@ -2022,6 +2026,10 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 
     // After setting a new screen mode we should not be minimized
     minimized_ = (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED) != 0;
+
+    // Remember that screen mode changed in case we lose focus (needed on Linux)
+    if (!inResize_)
+        screenModeChanged_ = true;
 }
 
 void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)

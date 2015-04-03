@@ -368,6 +368,8 @@ private:
     bool suppressNextMouseMove_;
     /// Handling a window resize event flag.
     bool inResize_;
+    /// Flag for automatic focus (without click inside window) after screen mode change, needed on Linux.
+    bool screenModeChanged_;
     /// Initialized flag.
     bool initialized_;
 #ifdef EMSCRIPTEN
