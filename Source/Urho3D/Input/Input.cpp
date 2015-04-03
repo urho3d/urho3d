@@ -48,6 +48,11 @@
 
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char *name);
 
+// Use a "click inside window to focus" mechanism on desktop platforms when the mouse cursor is hidden
+#if defined(WIN32) || (defined(__APPLE__) && !defined(IOS)) || (defined(__linux__) && !defined(ANDROID) && !defined(RPI))
+#define REQUIRE_CLICK_TO_FOCUS
+#endif
+
 namespace Urho3D
 {
 
@@ -208,10 +213,10 @@ Input::Input(Context* context) :
     lastMouseVisible_(false),
     mouseGrabbed_(false),
     mouseMode_(MM_ABSOLUTE),
-#ifdef EMSCRIPTEN
+    #ifdef EMSCRIPTEN
     emscriptenExitingPointerLock_(false),
     emscriptenEnteredPointerLock_(false),
-#endif
+    #endif
     touchEmulation_(false),
     inputFocus_(false),
     minimized_(false),
@@ -267,15 +272,6 @@ void Input::Update()
         state.delta_ = IntVector2::ZERO;
     }
 
-    // Check and handle SDL events
-
-    if (!inputFocus_)
-    {
-        // While there is no input focus, don't process key, mouse, touch or joystick events.
-        SDL_PumpEvents();
-        SDL_FlushEvents(SDL_KEYDOWN, SDL_MULTIGESTURE);
-    }
-
     SDL_Event evt;
     while (SDL_PollEvent(&evt))
         HandleSDLEvent(&evt);
@@ -283,10 +279,15 @@ void Input::Update()
     // Check for focus change this frame
     SDL_Window* window = graphics_->GetImpl()->GetWindow();
     unsigned flags = window ? SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS) : 0;
-#ifndef EMSCRIPTEN
+    #ifndef EMSCRIPTEN
     if (window)
     {
+        #ifdef REQUIRE_CLICK_TO_FOCUS
+        // When using the "click to focus" mechanism, only focus automatically in fullscreen or non-hidden mouse mode
+        if (!inputFocus_ && (mouseVisible_ || graphics_->GetFullscreen()) && (flags & SDL_WINDOW_INPUT_FOCUS))
+        #else
         if (!inputFocus_ && (flags & SDL_WINDOW_INPUT_FOCUS))
+        #endif
             focusedThisFrame_ = true;
 
         if (focusedThisFrame_)
@@ -374,9 +375,7 @@ void Input::Update()
         }
         #else
         if (mouseMode_ == MM_ABSOLUTE)
-        {
             lastMousePosition_ = mousePosition;
-        }
         #endif
         // Send mouse move event if necessary
         if (mouseMove_ != IntVector2::ZERO)
@@ -560,9 +559,7 @@ void Input::SetMouseMode(MouseMode mode)
         }
         #ifndef EMSCRIPTEN
         else if (previousMode == MM_WRAP)
-        {
             SDL_SetWindowGrab(window, SDL_FALSE);
-        }
         #endif
 
         // Handle changing to new mode
@@ -947,18 +944,18 @@ unsigned Input::LoadGestures(Deserializer& source)
 
 bool Input::RemoveGesture(unsigned gestureID)
 {
-#if defined(EMSCRIPTEN)
+    #ifdef EMSCRIPTEN
     return false;
-#else
+    #else
     return SDL_RemoveDollarTemplate(gestureID) != 0;
-#endif
+    #endif
 }
 
 void Input::RemoveAllGestures()
 {
-#if !defined(EMSCRIPTEN)
+    #ifndef EMSCRIPTEN
     SDL_RemoveAllDollarTemplates();
-#endif
+    #endif
 }
 
 SDL_JoystickID Input::OpenJoystick(unsigned index)
@@ -1181,15 +1178,15 @@ void Input::Initialize()
 
     // Set the initial activation
     initialized_ = true;
-#ifndef EMSCRIPTEN
+    #ifndef EMSCRIPTEN
     focusedThisFrame_ = true;
-#else
+    #else
     // Note: Page visibility and focus are slightly different, however we can't query last focus with Emscripten (1.29.0)
     if (emscriptenInput_->IsVisible())
         GainFocus();
     else
         LoseFocus();
-#endif
+    #endif
 
     ResetJoysticks();
     ResetState();
@@ -1368,7 +1365,7 @@ void Input::SendInputFocusEvent()
 
 void Input::SetMouseButton(int button, bool newState)
 {
-#ifdef EMSCRIPTEN
+    #ifdef EMSCRIPTEN
     if (emscriptenEnteredPointerLock_)
     {
         // Suppress mouse jump on initial Pointer Lock
@@ -1378,7 +1375,7 @@ void Input::SetMouseButton(int button, bool newState)
         suppressNextMouseMove_ = true;
         emscriptenEnteredPointerLock_ = false;
     }
-#endif
+    #endif
 
     if (newState)
     {
@@ -1474,23 +1471,46 @@ void Input::HandleSDLEvent(void* sdlEvent)
 {
     SDL_Event& evt = *static_cast<SDL_Event*>(sdlEvent);
 
+    // While not having input focus, skip key/mouse/touch/joystick events, except for the "click to focus" mechanism
+    if (!inputFocus_ && evt.type >= SDL_KEYDOWN && evt.type <= SDL_MULTIGESTURE)
+    {
+        #ifdef REQUIRE_CLICK_TO_FOCUS
+        // Require the click to be at least 1 pixel inside the window to disregard clicks in the title bar
+        if (evt.type == SDL_MOUSEBUTTONDOWN && evt.button.x > 0 && evt.button.y > 0 && evt.button.x < graphics_->GetWidth() - 1 &&
+            evt.button.y < graphics_->GetHeight() - 1)
+        {
+            focusedThisFrame_ = true;
+            // Do not cause the click to actually go through
+            return;
+        }
+        else if (evt.type == SDL_FINGERDOWN)
+        {
+            // When focusing by touch, call GainFocus() immediately as it resets the state; a touch has sustained state
+            // which should be kept
+            GainFocus();
+        }
+        else
+        #endif
+            return;
+    }
+
     switch (evt.type)
     {
     case SDL_KEYDOWN:
         // Convert to uppercase to match Win32 virtual key codes
-#if defined (EMSCRIPTEN)
+        #ifdef EMSCRIPTEN
         SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, 0, true);
-#else
+        #else
         SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.raw, true);
-#endif
+        #endif
         break;
 
     case SDL_KEYUP:
-#if defined(EMSCRIPTEN)
+        #ifdef EMSCRIPTEN
         SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, 0, false);
-#else
+        #else
         SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.raw, false);
-#endif
+        #endif
         break;
 
     case SDL_TEXTINPUT:
@@ -1976,6 +1996,7 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
         SetMousePosition(center);
         lastMousePosition_ = center;
+        focusedThisFrame_ = true;
     }
     else
         lastMousePosition_ = GetMousePosition();
@@ -1988,7 +2009,8 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
             screenjoystick->SetSize(graphics_->GetWidth(), graphics_->GetHeight());
     }
 
-    focusedThisFrame_ = true;
+    if (graphics_->GetFullscreen())
+        focusedThisFrame_ = true;
 
     // After setting a new screen mode we should not be minimized
     minimized_ = (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED) != 0;
