@@ -204,6 +204,8 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
             graphics->SetDepthBias(depthBias.constantBias_, depthBias.slopeScaledBias_);
         }
 
+        // Use the "least filled" fill mode combined from camera & material
+        graphics->SetFillMode((FillMode)(Max(camera_->GetFillMode(), material_->GetFillMode())));
         graphics->SetDepthTest(pass_->GetDepthTestMode());
         graphics->SetDepthWrite(pass_->GetDepthWrite() && allowDepthWrite);
     }

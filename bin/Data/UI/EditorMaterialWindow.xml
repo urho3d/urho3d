@@ -205,6 +205,12 @@
                                 </element>
                             </element>
                         </element>
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="8" />
                         <element type="Text" style="EditorAttributeText">
                             <attribute name="Text" value="Shadow cull" />
                         </element>
@@ -224,6 +230,37 @@
                                             </element>
                                             <element type="Text" style="FileSelectorFilterText">
                                                 <attribute name="Text" value="CW" />
+                                            </element>
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="8" />
+                        <element type="Text" style="EditorAttributeText">
+                            <attribute name="Text" value="Fill mode" />
+                        </element>
+                        <element type="DropDownList">
+                            <attribute name="Name" value="FillModeEdit" />
+                            <attribute name="Resize Popup" value="true" />
+                            <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                            <element type="Window" internal="true" popup="true" style="none">
+                                <element type="ListView" internal="true" style="none">
+                                    <element type="BorderImage" internal="true" style="none">
+                                        <element internal="true" style="none">
+                                            <element type="Text" style="FileSelectorFilterText">
+                                                <attribute name="Text" value="Solid" />
+                                            </element>
+                                            <element type="Text" style="FileSelectorFilterText">
+                                                <attribute name="Text" value="Wireframe" />
+                                            </element>
+                                            <element type="Text" style="FileSelectorFilterText">
+                                                <attribute name="Text" value="Point" />
                                             </element>
                                         </element>
                                     </element>

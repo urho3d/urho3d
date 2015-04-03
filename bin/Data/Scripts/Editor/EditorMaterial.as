@@ -46,6 +46,7 @@ void CreateMaterialEditor()
     SubscribeToEvent(materialWindow.GetChild("SlopeBiasEdit", true), "TextFinished", "EditSlopeBias");
     SubscribeToEvent(materialWindow.GetChild("CullModeEdit", true), "ItemSelected", "EditCullMode");
     SubscribeToEvent(materialWindow.GetChild("ShadowCullModeEdit", true), "ItemSelected", "EditShadowCullMode");
+    SubscribeToEvent(materialWindow.GetChild("FillModeEdit", true), "ItemSelected", "EditFillMode");
 }
 
 bool ShowMaterialEditor()
@@ -322,7 +323,9 @@ void RefreshMaterialMiscParameters()
     attrList.selection = editMaterial.cullMode;
     attrList = materialWindow.GetChild("ShadowCullModeEdit", true);
     attrList.selection = editMaterial.shadowCullMode;
-    
+    attrList = materialWindow.GetChild("FillModeEdit", true);
+    attrList.selection = editMaterial.fillMode;
+
     inMaterialRefresh = false;
 }
 
@@ -804,6 +807,19 @@ void EditShadowCullMode(StringHash eventType, VariantMap& eventData)
     
     DropDownList@ attrEdit = eventData["Element"].GetPtr();
     editMaterial.shadowCullMode = CullMode(attrEdit.selection);
+
+    EndMaterialEdit();
+}
+
+void EditFillMode(StringHash eventType, VariantMap& eventData)
+{
+    if (editMaterial is null || inMaterialRefresh)
+        return;
+        
+    BeginMaterialEdit();
+    
+    DropDownList@ attrEdit = eventData["Element"].GetPtr();
+    editMaterial.fillMode = FillMode(attrEdit.selection);
 
     EndMaterialEdit();
 }

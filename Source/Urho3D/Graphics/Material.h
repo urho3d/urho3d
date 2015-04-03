@@ -142,6 +142,8 @@ public:
     void SetCullMode(CullMode mode);
     /// Set culling mode for shadows.
     void SetShadowCullMode(CullMode mode);
+    /// Set polygon fill mode. Interacts with the camera's fill mode setting so that the "least filled" mode will be used.
+    void SetFillMode(FillMode mode);
     /// Set depth bias.
     void SetDepthBias(const BiasParameters& parameters);
     /// Associate the material with a scene to ensure that shader parameter animation happens in sync with scene update, respecting the scene time scale. If no scene is set, the global update events will be used.
@@ -185,6 +187,8 @@ public:
     CullMode GetCullMode() const { return cullMode_; }
     /// Return culling mode for shadows.
     CullMode GetShadowCullMode() const { return shadowCullMode_; }
+    /// Return polygon fill mode.
+    FillMode GetFillMode() const { return fillMode_; }
     /// Return depth bias.
     const BiasParameters& GetDepthBias() const { return depthBias_; }
     /// Return last auxiliary view rendered frame number.
@@ -231,6 +235,8 @@ private:
     CullMode cullMode_;
     /// Culling mode for shadow rendering.
     CullMode shadowCullMode_;
+    /// Polygon fill mode.
+    FillMode fillMode_;
     /// Depth bias parameters.
     BiasParameters depthBias_;
     /// Last auxiliary view rendered frame number.
