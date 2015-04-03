@@ -1480,7 +1480,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             evt.button.y < graphics_->GetHeight() - 1)
         {
             focusedThisFrame_ = true;
-            // Do not cause the click to actually go through
+            // Do not cause the click to actually go throughfin
             return;
         }
         else if (evt.type == SDL_FINGERDOWN)
@@ -1640,6 +1640,10 @@ void Input::HandleSDLEvent(void* sdlEvent)
             eventData[P_Y] = state.position_.y_;
             eventData[P_PRESSURE] = state.pressure_;
             SendEvent(E_TOUCHBEGIN, eventData);
+
+            // Finger touch may move the mouse cursor. Suppress next mouse move when cursor hidden to prevent jumps
+            if (!mouseVisible_)
+                suppressNextMouseMove_ = true;
         }
         break;
 
@@ -1699,6 +1703,10 @@ void Input::HandleSDLEvent(void* sdlEvent)
             #endif
             eventData[P_PRESSURE] = state.pressure_;
             SendEvent(E_TOUCHMOVE, eventData);
+
+            // Finger touch may move the mouse cursor. Suppress next mouse move when cursor hidden to prevent jumps
+            if (!mouseVisible_)
+                suppressNextMouseMove_ = true;
         }
         break;
 
