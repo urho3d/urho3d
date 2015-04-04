@@ -5396,6 +5396,7 @@ StringHash baseType;
 String category;
 CullMode cullMode;
 BiasParameters depthBias;
+FillMode fillMode;
 /* readonly */
 uint memoryUse;
 String name;
