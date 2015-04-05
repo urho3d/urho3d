@@ -485,8 +485,12 @@ public:
     void SetPositionSilent(const Vector3& position) { position_ = position; }
     /// Set position in parent space silently without marking the node & child nodes dirty. Used by animation code.
     void SetPositionSilent(float x, float y, float z) { position_ = Vector3(x, y, z); }
-    /// Set position in parent space silently without marking the node & child nodes dirty. Used by animation code.
+    /// Set rotation in parent space silently without marking the node & child nodes dirty. Used by animation code.
     void SetRotationSilent(const Quaternion& rotation) { rotation_ = rotation; }
+    /// Set rotation in parent space silently without marking the node & child nodes dirty. Used by animation code.
+    void SetRotationSilent(float x, float y, float z) { rotation_ = Quaternion(x, y, z); }
+    /// Set rotation in parent space silently without marking the node & child nodes dirty. Used by animation code.
+    void SetRotationSilent(float w, float x, float y, float z) { rotation_ = Quaternion(w, x, y, z); }
     /// Set scale in parent space silently without marking the node & child nodes dirty. Used by animation code.
     void SetScaleSilent(const Vector3& scale) { scale_ = scale; }
     /// Set scale in parent space silently without marking the node & child nodes dirty. Used by animation code.
