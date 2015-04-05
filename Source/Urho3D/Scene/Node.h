@@ -179,9 +179,9 @@ public:
     /// Rotate the scene node in the chosen transform space.
     void Rotate(const Quaternion& delta, TransformSpace space = TS_LOCAL);
     /// Rotate the scene node in the chosen transform space.
-    void Rotate(float x, float y, float z, TransformSpace space = TS_LOCAL) { Rotate(Quaternion(x, y, z), space);
+    void Rotate(float x, float y, float z, TransformSpace space = TS_LOCAL) { Rotate(Quaternion(x, y, z), space); }
     /// Rotate the scene node in the chosen transform space.
-    void Rotate(float w, float x, float y, float z, TransformSpace space = TS_LOCAL) { Rotate(Quaternion(w, x, y, z), space);
+    void Rotate(float w, float x, float y, float z, TransformSpace space = TS_LOCAL) { Rotate(Quaternion(w, x, y, z), space); }
     /// Rotate the scene node in the chosen transform space (for Urho2D).
     void Rotate2D(float delta, TransformSpace space = TS_LOCAL) { Rotate(Quaternion(delta), space); }
     /// Rotate around a point in the chosen transform space.
