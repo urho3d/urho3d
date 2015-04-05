@@ -90,12 +90,18 @@ public:
     void SetName(const String& name);
     /// Set position in parent space. If the scene node is on the root level (is child of the scene itself), this is same as world space.
     void SetPosition(const Vector3& position);
+    /// Set position in parent space.
+    void SetPosition(float x, float y, float z) { SetPosition(Vector3(x, y, z)); }
     /// Set position in parent space (for Urho2D).
     void SetPosition2D(const Vector2& position) { SetPosition(Vector3(position)); }
     /// Set position in parent space (for Urho2D).
     void SetPosition2D(float x, float y) { SetPosition(Vector3(x, y, 0.0f)); }
     /// Set rotation in parent space.
     void SetRotation(const Quaternion& rotation);
+    /// Set rotation in parent space.
+    void SetRotation(float x, float y, float z) { SetRotation(Quaternion(x, y, z)); }
+    /// Set rotation in parent space.
+    void SetRotation(float w, float x, float y, float z) { SetRotation(Quaternion(w, x, y, z)); }
     /// Set rotation in parent space (for Urho2D).
     void SetRotation2D(float rotation) { SetRotation(Quaternion(rotation)); }
     /// Set forward direction in parent space. Positive Z axis equals identity rotation.
@@ -104,6 +110,8 @@ public:
     void SetScale(float scale);
     /// Set scale in parent space.
     void SetScale(const Vector3& scale);
+    /// Set scale in parent space.
+    void SetScale(float x, float y, float z) { SetScale(Vector3(x, y, z)); }
     /// Set scale in parent space (for Urho2D).
     void SetScale2D(const Vector2& scale) { SetScale(Vector3(scale, 1.0f)); }
     /// Set scale in parent space (for Urho2D).
@@ -122,20 +130,30 @@ public:
     void SetTransform2D(const Vector2& position, float rotation, const Vector2& scale)  { SetTransform(Vector3(position), Quaternion(rotation), Vector3(scale, 1.0f)); }
     /// Set position in world space.
     void SetWorldPosition(const Vector3& position);
+    /// Set position in world space.
+    void SetWorldPosition(float x, float y, float z) { SetWorldPosition(Vector3(x, y, z)); }
     /// Set position in world space (for Urho2D).
     void SetWorldPosition2D(const Vector2& position) { SetWorldPosition(Vector3(position)); }
     /// Set position in world space (for Urho2D).
     void SetWorldPosition2D(float x, float y) { SetWorldPosition(Vector3(x, y, 0.0f)); }
     /// Set rotation in world space.
     void SetWorldRotation(const Quaternion& rotation);
+    /// Set rotation in parent space.
+    void SetWorldRotation(float x, float y, float z) { SetWorldRotation(Quaternion(x, y, z)); }
+    /// Set rotation in parent space.
+    void SetWorldRotation(float w, float x, float y, float z) { SetWorldRotation(Quaternion(w, x, y, z)); }
     /// Set rotation in world space (for Urho2D).
     void SetWorldRotation2D(float rotation) { SetWorldRotation(Quaternion(rotation)); }
     /// Set forward direction in world space.
     void SetWorldDirection(const Vector3& direction);
+    /// Set forward direction in world space.
+    void SetWorldDirection(float x, float y, float z) { SetWorldDirection(Vector3(x, y, z)); }
     /// Set uniform scale in world space.
     void SetWorldScale(float scale);
     /// Set scale in world space.
     void SetWorldScale(const Vector3& scale);
+    /// Set scale in world space.
+    void SetWorldScale(float x, float y, float z) { SetWorldScale(Vector3(x, y, z)); }
     /// Set scale in world space (for Urho2D).
     void SetWorldScale2D(const Vector2& scale) { SetWorldScale(Vector3(scale, 1.0f)); }
     /// Set scale in world space (for Urho2D).
@@ -154,10 +172,16 @@ public:
     void SetWorldTransform2D(const Vector2& position, float rotation, const Vector2& scale) { SetWorldTransform(Vector3(position), Quaternion(rotation), Vector3(scale, 1.0f)); }
     /// Move the scene node in the chosen transform space.
     void Translate(const Vector3& delta, TransformSpace space = TS_LOCAL);
+    /// Move the scene node in the chosen transform space.
+    void Translate(float x, float y, float z, TransformSpace space = TS_LOCAL) { Translate(Vector3(x, y, z), space); }
     /// Move the scene node in the chosen transform space (for Urho2D).
     void Translate2D(const Vector2& delta, TransformSpace space = TS_LOCAL) { Translate(Vector3(delta), space); }
     /// Rotate the scene node in the chosen transform space.
     void Rotate(const Quaternion& delta, TransformSpace space = TS_LOCAL);
+    /// Rotate the scene node in the chosen transform space.
+    void Rotate(float x, float y, float z, TransformSpace space = TS_LOCAL) { Rotate(Quaternion(x, y, z), space); }
+    /// Rotate the scene node in the chosen transform space.
+    void Rotate(float w, float x, float y, float z, TransformSpace space = TS_LOCAL) { Rotate(Quaternion(w, x, y, z), space); }
     /// Rotate the scene node in the chosen transform space (for Urho2D).
     void Rotate2D(float delta, TransformSpace space = TS_LOCAL) { Rotate(Quaternion(delta), space); }
     /// Rotate around a point in the chosen transform space.
@@ -176,6 +200,8 @@ public:
     void Scale(float scale);
     /// Modify scale in parent space.
     void Scale(const Vector3& scale);
+    /// Modify scale in parent space.
+    void Scale(float x, float y, float z) { Scale(Vector3(x, y, z)); }
     /// Modify scale in parent space (for Urho2D).
     void Scale2D(const Vector2& scale) { Scale(Vector3(scale, 1.0f)); }
     /// Set enabled/disabled state without recursion. Components in a disabled node become effectively disabled regardless of their own enable/disable state.
@@ -458,9 +484,17 @@ public:
     /// Set position in parent space silently without marking the node & child nodes dirty. Used by animation code.
     void SetPositionSilent(const Vector3& position) { position_ = position; }
     /// Set position in parent space silently without marking the node & child nodes dirty. Used by animation code.
+    void SetPositionSilent(float x, float y, float z) { position_ = Vector3(x, y, z); }
+    /// Set rotation in parent space silently without marking the node & child nodes dirty. Used by animation code.
     void SetRotationSilent(const Quaternion& rotation) { rotation_ = rotation; }
+    /// Set rotation in parent space silently without marking the node & child nodes dirty. Used by animation code.
+    void SetRotationSilent(float x, float y, float z) { rotation_ = Quaternion(x, y, z); }
+    /// Set rotation in parent space silently without marking the node & child nodes dirty. Used by animation code.
+    void SetRotationSilent(float w, float x, float y, float z) { rotation_ = Quaternion(w, x, y, z); }
     /// Set scale in parent space silently without marking the node & child nodes dirty. Used by animation code.
     void SetScaleSilent(const Vector3& scale) { scale_ = scale; }
+    /// Set scale in parent space silently without marking the node & child nodes dirty. Used by animation code.
+    void SetScaleSilent(float x, float y, float z) { scale_ = Vector3(x, y, z); }
     /// Set local transform silently without marking the node & child nodes dirty. Used by animation code.
     void SetTransformSilent(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
 
