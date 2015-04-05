@@ -138,7 +138,7 @@ public:
     void SetWorldPosition2D(float x, float y) { SetWorldPosition(Vector3(x, y, 0.0f)); }
     /// Set rotation in world space.
     void SetWorldRotation(const Quaternion& rotation);
-        /// Set rotation in parent space.
+    /// Set rotation in parent space.
     void SetWorldRotation(float x, float y, float z) { SetWorldRotation(Quaternion(x, y, z)); }
     /// Set rotation in parent space.
     void SetWorldRotation(float w, float x, float y, float z) { SetWorldRotation(Quaternion(w, x, y, z)); }
@@ -146,6 +146,8 @@ public:
     void SetWorldRotation2D(float rotation) { SetWorldRotation(Quaternion(rotation)); }
     /// Set forward direction in world space.
     void SetWorldDirection(const Vector3& direction);
+    /// Set forward direction in world space.
+    void SetWorldDirection(float x, float y, float z) { SetWorldDirection(Vector3(x, y, z)); }
     /// Set uniform scale in world space.
     void SetWorldScale(float scale);
     /// Set scale in world space.
