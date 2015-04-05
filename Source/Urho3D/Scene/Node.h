@@ -90,7 +90,7 @@ public:
     void SetName(const String& name);
     /// Set position in parent space. If the scene node is on the root level (is child of the scene itself), this is same as world space.
     void SetPosition(const Vector3& position);
-    /// Set position in parent space using a three float overload.
+    /// Set position in parent space.
     void SetPosition(float x, float y, float z) { SetPosition(Vector3(x, y, z)); }
     /// Set position in parent space (for Urho2D).
     void SetPosition2D(const Vector2& position) { SetPosition(Vector3(position)); }
@@ -110,7 +110,7 @@ public:
     void SetScale(float scale);
     /// Set scale in parent space.
     void SetScale(const Vector3& scale);
-    /// Set scale in parent space using three float overload.
+    /// Set scale in parent space.
     void SetScale(float x, float y, float z) { SetScale(Vector3(x, y, z)); }
     /// Set scale in parent space (for Urho2D).
     void SetScale2D(const Vector2& scale) { SetScale(Vector3(scale, 1.0f)); }
@@ -130,7 +130,7 @@ public:
     void SetTransform2D(const Vector2& position, float rotation, const Vector2& scale)  { SetTransform(Vector3(position), Quaternion(rotation), Vector3(scale, 1.0f)); }
     /// Set position in world space.
     void SetWorldPosition(const Vector3& position);
-    /// Set position in world space using three float overload.
+    /// Set position in world space.
     void SetWorldPosition(float x, float y, float z) { SetWorldPosition(Vector3(x, y, z)); }
     /// Set position in world space (for Urho2D).
     void SetWorldPosition2D(const Vector2& position) { SetWorldPosition(Vector3(position)); }
@@ -152,7 +152,7 @@ public:
     void SetWorldScale(float scale);
     /// Set scale in world space.
     void SetWorldScale(const Vector3& scale);
-    /// Set scale in world space using three float overload.
+    /// Set scale in world space.
     void SetWorldScale(float x, float y, float z) { SetWorldScale(Vector3(x, y, z)); }
     /// Set scale in world space (for Urho2D).
     void SetWorldScale2D(const Vector2& scale) { SetWorldScale(Vector3(scale, 1.0f)); }
@@ -172,7 +172,7 @@ public:
     void SetWorldTransform2D(const Vector2& position, float rotation, const Vector2& scale) { SetWorldTransform(Vector3(position), Quaternion(rotation), Vector3(scale, 1.0f)); }
     /// Move the scene node in the chosen transform space.
     void Translate(const Vector3& delta, TransformSpace space = TS_LOCAL);
-    /// Move the scene node in the chosen transform space using three float overload.
+    /// Move the scene node in the chosen transform space.
     void Translate(float x, float y, float z, TransformSpace space = TS_LOCAL) { Translate(Vector3(x, y, z), space); }
     /// Move the scene node in the chosen transform space (for Urho2D).
     void Translate2D(const Vector2& delta, TransformSpace space = TS_LOCAL) { Translate(Vector3(delta), space); }
@@ -200,7 +200,7 @@ public:
     void Scale(float scale);
     /// Modify scale in parent space.
     void Scale(const Vector3& scale);
-    /// Modify scale in parent space using three float overload.
+    /// Modify scale in parent space.
     void Scale(float x, float y, float z) { Scale(Vector3(x, y, z)); }
     /// Modify scale in parent space (for Urho2D).
     void Scale2D(const Vector2& scale) { Scale(Vector3(scale, 1.0f)); }
