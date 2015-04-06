@@ -22,7 +22,8 @@
 #
 
 # Determine source tree and build tree
-if [ "$1" ] && [[ ! "$1" =~ ^- ]]; then BUILD=$1; shift; elif [ -f $(pwd)/CMakeCache.txt ]; then BUILD=$(pwd); else echo An error has occured, build tree has to be provided as the first argument OR call this script in a build tree itself; exit 1; fi
+source cmake_shutil.sh
+get_build_dir
 SOURCE=$(dirname $0)
 if [ "$SOURCE" == "." ]; then SOURCE=$(pwd); fi
 if [ "$BUILD" == "." ]; then BUILD=$(pwd); fi
