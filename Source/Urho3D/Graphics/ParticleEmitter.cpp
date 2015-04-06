@@ -483,7 +483,7 @@ bool ParticleEmitter::EmitNewParticle()
     billboard.uv_ = textureFrames_.Size() ? textureFrames_[0].uv_ : Rect::POSITIVE;
     billboard.rotation_ = effect_->GetRandomRotation();
     const Vector<ColorFrame>& colorFrames_ = effect_->GetColorFrames();
-    billboard.color_ = colorFrames_[0].color_;
+    billboard.color_ = colorFrames_.Size() ? colorFrames_[0].color_ : Color();
     billboard.enabled_ = true;
 
     return true;

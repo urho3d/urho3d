@@ -207,7 +207,6 @@ unsigned WorkQueue::RemoveWorkItems(const Vector<SharedPtr<WorkItem> >& items)
     return removed;
 }
 
-
 void WorkQueue::Pause()
 {
     if (!paused_)
