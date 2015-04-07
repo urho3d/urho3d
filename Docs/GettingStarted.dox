@@ -368,8 +368,6 @@ The last command resets the launch service database and rebuilds it, so the chan
 
 \page Examples Examples
 
-\tableofcontents
-
 The examples included with Urho3D consist of two larger applications built in AngelScript, and a set of smaller sample applications provided in both C++, AngelScript and Lua, which demonstrate a specific engine feature.
 
 \section Examples_NinjaSnowWar NinjaSnowWar
@@ -585,8 +583,6 @@ You can in fact set and export any other key/value pair build options as environ
 
 \page Structure Overall structure
 
-\tableofcontents
-
 The Urho3D engine compiles into one library. Conceptually it consists of several "sublibraries" that represent different subsystems or functionality. Each of these resides in a subdirectory
 under the Source/Urho3D directory:
 
@@ -643,8 +639,6 @@ The third-party libraries used by Urho3D and their purposes are:
 
 
 \page Conventions Conventions
-
-\tableofcontents
 
 Urho3D uses the following conventions and principles:
 
