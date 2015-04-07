@@ -48,6 +48,16 @@ GLenum glWrapModes[] =
     #endif
 };
 
+#ifndef GL_ES_VERSION_2_0
+GLenum gl3WrapModes[] =
+{
+    GL_REPEAT,
+    GL_MIRRORED_REPEAT,
+    GL_CLAMP_TO_EDGE,
+    GL_CLAMP_TO_BORDER
+};
+#endif
+
 static const char* addressModeNames[] =
 {
     "wrap",
@@ -66,6 +76,15 @@ static const char* filterModeNames[] =
     "default",
     0
 };
+
+GLenum GetWrapMode(TextureAddressMode mode)
+{
+    #ifndef GL_ES_VERSION_2_0
+    return Graphics::GetGL3Support() ? gl3WrapModes[mode] : glWrapModes[mode];
+    #else
+    return glWrapModes[mode];
+    #endif
+}
 
 Texture::Texture(Context* context) :
     Resource(context),
@@ -170,10 +189,10 @@ void Texture::UpdateParameters()
         return;
     
     // Wrapping
-    glTexParameteri(target_, GL_TEXTURE_WRAP_S, glWrapModes[addressMode_[COORD_U]]);
-    glTexParameteri(target_, GL_TEXTURE_WRAP_T, glWrapModes[addressMode_[COORD_V]]);
+    glTexParameteri(target_, GL_TEXTURE_WRAP_S, GetWrapMode(addressMode_[COORD_U]));
+    glTexParameteri(target_, GL_TEXTURE_WRAP_T, GetWrapMode(addressMode_[COORD_V]));
     #ifndef GL_ES_VERSION_2_0
-    glTexParameteri(target_, GL_TEXTURE_WRAP_R, glWrapModes[addressMode_[COORD_W]]);
+    glTexParameteri(target_, GL_TEXTURE_WRAP_R, GetWrapMode(addressMode_[COORD_W]));
     #endif
     
     TextureFilterMode filterMode = filterMode_;
