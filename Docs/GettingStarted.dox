@@ -4,6 +4,8 @@ namespace Urho3D
 /**
 \page Building Building Urho3D
 
+\tableofcontents
+
 \section Building_Prerequisites Building prerequisites
 
 Although all required third-party libraries are included as source code, there are system-level dependencies that must be satisfied before Urho3D can be built successfully:
@@ -287,6 +289,8 @@ Failure to do so would cause the precompiled header cannot be used by ccache. Wh
 
 \page Running Running Urho3D player application
 
+\tableofcontents
+
 The Urho3D player application in the bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic, and therefore must be supplied with the name of the application script file it should run:
 
 \verbatim
@@ -364,6 +368,8 @@ The last command resets the launch service database and rebuilds it, so the chan
 
 \page Examples Examples
 
+\tableofcontents
+
 The examples included with Urho3D consist of two larger applications built in AngelScript, and a set of smaller sample applications provided in both C++, AngelScript and Lua, which demonstrate a specific engine feature.
 
 \section Examples_NinjaSnowWar NinjaSnowWar
@@ -420,6 +426,8 @@ F2          Toggle debug HUD
 
 
 \page UsingLibrary Using Urho3D as external library
+
+\tableofcontents
 
 This page shows how to create a new C++ project linking against Urho3D library as external library. There are two approaches to do this. The first approach uses Urho3D library directly from the Urho3D project build tree. The second approach uses Urho3D SDK installation. It is imperative to clean the CMake cache when changing from one approach to the other. You should also clean the cache when you change the path in the URHO3D_HOME environment variable.
 
@@ -577,6 +585,8 @@ You can in fact set and export any other key/value pair build options as environ
 
 \page Structure Overall structure
 
+\tableofcontents
+
 The Urho3D engine compiles into one library. Conceptually it consists of several "sublibraries" that represent different subsystems or functionality. Each of these resides in a subdirectory
 under the Source/Urho3D directory:
 
@@ -634,6 +644,8 @@ The third-party libraries used by Urho3D and their purposes are:
 
 \page Conventions Conventions
 
+\tableofcontents
+
 Urho3D uses the following conventions and principles:
 
 - Left-handed coordinates. Positive X, Y & Z axes point to the right, up, and forward, and positive rotation is clockwise.
@@ -660,6 +672,8 @@ For more details related to the C++ coding style, see also \ref CodingConvention
 
 
 \page EditorInstructions Editor instructions
+
+\tableofcontents
 
 The Urho3D editor is a script application that can be run with the Urho3D player application. To start, execute any of these commands: (in the bin directory) Editor.bat, Editor.sh or Urho3DPlayer Scripts/Editor.as
 
