@@ -401,7 +401,7 @@ static inline bool CompareSourceBatch2Ds(const SourceBatch2D* lhs, const SourceB
     if (lhs->material_ != rhs->material_)
         return lhs->material_->GetNameHash() < rhs->material_->GetNameHash();
 
-    return (int)lhs < (int)rhs;
+    return lhs < rhs;
 }
 
 void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* camera)
