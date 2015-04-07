@@ -36,7 +36,7 @@
 namespace Urho3D
 {
 
-GLenum glWrapModes[] =
+static GLenum glWrapModes[] =
 {
     GL_REPEAT,
     GL_MIRRORED_REPEAT,
@@ -49,7 +49,7 @@ GLenum glWrapModes[] =
 };
 
 #ifndef GL_ES_VERSION_2_0
-GLenum gl3WrapModes[] =
+static GLenum gl3WrapModes[] =
 {
     GL_REPEAT,
     GL_MIRRORED_REPEAT,
@@ -77,7 +77,7 @@ static const char* filterModeNames[] =
     0
 };
 
-GLenum GetWrapMode(TextureAddressMode mode)
+static GLenum GetWrapMode(TextureAddressMode mode)
 {
     #ifndef GL_ES_VERSION_2_0
     return Graphics::GetGL3Support() ? gl3WrapModes[mode] : glWrapModes[mode];
