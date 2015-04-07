@@ -136,7 +136,7 @@ if (URHO3D_64BIT)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-64bit)
 else ()
     set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE i386)
-    set (CPACK_RPM_PACKAGE_ARCHITECTURE i686)       # On RPM-based host systems such as Fedora or RedHat, the 'package' target should be built with the help of 'setarch i686' command
+    set (CPACK_RPM_PACKAGE_ARCHITECTURE i686)       # The 'package' target should be built with the help of 'setarch i686' command on a 64-bit host system
 endif ()
 set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-${URHO3D_LIB_TYPE})
 if (WIN32 AND NOT URHO3D_OPENGL)
