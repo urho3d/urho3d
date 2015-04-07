@@ -20,24 +20,25 @@
 // THE SOFTWARE.
 //
 
-#include "../Graphics/Camera.h"
+#include "../Container/Sort.h"
 #include "../Core/Context.h"
-#include "../Urho2D/Drawable2D.h"
+#include "../Core/Profiler.h"
+#include "../Core/WorkQueue.h"
+#include "../Graphics/Camera.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/GraphicsEvents.h"
 #include "../Graphics/IndexBuffer.h"
-#include "../IO/Log.h"
 #include "../Graphics/Material.h"
-#include "../Scene/Node.h"
-#include "../Core/Profiler.h"
-#include "../Urho2D/Renderer2D.h"
-#include "../Scene/Scene.h"
-#include "../Container/Sort.h"
+#include "../Graphics/OctreeQuery.h"
 #include "../Graphics/Technique.h"
 #include "../Graphics/Texture2D.h"
 #include "../Graphics/VertexBuffer.h"
 #include "../Graphics/View.h"
-#include "../Core/WorkQueue.h"
+#include "../IO/Log.h"
+#include "../Scene/Node.h"
+#include "../Scene/Scene.h"
+#include "../Urho2D/Drawable2D.h"
+#include "../Urho2D/Renderer2D.h"
 
 #include "../DebugNew.h"
 
@@ -46,14 +47,33 @@ namespace Urho3D
 
 extern const char* blendModeNames[];
 
+static const unsigned MASK_VERTEX2D = MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1;
+
+ViewBatchInfo2D::ViewBatchInfo2D() : vertexBufferUpdateFrameNumber_(0),
+    indexCount_(0),
+    vertexCount_(0),
+    batchUpdatedFrameNumber_(0), 
+    batchCount_(0)
+{
+}
+
 Renderer2D::Renderer2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
+    material_(new Material(context)),
     indexBuffer_(new IndexBuffer(context_)),
-    vertexBuffer_(new VertexBuffer(context_)),
-    orderDirty_(true),
-    geometryCount_(0),
     frustum_(0)
 {
+    material_->SetName("Urho2D");
+
+    Technique* tech = new Technique(context_);
+    Pass* pass = tech->CreatePass("alpha");
+    pass->SetVertexShader("Urho2D");
+    pass->SetPixelShader("Urho2D");
+    pass->SetDepthWrite(false);
+
+    material_->SetTechnique(0, tech);
+    material_->SetCullMode(CULL_NONE);
+
     frame_.frameNumber_ = 0;
     SubscribeToEvent(E_BEGINVIEWUPDATE, HANDLER(Renderer2D, HandleBeginViewUpdate));
 }
@@ -67,37 +87,27 @@ void Renderer2D::RegisterObject(Context* context)
     context->RegisterFactory<Renderer2D>();
 }
 
-static inline bool CompareDrawable2Ds(Drawable2D* lhs, Drawable2D* rhs)
+static inline bool CompareRayQueryResults(RayQueryResult& lr, RayQueryResult& rr)
 {
+    Drawable2D* lhs = static_cast<Drawable2D*>(lr.drawable_);
+    Drawable2D* rhs = static_cast<Drawable2D*>(rr.drawable_);
     if (lhs->GetLayer() != rhs->GetLayer())
-        return lhs->GetLayer() < rhs->GetLayer();
+        return lhs->GetLayer() > rhs->GetLayer();
 
     if (lhs->GetOrderInLayer() != rhs->GetOrderInLayer())
-        return lhs->GetOrderInLayer() < rhs->GetOrderInLayer();
+        return lhs->GetOrderInLayer() > rhs->GetOrderInLayer();
 
-    Material* lhsUsedMaterial = lhs->GetMaterial();
-    Material* rhsUsedMaterial = rhs->GetMaterial();
-    if (lhsUsedMaterial && rhsUsedMaterial && lhsUsedMaterial != rhsUsedMaterial)
-        return lhsUsedMaterial->GetNameHash() < rhsUsedMaterial->GetNameHash();
-
-    return lhs->GetID() < rhs->GetID();
+    return lhs->GetID() > rhs->GetID();
 }
 
 void Renderer2D::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
-    if (orderDirty_)
-    {
-        Sort(drawables_.Begin(), drawables_.End(), CompareDrawable2Ds);
-        orderDirty_ = false;
-    }
-
     unsigned resultSize = results.Size();
-    for (unsigned i = drawables_.Size() - 1; i < drawables_.Size(); --i)
-    {
+    for (unsigned i = 0; i < drawables_.Size(); ++i)
         drawables_[i]->ProcessRayQuery(query, results);
-        if (results.Size() != resultSize)
-            return;
-    }
+
+    if (results.Size() != resultSize)
+        Sort(results.Begin() + resultSize, results.End(), CompareRayQueryResults);
 }
 
 void Renderer2D::UpdateBatches(const FrameInfo& frame)
@@ -114,14 +124,19 @@ void Renderer2D::UpdateBatches(const FrameInfo& frame)
 
 void Renderer2D::UpdateGeometry(const FrameInfo& frame)
 {
-    unsigned& vertexCount = vertexCount_[frame.camera_];
-    unsigned& indexCount = indexCount_[frame.camera_];
+    unsigned indexCount = 0;
+    for (HashMap<Camera*, ViewBatchInfo2D>::ConstIterator i = viewBatchInfos_.Begin(); i != viewBatchInfos_.End(); ++i)
+    {
+        if (i->second_.batchUpdatedFrameNumber_ == frame_.frameNumber_)
+            indexCount = Max((int)indexCount, (int)i->second_.indexCount_);
+    }
 
     // Fill index buffer
     if (indexBuffer_->GetIndexCount() < indexCount || indexBuffer_->IsDataLost())
     {
-        bool largeIndices = vertexCount > 0xffff;
+        bool largeIndices = (indexCount * 4 / 6) > 0xffff;
         indexBuffer_->SetSize(indexCount, largeIndices);
+
         void* buffer = indexBuffer_->Lock(0, indexCount, true);
         if (buffer)
         {
@@ -166,29 +181,37 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
         }
     }
 
-    if (vertexBuffer_->GetVertexCount() < vertexCount)
-        vertexBuffer_->SetSize(vertexCount, MASK_VERTEX2D);
+    Camera* camera = frame.camera_;
+    ViewBatchInfo2D& viewBatchInfo = viewBatchInfos_[camera];
 
-    if (vertexCount)
-    {
-        Vertex2D* dest = reinterpret_cast<Vertex2D*>(vertexBuffer_->Lock(0, vertexCount, true));
-        if (dest)
+    if (viewBatchInfo.vertexBufferUpdateFrameNumber_ != frame_.frameNumber_)
+    {       
+        unsigned vertexCount = viewBatchInfo.vertexCount_;
+        VertexBuffer* vertexBuffer = viewBatchInfo.vertexBuffer_;
+        if (vertexBuffer->GetVertexCount() < vertexCount)
+            vertexBuffer->SetSize(vertexCount, MASK_VERTEX2D, true);
+
+        if (vertexCount)
         {
-            for (unsigned d = 0; d < drawables_.Size(); ++d)
+            Vertex2D* dest = reinterpret_cast<Vertex2D*>(vertexBuffer->Lock(0, vertexCount, true));
+            if (dest)
             {
-                if (!drawables_[d]->IsInView(frame) || drawables_[d]->GetVertices().Empty())
-                    continue;
+                const PODVector<const SourceBatch2D*>& sourceBatches = viewBatchInfo.sourceBatches_;
+                for (unsigned b = 0; b < sourceBatches.Size(); ++b)
+                {
+                    const Vector<Vertex2D>& vertices = sourceBatches[b]->vertices_;
+                    for (unsigned i = 0; i < vertices.Size(); ++i)
+                        dest[i] = vertices[i];
+                    dest += vertices.Size();
+                }
 
-                const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
-                for (unsigned i = 0; i < vertices.Size(); ++i)
-                    dest[i] = vertices[i];
-                dest += vertices.Size();
+                vertexBuffer->Unlock();
             }
-
-            vertexBuffer_->Unlock();
+            else
+                LOGERROR("Failed to lock vertex buffer");
         }
-        else
-            LOGERROR("Failed to lock vertex buffer");
+
+        viewBatchInfo.vertexBufferUpdateFrameNumber_ = frame_.frameNumber_;
     }
 }
 
@@ -203,9 +226,6 @@ void Renderer2D::AddDrawable(Drawable2D* drawable)
         return;
 
     drawables_.Push(drawable);
-    materialDirtyDrawables_.Push(drawable);
-
-    orderDirty_ = true;
 }
 
 void Renderer2D::RemoveDrawable(Drawable2D* drawable)
@@ -214,24 +234,33 @@ void Renderer2D::RemoveDrawable(Drawable2D* drawable)
         return;
 
     drawables_.Remove(drawable);
-
-    // Drawable may be on the dirty list multiple times; remove all instances
-    for (;;)
-    {
-        PODVector<Drawable2D*>::Iterator i = materialDirtyDrawables_.Find(drawable);
-        if (i != materialDirtyDrawables_.End())
-            materialDirtyDrawables_.Erase(i);
-        else
-            break;
-    }
-
-    orderDirty_ = true;
 }
 
-void Renderer2D::MarkMaterialDirty(Drawable2D* drawable)
+Material* Renderer2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
 {
-    // Note: this may cause the drawable to appear on the dirty list multiple times
-    materialDirtyDrawables_.Push(drawable);
+    if (!material_)
+        return 0;
+
+    if (!texture)
+        return material_;
+
+    HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > >::Iterator t = cachedMaterials_.Find(texture);
+    if (t == cachedMaterials_.End())
+    {
+        SharedPtr<Material> newMaterial = CreateMaterial(texture, blendMode);
+        cachedMaterials_[texture][blendMode] = newMaterial;
+        return newMaterial;
+    }
+
+    HashMap<int, SharedPtr<Material> >& materials = t->second_;
+    HashMap<int, SharedPtr<Material> >::Iterator b = materials.Find(blendMode);
+    if (b != materials.End())
+        return b->second_;
+
+    SharedPtr<Material> newMaterial = CreateMaterial(texture, blendMode);
+    materials[blendMode] = newMaterial;
+
+    return newMaterial;
 }
 
 bool Renderer2D::CheckVisibility(Drawable2D* drawable) const
@@ -250,6 +279,17 @@ void Renderer2D::OnWorldBoundingBoxUpdate()
     worldBoundingBox_ = boundingBox_;
 }
 
+SharedPtr<Material> Renderer2D::CreateMaterial(Texture2D* texture, BlendMode blendMode)
+{
+    SharedPtr<Material> newMaterial = material_->Clone();
+
+    newMaterial->SetName(texture->GetName() + "_" + blendModeNames[blendMode]);
+    newMaterial->SetTexture(TU_DIFFUSE, texture);
+    newMaterial->GetTechnique(0)->GetPass("alpha")->SetBlendMode(blendMode);
+
+    return newMaterial;
+}
+
 void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
 {
     Renderer2D* renderer = reinterpret_cast<Renderer2D*>(item->aux_);
@@ -259,7 +299,7 @@ void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
     while (start != end)
     {
         Drawable2D* drawable = *start++;
-        if (renderer->CheckVisibility(drawable) && drawable->GetVertices().Size())
+        if (renderer->CheckVisibility(drawable))
             drawable->MarkInView(renderer->frame_);
     }
 }
@@ -268,34 +308,13 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
 {
     using namespace BeginViewUpdate;
 
-    Scene* scene = GetScene();
     // Check that we are updating the correct scene
-    if (scene != eventData[P_SCENE].GetPtr())
+    if (GetScene() != eventData[P_SCENE].GetPtr())
         return;
-    unsigned lastFrameNumber = frame_.frameNumber_;
+
     frame_ = static_cast<View*>(eventData[P_VIEW].GetPtr())->GetFrameInfo();
-    // Reset geometry use when new frame started
-    if (frame_.frameNumber_ != lastFrameNumber)
-        geometryCount_ = 0;
 
     PROFILE(UpdateRenderer2D);
-
-    if (!materialDirtyDrawables_.Empty())
-    {
-        for (unsigned i = 0; i < materialDirtyDrawables_.Size(); ++i)
-        {
-            Drawable2D* drawable = materialDirtyDrawables_[i];
-            if (!drawable->GetMaterial())
-                drawable->SetMaterial(GetMaterial(drawable->GetTexture(), drawable->GetBlendMode()));
-        }
-        materialDirtyDrawables_.Clear();
-    }
-
-    if (orderDirty_)
-    {
-        Sort(drawables_.Begin(), drawables_.End(), CompareDrawable2Ds);
-        orderDirty_ = false;
-    }
 
     Camera* camera = static_cast<Camera*>(eventData[P_CAMERA].GetPtr());
     frustum_ = &camera->GetFrustum();
@@ -336,54 +355,24 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
         queue->Complete(M_MAX_UNSIGNED);
     }
 
+    ViewBatchInfo2D& viewBatchInfo = viewBatchInfos_[camera];
+    
+    // Create vertex buffer
+    if (!viewBatchInfo.vertexBuffer_)
+        viewBatchInfo.vertexBuffer_ = new VertexBuffer(context_);
+
+    UpdateViewBatchInfo(viewBatchInfo, camera);
+
     // Go through the drawables to form geometries & batches and calculate the total vertex / index count,
     // but upload the actual vertex data later. The idea is that the View class copies our batch vector to
     // its internal data structures, so we can reuse the batches for each view, provided that unique Geometry
     // objects are used for each view to specify the draw ranges
-    batches_.Clear();
-    Material* material = 0;
-    unsigned iStart = 0;
-    unsigned iCount = 0;
-    unsigned vStart = 0;
-    unsigned vCount = 0;
-    unsigned& vTotal = vertexCount_[frame_.camera_];
-    unsigned& iTotal = indexCount_[frame_.camera_];
-    vTotal = 0;
-    iTotal = 0;
-
-    for (unsigned d = 0; d < drawables_.Size(); ++d)
+    batches_.Resize(viewBatchInfo.batchCount_);
+    for (unsigned i = 0; i < viewBatchInfo.batchCount_; ++i)
     {
-        if (!drawables_[d]->IsInView(frame_))
-            continue;
-
-        Material* usedMaterial = drawables_[d]->GetMaterial();
-        const Vector<Vertex2D>& vertices = drawables_[d]->GetVertices();
-
-        // When new material encountered, finish the current batch and start new
-        if (material != usedMaterial)
-        {
-            if (material)
-            {
-                AddBatch(material, iStart, iCount, vStart, vCount);
-                iStart += iCount;
-                iCount = 0;
-                vStart += vCount;
-                vCount = 0;
-            }
-
-            material = usedMaterial;
-        }
-
-        unsigned indices = vertices.Size() / 4 * 6;
-        iCount += indices;
-        iTotal += indices;
-        vCount += vertices.Size();
-        vTotal += vertices.Size();
+        batches_[i].material_ = viewBatchInfo.materials_[i];
+        batches_[i].geometry_ = viewBatchInfo.geometries_[i];
     }
-
-    // Add the final batch if necessary
-    if (material && vCount)
-        AddBatch(material, iStart, iCount, vStart, vCount);
 }
 
 void Renderer2D::GetDrawables(PODVector<Drawable2D*>& dest, Node* node)
@@ -404,74 +393,103 @@ void Renderer2D::GetDrawables(PODVector<Drawable2D*>& dest, Node* node)
         GetDrawables(dest, i->Get());
 }
 
-Material* Renderer2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
+static inline bool CompareSourceBatch2Ds(const SourceBatch2D* lhs, const SourceBatch2D* rhs)
 {
-    HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > >::Iterator t = cachedMaterials_.Find(texture);
-    if (t == cachedMaterials_.End())
+    if (lhs->drawOrder_ != rhs->drawOrder_)
+        return lhs->drawOrder_ < rhs->drawOrder_;
+
+    if (lhs->material_ != rhs->material_)
+        return lhs->material_->GetNameHash() < rhs->material_->GetNameHash();
+
+    return (int)lhs < (int)rhs;
+}
+
+void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* camera)
+{
+    // Already update in same frame
+    if (viewBatchInfo.batchUpdatedFrameNumber_ == frame_.frameNumber_)
+        return;
+
+    PODVector<const SourceBatch2D*>& soruceBatches = viewBatchInfo.sourceBatches_;
+    soruceBatches.Clear();
+    for (unsigned d = 0; d < drawables_.Size(); ++d)
     {
-        SharedPtr<Material> material(CreateMaterial(texture, blendMode));
-        cachedMaterials_[texture][blendMode] = material;
-        return material;
+        if (!drawables_[d]->IsInView(camera))
+            continue;
+
+        const Vector<SourceBatch2D>& batches = drawables_[d]->GetSourceBatches();
+        for (unsigned b = 0; b < batches.Size(); ++b)
+        {
+            if (batches[b].material_ && !batches[b].vertices_.Empty())
+                soruceBatches.Push(&batches[b]);
+        }
     }
 
-    HashMap<int, SharedPtr<Material> >& materials = t->second_;
-    HashMap<int, SharedPtr<Material> >::Iterator b = materials.Find(blendMode);
-    if (b != materials.End())
-        return b->second_;
+    Sort(soruceBatches.Begin(), soruceBatches.End(), CompareSourceBatch2Ds);
 
-    SharedPtr<Material> material(CreateMaterial(texture, blendMode));
-    materials[blendMode] = material;
+    viewBatchInfo.batchCount_ = 0;
+    Material* currMaterial = 0;
+    unsigned iStart = 0;
+    unsigned iCount = 0;
+    unsigned vStart = 0;
+    unsigned vCount = 0;
 
-    return material;
+    for (unsigned b = 0; b < soruceBatches.Size(); ++b)
+    {
+        Material* material = soruceBatches[b]->material_;
+        const Vector<Vertex2D>& vertices = soruceBatches[b]->vertices_;
+
+        // When new material encountered, finish the current batch and start new
+        if (currMaterial != material)
+        {
+            if (currMaterial)
+            {
+                AddViewBatch(viewBatchInfo, currMaterial, iStart, iCount, vStart, vCount);
+                iStart += iCount;
+                iCount = 0;
+                vStart += vCount;
+                vCount = 0;
+            }
+
+            currMaterial = material;
+        }
+
+        iCount += vertices.Size() * 6 / 4;
+        vCount += vertices.Size();
+    }
+
+    // Add the final batch if necessary
+    if (currMaterial && vCount)
+        AddViewBatch(viewBatchInfo, currMaterial, iStart, iCount, vStart, vCount);
+
+    viewBatchInfo.indexCount_ = iStart + iCount;
+    viewBatchInfo.vertexCount_ = vStart + vCount;
+    viewBatchInfo.batchUpdatedFrameNumber_ = frame_.frameNumber_;
 }
 
-Material* Renderer2D::CreateMaterial(Texture2D* texture, BlendMode blendMode)
-{
-    Material* material = new Material(context_);
-    if (texture)
-        material->SetName(texture->GetName() + "_" + blendModeNames[blendMode]);
-    else
-        material->SetName(blendModeNames[blendMode]);
-
-    Technique* tech = new Technique(context_);
-    Pass* pass = tech->CreatePass("alpha");
-    pass->SetBlendMode(blendMode);
-
-    pass->SetVertexShader("Urho2D");
-    pass->SetPixelShader("Urho2D");
-
-    pass->SetDepthWrite(false);
-
-    material->SetTechnique(0, tech);
-    material->SetCullMode(CULL_NONE);
-
-    material->SetTexture(TU_DIFFUSE, texture);
-
-    return material;
-}
-
-void Renderer2D::AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount)
+void Renderer2D::AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount)
 {
     if (!material || indexCount == 0 || vertexCount == 0)
         return;
 
+    if (viewBatchInfo.materials_.Size() <= viewBatchInfo.batchCount_)
+        viewBatchInfo.materials_.Resize(viewBatchInfo.batchCount_ + 1);
+    viewBatchInfo.materials_[viewBatchInfo.batchCount_] = material;
+
     // Allocate new geometry if necessary
-    if (geometries_.Size() <= geometryCount_)
+    if (viewBatchInfo.geometries_.Size() <= viewBatchInfo.batchCount_)
     {
         SharedPtr<Geometry> geometry(new Geometry(context_));
         geometry->SetIndexBuffer(indexBuffer_);
-        geometry->SetVertexBuffer(0, vertexBuffer_, MASK_VERTEX2D);
-        geometries_.Push(geometry);
+        geometry->SetVertexBuffer(0, viewBatchInfo.vertexBuffer_, MASK_VERTEX2D);
+
+        viewBatchInfo.geometries_.Push(geometry);
     }
 
-    geometries_[geometryCount_]->SetDrawRange(TRIANGLE_LIST, indexStart, indexCount, vertexStart, vertexCount, false);
+    Geometry* geometry = viewBatchInfo.geometries_[viewBatchInfo.batchCount_];
+    geometry->SetDrawRange(TRIANGLE_LIST, indexStart, indexCount, vertexStart, vertexCount, false);
 
-    batches_.Resize(batches_.Size() + 1);
-    SourceBatch& batch = batches_.Back();
-    batch.geometry_ = geometries_[geometryCount_];
-    batch.material_ = material;
-
-    ++geometryCount_;
+    viewBatchInfo.batchCount_++;
 }
 
 }

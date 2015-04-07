@@ -32,6 +32,33 @@ class IndexBuffer;
 class Material;
 class VertexBuffer;
 struct FrameInfo;
+struct SourceBatch2D;
+
+/// 2D view batch info.
+struct ViewBatchInfo2D
+{
+    /// Construct.
+    ViewBatchInfo2D();
+
+    /// Vertex buffer update frame number.
+    unsigned vertexBufferUpdateFrameNumber_;
+    /// Index count.
+    unsigned indexCount_;
+    /// Vertex count.
+    unsigned vertexCount_;
+    /// Vertex buffer.
+    SharedPtr<VertexBuffer> vertexBuffer_;
+    /// Batch updated frame number.
+    unsigned batchUpdatedFrameNumber_;
+    /// Source batches.
+    PODVector<const SourceBatch2D*> sourceBatches_;
+    /// Batch count;
+    unsigned batchCount_;
+    /// Materials.
+    Vector<SharedPtr<Material> > materials_;
+    /// Geometries.
+    Vector<SharedPtr<Geometry> > geometries_;
+};
 
 /// 2D renderer components.
 class URHO3D_API Renderer2D : public Drawable
@@ -61,47 +88,36 @@ public:
     void AddDrawable(Drawable2D* drawable);
     /// Remove Drawable2D.
     void RemoveDrawable(Drawable2D* drawable);
-    /// Mark material dirty.
-    void MarkMaterialDirty(Drawable2D* drawable);
-    /// Mark order dirty.
-    void MarkOrderDirty(){ orderDirty_ = true; }
+    /// Return material by texture and blend mode.
+    Material* GetMaterial(Texture2D* texture, BlendMode blendMode);
+
     /// Check visibility.
     bool CheckVisibility(Drawable2D* drawable) const;
 
 private:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
+    /// Create material by texture and blend mode.
+    SharedPtr<Material> CreateMaterial(Texture2D* texture, BlendMode blendMode);
     /// Handle view update begin event. Determine Drawable2D's and their batches here.
     void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData);
     /// Get all drawables in node.
     void GetDrawables(PODVector<Drawable2D*>& drawables, Node* node);
-    /// Return material by texture and blend mode.
-    Material* GetMaterial(Texture2D* texture, BlendMode blendMode);
-    /// Create new material by texture and blend mode.
-    Material* CreateMaterial(Texture2D* Texture, BlendMode blendMode);
-    /// Add batch.
-    void AddBatch(Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
+    /// Update view batch info.
+    void UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* camera);
+    /// Add view batch.
+    void AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
 
     /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
-    /// Vertex buffer.
-    SharedPtr<VertexBuffer> vertexBuffer_;
+    /// Material.
+    SharedPtr<Material> material_;
     /// Drawables.
     PODVector<Drawable2D*> drawables_;
-    /// Material dirty drawables.
-    PODVector<Drawable2D*> materialDirtyDrawables_;
-    /// Order dirty.
-    bool orderDirty_;
-    /// View frameinfo for current frame.
+    /// View frame info for current frame.
     FrameInfo frame_;
-    /// Used geometry count. Shared by all views and reset when a new frame begins.
-    unsigned geometryCount_;
-    /// Vertex count by view.
-    HashMap<Camera*, unsigned> vertexCount_;
-    /// Index count by view.
-    HashMap<Camera*, unsigned> indexCount_;
-    /// Geometries used in all views.
-    Vector<SharedPtr<Geometry> > geometries_;
+    /// View batch info.
+    HashMap<Camera*, ViewBatchInfo2D> viewBatchInfos_;
     /// Frustum for current frame.
     const Frustum* frustum_;
     /// Frustum bounding box for current frame.
