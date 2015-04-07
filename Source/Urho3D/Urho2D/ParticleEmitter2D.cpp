@@ -202,23 +202,28 @@ void ParticleEmitter2D::UpdateSourceBatches()
     if (!sprite_)
         return;
 
-    Texture2D* texture = sprite_->GetTexture();
-    if (!texture)
+    Rect textureRect;
+    if (!sprite_->GetTextureRectangle(textureRect))
         return;
 
-    const IntRect& rectangle_ = sprite_->GetRectangle();
-    if (rectangle_.Width() == 0 || rectangle_.Height() == 0)
-        return;
-
+    /*
+    V1---------V2
+    |         / |
+    |       /   |
+    |     /     |
+    |   /       |
+    | /         |
+    V0---------V3
+    */
     Vertex2D vertex0;
     Vertex2D vertex1;
     Vertex2D vertex2;
     Vertex2D vertex3;
 
-    vertex0.uv_ = Vector2(0.0f, 1.0f);
-    vertex1.uv_ = Vector2(0.0f, 0.0f);
-    vertex2.uv_ = Vector2(1.0f, 0.0f);
-    vertex3.uv_ = Vector2(1.0f, 1.0f);
+    vertex0.uv_ = textureRect.min_;
+    vertex1.uv_ = Vector2(textureRect.min_.x_, textureRect.max_.y_);
+    vertex2.uv_ = textureRect.max_;
+    vertex3.uv_ = Vector2(textureRect.max_.x_, textureRect.min_.y_);
 
     for (int i = 0; i < numParticles_; ++i)
     {

@@ -23,6 +23,7 @@
 #include "../Core/Context.h"
 #include "../IO/Deserializer.h"
 #include "../Resource/ResourceCache.h"
+#include "../Urho2D/Drawable2D.h"
 #include "../Urho2D/Sprite2D.h"
 #include "../Urho2D/SpriteSheet2D.h"
 #include "../Graphics/Texture2D.h"
@@ -123,6 +124,60 @@ void Sprite2D::SetOffset(const IntVector2& offset)
 void Sprite2D::SetSpriteSheet(SpriteSheet2D* spriteSheet)
 {
     spriteSheet_ = spriteSheet;
+}
+
+bool Sprite2D::GetDrawRectangle(Rect& rect, bool flipX, bool flipY) const
+{
+    return GetDrawRectangle(rect, hotSpot_, flipX, flipY);
+}
+
+bool Sprite2D::GetDrawRectangle(Rect& rect, const Vector2& hotSpot, bool flipX, bool flipY) const
+{
+    if (rectangle_.Width() == 0 || rectangle_.Height() == 0)
+        return false;
+
+    float width = (float)rectangle_.Width() * PIXEL_SIZE;
+    float height = (float)rectangle_.Height() * PIXEL_SIZE;        
+
+    float hotSpotX = flipX ? (1.0f - hotSpot.x_) : hotSpot.x_;
+    float hotSpotY = flipY ? (1.0f - hotSpot.y_) : hotSpot.y_;
+
+#ifdef URHO3D_OPENGL
+    rect.min_.x_ = -width * hotSpotX;
+    rect.max_.x_ = width * (1.0f - hotSpotX);
+    rect.min_.y_ = -height * hotSpotY;
+    rect.max_.y_ = height * (1.0f - hotSpotY);
+#else
+    const float halfPixelOffset = 0.5f * PIXEL_SIZE;
+    rect.min_.x_ = -width * hotSpotX + halfPixelOffset;
+    rect.max_.x_ = width * (1.0f - hotSpotX) + halfPixelOffset;
+    rect.min_.y_ = -height * hotSpotY + halfPixelOffset;
+    rect.max_.y_ = height * (1.0f - hotSpotY) + halfPixelOffset;
+#endif
+    return true;
+}
+
+bool Sprite2D::GetTextureRectangle(Rect& rect, bool flipX, bool flipY) const
+{
+    if (!texture_)
+        return false;
+
+    float invWidth = 1.0f / (float)texture_->GetWidth();
+    float invHeight = 1.0f / (float)texture_->GetHeight();
+
+    rect.min_.x_ = rectangle_.left_ * invWidth;
+    rect.max_.x_ = rectangle_.right_ * invWidth;
+
+    rect.min_.y_ = rectangle_.bottom_ * invHeight;
+    rect.max_.y_ = rectangle_.top_ * invHeight;
+
+    if (flipX)
+        Swap(rect.min_.x_, rect.max_.x_);
+    
+    if (flipY)
+        Swap(rect.min_.y_, rect.max_.y_);
+
+    return true;
 }
 
 ResourceRef Sprite2D::SaveToResourceRef(Sprite2D* sprite)

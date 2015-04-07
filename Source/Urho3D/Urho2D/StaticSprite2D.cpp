@@ -245,14 +245,23 @@ void StaticSprite2D::UpdateSourceBatches()
 
     if (!sprite_)
         return;
-    Texture2D* texture = sprite_->GetTexture();
-    if (!texture)
-        return;
 
-    const IntRect& rectangle_ = sprite_->GetRectangle();
-    if (rectangle_.Width() == 0 || rectangle_.Height() == 0)
-        return;
+    Rect drawRect;
+    if (useHotSpot_)
+    {
+        if (!sprite_->GetDrawRectangle(drawRect, hotSpot_, flipX_, flipY_))
+            return;
+    }
+    else
+    {
+        if (!sprite_->GetDrawRectangle(drawRect, flipX_, flipY_))
+            return;
+    }
 
+    Rect textureRect;
+    if (!sprite_->GetTextureRectangle(textureRect, flipX_, flipY_))
+        return;
+    
     /*
     V1---------V2
     |         / |
@@ -267,67 +276,17 @@ void StaticSprite2D::UpdateSourceBatches()
     Vertex2D vertex2;
     Vertex2D vertex3;
 
-    float width = (float)rectangle_.Width() * PIXEL_SIZE;     // Compute width and height in pixels
-    float height = (float)rectangle_.Height() * PIXEL_SIZE;
-
-    float hotSpotX;
-    float hotSpotY;
-
-    if (useHotSpot_)
-    {
-        hotSpotX = flipX_ ? (1.0f - hotSpot_.x_) : hotSpot_.x_;
-        hotSpotY = flipY_ ? (1.0f - hotSpot_.y_) : hotSpot_.y_;
-    }
-    else
-    {
-        const Vector2& hotSpot = sprite_->GetHotSpot();
-        hotSpotX = flipX_ ? (1.0f - hotSpot.x_) : hotSpot.x_;
-        hotSpotY = flipY_ ? (1.0f - hotSpot.y_) : hotSpot.y_;
-    }
-
-#ifdef URHO3D_OPENGL
-    float leftX = -width * hotSpotX;
-    float rightX = width * (1.0f - hotSpotX);
-    float bottomY = -height * hotSpotY;
-    float topY = height * (1.0f - hotSpotY);
-#else
-    const float halfPixelOffset = 0.5f * PIXEL_SIZE;
-    float leftX = -width * hotSpotX + halfPixelOffset;
-    float rightX = width * (1.0f - hotSpotX) + halfPixelOffset;
-    float bottomY = -height * hotSpotY + halfPixelOffset;
-    float topY = height * (1.0f - hotSpotY) + halfPixelOffset;
-#endif
-
+    // Convert to world space
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
+    vertex0.position_ = worldTransform * Vector3(drawRect.min_.x_, drawRect.min_.y_, 0.0f);
+    vertex1.position_ = worldTransform * Vector3(drawRect.min_.x_, drawRect.max_.y_, 0.0f);
+    vertex2.position_ = worldTransform * Vector3(drawRect.max_.x_, drawRect.max_.y_, 0.0f);
+    vertex3.position_ = worldTransform * Vector3(drawRect.max_.x_, drawRect.min_.y_, 0.0f);
 
-    vertex0.position_ = worldTransform * Vector3(leftX, bottomY, 0.0f);
-    vertex1.position_ = worldTransform * Vector3(leftX, topY, 0.0f);
-    vertex2.position_ = worldTransform * Vector3(rightX, topY, 0.0f);
-    vertex3.position_ = worldTransform * Vector3(rightX, bottomY, 0.0f);
-
-    float invTexW = 1.0f / (float)texture->GetWidth();
-    float invTexH = 1.0f / (float)texture->GetHeight();
-
-    float leftU = rectangle_.left_ * invTexW;
-    float rightU = rectangle_.right_ * invTexW;
-    float topV = rectangle_.top_ * invTexH;
-    float bottomV = rectangle_.bottom_ * invTexH;
-    vertex0.uv_ = Vector2(leftU, bottomV);
-    vertex1.uv_ = Vector2(leftU, topV);
-    vertex2.uv_ = Vector2(rightU, topV);
-    vertex3.uv_ = Vector2(rightU, bottomV);
-
-    if (flipX_)
-    {
-        Swap(vertex0.uv_.x_, vertex3.uv_.x_);
-        Swap(vertex1.uv_.x_, vertex2.uv_.x_);
-    }
-    
-    if (flipY_)
-    {
-        Swap(vertex0.uv_.y_, vertex1.uv_.y_);
-        Swap(vertex2.uv_.y_, vertex3.uv_.y_);
-    }
+    vertex0.uv_ = textureRect.min_;
+    vertex1.uv_ = Vector2(textureRect.min_.x_, textureRect.max_.y_);
+    vertex2.uv_ = textureRect.max_;
+    vertex3.uv_ = Vector2(textureRect.max_.x_, textureRect.min_.y_);
 
     vertex0.color_ = vertex1.color_ = vertex2.color_  = vertex3.color_ = color_.ToUInt();
 
