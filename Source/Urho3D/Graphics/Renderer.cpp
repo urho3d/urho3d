@@ -279,7 +279,6 @@ Renderer::Renderer(Context* context) :
     resetViews_(false)
 {
     SubscribeToEvent(E_SCREENMODE, HANDLER(Renderer, HandleScreenMode));
-    SubscribeToEvent(E_GRAPHICSFEATURES, HANDLER(Renderer, HandleGraphicsFeatures));
     
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
@@ -1709,13 +1708,6 @@ void Renderer::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         Initialize();
     else
         resetViews_ = true;
-}
-
-void Renderer::HandleGraphicsFeatures(StringHash eventType, VariantMap& eventData)
-{
-    // Reinitialize if already initialized
-    if (initialized_)
-        Initialize();
 }
 
 void Renderer::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)

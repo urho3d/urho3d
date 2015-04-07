@@ -1511,7 +1511,6 @@ void View::ExecuteRenderPathCommands()
                         
                         SetRenderTargets(command);
                         bool allowDepthWrite = SetTextures(command);
-                        graphics_->SetFillMode(camera_->GetFillMode());
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
                         queue.Draw(this, command.markToStencil_, false, allowDepthWrite);
                     }
@@ -1546,7 +1545,6 @@ void View::ExecuteRenderPathCommands()
                         }
 
                         bool allowDepthWrite = SetTextures(command);
-                        graphics_->SetFillMode(camera_->GetFillMode());
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
                         
                         // Draw base (replace blend) batches first

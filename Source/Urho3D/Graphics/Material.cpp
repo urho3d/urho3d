@@ -83,6 +83,14 @@ static const char* cullModeNames[] =
     0
 };
 
+static const char* fillModeNames[] =
+{
+    "solid",
+    "wireframe",
+    "point",
+    0
+};
+
 TextureUnit ParseTextureUnitName(String name)
 {
     name = name.ToLower().Trimmed();
@@ -373,6 +381,10 @@ bool Material::Load(const XMLElement& source)
     if (shadowCullElem)
         SetShadowCullMode((CullMode)GetStringListIndex(shadowCullElem.GetAttribute("value").CString(), cullModeNames, CULL_CCW));
 
+    XMLElement fillElem = source.GetChild("fill");
+    if (fillElem)
+        SetFillMode((FillMode)GetStringListIndex(fillElem.GetAttribute("value").CString(), fillModeNames, FILL_SOLID));
+
     XMLElement depthBiasElem = source.GetChild("depthbias");
     if (depthBiasElem)
         SetDepthBias(BiasParameters(depthBiasElem.GetFloat("constant"), depthBiasElem.GetFloat("slopescaled")));
@@ -443,6 +455,10 @@ bool Material::Save(XMLElement& dest) const
 
     XMLElement shadowCullElem = dest.CreateChild("shadowcull");
     shadowCullElem.SetString("value", cullModeNames[shadowCullMode_]);
+
+    // Write fill mode
+    XMLElement fillElem = dest.CreateChild("fill");
+    fillElem.SetString("value", fillModeNames[fillMode_]);
 
     // Write depth bias
     XMLElement depthBiasElem = dest.CreateChild("depthbias");
@@ -602,6 +618,11 @@ void Material::SetShadowCullMode(CullMode mode)
     shadowCullMode_ = mode;
 }
 
+void Material::SetFillMode(FillMode mode)
+{
+    fillMode_ = mode;
+}
+
 void Material::SetDepthBias(const BiasParameters& parameters)
 {
     depthBias_ = parameters;
@@ -651,6 +672,7 @@ SharedPtr<Material> Material::Clone(const String& cloneName) const
     ret->specular_ = specular_;
     ret->cullMode_ = cullMode_;
     ret->shadowCullMode_ = shadowCullMode_;
+    ret->fillMode_ = fillMode_;
     ret->RefreshMemoryUse();
 
     return ret;
@@ -770,6 +792,7 @@ void Material::ResetToDefaults()
 
     cullMode_ = CULL_CCW;
     shadowCullMode_ = CULL_CCW;
+    fillMode_ = FILL_SOLID;
     depthBias_ = BiasParameters(0.0f, 0.0f);
 
     RefreshShaderParameterHash();

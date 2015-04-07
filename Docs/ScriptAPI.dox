@@ -58,8 +58,6 @@ namespace Urho3D
 - %X : int
 - %Y : int
 
-### GraphicsFeatures
-
 ### RenderSurfaceUpdate
 
 ### BeginRendering
@@ -6907,6 +6905,7 @@ Properties:
 - String category // readonly
 - CullMode cullMode
 - BiasParameters depthBias
+- FillMode fillMode
 - uint memoryUse // readonly
 - String name
 - uint numTechniques

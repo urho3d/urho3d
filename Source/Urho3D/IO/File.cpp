@@ -123,7 +123,7 @@ bool File::Open(const String& fileName, FileMode mode)
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
-        LOGERROR("Access denied to " + fileName);
+        LOGERRORF("Access denied to %s", fileName.CString());
         return false;
     }
 
@@ -139,7 +139,7 @@ bool File::Open(const String& fileName, FileMode mode)
         assetHandle_ = SDL_RWFromFile(fileName.Substring(5).CString(), "rb");
         if (!assetHandle_)
         {
-            LOGERROR("Could not open asset file " + fileName);
+            LOGERRORF("Could not open asset file %s", fileName.CString());
             return false;
         }
         else
@@ -163,7 +163,7 @@ bool File::Open(const String& fileName, FileMode mode)
         LOGERROR("Could not open file with empty name");
         return false;
     }
-    
+
     #ifdef WIN32
     handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode]);
     #else
@@ -179,10 +179,10 @@ bool File::Open(const String& fileName, FileMode mode)
         handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode + 1]);
         #endif
     }
-    
+
     if (!handle_)
     {
-        LOGERROR("Could not open file " + fileName);
+        LOGERRORF("Could not open file %s", fileName.CString());
         return false;
     }
 
@@ -196,8 +196,16 @@ bool File::Open(const String& fileName, FileMode mode)
     writeSyncNeeded_ = false;
 
     fseek((FILE*)handle_, 0, SEEK_END);
-    size_ = ftell((FILE*)handle_);
+    long size = ftell((FILE*)handle_);
     fseek((FILE*)handle_, 0, SEEK_SET);
+    if (size > M_MAX_UNSIGNED)
+    {
+        LOGERRORF("Could not open file %s which is larger than 4GB", fileName.CString());
+        Close();
+        size_ = 0;
+        return false;
+    }
+    size_ = (unsigned)size;
     return true;
 }
 
@@ -232,7 +240,7 @@ bool File::Open(PackageFile* package, const String& fileName)
     compressed_ = package->IsCompressed();
     readSyncNeeded_ = false;
     writeSyncNeeded_ = false;
-    
+
     fseek((FILE*)handle_, offset_, SEEK_SET);
     return true;
 }
@@ -333,7 +341,7 @@ unsigned File::Read(void* dest, unsigned size)
         fseek((FILE*)handle_, position_ + offset_, SEEK_SET);
         readSyncNeeded_ = false;
     }
-    
+
     size_t ret = fread(dest, size, 1, (FILE*)handle_);
     if (ret != 1)
     {
@@ -427,7 +435,7 @@ unsigned File::Write(const void* data, unsigned size)
         fseek((FILE*)handle_, position_ + offset_, SEEK_SET);
         writeSyncNeeded_ = false;
     }
-    
+
     if (fwrite(data, size, 1, (FILE*)handle_) != 1)
     {
         // Return to the position where the write began

@@ -2562,8 +2562,6 @@ void Graphics::CheckFeatureSupport()
     /// \todo Should be checked for each texture format separately
     sRGBSupport_ = impl_->CheckFormatSupport(D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD, D3DRTYPE_TEXTURE);
     sRGBWriteSupport_ = impl_->CheckFormatSupport(D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBWRITE, D3DRTYPE_TEXTURE);
-    
-    SendEvent(E_GRAPHICSFEATURES);
 }
 
 void Graphics::ResetDevice()

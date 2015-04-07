@@ -242,7 +242,8 @@ void AnimatedSprite2D::OnBlendModeChanged()
             continue;
 
         StaticSprite2D* staticSprite = trackNodes_[i]->GetComponent<StaticSprite2D>();
-        staticSprite->SetBlendMode(blendMode_);
+        if (staticSprite)
+            staticSprite->SetBlendMode(blendMode_);
     }
 }
 
@@ -254,7 +255,8 @@ void AnimatedSprite2D::OnFlipChanged()
             continue;
 
         StaticSprite2D* staticSprite = trackNodes_[i]->GetComponent<StaticSprite2D>();
-        staticSprite->SetFlip(flipX_, flipY_);
+        if (staticSprite)
+            staticSprite->SetFlip(flipX_, flipY_);
     }
 
     // For editor paused mode

@@ -52,6 +52,7 @@ static const char* shapeNames[] =
 };
 
 /// OS cursor shape lookup table matching cursor shape enumeration
+#if !defined(ANDROID) && !defined(IOS)
 static const int osCursorLookup[CS_MAX_SHAPES] =
 {
     SDL_SYSTEM_CURSOR_ARROW,    // CS_NORMAL
@@ -67,6 +68,7 @@ static const int osCursorLookup[CS_MAX_SHAPES] =
     SDL_SYSTEM_CURSOR_WAIT,   // CS_BUSY
     SDL_SYSTEM_CURSOR_WAITARROW // CS_BUSY_ARROW
 };
+#endif
 
 extern const char* UI_CATEGORY;
 
@@ -211,7 +213,6 @@ void Cursor::SetUseSystemShapes(bool enable)
 
 void Cursor::SetShapesAttr(const VariantVector& value)
 {
-    unsigned index = 0;
     if (!value.Size())
         return;
 

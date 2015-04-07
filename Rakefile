@@ -88,11 +88,11 @@ task :cmake do
   system "./#{script}#{ENV['OS'] ? '.bat' : '.sh'} \"#{build_tree}\" #{build_options}" or abort
 end
 
-# Usage: rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [numjobs=8] [clean_first] [unfilter]
+# Usage: rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [numjobs=n] [clean_first] [unfilter]
 # e.g.: rake make android; or rake make android doc; or rake make ios config=Debug sdk=iphonesimulator build_tree=~/ios-Build
 desc 'Build the generated project in its corresponding build tree'
 task :make do
-  numjobs = '-j' + (ENV['numjobs'] || '8')
+  numjobs = ENV['numjobs'] || ''
   platform = 'native'
   cmake_build_options = ''
   build_options = ''
@@ -117,15 +117,40 @@ task :make do
     end
   }
   build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
+  ccache_envvar = ''
   if !Dir.glob("#{build_tree}/*.xcodeproj").empty?
+    # xcodebuild
+    if !numjobs.empty?
+      build_options = "-jobs #{numjobs}#{build_options}"
+    end
     filter = !unfilter && system('xcpretty -v >/dev/null 2>&1') ? '|xcpretty -c && exit ${PIPESTATUS[0]}' : ''
   elsif !Dir.glob("#{build_tree}/*.sln").empty?
-    filter = ''
+    # msbuild
+    numjobs = ":#{numjobs}" unless numjobs.empty?
+    build_options = "/maxcpucount#{numjobs}#{build_options}"
+    filter = unfilter ? '' : '/nologo /verbosity:minimal'
   else
-    build_options = "#{numjobs}#{build_options}"
+    # make
+    ccache_envvar = 'CCACHE_SLOPPINESS=pch_defines,time_macros' unless ENV['CCACHE_SLOPPINESS']   # Only attempt to do the right thing when user hasn't done it
+    ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CACHE_COMPRESS']
+    if numjobs.empty?
+      case RUBY_PLATFORM
+      when /linux/
+        numjobs = `grep -c processor /proc/cpuinfo`.chomp
+      when /darwin/
+        numjobs = `sysctl -n hw.logicalcpu`.chomp
+      when /win32|mingw|mswin/
+        require 'win32ole'
+        WIN32OLE.connect('winmgmts://').ExecQuery('select NumberOfLogicalProcessors from Win32_ComputerSystem').each { |out| numjobs = out.NumberOfLogicalProcessors }
+        ccache_envvar = ''    # Extra env var is harmless even when ccache is not in use, well, except on Windows host system
+      else
+        numjobs = 1
+      end
+    end
+    build_options = "-j#{numjobs}#{build_options}"
     filter = ''
   end
-  system "cd \"#{build_tree}\" && cmake --build . #{cmake_build_options} -- #{build_options} #{filter}" or abort
+  system "cd \"#{build_tree}\" && #{ccache_envvar} cmake --build . #{cmake_build_options} -- #{build_options} #{filter}" or abort
 end
 
 # Usage: rake android [parameter='--es pickedLibrary Urho3DPlayer'] [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='sleep 30'] [api=19] [abi=armeabi-v7a] [avd=test_#{api}_#{abi}] [retries=10] [retry_interval=10]
@@ -169,7 +194,7 @@ task :ci do
   $build_options = "-DWIN32=#{ENV['WINDOWS']}" if ENV['WINDOWS']
   $build_options = "#{$build_options} -DANDROID_ABI=#{ENV['ABI']}" if ENV['ABI']
   $build_options = "#{$build_options} -DANDROID_NATIVE_API_LEVEL=#{ENV['API']}" if ENV['API']
-  ['URHO3D_64BIT', 'URHO3D_OPENGL', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
+  ['URHO3D_64BIT', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
     $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var]
   }
   if ENV['XCODE']
@@ -288,7 +313,8 @@ task :ci_package_upload do
     if ENV['URHO3D_USE_LIB64_RPM']
       system "cd ../Build && cmake . -DURHO3D_USE_LIB64_RPM=#{ENV['URHO3D_USE_LIB64_RPM']}" or abort 'Failed to reconfigure to generate 64-bit RPM package'
     end
-    system 'cd ../Build && make package' or abort 'Failed to make binary package'
+    wrapper = ENV['CI'] && ENV['URHO3D_64BIT'] ? 'setarch i686' : ''
+    system "cd ../Build && #{wrapper} make package" or abort 'Failed to make binary package'
   end
   # Determine the upload location
   setup_digital_keys

@@ -159,6 +159,54 @@ void WorkQueue::AddWorkItem(SharedPtr<WorkItem> item)
     }
 }
 
+bool WorkQueue::RemoveWorkItem(SharedPtr<WorkItem> item)
+{
+    if (!item)
+        return false;
+
+    MutexLock lock(queueMutex_);
+    
+    // Can only remove successfully if the item was not yet taken by threads for execution
+    List<WorkItem*>::Iterator i = queue_.Find(item.Get());
+    if (i != queue_.End())
+    {
+        List<SharedPtr<WorkItem> >::Iterator j = workItems_.Find(item);
+        if (j != workItems_.End())
+        {
+            queue_.Erase(i);
+            ReturnToPool(item);
+            workItems_.Erase(j);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+unsigned WorkQueue::RemoveWorkItems(const Vector<SharedPtr<WorkItem> >& items)
+{
+    MutexLock lock(queueMutex_);
+    unsigned removed = 0;
+
+    for (Vector<SharedPtr<WorkItem> >::ConstIterator i = items.Begin(); i != items.End(); ++i)
+    {
+        List<WorkItem*>::Iterator j = queue_.Find(i->Get());
+        if (j != queue_.End())
+        {
+            List<SharedPtr<WorkItem> >::Iterator k = workItems_.Find(*i);
+            if (k != workItems_.End())
+            {
+                queue_.Erase(j);
+                ReturnToPool(*k);
+                workItems_.Erase(k);
+                ++removed;
+            }
+        }
+    }
+
+    return removed;
+}
+
 void WorkQueue::Pause()
 {
     if (!paused_)
@@ -295,24 +343,7 @@ void WorkQueue::PurgeCompleted(unsigned priority)
                 SendEvent(E_WORKITEMCOMPLETED, eventData);
             }
 
-            // Check if this was a pooled item and set it to usable
-            if ((*i)->pooled_)
-            {
-                // Reset the values to their defaults. This should 
-                // be safe to do here as the completed event has 
-                // already been handled and this is part of the 
-                // internal pool.
-                (*i)->start_ = NULL;
-                (*i)->end_ = NULL;
-                (*i)->aux_ = NULL;
-                (*i)->workFunction_ = NULL;
-                (*i)->priority_ = M_MAX_UNSIGNED;
-                (*i)->sendEvent_ = false;
-                (*i)->completed_ = false;
-
-                poolItems_.Push(*i);
-            }
-
+            ReturnToPool(*i);
             i = workItems_.Erase(i);
         }
         else
@@ -330,6 +361,27 @@ void WorkQueue::PurgePool()
         poolItems_.PopFront();
 
     lastSize_ = currentSize;
+}
+
+void WorkQueue::ReturnToPool(SharedPtr<WorkItem>& item)
+{
+    // Check if this was a pooled item and set it to usable
+    if (item->pooled_)
+    {
+        // Reset the values to their defaults. This should 
+        // be safe to do here as the completed event has
+        // already been handled and this is part of the
+        // internal pool.
+        item->start_ = 0;
+        item->end_ = 0;
+        item->aux_ = 0;
+        item->workFunction_ = 0;
+        item->priority_ = M_MAX_UNSIGNED;
+        item->sendEvent_ = false;
+        item->completed_ = false;
+
+        poolItems_.Push(item);
+    }
 }
 
 void WorkQueue::HandleBeginFrame(StringHash eventType, VariantMap& eventData)

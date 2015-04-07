@@ -448,7 +448,7 @@ private:
     /// Create the application window icon.
     void CreateWindowIcon();
     /// Check supported rendering features.
-    void CheckFeatureSupport(String& extensions);
+    void CheckFeatureSupport();
     /// Prepare for draw call. Update constant buffers and setup the FBO.
     void PrepareDraw();
     /// Clean up all framebuffers. Called when destroying the context.

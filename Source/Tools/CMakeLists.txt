@@ -40,7 +40,7 @@ if ((CMAKE_CROSSCOMPILING OR IOS) AND URHO3D_PACKAGING)
         # For iOS target, its host is MacOSX; Also workaround a known CMake/Xcode generator bug which prevents it from installing binaries correctly
         set (OSX_HOST -DCMAKE_OSX_SYSROOT=macosx BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
     endif ()
-    ExternalProject_Add(PackageTool
+    ExternalProject_Add (PackageTool
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Tools/PackageTool
         CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DBAKED_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} ${OSX_HOST})
     install (PROGRAMS ${CMAKE_BINARY_DIR}/bin/tool/PackageTool DESTINATION ${DEST_RUNTIME_DIR}/tool)

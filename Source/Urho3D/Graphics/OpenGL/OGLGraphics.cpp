@@ -137,7 +137,6 @@ static const unsigned glFillMode[] =
     GL_LINE,
     GL_POINT
 };
-#endif
 
 static const unsigned glStencilOps[] =
 {
@@ -147,6 +146,7 @@ static const unsigned glStencilOps[] =
     GL_INCR_WRAP,
     GL_DECR_WRAP
 };
+#endif
 
 // Remap vertex attributes on OpenGL so that all usually needed attributes including skinning fit to the first 8.
 // This avoids a skinning bug on GLES2 devices which only support 8.
@@ -160,7 +160,9 @@ static unsigned glesDepthStencilFormat = GL_DEPTH_COMPONENT16;
 static unsigned glesReadableDepthFormat = GL_DEPTH_COMPONENT;
 #endif
 
-bool CheckExtension(String& extensions, const String& name)
+static String extensions;
+
+bool CheckExtension(const String& name)
 {
     if (extensions.Empty())
         extensions = (const char*)glGetString(GL_EXTENSIONS);
@@ -331,7 +333,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         vsync_ = vsync;
         return true;
     }
-    
+
     // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. 
     // If zero in fullscreen, use desktop mode
     if (!width || !height)
@@ -491,83 +493,9 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         // Create/restore context and GPU objects and set initial renderstate
         Restore();
         
+        // Specific error message is already logged by Restore() when context creation or OpenGL extensions check fails
         if (!impl_->context_)
-        {
-            LOGERROR("Could not create OpenGL context");
             return false;
-        }
-        
-        // If OpenGL extensions not yet initialized, initialize now
-        #ifndef GL_ES_VERSION_2_0
-        GLenum err = glewInit();
-        if (GLEW_OK != err)
-        {
-            LOGERROR("Cannot initialize OpenGL");
-            Release(true, true);
-            return false;
-        }
-
-        if (!forceGL2_ && GLEW_VERSION_3_2)
-        {
-            gl3Support = true;
-            apiName_ = "GL3";
-
-            // Create and bind a vertex array object that will stay in use throughout
-            unsigned vertexArrayObject;
-            glGenVertexArrays(1, &vertexArrayObject);
-            glBindVertexArray(vertexArrayObject);
-
-            // Work around GLEW failure to check extensions properly from a GL3 context
-            instancingSupport_ = true;
-            dxtTextureSupport_ = true;
-            anisotropySupport_ = true;
-            sRGBSupport_ = true;
-            sRGBWriteSupport_ = true;
-        }
-        else if (GLEW_VERSION_2_0)
-        {
-            if (!GLEW_EXT_framebuffer_object || !GLEW_EXT_packed_depth_stencil)
-            {
-                LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
-                Release(true, true);
-                return false;
-            }
-
-            gl3Support = false;
-            apiName_ = "GL2";
-
-            instancingSupport_ = GLEW_ARB_instanced_arrays != 0;
-            dxtTextureSupport_ = GLEW_EXT_texture_compression_s3tc != 0;
-            anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
-            sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
-            sRGBWriteSupport_ = GLEW_EXT_framebuffer_sRGB != 0;
-        }
-        else
-        {
-            LOGERROR("OpenGL 2.0 is required");
-            Release(true, true);
-            return false;
-        }
-        
-        // Set up instancing divisors if supported
-        if (gl3Support)
-        {
-            glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX1, 1);
-            glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX2, 1);
-            glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX3, 1);
-        }
-        else if (instancingSupport_)
-        {
-            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX1, 1);
-            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX2, 1);
-            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX3, 1);
-        }
-        
-        #else
-        dxtTextureSupport_ = CheckExtension(extensions, "EXT_texture_compression_dxt1");
-        etcTextureSupport_ = CheckExtension(extensions, "OES_compressed_ETC1_RGB8_texture");
-        pvrtcTextureSupport_ = CheckExtension(extensions, "IMG_texture_compression_pvrtc");
-        #endif
     }
     
     // Set vsync
@@ -596,7 +524,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     Clear(CLEAR_COLOR);
     SDL_GL_SwapWindow(impl_->window_);
     
-    CheckFeatureSupport(extensions);
+    CheckFeatureSupport();
     
     #ifdef URHO3D_LOGGING
     String msg;
@@ -2056,13 +1984,14 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
     case CF_DXT1:
         return dxtTextureSupport_ ? GL_COMPRESSED_RGBA_S3TC_DXT1_EXT : 0;
 
-    #ifndef GL_ES_VERSION_2_0
+    #if !defined(GL_ES_VERSION_2_0) || defined(EMSCRIPTEN)
     case CF_DXT3:
         return dxtTextureSupport_ ? GL_COMPRESSED_RGBA_S3TC_DXT3_EXT : 0;
         
     case CF_DXT5:
         return dxtTextureSupport_ ? GL_COMPRESSED_RGBA_S3TC_DXT5_EXT : 0;
-    #else
+    #endif
+    #ifdef GL_ES_VERSION_2_0
     case CF_ETC1:
         return etcTextureSupport_ ? GL_ETC1_RGB8_OES : 0;
         
@@ -2187,7 +2116,8 @@ void Graphics::WindowResized()
     width_ = newWidth;
     height_ = newHeight;
     
-    // Reset rendertargets and viewport for the new screen size
+    // Reset rendertargets and viewport for the new screen size. Also clean up any FBO's, as they may be screen size dependent
+    CleanupFramebuffers();
     ResetRenderTargets();
     
     LOGDEBUGF("Window was resized to %dx%d", width_, height_);
@@ -2485,15 +2415,58 @@ void Graphics::Restore()
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint*)&impl_->systemFBO_);
         #endif
         
+        if (!impl_->context_)
+        {
+            LOGERROR("Could not create OpenGL context");
+            return;
+        }
+
+        // Clear cached extensions string from the previous context
+        extensions.Clear();
+
+        // Initialize OpenGL extensions library (desktop only)
+        #ifndef GL_ES_VERSION_2_0
+        GLenum err = glewInit();
+        if (GLEW_OK != err)
+        {
+            LOGERROR("Could not initialize OpenGL extensions");
+            return;
+        }
+
+        if (!forceGL2_ && GLEW_VERSION_3_2)
+        {
+            gl3Support = true;
+            apiName_ = "GL3";
+
+            // Create and bind a vertex array object that will stay in use throughout
+            unsigned vertexArrayObject;
+            glGenVertexArrays(1, &vertexArrayObject);
+            glBindVertexArray(vertexArrayObject);
+        }
+        else if (GLEW_VERSION_2_0)
+        {
+            if (!GLEW_EXT_framebuffer_object || !GLEW_EXT_packed_depth_stencil)
+            {
+                LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
+                return;
+            }
+
+            gl3Support = false;
+            apiName_ = "GL2";
+        }
+        else
+        {
+            LOGERROR("OpenGL 2.0 is required");
+            return;
+        }
+        #endif
+
+        // Set up texture data read/write alignment. It is important that this is done before uploading any texture data
+        glPixelStorei(GL_PACK_ALIGNMENT, 1);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         ResetCachedState();
     }
-    if (!impl_->context_)
-        return;
-    
-    // Set up texture data read/write alignment. It is important that this is done before uploading any texture data
-    glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    
+
     {
         MutexLock lock(gpuObjectMutex_);
         
@@ -2742,19 +2715,47 @@ void Graphics::CreateWindowIcon()
     }
 }
 
-void Graphics::CheckFeatureSupport(String& extensions)
+void Graphics::CheckFeatureSupport()
 {
     // Check supported features: light pre-pass, deferred rendering and hardware depth texture
     lightPrepassSupport_ = false;
     deferredSupport_ = false;
     
-    int numSupportedRTs = 1;
-    
     #ifndef GL_ES_VERSION_2_0
-    if (!gl3Support)
-        glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
-    else
+    int numSupportedRTs = 1;
+    if (gl3Support)
+    {
+        // Work around GLEW failure to check extensions properly from a GL3 context
+        instancingSupport_ = true;
+        dxtTextureSupport_ = true;
+        anisotropySupport_ = true;
+        sRGBSupport_ = true;
+        sRGBWriteSupport_ = true;
+
+        glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX1, 1);
+        glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX2, 1);
+        glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX3, 1);
+
         glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &numSupportedRTs);
+    }
+    else
+    {
+        instancingSupport_ = GLEW_ARB_instanced_arrays != 0;
+        dxtTextureSupport_ = GLEW_EXT_texture_compression_s3tc != 0;
+        anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
+        sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
+        sRGBWriteSupport_ = GLEW_EXT_framebuffer_sRGB != 0;
+
+        // Set up instancing divisors if supported
+        if (instancingSupport_)
+        {
+            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX1, 1);
+            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX2, 1);
+            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX3, 1);
+        }
+
+        glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
+    }
 
     // Must support 2 rendertargets for light pre-pass, and 4 for deferred
     if (numSupportedRTs >= 2)
@@ -2772,15 +2773,24 @@ void Graphics::CheckFeatureSupport(String& extensions)
     #endif
     
     #else
+    // Check for supported compressed texture formats
+    #ifdef EMSCRIPTEN
+    dxtTextureSupport_ = CheckExtension("WEBGL_compressed_texture_s3tc");
+    #else
+    dxtTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
+    etcTextureSupport_ = CheckExtension("OES_compressed_ETC1_RGB8_texture");
+    pvrtcTextureSupport_ = CheckExtension("IMG_texture_compression_pvrtc");
+    #endif
+
     // Check for best supported depth renderbuffer format for GLES2
-    if (CheckExtension(extensions, "GL_OES_depth24"))
+    if (CheckExtension("GL_OES_depth24"))
         glesDepthStencilFormat = GL_DEPTH_COMPONENT24_OES;
-    if (CheckExtension(extensions, "GL_OES_packed_depth_stencil"))
+    if (CheckExtension("GL_OES_packed_depth_stencil"))
         glesDepthStencilFormat = GL_DEPTH24_STENCIL8_OES;
     #ifdef EMSCRIPTEN
-    if (!CheckExtension(extensions, "WEBGL_depth_texture"))
+    if (!CheckExtension("WEBGL_depth_texture"))
     #else
-    if (!CheckExtension(extensions, "GL_OES_depth_texture"))
+    if (!CheckExtension("GL_OES_depth_texture"))
     #endif
     {
         shadowMapFormat_ = 0;
@@ -2894,10 +2904,10 @@ void Graphics::PrepareDraw()
     
         // Calculate the bit combination of non-zero color rendertargets to first check if the combination changed
         unsigned newDrawBuffers = 0;
-        for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+        for (unsigned j = 0; j < MAX_RENDERTARGETS; ++j)
         {
-            if (renderTargets_[i])
-                newDrawBuffers |= 1 << i;
+            if (renderTargets_[j])
+                newDrawBuffers |= 1 << j;
         }
     
         if (newDrawBuffers != i->second_.drawBuffers_)
@@ -2910,14 +2920,14 @@ void Graphics::PrepareDraw()
                 int drawBufferIds[MAX_RENDERTARGETS];
                 unsigned drawBufferCount = 0;
             
-                for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+                for (unsigned j = 0; j < MAX_RENDERTARGETS; ++j)
                 {
-                    if (renderTargets_[i])
+                    if (renderTargets_[j])
                     {
                         if (!gl3Support)
-                            drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0_EXT + i;
+                            drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0_EXT + j;
                         else
-                            drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0 + i;
+                            drawBufferIds[drawBufferCount++] = GL_COLOR_ATTACHMENT0 + j;
                     }
                 }
                 glDrawBuffers(drawBufferCount, (const GLenum*)drawBufferIds);
@@ -3026,12 +3036,17 @@ void Graphics::CleanupFramebuffers()
 {
     if (!IsDeviceLost())
     {
+        BindFramebuffer(impl_->systemFBO_);
+        impl_->boundFBO_ = impl_->systemFBO_;
+        impl_->fboDirty_ = true;
+
         for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin(); i !=
             impl_->frameBuffers_.End(); ++i)
             DeleteFramebuffer(i->second_.fbo_);
     }
+    else
+        impl_->boundFBO_ = 0;
 
-    impl_->boundFBO_ = 0;
     impl_->frameBuffers_.Clear();
 }
 

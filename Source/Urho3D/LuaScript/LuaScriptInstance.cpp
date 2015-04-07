@@ -504,7 +504,7 @@ void LuaScriptInstance::GetScriptAttributes()
     Vector<String> names;
     if (lua_istable(luaState_, -1))
     {
-        int length = lua_objlen(luaState_, -1);
+        size_t length = lua_objlen(luaState_, -1);
         for (int i = 1; i <= length; ++i)
         {
             lua_pushinteger(luaState_, i);

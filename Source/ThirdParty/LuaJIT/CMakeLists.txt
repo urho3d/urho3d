@@ -320,10 +320,9 @@ if (CMAKE_CROSSCOMPILING OR IOS)
     endforeach ()
     # When cross-compiling, build the host tool as external project
     include (ExternalProject)
-    ExternalProject_Add(buildvm
+    ExternalProject_Add (buildvm
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/host
-        CMAKE_ARGS -DURHO3D_64BIT=${URHO3D_64BIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DHOST_XCFLAGS=${HOST_XCFLAGS} -DTARGET_ARCH=${TARGET_ARCH} -DDASM_FLAGS=${DASM_FLAGS} -DDASM_ARCH=${DASM_ARCH}
-    )
+        CMAKE_ARGS -DURHO3D_64BIT=${URHO3D_64BIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DHOST_XCFLAGS=${HOST_XCFLAGS} -DTARGET_ARCH=${TARGET_ARCH} -DDASM_FLAGS=${DASM_FLAGS} -DDASM_ARCH=${DASM_ARCH})
 else ()
     # Otherwise, build it internally as per normal
     add_subdirectory (src/host)

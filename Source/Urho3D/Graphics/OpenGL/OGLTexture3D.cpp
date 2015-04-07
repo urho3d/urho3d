@@ -284,10 +284,10 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     
     graphics_->SetTextureForUpdate(this);
     
+    #ifndef GL_ES_VERSION_2_0
     bool wholeLevel = x == 0 && y == 0 && z == 0 && width == levelWidth && height == levelHeight && depth == levelDepth;
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     
-    #ifndef GL_ES_VERSION_2_0
     if (!IsCompressed())
     {
         if (wholeLevel)

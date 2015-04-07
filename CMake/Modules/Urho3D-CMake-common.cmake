@@ -121,23 +121,24 @@ if (URHO3D_TESTING)
     set (URHO3D_TEST_TIMEOUT ${DEFAULT_TIMEOUT} CACHE STRING "Number of seconds to test run the executables (when testing support is enabled only), default to 10 on Emscripten platform and 5 on other platforms")
 else ()
     unset (URHO3D_TEST_TIMEOUT CACHE)
-    unset (EMSCRIPTEN_EMRUN_BROWSER CACHE)
+    if (EMSCRIPTEN_EMRUN_BROWSER)   # Suppress unused variable warning at the same time
+        unset (EMSCRIPTEN_EMRUN_BROWSER CACHE)
+    endif ()
 endif ()
 # The URHO3D_OPENGL option is not defined on non-Windows platforms as they should always use OpenGL
 if (MSVC)
     # On MSVC compiler, default to false (i.e. prefers Direct3D)
     # OpenGL can be manually enabled with -DURHO3D_OPENGL=1, but Windows graphics card drivers are usually better optimized for Direct3D
-    option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)")
-elseif (WIN32)
+    set (DEFAULT_OPENGL FALSE)
+else ()
     # On non-MSVC compiler on Windows platform, default to true to enable use of OpenGL instead of Direct3D
     # Direct3D can be manually enabled with -DURHO3D_OPENGL=0, but it is likely to fail unless the MinGW-w64 distribution is used due to dependency to Direct3D headers and libs
-    option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)" TRUE)
+    set (DEFAULT_OPENGL TRUE)
 endif ()
-if (WIN32)
-    # On Windows platform Direct3D11 can be optionally chosen
-    # Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
-    option (URHO3D_D3D11 "Use Direct3D11 instead of Direct3D9 (Windows platform only)")
-endif ()
+cmake_dependent_option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)" ${DEFAULT_OPENGL} "WIN32" TRUE)      # Force the variable to TRUE when not WIN32
+# On Windows platform Direct3D11 can be optionally chosen
+# Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
+cmake_dependent_option (URHO3D_D3D11 "Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option" FALSE "WIN32" FALSE)
 if (CMAKE_HOST_WIN32 AND NOT DEFINED URHO3D_MKLINK)
     # Test whether the host system is capable of setting up symbolic link
     execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
@@ -271,17 +272,13 @@ if (URHO3D_LOGGING)
     add_definitions (-DURHO3D_LOGGING)
 endif ()
 
-# If not on Windows platform, enable Unix mode for kNet library and OpenGL graphic back-end
+# If not on Windows platform, enable Unix mode for kNet library
 if (NOT WIN32)
     add_definitions (-DKNET_UNIX)
-    set (URHO3D_OPENGL 1)
 endif ()
 
 # Add definition for Direct3D11
 if (URHO3D_D3D11)
-    if (NOT WIN32)
-        message(FATAL_ERROR "Direct3D 11 can only be used on Windows platform")
-    endif ()
     set (URHO3D_OPENGL 0)
     add_definitions (-DURHO3D_D3D11)
 endif ()
@@ -460,6 +457,8 @@ else ()
             # Emscripten-specific setup
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
+            set (CMAKE_C_FLAGS_RELEASE "-Oz")
+            set (CMAKE_CXX_FLAGS_RELEASE "-Oz")
             if (DEFINED ENV{CI})
                 # Our CI server is slow, so do not optimize and discard all debug info when test building in Debug configuration
                 set (CMAKE_C_FLAGS_DEBUG "-g0")
@@ -836,10 +835,10 @@ macro (setup_emscripten_linker_flags LINKER_FLAGS)
     else ()
         set (MEMORY_LINKER_FLAGS "-s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY}")
     endif ()
-    set (${LINKER_FLAGS} "${${LINKER_FLAGS}} ${MEMORY_LINKER_FLAGS} -s USE_SDL=2 -s NO_EXIT_RUNTIME=1")    # Urho3D uses SDL2 so set it here instead of in the toolchain which potentially could be reused in other projects not using SDL2
-    set (${LINKER_FLAGS}_RELEASE "-s AGGRESSIVE_VARIABLE_ELIMINATION=1")     # Remove variables to make the -O3 regalloc easier
+    set (${LINKER_FLAGS} "${${LINKER_FLAGS}} ${MEMORY_LINKER_FLAGS} -s USE_SDL=2 -s NO_EXIT_RUNTIME=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1")
+    set (${LINKER_FLAGS}_RELEASE "${${LINKER_FLAGS}_RELEASE} -O3 -s AGGRESSIVE_VARIABLE_ELIMINATION=1")     # Remove variables to make the -O3 regalloc easier
     if (NOT DEFINED ENV{CI})
-        set (${LINKER_FLAGS}_DEBUG -g4)     # Preserve LLVM debug information, show line number debug comments, and generate source maps
+        set (${LINKER_FLAGS}_DEBUG "${${LINKER_FLAGS}_DEBUG} -g4")     # Preserve LLVM debug information, show line number debug comments, and generate source maps
     endif ()
     if (URHO3D_TESTING)
         set (${LINKER_FLAGS} "${${LINKER_FLAGS}} --emrun")  # Inject code into the generated Module object to enable capture of stdout, stderr and exit()
@@ -849,6 +848,8 @@ macro (setup_emscripten_linker_flags LINKER_FLAGS)
         get_property (EMCC_OPTION SOURCE ${FILE} PROPERTY EMCC_OPTION)
         if (EMCC_OPTION)
             list (APPEND LINK_DEPENDS ${FILE})
+            unset (EMCC_FILE_ALIAS)
+            unset (EMCC_EXCLUDE_FILE)
             if (EMCC_OPTION STREQUAL embed-file OR EMCC_OPTION STREQUAL preload-file)
                 get_property (EMCC_FILE_ALIAS SOURCE ${FILE} PROPERTY EMCC_FILE_ALIAS)
                 get_property (EMCC_EXCLUDE_FILE SOURCE ${FILE} PROPERTY EMCC_EXCLUDE_FILE)
@@ -1108,8 +1109,10 @@ endmacro ()
 
 # Macro for adjusting target output name by dropping _suffix from the target name
 macro (adjust_target_name)
-    string (REGEX REPLACE _.*$ "" OUTPUT_NAME ${TARGET_NAME})
-    set_target_properties (${TARGET_NAME} PROPERTIES OUTPUT_NAME ${OUTPUT_NAME})
+    if (TARGET_NAME MATCHES _.*$)
+        string (REGEX REPLACE _.*$ "" OUTPUT_NAME ${TARGET_NAME})
+        set_target_properties (${TARGET_NAME} PROPERTIES OUTPUT_NAME ${OUTPUT_NAME})
+    endif ()
 endmacro ()
 
 # Macro for setting up a test case

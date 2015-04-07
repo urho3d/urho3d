@@ -52,7 +52,7 @@ public:
     /// Write bytes to output.
     void write(const void* data, size_t size)
     {
-        if (dest_.Write(data, size) != size)
+        if (dest_.Write(data, (unsigned)size) != size)
             success_ = false;
     }
 
@@ -105,7 +105,9 @@ bool XMLFile::BeginLoad(Deserializer& source)
     {
         // The existence of this attribute indicates this is an RFC 5261 patch file
         ResourceCache* cache = GetSubsystem<ResourceCache>();
-        XMLFile* inheritedXMLFile = cache->GetResource<XMLFile>(inherit);
+        // If being async loaded, GetResource() is not safe, so use GetTempResource() instead
+        XMLFile* inheritedXMLFile = GetAsyncLoadState() == ASYNC_DONE ? cache->GetResource<XMLFile>(inherit) :
+            cache->GetTempResource<XMLFile>(inherit);
         if (!inheritedXMLFile)
         {
             LOGERRORF("Could not find inherited XML file: %s", inherit.CString());
@@ -154,7 +156,7 @@ bool XMLFile::FromString(const String& source)
 {
     if (source.Empty())
         return false;
-    
+
     MemoryBuffer buffer(source.CString(), source.Length());
     return Load(buffer);
 }

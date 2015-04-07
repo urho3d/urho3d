@@ -81,10 +81,8 @@ set (CMAKE_C_COMPILER_ID Clang)
 set (CMAKE_CXX_COMPILER_ID_RUN TRUE)
 set (CMAKE_CXX_COMPILER_ID Clang)
 
-# Set additional linker flags to consider unresolved symbols as an error
-set (CMAKE_EXE_LINKER_FLAGS "-s ERROR_ON_UNDEFINED_SYMBOLS=1")
 # Set required compiler flags for internal CMake various check_xxx() macros which rely on the error to occur for the check to be performed correctly
-set (CMAKE_REQUIRED_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
+set (CMAKE_REQUIRED_FLAGS "-s ERROR_ON_UNDEFINED_SYMBOLS=1")
 
 # Use response files on Windows host
 if (CMAKE_HOST_WIN32)

@@ -47,14 +47,14 @@ public:
 
     /// Return the RWOps structure.
     SDL_RWops* GetRWOps() { return &ops_; }
-    
+
 private:
     /// Return data size of the object.
     static Sint64 Size(SDL_RWops* context)
     {
         T* object = reinterpret_cast<T*>(context->hidden.unknown.data1);
         Deserializer* des = dynamic_cast<Deserializer*>(object);
-        return des ? des->GetSize() : 0;
+        return des ? (Sint64)des->GetSize() : 0;
     }
 
     /// Seek within the object's data.
@@ -74,7 +74,7 @@ private:
         case RW_SEEK_CUR:
             des->Seek((unsigned)(des->GetPosition() + offset));
             break;
-            
+
         case RW_SEEK_END:
             des->Seek((unsigned)(des->GetSize() + offset));
             break;
@@ -98,7 +98,7 @@ private:
     {
         T* object = reinterpret_cast<T*>(context->hidden.unknown.data1);
         Deserializer* des = dynamic_cast<Deserializer*>(object);
-        return des ? des->Read(ptr, size * maxNum) / size : 0;
+        return des ? (size_t)(des->Read(ptr, size * maxNum) / size) : 0;
     }
 
     /// Write to the object. Return number of "packets" written.
@@ -106,7 +106,7 @@ private:
     {
         T* object = reinterpret_cast<T*>(context->hidden.unknown.data1);
         Serializer* ser = dynamic_cast<Serializer*>(object);
-        return ser ? ser->Write(ptr, size * maxNum) / size : 0;
+        return ser ? (size_t)(ser->Write(ptr, size * maxNum) / size) : 0;
     }
 
     /// SDL RWOps structure associated with the object.

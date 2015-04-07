@@ -51,8 +51,8 @@ Renderer2D::Renderer2D(Context* context) :
     indexBuffer_(new IndexBuffer(context_)),
     vertexBuffer_(new VertexBuffer(context_)),
     orderDirty_(true),
-    frustum_(0),
-    geometryCount_(0)
+    geometryCount_(0),
+    frustum_(0)
 {
     frame_.frameNumber_ = 0;
     SubscribeToEvent(E_BEGINVIEWUPDATE, HANDLER(Renderer2D, HandleBeginViewUpdate));

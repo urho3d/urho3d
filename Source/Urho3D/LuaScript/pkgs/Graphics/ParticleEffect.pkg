@@ -29,6 +29,9 @@ struct TextureFrame
 
 class ParticleEffect : public Resource
 {
+    ParticleEffect();
+    ~ParticleEffect();
+
     void SetMaterial(Material* material);
     void SetNumParticles(unsigned num);
     void SetUpdateInvisible(bool enable);
@@ -58,8 +61,18 @@ class ParticleEffect : public Resource
     void SetMaxRotationSpeed(float speed);    
     void SetSizeAdd(float sizeAdd);
     void SetSizeMul(float sizeMul);
+    void AddColorTime(const Color& color, const float time);
+    void AddColorFrame(const ColorFrame& colorFrame);
+    void RemoveColorFrame(unsigned index);
     void SetColorFrame(unsigned index, const ColorFrame& colorFrame);
+    void SetNumColorFrames(unsigned number);
+    void SortColorFrames();
+    void AddTextureTime(const Rect& uv, const float time);
+    void AddTextureFrame(const TextureFrame& textureFrame);
+    void RemoveTextureFrame(unsigned index);
     void SetTextureFrame(unsigned index, const TextureFrame& textureFrame);
+    void SetNumTextureFrames(unsigned number);
+    void SortTextureFrames();
 
     Material* GetMaterial() const;
     unsigned GetNumParticles() const;
@@ -127,3 +140,17 @@ class ParticleEffect : public Resource
     tolua_property__get_set unsigned numColorFrames;
     tolua_property__get_set unsigned numTextureFrames;
 };
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_ParticleEffect_new00
+static int tolua_GraphicsLuaAPI_ParticleEffect_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<ParticleEffect>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_ParticleEffect_new00_local
+static int tolua_GraphicsLuaAPI_ParticleEffect_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<ParticleEffect>(tolua_S);
+}
+$}

@@ -2877,6 +2877,7 @@ Methods:
 - void SetUVTransform(const Vector2& offset, float rotation, float repeat)
 - void SetCullMode(CullMode mode)
 - void SetShadowCullMode(CullMode mode)
+- void SetFillMode(FillMode mode)
 - void SetDepthBias(const BiasParameters& parameters)
 - void SetScene(Scene* scene)
 - void RemoveShaderParameter(const String name)
@@ -2893,6 +2894,7 @@ Methods:
 - float GetShaderParameterAnimationSpeed(const String name) const
 - CullMode GetCullMode() const
 - CullMode GetShadowCullMode() const
+- FillMode GetFillMode() const
 - const BiasParameters& GetDepthBias() const
 - bool GetOcclusion() const
 - bool GetSpecular() const
@@ -2902,6 +2904,7 @@ Properties:
 
 - CullMode cullMode (readonly)
 - CullMode shadowCullMode (readonly)
+- FillMode fillMode (readonly)
 - bool occlusion (readonly)
 - bool specular (readonly)
 - Scene* scene
@@ -3621,6 +3624,9 @@ Properties:
 
 Methods:
 
+- ParticleEffect() (GC)
+- ParticleEffect* new()
+- void delete()
 - void SetMaterial(Material* material)
 - void SetNumParticles(unsigned num)
 - void SetUpdateInvisible(bool enable)
@@ -3650,8 +3656,18 @@ Methods:
 - void SetMaxRotationSpeed(float speed)
 - void SetSizeAdd(float sizeAdd)
 - void SetSizeMul(float sizeMul)
+- void AddColorTime(const Color& color, const float time)
+- void AddColorFrame(const ColorFrame& colorFrame)
+- void RemoveColorFrame(unsigned index)
 - void SetColorFrame(unsigned index, const ColorFrame& colorFrame)
+- void SetNumColorFrames(unsigned number)
+- void SortColorFrames()
+- void AddTextureTime(const Rect& uv, const float time)
+- void AddTextureFrame(const TextureFrame& textureFrame)
+- void RemoveTextureFrame(unsigned index)
 - void SetTextureFrame(unsigned index, const TextureFrame& textureFrame)
+- void SetNumTextureFrames(unsigned number)
+- void SortTextureFrames()
 - Material* GetMaterial() const
 - unsigned GetNumParticles() const
 - bool GetUpdateInvisible() const
