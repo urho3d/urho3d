@@ -1,5 +1,0 @@
-$#include "TmxFile2D.h"
-
-class TmxFile2D : Resource
-{
-};

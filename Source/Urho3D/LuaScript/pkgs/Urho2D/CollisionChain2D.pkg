@@ -1,0 +1,17 @@
+$#include "Urho2D/CollisionChain2D.h"
+
+class CollisionChain2D : CollisionShape2D
+{
+    void SetLoop(bool loop);
+    void SetVertexCount(unsigned count);
+    void SetVertex(unsigned index, const Vector2& vertex);
+    void SetVertices(const PODVector<Vector2>& vertices);
+
+    bool GetLoop() const;
+    unsigned GetVertexCount() const;
+    const Vector2& GetVertex(unsigned index) const;
+    // const PODVector<Vector2>& GetVertices() const;
+
+    tolua_property__get_set bool loop;
+    tolua_property__get_set unsigned vertexCount;
+};

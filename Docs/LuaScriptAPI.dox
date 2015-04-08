@@ -133,6 +133,7 @@ namespace Urho3D
 <a href="#Class_Rect"><b>Rect</b></a>
 <a href="#Class_RemoteEvent"><b>RemoteEvent</b></a>
 <a href="#Class_RenderPath"><b>RenderPath</b></a>
+<a href="#Class_RenderPathCommand"><b>RenderPathCommand</b></a>
 <a href="#Class_RenderSurface"><b>RenderSurface</b></a>
 <a href="#Class_Renderer"><b>Renderer</b></a>
 <a href="#Class_Resource"><b>Resource</b></a>
@@ -460,7 +461,7 @@ Methods:
 - bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true)
 - bool Play()
 - void Stop()
-- void SetMasterGain(SoundType type, float gain)
+- void SetMasterGain(const String type, float gain)
 - void SetListener(SoundListener* listener)
 - void StopSound(Sound* sound)
 - unsigned GetSampleSize() const
@@ -469,12 +470,12 @@ Methods:
 - bool IsStereo() const
 - bool IsPlaying() const
 - bool IsInitialized() const
-- float GetMasterGain(SoundType type) const
+- bool HasMasterGain(const String type) const
+- float GetMasterGain(const String type) const
 - SoundListener* GetListener() const
 - const PODVector<SoundSource*>& GetSoundSources() const
 - void AddSoundSource(SoundSource* soundSource)
 - void RemoveSoundSource(SoundSource* soundSource)
-- float GetSoundSourceMasterGain(SoundType type) const
 - void MixOutput(void* dest, unsigned samples)
 
 Properties:
@@ -936,7 +937,7 @@ Methods:
 - void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale)
 - void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale, const Vector3& position)
 - void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale, const Vector3& position, const Quaternion& rotation)
-- void SetTerrain()
+- void SetTerrain(unsigned lodLevel = 0)
 - void SetShapeType(ShapeType type)
 - void SetSize(const Vector3& size)
 - void SetPosition(const Vector3& position)
@@ -1128,6 +1129,7 @@ Methods:
 - VariantMap& GetIdentity()
 - Scene* GetScene() const
 - const Controls& GetControls() const
+- char GetTimeStamp() const
 - const Vector3& GetPosition() const
 - const Quaternion& GetRotation() const
 - bool IsClient() const
@@ -1147,6 +1149,7 @@ Properties:
 - VariantMap& identity
 - Scene* scene
 - Controls& controls
+- char timeStamp (readonly)
 - Vector3& position
 - Quaternion& rotation
 - bool client (readonly)
@@ -1569,15 +1572,17 @@ Methods:
 - Cursor() (GC)
 - Cursor* new()
 - void delete()
+- void DefineShape(const String shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot)
 - void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot)
 - void SetShape(CursorShape shape)
+- void SetShape(const String shape)
 - void SetUseSystemShapes(bool enable)
-- CursorShape GetShape() const
+- String GetShape() const
 - bool GetUseSystemShapes() const
 
 Properties:
 
-- CursorShape shape
+- String shape
 - bool useSystemShapes
 
 <a name="Class_CustomGeometry"></a>
@@ -2211,6 +2216,7 @@ Methods:
 - bool IsInitialized() const
 - void* GetExternalWindow() const
 - const String GetWindowTitle() const
+- const String GetApiName() const
 - IntVector2 GetWindowPosition() const
 - int GetWidth() const
 - int GetHeight() const
@@ -2229,21 +2235,38 @@ Methods:
 - unsigned GetDummyColorFormat() const
 - unsigned GetShadowMapFormat() const
 - unsigned GetHiresShadowMapFormat() const
-- bool GetSM3Support() const
 - bool GetInstancingSupport() const
 - bool GetLightPrepassSupport() const
 - bool GetDeferredSupport() const
 - bool GetHardwareShadowSupport() const
-- bool GetStreamOffsetSupport() const
+- bool GetReadableDepthSupport() const
 - bool GetSRGBSupport() const
 - bool GetSRGBWriteSupport() const
 - IntVector2 GetDesktopResolution() const
+- unsigned GetAlphaFormat()
+- unsigned GetLuminanceFormat()
+- unsigned GetLuminanceAlphaFormat()
 - unsigned GetRGBFormat()
+- unsigned GetRGBAFormat()
+- unsigned GetRGBA16Format()
+- unsigned GetRGBAFloat16Format()
+- unsigned GetRGBAFloat32Format()
+- unsigned GetRG16Format()
+- unsigned GetRGFloat16Format()
+- unsigned GetRGFloat32Format()
+- unsigned GetFloat16Format()
+- unsigned GetFloat32Format()
+- unsigned GetLinearDepthFormat()
+- unsigned GetDepthStencilFormat()
+- unsigned GetReadableDepthFormat()
+- unsigned GetFormat(const String formatName)
+- unsigned GetMaxBones()
 
 Properties:
 
 - bool initialized (readonly)
 - String windowTitle
+- String apiName (readonly)
 - IntVector2 windowPosition
 - int width (readonly)
 - int height (readonly)
@@ -2262,12 +2285,11 @@ Properties:
 - unsigned dummyColorFormat (readonly)
 - unsigned shadowMapFormat (readonly)
 - unsigned hiresShadowMapFormat (readonly)
-- bool SM3Support (readonly)
 - bool instancingSupport (readonly)
 - bool lightPrepassSupport (readonly)
 - bool deferredSupport (readonly)
 - bool hardwareShadowSupport (readonly)
-- bool streamOffsetSupport (readonly)
+- bool readableDepthSupport (readonly)
 - bool sRGBSupport (readonly)
 - bool sRGBWriteSupport (readonly)
 - IntVector2 desktopResolution (readonly)
@@ -2331,7 +2353,6 @@ Methods:
 - bool IsCompressed() const
 - CompressedFormat GetCompressedFormat() const
 - unsigned GetNumCompressedLevels() const
-- CompressedLevel GetCompressedLevel(unsigned index) const
 - Image* GetSubimage(const IntRect& rect) const
 
 Properties:
@@ -2489,6 +2510,7 @@ Methods:
 - void delete()
 - JSONValue CreateRoot(JSONValueType valueType = JSON_OBJECT)
 - JSONValue GetRoot(JSONValueType valueType = JSON_ANY)
+- bool Save(const String fileName, const String indentation = "\t") const
 
 <a name="Class_JSONValue"></a>
 ### JSONValue
@@ -2822,11 +2844,12 @@ Methods:
 - void SetScriptFile(LuaFile* scriptFile)
 - void SetScriptObjectType(const String scriptObjectType)
 - void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
-- void UnsubscribeFromEvent(const String eventName)
-- void UnsubscribeFromAllEvents()
 - void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
-- void UnsubscribeFromEvent(void* sender, const String eventName)
-- void UnsubscribeFromEvents(void* sender)
+- void UnsubscribeFromEvent(const String eventName)
+- void UnsubscribeFromEvent(Object* sender, const String eventName)
+- void UnsubscribeFromEvents(Object* sender)
+- void UnsubscribeFromAllEvents()
+- void UnsubscribeFromAllEventsExcept(const Vector<String>& exceptionNames)
 - LuaFile* GetScriptFile() const
 - const String GetScriptObjectType() const
 
@@ -2854,6 +2877,7 @@ Methods:
 - void SetUVTransform(const Vector2& offset, float rotation, float repeat)
 - void SetCullMode(CullMode mode)
 - void SetShadowCullMode(CullMode mode)
+- void SetFillMode(FillMode mode)
 - void SetDepthBias(const BiasParameters& parameters)
 - void SetScene(Scene* scene)
 - void RemoveShaderParameter(const String name)
@@ -2863,16 +2887,15 @@ Methods:
 - void MarkForAuxView(unsigned frameNumber)
 - unsigned GetNumTechniques() const
 - Technique* GetTechnique(unsigned index) const
-- Pass* GetPass(unsigned index, StringHash passType) const
-- Pass* GetPass(unsigned index, const String passType) const
+- Pass* GetPass(unsigned index, const String passName) const
 - Texture* GetTexture(TextureUnit unit) const
 - ValueAnimation* GetShaderParameterAnimation(const String name) const
 - WrapMode GetShaderParameterAnimationWrapMode(const String name) const
 - float GetShaderParameterAnimationSpeed(const String name) const
 - CullMode GetCullMode() const
 - CullMode GetShadowCullMode() const
+- FillMode GetFillMode() const
 - const BiasParameters& GetDepthBias() const
-- unsigned GetAuxViewFrameNumber() const
 - bool GetOcclusion() const
 - bool GetSpecular() const
 - Scene* GetScene() const
@@ -2881,7 +2904,7 @@ Properties:
 
 - CullMode cullMode (readonly)
 - CullMode shadowCullMode (readonly)
-- unsigned auxViewFrameNumber (readonly)
+- FillMode fillMode (readonly)
 - bool occlusion (readonly)
 - bool specular (readonly)
 - Scene* scene
@@ -3243,6 +3266,8 @@ Methods:
 - void BroadcastRemoteEvent(Node* node, const String eventType, bool inOrder)
 - void BroadcastRemoteEvent(Node* node, const String eventType, bool inOrder, const VariantMap& eventData)
 - void SetUpdateFps(int fps)
+- void SetSimulatedLatency(int ms)
+- void SetSimulatedPacketLoss(float loss)
 - void RegisterRemoteEvent(StringHash eventType)
 - void RegisterRemoteEvent(const String eventType)
 - void UnregisterRemoteEvent(StringHash eventType)
@@ -3253,6 +3278,8 @@ Methods:
 - HttpRequest* MakeHttpRequest(const String url, const String verb = String::EMPTY)
 - HttpRequest* MakeHttpRequest(const String url, const String verb, const Vector<String>& headers, const String postData = String::EMPTY)
 - int GetUpdateFps() const
+- int GetSimulatedLatency() const
+- float GetSimulatedPacketLoss() const
 - Connection* GetServerConnection() const
 - bool IsServerRunning() const
 - bool CheckRemoteEvent(StringHash eventType) const
@@ -3261,6 +3288,8 @@ Methods:
 Properties:
 
 - int updateFps
+- int simulatedLatency
+- float simulatedPacketLoss
 - Connection* serverConnection (readonly)
 - bool serverRunning (readonly)
 - String packageCacheDir
@@ -3295,7 +3324,7 @@ Methods:
 - Node() (GC)
 - Node* new()
 - void delete()
-- bool SaveXML(File* dest) const
+- bool SaveXML(File* dest, const String indentation = "\t") const
 - void SetName(const String name)
 - void SetPosition(const Vector3& position)
 - void SetPosition2D(const Vector2& position)
@@ -3366,6 +3395,7 @@ Methods:
 - void AddListener(Component* component)
 - void RemoveListener(Component* component)
 - Component* CreateComponent(const String type, CreateMode mode = REPLICATED, unsigned id = 0)
+- Component* GetOrCreateComponent(const String type, CreateMode mode = REPLICATED, unsigned id = 0)
 - Component* CloneComponent(Component* component, unsigned id = 0)
 - Component* CloneComponent(Component* component, CreateMode mode, unsigned id = 0)
 - int CreateScriptObject(const String scriptObjectType)
@@ -3594,6 +3624,9 @@ Properties:
 
 Methods:
 
+- ParticleEffect() (GC)
+- ParticleEffect* new()
+- void delete()
 - void SetMaterial(Material* material)
 - void SetNumParticles(unsigned num)
 - void SetUpdateInvisible(bool enable)
@@ -3623,8 +3656,18 @@ Methods:
 - void SetMaxRotationSpeed(float speed)
 - void SetSizeAdd(float sizeAdd)
 - void SetSizeMul(float sizeMul)
+- void AddColorTime(const Color& color, const float time)
+- void AddColorFrame(const ColorFrame& colorFrame)
+- void RemoveColorFrame(unsigned index)
 - void SetColorFrame(unsigned index, const ColorFrame& colorFrame)
+- void SetNumColorFrames(unsigned number)
+- void SortColorFrames()
+- void AddTextureTime(const Rect& uv, const float time)
+- void AddTextureFrame(const TextureFrame& textureFrame)
+- void RemoveTextureFrame(unsigned index)
 - void SetTextureFrame(unsigned index, const TextureFrame& textureFrame)
+- void SetNumTextureFrames(unsigned number)
+- void SortTextureFrames()
 - Material* GetMaterial() const
 - unsigned GetNumParticles() const
 - bool GetUpdateInvisible() const
@@ -3741,14 +3784,12 @@ Properties:
 
 Methods:
 
-- bool IsSM3() const
 - bool IsDesktop() const
 - const String GetVertexShader() const
 - const String GetPixelShader() const
 
 Properties:
 
-- bool SM3 (readonly)
 - bool desktop (readonly)
 - const String vertexShader (readonly)
 - const String pixelShader (readonly)
@@ -4161,7 +4202,50 @@ Methods:
 - void SetShaderParameter(const String name, const Variant& value)
 - unsigned GetNumRenderTargets() const
 - unsigned GetNumCommands() const
+- RenderPathCommand* GetCommand(unsigned index)
 - const Variant& GetShaderParameter(const String name) const
+
+<a name="Class_RenderPathCommand"></a>
+### RenderPathCommand
+
+
+Methods:
+
+- RenderPathCommand() (GC)
+- RenderPathCommand* new()
+- void Load(const XMLElement& element)
+- void SetTextureName(TextureUnit unit, const String name)
+- void SetShaderParameter(const String name, const Variant& value)
+- void RemoveShaderParameter(const String name)
+- void SetNumOutputs(unsigned num)
+- void SetOutputName(unsigned index, const String name)
+- void SetDepthStencilName(const String name)
+- const String GetTextureName(TextureUnit unit) const
+- const Variant& GetShaderParameter(const String name) const
+- unsigned GetNumOutputs() const
+- const String GetOutputName(unsigned index) const
+- const String GetDepthStencilName() const
+
+Properties:
+
+- String tag
+- RenderCommandType type
+- RenderCommandSortMode sortMode
+- String pass
+- String metadata
+- String vertexShaderName
+- String pixelShaderName
+- String vertexShaderDefines
+- String pixelShaderDefines
+- unsigned clearFlags
+- Color clearColor
+- float clearDepth
+- unsigned clearStencil
+- bool enabled
+- bool useFogColor
+- bool markToStencil
+- bool useLitBase
+- bool vertexLights
 
 <a name="Class_RenderSurface"></a>
 ### RenderSurface
@@ -4223,7 +4307,6 @@ Methods:
 - void SetMaxShadowMaps(int shadowMaps)
 - void SetDynamicInstancing(bool enable)
 - void SetMinInstances(int instances)
-- void SetMaxInstanceTriangles(int triangles)
 - void SetMaxSortedInstances(int instances)
 - void SetMaxOccluderTriangles(int triangles)
 - void SetOcclusionBufferSize(int size)
@@ -4247,7 +4330,6 @@ Methods:
 - int GetMaxShadowMaps() const
 - bool GetDynamicInstancing() const
 - int GetMinInstances() const
-- int GetMaxInstanceTriangles() const
 - int GetMaxSortedInstances() const
 - int GetMaxOccluderTriangles() const
 - int GetOcclusionBufferSize() const
@@ -4284,7 +4366,6 @@ Properties:
 - int maxShadowMaps
 - bool dynamicInstancing
 - int minInstances
-- int maxInstanceTriangles
 - int maxSortedInstances
 - int maxOccluderTriangles
 - int occlusionBufferSize
@@ -4338,6 +4419,7 @@ Methods:
 - Resource* GetResource(const String type, const String name, bool sendEventOnFailure = true)
 - bool BackgroundLoadResource(const String type, const String name, bool sendEventOnFailure = true)
 - unsigned GetNumBackgroundLoadResources() const
+- const Vector<String>& GetResourceDirs() const
 - bool Exists(const String name) const
 - unsigned GetMemoryBudget(StringHash type) const
 - unsigned GetMemoryUse(StringHash type) const
@@ -4358,6 +4440,7 @@ Properties:
 - bool returnFailedResources
 - bool searchPackagesFirst
 - unsigned numBackgroundLoadResources (readonly)
+- Vector<String>& resourceDirs (readonly)
 - int finishBackgroundResourcesMs
 
 <a name="Class_ResourceRef"></a>
@@ -4572,9 +4655,9 @@ Methods:
 - bool Load(const String fileName)
 - bool Save(const String fileName) const
 - bool LoadXML(File* source)
-- bool SaveXML(File* dest) const
+- bool SaveXML(File* dest, const String indentation = "\t") const
 - bool LoadXML(const String fileName)
-- bool SaveXML(const String fileName) const
+- bool SaveXML(const String fileName, const String indentation = "\t") const
 - Node* Instantiate(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - Node* Instantiate(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - Node* InstantiateXML(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
@@ -4729,6 +4812,8 @@ Methods:
 
 - void SetTemporary(bool enable)
 - bool IsTemporary() const
+- void SetInterceptNetworkUpdate(const String attributeName, bool enable)
+- bool GetInterceptNetworkUpdate(const String attributeName)
 
 Properties:
 
@@ -4878,14 +4963,14 @@ Methods:
 - void Play(Sound* sound, float frequency, float gain)
 - void Play(Sound* sound, float frequency, float gain, float panning)
 - void Stop()
-- void SetSoundType(SoundType type)
+- void SetSoundType(const String type)
 - void SetFrequency(float frequency)
 - void SetGain(float gain)
 - void SetAttenuation(float attenuation)
 - void SetPanning(float panning)
 - void SetAutoRemove(bool enable)
 - Sound* GetSound() const
-- SoundType GetSoundType() const
+- String GetSoundType() const
 - float GetTimePosition() const
 - float GetFrequency() const
 - float GetGain() const
@@ -4897,7 +4982,7 @@ Methods:
 Properties:
 
 - Sound* sound (readonly)
-- SoundType soundType
+- String soundType
 - float timePosition (readonly)
 - float frequency
 - float gain
@@ -5151,10 +5236,16 @@ Methods:
 - void SetFlipX(bool flipX)
 - void SetFlipY(bool flipY)
 - void SetColor(const Color& color)
+- void SetAlpha(float alpha)
+- void SetUseHotSpot(bool useHotSpot)
+- void SetHotSpot(const Vector2& hotspot)
 - Sprite2D* GetSprite() const
 - bool GetFlipX() const
 - bool GetFlipY() const
 - const Color& GetColor() const
+- float GetAlpha() const
+- bool GetUseHotSpot() const
+- const Vector2& GetHotSpot() const
 
 Properties:
 
@@ -5162,6 +5253,9 @@ Properties:
 - bool flipX
 - bool flipY
 - Color& color
+- float alpha
+- bool useHotSpot
+- Vector2 hotSpot
 
 <a name="Class_StringHash"></a>
 ### StringHash
@@ -5197,20 +5291,18 @@ Properties:
 
 Methods:
 
-- bool HasPass(const StringHash type) const
-- Pass* GetPass(const StringHash type) const
-- Pass* GetSupportedPass(const StringHash type) const
+- bool HasPass(const String type) const
+- Pass* GetPass(const String type) const
+- Pass* GetSupportedPass(const String type) const
 - bool IsSupported() const
-- bool IsSM3() const
 - bool IsDesktop() const
 - unsigned GetNumPasses() const
-- const Vector<StringHash>& GetPassTypes() const
+- const Vector<String>& GetPassTypes() const
 - const PODVector<Pass*>& GetPasses() const
 
 Properties:
 
 - bool supported (readonly)
-- bool SM3 (readonly)
 - bool desktop (readonly)
 - unsigned numPasses (readonly)
 
@@ -5556,6 +5648,7 @@ Properties:
 
 Methods:
 
+- void DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 - void SetTmxFile(TmxFile2D* tmxFile)
 - TmxFile2D* GetTmxFile() const
 - const TileMapInfo2D& GetInfo() const
@@ -5594,6 +5687,7 @@ Properties:
 
 Methods:
 
+- void DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 - void SetDrawOrder(int drawOrder)
 - void SetVisible(bool visible)
 - int GetDrawOrder() const
@@ -5714,9 +5808,6 @@ Methods:
 - void SetFocusElement(UIElement* element, bool byKey = false)
 - bool SetModalElement(UIElement* modalElement, bool enable)
 - void Clear()
-- void Update(float timeStep)
-- void RenderUpdate()
-- void Render()
 - void DebugDraw(UIElement* element)
 - UIElement* LoadLayout(File* source, XMLFile* styleFile = 0)
 - UIElement* LoadLayout(const String fileName, XMLFile* styleFile = 0)
@@ -5787,9 +5878,9 @@ Methods:
 - void delete()
 - const IntVector2& GetScreenPosition() const
 - bool LoadXML(Deserializer& source)
-- bool SaveXML(Serializer& dest) const
+- bool SaveXML(Serializer& dest, const String indentation = "\t") const
 - bool LoadXML(const String fileName)
-- bool SaveXML(const String fileName) const
+- bool SaveXML(const String fileName, const String indentation = "\t") const
 - bool FilterAttributes(XMLElement& dest) const
 - void SetName(const String name)
 - void SetPosition(const IntVector2& position)
@@ -6633,9 +6724,10 @@ Methods:
 - bool FromString(const String source)
 - XMLElement CreateRoot(const String name = String::EMPTY)
 - XMLElement GetRoot(const String name = String::EMPTY)
-- String ToString() const
+- String ToString(const String indentation = "\t") const
 - void Patch(XMLFile* patchFile)
 - void Patch(XMLElement patchElement)
+- bool Save(const String fileName, const String indentation = "\t") const
 
 <a name="Class_Zone"></a>
 ### Zone : Drawable
@@ -6729,6 +6821,7 @@ Properties:
 ### CompressedFormat
 
 - int CF_NONE
+- int CF_RGBA
 - int CF_DXT1
 - int CF_DXT3
 - int CF_DXT5
@@ -6778,13 +6871,17 @@ Properties:
 ### CursorShape
 
 - int CS_NORMAL
+- int CS_IBEAM
+- int CS_CROSS
 - int CS_RESIZEVERTICAL
 - int CS_RESIZEDIAGONAL_TOPRIGHT
 - int CS_RESIZEHORIZONTAL
 - int CS_RESIZEDIAGONAL_TOPLEFT
+- int CS_RESIZE_ALL
 - int CS_ACCEPTDROP
 - int CS_REJECTDROP
 - int CS_BUSY
+- int CS_BUSY_ARROW
 - int CS_MAX_SHAPES
 
 ### EmitterType
@@ -6959,23 +7056,21 @@ Properties:
 - int RAY_OBB
 - int RAY_TRIANGLE
 
+### RenderCommandType
+
+- int CMD_NONE
+- int CMD_CLEAR
+- int CMD_SCENEPASS
+- int CMD_QUAD
+- int CMD_FORWARDLIGHTS
+- int CMD_LIGHTVOLUMES
+- int CMD_RENDERUI
+
 ### RenderSurfaceUpdateMode
 
 - int SURFACE_MANUALUPDATE
 - int SURFACE_UPDATEVISIBLE
 - int SURFACE_UPDATEALWAYS
-
-### ShaderParameterGroup
-
-- int SP_FRAME
-- int SP_CAMERA
-- int SP_VIEWPORT
-- int SP_ZONE
-- int SP_LIGHT
-- int SP_VERTEXLIGHTS
-- int SP_MATERIAL
-- int SP_OBJECTTRANSFORM
-- int MAX_SHADER_PARAMETER_GROUPS
 
 ### ShaderType
 
@@ -6993,15 +7088,6 @@ Properties:
 - int SHAPE_TRIANGLEMESH
 - int SHAPE_CONVEXHULL
 - int SHAPE_TERRAIN
-
-### SoundType
-
-- int SOUND_EFFECT
-- int SOUND_AMBIENT
-- int SOUND_VOICE
-- int SOUND_MUSIC
-- int SOUND_MASTER
-- int MAX_SOUND_TYPES
 
 ### StencilOp
 
@@ -7050,17 +7136,6 @@ Properties:
 - int TU_SPECULAR
 - int TU_EMISSIVE
 - int TU_ENVIRONMENT
-- int MAX_MATERIAL_TEXTURE_UNITS
-- int TU_LIGHTRAMP
-- int TU_LIGHTSHAPE
-- int TU_SHADOWMAP
-- int TU_FACESELECT
-- int TU_INDIRECTION
-- int TU_DEPTHBUFFER
-- int TU_LIGHTBUFFER
-- int TU_VOLUMEMAP
-- int TU_ZONE
-- int MAX_TEXTURE_UNITS
 
 ### TextureUsage
 
@@ -7242,8 +7317,8 @@ Properties:
 - float Sign(float value)
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
-- void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
 - void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
+- void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
 - float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
@@ -7265,10 +7340,10 @@ Properties:
 - Vector3 ToVector3(const String source)
 - Vector4 ToVector4(const String source, bool allowMissingCoords = false)
 - void UnsubscribeFromAllEvents()
-- void UnsubscribeFromEvent(void* sender, const String eventName, void* functionOrFunctionName)
+- void UnsubscribeFromAllEventsExcept(const Vector<String>& exceptionNames)
+- void UnsubscribeFromEvent(Object* sender, const String eventName)
 - void UnsubscribeFromEvent(const String eventName)
-- void UnsubscribeFromEvent(const String eventName, void* functionOrFunctionName)
-- void UnsubscribeFromEvents(void* sender)
+- void UnsubscribeFromEvents(Object* sender)
 
 
 \section LuaScriptAPI_GlobalProperties Global properties
@@ -7330,8 +7405,8 @@ Properties:
 - unsigned DEFAULT_ZONEMASK
 - unsigned DRAWABLE_ANY
 - unsigned DRAWABLE_GEOMETRY
+- unsigned DRAWABLE_GEOMETRY2D
 - unsigned DRAWABLE_LIGHT
-- unsigned DRAWABLE_RENDERER2D
 - unsigned DRAWABLE_ZONE
 - unsigned FIRST_LOCAL_ID
 - unsigned FIRST_REPLICATED_ID
@@ -7740,6 +7815,11 @@ Properties:
 - int SHADOWQUALITY_HIGH_24BIT
 - int SHADOWQUALITY_LOW_16BIT
 - int SHADOWQUALITY_LOW_24BIT
+- String SOUND_AMBIENT
+- String SOUND_EFFECT
+- String SOUND_MASTER
+- String SOUND_MUSIC
+- String SOUND_VOICE
 - unsigned VO_DISABLE_OCCLUSION
 - unsigned VO_DISABLE_SHADOWS
 - unsigned VO_LOW_MATERIAL_QUALITY

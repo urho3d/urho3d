@@ -163,6 +163,32 @@ Android_VideoInit(_THIS)
     mode.h = Android_ScreenHeight;
     mode.refresh_rate = 0;
     mode.driverdata = NULL;
+
+    // Urho3D: merge patch found in https://bugzilla.libsdl.org/show_bug.cgi?id=2291 submitted by Thomas Faller
+    SDL_PixelFormat pixelFormat;
+    Uint32 mask;
+    int bitCount;
+
+    /* We need to set color sizes */
+    if(!SDL_InitFormat(&pixelFormat, mode.format)){
+        for(mask = pixelFormat.Rmask >> pixelFormat.Rshift,
+            bitCount = 0; mask > 0; mask >>= 1)
+            bitCount += 1;
+        SDL_GL_SetAttribute(SDL_GL_RED_SIZE, bitCount);
+        for(mask = pixelFormat.Gmask >> pixelFormat.Gshift,
+            bitCount = 0; mask > 0; mask >>= 1)
+            bitCount += 1;
+        SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, bitCount);
+        for(mask = pixelFormat.Bmask >> pixelFormat.Bshift,
+            bitCount = 0; mask > 0; mask >>= 1)
+            bitCount += 1;
+        SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, bitCount);
+        for(mask = pixelFormat.Amask >> pixelFormat.Ashift,
+            bitCount = 0; mask > 0; mask >>= 1)
+            bitCount += 1;
+        SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, bitCount);
+    }
+
     if (SDL_AddBasicVideoDisplay(&mode) < 0) {
         return -1;
     }

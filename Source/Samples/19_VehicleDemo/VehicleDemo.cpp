@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,34 +20,36 @@
 // THE SOFTWARE.
 //
 
-#include "Camera.h"
-#include "CollisionShape.h"
-#include "Constraint.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "FileSystem.h"
-#include "Font.h"
-#include "Input.h"
-#include "Light.h"
-#include "Material.h"
-#include "Model.h"
-#include "Octree.h"
-#include "PhysicsWorld.h"
-#include "ProcessUtils.h"
-#include "Renderer.h"
-#include "RigidBody.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "StaticModel.h"
-#include "Terrain.h"
-#include "Text.h"
-#include "UI.h"
-#include "Vehicle.h"
-#include "Zone.h"
+#include <Urho3D/Urho3D.h>
 
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Physics/CollisionShape.h>
+#include <Urho3D/Physics/Constraint.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Graphics/Light.h>
+#include <Urho3D/Graphics/Material.h>
+#include <Urho3D/Graphics/Model.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Physics/PhysicsWorld.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Physics/RigidBody.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/Graphics/Terrain.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/UI.h>
+#include <Urho3D/Graphics/Zone.h>
+
+#include "Vehicle.h"
 #include "VehicleDemo.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 const float CAMERA_DISTANCE = 10.0f;
 

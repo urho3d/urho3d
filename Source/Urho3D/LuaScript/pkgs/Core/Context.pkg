@@ -1,0 +1,38 @@
+$#include "Core/Context.h"
+
+class Context
+{
+    Object* GetEventSender() const;
+    EventHandler* GetEventHandler() const;
+    const String GetTypeName(StringHash objectType) const;
+};
+
+Context* GetContext();
+Object* GetEventSender();
+EventHandler* GetEventHandler() const;
+
+${
+#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetContext00
+static int tolua_CoreLuaAPI_GetContext00(lua_State* tolua_S)
+{
+    Context* tolua_ret = GetContext(tolua_S);
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Context");
+    return 1;
+}
+
+#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetEventSender00
+static int tolua_CoreLuaAPI_GetEventSender00(lua_State* tolua_S)
+{
+    Object* tolua_ret = GetContext(tolua_S)->GetEventSender();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Object");
+    return 1;
+}
+
+#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetEventHandler00
+static int tolua_CoreLuaAPI_GetEventHandler00(lua_State* tolua_S)
+{
+    EventHandler* tolua_ret = GetContext(tolua_S)->GetEventHandler();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"EventHandler");
+    return 1;
+}
+$}

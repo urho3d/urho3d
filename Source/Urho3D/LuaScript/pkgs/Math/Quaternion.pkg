@@ -1,0 +1,61 @@
+$#include "Math/Quaternion.h"
+
+class Quaternion
+{
+    Quaternion();
+    Quaternion(const Quaternion& quat);
+    Quaternion(float w, float x, float y, float z);
+    Quaternion(float angle, const Vector3& axis);
+    Quaternion(float angle);
+    Quaternion(float x, float y, float z);
+    Quaternion(const Vector3& start, const Vector3& end);
+    Quaternion(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
+    Quaternion(const Matrix3& matrix);
+    ~Quaternion();
+
+    bool operator == (const Quaternion& rhs) const;
+    
+    Quaternion operator * (float rhs) const;
+    Quaternion operator - () const;
+    bool operator == (const Quaternion& rhs) const;
+    
+    Quaternion operator * (float rhs) const;
+    Quaternion operator - () const;
+    Quaternion operator + (const Quaternion& rhs) const;
+    Quaternion operator - (const Quaternion& rhs) const;
+    Quaternion operator * (const Quaternion& rhs) const;
+    Vector3 operator * (const Vector3& rhs) const;
+    
+    void FromAngleAxis(float angle, const Vector3& axis);
+    void FromEulerAngles(float x, float y, float z);
+    void FromRotationTo(const Vector3& start, const Vector3& end);
+    void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
+    void FromRotationMatrix(const Matrix3& matrix);
+    bool FromLookRotation(const Vector3& direction, const Vector3& up);
+    
+    void Normalize();
+    
+    Quaternion Normalized() const;
+    Quaternion Inverse() const;
+    float LengthSquared() const;
+    float DotProduct(const Quaternion& rhs) const;
+    bool Equals(const Quaternion& rhs) const;
+    bool IsNaN() const;
+    
+    Quaternion Conjugate() const;
+    Vector3 EulerAngles() const;
+    float YawAngle() const;
+    float PitchAngle() const;
+    float RollAngle() const;
+    Matrix3 RotationMatrix() const;
+    Quaternion Slerp(Quaternion rhs, float t) const;
+    Quaternion Nlerp(Quaternion rhs, float t, bool shortestPath) const;
+    String ToString() const;
+
+    float w_ @ w;
+    float x_ @ x;
+    float y_ @ y;
+    float z_ @ z;
+    
+    static const Quaternion IDENTITY;
+};

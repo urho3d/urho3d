@@ -1,5 +1,0 @@
-$#include "Skybox.h"
-
-class Skybox : public StaticModel
-{
-};

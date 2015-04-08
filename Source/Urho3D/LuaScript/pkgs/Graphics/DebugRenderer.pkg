@@ -1,0 +1,28 @@
+$#include "Graphics/DebugRenderer.h"
+
+class DebugRenderer : public Component
+{
+    void SetView(Camera* camera);
+    void AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest = true);
+    void AddLine(const Vector3& start, const Vector3& end, unsigned color, bool depthTest = true);
+    void AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Color& color, bool depthTest = true);
+    void AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, unsigned color, bool depthTest = true);
+    void AddNode(Node* node, float scale = 1.0f, bool depthTest = true);
+    void AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest = true);
+    void AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest = true);
+    void AddFrustum(const Frustum& frustum, const Color& color, bool depthTest = true);
+    void AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest = true);
+    void AddSphere(const Sphere& sphere, const Color& color, bool depthTest = true);
+    void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true);
+    void AddTriangleMesh(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true);
+    void Render();
+    
+    const Matrix3x4& GetView() const;
+    const Matrix4& GetProjection() const;
+    const Frustum& GetFrustum() const;
+    bool IsInside(const BoundingBox& box) const;
+    
+    tolua_readonly tolua_property__get_set Matrix3x4& view;
+    tolua_readonly tolua_property__get_set Matrix4& projection;
+    tolua_readonly tolua_property__get_set Frustum& frustum;
+};

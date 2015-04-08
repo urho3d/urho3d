@@ -104,11 +104,11 @@ public:
 	typedef ArrayIterator<T, AllocT> iterator;
 
 	Array(AllocT *allocator_ = 0)
-	:data(0), cap(0), used(0), allocator(allocator_)
+	:data(0), allocator(allocator_), cap(0), used(0)
 	{ }
 
 	Array(const Array &rhs)
-	:allocator(rhs.allocator), data(0), cap(0), used(0)
+	:data(0), allocator(rhs.allocator), cap(0), used(0)
 	{
 		reserve(rhs.cap);
 		for(size_t i = 0; i < rhs.size(); ++i)

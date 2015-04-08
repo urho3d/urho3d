@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,24 +20,27 @@
 // THE SOFTWARE.
 //
 
-#include "Camera.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "InputEvents.h"
-#include "Octree.h"
-#include "ParticleEmitter2D.h"
-#include "ParticleEffect2D.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "Text.h"
-#include "Urho2DParticle.h"
-#include "Zone.h"
+#include <Urho3D/Urho3D.h>
 
-#include "DebugNew.h"
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Input/InputEvents.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Urho2D/ParticleEmitter2D.h>
+#include <Urho3D/Urho2D/ParticleEffect2D.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/Graphics/Zone.h>
+
+#include "Urho2DParticle.h"
+
+#include <Urho3D/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(Urho2DParticle)
 
@@ -83,6 +86,7 @@ void Urho2DParticle::CreateScene()
 
     Graphics* graphics = GetSubsystem<Graphics>();
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
+    camera->SetZoom(1.2f * Min((float)graphics->GetWidth() / 1280.0f, (float)graphics->GetHeight() / 800.0f)); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.2) is set for full visibility at 1280x800 resolution)
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     ParticleEffect2D* particleEffect = cache->GetResource<ParticleEffect2D>("Urho2D/sun.pex");

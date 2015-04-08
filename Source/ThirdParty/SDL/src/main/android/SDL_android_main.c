@@ -1,12 +1,16 @@
 /*
     SDL_android_main.c, placed in the public domain by Sam Lantinga  3/13/14
 */
-#include "../../SDL_internal.h"
+
+// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
+
+// Urho3D - use SDK include dir
+#include <SDL/SDL_internal.h>
 
 #ifdef __ANDROID__
 
-/* Include the SDL main definition header */
-#include "SDL_main.h"
+/* Include the SDL main definition header */ // Urho3D - use SDK include dir
+#include <SDL/SDL_main.h>
 
 /*******************************************************************************
                  Functions called by JNI

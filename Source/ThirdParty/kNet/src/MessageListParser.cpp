@@ -15,8 +15,6 @@
 /** @file MessageListParser.cpp
 	@brief */
 
-// Modified by Yao Wei Tjong for Urho3D
-
 #ifdef KNET_USE_TINYXML
 #include <tinyxml.h>
 #endif
@@ -37,8 +35,7 @@ namespace
 {
 	///\note See BasicSerializedDataTypes.h:31: The order of these elements matches that of the BasicSerializedDataType enum.
 	const char *data[] = { "", "bit", "u8", "s8", "u16", "s16", "u32", "s32", "u64", "s64", "float", "double", "string", "struct" };
-	// Urho3D: use static_cast to suppress warning when compiling using modern C++ standard
-	const size_t typeSizes[] = { static_cast<size_t>(-1), static_cast<size_t>(-1), 1, 1, 2, 2, 4, 4, 8, 8, 4, 8, static_cast<size_t>(-1), static_cast<size_t>(-1) }; ///< -1 here denotes 'does not apply'.
+	const size_t typeSizes[] = { 0xFFFFFFFF, 0xFFFFFFFF, 1, 1, 2, 2, 4, 4, 8, 8, 4, 8, 0xFFFFFFFF, 0xFFFFFFFF }; // 0xFFFFFFFF here denotes 'does not apply'.
 }
 
 namespace kNet
@@ -49,7 +46,7 @@ BasicSerializedDataType StringToSerialType(const char *type)
 	if (!strcmp(type, "string") || !strcmp(type, "std::string"))
 		return SerialString;
 	assert(NumSerialTypes-2 == NUMELEMS(data));
-	for(int i = 0; i < NUMELEMS(data); ++i)
+	for(size_t i = 0; i < NUMELEMS(data); ++i)
 		if (!strcmp(type, data[i]))
 			return (BasicSerializedDataType)i;
 
@@ -100,7 +97,7 @@ SerializedElementDesc *SerializedMessageList::ParseNode(TiXmlElement *node, Seri
 	{
 		// Cannot have both static count and dynamic count!
 		if (node->Attribute("count") && node->Attribute("varyingCount"))
-			LOG(LogError, "Warning: An XML node contains both 'count' and 'varyingCount' attributes! 'varyingCount' takes precedence.");
+			KNET_LOG(LogError, "Warning: An XML node contains both 'count' and 'varyingCount' attributes! 'varyingCount' takes precedence.");
 
 		if (node->Attribute("dynamicCount"))
 		{
@@ -168,7 +165,7 @@ void SerializedMessageList::ParseMessages(TiXmlElement *root)
 		int success = node->QueryIntAttribute("id", (int*)&desc.id);
 		if (success == TIXML_NO_ATTRIBUTE)
 		{
-			LOG(LogError, "Error parsing message attribute 'id' as int!");
+			KNET_LOG(LogError, "Error parsing message attribute 'id' as int!");
 			node = node->NextSiblingElement("message");
 			continue; 
 		}
@@ -214,7 +211,7 @@ void SerializedMessageList::LoadMessagesFromFile(const char *filename)
 	bool success = doc.LoadFile();
 	if (!success)
 	{
-		LOG(LogError, "TiXmlDocument open failed on filename %s!", filename);
+		KNET_LOG(LogError, "TiXmlDocument open failed on filename %s!", filename);
 		return;
 	}
 

@@ -1,0 +1,66 @@
+$#include "Network/Connection.h"
+
+struct RemoteEvent
+{
+    unsigned senderID_ @ senderID;
+    StringHash eventType_ @ eventType;
+    VariantMap eventData_ @ eventData;
+    bool inOrder_ @ inOrder;
+};
+
+class Connection : public Object
+{
+    void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
+
+    
+    void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    void SendRemoteEvent(const String eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    
+    void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    void SendRemoteEvent(Node* node, const String eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    
+    void SetScene(Scene* newScene);
+    void SetIdentity(const VariantMap& identity);
+    void SetControls(const Controls& newControls);
+    void SetPosition(const Vector3& position);
+    void SetRotation(const Quaternion& rotation);
+    void SetConnectPending(bool connectPending);
+    void SetLogStatistics(bool enable);
+    void Disconnect(int waitMSec = 0);
+    void SendPackageToClient(PackageFile* package);
+
+    VariantMap& GetIdentity();
+    Scene* GetScene() const;
+    const Controls& GetControls() const;
+    unsigned char GetTimeStamp() const;
+    const Vector3& GetPosition() const;
+    const Quaternion& GetRotation() const;
+    bool IsClient() const;
+    bool IsConnected() const;
+    bool IsConnectPending() const;
+    bool IsSceneLoaded() const;
+    bool GetLogStatistics() const;
+    String GetAddress() const;
+    unsigned short GetPort() const;
+    String ToString() const;
+    unsigned GetNumDownloads() const;
+    const String GetDownloadName() const;
+    float GetDownloadProgress() const;
+
+    tolua_property__get_set VariantMap& identity;
+    tolua_property__get_set Scene* scene;
+    tolua_property__get_set Controls& controls;
+    tolua_readonly tolua_property__get_set unsigned char timeStamp;
+    tolua_property__get_set Vector3& position;
+    tolua_property__get_set Quaternion& rotation;
+    tolua_readonly tolua_property__is_set bool client;
+    tolua_readonly tolua_property__is_set bool connected;
+    tolua_property__is_set bool connectPending;
+    tolua_readonly tolua_property__is_set bool sceneLoaded;
+    tolua_property__get_set bool logStatistics;
+    tolua_readonly tolua_property__get_set String address;
+    tolua_readonly tolua_property__get_set unsigned short port;
+    tolua_readonly tolua_property__get_set unsigned numDownloads;
+    tolua_readonly tolua_property__get_set String downloadName;
+    tolua_readonly tolua_property__get_set float downloadProgress;
+};

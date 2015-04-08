@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,17 @@
 // THE SOFTWARE.
 //
 
+#include <Urho3D/Urho3D.h>
+
+#include <Urho3D/UI/Button.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/UIEvents.h>
+
 #include "UIDrag.h"
 
-#include "Camera.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "Octree.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "Zone.h"
-#include "Drawable2D.h"
-#include "Log.h"
-
-#include "UIEvents.h"
-#include "Text.h"
-#include "UIElement.h"
-#include "Button.h"
-
-#include "DebugNew.h"
-#include "Log.h"
+#include <Urho3D/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(UIDrag)
 

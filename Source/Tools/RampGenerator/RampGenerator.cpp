@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,19 +20,21 @@
 // THE SOFTWARE.
 //
 
-#include "ArrayPtr.h"
-#include "MathDefs.h"
-#include "ProcessUtils.h"
-#include "StringUtils.h"
+#include <Urho3D/Urho3D.h>
+
+#include <Urho3D/Container/ArrayPtr.h>
+#include <Urho3D/Math/MathDefs.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Core/StringUtils.h>
 
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-#include <stb_image.h>
-#include <stb_image_write.h>
+#include <STB/stb_image.h>
+#include <STB/stb_image_write.h>
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 using namespace Urho3D;
 
@@ -91,13 +93,13 @@ void Run(const Vector<String>& arguments)
     
     if (dimensions == 2)
     {
-        SharedArrayPtr<unsigned char> data(new unsigned char[width * width]);
+        SharedArrayPtr<unsigned char> data(new unsigned char[width * width * 3]);
         
         for (int y = 0; y < width; ++y)
         {
             for (int x = 0; x < width; ++x)
             {
-                unsigned i = y * width + x;
+                unsigned i = (y * width + x) * 3;
                 
                 float halfWidth = width * 0.5f;
                 float xf = (x - halfWidth + 0.5f) / (halfWidth - 0.5f);
@@ -107,18 +109,29 @@ void Run(const Vector<String>& arguments)
                     dist = 1.0f;
                 
                 data[i] = (unsigned char)((1.0f - pow(dist, power)) * 255.0f);
+                data[i + 1] = data[i];
+                data[i + 2] = data[i];
             }
         }
         
         // Ensure the border is completely black
         for (int x = 0; x < width; ++x)
         {
-            data[x] = 0;
-            data[(width - 1) * width + x] = 0;
-            data[x * width] = 0;
-            data[x * width + (width - 1)] = 0;
+            data[x * 3] = 0;
+            data[x * 3 + 1] = 0;
+            data[x * 3 + 2] = 0;
+            data[((width - 1) * width + x) * 3] = 0;
+            data[((width - 1) * width + x) * 3 + 1] = 0;
+            data[((width - 1) * width + x) * 3 + 2] = 0;
+            data[x * width * 3] = 0;
+            data[x * width * 3 + 1] = 0;
+            data[x * width * 3 + 2] = 0;
+            data[(x * width + (width - 1)) * 3] = 0;
+            data[(x * width + (width - 1)) * 3 + 1] = 0;
+            data[(x * width + (width - 1)) * 3 + 2] = 0;
         }
         
-        stbi_write_png(arguments[0].CString(), width, width, 1, data.Get(), 0);
+        // Save as RGB to allow Direct3D11 shaders to sample monochrome and color spot textures similarly
+        stbi_write_png(arguments[0].CString(), width, width, 3, data.Get(), 0);
     }
 }

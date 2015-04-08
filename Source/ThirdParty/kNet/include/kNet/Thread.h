@@ -16,19 +16,23 @@
 /** @file Thread.h
 	@brief The Thread class. Implements threading either using Boost, native Win32 or pthreads constructs. */
 
+// Modified by Lasse Oorni for Urho3D
+
 #include <string>
 
 #ifdef KNET_USE_BOOST
 #include <boost/thread.hpp>
 #else
 
+// Urho3D: include Event.h first to make sure WS2Include.h is included before windows.h / winsock.h
+#include "Event.h"
+
 #ifdef WIN32
+// Urho3D: windows.h in lowercase to fix MinGW cross-compiling on a case-sensitive system
 #include <windows.h>
 #else
 #include <pthread.h>
 #endif
-
-#include "Event.h"
 
 namespace kNet
 {
@@ -39,7 +43,6 @@ typedef void (*ThreadEntryFunc)(void *threadStartData);
 
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
-#include "kNetBuildConfig.h"
 #include "SharedPtr.h"
 
 namespace kNet

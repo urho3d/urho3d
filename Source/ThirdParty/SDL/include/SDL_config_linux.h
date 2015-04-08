@@ -275,7 +275,7 @@
 #define SDL_VIDEO_DRIVER_X11_HAS_XKBKEYCODETOKEYSYM 1
 
 // Urho3D: Use OpenGL ES 2 implementation from Broadcom VideoCore for Raspberry Pi
-#ifdef RASPI
+#ifdef RPI
 #undef SDL_VIDEO_DRIVER_X11			/* No X */
 #define SDL_VIDEO_DRIVER_RPI 1
 

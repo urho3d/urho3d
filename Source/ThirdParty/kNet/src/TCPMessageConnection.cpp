@@ -68,7 +68,7 @@ MessageConnection::SocketReadResult TCPMessageConnection::ReadSocket(size_t &tot
 
 	if (inboundMessageQueue.CapacityLeft() < arbitraryInboundMessageCapacityLimit) 
 	{
-		LOG(LogVerbose, "TCPMessageConnection::ReadSocket: Read throttled! Application cannot consume data fast enough.");
+		KNET_LOG(LogVerbose, "TCPMessageConnection::ReadSocket: Read throttled! Application cannot consume data fast enough.");
 		return SocketReadThrottled; // Can't read in new data, since the client app can't process it so fast.
 	}
 
@@ -104,12 +104,12 @@ MessageConnection::SocketReadResult TCPMessageConnection::ReadSocket(size_t &tot
 				// Even compacting didn't get enough space to fit the message, so resize the ring buffer to be able to contain the message.
 				// At least always double the capacity of the buffer, so that we don't waste effort incrementing the capacity by too small amounts at a time.
 				tcpInboundSocketData.Resize(max(tcpInboundSocketData.Capacity()*2, tcpInboundSocketData.Capacity() + buffer->bytesContains - tcpInboundSocketData.ContiguousFreeBytesLeft()));
-				LOG(LogWaits, "TCPMessageConnection::ReadSocket: Performance warning! Resized the capacity of the receive ring buffer to %d bytes to accommodate a message of size %d (now have %d bytes of free space)",
+				KNET_LOG(LogWaits, "TCPMessageConnection::ReadSocket: Performance warning! Resized the capacity of the receive ring buffer to %d bytes to accommodate a message of size %d (now have %d bytes of free space)",
 					tcpInboundSocketData.Capacity(), buffer->bytesContains, tcpInboundSocketData.ContiguousFreeBytesLeft());
 			}
 		}
 
-		LOG(LogData, "TCPMessageConnection::ReadSocket: Received %d bytes from the network from peer %s.", 
+		KNET_LOG(LogData, "TCPMessageConnection::ReadSocket: Received %d bytes from the network from peer %s.", 
 			buffer->bytesContains, socket->ToString().c_str());
 
 		assert((size_t)buffer->bytesContains <= (size_t)tcpInboundSocketData.ContiguousFreeBytesLeft());
@@ -166,7 +166,7 @@ MessageConnection::PacketSendResult TCPMessageConnection::SendOutPacket()
 
 	if (!socket || !socket->IsWriteOpen())
 	{
-		LOG(LogVerbose, "TCPMessageConnection::SendOutPacket: Socket is not write open %p!", socket);
+		KNET_LOG(LogVerbose, "TCPMessageConnection::SendOutPacket: Socket is not write open %p!", socket);
 		if (connectionState == ConnectionOK) ///\todo This is slightly annoying to manually update the state here,
 			connectionState = ConnectionPeerClosed; /// reorganize to be able to have this automatically apply.
 		if (connectionState == ConnectionDisconnecting)
@@ -216,8 +216,8 @@ MessageConnection::PacketSendResult TCPMessageConnection::SendOutPacket()
             overlappedTransfer = socket->BeginSend(std::max<size_t>(socket->MaxSendSize(), totalMessageSize));
 	        if (!overlappedTransfer)
 	        {
-		        LOG(LogError, "TCPMessageConnection::SendOutPacket: Starting an overlapped send failed!");
-                assert(serializedMessages.size() == 0);
+		        KNET_LOG(LogError, "TCPMessageConnection::SendOutPacket: Starting an overlapped send failed!");
+                assert(serializedMessages.empty());
 		        return PacketSendSocketClosed;
 	        }
             writer = DataSerializer(overlappedTransfer->buffer.buf, overlappedTransfer->buffer.len);
@@ -244,7 +244,7 @@ MessageConnection::PacketSendResult TCPMessageConnection::SendOutPacket()
 //	assert(ContainerUniqueAndNoNullElements(serializedMessages)); // This precondition should always hold (but very heavy to test, uncomment to debug)
 
 	if (writer.BytesFilled() == 0 && outboundQueue.Size() > 0)
-		LOG(LogError, "Failed to send any messages to socket %s! (Probably next message was too big to fit in the buffer).", socket->ToString().c_str());
+		KNET_LOG(LogError, "Failed to send any messages to socket %s! (Probably next message was too big to fit in the buffer).", socket->ToString().c_str());
 
 	overlappedTransfer->bytesContains = writer.BytesFilled();
 	bool success = socket->EndSend(overlappedTransfer);
@@ -259,12 +259,12 @@ MessageConnection::PacketSendResult TCPMessageConnection::SendOutPacket()
 #endif
 //		assert(ContainerUniqueAndNoNullElements(outboundQueue));
 
-		LOG(LogError, "TCPMessageConnection::SendOutPacket() failed: Could not initiate overlapped transfer!");
+		KNET_LOG(LogError, "TCPMessageConnection::SendOutPacket() failed: Could not initiate overlapped transfer!");
 
 		return PacketSendSocketFull;
 	}
 
-	LOG(LogData, "TCPMessageConnection::SendOutPacket: Sent %d bytes (%d messages) to peer %s.", (int)writer.BytesFilled(), (int)serializedMessages.size(), socket->ToString().c_str());
+	KNET_LOG(LogData, "TCPMessageConnection::SendOutPacket: Sent %d bytes (%d messages) to peer %s.", (int)writer.BytesFilled(), (int)serializedMessages.size(), socket->ToString().c_str());
 	AddOutboundStats(writer.BytesFilled(), 1, numMessagesPacked);
 	ADDEVENT("tcpDataOut", (float)writer.BytesFilled(), "bytes");
 
@@ -333,7 +333,7 @@ void TCPMessageConnection::ExtractMessages()
 
 			if (messageSize == 0 || messageSize > cMaxReceivableTCPMessageSize)
 			{
-				LOG(LogError, "Received an invalid message size %d!", (int)messageSize);
+				KNET_LOG(LogError, "Received an invalid message size %d!", (int)messageSize);
 				throw NetException("Malformed TCP data! Received an invalid message size!");
 			}
 
@@ -354,7 +354,7 @@ void TCPMessageConnection::ExtractMessages()
 		AddInboundStats(0, 0, numMessagesReceived);
 	} catch(const NetException &e)
 	{
-		LOG(LogError, "TCPMessageConnection::ExtractMessages() caught a network exception: \"%s\"!", e.what());
+		KNET_LOG(LogError, "TCPMessageConnection::ExtractMessages() caught a network exception: \"%s\"!", e.what());
 		if (socket)
 			socket->Close();
 		connectionState = ConnectionClosed;
@@ -382,7 +382,7 @@ void TCPMessageConnection::DumpConnectionStatus() const
 		tcpInboundSocketData.Size(), 
 		tcpInboundSocketData.ContiguousFreeBytesLeft());
 
-	LOGUSER(str);
+	KNET_LOGUSER(str);
 
 
 }

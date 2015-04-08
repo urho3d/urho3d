@@ -1,5 +1,5 @@
 ::
-:: Copyright (c) 2008-2014 the Urho3D project.
+:: Copyright (c) 2008-2015 the Urho3D project.
 ::
 :: Permission is hereby granted, free of charge, to any person obtaining a copy
 :: of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,4 @@
 :: THE SOFTWARE.
 ::
 
-@echo off
-pushd %~dp0
-cmake -E make_directory Build
-set "arch="
-set "version=9 2008"
-if exist Build\CMakeCache.txt. for /F "eol=/ delims=:= tokens=1-3" %%i in (Build\CMakeCache.txt) do if "%%i" == "URHO3D_64BIT" if "%%k" == "1" set "arch= Win64"
-:loop
-if not "%1" == "" (
-    if "%1" == "-DURHO3D_64BIT" if "%~2" == "1" set "arch= Win64"
-    if "%1" == "-DURHO3D_64BIT" if "%~2" == "0" set "arch="
-    if "%1" == "VERSION" set "version=%~2"
-    shift
-    shift
-    goto loop
-)
-echo on
-@set "OPT="
-cmake -E chdir Build cmake %OPT% -G "Visual Studio %version%%arch%" %* ..\Source
-@popd
+@%~dp0\cmake_generic.bat %* -VS="9 2008"

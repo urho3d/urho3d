@@ -429,8 +429,9 @@ void btSequentialImpulseConstraintSolver::setupFrictionConstraint(btSolverConstr
 
 //		btScalar positionalError = 0.f;
 
-		btSimdScalar velocityError =  desiredVelocity - rel_vel;
-		btSimdScalar	velocityImpulse = velocityError * btSimdScalar(solverConstraint.m_jacDiagABInv);
+        // Urho3D: possible friction fix from https://github.com/bulletphysics/bullet3/commit/907ac49892ede3f4a3295f7cbd96759107e5fc0e
+		btScalar velocityError =  desiredVelocity - rel_vel;
+		btScalar	velocityImpulse = velocityError * btScalar(solverConstraint.m_jacDiagABInv);
 		solverConstraint.m_rhs = velocityImpulse;
 		solverConstraint.m_cfm = cfmSlip;
 		solverConstraint.m_lowerLimit = -solverConstraint.m_friction;
@@ -509,8 +510,9 @@ void btSequentialImpulseConstraintSolver::setupRollingFrictionConstraint(	btSolv
 
 //		btScalar positionalError = 0.f;
 
-		btSimdScalar velocityError =  desiredVelocity - rel_vel;
-		btSimdScalar	velocityImpulse = velocityError * btSimdScalar(solverConstraint.m_jacDiagABInv);
+        // Urho3D: possible friction fix from https://github.com/bulletphysics/bullet3/commit/907ac49892ede3f4a3295f7cbd96759107e5fc0e
+		btScalar velocityError =  desiredVelocity - rel_vel;
+		btScalar	velocityImpulse = velocityError * btScalar(solverConstraint.m_jacDiagABInv);
 		solverConstraint.m_rhs = velocityImpulse;
 		solverConstraint.m_cfm = cfmSlip;
 		solverConstraint.m_lowerLimit = -solverConstraint.m_friction;

@@ -1,0 +1,6 @@
+$#include "Graphics/TextureCube.h"
+
+class TextureCube : public Texture
+{
+    RenderSurface* GetRenderSurface(CubeMapFace face) const;
+};

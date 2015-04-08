@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2014 the Urho3D project.
+# Copyright (c) 2008-2015 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ env:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
     - DISPLAY=:99.0
     - NUMJOBS=3
+    - URHO3D_MODERN_CPP=1
   matrix:
     - LINUX=1   URHO3D_LIB_TYPE=STATIC REBASE=1
     - LINUX=1   URHO3D_LIB_TYPE=SHARED
@@ -34,12 +35,15 @@ env:
     - WINDOWS=1 URHO3D_LIB_TYPE=SHARED
     - WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_OPENGL=0
     - WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_OPENGL=0
+    # Ubuntu 12.04 LTS does not have up-to-date D3D11 headers, disable the CI build jobs for D3D11 for now until Travis-CI upgrades their OS to 14.04 LTS or better
+    # WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_D3D11=1
+    # WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_D3D11=1
     - LINUX=1   URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - LINUX=1   URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
     - WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
-    - WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_OPENGL=0
-    - WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_OPENGL=0
+    # WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_D3D11=1
+    # WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_D3D11=1
 matrix:
   fast_finish: true
   include:

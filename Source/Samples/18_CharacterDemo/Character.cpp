@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,18 @@
 // THE SOFTWARE.
 //
 
-#include "AnimationController.h"
+#include <Urho3D/Urho3D.h>
+
+#include <Urho3D/Graphics/AnimationController.h>
+#include <Urho3D/Core/Context.h>
+#include <Urho3D/IO/MemoryBuffer.h>
+#include <Urho3D/Physics/PhysicsEvents.h>
+#include <Urho3D/Physics/PhysicsWorld.h>
+#include <Urho3D/Physics/RigidBody.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Scene/SceneEvents.h>
+
 #include "Character.h"
-#include "Context.h"
-#include "MemoryBuffer.h"
-#include "PhysicsEvents.h"
-#include "PhysicsWorld.h"
-#include "RigidBody.h"
-#include "Scene.h"
-#include "SceneEvents.h"
 
 Character::Character(Context* context) :
     LogicComponent(context),

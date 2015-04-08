@@ -1,0 +1,71 @@
+$#include "UI/FileSelector.h"
+
+struct FileSelectorEntry
+{
+    String name_ @ name;
+    bool directory_ @ directory;
+};
+
+class FileSelector : public Object
+{
+    FileSelector();
+    virtual ~FileSelector();
+
+    void SetDefaultStyle(XMLFile* style);
+    
+    void SetTitle(const String text);
+    void SetButtonTexts(const String okText, const String cancelText);
+    void SetPath(const String path);
+    void SetFileName(const String fileName);
+    void SetFilters(const Vector<String>& filters, unsigned defaultIndex);
+    void SetDirectoryMode(bool enable);
+    void UpdateElements();
+
+    XMLFile* GetDefaultStyle() const;
+    Window* GetWindow() const;
+    Text* GetTitleText() const;
+    ListView* GetFileList() const;
+    LineEdit* GetPathEdit() const;
+    LineEdit* GetFileNameEdit() const;
+    DropDownList* GetFilterList() const;
+    Button* GetOKButton() const;
+    Button* GetCancelButton() const;
+    Button* GetCloseButton() const;
+    const String GetTitle() const;
+    const String GetPath() const;
+    const String GetFileName() const;
+    const String GetFilter() const;
+    unsigned GetFilterIndex() const;
+    bool GetDirectoryMode() const;
+    
+    tolua_property__get_set XMLFile* defaultStyle;
+    tolua_readonly tolua_property__get_set Window* window;
+    tolua_readonly tolua_property__get_set Text* titleText;
+    tolua_readonly tolua_property__get_set ListView* fileList;
+    tolua_readonly tolua_property__get_set LineEdit* pathEdit;
+    tolua_readonly tolua_property__get_set LineEdit* fileNameEdit;
+    tolua_readonly tolua_property__get_set DropDownList* filterList;
+    tolua_readonly tolua_property__get_set Button* OKButton;
+    tolua_readonly tolua_property__get_set Button* cancelButton;
+    tolua_readonly tolua_property__get_set Button* closeButton;
+    tolua_property__get_set String title;
+    tolua_property__get_set String path;
+    tolua_property__get_set String fileName;
+    tolua_readonly tolua_property__get_set String filter;
+    tolua_readonly tolua_property__get_set unsigned filterIndex;
+    tolua_property__get_set bool directoryMode;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_FileSelector_new00
+static int tolua_UILuaAPI_FileSelector_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<FileSelector>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_FileSelector_new00_local
+static int tolua_UILuaAPI_FileSelector_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<FileSelector>(tolua_S);
+}
+$}

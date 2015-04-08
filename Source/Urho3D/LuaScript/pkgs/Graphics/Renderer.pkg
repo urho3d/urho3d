@@ -1,0 +1,108 @@
+$#include "Graphics/Renderer.h"
+
+class Renderer
+{
+    void SetNumViewports(unsigned num);
+    void SetViewport(unsigned index, Viewport* viewport);
+    void SetDefaultRenderPath(RenderPath* renderPath);
+    void SetDefaultRenderPath(XMLFile* file);
+    void SetHDRRendering(bool enable);
+    void SetSpecularLighting(bool enable);
+    void SetTextureAnisotropy(int level);
+    void SetTextureFilterMode(TextureFilterMode mode);
+    void SetTextureQuality(int quality);
+    void SetMaterialQuality(int quality);
+    void SetDrawShadows(bool enable);
+    void SetShadowMapSize(int size);
+    void SetShadowQuality(int quality);
+    void SetReuseShadowMaps(bool enable);
+    void SetMaxShadowMaps(int shadowMaps);
+    void SetDynamicInstancing(bool enable);
+    void SetMinInstances(int instances);
+    void SetMaxSortedInstances(int instances);
+    void SetMaxOccluderTriangles(int triangles);
+    void SetOcclusionBufferSize(int size);
+    void SetOccluderSizeThreshold(float screenSize);
+    void SetMobileShadowBiasMul(float mul);
+    void SetMobileShadowBiasAdd(float add);
+    void ReloadShaders();
+    
+    unsigned GetNumViewports() const;
+    Viewport* GetViewport(unsigned index) const;
+    RenderPath* GetDefaultRenderPath() const;
+    bool GetHDRRendering() const;
+    bool GetSpecularLighting() const;
+    bool GetDrawShadows() const;
+    int GetTextureAnisotropy() const;
+    TextureFilterMode GetTextureFilterMode() const;
+    int GetTextureQuality() const;
+    int GetMaterialQuality() const;
+    int GetShadowMapSize() const;
+    int GetShadowQuality() const;
+    bool GetReuseShadowMaps() const;
+    int GetMaxShadowMaps() const;
+    bool GetDynamicInstancing() const;
+    int GetMinInstances() const;
+    int GetMaxSortedInstances() const;
+    int GetMaxOccluderTriangles() const;
+    int GetOcclusionBufferSize() const;
+    float GetOccluderSizeThreshold() const;
+    float GetMobileShadowBiasMul() const;
+    float GetMobileShadowBiasAdd() const;
+    unsigned GetNumViews() const;
+    unsigned GetNumPrimitives() const;
+    unsigned GetNumBatches() const;
+    unsigned GetNumGeometries(bool allViews = false) const;
+    unsigned GetNumLights(bool allViews = false) const;
+    unsigned GetNumShadowMaps(bool allViews = false) const;
+    unsigned GetNumOccluders(bool allViews = false) const;
+    Zone* GetDefaultZone() const;
+    Material* GetDefaultMaterial() const;
+    Texture2D* GetDefaultLightRamp() const;
+    Texture2D* GetDefaultLightSpot() const;
+
+    void DrawDebugGeometry(bool depthTest);
+
+    tolua_property__get_set unsigned numViewports;
+    tolua_property__get_set RenderPath* defaultRenderPath;
+    tolua_property__get_set bool HDRRendering;
+    tolua_property__get_set bool specularLighting;
+    tolua_property__get_set bool drawShadows;
+    tolua_property__get_set int textureAnisotropy;
+    tolua_property__get_set TextureFilterMode textureFilterMode;
+    tolua_property__get_set int textureQuality;
+    tolua_property__get_set int materialQuality;
+    tolua_property__get_set int shadowMapSize;
+    tolua_property__get_set int shadowQuality;
+    tolua_property__get_set bool reuseShadowMaps;
+    tolua_property__get_set int maxShadowMaps;
+    tolua_property__get_set bool dynamicInstancing;
+    tolua_property__get_set int minInstances;
+    tolua_property__get_set int maxSortedInstances;
+    tolua_property__get_set int maxOccluderTriangles;
+    tolua_property__get_set int occlusionBufferSize;
+    tolua_property__get_set float occluderSizeThreshold;
+    tolua_property__get_set float mobileShadowBiasMul;
+    tolua_property__get_set float mobileShadowBiasAdd;
+    tolua_readonly tolua_property__get_set unsigned numViews;
+    tolua_readonly tolua_property__get_set unsigned numPrimitives;
+    tolua_readonly tolua_property__get_set unsigned numBatches;
+    tolua_readonly tolua_property__get_set Zone* defaultZone;
+    tolua_readonly tolua_property__get_set Material* defaultMaterial;
+    tolua_readonly tolua_property__get_set Texture2D* defaultLightRamp;
+    tolua_readonly tolua_property__get_set Texture2D* defaultLightSpot;
+};
+
+Renderer* GetRenderer();
+tolua_readonly tolua_property__get_set Renderer* renderer;
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_GetRenderer00
+static int tolua_GraphicsLuaAPI_GetRenderer00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Renderer>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_renderer_ptr
+#define tolua_get_renderer_ptr tolua_GraphicsLuaAPI_GetRenderer00
+$}

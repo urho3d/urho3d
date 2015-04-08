@@ -1,0 +1,166 @@
+$#include "IO/File.h"
+$#include "Input/Input.h"
+
+enum MouseMode
+{
+    MM_ABSOLUTE = 0,
+    MM_RELATIVE,
+    MM_WRAP
+};
+
+struct TouchState
+{
+    UIElement* GetTouchedElement();
+
+    int touchID_ @ touchID;
+    IntVector2 position_ @ position;
+    IntVector2 lastPosition_ @ lastPosition;
+    IntVector2 delta_ @ delta;
+    float pressure_ @ pressure;
+
+    tolua_readonly tolua_property__get_set UIElement* touchedElement;
+};
+
+struct JoystickState
+{
+    const String name_ @ name;
+    const int joystickID_ @ joystickID;
+
+    bool IsController() const;
+    unsigned GetNumButtons() const;
+    unsigned GetNumAxes() const;
+    unsigned GetNumHats() const;
+
+    bool GetButtonDown(unsigned index) const;
+    bool GetButtonPress(unsigned index) const;
+    float GetAxisPosition(unsigned index) const;
+    int GetHatPosition(unsigned index) const;
+
+    tolua_readonly tolua_property__is_set bool controller;
+    tolua_readonly tolua_property__get_set unsigned numButtons;
+    tolua_readonly tolua_property__get_set unsigned numAxes;
+    tolua_readonly tolua_property__get_set unsigned numHats;
+};
+
+class Input : public Object
+{
+    void SetToggleFullscreen(bool enable);
+    void SetMouseVisible(bool enable, bool suppressEvent = false);
+    void SetMouseGrabbed(bool grab);
+    void SetMouseMode(MouseMode mode);
+    int AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+    bool RemoveScreenJoystick(int id);
+    void SetScreenJoystickVisible(int id, bool enable);
+    void SetScreenKeyboardVisible(bool enable);
+    void SetTouchEmulation(bool enable);
+    bool RecordGesture();
+    tolua_outside bool InputSaveGestures @ SaveGestures(File* dest);
+    tolua_outside bool InputSaveGesture @ SaveGesture(File* dest, unsigned gestureID);
+    tolua_outside unsigned InputLoadGestures @ LoadGestures(File* source);
+    tolua_outside bool InputSaveGestures @ SaveGestures(const String fileName);
+    tolua_outside bool InputSaveGesture @ SaveGesture(const String fileName, unsigned gestureID);
+    tolua_outside unsigned InputLoadGestures @ LoadGestures(const String fileName);
+    bool RemoveGesture(unsigned gestureID);
+    void RemoveAllGestures();
+
+    int GetKeyFromName(const String name) const;
+    int GetKeyFromScancode(int scancode) const;
+    String GetKeyName(int key) const;
+    int GetScancodeFromKey(int key) const;
+    int GetScancodeFromName(const String name) const;
+    String GetScancodeName(int scancode) const;
+    bool GetKeyDown(int key) const;
+    bool GetKeyPress(int key) const;
+    bool GetScancodeDown(int scancode) const;
+    bool GetScancodePress(int scancode) const;
+    bool GetMouseButtonDown(int button) const;
+    bool GetMouseButtonPress(int button) const;
+    bool GetQualifierDown(int qualifier) const;
+    bool GetQualifierPress(int qualifier) const;
+    int GetQualifiers() const;
+    IntVector2 GetMousePosition() const;
+    const IntVector2& GetMouseMove() const;
+    int GetMouseMoveX() const;
+    int GetMouseMoveY() const;
+    int GetMouseMoveWheel() const;
+    unsigned GetNumTouches() const;
+    TouchState* GetTouch(unsigned index) const;
+    unsigned GetNumJoysticks() const;
+    JoystickState* GetJoystick(int id);
+    JoystickState* GetJoystickByIndex(unsigned index);
+    bool GetToggleFullscreen() const;
+    bool GetScreenKeyboardSupport() const;
+    bool IsScreenJoystickVisible(int id) const;
+    bool IsScreenKeyboardVisible() const;
+    bool GetTouchEmulation() const;
+    bool IsMouseVisible() const;
+    bool IsMouseGrabbed() const;
+    MouseMode GetMouseMode() const;
+    bool HasFocus();
+    bool IsMinimized() const;
+
+    tolua_readonly tolua_property__get_set int qualifiers;
+    tolua_readonly tolua_property__get_set IntVector2 mousePosition;
+    tolua_readonly tolua_property__get_set IntVector2& mouseMove;
+    tolua_readonly tolua_property__get_set int mouseMoveX;
+    tolua_readonly tolua_property__get_set int mouseMoveY;
+    tolua_readonly tolua_property__get_set int mouseMoveWheel;
+    tolua_readonly tolua_property__get_set unsigned numTouches;
+    tolua_readonly tolua_property__get_set unsigned numJoysticks;
+    tolua_readonly tolua_property__get_set bool toggleFullscreen;
+    tolua_readonly tolua_property__get_set bool screenKeyboardSupport;
+    tolua_property__get_set MouseMode mouseMode;
+    tolua_property__is_set bool screenKeyboardVisible;
+    tolua_property__get_set bool touchEmulation;
+    tolua_property__is_set bool mouseVisible;
+    tolua_property__is_set bool mouseGrabbed;
+    tolua_readonly tolua_property__has_set bool focus;
+    tolua_readonly tolua_property__is_set bool minimized;
+};
+
+Input* GetInput();
+tolua_readonly tolua_property__get_set Input* input;
+
+${
+static bool InputSaveGestures(Input* input, File* file)
+{
+    return file ? input->SaveGestures(*file) : false;
+}
+
+static bool InputSaveGesture(Input* input, File* file, unsigned gestureID)
+{
+    return file ? input->SaveGesture(*file, gestureID) : false;
+}
+
+static unsigned InputLoadGestures(Input* input, File* file)
+{
+    return file ? input->LoadGestures(*file) : 0;
+}
+
+static bool InputSaveGestures(Input* input, const String& fileName)
+{
+    File file(input->GetContext(), fileName, FILE_WRITE);
+    return file.IsOpen() ? input->SaveGestures(file) : false;
+}
+
+static bool InputSaveGesture(Input* input, const String& fileName, unsigned gestureID)
+{
+    File file(input->GetContext(), fileName, FILE_WRITE);
+    return file.IsOpen() ? input->SaveGesture(file, gestureID) : false;
+}
+
+static unsigned InputLoadGestures(Input* input, const String& fileName)
+{
+    File file(input->GetContext(), fileName, FILE_READ);
+    return file.IsOpen() ? input->LoadGestures(file) : 0;
+}
+
+#define TOLUA_DISABLE_tolua_InputLuaAPI_GetInput00
+static int tolua_InputLuaAPI_GetInput00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Input>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_input_ptr
+#define tolua_get_input_ptr tolua_InputLuaAPI_GetInput00
+$}

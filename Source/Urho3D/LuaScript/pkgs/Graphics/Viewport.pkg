@@ -1,0 +1,163 @@
+$#include "Graphics/Viewport.h"
+
+class Viewport
+{
+    Viewport();
+    Viewport(Scene* scene, Camera* camera, RenderPath* renderPath = 0);
+    Viewport(Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath = 0);
+    ~Viewport();
+    
+    void SetScene(Scene* scene);
+    void SetCamera(Camera* camera);
+    void SetRect(const IntRect& rect);
+    void SetRenderPath(RenderPath* path);
+    void SetRenderPath(XMLFile* file);
+    void SetDrawDebug(bool enable);
+    
+    Scene* GetScene() const;
+    Camera* GetCamera() const;
+    const IntRect& GetRect() const;
+    RenderPath* GetRenderPath() const;
+    bool GetDrawDebug() const;
+    Ray GetScreenRay(int x, int y) const;
+    IntVector2 WorldToScreenPoint(const Vector3& worldPos) const;
+    Vector3 ScreenToWorldPoint(int x, int y, float depth) const;
+
+    tolua_property__get_set Scene* scene;
+    tolua_property__get_set Camera* camera;
+    tolua_property__get_set IntRect& rect;
+    tolua_property__get_set RenderPath* renderPath;
+    tolua_property__get_set bool drawDebug;
+};
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Viewport_new00
+static int tolua_GraphicsLuaAPI_Viewport_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Viewport>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Viewport_new00_local
+static int tolua_GraphicsLuaAPI_Viewport_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Viewport>(tolua_S);
+}
+
+/* method: new of class  Viewport */
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Viewport_new01
+static int tolua_GraphicsLuaAPI_Viewport_new01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"Viewport",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"Scene",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,3,"Camera",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,4,"RenderPath",1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  Scene* scene = ((Scene*)  tolua_tousertype(tolua_S,2,0));
+  Camera* camera = ((Camera*)  tolua_tousertype(tolua_S,3,0));
+  RenderPath* renderPath = ((RenderPath*)  tolua_tousertype(tolua_S,4,0));
+ {
+  Viewport* tolua_ret = (Viewport*)  Mtolua_new((Viewport)(GetContext(tolua_S),scene,camera,renderPath));
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,"Viewport");
+ }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_GraphicsLuaAPI_Viewport_new00(tolua_S);
+}
+
+/* method: new_local of class  Viewport */
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Viewport_new01_local
+static int tolua_GraphicsLuaAPI_Viewport_new01_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"Viewport",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"Scene",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,3,"Camera",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,4,"RenderPath",1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  Scene* scene = ((Scene*)  tolua_tousertype(tolua_S,2,0));
+  Camera* camera = ((Camera*)  tolua_tousertype(tolua_S,3,0));
+  RenderPath* renderPath = ((RenderPath*)  tolua_tousertype(tolua_S,4,0));
+ {
+  Viewport* tolua_ret = (Viewport*)  Mtolua_new((Viewport)(GetContext(tolua_S),scene,camera,renderPath));
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,"Viewport");
+ tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+ }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_GraphicsLuaAPI_Viewport_new00_local(tolua_S);
+}
+
+/* method: new of class  Viewport */
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Viewport_new02
+static int tolua_GraphicsLuaAPI_Viewport_new02(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"Viewport",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"Scene",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,3,"Camera",0,&tolua_err) ||
+ (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const IntRect",0,&tolua_err)) ||
+ !tolua_isusertype(tolua_S,5,"RenderPath",1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  Scene* scene = ((Scene*)  tolua_tousertype(tolua_S,2,0));
+  Camera* camera = ((Camera*)  tolua_tousertype(tolua_S,3,0));
+  const IntRect* rect = ((const IntRect*)  tolua_tousertype(tolua_S,4,0));
+  RenderPath* renderPath = ((RenderPath*)  tolua_tousertype(tolua_S,5,0));
+ {
+  Viewport* tolua_ret = (Viewport*)  Mtolua_new((Viewport)(GetContext(tolua_S),scene,camera,*rect,renderPath));
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,"Viewport");
+ }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_GraphicsLuaAPI_Viewport_new01(tolua_S);
+}
+
+/* method: new_local of class  Viewport */
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Viewport_new02_local
+static int tolua_GraphicsLuaAPI_Viewport_new02_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"Viewport",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,2,"Scene",0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,3,"Camera",0,&tolua_err) ||
+ (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const IntRect",0,&tolua_err)) ||
+ !tolua_isusertype(tolua_S,5,"RenderPath",1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  Scene* scene = ((Scene*)  tolua_tousertype(tolua_S,2,0));
+  Camera* camera = ((Camera*)  tolua_tousertype(tolua_S,3,0));
+  const IntRect* rect = ((const IntRect*)  tolua_tousertype(tolua_S,4,0));
+  RenderPath* renderPath = ((RenderPath*)  tolua_tousertype(tolua_S,5,0));
+ {
+  Viewport* tolua_ret = (Viewport*)  Mtolua_new((Viewport)(GetContext(tolua_S),scene,camera,*rect,renderPath));
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,"Viewport");
+ tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+ }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_GraphicsLuaAPI_Viewport_new01_local(tolua_S);
+}
+$}

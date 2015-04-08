@@ -1,0 +1,42 @@
+$#include "IO/Log.h"
+
+static const int LOG_DEBUG;
+static const int LOG_INFO;
+static const int LOG_WARNING;
+static const int LOG_ERROR;
+static const int LOG_NONE;
+
+class Log : public Object
+{
+    void Open(const String fileName);
+    void Close();
+    void SetLevel(int level);
+    void SetTimeStamp(bool enable);
+    void SetQuiet(bool quiet);
+    
+    int GetLevel() const;
+    bool GetTimeStamp() const;
+    String GetLastMessage() const;
+    bool IsQuiet() const;
+    
+    static void Write(int level, const String message);
+    static void WriteRaw(const String message, bool error = false);
+    
+    tolua_property__get_set int level;
+    tolua_property__get_set bool timeStamp;
+    tolua_property__is_set bool quiet;
+};
+
+Log* GetLog();
+tolua_readonly tolua_property__get_set Log* log;
+
+${
+#define TOLUA_DISABLE_tolua_IOLuaAPI_GetLog00
+static int tolua_IOLuaAPI_GetLog00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Log>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_log_ptr
+#define tolua_get_log_ptr tolua_IOLuaAPI_GetLog00
+$}

@@ -1,0 +1,16 @@
+$#include "Urho2D/ConstraintRope2D.h"
+
+class ConstraintRope2D : Constraint2D
+{
+    void SetOwnerBodyAnchor(const Vector2& anchor);
+    void SetOtherBodyAnchor(const Vector2& anchor);
+    void SetMaxLength(float maxLength);
+
+    const Vector2& GetOwnerBodyAnchor() const;
+    const Vector2& GetOtherBodyAnchor() const;
+    float GetMaxLength() const;
+
+    tolua_property__get_set Vector2& ownerBodyAnchor;
+    tolua_property__get_set Vector2& otherBodyAnchor;
+    tolua_property__get_set float maxLength;
+};

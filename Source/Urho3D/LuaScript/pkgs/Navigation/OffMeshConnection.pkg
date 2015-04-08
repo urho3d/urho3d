@@ -1,0 +1,16 @@
+$#include "Navigation/OffMeshConnection.h"
+
+class OffMeshConnection : public Component
+{
+    void SetEndPoint(Node* node);
+    void SetRadius(float radius);
+    void SetBidirectional(bool enabled);
+    
+    Node* GetEndPoint() const;
+    float GetRadius() const;
+    bool IsBidirectional() const;
+    
+    tolua_property__get_set Node* endPoint;
+    tolua_property__get_set float radius;
+    tolua_property__is_set bool bidirectional;
+};

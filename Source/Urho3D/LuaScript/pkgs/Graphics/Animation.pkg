@@ -1,0 +1,49 @@
+$#include "Graphics/Animation.h"
+
+struct AnimationKeyFrame
+{
+    float time_ @ time;
+    Vector3 position_ @ position;
+    Quaternion rotation_ @ rotation;
+    Vector3 scale_ @ scale;
+};
+
+/*
+struct AnimationTrack
+{
+    void GetKeyFrameIndex(float time, unsigned& index) const;
+    String name_ @ name;
+    StringHash nameHash_ @ nameHash;
+    unsigned char channelMask_ @ channelMas;
+    Vector<AnimationKeyFrame> keyFrames_ @ keyFrames;
+};
+
+struct AnimationTriggerPoint
+{
+    AnimationTriggerPoint();
+    float time_ @ time;
+    Variant data_ @ data;
+};
+*/
+
+static const unsigned char CHANNEL_POSITION;
+static const unsigned char CHANNEL_ROTATION;
+static const unsigned char CHANNEL_SCALE;
+
+class Animation : public Resource
+{
+    const String GetAnimationName() const;
+    StringHash GetAnimationNameHash() const;
+    float GetLength() const;
+    unsigned GetNumTracks() const;
+    const AnimationTrack* GetTrack(const String name) const;
+    const AnimationTrack* GetTrack(StringHash nameHash) const;
+    const AnimationTrack* GetTrack(unsigned index) const;
+    unsigned GetNumTriggers() const;
+
+    tolua_readonly tolua_property__get_set String animationName;
+    tolua_readonly tolua_property__get_set StringHash animationNameHash;
+    tolua_readonly tolua_property__get_set float length;
+    tolua_readonly tolua_property__get_set unsigned numTracks;
+    tolua_readonly tolua_property__get_set unsigned numTriggers;
+};

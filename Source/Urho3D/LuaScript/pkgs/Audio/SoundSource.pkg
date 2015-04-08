@@ -1,0 +1,36 @@
+$#include "Audio/SoundSource.h"
+
+class SoundSource : public Component
+{
+    void Play(Sound* sound);
+    void Play(Sound* sound, float frequency);
+    void Play(Sound* sound, float frequency, float gain);
+    void Play(Sound* sound, float frequency, float gain, float panning);
+    void Stop();
+    void SetSoundType(const String type);
+    void SetFrequency(float frequency);
+    void SetGain(float gain);
+    void SetAttenuation(float attenuation);
+    void SetPanning(float panning);
+    void SetAutoRemove(bool enable);
+
+    Sound* GetSound() const;
+    String GetSoundType() const;
+    float GetTimePosition() const;
+    float GetFrequency() const;
+    float GetGain() const;
+    float GetAttenuation() const;
+    float GetPanning() const;
+    bool GetAutoRemove() const;
+    bool IsPlaying() const;
+    
+    tolua_readonly tolua_property__get_set Sound* sound;
+    tolua_property__get_set String soundType;
+    tolua_readonly tolua_property__get_set float timePosition;
+    tolua_property__get_set float frequency;
+    tolua_property__get_set float gain;
+    tolua_property__get_set float attenuation;
+    tolua_property__get_set float panning;
+    tolua_property__get_set bool autoRemove;
+    tolua_readonly tolua_property__is_set bool playing;
+};

@@ -14,13 +14,12 @@
 
 /** @file BoostThread.cpp
 	@brief */
+#ifdef KNET_USE_BOOST
 
 #include <cassert>
 #include <exception>
 
-#ifdef KNET_USE_BOOST
 #include <boost/thread/thread.hpp>
-#endif
 
 #include "kNet/DebugMemoryLeakCheck.h"
 
@@ -127,3 +126,5 @@ ThreadId Thread::NullThreadId()
 }
 
 } // ~kNet
+
+#endif // ~KNET_USE_BOOST

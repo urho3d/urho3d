@@ -24,16 +24,20 @@ namespace kNet
 {
 
 NetworkMessage::NetworkMessage()
-:messageNumber(0),
+:data(0),
+priority(0),
+id(0),
+contentID(0),
+reliable(true),
+inOrder(true),
+obsolete(false),
+receivedPacketID(0),
+messageNumber(0),
 reliableMessageNumber(0),
 sendCount(0),
 fragmentIndex(0),
 dataCapacity(0),
 dataSize(0),
-data(0),
-contentID(0),
-obsolete(false),
-priority(0),
 transfer(0)
 {
 }

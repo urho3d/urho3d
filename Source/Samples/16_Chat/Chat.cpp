@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,30 +20,32 @@
 // THE SOFTWARE.
 //
 
-#include "Audio.h"
-#include "Button.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "IOEvents.h"
-#include "LineEdit.h"
-#include "Log.h"
-#include "MemoryBuffer.h"
-#include "Network.h"
-#include "NetworkEvents.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "Sound.h"
-#include "Text.h"
-#include "UI.h"
-#include "UIEvents.h"
-#include "VectorBuffer.h"
-#include "Zone.h"
+#include <Urho3D/Urho3D.h>
+
+#include <Urho3D/Audio/Audio.h>
+#include <Urho3D/UI/Button.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/IO/IOEvents.h>
+#include <Urho3D/UI/LineEdit.h>
+#include <Urho3D/IO/Log.h>
+#include <Urho3D/IO/MemoryBuffer.h>
+#include <Urho3D/Network/Network.h>
+#include <Urho3D/Network/NetworkEvents.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Audio/Sound.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/UI.h>
+#include <Urho3D/UI/UIEvents.h>
+#include <Urho3D/IO/VectorBuffer.h>
+#include <Urho3D/Graphics/Zone.h>
 
 #include "Chat.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 // Undefine Windows macro, as our Connection class has a function called SendMessage
 #ifdef SendMessage

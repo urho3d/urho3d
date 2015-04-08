@@ -1,0 +1,85 @@
+$#include "Graphics/Material.h"
+
+enum CullMode {};
+enum WrapMode {};
+
+class Material : public Resource
+{
+    Material();
+    ~Material();
+    
+    void SetNumTechniques(unsigned num);
+    void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f);
+    void SetShaderParameter(const String name, const Variant& value);
+    void SetShaderParameterAnimation(const String name, ValueAnimation* animation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
+    void SetShaderParameterAnimationWrapMode(const String name, WrapMode wrapMode);
+    void SetShaderParameterAnimationSpeed(const String name, float speed);
+    void SetTexture(TextureUnit unit, Texture* texture);
+    void SetUVTransform(const Vector2& offset, float rotation, const Vector2& repeat);
+    void SetUVTransform(const Vector2& offset, float rotation, float repeat);
+    void SetCullMode(CullMode mode);
+    void SetShadowCullMode(CullMode mode);
+    void SetFillMode(FillMode mode);
+    void SetDepthBias(const BiasParameters& parameters);
+    void SetScene(Scene* scene);
+    void RemoveShaderParameter(const String name);
+    void ReleaseShaders();
+    
+    // SharedPtr<Material> Clone(const String cloneName = String::EMPTY) const;
+    tolua_outside Material* MaterialClone @ Clone(const String cloneName = String::EMPTY) const;
+    
+    void SortTechniques();
+    void MarkForAuxView(unsigned frameNumber);
+    
+    unsigned GetNumTechniques() const;
+    
+    Technique* GetTechnique(unsigned index) const;
+
+    Pass* GetPass(unsigned index, const String passName) const;
+    
+    Texture* GetTexture(TextureUnit unit) const;
+    ValueAnimation* GetShaderParameterAnimation(const String name) const;
+    WrapMode GetShaderParameterAnimationWrapMode(const String name) const;
+    float GetShaderParameterAnimationSpeed(const String name) const;
+    
+    CullMode GetCullMode() const;
+    CullMode GetShadowCullMode() const;
+    FillMode GetFillMode() const;
+    const BiasParameters& GetDepthBias() const;
+    bool GetOcclusion() const;
+    bool GetSpecular() const;
+    Scene* GetScene() const;
+
+    tolua_readonly tolua_property__get_set CullMode cullMode;
+    tolua_readonly tolua_property__get_set CullMode shadowCullMode;
+    tolua_readonly tolua_property__get_set FillMode fillMode;
+    tolua_readonly tolua_property__get_set bool occlusion;
+    tolua_readonly tolua_property__get_set bool specular;
+    tolua_property__get_set Scene* scene;
+};
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Material_new00
+static int tolua_GraphicsLuaAPI_Material_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Material>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Material_new00_local
+static int tolua_GraphicsLuaAPI_Material_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Material>(tolua_S);
+}
+
+static Material* MaterialClone(const Material* material, const String& cloneName = String::EMPTY)
+{
+    if (!material)
+        return 0;
+        
+    SharedPtr<Material> clonedMaterialPtr = material->Clone(cloneName);
+    Material* clonedMaterial = clonedMaterialPtr.Get();
+    clonedMaterialPtr.Detach();
+    
+    return clonedMaterial;
+}
+$}
