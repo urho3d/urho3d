@@ -676,6 +676,8 @@ macro (enable_pch HEADER_PATHNAME)
             if (CMAKE_GENERATOR STREQUAL Ninja)
                 # The precompiled header is always generated in the current binary dir,
                 # but Ninja project is not able to find it without adding the binary dir to the include search path
+                # FIXME: below quick fix may have negatively impacted ccache from perfoming correctly in Ninja
+                #        ccache increases the 'preprocessor error' stat count and fallbacks to perform the actual compilation which slows down the build unnecessarily
                 list (APPEND INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR})
             endif ()
         endif ()

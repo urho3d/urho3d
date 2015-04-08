@@ -117,7 +117,8 @@ task :make do
     end
   }
   build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
-  ccache_envvar = ''
+  ccache_envvar = ENV['CCACHE_SLOPPINESS'] ? '' : 'CCACHE_SLOPPINESS=pch_defines,time_macros'   # Only attempt to do the right thing when user hasn't done it
+  ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CCACHE_COMPRESS']
   if !Dir.glob("#{build_tree}/*.xcodeproj").empty?
     # xcodebuild
     if !numjobs.empty?
@@ -127,12 +128,16 @@ task :make do
   elsif !Dir.glob("#{build_tree}/*.sln").empty?
     # msbuild
     numjobs = ":#{numjobs}" unless numjobs.empty?
+    ccache_envvar = ''    # Extra env var is harmless even when ccache is not in use, well, except on Windows host system
     build_options = "/maxcpucount#{numjobs}#{build_options}"
     filter = unfilter ? '' : '/nologo /verbosity:minimal'
+  elsif !Dir.glob("#{build_tree}/*.ninja").empty?
+    # ninja
+    if !numjobs.empty?
+      build_options = "-j#{numjobs}#{build_options}"
+    end
   else
     # make
-    ccache_envvar = 'CCACHE_SLOPPINESS=pch_defines,time_macros' unless ENV['CCACHE_SLOPPINESS']   # Only attempt to do the right thing when user hasn't done it
-    ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CACHE_COMPRESS']
     if numjobs.empty?
       case RUBY_PLATFORM
       when /linux/
