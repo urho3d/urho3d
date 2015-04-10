@@ -14,6 +14,8 @@
 
   JAVA_HOME = F:\Android\Java\jdk1.8.0_40
 
+  ANDROID_NDK = F:\Android\android-ndk
+
   Path变量追加 F:\Android\android-ndk\prebuilt\windows-x86_64\bin;F:\Android\android-sdk\tools;F:\Android\android-sdk\platform-tools;F:\Android\apache-ant-1.9.4\bin
 
   注意这个是为了能使用 1. ant命令 2. android的make命令
@@ -33,14 +35,12 @@
   5. ant debug (或者release) ---> .build\android\bin 这里会生成一个apk包 ！
   6. adb install 生成的apk包 就可以部署到手机里了
 
-   (
+  **5.代码开发：**
 
-    By default the Android package for Urho3D is com.googlecode.urho3d. For a real application you must replace this with your own package name. The Urho3D activity subclasses the SDLActivity from org.libsdl.app package, whose name (or the JNI code from SDL library) does not have to be changed.
+   本身引擎自带anglescript的脚本 但是放到手机上有点大 可以直接写c++的代码
 
-    Note that the native code is built by default for armeabi-v7a ABI. To make your program compatible also with old Android devices, build also an armeabi version by executing the CMake batch file again with the build option "-DANDROID_ABI=armeabi" added, then execute make again in the build directory. Similarly, the native code can be built using 64-bit ABI by changing the value of this build option. See Build options for all the possible values.
+   C++示例可以参考目录 Urho3D/Source/Samples
 
-    You can also build and deploy using Eclipse IDE with ADT plugin. To do that, after setting the ANDROID_NDK environment variable then run cmake_eclipse.sh. Import "Existing Android Code into Workspace" from the CMake generated Eclipse's project found in the android-Build directory. Switch Eclipse IDE to use Java Perspective. Update project properties to choose the desired Android API target and that's it. Just choose "Run" to let ADT automatically build and deploy the application to Android (virtual) device.
-   ) 这里懒的翻译了
 
 
    其他的平台可以参考 http://urho3d.github.io/documentation/1.32/_building.html
