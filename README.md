@@ -37,19 +37,19 @@
 
   **5.代码开发：**
 
-   本身引擎自带anglescript的脚本 但是放到手机上有点大 可以直接写c++的代码
+  本身引擎自带anglescript的脚本 但是放到手机上有点大 可以直接写c++的代码
 
-   C++示例可以参考目录 Urho3D/Source/Samples
-
-
-
-   其他的平台可以参考 http://urho3d.github.io/documentation/1.32/_building.html
+  C++示例可以参考目录 Urho3D/Source/Samples
 
 
-   后续: 因为包太大 可以考虑 删除部分不必要的组件 比如脚本
+
+  其他的平台可以参考 http://urho3d.github.io/documentation/1.32/_building.html
 
 
-   这里提供一个android4.2 API编译的测试apk http://pan.baidu.com/s/1sj0qdkD 可以尝试跑一下该引擎以及示例
+  后续: 因为包太大 可以考虑 删除部分不必要的组件 比如脚本
 
-   第一个游戏例子截图
-   ![screen shot](https://raw.githubusercontent.com/299299/Urho3D/master/Docs/shot1.jpg)
+
+  这里提供一个android4.2 API编译的测试apk http://pan.baidu.com/s/1sj0qdkD 可以尝试跑一下该引擎以及示例
+
+  第一个游戏例子截图
+  ![screen shot](https://raw.githubusercontent.com/299299/Urho3D/master/Docs/shot1.jpg)
