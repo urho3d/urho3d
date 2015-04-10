@@ -22,7 +22,7 @@
 
 # Limit the supported build configurations
 set (URHO3D_BUILD_CONFIGURATIONS Release RelWithDebInfo Debug)
-set (DOC_STRING "Choose the build configuration, possible options are: ${URHO3D_BUILD_CONFIGURATIONS}")
+set (DOC_STRING "Specify CMake build configuration (single-configuration generator only), possible values are Release (default), RelWithDebInfo, and Debug")
 if (CMAKE_CONFIGURATION_TYPES)
     # For multi-configurations generator, such as VS and Xcode
     set (CMAKE_CONFIGURATION_TYPES ${URHO3D_BUILD_CONFIGURATIONS} CACHE STRING "${DOC_STRING}" FORCE)
@@ -68,7 +68,7 @@ if (ANDROID OR RPI OR EMSCRIPTEN)
     # This build option is not available on Android, Raspberry-Pi, and Emscripten platforms as its value is preset by the chosen toolchain in the build tree
     set (URHO3D_64BIT ${URHO3D_DEFAULT_64BIT})
 else ()
-    option (URHO3D_64BIT "Enable 64-bit build" ${URHO3D_DEFAULT_64BIT})
+    option (URHO3D_64BIT "Enable 64-bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system" ${URHO3D_DEFAULT_64BIT})
 endif ()
 cmake_dependent_option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE "NOT EMSCRIPTEN" FALSE)
 option (URHO3D_LUA "Enable additional Lua scripting support")
@@ -114,7 +114,7 @@ option (URHO3D_TESTING "Enable testing support")
 if (URHO3D_TESTING)
     if (EMSCRIPTEN)
         set (DEFAULT_TIMEOUT 10)
-        set (EMSCRIPTEN_EMRUN_BROWSER firefox CACHE STRING "Specify the particular browser to be spawned by emrun during testing (Emscripten cross-compiling build only), default to firefox")
+        set (EMSCRIPTEN_EMRUN_BROWSER firefox CACHE STRING "Specify the particular browser to be spawned by emrun during testing (Emscripten cross-compiling build only), use 'emrun --list_browsers' command to get the list of possible values")
     else ()
         set (DEFAULT_TIMEOUT 5)
     endif ()
@@ -203,13 +203,14 @@ if (RPI)
     else ()
         set (RPI_ABI armeabi-v6)
     endif ()
-    set (RPI_ABI ${RPI_ABI} CACHE STRING "Specify target ABI (RPI build only), possible values are armeabi-v6 (*default for RPI 1), armeabi-v7a (*default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4" FORCE)
+    set (RPI_ABI ${RPI_ABI} CACHE STRING "Specify target ABI (RPI build only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4" FORCE)
 endif ()
 if (EMSCRIPTEN)     # CMAKE_CROSSCOMPILING is always true for Emscripten
     set (EMSCRIPTEN_ROOT_PATH "" CACHE PATH "Root path to Emscripten cross-compiler tools (Emscripten cross-compiling build only)")
     set (EMSCRIPTEN_SYSROOT "" CACHE PATH "Path to Emscripten system root (Emscripten cross-compiling build only)")
     option (EMSCRIPTEN_ALLOW_MEMORY_GROWTH "Enable memory growing based on application demand (Emscripten cross-compiling build only)")
     math (EXPR EMSCRIPTEN_TOTAL_MEMORY "32 * 1024 * 1024")     # This option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH option is set
+    set (EMSCRIPTEN_TOTAL_MEMORY ${EMSCRIPTEN_TOTAL_MEMORY} CACHE STRING "Specify the total size of memory to be used (Emscripten cross-compiling build only); default to 33554432 (32MB), this option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH=1")
     cmake_dependent_option (EMSCRIPTEN_SHARE_DATA "Enable sharing data file support (Emscripten cross-compiling build only)" FALSE "EMSCRIPTEN" FALSE)
 endif ()
 # Constrain the build option values in cmake-gui, if applicable

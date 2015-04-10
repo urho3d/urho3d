@@ -136,6 +136,7 @@ task :make do
     if !numjobs.empty?
       build_options = "-j#{numjobs}#{build_options}"
     end
+    filter = ''
   else
     # make
     if numjobs.empty?
@@ -267,7 +268,7 @@ task :ci_rebase do
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
   baseline = ENV['RELEASE_TAG'] || "origin/#{ENV['TRAVIS_BRANCH']}"
   enable = /\[ci rebase\]/ =~ ENV['COMMIT_MESSAGE']
-  [ 'Android-CI', 'RPI-CI', 'Emscripten-CI', 'OSX-CI' ].each { |ci| ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git rebase #{baseline} #{ci_branch} && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; elif [ #{enable} ]; then git checkout -b #{ci_branch} #{ENV['TRAVIS_BRANCH']} && rm .travis.yml && wget -q https://raw.githubusercontent.com/#{ENV['TRAVIS_REPO_SLUG']}/#{ci}/.travis.yml && cat <<EOF >README.md && git add -A . && git commit -m 'For Travis CI - switch CI build to use #{ci.split('-').first} build environment.' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; fi
+  [ 'Emscripten-CI', 'Android-CI', 'RPI-CI', 'OSX-CI' ].each { |ci| ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git rebase #{baseline} #{ci_branch} && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; elif [ #{enable} ]; then git checkout -b #{ci_branch} #{ENV['TRAVIS_BRANCH']} && rm .travis.yml && wget -q https://raw.githubusercontent.com/#{ENV['TRAVIS_REPO_SLUG']}/#{ci}/.travis.yml && cat <<EOF >README.md && git add -A . && git commit -m 'For Travis CI - switch CI build to use #{ci.split('-').first} build environment.' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; fi
 This is a mirror branch which is constantly being \"rebased\" from #{ENV['TRAVIS_BRANCH']} branch. Please DO NOT checkout from this mirror branch! The purpose of this mirror branch is to perform CI build using #{ci.split('-').first} build environment on Travis-CI.org. See #{ENV['TRAVIS_BRANCH']} branch for CI build result using Ubuntu Linux build environment.
 
 [![Build Status](https://travis-ci.org/#{ENV['TRAVIS_REPO_SLUG']}.png?branch=#{ci_branch})](https://travis-ci.org/#{ENV['TRAVIS_REPO_SLUG']}?branch=#{ci_branch})
@@ -439,7 +440,7 @@ def makefile_ci
   end
   system "./cmake_generic.sh ../Build -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
-      android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
+    android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
   end
   test = $testing == 1 ? '&& make test' : ''
   system "cd ../Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
