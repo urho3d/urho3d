@@ -1,4 +1,4 @@
-![Urho3D logo](https://raw.githubusercontent.com/urho3d/Urho3D/master/bin/Data/Textures/LogoLarge.png)
+![My logo](https://raw.githubusercontent.com/299299/Urho3D/master/Docs/logo.jpg)
 
 #Android 环境手顺
 
@@ -52,4 +52,4 @@
    这里提供一个android4.2 API编译的测试apk http://pan.baidu.com/s/1sj0qdkD 可以尝试跑一下该引擎以及示例
 
    第一个游戏例子截图
-   https://raw.githubusercontent.com/299299/Urho3D/master/Docs/shot1.jpg
+   ![screen shot](https://raw.githubusercontent.com/299299/Urho3D/master/Docs/shot1.jpg)
