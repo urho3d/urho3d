@@ -1,0 +1,1 @@
+cmake_vs2008.bat .build/vs2008 -DURHO3D_SAMPLES=1
