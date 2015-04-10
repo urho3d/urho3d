@@ -1,142 +1,55 @@
 ![Urho3D logo](https://raw.githubusercontent.com/urho3d/Urho3D/master/bin/Data/Textures/LogoLarge.png)
 
-#Urho3D
+#Android 环境手顺
 
-**Urho3D** is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE and Horde3D.
+## Android PC win 7环境配置
 
-Main website: [http://urho3d.github.io/](http://urho3d.github.io/)
+  **1. 环境包下载：**
 
-##License
-Licensed under the MIT license, see [License.txt](https://github.com/urho3d/Urho3D/blob/master/License.txt) for details.
+   下载地址 http://pan.baidu.com/s/1jGoZbMm 我的百度共享
 
-##Credits
-Urho3D development, contributions and bugfixes by:
-- Lasse Öörni (loorni@gmail.com, AgentC at GameDev.net)
-- Wei Tjong Yao
-- Aster Jian
-- Colin Barrett
-- Erik Beran
-- Danny Boisvert
-- Carlo Carollo
-- Pete Chown
-- Sebastian Delatorre (primitivewaste)
-- Josh Engebretson
-- Chris Friesen
-- Alex Fuller
-- Mika Heinonen
-- Graham King
-- Jason Kinzer
-- Gunnar Kriik
-- Ali Kämäräinen
-- Pete Leigh
-- Jonne Nauha
-- Paul Noome
-- David Palacios
-- Alex Parlett
-- Jordan Patterson
-- Vladimir Pobedinsky
-- Nick Royer
-- Miika Santala
-- Joshua Tippetts
-- Daniel Wiberg
-- Steven Zhang
-- AGreatFish
-- Enhex
-- Firegorilla
-- Magic.Lixin
-- Mike3D
-- OvermindDL1
-- andmar1x
-- amadeus_osa
-- atship
-- att
-- celeron55
-- hdunderscore
-- mightyCelu
-- nemerle
-- ninjastone
-- rasteron
-- reattiva
-- rifai
-- skaiware
-- szamq
-- thebluefish
+  可以选择都安装到比如 F:\Android 目录下
 
-Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
-(http://www.horde3d.org). Additional inspiration & research used:
-- Rectangle packing by Jukka Jylänki (clb)
-  http://clb.demon.fi/projects/rectangle-bin-packing
-- Tangent generation from Terathon
-  http://www.terathon.com/code/tangent.html
-- Fast, Minimum Storage Ray/Triangle Intersection by Möller & Trumbore
-  http://www.graphics.cornell.edu/pubs/1997/MT97.pdf
-- Linear-Speed Vertex Cache Optimisation by Tom Forsyth
-  http://home.comcast.net/~tom_forsyth/papers/fast_vert_cache_opt.html
-- Software rasterization of triangles based on Chris Hecker's
-  Perspective Texture Mapping series in the Game Developer magazine
-  http://chrishecker.com/Miscellaneous_Technical_Articles
-- Networked Physics by Glenn Fiedler
-  http://gafferongames.com/game-physics/networked-physics/
-- Euler Angle Formulas by David Eberly
-  http://www.geometrictools.com/Documentation/EulerAngles.pdf
-- Red Black Trees by Julienne Walker
-  http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
-- Comparison of several sorting algorithms by Juha Nieminen
-  http://warp.povusers.org/SortComparison/
+  **2.配置windows环境变量：**
 
-Urho3D uses the following third-party libraries:
-- AngelScript 2.29.1 (http://www.angelcode.com/angelscript/)
-- Box2D 2.3.0 (http://box2d.org/)
-- Bullet 2.82 (http://www.bulletphysics.org/)
-- Civetweb (http://sourceforge.net/projects/civetweb/)
-- FreeType 2.5.0 (http://www.freetype.org/)
-- GLEW 1.9.0 (http://glew.sourceforge.net/)
-- jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)
-- kNet (https://github.com/juj/kNet)
-- libcpuid 0.2.0 (http://libcpuid.sourceforge.net/)
-- Lua 5.1 (http://www.lua.org)
-- LuaJIT 2.0.3 (http://www.luajit.org)
-- LZ4 (http://code.google.com/p/lz4/)
-- MojoShader (http://icculus.org/mojoshader/)
-- Open Asset Import Library (http://assimp.sourceforge.net/)
-- pugixml 1.5 (http://pugixml.org/)
-- rapidjson 0.11 (https://code.google.com/p/rapidjson/)
-- Recast/Detour (https://github.com/memononen/recastnavigation/)
-- SDL 2.0.3 (http://www.libsdl.org/)
-- StanHull (http://codesuppository.blogspot.com/2006/03/
-  john-ratcliffs-code-suppository-blog.html)
-- stb_image 1.29 (http://nothings.org/)
-- stb_vorbis 0.99996 (http://nothings.org/)
-- tolua++ 1.0.93 (http://www.codenix.com/~tolua)
+  JAVA_HOME = F:\Android\Java\jdk1.8.0_40
 
-DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong
-Engine.
-Jack and mushroom models from the realXtend project. (http://www.realxtend.org)
-Ninja model and terrain, water, smoke, flare and status bar textures from OGRE.
-BlueHighway font from Larabie Fonts.
-Anonymous Pro font by Mark Simonson.
-NinjaSnowWar sounds by Veli-Pekka Tätilä.
+  Path变量追加 F:\Android\android-ndk\prebuilt\windows-x86_64\bin;F:\Android\android-sdk\tools;F:\Android\android-sdk\platform-tools;F:\Android\apache-ant-1.9.4\bin
 
-##Documentation
-Urho3D classes have been sparsely documented using Doxygen notation. To
-generate documentation into the "Docs" subdirectory, open the Doxyfile in the
-"Docs" subdirectory with doxywizard and click "Run doxygen" from the "Run" tab.
-Get Doxygen from http://www.doxygen.org & Graphviz from http://www.graphviz.org.
-See section "Documentation build" below on how to automate documentation
-generation as part of the build process.
+  注意这个是为了能使用 1. ant命令 2. android的make命令
 
-The documentation is also available online at
-  http://urho3d.github.io/documentation/HEAD/index.html
+  **3.下载android的SDK Tools：**
 
-Documentation on how to build Urho3D:
-  http://urho3d.github.io/documentation/HEAD/_building.html
-Documentation on how to use Urho3D as external library
-  http://urho3d.github.io/documentation/HEAD/_using_library.html
+  执行Android SDK Manager 根据调试手机选择你要的API Target包
 
-Replace HEAD with a specific release version in the above links to obtain the
-documentation pertinent to the specified release. Alternatively, use the
-document-switcher in the documentation website to do so.
+  (Optionally, also install Eclipse ADT plugin for building and deployment via Eclipse.)
 
-##History
-The change history is available online at
-  http://urho3d.github.io/documentation/HEAD/_history.html
+  **4.代码编译部署：**
+
+  1. 控制台执行 当前目录下的 make_android.bat (前提是NDK的环境变量都已配好)
+  2. cd .build/android ---> 进入目录
+  3. android update project -p . -t TARGET_ID  --->  这里TARGET_ID 是通过命令android list targets得到的 我的是android-16
+  4. make -j8 --->  第一次编译很慢
+  5. ant debug (或者release) ---> .build\android\bin 这里会生成一个apk包 ！
+  6. adb install 生成的apk包 就可以部署到手机里了
+
+   (
+
+    By default the Android package for Urho3D is com.googlecode.urho3d. For a real application you must replace this with your own package name. The Urho3D activity subclasses the SDLActivity from org.libsdl.app package, whose name (or the JNI code from SDL library) does not have to be changed.
+
+    Note that the native code is built by default for armeabi-v7a ABI. To make your program compatible also with old Android devices, build also an armeabi version by executing the CMake batch file again with the build option "-DANDROID_ABI=armeabi" added, then execute make again in the build directory. Similarly, the native code can be built using 64-bit ABI by changing the value of this build option. See Build options for all the possible values.
+
+    You can also build and deploy using Eclipse IDE with ADT plugin. To do that, after setting the ANDROID_NDK environment variable then run cmake_eclipse.sh. Import "Existing Android Code into Workspace" from the CMake generated Eclipse's project found in the android-Build directory. Switch Eclipse IDE to use Java Perspective. Update project properties to choose the desired Android API target and that's it. Just choose "Run" to let ADT automatically build and deploy the application to Android (virtual) device.
+   ) 这里懒的翻译了
+
+
+   其他的平台可以参考 http://urho3d.github.io/documentation/1.32/_building.html
+
+
+   后续: 因为包太大 可以考虑 删除部分不必要的组件 比如脚本
+
+
+   这里提供一个android4.2 API编译的测试apk http://pan.baidu.com/s/1sj0qdkD 可以尝试跑一下该引擎以及示例
+
+   第一个游戏例子截图
+   https://raw.githubusercontent.com/299299/Urho3D/master/Docs/shot1.jpg
