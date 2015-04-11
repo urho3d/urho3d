@@ -163,6 +163,12 @@ if (URHO3D_LUA)
     # ditto for Lua/LuaJIT
     list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Lua${JIT})
 endif ()
+if (URHO3D_AMALG)
+    # Add the third parties include directories for amalgamated build
+    foreach (SUBLIB Civetweb Detour GLEW kNet Recast SDL)
+        list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/${SUBLIB})
+    endforeach ()
+endif ()
 
 # Setup library output path
 if (ANDROID)

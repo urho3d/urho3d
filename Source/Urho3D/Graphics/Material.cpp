@@ -83,7 +83,7 @@ static const char* cullModeNames[] =
     0
 };
 
-static const char* fillModeNames[] =
+static const char* MaterialFillModeNames[] =
 {
     "solid",
     "wireframe",
@@ -383,7 +383,7 @@ bool Material::Load(const XMLElement& source)
 
     XMLElement fillElem = source.GetChild("fill");
     if (fillElem)
-        SetFillMode((FillMode)GetStringListIndex(fillElem.GetAttribute("value").CString(), fillModeNames, FILL_SOLID));
+        SetFillMode((FillMode)GetStringListIndex(fillElem.GetAttribute("value").CString(), MaterialFillModeNames, FILL_SOLID));
 
     XMLElement depthBiasElem = source.GetChild("depthbias");
     if (depthBiasElem)
@@ -458,7 +458,7 @@ bool Material::Save(XMLElement& dest) const
 
     // Write fill mode
     XMLElement fillElem = dest.CreateChild("fill");
-    fillElem.SetString("value", fillModeNames[fillMode_]);
+    fillElem.SetString("value", MaterialFillModeNames[fillMode_]);
 
     // Write depth bias
     XMLElement depthBiasElem = dest.CreateChild("depthbias");

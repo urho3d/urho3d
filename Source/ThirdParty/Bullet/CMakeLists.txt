@@ -40,6 +40,7 @@ file (GLOB H_FILES *.h src/BulletCollision/BroadphaseCollision/*.h
     src/LinearMath/*.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 set (AMALG_EXCLUDES "(btDantzigLCP|btSoftBodyHelpers|Gimpact|Narrow)")
+set (AMALG_SINGLE_TARGET 1)
 
 # Define dependency libs
 set (INCLUDE_DIRS src)
