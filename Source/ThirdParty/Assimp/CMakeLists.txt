@@ -724,7 +724,10 @@ else ()
     set (AMALG_SINGLE_TARGET 1)
 endif ()
 
-set_source_files_properties (contrib/clipper/clipper.cpp contrib/irrXML/irrXML.cpp PROPERTIES NO_PCH TRUE)
-enable_pch (code/AssimpPCH.h)
+if (NOT APPLE OR NOT URHO3D_AMALG)
+    # It appears that xcodebuild cannot handle both Assimp amalgamated build and precompiled header enabled at the same time.
+    set_source_files_properties (contrib/clipper/clipper.cpp contrib/irrXML/irrXML.cpp PROPERTIES NO_PCH TRUE)
+    enable_pch (code/AssimpPCH.h)
+endif ()
 
 setup_library ()

@@ -58,7 +58,7 @@ endif ()
 # Define source files
 set (SOURCE_FILES ${kNetSourceFiles} ${kNetHeaderFiles})
 if (APPLE)
-    set (AMALG_EXCLUDES UnixClock)
+    set (AMALG_EXCLUDES Clock)
 elseif (MSVC)
     set (AMALG_EXCLUDES "(Connection|Data.*erializer)")
 endif ()
