@@ -2083,7 +2083,7 @@ The following queries into the physics world are provided:
 Contact listener (see Box2D manual, Chapter 9 Contacts) enables a given node to report contacts through events. Available events are:
 - E_PHYSICSBEGINCONTACT2D ("PhysicsBeginContact2D" in script): called when 2 collision shapes begin to overlap
 - E_PHYSICSENDCONTACT2D ("PhysicsEndContact2D" in script): called when 2 collision shapes cease to overlap
-- E_PHYSICSPRESTEP2D ("Physics2DPreStep2D" in script): called after collision detection, but before collision resolution. This allows to disable the contact if need be (for example on a one-sided platform). Currently ineffective (only reports PhysicsWorld2D and time step)
+- E_PHYSICSPRESTEP2D ("PhysicsPreStep2D" in script): called after collision detection, but before collision resolution. This allows to disable the contact if need be (for example on a one-sided platform). Currently ineffective (only reports PhysicsWorld2D and time step)
 - E_PHYSICSPOSTSTEP2D ("PhysicsPostStep2D" in script): used to gather collision impulse results. Currentlly ineffective (only reports PhysicsWorld2D and time step)
 
 \section Urho2D_TileMap Tile maps
