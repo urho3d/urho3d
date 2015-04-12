@@ -678,7 +678,7 @@ macro (enable_pch HEADER_PATHNAME)
             foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
                 # Generate *.rsp containing configuration specific compiler flags
                 string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
-                file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES} -c -x c++-header")
+                file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${CLANG_CXX_FLAGS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES} -c -x c++-header")
                 execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp)
                 file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new)
                 # Determine the dependency list
@@ -775,7 +775,7 @@ macro (setup_target)
     if (CLANG_CXX_FLAGS)
         foreach (FILE ${SOURCE_FILES})
             if (FILE MATCHES \\.cpp|\\.cc)
-                set_source_files_properties (${FILE} PROPERTIES COMPILE_FLAGS "${CLANG_CXX_FLAGS}")
+                set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " ${CLANG_CXX_FLAGS}")
             endif ()
         endforeach ()
     endif ()
