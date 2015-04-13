@@ -74,12 +74,12 @@ if (URHO3D_NAVIGATION)
     add_subdirectory (ThirdParty/Recast)
 endif ()
 
-if (URHO3D_PHYSICS)
-    add_subdirectory (ThirdParty/Bullet)
-endif ()
-
 if (URHO3D_URHO2D)
     add_subdirectory (ThirdParty/Box2D)
+endif ()
+
+if (URHO3D_PHYSICS)
+    add_subdirectory (ThirdParty/Bullet)
 endif ()
 
 if (NOT IOS AND NOT ANDROID AND NOT RPI AND NOT EMSCRIPTEN)
