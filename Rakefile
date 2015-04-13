@@ -142,12 +142,12 @@ task :make do
     if numjobs.empty?
       case RUBY_PLATFORM
       when /linux/
-        numjobs = `grep -c processor /proc/cpuinfo`.chomp
+        numjobs = (platform == 'emscripten' ? `grep 'core id' /proc/cpuinfo |sort |uniq |wc -l` : `grep -c processor /proc/cpuinfo`).chomp
       when /darwin/
-        numjobs = `sysctl -n hw.logicalcpu`.chomp
+        numjobs = `sysctl -n hw.#{platform == 'emscripten' ? 'physical' : 'logical'}cpu`.chomp
       when /win32|mingw|mswin/
         require 'win32ole'
-        WIN32OLE.connect('winmgmts://').ExecQuery('select NumberOfLogicalProcessors from Win32_ComputerSystem').each { |out| numjobs = out.NumberOfLogicalProcessors }
+        WIN32OLE.connect('winmgmts://').ExecQuery("select NumberOf#{platform == 'emscripten' ? '' : 'Logical'}Processors from Win32_ComputerSystem").each { |out| numjobs = platform == 'emscripten' ? out.NumberOfProcessors : out.NumberOfLogicalProcessors }
         ccache_envvar = ''    # Extra env var is harmless even when ccache is not in use, well, except on Windows host system
       else
         numjobs = 1
@@ -200,9 +200,7 @@ task :ci do
   $build_options = "-DWIN32=#{ENV['WINDOWS']}" if ENV['WINDOWS']
   $build_options = "#{$build_options} -DANDROID_ABI=#{ENV['ABI']}" if ENV['ABI']
   $build_options = "#{$build_options} -DANDROID_NATIVE_API_LEVEL=#{ENV['API']}" if ENV['API']
-  ['URHO3D_64BIT', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
-    $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var]
-  }
+  ['URHO3D_64BIT', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TEST_TIMEOUT', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var| $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var] }
   if ENV['XCODE']
     # xcodebuild
     xcode_ci
