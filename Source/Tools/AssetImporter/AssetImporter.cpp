@@ -122,6 +122,7 @@ bool noOverwriteMaterial_ = false;
 bool noOverwriteTexture_ = false;
 bool noOverwriteNewerTexture_ = false;
 bool checkUniqueModel_ = true;
+int  rootmotion_ = 0;
 unsigned maxBones_ = 64;
 Vector<String> nonSkinningBoneIncludes_;
 Vector<String> nonSkinningBoneExcludes_;
@@ -136,13 +137,14 @@ void Run(const Vector<String>& arguments);
 void DumpNodes(aiNode* rootNode, unsigned level);
 
 void ExportModel(const String& outName, bool animationOnly);
+void ExportAnimation(const String& outName);
 void CollectMeshes(OutModel& model, aiNode* node);
 void CollectBones(OutModel& model, bool animationOnly = false);
 void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
 void CollectAnimations(OutModel* model = 0);
 void BuildBoneCollisionInfo(OutModel& model);
 void BuildAndSaveModel(OutModel& model);
-void BuildAndSaveAnimations(OutModel* model = 0);
+void BuildAndSaveAnimations(OutModel* model = 0, int rootMotion = 0);
 
 void ExportScene(const String& outName, bool asPrefab);
 void CollectSceneModels(OutScene& scene, aiNode* node);
@@ -217,6 +219,7 @@ void Run(const Vector<String>& arguments)
             "dump       Dump scene node structure. No output file is generated\n"
             "lod        Combine several Urho3D models as LOD levels of the output model\n"
             "           Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
+            "animation  Output an animation\n"
             "\n"
             "Options:\n"
             "-b          Save scene in binary format, default format is XML\n"
@@ -248,6 +251,8 @@ void Run(const Vector<String>& arguments)
             "-ct         Check and do not overwrite if texture exists\n"
             "-ctn        Check and do not overwrite if texture has newer timestamp\n"
             "-am         Export all meshes even if identical (scene mode only)\n"
+            "-rm         Export root-motion (animation mode only)\n"
+            "-rmy        Export root-motion with Y component(animation mode only)\n"
         );
     }
     
@@ -389,10 +394,14 @@ void Run(const Vector<String>& arguments)
                 noOverwriteNewerTexture_ = true;
             else if (argument == "am")
                 checkUniqueModel_ = false;
+            else if(argument == "rm")
+                rootmotion_ = 1;
+            else if(argument == "rmy")
+                rootmotion_ = 2;
         }
     }
     
-    if (command == "model" || command == "scene" || command == "node" || command == "dump")
+    if (command == "model" || command == "scene" || command == "node" || command == "dump" || command == "animation")
     {
         String inFile = arguments[1];
         String outFile;
@@ -447,6 +456,12 @@ void Run(const Vector<String>& arguments)
         
         if (command == "model")
             ExportModel(outFile, scene_->mFlags & AI_SCENE_FLAGS_INCOMPLETE);
+
+        if (command == "animation")
+        {
+            noMaterials_ = true;
+            ExportAnimation(outFile);
+        }
         
         if (command == "scene" || command == "node")
         {
@@ -546,7 +561,7 @@ void ExportModel(const String& outName, bool animationOnly)
     if (!noAnimations_)
     {
         CollectAnimations(&model);
-        BuildAndSaveAnimations(&model);
+        BuildAndSaveAnimations(&model, rootmotion_);
         
         // Save scene-global animations
         CollectAnimations();
@@ -999,7 +1014,7 @@ void BuildAndSaveModel(OutModel& model)
     }
 }
 
-void BuildAndSaveAnimations(OutModel* model)
+void BuildAndSaveAnimations(OutModel* model, int rootMotion)
 {
     const PODVector<aiAnimation*>& animations = model ? model->animations_ : sceneAnimations_;
     
@@ -1045,12 +1060,17 @@ void BuildAndSaveAnimations(OutModel* model)
         
         PrintLine("Writing animation " + animName + " length " + String(outAnim->GetLength()));
         Vector<AnimationTrack> tracks;
+        PODVector<AnimationRMKeyFrame> rmTracks;
+        const Vector3 pelvisRightAxis(1, 0, 0);
+
         for (unsigned j = 0; j < anim->mNumChannels; ++j)
         {
             aiNodeAnim* channel = anim->mChannels[j];
             String channelName = FromAIString(channel->mNodeName);
             aiNode* boneNode = 0;
             bool isRootBone = false;
+            bool isTranslateBone = rootMotion ? channelName.EndsWith("_$AssimpFbx$_Translation") : false;
+            bool isRotateBone = rootMotion ? channelName.EndsWith("$AssimpFbx$_Rotation") : false;
             
             if (model)
             {
@@ -1104,8 +1124,11 @@ void BuildAndSaveAnimations(OutModel* model)
                     track.channelMask_ &= ~CHANNEL_SCALE;
             }
             
-            if (!track.channelMask_)
+            if (!track.channelMask_) 
+            {
                 PrintLine("Warning: skipping animation track " + channelName + " with no keyframes");
+                continue;
+            }
             
             // Currently only same amount of keyframes is supported
             // Note: should also check the times of individual keyframes for match
@@ -1176,10 +1199,57 @@ void BuildAndSaveAnimations(OutModel* model)
                 
                 track.keyFrames_.Push(kf);
             }
+
+            if (isTranslateBone || isRotateBone)
+            {
+                if (rmTracks.Empty())
+                    rmTracks.Resize(track.keyFrames_.Size());
+
+                assert(rmTracks.Size() == track.keyFrames_.Size());
+                if (isTranslateBone)
+                {
+                    for (unsigned i=0; i<track.keyFrames_.Size(); ++i)
+                    {
+                        AnimationKeyFrame& kf = track.keyFrames_[i];
+                        AnimationRMKeyFrame& rmkf = rmTracks[i];
+                        rmkf.time_ = track.keyFrames_[i].time_;
+                        // only set delta position
+                        rmkf.position_ = track.keyFrames_[i].position_ - track.keyFrames_[0].position_;
+                        if (rootmotion_ != 2)
+                        {
+                            rmkf.position_.y_ = 0;
+                            kf.position_ = Vector3(0, kf.position_.y_, 0); 
+                        }
+                        else
+                        {
+                            kf.position_ = Vector3::ZERO;
+                        }
+                    }
+                }
+                
+                if (isRotateBone)
+                {
+                    for (unsigned i=0; i<track.keyFrames_.Size(); ++i)
+                    {
+                        AnimationRMKeyFrame &kf = rmTracks[i];
+                        // kf.time_ = track.keyFrames_[i];
+                        // only set delta position
+                        // kf.position_ = track.keyFrames_[i].position_ - track.keyFrames_[0].position_;
+                    }
+                } 
+            }
             
             tracks.Push(track);
         }
+
+#if 1
+        for (unsigned i=0; i<rmTracks.Size(); ++i)
+        {
+            printf("rm track [%02d] = %f, %s, %f\n", i, rmTracks[i].time_, rmTracks[i].position_.ToString().CString(), rmTracks[i].yaw_);
+        }
+#endif
         
+        outAnim->SetRootmotionTracks(rmTracks);
         outAnim->SetTracks(tracks);
         
         File outFile(context_);
@@ -2218,4 +2288,24 @@ String SanitateAssetName(const String& name)
     fixedName.Replace("|", "");
     
     return fixedName;
+}
+
+void ExportAnimation( const String& outName )
+{
+    if (outName.Empty())
+        ErrorExit("No output file defined");
+
+    OutModel model;
+    model.rootNode_ = rootNode_;
+    model.outName_ = outName;
+
+    CollectMeshes(model, model.rootNode_);
+    CollectBones(model, false);
+    //BuildBoneCollisionInfo(model);
+    //BuildAndSaveModel(model);
+    CollectAnimations(&model);
+    BuildAndSaveAnimations(&model, rootmotion_);
+    // Save scene-global animations
+    CollectAnimations();
+    BuildAndSaveAnimations();
 }

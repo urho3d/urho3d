@@ -74,6 +74,17 @@ struct AnimationTriggerPoint
     Variant data_;
 };
 
+/// %Animation root motion key.
+struct AnimationRMKeyFrame
+{
+    /// Keyframe time.
+    float time_;
+    /// Bone position.
+    Vector3 position_;
+    /// Bone rotation yaw.
+    float yaw_;
+};
+
 static const unsigned char CHANNEL_POSITION = 0x1;
 static const unsigned char CHANNEL_ROTATION = 0x2;
 static const unsigned char CHANNEL_SCALE = 0x4;
@@ -131,7 +142,8 @@ public:
     const Vector<AnimationTriggerPoint>& GetTriggers() const { return triggers_; }
     /// Return number of animation trigger points.
     unsigned GetNumTriggers() const {return triggers_.Size(); }
-    
+    /// Set root motion tracks.
+    void SetRootmotionTracks(const PODVector<AnimationRMKeyFrame>& rootmotionTracks);
 private:
     /// Animation name.
     String animationName_;
@@ -143,6 +155,8 @@ private:
     Vector<AnimationTrack> tracks_;
     /// Animation trigger points.
     Vector<AnimationTriggerPoint> triggers_;
+    /// Animation Root motion keyframes
+    PODVector<AnimationRMKeyFrame> rmTracks_;
 };
 
 }
