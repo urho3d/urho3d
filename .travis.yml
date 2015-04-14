@@ -21,51 +21,67 @@
 #
 
 language: cpp
-compiler: gcc
+compiler:
+  - gcc
+  - clang
+sudo: false
+addons: {apt: {packages: libasound2-dev}}
 env:
   global:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
-    - DISPLAY=:99.0
     - NUMJOBS=3
     - URHO3D_MODERN_CPP=1
   matrix:
-    - LINUX=1   URHO3D_LIB_TYPE=STATIC REBASE=1
-    - LINUX=1   URHO3D_LIB_TYPE=SHARED
-    - WINDOWS=1 URHO3D_LIB_TYPE=STATIC
-    - WINDOWS=1 URHO3D_LIB_TYPE=SHARED
-    - WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_OPENGL=0
-    - WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_OPENGL=0
-    # Ubuntu 12.04 LTS does not have up-to-date D3D11 headers, disable the CI build jobs for D3D11 for now until Travis-CI upgrades their OS to 14.04 LTS or better
-    # WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_D3D11=1
-    # WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_D3D11=1
-    - LINUX=1   URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
-    - LINUX=1   URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
-    - WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
-    - WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
-    # WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_D3D11=1
-    # WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_D3D11=1
+    - LINUX=1 URHO3D_LIB_TYPE=STATIC
+    - LINUX=1 URHO3D_LIB_TYPE=SHARED
 matrix:
   fast_finish: true
   include:
-    - compiler: clang
-      env: LINUX=1 URHO3D_LIB_TYPE=STATIC
-    - compiler: clang
-      env: LINUX=1 URHO3D_LIB_TYPE=SHARED
-    - compiler: clang
+    - &Linux-32bit
+      addons: {apt: {packages: ["libxrandr-dev:i386", "libglapi-mesa:i386", "libgl1-mesa-glx:i386", "libgl1-mesa-dev:i386", "libxext-dev:i386", "libxrender-dev:i386",
+        g++-multilib]}}
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
-    - compiler: clang
+    - &Linux-32bit-shared
+      <<: *Linux-32bit
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
+    - <<: *Linux-32bit
+      compiler: clang
+    - <<: *Linux-32bit-shared
+      compiler: clang
+    - &MinGW-64bit
+      addons: {apt: {packages: [gcc-mingw-w64-x86-64, g++-mingw-w64-x86-64, binutils-mingw-w64-x86-64]}}
+      env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC
+    - <<: *MinGW-64bit
+      env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED
+    - <<: *MinGW-64bit
+      env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_OPENGL=0
+    - <<: *MinGW-64bit
+      env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_OPENGL=0
+    # Ubuntu 12.04 LTS does not have up-to-date D3D11 headers, disable the CI build jobs for D3D11 for now until Travis-CI upgrades their OS to 14.04 LTS or better
+    # <<: *MinGW-64bit
+    # env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_D3D11=1
+    # <<: *MinGW-64bit
+    # env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_D3D11=1
+    - &MinGW-32bit
+      addons: {apt: {packages: [gcc-mingw-w64-i686, g++-mingw-w64-i686, binutils-mingw-w64-i686, g++-multilib]}}
+      env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
+    - <<: *MinGW-32bit
+      env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
+    - <<: *MinGW-32bit
+      env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_OPENGL=0
+    - <<: *MinGW-32bit
+      env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_OPENGL=0
+    # <<: *MinGW-32bit
+    # env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_D3D11=1
+    # <<: *MinGW-32bit
+    # env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_D3D11=1
 before_install:
   - free -tm
-  - mem=($(free -m |head -2 |tail -1)); if [ ${mem[6]} -eq 0 ]; then export BAD_VM=1; fi
+  - mem=($(free -m |head -2 |tail -1)); if [ ${mem[6]} -eq 0 ]; then export BAD_VM=1; echo "Bad VM detected!"; fi
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
-  - travis_retry sudo apt-get update -q -y
-install:
-  - travis_retry sudo apt-get install -q -y --no-install-recommends libasound2-dev
-  - if [ $LINUX ]; then if [ "$URHO3D_64BIT" == "0" ]; then travis_retry sudo apt-get remove -q -y gvfs-daemons && travis_retry sudo apt-get install -q -y libxrandr-dev:i386 libglapi-mesa:i386 libgl1-mesa-glx:i386 libgl1-mesa-dev:i386 libxext-dev:i386 libxrender-dev:i386 g++-multilib && export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu; else bash -e /etc/init.d/xvfb start; fi && if [ $PACKAGE_UPLOAD ]; then travis_retry sudo apt-get install -q -y rpm; fi; fi
-  - if [ $WINDOWS ]; then if [ "$URHO3D_64BIT" == "0" ]; then travis_retry sudo apt-get install -q -y gcc-mingw-w64-i686 g++-mingw-w64-i686 binutils-mingw-w64-i686 && export ARCH=i686; else travis_retry sudo apt-get install -q -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 binutils-mingw-w64-x86-64 && export ARCH=x86_64; fi && travis_retry sudo apt-get install -q -y g++-multilib && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
-  - free -tm
+  - if [ $LINUX ]; then if [ "$URHO3D_64BIT" == "0" ]; then export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu; else export DISPLAY=:99.0; bash -e /etc/init.d/xvfb start; fi; fi
+  - if [ $WINDOWS ]; then if [ "$URHO3D_64BIT" == "0" ]; then export ARCH=i686; else export ARCH=x86_64; fi && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
 script: rake ci
-after_success: if [ $REBASE ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_rebase; fi
+after_success: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_rebase; fi
 
 # vi: set ts=2 sw=2 expandtab:
