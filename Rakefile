@@ -424,7 +424,7 @@ def makefile_ci
     # Temporarily workaround the problem by downloading the missing header from Ubuntu 14.04 LTS source package.
     if ENV['URHO3D_OPENGL']
       # We cannot use sudo in the container-based VM to put the d3dcompiler.h in the MinGW system-wide include dir, so workaround by having it in the project-wide include dir
-      system 'mkdir -p ../Build/{,generated/{UsingBuildTree,UsingSDK}/}include/Urho3D/ThirdParty' or abort 'Failed to create third party include dirs'
+      system 'bash -c "mkdir -p ../Build/{,generated/{UsingBuildTree,UsingSDK}/}include/Urho3D/ThirdParty"' or abort 'Failed to create third party include dirs'
       system 'wget -P ../Build/include/Urho3D/ThirdParty http://bazaar.launchpad.net/~ubuntu-branches/ubuntu/trusty/mingw-w64/trusty/download/package-import%40ubuntu.com-20130624192537-vzn12bb7qd5w3iy8/d3dcompiler.h-20120402093420-bk10a737hzitlkgj-65/d3dcompiler.h' or abort 'Failed to download d3dcompiler.h'
       ['UsingBuildTree', 'UsingSDK'].each { |dir| system "cd ../Build/generated/#{dir}/include/Urho3D/ThirdParty && ln -s ../../../../../include/Urho3D/ThirdParty/d3dcompiler.h ." or abort 'Failed to create symlinks to d3dcompiler.h' }
     end
