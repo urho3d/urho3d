@@ -206,6 +206,10 @@ public:
     String& operator += (int rhs);
     /// Add-assign a short integer.
     String& operator += (short rhs);
+    /// Add-assign a long integer.
+    String& operator += (long rhs);
+    /// Add-assign a long long integer.
+    String& operator += (long long rhs);
     /// Add-assign an unsigned integer.
     String& operator += (unsigned rhs);
     /// Add-assign a short unsigned integer.
