@@ -168,6 +168,13 @@ endif ()
 if (MINGW AND CMAKE_CROSSCOMPILING)
     set (MINGW_PREFIX "" CACHE STRING "Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)")
     set (MINGW_SYSROOT "" CACHE PATH "Path to MinGW system root (MinGW cross-compiling build only)")
+    # When cross-compiling then we are most probably in Unix-alike host environment which should not have problem to handle long include dirs
+    # This change is required to keep ccache happy because it does not like the CMake generated include response file
+    foreach (lang C CXX)
+        foreach (cat OBJECTS INCLUDES)
+            unset (CMAKE_${lang}_USE_RESPONSE_FILE_FOR_${cat})
+        endforeach ()
+    endforeach ()
 endif ()
 if (RPI)
     if (NOT RPI_SUPPORTED_ABIS)
