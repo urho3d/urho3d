@@ -46,7 +46,7 @@ if (CMAKE_HOST_WIN32)
     set (TOOL_EXT .bat)
 endif ()
 set (COMPILER_PATH ${EMSCRIPTEN_ROOT_PATH})
-if ($ENV{USE_CCACHE} AND NOT CMAKE_HOST_WIN32 AND FALSE)    # Disable ccache support for now until Emscripten has fixed https://github.com/kripken/emscripten/issues/3365
+if ("$ENV{USE_CCACHE}" AND NOT CMAKE_HOST_WIN32 AND FALSE)    # Disable ccache support for now until Emscripten has fixed https://github.com/kripken/emscripten/issues/3365
     if (NOT $ENV{PATH} MATCHES ${EMSCRIPTEN_ROOT_PATH})
         message (FATAL_ERROR "The bin directory containing the compiler toolchain (${EMSCRIPTEN_ROOT_PATH}) has not been added in the PATH environment variable. "
             "This is required to enable ccache support for Emscripten compiler toolchain.")

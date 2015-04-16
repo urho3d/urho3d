@@ -1150,7 +1150,7 @@ if( NOT CMAKE_C_COMPILER )
  # Urho3D - there are two ways to use ccache, by prefixing compiler toolchain with 'ccache' command (as done by NDK_CCACHE code branch above) or
  #          let ccache masquerade as the compiler by creating a symbolic link named as the compiler pointing back to 'ccache' command
  #          Urho3D has to use the second way because the first one does not handle our precompiled header build rules well
- elseif ($ENV{USE_CCACHE} AND NOT CMAKE_HOST_WIN32)
+ elseif ("$ENV{USE_CCACHE}" AND NOT CMAKE_HOST_WIN32)   # Need to stringify to guard against undefined environment variable
     execute_process (COMMAND which ccache RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
     if (NOT EXIT_CODE EQUAL 0)
         set (CCACHE /usr/bin/ccache)
