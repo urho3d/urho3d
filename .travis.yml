@@ -21,15 +21,17 @@
 #
 
 language: cpp
-compiler:
-  - gcc
-  - clang
+compiler: [gcc, clang]
+cache: { directories: $HOME/.ccache }
 sudo: false
 addons: {apt: {packages: &native_deps [libasound2-dev]}}
 env:
   global:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
     - NUMJOBS=4
+    - USE_CCACHE=1
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
     - URHO3D_MODERN_CPP=1
     - URHO3D_AMALG=1
   matrix:
@@ -79,7 +81,7 @@ matrix:
     # env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_D3D11=1
     # <<: *MinGW-32bit
     # env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_D3D11=1
-before_install:
+before_script:
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - if [ $LINUX ]; then if [ "$URHO3D_64BIT" == "0" ]; then export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu; else export DISPLAY=:99.0; bash -e /etc/init.d/xvfb start; fi; fi
   - if [ $WINDOWS ]; then if [ "$URHO3D_64BIT" == "0" ]; then export ARCH=i686; else export ARCH=x86_64; fi && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
