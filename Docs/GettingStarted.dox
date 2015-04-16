@@ -287,6 +287,8 @@ CCACHE_SLOPPINESS=pch_defines,time_macros
 
 Failure to do so would cause the precompiled header cannot be used by ccache. When ccache is setup correctly and with more hits than misses then even clean build can be done as fast as incremental build.
 
+You may also want to set 'USE_CCACHE' and 'CCACHE_COMPRESS' environment variable to 1 to enable ccache support when cross-compiling using MinGW, Raspberry-Pi, and Android compiler toolchains; and to enable the compression of the cache objects, respectively.
+
 \page Running Running Urho3D player application
 
 \tableofcontents
