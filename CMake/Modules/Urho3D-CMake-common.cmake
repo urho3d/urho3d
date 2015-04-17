@@ -464,7 +464,9 @@ else ()
         if (EMSCRIPTEN)
             # Emscripten-specific setup
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
+            # Temporarily add the C++ standard explicitly because currently Emscripten does not consistently add the standard in its internall processing
+            # and this may cause compilation problem when precompiled header is involved (See https://github.com/kripken/emscripten/issues/3365 for more detail)
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option -std=c++03")
             set (CMAKE_C_FLAGS_RELEASE "-Oz")
             set (CMAKE_CXX_FLAGS_RELEASE "-Oz")
             if (DEFINED ENV{CI})

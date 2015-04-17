@@ -287,7 +287,12 @@ CCACHE_SLOPPINESS=pch_defines,time_macros
 
 Failure to do so would cause the precompiled header cannot be used by ccache. When ccache is setup correctly and with more hits than misses then even clean build can be done as fast as incremental build.
 
-You may also want to set 'USE_CCACHE' and 'CCACHE_COMPRESS' environment variable to 1 to enable ccache support when cross-compiling using MinGW, Raspberry-Pi, and Android compiler toolchains; and to enable the compression of the cache objects, respectively.
+You may also want to set 'USE_CCACHE' and 'CCACHE_COMPRESS' environment variable to 1 to enable ccache support when cross-compiling using MinGW, Raspberry-Pi, Android, and Emscripten (with some caveat) cross-compiler toolchains; and to enable the compression of the cached objects, respectively. At the moment to enable ccache support for Emscripten, you also need to set 'CCACHE_CPP2' environment variable to 1 (see Emscripten issue [#3365](https://github.com/kripken/emscripten/issues/3365) for more detail).
+
+Ensure the ccache symlinks directory is being added as the first entry in the 'PATH' environment variable so the symlinks of the compiler toolchain is being found first by CMake rather than the actual compiler toolchain. This is especially important for native build. The 'PATH' environment variable has been set correctly for ccache in RedHat-based host system such as Fedora, but it is not the case in Debian-based host system such as Ubuntu nor in Mac OS X host system with homebrew's ccache installation. For the latter case, use "whereis -b ccache" or "brew info ccache" to find out where your ccache symlinks directory is and adjust the 'PATH' environment variable accordingly.
+
+Note that these environment variables are used by ccache itself and not by our CMake build rules, so they must remain set in the host system not only while generating the initial project file using CMake but also while building the project later.
+
 
 \page Running Running Urho3D player application
 
