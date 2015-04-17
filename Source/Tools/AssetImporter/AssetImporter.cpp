@@ -122,7 +122,6 @@ bool noOverwriteMaterial_ = false;
 bool noOverwriteTexture_ = false;
 bool noOverwriteNewerTexture_ = false;
 bool checkUniqueModel_ = true;
-int  rootmotion_ = 0;
 unsigned maxBones_ = 64;
 Vector<String> nonSkinningBoneIncludes_;
 Vector<String> nonSkinningBoneExcludes_;
@@ -144,7 +143,7 @@ void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessa
 void CollectAnimations(OutModel* model = 0);
 void BuildBoneCollisionInfo(OutModel& model);
 void BuildAndSaveModel(OutModel& model);
-void BuildAndSaveAnimations(OutModel* model = 0, int rootMotion = 0);
+void BuildAndSaveAnimations(OutModel* model = 0);
 
 void ExportScene(const String& outName, bool asPrefab);
 void CollectSceneModels(OutScene& scene, aiNode* node);
@@ -251,8 +250,6 @@ void Run(const Vector<String>& arguments)
             "-ct         Check and do not overwrite if texture exists\n"
             "-ctn        Check and do not overwrite if texture has newer timestamp\n"
             "-am         Export all meshes even if identical (scene mode only)\n"
-            "-rm         Export root-motion (animation mode only)\n"
-            "-rmy        Export root-motion with Y component(animation mode only)\n"
         );
     }
     
@@ -394,10 +391,6 @@ void Run(const Vector<String>& arguments)
                 noOverwriteNewerTexture_ = true;
             else if (argument == "am")
                 checkUniqueModel_ = false;
-            else if(argument == "rm")
-                rootmotion_ = 1;
-            else if(argument == "rmy")
-                rootmotion_ = 2;
         }
     }
     
@@ -561,7 +554,7 @@ void ExportModel(const String& outName, bool animationOnly)
     if (!noAnimations_)
     {
         CollectAnimations(&model);
-        BuildAndSaveAnimations(&model, rootmotion_);
+        BuildAndSaveAnimations(&model);
         
         // Save scene-global animations
         CollectAnimations();
@@ -1014,7 +1007,7 @@ void BuildAndSaveModel(OutModel& model)
     }
 }
 
-void BuildAndSaveAnimations(OutModel* model, int rootMotion)
+void BuildAndSaveAnimations(OutModel* model)
 {
     const PODVector<aiAnimation*>& animations = model ? model->animations_ : sceneAnimations_;
     
@@ -1060,8 +1053,6 @@ void BuildAndSaveAnimations(OutModel* model, int rootMotion)
         
         PrintLine("Writing animation " + animName + " length " + String(outAnim->GetLength()));
         Vector<AnimationTrack> tracks;
-        PODVector<AnimationRMKeyFrame> rmTracks;
-        const Vector3 pelvisRightAxis(1, 0, 0);
 
         for (unsigned j = 0; j < anim->mNumChannels; ++j)
         {
@@ -1069,9 +1060,7 @@ void BuildAndSaveAnimations(OutModel* model, int rootMotion)
             String channelName = FromAIString(channel->mNodeName);
             aiNode* boneNode = 0;
             bool isRootBone = false;
-            bool isTranslateBone = rootMotion ? channelName.EndsWith("_$AssimpFbx$_Translation") : false;
-            bool isRotateBone = rootMotion ? channelName.EndsWith("$AssimpFbx$_Rotation") : false;
-            
+
             if (model)
             {
                 unsigned boneIndex = GetBoneIndex(*model, channelName);
@@ -1199,57 +1188,9 @@ void BuildAndSaveAnimations(OutModel* model, int rootMotion)
                 
                 track.keyFrames_.Push(kf);
             }
-
-            if (isTranslateBone || isRotateBone)
-            {
-                if (rmTracks.Empty())
-                    rmTracks.Resize(track.keyFrames_.Size());
-
-                assert(rmTracks.Size() == track.keyFrames_.Size());
-                if (isTranslateBone)
-                {
-                    for (unsigned i=0; i<track.keyFrames_.Size(); ++i)
-                    {
-                        AnimationKeyFrame& kf = track.keyFrames_[i];
-                        AnimationRMKeyFrame& rmkf = rmTracks[i];
-                        rmkf.time_ = track.keyFrames_[i].time_;
-                        // only set delta position
-                        rmkf.position_ = track.keyFrames_[i].position_ - track.keyFrames_[0].position_;
-                        if (rootmotion_ != 2)
-                        {
-                            rmkf.position_.y_ = 0;
-                            kf.position_ = Vector3(0, kf.position_.y_, 0); 
-                        }
-                        else
-                        {
-                            kf.position_ = Vector3::ZERO;
-                        }
-                    }
-                }
-                
-                if (isRotateBone)
-                {
-                    for (unsigned i=0; i<track.keyFrames_.Size(); ++i)
-                    {
-                        AnimationRMKeyFrame &kf = rmTracks[i];
-                        // kf.time_ = track.keyFrames_[i];
-                        // only set delta position
-                        // kf.position_ = track.keyFrames_[i].position_ - track.keyFrames_[0].position_;
-                    }
-                } 
-            }
-            
             tracks.Push(track);
         }
-
-#if 1
-        for (unsigned i=0; i<rmTracks.Size(); ++i)
-        {
-            printf("rm track [%02d] = %f, %s, %f\n", i, rmTracks[i].time_, rmTracks[i].position_.ToString().CString(), rmTracks[i].yaw_);
-        }
-#endif
         
-        outAnim->SetRootmotionTracks(rmTracks);
         outAnim->SetTracks(tracks);
         
         File outFile(context_);
@@ -2304,7 +2245,7 @@ void ExportAnimation( const String& outName )
     //BuildBoneCollisionInfo(model);
     //BuildAndSaveModel(model);
     CollectAnimations(&model);
-    BuildAndSaveAnimations(&model, rootmotion_);
+    BuildAndSaveAnimations(&model);
     // Save scene-global animations
     CollectAnimations();
     BuildAndSaveAnimations();

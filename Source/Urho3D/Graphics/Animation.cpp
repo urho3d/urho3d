@@ -118,21 +118,6 @@ bool Animation::BeginLoad(Deserializer& source)
                 newKeyFrame.scale_ = source.ReadVector3();
         }
     }
-
-    if (!source.IsEof())
-    {
-        unsigned keyFrames = source.ReadUInt();
-        LOGDEBUGF("rootmotion keyframes = %u", keyFrames);
-        rmTracks_.Resize(keyFrames);
-        memoryUse += keyFrames * sizeof(AnimationRMKeyFrame); 
-        for (unsigned i = 0; i < keyFrames; ++i)
-        {
-            AnimationRMKeyFrame& newKeyFrame = rmTracks_[i];
-            newKeyFrame.time_ = source.ReadFloat();
-            newKeyFrame.position_ = source.ReadVector3();
-            newKeyFrame.yaw_ = source.ReadFloat();
-        }
-    }
     
     // Optionally read triggers from an XML file
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -187,18 +172,6 @@ bool Animation::Save(Serializer& dest) const
                 dest.WriteQuaternion(keyFrame.rotation_);
             if (track.channelMask_ & CHANNEL_SCALE)
                 dest.WriteVector3(keyFrame.scale_);
-        }
-    }
-
-    if (!rmTracks_.Empty())
-    {
-        dest.WriteUInt(rmTracks_.Size());
-        for (unsigned i=0; i<rmTracks_.Size(); ++i)
-        {
-            const AnimationRMKeyFrame& keyframe = rmTracks_[i];
-            dest.WriteFloat(keyframe.time_);
-            dest.WriteVector3(keyframe.position_);
-            dest.WriteFloat(keyframe.yaw_);
         }
     }
     
@@ -297,11 +270,6 @@ const AnimationTrack* Animation::GetTrack(StringHash nameHash) const
     }
     
     return 0;
-}
-
-void Animation::SetRootmotionTracks( const PODVector<AnimationRMKeyFrame>& rmTracks )
-{
-    rmTracks_ = rmTracks;
 }
 
 }
