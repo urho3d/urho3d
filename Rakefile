@@ -222,7 +222,9 @@ task :ci do
         ENV['PATH'] = "/usr/lib/ccache:#{ENV['PATH']}"
       end
     end
+puts `ccache -s`
     makefile_ci
+puts `ccache -s`
   end
 end
 
