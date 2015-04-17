@@ -85,7 +85,12 @@ task :cmake do
     end
   }
   build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
-  system "./#{script}#{ENV['OS'] ? '.bat' : '.sh'} \"#{build_tree}\" #{build_options}" or abort
+  unless ENV['OS']
+    ccache_envvar = ENV['CCACHE_SLOPPINESS'] ? '' : 'CCACHE_SLOPPINESS=pch_defines,time_macros'   # Only attempt to do the right thing when user hasn't done it
+    ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CCACHE_COMPRESS']
+    ccache_envvar = "#{ccache_envvar} CCACHE_CPP2=1" unless ENV['CCACHE_CPP2'] || platform != 'emscripten'  # TODO: Temporary workaround for ccache support on Emscripten
+  end
+  system "#{ccache_envvar} ./#{script}#{ENV['OS'] ? '.bat' : '.sh'} \"#{build_tree}\" #{build_options}" or abort
 end
 
 # Usage: rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [numjobs=n] [clean_first] [unfilter]
@@ -119,6 +124,7 @@ task :make do
   build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
   ccache_envvar = ENV['CCACHE_SLOPPINESS'] ? '' : 'CCACHE_SLOPPINESS=pch_defines,time_macros'   # Only attempt to do the right thing when user hasn't done it
   ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CCACHE_COMPRESS']
+  ccache_envvar = "#{ccache_envvar} CCACHE_CPP2=1" unless ENV['CCACHE_CPP2'] || platform != 'emscripten'  # TODO: Temporary workaround for ccache support on Emscripten
   if !Dir.glob("#{build_tree}/*.xcodeproj").empty?
     # xcodebuild
     if !numjobs.empty?
