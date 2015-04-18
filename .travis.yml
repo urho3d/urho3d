@@ -41,7 +41,7 @@ matrix:
   fast_finish: true
   include:
     - &Linux-32bit
-      compiler: gcc
+      compiler: gcc-i686
       addons: {apt: {packages: ["libxrandr-dev:i386", "libglapi-mesa:i386", "libgl1-mesa-glx:i386", "libgl1-mesa-dev:i386", "libxext-dev:i386", "libxrender-dev:i386",
         g++-multilib, *native_deps]}}
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
@@ -49,9 +49,9 @@ matrix:
       <<: *Linux-32bit
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
     - <<: *Linux-32bit
-      compiler: clang
+      compiler: clang-i686
     - <<: *Linux-32bit-shared
-      compiler: clang
+      compiler: clang-i686
     - &MinGW-64bit
       compiler: x86_64-w64-mingw32-gcc
       addons: {apt: {packages: [gcc-mingw-w64-x86-64, g++-mingw-w64-x86-64, binutils-mingw-w64-x86-64]}}
@@ -59,8 +59,10 @@ matrix:
     - <<: *MinGW-64bit
       env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED
     - <<: *MinGW-64bit
+      compiler: x86_64-w64-mingw32-gcc-d3d9
       env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_OPENGL=0
     - <<: *MinGW-64bit
+      compiler: x86_64-w64-mingw32-gcc-d3d9
       env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_OPENGL=0
     # Ubuntu 12.04 LTS does not have up-to-date D3D11 headers, disable the CI build jobs for D3D11 for now until Travis-CI upgrades their OS to 14.04 LTS or better
     # <<: *MinGW-64bit
@@ -74,8 +76,10 @@ matrix:
     - <<: *MinGW-32bit
       env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
     - <<: *MinGW-32bit
+      compiler: i686-w64-mingw32-gcc-d3d9
       env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_OPENGL=0
     - <<: *MinGW-32bit
+      compiler: i686-w64-mingw32-gcc-d3d9
       env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_OPENGL=0
     # <<: *MinGW-32bit
     # env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_D3D11=1
@@ -91,7 +95,7 @@ before_script:
   - if [ $USE_CCACHE ]; then ccache -z; if [ "$CC"  == "clang" ]; then ln -s /usr/bin/ccache $HOME/clang && ln -s /usr/bin/ccache $HOME/clang++ && export PATH=$HOME:$PATH; else export PATH=/usr/lib/ccache:$PATH; fi; fi
 script:
   - rake ci
-after_script:
+before_cache:
   - if [ $USE_CCACHE ]; then ccache -s; fi
 #after_success: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_rebase; fi
 
