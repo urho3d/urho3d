@@ -210,11 +210,11 @@ task :ci do
   ['URHO3D_MODERN_CPP', 'URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TEST_TIMEOUT', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var| $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var] }
   if ENV['XCODE']
     # xcodebuild
-    ENV['PATH'] = "/usr/local/opt/ccache/libexec:#{ENV['PATH']}" if ENV['CI']
+    ENV['PATH'] = "/usr/local/opt/ccache/libexec:#{ENV['PATH']}" if ENV['CI'] && ENV['USE_CCACHE'].to_i == 1
     xcode_ci
   else
     # GCC or Clang
-    if ENV['CI']
+    if ENV['CI'] && ENV['USE_CCACHE'].to_i == 1
       if ENV['CC'] == 'clang'
         system 'ln -s /usr/bin/ccache $HOME/clang && ln -s /usr/bin/ccache $HOME/clang++' or abort 'Failed to create ccache symlinks for clang/clang++'
         ENV['PATH'] = "#{ENV['HOME']}:#{ENV['PATH']}"

@@ -32,8 +32,8 @@ env:
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
-    - URHO3D_MODERN_CPP=1
-    - URHO3D_AMALG=1
+    - URHO3D_MODERN_CPP=0
+    - URHO3D_AMALG=0
   matrix:
     - LINUX=1 URHO3D_LIB_TYPE=STATIC
     - LINUX=1 URHO3D_LIB_TYPE=SHARED
@@ -53,7 +53,7 @@ matrix:
     - <<: *Linux-32bit-shared
       compiler: clang
     - &MinGW-64bit
-      compiler: gcc
+      compiler: x86_64-w64-mingw32-gcc
       addons: {apt: {packages: [gcc-mingw-w64-x86-64, g++-mingw-w64-x86-64, binutils-mingw-w64-x86-64]}}
       env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC
     - <<: *MinGW-64bit
@@ -68,7 +68,7 @@ matrix:
     # <<: *MinGW-64bit
     # env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_D3D11=1
     - &MinGW-32bit
-      compiler: gcc
+      compiler: i686-w64-mingw32-gcc
       addons: {apt: {packages: [gcc-mingw-w64-i686, g++-mingw-w64-i686, binutils-mingw-w64-i686]}}
       env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - <<: *MinGW-32bit
