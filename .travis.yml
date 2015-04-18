@@ -85,7 +85,14 @@ before_script:
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - if [ $LINUX ]; then if [ "$URHO3D_64BIT" == "0" ]; then export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu; else export DISPLAY=:99.0; bash -e /etc/init.d/xvfb start; fi; fi
   - if [ $WINDOWS ]; then if [ "$URHO3D_64BIT" == "0" ]; then export ARCH=i686; else export ARCH=x86_64; fi && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
-script: rake ci
+  # MinGW package on Ubuntu 12.04 LTS does not come with d3dcompiler.h file which is required by our CI build with URHO3D_OPENGL=0.
+  # Temporarily workaround the problem by downloading the missing header from Ubuntu 14.04 LTS source package.
+  - if [ $URHO3D_OPENGL ]; then mkdir -p ../Build/{,generated/{UsingBuildTree,UsingSDK}/}include/Urho3D/ThirdParty && wget -P ../Build/include/Urho3D/ThirdParty http://bazaar.launchpad.net/~ubuntu-branches/ubuntu/trusty/mingw-w64/trusty/download/package-import%40ubuntu.com-20130624192537-vzn12bb7qd5w3iy8/d3dcompiler.h-20120402093420-bk10a737hzitlkgj-65/d3dcompiler.h && for d in UsingBuildTree UsingSDK; do bash -c "cd ../Build/generated/$d/include/Urho3D/ThirdParty && ln -s ../../../../../include/Urho3D/ThirdParty/d3dcompiler.h ."; done; fi
+  - if [ $USE_CCACHE ]; then ccache -z; if [ "$CC"  == "clang" ]; then ln -s /usr/bin/ccache $HOME/clang && ln -s /usr/bin/ccache $HOME/clang++ && export PATH=$HOME:$PATH; else export PATH=/usr/lib/ccache:$PATH; fi; fi
+script:
+  - rake ci
+after_script:
+  - if [ $USE_CCACHE ]; then ccache -s; fi
 #after_success: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_rebase; fi
 
 # vi: set ts=2 sw=2 expandtab:

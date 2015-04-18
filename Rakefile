@@ -190,6 +190,8 @@ task :ci do
   if ENV['CI'] && ENV['PACKAGE_UPLOAD'] && !ENV['RELEASE_TAG']
     system 'git fetch --unshallow' or abort 'Failed to unshallow cloned repository'
   end
+  # Clear ccache on demand
+  system 'ccache -C' if /\[ccache clear\]/ =~ ENV['COMMIT_MESSAGE']
   # Packaging always use Release configuration (temporary workaround due to Travis-CI insufficient memory, also use Release configuration when CI build runs on a bad VM)
   if ENV['PACKAGE_UPLOAD'] || ENV['BAD_VM']
     $configuration = 'Release'
@@ -210,21 +212,10 @@ task :ci do
   ['URHO3D_MODERN_CPP', 'URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TEST_TIMEOUT', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var| $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var] }
   if ENV['XCODE']
     # xcodebuild
-    ENV['PATH'] = "/usr/local/opt/ccache/libexec:#{ENV['PATH']}" if ENV['CI'] && ENV['USE_CCACHE'].to_i == 1
     xcode_ci
   else
     # GCC or Clang
-    if ENV['CI'] && ENV['USE_CCACHE'].to_i == 1
-      if ENV['CC'] == 'clang'
-        system 'ln -s /usr/bin/ccache $HOME/clang && ln -s /usr/bin/ccache $HOME/clang++' or abort 'Failed to create ccache symlinks for clang/clang++'
-        ENV['PATH'] = "#{ENV['HOME']}:#{ENV['PATH']}"
-      else
-        ENV['PATH'] = "/usr/lib/ccache:#{ENV['PATH']}"
-      end
-    end
-puts `ccache -s`
     makefile_ci
-puts `ccache -s`
   end
 end
 
@@ -335,7 +326,7 @@ task :ci_package_upload do
     if ENV['URHO3D_USE_LIB64_RPM']
       system "cd ../Build && cmake . -DURHO3D_USE_LIB64_RPM=#{ENV['URHO3D_USE_LIB64_RPM']}" or abort 'Failed to reconfigure to generate 64-bit RPM package'
     end
-    wrapper = ENV['CI'] && ENV['URHO3D_64BIT'] ? 'setarch i686' : ''
+    wrapper = ENV['URHO3D_64BIT'] ? 'setarch i686' : ''
     system "cd ../Build && #{wrapper} make package" or abort 'Failed to make binary package'
   end
   # Determine the upload location
@@ -437,14 +428,6 @@ end
 
 def makefile_ci
   if ENV['WINDOWS'] && ENV['CI']
-    # MinGW package on Ubuntu 12.04 LTS does not come with d3dcompiler.h file which is required by our CI build with URHO3D_OPENGL=0.
-    # Temporarily workaround the problem by downloading the missing header from Ubuntu 14.04 LTS source package.
-    if ENV['URHO3D_OPENGL']
-      # We cannot use sudo in the container-based VM to put the d3dcompiler.h in the MinGW system-wide include dir, so workaround by having it in the project-wide include dir
-      system 'bash -c "mkdir -p ../Build/{,generated/{UsingBuildTree,UsingSDK}/}include/Urho3D/ThirdParty"' or abort 'Failed to create third party include dirs'
-      system 'wget -P ../Build/include/Urho3D/ThirdParty http://bazaar.launchpad.net/~ubuntu-branches/ubuntu/trusty/mingw-w64/trusty/download/package-import%40ubuntu.com-20130624192537-vzn12bb7qd5w3iy8/d3dcompiler.h-20120402093420-bk10a737hzitlkgj-65/d3dcompiler.h' or abort 'Failed to download d3dcompiler.h'
-      ['UsingBuildTree', 'UsingSDK'].each { |dir| system "cd ../Build/generated/#{dir}/include/Urho3D/ThirdParty && ln -s ../../../../../include/Urho3D/ThirdParty/d3dcompiler.h ." or abort 'Failed to create symlinks to d3dcompiler.h' }
-    end
     # LuaJIT on MinGW build is not possible on Ubuntu 12.04 LTS as its GCC cross-compiler version is too old. Fallback to use Lua library instead.
     jit = ''
     amalg = ''
