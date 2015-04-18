@@ -122,9 +122,11 @@ task :make do
     end
   }
   build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
-  ccache_envvar = ENV['CCACHE_SLOPPINESS'] ? '' : 'CCACHE_SLOPPINESS=pch_defines,time_macros'   # Only attempt to do the right thing when user hasn't done it
-  ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CCACHE_COMPRESS']
-  ccache_envvar = "#{ccache_envvar} CCACHE_CPP2=1" unless ENV['CCACHE_CPP2'] || platform != 'emscripten'  # TODO: Temporary workaround for ccache support on Emscripten
+  unless ENV['OS']
+    ccache_envvar = ENV['CCACHE_SLOPPINESS'] ? '' : 'CCACHE_SLOPPINESS=pch_defines,time_macros'   # Only attempt to do the right thing when user hasn't done it
+    ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CCACHE_COMPRESS']
+    ccache_envvar = "#{ccache_envvar} CCACHE_CPP2=1" unless ENV['CCACHE_CPP2'] || platform != 'emscripten'  # TODO: Temporary workaround for ccache support on Emscripten
+  end
   if !Dir.glob("#{build_tree}/*.xcodeproj").empty?
     # xcodebuild
     if !numjobs.empty?
@@ -134,7 +136,6 @@ task :make do
   elsif !Dir.glob("#{build_tree}/*.sln").empty?
     # msbuild
     numjobs = ":#{numjobs}" unless numjobs.empty?
-    ccache_envvar = ''    # Extra env var is harmless even when ccache is not in use, well, except on Windows host system
     build_options = "/maxcpucount#{numjobs}#{build_options}"
     filter = unfilter ? '' : '/nologo /verbosity:minimal'
   elsif !Dir.glob("#{build_tree}/*.ninja").empty?
@@ -154,7 +155,6 @@ task :make do
       when /win32|mingw|mswin/
         require 'win32ole'
         WIN32OLE.connect('winmgmts://').ExecQuery("select NumberOf#{platform == 'emscripten' ? '' : 'Logical'}Processors from Win32_ComputerSystem").each { |out| numjobs = platform == 'emscripten' ? out.NumberOfProcessors : out.NumberOfLogicalProcessors }
-        ccache_envvar = ''    # Extra env var is harmless even when ccache is not in use, well, except on Windows host system
       else
         numjobs = 1
       end
