@@ -21,7 +21,6 @@
 #
 
 language: cpp
-compiler: [gcc, clang]
 cache: { directories: $HOME/.ccache }
 sudo: false
 addons: {apt: {packages: &native_deps [libasound2-dev]}}
@@ -34,56 +33,70 @@ env:
     - CCACHE_COMPRESS=1
     - URHO3D_MODERN_CPP=0
     - URHO3D_AMALG=0
-  matrix:
-    - LINUX=1 URHO3D_LIB_TYPE=STATIC
-    - LINUX=1 URHO3D_LIB_TYPE=SHARED
 matrix:
   fast_finish: true
   include:
+    - &Linux-64bit
+      compiler: gcc-64bit-static
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC
+    - &Linux-64bit-shared
+      compiler: gcc-64bit-shared
+      env: LINUX=1 URHO3D_LIB_TYPE=SHARED
+    - <<: *Linux-64bit
+      compiler: clang-64bit-static
+    - <<: *Linux-64bit-shared
+      compiler: clang-64bit-shared
     - &Linux-32bit
-      compiler: gcc-i686
+      compiler: gcc-32bit-static
       addons: {apt: {packages: ["libxrandr-dev:i386", "libglapi-mesa:i386", "libgl1-mesa-glx:i386", "libgl1-mesa-dev:i386", "libxext-dev:i386", "libxrender-dev:i386",
         g++-multilib, *native_deps]}}
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - &Linux-32bit-shared
       <<: *Linux-32bit
+      compiler: gcc-32bit-shared
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
     - <<: *Linux-32bit
-      compiler: clang-i686
+      compiler: clang-32bit-static
     - <<: *Linux-32bit-shared
-      compiler: clang-i686
+      compiler: clang-32bit-shared
     - &MinGW-64bit
-      compiler: x86_64-w64-mingw32-gcc
+      compiler: x86_64-w64-mingw32-gcc-static
       addons: {apt: {packages: [gcc-mingw-w64-x86-64, g++-mingw-w64-x86-64, binutils-mingw-w64-x86-64]}}
       env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC
     - <<: *MinGW-64bit
+      compiler: x86_64-w64-mingw32-gcc-shared
       env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED
     - <<: *MinGW-64bit
-      compiler: x86_64-w64-mingw32-gcc-d3d9
+      compiler: x86_64-w64-mingw32-gcc-d3d9-static
       env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_OPENGL=0
     - <<: *MinGW-64bit
-      compiler: x86_64-w64-mingw32-gcc-d3d9
+      compiler: x86_64-w64-mingw32-gcc-d3d9-shared
       env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_OPENGL=0
     # Ubuntu 12.04 LTS does not have up-to-date D3D11 headers, disable the CI build jobs for D3D11 for now until Travis-CI upgrades their OS to 14.04 LTS or better
     # <<: *MinGW-64bit
+    # compiler: x86_64-w64-mingw32-gcc-d3d11-static
     # env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_D3D11=1
     # <<: *MinGW-64bit
+    # compiler: x86_64-w64-mingw32-gcc-d3d11-shared
     # env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_D3D11=1
     - &MinGW-32bit
-      compiler: i686-w64-mingw32-gcc
+      compiler: i686-w64-mingw32-gcc-static
       addons: {apt: {packages: [gcc-mingw-w64-i686, g++-mingw-w64-i686, binutils-mingw-w64-i686]}}
       env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - <<: *MinGW-32bit
+      compiler: i686-w64-mingw32-gcc-shared
       env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
     - <<: *MinGW-32bit
-      compiler: i686-w64-mingw32-gcc-d3d9
+      compiler: i686-w64-mingw32-gcc-d3d9-static
       env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_OPENGL=0
     - <<: *MinGW-32bit
-      compiler: i686-w64-mingw32-gcc-d3d9
+      compiler: i686-w64-mingw32-gcc-d3d9-shared
       env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_OPENGL=0
     # <<: *MinGW-32bit
+    # compiler: i686-w64-mingw32-gcc-d3d11-static
     # env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_D3D11=1
     # <<: *MinGW-32bit
+    # compiler: i686-w64-mingw32-gcc-d3d11-shared
     # env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_D3D11=1
 before_script:
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
