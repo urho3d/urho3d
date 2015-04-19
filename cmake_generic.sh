@@ -22,7 +22,7 @@
 #
 
 # Determine source tree and build tree
-if [ "$1" ] && [[ ! "$1" =~ ^- ]]; then BUILD=$1; shift; elif [ -f $(pwd)/CMakeCache.txt ]; then BUILD=$(pwd); else caller=$(ps -o args= $PPID |cut -d' ' -f2); if [[ ! "$caller" =~ cmake_.*\.sh$ ]]; then caller=$0; fi; echo -e "An error has occured, build tree has to be provided as the first argument OR call this script in a build tree itself\nUsage: ${caller##*/} /path/to/build-tree"; exit 1; fi
+if [ "$1" ] && [[ ! "$1" =~ ^- ]]; then BUILD=$1; shift; elif [ -f $(pwd)/CMakeCache.txt ]; then BUILD=$(pwd); else caller=$(ps -o args= $PPID |cut -d' ' -f2); if [[ ! "$caller" =~ cmake_.*\.sh$ ]]; then caller=$0; fi; echo "Usage: ${caller##*/} /path/to/build-tree [build-options]"; exit 1; fi
 SOURCE=$(cd ${0%/*}; pwd)
 if [ "$BUILD" == "." ]; then BUILD=$(pwd); fi
 

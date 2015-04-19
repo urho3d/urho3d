@@ -45,6 +45,7 @@ Urho3D development, contributions and bugfixes by:
 - Firegorilla
 - Magic.Lixin
 - Mike3D
+- Modanung
 - OvermindDL1
 - andmar1x
 - amadeus_osa
@@ -52,9 +53,11 @@ Urho3D development, contributions and bugfixes by:
 - att
 - celeron55
 - hdunderscore
+- marynate
 - mightyCelu
 - nemerle
 - ninjastone
+- raould
 - rasteron
 - reattiva
 - rifai

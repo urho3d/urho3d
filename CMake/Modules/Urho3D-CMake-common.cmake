@@ -170,6 +170,13 @@ endif ()
 if (MINGW AND CMAKE_CROSSCOMPILING)
     set (MINGW_PREFIX "" CACHE STRING "Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)")
     set (MINGW_SYSROOT "" CACHE PATH "Path to MinGW system root (MinGW cross-compiling build only)")
+    # When cross-compiling then we are most probably in Unix-alike host environment which should not have problem to handle long include dirs
+    # This change is required to keep ccache happy because it does not like the CMake generated include response file
+    foreach (lang C CXX)
+        foreach (cat OBJECTS INCLUDES)
+            unset (CMAKE_${lang}_USE_RESPONSE_FILE_FOR_${cat})
+        endforeach ()
+    endforeach ()
 endif ()
 if (RPI)
     if (NOT RPI_SUPPORTED_ABIS)
@@ -506,9 +513,11 @@ else ()
         if (EMSCRIPTEN)
             # Emscripten-specific setup
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
-            set (CMAKE_C_FLAGS_RELEASE "-Oz")
-            set (CMAKE_CXX_FLAGS_RELEASE "-Oz")
+            # Temporarily add the C++ standard explicitly because currently Emscripten does not consistently add the standard in its internall processing
+            # and this may cause compilation problem when precompiled header is involved (See https://github.com/kripken/emscripten/issues/3365 for more detail)
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option -std=c++03")
+            set (CMAKE_C_FLAGS_RELEASE "-Oz -DNDEBUG")
+            set (CMAKE_CXX_FLAGS_RELEASE "-Oz -DNDEBUG")
             if (DEFINED ENV{CI})
                 # Our CI server is slow, so do not optimize and discard all debug info when test building in Debug configuration
                 set (CMAKE_C_FLAGS_DEBUG "-g0")
@@ -533,13 +542,14 @@ else ()
         set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -D_DEBUG")
     endif ()
     if (CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-        if (CMAKE_GENERATOR STREQUAL Ninja)
-            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcolor-diagnostics")
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
+        if (CMAKE_GENERATOR STREQUAL Ninja OR "$ENV{USE_CCACHE}")
+            # When ccache support is on, these flags keep the color diagnostics pipe through ccache output and suppress Clang warning due ccache internal preprocessing step
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcolor-diagnostics -Qunused-arguments")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics -Qunused-arguments")
         endif ()
         # Temporary workaround for Travis CI VM as Ubuntu 12.04 LTS still uses old glibc header files that do not have the necessary patch for Clang to work correctly
         # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS (or hopefully it will be CentOS :)
-        if (DEFINED ENV{CI} AND "$ENV{LINUX}" STREQUAL 1)
+        if (DEFINED ENV{CI} AND "$ENV{LINUX}")
             add_definitions (-D__extern_always_inline=inline)
         endif ()
     endif ()
@@ -699,11 +709,14 @@ macro (enable_pch HEADER_PATHNAME)
                     COMMENT "Precompiling header file '${HEADER_FILENAME}' for ${CONFIG} configuration")
             endforeach ()
             # Use the precompiled header file
+            if (NOT XCODE)
+                set (PCH_DIR ${CMAKE_CURRENT_BINARY_DIR}/)
+            endif ()
             foreach (FILE ${SOURCE_FILES})
                 if (FILE MATCHES \\.cpp$)
                     get_property (NO_PCH SOURCE ${FILE} PROPERTY NO_PCH)
                     if (NOT NO_PCH)
-                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -include ${HEADER_FILENAME}")
+                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -include ${PCH_DIR}${HEADER_FILENAME}")
                     endif ()
                 endif ()
             endforeach ()
@@ -722,14 +735,6 @@ macro (enable_pch HEADER_PATHNAME)
                 set (TRIGGERS ${HEADER_FILENAME}.${CMAKE_BUILD_TYPE}.pch.trigger)
             endif ()
             list (APPEND SOURCE_FILES ${TRIGGERS})
-            # Ninja-build specific
-            if (CMAKE_GENERATOR STREQUAL Ninja)
-                # The precompiled header is always generated in the current binary dir,
-                # but Ninja project is not able to find it without adding the binary dir to the include search path
-                # FIXME: below quick fix may have negatively impacted ccache from perfoming correctly in Ninja
-                #        ccache increases the 'preprocessor error' stat count and fallbacks to perform the actual compilation which slows down the build unnecessarily
-                list (APPEND INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR})
-            endif ()
         endif ()
     endif ()
 endmacro ()
@@ -1606,6 +1611,14 @@ elseif (EMSCRIPTEN)
         string (REPLACE "<!doctype html>" "<!-- This is a generated file. DO NOT EDIT!-->\n\n<!doctype html>" SHELL_HTML "${SHELL_HTML}")     # Stringify to preserve semicolons
         string (REPLACE "<body>" "<body>\n\n<a href=\"http://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"http://urho3d.github.io/assets/images/logo.png\" alt=\"link to http://urho3d.github.io\" height=\"80\" width=\"320\" /></a>\n" SHELL_HTML "${SHELL_HTML}")
         file (WRITE ${CMAKE_BINARY_DIR}/Source/shell.html "${SHELL_HTML}")
+    endif ()
+elseif (NOT CMAKE_CROSSCOMPILING AND NOT CMAKE_HOST_WIN32 AND "$ENV{USE_CCACHE}")
+    # Warn user if PATH environment variable has not been correctly set for using ccache
+    execute_process (COMMAND whereis -b ccache COMMAND grep -o \\S*lib\\S* RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (EXIT_CODE EQUAL 0 AND NOT ${CMAKE_C_COMPILER} MATCHES ${CCACHE_SYMLINK})
+        message (WARNING "The lib directory containing the ccache symlinks (${CCACHE_SYMLINK}) has not been added in the PATH environment variable. "
+            "This is required to enable ccache support for native compiler toolchain. CMake has been configured to use the actual compiler toolchain instead of ccache. "
+            "In order to rectify this, the build tree must be regenerated after the PATH environment variable has been adjusted accordingly.")
     endif ()
 endif ()
 
