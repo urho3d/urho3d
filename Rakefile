@@ -192,8 +192,8 @@ task :ci do
   end
   # Clear ccache on demand
   system 'ccache -C' if /\[ccache clear\]/ =~ ENV['COMMIT_MESSAGE']
-  # Packaging always use Release configuration (temporary workaround due to Travis-CI insufficient memory, also use Release configuration when CI build runs on a bad VM)
-  if ENV['PACKAGE_UPLOAD'] || ENV['BAD_VM']
+  # Packaging always use Release configuration
+  if ENV['PACKAGE_UPLOAD']
     $configuration = 'Release'
     $testing = 0
   else
