@@ -197,7 +197,7 @@ task :ci do
     $configuration = 'Release'
     $testing = 0
   else
-    $configuration = 'Debug'
+    $configuration = ENV['CI'] && ENV['USE_CCACHE'].to_i == 1 ? 'Release' : 'Debug'  # Aways use a same build configuration to keep ccache's cache size small when on Travis CI
     # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment and not iOS build; or Emscripten build environment are capable to run tests
     $testing = (ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && ENV['IOS'].to_i != 1) || ENV['EMSCRIPTEN'] ? 1 : 0
     if $testing
