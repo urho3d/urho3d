@@ -106,12 +106,12 @@ before_script:
   # Temporarily workaround the problem by downloading the missing header from Ubuntu 14.04 LTS source package.
   - if [ $URHO3D_OPENGL ]; then mkdir -p ../Build/{,generated/{UsingBuildTree,UsingSDK}/}include/Urho3D/ThirdParty && wget -P ../Build/include/Urho3D/ThirdParty http://bazaar.launchpad.net/~ubuntu-branches/ubuntu/trusty/mingw-w64/trusty/download/package-import%40ubuntu.com-20130624192537-vzn12bb7qd5w3iy8/d3dcompiler.h-20120402093420-bk10a737hzitlkgj-65/d3dcompiler.h && for d in UsingBuildTree UsingSDK; do bash -c "cd ../Build/generated/$d/include/Urho3D/ThirdParty && ln -s ../../../../../include/Urho3D/ThirdParty/d3dcompiler.h ."; done; fi
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH
-  # For some reason Travis CI clang compiler toolchain installation does not have symlink in the ccache symlinks directory, so workaround it
+  # For some reason clang compiler toolchain installation in Travis CI VM does not have symlink in the ccache symlinks directory, so workaround it
   - if [ "$CC"  == "clang" ]; then ln -s $(which ccache) $HOME/clang && ln -s $(which ccache) $HOME/clang++ && export PATH=$HOME:$PATH; fi
   - ccache -z -M 100M
 script:
   - rake ci
 before_cache: ccache -s
-#after_success: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_rebase; fi
+after_success: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_rebase; fi
 
 # vi: set ts=2 sw=2 expandtab:
