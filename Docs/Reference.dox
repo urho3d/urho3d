@@ -891,7 +891,7 @@ OpenGL ES 2.0 has further limitations:
 
 Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. Default and example materials exist in the bin/CoreData/Materials & bin/Data/Materials subdirectories, and techniques exist in the bin/CoreData/Techniques subdirectory.
 
-A material defines the textures, shader parameters and culling mode to use, and refers to one or several techniques. A technique defines the actual rendering passes, the shaders to use in each, and all other rendering states such as depth test, depth write, and blending.
+A material defines the textures, shader parameters and culling & fill mode to use, and refers to one or several techniques. A technique defines the actual rendering passes, the shaders to use in each, and all other rendering states such as depth test, depth write, and blending.
 
 A material definition looks like this:
 
@@ -904,6 +904,7 @@ A material definition looks like this:
     <parameter ... />
     <cull value="cw|ccw|none" />
     <shadowcull value="cw|ccw|none" />
+    <fill value="solid|wireframe|point" />
     <depthbias constant="x" slopescaled="y" />
 </material>
 \endcode
@@ -2083,7 +2084,7 @@ The following queries into the physics world are provided:
 Contact listener (see Box2D manual, Chapter 9 Contacts) enables a given node to report contacts through events. Available events are:
 - E_PHYSICSBEGINCONTACT2D ("PhysicsBeginContact2D" in script): called when 2 collision shapes begin to overlap
 - E_PHYSICSENDCONTACT2D ("PhysicsEndContact2D" in script): called when 2 collision shapes cease to overlap
-- E_PHYSICSPRESTEP2D ("Physics2DPreStep2D" in script): called after collision detection, but before collision resolution. This allows to disable the contact if need be (for example on a one-sided platform). Currently ineffective (only reports PhysicsWorld2D and time step)
+- E_PHYSICSPRESTEP2D ("PhysicsPreStep2D" in script): called after collision detection, but before collision resolution. This allows to disable the contact if need be (for example on a one-sided platform). Currently ineffective (only reports PhysicsWorld2D and time step)
 - E_PHYSICSPOSTSTEP2D ("PhysicsPostStep2D" in script): used to gather collision impulse results. Currentlly ineffective (only reports PhysicsWorld2D and time step)
 
 \section Urho2D_TileMap Tile maps

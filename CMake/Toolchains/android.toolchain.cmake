@@ -1147,6 +1147,35 @@ if( NOT CMAKE_C_COMPILER )
    set( CMAKE_C_COMPILER_ARG1   "${ANDROID_TOOLCHAIN_ROOT}/bin/${ANDROID_TOOLCHAIN_MACHINE_NAME}-gcc${TOOL_OS_SUFFIX}" CACHE PATH "C compiler")
    set( CMAKE_CXX_COMPILER_ARG1 "${ANDROID_TOOLCHAIN_ROOT}/bin/${ANDROID_TOOLCHAIN_MACHINE_NAME}-g++${TOOL_OS_SUFFIX}" CACHE PATH "C++ compiler")
   endif()
+ # Urho3D - there are two ways to use ccache, by prefixing compiler toolchain with 'ccache' command (as done by NDK_CCACHE code branch above) or
+ #          let ccache masquerade as the compiler by creating a symbolic link named as the compiler pointing back to 'ccache' command
+ #          Urho3D has to use the second way because the first one does not handle our precompiled header build rules well
+ elseif ("$ENV{USE_CCACHE}" AND NOT CMAKE_HOST_WIN32)   # Need to stringify to guard against undefined environment variable
+    execute_process (COMMAND which ccache RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (EXIT_CODE EQUAL 0)
+        if (ANDROID_COMPILER_IS_CLANG)
+            set (PATH ${ANDROID_CLANG_TOOLCHAIN_ROOT}/bin)
+            execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${_clang_name})
+            set (CMAKE_C_COMPILER ${CMAKE_BINARY_DIR}/${_clang_name} CACHE PATH "C compiler")
+            execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${_clang_name}++)
+            set (CMAKE_CXX_COMPILER ${CMAKE_BINARY_DIR}/${_clang_name}++ CACHE PATH "C++ compiler")
+        else ()
+            set (PATH ${ANDROID_TOOLCHAIN_ROOT}/bin)
+            execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${ANDROID_TOOLCHAIN_MACHINE_NAME}-gcc)
+            set (CMAKE_C_COMPILER ${CMAKE_BINARY_DIR}/${ANDROID_TOOLCHAIN_MACHINE_NAME}-gcc CACHE PATH "C compiler")
+            execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${ANDROID_TOOLCHAIN_MACHINE_NAME}-g++)
+            set (CMAKE_CXX_COMPILER ${CMAKE_BINARY_DIR}/${ANDROID_TOOLCHAIN_MACHINE_NAME}-g++ CACHE PATH "C++ compiler")
+        endif ()
+    else ()
+        # To avoid repeating the code to instruct CMake to fallback to use the actual Android compiler toolchain below, we raise this as an error instead of warning
+        message (FATAL_ERROR "ccache may not have been installed on this host system. "
+            "This is required to enable ccache support for Android compiler toolchain. "
+            "In order to rectify this, install ccache software package first or do not set the USE_CCACHE environment variable.")
+    endif ()
+    if (NOT $ENV{PATH} MATCHES ${PATH})
+        message (FATAL_ERROR "The bin directory containing the compiler toolchain (${PATH}) has not been added in the PATH environment variable. "
+            "This is required to enable ccache support for Android compiler toolchain.")
+    endif ()
  else()
   if( ANDROID_COMPILER_IS_CLANG )
    set( CMAKE_C_COMPILER   "${ANDROID_CLANG_TOOLCHAIN_ROOT}/bin/${_clang_name}${TOOL_OS_SUFFIX}"   CACHE PATH "C compiler")

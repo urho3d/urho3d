@@ -32,6 +32,6 @@ cmake -E touch "%BUILD%\CMakeCache.txt"
 
 goto :eof
 :error
-echo An error has occured, build tree has to be provided as the first argument OR call this script in a build tree itself
+echo Usage: %~nx0 \path\to\build-tree
 exit /B 1
 :eof

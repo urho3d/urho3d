@@ -45,8 +45,28 @@ endif ()
 if (CMAKE_HOST_WIN32)
     set (TOOL_EXT .bat)
 endif ()
-set (CMAKE_C_COMPILER   ${EMSCRIPTEN_ROOT_PATH}/emcc${TOOL_EXT}     CACHE PATH "C compiler")
-set (CMAKE_CXX_COMPILER ${EMSCRIPTEN_ROOT_PATH}/em++${TOOL_EXT}     CACHE PATH "C++ compiler")
+set (COMPILER_PATH ${EMSCRIPTEN_ROOT_PATH})
+# For now enable ccache support only when the CCACHE_CPP2 env var is also set to 1, until Emscripten has fixed https://github.com/kripken/emscripten/issues/3365
+# This ccache's option tells ccache to fallback to use original input source file instead of preprocessed source file which Emscripten does not support currently
+if ("$ENV{USE_CCACHE}" AND NOT CMAKE_HOST_WIN32 AND "$ENV{CCACHE_CPP2}")
+    if (NOT $ENV{PATH} MATCHES ${EMSCRIPTEN_ROOT_PATH})
+        message (FATAL_ERROR "The bin directory containing the compiler toolchain (${EMSCRIPTEN_ROOT_PATH}) has not been added in the PATH environment variable. "
+            "This is required to enable ccache support for Emscripten compiler toolchain.")
+    endif ()
+    execute_process (COMMAND which ccache RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (EXIT_CODE EQUAL 0)
+        foreach (name emcc em++)
+            execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${name})
+        endforeach ()
+        set (COMPILER_PATH ${CMAKE_BINARY_DIR})
+    else ()
+        message (WARNING "ccache may not have been installed on this host system. "
+            "This is required to enable ccache support for Emscripten compiler toolchain. CMake has been configured to use the actual compiler toolchain instead of ccache. "
+            "In order to rectify this, the build tree must be regenerated after installing ccache.")
+    endif ()
+endif ()
+set (CMAKE_C_COMPILER   ${COMPILER_PATH}/emcc${TOOL_EXT}            CACHE PATH "C compiler")
+set (CMAKE_CXX_COMPILER ${COMPILER_PATH}/em++${TOOL_EXT}            CACHE PATH "C++ compiler")
 set (CMAKE_AR           ${EMSCRIPTEN_ROOT_PATH}/emar${TOOL_EXT}     CACHE PATH "archive")
 set (CMAKE_RANLIB       ${EMSCRIPTEN_ROOT_PATH}/emranlib${TOOL_EXT} CACHE PATH "ranlib")
 # Specific to Emscripten

@@ -59,6 +59,6 @@ cmake -E make_directory %BUILD% && cmake -E chdir %BUILD% cmake %OPTS% %* %SOURC
 
 goto :eof
 :error
-echo An error has occured, build tree has to be provided as the first argument OR call this script in a build tree itself
+echo Usage: %~nx0 \path\to\build-tree [build-options]
 exit /B 1
 :eof

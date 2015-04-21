@@ -89,7 +89,7 @@ post_cmake() {
                 #
                 xmlstarlet ed -P -L \
                     -u "/cproject/storageModule/cconfiguration/storageModule/pathentry[@kind = 'src']/@path" -v "" \
-                    -s "/cproject/storageModule/cconfiguration/storageModule/pathentry[@kind = 'src']" -t attr -n "excluding" -v "[Build]/|[Subprojects]/|[Targets]/" \
+                    -s "/cproject/storageModule/cconfiguration/storageModule/pathentry[@kind = 'src']" -t attr -n "excluding" -v "[Build]/|[Subprojects]/|[Targets]/|Docs/AngelScriptAPI.h" \
                     -u "/cproject/storageModule/cconfiguration/storageModule/pathentry[@kind = 'out']/@path" -v "[Build]" \
                     -u "/cproject/storageModule/cconfiguration/storageModule/pathentry[@kind = 'out']/@excluding" -x "substring-after(., '[Source directory]/|')" \
                     "$SOURCE"/.cproject

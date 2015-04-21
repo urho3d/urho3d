@@ -426,7 +426,7 @@ void Run(const Vector<String>& arguments)
         PrintLine("Reading file " + inFile);
         scene_ = aiImportFile(GetNativePath(inFile).CString(), flags);
         if (!scene_)
-            ErrorExit("Could not open or parse input file " + inFile);
+            ErrorExit("Could not open or parse input file " + inFile + ": " + String(aiGetErrorString()));
         
         if (verboseLog_)
             Assimp::DefaultLogger::kill();

@@ -85,7 +85,12 @@ task :cmake do
     end
   }
   build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
-  system "./#{script}#{ENV['OS'] ? '.bat' : '.sh'} \"#{build_tree}\" #{build_options}" or abort
+  unless ENV['OS']
+    ccache_envvar = ENV['CCACHE_SLOPPINESS'] ? '' : 'CCACHE_SLOPPINESS=pch_defines,time_macros'   # Only attempt to do the right thing when user hasn't done it
+    ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CCACHE_COMPRESS']
+    ccache_envvar = "#{ccache_envvar} CCACHE_CPP2=1" unless ENV['CCACHE_CPP2'] || platform != 'emscripten'  # TODO: Temporary workaround for ccache support on Emscripten
+  end
+  system "#{ccache_envvar} ./#{script}#{ENV['OS'] ? '.bat' : '.sh'} \"#{build_tree}\" #{build_options}" or abort
 end
 
 # Usage: rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [numjobs=n] [clean_first] [unfilter]
@@ -117,7 +122,11 @@ task :make do
     end
   }
   build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
-  ccache_envvar = ''
+  unless ENV['OS']
+    ccache_envvar = ENV['CCACHE_SLOPPINESS'] ? '' : 'CCACHE_SLOPPINESS=pch_defines,time_macros'   # Only attempt to do the right thing when user hasn't done it
+    ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CCACHE_COMPRESS']
+    ccache_envvar = "#{ccache_envvar} CCACHE_CPP2=1" unless ENV['CCACHE_CPP2'] || platform != 'emscripten'  # TODO: Temporary workaround for ccache support on Emscripten
+  end
   if !Dir.glob("#{build_tree}/*.xcodeproj").empty?
     # xcodebuild
     if !numjobs.empty?
@@ -129,20 +138,23 @@ task :make do
     numjobs = ":#{numjobs}" unless numjobs.empty?
     build_options = "/maxcpucount#{numjobs}#{build_options}"
     filter = unfilter ? '' : '/nologo /verbosity:minimal'
+  elsif !Dir.glob("#{build_tree}/*.ninja").empty?
+    # ninja
+    if !numjobs.empty?
+      build_options = "-j#{numjobs}#{build_options}"
+    end
+    filter = ''
   else
     # make
-    ccache_envvar = 'CCACHE_SLOPPINESS=pch_defines,time_macros' unless ENV['CCACHE_SLOPPINESS']   # Only attempt to do the right thing when user hasn't done it
-    ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CACHE_COMPRESS']
     if numjobs.empty?
       case RUBY_PLATFORM
       when /linux/
-        numjobs = `grep -c processor /proc/cpuinfo`.chomp
+        numjobs = (platform == 'emscripten' ? `grep 'core id' /proc/cpuinfo |sort |uniq |wc -l` : `grep -c processor /proc/cpuinfo`).chomp
       when /darwin/
-        numjobs = `sysctl -n hw.logicalcpu`.chomp
+        numjobs = `sysctl -n hw.#{platform == 'emscripten' ? 'physical' : 'logical'}cpu`.chomp
       when /win32|mingw|mswin/
         require 'win32ole'
-        WIN32OLE.connect('winmgmts://').ExecQuery('select NumberOfLogicalProcessors from Win32_ComputerSystem').each { |out| numjobs = out.NumberOfLogicalProcessors }
-        ccache_envvar = ''    # Extra env var is harmless even when ccache is not in use, well, except on Windows host system
+        WIN32OLE.connect('winmgmts://').ExecQuery("select NumberOf#{platform == 'emscripten' ? '' : 'Logical'}Processors from Win32_ComputerSystem").each { |out| numjobs = platform == 'emscripten' ? out.NumberOfProcessors : out.NumberOfLogicalProcessors }
       else
         numjobs = 1
       end
@@ -194,9 +206,7 @@ task :ci do
   $build_options = "-DWIN32=#{ENV['WINDOWS']}" if ENV['WINDOWS']
   $build_options = "#{$build_options} -DANDROID_ABI=#{ENV['ABI']}" if ENV['ABI']
   $build_options = "#{$build_options} -DANDROID_NATIVE_API_LEVEL=#{ENV['API']}" if ENV['API']
-  ['URHO3D_64BIT', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
-    $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var]
-  }
+  ['URHO3D_64BIT', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TEST_TIMEOUT', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var| $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var] }
   if ENV['XCODE']
     # xcodebuild
     xcode_ci
@@ -262,7 +272,7 @@ task :ci_rebase do
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
   baseline = ENV['RELEASE_TAG'] || "origin/#{ENV['TRAVIS_BRANCH']}"
   enable = /\[ci rebase\]/ =~ ENV['COMMIT_MESSAGE']
-  [ 'Android-CI', 'RPI-CI', 'Emscripten-CI', 'OSX-CI' ].each { |ci| ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git rebase #{baseline} #{ci_branch} && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; elif [ #{enable} ]; then git checkout -b #{ci_branch} #{ENV['TRAVIS_BRANCH']} && rm .travis.yml && wget -q https://raw.githubusercontent.com/#{ENV['TRAVIS_REPO_SLUG']}/#{ci}/.travis.yml && cat <<EOF >README.md && git add -A . && git commit -m 'For Travis CI - switch CI build to use #{ci.split('-').first} build environment.' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; fi
+  ['Android-CI', 'RPI-CI', 'OSX-CI', 'Emscripten-CI'].each { |ci| ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git rebase #{baseline} #{ci_branch} && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; elif [ #{enable} ]; then git checkout -b #{ci_branch} #{ENV['TRAVIS_BRANCH']} && rm .travis.yml && wget -q https://raw.githubusercontent.com/#{ENV['TRAVIS_REPO_SLUG']}/#{ci}/.travis.yml && cat <<EOF >README.md && git add -A . && git commit -m 'For Travis CI - switch CI build to use #{ci.split('-').first} build environment.' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; fi
 This is a mirror branch which is constantly being \"rebased\" from #{ENV['TRAVIS_BRANCH']} branch. Please DO NOT checkout from this mirror branch! The purpose of this mirror branch is to perform CI build using #{ci.split('-').first} build environment on Travis-CI.org. See #{ENV['TRAVIS_BRANCH']} branch for CI build result using Ubuntu Linux build environment.
 
 [![Build Status](https://travis-ci.org/#{ENV['TRAVIS_REPO_SLUG']}.png?branch=#{ci_branch})](https://travis-ci.org/#{ENV['TRAVIS_REPO_SLUG']}?branch=#{ci_branch})
@@ -313,7 +323,8 @@ task :ci_package_upload do
     if ENV['URHO3D_USE_LIB64_RPM']
       system "cd ../Build && cmake . -DURHO3D_USE_LIB64_RPM=#{ENV['URHO3D_USE_LIB64_RPM']}" or abort 'Failed to reconfigure to generate 64-bit RPM package'
     end
-    system 'cd ../Build && make package' or abort 'Failed to make binary package'
+    wrapper = ENV['CI'] && ENV['URHO3D_64BIT'] ? 'setarch i686' : ''
+    system "cd ../Build && #{wrapper} make package" or abort 'Failed to make binary package'
   end
   # Determine the upload location
   setup_digital_keys
@@ -433,7 +444,7 @@ def makefile_ci
   end
   system "./cmake_generic.sh ../Build -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
-      android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
+    android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
   end
   test = $testing == 1 ? '&& make test' : ''
   system "cd ../Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'

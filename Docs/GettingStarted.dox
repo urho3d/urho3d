@@ -4,6 +4,8 @@ namespace Urho3D
 /**
 \page Building Building Urho3D
 
+\tableofcontents
+
 \section Building_Prerequisites Building prerequisites
 
 Although all required third-party libraries are included as source code, there are system-level dependencies that must be satisfied before Urho3D can be built successfully:
@@ -62,14 +64,14 @@ Our CMakeLists.txt files are designed to work with most of the generators suppor
 
 \section Build_Options Build options
 
-A number of build options can be defined when invoking the build scripts or when configurating the project interactively using cmake-gui. To use one of these build options on the command line interface, pass it in this format "-DOPTION=VALUE" without the quotes.\n
-|Build Option         |V|Description          |
-|---------------------|-|---------------------|
+A number of build options can be defined when invoking the build scripts or when configurating the project interactively using cmake-gui. To use one of these build options on the command line interface, pass it in this format "-DOPTION=VALUE" without the quotes. Most of the build options are boolean variables where setting their values to 0 means disabling a feature or setting an option to false, while 1 means enabling a feature or setting an option to true. The table below shows all the available build options and their default values. Non-boolean build options generally do not have any default values and are marked with '-' in the table. However, a few build options marked with '*' have their default values set differently based on the value of other variables or external factors.
+|Build Option         |Value|Description          |
+|---------------------|-----|---------------------|
 |ANDROID              |0|Configure project using Android cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only)|
 |RPI                  |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only)|
 |WIN32                |0|Configure project using MinGW cross-compiler toolchain (cmake_generic.sh only); also applicable when cross-compiling 64-bit Windows platform|
 |IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only)|
-|URHO3D_64BIT         |*|Enable 64bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system|
+|URHO3D_64BIT         |*|Enable 64-bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system|
 |URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
 |URHO3D_LUA           |0|Enable Lua scripting support|
 |URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)|
@@ -97,29 +99,29 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_STATIC_RUNTIME|0|Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
 |URHO3D_WIN32_CONSOLE |0|Use console main() as entry point when setting up Windows executable targets (Windows platform only)|
 |URHO3D_MACOSX_BUNDLE |0|Use MACOSX_BUNDLE when setting up Mac OS X executable targets (Xcode native build only)|
-|URHO3D_LIB_TYPE      |*|Specify Urho3D library type, possible values are STATIC (\*default) and SHARED|
+|URHO3D_LIB_TYPE      |STATIC|Specify Urho3D library type, possible values are STATIC (default) and SHARED|
 |URHO3D_SCP_TO_TARGET |-|Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
 |URHO3D_USE_LIB64_RPM |0|Enable 64-bit RPM CPack generator using /usr/lib64 and disable all other generators (Debian-based host only, which uses /usr/lib by default)|
 |URHO3D_USE_LIB_DEB   |0|Enable 64-bit DEB CPack generator using /usr/lib and disable all other generators (Redhat-based host only, which uses /usr/lib64 by default)|
 |URHO3D_HOME          |-|Path to Urho3D build tree or SDK installation location (external project only)|
-|CMAKE_BUILD_TYPE     |*|Specify CMake build configuration (single-configuration generator only), possible values are Release (\*default), RelWithDebInfo, and Debug|
+|CMAKE_BUILD_TYPE     |Release|Specify CMake build configuration (single-configuration generator only), possible values are Release (default), RelWithDebInfo, and Debug|
 |CMAKE_INSTALL_PREFIX |*|Install path prefix, prepended onto install directories; default to 'c:/Program Files/Urho3D' on Windows host and '/usr/local' on all other non-Windows hosts|
 |CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify Mac OS X deployment target (OSX build only); default to current running OS X if not specified, the minimum supported target is 10.5 due to constraint from SDL library|
 |IPHONEOS_DEPLOYMENT_TARGET|-|Specify iPhone OS deployment target (iOS build only); default to latest installed iOS SDK if not specified, the minimum spported target is 3.0 due to constraint from SDL library|
-|ANDROID_ABI          |*|Specify target ABI (Android build only), possible values are arm64-v8a, armeabi, armeabi-v6 with VFP, armeabi-v7a (\*default), armeabi-v7a with NEON, armeabi-v7a with VFPV3, mips, mips64, x86, and x86_64|
+|ANDROID_ABI          |armeabi-v7a|Specify target ABI (Android build only), possible values are arm64-v8a, armeabi, armeabi-v6 with VFP, armeabi-v7a (default), armeabi-v7a with NEON, armeabi-v7a with VFPV3, mips, mips64, x86, and x86_64|
 |ANDROID_NATIVE_API_LEVEL|*|Specify target API level (Android build only), possible values depends on installed NDK version, default to API level 12 on 32-bit ABIs, default to API level 21 on 64-bit ABIs|
 |ANDROID_NDK_GDB      |0|Enable ndk-gdb support (Android Debug build only)|
 |MINGW_PREFIX         |-|Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)|
 |MINGW_SYSROOT        |-|Path to MinGW system root (MinGW cross-compiling build only)|
 |RPI_PREFIX           |-|Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)|
 |RPI_SYSROOT          |-|Path to Raspberry Pi system root (RPI cross-compiling build only)|
-|RPI_ABI              |*|Specify target ABI (RPI build only), possible values are armeabi-v6 (\*default for RPI 1), armeabi-v7a (\*default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4|
+|RPI_ABI              |*|Specify target ABI (RPI build only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4|
 |EMSCRIPTEN_ROOT_PATH |-|Root path to Emscripten cross-compiler tools (Emscripten cross-compiling build only)|
 |EMSCRIPTEN_SYSROOT   |-|Path to Emscripten system root (Emscripten cross-compiling build only)|
 |EMSCRIPTEN_ALLOW_MEMORY_GROWTH|0|Enable memory growing based on application demand (Emscripten cross-compiling build only)|
-|EMSCRIPTEN_TOTAL_MEMORY|*|Specify the total size of memory to be used (Emscripten cross-compiling build only); default to 32MB, this option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH=1|
+|EMSCRIPTEN_TOTAL_MEMORY|*|Specify the total size of memory to be used (Emscripten cross-compiling build only); default to 33554432 (32MB), this option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH=1|
 |EMSCRIPTEN_SHARE_DATA|0|Enable sharing data file support (Emscripten cross-compiling build only)|
-|EMSCRIPTEN_EMRUN_BROWSER|*|Specify the particular browser to be spawned by emrun during testing (Emscripten cross-compiling build only), default to firefox|
+|EMSCRIPTEN_EMRUN_BROWSER|firefox|Specify the particular browser to be spawned by emrun during testing (Emscripten cross-compiling build only), use 'emrun --list_browsers' command to get the list of possible values|
 
 Note that the specified build option values are cached by CMake after the initial configuration step. The cached values will be used by CMake in the subsequent configuration. The same build options are not required to be specified again and again. But once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly resetting it. That is, simply by not passing the corresponding build option would not revert it back to its default. One way to revert all the build options to their default values is by clearing the CMake cache by executing cmake_clean.bat or cmake_clean.sh with the location of the build tree as the first argument or by executing it in the build tree itself.
 
@@ -278,14 +280,26 @@ OpenGL does not depend on a separate shader compiler DLL.
 
 \section Using_ccache Using ccache
 
-ccache is a compiler cache software available on Linux and Mac OS X host systems. It speeds up the build by bypassing the actual compilation and reusing the result from previous compilation when the cache is hit. In order for this to work correctly when building/using Urho3D library with GCC/Clang precompiled header enabled, the following environment variable must be set:
+ccache is a compiler cache software available on Linux and Mac OS X host systems. It speeds up the build by bypassing the actual compilation and reusing the result from previous compilation when the cache is hit. As such, this is optional in the build process. In order to enable ccache support and make it work correctly when building/using Urho3D library with GCC/Clang precompiled header enabled, the following environment variables must be set:
 \verbatim
+USE_CCACHE=1
 CCACHE_SLOPPINESS=pch_defines,time_macros
 \endverbatim
 
-Failure to do so would cause the precompiled header cannot be used by ccache. When ccache is setup correctly and with more hits than misses then even clean build can be done as fast as incremental build.
+Failure to do so would cause the precompiled header cannot be used by ccache. When ccache is setup correctly and with more hits than misses then even clean build can be done as fast as incremental build. The ccache support is available for native compiler toolchains as well as all cross-compiler toolchains supported by Urho3D.
+
+> There are some caveats with ccache support on Emscripten compiler toolchain. At the moment to enable ccache support for Emscripten, you also need to set 'CCACHE_CPP2' environment variable to 1 (see Emscripten issue [#3365](https://github.com/kripken/emscripten/issues/3365) for more detail).
+
+You may also want to set 'CCACHE_COMPRESS' environment variable to 1 to enable the compression of the cached objects. It is a trade-off between cache size and build time.
+
+Ensure the ccache symlinks directory is being added as the first entry in the 'PATH' environment variable so the symlinks of the compiler toolchain is being found first by CMake rather than the actual compiler toolchain. This is especially important for native build. Usually the 'PATH' environment variable has been set correctly for ccache in RedHat-based host system such as Fedora, but it is not the case in Debian-based host system such as Ubuntu nor in Mac OS X host system with homebrew's ccache installation. For the latter case, use "whereis -b ccache" or "brew info ccache" to find out where your ccache symlinks directory is and adjust the 'PATH' environment variable accordingly.
+
+Note that these environment variables are used by ccache itself and not by our CMake build rules, so they must remain set in the host system not only while generating the initial project file using CMake but also while building the project later.
+
 
 \page Running Running Urho3D player application
+
+\tableofcontents
 
 The Urho3D player application in the bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic, and therefore must be supplied with the name of the application script file it should run:
 
@@ -420,6 +434,8 @@ F2          Toggle debug HUD
 
 
 \page UsingLibrary Using Urho3D as external library
+
+\tableofcontents
 
 This page shows how to create a new C++ project linking against Urho3D library as external library. There are two approaches to do this. The first approach uses Urho3D library directly from the Urho3D project build tree. The second approach uses Urho3D SDK installation. It is imperative to clean the CMake cache when changing from one approach to the other. You should also clean the cache when you change the path in the URHO3D_HOME environment variable.
 
@@ -660,6 +676,8 @@ For more details related to the C++ coding style, see also \ref CodingConvention
 
 
 \page EditorInstructions Editor instructions
+
+\tableofcontents
 
 The Urho3D editor is a script application that can be run with the Urho3D player application. To start, execute any of these commands: (in the bin directory) Editor.bat, Editor.sh or Urho3DPlayer Scripts/Editor.as
 
