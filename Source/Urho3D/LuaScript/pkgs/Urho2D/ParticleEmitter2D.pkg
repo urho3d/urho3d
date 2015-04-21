@@ -4,10 +4,14 @@ class ParticleEmitter2D : public Drawable2D
 {    
 public:
     void SetEffect(ParticleEffect2D* effect);
-    ParticleEffect2D* GetEffect() const;
     void SetSprite(Sprite2D* sprite);
+    void SetBlendMode(BlendMode blendMode);
+
+    ParticleEffect2D* GetEffect() const;
     Sprite2D* GetSprite() const;
+    BlendMode GetBlendMode() const;
 
     tolua_property__get_set ParticleEffect2D* effect;
     tolua_property__get_set Sprite2D* sprite;
+    tolua_property__get_set BlendMode blendMode;
 };

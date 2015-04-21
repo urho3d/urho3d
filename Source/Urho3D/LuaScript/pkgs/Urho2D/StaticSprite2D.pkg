@@ -4,6 +4,7 @@ class StaticSprite2D : public Drawable2D
 {    
 public:
     void SetSprite(Sprite2D* sprite);
+    void SetBlendMode(BlendMode mode);
     void SetFlip(bool flipX, bool flipY);
     void SetFlipX(bool flipX);
     void SetFlipY(bool flipY);
@@ -11,20 +12,25 @@ public:
     void SetAlpha(float alpha);
     void SetUseHotSpot(bool useHotSpot);
     void SetHotSpot(const Vector2& hotspot);
+    void SetCustomMaterial(Material* customMaterial);
 
     Sprite2D* GetSprite() const;
+    BlendMode GetBlendMode() const;
     bool GetFlipX() const;
     bool GetFlipY() const;
     const Color& GetColor() const;
     float GetAlpha() const;
     bool GetUseHotSpot() const;
     const Vector2& GetHotSpot() const;
+    Material* GetCustomMaterial() const;
     
     tolua_property__get_set Sprite2D* sprite;
+    tolua_property__get_set BlendMode blendMode;
     tolua_property__get_set bool flipX;
     tolua_property__get_set bool flipY;
     tolua_property__get_set Color& color;
     tolua_property__get_set float alpha;
     tolua_property__get_set bool useHotSpot;
     tolua_property__get_set Vector2 hotSpot;
+    tolua_property__get_set Material* customMaterial;
 };

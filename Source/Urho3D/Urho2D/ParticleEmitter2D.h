@@ -92,6 +92,8 @@ public:
     void SetEffect(ParticleEffect2D* effect);
     /// Set sprite.
     void SetSprite(Sprite2D* sprite);
+    /// Set blend mode.
+    void SetBlendMode(BlendMode blendMode);
     /// Set max particles.
     void SetMaxParticles(unsigned maxParticles);
 
@@ -99,6 +101,8 @@ public:
     ParticleEffect2D* GetEffect() const;
     /// Return sprite.
     Sprite2D* GetSprite() const;
+    /// Return blend mode.
+    BlendMode GetBlendMode() const { return blendMode_; }
     /// Return max particles.
     unsigned GetMaxParticles() const { return particles_.Size(); }
 
@@ -116,8 +120,12 @@ private:
     virtual void OnNodeSet(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    /// Update vertices.
-    virtual void UpdateVertices();
+    /// Handle draw order changed.
+    virtual void OnDrawOrderChanged();
+    /// Update source batches.
+    virtual void UpdateSourceBatches();
+    /// Update material.
+    void UpdateMaterial();
     /// Handle scene post update.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Update.
@@ -131,6 +139,8 @@ private:
     SharedPtr<ParticleEffect2D> effect_;
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
+    /// Blend mode.
+    BlendMode blendMode_;
     /// Num particles.
     int numParticles_;
     /// Emission time.

@@ -1838,19 +1838,13 @@ Methods:
 
 - void SetLayer(int layer)
 - void SetOrderInLayer(int orderInLayer)
-- void SetTexture(Texture2D* texture)
-- void SetBlendMode(BlendMode mode)
 - int GetLayer() const
 - int GetOrderInLayer() const
-- Texture2D* GetTexture() const
-- BlendMode GetBlendMode() const
 
 Properties:
 
 - int layer
 - int orderInLayer
-- Texture2D* texture
-- BlendMode blendMode
 
 <a name="Class_DropDownList"></a>
 ### DropDownList : Menu
@@ -3770,14 +3764,17 @@ Properties:
 Methods:
 
 - void SetEffect(ParticleEffect2D* effect)
-- ParticleEffect2D* GetEffect() const
 - void SetSprite(Sprite2D* sprite)
+- void SetBlendMode(BlendMode blendMode)
+- ParticleEffect2D* GetEffect() const
 - Sprite2D* GetSprite() const
+- BlendMode GetBlendMode() const
 
 Properties:
 
 - ParticleEffect2D* effect
 - Sprite2D* sprite
+- BlendMode blendMode
 
 <a name="Class_Pass"></a>
 ### Pass : RefCounted
@@ -5232,6 +5229,7 @@ Properties:
 Methods:
 
 - void SetSprite(Sprite2D* sprite)
+- void SetBlendMode(BlendMode mode)
 - void SetFlip(bool flipX, bool flipY)
 - void SetFlipX(bool flipX)
 - void SetFlipY(bool flipY)
@@ -5239,23 +5237,28 @@ Methods:
 - void SetAlpha(float alpha)
 - void SetUseHotSpot(bool useHotSpot)
 - void SetHotSpot(const Vector2& hotspot)
+- void SetCustomMaterial(Material* customMaterial)
 - Sprite2D* GetSprite() const
+- BlendMode GetBlendMode() const
 - bool GetFlipX() const
 - bool GetFlipY() const
 - const Color& GetColor() const
 - float GetAlpha() const
 - bool GetUseHotSpot() const
 - const Vector2& GetHotSpot() const
+- Material* GetCustomMaterial() const
 
 Properties:
 
 - Sprite2D* sprite
+- BlendMode blendMode
 - bool flipX
 - bool flipY
 - Color& color
 - float alpha
 - bool useHotSpot
 - Vector2 hotSpot
+- Material* customMaterial
 
 <a name="Class_StringHash"></a>
 ### StringHash

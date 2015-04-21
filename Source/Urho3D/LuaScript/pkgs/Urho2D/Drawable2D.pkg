@@ -9,16 +9,10 @@ class Drawable2D : public Drawable
 public:
     void SetLayer(int layer);
     void SetOrderInLayer(int orderInLayer);
-    void SetTexture(Texture2D* texture);
-    void SetBlendMode(BlendMode mode);
     
     int GetLayer() const;
     int GetOrderInLayer() const;
-    Texture2D* GetTexture() const;
-    BlendMode GetBlendMode() const;
     
     tolua_property__get_set int layer;
     tolua_property__get_set int orderInLayer;
-    tolua_property__get_set Texture2D* texture;
-    tolua_property__get_set BlendMode blendMode;
 };
