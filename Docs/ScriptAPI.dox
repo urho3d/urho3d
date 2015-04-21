@@ -705,17 +705,13 @@ namespace Urho3D
 
 ### AnimatedSprite2D
 - %Is %Enabled : bool
-- %Flip X : bool
-- %Flip Y : bool
-- %Color : Color
 - %Layer : int
 - %Order %in %Layer : int
 - %Blend %Mode : int
-- %Max %Lights : int
-- %View %Mask : int
-- %Light %Mask : int
-- %Shadow %Mask : int
-- %Zone %Mask : int
+- %Flip X : bool
+- %Flip Y : bool
+- %Color : Color
+- %Custom %material : ResourceRef
 - %Speed : float
 - %Animation %Set : ResourceRef
 - %Animation : String
@@ -1435,16 +1431,11 @@ namespace Urho3D
 
 ### ParticleEmitter2D
 - %Is %Enabled : bool
-- %Particle %Effect : ResourceRef
-- %Sprite : ResourceRef
 - %Layer : int
 - %Order %in %Layer : int
+- %Particle %Effect : ResourceRef
+- %Sprite : ResourceRef
 - %Blend %Mode : int
-- %Max %Lights : int
-- %View %Mask : int
-- %Light %Mask : int
-- %Shadow %Mask : int
-- %Zone %Mask : int
 
 ### PhysicsWorld
 - %Gravity : Vector3
@@ -1770,18 +1761,14 @@ namespace Urho3D
 
 ### StaticSprite2D
 - %Is %Enabled : bool
+- %Layer : int
+- %Order %in %Layer : int
 - %Sprite : ResourceRef
+- %Blend %Mode : int
 - %Flip X : bool
 - %Flip Y : bool
 - %Color : Color
-- %Layer : int
-- %Order %in %Layer : int
-- %Blend %Mode : int
-- %Max %Lights : int
-- %View %Mask : int
-- %Light %Mask : int
-- %Shadow %Mask : int
-- %Zone %Mask : int
+- %Custom %material : ResourceRef
 
 ### Terrain
 - %Is %Enabled : bool
@@ -2454,6 +2441,7 @@ Properties:
 - bool castShadows
 - String category // readonly
 - Color color
+- Material@ customMaterial
 - float drawDistance
 - bool enabled
 - bool enabledEffective // readonly
@@ -2479,7 +2467,6 @@ Properties:
 - float speed
 - Sprite2D@ sprite
 - bool temporary
-- Texture2D@ texture
 - StringHash type // readonly
 - String typeName // readonly
 - bool useHotSpot
@@ -5506,7 +5493,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - StringHash baseType // readonly
-- BlendMode blendMode
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -5529,7 +5515,6 @@ Properties:
 - float shadowDistance
 - uint shadowMask
 - bool temporary
-- Texture2D@ texture
 - StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
@@ -8054,7 +8039,6 @@ Properties:
 - uint shadowMask
 - Sprite2D@ sprite
 - bool temporary
-- Texture2D@ texture
 - StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
@@ -10525,6 +10509,7 @@ Properties:
 - bool castShadows
 - String category // readonly
 - Color color
+- Material@ customMaterial
 - float drawDistance
 - bool enabled
 - bool enabledEffective // readonly
@@ -10548,7 +10533,6 @@ Properties:
 - uint shadowMask
 - Sprite2D@ sprite
 - bool temporary
-- Texture2D@ texture
 - StringHash type // readonly
 - String typeName // readonly
 - bool useHotSpot

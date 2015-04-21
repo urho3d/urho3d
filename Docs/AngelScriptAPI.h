@@ -223,6 +223,7 @@ bool castShadows;
 /* readonly */
 String category;
 Color color;
+Material customMaterial;
 float drawDistance;
 bool enabled;
 /* readonly */
@@ -254,7 +255,6 @@ uint shadowMask;
 float speed;
 Sprite2D sprite;
 bool temporary;
-Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -3747,7 +3747,6 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
 StringHash baseType;
-BlendMode blendMode;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -3778,7 +3777,6 @@ int refs;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
-Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -6717,7 +6715,6 @@ float shadowDistance;
 uint shadowMask;
 Sprite2D sprite;
 bool temporary;
-Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -9524,6 +9521,7 @@ bool castShadows;
 /* readonly */
 String category;
 Color color;
+Material customMaterial;
 float drawDistance;
 bool enabled;
 /* readonly */
@@ -9553,7 +9551,6 @@ float shadowDistance;
 uint shadowMask;
 Sprite2D sprite;
 bool temporary;
-Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
