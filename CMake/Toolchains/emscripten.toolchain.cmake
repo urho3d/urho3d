@@ -48,7 +48,8 @@ endif ()
 set (COMPILER_PATH ${EMSCRIPTEN_ROOT_PATH})
 # For now enable ccache support only when the CCACHE_CPP2 env var is also set to 1, until Emscripten has fixed https://github.com/kripken/emscripten/issues/3365
 # This ccache's option tells ccache to fallback to use original input source file instead of preprocessed source file which Emscripten does not support currently
-if ("$ENV{USE_CCACHE}" AND NOT CMAKE_HOST_WIN32 AND "$ENV{CCACHE_CPP2}")
+# TODO: Remove this temporary workaround once Emscripten incoming has been pushed to master in its next release
+if ("$ENV{USE_CCACHE}" AND NOT CMAKE_HOST_WIN32 AND ("$ENV{CCACHE_CPP2}" OR EMSCRIPTEN_ROOT_PATH MATCHES /incoming$))
     if (NOT $ENV{PATH} MATCHES ${EMSCRIPTEN_ROOT_PATH})
         message (FATAL_ERROR "The bin directory containing the compiler toolchain (${EMSCRIPTEN_ROOT_PATH}) has not been added in the PATH environment variable. "
             "This is required to enable ccache support for Emscripten compiler toolchain.")
