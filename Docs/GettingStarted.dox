@@ -289,6 +289,7 @@ CCACHE_SLOPPINESS=pch_defines,time_macros
 Failure to do so would cause the precompiled header cannot be used by ccache. When ccache is setup correctly and with more hits than misses then even clean build can be done as fast as incremental build. The ccache support is available for native compiler toolchains as well as all cross-compiler toolchains supported by Urho3D.
 
 > There are some caveats with ccache support on Emscripten compiler toolchain. At the moment to enable ccache support for Emscripten, you also need to set 'CCACHE_CPP2' environment variable to 1 (see Emscripten issue [#3365](https://github.com/kripken/emscripten/issues/3365) for more detail).
+> This upstream issue has been closed. The issue is now fixed in the Emscripten incoming branch.
 
 You may also want to set 'CCACHE_COMPRESS' environment variable to 1 to enable the compression of the cached objects. It is a trade-off between cache size and build time.
 
