@@ -21,7 +21,7 @@
 #
 
 language: cpp
-cache: { directories: $HOME/.ccache }
+cache: ccache
 sudo: false
 addons: {apt: {packages: &native_deps [libasound2-dev]}}
 env:
@@ -109,8 +109,7 @@ before_script:
   # For some reason clang compiler toolchain installation in Travis CI VM does not have symlink in the ccache symlinks directory, so workaround it
   - if [ "$CC"  == "clang" ]; then ln -s $(which ccache) $HOME/clang && ln -s $(which ccache) $HOME/clang++ && export PATH=$HOME:$PATH; fi
   - ccache -z -M 100M
-script:
-  - rake ci
+script: rake ci
 before_cache: ccache -s
 after_success: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_rebase; fi
 
