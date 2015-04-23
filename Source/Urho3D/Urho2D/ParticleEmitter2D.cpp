@@ -20,13 +20,15 @@
 // THE SOFTWARE.
 //
 
-#include "../Graphics/Camera.h"
 #include "../Core/Context.h"
-#include "../Urho2D/ParticleEffect2D.h"
-#include "../Urho2D/ParticleEmitter2D.h"
+#include "../Graphics/Camera.h"
+#include "../Graphics/Material.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
+#include "../Urho2D/ParticleEffect2D.h"
+#include "../Urho2D/ParticleEmitter2D.h"
+#include "../Urho2D/Renderer2D.h"
 #include "../Urho2D/Sprite2D.h"
 
 #include "../DebugNew.h"
@@ -35,15 +37,18 @@ namespace Urho3D
 {
 
 extern const char* URHO2D_CATEGORY;
+extern const char* blendModeNames[];
 
 ParticleEmitter2D::ParticleEmitter2D(Context* context) :
     Drawable2D(context),
+    blendMode_(BLEND_ADDALPHA),
     numParticles_(0),
     emissionTime_(0.0f),
     emitParticleTime_(0.0f),
     boundingBoxMinPoint_(Vector3::ZERO),
     boundingBoxMaxPoint_(Vector3::ZERO)
 {
+    sourceBatches_.Resize(1);
 }
 
 ParticleEmitter2D::~ParticleEmitter2D()
@@ -55,9 +60,10 @@ void ParticleEmitter2D::RegisterObject(Context* context)
     context->RegisterFactory<ParticleEmitter2D>(URHO2D_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(Drawable2D);
     MIXED_ACCESSOR_ATTRIBUTE("Particle Effect", GetParticleEffectAttr, SetParticleEffectAttr, ResourceRef, ResourceRef(ParticleEffect2D::GetTypeStatic()), AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Sprite ", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()), AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Drawable2D);
+    ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
 }
 
 void ParticleEmitter2D::OnSetEnabled()
@@ -99,8 +105,20 @@ void ParticleEmitter2D::SetSprite(Sprite2D* sprite)
         return;
 
     sprite_ = sprite;
+    UpdateMaterial();
 
-    SetTexture(sprite_ ? sprite_->GetTexture() : 0);
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter2D::SetBlendMode(BlendMode blendMode)
+{
+    if (blendMode == blendMode_)
+        return;
+
+    blendMode_ = blendMode;
+    UpdateMaterial();
+
+    MarkNetworkUpdate();
 }
 
 void ParticleEmitter2D::SetMaxParticles(unsigned maxParticles)
@@ -108,7 +126,7 @@ void ParticleEmitter2D::SetMaxParticles(unsigned maxParticles)
     maxParticles = Max(maxParticles, 1);
 
     particles_.Resize(maxParticles);
-    vertices_.Reserve(maxParticles * 4);
+    sourceBatches_[0].vertices_.Reserve(maxParticles * 4);
 
     numParticles_ = Min(maxParticles, numParticles_);
 }
@@ -168,30 +186,44 @@ void ParticleEmitter2D::OnWorldBoundingBoxUpdate()
     worldBoundingBox_ = boundingBox_;
 }
 
-void ParticleEmitter2D::UpdateVertices()
+void ParticleEmitter2D::OnDrawOrderChanged()
 {
-    if (!verticesDirty_)
+    sourceBatches_[0].drawOrder_ = GetDrawOrder();
+}
+
+void ParticleEmitter2D::UpdateSourceBatches()
+{
+    if (!sourceBatchesDirty_)
         return;
 
-    vertices_.Clear();
+    Vector<Vertex2D>& vertices = sourceBatches_[0].vertices_;
+    vertices.Clear();
 
-    Texture2D* texture = GetTexture();
-    if (!texture)
+    if (!sprite_)
         return;
 
-    const IntRect& rectangle_ = sprite_->GetRectangle();
-    if (rectangle_.Width() == 0 || rectangle_.Height() == 0)
+    Rect textureRect;
+    if (!sprite_->GetTextureRectangle(textureRect))
         return;
 
+    /*
+    V1---------V2
+    |         / |
+    |       /   |
+    |     /     |
+    |   /       |
+    | /         |
+    V0---------V3
+    */
     Vertex2D vertex0;
     Vertex2D vertex1;
     Vertex2D vertex2;
     Vertex2D vertex3;
 
-    vertex0.uv_ = Vector2(0.0f, 1.0f);
-    vertex1.uv_ = Vector2(0.0f, 0.0f);
-    vertex2.uv_ = Vector2(1.0f, 0.0f);
-    vertex3.uv_ = Vector2(1.0f, 1.0f);
+    vertex0.uv_ = textureRect.min_;
+    vertex1.uv_ = Vector2(textureRect.min_.x_, textureRect.max_.y_);
+    vertex2.uv_ = textureRect.max_;
+    vertex3.uv_ = Vector2(textureRect.max_.x_, textureRect.min_.y_);
 
     for (int i = 0; i < numParticles_; ++i)
     {
@@ -210,13 +242,21 @@ void ParticleEmitter2D::UpdateVertices()
 
         vertex0.color_ = vertex1.color_ = vertex2.color_  = vertex3.color_ = p.color_.ToUInt();
 
-        vertices_.Push(vertex0);
-        vertices_.Push(vertex1);
-        vertices_.Push(vertex2);
-        vertices_.Push(vertex3);
+        vertices.Push(vertex0);
+        vertices.Push(vertex1);
+        vertices.Push(vertex2);
+        vertices.Push(vertex3);
     }
 
-    verticesDirty_ = false;
+    sourceBatchesDirty_ = false;
+}
+
+void ParticleEmitter2D::UpdateMaterial()
+{
+    if (sprite_)
+        sourceBatches_[0].material_ = renderer_->GetMaterial(sprite_->GetTexture(), blendMode_);
+    else
+        sourceBatches_[0].material_ = 0;
 }
 
 void ParticleEmitter2D::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
@@ -273,7 +313,7 @@ void ParticleEmitter2D::Update(float timeStep)
             emissionTime_ = Max(0.0f, emissionTime_ - timeStep);
     }
 
-    verticesDirty_ = true;
+    sourceBatchesDirty_ = true;
 
     OnMarkedDirty(node_);
 }

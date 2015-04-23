@@ -91,12 +91,10 @@ protected:
     virtual void OnNodeSet(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    /// Handle layer changed.
-    virtual void OnLayerChanged();
-    /// Handle blend mode changed.
-    virtual void OnBlendModeChanged();
+    /// Handle draw order changed.
+    virtual void OnDrawOrderChanged();
     /// Handle update vertices.
-    virtual void UpdateVertices();
+    virtual void UpdateSourceBatches();
     /// Handle flip changed.
     virtual void OnFlipChanged();
     /// Set animation.

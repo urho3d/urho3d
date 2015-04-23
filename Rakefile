@@ -190,12 +190,14 @@ task :ci do
   if ENV['CI'] && ENV['PACKAGE_UPLOAD'] && !ENV['RELEASE_TAG']
     system 'git fetch --unshallow' or abort 'Failed to unshallow cloned repository'
   end
-  # Packaging always use Release configuration (temporary workaround due to Travis-CI insufficient memory, also use Release configuration when CI build runs on a bad VM)
-  if ENV['PACKAGE_UPLOAD'] || ENV['BAD_VM']
+  # Clear ccache on demand
+  system 'ccache -C' if /\[ccache clear\]/ =~ ENV['COMMIT_MESSAGE']
+  # Packaging always use Release configuration
+  if ENV['PACKAGE_UPLOAD']
     $configuration = 'Release'
     $testing = 0
   else
-    $configuration = 'Debug'
+    $configuration = ENV['CI'] && ENV['USE_CCACHE'].to_i == 1 ? 'Release' : 'Debug'  # Aways use a same build configuration to keep ccache's cache size small when on Travis CI
     # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment and not iOS build; or Emscripten build environment are capable to run tests
     $testing = (ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && ENV['IOS'].to_i != 1) || ENV['EMSCRIPTEN'] ? 1 : 0
     if $testing
@@ -206,7 +208,7 @@ task :ci do
   $build_options = "-DWIN32=#{ENV['WINDOWS']}" if ENV['WINDOWS']
   $build_options = "#{$build_options} -DANDROID_ABI=#{ENV['ABI']}" if ENV['ABI']
   $build_options = "#{$build_options} -DANDROID_NATIVE_API_LEVEL=#{ENV['API']}" if ENV['API']
-  ['URHO3D_64BIT', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TEST_TIMEOUT', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var| $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var] }
+  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TEST_TIMEOUT', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var| $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var] }
   if ENV['XCODE']
     # xcodebuild
     xcode_ci
@@ -323,7 +325,7 @@ task :ci_package_upload do
     if ENV['URHO3D_USE_LIB64_RPM']
       system "cd ../Build && cmake . -DURHO3D_USE_LIB64_RPM=#{ENV['URHO3D_USE_LIB64_RPM']}" or abort 'Failed to reconfigure to generate 64-bit RPM package'
     end
-    wrapper = ENV['CI'] && ENV['URHO3D_64BIT'] ? 'setarch i686' : ''
+    wrapper = ENV['URHO3D_64BIT'] ? 'setarch i686' : ''
     system "cd ../Build && #{wrapper} make package" or abort 'Failed to make binary package'
   end
   # Determine the upload location
@@ -425,11 +427,6 @@ end
 
 def makefile_ci
   if ENV['WINDOWS'] && ENV['CI']
-    # MinGW package on Ubuntu 12.04 LTS does not come with d3dcompiler.h file which is required by our CI build with URHO3D_OPENGL=0.
-    # Temporarily workaround the problem by downloading the missing header from Ubuntu 14.04 LTS source package.
-    if ENV['URHO3D_OPENGL']
-      system "sudo wget -P $(echo |$MINGW_PREFIX-gcc -v -E - 2>&1 |grep -B 1 'End of search list' |head -1) http://bazaar.launchpad.net/~ubuntu-branches/ubuntu/trusty/mingw-w64/trusty/download/package-import%40ubuntu.com-20130624192537-vzn12bb7qd5w3iy8/d3dcompiler.h-20120402093420-bk10a737hzitlkgj-65/d3dcompiler.h" or abort 'Failed to download d3dcompiler.h header'
-    end
     # LuaJIT on MinGW build is not possible on Ubuntu 12.04 LTS as its GCC cross-compiler version is too old. Fallback to use Lua library instead.
     jit = ''
     amalg = ''
@@ -442,7 +439,7 @@ def makefile_ci
     jit = 'JIT'
     amalg = '-DURHO3D_LUAJIT_AMALG=1'
   end
-  system "./cmake_generic.sh ../Build -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
+  system "./cmake_generic.sh ../Build #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration}" or abort 'Failed to configure Urho3D library build'
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
     android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
   end
@@ -462,7 +459,7 @@ def makefile_ci
   # Make, deploy, and test run Android APK in an Android (virtual) device
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']
     system "echo '\nTest deploying and running Urho3D Samples APK...' && cd ../Build && android update project -p . -t $( android list target |grep android-$API |cut -d ' ' -f2 ) && ant debug" or abort 'Failed to make Urho3D Samples APK'
-    if android_wait_for_device ENV['CI'] ? 1 : 10 # minutes
+    if android_wait_for_device
       system "cd ../Build && ant -Dadb.device.arg='-s #{$specific_device}' installd" or abort 'Failed to deploy Urho3D Samples APK'
       android_test_run or abort 'Failed to test run Urho3D Samples APK'
     else
@@ -579,7 +576,7 @@ def xcode_ci
     amalg = '-DURHO3D_LUAJIT_AMALG=1'
     deployment_target = "-DCMAKE_OSX_DEPLOYMENT_TARGET=#{ENV['DEPLOYMENT_TARGET']}"
   end
-  system "./cmake_macosx.sh ../Build -DIOS=$IOS #{deployment_target} -DURHO3D_LIB_TYPE=$URHO3D_LIB_TYPE #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
+  system "./cmake_macosx.sh ../Build -DIOS=$IOS #{deployment_target} #{$build_options} -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
   xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj') or abort 'Failed to build or test Urho3D library'
   unless ENV['CI'] && ENV['IOS'] && ENV['PACKAGE_UPLOAD']   # Skip scaffolding test when packaging for iOS
     # Create a new project on the fly that uses newly built Urho3D library in the build tree

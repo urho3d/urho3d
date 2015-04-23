@@ -20,13 +20,13 @@
 // THE SOFTWARE.
 //
 
-#include "../Urho2D/AnimatedSprite2D.h"
-#include "../Urho2D/Animation2D.h"
-#include "../Urho2D/AnimationSet2D.h"
 #include "../Core/Context.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
+#include "../Urho2D/AnimatedSprite2D.h"
+#include "../Urho2D/Animation2D.h"
+#include "../Urho2D/AnimationSet2D.h"
 #include "../Urho2D/Sprite2D.h"
 #include "../Urho2D/StaticSprite2D.h"
 
@@ -221,7 +221,7 @@ void AnimatedSprite2D::OnWorldBoundingBoxUpdate()
     boundingBox_ = worldBoundingBox_.Transformed(node_->GetWorldTransform().Inverse());
 }
 
-void AnimatedSprite2D::OnLayerChanged()
+void AnimatedSprite2D::OnDrawOrderChanged()
 {
     for (unsigned i = 0; i < numTracks_; ++i)
     {
@@ -234,19 +234,6 @@ void AnimatedSprite2D::OnLayerChanged()
     }
 }
 
-void AnimatedSprite2D::OnBlendModeChanged()
-{
-    for (unsigned i = 0; i < numTracks_; ++i)
-    {
-        if (!trackNodes_[i])
-            continue;
-
-        StaticSprite2D* staticSprite = trackNodes_[i]->GetComponent<StaticSprite2D>();
-        if (staticSprite)
-            staticSprite->SetBlendMode(blendMode_);
-    }
-}
-
 void AnimatedSprite2D::OnFlipChanged()
 {
     for (unsigned i = 0; i < numTracks_; ++i)
@@ -255,17 +242,16 @@ void AnimatedSprite2D::OnFlipChanged()
             continue;
 
         StaticSprite2D* staticSprite = trackNodes_[i]->GetComponent<StaticSprite2D>();
-        if (staticSprite)
-            staticSprite->SetFlip(flipX_, flipY_);
+        staticSprite->SetFlip(flipX_, flipY_);
     }
 
     // For editor paused mode
     UpdateAnimation(0.0f);
 }
 
-void AnimatedSprite2D::UpdateVertices()
+void AnimatedSprite2D::UpdateSourceBatches()
 {
-    verticesDirty_ = false;
+    sourceBatchesDirty_ = false;
 }
 
 void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)

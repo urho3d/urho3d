@@ -44,6 +44,8 @@ public:
 
     /// Set sprite.
     void SetSprite(Sprite2D* sprite);
+    /// Set blend mode.
+    void SetBlendMode(BlendMode blendMode);
     /// Set flip.
     void SetFlip(bool flipX, bool flipY);
     /// Set flip X.
@@ -58,9 +60,13 @@ public:
     void SetUseHotSpot(bool useHotSpot);
     /// Set hot spot.
     void SetHotSpot(const Vector2& hotspot);
-    
+    /// Set custom material.
+    void SetCustomMaterial(Material* customMaterial);
+
     /// Return sprite.
     Sprite2D* GetSprite() const;
+    /// Return blend mode.
+    BlendMode GetBlendMode() const { return blendMode_; }
     /// Return flip X.
     bool GetFlipX() const { return flipX_; }
     /// Return flip Y.
@@ -73,22 +79,34 @@ public:
     bool GetUseHotSpot() const { return useHotSpot_; }
     /// Return hot spot.
     const Vector2& GetHotSpot() const { return hotSpot_; }
+    /// Return custom material.
+    Material* GetCustomMaterial() const;
 
     /// Set sprite attribute.
     void SetSpriteAttr(const ResourceRef& value);
     /// Return sprite attribute.
     ResourceRef GetSpriteAttr() const;
+    /// Set custom material attribute.
+    void SetCustomMaterialAttr(const ResourceRef& value);
+    /// Return custom material attribute.
+    ResourceRef GetCustomMaterialAttr() const;
 
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    /// Update vertices.
-    virtual void UpdateVertices();
+    /// Handle draw order changed.
+    virtual void OnDrawOrderChanged();
+    /// Update source batches.
+    virtual void UpdateSourceBatches();
     /// Handle flip changed.
     virtual void OnFlipChanged();
+    /// Update material.
+    void UpdateMaterial();
 
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
+    /// Blend mode.
+    BlendMode blendMode_;
     /// Flip X.
     bool flipX_;
     /// Flip Y.
@@ -99,6 +117,8 @@ protected:
     bool useHotSpot_;
     /// Hot spot.
     Vector2 hotSpot_;
+    /// Custom material.
+    SharedPtr<Material> customMaterial_;
 };
 
 }
