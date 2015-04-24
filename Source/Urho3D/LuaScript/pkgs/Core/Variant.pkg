@@ -124,7 +124,7 @@ class Variant
     tolua_outside void VariantSetMatrix4 @ SetMatrix4(const Matrix4& value);
 
     int GetInt() const;
-    int GetUInt() const;
+    unsigned GetUInt() const;
     StringHash GetStringHash();
     bool GetBool() const;
     float GetFloat() const;
