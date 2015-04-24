@@ -325,7 +325,7 @@ task :ci_package_upload do
     if ENV['URHO3D_USE_LIB64_RPM']
       system "cd ../Build && cmake . -DURHO3D_USE_LIB64_RPM=#{ENV['URHO3D_USE_LIB64_RPM']}" or abort 'Failed to reconfigure to generate 64-bit RPM package'
     end
-    wrapper = ENV['URHO3D_64BIT'] ? 'setarch i686' : ''
+    wrapper = ENV['URHO3D_64BIT'] || ENV['RPI'] ? 'setarch i686' : ''
     system "cd ../Build && #{wrapper} make package" or abort 'Failed to make binary package'
   end
   # Determine the upload location
