@@ -463,10 +463,16 @@ else ()
         endif ()
         if (EMSCRIPTEN)
             # Emscripten-specific setup
-            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
-            # Temporarily add the C++ standard explicitly because currently Emscripten does not consistently add the standard in its internall processing
-            # and this may cause compilation problem when precompiled header is involved (See https://github.com/kripken/emscripten/issues/3365 for more detail)
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option -std=c++03")
+            # Prior to version 1.31.4 emcc does not consistently add the cpp standard and remove Emscripten-specific compiler flags
+            # before passing on the work to the underlying LLVM/Clang compiler, this has resulted in preprocessing error when enabling the PCH and ccache
+            # (See https://github.com/kripken/emscripten/issues/3365 for more detail)
+            if (EMCC_VERSION VERSION_LESS 1.31.4)
+                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option -std=c++03")
+            else ()
+                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths")
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths")
+            endif ()
             set (CMAKE_C_FLAGS_RELEASE "-Oz -DNDEBUG")
             set (CMAKE_CXX_FLAGS_RELEASE "-Oz -DNDEBUG")
             if (DEFINED ENV{CI})
@@ -1107,8 +1113,11 @@ macro (setup_main_executable)
             get_filename_component (NAME ${FILE} NAME)
             list (APPEND PAK_NAMES ${NAME})
         endforeach ()
+        if (CMAKE_BUILD_TYPE STREQUAL Debug AND NOT EMCC_VERSION VERSION_LESS 1.31.4)
+            set (USE_METADATA --use-metadata)
+        endif ()
         add_custom_command (OUTPUT ${SHARED_RESOURCE_JS}.data
-            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache
+            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache ${USE_METADATA}
             DEPENDS RESOURCE_CHECK ${RESOURCE_PAKS}
             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMENT "Generating shared data file")
