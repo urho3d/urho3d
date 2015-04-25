@@ -173,15 +173,15 @@ public:
     void SetTextureAnisotropy(int level);
     /// Set texture filtering.
     void SetTextureFilterMode(TextureFilterMode mode);
-    /// Set texture quality level.
+    /// Set texture quality level. See the QUALITY constants in GraphicsDefs.h.
     void SetTextureQuality(int quality);
-    /// Set material quality level.
+    /// Set material quality level. See the QUALITY constants in GraphicsDefs.h.
     void SetMaterialQuality(int quality);
     /// Set shadows on/off.
     void SetDrawShadows(bool enable);
     /// Set shadow map resolution.
     void SetShadowMapSize(int size);
-    /// Set shadow quality (amount of samples and bit depth.)
+    /// Set shadow quality mode. See the SHADOWQUALITY constants in GraphicsDefs.h.
     void SetShadowQuality(int quality);
     /// Set reuse of shadow maps. Default is true. If disabled, also transparent geometry can be shadowed.
     void SetReuseShadowMaps(bool enable);

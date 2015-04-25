@@ -722,7 +722,7 @@ public:
     /// Return int or zero on type mismatch.
     int GetInt() const { return type_ == VAR_INT ? value_.int_ : 0; }
     /// Return unsigned int or zero on type mismatch.
-    int GetUInt() const { return type_ == VAR_INT ? (unsigned)value_.int_ : 0; }
+    unsigned GetUInt() const { return type_ == VAR_INT ? (unsigned)value_.int_ : 0; }
     /// Return StringHash or zero on type mismatch.
     StringHash GetStringHash() const { return StringHash(GetUInt()); }
     /// Return bool or false on type mismatch.
