@@ -6203,7 +6203,7 @@ Methods:
 - void SetMatrix3x4(const Matrix3x4& value)
 - void SetMatrix4(const Matrix4& value)
 - int GetInt() const
-- int GetUInt() const
+- unsigned GetUInt() const
 - StringHash GetStringHash()
 - bool GetBool() const
 - float GetFloat() const
