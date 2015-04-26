@@ -271,12 +271,9 @@ desc 'Rebase all CI mirror branches'
 task :ci_rebase do
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
   baseline = ENV['RELEASE_TAG'] || "origin/#{ENV['TRAVIS_BRANCH']}"
-  enable = /\[ci rebase\]/ =~ ENV['COMMIT_MESSAGE']
-  ['Android-CI', 'RPI-CI', 'OSX-CI', 'Emscripten-CI'].each { |ci| ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git rebase #{baseline} #{ci_branch} && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; elif [ #{enable} ]; then git checkout -b #{ci_branch} #{ENV['TRAVIS_BRANCH']} && rm .travis.yml && wget -q https://raw.githubusercontent.com/#{ENV['TRAVIS_REPO_SLUG']}/#{ci}/.travis.yml && cat <<EOF >README.md && git add -A . && git commit -m 'For Travis CI - switch CI build to use #{ci.split('-').first} build environment.' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; fi
-This is a mirror branch which is constantly being \"rebased\" from #{ENV['TRAVIS_BRANCH']} branch. Please DO NOT checkout from this mirror branch! The purpose of this mirror branch is to perform CI build using #{ci.split('-').first} build environment on Travis-CI.org. See #{ENV['TRAVIS_BRANCH']} branch for CI build result using Ubuntu Linux build environment.
-
-[![Build Status](https://travis-ci.org/#{ENV['TRAVIS_REPO_SLUG']}.png?branch=#{ci_branch})](https://travis-ci.org/#{ENV['TRAVIS_REPO_SLUG']}?branch=#{ci_branch})
-EOF" or abort "Failed to rebase #{ci_branch} mirror branch" }
+  rebase = /\[ci rebase\]/ =~ ENV['COMMIT_MESSAGE']
+  scan = /\[ci scan\]/ =~ ENV['COMMIT_MESSAGE'] || ENV['PACKAGE_UPLOAD']  # Limit the frequency of scanning
+  ['Coverity-Scan', 'Android-CI', 'RPI-CI', 'OSX-CI', 'Emscripten-CI'].each { |ci| ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then if [ #{scan} ] || [ #{/Scan/ =~ ci} ]; then git rebase #{baseline} #{ci_branch} && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; fi; elif [ #{rebase} ]; then git checkout -b #{ci_branch} #{ENV['TRAVIS_BRANCH']} && rm .travis.yml && wget -q https://raw.githubusercontent.com/#{ENV['TRAVIS_REPO_SLUG']}/#{ci}/.travis.yml && git add -A . && git commit -m 'For Travis CI - switch CI build to use #{ci.split('-').first} build environment.' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; fi" or abort "Failed to rebase #{ci_branch} mirror branch" }
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake ci_package_upload)
