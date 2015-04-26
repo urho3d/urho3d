@@ -1,0 +1,71 @@
+$#include "Graphics/IndexBuffer.h"
+
+class IndexBuffer : public Object
+{
+    IndexBuffer();
+    ~IndexBuffer();
+
+    void SetShadowed(bool enable);
+    bool SetSize(unsigned indexCount, bool largeIndices, bool dynamic = false);
+    tolua_outside bool IndexBufferSetData @ SetData(VectorBuffer& data);
+    tolua_outside bool IndexBufferSetDataRange @ SetDataRange(VectorBuffer& data, unsigned start, unsigned count, bool discard = false);
+    tolua_outside VectorBuffer IndexBufferGetData @ GetData();
+
+    bool IsShadowed() const;
+    bool IsDynamic() const;
+    unsigned GetIndexCount() const;
+    unsigned GetIndexSize() const;
+    
+    tolua_property__is_set bool shadowed;
+    tolua_readonly tolua_property__is_set bool dynamic;
+    tolua_readonly tolua_property__get_set unsigned indexCount;
+    tolua_readonly tolua_property__get_set unsigned indexSize;
+};
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_IndexBuffer_new00
+static int tolua_GraphicsLuaAPI_IndexBuffer_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<IndexBuffer>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_IndexBuffer_new00_local
+static int tolua_GraphicsLuaAPI_IndexBuffer_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<IndexBuffer>(tolua_S);
+}
+
+static bool IndexBufferSetData(IndexBuffer* dest, VectorBuffer& src)
+{
+    // Make sure there is enough data
+    if (dest->GetIndexCount() && src.GetSize() >= dest->GetIndexCount() * dest->GetIndexSize())
+        return dest->SetData(&src.GetBuffer()[0]);
+    else
+        return false;
+}
+
+static bool IndexBufferSetDataRange(IndexBuffer* dest, VectorBuffer& src, unsigned start, unsigned count, bool discard)
+{
+    // Make sure there is enough data
+    if (dest->GetIndexCount() && src.GetSize() >= count * dest->GetIndexSize())
+        return dest->SetDataRange(&src.GetBuffer()[0], start, count, discard);
+    else
+        return false;
+}
+
+static VectorBuffer IndexBufferGetData(IndexBuffer* src)
+{
+    VectorBuffer ret;
+    void* data = src->Lock(0, src->GetIndexCount(), false);
+
+    if (data)
+    {
+        ret.Write(data, src->GetIndexCount() * src->GetIndexSize());
+        ret.Seek(0);
+        src->Unlock();
+    }
+
+    return ret;
+}
+
+$}
