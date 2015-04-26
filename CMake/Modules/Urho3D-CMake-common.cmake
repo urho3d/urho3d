@@ -463,15 +463,13 @@ else ()
         endif ()
         if (EMSCRIPTEN)
             # Emscripten-specific setup
-            # Prior to version 1.31.4 emcc does not consistently add the cpp standard and remove Emscripten-specific compiler flags
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
+            # Prior to version 1.31.3 emcc does not consistently add the cpp standard and remove Emscripten-specific compiler flags
             # before passing on the work to the underlying LLVM/Clang compiler, this has resulted in preprocessing error when enabling the PCH and ccache
             # (See https://github.com/kripken/emscripten/issues/3365 for more detail)
-            if (EMCC_VERSION VERSION_LESS 1.31.4)
-                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
-                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option -std=c++03")
-            else ()
-                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths")
-                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths")
+            if (EMCC_VERSION VERSION_LESS 1.31.3)
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++03")
             endif ()
             set (CMAKE_C_FLAGS_RELEASE "-Oz -DNDEBUG")
             set (CMAKE_CXX_FLAGS_RELEASE "-Oz -DNDEBUG")

@@ -88,7 +88,6 @@ task :cmake do
   unless ENV['OS']
     ccache_envvar = ENV['CCACHE_SLOPPINESS'] ? '' : 'CCACHE_SLOPPINESS=pch_defines,time_macros'   # Only attempt to do the right thing when user hasn't done it
     ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CCACHE_COMPRESS']
-    ccache_envvar = "#{ccache_envvar} CCACHE_CPP2=1" unless ENV['CCACHE_CPP2'] || platform != 'emscripten'  # TODO: Temporary workaround for ccache support on Emscripten
   end
   system "#{ccache_envvar} ./#{script}#{ENV['OS'] ? '.bat' : '.sh'} \"#{build_tree}\" #{build_options}" or abort
 end
@@ -125,7 +124,6 @@ task :make do
   unless ENV['OS']
     ccache_envvar = ENV['CCACHE_SLOPPINESS'] ? '' : 'CCACHE_SLOPPINESS=pch_defines,time_macros'   # Only attempt to do the right thing when user hasn't done it
     ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CCACHE_COMPRESS']
-    ccache_envvar = "#{ccache_envvar} CCACHE_CPP2=1" unless ENV['CCACHE_CPP2'] || platform != 'emscripten'  # TODO: Temporary workaround for ccache support on Emscripten
   end
   if !Dir.glob("#{build_tree}/*.xcodeproj").empty?
     # xcodebuild
