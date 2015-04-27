@@ -3183,6 +3183,9 @@ Properties:
 
 Methods:
 
+- Model() (GC)
+- Model* new()
+- void delete()
 - Model* Clone(const String cloneName = String::EMPTY) const
 - void SetBoundingBox(const BoundingBox& box)
 - void SetNumGeometries(unsigned num)
@@ -3206,7 +3209,7 @@ Properties:
 
 - BoundingBox& boundingBox
 - Skeleton skeleton (readonly)
-- unsigned numGeometries (readonly)
+- unsigned numGeometries
 - unsigned numMorphs (readonly)
 
 <a name="Class_Navigable"></a>
@@ -7635,6 +7638,21 @@ Properties:
 - int LOG_INFO
 - int LOG_NONE
 - int LOG_WARNING
+- unsigned MASK_BLENDINDICES
+- unsigned MASK_BLENDWEIGHTS
+- unsigned MASK_COLOR
+- unsigned MASK_CUBETEXCOORD1
+- unsigned MASK_CUBETEXCOORD2
+- unsigned MASK_DEFAULT
+- unsigned MASK_INSTANCEMATRIX1
+- unsigned MASK_INSTANCEMATRIX2
+- unsigned MASK_INSTANCEMATRIX3
+- unsigned MASK_NONE
+- unsigned MASK_NORMAL
+- unsigned MASK_POSITION
+- unsigned MASK_TANGENT
+- unsigned MASK_TEXCOORD1
+- unsigned MASK_TEXCOORD2
 - int MAX_VERTEX_LIGHTS
 - int MOUSEB_LEFT
 - int MOUSEB_MIDDLE
