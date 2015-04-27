@@ -81,9 +81,11 @@ namespace Urho3D
 <a href="#Class_FocusParameters"><b>FocusParameters</b></a>
 <a href="#Class_Font"><b>Font</b></a>
 <a href="#Class_Frustum"><b>Frustum</b></a>
+<a href="#Class_Geometry"><b>Geometry</b></a>
 <a href="#Class_Graphics"><b>Graphics</b></a>
 <a href="#Class_HttpRequest"><b>HttpRequest</b></a>
 <a href="#Class_Image"><b>Image</b></a>
+<a href="#Class_IndexBuffer"><b>IndexBuffer</b></a>
 <a href="#Class_Input"><b>Input</b></a>
 <a href="#Class_IntRect"><b>IntRect</b></a>
 <a href="#Class_IntVector2"><b>IntVector2</b></a>
@@ -191,6 +193,7 @@ namespace Urho3D
 <a href="#Class_Vector3"><b>Vector3</b></a>
 <a href="#Class_Vector4"><b>Vector4</b></a>
 <a href="#Class_VectorBuffer"><b>VectorBuffer</b></a>
+<a href="#Class_VertexBuffer"><b>VertexBuffer</b></a>
 <a href="#Class_View3D"><b>View3D</b></a>
 <a href="#Class_Viewport"><b>Viewport</b></a>
 <a href="#Class_Window"><b>Window</b></a>
@@ -2184,6 +2187,44 @@ Methods:
 - Rect Projected(const Matrix4& transform) const
 - void UpdatePlanes()
 
+<a name="Class_Geometry"></a>
+### Geometry : Object
+
+Methods:
+
+- Geometry() (GC)
+- Geometry* new()
+- void delete()
+- bool SetNumVertexBuffers(unsigned num)
+- bool SetVertexBuffer(unsigned index, VertexBuffer* buffer, unsigned elementMask = MASK_DEFAULT)
+- void SetIndexBuffer(IndexBuffer* buffer)
+- bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool getUsedVertexRange = true)
+- bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount, bool checkIllegal = true)
+- void SetLodDistance(float distance)
+- unsigned GetNumVertexBuffers() const
+- VertexBuffer* GetVertexBuffer(unsigned index) const
+- unsigned GetVertexElementMask(unsigned index) const
+- IndexBuffer* GetIndexBuffer() const
+- PrimitiveType GetPrimitiveType() const
+- unsigned GetIndexStart() const
+- unsigned GetIndexCount() const
+- unsigned GetVertexStart() const
+- unsigned GetVertexCount() const
+- float GetLodDistance()
+- bool IsEmpty() const
+
+Properties:
+
+- unsigned numVertexBuffers
+- IndexBuffer* indexBuffer
+- PrimitiveType primitiveType (readonly)
+- unsigned indexStart (readonly)
+- unsigned indexCount (readonly)
+- unsigned vertexStart (readonly)
+- unsigned vertexCount (readonly)
+- float lodDistance
+- bool empty (readonly)
+
 <a name="Class_Graphics"></a>
 ### Graphics : Object
 
@@ -2358,6 +2399,31 @@ Properties:
 - bool compressed (readonly)
 - CompressedFormat compressedFormat (readonly)
 - unsigned numCompressedLevels (readonly)
+
+<a name="Class_IndexBuffer"></a>
+### IndexBuffer : Object
+
+Methods:
+
+- IndexBuffer() (GC)
+- IndexBuffer* new()
+- void delete()
+- void SetShadowed(bool enable)
+- bool SetSize(unsigned indexCount, bool largeIndices, bool dynamic = false)
+- bool SetData(VectorBuffer& data)
+- bool SetDataRange(VectorBuffer& data, unsigned start, unsigned count, bool discard = false)
+- VectorBuffer GetData()
+- bool IsShadowed() const
+- bool IsDynamic() const
+- unsigned GetIndexCount() const
+- unsigned GetIndexSize() const
+
+Properties:
+
+- bool shadowed
+- bool dynamic (readonly)
+- unsigned indexCount (readonly)
+- unsigned indexSize (readonly)
 
 <a name="Class_Input"></a>
 ### Input : Object
@@ -3118,11 +3184,17 @@ Properties:
 Methods:
 
 - Model* Clone(const String cloneName = String::EMPTY) const
+- void SetBoundingBox(const BoundingBox& box)
+- void SetNumGeometries(unsigned num)
+- bool SetNumGeometryLodLevels(unsigned index, unsigned num)
+- bool SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry)
+- bool SetGeometryCenter(unsigned index, const Vector3& center)
 - const BoundingBox& GetBoundingBox() const
 - Skeleton& GetSkeleton()
 - unsigned GetNumGeometries() const
 - unsigned GetNumGeometryLodLevels(unsigned index) const
 - Geometry* GetGeometry(unsigned index, unsigned lodLevel) const
+- const Vector3& GetGeometryCenter(unsigned index) const
 - unsigned GetNumMorphs() const
 - const ModelMorph* GetMorph(const String name) const
 - const ModelMorph* GetMorph(StringHash nameHash) const
@@ -3132,7 +3204,7 @@ Methods:
 
 Properties:
 
-- BoundingBox& boundingBox (readonly)
+- BoundingBox& boundingBox
 - Skeleton skeleton (readonly)
 - unsigned numGeometries (readonly)
 - unsigned numMorphs (readonly)
@@ -6527,6 +6599,33 @@ Properties:
 - unsigned position (readonly)
 - unsigned size (readonly)
 - bool eof (readonly)
+
+<a name="Class_VertexBuffer"></a>
+### VertexBuffer : Object
+
+Methods:
+
+- VertexBuffer() (GC)
+- VertexBuffer* new()
+- void delete()
+- void SetShadowed(bool enable)
+- bool SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic = false)
+- bool SetData(VectorBuffer& data)
+- bool SetDataRange(VectorBuffer& data, unsigned start, unsigned count, bool discard = false)
+- VectorBuffer GetData()
+- bool IsShadowed() const
+- bool IsDynamic() const
+- unsigned GetVertexCount() const
+- unsigned GetVertexSize() const
+- unsigned GetElementMask() const
+
+Properties:
+
+- bool shadowed
+- bool dynamic (readonly)
+- unsigned vertexCount (readonly)
+- unsigned vertexSize (readonly)
+- unsigned elementMask (readonly)
 
 <a name="Class_View3D"></a>
 ### View3D : Window

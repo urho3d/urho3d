@@ -4305,6 +4305,49 @@ Frustum Transformed(const Matrix3x4&) const;
 Array<Vector3> vertices;
 };
 
+class Geometry
+{
+// Methods:
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetDrawRange(PrimitiveType, uint, uint, bool = true);
+bool SetDrawRange(PrimitiveType, uint, uint, uint, uint, bool = true);
+void SetIndexBuffer(IndexBuffer);
+bool SetVertexBuffer(uint, VertexBuffer, uint = MASK_DEFAULT);
+
+// Properties:
+/* readonly */
+StringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+bool empty;
+IndexBuffer indexBuffer;
+/* readonly */
+uint indexCount;
+/* readonly */
+uint indexStart;
+float lodDistance;
+uint numVertexBuffers;
+/* readonly */
+PrimitiveType primitiveType;
+/* readonly */
+int refs;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+Array<VertexBuffer> vertexBuffers;
+/* readonly */
+uint vertexCount;
+/* readonly */
+Array<uint> vertexElementMasks;
+/* readonly */
+uint vertexStart;
+/* readonly */
+int weakRefs;
+};
+
 class Graphics
 {
 // Methods:
@@ -4520,6 +4563,37 @@ uint useTimer;
 int weakRefs;
 /* readonly */
 int width;
+};
+
+class IndexBuffer
+{
+// Methods:
+VectorBuffer GetData();
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetData(VectorBuffer&);
+bool SetDataRange(VectorBuffer&, uint, uint, bool = false);
+void SetSize(uint, bool, bool = false);
+
+// Properties:
+/* readonly */
+StringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+bool dynamic;
+/* readonly */
+uint indexCount;
+/* readonly */
+uint indexSize;
+/* readonly */
+int refs;
+bool shadowed;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
 };
 
 class Input
@@ -5748,25 +5822,25 @@ class Model
 {
 // Methods:
 Model Clone(const String& = String ( )) const;
+Geometry GetGeometry(uint, uint) const;
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetGeometry(uint, uint, Geometry);
 
 // Properties:
 /* readonly */
 StringHash baseType;
-/* readonly */
 BoundingBox boundingBox;
 /* readonly */
 String category;
+Array<Vector3> geometryCenters;
 /* readonly */
 uint memoryUse;
 String name;
-/* readonly */
 uint numGeometries;
-/* readonly */
 Array<uint> numGeometryLodLevels;
 /* readonly */
 uint numMorphs;
@@ -11354,6 +11428,39 @@ uint position;
 uint size;
 };
 
+class VertexBuffer
+{
+// Methods:
+VectorBuffer GetData();
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetData(VectorBuffer&);
+bool SetDataRange(VectorBuffer&, uint, uint, bool = false);
+void SetSize(uint, uint, bool = false);
+
+// Properties:
+/* readonly */
+StringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+bool dynamic;
+/* readonly */
+uint elementMask;
+/* readonly */
+int refs;
+bool shadowed;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+uint vertexCount;
+/* readonly */
+uint vertexSize;
+/* readonly */
+int weakRefs;
+};
+
 class View3D
 {
 // Methods:
@@ -12790,6 +12897,21 @@ int LOG_INFO;
 int LOG_NONE;
 int LOG_WARNING;
 Color MAGENTA;
+uint MASK_BLENDINDICES;
+uint MASK_BLENDWEIGHTS;
+uint MASK_COLOR;
+uint MASK_CUBETEXCOORD1;
+uint MASK_CUBETEXCOORD2;
+uint MASK_DEFAULT;
+uint MASK_INSTANCEMATRIX1;
+uint MASK_INSTANCEMATRIX2;
+uint MASK_INSTANCEMATRIX3;
+uint MASK_NONE;
+uint MASK_NORMAL;
+uint MASK_POSITION;
+uint MASK_TANGENT;
+uint MASK_TEXCOORD1;
+uint MASK_TEXCOORD2;
 int MOUSEB_LEFT;
 int MOUSEB_MIDDLE;
 int MOUSEB_RIGHT;
