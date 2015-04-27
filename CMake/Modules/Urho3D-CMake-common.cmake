@@ -1118,10 +1118,10 @@ macro (setup_main_executable)
             list (APPEND PAK_NAMES ${NAME})
         endforeach ()
         if (CMAKE_BUILD_TYPE STREQUAL Debug AND NOT EMCC_VERSION VERSION_LESS 1.31.4)
-            set (USE_METADATA --use-metadata)
+            set (SEPARATE_METADATA --separate-metadata)
         endif ()
         add_custom_command (OUTPUT ${SHARED_RESOURCE_JS}.data
-            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache ${USE_METADATA}
+            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache ${SEPARATE_METADATA}
             DEPENDS RESOURCE_CHECK ${RESOURCE_PAKS}
             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMENT "Generating shared data file")
