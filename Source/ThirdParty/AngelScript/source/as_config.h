@@ -772,8 +772,17 @@
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
 
 			// As of version 4.7 MinGW changed the ABI, presumably
+
 			// to be better aligned with how MSVC works
 			#if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7) || __GNUC__ > 4
+			    #define AS_MINGW47_WORKAROUND
+			#endif
+
+			#if (__clang_major__ == 3 && __clang_minor__ > 4)
+			    #define AS_MINGW47_WORKAROUND
+			#endif
+
+			#ifdef AS_MINGW47_WORKAROUND
 				#undef  CALLEE_POPS_HIDDEN_RETURN_POINTER
 				#define THISCALL_CALLEE_POPS_ARGUMENTS
 			#else
