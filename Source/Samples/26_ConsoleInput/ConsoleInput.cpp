@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,20 +20,22 @@
 // THE SOFTWARE.
 //
 
-#include "Button.h"
-#include "Console.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "EngineEvents.h"
-#include "Input.h"
-#include "Log.h"
-#include "ProcessUtils.h"
-#include "Random.h"
-#include "Timer.h"
+#include <Urho3D/Urho3D.h>
+
+#include <Urho3D/UI/Button.h>
+#include <Urho3D/Engine/Console.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Engine/EngineEvents.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/IO/Log.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Math/Random.h>
+#include <Urho3D/Core/Timer.h>
 
 #include "ConsoleInput.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 // Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(ConsoleInput)

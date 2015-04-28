@@ -44,12 +44,12 @@ public:
 		maxElements = (size_t)RoundUpToNextPow2((u32)maxElements); // but avoid any silliness in release anyways.
 
 		data = new T[maxElements];
-		maxElementsMask = maxElements - 1;
+		maxElementsMask = (unsigned long)maxElements - 1;
 	}
 
 	/// Warning: This is not thread-safe.
 	WaitFreeQueue(const WaitFreeQueue &rhs)
-	:head(rhs.head), tail(rhs.tail), maxElementsMask(rhs.maxElementsMask)
+	:maxElementsMask(rhs.maxElementsMask), head(rhs.head), tail(rhs.tail)
 	{
 		size_t maxElements = rhs.maxElementsMask+1;
 		data = new T[maxElements];
@@ -144,9 +144,14 @@ public:
 		if (!success)
 		{
 			DoubleCapacity();
-			success = Insert(value);
+#ifdef _DEBUG
+			success = 
+#endif
+				Insert(value);
 		}
+#ifdef _DEBUG
 		assert(success);
+#endif
 	}
 
 	/// Re-allocates the queue to the new maximum size. All old elements are copied over.
@@ -165,7 +170,7 @@ public:
 		data = newData;
 		head = 0;
 		tail = newTail;
-		maxElementsMask = newSize - 1;
+		maxElementsMask = (unsigned long)newSize - 1;
 	}
 
 	/// Resizes this queue to hold twice the amount of maximum elements.
@@ -282,7 +287,7 @@ public:
 		if (head == tail)
 			return;
 		size_t head_ = (head + 1) & maxElementsMask;
-		head = head_;
+		head = (unsigned long)head_;
 	}
 
 private:

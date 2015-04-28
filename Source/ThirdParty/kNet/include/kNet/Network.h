@@ -18,7 +18,7 @@
 
 // Modified by Lasse Oorni for Urho3D
 
-#if defined(UNIX) || defined(ANDROID)
+#if defined(KNET_UNIX) || defined(ANDROID)
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -94,7 +94,7 @@ public:
 	static int GetLastError();
 
 	/// Returns the amount of currently executing background network worker threads.
-	int NumWorkerThreads() const { return workerThreads.size(); }
+	int NumWorkerThreads() const { return (int)workerThreads.size(); }
 
 	/// Returns the NetworkServer object, or null if no server has been started.
 	Ptr(NetworkServer) GetServer() { return server; }

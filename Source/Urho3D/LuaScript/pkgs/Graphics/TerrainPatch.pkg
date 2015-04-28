@@ -1,0 +1,39 @@
+$#include "Graphics/TerrainPatch.h"
+
+class TerrainPatch : public Drawable
+{
+    void SetOwner(Terrain* terrain);
+    void SetNeighbors(TerrainPatch* north, TerrainPatch* south, TerrainPatch* west, TerrainPatch* east);
+    void SetMaterial(Material* material);
+    void SetBoundingBox(const BoundingBox& box);
+    void SetCoordinates(const IntVector2& coordinates);
+    void SetOcclusionOffset(float offset);
+    void ResetLod();
+    
+    Geometry* GetGeometry() const;
+    Geometry* GetMaxLodGeometry() const;
+    Geometry* GetMinLodGeometry() const;
+    VertexBuffer* GetVertexBuffer() const;
+    Terrain* GetOwner() const;
+    TerrainPatch* GetNorthPatch() const;
+    TerrainPatch* GetSouthPatch() const;
+    TerrainPatch* GetWestPatch() const;
+    TerrainPatch* GetEastPatch() const;
+    const IntVector2& GetCoordinates() const;
+    unsigned GetLodLevel() const;
+    float GetOcclusionOffset() const;
+    
+    tolua_readonly tolua_property__get_set Geometry* geometry;
+    tolua_readonly tolua_property__get_set Geometry* maxLodGeometry;
+    tolua_readonly tolua_property__get_set Geometry* minLodGeometry;
+    tolua_readonly tolua_property__get_set VertexBuffer* vertexBuffer;
+    tolua_property__get_set Terrain* owner;
+    tolua_readonly tolua_property__get_set TerrainPatch* northPatch;
+    tolua_readonly tolua_property__get_set TerrainPatch* southPatch;
+    tolua_readonly tolua_property__get_set TerrainPatch* westPatch;
+    tolua_readonly tolua_property__get_set TerrainPatch* eastPatch;
+    tolua_property__get_set BoundingBox& boundingBox;
+    tolua_property__get_set IntVector2& coordinates;
+    tolua_readonly tolua_property__get_set unsigned lodLevel;
+    tolua_property__get_set float occlusionOffset;
+};

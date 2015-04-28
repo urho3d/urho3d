@@ -86,20 +86,24 @@ std::string ConnectionStateToString(ConnectionState state)
 }
 
 MessageConnection::MessageConnection(Network *owner_, NetworkServer *ownerServer_, Socket *socket_, ConnectionState startingState)
-:owner(owner_), ownerServer(ownerServer_), inboundMessageHandler(0), socket(socket_), 
-bOutboundSendsPaused(false),
+:owner(owner_), ownerServer(ownerServer_), workerThread(0), 
+#ifdef KNET_THREAD_CHECKING_ENABLED
+workerThreadId(Thread::NullThreadId()),
+#endif
 outboundAcceptQueue(16*1024), inboundMessageQueue(16*1024), 
-rtt(0.f), packetsInPerSec(0), packetsOutPerSec(0), 
-msgsInPerSec(0), msgsOutPerSec(0), bytesInPerSec(0), bytesOutPerSec(0),
-lastHeardTime(Clock::Tick()), outboundMessageNumberCounter(0), outboundReliableMessageNumberCounter(0),
 #ifdef KNET_NO_MAXHEAP
 outboundQueue(16 * 1024), 
 #endif
-workerThread(0),
-bytesInTotal(0), bytesOutTotal(0)
-#ifdef KNET_THREAD_CHECKING_ENABLED
-,workerThreadId(Thread::NullThreadId())
-#endif
+inboundMessageHandler(0), socket(socket_), 
+bOutboundSendsPaused(false), 
+rtt(0.f), 
+lastHeardTime(Clock::Tick()), 
+packetsInPerSec(0), packetsOutPerSec(0), 
+msgsInPerSec(0), msgsOutPerSec(0),
+bytesInPerSec(0), bytesOutPerSec(0), 
+bytesInTotal(0), bytesOutTotal(0),
+outboundMessageNumberCounter(0),
+outboundReliableMessageNumberCounter(0)
 {
 	connectionState = startingState;
 	networkSendSimulator.owner = this;
@@ -110,7 +114,7 @@ bytesInTotal(0), bytesOutTotal(0)
 
 MessageConnection::~MessageConnection()
 {
-	LOG(LogObjectAlloc, "Deleting MessageConnection %p.", this);
+	KNET_LOG(LogObjectAlloc, "Deleting MessageConnection %p.", this);
 
 	// This MessageConnection must have been detached from its owners before deleting it. 
 	// (owner->CloseConnection must have been called)
@@ -193,7 +197,7 @@ bool MessageConnection::WaitToEstablishConnection(int maxMSecsToWait)
 	while(GetConnectionState() == ConnectionPending && !timer.Test())
 		Clock::Sleep(1); ///\todo Instead of waiting multiple 1msec slices, should wait for proper event.
 
-	LOG(LogWaits, "MessageConnection::WaitToEstablishConnection: Waited %f msecs for connection. Result: %s.",
+	KNET_LOG(LogWaits, "MessageConnection::WaitToEstablishConnection: Waited %f msecs for connection. Result: %s.",
 		timer.MSecsElapsed(), ConnectionStateToString(GetConnectionState()).c_str());
 
 	return GetConnectionState() == ConnectionOK;
@@ -209,7 +213,7 @@ void MessageConnection::Disconnect(int maxMSecsToWait)
 	if (connectionState == ConnectionClosed || connectionState == ConnectionDisconnecting)
 		return;
 
-	LOG(LogInfo, "MessageConnection::Disconnect(%d msecs): Write-closing connection. connectionState = %s, socket readOpen:%s, socket writeOpen:%s.", 
+	KNET_LOG(LogInfo, "MessageConnection::Disconnect(%d msecs): Write-closing connection. connectionState = %s, socket readOpen:%s, socket writeOpen:%s.", 
 		maxMSecsToWait, ConnectionStateToString(connectionState).c_str(), socket->IsReadOpen() ? "true":"false",
 		socket->IsWriteOpen() ? "true":"false");
 	assert(maxMSecsToWait >= 0);
@@ -224,7 +228,7 @@ void MessageConnection::Disconnect(int maxMSecsToWait)
 			Clock::Sleep(1); ///\todo Instead of waiting multiple 1msec slices, should wait for proper event.
 		}
 
-		LOG(LogWaits, "MessageConnection::Disconnect: Waited %f msecs for disconnection. Result: %s.",
+		KNET_LOG(LogWaits, "MessageConnection::Disconnect: Waited %f msecs for disconnection. Result: %s.",
 			timer.MSecsElapsed(), ConnectionStateToString(GetConnectionState()).c_str());
 	}
 
@@ -239,14 +243,14 @@ void MessageConnection::Close(int maxMSecsToWait) // [main thread]
 	if (maxMSecsToWait > 0 && socket && socket->IsWriteOpen())
 	{
 		Disconnect(maxMSecsToWait);
-		LOG(LogInfo, "MessageConnection::Close(%d msecs): Disconnecting. connectionState = %s, readOpen:%s, writeOpen:%s.", 
+		KNET_LOG(LogInfo, "MessageConnection::Close(%d msecs): Disconnecting. connectionState = %s, readOpen:%s, writeOpen:%s.", 
 			maxMSecsToWait, ConnectionStateToString(connectionState).c_str(), (socket && socket->IsReadOpen()) ? "true":"false",
 			(socket && socket->IsWriteOpen()) ? "true":"false");
 	}
 
 	if (owner)
 	{
-		LOG(LogInfo, "MessageConnection::Close: Closed connection to %s.", ToString().c_str());
+		KNET_LOG(LogInfo, "MessageConnection::Close: Closed connection to %s.", ToString().c_str());
 		owner->CloseConnection(this); // This will cause this connection to be disconnected of its worker thread, so that we can safely proceed to tear down the socket.
 		assert(!IsWorkerThreadRunning());
 		owner = 0;
@@ -263,19 +267,19 @@ void MessageConnection::Close(int maxMSecsToWait) // [main thread]
 	connectionState = ConnectionClosed;
 
 	if (outboundAcceptQueue.Size() > 0)
-		LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in outboundAcceptQueue!", (int)outboundAcceptQueue.Size());
+		KNET_LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in outboundAcceptQueue!", (int)outboundAcceptQueue.Size());
 
 	if (outboundQueue.Size() > 0)
-		LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in outboundQueue!", (int)outboundQueue.Size());
+		KNET_LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in outboundQueue!", (int)outboundQueue.Size());
 
 	if (inboundMessageQueue.Size() > 0)
-		LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in inboundMessageQueue!", (int)inboundMessageQueue.Size());
+		KNET_LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in inboundMessageQueue!", (int)inboundMessageQueue.Size());
 
 	if (fragmentedSends.UnsafeGetValue().transfers.size() > 0)
-		LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in fragmentedSends.transfers list!", (int)fragmentedSends.UnsafeGetValue().transfers.size());
+		KNET_LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in fragmentedSends.transfers list!", (int)fragmentedSends.UnsafeGetValue().transfers.size());
 
-	if (fragmentedReceives.transfers.size() > 0)
-		LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in fragmentedReceives.transfers list!", (int)fragmentedReceives.transfers.size());
+	if (!fragmentedReceives.transfers.empty())
+		KNET_LOG(LogVerbose, "MessageConnection::Close(): Had %d messages in fragmentedReceives.transfers list!", (int)fragmentedReceives.transfers.size());
 
 	FreeMessageData();
 }
@@ -304,7 +308,7 @@ void MessageConnection::SetPeerClosed()
 	switch(connectionState)
 	{
 	case ConnectionPending:
-		LOG(LogVerbose, "Peer closed connection when in ConnectionPending state!"); 
+		KNET_LOG(LogVerbose, "Peer closed connection when in ConnectionPending state!"); 
 		connectionState = ConnectionClosed; // Just tear it down, the peer rejected the connection.
 		break;
 	case ConnectionOK:
@@ -317,7 +321,7 @@ void MessageConnection::SetPeerClosed()
 	case ConnectionClosed:
 		break; // We've already in the state where peer has closed the connection, no need to do anything.
 	default:
-		LOG(LogError, "SetPeerClosed() called at an unexpected time. The internal connectionState has an invalid value %d!", (int)connectionState);
+		KNET_LOG(LogError, "SetPeerClosed() called at an unexpected time. The internal connectionState has an invalid value %d!", (int)connectionState);
 		assert(false);
 		break;
 	}
@@ -376,7 +380,7 @@ void MessageConnection::DetectConnectionTimeOut()
 	float lastHeardSince = LastHeardTime();
 	if (lastHeardSince > connectionLostTimeout)
 	{
-		LOG(LogInfo, "It's been %.2fms since last heard from other end. connectionLostTimeout=%.2fms, so closing connection.",
+		KNET_LOG(LogInfo, "It's been %.2fms since last heard from other end. connectionLostTimeout=%.2fms, so closing connection.",
 			lastHeardSince, connectionLostTimeout);
 		connectionState = ConnectionClosed;
 	}
@@ -393,7 +397,7 @@ void MessageConnection::AcceptOutboundMessages() // [worker thread]
 		{
 			NetworkMessage *msg = *outboundAcceptQueue.Front();
 			outboundAcceptQueue.PopFront();
-			LOG(LogVerbose, "Warning: Discarding outbound network message with ID %d, since the connection is write-closed.", 
+			KNET_LOG(LogVerbose, "Warning: Discarding outbound network message with ID %d, since the connection is write-closed.", 
 				msg->id);
 			// assert(!HaveOutboundMessageWithContentID(msg));
 			FreeMessage(msg);
@@ -453,7 +457,7 @@ void MessageConnection::UpdateConnection() // [Called from the worker thread]
 		if (connectionState == ConnectionOK || connectionState == ConnectionDisconnecting)
 			if (!socket || !socket->IsReadOpen())
 			{
-				LOG(LogInfo, "Peer closed connection.");
+				KNET_LOG(LogInfo, "Peer closed connection.");
 				SetPeerClosed();
 			}
 
@@ -478,7 +482,7 @@ void MessageConnection::UpdateConnection() // [Called from the worker thread]
 NetworkMessage *MessageConnection::AllocateNewMessage()
 {
 	NetworkMessage *msg = messagePool.New();
-	LOG(LogObjectAlloc, "MessageConnection::AllocateMessage %p!", msg);
+	KNET_LOG(LogObjectAlloc, "MessageConnection::AllocateMessage %p!", msg);
 	return msg;
 }
 
@@ -493,7 +497,7 @@ void MessageConnection::FreeMessage(NetworkMessage *msg) // [main and worker thr
 		msg->transfer = 0;
 	}
 
-	LOG(LogObjectAlloc, "MessageConnection::FreeMessage %p!", msg);
+	KNET_LOG(LogObjectAlloc, "MessageConnection::FreeMessage %p!", msg);
 	messagePool.Free(msg);
 }
 
@@ -502,7 +506,7 @@ NetworkMessage *MessageConnection::StartNewMessage(unsigned long id, size_t numB
 	NetworkMessage *msg = AllocateNewMessage();
 	if (!msg)
 	{
-		LOG(LogError, "MessageConnection::SendMessage: StartNewMessage failed! Discarding message send.");
+		KNET_LOG(LogError, "MessageConnection::SendMessage: StartNewMessage failed! Discarding message send.");
 		return 0; // Failed to allocate a new message. This is caused only by memory allocation issues.
 	}
 
@@ -545,7 +549,7 @@ void MessageConnection::SplitAndQueueMessage(NetworkMessage *message, bool inter
 	const size_t totalNumFragments = (message->dataSize + maxFragmentSize - 1) / maxFragmentSize;
 	assert(totalNumFragments > 1); // Shouldn't be calling this function if the message can well fit into one fragment.
 
-	LOG(LogVerbose, "Splitting a message of %db into %d fragments of %db size at most.",
+	KNET_LOG(LogVerbose, "Splitting a message of %db into %d fragments of %db size at most.",
 		(int)message->dataSize, (int)totalNumFragments, (int)maxFragmentSize);
 
 /** \todo Would like to do this:
@@ -567,12 +571,12 @@ void MessageConnection::SplitAndQueueMessage(NetworkMessage *message, bool inter
 
 	if (!message->reliable)
 	{
-		LOG(LogVerbose, "Upgraded a nonreliable message with ID %d and size %d to a reliable message since it had to be fragmented!", (int)message->id, (int)message->dataSize);
+		KNET_LOG(LogVerbose, "Upgraded a nonreliable message with ID %d and size %d to a reliable message since it had to be fragmented!", (int)message->id, (int)message->dataSize);
 	}
 
 	if (message->contentID != 0)
 	{
-		LOG(LogVerbose, "Warning: Content IDs are not supported with fragmented transfers. Removing the content ID %d of message %d of size %d.",
+		KNET_LOG(LogVerbose, "Warning: Content IDs are not supported with fragmented transfers. Removing the content ID %d of message %d of size %d.",
 			(int)message->contentID, (int)message->id, (int)message->Size());
 		message->contentID = 0;
 	}
@@ -618,7 +622,7 @@ void MessageConnection::SplitAndQueueMessage(NetworkMessage *message, bool inter
 			if (!outboundAcceptQueue.Insert(fragment))
 			{
 				///\todo Is it possible to check beforehand if this criteria is avoided, or if we are doomed?
-				LOG(LogError, "Critical: Failed to add message fragment to outboundAcceptQueue! Queue was full. Do not know how to recover here!");
+				KNET_LOG(LogError, "Critical: Failed to add message fragment to outboundAcceptQueue! Queue was full. Do not know how to recover here!");
 				assert(false);
 			}
 		}
@@ -650,7 +654,7 @@ void MessageConnection::EndAndQueueMessage(NetworkMessage *msg, size_t numBytes,
 	if (msg->obsolete || !socket || GetConnectionState() == ConnectionClosed || !socket->IsWriteOpen() || 
 		(internalQueue == false && !IsWriteOpen()))
 	{
-		LOG(LogVerbose, "MessageConnection::EndAndQueueMessage: Discarded message with ID 0x%X and size %d bytes. "
+		KNET_LOG(LogVerbose, "MessageConnection::EndAndQueueMessage: Discarded message with ID 0x%X and size %d bytes. "
 			"msg->obsolete: %d. socket ptr: %p. ConnectionState: %s. socket->IsWriteOpen(): %s. msgconn->IsWriteOpen: %s. "
 			"internalQueue: %s.",
 			(int)msg->id, (int)numBytes, (int)msg->obsolete, socket, ConnectionStateToString(GetConnectionState()).c_str(), (socket && socket->IsWriteOpen()) ? "true" : "false",
@@ -666,7 +670,7 @@ void MessageConnection::EndAndQueueMessage(NetworkMessage *msg, size_t numBytes,
 	assert(msg->dataSize <= msg->Capacity());
 	if (msg->dataSize > msg->Capacity())
 	{
-		LOG(LogError, "Critical! User specified a larger NetworkMessage than there is Capacity() for. Call NetworkMessage::Reserve() "
+		KNET_LOG(LogError, "Critical! User specified a larger NetworkMessage than there is Capacity() for. Call NetworkMessage::Reserve() "
 			"to ensure there is a proper amount of space for the buffer! Specified: %d bytes, Capacity(): %d bytes.",
 			(int)msg->dataSize, (int)msg->Capacity());
 	}
@@ -689,7 +693,7 @@ void MessageConnection::EndAndQueueMessage(NetworkMessage *msg, size_t numBytes,
 
 	if (internalQueue) // if true, we are accessing from the worker thread, and can directly access the outboundQueue member.
 	{
-		LOG(LogVerbose, "MessageConnection::EndAndQueueMessage: Internal-queued message of size %d bytes and ID 0x%X.", (int)msg->Size(), (int)msg->id);
+		KNET_LOG(LogVerbose, "MessageConnection::EndAndQueueMessage: Internal-queued message of size %d bytes and ID 0x%X.", (int)msg->Size(), (int)msg->id);
 //		assert(ContainerUniqueAndNoNullElements(outboundQueue));
 #ifdef KNET_NO_MAXHEAP
 		outboundQueue.InsertWithResize(msg);
@@ -705,13 +709,13 @@ void MessageConnection::EndAndQueueMessage(NetworkMessage *msg, size_t numBytes,
 			if (msg->reliable) // For nonreliable messages it is not critical if we can't enqueue the message. Just discard it.
 			{
 				///\todo Is it possible to check beforehand if this criteria is avoided, or if we are doomed?
-				LOG(LogVerbose, "Critical: Failed to add new reliable message to outboundAcceptQueue! Queue was full. Discarding the message!");
+				KNET_LOG(LogVerbose, "Critical: Failed to add new reliable message to outboundAcceptQueue! Queue was full. Discarding the message!");
 				assert(false);
 			}
 			FreeMessage(msg);
 			return;
 		}
-		LOG(LogData, "MessageConnection::EndAndQueueMessage: Queued message of size %d bytes and ID 0x%X.", (int)msg->Size(), (int)msg->id);
+		KNET_LOG(LogData, "MessageConnection::EndAndQueueMessage: Queued message of size %d bytes and ID 0x%X.", (int)msg->Size(), (int)msg->id);
 	}
 
 	// Signal the worker thread that there are new outbound events available.
@@ -727,7 +731,7 @@ void MessageConnection::SendMessage(unsigned long id, bool reliable, bool inOrde
 	NetworkMessage *msg = StartNewMessage(id, numBytes);
 	if (!msg)
 	{
-		LOG(LogError, "MessageConnection::SendMessage: StartNewMessage failed! Discarding message send.");
+		KNET_LOG(LogError, "MessageConnection::SendMessage: StartNewMessage failed! Discarding message send.");
 		return;
 	}
 	msg->reliable = reliable;
@@ -764,7 +768,7 @@ void MessageConnection::Process(int maxMessagesToProcess)
 	{
 		if (!inboundMessageHandler)
 		{
-			LOG(LogVerbose, "Warning! Cannot process messages since no message handler registered to connection %s!",
+			KNET_LOG(LogVerbose, "Warning! Cannot process messages since no message handler registered to connection %s!",
 				ToString().c_str());
 			return;
 		}
@@ -814,7 +818,7 @@ void MessageConnection::WaitForMessage(int maxMSecsToWait) // [main thread]
 
 		if (timer.MSecsElapsed() >= 1000.f)
 		{
-				LOG(LogWaits, "MessageConnection::WaitForMessage: Waited %f msecs for a new message. ConnectionState: %s. %d messages in queue.",
+				KNET_LOG(LogWaits, "MessageConnection::WaitForMessage: Waited %f msecs for a new message. ConnectionState: %s. %d messages in queue.",
 				timer.MSecsElapsed(), ConnectionStateToString(GetConnectionState()).c_str(), (int)inboundMessageQueue.Size());
 		}
 	}
@@ -989,7 +993,7 @@ void MessageConnection::CheckAndSaveOutboundMessageWithContentID(NetworkMessage 
 		}
 		else // This shouldn't happen, but gracefully handle that situation if it does!
 		{
-			LOG(LogError, "Warning! Adding new message ID %d, number %d, content ID %d, priority %d, but it was obsoleted by an already existing message number %d.", 
+			KNET_LOG(LogError, "Warning! Adding new message ID %d, number %d, content ID %d, priority %d, but it was obsoleted by an already existing message number %d.", 
 				(int)msg->id, (int)msg->messageNumber, (int)msg->contentID, (int)iter->second->priority, (int)iter->second->messageNumber);
 			msg->obsolete = true;
 		}
@@ -1058,10 +1062,10 @@ void MessageConnection::HandleInboundMessage(packet_id_t packetID, const char *d
 	message_id_t messageID = reader.ReadVLE<VLE8_16_32>(); ///\todo Check that there actually is enough space to read.
 	if (messageID == DataDeserializer::VLEReadError)
 	{
-		LOG(LogError, "Error parsing messageID of a message in socket %s. Data size: %d bytes.", socket->ToString().c_str(), (int)numBytes);
+		KNET_LOG(LogError, "Error parsing messageID of a message in socket %s. Data size: %d bytes.", socket->ToString().c_str(), (int)numBytes);
 		throw NetException("MessageConnection::HandleInboundMessage: Network error occurred when deserializing message ID VLE field!");
 	}
-	LOG(LogData, "Received message with ID %d and size %d from peer %s.", (int)packetID, (int)numBytes, socket->ToString().c_str());
+	KNET_LOG(LogData, "Received message with ID %d and size %d from peer %s.", (int)packetID, (int)numBytes, socket->ToString().c_str());
 
 	char str[256];
 	sprintf(str, "messageIn.%u", (unsigned int)messageID);
@@ -1093,7 +1097,7 @@ void MessageConnection::HandleInboundMessage(packet_id_t packetID, const char *d
 			bool success = inboundMessageQueue.Insert(msg);
 			if (!success)
 			{
-				LOG(LogError, "Failed to add a new message of ID %d and size %dB to inbound queue! Queue was full.",
+				KNET_LOG(LogError, "Failed to add a new message of ID %d and size %dB to inbound queue! Queue was full.",
 					(int)messageID, (int)msg->dataSize);
 				FreeMessage(msg);
 			}
@@ -1102,7 +1106,7 @@ void MessageConnection::HandleInboundMessage(packet_id_t packetID, const char *d
 	}
 }
 
-void MessageConnection::SetMaximumDataSendRate(int numBytesPerSec, int numDatagramsPerSec)
+void MessageConnection::SetMaximumDataSendRate(int /*numBytesPerSec*/, int /*numDatagramsPerSec*/)
 {
 }
 
@@ -1124,7 +1128,7 @@ void MessageConnection::SendPingRequestMessage(bool internalQueue)
 
 	ConnectionStatistics &cs = statistics.LockGet();
 	
-	u8 pingID = (u8)((cs.ping.size() == 0) ? 1 : (cs.ping.back().pingID + 1));
+	u8 pingID = (u8)((cs.ping.empty()) ? 1 : (cs.ping.back().pingID + 1));
 	cs.ping.push_back(ConnectionStatistics::PingTrack());
 	ConnectionStatistics::PingTrack &pingTrack = cs.ping.back();
 	pingTrack.replyReceived = false;
@@ -1140,7 +1144,7 @@ void MessageConnection::SendPingRequestMessage(bool internalQueue)
 	msg->profilerName = "PingRequest (1)";
 #endif
 	EndAndQueueMessage(msg, 1, internalQueue);
-	LOG(LogVerbose, "Enqueued ping message %d.", (int)pingID);
+	KNET_LOG(LogVerbose, "Enqueued ping message %d.", (int)pingID);
 }
 
 void MessageConnection::HandlePingRequestMessage(const char *data, size_t numBytes)
@@ -1149,7 +1153,7 @@ void MessageConnection::HandlePingRequestMessage(const char *data, size_t numByt
 
 	if (numBytes != 1)
 	{
-		LOG(LogError, "Malformed PingRequest message received! Size was %d bytes, expected 1 byte!", (int)numBytes);
+		KNET_LOG(LogError, "Malformed PingRequest message received! Size was %d bytes, expected 1 byte!", (int)numBytes);
 		return;
 	}
 
@@ -1161,7 +1165,7 @@ void MessageConnection::HandlePingRequestMessage(const char *data, size_t numByt
 	msg->profilerName = "PingReply (2)";
 #endif
 	EndAndQueueMessage(msg, 1, true);
-	LOG(LogVerbose, "HandlePingRequestMessage: %d.", (int)pingID);
+	KNET_LOG(LogVerbose, "HandlePingRequestMessage: %d.", (int)pingID);
 }
 
 void MessageConnection::HandlePingReplyMessage(const char *data, size_t numBytes)
@@ -1170,7 +1174,7 @@ void MessageConnection::HandlePingReplyMessage(const char *data, size_t numBytes
 
 	if (numBytes != 1)
 	{
-		LOG(LogError, "Malformed PingReply message received! Size was %d bytes, expected 1 byte!", (int)numBytes);
+		KNET_LOG(LogError, "Malformed PingReply message received! Size was %d bytes, expected 1 byte!", (int)numBytes);
 		return;
 	}
 
@@ -1189,12 +1193,12 @@ void MessageConnection::HandlePingReplyMessage(const char *data, size_t numBytes
 			statistics.Unlock();
 			rtt = rttPredictBias * newRtt + (1.f * rttPredictBias) * rtt;
 
-			LOG(LogVerbose, "HandlePingReplyMessage: %d.", (int)pingID);
+			KNET_LOG(LogVerbose, "HandlePingReplyMessage: %d.", (int)pingID);
 			return;
 		}
 
 	statistics.Unlock();
-	LOG(LogError, "Received PingReply with ID %d in socket %s, but no matching PingRequest was ever sent!", (int)pingID, socket->ToString().c_str());
+	KNET_LOG(LogError, "Received PingReply with ID %d in socket %s, but no matching PingRequest was ever sent!", (int)pingID, socket->ToString().c_str());
 }
 
 std::string MessageConnection::ToString() const
@@ -1258,7 +1262,7 @@ void MessageConnection::DumpStatus() const
 		(int)TimeUntilCanSendPacket(),
 		(int)outboundQueue.Size());
 
-	LOGUSER(str);
+	KNET_LOGUSER(str);
 
 	DumpConnectionStatus();
 }
@@ -1287,7 +1291,7 @@ void MessageConnection::AssertInWorkerThreadContext() const
 	kNet::ThreadId currentThreadId = Thread::CurrentThreadId();
 	if (haveWorkerThread && currentThreadId != workerThreadId)
 	{
-		LOG(LogError, "Assert failure in MessageConnection::AssertInWorkerThreadContext()!: haveWorkerThread: %s, currentThreadId: %s, workerThreadId: %s,",
+		KNET_LOG(LogError, "Assert failure in MessageConnection::AssertInWorkerThreadContext()!: haveWorkerThread: %s, currentThreadId: %s, workerThreadId: %s,",
 			haveWorkerThread ? "true" : "false", ThreadIdToString(currentThreadId).c_str(), ThreadIdToString(workerThreadId).c_str());
 		assert(false && "MessageConnection::AssertInWorkerThreadContext assert failure!");
 	}
@@ -1302,7 +1306,7 @@ void MessageConnection::AssertInMainThreadContext() const
 	kNet::ThreadId currentThreadId = Thread::CurrentThreadId();
 	if (haveWorkerThread && currentThreadId == workerThreadId)
 	{
-		LOG(LogError, "Assert failure in MessageConnection::AssertInMainThreadContext()!: haveWorkerThread: %s, currentThreadId: %s, workerThreadId: %s,",
+		KNET_LOG(LogError, "Assert failure in MessageConnection::AssertInMainThreadContext()!: haveWorkerThread: %s, currentThreadId: %s, workerThreadId: %s,",
 			haveWorkerThread ? "true" : "false", ThreadIdToString(currentThreadId).c_str(), ThreadIdToString(workerThreadId).c_str());
 		assert(false && "MessageConnection::AssertInMainThreadContext assert failure!");
 	}

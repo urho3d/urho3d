@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,17 +20,19 @@
 // THE SOFTWARE.
 //
 
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "Graphics.h"
-#include "ResourceCache.h"
-#include "Sprite.h"
-#include "Texture2D.h"
-#include "UI.h"
+#include <Urho3D/Urho3D.h>
+
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/UI/Sprite.h>
+#include <Urho3D/Graphics/Texture2D.h>
+#include <Urho3D/UI/UI.h>
 
 #include "Sprites.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 // Number of sprites to draw
 static const unsigned NUM_SPRITES = 100;

@@ -21,7 +21,7 @@ The list, set and map classes use a fixed-size allocator internally. This can al
 In script, the String class is exposed as it is. The template containers can not be directly exposed to script, but instead a template Array type exists, which behaves like a Vector, but does not expose iterators. In addition the VariantMap is available, which is a HashMap<StringHash, Variant>.
 
 
-\page ObjectTypes %Object types and factories
+\page ObjectTypes Object types and factories
 
 Classes that derive from Object contain type-identification, they can be created through object factories, and they can send and receive \ref Events "events". Examples of these are all Component, Resource and UIElement subclasses. To be able to be constructed by a factory, they need to have a constructor that takes a Context pointer as the only parameter.
 
@@ -117,7 +117,7 @@ SendEvent("Update", eventData);
 Because the \ref Object::SendEvent "SendEvent()" function is public, an event can be "masqueraded" as originating from any object, even when not actually sent by that object's member function code. This can be used to simplify communication, particularly between components in the scene. For example, the \ref Physics "physics simulation" signals collision events by using the participating \ref Node "scene nodes" as senders. This means that any component can easily subscribe to its own node's collisions without having to know of the actual physics components involved. The same principle can also be used in any game-specific messaging, for example making a "damage received" event originate from the scene node, though it itself has no concept of damage or health.
 
 
-\page MainLoop %Engine initialization and main loop
+\page MainLoop Engine initialization and main loop
 
 Before a Urho3D application can enter its main loop, the Engine subsystem object must be created and initialized by calling its \ref Engine::Initialize "Initialize()" function. Parameters sent in a VariantMap can be used to direct how the Engine initializes itself and the subsystems. One way to configure the parameters is to parse them from the command line like the Urho3DPlayer application does: this is accomplished by the helper function \ref Engine::ParseParameters "ParseParameters()".
 
@@ -129,10 +129,10 @@ The full list of supported parameters, their datatypes and default values:
 - LogName (string) %Log filename. Default "Urho3D.log".
 - FrameLimiter (bool) Whether to cap maximum framerate to 200 (desktop) or 60 (Android/iOS.) Default true.
 - WorkerThreads (bool) Whether to create worker threads for the %WorkQueue subsystem according to available CPU cores. Default true.
+- ResourcePrefixPath (string) Override the resource prefix path to use. If not specified then the default prefix path is set to URHO3D_PREFIX_PATH environment variable (if defined) or executable path.
 - ResourcePaths (string) A semicolon-separated list of resource paths to use. If corresponding packages (ie. Data.pak for Data directory) exist they will be used instead. Default "Data;CoreData".
 - ResourcePackages (string) A semicolon-separated list of resource packages to use. Default empty.
-- AutoloadPaths (string) A semicolon-separated list of autoload paths to use. Any resource packages and subdirectories inside an autoload path will be added to the resource system. Default "Extra".
-- ForceSM2 (bool) Whether to force %Shader %Model 2, effective in Direct3D9 mode only. Default false.
+- AutoloadPaths (string) A semicolon-separated list of autoload paths to use. Any resource packages and subdirectories inside an autoload path will be added to the resource system. Default "Autoload".
 - ExternalWindow (void ptr) External window handle to use instead of creating an application window. Default null.
 - WindowIcon (string) %Window icon image resource name. Default empty (use application default icon.)
 - WindowTitle (string) %Window title. Default "Urho3D".
@@ -145,11 +145,12 @@ The full list of supported parameters, their datatypes and default values:
 - Borderless (bool) Whether to create the window as borderless. Default false.
 - TripleBuffer (bool) Whether to use triple-buffering. Default false.
 - VSync (bool) Whether to wait for vertical sync when presenting rendering window contents. Default false.
-- FlushGPU (bool) Whether to flush GPU command buffer each frame for less input latency. Effective only on Direct3D9. Default false.
+- FlushGPU (bool) Whether to flush GPU command buffer each frame (Direct3D9) or limit the amount of buffered frames (Direct3D11) for less input latency. Ineffective on OpenGL. Default false.
+- ForceGL2 (bool) When true, forces OpenGL 2 use even if OpenGL 3 is available. No effect on Direct3D or mobile builds. Default false.
 - Multisample (int) Hardware multisampling level. Default 1 (no multisampling.)
 - Orientations (string) Space-separated list of allowed orientations. Effective only on iOS. All possible values are "LandscapeLeft", "LandscapeRight", "Portrait" and "PortraitUpsideDown". Default "LandscapeLeft LandscapeRight".
 - DumpShaders (string) Filename to dump used shader variations to for precaching.
-- %RenderPath (string) Default renderpath resource name. Default empty, which causes forward rendering (Bin/CoreData/RenderPaths/Forward.xml) to be used.
+- %RenderPath (string) Default renderpath resource name. Default empty, which causes forward rendering (bin/CoreData/RenderPaths/Forward.xml) to be used.
 - Shadows (bool) Shadow rendering enable. Default true.
 - LowQualityShadows (bool) Low-quality (1 sample) shadow mode. Default false.
 - MaterialQuality (int) %Material quality level. Default 2 (high)
@@ -207,9 +208,13 @@ The Application class provides a minimal framework for a Urho3D C++ application 
 will instantiate the Context object and then the user-specified application class. A minimal example, which would just display a blank rendering window and exit by pressing ESC:
 
 \code
-#include "Application.h"
-#include "Engine.h"
-#include "InputEvents.h"
+#include <Urho3D/Urho3D.h>
+
+#include <Urho3D/Engine/Application.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Input/InputEvents.h>
+
+using namespace Urho3D;
 
 class MyApp : public Application
 {
@@ -234,7 +239,7 @@ public:
     {
         // Perform optional cleanup after main loop has terminated
     }
-    
+
     void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     {
         using namespace KeyDown;
@@ -249,7 +254,7 @@ public:
 DEFINE_APPLICATION_MAIN(MyApp)
 \endcode
 
-\page SceneModel %Scene model
+\page SceneModel Scene model
 
 Urho3D's scene model can be described as a component-based scene graph. The Scene consists of a hierarchy of scene nodes, starting from the root node, which also represents the whole scene. Each Node has a 3D transform (position, rotation and scale), a name and an ID, and a freeform VariantMap for \ref Node::GetVars "user variables", but no other functionality.
 
@@ -322,7 +327,7 @@ Just loading or saving whole scenes is not flexible enough for eg. games where n
 - In the editor, by selecting the node in the hierarchy window and choosing "Save node as" from the "File" menu.
 - Using the "node" command in AssetImporter, which will save the scene node hierarchy and any models contained in the input asset (eg. a Collada file)
 
-To instantiate the saved node into a scene, call \ref Scene::Instantiate "Instantiate()" or \ref Scene::InstantiateXML "InstantiateXML()" depending on the format. The node will be created as a child of the Scene but can be freely reparented after that. Position and rotation for placing the node need to be specified. The NinjaSnowWar example uses XML format for its object prefabs; these exist in the Bin/Data/Objects directory.
+To instantiate the saved node into a scene, call \ref Scene::Instantiate "Instantiate()" or \ref Scene::InstantiateXML "InstantiateXML()" depending on the format. The node will be created as a child of the Scene but can be freely reparented after that. Position and rotation for placing the node need to be specified. The NinjaSnowWar example uses XML format for its object prefabs; these exist in the bin/Data/Objects directory.
 
 \section SceneModel_FurtherInformation Further information
 
@@ -502,7 +507,7 @@ When a scene is saved/loaded, any pending delayed calls are also saved and resto
 
 \section Script_ScriptAPI The script API
 
-Much of the Urho3D classes are exposed to scripts, however things that require low-level access or high performance (like direct vertex buffer access) are not. Also for scripting convenience some things have been changed from the C++ API:
+Much of the Urho3D classes are exposed to scripts, however things that require low-level access or high performance (like direct low level rendering) are not. Also for scripting convenience some things have been changed from the C++ API:
 
 - The template array and string classes are exposed as Array<type> and String.
 
@@ -661,7 +666,7 @@ The binding of Urho3D C++ classes is accomplished with the tolua++ library, whic
 
 As seen above from the event handling examples, VariantMap handling has some differences to both C++ and AngelScript. To get a value, supply its key name as a string. To get a pointer to an object, supply first the object type, then the key name.
 
-For the rest of the functions and classes, see the generated \ref LuaScriptAPI "Lua script API reference". Also, look at the Lua counterparts of the sample applications in the Bin/Data/LuaScripts directory and compare them to the C++ and AngelScript versions to familiarize yourself with how things are done on the Lua side.
+For the rest of the functions and classes, see the generated \ref LuaScriptAPI "Lua script API reference". Also, look at the Lua counterparts of the sample applications in the bin/Data/LuaScripts directory and compare them to the C++ and AngelScript versions to familiarize yourself with how things are done on the Lua side.
 
 \section LuaScripting_Allocation Object allocation & Lua garbage collection
 
@@ -708,18 +713,10 @@ Screen resolution, fullscreen/windowed, vertical sync and hardware multisampling
 
 When setting the initial screen mode, Graphics does a few checks:
 
-- For Direct3D9, the supported shader model is checked. 2 is minimum, but 3 will be used if available. For testing, SM2 can be forced by calling \ref Graphics::SetForceSM2 "SetForceSM2()" before setting the initial screen mode.
-- For OpenGL, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is checked for.
-- Is hardware instancing supported? This requires %Shader %Model 3 on Direct3D9 and the ARB_instanced_arrays extension on OpenGL.
+- For Direct3D9, shader model 3.0 support is checked.
+- For OpenGL, version 3.2 support is checked for first and used if available. As a fallback, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is checked for. The ARB_instanced_arrays extension is also checked for but not required; it will enable hardware instancing support when present.
 - Are hardware shadow maps supported? Both AMD & NVIDIA style shadow maps can be used. If neither are available, no shadows will be rendered.
 - Are light pre-pass and deferred rendering modes supported? These require sufficient multiple rendertarget support, and R32F texture format support.
-
-%Shader model 2 has the following limitations due to limited pixel shader instruction count:
-
-- Directional light shadows support a maximum of 3 cascade splits instead of 4.
-- Shadowed point lights do not support specular calculations in forward rendering.
-- Complex materials do not combine the ambient pass with the first forward light (lit base pass optimization.)
-- Complex forward rendered materials (eg. normal + specular map + alpha masking) combined with shadow mapping or height fog may not work.
 
 \section Rendering_Renderer Renderer
 
@@ -731,7 +728,7 @@ By default there is one viewport, but the amount can be increased with the funct
 
 Viewports can also be defined for rendertarget textures. See \ref AuxiliaryViews "Auxiliary views" for details.
 
-Each viewport defines a command sequence for rendering the scene, the \ref RenderPaths "render path". By default there exist forward, light pre-pass and deferred render paths in the Bin/CoreData/RenderPaths directory, see \ref Renderer::SetDefaultRenderPath "SetDefaultRenderPath()" to set the default for new viewports. If not overridden from the command line, forward rendering is the default. Deferred rendering modes will be advantageous once there is a large number of per-pixel lights affecting each object, but their disadvantages are the lack of hardware multisampling and inability to choose the lighting model per material. In place of multisample antialiasing, a FXAA post-processing edge filter can be used, see the MultipleViewports sample application (Bin/Data/Scripts/09_MultipleViewports.as) for an example of how to use.
+Each viewport defines a command sequence for rendering the scene, the \ref RenderPaths "render path". By default there exist forward, light pre-pass and deferred render paths in the bin/CoreData/RenderPaths directory, see \ref Renderer::SetDefaultRenderPath "SetDefaultRenderPath()" to set the default for new viewports. If not overridden from the command line, forward rendering is the default. Deferred rendering modes will be advantageous once there is a large number of per-pixel lights affecting each object, but their disadvantages are the lack of hardware multisampling and inability to choose the lighting model per material. In place of multisample antialiasing, a FXAA post-processing edge filter can be used, see the MultipleViewports sample application (bin/Data/Scripts/09_MultipleViewports.as) for an example of how to use.
 
 The steps for rendering each viewport on each frame are roughly the following:
 
@@ -800,7 +797,7 @@ See also \ref Materials "Materials", \ref Shaders "Shaders", \ref Lights "Lights
 
 See \ref RenderingModes "Rendering modes" for detailed discussion on the forward, light pre-pass and deferred rendering modes.
 
-See \ref APIDifferences "Differences between Direct3D9 and OpenGL" for what to watch out for when using the low-level rendering functionality directly.
+See \ref APIDifferences "Differences between Direct3D and OpenGL" for what to watch out for when using the low-level rendering functionality directly.
 
 
 \page RenderingModes Rendering modes
@@ -850,23 +847,23 @@ Forward rendering makes it possible to use hardware multisampling and different 
 Finally note that due to OpenGL framebuffer object limitations an extra framebuffer blit has to happen at the end in both light pre-pass and deferred rendering, which costs some performance. Also, because multiple rendertargets on OpenGL must have the same format, an R32F texture can not be used for linear depth, but instead 24-bit depth is manually encoded and decoded into RGB channels.
 
 
-\page APIDifferences Differences between Direct3D9 and OpenGL
+\page APIDifferences Differences between Direct3D and OpenGL
 
 These differences need to be observed when using the low-level rendering functionality directly. The high-level rendering architecture, including the Renderer and UI subsystems and the Drawable subclasses already handle most of them transparently to the user.
 
-- The post-projection depth range is (0,1) for Direct3D9 and (-1,1) for OpenGL. The Camera can be queried either for an API-specific or API-independent (Direct3D9 convention) projection matrix.
+- The post-projection depth range is (0,1) for Direct3D and (-1,1) for OpenGL. The Camera can be queried either for an API-specific or API-independent (Direct3D convention) projection matrix.
 
-- To render with 1:1 texel-to-pixel mapping, on Direct3D9 UV coordinates have to be shifted a half-pixel to the right and down, or alternatively vertex positions can be shifted a half-pixel left and up.
+- To render with 1:1 texel-to-pixel mapping, on Direct3D9 UV coordinates have to be shifted a half-pixel to the right and down, or alternatively vertex positions can be shifted a half-pixel left and up. The required shift can be queried with the function \ref Graphics::GetPixelUVOffset "GetPixelUVOffset()".
 
-- On Direct3D9 the depth-stencil surface can be equal or larger in size than the color rendertarget. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the backbuffer depth-stencil surface when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth-stencil surfaces on demand whenever a texture is set as a color rendertarget, and a null depth-stencil is specified.
+- On Direct3D the depth-stencil surface can be equal or larger in size than the color rendertarget. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the backbuffer depth-stencil surface when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth-stencil surfaces on demand whenever a texture is set as a color rendertarget, and a null depth-stencil is specified.
 
-- On Direct3D9 the viewport will be reset to full size when the first color rendertarget is changed. On OpenGL this does not happen. To ensure correct operation on both APIs, always use this sequence: first set the rendertargets, then the depth-stencil surface and finally the viewport.
+- On Direct3D9 the viewport will be reset to full size when the first color rendertarget is changed. On OpenGL & Direct3D11 this does not happen. To ensure correct operation on both APIs, always use this sequence: first set the rendertargets, then the depth-stencil surface and finally the viewport.
 
 - On OpenGL modifying a texture will cause it to be momentarily set on the first texture unit. If another texture was set there, the assignment will be lost. Graphics performs a check to not assign textures redundantly, so it is safe and recommended to always set all needed textures before rendering.
 
 - Modifying an index buffer on OpenGL will similarly cause the existing index buffer assignment to be lost. Therefore, always set the vertex and index buffers before rendering.
 
-- %Shader resources are stored in different locations depending on the API: Bin/CoreData/Shaders/HLSL for Direct3D9, and Bin/CoreData/Shaders/GLSL for OpenGL.
+- %Shader resources are stored in different locations depending on the API: bin/CoreData/Shaders/HLSL for Direct3D, and bin/CoreData/Shaders/GLSL for OpenGL.
 
 - To ensure similar UV addressing for render-to-texture viewports on both APIs, on OpenGL texture viewports will be rendered upside down.
 
@@ -892,9 +889,9 @@ OpenGL ES 2.0 has further limitations:
 
 \page Materials Materials
 
-Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. Default and example materials exist in the Bin/CoreData/Materials & Bin/Data/Materials subdirectories, and techniques exist in the Bin/CoreData/Techniques subdirectory.
+Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. Default and example materials exist in the bin/CoreData/Materials & bin/Data/Materials subdirectories, and techniques exist in the bin/CoreData/Techniques subdirectory.
 
-A material defines the textures, shader parameters and culling mode to use, and refers to one or several techniques. A technique defines the actual rendering passes, the shaders to use in each, and all other rendering states such as depth test, depth write, and blending.
+A material defines the textures, shader parameters and culling & fill mode to use, and refers to one or several techniques. A technique defines the actual rendering passes, the shaders to use in each, and all other rendering states such as depth test, depth write, and blending.
 
 A material definition looks like this:
 
@@ -907,6 +904,7 @@ A material definition looks like this:
     <parameter ... />
     <cull value="cw|ccw|none" />
     <shadowcull value="cw|ccw|none" />
+    <fill value="solid|wireframe|point" />
     <depthbias constant="x" slopescaled="y" />
 </material>
 \endcode
@@ -959,7 +957,7 @@ The sRGB flag controls both whether the texture should be sampled with sRGB to l
 
 Using cube map textures requires an XML file to define the cube map face textures or layout. In this case the XML file *is* the texture resource name in material scripts or in LoadResource() calls.
 
-Individual face textures are defined in the XML like this: (see Bin/Data/Textures/Skybox.xml for an example)
+Individual face textures are defined in the XML like this: (see bin/Data/Textures/Skybox.xml for an example)
 
 \code
 <cubemap>
@@ -987,8 +985,8 @@ For the layout definitions, see http://www.cgtextures.com/content.php?action=tut
 A technique definition looks like this:
 
 \code
-<technique vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" sm3="false|true" desktop="false|true" >
-    <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow" sm3="false|true" desktop="false|true" >
+<technique vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" desktop="false|true" >
+    <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow" desktop="false|true" >
         vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4"
         lighting="unlit|pervertex|perpixel"
         blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha|subtract|subtractalpha"
@@ -1000,11 +998,9 @@ A technique definition looks like this:
 </technique>
 \endcode
 
-The "sm3" attribute in the technique root element allows the technique to specify it requires %Shader %Model 3 hardware. Omitting it is same as specifying false (works on both SM2 & 3.) The sm3 attribute can also be specified per pass, to disable for example a too complex lit base optimization pass on SM2.
+The "desktop" attribute in either technique or pass allows to specify it requires desktop graphics hardware (exclude mobile devices.) Omitting it is the same as specifying false.
 
-The "desktop" attribute in either technique or pass works similarly to allow requiring desktop hardware and excluding mobile devices.
-
-Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D9, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
+Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
 
 Shaders and their compilation defines can be specified on both the technique and pass level. If a pass does not override the default shaders specified on the technique level, it still can specify additional compilation defines to be used. However, if a pass overrides the shaders, then the technique-level defines are not used.
 
@@ -1040,7 +1036,7 @@ Urho3D uses an ubershader-like approach: permutations of each shader will be bui
 
 The building of these permutations happens on demand: technique and renderpath definition files both refer to shaders and the compilation defines to use with them. In addition the engine will add inbuilt defines related to geometry type and lighting. It is not generally possible to enumerate beforehand all the possible permutations that can be built out of a single shader.
 
-On Direct3D9 compiled shader bytecode is saved to disk in a "Cache" subdirectory next to the shader source code, so that the possibly time-consuming compile can be skipped on the next time the shader permutation is needed. On OpenGL such mechanism is not available.
+On Direct3D compiled shader bytecode is saved to disk in a "Cache" subdirectory next to the shader source code, so that the possibly time-consuming compile can be skipped on the next time the shader permutation is needed. On OpenGL such mechanism is not available.
 
 \section Shaders_InbuiltDefines Inbuilt compilation defines
 
@@ -1076,6 +1072,7 @@ Vertex shader uniforms:
 - float cNearClip: camera's near clip distance
 - float cFarClip: camera's far clip distance
 - float cDeltaTime: the timestep of the current frame
+- float4 cDepthMode: parameters for calculating a linear depth value between 0-1 to pass to the pixel shader in an interpolator.
 - float cElapsedTime: scene's elapsed time value. Can be used to implement animating materials
 - float4x3 cModel: the world transform matrix of the object being rendered
 - float4x4 cViewProj: the camera's concatenated view and projection matrices
@@ -1085,6 +1082,7 @@ Pixel shader uniforms:
 
 - float3 cAmbientColor: ambient color for a zone with no ambient gradient
 - float3 cCameraPosPS: camera's world position
+- float4 cDepthReconstruct: parameters for reconstructing a linear depth value between 0-1 from a nonlinear hardware depth texture sample.
 - float cDeltaTimePS: the timestep of the current frame
 - float cElapsedTimePS: scene's elapsed time value
 - float3 cFogColor: the zone's fog color
@@ -1094,7 +1092,7 @@ Pixel shader uniforms:
 
 \section Shaders_Writing Writing shaders
 
-Shaders must be written separately for HLSL (Direct3D9) and GLSL (OpenGL). The built-in shaders try to implement the same functionality on both shader languages as closely as possible.
+Shaders must be written separately for HLSL (Direct3D) and GLSL (OpenGL). The built-in shaders try to implement the same functionality on both shader languages as closely as possible.
 
 To get started with writing your own shaders, start with studying the most basic examples possible: the Basic, Shadow & Unlit shaders. Note the shader include files which bring common functionality, for example Uniforms.hlsl, Samplers.hlsl & Transform.hlsl for HLSL shaders.
 
@@ -1114,7 +1112,7 @@ vec3 worldPos = GetWorldPos(modelMatrix);
 gl_Position = GetClipPos(worldPos);
 \endcode
 
-On both Direct3D9 and OpenGL the vertex and pixel shaders are written into the same file, and the entrypoint functions must be called VS() and PS(). In OpenGL mode one of these is transformed to the main() function required by GLSL behind the scenes. When compiling a vertex shader, the compilation define "COMPILEVS" is always present, and likewise "COMPILEPS" when compiling a pixel shader. These are heavily used in the shader include files to prevent constructs that are illegal for the "wrong" type of shader, and to reduce compilation time. When compiling for %Shader %Model 3 on Direct3D9, the compilation define "SM3" is present: this can be used to separate code which would not compile on SM2.
+On both Direct3D and OpenGL the vertex and pixel shaders are written into the same file, and the entrypoint functions must be called VS() and PS(). In OpenGL mode one of these is transformed to the main() function required by GLSL behind the scenes. When compiling a vertex shader, the compilation define "COMPILEVS" is always present, and likewise "COMPILEPS" when compiling a pixel shader. These are heavily used in the shader include files to prevent constructs that are illegal for the "wrong" type of shader, and to reduce compilation time.
 
 The uniforms must be prefixed in a certain way so that the engine understands them:
 
@@ -1130,13 +1128,26 @@ uniform sampler2D sDetailMap2;
 uniform sampler2D sDetailMap3;
 \endcode
 
-\section Shaders_Migration Migration of old shaders
+The maximum number of bones supported for hardware skinning depends on the graphics API and is relayed to the shader code in the MAXBONES compilation define. Typically the maximum is 64, but is reduced to 32 on the Raspberry PI, and increased to 128 on Direct3D 11 & OpenGL 3. See also \ref Graphics::GetMaxBones "GetMaxBones()".
 
-In Urho3D V1.3 and before an XML description file was used for shaders, which would enumerate the compilation defines used by shaders into named "options" or "variations".
-The shader would then be referred to with these option names, for example a pixel shader LitSolid_Diff would use the LitSolid source code and the define DIFFMAP. To convert to the
-current system, look up the defines from the description files and add them directly to the technique or renderpath XML descriptions ("vsdefines" or "psdefines" attributes). Also make sure the shader references ("vs" and "ps" attributes) are just the bare shader names with no underscore or option names attached. Finally, delete the shader XML description files.
+\section Shaders_API API differences
 
-GLSL shaders in V1.3 and before used separate .vert and .frag files for the vertex and pixel shader source code. Now these are combined into .glsl files that include both shaders. Include files are likewise merged into .glsl files instead of separate vertex and pixel shader includes. To merge your shader code, append the pixel shader source into the vertex shader source file without the varyings definition (which should already be in the vertex shader code). Merge and fix include statements: change the file extension to .glsl. Note that some include files depend on each other so it is safest to always include Uniforms.glsl and Samplers.glsl first. Finally change the file extension of the vertex shader source file from .vert to .glsl and delete the .frag file. If you have pieces of pixel shader code (for example additional functions or variables) that produce errors when included in the vertex shader compile, wrap these with #ifdef COMPILEPS, and vice versa for vertex shader code.
+Direct3D9 and Direct3D11 share the same HLSL shader code, and likewise OpenGL 2, OpenGL 3, OpenGL ES 2 and WebGL share the same GLSL code. Macros and some conditional code are used to hide the API differences where possible.
+
+When HLSL shaders are compiled for Direct3D11, the define D3D11 is present, and the following details need to be observed:
+
+- Uniforms are organized into constant buffers. See the file Uniforms.hlsl for the built-in uniforms. See TerrainBlend.hlsl for an example of defining your own uniforms into the "custom" constant buffer slot.
+- Both textures and samplers are defined for each texture unit. The macros in Samplers.hlsl (Sample2D, SampleCube etc.) can be used to write code that works on both APIs. These take the texture unit name without the 's' prefix.
+- Vertex shader output position and pixel shader output color need to use the SV_POSITION and SV_TARGET semantics. The macros OUTPOSITION and OUTCOLOR0-3 can be used to select the correct semantic on both APIs. In the vertex shader, the output position should be specified last, as otherwise other interpolator outputs may not function correctly.
+- On Direct3D11 the clip plane coordinate must be calculated manually. This is indicated by the CLIPPLANE compilation define, which is added automatically by the Graphics class. See for example the LitSolid.hlsl shader.
+- Direct3D11 does not support luminance and luminance-alpha texture formats, but rather uses the R and RG channels. Therefore be prepared to perform swizzling in the texture reads as appropriate.
+- Direct3D11 will fail to render if the vertex shader refers to vertex elements that don't exist in the vertex buffers.
+
+For OpenGL, the define GL3 is present when GLSL shaders are being compiled for OpenGL 3+, the define GL_ES is present for OpenGL ES 2, WEBGL define is present for WebGL and RPI define is present for the Raspberry Pi. Observe the following differences:
+
+- On OpenGL 3 GLSL version 150 will be used if the shader source code does not define the version. The texture sampling functions are different but are worked around with defines in the file Samplers.glsl. Likewise the file Transform.glsl contains macros to hide the differences in declaring vertex attributes, interpolators and fragment outputs.
+- On OpenGL 3 luminance, alpha and luminance-alpha texture formats are deprecated, and are replaced with R and RG formats. Therefore be prepared to perform swizzling in the texture reads as appropriate.
+- On OpenGL ES 2 precision qualifiers need to be used.
 
 \section Shaders_Precaching Shader precaching
 
@@ -1150,7 +1161,7 @@ Note that the used shader variations will vary with graphics settings, for examp
 
 The render path consists of rendertarget definitions and commands. The commands are executed in order to yield the rendering result. Each command outputs either to the destination rendertarget & viewport (default if output definition is omitted), or one of the named rendertargets. MRT output is also possible.
 
-A rendertarget's size can be either absolute or multiply or divide the destination viewport size. The multiplier or divisor does not need to be an integer number. Furthermore, a rendertarget can be declared "persistent" so that it will not be mixed with other rendertargets of the same size and format, and its contents can be assumed to be available also on subsequent frames. For examples of rendertarget definitions, see the postprocess renderpath definitions in the Bin/Data/PostProcess directory.
+A rendertarget's size can be either absolute or multiply or divide the destination viewport size. The multiplier or divisor does not need to be an integer number. Furthermore, a rendertarget can be declared "persistent" so that it will not be mixed with other rendertargets of the same size and format, and its contents can be assumed to be available also on subsequent frames.
 
 The available commands are:
 
@@ -1159,6 +1170,7 @@ The available commands are:
 - quad: Render a viewport-sized quad using the specified shaders and compilation defines. Textures can be bound and additionally shader parameters can be specified.
 - forwardlights: Render per-pixel forward lighting for opaque objects with the specified pass name. Shadow maps are also rendered as necessary.
 - lightvolumes: Render deferred light volumes using the specified shaders. G-buffer textures can be bound as necessary.
+- renderui: Render the UI into the output rendertarget. Using this will cause the default %UI render to the backbuffer to be skipped.
 
 A render path can be loaded from a main XML file by calling \ref RenderPath::Load "Load()", after which other XML files (for example one for each post-processing effect) can be appended to it by calling \ref RenderPath::Append "Append()". Rendertargets and commands can be enabled or disabled by calling \ref RenderPath::SetEnabled "SetEnabled()" to switch eg. a post-processing effect on or off. To aid in this, both can be identified by tag names, for example the bloom effect uses the tag "Bloom" for all of its rendertargets and commands.
 
@@ -1169,26 +1181,62 @@ The render path XML definition looks like this:
 \code
 <renderpath>
     <rendertarget name="RTName" tag="TagName" enabled="true|false" size="x y"|sizedivisor="x y"|sizemultiplier="x y"
-        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth" filter="true|false" srgb="true|false" persistent="true|false" />
-    <command type="clear" tag="TagName" enabled="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" />
-    <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" >
+        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth|readabledepth" filter="true|false" srgb="true|false" persistent="true|false" />
+    <command type="clear" tag="TagName" enabled="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" depthstencil="DSName" />
+    <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" depthstencil="DSName">
         <output index="0" name="RTName1" />
         <output index="1" name="RTName2" />
         <output index="2" name="RTName3" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
     </command>
-    <command type="quad" vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" output="viewport|RTName" />
+    <command type="quad" vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" output="viewport|RTName" depthstencil="DSName" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
         <parameter name="ParameterName" value="x y z w" />
     </command>
-    <command type="forwardlights" pass="PassName" uselitbase="true|false" output="viewport|RTName" />
-    <command type="lightvolumes"  vs="VertexShaderName" ps="PixelShaderName" output="viewport|RTName" />
+    <command type="forwardlights" pass="PassName" uselitbase="true|false" output="viewport|RTName" depthstencil="DSName" />
+    <command type="lightvolumes"  vs="VertexShaderName" ps="PixelShaderName" output="viewport|RTName" depthstencil="DSName" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
     </command>
+    <command type="renderui" output="viewport|RTName" depthstencil="DSName" />
 </renderpath>
 \endcode
 
-Note the special "lineardepth" format available for rendertargets. This is intended for storing scene depth in deferred rendering. It will be D3DFMT_R32F on Direct3D9, but RGBA on OpenGL, due to the limitation of all color buffers having to be the same format. The shader include file Samplers.glsl in Bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB.
+For examples of renderpath definitions, see the default forward, deferred and light pre-pass renderpaths in the bin/CoreData/RenderPaths directory, and the postprocess renderpath definitions in the bin/Data/PostProcess directory.
+
+\section RenderPaths_Depth Depth-stencil handling and reading scene depth
+
+Normally needed depth-stencil surfaces are automatically allocated when the render path is executed.
+
+The special "lineardepth" (synonym "depth") format is intended for storing scene depth in deferred rendering. It is not an actual hardware depth-stencil texture, but will be D3DFMT_R32F on Direct3D9 and RGBA on OpenGL, due to the limitation of all color buffers having to be the same format. The shader include file Samplers.glsl in bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB. Writing depth manually to a rendertarget, while using a non-readable depth-stencil surface ensures best compatibility and prevents any conflicts from using both depth test and manual depth sampling at the same time.
+
+There is also a possibility to define a readable hardware depth texture, and instruct the render path to use it instead. Availability for this must first be checked with the function \ref Graphics::GetReadableDepthSupport "GetReadableDepthSupport()". On Direct3D9 this will use the INTZ "hack" format. To define a readable depth-stencil texture, use the format "readabledepth" (synonym "hwdepth") and set it as the depth-stencil by using the "depthstencil" attribute in render path commands. Note that you must set it in every command where you want to use it, otherwise an automatically allocated depth-stencil will be used. Note also that the existence of a stencil channel is not guaranteed, so stencil masking optimizations for lights normally used by the Renderer & View classes will be disabled.
+
+In the special case of a depth-only rendering pass you can set the readable depth texture directly as the "output" and don't need to specify the "depthstencil" attribute at all.
+
+After the readable depth texture has been filled, it can be bound to a texture unit in any subsequent commands. Pixel shaders should use the ReconstructDepth() helper function to reconstruct a linear depth value between 0-1 from the nonlinear hardware depth value. When the readable depth texture is bound for sampling, depth write is automatically disabled, as both modifying and sampling the depth would be undefined.
+
+An example render path for readable hardware depth exists in bin/CoreData/RenderPaths/ForwardHWDepth.xml:
+
+\code
+<renderpath>
+    <rendertarget name="depth" sizedivisor="1 1" format="readabledepth" />
+    <command type="clear" depth="1.0" output="depth" />
+    <command type="scenepass" pass="shadow" output="depth" />
+    <command type="clear" color="fog" depthstencil="depth" />
+    <command type="scenepass" pass="base" vertexlights="true" metadata="base" depthstencil="depth" />
+    <command type="forwardlights" pass="light" depthstencil="depth" />
+    <command type="scenepass" pass="postopaque" depthstencil="depth" />
+    <command type="scenepass" pass="refract" depthstencil="depth">
+        <texture unit="environment" name="viewport" />
+    </command>
+    <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" depthstencil="depth"  />
+    <command type="scenepass" pass="postalpha" sort="backtofront" depthstencil="depth" />
+</renderpath>
+\endcode
+
+The render path starts by allocating a readable depth-stencil texture the same size as the destination viewport, clearing its depth, then rendering a depth-only pass to it. Next the destination color rendertarget is cleared normally, while the readable depth texture is used as the depth-stencil for that and all subsequent commands. Any command after the depth render pass could now bind the depth texture to an unit for sampling, for example for smooth particle or SSAO effects.
+
+The ForwardDepth.xml render path does the same, but using a linear depth rendertarget instead of a hardware depth texture. The advantage is better compatibility (guaranteed to work without checking \ref Graphics::GetReadableDepthSupport "GetReadableDepthSupport()") but it has worse performance as it will fill the hardware depth-stencil twice.
 
 \section RenderPaths_ForwardLighting Forward lighting special considerations
 
@@ -1301,7 +1349,7 @@ By default an Animation is played back by using all the available bone tracks. H
 
 Animations can be accompanied with trigger data that contains timestamped Variant data to be interpreted by the application. This trigger data is in XML format next to the animation file itself. When an animation contains triggers, the AnimatedModel's scene node sends the E_ANIMATIONTRIGGER event each time a trigger point is crossed. The event data contains the timestamp, the animation name, and the variant data. Triggers will fire when the animation is advanced using \ref AnimationState::AddTime "AddTime()", but not when setting the absolute animation time position.
 
-The trigger data definition is below. Either normalized (0 = animation start, 1 = animation end) or non-normalized (time in seconds) timestamps can be used. See Bin/Data/Models/Ninja_Walk.xml and Bin/Data/Models/Ninja_Stealth.xml for examples; NinjaSnowWar implements footstep particle effects using animation triggers.
+The trigger data definition is below. Either normalized (0 = animation start, 1 = animation end) or non-normalized (time in seconds) timestamps can be used. See bin/Data/Models/Ninja_Walk.xml and bin/Data/Models/Ninja_Stealth.xml for examples; NinjaSnowWar implements footstep particle effects using animation triggers.
 
 \code
 <animation>
@@ -1336,7 +1384,7 @@ Like with skeletal animations, there are two ways to play back node animations:
 %Node animations do not support blending, as there is no initial pose to blend from. Instead they are always played back with full weight. Note that the scene node names in the animation and in the scene must match exactly, otherwise the animation will not play.
 
 
-\page Particles %Particle systems
+\page Particles Particle systems
 
 The ParticleEmitter class derives from BillboardSet to implement a particle system that updates automatically. 
 
@@ -1411,7 +1459,7 @@ Rendering detailed auxiliary views can easily have a large performance impact. S
 The surface can also be configured to always update its viewports, or to only update when manually requested. See \ref RenderSurface::SetUpdateMode "SetUpdateMode()". For example an editor widget showing a rendered texture might use either of those modes. Call \ref RenderSurface::QueueUpdate "QueueUpdate()" to request a manual update of the surface on the current frame.
 
 
-\page Input %Input
+\page Input Input
 
 The Input subsystem provides keyboard, mouse, joystick and touch input both via a polled interface and events. This subsystem is also used for querying whether the application window has input focus or is minimized.
 
@@ -1498,7 +1546,7 @@ On platforms that support it (such as Android) an on-screen virtual keyboard can
 
 On Windows the user must first touch the screen once before touch input is activated. Trying to record or load touch gestures will fail before that.
 
-\page Audio %Audio
+\page Audio Audio
 
 The Audio subsystem implements an audio output stream. Once it has been initialized, the following operations are supported:
 
@@ -1509,14 +1557,9 @@ To hear pseudo-3D positional sounds, a SoundListener component must exist in a s
 
 The output is software mixed for an unlimited amount of simultaneous sounds. Ogg Vorbis sounds are decoded on the fly, and decoding them can be memory- and CPU-intensive, so WAV files are recommended when a large number of short sound effects need to be played.
 
-For purposes of volume control, each SoundSource is classified into one of four categories:
+For purposes of volume control, each SoundSource can be classified into a user defined group which is multiplied with a master category and the individual SoundSource gain set using \ref SoundSource::SetGain "SetGain()" for the final volume level.
 
-- %Sound effects
-- Ambient
-- Music
-- Voice
-
-A master gain category also exists that affects the final output level. To control the category volumes, use \ref Audio::SetMasterGain "SetMasterGain()".
+To control the category volumes, use \ref Audio::SetMasterGain "SetMasterGain()", which defines the category if it didn't already exist.
 
 The SoundSource components support automatic removal from the node they belong to, once playback is finished. To use, call \ref SoundSource::SetAutoRemove "SetAutoRemove()" on them. This may be useful when a game object plays several "fire and forget" sound effects.
 
@@ -1649,7 +1692,7 @@ The navigation mesh generation must be triggered manually by calling \ref Naviga
 
 To query for a path between start and end points on the navigation mesh, call \ref NavigationMesh::FindPath "FindPath()".
 
-For a demonstration of the navigation capabilities, check the related sample application (Bin/Data/Scripts/15_Navigation.as), which features partial navigation mesh rebuilds (objects can be created and deleted) and querying paths.
+For a demonstration of the navigation capabilities, check the related sample application (bin/Data/Scripts/15_Navigation.as), which features partial navigation mesh rebuilds (objects can be created and deleted) and querying paths.
 
 
 \page UI User interface
@@ -1695,13 +1738,13 @@ The absolute pixel rects interact poorly with the Renderer's texture quality set
 
 \section UI_Defining Defining UI elements in XML
 
-User interface elements derive from Serializable, so they can be serialized to/from XML using their attributes. There are two distinct use cases for %UI definition files: either defining just the %UI element style and leaving the actual position and dimensions to be filled in later, or fully defining an %UI element layout. The default element style definitions, used for example by the editor and the debug console, are in the file Bin/Data/UI/DefaultStyle.xml.
+User interface elements derive from Serializable, so they can be serialized to/from XML using their attributes. There are two distinct use cases for %UI definition files: either defining just the %UI element style and leaving the actual position and dimensions to be filled in later, or fully defining an %UI element layout. The default element style definitions, used for example by the editor and the debug console, are in the file bin/Data/UI/DefaultStyle.xml.
 
 The function \ref UI::LoadLayout "LoadLayout()" in UI will take an XML file and instantiate the elements defined in it. To be valid XML, there should be one root-level %UI element. An optional style XML file can be specified; the idea is to first read the element's style from that file, then fill in the rest from the actual layout XML file. This way the layout file can be relatively simple, as the majority of the data is already defined.
 
 Note that a style can not be easily applied recursively to the loaded elements afterward. Therefore remember to specify the style file already when loading, or alternatively \ref UIElement::SetDefaultStyle "assign a default style file" to the %UI root element, which will then be picked up by all loaded layouts. This works because the %UI subsystem searches the style file by going up the parental chain starting from target parent %UI element. The search stops immediately when a style file is found or when it has reached the root element. Also note that Urho3D does not limit the number of style files being used at the same time in an application. You may have different style file set along the %UI parental hierarchy, if your application needs that.
 
-See the elements' C++ code for all supported attributes, and look at the editor's user interface layouts in the Bin/Data/UI directory for examples. You can also use the Editor application to create %UI layouts. The serialization format is similar to scene XML serialization, with three important differences:
+See the elements' C++ code for all supported attributes, and look at the editor's user interface layouts in the bin/Data/UI directory for examples. You can also use the Editor application to create %UI layouts. The serialization format is similar to scene XML serialization, with three important differences:
 
 1) The element type to instantiate, and the style to use for it can be set separately. For example the following element definition
 
@@ -1753,165 +1796,300 @@ Sprites are a special kind of %UI element that allow subpixel (float) positionin
 
 Due to the free transformability, sprites can not be reliably queried with \ref UI::GetElementAt "GetElementAt()". Also, only other sprites should be parented to sprites, as the other elements do not support scaling and rotation.
 
+\section UI_Cursor_Shapes Cursor Shapes
+
+Urho3D supports custom Cursor Shapes defined from an \ref Image.
+
+The Shape can be an OS default from the \ref CursorShape "CursorShape" enum, which are automatically switched to and from by the \ref UI "UI" subsystem, but can be manually switched to using \ref Cursor::SetShape "Cursor::SetShape(CursorShape)".
+
+Alternatively they can be defined using a name in String format to identify it, which can only be manually switched to and from using \ref Cursor::SetShape "Cursor::SetShape(const String&)".
+
+There are a number of reserved names that are used for the OS defaults:
+    - Normal
+    - IBeam
+    - Cross
+    - ResizeVertical
+    - ResizeDiagonalTopRight
+    - ResizeHorizontal
+    - ResizeDiagonalTopLeft
+    - ResizeAll
+    - AcceptDrop
+    - RejectDrop
+    - Busy
+    - BusyArrow
+	
+Cursor Shapes can be define in a number of different ways:
+
+XML:
+\code
+	<element type="Cursor">
+		<attribute name="Shapes">
+			<variant type="VariantVector" >
+				<variant type="String" value="Normal" />
+				<variant type="ResourceRef" value="Image;Textures/UI.png" />
+				<variant type="IntRect" value="0 0 12 24" />
+				<variant type="IntVector2" value="0 0" />
+			</variant>  
+			<variant type="VariantVector" >
+				<variant type="String" value="Custom" />
+				<variant type="ResourceRef" value="Image;Textures/UI.png" />
+				<variant type="IntRect" value="12 0 12 36" />
+				<variant type="IntVector2" value="0 0" />
+			</variant>  
+		</atrribute>
+	</element>
+\endcode
+
+C++:
+\code
+    UI* ui = GetSubsystem<UI>();
+    ResourceCache* rc = GetSubsystem<ResourceCache>();
+
+    Cursor* cursor = new Cursor(context_);
+    Image* image = rc->GetResource<Image>("Textures/UI.png");
+    if (image)
+	{
+        cursor->DefineShape(CS_NORMAL, image, IntRect(0, 0, 12, 24), IntVector2(0, 0));
+		cursor->DefineShape("Custom", image, IntRect(12, 0, 12, 36), IntVector2(0, 0));
+	}
+
+    ui->SetCursor(cursor);
+\endcode
+
+Angelcode:
+\code
+	Cursor@ cursor = new Cursor();
+	Image@ image = cache.GetResource("Image", "Textures/UI.png");
+	if (image !is null)
+	{
+		cursor.DefineShape(CS_NORMAL, image, IntRect(0, 0, 12, 24), IntVector2(0, 0));
+		cursor.DefineShape("Custom", image, IntRect(12, 0, 12, 36), IntVector2(0, 0));
+	}
+		
+	ui.SetCursor(cursor);
+\endcode
+
 \page Urho2D Urho2D
 In order to make 2D games in Urho3D, the Urho2D sublibrary is provided. Urho2D includes 2D graphics and 2D physics.
 
 A typical 2D game setup would consist of the following:
-	- Create an orthographic camera
-	- Create some sprites
-	- Use physics and constraints to interact with the scene
+    - Create an orthographic camera
+    - Create some sprites
+    - Use physics and constraints to interact with the scene
 
 \section Urho2D_Orthographic Orthographic camera
 In order to use Urho2D we need to set camera to orthographic mode first; it can be done with following code:
 
 C++:
 \code
-    // Create camera node
-    Node* cameraNode = scene_->CreateChild("Camera");
-
-    // Create camera
-    Camera* camera = cameraNode->CreateComponent<Camera>();
-    // Set camera orthographic
-    camera->SetOrthographic(true);
-    // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
-\endcode 
+    Node* cameraNode = scene_->CreateChild("Camera"); // Create camera node
+    Camera* camera = cameraNode->CreateComponent<Camera>(); // Create camera
+    camera->SetOrthographic(true); // Set camera orthographic
+    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE); // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+\endcode
 
 AngelScript:
 \code
-    // Create camera node
-    Node@ cameraNode = scene_.CreateChild("Camera");
-
-    // Create camera
-    Camera@ camera = cameraNode.CreateComponent("Camera");
-    // Set camera orthographic
-    camera.orthographic = true;
-    // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera.orthoSize = graphics.height * PIXEL_SIZE;
-\endcode 
+    Node@ cameraNode = scene_.CreateChild("Camera"); // Create camera node
+    Camera@ camera = cameraNode.CreateComponent("Camera"); // Create camera
+    camera.orthographic = true; // Set camera orthographic
+    camera.orthoSize = graphics.height * PIXEL_SIZE; // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+\endcode
 
 Lua:
 \code
-    -- Create camera node
-    cameraNode = scene_:CreateChild("Camera")
-
-    -- Create camera
-    local camera = cameraNode:CreateComponent("Camera")
-    -- Set camera orthographic
-    camera.orthographic = true
-    -- Set camera ortho size (the value of PIXEL_SIZE is 0.01)
-    camera.orthoSize = graphics.height * PIXEL_SIZE
-\endcode 
+    cameraNode = scene_:CreateChild("Camera") -- Create camera node
+    local camera = cameraNode:CreateComponent("Camera") -- Create camera
+    camera.orthographic = true -- Set camera orthographic
+    camera.orthoSize = graphics.height * PIXEL_SIZE -- Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+\endcode
 
 To zoom in/out, use \ref Camera::SetZoom "SetZoom()".
 
 \section Urho2D_Sprites Sprites
-Urho2D provides a handful of classes for loading/drawing the kind of sprite required by your game.
-You can chose from animated sprites, 2D particle emitters and static sprites.
+Urho2D provides a handful of classes for loading/drawing the kind of sprite required by your game. You can chose from animated sprites, 2D particle emitters and static sprites.
 
 \section Urho2D_Animated Animated sprites
 
-Workflow for creating animated sprites in Urho2D relies on Spriter (c).
-Spriter is a crossplatform tool for creating 2D animations. It comes both as an almost fully featured free version and a more advanced 'pro' version. Free version is available at http://www.brashmonkey.com/spriter.htm. To get started, scml files from Bin/Data/Urho2D folder can be loaded in Spriter. Note that although currently Spriter doesn't support spritesheets/texture atlases, Urho2D does: you just have to use the same name for your scml file and your spritesheet's xml file (see \ref SpriteSheet2D below for details on how to generate this file). Example 33_Urho2DSpriterAnimation is a good demonstration of this feature (scml file and xml spritesheet are both named 'imp' to instruct Urho2D to use the atlas instead of the individual files). You could remove every image files in the 'imp' folder and just keep 'imp_all.png' to test it out. However, keep your individual image files as they are still required if you want to later edit your scml project in Spriter.
-
+Workflow for creating animated sprites in Urho2D relies on Spriter (c). Spriter is a crossplatform tool for creating 2D animations. It comes both as an almost fully featured free version and a more advanced 'pro' version. Free version is available at http://www.brashmonkey.com/spriter.htm. To get started, scml files from bin/Data/Urho2D folder can be loaded in Spriter. Note that although currently Spriter doesn't support spritesheets/texture atlases, Urho2D does: you just have to use the same name for your scml file and your spritesheet's xml file (see \ref Urho2D_Static_Sprites "Static sprites" below for details on how to generate this file). Example 33_Urho2DSpriterAnimation is a good demonstration of this feature (scml file and xml spritesheet are both named 'imp' to instruct Urho2D to use the atlas instead of the individual files). You could remove every image files in the 'imp' folder and just keep 'imp_all.png' to test it out. However, keep your individual image files as they are still required if you want to later edit your scml project in Spriter.
 
 A *.scml file is loaded using AnimationSet2D class (Resource) and rendered using AnimatedSprite2D class (Drawable component):
 
 - AnimationSet2D: a Spriter *.scml file including one or more animations.
-Each Spriter animation (Animation2D) contained in an AnimationSet2D can be accessed by its index and by its name (\ref AnimationSet2D::GetAnimation "GetAnimation()").
+Each Spriter animation (Animation2D) contained in an AnimationSet2D can be accessed by its index and by its name (using \ref AnimationSet2D::GetAnimation "GetAnimation()").
 
-- AnimatedSprite2D: used to display a Spriter animation (Animation2D from an AnimationSet2D). Equivalent to a 3D AnimatedModel. Animation2D animations inside the AnimationSet2D are accessed by their name (String) using \ref AnimatedSprite2D::SetAnimation "SetAnimation()". Playback animation speed can be controlled using \ref AnimatedSprite2D::SetSpeed "SetSpeed()". Loop mode can be controlled using \ref AnimatedSprite2D::SetLoopMode "SetLoopMode()" (you can use the default value set in Spriter or make the animation repeat or clamp).
-One interesting feature is the ability to flip/mirror animations on both axes, using \ref AnimatedSprite2D::SetFlip "SetFlip()", \ref AnimatedSprite2D::SetFlipX "SetFlipX()" or \ref AnimatedSprite2D::SetFlipY "SetFlipY()". Once flipped, the animation remains in that state until boolean state is restored to false. It is recommended to build your sprites centered in Spriter if you want to easily flip their animations (otherwise sprite position will seem to diverge).
+- AnimatedSprite2D: component used to display a Spriter animation (Animation2D) from an AnimationSet2D. Equivalent to a 3D AnimatedModel. Animation2D animations inside the AnimationSet2D are accessed by their name (%String) using \ref AnimatedSprite2D::SetAnimation "SetAnimation()". Playback animation speed can be controlled using \ref AnimatedSprite2D::SetSpeed "SetSpeed()". Loop mode can be controlled using \ref AnimatedSprite2D::SetLoopMode "SetLoopMode()". You can use the default value set in Spriter (LM_DEFAULT) or make the animation repeat (LM_FORCE_LOOPED) or clamp (LM_FORCE_CLAMPED).
+One interesting feature is the ability to flip/mirror animations on both axes, using \ref AnimatedSprite2D::SetFlip "SetFlip()", \ref AnimatedSprite2D::SetFlipX "SetFlipX()" or \ref AnimatedSprite2D::SetFlipY "SetFlipY()". Once flipped, the animation remains in that state until boolean state is restored to false. It is recommended to build your sprites centered in Spriter if you want to easily flip their animations and avoid using offsets for position and collision shapes.
 
-- Animation2D (RefCounted): a Spriter animation from an AnimationSet2D.
+- Animation2D (RefCounted): a Spriter animation from an AnimationSet2D. It allows readonly access to a given scml's animation name (\ref Animation2D::GetName "GetName()"), length (\ref Animation2D::GetLength "GetLength()") and loop state (\ref Animation2D::IsLooped "IsLooped()").
 
 For a demonstration, check examples 33_Urho2DSpriterAnimation and 24_Urho2DSprite.
 
 \section Urho2D_Particle Particle emitters
 A 2D particle emitter is built from a *.pex file (a format used by many 2D engines).
-A *.pex file is loaded using ParticleEffect2D class (Resource) and rendered using AnimatedSprite2D class (Drawable component):
+A *.pex file is loaded using ParticleEffect2D class (Resource) and rendered using ParticleEmitter2D class (Drawable component):
 
-- ParticleEffect2D: a *.pex file defining the behavior and texture of a 2D particle (ParticleEmitter2D). For an example, see Bin/Data/Urho2D/greenspiral.pex
+- ParticleEffect2D: a *.pex file defining the behavior and texture of a 2D particle (ParticleEmitter2D). For an example, see bin/Data/Urho2D/greenspiral.pex
 - ParticleEmitter2D: used to display a ParticleEffect2D. Equivalent to a 3D ParticleEmitter.
 
 For a demonstration, check example 25_Urho2DParticle.
 
-ParticleEditor2D tool (https://github.com/aster2013/ParticleEditor2D) can be used to easily create pex files.
+'ParticleEditor2D' tool (https://github.com/aster2013/ParticleEditor2D) can be used to easily create pex files. And to get you started, many elaborate pex samples under friendly licenses are available on the web, mostly on Github (check ParticlePanda, Citrus %Engine, %Particle Designer, Flambe, Starling, CBL...)
 
 \section Urho2D_Static_Sprites Static sprites
 Static sprites are built from single image files or from spritesheets/texture atlases.
 Single image files are loaded using Sprite2D class (Resource) and spritesheets/texture atlases are loaded using SpriteSheet2D class (Resource).
 Both are rendered using StaticSprite2D class (Drawable component):
-- StaticSprite2D: used to display a Sprite2D. Equivalent to a 3D StaticModel.
 - Sprite2D: an image defined with texture, texture rectangle and hot spot.
 - SpriteSheet2D: a texture atlas image (that packs multiple Sprite2D images).
+- StaticSprite2D: used to display a Sprite2D. Equivalent to a 3D StaticModel.
 Spritesheets can be created using tools like ShoeBox (http://renderhjs.net/shoebox/), darkFunction Editor (http://darkfunction.com/editor/), SpriteHelper (http://www.gamedevhelper.com/spriteHelper2Info.php), TexturePacker (http://www.codeandweb.com/texturepacker), ...
 These tools will generate an image file and a xml file mapping coordinates and size for each individual image. Note that Urho2D uses same xml file format as Sparrow/Starling engines.
 
 You can assign a material to an image by creating a xml parameter file named as the image and located in the same folder.
-For example, to make the box sprite (Bin/Data/Urho2D/Box.png) nearest filtered, create a file Box.xml next to it, with the following content:
+For example, to make the box sprite (bin/Data/Urho2D/Box.png) nearest filtered, create a file Box.xml next to it, with the following content:
 
 \code
 <texture>
     <filter mode="nearest" />
 </texture>
-\endcode 
+\endcode
 
 The full list of texture parameters is documented \ref Materials "here".
 
-\section Urho2D_Physics Physics
-Physics in Urho2D uses Box2D. You can refer to Box2D manual at http://box2d.org/manual.pdf for full reference (just substitute "joints" for "constraints").
-- PhysicsWorld2D: implements 2D physics simulation. Mandatory for 2D physics components such as RigidBody2D, CollisionShape2D or Constraint2D.
+To control sprite opacity, use \ref StaticSprite2D::SetAlpha() "SetAlpha()" (you can also tweak the color alpha using \ref StaticSprite2D::SetColor "SetColor()".)
 
-\section Urho2D_Rigidbodies_Components Rigid bodies components
-- RigidBody2D: a 2D physics object instance.
-Available BodyType2Ds are:
-- BT_STATIC: A static body does not move under simulation and behaves as if it has infinite mass. Internally, Box2D stores zero for the mass and the inverse mass. Static bodies can be moved manually by the user. A static body has zero velocity. Static bodies do not collide with other static or kinematic bodies.
-- BT_DYNAMIC: A dynamic body is fully simulated. It can be moved manually by the user, but normally they move according to forces. A dynamic body can collide with all body types. A dynamic body always has finite, non-zero mass. If you try to set the mass of a dynamic body to zero, it will automatically acquire a mass of one kilogram.
-- BT_KINEMATIC: A kinematic body moves under simulation according to its velocity. Kinematic bodies do not respond to forces. They can be moved manually by the user, but normally a kinematic body is moved by setting its velocity. A kinematic body behaves as if it has infinite mass, however, Box2D stores zero for the mass and the inverse mass. Kinematic bodies do not collide with other static or kinematic bodies.
-
-You should establish the body type at creation, using \ref RigidBody2D::SetBodyType "SetBodyType()", because changing the body type later is expensive.
-
-\section Urho2D_Collision_Shapes_Components Collision shapes components
-Use \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to display the shapes.
-- CollisionShape2D: base class for 2D physics collision shapes.
-- CollisionBox2D: defines 2D physics collision box.
-- CollisionCircle2D: defines 2D physics collision circle. Circle shapes have a position (\ref CollisionCircle2D::SetCenter "SetCenter()") and radius (\ref CollisionCircle2D::SetRadius "SetRadius()"). Circles are solid, you cannot make a hollow circle using the circle shape.
-- CollisionEdge2D: defines 2D physics collision edge. Edge shapes are line segments defined by 2 vertices (\ref CollisionEdge2D::SetVertex1 "SetVertex1()" and \ref CollisionEdge2D::SetVertex2 "SetVertex2()" or globaly \ref CollisionEdge2D::SetVertices "SetVertices()"). They are provided to assist in making a free-form static environment for your game. A major limitation of edge shapes is that they can collide with circles and polygons but not with themselves. The collision algorithms used by Box2D require that at least one of two colliding shapes have volume. Edge shapes have no volume, so edge-edge collision is not possible.
-- CollisionChain2D: defines 2D physics collision chain. The chain shape provides an efficient way to connect many edges together (\ref CollisionChain2D::SetVertices "SetVertices()") to construct your static game worlds. You can connect chains together using ghost vertices. Self-intersection of chain shapes is not supported.
-- CollisionPolygon2D: defines 2D physics collision polygon. Polygon shapes are solid convex polygons. A polygon is convex when all line segments connecting two points in the interior do not cross any edge of the polygon. A polygon must have 3 or more vertices (\ref CollisionPolygon2D::SetVertices "SetVertices()"). Polygons vertices are stored with a counter clockwise winding.
-
-Important: collision shapes must match your textures in order to be accurate. You can use tools like Physics Body Editor (https://code.google.com/p/box2d-editor/), RUBE (https://www.iforce2d.net/rube/), LevelHelper (http://www.gamedevhelper.com/levelhelper/), PhysicsEditor (http://www.codeandweb.com/physicseditor), ... to help you.
-Other interesting tool is BisonKick (https://bisonkick.com/app/518195d06927101d38a83b66/).
-
-\section Urho2D_Constraints_Components Constraints components
-Apply a constraint to a node (called 'ownerBody') and use \ref Constraint::SetOtherBody "SetOtherBody()" to set the other node's body to be constrained to the ownerBody.
-Use \ref Constraint2D::SetCollideConnected "SetCollideConnected()" to switch collision on/off between the bodies.
-Use \ref PhysicsWorld2D::SetDrawJoint "SetDrawJoint()" in combination with \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to display the joints.
-See 32_Urho2DConstraints sample for detailed examples and to help selecting the appropriate constraint.
-- Constraint2D: base class for 2D physics constraints.
-- ConstraintDistance2D: defines 2D physics distance constraint. The distance between two anchor points (\ref ConstraintDistance2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintDistance2D::SetOtherBodyAnchor "SetOtherBodyAnchor()") on two bodies is kept constant. The constraint can also be made soft, like a spring-damper connection. Softness is achieved by tuning frequency (\ref ConstraintDistance2D::SetFrequencyHz "SetFrequencyHz()" is below half of the timestep) and damping ratio (\ref ConstraintDistance2D::SetDampingRatio "SetDampingRatio()").
-- ConstraintFriction2D: defines 2D physics friction constraint. This constraint is used for top-down friction. It provides 2D translational friction (\ref ConstraintFriction2D::SetMaxForce "SetMaxForce()") and angular friction (\ref ConstraintFriction2D::SetMaxTorque "SetMaxTorque()").
-- ConstraintGear2D: defines 2D physics gear constraint. Used to create sophisticated mechanisms and saves from using compound shapes. This constraint can only connect ConstraintRevolute2Ds and/or ConstraintPrismatic2Ds (\ref ConstraintGear2D::SetOwnerConstraint "SetOwnerConstraint()" and \ref ConstraintGear2D::SetOtherConstraint "SetOtherConstraint()"). Like the pulley ratio, you can specify a gear ratio (\ref ConstraintGear2D::SetRatio "SetRatio()"). However, in this case the gear ratio can be negative.
-- ConstraintMotor2D: defines 2D physics motor constraint. This constraint lets you control the motion of a body by specifying target position (\ref ConstraintMotor2D::SetLinearOffset "SetLinearOffset()") and rotation offsets (\ref ConstraintMotor2D::SetAngularOffset "SetAngularOffset()"). You can set the maximum motor force (\ref ConstraintMotor2D::SetMaxForce "SetMaxForce()") and torque (\ref ConstraintMotor2D::SetMaxTorque "SetMaxTorque()") that will be applied to reach the target position and rotation. If the body is blocked, it will stop and the contact forces will be proportional to the maximum motor force and torque.
-- ConstraintMouse2D: defines 2D physics mouse constraint. Used to manipulate bodies with the mouse, this constraint is almost used in every Box2D tutorial available on the net, to allow interacting with the 2D scene. It attempts to drive a point on a body towards the current position of the cursor. There is no restriction on rotation. This constraint has a target point, maximum force, frequency, and damping ratio. The target point (\ref ConstraintMouse2D::SetTarget "SetTarget()") initially coincides with the body’s anchor point. The maximum force (\ref ConstraintMouse2D::SetMaxForce "SetMaxForce()") is used to prevent violent reactions when multiple dynamic bodies interact. You can make this as large as you like. The frequency (\ref ConstraintMouse2D::SetFrequencyHz "SetFrequencyHz()") and damping ratio (\ref ConstraintMouse2D::SetDampingRatio "SetDampingRatio()") are used to create a spring/damper effect similar to the ConstraintDistance2D. Many users have tried to adapt the ConstraintMouse2D for game play. Users often want to achieve precise positioning and instantaneous response. The ConstraintMouse2D doesn’t work very well in that context. You may wish to consider using kinematic bodies instead.
-- ConstraintPrismatic2D: defines 2D physics prismatic constraint. This constraint allows for relative translation of two bodies along a specified axis (\ref ConstraintPrismatic2D::SetAxis "SetAxis()"). There's no rotation applied. This constraint definition is similar to ConstraintRevolute2D description; just substitute translation for angle and force for torque.
-- ConstraintPulley2D: defines 2D physics pulley constraint. The pulley connects two bodies to ground (\ref ConstraintPulley2D::SetOwnerBodyGroundAnchor "SetOwnerBodyGroundAnchor()" and \ref ConstraintPulley2D::SetOtherBodyGroundAnchor "SetOtherBodyGroundAnchor()") and to each other (\ref ConstraintPulley2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintPulley2D::SetOtherBodyAnchor "SetOtherBodyAnchor()"). As one body goes up, the other goes down. You can supply a ratio (\ref ConstraintPulley2D::SetRatio "SetRatio()") that simulates a block and tackle. This causes one side of the pulley to extend faster than the other. At the same time the constraint force is smaller on one side than the other. You can use this to create mechanical leverage.
-- ConstraintRevolute2D: defines 2D physics revolute constraint. This constraint forces two bodies to share a common hinge anchor point (\ref ConstraintRevolute2D::SetAnchor "SetAnchor()"). You can control the relative rotation of the two bodies (the constraint angle) using a limit and/or a motor. A limit (\ref ConstraintRevolute2D::SetEnableLimit "SetEnableLimit()") forces the joint angle to remain between a lower (\ref ConstraintRevolute2D::SetLowerAngle "SetLowerAngle()") and upper (\ref ConstraintRevolute2D::SetUpperAngle "SetUpperAngle()") bound. The limit will apply as much torque as needed to make this happen. The limit range should include zero, otherwise the constraint will lurch when the simulation begins. A motor (\ref ConstraintRevolute2D::SetEnableMotor "SetEnableMotor()") allows you to specify the constraint speed (the time derivative of the angle). The speed (\ref ConstraintRevolute2D::SetMotorSpeed "SetMotorSpeed()") can be negative or positive. When the maximum torque (\ref ConstraintRevolute2D::SetMaxMotorTorque "SetMaxMotorTorque()") is exceeded, the joint will slow down and can even reverse. You can use a motor to simulate friction. Just set the joint speed to zero, and set the maximum torque to some small, but significant value. The motor will try to prevent the constraint from rotating, but will yield to a significant load.
-- ConstraintRope2D: defines 2D physics rope constraint. This constraint restricts the maximum distance (\ref ConstraintRope2D::SetMaxLength "SetMaxLength()") between two points (\ref ConstraintRope2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintRope2D::SetOtherBodyAnchor "SetOtherBodyAnchor()"). This can be useful to prevent chains of bodies from stretching, even under high load.
-- ConstraintWeld2D: defines 2D physics weld constraint. This constraint attempts to constrain all relative motion between two bodies.
-- ConstraintWheel2D: defines 2D physics wheel constraint. This constraint restricts a point on bodyB (\ref ConstraintWheel2D::SetAnchor() "SetAnchor()") to a line on bodyA (\ref ConstraintWheel2D::SetAxis "SetAxis()"). It also provides a suspension spring.
+By default, sprite hotspot is centered, but you can choose another hotspot if need be: use \ref StaticSprite2D::SetUseHotSpot "SetUseHotSpot()" and \ref StaticSprite2D::SetHotSpot "SetHotSpot()".
 
 \section Urho2D_Background_and_Layers Background and layers
-To set the background color for the scene, use \ref Renderer::GetDefaultZone "GetDefaultZone()".fogColor
+To set the background color for the scene, use \ref Renderer::GetDefaultZone "GetDefaultZone()" and \ref Zone::SetFogColor "SetFogColor()".
 
-You can use different layers in order to simulate perspective. In this case you can use \ref Drawable2D::SetLayer "SetLayer()" and \ref Drawable2D::SetOrderInLayer "SetOrderInLayer()" to organise your sprites and arrange thir display order.
+You can use different layers in order to simulate perspective. In this case you can use \ref Drawable2D::SetLayer "SetLayer()" and \ref Drawable2D::SetOrderInLayer "SetOrderInLayer()" to organise your sprites and arrange their display order.
 
 Finally, note that you can easily mix both 2D and 3D resources. 3D assets' position need to be slightly offset on the Z axis (z=1 is enough), Camera's position needs to be slightly offset (on the Z axis) from 3D assets' max girth and a Light is required.
 
+\section Urho2D_Physics Physics
+Urho2D implements rigid body physics simulation using the Box2D library. You can refer to Box2D manual at http://box2d.org/manual.pdf for full reference.
+PhysicsWorld2D class implements 2D physics simulation in Urho3D and is mandatory for 2D physics components such as RigidBody2D, CollisionShape2D or Constraint2D.
+
+\section Urho2D_Rigidbodies_Components Rigid bodies components
+RigidBody2D is the base class for 2D physics object instance.
+
+Available rigid bodies (BodyType2D) are:
+- BT_STATIC: a static body does not move under simulation and behaves as if it has infinite mass. Internally, Box2D stores zero for the mass and the inverse mass. Static bodies can be moved manually by the user. A static body has zero velocity. Static bodies do not collide with other static or kinematic bodies.
+- BT_DYNAMIC: a dynamic body is fully simulated. It can be moved manually by the user, but normally it moves according to forces. A dynamic body can collide with all body types. A dynamic body always has finite, non-zero mass. If you try to set the mass of a dynamic body to zero, it will automatically acquire a mass of one kilogram.
+- BT_KINEMATIC: a kinematic body moves under simulation according to its velocity. Kinematic bodies do not respond to forces. They can be moved manually by the user, but normally a kinematic body is moved by setting its velocity. A kinematic body behaves as if it has infinite mass, however, Box2D stores zero for the mass and the inverse mass. Kinematic bodies do not collide with other static or kinematic bodies.
+
+You should establish the body type at creation, using \ref RigidBody2D::SetBodyType "SetBodyType()", because changing the body type later is expensive.
+
+Rigid bodies can be moved/rotated by applying forces and impulses:
+- linear force (progressive/gradual):
+    - \ref RigidBody2D::ApplyForce "ApplyForce()"
+    - \ref RigidBody2D::ApplyForceToCenter "ApplyForceToCenter()" (same as ApplyForce, the world point where to apply the force is set to center of mass, which prevents the body from rotating/spinning)
+- linear or angular impulse (brutal/immediate):
+    - \ref RigidBody2D::ApplyLinearImpulse "ApplyLinearImpulse()"
+    - \ref RigidBody2D::ApplyAngularImpulse "ApplyAngularImpulse()"
+- torque (angular force):
+    - \ref RigidBody2D::ApplyTorque "ApplyTorque()"
+
+ApplyForce() and ApplyLinearImpulse() take two parameters: the direction of the force and where to apply it. Note that in order to improve performance, you can request the body to sleep by setting 'wake' parameter to false.
+
+You can also directly set the linear or angular velocity of the body using \ref RigidBody2D::SetLinearVelocity "SetLinearVelocity()" or \ref RigidBody2D::SetAngularVelocity "SetAngularVelocity()". And you can get current velocity using \ref RigidBody2D::GetLinearVelocity "GetLinearVelocity()" or \ref RigidBody2D::GetAngularVelocity "GetAngularVelocity()".
+
+To 'manually' move or rotate a body, simply translate or rotate the node to which it belongs to.
+
+\section Urho2D_Collision_Shapes_Components Collision shapes components
+Check Box2D manual - Chapter 4 Collision Module and Chapter 7 Fixtures for full reference.
+
+\subsection Urho2D_Collision_Shapes_Shapes Shapes
+- CollisionBox2D: defines 2D physics collision box. Box shapes have an optional position offset (\ref CollisionBox2D::SetCenter "SetCenter()"), width and height size (\ref CollisionBox2D::SetSize "SetSize()") and a rotation angle expressed in degrees (\ref CollisionBox2D::SetAngle "SetAngle()".). Boxes are solid, so if you need a hollow box shape then create one from a CollisionChain2D shape.
+- Circle shapes <=> CollisionCircle2D: defines 2D physics collision circle. Circle shapes have an optional position offset (\ref CollisionCircle2D::SetCenter "SetCenter()") and a radius (\ref CollisionCircle2D::SetRadius "SetRadius()"). Circles are solid, you cannot make a hollow circle using the circle shape.
+- Polygon shapes <=> CollisionPolygon2D: defines 2D physics collision polygon. Polygon shapes are solid convex polygons. A polygon is convex when all line segments connecting two points in the interior do not cross any edge of the polygon. A polygon must have 3 or more vertices (\ref CollisionPolygon2D::SetVertices "SetVertices()"). Polygons vertices winding doesn't matter.
+- Edge shapes <=> CollisionEdge2D: defines 2D physics collision edge. Edge shapes are line segments defined by 2 vertices (\ref CollisionEdge2D::SetVertex1 "SetVertex1()" and \ref CollisionEdge2D::SetVertex2 "SetVertex2()" or globaly \ref CollisionEdge2D::SetVertices "SetVertices()"). They are provided to assist in making a free-form static environment for your game. A major limitation of edge shapes is that they can collide with circles and polygons but not with themselves. The collision algorithms used by Box2D require that at least one of two colliding shapes have volume. Edge shapes have no volume, so edge-edge collision is not possible.
+- Chain shapes <=> CollisionChain2D: defines 2D physics collision chain. The chain shape provides an efficient way to connect many edges together (\ref CollisionChain2D::SetVertices "SetVertices()") to construct your static game worlds. You can connect chains together using ghost vertices. Self-intersection of chain shapes is not supported.
+
+Important: collision shapes must match your textures in order to be accurate. You can use Tiled's objects to create your shapes (see \ref Urho2D_TMX_Objects "Tile map objects"). Or you can use tools like Physics Body Editor (https://code.google.com/p/box2d-editor/), RUBE (https://www.iforce2d.net/rube/), LevelHelper (http://www.gamedevhelper.com/levelhelper/), PhysicsEditor (http://www.codeandweb.com/physicseditor), ... to help you. Other interesting tool is BisonKick (https://bisonkick.com/app/518195d06927101d38a83b66/).
+
+Use \ref PhysicsWorld2D::SetDrawShape "SetDrawShape()" in combination with \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to toggle shapes visibility.
+
+\subsection Urho2D_Collision_Shapes_Fixtures Fixtures
+Box2D fixtures are implemented through the CollisionShape2D base class for 2D physics collision shapes. Common parameters shared by every collision shape include:
+- Density: \ref CollisionShape2D::SetDensity "SetDensity()" and \ref CollisionShape2D::GetDensity "GetDensity()"
+- Friction: \ref CollisionShape2D::SetFriction "SetFriction()" and \ref CollisionShape2D::GetFriction "GetFriction()"
+- Restitution (bounciness): \ref CollisionShape2D::SetRestitution "SetRestitution()" and \ref CollisionShape2D::GetRestitution "GetRestitution()"
+
+CollisionShape2D class also provides readonly acces to these properties:
+- Mass: \ref CollisionShape2D::GetMass "GetMass()"
+- Inertia: \ref CollisionShape2D::GetInertia "GetInertia()"
+- Center of mass: \ref CollisionShape2D::GetMassCenter "GetMassCenter()"
+
+\subsection Urho2D_Collision_Shapes_Filtering Collision filtering
+Box2D supports collision filtering (restricting which other objects to collide with) using categories and groups:
+- Collision categories:
+    - First assign the collision shape to a category, using \ref CollisionShape2D::SetCategoryBits "SetCategoryBits()". Sixteen categories are available.
+    - Then you can specify what other categories the given collision shape can collide with, using \ref CollisionShape2D::SetMaskBits "SetMaskBits()".
+- Collision groups: positive and negative indices assigned using \ref CollisionShape2D::SetGroupIndex "SetGroupIndex()". All collision shapes within the same group index either always collide (positive index) or never collide (negative index).
+
+Note that:
+- collision group has higher precedence than collision category
+- a collision shape on a static body can only collide with a dynamic body
+- a collision shape on a kinematic body can only collide with a dynamic body
+- collision shapes on the same body never collide with each other
+
+\subsection Urho2D_Collision_Shapes_Sensors Sensors
+A collision shape can be set to \ref CollisionShape2D::SetTrigger "trigger mode" to only report collisions without actually applying collision forces. This can be used to implement trigger areas. Note that:
+- a sensor can be triggered only by dynamic bodies (BT_DYNAMIC)
+- \ref Urho2D_Physics_Queries "physics queries" don't report triggers. To get notified when a sensor is triggered or cease to be triggered, subscribe to E_PHYSICSBEGINCONTACT2D and E_PHYSICSENDCONTACT2D \ref Urho2D_Physics_Events "physics events".
+
+\section Urho2D_Constraints_Components Constraints components
+Constraints ('joints' in Box2D terminology) are used to constrain bodies to an anchor point or between themselves. Apply a constraint to a node (called 'ownerBody') and use \ref Constraint::SetOtherBody "SetOtherBody()" to set the other node's body to be constrained to the ownerBody.
+
+See 32_Urho2DConstraints sample for detailed examples and to help selecting the appropriate constraint. Following are the available constraints classes, with the indication of the corresponding 'joint' in Box2D manual (see Chapter 8 Joints):
+- Constraint2D: base class for 2D physics constraints.
+- Distance joint <=> ConstraintDistance2D: defines 2D physics distance constraint. The distance between two anchor points (\ref ConstraintDistance2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintDistance2D::SetOtherBodyAnchor "SetOtherBodyAnchor()") on two bodies is kept constant. The constraint can also be made soft, like a spring-damper connection. Softness is achieved by tuning frequency (\ref ConstraintDistance2D::SetFrequencyHz "SetFrequencyHz()" is below half of the timestep) and damping ratio (\ref ConstraintDistance2D::SetDampingRatio "SetDampingRatio()").
+- Revolute joint <=> ConstraintRevolute2D: defines 2D physics revolute constraint. This constraint forces two bodies to share a common hinge anchor point (\ref ConstraintRevolute2D::SetAnchor "SetAnchor()"). You can control the relative rotation of the two bodies (the constraint angle) using a limit and/or a motor. A limit (\ref ConstraintRevolute2D::SetEnableLimit "SetEnableLimit()") forces the joint angle to remain between a lower (\ref ConstraintRevolute2D::SetLowerAngle "SetLowerAngle()") and upper (\ref ConstraintRevolute2D::SetUpperAngle "SetUpperAngle()") bound. The limit will apply as much torque as needed to make this happen. The limit range should include zero, otherwise the constraint will lurch when the simulation begins. A motor (\ref ConstraintRevolute2D::SetEnableMotor "SetEnableMotor()") allows you to specify the constraint speed (the time derivative of the angle). The speed (\ref ConstraintRevolute2D::SetMotorSpeed "SetMotorSpeed()") can be negative or positive. When the maximum torque (\ref ConstraintRevolute2D::SetMaxMotorTorque "SetMaxMotorTorque()") is exceeded, the joint will slow down and can even reverse. You can use a motor to simulate friction. Just set the joint speed to zero, and set the maximum torque to some small, but significant value. The motor will try to prevent the constraint from rotating, but will yield to a significant load.
+- Prismatic joint <=> ConstraintPrismatic2D: defines 2D physics prismatic constraint. This constraint allows for relative translation of two bodies along a specified axis (\ref ConstraintPrismatic2D::SetAxis "SetAxis()"). There's no rotation applied. This constraint definition is similar to ConstraintRevolute2D description; just substitute translation for angle and force for torque.
+- Pulley joint <=> ConstraintPulley2D: defines 2D physics pulley constraint. The pulley connects two bodies to ground (\ref ConstraintPulley2D::SetOwnerBodyGroundAnchor "SetOwnerBodyGroundAnchor()" and \ref ConstraintPulley2D::SetOtherBodyGroundAnchor "SetOtherBodyGroundAnchor()") and to each other (\ref ConstraintPulley2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintPulley2D::SetOtherBodyAnchor "SetOtherBodyAnchor()"). As one body goes up, the other goes down. You can supply a ratio (\ref ConstraintPulley2D::SetRatio "SetRatio()") that simulates a block and tackle. This causes one side of the pulley to extend faster than the other. At the same time the constraint force is smaller on one side than the other. You can use this to create mechanical leverage.
+- Gear joint <=> ConstraintGear2D: defines 2D physics gear constraint. Used to create sophisticated mechanisms and saves from using compound shapes. This constraint can only connect ConstraintRevolute2Ds and/or ConstraintPrismatic2Ds (\ref ConstraintGear2D::SetOwnerConstraint "SetOwnerConstraint()" and \ref ConstraintGear2D::SetOtherConstraint "SetOtherConstraint()"). Like the pulley ratio, you can specify a gear ratio (\ref ConstraintGear2D::SetRatio "SetRatio()"). However, in this case the gear ratio can be negative.
+- Mouse joint <=> ConstraintMouse2D: defines 2D physics mouse constraint. Used to manipulate bodies with the mouse, this constraint is almost used in every Box2D tutorial available on the net, to allow interacting with the 2D scene. It attempts to drive a point on a body towards the current position of the cursor. There is no restriction on rotation. This constraint has a target point, maximum force, frequency, and damping ratio. The target point (\ref ConstraintMouse2D::SetTarget "SetTarget()") initially coincides with the body’s anchor point. The maximum force (\ref ConstraintMouse2D::SetMaxForce "SetMaxForce()") is used to prevent violent reactions when multiple dynamic bodies interact. You can make this as large as you like. The frequency (\ref ConstraintMouse2D::SetFrequencyHz "SetFrequencyHz()") and damping ratio (\ref ConstraintMouse2D::SetDampingRatio "SetDampingRatio()") are used to create a spring/damper effect similar to the ConstraintDistance2D. Many users have tried to adapt the ConstraintMouse2D for game play. Users often want to achieve precise positioning and instantaneous response. The ConstraintMouse2D doesn’t work very well in that context. You may wish to consider using kinematic bodies instead.
+- Wheel joint <=> ConstraintWheel2D: defines 2D physics wheel constraint. This constraint restricts a point on bodyB (\ref ConstraintWheel2D::SetAnchor() "SetAnchor()") to a line on bodyA (\ref ConstraintWheel2D::SetAxis "SetAxis()"). It also provides a suspension spring.
+- Weld joint <=> ConstraintWeld2D: defines 2D physics weld constraint. This constraint attempts to constrain all relative motion between two bodies.
+- Rope joint <=> ConstraintRope2D: defines 2D physics rope constraint. This constraint restricts the maximum distance (\ref ConstraintRope2D::SetMaxLength "SetMaxLength()") between two points (\ref ConstraintRope2D::SetOwnerBodyAnchor "SetOwnerBodyAnchor()" and \ref ConstraintRope2D::SetOtherBodyAnchor "SetOtherBodyAnchor()"). This can be useful to prevent chains of bodies from stretching, even under high load.
+- Friction joint <=> ConstraintFriction2D: defines 2D physics friction constraint. This constraint is used for top-down friction. It provides 2D translational friction (\ref ConstraintFriction2D::SetMaxForce "SetMaxForce()") and angular friction (\ref ConstraintFriction2D::SetMaxTorque "SetMaxTorque()").
+- Motor joint <=> ConstraintMotor2D: defines 2D physics motor constraint. This constraint lets you control the motion of a body by specifying target position (\ref ConstraintMotor2D::SetLinearOffset "SetLinearOffset()") and rotation offsets (\ref ConstraintMotor2D::SetAngularOffset "SetAngularOffset()"). You can set the maximum motor force (\ref ConstraintMotor2D::SetMaxForce "SetMaxForce()") and torque (\ref ConstraintMotor2D::SetMaxTorque "SetMaxTorque()") that will be applied to reach the target position and rotation. If the body is blocked, it will stop and the contact forces will be proportional to the maximum motor force and torque.
+
+Collision between bodies connected by a constraint can be enabled/disabled using \ref Constraint2D::SetCollideConnected "SetCollideConnected()".
+
+Use \ref PhysicsWorld2D::SetDrawJoint "SetDrawJoint()" in combination with \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to toggle joints visibility.
+
+\section Urho2D_Physics_Queries Physics queries
+The following queries into the physics world are provided:
+
+\subsection Urho2D_Physics_Queries_Unary Unary geometric queries (queries on a single shape)
+- Shape point test: test if a point is inside a given plain shape and returns the body if true. Use \ref PhysicsWorld2D::GetRigidBody() "GetRigidBody()". Point can be a Vector2 world position, or more conveniently you can pass screen coordinates when performing the test from an input (mouse, joystick, touch). Note that only plain shapes are supported, this test is not applicable to \ref CollisionChain2D and \ref CollisionEdge2D shapes.
+- Shape ray cast: returns the body, distance, point of intersection (position) and normal vector for the first shape hit by the ray. Use \ref PhysicsWorld2D::RaycastSingle "RaycastSingle()".
+
+\subsection Urho2D_Physics_Queries_Binary Binary functions
+- Overlap between 2 shapes: not implemented
+- Contact manifolds (contact points for overlaping shapes): not implemented
+- Distance between 2 shapes: not implemented
+- %Time of impact (time when 2 moving shapes collide): not implemented
+
+\subsection Urho2D_Physics_Queries_World World queries (see Box2D manual - Chapter 10 World Class)
+- AABB queries: return the bodies overlaping with the given rectangle. See \ref PhysicsWorld2D::GetRigidBodies "GetRigidBodies()".
+- %Ray casts: return the body, distance, point of intersection (position) and normal vector for every shape hit by the ray. See \ref PhysicsWorld2D::Raycast "Raycast()".
+
+\section Urho2D_Physics_Events Physics events
+
+Contact listener (see Box2D manual, Chapter 9 Contacts) enables a given node to report contacts through events. Available events are:
+- E_PHYSICSBEGINCONTACT2D ("PhysicsBeginContact2D" in script): called when 2 collision shapes begin to overlap
+- E_PHYSICSENDCONTACT2D ("PhysicsEndContact2D" in script): called when 2 collision shapes cease to overlap
+- E_PHYSICSPRESTEP2D ("PhysicsPreStep2D" in script): called after collision detection, but before collision resolution. This allows to disable the contact if need be (for example on a one-sided platform). Currently ineffective (only reports PhysicsWorld2D and time step)
+- E_PHYSICSPOSTSTEP2D ("PhysicsPostStep2D" in script): used to gather collision impulse results. Currentlly ineffective (only reports PhysicsWorld2D and time step)
+
 \section Urho2D_TileMap Tile maps
 
-Tile maps workflow relies on the tmx file format, which is the native format of Tiled, a free app available at http://www.mapeditor.org/. It is strongly recommended to only use the latest stable release (currently 0.9.1). Do not use daily builds or older revisions, otherwise results may be unpredictable.
+Tile maps workflow relies on the tmx file format, which is the native format of Tiled, a free app available at http://www.mapeditor.org/. It is strongly recommended to use stable release 0.9.1. Do not use daily builds or other newer/older stable revisions, otherwise results may be unpredictable.
 
 Check example 36_Urho2DTileMap for a basic demonstration.
 
@@ -1925,7 +2103,6 @@ You just have to create a \ref TileMap2D "TileMap2D" component inside a node and
 C++:
 \code
 SharedPtr<Node> tileMapNode(scene_->CreateChild("TileMap")); // Create a standard Urho3D node
-tileMapNode->SetPosition(Vector3(0.0f, 0.0f, -1.0f));
 TileMap2D* tileMap = tileMapNode->CreateComponent<TileMap2D>(); // Create the TileMap2D component
 tileMap->SetTmxFile(cache->GetResource<TmxFile2D>("Urho2D/isometric_grass_and_water.tmx")); // Assign tmx resource file to component
 \endcode
@@ -1933,7 +2110,6 @@ tileMap->SetTmxFile(cache->GetResource<TmxFile2D>("Urho2D/isometric_grass_and_wa
 AngelScript:
 \code
 Node@ tileMapNode = scene_.CreateChild("TileMap"); // Create a standard Urho3D node
-tileMapNode.position = Vector3(0.0f, 0.0f, -1.0f);
 TileMap2D@ tileMap = tileMapNode.CreateComponent("TileMap2D"); // Create the TileMap2D component
 tileMap.tmxFile = cache.GetResource("TmxFile2D", "Urho2D/isometric_grass_and_water.tmx"); // Assign the tmx resource file to component
 \endcode
@@ -1941,57 +2117,86 @@ tileMap.tmxFile = cache.GetResource("TmxFile2D", "Urho2D/isometric_grass_and_wat
 Lua:
 \code
 local tileMapNode = scene_:CreateChild("TileMap") -- Create a standard Urho3D node
-tileMapNode.position = Vector3(0, 0, -1)
 local tileMap = tileMapNode:CreateComponent("TileMap2D") -- Create the TileMap2D component
 tileMap.tmxFile = cache:GetResource("TmxFile2D", "Urho2D/isometric_grass_and_water.tmx") -- Assign tmx resource file to component
 \endcode
 
-Note that currently only XML Layer Format is supported (Base64 and CSV are not). In Tiled, go to Maps > Map Properties to set 'Layer Format' to 'XML'.
+Note that:
+- currently only XML Layer Format is supported (Base64 and CSV are not). In Tiled, go to Maps > Properties to set 'Layer Format' to 'XML'.
+- if 'seams' between tiles are obvious then you should make your tilesets images nearest filtered (see \ref Urho2D_Static_Sprites "Static sprites" section above.)
 
 \subsection Urho2D_TMX_maps TMX tile maps
 
 Once a tmx file is loaded in Urho, use \ref TileMap2D::GetInfo "GetInfo()" to access the map properties through \ref TileMapInfo2D class.
 
 A map is defined by its:
-- orientation: Urho2D supports both orthogonal (flat) and isometric (strict iso 2.5D and staggered iso) tile maps. Orientation can be retrieved with \ref TileMapInfo2D::orientation_ "orientation_" attribute (returns 0 for ortho, 1 for iso and 2 for staggered).
-- width and height expressed as a number of tiles in the map:  use \ref TileMapInfo2D::width_ "width_" and \ref TileMapInfo2D::height_ "height_" attributes to access these values
+- orientation: Urho2D supports both orthogonal (flat) and isometric (strict iso 2.5D and staggered iso) tile maps. Orientation can be retrieved with \ref TileMapInfo2D::orientation_ "orientation_" attribute (O_ORTHOGONAL for ortho, O_ISOMETRIC for iso and O_STAGGERED for staggered)
+- width and height expressed as a number of tiles in the map: use \ref TileMapInfo2D::width_ "width_" and \ref TileMapInfo2D::height_ "height_" attributes to access these values
 - width and height expressed in Urho2D space: use \ref TileMapInfo2D::GetMapWidth "GetMapWidth()" and \ref TileMapInfo2D::GetMapHeight "GetMapHeight()" to access these values which are useful to set the camera's position for example
-- tile width and tile height as the size in pixels of the tiles in the map (expressed a percentage): use \ref TileMapInfo2D::tileWidth_ "tileWidth_" and \ref TileMapInfo2D::tileHeight_ "tileHeight_" attributes to access these values
+- tile width and tile height as the size in pixels of the tiles in the map (equates to Tiled width/height * PIXEL_SIZE): use \ref TileMapInfo2D::tileWidth_ "tileWidth_" and \ref TileMapInfo2D::tileHeight_ "tileHeight_" attributes to access these values
 
 Two convenient functions are provided to convert Tiled index to/from Urho2D space:
-- \ref TileMapInfo2D::TileIndexToPosition "TileIndexToPosition()" to convert tile index to Urho position
-- \ref TileMapInfo2D::PositionToTileIndex "PositionToTileIndex()" to convert Urho position to tile index (returns false if position is outside of the map) 
+- \ref TileMap2D::TileIndexToPosition "TileIndexToPosition()" to convert tile index to Urho position
+- \ref TileMap2D::PositionToTileIndex "PositionToTileIndex()" to convert Urho position to tile index (returns false if position is outside of the map)
+
+You can display debug geometry for the whole tile map using \ref TileMap2D::DrawDebugGeometry "DrawDebugGeometry()".
+
+\subsection Urho2D_TMX_Tileset TMX tile map tilesets and tiles
+
+A tile map is built from fixed-size sprites ('tiles', accessible from the Tile2D class) belonging to one or more 'tilesets' (=spritesheets). Each tile is characterized by its:
+- grid ID (ID in the tileset, from top-left to bottom-right): use \ref Tile2D::GetGid "GetGid()"
+- sprite/image (Sprite2D): use \ref Tile2D::GetSprite "GetSprite()"
+- property: use \ref Tile2D::HasProperty "HasProperty()" and \ref Tile2D::GetProperty "GetProperty()"
+
+Tiles from a tileset can only be accessed from one of the layers they are 'stamped' onto, using \ref TileMapLayer2D::GetTile "GetTile()" (see next section).
 
 \subsection Urho2D_TMX_layers TMX tile map layers
 
-A tile map is composed of a mix of ordered \ref TileMapLayer2D "layers".
+A tile map is composed of a mix of ordered \ref TileMapLayer2D "layers". The number of layers contained in the tmx file is retrieved using \ref TileMap2D::GetNumLayers "GetNumLayers()".
 
-Accessing layers : from a \ref TileMap2D "TileMap2D component", layers are accessed by their index from bottom to top using \ref TileMap2D::GetLayer "GetLayer()" function.  \ref TileMap2D::GetNumLayers "GetNumLayers()" returns the number of layers contained in the tmx file. \ref TileMapLayer2D::GetLayerType "GetLayerType()" returns the type of layer (Tile, Object or Image).
+Accessing layers : from a \ref TileMap2D "TileMap2D component", layers are accessed by their index from bottom (0) to top using \ref TileMap2D::GetLayer "GetLayer()" function.
 
 A layer is characterized by its:
 - name: currently not accessible
 - width and height expressed as a number of tiles: use \ref TileMapLayer2D::GetWidth "GetWidth()" and \ref TileMapLayer2D::GetHeight "GetHeight()" to access these values
+- type: retrieved using \ref TileMapLayer2D::GetLayerType "GetLayerType()" (returns the type of layer, a TileMapLayerType2D: Tile=LT_TILE_LAYER, %Object=LT_OBJECT_GROUP, %Image=LT_IMAGE_LAYER and Invalid=LT_INVALID)
+- custom properties : use \ref TileMapLayer2D::HasProperty "HasProperty()" and \ref TileMapLayer2D::GetProperty "GetProperty()" to check/access these values
 
-Layer visibility can be toggled using \ref TileMapLayer2D::SetVisible "SetVisible()"  (and visibility state can be accessed with \ref TileMapLayer2D::IsVisible "IsVisible()")
+Layer visibility can be toggled using \ref TileMapLayer2D::SetVisible "SetVisible()"  (and visibility state can be accessed with \ref TileMapLayer2D::IsVisible "IsVisible()"). Currently layer opacity is not implemented. Use \ref TileMapLayer2D::DrawDebugGeometry "DrawDebugGeometry()" to display debug geometry for a given layer.
+
+By default, first tile map layer is drawn on scene layer 0 and subsequent layers are drawn in a 10 scene layers step. For example, if your tile map has 3 layers:
+- bottom layer is drawn on layer 0
+- middle layer is on layer 10
+- top layer is on layer 20
+
+You can override this default layering order by using \ref TileMapLayer2D::SetDrawOrder "SetDrawOrder()", and you can retrieve the order using \ref TileMapLayer2D::GetDrawOrder "GetDrawOrder()".
+
+You can access a given tile node or tileset's tile (Tile2D) by its index (tile index is displayed at the bottom-left in Tiled and can be retrieved from position using \ref TileMap2D::PositionToTileIndex "PositionToTileIndex()"):
+- to access a tile node, which enables access to the StaticSprite2D component, for example to remove it or replace it, use \ref TileMapLayer2D::GetTileNode "GetTileNode()"
+- to access a tileset's Tile2D tile, which enables access to the Sprite2D resource, gid and custom properties (as mentioned \ref Urho2D_TMX_Tileset "above"), use \ref TileMapLayer2D::GetTile "GetTile()"
+
+An %Image layer node or an %Object layer node are accessible using \ref TileMapLayer2D::GetImageNode "GetImageNode()" and \ref TileMapLayer2D::GetObjectNode "GetObjectNode()".
 
 \subsection Urho2D_TMX_Objects TMX tile map objects
 
 Tiled \ref TileMapObject2D "objects" are wire shapes (Rectangle, Ellipse, Polygon, Polyline) and sprites (Tile) that are freely positionable in the tile map.
 
+IMPORTANT: make sure that 'Rectangle' and 'Ellipse' objects' size is not zero, otherwise your whole scene won't render and you won't have any clue to debug (this is due to the fact that 'width' and 'height' fields are not saved in the tmx file when their value is zero).
+
 Accessing Tiled objects : from a \ref TileMapLayer2D "TileMapLayer2D layer", objects are accessed by their index using \ref TileMapLayer2D::GetObject "GetObject()". \ref TileMapLayer2D::GetNumObjects "GetNumObjects()" returns the number of objects contained in the object layer (tile and image layers will return 0 as they don't hold objects).
 
-Use \ref TileMapObject2D::GetObjectType "GetObjectType()" to get the nature (TileMapObjectType2D) of the selected object.
+Use \ref TileMapObject2D::GetObjectType "GetObjectType()" to get the nature of the selected object (TileMapObjectType2D: OT_RECTANGLE for Rectangle, OT_ELLIPSE for Ellipse, OT_POLYGON for Polygon, OT_POLYLINE for PolyLine, OT_TILE for Tile and OT_INVALID if not a valid object).
 
 Objects' properties (Name and Type) can be accessed using respectively \ref TileMapObject2D::GetName "GetName()" and \ref TileMapObject2D::GetType "GetType()". Type can be useful to flag categories of objects in Tiled.
 
-Except Tile, object layers are not visible. They can be used:
+Except Tile, objects are not visible (although you can display them for debugging purpose using DrawDebugGeometry() at the level of the tile map or a given layer, as mentioned previously). They can be used:
 - to easily design polygon sprites and Box2D shapes using the object's vertices: use \ref TileMapObject2D::GetNumPoints "GetNumPoints()" to get the number of vertices and \ref TileMapObject2D::GetPoint "GetPoint()" to iterate through the vertices
 - as placeholders to easily set the position and size of entities in the world, using \ref TileMapObject2D::GetPosition "GetPosition()" and \ref TileMapObject2D::GetSize "GetSize()"
 - to display Tile objects as sprites
 - to create a background from Tile sprites
 - etc.
 
-Additionaly \ref Sprite2D "Sprite2D" resource from a Tile object is retrieved using \ref TileMapObject2D::GetTileSprite "GetTileSprite()".
+Additionaly Sprite2D resource from a Tile object is retrieved using \ref TileMapObject2D::GetTileSprite "GetTileSprite()".
 
 If need be you can access the grid id (relative to the tilesets used) of a Tile object using \ref TileMapObject2D::GetTileGid "GetTileGid()".
 
@@ -2066,8 +2271,6 @@ There are some things to watch out for:
 
 - Nodes have the concept of the \ref Node::SetOwner "owner connection" (for example the player that is controlling a specific game object), which can be set in server code. This property is not replicated to the client. Messages or remote events can be used instead to tell the players what object they control.
 
-- At least for now, there is no built-in client-side prediction.
-
 \section Network_InterestManagement Interest management
 
 %Scene replication includes a simple, distance-based interest management mechanism for reducing bandwidth use. To use, create the NetworkPriority component to a Node you wish to apply interest management to. The component can be created as local, as it is not important to the clients.
@@ -2089,7 +2292,20 @@ The Controls structure is used to send controls information from the client to t
 
 It is up to the client code to ensure they are kept up-to-date, by calling \ref Connection::SetControls "SetControls()" on the server connection. The event E_NETWORKUPDDATE will be sent to remind of the impending update, and the event E_NETWORKUPDATESENT will be sent after the update. The controls can then be inspected on the server side by calling \ref Connection::GetControls "GetControls()".
 
-The controls update message also includes the client's observer position for interest management.
+The controls update message also includes a running 8-bit timestamp, see \ref Connection::GetTimeStamp "GetTimeStamp()", and the client's observer position / rotation for interest management. To conserve bandwidth, the position and rotation values are left out if they have never been assigned.
+
+\section Network_ClientPrediction Client-side prediction
+
+Urho3D does not implement built-in client-side prediction for player controllable objects due to the difficulty of rewinding and resimulating a generic physics simulation. However, when not using
+physics for player movement, it is possible to intercept the authoritative network updates from the server and build a prediction system on the application level.
+
+By calling \ref Serializable::SetInterceptNetworkUpdate "SetInterceptNetworkUpdate()" the update of an individual networked attribute is redirected to send an event (E_INTERCEPTNETWORKUPDATE) instead of applying the attribute value directly. This should be called on the client for the node or component that is to be predicted. For example to redirect a Node's position update:
+
+\code
+node->SetInterceptNetworkUpdate("Network Position", true);
+\endcode
+
+The event includes the attribute name, index, new value as a Variant, and the latest 8-bit controls timestamp that the server has seen from the client. Typically, the event handler would store the value that arrived from the server and set an internal "update arrived" flag, which the application logic update code could use later on the same frame, by taking the server-sent value and replaying any user input on top of it. The timestamp value can be used to estimate how many client controls packets have been sent during the roundtrip time, and how much input needs to be replayed.
 
 \section Network_Messages Raw network messages
 
@@ -2107,7 +2323,7 @@ A remote event consists of its event type (name hash), a flag that tells whether
 
 To send a remote event to a Connection, use its \ref Connection::SendRemoteEvent "SendRemoteEvent()" function. To broadcast remote events to several connections at once (server only), use Network's \ref Network::BroadcastRemoteEvent "BroadcastRemoteEvent()" function.
 
-For safety, allowed remote event types must be registered. See \ref Network::RegisterRemoteEvent "RegisterRemoteEvent()". The registration affects only receiving events; sending whatever event is always allowed. There is a fixed blacklist of event types defined in Source/Engine/Network/Network.cpp that pose a security risk and are never allowed to be registered for reception; for example E_CONSOLECOMMAND.
+For safety, allowed remote event types must be registered. See \ref Network::RegisterRemoteEvent "RegisterRemoteEvent()". The registration affects only receiving events; sending whatever event is always allowed. There is a fixed blacklist of event types defined in Source/Urho3D/Network/Network.cpp that pose a security risk and are never allowed to be registered for reception; for example E_CONSOLECOMMAND.
 
 Like with ordinary events, in script remote event types are strings instead of name hashes for convenience.
 
@@ -2127,6 +2343,10 @@ Connection@ remoteSender = eventData["Connection"].GetPtr();
 \section Network_HttpRequests HTTP requests
 
 In addition to UDP messaging, the network subsystem allows to make HTTP requests. Use the \ref Network::MakeHttpRequest "MakeHttpRequest()" function for this. You can specify the URL, the verb to use (default GET if empty), optional headers and optional post data. The HttpRequest object that is returned acts like a Deserializer, and you can read the response data in suitably sized chunks. After the whole response is read, the connection closes. The connection can also be closed early by allowing the request object to expire.
+
+\section Network_Simulation Network conditions simulation
+
+The Network subsystem can optionally add delay to sending packets, as well as simulate packet loss. See \ref Network::SetSimulatedLatency "SetSimulatedLatency()" and \ref Network::SetSimulatedPacketLoss "SetSimulatedPacketLoss()".
 
 \page Multithreading Multithreading
 
@@ -2153,10 +2373,11 @@ When making your own work functions or threads, observe that the following thing
 
 Using the Profiler is treated as a no-op when called from outside the main thread. Trying to send an event or get a resource from the ResourceCache when not in the main thread will cause an error to be logged. %Log messages from other threads are collected and handled in the main thread at the end of the frame.
 
-\page AttributeAnimation %Attribute animation
-Attribute animation is a new system for Urho3D, With it user can apply animation to object's attribute. All object derived from Animatable can use attribute animation, currently these classes include Node, Component and UIElement.
+\page AttributeAnimation Attribute animation
 
-These are two way to use use attribute animation. First user can create attribute animation with code, and then apply it to object's attribute. Here is a simple code for light color animation:
+Attribute animation is a mechanism to animate the values of an object's attribute. Objects derived from Animatable can use attribute animation, this includes the Node class and all Component and UIElement subclasses.
+
+These are two ways to use attribute animation. Either the user can create attribute animation with code, and then apply it to object's attribute. Here is a simple code for light color animation:
 \code
 SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
 colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
@@ -2166,62 +2387,69 @@ colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
 light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP); 
 \endcode
 
-On above code, we first create an ValueAnimation object call colorAnimation, and set its key frame value, then apply it to light's color attribute. (Note here: in order to make animation look correct, the last key frame must equal to the first key frame for loop mode).
+In the above code, we first create an ValueAnimation object call colorAnimation, and set three key frame values to it, then assign it to light's color attribute. (Note here: in order to make animation look correct, the last key frame must equal to the first key frame for loop mode).
 
-Another way is load attribute animation from resource, here is a simple sample:
+Another way is to load an attribute animation resource, here is a simple example:
 \code
 ValueAnimation* colorAnimation = cache->GetResource<ValueAnimation>("Scene/LightColorAnimation.xml");
 light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP);
 \endcode
 
-These are three kind of wrap mode for attribute animation:
-- WM_LOOP: Loop mode, when the animation arrived to end, it will loop from begin.
-- WM_ONCE: Play once mode, when the animation finished, it will be removed from the object.
-- WM_CLAMP: Clamp mode, then the animation finished, it will keep the last key frame's value.
+Attribute animation supports three different wrap modes:
+- WM_LOOP: Loop mode, when the animation arrives to end, it will loop from beginning.
+- WM_ONCE: Play once mode, when the animation is finished, it will be removed from the object.
+- WM_CLAMP: Clamp mode, when the animation is finished, it will keep the last key frame's value.
 
-These is another argument call speed the animation play speed, the default value is 1.0f, user can change the value to control the animation play speed. User can also change animation’s wrap mode and speed on fly.
+The playback speed (default 1 or "original speed") of an animation, as well as the animation's wrap mode can be adjusted on the fly.
 
-When user want to apply multi-attribute animation to an object, ObjectAnimation is for it. For example when user want to apply position and color animation for light, can use following code:
+The ObjectAnimation class can be used to group together multiple value animations that affect different attributes. For example when the user wants to apply position and color animation for a light, the following code can be used. Note that the object animation is attached to the light's scene node, so a special syntax is needed to refer to the light component's attribute.
+
 \code
-// Create object animation.
+// Create light animation
 SharedPtr<ObjectAnimation> lightAnimation(new ObjectAnimation(context_));
 
-// Create position animation
+// Create light position animation
 SharedPtr<ValueAnimation> positionAnimation(new ValueAnimation(context_));
-positionAnimation->SetKeyFrame(0.0f, Vector3::ZERO);
-positionAnimation->SetKeyFrame(1.0f, Vector3(1.0f, 1.0f, 1.0f));
-positionAnimation->SetKeyFrame(4.0f, Vector3::ZERO);
-// Add position animation
-lightAnimation->AddAttributeAnimation("Position", positionAnimation, WM_LOOP); 
+// Use spline interpolation method
+positionAnimation->SetInterpolationMethod(IM_SPLINE);
+// Set spline tension
+positionAnimation->SetSplineTension(0.7f);
+positionAnimation->SetKeyFrame(0.0f, Vector3(-30.0f, 5.0f, -30.0f));
+positionAnimation->SetKeyFrame(1.0f, Vector3( 30.0f, 5.0f, -30.0f));
+positionAnimation->SetKeyFrame(2.0f, Vector3( 30.0f, 5.0f,  30.0f));
+positionAnimation->SetKeyFrame(3.0f, Vector3(-30.0f, 5.0f,  30.0f));
+positionAnimation->SetKeyFrame(4.0f, Vector3(-30.0f, 5.0f, -30.0f));
+// Set position animation
+lightAnimation->AddAttributeAnimation("Position", positionAnimation);
 
-// Create color animation
+// Create light color animation
 SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
 colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
+colorAnimation->SetKeyFrame(1.0f, Color::RED);
 colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
+colorAnimation->SetKeyFrame(3.0f, Color::GREEN);
 colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
-// Add color animation
-lightAnimation->AddAttributeAnimation("Color", colorAnimation, WM_LOOP); 
+// Set Light component's color animation
+lightAnimation->AddAttributeAnimation("@Light/Color", colorAnimation);
 
-// Apply object animation to light
-light->SetObjectAnimation(lightAnimation);
+// Apply light animation to light node
+lightNode->SetObjectAnimation(lightAnimation);
 \endcode
 
-Also user can load object animation from file, like:
+%Object animations can also be loaded from file, like:
 \code
 ObjectAnimation * lightAnimation = cache->GetResource<ObjectAnimation>("Scene/LightAnimation.xml");
-light-> SetObjectAnimation (lightAnimation);
+lightNode->SetObjectAnimation (lightAnimation);
 \endcode
 
-Current attribute animation use linear interpolation for numeric value type (like float, Vector2, Vector3 etc), and these is no interpolation for non-numeric type (like int, bool).
+Attribute animation uses either linear or spline interpolation for floating point types (like float, Vector2, Vector3 etc), and no interpolation for integer and non-numeric types (like int, bool).
 
-Attribute animation and object animation can be save to scene file, Someday if our editor support edit animation, we can create animation in editor and save it to scene file.
+\section AttributeAnimation_Classes Attribute animation classes
 
-\section AttributeAnimation_Classes Classes of attribute animation:
-- Animatable: Base class for animatable object, an animatable object can be set animation on it's attributes, or can be set an object animation to it.
-- ValueAnimation: Animation class, include some key frame in it.
-- ObjectAnimation: Object animation class, an object animation include one or more attribute animations and theirs wrap mode and speed for an Animatable object.
-- ValueAnimationInfo: Animation info, it include attribute animation, wrap mode and animation speed.
-- AttributeAnimationInstance: Attribute animation instance, it is derived from ValueAnimationInfo. and include animation runtime information, when animation playing it will update the object's attribute value automatically.
+- Animatable: Base class for animatable objects, which can assign animations on its individual attributes (ValueAnimation), or an animation which affects several attributes (ObjectAnimation).
+- ValueAnimation: Includes key frame values for a single attribute
+- ObjectAnimation: Includes one or more attribute animations and their wrap modes and speeds for an Animatable object.
+- ValueAnimationInfo: Base class for runtime instances of an attribute animation, which includes the referred animation, wrap mode, speed and time position.
 
 \page Tools Tools
 
@@ -2257,6 +2485,7 @@ Options:
 -ns         Do not create subdirectories for resources
 -nz         Do not create a zone and a directional light (scene mode only)
 -nf         Do not fix infacing normals
+-mb <x>     Maximum number of bones per submesh. Default 64
 -p <path>   Set path for scene resources. Default is output file path
 -r <name>   Use the named scene node as root node\n"
 -f <freq>   Animation tick frequency to use if unspecified. Default 4800
@@ -2294,6 +2523,7 @@ Options:
 -r      Output only rotations from animations
 -s      Split each submesh into own vertex buffer
 -t      Generate tangents
+-mb <x> Maximum number of bones per submesh, default 64
 \endverbatim
 
 Note: outputting only bone rotations may help when using an animation in a different model, but if bone position changes have been used for effect, the animation may become less lively. Unpredictable mutilations might result from using an animation in a model not originally intended for, as Urho3D does not specifically attempt to retarget animations.
@@ -2309,17 +2539,19 @@ PackageTool <directory to process> <package name> [basepath] [options]
 
 Options:
 -c      Enable package file LZ4 compression
+-q      Enable quiet mode
+
 \endverbatim
 
 When PackageTool runs, it will go inside the source directory, then look for subdirectories and any files. Paths inside the package will by default be relative to the source directory, but if an extra path prefix is desired, it can be specified by the optional basepath argument.
 
-For example, this would convert all the resource files inside the Urho3D Data directory into a package called Data.pak (execute the command from the Bin directory)
+For example, this would convert all the resource files inside the Urho3D Data directory into a package called Data.pak (execute the command from the bin directory)
 
 \verbatim
 PackageTool Data Data.pak
 \endverbatim
 
-The -c option enables LZ4 compression on the files.
+The -c option enables LZ4 compression on the files. The -q option enables the operation to be performed without sending output to the standard output stream.
 
 \section Tools_RampGenerator RampGenerator
 
@@ -2333,6 +2565,26 @@ RampGenerator <output file> <width> <power> [dimensions]
 
 The output is saved in PNG format. The power parameter is fed into the pow() function to determine ramp shape; higher value gives more brightness and more abrupt fade at the edge.
 
+\section Tools_SpritePacker SpritePacker
+
+Takes a series of images and packs them into a single texture and creates a sprite sheet xml file.
+
+Usage:
+\verbatim
+SpritePacker -options <input file> <input file> <output png file>
+Options:
+    -h Shows this help message.
+    -px Adds x pixels of padding per image to width.
+    -py Adds y pixels of padding per image to height.
+    -ox Adds x pixels to the horizontal position per image.
+    -oy Adds y pixels to the horizontal position per image.
+    -frameHeight Sets a fixed height for image and centers within frame.
+    -frameWidth Sets a fixed width for image and centers within frame.
+    -trim Trims excess transparent space from individual images offsets by frame size.
+    -xml 'path' Generates an SpriteSheet xml file at path.
+    -debug Draws allocation boxes on sprite.
+\endverbatim
+
 \section Tools_ScriptCompiler ScriptCompiler
 
 Compiles AngelScript file(s) to binary bytecode for faster loading. Can also dump the %Script API in Doxygen format.
@@ -2345,7 +2597,7 @@ ScriptCompiler -dumpapi <Doxygen output file> [C header output file]
 
 \endverbatim
 
-The output files are saved with the extension .asc (compiled AngelScript.) Binary files are not automatically loaded instead of the text format (.as) script files, instead resource requests and resource references in objects need to point to the compiled files. In a final build of an application it may be convenient to simply replace the text format script files with the compiled scripts.
+The output files are saved with the extension .asc (compiled AngelScript.) binary files are not automatically loaded instead of the text format (.as) script files, instead resource requests and resource references in objects need to point to the compiled files. In a final build of an application it may be convenient to simply replace the text format script files with the compiled scripts.
 
 The script API dump mode can be used to replace the 'ScriptAPI.dox' file in the 'Docs' directory. If the output file name is not provided then the script API would be dumped to standard output (console) instead.
 
@@ -2362,7 +2614,7 @@ Note that \ref FileSystem::ScanDir "ScanDir()" function may return filenames in 
 
 Urho3D tries to use existing file formats whenever possible, and define custom file formats only when absolutely necessary. Currently used custom file formats are:
 
-\section FileFormats_Model Binary model format (.mdl)
+\section FileFormats_Model binary model format (.mdl)
 
 \verbatim
 Model geometry and vertex morph data
@@ -2449,7 +2701,7 @@ Geometry center data
 
 \endverbatim
 
-\section FileFormats_Animation Binary animation format (.ani)
+\section FileFormats_Animation binary animation format (.ani)
 
 \verbatim
 byte[4]    Identifier "UANI"
@@ -2471,13 +2723,13 @@ uint       Number of tracks
 
 Note: animations are stored using absolute bone transformations. Therefore only lerp-blending between animations is supported; additive pose modification is not.
 
-\section FileFormats_Shader Direct3D9 binary shader format (.vs2, .ps2, .vs3, .ps3)
+\section FileFormats_Shader Direct3D9 binary shader format (.vs3, .ps3)
 
 \verbatim
 byte[4]    Identifier "USHD"
 
 short      Shader type (0 = vertex, 1 = pixel)
-short      Shader model (2 or 3)
+short      Shader model (3)
 
 uint       Number of constant parameters
 
@@ -2485,6 +2737,33 @@ uint       Number of constant parameters
     cstring    Parameter name
     byte       Register index
     byte       Number of registers
+
+uint       Number of texture units
+
+    For each texture unit:
+    cstring    Texture unit name
+    byte       Sampler index
+
+uint       Bytecode size
+byte[]     Bytecode
+\endverbatim
+
+\section FileFormats_Shader Direct3D11 binary shader format (.vs4, .ps4)
+
+\verbatim
+byte[4]    Identifier "USHD"
+
+short      Shader type (0 = vertex, 1 = pixel)
+short      Shader model (4)
+uint       Vertex element mask (0 for pixel shaders)
+
+uint       Number of constant parameters
+
+    For each constant parameter:
+    cstring    Parameter name
+    byte       CBuffer index
+    uint       Start byte offset in CBuffer
+    uint       Byte size
 
 uint       Number of texture units
 
@@ -2557,7 +2836,7 @@ When contributing code to the Urho3D project, there are a few things to check so
 
 First of all, the contribution should be wholly your own, so that you hold the copyright. If you are borrowing anything (for example a specific implementation of a math formula), you must be sure that you're allowed to do so, and give credit appropriately. For example borrowing code that is in the public domain would be OK.
 
-Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2014 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
+Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2015 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
 
 Third, there are requirements for new code that come from Urho3D striving to be a cohesive, easy-to-use package where features like events, serialization and script bindings integrate tightly. Check all that apply:
 
@@ -2567,7 +2846,7 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 
 - Unless impossible due to missing bindings (see above) new examples should be implemented in all of C++, AngelScript and Lua.
 
-- For new Component or UIElement subclasses, \ref Serialization "attributes" should exist for serialization, network replication and editing. The classes should be possible to create from within the editor; check the component category and supply icons for them as necessary (see the files Bin/Data/Textures/EditorIcons.png and Bin/Data/UI/EditorIcons.xml.)
+- For new Component or UIElement subclasses, \ref Serialization "attributes" should exist for serialization, network replication and editing. The classes should be possible to create from within the editor; check the component category and supply icons for them as necessary (see the files bin/Data/Textures/EditorIcons.png and bin/Data/UI/EditorIcons.xml.)
 
 - If the classes inherit attribute definitions from other classes, make sure that they are registered in the correct order on engine initialization.
 

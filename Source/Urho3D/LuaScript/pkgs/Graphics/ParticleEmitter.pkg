@@ -1,0 +1,31 @@
+$#include "Graphics/ParticleEmitter.h"
+
+class ParticleEmitter : public BillboardSet
+{
+    void SetEffect(ParticleEffect* effect);
+    void SetNumParticles(unsigned num);
+    void SetEmitting(bool enable);
+    void SetSerializeParticles(bool enable);
+    void ResetEmissionTimer();
+    void RemoveAllParticles();
+    void Reset();
+    void ApplyEffect();
+
+    ParticleEffect* GetEffect() const;
+    unsigned GetNumParticles() const;
+    bool IsEmitting() const;
+    bool GetSerializeParticles() const;
+
+    tolua_property__get_set ParticleEffect* effect;
+    tolua_property__get_set unsigned numParticles;
+    tolua_property__is_set bool emitting;
+    tolua_property__get_set bool serializeParticles;
+};
+
+${
+#define TOLUA_DISABLE_tolua_set_ParticleEffect_numColorFrames
+#define tolua_set_ParticleEffect_numColorFrames NULL
+
+#define TOLUA_DISABLE_tolua_set_ParticleEffect_numTextureFrames
+#define tolua_set_ParticleEffect_numTextureFrames NULL
+$}

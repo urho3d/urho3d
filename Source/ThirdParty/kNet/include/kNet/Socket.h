@@ -29,7 +29,7 @@ namespace kNet
 typedef int socklen_t;
 }
 
-#elif defined(UNIX) || defined(ANDROID)
+#elif defined(KNET_UNIX) || defined(ANDROID)
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -37,9 +37,9 @@ typedef int socklen_t;
 #include <netdb.h>
 #include <errno.h>
 
-#define INVALID_SOCKET (0)
-#define KNET_SOCKET_ERROR (-1)
-#define KNET_ACCEPT_FAILURE (-1)
+#define INVALID_SOCKET ((SOCKET)0)
+#define KNET_SOCKET_ERROR ((SOCKET)-1)
+#define KNET_ACCEPT_FAILURE ((SOCKET)-1)
 #define KNET_EWOULDBLOCK EWOULDBLOCK
 #define closesocket close
 #define TIMEVAL timeval
@@ -49,7 +49,7 @@ typedef int socklen_t;
 
 namespace kNet
 {
-typedef unsigned int SOCKET;
+typedef int SOCKET;
 }
 #endif
 

@@ -1,0 +1,188 @@
+$#include "Scene/Scene.h"
+
+static const unsigned FIRST_REPLICATED_ID;
+static const unsigned LAST_REPLICATED_ID;
+static const unsigned FIRST_LOCAL_ID;
+static const unsigned LAST_LOCAL_ID;
+
+enum LoadMode
+{
+    LOAD_RESOURCES_ONLY = 0,
+    LOAD_SCENE,
+    LOAD_SCENE_AND_RESOURCES
+};
+
+class Scene : public Node
+{
+    Scene();
+    virtual ~Scene();
+    
+    tolua_outside bool SceneLoad @ Load(File* source);
+    tolua_outside bool SceneSave @ Save(File* dest) const;
+    tolua_outside bool SceneLoad @ Load(const String fileName);
+    tolua_outside bool SceneSave @ Save(const String fileName) const;
+    tolua_outside bool SceneLoadXML @ LoadXML(File* source);
+    tolua_outside bool SceneSaveXML @ SaveXML(File* dest, const String indentation = "\t") const;
+    tolua_outside bool SceneLoadXML @ LoadXML(const String fileName);
+    tolua_outside bool SceneSaveXML @ SaveXML(const String fileName, const String indentation = "\t") const;
+    tolua_outside Node* SceneInstantiate @ Instantiate(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+    tolua_outside Node* SceneInstantiate @ Instantiate(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+    tolua_outside Node* SceneInstantiateXML @ InstantiateXML(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+    tolua_outside Node* SceneInstantiateXML @ InstantiateXML(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+
+    bool LoadAsync(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
+    bool LoadAsyncXML(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
+    tolua_outside bool SceneLoadAsync @ LoadAsync(const String fileName, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
+    tolua_outside bool SceneLoadAsyncXML @ LoadAsyncXML(const String fileName, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
+    void StopAsyncLoading();
+    void Clear(bool clearReplicated = true, bool clearLocal = true);
+    void SetUpdateEnabled(bool enable);
+    void SetTimeScale(float scale);
+    void SetElapsedTime(float time);
+    void SetSmoothingConstant(float constant);
+    void SetSnapThreshold(float threshold);
+    void SetAsyncLoadingMs(int ms);
+    
+    Node* GetNode(unsigned id) const;
+    //Component* GetComponent(unsigned id) const;
+
+    bool IsUpdateEnabled() const;
+    bool IsAsyncLoading() const;
+    float GetAsyncProgress() const;
+    LoadMode GetAsyncLoadMode() const;
+    const String GetFileName() const;
+    unsigned GetChecksum() const;
+    float GetTimeScale() const;
+    float GetElapsedTime() const;
+    float GetSmoothingConstant() const;
+    float GetSnapThreshold() const;
+    int GetAsyncLoadingMs() const;
+    const String GetVarName(StringHash hash) const;
+
+    void Update(float timeStep);
+    void BeginThreadedUpdate();
+    void EndThreadedUpdate();
+    void DelayedMarkedDirty(Component* component);
+    bool IsThreadedUpdate() const;
+    unsigned GetFreeNodeID(CreateMode mode);
+    unsigned GetFreeComponentID(CreateMode mode);
+    void NodeAdded(Node* node);
+    void NodeRemoved(Node* node);
+    void ComponentAdded(Component* component);
+    void ComponentRemoved(Component* component);
+    void SetVarNamesAttr(const String value);
+    String GetVarNamesAttr() const;
+    void PrepareNetworkUpdate();
+    void CleanupConnection(Connection* connection);
+    void MarkNetworkUpdate(Node* node);
+    void MarkNetworkUpdate(Component* component);
+    void MarkReplicationDirty(Node* node);
+    
+    tolua_property__is_set bool updateEnabled;
+    tolua_readonly tolua_property__is_set bool asyncLoading;
+    tolua_readonly tolua_property__get_set float asyncProgress;
+    tolua_readonly tolua_property__get_set LoadMode asyncLoadMode;
+    tolua_property__get_set const String fileName;
+    tolua_readonly tolua_property__get_set unsigned checksum;
+    tolua_property__get_set float timeScale;
+    tolua_property__get_set float elapsedTime;
+    tolua_property__get_set float smoothingConstant;
+    tolua_property__get_set float snapThreshold;
+    tolua_property__get_set int asyncLoadingMs;
+    tolua_readonly tolua_property__is_set bool threadedUpdate;
+    tolua_property__get_set String varNamesAttr;
+};
+
+${
+#define TOLUA_DISABLE_tolua_SceneLuaAPI_Scene_new00
+static int tolua_SceneLuaAPI_Scene_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Scene>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_SceneLuaAPI_Scene_new00_local
+static int tolua_SceneLuaAPI_Scene_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Scene>(tolua_S);
+}
+
+static bool SceneLoad(Scene* scene, File* file)
+{
+    return file ? scene->Load(*file) : false;
+}
+
+static bool SceneSave(const Scene* scene, File* file)
+{
+    return file ? scene->Save(*file) : false;
+}
+
+static bool SceneLoad(Scene* scene, const String& fileName)
+{
+    File file(scene->GetContext(), fileName, FILE_READ);
+    return file.IsOpen() && scene->Load(file);
+}
+
+static bool SceneSave(const Scene* scene, const String& fileName)
+{
+    File file(scene->GetContext(), fileName, FILE_WRITE);
+    return file.IsOpen() && scene->Save(file);
+}
+
+static bool SceneLoadXML(Scene* scene, File* file)
+{
+    return file ? scene->LoadXML(*file) : false;
+}
+
+static bool SceneSaveXML(const Scene* scene, File* file, const String& indentation)
+{
+    return file ? scene->SaveXML(*file, indentation) : false;
+}
+
+static bool SceneLoadXML(Scene* scene, const String& fileName)
+{
+    File file(scene->GetContext(), fileName, FILE_READ);
+    return file.IsOpen() && scene->LoadXML(file);
+}
+
+static bool SceneSaveXML(const Scene* scene, const String& fileName, const String& indentation)
+{
+    File file(scene->GetContext(), fileName, FILE_WRITE);
+    if (!file.IsOpen())
+        return false;
+    return scene->SaveXML(file, indentation);
+}
+
+static bool SceneLoadAsync(Scene* scene, const String& fileName, LoadMode mode)
+{
+    SharedPtr<File> file(new File(scene->GetContext(), fileName, FILE_READ));
+    return file->IsOpen() && scene->LoadAsync(file, mode);
+}
+
+static bool SceneLoadAsyncXML(Scene* scene, const String& fileName, LoadMode mode)
+{
+    SharedPtr<File> file(new File(scene->GetContext(), fileName, FILE_READ));
+    return file->IsOpen() && scene->LoadAsyncXML(file, mode);
+}
+
+static Node* SceneInstantiate(Scene* scene, File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode)
+{
+    return file ? scene->Instantiate(*file, position, rotation, mode) : 0;
+}
+
+static Node* SceneInstantiate(Scene* scene, const String& fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode)
+{
+    File file(scene->GetContext(), fileName, FILE_READ);
+    return file.IsOpen() ? scene->Instantiate(file, position, rotation, mode) : 0;
+}
+
+static Node* SceneInstantiateXML(Scene* scene, File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode)
+{
+    return file ? scene->InstantiateXML(*file, position, rotation, mode) : 0;
+}
+
+static Node* SceneInstantiateXML(Scene* scene, const String& fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode)
+{
+    File file(scene->GetContext(), fileName, FILE_READ);
+    return file.IsOpen() ? scene->InstantiateXML(file, position, rotation, mode) : 0;
+}
+$}

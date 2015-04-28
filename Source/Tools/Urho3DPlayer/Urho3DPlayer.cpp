@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,26 +20,28 @@
 // THE SOFTWARE.
 //
 
-#include "Engine.h"
-#include "FileSystem.h"
-#include "Log.h"
-#include "Main.h"
-#include "ProcessUtils.h"
-#include "ResourceCache.h"
-#include "ResourceEvents.h"
+#include <Urho3D/Urho3D.h>
+
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/IO/Log.h>
+#include <Urho3D/Core/Main.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Resource/ResourceEvents.h>
 
 #ifdef URHO3D_ANGELSCRIPT
-#include "ScriptFile.h"
-#include "Script.h"
+#include <Urho3D/Script/ScriptFile.h>
+#include <Urho3D/Script/Script.h>
 #endif
 
 #ifdef URHO3D_LUA
-#include "LuaScript.h"
+#include <Urho3D/LuaScript/LuaScript.h>
 #endif
 
 #include "Urho3DPlayer.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(Urho3DPlayer);
 
@@ -52,28 +54,25 @@ void Urho3DPlayer::Setup()
 {
     FileSystem* filesystem = GetSubsystem<FileSystem>();
 
-    // On Android and iOS, read command line from a file as parameters can not otherwise be easily given
-    #if defined(ANDROID) || defined(IOS)
-    SharedPtr<File> commandFile(new File(context_, filesystem->GetProgramDir() + "Data/CommandLine.txt",
-        FILE_READ));
-    String commandLine = commandFile->ReadLine();
-    commandFile->Close();
-    ParseArguments(commandLine, false);
-    // Reparse engine startup parameters now
-    engineParameters_ = Engine::ParseParameters(GetArguments());
-    #endif
+    // Read command line from a file if no arguments given. This is primarily intended for mobile platforms.
+    // Note that the command file name uses a hardcoded path that does not utilize the resource system
+    // properly (including resource path prefix), as the resource system is not yet initialized at this point
+    const String commandFileName = filesystem->GetProgramDir() + "Data/CommandLine.txt";
+    if (GetArguments().Empty() && filesystem->FileExists(commandFileName))
+    {
+        SharedPtr<File> commandFile(new File(context_, commandFileName));
+        String commandLine = commandFile->ReadLine();
+        commandFile->Close();
+        ParseArguments(commandLine, false);
+        // Reparse engine startup parameters now
+        engineParameters_ = Engine::ParseParameters(GetArguments());
+    }
 
     // Check for script file name
     const Vector<String>& arguments = GetArguments();
     String scriptFileName;
-    for (unsigned i = 0; i < arguments.Size(); ++i)
-    {
-        if (arguments[i][0] != '-')
-        {
-            scriptFileName_ = GetInternalPath(arguments[i]);
-            break;
-        }
-    }
+    if (arguments.Size() && arguments[0][0] != '-')
+        scriptFileName_ = GetInternalPath(arguments[0]);
 
     // Show usage if not found
     if (scriptFileName_.Empty())
@@ -101,20 +100,21 @@ void Urho3DPlayer::Setup()
             "-tq <level>  Texture quality level, default 2 (high)\n"
             "-tf <level>  Texture filter mode, default 2 (trilinear)\n"
             "-af <level>  Texture anisotropy level, default 4. Also sets anisotropic filter mode\n"
-            "-flushgpu    Flush GPU command queue each frame. Effective only on Direct3D9\n"
+            "-gl2         Force OpenGL 2 use even if OpenGL 3 is available\n"
+            "-flushgpu    Flush GPU command queue each frame. Effective only on Direct3D\n"
             "-borderless  Borderless window mode\n"
             "-headless    Headless mode. No application window will be created\n"
             "-landscape   Use landscape orientations (iOS only, default)\n"
             "-portrait    Use portrait orientations (iOS only)\n"
             "-prepass     Use light pre-pass rendering\n"
             "-deferred    Use deferred rendering\n"
+            "-renderpath <name> Use the named renderpath (must enter full resource name)\n"
             "-lqshadows   Use low-quality (1-sample) shadow filtering\n"
             "-noshadows   Disable shadow rendering\n"
             "-nolimit     Disable frame limiter\n"
             "-nothreads   Disable worker threads\n"
             "-nosound     Disable sound output\n"
             "-noip        Disable sound mixing interpolation\n"
-            "-sm2         Force SM2.0 rendering\n"
             "-touch       Touch emulation on desktop platform\n"
             #endif
         );

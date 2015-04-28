@@ -1,0 +1,53 @@
+$#include "UI/LineEdit.h"
+
+class LineEdit : public BorderImage
+{
+    LineEdit();
+    virtual ~LineEdit();
+    
+    void SetText(const String text);
+    
+    void SetCursorPosition(unsigned position);
+    void SetCursorBlinkRate(float rate);
+    void SetMaxLength(unsigned length);
+    void SetEchoCharacter(unsigned c);
+    void SetCursorMovable(bool enable);
+    void SetTextSelectable(bool enable);
+    void SetTextCopyable(bool enable);
+
+    const String GetText() const;
+    unsigned GetCursorPosition() const;
+    float GetCursorBlinkRate() const;
+    unsigned GetMaxLength() const;
+    unsigned GetEchoCharacter() const;
+    bool IsCursorMovable() const;
+    bool IsTextSelectable() const;
+    bool IsTextCopyable() const;
+    Text* GetTextElement() const;
+    BorderImage* GetCursor() const;
+
+    tolua_property__get_set String text;
+    tolua_property__get_set unsigned cursorPosition;
+    tolua_property__get_set float cursorBlinkRate;
+    tolua_property__get_set unsigned maxLength;
+    tolua_property__get_set unsigned echoCharacter;
+    tolua_property__is_set bool cursorMovable;
+    tolua_property__is_set bool textSelectable;
+    tolua_property__is_set bool textCopyable;
+    tolua_readonly tolua_property__get_set Text* textElement;
+    tolua_readonly tolua_property__get_set BorderImage* cursor;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_LineEdit_new00
+static int tolua_UILuaAPI_LineEdit_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<LineEdit>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_LineEdit_new00_local
+static int tolua_UILuaAPI_LineEdit_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<LineEdit>(tolua_S);
+}
+$}

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,25 +20,25 @@
 // THE SOFTWARE.
 //
 
-#include "Application.h"
-#include "Camera.h"
-#include "Console.h"
-#include "Cursor.h"
-#include "DebugHud.h"
-#include "Engine.h"
-#include "FileSystem.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "InputEvents.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "Sprite.h"
-#include "Texture2D.h"
-#include "Timer.h"
-#include "UI.h"
-#include "XMLFile.h"
+#include <Urho3D/Engine/Application.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Engine/Console.h>
+#include <Urho3D/UI/Cursor.h>
+#include <Urho3D/Engine/DebugHud.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Input/InputEvents.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Scene/SceneEvents.h>
+#include <Urho3D/UI/Sprite.h>
+#include <Urho3D/Graphics/Texture2D.h>
+#include <Urho3D/Core/Timer.h>
+#include <Urho3D/UI/UI.h>
+#include <Urho3D/Resource/XMLFile.h>
 
 Sample::Sample(Context* context) :
     Application(context),

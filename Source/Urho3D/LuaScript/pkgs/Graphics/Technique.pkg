@@ -1,0 +1,49 @@
+$#include "Graphics/Technique.h"
+
+enum PassLightingMode
+{
+    LIGHTING_UNLIT,
+    LIGHTING_PERVERTEX,
+    LIGHTING_PERPIXEL
+};
+
+class Pass : public RefCounted
+{
+    bool IsDesktop() const;
+    const String GetVertexShader() const;
+    const String GetPixelShader() const;
+
+    tolua_readonly tolua_property__is_set bool desktop;
+    tolua_readonly tolua_property__get_set const String vertexShader;
+    tolua_readonly tolua_property__get_set const String pixelShader;
+};
+
+class Technique : public Resource
+{
+    bool HasPass(const String type) const;
+    Pass* GetPass(const String type) const;
+    Pass* GetSupportedPass(const String type) const;
+    bool IsSupported() const;
+    bool IsDesktop() const;
+    unsigned GetNumPasses() const;
+    tolua_outside const Vector<String>& TechniqueGetPassNames @ GetPassTypes() const;
+    tolua_outside const PODVector<Pass*>& TechniqueGetPasses @ GetPasses() const;
+
+    tolua_readonly tolua_property__is_set bool supported;
+    tolua_readonly tolua_property__is_set bool desktop;
+    tolua_readonly tolua_property__get_set unsigned numPasses;
+};
+
+${
+static const Vector<String>& TechniqueGetPassNames(const Technique* technique)
+{
+    static Vector<String> vector = technique->GetPassNames();
+    return vector;
+}
+
+static const PODVector<Pass*>& TechniqueGetPasses(const Technique* technique)
+{
+    static PODVector<Pass*> vector = technique->GetPasses();
+    return vector;
+}
+$}

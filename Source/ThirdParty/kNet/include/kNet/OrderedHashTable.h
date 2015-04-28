@@ -147,6 +147,8 @@ private:
 	size_t numElemsMask;
 	size_t size;
 
+	void operator =(const OrderedHashTable &); ///< \todo Implement.
+	OrderedHashTable(const OrderedHashTable &); ///< \todo Implement.
 };
 
 } // ~kNet

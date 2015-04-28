@@ -1,0 +1,22 @@
+$#include "Scene/SplinePath.h"
+
+class SplinePath : public Component
+{
+    void AddControlPoint(Node* point, unsigned index = M_MAX_UNSIGNED);
+    void RemoveControlPoint(Node* point);
+    void ClearControlPoints();
+    Vector3 GetPoint(float factor) const;
+
+    InterpolationMode GetInterpolationMode() const;
+    Vector3 GetPosition() const;
+    
+    void SetInterpolationMode(InterpolationMode mode);
+    void SetPosition(float factor);
+    
+    void Move(float timeStep);
+    void Reset();
+    bool IsFinished() const;
+    
+    tolua_property__get_set float speed;
+    tolua_property__get_set Node* controlledNode;
+};

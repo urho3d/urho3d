@@ -182,7 +182,7 @@ u32 DataDeserializer::ReadVLE()
 		return sml;
 	sml &= (1 << VLEType::numBits1) - 1;
 
-	const int numBitsMed = VLEType::numBits2 + (VLEType::numBits3 == 0 ? 0 : 1);
+	const u32 numBitsMed = VLEType::numBits2 + (VLEType::numBits3 == 0 ? 0 : 1);
 	if (BitsLeft() < numBitsMed)
 		return cStreamEndError;
 
@@ -190,7 +190,7 @@ u32 DataDeserializer::ReadVLE()
 	if ((med & (1 << VLEType::numBits2)) == 0)
 		return sml | (med << VLEType::numBits1);
 
-	if (BitsLeft() < VLEType::numBits3)
+	if (BitsLeft() < (u32)VLEType::numBits3)
 		return cStreamEndError;
 
 	med &= (1 << VLEType::numBits2) - 1;

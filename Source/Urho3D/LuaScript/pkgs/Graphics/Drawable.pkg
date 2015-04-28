@@ -1,0 +1,65 @@
+$#include "Graphics/Drawable.h"
+
+static const unsigned DRAWABLE_GEOMETRY;
+static const unsigned DRAWABLE_LIGHT;
+static const unsigned DRAWABLE_ZONE;
+static const unsigned DRAWABLE_GEOMETRY2D;
+static const unsigned DRAWABLE_ANY;
+static const unsigned DEFAULT_VIEWMASK;
+static const unsigned DEFAULT_LIGHTMASK;
+static const unsigned DEFAULT_SHADOWMASK;
+static const unsigned DEFAULT_ZONEMASK;
+static const int MAX_VERTEX_LIGHTS;
+static const float ANIMATION_LOD_BASESCALE;
+
+class Drawable : public Component
+{
+    void SetDrawDistance(float distance);
+    void SetShadowDistance(float distance);
+    void SetLodBias(float bias);
+    void SetViewMask(unsigned mask);
+    void SetLightMask(unsigned mask);
+    void SetShadowMask(unsigned mask);
+    void SetZoneMask(unsigned mask);
+    void SetMaxLights(unsigned num);
+    void SetCastShadows(bool enable);
+    void SetOccluder(bool enable);
+    void SetOccludee(bool enable);
+    void MarkForUpdate();
+    
+    const BoundingBox& GetBoundingBox() const;
+    const BoundingBox& GetWorldBoundingBox();
+    unsigned char GetDrawableFlags() const;
+    float GetDrawDistance() const;
+    float GetShadowDistance() const;
+    float GetLodBias() const;
+    unsigned GetViewMask() const;
+    unsigned GetLightMask() const;
+    unsigned GetShadowMask() const;
+    unsigned GetZoneMask() const;
+    unsigned GetMaxLights() const;
+    bool GetCastShadows() const;
+    bool IsOccluder() const;
+    bool IsOccludee() const;
+    bool IsInView() const;
+    bool IsInView(Camera*) const;
+
+    Zone* GetZone() const;
+
+    tolua_readonly tolua_property__get_set BoundingBox& worldBoundingBox;
+    tolua_readonly tolua_property__get_set unsigned char drawableFlags;
+    tolua_property__get_set float drawDistance;
+    tolua_property__get_set float shadowDistance;
+    tolua_property__get_set float lodBias;
+    tolua_property__get_set unsigned viewMask;
+    tolua_property__get_set unsigned lightMask;
+    tolua_property__get_set unsigned shadowMask;
+    tolua_property__get_set unsigned zoneMask;
+    tolua_property__get_set unsigned maxLights;
+    tolua_property__get_set bool castShadows;
+    tolua_property__is_set bool occluder;
+    tolua_property__is_set bool occludee;
+    tolua_readonly tolua_property__is_set bool inView;
+    tolua_readonly tolua_property__get_set Zone* zone;
+};
+

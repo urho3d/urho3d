@@ -14,6 +14,7 @@
 
 /** @file W32Event.cpp
 	@brief */
+#ifdef WIN32
 
 #include <cassert>
 
@@ -26,7 +27,7 @@ namespace kNet
 {
 
 Event::Event()
-:wsaEvent(NULL)
+:wsaEvent(NULL), type(EventWaitInvalid)
 {
 }
 
@@ -63,7 +64,7 @@ bool Event::IsNull() const
 void Event::Reset()
 {
 	if (wsaEvent == NULL)
-		LOG(LogError, "Event::Reset called on a null event!");
+		KNET_LOG(LogError, "Event::Reset called on a null event!");
 	else
 		WSAResetEvent(wsaEvent);
 }
@@ -71,7 +72,7 @@ void Event::Reset()
 void Event::Set()
 {
 	if (wsaEvent == NULL)
-		LOG(LogError, "Event::Set called on a null event!");
+		KNET_LOG(LogError, "Event::Set called on a null event!");
 	else
 		WSASetEvent(wsaEvent);
 }
@@ -101,3 +102,5 @@ bool Event::IsValid() const
 }
 
 } // ~kNet
+
+#endif // ~WIN32

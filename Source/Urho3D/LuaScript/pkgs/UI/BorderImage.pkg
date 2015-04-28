@@ -1,0 +1,50 @@
+$#include "UI/BorderImage.h"
+
+enum BlendMode{};
+
+class BorderImage : public UIElement
+{
+    BorderImage();
+    virtual ~BorderImage();
+    
+    void SetTexture(Texture* texture);
+    void SetImageRect(const IntRect& rect);
+    void SetFullImageRect();
+    void SetBorder(const IntRect& rect);
+    void SetImageBorder(const IntRect& rect);
+    void SetHoverOffset(const IntVector2& offset);
+    void SetHoverOffset(int x, int y);
+    void SetBlendMode(BlendMode mode);
+    void SetTiled(bool enable);
+    
+    Texture* GetTexture() const;
+    const IntRect& GetImageRect() const;
+    const IntRect& GetBorder() const;
+    const IntRect& GetImageBorder() const;
+    const IntVector2& GetHoverOffset() const;
+    BlendMode GetBlendMode() const;
+    bool IsTiled() const;
+    
+    tolua_property__get_set Texture* texture;
+    tolua_property__get_set IntRect& imageRect;
+    tolua_property__get_set IntRect& border;
+    tolua_property__get_set IntRect& imageBorder;
+    tolua_property__get_set IntVector2& hoverOffset;
+    tolua_property__get_set BlendMode blendMode;
+    tolua_property__is_set bool tiled;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_BorderImage_new00
+static int tolua_UILuaAPI_BorderImage_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<BorderImage>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_BorderImage_new00_local
+static int tolua_UILuaAPI_BorderImage_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<BorderImage>(tolua_S);
+}
+$}
+

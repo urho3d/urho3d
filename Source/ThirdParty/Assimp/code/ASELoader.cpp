@@ -43,6 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  @brief Implementation of the ASE importer class
  */
 
+// Modified by Lasse Oorni for Urho3D
+
 #include "AssimpPCH.h"
 #ifndef ASSIMP_BUILD_NO_ASE_IMPORTER
 
@@ -449,8 +451,9 @@ void ASEImporter::BuildLights()
 
 			// The direction is encoded in the transformation matrix of the node. 
 			// In 3DS MAX the light source points into negative Z direction if 
-			// the node transformation is the identity. 
-			out->mDirection = aiVector3D(0.f,0.f,-1.f);
+			// the node transformation is the identity.
+            // Urho3D: lights should use positive Z as local direction
+			out->mDirection = aiVector3D(0.f,0.f,1.f);
 
 			out->mName.Set(in.mName);
 			switch (in.mLightType)

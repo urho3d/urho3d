@@ -715,18 +715,10 @@ SET( CONTRIB_FILES
 	${Boost_SRCS}
 )
 
-if (MSVC)
-    foreach(FILE ${SOURCE_FILES})
-        if (${FILE} MATCHES "[A-Za-z0-9 _/]*[.]cpp")
-            if (${FILE} MATCHES "AssimpPCH.cpp$")
-                set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "/YcAssimpPCH.h")
-            else ()
-                set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "/YuAssimpPCH.h")
-            endif ()
-        endif ()
-    endforeach ()
-endif ()
-
 set (TARGET_NAME Assimp)
 list (APPEND SOURCE_FILES ${CONTRIB_FILES} ${PUBLIC_HEADERS} ${COMPILER_HEADERS})
+
+set_source_files_properties (contrib/clipper/clipper.cpp contrib/irrXML/irrXML.cpp PROPERTIES NO_PCH TRUE)
+enable_pch (code/AssimpPCH.h)
+
 setup_library ()

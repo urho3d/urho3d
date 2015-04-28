@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #ifndef _SDL_uikitwindow_h
 #define _SDL_uikitwindow_h
 
@@ -39,9 +42,15 @@ extern SDL_bool UIKit_GetWindowWMInfo(_THIS, SDL_Window * window,
 
 @class UIWindow;
 
+// Urho3D: subclass for iOS 8 window size hack
+@interface SDL_uikitwindow : UIWindow
+
+@end
+
 struct SDL_WindowData
 {
-    UIWindow *uiwindow;
+    // Urho3D: subclass for iOS 8 window size hack
+    SDL_uikitwindow *uiwindow;
     SDL_uikitopenglview *view;
     SDL_uikitviewcontroller *viewcontroller;
 };

@@ -19,6 +19,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -33,6 +34,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -73,6 +75,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 float GetMorphWeight(uint) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
@@ -96,6 +99,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetMorphWeight(uint, float);
 
 // Properties:
@@ -178,6 +182,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -197,8 +202,10 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetFlip(bool, bool);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
+float alpha;
 String animation;
 bool animationEnabled;
 AnimationSet2D animationSet;
@@ -216,12 +223,14 @@ bool castShadows;
 /* readonly */
 String category;
 Color color;
+Material customMaterial;
 float drawDistance;
 bool enabled;
 /* readonly */
 bool enabledEffective;
 bool flipX;
 bool flipY;
+Vector2 hotSpot;
 /* readonly */
 uint id;
 /* readonly */
@@ -246,11 +255,11 @@ uint shadowMask;
 float speed;
 Sprite2D sprite;
 bool temporary;
-Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
 String typeName;
+bool useHotSpot;
 uint viewMask;
 /* readonly */
 int weakRefs;
@@ -332,6 +341,7 @@ WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 float GetAutoFade(const String&) const;
 float GetFadeTarget(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint8 GetLayer(const String&) const;
 float GetLength(const String&) const;
 bool GetLooped(const String&) const;
@@ -359,6 +369,7 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 bool SetAutoFade(const String&, float);
+void SetInterceptNetworkUpdate(const String&, bool);
 bool SetLayer(const String&, uint8);
 bool SetLooped(const String&, bool);
 bool SetSpeed(const String&, float);
@@ -521,6 +532,7 @@ VariantType type;
 class Audio
 {
 // Methods:
+bool HasMasterGain(const String&) const;
 bool Play();
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetMode(int, int, bool, bool = true);
@@ -586,6 +598,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -602,6 +615,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -697,6 +711,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -720,8 +735,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -737,6 +752,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -919,6 +935,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -942,8 +959,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -959,6 +976,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -1103,6 +1121,7 @@ WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 float GetDistance(const Vector3&) const;
 float GetDistanceSquared(const Vector3&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Ray GetScreenRay(float, float) const;
 Frustum GetSplitFrustum(float, float) const;
 bool Load(File, bool = false);
@@ -1121,6 +1140,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetOrthoSize(const Vector2&);
 Vector2 WorldToScreenPoint(const Vector3&) const;
 
@@ -1217,6 +1237,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -1240,8 +1261,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -1258,6 +1279,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -1393,6 +1415,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -1409,6 +1432,7 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetCenter(float, float);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetSize(float, float);
 
 // Properties:
@@ -1469,6 +1493,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Array<Vector2> GetVertices() const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -1485,6 +1510,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetVertex(uint, const Vector2&);
 void SetVertices(Array<Vector2>);
 const Vector2& GetVertex(uint) const;
@@ -1546,6 +1572,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -1562,6 +1589,7 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetCenter(float, float);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -1620,6 +1648,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -1635,6 +1664,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetVertices(const Vector2&, const Vector2&);
 
 // Properties:
@@ -1694,6 +1724,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Array<Vector2> GetVertices() const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -1710,6 +1741,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetVertex(uint, const Vector2&);
 void SetVertices(Array<Vector2>);
 const Vector2& GetVertex(uint) const;
@@ -1770,6 +1802,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -1792,9 +1825,10 @@ void SetConvexHull(Model, uint = 0, const Vector3& = Vector3 ( 1 , 1 , 1 ), cons
 void SetCustomConvexHull(CustomGeometry, const Vector3& = Vector3 ( 1 , 1 , 1 ), const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
 void SetCustomTriangleMesh(CustomGeometry, const Vector3& = Vector3 ( 1 , 1 , 1 ), const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
 void SetCylinder(float, float, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetSphere(float, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
 void SetStaticPlane(const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
-void SetTerrain();
+void SetTerrain(uint = 0);
 void SetTransform(const Vector3&, const Quaternion&);
 void SetTriangleMesh(Model, uint = 0, const Vector3& = Vector3 ( 1 , 1 , 1 ), const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
 
@@ -1849,6 +1883,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -1864,6 +1899,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -1968,6 +2004,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -1983,6 +2020,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2058,6 +2096,7 @@ Quaternion rotation;
 Scene scene;
 /* readonly */
 bool sceneLoaded;
+uint8 timeStamp;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -2117,6 +2156,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -2132,6 +2172,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2193,6 +2234,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -2208,6 +2250,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2255,6 +2298,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -2270,6 +2314,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2321,6 +2366,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -2336,6 +2382,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 Vector2 anchor;
@@ -2386,6 +2433,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -2401,6 +2449,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2451,6 +2500,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -2466,6 +2516,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 float angularOffset;
@@ -2518,6 +2569,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -2533,6 +2585,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2584,6 +2637,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -2599,6 +2653,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 Vector2 anchor;
@@ -2654,6 +2709,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -2669,6 +2725,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2721,6 +2778,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -2736,6 +2794,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 Vector2 anchor;
@@ -2790,6 +2849,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -2805,6 +2865,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2855,6 +2916,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -2870,6 +2932,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 Vector2 anchor;
@@ -2920,6 +2983,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -2935,6 +2999,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 Vector2 anchor;
@@ -3002,6 +3067,7 @@ void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
 void DefineShape(CursorShape, Texture, const IntRect&, const IntVector2&);
+void DefineShape(const String&, Texture, const IntRect&, const IntVector2&);
 void DisableLayoutUpdate();
 IntVector2 ElementToScreen(const IntVector2&);
 void EnableLayoutUpdate();
@@ -3015,6 +3081,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -3038,8 +3105,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -3055,11 +3122,14 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
 void SetPosition(int, int);
+void SetShape(CursorShape);
+void SetShape(const String&);
 void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
@@ -3157,7 +3227,7 @@ UIElement root;
 /* readonly */
 IntVector2 screenPosition;
 bool selected;
-CursorShape shape;
+String shape;
 IntVector2 size;
 bool sortChildren;
 String style;
@@ -3199,6 +3269,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 CustomGeometryVertex GetVertex(uint, uint);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
@@ -3216,6 +3287,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -3342,6 +3414,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -3357,6 +3430,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -3401,6 +3475,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -3419,6 +3494,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -3513,6 +3589,7 @@ VariantMap ReadVariantMap();
 Vector2 ReadVector2();
 Vector3 ReadVector3();
 Vector4 ReadVector4();
+VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
 
 // Properties:
@@ -3564,6 +3641,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -3580,6 +3658,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -3640,6 +3719,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -3656,6 +3736,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -3666,7 +3747,6 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
 StringHash baseType;
-BlendMode blendMode;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -3697,7 +3777,6 @@ int refs;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
-Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -3731,6 +3810,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Array<UIElement> GetItems() const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
@@ -3759,8 +3839,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -3777,6 +3857,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -4002,6 +4083,7 @@ VariantMap ReadVariantMap();
 Vector2 ReadVector2();
 Vector3 ReadVector3();
 Vector4 ReadVector4();
+VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 uint Write(Array<uint8>);
@@ -4034,6 +4116,7 @@ bool WriteVariantMap(const VariantMap&);
 bool WriteVector2(const Vector2&);
 bool WriteVector3(const Vector3&);
 bool WriteVector4(const Vector4&);
+bool WriteVectorBuffer(const VectorBuffer&);
 
 // Properties:
 /* readonly */
@@ -4174,9 +4257,9 @@ bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File, int, bool = false);
-bool SaveXML(VectorBuffer&, int, bool = false);
-bool SaveXML(const String&, int, bool = false);
+bool SaveXML(File, int, bool = false, const String& = "\t");
+bool SaveXML(VectorBuffer&, int, bool = false, const String& = "\t");
+bool SaveXML(const String&, int, bool = false, const String& = "\t");
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
@@ -4222,6 +4305,49 @@ Frustum Transformed(const Matrix3x4&) const;
 Array<Vector3> vertices;
 };
 
+class Geometry
+{
+// Methods:
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetDrawRange(PrimitiveType, uint, uint, bool = true);
+bool SetDrawRange(PrimitiveType, uint, uint, uint, uint, bool = true);
+void SetIndexBuffer(IndexBuffer);
+bool SetVertexBuffer(uint, VertexBuffer, uint = MASK_DEFAULT);
+
+// Properties:
+/* readonly */
+StringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+bool empty;
+IndexBuffer indexBuffer;
+/* readonly */
+uint indexCount;
+/* readonly */
+uint indexStart;
+float lodDistance;
+uint numVertexBuffers;
+/* readonly */
+PrimitiveType primitiveType;
+/* readonly */
+int refs;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+Array<VertexBuffer> vertexBuffers;
+/* readonly */
+uint vertexCount;
+/* readonly */
+Array<uint> vertexElementMasks;
+/* readonly */
+uint vertexStart;
+/* readonly */
+int weakRefs;
+};
+
 class Graphics
 {
 // Methods:
@@ -4241,6 +4367,8 @@ bool ToggleFullscreen();
 
 // Properties:
 /* readonly */
+String apiName;
+/* readonly */
 StringHash baseType;
 /* readonly */
 bool borderless;
@@ -4253,7 +4381,6 @@ IntVector2 desktopResolution;
 /* readonly */
 bool deviceLost;
 bool flushGPU;
-bool forceSM2;
 /* readonly */
 bool fullscreen;
 /* readonly */
@@ -4276,6 +4403,8 @@ uint numBatches;
 uint numPrimitives;
 String orientations;
 /* readonly */
+bool readableDepthSupport;
+/* readonly */
 int refs;
 /* readonly */
 bool resizable;
@@ -4286,8 +4415,6 @@ bool sRGB;
 bool sRGBSupport;
 /* readonly */
 bool sRGBWriteSupport;
-/* readonly */
-bool sm3Support;
 /* readonly */
 bool tripleBuffer;
 /* readonly */
@@ -4339,6 +4466,7 @@ VariantMap ReadVariantMap();
 Vector2 ReadVector2();
 Vector3 ReadVector3();
 Vector4 ReadVector4();
+VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
 
 // Properties:
@@ -4413,12 +4541,16 @@ uint components;
 /* readonly */
 bool compressed;
 /* readonly */
+CompressedFormat compressedFormat;
+/* readonly */
 int depth;
 /* readonly */
 int height;
 /* readonly */
 uint memoryUse;
 String name;
+/* readonly */
+uint numCompressedLevels;
 /* readonly */
 int refs;
 /* readonly */
@@ -4431,6 +4563,37 @@ uint useTimer;
 int weakRefs;
 /* readonly */
 int width;
+};
+
+class IndexBuffer
+{
+// Methods:
+VectorBuffer GetData();
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetData(VectorBuffer&);
+bool SetDataRange(VectorBuffer&, uint, uint, bool = false);
+void SetSize(uint, bool, bool = false);
+
+// Properties:
+/* readonly */
+StringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+bool dynamic;
+/* readonly */
+uint indexCount;
+/* readonly */
+uint indexSize;
+/* readonly */
+int refs;
+bool shadowed;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
 };
 
 class Input
@@ -4563,6 +4726,7 @@ JSONValue GetRoot(JSONValueType = JSON_ANY);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
+bool Save(File, const String&) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
@@ -4719,6 +4883,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -4735,6 +4900,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -4833,6 +4999,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -4856,8 +5023,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -4873,6 +5040,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -5035,6 +5203,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Array<UIElement> GetItems() const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
@@ -5066,8 +5235,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -5081,6 +5250,7 @@ void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -5105,6 +5275,8 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
+bool autoDisableChildren;
+float autoDisableThreshold;
 int baseIndent;
 /* readonly */
 StringHash baseType;
@@ -5269,6 +5441,7 @@ class Material
 {
 // Methods:
 Material Clone(const String& = String ( )) const;
+Pass GetPass(uint, const String&);
 ValueAnimation GetShaderParameterAnimation(const String&) const;
 float GetShaderParameterAnimationSpeed(const String&) const;
 WrapMode GetShaderParameterAnimationWrapMode(const String&) const;
@@ -5295,6 +5468,7 @@ StringHash baseType;
 String category;
 CullMode cullMode;
 BiasParameters depthBias;
+FillMode fillMode;
 /* readonly */
 uint memoryUse;
 String name;
@@ -5437,6 +5611,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -5460,8 +5635,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -5478,6 +5653,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -5646,25 +5822,25 @@ class Model
 {
 // Methods:
 Model Clone(const String& = String ( )) const;
+Geometry GetGeometry(uint, uint) const;
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetGeometry(uint, uint, Geometry);
 
 // Properties:
 /* readonly */
 StringHash baseType;
-/* readonly */
 BoundingBox boundingBox;
 /* readonly */
 String category;
+Array<Vector3> geometryCenters;
 /* readonly */
 uint memoryUse;
 String name;
-/* readonly */
 uint numGeometries;
-/* readonly */
 Array<uint> numGeometryLodLevels;
 /* readonly */
 uint numMorphs;
@@ -5692,6 +5868,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -5707,6 +5884,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -5757,6 +5935,7 @@ float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetRandomPoint();
 Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
 bool Load(File, bool = false);
@@ -5776,6 +5955,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 float agentHeight;
@@ -5864,6 +6044,8 @@ int refs;
 Connection serverConnection;
 /* readonly */
 bool serverRunning;
+int simulatedLatency;
+float simulatedPacketLoss;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -5883,6 +6065,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -5898,6 +6081,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool alwaysUpdateOwner;
@@ -5960,6 +6144,7 @@ Array<Node> GetChildrenWithScript(const String&, bool = false) const;
 Component GetComponent(const String&) const;
 Array<Component> GetComponents() const;
 Array<Component> GetComponents(const String&, bool = false) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Component GetOrCreateComponent(const String&, CreateMode = REPLICATED, uint = 0);
 ScriptObject GetScriptObject() const;
 ScriptObject GetScriptObject(const String&) const;
@@ -5991,8 +6176,8 @@ void RotateAround(const Vector3&, const Quaternion&, TransformSpace = TS_LOCAL);
 void RotateAround2D(const Vector2&, float, TransformSpace = TS_LOCAL);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 void Scale(const Vector3&);
 void Scale(float);
@@ -6004,6 +6189,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetPosition2D(float, float);
 void SetScale(float);
 void SetScale2D(float, float);
@@ -6174,10 +6360,11 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-Array<Node> GetDrawables(const BoundingBox&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
-Array<Node> GetDrawables(const Frustum&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
-Array<Node> GetDrawables(const Sphere&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
-Array<Node> GetDrawables(const Vector3&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
+Array<Drawable> GetDrawables(const BoundingBox&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
+Array<Drawable> GetDrawables(const Frustum&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
+Array<Drawable> GetDrawables(const Sphere&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
+Array<Drawable> GetDrawables(const Vector3&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -6196,6 +6383,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetSize(const BoundingBox&, uint);
 
 // Properties:
@@ -6244,6 +6432,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -6259,6 +6448,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -6442,6 +6632,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -6461,6 +6652,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -6536,6 +6728,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -6552,6 +6745,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -6595,7 +6789,6 @@ float shadowDistance;
 uint shadowMask;
 Sprite2D sprite;
 bool temporary;
-Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -6622,7 +6815,6 @@ String pixelShader;
 String pixelShaderDefines;
 /* readonly */
 int refs;
-bool sm3;
 String vertexShader;
 String vertexShaderDefines;
 /* readonly */
@@ -6663,6 +6855,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Array<RigidBody> GetRigidBodies(RigidBody);
 Array<RigidBody> GetRigidBodies(const BoundingBox&, uint = 0xffff);
 Array<RigidBody> GetRigidBodies(const Sphere&, uint = 0xffff);
@@ -6684,6 +6877,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 PhysicsRaycastResult SphereCast(const Ray&, float, float = M_INFINITY, uint = 0xffff);
 void Update(float);
 void UpdateCollisions();
@@ -6738,6 +6932,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Array<RigidBody2D> GetRigidBodies(const Rect&, uint = 0xffff);
 RigidBody2D GetRigidBody(const Vector2&, uint = 0xffff);
 RigidBody2D GetRigidBody(int, int, uint = 0xffff);
@@ -6758,6 +6953,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool allowSleeping;
@@ -6906,6 +7102,7 @@ void Define(const Vector3&, const Vector3&);
 float Distance(const Vector3&) const;
 float HitDistance(const BoundingBox&) const;
 float HitDistance(const Frustum&, bool = true) const;
+float HitDistance(const Plane&) const;
 float HitDistance(const Sphere&) const;
 float HitDistance(const Vector3&, const Vector3&, const Vector3&) const;
 Vector3 Project(const Vector3&) const;
@@ -7010,6 +7207,7 @@ Color clearColor;
 float clearDepth;
 uint clearFlags;
 uint clearStencil;
+String depthStencilName;
 bool enabled;
 bool markToStencil;
 String metadata;
@@ -7092,7 +7290,6 @@ bool drawShadows;
 bool dynamicInstancing;
 bool hdrRendering;
 int materialQuality;
-int maxInstanceTriangles;
 int maxOccluderTriangles;
 int maxShadowMaps;
 int maxSortedInstances;
@@ -7167,7 +7364,8 @@ class ResourceCache
 {
 // Methods:
 bool AddManualResource(Resource);
-void AddPackageFile(PackageFile, uint = M_MAX_UNSIGNED);
+bool AddPackageFile(PackageFile, uint = M_MAX_UNSIGNED);
+bool AddPackageFile(const String&, uint = M_MAX_UNSIGNED);
 bool AddResourceDir(const String&, uint = M_MAX_UNSIGNED);
 bool BackgroundLoadResource(const String&, const String&, bool = true);
 bool Exists(const String&) const;
@@ -7264,6 +7462,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetVelocityAtPoint(const Vector3&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -7283,6 +7482,7 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetCollisionLayerAndMask(uint, uint);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetTransform(const Vector3&, const Quaternion&);
 
 // Properties:
@@ -7363,6 +7563,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -7378,6 +7579,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool allowSleep;
@@ -7452,6 +7654,7 @@ Component GetComponent(const String&) const;
 Component GetComponent(uint);
 Array<Component> GetComponents() const;
 Array<Component> GetComponents(const String&, bool = false) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Node GetNode(uint);
 Component GetOrCreateComponent(const String&, CreateMode = REPLICATED, uint = 0);
 ScriptObject GetScriptObject() const;
@@ -7494,8 +7697,8 @@ void RotateAround(const Vector3&, const Quaternion&, TransformSpace = TS_LOCAL);
 void RotateAround2D(const Vector2&, float, TransformSpace = TS_LOCAL);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 void Scale(const Vector3&);
 void Scale(float);
@@ -7505,6 +7708,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetPosition2D(float, float);
 void SetScale(float);
 void SetScale2D(float, float);
@@ -7630,7 +7834,7 @@ Vector3 worldUp;
 class Script
 {
 // Methods:
-void DumpAPI(DumpMode = DOXYGEN);
+void DumpAPI(DumpMode = DOXYGEN, const String& = String ( ));
 bool Execute(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
@@ -7656,9 +7860,8 @@ class ScriptFile
 {
 // Methods:
 void ClearDelayedExecute(const String& = String ( ));
-void DelayedExecute(float, bool, const String&);
-void DelayedExecute(float, bool, const String&, const Array<Variant>);
-bool Execute(const String&, const Array<Variant>);
+void DelayedExecute(float, bool, const String&, const Array<Variant> = null);
+bool Execute(const String&, const Array<Variant> = null);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -7693,16 +7896,15 @@ class ScriptInstance
 void ApplyAttributes();
 void ClearDelayedExecute(const String& = String ( ));
 bool CreateObject(ScriptFile, const String&);
-void DelayedExecute(float, bool, const String&);
-void DelayedExecute(float, bool, const String&, const Array<Variant>);
+void DelayedExecute(float, bool, const String&, const Array<Variant> = null);
 void DrawDebugGeometry(DebugRenderer, bool);
-bool Execute(const String&);
-bool Execute(const String&, const Array<Variant>);
+bool Execute(const String&, const Array<Variant> = null);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -7718,6 +7920,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -7780,6 +7983,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -7803,8 +8007,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -7818,6 +8022,7 @@ void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -7969,6 +8174,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -7992,8 +8198,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -8007,6 +8213,7 @@ void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -8146,6 +8353,7 @@ class Serializable
 void ApplyAttributes();
 Variant GetAttribute(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -8157,6 +8365,7 @@ bool Save(VectorBuffer&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 /* readonly */
@@ -8214,6 +8423,7 @@ bool WriteVariantMap(const VariantMap&);
 bool WriteVector2(const Vector2&);
 bool WriteVector3(const Vector3&);
 bool WriteVector4(const Vector4&);
+bool WriteVectorBuffer(const VectorBuffer&);
 };
 
 class Skeleton
@@ -8242,6 +8452,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -8258,6 +8469,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -8337,6 +8549,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -8360,8 +8573,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -8377,6 +8590,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -8516,6 +8730,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -8531,6 +8746,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void Update(float, float);
 
 // Properties:
@@ -8623,6 +8839,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -8638,6 +8855,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -8681,6 +8899,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -8700,6 +8919,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void Stop();
 
 // Properties:
@@ -8735,7 +8955,7 @@ bool playing;
 int refs;
 /* readonly */
 Sound sound;
-SoundType soundType;
+String soundType;
 bool temporary;
 /* readonly */
 float timePosition;
@@ -8757,6 +8977,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -8778,6 +8999,7 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDistanceAttenuation(float, float, float);
+void SetInterceptNetworkUpdate(const String&, bool);
 void Stop();
 
 // Properties:
@@ -8818,7 +9040,7 @@ int refs;
 float rolloffFactor;
 /* readonly */
 Sound sound;
-SoundType soundType;
+String soundType;
 bool temporary;
 /* readonly */
 float timePosition;
@@ -8882,6 +9104,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetPoint(float) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -8901,6 +9124,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -8957,6 +9181,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool Load(File, bool = false);
@@ -8977,8 +9202,8 @@ void RemoveInstanceDefault();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
@@ -8991,6 +9216,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHotSpot(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
@@ -9150,6 +9376,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool IsInside(const Vector3&) const;
 bool IsInsideLocal(const Vector3&) const;
@@ -9168,6 +9395,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -9237,6 +9465,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -9255,6 +9484,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -9328,6 +9558,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -9345,8 +9576,10 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetFlip(bool, bool);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
+float alpha;
 bool animationEnabled;
 /* readonly */
 Array<Variant> attributeDefaults;
@@ -9362,12 +9595,14 @@ bool castShadows;
 /* readonly */
 String category;
 Color color;
+Material customMaterial;
 float drawDistance;
 bool enabled;
 /* readonly */
 bool enabledEffective;
 bool flipX;
 bool flipY;
+Vector2 hotSpot;
 /* readonly */
 uint id;
 /* readonly */
@@ -9390,11 +9625,11 @@ float shadowDistance;
 uint shadowMask;
 Sprite2D sprite;
 bool temporary;
-Texture2D texture;
 /* readonly */
 StringHash type;
 /* readonly */
 String typeName;
+bool useHotSpot;
 uint viewMask;
 /* readonly */
 int weakRefs;
@@ -9474,13 +9709,13 @@ uint value;
 class Technique
 {
 // Methods:
-Pass CreatePass(StringHash);
-Pass GetPass(StringHash);
-Pass GetSupportedPass(StringHash);
-bool HasPass(StringHash) const;
+Pass CreatePass(const String&);
+Pass GetPass(const String&);
+Pass GetSupportedPass(const String&);
+bool HasPass(const String&) const;
 bool Load(File);
 bool Load(VectorBuffer&);
-void RemovePass(StringHash);
+void RemovePass(const String&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -9497,12 +9732,11 @@ String name;
 /* readonly */
 uint numPasses;
 /* readonly */
-Array<StringHash> passTypes;
+Array<String> passNames;
 /* readonly */
 Array<Pass> passes;
 /* readonly */
 int refs;
-bool sm3;
 /* readonly */
 bool supported;
 /* readonly */
@@ -9536,6 +9770,7 @@ float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 float GetHeight(const Vector3&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetNormal(const Vector3&) const;
 TerrainPatch GetPatch(int, int) const;
 bool Load(File, bool = false);
@@ -9553,6 +9788,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 IntVector2 WorldToHeightMap(const Vector3&) const;
 
 // Properties:
@@ -9619,6 +9855,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -9635,6 +9872,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -9706,6 +9944,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -9729,8 +9968,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -9746,6 +9985,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 bool SetFont(Font, int);
 bool SetFont(const String&, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -9901,6 +10141,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -9920,6 +10161,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 bool SetFont(Font, int);
 bool SetFont(const String&, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -10269,6 +10511,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 TileMapLayer2D GetLayer(uint) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -10286,6 +10529,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 Vector2 TileIndexToPosition(int, int) const;
 
 // Properties:
@@ -10350,6 +10594,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 TileMapObject2D GetObject(uint) const;
 Node GetObjectNode(uint) const;
 Tile2D GetTile(int, int) const;
@@ -10370,6 +10615,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 const String& GetProperty(const String&) const;
 
 // Properties:
@@ -10383,7 +10629,6 @@ Array<Variant> attributes;
 StringHash baseType;
 /* readonly */
 String category;
-/* writeonly */
 int drawOrder;
 bool enabled;
 /* readonly */
@@ -10405,8 +10650,6 @@ uint numObjects;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
-/* readonly */
-int rrawOrder;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -10537,6 +10780,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -10560,8 +10804,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -10575,6 +10819,7 @@ void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -10782,6 +11027,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -10805,8 +11051,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -10820,6 +11066,7 @@ void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -10982,6 +11229,7 @@ VectorBuffer GetBuffer() const;
 float GetFloat() const;
 int GetInt() const;
 RefCounted GetPtr() const;
+ScriptObject GetScriptObject() const;
 StringHash GetStringHash() const;
 uint GetUInt() const;
 Array<Variant> GetVariantVector() const;
@@ -11131,6 +11379,7 @@ VariantMap ReadVariantMap();
 Vector2 ReadVector2();
 Vector3 ReadVector3();
 Vector4 ReadVector4();
+VectorBuffer ReadVectorBuffer(uint);
 void Resize(uint);
 uint Seek(uint);
 void SetData(Deserializer, uint);
@@ -11164,6 +11413,7 @@ bool WriteVariantMap(const VariantMap&);
 bool WriteVector2(const Vector2&);
 bool WriteVector3(const Vector3&);
 bool WriteVector4(const Vector4&);
+bool WriteVectorBuffer(const VectorBuffer&);
 
 // Properties:
 /* readonly */
@@ -11176,6 +11426,39 @@ String name;
 uint position;
 /* readonly */
 uint size;
+};
+
+class VertexBuffer
+{
+// Methods:
+VectorBuffer GetData();
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetData(VectorBuffer&);
+bool SetDataRange(VectorBuffer&, uint, uint, bool = false);
+void SetSize(uint, uint, bool = false);
+
+// Properties:
+/* readonly */
+StringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+bool dynamic;
+/* readonly */
+uint elementMask;
+/* readonly */
+int refs;
+bool shadowed;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+uint vertexCount;
+/* readonly */
+uint vertexSize;
+/* readonly */
+int weakRefs;
 };
 
 class View3D
@@ -11198,6 +11481,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -11222,8 +11506,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -11237,6 +11521,7 @@ void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -11439,6 +11724,7 @@ UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -11462,8 +11748,8 @@ void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -11477,6 +11763,7 @@ void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -11695,9 +11982,10 @@ bool Load(VectorBuffer&);
 void Patch(XMLElement);
 void Patch(XMLFile);
 bool Save(File) const;
+bool Save(File, const String&) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-String ToString() const;
+String ToString(const String& = String ( "\t" )) const;
 
 // Properties:
 /* readonly */
@@ -11762,6 +12050,7 @@ ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -11778,6 +12067,7 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 Color ambientColor;
@@ -11884,6 +12174,20 @@ CMP_GREATER,
 CMP_GREATEREQUAL,
 };
 
+enum CompressedFormat
+{
+CF_NONE,
+CF_RGBA,
+CF_DXT1,
+CF_DXT3,
+CF_DXT5,
+CF_ETC1,
+CF_PVRTC_RGB_2BPP,
+CF_PVRTC_RGBA_2BPP,
+CF_PVRTC_RGB_4BPP,
+CF_PVRTC_RGBA_4BPP,
+};
+
 enum ConstraintType
 {
 CONSTRAINT_POINT,
@@ -11926,13 +12230,17 @@ CULL_CW,
 enum CursorShape
 {
 CS_NORMAL,
+CS_IBEAM,
+CS_CROSS,
 CS_RESIZEVERTICAL,
 CS_RESIZEDIAGONAL_TOPRIGHT,
 CS_RESIZEHORIZONTAL,
 CS_RESIZEDIAGONAL_TOPLEFT,
+CS_RESIZE_ALL,
 CS_ACCEPTDROP,
 CS_REJECTDROP,
 CS_BUSY,
+CS_BUSY_ARROW,
 };
 
 enum DumpMode
@@ -12117,6 +12425,7 @@ CMD_SCENEPASS,
 CMD_QUAD,
 CMD_FORWARDLIGHTS,
 CMD_LIGHTVOLUMES,
+CMD_RENDERUI,
 };
 
 enum RenderSurfaceUpdateMode
@@ -12144,15 +12453,6 @@ SHAPE_CONE,
 SHAPE_TRIANGLEMESH,
 SHAPE_CONVEXHULL,
 SHAPE_TERRAIN,
-};
-
-enum SoundType
-{
-SOUND_EFFECT,
-SOUND_AMBIENT,
-SOUND_VOICE,
-SOUND_MUSIC,
-SOUND_MASTER,
 };
 
 enum TextEffect
@@ -12189,20 +12489,22 @@ FILTER_DEFAULT,
 enum TextureUnit
 {
 TU_DIFFUSE,
+TU_ALBEDOBUFFER,
 TU_NORMAL,
+TU_NORMALBUFFER,
 TU_SPECULAR,
 TU_EMISSIVE,
 TU_ENVIRONMENT,
 TU_LIGHTRAMP,
 TU_LIGHTSHAPE,
 TU_SHADOWMAP,
+TU_CUSTOM1,
+TU_CUSTOM2,
+TU_VOLUMEMAP,
 TU_FACESELECT,
 TU_INDIRECTION,
-TU_ALBEDOBUFFER,
-TU_NORMALBUFFER,
 TU_DEPTHBUFFER,
 TU_LIGHTBUFFER,
-TU_VOLUMEMAP,
 TU_ZONE,
 MAX_MATERIAL_TEXTURE_UNITS,
 MAX_TEXTURE_UNITS,
@@ -12302,8 +12604,7 @@ VectorBuffer CompressVectorBuffer(VectorBuffer&);
 float Cos(float);
 uint CountSetBits(uint);
 VectorBuffer DecompressVectorBuffer(VectorBuffer&);
-void DelayedExecute(float, bool, const String&);
-void DelayedExecute(float, bool, const String&, const Array<Variant>);
+void DelayedExecute(float, bool, const String&, const Array<Variant> = null);
 bool Equals(float, float);
 void ErrorDialog(const String&, const String&);
 float Floor(float);
@@ -12319,8 +12620,10 @@ uint GetFloat16Format();
 uint GetFloat32Format();
 uint GetFormat(const String&);
 String GetInternalPath(const String&);
+uint GetLinearDepthFormat();
 uint GetLuminanceAlphaFormat();
 uint GetLuminanceFormat();
+uint GetMaxBones();
 uint GetNumLogicalCPUs();
 uint GetNumPhysicalCPUs();
 Array<String> GetObjectCategories();
@@ -12337,6 +12640,7 @@ uint GetRGBFormat();
 uint GetRGFloat16Format();
 uint GetRGFloat32Format();
 uint GetRandomSeed();
+uint GetReadableDepthFormat();
 String GetTextureUnitName(TextureUnit);
 bool IsAbsolutePath(const String&);
 bool IsAlpha(uint);
@@ -12462,8 +12766,8 @@ uint DEFAULT_LIGHTMASK;
 uint DEFAULT_VIEWMASK;
 uint DRAWABLE_ANY;
 uint DRAWABLE_GEOMETRY;
+uint DRAWABLE_GEOMETRY2D;
 uint DRAWABLE_LIGHT;
-uint DRAWABLE_PROXYGEOMETRY;
 uint DRAWABLE_ZONE;
 uint FIRST_LOCAL_ID;
 uint FIRST_REPLICATED_ID;
@@ -12593,6 +12897,21 @@ int LOG_INFO;
 int LOG_NONE;
 int LOG_WARNING;
 Color MAGENTA;
+uint MASK_BLENDINDICES;
+uint MASK_BLENDWEIGHTS;
+uint MASK_COLOR;
+uint MASK_CUBETEXCOORD1;
+uint MASK_CUBETEXCOORD2;
+uint MASK_DEFAULT;
+uint MASK_INSTANCEMATRIX1;
+uint MASK_INSTANCEMATRIX2;
+uint MASK_INSTANCEMATRIX3;
+uint MASK_NONE;
+uint MASK_NORMAL;
+uint MASK_POSITION;
+uint MASK_TANGENT;
+uint MASK_TEXCOORD1;
+uint MASK_TEXCOORD2;
 int MOUSEB_LEFT;
 int MOUSEB_MIDDLE;
 int MOUSEB_RIGHT;
@@ -12871,6 +13190,11 @@ int SHADOWQUALITY_HIGH_16BIT;
 int SHADOWQUALITY_HIGH_24BIT;
 int SHADOWQUALITY_LOW_16BIT;
 int SHADOWQUALITY_LOW_24BIT;
+String SOUND_AMBIENT;
+String SOUND_EFFECT;
+String SOUND_MASTER;
+String SOUND_MUSIC;
+String SOUND_VOICE;
 Color TRANSPARENT;
 uint VO_DISABLE_OCCLUSION;
 uint VO_DISABLE_SHADOWS;

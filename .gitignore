@@ -1,19 +1,16 @@
-# Build directories
-Build/
-*-Build/
-
-# Output directories
-Bin/*
-!Bin/**/
-!Bin/*.bat
-!Bin/*.sh
-Bin/*.app/
-Bin/*.app.dSYM/
-Bin/Data/LuaScripts/jit/
-Bin/Screenshots
-*-Bin/
-Lib/
-*-Lib/
+# Output directories (in case of non out-of-source)
+/bin/*
+!/bin/**/
+!/bin/*.bat
+!/bin/*.sh
+/bin/*.app/
+/bin/*.app.dSYM/
+/bin/jit/
+/bin/Screenshots/
+/bin/tool/
+/include/
+/lib*/
+generated/
 
 # Compiled shaders
 *.vs2
@@ -27,33 +24,32 @@ Lib/
 # Compiled Lua script
 *.luc
 
-# Generated documentation
-Docs/html/
-Docs/qch/
-Docs/Doxyfile
-Docs/minimal-*
+# Generated documentation (in case of non out-of-source)
+/Docs/html/
+/Docs/qch/
+/Docs/Doxyfile
 
-# Eclipse project settings
-Source/.*project
-Source/.settings
+# Eclipse project settings (in case of non out-of-source)
+/.*project
+/.settings
 
 # KDevelop project settings
-*.kdev?
+/*.kdev?
 
 # Qt Creator project settings
-Source/CMakeLists.txt.user
+/CMakeLists.txt.user
 
-# Android in-the-source project settings
-Source/Android/project.properties
-Source/Android/local.properties
-Source/Android/proguard-project.txt
+# Android non out-of-source project settings
+/Android/project.properties
+/Android/local.properties
+/Android/proguard-project.txt
 
-# Android in-the-source build and output directories
-Source/Android/Engine
-Source/Android/ThirdParty
-Source/Android/libs
+# Android non out-of-source build and output directories
+/Android/Urho3D/
+/Android/ThirdParty/
+/Android/libs/
 
-# Android in-the-source CMake build files
+# Non out-of-source CMake generated build files
 CMakeCache.txt
 CMakeFiles/
 CMakeScripts/
@@ -61,8 +57,10 @@ Makefile
 cmake_install.cmake
 install_manifest.txt
 
-# GCC PCH files that are some-how ending up in the Source tree instead of the Build directory
-*.gch
+# Precompiled header files (in case of non out-of-source)
+*.gch/
+*.pch/
+*.pch.*
 
 # Misc.
 configure*

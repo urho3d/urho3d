@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,13 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "AnimatedModel.h"
-#include "AnimationState.h"
-#include "Mover.h"
-#include "Scene.h"
-#include "SceneEvents.h"
+#include <Urho3D/Urho3D.h>
 
-#include "DebugNew.h"
+#include <Urho3D/Graphics/AnimatedModel.h>
+#include <Urho3D/Graphics/AnimationState.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Scene/SceneEvents.h>
+
+#include "Mover.h"
+
+#include <Urho3D/DebugNew.h>
 
 Mover::Mover(Context* context) :
     LogicComponent(context),

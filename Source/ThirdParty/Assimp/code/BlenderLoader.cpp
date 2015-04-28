@@ -42,6 +42,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @file  BlenderLoader.cpp
  *  @brief Implementation of the Blender3D importer class.
  */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "AssimpPCH.h"
 
 //#define ASSIMP_BUILD_NO_COMPRESSED_BLEND
@@ -1024,7 +1027,8 @@ aiLight* BlenderImporter::ConvertLight(const Scene& in, const Object* obj, const
 	        out->mType = aiLightSource_DIRECTIONAL;
 
 	        // blender orients directional lights as facing toward -z
-	        out->mDirection = aiVector3D(0.f, 0.f, -1.f);
+            // Urho3D: lights should use positive Z as local direction
+	        out->mDirection = aiVector3D(0.f, 0.f, 1.f);
 	        break;
 	    default:
 	        break;

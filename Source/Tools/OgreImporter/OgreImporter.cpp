@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,19 @@
 // THE SOFTWARE.
 //
 
-#include "Context.h"
-#include "File.h"
-#include "FileSystem.h"
-#include "HashSet.h"
+#include <Urho3D/Urho3D.h>
+
+#include <Urho3D/Core/Context.h>
+#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/Container/HashSet.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Container/Sort.h>
+#include <Urho3D/Core/StringUtils.h>
+#include <Urho3D/Graphics/Tangent.h>
+#include <Urho3D/Resource/XMLFile.h>
+
 #include "OgreImporterUtils.h"
-#include "ProcessUtils.h"
-#include "Sort.h"
-#include "Tangent.h"
-#include "XMLFile.h"
 
 #ifdef WIN32
 #include <windows.h>
@@ -37,7 +41,7 @@
 #include <cstddef>
 #include <cstring>
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 static const int VERTEX_CACHE_SIZE = 32;
 
@@ -52,6 +56,7 @@ Vector<ModelBone> bones_;
 Vector<ModelMorph> morphs_;
 Vector<String> materialNames_;
 BoundingBox boundingBox_;
+unsigned maxBones_ = 64;
 unsigned numSubMeshes_ = 0;
 bool useOneBuffer_ = true;
 
@@ -91,6 +96,7 @@ void Run(const Vector<String>& arguments)
             "-r      Output only rotations from animations\n"
             "-s      Split each submesh into own vertex buffer\n"
             "-t      Generate tangents\n"
+            "-mb <x> Maximum number of bones per submesh, default 64\n"
         );
     }
     
@@ -129,6 +135,13 @@ void Run(const Vector<String>& arguments)
                         break;
                     }
                     break;
+                }
+                else if (argument == "mb" && i < arguments.Size() - 1)
+                {
+                    maxBones_ = ToUInt(arguments[i + 1]);
+                    if (maxBones_ < 1)
+                        maxBones_ = 1;
+                    ++i;
                 }
             }
         }
@@ -497,7 +510,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 bool sorted = false;
                 
                 // If amount of bones is larger than supported by HW skinning, must remap per submesh
-                if (bones_.Size() > MAX_SKIN_MATRICES)
+                if (bones_.Size() > maxBones_)
                 {
                     HashMap<unsigned, unsigned> usedBoneMap;
                     unsigned remapIndex = 0;
@@ -521,8 +534,8 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                     }
                     
                     // If still too many bones in one subgeometry, error
-                    if (usedBoneMap.Size() > MAX_SKIN_MATRICES)
-                        ErrorExit("Too many bones in submesh " + String(subMeshIndex + 1));
+                    if (usedBoneMap.Size() > maxBones_)
+                        ErrorExit("Too many bones (limit " + String(maxBones_) + ") in submesh " + String(subMeshIndex + 1));
                     
                     // Write mapping of vertex buffer bone indices to original bone indices
                     subGeometryLodLevel.boneMapping_.Resize(usedBoneMap.Size());

@@ -16,36 +16,35 @@
 
 set (TARGET_NAME kNet)
 
-file (GLOB kNetSourceFiles ./src/*.cpp)
-file (GLOB kNetHeaderFiles ./include/*.h ./include/kNet/*.h ./include/kNet/*.inl)
+file (GLOB kNetSourceFiles src/*.cpp)
+file (GLOB kNetHeaderFiles include/*.h include/kNet/*.h include/kNet/*.inl)
 
 if (WIN32)
-   file (GLOB kNetWin32SourceFiles ./src/win32/*.cpp)
-   file (GLOB kNetWin32HeaderFiles ./include/kNet/win32/*.h)
+   file (GLOB kNetWin32SourceFiles src/win32/*.cpp)
+   file (GLOB kNetWin32HeaderFiles include/kNet/win32/*.h)
 
    if (USE_BOOST)
-      list (REMOVE_ITEM kNetWin32SourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/./src/win32/W32Thread.cpp)
+      list (REMOVE_ITEM kNetWin32SourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/W32Thread.cpp)
    endif ()
 
-   set (kNetSourceFiles ${kNetSourceFiles} ${kNetWin32SourceFiles})
-   set (kNetHeaderFiles ${kNetHeaderFiles} ${kNetWin32HeaderFiles})
+   list (APPEND kNetSourceFiles ${kNetWin32SourceFiles})
+   list (APPEND kNetHeaderFiles ${kNetWin32HeaderFiles})
 
    add_definitions (-D_WINSOCKAPI_)
    add_definitions (-D_CRT_SECURE_NO_WARNINGS)
    add_definitions (-DKNET_MEMORY_LEAK_CHECK)
 elseif (UNIX)
-   list (REMOVE_ITEM kNetSourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/./src/Clock.cpp)
-   file (GLOB kNetUnixSourceFiles ./src/unix/*.cpp)
-   file (GLOB kNetUnixHeaderFiles ./include/*.h ./include/kNet/*.h ./include/kNet/unix/*.h)
+   file (GLOB kNetUnixSourceFiles src/unix/*.cpp)
+   file (GLOB kNetUnixHeaderFiles include/*.h include/kNet/*.h include/kNet/unix/*.h)
 
    if (USE_BOOST)
-      list (REMOVE_ITEM kNetUnixSourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/./src/unix/UnixThread.cpp)
+      list (REMOVE_ITEM kNetUnixSourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/src/unix/UnixThread.cpp)
    endif ()
 
-   set (kNetSourceFiles ${kNetSourceFiles} ${kNetUnixSourceFiles})
-   set (kNetHeaderFiles ${kNetHeaderFiles} ${kNetUnixHeaderFiles})
+   list (APPEND kNetSourceFiles ${kNetUnixSourceFiles})
+   list (APPEND kNetHeaderFiles ${kNetUnixHeaderFiles})
 
-   add_definitions (-DUNIX)
+   add_definitions (-DKNET_UNIX)
 endif ()
 
 # Urho3D: set DEBUG_CPP_NAME only on Windows, Xcode project file can not be opened if this is included
@@ -58,12 +57,14 @@ endif ()
 
 # Define source files
 set (SOURCE_FILES ${kNetSourceFiles} ${kNetHeaderFiles})
-# Install dependency for Engine/Network/Connection.h and Engine/Network/Network.h
-install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/kNet ${DEST_PERMISSIONS} FILES_MATCHING PATTERN *.h PATTERN *.inl)     # Note: the trailing slash is significant
-set (INSTALL_INCLUDE_DIRS ${INSTALL_INCLUDE_DIRS} kNet PARENT_SCOPE)
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY include)
+set (INCLUDE_DIRS include)
 
 # Setup target
 setup_library ()
+
+# Install headers for building and using the Urho3D library (install dependency for Urho3D/Network/Connection.h and Urho3D/Network/Network.h)
+install_header_files (DIRECTORY include/kNet/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/kNet FILES_MATCHING PATTERN *.h *.inl USE_FILE_SYMLINK)     # Note: the trailing slash is significant
+file (GLOB kNetHeaderFiles include/*.h)
+install_header_files (FILES ${kNetHeaderFiles} DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/kNet)

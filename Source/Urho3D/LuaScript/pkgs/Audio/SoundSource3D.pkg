@@ -1,0 +1,27 @@
+$#include "Audio/SoundSource3D.h"
+
+class SoundSource3D : public SoundSource
+{
+    void SetDistanceAttenuation(float nearDistance, float farDistance, float rolloffFactor);
+    void SetAngleAttenuation(float innerAngle, float outerAngle);
+    void SetNearDistance(float distance);
+    void SetFarDistance(float distance);
+    void SetInnerAngle(float angle);
+    void SetOuterAngle(float angle);
+    void SetRolloffFactor(float factor);
+    void CalculateAttenuation();
+    
+    float GetNearDistance() const;
+    float GetFarDistance() const;
+    float GetInnerAngle() const;
+    float GetOuterAngle() const;
+    float RollAngleoffFactor() const;
+    
+    tolua_property__get_set float nearDistance;
+    tolua_property__get_set float farDistance;
+    tolua_property__get_set float innerAngle;
+    tolua_property__get_set float outerAngle;
+    tolua_property__get_set float rolloffFactor;
+};
+
+$#define GetRolloffFactor RollAngleoffFactor

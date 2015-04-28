@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,33 +20,35 @@
 // THE SOFTWARE.
 //
 
-#include "AnimatedModel.h"
-#include "Camera.h"
-#include "CoreEvents.h"
-#include "Cursor.h"
-#include "DebugRenderer.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "Light.h"
-#include "Material.h"
-#include "Model.h"
-#include "Navigable.h"
-#include "NavigationMesh.h"
-#include "Octree.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "StaticModel.h"
-#include "Text.h"
-#include "UI.h"
-#include "XMLFile.h"
-#include "Zone.h"
+#include <Urho3D/Urho3D.h>
+
+#include <Urho3D/Graphics/AnimatedModel.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/UI/Cursor.h>
+#include <Urho3D/Graphics/DebugRenderer.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Graphics/Light.h>
+#include <Urho3D/Graphics/Material.h>
+#include <Urho3D/Graphics/Model.h>
+#include <Urho3D/Navigation/Navigable.h>
+#include <Urho3D/Navigation/NavigationMesh.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/UI.h>
+#include <Urho3D/Resource/XMLFile.h>
+#include <Urho3D/Graphics/Zone.h>
 
 #include "Navigation.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(Navigation)
 
@@ -384,7 +386,7 @@ void Navigation::FollowPath(float timeStep)
         jackNode_->Translate(Vector3::FORWARD * move);
 
         // Remove waypoint if reached it
-        if ((jackNode_->GetPosition() - nextWaypoint).Length() < 0.1f)
+        if (distance < 0.1f)
             currentPath_.Erase(0);
     }
 }

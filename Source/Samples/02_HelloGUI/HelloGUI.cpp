@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,26 +20,28 @@
 // THE SOFTWARE.
 //
 
-#include "Button.h"
-#include "BorderImage.h"
-#include "CheckBox.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "LineEdit.h"
-#include "ResourceCache.h"
-#include "Text.h"
-#include "Texture2D.h"
-#include "ToolTip.h"
-#include "UI.h"
-#include "UIElement.h"
-#include "UIEvents.h"
-#include "Window.h"
+#include <Urho3D/Urho3D.h>
+
+#include <Urho3D/UI/Button.h>
+#include <Urho3D/UI/BorderImage.h>
+#include <Urho3D/UI/CheckBox.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/UI/LineEdit.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/Graphics/Texture2D.h>
+#include <Urho3D/UI/ToolTip.h>
+#include <Urho3D/UI/UI.h>
+#include <Urho3D/UI/UIElement.h>
+#include <Urho3D/UI/UIEvents.h>
+#include <Urho3D/UI/Window.h>
 
 #include "HelloGUI.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(HelloGUI)
 

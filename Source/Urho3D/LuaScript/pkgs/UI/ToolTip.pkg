@@ -1,0 +1,27 @@
+$#include "UI/ToolTip.h"
+
+class ToolTip : public UIElement
+{
+    ToolTip();
+    virtual ~ToolTip();
+
+    void SetDelay(float delay);
+    
+    float GetDelay() const;
+    
+    tolua_property__get_set float delay;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_ToolTip_new00
+static int tolua_UILuaAPI_ToolTip_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<ToolTip>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_ToolTip_new00_local
+static int tolua_UILuaAPI_ToolTip_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<ToolTip>(tolua_S);
+}
+$}

@@ -1,0 +1,41 @@
+$#include "Graphics/AnimatedModel.h"
+
+class AnimatedModel : public StaticModel
+{
+    void SetModel(Model* model);
+    AnimationState* AddAnimationState(Animation* animation);
+    void RemoveAnimationState(Animation* animation);
+    void RemoveAnimationState(const String animationName);
+    void RemoveAnimationState(StringHash animationNameHash);
+    void RemoveAnimationState(AnimationState* state);
+    void RemoveAnimationState(unsigned index);
+    void RemoveAllAnimationStates();
+    void SetAnimationLodBias(float bias);
+    void SetUpdateInvisible(bool enable);
+    void SetMorphWeight(const String name, float weight);
+    void SetMorphWeight(StringHash nameHash, float weight);
+    void SetMorphWeight(unsigned index, float weight);
+    void ResetMorphWeights();
+
+    Skeleton& GetSkeleton();
+    unsigned GetNumAnimationStates() const;
+    AnimationState* GetAnimationState(Animation* animation) const;
+    AnimationState* GetAnimationState(const String animationName) const;
+    AnimationState* GetAnimationState(const StringHash animationNameHash) const;
+    AnimationState* GetAnimationState(unsigned index) const;
+    float GetAnimationLodBias() const;
+    bool GetUpdateInvisible() const;
+    unsigned GetNumMorphs() const;
+    float GetMorphWeight(const String name) const;
+    float GetMorphWeight(StringHash nameHash) const;
+    float GetMorphWeight(unsigned index) const;
+    bool IsMaster() const;
+
+    tolua_property__get_set Model* model;
+    tolua_readonly tolua_property__get_set Skeleton& skeleton;
+    tolua_readonly tolua_property__get_set unsigned numAnimationStates;
+    tolua_property__get_set float animationLodBias;
+    tolua_property__get_set bool updateInvisible;
+    tolua_readonly tolua_property__get_set unsigned numMorphs;
+    tolua_readonly tolua_property__is_set bool master;
+};

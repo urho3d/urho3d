@@ -1,0 +1,48 @@
+$#include "Math/Vector3.h"
+
+class Vector3
+{
+    Vector3();
+    Vector3(const Vector3& vector);
+    Vector3(const Vector2& vector, float z);
+    Vector3(const Vector2& vector);
+    Vector3(float x, float y, float z);
+    Vector3(float x, float y);
+    ~Vector3();
+    
+    bool operator == (const Vector3& rhs) const;
+    Vector3 operator + (const Vector3& rhs) const;
+    Vector3 operator - () const;
+    Vector3 operator - (const Vector3& rhs) const;
+    Vector3 operator * (float rhs) const;
+    Vector3 operator * (const Vector3& rhs) const;
+    Vector3 operator / (float rhs) const;
+    Vector3 operator / (const Vector3& rhs) const;
+    void Normalize();
+    float Length() const;
+    float LengthSquared() const;
+    float DotProduct(const Vector3& rhs) const;
+    float AbsDotProduct(const Vector3& rhs) const;
+    Vector3 CrossProduct(const Vector3& rhs) const;
+    Vector3 Abs() const;
+    Vector3 Lerp(const Vector3& rhs, float t) const;
+    bool Equals(const Vector3& rhs) const;
+    bool IsNaN() const;
+    float Angle(const Vector3& rhs) const;
+    Vector3 Normalized() const;
+    
+    String ToString() const;
+    
+    float x_ @ x;
+    float y_ @ y;
+    float z_ @ z;
+    
+    static const Vector3 ZERO;
+    static const Vector3 LEFT;
+    static const Vector3 RIGHT;
+    static const Vector3 UP;
+    static const Vector3 DOWN;
+    static const Vector3 FORWARD;
+    static const Vector3 BACK;
+    static const Vector3 ONE;
+};

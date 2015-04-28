@@ -29,7 +29,7 @@
 #	pragma pack(push,1)
 #	define PACK_STRUCT
 #elif defined( __GNUC__ )
-#	if defined(__clang__) || defined(RASPI)
+#	if defined(__clang__) || defined(RPI)
 #		define PACK_STRUCT	__attribute__((__packed__))
 #	else
 #		define PACK_STRUCT	__attribute__((gcc_struct, __packed__))

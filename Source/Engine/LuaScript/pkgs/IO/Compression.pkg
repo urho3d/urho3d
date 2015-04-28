@@ -1,4 +1,0 @@
-$#include "Compression.h"
-
-VectorBuffer CompressVectorBuffer(VectorBuffer& src);
-VectorBuffer DecompressVectorBuffer(VectorBuffer& src);
