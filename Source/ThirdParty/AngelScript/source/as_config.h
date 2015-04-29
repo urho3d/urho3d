@@ -28,7 +28,7 @@
    andreas@angelcode.com
 */
 
-// Modified by Yao Wei Tjong for Urho3D
+// Modified by Yao Wei Tjong and Skrylar for Urho3D
 
 
 //
@@ -774,6 +774,7 @@
 			// As of version 4.7 MinGW changed the ABI, presumably
 
 			// to be better aligned with how MSVC works
+			// Urho3D: also check for Clang version and use the same workaround 
 			#if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7) || __GNUC__ > 4
 			    #define AS_MINGW47_WORKAROUND
 			#endif
