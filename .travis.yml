@@ -112,11 +112,11 @@ before_script:
   - ccache -z -M 100M
 script: rake ci
 before_cache: ccache -s
-#after_success: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_rebase; fi
+after_success: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_create_mirrors; fi
 
 ---
 
-branch: {name: Coverity-Scan, active: no}
+branch: {name: Coverity-Scan, active: no, description: For Travis CI - switch CI build to enable Coverity Scan addon.}
 language: cpp
 compiler: gcc
 cache: ccache
@@ -134,6 +134,7 @@ addons:
     branch_pattern: .*Coverity-Scan$
 env:
   global:
+    - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
     - secure: N4zqaSj/QZ2Z2j5hJc1Y2wBls4tvS0u8bFgutG3dEDxX5HF9tj6nw1wykDY3fvkpFP4gLEUJ6wV9HFXTR6PxwtCly9dsy0Bkb9+4CnRLTTeyUdqJA+Ca2bnjFPsYP/p6+kmOOo9rbYXsT5BGXVsm3euqJiKhCDP2CIG/YDvYtdw=
     - LINUX=1
     - USE_CCACHE=1
@@ -144,17 +145,19 @@ before_script:
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH
   - ccache -z -M 100M
-script: ccache -s
+script: true
+before_cache: ccache -s
 
 ---
 
-branch: {name: Android-CI, active: yes}
+branch: {name: Android-CI, active: yes, description: For Travis CI - switch CI build to use Android build environment.}
 language: android
 cache: { directories: $HOME/.ccache }
 sudo: false
 addons: {apt: {packages: &native_deps [libasound2-dev, g++-multilib]}}
 env:
   global:
+    - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
     - NUMJOBS=4
     - ANDROID=1
     - ANDROID_TMP=~/tmp
@@ -213,13 +216,14 @@ before_cache: ccache -s
 
 ---
 
-branch: {name: RPI-CI, active: yes}
+branch: {name: RPI-CI, active: yes, description: For Travis CI - switch CI build to use Raspberry-Pi build environment.}
 language: cpp
 cache: ccache
 sudo: false
 addons: {apt: {packages: &native_deps [libasound2-dev, g++-multilib]}}
 env:
   global:
+    - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
     - NUMJOBS=4
     - RPI=1
     - USE_CCACHE=1
@@ -249,10 +253,11 @@ before_cache: ccache -s
 
 ---
 
-branch: {name: OSX-CI, active: yes}
+branch: {name: OSX-CI, active: yes, description: For Travis CI - switch CI build to use OS X build environment.}
 language: objective-c
 env:
   global:
+    - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
     - NUMJOBS=3
     - OSX=1
     - URHO3D_MODERN_CPP=0
@@ -276,10 +281,11 @@ script: rake ci
 
 ---
 
-branch: {name: Emscripten-CI, active: yes}
+branch: {name: Emscripten-CI, active: yes, description: For Travis CI - switch CI build to use Emscripten build environment.}
 language: objective-c
 env:
   global:
+    - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
     - NUMJOBS=3
     - EMSCRIPTEN=1
     - EMSCRIPTEN_SHARE_DATA=1
