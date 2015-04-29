@@ -216,7 +216,7 @@ task :ci do
   end
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake ci_site_update)
+# Usage: NOT intended to be used manually
 desc 'Update site documentation to GitHub Pages'
 task :ci_site_update do
   # Pull or clone
@@ -253,7 +253,7 @@ task :ci_site_update do
   end
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... rake ci_emscripten_samples_update)
+# Usage: NOT intended to be used manually
 desc 'Update Emscripten HTML5 samples to GitHub Pages'
 task :ci_emscripten_samples_update do
   # Pull or clone
@@ -266,17 +266,25 @@ task :ci_emscripten_samples_update do
   system "cd ../doc-Build && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -q -m \"Travis CI: Emscripten samples update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update Emscripten samples'
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=... rake ci_rebase)
-desc 'Rebase all CI mirror branches'
-task :ci_rebase do
+# Usage: NOT intended to be used manually
+desc 'Create all CI mirror branches'
+task :ci_create_mirrors do
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
   baseline = ENV['RELEASE_TAG'] || "origin/#{ENV['TRAVIS_BRANCH']}"
-  rebase = /\[ci rebase\]/ =~ ENV['COMMIT_MESSAGE']
   scan = ENV['PACKAGE_UPLOAD'] || /\[ci scan\]/ =~ ENV['COMMIT_MESSAGE']  # Limit the frequency of scanning
-  ['Coverity-Scan', 'Android-CI', 'RPI-CI', 'OSX-CI', 'Emscripten-CI'].each { |ci| ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then if [ #{scan} ] || [ #{/Scan/ !~ ci} ]; then git rebase #{baseline} #{ci_branch} && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; fi; elif [ #{rebase} ] && ([ #{scan} ] || [ #{/Scan/ !~ ci} ]); then git checkout -b #{ci_branch} #{ENV['TRAVIS_BRANCH']} && rm .travis.yml && wget -q https://raw.githubusercontent.com/#{ENV['TRAVIS_REPO_SLUG']}/#{ci}/.travis.yml && git add -A . && git commit -m 'For Travis CI - switch CI build to use #{ci.split('-').first} build environment.' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1; fi" or abort "Failed to rebase #{ci_branch} mirror branch" }
+  require 'yaml'
+  stream = YAML::load_stream(File.open('.travis.yml')).drop(1)
+  stream.each { |doc| branch = doc.delete('branch'); ci = branch['name']; next unless branch['active'] || (scan && /Scan/ =~ ci); lastjob = doc['matrix'] && doc['matrix']['include'] ? doc['matrix']['include'].length : (doc['env']['matrix'] ? doc['env']['matrix'].length : 1); doc['after_script'] = "if [ ${TRAVIS_JOB_NUMBER##*.} == #{lastjob} ]; then rake ci_delete_mirror; fi"; File.open('.travis.yml.doc', 'w') { |file| file.write doc.to_yaml }; ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch} && git branch -D #{ci_branch}; fi && git checkout -b #{ci_branch} #{ENV['TRAVIS_BRANCH']} && rm .travis.yml && mv .travis.yml.doc .travis.yml && git add -A . && git commit -m '#{branch['description']}' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1" or abort "Failed to create #{ci_branch} mirror branch" }
 end
 
-# Usage: NOT intended to be used manually (if you insist then try: rake ci_package_upload)
+# Usage: NOT intended to be used manually
+desc 'Delete CI mirror branch'
+task :ci_delete_mirror do
+  system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
+  system "git push -qf origin --delete #{ENV['TRAVIS_BRANCH']}" or abort "Failed to clean #{ENV['TRAVIS_BRANCH']} mirror branch"
+end
+
+# Usage: NOT intended to be used manually
 desc 'Make binary package and upload it to a designated central hosting server'
 task :ci_package_upload do
   if ENV['XCODE']
