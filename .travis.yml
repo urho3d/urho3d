@@ -20,6 +20,8 @@
 # THE SOFTWARE.
 #
 
+---
+
 language: cpp
 cache: ccache
 sudo: false
@@ -110,6 +112,191 @@ before_script:
   - ccache -z -M 100M
 script: rake ci
 before_cache: ccache -s
-after_success: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_rebase; fi
+#after_success: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_rebase; fi
+
+---
+
+branch: {name: Coverity-Scan, active: no}
+language: cpp
+compiler: gcc
+cache: ccache
+sudo: false
+addons:
+  apt:
+    packages: libasound2-dev
+  coverity_scan:
+    project:
+      name: weitjong/Urho3D
+      description: Urho3D is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE and Horde3D.
+    notification_email: weitjong@gmail.com
+    build_command_prepend: rake cmake URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 URHO3D_SAMPLES=1 URHO3D_TOOLS=1 URHO3D_EXTRAS=1 URHO3D_LIB_TYPE=SHARED
+    build_command: rake make numjobs=4
+    branch_pattern: .*Coverity-Scan$
+env:
+  global:
+    - secure: N4zqaSj/QZ2Z2j5hJc1Y2wBls4tvS0u8bFgutG3dEDxX5HF9tj6nw1wykDY3fvkpFP4gLEUJ6wV9HFXTR6PxwtCly9dsy0Bkb9+4CnRLTTeyUdqJA+Ca2bnjFPsYP/p6+kmOOo9rbYXsT5BGXVsm3euqJiKhCDP2CIG/YDvYtdw=
+    - LINUX=1
+    - USE_CCACHE=1
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+before_script:
+  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH
+  - ccache -z -M 100M
+script: ccache -s
+
+---
+
+branch: {name: Android-CI, active: yes}
+language: android
+cache: { directories: $HOME/.ccache }
+sudo: false
+addons: {apt: {packages: &native_deps [libasound2-dev, g++-multilib]}}
+env:
+  global:
+    - NUMJOBS=4
+    - ANDROID=1
+    - ANDROID_TMP=~/tmp
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+    - URHO3D_MODERN_CPP=0
+    - URHO3D_AMALG=0
+matrix:
+  fast_finish: true
+  include:
+    # x86 and x86_64 emulation currently requires hardware acceleration which Travis-CI cannot provide, so skip AVD for now
+    # env: API=21 ABI=x86_64      URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21,tools AVD=test_21_x86_64
+    # env: API=21 ABI=x86         URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21,tools AVD=test_21_x86
+    
+    # Travis CI does not create one cache per job at the moment, so workaround it to have still high cache hit/miss ratio
+    # We use jdk key as the cache storage differentiator! Our library is compiled using NDK so it should not be affected by JDK version
+    # We can only cache 5 jobs due to limited supply of valid JDK versions, the rest use the Android compiler proper
+    # We have to ensure those jobs with AVD test are run using the correct JDK version, i.e. Oracle JDK 7 which is the default
+    - &cache1
+      jdk: oraclejdk8
+      env: API=21 ABI=x86_64      URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21     USE_CCACHE=1
+    - &nocache
+      cache: false
+      env: API=21 ABI=x86_64      URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21     USE_CCACHE=0
+    - &cache2
+      jdk: openjdk7
+      env: API=21 ABI=x86         URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86-android-21        USE_CCACHE=1
+    - <<: *nocache
+      env: API=21 ABI=x86         URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21        USE_CCACHE=0
+    - &cache3
+      jdk: openjdk6
+      env: API=21 ABI=arm64-v8a   URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1                       USE_CCACHE=1
+    - <<: *nocache
+      env: API=21 ABI=arm64-v8a   URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1                       USE_CCACHE=0
+    - <<: *nocache
+      env: API=21 ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC                                       USE_CCACHE=0
+    - &cache4
+      jdk: oraclejdk7
+      env: API=21 ABI=armeabi-v7a URHO3D_LIB_TYPE=SHARED INSTALL=tools AVD=test_21_armeabi-v7a USE_CCACHE=1
+    - <<: *nocache
+      env: API=19 ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC                                       USE_CCACHE=0
+    - &cache5
+      env: API=19 ABI=armeabi-v7a URHO3D_LIB_TYPE=SHARED AVD=test_19_armeabi-v7a               USE_CCACHE=1
+before_script:
+  - git clone --depth 1 --branch strip https://github.com/urho3d/android-ndk.git && export ANDROID_NDK=$(pwd)/android-ndk && if ([ $AVD ] || [ $PACKAGE_UPLOAD ]) && [ $INSTALL ]; then (while :; do echo 'y'; sleep 1; done) |android update sdk --no-ui --all --filter $INSTALL; fi
+  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - if [ "$ABI" == "x86_64" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/x86_64-4.9/prebuilt/linux-x86_64/bin C_PREFIX=x86_64-linux-android; fi
+  - if [ "$ABI" == "x86" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/x86-4.9/prebuilt/linux-x86_64/bin C_PREFIX=i686-linux-android; fi
+  - if [ "$ABI" == "arm64-v8a" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin C_PREFIX=aarch64-linux-android; fi
+  - if [ "$ABI" == "armeabi-v7a" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin C_PREFIX=arm-linux-androideabi; fi
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$C_PATH:$PATH; for f in $C_PATH/$C_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
+  - ccache -z -M 100M
+script: rake ci
+before_cache: ccache -s
+
+---
+
+branch: {name: RPI-CI, active: yes}
+language: cpp
+cache: ccache
+sudo: false
+addons: {apt: {packages: &native_deps [libasound2-dev, g++-multilib]}}
+env:
+  global:
+    - NUMJOBS=4
+    - RPI=1
+    - USE_CCACHE=1
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+    - URHO3D_MODERN_CPP=0
+    - URHO3D_AMALG=0
+matrix:
+  fast_finish: true
+  include:
+    - compiler: gcc-armeabi-v6-static
+      env: URHO3D_LIB_TYPE=STATIC
+    - compiler: gcc-armeabi-v6-shared
+      env: URHO3D_LIB_TYPE=SHARED
+    - compiler: gcc-armeabi-v7a-static
+      env: URHO3D_LIB_TYPE=STATIC RPI_ABI=armeabi-v7a
+    - compiler: gcc-armeabi-v7a-shared
+      env: URHO3D_LIB_TYPE=SHARED RPI_ABI=armeabi-v7a
+before_script:
+  - git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export RPI_PREFIX=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf && git clone --depth 1 --branch strip https://github.com/urho3d/rpi-sysroot.git && export RPI_SYSROOT=$(pwd)/rpi-sysroot && for f in $RPI_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
+  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):${RPI_PREFIX%/*}:$PATH
+  - ccache -z -M 100M
+script: rake ci
+before_cache: ccache -s
+
+---
+
+branch: {name: OSX-CI, active: yes}
+language: objective-c
+env:
+  global:
+    - NUMJOBS=3
+    - OSX=1
+    - URHO3D_MODERN_CPP=0
+    - URHO3D_AMALG=0
+  matrix:
+    - MAKEFILE=1    URHO3D_LIB_TYPE=STATIC
+    - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED
+    - MAKEFILE=1    URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
+    - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
+    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.8
+    - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.8
+    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.8 URHO3D_64BIT=0
+    - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.8 URHO3D_64BIT=0
+    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=7.0
+    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=7.0 URHO3D_64BIT=0
+matrix:
+  fast_finish: true
+install:
+  - if [ $XCODE ]; then rvm gemset use global && travis_retry gem install xcpretty; fi
+script: rake ci
+
+---
+
+branch: {name: Emscripten-CI, active: yes}
+language: objective-c
+env:
+  global:
+    - NUMJOBS=3
+    - EMSCRIPTEN=1
+    - EMSCRIPTEN_SHARE_DATA=1
+    - EMSCRIPTEN_EMRUN_BROWSER=chrome
+    - URHO3D_MODERN_CPP=0
+    - URHO3D_AMALG=0
+  matrix:
+    - URHO3D_LIB_TYPE=STATIC
+matrix:
+  fast_finish: true
+before_install:
+  - pushd /usr/bin && sudo ln -sf python python2 && popd
+  - ulimit -Sn 512
+install:
+  - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz && tar xfz emsdk-portable.tar.gz && rm emsdk-portable.tar.gz && cd emsdk_portable && ./emsdk update >/dev/null && sed -i.bak 's/-xvf/-xf/g' emsdk && ./emsdk install latest >/dev/null && ./emsdk activate latest >/dev/null && source ./emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
+script: rake ci
+
+...
 
 # vi: set ts=2 sw=2 expandtab:
