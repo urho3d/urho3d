@@ -507,7 +507,7 @@ When a scene is saved/loaded, any pending delayed calls are also saved and resto
 
 \section Script_ScriptAPI The script API
 
-Much of the Urho3D classes are exposed to scripts, however things that require low-level access or high performance (like direct vertex buffer access) are not. Also for scripting convenience some things have been changed from the C++ API:
+Much of the Urho3D classes are exposed to scripts, however things that require low-level access or high performance (like direct low level rendering) are not. Also for scripting convenience some things have been changed from the C++ API:
 
 - The template array and string classes are exposed as Array<type> and String.
 

@@ -2,14 +2,23 @@ $#include "Graphics/Model.h"
 
 class Model : public Resource
 {
+    Model();
+    ~Model();
+
     // SharedPtr<Model> Clone(const String cloneName = String::EMPTY) const;
     tolua_outside Model* ModelClone @ Clone(const String cloneName = String::EMPTY) const;
 
+    void SetBoundingBox(const BoundingBox& box);
+    void SetNumGeometries(unsigned num);
+    bool SetNumGeometryLodLevels(unsigned index, unsigned num);
+    bool SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry);
+    bool SetGeometryCenter(unsigned index, const Vector3& center);
     const BoundingBox& GetBoundingBox() const;
     Skeleton& GetSkeleton();
     unsigned GetNumGeometries() const;
     unsigned GetNumGeometryLodLevels(unsigned index) const;
     Geometry* GetGeometry(unsigned index, unsigned lodLevel) const;
+    const Vector3& GetGeometryCenter(unsigned index) const;
     unsigned GetNumMorphs() const;
     const ModelMorph* GetMorph(const String name) const;
     const ModelMorph* GetMorph(StringHash nameHash) const;
@@ -17,13 +26,25 @@ class Model : public Resource
     unsigned GetMorphRangeStart(unsigned bufferIndex) const;
     unsigned GetMorphRangeCount(unsigned bufferIndex) const;
 
-    tolua_readonly tolua_property__get_set BoundingBox& boundingBox;
+    tolua_property__get_set BoundingBox& boundingBox;
     tolua_readonly tolua_property__get_set Skeleton skeleton;
-    tolua_readonly tolua_property__get_set unsigned numGeometries;
+    tolua_property__get_set unsigned numGeometries;
     tolua_readonly tolua_property__get_set unsigned numMorphs;
 };
 
 ${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Model_new00
+static int tolua_GraphicsLuaAPI_Model_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Model>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Model_new00_local
+static int tolua_GraphicsLuaAPI_Model_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Model>(tolua_S);
+}
+
 static Model* ModelClone(const Model* model, const String& cloneName = String::EMPTY)
 {
     if (!model)

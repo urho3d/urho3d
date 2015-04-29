@@ -165,6 +165,8 @@ public:
     const PODVector<Vector3>& GetGeometryCenters() const { return geometryCenters_; }
     /// Return geometry by index and LOD level. The LOD level is clamped if out of range.
     Geometry* GetGeometry(unsigned index, unsigned lodLevel) const;
+    /// Return geometry center by index.
+    const Vector3& GetGeometryCenter(unsigned index) const { return index < geometryCenters_.Size() ? geometryCenters_[index] : Vector3::ZERO; }
     /// Return geometery bone mappings.
     const Vector<PODVector<unsigned> >& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
     /// Return vertex morphs.

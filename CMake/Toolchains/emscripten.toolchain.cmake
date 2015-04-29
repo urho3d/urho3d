@@ -53,9 +53,9 @@ if (CMAKE_HOST_WIN32)
     set (TOOL_EXT .bat)
 endif ()
 set (COMPILER_PATH ${EMSCRIPTEN_ROOT_PATH})
-# ccache support could only be enabled for emcc prior to 1.31.4 when the CCACHE_CPP2 env var is also set to 1, newer emcc version could enable ccache support without this caveat (see https://github.com/kripken/emscripten/issues/3365 for more detail)
+# ccache support could only be enabled for emcc prior to 1.31.3 when the CCACHE_CPP2 env var is also set to 1, newer emcc version could enable ccache support without this caveat (see https://github.com/kripken/emscripten/issues/3365 for more detail)
 # The CCACHE_CPP2 env var tells ccache to fallback to use original input source file instead of preprocessed one when passing on the compilation task to the compiler proper
-if (NOT CMAKE_C_COMPILER AND "$ENV{USE_CCACHE}" AND NOT CMAKE_HOST_WIN32 AND ("$ENV{CCACHE_CPP2}" OR NOT EMCC_VERSION VERSION_LESS 1.31.4))
+if (NOT CMAKE_C_COMPILER AND "$ENV{USE_CCACHE}" AND NOT CMAKE_HOST_WIN32 AND ("$ENV{CCACHE_CPP2}" OR NOT EMCC_VERSION VERSION_LESS 1.31.3))
     if (NOT $ENV{PATH} MATCHES ${EMSCRIPTEN_ROOT_PATH})
         message (FATAL_ERROR "The bin directory containing the compiler toolchain (${EMSCRIPTEN_ROOT_PATH}) has not been added in the PATH environment variable. "
             "This is required to enable ccache support for Emscripten compiler toolchain.")
