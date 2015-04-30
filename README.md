@@ -47,6 +47,7 @@ Urho3D development, contributions and bugfixes by:
 - Mike3D
 - Modanung
 - OvermindDL1
+- Skrylar
 - andmar1x
 - amadeus_osa
 - atship

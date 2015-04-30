@@ -28,6 +28,7 @@
    andreas@angelcode.com
 */
 
+// Modified by Skrylar for Urho3D
 
 //
 // as_callfunc_x86.cpp
@@ -1287,7 +1288,8 @@ endcopy:
 		"subl  $4, %%ecx       \n"
 		"jne   copyloop3       \n"
 		"endcopy3:             \n"
-#if defined(__MINGW32__) && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 7) || __GNUC__ > 4)
+// Urho3D: modified to use a define set in as_config.h
+#ifdef AS_MINGW47_WORKAROUND
         // MinGW made some strange choices with 4.7, and the thiscall calling convention
         // when returning an object in memory is completely different from when not returning
         // in memory
