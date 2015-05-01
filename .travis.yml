@@ -51,8 +51,7 @@ matrix:
       compiler: clang-64bit-shared
     - &Linux-32bit
       compiler: gcc-32bit-static
-      addons: {apt: {sources: *default_sources, packages: [*linux_packages, g++-multilib,
-        "libxrandr-dev:i386", "libglapi-mesa:i386", "libgl1-mesa-glx:i386", "libgl1-mesa-dev:i386", "libxext-dev:i386", "libxrender-dev:i386"]}}
+      addons: {apt: {sources: *default_sources, packages: [*linux_packages, g++-multilib, "libxrandr-dev:i386", "libglapi-mesa:i386", "libgl1-mesa-glx:i386", "libgl1-mesa-dev:i386", "libxext-dev:i386", "libxrender-dev:i386"]}}
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - &Linux-32bit-shared
       <<: *Linux-32bit
@@ -281,8 +280,8 @@ env:
     - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.8
     - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.8 URHO3D_64BIT=0
     - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.8 URHO3D_64BIT=0
+    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=7.0  URHO3D_64BIT=0
     - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=7.0
-    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=7.0 URHO3D_64BIT=0
 matrix:
   fast_finish: true
 before_install:
