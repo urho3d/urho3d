@@ -4,7 +4,9 @@
 #include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
-    float2 iTexCoord : TEXCOORD0,
+    #ifndef NOUV
+        float2 iTexCoord : TEXCOORD0,
+    #endif
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
     #endif
@@ -28,6 +30,11 @@ void VS(float4 iPos : POSITION,
     #endif
     out float4 oPos : OUTPOSITION)
 {
+    // Define a 0,0 UV coord if not expected from the vertex data
+    #ifdef NOUV
+    float2 iTexCoord = float2(0.0, 0.0);
+    #endif
+
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);

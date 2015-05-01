@@ -463,15 +463,13 @@ else ()
         endif ()
         if (EMSCRIPTEN)
             # Emscripten-specific setup
-            # Prior to version 1.31.4 emcc does not consistently add the cpp standard and remove Emscripten-specific compiler flags
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
+            # Prior to version 1.31.3 emcc does not consistently add the cpp standard and remove Emscripten-specific compiler flags
             # before passing on the work to the underlying LLVM/Clang compiler, this has resulted in preprocessing error when enabling the PCH and ccache
             # (See https://github.com/kripken/emscripten/issues/3365 for more detail)
-            if (EMCC_VERSION VERSION_LESS 1.31.4)
-                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
-                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option -std=c++03")
-            else ()
-                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths")
-                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths")
+            if (EMCC_VERSION VERSION_LESS 1.31.3)
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++03")
             endif ()
             set (CMAKE_C_FLAGS_RELEASE "-Oz -DNDEBUG")
             set (CMAKE_CXX_FLAGS_RELEASE "-Oz -DNDEBUG")
@@ -666,14 +664,20 @@ macro (enable_pch HEADER_PATHNAME)
                     COMMENT "Precompiling header file '${HEADER_FILENAME}' for ${CONFIG} configuration")
             endforeach ()
             # Use the precompiled header file
-            if (NOT XCODE)
-                set (PCH_DIR ${CMAKE_CURRENT_BINARY_DIR}/)
+            if ($ENV{COVERITY_SCAN_BRANCH})
+                # Coverity scan does not support PCH so workaround by including the actual header file
+                set (ABS_PATH_PCH ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME})
+            else ()
+                if (NOT XCODE)
+                    set (PCH_DIR ${CMAKE_CURRENT_BINARY_DIR}/)
+                endif ()
+                set (ABS_PATH_PCH ${PCH_DIR}${HEADER_FILENAME})
             endif ()
             foreach (FILE ${SOURCE_FILES})
                 if (FILE MATCHES \\.cpp$)
                     get_property (NO_PCH SOURCE ${FILE} PROPERTY NO_PCH)
                     if (NOT NO_PCH)
-                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -include ${PCH_DIR}${HEADER_FILENAME}")
+                        set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -include ${ABS_PATH_PCH}")
                     endif ()
                 endif ()
             endforeach ()
@@ -1114,10 +1118,10 @@ macro (setup_main_executable)
             list (APPEND PAK_NAMES ${NAME})
         endforeach ()
         if (CMAKE_BUILD_TYPE STREQUAL Debug AND NOT EMCC_VERSION VERSION_LESS 1.31.4)
-            set (USE_METADATA --use-metadata)
+            set (SEPARATE_METADATA --separate-metadata)
         endif ()
         add_custom_command (OUTPUT ${SHARED_RESOURCE_JS}.data
-            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache ${USE_METADATA}
+            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache ${SEPARATE_METADATA}
             DEPENDS RESOURCE_CHECK ${RESOURCE_PAKS}
             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMENT "Generating shared data file")

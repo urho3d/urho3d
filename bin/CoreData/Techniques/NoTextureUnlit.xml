@@ -1,4 +1,4 @@
-<technique vs="Unlit" ps="Unlit">
+<technique vs="Unlit" ps="Unlit" vsdefines="NOUV" >
     <pass name="base" />
     <pass name="prepass" psdefines="PREPASS" />
     <pass name="material" />

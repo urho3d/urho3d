@@ -1,4 +1,4 @@
-<technique vs="LitSolid" ps="LitSolid">
+<technique vs="LitSolid" ps="LitSolid" vsdefines="NOUV" >
     <pass name="base" />
     <pass name="litbase" psdefines="AMBIENT" />
     <pass name="light" depthtest="equal" depthwrite="false" blend="add" />

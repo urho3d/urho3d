@@ -9,7 +9,9 @@ void VS(float4 iPos : POSITION,
     #ifndef BILLBOARD
         float3 iNormal : NORMAL,
     #endif
-    float2 iTexCoord : TEXCOORD0,
+    #ifndef NOUV
+        float2 iTexCoord : TEXCOORD0,
+    #endif
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
@@ -59,12 +61,17 @@ void VS(float4 iPos : POSITION,
     #endif
     out float4 oPos : OUTPOSITION)
 {
+    // Define a 0,0 UV coord if not expected from the vertex data
+    #ifdef NOUV
+    float2 iTexCoord = float2(0.0, 0.0);
+    #endif
+
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
     oNormal = GetWorldNormal(modelMatrix);
     oWorldPos = float4(worldPos, GetDepth(oPos));
-    
+
     #if defined(D3D11) && defined(CLIPPLANE)
         oClip = dot(oPos, cClipPlane);
     #endif
