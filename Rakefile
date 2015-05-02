@@ -275,17 +275,21 @@ task :ci_create_mirrors do
   require 'yaml'
   stream = YAML::load_stream(File.open('.travis.yml'))
   notifications = stream[0]['notifications'] || { 'email' => `git show -s --format='%ae %ce' #{ENV['TRAVIS_COMMIT']}`.chomp.split.uniq }
-  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; next unless branch['active'] || (scan && /Scan/ =~ ci); lastjob = doc['matrix'] && doc['matrix']['include'] ? doc['matrix']['include'].length : (doc['env']['matrix'] ? doc['env']['matrix'].length : 1); doc['after_script'] = "if [ ${TRAVIS_JOB_NUMBER##*.} == #{lastjob} ]; then rake ci_delete_mirror; fi"; doc['notifications'] = notifications unless doc['notifications']; File.open('.travis.yml.doc', 'w') { |file| file.write doc.to_yaml }; ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch} && git branch -D #{ci_branch}; fi && git checkout -b #{ci_branch} #{ENV['TRAVIS_BRANCH']} && rm .travis.yml && mv .travis.yml.doc .travis.yml && git add -A . && git commit -m '#{branch['description']}' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1" or abort "Failed to create #{ci_branch} mirror branch" }
+  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; next unless branch['active'] || (scan && /Scan/ =~ ci); lastjob = doc['matrix'] && doc['matrix']['include'] ? doc['matrix']['include'].length : (doc['env']['matrix'] ? doc['env']['matrix'].length : 1); doc['after_script'] = (lastjob == 1 ? '%s' : "if [ ${TRAVIS_JOB_NUMBER##*.} == #{lastjob} ]; then %s; fi") % 'rake ci_delete_mirror'; doc['notifications'] = notifications unless doc['notifications']; File.open('.travis.yml.doc', 'w') { |file| file.write doc.to_yaml }; ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch} && git branch -D #{ci_branch}; fi && git checkout -b #{ci_branch} #{ENV['TRAVIS_BRANCH']} && rm .travis.yml && mv .travis.yml.doc .travis.yml && git add -A . && git commit -m '#{branch['description']}' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1" or abort "Failed to create #{ci_branch} mirror branch" }
 end
 
 # Usage: NOT intended to be used manually
 desc 'Delete CI mirror branch'
 task :ci_delete_mirror do
   # Skip if there are more commits since this one
-  if `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD` == ENV['TRAVIS_COMMIT']
+  #if `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD` == ENV['TRAVIS_COMMIT']
+  # Temporary debug print
+  puts `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD`
+  puts ENV['TRAVIS_COMMIT']
+  puts `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD` == ENV['TRAVIS_COMMIT']
     system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
     system "git push -qf origin --delete #{ENV['TRAVIS_BRANCH']}" or abort "Failed to delete #{ENV['TRAVIS_BRANCH']} mirror branch"
-  end
+  #end
 end
 
 # Usage: NOT intended to be used manually
