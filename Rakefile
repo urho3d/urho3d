@@ -282,14 +282,10 @@ end
 desc 'Delete CI mirror branch'
 task :ci_delete_mirror do
   # Skip if there are more commits since this one
-  #if `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD` == ENV['TRAVIS_COMMIT']
-  # Temporary debug print
-  puts `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD`
-  puts ENV['TRAVIS_COMMIT']
-  puts `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD` == ENV['TRAVIS_COMMIT']
+  if `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp
     system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
     system "git push -qf origin --delete #{ENV['TRAVIS_BRANCH']}" or abort "Failed to delete #{ENV['TRAVIS_BRANCH']} mirror branch"
-  #end
+  end
 end
 
 # Usage: NOT intended to be used manually
