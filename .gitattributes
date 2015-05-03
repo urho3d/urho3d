@@ -1,0 +1,4 @@
+Docs/ linguist-documentation
+Source/ThirdParty/ linguist-vendored
+*.asc?$ linguist-language=AngelScript
+*.lu(?:a|c)$ linguist-language=Lua
