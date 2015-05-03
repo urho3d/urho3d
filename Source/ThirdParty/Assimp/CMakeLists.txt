@@ -15,6 +15,7 @@ if (MINGW)
     set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O1")
 endif ()
 
+INCLUDE_DIRECTORIES( code )
 INCLUDE_DIRECTORIES( include )
 INCLUDE_DIRECTORIES( code/BoostWorkaround )
 INCLUDE_DIRECTORIES( contrib/unzip )
