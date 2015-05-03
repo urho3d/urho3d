@@ -1,0 +1,31 @@
+$#include "Navigation/DetourCrowdManager.h"
+
+enum NavigationQuality
+{
+    NAVIGATIONQUALITY_LOW = 0,
+    NAVIGATIONQUALITY_MEDIUM = 1,
+    NAVIGATIONQUALITY_HIGH = 2
+};
+enum NavigationPushiness
+{
+    PUSHINESS_LOW,
+    PUSHINESS_MEDIUM,
+    PUSHINESS_HIGH
+};
+
+class DetourCrowdManager : public Component
+{
+    bool CreateCrowd();
+
+    void SetNavigationMesh(NavigationMesh *navMesh);
+    void SetMaxAgents(unsigned agentCt);
+    void SetAreaTypeCost(unsigned filterID, unsigned areaType, float cost);
+    
+    NavigationMesh* GetNavigationMesh();
+    unsigned GetMaxAgents() const;
+    float GetAreaTypeCost(unsigned filterID, unsigned areaType) const;
+    unsigned GetAgentCount() const;
+    
+    tolua_property__get_set NavigationMesh* navigationMesh;
+    tolua_property__get_set int maxAgents;
+};

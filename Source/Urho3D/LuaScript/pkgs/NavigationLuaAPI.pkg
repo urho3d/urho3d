@@ -1,6 +1,12 @@
 $pfile "Navigation/Navigable.pkg"
 $pfile "Navigation/NavigationMesh.pkg"
+$pfile "Navigation/DynamicNavigationMesh.pkg"
 $pfile "Navigation/OffMeshConnection.pkg"
+$pfile "Navigation/NavArea.pkg"
+$pfile "Navigation/Obstacle.pkg"
+$pfile "Navigation/DetourCrowdManager.pkg"
+$pfile "Navigation/CrowdAgent.pkg"
+
 
 $using namespace Urho3D;
 $#pragma warning(disable:4800)

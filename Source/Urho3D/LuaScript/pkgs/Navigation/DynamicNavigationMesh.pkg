@@ -1,0 +1,7 @@
+$#include "Navigation/DynamicNavigationMesh.h"
+
+
+class DynamicNavigationMesh : public NavigationMesh
+{
+        
+};
