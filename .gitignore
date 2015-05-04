@@ -70,3 +70,4 @@ configure*
 *.log
 *.bak
 Thumbs.db
+*.a
