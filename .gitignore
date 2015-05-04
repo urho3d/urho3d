@@ -71,3 +71,4 @@ configure*
 *.bak
 Thumbs.db
 *.a
+*.cmake
