@@ -4978,7 +4978,6 @@ Methods:
 - void ApplyAttributes()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void DrawDebugGeometry(bool)
-- CrowdAgentState GetAgentState() const
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
@@ -5007,6 +5006,7 @@ Methods:
 Properties:
 
 - Vector3 actualVelocity // readonly
+- CrowdAgentState agentState // readonly
 - bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
@@ -5016,6 +5016,7 @@ Properties:
 - Vector3 desiredVelocity // readonly
 - bool enabled
 - bool enabledEffective // readonly
+- float height
 - uint id // readonly
 - float maxAccel
 - float maxSpeed
@@ -5026,6 +5027,7 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - Vector3 position // readonly
+- float radius
 - int refs // readonly
 - Vector3 targetPosition // readonly
 - CrowdTargetState targetState // readonly

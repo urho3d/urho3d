@@ -1584,6 +1584,8 @@ Methods:
 - void SetMaxSpeed(float val)
 - void SetNavigationQuality(NavigationQuality val)
 - void SetNavigationPushiness(NavigationPushiness val)
+- void SetRadius(float radius)
+- void SetHeight(float height)
 - unsigned GetNavigationFilterType() const
 - Vector3 GetDesiredVelocity() const
 - Vector3 GetActualVelocity() const
@@ -1591,10 +1593,12 @@ Methods:
 - CrowdAgentState GetAgentState() const
 - CrowdTargetState GetTargetState() const
 - bool GetUpdateNodePosition()
-- float GetMaxSpeed()
-- float GetMaxAccel()
+- float GetMaxSpeed() const
+- float GetMaxAccel() const
 - NavigationQuality GetNavigationQuality() const
 - NavigationPushiness GetNavigationPushiness() const
+- float GetRadius() const
+- float GetHeight() const
 - Vector3 GetPosition() const
 - void DrawDebugGeometry(bool depthTest)
 
@@ -1605,6 +1609,15 @@ Properties:
 - NavigationPushiness navigationPushiness
 - float maxSpeed
 - float maxAccel
+- float radius
+- float height
+- unsigned navigationFilterType
+- Vector3 desiredVelocity (readonly)
+- Vector3 actualVelocity (readonly)
+- Vector3 targetPosition (readonly)
+- Vector3 position (readonly)
+- CrowdAgentState agentState (readonly)
+- CrowdTargetState targetState (readonly)
 
 <a name="Class_Cursor"></a>
 ### Cursor : BorderImage

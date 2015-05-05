@@ -3065,7 +3065,6 @@ class CrowdAgent
 void ApplyAttributes();
 void DrawDebugGeometry(DebugRenderer, bool);
 void DrawDebugGeometry(bool);
-CrowdAgentState GetAgentState() const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
@@ -3094,6 +3093,8 @@ bool SetMoveVelocity(const Vector3&);
 // Properties:
 /* readonly */
 Vector3 actualVelocity;
+/* readonly */
+CrowdAgentState agentState;
 bool animationEnabled;
 /* readonly */
 Array<Variant> attributeDefaults;
@@ -3109,6 +3110,7 @@ Vector3 desiredVelocity;
 bool enabled;
 /* readonly */
 bool enabledEffective;
+float height;
 /* readonly */
 uint id;
 float maxAccel;
@@ -3123,6 +3125,7 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 /* readonly */
 Vector3 position;
+float radius;
 /* readonly */
 int refs;
 /* readonly */
