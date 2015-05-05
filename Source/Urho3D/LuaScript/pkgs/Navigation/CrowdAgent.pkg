@@ -31,6 +31,8 @@ class CrowdAgent : public Component
     void SetMaxSpeed(float val);
     void SetNavigationQuality(NavigationQuality val);
     void SetNavigationPushiness(NavigationPushiness val);
+    void SetRadius(float radius);
+    void SetHeight(float height);
 
     unsigned GetNavigationFilterType() const;
     Vector3 GetDesiredVelocity() const;
@@ -39,16 +41,27 @@ class CrowdAgent : public Component
     CrowdAgentState GetAgentState() const;
     CrowdTargetState GetTargetState() const;
     bool GetUpdateNodePosition();
-    float GetMaxSpeed();
-    float GetMaxAccel();
+    float GetMaxSpeed() const;
+    float GetMaxAccel() const;
     NavigationQuality GetNavigationQuality() const;
     NavigationPushiness GetNavigationPushiness() const;
+    float GetRadius() const;
+    float GetHeight() const;
     Vector3 GetPosition() const;
     void DrawDebugGeometry(bool depthTest);
-    
+
     tolua_property__get_set bool updateNodePosition;
     tolua_property__get_set NavigationQuality navigationQuality;
     tolua_property__get_set NavigationPushiness navigationPushiness;
     tolua_property__get_set float maxSpeed;
     tolua_property__get_set float maxAccel;
+    tolua_property__get_set float radius;
+    tolua_property__get_set float height;
+    tolua_property__get_set unsigned navigationFilterType;
+    tolua_readonly tolua_property__get_set Vector3 desiredVelocity;
+    tolua_readonly tolua_property__get_set Vector3 actualVelocity;
+    tolua_readonly tolua_property__get_set Vector3 targetPosition;
+    tolua_readonly tolua_property__get_set Vector3 position;
+    tolua_readonly tolua_property__get_set CrowdAgentState agentState;
+    tolua_readonly tolua_property__get_set CrowdTargetState targetState;
 };
