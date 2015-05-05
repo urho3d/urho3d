@@ -121,8 +121,9 @@ inline int Max(int lhs, int rhs) { return lhs > rhs ? lhs : rhs; }
 /// Return absolute value of an integer
 inline int Abs(int value) { return value >= 0 ? value : -value; }
 
-/// Clamp an integer to a range.
-inline int Clamp(int value, int min, int max)
+///Clamp a value to a range.
+template <class T>
+T Clamp(const T& value, const T& min, const T& max)
 {
     if (value < min)
         return min;
