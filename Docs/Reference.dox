@@ -1692,8 +1692,11 @@ The navigation mesh generation must be triggered manually by calling \ref Naviga
 
 To query for a path between start and end points on the navigation mesh, call \ref NavigationMesh::FindPath "FindPath()".
 
-For a demonstration of the navigation capabilities, check the related sample application (bin/Data/Scripts/15_Navigation.as), which features partial navigation mesh rebuilds (objects can be created and deleted) and querying paths.
+For a demonstration of the navigation capabilities, check the related sample application (15_Navigation), which features partial navigation mesh rebuilds (objects can be created and deleted) and querying paths.
 
+\section CrowdNavigation Crowd navigation
+
+In addition to the basic pathfinding, additional navigation components use the DetourCrowd library for pathfinding between crowd agents and possibility to add dynamic obstacles. These components are DynamicNavigationMesh, DetourCrowdManager, CrowdAgent, NavArea & Obstacle. See the 39_CrowdNavigation sample application for an example on how to use these.
 
 \page UI User interface
 
