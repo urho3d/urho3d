@@ -1,1 +1,1 @@
-cmake_vs2008.bat .build/vs2008 -DURHO3D_SAMPLES=0 -DURHO3D_URHO2D=0
+cmake_vs2008.bat .build/vs2008 -DURHO3D_SAMPLES=0 -DURHO3D_URHO2D=0  %*
