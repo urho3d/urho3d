@@ -3059,6 +3059,86 @@ float pitch;
 float yaw;
 };
 
+class CrowdAgent
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+void DrawDebugGeometry(bool);
+CrowdAgentState GetAgentState() const;
+Variant GetAttribute(const String&) const;
+ValueAnimation GetAttributeAnimation(const String&) const;
+float GetAttributeAnimationSpeed(const String&) const;
+WrapMode GetAttributeAnimationWrapMode(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool Load(File, bool = false);
+bool Load(VectorBuffer&, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
+bool SetMoveTarget(const Vector3&);
+bool SetMoveVelocity(const Vector3&);
+
+// Properties:
+/* readonly */
+Vector3 actualVelocity;
+bool animationEnabled;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+StringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+Vector3 desiredVelocity;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+float maxAccel;
+float maxSpeed;
+uint navigationFilterType;
+NavigationPushiness navigationPushiness;
+NavigationAvoidanceQuality navigationQuality;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+ObjectAnimation objectAnimation;
+/* readonly */
+Vector3 position;
+/* readonly */
+int refs;
+/* readonly */
+Vector3 targetPosition;
+/* readonly */
+CrowdTargetState targetState;
+bool temporary;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+bool updateNodePosition;
+/* readonly */
+int weakRefs;
+};
+
 class Cursor
 {
 // Methods:
@@ -3605,6 +3685,72 @@ uint position;
 uint size;
 };
 
+class DetourCrowdManager
+{
+// Methods:
+void ApplyAttributes();
+void CreateCrowd();
+void DrawDebugGeometry(DebugRenderer, bool);
+Array<CrowdAgent> GetActiveAgents();
+float GetAreaTypeCost(uint, uint);
+Variant GetAttribute(const String&) const;
+ValueAnimation GetAttributeAnimation(const String&) const;
+float GetAttributeAnimationSpeed(const String&) const;
+WrapMode GetAttributeAnimationWrapMode(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool Load(File, bool = false);
+bool Load(VectorBuffer&, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAreaTypeCost(uint, uint, float);
+bool SetAttribute(const String&, const Variant&);
+void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
+
+// Properties:
+bool animationEnabled;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+StringHash baseType;
+/* readonly */
+String category;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+int maxAgents;
+NavigationMesh navMesh;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+ObjectAnimation objectAnimation;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
 class Dictionary
 {
 // Methods:
@@ -4007,6 +4153,99 @@ bool visible;
 /* readonly */
 int weakRefs;
 int width;
+};
+
+class DynamicNavigationMesh
+{
+// Methods:
+void ApplyAttributes();
+bool Build();
+bool Build(const BoundingBox&);
+void DrawDebugGeometry(DebugRenderer, bool);
+void DrawDebugGeometry(bool);
+Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+Array<Vector3> FindPath(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+Variant GetAttribute(const String&) const;
+ValueAnimation GetAttributeAnimation(const String&) const;
+float GetAttributeAnimationSpeed(const String&) const;
+WrapMode GetAttributeAnimationWrapMode(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+bool GetInterceptNetworkUpdate(const String&) const;
+Vector3 GetRandomPoint();
+Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+bool Load(File, bool = false);
+bool Load(VectorBuffer&, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), uint = 3);
+Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAreaTypeCost(uint, float);
+bool SetAttribute(const String&, const Variant&);
+void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
+
+// Properties:
+float agentHeight;
+float agentMaxClimb;
+float agentMaxSlope;
+float agentRadius;
+bool animationEnabled;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+StringHash baseType;
+/* readonly */
+BoundingBox boundingBox;
+/* readonly */
+String category;
+float cellHeight;
+float cellSize;
+float detailSampleDistance;
+float detailSampleMaxError;
+float edgeMaxError;
+float edgeMaxLength;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+/* readonly */
+bool initialized;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+/* readonly */
+IntVector2 numTiles;
+ObjectAnimation objectAnimation;
+Vector3 padding;
+/* readonly */
+int refs;
+float regionMergeSize;
+float regionMinSize;
+bool temporary;
+int tileSize;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+/* readonly */
+BoundingBox worldBoundingBox;
 };
 
 class Engine
@@ -5858,6 +6097,70 @@ uint useTimer;
 int weakRefs;
 };
 
+class NavArea
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+ValueAnimation GetAttributeAnimation(const String&) const;
+float GetAttributeAnimationSpeed(const String&) const;
+WrapMode GetAttributeAnimationWrapMode(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool Load(File, bool = false);
+bool Load(VectorBuffer&, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
+
+// Properties:
+bool animationEnabled;
+uint areaType;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+StringHash baseType;
+BoundingBox bounds;
+/* readonly */
+String category;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+ObjectAnimation objectAnimation;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+BoundingBox transformedBounds;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
 class Navigable
 {
 // Methods:
@@ -5951,6 +6254,7 @@ bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAreaTypeCost(uint, float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
@@ -6346,6 +6650,71 @@ uint useTimer;
 int weakRefs;
 /* readonly */
 Array<Variant> wrapModes;
+};
+
+class Obstacle
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+void DrawDebugGeometry(bool);
+Variant GetAttribute(const String&) const;
+ValueAnimation GetAttributeAnimation(const String&) const;
+float GetAttributeAnimationSpeed(const String&) const;
+WrapMode GetAttributeAnimationWrapMode(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool Load(File, bool = false);
+bool Load(VectorBuffer&, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveInstanceDefault();
+void ResetToDefault();
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetAttribute(const String&, const Variant&);
+void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
+
+// Properties:
+bool animationEnabled;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+StringHash baseType;
+/* readonly */
+String category;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+float height;
+/* readonly */
+uint id;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+ObjectAnimation objectAnimation;
+/* readonly */
+uint obstacleId;
+float radius;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
 };
 
 class Octree
@@ -12210,6 +12579,25 @@ REPLICATED,
 LOCAL,
 };
 
+enum CrowdAgentState
+{
+NAV_AGENT_INVALID,
+NAV_AGENT_READY,
+NAV_AGENT_TRAVERSINGLINK,
+};
+
+enum CrowdTargetState
+{
+CROWD_AGENT_TARGET_NONE,
+CROWD_AGENT_TARGET_FAILED,
+CROWD_AGENT_TARGET_VALID,
+CROWD_AGENT_TARGET_REQUESTING,
+CROWD_AGENT_TARGET_WAITINGFORPATH,
+CROWD_AGENT_TARGET_WAITINGFORQUEUE,
+CROWD_AGENT_TARGET_VELOCITY,
+CROWD_AGENT_TARGET_ARRIVED,
+};
+
 enum CubeMapFace
 {
 FACE_POSITIVE_X,
@@ -12372,6 +12760,20 @@ enum MouseMode
 MM_ABSOLUTE,
 MM_RELATIVE,
 MM_WRAP,
+};
+
+enum NavigationAvoidanceQuality
+{
+NAVIGATIONQUALITY_LOW,
+NAVIGATIONQUALITY_MEDIUM,
+NAVIGATIONQUALITY_HIGH,
+};
+
+enum NavigationPushiness
+{
+PUSHINESS_LOW,
+PUSHINESS_MEDIUM,
+PUSHINESS_HIGH,
 };
 
 enum Orientation

@@ -226,6 +226,37 @@ namespace Urho3D
 
 ### ExitRequested
 
+## %Navigation events
+
+### NavigationMeshRebuilt
+- %Node : Node pointer
+- %Mesh : NavigationMesh pointer
+
+### NavigationAreaRebuilt
+- %BoundsMin : Vector3
+- %BoundsMax : Vector3
+
+### CrowdAgentReposition
+- %Position : Vector3
+- %Velocity : Vector3
+
+### CrowdAgentStateChanged
+- %Position : Vector3
+- %Velocity : Vector3
+- %State : int
+
+### NavigationObstacleAdded
+- %Node : Node pointer
+- %Position : Vector3
+- %Radius : float
+- %Height : float
+
+### NavigationObstacleRemoved
+- %Node : Node pointer
+- %Position : Vector3
+- %Radius : float
+- %Height : float
+
 ## %Network events
 
 ### ServerConnected
@@ -1067,6 +1098,15 @@ namespace Urho3D
 - %Damping %Ratio : float
 - %Collide %Connected : bool
 
+### CrowdAgent
+- %Max %Accel : float
+- %Max %Speed : float
+- %Radius : float
+- %Height : float
+- %Navigation %Filter : int
+- %Navigation %Pushiness : int
+- %Navigation %Quality : int
+
 ### Cursor
 - %Name : String
 - %Position : IntVector2
@@ -1139,6 +1179,9 @@ namespace Urho3D
 - %Shadow %Mask : int
 - %Zone %Mask : int
 
+### DetourCrowdManager
+- %Max %Agents : int
+
 ### DropDownList
 - %Name : String
 - %Position : IntVector2
@@ -1186,6 +1229,24 @@ namespace Urho3D
 - %Popup %Offset : IntVector2
 - %Selection : int
 - %Resize %Popup : bool
+
+### DynamicNavigationMesh
+- %Tile %Size : int
+- %Cell %Size : float
+- %Cell %Height : float
+- %Agent %Height : float
+- %Agent %Radius : float
+- %Agent %Max %Climb : float
+- %Agent %Max %Slope : float
+- %Region %Min %Size : float
+- %Region %Merge %Size : float
+- %Edge %Max %Length : float
+- %Edge %Max %Error : float
+- %Detail %Sample %Distance : float
+- %Detail %Sample %Max %Error : float
+- %Bounding %Box %Padding : Vector3
+- %Partition %Type : int
+- %Max %Obstacles : int
 
 ### Light
 - %Is %Enabled : bool
@@ -1367,6 +1428,11 @@ namespace Urho3D
 - %Repeat %Rate : float
 - %Popup %Offset : IntVector2
 
+### NavArea
+- %Bounding %Box %Min : Vector3
+- %Bounding %Box %Max : Vector3
+- %Area %Type : int
+
 ### Navigable
 - %Is %Enabled : bool
 - %Recursive : bool
@@ -1386,6 +1452,7 @@ namespace Urho3D
 - %Detail %Sample %Distance : float
 - %Detail %Sample %Max %Error : float
 - %Bounding %Box %Padding : Vector3
+- %Partition %Type : int
 
 ### NetworkPriority
 - %Base %Priority : float
@@ -1401,6 +1468,10 @@ namespace Urho3D
 - %Scale : Vector3
 - %Variables : VariantMap
 
+### Obstacle
+- %Radius : float
+- %Height : float
+
 ### Octree
 - %Bounding %Box %Min : Vector3
 - %Bounding %Box %Max : Vector3
@@ -1411,6 +1482,8 @@ namespace Urho3D
 - %Endpoint %NodeID : int
 - %Radius : float
 - %Bidirectional : bool
+- %Flags %Mask : int
+- %Area %Type : int
 
 ### ParticleEmitter
 - %Is %Enabled : bool
@@ -2109,6 +2182,7 @@ namespace Urho3D
 <a href="#Class_ConstraintWeld2D"><b>ConstraintWeld2D</b></a>
 <a href="#Class_ConstraintWheel2D"><b>ConstraintWheel2D</b></a>
 <a href="#Class_Controls"><b>Controls</b></a>
+<a href="#Class_CrowdAgent"><b>CrowdAgent</b></a>
 <a href="#Class_Cursor"><b>Cursor</b></a>
 <a href="#Class_CustomGeometry"><b>CustomGeometry</b></a>
 <a href="#Class_CustomGeometryVertex"><b>CustomGeometryVertex</b></a>
@@ -2116,11 +2190,13 @@ namespace Urho3D
 <a href="#Class_DebugRenderer"><b>DebugRenderer</b></a>
 <a href="#Class_DecalSet"><b>DecalSet</b></a>
 <a href="#Class_Deserializer"><b>Deserializer</b></a>
+<a href="#Class_DetourCrowdManager"><b>DetourCrowdManager</b></a>
 <a href="#Class_Dictionary"><b>Dictionary</b></a>
 <a href="#Class_DictionaryValue"><b>DictionaryValue</b></a>
 <a href="#Class_Drawable"><b>Drawable</b></a>
 <a href="#Class_Drawable2D"><b>Drawable2D</b></a>
 <a href="#Class_DropDownList"><b>DropDownList</b></a>
+<a href="#Class_DynamicNavigationMesh"><b>DynamicNavigationMesh</b></a>
 <a href="#Class_Engine"><b>Engine</b></a>
 <a href="#Class_File"><b>File</b></a>
 <a href="#Class_FileSelector"><b>FileSelector</b></a>
@@ -2150,6 +2226,7 @@ namespace Urho3D
 <a href="#Class_Menu"><b>Menu</b></a>
 <a href="#Class_MessageBox"><b>MessageBox</b></a>
 <a href="#Class_Model"><b>Model</b></a>
+<a href="#Class_NavArea"><b>NavArea</b></a>
 <a href="#Class_Navigable"><b>Navigable</b></a>
 <a href="#Class_NavigationMesh"><b>NavigationMesh</b></a>
 <a href="#Class_Network"><b>Network</b></a>
@@ -2157,6 +2234,7 @@ namespace Urho3D
 <a href="#Class_Node"><b>Node</b></a>
 <a href="#Class_Object"><b>Object</b></a>
 <a href="#Class_ObjectAnimation"><b>ObjectAnimation</b></a>
+<a href="#Class_Obstacle"><b>Obstacle</b></a>
 <a href="#Class_Octree"><b>Octree</b></a>
 <a href="#Class_OffMeshConnection"><b>OffMeshConnection</b></a>
 <a href="#Class_PackageFile"><b>PackageFile</b></a>
@@ -4891,6 +4969,72 @@ Properties:
 - float pitch
 - float yaw
 
+<a name="Class_CrowdAgent"></a>
+
+### CrowdAgent
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- void DrawDebugGeometry(bool)
+- CrowdAgentState GetAgentState() const
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+- bool SetMoveTarget(const Vector3&)
+- bool SetMoveVelocity(const Vector3&)
+
+Properties:
+
+- Vector3 actualVelocity // readonly
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- StringHash baseType // readonly
+- String category // readonly
+- Vector3 desiredVelocity // readonly
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- float maxAccel
+- float maxSpeed
+- uint navigationFilterType
+- NavigationPushiness navigationPushiness
+- NavigationAvoidanceQuality navigationQuality
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- Vector3 position // readonly
+- int refs // readonly
+- Vector3 targetPosition // readonly
+- CrowdTargetState targetState // readonly
+- bool temporary
+- StringHash type // readonly
+- String typeName // readonly
+- bool updateNodePosition
+- int weakRefs // readonly
+
 <a name="Class_Cursor"></a>
 
 ### Cursor
@@ -5365,6 +5509,63 @@ Properties:
 - uint position // readonly
 - uint size // readonly
 
+<a name="Class_DetourCrowdManager"></a>
+
+### DetourCrowdManager
+
+Methods:
+
+- void ApplyAttributes()
+- void CreateCrowd()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- CrowdAgent@[]@ GetActiveAgents()
+- float GetAreaTypeCost(uint, uint)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAreaTypeCost(uint, uint, float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- StringHash baseType // readonly
+- String category // readonly
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- int maxAgents
+- NavigationMesh@ navMesh
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- bool temporary
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
 <a name="Class_Dictionary"></a>
 
 ### Dictionary
@@ -5711,6 +5912,86 @@ Properties:
 - bool visible
 - int weakRefs // readonly
 - int width
+
+<a name="Class_DynamicNavigationMesh"></a>
+
+### DynamicNavigationMesh
+
+Methods:
+
+- void ApplyAttributes()
+- bool Build()
+- bool Build(const BoundingBox&)
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- void DrawDebugGeometry(bool)
+- Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- Vector3[]@ FindPath(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- bool GetInterceptNetworkUpdate(const String&) const
+- Vector3 GetRandomPoint()
+- Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), uint = 3)
+- Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAreaTypeCost(uint, float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- float agentHeight
+- float agentMaxClimb
+- float agentMaxSlope
+- float agentRadius
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- StringHash baseType // readonly
+- BoundingBox boundingBox // readonly
+- String category // readonly
+- float cellHeight
+- float cellSize
+- float detailSampleDistance
+- float detailSampleMaxError
+- float edgeMaxError
+- float edgeMaxLength
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool initialized // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- IntVector2 numTiles // readonly
+- ObjectAnimation@ objectAnimation
+- Vector3 padding
+- int refs // readonly
+- float regionMergeSize
+- float regionMinSize
+- bool temporary
+- int tileSize
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
 
 <a name="Class_Engine"></a>
 
@@ -7299,6 +7580,60 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_NavArea"></a>
+
+### NavArea
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- bool animationEnabled
+- uint areaType
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- StringHash baseType // readonly
+- BoundingBox bounds
+- String category // readonly
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- bool temporary
+- BoundingBox transformedBounds // readonly
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
 <a name="Class_Navigable"></a>
 
 ### Navigable
@@ -7386,6 +7721,7 @@ Methods:
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAreaTypeCost(uint, float)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
@@ -7718,6 +8054,61 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 - Variant[] wrapModes // readonly
+
+<a name="Class_Obstacle"></a>
+
+### Obstacle
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- void DrawDebugGeometry(bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveInstanceDefault()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- StringHash baseType // readonly
+- String category // readonly
+- bool enabled
+- bool enabledEffective // readonly
+- float height
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- uint obstacleId // readonly
+- float radius
+- int refs // readonly
+- bool temporary
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 <a name="Class_Octree"></a>
 
@@ -12835,6 +13226,25 @@ Properties:
 - LOCAL
 
 
+### CrowdAgentState
+
+- NAV_AGENT_INVALID
+- NAV_AGENT_READY
+- NAV_AGENT_TRAVERSINGLINK
+
+
+### CrowdTargetState
+
+- CROWD_AGENT_TARGET_NONE
+- CROWD_AGENT_TARGET_FAILED
+- CROWD_AGENT_TARGET_VALID
+- CROWD_AGENT_TARGET_REQUESTING
+- CROWD_AGENT_TARGET_WAITINGFORPATH
+- CROWD_AGENT_TARGET_WAITINGFORQUEUE
+- CROWD_AGENT_TARGET_VELOCITY
+- CROWD_AGENT_TARGET_ARRIVED
+
+
 ### CubeMapFace
 
 - FACE_POSITIVE_X
@@ -12997,6 +13407,20 @@ Properties:
 - MM_ABSOLUTE
 - MM_RELATIVE
 - MM_WRAP
+
+
+### NavigationAvoidanceQuality
+
+- NAVIGATIONQUALITY_LOW
+- NAVIGATIONQUALITY_MEDIUM
+- NAVIGATIONQUALITY_HIGH
+
+
+### NavigationPushiness
+
+- PUSHINESS_LOW
+- PUSHINESS_MEDIUM
+- PUSHINESS_HIGH
 
 
 ### Orientation

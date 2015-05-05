@@ -63,6 +63,7 @@ namespace Urho3D
 <a href="#Class_ConstraintWheel2D"><b>ConstraintWheel2D</b></a>
 <a href="#Class_Context"><b>Context</b></a>
 <a href="#Class_Controls"><b>Controls</b></a>
+<a href="#Class_CrowdAgent"><b>CrowdAgent</b></a>
 <a href="#Class_Cursor"><b>Cursor</b></a>
 <a href="#Class_CustomGeometry"><b>CustomGeometry</b></a>
 <a href="#Class_CustomGeometryVertex"><b>CustomGeometryVertex</b></a>
@@ -70,9 +71,11 @@ namespace Urho3D
 <a href="#Class_DebugRenderer"><b>DebugRenderer</b></a>
 <a href="#Class_DecalSet"><b>DecalSet</b></a>
 <a href="#Class_Deserializer"><b>Deserializer</b></a>
+<a href="#Class_DetourCrowdManager"><b>DetourCrowdManager</b></a>
 <a href="#Class_Drawable"><b>Drawable</b></a>
 <a href="#Class_Drawable2D"><b>Drawable2D</b></a>
 <a href="#Class_DropDownList"><b>DropDownList</b></a>
+<a href="#Class_DynamicNavigationMesh"><b>DynamicNavigationMesh</b></a>
 <a href="#Class_Engine"><b>Engine</b></a>
 <a href="#Class_File"><b>File</b></a>
 <a href="#Class_FileSelector"><b>FileSelector</b></a>
@@ -112,6 +115,7 @@ namespace Urho3D
 <a href="#Class_Node"><b>Node</b></a>
 <a href="#Class_Object"><b>Object</b></a>
 <a href="#Class_ObjectAnimation"><b>ObjectAnimation</b></a>
+<a href="#Class_Obstacle"><b>Obstacle</b></a>
 <a href="#Class_Octree"><b>Octree</b></a>
 <a href="#Class_OctreeQueryResult"><b>OctreeQueryResult</b></a>
 <a href="#Class_OffMeshConnection"><b>OffMeshConnection</b></a>
@@ -1567,6 +1571,41 @@ Properties:
 - float pitch
 - VariantMap extraData
 
+<a name="Class_CrowdAgent"></a>
+### CrowdAgent : Component
+
+Methods:
+
+- void SetNavigationFilterType(unsigned filterID)
+- bool SetMoveTarget(const Vector3& position)
+- bool SetMoveVelocity(const Vector3& velocity)
+- void SetUpdateNodePosition(bool unodepos)
+- void SetMaxAccel(float val)
+- void SetMaxSpeed(float val)
+- void SetNavigationQuality(NavigationQuality val)
+- void SetNavigationPushiness(NavigationPushiness val)
+- unsigned GetNavigationFilterType() const
+- Vector3 GetDesiredVelocity() const
+- Vector3 GetActualVelocity() const
+- const Vector3& GetTargetPosition() const
+- CrowdAgentState GetAgentState() const
+- CrowdTargetState GetTargetState() const
+- bool GetUpdateNodePosition()
+- float GetMaxSpeed()
+- float GetMaxAccel()
+- NavigationQuality GetNavigationQuality() const
+- NavigationPushiness GetNavigationPushiness() const
+- Vector3 GetPosition() const
+- void DrawDebugGeometry(bool depthTest)
+
+Properties:
+
+- bool updateNodePosition
+- NavigationQuality navigationQuality
+- NavigationPushiness navigationPushiness
+- float maxSpeed
+- float maxAccel
+
 <a name="Class_Cursor"></a>
 ### Cursor : BorderImage
 
@@ -1781,6 +1820,25 @@ Properties:
 - unsigned size (readonly)
 - bool eof (readonly)
 
+<a name="Class_DetourCrowdManager"></a>
+### DetourCrowdManager : Component
+
+Methods:
+
+- bool CreateCrowd()
+- void SetNavigationMesh(NavigationMesh* navMesh)
+- void SetMaxAgents(unsigned agentCt)
+- void SetAreaTypeCost(unsigned filterID, unsigned areaType, float cost)
+- NavigationMesh* GetNavigationMesh()
+- unsigned GetMaxAgents() const
+- float GetAreaTypeCost(unsigned filterID, unsigned areaType) const
+- unsigned GetAgentCount() const
+
+Properties:
+
+- NavigationMesh* navigationMesh
+- int maxAgents
+
 <a name="Class_Drawable"></a>
 ### Drawable : Component
 
@@ -1884,6 +1942,9 @@ Properties:
 - UIElement* placeholder (readonly)
 - String placeholderText
 - bool resizePopup
+
+<a name="Class_DynamicNavigationMesh"></a>
+### DynamicNavigationMesh : NavigationMesh
 
 <a name="Class_Engine"></a>
 ### Engine : Object
@@ -3591,6 +3652,22 @@ Methods:
 - ValueAnimation* GetAttributeAnimation(const String name) const
 - WrapMode GetAttributeAnimationWrapMode(const String name) const
 - float GetAttributeAnimationSpeed(const String name) const
+
+<a name="Class_Obstacle"></a>
+### Obstacle : Component
+
+Methods:
+
+- void DrawDebugGeometry(bool depthTest)
+- void SetRadius(float radius)
+- void SetHeight(float height)
+- float GetRadius() const
+- float GetHeight() const
+
+Properties:
+
+- float radius
+- float height
 
 <a name="Class_Octree"></a>
 ### Octree : Component
@@ -6956,6 +7033,23 @@ Properties:
 - int REPLICATED
 - int LOCAL
 
+### CrowdAgentState
+
+- int CROWD_AGENT_INVALID
+- int CROWD_AGENT_READY
+- int CROWD_AGENT_TRAVERSINGLINK
+
+### CrowdTargetState
+
+- int CROWD_AGENT_TARGET_NONE
+- int CROWD_AGENT_TARGET_FAILED
+- int CROWD_AGENT_TARGET_VALID
+- int CROWD_AGENT_TARGET_REQUESTING
+- int CROWD_AGENT_TARGET_WAITINGFORPATH
+- int CROWD_AGENT_TARGET_WAITINGFORQUEUE
+- int CROWD_AGENT_TARGET_VELOCITY
+- int CROWD_AGENT_TARGET_ARRIVED
+
 ### CubeMapFace
 
 - int FACE_POSITIVE_X
@@ -7128,6 +7222,18 @@ Properties:
 - int MM_ABSOLUTE
 - int MM_RELATIVE
 - int MM_WRAP
+
+### NavigationPushiness
+
+- int PUSHINESS_LOW
+- int PUSHINESS_MEDIUM
+- int PUSHINESS_HIGH
+
+### NavigationQuality
+
+- int NAVIGATIONQUALITY_LOW
+- int NAVIGATIONQUALITY_MEDIUM
+- int NAVIGATIONQUALITY_HIGH
 
 ### Orientation
 
