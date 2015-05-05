@@ -35,7 +35,7 @@ namespace Urho3D
 {
     /// Construct.
     NavBuildData::NavBuildData() :
-        ctx_(new rcContext(false)),
+        ctx_(0),
         heightField_(0),
         compactHeightField_(0)
     {
@@ -52,7 +52,6 @@ namespace Urho3D
         ctx_ = 0;
         heightField_ = 0;
         compactHeightField_ = 0;
-        
     }
 
     SimpleNavBuildData::SimpleNavBuildData() :
@@ -61,7 +60,6 @@ namespace Urho3D
         polyMesh_(0),
         polyMeshDetail_(0)
     {
-
     }
 
     SimpleNavBuildData::~SimpleNavBuildData()
@@ -81,7 +79,6 @@ namespace Urho3D
         polyMesh_(0),
         alloc_(allocator)
     {
-
     }
 
     DynamicNavBuildData::~DynamicNavBuildData()

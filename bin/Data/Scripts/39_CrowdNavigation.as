@@ -139,7 +139,7 @@ void CreateUI()
     Text@ instructionText = ui.root.CreateChild("Text");
     instructionText.text =
         "Use WASD keys to move, RMB to rotate view\n"
-        "LMB to set destination, SHIFT+LMB to Spawn a Jack\n"
+        "LMB to set destination, SHIFT+LMB to spawn a Jack\n"
         "MMB to add or remove obstacles\n"
         "F5 To Save The Scene, F7 to Reload the Scene\n"
         "Space to toggle debug geometry";

@@ -132,7 +132,7 @@ function CreateUI()
     -- Construct new Text object, set string to display and font to use
     local instructionText = ui.root:CreateChild("Text")
     instructionText.text = "Use WASD keys to move, RMB to rotate view\n"..
-        "LMB to set destination, SHIFT+LMB to spawn a jack\n"..
+        "LMB to set destination, SHIFT+LMB to spawn a Jack\n"..
         "MMB to add or remove obstacles\n"..
         "Space to toggle debug geometry"
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
