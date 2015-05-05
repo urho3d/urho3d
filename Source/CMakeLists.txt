@@ -71,6 +71,8 @@ endif ()
 
 if (URHO3D_NAVIGATION)
     add_subdirectory (ThirdParty/Detour)
+    add_subdirectory (ThirdParty/DetourCrowd)
+    add_subdirectory (ThirdParty/DetourTileCache)
     add_subdirectory (ThirdParty/Recast)
 endif ()
 

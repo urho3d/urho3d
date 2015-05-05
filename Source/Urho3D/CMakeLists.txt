@@ -150,6 +150,12 @@ if (URHO3D_PHYSICS)
     # This is more practical than patching its header files in many places to make them work with relative path
     list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Bullet)
 endif ()
+
+if (URHO3D_NAVIGATION)
+    # DetourTileCache and DetourCrowd libraries depend on Detour's include dir to be added in the header search path
+    list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Detour)
+endif ()
+
 if (URHO3D_LUA)
     # ditto for Lua/LuaJIT
     list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Lua${JIT})

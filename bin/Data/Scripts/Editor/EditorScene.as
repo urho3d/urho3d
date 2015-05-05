@@ -998,8 +998,12 @@ bool SceneRebuildNavigation()
     Array<Component@>@ navMeshes = editorScene.GetComponents("NavigationMesh", true);
     if (navMeshes.empty)
     {
-        MessageBox("No NavigationMesh components in the scene, nothing to rebuild.");
-        return false;
+        @navMeshes = editorScene.GetComponents("DynamicNavigationMesh", true);
+        if (navMeshes.empty)
+        {
+            MessageBox("No NavigationMesh components in the scene, nothing to rebuild.");
+            return false;
+        }
     }
 
     bool success = true;

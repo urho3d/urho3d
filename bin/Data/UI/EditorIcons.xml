@@ -151,7 +151,31 @@
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="64 16 78 30" />
     </element>
+    <element type="DynamicNavigationMesh">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="64 16 78 30" />
+    </element>
     <element type="Navigable">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="64 16 78 30" />
+    </element>
+    <element type="NavArea">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="240 0 254 14" />
+    </element>
+    <element type="DetourCrowdManager">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="128 16 142 30" />
+    </element>
+    <element type="CrowdAgent">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="144 16 158 30" />
+    </element>
+    <element type="Obstacle">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="160 16 174 30" />
+    </element>
+    <element type="NavigationMesh">
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="64 16 78 30" />
     </element>
