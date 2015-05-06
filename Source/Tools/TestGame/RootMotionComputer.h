@@ -24,7 +24,7 @@
 
 #include <Urho3D/Scene/LogicComponent.h>
 #include <Urho3D/Container/HashMap.h>
-#include <Urho3D/Container/Str.h>
+#include <Urho3D/Math/StringHash.h>
 
 using namespace Urho3D;
 
@@ -71,11 +71,18 @@ public:
 
     void SetupNewAnimInfo(const String& animName);
 
+protected:
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+
 private:
     RootMotionComputationMode           computationMode;
 
+    float                               debugGizmoSize;
+
     // the pelvis joint from which the script obtains x-z motion and y-rotation for the root
     Node*                               pelvis;
+
+    Node*                               rootNode;
 
     // its local axis specifying the right direction
     Vector3                             pelvisRightAxis;
@@ -89,6 +96,6 @@ private:
     // local-space delta rotation since previous frame
     Quaternion                          dRotation;
 
-    HashMap<String, AnimInfo>           animInfoTable;
+    HashMap<StringHash, AnimInfo>       animInfoTable;
 
 };
