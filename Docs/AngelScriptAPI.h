@@ -6138,7 +6138,7 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
 StringHash baseType;
-BoundingBox bounds;
+BoundingBox boundingBox;
 /* readonly */
 String category;
 bool enabled;
@@ -6155,13 +6155,13 @@ ObjectAnimation objectAnimation;
 int refs;
 bool temporary;
 /* readonly */
-BoundingBox transformedBounds;
-/* readonly */
 StringHash type;
 /* readonly */
 String typeName;
 /* readonly */
 int weakRefs;
+/* readonly */
+BoundingBox worldBoundingBox;
 };
 
 class Navigable

@@ -42,9 +42,9 @@ enum CrowdTargetState
 
 enum CrowdAgentState
 {
-    CROWD_AGENT_INVALID = 0,	///< The agent is not in a valid state.
-    CROWD_AGENT_READY,			///< The agent is traversing a normal navigation mesh polygon
-    CROWD_AGENT_TRAVERSINGLINK	///< The agent is traversing an off-mesh connection.
+    CROWD_AGENT_INVALID = 0,    ///< The agent is not in a valid state.
+    CROWD_AGENT_READY,            ///< The agent is traversing a normal navigation mesh polygon
+    CROWD_AGENT_TRAVERSINGLINK    ///< The agent is traversing an off-mesh connection.
 };
 
 /// DetourCrowd Agent, requires a DetourCrowdManager in the scene
@@ -111,7 +111,7 @@ public:
     /// Gets the agent's max velocity.
     float GetMaxSpeed() const { return maxSpeed_; }
     /// Gets the agent's max acceleration.
-    float GetMaxAccel()	const { return maxAccel_; }
+    float GetMaxAccel()    const { return maxAccel_; }
     /// Gets the agent's radius
     float GetRadius() const { return radius_; }
     /// Gets the agent's height

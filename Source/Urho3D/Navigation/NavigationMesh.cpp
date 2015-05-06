@@ -97,7 +97,7 @@ struct FindPathData
     Vector3 pathPoints_[MAX_POLYS];
     // Flags on the path.
     unsigned char pathFlags_[MAX_POLYS];
-    //	Arera Ids on the path
+    //    Arera Ids on the path
     unsigned char pathAreras_[MAX_POLYS];
 };
 
@@ -783,7 +783,7 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
         {
             NavigationGeometryInfo info;
             info.component_ = area;
-            info.boundingBox_ = area->GetTransformedBounds();
+            info.boundingBox_ = area->GetWorldBoundingBox();
             geometryList.Push(info);
         }
     }
@@ -894,7 +894,7 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
                 NavAreaStub stub;
                 //\todo is there an alternative to casting down? Attributes restricts area ID/type to being an unsigned int
                 stub.areaID_ = (unsigned char)area->GetAreaType();
-                stub.bounds_ = area->GetTransformedBounds();
+                stub.bounds_ = area->GetWorldBoundingBox();
                 build->navAreas_.Push(stub);
                 continue;
             }

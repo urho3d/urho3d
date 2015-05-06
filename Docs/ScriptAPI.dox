@@ -7621,7 +7621,7 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - StringHash baseType // readonly
-- BoundingBox bounds
+- BoundingBox boundingBox
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -7631,10 +7631,10 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
 - bool temporary
-- BoundingBox transformedBounds // readonly
 - StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
+- BoundingBox worldBoundingBox // readonly
 
 <a name="Class_Navigable"></a>
 

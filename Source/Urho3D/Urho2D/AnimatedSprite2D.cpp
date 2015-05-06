@@ -242,7 +242,8 @@ void AnimatedSprite2D::OnFlipChanged()
             continue;
 
         StaticSprite2D* staticSprite = trackNodes_[i]->GetComponent<StaticSprite2D>();
-        staticSprite->SetFlip(flipX_, flipY_);
+        if (staticSprite)
+            staticSprite->SetFlip(flipX_, flipY_);
     }
 
     // For editor paused mode
@@ -363,7 +364,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
     {
         trackNodeInfos_[i].worldSpace = false;
         
-        const AnimationTrack2D& track = animation_->GetTrack(i);        
+        const AnimationTrack2D& track = animation_->GetTrack(i);
         const Vector<AnimationKeyFrame2D>& keyFrames = track.keyFrames_;
 
         // Time out of range
@@ -417,6 +418,9 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
     for (unsigned i = 0; i < numTracks_; ++i)
     {
         Node* node = trackNodes_[i];
+        if (!node)
+            continue;
+
         TrackNodeInfo& nodeInfo = trackNodeInfos_[i];
 
         if (!nodeInfo.value.enabled_)

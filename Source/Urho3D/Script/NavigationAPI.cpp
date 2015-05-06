@@ -148,11 +148,11 @@ void RegisterObstacle(asIScriptEngine* engine)
 void RegisterNavArea(asIScriptEngine* engine)
 {
     RegisterComponent<NavArea>(engine, "NavArea");
-    engine->RegisterObjectMethod("NavArea", "BoundingBox get_bounds() const", asMETHOD(NavArea, GetBounds), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "void set_bounds(const BoundingBox&in)", asMETHOD(NavArea, SetBounds), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "BoundingBox get_boundingBox() const", asMETHOD(NavArea, GetBoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "void set_boundingBox(const BoundingBox&in)", asMETHOD(NavArea, SetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavArea", "uint get_areaType() const", asMETHOD(NavArea, GetAreaType), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavArea", "void set_areaType(uint)", asMETHOD(NavArea, SetAreaType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "BoundingBox get_transformedBounds() const", asMETHOD(NavArea, GetTransformedBounds), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "BoundingBox get_worldBoundingBox() const", asMETHOD(NavArea, GetWorldBoundingBox), asCALL_THISCALL);
 }
 
 void RegisterDetourCrowdManager(asIScriptEngine* engine)
