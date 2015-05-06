@@ -346,48 +346,6 @@ void Texture::UpdateParameters()
     parametersDirty_ = false;
 }
 
-SharedArrayPtr<unsigned char> Texture::ConvertRGBToRGBA(int width, int height, const unsigned char* data)
-{
-    if (!width || !height)
-        return SharedArrayPtr<unsigned char>();
-
-    SharedArrayPtr<unsigned char> ret(new unsigned char[width * height * 4]);
-    unsigned char* dest = ret.Get();
-
-    for (int i = 0; i < width * height; ++i)
-    {
-        dest[0] = data[0];
-        dest[1] = data[1];
-        dest[2] = data[2];
-        dest[3] = 255;
-        dest += 4;
-        data += 3;
-    }
-
-    return ret;
-}
-
-SharedArrayPtr<unsigned char> Texture::ConvertRGBToRGBA(int width, int height, int depth, const unsigned char* data)
-{
-    if (!width || !height || !depth)
-        return SharedArrayPtr<unsigned char>();
-
-    SharedArrayPtr<unsigned char> ret(new unsigned char[width * height * depth * 4]);
-    unsigned char* dest = ret.Get();
-
-    for (int i = 0; i < width * height * depth; ++i)
-    {
-        dest[0] = data[0];
-        dest[1] = data[1];
-        dest[2] = data[2];
-        dest[3] = 255;
-        dest += 4;
-        data += 3;
-    }
-
-    return ret;
-}
-
 unsigned Texture::CheckMaxLevels(int width, int height, unsigned requestedLevels)
 {
     unsigned maxLevels = 1;

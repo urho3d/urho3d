@@ -440,10 +440,19 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
     
     if (!image->IsCompressed())
     {
+        // Convert unsuitable formats to RGBA
+        unsigned components = image->GetComponents();
+        if (Graphics::GetGL3Support() && ((components == 1 && !useAlpha) || components == 2))
+        {
+            image = image->ConvertToRGBA();
+            if (!image)
+                return false;
+            components = image->GetComponents();
+        }
+
         unsigned char* levelData = image->GetData();
         int levelWidth = image->GetWidth();
         int levelHeight = image->GetHeight();
-        unsigned components = image->GetComponents();
         unsigned format = 0;
         
         if (levelWidth != levelHeight)

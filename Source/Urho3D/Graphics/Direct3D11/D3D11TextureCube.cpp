@@ -422,10 +422,19 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
     
     if (!image->IsCompressed())
     {
+        // Convert unsuitable formats to RGBA
+        unsigned components = image->GetComponents();
+        if ((components == 1 && !useAlpha) || components == 2 || components == 3)
+        {
+            image = image->ConvertToRGBA();
+            if (!image)
+                return false;
+            components = image->GetComponents();
+        }
+
         unsigned char* levelData = image->GetData();
         int levelWidth = image->GetWidth();
         int levelHeight = image->GetHeight();
-        unsigned components = image->GetComponents();
         unsigned format = 0;
         
         if (levelWidth != levelHeight)
@@ -433,7 +442,7 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
             LOGERROR("Cube texture width not equal to height");
             return false;
         }
-        
+
         // Discard unnecessary mip levels
         for (unsigned i = 0; i < mipsToSkip_[quality]; ++i)
         {
@@ -446,17 +455,9 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
         switch (components)
         {
         case 1:
-            format = useAlpha ? Graphics::GetAlphaFormat() : Graphics::GetLuminanceFormat();
+            format = Graphics::GetAlphaFormat();
             break;
-            
-        case 2:
-            format = Graphics::GetLuminanceAlphaFormat();
-            break;
-            
-        case 3:
-            format = Graphics::GetRGBFormat();
-            break;
-            
+
         case 4:
             format = Graphics::GetRGBAFormat();
             break;
@@ -486,14 +487,6 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
         
         for (unsigned i = 0; i < levels_; ++i)
         {
-            // D3D11 needs RGB data as 4-component
-            SharedArrayPtr<unsigned char> convertedData;
-            if (components == 3)
-            {
-                convertedData = ConvertRGBToRGBA(levelWidth, levelHeight, levelData);
-                levelData = convertedData;
-            }
-
             SetData(face, i, 0, 0, levelWidth, levelHeight, levelData);
             memoryUse += levelWidth * levelHeight * components;
             
