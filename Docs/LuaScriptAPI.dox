@@ -107,6 +107,7 @@ namespace Urho3D
 <a href="#Class_Menu"><b>Menu</b></a>
 <a href="#Class_MessageBox"><b>MessageBox</b></a>
 <a href="#Class_Model"><b>Model</b></a>
+<a href="#Class_NavArea"><b>NavArea</b></a>
 <a href="#Class_Navigable"><b>Navigable</b></a>
 <a href="#Class_NavigationGeometryInfo"><b>NavigationGeometryInfo</b></a>
 <a href="#Class_NavigationMesh"><b>NavigationMesh</b></a>
@@ -3285,6 +3286,23 @@ Properties:
 - Skeleton skeleton (readonly)
 - unsigned numGeometries
 - unsigned numMorphs (readonly)
+
+<a name="Class_NavArea"></a>
+### NavArea : Component
+
+Methods:
+
+- unsigned GetAreaType() const
+- void SetAreaType(unsigned tolua_var_3)
+- BoundingBox GetBoundingBox()
+- void SetBoundingBox(const BoundingBox& bnds)
+- BoundingBox GetWorldBoundingBox() const
+
+Properties:
+
+- unsigned areaType
+- BoundingBox boundingBox
+- BoundingBox worldBoundingBox (readonly)
 
 <a name="Class_Navigable"></a>
 ### Navigable : Component
