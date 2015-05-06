@@ -91,7 +91,7 @@ void CrowdNavigation::CreateScene()
     // Also create a DebugRenderer component so that we can draw debug geometry
     scene_->CreateComponent<Octree>();
     scene_->CreateComponent<DebugRenderer>();
-	scene_->CreateComponent<PhysicsWorld>();
+    scene_->CreateComponent<PhysicsWorld>();
     
     // Create scene node & StaticModel component for showing a static plane
     Node* planeNode = scene_->CreateChild("Plane");
@@ -137,7 +137,7 @@ void CrowdNavigation::CreateScene()
 
     // Create a DynamicNavigationMesh component to the scene root
     DynamicNavigationMesh* navMesh = scene_->CreateComponent<DynamicNavigationMesh>();
-	navMesh->SetTileSize(64);
+    navMesh->SetTileSize(64);
     // Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
     // navigation mesh. By default this is recursive, but the recursion could be turned off from Navigable
     scene_->CreateComponent<Navigable>();
@@ -282,8 +282,8 @@ void CrowdNavigation::MoveCamera(float timeStep)
         
         // Redetermine which nodes are "jacks" and "mushrooms"
         jackNodes_.Clear();
-		PODVector<Node*> nodes;
-		scene_->GetChildrenWithComponent<CrowdAgent>(nodes, true);
+        PODVector<Node*> nodes;
+        scene_->GetChildrenWithComponent<CrowdAgent>(nodes, true);
         for (unsigned i = 0; i < nodes.Size(); ++i)
         {
             jackNodes_.Push(SharedPtr<Node>(nodes[i]));
@@ -319,21 +319,21 @@ void CrowdNavigation::SetPathPoint()
         else
         {
             // Set crowd agents to move to the target
-			for (unsigned i = 0; i < jackNodes_.Size(); ++i)
-			{
-				CrowdAgent* agent = jackNodes_[i]->GetComponent<CrowdAgent>();
-				// The first agent will always move to the exact position, all other agents will select a random point nearby
-				if (i == 0)
-				{
-					agent->SetMoveTarget(pathPos);
-				}
-				else
-				{
-					// Keep the random point somewhere on the navigation mesh
-					Vector3 targetPos = navMesh->FindNearestPoint(pathPos + Vector3(Random(7.0f), 0.0f, Random(7.0f)), Vector3(1.0f, 1.0f, 1.0f));
-					agent->SetMoveTarget(targetPos);
-				}
-            }            
+            for (unsigned i = 0; i < jackNodes_.Size(); ++i)
+            {
+                CrowdAgent* agent = jackNodes_[i]->GetComponent<CrowdAgent>();
+                // The first agent will always move to the exact position, all other agents will select a random point nearby
+                if (i == 0)
+                {
+                    agent->SetMoveTarget(pathPos);
+                }
+                else
+                {
+                    // Keep the random point somewhere on the navigation mesh
+                    Vector3 targetPos = navMesh->FindNearestPoint(pathPos + Vector3(Random(7.0f), 0.0f, Random(7.0f)), Vector3(1.0f, 1.0f, 1.0f));
+                    agent->SetMoveTarget(targetPos);
+                }
+            }
         }
     }
 }
@@ -361,15 +361,15 @@ void CrowdNavigation::AddOrRemoveObject()
 
 void CrowdNavigation::CreateJack(const Vector3& pos)
 {
-	ResourceCache* cache = GetSubsystem<ResourceCache>();
-	SharedPtr<Node> jackNode(scene_->CreateChild("Jack"));
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SharedPtr<Node> jackNode(scene_->CreateChild("Jack"));
     jackNode->SetPosition(pos);
     AnimatedModel* modelObject = jackNode->CreateComponent<AnimatedModel>();
     modelObject->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
     modelObject->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
     modelObject->SetCastShadows(true);
 
-	// Create the CrowdAgent
+    // Create the CrowdAgent
     CrowdAgent* agent = jackNode->CreateComponent<CrowdAgent>();
     jackNodes_.Push(jackNode);
 }
@@ -386,7 +386,7 @@ Node* CrowdNavigation::CreateMushroom(const Vector3& pos)
     mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
     mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
     mushroomObject->SetCastShadows(true);
-	// Create the navigation obstacle
+    // Create the navigation obstacle
     Obstacle* obstacle = mushroomNode->CreateComponent<Obstacle>();
     obstacle->SetRadius(2.0f);
     mushroomNodes_.Push(mushroomNode);
@@ -432,12 +432,12 @@ void CrowdNavigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
 
-	for (unsigned i = 0; i < jackNodes_.Size(); ++i)
-	{
-		CrowdAgent* agent = jackNodes_[i]->GetComponent<CrowdAgent>();
-		Vector3 vel = agent->GetActualVelocity();
-		jackNodes_[i]->SetWorldDirection(vel);
-	}
+    for (unsigned i = 0; i < jackNodes_.Size(); ++i)
+    {
+        CrowdAgent* agent = jackNodes_[i]->GetComponent<CrowdAgent>();
+        Vector3 vel = agent->GetActualVelocity();
+        jackNodes_[i]->SetWorldDirection(vel);
+    }
 }
 
 void CrowdNavigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)

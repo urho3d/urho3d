@@ -109,7 +109,7 @@ void CrowdAgent::OnNodeSet(Node* node)
         if (scene)
         {
             if (scene == node)
-                LOGERROR(GetTypeName() + " should not be created to the root scene node");		
+                LOGERROR(GetTypeName() + " should not be created to the root scene node");        
             crowdManager_ = scene->GetOrCreateComponent<DetourCrowdManager>();
             AddAgentToCrowd();
         }

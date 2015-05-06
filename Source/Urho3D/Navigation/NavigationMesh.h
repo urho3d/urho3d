@@ -138,7 +138,7 @@ public:
     /// Sets the cost of an area
     void SetAreaTypeCost(unsigned areaType, float cost);
 
-    ///	Return the given name of this navigation mesh
+    ///    Return the given name of this navigation mesh
     String GetMeshName() const { return meshName_; }
     /// Set the name of this navigation mesh
     void SetMeshName(const String& newName);

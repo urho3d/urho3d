@@ -48,12 +48,12 @@ namespace Urho3D
         void SetAreaType(unsigned);
 
         /// Gets the bounding box of this navigation area, in local space
-        BoundingBox GetBounds() const { return boundingBox_; }
+        BoundingBox GetBoundingBox() const { return boundingBox_; }
         /// Sets the bounding box of this area, in local space
-        void SetBounds(const BoundingBox& bnds) { boundingBox_ = bnds; }
+        void SetBoundingBox(const BoundingBox& bnds) { boundingBox_ = bnds; }
 
         /// Gets the bounds of this navigation area in world space
-        BoundingBox GetTransformedBounds() const;
+        BoundingBox GetWorldBoundingBox() const;
 
     private:
         /// Bounds of area to mark

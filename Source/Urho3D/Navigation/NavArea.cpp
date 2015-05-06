@@ -66,7 +66,7 @@ namespace Urho3D
         MarkNetworkUpdate();
     }
 
-    BoundingBox NavArea::GetTransformedBounds() const
+    BoundingBox NavArea::GetWorldBoundingBox() const
     {
         Matrix3x4 mat;
         mat.SetTranslation(node_->GetWorldPosition());

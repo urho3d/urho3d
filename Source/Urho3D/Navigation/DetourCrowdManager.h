@@ -128,7 +128,7 @@ private:
     /// NavigationMesh for which the crowd was created
     WeakPtr<NavigationMesh> navigationMesh_;
     /// max agents for the crowd 
-    unsigned maxAgents_;	
+    unsigned maxAgents_;    
     /// internal debug information 
     dtCrowdAgentDebugInfo* agentDebug_;
     /// Container for fetching agents from DetourCrowd during update
