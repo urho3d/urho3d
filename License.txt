@@ -1,4 +1,4 @@
-Urho3D license
+﻿Urho3D license
 --------------
 
 Copyright (c) 2008-2015 the Urho3D project.
@@ -478,7 +478,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-Recast/Detour license
+Recast/Detour/DetourCrowd/DetourTileCache license
 ---------------------
 
 Copyright (c) 2009 Mikko Mononen memon@inside.org

@@ -241,6 +241,25 @@ void DebugRenderer::AddSphere(const Sphere& sphere, const Color& color, bool dep
     }
 }
 
+void DebugRenderer::AddCylinder(const Vector3& position, float radius, float height, const Color& color, bool depthTest)
+{
+	Sphere sphere(position, radius);
+	Vector3 heightVec(0, height, 0);
+	Vector3 offsetXVec(radius, 0, 0);
+	Vector3 offsetZVec(0, 0, radius);
+	for (unsigned i = 0; i < 360; i += 45)
+	{
+		Vector3 p1 = PointOnSphere(sphere, i, 90);
+		Vector3 p2 = PointOnSphere(sphere, i + 45, 90);
+		AddLine(p1, p2, color, depthTest);
+		AddLine(p1 + heightVec, p2 + heightVec, color, depthTest);
+	}
+	AddLine(position + offsetXVec, position + heightVec + offsetXVec, color, depthTest);
+	AddLine(position - offsetXVec, position + heightVec - offsetXVec, color, depthTest);
+	AddLine(position + offsetZVec, position + heightVec + offsetZVec, color, depthTest);
+	AddLine(position - offsetZVec, position + heightVec - offsetZVec, color, depthTest);
+}
+
 void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest)
 {
     const Vector<Bone>& bones = skeleton.GetBones();
