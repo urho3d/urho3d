@@ -141,7 +141,7 @@ public:
     unsigned GetNumBackgroundLoadResources() const;
     /// Return all loaded resources of a specific type.
     void GetResources(PODVector<Resource*>& result, StringHash type) const;
-    /// Return an already loaded resource of specific type & name. Will not load if does not exist.
+    /// Return an already loaded resource of specific type & name, or null if not found. Will not load if does not exist.
     Resource* GetExistingResource(StringHash type, const String& name);
     /// Return all loaded resources.
     const HashMap<StringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }

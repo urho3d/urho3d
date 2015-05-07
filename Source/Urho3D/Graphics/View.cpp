@@ -2956,6 +2956,18 @@ Texture* View::FindNamedTexture(const String& name, bool isRenderTarget, bool is
     // Then the resource system
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
+    // Check existing resources first. This does not load resources, so we can afford to guess the resource type wrong
+    // without having to rely on the file extension
+    Texture* texture = cache->GetExistingResource<Texture2D>(name);
+    if (!texture)
+        texture = cache->GetExistingResource<TextureCube>(name);
+    if (!texture)
+        texture = cache->GetExistingResource<Texture3D>(name);
+    if (texture)
+        return texture;
+
+    // If not a rendertarget (which will never be loaded from a file), finally also try to load the texture
+    // This will log an error if not found; the texture binding will be cleared in that case to not constantly spam the log
     if (!isRenderTarget)
     {
         if (GetExtension(name) == ".xml")
@@ -2970,15 +2982,6 @@ Texture* View::FindNamedTexture(const String& name, bool isRenderTarget, bool is
         }
         else
             return cache->GetResource<Texture2D>(name);
-    }
-    else
-    {
-        // Rendertargets can only be manually added existing resources; do not attempt to load files through ResourceCache
-        // Try both Texture2D & TextureCube
-        Texture* texture = cache->GetExistingResource<Texture2D>(name);
-        if (!texture)
-            texture = cache->GetExistingResource<TextureCube>(name);
-        return texture;
     }
 }
 
