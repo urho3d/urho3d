@@ -436,7 +436,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             continue;
         
         // Check if ambient pass and G-buffer rendering happens at the same time
-        if (command.type_ == CMD_SCENEPASS && command.outputNames_.Size() > 1)
+        if (command.type_ == CMD_SCENEPASS && command.outputs_.Size() > 1)
         {
             if (CheckViewportWrite(command))
                 deferredAmbient_ = true;
@@ -1619,16 +1619,16 @@ void View::SetRenderTargets(RenderPathCommand& command)
     bool useColorWrite = true;
     bool useCustomDepth = false;
 
-    while (index < command.outputNames_.Size())
+    while (index < command.outputs_.Size())
     {
-        if (!command.outputNames_[index].Compare("viewport", false))
+        if (!command.outputs_[index].first_.Compare("viewport", false))
             graphics_->SetRenderTarget(index, currentRenderTarget_);
         else
         {
-            Texture* texture = FindNamedTexture(command.outputNames_[index], true, false);
+            Texture* texture = FindNamedTexture(command.outputs_[index].first_, true, false);
 
             // Check for depth only rendering (by specifying a depth texture as the sole output)
-            if (!index && command.outputNames_.Size() == 1 && texture && (texture->GetFormat() ==
+            if (!index && command.outputs_.Size() == 1 && texture && (texture->GetFormat() ==
                 Graphics::GetReadableDepthFormat() || texture->GetFormat() == Graphics::GetDepthStencilFormat()))
             {
                 useColorWrite = false;
@@ -1645,7 +1645,7 @@ void View::SetRenderTargets(RenderPathCommand& command)
                 graphics_->SetDepthStencil(GetRenderSurfaceFromTexture(texture));
             }
             else
-                graphics_->SetRenderTarget(index, GetRenderSurfaceFromTexture(texture, command.outputFaces_[index]));
+                graphics_->SetRenderTarget(index, GetRenderSurfaceFromTexture(texture, command.outputs_[index].second_));
         }
         
         ++index;
@@ -1777,7 +1777,7 @@ void View::RenderQuad(RenderPathCommand& command)
 
 bool View::IsNecessary(const RenderPathCommand& command)
 {
-    return command.enabled_ && command.outputNames_.Size() && (command.type_ != CMD_SCENEPASS ||
+    return command.enabled_ && command.outputs_.Size() && (command.type_ != CMD_SCENEPASS ||
         !batchQueues_[command.passIndex_].IsEmpty());
 }
 
@@ -1794,9 +1794,9 @@ bool View::CheckViewportRead(const RenderPathCommand& command)
 
 bool View::CheckViewportWrite(const RenderPathCommand& command)
 {
-    for (unsigned i = 0; i < command.outputNames_.Size(); ++i)
+    for (unsigned i = 0; i < command.outputs_.Size(); ++i)
     {
-        if (!command.outputNames_[i].Compare("viewport", false))
+        if (!command.outputs_[i].first_.Compare("viewport", false))
             return true;
     }
     
@@ -1849,7 +1849,7 @@ void View::AllocateScreenBuffers()
             const RenderPathCommand& command = renderPath_->commands_[i];
             if (!IsNecessary(command))
                 continue;
-            if (command.depthStencilName_.Length() && command.outputNames_.Size() && !command.outputNames_[0].Compare("viewport",
+            if (command.depthStencilName_.Length() && command.outputs_.Size() && !command.outputs_[0].first_.Compare("viewport",
                 false))
             {
                 needSubstitute = true;
@@ -1878,11 +1878,11 @@ void View::AllocateScreenBuffers()
                     continue;
                 if (command.depthStencilName_.Length())
                     needSubstitute = true;
-                if (!needSubstitute && command.outputNames_.Size() > 1)
+                if (!needSubstitute && command.outputs_.Size() > 1)
                 {
-                    for (unsigned j = 0; j < command.outputNames_.Size(); ++j)
+                    for (unsigned j = 0; j < command.outputs_.Size(); ++j)
                     {
-                        if (!command.outputNames_[j].Compare("viewport", false))
+                        if (!command.outputs_[j].first_.Compare("viewport", false))
                         {
                             needSubstitute = true;
                             break;
