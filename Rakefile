@@ -248,9 +248,8 @@ task :ci_site_update do
     if system("git commit -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'") && !ENV['PACKAGE_UPLOAD']
       bump_soversion 'Source/Urho3D/.soversion' or abort 'Failed to bump soversion'
       system "git add Source/Urho3D/.soversion && git commit --amend -q -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'" or abort 'Failed to stage .soversion file'
+      system 'git push origin HEAD:master -q >/dev/null 2>&1' or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
     end
-    system 'git push origin HEAD:master -q >/dev/null 2>&1' or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
-    abort   # Always abort even when the push is successful so that the caller script (.travis.yml) does not proceed with the next command (create CI mirror branches)
   end
 end
 
@@ -270,12 +269,15 @@ end
 # Usage: NOT intended to be used manually
 desc 'Create all CI mirror branches'
 task :ci_create_mirrors do
-  system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
-  scan = ENV['PACKAGE_UPLOAD'] || /\[ci scan\]/ =~ ENV['COMMIT_MESSAGE']  # Limit the frequency of scanning
-  require 'yaml'
-  stream = YAML::load_stream(File.open('.travis.yml'))
-  notifications = stream[0]['notifications'] || { 'email' => `git show -s --format='%ae %ce' #{ENV['TRAVIS_COMMIT']}`.chomp.split.uniq }
-  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; next unless branch['active'] || (scan && /Scan/ =~ ci); lastjob = doc['matrix'] && doc['matrix']['include'] ? doc['matrix']['include'].length : (doc['env']['matrix'] ? doc['env']['matrix'].length : 1); doc['after_script'] = (lastjob == 1 ? '%s' : "if [ ${TRAVIS_JOB_NUMBER##*.} == #{lastjob} ]; then %s; fi") % 'rake ci_delete_mirror'; doc['notifications'] = notifications unless doc['notifications']; File.open('.travis.yml.doc', 'w') { |file| file.write doc.to_yaml }; ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch} && git branch -D #{ci_branch}; fi && git checkout -b #{ci_branch} #{ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH']} && rm .travis.yml && mv .travis.yml.doc .travis.yml && git add -A . && git commit -m '#{branch['description']}' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1" or abort "Failed to create #{ci_branch} mirror branch" }
+  # Skip if there are more commits since this one
+  if `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD` == ENV['TRAVIS_COMMIT']
+    system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
+    scan = ENV['PACKAGE_UPLOAD'] || /\[ci scan\]/ =~ ENV['COMMIT_MESSAGE']  # Limit the frequency of scanning
+    require 'yaml'
+    stream = YAML::load_stream(File.open('.travis.yml'))
+    notifications = stream[0]['notifications'] || { 'email' => `git show -s --format='%ae %ce' #{ENV['TRAVIS_COMMIT']}`.chomp.split.uniq }
+    stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; next unless branch['active'] || (scan && /Scan/ =~ ci); lastjob = doc['matrix'] && doc['matrix']['include'] ? doc['matrix']['include'].length : (doc['env']['matrix'] ? doc['env']['matrix'].length : 1); doc['after_script'] = (lastjob == 1 ? '%s' : "if [ ${TRAVIS_JOB_NUMBER##*.} == #{lastjob} ]; then %s; fi") % 'rake ci_delete_mirror'; doc['notifications'] = notifications unless doc['notifications']; File.open('.travis.yml.doc', 'w') { |file| file.write doc.to_yaml }; ci_branch = ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH'] == 'master' ? ci : "#{ENV['TRAVIS_BRANCH']}-#{ci}"; system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch} && git branch -D #{ci_branch}; fi && git checkout -b #{ci_branch} #{ENV['RELEASE_TAG'] || ENV['TRAVIS_BRANCH']} && rm .travis.yml && mv .travis.yml.doc .travis.yml && git add -A . && git commit -m '#{branch['description']}' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1" or abort "Failed to create #{ci_branch} mirror branch" }
+  end
 end
 
 # Usage: NOT intended to be used manually
