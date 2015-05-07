@@ -325,11 +325,20 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
     
     if (!image->IsCompressed())
     {
+        // Convert unsuitable formats to RGBA
+        unsigned components = image->GetComponents();
+        if (Graphics::GetGL3Support() && ((components == 1 && !useAlpha) || components == 2))
+        {
+            image = image->ConvertToRGBA();
+            if (!image)
+                return false;
+            components = image->GetComponents();
+        }
+
         unsigned char* levelData = image->GetData();
         int levelWidth = image->GetWidth();
         int levelHeight = image->GetHeight();
         int levelDepth = image->GetDepth();
-        unsigned components = image->GetComponents();
         unsigned format = 0;
         
         // Discard unnecessary mip levels
