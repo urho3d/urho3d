@@ -236,7 +236,7 @@ private:
 template <class T> T* ResourceCache::GetExistingResource(const String& name)
 {
     StringHash type = T::GetTypeStatic();
-    return static_cast<T*>(GetResource(type, name));
+    return static_cast<T*>(GetExistingResource(type, name));
 }
 
 template <class T> T* ResourceCache::GetResource(const String& name, bool sendEventOnFailure)
