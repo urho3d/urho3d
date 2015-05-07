@@ -68,6 +68,7 @@ struct RenderTargetInfo
     RenderTargetInfo() :
         size_(Vector2::ZERO),
         sizeMode_(SIZE_ABSOLUTE),
+        cubemap_(false),
         enabled_(true),
         filtered_(false),
         sRGB_(false),
@@ -88,6 +89,8 @@ struct RenderTargetInfo
     Vector2 size_;
     /// Size mode.
     RenderTargetSizeMode sizeMode_;
+    /// Cube map flag.
+    bool cubemap_;
     /// Enabled flag.
     bool enabled_;
     /// Filtering flag.
@@ -124,6 +127,8 @@ struct RenderPathCommand
     void SetNumOutputs(unsigned num);
     /// Set output rendertarget name.
     void SetOutputName(unsigned index, const String& name);
+    /// Set output rendertarget face index, in case rendertarget is a cube map.
+    void SetOutputFace(unsigned index, CubeMapFace face);
     /// Set depth-stencil output name. When empty, will assign a depth-stencil buffer automatically.
     void SetDepthStencilName(const String& name);
     
@@ -135,6 +140,8 @@ struct RenderPathCommand
     unsigned GetNumOutputs() const { return outputNames_.Size(); }
     /// Return output rendertarget name.
     const String& GetOutputName(unsigned index) const;
+    /// Return output rendertarget face index.
+    CubeMapFace GetOutputFace(unsigned index) const;
     /// Return depth-stencil output name.
     const String& GetDepthStencilName() const { return depthStencilName_; }
     
@@ -164,6 +171,8 @@ struct RenderPathCommand
     HashMap<StringHash, Variant> shaderParameters_;
     /// Output rendertarget names.
     Vector<String> outputNames_;
+    /// Output rendertarget faces.
+    Vector<CubeMapFace> outputFaces_;
     /// Depth-stencil output name.
     String depthStencilName_;
     /// Clear flags.

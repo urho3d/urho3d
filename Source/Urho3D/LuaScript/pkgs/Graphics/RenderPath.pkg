@@ -21,12 +21,14 @@ struct RenderPathCommand
     void RemoveShaderParameter(const String name);
     void SetNumOutputs(unsigned num);
     void SetOutputName(unsigned index, const String name);
+    void SetOutputFace(unsigned index, CubeMapFace face);
     void SetDepthStencilName(const String name);
 
     const String GetTextureName(TextureUnit unit) const;
     const Variant& GetShaderParameter(const String name) const;
     unsigned GetNumOutputs() const;
     const String GetOutputName(unsigned index) const;
+    CubeMapFace GetOutputFace(unsigned index) const;
     const String GetDepthStencilName() const;
 
     String tag_ @ tag;

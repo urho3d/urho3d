@@ -499,16 +499,36 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFai
     return SharedPtr<File>();
 }
 
-Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool sendEventOnFailure)
+Resource* ResourceCache::GetExistingResource(StringHash type, const String& nameIn)
 {
     String name = SanitateResourceName(nameIn);
-    
+
     if (!Thread::IsMainThread())
     {
         LOGERROR("Attempted to get resource " + name + " from outside the main thread");
         return 0;
     }
-    
+
+    // If empty name, return null pointer immediately
+    if (name.Empty())
+        return 0;
+
+    StringHash nameHash(name);
+
+    const SharedPtr<Resource>& existing = FindResource(type, nameHash);
+    return existing;
+}
+
+Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool sendEventOnFailure)
+{
+    String name = SanitateResourceName(nameIn);
+
+    if (!Thread::IsMainThread())
+    {
+        LOGERROR("Attempted to get resource " + name + " from outside the main thread");
+        return 0;
+    }
+
     // If empty name, return null pointer immediately
     if (name.Empty())
         return 0;

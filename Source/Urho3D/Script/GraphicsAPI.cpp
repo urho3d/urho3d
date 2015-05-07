@@ -261,6 +261,14 @@ static RenderPathCommand* RenderPathGetCommand(unsigned index, RenderPath* ptr)
 
 static void RegisterRenderPath(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("CubeMapFace");
+    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_X", FACE_POSITIVE_X);
+    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_X", FACE_NEGATIVE_X);
+    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_Y", FACE_POSITIVE_Y);
+    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_Y", FACE_NEGATIVE_Y);
+    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_Z", FACE_POSITIVE_Z);
+    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_Z", FACE_NEGATIVE_Z);
+
     engine->RegisterEnum("RenderCommandType");
     engine->RegisterEnumValue("RenderCommandType", "CMD_NONE", CMD_NONE);
     engine->RegisterEnumValue("RenderCommandType", "CMD_CLEAR", CMD_CLEAR);
@@ -313,6 +321,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectProperty("RenderTargetInfo", "uint format", offsetof(RenderTargetInfo, format_));
     engine->RegisterObjectProperty("RenderTargetInfo", "Vector2 size", offsetof(RenderTargetInfo, size_));
     engine->RegisterObjectProperty("RenderTargetInfo", "RenderTargetSizeMode sizeMode", offsetof(RenderTargetInfo, sizeMode_));
+    engine->RegisterObjectProperty("RenderTargetInfo", "bool cubemap", offsetof(RenderTargetInfo, cubemap_));
     engine->RegisterObjectProperty("RenderTargetInfo", "bool enabled", offsetof(RenderTargetInfo, enabled_));
     engine->RegisterObjectProperty("RenderTargetInfo", "bool filtered", offsetof(RenderTargetInfo, filtered_));
     engine->RegisterObjectProperty("RenderTargetInfo", "bool sRGB", offsetof(RenderTargetInfo, sRGB_));
@@ -332,6 +341,8 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderPathCommand", "uint get_numOutputs() const", asMETHOD(RenderPathCommand, GetNumOutputs), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "void set_outputNames(uint, const String&in)", asMETHOD(RenderPathCommand, SetOutputName), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "const String& get_outputNames(uint) const", asMETHOD(RenderPathCommand, GetOutputName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "void set_outputFaces(uint, CubeMapFace)", asMETHOD(RenderPathCommand, SetOutputFace), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "CubeMapFace get_outputFaces(uint) const", asMETHOD(RenderPathCommand, GetOutputFace), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "void set_depthStencilName(const String&in)", asMETHOD(RenderPathCommand, SetDepthStencilName), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "const String& get_depthStencilName() const", asMETHOD(RenderPathCommand, GetDepthStencilName), asCALL_THISCALL);
     engine->RegisterObjectProperty("RenderPathCommand", "String tag", offsetof(RenderPathCommand, tag_));
@@ -405,14 +416,6 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureCoordinate", "COORD_U", COORD_U);
     engine->RegisterEnumValue("TextureCoordinate", "COORD_V", COORD_V);
     engine->RegisterEnumValue("TextureCoordinate", "COORD_W", COORD_W);
-    
-    engine->RegisterEnum("CubeMapFace");
-    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_X", FACE_POSITIVE_X);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_X", FACE_NEGATIVE_X);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_Y", FACE_POSITIVE_Y);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_Y", FACE_NEGATIVE_Y);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_Z", FACE_POSITIVE_Z);
-    engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_Z", FACE_NEGATIVE_Z);
     
     engine->RegisterEnum("RenderSurfaceUpdateMode");
     engine->RegisterEnumValue("RenderSurfaceUpdateMode", "SURFACE_MANUALUPDATE", SURFACE_MANUALUPDATE);
