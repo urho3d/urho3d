@@ -133,6 +133,7 @@ addons:
     project:
       name: urho3d/Urho3D
       description: Urho3D is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE and Horde3D.
+    notification_email: urho3d.travis.ci@gmail.com
     build_command_prepend: rake cmake URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 URHO3D_SAMPLES=1 URHO3D_TOOLS=1 URHO3D_EXTRAS=1 URHO3D_LIB_TYPE=SHARED
     build_command: rake make numjobs=4
     branch_pattern: .*Coverity-Scan$
