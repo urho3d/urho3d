@@ -116,8 +116,10 @@ before_script:
 script: rake ci
 before_cache: ccache -s
 after_success:
-  - if [ $SITE_UPDATE ]; then rake ci_site_update; fi && if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_create_mirrors; fi
+  - if [ $SITE_UPDATE ]; then rake ci_site_update; fi
+  - if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ]; then rake ci_create_mirrors; fi
   - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; if [ $LINUX ] && [ ! "$URHO3D_64BIT" == "0" ]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi
+notifications: {email: {on_success: never, on_failure: change}}
 
 ---
 
@@ -292,7 +294,7 @@ before_install:
 install:
   - if [ $PACKAGE_UPLOAD ]; then travis_retry brew update >/dev/null && travis_retry brew install doxygen graphviz; fi
   - if [ $XCODE ]; then rvm gemset use global && travis_retry gem install xcpretty; fi
-  - if [ $IOS ]; then export CI_START_TIME=$(date); fi
+  - if [ $IOS ]; then export CI_START_TIME=$(date +%s); fi
 script: rake ci
 after_success: if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
 
@@ -322,8 +324,26 @@ before_install:
 install:
   - if [ $PACKAGE_UPLOAD ]; then travis_retry brew update >/dev/null && travis_retry brew install doxygen graphviz; fi
   - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz && tar xfz emsdk-portable.tar.gz && rm emsdk-portable.tar.gz && cd emsdk_portable && ./emsdk update >/dev/null && sed -i.bak 's/-xvf/-xf/g' emsdk && ./emsdk install latest >/dev/null && ./emsdk activate latest >/dev/null && source ./emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
+before_script: export CI_START_TIME=$(date +%s)
 script: rake ci
 after_success: if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && rake ci_emscripten_samples_update; fi
+
+# Below samples are excluded from Emscripten CI build due to build time constraint
+data:
+  excluded_sample:
+    - 01_HelloWorld
+    - 02_HelloGUI
+    - 03_Sprites
+    - 04_StaticScene
+    - 05_AnimatingScene
+    - 26_ConsoleInput
+    - 29_SoundSynthesis
+    - 30_LightAnimation
+    - 31_MaterialAnimation
+    - 34_DynamicGeometry
+    - 35_SignedDistanceFieldText
+    - 37_UIDrag
+    - 38_SceneAndUILoad
 
 ...
 
