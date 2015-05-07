@@ -297,7 +297,7 @@ Node@ CreateMushroom(const Vector3& pos)
     mushroomObject.material = cache.GetResource("Material", "Materials/Mushroom.xml");
     mushroomObject.castShadows = true;
     Obstacle@ obstacleObject = mushroomNode.CreateComponent("Obstacle");
-    obstacleObject.radius = 2.5f;
+    obstacleObject.radius = mushroomNode.scale.x;
     mushroomNodes.Push(mushroomNode);
     
     return mushroomNode;

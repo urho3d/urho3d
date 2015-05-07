@@ -386,7 +386,7 @@ Node* CrowdNavigation::CreateMushroom(const Vector3& pos)
     mushroomObject->SetCastShadows(true);
     // Create the navigation obstacle
     Obstacle* obstacle = mushroomNode->CreateComponent<Obstacle>();
-    obstacle->SetRadius(2.0f);
+    obstacle->SetRadius(mushroomNode->GetScale().x_);
     mushroomNodes_.Push(mushroomNode);
     
     return mushroomNode;
