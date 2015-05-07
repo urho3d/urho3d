@@ -40,7 +40,7 @@ class CrowdAgent : public Component
     const Vector3& GetTargetPosition() const;
     CrowdAgentState GetAgentState() const;
     CrowdTargetState GetTargetState() const;
-    bool GetUpdateNodePosition();
+    bool GetUpdateNodePosition() const;
     float GetMaxSpeed() const;
     float GetMaxAccel() const;
     NavigationQuality GetNavigationQuality() const;

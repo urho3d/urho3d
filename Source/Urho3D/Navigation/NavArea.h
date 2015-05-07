@@ -32,35 +32,35 @@ namespace Urho3D
         OBJECT(NavArea);
 
     public:
-        /// Construct
+        /// Construct.
         NavArea(Context*);
-        /// Destruct
+        /// Destruct.
         virtual ~NavArea();
-        /// Register object factory and attributes
+        /// Register object factory and attributes.
         static void RegisterObject(Context*);
 
-        /// Render debug geometry for the bounds
+        /// Render debug geometry for the bounds.
         virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
-        /// Gets the area id for this volume
+        /// Get the area id for this volume.
         unsigned GetAreaType() const { return areaType_; }
-        /// Sets the area id for this volume
+        /// Set the area id for this volume.
         void SetAreaType(unsigned);
 
-        /// Gets the bounding box of this navigation area, in local space
+        /// Get the bounding box of this navigation area, in local space.
         BoundingBox GetBoundingBox() const { return boundingBox_; }
-        /// Sets the bounding box of this area, in local space
+        /// Set the bounding box of this area, in local space.
         void SetBoundingBox(const BoundingBox& bnds) { boundingBox_ = bnds; }
 
-        /// Gets the bounds of this navigation area in world space
+        /// Get the bounds of this navigation area in world space.
         BoundingBox GetWorldBoundingBox() const;
 
     private:
-        /// Bounds of area to mark
+        /// Bounds of area to mark.
         BoundingBox boundingBox_;
-        /// Flags to assign to the marked area of the navigation map
+        /// Flags to assign to the marked area of the navigation map.
         unsigned flags_;
-        /// Area identifier to assign to the marked area
+        /// Area id to assign to the marked area.
         unsigned areaType_;
     };
 }

@@ -45,17 +45,17 @@ namespace Urho3D
         friend struct MeshProcess;
 
     public:
-        /// Constructor
+        /// Constructor.
         DynamicNavigationMesh(Context*);
-        /// Destructor
-        ~DynamicNavigationMesh();
+        /// Destructor.
+        virtual ~DynamicNavigationMesh();
 
-        /// Register with engine context
+        /// Register with engine context.
         static void RegisterObject(Context*);
 
-        /// Builds/rebuilds the entire navigation mesh
+        /// Build/rebuild the entire navigation mesh.
         virtual bool Build();
-        /// Builds/rebuilds a portion of the navigation mesh
+        /// Build/rebuild a portion of the navigation mesh.
         virtual bool Build(const BoundingBox& boundingBox);
 
         /// Set navigation data attribute.
@@ -66,38 +66,38 @@ namespace Urho3D
     protected:
         struct TileCacheData;
 
-        /// Subscribe to events when assigned to a node
+        /// Subscribe to events when assigned to a node.
         virtual void OnNodeSet(Node*);
-        /// Triggers the tile cache to make updates to the nav mesh if necessary
+        /// Trigger the tile cache to make updates to the nav mesh if necessary.
         void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
 
-        /// Used by Obstacle class to add itself to the tile cache, if 'silent' an event will not be raised
+        /// Used by Obstacle class to add itself to the tile cache, if 'silent' an event will not be raised.
         void AddObstacle(Obstacle* obstacle, bool silent = false);
-        /// Used by Obstacle class to update itself
+        /// Used by Obstacle class to update itself.
         void ObstacleChanged(Obstacle* obstacle);
-        /// Used by Obstacle class to remove itself from the tile cache, if 'silent' an event will not be raised
+        /// Used by Obstacle class to remove itself from the tile cache, if 'silent' an event will not be raised.
         void RemoveObstacle(Obstacle*, bool silent = false);
 
         /// Build one tile of the navigation mesh. Return true if successful.
         int BuildTile(Vector<NavigationGeometryInfo>& geometryList, int x, int z, TileCacheData*);
-        /// Off-mesh connections to be rebuilt in the mesh processor
+        /// Off-mesh connections to be rebuilt in the mesh processor.
         PODVector<OffMeshConnection*> CollectOffMeshConnections(const BoundingBox& bounds);
-        /// Release the navigation mesh, query, and tile cache
+        /// Release the navigation mesh, query, and tile cache.
         virtual void ReleaseNavigationMesh();
 
     private:
-        /// Frees the tile cache
+        /// Free the tile cache.
         void ReleaseTileCache();
 
-        /// Detour tile cache instance that works with the nav mesh
+        /// Detour tile cache instance that works with the nav mesh.
         dtTileCache* tileCache_;
-        /// Used by dtTileCache to allocate blocks of memory
+        /// Used by dtTileCache to allocate blocks of memory.
         dtTileCacheAlloc* allocator_;
-        /// Used by dtTileCache to compress the original tiles to use when reconstructing for changes
+        /// Used by dtTileCache to compress the original tiles to use when reconstructing for changes.
         dtTileCacheCompressor* compressor_;
-        /// Mesh processer used by Detour, in this case a 'pass-through' processor
+        /// Mesh processer used by Detour, in this case a 'pass-through' processor.
         dtTileCacheMeshProcess* meshProcessor_;
-        /// Maximum number of obstacle objects allowed
+        /// Maximum number of obstacle objects allowed.
         unsigned maxObstacles_;
     };
 

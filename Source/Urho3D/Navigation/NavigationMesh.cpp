@@ -83,8 +83,6 @@ static const float DEFAULT_DETAIL_SAMPLE_MAX_ERROR = 1.0f;
 
 static const int MAX_POLYS = 2048;
 
-/// Temporary data for building one tile of the navigation mesh.
-
 
 /// Temporary data for finding a path.
 struct FindPathData
@@ -97,7 +95,7 @@ struct FindPathData
     Vector3 pathPoints_[MAX_POLYS];
     // Flags on the path.
     unsigned char pathFlags_[MAX_POLYS];
-    //    Arera Ids on the path
+    // Area Ids on the path.
     unsigned char pathAreras_[MAX_POLYS];
 };
 
@@ -778,7 +776,7 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
     for (unsigned i = 0; i < navAreas.Size(); ++i)
     {
         NavArea* area = navAreas[i];
-        // ignore disabled AND any areas that have no meaningful settings
+        // Ignore disabled AND any areas that have no meaningful settings
         if (area->IsEnabledEffective() && area->GetAreaType() != 0)
         {
             NavigationGeometryInfo info;
@@ -887,8 +885,7 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
                 build->offMeshDir_.Push(connection->IsBidirectional() ? DT_OFFMESH_CON_BIDIR : 0);
                 continue;
             }
-
-            if (geometryList[i].component_->GetType() == NavArea::GetTypeStatic())
+            else if (geometryList[i].component_->GetType() == NavArea::GetTypeStatic())
             {
                 NavArea* area = static_cast<NavArea*>(geometryList[i].component_);
                 NavAreaStub stub;
@@ -1311,11 +1308,6 @@ void NavigationMesh::SetPartitionType(NavmeshPartitionType ptype)
 {
     partitionType_ = ptype;
     MarkNetworkUpdate();
-}
-
-NavmeshPartitionType NavigationMesh::GetPartitionType() const
-{
-    return partitionType_;
 }
 
 void RegisterNavigationLibrary(Context* context)

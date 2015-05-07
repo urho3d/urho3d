@@ -202,7 +202,7 @@ void RegisterCrowdAgent(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CrowdAgent", "bool SetMoveTarget(const Vector3&in)", asMETHOD(CrowdAgent, SetMoveTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "bool SetMoveVelocity(const Vector3&in)", asMETHOD(CrowdAgent, SetMoveVelocity), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "void set_updateNodePosition(bool)", asMETHOD(CrowdAgent, SetUpdateNodePosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "bool get_updateNodePosition()", asMETHOD(CrowdAgent, GetUpdateNodePosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "bool get_updateNodePosition() const", asMETHOD(CrowdAgent, GetUpdateNodePosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "void set_maxAccel(float)", asMETHOD(CrowdAgent, SetMaxAccel), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "float get_maxAccel()", asMETHOD(CrowdAgent, GetMaxAccel), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "void set_maxSpeed(float)", asMETHOD(CrowdAgent, SetMaxSpeed), asCALL_THISCALL);

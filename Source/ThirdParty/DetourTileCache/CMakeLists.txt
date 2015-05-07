@@ -29,7 +29,6 @@ define_source_files (GLOB_CPP_PATTERNS source/*.cpp GLOB_H_PATTERNS include/*.h)
 # Define dependency libs
 set (INCLUDE_DIRS include ../Detour/include)
 
-
 # Setup target
 setup_library ()
 

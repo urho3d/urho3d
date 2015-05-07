@@ -39,7 +39,6 @@ function CreateScene()
     -- Also create a DebugRenderer component so that we can draw debug geometry
     scene_:CreateComponent("Octree")
     scene_:CreateComponent("DebugRenderer")
-    scene_:CreateComponent("PhysicsWorld")
 
     -- Create scene node & StaticModel component for showing a static plane
     local planeNode = scene_:CreateChild("Plane")

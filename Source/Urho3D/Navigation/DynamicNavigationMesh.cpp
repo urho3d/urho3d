@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-
 #include "../Navigation/DynamicNavigationMesh.h"
 
 #include "../Math/BoundingBox.h"
@@ -225,8 +223,11 @@ DynamicNavigationMesh::~DynamicNavigationMesh()
 {
     ReleaseNavigationMesh();
     delete allocator_;
+    allocator_ = 0;
     delete compressor_;
+    compressor_ = 0;
     delete meshProcessor_;
+    meshProcessor_ = 0;
 }
 
 void DynamicNavigationMesh::RegisterObject(Context* context)
@@ -783,13 +784,7 @@ void DynamicNavigationMesh::OnNodeSet(Node* node)
 {
     // Subscribe to the scene subsystem update, which will trigger the tile cache to update the nav mesh
     if (node)
-    {
         SubscribeToEvent(node, E_SCENESUBSYSTEMUPDATE, HANDLER(DynamicNavigationMesh, HandleSceneSubsystemUpdate));
-    }
-    else
-    {
-        UnsubscribeFromAllEvents();
-    }
 }
 
 void DynamicNavigationMesh::AddObstacle(Obstacle* obstacle, bool silent)
@@ -806,6 +801,7 @@ void DynamicNavigationMesh::AddObstacle(Obstacle* obstacle, bool silent)
             return;
         }
         obstacle->obstacleId_ = refHolder;
+        assert(refHolder > 0);
         tileCache_->update(1, navMesh_);
         
         if (!silent)
@@ -858,11 +854,8 @@ void DynamicNavigationMesh::HandleSceneSubsystemUpdate(StringHash eventType, Var
 {
     using namespace SceneSubsystemUpdate;
 
-    const float deltaTime = eventData[P_TIMESTEP].GetFloat();
-    if (tileCache_ && navMesh_)
-    {
-        tileCache_->update(deltaTime, navMesh_);
-    }
+    if (tileCache_ && navMesh_ && IsEnabledEffective())
+        tileCache_->update(eventData[P_TIMESTEP].GetFloat(), navMesh_);
 }
 
 }

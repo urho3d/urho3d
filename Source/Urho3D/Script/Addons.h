@@ -235,7 +235,7 @@ public:
     CScriptArray *GetKeys() const;
 
 public:
-    // STL style iterator
+    /// STL style iterator for %Script dictionary class.
     class CIterator
     {
     public:

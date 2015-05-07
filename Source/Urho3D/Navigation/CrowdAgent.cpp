@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-
 #include "../Scene/Component.h"
 #include "../Core/Context.h"
 #include "../Navigation/CrowdAgent.h"
@@ -332,11 +330,6 @@ Vector3 CrowdAgent::GetActualVelocity() const
     return Vector3::ZERO;
 }
 
-const Vector3& CrowdAgent::GetTargetPosition() const
-{
-    return targetPosition_;
-}
-
 Urho3D::CrowdAgentState CrowdAgent::GetAgentState() const
 {
     if (crowdManager_ && inCrowd_)
@@ -363,8 +356,7 @@ Urho3D::CrowdTargetState CrowdAgent::GetTargetState() const
             if (agent->ncorners)
             {
                 // Is the agent at the end of its path?
-                const bool endOfPath = (agent->cornerFlags[agent->ncorners - 1] & DT_STRAIGHTPATH_END) ? true : false;
-                if (endOfPath)
+                if (agent->cornerFlags[agent->ncorners - 1] & DT_STRAIGHTPATH_END)
                 {
                     // Within its own radius of the goal?
                     if (dtVdist2D(agent->npos, &agent->cornerVerts[(agent->ncorners - 1) * 3]) <= agent->params.radius)
@@ -384,14 +376,9 @@ void CrowdAgent::SetUpdateNodePosition(bool unodepos)
     MarkNetworkUpdate();
 }
 
-bool CrowdAgent::GetUpdateNodePosition()
-{
-    return updateNodePosition_;
-}
-
 void CrowdAgent::OnCrowdAgentReposition(const Vector3& newPos, const Vector3& newDirection)
 {
-    if(node_)
+    if (node_)
     {
         // Notify parent node of the reposition
         VariantMap& map = GetContext()->GetEventDataMap();
@@ -399,10 +386,12 @@ void CrowdAgent::OnCrowdAgentReposition(const Vector3& newPos, const Vector3& ne
         map[CrowdAgentReposition::P_VELOCITY] = GetActualVelocity();
         SendEvent(E_CROWD_AGENT_REPOSITION, map);
         
-        ignoreTransformChanges_ = true;
         if (updateNodePosition_)
+        {
+            ignoreTransformChanges_ = true;
             node_->SetPosition(newPos);
-        ignoreTransformChanges_ = false;
+            ignoreTransformChanges_ = false;
+        }
 
         // Send a notification event if we've reached the destination
         CrowdTargetState targetState = GetTargetState();
@@ -418,7 +407,6 @@ void CrowdAgent::OnCrowdAgentReposition(const Vector3& newPos, const Vector3& ne
         }
     }
 }
-
 
 PODVector<unsigned char> CrowdAgent::GetAgentDataAttr() const
 {

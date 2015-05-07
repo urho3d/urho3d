@@ -41,7 +41,6 @@
 #include <Urho3D/Navigation/Navigable.h>
 #include <Urho3D/Navigation/Obstacle.h>
 #include <Urho3D/Graphics/Octree.h>
-#include <Urho3D/Physics/PhysicsWorld.h>
 #include <Urho3D/Graphics/Renderer.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
@@ -91,7 +90,6 @@ void CrowdNavigation::CreateScene()
     // Also create a DebugRenderer component so that we can draw debug geometry
     scene_->CreateComponent<Octree>();
     scene_->CreateComponent<DebugRenderer>();
-    scene_->CreateComponent<PhysicsWorld>();
     
     // Create scene node & StaticModel component for showing a static plane
     Node* planeNode = scene_->CreateChild("Plane");
