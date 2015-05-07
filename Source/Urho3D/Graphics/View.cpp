@@ -1858,9 +1858,6 @@ void View::AllocateScreenBuffers()
         }
     }
     #endif
-    // If destination is a cubemap, need a 2D texture substitute for pingponging, as the View logic does not retain the proper destination face index
-    if (renderTarget_ && renderTarget_->GetParentTexture()->GetType() == TextureCube::GetTypeStatic())
-        needSubstitute = true;
     // If backbuffer is antialiased when using deferred rendering, need to reserve a buffer
     if (deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1)
         needSubstitute = true;
