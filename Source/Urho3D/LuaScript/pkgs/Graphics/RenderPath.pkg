@@ -34,7 +34,7 @@ struct RenderTargetInfo
     String tag_ @ tag;
     unsigned format_ @ format;
     Vector2 size_ @ size;
-    RenderTargetSizeMode sizeMode_ @ sizemode;
+    RenderTargetSizeMode sizeMode_ @ sizeMode;
     bool enabled_ @ enabled;
     bool cubemap_ @ cubemap;
     bool filtered_ @ filtered;
