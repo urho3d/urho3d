@@ -1641,7 +1641,7 @@ void View::SetRenderTargets(RenderPathCommand& command)
                         graphics_->GetDummyColorFormat(), false, false, false);
                 }
                 #endif
-                graphics_->SetRenderTarget(0, depthOnlyDummyTexture_);
+                graphics_->SetRenderTarget(0, GetRenderSurfaceFromTexture(depthOnlyDummyTexture_));
                 graphics_->SetDepthStencil(GetRenderSurfaceFromTexture(texture));
             }
             else

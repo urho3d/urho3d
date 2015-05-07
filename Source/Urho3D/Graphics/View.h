@@ -297,7 +297,7 @@ private:
     /// Texture containing the latest viewport texture.
     Texture* currentViewportTexture_;
     /// Dummy texture for D3D9 depth only rendering.
-    Texture2D* depthOnlyDummyTexture_;
+    Texture* depthOnlyDummyTexture_;
     /// Viewport rectangle.
     IntRect viewRect_;
     /// Viewport size.
