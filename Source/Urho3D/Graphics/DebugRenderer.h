@@ -143,6 +143,8 @@ public:
     const Frustum& GetFrustum() const { return frustum_; }
     /// Check whether a bounding box is inside the view frustum.
     bool IsInside(const BoundingBox& box) const;
+    /// Return whether has something to render.
+    bool HasContent() const;
     
 private:
     /// Handle end of frame. Clear debug geometry.

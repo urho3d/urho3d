@@ -341,7 +341,7 @@ void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize,
 
 void DebugRenderer::Render()
 {
-    if (lines_.Empty() && noDepthLines_.Empty() && triangles_.Empty() && noDepthTriangles_.Empty())
+    if (!HasContent())
         return;
 
     Graphics* graphics = GetSubsystem<Graphics>();
@@ -469,6 +469,11 @@ void DebugRenderer::Render()
 bool DebugRenderer::IsInside(const BoundingBox& box) const
 {
     return frustum_.IsInsideFast(box) == INSIDE;
+}
+
+bool DebugRenderer::HasContent() const
+{
+    return (lines_.Empty() && noDepthLines_.Empty() && triangles_.Empty() && noDepthTriangles_.Empty()) ? false : true;
 }
 
 void DebugRenderer::HandleEndFrame(StringHash eventType, VariantMap& eventData)

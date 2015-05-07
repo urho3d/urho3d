@@ -590,30 +590,31 @@ void View::Render()
     // Render
     ExecuteRenderPathCommands();
     
-    // After executing all commands, reset rendertarget & state for debug geometry rendering
-    // Use the last rendertarget (before blitting) so that OpenGL deferred rendering can have benefit of proper depth buffer
-    // values; after a blit to backbuffer the same depth buffer would not be available any longer
-    graphics_->SetRenderTarget(0, currentRenderTarget_);
-    for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
-        graphics_->SetRenderTarget(i, (RenderSurface*)0);
-    graphics_->SetDepthStencil(GetDepthStencil(currentRenderTarget_));
-    IntVector2 rtSizeNow = graphics_->GetRenderTargetDimensions();
-    IntRect viewport = (currentRenderTarget_ == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
-        rtSizeNow.y_);
-    graphics_->SetViewport(viewport);
+    // Reset state after commands
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetClipPlane(false);
     graphics_->SetColorWrite(true);
     graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
-    
+
     // Draw the associated debug geometry now if enabled
     if (drawDebug_ && octree_ && camera_)
     {
         DebugRenderer* debug = octree_->GetComponent<DebugRenderer>();
-        if (debug && debug->IsEnabledEffective())
+        if (debug && debug->IsEnabledEffective() && debug->HasContent())
         {
+            // Use the last rendertarget (before blitting) so that OpenGL deferred rendering can have benefit of proper depth buffer
+            // values; after a blit to backbuffer the same depth buffer would not be available any longer
+            graphics_->SetRenderTarget(0, currentRenderTarget_);
+            for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+                graphics_->SetRenderTarget(i, (RenderSurface*)0);
+            graphics_->SetDepthStencil(GetDepthStencil(currentRenderTarget_));
+            IntVector2 rtSizeNow = graphics_->GetRenderTargetDimensions();
+            IntRect viewport = (currentRenderTarget_ == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
+                rtSizeNow.y_);
+            graphics_->SetViewport(viewport);
+
             debug->SetView(camera_);
             debug->Render();
         }
@@ -1675,7 +1676,7 @@ void View::SetRenderTargets(RenderPathCommand& command)
     // When rendering to the final destination rendertarget, use the actual viewport. Otherwise texture rendertargets will be
     // viewport-sized, so they should use their full size as the viewport
     IntVector2 rtSizeNow = graphics_->GetRenderTargetDimensions();
-    IntRect viewport = (graphics_->GetRenderTarget(0) == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
+    IntRect viewport = (currentRenderTarget_ == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
         rtSizeNow.y_);
     
     if (!useCustomDepth)
