@@ -13,6 +13,9 @@
 #endif
 varying vec3 vNormal;
 varying vec4 vWorldPos;
+#ifdef VERTEXCOLOR
+    varying vec4 vColor;
+#endif
 #ifdef PERPIXEL
     #ifdef SHADOW
         varying vec4 vShadowPos[NUMCASCADES];
@@ -41,6 +44,10 @@ void VS()
     gl_Position = GetClipPos(worldPos);
     vNormal = GetWorldNormal(modelMatrix);
     vWorldPos = vec4(worldPos, GetDepth(gl_Position));
+
+    #ifdef VERTEXCOLOR
+        vColor = iColor;
+    #endif
 
     #ifdef NORMALMAP
         vec3 tangent = GetWorldTangent(modelMatrix);
@@ -105,6 +112,10 @@ void PS()
         vec4 diffColor = cMatDiffColor * diffInput;
     #else
         vec4 diffColor = cMatDiffColor;
+    #endif
+
+    #ifdef VERTEXCOLOR
+        diffColor *= vColor;
     #endif
     
     // Get material specular albedo

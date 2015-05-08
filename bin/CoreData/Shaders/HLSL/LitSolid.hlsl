@@ -12,6 +12,9 @@ void VS(float4 iPos : POSITION,
     #ifndef NOUV
         float2 iTexCoord : TEXCOORD0,
     #endif
+    #ifdef VERTEXCOLOR
+        float4 iColor : COLOR0,
+    #endif
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
@@ -56,6 +59,9 @@ void VS(float4 iPos : POSITION,
             out float2 oTexCoord2 : TEXCOORD7,
         #endif
     #endif
+    #ifdef VERTEXCOLOR
+        out float4 oColor : COLOR0,
+    #endif
     #if defined(D3D11) && defined(CLIPPLANE)
         out float oClip : SV_CLIPDISTANCE0,
     #endif
@@ -74,6 +80,10 @@ void VS(float4 iPos : POSITION,
 
     #if defined(D3D11) && defined(CLIPPLANE)
         oClip = dot(oPos, cClipPlane);
+    #endif
+
+    #ifdef VERTEXCOLOR
+        oColor = iColor;
     #endif
 
     #ifdef NORMALMAP
@@ -155,6 +165,9 @@ void PS(
             float2 iTexCoord2 : TEXCOORD7,
         #endif
     #endif
+    #ifdef VERTEXCOLOR
+        float4 iColor : COLOR0,
+    #endif
     #if defined(D3D11) && defined(CLIPPLANE)
         float iClip : SV_CLIPDISTANCE0,
     #endif
@@ -178,6 +191,10 @@ void PS(
         float4 diffColor = cMatDiffColor * diffInput;
     #else
         float4 diffColor = cMatDiffColor;
+    #endif
+
+    #ifdef VERTEXCOLOR
+        diffColor *= iColor;
     #endif
 
     // Get material specular albedo
