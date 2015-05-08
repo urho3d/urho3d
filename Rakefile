@@ -459,14 +459,16 @@ def makefile_ci
     elapsed_time = (Time.now - Time.at(ENV['CI_START_TIME'].to_i)) / 60
     puts "\nEmscripten checkpoint reached, elapsed time: #{elapsed_time}\n\n"
   end
-  unless ENV['CI'] && ENV['EMSCRIPTEN'] && ENV['PACKAGE_UPLOAD'] && elapsed_time > 40  # Skip scaffolding test when packaging for Emscripten
+  unless ENV['CI'] && ENV['EMSCRIPTEN'] && (ENV['PACKAGE_UPLOAD'] || elapsed_time > 40)  # For Emscripten, skip scaffolding test when packaging or running out of time
     # Create a new project on the fly that uses newly built Urho3D library in the build tree
+    test.sub!(/< 25/, '< 43')
     scaffolding "../Build/generated/UsingBuildTree"
     system "cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_generic.sh . #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
     ENV['DESTDIR'] = ENV['HOME'] || Dir.home
     puts "\nInstalling Urho3D SDK to #{ENV['DESTDIR']}/usr/local...\n"  # The default CMAKE_INSTALL_PREFIX is /usr/local
     system 'cd ../Build && make -j$NUMJOBS install >/dev/null' or abort 'Failed to install Urho3D SDK'
     # Create a new project on the fly that uses newly installed Urho3D SDK
+    test.sub!(/< 43/, '< 48')
     scaffolding "../Build/generated/UsingSDK"
     system "export URHO3D_HOME=~/usr/local && cd ../Build/generated/UsingSDK && echo '\nExternal project referencing Urho3D SDK' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
   end
