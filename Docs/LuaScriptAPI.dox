@@ -142,6 +142,7 @@ namespace Urho3D
 <a href="#Class_RenderPath"><b>RenderPath</b></a>
 <a href="#Class_RenderPathCommand"><b>RenderPathCommand</b></a>
 <a href="#Class_RenderSurface"><b>RenderSurface</b></a>
+<a href="#Class_RenderTargetInfo"><b>RenderTargetInfo</b></a>
 <a href="#Class_Renderer"><b>Renderer</b></a>
 <a href="#Class_Resource"><b>Resource</b></a>
 <a href="#Class_ResourceCache"><b>ResourceCache</b></a>
@@ -4398,12 +4399,15 @@ Methods:
 - void SetShaderParameter(const String name, const Variant& value)
 - void RemoveShaderParameter(const String name)
 - void SetNumOutputs(unsigned num)
+- void SetOutput(unsigned index, const String name, CubeMapFace face)
 - void SetOutputName(unsigned index, const String name)
+- void SetOutputFace(unsigned index, CubeMapFace face)
 - void SetDepthStencilName(const String name)
 - const String GetTextureName(TextureUnit unit) const
 - const Variant& GetShaderParameter(const String name) const
 - unsigned GetNumOutputs() const
 - const String GetOutputName(unsigned index) const
+- CubeMapFace GetOutputFace(unsigned index) const
 - const String GetDepthStencilName() const
 
 Properties:
@@ -4463,6 +4467,29 @@ Properties:
 - RenderSurfaceUpdateMode updateMode
 - RenderSurface* linkedRenderTarget
 - RenderSurface* linkedDepthStencil
+
+<a name="Class_RenderTargetInfo"></a>
+### RenderTargetInfo
+
+
+Methods:
+
+- RenderTargetInfo() (GC)
+- RenderTargetInfo* new()
+- void Load(const XMLElement& element)
+
+Properties:
+
+- String name
+- String tag
+- unsigned format
+- Vector2 size
+- RenderTargetSizeMode sizeMode
+- bool enabled
+- bool cubemap
+- bool filtered
+- bool sRGB
+- bool persistent
 
 <a name="Class_Renderer"></a>
 ### Renderer
@@ -4597,6 +4624,7 @@ Methods:
 - void SetFinishBackgroundResourcesMs(int ms)
 - File* GetFile(const String name)
 - Resource* GetResource(const String type, const String name, bool sendEventOnFailure = true)
+- Resource* GetExistingResource(const String type, const String name)
 - bool BackgroundLoadResource(const String type, const String name, bool sendEventOnFailure = true)
 - unsigned GetNumBackgroundLoadResources() const
 - const Vector<String>& GetResourceDirs() const
@@ -7298,6 +7326,11 @@ Properties:
 - int RAY_OBB
 - int RAY_TRIANGLE
 
+### RenderCommandSortMode
+
+- int SORT_FRONTTOBACK
+- int SORT_BACKTOFRONT
+
 ### RenderCommandType
 
 - int CMD_NONE
@@ -7313,6 +7346,12 @@ Properties:
 - int SURFACE_MANUALUPDATE
 - int SURFACE_UPDATEVISIBLE
 - int SURFACE_UPDATEALWAYS
+
+### RenderTargetSizeMode
+
+- int SIZE_ABSOLUTE
+- int SIZE_VIEWPORTDIVISOR
+- int SIZE_VIEWPORTMULTIPLIER
 
 ### ShaderType
 
