@@ -1698,7 +1698,12 @@ bool View::SetTextures(RenderPathCommand& command)
             continue;
         }
         
+        #ifdef DESKTOP_GRAPHICS
         Texture* texture = FindNamedTexture(command.textureNames_[i], false, i == TU_VOLUMEMAP);
+        #else
+        Texture* texture = FindNamedTexture(command.textureNames_[i], false, false);
+        #endif
+
         if (texture)
         {
             graphics_->SetTexture(i, texture);
