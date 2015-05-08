@@ -11,6 +11,37 @@ enum RenderCommandType
     CMD_RENDERUI
 };
 
+enum RenderCommandSortMode
+{
+    SORT_FRONTTOBACK = 0,
+    SORT_BACKTOFRONT
+};
+
+enum RenderTargetSizeMode
+{
+    SIZE_ABSOLUTE = 0,
+    SIZE_VIEWPORTDIVISOR,
+    SIZE_VIEWPORTMULTIPLIER
+};
+
+struct RenderTargetInfo
+{
+    RenderTargetInfo();
+
+    void Load(const XMLElement& element);
+
+    String name_ @ name;
+    String tag_ @ tag;
+    unsigned format_ @ format;
+    Vector2 size_ @ size;
+    RenderTargetSizeMode sizeMode_ @ sizeMode;
+    bool enabled_ @ enabled;
+    bool cubemap_ @ cubemap;
+    bool filtered_ @ filtered;
+    bool sRGB_ @ sRGB;
+    bool persistent_ @ persistent;
+};
+
 struct RenderPathCommand
 {
     RenderPathCommand();
@@ -20,13 +51,16 @@ struct RenderPathCommand
     void SetShaderParameter(const String name, const Variant& value);
     void RemoveShaderParameter(const String name);
     void SetNumOutputs(unsigned num);
+    void SetOutput(unsigned index, const String name, CubeMapFace face);
     void SetOutputName(unsigned index, const String name);
+    void SetOutputFace(unsigned index, CubeMapFace face);
     void SetDepthStencilName(const String name);
 
     const String GetTextureName(TextureUnit unit) const;
     const Variant& GetShaderParameter(const String name) const;
     unsigned GetNumOutputs() const;
     const String GetOutputName(unsigned index) const;
+    CubeMapFace GetOutputFace(unsigned index) const;
     const String GetDepthStencilName() const;
 
     String tag_ @ tag;

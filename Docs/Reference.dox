@@ -1159,14 +1159,17 @@ Note that the used shader variations will vary with graphics settings, for examp
 
 %Scene rendering and any post-processing on a Viewport is defined by its RenderPath object, which can either be read from an XML file or be created programmatically.
 
-The render path consists of rendertarget definitions and commands. The commands are executed in order to yield the rendering result. Each command outputs either to the destination rendertarget & viewport (default if output definition is omitted), or one of the named rendertargets. MRT output is also possible.
+The render path consists of rendertarget definitions and commands. The commands are executed in order to yield the rendering result. Each command outputs either to the destination rendertarget & viewport (default if output definition is omitted), or one of the named rendertargets. MRT output is also possible. If the rendertarget is a cube map,
+the face to render to (0-5) can also be specified.
 
 A rendertarget's size can be either absolute or multiply or divide the destination viewport size. The multiplier or divisor does not need to be an integer number. Furthermore, a rendertarget can be declared "persistent" so that it will not be mixed with other rendertargets of the same size and format, and its contents can be assumed to be available also on subsequent frames.
+
+Note that if you already have created a named rendertarget texture in code and have stored it into the resource cache by using \ref ResourceCache::AddManualResource "AddManualResource()" you can use it directly as an output (by referring to its name) without requiring a rendertarget definition for it.
 
 The available commands are:
 
 - clear: Clear any of color, depth and stencil. Color clear can optionally use the fog color from the Zone visible at the far clip distance.
-- scenepass: Render scene objects whose \ref Materials "material technique" contains the specified pass. Will either be front-to-back ordered with state sorting, or back-to-front ordered with no state sorting. For deferred rendering, object lightmasks can be optionally marked to the stencil buffer. Vertex lights can optionally be handled during a pass, if it has the necessary shader combinations. Textures global to the pass can be bound to free texture units; these can either be the viewport, a named rendertarget, or a 2D texture resource identified with its pathname.
+- scenepass: Render scene objects whose \ref Materials "material technique" contains the specified pass. Will either be front-to-back ordered with state sorting, or back-to-front ordered with no state sorting. For deferred rendering, object lightmasks can be optionally marked to the stencil buffer. Vertex lights can optionally be handled during a pass, if it has the necessary shader combinations. Textures global to the pass can be bound to free texture units; these can either be the viewport, a named rendertarget, or a texture resource identified with its pathname.
 - quad: Render a viewport-sized quad using the specified shaders and compilation defines. Textures can be bound and additionally shader parameters can be specified.
 - forwardlights: Render per-pixel forward lighting for opaque objects with the specified pass name. Shadow maps are also rendered as necessary.
 - lightvolumes: Render deferred light volumes using the specified shaders. G-buffer textures can be bound as necessary.
@@ -1180,11 +1183,11 @@ The render path XML definition looks like this:
 
 \code
 <renderpath>
-    <rendertarget name="RTName" tag="TagName" enabled="true|false" size="x y"|sizedivisor="x y"|sizemultiplier="x y"
+    <rendertarget name="RTName" tag="TagName" enabled="true|false" cubemap="true|false" size="x y"|sizedivisor="x y"|sizemultiplier="x y"
         format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth|readabledepth" filter="true|false" srgb="true|false" persistent="true|false" />
-    <command type="clear" tag="TagName" enabled="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" depthstencil="DSName" />
+    <command type="clear" tag="TagName" enabled="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" face="0|1|2|3|4|5" depthstencil="DSName" />
     <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" depthstencil="DSName">
-        <output index="0" name="RTName1" />
+        <output index="0" name="RTName1" face="0|1|2|3|4|5" />
         <output index="1" name="RTName2" />
         <output index="2" name="RTName3" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
@@ -1207,7 +1210,9 @@ For examples of renderpath definitions, see the default forward, deferred and li
 
 Normally needed depth-stencil surfaces are automatically allocated when the render path is executed.
 
-The special "lineardepth" (synonym "depth") format is intended for storing scene depth in deferred rendering. It is not an actual hardware depth-stencil texture, but will be D3DFMT_R32F on Direct3D9 and RGBA on OpenGL, due to the limitation of all color buffers having to be the same format. The shader include file Samplers.glsl in bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB. Writing depth manually to a rendertarget, while using a non-readable depth-stencil surface ensures best compatibility and prevents any conflicts from using both depth test and manual depth sampling at the same time.
+The special "lineardepth" (synonym "depth") format is intended for storing scene depth in deferred rendering. It is not an actual hardware depth-stencil texture, but a 32-bit single channel (R) float rendertarget. (On OpenGL2 it's RGBA instead, due to the limitation of all color buffers having to be the same format. The shader include file Samplers.glsl in bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB.) 
+
+Writing depth manually to a rendertarget, while using a non-readable depth-stencil surface ensures best compatibility and prevents any conflicts from using both depth test and manual depth sampling at the same time.
 
 There is also a possibility to define a readable hardware depth texture, and instruct the render path to use it instead. Availability for this must first be checked with the function \ref Graphics::GetReadableDepthSupport "GetReadableDepthSupport()". On Direct3D9 this will use the INTZ "hack" format. To define a readable depth-stencil texture, use the format "readabledepth" (synonym "hwdepth") and set it as the depth-stencil by using the "depthstencil" attribute in render path commands. Note that you must set it in every command where you want to use it, otherwise an automatically allocated depth-stencil will be used. Note also that the existence of a stencil channel is not guaranteed, so stencil masking optimizations for lights normally used by the Renderer & View classes will be disabled.
 

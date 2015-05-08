@@ -44,6 +44,7 @@ class Renderer;
 class RenderPath;
 class RenderSurface;
 class Technique;
+class Texture;
 class Texture2D;
 class Viewport;
 class Zone;
@@ -193,7 +194,7 @@ private:
     /// Allocate needed screen buffers.
     void AllocateScreenBuffers();
     /// Blit the viewport from one surface to another.
-    void BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool depthWrite);
+    void BlitFramebuffer(Texture* source, RenderSurface* destination, bool depthWrite);
     /// Draw a fullscreen quad. Shaders and renderstates must have been set beforehand.
     void DrawFullscreenQuad(bool nearQuad);
     /// Query for occluders as seen from a camera.
@@ -232,7 +233,11 @@ private:
     void RenderShadowMap(const LightBatchQueue& queue);
     /// Return the proper depth-stencil surface to use for a rendertarget.
     RenderSurface* GetDepthStencil(RenderSurface* renderTarget);
-    
+    /// Helper function to get the render surface from a texture. 2D textures will always return the first face only.
+    RenderSurface* GetRenderSurfaceFromTexture(Texture* texture, CubeMapFace face = FACE_POSITIVE_X);
+    /// Get a named texture from the rendertarget list or from the resource cache, to be either used as a rendertarget or texture binding.
+    Texture* FindNamedTexture(const String& name, bool isRenderTarget, bool isVolumeMap = false);
+
     /// Return the drawable's zone, or camera zone if it has override mode enabled.
     Zone* GetZone(Drawable* drawable)
     {
@@ -286,13 +291,13 @@ private:
     /// Substitute rendertarget for deferred rendering. Allocated if necessary.
     RenderSurface* substituteRenderTarget_;
     /// Texture(s) for sampling the viewport contents. Allocated if necessary.
-    Texture2D* viewportTextures_[MAX_VIEWPORT_TEXTURES];
+    Texture* viewportTextures_[MAX_VIEWPORT_TEXTURES];
     /// Color rendertarget active for the current renderpath command.
     RenderSurface* currentRenderTarget_;
     /// Texture containing the latest viewport texture.
-    Texture2D* currentViewportTexture_;
+    Texture* currentViewportTexture_;
     /// Dummy texture for D3D9 depth only rendering.
-    Texture2D* depthOnlyDummyTexture_;
+    Texture* depthOnlyDummyTexture_;
     /// Viewport rectangle.
     IntRect viewRect_;
     /// Viewport size.
@@ -351,7 +356,7 @@ private:
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;
     /// Rendertargets defined by the renderpath.
-    HashMap<StringHash, Texture2D*> renderTargets_;
+    HashMap<StringHash, Texture*> renderTargets_;
     /// Intermediate light processing results.
     Vector<LightQueryResult> lightQueryResults_;
     /// Info for scene render passes defined by the renderpath.
