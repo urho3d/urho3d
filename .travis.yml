@@ -117,8 +117,8 @@ script: rake ci
 before_cache: ccache -s
 after_success:
   - if [ $SITE_UPDATE ]; then rake ci_site_update; fi
-  - if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ]; then rake ci_create_mirrors; fi
   - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; if [ $LINUX ] && [ ! "$URHO3D_64BIT" == "0" ]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi
+after_script: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ]; then rake ci_create_mirrors; fi
 notifications: {email: {on_success: never, on_failure: change}}
 
 ---
@@ -273,7 +273,7 @@ env:
     - secure: AfoHc5tpnYoI2TVGUeE9Xdru+15pd5N4YzO7EWvwmMnrHtNO3retrmKOGpnIyfbP2BeWRTW/z+BI4G0RrfvubjHu2us4wRh6Jq8+UZohBBkM+ldTnyqYHX97q+6ScWBWZGg7dpthd1x/7fmds8dSRzustHUhI7RzPbWEMQH1DGI=
     - NUMJOBS=3
     - OSX=1
-    - USE_CCACHE=1
+    - USE_CCACHE=2
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
   matrix:
@@ -298,7 +298,7 @@ before_script:
   - travis_retry brew update >/dev/null && travis_retry brew install ccache
   - if [ $PACKAGE_UPLOAD ]; then travis_retry brew install doxygen graphviz; fi
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
-  - ccache -z -M 200M
+  - if [ $XCODE ]; then cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && ln -s ccache $path; done; fi
   - if [ $IOS ]; then export CI_START_TIME=$(date +%s); fi
 script: rake ci
 after_success: if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
