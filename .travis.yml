@@ -112,7 +112,7 @@ before_script:
   - ccache -z -M 100M
 script: rake ci
 before_cache: ccache -s
-after_success: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ]; then rake ci_create_mirrors; fi
+after_script: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ]; then rake ci_create_mirrors; fi
 notifications: {email: {on_success: never, on_failure: change}}
 
 ---
@@ -261,7 +261,7 @@ env:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
     - NUMJOBS=3
     - OSX=1
-    - USE_CCACHE=1
+    - USE_CCACHE=2
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - URHO3D_MODERN_CPP=0
@@ -285,7 +285,7 @@ before_script:
   - if [ $XCODE ]; then rvm gemset use global && travis_retry gem install xcpretty; fi
   - travis_retry brew update >/dev/null && travis_retry brew install ccache
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
-  - ccache -z -M 200M
+  - if [ $XCODE ]; then cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && ln -s ccache $path; done; fi
   - if [ $IOS ]; then export CI_START_TIME=$(date +%s); fi
 script: rake ci
 after_script: ccache -s
