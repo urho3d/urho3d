@@ -172,6 +172,92 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 \page History History
 
+V1.4
+
+- Direct3D11 and OpenGL 3 rendering. %Shader %Model 2 support removed
+- Experimental Emscripten support
+- Overhauled build system with better out-of-source build support & source tree reorganization
+- Crowd navigation and dynamic navigation mesh using the DetourCrowd and DetourTileCache libraries
+- 2D rendering improvements and optimization
+- Allow materials to use any texture unit; up to 8 consecutive material texture units available for desktop graphics
+- Depth-only rendering pass and readable hardware depth support
+- Cubemap support and using programmatically defined rendertargets in renderpaths
+- Vertex and index buffer access from script through %VectorBuffer
+- %UI can be rendered to a texture with a renderpath command
+- Uncompressed DDS support: generic decode to 8-bit RGBA
+- Dynamic audio types instead of hardcoded
+- Dynamic cursor image type definitions
+- Added various material techniques
+- Allow reading Data/CommandLine.txt on all platforms, if Urho3DPlayer is started without parameters
+- LOD level support in %Terrain collision shape
+- Reduce cost of rendering multiple materials with same shader parameter values, reduce shader switching cost on D3D9, and other rendering efficiency optimizations
+- Refactored event subscription mechanism with Lua
+- Add SpritePacker utility
+- User configurable indentation for XML and JSON files
+- %Controls class moved away from %Network subdirectory to allow using when Urho3D is built without networking
+- MOBILE_GRAPHICS & DESKTOP_GRAPHICS defines for graphics capability level, to avoid hardcoded platform checks
+- Remove bell sound when pressing Alt key combinations on Windows
+- 8-bit time stamp added to client controls sent over the network. Allow to intercept attribute updates from network. These features should allow writing custom clientside prediction
+- Return hit submesh index in raycast to %StaticModel
+- Fill mode added to materials
+- AngelScript script objects can be stored in a %Variant
+- Improved attribute registration: class name and variant type not needed
+- Update PugiXml to 1.5
+- Update STB libraries o latest
+- Editor: particle effect editor window
+- Editor: sound type editor window
+- Editor: remember script attributes and restore them if a compile error occurs
+- Editor: remember custom var names globally in the editor configuration
+- Editor: button-based editor for bitmask attributes
+- Editor: duplicate operation
+- Editor: resource browser improvements
+- Editor: renderpath can be chosen
+- Editor: allow running without Urho2D compiled in
+- Editor: inspector lock
+- Editor: ensure correct gizmo size in orthographic mode
+- Editor: copy camera transform operation
+- Editor: do not allow to set a dialog modal in the UI editor
+- Fix mouse stutter by using SDL_PollEvent() instead of SDL_PumpEvents()
+- Fix various missing script bindings
+- Fix missing editor grid after scene revert
+- Fix StaticModelGrup alpha materials rendering only 1 instance
+- Fix missing attribute side effects (ApplyAttributes) in attribute animation
+- Fix billboard render sorting from several views on the same frame
+- Fix editor to load %UI assets from executable directory to prevent using old UI assets from user's resource directories
+- Fix %UI element drag showing "not accepted" mistakenly
+- Fix WritePackedQuaternion() always returning false
+- Fix uninitialized variable in %Shader class
+- Fix wrong camera aspect ratio after modifying orthographic size
+- Fix "lightvolumes" render path command not allowing custom shader defines
+- Fix %AnimatedSprite2D not hiding child sprites when disabled
+- Fix missing export specifiers for some Urho3D classes
+- Fix additive particle scale modification making the particle size negative
+- Fix screen orientation issue on iOS 8
+- Fix multiple view rendering for 2D drawables
+- Fix Bullet friction on Clang compiler
+- Fix textures left bound in multiple units on OpenGL
+- Fix infinite loop in %ResourceCache::AddPackageFile()
+- Fix corrupt network message reception by updating kNet library
+- Fix NaN check working incorrectly on GCC
+- Fix possible wrong logic when a component is removed from a scene node, as opposed to being destroyed
+- Fix tab escape sequences in the generated script documentation
+- Fix warnings that leak into Urho3D applications
+- Fix being able to create a REPLICATED component into a LOCAL node
+- Fix negative light direction from Assimp with certain 3D file formats
+- Fix spot light FOV handling with Assimp
+- Fix incorrect partial terrain update and improve terrain update worst-case performance
+- Fix incorrect rendering to backbuffer after post-process pingponging on OpenGL
+- Fix crash when calling FixInterpolation() incorrectly on a compressed sound resource
+- Fix AngelScript compile on VS2015
+- Fix crash with null materials in 2D rendering
+- Fix kNet WinXP compatibility
+- Fix possible threaded resource load issues with XML files
+- Fix missing null checks in %AnimatedSprite2D
+- Fix window drag behavior with hidden mouse on Linux; require click in window before re-enabling hidden mouse on all desktop OS'es
+- Fix erratic hidden mouse move when used together with touch input
+- Fix black screen on OSX after fullscreen/windowed switch
+- Fix incorrectly working AngelScript native calls on Clang / Windows
+
 V1.32
 
 - Finalized Urho2D functionality, including 2D physics using Box2D, sprite animation and tile maps
