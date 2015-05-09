@@ -617,9 +617,9 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
 {
     RegisterAnimatable<T>(engine, className);
     RegisterSubclass<Node, T>(engine, "Node", className);
-	engine->RegisterObjectMethod(className, "void SetPosition2D(float, float)", asMETHODPR(T, SetPosition2D, (float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetPosition2D(float, float)", asMETHODPR(T, SetPosition2D, (float, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetScale(float)", asMETHODPR(T, SetScale, (float), void), asCALL_THISCALL);
-	engine->RegisterObjectMethod(className, "void SetScale2D(float, float)", asMETHODPR(T, SetScale2D, (float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetScale2D(float, float)", asMETHODPR(T, SetScale2D, (float, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in, const Vector3&in)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&, const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in, float)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&, float), void), asCALL_THISCALL);

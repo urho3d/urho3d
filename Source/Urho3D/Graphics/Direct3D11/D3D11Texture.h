@@ -118,10 +118,6 @@ public:
     /// Return sampler state object.
     void* GetSampler() const { return sampler_; }
     
-    /// Convert RGB data to RGBA for loading into a texture.
-    static SharedArrayPtr<unsigned char> ConvertRGBToRGBA(int width, int height, const unsigned char* data);
-    /// Convert RGB data to RGBA for loading into a 3D texture.
-    static SharedArrayPtr<unsigned char> ConvertRGBToRGBA(int width, int height, int depth, const unsigned char* data);
     /// Check maximum allowed mip levels for a specific texture size.
     static unsigned CheckMaxLevels(int width, int height, unsigned requestedLevels);
     /// Check maximum allowed mip levels for a specific 3D texture size.

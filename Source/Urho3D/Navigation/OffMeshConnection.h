@@ -53,6 +53,10 @@ public:
     void SetRadius(float radius);
     /// Set bidirectional flag. Default true.
     void SetBidirectional(bool enabled);
+    /// Set a user assigned mask
+    void SetMask(unsigned newMask);
+    /// Sets the assigned area Id for the connection
+    void SetAreaID(unsigned newAreaID);
     
     /// Return endpoint node.
     Node* GetEndPoint() const;
@@ -60,6 +64,10 @@ public:
     float GetRadius() const { return radius_; }
     /// Return whether is bidirectional.
     bool IsBidirectional() const { return bidirectional_; }
+    /// Return the user assigned mask
+    unsigned GetMask() const { return mask_; }
+    /// Return the user assigned area ID
+    unsigned GetAreaID() const { return areaId_; }
     
 private:
     /// Endpoint node.
@@ -72,6 +80,10 @@ private:
     bool bidirectional_;
     /// Endpoint changed flag.
     bool endPointDirty_;
+    /// Flags mask to represent properties of this mesh
+    unsigned mask_;
+    /// Area id to be used for this off mesh connection's internal poly
+    unsigned areaId_;
 };
 
 }

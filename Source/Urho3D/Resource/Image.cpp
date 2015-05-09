@@ -1425,6 +1425,72 @@ SharedPtr<Image> Image::GetNextLevel() const
     return mipImage;
 }
 
+SharedPtr<Image> Image::ConvertToRGBA() const
+{
+    if (IsCompressed())
+    {
+        LOGERROR("Can not convert compressed image to RGBA");
+        return SharedPtr<Image>();
+    }
+    if (components_ < 1 || components_ > 4)
+    {
+        LOGERROR("Illegal number of image components for conversion to RGBA");
+        return SharedPtr<Image>();
+    }
+    if (!data_)
+    {
+        LOGERROR("Can not convert image without data to RGBA");
+        return SharedPtr<Image>();
+    }
+
+    // Already RGBA?
+    if (components_ == 4)
+        return SharedPtr<Image>(const_cast<Image*>(this));
+
+    SharedPtr<Image> ret(new Image(context_));
+    ret->SetSize(width_, height_, depth_, 4);
+    
+    const unsigned char* src = data_;
+    unsigned char* dest = ret->GetData();
+
+    switch (components_)
+    {
+    case 1:
+        for (unsigned i = 0; i < width_ * height_ * depth_; ++i)
+        {
+            unsigned char pixel = *src++;
+            *dest++ = pixel;
+            *dest++ = pixel;
+            *dest++ = pixel;
+            *dest++ = 255;
+        }
+        break;
+
+    case 2:
+        for (unsigned i = 0; i < width_ * height_ * depth_; ++i)
+        {
+            unsigned char pixel = *src++;
+            *dest++ = pixel;
+            *dest++ = pixel;
+            *dest++ = pixel;
+            *dest++ = *src++;
+        }
+        break;
+
+    case 3:
+        for (unsigned i = 0; i < width_ * height_ * depth_; ++i)
+        {
+            *dest++ = *src++;
+            *dest++ = *src++;
+            *dest++ = *src++;
+            *dest++ = 255;
+        }
+        break;
+    }
+
+    return ret;
+}
+
 CompressedLevel Image::GetCompressedLevel(unsigned index) const
 {
     CompressedLevel level;

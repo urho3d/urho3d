@@ -267,10 +267,19 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
     
     if (!image->IsCompressed())
     {
+        // Convert unsuitable formats to RGBA
+        unsigned components = image->GetComponents();
+        if ((components == 1 && !useAlpha) || components == 2 || components == 3)
+        {
+            image = image->ConvertToRGBA();
+            if (!image)
+                return false;
+            components = image->GetComponents();
+        }
+
         unsigned char* levelData = image->GetData();
         int levelWidth = image->GetWidth();
         int levelHeight = image->GetHeight();
-        unsigned components = image->GetComponents();
         unsigned format = 0;
         
         // Discard unnecessary mip levels
@@ -285,15 +294,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         switch (components)
         {
         case 1:
-            format = useAlpha ? Graphics::GetAlphaFormat() : Graphics::GetLuminanceFormat();
-            break;
-            
-        case 2:
-            format = Graphics::GetLuminanceAlphaFormat();
-            break;
-            
-        case 3:
-            format = Graphics::GetRGBFormat();
+            format = Graphics::GetAlphaFormat();
             break;
             
         case 4:
@@ -308,14 +309,6 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         
         for (unsigned i = 0; i < levels_; ++i)
         {
-            // D3D11 needs RGB data as 4-component
-            SharedArrayPtr<unsigned char> convertedData;
-            if (components == 3)
-            {
-                convertedData = ConvertRGBToRGBA(levelWidth, levelHeight, levelData);
-                levelData = convertedData;
-            }
-
             SetData(i, 0, 0, levelWidth, levelHeight, levelData);
             memoryUse += levelWidth * levelHeight * components;
             

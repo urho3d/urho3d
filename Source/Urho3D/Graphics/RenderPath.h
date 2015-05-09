@@ -69,6 +69,7 @@ struct RenderTargetInfo
         size_(Vector2::ZERO),
         sizeMode_(SIZE_ABSOLUTE),
         enabled_(true),
+        cubemap_(false),
         filtered_(false),
         sRGB_(false),
         persistent_(false)
@@ -90,6 +91,8 @@ struct RenderTargetInfo
     RenderTargetSizeMode sizeMode_;
     /// Enabled flag.
     bool enabled_;
+    /// Cube map flag.
+    bool cubemap_;
     /// Filtering flag.
     bool filtered_;
     /// sRGB sampling/writing mode flag.
@@ -122,8 +125,12 @@ struct RenderPathCommand
     void RemoveShaderParameter(const String& name);
     /// Set number of output rendertargets.
     void SetNumOutputs(unsigned num);
+    /// Set output rendertarget name and face index for cube maps.
+    void SetOutput(unsigned index, const String& name, CubeMapFace face = FACE_POSITIVE_X);
     /// Set output rendertarget name.
     void SetOutputName(unsigned index, const String& name);
+    /// Set output rendertarget face index for cube maps.
+    void SetOutputFace(unsigned index, CubeMapFace face);
     /// Set depth-stencil output name. When empty, will assign a depth-stencil buffer automatically.
     void SetDepthStencilName(const String& name);
     
@@ -132,9 +139,11 @@ struct RenderPathCommand
     /// Return shader parameter.
     const Variant& GetShaderParameter(const String& name) const;
     /// Return number of output rendertargets.
-    unsigned GetNumOutputs() const { return outputNames_.Size(); }
+    unsigned GetNumOutputs() const { return outputs_.Size(); }
     /// Return output rendertarget name.
     const String& GetOutputName(unsigned index) const;
+    /// Return output rendertarget face index.
+    CubeMapFace GetOutputFace(unsigned index) const;
     /// Return depth-stencil output name.
     const String& GetDepthStencilName() const { return depthStencilName_; }
     
@@ -162,8 +171,8 @@ struct RenderPathCommand
     String textureNames_[MAX_TEXTURE_UNITS];
     /// %Shader parameters.
     HashMap<StringHash, Variant> shaderParameters_;
-    /// Output rendertarget names.
-    Vector<String> outputNames_;
+    /// Output rendertarget names and faces.
+    Vector<Pair<String, CubeMapFace> > outputs_;
     /// Depth-stencil output name.
     String depthStencilName_;
     /// Clear flags.

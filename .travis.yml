@@ -112,7 +112,8 @@ before_script:
   - ccache -z -M 100M
 script: rake ci
 before_cache: ccache -s
-after_success: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_create_mirrors; fi
+after_success: if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ]; then rake ci_create_mirrors; fi
+notifications: {email: {on_success: never, on_failure: change}}
 
 ---
 
@@ -128,6 +129,7 @@ addons:
     project:
       name: weitjong/Urho3D
       description: Urho3D is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE and Horde3D.
+    notification_email: urho3d.travis.ci@gmail.com
     build_command_prepend: rake cmake URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 URHO3D_SAMPLES=1 URHO3D_TOOLS=1 URHO3D_EXTRAS=1 URHO3D_LIB_TYPE=SHARED
     build_command: rake make numjobs=4
     branch_pattern: .*Coverity-Scan$
@@ -276,6 +278,7 @@ matrix:
   fast_finish: true
 install:
   - if [ $XCODE ]; then rvm gemset use global && travis_retry gem install xcpretty; fi
+  - if [ $IOS ]; then export CI_START_TIME=$(date +%s); fi
 script: rake ci
 
 ---
@@ -300,7 +303,25 @@ before_install:
   - ulimit -Sn 512
 install:
   - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz && tar xfz emsdk-portable.tar.gz && rm emsdk-portable.tar.gz && cd emsdk_portable && ./emsdk update >/dev/null && sed -i.bak 's/-xvf/-xf/g' emsdk && ./emsdk install latest >/dev/null && ./emsdk activate latest >/dev/null && source ./emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
+before_script: export CI_START_TIME=$(date +%s)
 script: rake ci
+
+# Below samples are excluded from Emscripten CI build due to build time constraint
+data:
+  excluded_sample:
+    - 01_HelloWorld
+    - 02_HelloGUI
+    - 03_Sprites
+    - 04_StaticScene
+    - 05_AnimatingScene
+    - 26_ConsoleInput
+    - 29_SoundSynthesis
+    - 30_LightAnimation
+    - 31_MaterialAnimation
+    - 34_DynamicGeometry
+    - 35_SignedDistanceFieldText
+    - 37_UIDrag
+    - 38_SceneAndUILoad
 
 ...
 

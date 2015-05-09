@@ -126,6 +126,8 @@ public:
     void AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest = true);
     /// Add a sphere.
     void AddSphere(const Sphere& sphere, const Color& color, bool depthTest = true);
+    /// Add a cylinder
+    void AddCylinder(const Vector3& position, float radius, float height, const Color& color, bool depthTest = true);
     /// Add a skeleton.
     void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true);
     /// Add a triangle mesh.
@@ -141,6 +143,8 @@ public:
     const Frustum& GetFrustum() const { return frustum_; }
     /// Check whether a bounding box is inside the view frustum.
     bool IsInside(const BoundingBox& box) const;
+    /// Return whether has something to render.
+    bool HasContent() const;
     
 private:
     /// Handle end of frame. Clear debug geometry.

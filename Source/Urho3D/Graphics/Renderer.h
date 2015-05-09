@@ -299,7 +299,7 @@ public:
     /// Allocate a shadow map. If shadow map reuse is disabled, a different map is returned each time.
     Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
     /// Allocate a rendertarget or depth-stencil texture for deferred rendering or postprocessing. Should only be called during actual rendering, not before.
-    Texture2D* GetScreenBuffer(int width, int height, unsigned format, bool filtered, bool srgb, unsigned persistentKey = 0);
+    Texture* GetScreenBuffer(int width, int height, unsigned format, bool cubemap, bool filtered, bool srgb, unsigned persistentKey = 0);
     /// Allocate a depth-stencil surface that does not need to be readable. Should only be called during actual rendering, not before.
     RenderSurface* GetDepthStencil(int width, int height);
     /// Allocate an occlusion buffer.
@@ -394,7 +394,7 @@ private:
     /// Shadow map allocations by resolution.
     HashMap<int, PODVector<Light*> > shadowMapAllocations_;
     /// Screen buffers by resolution and format.
-    HashMap<long long, Vector<SharedPtr<Texture2D> > > screenBuffers_;
+    HashMap<long long, Vector<SharedPtr<Texture> > > screenBuffers_;
     /// Current screen buffer allocations by resolution and format.
     HashMap<long long, unsigned> screenBufferAllocations_;
     /// Saved status of screen buffer allocations for restoring.

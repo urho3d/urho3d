@@ -169,6 +169,8 @@ public:
     unsigned GetNumCompressedLevels() const { return numCompressedLevels_; }
     /// Return next mip level by bilinear filtering.
     SharedPtr<Image> GetNextLevel() const;
+    /// Return image converted to 4-component (RGBA) to circumvent modern rendering API's not supporting e.g. the luminance-alpha format.
+    SharedPtr<Image> ConvertToRGBA() const;
     /// Return a compressed mip level.
     CompressedLevel GetCompressedLevel(unsigned index) const;
     /// Return subimage from the image by the defined rect or null if failed. 3D images are not supported. You must free the subimage yourself.
