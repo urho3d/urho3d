@@ -172,7 +172,7 @@ matrix:
     # x86 and x86_64 emulation currently requires hardware acceleration which Travis-CI cannot provide, so skip AVD for now
     # env: API=21 ABI=x86_64      URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21,tools AVD=test_21_x86_64
     # env: API=21 ABI=x86         URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21,tools AVD=test_21_x86
-    
+
     # Travis CI does not create one cache per job at the moment, so workaround it to have still high cache hit/miss ratio
     # We use jdk key as the cache storage differentiator! Our library is compiled using NDK so it should not be affected by JDK version
     # We can only cache 5 jobs due to limited supply of valid JDK versions, the rest use the Android compiler proper
@@ -261,6 +261,9 @@ env:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
     - NUMJOBS=3
     - OSX=1
+    - USE_CCACHE=1
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
     - URHO3D_MODERN_CPP=0
     - URHO3D_AMALG=0
   matrix:
@@ -276,10 +279,16 @@ env:
     - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=7.0
 matrix:
   fast_finish: true
-install:
+before_script:
+  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - if [ $XCODE ]; then rvm gemset use global && travis_retry gem install xcpretty; fi
+  - travis_retry brew update >/dev/null && travis_retry brew install ccache
+  - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
+  - ccache -z -M 200M
   - if [ $IOS ]; then export CI_START_TIME=$(date +%s); fi
 script: rake ci
+after_script: ccache -s
 
 ---
 
@@ -298,12 +307,13 @@ env:
     - URHO3D_LIB_TYPE=STATIC
 matrix:
   fast_finish: true
-before_install:
+before_script:
+  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - pushd /usr/bin && sudo ln -sf python python2 && popd
   - ulimit -Sn 512
-install:
   - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz && tar xfz emsdk-portable.tar.gz && rm emsdk-portable.tar.gz && cd emsdk_portable && ./emsdk update >/dev/null && sed -i.bak 's/-xvf/-xf/g' emsdk && ./emsdk install latest >/dev/null && ./emsdk activate latest >/dev/null && source ./emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
-before_script: export CI_START_TIME=$(date +%s)
+  - export CI_START_TIME=$(date +%s)
 script: rake ci
 
 # Below samples are excluded from Emscripten CI build due to build time constraint
