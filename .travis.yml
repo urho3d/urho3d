@@ -273,6 +273,9 @@ env:
     - secure: AfoHc5tpnYoI2TVGUeE9Xdru+15pd5N4YzO7EWvwmMnrHtNO3retrmKOGpnIyfbP2BeWRTW/z+BI4G0RrfvubjHu2us4wRh6Jq8+UZohBBkM+ldTnyqYHX97q+6ScWBWZGg7dpthd1x/7fmds8dSRzustHUhI7RzPbWEMQH1DGI=
     - NUMJOBS=3
     - OSX=1
+    - USE_CCACHE=1
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
   matrix:
     - MAKEFILE=1    URHO3D_LIB_TYPE=STATIC
     - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED
@@ -286,17 +289,20 @@ env:
     - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=7.0
 matrix:
   fast_finish: true
-before_install:
+before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - if [ $XCODE ] && ([ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
-install:
-  - if [ $PACKAGE_UPLOAD ]; then travis_retry brew update >/dev/null && travis_retry brew install doxygen graphviz; fi
   - if [ $XCODE ]; then rvm gemset use global && travis_retry gem install xcpretty; fi
+  - travis_retry brew update >/dev/null && travis_retry brew install ccache
+  - if [ $PACKAGE_UPLOAD ]; then travis_retry brew install doxygen graphviz; fi
+  - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
+  - ccache -z -M 200M
   - if [ $IOS ]; then export CI_START_TIME=$(date +%s); fi
 script: rake ci
 after_success: if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
+after_script: ccache -s
 
 ---
 
@@ -314,17 +320,16 @@ env:
     - URHO3D_LIB_TYPE=STATIC
 matrix:
   fast_finish: true
-before_install:
+before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - if [ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
   - pushd /usr/bin && sudo ln -sf python python2 && popd
   - ulimit -Sn 512
-install:
   - if [ $PACKAGE_UPLOAD ]; then travis_retry brew update >/dev/null && travis_retry brew install doxygen graphviz; fi
   - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz && tar xfz emsdk-portable.tar.gz && rm emsdk-portable.tar.gz && cd emsdk_portable && ./emsdk update >/dev/null && sed -i.bak 's/-xvf/-xf/g' emsdk && ./emsdk install latest >/dev/null && ./emsdk activate latest >/dev/null && source ./emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
-before_script: export CI_START_TIME=$(date +%s)
+  - export CI_START_TIME=$(date +%s)
 script: rake ci
 after_success: if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && rake ci_emscripten_samples_update; fi
 
