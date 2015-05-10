@@ -181,31 +181,32 @@ matrix:
 
     # Travis CI does not create one cache per job at the moment, so workaround it to have still high cache hit/miss ratio
     # We use jdk key as the cache storage differentiator! Our library is compiled using NDK so it should not be affected by JDK version
-    # We can only cache 5 jobs due to limited supply of valid JDK versions, the rest use the Android compiler proper
     # We have to ensure those jobs with AVD test are run using the correct JDK version, i.e. Oracle JDK 7 which is the default
+    # We can only cache 5 jobs due to limited supply of valid JDK versions when using Travis CI native ccache support
+    # The other 5 jobs are cached using our own cache store (originally designed for Travis CI legacy build infra)
     - &cache1
       jdk: oraclejdk8
       env: API=21 ABI=x86_64      URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21     USE_CCACHE=1
-    - &nocache
+    - &alternative-cache
       cache: false
-      env: API=21 ABI=x86_64      URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21     USE_CCACHE=0
+      env: API=21 ABI=x86_64      URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21     USE_CCACHE=2
     - &cache2
       jdk: openjdk7
       env: API=21 ABI=x86         URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86-android-21        USE_CCACHE=1
-    - <<: *nocache
-      env: API=21 ABI=x86         URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21        USE_CCACHE=0
+    - <<: *alternative-cache
+      env: API=21 ABI=x86         URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21        USE_CCACHE=2
     - &cache3
       jdk: openjdk6
       env: API=21 ABI=arm64-v8a   URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1                       USE_CCACHE=1
-    - <<: *nocache
-      env: API=21 ABI=arm64-v8a   URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1                       USE_CCACHE=0
-    - <<: *nocache
-      env: API=21 ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC                                       USE_CCACHE=0
+    - <<: *alternative-cache
+      env: API=21 ABI=arm64-v8a   URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1                       USE_CCACHE=2
+    - <<: *alternative-cache
+      env: API=21 ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC                                       USE_CCACHE=2
     - &cache4
       jdk: oraclejdk7
       env: API=21 ABI=armeabi-v7a URHO3D_LIB_TYPE=SHARED INSTALL=tools AVD=test_21_armeabi-v7a USE_CCACHE=1
-    - <<: *nocache
-      env: API=19 ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC                                       USE_CCACHE=0
+    - <<: *alternative-cache
+      env: API=19 ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC                                       USE_CCACHE=2
     - &cache5
       env: API=19 ABI=armeabi-v7a URHO3D_LIB_TYPE=SHARED AVD=test_19_armeabi-v7a               USE_CCACHE=1
 before_script:
@@ -219,7 +220,7 @@ before_script:
   - if [ "$ABI" == "arm64-v8a" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin C_PREFIX=aarch64-linux-android; fi
   - if [ "$ABI" == "armeabi-v7a" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin C_PREFIX=arm-linux-androideabi; fi
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$C_PATH:$PATH; for f in $C_PATH/$C_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
-  - ccache -z -M 100M
+  - if [ "$USE_CCACHE" == "1" ]; then ccache -z -M 100M; fi
 script: rake ci
 before_cache: ccache -s
 after_success: if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
@@ -332,9 +333,9 @@ before_script:
   - if [ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
   - pushd /usr/bin && sudo ln -sf python python2 && popd
   - ulimit -Sn 512
-  - if [ $PACKAGE_UPLOAD ]; then travis_retry brew update >/dev/null && travis_retry brew install doxygen graphviz; fi
-  - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz && tar xfz emsdk-portable.tar.gz && rm emsdk-portable.tar.gz && cd emsdk_portable && ./emsdk update >/dev/null && sed -i.bak 's/-xvf/-xf/g' emsdk && ./emsdk install latest >/dev/null && ./emsdk activate latest >/dev/null && source ./emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
   - travis_retry brew update >/dev/null && travis_retry brew install ccache
+  - if [ $PACKAGE_UPLOAD ]; then travis_retry brew install doxygen graphviz; fi
+  - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz && tar xfz emsdk-portable.tar.gz && rm emsdk-portable.tar.gz && cd emsdk_portable && ./emsdk update >/dev/null && sed -i.bak 's/-xvf/-xf/g' emsdk && ./emsdk install latest >/dev/null && ./emsdk activate latest >/dev/null && source ./emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$EMSCRIPTEN_ROOT_PATH:$PATH
   - export CI_START_TIME=$(date +%s)
 script: rake ci
