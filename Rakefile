@@ -198,11 +198,10 @@ task :ci do
   # Use internal cache store instead of using Travis CI one (this is a workaround for using ccache on Travis CI legacy build infra)
   if ENV['USE_CCACHE'].to_i == 2
     puts 'Setting up build cache'
-    job_number = ENV['TRAVIS_JOB_NUMBER'].split('.')[1]
-    job_number = ".#{job_number}" if job_number
+    job_number = ".#{ENV['TRAVIS_JOB_NUMBER'].split('.')[1]}"
     repo_slug = "#{ENV['TRAVIS_REPO_SLUG'].split('/')[0]}/cache-store.git"
     # Do not abort even when it fails here
-    system "time (if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi && ccache -z -M 100M)"
+    system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi && ccache -z -M 100M"
     puts "\n"
   end
   # Clear ccache on demand
@@ -236,7 +235,7 @@ task :ci do
   if ENV['USE_CCACHE'].to_i == 2
     puts "\nStoring build cache"
     # Do not abort even when it fails here
-    system "time (cd ~/.ccache && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/#{repo_slug} && git add -A . && git commit --amend -qm \"Travis CI: cache update at #{Time.now.utc}.\" && git push -qf -u origin #{ENV['TRAVIS_BRANCH']}#{job_number} >/dev/null 2>&1)"
+    system "cd ~/.ccache && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/#{repo_slug} && git add -A . && git commit --amend -qm 'Travis CI: cache update at #{Time.now.utc}.' && git push -qf -u origin #{ENV['TRAVIS_BRANCH']}#{job_number} >/dev/null 2>&1"
   end
 end
 
