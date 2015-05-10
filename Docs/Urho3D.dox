@@ -177,6 +177,8 @@ V1.4
 - Direct3D11 and OpenGL 3 rendering. %Shader %Model 2 support removed
 - Experimental Emscripten support
 - Overhauled build system with better out-of-source build support & source tree reorganization
+- Add proper precompiled header (PCH) support for GCC/Clang compiler toolchains (and their derivatives)
+- Add compiler cache (ccache) support to build system for host systems where ccache is installable
 - Crowd navigation and dynamic navigation mesh using the DetourCrowd and DetourTileCache libraries
 - 2D rendering improvements and optimization
 - Allow materials to use any texture unit; up to 8 consecutive material texture units available for desktop graphics
@@ -202,8 +204,9 @@ V1.4
 - Fill mode added to materials
 - AngelScript script objects can be stored in a %Variant
 - Improved attribute registration: class name and variant type not needed
+- Add new rake tasks to facilitate configuring/generating and building Urho3D project, including external project using Urho3D library
 - Update PugiXml to 1.5
-- Update STB libraries o latest
+- Update STB libraries to latest
 - Editor: particle effect editor window
 - Editor: sound type editor window
 - Editor: remember script attributes and restore them if a compile error occurs
