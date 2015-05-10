@@ -202,7 +202,7 @@ task :ci do
     job_number = ".#{job_number}" if job_number
     repo_slug = "#{ENV['TRAVIS_REPO_SLUG'].split('/')[0]}/cache-store.git"
     # Do not abort even when it fails here
-    system "time if `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache`; then ccache -z; else git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache && cd ~/.ccache && git -qf checkout -b #{ENV['TRAVIS_BRANCH']}#{job_number} && ccache -M 100M; fi"
+    system "time (if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi && ccache -z -M 100M)"
     puts "\n"
   end
   # Clear ccache on demand

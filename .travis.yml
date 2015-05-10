@@ -316,6 +316,11 @@ env:
     - EMSCRIPTEN=1
     - EMSCRIPTEN_SHARE_DATA=1
     - EMSCRIPTEN_EMRUN_BROWSER=chrome
+    - USE_CCACHE=2
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+    # TODO: Remove CCACHE_CPP2 env var when Emscripten version has reached beyond 1.31.3
+    - CCACHE_CPP2=1
   matrix:
     - URHO3D_LIB_TYPE=STATIC
 matrix:
@@ -329,9 +334,12 @@ before_script:
   - ulimit -Sn 512
   - if [ $PACKAGE_UPLOAD ]; then travis_retry brew update >/dev/null && travis_retry brew install doxygen graphviz; fi
   - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz && tar xfz emsdk-portable.tar.gz && rm emsdk-portable.tar.gz && cd emsdk_portable && ./emsdk update >/dev/null && sed -i.bak 's/-xvf/-xf/g' emsdk && ./emsdk install latest >/dev/null && ./emsdk activate latest >/dev/null && source ./emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
+  - travis_retry brew update >/dev/null && travis_retry brew install ccache
+  - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$EMSCRIPTEN_ROOT_PATH:$PATH
   - export CI_START_TIME=$(date +%s)
 script: rake ci
 after_success: if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && rake ci_emscripten_samples_update; fi
+after_script: ccache -s
 
 # Below samples are excluded from Emscripten CI build due to build time constraint
 data:
