@@ -297,6 +297,21 @@ Ensure the ccache symlinks directory is being added as the first entry in the 'P
 
 Note that these environment variables are used by ccache itself and not by our CMake build rules, so they must remain set in the host system not only while generating the initial project file using CMake but also while building the project later.
 
+Xcode IDE and its CLI version, xcodebuild, do not work with ccache out of the box. They probably don't need it because internally they already cache the derived build data. However, if you are performing a lot of switching between different checked out versions of the project source tree or performing a lot of clean build similar to continuous integration build then probably it is more beneficial to hack Xcode/xcodebuild to use ccache. As it is a hack, do the following at your own risk.
+
+On Xcode 5:
+\verbatim
+cd $(dirname $(xcodebuild -find-executable clang))
+for compiler in clang clang++; do mv $compiler{,.orig} && ln -sf $(which ccache) $compiler; done
+\endverbatim
+
+On Xcode 6:
+\verbatim
+cd $(dirname $(xcodebuild -find-executable clang))
+cp -p $(which ccache) .
+for compiler in clang clang++; do mv $compiler{,.orig} && sudo mv /usr/bin/$compiler{,.orig} && sudo ln -sf $(pwd)/$compiler.orig /usr/bin/$compiler && ln -sf ccache $compiler; done
+\endverbatim
+
 
 \page Running Running Urho3D player application
 
