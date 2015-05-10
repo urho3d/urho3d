@@ -241,6 +241,8 @@ end
 # Usage: NOT intended to be used manually
 desc 'Update site documentation to GitHub Pages'
 task :ci_site_update do
+  # Skip when :ci rake task was skipped
+  next unless Dir.exists?('../Build')
   # Pull or clone
   system 'cd ../doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../doc-Build' or abort 'Failed to pull/clone'
   # Update credits from README.md to about.md
@@ -316,6 +318,8 @@ end
 # Usage: NOT intended to be used manually
 desc 'Make binary package and upload it to a designated central hosting server'
 task :ci_package_upload do
+  # Skip when :ci rake task was skipped
+  next unless Dir.exists?('../Build')
   if ENV['XCODE']
     $configuration = 'Release'
     $testing = 0
