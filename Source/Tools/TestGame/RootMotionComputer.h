@@ -71,8 +71,11 @@ public:
 
     void SetupNewAnimInfo(const String& animName);
 
+    void ComputeRootMotion();
+
 protected:
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void OnNodeSet(Node* node);
 
 private:
     RootMotionComputationMode           computationMode;
