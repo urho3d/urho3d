@@ -921,7 +921,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     return newShadowMap;
 }
 
-Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool filtered, bool srgb, unsigned persistentKey)
+Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool cubemap, bool filtered, bool srgb, unsigned persistentKey)
 {
     bool depthStencil = (format == Graphics::GetDepthStencilFormat()) || (format == Graphics::GetReadableDepthFormat());
     if (depthStencil)
@@ -930,11 +930,16 @@ Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, boo
         srgb = false;
     }
     
+    if (cubemap)
+        height = width;
+
     long long searchKey = ((long long)format << 32) | (width << 16) | height;
     if (filtered)
         searchKey |= 0x8000000000000000LL;
     if (srgb)
         searchKey |= 0x4000000000000000LL;
+    if (cubemap)
+        searchKey |= 0x2000000000000000LL;
     
     // Add persistent key if defined
     if (persistentKey)
@@ -951,32 +956,48 @@ Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, boo
     
     if (allocations >= screenBuffers_[searchKey].Size())
     {
-        SharedPtr<Texture2D> newBuffer(new Texture2D(context_));
+        SharedPtr<Texture> newBuffer;
+
+        if (!cubemap)
+        {
+            SharedPtr<Texture2D> newTex2D(new Texture2D(context_));
+            newTex2D->SetSize(width, height, format, depthStencil ? TEXTURE_DEPTHSTENCIL : TEXTURE_RENDERTARGET);
+
+            #ifdef URHO3D_OPENGL
+            // OpenGL hack: clear persistent floating point screen buffers to ensure the initial contents aren't illegal (NaN)?
+            // Otherwise eg. the AutoExposure post process will not work correctly
+            if (persistentKey && Texture::GetDataType(format) == GL_FLOAT)
+            {
+                // Note: this loses current rendertarget assignment
+                graphics_->ResetRenderTargets();
+                graphics_->SetRenderTarget(0, newTex2D);
+                graphics_->SetDepthStencil((RenderSurface*)0);
+                graphics_->SetViewport(IntRect(0, 0, width, height));
+                graphics_->Clear(CLEAR_COLOR);
+            }
+            #endif
+
+            newBuffer = StaticCast<Texture>(newTex2D);
+        }
+        else
+        {
+            SharedPtr<TextureCube> newTexCube(new TextureCube(context_));
+            newTexCube->SetSize(width, format, TEXTURE_RENDERTARGET);
+
+            newBuffer = StaticCast<Texture>(newTexCube);
+        }
+        
         newBuffer->SetSRGB(srgb);
-        newBuffer->SetSize(width, height, format, depthStencil ? TEXTURE_DEPTHSTENCIL : TEXTURE_RENDERTARGET);
         newBuffer->SetFilterMode(filtered ? FILTER_BILINEAR : FILTER_NEAREST);
         newBuffer->ResetUseTimer();
         screenBuffers_[searchKey].Push(newBuffer);
-        #ifdef URHO3D_OPENGL
-        // OpenGL hack: clear persistent floating point screen buffers to ensure the initial contents aren't illegal (NaN)?
-        // Otherwise eg. the AutoExposure post process will not work correctly
-        if (persistentKey && Texture::GetDataType(format) == GL_FLOAT)
-        {
-            // Note: this loses current rendertarget assignment
-            graphics_->ResetRenderTargets();
-            graphics_->SetRenderTarget(0, newBuffer);
-            graphics_->SetDepthStencil((RenderSurface*)0);
-            graphics_->SetViewport(IntRect(0, 0, width, height));
-            graphics_->Clear(CLEAR_COLOR);
-        }
-        #endif
-        
+
         LOGDEBUG("Allocated new screen buffer size " + String(width) + "x" + String(height) + " format " + String(format));
         return newBuffer;
     }
     else
     {
-        Texture2D* buffer = screenBuffers_[searchKey][allocations];
+        Texture* buffer = screenBuffers_[searchKey][allocations];
         buffer->ResetUseTimer();
         return buffer;
     }
@@ -989,7 +1010,10 @@ RenderSurface* Renderer::GetDepthStencil(int width, int height)
     if (width == graphics_->GetWidth() && height == graphics_->GetHeight() && graphics_->GetMultiSample() <= 1)
         return 0;
     else
-        return GetScreenBuffer(width, height, Graphics::GetDepthStencilFormat(), false, false)->GetRenderSurface();
+    {
+        return static_cast<Texture2D*>(GetScreenBuffer(width, height, Graphics::GetDepthStencilFormat(), false, false, false))->
+            GetRenderSurface();
+    }
 }
 
 OcclusionBuffer* Renderer::GetOcclusionBuffer(Camera* camera)
@@ -1360,13 +1384,13 @@ void Renderer::RemoveUnusedBuffers()
         }
     }
     
-    for (HashMap<long long, Vector<SharedPtr<Texture2D> > >::Iterator i = screenBuffers_.Begin(); i != screenBuffers_.End();)
+    for (HashMap<long long, Vector<SharedPtr<Texture> > >::Iterator i = screenBuffers_.Begin(); i != screenBuffers_.End();)
     {
-        HashMap<long long, Vector<SharedPtr<Texture2D> > >::Iterator current = i++;
-        Vector<SharedPtr<Texture2D> >& buffers = current->second_;
+        HashMap<long long, Vector<SharedPtr<Texture> > >::Iterator current = i++;
+        Vector<SharedPtr<Texture> >& buffers = current->second_;
         for (unsigned j = buffers.Size() - 1; j < buffers.Size(); --j)
         {
-            Texture2D* buffer = buffers[j];
+            Texture* buffer = buffers[j];
             if (buffer->GetUseTimer() > MAX_BUFFER_AGE)
             {
                 LOGDEBUG("Removed unused screen buffer size " + String(buffer->GetWidth()) + "x" + String(buffer->GetHeight()) + " format " + String(buffer->GetFormat()));

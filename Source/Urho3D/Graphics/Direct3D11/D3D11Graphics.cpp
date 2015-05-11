@@ -2472,7 +2472,9 @@ void Graphics::PrepareDraw()
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
             impl_->renderTargetViews_[i] = renderTargets_[i] ? (ID3D11RenderTargetView*)renderTargets_[i]->GetRenderTargetView() : 0;
         // If rendertarget 0 is null and not doing depth-only rendering, render to the backbuffer
-        if (!renderTargets_[0] && !depthStencil_)
+        // Special case: if rendertarget 0 is null and depth stencil has same size as backbuffer, assume the intention is to do
+        // backbuffer rendering with a custom depth stencil
+        if (!renderTargets_[0] && (!depthStencil_ || (depthStencil_ && depthStencil_->GetWidth() == width_ && depthStencil_->GetHeight() == height_)))
             impl_->renderTargetViews_[0] = impl_->defaultRenderTargetView_;
         
         impl_->deviceContext_->OMSetRenderTargets(MAX_RENDERTARGETS, &impl_->renderTargetViews_[0], impl_->depthStencilView_);

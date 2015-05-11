@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-
 #include "../Navigation/Obstacle.h"
 
 #include "../Core/Context.h"
@@ -44,13 +42,12 @@ Obstacle::Obstacle(Context* context) :
     radius_(5.0f),
     obstacleId_(0)
 {
-
 }
 
 Obstacle::~Obstacle()
 {
-    if (obstacleId_ > 0 && !ownerMesh_.Expired())
-        ownerMesh_.Get()->RemoveObstacle(this);
+    if (obstacleId_ > 0 && ownerMesh_)
+        ownerMesh_->RemoveObstacle(this);
 }
 
 void Obstacle::RegisterObject(Context* context)
@@ -63,18 +60,12 @@ void Obstacle::RegisterObject(Context* context)
 
 void Obstacle::OnSetEnabled()
 {
-    bool enabled = IsEnabledEffective();
-
     if (ownerMesh_)
     {
-        if (enabled)
-        {
-            ownerMesh_.Get()->AddObstacle(this);
-        }
+        if (IsEnabledEffective())
+            ownerMesh_->AddObstacle(this);
         else
-        {
-            ownerMesh_.Get()->RemoveObstacle(this);
-        }
+            ownerMesh_->RemoveObstacle(this);
     }
 }
 
@@ -103,33 +94,24 @@ void Obstacle::OnNodeSet(Node* node)
             LOGWARNING(GetTypeName() + " should not be created to the root scene node");
             return;
         }
+        if (!ownerMesh_)
+            ownerMesh_ = GetScene()->GetComponent<DynamicNavigationMesh>();
         if (ownerMesh_)
-            return;
-        ownerMesh_ = GetScene()->GetComponent<DynamicNavigationMesh>();
-        if (ownerMesh_)
-        {
-            ownerMesh_.Get()->AddObstacle(this);
-        }
+            ownerMesh_->AddObstacle(this);
     }
 }
 
 void Obstacle::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (IsEnabledEffective())
-    {
+    if (debug && IsEnabledEffective())
         debug->AddCylinder(node_->GetWorldPosition(), radius_, height_, Color(0.0f, 1.0f, 1.0f), depthTest);
-    }
 }
 
 void Obstacle::DrawDebugGeometry(bool depthTest)
 {
     Scene* scene = GetScene();
     if (scene)
-    {
-        DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
-        if (debug)
-            DrawDebugGeometry(debug, depthTest);
-    }
+        DrawDebugGeometry(scene->GetComponent<DebugRenderer>(), depthTest);
 }
 
 }

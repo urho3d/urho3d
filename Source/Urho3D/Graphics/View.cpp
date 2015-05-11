@@ -436,7 +436,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             continue;
         
         // Check if ambient pass and G-buffer rendering happens at the same time
-        if (command.type_ == CMD_SCENEPASS && command.outputNames_.Size() > 1)
+        if (command.type_ == CMD_SCENEPASS && command.outputs_.Size() > 1)
         {
             if (CheckViewportWrite(command))
                 deferredAmbient_ = true;
@@ -590,30 +590,31 @@ void View::Render()
     // Render
     ExecuteRenderPathCommands();
     
-    // After executing all commands, reset rendertarget & state for debug geometry rendering
-    // Use the last rendertarget (before blitting) so that OpenGL deferred rendering can have benefit of proper depth buffer
-    // values; after a blit to backbuffer the same depth buffer would not be available any longer
-    graphics_->SetRenderTarget(0, currentRenderTarget_);
-    for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
-        graphics_->SetRenderTarget(i, (RenderSurface*)0);
-    graphics_->SetDepthStencil(GetDepthStencil(currentRenderTarget_));
-    IntVector2 rtSizeNow = graphics_->GetRenderTargetDimensions();
-    IntRect viewport = (currentRenderTarget_ == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
-        rtSizeNow.y_);
-    graphics_->SetViewport(viewport);
+    // Reset state after commands
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetClipPlane(false);
     graphics_->SetColorWrite(true);
     graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
-    
+
     // Draw the associated debug geometry now if enabled
     if (drawDebug_ && octree_ && camera_)
     {
         DebugRenderer* debug = octree_->GetComponent<DebugRenderer>();
-        if (debug && debug->IsEnabledEffective())
+        if (debug && debug->IsEnabledEffective() && debug->HasContent())
         {
+            // Use the last rendertarget (before blitting) so that OpenGL deferred rendering can have benefit of proper depth buffer
+            // values; after a blit to backbuffer the same depth buffer would not be available any longer
+            graphics_->SetRenderTarget(0, currentRenderTarget_);
+            for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+                graphics_->SetRenderTarget(i, (RenderSurface*)0);
+            graphics_->SetDepthStencil(GetDepthStencil(currentRenderTarget_));
+            IntVector2 rtSizeNow = graphics_->GetRenderTargetDimensions();
+            IntRect viewport = (currentRenderTarget_ == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
+                rtSizeNow.y_);
+            graphics_->SetViewport(viewport);
+
             debug->SetView(camera_);
             debug->Render();
         }
@@ -626,7 +627,7 @@ void View::Render()
     
     // Run framebuffer blitting if necessary
     if (currentRenderTarget_ != renderTarget_)
-        BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()), renderTarget_, true);
+        BlitFramebuffer(currentRenderTarget_->GetParentTexture(), renderTarget_, true);
     
     // "Forget" the scene, camera, octree and zone after rendering
     scene_ = 0;
@@ -1432,7 +1433,7 @@ void View::ExecuteRenderPathCommands()
                 {
                     if (!currentRenderTarget_)
                     {
-                        graphics_->ResolveToTexture(viewportTextures_[0], viewRect_);
+                        graphics_->ResolveToTexture(dynamic_cast<Texture2D*>(viewportTextures_[0]), viewRect_);
                         currentViewportTexture_ = viewportTextures_[0];
                         viewportModified = false;
                     }
@@ -1440,8 +1441,8 @@ void View::ExecuteRenderPathCommands()
                     {
                         if (viewportWrite)
                         {
-                            BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()),
-                                viewportTextures_[0]->GetRenderSurface(), false);
+                            BlitFramebuffer(currentRenderTarget_->GetParentTexture(),
+                                GetRenderSurfaceFromTexture(viewportTextures_[0]), false);
                             currentViewportTexture_ = viewportTextures_[0];
                             viewportModified = false;
                         }
@@ -1450,7 +1451,7 @@ void View::ExecuteRenderPathCommands()
                             // If the current render target is already a texture, and we are not writing to it, can read that
                             // texture directly instead of blitting. However keep the viewport dirty flag in case a later command
                             // will do both read and write, and then we need to blit / resolve
-                            currentViewportTexture_ = static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture());
+                            currentViewportTexture_ = currentRenderTarget_->GetParentTexture();
                         }
                     }
                 }
@@ -1458,7 +1459,7 @@ void View::ExecuteRenderPathCommands()
                 {
                     // Swap the pingpong double buffer sides. Texture 0 will be read next
                     viewportTextures_[1] = viewportTextures_[0];
-                    viewportTextures_[0] = static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture());
+                    viewportTextures_[0] = currentRenderTarget_->GetParentTexture();
                     currentViewportTexture_ = viewportTextures_[0];
                     viewportModified = false;
                 }
@@ -1472,7 +1473,7 @@ void View::ExecuteRenderPathCommands()
             {
                 if (isPingponging)
                 {
-                    currentRenderTarget_ = viewportTextures_[1]->GetRenderSurface();
+                    currentRenderTarget_ = GetRenderSurfaceFromTexture(viewportTextures_[1]);
                     // If the render path ends into a quad, it can be redirected to the final render target
                     // However, on OpenGL we can not reliably do this in case the final target is the backbuffer, and we want to
                     // render depth buffer sensitive debug geometry afterward (backbuffer and textures can not share depth)
@@ -1619,38 +1620,33 @@ void View::SetRenderTargets(RenderPathCommand& command)
     bool useColorWrite = true;
     bool useCustomDepth = false;
 
-    while (index < command.outputNames_.Size())
+    while (index < command.outputs_.Size())
     {
-        if (!command.outputNames_[index].Compare("viewport", false))
+        if (!command.outputs_[index].first_.Compare("viewport", false))
             graphics_->SetRenderTarget(index, currentRenderTarget_);
         else
         {
-            StringHash nameHash(command.outputNames_[index]);
-            if (renderTargets_.Contains(nameHash))
+            Texture* texture = FindNamedTexture(command.outputs_[index].first_, true, false);
+
+            // Check for depth only rendering (by specifying a depth texture as the sole output)
+            if (!index && command.outputs_.Size() == 1 && texture && (texture->GetFormat() ==
+                Graphics::GetReadableDepthFormat() || texture->GetFormat() == Graphics::GetDepthStencilFormat()))
             {
-                Texture2D* texture = renderTargets_[nameHash];
-                // Check for depth only rendering (by specifying a depth texture as the sole output)
-                if (!index && command.outputNames_.Size() == 1 && texture && (texture->GetFormat() ==
-                    Graphics::GetReadableDepthFormat() || texture->GetFormat() == Graphics::GetDepthStencilFormat()))
+                useColorWrite = false;
+                useCustomDepth = true;
+                #if !defined(URHO3D_OPENGL) && !defined(URHO3D_D3D11)
+                // On D3D actual depth-only rendering is illegal, we need a color rendertarget
+                if (!depthOnlyDummyTexture_)
                 {
-                    useColorWrite = false;
-                    useCustomDepth = true;
-                    #ifndef URHO3D_OPENGL
-                    // On D3D actual depth-only rendering is illegal, we need a color rendertarget
-                    if (!depthOnlyDummyTexture_)
-                    {
-                        depthOnlyDummyTexture_ = renderer_->GetScreenBuffer(texture->GetWidth(), texture->GetHeight(),
-                            graphics_->GetDummyColorFormat(), false, false);
-                    }
-                    #endif
-                    graphics_->SetRenderTarget(0, depthOnlyDummyTexture_); 
-                    graphics_->SetDepthStencil(texture);
+                    depthOnlyDummyTexture_ = renderer_->GetScreenBuffer(texture->GetWidth(), texture->GetHeight(),
+                        graphics_->GetDummyColorFormat(), false, false, false);
                 }
-                else
-                    graphics_->SetRenderTarget(index, texture);
+                #endif
+                graphics_->SetRenderTarget(0, GetRenderSurfaceFromTexture(depthOnlyDummyTexture_));
+                graphics_->SetDepthStencil(GetRenderSurfaceFromTexture(texture));
             }
             else
-                graphics_->SetRenderTarget(0, (RenderSurface*)0);
+                graphics_->SetRenderTarget(index, GetRenderSurfaceFromTexture(texture, command.outputs_[index].second_));
         }
         
         ++index;
@@ -1664,18 +1660,18 @@ void View::SetRenderTargets(RenderPathCommand& command)
     
     if (command.depthStencilName_.Length())
     {
-        Texture2D* depthTexture = renderTargets_[StringHash(command.depthStencilName_)];
+        Texture* depthTexture = FindNamedTexture(command.depthStencilName_, true, false);
         if (depthTexture)
         {
             useCustomDepth = true;
-            graphics_->SetDepthStencil(depthTexture);
+            graphics_->SetDepthStencil(GetRenderSurfaceFromTexture(depthTexture));
         }
     }
 
     // When rendering to the final destination rendertarget, use the actual viewport. Otherwise texture rendertargets will be
     // viewport-sized, so they should use their full size as the viewport
     IntVector2 rtSizeNow = graphics_->GetRenderTargetDimensions();
-    IntRect viewport = (graphics_->GetRenderTarget(0) == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
+    IntRect viewport = (currentRenderTarget_ == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
         rtSizeNow.y_);
     
     if (!useCustomDepth)
@@ -1702,36 +1698,19 @@ bool View::SetTextures(RenderPathCommand& command)
             continue;
         }
         
-        // Bind a rendertarget
-        HashMap<StringHash, Texture2D*>::ConstIterator j = renderTargets_.Find(command.textureNames_[i]);
-        if (j != renderTargets_.End())
-        {
-            graphics_->SetTexture(i, j->second_);
-            // Check if the current depth stencil is being sampled
-            if (graphics_->GetDepthStencil() && j->second_ == graphics_->GetDepthStencil()->GetParentTexture())
-                allowDepthWrite = false;
-            continue;
-        }
-        
-        // Bind a texture from the resource system
-        Texture* texture;
-
-        // Detect cube/3D textures by file extension: they are defined by an XML file
-        if (GetExtension(command.textureNames_[i]) == ".xml")
-        {
-            // Assume 3D textures are only bound to the volume map unit, otherwise it's a cube texture
-            #ifdef DESKTOP_GRAPHICS
-            if (i == TU_VOLUMEMAP)
-                texture = cache->GetResource<Texture3D>(command.textureNames_[i]);
-            else
-            #endif
-                texture = cache->GetResource<TextureCube>(command.textureNames_[i]);
-        }
-        else
-            texture = cache->GetResource<Texture2D>(command.textureNames_[i]);
+        #ifdef DESKTOP_GRAPHICS
+        Texture* texture = FindNamedTexture(command.textureNames_[i], false, i == TU_VOLUMEMAP);
+        #else
+        Texture* texture = FindNamedTexture(command.textureNames_[i], false, false);
+        #endif
 
         if (texture)
+        {
             graphics_->SetTexture(i, texture);
+            // Check if the current depth stencil is being sampled
+            if (graphics_->GetDepthStencil() && texture == graphics_->GetDepthStencil()->GetParentTexture())
+                allowDepthWrite = false;
+        }
         else
         {
             // If requesting a texture fails, clear the texture name to prevent redundant attempts
@@ -1804,7 +1783,7 @@ void View::RenderQuad(RenderPathCommand& command)
 
 bool View::IsNecessary(const RenderPathCommand& command)
 {
-    return command.enabled_ && command.outputNames_.Size() && (command.type_ != CMD_SCENEPASS ||
+    return command.enabled_ && command.outputs_.Size() && (command.type_ != CMD_SCENEPASS ||
         !batchQueues_[command.passIndex_].IsEmpty());
 }
 
@@ -1821,9 +1800,9 @@ bool View::CheckViewportRead(const RenderPathCommand& command)
 
 bool View::CheckViewportWrite(const RenderPathCommand& command)
 {
-    for (unsigned i = 0; i < command.outputNames_.Size(); ++i)
+    for (unsigned i = 0; i < command.outputs_.Size(); ++i)
     {
-        if (!command.outputNames_[i].Compare("viewport", false))
+        if (!command.outputs_[i].first_.Compare("viewport", false))
             return true;
     }
     
@@ -1876,7 +1855,7 @@ void View::AllocateScreenBuffers()
             const RenderPathCommand& command = renderPath_->commands_[i];
             if (!IsNecessary(command))
                 continue;
-            if (command.depthStencilName_.Length() && command.outputNames_.Size() && !command.outputNames_[0].Compare("viewport",
+            if (command.depthStencilName_.Length() && command.outputs_.Size() && !command.outputs_[0].first_.Compare("viewport",
                 false))
             {
                 needSubstitute = true;
@@ -1905,11 +1884,11 @@ void View::AllocateScreenBuffers()
                     continue;
                 if (command.depthStencilName_.Length())
                     needSubstitute = true;
-                if (!needSubstitute && command.outputNames_.Size() > 1)
+                if (!needSubstitute && command.outputs_.Size() > 1)
                 {
-                    for (unsigned j = 0; j < command.outputNames_.Size(); ++j)
+                    for (unsigned j = 0; j < command.outputs_.Size(); ++j)
                     {
-                        if (!command.outputNames_[j].Compare("viewport", false))
+                        if (!command.outputs_[j].first_.Compare("viewport", false))
                         {
                             needSubstitute = true;
                             break;
@@ -1981,16 +1960,16 @@ void View::AllocateScreenBuffers()
     // Allocate screen buffers with filtering active in case the quad commands need that
     // Follow the sRGB mode of the destination render target
     bool sRGB = renderTarget_ ? renderTarget_->GetParentTexture()->GetSRGB() : graphics_->GetSRGB();
-    substituteRenderTarget_ = needSubstitute ? renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_, format, true, 
-        sRGB)->GetRenderSurface() : (RenderSurface*)0;
+    substituteRenderTarget_ = needSubstitute ? GetRenderSurfaceFromTexture(renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_,
+        format, false, true, sRGB)) : (RenderSurface*)0;
     for (unsigned i = 0; i < MAX_VIEWPORT_TEXTURES; ++i)
     {
-        viewportTextures_[i] = i < numViewportTextures ? renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_, format, true, sRGB) :
-            (Texture2D*)0;
+        viewportTextures_[i] = i < numViewportTextures ? renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_, format, false, true, sRGB) :
+            (Texture*)0;
     }
     // If using a substitute render target and pingponging, the substitute can act as the second viewport texture
     if (numViewportTextures == 1 && substituteRenderTarget_)
-        viewportTextures_[1] = static_cast<Texture2D*>(substituteRenderTarget_->GetParentTexture());
+        viewportTextures_[1] = substituteRenderTarget_->GetParentTexture();
     
     // Allocate extra render targets defined by the rendering path
     for (unsigned i = 0; i < renderPath_->renderTargets_.Size(); ++i)
@@ -2017,12 +1996,12 @@ void View::AllocateScreenBuffers()
         int intHeight = (int)(height + 0.5f);
         
         // If the rendertarget is persistent, key it with a hash derived from the RT name and the view's pointer
-        renderTargets_[rtInfo.name_] = renderer_->GetScreenBuffer(intWidth, intHeight, rtInfo.format_, rtInfo.filtered_,
+        renderTargets_[rtInfo.name_] = renderer_->GetScreenBuffer(intWidth, intHeight, rtInfo.format_, rtInfo.cubemap_, rtInfo.filtered_,
             rtInfo.sRGB_, rtInfo.persistent_ ? StringHash(rtInfo.name_).Value() + (unsigned)(size_t)this : 0);
     }
 }
 
-void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool depthWrite)
+void View::BlitFramebuffer(Texture* source, RenderSurface* destination, bool depthWrite)
 {
     if (!source)
         return;
@@ -2035,7 +2014,7 @@ void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool d
     IntVector2 destSize = destination ? IntVector2(destination->GetWidth(), destination->GetHeight()) : IntVector2(
         graphics_->GetWidth(), graphics_->GetHeight());
     
-    IntRect srcRect = (source->GetRenderSurface() == renderTarget_) ? viewRect_ : IntRect(0, 0, srcSize.x_, srcSize.y_);
+    IntRect srcRect = (GetRenderSurfaceFromTexture(source) == renderTarget_) ? viewRect_ : IntRect(0, 0, srcSize.x_, srcSize.y_);
     IntRect destRect = (destination == renderTarget_) ? viewRect_ : IntRect(0, 0, destSize.x_, destSize.y_);
     
     graphics_->SetBlendMode(BLEND_REPLACE);
@@ -2958,6 +2937,58 @@ RenderSurface* View::GetDepthStencil(RenderSurface* renderTarget)
     if (!depthStencil)
         depthStencil = renderer_->GetDepthStencil(renderTarget->GetWidth(), renderTarget->GetHeight());
     return depthStencil;
+}
+
+RenderSurface* View::GetRenderSurfaceFromTexture(Texture* texture, CubeMapFace face)
+{
+    if (!texture)
+        return 0;
+
+    if (texture->GetType() == Texture2D::GetTypeStatic())
+        return static_cast<Texture2D*>(texture)->GetRenderSurface();
+    else if (texture->GetType() == TextureCube::GetTypeStatic())
+        return static_cast<TextureCube*>(texture)->GetRenderSurface(face);
+    else
+        return 0;
+}
+
+Texture* View::FindNamedTexture(const String& name, bool isRenderTarget, bool isVolumeMap)
+{
+    // Check rendertargets first
+    StringHash nameHash(name);
+    if (renderTargets_.Contains(nameHash))
+        return renderTargets_[nameHash];
+
+    // Then the resource system
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    // Check existing resources first. This does not load resources, so we can afford to guess the resource type wrong
+    // without having to rely on the file extension
+    Texture* texture = cache->GetExistingResource<Texture2D>(name);
+    if (!texture)
+        texture = cache->GetExistingResource<TextureCube>(name);
+    if (!texture)
+        texture = cache->GetExistingResource<Texture3D>(name);
+    if (texture)
+        return texture;
+
+    // If not a rendertarget (which will never be loaded from a file), finally also try to load the texture
+    // This will log an error if not found; the texture binding will be cleared in that case to not constantly spam the log
+    if (!isRenderTarget)
+    {
+        if (GetExtension(name) == ".xml")
+        {
+            // Assume 3D textures are only bound to the volume map unit, otherwise it's a cube texture
+            #ifdef DESKTOP_GRAPHICS
+            if (isVolumeMap)
+                return cache->GetResource<Texture3D>(name);
+            else
+            #endif
+                return cache->GetResource<TextureCube>(name);
+        }
+        else
+            return cache->GetResource<Texture2D>(name);
+    }
 }
 
 }

@@ -39,7 +39,6 @@ function CreateScene()
     -- Also create a DebugRenderer component so that we can draw debug geometry
     scene_:CreateComponent("Octree")
     scene_:CreateComponent("DebugRenderer")
-    scene_:CreateComponent("PhysicsWorld")
 
     -- Create scene node & StaticModel component for showing a static plane
     local planeNode = scene_:CreateChild("Plane")
@@ -87,7 +86,7 @@ function CreateScene()
     -- Create a DynamicNavigationMesh component to the scene root
     local navMesh = scene_:CreateComponent("DynamicNavigationMesh")
     -- Set nav mesh tilesize to something reasonable
-    navMesh.tileSize = 64;
+    navMesh.tileSize = 64
     -- Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
     -- navigation mesh. By default this is recursive, but the recursion could be turned off from Navigable
     scene_:CreateComponent("Navigable")
@@ -281,7 +280,7 @@ function SpawnJack(pos)
     modelObject.material = cache:GetResource("Material", "Materials/Jack.xml")
     modelObject.castShadows = true
     local agent = jackNode:CreateComponent("CrowdAgent")
-    agent.enabled = false;
+    agent.enabled = false
     table.insert(jackNodes, jackNode)
 end
 
@@ -295,7 +294,7 @@ function CreateMushroom(pos)
     mushroomObject.material = cache:GetResource("Material", "Materials/Mushroom.xml")
     mushroomObject.castShadows = true
     local obstacleObject = mushroomNode:CreateComponent("Obstacle")
-    obstacleObject.radius = 2.5
+    obstacleObject.radius = mushroomNode.scale.x
     table.insert(mushrooms, mushroomNode)
     return mushroomNode
 end

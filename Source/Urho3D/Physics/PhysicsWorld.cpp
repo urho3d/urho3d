@@ -699,7 +699,7 @@ void PhysicsWorld::PostStep(float timeStep)
     SendCollisionEvents();
 
     // Send post-step event
-    using namespace PhysicsPreStep;
+    using namespace PhysicsPostStep;
 
     VariantMap& eventData = GetEventDataMap();
     eventData[P_WORLD] = this;

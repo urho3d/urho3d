@@ -27,28 +27,28 @@
 namespace Urho3D
 {
 
-/// Complete rebuild of navigation mesh
+/// Complete rebuild of navigation mesh.
 EVENT(E_NAVIGATION_MESH_REBUILT, NavigationMeshRebuilt)
 {
     PARAM(P_NODE, Node); // Node pointer
     PARAM(P_MESH, Mesh); // NavigationMesh pointer
 }
 
-/// Partial bounding box rebuild of navigation mesh
+/// Partial bounding box rebuild of navigation mesh.
 EVENT(E_NAVIGATION_AREA_REBUILT, NavigationAreaRebuilt)
 {
     PARAM(P_BOUNDSMIN, BoundsMin); // Vector3
     PARAM(P_BOUNDSMAX, BoundsMax); // Vector3
 }
 
-/// Crowd agent has been repositioned
+/// Crowd agent has been repositioned.
 EVENT(E_CROWD_AGENT_REPOSITION, CrowdAgentReposition)
 {
     PARAM(P_POSITION, Position); // Vector3
     PARAM(P_VELOCITY, Velocity); // Vector3
 }
 
-/// Crowd agent's state has been changed, reached goal
+/// Crowd agent's state has been changed, reached goal.
 EVENT(E_CROWD_AGENT_STATE_CHANGED, CrowdAgentStateChanged)
 {
     PARAM(P_POSITION, Position); // Vector3
@@ -56,7 +56,7 @@ EVENT(E_CROWD_AGENT_STATE_CHANGED, CrowdAgentStateChanged)
     PARAM(P_STATE, State); // int
 }
 
-/// Addition of obstacle to dynamic navigation mesh
+/// Addition of obstacle to dynamic navigation mesh.
 EVENT(E_NAVIGATION_OBSTACLE_ADDED, NavigationObstacleAdded)
 {
     PARAM(P_NODE, Node); // Node pointer
@@ -65,7 +65,7 @@ EVENT(E_NAVIGATION_OBSTACLE_ADDED, NavigationObstacleAdded)
     PARAM(P_HEIGHT, Height); // float
 }
 
-/// Removal of obstacle from dynamic navigation mesh
+/// Removal of obstacle from dynamic navigation mesh.
 EVENT(E_NAVIGATION_OBSTACLE_REMOVED, NavigationObstacleRemoved)
 {
     PARAM(P_NODE, Node); // Node pointer

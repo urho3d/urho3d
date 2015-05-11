@@ -40,7 +40,6 @@ void CreateScene()
     // Also create a DebugRenderer component so that we can draw debug geometry
     scene_.CreateComponent("Octree");
     scene_.CreateComponent("DebugRenderer");
-    scene_.CreateComponent("PhysicsWorld");
 
     // Create scene node & StaticModel component for showing a static plane
     Node@ planeNode = scene_.CreateChild("Plane");
@@ -298,7 +297,7 @@ Node@ CreateMushroom(const Vector3& pos)
     mushroomObject.material = cache.GetResource("Material", "Materials/Mushroom.xml");
     mushroomObject.castShadows = true;
     Obstacle@ obstacleObject = mushroomNode.CreateComponent("Obstacle");
-    obstacleObject.radius = 2.5f;
+    obstacleObject.radius = mushroomNode.scale.x;
     mushroomNodes.Push(mushroomNode);
     
     return mushroomNode;

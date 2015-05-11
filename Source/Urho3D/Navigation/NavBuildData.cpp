@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-
 #include "../Navigation/NavBuildData.h"
 
 #include <Recast/Recast.h>
@@ -33,65 +31,66 @@
 
 namespace Urho3D
 {
-    /// Construct.
-    NavBuildData::NavBuildData() :
-        ctx_(0),
-        heightField_(0),
-        compactHeightField_(0)
-    {
-        ctx_ = new rcContext(true);
-    }
 
-    NavBuildData::~NavBuildData()
-    {
-        if (ctx_)
-            delete(ctx_);
-        rcFreeHeightField(heightField_);
-        rcFreeCompactHeightfield(compactHeightField_);
+NavBuildData::NavBuildData() :
+    ctx_(0),
+    heightField_(0),
+    compactHeightField_(0)
+{
+    ctx_ = new rcContext(true);
+}
 
-        ctx_ = 0;
-        heightField_ = 0;
-        compactHeightField_ = 0;
-    }
+NavBuildData::~NavBuildData()
+{
+    if (ctx_)
+        delete(ctx_);
+    rcFreeHeightField(heightField_);
+    rcFreeCompactHeightfield(compactHeightField_);
 
-    SimpleNavBuildData::SimpleNavBuildData() :
-        NavBuildData(),
-        contourSet_(0),
-        polyMesh_(0),
-        polyMeshDetail_(0)
-    {
-    }
+    ctx_ = 0;
+    heightField_ = 0;
+    compactHeightField_ = 0;
+}
 
-    SimpleNavBuildData::~SimpleNavBuildData()
-    {
-        rcFreeContourSet(contourSet_);
-        rcFreePolyMesh(polyMesh_);
-        rcFreePolyMeshDetail(polyMeshDetail_);
+SimpleNavBuildData::SimpleNavBuildData() :
+    NavBuildData(),
+    contourSet_(0),
+    polyMesh_(0),
+    polyMeshDetail_(0)
+{
+}
 
-        contourSet_ = 0;
-        polyMesh_ = 0;
-        polyMeshDetail_ = 0;
-    }
+SimpleNavBuildData::~SimpleNavBuildData()
+{
+    rcFreeContourSet(contourSet_);
+    rcFreePolyMesh(polyMesh_);
+    rcFreePolyMeshDetail(polyMeshDetail_);
 
-    DynamicNavBuildData::DynamicNavBuildData(dtTileCacheAlloc* allocator) :
-        contourSet_(0),
-        heightFieldLayers_(0),
-        polyMesh_(0),
-        alloc_(allocator)
-    {
-    }
+    contourSet_ = 0;
+    polyMesh_ = 0;
+    polyMeshDetail_ = 0;
+}
 
-    DynamicNavBuildData::~DynamicNavBuildData()
-    {
-        if (contourSet_)
-            dtFreeTileCacheContourSet(alloc_, contourSet_);
-        if (polyMesh_)
-            dtFreeTileCachePolyMesh(alloc_, polyMesh_);
-        if (heightFieldLayers_)
-            rcFreeHeightfieldLayerSet(heightFieldLayers_);
+DynamicNavBuildData::DynamicNavBuildData(dtTileCacheAlloc* allocator) :
+    contourSet_(0),
+    heightFieldLayers_(0),
+    polyMesh_(0),
+    alloc_(allocator)
+{
+}
 
-        contourSet_ = 0;
-        polyMesh_ = 0;
-        heightFieldLayers_ = 0;
-    }
+DynamicNavBuildData::~DynamicNavBuildData()
+{
+    if (contourSet_)
+        dtFreeTileCacheContourSet(alloc_, contourSet_);
+    if (polyMesh_)
+        dtFreeTileCachePolyMesh(alloc_, polyMesh_);
+    if (heightFieldLayers_)
+        rcFreeHeightfieldLayerSet(heightFieldLayers_);
+
+    contourSet_ = 0;
+    polyMesh_ = 0;
+    heightFieldLayers_ = 0;
+}
+
 }

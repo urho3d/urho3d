@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-
 #include "../Core/Context.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Scene/Component.h"
@@ -32,7 +30,6 @@ namespace Urho3D
 {
     static const Vector3 DEFAULT_BOUNDING_BOX_MIN(-10.0f, -10.0f, -10.0f);
     static const Vector3 DEFAULT_BOUNDING_BOX_MAX(10.0f, 10.0f, 10.0f);
-    static const unsigned DEFAULT_MASK_FLAG = 0;
     static const unsigned DEFAULT_AREA = 0;
 
     extern const char* NAVIGATION_CATEGORY;
@@ -42,12 +39,10 @@ namespace Urho3D
         areaType_(0),
         boundingBox_(DEFAULT_BOUNDING_BOX_MIN, DEFAULT_BOUNDING_BOX_MAX)
     {
-
     }
 
     NavArea::~NavArea()
     {
-
     }
     
     void NavArea::RegisterObject(Context* context)

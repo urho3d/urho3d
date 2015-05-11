@@ -7573,6 +7573,7 @@ class RenderPathCommand
 {
 // Methods:
 void RemoveShaderParameter(const String&);
+void SetOutput(uint, const String&, CubeMapFace = FACE_POSITIVE_X);
 
 // Properties:
 Color clearColor;
@@ -7584,6 +7585,7 @@ bool enabled;
 bool markToStencil;
 String metadata;
 uint numOutputs;
+Array<CubeMapFace> outputFaces;
 Array<String> outputNames;
 String pass;
 String pixelShaderDefines;
@@ -7625,6 +7627,7 @@ class RenderTargetInfo
 {
 
 // Properties:
+bool cubemap;
 bool enabled;
 bool filtered;
 uint format;
@@ -7741,6 +7744,8 @@ bool AddPackageFile(const String&, uint = M_MAX_UNSIGNED);
 bool AddResourceDir(const String&, uint = M_MAX_UNSIGNED);
 bool BackgroundLoadResource(const String&, const String&, bool = true);
 bool Exists(const String&) const;
+Resource GetExistingResource(StringHash, const String&);
+Resource GetExistingResource(const String&, const String&);
 File GetFile(const String&);
 String GetPreferredResourceDir(const String&) const;
 Resource GetResource(StringHash, const String&, bool = true);
@@ -13136,6 +13141,9 @@ uint AM_NODEIDVECTOR;
 uint AM_NOEDIT;
 Color BLACK;
 Color BLUE;
+uint CLEAR_COLOR;
+uint CLEAR_DEPTH;
+uint CLEAR_STENCIL;
 int CONTROLLER_AXIS_LEFTX;
 int CONTROLLER_AXIS_LEFTY;
 int CONTROLLER_AXIS_RIGHTX;

@@ -360,7 +360,12 @@ void Input::Update()
     #endif
 
     // Check for relative mode mouse move
+    // Note that Emscripten will use SDL mouse move events for relative mode instead
+    #ifndef EMSCRIPTEN
+    if (!touchEmulation_ && (graphics_->GetExternalWindow() || (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))))
+    #else
     if (!touchEmulation_ && mouseMode_ != MM_RELATIVE && (graphics_->GetExternalWindow() || (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))))
+    #endif
     {
         IntVector2 mousePosition = GetMousePosition();
         mouseMove_ = mousePosition - lastMousePosition_;
@@ -407,21 +412,6 @@ void Input::Update()
             }
         }
     }
-
-    #ifndef EMSCRIPTEN
-    if (mouseMode_ == MM_RELATIVE)
-    {
-        IntVector2 mousePosition = GetMousePosition();
-        IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-        if (graphics_->GetExternalWindow())
-            lastMousePosition_ = mousePosition;
-        else if (mousePosition != center)
-        {
-            SetMousePosition(center);
-            lastMousePosition_ = center;
-        }
-    }
-    #endif
 }
 
 void Input::SetMouseVisible(bool enable, bool suppressEvent)
@@ -1578,7 +1568,13 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
 
     case SDL_MOUSEMOTION:
+        // Emscripten will use SDL mouse move events for relative mode, as repositioning the mouse and
+        // measuring distance from window center is not supported
+        #ifndef EMSCRIPTEN
+        if (mouseVisible_ && !touchEmulation_)
+        #else
         if ((mouseVisible_ || mouseMode_ == MM_RELATIVE) && !touchEmulation_)
+        #endif
         {
             mouseMove_.x_ += evt.motion.xrel;
             mouseMove_.y_ += evt.motion.yrel;

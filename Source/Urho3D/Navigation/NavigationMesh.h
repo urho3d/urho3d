@@ -28,7 +28,6 @@
 #include "../Container/HashSet.h"
 #include "../Math/Matrix3x4.h"
 
-
 class dtNavMesh;
 class dtNavMeshQuery;
 class dtQueryFilter;
@@ -40,7 +39,6 @@ struct rcContourSet;
 struct rcPolyMesh;
 struct rcPolyMeshDetail;
 struct rcHeightFieldLayerSet;
-
 
 namespace Urho3D
 {
@@ -121,7 +119,7 @@ public:
     virtual bool Build(const BoundingBox& boundingBox);
     /// Find the nearest point on the navigation mesh to a given point. Extens specifies how far out from the specified point to check along each axis.
     Vector3 FindNearestPoint(const Vector3& point, const Vector3& extents=Vector3::ONE);
-    /// Try to move along the surface from one point to another
+    /// Try to move along the surface from one point to another.
     Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents=Vector3::ONE, int maxVisited=3);
     /// Find a path between world space points. Return non-empty list of points if successful. Extents specifies how far off the navigation mesh the points can be.
     void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
@@ -135,12 +133,12 @@ public:
     Vector3 Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
-    /// Sets the cost of an area
+    /// Set the cost of an area.
     void SetAreaTypeCost(unsigned areaType, float cost);
 
-    ///    Return the given name of this navigation mesh
+    /// Return the given name of this navigation mesh.
     String GetMeshName() const { return meshName_; }
-    /// Set the name of this navigation mesh
+    /// Set the name of this navigation mesh.
     void SetMeshName(const String& newName);
     /// Return tile size.
     int GetTileSize() const { return tileSize_; }
@@ -179,10 +177,10 @@ public:
     /// Return number of tiles.
     IntVector2 GetNumTiles() const { return IntVector2(numTilesX_, numTilesZ_); }
 
-    /// Sets the partition type used for polygon generation
+    /// Set the partition type used for polygon generation.
     void SetPartitionType(NavmeshPartitionType aType);
     /// Return Partition Type.
-    NavmeshPartitionType GetPartitionType() const;
+    NavmeshPartitionType GetPartitionType() const { return partitionType_; }
 
     /// Set navigation data attribute.
     virtual void SetNavigationDataAttr(const PODVector<unsigned char>& value);
@@ -205,7 +203,7 @@ protected:
     /// Release the navigation mesh and the query.
     virtual void ReleaseNavigationMesh();
 
-    /// Identifying name for this navigation mesh
+    /// Identifying name for this navigation mesh.
     String meshName_;
     /// Detour navigation mesh.
     dtNavMesh* navMesh_;
@@ -252,9 +250,9 @@ protected:
 
     /// Type of the heightfield partitioning.
     NavmeshPartitionType partitionType_;
-    /// keep internal build resources for debug draw modes.
+    /// Keep internal build resources for debug draw modes.
     bool keepInterResults_;
-    /// internal build resources for creating the navmesh.
+    /// Internal build resources for creating the navmesh.
     HashMap<Pair<int, int>, NavBuildData*> builds_;
 };
 

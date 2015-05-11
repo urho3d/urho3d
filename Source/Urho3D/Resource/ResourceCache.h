@@ -141,6 +141,8 @@ public:
     unsigned GetNumBackgroundLoadResources() const;
     /// Return all loaded resources of a specific type.
     void GetResources(PODVector<Resource*>& result, StringHash type) const;
+    /// Return an already loaded resource of specific type & name, or null if not found. Will not load if does not exist.
+    Resource* GetExistingResource(StringHash type, const String& name);
     /// Return all loaded resources.
     const HashMap<StringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
     /// Return added resource load directories.
@@ -149,6 +151,8 @@ public:
     const Vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
     /// Template version of returning a resource by name.
     template <class T> T* GetResource(const String& name, bool sendEventOnFailure = true);
+    /// Template version of returning an existing resource by name.
+    template <class T> T* GetExistingResource(const String& name);
     /// Template version of loading a resource without storing it to the cache.
     template <class T> SharedPtr<T> GetTempResource(const String& name, bool sendEventOnFailure = true);
     /// Template version of queueing a resource background load.
@@ -228,6 +232,12 @@ private:
     /// How many milliseconds maximum per frame to spend on finishing background loaded resources.
     int finishBackgroundResourcesMs_;
 };
+
+template <class T> T* ResourceCache::GetExistingResource(const String& name)
+{
+    StringHash type = T::GetTypeStatic();
+    return static_cast<T*>(GetExistingResource(type, name));
+}
 
 template <class T> T* ResourceCache::GetResource(const String& name, bool sendEventOnFailure)
 {

@@ -1463,8 +1463,13 @@ elseif (EMSCRIPTEN)
     endif ()
 elseif (NOT CMAKE_CROSSCOMPILING AND NOT CMAKE_HOST_WIN32 AND "$ENV{USE_CCACHE}")
     # Warn user if PATH environment variable has not been correctly set for using ccache
-    execute_process (COMMAND whereis -b ccache COMMAND grep -o \\S*lib\\S* RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (EXIT_CODE EQUAL 0 AND NOT ${CMAKE_C_COMPILER} MATCHES ${CCACHE_SYMLINK})
+    if (APPLE)
+        set (WHEREIS brew info ccache)
+    else ()
+        set (WHEREIS whereis -b ccache)
+    endif ()
+    execute_process (COMMAND ${WHEREIS} COMMAND grep -o \\S*lib\\S* RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (EXIT_CODE EQUAL 0 AND NOT $ENV{PATH} MATCHES "${CCACHE_SYMLINK}")  # Need to stringify because CCACHE_SYMLINK variable could be empty when the command failed
         message (WARNING "The lib directory containing the ccache symlinks (${CCACHE_SYMLINK}) has not been added in the PATH environment variable. "
             "This is required to enable ccache support for native compiler toolchain. CMake has been configured to use the actual compiler toolchain instead of ccache. "
             "In order to rectify this, the build tree must be regenerated after the PATH environment variable has been adjusted accordingly.")

@@ -27,55 +27,58 @@
 
 namespace Urho3D
 {
-    class DynamicNavigationMesh;
 
-    class URHO3D_API Obstacle : public Component
-    {
-        OBJECT(Obstacle)
-        friend class DynamicNavigationMesh;
+class DynamicNavigationMesh;
 
-    public:
-        /// Construct
-        Obstacle(Context*);
-        /// Destruct
-        virtual ~Obstacle();
+/// Obstacle for dynamic navigation mesh.
+class URHO3D_API Obstacle : public Component
+{
+    OBJECT(Obstacle)
+    friend class DynamicNavigationMesh;
 
-        /// Register Obstacle with engine context
-        static void RegisterObject(Context*);
+public:
+    /// Construct.
+    Obstacle(Context*);
+    /// Destruct.
+    virtual ~Obstacle();
 
-        /// Updates the owning mesh when enabled status has changed
-        virtual void OnSetEnabled();
+    /// Register Obstacle with engine context.
+    static void RegisterObject(Context*);
 
-        /// Gets the height of this obstacle
-        float GetHeight() const { return height_; }
-        /// Sets the height of this obstacle
-        void SetHeight(float);
-        /// Gets the blocking radius of this obstacle
-        float GetRadius() const { return radius_; }
-        /// Sets the blocking radius of this obstacle
-        void SetRadius(float);
+    /// Update the owning mesh when enabled status has changed.
+    virtual void OnSetEnabled();
 
-        /// Gets the internal obstacle ID
-        unsigned GetObstacleID() const { return obstacleId_; }
+    /// Get the height of this obstacle.
+    float GetHeight() const { return height_; }
+    /// Set the height of this obstacle.
+    void SetHeight(float);
+    /// Get the blocking radius of this obstacle.
+    float GetRadius() const { return radius_; }
+    /// Set the blocking radius of this obstacle.
+    void SetRadius(float);
 
-        /// Render debug information
-        virtual void DrawDebugGeometry(DebugRenderer*, bool depthTest);
-        /// Simplified rendering of debug information for script usage
-        void DrawDebugGeometry(bool depthTest);
+    /// Get the internal obstacle ID.
+    unsigned GetObstacleID() const { return obstacleId_; }
 
-    protected:
-        /// Handle node being assigned, identify our DynamicNavigationMesh
-        virtual void OnNodeSet(Node* node);
+    /// Render debug information.
+    virtual void DrawDebugGeometry(DebugRenderer*, bool depthTest);
+    /// Simplified rendering of debug information for script usage.
+    void DrawDebugGeometry(bool depthTest);
 
-    private:
-        /// radius of this obstacle
-        float radius_;
-        /// height of this obstacle, extends 1/2 height below and 1/2 height above the owning node's position
-        float height_;
+protected:
+    /// Handle node being assigned, identify our DynamicNavigationMesh.
+    virtual void OnNodeSet(Node* node);
 
-        /// id received from tile cache
-        unsigned obstacleId_;
-        /// pointer to the navigation mesh we belong to
-        WeakPtr<DynamicNavigationMesh> ownerMesh_;
-    };
+private:
+    /// Radius of this obstacle.
+    float radius_;
+    /// Height of this obstacle, extends 1/2 height below and 1/2 height above the owning node's position.
+    float height_;
+
+    /// Id received from tile cache.
+    unsigned obstacleId_;
+    /// Pointer to the navigation mesh we belong to.
+    WeakPtr<DynamicNavigationMesh> ownerMesh_;
+};
+
 }

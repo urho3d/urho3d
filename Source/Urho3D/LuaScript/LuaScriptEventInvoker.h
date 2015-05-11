@@ -30,6 +30,7 @@ namespace Urho3D
 class LuaFunction;
 class LuaScriptInstance;
 
+/// Lua script event invoker.
 class LuaScriptEventInvoker : public Object
 {
     OBJECT(LuaScriptEventInvoker);

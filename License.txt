@@ -1,4 +1,4 @@
-﻿Urho3D license
+Urho3D license
 --------------
 
 Copyright (c) 2008-2015 the Urho3D project.
