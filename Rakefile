@@ -195,17 +195,6 @@ task :ci do
   if ENV['CI'] && ENV['PACKAGE_UPLOAD'] && !ENV['RELEASE_TAG']
     system 'git fetch --unshallow' or abort 'Failed to unshallow cloned repository'
   end
-  # Use internal cache store instead of using Travis CI one (this is a workaround for using ccache on Travis CI legacy build infra)
-  if ENV['USE_CCACHE'].to_i == 2
-    puts 'Setting up build cache'
-    job_number = ".#{ENV['TRAVIS_JOB_NUMBER'].split('.')[1]}"
-    repo_slug = "#{ENV['TRAVIS_REPO_SLUG'].split('/')[0]}/cache-store.git"
-    # Do not abort even when it fails here
-    system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi && ccache -z -M 100M"
-    puts "\n"
-  end
-  # Clear ccache on demand
-  system 'ccache -C' if /\[ccache clear\]/ =~ ENV['COMMIT_MESSAGE']
   # Packaging always use Release configuration
   if ENV['PACKAGE_UPLOAD']
     $configuration = 'Release'
@@ -231,17 +220,45 @@ task :ci do
     # GCC or Clang
     makefile_ci
   end
-  # Upload cache to internal cache store
+end
+
+# Usage: NOT intended to be used manually
+desc 'Setup build cache'
+task :ci_setup_cache do
+  # Use internal cache store instead of using Travis CI one (this is a workaround for using ccache on Travis CI legacy build infra)
   if ENV['USE_CCACHE'].to_i == 2
-    puts "\nStoring build cache"
+    puts 'Setting up build cache'
+    job_number = ".#{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"
+    repo_slug = "#{ENV['TRAVIS_REPO_SLUG'].split('/').first}/cache-store.git"
+    matched = /.*-([^-]+-[^-]+)$/.match(ENV['TRAVIS_BRANCH'])
+    base_name = matched ? matched[1] : nil
+    # Do not abort even when it fails here
+    system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then if ! [ #{base_name} ] || ! `git clone -q --depth 1 --branch #{base_name}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null; fi && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi"
+  end
+  system 'ccache -z -M 100M'
+  # Clear ccache on demand
+  system 'ccache -C' if /\[ccache clear\]/ =~ ENV['COMMIT_MESSAGE']
+end
+
+# Usage: NOT intended to be used manually
+desc 'Teardown build cache'
+task :ci_teardown_cache do
+  # Upload cache to internal cache store if it is our own
+  if ENV['USE_CCACHE'].to_i == 2
+    puts 'Storing build cache'
+    job_number = ".#{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"
+    repo_slug = "#{ENV['TRAVIS_REPO_SLUG'].split('/').first}/cache-store.git"
     # Do not abort even when it fails here
     system "cd ~/.ccache && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/#{repo_slug} && git add -A . && git commit --amend -qm 'Travis CI: cache update at #{Time.now.utc}.' && git push -qf -u origin #{ENV['TRAVIS_BRANCH']}#{job_number} >/dev/null 2>&1"
   end
+  system 'ccache -s'
 end
 
 # Usage: NOT intended to be used manually
 desc 'Update site documentation to GitHub Pages'
 task :ci_site_update do
+  # Skip when :ci rake task was skipped
+  next unless Dir.exists?('../Build')
   # Pull or clone
   system 'cd ../doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../doc-Build' or abort 'Failed to pull/clone'
   # Update credits from README.md to about.md
@@ -259,19 +276,19 @@ task :ci_site_update do
   system "cd ../Build && make -j$NUMJOBS doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' Docs/html/_*.html && rsync -a --delete Docs/html/ ../doc-Build/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
   # Supply GIT credentials and push site documentation to urho3d/urho3d.github.io.git
   system "cd ../doc-Build && pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -qm \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
-  # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
-  if ENV['PACKAGE_UPLOAD']
-    instruction = 'skip'
-  else
-    instruction = 'package'
-  end
-  if !ENV['RELEASE_TAG']
+  unless ENV['RELEASE_TAG'] || `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD` != ENV['TRAVIS_COMMIT']
+    # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
+    if ENV['PACKAGE_UPLOAD']
+      instruction = 'skip'
+    else
+      instruction = 'package'
+    end
     # Supply GIT credentials and push API documentation to urho3d/Urho3D.git (the push may not be successful if remote master has already diverged)
     system 'pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git add Docs/*API*'
     if system("git commit -qm 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'") && !ENV['PACKAGE_UPLOAD']
       bump_soversion 'Source/Urho3D/.soversion' or abort 'Failed to bump soversion'
       system "git add Source/Urho3D/.soversion && git commit --amend -qm 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'" or abort 'Failed to stage .soversion file'
-      system 'git push origin HEAD:master -q >/dev/null 2>&1' or abort 'Failed to update API documentation, most likely due to remote master has diverged, the API documentation update will be performed again in the subsequent CI build'
+      system 'git push origin HEAD:master -q >/dev/null 2>&1' or abort 'Failed to update API documentation'
     end
   end
 end
@@ -317,6 +334,8 @@ end
 # Usage: NOT intended to be used manually
 desc 'Make binary package and upload it to a designated central hosting server'
 task :ci_package_upload do
+  # Skip when :ci rake task was skipped
+  next unless Dir.exists?('../Build')
   if ENV['XCODE']
     $configuration = 'Release'
     $testing = 0
