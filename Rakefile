@@ -232,7 +232,7 @@ task :ci_setup_cache do
     matched = /.*-([^-]+-[^-]+)$/.match(ENV['TRAVIS_BRANCH'])
     base_name = matched ? matched[1] : nil
     # Do not abort even when it fails here
-    system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then if ! `git clone -q --depth 1 --branch #{base_name}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi; fi"
+    system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then if ! [ #{base_name} ] || ! `git clone -q --depth 1 --branch #{base_name}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null; fi && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi"
   end
   system 'ccache -z -M 100M'
   # Clear ccache on demand
