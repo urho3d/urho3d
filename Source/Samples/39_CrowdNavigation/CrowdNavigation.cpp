@@ -300,7 +300,7 @@ void CrowdNavigation::MoveCamera(float timeStep)
             mushroomNodes_.Push(SharedPtr<Node>(nodes[i]));
         }
     }
-        
+    
     // Toggle debug geometry with space
     if (input->GetKeyPress(KEY_SPACE))
         drawDebug_ = !drawDebug_;

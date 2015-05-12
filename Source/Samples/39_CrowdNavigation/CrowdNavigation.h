@@ -158,9 +158,9 @@ private:
     /// Path end position.
     Vector3 endPos_;
     /// Jack scene node.
-    Vector< SharedPtr<Node> > jackNodes_;
+    Vector<SharedPtr<Node> > jackNodes_;
     /// Mushroom nodes
-    Vector< Node* > mushroomNodes_;
+    Vector<Node*> mushroomNodes_;
     /// Flag for drawing debug geometry.
     bool drawDebug_;
 };

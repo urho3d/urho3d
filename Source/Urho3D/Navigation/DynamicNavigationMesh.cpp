@@ -361,7 +361,7 @@ bool DynamicNavigationMesh::Build()
             for (int x = 0; x < numTilesX_; ++x)
                 tileCache_->buildNavMeshTilesAt(x, z, navMesh_);
         }
-            
+        
         // For a full build it's necessary to update the nav mesh
         // not doing so will cause dependent components to crash, like DetourCrowdManager
         tileCache_->update(0, navMesh_);
@@ -732,7 +732,7 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
             return 0;
         }
     }
-        
+    
     build.heightFieldLayers_ = rcAllocHeightfieldLayerSet();
     if (!build.heightFieldLayers_)
     {

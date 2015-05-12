@@ -403,7 +403,7 @@ void DetourCrowdManager::Update(float delta)
         return;
 
     PROFILE(UpdateCrowd);
-        
+    
     crowd_->update(delta, agentDebug_);
 
     memset(&agentBuffer_[0], 0, maxAgents_ * sizeof(dtCrowdAgent*));
@@ -472,13 +472,12 @@ void DetourCrowdManager::OnNodeSet(Node* node)
     {
         SubscribeToEvent(node, E_SCENESUBSYSTEMUPDATE, HANDLER(DetourCrowdManager, HandleSceneSubsystemUpdate));
         SubscribeToEvent(node, E_NAVIGATION_MESH_REBUILT, HANDLER(DetourCrowdManager, HandleNavMeshFullRebuild));
-            
+        
         NavigationMesh* mesh = GetScene()->GetComponent<NavigationMesh>();
         if (!mesh)
             mesh = GetScene()->GetComponent<DynamicNavigationMesh>();
-        if (mesh) {
+        if (mesh)
             SetNavigationMesh(mesh);
-        }
         else
             LOGERROR("DetourCrowdManager requires an existing navigation mesh");
     }

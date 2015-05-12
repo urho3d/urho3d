@@ -110,7 +110,7 @@ void CrowdAgent::OnNodeSet(Node* node)
         if (scene)
         {
             if (scene == node)
-                LOGERROR(GetTypeName() + " should not be created to the root scene node");        
+                LOGERROR(GetTypeName() + " should not be created to the root scene node");
             crowdManager_ = scene->GetOrCreateComponent<DetourCrowdManager>();
             AddAgentToCrowd();
         }
@@ -301,7 +301,7 @@ void CrowdAgent::SetHeight(float height)
 
 void CrowdAgent::SetNavigationQuality(NavigationQuality val)
 {
-    navQuality_=val;
+    navQuality_ = val;
     if(crowdManager_ && inCrowd_)
     {
         crowdManager_->UpdateAgentNavigationQuality(this, navQuality_);
@@ -311,7 +311,7 @@ void CrowdAgent::SetNavigationQuality(NavigationQuality val)
 
 void CrowdAgent::SetNavigationPushiness(NavigationPushiness val)
 {
-    navPushiness_=val;
+    navPushiness_ = val;
     if(crowdManager_ && inCrowd_)
     {
         crowdManager_->UpdateAgentPushiness(this, navPushiness_);
@@ -491,7 +491,8 @@ void CrowdAgent::SetAgentDataAttr(const PODVector<unsigned char>& value)
 
 void CrowdAgent::OnMarkedDirty(Node* node)
 {
-    if (inCrowd_ && crowdManager_ && !ignoreTransformChanges_ && IsEnabledEffective()) {
+    if (inCrowd_ && crowdManager_ && !ignoreTransformChanges_ && IsEnabledEffective())
+    {
         dtCrowdAgent* agt = crowdManager_->GetCrowd()->getEditableAgent(agentCrowdId_);
         if (agt)
         {
