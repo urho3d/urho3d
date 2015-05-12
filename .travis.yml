@@ -113,7 +113,7 @@ before_script:
 script: rake ci
 after_script:
   - rake ci_teardown_cache
-  - if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ]; then rake ci_create_mirrors; fi
+  - if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_create_mirrors; fi
 notifications: {email: {on_success: never, on_failure: change}}
 
 ---

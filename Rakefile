@@ -231,9 +231,9 @@ task :ci_setup_cache do
     job_number = ".#{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"
     repo_slug = "#{ENV['TRAVIS_REPO_SLUG'].split('/').first}/cache-store.git"
     matched = /.*-([^-]+-[^-]+)$/.match(ENV['TRAVIS_BRANCH'])
-    base_name = matched ? matched[1] : nil
+    base_mirror = matched ? matched[1] : nil
     # Do not abort even when it fails here
-    system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then if ! [ #{base_name} ] || ! `git clone -q --depth 1 --branch #{base_name}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null; fi && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi"
+    system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then if ! [ #{base_mirror} ] || ! `git clone -q --depth 1 --branch #{base_mirror}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null; fi && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi"
   end
   system 'ccache -z -M 100M'
   # Clear ccache on demand
@@ -276,19 +276,19 @@ task :ci_site_update do
   system "cd ../Build && make -j$NUMJOBS doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' Docs/html/_*.html && rsync -a --delete Docs/html/ ../doc-Build/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
   # Supply GIT credentials and push site documentation to urho3d/urho3d.github.io.git
   system "cd ../doc-Build && pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -qm \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update site'
-  unless ENV['RELEASE_TAG'] || `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD` != ENV['TRAVIS_COMMIT']
+  unless ENV['RELEASE_TAG'] || `git fetch -qf origin #{ENV['TRAVIS_BRANCH']}; git log -1 --pretty=format:'%H' FETCH_HEAD` != ENV['TRAVIS_COMMIT']
     # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
     if ENV['PACKAGE_UPLOAD']
       instruction = 'skip'
     else
       instruction = 'package'
     end
-    # Supply GIT credentials and push API documentation to urho3d/Urho3D.git (the push may not be successful if remote master has already diverged)
+    # Supply GIT credentials and push API documentation to urho3d/Urho3D.git
     system 'pwd && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git add Docs/*API*'
     if system("git commit -qm 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'") && !ENV['PACKAGE_UPLOAD']
       bump_soversion 'Source/Urho3D/.soversion' or abort 'Failed to bump soversion'
       system "git add Source/Urho3D/.soversion && git commit --amend -qm 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci #{instruction}]'" or abort 'Failed to stage .soversion file'
-      system 'git push origin HEAD:master -q >/dev/null 2>&1' or abort 'Failed to update API documentation'
+      system "git push origin HEAD:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1" or abort 'Failed to update API documentation'
     end
   end
 end
@@ -310,7 +310,7 @@ end
 desc 'Create all CI mirror branches'
 task :ci_create_mirrors do
   # Skip if there are more commits since this one
-  abort 'Skipped creating mirror branches due to moving HEAD' unless `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD` == ENV['TRAVIS_COMMIT']
+  abort 'Skipped creating mirror branches due to moving HEAD' unless `git fetch -qf origin #{ENV['TRAVIS_PULL_REQUEST'] == 'false' ? ENV['TRAVIS_BRANCH'] : %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST']}/head'}}; git log -1 --pretty=format:'%H' FETCH_HEAD` == ENV['TRAVIS_COMMIT']
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
   scan = ENV['PACKAGE_UPLOAD'] || /\[ci scan\]/ =~ ENV['COMMIT_MESSAGE']  # Limit the frequency of scanning
   matched = /\[ci only:(.*?)\]/.match(ENV['COMMIT_MESSAGE'])
@@ -326,7 +326,9 @@ end
 desc 'Delete CI mirror branch'
 task :ci_delete_mirror do
   # Skip if there are more commits since this one or if this is a release build
-  abort "Skipped deleting #{ENV['TRAVIS_BRANCH']} mirror branch ('%s' vs '%s', %s, '%s')" % [`git log -1 --pretty=format:'%H' FETCH_HEAD`, `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp, (`git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp).to_s, ENV['RELEASE_TAG']] unless `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp && !ENV['RELEASE_TAG']
+  matched = /(.*)-[^-]+-[^-]+$/.match(ENV['TRAVIS_BRANCH'])
+  base_branch= matched ? matched[1] : 'master'  # Assume 'master' is the default branch name
+  abort "Skipped deleting #{ENV['TRAVIS_BRANCH']} mirror branch ('%s' vs '%s', %s, '%s')" % [`git log -1 --pretty=format:'%H' FETCH_HEAD`, `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp, (`git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp).to_s, ENV['RELEASE_TAG']] unless `git fetch -qf origin #{/^PR #/ =~ base_branch ? %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST']}/merge'} : base_branch}; git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp && !ENV['RELEASE_TAG']
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
   system "git push -qf origin --delete #{ENV['TRAVIS_BRANCH']}" or abort "Failed to delete #{ENV['TRAVIS_BRANCH']} mirror branch"
 end
