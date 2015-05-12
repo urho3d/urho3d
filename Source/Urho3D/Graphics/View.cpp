@@ -2989,6 +2989,8 @@ Texture* View::FindNamedTexture(const String& name, bool isRenderTarget, bool is
         else
             return cache->GetResource<Texture2D>(name);
     }
+
+    return 0;
 }
 
 }
