@@ -2617,7 +2617,7 @@ unsigned Graphics::GetRGFloat32Format()
 unsigned Graphics::GetFloat16Format()
 {
     #ifndef GL_ES_VERSION_2_0
-    return GL_LUMINANCE16F_ARB;
+    return GL_R16F;
     #else
     return GL_LUMINANCE;
     #endif
@@ -2626,7 +2626,7 @@ unsigned Graphics::GetFloat16Format()
 unsigned Graphics::GetFloat32Format()
 {
     #ifndef GL_ES_VERSION_2_0
-    return GL_LUMINANCE32F_ARB;
+    return GL_R32F;
     #else
     return GL_LUMINANCE;
     #endif
