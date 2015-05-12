@@ -1843,10 +1843,10 @@ Methods:
 - bool CreateCrowd()
 - void SetNavigationMesh(NavigationMesh* navMesh)
 - void SetMaxAgents(unsigned agentCt)
-- void SetAreaTypeCost(unsigned filterID, unsigned areaType, float cost)
+- void SetAreaCost(unsigned filterID, unsigned areaID, float cost)
 - NavigationMesh* GetNavigationMesh()
 - unsigned GetMaxAgents() const
-- float GetAreaTypeCost(unsigned filterID, unsigned areaType) const
+- float GetAreaCost(unsigned filterID, unsigned areaID) const
 - unsigned GetAgentCount() const
 
 Properties:
@@ -3293,15 +3293,15 @@ Properties:
 
 Methods:
 
-- unsigned GetAreaType() const
-- void SetAreaType(unsigned tolua_var_3)
+- unsigned GetAreaID() const
+- void SetAreaID(unsigned tolua_var_3)
 - BoundingBox GetBoundingBox()
 - void SetBoundingBox(const BoundingBox& bnds)
 - BoundingBox GetWorldBoundingBox() const
 
 Properties:
 
-- unsigned areaType
+- unsigned areaID
 - BoundingBox boundingBox
 - BoundingBox worldBoundingBox (readonly)
 
@@ -3347,6 +3347,7 @@ Methods:
 - void SetDetailSampleDistance(float distance)
 - void SetDetailSampleMaxError(float error)
 - void SetPadding(const Vector3& padding)
+- void SetAreaCost(unsigned areaID, float cost)
 - bool Build()
 - bool Build(const BoundingBox& boundingBox)
 - Vector3 FindNearestPoint(const Vector3& point)
@@ -3377,6 +3378,7 @@ Methods:
 - float GetDetailSampleDistance() const
 - float GetDetailSampleMaxError() const
 - const Vector3& GetPadding() const
+- float GetAreaCost(unsigned areaID) const
 - bool IsInitialized() const
 - const BoundingBox& GetBoundingBox() const
 - BoundingBox GetWorldBoundingBox() const
