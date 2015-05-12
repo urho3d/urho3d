@@ -119,7 +119,7 @@ script:
   - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; if [ $LINUX ] && [ ! "$URHO3D_64BIT" == "0" ]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi
 after_script:
   - rake ci_teardown_cache
-  - if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ]; then rake ci_create_mirrors; fi
+  - if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_create_mirrors; fi
 notifications: {email: {on_success: never, on_failure: change}}
 
 ---
