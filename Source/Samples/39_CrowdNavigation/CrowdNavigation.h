@@ -150,6 +150,8 @@ private:
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle the post-render update event.
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle problems with crowd agent placement.
+    void HandleCrowdAgentFailure(StringHash eventType, VariantMap& eventData);
 
     /// Last calculated path.
     PODVector<Vector3> currentPath_;

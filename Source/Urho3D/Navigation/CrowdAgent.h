@@ -163,6 +163,10 @@ private:
     NavigationQuality navQuality_;
     /// Agent's Navigation Pushiness.
     NavigationPushiness navPushiness_;
+    /// Agent's previous target state used to check for state changes.
+    CrowdTargetState previousTargetState_;
+    /// Agent's previous agent state used to check for state changes.
+    CrowdAgentState previousAgentState_;
     /// Internal flag to ignore transform changes because it came from us, used in OnCrowdAgentReposition().
     bool ignoreTransformChanges_;
 };

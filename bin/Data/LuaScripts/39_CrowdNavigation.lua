@@ -85,6 +85,8 @@ function CreateScene()
 
     -- Create a DynamicNavigationMesh component to the scene root
     local navMesh = scene_:CreateComponent("DynamicNavigationMesh")
+    -- Set the agent height large enough to exclude the layers under boxes
+    navMesh.agentHeight = 10
     -- Set nav mesh tilesize to something reasonable
     navMesh.tileSize = 64
     -- Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
@@ -157,6 +159,10 @@ function SubscribeToEvents()
     -- Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request
     -- debug geometry
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate")
+    
+    -- Subscribe HandleCrowdAgentFailure() function for resolving invalidation issues with agents, during which we
+    -- use a larger extents for finding a point on the navmesh to fix the agent's position
+    SubscribeToEvent("CrowdAgentFailure", "HandleCrowdAgentFailure")
 end
 
 function MoveCamera(timeStep)
@@ -235,7 +241,7 @@ function SetPathPoint()
                         agt:SetMoveTarget(pathPos)
                     else
                         -- Keep the random point on the navigation mesh
-                        local targetPos = navMesh:FindNearestPoint(pathPos + Vector3(Random(7.0), 0, Random(7.0)), Vector3.ONE)
+                        local targetPos = navMesh:FindNearestPoint(pathPos + Vector3(Random(-4.5, 4.5), 0, Random(-4.5, 4.5)), Vector3.ONE)
                         agt:SetMoveTarget(targetPos)
                     end
                 end
@@ -280,6 +286,7 @@ function SpawnJack(pos)
     modelObject.material = cache:GetResource("Material", "Materials/Jack.xml")
     modelObject.castShadows = true
     local agent = jackNode:CreateComponent("CrowdAgent")
+    agent.height = 2.0
     agent.enabled = false
     table.insert(jackNodes, jackNode)
 end
@@ -364,6 +371,23 @@ function HandlePostRenderUpdate(eventType, eventData)
             end
         end
     end
+end
+
+function HandleCrowdAgentFailure(eventType, eventData)
+
+    local node = eventData:GetPtr("Node", "Node")
+    local agent = eventData:GetPtr("CrowdAgent", "CrowdAgent")
+    local agentState = eventData:GetInt("CrowdAgentState")
+    
+    -- If the agent's state is invalid, likely from spawning on the side of a box, find a point in a larger area
+    if agentState == CROWD_AGENT_INVALID then
+        local navMesh = scene_:GetComponent("DynamicNavigationMesh")
+        -- Get a point on the navmesh using more generous extents
+        local newPos = navMesh:FindNearestPoint(node:GetWorldPosition(), Vector3(5, 5, 5))
+        -- Set the new node position, CrowdAgent component will automatically reset the state of the agent
+        node:SetWorldPosition(newPos)
+    end
+
 end
 
 -- Create XML patch instructions for screen joystick layout specific to this sample app
