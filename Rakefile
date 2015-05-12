@@ -326,7 +326,7 @@ end
 desc 'Delete CI mirror branch'
 task :ci_delete_mirror do
   # Skip if there are more commits since this one or if this is a release build
-  abort "Skipped deleting #{ENV['TRAVIS_BRANCH']} mirror branch (%s vs %s)" % [`git log -1 --pretty=format:'%H' FETCH_HEAD`, `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp] unless `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp && !ENV['RELEASE_TAG']
+  abort "Skipped deleting #{ENV['TRAVIS_BRANCH']} mirror branch ('%s' vs '%s', %s, '%s')" % [`git log -1 --pretty=format:'%H' FETCH_HEAD`, `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp, (`git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp).to_s, ENV['RELEASE_TAG']] unless `git fetch -qf origin master; git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp && !ENV['RELEASE_TAG']
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
   system "git push -qf origin --delete #{ENV['TRAVIS_BRANCH']}" or abort "Failed to delete #{ENV['TRAVIS_BRANCH']} mirror branch"
 end
@@ -498,7 +498,7 @@ def makefile_ci
   system "cd ../Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
   if ENV['CI_START_TIME'] then
     elapsed_time = (Time.now - Time.at(ENV['CI_START_TIME'].to_i)) / 60
-    puts "\nEmscripten checkpoint reached, elapsed time: #{elapsed_time}\n\n"
+    puts "\nEmscripten checkpoint reached, elapsed time: #{elapsed_time}\n"
   end
   unless ENV['CI'] && ENV['EMSCRIPTEN'] && (ENV['PACKAGE_UPLOAD'] || elapsed_time > 40)  # For Emscripten, skip scaffolding test when packaging or running out of time
     # Create a new project on the fly that uses newly built Urho3D library in the build tree
