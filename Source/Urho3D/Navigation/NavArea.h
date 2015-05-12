@@ -43,9 +43,9 @@ namespace Urho3D
         virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
         /// Get the area id for this volume.
-        unsigned GetAreaType() const { return areaType_; }
+        unsigned GetAreaID() const { return (unsigned)areaID_; }
         /// Set the area id for this volume.
-        void SetAreaType(unsigned);
+        void SetAreaID(unsigned newID);
 
         /// Get the bounding box of this navigation area, in local space.
         BoundingBox GetBoundingBox() const { return boundingBox_; }
@@ -61,6 +61,6 @@ namespace Urho3D
         /// Flags to assign to the marked area of the navigation map.
         unsigned flags_;
         /// Area id to assign to the marked area.
-        unsigned areaType_;
+        unsigned char areaID_;
     };
 }

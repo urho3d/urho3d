@@ -85,11 +85,11 @@ void DetourCrowdManager::SetNavigationMesh(NavigationMesh* navMesh)
     MarkNetworkUpdate();
 }
 
-void DetourCrowdManager::SetAreaTypeCost(unsigned filterID, unsigned areaType, float weight)
+void DetourCrowdManager::SetAreaCost(unsigned filterID, unsigned areaID, float weight)
 {
     dtQueryFilter* filter = crowd_->getEditableFilter(filterID);
     if (filter)
-        filter->setAreaCost((int)areaType, weight);
+        filter->setAreaCost((int)areaID, weight);
 }
 
 void DetourCrowdManager::SetMaxAgents(unsigned agentCt)
@@ -122,13 +122,13 @@ NavigationMesh* DetourCrowdManager::GetNavigationMesh()
     return navigationMesh_.Get();
 }
 
-float DetourCrowdManager::GetAreaTypeCost(unsigned filterID, unsigned areaType) const
+float DetourCrowdManager::GetAreaCost(unsigned filterID, unsigned areaID) const
 {
     if (crowd_ && navigationMesh_)
     {
         const dtQueryFilter* filter = crowd_->getFilter((int)filterID);
         if (filter)
-            return filter->getAreaCost((int)areaType);
+            return filter->getAreaCost((int)areaID);
     }
     return 0.0f;
 }

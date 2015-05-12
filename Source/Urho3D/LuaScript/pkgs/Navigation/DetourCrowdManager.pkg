@@ -19,11 +19,11 @@ class DetourCrowdManager : public Component
 
     void SetNavigationMesh(NavigationMesh *navMesh);
     void SetMaxAgents(unsigned agentCt);
-    void SetAreaTypeCost(unsigned filterID, unsigned areaType, float cost);
+    void SetAreaCost(unsigned filterID, unsigned areaID, float cost);
     
     NavigationMesh* GetNavigationMesh();
     unsigned GetMaxAgents() const;
-    float GetAreaTypeCost(unsigned filterID, unsigned areaType) const;
+    float GetAreaCost(unsigned filterID, unsigned areaID) const;
     unsigned GetAgentCount() const;
     
     tolua_property__get_set NavigationMesh* navigationMesh;

@@ -66,14 +66,14 @@ public:
     /// Assigns the navigation mesh for the crowd.
     void SetNavigationMesh(NavigationMesh* navMesh);
     /// Set the cost of an area-type for the specified navigation filter type.
-    void SetAreaTypeCost(unsigned filterTypeID, unsigned areaType, float weight);
+    void SetAreaCost(unsigned filterTypeID, unsigned areaID, float weight);
     /// Set the maximum number of agents.
     void SetMaxAgents(unsigned agentCt);
 
     /// Get the Navigation mesh assigned to the crowd.
     NavigationMesh* GetNavigationMesh();
     /// Get the cost of an area-type for the specified navigation filter type.
-    float GetAreaTypeCost(unsigned filterTypeID, unsigned areaType) const;
+    float GetAreaCost(unsigned filterTypeID, unsigned areaID) const;
     /// Get the maximum number of agents.
     unsigned GetMaxAgents() const { return maxAgents_; }
     /// Get the current number of active agents.

@@ -458,6 +458,47 @@ bool DynamicNavigationMesh::Build(const BoundingBox& boundingBox)
     return true;
 }
 
+
+void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    if (!debug || !navMesh_ || !node_)
+        return;
+
+    const Matrix3x4& worldTransform = node_->GetWorldTransform();
+
+    const dtNavMesh* navMesh = navMesh_;
+
+    for (int z = 0; z < numTilesZ_; ++z)
+    {
+        for (int x = 0; x < numTilesX_; ++x)
+        {
+            // Get the layers from the tile-cache
+            const dtMeshTile* tiles[TILECACHE_MAXLAYERS];
+            int tileCount = navMesh->getTilesAt(x, z, tiles, TILECACHE_MAXLAYERS);
+            for (int i = 0; i < tileCount; ++i) 
+            {
+                const dtMeshTile* tile = tiles[i];
+                if (!tile)
+                    continue;
+
+                for (int i = 0; i < tile->header->polyCount; ++i)
+                {
+                    dtPoly* poly = tile->polys + i;
+                    for (unsigned j = 0; j < poly->vertCount; ++j)
+                    {
+                        debug->AddLine(
+                            worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[j] * 3]),
+                            worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[(j + 1) % poly->vertCount] * 3]),
+                            Color::YELLOW,
+                            depthTest
+                            );
+                    }
+                }
+            }
+        }
+    }
+}
+
 void DynamicNavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value)
 {
     ReleaseNavigationMesh();
@@ -643,8 +684,8 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
     rcRasterizeTriangles(build.ctx_, &build.vertices_[0].x_, build.vertices_.Size(), &build.indices_[0],
         triAreas.Get(), numTriangles, *build.heightField_, cfg.walkableClimb);
     rcFilterLowHangingWalkableObstacles(build.ctx_, cfg.walkableClimb, *build.heightField_);
-    //\todo figure out why behavior of rcFilterLedgeSpans differs between regular tiled nav mesh and cached tiled nav mesh
-    //rcFilterLedgeSpans(build.ctx_, cfg.walkableHeight, cfg.walkableClimb, *build.heightField_);
+    
+    rcFilterLedgeSpans(build.ctx_, cfg.walkableHeight, cfg.walkableClimb, *build.heightField_);
     rcFilterWalkableLowHeightSpans(build.ctx_, cfg.walkableHeight, *build.heightField_);
 
     build.compactHeightField_ = rcAllocCompactHeightfield();
@@ -742,6 +783,8 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
     {
         using namespace NavigationAreaRebuilt;
         VariantMap& eventData = GetContext()->GetEventDataMap();
+        eventData[P_NODE] = GetNode();
+        eventData[P_MESH] = this;
         eventData[P_BOUNDSMIN] = Variant(tileBoundingBox.min_);
         eventData[P_BOUNDSMAX] = Variant(tileBoundingBox.max_);
         SendEvent(E_NAVIGATION_AREA_REBUILT, eventData);
@@ -809,6 +852,7 @@ void DynamicNavigationMesh::AddObstacle(Obstacle* obstacle, bool silent)
             using namespace NavigationObstacleAdded;
             VariantMap& eventData = GetContext()->GetEventDataMap();
             eventData[P_NODE] = obstacle->GetNode();
+            eventData[P_OBSTACLE] = obstacle;
             eventData[P_POSITION] = obstacle->GetNode()->GetWorldPosition();
             eventData[P_RADIUS] = obstacle->GetRadius();
             eventData[P_HEIGHT] = obstacle->GetHeight();
@@ -842,6 +886,7 @@ void DynamicNavigationMesh::RemoveObstacle(Obstacle* obstacle, bool silent)
             using namespace NavigationObstacleRemoved;
             VariantMap& eventData = GetContext()->GetEventDataMap();
             eventData[P_NODE] = obstacle->GetNode();
+            eventData[P_OBSTACLE] = obstacle;
             eventData[P_POSITION] = obstacle->GetNode()->GetWorldPosition();
             eventData[P_RADIUS] = obstacle->GetRadius();
             eventData[P_HEIGHT] = obstacle->GetHeight();

@@ -65,7 +65,8 @@ template<class T> static void RegisterNavMeshBase(asIScriptEngine* engine, const
 {
     engine->RegisterObjectMethod(name, "bool Build()", asMETHODPR(T, Build, (void), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "bool Build(const BoundingBox&in)", asMETHODPR(T, Build, (const BoundingBox&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod(name, "void SetAreaTypeCost(uint, float)", asMETHOD(T, SetAreaTypeCost), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "void SetAreaCost(uint, float)", asMETHOD(T, SetAreaCost), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "float GetAreaCost(uint) const", asMETHOD(T, GetAreaCost), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "Vector3 FindNearestPoint(const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asMETHOD(T, FindNearestPoint), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "Vector3 MoveAlongSurface(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0), uint = 3)", asMETHOD(T, MoveAlongSurface), asCALL_THISCALL);
     //engine->RegisterObjectMethod(name, "Array<Vector3>@ FindPath(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshFindPath), asCALL_CDECL_OBJLAST);
@@ -150,8 +151,8 @@ void RegisterNavArea(asIScriptEngine* engine)
     RegisterComponent<NavArea>(engine, "NavArea");
     engine->RegisterObjectMethod("NavArea", "BoundingBox get_boundingBox() const", asMETHOD(NavArea, GetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavArea", "void set_boundingBox(const BoundingBox&in)", asMETHOD(NavArea, SetBoundingBox), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "uint get_areaType() const", asMETHOD(NavArea, GetAreaType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavArea", "void set_areaType(uint)", asMETHOD(NavArea, SetAreaType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "uint get_areaID() const", asMETHOD(NavArea, GetAreaID), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavArea", "void set_areaID(uint)", asMETHOD(NavArea, SetAreaID), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavArea", "BoundingBox get_worldBoundingBox() const", asMETHOD(NavArea, GetWorldBoundingBox), asCALL_THISCALL);
 }
 
@@ -164,8 +165,8 @@ void RegisterDetourCrowdManager(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DetourCrowdManager", "int get_maxAgents() const", asMETHOD(DetourCrowdManager, GetMaxAgents), asCALL_THISCALL);
     engine->RegisterObjectMethod("DetourCrowdManager", "void set_maxAgents(int)", asMETHOD(DetourCrowdManager, SetMaxAgents), asCALL_THISCALL);
     engine->RegisterObjectMethod("DetourCrowdManager", "Array<CrowdAgent@>@ GetActiveAgents()", asFUNCTION(DetourCrowdManagerGetActiveAgents), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DetourCrowdManager", "void SetAreaTypeCost(uint, uint, float)", asMETHOD(DetourCrowdManager, SetAreaTypeCost), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DetourCrowdManager", "float GetAreaTypeCost(uint, uint)", asMETHOD(DetourCrowdManager, GetAreaTypeCost), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DetourCrowdManager", "void SetAreaCost(uint, uint, float)", asMETHOD(DetourCrowdManager, SetAreaCost), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DetourCrowdManager", "float GetAreaCost(uint, uint)", asMETHOD(DetourCrowdManager, GetAreaCost), asCALL_THISCALL);
 }
 
 void RegisterCrowdAgent(asIScriptEngine* engine)
@@ -181,9 +182,9 @@ void RegisterCrowdAgent(asIScriptEngine* engine)
     engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_ARRIVED", CROWD_AGENT_TARGET_ARRIVED);
 
     engine->RegisterEnum("CrowdAgentState");
-    engine->RegisterEnumValue("CrowdAgentState", "NAV_AGENT_INVALID", CROWD_AGENT_INVALID);
-    engine->RegisterEnumValue("CrowdAgentState", "NAV_AGENT_READY", CROWD_AGENT_READY);
-    engine->RegisterEnumValue("CrowdAgentState", "NAV_AGENT_TRAVERSINGLINK", CROWD_AGENT_TRAVERSINGLINK);
+    engine->RegisterEnumValue("CrowdAgentState", "CROWD_AGENT_INVALID", CROWD_AGENT_INVALID);
+    engine->RegisterEnumValue("CrowdAgentState", "CROWD_AGENT_READY", CROWD_AGENT_READY);
+    engine->RegisterEnumValue("CrowdAgentState", "CROWD_AGENT_TRAVERSINGLINK", CROWD_AGENT_TRAVERSINGLINK);
 
     engine->RegisterEnum("NavigationAvoidanceQuality");
     engine->RegisterEnumValue("NavigationAvoidanceQuality", "NAVIGATIONQUALITY_LOW", NAVIGATIONQUALITY_LOW);
