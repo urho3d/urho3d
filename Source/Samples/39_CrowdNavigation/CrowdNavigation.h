@@ -150,15 +150,17 @@ private:
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle the post-render update event.
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle problems with crowd agent placement.
+    void HandleCrowdAgentFailure(StringHash eventType, VariantMap& eventData);
 
     /// Last calculated path.
     PODVector<Vector3> currentPath_;
     /// Path end position.
     Vector3 endPos_;
     /// Jack scene node.
-    Vector< SharedPtr<Node> > jackNodes_;
+    Vector<SharedPtr<Node> > jackNodes_;
     /// Mushroom nodes
-    Vector< Node* > mushroomNodes_;
+    Vector<Node*> mushroomNodes_;
     /// Flag for drawing debug geometry.
     bool drawDebug_;
 };

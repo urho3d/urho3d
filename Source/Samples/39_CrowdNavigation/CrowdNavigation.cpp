@@ -39,6 +39,7 @@
 #include <Urho3D/Navigation/DetourCrowdManager.h>
 #include <Urho3D/Navigation/DynamicNavigationMesh.h>
 #include <Urho3D/Navigation/Navigable.h>
+#include <Urho3D/Navigation/NavigationEvents.h>
 #include <Urho3D/Navigation/Obstacle.h>
 #include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Graphics/Renderer.h>
@@ -135,6 +136,8 @@ void CrowdNavigation::CreateScene()
 
     // Create a DynamicNavigationMesh component to the scene root
     DynamicNavigationMesh* navMesh = scene_->CreateComponent<DynamicNavigationMesh>();
+    // Set the agent height large enough to exclude the layers under boxes
+    navMesh->SetAgentHeight(10.0f);
     navMesh->SetTileSize(64);
     // Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
     // navigation mesh. By default this is recursive, but the recursion could be turned off from Navigable
@@ -153,7 +156,7 @@ void CrowdNavigation::CreateScene()
     CreateJack(Vector3(-5.0f, 0.0f, 20.0f));
     
     // Create some mushrooms
-    const unsigned NUM_MUSHROOMS = 75;
+    const unsigned NUM_MUSHROOMS = 100;
     for (unsigned i = 0; i < NUM_MUSHROOMS; ++i)
         CreateMushroom(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
     
@@ -218,6 +221,10 @@ void CrowdNavigation::SubscribeToEvents()
     // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request
     // debug geometry
     SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(CrowdNavigation, HandlePostRenderUpdate));
+
+    // Subscribe HandleCrowdAgentFailure() function for resolving invalidation issues with agents, during which we
+    // use a larger extents for finding a point on the navmesh to fix the agent's position
+    SubscribeToEvent(E_CROWD_AGENT_FAILURE, HANDLER(CrowdNavigation, HandleCrowdAgentFailure));
 }
 
 void CrowdNavigation::MoveCamera(float timeStep)
@@ -293,7 +300,7 @@ void CrowdNavigation::MoveCamera(float timeStep)
             mushroomNodes_.Push(SharedPtr<Node>(nodes[i]));
         }
     }
-        
+    
     // Toggle debug geometry with space
     if (input->GetKeyPress(KEY_SPACE))
         drawDebug_ = !drawDebug_;
@@ -328,7 +335,7 @@ void CrowdNavigation::SetPathPoint()
                 else
                 {
                     // Keep the random point somewhere on the navigation mesh
-                    Vector3 targetPos = navMesh->FindNearestPoint(pathPos + Vector3(Random(7.0f), 0.0f, Random(7.0f)), Vector3(1.0f, 1.0f, 1.0f));
+                    Vector3 targetPos = navMesh->FindNearestPoint(pathPos + Vector3(Random(-4.5f, 4.5f), 0.0f, Random(-4.5f, 4.5f)), Vector3(1.0f, 1.0f, 1.0f));
                     agent->SetMoveTarget(targetPos);
                 }
             }
@@ -369,6 +376,7 @@ void CrowdNavigation::CreateJack(const Vector3& pos)
 
     // Create the CrowdAgent
     CrowdAgent* agent = jackNode->CreateComponent<CrowdAgent>();
+    agent->SetHeight(2.0f);
     jackNodes_.Push(jackNode);
 }
 
@@ -443,7 +451,9 @@ void CrowdNavigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& e
     // If draw debug mode is enabled, draw navigation mesh debug geometry
     if (drawDebug_)
     {
-        scene_->GetComponent<DynamicNavigationMesh>()->DrawDebugGeometry(true);
+        DebugRenderer* debugRenderer = scene_->GetComponent<DebugRenderer>();
+        DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
+        navMesh->DrawDebugGeometry(debugRenderer, true);
     
         for (unsigned i = 0; i < jackNodes_.Size(); ++i)
         {
@@ -456,5 +466,24 @@ void CrowdNavigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& e
             Obstacle* obstacle = mushroomNodes_[i]->GetComponent<Obstacle>();
             obstacle->DrawDebugGeometry(true);
         }
+    }
+}
+
+void CrowdNavigation::HandleCrowdAgentFailure(StringHash eventType, VariantMap& eventData)
+{
+    using namespace CrowdAgentFailure;
+
+    Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
+    CrowdAgent* agent = static_cast<CrowdAgent*>(eventData[P_CROWD_AGENT].GetPtr());
+    CrowdAgentState agentState = (CrowdAgentState)eventData[P_CROWD_AGENT_STATE].GetInt();
+
+    // If the agent's state is invalid, likely from spawning on the side of a box, find a point in a larger area
+    if (agentState == CROWD_AGENT_INVALID)
+    {
+        DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
+        // Get a point on the navmesh using more generous extents
+        Vector3 newPt = navMesh->FindNearestPoint(node->GetWorldPosition(), Vector3(5.0f, 5.0f, 5.0f));
+        // Set the new node position, CrowdAgent component will automatically reset the state of the agent
+        node->SetWorldPosition(newPt);
     }
 }

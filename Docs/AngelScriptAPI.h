@@ -3695,7 +3695,7 @@ void ApplyAttributes();
 void CreateCrowd();
 void DrawDebugGeometry(DebugRenderer, bool);
 Array<CrowdAgent> GetActiveAgents();
-float GetAreaTypeCost(uint, uint);
+float GetAreaCost(uint, uint);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
@@ -3713,7 +3713,7 @@ bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetAreaTypeCost(uint, uint, float);
+void SetAreaCost(uint, uint, float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
@@ -4168,6 +4168,7 @@ void DrawDebugGeometry(DebugRenderer, bool);
 void DrawDebugGeometry(bool);
 Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
 Array<Vector3> FindPath(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+float GetAreaCost(uint) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
@@ -4190,7 +4191,7 @@ bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetAreaTypeCost(uint, float);
+void SetAreaCost(uint, float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
@@ -6130,7 +6131,7 @@ void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
-uint areaType;
+uint areaID;
 /* readonly */
 Array<Variant> attributeDefaults;
 /* readonly */
@@ -6235,6 +6236,7 @@ void DrawDebugGeometry(DebugRenderer, bool);
 void DrawDebugGeometry(bool);
 Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
 Array<Vector3> FindPath(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+float GetAreaCost(uint) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
@@ -6257,7 +6259,7 @@ bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetAreaTypeCost(uint, float);
+void SetAreaCost(uint, float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
@@ -12589,9 +12591,9 @@ LOCAL,
 
 enum CrowdAgentState
 {
-NAV_AGENT_INVALID,
-NAV_AGENT_READY,
-NAV_AGENT_TRAVERSINGLINK,
+CROWD_AGENT_INVALID,
+CROWD_AGENT_READY,
+CROWD_AGENT_TRAVERSINGLINK,
 };
 
 enum CrowdTargetState
