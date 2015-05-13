@@ -43,6 +43,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  PCH master include. Every unit in Assimp has to include it.
  */
 
+// Modified by Yao Wei Tjong for Urho3D
+// Urho3D: only include C++ headers when the compiler is a C++ compiler
+#ifdef __cplusplus
+
 #ifndef ASSIMP_PCH_INCLUDED
 #define ASSIMP_PCH_INCLUDED
 #define ASSIMP_INTERNAL_BUILD
@@ -160,3 +164,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #endif // !! ASSIMP_PCH_INCLUDED
+
+#endif // !! Urho3D: __cpluscplus
