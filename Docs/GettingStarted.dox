@@ -16,7 +16,7 @@ Although all required third-party libraries are included as source code, there a
 
 - For Raspberry Pi, the following development packages need to be installed. On Raspbian: libasound2-dev, libudev-dev. On Pidora: alsa-lib-devel, systemd-devel.
 
-- For Mac OS X, the Xcode developer tools package should include everything necessary.
+- For Mac OS X, the Xcode developer tools package should include everything necessary. Make sure that the Xcode command line tools are also installed.
 
 - For Android, the Android SDK and Android NDK (minimum API level 12) need to be installed.
 
