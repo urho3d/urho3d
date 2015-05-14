@@ -1222,9 +1222,10 @@ macro (setup_test)
                 # The latency on Travis CI server could be very high at time, so add some adjustment
                 # If it is not enough causing a test case failure then so be it because it is better that than wait for it and still ends up in build error due to time limit
                 set (EMRUN_TIMEOUT_ADJUSTMENT + 8 * \\${URHO3D_TEST_TIMEOUT})
+                set (EMRUN_TIMEOUT_RETURNCODE --timeout_returncode 0)
             endif ()
             math (EXPR EMRUN_TIMEOUT "2 * ${URHO3D_TEST_TIMEOUT} ${EMRUN_TIMEOUT_ADJUSTMENT}")
-            add_test (NAME ${ARG_NAME} COMMAND ${EMRUN} --browser ${EMSCRIPTEN_EMRUN_BROWSER} --timeout ${EMRUN_TIMEOUT} --timeout_returncode 1 --kill_exit ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET_NAME}.html ${ARG_OPTIONS})
+            add_test (NAME ${ARG_NAME} COMMAND ${EMRUN} --browser ${EMSCRIPTEN_EMRUN_BROWSER} --timeout ${EMRUN_TIMEOUT} ${EMRUN_TIMEOUT_RETURNCODE} --kill_exit ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET_NAME}.html ${ARG_OPTIONS})
         else ()
             add_test (NAME ${ARG_NAME} COMMAND ${TARGET_NAME} ${ARG_OPTIONS})
         endif ()
