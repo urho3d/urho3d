@@ -326,7 +326,7 @@ task :ci_delete_mirror do
   # Skip if there are more commits since this one or if this is a release build
   matched = /(.*)-[^-]+-[^-]+$/.match(ENV['TRAVIS_BRANCH'])
   base_branch = matched ? matched[1] : 'master'  # Assume 'master' is the default branch name
-  abort "Skipped deleting #{ENV['TRAVIS_BRANCH']} mirror branch" unless `git fetch -qf origin #{/^PR #/ =~ base_branch ? %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST']}/merge'} : base_branch}; git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp && !ENV['RELEASE_TAG']
+  abort "Skipped deleting #{ENV['TRAVIS_BRANCH']} mirror branch" unless `git fetch -qf origin #{/^PR #/ =~ base_branch ? %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST']}/merge'} : base_branch}; git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.rstrip && !ENV['RELEASE_TAG']
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
   system "git push -qf origin --delete #{ENV['TRAVIS_BRANCH']}" or abort "Failed to delete #{ENV['TRAVIS_BRANCH']} mirror branch"
 end
@@ -494,7 +494,7 @@ def makefile_ci
     android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
   end
   # For Emscripten CI build, skip make test and/or scaffolding test if Travis-CI VM took too long to get here, as otherwise overall build time may exceed 50 minutes time limit
-  test = $testing == 1 ? (ENV['CI'] && ENV['EMSCRIPTEN'] ? '&& (if (( $((($(date +%%s)-$CI_START_TIME)/60)) < 25 )); then %s; fi || true)' : '&& %s') % 'make test' : ''
+  test = $testing == 1 ? (ENV['CI'] && ENV['EMSCRIPTEN'] ? '&& if (( $((($(date +%%s)-$CI_START_TIME)/60)) < 25 )); then %s; fi' : '&& %s') % 'make test' : ''
   system "cd ../Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
   if ENV['CI_START_TIME'] then
     elapsed_time = (Time.now - Time.at(ENV['CI_START_TIME'].to_i)) / 60
