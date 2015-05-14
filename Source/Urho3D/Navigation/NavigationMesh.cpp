@@ -172,21 +172,24 @@ void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     {
         for (int x = 0; x < numTilesX_; ++x)
         {
-            const dtMeshTile* tile = navMesh->getTileAt(x, z, 0);
-            if (!tile)
-                continue;
-
-            for (int i = 0; i < tile->header->polyCount; ++i)
+            for (int i = 0; i < 128; ++i)
             {
-                dtPoly* poly = tile->polys + i;
-                for (unsigned j = 0; j < poly->vertCount; ++j)
+                const dtMeshTile* tile = navMesh->getTileAt(x, z, i);
+                if (!tile)
+                    continue;
+
+                for (int i = 0; i < tile->header->polyCount; ++i)
                 {
-                    debug->AddLine(
-                        worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[j] * 3]),
-                        worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[(j + 1) % poly->vertCount] * 3]),
-                        Color::YELLOW,
-                        depthTest
-                    );
+                    dtPoly* poly = tile->polys + i;
+                    for (unsigned j = 0; j < poly->vertCount; ++j)
+                    {
+                        debug->AddLine(
+                            worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[j] * 3]),
+                            worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[(j + 1) % poly->vertCount] * 3]),
+                            Color::YELLOW,
+                            depthTest
+                            );
+                    }
                 }
             }
         }
@@ -621,15 +624,22 @@ void NavigationMesh::DrawDebugGeometry(bool depthTest)
     }
 }
 
-void NavigationMesh::SetAreaTypeCost(unsigned areaType, float cost)
+void NavigationMesh::SetAreaCost(unsigned areaID, float cost)
 {
     if (queryFilter_)
-        queryFilter_->setAreaCost((int)areaType, cost);
+        queryFilter_->setAreaCost((int)areaID, cost);
 }
 
 BoundingBox NavigationMesh::GetWorldBoundingBox() const
 {
     return node_ ? boundingBox_.Transformed(node_->GetWorldTransform()) : boundingBox_;
+}
+
+float NavigationMesh::GetAreaCost(unsigned areaID) const
+{
+    if (queryFilter_)
+        return queryFilter_->getAreaCost((int)areaID);
+    return 1.0f;
 }
 
 void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value)
@@ -777,7 +787,7 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
     {
         NavArea* area = navAreas[i];
         // Ignore disabled AND any areas that have no meaningful settings
-        if (area->IsEnabledEffective() && area->GetAreaType() != 0)
+        if (area->IsEnabledEffective() && area->GetAreaID() != 0)
         {
             NavigationGeometryInfo info;
             info.component_ = area;
@@ -889,8 +899,7 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
             {
                 NavArea* area = static_cast<NavArea*>(geometryList[i].component_);
                 NavAreaStub stub;
-                //\todo is there an alternative to casting down? Attributes restricts area ID/type to being an unsigned int
-                stub.areaID_ = (unsigned char)area->GetAreaType();
+                stub.areaID_ = (unsigned char)area->GetAreaID();
                 stub.bounds_ = area->GetWorldBoundingBox();
                 build->navAreas_.Push(stub);
                 continue;
@@ -1259,6 +1268,8 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
     {
         using namespace NavigationAreaRebuilt;
         VariantMap& eventData = GetContext()->GetEventDataMap();
+        eventData[P_NODE] = GetNode();
+        eventData[P_MESH] = this;
         eventData[P_BOUNDSMIN] = Variant(tileBoundingBox.min_);
         eventData[P_BOUNDSMAX] = Variant(tileBoundingBox.max_);
         SendEvent(E_NAVIGATION_AREA_REBUILT, eventData);

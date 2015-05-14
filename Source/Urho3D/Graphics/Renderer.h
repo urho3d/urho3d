@@ -45,6 +45,7 @@ class RenderSurface;
 class ResourceCache;
 class Skeleton;
 class OcclusionBuffer;
+class Texture;
 class Texture2D;
 class TextureCube;
 class View;

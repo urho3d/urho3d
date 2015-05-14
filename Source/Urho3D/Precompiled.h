@@ -20,9 +20,13 @@
 // THE SOFTWARE.
 //
 
+#ifdef __cplusplus
+
 #include "Urho3D.h"
 
 #include "Container/HashMap.h"
 #include "Container/HashSet.h"
 #include "Container/Sort.h"
 #include "Container/Str.h"
+
+#endif

@@ -72,7 +72,6 @@ class URHO3D_API NavigationMesh : public Component
 {
     OBJECT(NavigationMesh);
     friend class DetourCrowdManager;
-    friend class AnnotationBuilder;
 
 public:
     /// Construct.
@@ -113,6 +112,8 @@ public:
     void SetDetailSampleMaxError(float error);
     /// Set padding of the navigation mesh bounding box. Having enough padding allows to add geometry on the extremities of the navigation mesh when doing partial rebuilds.
     void SetPadding(const Vector3& padding);
+    /// Set the cost of an area.
+    void SetAreaCost(unsigned areaID, float cost);
     /// Rebuild the navigation mesh. Return true if successful.
     virtual bool Build();
     /// Rebuild part of the navigation mesh contained by the world-space bounding box. Return true if successful.
@@ -133,8 +134,6 @@ public:
     Vector3 Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
-    /// Set the cost of an area.
-    void SetAreaTypeCost(unsigned areaType, float cost);
 
     /// Return the given name of this navigation mesh.
     String GetMeshName() const { return meshName_; }
@@ -168,6 +167,8 @@ public:
     float GetDetailSampleMaxError() const { return detailSampleMaxError_; }
     /// Return navigation mesh bounding box padding.
     const Vector3& GetPadding() const { return padding_; }
+    /// Get the current cost of an area
+    float GetAreaCost(unsigned areaID) const;
     /// Return whether has been initialized with valid navigation data.
     bool IsInitialized() const { return navMesh_ != 0; }
     /// Return local space bounding box of the navigation mesh.

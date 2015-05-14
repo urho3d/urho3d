@@ -25,6 +25,7 @@ class NavigationMesh : public Component
     void SetDetailSampleDistance(float distance);
     void SetDetailSampleMaxError(float error);
     void SetPadding(const Vector3& padding);
+    void SetAreaCost(unsigned areaID, float cost);
     bool Build();
     bool Build(const BoundingBox& boundingBox);
     
@@ -54,6 +55,7 @@ class NavigationMesh : public Component
     float GetDetailSampleDistance() const;
     float GetDetailSampleMaxError() const;
     const Vector3& GetPadding() const;
+    float GetAreaCost(unsigned areaID) const;
     bool IsInitialized() const;
     const BoundingBox& GetBoundingBox() const;
     BoundingBox GetWorldBoundingBox() const;

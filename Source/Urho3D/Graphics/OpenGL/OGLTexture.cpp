@@ -321,10 +321,9 @@ unsigned Texture::GetRowDataSize(int width) const
         
     case GL_RGBA:
     #ifndef GL_ES_VERSION_2_0
-    case GL_LUMINANCE16F_ARB:
-    case GL_LUMINANCE32F_ARB:
     case GL_DEPTH24_STENCIL8_EXT:
     case GL_RG16:
+    case GL_R16F:
     case GL_R32F:
     #endif
         return width * 4;
@@ -374,11 +373,11 @@ unsigned Texture::GetExternalFormat(unsigned format)
         return GL_DEPTH_COMPONENT;
     else if (format == GL_DEPTH24_STENCIL8_EXT)
         return GL_DEPTH_STENCIL_EXT;
-    else if (format == GL_LUMINANCE16F_ARB || format == GL_LUMINANCE32F_ARB || format == GL_SLUMINANCE_EXT)
+    else if (format == GL_SLUMINANCE_EXT)
         return GL_LUMINANCE;
     else if (format == GL_SLUMINANCE_ALPHA_EXT)
         return GL_LUMINANCE_ALPHA;
-    else if (format == GL_R8 || format == GL_R32F)
+    else if (format == GL_R8 || format == GL_R16F || format == GL_R32F)
         return GL_RED;
     else if (format == GL_RG8 || format == GL_RG16 || format == GL_RG16F || format == GL_RG32F)
         return GL_RG;
@@ -400,8 +399,8 @@ unsigned Texture::GetDataType(unsigned format)
         return GL_UNSIGNED_INT_24_8_EXT;
     else if (format == GL_RG16 || format == GL_RGBA16)
         return GL_UNSIGNED_SHORT;
-    else if (format == GL_LUMINANCE16F_ARB || format == GL_LUMINANCE32F_ARB || format == GL_RGBA16F_ARB ||
-        format == GL_RGBA32F_ARB || format == GL_RG16F || format == GL_RG32F || format == GL_R32F)
+    else if (format == GL_RGBA16F_ARB || format == GL_RGBA32F_ARB || format == GL_RG16F || format == GL_RG32F || format == GL_R16F ||
+        format == GL_R32F)
         return GL_FLOAT;
     else
         return GL_UNSIGNED_BYTE;

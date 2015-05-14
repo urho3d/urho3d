@@ -77,7 +77,10 @@ CrowdAgent::CrowdAgent(Context* context) :
     height_(0.0f),
     filterType_(DEFAULT_AGENT_NAVIGATION_FILTER_TYPE),
     navQuality_(DEFAULT_AGENT_AVOIDANCE_QUALITY),
-    navPushiness_(DEFAULT_AGENT_NAVIGATION_PUSHINESS)
+    navPushiness_(DEFAULT_AGENT_NAVIGATION_PUSHINESS),
+    previousTargetState_(CROWD_AGENT_TARGET_NONE),
+    previousAgentState_(CROWD_AGENT_READY),
+    ignoreTransformChanges_(false)
 {
 }
 
@@ -107,7 +110,7 @@ void CrowdAgent::OnNodeSet(Node* node)
         if (scene)
         {
             if (scene == node)
-                LOGERROR(GetTypeName() + " should not be created to the root scene node");        
+                LOGERROR(GetTypeName() + " should not be created to the root scene node");
             crowdManager_ = scene->GetOrCreateComponent<DetourCrowdManager>();
             AddAgentToCrowd();
         }
@@ -173,6 +176,25 @@ void CrowdAgent::AddAgentToCrowd()
         params.userData = this;
         crowdManager_->UpdateAgentNavigationQuality(this, navQuality_);
         crowdManager_->UpdateAgentPushiness(this, navPushiness_);
+        previousAgentState_ = GetAgentState();
+        previousTargetState_ = GetTargetState();
+
+        // Agent created, but initial state is invalid and needs to be addressed
+        if (previousAgentState_ == CROWD_AGENT_INVALID)
+        {
+            VariantMap& map = GetContext()->GetEventDataMap();
+            map[CrowdAgentFailure::P_NODE] = GetNode();
+            map[CrowdAgentFailure::P_CROWD_AGENT] = this;
+            map[CrowdAgentFailure::P_CROWD_TARGET_STATE] = previousTargetState_;
+            map[CrowdAgentFailure::P_CROWD_AGENT_STATE] = previousAgentState_;
+            map[CrowdAgentFailure::P_POSITION] = GetPosition();
+            map[CrowdAgentFailure::P_VELOCITY] = GetActualVelocity();
+            SendEvent(E_CROWD_AGENT_FAILURE, map);
+
+            // Reevaluate states as handling of event may have resulted in changes
+            previousAgentState_ = GetAgentState();
+            previousTargetState_ = GetTargetState();
+        }
     }
 }
 
@@ -279,7 +301,7 @@ void CrowdAgent::SetHeight(float height)
 
 void CrowdAgent::SetNavigationQuality(NavigationQuality val)
 {
-    navQuality_=val;
+    navQuality_ = val;
     if(crowdManager_ && inCrowd_)
     {
         crowdManager_->UpdateAgentNavigationQuality(this, navQuality_);
@@ -289,7 +311,7 @@ void CrowdAgent::SetNavigationQuality(NavigationQuality val)
 
 void CrowdAgent::SetNavigationPushiness(NavigationPushiness val)
 {
-    navPushiness_=val;
+    navPushiness_ = val;
     if(crowdManager_ && inCrowd_)
     {
         crowdManager_->UpdateAgentPushiness(this, navPushiness_);
@@ -361,7 +383,7 @@ Urho3D::CrowdTargetState CrowdAgent::GetTargetState() const
                     // Within its own radius of the goal?
                     if (dtVdist2D(agent->npos, &agent->cornerVerts[(agent->ncorners - 1) * 3]) <= agent->params.radius)
                         return CROWD_AGENT_TARGET_ARRIVED;
-
+            
                 }
             }
         }
@@ -382,6 +404,8 @@ void CrowdAgent::OnCrowdAgentReposition(const Vector3& newPos, const Vector3& ne
     {
         // Notify parent node of the reposition
         VariantMap& map = GetContext()->GetEventDataMap();
+        map[CrowdAgentReposition::P_NODE] = GetNode();
+        map[CrowdAgentReposition::P_CROWD_AGENT] = this;
         map[CrowdAgentReposition::P_POSITION] = newPos;
         map[CrowdAgentReposition::P_VELOCITY] = GetActualVelocity();
         SendEvent(E_CROWD_AGENT_REPOSITION, map);
@@ -394,16 +418,35 @@ void CrowdAgent::OnCrowdAgentReposition(const Vector3& newPos, const Vector3& ne
         }
 
         // Send a notification event if we've reached the destination
-        CrowdTargetState targetState = GetTargetState();
-        switch (targetState)
+        CrowdTargetState newTargetState = GetTargetState();
+        CrowdAgentState newAgentState = GetAgentState();
+        if (newAgentState != previousAgentState_ || newTargetState != previousTargetState_)
         {
-        case CROWD_AGENT_TARGET_ARRIVED:
             VariantMap& map = GetContext()->GetEventDataMap();
-            map[CrowdAgentStateChanged::P_STATE] = targetState;
+            map[CrowdAgentStateChanged::P_NODE] = GetNode();
+            map[CrowdAgentStateChanged::P_CROWD_AGENT] = this;
+            map[CrowdAgentStateChanged::P_CROWD_TARGET_STATE] = newTargetState;
+            map[CrowdAgentStateChanged::P_CROWD_AGENT_STATE] = newAgentState;
             map[CrowdAgentStateChanged::P_POSITION] = newPos;
             map[CrowdAgentStateChanged::P_VELOCITY] = GetActualVelocity();
             SendEvent(E_CROWD_AGENT_STATE_CHANGED, map);
-            break;
+
+            // Send a failure event if either state is a failed status
+            if (newAgentState == CROWD_AGENT_INVALID || newTargetState == CROWD_AGENT_TARGET_FAILED)
+            {
+                VariantMap& map = GetContext()->GetEventDataMap();
+                map[CrowdAgentFailure::P_NODE] = GetNode();
+                map[CrowdAgentFailure::P_CROWD_AGENT] = this;
+                map[CrowdAgentFailure::P_CROWD_TARGET_STATE] = newTargetState;
+                map[CrowdAgentFailure::P_CROWD_AGENT_STATE] = newAgentState;
+                map[CrowdAgentFailure::P_POSITION] = newPos;
+                map[CrowdAgentFailure::P_VELOCITY] = GetActualVelocity();
+                SendEvent(E_CROWD_AGENT_FAILURE, map);
+            }
+
+            // State may have been altered during the handling of the event
+            previousAgentState_ = GetAgentState();
+            previousTargetState_ = GetTargetState();
         }
     }
 }
@@ -448,9 +491,17 @@ void CrowdAgent::SetAgentDataAttr(const PODVector<unsigned char>& value)
 
 void CrowdAgent::OnMarkedDirty(Node* node)
 {
-    if (inCrowd_ && crowdManager_ && !ignoreTransformChanges_) {
+    if (inCrowd_ && crowdManager_ && !ignoreTransformChanges_ && IsEnabledEffective())
+    {
         dtCrowdAgent* agt = crowdManager_->GetCrowd()->getEditableAgent(agentCrowdId_);
-        memcpy(agt->npos, node->GetPosition().Data(), sizeof(float) * 3);
+        if (agt)
+        {
+            memcpy(agt->npos, node->GetWorldPosition().Data(), sizeof(float) * 3);
+
+            // If the node has been externally altered, provide the opportunity for DetourCrowd to reevaluate the crowd agent
+            if (agt->state == CROWD_AGENT_INVALID)
+                agt->state = CROWD_AGENT_READY;
+        }
     }
 }
 

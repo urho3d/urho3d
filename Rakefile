@@ -233,11 +233,10 @@ task :ci_setup_cache do
     matched = /.*-([^-]+-[^-]+)$/.match(ENV['TRAVIS_BRANCH'])
     base_mirror = matched ? matched[1] : nil
     # Do not abort even when it fails here
-    system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then if ! [ #{base_mirror} ] || ! `git clone -q --depth 1 --branch #{base_mirror}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null; fi && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi"
+    system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then if ! [ #{base_mirror} ] || ! `git clone -q --depth 1 --branch #{base_mirror}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null; fi && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi && find ~/.ccache -type f |xargs touch -r $(which ccache)"
   end
-  system 'ccache -z -M 100M'
   # Clear ccache on demand
-  system 'ccache -C' if /\[ccache clear\]/ =~ ENV['COMMIT_MESSAGE']
+  system "ccache -z -M 100M #{/\[ccache clear\]/ =~ ENV['COMMIT_MESSAGE'] ? '-C' : ''}"
 end
 
 # Usage: NOT intended to be used manually
@@ -327,7 +326,7 @@ desc 'Delete CI mirror branch'
 task :ci_delete_mirror do
   # Skip if there are more commits since this one or if this is a release build
   matched = /(.*)-[^-]+-[^-]+$/.match(ENV['TRAVIS_BRANCH'])
-  base_branch= matched ? matched[1] : 'master'  # Assume 'master' is the default branch name
+  base_branch = matched ? matched[1] : 'master'  # Assume 'master' is the default branch name
   abort "Skipped deleting #{ENV['TRAVIS_BRANCH']} mirror branch ('%s' vs '%s', %s, '%s')" % [`git log -1 --pretty=format:'%H' FETCH_HEAD`, `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp, (`git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp).to_s, ENV['RELEASE_TAG']] unless `git fetch -qf origin #{/^PR #/ =~ base_branch ? %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST']}/merge'} : base_branch}; git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.chomp && !ENV['RELEASE_TAG']
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
   system "git push -qf origin --delete #{ENV['TRAVIS_BRANCH']}" or abort "Failed to delete #{ENV['TRAVIS_BRANCH']} mirror branch"

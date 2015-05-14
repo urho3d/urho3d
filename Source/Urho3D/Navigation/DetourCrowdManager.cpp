@@ -85,11 +85,11 @@ void DetourCrowdManager::SetNavigationMesh(NavigationMesh* navMesh)
     MarkNetworkUpdate();
 }
 
-void DetourCrowdManager::SetAreaTypeCost(unsigned filterID, unsigned areaType, float weight)
+void DetourCrowdManager::SetAreaCost(unsigned filterID, unsigned areaID, float weight)
 {
     dtQueryFilter* filter = crowd_->getEditableFilter(filterID);
     if (filter)
-        filter->setAreaCost((int)areaType, weight);
+        filter->setAreaCost((int)areaID, weight);
 }
 
 void DetourCrowdManager::SetMaxAgents(unsigned agentCt)
@@ -122,13 +122,13 @@ NavigationMesh* DetourCrowdManager::GetNavigationMesh()
     return navigationMesh_.Get();
 }
 
-float DetourCrowdManager::GetAreaTypeCost(unsigned filterID, unsigned areaType) const
+float DetourCrowdManager::GetAreaCost(unsigned filterID, unsigned areaID) const
 {
     if (crowd_ && navigationMesh_)
     {
         const dtQueryFilter* filter = crowd_->getFilter((int)filterID);
         if (filter)
-            return filter->getAreaCost((int)areaType);
+            return filter->getAreaCost((int)areaID);
     }
     return 0.0f;
 }
@@ -403,7 +403,7 @@ void DetourCrowdManager::Update(float delta)
         return;
 
     PROFILE(UpdateCrowd);
-        
+    
     crowd_->update(delta, agentDebug_);
 
     memset(&agentBuffer_[0], 0, maxAgents_ * sizeof(dtCrowdAgent*));
@@ -472,13 +472,12 @@ void DetourCrowdManager::OnNodeSet(Node* node)
     {
         SubscribeToEvent(node, E_SCENESUBSYSTEMUPDATE, HANDLER(DetourCrowdManager, HandleSceneSubsystemUpdate));
         SubscribeToEvent(node, E_NAVIGATION_MESH_REBUILT, HANDLER(DetourCrowdManager, HandleNavMeshFullRebuild));
-            
+        
         NavigationMesh* mesh = GetScene()->GetComponent<NavigationMesh>();
         if (!mesh)
             mesh = GetScene()->GetComponent<DynamicNavigationMesh>();
-        if (mesh) {
+        if (mesh)
             SetNavigationMesh(mesh);
-        }
         else
             LOGERROR("DetourCrowdManager requires an existing navigation mesh");
     }
