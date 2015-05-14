@@ -20,7 +20,7 @@ Although all required third-party libraries are included as source code, there a
 
 - For Android, the Android SDK and Android NDK (minimum API level 12) need to be installed.
 
-- For Emscripten, the Emscripten SDK need to be installed.
+- For Emscripten, the Emscripten SDK need to be installed (on Windows also MinGW toolchain is required.)
 
 To run Urho3D, the minimum system requirements are:
 
@@ -240,6 +240,10 @@ ulimit -Sn 512
 \endverbatim
 
 After the commands finish successfully, the HTMLs and its correspondng data files should have been generated in the build tree's "bin" subdirectory, from where it can be launched in a browser.
+
+On Windows building with Emscripten requires a MinGW toolchain. The one that can be installed through emsdk may not work correctly, but for example http://sourceforge.net/projects/mingw-w64/ with the default install settings has been known to work.
+
+If CMake complains that emcc is not able to compile a test program, try reactivating your current Emscripten cross-compiler tools with 'emsdk activate <your-tools-version>', clear all generated *.cmake files as well as the CMake cache, and retry running CMake.
 
 \section Building_64bit Native 64bit build
 
