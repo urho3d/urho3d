@@ -312,6 +312,7 @@ cp -p $(which ccache) .
 for compiler in clang clang++; do mv $compiler{,.orig} && sudo mv /usr/bin/$compiler{,.orig} && sudo ln -sf $(pwd)/$compiler.orig /usr/bin/$compiler && ln -sf ccache $compiler; done
 \endverbatim
 
+Xcode 6 has done something funky internally. It won't build unless the symlink resolves to an executable within its own rooted-'/usr/bin' in Xcode.app package. The 'ccache' executable is physically copied to this location for this reason. But as the result, you have to manually keep this copy up to date when upgrading 'ccache'.
 
 \page Running Running Urho3D player application
 
