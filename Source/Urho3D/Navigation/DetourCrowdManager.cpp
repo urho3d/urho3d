@@ -416,7 +416,7 @@ void DetourCrowdManager::Update(float delta)
             dtCrowdAgent* agent = agentBuffer_[i];
             if (agent)
             {
-                CrowdAgent* crowdAgent = static_cast<CrowdAgent*>(agent->params.userData);    
+                CrowdAgent* crowdAgent = static_cast<CrowdAgent*>(agent->params.userData);
                 if (crowdAgent)
                     crowdAgent->OnCrowdAgentReposition(Vector3(agent->npos), Vector3(agent->vel));
             }
