@@ -34,6 +34,7 @@ env:
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
 matrix:
   fast_finish: true
   include:
@@ -115,8 +116,8 @@ before_script:
   - rake ci_setup_cache
 script:
   - rake ci
-  - if [ $SITE_UPDATE ]; then rake ci_site_update; fi
-  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; if [ $LINUX ] && [ ! "$URHO3D_64BIT" == "0" ]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi
+  - if [ $SITE_UPDATE ]; then rake ci_site_update || ! [ $RELEASE_TAG ]; fi
+  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && if [ $LINUX ] && [ ! "$URHO3D_64BIT" == "0" ]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi || ! [ $RELEASE_TAG ]; fi
 after_script:
   - rake ci_teardown_cache
   - if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_create_mirrors; fi
@@ -148,6 +149,7 @@ env:
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
 before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
@@ -173,6 +175,7 @@ env:
     - PACKAGE_JOB_END=9
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
 matrix:
   fast_finish: true
   include:
@@ -224,7 +227,7 @@ before_script:
   - rake ci_setup_cache
 script:
   - rake ci
-  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
+  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload || ! [ $RELEASE_TAG ]; fi
 after_script: rake ci_teardown_cache
 
 ---
@@ -243,6 +246,7 @@ env:
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
 matrix:
   fast_finish: true
   include:
@@ -264,7 +268,7 @@ before_script:
   - rake ci_setup_cache
 script:
   - rake ci
-  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
+  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload || ! [ $RELEASE_TAG ]; fi
 after_script: rake ci_teardown_cache
 
 ---
@@ -280,6 +284,7 @@ env:
     - USE_CCACHE=2
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=300M
   matrix:
     - MAKEFILE=1    URHO3D_LIB_TYPE=STATIC
     - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED
@@ -307,7 +312,7 @@ before_script:
   - rake ci_setup_cache
 script:
   - rake ci
-  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
+  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload || ! [ $RELEASE_TAG ]; fi
 after_script: rake ci_teardown_cache
 
 ---
@@ -325,6 +330,7 @@ env:
     - USE_CCACHE=2
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
     # TODO: Remove CCACHE_CPP2 env var when Emscripten version has reached beyond 1.31.3
     - CCACHE_CPP2=1
   matrix:
@@ -346,7 +352,7 @@ before_script:
   - rake ci_setup_cache
 script:
   - rake ci
-  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && rake ci_emscripten_samples_update; fi
+  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && rake ci_emscripten_samples_update || ! [ $RELEASE_TAG ]; fi
 after_script: rake ci_teardown_cache
 
 # Below samples are excluded from Emscripten CI build due to build time constraint

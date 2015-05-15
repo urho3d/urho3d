@@ -186,8 +186,10 @@ end
 desc 'Configure, build, and test Urho3D project'
 task :ci do
   # Skip if only performing CI for selected branches and the current branch is not in the list
-  matched = /\[ci only:(.*?)\]/.match(ENV['COMMIT_MESSAGE'])
-  next if matched && !matched[1].split(/[ ,]/).reject!(&:empty?).map { |i| /#{i}/ =~ ENV['TRAVIS_BRANCH'] }.any?
+  unless ENV['RELEASE_TAG']
+    matched = /\[ci only:(.*?)\]/.match(ENV['COMMIT_MESSAGE'])
+    next if matched && !matched[1].split(/[ ,]/).reject!(&:empty?).map { |i| /#{i}/ =~ ENV['TRAVIS_BRANCH'] }.any?
+  end
   # Obtain our custom data, if any
   data = YAML::load(File.open(".travis.yml"))['data']
   data['excluded_sample'].each { |name| ENV["EXCLUDE_SAMPLE_#{name}"] = '1' } if data && data['excluded_sample']
@@ -235,7 +237,7 @@ task :ci_setup_cache do
     system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then if ! [ #{base_mirror} ] || ! `git clone -q --depth 1 --branch #{base_mirror}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null; fi && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi && find ~/.ccache -type f |xargs touch -r $(which ccache)"
   end
   # Clear ccache on demand
-  system "ccache -z -M 100M #{/\[ccache clear\]/ =~ ENV['COMMIT_MESSAGE'] ? '-C' : ''}"
+  system "ccache -z -M #{ENV['CCACHE_MAXSIZE']} #{/\[ccache clear\]/ =~ ENV['COMMIT_MESSAGE'] ? '-C' : ''}"
 end
 
 # Usage: NOT intended to be used manually
@@ -311,9 +313,13 @@ task :ci_create_mirrors do
   abort 'Skipped creating mirror branches due to moving HEAD' unless `git fetch -qf origin #{ENV['TRAVIS_PULL_REQUEST'] == 'false' ? ENV['TRAVIS_BRANCH'] : %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST']}/head'}}; git log -1 --pretty=format:'%H' FETCH_HEAD` == ENV['TRAVIS_COMMIT']
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
   scan = ENV['PACKAGE_UPLOAD'] || /\[ci scan\]/ =~ ENV['COMMIT_MESSAGE']  # Limit the frequency of scanning
-  matched = /\[ci only:(.*?)\]/.match(ENV['COMMIT_MESSAGE'])
-  ci_only = matched ? matched[1].split(/[ ,]/).reject!(&:empty?) : nil
-  ci_only.push('Coverity-Scan') if ci_only && scan
+  unless ENV['RELEASE_TAG']
+    matched = /\[ci only:(.*?)\]/.match(ENV['COMMIT_MESSAGE'])
+    ci_only = matched ? matched[1].split(/[ ,]/).reject!(&:empty?) : nil
+    ci_only.push('Coverity-Scan') if ci_only && scan
+  else
+    ci_only = nil
+  end
   stream = YAML::load_stream(File.open('.travis.yml'))
   notifications = stream[0]['notifications']
   notifications['email']['recipients'] = `git show -s --format='%ae %ce' #{ENV['TRAVIS_COMMIT']}`.chomp.split.uniq unless notifications['email']['recipients']
@@ -361,7 +367,7 @@ task :ci_package_upload do
       elapsed_time = (Time.now - Time.at(ENV['CI_START_TIME'].to_i)) / 60
       puts "\niOS checkpoint reached, elapsed time: #{elapsed_time}\n\n"
     end
-    if !ENV['CI_START_TIME'] || elapsed_time < 15 # minutes
+    if !ENV['CI_START_TIME'] || elapsed_time < 25 # minutes
       # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
       system 'echo Rebuild Urho3D library as Mach-O universal binary'
       xcode_build(0, '../Build/Urho3D.xcodeproj', 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
