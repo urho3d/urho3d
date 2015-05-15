@@ -1699,9 +1699,33 @@ To query for a path between start and end points on the navigation mesh, call \r
 
 For a demonstration of the navigation capabilities, check the related sample application (15_Navigation), which features partial navigation mesh rebuilds (objects can be created and deleted) and querying paths.
 
+Navigation meshes may be generated using either Watershed or Monotone triangulation. Watershed will typically produce more polygons that produce more natural paths while monotone is faster to generate but may produce undesirable path artifacts.
+
+\section PathfindingWeights Pathfinding weights
+
+Axis-aligned box regions of the navigation mesh may marked as belonging to specific 'area types' using NavArea components. The weight for a given area type is assigned using the SetAreaCost(unsigned, float) method of the NavigationMesh (or DynamicNavigationMesh).
+
+\section DynamicNavMesh Dynamic Navigation Mesh
+
+The DetourTileCache library is used to provide a variant of the NavigationMesh that supports the addition and removal of dynamic obstacles, the trade-off for which is almost twice the memory consumption. However, the addition and removal of obstacles is significantly faster than partially rebuilding a NavigationMesh.
+
+Obstacles are limited to cylindrical shapes consisting of a radius and height. When an obstacle is added (or enabled) DetourTileCache will use a stored copy of the obstacle free DynamicNavigationMesh to regenerate the relevant tiles.
+
+Changes that cannot be represented in the form of obstacles will require a partial rebuild using the Build() method and have no advantages over rebuilds of the standard NavigationMesh.
+
+In all other facets the usage of the DynamicNavigationMesh is identical to that of the regular NavigationMesh. See the 39_CrowdNavigation sample application for usage of Obstacles and the DynamicNavigationMesh.
+
 \section CrowdNavigation Crowd navigation
 
-In addition to the basic pathfinding, additional navigation components use the DetourCrowd library for pathfinding between crowd agents and possibility to add dynamic obstacles. These components are DynamicNavigationMesh, DetourCrowdManager, CrowdAgent, NavArea & Obstacle. See the 39_CrowdNavigation sample application for an example on how to use these.
+In addition to the basic pathfinding, additional navigation components use the DetourCrowd library for pathfinding between crowd agents and possibility to add dynamic obstacles. These components are DynamicNavigationMesh, DetourCrowdManager, CrowdAgent, NavArea & Obstacle.
+
+CrowdAgent's navigate using "targets" which is assigned with the SetMoveTarget(Vector3) method. The agent will halt upon reaching its' destination. To halt an agent in progress set it's move target to its current position.
+
+CrowdAgent's will fire events under different circumstances. The most important of which is the CrowdAgentFailureEvent which will be sent if the CrowdAgent is either in an invalid state (such as off of the NavigationMesh) or if the target destination is no longer reachable through the NavigationMesh. As the CrowdAgent moves through space it may send other events regarding it's current state using the CrowdAgentStateChanged event which will include state as CROWD_AGENT_TARGET_ARRIVED when the agent has reach the target destination.
+
+CrowdAgents' handle navigation areas differently. The DetourCrowdManager can contains 16 different "Filter types" (0 - 15) which have different settings for area costs. These costs are assigned in the DetourCrowdManager using the SetAreaCost(unsigned filterTypeID, unsigned areaID, float weight) method. The filter the CrowdAgent will use is assigned to the agent using its' SetNavigationFilterType(unsigned filterTypeID) method.
+
+See the 39_CrowdNavigation sample application for an example on how to use CrowdAgents and the DetourCrowdManager.
 
 \page UI User interface
 
