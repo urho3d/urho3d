@@ -26,7 +26,19 @@ class DetourCrowdManager : public Component
     unsigned GetMaxAgents() const;
     float GetAreaCost(unsigned filterID, unsigned areaID) const;
     unsigned GetAgentCount() const;
+    tolua_outside const PODVector<CrowdAgent*>& DetourCrowdManagerGetActiveAgents @ GetActiveAgents();
 
     tolua_property__get_set NavigationMesh* navigationMesh;
     tolua_property__get_set int maxAgents;
 };
+
+${
+
+static const PODVector<CrowdAgent*>& DetourCrowdManagerGetActiveAgents(DetourCrowdManager* crowdManager)
+{
+    static PODVector<CrowdAgent*> result;
+    result = crowdManager->GetActiveAgents();
+    return result;
+}
+
+$}
