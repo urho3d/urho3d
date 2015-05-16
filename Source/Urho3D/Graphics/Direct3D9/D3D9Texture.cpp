@@ -291,6 +291,11 @@ void Texture::SetParameters(const XMLElement& element)
     }
 }
 
+void Texture::SetSRGB(bool /* enable */)
+{
+
+}
+
 void Texture::CheckTextureBudget(StringHash type)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
