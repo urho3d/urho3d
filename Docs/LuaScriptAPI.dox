@@ -1841,6 +1841,7 @@ Properties:
 Methods:
 
 - bool CreateCrowd()
+- void DrawDebugGeometry(bool depthTest)
 - void SetNavigationMesh(NavigationMesh* navMesh)
 - void SetMaxAgents(unsigned agentCt)
 - void SetAreaCost(unsigned filterID, unsigned areaID, float cost)
@@ -1960,6 +1961,15 @@ Properties:
 
 <a name="Class_DynamicNavigationMesh"></a>
 ### DynamicNavigationMesh : NavigationMesh
+
+Methods:
+
+- void SetDrawObstacles(bool enable)
+- bool GetDrawObstacles() const
+
+Properties:
+
+- bool drawObstacles
 
 <a name="Class_Engine"></a>
 ### Engine : Object
@@ -3350,6 +3360,7 @@ Methods:
 - void SetAreaCost(unsigned areaID, float cost)
 - bool Build()
 - bool Build(const BoundingBox& boundingBox)
+- void SetPartitionType(NavmeshPartitionType aType)
 - Vector3 FindNearestPoint(const Vector3& point)
 - Vector3 FindNearestPoint(const Vector3& point, const Vector3& extents)
 - Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end)
@@ -3383,6 +3394,7 @@ Methods:
 - const BoundingBox& GetBoundingBox() const
 - BoundingBox GetWorldBoundingBox() const
 - IntVector2 GetNumTiles() const
+- NavmeshPartitionType GetPartitionType()
 
 Properties:
 
@@ -3400,6 +3412,7 @@ Properties:
 - float detailSampleDistance
 - float detailSampleMaxError
 - Vector3& padding
+- NavmeshPartitionType partitionType
 - bool initialized (readonly)
 - BoundingBox& boundingBox (readonly)
 - BoundingBox worldBoundingBox (readonly)
@@ -7295,6 +7308,11 @@ Properties:
 - int NAVIGATIONQUALITY_LOW
 - int NAVIGATIONQUALITY_MEDIUM
 - int NAVIGATIONQUALITY_HIGH
+
+### NavmeshPartitionType
+
+- int NAVMESH_PARTITION_WATERSHED
+- int NAVMESH_PARTITION_MONOTONE
 
 ### Orientation
 
