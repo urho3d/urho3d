@@ -894,10 +894,10 @@ void DynamicNavigationMesh::RemoveObstacle(Obstacle* obstacle, bool silent)
             LOGERROR("Failed to remove obstacle");
             return;
         }
+        obstacle->obstacleId_ = 0;
         // Require a node in order to send an event
         if (!silent && obstacle->GetNode())
         {
-            obstacle->obstacleId_ = 0;
             using namespace NavigationObstacleRemoved;
             VariantMap& eventData = GetContext()->GetEventDataMap();
             eventData[P_NODE] = obstacle->GetNode();
@@ -905,7 +905,7 @@ void DynamicNavigationMesh::RemoveObstacle(Obstacle* obstacle, bool silent)
             eventData[P_POSITION] = obstacle->GetNode()->GetWorldPosition();
             eventData[P_RADIUS] = obstacle->GetRadius();
             eventData[P_HEIGHT] = obstacle->GetHeight();
-            SendEvent(E_NAVIGATION_OBSTACLE_ADDED, eventData);
+            SendEvent(E_NAVIGATION_OBSTACLE_REMOVED, eventData);
         }
     }
 }
