@@ -1849,6 +1849,7 @@ Methods:
 - unsigned GetMaxAgents() const
 - float GetAreaCost(unsigned filterID, unsigned areaID) const
 - unsigned GetAgentCount() const
+- const PODVector<CrowdAgent*>& GetActiveAgents()
 
 Properties:
 
