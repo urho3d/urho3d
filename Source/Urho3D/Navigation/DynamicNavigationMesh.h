@@ -65,6 +65,11 @@ public:
     /// Return navigation data attribute.
     virtual PODVector<unsigned char> GetNavigationDataAttr() const;
 
+    /// Draw debug geometry for Obstacles.
+    void SetDrawObstacles(bool enable) { drawObstacles_ = enable; }
+    /// Return whether to draw Obstacles.
+    bool GetDrawObstacles() const { return drawObstacles_; }
+
 protected:
     struct TileCacheData;
 
@@ -101,6 +106,8 @@ private:
     dtTileCacheMeshProcess* meshProcessor_;
     /// Maximum number of obstacle objects allowed.
     unsigned maxObstacles_;
+    /// Debug draw Obstacles.
+    bool drawObstacles_;
 };
 
 }

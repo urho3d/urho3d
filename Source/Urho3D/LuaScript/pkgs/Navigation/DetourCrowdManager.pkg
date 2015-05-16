@@ -16,16 +16,17 @@ enum NavigationPushiness
 class DetourCrowdManager : public Component
 {
     bool CreateCrowd();
+    void DrawDebugGeometry(bool depthTest);
 
     void SetNavigationMesh(NavigationMesh *navMesh);
     void SetMaxAgents(unsigned agentCt);
     void SetAreaCost(unsigned filterID, unsigned areaID, float cost);
-    
+
     NavigationMesh* GetNavigationMesh();
     unsigned GetMaxAgents() const;
     float GetAreaCost(unsigned filterID, unsigned areaID) const;
     unsigned GetAgentCount() const;
-    
+
     tolua_property__get_set NavigationMesh* navigationMesh;
     tolua_property__get_set int maxAgents;
 };

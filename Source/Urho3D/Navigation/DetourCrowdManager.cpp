@@ -46,7 +46,7 @@
 
 namespace Urho3D
 {
-    
+
 extern const char* NAVIGATION_CATEGORY;
 
 static const unsigned DEFAULT_MAX_AGENTS = 512;
@@ -72,7 +72,7 @@ DetourCrowdManager::~DetourCrowdManager()
 void DetourCrowdManager::RegisterObject(Context* context)
 {
     context->RegisterFactory<DetourCrowdManager>(NAVIGATION_CATEGORY);
-    
+
     ACCESSOR_ATTRIBUTE("Max Agents", GetMaxAgents, SetMaxAgents, unsigned, DEFAULT_MAX_AGENTS, AM_DEFAULT);
 }
 
@@ -169,7 +169,22 @@ void DetourCrowdManager::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
             // Target circle
             debug->AddSphere(Sphere(pos2, 0.5f), color, depthTest);
+
+            // Draw CrowdAgent shape (from its radius & height)
+            CrowdAgent* crowdAgent = static_cast<CrowdAgent*>(ag->params.userData);
+            crowdAgent->DrawDebugGeometry(debug, depthTest);
         }
+    }
+}
+
+void DetourCrowdManager::DrawDebugGeometry(bool depthTest)
+{
+    Scene* scene = GetScene();
+    if (scene)
+    {
+        DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
+        if (debug)
+            DrawDebugGeometry(debug, depthTest);
     }
 }
 
@@ -258,7 +273,7 @@ int DetourCrowdManager::AddAgent(CrowdAgent* agent, const Vector3& pos)
         crowd_->getFilter(agent->filterType_),
         &polyRef,
         nearestPos);
-    
+
     const int agentID = crowd_->addAgent(nearestPos, &params);
     if (agentID != -1)
         agents_.Push(agent);
@@ -403,12 +418,12 @@ void DetourCrowdManager::Update(float delta)
         return;
 
     PROFILE(UpdateCrowd);
-    
+
     crowd_->update(delta, agentDebug_);
 
     memset(&agentBuffer_[0], 0, maxAgents_ * sizeof(dtCrowdAgent*));
     const int count = crowd_->getActiveAgents(&agentBuffer_[0], maxAgents_);
-    
+
     {
         PROFILE(ApplyCrowdUpdates);
         for (int i = 0; i < count; i++)
@@ -472,7 +487,7 @@ void DetourCrowdManager::OnNodeSet(Node* node)
     {
         SubscribeToEvent(node, E_SCENESUBSYSTEMUPDATE, HANDLER(DetourCrowdManager, HandleSceneSubsystemUpdate));
         SubscribeToEvent(node, E_NAVIGATION_MESH_REBUILT, HANDLER(DetourCrowdManager, HandleNavMeshFullRebuild));
-        
+
         NavigationMesh* mesh = GetScene()->GetComponent<NavigationMesh>();
         if (!mesh)
             mesh = GetScene()->GetComponent<DynamicNavigationMesh>();

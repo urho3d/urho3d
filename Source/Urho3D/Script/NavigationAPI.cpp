@@ -63,6 +63,7 @@ static CScriptArray* DetourCrowdManagerGetActiveAgents(DetourCrowdManager* crowd
 
 template<class T> static void RegisterNavMeshBase(asIScriptEngine* engine, const char* name)
 {
+    engine->RegisterEnum("NavmeshPartitionType");
     engine->RegisterObjectMethod(name, "bool Build()", asMETHODPR(T, Build, (void), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "bool Build(const BoundingBox&in)", asMETHODPR(T, Build, (const BoundingBox&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "void SetAreaCost(uint, float)", asMETHOD(T, SetAreaCost), asCALL_THISCALL);
@@ -107,6 +108,8 @@ template<class T> static void RegisterNavMeshBase(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(name, "const BoundingBox& get_boundingBox() const", asMETHOD(T, GetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "BoundingBox get_worldBoundingBox() const", asMETHOD(T, GetWorldBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "IntVector2 get_numTiles() const", asMETHOD(T, GetNumTiles), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "void set_partitionType()", asMETHOD(T, SetPartitionType), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "NavmeshPartitionType get_partitionType()", asMETHOD(T, GetPartitionType), asCALL_THISCALL);
 }
 
 void RegisterNavigationMesh(asIScriptEngine* engine)
@@ -122,6 +125,8 @@ void RegisterDynamicNavigationMesh(asIScriptEngine* engine)
     RegisterSubclass<NavigationMesh, DynamicNavigationMesh>(engine, "NavigationMesh", "DynamicNavigationMesh");
     RegisterNavMeshBase<DynamicNavigationMesh>(engine, "DynamicNavigationMesh");
     engine->RegisterObjectMethod("DynamicNavigationMesh", "Array<Vector3>@ FindPath(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(DynamicNavigationMeshFindPath), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DynamicNavigationMesh", "void set_drawObstacles(bool)", asMETHOD(DynamicNavigationMesh, SetDrawObstacles), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DynamicNavigationMesh", "bool get_drawObstacles() const", asMETHOD(DynamicNavigationMesh, GetDrawObstacles), asCALL_THISCALL);
 }
 
 void RegisterOffMeshConnection(asIScriptEngine* engine)
@@ -160,6 +165,7 @@ void RegisterDetourCrowdManager(asIScriptEngine* engine)
 {
     RegisterComponent<DetourCrowdManager>(engine, "DetourCrowdManager");
     engine->RegisterObjectMethod("DetourCrowdManager", "void CreateCrowd()", asMETHOD(DetourCrowdManager, CreateCrowd), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DetourCrowdManager", "void DrawDebugGeometry(bool)", asMETHODPR(DetourCrowdManager, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DetourCrowdManager", "void set_navMesh(NavigationMesh@+)", asMETHOD(DetourCrowdManager, SetNavigationMesh), asCALL_THISCALL);
     engine->RegisterObjectMethod("DetourCrowdManager", "NavigationMesh@+ get_navMesh() const", asMETHOD(DetourCrowdManager, GetNavigationMesh), asCALL_THISCALL);
     engine->RegisterObjectMethod("DetourCrowdManager", "int get_maxAgents() const", asMETHOD(DetourCrowdManager, GetMaxAgents), asCALL_THISCALL);
