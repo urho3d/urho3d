@@ -86,6 +86,7 @@ CrowdAgent::CrowdAgent(Context* context) :
 
 CrowdAgent::~CrowdAgent()
 {
+    RemoveAgentFromCrowd();
 }
 
 void CrowdAgent::RegisterObject(Context* context)

@@ -33,6 +33,7 @@ env:
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
     - URHO3D_MODERN_CPP=0
     - URHO3D_AMALG=0
 matrix:
@@ -40,7 +41,7 @@ matrix:
   include:
     - &Linux-64bit
       compiler: gcc-64bit-static
-      env: LINUX=1 URHO3D_LIB_TYPE=STATIC
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC COVERITY_SCAN_THRESHOLD=20
     - &Linux-64bit-shared
       compiler: gcc-64bit-shared
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED
@@ -142,6 +143,7 @@ env:
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
 before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
@@ -165,6 +167,7 @@ env:
     - ANDROID_TMP=~/tmp
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
     - URHO3D_MODERN_CPP=0
     - URHO3D_AMALG=0
 matrix:
@@ -232,6 +235,7 @@ env:
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
     - URHO3D_MODERN_CPP=0
     - URHO3D_AMALG=0
 matrix:
@@ -266,6 +270,7 @@ env:
     - USE_CCACHE=2
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=300M
     - URHO3D_MODERN_CPP=0
     - URHO3D_AMALG=0
   matrix:
@@ -304,11 +309,11 @@ env:
     - EMSCRIPTEN=1
     - EMSCRIPTEN_SHARE_DATA=1
     - EMSCRIPTEN_EMRUN_BROWSER=chrome
-    - USE_CCACHE=2
+    # Temporarily disable ccache until we are using Emscripten 1.32
+    # USE_CCACHE=2
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
-    # TODO: Remove CCACHE_CPP2 env var when Emscripten version has reached beyond 1.31.3
-    - CCACHE_CPP2=1
+    - CCACHE_MAXSIZE=100M
     - URHO3D_MODERN_CPP=0
     - URHO3D_AMALG=0
   matrix:
@@ -324,9 +329,9 @@ before_script:
   - travis_retry brew update >/dev/null && travis_retry brew install ccache
   - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz && tar xfz emsdk-portable.tar.gz && rm emsdk-portable.tar.gz && cd emsdk_portable && ./emsdk update >/dev/null && sed -i.bak 's/-xvf/-xf/g' emsdk && ./emsdk install latest >/dev/null && ./emsdk activate latest >/dev/null && source ./emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$EMSCRIPTEN_ROOT_PATH:$PATH
-  - rake ci_setup_cache
+  # rake ci_setup_cache
 script: rake ci
-after_script: rake ci_teardown_cache
+#after_script: rake ci_teardown_cache
 
 # Below samples are excluded from Emscripten CI build due to build time constraint
 data:

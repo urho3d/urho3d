@@ -5537,6 +5537,7 @@ Methods:
 - void ApplyAttributes()
 - void CreateCrowd()
 - void DrawDebugGeometry(DebugRenderer@, bool)
+- void DrawDebugGeometry(bool)
 - CrowdAgent@[]@ GetActiveAgents()
 - float GetAreaCost(uint, uint)
 - Variant GetAttribute(const String&) const
@@ -5992,6 +5993,7 @@ Properties:
 - float cellSize
 - float detailSampleDistance
 - float detailSampleMaxError
+- bool drawObstacles
 - float edgeMaxError
 - float edgeMaxLength
 - bool enabled
@@ -6003,6 +6005,7 @@ Properties:
 - IntVector2 numTiles // readonly
 - ObjectAnimation@ objectAnimation
 - Vector3 padding
+- NavmeshPartitionType partitionType
 - int refs // readonly
 - float regionMergeSize
 - float regionMinSize
@@ -7777,6 +7780,7 @@ Properties:
 - IntVector2 numTiles // readonly
 - ObjectAnimation@ objectAnimation
 - Vector3 padding
+- NavmeshPartitionType partitionType
 - int refs // readonly
 - float regionMergeSize
 - float regionMinSize
@@ -13447,6 +13451,10 @@ Properties:
 - PUSHINESS_LOW
 - PUSHINESS_MEDIUM
 - PUSHINESS_HIGH
+
+
+### NavmeshPartitionType
+
 
 
 ### Orientation

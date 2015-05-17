@@ -54,7 +54,7 @@ class URHO3D_API DetourCrowdManager : public Component
 {
     OBJECT(DetourCrowdManager);
     friend class CrowdAgent;
-              
+
 public:
     /// Construct.
     DetourCrowdManager(Context* context);
@@ -81,6 +81,8 @@ public:
 
     /// Draw the agents' pathing debug data.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    /// Add debug geometry to the debug renderer.
+    void DrawDebugGeometry(bool depthTest);
     /// Get the currently included agents.
     PODVector<CrowdAgent*> GetActiveAgents() const { return agents_; }
     /// Create detour crowd component for the specified navigation mesh.
@@ -126,7 +128,7 @@ private:
     /// NavigationMesh for which the crowd was created.
     WeakPtr<NavigationMesh> navigationMesh_;
     /// Max agents for the crowd.
-    unsigned maxAgents_;    
+    unsigned maxAgents_;
     /// Internal debug information.
     dtCrowdAgentDebugInfo* agentDebug_;
     /// Container for fetching agents from DetourCrowd during update.

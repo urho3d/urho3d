@@ -1,7 +1,10 @@
 $#include "Navigation/DynamicNavigationMesh.h"
 
-
 class DynamicNavigationMesh : public NavigationMesh
 {
-        
+    void SetDrawObstacles(bool enable);
+
+    bool GetDrawObstacles() const;
+
+    tolua_property__get_set bool drawObstacles;
 };
