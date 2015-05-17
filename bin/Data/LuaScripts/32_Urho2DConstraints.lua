@@ -364,7 +364,7 @@ end
 function HandleMouseButtonDown(eventType, eventData)
     local rigidBody = physicsWorld:GetRigidBody(input.mousePosition.x, input.mousePosition.y) -- Raycast for RigidBody2Ds to pick
     if rigidBody ~= nil then
-        pickedNode = rigidBody:GetNode()
+        pickedNode = rigidBody.node
         local staticSprite = pickedNode:GetComponent("StaticSprite2D")
         staticSprite.color = Color(1, 0, 0, 1) -- Temporary modify color of the picked sprite
 
@@ -408,7 +408,7 @@ end
 function HandleTouchBegin3(eventType, eventData)
     local rigidBody = physicsWorld:GetRigidBody(eventData:GetInt("X"), eventData:GetInt("Y")) -- Raycast for RigidBody2Ds to pick
     if rigidBody ~= nil then
-        pickedNode = rigidBody:GetNode()
+        pickedNode = rigidBody.node
         local staticSprite = pickedNode:GetComponent("StaticSprite2D")
         staticSprite.color = Color(1, 0, 0, 1) -- Temporary modify color of the picked sprite
         local rigidBody = pickedNode:GetComponent("RigidBody2D")

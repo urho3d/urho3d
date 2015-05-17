@@ -231,7 +231,7 @@ function AddOrRemoveObject()
     local hitPos, hitDrawable = Raycast(250.0)
     if hitDrawable then
 
-        local hitNode = hitDrawable:GetNode()
+        local hitNode = hitDrawable.node
         if hitNode.name == "Mushroom" then
             hitNode:Remove()
         elseif hitNode.name == "Jack" then
@@ -345,7 +345,7 @@ function HandleUpdate(eventType, eventData)
     -- Make the CrowdAgents face the direction of their velocity
     for i = 1, table.maxn(agents) do
         local agent = agents[i]
-        agent:GetNode().worldDirection = agent.actualVelocity
+        agent.node.worldDirection = agent.actualVelocity
     end
 end
 
