@@ -136,7 +136,7 @@ function CreateUI()
     instructionText.text = "Use WASD keys to move, RMB to rotate view\n"..
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"..
         "MMB to add obstacles or remove obstacles/agents\n"..
-        "F5 To Save The Scene, F7 to Reload the Scene\n"..
+        "F5 to save scene, F7 to load\n"..
         "Space to toggle debug geometry"
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
     -- The text has multiple rows. Center them in relation to each other

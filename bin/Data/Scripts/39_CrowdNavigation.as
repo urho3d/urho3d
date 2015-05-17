@@ -11,7 +11,6 @@
 #include "Scripts/Utilities/Sample.as"
 
 DetourCrowdManager@ crowdManager;
-Array<CrowdAgent@> agents;
 
 void Start()
 {
@@ -140,7 +139,7 @@ void CreateUI()
         "Use WASD keys to move, RMB to rotate view\n"
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"
         "MMB to add obstacles or remove obstacles/agents\n"
-        "F5 To Save The Scene, F7 to Reload the Scene\n"
+        "F5 to save scene, F7 to load\n"
         "Space to toggle debug geometry";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other
@@ -204,7 +203,6 @@ Node@ SpawnJack(const Vector3& pos)
     // Create a CrowdAgent component and set its height (use default radius)
     CrowdAgent@ agent = jackNode.CreateComponent("CrowdAgent");
     agent.height = 2.0f;
-    agents = crowdManager.GetActiveAgents(); // Update agents container
 
     return jackNode;
 }
@@ -224,7 +222,8 @@ void SetPathPoint()
             SpawnJack(pathPos);
         else
         {
-            // Set target position and ignit agents' move
+            // Set target position and init agents' move
+            Array<CrowdAgent@>@ agents = crowdManager.GetActiveAgents();
             for (uint i = 0; i < agents.length; ++i)
             {
                 CrowdAgent@ agent = agents[i];
@@ -257,10 +256,7 @@ void AddOrRemoveObject()
         if (hitNode.name == "Mushroom")
             hitNode.Remove();
         else if (hitNode.name == "Jack")
-        {
             hitNode.Remove();
-            agents = crowdManager.GetActiveAgents(); // Update agents container
-        }
         else
             CreateMushroom(hitPos);
     }
@@ -348,6 +344,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     MoveCamera(timeStep);
 
     // Make the CrowdAgents face the direction of their velocity
+    Array<CrowdAgent@>@ agents = crowdManager.GetActiveAgents();
     for (uint i = 0; i < agents.length; ++i)
     {
         CrowdAgent@ agent = agents[i];
@@ -365,9 +362,8 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         File loadFile(fileSystem.programDir + "Data/Scenes/CrowdNavigation.xml", FILE_READ);
         scene_.LoadXML(loadFile);
 
-        // After reload, reacquire crowd manager & agents
+        // After reload, reacquire crowd manager
         crowdManager = scene_.GetComponent("DetourCrowdManager");
-        agents = crowdManager.GetActiveAgents();
 
         // Re-enable debug draw for obstacles
         DynamicNavigationMesh@ navMesh = scene_.GetComponent("DynamicNavigationMesh");
