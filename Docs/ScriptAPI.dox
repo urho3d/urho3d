@@ -13455,6 +13455,8 @@ Properties:
 
 ### NavmeshPartitionType
 
+- NAVMESH_PARTITION_WATERSHED
+- NAVMESH_PARTITION_MONOTONE
 
 
 ### Orientation
