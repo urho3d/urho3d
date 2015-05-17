@@ -282,7 +282,7 @@ task :ci_site_update do
     if system("git commit -qm 'Test commit to detect API changes'")
       # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
       bump_soversion 'Source/Urho3D/.soversion' or abort 'Failed to bump soversion'
-      system "git add Source/Urho3D/.soversion && git commit --amend -qm 'Travis CI: API documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\n#{ENV['PACKAGE_UPLOAD'] ? '' : '[ci package]'}'" or abort 'Failed to stage .soversion file'
+      system "git add Source/Urho3D/.soversion && git commit --amend -qm \"Travis CI: API documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\n#{ENV['PACKAGE_UPLOAD'] ? '' : '[ci package]'}\"" or abort 'Failed to stage .soversion file'
       system "git push origin HEAD:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1" or abort 'Failed to update API documentation'
     end
   end
@@ -529,9 +529,10 @@ def makefile_ci
   end
 end
 
-def get_root_commit_and_recipients sha=ENV['TRAVIS_COMMIT']
+def get_root_commit_and_recipients
   # Root commit is a commit submitted by human
-  recipients = `git show -s --format='%ae %ce' #{sha}`.chomp.split.uniq
+  root_commit = `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.rstrip
+  recipients = `git show -s --format='%ae %ce' #{root_commit}`.chomp.split.uniq
   if recipients.include? 'urho3d.travis.ci@gmail.com'
     matched = /Commit:.*commit\/(.*?)\n/.match(ENV['COMMIT_MESSAGE'])
     if (matched)
@@ -539,7 +540,7 @@ def get_root_commit_and_recipients sha=ENV['TRAVIS_COMMIT']
       recipients = `git show -s --format='%ae %ce' #{root_commit}`.chomp.split.uniq
     end
   end
-  return root_commit ? root_commit : sha, recipients
+  return root_commit, recipients
 end
 
 def android_find_device api = nil, abi = nil
