@@ -1112,6 +1112,14 @@ Methods:
 - Component* GetComponent(StringHash type) const
 - Component* GetComponent(const String type) const
 
+Properties:
+
+- unsigned ID (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
+- Node* node (readonly)
+- Scene* scene (readonly)
+
 <a name="Class_Connection"></a>
 ### Connection : Object
 
@@ -3626,9 +3634,6 @@ Methods:
 - const Variant& GetVar(StringHash key) const
 - const VariantMap& GetVars() const
 - Component* GetComponent(const String type) const
-- void SetID(unsigned id)
-- void SetScene(Scene* scene)
-- void ResetScene()
 - bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
 - bool LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
 - Node* CreateChild(unsigned id, CreateMode mode)
@@ -3636,11 +3641,11 @@ Methods:
 
 Properties:
 
-- unsigned ID
+- unsigned ID (readonly)
 - String name
 - StringHash nameHash (readonly)
 - Node* parent
-- Scene* scene
+- Scene* scene (readonly)
 - bool enabled
 - bool enabledSelf (readonly)
 - Connection* owner
