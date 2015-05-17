@@ -41,7 +41,7 @@ matrix:
     - &Linux-64bit
       addons: {apt: {sources: *default_sources, packages: &linux_packages [*default_packages, libasound2-dev, rpm]}}
       compiler: gcc-64bit-static
-      env: LINUX=1 URHO3D_LIB_TYPE=STATIC
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC COVERITY_SCAN_THRESHOLD=20
     - &Linux-64bit-shared
       <<: *Linux-64bit
       compiler: gcc-64bit-shared
@@ -150,7 +150,6 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
-    - COVERITY_SCAN_THHRESHOLD=20
 before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
