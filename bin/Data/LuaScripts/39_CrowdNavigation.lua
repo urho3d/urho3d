@@ -1,20 +1,17 @@
 -- CrowdNavigation example.
 -- This sample demonstrates:
---     - Generating a cached navigation mesh into the scene
+--     - Generating a dynamic navigation mesh into the scene
 --     - Performing path queries to the navigation mesh
 --     - Adding and removing obstacles at runtime from the dynamic mesh
---     - Visualizing custom debug geometry
+--     - Adding and removing crowd agents at runtime
 --     - Raycasting drawable components
---     - Making a node follow the Detour path
 --     - Crowd movement management
+--     - Accessing crowd agents with the crowd manager
 
 require "LuaScripts/Utilities/Sample"
 
-local endPos = nil
-local currentPath = {}
-local jackNodes = {}
 local crowdManager = nil
-local mushrooms = {}
+local agents = {}
 
 function Start()
     -- Execute the common startup for samples
@@ -68,8 +65,7 @@ function CreateScene()
 
     -- Create randomly sized boxes. If boxes are big enough, make them occluders. Occluders will be software rasterized before
     -- rendering to a low-resolution depth-only buffer to test the objects in the view frustum for visibility
-    local NUM_BOXES = 20
-    for i = 1, NUM_BOXES do
+    for i = 1, 20 do
         local boxNode = scene_:CreateChild("Box")
         local size = 1.0 + Random(10.0)
         boxNode.position = Vector3(Random(80.0) - 40.0, size * 0.5, Random(80.0) - 40.0)
@@ -85,10 +81,14 @@ function CreateScene()
 
     -- Create a DynamicNavigationMesh component to the scene root
     local navMesh = scene_:CreateComponent("DynamicNavigationMesh")
+    -- Enable drawing debug geometry for obstacles
+    navMesh.drawObstacles = true
     -- Set the agent height large enough to exclude the layers under boxes
     navMesh.agentHeight = 10
     -- Set nav mesh tilesize to something reasonable
     navMesh.tileSize = 64
+    -- Set nav mesh cell height to minimum (allows agents to be grounded)
+    navMesh.cellHeight = 0.04
     -- Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
     -- navigation mesh. By default this is recursive, but the recursion could be turned off from Navigable
     scene_:CreateComponent("Navigable")
@@ -100,19 +100,20 @@ function CreateScene()
     -- it will use renderable geometry instead
     navMesh:Build()
 
+    -- Create a DetourCrowdManager component to the scene root
     crowdManager = scene_:CreateComponent("DetourCrowdManager")
-    
-    -- Create Jack node that will follow the path
+
+    -- Create Jack node as crowd agent
     SpawnJack(Vector3(-5, 0, 20))
-    
-    -- Create some mushrooms
-    local NUM_MUSHROOMS = 100
-    for i = 1, NUM_MUSHROOMS do
+
+    -- Create some mushrooms as obstacles. Note that obstacles are added onto an already buit navigation mesh
+    for i = 1, 100 do
         CreateMushroom(Vector3(Random(90.0) - 45.0, 0.0, Random(90.0) - 45.0))
     end
-    
-    -- Create the camera. Limit far clip distance to match the fog
-    cameraNode = scene_:CreateChild("Camera")
+
+    -- Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
+    -- the scene, because we want it to be unaffected by scene load / save
+    cameraNode = Node()
     local camera = cameraNode:CreateComponent("Camera")
     camera.farClip = 300.0
 
@@ -134,7 +135,8 @@ function CreateUI()
     local instructionText = ui.root:CreateChild("Text")
     instructionText.text = "Use WASD keys to move, RMB to rotate view\n"..
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"..
-        "MMB to add or remove obstacles\n"..
+        "MMB to add obstacles or remove obstacles/agents\n"..
+        "F5 To Save The Scene, F7 to Reload the Scene\n"..
         "Space to toggle debug geometry"
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
     -- The text has multiple rows. Center them in relation to each other
@@ -159,10 +161,108 @@ function SubscribeToEvents()
     -- Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request
     -- debug geometry
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate")
-    
+
     -- Subscribe HandleCrowdAgentFailure() function for resolving invalidation issues with agents, during which we
     -- use a larger extents for finding a point on the navmesh to fix the agent's position
     SubscribeToEvent("CrowdAgentFailure", "HandleCrowdAgentFailure")
+end
+
+function SpawnJack(pos)
+    local jackNode = scene_:CreateChild("Jack")
+    jackNode.position = pos
+    local modelObject = jackNode:CreateComponent("AnimatedModel")
+    modelObject.model = cache:GetResource("Model", "Models/Jack.mdl")
+    modelObject.material = cache:GetResource("Material", "Materials/Jack.xml")
+    modelObject.castShadows = true
+
+    -- Create a CrowdAgent component and set its height (use default radius)
+    local agent = jackNode:CreateComponent("CrowdAgent")
+    agent.height = 2.0
+    agents = crowdManager:GetActiveAgents() -- Update agents container
+end
+
+function CreateMushroom(pos)
+    local mushroomNode = scene_:CreateChild("Mushroom")
+    mushroomNode.position = pos
+    mushroomNode.rotation = Quaternion(0.0, Random(360.0), 0.0)
+    mushroomNode:SetScale(2.0 + Random(0.5))
+    local mushroomObject = mushroomNode:CreateComponent("StaticModel")
+    mushroomObject.model = cache:GetResource("Model", "Models/Mushroom.mdl")
+    mushroomObject.material = cache:GetResource("Material", "Materials/Mushroom.xml")
+    mushroomObject.castShadows = true
+
+    -- Create the navigation Obstacle component and set its height & radius proportional to scale
+    local obstacle = mushroomNode:CreateComponent("Obstacle")
+    obstacle.radius = mushroomNode.scale.x
+    obstacle.height = mushroomNode.scale.y
+    return mushroomNode
+end
+
+function SetPathPoint()
+    local hitPos, hitDrawable = Raycast(250.0)
+    local navMesh = scene_:GetComponent("DynamicNavigationMesh")
+
+    if hitDrawable then
+        local pathPos = navMesh:FindNearestPoint(hitPos, Vector3.ONE)
+
+        if input:GetQualifierDown(QUAL_SHIFT) then
+            -- Spawn a Jack
+            SpawnJack(pathPos)
+        else
+            -- Set target position and ignit agents' move
+            for i = 1, table.maxn(agents) do
+                local agent = agents[i]
+
+                if i == 1 then
+                    -- The first agent will always move to the exact position
+                    agent:SetMoveTarget(pathPos)
+                else
+                    -- Other agents will move to a random point nearby
+                    local targetPos = navMesh:FindNearestPoint(pathPos + Vector3(Random(-4.5, 4.5), 0, Random(-4.5, 4.5)), Vector3.ONE)
+                    agent:SetMoveTarget(targetPos)
+                end
+            end
+        end
+    end
+end
+
+function AddOrRemoveObject()
+    -- Raycast and check if we hit a mushroom node. If yes, remove it, if no, create a new one
+    local hitPos, hitDrawable = Raycast(250.0)
+    if hitDrawable then
+
+        local hitNode = hitDrawable:GetNode()
+        if hitNode.name == "Mushroom" then
+            hitNode:Remove()
+        elseif hitNode.name == "Jack" then
+            hitNode:Remove()
+            agents = crowdManager:GetActiveAgents() -- Update agents container
+        else
+            CreateMushroom(hitPos)
+        end
+    end
+end
+
+function Raycast(maxDistance)
+    local hitPos = nil
+    local hitDrawable = nil
+
+    local pos = ui.cursorPosition
+    -- Check the cursor is visible and there is no UI element in front of the cursor
+    if (not ui.cursor.visible) or (ui:GetElementAt(pos, true) ~= nil) then
+        return nil, nil
+    end
+
+    local camera = cameraNode:GetComponent("Camera")
+    local cameraRay = camera:GetScreenRay(pos.x / graphics.width, pos.y / graphics.height)
+    -- Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit
+    local octree = scene_:GetComponent("Octree")
+    local result = octree:RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY)
+    if result.drawable ~= nil then
+        return result.position, result.drawable
+    end
+
+    return nil, nil
 end
 
 function MoveCamera(timeStep)
@@ -208,127 +308,31 @@ function MoveCamera(timeStep)
     if input:GetMouseButtonPress(MOUSEB_LEFT) then
         SetPathPoint()
     end
-    -- Add or remove objects with middle mouse button, then rebuild navigation mesh partially
+    -- Add new obstacle or remove existing obstacle/agent with middle mouse button
     if input:GetMouseButtonPress(MOUSEB_MIDDLE) then
         AddOrRemoveObject()
     end
-    
+
     -- Toggle debug geometry with space
     if input:GetKeyPress(KEY_SPACE) then
         drawDebug = not drawDebug
     end
-end
 
-function SetPathPoint()
-    local result, hitPos, hitDrawable = Raycast(250.0)
-    local navMesh = scene_:GetComponent("DynamicNavigationMesh")
-    
-    if result then
-        local pathPos = navMesh:FindNearestPoint(hitPos, Vector3.ONE)
-        
-        if input:GetQualifierDown(QUAL_SHIFT) then
-            -- spawn a jack
-            SpawnJack(pathPos)
-        else
-            -- Calculate path from Jack's current position to the end point
-            local ct = table.maxn(jackNodes)
-            if ct > 0 then
-                for i = 1, ct do
-                    local agt = jackNodes[i]:GetComponent("CrowdAgent")
-                    agt.enabled = true
-                    if i == 1 then
-                        -- The first agent will always move to the exact target
-                        agt:SetMoveTarget(pathPos)
-                    else
-                        -- Keep the random point on the navigation mesh
-                        local targetPos = navMesh:FindNearestPoint(pathPos + Vector3(Random(-4.5, 4.5), 0, Random(-4.5, 4.5)), Vector3.ONE)
-                        agt:SetMoveTarget(targetPos)
-                    end
-                end
-            end
-        end
+    -- Check for loading/saving the scene from/to the file Data/Scenes/CrowdNavigation.xml relative to the executable directory
+    if input:GetKeyPress(KEY_F5) then
+        scene_:SaveXML(fileSystem:GetProgramDir().."Data/Scenes/CrowdNavigation.xml")
     end
-end
+    if input:GetKeyPress(KEY_F7) then
+        scene_:LoadXML(fileSystem:GetProgramDir().."Data/Scenes/CrowdNavigation.xml")
 
-function GetIndexOf(tableTarget, objectTarget)
-    for k,v in pairs(tableTarget) do
-        if objectTarget == v then
-            return k
-        end
+        -- After reload, reacquire crowd manager & agents
+        crowdManager = scene_:GetComponent("DetourCrowdManager")
+        agents = crowdManager:GetActiveAgents()
+
+        -- Re-enable debug draw for obstacles
+        local navMesh = scene_:GetComponent("DynamicNavigationMesh")
+        navMesh.drawObstacles = true
     end
-    return -1
-end
-
-function AddOrRemoveObject()
-    -- Raycast and check if we hit a mushroom node. If yes, remove it, if no, create a new one
-    local result, hitPos, hitDrawable = Raycast(250.0)
-    if result then
-
-        local hitNode = hitDrawable:GetNode()
-        if hitNode.name == "Mushroom" then
-            local idx = GetIndexOf(mushrooms, hitNode)
-            if idx >= 0 then
-                table.remove(mushrooms, idx)
-            end
-            hitNode:Remove()
-        else
-            local newNode = CreateMushroom(hitPos)
-            local newObject = newNode:GetComponent("StaticModel")
-        end
-    end
-end
-
-function SpawnJack(pos)
-    local jackNode = scene_:CreateChild("Jack")
-    jackNode.position = pos
-    local modelObject = jackNode:CreateComponent("AnimatedModel")
-    modelObject.model = cache:GetResource("Model", "Models/Jack.mdl")
-    modelObject.material = cache:GetResource("Material", "Materials/Jack.xml")
-    modelObject.castShadows = true
-    local agent = jackNode:CreateComponent("CrowdAgent")
-    agent.height = 2.0
-    agent.enabled = false
-    table.insert(jackNodes, jackNode)
-end
-
-function CreateMushroom(pos)
-    local mushroomNode = scene_:CreateChild("Mushroom")
-    mushroomNode.position = pos
-    mushroomNode.rotation = Quaternion(0.0, Random(360.0), 0.0)
-    mushroomNode:SetScale(2.0 + Random(0.5))
-    local mushroomObject = mushroomNode:CreateComponent("StaticModel")
-    mushroomObject.model = cache:GetResource("Model", "Models/Mushroom.mdl")
-    mushroomObject.material = cache:GetResource("Material", "Materials/Mushroom.xml")
-    mushroomObject.castShadows = true
-    local obstacleObject = mushroomNode:CreateComponent("Obstacle")
-    obstacleObject.radius = mushroomNode.scale.x
-    table.insert(mushrooms, mushroomNode)
-    return mushroomNode
-end
-
-function Raycast(maxDistance)
-    local hitPos = nil
-    local hitDrawable = nil
-
-    local pos = ui.cursorPosition
-    -- Check the cursor is visible and there is no UI element in front of the cursor
-    if (not ui.cursor.visible) or (ui:GetElementAt(pos, true) ~= nil) then
-        return false, nil, nil
-    end
-
-    local camera = cameraNode:GetComponent("Camera")
-    local cameraRay = camera:GetScreenRay(pos.x / graphics.width, pos.y / graphics.height)
-    -- Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit
-    local octree = scene_:GetComponent("Octree")
-    local result = octree:RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY)
-    if result.drawable ~= nil then
-        -- Calculate hit position in world space
-        hitPos = cameraRay.origin + cameraRay.direction * result.distance
-        hitDrawable = result.drawable
-        return true, hitPos, hitDrawable
-    end
-
-    return false, nil, nil
 end
 
 function HandleUpdate(eventType, eventData)
@@ -337,39 +341,23 @@ function HandleUpdate(eventType, eventData)
 
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
-    
+
     -- Make the CrowdAgents face the direction of their velocity
-    local ct = table.maxn(jackNodes)
-    if ct > 0 then
-        for i = 1, ct do
-            local agent = jackNodes[i]:GetComponent("CrowdAgent")
-            jackNodes[i].worldDirection = agent:GetActualVelocity()
-        end
+    for i = 1, table.maxn(agents) do
+        local agent = agents[i]
+        agent:GetNode().worldDirection = agent.actualVelocity
     end
 end
 
 function HandlePostRenderUpdate(eventType, eventData)
-    -- If draw debug mode is enabled, draw navigation mesh debug geometry
+    -- If draw debug mode is enabled, draw navigation debug geometry
     if drawDebug then
+        -- Visualize navigation mesh and obstacles
         local navMesh = scene_:GetComponent("DynamicNavigationMesh")
         navMesh:DrawDebugGeometry(true)
-        
-        -- Visualize the start and end points and the last calculated path
-        local size = table.maxn(jackNodes)
-        if size > 0 then
-            for i = 1, size do
-                local agent = jackNodes[i]:GetComponent("CrowdAgent")
-                agent:DrawDebugGeometry(true)
-            end
-        end
-        
-        size = table.maxn(mushrooms)
-        if size > 0 then
-            for i = 1, size do
-                local obstacle = mushrooms[i]:GetComponent("Obstacle")
-                obstacle:DrawDebugGeometry(true)
-            end
-        end
+
+        -- Visualize agents' path and position to reach
+        crowdManager:DrawDebugGeometry(true)
     end
 end
 
@@ -378,7 +366,7 @@ function HandleCrowdAgentFailure(eventType, eventData)
     local node = eventData:GetPtr("Node", "Node")
     local agent = eventData:GetPtr("CrowdAgent", "CrowdAgent")
     local agentState = eventData:GetInt("CrowdAgentState")
-    
+
     -- If the agent's state is invalid, likely from spawning on the side of a box, find a point in a larger area
     if agentState == CROWD_AGENT_INVALID then
         local navMesh = scene_:GetComponent("DynamicNavigationMesh")

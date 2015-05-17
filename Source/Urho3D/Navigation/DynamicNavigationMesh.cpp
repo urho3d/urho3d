@@ -514,6 +514,17 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
     }
 }
 
+void DynamicNavigationMesh::DrawDebugGeometry(bool depthTest)
+{
+    Scene* scene = GetScene();
+    if (scene)
+    {
+        DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
+        if (debug)
+            DrawDebugGeometry(debug, depthTest);
+    }
+}
+
 void DynamicNavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value)
 {
     ReleaseNavigationMesh();

@@ -59,6 +59,8 @@ public:
     virtual bool Build(const BoundingBox& boundingBox);
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    /// Add debug geometry to the debug renderer.
+    void DrawDebugGeometry(bool depthTest);
 
     /// Set navigation data attribute.
     virtual void SetNavigationDataAttr(const PODVector<unsigned char>& value);
