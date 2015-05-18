@@ -1,4 +1,4 @@
-# Output directories (in case of non out-of-source)
+# Output directories
 /bin/*
 !/bin/**/
 !/bin/*.bat
@@ -12,6 +12,13 @@
 /lib*/
 generated/
 
+# Output files
+/Source/**/*.a
+/Source/ThirdParty/LuaJIT/src/host/buildvm_arch.h
+/Source/Urho3D/Urho3D.h
+/Source/Urho3D/Urho3D.pc
+/Source/Urho3D/librevision.h
+
 # Compiled shaders
 *.vs2
 *.vs3
@@ -24,12 +31,12 @@ generated/
 # Compiled Lua script
 *.luc
 
-# Generated documentation (in case of non out-of-source)
+# Generated documentation
 /Docs/html/
 /Docs/qch/
 /Docs/Doxyfile
 
-# Eclipse project settings (in case of non out-of-source)
+# Eclipse project settings
 /.*project
 /.settings
 
@@ -39,25 +46,30 @@ generated/
 # Qt Creator project settings
 /CMakeLists.txt.user
 
-# Android non out-of-source project settings
+# Android project settings
 /Android/project.properties
 /Android/local.properties
 /Android/proguard-project.txt
 
-# Android non out-of-source build and output directories
+# Android output directories
 /Android/Urho3D/
 /Android/ThirdParty/
 /Android/libs/
 
-# Non out-of-source CMake generated build files
+# CMake generated build files
 CMakeCache.txt
 CMakeFiles/
 CMakeScripts/
 Makefile
 cmake_install.cmake
 install_manifest.txt
+CPackConfig.cmake
+CPackSourceConfig.cmake
+CTestTestfile.cmake
+/Source/**/*.cmake
+/Docs/**/*.cmake
 
-# Precompiled header files (in case of non out-of-source)
+# Precompiled header files
 *.gch/
 *.pch/
 *.pch.*
