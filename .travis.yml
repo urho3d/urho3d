@@ -41,7 +41,7 @@ matrix:
   include:
     - &Linux-64bit
       compiler: gcc-64bit-static
-      env: LINUX=1 URHO3D_LIB_TYPE=STATIC COVERITY_SCAN_THRESHOLD=20
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC COVERITY_SCAN_THRESHOLD=20 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
     - &Linux-64bit-shared
       compiler: gcc-64bit-shared
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED
@@ -64,7 +64,7 @@ matrix:
     - &MinGW-64bit
       compiler: x86_64-w64-mingw32-gcc-static
       addons: {apt: {packages: [gcc-mingw-w64-x86-64, g++-mingw-w64-x86-64, binutils-mingw-w64-x86-64]}}
-      env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC
+      env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC SF_DEFAULT=windows:Windows-64bit-STATIC.zip
     - <<: *MinGW-64bit
       compiler: x86_64-w64-mingw32-gcc-shared
       env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED
@@ -278,7 +278,7 @@ env:
     - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED
     - MAKEFILE=1    URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
-    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.8
+    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.8 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
     - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.8
     - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.8 URHO3D_64BIT=0
     - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.8 URHO3D_64BIT=0

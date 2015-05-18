@@ -864,6 +864,10 @@ void DynamicNavigationMesh::AddObstacle(Obstacle* obstacle, bool silent)
         Vector3 obsPos = obstacle->GetNode()->GetWorldPosition();
         rcVcopy(pos, &obsPos.x_);
         dtObstacleRef refHolder;
+
+        if (tileCache_->isObstacleQueueFull())
+            tileCache_->update(1, navMesh_);
+
         if (dtStatusFailed(tileCache_->addObstacle(pos, obstacle->GetRadius(), obstacle->GetHeight(), &refHolder)))
         {
             LOGERROR("Failed to add obstacle");
@@ -900,6 +904,9 @@ void DynamicNavigationMesh::RemoveObstacle(Obstacle* obstacle, bool silent)
 {
     if (tileCache_ && obstacle->obstacleId_ > 0)
     {
+        if (tileCache_->isObstacleQueueFull())
+            tileCache_->update(1, navMesh_);
+
         if (dtStatusFailed(tileCache_->removeObstacle(obstacle->obstacleId_)))
         {
             LOGERROR("Failed to remove obstacle");

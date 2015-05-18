@@ -13,4 +13,10 @@ class Component : public Animatable
   
     Component* GetComponent(StringHash type) const;
     Component* GetComponent(const String type) const;
+
+    tolua_readonly tolua_property__get_set unsigned ID;
+    tolua_property__is_set bool enabled;
+    tolua_readonly tolua_property__is_set bool enabledEffective;
+    tolua_readonly tolua_property__get_set Node* node;
+    tolua_readonly tolua_property__get_set Scene* scene;
 };

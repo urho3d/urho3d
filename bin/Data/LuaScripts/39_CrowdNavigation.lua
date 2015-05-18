@@ -136,7 +136,7 @@ function CreateUI()
     instructionText.text = "Use WASD keys to move, RMB to rotate view\n"..
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"..
         "MMB to add obstacles or remove obstacles/agents\n"..
-        "F5 To Save The Scene, F7 to Reload the Scene\n"..
+        "F5 to save scene, F7 to load\n"..
         "Space to toggle debug geometry"
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
     -- The text has multiple rows. Center them in relation to each other
@@ -231,7 +231,7 @@ function AddOrRemoveObject()
     local hitPos, hitDrawable = Raycast(250.0)
     if hitDrawable then
 
-        local hitNode = hitDrawable:GetNode()
+        local hitNode = hitDrawable.node
         if hitNode.name == "Mushroom" then
             hitNode:Remove()
         elseif hitNode.name == "Jack" then
@@ -345,7 +345,7 @@ function HandleUpdate(eventType, eventData)
     -- Make the CrowdAgents face the direction of their velocity
     for i = 1, table.maxn(agents) do
         local agent = agents[i]
-        agent:GetNode().worldDirection = agent.actualVelocity
+        agent.node.worldDirection = agent.actualVelocity
     end
 end
 
