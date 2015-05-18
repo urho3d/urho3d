@@ -4,13 +4,14 @@ class Component : public Animatable
 {
     void SetEnabled(bool enable);
     void Remove();
-    
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+
     unsigned GetID() const;
     Node* GetNode() const;
     Scene* GetScene() const;
     bool IsEnabled() const;
     bool IsEnabledEffective() const;
-  
+
     Component* GetComponent(StringHash type) const;
     Component* GetComponent(const String type) const;
 

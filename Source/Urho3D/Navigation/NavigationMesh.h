@@ -45,8 +45,8 @@ namespace Urho3D
 
 enum NavmeshPartitionType
 {
-    NAVMESH_PARTITION_WATERSHED,
-    NAVMESH_PARTITION_MONOTONE,
+    NAVMESH_PARTITION_WATERSHED = 0,
+    NAVMESH_PARTITION_MONOTONE
 };
 
 class Geometry;
@@ -188,6 +188,16 @@ public:
     /// Return navigation data attribute.
     virtual PODVector<unsigned char> GetNavigationDataAttr() const;
 
+    /// Draw debug geometry for OffMeshConnection components.
+    void SetDrawOffMeshConnections(bool enable) { drawOffMeshConnections_ = enable; }
+    /// Return whether to draw OffMeshConnection components.
+    bool GetDrawOffMeshConnections() const { return drawOffMeshConnections_; }
+
+    /// Draw debug geometry for NavArea components.
+    void SetDrawNavAreas(bool enable) { drawNavAreas_ = enable; }
+    /// Return whether to draw NavArea components.
+    bool GetDrawNavAreas() const { return drawNavAreas_; }
+
 protected:
     /// Collect geometry from under Navigable components.
     void CollectGeometries(Vector<NavigationGeometryInfo>& geometryList);
@@ -255,6 +265,11 @@ protected:
     bool keepInterResults_;
     /// Internal build resources for creating the navmesh.
     HashMap<Pair<int, int>, NavBuildData*> builds_;
+
+    /// Debug draw OffMeshConnection components.
+    bool drawOffMeshConnections_;
+    /// Debug draw NavArea components.
+    bool drawNavAreas_;
 };
 
 /// Register Navigation library objects.

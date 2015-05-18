@@ -28,12 +28,13 @@
 #include "../Graphics/DebugRenderer.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
+#include "../Navigation/NavArea.h"
 #include "../Navigation/NavBuildData.h"
 #include "../Navigation/NavigationEvents.h"
 #include "../Scene/Node.h"
+#include "../Navigation/Obstacle.h"
 #include "../Navigation/OffMeshConnection.h"
 #include "../Core/Profiler.h"
-#include "../Navigation/Obstacle.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
 
@@ -500,16 +501,46 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
         }
     }
 
-    // Draw obstacles
-    if (drawObstacles_)
+    Scene* scene = GetScene();
+    if (scene)
     {
-        PODVector<Node*> obstacles;
-        GetScene()->GetChildrenWithComponent<Obstacle>(obstacles, true);
-        for (unsigned i = 0; i < obstacles.Size(); ++i)
+        // Draw Obstacle components
+        if (drawObstacles_)
         {
-            Obstacle* obstacle = obstacles[i]->GetComponent<Obstacle>();
-            if (obstacle && obstacle->IsEnabledEffective())
-                obstacle->DrawDebugGeometry(debug, depthTest);
+            PODVector<Node*> obstacles;
+            scene->GetChildrenWithComponent<Obstacle>(obstacles, true);
+            for (unsigned i = 0; i < obstacles.Size(); ++i)
+            {
+                Obstacle* obstacle = obstacles[i]->GetComponent<Obstacle>();
+                if (obstacle && obstacle->IsEnabledEffective())
+                    obstacle->DrawDebugGeometry(debug, depthTest);
+            }
+        }
+
+        // Draw OffMeshConnection components
+        if (drawOffMeshConnections_)
+        {
+            PODVector<Node*> connections;
+            scene->GetChildrenWithComponent<OffMeshConnection>(connections, true);
+            for (unsigned i = 0; i < connections.Size(); ++i)
+            {
+                OffMeshConnection* connection = connections[i]->GetComponent<OffMeshConnection>();
+                if (connection && connection->IsEnabledEffective())
+                    connection->DrawDebugGeometry(debug, depthTest);
+            }
+        }
+
+        // Draw NavArea components
+        if (drawNavAreas_)
+        {
+            PODVector<Node*> areas;
+            scene->GetChildrenWithComponent<NavArea>(areas, true);
+            for (unsigned i = 0; i < areas.Size(); ++i)
+            {
+                NavArea* area = areas[i]->GetComponent<NavArea>();
+                if (area && area->IsEnabledEffective())
+                    area->DrawDebugGeometry(debug, depthTest);
+            }
         }
     }
 }
