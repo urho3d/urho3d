@@ -282,7 +282,7 @@ task :ci_site_update do
     if system("git commit -qm 'Test commit to detect API changes'")
       # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
       bump_soversion 'Source/Urho3D/.soversion' or abort 'Failed to bump soversion'
-      system "git add Source/Urho3D/.soversion && git commit --amend -qm \"Travis CI: API documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\n#{ENV['PACKAGE_UPLOAD'] ? '' : '[ci package]'}\"" or abort 'Failed to stage .soversion file'
+      system "git add Source/Urho3D/.soversion && git commit --amend -qm \"Travis CI: API documentation update at #{Time.now.utc}.\n#{ENV['PACKAGE_UPLOAD'] ? '' : '[ci package]'}\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\"" or abort 'Failed to stage .soversion file'
       system "git push origin HEAD:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1" or abort 'Failed to update API documentation'
     end
   end
@@ -386,7 +386,7 @@ task :ci_package_upload do
   end
   # Determine the upload location
   setup_digital_keys
-  if !ENV['RELEASE_TAG']
+  unless ENV['RELEASE_TAG']
     upload_dir = "/home/frs/project/#{ENV['TRAVIS_REPO_SLUG']}/Snapshots"
     if ENV['SITE_UPDATE']
       # Download source packages from GitHub
@@ -414,14 +414,22 @@ EOF" or abort 'Failed to create release directory remotely'
   if ENV['SITE_UPDATE']
     # Upload the source package
     system "scp Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}" or abort 'Failed to upload source package'
+    if ENV['RELEASE_TAG']
+      # Mark the source tarball as default download for host systems other than Windows/Mac/Linux
+      system "curl -H 'Accept: application/json' -X PUT -d 'default=bsd&default=solaris&default=others' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-Source.tar.gz" % ENV['TRAVIS_REPO_SLUG'].split('/') or abort 'Failed to set source tarball as default download'
+    end
     # Sync readme and license files, just in case they are updated in the repo
     system 'for f in README.md License.txt; do mtime=$(git log --format=%ai -n1 $f); touch -d "$mtime" $f; done' or abort 'Failed to acquire file modified time'
     system 'rsync -e ssh -az README.md License.txt urho-travis-ci@frs.sourceforge.net:/home/frs/project/$TRAVIS_REPO_SLUG' or abort 'Failed to sync readme and license files'
     # Mark that the site has been updated
     File.open('.site_updated', 'w') {}
   end
-  # Upload the package
+  # Upload the binary package
   system "scp ../Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir} && rm ../Build/Urho3D-*" or abort 'Failed to upload binary package'
+  if ENV['RELEASE_TAG'] && ENV['SF_DEFAULT']
+    # Mark the corresponding binary package as default download for each Windows/Mac/Linux host systems
+    system "curl -H 'Accept: application/json' -X PUT -d 'default=%s' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-%s" % ENV['SF_DEFAULT'].split(':').insert(1, ENV['TRAVIS_REPO_SLUG'].split('/')).flatten or abort 'Failed to set binary tarball/zip as default download'
+  end
 end
 
 def scaffolding dir, project = 'Scaffolding', target = 'Main'
