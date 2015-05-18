@@ -397,7 +397,7 @@ void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float
         }
     }
 
-    batch.SetColor(DEBUG_DRAW_COLOR, true);
+    batch.SetColor(Color::BLUE, true);
     // Left
     batch.AddQuad(0, 0, horizontalThickness, size_.y_, 0, 0);
     // Top
