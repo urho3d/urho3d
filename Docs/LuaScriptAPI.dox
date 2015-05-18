@@ -1104,6 +1104,7 @@ Methods:
 
 - void SetEnabled(bool enable)
 - void Remove()
+- void DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 - unsigned GetID() const
 - Node* GetNode() const
 - Scene* GetScene() const
@@ -1863,6 +1864,7 @@ Properties:
 
 - NavigationMesh* navigationMesh
 - int maxAgents
+- unsigned agentCount (readonly)
 
 <a name="Class_Drawable"></a>
 ### Drawable : Component
@@ -3370,6 +3372,8 @@ Methods:
 - bool Build()
 - bool Build(const BoundingBox& boundingBox)
 - void SetPartitionType(NavmeshPartitionType aType)
+- void SetDrawOffMeshConnections(bool enable)
+- void SetDrawNavAreas(bool enable)
 - Vector3 FindNearestPoint(const Vector3& point)
 - Vector3 FindNearestPoint(const Vector3& point, const Vector3& extents)
 - Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end)
@@ -3404,6 +3408,8 @@ Methods:
 - BoundingBox GetWorldBoundingBox() const
 - IntVector2 GetNumTiles() const
 - NavmeshPartitionType GetPartitionType()
+- bool GetDrawOffMeshConnections() const
+- bool GetDrawNavAreas() const
 
 Properties:
 
@@ -3422,6 +3428,8 @@ Properties:
 - float detailSampleMaxError
 - Vector3& padding
 - NavmeshPartitionType partitionType
+- bool drawOffMeshConnections
+- bool drawNavAreas
 - bool initialized (readonly)
 - BoundingBox& boundingBox (readonly)
 - BoundingBox worldBoundingBox (readonly)
@@ -3768,15 +3776,21 @@ Methods:
 - void SetEndPoint(Node* node)
 - void SetRadius(float radius)
 - void SetBidirectional(bool enabled)
+- void SetMask(unsigned newMask)
+- void SetAreaID(unsigned newAreaID)
 - Node* GetEndPoint() const
 - float GetRadius() const
 - bool IsBidirectional() const
+- unsigned GetMask() const
+- unsigned GetAreaID() const
 
 Properties:
 
 - Node* endPoint
 - float radius
 - bool bidirectional
+- unsigned mask
+- unsigned areaID
 
 <a name="Class_PackageEntry"></a>
 ### PackageEntry
@@ -5883,7 +5897,6 @@ Properties:
 
 Methods:
 
-- void DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 - void SetTmxFile(TmxFile2D* tmxFile)
 - TmxFile2D* GetTmxFile() const
 - const TileMapInfo2D& GetInfo() const
@@ -5922,7 +5935,6 @@ Properties:
 
 Methods:
 
-- void DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 - void SetDrawOrder(int drawOrder)
 - void SetVisible(bool visible)
 - int GetDrawOrder() const
