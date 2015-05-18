@@ -29,7 +29,7 @@ addons: {apt: {sources: &default_sources george-edison55-precise-backports, pack
 env:
   global:
     - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
-    - secure: AfoHc5tpnYoI2TVGUeE9Xdru+15pd5N4YzO7EWvwmMnrHtNO3retrmKOGpnIyfbP2BeWRTW/z+BI4G0RrfvubjHu2us4wRh6Jq8+UZohBBkM+ldTnyqYHX97q+6ScWBWZGg7dpthd1x/7fmds8dSRzustHUhI7RzPbWEMQH1DGI=
+    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
     - NUMJOBS=4
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
@@ -41,7 +41,7 @@ matrix:
     - &Linux-64bit
       addons: {apt: {sources: *default_sources, packages: &linux_packages [*default_packages, libasound2-dev, rpm]}}
       compiler: gcc-64bit-static
-      env: LINUX=1 URHO3D_LIB_TYPE=STATIC COVERITY_SCAN_THRESHOLD=20
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC COVERITY_SCAN_THRESHOLD=20 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
     - &Linux-64bit-shared
       <<: *Linux-64bit
       compiler: gcc-64bit-shared
@@ -65,7 +65,7 @@ matrix:
     - &MinGW-64bit
       compiler: x86_64-w64-mingw32-gcc-static
       addons: {apt: {sources: *default_sources, packages: [*default_packages, gcc-mingw-w64-x86-64, g++-mingw-w64-x86-64, binutils-mingw-w64-x86-64]}}
-      env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC
+      env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC SF_DEFAULT=windows:Windows-64bit-STATIC.zip
     - <<: *MinGW-64bit
       compiler: x86_64-w64-mingw32-gcc-shared
       env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED
@@ -168,7 +168,7 @@ addons: {apt: {sources: &default_sources george-edison55-precise-backports, pack
 env:
   global:
     - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
-    - secure: AfoHc5tpnYoI2TVGUeE9Xdru+15pd5N4YzO7EWvwmMnrHtNO3retrmKOGpnIyfbP2BeWRTW/z+BI4G0RrfvubjHu2us4wRh6Jq8+UZohBBkM+ldTnyqYHX97q+6ScWBWZGg7dpthd1x/7fmds8dSRzustHUhI7RzPbWEMQH1DGI=
+    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
     - NUMJOBS=4
     - ANDROID=1
     - ANDROID_TMP=~/tmp
@@ -240,7 +240,7 @@ addons: {apt: {sources: &default_sources george-edison55-precise-backports, pack
 env:
   global:
     - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
-    - secure: AfoHc5tpnYoI2TVGUeE9Xdru+15pd5N4YzO7EWvwmMnrHtNO3retrmKOGpnIyfbP2BeWRTW/z+BI4G0RrfvubjHu2us4wRh6Jq8+UZohBBkM+ldTnyqYHX97q+6ScWBWZGg7dpthd1x/7fmds8dSRzustHUhI7RzPbWEMQH1DGI=
+    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
     - NUMJOBS=4
     - RPI=1
     - USE_CCACHE=1
@@ -278,7 +278,7 @@ language: objective-c
 env:
   global:
     - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
-    - secure: AfoHc5tpnYoI2TVGUeE9Xdru+15pd5N4YzO7EWvwmMnrHtNO3retrmKOGpnIyfbP2BeWRTW/z+BI4G0RrfvubjHu2us4wRh6Jq8+UZohBBkM+ldTnyqYHX97q+6ScWBWZGg7dpthd1x/7fmds8dSRzustHUhI7RzPbWEMQH1DGI=
+    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
     - NUMJOBS=3
     - OSX=1
     - USE_CCACHE=2
@@ -290,7 +290,7 @@ env:
     - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED
     - MAKEFILE=1    URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
-    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.8
+    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.8 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
     - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.8
     - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.8 URHO3D_64BIT=0
     - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.8 URHO3D_64BIT=0
@@ -322,7 +322,7 @@ language: objective-c
 env:
   global:
     - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
-    - secure: AfoHc5tpnYoI2TVGUeE9Xdru+15pd5N4YzO7EWvwmMnrHtNO3retrmKOGpnIyfbP2BeWRTW/z+BI4G0RrfvubjHu2us4wRh6Jq8+UZohBBkM+ldTnyqYHX97q+6ScWBWZGg7dpthd1x/7fmds8dSRzustHUhI7RzPbWEMQH1DGI=
+    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
     - NUMJOBS=3
     - EMSCRIPTEN=1
     - EMSCRIPTEN_SHARE_DATA=1
