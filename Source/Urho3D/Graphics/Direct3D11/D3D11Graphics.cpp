@@ -2172,7 +2172,7 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
 
     if (!impl_->window_)
     {
-        LOGERROR("Could not create window");
+        LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
         return false;
     }
 

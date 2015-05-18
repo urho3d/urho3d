@@ -24,6 +24,7 @@
 
 #include "../Math/BoundingBox.h"
 #include "../Core/Context.h"
+#include "../Navigation/CrowdAgent.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
@@ -53,7 +54,7 @@
 
 namespace Urho3D
 {
-    
+
 extern const char* NAVIGATION_CATEGORY;
 
 static const int DEFAULT_MAX_OBSTACLES = 1024;
@@ -113,7 +114,7 @@ struct MeshProcess : public dtTileCacheMeshProcess
         BoundingBox bounds;
         rcVcopy(&bounds.min_.x_, params->bmin);
         rcVcopy(&bounds.max_.x_, params->bmin);
-        
+
         // collect off-mesh connections
         PODVector<OffMeshConnection*> offMeshConnections = owner_->CollectOffMeshConnections(bounds);
 
@@ -177,7 +178,7 @@ struct LinearAllocator : public dtTileCacheAlloc
 
     void resize(const int cap)
     {
-        if (buffer) 
+        if (buffer)
             dtFree(buffer);
         buffer = (unsigned char*)dtAlloc(cap, DT_ALLOC_PERM);
         capacity = cap;
@@ -209,10 +210,11 @@ struct LinearAllocator : public dtTileCacheAlloc
 DynamicNavigationMesh::DynamicNavigationMesh(Context* context) :
     NavigationMesh(context),
     tileCache_(0),
-    maxObstacles_(1024)
+    maxObstacles_(1024),
+    drawObstacles_(false)
 {
     //64 is the largest tile-size that DetourTileCache will tolerate without silently failing
-    tileSize_ = 64; 
+    tileSize_ = 64;
     partitionType_ = NAVMESH_PARTITION_MONOTONE;
     allocator_ = new LinearAllocator(32000); //32kb to start
     compressor_ = new TileCompressor();
@@ -361,7 +363,7 @@ bool DynamicNavigationMesh::Build()
             for (int x = 0; x < numTilesX_; ++x)
                 tileCache_->buildNavMeshTilesAt(x, z, navMesh_);
         }
-        
+
         // For a full build it's necessary to update the nav mesh
         // not doing so will cause dependent components to crash, like DetourCrowdManager
         tileCache_->update(0, navMesh_);
@@ -475,7 +477,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
             // Get the layers from the tile-cache
             const dtMeshTile* tiles[TILECACHE_MAXLAYERS];
             int tileCount = navMesh->getTilesAt(x, z, tiles, TILECACHE_MAXLAYERS);
-            for (int i = 0; i < tileCount; ++i) 
+            for (int i = 0; i < tileCount; ++i)
             {
                 const dtMeshTile* tile = tiles[i];
                 if (!tile)
@@ -497,12 +499,36 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
             }
         }
     }
+
+    // Draw obstacles
+    if (drawObstacles_)
+    {
+        PODVector<Node*> obstacles;
+        GetScene()->GetChildrenWithComponent<Obstacle>(obstacles, true);
+        for (unsigned i = 0; i < obstacles.Size(); ++i)
+        {
+            Obstacle* obstacle = obstacles[i]->GetComponent<Obstacle>();
+            if (obstacle && obstacle->IsEnabledEffective())
+                obstacle->DrawDebugGeometry(debug, depthTest);
+        }
+    }
+}
+
+void DynamicNavigationMesh::DrawDebugGeometry(bool depthTest)
+{
+    Scene* scene = GetScene();
+    if (scene)
+    {
+        DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
+        if (debug)
+            DrawDebugGeometry(debug, depthTest);
+    }
 }
 
 void DynamicNavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value)
 {
     ReleaseNavigationMesh();
-        
+
     if (value.Empty())
         return;
 
@@ -684,7 +710,7 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
     rcRasterizeTriangles(build.ctx_, &build.vertices_[0].x_, build.vertices_.Size(), &build.indices_[0],
         triAreas.Get(), numTriangles, *build.heightField_, cfg.walkableClimb);
     rcFilterLowHangingWalkableObstacles(build.ctx_, cfg.walkableClimb, *build.heightField_);
-    
+
     rcFilterLedgeSpans(build.ctx_, cfg.walkableHeight, cfg.walkableClimb, *build.heightField_);
     rcFilterWalkableLowHeightSpans(build.ctx_, cfg.walkableHeight, *build.heightField_);
 
@@ -732,7 +758,7 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
             return 0;
         }
     }
-    
+
     build.heightFieldLayers_ = rcAllocHeightfieldLayerSet();
     if (!build.heightFieldLayers_)
     {
@@ -838,6 +864,10 @@ void DynamicNavigationMesh::AddObstacle(Obstacle* obstacle, bool silent)
         Vector3 obsPos = obstacle->GetNode()->GetWorldPosition();
         rcVcopy(pos, &obsPos.x_);
         dtObstacleRef refHolder;
+
+        if (tileCache_->isObstacleQueueFull())
+            tileCache_->update(1, navMesh_);
+
         if (dtStatusFailed(tileCache_->addObstacle(pos, obstacle->GetRadius(), obstacle->GetHeight(), &refHolder)))
         {
             LOGERROR("Failed to add obstacle");
@@ -846,7 +876,7 @@ void DynamicNavigationMesh::AddObstacle(Obstacle* obstacle, bool silent)
         obstacle->obstacleId_ = refHolder;
         assert(refHolder > 0);
         tileCache_->update(1, navMesh_);
-        
+
         if (!silent)
         {
             using namespace NavigationObstacleAdded;
@@ -874,15 +904,18 @@ void DynamicNavigationMesh::RemoveObstacle(Obstacle* obstacle, bool silent)
 {
     if (tileCache_ && obstacle->obstacleId_ > 0)
     {
+        if (tileCache_->isObstacleQueueFull())
+            tileCache_->update(1, navMesh_);
+
         if (dtStatusFailed(tileCache_->removeObstacle(obstacle->obstacleId_)))
         {
             LOGERROR("Failed to remove obstacle");
             return;
         }
+        obstacle->obstacleId_ = 0;
         // Require a node in order to send an event
         if (!silent && obstacle->GetNode())
         {
-            obstacle->obstacleId_ = 0;
             using namespace NavigationObstacleRemoved;
             VariantMap& eventData = GetContext()->GetEventDataMap();
             eventData[P_NODE] = obstacle->GetNode();
@@ -890,7 +923,7 @@ void DynamicNavigationMesh::RemoveObstacle(Obstacle* obstacle, bool silent)
             eventData[P_POSITION] = obstacle->GetNode()->GetWorldPosition();
             eventData[P_RADIUS] = obstacle->GetRadius();
             eventData[P_HEIGHT] = obstacle->GetHeight();
-            SendEvent(E_NAVIGATION_OBSTACLE_ADDED, eventData);
+            SendEvent(E_NAVIGATION_OBSTACLE_REMOVED, eventData);
         }
     }
 }

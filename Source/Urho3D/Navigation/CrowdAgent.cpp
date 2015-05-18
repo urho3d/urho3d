@@ -86,6 +86,7 @@ CrowdAgent::CrowdAgent(Context* context) :
 
 CrowdAgent::~CrowdAgent()
 {
+    RemoveAgentFromCrowd();
 }
 
 void CrowdAgent::RegisterObject(Context* context)
@@ -117,6 +118,8 @@ void CrowdAgent::OnNodeSet(Node* node)
 
         node->AddListener(this);
     }
+    else
+        RemoveAgentFromCrowd();
 }
 
 void CrowdAgent::OnSetEnabled()
@@ -157,7 +160,7 @@ void CrowdAgent::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void CrowdAgent::AddAgentToCrowd()
 {
-    if (!crowdManager_ || !crowdManager_->crowd_)
+    if (!crowdManager_ || !crowdManager_->crowd_ || !node_)
         return;
 
     PROFILE(AddAgentToCrowd);

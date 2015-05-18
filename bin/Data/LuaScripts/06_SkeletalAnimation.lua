@@ -201,7 +201,7 @@ function Mover:SetParameters(moveSpeed, rotationSpeed, bounds)
 end
 
 function Mover:Update(timeStep)
-    local node = self:GetNode()
+    local node = self.node
     node:Translate(Vector3(0.0, 0.0, 1.0) * self.moveSpeed * timeStep)
 
     -- If in risk of going outside the plane, rotate the model right

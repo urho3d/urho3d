@@ -99,6 +99,11 @@ void Obstacle::OnNodeSet(Node* node)
         if (ownerMesh_)
             ownerMesh_->AddObstacle(this);
     }
+    else
+    {
+        if (obstacleId_ > 0 && ownerMesh_)
+            ownerMesh_->RemoveObstacle(this);
+    }
 }
 
 void Obstacle::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)

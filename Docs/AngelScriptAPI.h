@@ -3694,6 +3694,7 @@ class DetourCrowdManager
 void ApplyAttributes();
 void CreateCrowd();
 void DrawDebugGeometry(DebugRenderer, bool);
+void DrawDebugGeometry(bool);
 Array<CrowdAgent> GetActiveAgents();
 float GetAreaCost(uint, uint);
 Variant GetAttribute(const String&) const;
@@ -4219,6 +4220,7 @@ float cellHeight;
 float cellSize;
 float detailSampleDistance;
 float detailSampleMaxError;
+bool drawObstacles;
 float edgeMaxError;
 float edgeMaxLength;
 bool enabled;
@@ -4236,6 +4238,7 @@ uint numAttributes;
 IntVector2 numTiles;
 ObjectAnimation objectAnimation;
 Vector3 padding;
+NavmeshPartitionType partitionType;
 /* readonly */
 int refs;
 float regionMergeSize;
@@ -6304,6 +6307,7 @@ uint numAttributes;
 IntVector2 numTiles;
 ObjectAnimation objectAnimation;
 Vector3 padding;
+NavmeshPartitionType partitionType;
 /* readonly */
 int refs;
 float regionMergeSize;
@@ -12784,6 +12788,12 @@ enum NavigationPushiness
 PUSHINESS_LOW,
 PUSHINESS_MEDIUM,
 PUSHINESS_HIGH,
+};
+
+enum NavmeshPartitionType
+{
+NAVMESH_PARTITION_WATERSHED,
+NAVMESH_PARTITION_MONOTONE,
 };
 
 enum Orientation

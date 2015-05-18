@@ -194,7 +194,7 @@ function PaintDecal()
     local hitPos, hitDrawable = Raycast(250.0)
     if hitDrawable ~= nil then
         -- Check if target scene node already has a DecalSet component. If not, create now
-        local targetNode = hitDrawable:GetNode()
+        local targetNode = hitDrawable.node
         local decal = targetNode:GetComponent("DecalSet")
         if decal == nil then
             decal = targetNode:CreateComponent("DecalSet")

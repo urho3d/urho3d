@@ -59,11 +59,18 @@ public:
     virtual bool Build(const BoundingBox& boundingBox);
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    /// Add debug geometry to the debug renderer.
+    void DrawDebugGeometry(bool depthTest);
 
     /// Set navigation data attribute.
     virtual void SetNavigationDataAttr(const PODVector<unsigned char>& value);
     /// Return navigation data attribute.
     virtual PODVector<unsigned char> GetNavigationDataAttr() const;
+
+    /// Draw debug geometry for Obstacles.
+    void SetDrawObstacles(bool enable) { drawObstacles_ = enable; }
+    /// Return whether to draw Obstacles.
+    bool GetDrawObstacles() const { return drawObstacles_; }
 
 protected:
     struct TileCacheData;
@@ -101,6 +108,8 @@ private:
     dtTileCacheMeshProcess* meshProcessor_;
     /// Maximum number of obstacle objects allowed.
     unsigned maxObstacles_;
+    /// Debug draw Obstacles.
+    bool drawObstacles_;
 };
 
 }
