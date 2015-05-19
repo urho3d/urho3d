@@ -8294,6 +8294,7 @@ float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 bool GetInterceptNetworkUpdate(const String&) const;
+bool HasMethod(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
