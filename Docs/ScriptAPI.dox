@@ -5993,7 +5993,9 @@ Properties:
 - float cellSize
 - float detailSampleDistance
 - float detailSampleMaxError
+- bool drawNavAreas
 - bool drawObstacles
+- bool drawOffMeshConnections
 - float edgeMaxError
 - float edgeMaxLength
 - bool enabled
@@ -7769,6 +7771,8 @@ Properties:
 - float cellSize
 - float detailSampleDistance
 - float detailSampleMaxError
+- bool drawNavAreas
+- bool drawOffMeshConnections
 - float edgeMaxError
 - float edgeMaxLength
 - bool enabled
@@ -8232,6 +8236,7 @@ Methods:
 Properties:
 
 - bool animationEnabled
+- uint areaID
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -8242,6 +8247,7 @@ Properties:
 - bool enabledEffective // readonly
 - Node@ endPoint
 - uint id // readonly
+- uint mask
 - Node@ node // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation

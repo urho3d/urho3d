@@ -4220,7 +4220,9 @@ float cellHeight;
 float cellSize;
 float detailSampleDistance;
 float detailSampleMaxError;
+bool drawNavAreas;
 bool drawObstacles;
+bool drawOffMeshConnections;
 float edgeMaxError;
 float edgeMaxLength;
 bool enabled;
@@ -6290,6 +6292,8 @@ float cellHeight;
 float cellSize;
 float detailSampleDistance;
 float detailSampleMaxError;
+bool drawNavAreas;
+bool drawOffMeshConnections;
 float edgeMaxError;
 float edgeMaxLength;
 bool enabled;
@@ -6830,6 +6834,7 @@ void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
+uint areaID;
 /* readonly */
 Array<Variant> attributeDefaults;
 /* readonly */
@@ -6846,6 +6851,7 @@ bool enabledEffective;
 Node endPoint;
 /* readonly */
 uint id;
+uint mask;
 /* readonly */
 Node node;
 /* readonly */
