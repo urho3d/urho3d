@@ -834,6 +834,9 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
     // Make sure nodes are not included twice
     if (processedNodes.Contains(node))
         return;
+    // Exclude obstacles from consideration
+    if (node->HasComponent<Obstacle>())
+        return;
     processedNodes.Insert(node);
 
     Matrix3x4 inverse = node_->GetWorldTransform().Inverse();

@@ -941,6 +941,7 @@ void CreateDragSlider(LineEdit@ parent)
     dragSld.SetFixedHeight(ATTR_HEIGHT - 3);
     dragSld.SetFixedWidth(dragSld.height);
     dragSld.SetAlignment(HA_RIGHT, VA_TOP);
+    dragSld.focusMode = FM_NOTFOCUSABLE;
     parent.AddChild(dragSld);
 
     SubscribeToEvent(dragSld, "DragBegin", "LineDragBegin");
