@@ -354,6 +354,11 @@ void ScriptFile::DelayedExecute(float delay, bool repeat, const String& declarat
     call.repeat_ = repeat;
     call.declaration_ = declaration;
     call.parameters_ = parameters;
+
+    // If user submitted just a function name and not a full declaration, assume a void function without parameters
+    if (call.declaration_.Find('(') == String::NPOS)
+        call.declaration_ = "void " + call.declaration_.Trimmed() + "()";
+
     delayedCalls_.Push(call);
     
     // Make sure we are registered to the application update event, because delayed calls are executed there

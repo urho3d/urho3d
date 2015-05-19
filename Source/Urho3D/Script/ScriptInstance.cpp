@@ -235,6 +235,12 @@ bool ScriptInstance::Execute(const String& declaration, const VariantVector& par
         return false;
 
     asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
+    if (!method)
+    {
+        LOGERROR("Method " + declaration + " not found in class " + className_);
+        return false;
+    }
+    
     return scriptFile_->Execute(scriptObject_, method, parameters);
 }
 
@@ -256,6 +262,11 @@ void ScriptInstance::DelayedExecute(float delay, bool repeat, const String& decl
     call.repeat_ = repeat;
     call.declaration_ = declaration;
     call.parameters_ = parameters;
+
+    // If user submitted just a function name and not a full declaration, assume a void function without parameters
+    if (call.declaration_.Find('(') == String::NPOS)
+        call.declaration_ = "void " + call.declaration_.Trimmed() + "()";
+
     delayedCalls_.Push(call);
 
     // Make sure we are registered to the scene update event, because delayed calls are executed there
