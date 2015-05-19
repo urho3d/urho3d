@@ -262,11 +262,6 @@ void ScriptInstance::DelayedExecute(float delay, bool repeat, const String& decl
     call.repeat_ = repeat;
     call.declaration_ = declaration;
     call.parameters_ = parameters;
-
-    // If user submitted just a function name and not a full declaration, assume a void function without parameters
-    if (call.declaration_.Find('(') == String::NPOS)
-        call.declaration_ = "void " + call.declaration_.Trimmed() + "()";
-
     delayedCalls_.Push(call);
 
     // Make sure we are registered to the scene update event, because delayed calls are executed there
@@ -299,8 +294,8 @@ void ScriptInstance::AddEventHandler(StringHash eventType, const String& handler
     asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
     if (!method)
     {
-        declaration = "void " + handlerName + "()";
-        method = scriptFile_->GetMethod(scriptObject_, declaration);
+        // Retry with parameterless signature
+        method = scriptFile_->GetMethod(scriptObject_, handlerName);
         if (!method)
         {
             LOGERROR("Event handler method " + handlerName + " not found in " + scriptFile_->GetName());
@@ -326,8 +321,8 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
     asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
     if (!method)
     {
-        declaration = "void " + handlerName + "()";
-        method = scriptFile_->GetMethod(scriptObject_, declaration);
+        // Retry with parameterless signature
+        method = scriptFile_->GetMethod(scriptObject_, handlerName);
         if (!method)
         {
             LOGERROR("Event handler method " + handlerName + " not found in " + scriptFile_->GetName());
@@ -361,6 +356,14 @@ void ScriptInstance::RemoveEventHandlers()
 void ScriptInstance::RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions)
 {
     UnsubscribeFromAllEventsExcept(exceptions, true);
+}
+
+bool ScriptInstance::HasMethod(const String& declaration) const
+{
+    if (!scriptFile_ || !scriptObject_)
+        return false;
+    else
+        return scriptFile_->GetMethod(scriptObject_, declaration) != 0;
 }
 
 void ScriptInstance::SetScriptFileAttr(const ResourceRef& value)

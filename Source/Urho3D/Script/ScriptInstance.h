@@ -98,7 +98,7 @@ public:
     void SetScriptFile(ScriptFile* scriptFile);
     /// Set class name only. Recreate object if necessary.
     void SetClassName(const String& className);
-    /// Query for a method by declaration and execute if found.
+    /// Query for a method by declaration and execute. Log an error if not found.
     bool Execute(const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector);
     /// Execute a method.
     bool Execute(asIScriptFunction* method, const VariantVector& parameters = Variant::emptyVariantVector);
@@ -113,6 +113,8 @@ public:
     asIScriptObject* GetScriptObject() const { return scriptObject_; }
     /// Return class name.
     const String& GetClassName() const { return className_; }
+    /// Check if has a method.
+    bool HasMethod(const String& declaration) const;
 
     /// Set script file attribute.
     void SetScriptFileAttr(const ResourceRef& value);
