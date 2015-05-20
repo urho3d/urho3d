@@ -42,6 +42,7 @@ class Scene;
 ///     - Raycasting drawable components
 ///     - Crowd movement management
 ///     - Accessing crowd agents with the crowd manager
+///     - Using off-mesh connections to make boxes climbable
 class CrowdNavigation : public Sample
 {
     OBJECT(CrowdNavigation);
@@ -145,6 +146,8 @@ private:
     void SpawnJack(const Vector3& pos);
     /// Create a mushroom object at position.
     Node* CreateMushroom(const Vector3& pos);
+    /// Create an off-mesh connection for each box to make it climbable.
+    void CreateBoxOffMeshConnections(DynamicNavigationMesh* navMesh, Vector< SharedPtr<Node> > boxes);
     /// Utility function to raycast to the cursor position. Return true if hit.
     bool Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable);
     /// Handle the logic update event.

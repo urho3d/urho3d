@@ -42,6 +42,7 @@
 #include <Urho3D/Navigation/NavigationEvents.h>
 #include <Urho3D/Navigation/Obstacle.h>
 #include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Navigation/OffMeshConnection.h>
 #include <Urho3D/Graphics/Renderer.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
@@ -119,6 +120,7 @@ void CrowdNavigation::CreateScene()
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
 
     // Create randomly sized boxes. If boxes are big enough, make them occluders
+    Vector< SharedPtr<Node> > boxes;
     for (unsigned i = 0; i < 20; ++i)
     {
         Node* boxNode = scene_->CreateChild("Box");
@@ -130,19 +132,23 @@ void CrowdNavigation::CreateScene()
         boxObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
         boxObject->SetCastShadows(true);
         if (size >= 3.0f)
+        {
             boxObject->SetOccluder(true);
+            boxes.Push(SharedPtr<Node>(boxNode));
+        }
     }
 
     // Create a DynamicNavigationMesh component to the scene root
     DynamicNavigationMesh* navMesh = scene_->CreateComponent<DynamicNavigationMesh>();
-    // Enable drawing debug geometry for obstacles
+    // Enable drawing debug geometry for obstacles and off-mesh connections
     navMesh->SetDrawObstacles(true);
+    navMesh->SetDrawOffMeshConnections(true);
     // Set the agent height large enough to exclude the layers under boxes
     navMesh->SetAgentHeight(10.0f);
     // Set nav mesh tilesize to something reasonable
     navMesh->SetTileSize(64);
     // Set nav mesh cell height to minimum (allows agents to be grounded)
-    navMesh->SetCellHeight(0.04f);
+    navMesh->SetCellHeight(0.05f);
     // Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
     // navigation mesh. By default this is recursive, but the recursion could be turned off from Navigable
     scene_->CreateComponent<Navigable>();
@@ -153,6 +159,11 @@ void CrowdNavigation::CreateScene()
     // physics geometry from the scene nodes, as it often is simpler, but if it can not find any (like in this example)
     // it will use renderable geometry instead
     navMesh->Build();
+
+    // Create an off-mesh connection to each box to make them climbable (tiny boxes are skipped). A connection is built from 2 nodes.
+    // Note that OffMeshConnections must be added before building the navMesh, but as we are adding Obstacles next, tiles will be automatically rebuilt.
+    // Creating connections post-build here allows us to use FindNearestPoint() to procedurally set accurate positions for the connection
+    CreateBoxOffMeshConnections(navMesh, boxes);
 
     // Create a DetourCrowdManager component to the scene root
     crowdManager_ = scene_->CreateComponent<DetourCrowdManager>();
@@ -267,6 +278,26 @@ Node* CrowdNavigation::CreateMushroom(const Vector3& pos)
     obstacle->SetHeight(mushroomNode->GetScale().y_);
 
     return mushroomNode;
+}
+
+void CrowdNavigation::CreateBoxOffMeshConnections(DynamicNavigationMesh* navMesh, Vector< SharedPtr<Node> > boxes)
+{
+    for (unsigned i=0; i < boxes.Size(); ++i)
+    {
+        Node* box = boxes[i];
+        Vector3 boxPos = box->GetPosition();
+        float boxHalfSize = box->GetScale().x_ / 2;
+
+        // Create 2 empty nodes for the start & end points of the connection. Note that order matters only when using one-way/unidirectional connection.
+        Node* connectionStart = scene_->CreateChild("ConnectionStart");
+        connectionStart->SetPosition(navMesh->FindNearestPoint(boxPos + Vector3(boxHalfSize, -boxHalfSize, 0))); // Base of box
+        Node* connectionEnd = connectionStart->CreateChild("ConnectionEnd");
+        connectionEnd->SetWorldPosition(navMesh->FindNearestPoint(boxPos + Vector3(boxHalfSize, boxHalfSize, 0))); // Top of box
+
+        // Create the OffMeshConnection component to one node and link the other node
+        OffMeshConnection* connection = connectionStart->CreateComponent<OffMeshConnection>();
+        connection->SetEndPoint(connectionEnd);
+    }
 }
 
 void CrowdNavigation::SetPathPoint()
@@ -415,9 +446,10 @@ void CrowdNavigation::MoveCamera(float timeStep)
         crowdManager_ = scene_->GetComponent<DetourCrowdManager>();
         agents_ = crowdManager_->GetActiveAgents();
 
-        // Re-enable debug draw for obstacles
+        // Re-enable debug draw for obstacles & off-mesh connections
         DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
         navMesh->SetDrawObstacles(true);
+        navMesh->SetDrawOffMeshConnections(true);
     }
 
     // Toggle debug geometry with space

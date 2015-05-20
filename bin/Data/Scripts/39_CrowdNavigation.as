@@ -7,6 +7,7 @@
 //     - Raycasting drawable components
 //     - Crowd movement management
 //     - Accessing crowd agents with the crowd manager
+//     - Using off-mesh connections to make boxes climbable
 
 #include "Scripts/Utilities/Sample.as"
 
@@ -67,6 +68,7 @@ void CreateScene()
 
     // Create randomly sized boxes. If boxes are big enough, make them occluders. Occluders will be software rasterized before
     // rendering to a low-resolution depth-only buffer to test the objects in the view frustum for visibility
+    Array<Node@> boxes;
     for (uint i = 0; i < 20; ++i)
     {
         Node@ boxNode = scene_.CreateChild("Box");
@@ -78,19 +80,23 @@ void CreateScene()
         boxObject.material = cache.GetResource("Material", "Materials/Stone.xml");
         boxObject.castShadows = true;
         if (size >= 3.0f)
+        {
             boxObject.occluder = true;
+            boxes.Push(boxNode);
+        }
     }
 
     // Create a DynamicNavigationMesh component to the scene root
     DynamicNavigationMesh@ navMesh = scene_.CreateComponent("DynamicNavigationMesh");
-    // Enable drawing debug geometry for obstacles
+    // Enable drawing debug geometry for obstacles and off-mesh connections
     navMesh.drawObstacles = true;
+    navMesh.drawOffMeshConnections = true;
     // Set the agent height large enough to exclude the layers under boxes
     navMesh.agentHeight = 10;
     // Set nav mesh tilesize to something reasonable
     navMesh.tileSize = 64;
     // Set nav mesh cell height to minimum (allows agents to be grounded)
-    navMesh.cellHeight = 0.04f;
+    navMesh.cellHeight = 0.05f;
     // Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
     // navigation mesh. By default this is recursive, but the recursion could be turned off from Navigable
     scene_.CreateComponent("Navigable");
@@ -101,6 +107,11 @@ void CreateScene()
     // physics geometry from the scene nodes, as it often is simpler, but if it can not find any (like in this example)
     // it will use renderable geometry instead
     navMesh.Build();
+
+    // Create an off-mesh connection to each box to make it climbable (tiny boxes are skipped). A connection is built from 2 nodes.
+    // Note that OffMeshConnections must be added before building the navMesh, but as we are adding Obstacles next, tiles will be automatically rebuilt.
+    // Creating connections post-build here allows us to use FindNearestPoint() to procedurally set accurate positions for the connection
+    CreateBoxOffMeshConnections(navMesh, boxes);
 
     // Create a DetourCrowdManager component to the scene root
     crowdManager = scene_.CreateComponent("DetourCrowdManager");
@@ -205,6 +216,26 @@ Node@ SpawnJack(const Vector3& pos)
     agent.height = 2.0f;
 
     return jackNode;
+}
+
+void CreateBoxOffMeshConnections(DynamicNavigationMesh@ navMesh, Array<Node@> boxes)
+{
+    for (uint i=0; i < boxes.length; ++i)
+    {
+        Node@ box = boxes[i];
+        Vector3 boxPos = box.position;
+        float boxHalfSize = box.scale.x / 2;
+
+        // Create 2 empty nodes for the start & end points of the connection. Note that order matters only when using one-way/unidirectional connection.
+        Node@ connectionStart = scene_.CreateChild("ConnectionStart");
+        connectionStart.position = navMesh.FindNearestPoint(boxPos + Vector3(boxHalfSize, -boxHalfSize, 0)); // Base of box
+        Node@ connectionEnd = connectionStart.CreateChild("ConnectionEnd");
+        connectionEnd.worldPosition = navMesh.FindNearestPoint(boxPos + Vector3(boxHalfSize, boxHalfSize, 0)); // Top of box
+
+        // Create the OffMeshConnection component to one node and link the other node
+        OffMeshConnection@ connection = connectionStart.CreateComponent("OffMeshConnection");
+        connection.endPoint = connectionEnd;
+    }
 }
 
 void SetPathPoint()
@@ -365,9 +396,10 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         // After reload, reacquire crowd manager
         crowdManager = scene_.GetComponent("DetourCrowdManager");
 
-        // Re-enable debug draw for obstacles
+        // Re-enable debug draw for obstacles & off-mesh connections
         DynamicNavigationMesh@ navMesh = scene_.GetComponent("DynamicNavigationMesh");
         navMesh.drawObstacles = true;
+        navMesh.drawOffMeshConnections = true;
     }
 }
 

@@ -7,6 +7,7 @@
 --     - Raycasting drawable components
 --     - Crowd movement management
 --     - Accessing crowd agents with the crowd manager
+--     - Using off-mesh connections to make boxes climbable
 
 require "LuaScripts/Utilities/Sample"
 
@@ -65,6 +66,7 @@ function CreateScene()
 
     -- Create randomly sized boxes. If boxes are big enough, make them occluders. Occluders will be software rasterized before
     -- rendering to a low-resolution depth-only buffer to test the objects in the view frustum for visibility
+    local boxes = {}
     for i = 1, 20 do
         local boxNode = scene_:CreateChild("Box")
         local size = 1.0 + Random(10.0)
@@ -76,19 +78,21 @@ function CreateScene()
         boxObject.castShadows = true
         if size >= 3.0 then
             boxObject.occluder = true
+            table.insert(boxes, boxNode)
         end
     end
 
     -- Create a DynamicNavigationMesh component to the scene root
     local navMesh = scene_:CreateComponent("DynamicNavigationMesh")
-    -- Enable drawing debug geometry for obstacles
+    -- Enable drawing debug geometry for obstacles and off-mesh connections
     navMesh.drawObstacles = true
+    navMesh.drawOffMeshConnections = true
     -- Set the agent height large enough to exclude the layers under boxes
     navMesh.agentHeight = 10
     -- Set nav mesh tilesize to something reasonable
     navMesh.tileSize = 64
     -- Set nav mesh cell height to minimum (allows agents to be grounded)
-    navMesh.cellHeight = 0.04
+    navMesh.cellHeight = 0.05
     -- Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
     -- navigation mesh. By default this is recursive, but the recursion could be turned off from Navigable
     scene_:CreateComponent("Navigable")
@@ -99,6 +103,11 @@ function CreateScene()
     -- physics geometry from the scene nodes, as it often is simpler, but if it can not find any (like in this example)
     -- it will use renderable geometry instead
     navMesh:Build()
+
+    -- Create an off-mesh connection for each box to make it climbable (tiny boxes are skipped).
+    -- Note that OffMeshConnections must be added before building the navMesh, but as we are adding Obstacles next, tiles will be automatically rebuilt.
+    -- Creating connections post-build here allows us to use FindNearestPoint() to procedurally set accurate positions for the connection
+    CreateBoxOffMeshConnections(navMesh, boxes)
 
     -- Create a DetourCrowdManager component to the scene root
     crowdManager = scene_:CreateComponent("DetourCrowdManager")
@@ -198,6 +207,23 @@ function CreateMushroom(pos)
     return mushroomNode
 end
 
+function CreateBoxOffMeshConnections(navMesh, boxes)
+    for i, box in ipairs(boxes) do
+        local boxPos = box.position
+        local boxHalfSize = box.scale.x / 2
+
+        -- Create 2 empty nodes for the start & end points of the connection. Note that order matters only when using one-way/unidirectional connection.
+        local connectionStart = scene_:CreateChild("ConnectionStart")
+        connectionStart.position = navMesh:FindNearestPoint(boxPos + Vector3(boxHalfSize, -boxHalfSize, 0)) -- Base of box
+        local connectionEnd = connectionStart:CreateChild("ConnectionEnd")
+        connectionEnd.worldPosition = navMesh:FindNearestPoint(boxPos + Vector3(boxHalfSize, boxHalfSize, 0)) -- Top of box
+
+        -- Create the OffMeshConnection component to one node and link the other node
+        local connection = connectionStart:CreateComponent("OffMeshConnection")
+        connection.endPoint = connectionEnd
+    end
+end
+
 function SetPathPoint()
     local hitPos, hitDrawable = Raycast(250.0)
     local navMesh = scene_:GetComponent("DynamicNavigationMesh")
@@ -244,9 +270,6 @@ function AddOrRemoveObject()
 end
 
 function Raycast(maxDistance)
-    local hitPos = nil
-    local hitDrawable = nil
-
     local pos = ui.cursorPosition
     -- Check the cursor is visible and there is no UI element in front of the cursor
     if (not ui.cursor.visible) or (ui:GetElementAt(pos, true) ~= nil) then
@@ -329,9 +352,10 @@ function MoveCamera(timeStep)
         crowdManager = scene_:GetComponent("DetourCrowdManager")
         agents = crowdManager:GetActiveAgents()
 
-        -- Re-enable debug draw for obstacles
+        -- Re-enable debug draw for obstacles & off-mesh connections
         local navMesh = scene_:GetComponent("DynamicNavigationMesh")
         navMesh.drawObstacles = true
+        navMesh.drawOffMeshConnections = true
     end
 end
 
