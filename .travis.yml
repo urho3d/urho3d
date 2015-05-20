@@ -162,7 +162,7 @@ after_script: rake ci_teardown_cache
 
 branch: {name: Android-CI, active: yes, description: For Travis CI - switch CI build to use Android build environment.}
 language: android
-cache: { directories: $HOME/.ccache }
+cache: {directories: $HOME/.ccache}
 sudo: false
 addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz, libasound2-dev, g++-multilib]}}
 env:
