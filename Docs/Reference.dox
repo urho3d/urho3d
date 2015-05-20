@@ -422,6 +422,8 @@ parameters.Push(Variant(100)); // Add an int parameter
 file->Execute("void MyFunction(int)", parameters); // Execute
 \endcode
 
+If the function being called has void return type and no parameters, its name can alternatively be given instead of the full declaration.
+
 \ref ScriptFile::Execute "Execute()" also has an overload which takes a function pointer instead of querying by declaration. Using a pointer is naturally faster than a query, but also more risky: in case the ScriptFile resource is unloaded or reloaded, any function pointers will be invalidated.
 
 \section Scripting_Object Instantiating a script object
@@ -501,9 +503,11 @@ class Test : ScriptObject
 }
 \endcode
 
-Delayed method calls can be removed by full declaration using the ClearDelayedExecute() function. If an empty declaration (default) is given as parameter, all delayed calls are removed.
+Delayed method calls can be removed by declaration using the ClearDelayedExecute() function. If an empty declaration (default) is given as parameter, all delayed calls are removed.
 
-When a scene is saved/loaded, any pending delayed calls are also saved and restored properly.
+If the method being called has void return type and no parameters, its name can alternatively be given instead of the full declaration.
+
+When a scene is saved/loaded, any pending delayed calls are also saved and restored.
 
 \section Script_ScriptAPI The script API
 
