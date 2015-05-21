@@ -301,16 +301,19 @@ after_script: rake ci_teardown_cache
 ---
 
 branch: {name: Emscripten-CI, active: yes, description: For Travis CI - switch CI build to use Emscripten build environment.}
-language: objective-c
+language: cpp
+compiler: gcc
+cache: ccache
+sudo: false
+addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, libasound2-dev]}}
 env:
   global:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
-    - NUMJOBS=3
+    - NUMJOBS=4
     - EMSCRIPTEN=1
     - EMSCRIPTEN_SHARE_DATA=1
     - EMSCRIPTEN_EMRUN_BROWSER=chrome
-    # Temporarily disable ccache until we are using Emscripten 1.32
-    # USE_CCACHE=2
+    - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
@@ -324,14 +327,12 @@ before_script:
   - export CI_START_TIME=$(date +%s)
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
-  - pushd /usr/bin && sudo ln -sf python python2 && popd
-  - ulimit -Sn 512
-  - travis_retry brew update >/dev/null && travis_retry brew install ccache
-  - wget https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz && tar xfz emsdk-portable.tar.gz && rm emsdk-portable.tar.gz && cd emsdk_portable && ./emsdk update >/dev/null && sed -i.bak 's/-xvf/-xf/g' emsdk && ./emsdk install latest >/dev/null && ./emsdk activate latest >/dev/null && source ./emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
-  - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$EMSCRIPTEN_ROOT_PATH:$PATH
-  # rake ci_setup_cache
+  - export DISPLAY=:99.0; bash -e /etc/init.d/xvfb start
+  - git clone --depth 1 https://github.com/urho3d/emscripten-sdk.git && emscripten-sdk/emsdk activate --build=Release sdk-incoming-64bit && source emscripten-sdk/emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH; for f in $EMSCRIPTEN_ROOT_PATH/{emcc,em++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
+  - rake ci_setup_cache
 script: rake ci
-#after_script: rake ci_teardown_cache
+after_script: rake ci_teardown_cache
 
 # Below samples are excluded from Emscripten CI build due to build time constraint
 data:
