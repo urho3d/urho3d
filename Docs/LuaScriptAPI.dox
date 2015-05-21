@@ -1976,11 +1976,14 @@ Properties:
 Methods:
 
 - void SetDrawObstacles(bool enable)
+- void SetMaxObstacles(unsigned maxObstacles)
 - bool GetDrawObstacles() const
+- unsigned GetMaxObstacles() const
 
 Properties:
 
 - bool drawObstacles
+- int maxObstacles
 
 <a name="Class_Engine"></a>
 ### Engine : Object

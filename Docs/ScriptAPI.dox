@@ -6002,6 +6002,7 @@ Properties:
 - bool enabledEffective // readonly
 - uint id // readonly
 - bool initialized // readonly
+- uint maxObstacles
 - Node@ node // readonly
 - uint numAttributes // readonly
 - IntVector2 numTiles // readonly
