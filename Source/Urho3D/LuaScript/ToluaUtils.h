@@ -22,12 +22,8 @@
 
 #pragma once
 
-#include "../Scene/Component.h"
 #include "../Core/Context.h"
 #include "../Graphics/OctreeQuery.h"
-#ifdef URHO3D_NAVIGATION
-#include "../Navigation/CrowdAgent.h"
-#endif
 #ifdef URHO3D_PHYSICS
 #include "../Physics/PhysicsWorld.h"
 #endif
@@ -41,7 +37,11 @@ struct lua_State;
 
 namespace Urho3D
 {
+class Component;
 class Context;
+#ifdef URHO3D_NAVIGATION
+class CrowdAgent;
+#endif
 class Pass;
 class SoundSource;
 class UIElement;
