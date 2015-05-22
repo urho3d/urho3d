@@ -1263,7 +1263,10 @@ namespace Urho3D
 - %Detail %Sample %Max %Error : float
 - %Bounding %Box %Padding : Vector3
 - %Partition %Type : int
+- %Draw %OffMeshConnections : bool
+- %Draw %NavAreas : bool
 - %Max %Obstacles : int
+- %Draw %Obstacles : bool
 
 ### Light
 - %Is %Enabled : bool
@@ -1470,6 +1473,8 @@ namespace Urho3D
 - %Detail %Sample %Max %Error : float
 - %Bounding %Box %Padding : Vector3
 - %Partition %Type : int
+- %Draw %OffMeshConnections : bool
+- %Draw %NavAreas : bool
 
 ### NetworkPriority
 - %Base %Priority : float
