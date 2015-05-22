@@ -1164,7 +1164,7 @@ macro (setup_main_executable)
                 else ()
                     set (OUTPUT_COMMAND true)   # Nothing to output
                 endif ()
-                list (APPEND COMMANDS COMMAND echo Checking ${DIR}... && \(\( `find ${DIR} -newer ${DIR} |wc -l` \)\) && touch -cm ${DIR} ${PACKAGING_COMMAND} || ${OUTPUT_COMMAND})
+                list (APPEND COMMANDS COMMAND echo Checking ${DIR}... && bash -c \"\(\( `find ${DIR} -newer ${DIR} |wc -l` \)\)\" && touch -cm ${DIR} ${PACKAGING_COMMAND} || ${OUTPUT_COMMAND})
             endif ()
         endforeach ()
         string (MD5 MD5ALL ${MD5ALL})
