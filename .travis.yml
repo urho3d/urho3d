@@ -309,10 +309,9 @@ addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: 
 env:
   global:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
-    - NUMJOBS=4
+    - NUMJOBS=3
     - EMSCRIPTEN=1
     - EMSCRIPTEN_SHARE_DATA=1
-    - EMSCRIPTEN_EMRUN_BROWSER=chrome
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
@@ -324,7 +323,6 @@ env:
 matrix:
   fast_finish: true
 before_script:
-  - export CI_START_TIME=$(date +%s)
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export DISPLAY=:99.0; bash -e /etc/init.d/xvfb start

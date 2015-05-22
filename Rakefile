@@ -23,9 +23,6 @@
 require 'pathname'
 require 'json'
 require 'yaml'
-if ENV['IOS'] || ENV['EMSCRIPTEN']
-  require 'time'
-end
 
 # Usage: rake sync (only intended to be used in a fork with remote 'upstream' set to urho3d/Urho3D)
 desc 'Fetch and merge upstream urho3d/Urho3D to a Urho3D fork'
@@ -507,22 +504,16 @@ def makefile_ci
     android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
   end
   # For Emscripten CI build, skip make test and/or scaffolding test if Travis-CI VM took too long to get here, as otherwise overall build time may exceed 50 minutes time limit
-  test = $testing == 1 ? (ENV['CI'] && ENV['EMSCRIPTEN'] ? '&& if (( $((($(date +%%s)-$CI_START_TIME)/60)) < 25 )); then %s; fi' : '&& %s') % 'make test' : ''
+  test = $testing == 1 ? '&& make test' : ''
   system "cd ../Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
-  if ENV['CI_START_TIME'] then
-    elapsed_time = (Time.now - Time.at(ENV['CI_START_TIME'].to_i)) / 60
-    puts "\nEmscripten checkpoint reached, elapsed time: #{elapsed_time}\n"
-  end
-  unless ENV['CI'] && ENV['EMSCRIPTEN'] && (ENV['PACKAGE_UPLOAD'] || elapsed_time > 40)  # For Emscripten, skip scaffolding test when packaging or running out of time
+  unless ENV['CI'] && ENV['EMSCRIPTEN'] && ENV['PACKAGE_UPLOAD']  # For Emscripten, skip scaffolding test when packaging
     # Create a new project on the fly that uses newly built Urho3D library in the build tree
-    test.sub!(/< 25/, '< 43')
     scaffolding "../Build/generated/UsingBuildTree"
     system "cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_generic.sh . #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
     ENV['DESTDIR'] = ENV['HOME'] || Dir.home
     puts "\nInstalling Urho3D SDK to #{ENV['DESTDIR']}/usr/local...\n"  # The default CMAKE_INSTALL_PREFIX is /usr/local
     system 'cd ../Build && make -j$NUMJOBS install >/dev/null' or abort 'Failed to install Urho3D SDK'
     # Create a new project on the fly that uses newly installed Urho3D SDK
-    test.sub!(/< 43/, '< 48')
     scaffolding "../Build/generated/UsingSDK"
     system "export URHO3D_HOME=~/usr/local && cd ../Build/generated/UsingSDK && echo '\nExternal project referencing Urho3D SDK' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
   end
