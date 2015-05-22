@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "../Scene/Component.h"
 #include "../Core/Context.h"
 #include "../Graphics/OctreeQuery.h"
 #ifdef URHO3D_NAVIGATION
@@ -123,6 +124,13 @@ template<typename T> int ToluaPushPODVector(lua_State* L, void* data, const char
 template<> int ToluaPushPODVector<int>(lua_State* L, void* data, const char* type);
 /// Push PODVector<unsigned> to Lua as a table.
 template<> int ToluaPushPODVector<unsigned>(lua_State* L, void* data, const char* type);
+
+/// Push PODVector<Component*> to Lua as a table.
+template<> int ToluaPushPODVector<Component*>(lua_State* L, void* data, const char* type);
+
+/// Push PODVector<Node*> to Lua as a table.
+template<> int ToluaPushPODVector<Node*>(lua_State* L, void* data, const char* type);
+
 /// Push PODVector<SoundSource*> to Lua as a table.
 template<> int ToluaPushPODVector<SoundSource*>(lua_State* L, void* data, const char* type);
 /// Push PODVector<UIElement*> to Lua as a table.

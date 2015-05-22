@@ -24,7 +24,7 @@ class Node : public Animatable
 
     tolua_outside bool NodeSaveXML @ SaveXML(File* dest, const String indentation = "\t") const;
     void SetName(const String name);
-    
+
     void SetPosition(const Vector3& position);
     void SetPosition2D(const Vector2& position);
     void SetPosition2D(float x, float y);
@@ -42,7 +42,7 @@ class Node : public Animatable
     void SetTransform2D(const Vector2& position, float rotation);
     void SetTransform2D(const Vector2& position, float rotation, const Vector2& scale);
     void SetTransform2D(const Vector2& position, float rotation, float scale);
-    
+
     void SetWorldPosition(const Vector3& position);
     void SetWorldPosition2D(const Vector2& position);
     void SetWorldPosition2D(float x, float y);
@@ -60,7 +60,7 @@ class Node : public Animatable
     void SetWorldTransform2D(const Vector2& position, float rotation);
     void SetWorldTransform2D(const Vector2& position, float rotation, const Vector2& scale);
     void SetWorldTransform2D(const Vector2& position, float rotation, float scale);
-    
+
     void Translate(const Vector3& delta, TransformSpace space = TS_LOCAL);
     void Translate2D(const Vector2& delta, TransformSpace space = TS_LOCAL);
     void Rotate(const Quaternion& delta, TransformSpace space = TS_LOCAL);
@@ -71,22 +71,22 @@ class Node : public Animatable
     void Pitch(float angle, TransformSpace space = TS_LOCAL);
     void Yaw(float angle, TransformSpace space = TS_LOCAL);
     void Roll(float angle, TransformSpace space = TS_LOCAL);
-    
+
     bool LookAt(const Vector3& target, const Vector3& upAxis = Vector3::UP, TransformSpace space = TS_WORLD);
-    
+
     void Scale(float scale);
     void Scale(const Vector3& scale);
     void Scale2D(const Vector2& scale);
-    
+
     void SetEnabled(bool enable);
     void SetDeepEnabled(bool enable);
     void ResetDeepEnabled();
     void SetEnabledRecursive(bool enable);
     void SetOwner(Connection* owner);
     void MarkDirty();
-    
+
     Node* CreateChild(const String name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
-    
+
     void AddChild(Node* node, unsigned index = M_MAX_UNSIGNED);
     void RemoveChild(Node* node);
     void RemoveAllChildren();
@@ -94,18 +94,18 @@ class Node : public Animatable
     void RemoveComponent(Component* component);
     void RemoveComponent(StringHash type);
     void RemoveComponent(const String type);
-    
+
     void RemoveAllComponents();
     void RemoveComponents(bool removeReplicated, bool removeLocal);
-    
+
     Node* Clone(CreateMode mode = REPLICATED);
-    
+
     void Remove();
     void SetParent(Node* parent);
     void SetVar(StringHash key, const Variant& value);
     void AddListener(Component* component);
     void RemoveListener(Component* component);
-    
+
     // template <class T> T* CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
     Component* CreateComponent(const String type, CreateMode mode = REPLICATED, unsigned id = 0);
     // template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
@@ -115,10 +115,10 @@ class Node : public Animatable
 
     int CreateScriptObject(const String scriptObjectType);
     int CreateScriptObject(const String fileName, const String scriptObjectType);
-    
+
     int GetScriptObject() const;
     int GetScriptObject(const String scriptObjectType) const;
-    
+
     unsigned GetID() const;
     const String GetName() const;
     StringHash GetNameHash() const;
@@ -127,7 +127,7 @@ class Node : public Animatable
     bool IsEnabled() const;
     bool IsEnabledSelf() const;
     Connection* GetOwner() const;
-    
+
     const Vector3& GetPosition() const;
     Vector2 GetPosition2D() const;
     const Quaternion& GetRotation() const;
@@ -137,7 +137,7 @@ class Node : public Animatable
     Vector3 GetRight() const;
     const Vector3& GetScale() const;
     Vector2 GetScale2D() const;
-    
+
     Matrix3x4 GetTransform() const;
     Vector3 GetWorldPosition() const;
     Vector2 GetWorldPosition2D() const;
@@ -148,7 +148,7 @@ class Node : public Animatable
     Vector3 GetWorldRight() const;
     Vector3 GetWorldScale() const;
     Vector2 GetWorldScale2D() const;
-    
+
     const Matrix3x4& GetWorldTransform() const;
     Vector3 LocalToWorld(const Vector3& position) const;
     Vector3 LocalToWorld(const Vector4& vector) const;
@@ -174,6 +174,13 @@ class Node : public Animatable
 
     // template <class T> T* GetComponent() const;
     Component* GetComponent(const String type) const;
+
+    // template <class T> void GetComponents(PODVector<T*>& dest, bool recursive = false) const;
+    tolua_outside const PODVector<Component*>& NodeGetComponentsWithType @ GetComponents(const String type, bool recursive = false);
+    // void GetChildren(PODVector<Node*>& dest, bool recursive = false) const;
+    tolua_outside const PODVector<Node*>& NodeGetChildren @ GetChildren(bool recursive = false);
+    // template <class T> void GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive = false) const;
+    tolua_outside const PODVector<Node*>& NodeGetChildrenWithComponent @ GetChildrenWithComponent(const String type, bool recursive = false);
 
     bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED);
     bool LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED);
@@ -369,19 +376,19 @@ static int tolua_SceneLuaAPI_Node_GetScriptObject01(lua_State* tolua_S)
 #endif
  {
  int scriptObjectRef = LUA_REFNIL;
- 
+
  PODVector<LuaScriptInstance*> instances;
  self->GetComponents<LuaScriptInstance>(instances, false);
- 
+
  for (unsigned i = 0; i < instances.Size(); ++i)
  {
   if (instances[i]->GetScriptObjectType() == scriptObjectType)
   {
     scriptObjectRef = instances[i]->GetScriptObjectRef();
     break;
-  } 
+  }
  }
- 
+
  if (scriptObjectRef == LUA_REFNIL)
   lua_pushnil(tolua_S);
  else
@@ -391,5 +398,29 @@ static int tolua_SceneLuaAPI_Node_GetScriptObject01(lua_State* tolua_S)
  return 1;
 tolua_lerror:
  return tolua_SceneLuaAPI_Node_GetScriptObject00(tolua_S);
+}
+
+static const PODVector<Component*>& NodeGetComponentsWithType(Node* node, String type, bool recursive)
+{
+    static PODVector<Component*> result;
+    result.Clear();
+    node->GetComponents(result, type, recursive);
+    return result;
+}
+
+static const PODVector<Node*>& NodeGetChildren(Node* node, bool recursive)
+{
+    static PODVector<Node*> result;
+    result.Clear();
+    node->GetChildren(result, recursive);
+    return result;
+}
+
+static const PODVector<Node*>& NodeGetChildrenWithComponent(Node* node, String type, bool recursive)
+{
+    static PODVector<Node*> result;
+    result.Clear();
+    node->GetChildrenWithComponent(result, type, recursive);
+    return result;
 }
 $}
