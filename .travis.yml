@@ -352,14 +352,6 @@ script:
   - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && rake ci_emscripten_samples_update || ! [ $RELEASE_TAG ]; fi
 after_script: rake ci_teardown_cache
 
-# Below samples are excluded from Emscripten CI build due to build time constraint
-data:
-  excluded_sample:
-    - 01_HelloWorld
-    - 02_HelloGUI
-    - 26_ConsoleInput
-    - 29_SoundSynthesis
-
 ...
 
 # vi: set ts=2 sw=2 expandtab:
