@@ -310,10 +310,13 @@ bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& param
 
 bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters, bool unprepare)
 {
+    if (!object)
+        return false;
+
     asIScriptFunction* method = GetMethod(object, declaration);
     if (!method)
     {
-        LOGERROR("Method " + declaration + " not found in " + GetName());
+        LOGERROR("Method " + declaration + " not found in class " + String(object->GetObjectType()->GetName()));
         return false;
     }
     
@@ -457,11 +460,16 @@ bool ScriptFile::SaveByteCode(Serializer& dest)
         return false;
 }
 
-asIScriptFunction* ScriptFile::GetFunction(const String& declaration)
+asIScriptFunction* ScriptFile::GetFunction(const String& declarationIn)
 {
     if (!compiled_)
         return 0;
     
+    String declaration = declarationIn.Trimmed();
+    // If not a full declaration, assume void with no parameters
+    if (declaration.Find('(') == String::NPOS)
+        declaration = "void " + declaration + "()";
+
     HashMap<String, asIScriptFunction*>::ConstIterator i = functions_.Find(declaration);
     if (i != functions_.End())
         return i->second_;
@@ -471,14 +479,20 @@ asIScriptFunction* ScriptFile::GetFunction(const String& declaration)
     return function;
 }
 
-asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& declaration)
+asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& declarationIn)
 {
     if (!compiled_ || !object)
         return 0;
-    
+
+    String declaration = declarationIn.Trimmed();
+    // If not a full declaration, assume void with no parameters
+    if (declaration.Find('(') == String::NPOS)
+        declaration = "void " + declaration + "()";
+
     asIObjectType* type = object->GetObjectType();
     if (!type)
         return 0;
+
     HashMap<asIObjectType*, HashMap<String, asIScriptFunction*> >::ConstIterator i = methods_.Find(type);
     if (i != methods_.End())
     {
@@ -510,12 +524,11 @@ void ScriptFile::AddEventHandlerInternal(Object* sender, StringHash eventType, c
 
     if (!function)
     {
-        declaration = "void " + handlerName + "()";
-
+        // Retry with parameterless signature
         if (receiver)
-            function = GetMethod(receiver, declaration);
+            function = GetMethod(receiver, handlerName);
         else
-            function = GetFunction(declaration);
+            function = GetFunction(handlerName);
 
         if (!function)
         {

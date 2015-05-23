@@ -108,6 +108,10 @@ template<class T> static void RegisterNavMeshBase(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(name, "IntVector2 get_numTiles() const", asMETHOD(T, GetNumTiles), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "void set_partitionType()", asMETHOD(T, SetPartitionType), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "NavmeshPartitionType get_partitionType()", asMETHOD(T, GetPartitionType), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "void set_drawOffMeshConnections(bool)", asMETHOD(T, SetDrawOffMeshConnections), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "bool get_drawOffMeshConnections() const", asMETHOD(T, GetDrawOffMeshConnections), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "void set_drawNavAreas(bool)", asMETHOD(T, SetDrawNavAreas), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "bool get_drawNavAreas() const", asMETHOD(T, GetDrawNavAreas), asCALL_THISCALL);
 }
 
 void RegisterNavigationMesh(asIScriptEngine* engine)
@@ -129,6 +133,8 @@ void RegisterDynamicNavigationMesh(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DynamicNavigationMesh", "Array<Vector3>@ FindPath(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(DynamicNavigationMeshFindPath), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("DynamicNavigationMesh", "void set_drawObstacles(bool)", asMETHOD(DynamicNavigationMesh, SetDrawObstacles), asCALL_THISCALL);
     engine->RegisterObjectMethod("DynamicNavigationMesh", "bool get_drawObstacles() const", asMETHOD(DynamicNavigationMesh, GetDrawObstacles), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DynamicNavigationMesh", "void set_maxObstacles(uint)", asMETHOD(DynamicNavigationMesh, SetMaxObstacles), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DynamicNavigationMesh", "uint get_maxObstacles() const", asMETHOD(DynamicNavigationMesh, GetMaxObstacles), asCALL_THISCALL);
 }
 
 void RegisterOffMeshConnection(asIScriptEngine* engine)
@@ -140,6 +146,10 @@ void RegisterOffMeshConnection(asIScriptEngine* engine)
     engine->RegisterObjectMethod("OffMeshConnection", "float get_radius() const", asMETHOD(OffMeshConnection, GetRadius), asCALL_THISCALL);
     engine->RegisterObjectMethod("OffMeshConnection", "void set_bidirectional(bool)", asMETHOD(OffMeshConnection, SetBidirectional), asCALL_THISCALL);
     engine->RegisterObjectMethod("OffMeshConnection", "bool get_bidirectional() const", asMETHOD(OffMeshConnection, IsBidirectional), asCALL_THISCALL);
+    engine->RegisterObjectMethod("OffMeshConnection", "void set_mask(uint)", asMETHOD(OffMeshConnection, SetMask), asCALL_THISCALL);
+    engine->RegisterObjectMethod("OffMeshConnection", "uint get_mask() const", asMETHOD(OffMeshConnection, GetMask), asCALL_THISCALL);
+    engine->RegisterObjectMethod("OffMeshConnection", "void set_areaID(uint)", asMETHOD(OffMeshConnection, SetAreaID), asCALL_THISCALL);
+    engine->RegisterObjectMethod("OffMeshConnection", "uint get_areaID() const", asMETHOD(OffMeshConnection, GetAreaID), asCALL_THISCALL);
 }
 
 void RegisterObstacle(asIScriptEngine* engine)

@@ -1263,7 +1263,10 @@ namespace Urho3D
 - %Detail %Sample %Max %Error : float
 - %Bounding %Box %Padding : Vector3
 - %Partition %Type : int
+- %Draw %OffMeshConnections : bool
+- %Draw %NavAreas : bool
 - %Max %Obstacles : int
+- %Draw %Obstacles : bool
 
 ### Light
 - %Is %Enabled : bool
@@ -1470,6 +1473,8 @@ namespace Urho3D
 - %Detail %Sample %Max %Error : float
 - %Bounding %Box %Padding : Vector3
 - %Partition %Type : int
+- %Draw %OffMeshConnections : bool
+- %Draw %NavAreas : bool
 
 ### NetworkPriority
 - %Base %Priority : float
@@ -5993,13 +5998,16 @@ Properties:
 - float cellSize
 - float detailSampleDistance
 - float detailSampleMaxError
+- bool drawNavAreas
 - bool drawObstacles
+- bool drawOffMeshConnections
 - float edgeMaxError
 - float edgeMaxLength
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
 - bool initialized // readonly
+- uint maxObstacles
 - Node@ node // readonly
 - uint numAttributes // readonly
 - IntVector2 numTiles // readonly
@@ -7769,6 +7777,8 @@ Properties:
 - float cellSize
 - float detailSampleDistance
 - float detailSampleMaxError
+- bool drawNavAreas
+- bool drawOffMeshConnections
 - float edgeMaxError
 - float edgeMaxLength
 - bool enabled
@@ -8232,6 +8242,7 @@ Methods:
 Properties:
 
 - bool animationEnabled
+- uint areaID
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -8242,6 +8253,7 @@ Properties:
 - bool enabledEffective // readonly
 - Node@ endPoint
 - uint id // readonly
+- uint mask
 - Node@ node // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
@@ -9537,6 +9549,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasMethod(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)

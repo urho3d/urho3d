@@ -290,6 +290,30 @@ template<> int ToluaPushPODVector<unsigned>(lua_State* L, void* data, const char
     return 1;
 }
 
+template<> int ToluaPushPODVector<Component*>(lua_State* L, void* data, const char*)
+{
+    const PODVector<Component*>& vector = *((const PODVector<Component*>*)data);
+    lua_newtable(L);
+    for (unsigned i = 0; i < vector.Size(); ++i)
+    {
+        tolua_pushusertype(L, vector[i], "Component");
+        lua_rawseti(L, -2, i + 1);
+    }
+    return 1;
+}
+
+template<> int ToluaPushPODVector<Node*>(lua_State* L, void* data, const char*)
+{
+    const PODVector<Node*>& vector = *((const PODVector<Node*>*)data);
+    lua_newtable(L);
+    for (unsigned i = 0; i < vector.Size(); ++i)
+    {
+        tolua_pushusertype(L, vector[i], "Node");
+        lua_rawseti(L, -2, i + 1);
+    }
+    return 1;
+}
+
 template<> int ToluaPushPODVector<SoundSource*>(lua_State* L, void* data, const char*)
 {
     const PODVector<SoundSource*>& vector = *((const PODVector<SoundSource*>*)data);

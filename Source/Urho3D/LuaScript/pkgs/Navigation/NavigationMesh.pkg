@@ -35,6 +35,8 @@ class NavigationMesh : public Component
     bool Build();
     bool Build(const BoundingBox& boundingBox);
     void SetPartitionType(NavmeshPartitionType aType);
+    void SetDrawOffMeshConnections(bool enable);
+    void SetDrawNavAreas(bool enable);
 
     Vector3 FindNearestPoint(const Vector3& point, const Vector3& extents = Vector3::ONE);
     Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents=Vector3::ONE, int maxVisited=3);
@@ -68,6 +70,8 @@ class NavigationMesh : public Component
     BoundingBox GetWorldBoundingBox() const;
     IntVector2 GetNumTiles() const;
     NavmeshPartitionType GetPartitionType();
+    bool GetDrawOffMeshConnections() const;
+    bool GetDrawNavAreas() const;
 
     tolua_property__get_set int tileSize;
     tolua_property__get_set float cellSize;
@@ -84,6 +88,8 @@ class NavigationMesh : public Component
     tolua_property__get_set float detailSampleMaxError;
     tolua_property__get_set Vector3& padding;
     tolua_property__get_set NavmeshPartitionType partitionType;
+    tolua_property__get_set bool drawOffMeshConnections;
+    tolua_property__get_set bool drawNavAreas;
     tolua_readonly tolua_property__is_set bool initialized;
     tolua_readonly tolua_property__get_set BoundingBox& boundingBox;
     tolua_readonly tolua_property__get_set BoundingBox worldBoundingBox;

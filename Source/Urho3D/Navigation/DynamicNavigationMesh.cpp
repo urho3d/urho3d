@@ -28,12 +28,13 @@
 #include "../Graphics/DebugRenderer.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
+#include "../Navigation/NavArea.h"
 #include "../Navigation/NavBuildData.h"
 #include "../Navigation/NavigationEvents.h"
 #include "../Scene/Node.h"
+#include "../Navigation/Obstacle.h"
 #include "../Navigation/OffMeshConnection.h"
 #include "../Core/Profiler.h"
-#include "../Navigation/Obstacle.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
 
@@ -237,7 +238,8 @@ void DynamicNavigationMesh::RegisterObject(Context* context)
     context->RegisterFactory<DynamicNavigationMesh>(NAVIGATION_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(NavigationMesh);
-    ATTRIBUTE("Max Obstacles", unsigned, maxObstacles_, DEFAULT_MAX_OBSTACLES, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Max Obstacles", GetMaxObstacles, SetMaxObstacles, unsigned, DEFAULT_MAX_OBSTACLES, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Draw Obstacles", GetDrawObstacles, SetDrawObstacles, bool, false, AM_DEFAULT);
 }
 
 bool DynamicNavigationMesh::Build()
@@ -500,16 +502,46 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
         }
     }
 
-    // Draw obstacles
-    if (drawObstacles_)
+    Scene* scene = GetScene();
+    if (scene)
     {
-        PODVector<Node*> obstacles;
-        GetScene()->GetChildrenWithComponent<Obstacle>(obstacles, true);
-        for (unsigned i = 0; i < obstacles.Size(); ++i)
+        // Draw Obstacle components
+        if (drawObstacles_)
         {
-            Obstacle* obstacle = obstacles[i]->GetComponent<Obstacle>();
-            if (obstacle && obstacle->IsEnabledEffective())
-                obstacle->DrawDebugGeometry(debug, depthTest);
+            PODVector<Node*> obstacles;
+            scene->GetChildrenWithComponent<Obstacle>(obstacles, true);
+            for (unsigned i = 0; i < obstacles.Size(); ++i)
+            {
+                Obstacle* obstacle = obstacles[i]->GetComponent<Obstacle>();
+                if (obstacle && obstacle->IsEnabledEffective())
+                    obstacle->DrawDebugGeometry(debug, depthTest);
+            }
+        }
+
+        // Draw OffMeshConnection components
+        if (drawOffMeshConnections_)
+        {
+            PODVector<Node*> connections;
+            scene->GetChildrenWithComponent<OffMeshConnection>(connections, true);
+            for (unsigned i = 0; i < connections.Size(); ++i)
+            {
+                OffMeshConnection* connection = connections[i]->GetComponent<OffMeshConnection>();
+                if (connection && connection->IsEnabledEffective())
+                    connection->DrawDebugGeometry(debug, depthTest);
+            }
+        }
+
+        // Draw NavArea components
+        if (drawNavAreas_)
+        {
+            PODVector<Node*> areas;
+            scene->GetChildrenWithComponent<NavArea>(areas, true);
+            for (unsigned i = 0; i < areas.Size(); ++i)
+            {
+                NavArea* area = areas[i]->GetComponent<NavArea>();
+                if (area && area->IsEnabledEffective())
+                    area->DrawDebugGeometry(debug, depthTest);
+            }
         }
     }
 }
@@ -865,7 +897,9 @@ void DynamicNavigationMesh::AddObstacle(Obstacle* obstacle, bool silent)
         rcVcopy(pos, &obsPos.x_);
         dtObstacleRef refHolder;
 
-        if (tileCache_->isObstacleQueueFull())
+        // Because dtTileCache doesn't process obstacle requests while updating tiles 
+        // it's necessary update until sufficient request space is available
+        while (tileCache_->isObstacleQueueFull())
             tileCache_->update(1, navMesh_);
 
         if (dtStatusFailed(tileCache_->addObstacle(pos, obstacle->GetRadius(), obstacle->GetHeight(), &refHolder)))
@@ -875,7 +909,6 @@ void DynamicNavigationMesh::AddObstacle(Obstacle* obstacle, bool silent)
         }
         obstacle->obstacleId_ = refHolder;
         assert(refHolder > 0);
-        tileCache_->update(1, navMesh_);
 
         if (!silent)
         {
@@ -904,7 +937,9 @@ void DynamicNavigationMesh::RemoveObstacle(Obstacle* obstacle, bool silent)
 {
     if (tileCache_ && obstacle->obstacleId_ > 0)
     {
-        if (tileCache_->isObstacleQueueFull())
+        // Because dtTileCache doesn't process obstacle requests while updating tiles 
+        // it's necessary update until sufficient request space is available
+        while (tileCache_->isObstacleQueueFull())
             tileCache_->update(1, navMesh_);
 
         if (dtStatusFailed(tileCache_->removeObstacle(obstacle->obstacleId_)))

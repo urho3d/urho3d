@@ -422,6 +422,8 @@ parameters.Push(Variant(100)); // Add an int parameter
 file->Execute("void MyFunction(int)", parameters); // Execute
 \endcode
 
+If the function being called has void return type and no parameters, its name can alternatively be given instead of the full declaration.
+
 \ref ScriptFile::Execute "Execute()" also has an overload which takes a function pointer instead of querying by declaration. Using a pointer is naturally faster than a query, but also more risky: in case the ScriptFile resource is unloaded or reloaded, any function pointers will be invalidated.
 
 \section Scripting_Object Instantiating a script object
@@ -501,9 +503,11 @@ class Test : ScriptObject
 }
 \endcode
 
-Delayed method calls can be removed by full declaration using the ClearDelayedExecute() function. If an empty declaration (default) is given as parameter, all delayed calls are removed.
+Delayed method calls can be removed by declaration using the ClearDelayedExecute() function. If an empty declaration (default) is given as parameter, all delayed calls are removed.
 
-When a scene is saved/loaded, any pending delayed calls are also saved and restored properly.
+If the method being called has void return type and no parameters, its name can alternatively be given instead of the full declaration.
+
+When a scene is saved/loaded, any pending delayed calls are also saved and restored.
 
 \section Script_ScriptAPI The script API
 
@@ -1957,6 +1961,11 @@ One interesting feature is the ability to flip/mirror animations on both axes, u
 
 For a demonstration, check examples 33_Urho2DSpriterAnimation and 24_Urho2DSprite.
 
+Tip for naming your files:
+- if an xml file has the same name as an image file in the same repository, it is assumed that it is a texture parameter file
+- if an xml file has the same name as a Spriter scml file in the same repository, it is assumed that it is a spritesheet file
+So to prevent conflicts, scml and image files shouldn't have the exact same name.
+
 \section Urho2D_Particle Particle emitters
 A 2D particle emitter is built from a *.pex file (a format used by many 2D engines).
 A *.pex file is loaded using ParticleEffect2D class (Resource) and rendered using ParticleEmitter2D class (Drawable component):
@@ -2039,6 +2048,8 @@ Check Box2D manual - Chapter 4 Collision Module and Chapter 7 Fixtures for full 
 - Polygon shapes <=> CollisionPolygon2D: defines 2D physics collision polygon. Polygon shapes are solid convex polygons. A polygon is convex when all line segments connecting two points in the interior do not cross any edge of the polygon. A polygon must have 3 or more vertices (\ref CollisionPolygon2D::SetVertices "SetVertices()"). Polygons vertices winding doesn't matter.
 - Edge shapes <=> CollisionEdge2D: defines 2D physics collision edge. Edge shapes are line segments defined by 2 vertices (\ref CollisionEdge2D::SetVertex1 "SetVertex1()" and \ref CollisionEdge2D::SetVertex2 "SetVertex2()" or globaly \ref CollisionEdge2D::SetVertices "SetVertices()"). They are provided to assist in making a free-form static environment for your game. A major limitation of edge shapes is that they can collide with circles and polygons but not with themselves. The collision algorithms used by Box2D require that at least one of two colliding shapes have volume. Edge shapes have no volume, so edge-edge collision is not possible.
 - Chain shapes <=> CollisionChain2D: defines 2D physics collision chain. The chain shape provides an efficient way to connect many edges together (\ref CollisionChain2D::SetVertices "SetVertices()") to construct your static game worlds. You can connect chains together using ghost vertices. Self-intersection of chain shapes is not supported.
+
+Several collision shapes may exist in the same node to create compound shapes. This can be handy to approximate complex or concave shapes.
 
 Important: collision shapes must match your textures in order to be accurate. You can use Tiled's objects to create your shapes (see \ref Urho2D_TMX_Objects "Tile map objects"). Or you can use tools like Physics Body Editor (https://code.google.com/p/box2d-editor/), RUBE (https://www.iforce2d.net/rube/), LevelHelper (http://www.gamedevhelper.com/levelhelper/), PhysicsEditor (http://www.codeandweb.com/physicseditor), ... to help you. Other interesting tool is BisonKick (https://bisonkick.com/app/518195d06927101d38a83b66/).
 

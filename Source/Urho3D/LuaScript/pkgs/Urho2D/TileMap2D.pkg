@@ -2,7 +2,6 @@ $#include "Urho2D/TileMap2D.h"
 
 class TileMap2D : Component
 {
-    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     void SetTmxFile(TmxFile2D* tmxFile);
     TmxFile2D* GetTmxFile() const;
     const TileMapInfo2D& GetInfo() const;

@@ -45,7 +45,7 @@ endif ()
 if (NOT EMCC_VERSION)
     execute_process (COMMAND ${EMSCRIPTEN_ROOT_PATH}/emcc --version RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE EMCC_VERSION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
     if (EXIT_CODE EQUAL 0)
-        string (REGEX MATCH "[^ .]+\\.[^.]+\\.[^ ]+" EMCC_VERSION "${EMCC_VERSION}")
+        string (REGEX MATCH "[^ .]+\\.[^.]+\\.[^ ]+" EMCC_VERSION "${EMCC_VERSION}")    # Stringify as it could be empty when an error has occured
     else ()
         message (FATAL_ERROR "Could not determine the emcc version. Make sure you have installed and activated the Emscripten SDK correctly.")
     endif ()

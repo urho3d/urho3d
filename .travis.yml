@@ -41,7 +41,7 @@ matrix:
   include:
     - &Linux-64bit
       compiler: gcc-64bit-static
-      env: LINUX=1 URHO3D_LIB_TYPE=STATIC COVERITY_SCAN_THRESHOLD=20 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC COVERITY_SCAN_THRESHOLD=100 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
     - &Linux-64bit-shared
       compiler: gcc-64bit-shared
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED
@@ -156,7 +156,7 @@ after_script: rake ci_teardown_cache
 
 branch: {name: Android-CI, active: yes, description: For Travis CI - switch CI build to use Android build environment.}
 language: android
-cache: { directories: $HOME/.ccache }
+cache: {directories: $HOME/.ccache}
 sudo: false
 addons: {apt: {packages: &native_deps [libasound2-dev, g++-multilib]}}
 env:
@@ -337,17 +337,8 @@ data:
   excluded_sample:
     - 01_HelloWorld
     - 02_HelloGUI
-    - 03_Sprites
-    - 04_StaticScene
-    - 05_AnimatingScene
     - 26_ConsoleInput
     - 29_SoundSynthesis
-    - 30_LightAnimation
-    - 31_MaterialAnimation
-    - 34_DynamicGeometry
-    - 35_SignedDistanceFieldText
-    - 37_UIDrag
-    - 38_SceneAndUILoad
 
 ...
 

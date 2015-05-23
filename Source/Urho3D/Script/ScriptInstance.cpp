@@ -235,6 +235,12 @@ bool ScriptInstance::Execute(const String& declaration, const VariantVector& par
         return false;
 
     asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
+    if (!method)
+    {
+        LOGERROR("Method " + declaration + " not found in class " + className_);
+        return false;
+    }
+    
     return scriptFile_->Execute(scriptObject_, method, parameters);
 }
 
@@ -288,8 +294,8 @@ void ScriptInstance::AddEventHandler(StringHash eventType, const String& handler
     asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
     if (!method)
     {
-        declaration = "void " + handlerName + "()";
-        method = scriptFile_->GetMethod(scriptObject_, declaration);
+        // Retry with parameterless signature
+        method = scriptFile_->GetMethod(scriptObject_, handlerName);
         if (!method)
         {
             LOGERROR("Event handler method " + handlerName + " not found in " + scriptFile_->GetName());
@@ -315,8 +321,8 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
     asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
     if (!method)
     {
-        declaration = "void " + handlerName + "()";
-        method = scriptFile_->GetMethod(scriptObject_, declaration);
+        // Retry with parameterless signature
+        method = scriptFile_->GetMethod(scriptObject_, handlerName);
         if (!method)
         {
             LOGERROR("Event handler method " + handlerName + " not found in " + scriptFile_->GetName());
@@ -350,6 +356,14 @@ void ScriptInstance::RemoveEventHandlers()
 void ScriptInstance::RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions)
 {
     UnsubscribeFromAllEventsExcept(exceptions, true);
+}
+
+bool ScriptInstance::HasMethod(const String& declaration) const
+{
+    if (!scriptFile_ || !scriptObject_)
+        return false;
+    else
+        return scriptFile_->GetMethod(scriptObject_, declaration) != 0;
 }
 
 void ScriptInstance::SetScriptFileAttr(const ResourceRef& value)

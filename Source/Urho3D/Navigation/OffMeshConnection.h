@@ -31,7 +31,7 @@ namespace Urho3D
 class URHO3D_API OffMeshConnection : public Component
 {
     OBJECT(OffMeshConnection);
-    
+
 public:
     /// Construct.
     OffMeshConnection(Context* context);
@@ -39,14 +39,14 @@ public:
     virtual ~OffMeshConnection();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
-    
+
     /// Set endpoint node.
     void SetEndPoint(Node* node);
     /// Set radius.
@@ -57,7 +57,7 @@ public:
     void SetMask(unsigned newMask);
     /// Sets the assigned area Id for the connection
     void SetAreaID(unsigned newAreaID);
-    
+
     /// Return endpoint node.
     Node* GetEndPoint() const;
     /// Return radius.
@@ -68,7 +68,7 @@ public:
     unsigned GetMask() const { return mask_; }
     /// Return the user assigned area ID
     unsigned GetAreaID() const { return areaId_; }
-    
+
 private:
     /// Endpoint node.
     WeakPtr<Node> endPoint_;

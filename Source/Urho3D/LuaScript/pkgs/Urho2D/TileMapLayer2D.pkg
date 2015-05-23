@@ -2,7 +2,6 @@ $#include "Urho2D/TileMapLayer2D.h"
 
 class TileMapLayer2D : Component
 {
-    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     void SetDrawOrder(int drawOrder);
     void SetVisible(bool visible);
 
@@ -16,7 +15,7 @@ class TileMapLayer2D : Component
     int GetHeight() const;
     Node* GetTileNode(int x, int y) const;
     Tile2D* GetTile(int x, int y) const;
-    
+
     unsigned GetNumObjects() const;
     TileMapObject2D* GetObject(unsigned index) const;
     Node* GetObjectNode(unsigned index) const;

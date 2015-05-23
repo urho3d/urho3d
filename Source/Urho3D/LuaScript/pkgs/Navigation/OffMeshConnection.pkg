@@ -5,12 +5,18 @@ class OffMeshConnection : public Component
     void SetEndPoint(Node* node);
     void SetRadius(float radius);
     void SetBidirectional(bool enabled);
-    
+    void SetMask(unsigned newMask);
+    void SetAreaID(unsigned newAreaID);
+
     Node* GetEndPoint() const;
     float GetRadius() const;
     bool IsBidirectional() const;
-    
+    unsigned GetMask() const;
+    unsigned GetAreaID() const;
+
     tolua_property__get_set Node* endPoint;
     tolua_property__get_set float radius;
     tolua_property__is_set bool bidirectional;
+    tolua_property__get_set unsigned mask;
+    tolua_property__get_set unsigned areaID;
 };
