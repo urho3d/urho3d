@@ -2,17 +2,19 @@
 -- This sample demonstrates:
 --     - Generating a dynamic navigation mesh into the scene
 --     - Performing path queries to the navigation mesh
---     - Adding and removing obstacles at runtime from the dynamic mesh
---     - Adding and removing crowd agents at runtime
+--     - Adding and removing obstacles/agents at runtime
 --     - Raycasting drawable components
 --     - Crowd movement management
 --     - Accessing crowd agents with the crowd manager
 --     - Using off-mesh connections to make boxes climbable
+--     - Using agents to simulate moving obstacles
 
 require "LuaScripts/Utilities/Sample"
 
+local navMesh = nil
 local crowdManager = nil
 local agents = {}
+local NUM_BARRELS = 20
 
 function Start()
     -- Execute the common startup for samples
@@ -83,14 +85,12 @@ function CreateScene()
     end
 
     -- Create a DynamicNavigationMesh component to the scene root
-    local navMesh = scene_:CreateComponent("DynamicNavigationMesh")
+    navMesh = scene_:CreateComponent("DynamicNavigationMesh")
     -- Enable drawing debug geometry for obstacles and off-mesh connections
     navMesh.drawObstacles = true
     navMesh.drawOffMeshConnections = true
     -- Set the agent height large enough to exclude the layers under boxes
     navMesh.agentHeight = 10
-    -- Set nav mesh tilesize to something reasonable
-    navMesh.tileSize = 64
     -- Set nav mesh cell height to minimum (allows agents to be grounded)
     navMesh.cellHeight = 0.05
     -- Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
@@ -107,18 +107,21 @@ function CreateScene()
     -- Create an off-mesh connection for each box to make it climbable (tiny boxes are skipped).
     -- Note that OffMeshConnections must be added before building the navMesh, but as we are adding Obstacles next, tiles will be automatically rebuilt.
     -- Creating connections post-build here allows us to use FindNearestPoint() to procedurally set accurate positions for the connection
-    CreateBoxOffMeshConnections(navMesh, boxes)
+    CreateBoxOffMeshConnections(boxes)
 
-    -- Create a DetourCrowdManager component to the scene root
-    crowdManager = scene_:CreateComponent("DetourCrowdManager")
-
-    -- Create Jack node as crowd agent
-    SpawnJack(Vector3(-5, 0, 20))
-
-    -- Create some mushrooms as obstacles. Note that obstacles are added onto an already buit navigation mesh
+    -- Create some mushrooms as obstacles. Note that obstacles are non-walkable areas
     for i = 1, 100 do
         CreateMushroom(Vector3(Random(90.0) - 45.0, 0.0, Random(90.0) - 45.0))
     end
+
+    -- Create a DetourCrowdManager component to the scene root (mandatory for crowd agents)
+    crowdManager = scene_:CreateComponent("DetourCrowdManager")
+
+    -- Create some movable barrels. We create them as crowd agents, as for moving entities it is less expensive and more convenient than using obstacles
+    CreateMovingBarrels()
+
+    -- Create Jack node as crowd agent
+    SpawnJack(Vector3(-5, 0, 20))
 
     -- Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
     -- the scene, because we want it to be unaffected by scene load / save
@@ -144,10 +147,11 @@ function CreateUI()
     local instructionText = ui.root:CreateChild("Text")
     instructionText.text = "Use WASD keys to move, RMB to rotate view\n"..
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"..
+        "CTRL+LMB to teleport main agent\n"..
         "MMB to add obstacles or remove obstacles/agents\n"..
         "F5 to save scene, F7 to load\n"..
         "Space to toggle debug geometry"
-    instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
+    instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 12)
     -- The text has multiple rows. Center them in relation to each other
     instructionText.textAlignment = HA_CENTER
 
@@ -183,10 +187,13 @@ function SpawnJack(pos)
     modelObject.model = cache:GetResource("Model", "Models/Jack.mdl")
     modelObject.material = cache:GetResource("Material", "Materials/Jack.xml")
     modelObject.castShadows = true
+    jackNode:CreateComponent("AnimationController")
 
-    -- Create a CrowdAgent component and set its height (use default radius)
+    -- Create a CrowdAgent component and set its height and realistic max speed/acceleration. Use default radius
     local agent = jackNode:CreateComponent("CrowdAgent")
     agent.height = 2.0
+    agent.maxSpeed = 4.0
+    agent.maxAccel = 100.0
     agents = crowdManager:GetActiveAgents() -- Update agents container
 end
 
@@ -204,17 +211,16 @@ function CreateMushroom(pos)
     local obstacle = mushroomNode:CreateComponent("Obstacle")
     obstacle.radius = mushroomNode.scale.x
     obstacle.height = mushroomNode.scale.y
-    return mushroomNode
 end
 
-function CreateBoxOffMeshConnections(navMesh, boxes)
+function CreateBoxOffMeshConnections(boxes)
     for i, box in ipairs(boxes) do
         local boxPos = box.position
         local boxHalfSize = box.scale.x / 2
 
         -- Create 2 empty nodes for the start & end points of the connection. Note that order matters only when using one-way/unidirectional connection.
-        local connectionStart = scene_:CreateChild("ConnectionStart")
-        connectionStart.position = navMesh:FindNearestPoint(boxPos + Vector3(boxHalfSize, -boxHalfSize, 0)) -- Base of box
+        local connectionStart = box:CreateChild("ConnectionStart")
+        connectionStart.worldPosition = navMesh:FindNearestPoint(boxPos + Vector3(boxHalfSize, -boxHalfSize, 0)) -- Base of box
         local connectionEnd = connectionStart:CreateChild("ConnectionEnd")
         connectionEnd.worldPosition = navMesh:FindNearestPoint(boxPos + Vector3(boxHalfSize, boxHalfSize, 0)) -- Top of box
 
@@ -224,9 +230,27 @@ function CreateBoxOffMeshConnections(navMesh, boxes)
     end
 end
 
+function CreateMovingBarrels()
+    local barrel = scene_:CreateChild("Barrel")
+    local model = barrel:CreateComponent("StaticModel")
+    model.model = cache:GetResource("Model", "Models/Cylinder.mdl")
+    model.material = cache:GetResource("Material", "Materials/StoneTiled.xml")
+    model.material:SetTexture(TU_DIFFUSE, cache:GetResource("Texture2D", "Textures/TerrainDetail2.dds"))
+    model.castShadows = true
+    for i = 1, NUM_BARRELS do
+        local clone = barrel:Clone()
+        local size = 0.5 + Random(1)
+        clone.scale = Vector3(size / 1.5, size * 2, size / 1.5)
+        clone.position = navMesh:FindNearestPoint(Vector3(Random(80.0) - 40.0, size * 0.5 , Random(80.0) - 40.0))
+        local agent = clone:CreateComponent("CrowdAgent")
+        agent.radius = clone.scale.x * 0.5
+        agent.height = size
+    end
+    barrel:Remove()
+end
+
 function SetPathPoint()
     local hitPos, hitDrawable = Raycast(250.0)
-    local navMesh = scene_:GetComponent("DynamicNavigationMesh")
 
     if hitDrawable then
         local pathPos = navMesh:FindNearestPoint(hitPos, Vector3.ONE)
@@ -234,16 +258,25 @@ function SetPathPoint()
         if input:GetQualifierDown(QUAL_SHIFT) then
             -- Spawn a Jack
             SpawnJack(pathPos)
-        else
-            -- Set target position and ignit agents' move
-            for i = 1, table.maxn(agents) do
-                local agent = agents[i]
 
-                if i == 1 then
-                    -- The first agent will always move to the exact position
+        elseif input:GetQualifierDown(QUAL_CTRL) and table.maxn(agents) > NUM_BARRELS then
+            -- Teleport
+            local agent = agents[NUM_BARRELS + 1] -- Get first Jack agent
+            local node = agent.node
+            node:LookAt(pathPos) -- Face target
+            agent:SetMoveVelocity(Vector3.ZERO) -- Stop agent
+            node.position = pathPos
+
+        else
+            -- Set target position and init agents' move
+            for i = NUM_BARRELS + 1, table.maxn(agents) do
+                local agent = agents[i]
+                if i == NUM_BARRELS + 1 then
+                    -- The first Jack agent will always move to the exact position and is strong enough to push barrels and his siblings (no avoidance)
+                    agent.navigationPushiness = PUSHINESS_HIGH
                     agent:SetMoveTarget(pathPos)
                 else
-                    -- Other agents will move to a random point nearby
+                    -- Other Jack agents will move to a random point nearby
                     local targetPos = navMesh:FindNearestPoint(pathPos + Vector3(Random(-4.5, 4.5), 0, Random(-4.5, 4.5)), Vector3.ONE)
                     agent:SetMoveTarget(targetPos)
                 end
@@ -336,26 +369,21 @@ function MoveCamera(timeStep)
         AddOrRemoveObject()
     end
 
-    -- Toggle debug geometry with space
-    if input:GetKeyPress(KEY_SPACE) then
-        drawDebug = not drawDebug
-    end
-
     -- Check for loading/saving the scene from/to the file Data/Scenes/CrowdNavigation.xml relative to the executable directory
     if input:GetKeyPress(KEY_F5) then
         scene_:SaveXML(fileSystem:GetProgramDir().."Data/Scenes/CrowdNavigation.xml")
     end
     if input:GetKeyPress(KEY_F7) then
         scene_:LoadXML(fileSystem:GetProgramDir().."Data/Scenes/CrowdNavigation.xml")
-
-        -- After reload, reacquire crowd manager & agents
+        -- After reload, reacquire navMesh, crowd manager & agents
+        navMesh = scene_:GetComponent("DynamicNavigationMesh")
         crowdManager = scene_:GetComponent("DetourCrowdManager")
         agents = crowdManager:GetActiveAgents()
+    end
 
-        -- Re-enable debug draw for obstacles & off-mesh connections
-        local navMesh = scene_:GetComponent("DynamicNavigationMesh")
-        navMesh.drawObstacles = true
-        navMesh.drawOffMeshConnections = true
+    -- Toggle debug geometry with space
+    if input:GetKeyPress(KEY_SPACE) then
+        drawDebug = not drawDebug
     end
 end
 
@@ -366,40 +394,43 @@ function HandleUpdate(eventType, eventData)
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
 
-    -- Make the CrowdAgents face the direction of their velocity
-    for i = 1, table.maxn(agents) do
+    -- Make the Jack CrowdAgents face the direction of their velocity and update animation
+    for i = NUM_BARRELS + 1, table.maxn(agents) do
         local agent = agents[i]
-        agent.node.worldDirection = agent.actualVelocity
+        local node = agent.node
+        local animCtrl = node:GetComponent("AnimationController")
+        local velocity = agent.actualVelocity
+
+        if velocity:Length() < 0.6 then
+            animCtrl:Stop("Models/Jack_Walk.ani", 0.2)
+        else
+            node.worldDirection = velocity
+            animCtrl:PlayExclusive("Models/Jack_Walk.ani", 0, true, 0.2)
+            animCtrl:SetSpeed("Models/Jack_Walk.ani", velocity:Length() * 0.3)
+        end
     end
 end
 
 function HandlePostRenderUpdate(eventType, eventData)
-    -- If draw debug mode is enabled, draw navigation debug geometry
     if drawDebug then
-        -- Visualize navigation mesh and obstacles
-        local navMesh = scene_:GetComponent("DynamicNavigationMesh")
+        -- Visualize navigation mesh, obstacles and off-mesh connections
         navMesh:DrawDebugGeometry(true)
-
         -- Visualize agents' path and position to reach
         crowdManager:DrawDebugGeometry(true)
     end
 end
 
 function HandleCrowdAgentFailure(eventType, eventData)
-
     local node = eventData:GetPtr("Node", "Node")
-    local agent = eventData:GetPtr("CrowdAgent", "CrowdAgent")
     local agentState = eventData:GetInt("CrowdAgentState")
 
     -- If the agent's state is invalid, likely from spawning on the side of a box, find a point in a larger area
     if agentState == CROWD_AGENT_INVALID then
-        local navMesh = scene_:GetComponent("DynamicNavigationMesh")
         -- Get a point on the navmesh using more generous extents
-        local newPos = navMesh:FindNearestPoint(node:GetWorldPosition(), Vector3(5, 5, 5))
+        local newPos = navMesh:FindNearestPoint(node.position, Vector3(5, 5, 5))
         -- Set the new node position, CrowdAgent component will automatically reset the state of the agent
-        node:SetWorldPosition(newPos)
+        node.position = newPos
     end
-
 end
 
 -- Create XML patch instructions for screen joystick layout specific to this sample app

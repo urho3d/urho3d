@@ -33,16 +33,18 @@ class Scene;
 
 }
 
+const int NUM_BARRELS = 20;
+
 /// CrowdNavigation example.
 /// This sample demonstrates:
 ///     - Generating a dynamic navigation mesh into the scene
 ///     - Performing path queries to the navigation mesh
-///     - Adding and removing obstacles at runtime from the dynamic mesh
-///     - Adding and removing crowd agents at runtime
+///     - Adding and removing obstacles/agents at runtime
 ///     - Raycasting drawable components
 ///     - Crowd movement management
 ///     - Accessing crowd agents with the crowd manager
 ///     - Using off-mesh connections to make boxes climbable
+///     - Using agents to simulate moving obstacles
 class CrowdNavigation : public Sample
 {
     OBJECT(CrowdNavigation);
@@ -145,9 +147,11 @@ private:
     /// Create a "Jack" object at position.
     void SpawnJack(const Vector3& pos);
     /// Create a mushroom object at position.
-    Node* CreateMushroom(const Vector3& pos);
+    void CreateMushroom(const Vector3& pos);
     /// Create an off-mesh connection for each box to make it climbable.
-    void CreateBoxOffMeshConnections(DynamicNavigationMesh* navMesh, Vector< SharedPtr<Node> > boxes);
+    void CreateBoxOffMeshConnections(Vector< SharedPtr<Node> > boxes);
+    /// Create some movable barrels as crowd agents.
+    void CreateMovingBarrels();
     /// Utility function to raycast to the cursor position. Return true if hit.
     bool Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable);
     /// Handle the logic update event.
@@ -157,6 +161,8 @@ private:
     /// Handle problems with crowd agent placement.
     void HandleCrowdAgentFailure(StringHash eventType, VariantMap& eventData);
 
+    /// Dynamic navigation mesh.
+    DynamicNavigationMesh* navMesh_;
     /// Crowd Manager.
     DetourCrowdManager* crowdManager_;
     /// Crowd Agents.

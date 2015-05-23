@@ -2,16 +2,18 @@
 // This sample demonstrates:
 //     - Generating a dynamic navigation mesh into the scene
 //     - Performing path queries to the navigation mesh
-//     - Adding and removing obstacles at runtime from the dynamic mesh
-//     - Adding and removing crowd agents at runtime
+//     - Adding and removing obstacles/agents at runtime
 //     - Raycasting drawable components
 //     - Crowd movement management
 //     - Accessing crowd agents with the crowd manager
 //     - Using off-mesh connections to make boxes climbable
+//     - Using agents to simulate moving obstacles
 
 #include "Scripts/Utilities/Sample.as"
 
+DynamicNavigationMesh@ navMesh;
 DetourCrowdManager@ crowdManager;
+const int NUM_BARRELS = 20;
 
 void Start()
 {
@@ -87,14 +89,12 @@ void CreateScene()
     }
 
     // Create a DynamicNavigationMesh component to the scene root
-    DynamicNavigationMesh@ navMesh = scene_.CreateComponent("DynamicNavigationMesh");
+    navMesh = scene_.CreateComponent("DynamicNavigationMesh");
     // Enable drawing debug geometry for obstacles and off-mesh connections
     navMesh.drawObstacles = true;
     navMesh.drawOffMeshConnections = true;
     // Set the agent height large enough to exclude the layers under boxes
     navMesh.agentHeight = 10;
-    // Set nav mesh tilesize to something reasonable
-    navMesh.tileSize = 64;
     // Set nav mesh cell height to minimum (allows agents to be grounded)
     navMesh.cellHeight = 0.05f;
     // Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
@@ -111,17 +111,20 @@ void CreateScene()
     // Create an off-mesh connection to each box to make it climbable (tiny boxes are skipped). A connection is built from 2 nodes.
     // Note that OffMeshConnections must be added before building the navMesh, but as we are adding Obstacles next, tiles will be automatically rebuilt.
     // Creating connections post-build here allows us to use FindNearestPoint() to procedurally set accurate positions for the connection
-    CreateBoxOffMeshConnections(navMesh, boxes);
+    CreateBoxOffMeshConnections(boxes);
 
-    // Create a DetourCrowdManager component to the scene root
+    // Create some mushrooms as obstacles. Note that obstacles are non-walkable areas
+    for (uint i = 0; i < 100; ++i)
+        CreateMushroom(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
+
+    // Create a DetourCrowdManager component to the scene root (mandatory for crowd agents)
     crowdManager = scene_.CreateComponent("DetourCrowdManager");
+
+    // Create some movable barrels. We create them as crowd agents, as for moving entities it is less expensive and more convenient than using obstacles
+    CreateMovingBarrels();
 
     // Create Jack node as crowd agent
     SpawnJack(Vector3(-5.0f, 0, 20.0f));
-
-    // Create some mushrooms as obstacles. Note that obstacles are added onto an already buit navigation mesh
-    for (uint i = 0; i < 100; ++i)
-        CreateMushroom(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
 
     // Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
     // the scene, because we want it to be unaffected by scene load / save
@@ -149,10 +152,11 @@ void CreateUI()
     instructionText.text =
         "Use WASD keys to move, RMB to rotate view\n"
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"
+        "CTRL+LMB to teleport main agent\n"
         "MMB to add obstacles or remove obstacles/agents\n"
         "F5 to save scene, F7 to load\n"
         "Space to toggle debug geometry";
-    instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
+    instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 12);
     // The text has multiple rows. Center them in relation to each other
     instructionText.textAlignment = HA_CENTER;
 
@@ -183,7 +187,7 @@ void SubscribeToEvents()
     SubscribeToEvent("CrowdAgentFailure", "HandleCrowdAgentFailure");
 }
 
-Node@ CreateMushroom(const Vector3& pos)
+void CreateMushroom(const Vector3& pos)
 {
     Node@ mushroomNode = scene_.CreateChild("Mushroom");
     mushroomNode.position = pos;
@@ -198,11 +202,9 @@ Node@ CreateMushroom(const Vector3& pos)
     Obstacle@ obstacle = mushroomNode.CreateComponent("Obstacle");
     obstacle.radius = mushroomNode.scale.x;
     obstacle.height = mushroomNode.scale.y;
-
-    return mushroomNode;
 }
 
-Node@ SpawnJack(const Vector3& pos)
+void SpawnJack(const Vector3& pos)
 {
     Node@ jackNode = scene_.CreateChild("Jack");
     jackNode.position = pos;
@@ -210,15 +212,16 @@ Node@ SpawnJack(const Vector3& pos)
     modelObject.model = cache.GetResource("Model", "Models/Jack.mdl");
     modelObject.material = cache.GetResource("Material", "Materials/Jack.xml");
     modelObject.castShadows = true;
+    jackNode.CreateComponent("AnimationController");
 
-    // Create a CrowdAgent component and set its height (use default radius)
+    // Create a CrowdAgent component and set its height and realistic max speed/acceleration. Use default radius
     CrowdAgent@ agent = jackNode.CreateComponent("CrowdAgent");
     agent.height = 2.0f;
-
-    return jackNode;
+    agent.maxSpeed = 4.0f;
+    agent.maxAccel = 100.0f;
 }
 
-void CreateBoxOffMeshConnections(DynamicNavigationMesh@ navMesh, Array<Node@> boxes)
+void CreateBoxOffMeshConnections(Array<Node@> boxes)
 {
     for (uint i=0; i < boxes.length; ++i)
     {
@@ -227,8 +230,8 @@ void CreateBoxOffMeshConnections(DynamicNavigationMesh@ navMesh, Array<Node@> bo
         float boxHalfSize = box.scale.x / 2;
 
         // Create 2 empty nodes for the start & end points of the connection. Note that order matters only when using one-way/unidirectional connection.
-        Node@ connectionStart = scene_.CreateChild("ConnectionStart");
-        connectionStart.position = navMesh.FindNearestPoint(boxPos + Vector3(boxHalfSize, -boxHalfSize, 0)); // Base of box
+        Node@ connectionStart = box.CreateChild("ConnectionStart");
+        connectionStart.worldPosition = navMesh.FindNearestPoint(boxPos + Vector3(boxHalfSize, -boxHalfSize, 0)); // Base of box
         Node@ connectionEnd = connectionStart.CreateChild("ConnectionEnd");
         connectionEnd.worldPosition = navMesh.FindNearestPoint(boxPos + Vector3(boxHalfSize, boxHalfSize, 0)); // Top of box
 
@@ -238,11 +241,32 @@ void CreateBoxOffMeshConnections(DynamicNavigationMesh@ navMesh, Array<Node@> bo
     }
 }
 
+void CreateMovingBarrels()
+{
+    Node@ barrel = scene_.CreateChild("Barrel");
+    StaticModel@ model = barrel.CreateComponent("StaticModel");
+    model.model = cache.GetResource("Model", "Models/Cylinder.mdl");
+    Material@ material = cache.GetResource("Material", "Materials/StoneTiled.xml");
+    model.material = material;
+    material.textures[TU_DIFFUSE] = cache.GetResource("Texture2D", "Textures/TerrainDetail2.dds");
+    model.castShadows = true;
+    for (uint i = 0;  i < NUM_BARRELS; ++i)
+    {
+        Node@ clone = barrel.Clone();
+        float size = 0.5 + Random(1);
+        clone.scale = Vector3(size / 1.5, size * 2.0, size / 1.5);
+        clone.position = navMesh.FindNearestPoint(Vector3(Random(80.0) - 40.0, size * 0.5 , Random(80.0) - 40.0));
+        CrowdAgent@ agent = clone.CreateComponent("CrowdAgent");
+        agent.radius = clone.scale.x * 0.5f;
+        agent.height = size;
+    }
+    barrel.Remove();
+}
+
 void SetPathPoint()
 {
     Vector3 hitPos;
     Drawable@ hitDrawable;
-    DynamicNavigationMesh@ navMesh = scene_.GetComponent("DynamicNavigationMesh");
 
     if (Raycast(250.0f, hitPos, hitDrawable))
     {
@@ -251,20 +275,35 @@ void SetPathPoint()
         if (input.qualifierDown[QUAL_SHIFT])
             // Spawn a jack
             SpawnJack(pathPos);
+        else if (input.qualifierDown[QUAL_CTRL])
+        {
+            // Teleport
+            Array<CrowdAgent@>@ agents = crowdManager.GetActiveAgents();
+            if (agents.length <= NUM_BARRELS)
+                return;
+            CrowdAgent@ agent = agents[NUM_BARRELS]; // Get first Jack agent
+            Node@ node = agent.node;
+            node.LookAt(pathPos); // Face target
+            agent.SetMoveVelocity(Vector3(0.0, 0.0, 0.0)); // Stop agent
+            node.position = pathPos;
+        }
         else
         {
             // Set target position and init agents' move
             Array<CrowdAgent@>@ agents = crowdManager.GetActiveAgents();
-            for (uint i = 0; i < agents.length; ++i)
+            for (uint i = NUM_BARRELS; i < agents.length; ++i)
             {
                 CrowdAgent@ agent = agents[i];
 
-                if (i == 0)
-                    // The first agent will always move to the exact target
+                if (i == NUM_BARRELS)
+                {
+                    // The first Jack agent will always move to the exact position and is strong enough to push barrels and his siblings (no avoidance)
+                    agent.navigationPushiness = PUSHINESS_HIGH;
                     agent.SetMoveTarget(pathPos);
+                }
                 else
                 {
-                    // Other agents will move to a random point nearby
+                    // Other Jack agents will move to a random point nearby
                     Vector3 targetPos = navMesh.FindNearestPoint(pathPos + Vector3(Random(-4.5f, 4.5f), 0.0f, Random(-4.5, 4.5f)), Vector3(1.0f, 1.0f, 1.0f));
                     agent.SetMoveTarget(targetPos);
                 }
@@ -361,6 +400,22 @@ void MoveCamera(float timeStep)
     if (input.mouseButtonPress[MOUSEB_MIDDLE])
         AddOrRemoveObject();
 
+    // Check for loading/saving the scene from/to the file Data/Scenes/CrowdNavigation.xml relative to the executable directory
+    if (input.keyPress[KEY_F5])
+    {
+        File saveFile(fileSystem.programDir + "Data/Scenes/CrowdNavigation.xml", FILE_WRITE);
+        scene_.SaveXML(saveFile);
+    }
+    if (input.keyPress[KEY_F7])
+    {
+        File loadFile(fileSystem.programDir + "Data/Scenes/CrowdNavigation.xml", FILE_READ);
+        scene_.LoadXML(loadFile);
+
+        // After reload, reacquire navMesh & crowd manager
+        navMesh = scene_.GetComponent("DynamicNavigationMesh");
+        crowdManager = scene_.GetComponent("DetourCrowdManager");
+    }
+
     // Toggle debug geometry with space
     if (input.keyPress[KEY_SPACE])
         drawDebug = !drawDebug;
@@ -374,44 +429,32 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
 
-    // Make the CrowdAgents face the direction of their velocity
+    // Make the Jack CrowdAgents face the direction of their velocity and update animation
     Array<CrowdAgent@>@ agents = crowdManager.GetActiveAgents();
-    for (uint i = 0; i < agents.length; ++i)
+    for (uint i = NUM_BARRELS; i < agents.length; ++i)
     {
         CrowdAgent@ agent = agents[i];
-        agent.node.worldDirection = agent.actualVelocity;
-    }
+        Node@ node = agent.node;
+        AnimationController@ animCtrl = node.GetComponent("AnimationController");
+        Vector3 velocity = agent.actualVelocity;
 
-    // Check for loading/saving the scene from/to the file Data/Scenes/CrowdNavigation.xml relative to the executable directory
-    if (input.keyPress[KEY_F5])
-    {
-        File saveFile(fileSystem.programDir + "Data/Scenes/CrowdNavigation.xml", FILE_WRITE);
-        scene_.SaveXML(saveFile);
-    }
-    if (input.keyPress[KEY_F7])
-    {
-        File loadFile(fileSystem.programDir + "Data/Scenes/CrowdNavigation.xml", FILE_READ);
-        scene_.LoadXML(loadFile);
-
-        // After reload, reacquire crowd manager
-        crowdManager = scene_.GetComponent("DetourCrowdManager");
-
-        // Re-enable debug draw for obstacles & off-mesh connections
-        DynamicNavigationMesh@ navMesh = scene_.GetComponent("DynamicNavigationMesh");
-        navMesh.drawObstacles = true;
-        navMesh.drawOffMeshConnections = true;
+        if (velocity.length < 0.6)
+            animCtrl.Stop("Models/Jack_Walk.ani", 0.2);
+        else
+        {
+            node.worldDirection = velocity;
+            animCtrl.PlayExclusive("Models/Jack_Walk.ani", 0, true, 0.2);
+            animCtrl.SetSpeed("Models/Jack_Walk.ani", velocity.length * 0.3);
+        }
     }
 }
 
 void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // If draw debug mode is enabled, draw navigation debug geometry
     if (drawDebug)
     {
-        // Visualize navigation mesh and obstacles
-        DynamicNavigationMesh@ navMesh = scene_.GetComponent("DynamicNavigationMesh");
+        // Visualize navigation mesh, obstacles and off-mesh connections
         navMesh.DrawDebugGeometry(true);
-
         // Visualize agents' path and position to reach
         crowdManager.DrawDebugGeometry(true);
     }
@@ -425,7 +468,6 @@ void HandleCrowdAgentFailure(StringHash eventType, VariantMap& eventData)
     // If the agent's state is invalid, likely from spawning on the side of a box, find a point in a larger area
     if (state == CrowdAgentState::CROWD_AGENT_INVALID)
     {
-        DynamicNavigationMesh@ navMesh = scene_.GetComponent("DynamicNavigationMesh");
         // Get a point on the navmesh using more generous extents
         Vector3 newPos = navMesh.FindNearestPoint(node.position, Vector3(5.0f,5.0f,5.0f));
         // Set the new node position, CrowdAgent component will automatically reset the state of the agent
