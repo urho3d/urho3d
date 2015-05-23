@@ -357,17 +357,8 @@ data:
   excluded_sample:
     - 01_HelloWorld
     - 02_HelloGUI
-    - 03_Sprites
-    - 04_StaticScene
-    - 05_AnimatingScene
     - 26_ConsoleInput
     - 29_SoundSynthesis
-    - 30_LightAnimation
-    - 31_MaterialAnimation
-    - 34_DynamicGeometry
-    - 35_SignedDistanceFieldText
-    - 37_UIDrag
-    - 38_SceneAndUILoad
 
 ...
 
