@@ -4232,6 +4232,7 @@ bool enabledEffective;
 uint id;
 /* readonly */
 bool initialized;
+uint maxObstacles;
 /* readonly */
 Node node;
 /* readonly */

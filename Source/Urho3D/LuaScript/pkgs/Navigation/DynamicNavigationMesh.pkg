@@ -3,8 +3,11 @@ $#include "Navigation/DynamicNavigationMesh.h"
 class DynamicNavigationMesh : public NavigationMesh
 {
     void SetDrawObstacles(bool enable);
+    void SetMaxObstacles(unsigned maxObstacles);
 
     bool GetDrawObstacles() const;
+    unsigned GetMaxObstacles() const;
 
     tolua_property__get_set bool drawObstacles;
+    tolua_property__get_set int maxObstacles;
 };

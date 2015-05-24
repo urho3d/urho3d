@@ -67,6 +67,11 @@ public:
     /// Return navigation data attribute.
     virtual PODVector<unsigned char> GetNavigationDataAttr() const;
 
+    /// Set the maximum number of obstacles allowed.
+    void SetMaxObstacles(unsigned maxObstacles) { maxObstacles_ = maxObstacles; }
+    /// Return the maximum number of obstacles allowed.
+    unsigned GetMaxObstacles() const { return maxObstacles_; }
+
     /// Draw debug geometry for Obstacles.
     void SetDrawObstacles(bool enable) { drawObstacles_ = enable; }
     /// Return whether to draw Obstacles.

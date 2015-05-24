@@ -23,9 +23,6 @@
 require 'pathname'
 require 'json'
 require 'yaml'
-if ENV['IOS'] || ENV['EMSCRIPTEN']
-  require 'time'
-end
 
 # Usage: rake sync (only intended to be used in a fork with remote 'upstream' set to urho3d/Urho3D)
 desc 'Fetch and merge upstream urho3d/Urho3D to a Urho3D fork'
@@ -258,7 +255,7 @@ end
 desc 'Update site documentation to GitHub Pages'
 task :ci_site_update do
   # Skip when :ci rake task was skipped
-  next unless Dir.exists?('../Build')
+  next unless File.exist?('../Build/CMakeCache.txt')
   # Pull or clone
   system 'cd ../doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../doc-Build' or abort 'Failed to pull/clone'
   # Update credits from README.md to about.md
@@ -291,6 +288,7 @@ end
 # Usage: NOT intended to be used manually
 desc 'Update Emscripten HTML5 samples to GitHub Pages'
 task :ci_emscripten_samples_update do
+  puts "\nUpdating Emscripten samples in main website..."
   # Pull or clone
   system 'cd ../doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../doc-Build' or abort 'Failed to pull/clone'
   # Sync Emscripten samples
@@ -339,7 +337,7 @@ end
 desc 'Make binary package and upload it to a designated central hosting server'
 task :ci_package_upload do
   # Skip when :ci rake task was skipped
-  next unless Dir.exists?('../Build')
+  next unless File.exist?('../Build/CMakeCache.txt')
   if ENV['XCODE']
     $configuration = 'Release'
     $testing = 0
@@ -351,7 +349,7 @@ task :ci_package_upload do
       ENV['SITE_UPDATE'] = nil
     end
   else
-    system 'echo Generate documentation'
+    system 'echo Generating documentation...'
     if ENV['XCODE']
       xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj', 'doc', '>/dev/null') or abort 'Failed to generate documentation'
     else
@@ -367,7 +365,7 @@ task :ci_package_upload do
     end
     if !ENV['CI_START_TIME'] || elapsed_time < 25 # minutes
       # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
-      system 'echo Rebuild Urho3D library as Mach-O universal binary'
+      system 'echo Rebuilding Urho3D library as Mach-O universal binary...'
       xcode_build(0, '../Build/Urho3D.xcodeproj', 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
     end
     # There is a bug in CMake/CPack that causes the 'package' target failed to build for IOS platform, workaround by calling cpack directly
@@ -506,22 +504,16 @@ def makefile_ci
     android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
   end
   # For Emscripten CI build, skip make test and/or scaffolding test if Travis-CI VM took too long to get here, as otherwise overall build time may exceed 50 minutes time limit
-  test = $testing == 1 ? (ENV['CI'] && ENV['EMSCRIPTEN'] ? '&& if (( $((($(date +%%s)-$CI_START_TIME)/60)) < 25 )); then %s; fi' : '&& %s') % 'make test' : ''
+  test = $testing == 1 ? '&& make test' : ''
   system "cd ../Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
-  if ENV['CI_START_TIME'] then
-    elapsed_time = (Time.now - Time.at(ENV['CI_START_TIME'].to_i)) / 60
-    puts "\nEmscripten checkpoint reached, elapsed time: #{elapsed_time}\n"
-  end
-  unless ENV['CI'] && ENV['EMSCRIPTEN'] && (ENV['PACKAGE_UPLOAD'] || elapsed_time > 40)  # For Emscripten, skip scaffolding test when packaging or running out of time
+  unless ENV['CI'] && ENV['EMSCRIPTEN'] && ENV['PACKAGE_UPLOAD']  # For Emscripten, skip scaffolding test when packaging
     # Create a new project on the fly that uses newly built Urho3D library in the build tree
-    test.sub!(/< 25/, '< 43')
     scaffolding "../Build/generated/UsingBuildTree"
     system "cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_generic.sh . #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
     ENV['DESTDIR'] = ENV['HOME'] || Dir.home
     puts "\nInstalling Urho3D SDK to #{ENV['DESTDIR']}/usr/local...\n"  # The default CMAKE_INSTALL_PREFIX is /usr/local
     system 'cd ../Build && make -j$NUMJOBS install >/dev/null' or abort 'Failed to install Urho3D SDK'
     # Create a new project on the fly that uses newly installed Urho3D SDK
-    test.sub!(/< 43/, '< 48')
     scaffolding "../Build/generated/UsingSDK"
     system "export URHO3D_HOME=~/usr/local && cd ../Build/generated/UsingSDK && echo '\nExternal project referencing Urho3D SDK' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
   end

@@ -238,7 +238,8 @@ void DynamicNavigationMesh::RegisterObject(Context* context)
     context->RegisterFactory<DynamicNavigationMesh>(NAVIGATION_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(NavigationMesh);
-    ATTRIBUTE("Max Obstacles", unsigned, maxObstacles_, DEFAULT_MAX_OBSTACLES, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Max Obstacles", GetMaxObstacles, SetMaxObstacles, unsigned, DEFAULT_MAX_OBSTACLES, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Draw Obstacles", GetDrawObstacles, SetDrawObstacles, bool, false, AM_DEFAULT);
 }
 
 bool DynamicNavigationMesh::Build()
@@ -896,7 +897,9 @@ void DynamicNavigationMesh::AddObstacle(Obstacle* obstacle, bool silent)
         rcVcopy(pos, &obsPos.x_);
         dtObstacleRef refHolder;
 
-        if (tileCache_->isObstacleQueueFull())
+        // Because dtTileCache doesn't process obstacle requests while updating tiles 
+        // it's necessary update until sufficient request space is available
+        while (tileCache_->isObstacleQueueFull())
             tileCache_->update(1, navMesh_);
 
         if (dtStatusFailed(tileCache_->addObstacle(pos, obstacle->GetRadius(), obstacle->GetHeight(), &refHolder)))
@@ -906,7 +909,6 @@ void DynamicNavigationMesh::AddObstacle(Obstacle* obstacle, bool silent)
         }
         obstacle->obstacleId_ = refHolder;
         assert(refHolder > 0);
-        tileCache_->update(1, navMesh_);
 
         if (!silent)
         {
@@ -935,7 +937,9 @@ void DynamicNavigationMesh::RemoveObstacle(Obstacle* obstacle, bool silent)
 {
     if (tileCache_ && obstacle->obstacleId_ > 0)
     {
-        if (tileCache_->isObstacleQueueFull())
+        // Because dtTileCache doesn't process obstacle requests while updating tiles 
+        // it's necessary update until sufficient request space is available
+        while (tileCache_->isObstacleQueueFull())
             tileCache_->update(1, navMesh_);
 
         if (dtStatusFailed(tileCache_->removeObstacle(obstacle->obstacleId_)))
