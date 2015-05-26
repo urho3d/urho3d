@@ -1619,11 +1619,15 @@ void View::SetRenderTargets(RenderPathCommand& command)
     unsigned index = 0;
     bool useColorWrite = true;
     bool useCustomDepth = false;
+    bool useViewportOutput = false;
 
     while (index < command.outputs_.Size())
     {
         if (!command.outputs_[index].first_.Compare("viewport", false))
+        {
             graphics_->SetRenderTarget(index, currentRenderTarget_);
+            useViewportOutput = true;
+        }
         else
         {
             Texture* texture = FindNamedTexture(command.outputs_[index].first_, true, false);
@@ -1668,10 +1672,10 @@ void View::SetRenderTargets(RenderPathCommand& command)
         }
     }
 
-    // When rendering to the final destination rendertarget, use the actual viewport. Otherwise texture rendertargets will be
-    // viewport-sized, so they should use their full size as the viewport
+    // When rendering to the final destination rendertarget, use the actual viewport. Otherwise texture rendertargets should use 
+    // their full size as the viewport
     IntVector2 rtSizeNow = graphics_->GetRenderTargetDimensions();
-    IntRect viewport = (currentRenderTarget_ == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
+    IntRect viewport = (useViewportOutput && currentRenderTarget_ == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
         rtSizeNow.y_);
     
     if (!useCustomDepth)
