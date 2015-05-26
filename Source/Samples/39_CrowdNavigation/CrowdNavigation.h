@@ -33,8 +33,6 @@ class Scene;
 
 }
 
-const int NUM_BARRELS = 20;
-
 /// CrowdNavigation example.
 /// This sample demonstrates:
 ///     - Generating a dynamic navigation mesh into the scene
@@ -140,8 +138,8 @@ private:
     void SubscribeToEvents();
     /// Read input and moves the camera.
     void MoveCamera(float timeStep);
-    /// Set path start or end point.
-    void SetPathPoint();
+    /// Set crowd agents target or spawn another jack.
+    void SetPathPoint(bool spawning);
     /// Add new obstacle or remove existing obstacle/agent.
     void AddOrRemoveObject();
     /// Create a "Jack" object at position.
@@ -149,9 +147,9 @@ private:
     /// Create a mushroom object at position.
     void CreateMushroom(const Vector3& pos);
     /// Create an off-mesh connection for each box to make it climbable.
-    void CreateBoxOffMeshConnections(Vector< SharedPtr<Node> > boxes);
+    void CreateBoxOffMeshConnections(DynamicNavigationMesh* navMesh, Node* boxGroup);
     /// Create some movable barrels as crowd agents.
-    void CreateMovingBarrels();
+    void CreateMovingBarrels(DynamicNavigationMesh* navMesh);
     /// Utility function to raycast to the cursor position. Return true if hit.
     bool Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable);
     /// Handle the logic update event.
@@ -160,13 +158,9 @@ private:
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle problems with crowd agent placement.
     void HandleCrowdAgentFailure(StringHash eventType, VariantMap& eventData);
+    /// Handle crowd agent reposition.
+    void HandleCrowdAgentReposition(StringHash eventType, VariantMap& eventData);
 
-    /// Dynamic navigation mesh.
-    DynamicNavigationMesh* navMesh_;
-    /// Crowd Manager.
-    DetourCrowdManager* crowdManager_;
-    /// Crowd Agents.
-    PODVector<CrowdAgent*> agents_;
     /// Flag for drawing debug geometry.
     bool drawDebug_;
 };

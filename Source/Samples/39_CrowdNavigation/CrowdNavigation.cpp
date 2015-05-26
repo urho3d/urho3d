@@ -57,6 +57,8 @@
 
 #include <Urho3D/DebugNew.h>
 
+const String INSTRUCTION("instructionText");
+
 DEFINE_APPLICATION_MAIN(CrowdNavigation)
 
 CrowdNavigation::CrowdNavigation(Context* context) :
@@ -121,10 +123,10 @@ void CrowdNavigation::CreateScene()
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
 
     // Create randomly sized boxes. If boxes are big enough, make them occluders
-    Vector< SharedPtr<Node> > boxes;
+    Node* boxGroup = scene_->CreateChild("Boxes");
     for (unsigned i = 0; i < 20; ++i)
     {
-        Node* boxNode = scene_->CreateChild("Box");
+        Node* boxNode = boxGroup->CreateChild("Box");
         float size = 1.0f + Random(10.0f);
         boxNode->SetPosition(Vector3(Random(80.0f) - 40.0f, size * 0.5f, Random(80.0f) - 40.0f));
         boxNode->SetScale(size);
@@ -133,46 +135,43 @@ void CrowdNavigation::CreateScene()
         boxObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
         boxObject->SetCastShadows(true);
         if (size >= 3.0f)
-        {
             boxObject->SetOccluder(true);
-            boxes.Push(SharedPtr<Node>(boxNode));
-        }
     }
 
     // Create a DynamicNavigationMesh component to the scene root
-    navMesh_ = scene_->CreateComponent<DynamicNavigationMesh>();
+    DynamicNavigationMesh* navMesh = scene_->CreateComponent<DynamicNavigationMesh>();
     // Enable drawing debug geometry for obstacles and off-mesh connections
-    navMesh_->SetDrawObstacles(true);
-    navMesh_->SetDrawOffMeshConnections(true);
+    navMesh->SetDrawObstacles(true);
+    navMesh->SetDrawOffMeshConnections(true);
     // Set the agent height large enough to exclude the layers under boxes
-    navMesh_->SetAgentHeight(10.0f);
+    navMesh->SetAgentHeight(10.0f);
     // Set nav mesh cell height to minimum (allows agents to be grounded)
-    navMesh_->SetCellHeight(0.05f);
+    navMesh->SetCellHeight(0.05f);
     // Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
     // navigation mesh. By default this is recursive, but the recursion could be turned off from Navigable
     scene_->CreateComponent<Navigable>();
     // Add padding to the navigation mesh in Y-direction so that we can add objects on top of the tallest boxes
     // in the scene and still update the mesh correctly
-    navMesh_->SetPadding(Vector3(0.0f, 10.0f, 0.0f));
+    navMesh->SetPadding(Vector3(0.0f, 10.0f, 0.0f));
     // Now build the navigation geometry. This will take some time. Note that the navigation mesh will prefer to use
     // physics geometry from the scene nodes, as it often is simpler, but if it can not find any (like in this example)
     // it will use renderable geometry instead
-    navMesh_->Build();
+    navMesh->Build();
 
     // Create an off-mesh connection to each box to make them climbable (tiny boxes are skipped). A connection is built from 2 nodes.
     // Note that OffMeshConnections must be added before building the navMesh, but as we are adding Obstacles next, tiles will be automatically rebuilt.
     // Creating connections post-build here allows us to use FindNearestPoint() to procedurally set accurate positions for the connection
-    CreateBoxOffMeshConnections(boxes);
+    CreateBoxOffMeshConnections(navMesh, boxGroup);
 
     // Create some mushrooms as obstacles. Note that obstacles are non-walkable areas
     for (unsigned i = 0; i < 100; ++i)
         CreateMushroom(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
 
     // Create a DetourCrowdManager component to the scene root
-    crowdManager_ = scene_->CreateComponent<DetourCrowdManager>();
+    scene_->CreateComponent<DetourCrowdManager>();
 
     // Create some movable barrels. We create them as crowd agents, as for moving entities it is less expensive and more convenient than using obstacles
-    CreateMovingBarrels();
+    CreateMovingBarrels(navMesh);
 
     // Create Jack node as crowd agent
     SpawnJack(Vector3(-5.0f, 0.0f, 20.0f));
@@ -183,8 +182,10 @@ void CrowdNavigation::CreateScene()
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
 
-    // Set an initial position for the camera scene node above the plane
-    cameraNode_->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
+    // Set an initial position for the camera scene node above the plane and looking down
+    cameraNode_->SetPosition(Vector3(0.0f, 50.0f, 0.0f));
+    pitch_ = 80.0f;
+    cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
 }
 
 void CrowdNavigation::CreateUI()
@@ -204,16 +205,17 @@ void CrowdNavigation::CreateUI()
     cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    Text* instructionText = ui->GetRoot()->CreateChild<Text>(INSTRUCTION);
     instructionText->SetText(
         "Use WASD keys to move, RMB to rotate view\n"
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"
         "CTRL+LMB to teleport main agent\n"
         "MMB to add obstacles or remove obstacles/agents\n"
         "F5 to save scene, F7 to load\n"
-        "Space to toggle debug geometry"
+        "Space to toggle debug geometry\n"
+        "F12 to toggle this instruction text"
     );
-    instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 12);
+    instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other
     instructionText->SetTextAlignment(HA_CENTER);
 
@@ -237,13 +239,15 @@ void CrowdNavigation::SubscribeToEvents()
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent(E_UPDATE, HANDLER(CrowdNavigation, HandleUpdate));
 
-    // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request
-    // debug geometry
+    // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request debug geometry
     SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(CrowdNavigation, HandlePostRenderUpdate));
 
     // Subscribe HandleCrowdAgentFailure() function for resolving invalidation issues with agents, during which we
     // use a larger extents for finding a point on the navmesh to fix the agent's position
     SubscribeToEvent(E_CROWD_AGENT_FAILURE, HANDLER(CrowdNavigation, HandleCrowdAgentFailure));
+
+    // Subscribe HandleCrowdAgentReposition() function for controlling the animation
+    SubscribeToEvent(E_CROWD_AGENT_REPOSITION, HANDLER(CrowdNavigation, HandleCrowdAgentReposition));
 }
 
 void CrowdNavigation::SpawnJack(const Vector3& pos)
@@ -260,9 +264,8 @@ void CrowdNavigation::SpawnJack(const Vector3& pos)
     // Create a CrowdAgent component and set its height and realistic max speed/acceleration. Use default radius
     CrowdAgent* agent = jackNode->CreateComponent<CrowdAgent>();
     agent->SetHeight(2.0f);
-    agent->SetMaxSpeed(4.0f);
+    agent->SetMaxSpeed(3.0f);
     agent->SetMaxAccel(100.0f);
-    agents_ = crowdManager_->GetActiveAgents(); // Update agents container
 }
 
 void CrowdNavigation::CreateMushroom(const Vector3& pos)
@@ -284,8 +287,9 @@ void CrowdNavigation::CreateMushroom(const Vector3& pos)
     obstacle->SetHeight(mushroomNode->GetScale().y_);
 }
 
-void CrowdNavigation::CreateBoxOffMeshConnections(Vector< SharedPtr<Node> > boxes)
+void CrowdNavigation::CreateBoxOffMeshConnections(DynamicNavigationMesh* navMesh, Node* boxGroup)
 {
+    const Vector<SharedPtr<Node> >& boxes = boxGroup->GetChildren();
     for (unsigned i=0; i < boxes.Size(); ++i)
     {
         Node* box = boxes[i];
@@ -294,9 +298,9 @@ void CrowdNavigation::CreateBoxOffMeshConnections(Vector< SharedPtr<Node> > boxe
 
         // Create 2 empty nodes for the start & end points of the connection. Note that order matters only when using one-way/unidirectional connection.
         Node* connectionStart = box->CreateChild("ConnectionStart");
-        connectionStart->SetWorldPosition(navMesh_->FindNearestPoint(boxPos + Vector3(boxHalfSize, -boxHalfSize, 0))); // Base of box
+        connectionStart->SetWorldPosition(navMesh->FindNearestPoint(boxPos + Vector3(boxHalfSize, -boxHalfSize, 0))); // Base of box
         Node* connectionEnd = connectionStart->CreateChild("ConnectionEnd");
-        connectionEnd->SetWorldPosition(navMesh_->FindNearestPoint(boxPos + Vector3(boxHalfSize, boxHalfSize, 0))); // Top of box
+        connectionEnd->SetWorldPosition(navMesh->FindNearestPoint(boxPos + Vector3(boxHalfSize, boxHalfSize, 0))); // Top of box
 
         // Create the OffMeshConnection component to one node and link the other node
         OffMeshConnection* connection = connectionStart->CreateComponent<OffMeshConnection>();
@@ -304,7 +308,7 @@ void CrowdNavigation::CreateBoxOffMeshConnections(Vector< SharedPtr<Node> > boxe
     }
 }
 
-void CrowdNavigation::CreateMovingBarrels()
+void CrowdNavigation::CreateMovingBarrels(DynamicNavigationMesh* navMesh)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Node* barrel = scene_->CreateChild("Barrel");
@@ -314,12 +318,12 @@ void CrowdNavigation::CreateMovingBarrels()
     model->SetMaterial(material);
     material->SetTexture(TU_DIFFUSE, cache->GetResource<Texture2D>("Textures/TerrainDetail2.dds"));
     model->SetCastShadows(true);
-    for (unsigned i = 0;  i < NUM_BARRELS; ++i)
+    for (unsigned i = 0;  i < 20; ++i)
     {
         Node* clone = barrel->Clone();
         float size = 0.5f + Random(1.0f);
         clone->SetScale(Vector3(size / 1.5f, size * 2.0f, size / 1.5f));
-        clone->SetPosition(navMesh_->FindNearestPoint(Vector3(Random(80.0f) - 40.0, size * 0.5 , Random(80.0f) - 40.0)));
+        clone->SetPosition(navMesh->FindNearestPoint(Vector3(Random(80.0f) - 40.0, size * 0.5 , Random(80.0f) - 40.0)));
         CrowdAgent* agent = clone->CreateComponent<CrowdAgent>();
         agent->SetRadius(clone->GetScale().x_ * 0.5f);
         agent->SetHeight(size);
@@ -327,49 +331,21 @@ void CrowdNavigation::CreateMovingBarrels()
     barrel->Remove();
 }
 
-void CrowdNavigation::SetPathPoint()
+void CrowdNavigation::SetPathPoint(bool spawning)
 {
     Vector3 hitPos;
     Drawable* hitDrawable;
 
     if (Raycast(250.0f, hitPos, hitDrawable))
     {
-        Vector3 pathPos = navMesh_->FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
-
-        if (GetSubsystem<Input>()->GetQualifierDown(QUAL_SHIFT))
+        DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
+        Vector3 pathPos = navMesh->FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
+        if (spawning)
             // Spawn a jack at the target position
             SpawnJack(pathPos);
-        else if (GetSubsystem<Input>()->GetQualifierDown(QUAL_CTRL) && agents_.Size() > NUM_BARRELS)
-        {
-            // Teleport
-            CrowdAgent* agent = agents_[NUM_BARRELS]; // Get first Jack agent
-            Node* node = agent->GetNode();
-            if (node->GetName() == "Barrel")
-                return;
-            node->LookAt(pathPos); // Face target
-            agent->SetMoveVelocity(Vector3(0.0f, 0.0f, 0.0f)); // Stop agent
-            node->SetPosition(pathPos);
-        }
         else
-        {
-            // Set target position and init agents' move
-            for (unsigned i = NUM_BARRELS; i < agents_.Size(); ++i)
-            {
-                CrowdAgent* agent = agents_[i];
-                if (i == NUM_BARRELS)
-                {
-                    // The first Jack agent will always move to the exact position and is strong enough to push barrels and his siblings (no avoidance)
-                    agent->SetNavigationPushiness(PUSHINESS_HIGH);
-                    agent->SetMoveTarget(pathPos);
-                }
-                else
-                {
-                    // Other Jack agents will move to a random point nearby
-                    Vector3 targetPos = navMesh_->FindNearestPoint(pathPos + Vector3(Random(-4.5f, 4.5f), 0.0f, Random(-4.5f, 4.5f)), Vector3(1.0f, 1.0f, 1.0f));
-                    agent->SetMoveTarget(targetPos);
-                }
-            }
-        }
+            // Set crowd agents target position
+            scene_->GetComponent<DetourCrowdManager>()->SetCrowdTarget(pathPos);
     }
 }
 
@@ -387,10 +363,7 @@ void CrowdNavigation::AddOrRemoveObject()
         if (hitNode->GetName() == "Mushroom")
             hitNode->Remove();
         else if (hitNode->GetName() == "Jack")
-        {
             hitNode->Remove();
-            agents_ = crowdManager_->GetActiveAgents(); // Update agents container
-        }
         else
             CreateMushroom(hitPos);
     }
@@ -465,9 +438,9 @@ void CrowdNavigation::MoveCamera(float timeStep)
 
     // Set destination or spawn a new jack with left mouse button
     if (input->GetMouseButtonPress(MOUSEB_LEFT))
-        SetPathPoint();
+        SetPathPoint(input->GetQualifierDown(QUAL_SHIFT));
     // Add new obstacle or remove existing obstacle/agent with middle mouse button
-    if (input->GetMouseButtonPress(MOUSEB_MIDDLE))
+    else if (input->GetMouseButtonPress(MOUSEB_MIDDLE))
         AddOrRemoveObject();
 
     // Check for loading/saving the scene from/to the file Data/Scenes/CrowdNavigation.xml relative to the executable directory
@@ -476,20 +449,22 @@ void CrowdNavigation::MoveCamera(float timeStep)
         File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/CrowdNavigation.xml", FILE_WRITE);
         scene_->SaveXML(saveFile);
     }
-    if (input->GetKeyPress(KEY_F7))
+    else if (input->GetKeyPress(KEY_F7))
     {
         File loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/CrowdNavigation.xml", FILE_READ);
         scene_->LoadXML(loadFile);
-
-        // After reload, reacquire navMesh, crowd manager & agents
-        navMesh_ = scene_->GetComponent<DynamicNavigationMesh>();
-        crowdManager_ = scene_->GetComponent<DetourCrowdManager>();
-        agents_ = crowdManager_->GetActiveAgents();
     }
 
     // Toggle debug geometry with space
-    if (input->GetKeyPress(KEY_SPACE))
+    else if (input->GetKeyPress(KEY_SPACE))
         drawDebug_ = !drawDebug_;
+
+    // Toggle instruction text with F12
+    else if (input->GetKeyPress(KEY_F12))
+    {
+        UIElement* instruction = ui->GetRoot()->GetChild(INSTRUCTION);
+        instruction->SetVisible(!instruction->IsVisible());
+    }
 }
 
 void CrowdNavigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -501,24 +476,6 @@ void CrowdNavigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
-
-    // Make the Jack CrowdAgents face the direction of their velocity and update animation
-    for (unsigned i = NUM_BARRELS; i < agents_.Size(); ++i)
-    {
-        CrowdAgent* agent = agents_[i];
-        Node* node = agent->GetNode();
-        AnimationController* animCtrl = node->GetComponent<AnimationController>();
-        Vector3 velocity = agent->GetActualVelocity();
-
-        if (velocity.Length() < 0.6)
-            animCtrl->Stop("Models/Jack_Walk.ani", 0.2);
-        else
-        {
-            node->SetWorldDirection(velocity);
-            animCtrl->PlayExclusive("Models/Jack_Walk.ani", 0, true, 0.2);
-            animCtrl->SetSpeed("Models/Jack_Walk.ani", velocity.Length() * 0.3);
-        }
-    }
 }
 
 void CrowdNavigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
@@ -526,9 +483,9 @@ void CrowdNavigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& e
     if (drawDebug_)
     {
         // Visualize navigation mesh, obstacles and off-mesh connections
-        navMesh_->DrawDebugGeometry(true);
+        scene_->GetComponent<DynamicNavigationMesh>()->DrawDebugGeometry(true);
         // Visualize agents' path and position to reach
-        crowdManager_->DrawDebugGeometry(true);
+        scene_->GetComponent<DetourCrowdManager>()->DrawDebugGeometry(true);
     }
 }
 
@@ -543,8 +500,37 @@ void CrowdNavigation::HandleCrowdAgentFailure(StringHash eventType, VariantMap& 
     if (agentState == CROWD_AGENT_INVALID)
     {
         // Get a point on the navmesh using more generous extents
-        Vector3 newPos = navMesh_->FindNearestPoint(node->GetPosition(), Vector3(5.0f, 5.0f, 5.0f));
+        Vector3 newPos = scene_->GetComponent<DynamicNavigationMesh>()->FindNearestPoint(node->GetPosition(), Vector3(5.0f, 5.0f, 5.0f));
         // Set the new node position, CrowdAgent component will automatically reset the state of the agent
         node->SetPosition(newPos);
+    }
+}
+
+void CrowdNavigation::HandleCrowdAgentReposition(StringHash eventType, VariantMap& eventData)
+{
+    const char* WALKING_ANI = "Models/Jack_Walk.ani";
+
+    using namespace CrowdAgentReposition;
+
+    Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
+    CrowdAgent* agent = static_cast<CrowdAgent*>(eventData[P_CROWD_AGENT].GetPtr());
+    Vector3 velocity = eventData[P_VELOCITY].GetVector3();
+
+    // Only Jack agent has animation controller
+    AnimationController* animCtrl = node->GetComponent<AnimationController>();
+    if (animCtrl)
+    {
+        float speed = velocity.Length();
+        if (speed < agent->GetRadius())
+            // If speed is too low then stopping the animation
+            animCtrl->Stop(WALKING_ANI, 0.8f);
+        else
+        {
+            // Face the direction of its velocity
+            node->SetWorldDirection(velocity);
+            animCtrl->Play(WALKING_ANI, 0, true);
+            // Throttle the animation speed based on agent speed ratio (ratio = 1 is full throttle)
+            animCtrl->SetSpeed(WALKING_ANI, speed / agent->GetMaxSpeed());
+        }
     }
 }

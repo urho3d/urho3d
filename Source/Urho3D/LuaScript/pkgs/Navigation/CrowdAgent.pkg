@@ -6,10 +6,9 @@ enum CrowdTargetState
     CROWD_AGENT_TARGET_FAILED,
     CROWD_AGENT_TARGET_VALID,
     CROWD_AGENT_TARGET_REQUESTING,
-    CROWD_AGENT_TARGET_WAITINGFORPATH,
     CROWD_AGENT_TARGET_WAITINGFORQUEUE,
-    CROWD_AGENT_TARGET_VELOCITY,
-    CROWD_AGENT_TARGET_ARRIVED
+    CROWD_AGENT_TARGET_WAITINGFORPATH,
+    CROWD_AGENT_TARGET_VELOCITY
 };
 
 enum CrowdAgentState
@@ -24,8 +23,8 @@ enum CrowdAgentState
 class CrowdAgent : public Component
 {
     void SetNavigationFilterType(unsigned filterID);
-    bool SetMoveTarget(const Vector3& position);
-    bool SetMoveVelocity(const Vector3& velocity);
+    void SetMoveTarget(const Vector3& position);
+    void SetMoveVelocity(const Vector3& velocity);
     void SetUpdateNodePosition(bool unodepos);
     void SetMaxAccel(float val);
     void SetMaxSpeed(float val);
@@ -45,6 +44,7 @@ class CrowdAgent : public Component
     float GetMaxAccel() const;
     NavigationQuality GetNavigationQuality() const;
     NavigationPushiness GetNavigationPushiness() const;
+    bool HasArrived() const;
     float GetRadius() const;
     float GetHeight() const;
     Vector3 GetPosition() const;

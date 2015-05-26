@@ -19,27 +19,19 @@ class DetourCrowdManager : public Component
     void DrawDebugGeometry(bool depthTest);
 
     void SetNavigationMesh(NavigationMesh *navMesh);
-    void SetMaxAgents(unsigned agentCt);
     void SetAreaCost(unsigned filterID, unsigned areaID, float cost);
+    void SetMaxAgents(unsigned agentCt);
+    void SetCrowdTarget(const Vector3& position, int startId = 0, int endId = M_MAX_INT);
+    void ResetCrowdTarget(int startId = 0, int endId = M_MAX_INT);
+    void SetCrowdVelocity(const Vector3& velocity, int startId = 0, int endId = M_MAX_INT);
 
-    NavigationMesh* GetNavigationMesh();
+    NavigationMesh* GetNavigationMesh() const;
     unsigned GetMaxAgents() const;
     float GetAreaCost(unsigned filterID, unsigned areaID) const;
     unsigned GetAgentCount() const;
-    tolua_outside const PODVector<CrowdAgent*>& DetourCrowdManagerGetActiveAgents @ GetActiveAgents();
+    const PODVector<CrowdAgent*>& GetActiveAgents() const;
 
     tolua_property__get_set NavigationMesh* navigationMesh;
     tolua_property__get_set int maxAgents;
     tolua_readonly tolua_property__get_set unsigned agentCount;
 };
-
-${
-
-static const PODVector<CrowdAgent*>& DetourCrowdManagerGetActiveAgents(DetourCrowdManager* crowdManager)
-{
-    static PODVector<CrowdAgent*> result;
-    result = crowdManager->GetActiveAgents();
-    return result;
-}
-
-$}
