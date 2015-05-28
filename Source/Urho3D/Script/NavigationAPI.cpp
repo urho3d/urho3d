@@ -197,8 +197,8 @@ void RegisterCrowdAgent(asIScriptEngine* engine)
     engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_FAILED", CROWD_AGENT_TARGET_FAILED);
     engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_VALID", CROWD_AGENT_TARGET_VALID);
     engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_REQUESTING", CROWD_AGENT_TARGET_REQUESTING);
-    engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_WAITINGFORPATH", CROWD_AGENT_TARGET_WAITINGFORPATH);
     engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_WAITINGFORQUEUE", CROWD_AGENT_TARGET_WAITINGFORQUEUE);
+    engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_WAITINGFORPATH", CROWD_AGENT_TARGET_WAITINGFORPATH);
     engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_VELOCITY", CROWD_AGENT_TARGET_VELOCITY);
 
     engine->RegisterEnum("CrowdAgentState");

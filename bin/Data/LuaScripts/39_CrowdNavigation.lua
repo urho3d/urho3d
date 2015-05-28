@@ -194,7 +194,7 @@ function SpawnJack(pos)
     local agent = jackNode:CreateComponent("CrowdAgent")
     agent.height = 2.0
     agent.maxSpeed = 3.0
-    agent.maxAccel = 100.0
+    agent.maxAccel = 3.0
 end
 
 function CreateMushroom(pos)
@@ -408,15 +408,19 @@ function HandleCrowdAgentReposition(eventType, eventData)
     local animCtrl = node:GetComponent("AnimationController")
     if animCtrl ~= nil then
         local speed = velocity:Length()
-        if speed < agent.radius then
-            -- If speed is too low then stopping the animation
-            animCtrl:Stop(WALKING_ANI, 0.8)
-        else
-            -- Face the direction of its velocity
-            node.worldDirection = velocity
-            animCtrl:Play(WALKING_ANI, 0, true)
+        if animCtrl:IsPlaying(WALKING_ANI) then
+            local speedRatio = speed / agent.maxSpeed
+            -- Face the direction of its velocity but moderate the turning speed based on the speed ratio as we do not have timeStep here
+            node.rotation = node.rotation:Slerp(Quaternion(Vector3.FORWARD, velocity), 0.1 * speedRatio)
             -- Throttle the animation speed based on agent speed ratio (ratio = 1 is full throttle)
-            animCtrl:SetSpeed(WALKING_ANI, speed / agent.maxSpeed)
+            animCtrl:SetSpeed(WALKING_ANI, speedRatio)
+        else
+            animCtrl:Play(WALKING_ANI, 0, true, 0.1)
+        end
+
+        -- If speed is too low then stopping the animation
+        if speed < agent.radius then
+            animCtrl:Stop(WALKING_ANI, 0.8)
         end
     end
 end
