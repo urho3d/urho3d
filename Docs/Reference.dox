@@ -1174,7 +1174,7 @@ The available commands are:
 
 - clear: Clear any of color, depth and stencil. Color clear can optionally use the fog color from the Zone visible at the far clip distance.
 - scenepass: Render scene objects whose \ref Materials "material technique" contains the specified pass. Will either be front-to-back ordered with state sorting, or back-to-front ordered with no state sorting. For deferred rendering, object lightmasks can be optionally marked to the stencil buffer. Vertex lights can optionally be handled during a pass, if it has the necessary shader combinations. Textures global to the pass can be bound to free texture units; these can either be the viewport, a named rendertarget, or a texture resource identified with its pathname.
-- quad: Render a viewport-sized quad using the specified shaders and compilation defines. Textures can be bound and additionally shader parameters can be specified.
+- quad: Render a viewport-sized quad using the specified shaders and compilation defines. Textures can be bound and additionally shader parameters and the blend mode (default=replace) can be specified.
 - forwardlights: Render per-pixel forward lighting for opaque objects with the specified pass name. Shadow maps are also rendered as necessary.
 - lightvolumes: Render deferred light volumes using the specified shaders. G-buffer textures can be bound as necessary.
 - renderui: Render the UI into the output rendertarget. Using this will cause the default %UI render to the backbuffer to be skipped.
@@ -1196,7 +1196,7 @@ The render path XML definition looks like this:
         <output index="2" name="RTName3" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
     </command>
-    <command type="quad" vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" output="viewport|RTName" depthstencil="DSName" />
+    <command type="quad" vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha|subtract|subtractalpha" output="viewport|RTName" depthstencil="DSName" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
         <parameter name="ParameterName" value="x y z w" />
     </command>

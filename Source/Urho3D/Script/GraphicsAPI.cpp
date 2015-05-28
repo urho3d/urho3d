@@ -261,6 +261,17 @@ static RenderPathCommand* RenderPathGetCommand(unsigned index, RenderPath* ptr)
 
 static void RegisterRenderPath(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("BlendMode");
+    engine->RegisterEnumValue("BlendMode", "BLEND_REPLACE", BLEND_REPLACE);
+    engine->RegisterEnumValue("BlendMode", "BLEND_ADD", BLEND_ADD);
+    engine->RegisterEnumValue("BlendMode", "BLEND_MULTIPLY", BLEND_MULTIPLY);
+    engine->RegisterEnumValue("BlendMode", "BLEND_ALPHA", BLEND_ALPHA);
+    engine->RegisterEnumValue("BlendMode", "BLEND_ADDALPHA", BLEND_ADDALPHA);
+    engine->RegisterEnumValue("BlendMode", "BLEND_PREMULALPHA", BLEND_PREMULALPHA);
+    engine->RegisterEnumValue("BlendMode", "BLEND_INVDESTALPHA", BLEND_INVDESTALPHA);
+    engine->RegisterEnumValue("BlendMode", "BLEND_SUBTRACT", BLEND_SUBTRACT);
+    engine->RegisterEnumValue("BlendMode", "BLEND_SUBTRACTALPHA", BLEND_SUBTRACTALPHA);
+
     engine->RegisterEnum("CubeMapFace");
     engine->RegisterEnumValue("CubeMapFace", "FACE_POSITIVE_X", FACE_POSITIVE_X);
     engine->RegisterEnumValue("CubeMapFace", "FACE_NEGATIVE_X", FACE_NEGATIVE_X);
@@ -359,6 +370,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectProperty("RenderPathCommand", "Color clearColor", offsetof(RenderPathCommand, clearColor_));
     engine->RegisterObjectProperty("RenderPathCommand", "float clearDepth", offsetof(RenderPathCommand, clearDepth_));
     engine->RegisterObjectProperty("RenderPathCommand", "uint clearStencil", offsetof(RenderPathCommand, clearStencil_));
+    engine->RegisterObjectProperty("RenderPathCommand", "BlendMode blendMode", offsetof(RenderPathCommand, blendMode_));
     engine->RegisterObjectProperty("RenderPathCommand", "bool enabled", offsetof(RenderPathCommand, enabled_));
     engine->RegisterObjectProperty("RenderPathCommand", "bool useFogColor", offsetof(RenderPathCommand, useFogColor_));
     engine->RegisterObjectProperty("RenderPathCommand", "bool markToStencil", offsetof(RenderPathCommand, markToStencil_));
@@ -732,17 +744,6 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(float, float)", asFUNCTION(ConstructBiasParametersInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("BiasParameters", "float constantBias", offsetof(BiasParameters, constantBias_));
     engine->RegisterObjectProperty("BiasParameters", "float slopeScaledBias", offsetof(BiasParameters, slopeScaledBias_));
-    
-    engine->RegisterEnum("BlendMode");
-    engine->RegisterEnumValue("BlendMode", "BLEND_REPLACE", BLEND_REPLACE);
-    engine->RegisterEnumValue("BlendMode", "BLEND_ADD", BLEND_ADD);
-    engine->RegisterEnumValue("BlendMode", "BLEND_MULTIPLY", BLEND_MULTIPLY);
-    engine->RegisterEnumValue("BlendMode", "BLEND_ALPHA", BLEND_ALPHA);
-    engine->RegisterEnumValue("BlendMode", "BLEND_ADDALPHA", BLEND_ADDALPHA);
-    engine->RegisterEnumValue("BlendMode", "BLEND_PREMULALPHA", BLEND_PREMULALPHA);
-    engine->RegisterEnumValue("BlendMode", "BLEND_INVDESTALPHA", BLEND_INVDESTALPHA);
-    engine->RegisterEnumValue("BlendMode", "BLEND_SUBTRACT", BLEND_SUBTRACT);
-    engine->RegisterEnumValue("BlendMode", "BLEND_SUBTRACTALPHA", BLEND_SUBTRACTALPHA);
     
     engine->RegisterEnum("CompareMode");
     engine->RegisterEnumValue("CompareMode", "CMP_ALWAYS", CMP_ALWAYS);
