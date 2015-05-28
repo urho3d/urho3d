@@ -135,6 +135,8 @@ protected:
     virtual void OnNodeSet(Node* node);
     /// \todo Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
+    /// Get internal Detour crowd agent.
+    const dtCrowdAgent* GetDetourCrowdAgent() const;
 private:
     /// Create or re-add.
     void AddAgentToCrowd();

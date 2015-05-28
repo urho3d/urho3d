@@ -218,7 +218,7 @@ void SpawnJack(const Vector3& pos)
     CrowdAgent@ agent = jackNode.CreateComponent("CrowdAgent");
     agent.height = 2.0f;
     agent.maxSpeed = 3.0f;
-    agent.maxAccel = 100.0f;
+    agent.maxAccel = 3.0f;
 }
 
 void CreateBoxOffMeshConnections(DynamicNavigationMesh@ navMesh, Node@ boxGroup)
@@ -432,6 +432,7 @@ void HandleCrowdAgentFailure(StringHash eventType, VariantMap& eventData)
 void HandleCrowdAgentReposition(StringHash eventType, VariantMap& eventData)
 {
     const String WALKING_ANI = "Models/Jack_Walk.ani";
+    const Vector3 FORWARD(0.0f, 0.0f, 1.0f);
 
     Node@ node = eventData["Node"].GetPtr();
     CrowdAgent@ agent = eventData["CrowdAgent"].GetPtr();
@@ -442,17 +443,20 @@ void HandleCrowdAgentReposition(StringHash eventType, VariantMap& eventData)
     if (animCtrl !is null)
     {
         float speed = velocity.length;
-        if (speed < agent.radius)
-            // If speed is too low then stopping the animation
-            animCtrl.Stop(WALKING_ANI, 0.8f);
-        else
+        if (animCtrl.IsPlaying(WALKING_ANI))
         {
-            // Face the direction of its velocity
-            node.worldDirection = velocity;
-            animCtrl.Play(WALKING_ANI, 0, true);
+            float speedRatio = speed / agent.maxSpeed;
+            // Face the direction of its velocity but moderate the turning speed based on the speed ratio as we do not have timeStep here
+            node.rotation = node.rotation.Slerp(Quaternion(FORWARD, velocity), 0.1f * speedRatio);
             // Throttle the animation speed based on agent speed ratio (ratio = 1 is full throttle)
-            animCtrl.SetSpeed(WALKING_ANI, speed / agent.maxSpeed);
+            animCtrl.SetSpeed(WALKING_ANI, speedRatio);
         }
+        else
+            animCtrl.Play(WALKING_ANI, 0, true, 0.1f);
+
+        // If speed is too low then stopping the animation
+        if (speed < agent.radius)
+            animCtrl.Stop(WALKING_ANI, 0.8f);
     }
 }
 

@@ -57,7 +57,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-const String INSTRUCTION("instructionText");
+static const String INSTRUCTION("instructionText");
 
 DEFINE_APPLICATION_MAIN(CrowdNavigation)
 
@@ -265,7 +265,7 @@ void CrowdNavigation::SpawnJack(const Vector3& pos)
     CrowdAgent* agent = jackNode->CreateComponent<CrowdAgent>();
     agent->SetHeight(2.0f);
     agent->SetMaxSpeed(3.0f);
-    agent->SetMaxAccel(100.0f);
+    agent->SetMaxAccel(3.0f);
 }
 
 void CrowdNavigation::CreateMushroom(const Vector3& pos)
@@ -508,7 +508,7 @@ void CrowdNavigation::HandleCrowdAgentFailure(StringHash eventType, VariantMap& 
 
 void CrowdNavigation::HandleCrowdAgentReposition(StringHash eventType, VariantMap& eventData)
 {
-    const char* WALKING_ANI = "Models/Jack_Walk.ani";
+    static const char* WALKING_ANI = "Models/Jack_Walk.ani";
 
     using namespace CrowdAgentReposition;
 
@@ -521,16 +521,19 @@ void CrowdNavigation::HandleCrowdAgentReposition(StringHash eventType, VariantMa
     if (animCtrl)
     {
         float speed = velocity.Length();
-        if (speed < agent->GetRadius())
-            // If speed is too low then stopping the animation
-            animCtrl->Stop(WALKING_ANI, 0.8f);
-        else
+        if (animCtrl->IsPlaying(WALKING_ANI))
         {
-            // Face the direction of its velocity
-            node->SetWorldDirection(velocity);
-            animCtrl->Play(WALKING_ANI, 0, true);
+            float speedRatio = speed / agent->GetMaxSpeed();
+            // Face the direction of its velocity but moderate the turning speed based on the speed ratio as we do not have timeStep here
+            node->SetRotation(node->GetRotation().Slerp(Quaternion(Vector3::FORWARD, velocity), 0.1f * speedRatio));
             // Throttle the animation speed based on agent speed ratio (ratio = 1 is full throttle)
-            animCtrl->SetSpeed(WALKING_ANI, speed / agent->GetMaxSpeed());
+            animCtrl->SetSpeed(WALKING_ANI, speedRatio);
         }
+        else
+            animCtrl->Play(WALKING_ANI, 0, true, 0.1f);
+
+        // If speed is too low then stopping the animation
+        if (speed < agent->GetRadius())
+            animCtrl->Stop(WALKING_ANI, 0.8f);
     }
 }
