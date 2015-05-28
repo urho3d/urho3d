@@ -4470,6 +4470,7 @@ Properties:
 - Color clearColor
 - float clearDepth
 - unsigned clearStencil
+- BlendMode blendMode
 - bool enabled
 - bool useFogColor
 - bool markToStencil
