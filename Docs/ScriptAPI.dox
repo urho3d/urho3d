@@ -8934,6 +8934,7 @@ Methods:
 
 Properties:
 
+- BlendMode blendMode
 - Color clearColor
 - float clearDepth
 - uint clearFlags

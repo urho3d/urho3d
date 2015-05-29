@@ -7594,6 +7594,7 @@ void RemoveShaderParameter(const String&);
 void SetOutput(uint, const String&, CubeMapFace = FACE_POSITIVE_X);
 
 // Properties:
+BlendMode blendMode;
 Color clearColor;
 float clearDepth;
 uint clearFlags;

@@ -1774,7 +1774,7 @@ void View::RenderQuad(RenderPathCommand& command)
         graphics_->SetShaderParameter(offsetsName, Vector2(pixelUVOffset.x_ / width, pixelUVOffset.y_ / height));
     }
     
-    graphics_->SetBlendMode(BLEND_REPLACE);
+    graphics_->SetBlendMode(command.blendMode_);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
