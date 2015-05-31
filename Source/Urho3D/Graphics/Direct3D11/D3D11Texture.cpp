@@ -248,6 +248,14 @@ unsigned Texture::GetRowDataSize(int width) const
     }
 }
 
+unsigned Texture::GetComponents() const
+{
+    if (!width_ || IsCompressed())
+        return 0;
+    else
+        return GetRowDataSize(width_) / width_;
+}
+
 void Texture::SetParameters(XMLFile* file)
 {
     if (!file)

@@ -109,6 +109,8 @@ public:
     unsigned GetDataSize(int width, int height, int depth) const;
     /// Return data size in bytes for a pixel or block row.
     unsigned GetRowDataSize(int width) const;
+    /// Return number of image components required to receive pixel data from GetData(), or 0 for compressed images.
+    unsigned GetComponents() const;
     /// Return the non-internal texture format corresponding to an OpenGL internal format.
     static unsigned GetExternalFormat(unsigned format);
     /// Return the data type corresponding to an OpenGL internal format.

@@ -849,6 +849,7 @@ template <class T> void RegisterTexture(asIScriptEngine* engine, const char* cla
     engine->RegisterObjectMethod(className, "void set_mipsToSkip(int, int)", asMETHOD(T, SetMipsToSkip), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_mipsToSkip(int) const", asMETHOD(T, GetMipsToSkip), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_dataLost() const", asMETHODPR(T, IsDataLost, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_components() const", asMETHOD(T, GetComponents), asCALL_THISCALL);
 }
 
 /// Template function for registering a class derived from StaticModel.

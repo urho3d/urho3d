@@ -463,12 +463,40 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     d3dRect.right = levelWidth;
     d3dRect.bottom = levelHeight;
     
-    if (FAILED(((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, &d3dRect, D3DLOCK_READONLY)))
+    IDirect3DSurface9* offscreenSurface = 0;
+    // Need to use a offscreen surface & GetRenderTargetData() for rendertargets
+    if (renderSurface_)
     {
-        LOGERROR("Could not lock texture");
-        return false;
+        if (level != 0)
+        {
+            LOGERROR("Can only get mip level 0 data from a rendertarget");
+            return false;
+        }
+
+        IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
+        device->CreateOffscreenPlainSurface(width_, height_, (D3DFORMAT)format_, D3DPOOL_SYSTEMMEM, &offscreenSurface, 0);
+        if (!offscreenSurface)
+        {
+            LOGERROR("Could not create surface for getting rendertarget data");
+            return false;
+        }
+        device->GetRenderTargetData((IDirect3DSurface9*)renderSurface_->GetSurface(), offscreenSurface);
+        if (FAILED(offscreenSurface->LockRect(&d3dLockedRect, &d3dRect, D3DLOCK_READONLY)))
+        {
+            LOGERROR("Could not lock surface for getting rendertarget data");
+            offscreenSurface->Release();
+            return false;
+        }
     }
-    
+    else
+    {
+        if (FAILED(((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, &d3dRect, D3DLOCK_READONLY)))
+        {
+            LOGERROR("Could not lock texture");
+            return false;
+        }
+    }
+
     int height = levelHeight;
     if (IsCompressed())
         height = (height + 3) >> 2;
@@ -516,7 +544,14 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         break;
     }
     
-    ((IDirect3DTexture9*)object_)->UnlockRect(level);
+    if (offscreenSurface)
+    {
+        offscreenSurface->UnlockRect();
+        offscreenSurface->Release();
+    }
+    else
+        ((IDirect3DTexture9*)object_)->UnlockRect(level);
+
     return true;
 }
 
