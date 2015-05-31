@@ -1074,8 +1074,6 @@ void BuildAndSaveAnimations(OutModel* model)
             }
 
             // To export single frame animation, check if first key frame is identical to bone transformation
-            Vector3 firstScale = ToVector3(channel->mScalingKeys[0].mValue);
-            Quaternion firstRot = ToQuaternion(channel->mRotationKeys[0].mValue);
             aiVector3D bonePos, boneScale;
             aiQuaternion boneRot;
             boneNode->mTransformation.Decompose(boneScale, boneRot, bonePos);
