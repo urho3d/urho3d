@@ -1,18 +1,5 @@
 $#include "Navigation/DetourCrowdManager.h"
 
-enum NavigationQuality
-{
-    NAVIGATIONQUALITY_LOW = 0,
-    NAVIGATIONQUALITY_MEDIUM = 1,
-    NAVIGATIONQUALITY_HIGH = 2
-};
-enum NavigationPushiness
-{
-    PUSHINESS_LOW,
-    PUSHINESS_MEDIUM,
-    PUSHINESS_HIGH
-};
-
 class DetourCrowdManager : public Component
 {
     bool CreateCrowd();

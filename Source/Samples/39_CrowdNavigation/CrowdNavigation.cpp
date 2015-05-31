@@ -497,7 +497,7 @@ void CrowdNavigation::HandleCrowdAgentFailure(StringHash eventType, VariantMap& 
     CrowdAgentState agentState = (CrowdAgentState)eventData[P_CROWD_AGENT_STATE].GetInt();
 
     // If the agent's state is invalid, likely from spawning on the side of a box, find a point in a larger area
-    if (agentState == CROWD_AGENT_INVALID)
+    if (agentState == CA_STATE_INVALID)
     {
         // Get a point on the navmesh using more generous extents
         Vector3 newPos = scene_->GetComponent<DynamicNavigationMesh>()->FindNearestPoint(node->GetPosition(), Vector3(5.0f, 5.0f, 5.0f));

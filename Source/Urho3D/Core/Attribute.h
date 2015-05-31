@@ -34,7 +34,7 @@ static const unsigned AM_EDIT = 0x0;
 static const unsigned AM_FILE = 0x1;
 /// Attribute used for network replication.
 static const unsigned AM_NET = 0x2;
-/// Attribute used for both file serialization and network replication (default.)
+/// Attribute used for both file serialization and network replication (default).
 static const unsigned AM_DEFAULT = 0x3;
 /// Attribute should use latest data grouping instead of delta update in network replication.
 static const unsigned AM_LATESTDATA = 0x4;

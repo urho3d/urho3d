@@ -28,25 +28,46 @@
 namespace Urho3D
 {
 
-enum CrowdTargetState
+enum CrowdAgentRequestedTarget
 {
-    CROWD_AGENT_TARGET_NONE = 0,
-    CROWD_AGENT_TARGET_FAILED,
-    CROWD_AGENT_TARGET_VALID,
-    CROWD_AGENT_TARGET_REQUESTING,
-    CROWD_AGENT_TARGET_WAITINGFORQUEUE,
-    CROWD_AGENT_TARGET_WAITINGFORPATH,
-    CROWD_AGENT_TARGET_VELOCITY
+    CA_REQUESTEDTARGET_NONE = 0,
+    CA_REQUESTEDTARGET_POSITION,
+    CA_REQUESTEDTARGET_VELOCITY
+};
+
+enum CrowdAgentTargetState
+{
+    CA_TARGET_NONE = 0,
+    CA_TARGET_FAILED,
+    CA_TARGET_VALID,
+    CA_TARGET_REQUESTING,
+    CA_TARGET_WAITINGFORQUEUE,
+    CA_TARGET_WAITINGFORPATH,
+    CA_TARGET_VELOCITY
 };
 
 enum CrowdAgentState
 {
-    CROWD_AGENT_INVALID = 0,      ///< The agent is not in a valid state.
-    CROWD_AGENT_READY,            ///< The agent is traversing a normal navigation mesh polygon.
-    CROWD_AGENT_TRAVERSINGLINK    ///< The agent is traversing an off-mesh connection.
+    CA_STATE_INVALID = 0,   ///< The agent is not in a valid state.
+    CA_STATE_WALKING,       ///< The agent is traversing a normal navigation mesh polygon.
+    CA_STATE_OFFMESH        ///< The agent is traversing an off-mesh connection.
 };
 
-/// DetourCrowd Agent, requires a DetourCrowdManager in the scene. Agent's radius and height is set through the navigation mesh.
+enum NavigationQuality
+{
+    NAVIGATIONQUALITY_LOW = 0,
+    NAVIGATIONQUALITY_MEDIUM = 1,
+    NAVIGATIONQUALITY_HIGH = 2
+};
+
+enum NavigationPushiness
+{
+    NAVIGATIONPUSHINESS_LOW = 0,
+    NAVIGATIONPUSHINESS_MEDIUM,
+    NAVIGATIONPUSHINESS_HIGH
+};
+
+/// Crowd agent component, requires a DetourCrowdManager in the scene. When not set explicitly, agent's radius and height are defaulted to navigation mesh's agent radius and height, respectively.
 class URHO3D_API CrowdAgent : public Component
 {
     OBJECT(CrowdAgent);
@@ -59,6 +80,8 @@ public:
     virtual ~CrowdAgent();
     /// Register object factory.
     static void RegisterObject(Context* context);
+    /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
+    virtual void ApplyAttributes();
 
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
@@ -67,14 +90,12 @@ public:
     /// Draw debug feelers.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
-    /// Set the navigation filter type the agent will use.
-    void SetNavigationFilterType(unsigned filterTypeID);
-    /// Submit a new move request for this agent.
-    void SetMoveTarget(const Vector3& position);
-    /// Reset any request for the specified agent.
-    void ResetMoveTarget();
-    /// Submit a new move velocity request for this agent.
-    void SetMoveVelocity(const Vector3& velocity);
+    /// Submit a new target position request for this agent.
+    void SetTargetPosition(const Vector3& position);
+    /// Submit a new target velocity request for this agent.
+    void SetTargetVelocity(const Vector3& velocity);
+    /// Reset any target request for the specified agent.
+    void ResetTarget();
     /// Update the node position. When set to false, the node position should be updated by other means (e.g. using Physics) in response to the E_CROWD_AGENT_REPOSITION event.
     void SetUpdateNodePosition(bool unodepos);
     /// Set the agent's max acceleration.
@@ -85,25 +106,31 @@ public:
     void SetRadius(float val);
     /// Set the agent's height.
     void SetHeight(float val);
+    /// Set the agent's filter type.
+    void SetFilterType(unsigned filterType);
+    /// Set the agent's obstacle avoidance type.
+    void SetObstacleAvoidanceType(unsigned obstacleAvoidanceType);
     /// Set the agent's navigation quality.
     void SetNavigationQuality(NavigationQuality val);
     /// Set the agent's navigation pushiness.
     void SetNavigationPushiness(NavigationPushiness val);
 
-    /// Get the navigation filter type this agent is using.
-    unsigned GetNavigationFilterType() const { return filterType_; }
     /// Return the agent's position.
     Vector3 GetPosition() const;
     /// Return the agent's desired velocity.
     Vector3 GetDesiredVelocity() const;
     /// Return the agent's actual velocity.
     Vector3 GetActualVelocity() const;
-    /// Return the agent's target position.
+    /// Return the agent's requested target position.
     const Vector3& GetTargetPosition() const { return targetPosition_; }
+    /// Return the agent's requested target velocity.
+    const Vector3& GetTargetVelocity() const { return targetVelocity_; }
+    /// Return the agent's requested target type, if any.
+    CrowdAgentRequestedTarget GetRequestedTargetType() const { return requestedTargetType_; }
     /// Return the agent's  state.
     CrowdAgentState GetAgentState() const;
     /// Return the agent's target state.
-    CrowdTargetState GetTargetState() const;
+    CrowdAgentTargetState GetTargetState() const;
     /// Return true when the node's position should be updated by the CrowdManager.
     bool GetUpdateNodePosition() const { return updateNodePosition_; }
     /// Return the agent id.
@@ -116,12 +143,20 @@ public:
     float GetRadius() const { return radius_; }
     /// Get the agent's height.
     float GetHeight() const { return height_; }
+    /// Get the agent's filter type.
+    unsigned GetFilterType() const { return filterType_; }
+    /// Get the agent's obstacle avoidance type.
+    unsigned GetObstacleAvoidanceType() const { return obstacleAvoidanceType_; }
     /// Get the agent's navigation quality.
     NavigationQuality GetNavigationQuality() const {return navQuality_; }
     /// Get the agent's navigation pushiness.
     NavigationPushiness GetNavigationPushiness() const {return navPushiness_; }
+    /// Return true when the agent has a target.
+    bool HasRequestedTarget() const { return requestedTargetType_ != CA_REQUESTEDTARGET_NONE; }
     /// Return true when the agent has arrived at its target.
     bool HasArrived() const;
+    /// Return true when the agent is in crowd (being managed by a crowd manager).
+    bool IsInCrowd() const;
 
     /// Get serialized data of internal state.
     PODVector<unsigned char> GetAgentDataAttr() const;
@@ -140,20 +175,24 @@ protected:
     /// Get internal Detour crowd agent.
     const dtCrowdAgent* GetDetourCrowdAgent() const;
 private:
-    /// Create or re-add.
+    /// Update Detour crowd agent parameter.
+    void UpdateParameters(unsigned scope = M_MAX_UNSIGNED);
+    /// Add agent into crowd.
     void AddAgentToCrowd();
-    /// Remove.
+    /// Remove agent from crowd.
     void RemoveAgentFromCrowd();
     /// Detour crowd manager.
     WeakPtr<DetourCrowdManager> crowdManager_;
-    /// Flag indicating agent is in DetourCrowd.
-    bool inCrowd_;
     /// DetourCrowd reference to this agent.
     int agentCrowdId_;
     /// Reference to poly closest to requested target position.
     unsigned targetRef_;
-    /// Actual target position, closest to that requested.
+    /// Requested target position.
     Vector3 targetPosition_;
+    /// Requested target velocity.
+    Vector3 targetVelocity_;
+    /// Requested target type.
+    CrowdAgentRequestedTarget requestedTargetType_;
     /// Flag indicating the node's position should be updated by Detour crowd manager.
     bool updateNodePosition_;
     /// Agent's max acceleration.
@@ -164,16 +203,18 @@ private:
     float radius_;
     /// Agent's height, if 0 the navigation mesh's setting will be used.
     float height_;
-    /// Agent's assigned navigation filter type, the actual filter is owned by the DetourCrowdManager the agent belongs to.
+    /// Agent's filter type, it is an index to the filter array configured in Detour crowd manager.
     unsigned filterType_;
-    /// Agent's NavigationAvoidanceQuality.
+    /// Agent's obstacle avoidance type, it is an index to the obstacle avoidance array configured in Detour crowd manager. It is ignored when agent's navigation quality is not set to "NAVIGATIONQUALITY_HIGH".
+    unsigned obstacleAvoidanceType_;
+    /// Agent's navigation quality. The higher the setting, the higher the CPU usage during crowd simulation.
     NavigationQuality navQuality_;
-    /// Agent's Navigation Pushiness.
+    /// Agent's navigation pushiness. The higher the setting, the stronger the agent pushes its colliding neighbours around.
     NavigationPushiness navPushiness_;
     /// Agent's previous position used to check for position changes.
     Vector3 previousPosition_;
     /// Agent's previous target state used to check for state changes.
-    CrowdTargetState previousTargetState_;
+    CrowdAgentTargetState previousTargetState_;
     /// Agent's previous agent state used to check for state changes.
     CrowdAgentState previousAgentState_;
     /// Internal flag to ignore transform changes because it came from us, used in OnCrowdAgentReposition().

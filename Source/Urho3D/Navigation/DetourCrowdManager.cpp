@@ -37,10 +37,6 @@
 #include "../Scene/SceneEvents.h"
 #include "../Container/Vector.h"
 
-#ifdef URHO3D_PHYSICS
-#include "../Physics/PhysicsEvents.h"
-#endif
-
 #include <DetourCrowd/DetourCrowd.h>
 #include <Recast/Recast.h>
 
@@ -106,10 +102,7 @@ void DetourCrowdManager::SetMaxAgents(unsigned agentCt)
         PODVector<CrowdAgent*> agents = agents_;
         // Reset the existing values in the agent
         for (unsigned i = 0; i < agents.Size(); ++i)
-        {
-            agents[i]->inCrowd_ = false;
             agents[i]->agentCrowdId_ = -1;
-        }
         // Add the agents back in
         for (unsigned i = 0; i < agents.Size() && i < maxAgents_; ++i)
             agents[i]->AddAgentToCrowd();
@@ -129,22 +122,11 @@ void DetourCrowdManager::SetCrowdTarget(const Vector3& position, int startId, in
         // Skip agent that does not have acceleration
         if (agents_[i]->GetMaxAccel() > 0.f)
         {
-            agents_[i]->SetMoveTarget(moveTarget);
+            agents_[i]->SetTargetPosition(moveTarget);
             // FIXME: Should reimplement this using event callback, i.e. it should be application-specific to decide what is the desired crowd formation when they reach the target
             if (navigationMesh_)
                 moveTarget = navigationMesh_->FindNearestPoint(position + Vector3(Random(-4.5f, 4.5f), 0.0f, Random(-4.5f, 4.5f)), Vector3(1.0f, 1.0f, 1.0f));
         }
-    }
-}
-
-void DetourCrowdManager::ResetCrowdTarget(int startId, int endId)
-{
-    startId = Max(0, startId);
-    endId = Clamp(endId, startId, agents_.Size() - 1);
-    for (int i = startId; i <= endId; ++i)
-    {
-        if (agents_[i]->GetMaxAccel() > 0.f)
-            agents_[i]->ResetMoveTarget();
     }
 }
 
@@ -155,7 +137,18 @@ void DetourCrowdManager::SetCrowdVelocity(const Vector3& velocity, int startId, 
     for (int i = startId; i <= endId; ++i)
     {
         if (agents_[i]->GetMaxAccel() > 0.f)
-            agents_[i]->SetMoveVelocity(velocity);
+            agents_[i]->SetTargetVelocity(velocity);
+    }
+}
+
+void DetourCrowdManager::ResetCrowdTarget(int startId, int endId)
+{
+    startId = Max(0, startId);
+    endId = Clamp(endId, startId, agents_.Size() - 1);
+    for (int i = startId; i <= endId; ++i)
+    {
+        if (agents_[i]->GetMaxAccel() > 0.f)
+            agents_[i]->ResetTarget();
     }
 }
 
@@ -191,7 +184,7 @@ void DetourCrowdManager::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             crowdAgent->DrawDebugGeometry(debug, depthTest);
 
             // Draw move target if any
-            if (crowdAgent->GetTargetState() == CROWD_AGENT_TARGET_NONE)
+            if (crowdAgent->GetTargetState() == CA_TARGET_NONE)
                 continue;
 
             Color color(0.6f, 0.2f, 0.2f, 1.0f);
@@ -297,6 +290,8 @@ int DetourCrowdManager::AddAgent(CrowdAgent* agent, const Vector3& pos)
     params.queryFilterType = (unsigned char)agent->filterType_;
     params.maxAcceleration = agent->maxAccel_;
     params.maxSpeed = agent->maxSpeed_;
+    // TODO: should be initialized according to agent's pushiness
+    params.separationWeight = 2.0f;
     params.collisionQueryRange = params.radius * 8.0f;
     params.pathOptimizationRange = params.radius * 30.0f;
     params.updateFlags = DT_CROWD_ANTICIPATE_TURNS
@@ -304,8 +299,6 @@ int DetourCrowdManager::AddAgent(CrowdAgent* agent, const Vector3& pos)
         | DT_CROWD_OPTIMIZE_TOPO
         | DT_CROWD_OBSTACLE_AVOIDANCE;
     params.obstacleAvoidanceType = 3;
-    params.separationWeight = 2.0f;
-    params.queryFilterType = 0;
     dtPolyRef polyRef;
     float nearestPos[3];
     rcVcopy(nearestPos, &pos.x_);
@@ -334,80 +327,11 @@ void DetourCrowdManager::RemoveAgent(CrowdAgent* agent)
     agents_.Remove(agent);
 }
 
-void DetourCrowdManager::UpdateAgentNavigationQuality(CrowdAgent* agent, NavigationQuality nq)
+bool DetourCrowdManager::SetAgentTarget(CrowdAgent* agent, const Vector3& target)
 {
-    if (!crowd_)
-        return;
-
-    dtCrowdAgentParams params = crowd_->getAgent(agent->GetAgentCrowdId())->params;
-    switch (nq)
-    {
-    case NAVIGATIONQUALITY_LOW:
-        {
-            params.updateFlags &= ~0
-                & ~DT_CROWD_ANTICIPATE_TURNS
-                & ~DT_CROWD_OPTIMIZE_VIS
-                & ~DT_CROWD_OPTIMIZE_TOPO
-                & ~DT_CROWD_OBSTACLE_AVOIDANCE;
-        }
-        break;
-
-    case NAVIGATIONQUALITY_MEDIUM:
-        {
-            params.updateFlags |= 0;
-            params.updateFlags &= ~0
-                & ~DT_CROWD_OBSTACLE_AVOIDANCE
-                & ~DT_CROWD_ANTICIPATE_TURNS
-                & ~DT_CROWD_OPTIMIZE_VIS
-                & ~DT_CROWD_OPTIMIZE_TOPO;
-        }
-        break;
-
-    case NAVIGATIONQUALITY_HIGH:
-        {
-            params.obstacleAvoidanceType = 3;
-            params.updateFlags |= 0
-                | DT_CROWD_ANTICIPATE_TURNS
-                | DT_CROWD_OPTIMIZE_VIS
-                | DT_CROWD_OPTIMIZE_TOPO
-                | DT_CROWD_OBSTACLE_AVOIDANCE;
-        }
-        break;
-    }
-
-    crowd_->updateAgentParameters(agent->GetAgentCrowdId(), &params);
-}
-
-void DetourCrowdManager::UpdateAgentPushiness(CrowdAgent* agent, NavigationPushiness pushiness)
-{
-    if (!crowd_)
-        return;
-
-    dtCrowdAgentParams params = crowd_->getAgent(agent->GetAgentCrowdId())->params;
-    switch (pushiness)
-    {
-    case PUSHINESS_LOW:
-        params.separationWeight = 4.0f;
-        params.collisionQueryRange = params.radius * 16.0f;
-        break;
-
-    case PUSHINESS_MEDIUM:
-        params.separationWeight = 2.0f;
-        params.collisionQueryRange = params.radius * 8.0f;
-        break;
-
-    case PUSHINESS_HIGH:
-        params.separationWeight = 0.5f;
-        params.collisionQueryRange = params.radius * 1.0f;
-        break;
-    }
-    crowd_->updateAgentParameters(agent->GetAgentCrowdId(), &params);
-}
-
-bool DetourCrowdManager::SetAgentTarget(CrowdAgent* agent, Vector3 target)
-{
-    if (!crowd_)
+    if (!crowd_ || !navigationMesh_ || !agent)
         return false;
+    int crowdId = agent->GetAgentCrowdId();
     dtPolyRef polyRef;
     float nearestPos[3];
     dtStatus status = navigationMesh_->navMeshQuery_->findNearestPoly(
@@ -417,39 +341,21 @@ bool DetourCrowdManager::SetAgentTarget(CrowdAgent* agent, Vector3 target)
         &polyRef,
         nearestPos);
 
-    return !dtStatusFailed(status) && crowd_->requestMoveTarget(agent->GetAgentCrowdId(), polyRef, nearestPos);
-}
-
-bool DetourCrowdManager::SetAgentTarget(CrowdAgent* agent, Vector3 target, unsigned& targetRef)
-{
-    if (crowd_ == 0)
-        return false;
-    float nearestPos[3];
-    dtStatus status = navigationMesh_->navMeshQuery_->findNearestPoly(
-        target.Data(),
-        crowd_->getQueryExtents(),
-        crowd_->getFilter(agent->filterType_),
-        &targetRef,
-        nearestPos);
-
-    // Return true if detour has determined it can do something with our move target
-    return !dtStatusFailed(status) && crowd_->requestMoveTarget(agent->GetAgentCrowdId(), targetRef, nearestPos) &&
+    return !dtStatusFailed(status) && crowd_->requestMoveTarget(crowdId, polyRef, nearestPos) &&
         crowd_->getAgent(agent->GetAgentCrowdId())->targetState != DT_CROWDAGENT_TARGET_FAILED;
 }
 
-Vector3 DetourCrowdManager::GetClosestWalkablePosition(Vector3 pos) const
+Vector3 DetourCrowdManager::GetClosestWalkablePosition(const Vector3& pos) const
 {
-    if (!crowd_)
+    if (!crowd_ || !navigationMesh_)
         return Vector3::ZERO;
     float closest[3];
-    const static float extents[] = { 1.0f, 20.0f, 1.0f };
-    dtPolyRef closestPoly;
     dtQueryFilter filter;
     dtStatus status = navigationMesh_->navMeshQuery_->findNearestPoly(
         pos.Data(),
         crowd_->getQueryExtents(),
         &filter,
-        &closestPoly,
+        0,
         closest);
     return Vector3(closest);
 }

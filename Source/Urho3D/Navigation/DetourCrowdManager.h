@@ -34,22 +34,7 @@ namespace Urho3D
 class CrowdAgent;
 class NavigationMesh;
 
-enum NavigationQuality
-{
-    NAVIGATIONQUALITY_LOW = 0,
-    NAVIGATIONQUALITY_MEDIUM = 1,
-    NAVIGATIONQUALITY_HIGH = 2
-};
-
-enum NavigationPushiness
-{
-    PUSHINESS_LOW = 0,
-    PUSHINESS_MEDIUM,
-    PUSHINESS_HIGH
-};
-
-
-/// Detour Crowd Simulation Scene Component. Should be added only to the root scene node. Agent's radius and height is set through the navigation mesh. \todo support multiple agent's radii and heights.
+/// Detour crowd manager scene component. Should be added only to the root scene node.
 class URHO3D_API DetourCrowdManager : public Component
 {
     OBJECT(DetourCrowdManager);
@@ -69,12 +54,12 @@ public:
     void SetAreaCost(unsigned filterTypeID, unsigned areaID, float weight);
     /// Set the maximum number of agents.
     void SetMaxAgents(unsigned agentCt);
-    /// Set the crowd move target. The move target is applied to all crowd agents within the id range, excluding crowd agent which does not have acceleration.
+    /// Set the crowd target position. The target position is set to all crowd agents within the id range, excluding crowd agent which does not have acceleration.
     void SetCrowdTarget(const Vector3& position, int startId = 0, int endId = M_MAX_INT);
-    /// Reset the crowd move target to all crowd agents within the id range, excluding crowd agent which does not have acceleration.
-    void ResetCrowdTarget(int startId = 0, int endId = M_MAX_INT);
     /// Set the crowd move velocity. The move velocity is applied to all crowd agents within the id range, excluding crowd agent which does not have acceleration.
     void SetCrowdVelocity(const Vector3& velocity, int startId = 0, int endId = M_MAX_INT);
+    /// Reset any crowd target for all crowd agents within the id range, excluding crowd agent which does not have acceleration.
+    void ResetCrowdTarget(int startId = 0, int endId = M_MAX_INT);
 
     /// Get the Navigation mesh assigned to the crowd.
     NavigationMesh* GetNavigationMesh() const { return navigationMesh_; }
@@ -100,18 +85,10 @@ protected:
     /// Removes the detour crowd agent.
     void RemoveAgent(CrowdAgent* agent);
 
-    /// Update the Navigation Agent's Avoidance Quality for the specified agent.
-    void UpdateAgentNavigationQuality(CrowdAgent* agent, NavigationQuality nq);
-    /// Update the Navigation Agent's Pushiness for the specified agent.
-    void UpdateAgentPushiness(CrowdAgent* agent, NavigationPushiness pushiness);
-
     /// Set the move target for the specified agent.
-    bool SetAgentTarget(CrowdAgent* agent, Vector3 target);
-    /// Set the move target for the specified agent.
-    bool SetAgentTarget(CrowdAgent* agent, Vector3 target, unsigned& targetRef);
-
+    bool SetAgentTarget(CrowdAgent* agent, const Vector3& target);
     /// Get the closest walkable position.
-    Vector3 GetClosestWalkablePosition(Vector3 pos) const;
+    Vector3 GetClosestWalkablePosition(const Vector3& pos) const;
 
 protected:
     /// Update the crowd simulation.

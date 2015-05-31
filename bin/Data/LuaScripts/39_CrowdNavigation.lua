@@ -389,7 +389,7 @@ function HandleCrowdAgentFailure(eventType, eventData)
     local agentState = eventData["CrowdAgentState"]:GetInt()
 
     -- If the agent's state is invalid, likely from spawning on the side of a box, find a point in a larger area
-    if agentState == CROWD_AGENT_INVALID then
+    if agentState == CA_STATE_INVALID then
         -- Get a point on the navmesh using more generous extents
         local newPos = scene_:GetComponent("DynamicNavigationMesh"):FindNearestPoint(node.position, Vector3(5, 5, 5))
         -- Set the new node position, CrowdAgent component will automatically reset the state of the agent

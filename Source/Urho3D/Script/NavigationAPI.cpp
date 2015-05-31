@@ -188,63 +188,75 @@ void RegisterDetourCrowdManager(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DetourCrowdManager", "void SetAreaCost(uint, uint, float)", asMETHOD(DetourCrowdManager, SetAreaCost), asCALL_THISCALL);
     engine->RegisterObjectMethod("DetourCrowdManager", "float GetAreaCost(uint, uint)", asMETHOD(DetourCrowdManager, GetAreaCost), asCALL_THISCALL);
     engine->RegisterObjectMethod("DetourCrowdManager", "void SetCrowdTarget(const Vector3&in, int startId = 0, int endId = M_MAX_INT)", asMETHOD(DetourCrowdManager, SetCrowdTarget), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DetourCrowdManager", "void ResetCrowdTarget(int startId = 0, int endId = M_MAX_INT)", asMETHOD(DetourCrowdManager, ResetCrowdTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("DetourCrowdManager", "void SetCrowdVelocity(const Vector3&in, int startId = 0, int endId = M_MAX_INT)", asMETHOD(DetourCrowdManager, SetCrowdVelocity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DetourCrowdManager", "void ResetCrowdTarget(int startId = 0, int endId = M_MAX_INT)", asMETHOD(DetourCrowdManager, ResetCrowdTarget), asCALL_THISCALL);
 }
 
 void RegisterCrowdAgent(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("CrowdTargetState");
-    engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_NONE", CROWD_AGENT_TARGET_NONE);
-    engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_FAILED", CROWD_AGENT_TARGET_FAILED);
-    engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_VALID", CROWD_AGENT_TARGET_VALID);
-    engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_REQUESTING", CROWD_AGENT_TARGET_REQUESTING);
-    engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_WAITINGFORQUEUE", CROWD_AGENT_TARGET_WAITINGFORQUEUE);
-    engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_WAITINGFORPATH", CROWD_AGENT_TARGET_WAITINGFORPATH);
-    engine->RegisterEnumValue("CrowdTargetState", "CROWD_AGENT_TARGET_VELOCITY", CROWD_AGENT_TARGET_VELOCITY);
+    engine->RegisterEnum("CrowdAgentRequestedTarget");
+    engine->RegisterEnumValue("CrowdAgentRequestedTarget", "CA_REQUESTEDTARGET_NONE", CA_REQUESTEDTARGET_NONE);
+    engine->RegisterEnumValue("CrowdAgentRequestedTarget", "CA_REQUESTEDTARGET_POSITION", CA_REQUESTEDTARGET_POSITION);
+    engine->RegisterEnumValue("CrowdAgentRequestedTarget", "CA_REQUESTEDTARGET_VELOCITY", CA_REQUESTEDTARGET_VELOCITY);
+
+    engine->RegisterEnum("CrowdAgentTargetState");
+    engine->RegisterEnumValue("CrowdAgentTargetState", "CA_TARGET_NONE", CA_TARGET_NONE);
+    engine->RegisterEnumValue("CrowdAgentTargetState", "CA_TARGET_FAILED", CA_TARGET_FAILED);
+    engine->RegisterEnumValue("CrowdAgentTargetState", "CA_TARGET_VALID", CA_TARGET_VALID);
+    engine->RegisterEnumValue("CrowdAgentTargetState", "CA_TARGET_REQUESTING", CA_TARGET_REQUESTING);
+    engine->RegisterEnumValue("CrowdAgentTargetState", "CA_TARGET_WAITINGFORQUEUE", CA_TARGET_WAITINGFORQUEUE);
+    engine->RegisterEnumValue("CrowdAgentTargetState", "CA_TARGET_WAITINGFORPATH", CA_TARGET_WAITINGFORPATH);
+    engine->RegisterEnumValue("CrowdAgentTargetState", "CA_TARGET_VELOCITY", CA_TARGET_VELOCITY);
 
     engine->RegisterEnum("CrowdAgentState");
-    engine->RegisterEnumValue("CrowdAgentState", "CROWD_AGENT_INVALID", CROWD_AGENT_INVALID);
-    engine->RegisterEnumValue("CrowdAgentState", "CROWD_AGENT_READY", CROWD_AGENT_READY);
-    engine->RegisterEnumValue("CrowdAgentState", "CROWD_AGENT_TRAVERSINGLINK", CROWD_AGENT_TRAVERSINGLINK);
+    engine->RegisterEnumValue("CrowdAgentState", "CA_STATE_INVALID", CA_STATE_INVALID);
+    engine->RegisterEnumValue("CrowdAgentState", "CA_STATE_WALKING", CA_STATE_WALKING);
+    engine->RegisterEnumValue("CrowdAgentState", "CA_STATE_OFFMESH", CA_STATE_OFFMESH);
 
-    engine->RegisterEnum("NavigationAvoidanceQuality");
-    engine->RegisterEnumValue("NavigationAvoidanceQuality", "NAVIGATIONQUALITY_LOW", NAVIGATIONQUALITY_LOW);
-    engine->RegisterEnumValue("NavigationAvoidanceQuality", "NAVIGATIONQUALITY_MEDIUM", NAVIGATIONQUALITY_MEDIUM);
-    engine->RegisterEnumValue("NavigationAvoidanceQuality", "NAVIGATIONQUALITY_HIGH", NAVIGATIONQUALITY_HIGH);
+    engine->RegisterEnum("NavigationQuality");
+    engine->RegisterEnumValue("NavigationQuality", "NAVIGATIONQUALITY_LOW", NAVIGATIONQUALITY_LOW);
+    engine->RegisterEnumValue("NavigationQuality", "NAVIGATIONQUALITY_MEDIUM", NAVIGATIONQUALITY_MEDIUM);
+    engine->RegisterEnumValue("NavigationQuality", "NAVIGATIONQUALITY_HIGH", NAVIGATIONQUALITY_HIGH);
 
     engine->RegisterEnum("NavigationPushiness");
-    engine->RegisterEnumValue("NavigationPushiness", "PUSHINESS_LOW", PUSHINESS_LOW);
-    engine->RegisterEnumValue("NavigationPushiness", "PUSHINESS_MEDIUM", PUSHINESS_MEDIUM);
-    engine->RegisterEnumValue("NavigationPushiness", "PUSHINESS_HIGH", PUSHINESS_HIGH);
+    engine->RegisterEnumValue("NavigationPushiness", "NAVIGATIONPUSHINESS_LOW", NAVIGATIONPUSHINESS_LOW);
+    engine->RegisterEnumValue("NavigationPushiness", "NAVIGATIONPUSHINESS_MEDIUM", NAVIGATIONPUSHINESS_MEDIUM);
+    engine->RegisterEnumValue("NavigationPushiness", "NAVIGATIONPUSHINESS_HIGH", NAVIGATIONPUSHINESS_HIGH);
 
     RegisterComponent<CrowdAgent>(engine, "CrowdAgent");
     engine->RegisterObjectMethod("CrowdAgent", "void DrawDebugGeometry(bool)", asMETHODPR(CrowdAgent, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "uint get_navigationFilterType()", asMETHOD(CrowdAgent, GetNavigationFilterType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "void set_navigationFilterType(uint)", asMETHOD(CrowdAgent, SetNavigationFilterType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "void SetMoveTarget(const Vector3&in)", asMETHOD(CrowdAgent, SetMoveTarget), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "void SetMoveVelocity(const Vector3&in)", asMETHOD(CrowdAgent, SetMoveVelocity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "void ResetTarget()", asMETHOD(CrowdAgent, ResetTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "void set_updateNodePosition(bool)", asMETHOD(CrowdAgent, SetUpdateNodePosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "bool get_updateNodePosition() const", asMETHOD(CrowdAgent, GetUpdateNodePosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "void set_targetPosition(const Vector3&in)", asMETHOD(CrowdAgent, SetTargetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "const Vector3& get_targetPosition()", asMETHOD(CrowdAgent, GetTargetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "void set_targetVelocity(const Vector3&in)", asMETHOD(CrowdAgent, SetTargetVelocity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "const Vector3& get_targetVelocity()", asMETHOD(CrowdAgent, GetTargetVelocity), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "void set_maxAccel(float)", asMETHOD(CrowdAgent, SetMaxAccel), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "float get_maxAccel()", asMETHOD(CrowdAgent, GetMaxAccel), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "void set_maxSpeed(float)", asMETHOD(CrowdAgent, SetMaxSpeed), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "float get_maxSpeed()", asMETHOD(CrowdAgent, GetMaxSpeed), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "void set_navigationQuality(NavigationAvoidanceQuality)", asMETHOD(CrowdAgent, SetNavigationQuality), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "NavigationAvoidanceQuality get_navigationQuality()", asMETHOD(CrowdAgent, GetNavigationQuality), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "void set_navigationPushiness(NavigationPushiness)", asMETHOD(CrowdAgent, SetNavigationPushiness), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "NavigationPushiness get_navigationPushiness()", asMETHOD(CrowdAgent, GetNavigationPushiness), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "bool get_arrived() const", asMETHOD(CrowdAgent, HasArrived), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "Vector3 get_desiredVelocity() const", asMETHOD(CrowdAgent, GetDesiredVelocity), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "Vector3 get_actualVelocity() const", asMETHOD(CrowdAgent, GetActualVelocity), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "Vector3 get_targetPosition() const", asMETHOD(CrowdAgent, GetTargetPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "CrowdAgentState get_agentState() const", asMETHOD(CrowdAgent, GetAgentState), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "CrowdTargetState get_targetState() const", asMETHOD(CrowdAgent, GetTargetState), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "Vector3 get_position() const", asMETHOD(CrowdAgent, GetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "void set_radius(float)", asMETHOD(CrowdAgent, SetRadius), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "float get_radius()", asMETHOD(CrowdAgent, GetRadius), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "void set_height(float)", asMETHOD(CrowdAgent, SetHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "float get_height()", asMETHOD(CrowdAgent, GetHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "uint get_filterType()", asMETHOD(CrowdAgent, GetFilterType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "void set_filterType(uint)", asMETHOD(CrowdAgent, SetFilterType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "uint get_obstacleAvoidanceType()", asMETHOD(CrowdAgent, GetObstacleAvoidanceType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "void set_obstacleAvoidanceType(uint)", asMETHOD(CrowdAgent, SetObstacleAvoidanceType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "void set_navigationQuality(NavigationQuality)", asMETHOD(CrowdAgent, SetNavigationQuality), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "NavigationQuality get_navigationQuality()", asMETHOD(CrowdAgent, GetNavigationQuality), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "void set_navigationPushiness(NavigationPushiness)", asMETHOD(CrowdAgent, SetNavigationPushiness), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "NavigationPushiness get_navigationPushiness()", asMETHOD(CrowdAgent, GetNavigationPushiness), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "CrowdAgentRequestedTarget get_requestedTargetType() const", asMETHOD(CrowdAgent, GetRequestedTargetType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "Vector3 get_position() const", asMETHOD(CrowdAgent, GetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "Vector3 get_desiredVelocity() const", asMETHOD(CrowdAgent, GetDesiredVelocity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "Vector3 get_actualVelocity() const", asMETHOD(CrowdAgent, GetActualVelocity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "CrowdAgentState get_agentState() const", asMETHOD(CrowdAgent, GetAgentState), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "CrowdAgentTargetState get_targetState() const", asMETHOD(CrowdAgent, GetTargetState), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "bool get_requestedTarget() const", asMETHOD(CrowdAgent, HasRequestedTarget), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "bool get_arrived() const", asMETHOD(CrowdAgent, HasArrived), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "bool get_inCrowd() const", asMETHOD(CrowdAgent, IsInCrowd), asCALL_THISCALL);
 }
 
 void RegisterNavigationAPI(asIScriptEngine* engine)
