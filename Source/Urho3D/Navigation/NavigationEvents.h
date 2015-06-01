@@ -51,6 +51,7 @@ EVENT(E_CROWD_AGENT_REPOSITION, CrowdAgentReposition)
     PARAM(P_POSITION, Position); // Vector3
     PARAM(P_VELOCITY, Velocity); // Vector3
     PARAM(P_ARRIVED, Arrived); // bool
+    PARAM(P_TIMESTEP, TimeStep); // float
 }
 
 /// Crowd agent's internal state has become invalidated.

@@ -53,7 +53,7 @@
 #include <Recast/Recast.h>
 
 #include "../Navigation/CrowdAgent.h"
-#include "../Navigation/DetourCrowdManager.h"
+#include "../Navigation/CrowdManager.h"
 
 #include "../DebugNew.h"
 
@@ -1366,7 +1366,7 @@ void RegisterNavigationLibrary(Context* context)
     NavigationMesh::RegisterObject(context);
     OffMeshConnection::RegisterObject(context);
     CrowdAgent::RegisterObject(context);
-    DetourCrowdManager::RegisterObject(context);
+    CrowdManager::RegisterObject(context);
     DynamicNavigationMesh::RegisterObject(context);
     Obstacle::RegisterObject(context);
     NavArea::RegisterObject(context);

@@ -110,8 +110,8 @@ function CreateScene()
         CreateMushroom(Vector3(Random(90.0) - 45.0, 0.0, Random(90.0) - 45.0))
     end
 
-    -- Create a DetourCrowdManager component to the scene root (mandatory for crowd agents)
-    scene_:CreateComponent("DetourCrowdManager")
+    -- Create a CrowdManager component to the scene root (mandatory for crowd agents)
+    scene_:CreateComponent("CrowdManager")
 
     -- Create some movable barrels. We create them as crowd agents, as for moving entities it is less expensive and more convenient than using obstacles
     CreateMovingBarrels(navMesh)
@@ -262,7 +262,7 @@ function SetPathPoint(spawning)
             SpawnJack(pathPos)
         else
             -- Set crowd agents target position
-            scene_:GetComponent("DetourCrowdManager"):SetCrowdTarget(pathPos)
+            scene_:GetComponent("CrowdManager"):SetCrowdTarget(pathPos)
         end
     end
 end
@@ -380,7 +380,7 @@ function HandlePostRenderUpdate(eventType, eventData)
         -- Visualize navigation mesh, obstacles and off-mesh connections
         scene_:GetComponent("DynamicNavigationMesh"):DrawDebugGeometry(true)
         -- Visualize agents' path and position to reach
-        scene_:GetComponent("DetourCrowdManager"):DrawDebugGeometry(true)
+        scene_:GetComponent("CrowdManager"):DrawDebugGeometry(true)
     end
 end
 
@@ -403,6 +403,7 @@ function HandleCrowdAgentReposition(eventType, eventData)
     local node = eventData["Node"]:GetPtr("Node")
     local agent = eventData["CrowdAgent"]:GetPtr("CrowdAgent")
     local velocity = eventData["Velocity"]:GetVector3()
+    local timeStep = eventData["TimeStep"]:GetFloat()
 
     -- Only Jack agent has animation controller
     local animCtrl = node:GetComponent("AnimationController")
@@ -410,8 +411,8 @@ function HandleCrowdAgentReposition(eventType, eventData)
         local speed = velocity:Length()
         if animCtrl:IsPlaying(WALKING_ANI) then
             local speedRatio = speed / agent.maxSpeed
-            -- Face the direction of its velocity but moderate the turning speed based on the speed ratio as we do not have timeStep here
-            node.rotation = node.rotation:Slerp(Quaternion(Vector3.FORWARD, velocity), 0.1 * speedRatio)
+            -- Face the direction of its velocity but moderate the turning speed based on the speed ratio and timeStep
+            node.rotation = node.rotation:Slerp(Quaternion(Vector3.FORWARD, velocity), 10.0 * timeStep * speedRatio)
             -- Throttle the animation speed based on agent speed ratio (ratio = 1 is full throttle)
             animCtrl:SetSpeed(WALKING_ANI, speedRatio)
         else

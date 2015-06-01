@@ -369,7 +369,7 @@ bool DynamicNavigationMesh::Build()
         }
 
         // For a full build it's necessary to update the nav mesh
-        // not doing so will cause dependent components to crash, like DetourCrowdManager
+        // not doing so will cause dependent components to crash, like CrowdManager
         tileCache_->update(0, navMesh_);
 
         LOGDEBUG("Built navigation mesh with " + String(numTiles) + " tiles");
@@ -901,7 +901,7 @@ void DynamicNavigationMesh::AddObstacle(Obstacle* obstacle, bool silent)
         rcVcopy(pos, &obsPos.x_);
         dtObstacleRef refHolder;
 
-        // Because dtTileCache doesn't process obstacle requests while updating tiles 
+        // Because dtTileCache doesn't process obstacle requests while updating tiles
         // it's necessary update until sufficient request space is available
         while (tileCache_->isObstacleQueueFull())
             tileCache_->update(1, navMesh_);
@@ -941,7 +941,7 @@ void DynamicNavigationMesh::RemoveObstacle(Obstacle* obstacle, bool silent)
 {
     if (tileCache_ && obstacle->obstacleId_ > 0)
     {
-        // Because dtTileCache doesn't process obstacle requests while updating tiles 
+        // Because dtTileCache doesn't process obstacle requests while updating tiles
         // it's necessary update until sufficient request space is available
         while (tileCache_->isObstacleQueueFull())
             tileCache_->update(1, navMesh_);

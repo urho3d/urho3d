@@ -26,12 +26,12 @@
 
 #include "../Navigation/Navigable.h"
 #include "../Navigation/CrowdAgent.h"
-#include "../Navigation/NavigationMesh.h"
+#include "../Navigation/CrowdManager.h"
 #include "../Navigation/DynamicNavigationMesh.h"
-#include "../Navigation/OffMeshConnection.h"
 #include "../Navigation/NavArea.h"
+#include "../Navigation/NavigationMesh.h"
 #include "../Navigation/Obstacle.h"
-#include "../Script/APITemplates.h"
+#include "../Navigation/OffMeshConnection.h"
 
 namespace Urho3D
 {
@@ -57,9 +57,9 @@ static CScriptArray* DynamicNavigationMeshFindPath(const Vector3& start, const V
     return VectorToArray<Vector3>(dest, "Array<Vector3>");
 }
 
-static CScriptArray* DetourCrowdManagerGetActiveAgents(DetourCrowdManager* crowd)
+static CScriptArray* CrowdManagerGetAgents(Node* node, bool inCrowdFilter, CrowdManager* crowd)
 {
-    const PODVector<CrowdAgent*>& agents = crowd->GetActiveAgents();
+    PODVector<CrowdAgent*> agents = crowd->GetAgents(node, inCrowdFilter);
     return VectorToHandleArray<CrowdAgent>(agents, "Array<CrowdAgent@>");
 }
 
@@ -175,21 +175,22 @@ void RegisterNavArea(asIScriptEngine* engine)
     engine->RegisterObjectMethod("NavArea", "BoundingBox get_worldBoundingBox() const", asMETHOD(NavArea, GetWorldBoundingBox), asCALL_THISCALL);
 }
 
-void RegisterDetourCrowdManager(asIScriptEngine* engine)
+void RegisterCrowdManager(asIScriptEngine* engine)
 {
-    RegisterComponent<DetourCrowdManager>(engine, "DetourCrowdManager");
-    engine->RegisterObjectMethod("DetourCrowdManager", "void CreateCrowd()", asMETHOD(DetourCrowdManager, CreateCrowd), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DetourCrowdManager", "void DrawDebugGeometry(bool)", asMETHODPR(DetourCrowdManager, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DetourCrowdManager", "void set_navMesh(NavigationMesh@+)", asMETHOD(DetourCrowdManager, SetNavigationMesh), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DetourCrowdManager", "NavigationMesh@+ get_navMesh() const", asMETHOD(DetourCrowdManager, GetNavigationMesh), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DetourCrowdManager", "int get_maxAgents() const", asMETHOD(DetourCrowdManager, GetMaxAgents), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DetourCrowdManager", "void set_maxAgents(int)", asMETHOD(DetourCrowdManager, SetMaxAgents), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DetourCrowdManager", "Array<CrowdAgent@>@ GetActiveAgents()", asFUNCTION(DetourCrowdManagerGetActiveAgents), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("DetourCrowdManager", "void SetAreaCost(uint, uint, float)", asMETHOD(DetourCrowdManager, SetAreaCost), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DetourCrowdManager", "float GetAreaCost(uint, uint)", asMETHOD(DetourCrowdManager, GetAreaCost), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DetourCrowdManager", "void SetCrowdTarget(const Vector3&in, int startId = 0, int endId = M_MAX_INT)", asMETHOD(DetourCrowdManager, SetCrowdTarget), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DetourCrowdManager", "void SetCrowdVelocity(const Vector3&in, int startId = 0, int endId = M_MAX_INT)", asMETHOD(DetourCrowdManager, SetCrowdVelocity), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DetourCrowdManager", "void ResetCrowdTarget(int startId = 0, int endId = M_MAX_INT)", asMETHOD(DetourCrowdManager, ResetCrowdTarget), asCALL_THISCALL);
+    RegisterComponent<CrowdManager>(engine, "CrowdManager");
+    engine->RegisterObjectMethod("CrowdManager", "void DrawDebugGeometry(bool)", asMETHODPR(CrowdManager, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "void SetCrowdTarget(const Vector3&in, Node@+ node = null)", asMETHOD(CrowdManager, SetCrowdTarget), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "void SetCrowdVelocity(const Vector3&in, Node@+ node = null)", asMETHOD(CrowdManager, SetCrowdVelocity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "void ResetCrowdTarget(Node@+ node = null)", asMETHOD(CrowdManager, ResetCrowdTarget), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "Array<CrowdAgent@>@ GetAgents(Node@+ node = null, bool inCrowdFilter = true)", asFUNCTION(CrowdManagerGetAgents), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("CrowdManager", "int get_maxAgents() const", asMETHOD(CrowdManager, GetMaxAgents), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "void set_maxAgents(int)", asMETHOD(CrowdManager, SetMaxAgents), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "float get_maxAgentRadius() const", asMETHOD(CrowdManager, GetMaxAgentRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "void set_maxAgentRadius(float)", asMETHOD(CrowdManager, SetMaxAgentRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "void set_navMesh(NavigationMesh@+)", asMETHOD(CrowdManager, SetNavigationMesh), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "NavigationMesh@+ get_navMesh() const", asMETHOD(CrowdManager, GetNavigationMesh), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "void SetAreaCost(uint, uint, float)", asMETHOD(CrowdManager, SetAreaCost), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "float GetAreaCost(uint, uint)", asMETHOD(CrowdManager, GetAreaCost), asCALL_THISCALL);
 }
 
 void RegisterCrowdAgent(asIScriptEngine* engine)
@@ -261,14 +262,14 @@ void RegisterCrowdAgent(asIScriptEngine* engine)
 
 void RegisterNavigationAPI(asIScriptEngine* engine)
 {
-    RegisterNavigable(engine);
     RegisterNavigationMesh(engine);
-    RegisterDynamicNavigationMesh(engine);
-    RegisterOffMeshConnection(engine);
     RegisterCrowdAgent(engine);
-    RegisterDetourCrowdManager(engine);
-    RegisterObstacle(engine);
+    RegisterCrowdManager(engine);
+    RegisterDynamicNavigationMesh(engine);
     RegisterNavArea(engine);
+    RegisterNavigable(engine);
+    RegisterObstacle(engine);
+    RegisterOffMeshConnection(engine);
 }
 
 }

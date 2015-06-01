@@ -41,12 +41,14 @@ enum NavigationPushiness
 
 class CrowdAgent : public Component
 {
+    void DrawDebugGeometry(bool depthTest);
+
     void SetTargetPosition(const Vector3& position);
     void SetTargetVelocity(const Vector3& velocity);
     void ResetTarget();
     void SetUpdateNodePosition(bool unodepos);
-    void SetMaxAccel(float val);
-    void SetMaxSpeed(float val);
+    void SetMaxAccel(float maxAccel);
+    void SetMaxSpeed(float maxSpeed);
     void SetRadius(float radius);
     void SetHeight(float height);
     void SetFilterType(unsigned filterType);
@@ -63,8 +65,8 @@ class CrowdAgent : public Component
     CrowdAgentState GetAgentState() const;
     CrowdAgentTargetState GetTargetState() const;
     bool GetUpdateNodePosition() const;
-    float GetMaxSpeed() const;
     float GetMaxAccel() const;
+    float GetMaxSpeed() const;
     float GetRadius() const;
     float GetHeight() const;
     unsigned GetFilterType() const;
@@ -74,13 +76,12 @@ class CrowdAgent : public Component
     bool HasRequestedTarget() const;
     bool HasArrived() const;
     bool IsInCrowd() const;
-    void DrawDebugGeometry(bool depthTest);
 
     tolua_property__get_set Vector3 targetPosition;
     tolua_property__get_set Vector3 targetVelocity;
     tolua_property__get_set bool updateNodePosition;
-    tolua_property__get_set float maxSpeed;
     tolua_property__get_set float maxAccel;
+    tolua_property__get_set float maxSpeed;
     tolua_property__get_set float radius;
     tolua_property__get_set float height;
     tolua_property__get_set unsigned filterType;

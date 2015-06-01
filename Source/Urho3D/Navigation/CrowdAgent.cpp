@@ -25,8 +25,8 @@
 #include "../Scene/Component.h"
 #include "../Core/Context.h"
 #include "../Navigation/CrowdAgent.h"
+#include "../Navigation/CrowdManager.h"
 #include "../Graphics/DebugRenderer.h"
-#include "../Navigation/DetourCrowdManager.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Navigation/NavigationEvents.h"
@@ -123,13 +123,18 @@ void CrowdAgent::RegisterObject(Context* context)
 
 void CrowdAgent::ApplyAttributes()
 {
+    maxAccel_ = Max(0.f, maxAccel_);
+    maxSpeed_ = Max(0.f, maxSpeed_);
+    radius_ = Max(0.f, radius_);
+    height_ = Max(0.f, height_);
+
     UpdateParameters();
 
     // Set or reset target after we have attributes applied to the agent's parameters.
     CrowdAgentRequestedTarget requestedTargetType = requestedTargetType_;
     if (CA_REQUESTEDTARGET_NONE != requestedTargetType_)
     {
-        requestedTargetType_ = CA_REQUESTEDTARGET_NONE;     // Assign any dummy value so that the value check in the setter method passes
+        requestedTargetType_ = CA_REQUESTEDTARGET_NONE;     // Assign a dummy value such that the value check in the setter method passes
         if (requestedTargetType == CA_REQUESTEDTARGET_POSITION)
             SetTargetPosition(targetPosition_);
         else
@@ -277,22 +282,20 @@ void CrowdAgent::UpdateParameters(unsigned scope)
     }
 }
 
-void CrowdAgent::AddAgentToCrowd()
+int CrowdAgent::AddAgentToCrowd(bool force)
 {
     if (!node_ || !crowdManager_ || !crowdManager_->crowd_)
-        return;
+        return -1;
 
-    if (!IsInCrowd())
+    if (force || !IsInCrowd())
     {
         PROFILE(AddAgentToCrowd);
 
         agentCrowdId_ = crowdManager_->AddAgent(this, node_->GetPosition());
         if (agentCrowdId_ == -1)
-        {
-            LOGERROR("AddAgentToCrowd: Could not add agent to crowd");
-            return;
-        }
-        UpdateParameters();
+            return -1;
+
+        ApplyAttributes();
 
         previousAgentState_ = GetAgentState();
         previousTargetState_ = GetTargetState();
@@ -317,6 +320,8 @@ void CrowdAgent::AddAgentToCrowd()
         // Save the initial position to prevent CrowdAgentReposition event being triggered unnecessarily
         previousPosition_ = GetPosition();
     }
+
+    return agentCrowdId_;
 }
 
 void CrowdAgent::RemoveAgentFromCrowd()
@@ -377,21 +382,21 @@ void CrowdAgent::SetUpdateNodePosition(bool unodepos)
     }
 }
 
-void CrowdAgent::SetMaxSpeed(float speed)
+void CrowdAgent::SetMaxAccel(float maxAccel)
 {
-    if (speed != maxSpeed_)
+    if (maxAccel != maxAccel_ && maxAccel >= 0.f)
     {
-        maxSpeed_ = speed;
+        maxAccel_ = maxAccel;
         UpdateParameters(SCOPE_BASE_PARAMS);
         MarkNetworkUpdate();
     }
 }
 
-void CrowdAgent::SetMaxAccel(float accel)
+void CrowdAgent::SetMaxSpeed(float maxSpeed)
 {
-    if (accel != maxAccel_)
+    if (maxSpeed != maxSpeed_ && maxSpeed >= 0.f)
     {
-        maxAccel_ = accel;
+        maxSpeed_ = maxSpeed;
         UpdateParameters(SCOPE_BASE_PARAMS);
         MarkNetworkUpdate();
     }
@@ -399,17 +404,17 @@ void CrowdAgent::SetMaxAccel(float accel)
 
 void CrowdAgent::SetRadius(float radius)
 {
-    if (radius != radius_)
+    if (radius != radius_ && radius > 0.f)
     {
         radius_ = radius;
-        UpdateParameters(SCOPE_BASE_PARAMS);
+        UpdateParameters(SCOPE_BASE_PARAMS | SCOPE_NAVIGATION_PUSHINESS_PARAMS);
         MarkNetworkUpdate();
     }
 }
 
 void CrowdAgent::SetHeight(float height)
 {
-    if (height != height_)
+    if (height != height_ && height > 0.f)
     {
         height_ = height;
         UpdateParameters(SCOPE_BASE_PARAMS);
@@ -513,10 +518,14 @@ bool CrowdAgent::IsInCrowd() const
     return crowdManager_ && agentCrowdId_ != -1;
 }
 
-void CrowdAgent::OnCrowdAgentReposition(const Vector3& newPos, const Vector3& newVel)
+void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
 {
+    assert (ag);
     if (node_)
     {
+        Vector3 newPos(ag->npos);
+        Vector3 newVel(ag->vel);
+
         // Notify parent node of the reposition
         if (newPos != previousPosition_)
         {
@@ -528,6 +537,7 @@ void CrowdAgent::OnCrowdAgentReposition(const Vector3& newPos, const Vector3& ne
             map[CrowdAgentReposition::P_POSITION] = newPos;
             map[CrowdAgentReposition::P_VELOCITY] = newVel;
             map[CrowdAgentReposition::P_ARRIVED] = HasArrived();
+            map[CrowdAgentReposition::P_TIMESTEP] = dt;
             SendEvent(E_CROWD_AGENT_REPOSITION, map);
 
             if (updateNodePosition_)

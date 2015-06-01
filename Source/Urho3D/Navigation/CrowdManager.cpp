@@ -25,8 +25,8 @@
 #include "../Scene/Component.h"
 #include "../Core/Context.h"
 #include "../Navigation/CrowdAgent.h"
+#include "../Navigation/CrowdManager.h"
 #include "../Graphics/DebugRenderer.h"
-#include "../Navigation/DetourCrowdManager.h"
 #include "../Navigation/DynamicNavigationMesh.h"
 #include "../IO/Log.h"
 #include "../Navigation/NavigationEvents.h"
@@ -48,129 +48,48 @@ namespace Urho3D
 extern const char* NAVIGATION_CATEGORY;
 
 static const unsigned DEFAULT_MAX_AGENTS = 512;
+static const float DEFAULT_MAX_AGENT_RADIUS = 0.f;
 
-DetourCrowdManager::DetourCrowdManager(Context* context) :
-    Component(context),
-    maxAgents_(DEFAULT_MAX_AGENTS),
-    crowd_(0),
-    navigationMesh_(0),
-    agentDebug_(0)
+void CrowdAgentUpdateCallback(dtCrowdAgent* ag, float dt)
 {
-    agentBuffer_.Resize(maxAgents_);
+    static_cast<CrowdAgent*>(ag->params.userData)->OnCrowdUpdate(ag, dt);
 }
 
-DetourCrowdManager::~DetourCrowdManager()
+CrowdManager::CrowdManager(Context* context) :
+    Component(context),
+    crowd_(0),
+    maxAgents_(DEFAULT_MAX_AGENTS),
+    maxAgentRadius_(DEFAULT_MAX_AGENT_RADIUS)
+{
+}
+
+CrowdManager::~CrowdManager()
 {
     dtFreeCrowd(crowd_);
     crowd_ = 0;
-    delete agentDebug_;
-    agentDebug_ = 0;
 }
 
-void DetourCrowdManager::RegisterObject(Context* context)
+void CrowdManager::RegisterObject(Context* context)
 {
-    context->RegisterFactory<DetourCrowdManager>(NAVIGATION_CATEGORY);
+    context->RegisterFactory<CrowdManager>(NAVIGATION_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Max Agents", GetMaxAgents, SetMaxAgents, unsigned, DEFAULT_MAX_AGENTS, AM_DEFAULT);
+    ATTRIBUTE("Max Agents", unsigned, maxAgents_, DEFAULT_MAX_AGENTS, AM_DEFAULT);
+    ATTRIBUTE("Max Agent Radius", float, maxAgentRadius_, DEFAULT_MAX_AGENT_RADIUS, AM_DEFAULT);
+    //TODO: add attribute for navmesh
 }
 
-void DetourCrowdManager::SetNavigationMesh(NavigationMesh* navMesh)
+void CrowdManager::ApplyAttributes()
 {
-    navigationMesh_ = navMesh;
-    if (navigationMesh_ && !navigationMesh_->navMeshQuery_)
-        navigationMesh_->InitializeQuery();
-    CreateCrowd();
-    MarkNetworkUpdate();
+    maxAgents_ = Max(1, maxAgents_);
+    maxAgentRadius_ = Max(0.f, maxAgentRadius_);
+
+    if (crowd_ && (crowd_->getAgentCount() != maxAgents_ || crowd_->getMaxAgentRadius() != (maxAgentRadius_ > 0.f ? maxAgentRadius_ : navigationMesh_->GetAgentRadius())))
+        CreateCrowd(true);
 }
 
-void DetourCrowdManager::SetAreaCost(unsigned filterID, unsigned areaID, float weight)
+void CrowdManager::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    dtQueryFilter* filter = crowd_->getEditableFilter(filterID);
-    if (filter)
-        filter->setAreaCost((int)areaID, weight);
-}
-
-void DetourCrowdManager::SetMaxAgents(unsigned agentCt)
-{
-    maxAgents_ = agentCt;
-    if (crowd_ && crowd_->getAgentCount() > 0)
-        LOGERROR("DetourCrowdManager contains active agents, their state will be lost");
-    agentBuffer_.Resize(maxAgents_);
-    CreateCrowd();
-    if (crowd_)
-    {
-        PODVector<CrowdAgent*> agents = agents_;
-        // Reset the existing values in the agent
-        for (unsigned i = 0; i < agents.Size(); ++i)
-            agents[i]->agentCrowdId_ = -1;
-        // Add the agents back in
-        for (unsigned i = 0; i < agents.Size() && i < maxAgents_; ++i)
-            agents[i]->AddAgentToCrowd();
-        if (agents.Size() > maxAgents_)
-            LOGERROR("DetourCrowdManager: resize left " + String(agents.Size() - maxAgents_) + " agents orphaned");
-    }
-    MarkNetworkUpdate();
-}
-
-void DetourCrowdManager::SetCrowdTarget(const Vector3& position, int startId, int endId)
-{
-    startId = Max(0, startId);
-    endId = Clamp(endId, startId, agents_.Size() - 1);
-    Vector3 moveTarget(position);
-    for (int i = startId; i <= endId; ++i)
-    {
-        // Skip agent that does not have acceleration
-        if (agents_[i]->GetMaxAccel() > 0.f)
-        {
-            agents_[i]->SetTargetPosition(moveTarget);
-            // FIXME: Should reimplement this using event callback, i.e. it should be application-specific to decide what is the desired crowd formation when they reach the target
-            if (navigationMesh_)
-                moveTarget = navigationMesh_->FindNearestPoint(position + Vector3(Random(-4.5f, 4.5f), 0.0f, Random(-4.5f, 4.5f)), Vector3(1.0f, 1.0f, 1.0f));
-        }
-    }
-}
-
-void DetourCrowdManager::SetCrowdVelocity(const Vector3& velocity, int startId, int endId)
-{
-    startId = Max(0, startId);
-    endId = Clamp(endId, startId, agents_.Size() - 1);
-    for (int i = startId; i <= endId; ++i)
-    {
-        if (agents_[i]->GetMaxAccel() > 0.f)
-            agents_[i]->SetTargetVelocity(velocity);
-    }
-}
-
-void DetourCrowdManager::ResetCrowdTarget(int startId, int endId)
-{
-    startId = Max(0, startId);
-    endId = Clamp(endId, startId, agents_.Size() - 1);
-    for (int i = startId; i <= endId; ++i)
-    {
-        if (agents_[i]->GetMaxAccel() > 0.f)
-            agents_[i]->ResetTarget();
-    }
-}
-
-float DetourCrowdManager::GetAreaCost(unsigned filterID, unsigned areaID) const
-{
-    if (crowd_ && navigationMesh_)
-    {
-        const dtQueryFilter* filter = crowd_->getFilter((int)filterID);
-        if (filter)
-            return filter->getAreaCost((int)areaID);
-    }
-    return 0.0f;
-}
-
-unsigned DetourCrowdManager::GetAgentCount() const
-{
-    return crowd_ ? crowd_->getAgentCount() : 0;
-}
-
-void DetourCrowdManager::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
-{
-    if (debug && navigationMesh_.NotNull() && crowd_)
+    if (debug && crowd_)
     {
         // Current position-to-target line
         for (int i = 0; i < crowd_->getAgentCount(); i++)
@@ -211,7 +130,7 @@ void DetourCrowdManager::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     }
 }
 
-void DetourCrowdManager::DrawDebugGeometry(bool depthTest)
+void CrowdManager::DrawDebugGeometry(bool depthTest)
 {
     Scene* scene = GetScene();
     if (scene)
@@ -222,19 +141,132 @@ void DetourCrowdManager::DrawDebugGeometry(bool depthTest)
     }
 }
 
-bool DetourCrowdManager::CreateCrowd()
+void CrowdManager::SetAreaCost(unsigned filterID, unsigned areaID, float cost)
+{
+    dtQueryFilter* filter = crowd_->getEditableFilter(filterID);
+    if (filter)
+        filter->setAreaCost((int)areaID, cost);
+}
+
+void CrowdManager::SetCrowdTarget(const Vector3& position, Node* node)
+{
+    if (!crowd_)
+        return;
+
+    PODVector<CrowdAgent*> agents = GetAgents(node, false);     // Get all crowd agent components
+    Vector3 moveTarget(position);
+    for (unsigned i = 0; i < agents.Size(); ++i)
+    {
+        if (agents[i]->GetMaxAccel() > 0.f)
+        {
+            agents[i]->SetTargetPosition(moveTarget);
+            // FIXME: Should reimplement this using event callback, i.e. it should be application-specific to decide what is the desired crowd formation when they reach the target
+            if (navigationMesh_)
+                moveTarget = navigationMesh_->FindNearestPoint(position + Vector3(Random(-4.5f, 4.5f), 0.0f, Random(-4.5f, 4.5f)), Vector3(1.0f, 1.0f, 1.0f));
+        }
+    }
+}
+
+void CrowdManager::SetCrowdVelocity(const Vector3& velocity, Node* node)
+{
+    if (!crowd_)
+        return;
+
+    PODVector<CrowdAgent*> agents = GetAgents(node, true);      // Get only crowd agent components already in the crowd
+    for (unsigned i = 0; i < agents.Size(); ++i)
+    {
+        if (agents[i]->GetMaxAccel() > 0.f)
+            agents[i]->SetTargetVelocity(velocity);
+    }
+}
+
+void CrowdManager::ResetCrowdTarget(Node* node)
+{
+    if (!crowd_)
+        return;
+
+    PODVector<CrowdAgent*> agents = GetAgents(node, true);
+    for (unsigned i = 0; i < agents.Size(); ++i)
+    {
+        if (agents[i]->GetMaxAccel() > 0.f)
+            agents[i]->ResetTarget();
+    }
+}
+
+void CrowdManager::SetMaxAgents(unsigned maxAgents)
+{
+    if (maxAgents != maxAgents_ && maxAgents > 0)
+    {
+        maxAgents_ = maxAgents;
+        CreateCrowd(true);
+        MarkNetworkUpdate();
+    }
+}
+
+void CrowdManager::SetMaxAgentRadius(float maxAgentRadius)
+{
+    if (maxAgentRadius != maxAgentRadius_ && maxAgentRadius > 0.f)
+    {
+        maxAgentRadius_ = maxAgentRadius;
+        CreateCrowd(true);
+        MarkNetworkUpdate();
+    }
+}
+
+void CrowdManager::SetNavigationMesh(NavigationMesh* navMesh)
+{
+    if (navMesh != navigationMesh_ && navMesh)
+    {
+        navigationMesh_ = navMesh;
+        CreateCrowd(true);
+        MarkNetworkUpdate();
+    }
+}
+
+float CrowdManager::GetAreaCost(unsigned filterID, unsigned areaID) const
+{
+    if (crowd_ && navigationMesh_)
+    {
+        const dtQueryFilter* filter = crowd_->getFilter((int)filterID);
+        if (filter)
+            return filter->getAreaCost((int)areaID);
+    }
+    return 0.0f;
+}
+
+PODVector<CrowdAgent*> CrowdManager::GetAgents(Node* node, bool inCrowdFilter) const
+{
+    if (!node)
+        node = GetScene();
+    PODVector<CrowdAgent*> agents;
+    node->GetComponents<CrowdAgent>(agents, true);
+    if (inCrowdFilter)
+    {
+        PODVector<CrowdAgent*>::Iterator i = agents.Begin();
+        while (i != agents.End())
+        {
+            if ((*i)->IsInCrowd())
+                ++i;
+            else
+                i = agents.Erase(i);
+        }
+    }
+    return agents;
+}
+
+bool CrowdManager::CreateCrowd(bool readdCrowdAgents)
 {
     if (!navigationMesh_ || !navigationMesh_->navMesh_)
         return false;
+    if (!navigationMesh_->navMeshQuery_)
+        navigationMesh_->InitializeQuery();
 
     if (crowd_)
         dtFreeCrowd(crowd_);
     crowd_ = dtAllocCrowd();
-    if (!agentDebug_)
-        agentDebug_ = new dtCrowdAgentDebugInfo();
 
     // Initialize the crowd
-    if (!crowd_->init(maxAgents_, navigationMesh_->GetAgentRadius(), navigationMesh_->navMesh_))
+    if (!crowd_->init(maxAgents_, maxAgentRadius_ > 0.f ? maxAgentRadius_ : navigationMesh_->GetAgentRadius(), navigationMesh_->navMesh_, CrowdAgentUpdateCallback))
     {
         LOGERROR("Could not initialize DetourCrowd");
         return false;
@@ -272,62 +304,57 @@ bool DetourCrowdManager::CreateCrowd()
     params.adaptiveDepth = 3;
     crowd_->setObstacleAvoidanceParams(3, &params);
 
+    if (readdCrowdAgents)
+    {
+        PODVector<CrowdAgent*> agents = GetAgents();
+        for (unsigned i = 0; i < agents.Size(); ++i)
+        {
+            // Keep adding until the crowd cannot take it anymore
+            if (agents[i]->AddAgentToCrowd(readdCrowdAgents) == -1)
+            {
+                LOGWARNINGF("CrowdManager: %d crowd agents orphaned", agents.Size() - i);
+                break;
+            }
+        }
+    }
+
     return true;
 }
 
-int DetourCrowdManager::AddAgent(CrowdAgent* agent, const Vector3& pos)
+int CrowdManager::AddAgent(CrowdAgent* agent, const Vector3& pos)
 {
-    if (!crowd_ || navigationMesh_.Expired())
+    if (!crowd_ || !navigationMesh_ || !agent)
         return -1;
     dtCrowdAgentParams params;
     params.userData = agent;
-    if (agent->radius_ <= 0.0f)
+    if (agent->radius_ == 0.f)
         agent->radius_ = navigationMesh_->GetAgentRadius();
-    params.radius = agent->radius_;
-    if (agent->height_ <= 0.0f)
+    if (agent->height_ == 0.f)
         agent->height_ = navigationMesh_->GetAgentHeight();
-    params.height = agent->height_;
-    params.queryFilterType = (unsigned char)agent->filterType_;
-    params.maxAcceleration = agent->maxAccel_;
-    params.maxSpeed = agent->maxSpeed_;
-    // TODO: should be initialized according to agent's pushiness
-    params.separationWeight = 2.0f;
-    params.collisionQueryRange = params.radius * 8.0f;
-    params.pathOptimizationRange = params.radius * 30.0f;
-    params.updateFlags = DT_CROWD_ANTICIPATE_TURNS
-        | DT_CROWD_OPTIMIZE_VIS
-        | DT_CROWD_OPTIMIZE_TOPO
-        | DT_CROWD_OBSTACLE_AVOIDANCE;
-    params.obstacleAvoidanceType = 3;
-    dtPolyRef polyRef;
+
     float nearestPos[3];
     rcVcopy(nearestPos, &pos.x_);
     dtStatus status = navigationMesh_->navMeshQuery_->findNearestPoly(
         pos.Data(),
         crowd_->getQueryExtents(),
         crowd_->getFilter(agent->filterType_),
-        &polyRef,
+        0,
         nearestPos);
 
-    const int agentID = crowd_->addAgent(nearestPos, &params);
-    if (agentID != -1)
-        agents_.Push(agent);
-    return agentID;
+    return crowd_->addAgent(nearestPos, &params);
 }
 
-void DetourCrowdManager::RemoveAgent(CrowdAgent* agent)
+void CrowdManager::RemoveAgent(CrowdAgent* agent)
 {
-    if (!crowd_)
+    if (!crowd_ || !agent)
         return;
-    // Clear user data
     dtCrowdAgent* agt = crowd_->getEditableAgent(agent->GetAgentCrowdId());
     if (agt)
         agt->params.userData = 0;
     crowd_->removeAgent(agent->GetAgentCrowdId());
-    agents_.Remove(agent);
 }
 
-bool DetourCrowdManager::SetAgentTarget(CrowdAgent* agent, const Vector3& target)
+bool CrowdManager::SetAgentTarget(CrowdAgent* agent, const Vector3& target)
 {
     if (!crowd_ || !navigationMesh_ || !agent)
         return false;
@@ -345,7 +372,7 @@ bool DetourCrowdManager::SetAgentTarget(CrowdAgent* agent, const Vector3& target
         crowd_->getAgent(agent->GetAgentCrowdId())->targetState != DT_CROWDAGENT_TARGET_FAILED;
 }
 
-Vector3 DetourCrowdManager::GetClosestWalkablePosition(const Vector3& pos) const
+Vector3 CrowdManager::GetClosestWalkablePosition(const Vector3& pos) const
 {
     if (!crowd_ || !navigationMesh_)
         return Vector3::ZERO;
@@ -360,39 +387,20 @@ Vector3 DetourCrowdManager::GetClosestWalkablePosition(const Vector3& pos) const
     return Vector3(closest);
 }
 
-void DetourCrowdManager::Update(float delta)
+void CrowdManager::Update(float delta)
 {
-    if (!crowd_)
+    if (!crowd_ || !navigationMesh_)
         return;
-
     PROFILE(UpdateCrowd);
-
-    crowd_->update(delta, agentDebug_);
-
-    memset(&agentBuffer_[0], 0, maxAgents_ * sizeof(dtCrowdAgent*));
-    const int count = crowd_->getActiveAgents(&agentBuffer_[0], maxAgents_);
-
-    {
-        PROFILE(ApplyCrowdUpdates);
-        for (int i = 0; i < count; i++)
-        {
-            dtCrowdAgent* agent = agentBuffer_[i];
-            if (agent)
-            {
-                CrowdAgent* crowdAgent = static_cast<CrowdAgent*>(agent->params.userData);
-                if (crowdAgent)
-                    crowdAgent->OnCrowdAgentReposition(Vector3(agent->npos), Vector3(agent->vel));
-            }
-        }
-    }
+    crowd_->update(delta, 0);
 }
 
-const dtCrowdAgent* DetourCrowdManager::GetCrowdAgent(int agent)
+const dtCrowdAgent* CrowdManager::GetCrowdAgent(int agent)
 {
     return crowd_ ? crowd_->getAgent(agent) : 0;
 }
 
-void DetourCrowdManager::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData)
+void CrowdManager::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace SceneSubsystemUpdate;
 
@@ -400,26 +408,14 @@ void DetourCrowdManager::HandleSceneSubsystemUpdate(StringHash eventType, Varian
         Update(eventData[P_TIMESTEP].GetFloat());
 }
 
-void DetourCrowdManager::HandleNavMeshFullRebuild(StringHash eventType, VariantMap& eventData)
+void CrowdManager::HandleNavMeshFullRebuild(StringHash eventType, VariantMap& eventData)
 {
     using namespace NavigationMeshRebuilt;
 
     // The mesh being rebuilt may not have existed before
     NavigationMesh* navMesh = static_cast<NavigationMesh*>(eventData[P_MESH].GetPtr());
     if (!navigationMesh_ || !crowd_)
-    {
         SetNavigationMesh(navMesh);
-
-        // Scan for existing agents that are potentially important
-        PODVector<Node*> agents;
-        GetScene()->GetChildrenWithComponent<CrowdAgent>(agents, true);
-        for (unsigned i = 0; i < agents.Size(); ++i)
-        {
-            CrowdAgent* agent = agents[i]->GetComponent<CrowdAgent>();
-            if (agent && agent->IsEnabledEffective())
-                agent->AddAgentToCrowd();
-        }
-    }
 }
 
 void DetourCrowdManager::OnSceneSet(Scene* scene)
@@ -428,17 +424,17 @@ void DetourCrowdManager::OnSceneSet(Scene* scene)
     // to the scene's NavigationMesh
     if (scene)
     {
-        SubscribeToEvent(scene, E_SCENESUBSYSTEMUPDATE, HANDLER(DetourCrowdManager, HandleSceneSubsystemUpdate));
+        SubscribeToEvent(scene, E_SCENESUBSYSTEMUPDATE, HANDLER(CrowdManager, HandleSceneSubsystemUpdate));
         NavigationMesh* mesh = GetScene()->GetComponent<NavigationMesh>();
         if (!mesh)
             mesh = GetScene()->GetComponent<DynamicNavigationMesh>();
         if (mesh)
         {
-            SubscribeToEvent(mesh, E_NAVIGATION_MESH_REBUILT, HANDLER(DetourCrowdManager, HandleNavMeshFullRebuild));
+            SubscribeToEvent(mesh, E_NAVIGATION_MESH_REBUILT, HANDLER(CrowdManager, HandleNavMeshFullRebuild));
             SetNavigationMesh(mesh);
         }
         else
-            LOGERROR("DetourCrowdManager requires an existing navigation mesh");
+            LOGERROR("CrowdManager requires an existing navigation mesh");
     }
     else
     {
@@ -446,7 +442,6 @@ void DetourCrowdManager::OnSceneSet(Scene* scene)
         UnsubscribeFromEvent(E_NAVIGATION_MESH_REBUILT);
         navigationMesh_.Reset();
     }
-
 }
 
 }

@@ -1,0 +1,24 @@
+$#include "Navigation/CrowdManager.h"
+
+class CrowdManager : public Component
+{
+    void DrawDebugGeometry(bool depthTest);
+
+    void SetCrowdTarget(const Vector3& position, Node* node = 0);
+    void SetCrowdVelocity(const Vector3& velocity, Node* node = 0);
+    void ResetCrowdTarget(Node* node = 0);
+    void SetMaxAgents(unsigned agentCt);
+    void SetMaxAgentRadius(float maxAgentRadius);
+    void SetNavigationMesh(NavigationMesh *navMesh);
+    void SetAreaCost(unsigned filterID, unsigned areaID, float cost);
+
+    PODVector<CrowdAgent*> GetAgents(Node* node = 0, bool inCrowdFilter = true) const;
+    unsigned GetMaxAgents() const;
+    float GetMaxAgentRadius() const;
+    NavigationMesh* GetNavigationMesh() const;
+    float GetAreaCost(unsigned filterID, unsigned areaID) const;
+
+    tolua_property__get_set int maxAgents;
+    tolua_property__get_set float maxAgentRadius;
+    tolua_property__get_set NavigationMesh* navigationMesh;
+};

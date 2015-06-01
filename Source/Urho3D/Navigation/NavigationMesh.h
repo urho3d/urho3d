@@ -71,7 +71,7 @@ struct NavigationGeometryInfo
 class URHO3D_API NavigationMesh : public Component
 {
     OBJECT(NavigationMesh);
-    friend class DetourCrowdManager;
+    friend class CrowdManager;
 
 public:
     /// Construct.

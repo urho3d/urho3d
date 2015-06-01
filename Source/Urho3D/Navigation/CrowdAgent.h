@@ -23,7 +23,7 @@
 #pragma once
 
 #include "../Scene/Component.h"
-#include "../Navigation/DetourCrowdManager.h"
+#include "../Navigation/CrowdManager.h"
 
 namespace Urho3D
 {
@@ -67,11 +67,13 @@ enum NavigationPushiness
     NAVIGATIONPUSHINESS_HIGH
 };
 
-/// Crowd agent component, requires a DetourCrowdManager in the scene. When not set explicitly, agent's radius and height are defaulted to navigation mesh's agent radius and height, respectively.
+/// Crowd agent component, requires a CrowdManager component in the scene. When not set explicitly, agent's radius and height are defaulted to navigation mesh's agent radius and height, respectively.
 class URHO3D_API CrowdAgent : public Component
 {
     OBJECT(CrowdAgent);
-    friend class DetourCrowdManager;
+
+    friend class CrowdManager;
+    friend void CrowdAgentUpdateCallback(dtCrowdAgent* ag, float dt);
 
 public:
     /// Construct.
@@ -99,13 +101,13 @@ public:
     /// Update the node position. When set to false, the node position should be updated by other means (e.g. using Physics) in response to the E_CROWD_AGENT_REPOSITION event.
     void SetUpdateNodePosition(bool unodepos);
     /// Set the agent's max acceleration.
-    void SetMaxAccel(float val);
+    void SetMaxAccel(float maxAccel);
     /// Set the agent's max velocity.
-    void SetMaxSpeed(float val);
+    void SetMaxSpeed(float maxSpeed);
     /// Set the agent's radius.
-    void SetRadius(float val);
+    void SetRadius(float radius);
     /// Set the agent's height.
-    void SetHeight(float val);
+    void SetHeight(float height);
     /// Set the agent's filter type.
     void SetFilterType(unsigned filterType);
     /// Set the agent's obstacle avoidance type.
@@ -135,10 +137,10 @@ public:
     bool GetUpdateNodePosition() const { return updateNodePosition_; }
     /// Return the agent id.
     int GetAgentCrowdId() const { return agentCrowdId_; }
-    /// Get the agent's max velocity.
-    float GetMaxSpeed() const { return maxSpeed_; }
     /// Get the agent's max acceleration.
     float GetMaxAccel() const { return maxAccel_; }
+    /// Get the agent's max velocity.
+    float GetMaxSpeed() const { return maxSpeed_; }
     /// Get the agent's radius.
     float GetRadius() const { return radius_; }
     /// Get the agent's height.
@@ -164,8 +166,8 @@ public:
     void SetAgentDataAttr(const PODVector<unsigned char>& value);
 
 protected:
-    /// Update the nodes position if updateNodePosition is set. Is called in DetourCrowdManager::Update().
-    virtual void OnCrowdAgentReposition(const Vector3& newPos, const Vector3& newVel);
+    /// Handle crowd agent being updated. It is called by CrowdManager::Update() via callback.
+    virtual void OnCrowdUpdate(dtCrowdAgent* ag, float dt);
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
     /// Handle node being assigned.
@@ -178,12 +180,12 @@ private:
     /// Update Detour crowd agent parameter.
     void UpdateParameters(unsigned scope = M_MAX_UNSIGNED);
     /// Add agent into crowd.
-    void AddAgentToCrowd();
+    int AddAgentToCrowd(bool force = false);
     /// Remove agent from crowd.
     void RemoveAgentFromCrowd();
-    /// Detour crowd manager.
-    WeakPtr<DetourCrowdManager> crowdManager_;
-    /// DetourCrowd reference to this agent.
+    /// Crowd manager.
+    WeakPtr<CrowdManager> crowdManager_;
+    /// Crowd manager reference to this agent.
     int agentCrowdId_;
     /// Reference to poly closest to requested target position.
     unsigned targetRef_;
