@@ -11586,6 +11586,7 @@ Properties:
 - StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
+- uint components // readonly
 - bool compressed // readonly
 - bool dataLost // readonly
 - TextureFilterMode filterMode
@@ -11629,6 +11630,7 @@ Properties:
 - StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
+- uint components // readonly
 - bool compressed // readonly
 - bool dataLost // readonly
 - TextureFilterMode filterMode
@@ -11673,6 +11675,7 @@ Properties:
 - StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
+- uint components // readonly
 - bool compressed // readonly
 - bool dataLost // readonly
 - TextureFilterMode filterMode
@@ -11717,6 +11720,7 @@ Properties:
 - StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
+- uint components // readonly
 - bool compressed // readonly
 - bool dataLost // readonly
 - TextureFilterMode filterMode

@@ -102,6 +102,8 @@ public:
     unsigned GetDataSize(int width, int height, int depth) const;
     /// Return data size in bytes for a pixel or block row.
     unsigned GetRowDataSize(int width) const;
+    /// Return number of image components required to receive pixel data from GetData(), or 0 for compressed images.
+    unsigned GetComponents() const;
     /// Return whether the parameters are dirty.
     bool GetParametersDirty() const { return parametersDirty_ || !sampler_; }
 

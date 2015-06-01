@@ -26,12 +26,14 @@ class Texture : public Resource
     TextureUsage GetUsage() const;
     unsigned GetDataSize(int width, int height) const;
     unsigned GetRowDataSize(int width) const;
-    
+    unsigned GetComponents() const;
+
     tolua_readonly tolua_property__get_set unsigned format;
     tolua_readonly tolua_property__is_set bool compressed;
     tolua_readonly tolua_property__get_set unsigned levels;
     tolua_readonly tolua_property__get_set int width;
     tolua_readonly tolua_property__get_set int height;
+    tolua_readonly tolua_property__get_set unsigned components;
     tolua_property__get_set TextureFilterMode filterMode;
     tolua_property__get_set Color& borderColor;
     tolua_property__get_set bool sRGB;

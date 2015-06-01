@@ -10661,6 +10661,8 @@ Color borderColor;
 /* readonly */
 String category;
 /* readonly */
+uint components;
+/* readonly */
 bool compressed;
 /* readonly */
 bool dataLost;
@@ -10717,6 +10719,8 @@ StringHash baseType;
 Color borderColor;
 /* readonly */
 String category;
+/* readonly */
+uint components;
 /* readonly */
 bool compressed;
 /* readonly */
@@ -10777,6 +10781,8 @@ Color borderColor;
 /* readonly */
 String category;
 /* readonly */
+uint components;
+/* readonly */
 bool compressed;
 /* readonly */
 bool dataLost;
@@ -10835,6 +10841,8 @@ StringHash baseType;
 Color borderColor;
 /* readonly */
 String category;
+/* readonly */
+uint components;
 /* readonly */
 bool compressed;
 /* readonly */

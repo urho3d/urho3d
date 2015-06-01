@@ -5835,6 +5835,7 @@ Methods:
 - TextureUsage GetUsage() const
 - unsigned GetDataSize(int width, int height) const
 - unsigned GetRowDataSize(int width) const
+- unsigned GetComponents() const
 
 Properties:
 
@@ -5843,6 +5844,7 @@ Properties:
 - unsigned levels (readonly)
 - int width (readonly)
 - int height (readonly)
+- unsigned components (readonly)
 - TextureFilterMode filterMode
 - Color& borderColor
 - bool sRGB
