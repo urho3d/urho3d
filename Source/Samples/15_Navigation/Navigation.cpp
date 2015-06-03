@@ -160,8 +160,10 @@ void Navigation::CreateScene()
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
     
-    // Set an initial position for the camera scene node above the plane
-    cameraNode_->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
+    // Set an initial position for the camera scene node above the plane and looking down
+    cameraNode_->SetPosition(Vector3(0.0f, 50.0f, 0.0f));
+    pitch_ = 80.0f;
+    cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
 }
 
 void Navigation::CreateUI()

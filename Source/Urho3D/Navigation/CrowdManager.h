@@ -24,6 +24,12 @@
 
 #include "../Scene/Component.h"
 
+#ifdef DT_POLYREF64
+typedef uint64_t dtPolyRef;
+#else
+typedef unsigned int dtPolyRef;
+#endif
+
 class dtCrowd;
 struct dtCrowdAgent;
 
@@ -69,6 +75,22 @@ public:
     /// Set the cost of an area-type for the specified navigation filter type.
     void SetAreaCost(unsigned filterTypeID, unsigned areaID, float cost);
 
+    /// Get all the crowd agent components in the specified node hierarchy. If the node is not specified then use scene node. When inCrowdFilter is set to true then only get agents that are in the crowd.
+    PODVector<CrowdAgent*> GetAgents(Node* node = 0, bool inCrowdFilter = true) const;
+    /// Find the nearest point on the navigation mesh to a given point using the crowd initialized query extent (based on maxAgentRadius) and the specified crowd filter type.
+    Vector3 FindNearestPoint(const Vector3& point, int filterType, dtPolyRef* nearestRef = 0);
+    /// Try to move along the surface from one point to another using the crowd initialized query extent (based on maxAgentRadius) and the specified crowd filter type.
+    Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, int filterType, int maxVisited = 3);
+    /// Find a path between world space points using the crowd initialized query extent (based on maxAgentRadius) and the specified crowd filter type. Return non-empty list of points if successful.
+    void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, int filterType);
+    /// Return a random point on the navigation mesh using the crowd initialized query extent (based on maxAgentRadius) and the specified crowd filter type.
+    Vector3 GetRandomPoint(int filterType, dtPolyRef* randomRef = 0);
+    /// Return a random point on the navigation mesh within a circle using the crowd initialized query extent (based on maxAgentRadius) and the specified crowd filter type. The circle radius is only a guideline and in practice the returned point may be further away.
+    Vector3 GetRandomPointInCircle(const Vector3& center, float radius, int filterType, dtPolyRef* randomRef = 0);
+    /// Return distance to wall from a point using the crowd initialized query extent (based on maxAgentRadius) and the specified crowd filter type. Maximum search radius must be specified.
+    float GetDistanceToWall(const Vector3& point, float radius, int filterType, Vector3* hitPos = 0, Vector3* hitNormal = 0);
+    /// Perform a walkability raycast on the navigation mesh between start and end using the crowd initialized query extent (based on maxAgentRadius) and the specified crowd filter type. Return the point where a wall was hit, or the end point if no walls.
+    Vector3 Raycast(const Vector3& start, const Vector3& end, int filterType, Vector3* hitNormal = 0);
     /// Get the maximum number of agents.
     unsigned GetMaxAgents() const { return maxAgents_; }
     /// Get the maximum radius of any agent.
@@ -78,9 +100,6 @@ public:
     /// Get the cost of an area-type for the specified navigation filter type.
     float GetAreaCost(unsigned filterTypeID, unsigned areaID) const;
 
-    /// Get all the crowd agent components in the specified node hierarchy. If the node is not specified then use scene node. When inCrowdFilter is set to true then only get agents that are in the crowd.
-    PODVector<CrowdAgent*> GetAgents(Node* node = 0, bool inCrowdFilter = true) const;
-
 protected:
     /// Create internal Detour crowd object for the specified navigation mesh. If readdCrowdAgents is true then attempt to re-add existing agents in the previous crowd back to the newly created crowd.
     bool CreateCrowd(bool readdCrowdAgents = false);
@@ -88,11 +107,6 @@ protected:
     int AddAgent(CrowdAgent* agent, const Vector3& pos);
     /// Removes the detour crowd agent.
     void RemoveAgent(CrowdAgent* agent);
-
-    /// Set the move target for the specified agent.
-    bool SetAgentTarget(CrowdAgent* agent, const Vector3& target);
-    /// Get the closest walkable position.
-    Vector3 GetClosestWalkablePosition(const Vector3& pos) const;
 
 protected:
     /// Update the crowd simulation.

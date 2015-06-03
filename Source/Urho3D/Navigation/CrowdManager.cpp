@@ -80,6 +80,7 @@ void CrowdManager::RegisterObject(Context* context)
 
 void CrowdManager::ApplyAttributes()
 {
+    // Values from Editor, saved-file, or network must be checked before applying
     maxAgents_ = Max(1, maxAgents_);
     maxAgentRadius_ = Max(0.f, maxAgentRadius_);
 
@@ -157,13 +158,21 @@ void CrowdManager::SetCrowdTarget(const Vector3& position, Node* node)
     Vector3 moveTarget(position);
     for (unsigned i = 0; i < agents.Size(); ++i)
     {
-        if (agents[i]->GetMaxAccel() > 0.f)
-        {
-            agents[i]->SetTargetPosition(moveTarget);
-            // FIXME: Should reimplement this using event callback, i.e. it should be application-specific to decide what is the desired crowd formation when they reach the target
-            if (navigationMesh_)
-                moveTarget = navigationMesh_->FindNearestPoint(position + Vector3(Random(-4.5f, 4.5f), 0.0f, Random(-4.5f, 4.5f)), Vector3(1.0f, 1.0f, 1.0f));
-        }
+        CrowdAgent* agent = agents[i];
+        // Give application a chance to determine the desired crowd formation when they reach the target position
+        using namespace CrowdAgentFormation;
+
+        VariantMap& map = GetEventDataMap();
+        map[P_NODE] = agent->GetNode();
+        map[P_CROWD_AGENT] = agent;
+        map[P_INDEX] = i;
+        map[P_SIZE] = agents.Size();
+        map[P_POSITION] = moveTarget;   // Expect the event handler will modify this position accordingly
+
+        SendEvent(E_CROWD_AGENT_FORMATION, map);
+
+        moveTarget = map[P_POSITION].GetVector3();
+        agent->SetTargetPosition(moveTarget);
     }
 }
 
@@ -174,10 +183,7 @@ void CrowdManager::SetCrowdVelocity(const Vector3& velocity, Node* node)
 
     PODVector<CrowdAgent*> agents = GetAgents(node, true);      // Get only crowd agent components already in the crowd
     for (unsigned i = 0; i < agents.Size(); ++i)
-    {
-        if (agents[i]->GetMaxAccel() > 0.f)
-            agents[i]->SetTargetVelocity(velocity);
-    }
+        agents[i]->SetTargetVelocity(velocity);
 }
 
 void CrowdManager::ResetCrowdTarget(Node* node)
@@ -187,10 +193,7 @@ void CrowdManager::ResetCrowdTarget(Node* node)
 
     PODVector<CrowdAgent*> agents = GetAgents(node, true);
     for (unsigned i = 0; i < agents.Size(); ++i)
-    {
-        if (agents[i]->GetMaxAccel() > 0.f)
-            agents[i]->ResetTarget();
-    }
+        agents[i]->ResetTarget();
 }
 
 void CrowdManager::SetMaxAgents(unsigned maxAgents)
@@ -254,12 +257,58 @@ PODVector<CrowdAgent*> CrowdManager::GetAgents(Node* node, bool inCrowdFilter) c
     return agents;
 }
 
+Vector3 CrowdManager::FindNearestPoint(const Vector3& point, int filterType, dtPolyRef* nearestRef)
+{
+    if (nearestRef)
+        *nearestRef = 0;
+    return crowd_ && navigationMesh_ ? navigationMesh_->FindNearestPoint(point, crowd_->getQueryExtents(), crowd_->getFilter(filterType), nearestRef) : point;
+}
+
+Vector3 CrowdManager::MoveAlongSurface(const Vector3& start, const Vector3& end, int filterType, int maxVisited)
+{
+    return crowd_ && navigationMesh_ ? navigationMesh_->MoveAlongSurface(start, end, crowd_->getQueryExtents(), maxVisited, crowd_->getFilter(filterType)) : end;
+}
+
+void CrowdManager::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, int filterType)
+{
+    if (crowd_ && navigationMesh_)
+        navigationMesh_->FindPath(dest, start, end, crowd_->getQueryExtents(), crowd_->getFilter(filterType));
+}
+
+Vector3 CrowdManager::GetRandomPoint(int filterType, dtPolyRef* randomRef)
+{
+    if (randomRef)
+        *randomRef = 0;
+    return crowd_ && navigationMesh_ ? navigationMesh_->GetRandomPoint(crowd_->getFilter(filterType), randomRef) : Vector3::ZERO;
+}
+
+Vector3 CrowdManager::GetRandomPointInCircle(const Vector3& center, float radius, int filterType, dtPolyRef* randomRef)
+{
+    if (randomRef)
+        *randomRef = 0;
+    return crowd_ && navigationMesh_ ? navigationMesh_->GetRandomPointInCircle(center, radius, crowd_->getQueryExtents(), crowd_->getFilter(filterType), randomRef) : center;
+}
+
+float CrowdManager::GetDistanceToWall(const Vector3& point, float radius, int filterType, Vector3* hitPos, Vector3* hitNormal)
+{
+    if (hitPos)
+        *hitPos = Vector3::ZERO;
+    if (hitNormal)
+        *hitNormal = Vector3::DOWN;
+    return crowd_ && navigationMesh_ ? navigationMesh_->GetDistanceToWall(point, radius, crowd_->getQueryExtents(), crowd_->getFilter(filterType), hitPos, hitNormal) : radius;
+}
+
+Vector3 CrowdManager::Raycast(const Vector3& start, const Vector3& end, int filterType, Vector3* hitNormal)
+{
+    if (hitNormal)
+        *hitNormal = Vector3::DOWN;
+    return crowd_ && navigationMesh_ ? navigationMesh_->Raycast(start, end, crowd_->getQueryExtents(), crowd_->getFilter(filterType), hitNormal) : end;
+}
+
 bool CrowdManager::CreateCrowd(bool readdCrowdAgents)
 {
-    if (!navigationMesh_ || !navigationMesh_->navMesh_)
+    if (!navigationMesh_ || !navigationMesh_->InitializeQuery())
         return false;
-    if (!navigationMesh_->navMeshQuery_)
-        navigationMesh_->InitializeQuery();
 
     if (crowd_)
         dtFreeCrowd(crowd_);
@@ -310,7 +359,7 @@ bool CrowdManager::CreateCrowd(bool readdCrowdAgents)
         for (unsigned i = 0; i < agents.Size(); ++i)
         {
             // Keep adding until the crowd cannot take it anymore
-            if (agents[i]->AddAgentToCrowd(readdCrowdAgents) == -1)
+            if (agents[i]->AddAgentToCrowd(true) == -1)
             {
                 LOGWARNINGF("CrowdManager: %d crowd agents orphaned", agents.Size() - i);
                 break;
@@ -331,17 +380,7 @@ int CrowdManager::AddAgent(CrowdAgent* agent, const Vector3& pos)
         agent->radius_ = navigationMesh_->GetAgentRadius();
     if (agent->height_ == 0.f)
         agent->height_ = navigationMesh_->GetAgentHeight();
-
-    float nearestPos[3];
-    rcVcopy(nearestPos, &pos.x_);
-    dtStatus status = navigationMesh_->navMeshQuery_->findNearestPoly(
-        pos.Data(),
-        crowd_->getQueryExtents(),
-        crowd_->getFilter(agent->filterType_),
-        0,
-        nearestPos);
-
-    return crowd_->addAgent(nearestPos, &params);
+    return crowd_->addAgent(pos.Data(), &params);
 }
 
 void CrowdManager::RemoveAgent(CrowdAgent* agent)
@@ -352,39 +391,6 @@ void CrowdManager::RemoveAgent(CrowdAgent* agent)
     if (agt)
         agt->params.userData = 0;
     crowd_->removeAgent(agent->GetAgentCrowdId());
-}
-
-bool CrowdManager::SetAgentTarget(CrowdAgent* agent, const Vector3& target)
-{
-    if (!crowd_ || !navigationMesh_ || !agent)
-        return false;
-    int crowdId = agent->GetAgentCrowdId();
-    dtPolyRef polyRef;
-    float nearestPos[3];
-    dtStatus status = navigationMesh_->navMeshQuery_->findNearestPoly(
-        target.Data(),
-        crowd_->getQueryExtents(),
-        crowd_->getFilter(agent->filterType_),
-        &polyRef,
-        nearestPos);
-
-    return !dtStatusFailed(status) && crowd_->requestMoveTarget(crowdId, polyRef, nearestPos) &&
-        crowd_->getAgent(agent->GetAgentCrowdId())->targetState != DT_CROWDAGENT_TARGET_FAILED;
-}
-
-Vector3 CrowdManager::GetClosestWalkablePosition(const Vector3& pos) const
-{
-    if (!crowd_ || !navigationMesh_)
-        return Vector3::ZERO;
-    float closest[3];
-    dtQueryFilter filter;
-    dtStatus status = navigationMesh_->navMeshQuery_->findNearestPoly(
-        pos.Data(),
-        crowd_->getQueryExtents(),
-        &filter,
-        0,
-        closest);
-    return Vector3(closest);
 }
 
 void CrowdManager::Update(float delta)
@@ -413,9 +419,7 @@ void CrowdManager::HandleNavMeshFullRebuild(StringHash eventType, VariantMap& ev
     using namespace NavigationMeshRebuilt;
 
     // The mesh being rebuilt may not have existed before
-    NavigationMesh* navMesh = static_cast<NavigationMesh*>(eventData[P_MESH].GetPtr());
-    if (!navigationMesh_ || !crowd_)
-        SetNavigationMesh(navMesh);
+    SetNavigationMesh(static_cast<NavigationMesh*>(eventData[P_MESH].GetPtr()));
 }
 
 void DetourCrowdManager::OnSceneSet(Scene* scene)
@@ -425,9 +429,7 @@ void DetourCrowdManager::OnSceneSet(Scene* scene)
     if (scene)
     {
         SubscribeToEvent(scene, E_SCENESUBSYSTEMUPDATE, HANDLER(CrowdManager, HandleSceneSubsystemUpdate));
-        NavigationMesh* mesh = GetScene()->GetComponent<NavigationMesh>();
-        if (!mesh)
-            mesh = GetScene()->GetComponent<DynamicNavigationMesh>();
+        NavigationMesh* mesh = GetScene()->GetDerivedComponent<NavigationMesh>();
         if (mesh)
         {
             SubscribeToEvent(mesh, E_NAVIGATION_MESH_REBUILT, HANDLER(CrowdManager, HandleNavMeshFullRebuild));

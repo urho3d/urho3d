@@ -123,10 +123,13 @@ void CrowdAgent::RegisterObject(Context* context)
 
 void CrowdAgent::ApplyAttributes()
 {
+    // Values from Editor, saved-file, or network must be checked before applying
     maxAccel_ = Max(0.f, maxAccel_);
     maxSpeed_ = Max(0.f, maxSpeed_);
     radius_ = Max(0.f, radius_);
     height_ = Max(0.f, height_);
+    filterType_ = Min(filterType_, DT_CROWD_MAX_QUERY_FILTER_TYPE - 1);
+    obstacleAvoidanceType_ = Min(obstacleAvoidanceType_, DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS - 1);
 
     UpdateParameters();
 
@@ -303,13 +306,15 @@ int CrowdAgent::AddAgentToCrowd(bool force)
         // Agent created, but initial state is invalid and needs to be addressed
         if (previousAgentState_ == CA_STATE_INVALID)
         {
-            VariantMap& map = GetContext()->GetEventDataMap();
-            map[CrowdAgentFailure::P_NODE] = GetNode();
-            map[CrowdAgentFailure::P_CROWD_AGENT] = this;
-            map[CrowdAgentFailure::P_CROWD_TARGET_STATE] = previousTargetState_;
-            map[CrowdAgentFailure::P_CROWD_AGENT_STATE] = previousAgentState_;
-            map[CrowdAgentFailure::P_POSITION] = GetPosition();
-            map[CrowdAgentFailure::P_VELOCITY] = GetActualVelocity();
+            using namespace CrowdAgentFailure;
+
+            VariantMap& map = GetEventDataMap();
+            map[P_NODE] = GetNode();
+            map[P_CROWD_AGENT] = this;
+            map[P_CROWD_TARGET_STATE] = previousTargetState_;
+            map[P_CROWD_AGENT_STATE] = previousAgentState_;
+            map[P_POSITION] = GetPosition();
+            map[P_VELOCITY] = GetActualVelocity();
             SendEvent(E_CROWD_AGENT_FAILURE, map);
 
             // Reevaluate states as handling of event may have resulted in changes
@@ -344,7 +349,11 @@ void CrowdAgent::SetTargetPosition(const Vector3& position)
         if (!IsInCrowd())
             AddAgentToCrowd();
         if (IsInCrowd())   // Make sure the previous method call is successful
-            crowdManager_->SetAgentTarget(this, position);
+        {
+            dtPolyRef nearestRef;
+            Vector3 nearestPos = crowdManager_->FindNearestPoint(position, filterType_, &nearestRef);
+            crowdManager_->GetCrowd()->requestMoveTarget(agentCrowdId_, nearestRef, nearestPos.Data());
+        }
     }
 }
 
@@ -531,13 +540,15 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
         {
             previousPosition_ = newPos;
 
-            VariantMap& map = GetContext()->GetEventDataMap();
-            map[CrowdAgentReposition::P_NODE] = node_;
-            map[CrowdAgentReposition::P_CROWD_AGENT] = this;
-            map[CrowdAgentReposition::P_POSITION] = newPos;
-            map[CrowdAgentReposition::P_VELOCITY] = newVel;
-            map[CrowdAgentReposition::P_ARRIVED] = HasArrived();
-            map[CrowdAgentReposition::P_TIMESTEP] = dt;
+            using namespace CrowdAgentReposition;
+
+            VariantMap& map = GetEventDataMap();
+            map[P_NODE] = node_;
+            map[P_CROWD_AGENT] = this;
+            map[P_POSITION] = newPos;
+            map[P_VELOCITY] = newVel;
+            map[P_ARRIVED] = HasArrived();
+            map[P_TIMESTEP] = dt;
             SendEvent(E_CROWD_AGENT_REPOSITION, map);
 
             if (updateNodePosition_)
@@ -553,25 +564,27 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
         CrowdAgentState newAgentState = GetAgentState();
         if (newAgentState != previousAgentState_ || newTargetState != previousTargetState_)
         {
-            VariantMap& map = GetContext()->GetEventDataMap();
-            map[CrowdAgentStateChanged::P_NODE] = node_;
-            map[CrowdAgentStateChanged::P_CROWD_AGENT] = this;
-            map[CrowdAgentStateChanged::P_CROWD_TARGET_STATE] = newTargetState;
-            map[CrowdAgentStateChanged::P_CROWD_AGENT_STATE] = newAgentState;
-            map[CrowdAgentStateChanged::P_POSITION] = newPos;
-            map[CrowdAgentStateChanged::P_VELOCITY] = newVel;
+            using namespace CrowdAgentStateChanged;
+
+            VariantMap& map = GetEventDataMap();
+            map[P_NODE] = node_;
+            map[P_CROWD_AGENT] = this;
+            map[P_CROWD_TARGET_STATE] = newTargetState;
+            map[P_CROWD_AGENT_STATE] = newAgentState;
+            map[P_POSITION] = newPos;
+            map[P_VELOCITY] = newVel;
             SendEvent(E_CROWD_AGENT_STATE_CHANGED, map);
 
             // Send a failure event if either state is a failed status
             if (newAgentState == CA_STATE_INVALID || newTargetState == CA_TARGET_FAILED)
             {
-                VariantMap& map = GetContext()->GetEventDataMap();
-                map[CrowdAgentFailure::P_NODE] = node_;
-                map[CrowdAgentFailure::P_CROWD_AGENT] = this;
-                map[CrowdAgentFailure::P_CROWD_TARGET_STATE] = newTargetState;
-                map[CrowdAgentFailure::P_CROWD_AGENT_STATE] = newAgentState;
-                map[CrowdAgentFailure::P_POSITION] = newPos;
-                map[CrowdAgentFailure::P_VELOCITY] = newVel;
+                VariantMap& map = GetEventDataMap();
+                map[P_NODE] = node_;
+                map[P_CROWD_AGENT] = this;
+                map[P_CROWD_TARGET_STATE] = newTargetState;
+                map[P_CROWD_AGENT_STATE] = newAgentState;
+                map[P_POSITION] = newPos;
+                map[P_VELOCITY] = newVel;
                 SendEvent(E_CROWD_AGENT_FAILURE, map);
             }
 

@@ -475,7 +475,7 @@ bool NavigationMesh::Build(const BoundingBox& boundingBox)
     return true;
 }
 
-Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& extents)
+Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& extents, const dtQueryFilter* filter, dtPolyRef* nearestRef)
 {
     if(!InitializeQuery())
         return point;
@@ -487,14 +487,13 @@ Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& ex
     Vector3 nearestPoint;
 
     dtPolyRef pointRef;
-    navMeshQuery_->findNearestPoly(&localPoint.x_, &extents.x_, queryFilter_, &pointRef, &nearestPoint.x_);
-    if (!pointRef)
-        return point;
-
-    return transform*nearestPoint;
+    if (!nearestRef)
+        nearestRef = &pointRef;
+    navMeshQuery_->findNearestPoly(&localPoint.x_, &extents.x_, filter ? filter : queryFilter_, nearestRef, &nearestPoint.x_);
+    return *nearestRef ? transform * nearestPoint : point;
 }
 
-Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents, int maxVisited)
+Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents, int maxVisited, const dtQueryFilter* filter)
 {
     if (!InitializeQuery())
         return end;
@@ -505,8 +504,9 @@ Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& en
     Vector3 localStart = inverse * start;
     Vector3 localEnd = inverse * end;
 
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_;
     dtPolyRef startRef;
-    navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter_, &startRef, 0);
+    navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter, &startRef, 0);
     if (!startRef)
         return end;
 
@@ -514,12 +514,12 @@ Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& en
     int visitedCount = 0;
     maxVisited = Max(maxVisited, 0);
     PODVector<dtPolyRef> visited(maxVisited);
-    navMeshQuery_->moveAlongSurface(startRef, &localStart.x_, &localEnd.x_, queryFilter_, &resultPos.x_, maxVisited ?
+    navMeshQuery_->moveAlongSurface(startRef, &localStart.x_, &localEnd.x_, queryFilter, &resultPos.x_, maxVisited ?
         &visited[0] : (dtPolyRef*)0, &visitedCount, maxVisited);
     return transform * resultPos;
 }
 
-void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents)
+void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents, const dtQueryFilter* filter)
 {
     PROFILE(FindPath);
 
@@ -535,10 +535,11 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
     Vector3 localStart = inverse * start;
     Vector3 localEnd = inverse * end;
 
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_;
     dtPolyRef startRef;
     dtPolyRef endRef;
-    navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter_, &startRef, 0);
-    navMeshQuery_->findNearestPoly(&localEnd.x_, &extents.x_, queryFilter_, &endRef, 0);
+    navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter, &startRef, 0);
+    navMeshQuery_->findNearestPoly(&localEnd.x_, &extents.x_, queryFilter, &endRef, 0);
 
     if (!startRef || !endRef)
         return;
@@ -546,7 +547,7 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
     int numPolys = 0;
     int numPathPoints = 0;
 
-    navMeshQuery_->findPath(startRef, endRef, &localStart.x_, &localEnd.x_, queryFilter_, pathData_->polys_, &numPolys,
+    navMeshQuery_->findPath(startRef, endRef, &localStart.x_, &localEnd.x_, queryFilter, pathData_->polys_, &numPolys,
         MAX_POLYS);
     if (!numPolys)
         return;
@@ -565,7 +566,7 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
         dest.Push(transform * pathData_->pathPoints_[i]);
 }
 
-Vector3 NavigationMesh::GetRandomPoint()
+Vector3 NavigationMesh::GetRandomPoint(const dtQueryFilter* filter, dtPolyRef* randomRef)
 {
     if (!InitializeQuery())
         return Vector3::ZERO;
@@ -573,13 +574,16 @@ Vector3 NavigationMesh::GetRandomPoint()
     dtPolyRef polyRef;
     Vector3 point(Vector3::ZERO);
 
-    navMeshQuery_->findRandomPoint(queryFilter_, Random, &polyRef, &point.x_);
+    navMeshQuery_->findRandomPoint(filter ? filter : queryFilter_, Random, randomRef ? randomRef : &polyRef, &point.x_);
 
     return node_->GetWorldTransform() * point;
 }
 
-Vector3 NavigationMesh::GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents)
+Vector3 NavigationMesh::GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents, const dtQueryFilter* filter, dtPolyRef* randomRef)
 {
+    if (randomRef)
+        *randomRef = 0;
+
     if (!InitializeQuery())
         return center;
 
@@ -587,21 +591,29 @@ Vector3 NavigationMesh::GetRandomPointInCircle(const Vector3& center, float radi
     Matrix3x4 inverse = transform.Inverse();
     Vector3 localCenter = inverse * center;
 
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_;
     dtPolyRef startRef;
-    navMeshQuery_->findNearestPoly(&localCenter.x_, &extents.x_, queryFilter_, &startRef, 0);
+    navMeshQuery_->findNearestPoly(&localCenter.x_, &extents.x_, queryFilter, &startRef, 0);
     if (!startRef)
         return center;
 
     dtPolyRef polyRef;
+    if (!randomRef)
+        randomRef = &polyRef;
     Vector3 point(localCenter);
 
-    navMeshQuery_->findRandomPointAroundCircle(startRef, &localCenter.x_, radius, queryFilter_, Random, &polyRef, &point.x_);
+    navMeshQuery_->findRandomPointAroundCircle(startRef, &localCenter.x_, radius, queryFilter, Random, randomRef, &point.x_);
 
     return transform * point;
 }
 
-float NavigationMesh::GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents)
+float NavigationMesh::GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents, const dtQueryFilter* filter, Vector3* hitPos, Vector3* hitNormal)
 {
+    if (hitPos)
+        *hitPos = Vector3::ZERO;
+    if (hitNormal)
+        *hitNormal = Vector3::DOWN;
+
     if (!InitializeQuery())
         return radius;
 
@@ -609,21 +621,29 @@ float NavigationMesh::GetDistanceToWall(const Vector3& point, float radius, cons
     Matrix3x4 inverse = transform.Inverse();
     Vector3 localPoint = inverse * point;
 
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_;
     dtPolyRef startRef;
-    navMeshQuery_->findNearestPoly(&localPoint.x_, &extents.x_, queryFilter_, &startRef, 0);
+    navMeshQuery_->findNearestPoly(&localPoint.x_, &extents.x_, queryFilter, &startRef, 0);
     if (!startRef)
         return radius;
 
     float hitDist = radius;
-    Vector3 hitPos;
-    Vector3 hitNormal;
+    Vector3 pos;
+    if (!hitPos)
+        hitPos = &pos;
+    Vector3 normal;
+    if (!hitNormal)
+        hitNormal = &normal;
 
-    navMeshQuery_->findDistanceToWall(startRef, &localPoint.x_, radius, queryFilter_, &hitDist, &hitPos.x_, &hitNormal.x_);
+    navMeshQuery_->findDistanceToWall(startRef, &localPoint.x_, radius, queryFilter, &hitDist, &hitPos->x_, &hitNormal->x_);
     return hitDist;
 }
 
-Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const Vector3& extents)
+Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const Vector3& extents, const dtQueryFilter* filter, Vector3* hitNormal)
 {
+    if (hitNormal)
+        *hitNormal = Vector3::DOWN;
+
     if (!InitializeQuery())
         return end;
 
@@ -633,16 +653,19 @@ Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const 
     Vector3 localStart = inverse * start;
     Vector3 localEnd = inverse * end;
 
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_;
     dtPolyRef startRef;
-    navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter_, &startRef, 0);
+    navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter, &startRef, 0);
     if (!startRef)
         return end;
 
-    Vector3 localHitNormal;
+    Vector3 normal;
+    if (!hitNormal)
+        hitNormal = &normal;
     float t;
     int numPolys;
 
-    navMeshQuery_->raycast(startRef, &localStart.x_, &localEnd.x_, queryFilter_, &t, &localHitNormal.x_, pathData_->polys_, &numPolys, MAX_POLYS);
+    navMeshQuery_->raycast(startRef, &localStart.x_, &localEnd.x_, queryFilter, &t, &hitNormal->x_, pathData_->polys_, &numPolys, MAX_POLYS);
     if (t == FLT_MAX)
         t = 1.0f;
 

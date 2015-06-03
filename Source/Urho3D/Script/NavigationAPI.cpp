@@ -70,7 +70,7 @@ template<class T> static void RegisterNavMeshBase(asIScriptEngine* engine, const
     engine->RegisterObjectMethod(name, "void SetAreaCost(uint, float)", asMETHOD(T, SetAreaCost), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "float GetAreaCost(uint) const", asMETHOD(T, GetAreaCost), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "Vector3 FindNearestPoint(const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asMETHOD(T, FindNearestPoint), asCALL_THISCALL);
-    engine->RegisterObjectMethod(name, "Vector3 MoveAlongSurface(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0), uint = 3)", asMETHOD(T, MoveAlongSurface), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "Vector3 MoveAlongSurface(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0), uint maxVisited = 3)", asMETHOD(T, MoveAlongSurface), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "Vector3 GetRandomPoint()", asMETHOD(T, GetRandomPoint), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "Vector3 GetRandomPointInCircle(const Vector3&in, float, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asMETHOD(T, GetRandomPointInCircle), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "float GetDistanceToWall(const Vector3&in, float, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asMETHOD(T, GetDistanceToWall), asCALL_THISCALL);
@@ -183,6 +183,12 @@ void RegisterCrowdManager(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CrowdManager", "void SetCrowdVelocity(const Vector3&in, Node@+ node = null)", asMETHOD(CrowdManager, SetCrowdVelocity), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "void ResetCrowdTarget(Node@+ node = null)", asMETHOD(CrowdManager, ResetCrowdTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "Array<CrowdAgent@>@ GetAgents(Node@+ node = null, bool inCrowdFilter = true)", asFUNCTION(CrowdManagerGetAgents), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("CrowdManager", "Vector3 FindNearestPoint(const Vector3&in, int)", asMETHOD(CrowdManager, FindNearestPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "Vector3 MoveAlongSurface(const Vector3&in, const Vector3&in, int, uint maxVisited = 3)", asMETHOD(CrowdManager, MoveAlongSurface), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "Vector3 GetRandomPoint(int)", asMETHOD(CrowdManager, GetRandomPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "Vector3 GetRandomPointInCircle(const Vector3&in, float, int)", asMETHOD(CrowdManager, GetRandomPointInCircle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "float GetDistanceToWall(const Vector3&in, float, int)", asMETHOD(CrowdManager, GetDistanceToWall), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "Vector3 Raycast(const Vector3&in, const Vector3&in, int)", asMETHOD(CrowdManager, Raycast), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "int get_maxAgents() const", asMETHOD(CrowdManager, GetMaxAgents), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "void set_maxAgents(int)", asMETHOD(CrowdManager, SetMaxAgents), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "float get_maxAgentRadius() const", asMETHOD(CrowdManager, GetMaxAgentRadius), asCALL_THISCALL);

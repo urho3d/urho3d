@@ -117,7 +117,7 @@ function CreateScene()
     CreateMovingBarrels(navMesh)
 
     -- Create Jack node as crowd agent
-    SpawnJack(Vector3(-5, 0, 20))
+    SpawnJack(Vector3(-5, 0, 20), scene_:CreateChild("Jacks"))
 
     -- Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
     -- the scene, because we want it to be unaffected by scene load / save
@@ -179,10 +179,13 @@ function SubscribeToEvents()
 
     -- Subscribe HandleCrowdAgentReposition() function for controlling the animation
     SubscribeToEvent("CrowdAgentReposition", "HandleCrowdAgentReposition")
+
+    -- Subscribe HandleCrowdAgentFormation() function for positioning agent into a formation
+    SubscribeToEvent("CrowdAgentFormation", "HandleCrowdAgentFormation")
 end
 
-function SpawnJack(pos)
-    local jackNode = scene_:CreateChild("Jack")
+function SpawnJack(pos, jackGroup)
+    local jackNode = jackGroup:CreateChild("Jack")
     jackNode.position = pos
     local modelObject = jackNode:CreateComponent("AnimatedModel")
     modelObject.model = cache:GetResource("Model", "Models/Jack.mdl")
@@ -246,6 +249,7 @@ function CreateMovingBarrels(navMesh)
         local agent = clone:CreateComponent("CrowdAgent")
         agent.radius = clone.scale.x * 0.5
         agent.height = size
+        agent.navigationQuality = NAVIGATIONQUALITY_LOW
     end
     barrel:Remove()
 end
@@ -256,13 +260,13 @@ function SetPathPoint(spawning)
     if hitDrawable then
         local navMesh = scene_:GetComponent("DynamicNavigationMesh")
         local pathPos = navMesh:FindNearestPoint(hitPos, Vector3.ONE)
-
+        local jackGroup = scene_:GetChild("Jacks")
         if spawning then
             -- Spawn a jack at the target position
-            SpawnJack(pathPos)
+            SpawnJack(pathPos, jackGroup)
         else
             -- Set crowd agents target position
-            scene_:GetComponent("CrowdManager"):SetCrowdTarget(pathPos)
+            scene_:GetComponent("CrowdManager"):SetCrowdTarget(pathPos, jackGroup)
         end
     end
 end
@@ -423,6 +427,19 @@ function HandleCrowdAgentReposition(eventType, eventData)
         if speed < agent.radius then
             animCtrl:Stop(WALKING_ANI, 0.8)
         end
+    end
+end
+
+function HandleCrowdAgentFormation(eventType, eventData)
+    local index = eventData:GetUInt("Index")
+    local size = eventData:GetUInt("Size")
+    local position = eventData:GetVector3("Position")
+
+    -- The first agent will always move to the exact position, all other agents will select a random point nearby
+    if index > 0 then
+        local crowdManager = GetEventSender()
+        local agent = eventData:GetPtr("CrowdAgent", "CrowdAgent")
+        eventData:SetVector3("Position", crowdManager:GetRandomPointInCircle(position, agent.radius, agent.filterType))
     end
 end
 

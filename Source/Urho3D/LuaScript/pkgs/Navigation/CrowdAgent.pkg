@@ -28,8 +28,8 @@ enum CrowdAgentState
 enum NavigationQuality
 {
     NAVIGATIONQUALITY_LOW = 0,
-    NAVIGATIONQUALITY_MEDIUM = 1,
-    NAVIGATIONQUALITY_HIGH = 2
+    NAVIGATIONQUALITY_MEDIUM,
+    NAVIGATIONQUALITY_HIGH
 };
 
 enum NavigationPushiness

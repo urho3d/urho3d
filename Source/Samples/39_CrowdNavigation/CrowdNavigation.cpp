@@ -174,7 +174,7 @@ void CrowdNavigation::CreateScene()
     CreateMovingBarrels(navMesh);
 
     // Create Jack node as crowd agent
-    SpawnJack(Vector3(-5.0f, 0.0f, 20.0f));
+    SpawnJack(Vector3(-5.0f, 0.0f, 20.0f), scene_->CreateChild("Jacks"));
 
     // Create the camera. Set far clip to match the fog. Note: now we actually create the camera node outside the scene, because
     // we want it to be unaffected by scene load / save
@@ -248,12 +248,15 @@ void CrowdNavigation::SubscribeToEvents()
 
     // Subscribe HandleCrowdAgentReposition() function for controlling the animation
     SubscribeToEvent(E_CROWD_AGENT_REPOSITION, HANDLER(CrowdNavigation, HandleCrowdAgentReposition));
+
+    // Subscribe HandleCrowdAgentFormation() function for positioning agent into a formation
+    SubscribeToEvent(E_CROWD_AGENT_FORMATION, HANDLER(CrowdNavigation, HandleCrowdAgentFormation));
 }
 
-void CrowdNavigation::SpawnJack(const Vector3& pos)
+void CrowdNavigation::SpawnJack(const Vector3& pos, Node* jackGroup)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SharedPtr<Node> jackNode(scene_->CreateChild("Jack"));
+    SharedPtr<Node> jackNode(jackGroup->CreateChild("Jack"));
     jackNode->SetPosition(pos);
     AnimatedModel* modelObject = jackNode->CreateComponent<AnimatedModel>();
     modelObject->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
@@ -327,6 +330,7 @@ void CrowdNavigation::CreateMovingBarrels(DynamicNavigationMesh* navMesh)
         CrowdAgent* agent = clone->CreateComponent<CrowdAgent>();
         agent->SetRadius(clone->GetScale().x_ * 0.5f);
         agent->SetHeight(size);
+        agent->SetNavigationQuality(NAVIGATIONQUALITY_LOW);
     }
     barrel->Remove();
 }
@@ -340,12 +344,13 @@ void CrowdNavigation::SetPathPoint(bool spawning)
     {
         DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
         Vector3 pathPos = navMesh->FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
+        Node* jackGroup = scene_->GetChild("Jacks");
         if (spawning)
             // Spawn a jack at the target position
-            SpawnJack(pathPos);
+            SpawnJack(pathPos, jackGroup);
         else
             // Set crowd agents target position
-            scene_->GetComponent<CrowdManager>()->SetCrowdTarget(pathPos);
+            scene_->GetComponent<CrowdManager>()->SetCrowdTarget(pathPos, jackGroup);
     }
 }
 
@@ -536,5 +541,22 @@ void CrowdNavigation::HandleCrowdAgentReposition(StringHash eventType, VariantMa
         // If speed is too low then stopping the animation
         if (speed < agent->GetRadius())
             animCtrl->Stop(WALKING_ANI, 0.8f);
+    }
+}
+
+void CrowdNavigation::HandleCrowdAgentFormation(StringHash eventType, VariantMap& eventData)
+{
+    using namespace CrowdAgentFormation;
+
+    unsigned index = eventData[P_INDEX].GetUInt();
+    unsigned size = eventData[P_SIZE].GetUInt();
+    Vector3 position = eventData[P_POSITION].GetVector3();
+
+    // The first agent will always move to the exact position, all other agents will select a random point nearby
+    if (index)
+    {
+        CrowdManager* crowdManager = static_cast<CrowdManager*>(GetEventSender());
+        CrowdAgent* agent = static_cast<CrowdAgent*>(eventData[P_CROWD_AGENT].GetPtr());
+        eventData[P_POSITION] = crowdManager->GetRandomPointInCircle(position, agent->GetRadius(), agent->GetFilterType());
     }
 }

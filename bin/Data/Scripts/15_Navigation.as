@@ -114,8 +114,10 @@ void CreateScene()
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.farClip = 300.0f;
 
-    // Set an initial position for the camera scene node above the plane
-    cameraNode.position = Vector3(0.0f, 5.0f, 0.0f);
+    // Set an initial position for the camera scene node above the plane and looking down
+    cameraNode.position = Vector3(0.0f, 50.0f, 0.0f);
+    pitch = 80.0f;
+    cameraNode.rotation = Quaternion(pitch, yaw, 0.0f);
 }
 
 void CreateUI()

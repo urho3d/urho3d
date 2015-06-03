@@ -13,6 +13,13 @@ class CrowdManager : public Component
     void SetAreaCost(unsigned filterID, unsigned areaID, float cost);
 
     PODVector<CrowdAgent*> GetAgents(Node* node = 0, bool inCrowdFilter = true) const;
+    Vector3 FindNearestPoint(const Vector3& point, int filterType);
+    Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, int filterType, int maxVisited = 3);
+    tolua_outside const PODVector<Vector3>& CrowdManagerFindPath @ FindPath(const Vector3& start, const Vector3& end, int filterType);
+    Vector3 GetRandomPoint(int filterType);
+    Vector3 GetRandomPointInCircle(const Vector3& center, float radius, int filterType);
+    float GetDistanceToWall(const Vector3& point, float radius, int filterType, Vector3* hitPos = 0, Vector3* hitNormal = 0);
+    Vector3 Raycast(const Vector3& start, const Vector3& end, int filterType, Vector3* hitNormal = 0);
     unsigned GetMaxAgents() const;
     float GetMaxAgentRadius() const;
     NavigationMesh* GetNavigationMesh() const;
@@ -22,3 +29,13 @@ class CrowdManager : public Component
     tolua_property__get_set float maxAgentRadius;
     tolua_property__get_set NavigationMesh* navigationMesh;
 };
+
+${
+const PODVector<Vector3>& CrowdManagerFindPath(CrowdManager* crowdManager, const Vector3& start, const Vector3& end, int filterType)
+{
+    static PODVector<Vector3> dest;
+    dest.Clear();
+    crowdManager->FindPath(dest, start, end, filterType);
+    return dest;
+}
+$}

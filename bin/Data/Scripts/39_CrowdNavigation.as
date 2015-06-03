@@ -119,7 +119,7 @@ void CreateScene()
     CreateMovingBarrels(navMesh);
 
     // Create Jack node as crowd agent
-    SpawnJack(Vector3(-5.0f, 0, 20.0f));
+    SpawnJack(Vector3(-5.0f, 0, 20.0f), scene_.CreateChild("Jacks"));
 
     // Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
     // the scene, because we want it to be unaffected by scene load / save
@@ -185,6 +185,9 @@ void SubscribeToEvents()
 
     // Subscribe HandleCrowdAgentReposition() function for controlling the animation
     SubscribeToEvent("CrowdAgentReposition", "HandleCrowdAgentReposition");
+
+    // Subscribe HandleCrowdAgentFormation() function for positioning agent into a formation
+    SubscribeToEvent("CrowdAgentFormation", "HandleCrowdAgentFormation");
 }
 
 void CreateMushroom(const Vector3& pos)
@@ -204,9 +207,9 @@ void CreateMushroom(const Vector3& pos)
     obstacle.height = mushroomNode.scale.y;
 }
 
-void SpawnJack(const Vector3& pos)
+void SpawnJack(const Vector3& pos, Node@ jackGroup)
 {
-    Node@ jackNode = scene_.CreateChild("Jack");
+    Node@ jackNode = jackGroup.CreateChild("Jack");
     jackNode.position = pos;
     AnimatedModel@ modelObject = jackNode.CreateComponent("AnimatedModel");
     modelObject.model = cache.GetResource("Model", "Models/Jack.mdl");
@@ -260,6 +263,7 @@ void CreateMovingBarrels(DynamicNavigationMesh@ navMesh)
         CrowdAgent@ agent = clone.CreateComponent("CrowdAgent");
         agent.radius = clone.scale.x * 0.5f;
         agent.height = size;
+        agent.navigationQuality = NAVIGATIONQUALITY_LOW;
     }
     barrel.Remove();
 }
@@ -273,12 +277,13 @@ void SetPathPoint(bool spawning)
     {
         DynamicNavigationMesh@ navMesh = scene_.GetComponent("DynamicNavigationMesh");
         Vector3 pathPos = navMesh.FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
+        Node@ jackGroup = scene_.GetChild("Jacks");
         if (spawning)
             // Spawn a jack at the target position
-            SpawnJack(pathPos);
+            SpawnJack(pathPos, jackGroup);
         else
             // Set crowd agents target position
-            cast<CrowdManager>(scene_.GetComponent("CrowdManager")).SetCrowdTarget(pathPos);
+            cast<CrowdManager>(scene_.GetComponent("CrowdManager")).SetCrowdTarget(pathPos, jackGroup);
     }
 }
 
@@ -426,6 +431,21 @@ void HandleCrowdAgentFailure(StringHash eventType, VariantMap& eventData)
         Vector3 newPos = cast<DynamicNavigationMesh>(scene_.GetComponent("DynamicNavigationMesh")).FindNearestPoint(node.position, Vector3(5.0f,5.0f,5.0f));
         // Set the new node position, CrowdAgent component will automatically reset the state of the agent
         node.position = newPos;
+    }
+}
+
+void HandleCrowdAgentFormation(StringHash eventType, VariantMap& eventData)
+{
+    uint index = eventData["Index"].GetUInt();
+    uint size = eventData["Size"].GetUInt();
+    Vector3 position = eventData["Position"].GetVector3();
+
+    // The first agent will always move to the exact position, all other agents will select a random point nearby
+    if (index > 0)
+    {
+        CrowdManager@ crowdManager =GetEventSender();
+        CrowdAgent@ agent = eventData["CrowdAgent"].GetPtr();
+        eventData["Position"] = crowdManager.GetRandomPointInCircle(position, agent.radius, agent.filterType);
     }
 }
 

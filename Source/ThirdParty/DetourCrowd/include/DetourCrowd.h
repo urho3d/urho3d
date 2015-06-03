@@ -201,7 +201,7 @@ struct dtCrowdAgentDebugInfo
 };
 
 // Urho3D: Add update callback support
-/// Type for the updat callback.
+/// Type for the update callback.
 typedef void (*dtUpdateCallback)(dtCrowdAgent* ag, float dt);
 
 /// Provides local steering behaviors for a group of agents. 
