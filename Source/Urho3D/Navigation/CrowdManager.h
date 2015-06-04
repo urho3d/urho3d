@@ -43,6 +43,7 @@ class NavigationMesh;
 class URHO3D_API CrowdManager : public Component
 {
     OBJECT(CrowdManager);
+
     friend class CrowdAgent;
 
 public:
@@ -60,11 +61,11 @@ public:
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
 
-    /// Set the crowd target position. The target position is set to all crowd agents found in the specified node, excluding crowd agent which does not have acceleration. Defaulted to scene node.
+    /// Set the crowd target position. The target position is set to all crowd agents found in the specified node. Defaulted to scene node.
     void SetCrowdTarget(const Vector3& position, Node* node = 0);
-    /// Set the crowd move velocity. The move velocity is applied to all crowd agents found in the specified node, excluding crowd agent which does not have acceleration. Defaulted to scene node.
+    /// Set the crowd move velocity. The move velocity is applied to all crowd agents found in the specified node. Defaulted to scene node.
     void SetCrowdVelocity(const Vector3& velocity, Node* node = 0);
-    /// Reset any crowd target for all crowd agents found in the specified node, excluding crowd agent which does not have acceleration. Defaulted to scene node.
+    /// Reset any crowd target for all crowd agents found in the specified node. Defaulted to scene node.
     void ResetCrowdTarget(Node* node = 0);
     /// Set the maximum number of agents.
     void SetMaxAgents(unsigned maxAgents);
@@ -102,17 +103,17 @@ public:
 
 protected:
     /// Create internal Detour crowd object for the specified navigation mesh. If readdCrowdAgents is true then attempt to re-add existing agents in the previous crowd back to the newly created crowd.
-    bool CreateCrowd(bool readdCrowdAgents = false);
+    bool CreateCrowd(bool readdCrowdAgents = true);
     /// Create and adds an detour crowd agent, Agent's radius and height is set through the navigation mesh. Return -1 on error, agent ID on success.
     int AddAgent(CrowdAgent* agent, const Vector3& pos);
     /// Removes the detour crowd agent.
     void RemoveAgent(CrowdAgent* agent);
 
 protected:
-    /// Update the crowd simulation.
-    void Update(float delta);
     /// Handle scene being assigned.
     virtual void OnSceneSet(Scene* scene);
+    /// Update the crowd simulation.
+    void Update(float delta);
     /// Get the detour crowd agent.
     const dtCrowdAgent* GetCrowdAgent(int agent);
     /// Get the internal detour crowd component.
@@ -132,6 +133,8 @@ private:
     unsigned maxAgents_;
     /// The maximum radius of any agent that will be added to the crowd.
     float maxAgentRadius_;
+    /// The NavigationMesh component Id for pending crowd creation.
+    unsigned navigationMeshId_;
 };
 
 }

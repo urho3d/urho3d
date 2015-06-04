@@ -176,6 +176,7 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     /// Get internal Detour crowd agent.
     const dtCrowdAgent* GetDetourCrowdAgent() const;
+
 private:
     /// Update Detour crowd agent parameter.
     void UpdateParameters(unsigned scope = M_MAX_UNSIGNED);
