@@ -38,7 +38,7 @@ To run Urho3D, the minimum system requirements are:
 
 SSE requirement can be eliminated by disabling the use of SSE instruction set, see URHO3D_SSE build option below.
 
-CMake is required to configure and generate the Urho3D project build tree. The minimum required version is 2.8.6. However, it is recommended to use the latest CMake version avaiable out there, especially when targeting Mac OS X and iOS platforms using the latest Xcode version available. This is because Apple is known to change the internal working of Xcode with little regards to other third party build tools, such as CMake.
+CMake (http://www.cmake.org) is required to configure and generate the Urho3D project build tree. The minimum required version is 2.8.6. However, it is recommended to use the latest CMake version avaiable out there, especially when targeting Mac OS X and iOS platforms using the latest Xcode version available. This is because Apple is known to change the internal working of Xcode with little regards to other third party build tools, such as CMake.
 
 \section Build_Scripts Build scripts
 
@@ -127,7 +127,7 @@ Note that the specified build option values are cached by CMake after the initia
 
 \section Building_Native Native build process
 
-Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
+A native build of Urho3D has two steps:
 
 -# Run CMake in the root directory (which is also CMake's source tree) with your preferred generator and toolchain specified to generate the build tree. You can use cmake-gui or the provided batch files or shell scripts on the respective host system. All the batch files and shell scripts expect the build tree location to be passed as the first argument, or to execute them in the build tree itself when reconfiguring the existing build tree.\n
     - Windows: cmake_vs20xx.bat, cmake_mingw.bat, cmake_codeblock.bat, cmake_ninja.bat, or cmake_generic.bat\n
@@ -139,8 +139,9 @@ Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
     - Xcode: open Urho3D.xcodeproj\n
     - CodeBlocks: open Urho3D.cbp\n
     - Eclipse: import project using File|Import "Existing Projects into Workspace"\n
+    - Alternatively, on make-based toolchains like GCC / MinGW, execute make in the build tree
 
-Note that Eclipse requires CDT plugin to build C/C++ project. When using generator backed by Unix Makefiles, you can also execute make command directly in the build tree to build the project.
+Note that Eclipse requires CDT plugin to build a C/C++ project.
 
 On Windows platform Urho3D can use either Direct3D 9 (default), Direct3D 11 or OpenGL rendering. Other platforms always use OpenGL. Use the CMake options "-DURHO3D_D3D11=1" or "-DURHO3D_OPENGL=1" to choose the non-default APIs.
 
