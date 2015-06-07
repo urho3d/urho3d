@@ -111,7 +111,14 @@ function CreateScene()
     end
 
     -- Create a CrowdManager component to the scene root (mandatory for crowd agents)
-    scene_:CreateComponent("CrowdManager")
+    local crowdManager = scene_:CreateComponent("CrowdManager")
+    local params = crowdManager:GetObstacleAvoidanceParams(0)
+    -- Set the params to "High (66)" setting
+    params.velBias = 0.5
+    params.adaptiveDivs = 7
+    params.adaptiveRings = 3
+    params.adaptiveDepth = 3
+    crowdManager:SetObstacleAvoidanceParams(0, params)
 
     -- Create some movable barrels. We create them as crowd agents, as for moving entities it is less expensive and more convenient than using obstacles
     CreateMovingBarrels(navMesh)

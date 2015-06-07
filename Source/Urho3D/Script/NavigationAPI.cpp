@@ -177,11 +177,27 @@ void RegisterNavArea(asIScriptEngine* engine)
 
 void RegisterCrowdManager(asIScriptEngine* engine)
 {
+    engine->RegisterObjectType("CrowdObstacleAvoidanceParams", sizeof(CrowdObstacleAvoidanceParams), asOBJ_VALUE | asOBJ_POD);
+    engine->RegisterObjectProperty("CrowdObstacleAvoidanceParams", "float velBias", offsetof(CrowdObstacleAvoidanceParams, velBias));
+    engine->RegisterObjectProperty("CrowdObstacleAvoidanceParams", "float weightDesVel", offsetof(CrowdObstacleAvoidanceParams, weightDesVel));
+    engine->RegisterObjectProperty("CrowdObstacleAvoidanceParams", "float weightCurVel", offsetof(CrowdObstacleAvoidanceParams, weightCurVel));
+    engine->RegisterObjectProperty("CrowdObstacleAvoidanceParams", "float weightSide", offsetof(CrowdObstacleAvoidanceParams, weightSide));
+    engine->RegisterObjectProperty("CrowdObstacleAvoidanceParams", "float weightToi", offsetof(CrowdObstacleAvoidanceParams, weightToi));
+    engine->RegisterObjectProperty("CrowdObstacleAvoidanceParams", "float horizTime", offsetof(CrowdObstacleAvoidanceParams, horizTime));
+    engine->RegisterObjectProperty("CrowdObstacleAvoidanceParams", "uint8 gridSize", offsetof(CrowdObstacleAvoidanceParams, gridSize));
+    engine->RegisterObjectProperty("CrowdObstacleAvoidanceParams", "uint8 adaptiveDivs", offsetof(CrowdObstacleAvoidanceParams, adaptiveDivs));
+    engine->RegisterObjectProperty("CrowdObstacleAvoidanceParams", "uint8 adaptiveRings", offsetof(CrowdObstacleAvoidanceParams, adaptiveRings));
+    engine->RegisterObjectProperty("CrowdObstacleAvoidanceParams", "uint8 adaptiveDepth", offsetof(CrowdObstacleAvoidanceParams, adaptiveDepth));
+
     RegisterComponent<CrowdManager>(engine, "CrowdManager");
     engine->RegisterObjectMethod("CrowdManager", "void DrawDebugGeometry(bool)", asMETHODPR(CrowdManager, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "void SetCrowdTarget(const Vector3&in, Node@+ node = null)", asMETHOD(CrowdManager, SetCrowdTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "void SetCrowdVelocity(const Vector3&in, Node@+ node = null)", asMETHOD(CrowdManager, SetCrowdVelocity), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "void ResetCrowdTarget(Node@+ node = null)", asMETHOD(CrowdManager, ResetCrowdTarget), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "void SetIncludeFlags(uint, uint16)", asMETHOD(CrowdManager, SetIncludeFlags), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "void SetExcludeFlags(uint, uint16)", asMETHOD(CrowdManager, SetExcludeFlags), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "void SetAreaCost(uint, uint, float)", asMETHOD(CrowdManager, SetAreaCost), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "void SetObstacleAvoidanceParams(uint, const CrowdObstacleAvoidanceParams&in)", asMETHOD(CrowdManager, SetObstacleAvoidanceParams), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "Array<CrowdAgent@>@ GetAgents(Node@+ node = null, bool inCrowdFilter = true)", asFUNCTION(CrowdManagerGetAgents), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("CrowdManager", "Vector3 FindNearestPoint(const Vector3&in, int)", asMETHOD(CrowdManager, FindNearestPoint), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "Vector3 MoveAlongSurface(const Vector3&in, const Vector3&in, int, uint maxVisited = 3)", asMETHOD(CrowdManager, MoveAlongSurface), asCALL_THISCALL);
@@ -189,14 +205,19 @@ void RegisterCrowdManager(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CrowdManager", "Vector3 GetRandomPointInCircle(const Vector3&in, float, int)", asMETHOD(CrowdManager, GetRandomPointInCircle), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "float GetDistanceToWall(const Vector3&in, float, int)", asMETHOD(CrowdManager, GetDistanceToWall), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "Vector3 Raycast(const Vector3&in, const Vector3&in, int)", asMETHOD(CrowdManager, Raycast), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "uint16 GetIncludeFlags(uint)", asMETHOD(CrowdManager, GetIncludeFlags), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "uint16 GetExcludeFlags(uint)", asMETHOD(CrowdManager, GetExcludeFlags), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "float GetAreaCost(uint, uint)", asMETHOD(CrowdManager, GetAreaCost), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "const CrowdObstacleAvoidanceParams& GetObstacleAvoidanceParams(uint)", asMETHOD(CrowdManager, GetObstacleAvoidanceParams), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "int get_maxAgents() const", asMETHOD(CrowdManager, GetMaxAgents), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "void set_maxAgents(int)", asMETHOD(CrowdManager, SetMaxAgents), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "float get_maxAgentRadius() const", asMETHOD(CrowdManager, GetMaxAgentRadius), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "void set_maxAgentRadius(float)", asMETHOD(CrowdManager, SetMaxAgentRadius), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "void set_navMesh(NavigationMesh@+)", asMETHOD(CrowdManager, SetNavigationMesh), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "NavigationMesh@+ get_navMesh() const", asMETHOD(CrowdManager, GetNavigationMesh), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdManager", "void SetAreaCost(uint, uint, float)", asMETHOD(CrowdManager, SetAreaCost), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdManager", "float GetAreaCost(uint, uint)", asMETHOD(CrowdManager, GetAreaCost), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "uint get_numFilterTypes() const", asMETHOD(CrowdManager, GetNumFilterTypes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "uint get_numAreas(uint) const", asMETHOD(CrowdManager, GetNumAreas), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "uint get_numObstacleAvoidanceTypes() const", asMETHOD(CrowdManager, GetNumObstacleAvoidanceTypes), asCALL_THISCALL);
 }
 
 void RegisterCrowdAgent(asIScriptEngine* engine)

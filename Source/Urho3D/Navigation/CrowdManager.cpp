@@ -60,8 +60,14 @@ CrowdManager::CrowdManager(Context* context) :
     crowd_(0),
     maxAgents_(DEFAULT_MAX_AGENTS),
     maxAgentRadius_(DEFAULT_MAX_AGENT_RADIUS),
-    navigationMeshId_(0)
+    navigationMeshId_(0),
+    numFilterTypes_(0),
+    numObstacleAvoidanceTypes_(0)
 {
+    // The actual buffer is allocated inside dtCrowd, we only track the number of "slots" being configured explicitly
+    numAreas_.Reserve(DT_CROWD_MAX_QUERY_FILTER_TYPE);
+    for (unsigned i = 0; i < DT_CROWD_MAX_QUERY_FILTER_TYPE; ++i)
+        numAreas_.Push(0);
 }
 
 CrowdManager::~CrowdManager()
@@ -77,7 +83,8 @@ void CrowdManager::RegisterObject(Context* context)
     ATTRIBUTE("Max Agents", unsigned, maxAgents_, DEFAULT_MAX_AGENTS, AM_DEFAULT);
     ATTRIBUTE("Max Agent Radius", float, maxAgentRadius_, DEFAULT_MAX_AGENT_RADIUS, AM_DEFAULT);
     ATTRIBUTE("Navigation Mesh", unsigned, navigationMeshId_, 0, AM_DEFAULT | AM_COMPONENTID);
-    // TODO: add attributes for crowd filter type and avoidance parameters configuration
+    MIXED_ACCESSOR_ATTRIBUTE("Filter Types", GetFilterTypesAttr, SetFilterTypesAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Obstacle Avoidance Types", GetObstacleAvoidanceTypesAttr, SetObstacleAvoidanceTypesAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT);
 }
 
 void CrowdManager::ApplyAttributes()
@@ -86,17 +93,21 @@ void CrowdManager::ApplyAttributes()
     maxAgents_ = Max(1, maxAgents_);
     maxAgentRadius_ = Max(0.f, maxAgentRadius_);
 
+    bool navMeshChange = false;
     Scene* scene = GetScene();
     if (scene && navigationMeshId_)
     {
         NavigationMesh* navMesh = dynamic_cast<NavigationMesh*>(scene->GetComponent(navigationMeshId_));
         if (navMesh)
+        {
+            navMeshChange = navMesh != navigationMesh_;
             navigationMesh_ = navMesh;
+        }
     }
-    navigationMeshId_ = navigationMesh_ ? navigationMesh_->GetID() : 0;
+    navigationMeshId_ = navigationMesh_ ? navigationMesh_->GetID() : 0;     // In case of receiving an invalid component id, revert it back to the existing navmesh component id (if any)
 
     // If the Detour crowd initialization parameters have changed then recreate it
-    if (crowd_ && (crowd_->getAgentCount() != maxAgents_ || crowd_->getMaxAgentRadius() != (maxAgentRadius_ > 0.f ? maxAgentRadius_ : navigationMesh_->GetAgentRadius())))
+    if (crowd_ && (navMeshChange || crowd_->getAgentCount() != maxAgents_ || crowd_->getMaxAgentRadius() != (maxAgentRadius_ > 0.f ? maxAgentRadius_ : navigationMesh_->GetAgentRadius())))
         CreateCrowd();
 }
 
@@ -152,13 +163,6 @@ void CrowdManager::DrawDebugGeometry(bool depthTest)
         if (debug)
             DrawDebugGeometry(debug, depthTest);
     }
-}
-
-void CrowdManager::SetAreaCost(unsigned filterID, unsigned areaID, float cost)
-{
-    dtQueryFilter* filter = crowd_->getEditableFilter(filterID);
-    if (filter)
-        filter->setAreaCost((int)areaID, cost);
 }
 
 void CrowdManager::SetCrowdTarget(const Vector3& position, Node* node)
@@ -240,35 +244,114 @@ void CrowdManager::SetNavigationMesh(NavigationMesh* navMesh)
     }
 }
 
-float CrowdManager::GetAreaCost(unsigned filterID, unsigned areaID) const
+void CrowdManager::SetFilterTypesAttr(const VariantVector& value)
 {
-    if (crowd_ && navigationMesh_)
+    if (!crowd_)
+        return;
+
+    unsigned index = 0;
+    unsigned filterType = 0;
+    numFilterTypes_ = index < value.Size() ? Min(value[index++].GetUInt(), DT_CROWD_MAX_QUERY_FILTER_TYPE) : 0;
+
+    while (filterType < numFilterTypes_)
     {
-        const dtQueryFilter* filter = crowd_->getFilter((int)filterID);
-        if (filter)
-            return filter->getAreaCost((int)areaID);
+        if (index + 3 <= value.Size())
+        {
+            dtQueryFilter* filter = crowd_->getEditableFilter(filterType);
+            assert(filter);
+            filter->setIncludeFlags((unsigned short)value[index++].GetUInt());
+            filter->setExcludeFlags((unsigned short)value[index++].GetUInt());
+            unsigned prevNumAreas = numAreas_[filterType];
+            numAreas_[filterType] = Min(value[index++].GetUInt(), DT_MAX_AREAS);
+
+            // Must loop thru based on previous number of areas, the new area cost (if any) can only be set in the next attribute get/set iteration
+            if (index + prevNumAreas <= value.Size())
+            {
+                for (int i = 0; i < prevNumAreas; ++i)
+                    filter->setAreaCost(i, value[index++].GetFloat());
+            }
+        }
+        ++filterType;
     }
-    return 0.0f;
 }
 
-PODVector<CrowdAgent*> CrowdManager::GetAgents(Node* node, bool inCrowdFilter) const
+void CrowdManager::SetIncludeFlags(unsigned filterType, unsigned short flags)
 {
-    if (!node)
-        node = GetScene();
-    PODVector<CrowdAgent*> agents;
-    node->GetComponents<CrowdAgent>(agents, true);
-    if (inCrowdFilter)
+    dtQueryFilter* filter = const_cast<dtQueryFilter*>(GetDetourQueryFilter(filterType));
+    if (filter)
     {
-        PODVector<CrowdAgent*>::Iterator i = agents.Begin();
-        while (i != agents.End())
-        {
-            if ((*i)->IsInCrowd())
-                ++i;
-            else
-                i = agents.Erase(i);
-        }
+        filter->setIncludeFlags(flags);
+        if (numFilterTypes_ < filterType + 1)
+            numFilterTypes_ = filterType + 1;
+        MarkNetworkUpdate();
     }
-    return agents;
+}
+
+void CrowdManager::SetExcludeFlags(unsigned filterType, unsigned short flags)
+{
+    dtQueryFilter* filter = const_cast<dtQueryFilter*>(GetDetourQueryFilter(filterType));
+    if (filter)
+    {
+        filter->setExcludeFlags(flags);
+        if (numFilterTypes_ < filterType + 1)
+            numFilterTypes_ = filterType + 1;
+        MarkNetworkUpdate();
+    }
+}
+
+void CrowdManager::SetAreaCost(unsigned filterType, unsigned areaID, float cost)
+{
+    dtQueryFilter* filter = const_cast<dtQueryFilter*>(GetDetourQueryFilter(filterType));
+    if (filter && areaID < DT_MAX_AREAS)
+    {
+        filter->setAreaCost((int)areaID, cost);
+        if (numFilterTypes_ < filterType + 1)
+            numFilterTypes_ = filterType + 1;
+        if (numAreas_[filterType] < areaID + 1)
+            numAreas_[filterType] = areaID + 1;
+        MarkNetworkUpdate();
+    }
+}
+
+void CrowdManager::SetObstacleAvoidanceTypesAttr(const VariantVector& value)
+{
+    if (!crowd_)
+        return;
+
+    unsigned index = 0;
+    unsigned obstacleAvoidanceType = 0;
+    numObstacleAvoidanceTypes_ = index < value.Size() ? Min(value[index++].GetUInt(), DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS) : 0;
+
+    while (obstacleAvoidanceType < numObstacleAvoidanceTypes_)
+    {
+        if (index + 10 <= value.Size())
+        {
+            dtObstacleAvoidanceParams params;
+            params.velBias = value[index++].GetFloat();
+            params.weightDesVel = value[index++].GetFloat();
+            params.weightCurVel = value[index++].GetFloat();
+            params.weightSide = value[index++].GetFloat();
+            params.weightToi = value[index++].GetFloat();
+            params.horizTime = value[index++].GetFloat();
+            params.gridSize = (unsigned char)value[index++].GetUInt();
+            params.adaptiveDivs = (unsigned char)value[index++].GetUInt();
+            params.adaptiveRings = (unsigned char)value[index++].GetUInt();
+            params.adaptiveDepth = (unsigned char)value[index++].GetUInt();
+            crowd_->setObstacleAvoidanceParams(obstacleAvoidanceType, &params);
+        }
+        ++obstacleAvoidanceType;
+    }
+}
+
+void CrowdManager::SetObstacleAvoidanceParams(unsigned obstacleAvoidanceType, const CrowdObstacleAvoidanceParams& params)
+{
+    if (crowd_ && obstacleAvoidanceType < DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS)
+    {
+        crowd_->setObstacleAvoidanceParams(obstacleAvoidanceType, (dtObstacleAvoidanceParams*)&params);
+        if (numObstacleAvoidanceTypes_ < obstacleAvoidanceType + 1)
+            numObstacleAvoidanceTypes_ = obstacleAvoidanceType + 1;
+        MarkNetworkUpdate();
+    }
 }
 
 Vector3 CrowdManager::FindNearestPoint(const Vector3& point, int filterType, dtPolyRef* nearestRef)
@@ -319,13 +402,136 @@ Vector3 CrowdManager::Raycast(const Vector3& start, const Vector3& end, int filt
     return crowd_ && navigationMesh_ ? navigationMesh_->Raycast(start, end, crowd_->getQueryExtents(), crowd_->getFilter(filterType), hitNormal) : end;
 }
 
-bool CrowdManager::CreateCrowd(bool readdCrowdAgents)
+unsigned CrowdManager::GetNumAreas(unsigned filterType) const
+{
+    return filterType < numFilterTypes_ ? numAreas_[filterType] : 0;
+}
+
+VariantVector CrowdManager::GetFilterTypesAttr() const
+{
+    VariantVector ret;
+    if (crowd_)
+    {
+        unsigned totalNumAreas = 0;
+        for (unsigned i = 0; i < numFilterTypes_; ++i)
+            totalNumAreas += numAreas_[i];
+
+        ret.Reserve(numFilterTypes_ * 3 + totalNumAreas + 1);
+        ret.Push(numFilterTypes_);
+
+        for (unsigned i = 0; i < numFilterTypes_; ++i)
+        {
+            const dtQueryFilter* filter = crowd_->getFilter(i);
+            assert(filter);
+            ret.Push(filter->getIncludeFlags());
+            ret.Push(filter->getExcludeFlags());
+            ret.Push(numAreas_[i]);
+
+            for (unsigned j = 0; j < numAreas_[i]; ++j)
+                ret.Push(filter->getAreaCost(j));
+        }
+    }
+    else
+        ret.Push(0);
+
+    return ret;
+}
+
+unsigned short CrowdManager::GetIncludeFlags(unsigned filterType) const
+{
+    if (filterType >= numFilterTypes_)
+        LOGWARNINGF("Filter type %d is not configured yet, returning the default include flags initialized by dtCrowd", filterType);
+    const dtQueryFilter* filter = GetDetourQueryFilter(filterType);
+    return filter ? filter->getIncludeFlags() : 0xffff;
+}
+
+unsigned short CrowdManager::GetExcludeFlags(unsigned filterType) const
+{
+    if (filterType >= numFilterTypes_)
+        LOGWARNINGF("Filter type %d is not configured yet, returning the default exclude flags initialized by dtCrowd", filterType);
+    const dtQueryFilter* filter = GetDetourQueryFilter(filterType);
+    return filter ? filter->getExcludeFlags() : 0;
+}
+
+float CrowdManager::GetAreaCost(unsigned filterType, unsigned areaID) const
+{
+    if (filterType >= numFilterTypes_ || areaID >= numAreas_[filterType])
+        LOGWARNINGF("Filter type %d and/or area id %d are not configured yet, returning the default area cost initialized by dtCrowd", filterType, areaID);
+    const dtQueryFilter* filter = GetDetourQueryFilter(filterType);
+    return filter ? filter->getAreaCost((int)areaID) : 1.f;
+}
+
+VariantVector CrowdManager::GetObstacleAvoidanceTypesAttr() const
+{
+    VariantVector ret;
+    if (crowd_)
+    {
+        ret.Reserve(numObstacleAvoidanceTypes_ * 10 + 1);
+        ret.Push(numObstacleAvoidanceTypes_);
+
+        for (unsigned i = 0; i < numObstacleAvoidanceTypes_; ++i)
+        {
+            const dtObstacleAvoidanceParams* params = crowd_->getObstacleAvoidanceParams(i);
+            assert(params);
+            ret.Push(params->velBias);
+            ret.Push(params->weightDesVel);
+            ret.Push(params->weightCurVel);
+            ret.Push(params->weightSide);
+            ret.Push(params->weightToi);
+            ret.Push(params->horizTime);
+            ret.Push(params->gridSize);
+            ret.Push(params->adaptiveDivs);
+            ret.Push(params->adaptiveRings);
+            ret.Push(params->adaptiveDepth);
+        }
+    }
+    else
+        ret.Push(0);
+
+    return ret;
+}
+
+const CrowdObstacleAvoidanceParams& CrowdManager::GetObstacleAvoidanceParams(unsigned obstacleAvoidanceType) const
+{
+    static const CrowdObstacleAvoidanceParams EMPTY_PARAMS = CrowdObstacleAvoidanceParams();
+    const dtObstacleAvoidanceParams* params = crowd_ ? crowd_->getObstacleAvoidanceParams(obstacleAvoidanceType) : 0;
+    return params ? *(const CrowdObstacleAvoidanceParams*)params : EMPTY_PARAMS;
+}
+
+PODVector<CrowdAgent*> CrowdManager::GetAgents(Node* node, bool inCrowdFilter) const
+{
+    if (!node)
+        node = GetScene();
+    PODVector<CrowdAgent*> agents;
+    node->GetComponents<CrowdAgent>(agents, true);
+    if (inCrowdFilter)
+    {
+        PODVector<CrowdAgent*>::Iterator i = agents.Begin();
+        while (i != agents.End())
+        {
+            if ((*i)->IsInCrowd())
+                ++i;
+            else
+                i = agents.Erase(i);
+        }
+    }
+    return agents;
+}
+
+bool CrowdManager::CreateCrowd()
 {
     if (!navigationMesh_ || !navigationMesh_->InitializeQuery())
         return false;
 
-    if (crowd_)
+    // Preserve the existing crowd configuration before recreating it
+    VariantVector filterTypeConfiguration, obstacleAvoidanceTypeConfiguration;
+    bool recreate = crowd_ != 0;
+    if (recreate)
+    {
+        filterTypeConfiguration = GetFilterTypesAttr();
+        obstacleAvoidanceTypeConfiguration = GetObstacleAvoidanceTypesAttr();
         dtFreeCrowd(crowd_);
+    }
     crowd_ = dtAllocCrowd();
 
     // Initialize the crowd
@@ -335,39 +541,14 @@ bool CrowdManager::CreateCrowd(bool readdCrowdAgents)
         return false;
     }
 
-    // Setup local avoidance params to different qualities.
-    dtObstacleAvoidanceParams params;
-    memcpy(&params, crowd_->getObstacleAvoidanceParams(0), sizeof(dtObstacleAvoidanceParams));
+    // Reconfigure the newly initialized crowd
+    if (recreate)
+    {
+        SetFilterTypesAttr(filterTypeConfiguration);
+        SetObstacleAvoidanceTypesAttr(obstacleAvoidanceTypeConfiguration);
+    }
 
-    // Low (11)
-    params.velBias = 0.5f;
-    params.adaptiveDivs = 5;
-    params.adaptiveRings = 2;
-    params.adaptiveDepth = 1;
-    crowd_->setObstacleAvoidanceParams(0, &params);
-
-    // Medium (22)
-    params.velBias = 0.5f;
-    params.adaptiveDivs = 5;
-    params.adaptiveRings = 2;
-    params.adaptiveDepth = 2;
-    crowd_->setObstacleAvoidanceParams(1, &params);
-
-    // Good (45)
-    params.velBias = 0.5f;
-    params.adaptiveDivs = 7;
-    params.adaptiveRings = 2;
-    params.adaptiveDepth = 3;
-    crowd_->setObstacleAvoidanceParams(2, &params);
-
-    // High (66)
-    params.velBias = 0.5f;
-    params.adaptiveDivs = 7;
-    params.adaptiveRings = 3;
-    params.adaptiveDepth = 3;
-    crowd_->setObstacleAvoidanceParams(3, &params);
-
-    if (readdCrowdAgents)
+    if (recreate)
     {
         PODVector<CrowdAgent*> agents = GetAgents();
         for (unsigned i = 0; i < agents.Size(); ++i)
@@ -414,13 +595,14 @@ void DetourCrowdManager::OnSceneSet(Scene* scene)
     if (scene)
     {
         SubscribeToEvent(scene, E_SCENESUBSYSTEMUPDATE, HANDLER(CrowdManager, HandleSceneSubsystemUpdate));
+        // TODO: Do not assume navmesh component always attach to scene node
         NavigationMesh* mesh = GetScene()->GetDerivedComponent<NavigationMesh>();
         if (mesh)
         {
             SubscribeToEvent(mesh, E_NAVIGATION_MESH_REBUILT, HANDLER(CrowdManager, HandleNavMeshFullRebuild));
             navigationMesh_ = navMesh;
             navigationMeshId_ = navMesh->GetID();
-            CreateCrowd(false);
+            CreateCrowd();
         }
         else
             LOGERROR("CrowdManager requires an existing navigation mesh");
@@ -435,23 +617,31 @@ void DetourCrowdManager::OnSceneSet(Scene* scene)
 
 void CrowdManager::Update(float delta)
 {
-    if (!crowd_ || !navigationMesh_)
-        return;
+    assert(crowd_ && navigationMesh_);
     PROFILE(UpdateCrowd);
     crowd_->update(delta, 0);
 }
 
-const dtCrowdAgent* CrowdManager::GetCrowdAgent(int agent)
+const dtCrowdAgent* CrowdManager::GetDetourCrowdAgent(int agent) const
 {
     return crowd_ ? crowd_->getAgent(agent) : 0;
 }
 
+const dtQueryFilter* CrowdManager::GetDetourQueryFilter(unsigned filterType) const
+{
+    return crowd_ ? crowd_->getFilter(filterType) : 0;
+}
+
 void CrowdManager::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData)
 {
-    using namespace SceneSubsystemUpdate;
+    // Perform update tick as long as the crowd is initialized and navmesh has not expired
+    if (crowd_ && navigationMesh_)
+    {
+        using namespace SceneSubsystemUpdate;
 
-    if (IsEnabledEffective())
-        Update(eventData[P_TIMESTEP].GetFloat());
+        if (IsEnabledEffective())
+            Update(eventData[P_TIMESTEP].GetFloat());
+    }
 }
 
 void CrowdManager::HandleNavMeshFullRebuild(StringHash eventType, VariantMap& eventData)

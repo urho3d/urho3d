@@ -168,7 +168,14 @@ void CrowdNavigation::CreateScene()
         CreateMushroom(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
 
     // Create a CrowdManager component to the scene root
-    scene_->CreateComponent<CrowdManager>();
+    CrowdManager* crowdManager = scene_->CreateComponent<CrowdManager>();
+    CrowdObstacleAvoidanceParams params = crowdManager->GetObstacleAvoidanceParams(0);
+    // Set the params to "High (66)" setting
+    params.velBias = 0.5f;
+    params.adaptiveDivs = 7;
+    params.adaptiveRings = 3;
+    params.adaptiveDepth = 3;
+    crowdManager->SetObstacleAvoidanceParams(0, params);
 
     // Create some movable barrels. We create them as crowd agents, as for moving entities it is less expensive and more convenient than using obstacles
     CreateMovingBarrels(navMesh);

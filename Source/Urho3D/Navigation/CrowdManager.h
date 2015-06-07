@@ -31,6 +31,7 @@ typedef unsigned int dtPolyRef;
 #endif
 
 class dtCrowd;
+class dtQueryFilter;
 struct dtCrowdAgent;
 
 namespace Urho3D
@@ -38,6 +39,21 @@ namespace Urho3D
 
 class CrowdAgent;
 class NavigationMesh;
+
+/// Parameter structure for obstacle avoidance params (copied from DetourObstacleAvoidance.h in order to hide Detour header from Urho3D library users).
+struct CrowdObstacleAvoidanceParams
+{
+    float velBias;
+    float weightDesVel;
+    float weightCurVel;
+    float weightSide;
+    float weightToi;
+    float horizTime;
+    unsigned char gridSize;         ///< grid
+    unsigned char adaptiveDivs;     ///< adaptive
+    unsigned char adaptiveRings;    ///< adaptive
+    unsigned char adaptiveDepth;    ///< adaptive
+};
 
 /// Crowd manager scene component. Should be added only to the root scene node.
 class URHO3D_API CrowdManager : public Component
@@ -73,8 +89,18 @@ public:
     void SetMaxAgentRadius(float maxAgentRadius);
     /// Assigns the navigation mesh for the crowd.
     void SetNavigationMesh(NavigationMesh* navMesh);
-    /// Set the cost of an area-type for the specified navigation filter type.
-    void SetAreaCost(unsigned filterTypeID, unsigned areaID, float cost);
+    /// Set all the filter types configured in the crowd based on the corresponding attribute.
+    void SetFilterTypesAttr(const VariantVector& value);
+    /// Set the include flags for the specified navigation filter type.
+    void SetIncludeFlags(unsigned filterType, unsigned short flags);
+    /// Set the exclude flags for the specified navigation filter type.
+    void SetExcludeFlags(unsigned filterType, unsigned short flags);
+    /// Set the cost of an area for the specified navigation filter type.
+    void SetAreaCost(unsigned filterType, unsigned areaID, float cost);
+    /// Set all the obstacle avoidance types configured in the crowd based on the corresponding attribute.
+    void SetObstacleAvoidanceTypesAttr(const VariantVector& value);
+    /// Set the params for the specified obstacle avoidance type.
+    void SetObstacleAvoidanceParams(unsigned obstacleAvoidanceType, const CrowdObstacleAvoidanceParams& params);
 
     /// Get all the crowd agent components in the specified node hierarchy. If the node is not specified then use scene node. When inCrowdFilter is set to true then only get agents that are in the crowd.
     PODVector<CrowdAgent*> GetAgents(Node* node = 0, bool inCrowdFilter = true) const;
@@ -98,12 +124,28 @@ public:
     float GetMaxAgentRadius() const { return maxAgentRadius_; }
     /// Get the Navigation mesh assigned to the crowd.
     NavigationMesh* GetNavigationMesh() const { return navigationMesh_; }
-    /// Get the cost of an area-type for the specified navigation filter type.
-    float GetAreaCost(unsigned filterTypeID, unsigned areaID) const;
+    /// Get the number of configured filter types.
+    unsigned GetNumFilterTypes() const { return numFilterTypes_; }
+    /// Get the number of configured area in the specified filter type.
+    unsigned GetNumAreas(unsigned filterType) const;
+    /// Return all the filter types configured in the crowd as attribute.
+    VariantVector GetFilterTypesAttr() const;
+    /// Get the include flags for the specified navigation filter type.
+    unsigned short GetIncludeFlags(unsigned filterType) const;
+    /// Get the exclude flags for the specified navigation filter type.
+    unsigned short GetExcludeFlags(unsigned filterType) const;
+    /// Get the cost of an area for the specified navigation filter type.
+    float GetAreaCost(unsigned filterType, unsigned areaID) const;
+    /// Get the number of configured obstacle avoidance types.
+    unsigned GetNumObstacleAvoidanceTypes() const { return numObstacleAvoidanceTypes_; }
+    /// Return all the obstacle avoidance types configured in the crowd as attribute.
+    VariantVector GetObstacleAvoidanceTypesAttr() const;
+    /// Get the params for the specified obstacle avoidance type.
+    const CrowdObstacleAvoidanceParams& GetObstacleAvoidanceParams(unsigned obstacleAvoidanceType) const;
 
 protected:
-    /// Create internal Detour crowd object for the specified navigation mesh. If readdCrowdAgents is true then attempt to re-add existing agents in the previous crowd back to the newly created crowd.
-    bool CreateCrowd(bool readdCrowdAgents = true);
+    /// Create and initialized internal Detour crowd object. When it is a recreate, it preserves the configuration and attempts to re-add existing agents in the previous crowd back to the newly created crowd.
+    bool CreateCrowd();
     /// Create and adds an detour crowd agent, Agent's radius and height is set through the navigation mesh. Return -1 on error, agent ID on success.
     int AddAgent(CrowdAgent* agent, const Vector3& pos);
     /// Removes the detour crowd agent.
@@ -115,7 +157,9 @@ protected:
     /// Update the crowd simulation.
     void Update(float delta);
     /// Get the detour crowd agent.
-    const dtCrowdAgent* GetCrowdAgent(int agent);
+    const dtCrowdAgent* GetDetourCrowdAgent(int agent) const;
+    /// Get the detour query filter.
+    const dtQueryFilter* GetDetourQueryFilter(unsigned filterType) const;
     /// Get the internal detour crowd component.
     dtCrowd* GetCrowd() const { return crowd_; }
 
@@ -135,6 +179,12 @@ private:
     float maxAgentRadius_;
     /// The NavigationMesh component Id for pending crowd creation.
     unsigned navigationMeshId_;
+    /// Number of filter types configured in the crowd. Limit to DT_CROWD_MAX_QUERY_FILTER_TYPE.
+    unsigned numFilterTypes_;
+    /// Number of configured area in each filter type. Limit to DT_MAX_AREAS.
+    PODVector<unsigned> numAreas_;
+    /// Number of obstacle avoidance types configured in the crowd. Limit to DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS.
+    unsigned numObstacleAvoidanceTypes_;
 };
 
 }

@@ -10,7 +10,10 @@ class CrowdManager : public Component
     void SetMaxAgents(unsigned agentCt);
     void SetMaxAgentRadius(float maxAgentRadius);
     void SetNavigationMesh(NavigationMesh *navMesh);
-    void SetAreaCost(unsigned filterID, unsigned areaID, float cost);
+    void SetIncludeFlags(unsigned filterType, unsigned short flags);
+    void SetExcludeFlags(unsigned filterType, unsigned short flags);
+    void SetAreaCost(unsigned filterType, unsigned areaID, float cost);
+    void SetObstacleAvoidanceParams(unsigned obstacleAvoidanceType, const CrowdObstacleAvoidanceParams& params);
 
     PODVector<CrowdAgent*> GetAgents(Node* node = 0, bool inCrowdFilter = true) const;
     Vector3 FindNearestPoint(const Vector3& point, int filterType);
@@ -23,7 +26,13 @@ class CrowdManager : public Component
     unsigned GetMaxAgents() const;
     float GetMaxAgentRadius() const;
     NavigationMesh* GetNavigationMesh() const;
-    float GetAreaCost(unsigned filterID, unsigned areaID) const;
+    unsigned GetNumFilterTypes() const;
+    unsigned GetNumAreas(unsigned filterType) const;
+    unsigned short GetIncludeFlags(unsigned filterType) const;
+    unsigned short GetExcludeFlags(unsigned filterType) const;
+    float GetAreaCost(unsigned filterType, unsigned areaID) const;
+    unsigned GetNumObstacleAvoidanceTypes() const;
+    const CrowdObstacleAvoidanceParams& GetObstacleAvoidanceParams(unsigned obstacleAvoidanceType) const;
 
     tolua_property__get_set int maxAgents;
     tolua_property__get_set float maxAgentRadius;
