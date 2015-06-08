@@ -58,9 +58,10 @@ void CrowdAgentUpdateCallback(dtCrowdAgent* ag, float dt)
 CrowdManager::CrowdManager(Context* context) :
     Component(context),
     crowd_(0),
+    navigationMesh_(0),
+    navigationMeshId_(0),
     maxAgents_(DEFAULT_MAX_AGENTS),
     maxAgentRadius_(DEFAULT_MAX_AGENT_RADIUS),
-    navigationMeshId_(0),
     numFilterTypes_(0),
     numObstacleAvoidanceTypes_(0)
 {
@@ -107,7 +108,7 @@ void CrowdManager::ApplyAttributes()
     navigationMeshId_ = navigationMesh_ ? navigationMesh_->GetID() : 0;     // In case of receiving an invalid component id, revert it back to the existing navmesh component id (if any)
 
     // If the Detour crowd initialization parameters have changed then recreate it
-    if (crowd_ && (navMeshChange || crowd_->getAgentCount() != maxAgents_ || crowd_->getMaxAgentRadius() != (maxAgentRadius_ > 0.f ? maxAgentRadius_ : navigationMesh_->GetAgentRadius())))
+    if (crowd_ && (navMeshChange || crowd_->getAgentCount() != maxAgents_ || crowd_->getMaxAgentRadius() != maxAgentRadius_))
         CreateCrowd();
 }
 
@@ -235,10 +236,10 @@ void CrowdManager::SetMaxAgentRadius(float maxAgentRadius)
 
 void CrowdManager::SetNavigationMesh(NavigationMesh* navMesh)
 {
-    if (navMesh != navigationMesh_ && navMesh)
+    if (navMesh != navigationMesh_)     // It is possible to reset navmesh pointer back to 0
     {
         navigationMesh_ = navMesh;
-        navigationMeshId_ = navMesh->GetID();
+        navigationMeshId_ = navMesh ? navMesh->GetID() : 0;
         CreateCrowd();
         MarkNetworkUpdate();
     }
@@ -347,7 +348,7 @@ void CrowdManager::SetObstacleAvoidanceParams(unsigned obstacleAvoidanceType, co
 {
     if (crowd_ && obstacleAvoidanceType < DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS)
     {
-        crowd_->setObstacleAvoidanceParams(obstacleAvoidanceType, (dtObstacleAvoidanceParams*)&params);
+        crowd_->setObstacleAvoidanceParams(obstacleAvoidanceType, reinterpret_cast<const dtObstacleAvoidanceParams*>(&params));
         if (numObstacleAvoidanceTypes_ < obstacleAvoidanceType + 1)
             numObstacleAvoidanceTypes_ = obstacleAvoidanceType + 1;
         MarkNetworkUpdate();
@@ -495,7 +496,7 @@ const CrowdObstacleAvoidanceParams& CrowdManager::GetObstacleAvoidanceParams(uns
 {
     static const CrowdObstacleAvoidanceParams EMPTY_PARAMS = CrowdObstacleAvoidanceParams();
     const dtObstacleAvoidanceParams* params = crowd_ ? crowd_->getObstacleAvoidanceParams(obstacleAvoidanceType) : 0;
-    return params ? *(const CrowdObstacleAvoidanceParams*)params : EMPTY_PARAMS;
+    return params ? *reinterpret_cast<const CrowdObstacleAvoidanceParams*>(params) : EMPTY_PARAMS;
 }
 
 PODVector<CrowdAgent*> CrowdManager::GetAgents(Node* node, bool inCrowdFilter) const
@@ -535,21 +536,21 @@ bool CrowdManager::CreateCrowd()
     crowd_ = dtAllocCrowd();
 
     // Initialize the crowd
-    if (!crowd_->init(maxAgents_, maxAgentRadius_ > 0.f ? maxAgentRadius_ : navigationMesh_->GetAgentRadius(), navigationMesh_->navMesh_, CrowdAgentUpdateCallback))
+    if (maxAgentRadius_ == 0.f)
+        maxAgentRadius_ = navigationMesh_->GetAgentRadius();
+    if (!crowd_->init(maxAgents_, maxAgentRadius_, navigationMesh_->navMesh_, CrowdAgentUpdateCallback))
     {
         LOGERROR("Could not initialize DetourCrowd");
         return false;
     }
 
-    // Reconfigure the newly initialized crowd
     if (recreate)
     {
+        // Reconfigure the newly initialized crowd
         SetFilterTypesAttr(filterTypeConfiguration);
         SetObstacleAvoidanceTypesAttr(obstacleAvoidanceTypeConfiguration);
-    }
 
-    if (recreate)
-    {
+        // Re-add the existing crowd agents
         PODVector<CrowdAgent*> agents = GetAgents();
         for (unsigned i = 0; i < agents.Size(); ++i)
         {
@@ -588,29 +589,37 @@ void CrowdManager::RemoveAgent(CrowdAgent* agent)
     crowd_->removeAgent(agent->GetAgentCrowdId());
 }
 
-void DetourCrowdManager::OnSceneSet(Scene* scene)
+void CrowdManager::OnSceneSet(Scene* scene)
 {
     // Subscribe to the scene subsystem update, which will trigger the crowd update step, and grab a reference
     // to the scene's NavigationMesh
     if (scene)
     {
-        SubscribeToEvent(scene, E_SCENESUBSYSTEMUPDATE, HANDLER(CrowdManager, HandleSceneSubsystemUpdate));
-        // TODO: Do not assume navmesh component always attach to scene node
-        NavigationMesh* mesh = GetScene()->GetDerivedComponent<NavigationMesh>();
-        if (mesh)
+        if (scene != node_)
         {
-            SubscribeToEvent(mesh, E_NAVIGATION_MESH_REBUILT, HANDLER(CrowdManager, HandleNavMeshFullRebuild));
+            LOGERROR("CrowdManager is a scene component and should only be attached to the scene node");
+            return;
+        }
+
+        SubscribeToEvent(scene, E_SCENESUBSYSTEMUPDATE, HANDLER(CrowdManager, HandleSceneSubsystemUpdate));
+
+        // Attempt to auto discover a NavigationMesh component (or its derivative) under the scene node
+        NavigationMesh* navMesh = scene->GetDerivedComponent<NavigationMesh>(true);
+        if (navMesh)
+        {
             navigationMesh_ = navMesh;
             navigationMeshId_ = navMesh->GetID();
             CreateCrowd();
+
+            SubscribeToEvent(navMesh->GetNode(), E_NAVIGATION_MESH_REBUILT, HANDLER(CrowdManager, HandleNavMeshChanged));
+            SubscribeToEvent(navMesh->GetNode(), E_COMPONENTREMOVED, HANDLER(CrowdManager, HandleNavMeshChanged));
         }
-        else
-            LOGERROR("CrowdManager requires an existing navigation mesh");
     }
     else
     {
         UnsubscribeFromEvent(E_SCENESUBSYSTEMUPDATE);
         UnsubscribeFromEvent(E_NAVIGATION_MESH_REBUILT);
+        UnsubscribeFromEvent(E_COMPONENTREMOVED);
         navigationMesh_.Reset();
     }
 }
@@ -634,7 +643,7 @@ const dtQueryFilter* CrowdManager::GetDetourQueryFilter(unsigned filterType) con
 
 void CrowdManager::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // Perform update tick as long as the crowd is initialized and navmesh has not expired
+    // Perform update tick as long as the crowd is initialized and the associated navmesh has not been removed
     if (crowd_ && navigationMesh_)
     {
         using namespace SceneSubsystemUpdate;
@@ -644,12 +653,25 @@ void CrowdManager::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& 
     }
 }
 
-void CrowdManager::HandleNavMeshFullRebuild(StringHash eventType, VariantMap& eventData)
+void CrowdManager::HandleNavMeshChanged(StringHash eventType, VariantMap& eventData)
 {
-    using namespace NavigationMeshRebuilt;
-
-    // The mesh being rebuilt may not have existed before
-    SetNavigationMesh(static_cast<NavigationMesh*>(eventData[P_MESH].GetPtr()));
+    NavigationMesh* navMesh;
+    if (eventType == E_NAVIGATION_MESH_REBUILT)
+    {
+        // The mesh being rebuilt may not have existed before
+        navMesh = static_cast<NavigationMesh*>(eventData[NavigationMeshRebuilt::P_MESH].GetPtr());
+    }
+    else
+    {
+        // eventType == E_COMPONENTREMOVED
+        navMesh = static_cast<NavigationMesh*>(eventData[ComponentRemoved::P_COMPONENT].GetPtr());
+        // Only interested in navmesh component being used to initialized the crowd
+        if (navMesh != navigationMesh_)
+            return;
+        // Since this is a component removed event, reset our own navmesh pointer
+        navMesh = 0;
+    }
+    SetNavigationMesh(navMesh);
 }
 
 }
