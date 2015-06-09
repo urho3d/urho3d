@@ -27,16 +27,16 @@
 #include "../Math/Vector3.h"
 
 class rcContext;
-struct rcHeightfield;
-struct rcCompactHeightfield;
-struct rcContourSet;
-struct rcPolyMesh;
-struct rcPolyMeshDetail;
 
-struct rcHeightfieldLayerSet;
 struct dtTileCacheContourSet;
 struct dtTileCachePolyMesh;
 struct dtTileCacheAlloc;
+struct rcCompactHeightfield;
+struct rcContourSet;
+struct rcHeightfield;
+struct rcHeightfieldLayerSet;
+struct rcPolyMesh;
+struct rcPolyMeshDetail;
 
 namespace Urho3D
 {

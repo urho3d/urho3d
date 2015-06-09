@@ -108,8 +108,8 @@ public:
     void SetRadius(float radius);
     /// Set the agent's height.
     void SetHeight(float height);
-    /// Set the agent's filter type.
-    void SetFilterType(unsigned filterType);
+    /// Set the agent's query filter type.
+    void SetQueryFilterType(unsigned queryFilterType);
     /// Set the agent's obstacle avoidance type.
     void SetObstacleAvoidanceType(unsigned obstacleAvoidanceType);
     /// Set the agent's navigation quality.
@@ -145,8 +145,8 @@ public:
     float GetRadius() const { return radius_; }
     /// Get the agent's height.
     float GetHeight() const { return height_; }
-    /// Get the agent's filter type.
-    unsigned GetFilterType() const { return filterType_; }
+    /// Get the agent's query filter type.
+    unsigned GetQueryFilterType() const { return queryFilterType_; }
     /// Get the agent's obstacle avoidance type.
     unsigned GetObstacleAvoidanceType() const { return obstacleAvoidanceType_; }
     /// Get the agent's navigation quality.
@@ -206,8 +206,8 @@ private:
     float radius_;
     /// Agent's height, if 0 the navigation mesh's setting will be used.
     float height_;
-    /// Agent's filter type, it is an index to the filter array configured in Detour crowd manager.
-    unsigned filterType_;
+    /// Agent's query filter type, it is an index to the query filter buffer configured in Detour crowd manager.
+    unsigned queryFilterType_;
     /// Agent's obstacle avoidance type, it is an index to the obstacle avoidance array configured in Detour crowd manager. It is ignored when agent's navigation quality is not set to "NAVIGATIONQUALITY_HIGH".
     unsigned obstacleAvoidanceType_;
     /// Agent's navigation quality. The higher the setting, the higher the CPU usage during crowd simulation.

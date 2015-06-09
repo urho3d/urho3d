@@ -37,14 +37,6 @@ typedef unsigned int dtPolyRef;
 class dtNavMesh;
 class dtNavMeshQuery;
 class dtQueryFilter;
-struct dtNavMeshCreateParams;
-class rcContext;
-struct rcHeightfield;
-struct rcCompactHeightfield;
-struct rcContourSet;
-struct rcPolyMesh;
-struct rcPolyMeshDetail;
-struct rcHeightFieldLayerSet;
 
 namespace Urho3D
 {

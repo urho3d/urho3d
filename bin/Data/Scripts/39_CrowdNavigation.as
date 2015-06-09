@@ -452,7 +452,7 @@ void HandleCrowdAgentFormation(StringHash eventType, VariantMap& eventData)
     {
         CrowdManager@ crowdManager =GetEventSender();
         CrowdAgent@ agent = eventData["CrowdAgent"].GetPtr();
-        eventData["Position"] = crowdManager.GetRandomPointInCircle(position, agent.radius, agent.filterType);
+        eventData["Position"] = crowdManager.GetRandomPointInCircle(position, agent.radius, agent.queryFilterType);
     }
 }
 

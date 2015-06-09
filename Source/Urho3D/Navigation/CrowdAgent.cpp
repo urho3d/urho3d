@@ -49,7 +49,7 @@ extern const char* NAVIGATION_CATEGORY;
 static const CrowdAgentRequestedTarget DEFAULT_AGENT_REQUEST_TARGET_TYPE = CA_REQUESTEDTARGET_NONE;
 static const float DEFAULT_AGENT_MAX_SPEED = 0.f;
 static const float DEFAULT_AGENT_MAX_ACCEL = 0.f;
-static const unsigned DEFAULT_AGENT_FILTER_TYPE = 0;
+static const unsigned DEFAULT_AGENT_QUERY_FILTER_TYPE = 0;
 static const unsigned DEFAULT_AGENT_OBSTACLE_AVOIDANCE_TYPE = 0;
 static const NavigationQuality DEFAULT_AGENT_AVOIDANCE_QUALITY = NAVIGATIONQUALITY_HIGH;
 static const NavigationPushiness DEFAULT_AGENT_NAVIGATION_PUSHINESS = NAVIGATIONPUSHINESS_MEDIUM;
@@ -88,7 +88,7 @@ CrowdAgent::CrowdAgent(Context* context) :
     maxSpeed_(DEFAULT_AGENT_MAX_SPEED),
     radius_(0.0f),
     height_(0.0f),
-    filterType_(DEFAULT_AGENT_FILTER_TYPE),
+    queryFilterType_(DEFAULT_AGENT_QUERY_FILTER_TYPE),
     obstacleAvoidanceType_(DEFAULT_AGENT_OBSTACLE_AVOIDANCE_TYPE),
     navQuality_(DEFAULT_AGENT_AVOIDANCE_QUALITY),
     navPushiness_(DEFAULT_AGENT_NAVIGATION_PUSHINESS),
@@ -115,7 +115,7 @@ void CrowdAgent::RegisterObject(Context* context)
     ATTRIBUTE("Max Speed", float, maxSpeed_, DEFAULT_AGENT_MAX_SPEED, AM_DEFAULT);
     ATTRIBUTE("Radius", float, radius_, 0.0f, AM_DEFAULT);
     ATTRIBUTE("Height", float, height_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE("Filter Type", unsigned, filterType_, DEFAULT_AGENT_FILTER_TYPE, AM_DEFAULT);
+    ATTRIBUTE("Query Filter Type", unsigned, queryFilterType_, DEFAULT_AGENT_QUERY_FILTER_TYPE, AM_DEFAULT);
     ATTRIBUTE("Obstacle Avoidance Type", unsigned, obstacleAvoidanceType_, DEFAULT_AGENT_OBSTACLE_AVOIDANCE_TYPE, AM_DEFAULT);
     ENUM_ATTRIBUTE("Navigation Pushiness", navPushiness_, crowdAgentPushinessNames, DEFAULT_AGENT_NAVIGATION_PUSHINESS, AM_DEFAULT);
     ENUM_ATTRIBUTE("Navigation Quality", navQuality_, crowdAgentAvoidanceQualityNames, DEFAULT_AGENT_AVOIDANCE_QUALITY, AM_DEFAULT);
@@ -128,7 +128,7 @@ void CrowdAgent::ApplyAttributes()
     maxSpeed_ = Max(0.f, maxSpeed_);
     radius_ = Max(0.f, radius_);
     height_ = Max(0.f, height_);
-    filterType_ = Min(filterType_, DT_CROWD_MAX_QUERY_FILTER_TYPE - 1);
+    queryFilterType_ = Min(queryFilterType_, DT_CROWD_MAX_QUERY_FILTER_TYPE - 1);
     obstacleAvoidanceType_ = Min(obstacleAvoidanceType_, DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS - 1);
 
     UpdateParameters();
@@ -253,7 +253,7 @@ void CrowdAgent::UpdateParameters(unsigned scope)
             params.maxAcceleration = maxAccel_;
             params.maxSpeed = maxSpeed_;
             params.pathOptimizationRange = radius_ * 30.0f;
-            params.queryFilterType = (unsigned char)filterType_;
+            params.queryFilterType = (unsigned char)queryFilterType_;
             params.obstacleAvoidanceType = (unsigned char)obstacleAvoidanceType_;
         }
 
@@ -327,7 +327,7 @@ void CrowdAgent::SetTargetPosition(const Vector3& position)
         if (IsInCrowd())   // Make sure the previous method call is successful
         {
             dtPolyRef nearestRef;
-            Vector3 nearestPos = crowdManager_->FindNearestPoint(position, filterType_, &nearestRef);
+            Vector3 nearestPos = crowdManager_->FindNearestPoint(position, queryFilterType_, &nearestRef);
             crowdManager_->GetCrowd()->requestMoveTarget(agentCrowdId_, nearestRef, nearestPos.Data());
         }
     }
@@ -407,17 +407,17 @@ void CrowdAgent::SetHeight(float height)
     }
 }
 
-void CrowdAgent::SetFilterType(unsigned filterType)
+void CrowdAgent::SetQueryFilterType(unsigned queryFilterType)
 {
-    if (filterType != filterType_)
+    if (queryFilterType != queryFilterType_)
     {
-        if (filterType >= DT_CROWD_MAX_QUERY_FILTER_TYPE)
+        if (queryFilterType >= DT_CROWD_MAX_QUERY_FILTER_TYPE)
         {
-            LOGERRORF("The specified filter type index (%d) exceeds the maximum allowed value (%d)", filterType, DT_CROWD_MAX_QUERY_FILTER_TYPE);
+            LOGERRORF("The specified filter type index (%d) exceeds the maximum allowed value (%d)", queryFilterType, DT_CROWD_MAX_QUERY_FILTER_TYPE);
             return;
         }
 
-        filterType_ = filterType;
+        queryFilterType_ = queryFilterType;
         UpdateParameters(SCOPE_BASE_PARAMS);
         MarkNetworkUpdate();
     }

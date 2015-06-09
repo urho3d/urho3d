@@ -564,6 +564,6 @@ void CrowdNavigation::HandleCrowdAgentFormation(StringHash eventType, VariantMap
     {
         CrowdManager* crowdManager = static_cast<CrowdManager*>(GetEventSender());
         CrowdAgent* agent = static_cast<CrowdAgent*>(eventData[P_CROWD_AGENT].GetPtr());
-        eventData[P_POSITION] = crowdManager->GetRandomPointInCircle(position, agent->GetRadius(), agent->GetFilterType());
+        eventData[P_POSITION] = crowdManager->GetRandomPointInCircle(position, agent->GetRadius(), agent->GetQueryFilterType());
     }
 }

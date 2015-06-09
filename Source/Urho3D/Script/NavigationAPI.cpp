@@ -32,6 +32,7 @@
 #include "../Navigation/NavigationMesh.h"
 #include "../Navigation/Obstacle.h"
 #include "../Navigation/OffMeshConnection.h"
+#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {
@@ -215,7 +216,7 @@ void RegisterCrowdManager(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CrowdManager", "void set_maxAgentRadius(float)", asMETHOD(CrowdManager, SetMaxAgentRadius), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "void set_navMesh(NavigationMesh@+)", asMETHOD(CrowdManager, SetNavigationMesh), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "NavigationMesh@+ get_navMesh() const", asMETHOD(CrowdManager, GetNavigationMesh), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdManager", "uint get_numFilterTypes() const", asMETHOD(CrowdManager, GetNumFilterTypes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdManager", "uint get_numQueryFilterTypes() const", asMETHOD(CrowdManager, GetNumQueryFilterTypes), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "uint get_numAreas(uint) const", asMETHOD(CrowdManager, GetNumAreas), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdManager", "uint get_numObstacleAvoidanceTypes() const", asMETHOD(CrowdManager, GetNumObstacleAvoidanceTypes), asCALL_THISCALL);
 }
@@ -268,8 +269,8 @@ void RegisterCrowdAgent(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CrowdAgent", "float get_radius()", asMETHOD(CrowdAgent, GetRadius), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "void set_height(float)", asMETHOD(CrowdAgent, SetHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "float get_height()", asMETHOD(CrowdAgent, GetHeight), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "uint get_filterType()", asMETHOD(CrowdAgent, GetFilterType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CrowdAgent", "void set_filterType(uint)", asMETHOD(CrowdAgent, SetFilterType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "uint get_queryFilterType()", asMETHOD(CrowdAgent, GetQueryFilterType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CrowdAgent", "void set_queryFilterType(uint)", asMETHOD(CrowdAgent, SetQueryFilterType), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "uint get_obstacleAvoidanceType()", asMETHOD(CrowdAgent, GetObstacleAvoidanceType), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "void set_obstacleAvoidanceType(uint)", asMETHOD(CrowdAgent, SetObstacleAvoidanceType), asCALL_THISCALL);
     engine->RegisterObjectMethod("CrowdAgent", "void set_navigationQuality(NavigationQuality)", asMETHOD(CrowdAgent, SetNavigationQuality), asCALL_THISCALL);

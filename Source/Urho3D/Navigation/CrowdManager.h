@@ -89,14 +89,14 @@ public:
     void SetMaxAgentRadius(float maxAgentRadius);
     /// Assigns the navigation mesh for the crowd.
     void SetNavigationMesh(NavigationMesh* navMesh);
-    /// Set all the filter types configured in the crowd based on the corresponding attribute.
-    void SetFilterTypesAttr(const VariantVector& value);
-    /// Set the include flags for the specified navigation filter type.
-    void SetIncludeFlags(unsigned filterType, unsigned short flags);
-    /// Set the exclude flags for the specified navigation filter type.
-    void SetExcludeFlags(unsigned filterType, unsigned short flags);
-    /// Set the cost of an area for the specified navigation filter type.
-    void SetAreaCost(unsigned filterType, unsigned areaID, float cost);
+    /// Set all the query filter types configured in the crowd based on the corresponding attribute.
+    void SetQueryFilterTypesAttr(const VariantVector& value);
+    /// Set the include flags for the specified query filter type.
+    void SetIncludeFlags(unsigned queryFilterType, unsigned short flags);
+    /// Set the exclude flags for the specified query filter type.
+    void SetExcludeFlags(unsigned queryFilterType, unsigned short flags);
+    /// Set the cost of an area for the specified query filter type.
+    void SetAreaCost(unsigned queryFilterType, unsigned areaID, float cost);
     /// Set all the obstacle avoidance types configured in the crowd based on the corresponding attribute.
     void SetObstacleAvoidanceTypesAttr(const VariantVector& value);
     /// Set the params for the specified obstacle avoidance type.
@@ -104,38 +104,38 @@ public:
 
     /// Get all the crowd agent components in the specified node hierarchy. If the node is not specified then use scene node. When inCrowdFilter is set to true then only get agents that are in the crowd.
     PODVector<CrowdAgent*> GetAgents(Node* node = 0, bool inCrowdFilter = true) const;
-    /// Find the nearest point on the navigation mesh to a given point using the crowd initialized query extent (based on maxAgentRadius) and the specified crowd filter type.
-    Vector3 FindNearestPoint(const Vector3& point, int filterType, dtPolyRef* nearestRef = 0);
-    /// Try to move along the surface from one point to another using the crowd initialized query extent (based on maxAgentRadius) and the specified crowd filter type.
-    Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, int filterType, int maxVisited = 3);
-    /// Find a path between world space points using the crowd initialized query extent (based on maxAgentRadius) and the specified crowd filter type. Return non-empty list of points if successful.
-    void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, int filterType);
-    /// Return a random point on the navigation mesh using the crowd initialized query extent (based on maxAgentRadius) and the specified crowd filter type.
-    Vector3 GetRandomPoint(int filterType, dtPolyRef* randomRef = 0);
-    /// Return a random point on the navigation mesh within a circle using the crowd initialized query extent (based on maxAgentRadius) and the specified crowd filter type. The circle radius is only a guideline and in practice the returned point may be further away.
-    Vector3 GetRandomPointInCircle(const Vector3& center, float radius, int filterType, dtPolyRef* randomRef = 0);
-    /// Return distance to wall from a point using the crowd initialized query extent (based on maxAgentRadius) and the specified crowd filter type. Maximum search radius must be specified.
-    float GetDistanceToWall(const Vector3& point, float radius, int filterType, Vector3* hitPos = 0, Vector3* hitNormal = 0);
-    /// Perform a walkability raycast on the navigation mesh between start and end using the crowd initialized query extent (based on maxAgentRadius) and the specified crowd filter type. Return the point where a wall was hit, or the end point if no walls.
-    Vector3 Raycast(const Vector3& start, const Vector3& end, int filterType, Vector3* hitNormal = 0);
+    /// Find the nearest point on the navigation mesh to a given point using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type.
+    Vector3 FindNearestPoint(const Vector3& point, int queryFilterType, dtPolyRef* nearestRef = 0);
+    /// Try to move along the surface from one point to another using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type.
+    Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, int queryFilterType, int maxVisited = 3);
+    /// Find a path between world space points using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type. Return non-empty list of points if successful.
+    void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, int queryFilterType);
+    /// Return a random point on the navigation mesh using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type.
+    Vector3 GetRandomPoint(int queryFilterType, dtPolyRef* randomRef = 0);
+    /// Return a random point on the navigation mesh within a circle using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type. The circle radius is only a guideline and in practice the returned point may be further away.
+    Vector3 GetRandomPointInCircle(const Vector3& center, float radius, int queryFilterType, dtPolyRef* randomRef = 0);
+    /// Return distance to wall from a point using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type. Maximum search radius must be specified.
+    float GetDistanceToWall(const Vector3& point, float radius, int queryFilterType, Vector3* hitPos = 0, Vector3* hitNormal = 0);
+    /// Perform a walkability raycast on the navigation mesh between start and end using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type. Return the point where a wall was hit, or the end point if no walls.
+    Vector3 Raycast(const Vector3& start, const Vector3& end, int queryFilterType, Vector3* hitNormal = 0);
     /// Get the maximum number of agents.
     unsigned GetMaxAgents() const { return maxAgents_; }
     /// Get the maximum radius of any agent.
     float GetMaxAgentRadius() const { return maxAgentRadius_; }
     /// Get the Navigation mesh assigned to the crowd.
     NavigationMesh* GetNavigationMesh() const { return navigationMesh_; }
-    /// Get the number of configured filter types.
-    unsigned GetNumFilterTypes() const { return numFilterTypes_; }
-    /// Get the number of configured area in the specified filter type.
-    unsigned GetNumAreas(unsigned filterType) const;
+    /// Get the number of configured query filter types.
+    unsigned GetNumQueryFilterTypes() const { return numQueryFilterTypes_; }
+    /// Get the number of configured area in the specified query filter type.
+    unsigned GetNumAreas(unsigned queryFilterType) const;
     /// Return all the filter types configured in the crowd as attribute.
-    VariantVector GetFilterTypesAttr() const;
-    /// Get the include flags for the specified navigation filter type.
-    unsigned short GetIncludeFlags(unsigned filterType) const;
-    /// Get the exclude flags for the specified navigation filter type.
-    unsigned short GetExcludeFlags(unsigned filterType) const;
-    /// Get the cost of an area for the specified navigation filter type.
-    float GetAreaCost(unsigned filterType, unsigned areaID) const;
+    VariantVector GetQueryFilterTypesAttr() const;
+    /// Get the include flags for the specified query filter type.
+    unsigned short GetIncludeFlags(unsigned queryFilterType) const;
+    /// Get the exclude flags for the specified query filter type.
+    unsigned short GetExcludeFlags(unsigned queryFilterType) const;
+    /// Get the cost of an area for the specified query filter type.
+    float GetAreaCost(unsigned queryFilterType, unsigned areaID) const;
     /// Get the number of configured obstacle avoidance types.
     unsigned GetNumObstacleAvoidanceTypes() const { return numObstacleAvoidanceTypes_; }
     /// Return all the obstacle avoidance types configured in the crowd as attribute.
@@ -159,7 +159,7 @@ protected:
     /// Get the detour crowd agent.
     const dtCrowdAgent* GetDetourCrowdAgent(int agent) const;
     /// Get the detour query filter.
-    const dtQueryFilter* GetDetourQueryFilter(unsigned filterType) const;
+    const dtQueryFilter* GetDetourQueryFilter(unsigned queryFilterType) const;
     /// Get the internal detour crowd component.
     dtCrowd* GetCrowd() const { return crowd_; }
 
@@ -179,8 +179,8 @@ private:
     unsigned maxAgents_;
     /// The maximum radius of any agent that will be added to the crowd.
     float maxAgentRadius_;
-    /// Number of filter types configured in the crowd. Limit to DT_CROWD_MAX_QUERY_FILTER_TYPE.
-    unsigned numFilterTypes_;
+    /// Number of query filter types configured in the crowd. Limit to DT_CROWD_MAX_QUERY_FILTER_TYPE.
+    unsigned numQueryFilterTypes_;
     /// Number of configured area in each filter type. Limit to DT_MAX_AREAS.
     PODVector<unsigned> numAreas_;
     /// Number of obstacle avoidance types configured in the crowd. Limit to DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS.

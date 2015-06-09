@@ -51,7 +51,7 @@ class CrowdAgent : public Component
     void SetMaxSpeed(float maxSpeed);
     void SetRadius(float radius);
     void SetHeight(float height);
-    void SetFilterType(unsigned filterType);
+    void SetQueryFilterType(unsigned queryFilterType);
     void SetObstacleAvoidanceType(unsigned obstacleOvoidanceType);
     void SetNavigationQuality(NavigationQuality val);
     void SetNavigationPushiness(NavigationPushiness val);
@@ -69,7 +69,7 @@ class CrowdAgent : public Component
     float GetMaxSpeed() const;
     float GetRadius() const;
     float GetHeight() const;
-    unsigned GetFilterType() const;
+    unsigned GetQueryFilterType() const;
     unsigned GetObstacleAvoidanceType() const;
     NavigationQuality GetNavigationQuality() const;
     NavigationPushiness GetNavigationPushiness() const;
@@ -84,7 +84,7 @@ class CrowdAgent : public Component
     tolua_property__get_set float maxSpeed;
     tolua_property__get_set float radius;
     tolua_property__get_set float height;
-    tolua_property__get_set unsigned filterType;
+    tolua_property__get_set unsigned queryFilterType;
     tolua_property__get_set unsigned obstacleAvoidanceType;
     tolua_property__get_set NavigationQuality navigationQuality;
     tolua_property__get_set NavigationPushiness navigationPushiness;
