@@ -98,6 +98,13 @@ if (MSVC)
             endif ()
         endif ()
     endif ()
+else ()
+    # MinGW compiler toolchain is assumed to come with its own necessary headers and libraries for Direct3D
+    if (NOT URHO3D_D3D11)
+        set (DIRECT3D_LIBRARIES d3d9 d3dcompiler)
+    else ()
+        set (DIRECT3D_LIBRARIES d3d11 d3dcompiler dxgi dxguid)
+    endif ()
 endif ()
 
 if (DIRECT3D_FOUND)
