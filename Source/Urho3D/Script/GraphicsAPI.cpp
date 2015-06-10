@@ -1180,6 +1180,7 @@ static void RegisterAnimationController(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationController", "bool IsPlaying(const String&in) const", asMETHOD(AnimationController, IsPlaying), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool IsFadingIn(const String&in) const", asMETHOD(AnimationController, IsFadingIn), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool IsFadingOut(const String&in) const", asMETHOD(AnimationController, IsFadingOut), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool IsAtEnd(const String&in) const", asMETHOD(AnimationController, IsAtEnd), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "uint8 GetLayer(const String&in) const", asMETHOD(AnimationController, GetLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "const String& GetStartBone(const String&in) const", asMETHOD(AnimationController, GetStartBoneName), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "float GetTime(const String&in) const", asMETHOD(AnimationController, GetTime), asCALL_THISCALL);
