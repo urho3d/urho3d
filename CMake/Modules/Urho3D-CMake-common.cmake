@@ -350,15 +350,18 @@ if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
     add_definitions (-DURHO3D_STATIC_DEFINE)
 endif ()
 
-# Find DirectX SDK include & library directories for Visual Studio. It is also possible to compile
-# without if a recent Windows SDK is installed. The SDK is not searched for with MinGW as it is
-# incompatible; rather, it is assumed that MinGW itself comes with the necessary headers & libraries.
+# Find Direct3D include & library directories for Visual Studio in MS Windows SDK or DirectX SDK.
+# The SDK is not searched for with MinGW as it is incompatible, rather, it is assumed that MinGW
+# itself comes with the necessary headers & libraries.
 # Note that when building for OpenGL, any libraries are not used, but the include directory may
 # be necessary for DirectInput & DirectSound headers, if those are not present in the compiler's own
 # default includes.
 if (WIN32)
-    find_package (Direct3D)
-    if (DIRECT3D_FOUND)
+    if (MSVC)
+        set (D3D_REQUIRED REQUIRED)
+    endif ()
+    find_package (Direct3D ${D3D_REQUIRED})
+    if (DIRECT3D_FOUND AND DIRECT3D_INCLUDE_DIRS)
         include_directories (${DIRECT3D_INCLUDE_DIRS})
     endif ()
 endif ()
@@ -838,6 +841,10 @@ macro (setup_executable)
             install (FILES ${FILES} DESTINATION ${DEST_BUNDLE_DIR} OPTIONAL)    # We get html.map or html.mem depend on the build configuration
         else ()
             install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_BUNDLE_DIR})
+            if (MSVC AND DIRECT3D_DLL AND NOT DIRECT3D_DLL_INSTALLED)
+                install (FILES ${DIRECT3D_DLL} DESTINATION ${DEST_RUNTIME_DIR})
+                set (DIRECT3D_DLL_INSTALLED TRUE)
+            endif ()
         endif ()
     endif ()
 endmacro ()
