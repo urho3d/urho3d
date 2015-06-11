@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 #
 
-# For MSVC compiler, find Microsoft DirectX installation (need June 2010 SDK or later, or a Windows SDK)
+# For MSVC compiler, find Microsoft Direct3D installation in Windows SDK or in June 2010 DirectX SDK or later
 # For MinGW compiler, assume MinGW not only comes with the necessary headers & libraries but also has the headers & libraries directories in its default search path
 # (use 'echo |$MINGW_PREFIX-gcc -v -E -' and '$MINGW_PREFIX-gcc -print-search-dirs', respectively, to double check)
 #
