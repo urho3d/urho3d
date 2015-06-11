@@ -381,6 +381,8 @@ private:
     unsigned litAlphaPassIndex_;
     /// Pointer to the light volume command if any.
     const RenderPathCommand* lightVolumeCommand_;
+    /// Flag for scene being resolved from the backbuffer.
+    bool usedResolve_;
 };
 
 }
