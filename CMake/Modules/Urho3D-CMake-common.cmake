@@ -357,11 +357,8 @@ endif ()
 # be necessary for DirectInput & DirectSound headers, if those are not present in the compiler's own
 # default includes.
 if (WIN32)
-    if (MSVC)
-        set (D3D_REQUIRED REQUIRED)
-    endif ()
-    find_package (Direct3D ${D3D_REQUIRED})
-    if (DIRECT3D_FOUND AND DIRECT3D_INCLUDE_DIRS)
+    find_package (Direct3D REQUIRED)
+    if (DIRECT3D_INCLUDE_DIRS)
         include_directories (${DIRECT3D_INCLUDE_DIRS})
     endif ()
 endif ()
@@ -824,6 +821,10 @@ macro (setup_executable)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
             COMMENT "Scp-ing ${TARGET_NAME} executable to target system")
     endif ()
+    if (DIRECT3D_DLL)
+        # Make a copy of the D3D DLL to the runtime directory in the build tree
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DIRECT3D_DLL} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    endif ()
     # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
     if (DEST_RUNTIME_DIR)
         if (EMSCRIPTEN)
@@ -841,7 +842,8 @@ macro (setup_executable)
             install (FILES ${FILES} DESTINATION ${DEST_BUNDLE_DIR} OPTIONAL)    # We get html.map or html.mem depend on the build configuration
         else ()
             install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_BUNDLE_DIR})
-            if (MSVC AND DIRECT3D_DLL AND NOT DIRECT3D_DLL_INSTALLED)
+            if (DIRECT3D_DLL AND NOT DIRECT3D_DLL_INSTALLED)
+                # Make a copy of the D3D DLL to the runtime directory in the installed location
                 install (FILES ${DIRECT3D_DLL} DESTINATION ${DEST_RUNTIME_DIR})
                 set (DIRECT3D_DLL_INSTALLED TRUE)
             endif ()
