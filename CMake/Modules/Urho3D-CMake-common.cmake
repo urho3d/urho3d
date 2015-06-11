@@ -350,15 +350,15 @@ if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
     add_definitions (-DURHO3D_STATIC_DEFINE)
 endif ()
 
-# Find DirectX SDK include & library directories for Visual Studio. It is also possible to compile
-# without if a recent Windows SDK is installed. The SDK is not searched for with MinGW as it is
-# incompatible; rather, it is assumed that MinGW itself comes with the necessary headers & libraries.
+# Find Direct3D include & library directories for Visual Studio in MS Windows SDK or DirectX SDK.
+# The SDK is not searched for with MinGW as it is incompatible, rather, it is assumed that MinGW
+# itself comes with the necessary headers & libraries.
 # Note that when building for OpenGL, any libraries are not used, but the include directory may
 # be necessary for DirectInput & DirectSound headers, if those are not present in the compiler's own
 # default includes.
 if (WIN32)
-    find_package (Direct3D)
-    if (DIRECT3D_FOUND)
+    find_package (Direct3D REQUIRED)
+    if (DIRECT3D_INCLUDE_DIRS)
         include_directories (${DIRECT3D_INCLUDE_DIRS})
     endif ()
 endif ()
@@ -821,6 +821,10 @@ macro (setup_executable)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
             COMMENT "Scp-ing ${TARGET_NAME} executable to target system")
     endif ()
+    if (DIRECT3D_DLL)
+        # Make a copy of the D3D DLL to the runtime directory in the build tree
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DIRECT3D_DLL} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    endif ()
     # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
     if (DEST_RUNTIME_DIR)
         if (EMSCRIPTEN)
@@ -838,6 +842,11 @@ macro (setup_executable)
             install (FILES ${FILES} DESTINATION ${DEST_BUNDLE_DIR} OPTIONAL)    # We get html.map or html.mem depend on the build configuration
         else ()
             install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_BUNDLE_DIR})
+            if (DIRECT3D_DLL AND NOT DIRECT3D_DLL_INSTALLED)
+                # Make a copy of the D3D DLL to the runtime directory in the installed location
+                install (FILES ${DIRECT3D_DLL} DESTINATION ${DEST_RUNTIME_DIR})
+                set (DIRECT3D_DLL_INSTALLED TRUE)
+            endif ()
         endif ()
     endif ()
 endmacro ()
@@ -1227,10 +1236,14 @@ macro (define_dependency_libs TARGET)
             endif ()
         else ()
             if (DIRECT3D_FOUND)
-                list (APPEND ABSOLUTE_PATH_LIBS ${DIRECT3D_LIBRARIES})
-            else ()
-                # If SDK not found, assume the libraries are found from default directories
-                list (APPEND LIBS ${DIRECT3D_LIBRARIES})
+                # Check if the libs are using absolute path
+                list (GET DIRECT3D_LIBRARIES 0 FIRST_LIB)
+                if (IS_ABSOLUTE ${FIRST_LIB})
+                    list (APPEND ABSOLUTE_PATH_LIIBS ${DIRECT3D_LIBRARIES})
+                else ()
+                    # Assume the libraries are found from default directories
+                    list (APPEND LIBS ${DIRECT3D_LIBRARIES})
+                endif ()
             endif ()
         endif ()
 
