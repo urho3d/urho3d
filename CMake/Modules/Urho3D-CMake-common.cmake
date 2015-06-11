@@ -1234,16 +1234,14 @@ macro (define_dependency_libs TARGET)
             elseif (NOT APPLE AND NOT RPI)
                 list (APPEND LIBS GL)
             endif ()
-        else ()
-            if (DIRECT3D_FOUND)
-                # Check if the libs are using absolute path
-                list (GET DIRECT3D_LIBRARIES 0 FIRST_LIB)
-                if (IS_ABSOLUTE ${FIRST_LIB})
-                    list (APPEND ABSOLUTE_PATH_LIIBS ${DIRECT3D_LIBRARIES})
-                else ()
-                    # Assume the libraries are found from default directories
-                    list (APPEND LIBS ${DIRECT3D_LIBRARIES})
-                endif ()
+        elseif (DIRECT3D_LIBRARIES)
+            # Check if the libs are using absolute path
+            list (GET DIRECT3D_LIBRARIES 0 FIRST_LIB)
+            if (IS_ABSOLUTE ${FIRST_LIB})
+                list (APPEND ABSOLUTE_PATH_LIBS ${DIRECT3D_LIBRARIES})
+            else ()
+                # Assume the libraries are found from default directories
+                list (APPEND LIBS ${DIRECT3D_LIBRARIES})
             endif ()
         endif ()
 
