@@ -1236,10 +1236,14 @@ macro (define_dependency_libs TARGET)
             endif ()
         else ()
             if (DIRECT3D_FOUND)
-                list (APPEND ABSOLUTE_PATH_LIBS ${DIRECT3D_LIBRARIES})
-            else ()
-                # If SDK not found, assume the libraries are found from default directories
-                list (APPEND LIBS ${DIRECT3D_LIBRARIES})
+                # Check if the libs are using absolute path
+                list (GET DIRECT3D_LIBRARIES 0 FIRST_LIB)
+                if (IS_ABSOLUTE ${FIRST_LIB})
+                    list (APPEND ABSOLUTE_PATH_LIIBS ${DIRECT3D_LIBRARIES})
+                else ()
+                    # Assume the libraries are found from default directories
+                    list (APPEND LIBS ${DIRECT3D_LIBRARIES})
+                endif ()
             endif ()
         endif ()
 
