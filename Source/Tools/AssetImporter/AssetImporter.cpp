@@ -1072,18 +1072,34 @@ void BuildAndSaveAnimations(OutModel* model)
                     continue;
                 }
             }
-            
+
+            // To export single frame animation, check if first key frame is identical to bone transformation
+            aiVector3D bonePos, boneScale;
+            aiQuaternion boneRot;
+            boneNode->mTransformation.Decompose(boneScale, boneRot, bonePos);
+
+            bool posEqual = true;
+            bool scaleEqual = true;
+            bool rotEqual = true;
+
+            if (channel->mNumPositionKeys > 0 && !ToVector3(bonePos).Equals(ToVector3(channel->mPositionKeys[0].mValue)))
+                posEqual = false;
+            if (channel->mNumScalingKeys > 0 && !ToVector3(boneScale).Equals(ToVector3(channel->mScalingKeys[0].mValue)))
+                scaleEqual = false;
+            if (channel->mNumRotationKeys > 0 && !ToQuaternion(boneRot).Equals(ToQuaternion(channel->mRotationKeys[0].mValue)))
+                rotEqual = false;
+
             AnimationTrack track;
             track.name_ = channelName;
             track.nameHash_ = channelName;
             
             // Check which channels are used
             track.channelMask_ = 0;
-            if (channel->mNumPositionKeys > 1)
+            if (channel->mNumPositionKeys > 1 || !posEqual)
                 track.channelMask_ |= CHANNEL_POSITION;
-            if (channel->mNumRotationKeys > 1)
+            if (channel->mNumRotationKeys > 1 || !rotEqual)
                 track.channelMask_ |= CHANNEL_ROTATION;
-            if (channel->mNumScalingKeys > 1)
+            if (channel->mNumScalingKeys > 1 || !scaleEqual)
                 track.channelMask_ |= CHANNEL_SCALE;
             // Check for redundant identity scale in all keyframes and remove in that case
             if (track.channelMask_ & CHANNEL_SCALE)
@@ -1542,7 +1558,7 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_SPECULAR, 0), stringVal) == AI_SUCCESS)
         specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_LIGHTMAP, 0), stringVal) == AI_SUCCESS)
-        specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
+        lightmapTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_EMISSIVE, 0), stringVal) == AI_SUCCESS)
         emissiveTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (!noMaterialDiffuseColor_)

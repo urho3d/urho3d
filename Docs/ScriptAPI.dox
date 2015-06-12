@@ -243,6 +243,7 @@ namespace Urho3D
 - %CrowdAgent : CrowdAgent pointer
 - %Position : Vector3
 - %Velocity : Vector3
+- %Arrived : bool
 
 ### CrowdAgentFailure
 - %Node : Node pointer
@@ -1120,6 +1121,7 @@ namespace Urho3D
 - %Max %Speed : float
 - %Radius : float
 - %Height : float
+- %Target %Position : Vector3
 - %Navigation %Filter : int
 - %Navigation %Pushiness : int
 - %Navigation %Quality : int
@@ -2648,6 +2650,7 @@ Methods:
 - float GetSpeed(const String&) const
 - float GetTime(const String&) const
 - float GetWeight(const String&) const
+- bool IsAtEnd(const String&) const
 - bool IsFadingIn(const String&) const
 - bool IsFadingOut(const String&) const
 - bool IsPlaying(const String&) const
@@ -5022,14 +5025,15 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
-- bool SetMoveTarget(const Vector3&)
-- bool SetMoveVelocity(const Vector3&)
+- void SetMoveTarget(const Vector3&)
+- void SetMoveVelocity(const Vector3&)
 
 Properties:
 
 - Vector3 actualVelocity // readonly
 - CrowdAgentState agentState // readonly
 - bool animationEnabled
+- bool arrived // readonly
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -5557,6 +5561,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveInstanceDefault()
+- void ResetCrowdTarget(int = 0, int = M_MAX_INT)
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -5567,6 +5572,8 @@ Methods:
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetCrowdTarget(const Vector3&, int = 0, int = M_MAX_INT)
+- void SetCrowdVelocity(const Vector3&, int = 0, int = M_MAX_INT)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
 Properties:
@@ -8928,6 +8935,7 @@ Methods:
 
 Properties:
 
+- BlendMode blendMode
 - Color clearColor
 - float clearDepth
 - uint clearFlags
@@ -11579,6 +11587,7 @@ Properties:
 - StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
+- uint components // readonly
 - bool compressed // readonly
 - bool dataLost // readonly
 - TextureFilterMode filterMode
@@ -11622,6 +11631,7 @@ Properties:
 - StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
+- uint components // readonly
 - bool compressed // readonly
 - bool dataLost // readonly
 - TextureFilterMode filterMode
@@ -11666,6 +11676,7 @@ Properties:
 - StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
+- uint components // readonly
 - bool compressed // readonly
 - bool dataLost // readonly
 - TextureFilterMode filterMode
@@ -11710,6 +11721,7 @@ Properties:
 - StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
+- uint components // readonly
 - bool compressed // readonly
 - bool dataLost // readonly
 - TextureFilterMode filterMode
@@ -13282,10 +13294,9 @@ Properties:
 - CROWD_AGENT_TARGET_FAILED
 - CROWD_AGENT_TARGET_VALID
 - CROWD_AGENT_TARGET_REQUESTING
-- CROWD_AGENT_TARGET_WAITINGFORPATH
 - CROWD_AGENT_TARGET_WAITINGFORQUEUE
+- CROWD_AGENT_TARGET_WAITINGFORPATH
 - CROWD_AGENT_TARGET_VELOCITY
-- CROWD_AGENT_TARGET_ARRIVED
 
 
 ### CubeMapFace

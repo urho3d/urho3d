@@ -348,6 +348,7 @@ bool GetLooped(const String&) const;
 float GetSpeed(const String&) const;
 float GetTime(const String&) const;
 float GetWeight(const String&) const;
+bool IsAtEnd(const String&) const;
 bool IsFadingIn(const String&) const;
 bool IsFadingOut(const String&) const;
 bool IsPlaying(const String&) const;
@@ -3087,8 +3088,8 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetInterceptNetworkUpdate(const String&, bool);
-bool SetMoveTarget(const Vector3&);
-bool SetMoveVelocity(const Vector3&);
+void SetMoveTarget(const Vector3&);
+void SetMoveVelocity(const Vector3&);
 
 // Properties:
 /* readonly */
@@ -3096,6 +3097,8 @@ Vector3 actualVelocity;
 /* readonly */
 CrowdAgentState agentState;
 bool animationEnabled;
+/* readonly */
+bool arrived;
 /* readonly */
 Array<Variant> attributeDefaults;
 /* readonly */
@@ -3709,6 +3712,7 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveInstanceDefault();
+void ResetCrowdTarget(int = 0, int = M_MAX_INT);
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -3719,6 +3723,8 @@ bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetCrowdTarget(const Vector3&, int = 0, int = M_MAX_INT);
+void SetCrowdVelocity(const Vector3&, int = 0, int = M_MAX_INT);
 void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
@@ -7589,6 +7595,7 @@ void RemoveShaderParameter(const String&);
 void SetOutput(uint, const String&, CubeMapFace = FACE_POSITIVE_X);
 
 // Properties:
+BlendMode blendMode;
 Color clearColor;
 float clearDepth;
 uint clearFlags;
@@ -10655,6 +10662,8 @@ Color borderColor;
 /* readonly */
 String category;
 /* readonly */
+uint components;
+/* readonly */
 bool compressed;
 /* readonly */
 bool dataLost;
@@ -10711,6 +10720,8 @@ StringHash baseType;
 Color borderColor;
 /* readonly */
 String category;
+/* readonly */
+uint components;
 /* readonly */
 bool compressed;
 /* readonly */
@@ -10771,6 +10782,8 @@ Color borderColor;
 /* readonly */
 String category;
 /* readonly */
+uint components;
+/* readonly */
 bool compressed;
 /* readonly */
 bool dataLost;
@@ -10829,6 +10842,8 @@ StringHash baseType;
 Color borderColor;
 /* readonly */
 String category;
+/* readonly */
+uint components;
 /* readonly */
 bool compressed;
 /* readonly */
@@ -12614,10 +12629,9 @@ CROWD_AGENT_TARGET_NONE,
 CROWD_AGENT_TARGET_FAILED,
 CROWD_AGENT_TARGET_VALID,
 CROWD_AGENT_TARGET_REQUESTING,
-CROWD_AGENT_TARGET_WAITINGFORPATH,
 CROWD_AGENT_TARGET_WAITINGFORQUEUE,
+CROWD_AGENT_TARGET_WAITINGFORPATH,
 CROWD_AGENT_TARGET_VELOCITY,
-CROWD_AGENT_TARGET_ARRIVED,
 };
 
 enum CubeMapFace

@@ -604,8 +604,14 @@ void View::Render()
         DebugRenderer* debug = octree_->GetComponent<DebugRenderer>();
         if (debug && debug->IsEnabledEffective() && debug->HasContent())
         {
-            // Use the last rendertarget (before blitting) so that OpenGL deferred rendering can have benefit of proper depth buffer
-            // values; after a blit to backbuffer the same depth buffer would not be available any longer
+            // If used resolve from backbuffer, blit first to the backbuffer to ensure correct depth buffer on OpenGL
+            // Otherwise use the last rendertarget and blit after debug geometry
+            if (usedResolve_ && currentRenderTarget_ != renderTarget_)
+            {
+                BlitFramebuffer(currentRenderTarget_->GetParentTexture(), renderTarget_, false);
+                currentRenderTarget_ = renderTarget_;
+            }
+
             graphics_->SetRenderTarget(0, currentRenderTarget_);
             for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
                 graphics_->SetRenderTarget(i, (RenderSurface*)0);
@@ -625,9 +631,10 @@ void View::Render()
         camera_->SetFlipVertical(false);
     #endif
     
-    // Run framebuffer blitting if necessary
+    // Run framebuffer blitting if necessary. If scene was resolved from backbuffer, do not touch depth
+    // (backbuffer should contain proper depth already)
     if (currentRenderTarget_ != renderTarget_)
-        BlitFramebuffer(currentRenderTarget_->GetParentTexture(), renderTarget_, true);
+        BlitFramebuffer(currentRenderTarget_->GetParentTexture(), renderTarget_, !usedResolve_);
     
     // "Forget" the scene, camera, octree and zone after rendering
     scene_ = 0;
@@ -1402,6 +1409,7 @@ void View::ExecuteRenderPathCommands()
 
         bool viewportModified = false;
         bool isPingponging = false;
+        usedResolve_ = false;
         
         unsigned lastCommandIndex = 0;
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
@@ -1436,6 +1444,7 @@ void View::ExecuteRenderPathCommands()
                         graphics_->ResolveToTexture(dynamic_cast<Texture2D*>(viewportTextures_[0]), viewRect_);
                         currentViewportTexture_ = viewportTextures_[0];
                         viewportModified = false;
+                        usedResolve_ = true;
                     }
                     else
                     {
@@ -1619,11 +1628,15 @@ void View::SetRenderTargets(RenderPathCommand& command)
     unsigned index = 0;
     bool useColorWrite = true;
     bool useCustomDepth = false;
+    bool useViewportOutput = false;
 
     while (index < command.outputs_.Size())
     {
         if (!command.outputs_[index].first_.Compare("viewport", false))
+        {
             graphics_->SetRenderTarget(index, currentRenderTarget_);
+            useViewportOutput = true;
+        }
         else
         {
             Texture* texture = FindNamedTexture(command.outputs_[index].first_, true, false);
@@ -1668,10 +1681,10 @@ void View::SetRenderTargets(RenderPathCommand& command)
         }
     }
 
-    // When rendering to the final destination rendertarget, use the actual viewport. Otherwise texture rendertargets will be
-    // viewport-sized, so they should use their full size as the viewport
+    // When rendering to the final destination rendertarget, use the actual viewport. Otherwise texture rendertargets should use 
+    // their full size as the viewport
     IntVector2 rtSizeNow = graphics_->GetRenderTargetDimensions();
-    IntRect viewport = (currentRenderTarget_ == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
+    IntRect viewport = (useViewportOutput && currentRenderTarget_ == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
         rtSizeNow.y_);
     
     if (!useCustomDepth)
@@ -1770,7 +1783,7 @@ void View::RenderQuad(RenderPathCommand& command)
         graphics_->SetShaderParameter(offsetsName, Vector2(pixelUVOffset.x_ / width, pixelUVOffset.y_ / height));
     }
     
-    graphics_->SetBlendMode(BLEND_REPLACE);
+    graphics_->SetBlendMode(command.blendMode_);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);

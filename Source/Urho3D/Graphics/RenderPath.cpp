@@ -51,6 +51,8 @@ static const char* sortModeNames[] =
     0
 };
 
+extern const char* blendModeNames[];
+
 TextureUnit ParseTextureUnitName(String name);
 
 void RenderTargetInfo::Load(const XMLElement& element)
@@ -156,6 +158,12 @@ void RenderPathCommand::Load(const XMLElement& element)
         
         if (type_ == CMD_QUAD)
         {
+            if (element.HasAttribute("blend"))
+            {
+                String blend = element.GetAttributeLower("blend");
+                blendMode_ = ((BlendMode)GetStringListIndex(blend.CString(), blendModeNames, BLEND_REPLACE));
+            }
+
             XMLElement parameterElem = element.GetChild("parameter");
             while (parameterElem)
             {

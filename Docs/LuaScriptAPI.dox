@@ -378,6 +378,7 @@ Methods:
 - bool IsPlaying(const String name) const
 - bool IsFadingIn(const String name) const
 - bool IsFadingOut(const String name) const
+- bool IsAtEnd(const String name) const
 - char GetLayer(const String name) const
 - Bone* GetStartBone(const String name) const
 - const String GetStartBoneName(const String name) const
@@ -1588,8 +1589,8 @@ Properties:
 Methods:
 
 - void SetNavigationFilterType(unsigned filterID)
-- bool SetMoveTarget(const Vector3& position)
-- bool SetMoveVelocity(const Vector3& velocity)
+- void SetMoveTarget(const Vector3& position)
+- void SetMoveVelocity(const Vector3& velocity)
 - void SetUpdateNodePosition(bool unodepos)
 - void SetMaxAccel(float val)
 - void SetMaxSpeed(float val)
@@ -1608,6 +1609,7 @@ Methods:
 - float GetMaxAccel() const
 - NavigationQuality GetNavigationQuality() const
 - NavigationPushiness GetNavigationPushiness() const
+- bool HasArrived() const
 - float GetRadius() const
 - float GetHeight() const
 - Vector3 GetPosition() const
@@ -1852,13 +1854,16 @@ Methods:
 - bool CreateCrowd()
 - void DrawDebugGeometry(bool depthTest)
 - void SetNavigationMesh(NavigationMesh* navMesh)
-- void SetMaxAgents(unsigned agentCt)
 - void SetAreaCost(unsigned filterID, unsigned areaID, float cost)
-- NavigationMesh* GetNavigationMesh()
+- void SetMaxAgents(unsigned agentCt)
+- void SetCrowdTarget(const Vector3& position, int startId = 0, int endId = M_MAX_INT)
+- void ResetCrowdTarget(int startId = 0, int endId = M_MAX_INT)
+- void SetCrowdVelocity(const Vector3& velocity, int startId = 0, int endId = M_MAX_INT)
+- NavigationMesh* GetNavigationMesh() const
 - unsigned GetMaxAgents() const
 - float GetAreaCost(unsigned filterID, unsigned areaID) const
 - unsigned GetAgentCount() const
-- const PODVector<CrowdAgent*>& GetActiveAgents()
+- const PODVector<CrowdAgent*>& GetActiveAgents() const
 
 Properties:
 
@@ -4466,6 +4471,7 @@ Properties:
 - Color clearColor
 - float clearDepth
 - unsigned clearStencil
+- BlendMode blendMode
 - bool enabled
 - bool useFogColor
 - bool markToStencil
@@ -5830,6 +5836,7 @@ Methods:
 - TextureUsage GetUsage() const
 - unsigned GetDataSize(int width, int height) const
 - unsigned GetRowDataSize(int width) const
+- unsigned GetComponents() const
 
 Properties:
 
@@ -5838,6 +5845,7 @@ Properties:
 - unsigned levels (readonly)
 - int width (readonly)
 - int height (readonly)
+- unsigned components (readonly)
 - TextureFilterMode filterMode
 - Color& borderColor
 - bool sRGB
@@ -7143,10 +7151,9 @@ Properties:
 - int CROWD_AGENT_TARGET_FAILED
 - int CROWD_AGENT_TARGET_VALID
 - int CROWD_AGENT_TARGET_REQUESTING
-- int CROWD_AGENT_TARGET_WAITINGFORPATH
 - int CROWD_AGENT_TARGET_WAITINGFORQUEUE
+- int CROWD_AGENT_TARGET_WAITINGFORPATH
 - int CROWD_AGENT_TARGET_VELOCITY
-- int CROWD_AGENT_TARGET_ARRIVED
 
 ### CubeMapFace
 

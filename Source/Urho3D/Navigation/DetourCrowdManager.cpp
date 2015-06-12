@@ -117,9 +117,44 @@ void DetourCrowdManager::SetMaxAgents(unsigned agentCt)
     MarkNetworkUpdate();
 }
 
-NavigationMesh* DetourCrowdManager::GetNavigationMesh()
+void DetourCrowdManager::SetCrowdTarget(const Vector3& position, int startId, int endId)
 {
-    return navigationMesh_.Get();
+    startId = Max(0, startId);
+    endId = Clamp(endId, startId, agents_.Size() - 1);
+    Vector3 moveTarget(position);
+    for (int i = startId; i <= endId; ++i)
+    {
+        // Skip agent that does not have acceleration
+        if (agents_[i]->GetMaxAccel() > 0.f)
+        {
+            agents_[i]->SetMoveTarget(moveTarget);
+            // FIXME: Should reimplement this using event callback, i.e. it should be application-specific to decide what is the desired crowd formation when they reach the target
+            if (navigationMesh_)
+                moveTarget = navigationMesh_->FindNearestPoint(position + Vector3(Random(-4.5f, 4.5f), 0.0f, Random(-4.5f, 4.5f)), Vector3(1.0f, 1.0f, 1.0f));
+        }
+    }
+}
+
+void DetourCrowdManager::ResetCrowdTarget(int startId, int endId)
+{
+    startId = Max(0, startId);
+    endId = Clamp(endId, startId, agents_.Size() - 1);
+    for (int i = startId; i <= endId; ++i)
+    {
+        if (agents_[i]->GetMaxAccel() > 0.f)
+            agents_[i]->ResetMoveTarget();
+    }
+}
+
+void DetourCrowdManager::SetCrowdVelocity(const Vector3& velocity, int startId, int endId)
+{
+    startId = Max(0, startId);
+    endId = Clamp(endId, startId, agents_.Size() - 1);
+    for (int i = startId; i <= endId; ++i)
+    {
+        if (agents_[i]->GetMaxAccel() > 0.f)
+            agents_[i]->SetMoveVelocity(velocity);
+    }
 }
 
 float DetourCrowdManager::GetAreaCost(unsigned filterID, unsigned areaID) const
@@ -149,9 +184,17 @@ void DetourCrowdManager::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             if (!ag->active)
                 continue;
 
+            // Draw CrowdAgent shape (from its radius & height)
+            CrowdAgent* crowdAgent = static_cast<CrowdAgent*>(ag->params.userData);
+            crowdAgent->DrawDebugGeometry(debug, depthTest);
+
+            // Draw move target if any
+            if (crowdAgent->GetTargetState() == CROWD_AGENT_TARGET_NONE)
+                continue;
+
             Color color(0.6f, 0.2f, 0.2f, 1.0f);
 
-            // Render line to target:
+            // Draw line to target
             Vector3 pos1(ag->npos[0], ag->npos[1], ag->npos[2]);
             Vector3 pos2;
             for (int i = 0; i < ag->ncorners; ++i)
@@ -167,12 +210,8 @@ void DetourCrowdManager::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             pos2.z_ = ag->targetPos[2];
             debug->AddLine(pos1, pos2, color, depthTest);
 
-            // Target circle
+            // Draw target circle
             debug->AddSphere(Sphere(pos2, 0.5f), color, depthTest);
-
-            // Draw CrowdAgent shape (from its radius & height)
-            CrowdAgent* crowdAgent = static_cast<CrowdAgent*>(ag->params.userData);
-            crowdAgent->DrawDebugGeometry(debug, depthTest);
         }
     }
 }
@@ -246,6 +285,7 @@ int DetourCrowdManager::AddAgent(CrowdAgent* agent, const Vector3& pos)
     if (!crowd_ || navigationMesh_.Expired())
         return -1;
     dtCrowdAgentParams params;
+    params.userData = agent;
     if (agent->radius_ <= 0.0f)
         agent->radius_ = navigationMesh_->GetAgentRadius();
     params.radius = agent->radius_;
@@ -442,11 +482,6 @@ void DetourCrowdManager::Update(float delta)
 const dtCrowdAgent* DetourCrowdManager::GetCrowdAgent(int agent)
 {
     return crowd_ ? crowd_->getAgent(agent) : 0;
-}
-
-dtCrowd* DetourCrowdManager::GetCrowd()
-{
-    return crowd_;
 }
 
 void DetourCrowdManager::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData)

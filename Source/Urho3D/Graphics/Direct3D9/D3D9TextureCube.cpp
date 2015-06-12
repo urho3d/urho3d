@@ -668,10 +668,38 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     d3dRect.right = levelWidth;
     d3dRect.bottom = levelHeight;
     
-    if (FAILED(((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect, &d3dRect, D3DLOCK_READONLY)))
+    IDirect3DSurface9* offscreenSurface = 0;
+    // Need to use a offscreen surface & GetRenderTargetData() for rendertargets
+    if (renderSurfaces_[face])
     {
-        LOGERROR("Could not lock texture");
-        return false;
+        if (level != 0)
+        {
+            LOGERROR("Can only get mip level 0 data from a rendertarget");
+            return false;
+        }
+
+        IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
+        device->CreateOffscreenPlainSurface(width_, height_, (D3DFORMAT)format_, D3DPOOL_SYSTEMMEM, &offscreenSurface, 0);
+        if (!offscreenSurface)
+        {
+            LOGERROR("Could not create surface for getting rendertarget data");
+            return false;
+        }
+        device->GetRenderTargetData((IDirect3DSurface9*)renderSurfaces_[face]->GetSurface(), offscreenSurface);
+        if (FAILED(offscreenSurface->LockRect(&d3dLockedRect, &d3dRect, D3DLOCK_READONLY)))
+        {
+            LOGERROR("Could not lock surface for getting rendertarget data");
+            offscreenSurface->Release();
+            return false;
+        }
+    }
+    else
+    {
+        if (FAILED(((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect, &d3dRect, D3DLOCK_READONLY)))
+        {
+            LOGERROR("Could not lock texture");
+            return false;
+        }
     }
     
     int height = levelHeight;
@@ -721,7 +749,14 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         break;
     }
     
-    ((IDirect3DCubeTexture9*)object_)->UnlockRect((D3DCUBEMAP_FACES)face, level);
+    if (offscreenSurface)
+    {
+        offscreenSurface->UnlockRect();
+        offscreenSurface->Release();
+    }
+    else
+        ((IDirect3DCubeTexture9*)object_)->UnlockRect((D3DCUBEMAP_FACES)face, level);
+    
     return true;
 }
 

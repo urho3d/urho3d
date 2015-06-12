@@ -41,9 +41,9 @@ OffMeshConnection::OffMeshConnection(Context* context) :
     endPointID_(0),
     radius_(DEFAULT_RADIUS),
     bidirectional_(true),
+    endPointDirty_(false),
     mask_(DEFAULT_MASK_FLAG),
-    areaId_(DEFAULT_AREA),
-    endPointDirty_(false)
+    areaId_(DEFAULT_AREA)
 {
 }
 
@@ -54,7 +54,7 @@ OffMeshConnection::~OffMeshConnection()
 void OffMeshConnection::RegisterObject(Context* context)
 {
     context->RegisterFactory<OffMeshConnection>(NAVIGATION_CATEGORY);
-    
+
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATTRIBUTE("Endpoint NodeID", int, endPointID_, 0, AM_DEFAULT | AM_NODEID);
     ATTRIBUTE("Radius", float, radius_, DEFAULT_RADIUS, AM_DEFAULT);
@@ -66,7 +66,7 @@ void OffMeshConnection::RegisterObject(Context* context)
 void OffMeshConnection::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     Serializable::OnSetAttribute(attr, src);
-    
+
     if (attr.offset_ == offsetof(OffMeshConnection, endPointID_))
         endPointDirty_ = true;
 }
@@ -85,10 +85,10 @@ void OffMeshConnection::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     if (!node_ || !endPoint_)
         return;
-    
+
     Vector3 start = node_->GetWorldPosition();
     Vector3 end = endPoint_->GetWorldPosition();
-    
+
     debug->AddSphere(Sphere(start, radius_), Color::WHITE, depthTest);
     debug->AddSphere(Sphere(end, radius_), Color::WHITE, depthTest);
     debug->AddLine(start, end, Color::WHITE, depthTest);

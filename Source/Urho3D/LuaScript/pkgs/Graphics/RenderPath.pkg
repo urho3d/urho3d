@@ -76,6 +76,7 @@ struct RenderPathCommand
     Color clearColor_ @ clearColor;
     float clearDepth_ @ clearDepth;
     unsigned clearStencil_ @ clearStencil;
+    BlendMode blendMode_ @ blendMode;
     bool enabled_ @ enabled;
     bool useFogColor_ @ useFogColor;
     bool markToStencil_ @ markToStencil;

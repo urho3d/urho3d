@@ -330,6 +330,8 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
     if (animationElem.HasAttribute("looping"))
         looped = animationElem.GetBool("looping");
 
+    float highestKeyTime = 0.0f;
+
     // Load timelines
     Vector<SpriterTimeline2D> timelines;
     for (XMLElement timelineElem = animationElem.GetChild("timeline"); timelineElem; timelineElem = timelineElem.GetNext("timeline"))
@@ -460,8 +462,9 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
             AnimationKeyFrame2D& keyFrame = track.keyFrames_[j];
 
             keyFrame.time_ = timelineKey.time_;
+            highestKeyTime = Max(highestKeyTime, keyFrame.time_);
 
-            // Set diabled
+            // Set disabled
             keyFrame.enabled_ = false;
             keyFrame.parent_ = timeline.parent_;
             keyFrame.transform_ = Transform2D(timelineKey.position_, timelineKey.angle_, timelineKey.scale_);
@@ -471,7 +474,7 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
             {
                 keyFrame.sprite_ = timelineKey.sprite_;
                 keyFrame.alpha_ = timelineKey.alpha_;
-                keyFrame.useHotSpot_ = timelineKey.useHotSpot_;                
+                keyFrame.useHotSpot_ = timelineKey.useHotSpot_;
                 if (timelineKey.useHotSpot_)
                     keyFrame.hotSpot_ = timelineKey.hotSpot_;
             }
@@ -509,6 +512,12 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
                 keyFrames.Push(keyFrame);
             }
         }
+    }
+    else
+    {
+        // Crop non-looped animation length if longer than the last keyframe
+        if (length > highestKeyTime)
+            animation->SetLength(highestKeyTime);
     }
 
     animations_.Push(animation);

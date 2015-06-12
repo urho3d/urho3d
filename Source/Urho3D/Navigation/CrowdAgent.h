@@ -34,17 +34,16 @@ enum CrowdTargetState
     CROWD_AGENT_TARGET_FAILED,
     CROWD_AGENT_TARGET_VALID,
     CROWD_AGENT_TARGET_REQUESTING,
-    CROWD_AGENT_TARGET_WAITINGFORPATH,
     CROWD_AGENT_TARGET_WAITINGFORQUEUE,
-    CROWD_AGENT_TARGET_VELOCITY,
-    CROWD_AGENT_TARGET_ARRIVED
+    CROWD_AGENT_TARGET_WAITINGFORPATH,
+    CROWD_AGENT_TARGET_VELOCITY
 };
 
 enum CrowdAgentState
 {
-    CROWD_AGENT_INVALID = 0,	///< The agent is not in a valid state.
-    CROWD_AGENT_READY,			///< The agent is traversing a normal navigation mesh polygon.
-    CROWD_AGENT_TRAVERSINGLINK	///< The agent is traversing an off-mesh connection.
+    CROWD_AGENT_INVALID = 0,      ///< The agent is not in a valid state.
+    CROWD_AGENT_READY,            ///< The agent is traversing a normal navigation mesh polygon.
+    CROWD_AGENT_TRAVERSINGLINK    ///< The agent is traversing an off-mesh connection.
 };
 
 /// DetourCrowd Agent, requires a DetourCrowdManager in the scene. Agent's radius and height is set through the navigation mesh.
@@ -71,9 +70,11 @@ public:
     /// Set the navigation filter type the agent will use.
     void SetNavigationFilterType(unsigned filterTypeID);
     /// Submit a new move request for this agent.
-    bool SetMoveTarget(const Vector3& position);
+    void SetMoveTarget(const Vector3& position);
+    /// Reset any request for the specified agent.
+    void ResetMoveTarget();
     /// Submit a new move velocity request for this agent.
-    bool SetMoveVelocity(const Vector3& velocity);
+    void SetMoveVelocity(const Vector3& velocity);
     /// Update the node position. When set to false, the node position should be updated by other means (e.g. using Physics) in response to the E_CROWD_AGENT_REPOSITION event.
     void SetUpdateNodePosition(bool unodepos);
     /// Set the agent's max acceleration.
@@ -110,7 +111,7 @@ public:
     /// Get the agent's max velocity.
     float GetMaxSpeed() const { return maxSpeed_; }
     /// Get the agent's max acceleration.
-    float GetMaxAccel()	const { return maxAccel_; }
+    float GetMaxAccel() const { return maxAccel_; }
     /// Get the agent's radius.
     float GetRadius() const { return radius_; }
     /// Get the agent's height.
@@ -119,6 +120,8 @@ public:
     NavigationQuality GetNavigationQuality() const {return navQuality_; }
     /// Get the agent's navigation pushiness.
     NavigationPushiness GetNavigationPushiness() const {return navPushiness_; }
+    /// Return true when the agent has arrived at its target.
+    bool HasArrived() const;
 
     /// Get serialized data of internal state.
     PODVector<unsigned char> GetAgentDataAttr() const;
@@ -127,11 +130,13 @@ public:
 
 protected:
     /// Update the nodes position if updateNodePosition is set. Is called in DetourCrowdManager::Update().
-    virtual void OnCrowdAgentReposition(const Vector3& newPos, const Vector3& newDirection);
+    virtual void OnCrowdAgentReposition(const Vector3& newPos, const Vector3& newVel);
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
     /// \todo Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
+    /// Get internal Detour crowd agent.
+    const dtCrowdAgent* GetDetourCrowdAgent() const;
 private:
     /// Create or re-add.
     void AddAgentToCrowd();
@@ -144,9 +149,9 @@ private:
     /// DetourCrowd reference to this agent.
     int agentCrowdId_;
     /// Reference to poly closest to requested target position.
-    unsigned int targetRef_;         
+    unsigned int targetRef_;
     /// Actual target position, closest to that requested.
-    Vector3 targetPosition_;   
+    Vector3 targetPosition_;
     /// Flag indicating the node's position should be updated by Detour crowd manager.
     bool updateNodePosition_;
     /// Agent's max acceleration.
@@ -163,6 +168,8 @@ private:
     NavigationQuality navQuality_;
     /// Agent's Navigation Pushiness.
     NavigationPushiness navPushiness_;
+    /// Agent's previous position used to check for position changes.
+    Vector3 previousPosition_;
     /// Agent's previous target state used to check for state changes.
     CrowdTargetState previousTargetState_;
     /// Agent's previous agent state used to check for state changes.

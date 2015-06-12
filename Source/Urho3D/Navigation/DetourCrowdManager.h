@@ -43,7 +43,7 @@ enum NavigationQuality
 
 enum NavigationPushiness
 {
-    PUSHINESS_LOW,
+    PUSHINESS_LOW = 0,
     PUSHINESS_MEDIUM,
     PUSHINESS_HIGH
 };
@@ -69,9 +69,15 @@ public:
     void SetAreaCost(unsigned filterTypeID, unsigned areaID, float weight);
     /// Set the maximum number of agents.
     void SetMaxAgents(unsigned agentCt);
+    /// Set the crowd move target. The move target is applied to all crowd agents within the id range, excluding crowd agent which does not have acceleration.
+    void SetCrowdTarget(const Vector3& position, int startId = 0, int endId = M_MAX_INT);
+    /// Reset the crowd move target to all crowd agents within the id range, excluding crowd agent which does not have acceleration.
+    void ResetCrowdTarget(int startId = 0, int endId = M_MAX_INT);
+    /// Set the crowd move velocity. The move velocity is applied to all crowd agents within the id range, excluding crowd agent which does not have acceleration.
+    void SetCrowdVelocity(const Vector3& velocity, int startId = 0, int endId = M_MAX_INT);
 
     /// Get the Navigation mesh assigned to the crowd.
-    NavigationMesh* GetNavigationMesh();
+    NavigationMesh* GetNavigationMesh() const { return navigationMesh_; }
     /// Get the cost of an area-type for the specified navigation filter type.
     float GetAreaCost(unsigned filterTypeID, unsigned areaID) const;
     /// Get the maximum number of agents.
@@ -84,7 +90,7 @@ public:
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
     /// Get the currently included agents.
-    PODVector<CrowdAgent*> GetActiveAgents() const { return agents_; }
+    const PODVector<CrowdAgent*>& GetActiveAgents() const { return agents_; }
     /// Create detour crowd component for the specified navigation mesh.
     bool CreateCrowd();
 
@@ -115,7 +121,7 @@ protected:
     /// Get the detour crowd agent.
     const dtCrowdAgent* GetCrowdAgent(int agent);
     /// Get the internal detour crowd component.
-    dtCrowd* GetCrowd();
+    dtCrowd* GetCrowd() const { return crowd_; }
 
 private:
     /// Handle the scene subsystem update event.

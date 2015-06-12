@@ -289,6 +289,7 @@ end
 # Usage: NOT intended to be used manually
 desc 'Update Emscripten HTML5 samples to GitHub Pages'
 task :ci_emscripten_samples_update do
+  puts "\nUpdating Emscripten samples in main website..."
   # Pull or clone
   system 'cd ../doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../doc-Build' or abort 'Failed to pull/clone'
   # Sync Emscripten samples
@@ -349,7 +350,7 @@ task :ci_package_upload do
       ENV['SITE_UPDATE'] = nil
     end
   else
-    system 'echo Generate documentation'
+    system 'echo Generating documentation...'
     if ENV['XCODE']
       xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj', 'doc', '>/dev/null') or abort 'Failed to generate documentation'
     else
@@ -365,7 +366,7 @@ task :ci_package_upload do
     end
     if !ENV['CI_START_TIME'] || elapsed_time < 25 # minutes
       # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
-      system 'echo Rebuild Urho3D library as Mach-O universal binary'
+      system 'echo Rebuilding Urho3D library as Mach-O universal binary...'
       xcode_build(0, '../Build/Urho3D.xcodeproj', 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
     end
     # There is a bug in CMake/CPack that causes the 'package' target failed to build for IOS platform, workaround by calling cpack directly
