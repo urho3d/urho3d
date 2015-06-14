@@ -358,6 +358,25 @@ void ScriptInstance::RemoveEventHandlersExcept(const PODVector<StringHash>& exce
     UnsubscribeFromAllEventsExcept(exceptions, true);
 }
 
+bool ScriptInstance::IsA(const String& className) const
+{
+    // Early out for the easiest case where that's what we are
+    if (className_ == className)
+        return true;
+    if (scriptObject_)
+    {
+        // Start immediately at the first base class because we already checked the early out
+        asIObjectType* currentType = scriptObject_->GetObjectType()->GetBaseType();
+        while (currentType)
+        {
+            if (className == currentType->GetName())
+                return true;
+            currentType = currentType->GetBaseType();
+        }
+    }
+    return false;
+}
+
 bool ScriptInstance::HasMethod(const String& declaration) const
 {
     if (!scriptFile_ || !scriptObject_)
