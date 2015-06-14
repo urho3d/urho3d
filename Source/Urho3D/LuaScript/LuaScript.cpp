@@ -224,7 +224,7 @@ bool LuaScript::ExecuteFile(const String& fileName)
 
 #ifdef URHO3D_LUA_RAW_SCRIPT_LOADER
     if (ExecuteRawFile(fileName))
-    	return true;
+        return true;
 #endif
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -261,7 +261,7 @@ bool LuaScript::LoadRawFile(const String& fileName)
     if (filePath.Empty())
     {
         LOGINFO("Lua file not found: " + fileName);
-    	return false;
+        return false;
     }
 
     filePath = GetNativePath(filePath);
@@ -287,10 +287,10 @@ bool LuaScript::ExecuteRawFile(const String& fileName)
 {
     PROFILE(ExecuteRawFile);
 
-	int top = lua_gettop(luaState_);
+    int top = lua_gettop(luaState_);
 
     if (!LoadRawFile(fileName))
-		return false;
+        return false;
 
     if (lua_pcall(luaState_, 0, 0, 0))
     {
@@ -349,17 +349,17 @@ int LuaScript::AtPanic(lua_State* L)
 
 int LuaScript::Loader(lua_State* L)
 {
-	LuaScript* lua = ::GetContext(L)->GetSubsystem<LuaScript>();
+    LuaScript* lua = ::GetContext(L)->GetSubsystem<LuaScript>();
     // Get module name
-	String fileName(luaL_checkstring(L, 1));
+    String fileName(luaL_checkstring(L, 1));
 
 #ifdef URHO3D_LUA_RAW_SCRIPT_LOADER
     // First attempt to load lua script file from the file system.
-	// Attempt to load .luc file first, then fall back to .lua.
-	if (
-		lua->LoadRawFile(fileName + ".luc")
-		|| lua->LoadRawFile(fileName + ".lua")
-	) return 1;
+    // Attempt to load .luc file first, then fall back to .lua.
+    if (
+        lua->LoadRawFile(fileName + ".luc")
+        || lua->LoadRawFile(fileName + ".lua")
+    ) return 1;
 #endif
 
     ResourceCache* cache = ::GetContext(L)->GetSubsystem<ResourceCache>();
