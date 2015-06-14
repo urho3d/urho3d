@@ -93,6 +93,20 @@ cmake_dependent_option (URHO3D_SSE "Enable SSE instruction set" ${URHO3D_DEFAULT
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
     cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
+
+    set(LUA_RAW_DESC "Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)")
+    if (CMAKE_BUILD_TYPE STREQUAL "Release")
+        cmake_dependent_option (
+            URHO3D_LUA_RAW_SCRIPT_LOADER
+            ${LUA_RAW_DESC} OFF "URHO3D_LUA OR URHO3D_LUAJIT" OFF
+        )    
+    else ()
+        cmake_dependent_option (
+            URHO3D_LUA_RAW_SCRIPT_LOADER
+            ${LUA_RAW_DESC} ON "URHO3D_LUA OR URHO3D_LUAJIT" OFF
+        )     
+    endif ()
+    
     option (URHO3D_SAMPLES "Build sample applications")
     cmake_dependent_option (URHO3D_TOOLS "Build tools (native and RPI only)" TRUE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     cmake_dependent_option (URHO3D_EXTRAS "Build extras (native and RPI only)" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
@@ -319,6 +333,9 @@ if (URHO3D_LUA)
     if (NOT URHO3D_SAFE_LUA)
         add_definitions (-DTOLUA_RELEASE)
     endif ()
+endif ()
+if (URHO3D_LUA_RAW_SCRIPT_LOADER)
+    add_definitions (-DURHO3D_LUA_RAW_SCRIPT_LOADER)
 endif ()
 
 # Add definition for Navigation
