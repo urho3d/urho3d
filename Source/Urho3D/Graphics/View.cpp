@@ -604,8 +604,14 @@ void View::Render()
         DebugRenderer* debug = octree_->GetComponent<DebugRenderer>();
         if (debug && debug->IsEnabledEffective() && debug->HasContent())
         {
-            // Use the last rendertarget (before blitting) so that OpenGL deferred rendering can have benefit of proper depth buffer
-            // values; after a blit to backbuffer the same depth buffer would not be available any longer
+            // If used resolve from backbuffer, blit first to the backbuffer to ensure correct depth buffer on OpenGL
+            // Otherwise use the last rendertarget and blit after debug geometry
+            if (usedResolve_ && currentRenderTarget_ != renderTarget_)
+            {
+                BlitFramebuffer(currentRenderTarget_->GetParentTexture(), renderTarget_, false);
+                currentRenderTarget_ = renderTarget_;
+            }
+
             graphics_->SetRenderTarget(0, currentRenderTarget_);
             for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
                 graphics_->SetRenderTarget(i, (RenderSurface*)0);
@@ -625,9 +631,10 @@ void View::Render()
         camera_->SetFlipVertical(false);
     #endif
     
-    // Run framebuffer blitting if necessary
+    // Run framebuffer blitting if necessary. If scene was resolved from backbuffer, do not touch depth
+    // (backbuffer should contain proper depth already)
     if (currentRenderTarget_ != renderTarget_)
-        BlitFramebuffer(currentRenderTarget_->GetParentTexture(), renderTarget_, true);
+        BlitFramebuffer(currentRenderTarget_->GetParentTexture(), renderTarget_, !usedResolve_);
     
     // "Forget" the scene, camera, octree and zone after rendering
     scene_ = 0;
@@ -1402,6 +1409,7 @@ void View::ExecuteRenderPathCommands()
 
         bool viewportModified = false;
         bool isPingponging = false;
+        usedResolve_ = false;
         
         unsigned lastCommandIndex = 0;
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
@@ -1436,6 +1444,7 @@ void View::ExecuteRenderPathCommands()
                         graphics_->ResolveToTexture(dynamic_cast<Texture2D*>(viewportTextures_[0]), viewRect_);
                         currentViewportTexture_ = viewportTextures_[0];
                         viewportModified = false;
+                        usedResolve_ = true;
                     }
                     else
                     {

@@ -347,7 +347,6 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
         {
             SpriterTimelineKey2D key;
             key.time_ = keyElem.GetFloat("time") * 0.001f;
-            highestKeyTime = Max(highestKeyTime, key.time_);
             if (keyElem.HasAttribute("spin"))
                 key.spin_ = keyElem.GetInt("spin");
 
@@ -438,10 +437,6 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
 
     // Create animation
     SharedPtr<Animation2D> animation(new Animation2D(this));
-    // Crop animation length if longer than the last keyframe, prevents sprites vanishing in clamp mode, or occasional flashes
-    // when looped
-    if (length > highestKeyTime)
-        length = highestKeyTime;
     animation->SetName(name);
     animation->SetLength(length);
     animation->SetLooped(looped);
@@ -467,6 +462,7 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
             AnimationKeyFrame2D& keyFrame = track.keyFrames_[j];
 
             keyFrame.time_ = timelineKey.time_;
+            highestKeyTime = Max(highestKeyTime, keyFrame.time_);
 
             // Set disabled
             keyFrame.enabled_ = false;
@@ -516,6 +512,12 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
                 keyFrames.Push(keyFrame);
             }
         }
+    }
+    else
+    {
+        // Crop non-looped animation length if longer than the last keyframe
+        if (length > highestKeyTime)
+            animation->SetLength(highestKeyTime);
     }
 
     animations_.Push(animation);

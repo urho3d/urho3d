@@ -37,6 +37,7 @@ class AnimationController : public Component
     bool IsPlaying(const String name) const;
     bool IsFadingIn(const String name) const;
     bool IsFadingOut(const String name) const;
+    bool IsAtEnd(const String name) const;
     unsigned char GetLayer(const String name) const;
     Bone* GetStartBone(const String name) const;
     const String GetStartBoneName(const String name) const;

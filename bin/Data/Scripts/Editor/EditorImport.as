@@ -16,6 +16,24 @@ class AssetMapping
 
 Array<AssetMapping> assetMappings;
 
+String assetImporterPath;
+
+int ExecuteAssetImporter(Array<String>@ args)
+{
+    if (assetImporterPath.empty)
+    {
+        String exeSuffix = "";
+        if (GetPlatform() == "Windows")
+            exeSuffix = ".exe";
+        // Try both with and without the tool directory; a packaged build may not have the tool directory
+        assetImporterPath = fileSystem.programDir + "tool/AssetImporter" + exeSuffix;
+        if (!fileSystem.FileExists(assetImporterPath))
+            assetImporterPath = fileSystem.programDir + "AssetImporter" + exeSuffix;
+    }
+
+    return fileSystem.SystemRun(assetImporterPath, args);
+}
+
 void ImportModel(const String&in fileName)
 {
     if (fileName.empty)
@@ -39,7 +57,7 @@ void ImportModel(const String&in fileName)
     if (applyMaterialList)
         args.Push("-l");
 
-    if (fileSystem.SystemRun(fileSystem.programDir + "tool/AssetImporter", args) == 0)
+    if (ExecuteAssetImporter(args) == 0)
     {
         Node@ newNode = editorScene.CreateChild(GetFileName(fileName));
         StaticModel@ newModel = newNode.CreateComponent("StaticModel");
@@ -83,7 +101,7 @@ void ImportScene(const String&in fileName)
             args.Push(options[i]);
         if (applyMaterialList)
             args.Push("-l");
-        if (fileSystem.SystemRun(fileSystem.programDir + "tool/AssetImporter", args) == 0)
+        if (ExecuteAssetImporter(args) == 0)
         {
             skipMruScene = true; // set to avoid adding tempscene to mru
             LoadScene(tempSceneName);

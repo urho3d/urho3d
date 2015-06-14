@@ -162,6 +162,7 @@ after_script: rake ci_teardown_cache
 
 branch: {name: Android-CI, active: yes, description: For Travis CI - switch CI build to use Android build environment.}
 language: android
+android: {components: [build-tools-22.0.1]}
 cache: {directories: $HOME/.ccache}
 sudo: false
 addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz, libasound2-dev, g++-multilib]}}
@@ -180,8 +181,8 @@ matrix:
   fast_finish: true
   include:
     # x86 and x86_64 emulation currently requires hardware acceleration which Travis-CI cannot provide, so skip AVD for now
-    # env: API=21 ABI=x86_64      URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21,tools AVD=test_21_x86_64
-    # env: API=21 ABI=x86         URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21,tools AVD=test_21_x86
+    # env: API=21 ABI=x86_64      URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21 AVD=test_21_x86_64 USE_CCACHE=2
+    # env: API=21 ABI=x86         URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21 AVD=test_21_x86       USE_CCACHE=2
 
     # Travis CI does not create one cache per job at the moment, so workaround it to have still high cache hit/miss ratio
     # We use jdk key as the cache storage differentiator! Our library is compiled using NDK so it should not be affected by JDK version
@@ -208,7 +209,7 @@ matrix:
       env: API=21 ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC                                       USE_CCACHE=2
     - &cache4
       jdk: oraclejdk7
-      env: API=21 ABI=armeabi-v7a URHO3D_LIB_TYPE=SHARED INSTALL=tools AVD=test_21_armeabi-v7a USE_CCACHE=1
+      env: API=21 ABI=armeabi-v7a URHO3D_LIB_TYPE=SHARED AVD=test_21_armeabi-v7a               USE_CCACHE=1
     - <<: *alternative-cache
       env: API=19 ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC                                       USE_CCACHE=2
     - &cache5

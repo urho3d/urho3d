@@ -20,23 +20,48 @@
 # THE SOFTWARE.
 #
 
-# For MSVC compiler, find Microsoft DirectX installation (need June 2010 SDK or later, or a Windows SDK)
+# For MSVC compiler, find Microsoft Direct3D installation in Windows SDK or in June 2010 DirectX SDK or later
 # For MinGW compiler, assume MinGW not only comes with the necessary headers & libraries but also has the headers & libraries directories in its default search path
-# (use 'echo |gcc -v -E -' and 'gcc -print-search-dirs', respectively, to double check)
+# (use 'echo |$MINGW_PREFIX-gcc -v -E -' and '$MINGW_PREFIX-gcc -print-search-dirs', respectively, to double check)
 #
 #  DIRECT3D_FOUND
 #  DIRECT3D_INCLUDE_DIRS
 #  DIRECT3D_LIBRARIES
+#  DIRECT3D_DLL
 #
 
 if (NOT WIN32 OR DIRECT3D_FOUND)
     return ()
 endif ()
 
-# When using Direct3D11, do not search for the SDK from Visual Studio 2012 onward
-# to avoid incompatibility between DirectX SDK and Windows SDK defines and the 
-# resulting warning spam
-if (MSVC AND (MSVC_VERSION LESS 1700 OR NOT URHO3D_D3D11))
+# Prefer to use MS Windows SDK, so search for it first
+if (MINGW)
+    # Assume that 'libd3dcompiler.a' is a symlink pointing to 'libd3dcompiler_46.a' (See this discussion http://urho3d.prophpbb.com/topic504.html)
+    # Anyway, we could not do anything else in the build system automation with version lower than 46 and libd3dcompiler_46.a is the latest supported version
+    set (DLL_NAMES d3dcompiler_46.dll)
+else ()
+    set (DLL_NAMES d3dcompiler_47.dll d3dcompiler_46.dll)
+endif ()
+if (CMAKE_CL_64)
+    set (PATH_SUFFIX x64)
+else ()
+    set (PATH_SUFFIX x86)
+endif ()
+# Only need to search the DLL as a proxy for the presence of the MS Windows SDK
+find_file (DIRECT3D_DLL NAMES ${DLL_NAMES} PATHS
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v8.1;InstallationFolder]/Redist/D3D/${PATH_SUFFIX}"
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v8.0;InstallationFolder]/Redist/D3D/${PATH_SUFFIX}")
+if (DIRECT3D_DLL OR MINGW)  # MinGW compiler toolchain is assumed to come with its own necessary headers and libraries for Direct3D
+    if (NOT URHO3D_D3D11)
+        set (DIRECT3D_LIBRARIES d3d9 d3dcompiler)
+    else ()
+        set (DIRECT3D_LIBRARIES d3d11 d3dcompiler dxgi dxguid)
+    endif ()
+    unset (DIRECT3D_INCLUDE_DIRS)
+    set (DIRECT3D_FOUND 1)
+elseif (MSVC_VERSION LESS 1700 OR NOT URHO3D_D3D11)
+    # To avoid incompatibility between DirectX SDK and Windows SDK defines and the resulting warning spam,
+    # only search for the DirectX SDK when using Visual Studion lower than VS2012 or when using D3D9
     set (DIRECTX_INC_SEARCH_PATH
         "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include"
         "C:/Program Files/Microsoft DirectX SDK (June 2010)/Include"
@@ -82,22 +107,9 @@ endif ()
 
 if (DIRECT3D_FOUND)
     include (FindPackageMessage)
-    FIND_PACKAGE_MESSAGE (Direct3D "Found DirectX SDK: ${DIRECT3D_LIBRARIES} ${DIRECT3D_INCLUDE_DIRS}" "[${DIRECT3D_LIBRARIES}][${DIRECT3D_INCLUDE_DIRS}]")
-else ()
-    if (NOT URHO3D_D3D11)
-        set (DIRECT3D_LIBRARIES d3d9 d3dcompiler)
-    else ()
-        set (DIRECT3D_LIBRARIES d3d11 d3dcompiler dxgi dxguid)
-    endif ()
-    if (MSVC)
-        if (MSVC_VERSION LESS 1700 OR NOT URHO3D_D3D11)
-            message (STATUS "DirectX SDK not found. This is not fatal if a recent Windows SDK is installed")
-        else ()
-            message (STATUS "DirectX SDK search skipped for MSVC 2012 and greater when using Direct3D 11")
-        endif ()
-    else ()
-        message (STATUS "DirectX SDK search skipped for MinGW. It is assumed that MinGW itself comes with the necessary headers & libraries")
-    endif ()
+    FIND_PACKAGE_MESSAGE (Direct3D "Found Direct3D: ${DIRECT3D_LIBRARIES} ${DIRECT3D_INCLUDE_DIRS}" "[${DIRECT3D_LIBRARIES}][${DIRECT3D_INCLUDE_DIRS}]")
+elseif (Direct3D_FIND_REQUIRED)
+    message (FATAL_ERROR "Could not find Direct3D in Windows SDK and DirectX SDK")
 endif ()
 
-mark_as_advanced (DIRECT3D_INCLUDE_DIRS DIRECT3D_LIBRARIES)
+mark_as_advanced (DIRECT3D_INCLUDE_DIRS DIRECT3D_LIBRARIES DIRECT3D_DLL)
