@@ -596,7 +596,7 @@ static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool 
             if ((*j)->GetType() == ScriptInstance::GetTypeStatic())
             {
                 ScriptInstance* instance = static_cast<ScriptInstance*>(j->Get());
-                if (instance->GetClassName() == className)
+                if (instance->IsA(className))
                     result.Push(node);
             }
         }

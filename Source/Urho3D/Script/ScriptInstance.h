@@ -113,6 +113,8 @@ public:
     asIScriptObject* GetScriptObject() const { return scriptObject_; }
     /// Return class name.
     const String& GetClassName() const { return className_; }
+    /// Check if the object is derived from a class.
+    bool IsA(const String& className) const;
     /// Check if has a method.
     bool HasMethod(const String& declaration) const;
 
