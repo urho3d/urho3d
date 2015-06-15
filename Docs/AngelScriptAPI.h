@@ -7516,6 +7516,7 @@ Node node;
 Vector3 normal;
 Vector3 position;
 uint subObject;
+Vector2 textureUV;
 };
 
 class Rect
@@ -12854,6 +12855,7 @@ enum RayQueryLevel
 RAY_AABB,
 RAY_OBB,
 RAY_TRIANGLE,
+RAY_TRIANGLE_UV,
 };
 
 enum RenderCommandSortMode

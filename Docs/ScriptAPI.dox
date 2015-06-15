@@ -8855,6 +8855,7 @@ Properties:
 - Vector3 normal
 - Vector3 position
 - uint subObject
+- Vector2 textureUV
 
 <a name="Class_Rect"></a>
 
@@ -13519,6 +13520,7 @@ Properties:
 - RAY_AABB
 - RAY_OBB
 - RAY_TRIANGLE
+- RAY_TRIANGLE_UV
 
 
 ### RenderCommandSortMode
