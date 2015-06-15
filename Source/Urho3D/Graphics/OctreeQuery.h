@@ -197,7 +197,7 @@ struct URHO3D_API RayQueryResult
     {
         return position_ != rhs.position_ ||
                 normal_ != rhs.normal_ ||
-                texture_uv_ != rhs.texture_uv_ ||
+                textureUV_ != rhs.textureUV_ ||
                 distance_ != rhs.distance_ ||
                 drawable_ != rhs.drawable_ ||
                 node_ != rhs.node_ ||
@@ -209,7 +209,7 @@ struct URHO3D_API RayQueryResult
     /// Hit normal in world space. Negation of ray direction if per-triangle data not available.
     Vector3 normal_;
     /// Hit texture position
-    Vector2 texture_uv_;
+    Vector2 textureUV_;
     /// Distance from ray origin.
     float distance_;
     /// Drawable.

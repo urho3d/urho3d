@@ -124,7 +124,7 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
             result.drawable_ = this;
             result.node_ = node_;
             result.subObject_ = hitBatch;
-            result.texture_uv_ = geometryUV;
+            result.textureUV_ = geometryUV;
             results.Push(result);
         }
         break;
