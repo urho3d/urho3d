@@ -203,7 +203,7 @@ float Ray::HitDistance(const Sphere& sphere) const
 
 float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const
 {
-    return HitDistance(v0, v1, v2, nullptr,nullptr);
+    return HitDistance(v0, v1, v2, 0, 0);
 }
 
 float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, Vector3* outNormal,Vector3 *outBary) const
@@ -285,7 +285,7 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned v
             const Vector3& v0 = *((const Vector3*)(&vertices[index * vertexStride]));
             const Vector3& v1 = *((const Vector3*)(&vertices[(index + 1) * vertexStride]));
             const Vector3& v2 = *((const Vector3*)(&vertices[(index + 2) * vertexStride]));
-            nearest = Min(nearest, HitDistance(v0, v1, v2, outNormal,nullptr));
+            nearest = Min(nearest, HitDistance(v0, v1, v2, outNormal,0));
             index += 3;
         }
     }
@@ -369,7 +369,7 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
                 const Vector3& v0 = *((const Vector3*)(&vertices[indices[0] * vertexStride]));
                 const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexStride]));
                 const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexStride]));
-                nearest = Min(nearest, HitDistance(v0, v1, v2, outNormal,nullptr));
+                nearest = Min(nearest, HitDistance(v0, v1, v2, outNormal,0));
                 indices += 3;
             }
         }
@@ -384,7 +384,7 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
                 const Vector3& v0 = *((const Vector3*)(&vertices[indices[0] * vertexStride]));
                 const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexStride]));
                 const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexStride]));
-                nearest = Min(nearest, HitDistance(v0, v1, v2, outNormal,nullptr));
+                nearest = Min(nearest, HitDistance(v0, v1, v2, outNormal,0));
                 indices += 3;
             }
         }

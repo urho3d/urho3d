@@ -348,10 +348,10 @@ float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2 * out
         if( 0 == (elementMask & MASK_TEXCOORD1) ) {
             // requested UV output, but no texture data in vertex buffer
             LOGWARNING("Illegal GetHitDistance call: UV return requested on vertex buffer without UV coords");
-            outUV = nullptr;
+            outUV = 0;
         }
         else
-            uvOffset = VertexBuffer::GetElementOffset(elementMask,VertexElement::ELEMENT_TEXCOORD1);
+            uvOffset = VertexBuffer::GetElementOffset(elementMask,ELEMENT_TEXCOORD1);
     }
     if (vertexData) {
         if(indexData)
