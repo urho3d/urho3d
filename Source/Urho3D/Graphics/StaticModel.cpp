@@ -82,13 +82,15 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
 
     case RAY_OBB:
     case RAY_TRIANGLE:
+    case RAY_TRIANGLE_UV:
         Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
         Ray localRay = query.ray_.Transformed(inverse);
         float distance = localRay.HitDistance(boundingBox_);
         Vector3 normal = -query.ray_.direction_;
+        Vector2 geometryUV;
         unsigned hitBatch = M_MAX_UNSIGNED;
 
-        if (level == RAY_TRIANGLE && distance < query.maxDistance_)
+        if (level >= RAY_TRIANGLE && distance < query.maxDistance_)
         {
             distance = M_INFINITY;
 
@@ -98,7 +100,11 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
                 if (geometry)
                 {
                     Vector3 geometryNormal;
-                    float geometryDistance = geometry->GetHitDistance(localRay, &geometryNormal);
+                    float geometryDistance ;
+                    if(level>RAY_TRIANGLE_UV)
+                        geometryDistance = geometry->GetHitDistance(localRay, &geometryNormal);
+                    else
+                        geometryDistance = geometry->GetHitDistance(localRay, &geometryNormal,&geometryUV);
                     if (geometryDistance < query.maxDistance_ && geometryDistance < distance)
                     {
                         distance = geometryDistance;
@@ -118,7 +124,8 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
             result.drawable_ = this;
             result.node_ = node_;
             result.subObject_ = hitBatch;
-            results.Push(result);
+            result.texture_uv_ = geometryUV;
+            results.push_back(result);
         }
         break;
     }

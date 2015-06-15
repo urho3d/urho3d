@@ -335,22 +335,30 @@ void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsig
     }
 }
 
-float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal) const
+float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2 * outUV) const
 {
     const unsigned char* vertexData;
     const unsigned char* indexData;
     unsigned vertexSize;
     unsigned indexSize;
     unsigned elementMask;
-    
+    unsigned uvOffset=0;
     GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-    
-    if (vertexData && indexData)
-        return ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_, outNormal);
-    else if (vertexData)
-        return ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_, outNormal);
-    else
-        return M_INFINITY;
+    if(outUV) {
+        if( 0 == (elementMask & MASK_TEXCOORD1) ) {
+            // requested UV output, but no texture data in vertex buffer
+            LOGWARNING("Illegal GetHitDistance call: UV return requested on vertex buffer without UV coords");
+            outUV = nullptr;
+        }
+        else
+            uvOffset = VertexBuffer::GetElementOffset(elementMask,VertexElement::ELEMENT_TEXCOORD1);
+    }
+    if (vertexData) {
+        if(indexData)
+            return ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_, outNormal,outUV,uvOffset);
+        return ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_, outNormal,outUV,uvOffset);
+    }
+    return M_INFINITY;
 }
 
 bool Geometry::IsInside(const Ray& ray) const

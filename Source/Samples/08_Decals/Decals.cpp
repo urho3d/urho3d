@@ -24,6 +24,7 @@
 
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/IO/Log.h>
 #include <Urho3D/UI/Cursor.h>
 #include <Urho3D/Graphics/DebugRenderer.h>
 #include <Urho3D/Graphics/DecalSet.h>
@@ -292,13 +293,14 @@ bool Decals::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable)
     Ray cameraRay = camera->GetScreenRay((float)pos.x_ / graphics->GetWidth(), (float)pos.y_ / graphics->GetHeight());
     // Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit
     PODVector<RayQueryResult> results;
-    RayOctreeQuery query(results, cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY);
+    RayOctreeQuery query(results, cameraRay, RAY_TRIANGLE_UV, maxDistance, DRAWABLE_GEOMETRY);
     scene_->GetComponent<Octree>()->RaycastSingle(query);
     if (results.Size())
     {
         RayQueryResult& result = results[0];
         hitPos = result.position_;
         hitDrawable = result.drawable_;
+        LOGWARNINGF("hit UV %f,%f",result.texture_uv_.x_,result.texture_uv_.y_);
         return true;
     }
     
