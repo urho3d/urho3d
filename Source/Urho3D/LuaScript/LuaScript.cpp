@@ -23,6 +23,7 @@
 #include "../Core/CoreEvents.h"
 #include "../Engine/EngineEvents.h"
 #include "../IO/File.h"
+#include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../LuaScript/LuaFile.h"
 #include "../LuaScript/LuaFunction.h"
@@ -221,6 +222,11 @@ bool LuaScript::ExecuteFile(const String& fileName)
 {
     PROFILE(ExecuteFile);
 
+#ifdef URHO3D_LUA_RAW_SCRIPT_LOADER
+    if (ExecuteRawFile(fileName))
+        return true;
+#endif
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     LuaFile* luaFile = cache->GetResource<LuaFile>(fileName);
     return luaFile && luaFile->LoadAndExecute(luaState_);
@@ -236,6 +242,60 @@ bool LuaScript::ExecuteString(const String& string)
     {
         const char* message = lua_tostring(luaState_, -1);
         LOGERROR("Execute Lua string failed: " + String(message));
+        lua_settop(luaState_, top);
+        return false;
+    }
+
+    return true;
+}
+
+bool LuaScript::LoadRawFile(const String& fileName)
+{
+    PROFILE(LoadRawFile);
+
+    LOGINFO("Finding Lua file on file system: " + fileName);
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    String filePath = cache->GetResourceFileName(fileName);
+
+    if (filePath.Empty())
+    {
+        LOGINFO("Lua file not found: " + fileName);
+        return false;
+    }
+
+    filePath = GetNativePath(filePath);
+
+    LOGINFO("Loading Lua file from file system: " + filePath);
+
+    int top = lua_gettop(luaState_);
+
+    if (luaL_loadfile (luaState_, filePath.CString()))
+    {
+        const char* message = lua_tostring(luaState_, -1);
+        LOGERROR("Load Lua file failed: " + String(message));
+        lua_settop(luaState_, top);
+        return false;
+    }
+
+    LOGINFO("Lua file loaded: " + filePath);
+
+    return true;
+}
+
+bool LuaScript::ExecuteRawFile(const String& fileName)
+{
+    PROFILE(ExecuteRawFile);
+
+    int top = lua_gettop(luaState_);
+
+    if (!LoadRawFile(fileName))
+        return false;
+
+    if (lua_pcall(luaState_, 0, 0, 0))
+    {
+        const char* message = lua_tostring(luaState_, -1);
+        LOGERROR("Execute Lua file failed: " + String(message));
         lua_settop(luaState_, top);
         return false;
     }
@@ -289,20 +349,29 @@ int LuaScript::AtPanic(lua_State* L)
 
 int LuaScript::Loader(lua_State* L)
 {
+    LuaScript* lua = ::GetContext(L)->GetSubsystem<LuaScript>();
+    // Get module name
+    String fileName(luaL_checkstring(L, 1));
+
+#ifdef URHO3D_LUA_RAW_SCRIPT_LOADER
+    // First attempt to load lua script file from the file system.
+    // Attempt to load .luc file first, then fall back to .lua.
+    if (
+        lua->LoadRawFile(fileName + ".luc")
+        || lua->LoadRawFile(fileName + ".lua")
+    ) return 1;
+#endif
+
     ResourceCache* cache = ::GetContext(L)->GetSubsystem<ResourceCache>();
 
-    // Get module name
-    const char* name = luaL_checkstring(L, 1);
-
     // Attempt to get .luc file first.
-    String lucFileName = String(name) + ".luc";
-    LuaFile* lucFile = cache->GetResource<LuaFile>(lucFileName, false);
+    LuaFile* lucFile = cache->GetResource<LuaFile>(fileName + ".luc", false);
     if (lucFile)
         return lucFile->LoadChunk(L) ? 1 : 0;
 
-    // Then try to get .lua file. If this also fails, error is logged and resource not found event is sent
-    String luaFileName = String(name) + ".lua";
-    LuaFile* luaFile = cache->GetResource<LuaFile>(luaFileName);
+    // Then try to get .lua file. If this also fails, error is logged and
+    // resource not found event is sent
+    LuaFile* luaFile = cache->GetResource<LuaFile>(fileName + ".lua");
     if (luaFile)
         return luaFile->LoadChunk(L) ? 1 : 0;
 
