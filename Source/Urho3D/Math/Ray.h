@@ -99,14 +99,12 @@ public:
     float HitDistance(const Frustum& frustum, bool solidInside = true) const;
     /// Return hit distance to a sphere, or infinity if no hit.
     float HitDistance(const Sphere& sphere) const;
-    /// Return hit distance to a triangle, or infinity if no hit.
-    float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
-    /// Return hit distance to a triangle and out normal, or infinity if no hit.
-    float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, Vector3* outNormal, Vector3 * outBary) const;
-    /// Return hit distance to non-indexed geometry data, or infinity if no hit. Optionally return normal, and uv coordinates at intersect point
-    float HitDistance(const void* vertexData, unsigned vertexStride, unsigned vertexStart, unsigned vertexCount, Vector3* outNormal = 0, Vector2* outUV1 = 0, unsigned uvOffset=0) const;
-    /// Return hit distance to indexed geometry data, or infinity if no hit.
-    float HitDistance(const void* vertexData, unsigned vertexStride, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, Vector3* outNormal = 0, Vector2* outUV1 = 0, unsigned uvOffset=0) const;
+    /// Return hit distance to a triangle, or infinity if no hit. Optionally return hit normal and hit barycentric coordinate at intersect point.
+    float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, Vector3* outNormal = 0, Vector3* outBary = 0) const;
+    /// Return hit distance to non-indexed geometry data, or infinity if no hit. Optionally return hit normal and hit uv coordinates at intersect point.
+    float HitDistance(const void* vertexData, unsigned vertexStride, unsigned vertexStart, unsigned vertexCount, Vector3* outNormal = 0, Vector2* outUV = 0, unsigned uvOffset = 0) const;
+    /// Return hit distance to indexed geometry data, or infinity if no hit. Optionally return hit normal and hit uv coordinates at intersect point.
+    float HitDistance(const void* vertexData, unsigned vertexStride, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, Vector3* outNormal = 0, Vector2* outUV = 0, unsigned uvOffset = 0) const;
     /// Return whether ray is inside non-indexed geometry.
     bool InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const;
     /// Return whether ray is inside indexed geometry.

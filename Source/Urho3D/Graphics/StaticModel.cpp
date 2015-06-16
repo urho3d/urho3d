@@ -100,11 +100,8 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
                 if (geometry)
                 {
                     Vector3 geometryNormal;
-                    float geometryDistance ;
-                    if(level>RAY_TRIANGLE_UV)
-                        geometryDistance = geometry->GetHitDistance(localRay, &geometryNormal);
-                    else
-                        geometryDistance = geometry->GetHitDistance(localRay, &geometryNormal,&geometryUV);
+                    float geometryDistance = level == RAY_TRIANGLE ? geometry->GetHitDistance(localRay, &geometryNormal) :
+                        geometry->GetHitDistance(localRay, &geometryNormal, &geometryUV);
                     if (geometryDistance < query.maxDistance_ && geometryDistance < distance)
                     {
                         distance = geometryDistance;
@@ -120,11 +117,11 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
             RayQueryResult result;
             result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
             result.normal_ = normal;
+            result.textureUV_ = geometryUV;
             result.distance_ = distance;
             result.drawable_ = this;
             result.node_ = node_;
             result.subObject_ = hitBatch;
-            result.textureUV_ = geometryUV;
             results.Push(result);
         }
         break;

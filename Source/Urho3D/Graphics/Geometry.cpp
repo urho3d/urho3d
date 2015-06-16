@@ -335,32 +335,36 @@ void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsig
     }
 }
 
-float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2 * outUV) const
+float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outUV) const
 {
     const unsigned char* vertexData;
     const unsigned char* indexData;
     unsigned vertexSize;
     unsigned indexSize;
     unsigned elementMask;
-    unsigned uvOffset=0;
+    unsigned uvOffset = 0;
+
     GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-    if (outUV)
-    {
-        if ( (elementMask & MASK_TEXCOORD1) == 0 )
-        {
-            // requested UV output, but no texture data in vertex buffer
-            LOGWARNING("Illegal GetHitDistance call: UV return requested on vertex buffer without UV coords");
-            outUV = 0;
-        }
-        else
-            uvOffset = VertexBuffer::GetElementOffset(elementMask,ELEMENT_TEXCOORD1);
-    }
+
     if (vertexData)
     {
-        if(indexData)
-            return ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_, outNormal,outUV,uvOffset);
-        return ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_, outNormal,outUV,uvOffset);
+        if (outUV)
+        {
+            if ((elementMask & MASK_TEXCOORD1) == 0)
+            {
+                // requested UV output, but no texture data in vertex buffer
+                LOGWARNING("Illegal GetHitDistance call: UV return requested on vertex buffer without UV coords");
+                *outUV = Vector2::ZERO;
+                outUV = 0;
+            }
+            else
+                uvOffset = VertexBuffer::GetElementOffset(elementMask, ELEMENT_TEXCOORD1);
+        }
+
+        return indexData ? ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_, outNormal, outUV, uvOffset) :
+            ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_, outNormal, outUV, uvOffset);
     }
+
     return M_INFINITY;
 }
 
@@ -374,12 +378,8 @@ bool Geometry::IsInside(const Ray& ray) const
 
     GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
 
-    if (vertexData && indexData)
-        return ray.InsideGeometry(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_);
-    else if (vertexData)
-        return ray.InsideGeometry(vertexData, vertexSize, vertexStart_, vertexCount_);
-    else
-        return false;
+    return vertexData ? (indexData ? ray.InsideGeometry(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_) :
+        ray.InsideGeometry(vertexData, vertexSize, vertexStart_, vertexCount_)) : false;
 }
 
 void Geometry::GetPositionBufferIndex()
