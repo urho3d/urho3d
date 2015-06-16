@@ -13,7 +13,8 @@ enum RayQueryLevel
 {
     RAY_AABB = 0,
     RAY_OBB,
-    RAY_TRIANGLE
+    RAY_TRIANGLE,
+    RAY_TRIANGLE_UV
 };
 
 struct RayQueryResult
@@ -23,6 +24,7 @@ struct RayQueryResult
     
     Vector3 position_ @ position;
     Vector3 normal_ @ normal;
+    Vector2 textureUV_ @ textureUV;
     float distance_ @ distance;
     Drawable* drawable_ @ drawable;
     Node* node_ @ node;

@@ -4345,6 +4345,7 @@ Properties:
 
 - Vector3 position
 - Vector3 normal
+- Vector2 textureUV
 - float distance
 - Drawable* drawable
 - Node* node
@@ -7376,6 +7377,7 @@ Properties:
 - int RAY_AABB
 - int RAY_OBB
 - int RAY_TRIANGLE
+- int RAY_TRIANGLE_UV
 
 ### RenderCommandSortMode
 

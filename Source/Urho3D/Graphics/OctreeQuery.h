@@ -45,24 +45,24 @@ public:
         viewMask_(viewMask)
     {
     }
-    
+
     /// Destruct.
     virtual ~OctreeQuery()
     {
     }
-    
+
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) = 0;
     /// Intersection test for drawables.
     virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) = 0;
-    
+
     /// Result vector reference.
     PODVector<Drawable*>& result_;
     /// Drawable flags to include.
     unsigned char drawableFlags_;
     /// Drawable layers to include.
     unsigned viewMask_;
-    
+
 private:
     /// Prevent copy construction.
     OctreeQuery(const OctreeQuery& rhs);
@@ -81,12 +81,12 @@ public:
         point_(point)
     {
     }
-    
+
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside);
     /// Intersection test for drawables.
     virtual void TestDrawables(Drawable** start, Drawable** end, bool inside);
-    
+
     /// Point.
     Vector3 point_;
 };
@@ -102,12 +102,12 @@ public:
         sphere_(sphere)
     {
     }
-    
+
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside);
     /// Intersection test for drawables.
     virtual void TestDrawables(Drawable** start, Drawable** end, bool inside);
-    
+
     /// Sphere.
     Sphere sphere_;
 };
@@ -123,12 +123,12 @@ public:
         box_(box)
     {
     }
-    
+
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside);
     /// Intersection test for drawables.
     virtual void TestDrawables(Drawable** start, Drawable** end, bool inside);
-    
+
     /// Bounding box.
     BoundingBox box_;
 };
@@ -144,12 +144,12 @@ public:
         frustum_(frustum)
     {
     }
-    
+
     /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside);
     /// Intersection test for drawables.
     virtual void TestDrawables(Drawable** start, Drawable** end, bool inside);
-    
+
     /// Frustum.
     Frustum frustum_;
 };
@@ -166,7 +166,7 @@ struct URHO3D_API OctreeQueryResult
 
     /// Test for inequality, added to prevent GCC from complaining.
     bool operator != (const OctreeQueryResult& rhs) const { return drawable_ != rhs.drawable_ || node_ != rhs.node_; }
-    
+
     /// Drawable.
     Drawable* drawable_;
     /// Scene node.
@@ -178,7 +178,8 @@ enum RayQueryLevel
 {
     RAY_AABB = 0,
     RAY_OBB,
-    RAY_TRIANGLE
+    RAY_TRIANGLE,
+    RAY_TRIANGLE_UV
 };
 
 /// Raycast result.
@@ -192,12 +193,23 @@ struct URHO3D_API RayQueryResult
     }
 
     /// Test for inequality, added to prevent GCC from complaining.
-    bool operator != (const RayQueryResult& rhs) const { return position_ != rhs.position_ || normal_ != rhs.normal_ || distance_ != rhs.distance_ || drawable_ != rhs.drawable_ || node_ != rhs.node_ || subObject_ != rhs.subObject_; }
-    
+    bool operator != (const RayQueryResult& rhs) const
+    {
+        return position_ != rhs.position_ ||
+                normal_ != rhs.normal_ ||
+                textureUV_ != rhs.textureUV_ ||
+                distance_ != rhs.distance_ ||
+                drawable_ != rhs.drawable_ ||
+                node_ != rhs.node_ ||
+                subObject_ != rhs.subObject_;
+    }
+
     /// Hit position in world space.
     Vector3 position_;
     /// Hit normal in world space. Negation of ray direction if per-triangle data not available.
     Vector3 normal_;
+    /// Hit texture position
+    Vector2 textureUV_;
     /// Distance from ray origin.
     float distance_;
     /// Drawable.
@@ -223,7 +235,7 @@ public:
         level_(level)
     {
     }
-    
+
     /// Result vector reference.
     PODVector<RayQueryResult>& result_;
     /// Ray.
@@ -236,7 +248,7 @@ public:
     float maxDistance_;
     /// Raycast detail level.
     RayQueryLevel level_;
-    
+
 private:
     /// Prevent copy construction.
     RayOctreeQuery(const RayOctreeQuery& rhs);
