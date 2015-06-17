@@ -71,6 +71,10 @@ public:
     bool ExecuteFile(const String& fileName);
     /// Execute script string. Return true if successful.
     bool ExecuteString(const String& string);
+    /// Load script file on file system (i.e. not from resource cache). Return true if successful.
+    bool LoadRawFile(const String& fileName);
+    /// Load and execute script file on file system (i.e. not from resource cache). Return true if successful.
+    bool ExecuteRawFile(const String& fileName);
     /// Execute script function.
     bool ExecuteFunction(const String& functionName);
     /// Send event.
