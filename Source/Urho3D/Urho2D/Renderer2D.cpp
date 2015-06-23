@@ -70,6 +70,7 @@ Renderer2D::Renderer2D(Context* context) :
     pass->SetVertexShader("Urho2D");
     pass->SetPixelShader("Urho2D");
     pass->SetDepthWrite(false);
+    cachedTechniques_[BLEND_REPLACE] = tech;
 
     material_->SetTechnique(0, tech);
     material_->SetCullMode(CULL_NONE);
@@ -238,9 +239,6 @@ void Renderer2D::RemoveDrawable(Drawable2D* drawable)
 
 Material* Renderer2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
 {
-    if (!material_)
-        return 0;
-
     if (!texture)
         return material_;
 
@@ -283,9 +281,21 @@ SharedPtr<Material> Renderer2D::CreateMaterial(Texture2D* texture, BlendMode ble
 {
     SharedPtr<Material> newMaterial = material_->Clone();
 
+    HashMap<int, SharedPtr<Technique> >::Iterator techIt = cachedTechniques_.Find((int)blendMode);
+    if (techIt == cachedTechniques_.End())
+    {
+        SharedPtr<Technique> tech(new Technique(context_));
+        Pass* pass = tech->CreatePass("alpha");
+        pass->SetVertexShader("Urho2D");
+        pass->SetPixelShader("Urho2D");
+        pass->SetDepthWrite(false);
+        pass->SetBlendMode(blendMode);
+        techIt = cachedTechniques_.Insert(MakePair((int)blendMode, tech));
+    }
+
+    newMaterial->SetTechnique(0, techIt->second_.Get());
     newMaterial->SetName(texture->GetName() + "_" + blendModeNames[blendMode]);
     newMaterial->SetTexture(TU_DIFFUSE, texture);
-    newMaterial->GetTechnique(0)->GetPass("alpha")->SetBlendMode(blendMode);
 
     return newMaterial;
 }
