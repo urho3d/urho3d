@@ -46,6 +46,9 @@ generated/
 # Qt Creator project settings
 /CMakeLists.txt.user
 
+# JetBrains IDE project settings
+/.idea/
+
 # Android project settings
 /Android/project.properties
 /Android/local.properties
