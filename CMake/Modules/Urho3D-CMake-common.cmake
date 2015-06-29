@@ -361,13 +361,8 @@ if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
     add_definitions (-DURHO3D_STATIC_DEFINE)
 endif ()
 
-# Find Direct3D include & library directories for Visual Studio in MS Windows SDK or DirectX SDK.
-# The SDK is not searched for with MinGW as it is incompatible, rather, it is assumed that MinGW
-# itself comes with the necessary headers & libraries.
-# Note that when building for OpenGL, any libraries are not used, but the include directory may
-# be necessary for DirectInput & DirectSound headers, if those are not present in the compiler's own
-# default includes.
-if (WIN32)
+# Find Direct3D include & library directories in MS Windows SDK or DirectX SDK when not using OpenGL.
+if (WIN32 AND NOT URHO3D_OPENGL)
     find_package (Direct3D REQUIRED)
     if (DIRECT3D_INCLUDE_DIRS)
         include_directories (${DIRECT3D_INCLUDE_DIRS})
