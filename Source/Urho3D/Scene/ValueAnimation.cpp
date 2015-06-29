@@ -339,6 +339,9 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
             return IntVector2((int)(v1.x_ * s + v2.x_ * t), (int)(v1.y_ * s + v2.y_ * t));
         }
 
+    case VAR_DOUBLE:
+        return Lerp(value1.GetDouble(), value2.GetDouble(), t);
+
     default:
         LOGERROR("Invalid value type for linear interpolation");
         return Variant::EMPTY;
@@ -387,6 +390,9 @@ Variant ValueAnimation::SplineInterpolation(unsigned index1, unsigned index2, fl
 
     case VAR_COLOR:
         return v1.GetColor() * h1 + v2.GetColor() * h2 + t1.GetColor() * h3 + t2.GetColor() * h4;
+
+    case VAR_DOUBLE:
+        return v1.GetDouble() * h1 + v2.GetDouble() * h2 + t1.GetDouble() * h3 + t2.GetDouble() * h4;
 
     default:
         LOGERROR("Invalid value type for spline interpolation");
@@ -437,6 +443,9 @@ Variant ValueAnimation::SubstractAndMultiply(const Variant& value1, const Varian
 
     case VAR_COLOR:
         return (value1.GetColor() - value2.GetColor()) * t;
+
+    case VAR_DOUBLE:
+        return (value1.GetDouble() - value2.GetDouble()) * t;
 
     default:
         LOGERROR("Invalid value type for spline interpolation's substract and multiply operation");

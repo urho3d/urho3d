@@ -19,6 +19,7 @@ class Deserializer
     unsigned char ReadUByte();
     bool ReadBool();
     float ReadFloat();
+    double ReadDouble();
     IntRect ReadIntRect();
     IntVector2 ReadIntVector2();
     Rect ReadRect();

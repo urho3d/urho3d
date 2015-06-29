@@ -131,8 +131,8 @@ void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant&
         case VAR_BOOL:
             lua_pushboolean(luaState_, src.GetBool());
             break;
-        case VAR_FLOAT:
-            lua_pushnumber(luaState_, src.GetFloat());
+        case VAR_DOUBLE:
+            lua_pushnumber(luaState_, src.GetDouble());
             break;
         case VAR_STRING:
             tolua_pushurho3dstring(luaState_, src.GetString());
@@ -237,8 +237,8 @@ void LuaScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
     case VAR_BOOL:
         dest = lua_toboolean(luaState_, -1) != 0;
         break;
-    case VAR_FLOAT:
-        dest = (float)lua_tonumber(luaState_, -1);
+    case VAR_DOUBLE:
+        dest = lua_tonumber(luaState_, -1);
         break;
     case VAR_STRING:
         dest = tolua_tourho3dstring(luaState_, -1, "");
@@ -505,9 +505,9 @@ void LuaScriptInstance::GetScriptAttributes()
     if (lua_istable(luaState_, -1))
     {
         size_t length = lua_objlen(luaState_, -1);
-        for (int i = 1; i <= length; ++i)
+        for (size_t i = 1; i <= length; ++i)
         {
-            lua_pushinteger(luaState_, i);
+            lua_pushinteger(luaState_, (int)i);
             lua_gettable(luaState_, -2);
 
             if (!lua_isstring(luaState_, -1))
@@ -545,7 +545,7 @@ void LuaScriptInstance::GetScriptAttributes()
             info.type_ = VAR_BOOL;
             break;
         case LUA_TNUMBER:
-            info.type_ = VAR_FLOAT;
+            info.type_ = VAR_DOUBLE;
             break;
         case LUA_TSTRING:
             info.type_ = VAR_STRING;

@@ -86,6 +86,8 @@ public:
     void SetBool(const String& name, bool value);
     /// Set float.
     void SetFloat(const String& name, float value);
+    /// Set double.
+    void SetDouble(const String& name, double value);
     /// Set vector2.
     void SetVector2(const String& name, const Vector2& value);
     /// Set vector3.
@@ -135,6 +137,8 @@ public:
     bool GetBool(const String& name) const;
     /// Return float.
     float GetFloat(const String& name) const;
+    /// Return double.
+    double GetDouble(const String& name) const;
     /// Return vector2.
     Vector2 GetVector2(const String& name) const;
     /// Return vector3.
@@ -185,6 +189,8 @@ public:
     void AddBool(bool value);
     /// Add float.
     void AddFloat(float value);
+    /// Add float.
+    void AddDouble(double value);
     /// Add vector2.
     void AddVector2(const Vector2& value);
     /// Add vector3.
@@ -231,6 +237,8 @@ public:
     bool GetBool(unsigned index) const;
     /// Return float.
     float GetFloat(unsigned index) const;
+    /// Return double.
+    double GetDouble(unsigned index) const;
     /// Return vector2.
     Vector2 GetVector2(unsigned index) const;
     /// Return vector3.

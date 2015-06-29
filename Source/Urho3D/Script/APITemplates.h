@@ -250,6 +250,7 @@ template <class T> void RegisterSerializer(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "bool WriteUByte(uint8)", asMETHODPR(T, WriteUByte, (unsigned char), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteBool(bool)", asMETHODPR(T, WriteBool, (bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteFloat(float)", asMETHODPR(T, WriteFloat, (float), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool WriteDouble(float)", asMETHODPR(T, WriteDouble, (double), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteIntRect(const IntRect&in)", asMETHODPR(T, WriteIntRect, (const IntRect&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteIntVector2(const IntVector2&in)", asMETHODPR(T, WriteIntVector2, (const IntVector2&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteVector2(const Vector2&in)", asMETHODPR(T, WriteVector2, (const Vector2&), bool), asCALL_THISCALL);
@@ -301,6 +302,7 @@ template <class T> void RegisterDeserializer(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "uint8 ReadUByte()", asMETHODPR(T, ReadUByte, (), unsigned char), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool ReadBool()", asMETHODPR(T, ReadBool, (), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float ReadFloat()", asMETHODPR(T, ReadFloat, (), float), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "double ReadDouble()", asMETHODPR(T, ReadDouble, (), double), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntRect ReadIntRect()", asMETHODPR(T, ReadIntRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 ReadIntVector2()", asMETHODPR(T, ReadIntVector2, (), IntVector2), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector2 ReadVector2()", asMETHODPR(T, ReadVector2, (), Vector2), asCALL_THISCALL);

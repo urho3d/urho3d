@@ -141,6 +141,19 @@ float ToFloat(const char* source)
     return (float)strtod(source, 0);
 }
 
+double ToDouble(const String& source)
+{
+    return ToDouble(source.CString());
+}
+
+double ToDouble(const char* source)
+{
+    if (!source)
+        return 0;
+
+    return strtod(source, 0);
+}
+
 Color ToColor(const String& source)
 {
     return ToColor(source.CString());

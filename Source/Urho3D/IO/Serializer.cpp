@@ -75,6 +75,11 @@ bool Serializer::WriteFloat(float value)
     return Write(&value, sizeof value) == sizeof value;
 }
 
+bool Serializer::WriteDouble(double value)
+{
+    return Write(&value, sizeof value) == sizeof value;
+}
+
 bool Serializer::WriteIntRect(const IntRect& value)
 {
     return Write(value.Data(), sizeof value) == sizeof value;
@@ -295,6 +300,9 @@ bool Serializer::WriteVariantData(const Variant& value)
     case VAR_MATRIX4:
         return WriteMatrix4(value.GetMatrix4());
         
+    case VAR_DOUBLE:
+        return WriteDouble(value.GetDouble());
+
     default:
         return false;
     }

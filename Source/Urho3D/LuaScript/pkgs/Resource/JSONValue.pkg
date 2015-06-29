@@ -18,6 +18,7 @@ class JSONValue
     void SetInt(const String name, int value);
     void SetBool(const String name, bool value);
     void SetFloat(const String name, float value);
+    void SetDouble(const String name, double value);
     void SetVector2(const String name, const Vector2& value);
     void SetVector3(const String name, const Vector3& value);
     void SetVector4(const String name, const Vector4& value);
@@ -43,6 +44,7 @@ class JSONValue
     int GetInt(const String name) const;
     bool GetBool(const String name) const;
     float GetFloat(const String name) const;
+    double GetDouble(const String name) const;
     Vector2 GetVector2(const String name) const;
     Vector3 GetVector3(const String name) const;
     Vector4 GetVector4(const String name) const;
@@ -68,6 +70,7 @@ class JSONValue
     void AddInt(int value);
     void AddBool(bool value);
     void AddFloat(float value);
+    void AddDouble(double value);
     void AddVector2(const Vector2& value);
     void AddVector3(const Vector3& value);
     void AddVector4(const Vector4& value);
@@ -91,6 +94,7 @@ class JSONValue
     int GetInt(unsigned index) const;
     bool GetBool(unsigned index) const;
     float GetFloat(unsigned index) const;
+    double GetDouble(unsigned index) const;
     Vector2 GetVector2(unsigned index) const;
     Vector3 GetVector3(unsigned index) const;
     Vector4 GetVector4(unsigned index) const;

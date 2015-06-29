@@ -58,6 +58,7 @@ enum VariantType
     VAR_MATRIX3,
     VAR_MATRIX3X4,
     VAR_MATRIX4,
+    VAR_DOUBLE,
     MAX_VAR_TYPES
 };
 
@@ -212,6 +213,13 @@ public:
 
     /// Construct from a float.
     Variant(float value) :
+        type_(VAR_NONE)
+    {
+        *this = value;
+    }
+
+    /// Construct from a double.
+    Variant(double value) :
         type_(VAR_NONE)
     {
         *this = value;
@@ -440,6 +448,14 @@ public:
         return *this;
     }
 
+    /// Assign from a double.
+    Variant& operator = (double rhs)
+    {
+        SetType(VAR_DOUBLE);
+        *(reinterpret_cast<double*>(&value_)) = rhs;
+        return *this;
+    }
+
     /// Assign from a Vector2.
     Variant& operator = (const Vector2& rhs)
     {
@@ -602,6 +618,8 @@ public:
     bool operator == (bool rhs) const { return type_ == VAR_BOOL ? value_.bool_ == rhs : false; }
     /// Test for equality with a float. To return true, both the type and value must match.
     bool operator == (float rhs) const { return type_ == VAR_FLOAT ? value_.float_ == rhs : false; }
+    /// Test for equality with a double. To return true, both the type and value must match.
+    bool operator == (double rhs) const { return type_ == VAR_DOUBLE ? *(reinterpret_cast<const double*>(&value_)) == rhs : false; }
     /// Test for equality with a Vector2. To return true, both the type and value must match.
     bool operator == (const Vector2& rhs) const { return type_ == VAR_VECTOR2 ? *(reinterpret_cast<const Vector2*>(&value_)) == rhs : false; }
     /// Test for equality with a Vector3. To return true, both the type and value must match.
@@ -671,6 +689,8 @@ public:
     bool operator != (bool rhs) const { return !(*this == rhs); }
     /// Test for inequality with a float.
     bool operator != (float rhs) const { return !(*this == rhs); }
+    /// Test for inequality with a double.
+    bool operator != (double rhs) const { return !(*this == rhs); }
     /// Test for inequality with a Vector2.
     bool operator != (const Vector2& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a Vector3.
@@ -729,6 +749,8 @@ public:
     bool GetBool() const { return type_ == VAR_BOOL ? value_.bool_ : false; }
     /// Return float or zero on type mismatch.
     float GetFloat() const { return type_ == VAR_FLOAT ? value_.float_ : 0.0f; }
+    /// Return double or zero on type mismatch.
+    double GetDouble() const { return type_ == VAR_DOUBLE ? *reinterpret_cast<const double*>(&value_) : 0.0; }
     /// Return Vector2 or zero on type mismatch.
     const Vector2& GetVector2() const { return type_ == VAR_VECTOR2 ? *reinterpret_cast<const Vector2*>(&value_) : Vector2::ZERO; }
     /// Return Vector3 or zero on type mismatch.
@@ -833,6 +855,7 @@ template<> inline VariantType GetVariantType<int>() { return VAR_INT; }
 template<> inline VariantType GetVariantType<unsigned>() { return VAR_INT; }
 template<> inline VariantType GetVariantType<bool>() { return VAR_BOOL; }
 template<> inline VariantType GetVariantType<float>() { return VAR_FLOAT; }
+template<> inline VariantType GetVariantType<double>() { return VAR_DOUBLE; }
 template<> inline VariantType GetVariantType<Vector2>() { return VAR_VECTOR2; }
 template<> inline VariantType GetVariantType<Vector3>() { return VAR_VECTOR3; }
 template<> inline VariantType GetVariantType<Vector4>() { return VAR_VECTOR4; }

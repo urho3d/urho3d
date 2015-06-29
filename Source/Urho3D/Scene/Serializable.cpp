@@ -150,6 +150,10 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
         *(reinterpret_cast<IntVector2*>(dest)) = src.GetIntVector2();
         break;
 
+    case VAR_DOUBLE:
+        *(reinterpret_cast<double*>(dest)) = src.GetDouble();
+        break;
+
     default:
         LOGERROR("Unsupported attribute type for OnSetAttribute()");
         return;
@@ -240,6 +244,10 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) cons
 
     case VAR_INTVECTOR2:
         dest = *(reinterpret_cast<const IntVector2*>(src));
+        break;
+
+    case VAR_DOUBLE:
+        dest = *(reinterpret_cast<const double*>(src));
         break;
 
     default:

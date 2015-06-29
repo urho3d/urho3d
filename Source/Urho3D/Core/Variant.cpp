@@ -58,6 +58,7 @@ static const char* typeNames[] =
     "Matrix3",
     "Matrix3x4",
     "Matrix4",
+    "Double",
     0
 };
 
@@ -177,6 +178,9 @@ bool Variant::operator == (const Variant& rhs) const
 
     case VAR_MATRIX4:
         return *(reinterpret_cast<const Matrix4*>(value_.ptr_)) == *(reinterpret_cast<const Matrix4*>(rhs.value_.ptr_));
+
+    case VAR_DOUBLE:
+        return *(reinterpret_cast<const double*>(&value_)) == *(reinterpret_cast<const double*>(&rhs.value_));
 
     default:
         return true;
@@ -304,6 +308,10 @@ void Variant::FromString(VariantType type, const char* value)
         *this = ToMatrix4(value);
         break;
         
+    case VAR_DOUBLE:
+        *this = ToDouble(value);
+        break;
+
     default:
         SetType(VAR_NONE);
     }
@@ -390,6 +398,9 @@ String Variant::ToString() const
         
     case VAR_MATRIX4:
         return (reinterpret_cast<const Matrix4*>(value_.ptr_))->ToString();
+
+    case VAR_DOUBLE:
+        return String(*reinterpret_cast<const double*>(&value_));
     }
 }
 
@@ -469,6 +480,9 @@ bool Variant::IsZero() const
     case VAR_MATRIX4:
         return *reinterpret_cast<const Matrix4*>(value_.ptr_) == Matrix4::IDENTITY;
         
+    case VAR_DOUBLE:
+        return *reinterpret_cast<const double*>(&value_) == 0.0;
+
     default:
         return true;
     }
@@ -597,6 +611,11 @@ template<> bool Variant::Get<bool>() const
 template<> float Variant::Get<float>() const
 {
     return GetFloat();
+}
+
+template<> double Variant::Get<double>() const
+{
+    return GetDouble();
 }
 
 template<> const Vector2& Variant::Get<const Vector2&>() const

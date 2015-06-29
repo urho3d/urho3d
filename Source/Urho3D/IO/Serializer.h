@@ -64,6 +64,8 @@ public:
     bool WriteBool(bool value);
     /// Write a float.
     bool WriteFloat(float value);
+    /// Write a double.
+    bool WriteDouble(double value);
     /// Write an IntRect.
     bool WriteIntRect(const IntRect& value);
     /// Write an IntVector2.

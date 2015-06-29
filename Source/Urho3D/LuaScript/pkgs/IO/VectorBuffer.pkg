@@ -36,6 +36,7 @@ class VectorBuffer
     unsigned char ReadUByte();
     bool ReadBool();
     float ReadFloat();
+    double ReadDouble();
     IntRect ReadIntRect();
     IntVector2 ReadIntVector2();
     Rect ReadRect();
@@ -79,6 +80,7 @@ class VectorBuffer
     bool WriteUByte(unsigned char value);
     bool WriteBool(bool value);
     bool WriteFloat(float value);
+    bool WriteDouble(double value);
     bool WriteIntRect(const IntRect& value);
     bool WriteIntVector2(const IntVector2& value);
     bool WriteRect(const Rect& value);

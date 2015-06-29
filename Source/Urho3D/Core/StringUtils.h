@@ -35,6 +35,10 @@ URHO3D_API bool ToBool(const char* source);
 URHO3D_API float ToFloat(const String& source);
 /// Parse a float from a C string.
 URHO3D_API float ToFloat(const char* source);
+/// Parse a double from a string.
+URHO3D_API double ToDouble(const String& source);
+/// Parse a double from a C string.
+URHO3D_API double ToDouble(const char* source);
 /// Parse an integer from a string.
 URHO3D_API int ToInt(const String& source);
 /// Parse an integer from a C string.
