@@ -5501,6 +5501,7 @@ Methods:
 - BoundingBox ReadBoundingBox()
 - int8 ReadByte()
 - Color ReadColor()
+- double ReadDouble()
 - String ReadFileID()
 - float ReadFloat()
 - int ReadInt()
@@ -6077,6 +6078,7 @@ Methods:
 - BoundingBox ReadBoundingBox()
 - int8 ReadByte()
 - Color ReadColor()
+- double ReadDouble()
 - String ReadFileID()
 - float ReadFloat()
 - int ReadInt()
@@ -6110,6 +6112,7 @@ Methods:
 - bool WriteBoundingBox(const BoundingBox&)
 - bool WriteByte(int8)
 - bool WriteColor(const Color&)
+- bool WriteDouble(float)
 - bool WriteFileID(const String&)
 - bool WriteFloat(float)
 - bool WriteInt(int)
@@ -6391,6 +6394,7 @@ Methods:
 - BoundingBox ReadBoundingBox()
 - int8 ReadByte()
 - Color ReadColor()
+- double ReadDouble()
 - String ReadFileID()
 - float ReadFloat()
 - int ReadInt()
@@ -6648,6 +6652,7 @@ Methods:
 
 - void AddBool(bool)
 - void AddColor(const Color&)
+- void AddDouble(double)
 - void AddFloat(float)
 - void AddInt(int)
 - void AddIntRect(const IntRect&)
@@ -6674,6 +6679,8 @@ Methods:
 - String[]@ GetChildNames() const
 - Color GetColor(const String&) const
 - Color GetColor(uint) const
+- double GetDouble(const String&) const
+- double GetDouble(uint) const
 - float GetFloat(const String&) const
 - float GetFloat(uint) const
 - int GetInt(const String&) const
@@ -6711,6 +6718,7 @@ Methods:
 - Variant GetVectorVariant(uint) const
 - void SetBool(const String&, bool)
 - void SetColor(const String&, const Color&)
+- void SetDouble(const String&, double)
 - void SetFloat(const String&, float)
 - void SetInt(const String&, int)
 - void SetIntRect(const String&, const IntRect&)
@@ -9980,6 +9988,7 @@ Methods:
 - bool WriteBoundingBox(const BoundingBox&)
 - bool WriteByte(int8)
 - bool WriteColor(const Color&)
+- bool WriteDouble(float)
 - bool WriteFileID(const String&)
 - bool WriteFloat(float)
 - bool WriteInt(int)
@@ -11083,6 +11092,7 @@ Methods:
 - String SubstringUTF8(uint, uint) const
 - bool ToBool() const
 - Color ToColor() const
+- double ToDouble() const
 - float ToFloat() const
 - int ToInt() const
 - IntRect ToIntRect() const
@@ -12391,6 +12401,7 @@ Methods:
 - void FromString(const String&, const String&)
 - bool GetBool() const
 - VectorBuffer GetBuffer() const
+- double GetDouble() const
 - float GetFloat() const
 - int GetInt() const
 - RefCounted@ GetPtr() const
@@ -12520,6 +12531,7 @@ Methods:
 - BoundingBox ReadBoundingBox()
 - int8 ReadByte()
 - Color ReadColor()
+- double ReadDouble()
 - String ReadFileID()
 - float ReadFloat()
 - int ReadInt()
@@ -12554,6 +12566,7 @@ Methods:
 - bool WriteBoundingBox(const BoundingBox&)
 - bool WriteByte(int8)
 - bool WriteColor(const Color&)
+- bool WriteDouble(float)
 - bool WriteFileID(const String&)
 - bool WriteFloat(float)
 - bool WriteInt(int)
@@ -13001,6 +13014,7 @@ Methods:
 - BoundingBox GetBoundingBox() const
 - XMLElement GetChild(const String& = String ( )) const
 - Color GetColor(const String&) const
+- double GetDouble(const String&) const
 - float GetFloat(const String&) const
 - int GetInt(const String&) const
 - Matrix3 GetMatrix3(const String&) const
@@ -13034,6 +13048,7 @@ Methods:
 - bool SetBool(const String&, bool)
 - bool SetBoundingBox(const BoundingBox&)
 - bool SetColor(const String&, const Color&)
+- bool SetDouble(const String&, double)
 - bool SetFloat(const String&, float)
 - bool SetInt(const String&, int)
 - bool SetMatrix3(const String&, const Matrix3&)
@@ -13685,6 +13700,7 @@ Properties:
 - VAR_MATRIX3
 - VAR_MATRIX3X4
 - VAR_MATRIX4
+- VAR_DOUBLE
 
 
 ### VerticalAlignment

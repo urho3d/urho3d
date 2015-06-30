@@ -71,6 +71,8 @@ public:
     bool ReadBool();
     /// Read a float.
     float ReadFloat();
+    /// Read a double.
+    double ReadDouble();
     /// Read an IntRect.
     IntRect ReadIntRect();
     /// Read an IntVector2.

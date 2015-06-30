@@ -25,6 +25,7 @@ enum VariantType
     VAR_MATRIX3,
     VAR_MATRIX3X4,
     VAR_MATRIX4,
+    VAR_DOUBLE,
     MAX_VAR_TYPES
 };
 
@@ -61,6 +62,7 @@ class Variant
     Variant(const StringHash& value);
     Variant(bool value);
     Variant(float value);
+    Variant(double value);
     Variant(const Vector2& value);
     Variant(const Vector3& value);
     Variant(const Vector4& value);
@@ -88,6 +90,7 @@ class Variant
     bool operator == (unsigned rhs) const;
     bool operator == (bool rhs) const;
     bool operator == (float rhs) const;
+    bool operator == (double rhs) const;
     bool operator == (const Vector2& rhs);
     bool operator == (const Vector3& rhs) const;
     bool operator == (const Vector4& rhs) const;
@@ -108,6 +111,7 @@ class Variant
     tolua_outside void VariantSetStringHash @ SetStringHash(const StringHash& value);
     tolua_outside void VariantSetBool @ SetBool(bool value);
     tolua_outside void VariantSetFloat @ SetFloat(float value);
+    tolua_outside void VariantSetDouble @ SetDouble(double value);
     tolua_outside void VariantSetVector2 @ SetVector2(const Vector2& value);
     tolua_outside void VariantSetVector3 @ SetVector3(const Vector3& value);
     tolua_outside void VariantSetVector4 @ SetVector4(const Vector4& value);
@@ -128,6 +132,7 @@ class Variant
     StringHash GetStringHash();
     bool GetBool() const;
     float GetFloat() const;
+    double GetDouble() const;
     const Vector2& GetVector2() const;
     const Vector3& GetVector3() const;
     const Vector4& GetVector4() const;
@@ -165,6 +170,7 @@ class VariantMap
     tolua_outside void VariantMapSetStringHash @ SetStringHash(const String key, const StringHash& value);
     tolua_outside void VariantMapSetBool @ SetBool(const String key, bool value);
     tolua_outside void VariantMapSetFloat @ SetFloat(const String key, float value);
+    tolua_outside void VariantMapSetDouble @ SetDouble(const String key, double value);
     tolua_outside void VariantMapSetVector2 @ SetVector2(const String key, const Vector2 value);
     tolua_outside void VariantMapSetVector3 @ SetVector3(const String key, const Vector3 value);
     tolua_outside void VariantMapSetVector4 @ SetVector4(const String key, const Vector4 value);
@@ -186,6 +192,7 @@ class VariantMap
     tolua_outside StringHash VariantMapGetStringHash @ GetStringHash(const String key);
     tolua_outside bool VariantMapGetBool @ GetBool(const String key);
     tolua_outside float VariantMapGetFloat @ GetFloat(const String key);
+    tolua_outside double VariantMapGetDouble @ GetDouble(const String key);
     tolua_outside const Vector2& VariantMapGetVector2 @ GetVector2(const String key);
     tolua_outside const Vector3& VariantMapGetVector3 @ GetVector3(const String key);
     tolua_outside const Vector4& VariantMapGetVector4 @ GetVector4(const String key);
@@ -225,6 +232,11 @@ static void VariantSetBool(Variant* variant, bool value)
 }
 
 static void VariantSetFloat(Variant* variant, float value)
+{
+    *variant = value;
+}
+
+static void VariantSetDouble(Variant* variant, double value)
 {
     *variant = value;
 }
@@ -325,6 +337,11 @@ static void VariantMapSetBool(VariantMap* vmap, const String& key, bool value)
 }
 
 static void VariantMapSetFloat(VariantMap* vmap, const String& key, float value)
+{
+    (*vmap)[StringHash(key)] = value;
+}
+
+static void VariantMapSetDouble(VariantMap* vmap, const String& key, double value)
 {
     (*vmap)[StringHash(key)] = value;
 }
@@ -433,6 +450,11 @@ static bool VariantMapGetBool(const VariantMap* vmap, const String& key)
 static float VariantMapGetFloat(const VariantMap* vmap, const String& key)
 {
     return FindVariant(vmap, key).GetFloat();
+}
+
+static double VariantMapGetDouble(const VariantMap* vmap, const String& key)
+{
+    return FindVariant(vmap, key).GetDouble();
 }
 
 static const Vector2& VariantMapGetVector2(const VariantMap* vmap, const String& key)

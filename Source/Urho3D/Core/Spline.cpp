@@ -122,6 +122,7 @@ Variant Spline::BezierInterpolation(const Vector<Variant>& knots, float t) const
         case VAR_VECTOR3:
         case VAR_VECTOR4:
         case VAR_COLOR:
+        case VAR_DOUBLE:
             return LinearInterpolation(knots[0], knots[1], t);
         default:
             return Variant::EMPTY;
@@ -139,6 +140,7 @@ Variant Spline::BezierInterpolation(const Vector<Variant>& knots, float t) const
             case VAR_VECTOR3:
             case VAR_VECTOR4:
             case VAR_COLOR:
+            case VAR_DOUBLE:
                 interpolatedKnots.Push(LinearInterpolation(knots[i - 1], knots[i], t));
                 break;
             default:
@@ -163,6 +165,8 @@ Variant Spline::LinearInterpolation(const Variant& lhs, const Variant& rhs, floa
         return lhs.GetVector4().Lerp(rhs.GetVector4(), t);
     case VAR_COLOR:
         return lhs.GetColor().Lerp(rhs.GetColor(), t);
+    case VAR_DOUBLE:
+        return Lerp(lhs.GetDouble(), rhs.GetDouble(), t);
     default:
         return Variant::EMPTY;
     }

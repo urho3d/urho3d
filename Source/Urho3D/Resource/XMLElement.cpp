@@ -303,6 +303,11 @@ bool XMLElement::SetFloat(const String& name, float value)
     return SetAttribute(name, String(value));
 }
 
+bool XMLElement::SetDouble(const String& name, double value)
+{
+    return SetAttribute(name, String(value));
+}
+
 bool XMLElement::SetUInt(const String& name, unsigned value)
 {
     return SetAttribute(name, String(value));
@@ -704,6 +709,11 @@ Color XMLElement::GetColor(const String& name) const
 float XMLElement::GetFloat(const String& name) const
 {
     return ToFloat(GetAttribute(name));
+}
+
+double XMLElement::GetDouble(const String& name) const
+{
+    return ToDouble(GetAttribute(name));
 }
 
 unsigned XMLElement::GetUInt(const String& name) const
