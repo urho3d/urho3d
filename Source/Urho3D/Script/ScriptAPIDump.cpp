@@ -157,10 +157,6 @@ bool ComparePropertyInfos(const PropertyInfo& lhs, const PropertyInfo& rhs)
 void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference, String separator)
 {
     String out(row);
-    ///\todo We need C++11 <regex> in String class to handle REGEX whole-word replacement correctly. Can't do that since we still support VS2008.
-    // Commenting out to temporary fix property name like 'doubleClickInterval' from being wrongly replaced.
-    // Fortunately, there is no occurence of type 'double' in the API at the moment.
-    //out.Replace("double", "float");   // s/\bdouble\b/float/g
     out.Replace("&in", "&");
     out.Replace("&out", "&");
     if (removeReference)

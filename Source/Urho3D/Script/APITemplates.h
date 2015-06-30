@@ -250,7 +250,7 @@ template <class T> void RegisterSerializer(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "bool WriteUByte(uint8)", asMETHODPR(T, WriteUByte, (unsigned char), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteBool(bool)", asMETHODPR(T, WriteBool, (bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteFloat(float)", asMETHODPR(T, WriteFloat, (float), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool WriteDouble(float)", asMETHODPR(T, WriteDouble, (double), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool WriteDouble(double)", asMETHODPR(T, WriteDouble, (double), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteIntRect(const IntRect&in)", asMETHODPR(T, WriteIntRect, (const IntRect&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteIntVector2(const IntVector2&in)", asMETHODPR(T, WriteIntVector2, (const IntVector2&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteVector2(const Vector2&in)", asMETHODPR(T, WriteVector2, (const Vector2&), bool), asCALL_THISCALL);
