@@ -85,7 +85,9 @@ public:
     /// Define a vertex tangent.
     void DefineTangent(const Vector4& tangent);
     /// Set the primitive type, number of vertices and elements in a geometry, after which the vertices can be edited with GetVertex(). An alternative to BeginGeometry() / DefineVertex().
-    void DefineGeometry(unsigned index, PrimitiveType type, unsigned numVertices, bool hasNormals, bool hasColors, bool hasTexCoords, bool hasTangents);
+    void DefineGeometry
+        (unsigned index, PrimitiveType type, unsigned numVertices, bool hasNormals, bool hasColors, bool hasTexCoords,
+            bool hasTangents);
     /// Update vertex buffer and calculate the bounding box. Call after finishing defining geometry.
     void Commit();
     /// Set material on all geometries.
@@ -95,14 +97,19 @@ public:
 
     /// Return number of geometries.
     unsigned GetNumGeometries() const { return geometries_.Size(); }
+
     /// Return number of vertices in a geometry.
     unsigned GetNumVertices(unsigned index) const;
+
     /// Return whether vertex buffer dynamic mode is enabled.
     bool IsDynamic() const { return dynamic_; }
+
     /// Return material by geometry index.
     Material* GetMaterial(unsigned index = 0) const;
+
     /// Return all vertices. These can be edited; calling Commit() updates the vertex buffer.
     Vector<PODVector<CustomGeometryVertex> >& GetVertices() { return vertices_; }
+
     /// Return a vertex in a geometry for editing, or null if out of bounds. After the edits are finished, calling Commit() updates  the vertex buffer.
     CustomGeometryVertex* GetVertex(unsigned geometryIndex, unsigned vertexNum);
 

@@ -61,7 +61,7 @@ private:
     /// Return sprite by hash.
     Sprite2D* GetSprite(const StringHash& hash) const;
     /// Begin load scml.
-    bool BeginLoadSpriter(Deserializer &source);
+    bool BeginLoadSpriter(Deserializer& source);
     /// Finish load scml.
     bool EndLoadSpriter();
     /// Load spriter folders.

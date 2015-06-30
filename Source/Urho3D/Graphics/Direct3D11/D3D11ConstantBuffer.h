@@ -59,9 +59,6 @@ public:
     bool IsDirty() const { return dirty_; }
 
 private:
-    /// Create buffer.
-    bool Create();
-
     /// Shadow data.
     SharedArrayPtr<unsigned char> shadowData_;
     /// Buffer byte size.

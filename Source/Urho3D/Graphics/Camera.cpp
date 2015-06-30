@@ -20,8 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "../Graphics/Camera.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Graphics/Camera.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Graphics/Drawable.h"
 #include "../Scene/Node.h"
@@ -97,8 +99,10 @@ void Camera::RegisterObject(Context* context)
     ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
     ATTRIBUTE("View Override Flags", int, viewOverrideFlags_, VO_NONE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Projection Offset", GetProjectionOffset, SetProjectionOffset, Vector2, Vector2::ZERO, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Reflection Plane", GetReflectionPlaneAttr, SetReflectionPlaneAttr, Vector4, Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Clip Plane", GetClipPlaneAttr, SetClipPlaneAttr, Vector4, Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Reflection Plane", GetReflectionPlaneAttr, SetReflectionPlaneAttr, Vector4,
+        Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Clip Plane", GetClipPlaneAttr, SetClipPlaneAttr, Vector4, Vector4(0.0f, 1.0f, 0.0f, 0.0f),
+        AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Use Reflection", GetUseReflection, SetUseReflection, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Use Clipping", GetUseClipping, SetUseClipping, bool, false, AM_DEFAULT);
 }
@@ -336,7 +340,7 @@ Vector2 Camera::WorldToScreenPoint(const Vector3& worldPos) const
     Vector3 eyeSpacePos = GetView() * worldPos;
     Vector2 ret;
 
-    if(eyeSpacePos.z_ > 0.0f)
+    if (eyeSpacePos.z_ > 0.0f)
     {
         Vector3 screenSpacePos = GetProjection(false) * eyeSpacePos;
         ret.x_ = screenSpacePos.x_;
@@ -392,11 +396,11 @@ Matrix4 Camera::GetProjection(bool apiSpecific) const
     Matrix4 ret(Matrix4::ZERO);
 
     // Whether to construct matrix using OpenGL or Direct3D clip space convention
-    #ifdef URHO3D_OPENGL
+#ifdef URHO3D_OPENGL
     bool openGLFormat = apiSpecific;
-    #else
+#else
     bool openGLFormat = false;
-    #endif
+#endif
 
     if (!orthographic_)
     {

@@ -84,10 +84,12 @@ public:
 
     /// Return Lua state.
     lua_State* GetState() const { return luaState_; }
+
     /// Return Lua function by function stack index.
     LuaFunction* GetFunction(int functionIndex);
     /// Return Lua function by function name.
     LuaFunction* GetFunction(const String& functionName, bool silentIfNotfound = false);
+
     /// Return whether is executing engine console commands as script code.
     bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
 

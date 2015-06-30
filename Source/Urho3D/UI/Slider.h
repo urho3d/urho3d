@@ -31,7 +31,7 @@ namespace Urho3D
 class URHO3D_API Slider : public BorderImage
 {
     OBJECT(Slider);
-    
+
 public:
     /// Construct.
     Slider(Context* context);
@@ -39,21 +39,28 @@ public:
     virtual ~Slider();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Perform UI element update.
     virtual void Update(float timeStep);
     /// React to mouse hover.
-    virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition,  int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse click begin.
-    virtual void OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnClickBegin
+        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse click end.
-    virtual void OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement);
+    virtual void OnClickEnd
+        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor,
+            UIElement* beginElement);
     /// React to mouse drag begin.
-    virtual void OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    virtual void
+        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag motion.
-    virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnDragMove
+        (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers,
+            Cursor* cursor);
     /// React to mouse drag end.
-    virtual void OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor);
+    virtual void
+        OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor);
     /// React to resize.
     virtual void OnResize();
 
@@ -70,12 +77,16 @@ public:
 
     /// Return orientation type.
     Orientation GetOrientation() const { return orientation_; }
+
     /// Return slider range.
     float GetRange() const { return range_; }
+
     /// Return slider current value.
     float GetValue() const { return value_; }
+
     /// Return knob element.
     BorderImage* GetKnob() const { return knob_; }
+
     /// Return paging minimum repeat rate (number of events per second).
     float GetRepeatRate() const { return repeatRate_; }
 

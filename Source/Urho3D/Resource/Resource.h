@@ -51,11 +51,11 @@ class URHO3D_API Resource : public Object
 {
     OBJECT(Resource);
     BASEOBJECT(Resource);
-    
+
 public:
     /// Construct.
     Resource(Context* context);
-    
+
     /// Load resource synchronously. Call both BeginLoad() & EndLoad() and return true if both succeeded.
     bool Load(Deserializer& source);
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
@@ -64,7 +64,7 @@ public:
     virtual bool EndLoad();
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
-    
+
     /// Set name.
     void SetName(const String& name);
     /// Set memory use in bytes, possibly approximate.
@@ -73,18 +73,22 @@ public:
     void ResetUseTimer();
     /// Set the asynchronous loading state. Called by ResourceCache. Resources in the middle of asynchronous loading are not normally returned to user.
     void SetAsyncLoadState(AsyncLoadState newState);
-    
+
     /// Return name.
     const String& GetName() const { return name_; }
+
     /// Return name hash.
     StringHash GetNameHash() const { return nameHash_; }
+
     /// Return memory use in bytes, possibly approximate.
     unsigned GetMemoryUse() const { return memoryUse_; }
+
     /// Return time since last use in milliseconds. If referred to elsewhere than in the resource cache, returns always zero.
     unsigned GetUseTimer();
+
     /// Return the asynchronous loading state.
     AsyncLoadState GetAsyncLoadState() const { return asyncLoadState_; }
-    
+
 private:
     /// Name.
     String name_;
@@ -118,7 +122,7 @@ template <class T> Vector<String> GetResourceNames(const Vector<SharedPtr<T> >& 
     Vector<String> ret(resources.Size());
     for (unsigned i = 0; i < resources.Size(); ++i)
         ret[i] = GetResourceName(resources[i]);
-    
+
     return ret;
 }
 

@@ -20,9 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "../UI/Button.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Input/InputEvents.h"
+#include "../UI/Button.h"
 #include "../UI/UI.h"
 #include "../UI/UIEvents.h"
 
@@ -96,7 +98,8 @@ void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
     BorderImage::GetBatches(batches, vertexData, currentScissor, offset);
 }
 
-void Button::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
+void Button::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
+    Cursor* cursor)
 {
     if (button == MOUSEB_LEFT)
     {
@@ -112,7 +115,8 @@ void Button::OnClickBegin(const IntVector2& position, const IntVector2& screenPo
     }
 }
 
-void Button::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement)
+void Button::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
+    Cursor* cursor, UIElement* beginElement)
 {
     if (pressed_ && button == MOUSEB_LEFT)
     {
@@ -126,7 +130,8 @@ void Button::OnClickEnd(const IntVector2& position, const IntVector2& screenPosi
     }
 }
 
-void Button::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers, Cursor* cursor)
+void Button::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons,
+    int qualifiers, Cursor* cursor)
 {
     SetPressed(true);
 }

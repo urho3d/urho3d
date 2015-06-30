@@ -20,14 +20,16 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../IO/Deserializer.h"
 #include "../IO/Log.h"
+#include "../IO/Serializer.h"
+#include "../Resource/XMLElement.h"
 #include "../Scene/ReplicationState.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/Serializable.h"
-#include "../IO/Serializer.h"
-#include "../Resource/XMLElement.h"
 
 #include "../DebugNew.h"
 
@@ -467,7 +469,7 @@ bool Serializable::SetAttribute(unsigned index, const Variant& value)
     else
     {
         LOGERROR("Could not set attribute " + attr.name_ + ": expected type " + Variant::GetTypeName(attr.type_) +
-            " but got " + value.GetTypeName());
+                 " but got " + value.GetTypeName());
         return false;
     }
 }
@@ -494,7 +496,7 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
             else
             {
                 LOGERROR("Could not set attribute " + i->name_ + ": expected type " + Variant::GetTypeName(i->type_)
-                    + " but got " + value.GetTypeName());
+                         + " but got " + value.GetTypeName());
                 return false;
             }
         }
@@ -864,7 +866,7 @@ void Serializable::SetInstanceDefault(const String& name, const Variant& default
     // Allocate the instance level default value
     if (!instanceDefaultValues_)
         instanceDefaultValues_ = new VariantMap();
-    instanceDefaultValues_->operator[] (name) = defaultValue;
+    instanceDefaultValues_->operator [](name) = defaultValue;
 }
 
 Variant Serializable::GetInstanceDefault(const String& name) const

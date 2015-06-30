@@ -20,9 +20,11 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
+#include "../IO/Log.h"
 #include "../Scene/ValueAnimation.h"
 #include "../Scene/ValueAnimationInfo.h"
-#include "../IO/Log.h"
 
 #include "../DebugNew.h"
 

@@ -20,7 +20,11 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/CoreEvents.h"
+#include "../Core/ProcessUtils.h"
+#include "../Core/Profiler.h"
 #include "../Engine/EngineEvents.h"
 #include "../IO/File.h"
 #include "../IO/FileSystem.h"
@@ -30,8 +34,6 @@
 #include "../LuaScript/LuaScript.h"
 #include "../LuaScript/LuaScriptEventInvoker.h"
 #include "../LuaScript/LuaScriptInstance.h"
-#include "../Core/ProcessUtils.h"
-#include "../Core/Profiler.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 
@@ -139,7 +141,7 @@ LuaScript::~LuaScript()
 {
     functionPointerToFunctionMap_.Clear();
     functionNameToFunctionMap_.Clear();
-    
+
     lua_State* luaState = luaState_;
     luaState_ = 0;
 
@@ -270,7 +272,7 @@ bool LuaScript::LoadRawFile(const String& fileName)
 
     int top = lua_gettop(luaState_);
 
-    if (luaL_loadfile (luaState_, filePath.CString()))
+    if (luaL_loadfile(luaState_, filePath.CString()))
     {
         const char* message = lua_tostring(luaState_, -1);
         LOGERROR("Load Lua file failed: " + String(message));
@@ -349,17 +351,15 @@ int LuaScript::AtPanic(lua_State* L)
 
 int LuaScript::Loader(lua_State* L)
 {
-    LuaScript* lua = ::GetContext(L)->GetSubsystem<LuaScript>();
     // Get module name
     String fileName(luaL_checkstring(L, 1));
 
 #ifdef URHO3D_LUA_RAW_SCRIPT_LOADER
     // First attempt to load lua script file from the file system.
     // Attempt to load .luc file first, then fall back to .lua.
-    if (
-        lua->LoadRawFile(fileName + ".luc")
-        || lua->LoadRawFile(fileName + ".lua")
-    ) return 1;
+    LuaScript* lua = ::GetContext(L)->GetSubsystem<LuaScript>();
+    if (lua->LoadRawFile(fileName + ".luc") || lua->LoadRawFile(fileName + ".lua"))
+        return 1;
 #endif
 
     ResourceCache* cache = ::GetContext(L)->GetSubsystem<ResourceCache>();
@@ -383,7 +383,7 @@ void LuaScript::ReplacePrint()
     static const struct luaL_reg reg[] =
     {
         {"print", &LuaScript::Print},
-        { NULL, NULL}
+        {NULL, NULL}
     };
 
     lua_getglobal(luaState_, "_G");
@@ -391,14 +391,14 @@ void LuaScript::ReplacePrint()
     lua_pop(luaState_, 1);
 }
 
-int LuaScript::Print(lua_State *L)
+int LuaScript::Print(lua_State* L)
 {
     String string;
     int n = lua_gettop(L);
     lua_getglobal(L, "tostring");
     for (int i = 1; i <= n; i++)
     {
-        const char *s;
+        const char* s;
         // Function to be called
         lua_pushvalue(L, -1);
         // Value to print
@@ -466,7 +466,7 @@ LuaFunction* LuaScript::GetFunction(const String& functionName, bool silentIfNot
 }
 
 void LuaScript::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
-{   
+{
     if (coroutineUpdate_ && coroutineUpdate_->BeginCall())
     {
         using namespace PostUpdate;

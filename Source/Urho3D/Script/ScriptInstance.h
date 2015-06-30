@@ -70,8 +70,10 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Handle attribute read access.
     virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest) const;
+
     /// Return attribute descriptions, or null if none defined.
     virtual const Vector<AttributeInfo>* GetAttributes() const { return &attributeInfos_; }
+
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     /// Handle enabled/disabled state change.
@@ -103,16 +105,20 @@ public:
     /// Execute a method.
     bool Execute(asIScriptFunction* method, const VariantVector& parameters = Variant::emptyVariantVector);
     /// Add a delay-executed method call, optionally repeating.
-    void DelayedExecute(float delay, bool repeat, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector);
+    void DelayedExecute
+        (float delay, bool repeat, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector);
     /// Clear pending delay-executed method calls. If empty declaration given, clears all.
     void ClearDelayedExecute(const String& declaration = String::EMPTY);
 
     /// Return script file.
     ScriptFile* GetScriptFile() const { return scriptFile_; }
+
     /// Return script object.
     asIScriptObject* GetScriptObject() const { return scriptObject_; }
+
     /// Return class name.
     const String& GetClassName() const { return className_; }
+
     /// Check if the object is derived from a class.
     bool IsA(const String& className) const;
     /// Check if has a method.
@@ -122,8 +128,6 @@ public:
     void SetScriptFileAttr(const ResourceRef& value);
     /// Set delayed method calls attribute.
     void SetDelayedCallsAttr(const PODVector<unsigned char>& value);
-    /// Set fixed update time accumulator attribute.
-    void SetFixedUpdateAccAttr(float value);
     /// Set script file serialization attribute by calling a script function.
     void SetScriptDataAttr(const PODVector<unsigned char>& data);
     /// Set script network serialization attribute by calling a script function.
@@ -132,8 +136,6 @@ public:
     ResourceRef GetScriptFileAttr() const;
     /// Return delayed method calls attribute.
     PODVector<unsigned char> GetDelayedCallsAttr() const;
-    /// Return fixed update time accumulator attribute.
-    float GetFixedUpdateAccAttr() const;
     /// Get script file serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptDataAttr() const;
     /// Get script network serialization attribute by calling a script function.

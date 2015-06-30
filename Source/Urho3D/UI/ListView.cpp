@@ -20,12 +20,13 @@
 // THE SOFTWARE.
 //
 
-#include "../UI/CheckBox.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Input/InputEvents.h"
-#include "../UI/ListView.h"
 #include "../IO/Log.h"
-#include "../Container/Sort.h"
+#include "../UI/CheckBox.h"
+#include "../UI/ListView.h"
 #include "../UI/Text.h"
 #include "../UI/UI.h"
 #include "../UI/UIEvents.h"
@@ -85,7 +86,7 @@ public:
         SubscribeToEvent(overlayContainer->GetParent(), E_VIEWCHANGED, HANDLER(HierarchyContainer, HandleViewChanged));
         SubscribeToEvent(E_UIMOUSECLICK, HANDLER(HierarchyContainer, HandleUIMouseClick));
     }
-    
+
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -132,7 +133,7 @@ public:
             const Vector<SharedPtr<UIElement> >& children = overlayContainer_->GetChildren();
             Vector<SharedPtr<UIElement> >::ConstIterator i = children.Find(SharedPtr<UIElement>(overlay));
             if (i != children.End())
-                listView_->ToggleExpand(i - children.Begin());
+                listView_->ToggleExpand((unsigned)(i - children.Begin()));
         }
     }
 
@@ -181,7 +182,7 @@ ListView::ListView(Context* context) :
     SubscribeToEvent(E_FOCUSCHANGED, HANDLER(ListView, HandleItemFocusChanged));
     SubscribeToEvent(this, E_DEFOCUSED, HANDLER(ListView, HandleFocusChanged));
     SubscribeToEvent(this, E_FOCUSED, HANDLER(ListView, HandleFocusChanged));
-    
+
     UpdateUIClickSubscription();
 }
 
@@ -292,6 +293,8 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         case KEY_END:
             delta = GetNumItems();
             break;
+
+        default: break;
         }
     }
 
@@ -756,7 +759,7 @@ void ListView::Expand(unsigned index, bool enable, bool recursive)
     SetItemExpanded(item, enable);
     int baseIndent = item->GetIndent();
 
-    PODVector<bool> expanded(baseIndent + 1);
+    PODVector<bool> expanded((unsigned)(baseIndent + 1));
     expanded[baseIndent] = enable;
 
     contentElement_->DisableLayoutUpdate();
@@ -777,7 +780,7 @@ void ListView::Expand(unsigned index, bool enable, bool recursive)
         item->SetVisible(visible);
 
         if (indent >= (int)expanded.Size())
-            expanded.Resize(indent + 1);
+            expanded.Resize((unsigned)(indent + 1));
         expanded[indent] = visible && GetItemExpanded(item);
     }
 
@@ -836,7 +839,7 @@ unsigned ListView::FindItem(UIElement* item) const
         {
             int mid = (left + right) / 2;
             if (children[mid] == item)
-                return mid;
+                return (unsigned)mid;
             if (itemY < children[mid]->GetScreenPosition().y_)
                 right = mid - 1;
             else
@@ -977,8 +980,8 @@ void ListView::EnsureItemVisibility(UIElement* item)
     IntVector2 newView = GetViewPosition();
     IntVector2 currentOffset = item->GetPosition() - newView;
     const IntRect& clipBorder = scrollPanel_->GetClipBorder();
-    IntVector2 windowSize(scrollPanel_->GetWidth() - clipBorder.left_ - clipBorder.right_, scrollPanel_->GetHeight() -
-        clipBorder.top_ - clipBorder.bottom_);
+    IntVector2 windowSize(scrollPanel_->GetWidth() - clipBorder.left_ - clipBorder.right_,
+        scrollPanel_->GetHeight() - clipBorder.top_ - clipBorder.bottom_);
 
     if (currentOffset.y_ < 0)
         newView.y_ += currentOffset.y_;
@@ -1065,7 +1068,7 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
                 ToggleSelection(i);
         }
     }
-    
+
     // Propagate the click as an event. Also include right-clicks
     VariantMap& clickEventData = GetEventDataMap();
     clickEventData[ItemClicked::P_ELEMENT] = this;

@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Math/Random.h"
 
 namespace Urho3D
@@ -49,7 +51,7 @@ float RandStandardNormal()
     for (int i = 0; i < 12; i++)
         val += Rand() / 32768.0f;
     val -= 6.0f;
-    
+
     // Now val is approximatly standard normal distributed
     return val;
 }

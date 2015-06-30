@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Math/Frustum.h"
 #include "../Math/Polyhedron.h"
 
@@ -30,7 +32,7 @@ void BoundingBox::Define(const Vector3* vertices, unsigned count)
 {
     if (!count)
         return;
-    
+
     defined_ = false;
     Merge(vertices, count);
 }
@@ -50,7 +52,7 @@ void BoundingBox::Define(const Sphere& sphere)
 {
     const Vector3& center = sphere.center_;
     float radius = sphere.radius_;
-    
+
     min_ = center + Vector3(-radius, -radius, -radius);
     max_ = center + Vector3(radius, radius, radius);
     defined_ = true;
@@ -81,7 +83,7 @@ void BoundingBox::Merge(const Sphere& sphere)
 {
     const Vector3& center = sphere.center_;
     float radius = sphere.radius_;
-    
+
     Merge(center + Vector3(radius, radius, radius));
     Merge(center + Vector3(-radius, -radius, -radius));
 }
@@ -100,7 +102,7 @@ void BoundingBox::Clip(const BoundingBox& box)
         min_.z_ = box.min_.z_;
     if (box.max_.z_ < max_.z_)
         max_.z_ = box.max_.z_;
-    
+
     if (min_.x_ > max_.x_)
         Swap(min_.x_, max_.x_);
     if (min_.y_ > max_.y_)
@@ -133,7 +135,7 @@ BoundingBox BoundingBox::Transformed(const Matrix3x4& transform) const
         Abs(transform.m10_) * oldEdge.x_ + Abs(transform.m11_) * oldEdge.y_ + Abs(transform.m12_) * oldEdge.z_,
         Abs(transform.m20_) * oldEdge.x_ + Abs(transform.m21_) * oldEdge.y_ + Abs(transform.m22_) * oldEdge.z_
     );
-    
+
     return BoundingBox(newCenter - newEdge, newCenter + newEdge);
 }
 
@@ -145,7 +147,7 @@ Rect BoundingBox::Projected(const Matrix4& projection) const
         projMin.z_ = M_MIN_NEARCLIP;
     if (projMax.z_ < M_MIN_NEARCLIP)
         projMax.z_ = M_MIN_NEARCLIP;
-    
+
     Vector3 vertices[8];
     vertices[0] = projMin;
     vertices[1] = Vector3(projMax.x_, projMin.y_, projMin.z_);
@@ -155,14 +157,14 @@ Rect BoundingBox::Projected(const Matrix4& projection) const
     vertices[5] = Vector3(projMax.x_, projMin.y_, projMax.z_);
     vertices[6] = Vector3(projMin.x_, projMax.y_, projMax.z_);
     vertices[7] = projMax;
-    
+
     Rect rect;
     for (unsigned i = 0; i < 8; ++i)
     {
         Vector3 projected = projection * vertices[i];
         rect.Merge(Vector2(projected.x_, projected.y_));
     }
-    
+
     return rect;
 }
 
@@ -171,7 +173,7 @@ Intersection BoundingBox::IsInside(const Sphere& sphere) const
     float distSquared = 0;
     float temp;
     const Vector3& center = sphere.center_;
-    
+
     if (center.x_ < min_.x_)
     {
         temp = center.x_ - min_.x_;
@@ -202,12 +204,12 @@ Intersection BoundingBox::IsInside(const Sphere& sphere) const
         temp = center.z_ - max_.z_;
         distSquared += temp * temp;
     }
-    
+
     float radius = sphere.radius_;
     if (distSquared >= radius * radius)
         return OUTSIDE;
     else if (center.x_ - radius < min_.x_ || center.x_ + radius > max_.x_ || center.y_ - radius < min_.y_ ||
-        center.y_ + radius > max_.y_ || center.z_ - radius < min_.z_ || center.z_ + radius > max_.z_)
+             center.y_ + radius > max_.y_ || center.z_ - radius < min_.z_ || center.z_ + radius > max_.z_)
         return INTERSECTS;
     else
         return INSIDE;
@@ -218,7 +220,7 @@ Intersection BoundingBox::IsInsideFast(const Sphere& sphere) const
     float distSquared = 0;
     float temp;
     const Vector3& center = sphere.center_;
-    
+
     if (center.x_ < min_.x_)
     {
         temp = center.x_ - min_.x_;
@@ -249,7 +251,7 @@ Intersection BoundingBox::IsInsideFast(const Sphere& sphere) const
         temp = center.z_ - max_.z_;
         distSquared += temp * temp;
     }
-    
+
     float radius = sphere.radius_;
     if (distSquared >= radius * radius)
         return OUTSIDE;

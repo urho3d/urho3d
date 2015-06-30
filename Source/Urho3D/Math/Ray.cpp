@@ -20,11 +20,11 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Math/BoundingBox.h"
 #include "../Math/Frustum.h"
-#include "../Math/Plane.h"
 #include "../Math/Ray.h"
-#include "../Math/Sphere.h"
 
 namespace Urho3D
 {
@@ -231,7 +231,7 @@ float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, 
                     if (outNormal)
                         *outNormal = edge1.CrossProduct(edge2);
                     if (outBary)
-                        *outBary = Vector3(1-(u/det)-(v/det), u/det, v/det);
+                        *outBary = Vector3(1 - (u / det) - (v / det), u / det, v / det);
 
                     return distance;
                 }
@@ -242,11 +242,12 @@ float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, 
     return M_INFINITY;
 }
 
-float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned vertexStart, unsigned vertexCount, Vector3* outNormal, Vector2* outUV, unsigned uvOffset) const
+float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned vertexStart, unsigned vertexCount,
+    Vector3* outNormal, Vector2* outUV, unsigned uvOffset) const
 {
     float nearest = M_INFINITY;
     const unsigned char* vertices = ((const unsigned char*)vertexData) + vertexStart * vertexStride;
-    unsigned index = 0, nearestIdx = -1;
+    unsigned index = 0, nearestIdx = M_MAX_UNSIGNED;
     Vector3 barycentric;
     Vector3* outBary = outUV ? &barycentric : 0;
 
@@ -256,7 +257,8 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned v
         const Vector3& v1 = *((const Vector3*)(&vertices[(index + 1) * vertexStride]));
         const Vector3& v2 = *((const Vector3*)(&vertices[(index + 2) * vertexStride]));
         float distance = HitDistance(v0, v1, v2, outNormal, outBary);
-        if (distance < nearest) {
+        if (distance < nearest)
+        {
             nearestIdx = index;
             nearest = distance;
         }
@@ -265,7 +267,7 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned v
 
     if (outUV)
     {
-        if (nearestIdx == -1)
+        if (nearestIdx == M_MAX_UNSIGNED)
             *outUV = Vector2::ZERO;
         else
         {
@@ -302,7 +304,8 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexStride]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexStride]));
             float distance = HitDistance(v0, v1, v2, outNormal, outBary);
-            if (distance < nearest) {
+            if (distance < nearest)
+            {
                 nearestIndices = indices;
                 nearest = distance;
             }
@@ -337,7 +340,8 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexStride]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexStride]));
             float distance = HitDistance(v0, v1, v2, outNormal, outBary);
-            if (distance < nearest) {
+            if (distance < nearest)
+            {
                 nearestIndices = indices;
                 nearest = distance;
             }
@@ -445,7 +449,7 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void
 
     // If the closest face is a backface, that means that the ray originates from the inside of the geometry
     // NOTE: there may be cases where both are equal, as in, no collision to either. This is prevented in the most likely case
-    // (ray doesnt hit either) by this conditional
+    // (ray doesn't hit either) by this conditional
     if (currentFrontFace != M_INFINITY || currentBackFace != M_INFINITY)
         return currentBackFace < currentFrontFace;
 

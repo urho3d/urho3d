@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Condition.h"
 
 #ifdef WIN32
@@ -32,6 +34,7 @@ namespace Urho3D
 {
 
 #ifdef WIN32
+
 Condition::Condition() :
     event_(0)
 {
@@ -53,7 +56,9 @@ void Condition::Wait()
 {
     WaitForSingleObject((HANDLE)event_, INFINITE);
 }
+
 #else
+
 Condition::Condition() :
     mutex_(new pthread_mutex_t),
     event_(new pthread_cond_t)
@@ -66,7 +71,7 @@ Condition::~Condition()
 {
     pthread_cond_t* cond = (pthread_cond_t*)event_;
     pthread_mutex_t* mutex = (pthread_mutex_t*)mutex_;
-    
+
     pthread_cond_destroy(cond);
     pthread_mutex_destroy(mutex);
     delete cond;
@@ -84,11 +89,12 @@ void Condition::Wait()
 {
     pthread_cond_t* cond = (pthread_cond_t*)event_;
     pthread_mutex_t* mutex = (pthread_mutex_t*)mutex_;
-    
+
     pthread_mutex_lock(mutex);
     pthread_cond_wait(cond, mutex);
     pthread_mutex_unlock(mutex);
 }
+
 #endif
 
 }

@@ -20,17 +20,18 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Octree.h"
-#include "../Scene/Scene.h"
 #include "../Graphics/Texture2D.h"
-#include "../Graphics/Viewport.h"
+#include "../Graphics/Zone.h"
+#include "../Scene/Scene.h"
 #include "../UI/View3D.h"
 #include "../UI/UI.h"
 #include "../UI/UIEvents.h"
-#include "../Graphics/Zone.h"
 
 namespace Urho3D
 {
@@ -68,7 +69,7 @@ void View3D::OnResize()
 {
     int width = GetWidth();
     int height = GetHeight();
-    
+
     if (width > 0 && height > 0)
     {
         renderTexture_->SetSize(width, height, rttFormat_, TEXTURE_RENDERTARGET);
@@ -77,7 +78,7 @@ void View3D::OnResize()
         surface->SetViewport(0, viewport_);
         surface->SetUpdateMode(autoUpdate_ ? SURFACE_UPDATEALWAYS : SURFACE_MANUALUPDATE);
         surface->SetLinkedDepthStencil(depthTexture_->GetRenderSurface());
-        
+
         SetTexture(renderTexture_);
         SetImageRect(IntRect(0, 0, width, height));
 
@@ -89,7 +90,7 @@ void View3D::OnResize()
 void View3D::SetView(Scene* scene, Camera* camera, bool ownScene)
 {
     ResetScene();
-    
+
     scene_ = scene;
     cameraNode_ = camera ? camera->GetNode() : 0;
     ownScene_ = ownScene;

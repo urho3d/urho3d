@@ -24,9 +24,9 @@
 
 #include "../Container/HashSet.h"
 #include "../Core/Mutex.h"
+#include "../Resource/XMLElement.h"
 #include "../Scene/Node.h"
 #include "../Scene/SceneResolver.h"
-#include "../Resource/XMLElement.h"
 
 namespace Urho3D
 {
@@ -113,7 +113,8 @@ public:
     /// Instantiate scene content from binary data. Return root node if successful.
     Node* Instantiate(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
     /// Instantiate scene content from XML data. Return root node if successful.
-    Node* InstantiateXML(const XMLElement& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+    Node* InstantiateXML
+        (const XMLElement& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
     /// Instantiate scene content from XML data. Return root node if successful.
     Node* InstantiateXML(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
     /// Clear scene completely of either replicated, local or all nodes and components.
@@ -145,30 +146,43 @@ public:
     Node* GetNode(unsigned id) const;
     /// Return component from the whole scene by ID, or null if not found.
     Component* GetComponent(unsigned id) const;
+
     /// Return whether updates are enabled.
     bool IsUpdateEnabled() const { return updateEnabled_; }
+
     /// Return whether an asynchronous loading operation is in progress.
     bool IsAsyncLoading() const { return asyncLoading_; }
+
     /// Return asynchronous loading progress between 0.0 and 1.0, or 1.0 if not in progress.
     float GetAsyncProgress() const;
+
     /// Return the load mode of the current asynchronous loading operation.
     LoadMode GetAsyncLoadMode() const { return asyncProgress_.mode_; }
+
     /// Return source file name.
     const String& GetFileName() const { return fileName_; }
+
     /// Return source file checksum.
     unsigned GetChecksum() const { return checksum_; }
+
     /// Return update time scale.
     float GetTimeScale() const { return timeScale_; }
+
     /// Return elapsed time in seconds.
     float GetElapsedTime() const { return elapsedTime_; }
+
     /// Return motion smoothing constant.
     float GetSmoothingConstant() const { return smoothingConstant_; }
+
     /// Return motion smoothing snap threshold.
     float GetSnapThreshold() const { return snapThreshold_; }
+
     /// Return maximum milliseconds per frame to spend on async loading.
     int GetAsyncLoadingMs() const { return asyncLoadingMs_; }
+
     /// Return required package files.
     const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
+
     /// Return a node user variable name, or empty if not registered.
     const String& GetVarName(StringHash hash) const;
 
@@ -180,8 +194,10 @@ public:
     void EndThreadedUpdate();
     /// Add a component to the delayed dirty notify queue. Is thread-safe.
     void DelayedMarkedDirty(Component* component);
+
     /// Return threaded update flag.
     bool IsThreadedUpdate() const { return threadedUpdate_; }
+
     /// Get free node ID, either non-local or local.
     unsigned GetFreeNodeID(CreateMode mode);
     /// Get free component ID, either non-local or local.

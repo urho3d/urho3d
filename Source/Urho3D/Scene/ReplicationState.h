@@ -54,21 +54,21 @@ struct URHO3D_API DirtyBits
     {
         memset(data_, 0, MAX_NETWORK_ATTRIBUTES / 8);
     }
-    
+
     /// Copy-construct.
     DirtyBits(const DirtyBits& bits) :
         count_(bits.count_)
     {
         memcpy(data_, bits.data_, MAX_NETWORK_ATTRIBUTES / 8);
     }
-    
+
     /// Set a bit.
     void Set(unsigned index)
     {
         if (index < MAX_NETWORK_ATTRIBUTES)
         {
             unsigned byteIndex = index >> 3;
-            unsigned bit = 1 << (index & 7);
+            unsigned bit = (unsigned)(1 << (index & 7));
             if ((data_[byteIndex] & bit) == 0)
             {
                 data_[byteIndex] |= bit;
@@ -76,14 +76,14 @@ struct URHO3D_API DirtyBits
             }
         }
     }
-    
+
     /// Clear a bit.
     void Clear(unsigned index)
     {
         if (index < MAX_NETWORK_ATTRIBUTES)
         {
             unsigned byteIndex = index >> 3;
-            unsigned bit = 1 << (index & 7);
+            unsigned bit = (unsigned)(1 << (index & 7));
             if ((data_[byteIndex] & bit) != 0)
             {
                 data_[byteIndex] &= ~bit;
@@ -91,30 +91,30 @@ struct URHO3D_API DirtyBits
             }
         }
     }
-    
+
     /// Clear all bits.
     void ClearAll()
     {
         memset(data_, 0, MAX_NETWORK_ATTRIBUTES / 8);
         count_ = 0;
     }
-    
+
     /// Return if bit is set.
     bool IsSet(unsigned index) const
     {
         if (index < MAX_NETWORK_ATTRIBUTES)
         {
             unsigned byteIndex = index >> 3;
-            unsigned bit = 1 << (index & 7);
+            unsigned bit = (unsigned)(1 << (index & 7));
             return (data_[byteIndex] & bit) != 0;
         }
         else
             return false;
     }
-    
+
     /// Return number of set bits.
     unsigned Count() const { return count_; }
-    
+
     /// Bit data.
     unsigned char data_[MAX_NETWORK_ATTRIBUTES / 8];
     /// Number of set bits.
@@ -172,7 +172,7 @@ struct URHO3D_API NodeReplicationState : public ReplicationState
         markedDirty_(false)
     {
     }
-    
+
     /// Parent scene replication state.
     SceneReplicationState* sceneState_;
     /// Link to the actual node.
@@ -196,7 +196,7 @@ struct URHO3D_API SceneReplicationState : public ReplicationState
     HashMap<unsigned, NodeReplicationState> nodeStates_;
     /// Dirty node IDs.
     HashSet<unsigned> dirtyNodes_;
-    
+
     void Clear()
     {
         nodeStates_.Clear();

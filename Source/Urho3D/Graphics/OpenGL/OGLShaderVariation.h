@@ -22,10 +22,10 @@
 
 #pragma once
 
+#include "../../Container/RefCounted.h"
 #include "../../Container/ArrayPtr.h"
 #include "../../Graphics/GPUObject.h"
 #include "../../Graphics/GraphicsDefs.h"
-#include "../../Container/RefCounted.h"
 
 namespace Urho3D
 {
@@ -41,32 +41,37 @@ public:
     ShaderVariation(Shader* owner, ShaderType type);
     /// Destruct.
     virtual ~ShaderVariation();
-    
+
     /// Mark the GPU resource destroyed on context destruction.
     virtual void OnDeviceLost();
     /// Release the shader.
     virtual void Release();
-    
+
     /// Compile the shader. Return true if successful.
     bool Create();
     /// Set name.
     void SetName(const String& name);
     /// Set defines.
     void SetDefines(const String& defines);
-    
+
     /// Return the owner resource.
     Shader* GetOwner() const;
+
     /// Return shader type.
     ShaderType GetShaderType() const { return type_; }
+
     /// Return name.
     const String& GetName() const { return name_; }
+
     /// Return defines.
     const String& GetDefines() const { return defines_; }
+
     /// Return full shader name.
     String GetFullName() const { return name_ + "(" + defines_ + ")"; }
+
     /// Return compile error/warning string.
     const String& GetCompilerOutput() const { return compilerOutput_; }
-    
+
 private:
     /// Shader this variation belongs to.
     WeakPtr<Shader> owner_;

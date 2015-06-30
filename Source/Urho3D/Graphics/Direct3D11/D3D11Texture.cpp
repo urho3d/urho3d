@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../../Precompiled.h"
+
 #include "../../IO/FileSystem.h"
 #include "../../IO/Log.h"
 #include "../../Graphics/Graphics.h"

@@ -39,7 +39,7 @@ public:
     SceneResolver();
     /// Destruct.
     ~SceneResolver();
-    
+
     /// Reset. Clear all remembered nodes and components.
     void Reset();
     /// Remember a created node.
@@ -48,7 +48,7 @@ public:
     void AddComponent(unsigned oldID, Component* component);
     /// Resolve component and node ID attributes and reset.
     void Resolve();
-    
+
 private:
     /// Nodes.
     HashMap<unsigned, WeakPtr<Node> > nodes_;

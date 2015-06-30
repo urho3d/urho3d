@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "../../Graphics/GPUObject.h"
-#include "../../Graphics/GraphicsDefs.h"
 #include "../../Container/ArrayPtr.h"
 #include "../../Core/Object.h"
+#include "../../Graphics/GPUObject.h"
+#include "../../Graphics/GraphicsDefs.h"
 
 namespace Urho3D
 {
@@ -34,18 +34,18 @@ namespace Urho3D
 class URHO3D_API ConstantBuffer : public Object, public GPUObject
 {
     OBJECT(ConstantBuffer);
-    
+
 public:
     /// Construct.
     ConstantBuffer(Context* context);
     /// Destruct.
     virtual ~ConstantBuffer();
-    
+
     /// Recreate the GPU resource and restore data if applicable.
     virtual void OnDeviceReset();
     /// Release the buffer.
     virtual void Release();
-    
+
     /// Set size and create GPU-side buffer. Return true on success.
     bool SetSize(unsigned size);
     /// Set a generic parameter and mark buffer dirty.
@@ -57,13 +57,11 @@ public:
 
     /// Return size.
     unsigned GetSize() const { return size_; }
+
     /// Return whether has unapplied data.
     bool IsDirty() const { return dirty_; }
 
 private:
-    /// Create buffer.
-    bool Create();
-
     /// Shadow data.
     SharedArrayPtr<unsigned char> shadowData_;
     /// Buffer byte size.

@@ -33,18 +33,18 @@ namespace Urho3D
 class URHO3D_API VertexBuffer : public Object, public GPUObject
 {
     OBJECT(VertexBuffer);
-    
+
 public:
     /// Construct.
     VertexBuffer(Context* context);
     /// Destruct.
     virtual ~VertexBuffer();
-    
+
     /// Recreate the GPU resource and restore data if applicable.
     virtual void OnDeviceReset();
     /// Release the buffer.
     virtual void Release();
-    
+
     /// Enable shadowing in CPU memory. Shadowing is forced on if the graphics subsystem does not exist.
     void SetShadowed(bool enable);
     /// Set size and vertex elements and dynamic mode. Previous data will be lost.
@@ -57,31 +57,39 @@ public:
     void* Lock(unsigned start, unsigned count, bool discard = false);
     /// Unlock the buffer and apply changes to the GPU buffer.
     void Unlock();
-    
+
     /// Return whether CPU memory shadowing is enabled.
     bool IsShadowed() const { return shadowed_; }
+
     /// Return whether is dynamic.
     bool IsDynamic() const { return dynamic_; }
+
     /// Return whether is currently locked.
     bool IsLocked() const { return lockState_ != LOCK_NONE; }
+
     /// Return number of vertices.
-    unsigned GetVertexCount() const {return vertexCount_; }
+    unsigned GetVertexCount() const { return vertexCount_; }
+
     /// Return vertex size.
     unsigned GetVertexSize() const { return vertexSize_; }
+
     /// Return bitmask of vertex elements.
     unsigned GetElementMask() const { return elementMask_; }
+
     /// Return offset of a specified element within a vertex.
     unsigned GetElementOffset(VertexElement element) const { return elementOffset_[element]; }
+
     /// Return CPU memory shadow data.
     unsigned char* GetShadowData() const { return shadowData_.Get(); }
+
     /// Return shared array pointer to the CPU memory shadow data.
     SharedArrayPtr<unsigned char> GetShadowDataShared() const { return shadowData_; }
-    
+
     /// Return vertex size corresponding to a vertex element mask.
     static unsigned GetVertexSize(unsigned elementMask);
     /// Return element offset from an element mask.
     static unsigned GetElementOffset(unsigned elementMask, VertexElement element);
-    
+
     /// Vertex element sizes in bytes.
     static const unsigned elementSize[];
     /// Vertex element OpenGL types.
@@ -98,7 +106,7 @@ private:
     bool Create();
     /// Update the shadow data to the GPU buffer.
     bool UpdateToGPU();
-    
+
     /// Shadow data.
     SharedArrayPtr<unsigned char> shadowData_;
     /// Number of vertices.

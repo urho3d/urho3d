@@ -20,8 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "../Script/APITemplates.h"
+#include "../Precompiled.h"
+
 #include "../Resource/ResourceCache.h"
+#include "../Script/APITemplates.h"
 #include "../Script/ScriptAPI.h"
 #include "../Script/ScriptFile.h"
 

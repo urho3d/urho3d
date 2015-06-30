@@ -20,10 +20,12 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Graphics/DebugRenderer.h"
-#include "../Scene/Node.h"
 #include "../Resource/ResourceCache.h"
+#include "../Scene/Node.h"
 #include "../Urho2D/StaticSprite2D.h"
 #include "../Urho2D/TileMap2D.h"
 #include "../Urho2D/TileMapLayer2D.h"
@@ -104,8 +106,7 @@ void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                 }
                 break;
 
-            default:
-                break;
+            default: break;
             }
         }
     }
@@ -217,12 +218,12 @@ TileMapLayerType2D TileMapLayer2D::GetLayerType() const
 
 int TileMapLayer2D::GetWidth() const
 {
-    return tmxLayer_ ? tmxLayer_->GetWidth(): 0;
+    return tmxLayer_ ? tmxLayer_->GetWidth() : 0;
 }
 
 int TileMapLayer2D::GetHeight() const
 {
-    return tmxLayer_ ? tmxLayer_->GetHeight(): 0;
+    return tmxLayer_ ? tmxLayer_->GetHeight() : 0;
 }
 
 Tile2D* TileMapLayer2D::GetTile(int x, int y) const
@@ -288,7 +289,7 @@ void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
 
     int width = tileLayer->GetWidth();
     int height = tileLayer->GetHeight();
-    nodes_.Resize(width * height);
+    nodes_.Resize((unsigned)(width * height));
 
     const TileMapInfo2D& info = tileMap_->GetInfo();
     for (int y = 0; y < height; ++y)

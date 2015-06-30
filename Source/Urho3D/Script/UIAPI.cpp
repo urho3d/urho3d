@@ -20,13 +20,14 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
+#include "../Input/Input.h"
 #include "../Script/APITemplates.h"
 #include "../UI/CheckBox.h"
-#include "../UI/Cursor.h"
 #include "../UI/DropDownList.h"
 #include "../UI/FileSelector.h"
 #include "../UI/Font.h"
-#include "../Input/Input.h"
 #include "../UI/LineEdit.h"
 #include "../UI/ListView.h"
 #include "../UI/MessageBox.h"
@@ -38,7 +39,6 @@
 #include "../UI/ToolTip.h"
 #include "../UI/UI.h"
 #include "../UI/View3D.h"
-#include "../UI/Window.h"
 
 #include "../DebugNew.h"
 

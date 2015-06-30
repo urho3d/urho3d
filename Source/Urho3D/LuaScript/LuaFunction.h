@@ -60,26 +60,31 @@ public:
     void PushString(const String& string);
     /// Push user type to stack.
     void PushUserType(void* userType, const char* typeName);
+
     /// Push user type to stack.
     template <typename T> void PushUserType(const T* userType)
     {
         PushUserType((void*)userType, T::GetTypeName().CString());
     }
+
     /// Push user type to stack.
     template <typename T> void PushUserType(const T& userType)
     {
         PushUserType((void*)&userType, T::GetTypeName().CString());
     }
+
     /// Push user type to stack.
     template <typename T> void PushUserType(const T* userType, const char* typeName)
     {
         PushUserType((void*)userType, typeName);
     }
+
     /// Push user type to stack.
     template <typename T> void PushUserType(const T& userType, const char* typeName)
     {
         PushUserType((void*)&userType, typeName);
     }
+
     /// Push variant to stack.
     bool PushVariant(const Variant& variant);
     /// Push Lua table to stack.

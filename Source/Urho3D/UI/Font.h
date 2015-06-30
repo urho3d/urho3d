@@ -66,18 +66,22 @@ public:
 
     /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
     FontFace* GetFace(int pointSize);
+
     /// Is signed distance field font.
     bool IsSDFFont() const { return sdfFont_; }
+
     /// Return absolute position adjustment for glyphs.
     const IntVector2& GetAbsoluteGlyphOffset() const { return absoluteOffset_; }
+
     /// Return point size scaled position adjustment for glyphs.
     const Vector2& GetScaledGlyphOffset() const { return scaledOffset_; }
+
     /// Return the total effective offset for a point size.
     IntVector2 GetTotalGlyphOffset(int pointSize) const;
-    
+
     /// Release font faces and recreate them next time when requested. Called when font textures lost or global font properties change.
     void ReleaseFaces();
-    
+
 private:
     /// Load font glyph offset parameters from an optional XML file. Called internally when loading TrueType fonts.
     void LoadParameters();
@@ -85,7 +89,7 @@ private:
     FontFace* GetFaceFreeType(int pointSize);
     /// Return bitmap font face. Called internally. Return null on error.
     FontFace* GetFaceBitmap(int pointSize);
-    
+
     /// Created faces.
     HashMap<int, SharedPtr<FontFace> > faces_;
     /// Font data.

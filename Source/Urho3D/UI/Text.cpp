@@ -20,14 +20,16 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Core/Profiler.h"
+#include "../Graphics/Texture2D.h"
+#include "../IO/Log.h"
+#include "../Resource/ResourceCache.h"
 #include "../UI/Font.h"
 #include "../UI/FontFace.h"
-#include "../IO/Log.h"
-#include "../Core/Profiler.h"
-#include "../Resource/ResourceCache.h"
 #include "../UI/Text.h"
-#include "../Graphics/Texture2D.h"
 
 #include "../DebugNew.h"
 
@@ -131,8 +133,8 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     {
         bool both = hovering_ && selected_ && hoverColor_.a_ > 0.0 && selectionColor_.a_ > 0.0f;
         UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
-        batch.SetColor(both ? selectionColor_.Lerp(hoverColor_, 0.5f) : (selected_ && selectionColor_.a_ > 0.0f ?
-            selectionColor_: hoverColor_));
+        batch.SetColor(both ? selectionColor_.Lerp(hoverColor_, 0.5f) :
+            (selected_ && selectionColor_.a_ > 0.0f ? selectionColor_ : hoverColor_));
         batch.AddQuad(0, 0, GetWidth(), GetHeight(), 0, 0);
         UIBatch::AddOrMerge(batch, batches);
     }
@@ -152,8 +154,8 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
             {
                 if (charLocations_[i].position_.y_ != currentStart.y_)
                 {
-                    batch.AddQuad(currentStart.x_, currentStart.y_, currentEnd.x_ - currentStart.x_, currentEnd.y_ - currentStart.y_,
-                        0, 0);
+                    batch.AddQuad(currentStart.x_, currentStart.y_, currentEnd.x_ - currentStart.x_,
+                        currentEnd.y_ - currentStart.y_, 0, 0);
                     currentStart = charLocations_[i].position_;
                     currentEnd = currentStart + charLocations_[i].size_;
                 }
@@ -166,8 +168,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
         }
         if (currentEnd != currentStart)
         {
-            batch.AddQuad(currentStart.x_, currentStart.y_, currentEnd.x_ - currentStart.x_, currentEnd.y_ - currentStart.y_,
-                0, 0);
+            batch.AddQuad(currentStart.x_, currentStart.y_, currentEnd.x_ - currentStart.x_, currentEnd.y_ - currentStart.y_, 0, 0);
         }
 
         UIBatch::AddOrMerge(batch, batches);
@@ -484,7 +485,7 @@ void Text::UpdateText(bool onResize)
                             printToText_.Pop();
                         }
                         printText_.Push('\n');
-                        printToText_.Push(Min((int)i, (int)unicodeText_.Size() - 1));
+                        printToText_.Push((unsigned)Min((int)i, (int)unicodeText_.Size() - 1));
                         rowWidth = 0;
                         nextBreak = lineStart = i;
                     }
@@ -510,7 +511,7 @@ void Text::UpdateText(bool onResize)
                 else
                 {
                     printText_.Push('\n');
-                    printToText_.Push(Min((int)i, (int)unicodeText_.Size() - 1));
+                    printToText_.Push((unsigned)Min((int)i, (int)unicodeText_.Size() - 1));
                     rowWidth = 0;
                     nextBreak = lineStart = i;
                 }

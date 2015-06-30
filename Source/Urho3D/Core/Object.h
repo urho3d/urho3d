@@ -48,15 +48,15 @@ class EventHandler;
 class URHO3D_API Object : public RefCounted
 {
     BASEOBJECT(Object);
-    
+
     friend class Context;
-    
+
 public:
     /// Construct.
     Object(Context* context);
     /// Destruct. Clean up self from event sender & receiver structures.
     virtual ~Object();
-    
+
     /// Return type hash.
     virtual Urho3D::StringHash GetType() const = 0;
     /// Return base class type hash.
@@ -65,7 +65,7 @@ public:
     virtual const Urho3D::String& GetTypeName() const = 0;
     /// Handle event.
     virtual void OnEvent(Object* sender, StringHash eventType, VariantMap& eventData);
-    
+
     /// Subscribe to an event that can be sent by any sender.
     void SubscribeToEvent(StringHash eventType, EventHandler* handler);
     /// Subscribe to a specific sender's event.
@@ -86,9 +86,10 @@ public:
     void SendEvent(StringHash eventType, VariantMap& eventData);
     /// Return a preallocated map for event data. Used for optimization to avoid constant re-allocation of event data maps.
     VariantMap& GetEventDataMap() const;
-    
+
     /// Return execution context.
     Context* GetContext() const { return context_; }
+
     /// Return subsystem by type.
     Object* GetSubsystem(StringHash type) const;
     /// Return active event sender. Null outside event handling.
@@ -99,17 +100,19 @@ public:
     bool HasSubscribedToEvent(StringHash eventType) const;
     /// Return whether has subscribed to a specific sender's event.
     bool HasSubscribedToEvent(Object* sender, StringHash eventType) const;
+
     /// Return whether has subscribed to any event.
     bool HasEventHandlers() const { return !eventHandlers_.Empty(); }
+
     /// Template version of returning a subsystem.
     template <class T> T* GetSubsystem() const;
     /// Return object category. Categories are (optionally) registered along with the object factory. Return an empty string if the object category is not registered.
     const String& GetCategory() const;
-    
+
 protected:
     /// Execution context.
     Context* context_;
-    
+
 private:
     /// Find the first event handler with no specific sender.
     EventHandler* FindEventHandler(StringHash eventType, EventHandler** previous = 0) const;
@@ -119,7 +122,7 @@ private:
     EventHandler* FindSpecificEventHandler(Object* sender, StringHash eventType, EventHandler** previous = 0) const;
     /// Remove event handlers related to a specific sender.
     void RemoveEventSender(Object* sender);
-    
+
     /// Event handlers. Sender is null for non-specific handlers.
     LinkedList<EventHandler> eventHandlers_;
 };
@@ -136,19 +139,22 @@ public:
     {
         assert(context_);
     }
-    
+
     /// Create an object. Implemented in templated subclasses.
     virtual SharedPtr<Object> CreateObject() = 0;
-    
+
     /// Return execution context.
     Context* GetContext() const { return context_; }
+
     /// Return type hash of objects created by this factory.
     StringHash GetType() const { return type_; }
+
     /// Return base type hash of objects created by this factory.
     StringHash GetBaseType() const { return baseType_; }
+
     /// Return type name of objects created by this factory.
     const String& GetTypeName() const { return typeName_; }
-    
+
 protected:
     /// Execution context.
     Context* context_;
@@ -172,7 +178,7 @@ public:
         baseType_ = T::GetBaseTypeStatic();
         typeName_ = T::GetTypeNameStatic();
     }
-    
+
     /// Create an object of the specific type.
     virtual SharedPtr<Object> CreateObject() { return SharedPtr<Object>(new T(context_)); }
 };
@@ -189,7 +195,7 @@ public:
     {
         assert(receiver_);
     }
-    
+
     /// Construct with specified receiver and userdata.
     EventHandler(Object* receiver, void* userData) :
         receiver_(receiver),
@@ -198,31 +204,34 @@ public:
     {
         assert(receiver_);
     }
-    
+
     /// Destruct.
-    virtual ~EventHandler() {}
-    
+    virtual ~EventHandler() { }
+
     /// Set sender and event type.
     void SetSenderAndEventType(Object* sender, StringHash eventType)
     {
         sender_ = sender;
         eventType_ = eventType;
     }
-    
+
     /// Invoke event handler function.
     virtual void Invoke(VariantMap& eventData) = 0;
     /// Return a unique copy of the event handler.
     virtual EventHandler* Clone() const = 0;
-    
+
     /// Return event receiver.
     Object* GetReceiver() const { return receiver_; }
+
     /// Return event sender. Null if the handler is non-specific.
     Object* GetSender() const { return sender_; }
+
     /// Return event type.
     const StringHash& GetEventType() const { return eventType_; }
+
     /// Return userdata.
     void* GetUserData() const { return userData_; }
-    
+
 protected:
     /// Event receiver.
     Object* receiver_;
@@ -239,7 +248,7 @@ template <class T> class EventHandlerImpl : public EventHandler
 {
 public:
     typedef void (T::*HandlerFunctionPtr)(StringHash, VariantMap&);
-    
+
     /// Construct with receiver and function pointers.
     EventHandlerImpl(T* receiver, HandlerFunctionPtr function) :
         EventHandler(receiver),
@@ -247,7 +256,7 @@ public:
     {
         assert(function_);
     }
-    
+
     /// Construct with receiver and function pointers and userdata.
     EventHandlerImpl(T* receiver, HandlerFunctionPtr function, void* userData) :
         EventHandler(receiver, userData),
@@ -255,20 +264,20 @@ public:
     {
         assert(function_);
     }
-    
+
     /// Invoke event handler function.
     virtual void Invoke(VariantMap& eventData)
     {
         T* receiver = static_cast<T*>(receiver_);
         (receiver->*function_)(eventType_, eventData);
     }
-    
+
     /// Return a unique copy of the event handler.
     virtual EventHandler* Clone() const
     {
         return new EventHandlerImpl(static_cast<T*>(receiver_), function_, userData_);
     }
-    
+
 private:
     /// Class-specific pointer to handler function.
     HandlerFunctionPtr function_;

@@ -20,11 +20,14 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../IO/Deserializer.h"
 #include "../IO/Log.h"
 #include "../Resource/PListFile.h"
 #include "../Resource/XMLFile.h"
+
 #include <stdio.h>
 
 #include "../DebugNew.h"
@@ -36,55 +39,49 @@ static PListValue EMPTY_VALUE;
 static PListValueMap EMPTY_VALUEMAP;
 static PListValueVector EMPTY_VALUEVECTOR;
 
-PListValue& PListValueMap::operator [](const String& key)
-{
-    return HashMap<String, PListValue>::operator [](key);
-}
-
-const PListValue& PListValueMap::operator [](const String& key) const
-{
-    ConstIterator i = Find(key);
-    if (i == End())
-        return EMPTY_VALUE;
-
-    return i->second_;
-}
-
-PListValue::PListValue() : type_(PLVT_NONE)
+PListValue::PListValue() :
+    type_(PLVT_NONE)
 {
 }
 
-PListValue::PListValue(int value) : type_(PLVT_NONE)
+PListValue::PListValue(int value) :
+    type_(PLVT_NONE)
 {
     SetInt(value);
 }
 
-PListValue::PListValue(bool value) : type_(PLVT_NONE)
+PListValue::PListValue(bool value) :
+    type_(PLVT_NONE)
 {
     SetBool(value);
 }
 
-PListValue::PListValue(float value) : type_(PLVT_NONE)
+PListValue::PListValue(float value) :
+    type_(PLVT_NONE)
 {
     SetFloat(value);
 }
 
-PListValue::PListValue(const String& value) : type_(PLVT_NONE)
+PListValue::PListValue(const String& value) :
+    type_(PLVT_NONE)
 {
     SetString(value);
 }
 
-PListValue::PListValue(PListValueMap& valueMap) : type_(PLVT_NONE)
+PListValue::PListValue(PListValueMap& valueMap) :
+    type_(PLVT_NONE)
 {
     SetValueMap(valueMap);
 }
 
-PListValue::PListValue(PListValueVector& valueVector) : type_(PLVT_NONE)
+PListValue::PListValue(PListValueVector& valueVector) :
+    type_(PLVT_NONE)
 {
     SetValueVector(valueVector);
 }
 
-PListValue::PListValue(const PListValue& value) : type_(PLVT_NONE)
+PListValue::PListValue(const PListValue& value) :
+    type_(PLVT_NONE)
 {
     *this = value;
 }
@@ -94,7 +91,7 @@ PListValue::~PListValue()
     Reset();
 }
 
-PListValue& PListValue::operator = (const PListValue& rhs)
+PListValue& PListValue::operator =(const PListValue& rhs)
 {
     switch (rhs.type_)
     {
@@ -152,7 +149,7 @@ void PListValue::SetFloat(float value)
     {
         Reset();
         type_ = PLVT_FLOAT;
-    }    
+    }
     float_ = value;
 }
 
@@ -204,12 +201,12 @@ bool PListValue::GetBool() const
 
 float PListValue::GetFloat() const
 {
-    return type_ == PLVT_FLOAT? float_ : 0.0f;
+    return type_ == PLVT_FLOAT ? float_ : 0.0f;
 }
 
 const String& PListValue::GetString() const
 {
-    return type_ == PLVT_STRING ? * string_ : String::EMPTY;
+    return type_ == PLVT_STRING ? *string_ : String::EMPTY;
 }
 
 IntRect PListValue::GetIntRect() const
@@ -239,7 +236,7 @@ const PListValueMap& PListValue::GetValueMap() const
 
 const PListValueVector& PListValue::GetValueVector() const
 {
-    return type_ == PLVT_VALUEVECTOR? *valueVector_ : EMPTY_VALUEVECTOR;
+    return type_ == PLVT_VALUEVECTOR ? *valueVector_ : EMPTY_VALUEVECTOR;
 }
 
 PListValueMap& PListValue::ConvertToValueMap()
@@ -265,6 +262,7 @@ PListValueVector& PListValue::ConvertToValueVector()
 
     return *valueVector_;
 }
+
 void PListValue::Reset()
 {
     if (type_ == PLVT_NONE)
@@ -342,7 +340,7 @@ bool PListFile::LoadDict(PListValueMap& dict, const XMLElement& dictElem)
     while (keyElem && valueElem)
     {
         String key = keyElem.GetValue();
-        XMLElement valueElem = keyElem.GetNext();
+        valueElem = keyElem.GetNext();
 
         PListValue value;
         if (!LoadValue(value, valueElem))
@@ -365,7 +363,7 @@ bool PListFile::LoadArray(PListValueVector& array, const XMLElement& arrayElem)
     for (XMLElement valueElem = arrayElem.GetChild(); valueElem; valueElem = valueElem.GetNext())
     {
         PListValue value;
-        
+
         if (!LoadValue(value, valueElem))
             return false;
 
@@ -375,7 +373,7 @@ bool PListFile::LoadArray(PListValueVector& array, const XMLElement& arrayElem)
     return true;
 }
 
-bool PListFile::LoadValue(PListValue& value, XMLElement valueElem)
+bool PListFile::LoadValue(PListValue& value, const XMLElement& valueElem)
 {
     String valueType = valueElem.GetName();
 

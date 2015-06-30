@@ -80,9 +80,10 @@ public:
     void SetLayer(int layer);
     /// Set order in layer.
     void SetOrderInLayer(int orderInLayer);
-    
+
     /// Return layer.
     int GetLayer() const { return layer_; }
+
     /// Return order in layer.
     int GetOrderInLayer() const { return orderInLayer_; }
 
@@ -98,9 +99,10 @@ protected:
     virtual void OnDrawOrderChanged() = 0;
     /// Update source batches.
     virtual void UpdateSourceBatches() = 0;
+
     /// Return draw order by layer and order in layer.
     int GetDrawOrder() const { return (layer_ << 20) + (orderInLayer_ << 10); }
-  
+
     /// Layer.
     int layer_;
     /// Order in layer.

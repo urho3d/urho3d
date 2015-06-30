@@ -28,7 +28,8 @@ namespace Urho3D
 {
 
 /// Decompress a DXT compressed image to RGBA.
-URHO3D_API void DecompressImageDXT(unsigned char* dest, const void* blocks, int width, int height, int depth, CompressedFormat format);
+URHO3D_API void
+    DecompressImageDXT(unsigned char* dest, const void* blocks, int width, int height, int depth, CompressedFormat format);
 /// Decompress an ETC1 compressed image to RGBA.
 URHO3D_API void DecompressImageETC(unsigned char* dest, const void* blocks, int width, int height);
 /// Decompress a PVRTC compressed image to RGBA.

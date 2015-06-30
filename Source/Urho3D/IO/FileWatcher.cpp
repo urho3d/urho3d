@@ -20,22 +20,25 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../IO/File.h"
 #include "../IO/FileSystem.h"
 #include "../IO/FileWatcher.h"
 #include "../IO/Log.h"
-#include "../Core/Timer.h"
 
 #ifdef WIN32
 #include <windows.h>
 #elif __linux__
 #include <sys/inotify.h>
-extern "C" {
+extern "C"
+{
 // Need read/close for inotify
 #include "unistd.h"
 }
 #elif defined(__APPLE__) && !defined(IOS)
-extern "C" {
+extern "C"
+{
 #include "../IO/MacFileWatcher.h"
 }
 #endif
@@ -78,10 +81,10 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         LOGERROR("No FileSystem, can not start watching");
         return false;
     }
-    
+
     // Stop any previous watching
     StopWatching();
-    
+
 #if defined(URHO3D_FILEWATCHER)
 #if defined(WIN32)
     String nativePath = GetNativePath(RemoveTrailingSlash(pathName));
@@ -110,8 +113,8 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         return false;
     }
 #elif defined(__linux__)
-    int flags = IN_CREATE|IN_DELETE|IN_MODIFY|IN_MOVED_FROM|IN_MOVED_TO;
-    int handle = inotify_add_watch(watchHandle_, pathName.CString(), flags);
+    int flags = IN_CREATE | IN_DELETE | IN_MODIFY | IN_MOVED_FROM | IN_MOVED_TO;
+    int handle = inotify_add_watch(watchHandle_, pathName.CString(), (uint32_t)flags);
 
     if (handle < 0)
     {
@@ -137,7 +140,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
                 // Don't watch ./ or ../ sub-directories
                 if (!subDirFullPath.EndsWith("./"))
                 {
-                    handle = inotify_add_watch(watchHandle_, subDirFullPath.CString(), flags);
+                    handle = inotify_add_watch(watchHandle_, subDirFullPath.CString(), (uint32_t)flags);
                     if (handle < 0)
                         LOGERROR("Failed to start watching subdirectory path " + subDirFullPath);
                     else
@@ -190,26 +193,26 @@ void FileWatcher::StopWatching()
     if (handle_)
     {
         shouldRun_ = false;
-        
+
         // Create and delete a dummy file to make sure the watcher loop terminates
         String dummyFileName = path_ + "dummy.tmp";
         File file(context_, dummyFileName, FILE_WRITE);
         file.Close();
         if (fileSystem_)
             fileSystem_->Delete(dummyFileName);
-        
+
         Stop();
-        
-        #if defined(WIN32)
+
+#if defined(WIN32)
         CloseHandle((HANDLE)dirHandle_);
-        #elif defined(__linux__)
+#elif defined(__linux__)
         for (HashMap<int, String>::Iterator i = dirHandle_.Begin(); i != dirHandle_.End(); ++i)
             inotify_rm_watch(watchHandle_, i->first_);
         dirHandle_.Clear();
-        #elif defined(__APPLE__) && !defined(IOS)
+#elif defined(__APPLE__) && !defined(IOS)
         CloseFileWatcher(watcher_);
-        #endif
-        
+#endif
+
         LOGDEBUG("Stopped watching path " + path_);
         path_.Clear();
     }
@@ -270,7 +273,7 @@ void FileWatcher::ThreadFunction()
     while (shouldRun_)
     {
         int i = 0;
-        int length = read(watchHandle_, buffer, sizeof(buffer));
+        int length = (int)read(watchHandle_, buffer, sizeof(buffer));
 
         if (length < 0)
             return;
@@ -312,7 +315,7 @@ void FileWatcher::ThreadFunction()
 void FileWatcher::AddChange(const String& fileName)
 {
     MutexLock lock(changesMutex_);
-    
+
     // Reset the timer associated with the filename. Will be notified once timer exceeds the delay
     changes_[fileName].Reset();
 }
@@ -320,9 +323,9 @@ void FileWatcher::AddChange(const String& fileName)
 bool FileWatcher::GetNextChange(String& dest)
 {
     MutexLock lock(changesMutex_);
-    
+
     unsigned delayMsec = (unsigned)(delay_ * 1000.0f);
-    
+
     if (changes_.Empty())
         return false;
     else
@@ -336,7 +339,7 @@ bool FileWatcher::GetNextChange(String& dest)
                 return true;
             }
         }
-        
+
         return false;
     }
 }

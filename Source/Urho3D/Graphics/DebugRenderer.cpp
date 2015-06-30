@@ -20,19 +20,20 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
 
-#include "../Graphics/AnimatedModel.h"
-#include "../Graphics/Camera.h"
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
+#include "../Core/Profiler.h"
+#include "../Graphics/AnimatedModel.h"
+#include "../Graphics/Camera.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Light.h"
-#include "../Math/Polyhedron.h"
-#include "../Core/Profiler.h"
-#include "../Resource/ResourceCache.h"
 #include "../Graphics/ShaderVariation.h"
 #include "../Graphics/VertexBuffer.h"
+#include "../Math/Polyhedron.h"
+#include "../Resource/ResourceCache.h"
 
 #include "../DebugNew.h"
 
@@ -89,7 +90,7 @@ void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, unsigned c
         noDepthLines_.Push(DebugLine(start, end, color));
 }
 
-void DebugRenderer::AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3,  const Color& color, bool depthTest)
+void DebugRenderer::AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Color& color, bool depthTest)
 {
     AddTriangle(v1, v2, v3, color.ToUInt(), depthTest);
 }
@@ -223,7 +224,7 @@ static Vector3 PointOnSphere(const Sphere& sphere, unsigned theta, unsigned phi)
 void DebugRenderer::AddSphere(const Sphere& sphere, const Color& color, bool depthTest)
 {
     unsigned uintColor = color.ToUInt();
-    
+
     for (unsigned j = 0; j < 180; j += 45)
     {
         for (unsigned i = 0; i < 360; i += 45)
@@ -232,7 +233,7 @@ void DebugRenderer::AddSphere(const Sphere& sphere, const Color& color, bool dep
             Vector3 p2 = PointOnSphere(sphere, i + 45, j);
             Vector3 p3 = PointOnSphere(sphere, i, j + 45);
             Vector3 p4 = PointOnSphere(sphere, i + 45, j + 45);
-            
+
             AddLine(p1, p2, uintColor, depthTest);
             AddLine(p3, p4, uintColor, depthTest);
             AddLine(p1, p3, uintColor, depthTest);
@@ -352,7 +353,7 @@ void DebugRenderer::Render()
 
     ShaderVariation* vs = graphics->GetShader(VS, "Basic", "VERTEXCOLOR");
     ShaderVariation* ps = graphics->GetShader(PS, "Basic", "VERTEXCOLOR");
-    
+
     unsigned numVertices = (lines_.Size() + noDepthLines_.Size()) * 2 + (triangles_.Size() + noDepthTriangles_.Size()) * 3;
     // Resize the vertex buffer if too small or much too large
     if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
@@ -366,9 +367,13 @@ void DebugRenderer::Render()
     {
         const DebugLine& line = lines_[i];
 
-        dest[0] = line.start_.x_; dest[1] = line.start_.y_; dest[2] = line.start_.z_;
+        dest[0] = line.start_.x_;
+        dest[1] = line.start_.y_;
+        dest[2] = line.start_.z_;
         ((unsigned&)dest[3]) = line.color_;
-        dest[4] = line.end_.x_; dest[5] = line.end_.y_; dest[6] = line.end_.z_;
+        dest[4] = line.end_.x_;
+        dest[5] = line.end_.y_;
+        dest[6] = line.end_.z_;
         ((unsigned&)dest[7]) = line.color_;
 
         dest += 8;
@@ -378,9 +383,13 @@ void DebugRenderer::Render()
     {
         const DebugLine& line = noDepthLines_[i];
 
-        dest[0] = line.start_.x_; dest[1] = line.start_.y_; dest[2] = line.start_.z_;
+        dest[0] = line.start_.x_;
+        dest[1] = line.start_.y_;
+        dest[2] = line.start_.z_;
         ((unsigned&)dest[3]) = line.color_;
-        dest[4] = line.end_.x_; dest[5] = line.end_.y_; dest[6] = line.end_.z_;
+        dest[4] = line.end_.x_;
+        dest[5] = line.end_.y_;
+        dest[6] = line.end_.z_;
         ((unsigned&)dest[7]) = line.color_;
 
         dest += 8;
@@ -390,13 +399,19 @@ void DebugRenderer::Render()
     {
         const DebugTriangle& triangle = triangles_[i];
 
-        dest[0] = triangle.v1_.x_; dest[1] = triangle.v1_.y_; dest[2] = triangle.v1_.z_;
+        dest[0] = triangle.v1_.x_;
+        dest[1] = triangle.v1_.y_;
+        dest[2] = triangle.v1_.z_;
         ((unsigned&)dest[3]) = triangle.color_;
 
-        dest[4] = triangle.v2_.x_; dest[5] = triangle.v2_.y_; dest[6] = triangle.v2_.z_;
+        dest[4] = triangle.v2_.x_;
+        dest[5] = triangle.v2_.y_;
+        dest[6] = triangle.v2_.z_;
         ((unsigned&)dest[7]) = triangle.color_;
-        
-        dest[8] = triangle.v3_.x_; dest[9] = triangle.v3_.y_; dest[10] = triangle.v3_.z_;
+
+        dest[8] = triangle.v3_.x_;
+        dest[9] = triangle.v3_.y_;
+        dest[10] = triangle.v3_.z_;
         ((unsigned&)dest[11]) = triangle.color_;
 
         dest += 12;
@@ -406,13 +421,19 @@ void DebugRenderer::Render()
     {
         const DebugTriangle& triangle = noDepthTriangles_[i];
 
-        dest[0] = triangle.v1_.x_; dest[1] = triangle.v1_.y_; dest[2] = triangle.v1_.z_;
+        dest[0] = triangle.v1_.x_;
+        dest[1] = triangle.v1_.y_;
+        dest[2] = triangle.v1_.z_;
         ((unsigned&)dest[3]) = triangle.color_;
 
-        dest[4] = triangle.v2_.x_; dest[5] = triangle.v2_.y_; dest[6] = triangle.v2_.z_;
+        dest[4] = triangle.v2_.x_;
+        dest[5] = triangle.v2_.y_;
+        dest[6] = triangle.v2_.z_;
         ((unsigned&)dest[7]) = triangle.color_;
 
-        dest[8] = triangle.v3_.x_; dest[9] = triangle.v3_.y_; dest[10] = triangle.v3_.z_;
+        dest[8] = triangle.v3_.x_;
+        dest[9] = triangle.v3_.y_;
+        dest[10] = triangle.v3_.z_;
         ((unsigned&)dest[11]) = triangle.color_;
 
         dest += 12;
@@ -448,9 +469,9 @@ void DebugRenderer::Render()
         graphics->Draw(LINE_LIST, start, count);
         start += count;
     }
-    
+
     graphics->SetBlendMode(BLEND_ALPHA);
-    
+
     if (triangles_.Size())
     {
         count = triangles_.Size() * 3;
@@ -473,7 +494,7 @@ bool DebugRenderer::IsInside(const BoundingBox& box) const
 
 bool DebugRenderer::HasContent() const
 {
-    return (lines_.Empty() && noDepthLines_.Empty() && triangles_.Empty() && noDepthTriangles_.Empty()) ? false : true;
+    return !(lines_.Empty() && noDepthLines_.Empty() && triangles_.Empty() && noDepthTriangles_.Empty());
 }
 
 void DebugRenderer::HandleEndFrame(StringHash eventType, VariantMap& eventData)

@@ -34,7 +34,7 @@ class URHO3D_API CollisionEdge2D : public CollisionShape2D
 
 public:
     /// Construct.
-    CollisionEdge2D(Context* scontext);
+    CollisionEdge2D(Context* context);
     /// Destruct.
     virtual ~CollisionEdge2D();
     /// Register object factory.
@@ -49,6 +49,7 @@ public:
 
     /// Return vertex 1.
     const Vector2& GetVertex1() const { return vertex1_; }
+
     /// Return vertex 2.
     const Vector2& GetVertex2() const { return vertex2_; }
 

@@ -20,11 +20,12 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Graphics/AnimatedModel.h"
 #include "../Graphics/Animation.h"
 #include "../Graphics/AnimationController.h"
 #include "../Graphics/AnimationState.h"
-#include "../Script/APITemplates.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/CustomGeometry.h"
 #include "../Graphics/DebugRenderer.h"
@@ -39,8 +40,6 @@
 #include "../Graphics/ParticleEmitter.h"
 #include "../Graphics/Renderer.h"
 #include "../Graphics/RenderPath.h"
-#include "../Scene/Scene.h"
-#include "../Scene/SmoothedTransform.h"
 #include "../Graphics/StaticModelGroup.h"
 #include "../Graphics/Technique.h"
 #include "../Graphics/Terrain.h"
@@ -51,6 +50,8 @@
 #include "../Graphics/Skybox.h"
 #include "../Graphics/VertexBuffer.h"
 #include "../Graphics/Zone.h"
+#include "../Script/APITemplates.h"
+#include "../Scene/Scene.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:4345)
@@ -309,7 +310,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureUnit", "TU_LIGHTRAMP", TU_LIGHTRAMP);
     engine->RegisterEnumValue("TextureUnit", "TU_LIGHTSHAPE", TU_LIGHTSHAPE);
     engine->RegisterEnumValue("TextureUnit", "TU_SHADOWMAP", TU_SHADOWMAP);
-    #ifdef DESKTOP_GRAPHICS
+#ifdef DESKTOP_GRAPHICS
     engine->RegisterEnumValue("TextureUnit", "TU_CUSTOM1", TU_CUSTOM1);
     engine->RegisterEnumValue("TextureUnit", "TU_CUSTOM2", TU_CUSTOM2);
     engine->RegisterEnumValue("TextureUnit", "TU_VOLUMEMAP", TU_VOLUMEMAP);
@@ -318,7 +319,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureUnit", "TU_DEPTHBUFFER", TU_DEPTHBUFFER);
     engine->RegisterEnumValue("TextureUnit", "TU_LIGHTBUFFER", TU_LIGHTBUFFER);
     engine->RegisterEnumValue("TextureUnit", "TU_ZONE", TU_ZONE);
-    #endif
+#endif
     engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
     engine->RegisterEnumValue("TextureUnit", "MAX_TEXTURE_UNITS", MAX_TEXTURE_UNITS);
 

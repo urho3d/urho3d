@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Urho2D/CollisionEdge2D.h"
 #include "../Urho2D/PhysicsUtils2D.h"
@@ -37,7 +39,6 @@ CollisionEdge2D::CollisionEdge2D(Context* context) :
     CollisionShape2D(context),
     vertex1_(DEFAULT_VERTEX1),
     vertex2_(DEFAULT_VERTEX2)
-
 {
     Vector2 worldScale(cachedWorldScale_.x_, cachedWorldScale_.y_);
     edgeShape_.Set(ToB2Vec2(vertex1_ * worldScale), ToB2Vec2(vertex2_ * worldScale));

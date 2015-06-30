@@ -20,14 +20,16 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Core/Profiler.h"
+#include "../Graphics/Graphics.h"
 #include "../IO/Deserializer.h"
 #include "../IO/FileSystem.h"
 #include "../UI/Font.h"
 #include "../UI/FontFaceBitmap.h"
 #include "../UI/FontFaceFreeType.h"
-#include "../Graphics/Graphics.h"
-#include "../Core/Profiler.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLElement.h"
 #include "../Resource/XMLFile.h"
@@ -183,23 +185,23 @@ void Font::LoadParameters()
     SharedPtr<XMLFile> xml = cache->GetTempResource<XMLFile>(xmlName, false);
     if (!xml)
         return;
-    
+
     XMLElement rootElem = xml->GetRoot();
-    
+
     XMLElement absoluteElem = rootElem.GetChild("absoluteoffset");
     if (!absoluteElem)
         absoluteElem = rootElem.GetChild("absolute");
-    
+
     if (absoluteElem)
     {
         absoluteOffset_.x_ = absoluteElem.GetInt("x");
         absoluteOffset_.y_ = absoluteElem.GetInt("y");
     }
-    
+
     XMLElement scaledElem = rootElem.GetChild("scaledoffset");
     if (!scaledElem)
         scaledElem = rootElem.GetChild("scaled");
-    
+
     if (scaledElem)
     {
         scaledOffset_.x_ = scaledElem.GetFloat("x");

@@ -20,14 +20,16 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Graphics/DebugRenderer.h"
-#include "../Scene/Node.h"
 #include "../Graphics/Octree.h"
-#include "../Resource/ResourceCache.h"
-#include "../Scene/Scene.h"
 #include "../Graphics/TextureCube.h"
 #include "../Graphics/Zone.h"
+#include "../Resource/ResourceCache.h"
+#include "../Scene/Node.h"
+#include "../Scene/Scene.h"
 
 #include "../DebugNew.h"
 
@@ -83,7 +85,8 @@ void Zone::RegisterObject(Context* context)
     ATTRIBUTE("Override Mode", bool, override_, false, AM_DEFAULT);
     ATTRIBUTE("Ambient Gradient", bool, ambientGradient_, false, AM_DEFAULT);
     ATTRIBUTE("Priority", int, priority_, 0, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr, ResourceRef, ResourceRef(TextureCube::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr, ResourceRef,
+        ResourceRef(TextureCube::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
     ATTRIBUTE("Shadow Mask", int, shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);

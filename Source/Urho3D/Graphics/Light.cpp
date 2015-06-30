@@ -20,17 +20,20 @@
 // THE SOFTWARE.
 //
 
-#include "../Graphics/Camera.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Core/Profiler.h"
+#include "../Graphics/Camera.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Light.h"
-#include "../Scene/Node.h"
 #include "../Graphics/OctreeQuery.h"
-#include "../Core/Profiler.h"
-#include "../Resource/ResourceCache.h"
 #include "../Graphics/Texture2D.h"
 #include "../Graphics/TextureCube.h"
+#include "../IO/Log.h"
+#include "../Resource/ResourceCache.h"
+#include "../Scene/Node.h"
 
 #include "../DebugNew.h"
 
@@ -112,13 +115,16 @@ void Light::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE("Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_SPECULARINTENSITY, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_SPECULARINTENSITY,
+        AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Brightness Multiplier", GetBrightness, SetBrightness, float, DEFAULT_BRIGHTNESS, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, DEFAULT_RANGE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Spot FOV", GetFov, SetFov, float, DEFAULT_LIGHT_FOV, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Spot Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Attenuation Texture", GetRampTextureAttr, SetRampTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Light Shape Texture", GetShapeTextureAttr, SetShapeTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Attenuation Texture", GetRampTextureAttr, SetRampTextureAttr, ResourceRef,
+        ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Light Shape Texture", GetShapeTextureAttr, SetShapeTextureAttr, ResourceRef,
+        ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
     ATTRIBUTE("Per Vertex", bool, perVertex_, false, AM_DEFAULT);
@@ -150,9 +156,11 @@ void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     // Validate the bias, cascade & focus parameters
     if (attr.offset_ >= offsetof(Light, shadowBias_) && attr.offset_ < (offsetof(Light, shadowBias_) + sizeof(BiasParameters)))
         shadowBias_.Validate();
-    else if (attr.offset_ >= offsetof(Light, shadowCascade_) && attr.offset_ < (offsetof(Light, shadowCascade_) + sizeof(CascadeParameters)))
+    else if (attr.offset_ >= offsetof(Light, shadowCascade_) &&
+             attr.offset_ < (offsetof(Light, shadowCascade_) + sizeof(CascadeParameters)))
         shadowCascade_.Validate();
-    else if (attr.offset_ >= offsetof(Light, shadowFocus_) && attr.offset_ < (offsetof(Light, shadowFocus_) + sizeof(FocusParameters)))
+    else if (attr.offset_ >= offsetof(Light, shadowFocus_) &&
+             attr.offset_ < (offsetof(Light, shadowFocus_) + sizeof(FocusParameters)))
         shadowFocus_.Validate();
 }
 
@@ -162,7 +170,7 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
     if (lightType_ == LIGHT_DIRECTIONAL)
         return;
 
-    float distance;
+    float distance = query.maxDistance_;
     switch (query.level_)
     {
     case RAY_AABB:
@@ -193,6 +201,10 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
                 return;
         }
         break;
+
+    case RAY_TRIANGLE_UV:
+        LOGWARNING("RAY_TRIANGLE_UV query level is not supported for Light component");
+        return;
     }
 
     // If the code reaches here then we have a hit
@@ -375,7 +387,7 @@ Frustum Light::GetFrustum() const
 {
     // Note: frustum is unaffected by node or parent scale
     Matrix3x4 frustumTransform(node_ ? Matrix3x4(node_->GetWorldPosition(), node_->GetWorldRotation(), 1.0f) :
-        Matrix3x4::IDENTITY);
+                               Matrix3x4::IDENTITY);
     Frustum ret;
     ret.Define(fov_, aspectRatio_, 1.0f, M_MIN_NEARCLIP, range_, frustumTransform);
     return ret;
@@ -415,8 +427,8 @@ const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
             quadTransform.SetTranslation(Vector3(0.0f, 0.0f, (camera->GetNearClip() + camera->GetFarClip()) * 0.5f));
             quadTransform.SetScale(Vector3(far.x_, far.y_, 1.0f)); // Will be oversized, but doesn't matter (gets frustum clipped)
             volumeTransform_ = camera->GetEffectiveWorldTransform() * quadTransform;
-            break;
         }
+        break;
 
     case LIGHT_SPOT:
         {

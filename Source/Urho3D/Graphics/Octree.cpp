@@ -20,18 +20,18 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
+#include "../Core/Profiler.h"
+#include "../Core/WorkQueue.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Graphics/Graphics.h"
-#include "../IO/Log.h"
-#include "../Core/Profiler.h"
 #include "../Graphics/Octree.h"
+#include "../IO/Log.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
-#include "../Container/Sort.h"
-#include "../Core/Timer.h"
-#include "../Core/WorkQueue.h"
 
 #include "../DebugNew.h"
 
@@ -336,7 +336,7 @@ Octree::Octree(Context* context) :
     // Resize threaded ray query intermediate result vector according to number of worker threads
     WorkQueue* workQueue = GetSubsystem<WorkQueue>();
     rayQueryResults_.Resize(workQueue ? workQueue->GetNumThreads() + 1 : 1);
-    
+
     // If the engine is running headless, subscribe to RenderUpdate events for manually updating the octree
     // to allow raycasts and animation update
     if (!GetSubsystem<Graphics>())
@@ -390,7 +390,7 @@ void Octree::SetSize(const BoundingBox& box, unsigned numLevels)
 
     Initialize(box);
     numDrawables_ = drawables_.Size();
-    numLevels_ = Max((int)numLevels, 1);
+    numLevels_ = (unsigned)Max((int)numLevels, 1);
 }
 
 void Octree::Update(const FrameInfo& frame)
@@ -405,10 +405,10 @@ void Octree::Update(const FrameInfo& frame)
         Scene* scene = GetScene();
         WorkQueue* queue = GetSubsystem<WorkQueue>();
         scene->BeginThreadedUpdate();
-        
+
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
         int drawablesPerItem = Max((int)(drawableUpdates_.Size() / numWorkItems), 1);
-        
+
         PODVector<Drawable*>::Iterator start = drawableUpdates_.Begin();
         // Create a work item for each thread
         for (int i = 0; i < numWorkItems; ++i)
@@ -432,7 +432,7 @@ void Octree::Update(const FrameInfo& frame)
         queue->Complete(M_MAX_UNSIGNED);
         scene->EndThreadedUpdate();
     }
-    
+
     // Notify drawable update being finished. Custom animation (eg. IK) can be done at this point
     Scene* scene = GetScene();
     if (scene)
@@ -444,7 +444,7 @@ void Octree::Update(const FrameInfo& frame)
         eventData[P_TIMESTEP] = frame.timeStep_;
         scene->SendEvent(E_SCENEDRAWABLEUPDATEFINISHED, eventData);
     }
-    
+
     // Reinsert drawables that have been moved or resized, or that have been newly added to the octree and do not sit inside
     // the proper octant yet
     if (!drawableUpdates_.Empty())
@@ -467,18 +467,18 @@ void Octree::Update(const FrameInfo& frame)
 
             InsertDrawable(drawable);
 
-            #ifdef _DEBUG
+#ifdef _DEBUG
             // Verify that the drawable will be culled correctly
             octant = drawable->GetOctant();
             if (octant != this && octant->GetCullingBox().IsInside(box) != INSIDE)
             {
                 LOGERROR("Drawable is not fully inside its octant's culling bounds: drawable box " + box.ToString() +
-                    " octant box " + octant->GetCullingBox().ToString());
+                         " octant box " + octant->GetCullingBox().ToString());
             }
-            #endif
+#endif
         }
     }
-    
+
     drawableUpdates_.Clear();
 }
 
@@ -614,7 +614,7 @@ void Octree::QueueUpdate(Drawable* drawable)
     }
     else
         drawableUpdates_.Push(drawable);
-    
+
     drawable->updateQueued_ = true;
 }
 
@@ -636,14 +636,14 @@ void Octree::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
     Scene* scene = GetScene();
     if (!scene || !scene->IsUpdateEnabled())
         return;
-    
+
     using namespace RenderUpdate;
-    
+
     FrameInfo frame;
     frame.frameNumber_ = GetSubsystem<Time>()->GetFrameNumber();
     frame.timeStep_ = eventData[P_TIMESTEP].GetFloat();
     frame.camera_ = 0;
-    
+
     Update(frame);
 }
 

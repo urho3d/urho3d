@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/Material.h"
@@ -35,7 +37,8 @@ namespace Urho3D
 
 const float PIXEL_SIZE = 0.01f;
 
-SourceBatch2D::SourceBatch2D() : drawOrder_(0)
+SourceBatch2D::SourceBatch2D() :
+    drawOrder_(0)
 {
 }
 
@@ -86,7 +89,7 @@ void Drawable2D::SetOrderInLayer(int orderInLayer)
         return;
 
     orderInLayer_ = orderInLayer;
-    
+
     OnDrawOrderChanged();
     MarkNetworkUpdate();
 }

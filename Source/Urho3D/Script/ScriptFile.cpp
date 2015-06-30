@@ -20,19 +20,20 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
+#include "../Core/Profiler.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
-#include "../Core/Profiler.h"
 #include "../Resource/ResourceCache.h"
 #include "../Script/Script.h"
 #include "../Script/ScriptFile.h"
 #include "../Script/ScriptInstance.h"
 
 #include <AngelScript/angelscript.h>
-#include <cstring>
 
 #include "../DebugNew.h"
 
@@ -48,19 +49,19 @@ public:
         dest_(dest)
     {
     }
-    
+
     /// Read from stream (no-op).
     virtual void Read(void* ptr, asUINT size)
     {
         // No-op, can not read from a Serializer
     }
-    
+
     /// Write to stream.
     virtual void Write(const void* ptr, asUINT size)
     {
         dest_.Write(ptr, size);
     }
-    
+
 private:
     /// Destination stream.
     Serializer& dest_;
@@ -75,18 +76,18 @@ public:
         source_(source)
     {
     }
-    
+
     /// Read from stream.
     virtual void Read(void* ptr, asUINT size)
     {
         source_.Read(ptr, size);
     }
-    
+
     /// Write to stream (no-op).
     virtual void Write(const void* ptr, asUINT size)
     {
     }
-    
+
 private:
     /// Source stream.
     MemoryBuffer& source_;
@@ -115,12 +116,12 @@ bool ScriptFile::BeginLoad(Deserializer& source)
 {
     ReleaseModule();
     loadByteCode_.Reset();
-    
+
     asIScriptEngine* engine = script_->GetScriptEngine();
-    
+
     {
         MutexLock lock(script_->GetModuleMutex());
-    
+
         // Create the module. Discard previous module if there was one
         scriptModule_ = engine->GetModule(GetName().CString(), asGM_ALWAYS_CREATE);
         if (!scriptModule_)
@@ -129,7 +130,7 @@ bool ScriptFile::BeginLoad(Deserializer& source)
             return false;
         }
     }
-    
+
     // Check if this file is precompiled bytecode
     if (source.ReadFileID() == "ASBC")
     {
@@ -141,7 +142,7 @@ bool ScriptFile::BeginLoad(Deserializer& source)
     }
     else
         source.Seek(0);
-    
+
     // Not bytecode: add the initial section and check for includes.
     // Perform actual building during EndLoad(), as AngelScript can not multithread module compilation,
     // and static initializers may access arbitrary engine functionality which may not be thread-safe
@@ -175,7 +176,7 @@ bool ScriptFile::EndLoad()
         else
             LOGERROR("Failed to compile script module " + GetName());
     }
-    
+
     if (success)
     {
         compiled_ = true;
@@ -278,33 +279,33 @@ bool ScriptFile::Execute(const String& declaration, const VariantVector& paramet
         LOGERROR("Function " + declaration + " not found in " + GetName());
         return false;
     }
-    
+
     return Execute(function, parameters, unprepare);
 }
 
 bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& parameters, bool unprepare)
 {
     PROFILE(ExecuteFunction);
-    
+
     if (!compiled_ || !function)
         return false;
-    
+
     // It is possible that executing the function causes us to unload. Therefore do not rely on member variables
     // However, we are not prepared for the whole script system getting destroyed during execution (should never happen)
     Script* scriptSystem = script_;
-    
+
     asIScriptContext* context = scriptSystem->GetScriptFileContext();
     if (context->Prepare(function) < 0)
         return false;
-    
+
     SetParameters(context, function, parameters);
-    
+
     scriptSystem->IncScriptNestingLevel();
     bool success = context->Execute() >= 0;
     if (unprepare)
         context->Unprepare();
     scriptSystem->DecScriptNestingLevel();
-    
+
     return success;
 }
 
@@ -319,34 +320,34 @@ bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, con
         LOGERROR("Method " + declaration + " not found in class " + String(object->GetObjectType()->GetName()));
         return false;
     }
-    
+
     return Execute(object, method, parameters, unprepare);
 }
 
 bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, bool unprepare)
 {
     PROFILE(ExecuteMethod);
-    
+
     if (!compiled_ || !object || !method)
         return false;
-    
+
     // It is possible that executing the method causes us to unload. Therefore do not rely on member variables
     // However, we are not prepared for the whole script system getting destroyed during execution (should never happen)
     Script* scriptSystem = script_;
-    
+
     asIScriptContext* context = scriptSystem->GetScriptFileContext();
     if (context->Prepare(method) < 0)
         return false;
-    
+
     context->SetObject(object);
     SetParameters(context, method, parameters);
-    
+
     scriptSystem->IncScriptNestingLevel();
     bool success = context->Execute() >= 0;
     if (unprepare)
         context->Unprepare();
     scriptSystem->DecScriptNestingLevel();
-    
+
     return success;
 }
 
@@ -358,7 +359,7 @@ void ScriptFile::DelayedExecute(float delay, bool repeat, const String& declarat
     call.declaration_ = declaration;
     call.parameters_ = parameters;
     delayedCalls_.Push(call);
-    
+
     // Make sure we are registered to the application update event, because delayed calls are executed there
     if (!subscribed_)
     {
@@ -382,13 +383,14 @@ void ScriptFile::ClearDelayedExecute(const String& declaration)
         }
     }
 }
+
 asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInterface)
 {
     PROFILE(CreateObject);
-    
+
     if (!compiled_)
         return 0;
-    
+
     asIScriptContext* context = script_->GetScriptFileContext();
     asIObjectType* type = 0;
     if (useInterface)
@@ -410,14 +412,14 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInter
     }
     else
     {
-       type = scriptModule_->GetObjectTypeByDecl(className.CString());
+        type = scriptModule_->GetObjectTypeByDecl(className.CString());
     }
 
     if (!type)
         return 0;
-    
+
     // Ensure that the type implements the "ScriptObject" interface, so it can be returned to script properly
-    bool found = false;
+    bool found;
     HashMap<asIObjectType*, bool>::ConstIterator i = validClasses_.Find(type);
     if (i != validClasses_.End())
         found = i->second_;
@@ -428,23 +430,23 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInter
         found = type->Implements(scriptObjectType);
         validClasses_[type] = found;
     }
-    
+
     if (!found)
     {
         LOGERRORF("Script class %s does not implement the ScriptObject interface", type->GetName());
         return 0;
     }
-    
+
     // Get the factory function id from the object type
     String factoryName = String(type->GetName()) + "@ " + type->GetName() + "()";
     asIScriptFunction* factory = type->GetFactoryByDecl(factoryName.CString());
     if (!factory || context->Prepare(factory) < 0 || context->Execute() < 0)
         return 0;
-    
+
     asIScriptObject* obj = *(static_cast<asIScriptObject**>(context->GetAddressOfReturnValue()));
     if (obj)
         obj->AddRef();
-    
+
     return obj;
 }
 
@@ -464,7 +466,7 @@ asIScriptFunction* ScriptFile::GetFunction(const String& declarationIn)
 {
     if (!compiled_)
         return 0;
-    
+
     String declaration = declarationIn.Trimmed();
     // If not a full declaration, assume void with no parameters
     if (declaration.Find('(') == String::NPOS)
@@ -473,7 +475,7 @@ asIScriptFunction* ScriptFile::GetFunction(const String& declarationIn)
     HashMap<String, asIScriptFunction*>::ConstIterator i = functions_.Find(declaration);
     if (i != functions_.End())
         return i->second_;
-    
+
     asIScriptFunction* function = scriptModule_->GetFunctionByDecl(declaration.CString());
     functions_[declaration] = function;
     return function;
@@ -500,7 +502,7 @@ asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& 
         if (j != i->second_.End())
             return j->second_;
     }
-    
+
     asIScriptFunction* function = type->GetMethodByDecl(declaration.CString());
     methods_[type][declaration] = function;
     return function;
@@ -562,16 +564,16 @@ void ScriptFile::AddEventHandlerInternal(Object* sender, StringHash eventType, c
 bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
+
     unsigned dataSize = source.GetSize();
     SharedArrayPtr<char> buffer(new char[dataSize]);
     source.Read((void*)buffer.Get(), dataSize);
-    
+
     // Pre-parse for includes
     // Adapted from Angelscript's scriptbuilder add-on
     Vector<String> includeFiles;
     unsigned pos = 0;
-    while(pos < dataSize)
+    while (pos < dataSize)
     {
         int len;
         asETokenClass t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
@@ -587,7 +589,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
             asETokenClass t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
             if (t == asTC_IDENTIFIER)
             {
-                String token(&buffer[pos], len);
+                String token(&buffer[pos], (unsigned)len);
                 if (token == "include")
                 {
                     pos += len;
@@ -597,13 +599,13 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                         pos += len;
                         t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
                     }
-                    
+
                     if (t == asTC_VALUE && len > 2 && buffer[pos] == '"')
                     {
                         // Get the include file
-                        String includeFile(&buffer[pos+1], len - 2);
+                        String includeFile(&buffer[pos + 1], (unsigned)(len - 2));
                         pos += len;
-                        
+
                         // If the file is not found as it is, add the path of current file but only if it is found there
                         if (!cache->Exists(includeFile))
                         {
@@ -611,16 +613,16 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                             if (cache->Exists(prefixedIncludeFile))
                                 includeFile = prefixedIncludeFile;
                         }
-                        
+
                         String includeFileLower = includeFile.ToLower();
-                        
+
                         // If not included yet, store it for later processing
                         if (!includeFiles_.Contains(includeFileLower))
                         {
                             includeFiles_.Insert(includeFileLower);
                             includeFiles.Push(includeFile);
                         }
-                        
+
                         // Overwrite the include directive with space characters to avoid compiler error
                         memset(&buffer[start], ' ', pos - start);
                     }
@@ -650,7 +652,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                     {
                         if (buffer[pos] == '{')
                             ++level;
-                        else if(buffer[pos] == '}')
+                        else if (buffer[pos] == '}')
                             --level;
                     }
                     pos += len;
@@ -660,7 +662,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                 ++pos;
         }
     }
-    
+
     // Process includes first
     for (unsigned i = 0; i < includeFiles.Size(); ++i)
     {
@@ -677,14 +679,14 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
             return false;
         }
     }
-    
+
     // Then add this section
     if (scriptModule_->AddScriptSection(source.GetName().CString(), (const char*)buffer.Get(), dataSize) < 0)
     {
         LOGERROR("Failed to add script section " + source.GetName());
         return false;
     }
-    
+
     SetMemoryUse(GetMemoryUse() + dataSize);
     return true;
 }
@@ -696,32 +698,32 @@ void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* fun
     {
         int paramTypeId;
         function->GetParam(i, &paramTypeId);
-        
+
         switch (paramTypeId)
         {
         case asTYPEID_BOOL:
             context->SetArgByte(i, (unsigned char)parameters[i].GetBool());
             break;
-            
+
         case asTYPEID_INT8:
         case asTYPEID_UINT8:
-            context->SetArgByte(i, parameters[i].GetInt());
+            context->SetArgByte(i, (asBYTE)parameters[i].GetInt());
             break;
-            
+
         case asTYPEID_INT16:
         case asTYPEID_UINT16:
-            context->SetArgWord(i, parameters[i].GetInt());
+            context->SetArgWord(i, (asWORD)parameters[i].GetInt());
             break;
-            
+
         case asTYPEID_INT32:
         case asTYPEID_UINT32:
-            context->SetArgDWord(i, parameters[i].GetInt());
+            context->SetArgDWord(i, (asDWORD)parameters[i].GetInt());
             break;
-            
+
         case asTYPEID_FLOAT:
             context->SetArgFloat(i, parameters[i].GetFloat());
             break;
-            
+
         default:
             if (paramTypeId & asTYPEID_APPOBJECT)
             {
@@ -730,31 +732,31 @@ void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* fun
                 case VAR_VECTOR2:
                     context->SetArgObject(i, (void*)&parameters[i].GetVector2());
                     break;
-                    
+
                 case VAR_VECTOR3:
                     context->SetArgObject(i, (void*)&parameters[i].GetVector3());
                     break;
-                    
+
                 case VAR_VECTOR4:
                     context->SetArgObject(i, (void*)&parameters[i].GetVector4());
                     break;
-                    
+
                 case VAR_QUATERNION:
                     context->SetArgObject(i, (void*)&parameters[i].GetQuaternion());
                     break;
-                    
+
                 case VAR_STRING:
                     context->SetArgObject(i, (void*)&parameters[i].GetString());
                     break;
-                    
+
                 case VAR_VOIDPTR:
                     context->SetArgObject(i, parameters[i].GetVoidPtr());
                     break;
-                    
+
                 case VAR_PTR:
                     context->SetArgObject(i, (void*)parameters[i].GetPtr());
                     break;
-                    
+
                 default:
                     break;
                 }
@@ -775,22 +777,22 @@ void ScriptFile::ReleaseModule()
         methods_.Clear();
         delayedCalls_.Clear();
         eventInvokers_.Clear();
-        
+
         asIScriptEngine* engine = script_->GetScriptEngine();
         scriptModule_->SetUserData(0);
-        
+
         // Remove the module
         {
             MutexLock lock(script_->GetModuleMutex());
-            
+
             script_->ClearObjectTypeCache();
             engine->DiscardModule(GetName().CString());
         }
-        
+
         scriptModule_ = 0;
         compiled_ = false;
         SetMemoryUse(0);
-        
+
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         cache->ResetDependencies(this);
     }
@@ -800,17 +802,17 @@ void ScriptFile::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (!compiled_)
         return;
-    
+
     using namespace Update;
-    
+
     float timeStep = eventData[P_TIMESTEP].GetFloat();
-    
+
     // Execute delayed calls
     for (unsigned i = 0; i < delayedCalls_.Size();)
     {
         DelayedCall& call = delayedCalls_[i];
         bool remove = false;
-        
+
         call.delay_ -= timeStep;
         if (call.delay_ <= 0.0f)
         {
@@ -818,10 +820,10 @@ void ScriptFile::HandleUpdate(StringHash eventType, VariantMap& eventData)
                 remove = true;
             else
                 call.delay_ += call.period_;
-            
+
             Execute(call.declaration_, call.parameters_);
         }
-        
+
         if (remove)
             delayedCalls_.Erase(i);
         else

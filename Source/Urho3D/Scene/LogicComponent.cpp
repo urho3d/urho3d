@@ -20,12 +20,14 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../IO/Log.h"
-#include "../Scene/LogicComponent.h"
 #ifdef URHO3D_PHYSICS
 #include "../Physics/PhysicsEvents.h"
 #include "../Physics/PhysicsWorld.h"
 #endif
+#include "../Scene/LogicComponent.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
 
@@ -109,9 +111,9 @@ void LogicComponent::UpdateEventSubscription()
     Scene* scene = GetScene();
     if (!scene)
         return;
-    
+
     bool enabled = IsEnabledEffective();
-    
+
     bool needUpdate = enabled && ((updateEventMask_ & USE_UPDATE) || !delayedStartCalled_);
     if (needUpdate && !(currentEventMask_ & USE_UPDATE))
     {
@@ -123,7 +125,7 @@ void LogicComponent::UpdateEventSubscription()
         UnsubscribeFromEvent(scene, E_SCENEUPDATE);
         currentEventMask_ &= ~USE_UPDATE;
     }
-    
+
     bool needPostUpdate = enabled && (updateEventMask_ & USE_POSTUPDATE);
     if (needPostUpdate && !(currentEventMask_ & USE_POSTUPDATE))
     {
@@ -152,7 +154,7 @@ void LogicComponent::UpdateEventSubscription()
         UnsubscribeFromEvent(world, E_PHYSICSPRESTEP);
         currentEventMask_ &= ~USE_FIXEDUPDATE;
     }
-    
+
     bool needFixedPostUpdate = enabled && (updateEventMask_ & USE_FIXEDPOSTUPDATE);
     if (needFixedPostUpdate && !(currentEventMask_ & USE_FIXEDPOSTUPDATE))
     {
@@ -164,19 +166,19 @@ void LogicComponent::UpdateEventSubscription()
         UnsubscribeFromEvent(world, E_PHYSICSPOSTSTEP);
         currentEventMask_ &= ~USE_FIXEDPOSTUPDATE;
     }
-#endif 
+#endif
 }
 
 void LogicComponent::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace SceneUpdate;
-    
+
     // Execute user-defined delayed start function before first update
     if (!delayedStartCalled_)
     {
         DelayedStart();
         delayedStartCalled_ = true;
-        
+
         // If did not need actual update events, unsubscribe now
         if (!(updateEventMask_ & USE_UPDATE))
         {
@@ -185,7 +187,7 @@ void LogicComponent::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
             return;
         }
     }
-    
+
     // Then execute user-defined update function
     Update(eventData[P_TIMESTEP].GetFloat());
 }
@@ -193,16 +195,17 @@ void LogicComponent::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
 void LogicComponent::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace ScenePostUpdate;
-    
+
     // Execute user-defined post-update function
     PostUpdate(eventData[P_TIMESTEP].GetFloat());
 }
 
 #ifdef URHO3D_PHYSICS
+
 void LogicComponent::HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
 {
     using namespace PhysicsPreStep;
-    
+
     // Execute user-defined fixed update function
     FixedUpdate(eventData[P_TIMESTEP].GetFloat());
 }
@@ -210,10 +213,11 @@ void LogicComponent::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
 void LogicComponent::HandlePhysicsPostStep(StringHash eventType, VariantMap& eventData)
 {
     using namespace PhysicsPostStep;
-    
+
     // Execute user-defined fixed post-update function
     FixedPostUpdate(eventData[P_TIMESTEP].GetFloat());
 }
+
 #endif
 
 }

@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Navigation/Obstacle.h"
 
 #include "../Core/Context.h"

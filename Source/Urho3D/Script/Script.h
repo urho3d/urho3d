@@ -71,7 +71,7 @@ public:
     /// Set whether to execute engine console commands as script code.
     void SetExecuteConsoleCommands(bool enable);
     /// Print the whole script API (all registered classes, methods and properties) to the log. No-ops when URHO3D_LOGGING not defined.
-    void DumpAPI(DumpMode mode= DOXYGEN, const String& sourceTree = String::EMPTY);
+    void DumpAPI(DumpMode mode = DOXYGEN, const String& sourceTree = String::EMPTY);
     /// Log a message from the script engine.
     void MessageCallback(const asSMessageInfo* msg);
     /// Handle a script exception.
@@ -81,28 +81,36 @@ public:
 
     /// Return the AngelScript engine.
     asIScriptEngine* GetScriptEngine() const { return scriptEngine_; }
+
     /// Return immediate execution script context.
     asIScriptContext* GetImmediateContext() const { return immediateContext_; }
+
     /// Return immediate mode script file.
     ScriptFile* GetDefaultScriptFile() const;
     /// Return immediate mode scene.
     Scene* GetDefaultScene() const;
+
     /// Return whether is executing engine console commands as script code.
     bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
+
     /// Clear the inbuild object type cache.
     void ClearObjectTypeCache();
     /// Query for an inbuilt object type by constant declaration. Can not be used for script types.
     asIObjectType* GetObjectType(const char* declaration);
+
     /// Return the script module create/delete mutex.
     Mutex& GetModuleMutex() { return moduleMutex_; }
 
 private:
     /// Increase script nesting level.
     void IncScriptNestingLevel() { ++scriptNestingLevel_; }
+
     /// Decrease script nesting level.
     void DecScriptNestingLevel() { --scriptNestingLevel_; }
+
     /// Return current script nesting level.
     unsigned GetScriptNestingLevel() { return scriptNestingLevel_; }
+
     /// Return a script function/method execution context for the current execution nesting level.
     asIScriptContext* GetScriptFileContext();
     /// Output a sanitated row of script API. No-ops when URHO3D_LOGGING not defined.

@@ -75,12 +75,16 @@ public:
 
     /// Return model.
     Model* GetModel() const { return model_; }
+
     /// Return number of geometries.
     unsigned GetNumGeometries() const { return geometries_.Size(); }
+
     /// Return material by geometry index.
     Material* GetMaterial(unsigned index = 0) const;
+
     /// Return occlusion LOD level.
     unsigned GetOcclusionLodLevel() const { return occlusionLodLevel_; }
+
     /// Determines if the given world space point is within the model geometry.
     bool IsInside(const Vector3& point) const;
     /// Determines if the given local space point is within the model geometry.

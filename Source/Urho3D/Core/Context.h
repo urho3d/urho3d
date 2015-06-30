@@ -78,16 +78,22 @@ public:
 
     /// Return subsystem by type.
     Object* GetSubsystem(StringHash type) const;
+
     /// Return all subsystems.
     const HashMap<StringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
+
     /// Return all object factories.
     const HashMap<StringHash, SharedPtr<ObjectFactory> >& GetObjectFactories() const { return factories_; }
+
     /// Return all object categories.
     const HashMap<String, Vector<StringHash> >& GetObjectCategories() const { return objectCategories_; }
+
     /// Return active event sender. Null outside event handling.
     Object* GetEventSender() const;
+
     /// Return active event handler. Set by Object. Null outside event handling.
     EventHandler* GetEventHandler() const { return eventHandler_; }
+
     /// Return object type name from hash, or empty if unknown.
     const String& GetTypeName(StringHash objectType) const;
     /// Return a specific attribute description for an object, or null if not found.
@@ -145,10 +151,13 @@ private:
     void RemoveEventReceiver(Object* receiver, Object* sender, StringHash eventType);
     /// Remove event receiver from non-specific events.
     void RemoveEventReceiver(Object* receiver, StringHash eventType);
+
     /// Set current event handler. Called by Object.
     void SetEventHandler(EventHandler* handler) { eventHandler_ = handler; }
+
     /// Begin event send.
     void BeginSendEvent(Object* sender) { eventSenders_.Push(sender); }
+
     /// End event send. Clean up event receivers removed in the meanwhile.
     void EndSendEvent() { eventSenders_.Pop(); }
 
@@ -175,13 +184,27 @@ private:
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }
-template <class T> void Context::RegisterFactory(const char* category) { RegisterFactory(new ObjectFactoryImpl<T>(this), category); }
+
+template <class T> void Context::RegisterFactory(const char* category)
+{
+    RegisterFactory(new ObjectFactoryImpl<T>(this), category);
+}
+
 template <class T> void Context::RemoveSubsystem() { RemoveSubsystem(T::GetTypeStatic()); }
+
 template <class T> void Context::RegisterAttribute(const AttributeInfo& attr) { RegisterAttribute(T::GetTypeStatic(), attr); }
+
 template <class T> void Context::RemoveAttribute(const char* name) { RemoveAttribute(T::GetTypeStatic(), name); }
+
 template <class T, class U> void Context::CopyBaseAttributes() { CopyBaseAttributes(T::GetTypeStatic(), U::GetTypeStatic()); }
+
 template <class T> T* Context::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }
+
 template <class T> AttributeInfo* Context::GetAttribute(const char* name) { return GetAttribute(T::GetTypeStatic(), name); }
-template <class T> void Context::UpdateAttributeDefaultValue(const char* name, const Variant& defaultValue) { UpdateAttributeDefaultValue(T::GetTypeStatic(), name, defaultValue); }
+
+template <class T> void Context::UpdateAttributeDefaultValue(const char* name, const Variant& defaultValue)
+{
+    UpdateAttributeDefaultValue(T::GetTypeStatic(), name, defaultValue);
+}
 
 }

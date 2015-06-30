@@ -20,20 +20,20 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
-#include "../UI/DropDownList.h"
 #include "../IO/File.h"
-#include "../UI/FileSelector.h"
 #include "../IO/FileSystem.h"
 #include "../Input/InputEvents.h"
+#include "../UI/DropDownList.h"
+#include "../UI/FileSelector.h"
 #include "../UI/LineEdit.h"
 #include "../UI/ListView.h"
 #include "../UI/Text.h"
 #include "../UI/UI.h"
 #include "../UI/UIEvents.h"
 #include "../UI/Window.h"
-
-#include "../Container/Sort.h"
 
 #include "../DebugNew.h"
 
@@ -354,7 +354,7 @@ bool FileSelector::EnterFile()
     {
         // If a directory double clicked, enter it. Recognize . and .. as a special case
         const String& newPath = fileEntries_[index].name_;
-        if ((newPath != ".") &&  (newPath != ".."))
+        if ((newPath != ".") && (newPath != ".."))
             SetPath(path_ + newPath);
         else if (newPath == "..")
         {

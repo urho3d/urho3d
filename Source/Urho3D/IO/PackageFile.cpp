@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../IO/File.h"
 #include "../IO/Log.h"
 #include "../IO/PackageFile.h"
@@ -50,18 +52,18 @@ PackageFile::~PackageFile()
 
 bool PackageFile::Open(const String& fileName, unsigned startOffset)
 {
-    #ifdef ANDROID
+#ifdef ANDROID
     if (fileName.StartsWith("/apk/"))
     {
         LOGERROR("Package files within the apk are not supported on Android");
         return false;
     }
-    #endif
-    
+#endif
+
     SharedPtr<File> file(new File(context_, fileName));
     if (!file->IsOpen())
         return false;
-    
+
     // Check ID, then read the directory
     file->Seek(startOffset);
     String id = file->ReadFileID();
@@ -72,7 +74,7 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
         if (!startOffset)
         {
             unsigned fileSize = file->GetSize();
-            file->Seek(fileSize - sizeof(unsigned));
+            file->Seek((unsigned)(fileSize - sizeof(unsigned)));
             unsigned newStartOffset = fileSize - file->ReadUInt();
             if (newStartOffset < fileSize)
             {
@@ -81,22 +83,22 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
                 id = file->ReadFileID();
             }
         }
-        
+
         if (id != "UPAK" && id != "ULZ4")
         {
             LOGERROR(fileName + " is not a valid package file");
             return false;
         }
     }
-    
+
     fileName_ = fileName;
     nameHash_ = fileName_;
     totalSize_ = file->GetSize();
     compressed_ = id == "ULZ4";
-    
+
     unsigned numFiles = file->ReadUInt();
     checksum_ = file->ReadUInt();
-    
+
     for (unsigned i = 0; i < numFiles; ++i)
     {
         String entryName = file->ReadString();
@@ -109,7 +111,7 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
         else
             entries_[entryName.ToLower()] = newEntry;
     }
-    
+
     return true;
 }
 

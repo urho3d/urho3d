@@ -23,6 +23,8 @@
 # Define target name
 set (TARGET_NAME Urho3D)
 
+add_definitions (-DURHO3D_IS_BUILDING)
+
 if (WIN32)
     set (CMAKE_DEBUG_POSTFIX _d)
 endif ()
@@ -140,7 +142,10 @@ if (APPLE AND NOT IOS)
     set (GLOB_OBJC_PATTERN *.m)     # Should only pick up MacFileWatcher.m for MacOSX platform at the moment
 endif ()
 string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
-define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} EXTRA_H_FILES librevision.h Urho3D.h RECURSE GROUP PCH Precompiled.h)
+if (URHO3D_PCH)
+    set (PCH PCH Precompiled.h)
+endif ()
+define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} EXTRA_H_FILES librevision.h Urho3D.h RECURSE GROUP ${PCH})
 list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${ALL_OBJ_FILES})
 
 # Define dependency libs

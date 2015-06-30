@@ -20,11 +20,12 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/CoreEvents.h"
 #include "../Core/Profiler.h"
 
 #include <cstdio>
-#include <cstring>
 
 #include "../DebugNew.h"
 
@@ -55,7 +56,7 @@ void Profiler::BeginFrame()
 {
     // End the previous frame if any
     EndFrame();
-    
+
     BeginBlock("RunFrame");
 }
 
@@ -82,33 +83,34 @@ void Profiler::BeginInterval()
 String Profiler::GetData(bool showUnused, bool showTotal, unsigned maxDepth) const
 {
     String output;
-    
+
     if (!showTotal)
-        output += String("Block                            Cnt     Avg      Max     Frame     Total\n\n");
+        output += "Block                            Cnt     Avg      Max     Frame     Total\n\n";
     else
     {
-        output += String("Block                                       Last frame                       Whole execution time\n\n");
-        output += String("                                 Cnt     Avg      Max      Total      Cnt      Avg       Max        Total\n\n");
+        output += "Block                                       Last frame                       Whole execution time\n\n";
+        output += "                                 Cnt     Avg      Max      Total      Cnt      Avg       Max        Total\n\n";
     }
-    
+
     if (!maxDepth)
         maxDepth = 1;
-    
+
     GetData(root_, output, 0, maxDepth, showUnused, showTotal);
-    
+
     return output;
 }
 
-void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused, bool showTotal) const
+void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused,
+    bool showTotal) const
 {
     char line[LINE_MAX_LENGTH];
     char indentedName[LINE_MAX_LENGTH];
-    
-    unsigned intervalFrames = Max(intervalFrames_, 1);
-    
+
+    unsigned intervalFrames = (unsigned)Max(intervalFrames_, 1);
+
     if (depth >= maxDepth)
         return;
-    
+
     // Do not print the root block as it does not collect any actual data
     if (block != root_)
     {
@@ -119,14 +121,14 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, uns
             strcat(indentedName, block->name_);
             indentedName[strlen(indentedName)] = ' ';
             indentedName[NAME_MAX_LENGTH] = 0;
-            
+
             if (!showTotal)
             {
                 float avg = (block->intervalCount_ ? block->intervalTime_ / block->intervalCount_ : 0.0f) / 1000.0f;
                 float max = block->intervalMaxTime_ / 1000.0f;
                 float frame = block->intervalTime_ / intervalFrames / 1000.0f;
                 float all = block->intervalTime_ / 1000.0f;
-        
+
                 sprintf(line, "%s %5u %8.3f %8.3f %8.3f %9.3f\n", indentedName, Min(block->intervalCount_, 99999),
                     avg, max, frame, all);
             }
@@ -135,21 +137,21 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, uns
                 float avg = (block->frameCount_ ? block->frameTime_ / block->frameCount_ : 0.0f) / 1000.0f;
                 float max = block->frameMaxTime_ / 1000.0f;
                 float all = block->frameTime_ / 1000.0f;
-                
+
                 float totalAvg = (block->totalCount_ ? block->totalTime_ / block->totalCount_ : 0.0f) / 1000.0f;
                 float totalMax = block->totalMaxTime_ / 1000.0f;
                 float totalAll = block->totalTime_ / 1000.0f;
-                
+
                 sprintf(line, "%s %5u %8.3f %8.3f %9.3f  %7u %9.3f %9.3f %11.3f\n", indentedName, Min(block->frameCount_, 99999),
                     avg, max, all, Min(block->totalCount_, 99999), totalAvg, totalMax, totalAll);
             }
-            
+
             output += String(line);
         }
-        
+
         ++depth;
     }
-    
+
     for (PODVector<ProfilerBlock*>::ConstIterator i = block->children_.Begin(); i != block->children_.End(); ++i)
         GetData(*i, output, depth, maxDepth, showUnused, showTotal);
 }

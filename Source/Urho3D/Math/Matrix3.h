@@ -44,7 +44,7 @@ public:
         m22_(1.0f)
     {
     }
-    
+
     /// Copy-construct from another matrix.
     Matrix3(const Matrix3& matrix) :
         m00_(matrix.m00_),
@@ -58,7 +58,7 @@ public:
         m22_(matrix.m22_)
     {
     }
-    
+
     /// Construct from values.
     Matrix3(float v00, float v01, float v02,
             float v10, float v11, float v12,
@@ -74,7 +74,7 @@ public:
         m22_(v22)
     {
     }
-    
+
     /// Construct from a float array.
     Matrix3(const float* data) :
         m00_(data[0]),
@@ -88,9 +88,9 @@ public:
         m22_(data[8])
     {
     }
-    
+
     /// Assign from another matrix.
-    Matrix3& operator = (const Matrix3& rhs)
+    Matrix3& operator =(const Matrix3& rhs)
     {
         m00_ = rhs.m00_;
         m01_ = rhs.m01_;
@@ -103,27 +103,27 @@ public:
         m22_ = rhs.m22_;
         return *this;
     }
-    
+
     /// Test for equality with another matrix without epsilon.
-    bool operator == (const Matrix3& rhs) const
+    bool operator ==(const Matrix3& rhs) const
     {
         const float* leftData = Data();
         const float* rightData = rhs.Data();
-        
+
         for (unsigned i = 0; i < 9; ++i)
         {
             if (leftData[i] != rightData[i])
                 return false;
         }
-        
+
         return true;
     }
-    
+
     /// Test for inequality with another matrix without epsilon.
-    bool operator != (const Matrix3& rhs) const { return !(*this == rhs); }
-    
+    bool operator !=(const Matrix3& rhs) const { return !(*this == rhs); }
+
     /// Multiply a Vector3.
-    Vector3 operator * (const Vector3& rhs) const
+    Vector3 operator *(const Vector3& rhs) const
     {
         return Vector3(
             m00_ * rhs.x_ + m01_ * rhs.y_ + m02_ * rhs.z_,
@@ -131,9 +131,9 @@ public:
             m20_ * rhs.x_ + m21_ * rhs.y_ + m22_ * rhs.z_
         );
     }
-    
+
     /// Add a matrix.
-    Matrix3 operator + (const Matrix3& rhs) const
+    Matrix3 operator +(const Matrix3& rhs) const
     {
         return Matrix3(
             m00_ + rhs.m00_,
@@ -147,9 +147,9 @@ public:
             m22_ + rhs.m22_
         );
     }
-    
+
     /// Subtract a matrix.
-    Matrix3 operator - (const Matrix3& rhs) const
+    Matrix3 operator -(const Matrix3& rhs) const
     {
         return Matrix3(
             m00_ - rhs.m00_,
@@ -163,9 +163,9 @@ public:
             m22_ - rhs.m22_
         );
     }
-    
+
     /// Multiply with a scalar.
-    Matrix3 operator * (float rhs) const
+    Matrix3 operator *(float rhs) const
     {
         return Matrix3(
             m00_ * rhs,
@@ -179,9 +179,9 @@ public:
             m22_ * rhs
         );
     }
-    
+
     /// Multiply a matrix.
-    Matrix3 operator * (const Matrix3& rhs) const
+    Matrix3 operator *(const Matrix3& rhs) const
     {
         return Matrix3(
             m00_ * rhs.m00_ + m01_ * rhs.m10_ + m02_ * rhs.m20_,
@@ -195,7 +195,7 @@ public:
             m20_ * rhs.m02_ + m21_ * rhs.m12_ + m22_ * rhs.m22_
         );
     }
-    
+
     /// Set scaling elements.
     void SetScale(const Vector3& scale)
     {
@@ -203,7 +203,7 @@ public:
         m11_ = scale.y_;
         m22_ = scale.z_;
     }
-    
+
     /// Set uniform scaling elements.
     void SetScale(float scale)
     {
@@ -211,7 +211,7 @@ public:
         m11_ = scale;
         m22_ = scale;
     }
-    
+
     /// Return the scaling part.
     Vector3 Scale() const
     {
@@ -221,7 +221,7 @@ public:
             sqrtf(m02_ * m02_ + m12_ * m12_ + m22_ * m22_)
         );
     }
-    
+
     /// Return transpose.
     Matrix3 Transpose() const
     {
@@ -237,7 +237,7 @@ public:
             m22_
         );
     }
-    
+
     /// Return scaled by a vector.
     Matrix3 Scaled(const Vector3& scale) const
     {
@@ -253,30 +253,31 @@ public:
             m22_ * scale.z_
         );
     }
-    
+
     /// Test for equality with another matrix with epsilon.
     bool Equals(const Matrix3& rhs) const
     {
         const float* leftData = Data();
         const float* rightData = rhs.Data();
-        
+
         for (unsigned i = 0; i < 9; ++i)
         {
             if (!Urho3D::Equals(leftData[i], rightData[i]))
                 return false;
         }
-        
+
         return true;
     }
-    
+
     /// Return inverse.
     Matrix3 Inverse() const;
-    
+
     /// Return float data.
     const float* Data() const { return &m00_; }
+
     /// Return as string.
     String ToString() const;
-    
+
     float m00_;
     float m01_;
     float m02_;
@@ -286,7 +287,7 @@ public:
     float m20_;
     float m21_;
     float m22_;
-    
+
     /// Bulk transpose matrices.
     static void BulkTranspose(float* dest, const float* src, unsigned count)
     {
@@ -301,12 +302,12 @@ public:
             dest[6] = src[2];
             dest[7] = src[5];
             dest[8] = src[8];
-            
+
             dest += 9;
             src += 9;
         }
     }
-    
+
     /// Zero matrix.
     static const Matrix3 ZERO;
     /// Identity matrix.
@@ -314,6 +315,6 @@ public:
 };
 
 /// Multiply a 3x3 matrix with a scalar.
-inline Matrix3 operator * (float lhs, const Matrix3& rhs) { return rhs * lhs; }
+inline Matrix3 operator *(float lhs, const Matrix3& rhs) { return rhs * lhs; }
 
 }

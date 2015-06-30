@@ -22,6 +22,12 @@
 
 #pragma once
 
+#ifdef URHO3D_IS_BUILDING
+#include "Urho3D.h"
+#else
+#include <Urho3D/Urho3D.h>
+#endif
+
 namespace Urho3D
 {
 
@@ -34,7 +40,7 @@ struct RefCount
         weakRefs_(0)
     {
     }
-    
+
     /// Destruct.
     ~RefCount()
     {
@@ -42,7 +48,7 @@ struct RefCount
         refs_ = -1;
         weakRefs_ = -1;
     }
-    
+
     /// Reference count. If below zero, the object has been destroyed.
     int refs_;
     /// Weak reference count.
@@ -57,7 +63,7 @@ public:
     RefCounted();
     /// Destruct. Mark as expired and also delete the reference count structure if no outside weak references exist.
     virtual ~RefCounted();
-    
+
     /// Increment reference count. Can also be called outside of a SharedPtr for traditional reference counting.
     void AddRef();
     /// Decrement reference count and delete self if no more references. Can also be called outside of a SharedPtr for traditional reference counting.
@@ -66,15 +72,16 @@ public:
     int Refs() const;
     /// Return weak reference count.
     int WeakRefs() const;
+
     /// Return pointer to the reference count structure.
     RefCount* RefCountPtr() { return refCount_; }
-    
+
 private:
     /// Prevent copy construction.
     RefCounted(const RefCounted& rhs);
     /// Prevent assignment.
-    RefCounted& operator = (const RefCounted& rhs);
-    
+    RefCounted& operator =(const RefCounted& rhs);
+
     /// Pointer to the reference count structure.
     RefCount* refCount_;
 };

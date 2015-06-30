@@ -68,16 +68,22 @@ public:
 
     /// Return texture.
     Texture* GetTexture() const { return texture_; }
+
     /// Return image rectangle.
     const IntRect& GetImageRect() const { return imageRect_; }
+
     /// Return border screen dimensions.
     const IntRect& GetBorder() const { return border_; }
+
     /// Return border image dimensions. Zero rect uses border screen dimensions.
     const IntRect& GetImageBorder() const { return imageBorder_; }
+
     /// Return offset to image rectangle used on hover.
     const IntVector2& GetHoverOffset() const { return hoverOffset_; }
+
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
+
     /// Return whether is tiled.
     bool IsTiled() const { return tiled_; }
 
@@ -88,7 +94,8 @@ public:
 
 protected:
     /// Return UI rendering batches with offset to image rectangle.
-    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor, const IntVector2& offset);
+    void GetBatches
+        (PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor, const IntVector2& offset);
 
     /// Texture.
     SharedPtr<Texture> texture_;

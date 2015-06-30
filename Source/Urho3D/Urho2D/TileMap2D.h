@@ -54,10 +54,13 @@ public:
 
     /// Return tmx file.
     TmxFile2D* GetTmxFile() const;
+
     /// Return information.
     const TileMapInfo2D& GetInfo() const { return info_; }
+
     /// Return number of layers.
     unsigned GetNumLayers() const { return layers_.Size(); }
+
     /// Return tile map layer at index.
     TileMapLayer2D* GetLayer(unsigned index) const;
     /// Convert tile index to position.

@@ -65,20 +65,28 @@ public:
 
     /// Return sprite.
     Sprite2D* GetSprite() const;
+
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
+
     /// Return flip X.
     bool GetFlipX() const { return flipX_; }
+
     /// Return flip Y.
     bool GetFlipY() const { return flipY_; }
+
     /// Return color.
     const Color& GetColor() const { return color_; }
+
     /// Return alpha.
     float GetAlpha() const { return color_.a_; }
+
     /// Return use hot spot.
     bool GetUseHotSpot() const { return useHotSpot_; }
+
     /// Return hot spot.
     const Vector2& GetHotSpot() const { return hotSpot_; }
+
     /// Return custom material.
     Material* GetCustomMaterial() const;
 

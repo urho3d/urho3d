@@ -49,7 +49,7 @@ public:
 private:
     /// Handle script event in Lua script.
     void HandleLuaScriptEvent(StringHash eventType, VariantMap& eventData);
-    
+
     /// Lua script instance.
     WeakPtr<LuaScriptInstance> instance_;
 };

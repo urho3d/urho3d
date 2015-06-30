@@ -20,18 +20,20 @@
 // THE SOFTWARE.
 //
 
-#include "../Graphics/Camera.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Graphics/Camera.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/IndexBuffer.h"
 #include "../Graphics/Material.h"
-#include "../Scene/Node.h"
 #include "../Graphics/OcclusionBuffer.h"
 #include "../Graphics/OctreeQuery.h"
-#include "../Core/Profiler.h"
 #include "../Graphics/Terrain.h"
 #include "../Graphics/TerrainPatch.h"
 #include "../Graphics/VertexBuffer.h"
+#include "../IO/Log.h"
+#include "../Scene/Node.h"
 
 #include "../DebugNew.h"
 
@@ -55,7 +57,7 @@ TerrainPatch::TerrainPatch(Context* context) :
     geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
     maxLodGeometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
     minLodGeometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
-    
+
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
     batches_[0].geometryType_ = GEOM_STATIC_NOINSTANCING;
@@ -73,38 +75,44 @@ void TerrainPatch::RegisterObject(Context* context)
 void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
     RayQueryLevel level = query.level_;
-    
+
     switch (level)
     {
     case RAY_AABB:
         Drawable::ProcessRayQuery(query, results);
         break;
-        
+
     case RAY_OBB:
     case RAY_TRIANGLE:
-        Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
-        Ray localRay = query.ray_.Transformed(inverse);
-        float distance = localRay.HitDistance(boundingBox_);
-        Vector3 normal = -query.ray_.direction_;
-        
-        if (level == RAY_TRIANGLE && distance < query.maxDistance_)
         {
-            Vector3 geometryNormal;
-            distance = geometry_->GetHitDistance(localRay, &geometryNormal);
-            normal = (node_->GetWorldTransform() * Vector4(geometryNormal, 0.0f)).Normalized();
+            Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
+            Ray localRay = query.ray_.Transformed(inverse);
+            float distance = localRay.HitDistance(boundingBox_);
+            Vector3 normal = -query.ray_.direction_;
+
+            if (level == RAY_TRIANGLE && distance < query.maxDistance_)
+            {
+                Vector3 geometryNormal;
+                distance = geometry_->GetHitDistance(localRay, &geometryNormal);
+                normal = (node_->GetWorldTransform() * Vector4(geometryNormal, 0.0f)).Normalized();
+            }
+
+            if (distance < query.maxDistance_)
+            {
+                RayQueryResult result;
+                result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
+                result.normal_ = normal;
+                result.distance_ = distance;
+                result.drawable_ = this;
+                result.node_ = node_;
+                result.subObject_ = M_MAX_UNSIGNED;
+                results.Push(result);
+            }
         }
-        
-        if (distance < query.maxDistance_)
-        {
-            RayQueryResult result;
-            result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
-            result.normal_ = normal;
-            result.distance_ = distance;
-            result.drawable_ = this;
-            result.node_ = node_;
-            result.subObject_ = M_MAX_UNSIGNED;
-            results.Push(result);
-        }
+        break;
+
+    case RAY_TRIANGLE_UV:
+        LOGWARNING("RAY_TRIANGLE_UV query level is not supported for TerrainPatch component");
         break;
     }
 }
@@ -113,13 +121,13 @@ void TerrainPatch::UpdateBatches(const FrameInfo& frame)
 {
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
-    
+
     float scale = worldTransform.Scale().DotProduct(DOT_SCALE);
     lodDistance_ = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
-    
+
     batches_[0].distance_ = distance_;
     batches_[0].worldTransform_ = &worldTransform;
-    
+
     unsigned newLodLevel = 0;
     for (unsigned i = 0; i < lodErrors_.Size(); ++i)
     {
@@ -128,7 +136,7 @@ void TerrainPatch::UpdateBatches(const FrameInfo& frame)
         else
             newLodLevel = i;
     }
-    
+
     lodLevel_ = GetCorrectedLodLevel(newLodLevel);
 }
 
@@ -141,7 +149,7 @@ void TerrainPatch::UpdateGeometry(const FrameInfo& frame)
         else
             vertexBuffer_->ClearDataLost();
     }
-    
+
     if (owner_)
         owner_->UpdatePatchLod(this);
 }
@@ -183,23 +191,23 @@ bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
     }
     else
         buffer->SetCullMode(CULL_CCW);
-    
+
     const unsigned char* vertexData;
     unsigned vertexSize;
     const unsigned char* indexData;
     unsigned indexSize;
     unsigned elementMask;
-    
+
     minLodGeometry_->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
     // Check for valid geometry data
     if (!vertexData || !indexData)
         return true;
-    
+
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
-    
+
     Matrix3x4 occlusionTransform(worldTransform.Translation() + worldTransform * Vector4(0.0f, occlusionOffset_, 0.0f,
         0.0f), worldTransform.Rotation(), worldTransform.Scale());
-    
+
     // Draw and check for running out of triangles
     return buffer->Draw(occlusionTransform, vertexData, vertexSize, indexData, indexSize, minLodGeometry_->GetIndexStart(),
         minLodGeometry_->GetIndexCount());
@@ -283,14 +291,14 @@ void TerrainPatch::OnWorldBoundingBoxUpdate()
 unsigned TerrainPatch::GetCorrectedLodLevel(unsigned lodLevel)
 {
     if (north_)
-        lodLevel = Min((int)lodLevel, north_->GetLodLevel() + 1);
+        lodLevel = (unsigned)Min((int)lodLevel, north_->GetLodLevel() + 1);
     if (south_)
-        lodLevel = Min((int)lodLevel, south_->GetLodLevel() + 1);
+        lodLevel = (unsigned)Min((int)lodLevel, south_->GetLodLevel() + 1);
     if (west_)
-        lodLevel = Min((int)lodLevel, west_->GetLodLevel() + 1);
+        lodLevel = (unsigned)Min((int)lodLevel, west_->GetLodLevel() + 1);
     if (east_)
-        lodLevel = Min((int)lodLevel, east_->GetLodLevel() + 1);
-    
+        lodLevel = (unsigned)Min((int)lodLevel, east_->GetLodLevel() + 1);
+
     return lodLevel;
 }
 

@@ -20,10 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "../IO/Deserializer.h"
-#include "../IO/Log.h"
-#include "../IO/Serializer.h"
+#include "../Precompiled.h"
+
 #include "../Graphics/Skeleton.h"
+#include "../IO/Log.h"
 
 #include "../DebugNew.h"
 
@@ -42,13 +42,13 @@ Skeleton::~Skeleton()
 bool Skeleton::Load(Deserializer& source)
 {
     ClearBones();
-    
+
     if (source.IsEof())
         return false;
-    
+
     unsigned bones = source.ReadUInt();
     bones_.Reserve(bones);
-    
+
     for (unsigned i = 0; i < bones; ++i)
     {
         Bone newBone;
@@ -59,20 +59,20 @@ bool Skeleton::Load(Deserializer& source)
         newBone.initialRotation_ = source.ReadQuaternion();
         newBone.initialScale_ = source.ReadVector3();
         source.Read(&newBone.offsetMatrix_.m00_, sizeof(Matrix3x4));
-        
+
         // Read bone collision data
         newBone.collisionMask_ = source.ReadUByte();
         if (newBone.collisionMask_ & BONECOLLISION_SPHERE)
             newBone.radius_ = source.ReadFloat();
         if (newBone.collisionMask_ & BONECOLLISION_BOX)
             newBone.boundingBox_ = source.ReadBoundingBox();
-        
+
         if (newBone.parentIndex_ == i)
             rootBoneIndex_ = i;
-        
+
         bones_.Push(newBone);
     }
-    
+
     return true;
 }
 
@@ -80,7 +80,7 @@ bool Skeleton::Save(Serializer& dest) const
 {
     if (!dest.WriteUInt(bones_.Size()))
         return false;
-    
+
     for (unsigned i = 0; i < bones_.Size(); ++i)
     {
         const Bone& bone = bones_[i];
@@ -90,7 +90,7 @@ bool Skeleton::Save(Serializer& dest) const
         dest.WriteQuaternion(bone.initialRotation_);
         dest.WriteVector3(bone.initialScale_);
         dest.Write(bone.offsetMatrix_.Data(), sizeof(Matrix3x4));
-        
+
         // Collision info
         dest.WriteUByte(bone.collisionMask_);
         if (bone.collisionMask_ & BONECOLLISION_SPHERE)
@@ -98,14 +98,14 @@ bool Skeleton::Save(Serializer& dest) const
         if (bone.collisionMask_ & BONECOLLISION_BOX)
             dest.WriteBoundingBox(bone.boundingBox_);
     }
-    
+
     return true;
 }
 
 void Skeleton::Define(const Skeleton& src)
 {
     ClearBones();
-    
+
     bones_ = src.bones_;
     // Make sure we clear node references, if they exist
     // (AnimatedModel will create new nodes on its own)
@@ -174,7 +174,7 @@ Bone* Skeleton::GetBone(StringHash nameHash)
         if (i->nameHash_ == nameHash)
             return &(*i);
     }
-    
+
     return 0;
 }
 

@@ -21,11 +21,13 @@
 //
 
 #ifdef URHO3D_NETWORK
-#include "../Script/APITemplates.h"
+
+#include "../Precompiled.h"
+
 #include "../Network/HttpRequest.h"
 #include "../Network/Network.h"
 #include "../Network/NetworkPriority.h"
-#include "../Network/Protocol.h"
+#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {
@@ -82,7 +84,7 @@ static void RegisterConnection(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Connection", "Controls controls", offsetof(Connection, controls_));
     engine->RegisterObjectProperty("Connection", "uint8 timeStamp", offsetof(Connection, timeStamp_));
     engine->RegisterObjectProperty("Connection", "VariantMap identity", offsetof(Connection, identity_));
-    
+
     // Register SetOwner/GetOwner now
     engine->RegisterObjectMethod("Node", "void set_owner(Connection@+)", asMETHOD(Node, SetOwner), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "Connection@+ get_owner() const", asMETHOD(Node, GetOwner), asCALL_THISCALL);
@@ -95,7 +97,7 @@ static void RegisterHttpRequest(asIScriptEngine* engine)
     engine->RegisterEnumValue("HttpRequestState", "HTTP_ERROR", HTTP_ERROR);
     engine->RegisterEnumValue("HttpRequestState", "HTTP_OPEN", HTTP_OPEN);
     engine->RegisterEnumValue("HttpRequestState", "HTTP_CLOSED", HTTP_CLOSED);
-    
+
     RegisterRefCounted<HttpRequest>(engine, "HttpRequest");
     RegisterDeserializer<HttpRequest>(engine, "HttpRequest");
     engine->RegisterObjectMethod("HttpRequest", "const String& get_url() const", asMETHOD(HttpRequest, GetURL), asCALL_THISCALL);

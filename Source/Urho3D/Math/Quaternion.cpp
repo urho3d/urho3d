@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Math/Quaternion.h"
 
 #include <cstdio>
@@ -35,7 +37,7 @@ void Quaternion::FromAngleAxis(float angle, const Vector3& axis)
     angle *= M_DEGTORAD_2;
     float sinAngle = sinf(angle);
     float cosAngle = cosf(angle);
-    
+
     w_ = cosAngle;
     x_ = normAxis.x_ * sinAngle;
     y_ = normAxis.y_ * sinAngle;
@@ -54,7 +56,7 @@ void Quaternion::FromEulerAngles(float x, float y, float z)
     float cosY = cosf(y);
     float sinZ = sinf(z);
     float cosZ = cosf(z);
-    
+
     w_ = cosY * cosX * cosZ + sinY * sinX * sinZ;
     x_ = cosY * sinX * cosZ + sinY * cosX * sinZ;
     y_ = sinY * cosX * cosZ - cosY * sinX * sinZ;
@@ -66,13 +68,13 @@ void Quaternion::FromRotationTo(const Vector3& start, const Vector3& end)
     Vector3 normStart = start.Normalized();
     Vector3 normEnd = end.Normalized();
     float d = normStart.DotProduct(normEnd);
-    
+
     if (d > -1.0f + M_EPSILON)
     {
         Vector3 c = normStart.CrossProduct(normEnd);
         float s = sqrtf((1.0f + d) * 2.0f);
         float invS = 1.0f / s;
-        
+
         x_ = c.x_ * invS;
         y_ = c.y_ * invS;
         z_ = c.z_ * invS;
@@ -83,7 +85,7 @@ void Quaternion::FromRotationTo(const Vector3& start, const Vector3& end)
         Vector3 axis = Vector3::RIGHT.CrossProduct(normStart);
         if (axis.Length() < M_EPSILON)
             axis = Vector3::UP.CrossProduct(normStart);
-        
+
         FromAngleAxis(180.f, axis);
     }
 }
@@ -95,18 +97,18 @@ void Quaternion::FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vect
         xAxis.y_, yAxis.y_, zAxis.y_,
         xAxis.z_, yAxis.z_, zAxis.z_
     );
-    
+
     FromRotationMatrix(matrix);
 }
 
 void Quaternion::FromRotationMatrix(const Matrix3& matrix)
 {
     float t = matrix.m00_ + matrix.m11_ + matrix.m22_;
-    
+
     if (t > 0.0f)
     {
         float invS = 0.5f / sqrtf(1.0f + t);
-        
+
         x_ = (matrix.m21_ - matrix.m12_) * invS;
         y_ = (matrix.m02_ - matrix.m20_) * invS;
         z_ = (matrix.m10_ - matrix.m01_) * invS;
@@ -117,7 +119,7 @@ void Quaternion::FromRotationMatrix(const Matrix3& matrix)
         if (matrix.m00_ > matrix.m11_ && matrix.m00_ > matrix.m22_)
         {
             float invS = 0.5f / sqrtf(1.0f + matrix.m00_ - matrix.m11_ - matrix.m22_);
-            
+
             x_ = 0.25f / invS;
             y_ = (matrix.m01_ + matrix.m10_) * invS;
             z_ = (matrix.m20_ + matrix.m02_) * invS;
@@ -126,7 +128,7 @@ void Quaternion::FromRotationMatrix(const Matrix3& matrix)
         else if (matrix.m11_ > matrix.m22_)
         {
             float invS = 0.5f / sqrtf(1.0f + matrix.m11_ - matrix.m00_ - matrix.m22_);
-            
+
             x_ = (matrix.m01_ + matrix.m10_) * invS;
             y_ = 0.25f / invS;
             z_ = (matrix.m12_ + matrix.m21_) * invS;
@@ -135,7 +137,7 @@ void Quaternion::FromRotationMatrix(const Matrix3& matrix)
         else
         {
             float invS = 0.5f / sqrtf(1.0f + matrix.m22_ - matrix.m00_ - matrix.m11_);
-            
+
             x_ = (matrix.m02_ + matrix.m20_) * invS;
             y_ = (matrix.m12_ + matrix.m21_) * invS;
             z_ = 0.25f / invS;
@@ -153,7 +155,7 @@ bool Quaternion::FromLookRotation(const Vector3& direction, const Vector3& upDir
 
     Quaternion ret;
     ret.FromAxes(right, up, forward);
-    
+
     if (!ret.IsNaN())
     {
         (*this) = ret;
@@ -168,7 +170,7 @@ Vector3 Quaternion::EulerAngles() const
     // Derivation from http://www.geometrictools.com/Documentation/EulerAngles.pdf
     // Order of rotations: Z first, then X, then Y
     float check = 2.0f * (-y_ * z_ + w_ * x_);
-    
+
     if (check < -0.995f)
     {
         return Vector3(
@@ -234,11 +236,11 @@ Quaternion Quaternion::Slerp(Quaternion rhs, float t) const
         cosAngle = -cosAngle;
         rhs = -rhs;
     }
-    
+
     float angle = acosf(cosAngle);
     float sinAngle = sinf(angle);
     float t1, t2;
-    
+
     if (sinAngle > 0.001f)
     {
         float invSinAngle = 1.0f / sinAngle;
@@ -250,7 +252,7 @@ Quaternion Quaternion::Slerp(Quaternion rhs, float t) const
         t1 = 1.0f - t;
         t2 = t;
     }
-    
+
     return *this * t1 + rhs * t2;
 }
 

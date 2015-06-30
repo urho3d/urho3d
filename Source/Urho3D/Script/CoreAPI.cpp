@@ -20,11 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "../Script/APITemplates.h"
-#include "../Core/Context.h"
+#include "../Precompiled.h"
+
 #include "../Core/ProcessUtils.h"
 #include "../Core/Spline.h"
-#include "../Core/StringUtils.h"
+#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {
@@ -439,7 +439,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectProperty("ResourceRefList", "StringHash type", offsetof(ResourceRef, type_));
 
     RegisterRefCounted<RefCounted>(engine, "RefCounted");
-    
+
     engine->RegisterObjectType("Variant", sizeof(Variant), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectType("VariantMap", sizeof(VariantMap), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVariant), asCALL_CDECL_OBJLAST);
@@ -570,22 +570,22 @@ static void RegisterVariant(asIScriptEngine* engine)
 
 static void ConstructSpline(Spline* ptr)
 {
-    new (ptr) Spline();
+    new(ptr) Spline();
 }
 
 static void ConstructSpline(InterpolationMode mode, Spline* ptr)
 {
-    new (ptr) Spline(mode);
+    new(ptr) Spline(mode);
 }
 
 static void ConstructSpline(CScriptArray* arr, InterpolationMode mode, Spline* ptr)
 {
-    new (ptr) Spline(ArrayToVector<Variant>(arr), mode);
+    new(ptr) Spline(ArrayToVector<Variant>(arr), mode);
 }
 
 static void ConstructSpline(const Spline& rhs, Spline* ptr)
 {
-    new (ptr) Spline(rhs);
+    new(ptr) Spline(rhs);
 }
 
 static CScriptArray* GetSplineKnots(Spline* ptr)
