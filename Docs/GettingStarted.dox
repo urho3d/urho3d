@@ -87,6 +87,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_EXTRAS        |0|Build extras (native and RPI only)|
 |URHO3D_DOCS          |0|Generate documentation as part of normal build (the 'doc' builtin target can be used to generate documentation regardless of this option's value)|
 |URHO3D_DOCS_QUIET    |0|Generate documentation as part of normal build, suppress generation process from sending anything to stdout|
+|URHO3D_PCH           |1|Enable PCH support|
 |URHO3D_SSE           |1|Enable SSE instruction set|
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
