@@ -305,8 +305,8 @@ task :ci_create_mirrors do
   # Skip if there are more commits since this one
   abort 'Skipped creating mirror branches due to moving HEAD' unless `git fetch -qf origin #{ENV['TRAVIS_PULL_REQUEST'] == 'false' ? ENV['TRAVIS_BRANCH'] : %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST']}/head'}}; git log -1 --pretty=format:'%H' FETCH_HEAD` == ENV['TRAVIS_COMMIT']
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
-  # Limit the frequency of scanning
-  scan = `ccache -s |grep 'cache miss'`.split.last.to_i >= ENV['COVERITY_SCAN_THRESHOLD'].to_i || /\[ci scan\]/ =~ ENV['COMMIT_MESSAGE']
+  # Limit the scanning to only master branch and limit the frequency of scanning
+  scan = ENV['TRAVIS_BRANCH'] == 'master' && (`ccache -s |grep 'cache miss'`.split.last.to_i >= ENV['COVERITY_SCAN_THRESHOLD'].to_i || /\[ci scan\]/ =~ ENV['COMMIT_MESSAGE'])
   # Determine which CI mirror branches to be auto created
   unless ENV['RELEASE_TAG']
     matched = /\[ci only:(.*?)\]/.match(ENV['COMMIT_MESSAGE'])

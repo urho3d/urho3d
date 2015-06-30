@@ -189,7 +189,7 @@ public:
     void AddBool(bool value);
     /// Add float.
     void AddFloat(float value);
-    /// Add float.
+    /// Add double.
     void AddDouble(double value);
     /// Add vector2.
     void AddVector2(const Vector2& value);
