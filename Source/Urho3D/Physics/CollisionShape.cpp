@@ -914,23 +914,30 @@ void CollisionShape::OnNodeSet(Node* node)
 {
     if (node)
     {
-        Scene* scene = GetScene();
-        if (scene)
-        {
-            if (scene == node)
-                LOGWARNING(GetTypeName() + " should not be created to the root scene node");
-
-            physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
-            physicsWorld_->AddCollisionShape(this);
-        }
-        else
-            LOGERROR("Node is detached from scene, can not create collision shape");
-
         node->AddListener(this);
         cachedWorldScale_ = node->GetWorldScale();
 
         // Terrain collision shape depends on the terrain component's geometry updates. Subscribe to them
         SubscribeToEvent(node, E_TERRAINCREATED, HANDLER(CollisionShape, HandleTerrainCreated));
+    }
+}
+
+void CollisionShape::OnSceneSet(Scene* scene)
+{
+    if (scene)
+    {
+        if (scene == node_)
+            LOGWARNING(GetTypeName() + " should not be created to the root scene node");
+
+        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
+        physicsWorld_->AddCollisionShape(this);
+    }
+    else
+    {
+        ReleaseShape();
+
+        if (physicsWorld_)
+            physicsWorld_->RemoveCollisionShape(this);
     }
 }
 

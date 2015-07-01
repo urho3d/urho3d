@@ -78,9 +78,7 @@ void LogicComponent::OnNodeSet(Node* node)
 {
     if (node)
     {
-        // We have been attached to a node. Set initial update event subscription state
-        UpdateEventSubscription();
-        // Then execute the user-defined start function
+        // Execute the user-defined start function
         Start();
     }
     else
@@ -90,12 +88,22 @@ void LogicComponent::OnNodeSet(Node* node)
     }
 }
 
+void LogicComponent::OnSceneSet(Scene* scene)
+{
+    if (scene)
+        UpdateEventSubscription();
+    else
+    {
+        UnsubscribeFromEvent(E_SCENEUPDATE);
+        UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
+        UnsubscribeFromEvent(E_PHYSICSPRESTEP);
+        UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
+        currentEventMask_ = 0;
+    }
+}
+
 void LogicComponent::UpdateEventSubscription()
 {
-    // If scene node is not assigned yet, no need to update subscription
-    if (!node_)
-        return;
-    
     Scene* scene = GetScene();
     if (!scene)
     {

@@ -216,6 +216,10 @@ void Component::OnNodeSet(Node* node)
 {
 }
 
+void Component::OnSceneSet(Scene* scene)
+{
+}
+
 void Component::OnMarkedDirty(Node* node)
 {
 }

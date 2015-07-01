@@ -757,14 +757,12 @@ VariantVector AnimationController::GetNodeAnimationStatesAttr() const
     return ret;
 }
 
-void AnimationController::OnNodeSet(Node* node)
+void AnimationController::OnSceneSet(Scene* scene)
 {
-    if (node)
-    {
-        Scene* scene = GetScene();
-        if (scene && IsEnabledEffective())
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimationController, HandleScenePostUpdate));
-    }
+    if (scene && IsEnabledEffective())
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimationController, HandleScenePostUpdate));
+    else if (!scene)
+        UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
 }
 
 AnimationState* AnimationController::AddAnimationState(Animation* animation)

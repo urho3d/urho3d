@@ -909,22 +909,27 @@ void RigidBody::OnMarkedDirty(Node* node)
 void RigidBody::OnNodeSet(Node* node)
 {
     if (node)
-    {
-        Scene* scene = GetScene();
-        if (scene)
-        {
-            if (scene == node)
-                LOGWARNING(GetTypeName() + " should not be created to the root scene node");
-
-            physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
-            physicsWorld_->AddRigidBody(this);
-
-            AddBodyToWorld();
-        }
-        else
-            LOGERROR("Node is detached from scene, can not create rigid body");
-
         node->AddListener(this);
+}
+
+void RigidBody::OnSceneSet(Scene* scene)
+{
+    if (scene)
+    {
+        if (scene == node_)
+            LOGWARNING(GetTypeName() + " should not be created to the root scene node");
+
+        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
+        physicsWorld_->AddRigidBody(this);
+
+        AddBodyToWorld();
+    }
+    else
+    {
+        ReleaseBody();
+
+        if (physicsWorld_)
+            physicsWorld_->RemoveRigidBody(this);
     }
 }
 

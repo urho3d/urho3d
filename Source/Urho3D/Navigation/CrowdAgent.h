@@ -133,6 +133,8 @@ protected:
     virtual void OnCrowdAgentReposition(const Vector3& newPos, const Vector3& newVel);
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
+    /// Handle node being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// \todo Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
     /// Get internal Detour crowd agent.

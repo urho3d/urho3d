@@ -74,6 +74,8 @@ class URHO3D_API LogicComponent : public Component
 protected:
     /// Handle scene node being assigned at creation.
     virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
     
 private:
     /// Subscribe/unsubscribe to update events based on current enabled state and update event mask.

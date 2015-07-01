@@ -408,16 +408,14 @@ VariantVector ParticleEmitter::GetParticleBillboardsAttr() const
     return ret;
 }
 
-void ParticleEmitter::OnNodeSet(Node* node)
+void ParticleEmitter::OnSceneSet(Scene* scene)
 {
-    BillboardSet::OnNodeSet(node);
+    BillboardSet::OnSceneSet(scene);
 
-    if (node)
-    {
-        Scene* scene = GetScene();
-        if (scene && IsEnabledEffective())
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
-    }
+    if (scene && IsEnabledEffective())
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
+    else if (!scene)
+         UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
 }
 
 bool ParticleEmitter::EmitNewParticle()

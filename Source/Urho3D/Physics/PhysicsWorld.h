@@ -217,8 +217,8 @@ public:
     bool IsApplyingTransforms() const { return applyingTransforms_; }
 
 protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
 
 private:
     /// Handle the scene subsystem update event, step simulation here.

@@ -844,6 +844,8 @@ void Scene::ComponentAdded(Component* component)
 
         localComponents_[id] = component;
     }
+
+    component->OnSceneSet(this);
 }
 
 void Scene::ComponentRemoved(Component* component)
@@ -858,6 +860,7 @@ void Scene::ComponentRemoved(Component* component)
         localComponents_.Erase(id);
 
     component->SetID(0);
+    component->OnSceneSet(0);
 }
 
 void Scene::SetVarNamesAttr(const String& value)

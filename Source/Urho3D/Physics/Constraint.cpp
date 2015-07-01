@@ -441,20 +441,27 @@ void Constraint::OnNodeSet(Node* node)
 {
     if (node)
     {
-        Scene* scene = GetScene();
-        if (scene)
-        {
-            if (scene == node)
-                LOGWARNING(GetTypeName() + " should not be created to the root scene node");
-
-            physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
-            physicsWorld_->AddConstraint(this);
-        }
-        else
-            LOGERROR("Node is detached from scene, can not create constraint");
-
         node->AddListener(this);
         cachedWorldScale_ = node->GetWorldScale();
+    }
+}
+
+void Constraint::OnSceneSet(Scene* scene)
+{
+    if (scene)
+    {
+        if (scene == node_)
+            LOGWARNING(GetTypeName() + " should not be created to the root scene node");
+
+        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
+        physicsWorld_->AddConstraint(this);
+    }
+    else
+    {
+        ReleaseConstraint();
+
+        if (physicsWorld_)
+            physicsWorld_->RemoveConstraint(this);
     }
 }
 
