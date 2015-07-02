@@ -295,6 +295,8 @@ Whenever there is some hierarchical composition, it is recommended (and in fact 
 
 It is also legal to create a Node that does not belong to a scene. This is useful for example with a camera moving in a scene that may be loaded or saved, because then the camera will not be saved along with the actual scene, and will not be destroyed when the scene is loaded.
 
+However, depending on the components used, creating components to a node outside the scene, then moving the node to a scene later may not work completely as expected. For example, a RigidBody component can not store its velocities if it does not have access to the scene's physics world component to actually create the Bullet rigid body object.
+
 \section SceneModel_Update Scene updates
 
 A Scene whose updates are enabled (default) will be automatically updated on each main loop iteration. See \ref Scene::SetUpdateEnabled "SetUpdateEnabled()".
