@@ -415,7 +415,8 @@ CollisionShape::CollisionShape(Context* context) :
     lodLevel_(0),
     customGeometryID_(0),
     margin_(DEFAULT_COLLISION_MARGIN),
-    recreateShape_(true)
+    recreateShape_(true),
+    retryCreation_(false)
 {
 }
 
@@ -931,6 +932,13 @@ void CollisionShape::OnSceneSet(Scene* scene)
 
         physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
         physicsWorld_->AddCollisionShape(this);
+
+        // Create shape now if necessary (attributes modified before adding to scene)
+        if (retryCreation_)
+        {
+            UpdateShape();
+            NotifyRigidBody();
+        }
     }
     else
     {
@@ -938,6 +946,9 @@ void CollisionShape::OnSceneSet(Scene* scene)
 
         if (physicsWorld_)
             physicsWorld_->RemoveCollisionShape(this);
+
+        // Recreate when moved to a scene again
+        retryCreation_ = true;
     }
 }
 
@@ -1001,8 +1012,12 @@ void CollisionShape::UpdateShape()
 
     ReleaseShape();
 
+    // If no physics world available now mark for retry later
     if (!physicsWorld_)
+    {
+        retryCreation_ = true;
         return;
+    }
 
     if (node_)
     {
@@ -1151,6 +1166,7 @@ void CollisionShape::UpdateShape()
         physicsWorld_->CleanupGeometryCache();
 
     recreateShape_ = false;
+    retryCreation_ = false;
 }
 
 void CollisionShape::HandleTerrainCreated(StringHash eventType, VariantMap& eventData)

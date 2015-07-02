@@ -65,7 +65,8 @@ Constraint::Constraint(Context* context) :
     otherBodyNodeID_(0),
     disableCollision_(false),
     recreateConstraint_(true),
-    framesDirty_(false)
+    framesDirty_(false),
+    retryCreation_(false)
 {
 }
 
@@ -455,6 +456,10 @@ void Constraint::OnSceneSet(Scene* scene)
 
         physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
         physicsWorld_->AddConstraint(this);
+
+        // Create constraint now if necessary (attributes modified before adding to scene)
+        if (retryCreation_)
+            CreateConstraint();
     }
     else
     {
@@ -462,6 +467,9 @@ void Constraint::OnSceneSet(Scene* scene)
 
         if (physicsWorld_)
             physicsWorld_->RemoveConstraint(this);
+
+        // Recreate when moved to a scene again
+        retryCreation_ = true;
     }
 }
 
@@ -484,8 +492,12 @@ void Constraint::CreateConstraint()
     btRigidBody* ownBody = ownBody_ ? ownBody_->GetBody() : 0;
     btRigidBody* otherBody = otherBody_ ? otherBody_->GetBody() : 0;
 
+    // If no physics world available now mark for retry later
     if (!physicsWorld_ || !ownBody)
+    {
+        retryCreation_ = true;
         return;
+    }
 
     if (!otherBody)
         otherBody = &btTypedConstraint::getFixedBody();
@@ -546,6 +558,7 @@ void Constraint::CreateConstraint()
 
     recreateConstraint_ = false;
     framesDirty_ = false;
+    retryCreation_ = false;
 }
 
 void Constraint::ApplyLimits()

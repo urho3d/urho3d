@@ -744,14 +744,10 @@ void Scene::NodeAdded(Node* node)
     if (!node || node->GetScene() == this)
         return;
 
-    // If node already exists in another scene, remove. This is unsupported, as components will not reinitialize themselves
-    // to use the new scene
+    // Remove from old scene first
     Scene* oldScene = node->GetScene();
     if (oldScene)
-    {
-        LOGERROR("Moving a node from one scene to another is unsupported");
         oldScene->NodeRemoved(node);
-    }
 
     node->SetScene(this);
 
@@ -770,7 +766,7 @@ void Scene::NodeAdded(Node* node)
         if (i != replicatedNodes_.End() && i->second_ != node)
         {
             LOGWARNING("Overwriting node with ID " + String(id));
-            i->second_->ResetScene();
+            NodeRemoved(i->second_);
         }
 
         replicatedNodes_[id] = node;
@@ -784,11 +780,18 @@ void Scene::NodeAdded(Node* node)
         if (i != localNodes_.End() && i->second_ != node)
         {
             LOGWARNING("Overwriting node with ID " + String(id));
-            i->second_->ResetScene();
+            NodeRemoved(i->second_);
         }
-
         localNodes_[id] = node;
     }
+
+    // Add already created components and child nodes now
+    const Vector<SharedPtr<Component> >& components = node->GetComponents();
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
+        ComponentAdded(*i);
+    const Vector<SharedPtr<Node> >& children = node->GetChildren();
+    for (Vector<SharedPtr<Node> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
+        NodeAdded(*i);
 }
 
 void Scene::NodeRemoved(Node* node)
@@ -805,8 +808,8 @@ void Scene::NodeRemoved(Node* node)
     else
         localNodes_.Erase(id);
 
-    node->SetID(0);
-    node->SetScene(0);
+    node->ResetScene();
+
     // Remove components and child nodes as well
     const Vector<SharedPtr<Component> >& components = node->GetComponents();
     for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
@@ -822,13 +825,21 @@ void Scene::ComponentAdded(Component* component)
         return;
 
     unsigned id = component->GetID();
+
+    // If the new component has an ID of zero (default), assign a replicated ID now
+    if (!id)
+    {
+        id = GetFreeComponentID(REPLICATED);
+        component->SetID(id);
+    }
+
     if (id < FIRST_LOCAL_ID)
     {
         HashMap<unsigned, Component*>::Iterator i = replicatedComponents_.Find(id);
         if (i != replicatedComponents_.End() && i->second_ != component)
         {
             LOGWARNING("Overwriting component with ID " + String(id));
-            i->second_->SetID(0);
+            ComponentRemoved(i->second_);
         }
 
         replicatedComponents_[id] = component;
@@ -839,7 +850,7 @@ void Scene::ComponentAdded(Component* component)
         if (i != localComponents_.End() && i->second_ != component)
         {
             LOGWARNING("Overwriting component with ID " + String(id));
-            i->second_->SetID(0);
+            ComponentRemoved(i->second_);
         }
 
         localComponents_[id] = component;

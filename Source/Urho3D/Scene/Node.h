@@ -421,7 +421,7 @@ public:
     void SetID(unsigned id);
     /// Set scene. Called by Scene.
     void SetScene(Scene* scene);
-    /// Reset scene. Called by Scene.
+    /// Reset scene, ID and owner. Called by Scene.
     void ResetScene();
     /// Set network position attribute.
     void SetNetPositionAttr(const Vector3& value);

@@ -264,6 +264,8 @@ private:
     float margin_;
     /// Recrease collision shape flag.
     bool recreateShape_;
+    /// Shape creation retry flag if attributes initially set without scene.
+    bool retryCreation_;
 };
 
 }
