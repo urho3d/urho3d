@@ -276,9 +276,7 @@ void LuaScriptInstance::ApplyAttributes()
 {
     LuaFunction* function = scriptObjectMethods_[LSOM_APPLYATTRIBUTES];
     if (function && function->BeginCall(this))
-    {
         function->EndCall();
-    }
 }
 
 void LuaScriptInstance::OnSetEnabled()
@@ -481,6 +479,14 @@ PODVector<unsigned char> LuaScriptInstance::GetScriptNetworkDataAttr() const
     return buf.GetBuffer();
 }
 
+void LuaScriptInstance::OnSceneSet(Scene* scene)
+{
+    if (scene)
+        SubscribeToScriptMethodEvents();
+    else
+        UnsubscribeFromScriptMethodEvents();
+}
+
 void LuaScriptInstance::OnMarkedDirty(Node* node)
 {
     // Script functions are not safe from worker threads
@@ -493,9 +499,7 @@ void LuaScriptInstance::OnMarkedDirty(Node* node)
 
     LuaFunction* function = scriptObjectMethods_[LSOM_TRANSFORMCHANGED];
     if (function && function->BeginCall(this))
-    {
         function->EndCall();
-    }
 }
 
 void LuaScriptInstance::GetScriptAttributes()
@@ -616,21 +620,12 @@ void LuaScriptInstance::SubscribeToScriptMethodEvents()
 
 void LuaScriptInstance::UnsubscribeFromScriptMethodEvents()
 {
-    Scene* scene = GetScene();
-    if (scene && scriptObjectMethods_[LSOM_UPDATE])
-        UnsubscribeFromEvent(scene, E_SCENEUPDATE);
-
-    if (scene && scriptObjectMethods_[LSOM_POSTUPDATE])
-        UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
+    UnsubscribeFromEvent(E_SCENEUPDATE);
+    UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
 
 #ifdef URHO3D_PHYSICS
-    PhysicsWorld* physicsWorld = scene ? scene->GetComponent<PhysicsWorld>() : 0;
-
-    if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDUPDATE])
-        UnsubscribeFromEvent(physicsWorld, E_PHYSICSPRESTEP);
-
-    if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDPOSTUPDATE])
-        UnsubscribeFromEvent(physicsWorld, E_PHYSICSPOSTSTEP);
+    UnsubscribeFromEvent(E_PHYSICSPRESTEP);
+    UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
 #endif
 
     if (node_ && scriptObjectMethods_[LSOM_TRANSFORMCHANGED])
@@ -711,6 +706,9 @@ void LuaScriptInstance::ReleaseObject()
         function->PushUserType((void*)this, "LuaScriptInstance");
         function->EndCall();
     }
+
+    for (int i = 0; i < MAX_LUA_SCRIPT_OBJECT_METHODS; ++i)
+        scriptObjectMethods_[i] = 0;
 }
 
 LuaFunction* LuaScriptInstance::GetScriptObjectFunction(const String& functionName) const

@@ -472,16 +472,27 @@ float RigidBody2D::GetAngularVelocity() const
 
 void RigidBody2D::OnNodeSet(Node* node)
 {
-    Component::OnNodeSet(node);
-
     if (node)
-    {
         node->AddListener(this);
-        Scene* scene = GetScene();
+}
+
+void RigidBody2D::OnSceneSet(Scene* scene)
+{
+    if (scene)
+    {
         physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
 
         CreateBody();
         physicsWorld_->AddRigidBody(this);
+    }
+    else
+    {
+        if (physicsWorld_)
+        {
+            ReleaseBody();
+            physicsWorld_->RemoveRigidBody(this);
+            physicsWorld_.Reset();
+        }
     }
 }
 

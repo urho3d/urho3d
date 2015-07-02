@@ -125,9 +125,6 @@ void Constraint2D::OnNodeSet(Node* node)
 
     if (node)
     {
-        Scene* scene = GetScene();
-        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
-
         ownerBody_ = node->GetComponent<RigidBody2D>();
         if (!ownerBody_)
         {
@@ -135,6 +132,12 @@ void Constraint2D::OnNodeSet(Node* node)
             return;
         }
     }
+}
+
+void Constraint2D::OnSceneSet(Scene* scene)
+{
+    if (scene)
+        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
 }
 
 void Constraint2D::InitializeJointDef(b2JointDef* jointDef)

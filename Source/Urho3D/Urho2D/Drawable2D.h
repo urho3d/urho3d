@@ -90,8 +90,8 @@ public:
     const Vector<SourceBatch2D>& GetSourceBatches();
 
 protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
     /// Handle draw order changed.

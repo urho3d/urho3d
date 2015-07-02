@@ -128,6 +128,8 @@ public:
     ResourceRef GetScriptFileAttr() const;
 
 protected:
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
 

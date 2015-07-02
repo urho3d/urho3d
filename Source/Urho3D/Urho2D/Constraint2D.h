@@ -73,6 +73,8 @@ public:
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// Return joint def.
     virtual b2JointDef* GetJointDef() { return 0; };
     /// Recreate joint.

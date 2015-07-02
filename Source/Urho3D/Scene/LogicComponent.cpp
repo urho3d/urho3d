@@ -96,8 +96,10 @@ void LogicComponent::OnSceneSet(Scene* scene)
     {
         UnsubscribeFromEvent(E_SCENEUPDATE);
         UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
+#ifdef URHO3D_PHYSICS
         UnsubscribeFromEvent(E_PHYSICSPRESTEP);
         UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
+#endif
         currentEventMask_ = 0;
     }
 }

@@ -116,8 +116,8 @@ public:
     ResourceRef GetSpriteAttr() const;
 
 private:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Handle draw order changed.

@@ -478,6 +478,23 @@ PODVector<unsigned char> ScriptInstance::GetScriptNetworkDataAttr() const
     }
 }
 
+void ScriptInstance::OnSceneSet(Scene* scene)
+{
+    if (scene)
+        UpdateEventSubscription();
+    else
+    {
+        UnsubscribeFromEvent(E_SCENEUPDATE);
+        UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
+#ifdef URHO3D_PHYSICS
+        UnsubscribeFromEvent(E_PHYSICSPRESTEP);
+        UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
+#endif
+        subscribed_ = false;
+        subscribedPostFixed_ = false;
+    }
+}
+
 void ScriptInstance::OnMarkedDirty(Node* node)
 {
     // Script functions are not safe from worker threads
