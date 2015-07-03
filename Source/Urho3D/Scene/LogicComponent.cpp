@@ -108,10 +108,7 @@ void LogicComponent::UpdateEventSubscription()
 {
     Scene* scene = GetScene();
     if (!scene)
-    {
-        LOGWARNING("Node is detached from scene, can not subscribe to update events");
         return;
-    }
     
     bool enabled = IsEnabledEffective();
     
