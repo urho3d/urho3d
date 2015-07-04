@@ -10,7 +10,7 @@ varying vec2 vTexCoord;
 #ifndef GL_ES
 varying vec2 vDetailTexCoord;
 #else
-varying lowp vec2 vDetailTexCoord;
+varying mediump vec2 vDetailTexCoord;
 #endif
 
 varying vec3 vNormal;
@@ -44,7 +44,7 @@ uniform sampler2D sDetailMap3;
 #ifndef GL_ES
 uniform vec2 cDetailTiling;
 #else
-uniform lowp vec2 cDetailTiling;
+uniform mediump vec2 cDetailTiling;
 #endif
 
 void VS()
