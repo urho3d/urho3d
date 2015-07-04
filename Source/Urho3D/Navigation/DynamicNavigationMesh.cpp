@@ -881,11 +881,13 @@ void DynamicNavigationMesh::ReleaseTileCache()
     tileCache_ = 0;
 }
 
-void DynamicNavigationMesh::OnNodeSet(Node* node)
+void DynamicNavigationMesh::OnSceneSet(Scene* scene)
 {
     // Subscribe to the scene subsystem update, which will trigger the tile cache to update the nav mesh
-    if (node)
-        SubscribeToEvent(node, E_SCENESUBSYSTEMUPDATE, HANDLER(DynamicNavigationMesh, HandleSceneSubsystemUpdate));
+    if (scene)
+        SubscribeToEvent(scene, E_SCENESUBSYSTEMUPDATE, HANDLER(DynamicNavigationMesh, HandleSceneSubsystemUpdate));
+    else
+        UnsubscribeFromEvent(E_SCENESUBSYSTEMUPDATE);
 }
 
 void DynamicNavigationMesh::AddObstacle(Obstacle* obstacle, bool silent)

@@ -173,26 +173,17 @@ ResourceRef AnimatedSprite2D::GetAnimationSetAttr() const
     return GetResourceRef(animationSet_, AnimationSet2D::GetTypeStatic());
 }
 
-void AnimatedSprite2D::OnNodeSet(Node* node)
+void AnimatedSprite2D::OnSceneSet(Scene* scene)
 {
-    StaticSprite2D::OnNodeSet(node);
+    StaticSprite2D::OnSceneSet(scene);
 
-    if (node)
+    if (scene)
     {
-        Scene* scene = GetScene();
-        if (scene && IsEnabledEffective())
+        if (IsEnabledEffective())
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimatedSprite2D, HandleScenePostUpdate));
     }
     else
-    {
-        if (rootNode_)
-            rootNode_->Remove();
-
-        rootNode_ = 0;
-        numTracks_ = 0;
-        trackNodes_.Clear();
-        trackNodeInfos_.Clear();
-    }
+        UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
 }
 
 void AnimatedSprite2D::SetAnimationAttr(const String& name)

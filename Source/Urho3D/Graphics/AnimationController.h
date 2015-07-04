@@ -174,8 +174,8 @@ public:
     VariantVector GetNodeAnimationStatesAttr() const;
 
 protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
 
 private:
     /// Add an animation state either to AnimatedModel or as a node animation.

@@ -1419,6 +1419,11 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
 
     components_.Push(SharedPtr<Component>(component));
 
+    if (component->GetNode())
+        LOGWARNING("Component " + component->GetTypeName() + " already belongs to a node!");
+
+    component->SetNode(this);
+
     // If zero ID specified, or the ID is already taken, let the scene assign
     if (scene_)
     {
@@ -1430,10 +1435,6 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
     else
         component->SetID(id);
 
-    if(component->GetNode())
-        LOGWARNING("Component " + component->GetTypeName() + " already belongs to a node!");
-
-    component->SetNode(this);
     component->OnMarkedDirty(this);
 
     // Check attributes of the new component on next network update, and mark node dirty in all replication states
@@ -1698,7 +1699,6 @@ void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
     child->parent_ = 0;
     child->MarkDirty();
     child->MarkNetworkUpdate();
-    // Remove the child from the scene already at this point, in case it is not destroyed immediately
     if (scene_)
         scene_->NodeRemoved(child);
 

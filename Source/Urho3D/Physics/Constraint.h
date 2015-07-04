@@ -136,6 +136,8 @@ public:
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
     
@@ -181,6 +183,8 @@ private:
     bool recreateConstraint_;
     /// Coordinate frames dirty flag.
     bool framesDirty_;
+    /// Constraint creation retry flag if attributes initially set without scene.
+    bool retryCreation_;
 };
 
 }

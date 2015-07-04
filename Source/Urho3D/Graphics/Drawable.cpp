@@ -359,10 +359,13 @@ void Drawable::LimitVertexLights(bool removeConvertedLights)
 void Drawable::OnNodeSet(Node* node)
 {
     if (node)
-    {
-        AddToOctree();
         node->AddListener(this);
-    }
+}
+
+void Drawable::OnSceneSet(Scene* scene)
+{
+    if (scene)
+        AddToOctree();
     else
         RemoveFromOctree();
 }

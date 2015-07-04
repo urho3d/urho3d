@@ -107,17 +107,17 @@ void CrowdAgent::RegisterObject(Context* context)
 void CrowdAgent::OnNodeSet(Node* node)
 {
     if (node)
-    {
-        Scene* scene = GetScene();
-        if (scene)
-        {
-            if (scene == node)
-                LOGERROR(GetTypeName() + " should not be created to the root scene node");
-            crowdManager_ = scene->GetOrCreateComponent<DetourCrowdManager>();
-            AddAgentToCrowd();
-        }
-
         node->AddListener(this);
+}
+
+void CrowdAgent::OnSceneSet(Scene* scene)
+{
+    if (scene)
+    {
+        if (scene == node_)
+            LOGERROR(GetTypeName() + " should not be created to the root scene node");
+        crowdManager_ = scene->GetOrCreateComponent<DetourCrowdManager>();
+        AddAgentToCrowd();
     }
     else
         RemoveAgentFromCrowd();

@@ -106,8 +106,8 @@ public:
     VariantVector GetParticleBillboardsAttr() const;
 
 protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
 
     /// Create a new particle. Return true if there was room.
     bool EmitNewParticle();

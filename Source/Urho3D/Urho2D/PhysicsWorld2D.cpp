@@ -602,14 +602,13 @@ bool PhysicsWorld2D::GetAutoClearForces() const
     return world_->GetAutoClearForces();
 }
 
-void PhysicsWorld2D::OnNodeSet(Node* node)
+void PhysicsWorld2D::OnSceneSet(Scene* scene)
 {
     // Subscribe to the scene subsystem update, which will trigger the physics simulation step
-    if (node)
-    {
-        scene_ = GetScene();
-        SubscribeToEvent(node, E_SCENESUBSYSTEMUPDATE, HANDLER(PhysicsWorld2D, HandleSceneSubsystemUpdate));
-    }
+    if (scene)
+        SubscribeToEvent(scene, E_SCENESUBSYSTEMUPDATE, HANDLER(PhysicsWorld2D, HandleSceneSubsystemUpdate));
+    else
+        UnsubscribeFromEvent(E_SCENESUBSYSTEMUPDATE);
 }
 
 void PhysicsWorld2D::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData)

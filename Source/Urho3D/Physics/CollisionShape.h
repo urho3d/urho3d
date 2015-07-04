@@ -221,6 +221,8 @@ public:
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
 
@@ -262,6 +264,8 @@ private:
     float margin_;
     /// Recrease collision shape flag.
     bool recreateShape_;
+    /// Shape creation retry flag if attributes initially set without scene.
+    bool retryCreation_;
 };
 
 }

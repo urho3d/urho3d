@@ -164,16 +164,14 @@ ResourceRef ParticleEmitter2D::GetSpriteAttr() const
     return Sprite2D::SaveToResourceRef(sprite_);
 }
 
-void ParticleEmitter2D::OnNodeSet(Node* node)
+void ParticleEmitter2D::OnSceneSet(Scene* scene)
 {
-    Drawable2D::OnNodeSet(node);
+    Drawable2D::OnSceneSet(scene);
 
-    if (node)
-    {
-        Scene* scene = GetScene();
-        if (scene && IsEnabledEffective())
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter2D, HandleScenePostUpdate));
-    }
+    if (scene && IsEnabledEffective())
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter2D, HandleScenePostUpdate));
+    else if (!scene)
+        UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
 }
 
 void ParticleEmitter2D::OnWorldBoundingBoxUpdate()
@@ -253,7 +251,7 @@ void ParticleEmitter2D::UpdateSourceBatches()
 
 void ParticleEmitter2D::UpdateMaterial()
 {
-    if (sprite_)
+    if (sprite_ && renderer_)
         sourceBatches_[0].material_ = renderer_->GetMaterial(sprite_->GetTexture(), blendMode_);
     else
         sourceBatches_[0].material_ = 0;
