@@ -621,6 +621,8 @@ bool Graphics::BeginFrame()
 {
     if (!IsInitialized() || IsDeviceLost())
         return false;
+        
+        SDL_GL_MakeCurrent(impl_->window_, impl_->context_);
     
     // If using an external window, check it for size changes, and reset screen mode if necessary
     if (externalWindow_)
@@ -2319,6 +2321,8 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
 {
     if (!impl_->window_)
         return;
+    
+    SDL_GL_MakeCurrent(impl_->window_, impl_->context_);
     
     {
         MutexLock lock(gpuObjectMutex_);
