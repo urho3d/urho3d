@@ -103,6 +103,8 @@ public:
     GraphicsImpl();
     /// Return the SDL window.
     SDL_Window* GetWindow() const { return window_; }
+    /// Return the GL Context.
+    const SDL_GLContext& GetGLContext() { return context_; }
 
 private:
     /// SDL window.
