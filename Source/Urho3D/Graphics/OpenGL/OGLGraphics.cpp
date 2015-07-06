@@ -2322,6 +2322,8 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     if (!impl_->window_)
         return;
     
+    SDL_GL_MakeCurrent(impl_->window_, impl_->context_);
+    
     {
         MutexLock lock(gpuObjectMutex_);
         
