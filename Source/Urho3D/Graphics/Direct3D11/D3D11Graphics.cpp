@@ -696,14 +696,14 @@ void Graphics::EndFrame()
 
 void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned stencil)
 {
-    PrepareDraw();
-
     IntVector2 rtSize = GetRenderTargetDimensions();
     
     // D3D11 clear always clears the whole target regardless of viewport or scissor test settings
     // Emulate partial clear by rendering a quad
     if (!viewport_.left_ && !viewport_.top_ && viewport_.right_ == rtSize.x_ && viewport_.bottom_ == rtSize.y_)
     {
+        PrepareDraw();
+
         if ((flags & CLEAR_COLOR) && impl_->renderTargetViews_[0])
             impl_->deviceContext_->ClearRenderTargetView(impl_->renderTargetViews_[0], color.Data());
         
@@ -729,6 +729,7 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
         Matrix4 projection = Matrix4::IDENTITY;
         model.m23_ = Clamp(depth, 0.0f, 1.0f);
 
+        SetBlendMode(BLEND_REPLACE);
         SetColorWrite((flags & CLEAR_COLOR) != 0);
         SetCullMode(CULL_NONE);
         SetDepthTest(CMP_ALWAYS);
