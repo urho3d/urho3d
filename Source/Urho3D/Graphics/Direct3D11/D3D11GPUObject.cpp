@@ -23,8 +23,6 @@
 #include "../../Precompiled.h"
 
 #include "../../Graphics/Graphics.h"
-#include "../../Graphics/GraphicsImpl.h"
-#include "../../Graphics/GPUObject.h"
 
 #include "../../DebugNew.h"
 

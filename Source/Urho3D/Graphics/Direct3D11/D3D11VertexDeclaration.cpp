@@ -24,7 +24,6 @@
 
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsImpl.h"
-#include "../../Graphics/ShaderVariation.h"
 #include "../../Graphics/VertexBuffer.h"
 #include "../../Graphics/VertexDeclaration.h"
 #include "../../IO/Log.h"
@@ -34,7 +33,8 @@
 namespace Urho3D
 {
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** vertexBuffers, unsigned* elementMasks) :
+VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** vertexBuffers,
+    unsigned* elementMasks) :
     inputLayout_(0)
 {
     PODVector<D3D11_INPUT_ELEMENT_DESC> elementDescs;
@@ -53,7 +53,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertex
                     newDesc.SemanticName = VertexBuffer::elementSemantics[j];
                     newDesc.SemanticIndex = VertexBuffer::elementSemanticIndices[j];
                     newDesc.Format = (DXGI_FORMAT)VertexBuffer::elementFormats[j];
-                    newDesc.InputSlot = (unsigned)i;
+                    newDesc.InputSlot = (UINT)i;
                     newDesc.AlignedByteOffset = vertexBuffers[i]->GetElementOffset((VertexElement)j);
                     newDesc.InputSlotClass = (j >= ELEMENT_INSTANCEMATRIX1 && j <= ELEMENT_INSTANCEMATRIX3) ?
                         D3D11_INPUT_PER_INSTANCE_DATA : D3D11_INPUT_PER_VERTEX_DATA;
@@ -71,7 +71,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertex
     ID3D11InputLayout* d3dInputLayout = 0;
     const PODVector<unsigned char>& byteCode = vertexShader->GetByteCode();
 
-    graphics->GetImpl()->GetDevice()->CreateInputLayout(&elementDescs[0], (unsigned)elementDescs.Size(), &byteCode[0],
+    graphics->GetImpl()->GetDevice()->CreateInputLayout(&elementDescs[0], (UINT)elementDescs.Size(), &byteCode[0],
         byteCode.Size(), &d3dInputLayout);
     if (d3dInputLayout)
         inputLayout_ = d3dInputLayout;

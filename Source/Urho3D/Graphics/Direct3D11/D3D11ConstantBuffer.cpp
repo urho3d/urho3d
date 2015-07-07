@@ -24,14 +24,13 @@
 
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsImpl.h"
-#include "../../IO/Log.h"
 #include "../../Graphics/ConstantBuffer.h"
+#include "../../IO/Log.h"
 
 #include "../../DebugNew.h"
 
 namespace Urho3D
 {
-
 
 ConstantBuffer::ConstantBuffer(Context* context) :
     Object(context),
