@@ -20,16 +20,18 @@
 // THE SOFTWARE.
 //
 
+#include "../../Precompiled.h"
+
 #include "../../Core/Context.h"
-#include "../../IO/FileSystem.h"
+#include "../../Core/Profiler.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsEvents.h"
 #include "../../Graphics/GraphicsImpl.h"
-#include "../../IO/Log.h"
-#include "../../Core/Profiler.h"
 #include "../../Graphics/Renderer.h"
-#include "../../Resource/ResourceCache.h"
 #include "../../Graphics/Texture3D.h"
+#include "../../IO/FileSystem.h"
+#include "../../IO/Log.h"
+#include "../../Resource/ResourceCache.h"
 #include "../../Resource/XMLFile.h"
 
 #include "../../DebugNew.h"
@@ -40,11 +42,11 @@ namespace Urho3D
 Texture3D::Texture3D(Context* context) :
     Texture(context)
 {
-    #ifndef GL_ES_VERSION_2_0
+#ifndef GL_ES_VERSION_2_0
     target_ = GL_TEXTURE_3D;
-    #else
+#else
     target_ = 0;
-    #endif
+#endif
 }
 
 Texture3D::~Texture3D()
@@ -64,7 +66,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
     // In headless mode, do not actually load the texture, just return success
     if (!graphics_)
         return true;
-    
+
     // If device is lost, retry later
     if (graphics_->IsDeviceLost())
     {
@@ -72,10 +74,10 @@ bool Texture3D::BeginLoad(Deserializer& source)
         dataPending_ = true;
         return true;
     }
-    
+
     String texPath, texName, texExt;
     SplitPath(GetName(), texPath, texName, texExt);
-    
+
     cache->ResetDependencies(this);
 
     loadParameters_ = new XMLFile(context_);
@@ -84,7 +86,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
         loadParameters_.Reset();
         return false;
     }
-    
+
     XMLElement textureElem = loadParameters_->GetRoot();
     XMLElement volumeElem = textureElem.GetChild("volume");
     XMLElement colorlutElem = textureElem.GetChild("colorlut");
@@ -92,7 +94,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
     if (volumeElem)
     {
         String name = volumeElem.GetAttribute("name");
-        
+
         String volumeTexPath, volumeTexName, volumeTexExt;
         SplitPath(name, volumeTexPath, volumeTexName, volumeTexExt);
         // If path is empty, add the XML file path
@@ -109,7 +111,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
     else if (colorlutElem)
     {
         String name = colorlutElem.GetAttribute("name");
-        
+
         String colorlutTexPath, colorlutTexName, colorlutTexExt;
         SplitPath(name, colorlutTexPath, colorlutTexName, colorlutTexExt);
         // If path is empty, add the XML file path
@@ -141,23 +143,23 @@ bool Texture3D::EndLoad()
     // In headless mode, do not actually load the texture, just return success
     if (!graphics_ || graphics_->IsDeviceLost())
         return true;
-    
+
     // If over the texture budget, see if materials can be freed to allow textures to be freed
     CheckTextureBudget(GetTypeStatic());
 
     SetParameters(loadParameters_);
     bool success = SetData(loadImage_);
-    
+
     loadImage_.Reset();
     loadParameters_.Reset();
-    
+
     return success;
 }
 
 void Texture3D::OnDeviceLost()
 {
     GPUObject::OnDeviceLost();
-    
+
     if (renderSurface_)
         renderSurface_->OnDeviceLost();
 }
@@ -177,7 +179,7 @@ void Texture3D::OnDeviceReset()
             dataLost_ = true;
         }
     }
-    
+
     dataPending_ = false;
 }
 
@@ -187,16 +189,16 @@ void Texture3D::Release()
     {
         if (!graphics_ || graphics_->IsDeviceLost())
             return;
-        
+
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
             if (graphics_->GetTexture(i) == this)
                 graphics_->SetTexture(i, 0);
         }
-        
+
         if (renderSurface_)
             renderSurface_->Release();
-        
+
         glDeleteTextures(1, &object_);
         object_ = 0;
     }
@@ -211,30 +213,30 @@ bool Texture3D::SetSize(int width, int height, int depth, unsigned format, Textu
 {
     // Delete the old rendersurface if any
     renderSurface_.Reset();
-    
+
     usage_ = usage;
-    
+
     if (usage >= TEXTURE_RENDERTARGET)
     {
         renderSurface_ = new RenderSurface(this);
-        
+
         // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
         addressMode_[COORD_U] = ADDRESS_CLAMP;
         addressMode_[COORD_V] = ADDRESS_CLAMP;
         filterMode_ = FILTER_NEAREST;
         requestedLevels_ = 1;
     }
-    
+
     if (usage == TEXTURE_RENDERTARGET)
         SubscribeToEvent(E_RENDERSURFACEUPDATE, HANDLER(Texture3D, HandleRenderSurfaceUpdate));
     else
         UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
-    
+
     width_ = width;
     height_ = height;
     depth_ = depth;
     format_ = format;
-    
+
     return Create();
 }
 
@@ -247,47 +249,48 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         LOGERROR("No texture created, can not set data");
         return false;
     }
-    
+
     if (!data)
     {
         LOGERROR("Null source for setting data");
         return false;
     }
-    
+
     if (level >= levels_)
     {
         LOGERROR("Illegal mip level for setting data");
         return false;
     }
-    
+
     if (graphics_->IsDeviceLost())
     {
         LOGWARNING("Texture data assignment while device is lost");
         dataPending_ = true;
         return true;
     }
-    
+
     if (IsCompressed())
     {
         x &= ~3;
         y &= ~3;
     }
-    
+
     int levelWidth = GetLevelWidth(level);
     int levelHeight = GetLevelHeight(level);
     int levelDepth = GetLevelDepth(level);
-    if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || z < 0 || z + depth > levelDepth || width <= 0 || height <= 0 || depth <= 0)
+    if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || z < 0 || z + depth > levelDepth || width <= 0 ||
+        height <= 0 || depth <= 0)
     {
         LOGERROR("Illegal dimensions for setting data");
         return false;
     }
-    
+
     graphics_->SetTextureForUpdate(this);
-    
-    #ifndef GL_ES_VERSION_2_0
+
+#ifndef GL_ES_VERSION_2_0
     bool wholeLevel = x == 0 && y == 0 && z == 0 && width == levelWidth && height == levelHeight && depth == levelDepth;
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
-    
+
     if (!IsCompressed())
     {
         if (wholeLevel)
@@ -300,10 +303,11 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         if (wholeLevel)
             glCompressedTexImage3D(target_, level, format, width, height, depth, 0, GetDataSize(width, height, depth), data);
         else
-            glCompressedTexSubImage3D(target_, level, x, y, z, width, height, depth, format, GetDataSize(width, height, depth), data);
+            glCompressedTexSubImage3D(target_, level, x, y, z, width, height, depth, format, GetDataSize(width, height, depth),
+                data);
     }
-    #endif
-    
+#endif
+
     graphics_->SetTexture(0, 0);
     return true;
 }
@@ -317,12 +321,12 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
     }
 
     unsigned memoryUse = sizeof(Texture3D);
-    
+
     int quality = QUALITY_HIGH;
     Renderer* renderer = GetSubsystem<Renderer>();
     if (renderer)
         quality = renderer->GetTextureQuality();
-    
+
     if (!image->IsCompressed())
     {
         // Convert unsuitable formats to RGBA
@@ -340,7 +344,7 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
         int levelHeight = image->GetHeight();
         int levelDepth = image->GetDepth();
         unsigned format = 0;
-        
+
         // Discard unnecessary mip levels
         for (unsigned i = 0; i < mipsToSkip_[quality]; ++i)
         {
@@ -350,38 +354,42 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
             levelHeight = image->GetHeight();
             levelDepth = image->GetDepth();
         }
-        
+
         switch (components)
         {
         case 1:
             format = useAlpha ? Graphics::GetAlphaFormat() : Graphics::GetLuminanceFormat();
             break;
-            
+
         case 2:
             format = Graphics::GetLuminanceAlphaFormat();
             break;
-            
+
         case 3:
             format = Graphics::GetRGBFormat();
             break;
-            
+
         case 4:
             format = Graphics::GetRGBAFormat();
             break;
+
+        default:
+            assert(false);  // Should not reach here
+            break;
         }
-        
+
         // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
         if (IsCompressed() && requestedLevels_ > 1)
             requestedLevels_ = 0;
         SetSize(levelWidth, levelHeight, levelDepth, format);
         if (!object_)
             return false;
-        
+
         for (unsigned i = 0; i < levels_; ++i)
         {
             SetData(i, 0, 0, 0, levelWidth, levelHeight, levelDepth, levelData);
             memoryUse += levelWidth * levelHeight * levelDepth * components;
-            
+
             if (i < levels_ - 1)
             {
                 image = image->GetNextLevel();
@@ -400,13 +408,13 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
         unsigned levels = image->GetNumCompressedLevels();
         unsigned format = graphics_->GetFormat(image->GetCompressedFormat());
         bool needDecompress = false;
-        
+
         if (!format)
         {
             format = Graphics::GetRGBAFormat();
             needDecompress = true;
         }
-        
+
         unsigned mipsToSkip = mipsToSkip_[quality];
         if (mipsToSkip >= levels)
             mipsToSkip = levels - 1;
@@ -415,10 +423,10 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
         width /= (1 << mipsToSkip);
         height /= (1 << mipsToSkip);
         depth /= (1 << mipsToSkip);
-        
-        SetNumLevels(Max((int)(levels - mipsToSkip), 1));
+
+        SetNumLevels((unsigned)Max((int)(levels - mipsToSkip), 1));
         SetSize(width, height, depth, format);
-        
+
         for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)
         {
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
@@ -437,82 +445,82 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
             }
         }
     }
-    
+
     SetMemoryUse(memoryUse);
     return true;
 }
 
 bool Texture3D::GetData(unsigned level, void* dest) const
 {
-    #ifndef GL_ES_VERSION_2_0
+#ifndef GL_ES_VERSION_2_0
     if (!object_ || !graphics_)
     {
         LOGERROR("No texture created, can not get data");
         return false;
     }
-    
+
     if (!dest)
     {
         LOGERROR("Null destination for getting data");
         return false;
     }
-    
+
     if (level >= levels_)
     {
         LOGERROR("Illegal mip level for getting data");
         return false;
     }
-    
+
     if (graphics_->IsDeviceLost())
     {
         LOGWARNING("Getting texture data while device is lost");
         return false;
     }
-    
+
     graphics_->SetTextureForUpdate(const_cast<Texture3D*>(this));
-    
+
     if (!IsCompressed())
         glGetTexImage(target_, level, GetExternalFormat(format_), GetDataType(format_), dest);
     else
         glGetCompressedTexImage(target_, level, dest);
-    
+
     graphics_->SetTexture(0, 0);
     return true;
-    #else
+#else
     LOGERROR("Getting texture data not supported");
     return false;
-    #endif
+#endif
 }
 
 bool Texture3D::Create()
 {
     Release();
-    
-    #ifdef GL_ES_VERSION_2_0
+
+#ifdef GL_ES_VERSION_2_0
     LOGERROR("Failed to create 3D texture, currently unsupported on OpenGL ES 2");
     return false;
-    #else
+#else
     if (!graphics_ || !width_ || !height_ || !depth_)
         return false;
-    
+
     if (graphics_->IsDeviceLost())
     {
         LOGWARNING("Texture creation while device is lost");
         return true;
     }
-    
+
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
-    
+
     glGenTextures(1, &object_);
-    
+
     // Ensure that our texture is bound to OpenGL texture unit 0
     graphics_->SetTextureForUpdate(this);
-    
+
     // If not compressed, create the initial level 0 texture with null data
     bool success = true;
-    
+
     if (!IsCompressed())
     {
         glGetError();
@@ -523,12 +531,12 @@ bool Texture3D::Create()
             success = false;
         }
     }
-    
+
     // Set mipmapping
     levels_ = requestedLevels_;
     if (!levels_)
     {
-        unsigned maxSize = Max(Max((int)width_, (int)height_), (int)depth_);
+        unsigned maxSize = (unsigned)Max(Max((int)width_, (int)height_), (int)depth_);
         while (maxSize)
         {
             maxSize >>= 1;
@@ -542,9 +550,9 @@ bool Texture3D::Create()
     // Set initial parameters, then unbind the texture
     UpdateParameters();
     graphics_->SetTexture(0, 0);
-    
+
     return success;
-    #endif
+#endif
 }
 
 void Texture3D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)

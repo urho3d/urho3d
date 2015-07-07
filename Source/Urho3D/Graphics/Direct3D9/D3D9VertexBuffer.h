@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include "../../Container/ArrayPtr.h"
 #include "../../Graphics/GPUObject.h"
 #include "../../Graphics/GraphicsDefs.h"
-#include "../../Container/ArrayPtr.h"
 
 namespace Urho3D
 {
@@ -33,20 +33,20 @@ namespace Urho3D
 class URHO3D_API VertexBuffer : public Object, public GPUObject
 {
     OBJECT(VertexBuffer);
-    
+
 public:
     /// Construct.
     VertexBuffer(Context* context);
     /// Destruct.
     virtual ~VertexBuffer();
-    
+
     /// Release default pool resources.
     virtual void OnDeviceLost();
     /// ReCreate default pool resources.
     virtual void OnDeviceReset();
     /// Release buffer.
     virtual void Release();
-    
+
     /// Enable shadowing in CPU memory. Shadowing is forced on if the graphics subsystem does not exist.
     void SetShadowed(bool enable);
     /// Set size and vertex elements and dynamic mode. Previous data will be lost.
@@ -59,25 +59,34 @@ public:
     void* Lock(unsigned start, unsigned count, bool discard = false);
     /// Unlock the buffer and apply changes to the GPU buffer.
     void Unlock();
-    
+
     /// Return whether CPU memory shadowing is enabled.
     bool IsShadowed() const { return shadowed_; }
+
     /// Return whether is dynamic.
     bool IsDynamic() const;
+
     /// Return whether is currently locked.
     bool IsLocked() const { return lockState_ != LOCK_NONE; }
+
     /// Return number of vertices.
-    unsigned GetVertexCount() const {return vertexCount_; }
+    unsigned GetVertexCount() const { return vertexCount_; }
+
     /// Return vertex size.
     unsigned GetVertexSize() const { return vertexSize_; }
+
     /// Return bitmask of vertex elements.
     unsigned GetElementMask() const { return elementMask_; }
+
     /// Return offset of a specified element within a vertex.
     unsigned GetElementOffset(VertexElement element) const { return elementOffset_[element]; }
+
     /// Return buffer hash for building vertex declarations.
     unsigned long long GetBufferHash(unsigned streamIndex, unsigned useMask);
+
     /// Return CPU memory shadow data.
     unsigned char* GetShadowData() const { return shadowData_.Get(); }
+
     /// Return shared array pointer to the CPU memory shadow data.
     SharedArrayPtr<unsigned char> GetShadowDataShared() const { return shadowData_; }
 
@@ -85,10 +94,10 @@ public:
     static unsigned GetVertexSize(unsigned elementMask);
     /// Return element offset from an element mask.
     static unsigned GetElementOffset(unsigned elementMask, VertexElement element);
-    
+
     /// Vertex element sizes.
     static const unsigned elementSize[];
-    
+
 private:
     /// Update offsets of vertex elements.
     void UpdateOffsets();
@@ -100,7 +109,7 @@ private:
     void* MapBuffer(unsigned start, unsigned count, bool discard);
     /// Unmap the GPU buffer.
     void UnmapBuffer();
-    
+
     /// Shadow data.
     SharedArrayPtr<unsigned char> shadowData_;
     /// Number of vertices.
@@ -109,7 +118,7 @@ private:
     unsigned vertexSize_;
     /// Vertex element bitmask.
     unsigned elementMask_;
-   /// Vertex element offsets.
+    /// Vertex element offsets.
     unsigned elementOffset_[MAX_VERTEX_ELEMENTS];
     /// Memory pool.
     unsigned pool_;

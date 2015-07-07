@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../Math/Color.h"
 #include "../Graphics/Drawable.h"
 #include "../Graphics/Texture.h"
+#include "../Math/Color.h"
 
 namespace Urho3D
 {
@@ -74,30 +74,42 @@ public:
 
     /// Return inverse world transform.
     const Matrix3x4& GetInverseWorldTransform() const;
+
     /// Return zone's own ambient color, disregarding gradient mode.
     const Color& GetAmbientColor() const { return ambientColor_; }
+
     /// Return ambient start color. Not safe to call from worker threads due to possible octree query.
     const Color& GetAmbientStartColor();
     /// Return ambient end color. Not safe to call from worker threads due to possible octree query.
     const Color& GetAmbientEndColor();
+
     /// Return fog color.
     const Color& GetFogColor() const { return fogColor_; }
+
     /// Return fog start distance.
     float GetFogStart() const { return fogStart_; }
+
     /// Return fog end distance.
     float GetFogEnd() const { return fogEnd_; }
+
     /// Return fog height distance relative to the scene node's world position.
     float GetFogHeight() const { return fogHeight_; }
+
     /// Return fog height scale.
     float GetFogHeightScale() const { return fogHeightScale_; }
+
     /// Return zone priority.
     int GetPriority() const { return priority_; }
+
     /// Return whether height fog mode is enabled.
     bool GetHeightFog() const { return heightFog_; }
+
     /// Return whether override mode is enabled.
     bool GetOverride() const { return override_; }
+
     /// Return whether ambient gradient mode is enabled.
     bool GetAmbientGradient() const { return ambientGradient_; }
+
     /// Return zone texture.
     Texture* GetZoneTexture() const { return zoneTexture_; }
 

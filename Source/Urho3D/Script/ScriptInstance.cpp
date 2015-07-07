@@ -20,14 +20,16 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Core/Profiler.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #ifdef URHO3D_PHYSICS
 #include "../Physics/PhysicsEvents.h"
 #include "../Physics/PhysicsWorld.h"
 #endif
-#include "../Core/Profiler.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/ResourceEvents.h"
 #include "../Scene/Scene.h"
@@ -80,11 +82,15 @@ void ScriptInstance::RegisterObject(Context* context)
     context->RegisterFactory<ScriptInstance>(LOGIC_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
-    MIXED_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr, PODVector<unsigned char>,
+        Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef,
+        ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Class Name", GetClassName, SetClassName, String, String::EMPTY, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
-    MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+        AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>,
+        Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
 void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -240,7 +246,7 @@ bool ScriptInstance::Execute(const String& declaration, const VariantVector& par
         LOGERROR("Method " + declaration + " not found in class " + className_);
         return false;
     }
-    
+
     return scriptFile_->Execute(scriptObject_, method, parameters);
 }
 
@@ -358,6 +364,25 @@ void ScriptInstance::RemoveEventHandlersExcept(const PODVector<StringHash>& exce
     UnsubscribeFromAllEventsExcept(exceptions, true);
 }
 
+bool ScriptInstance::IsA(const String& className) const
+{
+    // Early out for the easiest case where that's what we are
+    if (className_ == className)
+        return true;
+    if (scriptObject_)
+    {
+        // Start immediately at the first base class because we already checked the early out
+        asIObjectType* currentType = scriptObject_->GetObjectType()->GetBaseType();
+        while (currentType)
+        {
+            if (className == currentType->GetName())
+                return true;
+            currentType = currentType->GetBaseType();
+        }
+    }
+    return false;
+}
+
 bool ScriptInstance::HasMethod(const String& declaration) const
 {
     if (!scriptFile_ || !scriptObject_)
@@ -456,6 +481,23 @@ PODVector<unsigned char> ScriptInstance::GetScriptNetworkDataAttr() const
         parameters.Push(Variant((void*)static_cast<Serializer*>(&buf)));
         scriptFile_->Execute(scriptObject_, methods_[METHOD_WRITENETWORKUPDATE], parameters);
         return buf.GetBuffer();
+    }
+}
+
+void ScriptInstance::OnSceneSet(Scene* scene)
+{
+    if (scene)
+        UpdateEventSubscription();
+    else
+    {
+        UnsubscribeFromEvent(E_SCENEUPDATE);
+        UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
+#ifdef URHO3D_PHYSICS
+        UnsubscribeFromEvent(E_PHYSICSPRESTEP);
+        UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
+#endif
+        subscribed_ = false;
+        subscribedPostFixed_ = false;
     }
 }
 
@@ -758,6 +800,7 @@ void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
 }
 
 #ifdef URHO3D_PHYSICS
+
 void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
 {
     if (!scriptObject_)
@@ -781,7 +824,9 @@ void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
     parameters.Push(eventData[P_TIMESTEP]);
     scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDPOSTUPDATE], parameters);
 }
+
 #endif
+
 void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
 {
     if (!IsEnabledEffective() || !scriptFile_ || !scriptObject_)

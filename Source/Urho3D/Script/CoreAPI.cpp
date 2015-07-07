@@ -20,11 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "../Script/APITemplates.h"
-#include "../Core/Context.h"
+#include "../Precompiled.h"
+
 #include "../Core/ProcessUtils.h"
 #include "../Core/Spline.h"
-#include "../Core/StringUtils.h"
+#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {
@@ -183,6 +183,11 @@ static void ConstructVariantBool(bool value, Variant* ptr)
 static void ConstructVariantFloat(float value, Variant* ptr)
 {
     new(ptr) Variant(value);
+}
+
+static void ConstructVariantDouble(double value, Variant* ptr)
+{
+    new(ptr)Variant(value);
 }
 
 static void ConstructVariantVector2(const Vector2& value, Variant* ptr)
@@ -409,6 +414,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterEnumValue("VariantType", "VAR_MATRIX3", VAR_MATRIX3);
     engine->RegisterEnumValue("VariantType", "VAR_MATRIX3X4", VAR_MATRIX3X4);
     engine->RegisterEnumValue("VariantType", "VAR_MATRIX4", VAR_MATRIX4);
+    engine->RegisterEnumValue("VariantType", "VAR_DOUBLE", VAR_DOUBLE);
 
     engine->RegisterObjectType("ResourceRef", sizeof(ResourceRef), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CK);
     engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructResourceRef), asCALL_CDECL_OBJLAST);
@@ -433,7 +439,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectProperty("ResourceRefList", "StringHash type", offsetof(ResourceRef, type_));
 
     RegisterRefCounted<RefCounted>(engine, "RefCounted");
-    
+
     engine->RegisterObjectType("Variant", sizeof(Variant), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectType("VariantMap", sizeof(VariantMap), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVariant), asCALL_CDECL_OBJLAST);
@@ -443,6 +449,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", asFUNCTION(ConstructVariantStringHash), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(bool)", asFUNCTION(ConstructVariantBool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(float)", asFUNCTION(ConstructVariantFloat), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(double)", asFUNCTION(ConstructVariantDouble), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Vector2&in)", asFUNCTION(ConstructVariantVector2), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Vector3&in)", asFUNCTION(ConstructVariantVector3), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Vector4&in)", asFUNCTION(ConstructVariantVector4), asCALL_CDECL_OBJLAST);
@@ -470,6 +477,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const StringHash&in)", asMETHODPR(Variant, operator =, (const StringHash&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(bool)", asMETHODPR(Variant, operator =, (bool), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(float)", asMETHODPR(Variant, operator =, (float), Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(double)", asMETHODPR(Variant, operator =, (double), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Vector2&in)", asMETHODPR(Variant, operator =, (const Vector2&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Vector3&in)", asMETHODPR(Variant, operator =, (const Vector3&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Vector4&in)", asMETHODPR(Variant, operator =, (const Vector4&), Variant&), asCALL_THISCALL);
@@ -493,6 +501,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "bool opEquals(const StringHash&in) const", asMETHODPR(Variant, operator ==, (const StringHash&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(bool) const", asMETHODPR(Variant, operator ==, (bool) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(float) const", asMETHODPR(Variant, operator ==, (float) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(double) const", asMETHODPR(Variant, operator ==, (double) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Vector2&in) const", asMETHODPR(Variant, operator ==, (const Vector2&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Vector3&in) const", asMETHODPR(Variant, operator ==, (const Vector3&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Vector4&in) const", asMETHODPR(Variant, operator ==, (const Vector4&) const, bool), asCALL_THISCALL);
@@ -515,6 +524,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "StringHash GetStringHash() const", asMETHOD(Variant, GetStringHash), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool GetBool() const", asMETHOD(Variant, GetBool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "float GetFloat() const", asMETHOD(Variant, GetFloat), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "double GetDouble() const", asMETHOD(Variant, GetDouble), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "const Vector2& GetVector2() const", asMETHOD(Variant, GetVector2), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "const Vector3& GetVector3() const", asMETHOD(Variant, GetVector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "const Vector4& GetVector4() const", asMETHOD(Variant, GetVector4), asCALL_THISCALL);
@@ -560,22 +570,22 @@ static void RegisterVariant(asIScriptEngine* engine)
 
 static void ConstructSpline(Spline* ptr)
 {
-    new (ptr) Spline();
+    new(ptr) Spline();
 }
 
 static void ConstructSpline(InterpolationMode mode, Spline* ptr)
 {
-    new (ptr) Spline(mode);
+    new(ptr) Spline(mode);
 }
 
 static void ConstructSpline(CScriptArray* arr, InterpolationMode mode, Spline* ptr)
 {
-    new (ptr) Spline(ArrayToVector<Variant>(arr), mode);
+    new(ptr) Spline(ArrayToVector<Variant>(arr), mode);
 }
 
 static void ConstructSpline(const Spline& rhs, Spline* ptr)
 {
-    new (ptr) Spline(rhs);
+    new(ptr) Spline(rhs);
 }
 
 static CScriptArray* GetSplineKnots(Spline* ptr)
@@ -644,6 +654,7 @@ static void RegisterStringUtils(asIScriptEngine* engine)
     engine->RegisterObjectMethod("String", "void Join(String[]&, const String&in)", asFUNCTION(StringJoin), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "bool ToBool() const", asFUNCTIONPR(ToBool, (const String&), bool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "float ToFloat() const", asFUNCTIONPR(ToFloat, (const String&), float), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "double ToDouble() const", asFUNCTIONPR(ToDouble, (const String&), double), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "int ToInt() const", asFUNCTIONPR(ToInt, (const String&), int), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "uint ToUInt() const", asFUNCTIONPR(ToUInt, (const String&), unsigned), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "Color ToColor() const", asFUNCTIONPR(ToColor, (const String&), Color), asCALL_CDECL_OBJLAST);

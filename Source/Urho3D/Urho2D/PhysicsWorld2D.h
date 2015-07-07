@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Scene/Component.h"
+
 #include <Box2D/Box2D.h>
 
 namespace Urho3D
@@ -35,12 +36,16 @@ class RigidBody2D;
 struct URHO3D_API PhysicsRaycastResult2D
 {
     /// Construct with defaults.
-    PhysicsRaycastResult2D() : body_(0)
+    PhysicsRaycastResult2D() :
+        body_(0)
     {
     }
 
     /// Test for inequality, added to prevent GCC from complaining.
-    bool operator != (const PhysicsRaycastResult2D& rhs) const { return position_ != rhs.position_ || normal_ != rhs.normal_ || distance_ != rhs.distance_ || body_ != rhs.body_; }
+    bool operator !=(const PhysicsRaycastResult2D& rhs) const
+    {
+        return position_ != rhs.position_ || normal_ != rhs.normal_ || distance_ != rhs.distance_ || body_ != rhs.body_;
+    }
 
     /// Hit worldspace position.
     Vector2 position_;
@@ -59,7 +64,7 @@ class URHO3D_API PhysicsWorld2D : public Component, public b2ContactListener, pu
 
 public:
     /// Construct.
-    PhysicsWorld2D(Context* scontext);
+    PhysicsWorld2D(Context* context);
     /// Destruct.
     virtual ~PhysicsWorld2D();
     /// Register object factory.
@@ -124,9 +129,11 @@ public:
     void RemoveRigidBody(RigidBody2D* rigidBody);
 
     /// Perform a physics world raycast and return all hits.
-    void Raycast(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED);
+    void Raycast(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint,
+        unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world raycast and return the closest hit.
-    void RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_MAX_UNSIGNED);
+    void RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint,
+        unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid body at point.
     RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid body at screen point.
@@ -136,14 +143,19 @@ public:
 
     /// Return draw shape.
     bool GetDrawShape() const { return (m_drawFlags & e_shapeBit) != 0; }
+
     /// Return draw joint.
     bool GetDrawJoint() const { return (m_drawFlags & e_jointBit) != 0; }
+
     /// Return draw aabb.
     bool GetDrawAabb() const { return (m_drawFlags & e_aabbBit) != 0; }
+
     /// Return draw pair.
     bool GetDrawPair() const { return (m_drawFlags & e_pairBit) != 0; }
+
     /// Return draw center of mass.
     bool GetDrawCenterOfMass() const { return (m_drawFlags & e_centerOfMassBit) != 0; }
+
     /// Return allow sleeping.
     bool GetAllowSleeping() const;
     /// Return warm starting.
@@ -154,23 +166,28 @@ public:
     bool GetSubStepping() const;
     /// Return auto clear forces.
     bool GetAutoClearForces() const;
+
     /// Return gravity.
     const Vector2& GetGravity() const { return gravity_; }
+
     /// Return velocity iterations.
     int GetVelocityIterations() const { return velocityIterations_; }
+
     /// Return position iterations.
     int GetPositionIterations() const { return positionIterations_; }
 
     /// Return the Box2D physics world.
     b2World* GetWorld() { return world_; }
+
     /// Set node dirtying to be disregarded.
     void SetApplyingTransforms(bool enable) { applyingTransforms_ = enable; }
+
     /// Return whether node dirtying should be disregarded.
     bool IsApplyingTransforms() const { return applyingTransforms_; }
 
 protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
 
 private:
     /// Handle the scene subsystem update event, step simulation here.

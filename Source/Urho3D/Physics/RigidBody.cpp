@@ -20,17 +20,19 @@
 // THE SOFTWARE.
 //
 
-#include "../Physics/CollisionShape.h"
-#include "../Physics/Constraint.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Core/Profiler.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
+#include "../Physics/CollisionShape.h"
+#include "../Physics/Constraint.h"
 #include "../Physics/PhysicsUtils.h"
 #include "../Physics/PhysicsWorld.h"
-#include "../Core/Profiler.h"
+#include "../Physics/RigidBody.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/ResourceEvents.h"
-#include "../Physics/RigidBody.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/SmoothedTransform.h"
@@ -106,10 +108,12 @@ void RigidBody::RegisterObject(Context* context)
     MIXED_ACCESSOR_ATTRIBUTE("Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
     ATTRIBUTE("Mass", float, mass_, DEFAULT_MASS, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Anisotropic Friction", GetAnisotropicFriction, SetAnisotropicFriction, Vector3, Vector3::ONE, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Anisotropic Friction", GetAnisotropicFriction, SetAnisotropicFriction, Vector3, Vector3::ONE,
+        AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Rolling Friction", GetRollingFriction, SetRollingFriction, float, DEFAULT_ROLLING_FRICTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Restitution", GetRestitution, SetRestitution, float, DEFAULT_RESTITUTION, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
+    MIXED_ACCESSOR_ATTRIBUTE("Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO,
+        AM_DEFAULT | AM_LATESTDATA);
     MIXED_ACCESSOR_ATTRIBUTE("Angular Velocity", GetAngularVelocity, SetAngularVelocity, Vector3, Vector3::ZERO, AM_FILE);
     MIXED_ACCESSOR_ATTRIBUTE("Linear Factor", GetLinearFactor, SetLinearFactor, Vector3, Vector3::ONE, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Angular Factor", GetAngularFactor, SetAngularFactor, Vector3, Vector3::ONE, AM_DEFAULT);
@@ -119,10 +123,12 @@ void RigidBody::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 1.0f, AM_DEFAULT);
     ATTRIBUTE("Collision Layer", int, collisionLayer_, DEFAULT_COLLISION_LAYER, AM_DEFAULT);
     ATTRIBUTE("Collision Mask", int, collisionMask_, DEFAULT_COLLISION_MASK, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Contact Threshold", GetContactProcessingThreshold, SetContactProcessingThreshold, float, BT_LARGE_FLOAT, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Contact Threshold", GetContactProcessingThreshold, SetContactProcessingThreshold, float, BT_LARGE_FLOAT,
+        AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("CCD Radius", GetCcdRadius, SetCcdRadius, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("CCD Motion Threshold", GetCcdMotionThreshold, SetCcdMotionThreshold, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Network Angular Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE("Network Angular Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, PODVector<unsigned char>,
+        Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
     ENUM_ATTRIBUTE("Collision Event Mode", collisionEventMode_, collisionEventModeNames, COLLISION_ACTIVE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Use Gravity", GetUseGravity, SetUseGravity, bool, true, AM_DEFAULT);
     ATTRIBUTE("Is Kinematic", bool, kinematic_, false, AM_DEFAULT);
@@ -155,7 +161,7 @@ void RigidBody::OnSetEnabled()
         RemoveBodyFromWorld();
 }
 
-void RigidBody::getWorldTransform(btTransform &worldTrans) const
+void RigidBody::getWorldTransform(btTransform& worldTrans) const
 {
     // We may be in a pathological state where a RigidBody exists without a scene node when this callback is fired,
     // so check to be sure
@@ -168,7 +174,7 @@ void RigidBody::getWorldTransform(btTransform &worldTrans) const
     }
 }
 
-void RigidBody::setWorldTransform(const btTransform &worldTrans)
+void RigidBody::setWorldTransform(const btTransform& worldTrans)
 {
     Quaternion newWorldRotation = ToQuaternion(worldTrans.getRotation());
     Vector3 newWorldPosition = ToVector3(worldTrans.getOrigin()) - newWorldRotation * centerOfMass_;
@@ -740,7 +746,7 @@ void RigidBody::UpdateMass()
     principal.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
 
     // Calculate center of mass shift from all the collision shapes
-    unsigned numShapes = compoundShape_->getNumChildShapes();
+    unsigned numShapes = (unsigned)compoundShape_->getNumChildShapes();
     if (numShapes)
     {
         PODVector<float> masses(numShapes);
@@ -909,22 +915,27 @@ void RigidBody::OnMarkedDirty(Node* node)
 void RigidBody::OnNodeSet(Node* node)
 {
     if (node)
-    {
-        Scene* scene = GetScene();
-        if (scene)
-        {
-            if (scene == node)
-                LOGWARNING(GetTypeName() + " should not be created to the root scene node");
-
-            physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
-            physicsWorld_->AddRigidBody(this);
-
-            AddBodyToWorld();
-        }
-        else
-            LOGERROR("Node is detached from scene, can not create rigid body");
-
         node->AddListener(this);
+}
+
+void RigidBody::OnSceneSet(Scene* scene)
+{
+    if (scene)
+    {
+        if (scene == node_)
+            LOGWARNING(GetTypeName() + " should not be created to the root scene node");
+
+        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
+        physicsWorld_->AddRigidBody(this);
+
+        AddBodyToWorld();
+    }
+    else
+    {
+        ReleaseBody();
+
+        if (physicsWorld_)
+            physicsWorld_->RemoveRigidBody(this);
     }
 }
 
@@ -991,7 +1002,7 @@ void RigidBody::AddBodyToWorld()
         return;
 
     btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-    world->addRigidBody(body_, collisionLayer_, collisionMask_);
+    world->addRigidBody(body_, (short)collisionLayer_, (short)collisionMask_);
     inWorld_ = true;
     readdBody_ = false;
 

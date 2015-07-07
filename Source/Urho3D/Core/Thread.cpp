@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Thread.h"
 
 #ifdef WIN32
@@ -34,24 +36,28 @@ namespace Urho3D
 {
 
 #ifdef WIN32
+
 DWORD WINAPI ThreadFunctionStatic(void* data)
 {
     Thread* thread = static_cast<Thread*>(data);
     thread->ThreadFunction();
     return 0;
 }
+
 #else
+
 void* ThreadFunctionStatic(void* data)
 {
     Thread* thread = static_cast<Thread*>(data);
     thread->ThreadFunction();
 #ifdef EMSCRIPTEN
-// note: emscripten doesn't have this function but doesn't use threading anyway
-// so #ifdef it out to prevent linker warnings
+    // note: emscripten doesn't have this function but doesn't use threading anyway
+    // so #ifdef it out to prevent linker warnings
     pthread_exit((void*)0);
 #endif
     return 0;
 }
+
 #endif
 
 ThreadID Thread::mainThreadID;
@@ -72,20 +78,19 @@ bool Thread::Run()
     // Check if already running
     if (handle_)
         return false;
-    
+
     shouldRun_ = true;
-    #ifdef WIN32
+#ifdef WIN32
     handle_ = CreateThread(0, 0, ThreadFunctionStatic, this, 0, 0);
-//    #else
-    #elif !defined(EMSCRIPTEN)
-// note: emscripten doesn't have this function but doesn't use
-// threading anyway so #ifdef it out to prevent linker warnings
+#elif !defined(EMSCRIPTEN)
+    // note: emscripten doesn't have this function but doesn't use
+    // threading anyway so #ifdef it out to prevent linker warnings
     handle_ = new pthread_t;
     pthread_attr_t type;
     pthread_attr_init(&type);
     pthread_attr_setdetachstate(&type, PTHREAD_CREATE_JOINABLE);
     pthread_create((pthread_t*)handle_, &type, ThreadFunctionStatic, this);
-    #endif
+#endif
     return handle_ != 0;
 }
 
@@ -94,34 +99,33 @@ void Thread::Stop()
     // Check if already stopped
     if (!handle_)
         return;
-    
+
     shouldRun_ = false;
-    #ifdef WIN32
+#ifdef WIN32
     WaitForSingleObject((HANDLE)handle_, INFINITE);
     CloseHandle((HANDLE)handle_);
-//    #else
-    #elif !defined(EMSCRIPTEN)
- // note: emscripten doesn't have this function but doesn't use
- // threading anyway so #ifdef it out to prevent linker warnings
+#elif !defined(EMSCRIPTEN)
+    // note: emscripten doesn't have this function but doesn't use
+    // threading anyway so #ifdef it out to prevent linker warnings
     pthread_t* thread = (pthread_t*)handle_;
     if (thread)
         pthread_join(*thread, 0);
     delete thread;
-    #endif
+#endif
     handle_ = 0;
 }
 
 void Thread::SetPriority(int priority)
 {
-    #ifdef WIN32
+#ifdef WIN32
     if (handle_)
         SetThreadPriority((HANDLE)handle_, priority);
-    #endif
-    #if defined(__linux__) && !defined(ANDROID) && !defined(EMSCRIPTEN)
+#endif
+#if defined(__linux__) && !defined(ANDROID) && !defined(EMSCRIPTEN)
     pthread_t* thread = (pthread_t*)handle_;
     if (thread)
         pthread_setschedprio(*thread, priority);
-    #endif
+#endif
 }
 
 void Thread::SetMainThread()
@@ -131,11 +135,11 @@ void Thread::SetMainThread()
 
 ThreadID Thread::GetCurrentThreadID()
 {
-    #ifdef WIN32
+#ifdef WIN32
     return GetCurrentThreadId();
-    #else
+#else
     return pthread_self();
-    #endif
+#endif
 }
 
 bool Thread::IsMainThread()

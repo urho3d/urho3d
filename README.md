@@ -54,6 +54,7 @@ Urho3D development, contributions and bugfixes by:
 - atship
 - att
 - celeron55
+- feltech
 - hdunderscore
 - marynate
 - mightyCelu

@@ -70,12 +70,16 @@ public:
 
     /// Return speed.
     float GetSpeed() const { return speed_; }
+
     /// Return animation name.
     const String& GetAnimation() const { return animationName_; }
+
     /// Return animation.
     AnimationSet2D* GetAnimationSet() const;
+
     /// Return loop mode.
     LoopMode2D GetLoopMode() const { return loopMode_; }
+
     /// Return root node.
     Node* GetRootNode() const;
 
@@ -83,12 +87,12 @@ public:
     void SetAnimationSetAttr(const ResourceRef& value);
     /// Return animation set attribute.
     ResourceRef GetAnimationSetAttr() const;
-    /// Set anmiation by name.
+    /// Set animation by name.
     void SetAnimationAttr(const String& name);
 
 protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Handle draw order changed.
@@ -102,7 +106,7 @@ protected:
     /// Update animation.
     void UpdateAnimation(float timeStep);
     /// Calculate time line world world transform.
-    void CalculateTimelineWorldTransform(unsigned index);
+    void CalculateTimelineWorldTransform(int index);
     /// Handle scene post update.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
 

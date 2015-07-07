@@ -20,25 +20,27 @@
 // THE SOFTWARE.
 //
 
-#include "../Scene/Component.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
+#include "../Core/Profiler.h"
+#include "../Core/WorkQueue.h"
 #include "../IO/File.h"
 #include "../IO/Log.h"
-#include "../Scene/ObjectAnimation.h"
 #include "../IO/PackageFile.h"
-#include "../Core/Profiler.h"
-#include "../Scene/ReplicationState.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/ResourceEvents.h"
+#include "../Resource/XMLFile.h"
+#include "../Scene/Component.h"
+#include "../Scene/ObjectAnimation.h"
+#include "../Scene/ReplicationState.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/SmoothedTransform.h"
 #include "../Scene/SplinePath.h"
 #include "../Scene/UnknownComponent.h"
 #include "../Scene/ValueAnimation.h"
-#include "../Core/WorkQueue.h"
-#include "../Resource/XMLFile.h"
 
 #include "../DebugNew.h"
 
@@ -96,13 +98,14 @@ void Scene::RegisterObject(Context* context)
 
     ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Time Scale", GetTimeScale, SetTimeScale, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Smoothing Constant", GetSmoothingConstant, SetSmoothingConstant, float, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Smoothing Constant", GetSmoothingConstant, SetSmoothingConstant, float, DEFAULT_SMOOTHING_CONSTANT,
+        AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Snap Threshold", GetSnapThreshold, SetSnapThreshold, float, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Elapsed Time", GetElapsedTime, SetElapsedTime, float, 0.0f, AM_FILE);
-    ATTRIBUTE("Next Replicated Node ID", int, replicatedNodeID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE("Next Replicated Component ID", int, replicatedComponentID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE("Next Local Node ID", int, localNodeID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE("Next Local Component ID", int, localComponentID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE("Next Replicated Node ID", unsigned, replicatedNodeID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE("Next Replicated Component ID", unsigned, replicatedComponentID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE("Next Local Node ID", unsigned, localNodeID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE("Next Local Component ID", unsigned, localComponentID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
     MIXED_ACCESSOR_ATTRIBUTE("Variable Names", GetVarNamesAttr, SetVarNamesAttr, String, String::EMPTY, AM_FILE | AM_NOEDIT);
 }
@@ -351,7 +354,7 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
         }
 
         // Store own old ID for resolving possible root node references
-        unsigned nodeID = rootElement.GetInt("id");
+        unsigned nodeID = rootElement.GetUInt("id");
         resolver_.AddNode(nodeID, this);
 
         // Load the root level components first
@@ -395,7 +398,7 @@ Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Qu
     PROFILE(Instantiate);
 
     SceneResolver resolver;
-    unsigned nodeID = source.ReadInt();
+    unsigned nodeID = source.ReadUInt();
     // Rewrite IDs when instantiating
     Node* node = CreateChild(0, mode);
     resolver.AddNode(nodeID, node);
@@ -418,7 +421,7 @@ Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, c
     PROFILE(InstantiateXML);
 
     SceneResolver resolver;
-    unsigned nodeID = source.GetInt("id");
+    unsigned nodeID = source.GetUInt("id");
     // Rewrite IDs when instantiating
     Node* node = CreateChild(0, mode);
     resolver.AddNode(nodeID, node);
@@ -541,18 +544,12 @@ Node* Scene::GetNode(unsigned id) const
     if (id < FIRST_LOCAL_ID)
     {
         HashMap<unsigned, Node*>::ConstIterator i = replicatedNodes_.Find(id);
-        if (i != replicatedNodes_.End())
-            return i->second_;
-        else
-            return 0;
+        return i != replicatedNodes_.End() ? i->second_ : 0;
     }
     else
     {
         HashMap<unsigned, Node*>::ConstIterator i = localNodes_.Find(id);
-        if (i != localNodes_.End())
-            return i->second_;
-        else
-            return 0;
+        return i != localNodes_.End() ? i->second_ : 0;
     }
 }
 
@@ -561,30 +558,20 @@ Component* Scene::GetComponent(unsigned id) const
     if (id < FIRST_LOCAL_ID)
     {
         HashMap<unsigned, Component*>::ConstIterator i = replicatedComponents_.Find(id);
-        if (i != replicatedComponents_.End())
-            return i->second_;
-        else
-            return 0;
+        return i != replicatedComponents_.End() ? i->second_ : 0;
     }
     else
     {
         HashMap<unsigned, Component*>::ConstIterator i = localComponents_.Find(id);
-        if (i != localComponents_.End())
-            return i->second_;
-        else
-            return 0;
+        return i != localComponents_.End() ? i->second_ : 0;
     }
 }
 
 float Scene::GetAsyncProgress() const
 {
-    if (!asyncLoading_ || asyncProgress_.totalNodes_ + asyncProgress_.totalResources_ == 0)
-        return 1.0f;
-    else
-    {
-        return (float)(asyncProgress_.loadedNodes_ + asyncProgress_.loadedResources_) / (float)(asyncProgress_.totalNodes_ +
-            asyncProgress_.totalResources_);
-    }
+    return !asyncLoading_ || asyncProgress_.totalNodes_ + asyncProgress_.totalResources_ == 0 ? 1.0f :
+        (float)(asyncProgress_.loadedNodes_ + asyncProgress_.loadedResources_) /
+        (float)(asyncProgress_.totalNodes_ + asyncProgress_.totalResources_);
 }
 
 const String& Scene::GetVarName(StringHash hash) const
@@ -695,7 +682,7 @@ unsigned Scene::GetFreeNodeID(CreateMode mode)
     {
         for (;;)
         {
-            unsigned ret =  localNodeID_;
+            unsigned ret = localNodeID_;
             if (localNodeID_ < LAST_LOCAL_ID)
                 ++localNodeID_;
             else
@@ -727,7 +714,7 @@ unsigned Scene::GetFreeComponentID(CreateMode mode)
     {
         for (;;)
         {
-            unsigned ret =  localComponentID_;
+            unsigned ret = localComponentID_;
             if (localComponentID_ < LAST_LOCAL_ID)
                 ++localComponentID_;
             else
@@ -744,14 +731,10 @@ void Scene::NodeAdded(Node* node)
     if (!node || node->GetScene() == this)
         return;
 
-    // If node already exists in another scene, remove. This is unsupported, as components will not reinitialize themselves
-    // to use the new scene
+    // Remove from old scene first
     Scene* oldScene = node->GetScene();
     if (oldScene)
-    {
-        LOGERROR("Moving a node from one scene to another is unsupported");
         oldScene->NodeRemoved(node);
-    }
 
     node->SetScene(this);
 
@@ -770,7 +753,7 @@ void Scene::NodeAdded(Node* node)
         if (i != replicatedNodes_.End() && i->second_ != node)
         {
             LOGWARNING("Overwriting node with ID " + String(id));
-            i->second_->ResetScene();
+            NodeRemoved(i->second_);
         }
 
         replicatedNodes_[id] = node;
@@ -784,11 +767,18 @@ void Scene::NodeAdded(Node* node)
         if (i != localNodes_.End() && i->second_ != node)
         {
             LOGWARNING("Overwriting node with ID " + String(id));
-            i->second_->ResetScene();
+            NodeRemoved(i->second_);
         }
-
         localNodes_[id] = node;
     }
+
+    // Add already created components and child nodes now
+    const Vector<SharedPtr<Component> >& components = node->GetComponents();
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
+        ComponentAdded(*i);
+    const Vector<SharedPtr<Node> >& children = node->GetChildren();
+    for (Vector<SharedPtr<Node> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
+        NodeAdded(*i);
 }
 
 void Scene::NodeRemoved(Node* node)
@@ -805,8 +795,8 @@ void Scene::NodeRemoved(Node* node)
     else
         localNodes_.Erase(id);
 
-    node->SetID(0);
-    node->SetScene(0);
+    node->ResetScene();
+
     // Remove components and child nodes as well
     const Vector<SharedPtr<Component> >& components = node->GetComponents();
     for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
@@ -822,13 +812,21 @@ void Scene::ComponentAdded(Component* component)
         return;
 
     unsigned id = component->GetID();
+
+    // If the new component has an ID of zero (default), assign a replicated ID now
+    if (!id)
+    {
+        id = GetFreeComponentID(REPLICATED);
+        component->SetID(id);
+    }
+
     if (id < FIRST_LOCAL_ID)
     {
         HashMap<unsigned, Component*>::Iterator i = replicatedComponents_.Find(id);
         if (i != replicatedComponents_.End() && i->second_ != component)
         {
             LOGWARNING("Overwriting component with ID " + String(id));
-            i->second_->SetID(0);
+            ComponentRemoved(i->second_);
         }
 
         replicatedComponents_[id] = component;
@@ -839,11 +837,13 @@ void Scene::ComponentAdded(Component* component)
         if (i != localComponents_.End() && i->second_ != component)
         {
             LOGWARNING("Overwriting component with ID " + String(id));
-            i->second_->SetID(0);
+            ComponentRemoved(i->second_);
         }
 
         localComponents_[id] = component;
     }
+
+    component->OnSceneSet(this);
 }
 
 void Scene::ComponentRemoved(Component* component)
@@ -858,6 +858,7 @@ void Scene::ComponentRemoved(Component* component)
         localComponents_.Erase(id);
 
     component->SetID(0);
+    component->OnSceneSet(0);
 }
 
 void Scene::SetVarNamesAttr(const String& value)
@@ -949,8 +950,8 @@ void Scene::MarkReplicationDirty(Node* node)
 
     if (id < FIRST_LOCAL_ID && networkState_)
     {
-        for (PODVector<ReplicationState*>::Iterator i = networkState_->replicationStates_.Begin(); i !=
-            networkState_->replicationStates_.End(); ++i)
+        for (PODVector<ReplicationState*>::Iterator i = networkState_->replicationStates_.Begin();
+             i != networkState_->replicationStates_.End(); ++i)
         {
             NodeReplicationState* nodeState = static_cast<NodeReplicationState*>(*i);
             nodeState->sceneState_->dirtyNodes_.Insert(id);
@@ -1010,7 +1011,7 @@ void Scene::UpdateAsyncLoading()
         }
         else
         {
-            unsigned nodeID = asyncProgress_.xmlElement_.GetInt("id");
+            unsigned nodeID = asyncProgress_.xmlElement_.GetUInt("id");
             Node* newNode = CreateChild(nodeID, nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
             resolver_.AddNode(nodeID, newNode);
             newNode->LoadXML(asyncProgress_.xmlElement_, resolver_);
@@ -1031,7 +1032,7 @@ void Scene::UpdateAsyncLoading()
     eventData[P_PROGRESS] = GetAsyncProgress();
     eventData[P_LOADEDNODES] = asyncProgress_.loadedNodes_;
     eventData[P_TOTALNODES] = asyncProgress_.totalNodes_;
-    eventData[P_LOADEDRESOURCES]  = asyncProgress_.loadedResources_;
+    eventData[P_LOADEDRESOURCES] = asyncProgress_.loadedResources_;
     eventData[P_TOTALRESOURCES] = asyncProgress_.totalResources_;
     SendEvent(E_ASYNCLOADPROGRESS, eventData);
 }
@@ -1089,7 +1090,7 @@ void Scene::PreloadResources(File* file, bool isSceneFile)
         const AttributeInfo& attr = attributes->At(i);
         if (!(attr.mode_ & AM_FILE))
             continue;
-        Variant varValue = file->ReadVariant(attr.type_);
+        /*Variant varValue = */file->ReadVariant(attr.type_);
     }
 
     // Read component attributes
@@ -1136,7 +1137,7 @@ void Scene::PreloadResources(File* file, bool isSceneFile)
                         }
                     }
                 }
-             }
+            }
         }
     }
 

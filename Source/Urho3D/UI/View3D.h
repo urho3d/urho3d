@@ -57,11 +57,13 @@ public:
     void SetAutoUpdate(bool enable);
     /// Queue manual update on the render texture.
     void QueueUpdate();
-    
+
     /// Return render texture pixel format.
     unsigned GetFormat() const { return rttFormat_; }
+
     /// Return whether render target updates automatically.
     bool GetAutoUpdate() const { return autoUpdate_; }
+
     /// Return scene.
     Scene* GetScene() const;
     /// Return camera scene node.
@@ -72,7 +74,7 @@ public:
     Texture2D* GetDepthTexture() const;
     /// Return viewport.
     Viewport* GetViewport() const;
-    
+
 private:
     /// Reset scene.
     void ResetScene();

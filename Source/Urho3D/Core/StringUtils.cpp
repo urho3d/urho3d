@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/StringUtils.h"
 
 #include <cstdio>
@@ -91,7 +93,7 @@ bool ToBool(const char* source)
 
     for (unsigned i = 0; i < length; ++i)
     {
-        char c = tolower(source[i]);
+        char c = (char)tolower(source[i]);
         if (c == 't' || c == 'y' || c == '1')
             return true;
         else if (c != ' ' && c != '\t')
@@ -112,7 +114,7 @@ int ToInt(const char* source)
         return 0;
 
     // Explicitly ask for base 10 to prevent source starts with '0' or '0x' from being converted to base 8 or base 16, respectively
-    return strtol(source, 0, 10);
+    return (int)strtol(source, 0, 10);
 }
 
 unsigned ToUInt(const String& source)
@@ -125,7 +127,7 @@ unsigned ToUInt(const char* source)
     if (!source)
         return 0;
 
-    return strtoul(source, 0, 10);
+    return (unsigned)strtoul(source, 0, 10);
 }
 
 float ToFloat(const String& source)
@@ -139,6 +141,19 @@ float ToFloat(const char* source)
         return 0;
 
     return (float)strtod(source, 0);
+}
+
+double ToDouble(const String& source)
+{
+    return ToDouble(source.CString());
+}
+
+double ToDouble(const char* source)
+{
+    if (!source)
+        return 0;
+
+    return strtod(source, 0);
 }
 
 Color ToColor(const String& source)
@@ -382,6 +397,10 @@ Variant ToVectorVariant(const char* source)
     case 16:
         ret.FromString(VAR_MATRIX4, source);
         break;
+
+    default:
+        assert(false);  // Should not get here
+        break;
     }
 
     return ret;
@@ -525,14 +544,14 @@ void BufferToString(String& dest, const void* data, unsigned size)
         }
         else if (bytes[i] < 100)
         {
-            dest[index++] = '0' + bytes[i] / 10;
-            dest[index++] = '0' + bytes[i] % 10;
+            dest[index++] = (char)('0' + bytes[i] / 10);
+            dest[index++] = (char)('0' + bytes[i] % 10);
         }
         else
         {
-            dest[index++] = '0' + bytes[i] / 100;
-            dest[index++] = '0' + bytes[i] % 100 / 10;
-            dest[index++] = '0' + bytes[i] % 10;
+            dest[index++] = (char)('0' + bytes[i] / 100);
+            dest[index++] = (char)('0' + bytes[i] % 100 / 10);
+            dest[index++] = (char)('0' + bytes[i] % 10);
         }
     }
 }
@@ -564,7 +583,7 @@ void StringToBuffer(PODVector<unsigned char>& dest, const char* source)
         if (inSpace && *ptr != ' ')
         {
             inSpace = false;
-            value = *ptr - '0';
+            value = (unsigned)(*ptr - '0');
         }
         else if (!inSpace && *ptr != ' ')
         {
@@ -573,7 +592,7 @@ void StringToBuffer(PODVector<unsigned char>& dest, const char* source)
         }
         else if (!inSpace && *ptr == ' ')
         {
-            dest[index++] = value;
+            dest[index++] = (unsigned char)value;
             inSpace = true;
         }
 
@@ -582,7 +601,7 @@ void StringToBuffer(PODVector<unsigned char>& dest, const char* source)
 
     // Write the final value
     if (!inSpace && index < size)
-        dest[index] = value;
+        dest[index] = (unsigned char)value;
 }
 
 unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive)
@@ -640,12 +659,12 @@ bool IsDigit(unsigned ch)
 
 unsigned ToUpper(unsigned ch)
 {
-    return toupper(ch);
+    return (unsigned)toupper(ch);
 }
 
 unsigned ToLower(unsigned ch)
 {
-    return tolower(ch);
+    return (unsigned)tolower(ch);
 }
 
 }

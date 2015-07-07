@@ -22,12 +22,12 @@
 
 #pragma once
 
-#include "../Math/BoundingBox.h"
-#include "../Scene/Component.h"
 #include "../Container/HashSet.h"
+#include "../IO/VectorBuffer.h"
+#include "../Math/BoundingBox.h"
 #include "../Math/Sphere.h"
 #include "../Math/Vector3.h"
-#include "../IO/VectorBuffer.h"
+#include "../Scene/Component.h"
 
 #include <Bullet/LinearMath/btIDebugDraw.h>
 
@@ -66,7 +66,10 @@ struct URHO3D_API PhysicsRaycastResult
     }
 
     /// Test for inequality, added to prevent GCC from complaining.
-    bool operator != (const PhysicsRaycastResult& rhs) const { return position_ != rhs.position_ || normal_ != rhs.normal_ || distance_ != rhs.distance_ || body_ != rhs.body_; }
+    bool operator !=(const PhysicsRaycastResult& rhs) const
+    {
+        return position_ != rhs.position_ || normal_ != rhs.normal_ || distance_ != rhs.distance_ || body_ != rhs.body_;
+    }
 
     /// Hit worldspace position.
     Vector3 position_;
@@ -98,8 +101,8 @@ class URHO3D_API PhysicsWorld : public Component, public btIDebugDraw
 {
     OBJECT(PhysicsWorld);
 
-    friend void InternalPreTickCallback(btDynamicsWorld *world, btScalar timeStep);
-    friend void InternalTickCallback(btDynamicsWorld *world, btScalar timeStep);
+    friend void InternalPreTickCallback(btDynamicsWorld* world, btScalar timeStep);
+    friend void InternalTickCallback(btDynamicsWorld* world, btScalar timeStep);
 
 public:
     /// Construct.
@@ -116,13 +119,17 @@ public:
     /// Log warning from the physics engine.
     virtual void reportErrorWarning(const char* warningString);
     /// Draw a physics debug contact point. Not implemented.
-    virtual void drawContactPoint(const btVector3& pointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color);
+    virtual void drawContactPoint
+        (const btVector3& pointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color);
     /// Draw physics debug 3D text. Not implemented.
-    virtual void draw3dText(const btVector3& location,const char* textString);
+    virtual void draw3dText(const btVector3& location, const char* textString);
+
     /// Set debug draw flags.
     virtual void setDebugMode(int debugMode) { debugMode_ = debugMode; }
+
     /// Return debug draw flags.
     virtual int getDebugMode() const { return debugMode_; }
+
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
@@ -147,15 +154,19 @@ public:
     /// Set maximum angular velocity for network replication.
     void SetMaxNetworkAngularVelocity(float velocity);
     /// Perform a physics world raycast and return all hits.
-    void Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    void Raycast
+        (PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world raycast and return the closest hit.
     void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world swept sphere test and return the closest hit.
-    void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    void SphereCast
+        (PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world swept convex test using a user-supplied collision shape and return the first hit.
-    void ConvexCast(PhysicsRaycastResult& result, CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED);
+    void ConvexCast(PhysicsRaycastResult& result, CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot,
+        const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world swept convex test using a user-supplied Bullet collision shape and return the first hit.
-    void ConvexCast(PhysicsRaycastResult& result, btCollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED);
+    void ConvexCast(PhysicsRaycastResult& result, btCollisionShape* shape, const Vector3& startPos, const Quaternion& startRot,
+        const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Invalidate cached collision geometry for a model.
     void RemoveCachedGeometry(Model* model);
     /// Return rigid bodies by a sphere query.
@@ -167,18 +178,25 @@ public:
 
     /// Return gravity.
     Vector3 GetGravity() const;
+
     /// Return maximum number of physics substeps per frame.
     int GetMaxSubSteps() const { return maxSubSteps_; }
+
     /// Return number of constraint solver iterations.
     int GetNumIterations() const;
+
     /// Return whether interpolation between simulation steps is enabled.
     bool GetInterpolation() const { return interpolation_; }
+
     /// Return whether Bullet's internal edge utility for trimesh collisions is enabled.
     bool GetInternalEdge() const { return internalEdge_; }
+
     /// Return whether split impulse collision mode is enabled.
     bool GetSplitImpulse() const;
+
     /// Return simulation steps per second.
     int GetFps() const { return fps_; }
+
     /// Return maximum angular velocity for network replication.
     float GetMaxNetworkAngularVelocity() const { return maxNetworkAngularVelocity_; }
 
@@ -205,29 +223,32 @@ public:
 
     /// Return the Bullet physics world.
     btDiscreteDynamicsWorld* GetWorld() { return world_; }
+
     /// Clean up the geometry cache.
     void CleanupGeometryCache();
+
     /// Return trimesh collision geometry cache.
     HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >& GetTriMeshCache() { return triMeshCache_; }
+
     /// Return convex collision geometry cache.
     HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >& GetConvexCache() { return convexCache_; }
+
     /// Set node dirtying to be disregarded.
     void SetApplyingTransforms(bool enable) { applyingTransforms_ = enable; }
+
     /// Return whether node dirtying should be disregarded.
     bool IsApplyingTransforms() const { return applyingTransforms_; }
 
 protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
 
 private:
     /// Handle the scene subsystem update event, step simulation here.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
-    /// Handle collision model reload finished.
-    void HandleModelReloadFinished(StringHash eventType, VariantMap& eventData);
     /// Trigger update before each physics simulation step.
     void PreStep(float timeStep);
-    /// Trigger update after ecah physics simulation step.
+    /// Trigger update after each physics simulation step.
     void PostStep(float timeStep);
     /// Send accumulated collision events.
     void SendCollisionEvents();
@@ -251,9 +272,9 @@ private:
     /// Constraints in the world.
     PODVector<Constraint*> constraints_;
     /// Collision pairs on this frame.
-    HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold* > currentCollisions_;
+    HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*> currentCollisions_;
     /// Collision pairs on the previous frame. Used to check if a collision is "new." Manifolds are not guaranteed to exist anymore.
-    HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold* > previousCollisions_;
+    HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*> previousCollisions_;
     /// Delayed (parented) world transform assignments.
     HashMap<RigidBody*, DelayedWorldTransform> delayedWorldTransforms_;
     /// Cache for trimesh geometry data by model and LOD level.

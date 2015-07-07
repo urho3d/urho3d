@@ -43,6 +43,7 @@ public:
     virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize);
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
     virtual const FontGlyph* GetGlyph(unsigned c);
+
     /// Return if font face uses mutable glyphs.
     virtual bool HasMutableGlyphs() const { return hasMutableGlyph_; }
 
@@ -54,7 +55,7 @@ private:
     /// Load char glyph.
     bool LoadCharGlyph(unsigned charCode, Image* image = 0);
 
-        /// FreeType library.
+    /// FreeType library.
     SharedPtr<FreeTypeLibrary> freeType_;
     /// FreeType face. Non-null after creation only in dynamic mode.
     void* face_;

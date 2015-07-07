@@ -20,8 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "../Urho2D/ConstraintPulley2D.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Urho2D/ConstraintPulley2D.h"
 #include "../Urho2D/PhysicsUtils2D.h"
 #include "../Urho2D/RigidBody2D.h"
 
@@ -47,12 +49,14 @@ ConstraintPulley2D::~ConstraintPulley2D()
 void ConstraintPulley2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ConstraintPulley2D>();
-    
+
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Owner Body Ground Anchor", GetOwnerBodyGroundAnchor, SetOwnerBodyGroundAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Other Body Ground Anchor", GetOtherBodyGroundAnchor, SetOtherBodyGroundAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Owner Body Ground Anchor", GetOwnerBodyGroundAnchor, SetOwnerBodyGroundAnchor, Vector2, Vector2::ZERO,
+        AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Other Body Ground Anchor", GetOtherBodyGroundAnchor, SetOtherBodyGroundAnchor, Vector2, Vector2::ZERO,
+        AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Owner Body Anchor", GetOwnerBodyAnchor, SetOwnerBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Other Body Anchor", GetOtherBodyAnchor, SetOtherBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);    
+    ACCESSOR_ATTRIBUTE("Other Body Anchor", GetOtherBodyAnchor, SetOtherBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Ratio", GetRatio, SetRatio, float, 0.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Constraint2D);
 }
@@ -122,7 +126,8 @@ b2JointDef* ConstraintPulley2D::GetJointDef()
     if (!bodyA || !bodyB)
         return 0;
 
-    jointDef_.Initialize(bodyA, bodyB, ToB2Vec2(ownerBodyGroundAnchor_), ToB2Vec2(otherBodyGroundAnchor_), ToB2Vec2(ownerBodyAnchor_), ToB2Vec2(otherBodyAnchor_), jointDef_.ratio);
+    jointDef_.Initialize(bodyA, bodyB, ToB2Vec2(ownerBodyGroundAnchor_), ToB2Vec2(otherBodyGroundAnchor_),
+        ToB2Vec2(ownerBodyAnchor_), ToB2Vec2(otherBodyAnchor_), jointDef_.ratio);
 
     return &jointDef_;
 }

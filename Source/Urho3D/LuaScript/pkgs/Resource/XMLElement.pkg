@@ -15,6 +15,7 @@ class XMLElement
     bool SetBoundingBox(const BoundingBox& value);
     bool SetColor(const String name, const Color& value);
     bool SetFloat(const String name, float value);
+    bool SetDouble(const String name, double value);
     bool SetUInt(const String name, unsigned value);
     bool SetInt(const String name, int value);
     bool SetIntRect(const String name, const IntRect& value);
@@ -55,6 +56,7 @@ class XMLElement
     BoundingBox GetBoundingBox() const;
     Color GetColor(const String name) const;
     float GetFloat(const String name) const;
+    double GetDouble(const String name) const;
     unsigned GetUInt(const String name) const;
     int GetInt(const String name) const;
     IntRect GetIntRect(const String name) const;

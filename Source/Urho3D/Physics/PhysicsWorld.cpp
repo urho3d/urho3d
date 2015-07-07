@@ -20,25 +20,25 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
+#include "../Core/Context.h"
+#include "../Core/Mutex.h"
+#include "../Core/Profiler.h"
+#include "../Graphics/DebugRenderer.h"
+#include "../Graphics/Model.h"
+#include "../IO/Log.h"
+#include "../Math/Ray.h"
 #include "../Physics/CollisionShape.h"
 #include "../Physics/Constraint.h"
-#include "../Core/Context.h"
-#include "../Graphics/DebugRenderer.h"
-#include "../IO/Log.h"
-#include "../Graphics/Model.h"
-#include "../Core/Mutex.h"
 #include "../Physics/PhysicsEvents.h"
 #include "../Physics/PhysicsUtils.h"
 #include "../Physics/PhysicsWorld.h"
-#include "../Core/Profiler.h"
-#include "../Math/Ray.h"
 #include "../Physics/RigidBody.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
-#include "../Container/Sort.h"
 
 #include <Bullet/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
-#include <Bullet/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h>
 #include <Bullet/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
 #include <Bullet/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
 #include <Bullet/BulletCollision/CollisionShapes/btBoxShape.h>
@@ -63,22 +63,24 @@ static bool CompareRaycastResults(const PhysicsRaycastResult& lhs, const Physics
     return lhs.distance_ < rhs.distance_;
 }
 
-void InternalPreTickCallback(btDynamicsWorld *world, btScalar timeStep)
+void InternalPreTickCallback(btDynamicsWorld* world, btScalar timeStep)
 {
     static_cast<PhysicsWorld*>(world->getWorldUserInfo())->PreStep(timeStep);
 }
 
-void InternalTickCallback(btDynamicsWorld *world, btScalar timeStep)
+void InternalTickCallback(btDynamicsWorld* world, btScalar timeStep)
 {
     static_cast<PhysicsWorld*>(world->getWorldUserInfo())->PostStep(timeStep);
 }
 
-static bool CustomMaterialCombinerCallback(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0Wrap, int partId0, int index0, const btCollisionObjectWrapper* colObj1Wrap, int partId1, int index1)
+static bool CustomMaterialCombinerCallback(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0Wrap, int partId0,
+    int index0, const btCollisionObjectWrapper* colObj1Wrap, int partId1, int index1)
 {
     btAdjustInternalEdgeContacts(cp, colObj1Wrap, colObj0Wrap, partId1, index1);
 
     cp.m_combinedFriction = colObj0Wrap->getCollisionObject()->getFriction() * colObj1Wrap->getCollisionObject()->getFriction();
-    cp.m_combinedRestitution = colObj0Wrap->getCollisionObject()->getRestitution() * colObj1Wrap->getCollisionObject()->getRestitution();
+    cp.m_combinedRestitution =
+        colObj0Wrap->getCollisionObject()->getRestitution() * colObj1Wrap->getCollisionObject()->getRestitution();
 
     return true;
 }
@@ -87,13 +89,15 @@ static bool CustomMaterialCombinerCallback(btManifoldPoint& cp, const btCollisio
 struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
 {
     /// Construct.
-    PhysicsQueryCallback(PODVector<RigidBody*>& result, unsigned collisionMask) : result_(result),
+    PhysicsQueryCallback(PODVector<RigidBody*>& result, unsigned collisionMask) :
+        result_(result),
         collisionMask_(collisionMask)
     {
     }
 
     /// Add a contact result.
-    virtual btScalar addSingleResult(btManifoldPoint &, const btCollisionObjectWrapper *colObj0Wrap, int, int, const btCollisionObjectWrapper *colObj1Wrap, int, int)
+    virtual btScalar addSingleResult(btManifoldPoint&, const btCollisionObjectWrapper* colObj0Wrap, int, int,
+        const btCollisionObjectWrapper* colObj1Wrap, int, int)
     {
         RigidBody* body = reinterpret_cast<RigidBody*>(colObj0Wrap->getCollisionObject()->getUserPointer());
         if (body && !result_.Contains(body) && (body->GetCollisionLayer() & collisionMask_))
@@ -220,7 +224,8 @@ void PhysicsWorld::reportErrorWarning(const char* warningString)
     LOGWARNING("Physics: " + String(warningString));
 }
 
-void PhysicsWorld::drawContactPoint(const btVector3& pointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color)
+void PhysicsWorld::drawContactPoint(const btVector3& pointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime,
+    const btVector3& color)
 {
 }
 
@@ -261,7 +266,7 @@ void PhysicsWorld::Update(float timeStep)
     while (!delayedWorldTransforms_.Empty())
     {
         for (HashMap<RigidBody*, DelayedWorldTransform>::Iterator i = delayedWorldTransforms_.Begin();
-            i != delayedWorldTransforms_.End(); ++i)
+             i != delayedWorldTransforms_.End(); ++i)
         {
             const DelayedWorldTransform& transform = i->second_;
 
@@ -282,7 +287,7 @@ void PhysicsWorld::UpdateCollisions()
 
 void PhysicsWorld::SetFps(int fps)
 {
-    fps_ = Clamp(fps, 1, 1000);
+    fps_ = (unsigned)Clamp(fps, 1, 1000);
 
     MarkNetworkUpdate();
 }
@@ -338,10 +343,10 @@ void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& r
 {
     PROFILE(PhysicsRaycast);
 
-    btCollisionWorld::AllHitsRayResultCallback rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ +
-        maxDistance * ray.direction_));
+    btCollisionWorld::AllHitsRayResultCallback
+        rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ + maxDistance * ray.direction_));
     rayCallback.m_collisionFilterGroup = (short)0xffff;
-    rayCallback.m_collisionFilterMask = collisionMask;
+    rayCallback.m_collisionFilterMask = (short)collisionMask;
 
     world_->rayTest(rayCallback.m_rayFromWorld, rayCallback.m_rayToWorld, rayCallback);
 
@@ -362,10 +367,10 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
 {
     PROFILE(PhysicsRaycastSingle);
 
-    btCollisionWorld::ClosestRayResultCallback rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ +
-        maxDistance * ray.direction_));
+    btCollisionWorld::ClosestRayResultCallback
+        rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ + maxDistance * ray.direction_));
     rayCallback.m_collisionFilterGroup = (short)0xffff;
-    rayCallback.m_collisionFilterMask = collisionMask;
+    rayCallback.m_collisionFilterMask = (short)collisionMask;
 
     world_->rayTest(rayCallback.m_rayFromWorld, rayCallback.m_rayToWorld, rayCallback);
 
@@ -391,10 +396,10 @@ void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, floa
 
     btSphereShape shape(radius);
 
-    btCollisionWorld::ClosestConvexResultCallback convexCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ +
-        maxDistance * ray.direction_));
+    btCollisionWorld::ClosestConvexResultCallback
+        convexCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ + maxDistance * ray.direction_));
     convexCallback.m_collisionFilterGroup = (short)0xffff;
-    convexCallback.m_collisionFilterMask = collisionMask;
+    convexCallback.m_collisionFilterMask = (short)collisionMask;
 
     world_->convexSweepTest(&shape, btTransform(btQuaternion::getIdentity(), convexCallback.m_convexFromWorld),
         btTransform(btQuaternion::getIdentity(), convexCallback.m_convexToWorld), convexCallback);
@@ -415,7 +420,8 @@ void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, floa
     }
 }
 
-void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask)
+void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, CollisionShape* shape, const Vector3& startPos,
+    const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask)
 {
     if (!shape || !shape->GetCollisionShape())
     {
@@ -445,7 +451,8 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, CollisionShape* shap
         proxy->m_collisionFilterGroup = group;
 }
 
-void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask)
+void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* shape, const Vector3& startPos,
+    const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask)
 {
     if (!shape)
     {
@@ -471,10 +478,10 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
 
     btCollisionWorld::ClosestConvexResultCallback convexCallback(ToBtVector3(startPos), ToBtVector3(endPos));
     convexCallback.m_collisionFilterGroup = (short)0xffff;
-    convexCallback.m_collisionFilterMask = collisionMask;
+    convexCallback.m_collisionFilterMask = (short)collisionMask;
 
     world_->convexSweepTest(static_cast<btConvexShape*>(shape), btTransform(ToBtQuaternion(startRot),
-        convexCallback.m_convexFromWorld), btTransform(ToBtQuaternion(endRot), convexCallback.m_convexToWorld),
+            convexCallback.m_convexFromWorld), btTransform(ToBtQuaternion(endRot), convexCallback.m_convexToWorld),
         convexCallback);
 
     if (convexCallback.hasHit())
@@ -496,14 +503,14 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
 void PhysicsWorld::RemoveCachedGeometry(Model* model)
 {
     for (HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator i = triMeshCache_.Begin();
-        i != triMeshCache_.End();)
+         i != triMeshCache_.End();)
     {
         HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
         if (current->first_.first_ == model)
             triMeshCache_.Erase(current);
     }
     for (HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator i = convexCache_.Begin();
-        i != convexCache_.End();)
+         i != convexCache_.End();)
     {
         HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
         if (current->first_.first_ == model)
@@ -557,7 +564,7 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody
     result.Clear();
 
     for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator i = currentCollisions_.Begin();
-        i != currentCollisions_.End(); ++i)
+         i != currentCollisions_.End(); ++i)
     {
         if (i->first_.first_ == body)
             result.Push(i->first_.second_);
@@ -638,14 +645,14 @@ void PhysicsWorld::CleanupGeometryCache()
 {
     // Remove cached shapes whose only reference is the cache itself
     for (HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator i = triMeshCache_.Begin();
-        i != triMeshCache_.End();)
+         i != triMeshCache_.End();)
     {
         HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
         if (current->second_.Refs() == 1)
             triMeshCache_.Erase(current);
     }
     for (HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator i = convexCache_.Begin();
-        i != convexCache_.End();)
+         i != convexCache_.End();)
     {
         HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
         if (current->second_.Refs() == 1)
@@ -653,14 +660,16 @@ void PhysicsWorld::CleanupGeometryCache()
     }
 }
 
-void PhysicsWorld::OnNodeSet(Node* node)
+void PhysicsWorld::OnSceneSet(Scene* scene)
 {
     // Subscribe to the scene subsystem update, which will trigger the physics simulation step
-    if (node)
+    if (scene)
     {
         scene_ = GetScene();
-        SubscribeToEvent(node, E_SCENESUBSYSTEMUPDATE, HANDLER(PhysicsWorld, HandleSceneSubsystemUpdate));
+        SubscribeToEvent(scene_, E_SCENESUBSYSTEMUPDATE, HANDLER(PhysicsWorld, HandleSceneSubsystemUpdate));
     }
+    else
+        UnsubscribeFromEvent(E_SCENESUBSYSTEMUPDATE);
 }
 
 void PhysicsWorld::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData)
@@ -761,7 +770,7 @@ void PhysicsWorld::SendCollisionEvents()
         }
 
         for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator i = currentCollisions_.Begin();
-            i != currentCollisions_.End(); ++i)
+             i != currentCollisions_.End(); ++i)
         {
             RigidBody* bodyA = i->first_.first_;
             RigidBody* bodyB = i->first_.second_;
@@ -858,7 +867,8 @@ void PhysicsWorld::SendCollisionEvents()
     {
         physicsCollisionData_[PhysicsCollisionEnd::P_WORLD] = this;
 
-        for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator i = previousCollisions_.Begin(); i != previousCollisions_.End(); ++i)
+        for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator
+                 i = previousCollisions_.Begin(); i != previousCollisions_.End(); ++i)
         {
             if (!currentCollisions_.Contains(i->first_))
             {

@@ -42,7 +42,7 @@ struct PackageEntry
 class URHO3D_API PackageFile : public Object
 {
     OBJECT(PackageFile);
-    
+
 public:
     /// Construct.
     PackageFile(Context* context);
@@ -50,30 +50,38 @@ public:
     PackageFile(Context* context, const String& fileName, unsigned startOffset = 0);
     /// Destruct.
     virtual ~PackageFile();
-    
+
     /// Open the package file. Return true if successful.
     bool Open(const String& fileName, unsigned startOffset = 0);
     /// Check if a file exists within the package file.
     bool Exists(const String& fileName) const;
     /// Return the file entry corresponding to the name, or null if not found.
     const PackageEntry* GetEntry(const String& fileName) const;
+
     /// Return all file entries.
     const HashMap<String, PackageEntry>& GetEntries() const { return entries_; }
+
     /// Return the package file name.
     const String& GetName() const { return fileName_; }
+
     /// Return hash of the package file name.
     StringHash GetNameHash() const { return nameHash_; }
+
     /// Return number of files.
     unsigned GetNumFiles() const { return entries_.Size(); }
+
     /// Return total size of the package file.
     unsigned GetTotalSize() const { return totalSize_; }
+
     /// Return checksum of the package file contents.
     unsigned GetChecksum() const { return checksum_; }
+
     /// Return whether the files are compressed.
     bool IsCompressed() const { return compressed_; }
+
     /// Return list of entry names
     const Vector<String> GetEntryNames() const { return entries_.Keys(); }
-    
+
 private:
     /// File entries.
     HashMap<String, PackageEntry> entries_;

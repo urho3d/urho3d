@@ -20,9 +20,11 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
-#include "../UI/Cursor.h"
 #include "../Input/InputEvents.h"
+#include "../UI/Cursor.h"
 #include "../UI/UI.h"
 #include "../UI/UIEvents.h"
 #include "../UI/Window.h"
@@ -49,7 +51,6 @@ Window::Window(Context* context) :
     modalShadeColor_(Color::TRANSPARENT),
     modalFrameColor_(Color::TRANSPARENT),
     modalFrameSize_(IntVector2::ZERO)
-
 {
     bringToFront_ = true;
     clipChildren_ = true;
@@ -105,7 +106,8 @@ void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
             IntVector2 size = GetSize();
             size.x_ -= x;
             batch.SetColor(modalFrameColor_);
-            batch.AddQuad(x - modalFrameSize_.x_, -modalFrameSize_.y_, size.x_ + 2 * modalFrameSize_.x_, size.y_ + 2 * modalFrameSize_.y_, 0, 0);
+            batch.AddQuad(x - modalFrameSize_.x_, -modalFrameSize_.y_, size.x_ + 2 * modalFrameSize_.x_,
+                size.y_ + 2 * modalFrameSize_.y_, 0, 0);
             UIBatch::AddOrMerge(batch, batches);
         }
     }
@@ -143,7 +145,8 @@ void Window::OnDragBegin(const IntVector2& position, const IntVector2& screenPos
     SetCursorShape(dragMode_, cursor);
 }
 
-void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers, Cursor* cursor)
+void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons,
+    int qualifiers, Cursor* cursor)
 {
     if (dragMode_ == DRAG_NONE)
         return;
@@ -164,21 +167,25 @@ void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
         break;
 
     case DRAG_RESIZE_TOPLEFT:
-        SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_), position_.x_ + (size_.x_ - minSize_.x_)),
-            Clamp(dragBeginPosition_.y_ + delta.y_, position_.y_ - (maxSize_.y_ - size_.y_), position_.y_ + (size_.y_ - minSize_.y_)));
+        SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_),
+            position_.x_ + (size_.x_ - minSize_.x_)),
+            Clamp(dragBeginPosition_.y_ + delta.y_, position_.y_ - (maxSize_.y_ - size_.y_),
+                position_.y_ + (size_.y_ - minSize_.y_)));
         dragSize = dragBeginSize_ - delta;
         fixedWidthResizing_ ? SetFixedWidth(Max(dragSize.x_, resizeBorderSize.x_)) : SetWidth(dragSize.x_);
         fixedHeightResizing_ ? SetFixedHeight(Max(dragSize.y_, resizeBorderSize.y_)) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_TOP:
-        SetPosition(dragBeginPosition_.x_, Clamp(dragBeginPosition_.y_ + delta.y_, position_.y_ - (maxSize_.y_ - size_.y_), position_.y_ + (size_.y_ - minSize_.y_)));
+        SetPosition(dragBeginPosition_.x_, Clamp(dragBeginPosition_.y_ + delta.y_, position_.y_ - (maxSize_.y_ - size_.y_),
+            position_.y_ + (size_.y_ - minSize_.y_)));
         dragSize = IntVector2(dragBeginSize_.x_, dragBeginSize_.y_ - delta.y_);
         fixedHeightResizing_ ? SetFixedHeight(Max(dragSize.y_, resizeBorderSize.y_)) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_TOPRIGHT:
-        SetPosition(dragBeginPosition_.x_, Clamp(dragBeginPosition_.y_ + delta.y_, position_.y_ - (maxSize_.y_ - size_.y_), position_.y_ + (size_.y_ - minSize_.y_)));
+        SetPosition(dragBeginPosition_.x_, Clamp(dragBeginPosition_.y_ + delta.y_, position_.y_ - (maxSize_.y_ - size_.y_),
+            position_.y_ + (size_.y_ - minSize_.y_)));
         dragSize = IntVector2(dragBeginSize_.x_ + delta.x_, dragBeginSize_.y_ - delta.y_);
         fixedWidthResizing_ ? SetFixedWidth(Max(dragSize.x_, resizeBorderSize.x_)) : SetWidth(dragSize.x_);
         fixedHeightResizing_ ? SetFixedHeight(Max(dragSize.y_, resizeBorderSize.y_)) : SetHeight(dragSize.y_);
@@ -201,14 +208,16 @@ void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
         break;
 
     case DRAG_RESIZE_BOTTOMLEFT:
-        SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_), position_.x_ + (size_.x_ - minSize_.x_)), dragBeginPosition_.y_);
+        SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_),
+            position_.x_ + (size_.x_ - minSize_.x_)), dragBeginPosition_.y_);
         dragSize = IntVector2(dragBeginSize_.x_ - delta.x_, dragBeginSize_.y_ + delta.y_);
         fixedWidthResizing_ ? SetFixedWidth(Max(dragSize.x_, resizeBorderSize.x_)) : SetWidth(dragSize.x_);
         fixedHeightResizing_ ? SetFixedHeight(Max(dragSize.y_, resizeBorderSize.y_)) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_LEFT:
-        SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_), position_.x_ + (size_.x_ - minSize_.x_)), dragBeginPosition_.y_);
+        SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_),
+            position_.x_ + (size_.x_ - minSize_.x_)), dragBeginPosition_.y_);
         dragSize = IntVector2(dragBeginSize_.x_ - delta.x_, dragBeginSize_.y_);
         fixedWidthResizing_ ? SetFixedWidth(Max(dragSize.x_, resizeBorderSize.x_)) : SetWidth(dragSize.x_);
         break;
@@ -228,7 +237,8 @@ void Window::OnDragEnd(const IntVector2& position, const IntVector2& screenPosit
     dragMode_ = DRAG_NONE;
 }
 
-void Window::OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor)
+void Window::OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons,
+    Cursor* cursor)
 {
     UIElement::OnDragCancel(position, screenPosition, dragButtons, buttons, cursor);
 

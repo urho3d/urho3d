@@ -20,11 +20,13 @@
 // THE SOFTWARE.
 //
 
-#include "../Script/APITemplates.h"
+#include "../Precompiled.h"
+
 #include "../Audio/Audio.h"
 #include "../Audio/Sound.h"
 #include "../Audio/SoundListener.h"
 #include "../Audio/SoundSource3D.h"
+#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {
@@ -49,7 +51,7 @@ void RegisterSoundSources(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const String SOUND_AMBIENT", (void*) &SOUND_AMBIENT);
     engine->RegisterGlobalProperty("const String SOUND_VOICE", (void*) &SOUND_VOICE);
     engine->RegisterGlobalProperty("const String SOUND_MUSIC", (void*) &SOUND_MUSIC);
-    
+
     RegisterSoundSource<SoundSource>(engine, "SoundSource");
     RegisterSoundSource<SoundSource3D>(engine, "SoundSource3D");
     // Allow creation of sound sources also outside scene

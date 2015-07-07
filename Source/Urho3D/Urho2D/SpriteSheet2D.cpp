@@ -20,17 +20,18 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Graphics/Texture2D.h"
 #include "../IO/Deserializer.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../Resource/PListFile.h"
 #include "../Resource/ResourceCache.h"
-#include "../IO/Serializer.h"
+#include "../Resource/XMLFile.h"
 #include "../Urho2D/Sprite2D.h"
 #include "../Urho2D/SpriteSheet2D.h"
-#include "../Graphics/Texture2D.h"
-#include "../Resource/XMLFile.h"
 
 #include "../DebugNew.h"
 
@@ -122,9 +123,9 @@ bool SpriteSheet2D::BeginLoadFromPListFile(Deserializer& source)
     SetMemoryUse(source.GetSize());
 
     const PListValueMap& root = loadPListFile_->GetRoot();
-    const PListValueMap& metadata = root["metadata"].GetValueMap();
-    const String& textureFileName = metadata["realTextureFileName"].GetString();
-    
+    const PListValueMap& metadata = root["metadata"]->GetValueMap();
+    const String& textureFileName = metadata["realTextureFileName"]->GetString();
+
     // If we're async loading, request the texture now. Finish during EndLoad().
     loadTextureName_ = GetParentPath(GetName()) + textureFileName;
     if (GetAsyncLoadState() == ASYNC_LOADING)
@@ -146,32 +147,31 @@ bool SpriteSheet2D::EndLoadFromPListFile()
     }
 
     const PListValueMap& root = loadPListFile_->GetRoot();
-
-    const PListValueMap& frames = root["frames"].GetValueMap();
+    const PListValueMap& frames = root["frames"]->GetValueMap();
     for (PListValueMap::ConstIterator i = frames.Begin(); i != frames.End(); ++i)
     {
         String name = i->first_.Split('.')[0];
 
         const PListValueMap& frameInfo = i->second_.GetValueMap();
-        if (frameInfo["rotated"].GetBool())
+        if (frameInfo["rotated"]->GetBool())
         {
             LOGWARNING("Rotated sprite is not support now");
             continue;
         }
 
-        IntRect rectangle = frameInfo["frame"].GetIntRect();
+        IntRect rectangle = frameInfo["frame"]->GetIntRect();
         Vector2 hotSpot(0.5f, 0.5f);
         IntVector2 offset(0, 0);
 
-        IntRect sourceColorRect = frameInfo["sourceColorRect"].GetIntRect();
+        IntRect sourceColorRect = frameInfo["sourceColorRect"]->GetIntRect();
         if (sourceColorRect.left_ != 0 && sourceColorRect.top_ != 0)
         {
             offset.x_ = -sourceColorRect.left_;
             offset.y_ = -sourceColorRect.top_;
 
-            IntVector2 sourceSize = frameInfo["sourceSize"].GetIntVector2();
+            IntVector2 sourceSize = frameInfo["sourceSize"]->GetIntVector2();
             hotSpot.x_ = ((float)offset.x_ + sourceSize.x_ / 2) / rectangle.Width();
-            hotSpot.y_ = 1.0f - ((float)offset.y_ + sourceSize.y_/ 2) / rectangle.Height();
+            hotSpot.y_ = 1.0f - ((float)offset.y_ + sourceSize.y_ / 2) / rectangle.Height();
         }
 
         DefineSprite(name, rectangle, hotSpot, offset);

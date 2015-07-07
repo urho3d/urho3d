@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "../Math/BoundingBox.h"
 #include "../Container/ArrayPtr.h"
-#include "../Scene/Component.h"
+#include "../Math/BoundingBox.h"
 #include "../Math/Quaternion.h"
+#include "../Scene/Component.h"
 
 class btBvhTriangleMeshShape;
 class btCollisionShape;
@@ -154,19 +154,28 @@ public:
     /// Set as a static plane.
     void SetStaticPlane(const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a cylinder.
-    void SetCylinder(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCylinder
+        (float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a capsule.
-    void SetCapsule(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCapsule
+        (float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a cone.
-    void SetCone(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCone
+        (float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a triangle mesh from Model. If you update a model's geometry and want to reapply the shape, call physicsWorld->RemoveCachedGeometry(model) first.
-    void SetTriangleMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetTriangleMesh
+        (Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
+            const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a triangle mesh from CustomGeometry.
-    void SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
+        const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a convex hull from Model.
-    void SetConvexHull(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetConvexHull
+        (Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
+            const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a convex hull from CustomGeometry.
-    void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO,
+        const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a terrain. Only works if the same scene node contains a Terrain component.
     void SetTerrain(unsigned lodLevel = 0);
     /// Set shape type.
@@ -188,24 +197,34 @@ public:
 
     /// Return Bullet collision shape.
     btCollisionShape* GetCollisionShape() const { return shape_; }
+
     /// Return the shared geometry data.
     CollisionGeometryData* GetGeometryData() const { return geometry_; }
+
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
+
     /// Return shape type.
     ShapeType GetShapeType() const { return shapeType_; }
+
     /// Return shape size.
     const Vector3& GetSize() const { return size_; }
+
     /// Return offset position.
     const Vector3& GetPosition() const { return position_; }
+
     /// Return offset rotation.
     const Quaternion& GetRotation() const { return rotation_; }
+
     /// Return collision margin.
     float GetMargin() const { return margin_; }
+
     /// Return triangle mesh / convex hull model.
     Model* GetModel() const { return model_; }
+
     /// Return model LOD level.
     unsigned GetLodLevel() const { return lodLevel_; }
+
     /// Return world-space bounding box.
     BoundingBox GetWorldBoundingBox() const;
 
@@ -221,6 +240,8 @@ public:
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
 
@@ -257,11 +278,13 @@ private:
     /// Model LOD level.
     unsigned lodLevel_;
     /// CustomGeometry component ID for convex hull mode. 0 if not creating the convex hull from a CustomGeometry.
-    int customGeometryID_;
+    unsigned customGeometryID_;
     /// Collision margin.
     float margin_;
-    /// Recrease collision shape flag.
+    /// Recreate collision shape flag.
     bool recreateShape_;
+    /// Shape creation retry flag if attributes initially set without scene.
+    bool retryCreation_;
 };
 
 }

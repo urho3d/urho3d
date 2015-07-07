@@ -20,13 +20,15 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Core/Profiler.h"
 #include "../Graphics/DebugRenderer.h"
-#include "../Physics/Constraint.h"
 #include "../IO/Log.h"
+#include "../Physics/Constraint.h"
 #include "../Physics/PhysicsUtils.h"
 #include "../Physics/PhysicsWorld.h"
-#include "../Core/Profiler.h"
 #include "../Physics/RigidBody.h"
 #include "../Scene/Scene.h"
 
@@ -65,7 +67,8 @@ Constraint::Constraint(Context* context) :
     otherBodyNodeID_(0),
     disableCollision_(false),
     recreateConstraint_(true),
-    framesDirty_(false)
+    framesDirty_(false),
+    retryCreation_(false)
 {
 }
 
@@ -87,7 +90,7 @@ void Constraint::RegisterObject(Context* context)
     ATTRIBUTE("Rotation", Quaternion, rotation_, Quaternion::IDENTITY, AM_DEFAULT);
     ATTRIBUTE("Other Body Position", Vector3, otherPosition_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE("Other Body Rotation", Quaternion, otherRotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    ATTRIBUTE("Other Body NodeID", int, otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
+    ATTRIBUTE("Other Body NodeID", unsigned, otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
     ACCESSOR_ATTRIBUTE("High Limit", GetHighLimit, SetHighLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Low Limit", GetLowLimit, SetLowLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("ERP Parameter", GetERP, SetERP, float, 0.0f, AM_DEFAULT);
@@ -392,8 +395,8 @@ void Constraint::ApplyFrames()
     cachedWorldScale_ = node_->GetWorldScale();
 
     Vector3 ownBodyScaledPosition = position_ * cachedWorldScale_ - ownBody_->GetCenterOfMass();
-    Vector3 otherBodyScaledPosition = otherBody_ ? otherPosition_ * otherBody_->GetNode()->GetWorldScale() -
-        otherBody_->GetCenterOfMass() : otherPosition_;
+    Vector3 otherBodyScaledPosition =
+        otherBody_ ? otherPosition_ * otherBody_->GetNode()->GetWorldScale() - otherBody_->GetCenterOfMass() : otherPosition_;
 
     switch (constraint_->getConstraintType())
     {
@@ -441,20 +444,34 @@ void Constraint::OnNodeSet(Node* node)
 {
     if (node)
     {
-        Scene* scene = GetScene();
-        if (scene)
-        {
-            if (scene == node)
-                LOGWARNING(GetTypeName() + " should not be created to the root scene node");
-
-            physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
-            physicsWorld_->AddConstraint(this);
-        }
-        else
-            LOGERROR("Node is detached from scene, can not create constraint");
-
         node->AddListener(this);
         cachedWorldScale_ = node->GetWorldScale();
+    }
+}
+
+void Constraint::OnSceneSet(Scene* scene)
+{
+    if (scene)
+    {
+        if (scene == node_)
+            LOGWARNING(GetTypeName() + " should not be created to the root scene node");
+
+        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
+        physicsWorld_->AddConstraint(this);
+
+        // Create constraint now if necessary (attributes modified before adding to scene)
+        if (retryCreation_)
+            CreateConstraint();
+    }
+    else
+    {
+        ReleaseConstraint();
+
+        if (physicsWorld_)
+            physicsWorld_->RemoveConstraint(this);
+
+        // Recreate when moved to a scene again
+        retryCreation_ = true;
     }
 }
 
@@ -477,15 +494,19 @@ void Constraint::CreateConstraint()
     btRigidBody* ownBody = ownBody_ ? ownBody_->GetBody() : 0;
     btRigidBody* otherBody = otherBody_ ? otherBody_->GetBody() : 0;
 
+    // If no physics world available now mark for retry later
     if (!physicsWorld_ || !ownBody)
+    {
+        retryCreation_ = true;
         return;
+    }
 
     if (!otherBody)
         otherBody = &btTypedConstraint::getFixedBody();
 
     Vector3 ownBodyScaledPosition = position_ * cachedWorldScale_ - ownBody_->GetCenterOfMass();
     Vector3 otherBodyScaledPosition = otherBody_ ? otherPosition_ * otherBody_->GetNode()->GetWorldScale() -
-        otherBody_->GetCenterOfMass() : otherPosition_;
+                                                   otherBody_->GetCenterOfMass() : otherPosition_;
 
     switch (constraintType_)
     {
@@ -539,6 +560,7 @@ void Constraint::CreateConstraint()
 
     recreateConstraint_ = false;
     framesDirty_ = false;
+    retryCreation_ = false;
 }
 
 void Constraint::ApplyLimits()

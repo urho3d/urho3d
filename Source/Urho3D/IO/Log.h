@@ -52,7 +52,7 @@ struct StoredLogMessage
     StoredLogMessage()
     {
     }
-    
+
     /// Construct with parameters.
     StoredLogMessage(const String& message, int level, bool error) :
         message_(message),
@@ -60,7 +60,7 @@ struct StoredLogMessage
         error_(error)
     {
     }
-    
+
     /// Message text.
     String message_;
     /// Message level. -1 for raw messages.
@@ -93,10 +93,13 @@ public:
 
     /// Return logging level.
     int GetLevel() const { return level_; }
+
     /// Return whether log messages are timestamped.
     bool GetTimeStamp() const { return timeStamp_; }
+
     /// Return last log message.
     String GetLastMessage() const { return lastMessage_; }
+
     /// Return whether log is in quiet mode (only errors printed to standard error stream).
     bool IsQuiet() const { return quiet_; }
 
@@ -108,7 +111,7 @@ public:
 private:
     /// Handle end of frame. Process the threaded log messages.
     void HandleEndFrame(StringHash eventType, VariantMap& eventData);
-    
+
     /// Mutex for threaded operation.
     Mutex logMutex_;
     /// Log messages from other threads.

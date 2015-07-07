@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Input/Input.h"
 #include "../UI/LineEdit.h"
@@ -113,7 +115,8 @@ void LineEdit::Update(float timeStep)
     cursor_->SetVisible(cursorVisible);
 }
 
-void LineEdit::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
+void LineEdit::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
+    Cursor* cursor)
 {
     if (button == MOUSEB_LEFT && cursorMovable_)
     {
@@ -126,20 +129,23 @@ void LineEdit::OnClickBegin(const IntVector2& position, const IntVector2& screen
     }
 }
 
-void LineEdit::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
+void LineEdit::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
+    Cursor* cursor)
 {
     if (button == MOUSEB_LEFT)
         text_->SetSelection(0);
 }
 
-void LineEdit::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void LineEdit::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers,
+    Cursor* cursor)
 {
     UIElement::OnDragBegin(position, screenPosition, buttons, qualifiers, cursor);
-    
+
     dragBeginCursor_ = GetCharIndex(position);
 }
 
-void LineEdit::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers, Cursor* cursor)
+void LineEdit::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons,
+    int qualifiers, Cursor* cursor)
 {
     if (cursorMovable_ && textSelectable_)
     {
@@ -235,7 +241,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             if (!clipBoard.Empty())
             {
                 // Remove selected text first
-                if(text_->GetSelectionLength() > 0)
+                if (text_->GetSelectionLength() > 0)
                 {
                     unsigned start = text_->GetSelectionStart();
                     unsigned length = text_->GetSelectionLength();
@@ -410,7 +416,8 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             SendEvent(E_TEXTFINISHED, eventData);
             return;
         }
-        break;
+
+    default: break;
     }
 
     if (changed)
@@ -620,11 +627,10 @@ unsigned LineEdit::GetCharIndex(const IntVector2& position)
     if (textPosition.x_ < 0)
         return 0;
 
-    int numChars = text_->GetNumChars();
-    for (int i = numChars; i >= 0; --i)
+    for (int i = text_->GetNumChars(); i >= 0; --i)
     {
-        if (textPosition.x_ >= text_->GetCharPosition(i).x_)
-            return i;
+        if (textPosition.x_ >= text_->GetCharPosition((unsigned)i).x_)
+            return (unsigned)i;
     }
 
     return M_MAX_UNSIGNED;

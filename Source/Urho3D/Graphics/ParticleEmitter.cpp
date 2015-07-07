@@ -20,10 +20,12 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Core/Profiler.h"
 #include "../Graphics/ParticleEffect.h"
 #include "../Graphics/ParticleEmitter.h"
-#include "../Core/Profiler.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/ResourceEvents.h"
 #include "../Scene/Scene.h"
@@ -58,7 +60,8 @@ void ParticleEmitter::RegisterObject(Context* context)
     context->RegisterFactory<ParticleEmitter>(GEOMETRY_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Effect", GetEffectAttr, SetEffectAttr, ResourceRef, ResourceRef(ParticleEffect::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Effect", GetEffectAttr, SetEffectAttr, ResourceRef, ResourceRef(ParticleEffect::GetTypeStatic()),
+        AM_DEFAULT);
     ENUM_ATTRIBUTE("Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_ROTATE_XYZ, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
@@ -69,8 +72,10 @@ void ParticleEmitter::RegisterObject(Context* context)
     ATTRIBUTE("Period Timer", float, periodTimer_, 0.0f, AM_FILE | AM_NOEDIT);
     ATTRIBUTE("Emission Timer", float, emissionTimer_, 0.0f, AM_FILE | AM_NOEDIT);
     COPY_BASE_ATTRIBUTES(Drawable);
-    MIXED_ACCESSOR_ATTRIBUTE("Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
-    MIXED_ACCESSOR_ATTRIBUTE("Billboards", GetParticleBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, Variant::emptyVariantVector,
+        AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Billboards", GetParticleBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector,
+        AM_FILE | AM_NOEDIT);
     ATTRIBUTE("Serialize Particles", bool, serializeParticles_, true, AM_FILE);
 }
 
@@ -353,8 +358,8 @@ void ParticleEmitter::SetParticlesAttr(const VariantVector& value)
         i->timeToLive_ = value[index++].GetFloat();
         i->scale_ = value[index++].GetFloat();
         i->rotationSpeed_ = value[index++].GetFloat();
-        i->colorIndex_ = value[index++].GetInt();
-        i->texIndex_ = value[index++].GetInt();
+        i->colorIndex_ = (unsigned)value[index++].GetInt();
+        i->texIndex_ = (unsigned)value[index++].GetInt();
     }
 }
 
@@ -408,16 +413,14 @@ VariantVector ParticleEmitter::GetParticleBillboardsAttr() const
     return ret;
 }
 
-void ParticleEmitter::OnNodeSet(Node* node)
+void ParticleEmitter::OnSceneSet(Scene* scene)
 {
-    BillboardSet::OnNodeSet(node);
+    BillboardSet::OnSceneSet(scene);
 
-    if (node)
-    {
-        Scene* scene = GetScene();
-        if (scene && IsEnabledEffective())
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
-    }
+    if (scene && IsEnabledEffective())
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
+    else if (!scene)
+         UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
 }
 
 bool ParticleEmitter::EmitNewParticle()

@@ -20,16 +20,18 @@
 // THE SOFTWARE.
 //
 
+#include "../../Precompiled.h"
+
 #include "../../Core/Context.h"
-#include "../../IO/FileSystem.h"
+#include "../../Core/Profiler.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsEvents.h"
 #include "../../Graphics/GraphicsImpl.h"
-#include "../../IO/Log.h"
 #include "../../Graphics/Renderer.h"
-#include "../../Core/Profiler.h"
-#include "../../Resource/ResourceCache.h"
 #include "../../Graphics/Texture2D.h"
+#include "../../IO/FileSystem.h"
+#include "../../IO/Log.h"
+#include "../../Resource/ResourceCache.h"
 #include "../../Resource/XMLFile.h"
 
 #include "../../DebugNew.h"
@@ -57,7 +59,7 @@ bool Texture2D::BeginLoad(Deserializer& source)
     // In headless mode, do not actually load the texture, just return success
     if (!graphics_)
         return true;
-    
+
     // Load the image data for EndLoad()
     loadImage_ = new Image(context_);
     if (!loadImage_->Load(source))
@@ -69,12 +71,12 @@ bool Texture2D::BeginLoad(Deserializer& source)
     // Precalculate mip levels if async loading
     if (GetAsyncLoadState() == ASYNC_LOADING)
         loadImage_->PrecalculateLevels();
-    
+
     // Load the optional parameters file
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
     loadParameters_ = cache->GetTempResource<XMLFile>(xmlName, false);
-    
+
     return true;
 }
 
@@ -83,16 +85,16 @@ bool Texture2D::EndLoad()
     // In headless mode, do not actually load the texture, just return success
     if (!graphics_)
         return true;
-    
+
     // If over the texture budget, see if materials can be freed to allow textures to be freed
     CheckTextureBudget(GetTypeStatic());
 
     SetParameters(loadParameters_);
     bool success = SetData(loadImage_);
-    
+
     loadImage_.Reset();
     loadParameters_.Reset();
-    
+
     return success;
 }
 
@@ -102,16 +104,16 @@ void Texture2D::Release()
     {
         if (!graphics_)
             return;
-        
+
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
             if (graphics_->GetTexture(i) == this)
                 graphics_->SetTexture(i, 0);
         }
-        
+
         if (renderSurface_)
             renderSurface_->Release();
-        
+
         ((ID3D11Resource*)object_)->Release();
         object_ = 0;
 
@@ -139,7 +141,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     // Delete the old rendersurface if any
     renderSurface_.Reset();
     usage_ = usage;
-    
+
     if (usage_ == TEXTURE_RENDERTARGET || usage_ == TEXTURE_DEPTHSTENCIL)
     {
         renderSurface_ = new RenderSurface(this);
@@ -149,7 +151,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
         filterMode_ = FILTER_NEAREST;
         requestedLevels_ = 1;
     }
-    
+
     if (usage_ == TEXTURE_RENDERTARGET)
         SubscribeToEvent(E_RENDERSURFACEUPDATE, HANDLER(Texture2D, HandleRenderSurfaceUpdate));
     else
@@ -158,32 +160,32 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     width_ = width;
     height_ = height;
     format_ = format;
-    
+
     return Create();
 }
 
 bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const void* data)
 {
     PROFILE(SetTextureData);
-    
+
     if (!object_)
     {
         LOGERROR("No texture created, can not set data");
         return false;
     }
-    
+
     if (!data)
     {
         LOGERROR("Null source for setting data");
         return false;
     }
-    
+
     if (level >= levels_)
     {
         LOGERROR("Illegal mip level for setting data");
         return false;
     }
-    
+
     int levelWidth = GetLevelWidth(level);
     int levelHeight = GetLevelHeight(level);
     if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || width <= 0 || height <= 0)
@@ -191,7 +193,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         LOGERROR("Illegal dimensions for setting data");
         return false;
     }
-    
+
     // If compressed, align the update region on a block
     if (IsCompressed())
     {
@@ -236,10 +238,10 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     else
     {
         D3D11_BOX destBox;
-        destBox.left = x;
-        destBox.right = x + width;
-        destBox.top = y;
-        destBox.bottom = y + height;
+        destBox.left = (UINT)x;
+        destBox.right = (UINT)(x + width);
+        destBox.top = (UINT)y;
+        destBox.bottom = (UINT)(y + height);
         destBox.front = 0;
         destBox.back = 1;
 
@@ -257,14 +259,14 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         LOGERROR("Null image, can not load texture");
         return false;
     }
-    
+
     unsigned memoryUse = sizeof(Texture2D);
-    
+
     int quality = QUALITY_HIGH;
     Renderer* renderer = GetSubsystem<Renderer>();
     if (renderer)
         quality = renderer->GetTextureQuality();
-    
+
     if (!image->IsCompressed())
     {
         // Convert unsuitable formats to RGBA
@@ -281,7 +283,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         int levelWidth = image->GetWidth();
         int levelHeight = image->GetHeight();
         unsigned format = 0;
-        
+
         // Discard unnecessary mip levels
         for (unsigned i = 0; i < mipsToSkip_[quality]; ++i)
         {
@@ -290,28 +292,30 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
             levelWidth = image->GetWidth();
             levelHeight = image->GetHeight();
         }
-        
+
         switch (components)
         {
         case 1:
             format = Graphics::GetAlphaFormat();
             break;
-            
+
         case 4:
             format = Graphics::GetRGBAFormat();
             break;
+
+        default: break;
         }
-        
+
         // If image was previously compressed, reset number of requested levels to avoid error if level count is too high for new size
         if (IsCompressed() && requestedLevels_ > 1)
             requestedLevels_ = 0;
         SetSize(levelWidth, levelHeight, format);
-        
+
         for (unsigned i = 0; i < levels_; ++i)
         {
             SetData(i, 0, 0, levelWidth, levelHeight, levelData);
             memoryUse += levelWidth * levelHeight * components;
-            
+
             if (i < levels_ - 1)
             {
                 image = image->GetNextLevel();
@@ -328,13 +332,13 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         unsigned levels = image->GetNumCompressedLevels();
         unsigned format = graphics_->GetFormat(image->GetCompressedFormat());
         bool needDecompress = false;
-        
+
         if (!format)
         {
             format = Graphics::GetRGBAFormat();
             needDecompress = true;
         }
-        
+
         unsigned mipsToSkip = mipsToSkip_[quality];
         if (mipsToSkip >= levels)
             mipsToSkip = levels - 1;
@@ -342,10 +346,10 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
             --mipsToSkip;
         width /= (1 << mipsToSkip);
         height /= (1 << mipsToSkip);
-        
-        SetNumLevels(Max((int)(levels - mipsToSkip), 1));
+
+        SetNumLevels((unsigned)Max((int)(levels - mipsToSkip), 1));
         SetSize(width, height, format);
-        
+
         for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)
         {
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
@@ -364,7 +368,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
             }
         }
     }
-    
+
     SetMemoryUse(memoryUse);
     return true;
 }
@@ -376,26 +380,26 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         LOGERROR("No texture created, can not get data");
         return false;
     }
-    
+
     if (!dest)
     {
         LOGERROR("Null destination for getting data");
         return false;
     }
-    
+
     if (level >= levels_)
     {
         LOGERROR("Illegal mip level for getting data");
         return false;
     }
-    
+
     int levelWidth = GetLevelWidth(level);
     int levelHeight = GetLevelHeight(level);
-    
+
     D3D11_TEXTURE2D_DESC textureDesc;
     memset(&textureDesc, 0, sizeof textureDesc);
-    textureDesc.Width = levelWidth;
-    textureDesc.Height = levelHeight;
+    textureDesc.Width = (UINT)levelWidth;
+    textureDesc.Height = (UINT)levelHeight;
     textureDesc.MipLevels = 1;
     textureDesc.ArraySize = 1;
     textureDesc.Format = (DXGI_FORMAT)format_;
@@ -415,18 +419,18 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     unsigned srcSubResource = D3D11CalcSubresource(level, 0, levels_);
     D3D11_BOX srcBox;
     srcBox.left = 0;
-    srcBox.right = levelWidth;
+    srcBox.right = (UINT)levelWidth;
     srcBox.top = 0;
-    srcBox.bottom = levelHeight;
+    srcBox.bottom = (UINT)levelHeight;
     srcBox.front = 0;
     srcBox.back = 1;
     graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_,
         srcSubResource, &srcBox);
-    
+
     D3D11_MAPPED_SUBRESOURCE mappedData;
     mappedData.pData = 0;
     unsigned rowSize = GetRowDataSize(levelWidth);
-    unsigned numRows = IsCompressed() ? (levelHeight + 3) >> 2 : levelHeight;
+    unsigned numRows = (unsigned)(IsCompressed() ? (levelHeight + 3) >> 2 : levelHeight);
 
     graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
     if (mappedData.pData)
@@ -448,16 +452,16 @@ bool Texture2D::GetData(unsigned level, void* dest) const
 bool Texture2D::Create()
 {
     Release();
-    
+
     if (!graphics_ || !width_ || !height_)
         return false;
-    
+
     levels_ = CheckMaxLevels(width_, height_, requestedLevels_);
-    
+
     D3D11_TEXTURE2D_DESC textureDesc;
     memset(&textureDesc, 0, sizeof textureDesc);
-    textureDesc.Width = width_;
-    textureDesc.Height = height_;
+    textureDesc.Width = (UINT)width_;
+    textureDesc.Height = (UINT)height_;
     textureDesc.MipLevels = levels_;
     textureDesc.ArraySize = 1;
     textureDesc.Format = (DXGI_FORMAT)(sRGB_ ? GetSRGBFormat(format_) : format_);
@@ -482,7 +486,7 @@ bool Texture2D::Create()
     memset(&resourceViewDesc, 0, sizeof resourceViewDesc);
     resourceViewDesc.Format = (DXGI_FORMAT)GetSRVFormat(textureDesc.Format);
     resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    resourceViewDesc.Texture2D.MipLevels = (unsigned)levels_;
+    resourceViewDesc.Texture2D.MipLevels = (UINT)levels_;
 
     graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &resourceViewDesc,
         (ID3D11ShaderResourceView**)&shaderResourceView_);

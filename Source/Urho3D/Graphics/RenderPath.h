@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "../Math/Color.h"
-#include "../Graphics/GraphicsDefs.h"
 #include "../Container/Ptr.h"
 #include "../Container/RefCounted.h"
+#include "../Graphics/GraphicsDefs.h"
+#include "../Math/Color.h"
 #include "../Math/Vector4.h"
 
 namespace Urho3D
@@ -75,10 +75,10 @@ struct RenderTargetInfo
         persistent_(false)
     {
     }
-    
+
     /// Read from an XML element.
     void Load(const XMLElement& element);
-    
+
     /// Name.
     String name_;
     /// Tag name.
@@ -115,7 +115,7 @@ struct RenderPathCommand
         vertexLights_(false)
     {
     }
-    
+
     /// Read from an XML element.
     void Load(const XMLElement& element);
     /// Set a texture resource name. Can also refer to a rendertarget defined in the rendering path.
@@ -134,20 +134,23 @@ struct RenderPathCommand
     void SetOutputFace(unsigned index, CubeMapFace face);
     /// Set depth-stencil output name. When empty, will assign a depth-stencil buffer automatically.
     void SetDepthStencilName(const String& name);
-    
+
     /// Return texture resource name.
     const String& GetTextureName(TextureUnit unit) const;
     /// Return shader parameter.
     const Variant& GetShaderParameter(const String& name) const;
+
     /// Return number of output rendertargets.
     unsigned GetNumOutputs() const { return outputs_.Size(); }
+
     /// Return output rendertarget name.
     const String& GetOutputName(unsigned index) const;
     /// Return output rendertarget face index.
     CubeMapFace GetOutputFace(unsigned index) const;
+
     /// Return depth-stencil output name.
     const String& GetDepthStencilName() const { return depthStencilName_; }
-    
+
     /// Tag name.
     String tag_;
     /// Command type.
@@ -206,7 +209,7 @@ public:
     RenderPath();
     /// Destruct.
     ~RenderPath();
-    
+
     /// Clone the rendering path.
     SharedPtr<RenderPath> Clone();
     /// Clear existing data and load from an XML file. Return true if successful.
@@ -239,16 +242,19 @@ public:
     void RemoveCommands(const String& tag);
     /// Set a shader parameter in all commands that define it.
     void SetShaderParameter(const String& name, const Variant& value);
-    
+
     /// Return number of rendertargets.
     unsigned GetNumRenderTargets() const { return renderTargets_.Size(); }
+
     /// Return number of commands.
     unsigned GetNumCommands() const { return commands_.Size(); }
+
     /// Return command at index, or null if does not exist.
     RenderPathCommand* GetCommand(unsigned index) { return index < commands_.Size() ? &commands_[index] : (RenderPathCommand*)0; }
+
     /// Return a shader parameter (first appearance in any command.)
     const Variant& GetShaderParameter(const String& name) const;
-    
+
     /// Rendertargets.
     Vector<RenderTargetInfo> renderTargets_;
     /// Rendering commands.

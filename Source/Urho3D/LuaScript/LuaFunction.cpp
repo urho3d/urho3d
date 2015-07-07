@@ -20,11 +20,13 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../IO/Log.h"
+#include "../IO/VectorBuffer.h"
 #include "../LuaScript/LuaFunction.h"
 #include "../LuaScript/LuaScript.h"
 #include "../LuaScript/LuaScriptInstance.h"
-#include "../IO/VectorBuffer.h"
 
 #include <toluapp/tolua++.h>
 #include "../LuaScript/ToluaUtils.h"
@@ -34,11 +36,11 @@
 namespace Urho3D
 {
 
-LuaFunction::LuaFunction(lua_State* luaState, int functionRef, bool needUnref) : 
+LuaFunction::LuaFunction(lua_State* luaState, int functionRef, bool needUnref) :
     luaState_(luaState),
     functionRef_(functionRef),
     needUnref_(needUnref)
-{   
+{
 }
 
 LuaFunction::~LuaFunction()
@@ -138,11 +140,11 @@ bool LuaFunction::PushVariant(const Variant& variant)
         return true;
 
     case VAR_FLOAT:
-        PushFloat(variant.GetFloat()); 
+        PushFloat(variant.GetFloat());
         return true;
 
     case VAR_VECTOR2:
-        PushUserType(variant.GetVector2(), "Vector2"); 
+        PushUserType(variant.GetVector2(), "Vector2");
         return true;
 
     case VAR_VECTOR3:
@@ -154,7 +156,7 @@ bool LuaFunction::PushVariant(const Variant& variant)
         return true;
 
     case VAR_QUATERNION:
-        PushUserType(variant.GetQuaternion(), "Quaternion"); 
+        PushUserType(variant.GetQuaternion(), "Quaternion");
         return true;
 
     case VAR_COLOR:
@@ -181,7 +183,7 @@ bool LuaFunction::PushVariant(const Variant& variant)
         return true;
 
     case VAR_INTVECTOR2:
-        PushUserType(variant.GetIntVector2(), "IntVector2"); 
+        PushUserType(variant.GetIntVector2(), "IntVector2");
         return true;
 
     default:

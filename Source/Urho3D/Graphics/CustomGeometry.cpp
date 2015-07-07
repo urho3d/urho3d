@@ -20,21 +20,22 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
+#include "../Core/Context.h"
+#include "../Core/Profiler.h"
 #include "../Graphics/Batch.h"
 #include "../Graphics/Camera.h"
-#include "../Core/Context.h"
 #include "../Graphics/CustomGeometry.h"
 #include "../Graphics/Geometry.h"
-#include "../IO/Log.h"
 #include "../Graphics/Material.h"
-#include "../IO/MemoryBuffer.h"
-#include "../Scene/Node.h"
 #include "../Graphics/OcclusionBuffer.h"
 #include "../Graphics/OctreeQuery.h"
-#include "../Core/Profiler.h"
-#include "../Resource/ResourceCache.h"
-#include "../IO/VectorBuffer.h"
 #include "../Graphics/VertexBuffer.h"
+#include "../IO/Log.h"
+#include "../IO/MemoryBuffer.h"
+#include "../Resource/ResourceCache.h"
+#include "../Scene/Node.h"
 
 #include "../DebugNew.h"
 
@@ -65,8 +66,10 @@ void CustomGeometry::RegisterObject(Context* context)
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATTRIBUTE("Dynamic Vertex Buffer", bool, dynamic_, false, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Geometry Data", GetGeometryDataAttr, SetGeometryDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE|AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE("Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Geometry Data", GetGeometryDataAttr, SetGeometryDataAttr, PODVector<unsigned char>,
+        Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE("Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()),
+        AM_DEFAULT);
     ATTRIBUTE("Is Occluder", bool, occluder_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
@@ -88,42 +91,48 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQ
 
     case RAY_OBB:
     case RAY_TRIANGLE:
-        Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
-        Ray localRay = query.ray_.Transformed(inverse);
-        float distance = localRay.HitDistance(boundingBox_);
-        Vector3 normal = -query.ray_.direction_;
-
-        if (level == RAY_TRIANGLE && distance < query.maxDistance_)
         {
-            distance = M_INFINITY;
+            Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
+            Ray localRay = query.ray_.Transformed(inverse);
+            float distance = localRay.HitDistance(boundingBox_);
+            Vector3 normal = -query.ray_.direction_;
 
-            for (unsigned i = 0; i < batches_.Size(); ++i)
+            if (level == RAY_TRIANGLE && distance < query.maxDistance_)
             {
-                Geometry* geometry = batches_[i].geometry_;
-                if (geometry)
+                distance = M_INFINITY;
+
+                for (unsigned i = 0; i < batches_.Size(); ++i)
                 {
-                    Vector3 geometryNormal;
-                    float geometryDistance = geometry->GetHitDistance(localRay, &geometryNormal);
-                    if (geometryDistance < query.maxDistance_ && geometryDistance < distance)
+                    Geometry* geometry = batches_[i].geometry_;
+                    if (geometry)
                     {
-                        distance = geometryDistance;
-                        normal = (node_->GetWorldTransform() * Vector4(geometryNormal, 0.0f)).Normalized();
+                        Vector3 geometryNormal;
+                        float geometryDistance = geometry->GetHitDistance(localRay, &geometryNormal);
+                        if (geometryDistance < query.maxDistance_ && geometryDistance < distance)
+                        {
+                            distance = geometryDistance;
+                            normal = (node_->GetWorldTransform() * Vector4(geometryNormal, 0.0f)).Normalized();
+                        }
                     }
                 }
             }
-        }
 
-        if (distance < query.maxDistance_)
-        {
-            RayQueryResult result;
-            result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
-            result.normal_ = normal;
-            result.distance_ = distance;
-            result.drawable_ = this;
-            result.node_ = node_;
-            result.subObject_ = M_MAX_UNSIGNED;
-            results.Push(result);
+            if (distance < query.maxDistance_)
+            {
+                RayQueryResult result;
+                result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
+                result.normal_ = normal;
+                result.distance_ = distance;
+                result.drawable_ = this;
+                result.node_ = node_;
+                result.subObject_ = M_MAX_UNSIGNED;
+                results.Push(result);
+            }
         }
+        break;
+
+    case RAY_TRIANGLE_UV:
+        LOGWARNING("RAY_TRIANGLE_UV query level is not supported for CustomGeometry component");
         break;
     }
 }
@@ -187,7 +196,8 @@ bool CustomGeometry::DrawOcclusion(OcclusionBuffer* buffer)
             continue;
 
         // Draw and check for running out of triangles
-        success = buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, geometry->GetVertexStart(), geometry->GetVertexCount());
+        success = buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, geometry->GetVertexStart(),
+            geometry->GetVertexCount());
 
         if (!success)
             break;
@@ -290,7 +300,8 @@ void CustomGeometry::DefineTangent(const Vector4& tangent)
     elementMask_ |= MASK_TANGENT;
 }
 
-void CustomGeometry::DefineGeometry(unsigned index, PrimitiveType type, unsigned numVertices, bool hasNormals, bool hasColors, bool hasTexCoords, bool hasTangents)
+void CustomGeometry::DefineGeometry(unsigned index, PrimitiveType type, unsigned numVertices, bool hasNormals, bool hasColors,
+    bool hasTexCoords, bool hasTangents)
 {
     if (index > geometries_.Size())
     {
@@ -431,7 +442,7 @@ Material* CustomGeometry::GetMaterial(unsigned index) const
 CustomGeometryVertex* CustomGeometry::GetVertex(unsigned geometryIndex, unsigned vertexNum)
 {
     return (geometryIndex < vertices_.Size() && vertexNum < vertices_[geometryIndex].Size()) ?
-        &vertices_[geometryIndex][vertexNum] : (CustomGeometryVertex*)0;
+           &vertices_[geometryIndex][vertexNum] : (CustomGeometryVertex*)0;
 }
 
 void CustomGeometry::SetGeometryDataAttr(const PODVector<unsigned char>& value)
@@ -452,15 +463,15 @@ void CustomGeometry::SetGeometryDataAttr(const PODVector<unsigned char>& value)
 
         for (unsigned j = 0; j < numVertices; ++j)
         {
-             if (elementMask_ & MASK_POSITION)
+            if (elementMask_ & MASK_POSITION)
                 vertices_[i][j].position_ = buffer.ReadVector3();
-             if (elementMask_ & MASK_NORMAL)
+            if (elementMask_ & MASK_NORMAL)
                 vertices_[i][j].normal_ = buffer.ReadVector3();
-             if (elementMask_ & MASK_COLOR)
+            if (elementMask_ & MASK_COLOR)
                 vertices_[i][j].color_ = buffer.ReadUInt();
-             if (elementMask_ & MASK_TEXCOORD1)
+            if (elementMask_ & MASK_TEXCOORD1)
                 vertices_[i][j].texCoord_ = buffer.ReadVector2();
-             if (elementMask_ & MASK_TANGENT)
+            if (elementMask_ & MASK_TANGENT)
                 vertices_[i][j].tangent_ = buffer.ReadVector4();
         }
     }
@@ -490,15 +501,15 @@ PODVector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
 
         for (unsigned j = 0; j < numVertices; ++j)
         {
-             if (elementMask_ & MASK_POSITION)
+            if (elementMask_ & MASK_POSITION)
                 ret.WriteVector3(vertices_[i][j].position_);
-             if (elementMask_ & MASK_NORMAL)
+            if (elementMask_ & MASK_NORMAL)
                 ret.WriteVector3(vertices_[i][j].normal_);
-             if (elementMask_ & MASK_COLOR)
+            if (elementMask_ & MASK_COLOR)
                 ret.WriteUInt(vertices_[i][j].color_);
-             if (elementMask_ & MASK_TEXCOORD1)
+            if (elementMask_ & MASK_TEXCOORD1)
                 ret.WriteVector2(vertices_[i][j].texCoord_);
-             if (elementMask_ & MASK_TANGENT)
+            if (elementMask_ & MASK_TANGENT)
                 ret.WriteVector4(vertices_[i][j].tangent_);
         }
     }

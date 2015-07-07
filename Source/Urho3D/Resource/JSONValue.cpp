@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../IO/Log.h"
 #include "../Resource/JSONFile.h"
@@ -66,7 +68,7 @@ JSONValue::~JSONValue()
 {
 }
 
-JSONValue& JSONValue::operator = (const JSONValue& rhs)
+JSONValue& JSONValue::operator =(const JSONValue& rhs)
 {
     file_ = rhs.file_;
     value_ = rhs.value_;
@@ -137,6 +139,13 @@ void JSONValue::SetFloat(const String& name, float value)
 {
     Value jsonValue;
     jsonValue.SetDouble((double)value);
+    AddMember(name, jsonValue);
+}
+
+void JSONValue::SetDouble(const String& name, double value)
+{
+    Value jsonValue;
+    jsonValue.SetDouble(value);
     AddMember(name, jsonValue);
 }
 
@@ -321,6 +330,11 @@ float JSONValue::GetFloat(const String& name) const
     return (float)GetMember(name).GetDouble();
 }
 
+double JSONValue::GetDouble(const String& name) const
+{
+    return GetMember(name).GetDouble();
+}
+
 Vector2 JSONValue::GetVector2(const String& name) const
 {
     return ToVector2(GetCString(name));
@@ -376,7 +390,7 @@ bool JSONValue::GetBuffer(const String& name, void* dest, unsigned size) const
         return false;
 
     for (unsigned i = 0; i < bytes.Size(); ++i)
-        destBytes[i] = ToInt(bytes[i]);
+        destBytes[i] = (unsigned char)ToInt(bytes[i]);
     return true;
 }
 
@@ -507,6 +521,13 @@ void JSONValue::AddFloat(float value)
 {
     Value jsonValue;
     jsonValue.SetDouble((double)value);
+    AddMember(jsonValue);
+}
+
+void JSONValue::AddDouble(double value)
+{
+    Value jsonValue;
+    jsonValue.SetDouble(value);
     AddMember(jsonValue);
 }
 
@@ -668,6 +689,11 @@ float JSONValue::GetFloat(unsigned index) const
     return (float)GetMember(index).GetDouble();
 }
 
+double JSONValue::GetDouble(unsigned index) const
+{
+    return GetMember(index).GetDouble();
+}
+
 Vector2 JSONValue::GetVector2(unsigned index) const
 {
     return ToVector2(GetCString(index));
@@ -723,7 +749,7 @@ bool JSONValue::GetBuffer(unsigned index, void* dest, unsigned size) const
         return false;
 
     for (unsigned i = 0; i < bytes.Size(); ++i)
-        destBytes[i] = ToInt(bytes[i]);
+        destBytes[i] = (unsigned char)ToInt(bytes[i]);
     return true;
 }
 

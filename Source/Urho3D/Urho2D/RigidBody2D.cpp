@@ -20,14 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "../Urho2D/CollisionShape2D.h"
-#include "../Urho2D/Constraint2D.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../IO/Log.h"
+#include "../Scene/Scene.h"
+#include "../Urho2D/CollisionShape2D.h"
+#include "../Urho2D/Constraint2D.h"
 #include "../Urho2D/PhysicsUtils2D.h"
 #include "../Urho2D/PhysicsWorld2D.h"
 #include "../Urho2D/RigidBody2D.h"
-#include "../Scene/Scene.h"
 
 #include "../DebugNew.h"
 
@@ -164,7 +166,7 @@ void RigidBody2D::SetUseFixtureMass(bool useFixtureMass)
 
     if (body_)
     {
-       if (useFixtureMass_)
+        if (useFixtureMass_)
             body_->ResetMassData();
         else
             body_->SetMassData(&massData_);
@@ -346,7 +348,7 @@ void RigidBody2D::CreateBody()
 
     for (unsigned i = 0; i < constraints_.Size(); ++i)
     {
-            if (constraints_[i])
+        if (constraints_[i])
             constraints_[i]->CreateJoint();
     }
 }
@@ -472,16 +474,27 @@ float RigidBody2D::GetAngularVelocity() const
 
 void RigidBody2D::OnNodeSet(Node* node)
 {
-    Component::OnNodeSet(node);
-
     if (node)
-    {
         node->AddListener(this);
-        Scene* scene = GetScene();
+}
+
+void RigidBody2D::OnSceneSet(Scene* scene)
+{
+    if (scene)
+    {
         physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
 
         CreateBody();
         physicsWorld_->AddRigidBody(this);
+    }
+    else
+    {
+        if (physicsWorld_)
+        {
+            ReleaseBody();
+            physicsWorld_->RemoveRigidBody(this);
+            physicsWorld_.Reset();
+        }
     }
 }
 

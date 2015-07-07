@@ -20,9 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "../IO/Log.h"
+#include "../Precompiled.h"
+
 #include "../Core/Profiler.h"
-#include "../Core/Thread.h"
+#include "../IO/Log.h"
 #include "../Resource/Resource.h"
 
 namespace Urho3D
@@ -41,7 +42,7 @@ bool Resource::Load(Deserializer& source)
     // create a type name -based profile block here
 #ifdef URHO3D_PROFILING
     String profileBlockName("Load" + GetTypeName());
-    
+
     Profiler* profiler = GetSubsystem<Profiler>();
     if (profiler)
         profiler->BeginBlock(profileBlockName.CString());

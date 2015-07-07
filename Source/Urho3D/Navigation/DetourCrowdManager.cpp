@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Scene/Component.h"
 #include "../Core/Context.h"
 #include "../Navigation/CrowdAgent.h"
@@ -78,7 +80,7 @@ void DetourCrowdManager::RegisterObject(Context* context)
 
 void DetourCrowdManager::SetNavigationMesh(NavigationMesh* navMesh)
 {
-    navigationMesh_ = WeakPtr<NavigationMesh>(navMesh);
+    navigationMesh_ = navMesh;
     if (navigationMesh_ && !navigationMesh_->navMeshQuery_)
         navigationMesh_->InitializeQuery();
     CreateCrowd();
@@ -418,7 +420,7 @@ bool DetourCrowdManager::SetAgentTarget(CrowdAgent* agent, Vector3 target)
     return !dtStatusFailed(status) && crowd_->requestMoveTarget(agent->GetAgentCrowdId(), polyRef, nearestPos);
 }
 
-bool DetourCrowdManager::SetAgentTarget(CrowdAgent* agent, Vector3 target, unsigned int& targetRef)
+bool DetourCrowdManager::SetAgentTarget(CrowdAgent* agent, Vector3 target, unsigned& targetRef)
 {
     if (crowd_ == 0)
         return false;
@@ -514,23 +516,31 @@ void DetourCrowdManager::HandleNavMeshFullRebuild(StringHash eventType, VariantM
     }
 }
 
-void DetourCrowdManager::OnNodeSet(Node* node)
+void DetourCrowdManager::OnSceneSet(Scene* scene)
 {
     // Subscribe to the scene subsystem update, which will trigger the crowd update step, and grab a reference
     // to the scene's NavigationMesh
-    if (node)
+    if (scene)
     {
-        SubscribeToEvent(node, E_SCENESUBSYSTEMUPDATE, HANDLER(DetourCrowdManager, HandleSceneSubsystemUpdate));
-        SubscribeToEvent(node, E_NAVIGATION_MESH_REBUILT, HANDLER(DetourCrowdManager, HandleNavMeshFullRebuild));
-
+        SubscribeToEvent(scene, E_SCENESUBSYSTEMUPDATE, HANDLER(DetourCrowdManager, HandleSceneSubsystemUpdate));
         NavigationMesh* mesh = GetScene()->GetComponent<NavigationMesh>();
         if (!mesh)
             mesh = GetScene()->GetComponent<DynamicNavigationMesh>();
         if (mesh)
+        {
+            SubscribeToEvent(mesh, E_NAVIGATION_MESH_REBUILT, HANDLER(DetourCrowdManager, HandleNavMeshFullRebuild));
             SetNavigationMesh(mesh);
+        }
         else
             LOGERROR("DetourCrowdManager requires an existing navigation mesh");
     }
+    else
+    {
+        UnsubscribeFromEvent(E_SCENESUBSYSTEMUPDATE);
+        UnsubscribeFromEvent(E_NAVIGATION_MESH_REBUILT);
+        navigationMesh_.Reset();
+    }
+
 }
 
 }

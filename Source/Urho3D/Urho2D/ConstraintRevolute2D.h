@@ -34,7 +34,7 @@ class URHO3D_API ConstraintRevolute2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintRevolute2D(Context* scontext);
+    ConstraintRevolute2D(Context* context);
     /// Destruct.
     virtual ~ConstraintRevolute2D();
     /// Register object factory.
@@ -57,16 +57,22 @@ public:
 
     /// Return anchor.
     const Vector2& GetAnchor() const { return anchor_; }
+
     /// Return enable limit.
     bool GetEnableLimit() const { return jointDef_.enableLimit; }
+
     /// Return lower angle.
     float GetLowerAngle() const { return jointDef_.lowerAngle; }
+
     /// Return upper angle.
     float GetUpperAngle() const { return jointDef_.upperAngle; }
+
     /// Return enable motor.
     bool GetEnableMotor() const { return jointDef_.enableMotor; }
+
     /// Return motor speed.
     float GetMotorSpeed() const { return jointDef_.motorSpeed; }
+
     /// Return max motor torque.
     float GetMaxMotorTorque() const { return jointDef_.maxMotorTorque; }
 

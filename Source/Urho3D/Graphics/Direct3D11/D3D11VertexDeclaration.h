@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../../Graphics/GraphicsDefs.h"
 #include "../../Container/RefCounted.h"
 #include "../../Container/Vector.h"
+#include "../../Graphics/GraphicsDefs.h"
 
 namespace Urho3D
 {
@@ -41,10 +41,10 @@ public:
     VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** buffers, unsigned* elementMasks);
     /// Destruct.
     ~VertexDeclaration();
-    
+
     /// Return input layout object corresponding to the declaration.
     void* GetInputLayout() const { return inputLayout_; }
-    
+
 private:
     /// Input layout object.
     void* inputLayout_;

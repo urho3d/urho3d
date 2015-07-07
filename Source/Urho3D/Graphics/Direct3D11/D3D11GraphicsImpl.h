@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "../../Math/Color.h"
 #include "../../Graphics/GraphicsDefs.h"
+#include "../../Math/Color.h"
 
 #include <d3d11.h>
 #include <dxgi.h>
@@ -36,20 +36,23 @@ namespace Urho3D
 class URHO3D_API GraphicsImpl
 {
     friend class Graphics;
-    
+
 public:
     /// Construct.
     GraphicsImpl();
-    
+
     /// Return Direct3D device.
     ID3D11Device* GetDevice() const { return device_; }
+
     /// Return Direct3D immediate device context.
     ID3D11DeviceContext* GetDeviceContext() const { return deviceContext_; }
+
     /// Return swapchain.
     IDXGISwapChain* GetSwapChain() const { return swapChain_; }
+
     /// Return window.
     SDL_Window* GetWindow() const { return window_; }
-    
+
 private:
     /// SDL window.
     SDL_Window* window_;

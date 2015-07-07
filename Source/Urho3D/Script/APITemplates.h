@@ -22,23 +22,23 @@
 
 #pragma once
 
-#include "../Script/Addons.h"
-#include "../Scene/Animatable.h"
-#include "../UI/BorderImage.h"
-#include "../Core/Context.h"
-#include "../Graphics/Drawable.h"
-#include "../IO/File.h"
-#include "../Container/HashSet.h"
-#include "../IO/Log.h"
-#include "../IO/VectorBuffer.h"
-#include "../Scene/Node.h"
-#include "../Resource/Resource.h"
-#include "../Script/Script.h"
-#include "../Script/ScriptInstance.h"
-#include "../Container/Sort.h"
 #include "../Audio/SoundSource.h"
+#include "../Core/Context.h"
+#include "../Container/HashSet.h"
+#include "../Container/Sort.h"
+#include "../Graphics/Drawable.h"
 #include "../Graphics/StaticModel.h"
 #include "../Graphics/Texture.h"
+#include "../IO/File.h"
+#include "../IO/Log.h"
+#include "../IO/VectorBuffer.h"
+#include "../Resource/Resource.h"
+#include "../Script/Addons.h"
+#include "../Scene/Animatable.h"
+#include "../Scene/Node.h"
+#include "../Script/Script.h"
+#include "../Script/ScriptInstance.h"
+#include "../UI/BorderImage.h"
 
 #include <AngelScript/angelscript.h>
 #include <cstring>
@@ -65,7 +65,7 @@ template <class T, class U> U* RefCast(T* t)
 /// Template function for Vector to array conversion.
 template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const char* arrayName)
 {
-    asIScriptContext *context = asGetActiveContext();
+    asIScriptContext* context = asGetActiveContext();
     if (context)
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
@@ -83,7 +83,7 @@ template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const ch
 /// Template function for PODVector to array conversion.
 template <class T> CScriptArray* VectorToArray(const PODVector<T>& vector, const char* arrayName)
 {
-    asIScriptContext *context = asGetActiveContext();
+    asIScriptContext* context = asGetActiveContext();
     if (context)
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
@@ -101,7 +101,7 @@ template <class T> CScriptArray* VectorToArray(const PODVector<T>& vector, const
 /// Template function for data buffer to array conversion.
 template <class T> CScriptArray* BufferToArray(const T* buffer, unsigned size, const char* arrayName)
 {
-    asIScriptContext *context = asGetActiveContext();
+    asIScriptContext* context = asGetActiveContext();
     if (context)
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
@@ -119,7 +119,7 @@ template <class T> CScriptArray* BufferToArray(const T* buffer, unsigned size, c
 /// Template function for Vector to handle array conversion.
 template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, const char* arrayName)
 {
-    asIScriptContext *context = asGetActiveContext();
+    asIScriptContext* context = asGetActiveContext();
     if (context)
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
@@ -143,7 +143,7 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, c
 /// Template function for PODVector to handle array conversion.
 template <class T> CScriptArray* VectorToHandleArray(const PODVector<T*>& vector, const char* arrayName)
 {
-    asIScriptContext *context = asGetActiveContext();
+    asIScriptContext* context = asGetActiveContext();
     if (context)
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
@@ -167,7 +167,7 @@ template <class T> CScriptArray* VectorToHandleArray(const PODVector<T*>& vector
 /// Template function for shared pointer Vector to handle array conversion.
 template <class T> CScriptArray* VectorToHandleArray(const Vector<SharedPtr<T> >& vector, const char* arrayName)
 {
-    asIScriptContext *context = asGetActiveContext();
+    asIScriptContext* context = asGetActiveContext();
     if (context)
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
@@ -250,6 +250,7 @@ template <class T> void RegisterSerializer(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "bool WriteUByte(uint8)", asMETHODPR(T, WriteUByte, (unsigned char), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteBool(bool)", asMETHODPR(T, WriteBool, (bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteFloat(float)", asMETHODPR(T, WriteFloat, (float), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool WriteDouble(double)", asMETHODPR(T, WriteDouble, (double), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteIntRect(const IntRect&in)", asMETHODPR(T, WriteIntRect, (const IntRect&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteIntVector2(const IntVector2&in)", asMETHODPR(T, WriteIntVector2, (const IntVector2&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteVector2(const Vector2&in)", asMETHODPR(T, WriteVector2, (const Vector2&), bool), asCALL_THISCALL);
@@ -301,6 +302,7 @@ template <class T> void RegisterDeserializer(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "uint8 ReadUByte()", asMETHODPR(T, ReadUByte, (), unsigned char), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool ReadBool()", asMETHODPR(T, ReadBool, (), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float ReadFloat()", asMETHODPR(T, ReadFloat, (), float), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "double ReadDouble()", asMETHODPR(T, ReadDouble, (), double), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntRect ReadIntRect()", asMETHODPR(T, ReadIntRect, (), IntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 ReadIntVector2()", asMETHODPR(T, ReadIntVector2, (), IntVector2), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector2 ReadVector2()", asMETHODPR(T, ReadVector2, (), Vector2), asCALL_THISCALL);
@@ -596,7 +598,7 @@ static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool 
             if ((*j)->GetType() == ScriptInstance::GetTypeStatic())
             {
                 ScriptInstance* instance = static_cast<ScriptInstance*>(j->Get());
-                if (instance->GetClassName() == className)
+                if (instance->IsA(className))
                     result.Push(node);
             }
         }

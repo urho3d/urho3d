@@ -21,16 +21,17 @@
 // THE SOFTWARE.
 //
 
-#include "../Graphics/Camera.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Graphics/Camera.h"
 #include "../Graphics/DebugRenderer.h"
-#include "../IO/Log.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/Octree.h"
 #include "../Graphics/Renderer.h"
-#include "../Scene/Scene.h"
-#include "../Container/Sort.h"
 #include "../Graphics/Zone.h"
+#include "../IO/Log.h"
+#include "../Scene/Scene.h"
 
 #include "../DebugNew.h"
 
@@ -359,10 +360,13 @@ void Drawable::LimitVertexLights(bool removeConvertedLights)
 void Drawable::OnNodeSet(Node* node)
 {
     if (node)
-    {
-        AddToOctree();
         node->AddListener(this);
-    }
+}
+
+void Drawable::OnSceneSet(Scene* scene)
+{
+    if (scene)
+        AddToOctree();
     else
         RemoveFromOctree();
 }
@@ -407,10 +411,10 @@ void Drawable::RemoveFromOctree()
         Octree* octree = octant_->GetRoot();
         if (updateQueued_)
             octree->CancelUpdate(this);
-        
+
         // Perform subclass specific deinitialization if necessary
         OnRemoveFromOctree();
-        
+
         octant_->RemoveDrawable(this);
     }
 }

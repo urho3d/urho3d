@@ -20,8 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "../Urho2D/TileMapDefs2D.h"
+#include "../Precompiled.h"
+
 #include "../Resource/XMLElement.h"
+#include "../Urho2D/TileMapDefs2D.h"
 
 #include "../DebugNew.h"
 
@@ -49,7 +51,8 @@ Vector2 TileMapInfo2D::ConvertPosition(const Vector2& position) const
     case O_ISOMETRIC:
         {
             Vector2 index = position * PIXEL_SIZE / tileHeight_;
-            return Vector2((width_ + index.x_ - index.y_) * tileWidth_ * 0.5f, (height_ * 2.0f - index.x_ - index.y_) * tileHeight_ * 0.5f);
+            return Vector2((width_ + index.x_ - index.y_) * tileWidth_ * 0.5f,
+                (height_ * 2.0f - index.x_ - index.y_) * tileHeight_ * 0.5f);
         }
 
     case O_STAGGERED:
@@ -74,7 +77,7 @@ Vector2 TileMapInfo2D::TileIndexToPosition(int x, int y) const
         if (y % 2 == 0)
             return Vector2(x * tileWidth_, (height_ - 1 - y) * 0.5f * tileHeight_);
         else
-            return Vector2((x + 0.5f) * tileWidth_, (height_ - 1 - y)  * 0.5f * tileHeight_);
+            return Vector2((x + 0.5f) * tileWidth_, (height_ - 1 - y) * 0.5f * tileHeight_);
 
     case O_ORTHOGONAL:
     default:
@@ -89,12 +92,12 @@ bool TileMapInfo2D::PositionToTileIndex(int& x, int& y, const Vector2& position)
     switch (orientation_)
     {
     case O_ISOMETRIC:
-        {
-            int x_sub_y = (int)(position.x_ * 2.0f / tileWidth_ + 1 - width_);
-            int x_add_y = (int)(height_ * 2.0f - position.y_ * 2.0f / tileHeight_ - 2.0f);
-            x = (x_sub_y - x_add_y) / 2;
-            y = (x_sub_y - x_add_y) / 2;
-        }
+    {
+        int x_sub_y = (int)(position.x_ * 2.0f / tileWidth_ + 1 - width_);
+        int x_add_y = (int)(height_ * 2.0f - position.y_ * 2.0f / tileHeight_ - 2.0f);
+        x = (x_sub_y - x_add_y) / 2;
+        y = (x_sub_y - x_add_y) / 2;
+    }
         break;
 
     case O_STAGGERED:
@@ -146,8 +149,8 @@ const String& PropertySet2D::GetProperty(const String& name) const
     return i->second_;
 }
 
-Tile2D::Tile2D() : 
-    gid_(0) 
+Tile2D::Tile2D() :
+    gid_(0)
 {
 }
 

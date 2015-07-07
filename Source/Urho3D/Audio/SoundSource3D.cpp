@@ -20,15 +20,15 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Audio/Audio.h"
-#include "../Core/Context.h"
-#include "../Graphics/DebugRenderer.h"
-#include "../Scene/Node.h"
 #include "../Audio/Sound.h"
 #include "../Audio/SoundListener.h"
 #include "../Audio/SoundSource3D.h"
-
-#include "../DebugNew.h"
+#include "../Core/Context.h"
+#include "../Graphics/DebugRenderer.h"
+#include "../Scene/Node.h"
 
 namespace Urho3D
 {
@@ -47,7 +47,7 @@ static Vector3 PointOnSphere(float radius, float theta, float phi)
 {
     // Zero angles point toward positive Z axis
     phi += 90.0f;
-    
+
     return Vector3(
         radius * Sin(theta) * Sin(phi),
         radius * Cos(phi),
@@ -65,10 +65,10 @@ static void DrawDebugArc(const Vector3& worldPosition, const Quaternion& worldRo
         debug->AddSphere(Sphere(worldPosition, distance), color, depthTest);
         return;
     }
-    
+
     unsigned uintColor = color.ToUInt();
     float halfAngle = 0.5f * angle;
-    
+
     if (drawLines)
     {
         debug->AddLine(worldPosition, worldPosition + worldRotation * PointOnSphere(distance, halfAngle, halfAngle),
@@ -80,9 +80,9 @@ static void DrawDebugArc(const Vector3& worldPosition, const Quaternion& worldRo
         debug->AddLine(worldPosition, worldPosition + worldRotation * PointOnSphere(distance, -halfAngle, -halfAngle),
             uintColor);
     }
-    
+
     const float step = 0.5f;
-    
+
     for (float x = -1.0f; x < 1.0f; x += step)
     {
         debug->AddLine(worldPosition + worldRotation * PointOnSphere(distance, x * halfAngle, halfAngle),
@@ -131,11 +131,11 @@ void SoundSource3D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     if (!debug || !node_ || !IsEnabledEffective())
         return;
-    
+
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     Vector3 worldPosition = worldTransform.Translation();
     Quaternion worldRotation = worldTransform.Rotation();
-    
+
     // Draw cones for directional sounds, or spheres for non-directional
     if (innerAngle_ < DEFAULT_ANGLE && outerAngle_ > 0.0f)
     {
@@ -216,28 +216,29 @@ void SoundSource3D::CalculateAttenuation()
         if (listener && listener->IsEnabledEffective() && (!listener->GetScene() || listener->GetScene() == GetScene()))
         {
             Node* listenerNode = listener->GetNode();
-            Vector3 relativePos(listenerNode->GetWorldRotation().Inverse() * (node_->GetWorldPosition() - listenerNode->GetWorldPosition()));
+            Vector3 relativePos
+                (listenerNode->GetWorldRotation().Inverse() * (node_->GetWorldPosition() - listenerNode->GetWorldPosition()));
             float distance = relativePos.Length();
-            
+
             // Distance attenuation
             if (interval > 0.0f)
                 attenuation_ = powf(1.0f - Clamp(distance - nearDistance_, 0.0f, interval) / interval, rolloffFactor_);
             else
                 attenuation_ = distance <= nearDistance_ ? 1.0f : 0.0f;
-            
+
             // Panning
             panning_ = relativePos.Normalized().x_;
-            
+
             // Angle attenuation
             if (innerAngle_ < DEFAULT_ANGLE && outerAngle_ > 0.0f)
             {
-                Vector3 listenerRelativePos(node_->GetWorldRotation().Inverse() * (listenerNode->GetWorldPosition() -
-                    node_->GetWorldPosition()));
+                Vector3 listenerRelativePos
+                    (node_->GetWorldRotation().Inverse() * (listenerNode->GetWorldPosition() - node_->GetWorldPosition()));
                 float listenerDot = Vector3::FORWARD.DotProduct(listenerRelativePos.Normalized());
                 float listenerAngle = acosf(listenerDot) * M_RADTODEG * 2.0f;
                 float angleInterval = Max(outerAngle_ - innerAngle_, 0.0f);
                 float angleAttenuation = 1.0f;
-                
+
                 if (angleInterval > 0.0f)
                 {
                     if (listenerAngle > innerAngle_)
@@ -248,7 +249,7 @@ void SoundSource3D::CalculateAttenuation()
                 }
                 else
                     angleAttenuation = listenerAngle <= innerAngle_ ? 1.0f : 0.0f;
-                
+
                 attenuation_ *= angleAttenuation;
             }
         }

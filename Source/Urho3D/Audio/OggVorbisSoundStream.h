@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "../Container/ArrayPtr.h"
 #include "../Audio/SoundStream.h"
+#include "../Container/ArrayPtr.h"
 
 namespace Urho3D
 {
@@ -38,10 +38,10 @@ public:
     OggVorbisSoundStream(const Sound* sound);
     /// Destruct.
     ~OggVorbisSoundStream();
-    
+
     /// Produce sound data into destination. Return number of bytes produced. Called by SoundSource from the mixing thread.
     virtual unsigned GetData(signed char* dest, unsigned numBytes);
-    
+
 protected:
     /// Decoder state.
     void* decoder_;

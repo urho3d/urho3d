@@ -21,15 +21,17 @@
 //
 
 #ifdef URHO3D_NAVIGATION
-#include "../Script/APITemplates.h"
+
+#include "../Precompiled.h"
+
 #include "../Navigation/Navigable.h"
 #include "../Navigation/CrowdAgent.h"
 #include "../Navigation/NavigationMesh.h"
-#include "../Navigation/DetourCrowdManager.h"
 #include "../Navigation/DynamicNavigationMesh.h"
 #include "../Navigation/OffMeshConnection.h"
 #include "../Navigation/NavArea.h"
 #include "../Navigation/Obstacle.h"
+#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {
@@ -258,4 +260,5 @@ void RegisterNavigationAPI(asIScriptEngine* engine)
 }
 
 }
+
 #endif

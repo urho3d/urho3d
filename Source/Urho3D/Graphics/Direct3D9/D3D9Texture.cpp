@@ -20,14 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "../../IO/FileSystem.h"
+#include "../../Precompiled.h"
+
+#include "../../Core/StringUtils.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/Material.h"
-#include "../../Core/Profiler.h"
+#include "../../IO/FileSystem.h"
 #include "../../Resource/ResourceCache.h"
-#include "../../Core/StringUtils.h"
-#include "../../Graphics/Texture.h"
 #include "../../Resource/XMLFile.h"
 
 #include "../../DebugNew.h"
@@ -71,7 +71,7 @@ Texture::Texture(Context* context) :
     for (int i = 0; i < MAX_COORDS; ++i)
         addressMode_[i] = ADDRESS_WRAP;
     for (int i = 0; i < MAX_TEXTURE_QUALITY_LEVELS; ++i)
-        mipsToSkip_[i] = MAX_TEXTURE_QUALITY_LEVELS - 1 - i;
+        mipsToSkip_[i] = (unsigned)(MAX_TEXTURE_QUALITY_LEVELS - 1 - i);
 }
 
 Texture::~Texture()
@@ -105,7 +105,7 @@ void Texture::SetSRGB(bool enable)
 {
     if (graphics_)
         enable &= graphics_->GetSRGBSupport();
-    
+
     sRGB_ = enable;
 }
 
@@ -118,8 +118,8 @@ void Texture::SetMipsToSkip(int quality, int mips)
 {
     if (quality >= QUALITY_LOW && quality < MAX_TEXTURE_QUALITY_LEVELS)
     {
-        mipsToSkip_[quality] = mips;
-        
+        mipsToSkip_[quality] = (unsigned)mips;
+
         // Make sure a higher quality level does not actually skip more mips
         for (int i = 1; i < MAX_TEXTURE_QUALITY_LEVELS; ++i)
         {
@@ -164,13 +164,13 @@ TextureUsage Texture::GetUsage() const
 {
     if (usage_ & D3DUSAGE_DEPTHSTENCIL)
         return TEXTURE_DEPTHSTENCIL;
-    
+
     if (usage_ & D3DUSAGE_RENDERTARGET)
         return TEXTURE_RENDERTARGET;
-    
+
     if (pool_ == D3DPOOL_DEFAULT)
         return TEXTURE_DYNAMIC;
-    
+
     return TEXTURE_STATIC;
 }
 
@@ -193,18 +193,18 @@ unsigned Texture::GetRowDataSize(int width) const
     {
     case D3DFMT_A8:
     case D3DFMT_L8:
-        return width;
-    
+        return (unsigned)width;
+
     case D3DFMT_D16:
     case D3DFMT_R5G6B5:
     case D3DFMT_A4R4G4B4:
     case D3DFMT_A8L8:
     case D3DFMT_R16F:
-        return width * 2;
+        return (unsigned)(width * 2);
 
     case D3DFMT_X8R8G8B8:
         // Note: here source and destination data size differ
-        return width * 3;
+        return (unsigned)(width * 3);
 
     case D3DFMT_A8R8G8B8:
     case D3DFMT_G16R16:
@@ -212,22 +212,22 @@ unsigned Texture::GetRowDataSize(int width) const
     case D3DFMT_G16R16F:
     case D3DFMT_D24S8:
     case D3DFMT_D32:
-        return width * 4;
-        
+        return (unsigned)(width * 4);
+
     case D3DFMT_A16B16G16R16:
     case D3DFMT_A16B16G16R16F:
-        return width * 8;
-        
+        return (unsigned)(width * 8);
+
     case D3DFMT_A32B32G32R32F:
-        return width * 16;
-        
+        return (unsigned)(width * 16);
+
     case D3DFMT_DXT1:
-        return ((width + 3) >> 2) * 8;
-        
+        return (unsigned)(((width + 3) >> 2) * 8);
+
     case D3DFMT_DXT3:
     case D3DFMT_DXT5:
-        return ((width + 3) >> 2) * 16;
-        
+        return (unsigned)(((width + 3) >> 2) * 16);
+
     default:
         return 0;
     }
@@ -245,7 +245,7 @@ void Texture::SetParameters(XMLFile* file)
 {
     if (!file)
         return;
-    
+
     XMLElement rootElem = file->GetRoot();
     SetParameters(rootElem);
 }
@@ -256,7 +256,7 @@ void Texture::SetParameters(const XMLElement& element)
     while (paramElem)
     {
         String name = paramElem.GetName();
-        
+
         if (name == "address")
         {
             String coord = paramElem.GetAttributeLower("coord");
@@ -267,19 +267,19 @@ void Texture::SetParameters(const XMLElement& element)
                 SetAddressMode(coordIndex, (TextureAddressMode)GetStringListIndex(mode.CString(), addressModeNames, ADDRESS_WRAP));
             }
         }
-        
+
         if (name == "border")
             SetBorderColor(paramElem.GetColor("color"));
-        
+
         if (name == "filter")
         {
             String mode = paramElem.GetAttributeLower("mode");
             SetFilterMode((TextureFilterMode)GetStringListIndex(mode.CString(), filterModeNames, FILTER_DEFAULT));
         }
-        
+
         if (name == "mipmap")
             SetNumLevels(paramElem.GetBool("enable") ? 0 : 1);
-        
+
         if (name == "quality")
         {
             if (paramElem.HasAttribute("low"))
@@ -294,7 +294,7 @@ void Texture::SetParameters(const XMLElement& element)
 
         if (name == "srgb")
             SetSRGB(paramElem.GetBool("enable"));
-        
+
         paramElem = paramElem.GetNext();
     }
 }
@@ -306,7 +306,7 @@ void Texture::CheckTextureBudget(StringHash type)
     unsigned textureUse = cache->GetMemoryUse(type);
     if (!textureBudget)
         return;
-    
+
     // If textures are over the budget, they likely can not be freed directly as materials still refer to them.
     // Therefore free unused materials first
     if (textureUse > textureBudget)

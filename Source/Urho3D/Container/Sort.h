@@ -76,7 +76,7 @@ template <class T> void InitialQuickSort(RandomAccessIterator<T> begin, RandomAc
             pivot = begin;
         else if (*(end - 1) < *pivot && *begin < *(end - 1))
             pivot = end - 1;
-        
+
         // Partition and sort recursively
         RandomAccessIterator<T> i = begin - 1;
         RandomAccessIterator<T> j = end;
@@ -90,7 +90,7 @@ template <class T> void InitialQuickSort(RandomAccessIterator<T> begin, RandomAc
             else
                 break;
         }
-        
+
         InitialQuickSort(begin, j + 1);
         begin = j + 1;
     }
@@ -107,7 +107,7 @@ template <class T, class U> void InitialQuickSort(RandomAccessIterator<T> begin,
             pivot = begin;
         else if (compare(*(end - 1), *pivot) && compare(*begin, *(end - 1)))
             pivot = end - 1;
-        
+
         // Partition and sort recursively
         RandomAccessIterator<T> i = begin - 1;
         RandomAccessIterator<T> j = end;
@@ -121,7 +121,7 @@ template <class T, class U> void InitialQuickSort(RandomAccessIterator<T> begin,
             else
                 break;
         }
-        
+
         InitialQuickSort(begin, j + 1, compare);
         begin = j + 1;
     }

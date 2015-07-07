@@ -20,8 +20,9 @@
 // THE SOFTWARE.
 //
 
-
 #if defined(_MSC_VER) && defined(URHO3D_MINIDUMPS)
+
+#include "../Precompiled.h"
 
 #include "../Core/ProcessUtils.h"
 
@@ -83,4 +84,5 @@ URHO3D_API int WriteMiniDump(const char* applicationName, void* exceptionPointer
 }
 
 }
+
 #endif

@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "../Math/Quaternion.h"
-#include "../Resource/Resource.h"
 #include "../Container/Ptr.h"
+#include "../Math/Quaternion.h"
 #include "../Math/Vector3.h"
+#include "../Resource/Resource.h"
 
 namespace Urho3D
 {
@@ -48,7 +48,7 @@ struct AnimationTrack
 {
     /// Return keyframe index based on time and previous index.
     void GetKeyFrameIndex(float time, unsigned& index) const;
-    
+
     /// Bone name.
     String name_;
     /// Bone name hash.
@@ -67,7 +67,7 @@ struct AnimationTriggerPoint
         time_(0.0f)
     {
     }
-    
+
     /// Trigger time.
     float time_;
     /// Trigger data.
@@ -82,7 +82,7 @@ static const unsigned char CHANNEL_SCALE = 0x4;
 class URHO3D_API Animation : public Resource
 {
     OBJECT(Animation);
-    
+
 public:
     /// Construct.
     Animation(Context* context);
@@ -90,12 +90,12 @@ public:
     virtual ~Animation();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
-    
+
     /// Set animation name.
     void SetAnimationName(const String& name);
     /// Set animation length.
@@ -110,28 +110,35 @@ public:
     void RemoveAllTriggers();
     /// Resize trigger point vector.
     void SetNumTriggers(unsigned num);
-    
+
     /// Return animation name.
     const String& GetAnimationName() const { return animationName_; }
+
     /// Return animation name hash.
     StringHash GetAnimationNameHash() const { return animationNameHash_; }
+
     /// Return animation length.
     float GetLength() const { return length_; }
+
     /// Return all animation tracks.
     const Vector<AnimationTrack>& GetTracks() const { return tracks_; }
+
     /// Return number of animation tracks.
     unsigned GetNumTracks() const { return tracks_.Size(); }
+
     /// Return animation track by index.
     const AnimationTrack* GetTrack(unsigned index) const;
     /// Return animation track by bone name.
     const AnimationTrack* GetTrack(const String& name) const;
     /// Return animation track by bone name hash.
     const AnimationTrack* GetTrack(StringHash nameHash) const;
+
     /// Return animation trigger points.
     const Vector<AnimationTriggerPoint>& GetTriggers() const { return triggers_; }
+
     /// Return number of animation trigger points.
-    unsigned GetNumTriggers() const {return triggers_.Size(); }
-    
+    unsigned GetNumTriggers() const { return triggers_.Size(); }
+
 private:
     /// Animation name.
     String animationName_;

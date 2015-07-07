@@ -63,10 +63,10 @@ void Decals::Start()
 
     // Create the scene content
     CreateScene();
-    
+
     // Create the UI content
     CreateUI();
-    
+
     // Setup the viewport for displaying the scene
     SetupViewport();
 
@@ -77,21 +77,21 @@ void Decals::Start()
 void Decals::CreateScene()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
+
     scene_ = new Scene(context_);
-    
+
     // Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
     // Also create a DebugRenderer component so that we can draw debug geometry
     scene_->CreateComponent<Octree>();
     scene_->CreateComponent<DebugRenderer>();
-    
+
     // Create scene node & StaticModel component for showing a static plane
     Node* planeNode = scene_->CreateChild("Plane");
     planeNode->SetScale(Vector3(100.0f, 1.0f, 100.0f));
     StaticModel* planeObject = planeNode->CreateComponent<StaticModel>();
     planeObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
     planeObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
-    
+
     // Create a Zone component for ambient lighting & fog control
     Node* zoneNode = scene_->CreateChild("Zone");
     Zone* zone = zoneNode->CreateComponent<Zone>();
@@ -100,7 +100,7 @@ void Decals::CreateScene()
     zone->SetFogColor(Color(0.5f, 0.5f, 0.7f));
     zone->SetFogStart(100.0f);
     zone->SetFogEnd(300.0f);
-    
+
     // Create a directional light to the world. Enable cascaded shadows on it
     Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f));
@@ -124,7 +124,7 @@ void Decals::CreateScene()
         mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
         mushroomObject->SetCastShadows(true);
     }
-    
+
     // Create randomly sized boxes. If boxes are big enough, make them occluders. Occluders will be software rasterized before
     // rendering to a low-resolution depth-only buffer to test the objects in the view frustum for visibility
     const unsigned NUM_BOXES = 20;
@@ -141,12 +141,12 @@ void Decals::CreateScene()
         if (size >= 3.0f)
             boxObject->SetOccluder(true);
     }
-    
+
     // Create the camera. Limit far clip distance to match the fog
     cameraNode_ = scene_->CreateChild("Camera");
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
-    
+
     // Set an initial position for the camera scene node above the plane
     cameraNode_->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
 }
@@ -155,7 +155,7 @@ void Decals::CreateUI()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     UI* ui = GetSubsystem<UI>();
-    
+
     // Create a Cursor UI element because we want to be able to hide and show it at will. When hidden, the mouse cursor will
     // control the camera, and when visible, it will point the raycast target
     XMLFile* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
@@ -165,7 +165,7 @@ void Decals::CreateUI()
     // Set starting position of the cursor at the rendering window center
     Graphics* graphics = GetSubsystem<Graphics>();
     cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
-    
+
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
@@ -177,7 +177,7 @@ void Decals::CreateUI()
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other
     instructionText->SetTextAlignment(HA_CENTER);
-    
+
     // Position the text relative to the screen center
     instructionText->SetHorizontalAlignment(HA_CENTER);
     instructionText->SetVerticalAlignment(VA_CENTER);
@@ -187,7 +187,7 @@ void Decals::CreateUI()
 void Decals::SetupViewport()
 {
     Renderer* renderer = GetSubsystem<Renderer>();
-    
+
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
     renderer->SetViewport(0, viewport);
@@ -197,7 +197,7 @@ void Decals::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent(E_UPDATE, HANDLER(Decals, HandleUpdate));
-    
+
     // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request
     // debug geometry
     SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Decals, HandlePostRenderUpdate));
@@ -209,16 +209,16 @@ void Decals::MoveCamera(float timeStep)
     UI* ui = GetSubsystem<UI>();
     Input* input = GetSubsystem<Input>();
     ui->GetCursor()->SetVisible(!input->GetMouseButtonDown(MOUSEB_RIGHT));
-    
+
     // Do not move if the UI has a focused element (the console)
     if (ui->GetFocusElement())
         return;
-    
+
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.1f;
-    
+
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     // Only move the camera when the cursor is hidden
     if (!ui->GetCursor()->IsVisible())
@@ -227,11 +227,11 @@ void Decals::MoveCamera(float timeStep)
         yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
         pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
         pitch_ = Clamp(pitch_, -90.0f, 90.0f);
-        
+
         // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
         cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
     }
-    
+
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input->GetKeyDown('W'))
         cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
@@ -241,11 +241,11 @@ void Decals::MoveCamera(float timeStep)
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
-    
+
     // Toggle debug geometry with space
     if (input->GetKeyPress(KEY_SPACE))
         drawDebug_ = !drawDebug_;
-    
+
     // Paint decal with the left mousebutton; cursor must be visible
     if (ui->GetCursor()->IsVisible() && input->GetMouseButtonPress(MOUSEB_LEFT))
         PaintDecal();
@@ -255,7 +255,7 @@ void Decals::PaintDecal()
 {
     Vector3 hitPos;
     Drawable* hitDrawable;
-    
+
     if (Raycast(250.0f, hitPos, hitDrawable))
     {
         // Check if target scene node already has a DecalSet component. If not, create now
@@ -264,7 +264,7 @@ void Decals::PaintDecal()
         if (!decal)
         {
             ResourceCache* cache = GetSubsystem<ResourceCache>();
-            
+
             decal = targetNode->CreateComponent<DecalSet>();
             decal->SetMaterial(cache->GetResource<Material>("Materials/UrhoDecal.xml"));
         }
@@ -280,13 +280,13 @@ void Decals::PaintDecal()
 bool Decals::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable)
 {
     hitDrawable = 0;
-    
+
     UI* ui = GetSubsystem<UI>();
     IntVector2 pos = ui->GetCursorPosition();
     // Check the cursor is visible and there is no UI element in front of the cursor
     if (!ui->GetCursor()->IsVisible() || ui->GetElementAt(pos, true))
         return false;
-    
+
     Graphics* graphics = GetSubsystem<Graphics>();
     Camera* camera = cameraNode_->GetComponent<Camera>();
     Ray cameraRay = camera->GetScreenRay((float)pos.x_ / graphics->GetWidth(), (float)pos.y_ / graphics->GetHeight());
@@ -301,7 +301,7 @@ bool Decals::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable)
         hitDrawable = result.drawable_;
         return true;
     }
-    
+
     return false;
 }
 
@@ -311,7 +311,7 @@ void Decals::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Take the frame time step, which is stored as a float
     float timeStep = eventData[P_TIMESTEP].GetFloat();
-    
+
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
 }

@@ -293,7 +293,9 @@ Whenever there is some hierarchical composition, it is recommended (and in fact 
 
 %Scene nodes can be freely reparented. In contrast components are always created to the node they belong to, and can not be moved between nodes. Both child nodes and components are stored using SharedPtr containers; this means that detaching a child node from its parent or removing a component will also destroy it, if no other references to it exist. Both Node & Component provide the \ref Node::Remove "Remove()" function to accomplish this without having to go through the parent. Note that no operations on the node or component in question are safe after calling that function.
 
-It is also legal to create a Node that does not belong to a scene. This is useful for example with a camera moving in a scene that may be loaded or saved, because then the camera will not be saved along with the actual scene, and will not be destroyed when the scene is loaded. However, note that creating geometry, physics or script components to an unattached node, and then moving it into a scene later will cause those components to not work correctly.
+It is also legal to create a Node that does not belong to a scene. This is useful for example with a camera moving in a scene that may be loaded or saved, because then the camera will not be saved along with the actual scene, and will not be destroyed when the scene is loaded.
+
+However, depending on the components used, creating components to a node outside the scene, then moving the node to a scene later may not work completely as expected. For example, a RigidBody component can not store its velocities if it does not have access to the scene's physics world component to actually create the Bullet rigid body object.
 
 \section SceneModel_Update Scene updates
 
@@ -606,6 +608,18 @@ Use \ref LuaScript::ExecuteString "ExecuteString()" to compile and run a line of
 In contrast to AngelScript modules, which exist as separate entities and do not share functions or variables unless explicitly marked shared, in the Lua subsystem everything is loaded and executed in one Lua state, so scripts can naturally access everything  loaded so far. To load and execute a Lua script file, call \ref LuaScript::ExecuteFile "ExecuteFile()".
 
 After that, the functions in the script file are available for calling. Use \ref LuaScript::GetFunction "GetFunction()" to get a Lua function by name. This returns a LuaFunction object, on which you should call \ref LuaFunction::BeginCall "BeginCall()" first, followed by pushing the function parameters if any, and finally execute the function with \ref LuaFunction::EndCall "EndCall()".
+
+\subsection LuaScripting_Debugging Debugging script files
+
+Debugging Lua scripts embedded in an application can be done by attaching to a remote debugger, after first injecting a client into the application (for example, see <a href="https://wiki.eclipse.org/LDT/User_Area/User_Guides/User_Guide_1.2#Attach_session">eclipse LDT's remote debugger</a>). 
+
+However, Lua script files in Urho3D are loaded into the interpreter via Urho3D's resource cache, which loads the script file into a memory buffer before passing that buffer to the interpreter. This is good for performance and cross platform compatibility, but means that the source file is not available to debuggers and so, for example, breakpoints may not work and the code cannot be meaningfully stepped through.
+
+For a single script that you wish to step through, you can use \ref LuaScript::ExecuteRawFile "ExecuteRawFile()", which will load the script from the file system directly into the Lua interpreter, making the source available to debuggers that rely on it. There are a couple of caveats with this: 
+- The file has has to be on the file system, within a resource directory, and not packaged.
+- If the script uses `require()` to import a second script, then that second script will not be available for the debugger in the same way, since internally the second script is passed to Lua via the resource cache.
+
+To get around the second caveat, and avoid changing method calls, use the CMake flag `URHO3D_LUA_RAW_SCRIPT_LOADER`.  This will force Urho3D to attempt to load scripts from the file system by default, before falling back on the resource cache.  You can then use \ref LuaScript::ExecuteFile "ExecuteFile()", as above, and disable the CMake option for production if required.
 
 \section LuaScripting_ScriptObjects Script objects
 
@@ -2848,7 +2862,7 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - Indent style is Allman (BSD) -like, ie. brace on the next line from a control statement, indented on the same level. In switch-case statements the cases are on the same indent level as the switch statement.
 
-- Indents use 4 spaces instead of tabs.
+- Indents use 4 spaces instead of tabs. Indents on empty lines should not be kept.
 
 - Class and struct names are in camelcase beginning with an uppercase letter. They should be nouns. For example DebugRenderer, FreeTypeLibrary, Graphics.
 

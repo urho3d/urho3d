@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../Math/AreaAllocator.h"
 #include "../Container/ArrayPtr.h"
 #include "../Container/List.h"
+#include "../Math/AreaAllocator.h"
 
 namespace Urho3D
 {
@@ -74,16 +74,21 @@ public:
     virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize) = 0;
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
     virtual const FontGlyph* GetGlyph(unsigned c);
+
     /// Return if font face uses mutable glyphs.
     virtual bool HasMutableGlyphs() const { return false; }
+
     /// Return the kerning for a character and the next character.
     short GetKerning(unsigned c, unsigned d) const;
     /// Return true when one of the texture has a data loss.
     bool IsDataLost() const;
+
     /// Return point size.
     int GetPointSize() const { return pointSize_; }
+
     /// Return row height.
     int GetRowHeight() const { return rowHeight_; }
+
     /// Return textures.
     const Vector<SharedPtr<Texture2D> >& GetTextures() const { return textures_; }
 

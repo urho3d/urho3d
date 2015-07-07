@@ -20,24 +20,26 @@
 // THE SOFTWARE.
 //
 
-#include "../Physics/CollisionShape.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Core/Profiler.h"
 #include "../Graphics/CustomGeometry.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Graphics/DrawableEvents.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/IndexBuffer.h"
-#include "../IO/Log.h"
 #include "../Graphics/Model.h"
-#include "../Physics/PhysicsUtils.h"
-#include "../Physics/PhysicsWorld.h"
-#include "../Core/Profiler.h"
-#include "../Resource/ResourceCache.h"
-#include "../Resource/ResourceEvents.h"
-#include "../Physics/RigidBody.h"
-#include "../Scene/Scene.h"
 #include "../Graphics/Terrain.h"
 #include "../Graphics/VertexBuffer.h"
+#include "../IO/Log.h"
+#include "../Physics/CollisionShape.h"
+#include "../Physics/PhysicsUtils.h"
+#include "../Physics/PhysicsWorld.h"
+#include "../Physics/RigidBody.h"
+#include "../Resource/ResourceCache.h"
+#include "../Resource/ResourceEvents.h"
+#include "../Scene/Scene.h"
 
 #include <Bullet/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
 #include <Bullet/BulletCollision/CollisionShapes/btBoxShape.h>
@@ -82,7 +84,8 @@ extern const char* PHYSICS_CATEGORY;
 class TriangleMeshInterface : public btTriangleIndexVertexArray
 {
 public:
-    TriangleMeshInterface(Model* model, unsigned lodLevel) : btTriangleIndexVertexArray()
+    TriangleMeshInterface(Model* model, unsigned lodLevel) :
+        btTriangleIndexVertexArray()
     {
         unsigned numGeometries = model->GetNumGeometries();
         unsigned totalTriangles = 0;
@@ -126,7 +129,7 @@ public:
             meshIndex.m_indexType = (indexSize == sizeof(unsigned short)) ? PHY_SHORT : PHY_INTEGER;
             meshIndex.m_vertexType = PHY_FLOAT;
             m_indexedMeshes.push_back(meshIndex);
-            
+
             totalTriangles += meshIndex.m_numTriangles;
         }
 
@@ -135,7 +138,8 @@ public:
         useQuantize_ = totalTriangles <= QUANTIZE_MAX_TRIANGLES;
     }
 
-    TriangleMeshInterface(CustomGeometry* custom) : btTriangleIndexVertexArray()
+    TriangleMeshInterface(CustomGeometry* custom) :
+        btTriangleIndexVertexArray()
     {
         const Vector<PODVector<CustomGeometryVertex> >& srcVertices = custom->GetVertices();
         unsigned totalVertexCount = 0;
@@ -349,7 +353,7 @@ HeightfieldData::HeightfieldData(Terrain* terrain, unsigned lodLevel) :
                 if (lodSize.x_ <= 2 || lodSize.y_ <= 2)
                     break;
             }
-            
+
             SharedArrayPtr<float> lodHeightData(new float[lodSize.x_ * lodSize.y_]);
             for (int y = 0, dY = 0; y < size_.y_ && dY < lodSize.y_; y += skip, ++dY)
             {
@@ -362,7 +366,7 @@ HeightfieldData::HeightfieldData(Terrain* terrain, unsigned lodLevel) :
             heightData_ = lodHeightData;
         }
 
-        unsigned points = size_.x_ * size_.y_;
+        unsigned points = (unsigned)(size_.x_ * size_.y_);
         float* data = heightData_.Get();
 
         minHeight_ = maxHeight_ = data[0];
@@ -415,7 +419,8 @@ CollisionShape::CollisionShape(Context* context) :
     lodLevel_(0),
     customGeometryID_(0),
     margin_(DEFAULT_COLLISION_MARGIN),
-    recreateShape_(true)
+    recreateShape_(true),
+    retryCreation_(false)
 {
 }
 
@@ -439,7 +444,7 @@ void CollisionShape::RegisterObject(Context* context)
     MIXED_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE("LOD Level", int, lodLevel_, 0, AM_DEFAULT);
     ATTRIBUTE("Collision Margin", float, margin_, DEFAULT_COLLISION_MARGIN, AM_DEFAULT);
-    ATTRIBUTE("CustomGeometry NodeID", int, customGeometryID_, 0, AM_DEFAULT | AM_NODEID);
+    ATTRIBUTE("CustomGeometry NodeID", unsigned, customGeometryID_, 0, AM_DEFAULT | AM_NODEID);
 }
 
 void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -604,7 +609,8 @@ void CollisionShape::SetCone(float diameter, float height, const Vector3& positi
     MarkNetworkUpdate();
 }
 
-void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position, const Quaternion& rotation)
+void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position,
+    const Quaternion& rotation)
 {
     if (!model)
     {
@@ -628,7 +634,8 @@ void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vect
     MarkNetworkUpdate();
 }
 
-void CollisionShape::SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale, const Vector3& position, const Quaternion& rotation)
+void CollisionShape::SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale, const Vector3& position,
+    const Quaternion& rotation)
 {
     if (!custom)
     {
@@ -657,7 +664,8 @@ void CollisionShape::SetCustomTriangleMesh(CustomGeometry* custom, const Vector3
     MarkNetworkUpdate();
 }
 
-void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position, const Quaternion& rotation)
+void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, const Vector3& scale, const Vector3& position,
+    const Quaternion& rotation)
 {
     if (!model)
     {
@@ -681,7 +689,8 @@ void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, const Vector
     MarkNetworkUpdate();
 }
 
-void CollisionShape::SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale, const Vector3& position, const Quaternion& rotation)
+void CollisionShape::SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale, const Vector3& position,
+    const Quaternion& rotation)
 {
     if (!custom)
     {
@@ -914,23 +923,40 @@ void CollisionShape::OnNodeSet(Node* node)
 {
     if (node)
     {
-        Scene* scene = GetScene();
-        if (scene)
-        {
-            if (scene == node)
-                LOGWARNING(GetTypeName() + " should not be created to the root scene node");
-
-            physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
-            physicsWorld_->AddCollisionShape(this);
-        }
-        else
-            LOGERROR("Node is detached from scene, can not create collision shape");
-
         node->AddListener(this);
         cachedWorldScale_ = node->GetWorldScale();
 
         // Terrain collision shape depends on the terrain component's geometry updates. Subscribe to them
         SubscribeToEvent(node, E_TERRAINCREATED, HANDLER(CollisionShape, HandleTerrainCreated));
+    }
+}
+
+void CollisionShape::OnSceneSet(Scene* scene)
+{
+    if (scene)
+    {
+        if (scene == node_)
+            LOGWARNING(GetTypeName() + " should not be created to the root scene node");
+
+        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
+        physicsWorld_->AddCollisionShape(this);
+
+        // Create shape now if necessary (attributes modified before adding to scene)
+        if (retryCreation_)
+        {
+            UpdateShape();
+            NotifyRigidBody();
+        }
+    }
+    else
+    {
+        ReleaseShape();
+
+        if (physicsWorld_)
+            physicsWorld_->RemoveCollisionShape(this);
+
+        // Recreate when moved to a scene again
+        retryCreation_ = true;
     }
 }
 
@@ -966,7 +992,7 @@ void CollisionShape::OnMarkedDirty(Node* node)
             {
                 HeightfieldData* heightfield = static_cast<HeightfieldData*>(geometry_.Get());
                 shape_->setLocalScaling(ToBtVector3(Vector3(heightfield->spacing_.x_, 1.0f, heightfield->spacing_.z_) *
-                    newWorldScale * size_));
+                                                    newWorldScale * size_));
             }
             break;
 
@@ -994,8 +1020,12 @@ void CollisionShape::UpdateShape()
 
     ReleaseShape();
 
+    // If no physics world available now mark for retry later
     if (!physicsWorld_)
+    {
+        retryCreation_ = true;
         return;
+    }
 
     if (node_)
     {
@@ -1023,7 +1053,7 @@ void CollisionShape::UpdateShape()
             break;
 
         case SHAPE_CAPSULE:
-            shape_ = new btCapsuleShape(size_.x_ * 0.5f, Max(size_.y_  - size_.x_, 0.0f));
+            shape_ = new btCapsuleShape(size_.x_ * 0.5f, Max(size_.y_ - size_.x_, 0.0f));
             shape_->setLocalScaling(ToBtVector3(newWorldScale));
             break;
 
@@ -1045,7 +1075,8 @@ void CollisionShape::UpdateShape()
                     shape_ = new btScaledBvhTriangleMeshShape(triMesh->shape_, ToBtVector3(newWorldScale * size_));
                 }
                 else
-                    LOGWARNING("Could not find custom geometry component from node ID " + String(customGeometryID_) + " for triangle mesh shape creation");
+                    LOGWARNING("Could not find custom geometry component from node ID " + String(customGeometryID_) +
+                               " for triangle mesh shape creation");
             }
             else if (model_ && model_->GetNumGeometries())
             {
@@ -1084,7 +1115,8 @@ void CollisionShape::UpdateShape()
                     shape_->setLocalScaling(ToBtVector3(newWorldScale * size_));
                 }
                 else
-                    LOGWARNING("Could not find custom geometry component from node ID " + String(customGeometryID_) + " for convex shape creation");
+                    LOGWARNING("Could not find custom geometry component from node ID " + String(customGeometryID_) +
+                               " for convex shape creation");
             }
             else if (model_ && model_->GetNumGeometries())
             {
@@ -1118,11 +1150,11 @@ void CollisionShape::UpdateShape()
                     geometry_ = new HeightfieldData(terrain, lodLevel_);
                     HeightfieldData* heightfield = static_cast<HeightfieldData*>(geometry_.Get());
 
-                    shape_ = new btHeightfieldTerrainShape(heightfield->size_.x_, heightfield->size_.y_,
-                        heightfield->heightData_.Get(), 1.0f, heightfield->minHeight_, heightfield->maxHeight_, 1, PHY_FLOAT,
-                        false);
-                    shape_->setLocalScaling(ToBtVector3(Vector3(heightfield->spacing_.x_, 1.0f, heightfield->spacing_.z_) *
-                        newWorldScale * size_));
+                    shape_ =
+                        new btHeightfieldTerrainShape(heightfield->size_.x_, heightfield->size_.y_, heightfield->heightData_.Get(),
+                            1.0f, heightfield->minHeight_, heightfield->maxHeight_, 1, PHY_FLOAT, false);
+                    shape_->setLocalScaling(
+                        ToBtVector3(Vector3(heightfield->spacing_.x_, 1.0f, heightfield->spacing_.z_) * newWorldScale * size_));
                 }
             }
             break;
@@ -1144,6 +1176,7 @@ void CollisionShape::UpdateShape()
         physicsWorld_->CleanupGeometryCache();
 
     recreateShape_ = false;
+    retryCreation_ = false;
 }
 
 void CollisionShape::HandleTerrainCreated(StringHash eventType, VariantMap& eventData)

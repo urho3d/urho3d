@@ -20,11 +20,13 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
-#include "../Urho2D/CollisionPolygon2D.h"
 #include "../IO/MemoryBuffer.h"
-#include "../Urho2D/PhysicsUtils2D.h"
 #include "../IO/VectorBuffer.h"
+#include "../Urho2D/CollisionPolygon2D.h"
+#include "../Urho2D/PhysicsUtils2D.h"
 
 #include "../DebugNew.h"
 
@@ -111,7 +113,7 @@ void CollisionPolygon2D::ApplyNodeWorldScale()
 void CollisionPolygon2D::RecreateFixture()
 {
     ReleaseFixture();
-    
+
     if (vertices_.Size() < 3)
         return;
 

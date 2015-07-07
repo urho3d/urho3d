@@ -97,10 +97,13 @@ public:
 
     /// Return skeleton.
     Skeleton& GetSkeleton() { return skeleton_; }
+
     /// Return all animation states.
     const Vector<SharedPtr<AnimationState> >& GetAnimationStates() const { return animationStates_; }
+
     /// Return number of animation states.
     unsigned GetNumAnimationStates() const { return animationStates_.Size(); }
+
     /// Return animation state by animation pointer.
     AnimationState* GetAnimationState(Animation* animation) const;
     /// Return animation state by animation name.
@@ -109,22 +112,29 @@ public:
     AnimationState* GetAnimationState(const StringHash animationNameHash) const;
     /// Return animation state by index.
     AnimationState* GetAnimationState(unsigned index) const;
+
     /// Return animation LOD bias.
     float GetAnimationLodBias() const { return animationLodBias_; }
+
     /// Return whether to update animation when not visible.
     bool GetUpdateInvisible() const { return updateInvisible_; }
+
     /// Return all vertex morphs.
     const Vector<ModelMorph>& GetMorphs() const { return morphs_; }
+
     /// Return all morph vertex buffers.
     const Vector<SharedPtr<VertexBuffer> >& GetMorphVertexBuffers() const { return morphVertexBuffers_; }
+
     /// Return number of vertex morphs.
     unsigned GetNumMorphs() const { return morphs_.Size(); }
+
     /// Return vertex morph weight by index.
     float GetMorphWeight(unsigned index) const;
     /// Return vertex morph weight by name.
     float GetMorphWeight(const String& name) const;
     /// Return vertex morph weight by name hash.
     float GetMorphWeight(StringHash nameHash) const;
+
     /// Return whether is the master (first) animated model.
     bool IsMaster() const { return isMaster_; }
 
@@ -144,8 +154,10 @@ public:
     VariantVector GetAnimationStatesAttr() const;
     /// Return morphs attribute.
     const PODVector<unsigned char>& GetMorphsAttr() const;
+
     /// Return per-geometry bone mappings.
     const Vector<PODVector<unsigned> >& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
+
     /// Return per-geometry skin matrices. If empty, uses global skinning
     const Vector<PODVector<Matrix3x4> >& GetGeometrySkinMatrices() const { return geometrySkinMatrices_; }
 
@@ -185,7 +197,8 @@ private:
     /// Reapply all vertex morphs.
     void UpdateMorphs();
     /// Apply a vertex morph.
-    void ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsigned morphRangeStart, const VertexBufferMorph& morph, float weight);
+    void ApplyMorph
+        (VertexBuffer* buffer, void* destVertexData, unsigned morphRangeStart, const VertexBufferMorph& morph, float weight);
     /// Handle model reload finished.
     void HandleModelReloadFinished(StringHash eventType, VariantMap& eventData);
 

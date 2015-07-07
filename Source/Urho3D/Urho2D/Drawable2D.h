@@ -80,9 +80,10 @@ public:
     void SetLayer(int layer);
     /// Set order in layer.
     void SetOrderInLayer(int orderInLayer);
-    
+
     /// Return layer.
     int GetLayer() const { return layer_; }
+
     /// Return order in layer.
     int GetOrderInLayer() const { return orderInLayer_; }
 
@@ -90,17 +91,18 @@ public:
     const Vector<SourceBatch2D>& GetSourceBatches();
 
 protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
     /// Handle draw order changed.
     virtual void OnDrawOrderChanged() = 0;
     /// Update source batches.
     virtual void UpdateSourceBatches() = 0;
+
     /// Return draw order by layer and order in layer.
     int GetDrawOrder() const { return (layer_ << 20) + (orderInLayer_ << 10); }
-  
+
     /// Layer.
     int layer_;
     /// Order in layer.

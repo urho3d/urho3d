@@ -20,8 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "../Urho2D/ConstraintGear2D.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Urho2D/ConstraintGear2D.h"
 #include "../Urho2D/PhysicsUtils2D.h"
 #include "../Urho2D/RigidBody2D.h"
 
@@ -115,7 +117,7 @@ b2JointDef* ConstraintGear2D::GetJointDef()
     InitializeJointDef(&jointDef_);
     jointDef_.joint1 = jointA;
     jointDef_.joint2 = jointB;
-    
+
     return &jointDef_;
 }
 

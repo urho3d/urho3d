@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "../Graphics/Drawable.h"
-#include "../Math/Frustum.h"
 #include "../Container/List.h"
+#include "../Graphics/Drawable.h"
 #include "../Graphics/Skeleton.h"
+#include "../Math/Frustum.h"
 
 namespace Urho3D
 {
@@ -134,7 +134,9 @@ public:
     /// Set maximum number of decal vertex indices.
     void SetMaxIndices(unsigned num);
     /// Add a decal at world coordinates, using a target drawable's geometry for reference. If the decal needs to move with the target, the decal component should be created to the target's node. Return true if successful.
-    bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f, unsigned subGeometry = M_MAX_UNSIGNED);
+    bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio,
+        float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f,
+        unsigned subGeometry = M_MAX_UNSIGNED);
     /// Remove n oldest decals.
     void RemoveDecals(unsigned num);
     /// Remove all decals.
@@ -142,14 +144,19 @@ public:
 
     /// Return material.
     Material* GetMaterial() const;
+
     /// Return number of decals.
     unsigned GetNumDecals() const { return decals_.Size(); }
+
     /// Retur number of vertices in the decals.
     unsigned GetNumVertices() const { return numVertices_; }
+
     /// Retur number of vertex indices in the decals.
     unsigned GetNumIndices() const { return numIndices_; }
+
     /// Return maximum number of decal vertices.
     unsigned GetMaxVertices() const { return maxVertices_; }
+
     /// Return maximum number of decal vertex indices.
     unsigned GetMaxIndices() const { return maxIndices_; }
 
@@ -170,13 +177,20 @@ protected:
 
 private:
     /// Get triangle faces from the target geometry.
-    void GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff);
+    void GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, const Frustum& frustum,
+        const Vector3& decalNormal, float normalCutoff);
     /// Get triangle face from the target geometry.
-    void GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, unsigned i0, unsigned i1, unsigned i2, const unsigned char* positionData, const unsigned char* normalData, const unsigned char* skinningData, unsigned positionStride, unsigned normalStride, unsigned skinningStride, const Frustum& frustum, const Vector3& decalNormal, float normalCutoff);
+    void GetFace
+        (Vector<PODVector<DecalVertex> >& faces, Drawable* target, unsigned batchIndex, unsigned i0, unsigned i1, unsigned i2,
+            const unsigned char* positionData, const unsigned char* normalData, const unsigned char* skinningData,
+            unsigned positionStride, unsigned normalStride, unsigned skinningStride, const Frustum& frustum,
+            const Vector3& decalNormal, float normalCutoff);
     /// Get bones referenced by skinning data and remap the skinning indices. Return true if successful.
-    bool GetBones(Drawable* target, unsigned batchIndex, const float* blendWeights, const unsigned char* blendIndices, unsigned char* newBlendIndices);
+    bool GetBones(Drawable* target, unsigned batchIndex, const float* blendWeights, const unsigned char* blendIndices,
+        unsigned char* newBlendIndices);
     /// Calculate UV coordinates for the decal.
-    void CalculateUVs(Decal& decal, const Matrix3x4& view, const Matrix4& projection, const Vector2& topLeftUV, const Vector2& bottomRightUV);
+    void CalculateUVs
+        (Decal& decal, const Matrix3x4& view, const Matrix4& projection, const Vector2& topLeftUV, const Vector2& bottomRightUV);
     /// Transform decal's vertices from the target geometry to the decal set local space.
     void TransformVertices(Decal& decal, const Matrix3x4& transform);
     /// Remove a decal by iterator and return iterator to the next decal.

@@ -34,7 +34,7 @@ class URHO3D_API ConstraintMotor2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintMotor2D(Context* scontext);
+    ConstraintMotor2D(Context* context);
     /// Destruct.
     virtual ~ConstraintMotor2D();
     /// Register object factory.
@@ -53,12 +53,16 @@ public:
 
     /// Return linear offset.
     const Vector2& GetLinearOffset() const { return linearOffset_; }
+
     /// Return angular offset.
     float GetAngularOffset() const { return jointDef_.angularOffset; }
+
     /// Return max force.
     float GetMaxForce() const { return jointDef_.maxForce; }
+
     /// Return max torque.
     float GetMaxTorque() const { return jointDef_.maxTorque; }
+
     /// Return correction factor.
     float GetCorrectionFactor() const { return jointDef_.correctionFactor; }
 

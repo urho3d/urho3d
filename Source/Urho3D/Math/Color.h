@@ -44,7 +44,7 @@ public:
         a_(1.0f)
     {
     }
-    
+
     /// Copy-construct from another color.
     Color(const Color& color) :
         r_(color.r_),
@@ -53,7 +53,7 @@ public:
         a_(color.a_)
     {
     }
-    
+
     /// Construct from another color and modify the alpha.
     Color(const Color& color, float a) :
         r_(color.r_),
@@ -62,7 +62,7 @@ public:
         a_(a)
     {
     }
-    
+
     /// Construct from RGB values and set alpha fully opaque.
     Color(float r, float g, float b) :
         r_(r),
@@ -71,7 +71,7 @@ public:
         a_(1.0f)
     {
     }
-    
+
     /// Construct from RGBA values.
     Color(float r, float g, float b, float a) :
         r_(r),
@@ -91,18 +91,22 @@ public:
     }
 
     /// Test for equality with another color without epsilon.
-    bool operator == (const Color& rhs) const { return r_ == rhs.r_ && g_ == rhs.g_ && b_ == rhs.b_ && a_ == rhs.a_; }
+    bool operator ==(const Color& rhs) const { return r_ == rhs.r_ && g_ == rhs.g_ && b_ == rhs.b_ && a_ == rhs.a_; }
+
     /// Test for inequality with another color without epsilon.
-    bool operator != (const Color& rhs) const { return r_ != rhs.r_ || g_ != rhs.g_ || b_ != rhs.b_ || a_ != rhs.a_; }
+    bool operator !=(const Color& rhs) const { return r_ != rhs.r_ || g_ != rhs.g_ || b_ != rhs.b_ || a_ != rhs.a_; }
+
     /// Multiply with a scalar.
-    Color operator * (float rhs) const { return Color(r_ * rhs, g_ * rhs, b_ * rhs, a_ * rhs); }
+    Color operator *(float rhs) const { return Color(r_ * rhs, g_ * rhs, b_ * rhs, a_ * rhs); }
+
     /// Add a color.
-    Color operator + (const Color& rhs) const { return Color(r_ + rhs.r_, g_ + rhs.g_, b_ + rhs.b_, a_ + rhs.a_); }
+    Color operator +(const Color& rhs) const { return Color(r_ + rhs.r_, g_ + rhs.g_, b_ + rhs.b_, a_ + rhs.a_); }
+
     /// Substract a color.
-    Color operator - (const Color& rhs) const { return Color(r_ - rhs.r_, g_ - rhs.g_, b_ - rhs.b_, a_ - rhs.a_); }
-    
+    Color operator -(const Color& rhs) const { return Color(r_ - rhs.r_, g_ - rhs.g_, b_ - rhs.b_, a_ - rhs.a_); }
+
     /// Add-assign a color.
-    Color& operator += (const Color& rhs)
+    Color& operator +=(const Color& rhs)
     {
         r_ += rhs.r_;
         g_ += rhs.g_;
@@ -110,7 +114,7 @@ public:
         a_ += rhs.a_;
         return *this;
     }
-    
+
     /// Return float data.
     const float* Data() const { return &r_; }
 
@@ -127,16 +131,19 @@ public:
 
     /// Return RGB as a three-dimensional vector.
     Vector3 ToVector3() const { return Vector3(r_, g_, b_); }
+
     /// Return RGBA as a four-dimensional vector.
     Vector4 ToVector4() const { return Vector4(r_, g_, b_, a_); }
 
     /// Return sum of RGB components.
     float SumRGB() const { return r_ + g_ + b_; }
+
     /// Return average value of the RGB channels.
     float Average() const { return (r_ + g_ + b_) / 3.0f; }
 
     /// Return the 'grayscale' representation of RGB values, as used by JPEG and PAL/NTSC among others.
-    float Luma() const { return r_ * 0.299f +  g_ * 0.587f + b_ * 0.114f; }
+    float Luma() const { return r_ * 0.299f + g_ * 0.587f + b_ * 0.114f; }
+
     /// Return the colorfulness relative to the brightness of a similarly illuminated white.
     float Chroma() const;
     /// Return hue mapped to range [0, 1.0).
@@ -145,13 +152,15 @@ public:
     float SaturationHSL() const;
     /// Return saturation as defined for HSV.
     float SaturationHSV() const;
+
     /// Return value as defined for HSV: largest value of the RGB components. Equivalent to calling MinRGB().
     float Value() const { return MaxRGB(); }
+
     /// Return lightness as defined for HSL: average of the largest and smallest values of the RGB components.
     float Lightness() const;
 
     /// Stores the values of least and greatest RGB component at specified pointer addresses, optionally clipping those values to [0, 1] range.
-    void Bounds(float* min, float* max, bool clipped=false) const;
+    void Bounds(float* min, float* max, bool clipped = false) const;
     /// Return the largest value of the RGB components.
     float MaxRGB() const;
     /// Return the smallest value of the RGB components.
@@ -165,14 +174,19 @@ public:
     void Invert(bool invertAlpha = false);
     /// Return linear interpolation of this color with another color.
     Color Lerp(const Color& rhs, float t) const;
+
     /// Return color with absolute components.
     Color Abs() const { return Color(Urho3D::Abs(r_), Urho3D::Abs(g_), Urho3D::Abs(b_), Urho3D::Abs(a_)); }
+
     /// Test for equality with another color with epsilon.
-    bool Equals(const Color& rhs) const { return Urho3D::Equals(r_, rhs.r_) && Urho3D::Equals(g_, rhs.g_) && Urho3D::Equals(b_, rhs.b_) && Urho3D::Equals(a_, rhs.a_); }
-    
+    bool Equals(const Color& rhs) const
+    {
+        return Urho3D::Equals(r_, rhs.r_) && Urho3D::Equals(g_, rhs.g_) && Urho3D::Equals(b_, rhs.b_) && Urho3D::Equals(a_, rhs.a_);
+    }
+
     /// Return as string.
     String ToString() const;
-    
+
     /// Red value.
     float r_;
     /// Green value.
@@ -215,6 +229,6 @@ protected:
 };
 
 /// Multiply Color with a scalar.
-inline Color operator * (float lhs, const Color& rhs) { return rhs * lhs; }
+inline Color operator *(float lhs, const Color& rhs) { return rhs * lhs; }
 
 }

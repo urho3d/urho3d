@@ -20,11 +20,13 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
-#include "../Urho2D/CollisionChain2D.h"
 #include "../IO/MemoryBuffer.h"
-#include "../Urho2D/PhysicsUtils2D.h"
 #include "../IO/VectorBuffer.h"
+#include "../Urho2D/CollisionChain2D.h"
+#include "../Urho2D/PhysicsUtils2D.h"
 
 #include "../DebugNew.h"
 

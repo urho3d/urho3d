@@ -70,8 +70,10 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Handle attribute read access.
     virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest) const;
+
     /// Return attribute descriptions, or null if none defined.
     virtual const Vector<AttributeInfo>* GetAttributes() const { return &attributeInfos_; }
+
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     /// Handle enabled/disabled state change.
@@ -111,10 +113,13 @@ public:
 
     /// Return script file.
     LuaFile* GetScriptFile() const;
+
     /// Return script object type.
     const String& GetScriptObjectType() const { return scriptObjectType_; }
+
     /// Return script object ref.
     int GetScriptObjectRef() const { return scriptObjectRef_; }
+
     /// Get script file serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptDataAttr() const;
     /// Get script network serialization attribute by calling a script function.
@@ -128,6 +133,8 @@ public:
     ResourceRef GetScriptFileAttr() const;
 
 protected:
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
 

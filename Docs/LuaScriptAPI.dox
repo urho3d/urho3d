@@ -1810,6 +1810,7 @@ Methods:
 - char ReadUByte()
 - bool ReadBool()
 - float ReadFloat()
+- double ReadDouble()
 - IntRect ReadIntRect()
 - IntVector2 ReadIntVector2()
 - Rect ReadRect()
@@ -2066,6 +2067,7 @@ Methods:
 - char ReadUByte()
 - bool ReadBool()
 - float ReadFloat()
+- double ReadDouble()
 - IntRect ReadIntRect()
 - IntVector2 ReadIntVector2()
 - Rect ReadRect()
@@ -2102,6 +2104,7 @@ Methods:
 - bool WriteUByte(char value)
 - bool WriteBool(bool value)
 - bool WriteFloat(float value)
+- bool WriteDouble(double value)
 - bool WriteIntRect(const IntRect& value)
 - bool WriteIntVector2(const IntVector2& value)
 - bool WriteRect(const Rect& value)
@@ -2691,6 +2694,7 @@ Methods:
 - void SetInt(const String name, int value)
 - void SetBool(const String name, bool value)
 - void SetFloat(const String name, float value)
+- void SetDouble(const String name, double value)
 - void SetVector2(const String name, const Vector2& value)
 - void SetVector3(const String name, const Vector3& value)
 - void SetVector4(const String name, const Vector4& value)
@@ -2713,6 +2717,7 @@ Methods:
 - int GetInt(const String name) const
 - bool GetBool(const String name) const
 - float GetFloat(const String name) const
+- double GetDouble(const String name) const
 - Vector2 GetVector2(const String name) const
 - Vector3 GetVector3(const String name) const
 - Vector4 GetVector4(const String name) const
@@ -2735,6 +2740,7 @@ Methods:
 - void AddInt(int value)
 - void AddBool(bool value)
 - void AddFloat(float value)
+- void AddDouble(double value)
 - void AddVector2(const Vector2& value)
 - void AddVector3(const Vector3& value)
 - void AddVector4(const Vector4& value)
@@ -2756,6 +2762,7 @@ Methods:
 - int GetInt(unsigned index) const
 - bool GetBool(unsigned index) const
 - float GetFloat(unsigned index) const
+- double GetDouble(unsigned index) const
 - Vector2 GetVector2(unsigned index) const
 - Vector3 GetVector3(unsigned index) const
 - Vector4 GetVector4(unsigned index) const
@@ -4345,6 +4352,7 @@ Properties:
 
 - Vector3 position
 - Vector3 normal
+- Vector2 textureUV
 - float distance
 - Drawable* drawable
 - Node* node
@@ -5089,6 +5097,7 @@ Methods:
 - bool WriteUByte(char value)
 - bool WriteBool(bool value)
 - bool WriteFloat(float value)
+- bool WriteDouble(double value)
 - bool WriteIntRect(const IntRect& value)
 - bool WriteIntVector2(const IntVector2& value)
 - bool WriteRect(const Rect& value)
@@ -6384,6 +6393,8 @@ Methods:
 - Variant* new(bool value)
 - Variant(float value) (GC)
 - Variant* new(float value)
+- Variant(double value) (GC)
+- Variant* new(double value)
 - Variant(const Vector2& value) (GC)
 - Variant* new(const Vector2& value)
 - Variant(const Vector3& value) (GC)
@@ -6427,6 +6438,7 @@ Methods:
 - bool operator==(unsigned rhs) const
 - bool operator==(bool rhs) const
 - bool operator==(float rhs) const
+- bool operator==(double rhs) const
 - bool operator==(const Vector2& rhs)
 - bool operator==(const Vector3& rhs) const
 - bool operator==(const Vector4& rhs) const
@@ -6446,6 +6458,7 @@ Methods:
 - void SetStringHash(const StringHash& value)
 - void SetBool(bool value)
 - void SetFloat(float value)
+- void SetDouble(double value)
 - void SetVector2(const Vector2& value)
 - void SetVector3(const Vector3& value)
 - void SetVector4(const Vector4& value)
@@ -6465,6 +6478,7 @@ Methods:
 - StringHash GetStringHash()
 - bool GetBool() const
 - float GetFloat() const
+- double GetDouble() const
 - const Vector2& GetVector2() const
 - const Vector3& GetVector3() const
 - const Vector4& GetVector4() const
@@ -6506,6 +6520,7 @@ Methods:
 - void SetStringHash(const String key, const StringHash& value)
 - void SetBool(const String key, bool value)
 - void SetFloat(const String key, float value)
+- void SetDouble(const String key, double value)
 - void SetVector2(const String key, const Vector2 value)
 - void SetVector3(const String key, const Vector3 value)
 - void SetVector4(const String key, const Vector4 value)
@@ -6526,6 +6541,7 @@ Methods:
 - StringHash GetStringHash(const String key)
 - bool GetBool(const String key)
 - float GetFloat(const String key)
+- double GetDouble(const String key)
 - const Vector2& GetVector2(const String key)
 - const Vector3& GetVector3(const String key)
 - const Vector4& GetVector4(const String key)
@@ -6714,6 +6730,7 @@ Methods:
 - char ReadUByte()
 - bool ReadBool()
 - float ReadFloat()
+- double ReadDouble()
 - IntRect ReadIntRect()
 - IntVector2 ReadIntVector2()
 - Rect ReadRect()
@@ -6750,6 +6767,7 @@ Methods:
 - bool WriteUByte(char value)
 - bool WriteBool(bool value)
 - bool WriteFloat(float value)
+- bool WriteDouble(double value)
 - bool WriteIntRect(const IntRect& value)
 - bool WriteIntVector2(const IntVector2& value)
 - bool WriteRect(const Rect& value)
@@ -6934,6 +6952,7 @@ Methods:
 - bool SetBoundingBox(const BoundingBox& value)
 - bool SetColor(const String name, const Color& value)
 - bool SetFloat(const String name, float value)
+- bool SetDouble(const String name, double value)
 - bool SetUInt(const String name, unsigned value)
 - bool SetInt(const String name, int value)
 - bool SetIntRect(const String name, const IntRect& value)
@@ -6971,6 +6990,7 @@ Methods:
 - BoundingBox GetBoundingBox() const
 - Color GetColor(const String name) const
 - float GetFloat(const String name) const
+- double GetDouble(const String name) const
 - unsigned GetUInt(const String name) const
 - int GetInt(const String name) const
 - IntRect GetIntRect(const String name) const
@@ -7376,6 +7396,7 @@ Properties:
 - int RAY_AABB
 - int RAY_OBB
 - int RAY_TRIANGLE
+- int RAY_TRIANGLE_UV
 
 ### RenderCommandSortMode
 
@@ -7527,6 +7548,7 @@ Properties:
 - int VAR_MATRIX3
 - int VAR_MATRIX3X4
 - int VAR_MATRIX4
+- int VAR_DOUBLE
 - int MAX_VAR_TYPES
 
 ### VertexElement

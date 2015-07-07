@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Input/InputEvents.h"
 #include "../IO/Log.h"
@@ -72,7 +74,7 @@ void Menu::RegisterObject(Context* context)
 void Menu::Update(float timeStep)
 {
     Button::Update(timeStep);
-    
+
     if (popup_ && showPopup_)
     {
         const Vector<SharedPtr<UIElement> >& children = popup_->GetChildren();
@@ -424,8 +426,9 @@ void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     using namespace KeyDown;
 
     // Activate if accelerator key pressed
-    if (eventData[P_KEY].GetInt() == acceleratorKey_ && (acceleratorQualifiers_ == QUAL_ANY || eventData[P_QUALIFIERS].GetInt() ==
-        acceleratorQualifiers_) && eventData[P_REPEAT].GetBool() == false)
+    if (eventData[P_KEY].GetInt() == acceleratorKey_ &&
+        (acceleratorQualifiers_ == QUAL_ANY || eventData[P_QUALIFIERS].GetInt() == acceleratorQualifiers_) &&
+        eventData[P_REPEAT].GetBool() == false)
     {
         // Ignore if UI has modal element
         if (GetSubsystem<UI>()->HasModalElement())

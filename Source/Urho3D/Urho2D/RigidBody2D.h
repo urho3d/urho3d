@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Scene/Component.h"
+
 #include <Box2D/Box2D.h>
 
 namespace Urho3D
@@ -47,7 +48,7 @@ class URHO3D_API RigidBody2D : public Component
 
 public:
     /// Construct.
-    RigidBody2D(Context* scontext);
+    RigidBody2D(Context* context);
     /// Destruct.
     virtual ~RigidBody2D();
     /// Register object factory.
@@ -85,7 +86,7 @@ public:
     /// Set angular velocity.
     void SetAngularVelocity(float angularVelocity);
     /// Apply force.
-    void ApplyForce(const Vector2& force, const Vector2& point,  bool wake);
+    void ApplyForce(const Vector2& force, const Vector2& point, bool wake);
     /// Apply force to center.
     void ApplyForceToCenter(const Vector2& force, bool wake);
     /// Apply Torque.
@@ -113,26 +114,35 @@ public:
 
     /// Return body type.
     BodyType2D GetBodyType() const { return (BodyType2D)bodyDef_.type; }
+
     /// Return Mass.
     float GetMass() const;
     /// Return inertia.
     float GetInertia() const;
     /// Return mass center.
     Vector2 GetMassCenter() const;
+
     /// Return use fixture mass.
     bool GetUseFixtureMass() const { return useFixtureMass_; }
+
     /// Return linear damping.
     float GetLinearDamping() const { return bodyDef_.linearDamping; }
+
     /// Return angular damping.
     float GetAngularDamping() const { return bodyDef_.angularDamping; }
+
     /// Return allow sleep.
     bool IsAllowSleep() const { return bodyDef_.allowSleep; }
+
     /// Return fixed rotation.
     bool IsFixedRotation() const { return bodyDef_.fixedRotation; }
+
     /// Return bullet.
     bool IsBullet() const { return bodyDef_.bullet; }
+
     /// Return gravity scale.
     float GetGravityScale() const { return bodyDef_.gravityScale; }
+
     /// Return awake.
     bool IsAwake() const;
     /// Return linear velocity.
@@ -146,6 +156,8 @@ public:
 private:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
 

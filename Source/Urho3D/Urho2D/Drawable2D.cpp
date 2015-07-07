@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/Material.h"
@@ -35,7 +37,8 @@ namespace Urho3D
 
 const float PIXEL_SIZE = 0.01f;
 
-SourceBatch2D::SourceBatch2D() : drawOrder_(0)
+SourceBatch2D::SourceBatch2D() :
+    drawOrder_(0)
 {
 }
 
@@ -86,7 +89,7 @@ void Drawable2D::SetOrderInLayer(int orderInLayer)
         return;
 
     orderInLayer_ = orderInLayer;
-    
+
     OnDrawOrderChanged();
     MarkNetworkUpdate();
 }
@@ -99,21 +102,16 @@ const Vector<SourceBatch2D>& Drawable2D::GetSourceBatches()
     return sourceBatches_;
 }
 
-void Drawable2D::OnNodeSet(Node* node)
+void Drawable2D::OnSceneSet(Scene* scene)
 {
-    // Do not call Drawable::OnNodeSet(node)
-    if (node)
+    // Do not call Drawable::OnSceneSet(node), as 2D drawable components should not be added to the octree
+    // but are instead rendered through Renderer2D
+    if (scene)
     {
-        Scene* scene = GetScene();
-        if (scene)
-        {
-            renderer_ = scene->GetOrCreateComponent<Renderer2D>();
+        renderer_ = scene->GetOrCreateComponent<Renderer2D>();
 
-            if (IsEnabledEffective())
-                renderer_->AddDrawable(this);
-        }
-
-        node->AddListener(this);
+        if (IsEnabledEffective())
+            renderer_->AddDrawable(this);
     }
     else
     {

@@ -71,6 +71,10 @@ public:
     bool ExecuteFile(const String& fileName);
     /// Execute script string. Return true if successful.
     bool ExecuteString(const String& string);
+    /// Load script file on file system (i.e. not from resource cache). Return true if successful.
+    bool LoadRawFile(const String& fileName);
+    /// Load and execute script file on file system (i.e. not from resource cache). Return true if successful.
+    bool ExecuteRawFile(const String& fileName);
     /// Execute script function.
     bool ExecuteFunction(const String& functionName);
     /// Send event.
@@ -80,10 +84,12 @@ public:
 
     /// Return Lua state.
     lua_State* GetState() const { return luaState_; }
+
     /// Return Lua function by function stack index.
     LuaFunction* GetFunction(int functionIndex);
     /// Return Lua function by function name.
     LuaFunction* GetFunction(const String& functionName, bool silentIfNotfound = false);
+
     /// Return whether is executing engine console commands as script code.
     bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
 

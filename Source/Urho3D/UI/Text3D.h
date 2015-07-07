@@ -23,9 +23,9 @@
 #pragma once
 
 #include "../Graphics/Drawable.h"
+#include "../Graphics/VertexBuffer.h"
 #include "../Math/Matrix3x4.h"
 #include "../UI/Text.h"
-#include "../Graphics/VertexBuffer.h"
 
 namespace Urho3D
 {
@@ -133,6 +133,7 @@ public:
     const Color& GetColor(Corner corner) const;
     /// Return opacity.
     float GetOpacity() const;
+
     /// Return how the text rotates in relation to the camera.
     FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
 
@@ -144,6 +145,7 @@ public:
     void SetMaterialAttr(const ResourceRef& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
+
     /// Get color attribute. Uses just the top-left color.
     const Color& GetColorAttr() const { return text_.color_[0]; }
 
@@ -156,8 +158,6 @@ protected:
 private:
     /// Mark text & geometry dirty.
     void MarkTextDirty();
-    /// Update text and font.
-    void UpdateText();
     /// Update text %UI batches.
     void UpdateTextBatches();
     /// Create materials for text rendering. May only be called from the main thread. Text %UI batches must be up-to-date.

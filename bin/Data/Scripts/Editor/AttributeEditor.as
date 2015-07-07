@@ -276,13 +276,13 @@ UIElement@ CreateNumAttributeEditor(ListView@ list, Array<Serializable@>@ serial
 {
     UIElement@ parent = CreateAttributeEditorParent(list, info.name, index, subIndex);
     VariantType type = info.type;
-    uint numCoords = type - VAR_FLOAT + 1;
-    if (type == VAR_QUATERNION)
-        numCoords = 3;
-    else if (type == VAR_COLOR || type == VAR_INTRECT)
-        numCoords = 4;
-    else if (type == VAR_INTVECTOR2)
+    uint numCoords = 1;
+    if (type == VAR_VECTOR2 || type == VAR_INTVECTOR2)
         numCoords = 2;
+    if (type == VAR_VECTOR3 || type == VAR_QUATERNION)
+        numCoords = 3;
+    else if (type == VAR_VECTOR4 || type == VAR_COLOR || type == VAR_INTRECT)
+        numCoords = 4;
 
     for (uint i = 0; i < numCoords; ++i)
     {
@@ -430,7 +430,7 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
         parent = CreateStringAttributeEditor(list, serializables, info, index, subIndex);
     else if (type == VAR_BOOL)
         parent = CreateBoolAttributeEditor(list, serializables, info, index, subIndex);
-    else if ((type >= VAR_FLOAT && type <= VAR_VECTOR4) || type == VAR_QUATERNION || type == VAR_COLOR || type == VAR_INTVECTOR2 || type == VAR_INTRECT)
+    else if ((type >= VAR_FLOAT && type <= VAR_VECTOR4) || type == VAR_QUATERNION || type == VAR_COLOR || type == VAR_INTVECTOR2 || type == VAR_INTRECT || type == VAR_DOUBLE)
         parent = CreateNumAttributeEditor(list, serializables, info, index, subIndex);
     else if (type == VAR_INT)
         parent = CreateIntAttributeEditor(list, serializables, info, index, subIndex);
@@ -596,7 +596,7 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
     }
 
     VariantType type = info.type;
-    if (type == VAR_FLOAT || type == VAR_STRING || type == VAR_BUFFER)
+    if (type == VAR_FLOAT || type == VAR_DOUBLE || type == VAR_STRING || type == VAR_BUFFER)
         SetEditable(SetValue(parent.children[1], value.ToString(), sameValue), editable && sameValue);
     else if (type == VAR_BOOL)
         SetEditable(SetValue(parent.children[1], value.GetBool(), sameValue), editable && sameValue);
@@ -818,6 +818,8 @@ void SanitizeNumericalValue(VariantType type, String& value)
         value = String(value.ToFloat());
     else if (type == VAR_INT || type == VAR_INTRECT || type == VAR_INTVECTOR2)
         value = String(value.ToInt());
+    else if (type == VAR_DOUBLE)
+        value = String(value.ToDouble());
 }
 
 void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumNames, uint coordinate, Array<Variant>& values)
@@ -836,6 +838,8 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
     }
     else if (type == VAR_FLOAT)
         FillValue(values, Variant(attrEdit.text.ToFloat()));
+    else if (type == VAR_DOUBLE)
+        FillValue(values, Variant(attrEdit.text.ToDouble()));
     else if (type == VAR_QUATERNION)
     {
         float value = attrEdit.text.ToFloat();
@@ -977,22 +981,22 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
 
     if (!dragEditAttribute)
     {
-	    // Store old values so that PostEditAttribute can create undo actions
-	    for (uint i = 0; i < serializables.length; ++i)
-		    oldValues.Push(serializables[i].attributes[index]);
+        // Store old values so that PostEditAttribute can create undo actions
+        for (uint i = 0; i < serializables.length; ++i)
+            oldValues.Push(serializables[i].attributes[index]);
     }
 
     StoreAttributeEditor(parent, serializables, index, subIndex, coordinate);
     for (uint i = 0; i < serializables.length; ++i)
-	    serializables[i].ApplyAttributes();
+        serializables[i].ApplyAttributes();
     
     if (!dragEditAttribute)
     {
-	    // Do the editor post logic after attribute has been modified.
-	    PostEditAttribute(serializables, index, oldValues);
+        // Do the editor post logic after attribute has been modified.
+        PostEditAttribute(serializables, index, oldValues);
     }
 
-    // Update the stored script attributes if this is a ScriptInstance    
+    // Update the stored script attributes if this is a ScriptInstance
     EditScriptAttributes(serializables[0], index);
 
     inEditAttribute = false;
@@ -1000,7 +1004,7 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     // If not an intermediate edit, reload the editor fields with validated values
     // (attributes may have interactions; therefore we load everything, not just the value being edited)
     if (!intermediateEdit)
-	    attributesDirty = true;
+        attributesDirty = true;
 }
 
 void LineDragBegin(StringHash eventType, VariantMap& eventData)

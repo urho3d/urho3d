@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Container/ArrayPtr.h"
 #include "../IO/Compression.h"
 #include "../IO/Deserializer.h"
@@ -34,7 +36,7 @@ namespace Urho3D
 
 unsigned EstimateCompressBound(unsigned srcSize)
 {
-    return LZ4_compressBound(srcSize);
+    return (unsigned)LZ4_compressBound(srcSize);
 }
 
 unsigned CompressData(void* dest, const void* src, unsigned srcSize)
@@ -42,7 +44,7 @@ unsigned CompressData(void* dest, const void* src, unsigned srcSize)
     if (!dest || !src || !srcSize)
         return 0;
     else
-        return LZ4_compressHC((const char*)src, (char*)dest, srcSize);
+        return (unsigned)LZ4_compressHC((const char*)src, (char*)dest, srcSize);
 }
 
 unsigned DecompressData(void* dest, const void* src, unsigned destSize)
@@ -50,7 +52,7 @@ unsigned DecompressData(void* dest, const void* src, unsigned destSize)
     if (!dest || !src || !destSize)
         return 0;
     else
-        return LZ4_decompress_fast((const char*)src, (char*)dest, destSize);
+        return (unsigned)LZ4_decompress_fast((const char*)src, (char*)dest, destSize);
 }
 
 bool CompressStream(Serializer& dest, Deserializer& src)
@@ -63,15 +65,15 @@ bool CompressStream(Serializer& dest, Deserializer& src)
         dest.WriteUInt(0);
         return true;
     }
-    
-    unsigned maxDestSize = LZ4_compressBound(srcSize);
+
+    unsigned maxDestSize = (unsigned)LZ4_compressBound(srcSize);
     SharedArrayPtr<unsigned char> srcBuffer(new unsigned char[srcSize]);
     SharedArrayPtr<unsigned char> destBuffer(new unsigned char[maxDestSize]);
-    
+
     if (src.Read(srcBuffer, srcSize) != srcSize)
         return false;
-    
-    unsigned destSize = LZ4_compressHC((const char*)srcBuffer.Get(), (char*)destBuffer.Get(), srcSize);
+
+    unsigned destSize = (unsigned)LZ4_compressHC((const char*)srcBuffer.Get(), (char*)destBuffer.Get(), srcSize);
     bool success = true;
     success &= dest.WriteUInt(srcSize);
     success &= dest.WriteUInt(destSize);
@@ -83,21 +85,21 @@ bool DecompressStream(Serializer& dest, Deserializer& src)
 {
     if (src.IsEof())
         return false;
-    
+
     unsigned destSize = src.ReadUInt();
     unsigned srcSize = src.ReadUInt();
     if (!srcSize || !destSize)
         return true; // No data
-    
+
     if (srcSize > src.GetSize())
         return false; // Illegal source (packed data) size reported, possibly not valid data
-    
+
     SharedArrayPtr<unsigned char> srcBuffer(new unsigned char[srcSize]);
     SharedArrayPtr<unsigned char> destBuffer(new unsigned char[destSize]);
-    
+
     if (src.Read(srcBuffer, srcSize) != srcSize)
         return false;
-    
+
     LZ4_decompress_fast((const char*)srcBuffer.Get(), (char*)destBuffer.Get(), destSize);
     return dest.Write(destBuffer, destSize) == destSize;
 }

@@ -22,12 +22,12 @@
 
 #pragma once
 
-#include "../Input/Controls.h"
 #include "../Container/HashSet.h"
 #include "../Core/Object.h"
-#include "../Scene/ReplicationState.h"
 #include "../Core/Timer.h"
+#include "../Input/Controls.h"
 #include "../IO/VectorBuffer.h"
+#include "../Scene/ReplicationState.h"
 
 #include <kNet/kNetFwd.h>
 #include <kNet/SharedPtr.h>
@@ -64,7 +64,7 @@ struct PackageDownload
 {
     /// Construct with defaults.
     PackageDownload();
-    
+
     /// Destination file.
     SharedPtr<File> file_;
     /// Already received fragments.
@@ -84,7 +84,7 @@ struct PackageUpload
 {
     /// Construct with defaults.
     PackageUpload();
-    
+
     /// Source file.
     SharedPtr<File> file_;
     /// Current fragment index.
@@ -105,13 +105,13 @@ enum ObserverPositionSendMode
 class URHO3D_API Connection : public Object
 {
     OBJECT(Connection);
-    
+
 public:
     /// Construct with context and kNet message connection pointers.
     Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection);
     /// Destruct.
     ~Connection();
-    
+
     /// Send a message.
     void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
     /// Send a message.
@@ -148,35 +148,49 @@ public:
     void ProcessPendingLatestData();
     /// Process a message from the server or client. Called by Network.
     bool ProcessMessage(int msgID, MemoryBuffer& msg);
-    
+
     /// Return the kNet message connection.
     kNet::MessageConnection* GetMessageConnection() const;
+
     /// Return client identity.
     VariantMap& GetIdentity() { return identity_; }
+
     /// Return the scene used by this connection.
     Scene* GetScene() const;
+
     /// Return the client controls of this connection.
     const Controls& GetControls() const { return controls_; }
+
     /// Return the controls timestamp, sent from client to server along each control update.
     unsigned char GetTimeStamp() const { return timeStamp_; }
+
     /// Return the observer position sent by the client for interest management.
     const Vector3& GetPosition() const { return position_; }
+
     /// Return the observer rotation sent by the client for interest management.
     const Quaternion& GetRotation() const { return rotation_; }
+
     /// Return whether is a client connection.
     bool IsClient() const { return isClient_; }
+
     /// Return whether is fully connected.
     bool IsConnected() const;
+
     /// Return whether connection is pending.
     bool IsConnectPending() const { return connectPending_; }
+
     /// Return whether the scene is loaded and ready to receive server updates.
     bool IsSceneLoaded() const { return sceneLoaded_; }
+
     /// Return whether to log data in/out statistics.
     bool GetLogStatistics() const { return logStatistics_; }
+
     /// Return remote address.
     String GetAddress() const { return address_; }
+
     /// Return remote port.
     unsigned short GetPort() const { return port_; }
+
     /// Return an address:port string.
     String ToString() const;
     /// Return number of package downloads remaining.
@@ -197,7 +211,7 @@ public:
     unsigned char timeStamp_;
     /// Identity map.
     VariantMap identity_;
-    
+
 private:
     /// Handle scene loaded event.
     void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
@@ -237,7 +251,7 @@ private:
     void OnPackageDownloadFailed(const String& name);
     /// Handle all packages loaded successfully. Also called directly on MSG_LOADSCENE if there are none.
     void OnPackagesReady();
-    
+
     /// kNet message connection.
     kNet::SharedPtr<kNet::MessageConnection> connection_;
     /// Scene.

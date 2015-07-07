@@ -20,18 +20,20 @@
 // THE SOFTWARE.
 //
 
-#include "../Scene/Component.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Core/Profiler.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
+#include "../Resource/XMLFile.h"
+#include "../Scene/Component.h"
 #include "../Scene/ObjectAnimation.h"
-#include "../Core/Profiler.h"
 #include "../Scene/ReplicationState.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/SmoothedTransform.h"
 #include "../Scene/UnknownComponent.h"
-#include "../Resource/XMLFile.h"
 
 #include "../DebugNew.h"
 
@@ -76,9 +78,12 @@ void Node::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
     ACCESSOR_ATTRIBUTE("Scale", GetScale, SetScale, Vector3, Vector3::ONE, AM_DEFAULT);
     ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
-    ACCESSOR_ATTRIBUTE("Network Position", GetNetPositionAttr, SetNetPositionAttr, Vector3, Vector3::ZERO, AM_NET | AM_LATESTDATA | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE("Network Rotation", GetNetRotationAttr, SetNetRotationAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE("Network Parent Node", GetNetParentAttr, SetNetParentAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE("Network Position", GetNetPositionAttr, SetNetPositionAttr, Vector3, Vector3::ZERO,
+        AM_NET | AM_LATESTDATA | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE("Network Rotation", GetNetRotationAttr, SetNetRotationAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+        AM_NET | AM_LATESTDATA | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE("Network Parent Node", GetNetParentAttr, SetNetParentAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+        AM_NET | AM_NOEDIT);
 }
 
 bool Node::Load(Deserializer& source, bool setInstanceDefault)
@@ -86,7 +91,7 @@ bool Node::Load(Deserializer& source, bool setInstanceDefault)
     SceneResolver resolver;
 
     // Read own ID. Will not be applied, only stored for resolving possible references
-    unsigned nodeID = source.ReadInt();
+    unsigned nodeID = source.ReadUInt();
     resolver.AddNode(nodeID, this);
 
     // Read attributes, components and child nodes
@@ -146,7 +151,7 @@ bool Node::LoadXML(const XMLElement& source, bool setInstanceDefault)
     SceneResolver resolver;
 
     // Read own ID. Will not be applied, only stored for resolving possible references
-    unsigned nodeID = source.GetInt("id");
+    unsigned nodeID = source.GetUInt("id");
     resolver.AddNode(nodeID, this);
 
     // Read attributes, components and child nodes
@@ -163,7 +168,7 @@ bool Node::LoadXML(const XMLElement& source, bool setInstanceDefault)
 bool Node::SaveXML(XMLElement& dest) const
 {
     // Write node ID
-    if (!dest.SetInt("id", id_))
+    if (!dest.SetUInt("id", id_))
         return false;
 
     // Write attributes
@@ -595,15 +600,15 @@ void Node::AddChild(Node* node, unsigned index)
             {
                 // Otherwise do not remove from the scene during reparenting, just send the necessary change event
                 using namespace NodeRemoved;
-    
+
                 VariantMap& eventData = GetEventDataMap();
                 eventData[P_SCENE] = scene_;
                 eventData[P_PARENT] = oldParent;
                 eventData[P_NODE] = node;
-                
+
                 scene_->SendEvent(E_NODEREMOVED, eventData);
             }
-            
+
             oldParent->children_.Remove(nodeShared);
         }
     }
@@ -714,7 +719,7 @@ Component* Node::CloneComponent(Component* component, unsigned id)
         LOGERROR("Null source component given for CloneComponent");
         return 0;
     }
-    
+
     return CloneComponent(component, component->GetID() < FIRST_LOCAL_ID ? REPLICATED : LOCAL, id);
 }
 
@@ -735,7 +740,7 @@ Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned 
 
     const Vector<AttributeInfo>* compAttributes = component->GetAttributes();
     const Vector<AttributeInfo>* cloneAttributes = cloneComponent->GetAttributes();
-    
+
     if (compAttributes)
     {
         for (unsigned i = 0; i < compAttributes->Size() && i < cloneAttributes->Size(); ++i)
@@ -753,7 +758,7 @@ Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned 
         }
         cloneComponent->ApplyAttributes();
     }
-    
+
     return cloneComponent;
 }
 
@@ -1230,7 +1235,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     while (compElem)
     {
         String typeName = compElem.GetAttribute("type");
-        unsigned compID = compElem.GetInt("id");
+        unsigned compID = compElem.GetUInt("id");
         Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
             (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
@@ -1249,7 +1254,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     XMLElement childElem = source.GetChild("node");
     while (childElem)
     {
-        unsigned nodeID = childElem.GetInt("id");
+        unsigned nodeID = childElem.GetUInt("id");
         Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && nodeID < FIRST_LOCAL_ID) ? REPLICATED :
             LOCAL);
         resolver.AddNode(nodeID, newNode);
@@ -1318,9 +1323,8 @@ void Node::PrepareNetworkUpdate()
             networkState_->previousValues_[i] = networkState_->currentValues_[i];
 
             // Mark the attribute dirty in all replication states that are tracking this node
-            for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin(); j !=
-                networkState_->replicationStates_.End();
-                ++j)
+            for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
+                 j != networkState_->replicationStates_.End(); ++j)
             {
                 NodeReplicationState* nodeState = static_cast<NodeReplicationState*>(*j);
                 nodeState->dirtyAttributes_.Set(i);
@@ -1344,8 +1348,8 @@ void Node::PrepareNetworkUpdate()
             networkState_->previousVars_[i->first_] = i->second_;
 
             // Mark the var dirty in all replication states that are tracking this node
-            for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin(); j !=
-                networkState_->replicationStates_.End(); ++j)
+            for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
+                 j != networkState_->replicationStates_.End(); ++j)
             {
                 NodeReplicationState* nodeState = static_cast<NodeReplicationState*>(*j);
                 nodeState->dirtyVars_.Insert(i->first_);
@@ -1381,8 +1385,8 @@ void Node::MarkReplicationDirty()
 {
     if (networkState_)
     {
-        for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin(); j !=
-            networkState_->replicationStates_.End(); ++j)
+        for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
+             j != networkState_->replicationStates_.End(); ++j)
         {
             NodeReplicationState* nodeState = static_cast<NodeReplicationState*>(*j);
             if (!nodeState->markedDirty_)
@@ -1419,6 +1423,11 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
 
     components_.Push(SharedPtr<Component>(component));
 
+    if (component->GetNode())
+        LOGWARNING("Component " + component->GetTypeName() + " already belongs to a node!");
+
+    component->SetNode(this);
+
     // If zero ID specified, or the ID is already taken, let the scene assign
     if (scene_)
     {
@@ -1430,10 +1439,6 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
     else
         component->SetID(id);
 
-    if(component->GetNode())
-        LOGWARNING("Component " + component->GetTypeName() + " already belongs to a node!");
-
-    component->SetNode(this);
     component->OnMarkedDirty(this);
 
     // Check attributes of the new component on next network update, and mark node dirty in all replication states
@@ -1516,7 +1521,7 @@ void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attri
             if (names[i].Front() != '#')
                 break;
 
-            unsigned index = ToInt(names[i].Substring(1, names[i].Length() - 1));
+            unsigned index = ToUInt(names[i].Substring(1, names[i].Length() - 1));
             node = node->GetChild(index);
             if (!node)
             {
@@ -1524,7 +1529,7 @@ void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attri
                 return;
             }
         }
-        
+
         if (i == names.Size() - 1)
         {
             node->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
@@ -1552,7 +1557,7 @@ void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attri
         }
         else
         {
-            unsigned index = ToInt(componentNames[1]);
+            unsigned index = ToUInt(componentNames[1]);
             PODVector<Component*> components;
             node->GetComponents(components, StringHash(componentNames.Front()));
             if (index >= components.Size())
@@ -1577,7 +1582,7 @@ void Node::SetEnabled(bool enable, bool recursive, bool storeSelf)
 
     if (storeSelf)
         enabledPrev_ = enable;
-    
+
     if (enable != enabled_)
     {
         enabled_ = enable;
@@ -1682,7 +1687,7 @@ void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
 {
     // Send change event. Do not send when already being destroyed
     Node* child = *i;
-    
+
     if (Refs() > 0 && scene_)
     {
         using namespace NodeRemoved;
@@ -1691,14 +1696,13 @@ void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
         eventData[P_SCENE] = scene_;
         eventData[P_PARENT] = this;
         eventData[P_NODE] = child;
-        
+
         scene_->SendEvent(E_NODEREMOVED, eventData);
     }
 
     child->parent_ = 0;
     child->MarkDirty();
     child->MarkNetworkUpdate();
-    // Remove the child from the scene already at this point, in case it is not destroyed immediately
     if (scene_)
         scene_->NodeRemoved(child);
 

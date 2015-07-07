@@ -20,12 +20,14 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/IndexBuffer.h"
+#include "../Graphics/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../Math/Ray.h"
-#include "../Graphics/VertexBuffer.h"
 
 #include "../DebugNew.h"
 
@@ -59,14 +61,14 @@ bool Geometry::SetNumVertexBuffers(unsigned num)
         LOGERROR("Too many vertex streams");
         return false;
     }
-    
+
     unsigned oldSize = vertexBuffers_.Size();
     vertexBuffers_.Resize(num);
     elementMasks_.Resize(num);
-    
+
     for (unsigned i = oldSize; i < num; ++i)
         elementMasks_[i] = MASK_NONE;
-    
+
     GetPositionBufferIndex();
     return true;
 }
@@ -78,9 +80,9 @@ bool Geometry::SetVertexBuffer(unsigned index, VertexBuffer* buffer, unsigned el
         LOGERROR("Stream index out of bounds");
         return false;
     }
-    
+
     vertexBuffers_[index] = buffer;
-    
+
     if (buffer)
     {
         if (elementMask == MASK_DEFAULT)
@@ -88,7 +90,7 @@ bool Geometry::SetVertexBuffer(unsigned index, VertexBuffer* buffer, unsigned el
         else
             elementMasks_[index] = elementMask;
     }
-    
+
     GetPositionBufferIndex();
     return true;
 }
@@ -108,20 +110,20 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     if (indexBuffer_ && indexStart + indexCount > indexBuffer_->GetIndexCount())
     {
         LOGERROR("Illegal draw range " + String(indexStart) + " to " + String(indexStart + indexCount - 1) + ", index buffer has " +
-            String(indexBuffer_->GetIndexCount()) + " indices");
+                 String(indexBuffer_->GetIndexCount()) + " indices");
         return false;
     }
-    
+
     primitiveType_ = type;
     indexStart_ = indexStart;
     indexCount_ = indexCount;
-    
+
     // Get min.vertex index and num of vertices from index buffer. If it fails, use full range as fallback
     if (indexCount)
     {
         vertexStart_ = 0;
         vertexCount_ = vertexBuffers_[0] ? vertexBuffers_[0]->GetVertexCount() : 0;
-        
+
         if (getUsedVertexRange && indexBuffer_)
             indexBuffer_->GetUsedVertexRange(indexStart_, indexCount_, vertexStart_, vertexCount_);
     }
@@ -130,11 +132,12 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
         vertexStart_ = 0;
         vertexCount_ = 0;
     }
-    
+
     return true;
 }
 
-bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, bool checkIllegal)
+bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
+    bool checkIllegal)
 {
     if (indexBuffer_)
     {
@@ -142,7 +145,7 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
         if (checkIllegal && indexStart + indexCount > indexBuffer_->GetIndexCount())
         {
             LOGERROR("Illegal draw range " + String(indexStart) + " to " + String(indexStart + indexCount - 1) +
-                ", index buffer has " + String(indexBuffer_->GetIndexCount()) + " indices");
+                     ", index buffer has " + String(indexBuffer_->GetIndexCount()) + " indices");
             return false;
         }
     }
@@ -151,13 +154,13 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
         indexStart = 0;
         indexCount = 0;
     }
-    
+
     primitiveType_ = type;
     indexStart_ = indexStart;
     indexCount_ = indexCount;
     vertexStart_ = minVertex;
     vertexCount_ = vertexCount;
-    
+
     return true;
 }
 
@@ -165,7 +168,7 @@ void Geometry::SetLodDistance(float distance)
 {
     if (distance < 0.0f)
         distance = 0.0f;
-    
+
     lodDistance_ = distance;
 }
 
@@ -210,16 +213,16 @@ unsigned Geometry::GetVertexElementMask(unsigned index) const
 unsigned short Geometry::GetBufferHash() const
 {
     unsigned short hash = 0;
-    
+
     for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
     {
         VertexBuffer* vBuf = vertexBuffers_[i];
         hash += *((unsigned short*)&vBuf);
     }
-    
+
     IndexBuffer* iBuf = indexBuffer_;
     hash += *((unsigned short*)&iBuf);
-    
+
     return hash;
 }
 
@@ -255,7 +258,7 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
             elementMask = 0;
         }
     }
-    
+
     if (rawIndexData_)
     {
         indexData = rawIndexData_;
@@ -311,7 +314,7 @@ void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsig
             elementMask = 0;
         }
     }
-    
+
     if (rawIndexData_)
     {
         indexData = rawIndexData_;
@@ -335,22 +338,38 @@ void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsig
     }
 }
 
-float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal) const
+float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outUV) const
 {
     const unsigned char* vertexData;
     const unsigned char* indexData;
     unsigned vertexSize;
     unsigned indexSize;
     unsigned elementMask;
-    
+    unsigned uvOffset = 0;
+
     GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-    
-    if (vertexData && indexData)
-        return ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_, outNormal);
-    else if (vertexData)
-        return ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_, outNormal);
-    else
-        return M_INFINITY;
+
+    if (vertexData)
+    {
+        if (outUV)
+        {
+            if ((elementMask & MASK_TEXCOORD1) == 0)
+            {
+                // requested UV output, but no texture data in vertex buffer
+                LOGWARNING("Illegal GetHitDistance call: UV return requested on vertex buffer without UV coords");
+                *outUV = Vector2::ZERO;
+                outUV = 0;
+            }
+            else
+                uvOffset = VertexBuffer::GetElementOffset(elementMask, ELEMENT_TEXCOORD1);
+        }
+
+        return indexData ? ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_, outNormal, outUV,
+            uvOffset) :
+               ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_, outNormal, outUV, uvOffset);
+    }
+
+    return M_INFINITY;
 }
 
 bool Geometry::IsInside(const Ray& ray) const
@@ -360,15 +379,11 @@ bool Geometry::IsInside(const Ray& ray) const
     unsigned vertexSize;
     unsigned indexSize;
     unsigned elementMask;
-    
+
     GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-    
-    if (vertexData && indexData)
-        return ray.InsideGeometry(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_);
-    else if (vertexData)
-        return ray.InsideGeometry(vertexData, vertexSize, vertexStart_, vertexCount_);
-    else
-        return false;
+
+    return vertexData ? (indexData ? ray.InsideGeometry(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_) :
+                         ray.InsideGeometry(vertexData, vertexSize, vertexStart_, vertexCount_)) : false;
 }
 
 void Geometry::GetPositionBufferIndex()
@@ -381,7 +396,7 @@ void Geometry::GetPositionBufferIndex()
             return;
         }
     }
-    
+
     // No vertex buffer with positions
     positionBufferIndex_ = M_MAX_UNSIGNED;
 }

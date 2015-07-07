@@ -23,11 +23,10 @@
 #pragma once
 
 #include "../Container/HashSet.h"
-#include "../Input/InputEvents.h"
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
 #include "../Container/List.h"
-
+#include "../Input/InputEvents.h"
 #include "../UI/Cursor.h"
 
 namespace Urho3D
@@ -85,18 +84,25 @@ struct JoystickState
 
     /// Return whether is a game controller. Game controllers will use standardized axis and button mappings.
     bool IsController() const { return controller_ != 0; }
+
     /// Return number of buttons.
     unsigned GetNumButtons() const { return buttons_.Size(); }
+
     /// Return number of axes.
     unsigned GetNumAxes() const { return axes_.Size(); }
+
     /// Return number of hats.
     unsigned GetNumHats() const { return hats_.Size(); }
+
     /// Check if a button is held down.
     bool GetButtonDown(unsigned index) const { return index < buttons_.Size() ? buttons_[index] : false; }
+
     /// Check if a button has been pressed on this frame.
     bool GetButtonPress(unsigned index) const { return index < buttonPress_.Size() ? buttonPress_[index] : false; }
+
     /// Return axis position.
     float GetAxisPosition(unsigned index) const { return index < axes_.Size() ? axes_[index] : 0.0f; }
+
     /// Return hat position.
     int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : HAT_CENTER; }
 
@@ -127,10 +133,11 @@ class EmscriptenInput;
 /// %Input subsystem. Converts operating system window messages to input state and events.
 class URHO3D_API Input : public Object
 {
-    #ifdef EMSCRIPTEN
-    friend class EmscriptenInput;
-    #endif
     OBJECT(Input);
+
+#ifdef EMSCRIPTEN
+    friend class EmscriptenInput;
+#endif
 
 public:
     /// Construct.
@@ -142,9 +149,9 @@ public:
     void Update();
     /// Set whether ALT-ENTER fullscreen toggle is enabled.
     void SetToggleFullscreen(bool enable);
-    /// Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window. Mouse visiblility event can be suppressed-- this also recalls any unsuppressed SetMouseVisible which can be returned by ResetMouseVisible().
+    /// Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window. Mouse visibility event can be suppressed-- this also recalls any unsuppressed SetMouseVisible which can be returned by ResetMouseVisible().
     void SetMouseVisible(bool enable, bool suppressEvent = false);
-    /// Reset last mouse visibilty that was not suppressed in SetMouseVisible.
+    /// Reset last mouse visibility that was not suppressed in SetMouseVisible.
     void ResetMouseVisible();
     /// Set whether the mouse is currently being grabbed by an operation.
     void SetMouseGrabbed(bool grab);
@@ -216,7 +223,7 @@ public:
     /// Check if a key is held down by scancode.
     bool GetScancodeDown(int scancode) const;
     /// Check if a key has been pressed on this frame by scancode.
-    bool GetScancodePress(int scanode) const;
+    bool GetScancodePress(int scancode) const;
     /// Check if a mouse button is held down.
     bool GetMouseButtonDown(int button) const;
     /// Check if a mouse button has been pressed on this frame.
@@ -229,42 +236,58 @@ public:
     int GetQualifiers() const;
     /// Return mouse position within window. Should only be used with a visible mouse cursor.
     IntVector2 GetMousePosition() const;
+
     /// Return mouse movement since last frame.
     const IntVector2& GetMouseMove() const { return mouseMove_; }
+
     /// Return horizontal mouse movement since last frame.
     int GetMouseMoveX() const { return mouseMove_.x_; }
+
     /// Return vertical mouse movement since last frame.
     int GetMouseMoveY() const { return mouseMove_.y_; }
+
     /// Return mouse wheel movement since last frame.
     int GetMouseMoveWheel() const { return mouseMoveWheel_; }
+
     /// Return number of active finger touches.
     unsigned GetNumTouches() const { return touches_.Size(); }
+
     /// Return active finger touch by index.
     TouchState* GetTouch(unsigned index) const;
+
     /// Return number of connected joysticks.
     unsigned GetNumJoysticks() const { return joysticks_.Size(); }
+
     /// Return joystick state by ID, or null if does not exist.
     JoystickState* GetJoystick(SDL_JoystickID id);
     /// Return joystick state by index, or null if does not exist. 0 = first connected joystick.
     JoystickState* GetJoystickByIndex(unsigned index);
+
     /// Return whether fullscreen toggle is enabled.
     bool GetToggleFullscreen() const { return toggleFullscreen_; }
+
     /// Return whether a virtual joystick is visible.
     bool IsScreenJoystickVisible(SDL_JoystickID id) const;
     /// Return whether on-screen keyboard is supported.
     bool GetScreenKeyboardSupport() const;
     /// Return whether on-screen keyboard is being shown.
     bool IsScreenKeyboardVisible() const;
+
     /// Return whether touch emulation is enabled.
     bool GetTouchEmulation() const { return touchEmulation_; }
+
     /// Return whether the operating system mouse cursor is visible.
     bool IsMouseVisible() const { return mouseVisible_; }
+
     /// Return whether the mouse is currently being grabbed by an operation.
     bool IsMouseGrabbed() const { return mouseGrabbed_; }
+
     /// Return the mouse mode.
     MouseMode GetMouseMode() const { return mouseMode_; }
+
     /// Return whether application window has input focus.
     bool HasFocus() { return inputFocus_; }
+
     /// Return whether application window is minimized.
     bool IsMinimized() const;
 
@@ -295,11 +318,13 @@ private:
     void SetMouseButton(int button, bool newState);
     /// Handle a key change.
     void SetKey(int key, int scancode, unsigned raw, bool newState);
-    #ifdef EMSCRIPTEN
+#ifdef EMSCRIPTEN
+    /// Set whether the operating system mouse cursor is visible (Emscripten platform only).
     void SetMouseVisibleEmscripten(bool enable);
+    /// Set mouse mode (Emscripten platform only).
     void SetMouseModeEmscripten(MouseMode mode);
-    #endif
-    /// Handle mousewheel change.
+#endif
+    /// Handle mouse wheel change.
     void SetMouseWheel(int delta);
     /// Internal function to set the mouse cursor position.
     void SetMousePosition(const IntVector2& position);
@@ -326,7 +351,7 @@ private:
     HashMap<int, TouchState> touches_;
     /// List that maps between event touch IDs and normalised touch IDs
     List<int> availableTouchIDs_;
-    /// Mapping of touch indicies
+    /// Mapping of touch indices
     HashMap<int, int> touchIDMap_;
     /// String for text input.
     String textInput_;

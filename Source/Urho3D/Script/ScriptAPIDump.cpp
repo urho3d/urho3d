@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../IO/File.h"
 #include "../IO/FileSystem.h"
@@ -157,10 +159,6 @@ bool ComparePropertyInfos(const PropertyInfo& lhs, const PropertyInfo& rhs)
 void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference, String separator)
 {
     String out(row);
-    ///\todo We need C++11 <regex> in String class to handle REGEX whole-word replacement correctly. Can't do that since we still support VS2008.
-    // Commenting out to temporary fix property name like 'doubleClickInterval' from being wrongly replaced.
-    // Fortunately, there is no occurence of type 'double' in the API at the moment.
-    //out.Replace("double", "float");   // s/\bdouble\b/float/g
     out.Replace("&in", "&");
     out.Replace("&out", "&");
     if (removeReference)
@@ -210,7 +208,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         String path = AddTrailingSlash(sourceTree);
         if (!path.Empty())
             path.Append("Source/Urho3D/");
-        
+
         fileSystem->ScanDir(headerFileNames, path, "*.h", SCAN_FILES, true);
 
         /// \hack Rename any Events2D to 2DEvents to work with the event category creation correctly (currently PhysicsEvents2D)
@@ -234,12 +232,12 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 SharedPtr<File> file(new File(context_, path + headerFiles[i].fileName, FILE_READ));
                 if (!file->IsOpen())
                     continue;
-                
+
                 const String& sectionName = headerFiles[i].sectionName;
                 unsigned start = sectionName.Find('/') + 1;
                 unsigned end = sectionName.Find("Events.h");
                 Log::WriteRaw("\n## %" + sectionName.Substring(start, end - start) + " events\n");
-                    
+
                 while (!file->IsEof())
                 {
                     String line = file->ReadLine();
@@ -262,21 +260,20 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                     }
                 }
             }
-            
+
             Log::WriteRaw("\n");
         }
-        
+
         Log::WriteRaw("\n\\page AttributeList Attribute list\n");
-        
+
         const HashMap<StringHash, Vector<AttributeInfo> >& attributes = context_->GetAllAttributes();
 
         Vector<String> objectTypes;
-        for (HashMap<StringHash, Vector<AttributeInfo> >::ConstIterator i = attributes.Begin(); i != attributes.End();
-            ++i)
+        for (HashMap<StringHash, Vector<AttributeInfo> >::ConstIterator i = attributes.Begin(); i != attributes.End(); ++i)
             objectTypes.Push(context_->GetTypeName(i->first_));
-        
+
         Sort(objectTypes.Begin(), objectTypes.End());
-        
+
         for (unsigned i = 0; i < objectTypes.Size(); ++i)
         {
             const Vector<AttributeInfo>& attrs = attributes.Find(objectTypes[i])->second_;
@@ -289,12 +286,12 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                     continue;
                 ++usableAttrs;
             }
-            
+
             if (!usableAttrs)
                 continue;
-            
+
             Log::WriteRaw("\n### " + objectTypes[i] + "\n");
-            
+
             for (unsigned j = 0; j < attrs.Size(); ++j)
             {
                 if (attrs[j].mode_ & AM_NOEDIT)
@@ -303,7 +300,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 Vector<String> nameParts = attrs[j].name_.Split(' ');
                 for (unsigned k = 0; k < nameParts.Size(); ++k)
                 {
-                    if (nameParts[k].Length() > 1 && IsAlpha(nameParts[k][0]))
+                    if (nameParts[k].Length() > 1 && IsAlpha((unsigned)nameParts[k][0]))
                         nameParts[k] = "%" + nameParts[k];
                 }
                 String name;
@@ -311,26 +308,27 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 String type = Variant::GetTypeName(attrs[j].type_);
                 // Variant typenames are all uppercase. Convert primitive types to the proper lowercase form for the documentation
                 if (type == "Int" || type == "Bool" || type == "Float")
-                    type[0] = ToLower(type[0]);
-                
+                    type[0] = (char)ToLower((unsigned)type[0]);
+
                 Log::WriteRaw("- " + name + " : " + type + "\n");
             }
         }
-        
+
         Log::WriteRaw("\n");
     }
-    
+
     if (mode == DOXYGEN)
         Log::WriteRaw("\n\\page ScriptAPI Scripting API\n\n");
     else if (mode == C_HEADER)
-        Log::WriteRaw("// Script API header intended to be 'force included' in IDE for AngelScript content assist / code completion\n\n"
-            "#define int8 signed char\n"
-            "#define int16 signed short\n"
-            "#define int64 long\n"
-            "#define uint8 unsigned char\n"
-            "#define uint16 unsigned short\n"
-            "#define uint64 unsigned long\n"
-            "#define null 0\n");
+        Log::WriteRaw(
+            "// Script API header intended to be 'force included' in IDE for AngelScript content assist / code completion\n\n"
+                "#define int8 signed char\n"
+                "#define int16 signed short\n"
+                "#define int64 long\n"
+                "#define uint8 unsigned char\n"
+                "#define uint16 unsigned short\n"
+                "#define uint64 unsigned long\n"
+                "#define null 0\n");
 
     unsigned types = scriptEngine_->GetObjectTypeCount();
     Vector<Pair<String, unsigned> > sortedTypes;
@@ -344,7 +342,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         }
     }
     Sort(sortedTypes.Begin(), sortedTypes.End());
-    
+
     if (mode == DOXYGEN)
     {
         Log::WriteRaw("\\section ScriptAPI_TableOfContents Table of contents\n"
@@ -356,7 +354,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
             "\\ref ScriptAPI_GlobalConstants \"Global constants\"<br>\n\n");
 
         Log::WriteRaw("\\section ScriptAPI_ClassList Class list\n\n");
-        
+
         for (unsigned i = 0; i < sortedTypes.Size(); ++i)
         {
             asIObjectType* type = scriptEngine_->GetObjectTypeByIndex(sortedTypes[i].second_);
@@ -366,7 +364,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 Log::WriteRaw("<a href=\"#Class_" + typeName + "\"><b>" + typeName + "</b></a>\n");
             }
         }
-        
+
         Log::WriteRaw("\n\\section ScriptAPI_Classes Classes\n");
     }
     else if (mode == C_HEADER)
@@ -420,7 +418,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                         {
                             // Assume this 'mark' is added as the last parameter
                             unsigned posEnd = declaration.Find(')', posBegin);
-                            if (posBegin != String::NPOS)
+                            if (posEnd != String::NPOS)
                             {
                                 declaration.Replace(posBegin, posEnd - posBegin, "");
                                 posBegin = declaration.Find(", ", posBegin - 2);
@@ -454,10 +452,10 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 newInfo.read_ = newInfo.write_ = true;
                 propertyInfos.Push(newInfo);
             }
-            
+
             Sort(methodDeclarations.Begin(), methodDeclarations.End(), ComparePropertyStrings);
             Sort(propertyInfos.Begin(), propertyInfos.End(), ComparePropertyInfos);
-            
+
             if (!methodDeclarations.Empty())
             {
                 if (mode == DOXYGEN)
@@ -541,7 +539,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         sortedEnums.Push(MakePair(String(scriptEngine_->GetEnumByIndex(i, &typeId)), i));
     }
     Sort(sortedEnums.Begin(), sortedEnums.End());
-    
+
     for (unsigned i = 0; i < sortedEnums.Size(); ++i)
     {
         int typeId = 0;
@@ -562,7 +560,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         else if (mode == C_HEADER)
             Log::WriteRaw("};\n");
     }
-    
+
     if (mode == DOXYGEN)
         Log::WriteRaw("\\section ScriptAPI_GlobalFunctions Global functions\n");
     else if (mode == C_HEADER)
@@ -597,12 +595,12 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
         String type(propertyDeclaration);
         globalConstants.Push(type + " " + String(propertyName));
     }
-    
+
     Sort(globalConstants.Begin(), globalConstants.End(), ComparePropertyStrings);
-    
+
     for (unsigned i = 0; i < globalConstants.Size(); ++i)
         OutputAPIRow(mode, globalConstants[i], true);
-        
+
     if (mode == DOXYGEN)
         Log::WriteRaw("*/\n\n}\n");
 }

@@ -21,16 +21,18 @@
 //
 
 #ifdef URHO3D_URHO2D
-#include "../Urho2D/AnimatedSprite2D.h"
-#include "../Urho2D/Animation2D.h"
-#include "../Urho2D/AnimationSet2D.h"
+
+#include "../Precompiled.h"
+
 #include "../Script/APITemplates.h"
+#include "../Scene/Scene.h"
+#include "../Urho2D/AnimatedSprite2D.h"
+#include "../Urho2D/AnimationSet2D.h"
 #include "../Urho2D/CollisionBox2D.h"
 #include "../Urho2D/CollisionChain2D.h"
 #include "../Urho2D/CollisionCircle2D.h"
 #include "../Urho2D/CollisionEdge2D.h"
 #include "../Urho2D/CollisionPolygon2D.h"
-#include "../Urho2D/CollisionShape2D.h"
 #include "../Urho2D/Constraint2D.h"
 #include "../Urho2D/ConstraintDistance2D.h"
 #include "../Urho2D/ConstraintFriction2D.h"
@@ -43,17 +45,13 @@
 #include "../Urho2D/ConstraintRope2D.h"
 #include "../Urho2D/ConstraintWeld2D.h"
 #include "../Urho2D/ConstraintWheel2D.h"
-#include "../Urho2D/Drawable2D.h"
 #include "../Urho2D/ParticleEffect2D.h"
 #include "../Urho2D/ParticleEmitter2D.h"
 #include "../Urho2D/PhysicsWorld2D.h"
 #include "../Urho2D/RigidBody2D.h"
-#include "../Scene/Scene.h"
 #include "../Urho2D/Sprite2D.h"
 #include "../Urho2D/SpriteSheet2D.h"
-#include "../Urho2D/StaticSprite2D.h"
 #include "../Urho2D/TileMap2D.h"
-#include "../Urho2D/TileMapDefs2D.h"
 #include "../Urho2D/TileMapLayer2D.h"
 #include "../Urho2D/TmxFile2D.h"
 
@@ -763,4 +761,5 @@ void RegisterUrho2DAPI(asIScriptEngine* engine)
 }
 
 }
+
 #endif

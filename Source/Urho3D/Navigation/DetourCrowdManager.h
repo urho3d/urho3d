@@ -108,7 +108,7 @@ protected:
     /// Set the move target for the specified agent.
     bool SetAgentTarget(CrowdAgent* agent, Vector3 target);
     /// Set the move target for the specified agent.
-    bool SetAgentTarget(CrowdAgent* agent, Vector3 target, unsigned int& targetRef);
+    bool SetAgentTarget(CrowdAgent* agent, Vector3 target, unsigned& targetRef);
 
     /// Get the closest walkable position.
     Vector3 GetClosestWalkablePosition(Vector3 pos) const;
@@ -116,8 +116,8 @@ protected:
 protected:
     /// Update the crowd simulation.
     void Update(float delta);
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// Get the detour crowd agent.
     const dtCrowdAgent* GetCrowdAgent(int agent);
     /// Get the internal detour crowd component.

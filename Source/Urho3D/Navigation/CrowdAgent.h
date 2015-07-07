@@ -133,6 +133,8 @@ protected:
     virtual void OnCrowdAgentReposition(const Vector3& newPos, const Vector3& newVel);
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
+    /// Handle node being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// \todo Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
     /// Get internal Detour crowd agent.
@@ -149,7 +151,7 @@ private:
     /// DetourCrowd reference to this agent.
     int agentCrowdId_;
     /// Reference to poly closest to requested target position.
-    unsigned int targetRef_;
+    unsigned targetRef_;
     /// Actual target position, closest to that requested.
     Vector3 targetPosition_;
     /// Flag indicating the node's position should be updated by Detour crowd manager.

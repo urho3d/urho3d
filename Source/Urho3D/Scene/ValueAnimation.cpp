@@ -20,21 +20,23 @@
 // THE SOFTWARE.
 //
 
-#include "../Scene/Animatable.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../IO/Deserializer.h"
 #include "../IO/Log.h"
-#include "../Scene/ObjectAnimation.h"
 #include "../IO/Serializer.h"
-#include "../Scene/ValueAnimation.h"
 #include "../Resource/XMLFile.h"
+#include "../Scene/Animatable.h"
+#include "../Scene/ObjectAnimation.h"
+#include "../Scene/ValueAnimation.h"
 
 #include "../DebugNew.h"
 
 namespace Urho3D
 {
 
-const char* interpMethodNames[] = 
+const char* interpMethodNames[] =
 {
     "Linear",
     "Spline",
@@ -159,7 +161,8 @@ void ValueAnimation::SetValueType(VariantType valueType)
         return;
 
     valueType_ = valueType;
-    interpolatable_ = (valueType_ == VAR_FLOAT) || (valueType_ == VAR_VECTOR2) || (valueType_ == VAR_VECTOR3) || (valueType_ == VAR_VECTOR4) ||
+    interpolatable_ =
+        (valueType_ == VAR_FLOAT) || (valueType_ == VAR_VECTOR2) || (valueType_ == VAR_VECTOR3) || (valueType_ == VAR_VECTOR4) ||
         (valueType_ == VAR_QUATERNION) || (valueType_ == VAR_COLOR);
 
     if ((valueType_ == VAR_INTRECT) || (valueType_ == VAR_INTVECTOR2))
@@ -258,7 +261,8 @@ void ValueAnimation::SetEventFrame(float time, const StringHash& eventType, cons
 
 bool ValueAnimation::IsValid() const
 {
-    return (interpolationMethod_ == IM_LINEAR && keyFrames_.Size() > 1) || (interpolationMethod_ == IM_SPLINE && keyFrames_.Size() > 2);
+    return (interpolationMethod_ == IM_LINEAR && keyFrames_.Size() > 1) ||
+           (interpolationMethod_ == IM_SPLINE && keyFrames_.Size() > 2);
 }
 
 Variant ValueAnimation::GetAnimationValue(float scaledTime)
@@ -328,7 +332,8 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
             float s = 1.0f - t;
             const IntRect& r1 = value1.GetIntRect();
             const IntRect& r2 = value2.GetIntRect();
-            return IntRect((int)(r1.left_ * s + r2.left_ * t), (int)(r1.top_ * s + r2.top_ * t), (int)(r1.right_ * s + r2.right_ * t), (int)(r1.bottom_ * s + r2.bottom_ * t));
+            return IntRect((int)(r1.left_ * s + r2.left_ * t), (int)(r1.top_ * s + r2.top_ * t), (int)(r1.right_ * s + r2.right_ * t),
+                (int)(r1.bottom_ * s + r2.bottom_ * t));
         }
 
     case VAR_INTVECTOR2:
@@ -338,6 +343,9 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
             const IntVector2& v2 = value2.GetIntVector2();
             return IntVector2((int)(v1.x_ * s + v2.x_ * t), (int)(v1.y_ * s + v2.y_ * t));
         }
+
+    case VAR_DOUBLE:
+        return value1.GetDouble() * (1.0f - t) + value2.GetDouble() * t;
 
     default:
         LOGERROR("Invalid value type for linear interpolation");
@@ -388,6 +396,9 @@ Variant ValueAnimation::SplineInterpolation(unsigned index1, unsigned index2, fl
     case VAR_COLOR:
         return v1.GetColor() * h1 + v2.GetColor() * h2 + t1.GetColor() * h3 + t2.GetColor() * h4;
 
+    case VAR_DOUBLE:
+        return v1.GetDouble() * h1 + v2.GetDouble() * h2 + t1.GetDouble() * h3 + t2.GetDouble() * h4;
+
     default:
         LOGERROR("Invalid value type for spline interpolation");
         return Variant::EMPTY;
@@ -409,9 +420,11 @@ void ValueAnimation::UpdateSplineTangents()
 
     // If spline is not closed, make end point's tangent zero
     if (keyFrames_[0].value_ != keyFrames_[size - 1].value_)
-        splineTangents_[0] = splineTangents_[size - 1] = SubstractAndMultiply(keyFrames_[0].value_, keyFrames_[0].value_, splineTension_);
-    else 
-        splineTangents_[0] = splineTangents_[size - 1] = SubstractAndMultiply(keyFrames_[1].value_, keyFrames_[size - 2].value_, splineTension_);
+        splineTangents_[0] = splineTangents_[size - 1] =
+            SubstractAndMultiply(keyFrames_[0].value_, keyFrames_[0].value_, splineTension_);
+    else
+        splineTangents_[0] = splineTangents_[size - 1] =
+            SubstractAndMultiply(keyFrames_[1].value_, keyFrames_[size - 2].value_, splineTension_);
 
     splineTangentsDirty_ = false;
 }
@@ -437,6 +450,9 @@ Variant ValueAnimation::SubstractAndMultiply(const Variant& value1, const Varian
 
     case VAR_COLOR:
         return (value1.GetColor() - value2.GetColor()) * t;
+
+    case VAR_DOUBLE:
+        return (value1.GetDouble() - value2.GetDouble()) * t;
 
     default:
         LOGERROR("Invalid value type for spline interpolation's substract and multiply operation");

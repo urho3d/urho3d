@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "../../Graphics/GPUObject.h"
-#include "../../Graphics/GraphicsDefs.h"
 #include "../../Container/HashSet.h"
 #include "../../Container/RefCounted.h"
 #include "../../Container/ArrayPtr.h"
+#include "../../Graphics/GPUObject.h"
+#include "../../Graphics/GraphicsDefs.h"
 
 namespace Urho3D
 {
@@ -46,7 +46,7 @@ struct ShaderParameter
         bufferPtr_(0)
     {
     }
-    
+
     /// Construct with parameters.
     ShaderParameter(ShaderType type, const String& name, unsigned buffer, unsigned offset, unsigned size, ConstantBuffer* ptr = 0) :
         type_(type),
@@ -57,7 +57,7 @@ struct ShaderParameter
         bufferPtr_(ptr)
     {
     }
-    
+
     /// %Shader type.
     ShaderType type_;
     /// Name of the parameter.
@@ -80,39 +80,50 @@ public:
     ShaderVariation(Shader* owner, ShaderType type);
     /// Destruct.
     virtual ~ShaderVariation();
-    
+
     /// Release the shader.
     virtual void Release();
-    
+
     /// Compile the shader. Return true if successful.
     bool Create();
     /// Set name.
     void SetName(const String& name);
     /// Set defines.
     void SetDefines(const String& defines);
-    
+
     /// Return the owner resource.
     Shader* GetOwner() const;
+
     /// Return shader type.
     ShaderType GetShaderType() const { return type_; }
+
     /// Return shader name.
     const String& GetName() const { return name_; }
+
     /// Return full shader name.
     String GetFullName() const { return name_ + "(" + defines_ + ")"; }
+
     /// Return whether uses a parameter.
     bool HasParameter(StringHash param) const { return parameters_.Contains(param); }
+
     /// Return whether uses a texture unit (only for pixel shaders.)
     bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
+
     /// Return all parameter definitions.
     const HashMap<StringHash, ShaderParameter>& GetParameters() const { return parameters_; }
+
     /// Return vertex element mask.
     unsigned GetElementMask() const { return elementMask_; }
+
     /// Return shader bytecode.
     const PODVector<unsigned char>& GetByteCode() const { return byteCode_; }
+
     /// Return defines.
     const String& GetDefines() const { return defines_; }
+
     /// Return compile error/warning string.
     const String& GetCompilerOutput() const { return compilerOutput_; }
+
     /// Return constant buffer data sizes.
     const unsigned* GetConstantBufferSizes() const { return &constantBufferSizes_[0]; }
 
@@ -127,7 +138,7 @@ private:
     void SaveByteCode(const String& binaryShaderName);
     /// Calculate constant buffer sizes from parameters.
     void CalculateConstantBufferSizes();
-    
+
     /// Shader this variation belongs to.
     WeakPtr<Shader> owner_;
     /// Shader type.

@@ -20,11 +20,13 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
+#include "../Core/Context.h"
 #include "../Graphics/Batch.h"
 #include "../Graphics/Camera.h"
-#include "../Core/Context.h"
-#include "../Scene/Node.h"
 #include "../Graphics/Skybox.h"
+#include "../Scene/Node.h"
 
 #include "../DebugNew.h"
 

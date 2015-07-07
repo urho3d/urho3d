@@ -69,21 +69,28 @@ public:
 
     /// Return the UI style file.
     XMLFile* GetDefaultStyle() const;
+
     /// Return rendering stats text.
     Text* GetStatsText() const { return statsText_; }
+
     /// Return rendering mode text.
     Text* GetModeText() const { return modeText_; }
+
     /// Return profiler text.
     Text* GetProfilerText() const { return profilerText_; }
+
     /// Return currently shown elements.
     unsigned GetMode() const { return mode_; }
+
     /// Return maximum profiler block depth.
     unsigned GetProfilerMaxDepth() const { return profilerMaxDepth_; }
+
     /// Return profiler accumulation interval in seconds
     float GetProfilerInterval() const;
 
     /// Return whether showing 3D geometry primitive/batch count only.
     bool GetUseRendererStats() const { return useRendererStats_; }
+
     /// Set application-specific stats.
     void SetAppStats(const String& label, const Variant& stats);
     /// Set application-specific stats.

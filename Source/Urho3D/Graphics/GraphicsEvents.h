@@ -109,5 +109,4 @@ EVENT(E_DEVICERESET, DeviceReset)
 {
 }
 
-
 }

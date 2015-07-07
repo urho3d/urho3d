@@ -33,18 +33,18 @@ class Audio;
 class URHO3D_API SoundSource3D : public SoundSource
 {
     OBJECT(SoundSource3D);
-    
+
 public:
     /// Construct.
     SoundSource3D(Context* context);
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     /// Update sound source.
     virtual void Update(float timeStep);
-    
+
     /// Set attenuation parameters.
     void SetDistanceAttenuation(float nearDistance, float farDistance, float rolloffFactor);
     /// Set angle attenuation parameters.
@@ -61,18 +61,22 @@ public:
     void SetRolloffFactor(float factor);
     /// Calculate attenuation and panning based on current position and listener position.
     void CalculateAttenuation();
-    
+
     /// Return near distance.
     float GetNearDistance() const { return nearDistance_; }
+
     /// Return far distance.
     float GetFarDistance() const { return farDistance_; }
+
     /// Return inner angle in degrees.
     float GetInnerAngle() const { return innerAngle_; }
+
     /// Return outer angle in degrees.
     float GetOuterAngle() const { return outerAngle_; }
+
     /// Return rolloff power factor.
     float RollAngleoffFactor() const { return rolloffFactor_; }
-    
+
 protected:
     /// Near distance.
     float nearDistance_;

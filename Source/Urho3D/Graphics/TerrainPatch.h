@@ -35,7 +35,7 @@ class VertexBuffer;
 class URHO3D_API TerrainPatch : public Drawable
 {
     OBJECT(TerrainPatch);
-    
+
 public:
     /// Construct.
     TerrainPatch(Context* context);
@@ -43,7 +43,7 @@ public:
     ~TerrainPatch();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
@@ -60,7 +60,7 @@ public:
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
-    
+
     /// Set owner terrain.
     void SetOwner(Terrain* terrain);
     /// Set neighbor patches.
@@ -75,7 +75,7 @@ public:
     void SetOcclusionOffset(float offset);
     /// Reset to LOD level 0.
     void ResetLod();
-    
+
     /// Return visible geometry.
     Geometry* GetGeometry() const;
     /// Return max LOD geometry.
@@ -86,31 +86,39 @@ public:
     VertexBuffer* GetVertexBuffer() const;
     /// Return owner terrain.
     Terrain* GetOwner() const;
+
     /// Return north neighbor patch.
     TerrainPatch* GetNorthPatch() const { return north_; }
+
     /// Return south neighbor patch.
     TerrainPatch* GetSouthPatch() const { return south_; }
+
     /// Return west neighbor patch.
     TerrainPatch* GetWestPatch() const { return west_; }
+
     /// Return east neighbor patch.
     TerrainPatch* GetEastPatch() const { return east_; }
+
     /// Return geometrical error array.
     PODVector<float>& GetLodErrors() { return lodErrors_; }
+
     /// Return patch coordinates.
     const IntVector2& GetCoordinates() const { return coordinates_; }
+
     /// Return current LOD level.
     unsigned GetLodLevel() const { return lodLevel_; }
+
     /// Return vertical offset for occlusion geometry..
     float GetOcclusionOffset() const { return occlusionOffset_; }
-    
+
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    
+
 private:
     /// Return a corrected LOD level to ensure stitching can work correctly.
     unsigned GetCorrectedLodLevel(unsigned lodLevel);
-    
+
     /// Geometry.
     SharedPtr<Geometry> geometry_;
     /// Geometry that is locked to the max LOD level. Used for decals.

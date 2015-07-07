@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Navigation/Obstacle.h"
 
 #include "../Core/Context.h"
@@ -85,17 +87,17 @@ void Obstacle::SetRadius(float newRadius)
     MarkNetworkUpdate();
 }
 
-void Obstacle::OnNodeSet(Node* node)
+void Obstacle::OnSceneSet(Scene* scene)
 {
-    if (node)
+    if (scene)
     {
-        if (GetScene() == node)
+        if (scene == node_)
         {
             LOGWARNING(GetTypeName() + " should not be created to the root scene node");
             return;
         }
         if (!ownerMesh_)
-            ownerMesh_ = GetScene()->GetComponent<DynamicNavigationMesh>();
+            ownerMesh_ = scene->GetComponent<DynamicNavigationMesh>();
         if (ownerMesh_)
             ownerMesh_->AddObstacle(this);
     }

@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "../Container/ArrayPtr.h"
 #include "../Audio/AudioDefs.h"
+#include "../Container/ArrayPtr.h"
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
 
@@ -63,20 +63,27 @@ public:
 
     /// Return byte size of one sample.
     unsigned GetSampleSize() const { return sampleSize_; }
+
     /// Return mixing rate.
     int GetMixRate() const { return mixRate_; }
+
     /// Return whether output is interpolated.
     bool GetInterpolation() const { return interpolation_; }
+
     /// Return whether output is stereo.
     bool IsStereo() const { return stereo_; }
+
     /// Return whether audio is being output.
     bool IsPlaying() const { return playing_; }
+
     /// Return whether an audio stream has been reserved.
     bool IsInitialized() const { return deviceID_ != 0; }
+
     /// Return master gain for a specific sound source type. Unknown sound types will return full gain (1).
     float GetMasterGain(const String& type) const;
     /// Return active sound listener.
     SoundListener* GetListener() const;
+
     /// Return all sound sources.
     const PODVector<SoundSource*>& GetSoundSources() const { return soundSources_; }
 
@@ -87,13 +94,15 @@ public:
     void AddSoundSource(SoundSource* soundSource);
     /// Remove a sound source. Called by SoundSource.
     void RemoveSoundSource(SoundSource* soundSource);
+
     /// Return audio thread mutex.
     Mutex& GetMutex() { return audioMutex_; }
+
     /// Return sound type specific gain multiplied by master gain.
     float GetSoundSourceMasterGain(StringHash typeHash) const;
 
     /// Mix sound sources into the buffer.
-    void MixOutput(void *dest, unsigned samples);
+    void MixOutput(void* dest, unsigned samples);
 
     /// Final multiplier for for audio byte conversion
 #ifdef EMSCRIPTEN

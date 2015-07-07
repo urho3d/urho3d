@@ -95,11 +95,20 @@ cmake_dependent_option (URHO3D_SSE "Enable SSE instruction set" ${URHO3D_DEFAULT
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
     cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
+
+    if (CMAKE_BUILD_TYPE STREQUAL Release OR CMAKE_CONFIGURATION_TYPES)
+        set (URHO3D_DEFAULT_LUA_RAW FALSE)
+    else ()
+        set (URHO3D_DEFAULT_LUA_RAW TRUE)
+    endif ()
+    cmake_dependent_option (URHO3D_LUA_RAW_SCRIPT_LOADER "Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)" ${URHO3D_DEFAULT_LUA_RAW} "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
+ 
     option (URHO3D_SAMPLES "Build sample applications")
     cmake_dependent_option (URHO3D_TOOLS "Build tools (native and RPI only)" TRUE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     cmake_dependent_option (URHO3D_EXTRAS "Build extras (native and RPI only)" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     option (URHO3D_DOCS "Generate documentation as part of normal build")
     option (URHO3D_DOCS_QUIET "Generate documentation as part of normal build, suppress generation process from sending anything to stdout")
+    option (URHO3D_PCH "Enable PCH support" TRUE)
     cmake_dependent_option (URHO3D_MINIDUMPS "Enable minidumps on crash (VS only)" TRUE "MSVC" FALSE)
     option (URHO3D_FILEWATCHER "Enable filewatcher support" TRUE)
     if (CPACK_SYSTEM_NAME STREQUAL Linux)
@@ -348,6 +357,9 @@ if (URHO3D_LUA)
         add_definitions (-DTOLUA_RELEASE)
     endif ()
 endif ()
+if (URHO3D_LUA_RAW_SCRIPT_LOADER)
+    add_definitions (-DURHO3D_LUA_RAW_SCRIPT_LOADER)
+endif ()
 
 # Add definition for Navigation
 if (URHO3D_NAVIGATION)
@@ -369,13 +381,8 @@ if (URHO3D_URHO2D)
     add_definitions (-DURHO3D_URHO2D)
 endif ()
 
-# Find Direct3D include & library directories for Visual Studio in MS Windows SDK or DirectX SDK.
-# The SDK is not searched for with MinGW as it is incompatible, rather, it is assumed that MinGW
-# itself comes with the necessary headers & libraries.
-# Note that when building for OpenGL, any libraries are not used, but the include directory may
-# be necessary for DirectInput & DirectSound headers, if those are not present in the compiler's own
-# default includes.
-if (WIN32)
+# Find Direct3D include & library directories in MS Windows SDK or DirectX SDK when not using OpenGL.
+if (WIN32 AND NOT URHO3D_OPENGL)
     find_package (Direct3D REQUIRED)
     if (DIRECT3D_INCLUDE_DIRS)
         include_directories (${DIRECT3D_INCLUDE_DIRS})
@@ -708,9 +715,12 @@ macro (enable_pch HEADER_PATHNAME)
                 # Determine the dependency list
                 execute_process (COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -MTdeps -MM -o ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME} RESULT_VARIABLE CXX_COMPILER_EXIT_CODE)
                 if (NOT CXX_COMPILER_EXIT_CODE EQUAL 0)
-                    message (FATAL_ERROR "The configured compiler toolchain in the build tree is not able to handle all the compiler flags required to build the project. "
-                        "Please kindly update your compiler toolchain to its latest version. If you are using MinGW then make sure it is MinGW-W64 instead of MinGW-W32 or TDM-GCC (Code::Blocks default). "
-                        "However, if you think there is something wrong with the compiler flags being used then please file a bug report to the project devs.")
+                    message (FATAL_ERROR
+                        "The configured compiler toolchain in the build tree is not able to handle all the compiler flags required to build the project with PCH enabled. "
+                        "Please kindly update your compiler toolchain to its latest version. "
+                        "If you are using MinGW then make sure it is MinGW-W64 instead of MinGW-W32 or TDM-GCC (Code::Blocks default). "
+                        "Or disable the PCH build support by passing the '-DURHO3D_PCH=0' when retrying to configure/generate the build tree. "
+                        "However, if you think there is something wrong with our build system then kindly file a bug report to the project devs.")
                 endif ()
                 file (STRINGS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps DEPS)
                 string (REGEX REPLACE "^deps: *| *\\; +" ";" DEPS ${DEPS})

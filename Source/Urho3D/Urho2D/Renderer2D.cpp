@@ -20,7 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "../Container/Sort.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
 #include "../Core/WorkQueue.h"
@@ -49,10 +50,11 @@ extern const char* blendModeNames[];
 
 static const unsigned MASK_VERTEX2D = MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1;
 
-ViewBatchInfo2D::ViewBatchInfo2D() : vertexBufferUpdateFrameNumber_(0),
+ViewBatchInfo2D::ViewBatchInfo2D() :
+    vertexBufferUpdateFrameNumber_(0),
     indexCount_(0),
     vertexCount_(0),
-    batchUpdatedFrameNumber_(0), 
+    batchUpdatedFrameNumber_(0),
     batchCount_(0)
 {
 }
@@ -70,6 +72,7 @@ Renderer2D::Renderer2D(Context* context) :
     pass->SetVertexShader("Urho2D");
     pass->SetPixelShader("Urho2D");
     pass->SetDepthWrite(false);
+    cachedTechniques_[BLEND_REPLACE] = tech;
 
     material_->SetTechnique(0, tech);
     material_->SetCullMode(CULL_NONE);
@@ -128,7 +131,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
     for (HashMap<Camera*, ViewBatchInfo2D>::ConstIterator i = viewBatchInfos_.Begin(); i != viewBatchInfos_.End(); ++i)
     {
         if (i->second_.batchUpdatedFrameNumber_ == frame_.frameNumber_)
-            indexCount = Max((int)indexCount, (int)i->second_.indexCount_);
+            indexCount = (unsigned)Max((int)indexCount, (int)i->second_.indexCount_);
     }
 
     // Fill index buffer
@@ -185,7 +188,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
     ViewBatchInfo2D& viewBatchInfo = viewBatchInfos_[camera];
 
     if (viewBatchInfo.vertexBufferUpdateFrameNumber_ != frame_.frameNumber_)
-    {       
+    {
         unsigned vertexCount = viewBatchInfo.vertexCount_;
         VertexBuffer* vertexBuffer = viewBatchInfo.vertexBuffer_;
         if (vertexBuffer->GetVertexCount() < vertexCount)
@@ -238,9 +241,6 @@ void Renderer2D::RemoveDrawable(Drawable2D* drawable)
 
 Material* Renderer2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
 {
-    if (!material_)
-        return 0;
-
     if (!texture)
         return material_;
 
@@ -283,9 +283,21 @@ SharedPtr<Material> Renderer2D::CreateMaterial(Texture2D* texture, BlendMode ble
 {
     SharedPtr<Material> newMaterial = material_->Clone();
 
+    HashMap<int, SharedPtr<Technique> >::Iterator techIt = cachedTechniques_.Find((int)blendMode);
+    if (techIt == cachedTechniques_.End())
+    {
+        SharedPtr<Technique> tech(new Technique(context_));
+        Pass* pass = tech->CreatePass("alpha");
+        pass->SetVertexShader("Urho2D");
+        pass->SetPixelShader("Urho2D");
+        pass->SetDepthWrite(false);
+        pass->SetBlendMode(blendMode);
+        techIt = cachedTechniques_.Insert(MakePair((int)blendMode, tech));
+    }
+
+    newMaterial->SetTechnique(0, techIt->second_.Get());
     newMaterial->SetName(texture->GetName() + "_" + blendModeNames[blendMode]);
     newMaterial->SetTexture(TU_DIFFUSE, texture);
-    newMaterial->GetTechnique(0)->GetPass("alpha")->SetBlendMode(blendMode);
 
     return newMaterial;
 }
@@ -332,7 +344,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
         WorkQueue* queue = GetSubsystem<WorkQueue>();
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
         int drawablesPerItem = drawables_.Size() / numWorkItems;
-        
+
         PODVector<Drawable2D*>::Iterator start = drawables_.Begin();
         for (int i = 0; i < numWorkItems; ++i)
         {
@@ -344,11 +356,11 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
             PODVector<Drawable2D*>::Iterator end = drawables_.End();
             if (i < numWorkItems - 1 && end - start > drawablesPerItem)
                 end = start + drawablesPerItem;
-            
+
             item->start_ = &(*start);
             item->end_ = &(*end);
             queue->AddWorkItem(item);
-            
+
             start = end;
         }
 
@@ -356,7 +368,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     }
 
     ViewBatchInfo2D& viewBatchInfo = viewBatchInfos_[camera];
-    
+
     // Create vertex buffer
     if (!viewBatchInfo.vertexBuffer_)
         viewBatchInfo.vertexBuffer_ = new VertexBuffer(context_);
@@ -467,7 +479,8 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
     viewBatchInfo.batchUpdatedFrameNumber_ = frame_.frameNumber_;
 }
 
-void Renderer2D::AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount)
+void Renderer2D::AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material, unsigned indexStart, unsigned indexCount,
+    unsigned vertexStart, unsigned vertexCount)
 {
     if (!material || indexCount == 0 || vertexCount == 0)
         return;
