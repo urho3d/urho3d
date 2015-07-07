@@ -627,10 +627,10 @@ unsigned LineEdit::GetCharIndex(const IntVector2& position)
     if (textPosition.x_ < 0)
         return 0;
 
-    for (unsigned i = text_->GetNumChars(); i >= 0; --i)
+    for (int i = text_->GetNumChars(); i >= 0; --i)
     {
-        if (textPosition.x_ >= text_->GetCharPosition(i).x_)
-            return i;
+        if (textPosition.x_ >= text_->GetCharPosition((unsigned)i).x_)
+            return (unsigned)i;
     }
 
     return M_MAX_UNSIGNED;
