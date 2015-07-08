@@ -20,14 +20,18 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Graphics/GraphicsDefs.h"
-#include "../Math/StringHash.h"
 #include "../Math/Vector3.h"
 
 #include "../DebugNew.h"
 
 namespace Urho3D
 {
+
+// The extern keyword is required when building Urho3D.dll for Windows platform
+// The keyword is not required for other platforms but it does no harm, aside from warning from static analyzer
 
 extern URHO3D_API const StringHash VSP_AMBIENTSTARTCOLOR("AmbientStartColor");
 extern URHO3D_API const StringHash VSP_AMBIENTENDCOLOR("AmbientEndColor");
@@ -65,7 +69,7 @@ extern URHO3D_API const StringHash PSP_LIGHTDIR("LightDirPS");
 extern URHO3D_API const StringHash PSP_LIGHTPOS("LightPosPS");
 extern URHO3D_API const StringHash PSP_MATDIFFCOLOR("MatDiffColor");
 extern URHO3D_API const StringHash PSP_MATEMISSIVECOLOR("MatEmissiveColor");
-extern URHO3D_API const StringHash PSP_MATENVMAPECOLOR("MatEnvMapColor");
+extern URHO3D_API const StringHash PSP_MATENVMAPCOLOR("MatEnvMapColor");
 extern URHO3D_API const StringHash PSP_MATSPECCOLOR("MatSpecColor");
 extern URHO3D_API const StringHash PSP_NEARCLIP("NearClipPS");
 extern URHO3D_API const StringHash PSP_FARCLIP("FarClipPS");

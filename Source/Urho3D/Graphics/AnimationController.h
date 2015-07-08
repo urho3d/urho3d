@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "../Scene/Component.h"
 #include "../IO/VectorBuffer.h"
+#include "../Scene/Component.h"
 
 namespace Urho3D
 {

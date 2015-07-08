@@ -20,8 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "../Urho2D/ConstraintMotor2D.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Urho2D/ConstraintMotor2D.h"
 #include "../Urho2D/PhysicsUtils2D.h"
 #include "../Urho2D/RigidBody2D.h"
 
@@ -44,7 +46,7 @@ ConstraintMotor2D::~ConstraintMotor2D()
 void ConstraintMotor2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ConstraintMotor2D>();
-    
+
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Linear Offset", GetLinearOffset, SetLinearOffset, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Angular Offset", GetAngularOffset, SetAngularOffset, float, 0.0f, AM_DEFAULT);
@@ -60,7 +62,7 @@ void ConstraintMotor2D::SetLinearOffset(const Vector2& linearOffset)
         return;
 
     linearOffset_ = linearOffset;
-    
+
     RecreateJoint();
     MarkNetworkUpdate();
 }

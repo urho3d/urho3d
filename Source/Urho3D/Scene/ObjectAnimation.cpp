@@ -20,12 +20,14 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Resource/XMLFile.h"
 #include "../Scene/ObjectAnimation.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/ValueAnimation.h"
 #include "../Scene/ValueAnimationInfo.h"
-#include "../Resource/XMLFile.h"
 
 #include "../DebugNew.h"
 
@@ -83,7 +85,7 @@ bool ObjectAnimation::LoadXML(const XMLElement& source)
     while (animElem)
     {
         String name = animElem.GetAttribute("name");
-        
+
         SharedPtr<ValueAnimation> animation(new ValueAnimation(context_));
         if (!animation->LoadXML(animElem))
             return false;
@@ -110,7 +112,8 @@ bool ObjectAnimation::LoadXML(const XMLElement& source)
 
 bool ObjectAnimation::SaveXML(XMLElement& dest) const
 {
-    for (HashMap<String, SharedPtr<ValueAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin(); i != attributeAnimationInfos_.End(); ++i)
+    for (HashMap<String, SharedPtr<ValueAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin();
+         i != attributeAnimationInfos_.End(); ++i)
     {
         XMLElement animElem = dest.CreateChild("attributeanimation");
         animElem.SetAttribute("name", i->first_);
@@ -153,8 +156,9 @@ void ObjectAnimation::RemoveAttributeAnimation(ValueAnimation* attributeAnimatio
 {
     if (!attributeAnimation)
         return;
-    
-    for (HashMap<String, SharedPtr<ValueAnimationInfo> >::Iterator i = attributeAnimationInfos_.Begin(); i != attributeAnimationInfos_.End(); ++i)
+
+    for (HashMap<String, SharedPtr<ValueAnimationInfo> >::Iterator i = attributeAnimationInfos_.Begin();
+         i != attributeAnimationInfos_.End(); ++i)
     {
         if (i->second_->GetAnimation() == attributeAnimation)
         {

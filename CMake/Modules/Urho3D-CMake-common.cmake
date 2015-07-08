@@ -106,6 +106,7 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_EXTRAS "Build extras (native and RPI only)" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     option (URHO3D_DOCS "Generate documentation as part of normal build")
     option (URHO3D_DOCS_QUIET "Generate documentation as part of normal build, suppress generation process from sending anything to stdout")
+    option (URHO3D_PCH "Enable PCH support" TRUE)
     cmake_dependent_option (URHO3D_MINIDUMPS "Enable minidumps on crash (VS only)" TRUE "MSVC" FALSE)
     option (URHO3D_FILEWATCHER "Enable filewatcher support" TRUE)
     if (CPACK_SYSTEM_NAME STREQUAL Linux)
@@ -665,9 +666,12 @@ macro (enable_pch HEADER_PATHNAME)
                 # Determine the dependency list
                 execute_process (COMMAND ${CMAKE_CXX_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -MTdeps -MM -o ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER_PATHNAME} RESULT_VARIABLE CXX_COMPILER_EXIT_CODE)
                 if (NOT CXX_COMPILER_EXIT_CODE EQUAL 0)
-                    message (FATAL_ERROR "The configured compiler toolchain in the build tree is not able to handle all the compiler flags required to build the project. "
-                        "Please kindly update your compiler toolchain to its latest version. If you are using MinGW then make sure it is MinGW-W64 instead of MinGW-W32 or TDM-GCC (Code::Blocks default). "
-                        "However, if you think there is something wrong with the compiler flags being used then please file a bug report to the project devs.")
+                    message (FATAL_ERROR
+                        "The configured compiler toolchain in the build tree is not able to handle all the compiler flags required to build the project with PCH enabled. "
+                        "Please kindly update your compiler toolchain to its latest version. "
+                        "If you are using MinGW then make sure it is MinGW-W64 instead of MinGW-W32 or TDM-GCC (Code::Blocks default). "
+                        "Or disable the PCH build support by passing the '-DURHO3D_PCH=0' when retrying to configure/generate the build tree. "
+                        "However, if you think there is something wrong with our build system then kindly file a bug report to the project devs.")
                 endif ()
                 file (STRINGS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps DEPS)
                 string (REGEX REPLACE "^deps: *| *\\; +" ";" DEPS ${DEPS})

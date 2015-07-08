@@ -20,15 +20,18 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/CoreEvents.h"
 #include "../Core/Context.h"
+#include "../Core/ProcessUtils.h"
 #include "../IO/Log.h"
+#include "../IO/MemoryBuffer.h"
 #include "../LuaScript/LuaFile.h"
 #include "../LuaScript/LuaFunction.h"
 #include "../LuaScript/LuaScript.h"
 #include "../LuaScript/LuaScriptEventInvoker.h"
 #include "../LuaScript/LuaScriptInstance.h"
-#include "../IO/MemoryBuffer.h"
 #ifdef URHO3D_PHYSICS
 #include "../Physics/PhysicsEvents.h"
 #include "../Physics/PhysicsWorld.h"
@@ -36,8 +39,6 @@
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
-#include "../Core/ProcessUtils.h"
-#include "../IO/VectorBuffer.h"
 
 #include <toluapp/tolua++.h>
 #include "../LuaScript/ToluaUtils.h"
@@ -70,7 +71,7 @@ LuaScriptInstance::LuaScriptInstance(Context* context) :
     luaState_ = luaScript_->GetState();
     attributeInfos_ = *context_->GetAttributes(GetTypeStatic());
 
-    eventInvoker_ =  new LuaScriptEventInvoker(this);
+    eventInvoker_ = new LuaScriptEventInvoker(this);
 
     for (int i = 0; i < MAX_LUA_SCRIPT_OBJECT_METHODS; ++i)
         scriptObjectMethods_[i] = 0;
@@ -86,10 +87,13 @@ void LuaScriptInstance::RegisterObject(Context* context)
     context->RegisterFactory<LuaScriptInstance>(LOGIC_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(LuaFile::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef,
+        ResourceRef(LuaFile::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Script Object Type", GetScriptObjectType, SetScriptObjectType, String, String::EMPTY, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
-    MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+        AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>,
+        Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
 void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -164,7 +168,6 @@ void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant&
                 tolua_pushusertype(luaState_, value, "Quaternion");
                 tolua_register_gc(luaState_, lua_gettop(luaState_));
             }
-
             break;
         case VAR_COLOR:
             {
@@ -659,6 +662,7 @@ void LuaScriptInstance::HandlePostUpdate(StringHash eventType, VariantMap& event
 }
 
 #ifdef URHO3D_PHYSICS
+
 void LuaScriptInstance::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace PhysicsPreStep;
@@ -684,6 +688,7 @@ void LuaScriptInstance::HandlePostFixedUpdate(StringHash eventType, VariantMap& 
         function->EndCall();
     }
 }
+
 #endif
 
 void LuaScriptInstance::ReleaseObject()

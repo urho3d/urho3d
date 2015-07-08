@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Navigation/NavBuildData.h"
 
 #include <Recast/Recast.h>

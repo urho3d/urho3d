@@ -20,14 +20,16 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
-#include "../UI/Cursor.h"
 #include "../Container/HashSet.h"
-#include "../IO/Log.h"
-#include "../Scene/ObjectAnimation.h"
-#include "../Resource/ResourceCache.h"
 #include "../Container/Sort.h"
+#include "../IO/Log.h"
+#include "../Resource/ResourceCache.h"
+#include "../Scene/ObjectAnimation.h"
+#include "../UI/Cursor.h"
 #include "../UI/UI.h"
 #include "../UI/UIElement.h"
 #include "../UI/UIEvents.h"
@@ -155,8 +157,10 @@ void UIElement::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE("Min Size", GetMinSize, SetMinSize, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE("Max Size", GetMaxSize, SetMaxSize, IntVector2, IntVector2(M_MAX_INT, M_MAX_INT), AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment,
+        horizontalAlignments, HA_LEFT, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments,
+        VA_TOP, AM_FILE);
     ACCESSOR_ATTRIBUTE("Clip Border", GetClipBorder, SetClipBorder, IntRect, IntRect::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE("Priority", GetPriority, SetPriority, int, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
@@ -358,10 +362,7 @@ bool UIElement::SaveXML(XMLElement& dest) const
     }
 
     // Filter UI-style and implicit attributes
-    if (!FilterAttributes(dest))
-        return false;
-
-    return true;
+    return FilterAttributes(dest);
 }
 
 void UIElement::Update(float timeStep)
@@ -385,7 +386,7 @@ void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float
         switch (parent_->layoutMode_)
         {
         case LM_HORIZONTAL:
-            verticalThickness +=2;
+            verticalThickness += 2;
             break;
 
         case LM_VERTICAL:
@@ -417,7 +418,7 @@ bool UIElement::IsWithinScissor(const IntRect& currentScissor)
 
     const IntVector2& screenPos = GetScreenPosition();
     return screenPos.x_ < currentScissor.right_ && screenPos.x_ + GetWidth() > currentScissor.left_ &&
-        screenPos.y_ < currentScissor.bottom_ && screenPos.y_ + GetHeight() > currentScissor.top_;
+           screenPos.y_ < currentScissor.bottom_ && screenPos.y_ + GetHeight() > currentScissor.top_;
 }
 
 const IntVector2& UIElement::GetScreenPosition() const
@@ -475,35 +476,42 @@ void UIElement::OnHover(const IntVector2& position, const IntVector2& screenPosi
     hovering_ = true;
 }
 
-void UIElement::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
+void UIElement::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
+    Cursor* cursor)
 {
 }
 
-void UIElement::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement)
+void UIElement::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
+    Cursor* cursor, UIElement* beginElement)
 {
 }
 
-void UIElement::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
+void UIElement::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
+    Cursor* cursor)
 {
 }
 
-void UIElement::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void UIElement::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers,
+    Cursor* cursor)
 {
     dragButtonCombo_ = buttons;
-    dragButtonCount_ = CountSetBits(dragButtonCombo_);
+    dragButtonCount_ = CountSetBits((unsigned)dragButtonCombo_);
 }
 
-void UIElement::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers, Cursor* cursor)
+void UIElement::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons,
+    int qualifiers, Cursor* cursor)
 {
 }
 
-void UIElement::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor)
+void UIElement::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons,
+    Cursor* cursor)
 {
     dragButtonCombo_ = 0;
     dragButtonCount_ = 0;
 }
 
-void UIElement::OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor)
+void UIElement::OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons,
+    Cursor* cursor)
 {
     dragButtonCombo_ = 0;
     dragButtonCount_ = 0;
@@ -1039,7 +1047,7 @@ void UIElement::UpdateLayout()
             if (!children_[i]->IsVisible())
                 continue;
             positions.Push(baseIndentWidth);
-            unsigned indent = children_[i]->GetIndentWidth();
+            unsigned indent = (unsigned)children_[i]->GetIndentWidth();
             sizes.Push(children_[i]->GetWidth() + indent);
             minSizes.Push(children_[i]->GetMinWidth() + indent);
             maxSizes.Push(children_[i]->GetMaxWidth() + indent);
@@ -1047,11 +1055,13 @@ void UIElement::UpdateLayout()
             minChildHeight = Max(minChildHeight, children_[i]->GetMinHeight());
         }
 
-        CalculateLayout(positions, sizes, minSizes, maxSizes, flexScales, GetWidth(), layoutBorder_.left_, layoutBorder_.right_, layoutSpacing_);
+        CalculateLayout(positions, sizes, minSizes, maxSizes, flexScales, GetWidth(), layoutBorder_.left_, layoutBorder_.right_,
+            layoutSpacing_);
 
         int width = CalculateLayoutParentSize(sizes, layoutBorder_.left_, layoutBorder_.right_, layoutSpacing_);
         int height = Max(GetHeight(), minChildHeight + layoutBorder_.top_ + layoutBorder_.bottom_);
-        int minWidth = Min(CalculateLayoutParentSize(minSizes, layoutBorder_.left_, layoutBorder_.right_, layoutSpacing_), maxSize_.x_);
+        int minWidth =
+            Min(CalculateLayoutParentSize(minSizes, layoutBorder_.left_, layoutBorder_.right_, layoutSpacing_), maxSize_.x_);
         int minHeight = Min(minChildHeight + layoutBorder_.top_ + layoutBorder_.bottom_, maxSize_.y_);
         // Respect fixed size if already set
         if (minSize_.x_ != maxSize_.x_)
@@ -1089,11 +1099,13 @@ void UIElement::UpdateLayout()
             minChildWidth = Max(minChildWidth, children_[i]->GetMinWidth() + children_[i]->GetIndentWidth());
         }
 
-        CalculateLayout(positions, sizes, minSizes, maxSizes, flexScales, GetHeight(), layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_);
+        CalculateLayout(positions, sizes, minSizes, maxSizes, flexScales, GetHeight(), layoutBorder_.top_, layoutBorder_.bottom_,
+            layoutSpacing_);
 
         int height = CalculateLayoutParentSize(sizes, layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_);
         int width = Max(GetWidth(), minChildWidth + layoutBorder_.left_ + layoutBorder_.right_);
-        int minHeight = Min(CalculateLayoutParentSize(minSizes, layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_), maxSize_.y_);
+        int minHeight =
+            Min(CalculateLayoutParentSize(minSizes, layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_), maxSize_.y_);
         int minWidth = Min(minChildWidth + layoutBorder_.left_ + layoutBorder_.right_, maxSize_.x_);
         if (minSize_.x_ != maxSize_.x_)
             minSize_.x_ = minWidth;
@@ -1214,7 +1226,7 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
     // Check for illegal or redundant parent assignment
     if (!element || element == this || element->parent_ == this)
         return;
-     // Check for possible cyclic parent assignment
+    // Check for possible cyclic parent assignment
     UIElement* parent = parent_;
     while (parent)
     {
@@ -1319,7 +1331,7 @@ void UIElement::RemoveAllChildren()
     UIElement* root = GetRoot();
     UIElement* sender = Refs() > 0 ? GetElementEventSender() : 0;
 
-    for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i < children_.End(); )
+    for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i < children_.End();)
     {
         // Send change event if not already being destroyed
         if (sender)
@@ -1349,7 +1361,7 @@ void UIElement::Remove()
 unsigned UIElement::FindChild(UIElement* element) const
 {
     Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Find(SharedPtr<UIElement>(element));
-    return i != children_.End() ? i - children_.Begin() : M_MAX_UNSIGNED;
+    return i != children_.End() ? (unsigned)(i - children_.Begin()) : M_MAX_UNSIGNED;
 }
 
 void UIElement::SetParent(UIElement* parent, unsigned index)
@@ -1553,7 +1565,7 @@ bool UIElement::IsInsideCombined(IntVector2 position, bool isScreen)
 
     IntRect combined = GetCombinedScreenRect();
     return position.x_ >= combined.left_ && position.y_ >= combined.top_ && position.x_ < combined.right_ &&
-        position.y_ < combined.bottom_;
+           position.y_ < combined.bottom_;
 }
 
 IntRect UIElement::GetCombinedScreenRect()
@@ -1624,8 +1636,8 @@ void UIElement::AdjustScissor(IntRect& currentScissor)
     }
 }
 
-void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData, IntRect
-    currentScissor)
+void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData,
+    IntRect currentScissor)
 {
     Vector2 floatOffset((float)offset.x_, (float)offset.y_);
     unsigned initialSize = vertexData.Size();
@@ -1692,7 +1704,7 @@ void UIElement::SetObjectAttributeAnimation(const String& name, ValueAnimation* 
                 return;
             }
 
-            unsigned index = ToInt(names[i].Substring(1, names[i].Length() - 1));
+            unsigned index = (unsigned)ToInt(names[i].Substring(1, names[i].Length() - 1));
             element = element->GetChild(index);
             if (!element)
             {
@@ -1728,7 +1740,8 @@ bool UIElement::RemoveChildXML(XMLElement& parent, const String& name) const
 
 bool UIElement::RemoveChildXML(XMLElement& parent, const String& name, const String& value) const
 {
-    static XPathQuery matchXPathQuery("./attribute[@name=$attributeName and @value=$attributeValue]", "attributeName:String, attributeValue:String");
+    static XPathQuery matchXPathQuery
+        ("./attribute[@name=$attributeName and @value=$attributeValue]", "attributeName:String, attributeValue:String");
 
     if (!matchXPathQuery.SetVariable("attributeName", name))
         return false;
@@ -1838,7 +1851,7 @@ int UIElement::CalculateLayoutParentSize(const PODVector<int>& sizes, int begin,
 }
 
 void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes,
-        const PODVector<int>& maxSizes, const PODVector<float>& flexScales, int targetSize, int begin, int end, int spacing)
+    const PODVector<int>& maxSizes, const PODVector<float>& flexScales, int targetSize, int begin, int end, int spacing)
 {
     int numChildren = sizes.Size();
     if (!numChildren)
@@ -1881,7 +1894,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
 
         // Check which of the children can be resized to correct the error. If none, must break
         PODVector<unsigned> resizable;
-        for (int i = 0; i < numChildren; ++i)
+        for (unsigned i = 0; i < numChildren; ++i)
         {
             if (error < 0 && sizes[i] > minSizes[i])
                 resizable.Push(i);

@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "../Math/BoundingBox.h"
 #include "../Graphics/Drawable.h"
+#include "../Math/BoundingBox.h"
 #include "../Math/Frustum.h"
 #include "../Math/Ray.h"
 #include "../Math/Sphere.h"
@@ -67,7 +67,7 @@ private:
     /// Prevent copy construction.
     OctreeQuery(const OctreeQuery& rhs);
     /// Prevent assignment.
-    OctreeQuery& operator = (const OctreeQuery& rhs);
+    OctreeQuery& operator =(const OctreeQuery& rhs);
 };
 
 /// Point octree query.
@@ -165,7 +165,7 @@ struct URHO3D_API OctreeQueryResult
     }
 
     /// Test for inequality, added to prevent GCC from complaining.
-    bool operator != (const OctreeQueryResult& rhs) const { return drawable_ != rhs.drawable_ || node_ != rhs.node_; }
+    bool operator !=(const OctreeQueryResult& rhs) const { return drawable_ != rhs.drawable_ || node_ != rhs.node_; }
 
     /// Drawable.
     Drawable* drawable_;
@@ -193,15 +193,15 @@ struct URHO3D_API RayQueryResult
     }
 
     /// Test for inequality, added to prevent GCC from complaining.
-    bool operator != (const RayQueryResult& rhs) const
+    bool operator !=(const RayQueryResult& rhs) const
     {
         return position_ != rhs.position_ ||
-                normal_ != rhs.normal_ ||
-                textureUV_ != rhs.textureUV_ ||
-                distance_ != rhs.distance_ ||
-                drawable_ != rhs.drawable_ ||
-                node_ != rhs.node_ ||
-                subObject_ != rhs.subObject_;
+               normal_ != rhs.normal_ ||
+               textureUV_ != rhs.textureUV_ ||
+               distance_ != rhs.distance_ ||
+               drawable_ != rhs.drawable_ ||
+               node_ != rhs.node_ ||
+               subObject_ != rhs.subObject_;
     }
 
     /// Hit position in world space.
@@ -253,7 +253,7 @@ private:
     /// Prevent copy construction.
     RayOctreeQuery(const RayOctreeQuery& rhs);
     /// Prevent assignment.
-    RayOctreeQuery& operator = (const RayOctreeQuery& rhs);
+    RayOctreeQuery& operator =(const RayOctreeQuery& rhs);
 };
 
 }

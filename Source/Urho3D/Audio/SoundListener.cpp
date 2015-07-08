@@ -20,10 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "../Core/Context.h"
-#include "../Audio/SoundListener.h"
+#include "../Precompiled.h"
 
-#include "../DebugNew.h"
+#include "../Audio/SoundListener.h"
+#include "../Core/Context.h"
 
 namespace Urho3D
 {

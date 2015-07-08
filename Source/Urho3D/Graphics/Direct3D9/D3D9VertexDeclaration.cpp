@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../../Precompiled.h"
+
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/VertexBuffer.h"
@@ -86,11 +88,11 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, unsigned elementMask) :
 {
     PODVector<VertexDeclarationElement> elements;
     unsigned offset = 0;
-    
+
     for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
     {
         VertexElement element = (VertexElement)i;
-        
+
         if (elementMask & (1 << i))
         {
             VertexDeclarationElement newElement;
@@ -98,26 +100,27 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, unsigned elementMask) :
             newElement.element_ = element;
             newElement.offset_ = offset;
             offset += VertexBuffer::elementSize[i];
-            
+
             elements.Push(newElement);
         }
     }
-    
+
     Create(graphics, elements);
 }
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks) :
+VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexBuffer*>& buffers,
+    const PODVector<unsigned>& elementMasks) :
     declaration_(0)
 {
     unsigned usedElementMask = 0;
     PODVector<VertexDeclarationElement> elements;
-    
+
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
         if (buffers[i])
         {
             unsigned elementMask = elementMasks[i];
-            
+
             if (elementMask == MASK_DEFAULT)
                 elementMask = buffers[i]->GetElementMask();
             else
@@ -125,11 +128,11 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexB
                 if ((buffers[i]->GetElementMask() & elementMask) != elementMask)
                     return;
             }
-            
+
             for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
             {
                 VertexElement element = (VertexElement)j;
-                
+
                 if (elementMask & (1 << j) && !(usedElementMask & (1 << j)))
                 {
                     VertexDeclarationElement newElement;
@@ -137,28 +140,29 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexB
                     newElement.element_ = element;
                     newElement.offset_ = buffers[i]->GetElementOffset(element);
                     usedElementMask |= 1 << j;
-                    
+
                     elements.Push(newElement);
                 }
             }
         }
     }
-    
+
     Create(graphics, elements);
 }
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks) :
+VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers,
+    const PODVector<unsigned>& elementMasks) :
     declaration_(0)
 {
     unsigned usedElementMask = 0;
     PODVector<VertexDeclarationElement> elements;
-    
+
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
         if (buffers[i])
         {
             unsigned elementMask = elementMasks[i];
-            
+
             if (elementMask == MASK_DEFAULT)
                 elementMask = buffers[i]->GetElementMask();
             else
@@ -166,11 +170,11 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<
                 if ((buffers[i]->GetElementMask() & elementMask) != elementMask)
                     return;
             }
-            
+
             for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
             {
                 VertexElement element = (VertexElement)j;
-                
+
                 if (elementMask & (1 << j) && !(usedElementMask & (1 << j)))
                 {
                     VertexDeclarationElement newElement;
@@ -178,13 +182,13 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<
                     newElement.element_ = element;
                     newElement.offset_ = buffers[i]->GetElementOffset(element);
                     usedElementMask |= 1 << j;
-                    
+
                     elements.Push(newElement);
                 }
             }
         }
     }
-    
+
     Create(graphics, elements);
 }
 
@@ -196,30 +200,30 @@ VertexDeclaration::~VertexDeclaration()
 void VertexDeclaration::Create(Graphics* graphics, const PODVector<VertexDeclarationElement>& elements)
 {
     SharedArrayPtr<D3DVERTEXELEMENT9> elementArray(new D3DVERTEXELEMENT9[elements.Size() + 1]);
-    
+
     D3DVERTEXELEMENT9* dest = elementArray;
     for (Vector<VertexDeclarationElement>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
     {
-        dest->Stream = i->stream_;
-        dest->Offset = i->offset_;
+        dest->Stream = (WORD)i->stream_;
+        dest->Offset = (WORD)i->offset_;
         dest->Type = d3dElementType[i->element_];
         dest->Method = D3DDECLMETHOD_DEFAULT;
         dest->Usage = d3dElementUsage[i->element_];
         dest->UsageIndex = d3dElementUsageIndex[i->element_];
         dest++;
     }
-    
+
     dest->Stream = 0xff;
     dest->Offset = 0;
     dest->Type = D3DDECLTYPE_UNUSED;
     dest->Method = 0;
     dest->Usage = 0;
     dest->UsageIndex = 0;
-    
+
     IDirect3DDevice9* device = graphics->GetImpl()->GetDevice();
     if (!device)
         return;
-    
+
     device->CreateVertexDeclaration(elementArray, &declaration_);
 }
 

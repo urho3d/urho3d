@@ -20,18 +20,19 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
+#include "../Core/Context.h"
+#include "../Core/Profiler.h"
 #include "../Graphics/AnimatedModel.h"
 #include "../Graphics/Batch.h"
 #include "../Graphics/Camera.h"
-#include "../Core/Context.h"
-#include "../IO/FileSystem.h"
 #include "../Graphics/Geometry.h"
-#include "../IO/Log.h"
 #include "../Graphics/Material.h"
-#include "../Graphics/Model.h"
 #include "../Graphics/OcclusionBuffer.h"
 #include "../Graphics/OctreeQuery.h"
-#include "../Core/Profiler.h"
+#include "../IO/FileSystem.h"
+#include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/ResourceEvents.h"
 
@@ -59,7 +60,8 @@ void StaticModel::RegisterObject(Context* context)
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()),
+        AM_DEFAULT);
     ATTRIBUTE("Is Occluder", bool, occluder_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);

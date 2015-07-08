@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../../Math/Color.h"
 #include "../../Container/HashMap.h"
 #include "../../Core/Timer.h"
+#include "../../Math/Color.h"
 
 #if defined(ANDROID) || defined (RPI) || defined (EMSCRIPTEN)
 #include <GLES2/gl2.h>
@@ -101,6 +101,7 @@ class URHO3D_API GraphicsImpl
 public:
     /// Construct.
     GraphicsImpl();
+
     /// Return the SDL window.
     SDL_Window* GetWindow() const { return window_; }
     /// Return the GL Context.

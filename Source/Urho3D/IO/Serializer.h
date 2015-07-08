@@ -23,8 +23,9 @@
 #pragma once
 
 #include "../Container/HashMap.h"
-#include "../Math/StringHash.h"
 #include "../Core/Variant.h"
+#include "../Math/BoundingBox.h"
+#include "../Math/StringHash.h"
 
 namespace Urho3D
 {
@@ -44,10 +45,10 @@ class URHO3D_API Serializer
 public:
     /// Destruct.
     virtual ~Serializer();
-    
+
     /// Write bytes to the stream. Return number of bytes actually written.
     virtual unsigned Write(const void* data, unsigned size) = 0;
-    
+
     /// Write a 32-bit integer.
     bool WriteInt(int value);
     /// Write a 16-bit integer.

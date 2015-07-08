@@ -20,11 +20,9 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../IO/VectorBuffer.h"
-
-#include <cstring>
-
-#include "../DebugNew.h"
 
 namespace Urho3D
 {
@@ -54,11 +52,11 @@ unsigned VectorBuffer::Read(void* dest, unsigned size)
         size = size_ - position_;
     if (!size)
         return 0;
-    
+
     unsigned char* srcPtr = &buffer_[position_];
     unsigned char* destPtr = (unsigned char*)dest;
     position_ += size;
-    
+
     unsigned copySize = size;
     while (copySize >= sizeof(unsigned))
     {
@@ -75,7 +73,7 @@ unsigned VectorBuffer::Read(void* dest, unsigned size)
     }
     if (copySize & 1)
         *destPtr = *srcPtr;
-    
+
     return size;
 }
 
@@ -83,7 +81,7 @@ unsigned VectorBuffer::Seek(unsigned position)
 {
     if (position > size_)
         position = size_;
-    
+
     position_ = position;
     return position_;
 }
@@ -92,17 +90,17 @@ unsigned VectorBuffer::Write(const void* data, unsigned size)
 {
     if (!size)
         return 0;
-    
+
     if (size + position_ > size_)
     {
         size_ = size + position_;
         buffer_.Resize(size_);
     }
-    
+
     unsigned char* srcPtr = (unsigned char*)data;
     unsigned char* destPtr = &buffer_[position_];
     position_ += size;
-    
+
     unsigned copySize = size;
     while (copySize >= sizeof(unsigned))
     {
@@ -119,7 +117,7 @@ unsigned VectorBuffer::Write(const void* data, unsigned size)
     }
     if (copySize & 1)
         *destPtr = *srcPtr;
-    
+
     return size;
 }
 
@@ -134,11 +132,11 @@ void VectorBuffer::SetData(const void* data, unsigned size)
 {
     if (!data)
         size = 0;
-    
+
     buffer_.Resize(size);
     if (size)
         memcpy(&buffer_[0], data, size);
-    
+
     position_ = 0;
     size_ = size;
 }
@@ -149,7 +147,7 @@ void VectorBuffer::SetData(Deserializer& source, unsigned size)
     unsigned actualSize = source.Read(&buffer_[0], size);
     if (actualSize != size)
         buffer_.Resize(actualSize);
-    
+
     position_ = 0;
     size_ = actualSize;
 }

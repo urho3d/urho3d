@@ -87,10 +87,13 @@ public:
 
     /// Return particle effect.
     ParticleEffect* GetEffect() const { return effect_; }
+
     /// Return maximum number of particles.
     unsigned GetNumParticles() const { return particles_.Size(); }
+
     /// Return whether is currently emitting.
     bool IsEmitting() const { return emitting_; }
+
     /// Return whether particles are to be serialized.
     bool GetSerializeParticles() const { return serializeParticles_; }
 

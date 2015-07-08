@@ -98,50 +98,69 @@ public:
 
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
+
     /// Return root modal element.
     UIElement* GetRootModalElement() const { return rootModalElement_; }
+
     /// Return cursor.
     Cursor* GetCursor() const { return cursor_; }
+
     /// Return cursor position.
     IntVector2 GetCursorPosition() const;
     /// Return UI element at screen coordinates. By default returns only input-enabled elements.
     UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true);
     /// Return UI element at screen coordinates. By default returns only input-enabled elements.
     UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
+
     /// Return focused element.
     UIElement* GetFocusElement() const { return focusElement_; }
+
     /// Return topmost enabled root-level non-modal element.
     UIElement* GetFrontElement() const;
     /// Return currently dragged elements.
     const Vector<UIElement*> GetDragElements();
+
     /// Return the number of currently dragged elements.
-    unsigned GetNumDragElements() const { return dragConfirmedCount_; }
+    unsigned GetNumDragElements() const { return (unsigned)dragConfirmedCount_; }
+
     /// Return the drag element at index.
     UIElement* GetDragElement(unsigned index);
     /// Return clipboard text.
     const String& GetClipboardText() const;
+
     /// Return UI element double click interval in seconds.
     float GetDoubleClickInterval() const { return doubleClickInterval_; }
+
     /// Return UI drag start event interval in seconds.
     float GetDragBeginInterval() const { return dragBeginInterval_; }
+
     /// Return UI drag start event distance threshold in pixels.
     int GetDragBeginDistance() const { return dragBeginDistance_; }
+
     /// Return tooltip default display delay in seconds.
     float GetDefaultToolTipDelay() const { return defaultToolTipDelay_; }
+
     /// Return font texture maximum size.
     int GetMaxFontTextureSize() const { return maxFontTextureSize_; }
+
     /// Return whether mouse wheel can control also a non-focused element.
     bool IsNonFocusedMouseWheel() const { return nonFocusedMouseWheel_; }
+
     /// Return whether is using the system clipboard.
     bool GetUseSystemClipboard() const { return useSystemClipboard_; }
+
     /// Return whether focusing a %LineEdit will show the on-screen keyboard.
     bool GetUseScreenKeyboard() const { return useScreenKeyboard_; }
+
     /// Return whether is using mutable (eraseable) glyphs for fonts.
     bool GetUseMutableGlyphs() const { return useMutableGlyphs_; }
+
     /// Return whether is using forced autohinting.
     bool GetForceAutoHint() const { return forceAutoHint_; }
+
     /// Return true when UI has modal element(s).
     bool HasModalElement() const;
+
     /// Return whether a drag is in progress.
     bool IsDragging() const { return dragConfirmedCount_ > 0; };
 
@@ -170,7 +189,8 @@ private:
     /// Upload UI geometry into a vertex buffer.
     void SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData);
     /// Render UI batches. Geometry must have been uploaded first.
-    void Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
+    void Render
+        (bool resetRenderTargets, VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
     /// Generate batches from an UI element recursively. Skip the cursor element.
     void GetBatches(UIElement* element, IntRect currentScissor);
     /// Return UI element at screen position recursively.
@@ -186,15 +206,20 @@ private:
     /// Handle button or touch hover
     void ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, Cursor* cursor);
     /// Handle button or touch begin.
-    void ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
+    void
+        ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
     /// Handle button or touch end.
     void ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
     /// Handle mouse or touch move.
-    void ProcessMove(const IntVector2& cursorPos, const IntVector2& cursorDeltaPos, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
+    void ProcessMove(const IntVector2& cursorPos, const IntVector2& cursorDeltaPos, int buttons, int qualifiers, Cursor* cursor,
+        bool cursorVisible);
     /// Send a UI element drag or hover begin event.
-    void SendDragOrHoverEvent(StringHash eventType, UIElement* element, const IntVector2& screenPos, const IntVector2& deltaPos, UI::DragData* dragData);
+    void SendDragOrHoverEvent
+        (StringHash eventType, UIElement* element, const IntVector2& screenPos, const IntVector2& deltaPos, UI::DragData* dragData);
     /// Send a UI click or double click event.
-    void SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& pos, int button, int buttons, int qualifiers);
+    void SendClickEvent
+        (StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& pos, int button, int buttons,
+            int qualifiers);
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle mouse button down event.
@@ -282,9 +307,9 @@ private:
     bool useSystemClipboard_;
     /// Flag for showing the on-screen keyboard on focusing a %LineEdit.
     bool useScreenKeyboard_;
-    /// Flag for using mutable (eraseable) font glyphs.
+    /// Flag for using mutable (erasable) font glyphs.
     bool useMutableGlyphs_;
-    /// Flag for forcing FreeType autohinting.
+    /// Flag for forcing FreeType auto hinting.
     bool forceAutoHint_;
     /// Flag for UI already being rendered this frame.
     bool uiRendered_;

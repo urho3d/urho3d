@@ -20,9 +20,9 @@
 // THE SOFTWARE.
 //
 
-#include "../Core/Mutex.h"
+#include "../Precompiled.h"
+
 #include "../Core/ProcessUtils.h"
-#include "../Math/MathDefs.h"
 
 #include <cstdio>
 #include <fcntl.h>
@@ -32,6 +32,7 @@
 #endif
 
 #if defined(IOS)
+#include "../Math/MathDefs.h"
 #include <mach/mach_host.h>
 #elif !defined(ANDROID) && !defined(RPI) && !defined(EMSCRIPTEN)
 #include <LibCpuId/libcpuid.h>
@@ -70,6 +71,7 @@ inline void SetFPUState(unsigned control)
 {
     __asm__ __volatile__ ("fldcw %0" : : "m" (control));
 }
+
 #endif
 
 #include "../DebugNew.h"
@@ -91,6 +93,7 @@ static void GetCPUData(host_basic_info_data_t* data)
     host_info(mach_host_self(), HOST_BASIC_INFO, (host_info_t)data, &infoCount);
 }
 #elif !defined(ANDROID) && !defined(RPI) && !defined(EMSCRIPTEN)
+
 static void GetCPUData(struct cpu_id_t* data)
 {
     if (cpu_identify(0, data) < 0)
@@ -99,31 +102,32 @@ static void GetCPUData(struct cpu_id_t* data)
         data->num_cores = 1;
     }
 }
+
 #endif
 
 void InitFPU()
 {
-    #if !defined(URHO3D_LUAJIT) && !defined(ANDROID) && !defined(IOS) && !defined(RPI) && !defined(__x86_64__) && !defined(_M_AMD64) && !defined(EMSCRIPTEN)
+#if !defined(URHO3D_LUAJIT) && !defined(ANDROID) && !defined(IOS) && !defined(RPI) && !defined(__x86_64__) && !defined(_M_AMD64) && !defined(EMSCRIPTEN)
     // Make sure FPU is in round-to-nearest, single precision mode
     // This ensures Direct3D and OpenGL behave similarly, and all threads behave similarly
-    #ifdef _MSC_VER
+#ifdef _MSC_VER
     _controlfp(_RC_NEAR | _PC_24, _MCW_RC | _MCW_PC);
-    #else
+#else
     unsigned control = GetFPUState();
     control &= ~(FPU_CW_PREC_MASK | FPU_CW_ROUND_MASK);
     control |= (FPU_CW_PREC_SINGLE | FPU_CW_ROUND_NEAR);
     SetFPUState(control);
-    #endif
-    #endif
+#endif
+#endif
 }
 
 void ErrorDialog(const String& title, const String& message)
 {
-    #ifdef WIN32
+#ifdef WIN32
     MessageBoxW(0, WString(message).CString(), WString(title).CString(), 0);
-    #else
+#else
     PrintLine(message, true);
-    #endif
+#endif
 }
 
 void ErrorExit(const String& message, int exitCode)
@@ -136,7 +140,7 @@ void ErrorExit(const String& message, int exitCode)
 
 void OpenConsoleWindow()
 {
-    #ifdef WIN32
+#ifdef WIN32
     if (consoleOpened)
         return;
 
@@ -155,13 +159,13 @@ void OpenConsoleWindow()
     *stdin = *inFile;
 
     consoleOpened = true;
-    #endif
+#endif
 }
 
 void PrintUnicode(const String& str, bool error)
 {
-    #if !defined(ANDROID) && !defined(IOS)
-    #ifdef WIN32
+#if !defined(ANDROID) && !defined(IOS)
+#ifdef WIN32
     // If the output stream has been redirected, use fprintf instead of WriteConsoleW,
     // though it means that proper Unicode output will not work
     FILE* out = error ? stderr : stdout;
@@ -176,10 +180,10 @@ void PrintUnicode(const String& str, bool error)
         DWORD charsWritten;
         WriteConsoleW(stream, strW.CString(), strW.Length(), &charsWritten, 0);
     }
-    #else
+#else
     fprintf(error ? stderr : stdout, "%s", str.CString());
-    #endif
-    #endif
+#endif
+#endif
 }
 
 void PrintUnicodeLine(const String& str, bool error)
@@ -189,9 +193,9 @@ void PrintUnicodeLine(const String& str, bool error)
 
 void PrintLine(const String& str, bool error)
 {
-    #if !defined(ANDROID) && !defined(IOS)
-    fprintf(error ? stderr: stdout, "%s\n", str.CString());
-    #endif
+#if !defined(ANDROID) && !defined(IOS)
+    fprintf(error ? stderr : stdout, "%s\n", str.CString());
+#endif
 }
 
 const Vector<String>& ParseArguments(const String& cmdLine, bool skipFirstArgument)
@@ -274,12 +278,12 @@ const Vector<String>& GetArguments()
 String GetConsoleInput()
 {
     String ret;
-    #ifdef URHO3D_TESTING
+#ifdef URHO3D_TESTING
     // When we are running automated tests, reading the console may block. Just return empty in that case
     return ret;
-    #endif
+#endif
 
-    #ifdef WIN32
+#ifdef WIN32
     HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
     HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
     if (input == INVALID_HANDLE_VALUE || output == INVALID_HANDLE_VALUE)
@@ -328,7 +332,7 @@ String GetConsoleInput()
             }
         }
     }
-    #elif !defined(ANDROID) && !defined(IOS)
+#elif !defined(ANDROID) && !defined(IOS)
     int flags = fcntl(STDIN_FILENO, F_GETFL);
     fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
     for (;;)
@@ -339,30 +343,30 @@ String GetConsoleInput()
         else
             break;
     }
-    #endif
+#endif
 
     return ret;
 }
 
 String GetPlatform()
 {
-    #if defined(ANDROID)
+#if defined(ANDROID)
     return "Android";
-    #elif defined(IOS)
+#elif defined(IOS)
     return "iOS";
-    #elif defined(WIN32)
+#elif defined(WIN32)
     return "Windows";
-    #elif defined(__APPLE__)
+#elif defined(__APPLE__)
     return "Mac OS X";
-    #elif defined(RPI)
+#elif defined(RPI)
     return "Raspberry Pi";
-    #elif defined(EMSCRIPTEN)
+#elif defined(EMSCRIPTEN)
     return "HTML5";
-    #elif defined(__linux__)
+#elif defined(__linux__)
     return "Linux";
-    #else
+#else
     return String::EMPTY;
-    #endif
+#endif
 }
 
 #if defined(ANDROID) || defined(RPI)
@@ -391,47 +395,47 @@ static unsigned GetArmCPUCount()
 
 unsigned GetNumPhysicalCPUs()
 {
-    #if defined(IOS)
+#if defined(IOS)
     host_basic_info_data_t data;
     GetCPUData(&data);
-    #if defined(TARGET_IPHONE_SIMULATOR)
+#if defined(TARGET_IPHONE_SIMULATOR)
     // Hardcoded to dual-core on simulator mode even if the host has more
     return Min(2, data.physical_cpu);
-    #else
+#else
     return data.physical_cpu;
-    #endif
-    #elif defined(ANDROID) || defined(RPI)
+#endif
+#elif defined(ANDROID) || defined(RPI)
     return GetArmCPUCount();
-    #elif !defined(EMSCRIPTEN)
+#elif !defined(EMSCRIPTEN)
     struct cpu_id_t data;
     GetCPUData(&data);
-    return data.num_cores;
-    #else
+    return (unsigned)data.num_cores;
+#else
     /// \todo Implement properly
     return 1;
-    #endif
+#endif
 }
 
 unsigned GetNumLogicalCPUs()
 {
-    #if defined(IOS)
+#if defined(IOS)
     host_basic_info_data_t data;
     GetCPUData(&data);
-    #if defined(TARGET_IPHONE_SIMULATOR)
+#if defined(TARGET_IPHONE_SIMULATOR)
     return Min(2, data.logical_cpu);
-    #else
+#else
     return data.logical_cpu;
-    #endif
-    #elif defined(ANDROID) || defined (RPI)
+#endif
+#elif defined(ANDROID) || defined (RPI)
     return GetArmCPUCount();
-    #elif !defined(EMSCRIPTEN)
+#elif !defined(EMSCRIPTEN)
     struct cpu_id_t data;
     GetCPUData(&data);
-    return data.num_logical_cpus;
-    #else
+    return (unsigned)data.num_logical_cpus;
+#else
     /// \todo Implement properly
     return 1;
-    #endif
+#endif
 }
 
 }

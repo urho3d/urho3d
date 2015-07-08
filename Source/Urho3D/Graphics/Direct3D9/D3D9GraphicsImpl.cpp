@@ -20,8 +20,9 @@
 // THE SOFTWARE.
 //
 
+#include "../../Precompiled.h"
+
 #include "../../Graphics/Graphics.h"
-#include "../../Graphics/GraphicsEvents.h"
 #include "../../Graphics/GraphicsImpl.h"
 
 #include "../../DebugNew.h"
@@ -44,19 +45,8 @@ GraphicsImpl::GraphicsImpl() :
 
 bool GraphicsImpl::CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCETYPE type)
 {
-    if (!interface_)
-        return false;
-    
-    if (SUCCEEDED(interface_->CheckDeviceFormat(
-        adapter_,
-        deviceType_,
-        D3DFMT_X8R8G8B8,
-        usage,
-        type,
-        format)))
-        return true;
-    else
-        return false;
+    return interface_ ? SUCCEEDED(interface_->CheckDeviceFormat(adapter_, deviceType_, D3DFMT_X8R8G8B8, usage, type, format)) :
+        false;
 }
 
 }

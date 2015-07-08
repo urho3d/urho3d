@@ -71,7 +71,7 @@ struct AttributeInfo
         ptr_(0)
     {
     }
-    
+
     /// Construct offset attribute.
     AttributeInfo(VariantType type, const char* name, size_t offset, const Variant& defaultValue, unsigned mode) :
         type_(type),
@@ -83,7 +83,7 @@ struct AttributeInfo
         ptr_(0)
     {
     }
-    
+
     /// Construct offset enum attribute.
     AttributeInfo(const char* name, size_t offset, const char** enumNames, const Variant& defaultValue, unsigned mode) :
         type_(VAR_INT),
@@ -95,7 +95,7 @@ struct AttributeInfo
         ptr_(0)
     {
     }
-    
+
     /// Construct accessor attribute.
     AttributeInfo(VariantType type, const char* name, AttributeAccessor* accessor, const Variant& defaultValue, unsigned mode) :
         type_(type),
@@ -108,9 +108,10 @@ struct AttributeInfo
         ptr_(0)
     {
     }
-    
+
     /// Construct accessor enum attribute.
-    AttributeInfo(const char* name, AttributeAccessor* accessor, const char** enumNames, const Variant& defaultValue, unsigned mode) :
+    AttributeInfo(const char* name, AttributeAccessor* accessor, const char** enumNames, const Variant& defaultValue,
+        unsigned mode) :
         type_(VAR_INT),
         name_(name),
         offset_(0),
@@ -121,7 +122,7 @@ struct AttributeInfo
         ptr_(0)
     {
     }
-    
+
     /// Attribute type.
     VariantType type_;
     /// Name.

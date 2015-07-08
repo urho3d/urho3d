@@ -20,25 +20,25 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
+#include "../Core/Context.h"
+#include "../Core/Profiler.h"
 #include "../Graphics/AnimatedModel.h"
 #include "../Graphics/Batch.h"
 #include "../Graphics/Camera.h"
-#include "../Core/Context.h"
 #include "../Graphics/DecalSet.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/IndexBuffer.h"
-#include "../IO/Log.h"
 #include "../Graphics/Material.h"
+#include "../Graphics/Tangent.h"
+#include "../Graphics/VertexBuffer.h"
+#include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
-#include "../Scene/Node.h"
-#include "../Core/Profiler.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
-#include "../Graphics/Tangent.h"
-#include "../IO/VectorBuffer.h"
-#include "../Graphics/VertexBuffer.h"
 
 #include "../DebugNew.h"
 
@@ -54,7 +54,7 @@ static const unsigned DEFAULT_MAX_VERTICES = 512;
 static const unsigned DEFAULT_MAX_INDICES = 1024;
 static const unsigned STATIC_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT;
 static const unsigned SKINNED_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT | MASK_BLENDWEIGHTS |
-    MASK_BLENDINDICES;
+                                             MASK_BLENDINDICES;
 
 static DecalVertex ClipEdge(const DecalVertex& v0, const DecalVertex& v1, float d0, float d1, bool skinned)
 {
@@ -91,7 +91,7 @@ static DecalVertex ClipEdge(const DecalVertex& v0, const DecalVertex& v1, float 
 
 static void ClipPolygon(PODVector<DecalVertex>& dest, const PODVector<DecalVertex>& src, const Plane& plane, bool skinned)
 {
-    unsigned last;
+    unsigned last = 0;
     float lastDistance = 0.0f;
     dest.Clear();
 
@@ -130,12 +130,12 @@ void Decal::AddVertex(const DecalVertex& vertex)
     {
         if (vertex.position_.Equals(vertices_[i].position_) && vertex.normal_.Equals(vertices_[i].normal_))
         {
-            indices_.Push(i);
+            indices_.Push((unsigned short)i);
             return;
         }
     }
 
-    unsigned short newIndex = vertices_.Size();
+    unsigned short newIndex = (unsigned short)vertices_.Size();
     vertices_.Push(vertex);
     indices_.Push(newIndex);
 }
@@ -180,13 +180,15 @@ void DecalSet::RegisterObject(Context* context)
     context->RegisterFactory<DecalSet>(GEOMETRY_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
+        AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Max Vertices", GetMaxVertices, SetMaxVertices, unsigned, DEFAULT_MAX_VERTICES, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Max Indices", GetMaxIndices, SetMaxIndices, unsigned, DEFAULT_MAX_INDICES, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Drawable);
-    MIXED_ACCESSOR_ATTRIBUTE("Decals", GetDecalsAttr, SetDecalsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Decals", GetDecalsAttr, SetDecalsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+        AM_FILE | AM_NOEDIT);
 }
 
 void DecalSet::ApplyAttributes()
@@ -252,7 +254,7 @@ void DecalSet::SetMaterial(Material* material)
 void DecalSet::SetMaxVertices(unsigned num)
 {
     // Never expand to 32 bit indices
-    num = Clamp((int)num, MIN_VERTICES, MAX_VERTICES);
+    num = (unsigned)Clamp((int)num, MIN_VERTICES, MAX_VERTICES);
 
     if (num != maxVertices_)
     {
@@ -329,8 +331,8 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
                 continue;
 
             // Represent the decal as a sphere, try to find the biggest colliding bone
-            Sphere decalSphere(bone->node_->GetWorldTransform().Inverse() * worldPosition, 0.5f * size /
-                bone->node_->GetWorldScale().Length());
+            Sphere decalSphere
+                (bone->node_->GetWorldTransform().Inverse() * worldPosition, 0.5f * size / bone->node_->GetWorldScale().Length());
 
             if (bone->collisionMask_ & BONECOLLISION_BOX)
             {
@@ -421,14 +423,14 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     if (newDecal.vertices_.Size() > maxVertices_)
     {
         LOGWARNING("Can not add decal, vertex count " + String(newDecal.vertices_.Size()) + " exceeds maximum " +
-            String(maxVertices_));
+                   String(maxVertices_));
         decals_.Pop();
         return false;
     }
     if (newDecal.indices_.Size() > maxIndices_)
     {
         LOGWARNING("Can not add decal, index count " + String(newDecal.indices_.Size()) + " exceeds maximum " +
-            String(maxIndices_));
+                   String(maxIndices_));
         decals_.Pop();
         return false;
     }
@@ -932,7 +934,7 @@ bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blen
                 }
             }
 
-            newBlendIndices[i] = index;
+            newBlendIndices[i] = (unsigned char)index;
         }
         else
             newBlendIndices[i] = 0;

@@ -20,12 +20,13 @@
 // THE SOFTWARE.
 //
 
-#include "../Script/APITemplates.h"
+#include "../Precompiled.h"
+
+#include "../IO/PackageFile.h"
 #include "../Resource/Image.h"
 #include "../Resource/JSONFile.h"
-#include "../Resource/JSONValue.h"
-#include "../IO/PackageFile.h"
 #include "../Resource/ResourceCache.h"
+#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {
@@ -172,7 +173,7 @@ static void RegisterImage(asIScriptEngine* engine)
     engine->RegisterEnumValue("CompressedFormat", "CF_PVRTC_RGBA_2BPP", 7);
     engine->RegisterEnumValue("CompressedFormat", "CF_PVRTC_RGB_4BPP", 8);
     engine->RegisterEnumValue("CompressedFormat", "CF_PVRTC_RGBA_4BPP", 9);
-    
+
     RegisterResource<Image>(engine, "Image");
     engine->RegisterObjectMethod("Image", "bool SetSize(int, int, uint)", asMETHODPR(Image, SetSize, (int, int, unsigned), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "bool SetSize(int, int, int, uint)", asMETHODPR(Image, SetSize, (int, int, unsigned), bool), asCALL_THISCALL);

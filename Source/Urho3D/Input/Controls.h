@@ -35,10 +35,10 @@ public:
     Controls();
     /// Destruct.
     ~Controls();
-    
+
     /// Reset to initial state.
     void Reset();
-    
+
     /// Set or release buttons.
     void Set(unsigned buttons, bool down = true)
     {
@@ -47,16 +47,19 @@ public:
         else
             buttons_ &= ~buttons;
     }
-    
+
     /// Check if a button is held down.
     bool IsDown(unsigned button) const
     {
         return (buttons_ & button) != 0;
     }
-    
+
     /// Check if a button was pressed on this frame. Requires previous frame's controls.
-    bool IsPressed(unsigned button, const Controls& previousControls) const { return (buttons_ & button) != 0 && (previousControls.buttons_ & button) == 0; }
-    
+    bool IsPressed(unsigned button, const Controls& previousControls) const
+    {
+        return (buttons_ & button) != 0 && (previousControls.buttons_ & button) == 0;
+    }
+
     /// Button state.
     unsigned buttons_;
     /// Mouse yaw.

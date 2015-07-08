@@ -50,7 +50,7 @@ struct Bone
         radius_(0.0f)
     {
     }
-    
+
     /// Bone name.
     String name_;
     /// Bone name hash.
@@ -85,7 +85,7 @@ public:
     Skeleton();
     /// Destruct.
     ~Skeleton();
-    
+
     /// Read from a stream. Return true if successful.
     bool Load(Deserializer& source);
     /// Write to a stream. Return true if successful.
@@ -98,13 +98,16 @@ public:
     void ClearBones();
     /// Reset all animating bones to initial positions.
     void Reset();
-    
+
     /// Return all bones.
     const Vector<Bone>& GetBones() const { return bones_; }
+
     /// Return modifiable bones.
     Vector<Bone>& GetModifiableBones() { return bones_; }
+
     /// Return number of bones.
     unsigned GetNumBones() const { return bones_.Size(); }
+
     /// Return root bone.
     Bone* GetRootBone();
     /// Return bone by index.
@@ -115,7 +118,7 @@ public:
     Bone* GetBone(const char* boneName);
     /// Return bone by name hash.
     Bone* GetBone(StringHash boneNameHash);
-    
+
     /// Reset all animating bones to initial positions without marking the nodes dirty. Requires the node dirtying to be performed later.
     void ResetSilent();
 

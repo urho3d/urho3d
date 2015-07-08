@@ -61,12 +61,16 @@ public:
 
     /// Return tile map.
     TileMap2D* GetTileMap() const;
+
     /// Return tmx layer.
     const TmxLayer2D* GetTmxLayer() const { return tmxLayer_; }
+
     /// Return draw order.
     int GetDrawOrder() const { return drawOrder_; }
+
     /// Return visible.
     bool IsVisible() const { return visible_; }
+
     /// Return has property
     bool HasProperty(const String& name) const;
     /// Return property.

@@ -20,13 +20,15 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Core/Profiler.h"
 #include "../Graphics/DebugRenderer.h"
-#include "../Physics/Constraint.h"
 #include "../IO/Log.h"
+#include "../Physics/Constraint.h"
 #include "../Physics/PhysicsUtils.h"
 #include "../Physics/PhysicsWorld.h"
-#include "../Core/Profiler.h"
 #include "../Physics/RigidBody.h"
 #include "../Scene/Scene.h"
 
@@ -88,7 +90,7 @@ void Constraint::RegisterObject(Context* context)
     ATTRIBUTE("Rotation", Quaternion, rotation_, Quaternion::IDENTITY, AM_DEFAULT);
     ATTRIBUTE("Other Body Position", Vector3, otherPosition_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE("Other Body Rotation", Quaternion, otherRotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    ATTRIBUTE("Other Body NodeID", int, otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
+    ATTRIBUTE("Other Body NodeID", unsigned, otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
     ACCESSOR_ATTRIBUTE("High Limit", GetHighLimit, SetHighLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Low Limit", GetLowLimit, SetLowLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("ERP Parameter", GetERP, SetERP, float, 0.0f, AM_DEFAULT);
@@ -393,8 +395,8 @@ void Constraint::ApplyFrames()
     cachedWorldScale_ = node_->GetWorldScale();
 
     Vector3 ownBodyScaledPosition = position_ * cachedWorldScale_ - ownBody_->GetCenterOfMass();
-    Vector3 otherBodyScaledPosition = otherBody_ ? otherPosition_ * otherBody_->GetNode()->GetWorldScale() -
-        otherBody_->GetCenterOfMass() : otherPosition_;
+    Vector3 otherBodyScaledPosition =
+        otherBody_ ? otherPosition_ * otherBody_->GetNode()->GetWorldScale() - otherBody_->GetCenterOfMass() : otherPosition_;
 
     switch (constraint_->getConstraintType())
     {
@@ -504,7 +506,7 @@ void Constraint::CreateConstraint()
 
     Vector3 ownBodyScaledPosition = position_ * cachedWorldScale_ - ownBody_->GetCenterOfMass();
     Vector3 otherBodyScaledPosition = otherBody_ ? otherPosition_ * otherBody_->GetNode()->GetWorldScale() -
-        otherBody_->GetCenterOfMass() : otherPosition_;
+                                                   otherBody_->GetCenterOfMass() : otherPosition_;
 
     switch (constraintType_)
     {

@@ -31,7 +31,7 @@ namespace Urho3D
 class URHO3D_API StaticModelGroup : public StaticModel
 {
     OBJECT(StaticModelGroup);
-    
+
 public:
     /// Construct.
     StaticModelGroup(Context* context);
@@ -39,7 +39,7 @@ public:
     virtual ~StaticModelGroup();
     /// Register object factory. StaticModel must be registered first.
     static void RegisterObject(Context* context);
-    
+
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     void ApplyAttributes();
     /// Process octree raycast. May be called from a worker thread.
@@ -50,34 +50,36 @@ public:
     virtual unsigned GetNumOccluderTriangles();
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
-    
+
     /// Add an instance scene node. It does not need any drawable components of its own.
     void AddInstanceNode(Node* node);
     /// Remove an instance scene node.
     void RemoveInstanceNode(Node* node);
     /// Remove all instance scene nodes.
     void RemoveAllInstanceNodes();
-    
+
     /// Return number of instance nodes.
     unsigned GetNumInstanceNodes() const { return instanceNodes_.Size(); }
+
     /// Return instance node by index.
     Node* GetInstanceNode(unsigned index) const;
-    
+
     /// Set node IDs attribute.
     void SetNodeIDsAttr(const VariantVector& value);
+
     /// Return node IDs attribute.
     const VariantVector& GetNodeIDsAttr() const { return nodeIDsAttr_; }
-    
+
 protected:
     /// Handle scene node enabled status changing.
     virtual void OnNodeSetEnabled(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    
+
 private:
     /// Update node IDs attribute and ensure the transforms vector has the right size.
     void UpdateNodeIDs();
-    
+
     /// Instance nodes.
     Vector<WeakPtr<Node> > instanceNodes_;
     /// World transforms of valid (existing and visible) instances.

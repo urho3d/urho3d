@@ -34,7 +34,7 @@ class URHO3D_API ConstraintPrismatic2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintPrismatic2D(Context* scontext);
+    ConstraintPrismatic2D(Context* context);
     /// Destruct.
     virtual ~ConstraintPrismatic2D();
     /// Register object factory.
@@ -59,18 +59,25 @@ public:
 
     /// Return anchor.
     const Vector2& GetAnchor() const { return anchor_; }
+
     /// Return axis.
     const Vector2& GetAxis() const { return axis_; }
+
     /// Return enable limit.
     bool GetEnableLimit() const { return jointDef_.enableLimit; }
+
     /// Return lower translation.
     float GetLowerTranslation() const { return jointDef_.lowerTranslation; }
+
     /// Return upper translation.
     float GetUpperTranslation() const { return jointDef_.upperTranslation; }
+
     /// Return enable motor.
     bool GetEnableMotor() const { return jointDef_.enableMotor; }
+
     /// Return maxmotor force.
     float GetMaxMotorForce() const { return jointDef_.maxMotorForce; }
+
     /// Return motor speed.
     float GetMotorSpeed() const { return jointDef_.motorSpeed; }
 

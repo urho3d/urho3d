@@ -107,7 +107,9 @@ private:
     /// Update view batch info.
     void UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* camera);
     /// Add view batch.
-    void AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
+    void AddViewBatch
+        (ViewBatchInfo2D& viewBatchInfo, Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart,
+            unsigned vertexCount);
 
     /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;

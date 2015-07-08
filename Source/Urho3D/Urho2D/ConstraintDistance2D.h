@@ -34,7 +34,7 @@ class URHO3D_API ConstraintDistance2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintDistance2D(Context* scontext);
+    ConstraintDistance2D(Context* context);
     /// Destruct.
     virtual ~ConstraintDistance2D();
     /// Register object factory.
@@ -51,10 +51,13 @@ public:
 
     /// Return owner body anchor.
     const Vector2& GetOwnerBodyAnchor() const { return ownerBodyAnchor_; }
+
     /// Return other body anchor.
     const Vector2& GetOtherBodyAnchor() const { return otherBodyAnchor_; }
+
     /// Return frequency Hz.
     float GetFrequencyHz() const { return jointDef_.frequencyHz; }
+
     /// Return damping ratio.
     float GetDampingRatio() const { return jointDef_.dampingRatio; }
 

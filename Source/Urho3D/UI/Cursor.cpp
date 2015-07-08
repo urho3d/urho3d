@@ -20,14 +20,13 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
-#include "../UI/Cursor.h"
-#include "../Input/Input.h"
-#include "../Input/InputEvents.h"
-#include "../IO/Log.h"
-#include "../Container/Ptr.h"
-#include "../Resource/ResourceCache.h"
 #include "../Graphics/Texture2D.h"
+#include "../Input/Input.h"
+#include "../IO/Log.h"
+#include "../Resource/ResourceCache.h"
 #include "../UI/UI.h"
 
 #include "../DebugNew.h"
@@ -139,7 +138,7 @@ void Cursor::DefineShape(const String& shape, Image* image, const IntRect& image
         return;
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
+
     if (!shapeInfos_.Contains(shape))
         shapeInfos_[shape] = CursorShapeInfo();
 

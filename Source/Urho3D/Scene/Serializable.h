@@ -66,12 +66,15 @@ public:
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest) const;
+
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes() {}
+    virtual void ApplyAttributes() { }
+
     /// Return whether should save default-valued attributes into XML. Default false.
     virtual bool SaveDefaultAttributes() const { return false; }
+
     /// Mark for attribute check on the next network update.
-    virtual void MarkNetworkUpdate() {}
+    virtual void MarkNetworkUpdate() { }
 
     /// Set attribute by index. Return true if successfully set.
     bool SetAttribute(unsigned index, const Variant& value);
@@ -110,10 +113,13 @@ public:
     unsigned GetNumAttributes() const;
     /// Return number of network replication attributes.
     unsigned GetNumNetworkAttributes() const;
+
     /// Return whether is temporary.
     bool IsTemporary() const { return temporary_; }
+
     /// Return whether an attribute's network updates are being intercepted.
     bool GetInterceptNetworkUpdate(const String& attributeName) const;
+
     /// Return the network attribute state, if allocated.
     NetworkState* GetNetworkState() const { return networkState_; }
 
@@ -172,7 +178,7 @@ public:
 };
 
 /// Attribute trait (default use const reference for object type).
-template<typename T> struct AttributeTrait
+template <typename T> struct AttributeTrait
 {
     /// Get function return type.
     typedef const T& ReturnType;
@@ -181,35 +187,35 @@ template<typename T> struct AttributeTrait
 };
 
 /// Int attribute trait.
-template<> struct AttributeTrait<int>
+template <> struct AttributeTrait<int>
 {
     typedef int ReturnType;
     typedef int ParameterType;
 };
 
 /// unsigned attribute trait.
-template<> struct AttributeTrait<unsigned>
+template <> struct AttributeTrait<unsigned>
 {
     typedef unsigned ReturnType;
     typedef unsigned ParameterType;
 };
 
 /// Bool attribute trait.
-template<> struct AttributeTrait<bool>
+template <> struct AttributeTrait<bool>
 {
-    typedef bool ReturnType; 
-    typedef bool ParameterType; 
+    typedef bool ReturnType;
+    typedef bool ParameterType;
 };
 
 /// Float attribute trait.
-template<> struct AttributeTrait<float>
+template <> struct AttributeTrait<float>
 {
     typedef float ReturnType;
     typedef float ParameterType;
 };
 
 /// Mixed attribute trait (use const reference for set function only).
-template<typename T> struct MixedAttributeTrait
+template <typename T> struct MixedAttributeTrait
 {
     typedef T ReturnType;
     typedef const T& ParameterType;
@@ -219,8 +225,8 @@ template<typename T> struct MixedAttributeTrait
 template <typename T, typename U, typename Trait> class AttributeAccessorImpl : public AttributeAccessor
 {
 public:
-    typedef typename Trait ::ReturnType (T::*GetFunctionPtr)() const;
-    typedef void (T::*SetFunctionPtr)(typename Trait ::ParameterType);
+    typedef typename Trait::ReturnType (T::*GetFunctionPtr)() const;
+    typedef void (T::*SetFunctionPtr)(typename Trait::ParameterType);
 
     /// Construct with function pointers.
     AttributeAccessorImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
@@ -244,7 +250,7 @@ public:
     {
         assert(ptr);
         T* classPtr = static_cast<T*>(ptr);
-        (classPtr->*setFunction_)(value.Get<U>());
+        (classPtr->*setFunction_)(value.Get < U > ());
     }
 
     /// Class-specific pointer to getter function.

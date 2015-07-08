@@ -108,7 +108,7 @@ protected:
     /// Set the move target for the specified agent.
     bool SetAgentTarget(CrowdAgent* agent, Vector3 target);
     /// Set the move target for the specified agent.
-    bool SetAgentTarget(CrowdAgent* agent, Vector3 target, unsigned int& targetRef);
+    bool SetAgentTarget(CrowdAgent* agent, Vector3 target, unsigned& targetRef);
 
     /// Get the closest walkable position.
     Vector3 GetClosestWalkablePosition(Vector3 pos) const;

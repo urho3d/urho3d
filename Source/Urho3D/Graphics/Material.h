@@ -24,9 +24,9 @@
 
 #include "../Graphics/GraphicsDefs.h"
 #include "../Graphics/Light.h"
+#include "../Math/Vector4.h"
 #include "../Resource/Resource.h"
 #include "../Scene/ValueAnimationInfo.h"
-#include "../Math/Vector4.h"
 
 namespace Urho3D
 {
@@ -72,7 +72,8 @@ class ShaderParameterAnimationInfo : public ValueAnimationInfo
 {
 public:
     /// Construct.
-    ShaderParameterAnimationInfo(Material* material, const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed);
+    ShaderParameterAnimationInfo
+        (Material* material, const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed);
     /// Copy construct.
     ShaderParameterAnimationInfo(const ShaderParameterAnimationInfo& other);
     /// Destruct.
@@ -84,14 +85,14 @@ public:
 protected:
     /// Apply new animation value to the target object. Called by Update().
     virtual void ApplyValue(const Variant& newValue);
-    
+
 private:
     /// Shader parameter name.
     String name_;
 };
 
 /// TextureUnit hash function.
-template<> inline unsigned MakeHash(const TextureUnit& value)
+template <> inline unsigned MakeHash(const TextureUnit& value)
 {
     return (unsigned)value;
 }
@@ -127,7 +128,8 @@ public:
     /// Set shader parameter.
     void SetShaderParameter(const String& name, const Variant& value);
     /// Set shader parameter animation.
-    void SetShaderParameterAnimation(const String& name, ValueAnimation* animation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
+    void
+        SetShaderParameterAnimation(const String& name, ValueAnimation* animation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
     /// Set shader parameter animation wrap mode.
     void SetShaderParameterAnimationWrapMode(const String& name, WrapMode wrapMode);
     /// Set shader parameter animation speed.
@@ -161,8 +163,10 @@ public:
 
     /// Return number of techniques.
     unsigned GetNumTechniques() const { return techniques_.Size(); }
+
     /// Return all techniques.
     const Vector<TechniqueEntry>& GetTechniques() const { return techniques_; }
+
     /// Return technique entry by index.
     const TechniqueEntry& GetTechniqueEntry(unsigned index) const;
     /// Return technique by index.
@@ -171,8 +175,10 @@ public:
     Pass* GetPass(unsigned index, const String& passName) const;
     /// Return texture by unit.
     Texture* GetTexture(TextureUnit unit) const;
-   /// Return all textures.
+
+    /// Return all textures.
     const HashMap<TextureUnit, SharedPtr<Texture> >& GetTextures() const { return textures_; }
+
     /// Return shader parameter.
     const Variant& GetShaderParameter(const String& name) const;
     /// Return shader parameter animation.
@@ -181,24 +187,34 @@ public:
     WrapMode GetShaderParameterAnimationWrapMode(const String& name) const;
     /// Return shader parameter animation speed.
     float GetShaderParameterAnimationSpeed(const String& name) const;
+
     /// Return all shader parameters.
     const HashMap<StringHash, MaterialShaderParameter>& GetShaderParameters() const { return shaderParameters_; }
+
     /// Return normal culling mode.
     CullMode GetCullMode() const { return cullMode_; }
+
     /// Return culling mode for shadows.
     CullMode GetShadowCullMode() const { return shadowCullMode_; }
+
     /// Return polygon fill mode.
     FillMode GetFillMode() const { return fillMode_; }
+
     /// Return depth bias.
     const BiasParameters& GetDepthBias() const { return depthBias_; }
+
     /// Return last auxiliary view rendered frame number.
     unsigned GetAuxViewFrameNumber() const { return auxViewFrameNumber_; }
+
     /// Return whether should render occlusion.
     bool GetOcclusion() const { return occlusion_; }
+
     /// Return whether should render specular.
     bool GetSpecular() const { return specular_; }
+
     /// Return the scene associated with the material for shader parameter animation updates.
     Scene* GetScene() const;
+
     /// Return shader parameter hash value. Used as an optimization to avoid setting shader parameters unnecessarily.
     unsigned GetShaderParameterHash() const { return shaderParameterHash_; }
 
@@ -222,7 +238,7 @@ private:
     void UpdateEventSubscription();
     /// Update shader parameter animations.
     void HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData);
-    
+
     /// Techniques.
     Vector<TechniqueEntry> techniques_;
     /// Textures.

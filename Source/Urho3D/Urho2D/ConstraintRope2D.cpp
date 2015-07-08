@@ -20,8 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "../Urho2D/ConstraintRope2D.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Urho2D/ConstraintRope2D.h"
 #include "../Urho2D/PhysicsUtils2D.h"
 #include "../Urho2D/RigidBody2D.h"
 
@@ -45,7 +47,7 @@ ConstraintRope2D::~ConstraintRope2D()
 void ConstraintRope2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ConstraintRope2D>();
-    
+
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Owner Body Anchor", GetOwnerBodyAnchor, SetOwnerBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Other Body Anchor", GetOtherBodyAnchor, SetOtherBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);

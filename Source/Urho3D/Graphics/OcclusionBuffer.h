@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "../Container/ArrayPtr.h"
-#include "../Math/Frustum.h"
 #include "../Core/Object.h"
-#include "../Graphics/GraphicsDefs.h"
 #include "../Core/Timer.h"
+#include "../Container/ArrayPtr.h"
+#include "../Graphics/GraphicsDefs.h"
+#include "../Math/Frustum.h"
 
 namespace Urho3D
 {
@@ -59,13 +59,13 @@ static const float OCCLUSION_Z_SCALE = 16777216.0f;
 class URHO3D_API OcclusionBuffer : public Object
 {
     OBJECT(OcclusionBuffer);
-    
+
 public:
     /// Construct.
     OcclusionBuffer(Context* context);
     /// Destruct.
     virtual ~OcclusionBuffer();
-    
+
     /// Set occlusion buffer size.
     bool SetSize(int width, int height);
     /// Set camera view to render from.
@@ -81,33 +81,42 @@ public:
     /// Draw a triangle mesh to the buffer using non-indexed geometry.
     bool Draw(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount);
     /// Draw a triangle mesh to the buffer using indexed geometry.
-    bool Draw(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount);
+    bool Draw(const Matrix3x4& model, const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize,
+        unsigned indexStart, unsigned indexCount);
     /// Build reduced size mip levels.
     void BuildDepthHierarchy();
     /// Reset last used timer.
     void ResetUseTimer();
-    
+
     /// Return highest level depth values.
     int* GetBuffer() const { return buffer_; }
+
     /// Return view transform matrix.
     const Matrix3x4& GetView() const { return view_; }
+
     /// Return projection matrix.
     const Matrix4& GetProjection() const { return projection_; }
+
     /// Return buffer width.
     int GetWidth() const { return width_; }
+
     /// Return buffer height.
     int GetHeight() const { return height_; }
+
     /// Return number of rendered triangles.
     unsigned GetNumTriangles() const { return numTriangles_; }
+
     /// Return maximum number of triangles.
     unsigned GetMaxTriangles() const { return maxTriangles_; }
+
     /// Return culling mode.
     CullMode GetCullMode() const { return cullMode_; }
+
     /// Test a bounding box for visibility. For best performance, build depth hierarchy first.
     bool IsVisible(const BoundingBox& worldSpaceBox) const;
     /// Return time since last use in milliseconds.
     unsigned GetUseTimer();
-    
+
 private:
     /// Apply modelview transform to vertex.
     inline Vector4 ModelTransform(const Matrix4& transform, const Vector3& vertex) const;
@@ -125,7 +134,7 @@ private:
     void ClipVertices(const Vector4& plane, Vector4* vertices, bool* triangles, unsigned& numTriangles);
     /// Draw a clipped triangle.
     void DrawTriangle2D(const Vector3* vertices, bool clockwise);
-    
+
     /// Highest level depth buffer.
     int* buffer_;
     /// Buffer width.

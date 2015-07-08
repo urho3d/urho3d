@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Navigation/DynamicNavigationMesh.h"
 
 #include "../Math/BoundingBox.h"

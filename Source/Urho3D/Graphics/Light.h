@@ -208,48 +208,69 @@ public:
 
     /// Return light type.
     LightType GetLightType() const { return lightType_; }
+
     /// Return vertex lighting mode.
     bool GetPerVertex() const { return perVertex_; }
+
     /// Return color.
     const Color& GetColor() const { return color_; }
+
     /// Return specular intensity.
     float GetSpecularIntensity() const { return specularIntensity_; }
+
     /// Return brightness multiplier.
     float GetBrightness() const { return brightness_; }
+
     /// Return effective color, multiplied by brightness. Do not multiply the alpha so that can compare against the default black color to detect a light with no effect.
     Color GetEffectiveColor() const { return Color(color_ * brightness_, 1.0f); }
+
     /// Return effective specular intensity, multiplied by absolute value of brightness.
     float GetEffectiveSpecularIntensity() const { return specularIntensity_ * Abs(brightness_); }
+
     /// Return range.
     float GetRange() const { return range_; }
+
     /// Return spotlight field of view.
     float GetFov() const { return fov_; }
+
     /// Return spotlight aspect ratio.
     float GetAspectRatio() const { return aspectRatio_; }
+
     /// Return fade start distance.
     float GetFadeDistance() const { return fadeDistance_; }
+
     /// Return shadow fade start distance.
     float GetShadowFadeDistance() const { return shadowFadeDistance_; }
+
     /// Return shadow depth bias parameters.
     const BiasParameters& GetShadowBias() const { return shadowBias_; }
+
     /// Return directional light cascaded shadow parameters.
     const CascadeParameters& GetShadowCascade() const { return shadowCascade_; }
+
     /// Return shadow map focus parameters.
     const FocusParameters& GetShadowFocus() const { return shadowFocus_; }
+
     /// Return shadow intensity.
     float GetShadowIntensity() const { return shadowIntensity_; }
+
     /// Return shadow resolution.
     float GetShadowResolution() const { return shadowResolution_; }
+
     /// Return shadow camera near/far clip distance ratio.
     float GetShadowNearFarRatio() const { return shadowNearFarRatio_; }
+
     /// Return range attenuation texture.
     Texture* GetRampTexture() const { return rampTexture_; }
+
     /// Return spotlight attenuation texture.
     Texture* GetShapeTexture() const { return shapeTexture_; }
+
     /// Return spotlight frustum.
     Frustum GetFrustum() const;
     /// Return number of shadow map cascade splits for a directional light, considering also graphics API limitations.
     int GetNumShadowSplits() const;
+
     /// Return whether light has negative (darkening) color.
     bool IsNegative() const { return GetEffectiveColor().SumRGB() < 0.0f; }
 
@@ -261,10 +282,15 @@ public:
     void SetLightQueue(LightBatchQueue* queue);
     /// Return light volume model transform.
     const Matrix3x4& GetVolumeTransform(Camera* camera);
+
     /// Return light queue. Called by View.
     LightBatchQueue* GetLightQueue() const { return lightQueue_; }
+
     /// Return a divisor value based on intensity for calculating the sort value.
-    float GetIntensityDivisor(float attenuation = 1.0f) const { return Max(GetEffectiveColor().SumRGB(), 0.0f) * attenuation + M_EPSILON; }
+    float GetIntensityDivisor(float attenuation = 1.0f) const
+    {
+        return Max(GetEffectiveColor().SumRGB(), 0.0f) * attenuation + M_EPSILON;
+    }
 
     /// Set ramp texture attribute.
     void SetRampTextureAttr(const ResourceRef& value);

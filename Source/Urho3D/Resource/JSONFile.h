@@ -27,8 +27,10 @@
 
 namespace rapidjson
 {
-    template <typename Encoding, typename Allocator> class GenericDocument;
-    typedef GenericDocument<UTF8<char>, MemoryPoolAllocator<CrtAllocator> > Document;
+
+template <typename Encoding, typename Allocator> class GenericDocument;
+typedef GenericDocument<UTF8<char>, MemoryPoolAllocator<CrtAllocator> > Document;
+
 }
 
 namespace Urho3D

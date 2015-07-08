@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Math/Frustum.h"
 #include "../Math/Polyhedron.h"
 
@@ -30,7 +32,7 @@ void Sphere::Define(const Vector3* vertices, unsigned count)
 {
     if (!count)
         return;
-    
+
     defined_ = false;
     Merge(vertices, count);
 }
@@ -39,7 +41,7 @@ void Sphere::Define(const BoundingBox& box)
 {
     const Vector3& min = box.min_;
     const Vector3& max = box.max_;
-    
+
     defined_ = false;
     Merge(min);
     Merge(Vector3(max.x_, min.y_, min.z_));
@@ -72,7 +74,7 @@ void Sphere::Merge(const BoundingBox& box)
 {
     const Vector3& min = box.min_;
     const Vector3& max = box.max_;
-    
+
     Merge(min);
     Merge(Vector3(max.x_, min.y_, min.z_));
     Merge(Vector3(min.x_, max.y_, min.z_));
@@ -108,14 +110,14 @@ void Sphere::Merge(const Sphere& sphere)
         defined_ = true;
         return;
     }
-    
+
     Vector3 offset = sphere.center_ - center_;
     float dist = offset.Length();
-    
+
     // If sphere fits inside, do nothing
     if (dist + sphere.radius_ < radius_)
         return;
-    
+
     // If we fit inside the other sphere, become it
     if (dist + radius_ < sphere.radius_)
     {
@@ -125,7 +127,7 @@ void Sphere::Merge(const Sphere& sphere)
     else
     {
         Vector3 NormalizedOffset = offset / dist;
-        
+
         Vector3 min = center_ - radius_ * NormalizedOffset;
         Vector3 max = sphere.center_ + sphere.radius_ * NormalizedOffset;
         center_ = (min + max) * 0.5f;
@@ -140,7 +142,7 @@ Intersection Sphere::IsInside(const BoundingBox& box) const
     float temp;
     Vector3 min = box.min_;
     Vector3 max = box.max_;
-    
+
     if (center_.x_ < min.x_)
     {
         temp = center_.x_ - min.x_;
@@ -171,13 +173,13 @@ Intersection Sphere::IsInside(const BoundingBox& box) const
         temp = center_.z_ - max.z_;
         distSquared += temp * temp;
     }
-    
+
     if (distSquared >= radiusSquared)
         return OUTSIDE;
-    
+
     min -= center_;
     max -= center_;
-    
+
     Vector3 tempVec = min; // - - -
     if (tempVec.LengthSquared() >= radiusSquared)
         return INTERSECTS;
@@ -202,7 +204,7 @@ Intersection Sphere::IsInside(const BoundingBox& box) const
     tempVec.y_ = max.y_; // + + +
     if (tempVec.LengthSquared() >= radiusSquared)
         return INTERSECTS;
-    
+
     return INSIDE;
 }
 
@@ -213,7 +215,7 @@ Intersection Sphere::IsInsideFast(const BoundingBox& box) const
     float temp;
     Vector3 min = box.min_;
     Vector3 max = box.max_;
-    
+
     if (center_.x_ < min.x_)
     {
         temp = center_.x_ - min.x_;
@@ -244,7 +246,7 @@ Intersection Sphere::IsInsideFast(const BoundingBox& box) const
         temp = center_.z_ - max.z_;
         distSquared += temp * temp;
     }
-    
+
     if (distSquared >= radiusSquared)
         return OUTSIDE;
     else

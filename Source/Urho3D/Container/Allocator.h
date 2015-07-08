@@ -22,7 +22,13 @@
 
 #pragma once
 
-#include <new>
+#ifdef URHO3D_IS_BUILDING
+#include "Urho3D.h"
+#else
+#include <Urho3D/Urho3D.h>
+#endif
+
+#include <stddef.h>
 
 namespace Urho3D
 {
@@ -70,50 +76,50 @@ public:
         allocator_(0)
     {
         if (initialCapacity)
-            allocator_ = AllocatorInitialize(sizeof(T), initialCapacity);
+            allocator_ = AllocatorInitialize((unsigned)sizeof(T), initialCapacity);
     }
-    
+
     /// Destruct.
     ~Allocator()
     {
         AllocatorUninitialize(allocator_);
     }
-    
+
     /// Reserve and default-construct an object.
     T* Reserve()
     {
         if (!allocator_)
-            allocator_ = AllocatorInitialize(sizeof(T));
+            allocator_ = AllocatorInitialize((unsigned)sizeof(T));
         T* newObject = static_cast<T*>(AllocatorReserve(allocator_));
         new(newObject) T();
-        
+
         return newObject;
     }
-    
+
     /// Reserve and copy-construct an object.
     T* Reserve(const T& object)
     {
         if (!allocator_)
-            allocator_ = AllocatorInitialize(sizeof(T));
+            allocator_ = AllocatorInitialize((unsigned)sizeof(T));
         T* newObject = static_cast<T*>(AllocatorReserve(allocator_));
         new(newObject) T(object);
-        
+
         return newObject;
     }
-    
+
     /// Destruct and free an object.
     void Free(T* object)
     {
         (object)->~T();
         AllocatorFree(allocator_, object);
     }
-    
+
 private:
     /// Prevent copy construction.
     Allocator(const Allocator<T>& rhs);
     /// Prevent assignment.
-    Allocator<T>& operator = (const Allocator<T>& rhs);
-    
+    Allocator<T>& operator =(const Allocator<T>& rhs);
+
     /// Allocator block.
     AllocatorBlock* allocator_;
 };

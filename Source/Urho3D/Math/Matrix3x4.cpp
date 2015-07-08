@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Math/Matrix3x4.h"
 
 #include <cstdio>
@@ -53,11 +55,11 @@ void Matrix3x4::Decompose(Vector3& translation, Quaternion& rotation, Vector3& s
     translation.x_ = m03_;
     translation.y_ = m13_;
     translation.z_ = m23_;
-    
+
     scale.x_ = sqrtf(m00_ * m00_ + m10_ * m10_ + m20_ * m20_);
     scale.y_ = sqrtf(m01_ * m01_ + m11_ * m11_ + m21_ * m21_);
     scale.z_ = sqrtf(m02_ * m02_ + m12_ * m12_ + m22_ * m22_);
-    
+
     Vector3 invScale(1.0f / scale.x_, 1.0f / scale.y_, 1.0f / scale.z_);
     rotation = Quaternion(ToMatrix3().Scaled(invScale));
 }
@@ -65,15 +67,15 @@ void Matrix3x4::Decompose(Vector3& translation, Quaternion& rotation, Vector3& s
 Matrix3x4 Matrix3x4::Inverse() const
 {
     float det = m00_ * m11_ * m22_ +
-        m10_ * m21_ * m02_ +
-        m20_ * m01_ * m12_ -
-        m20_ * m11_ * m02_ -
-        m10_ * m01_ * m22_ -
-        m00_ * m21_ * m12_;
-    
+                m10_ * m21_ * m02_ +
+                m20_ * m01_ * m12_ -
+                m20_ * m11_ * m02_ -
+                m10_ * m01_ * m22_ -
+                m00_ * m21_ * m12_;
+
     float invDet = 1.0f / det;
     Matrix3x4 ret;
-    
+
     ret.m00_ = (m11_ * m22_ - m21_ * m12_) * invDet;
     ret.m01_ = -(m01_ * m22_ - m21_ * m02_) * invDet;
     ret.m02_ = (m01_ * m12_ - m11_ * m02_) * invDet;
@@ -86,7 +88,7 @@ Matrix3x4 Matrix3x4::Inverse() const
     ret.m21_ = -(m00_ * m21_ - m20_ * m01_) * invDet;
     ret.m22_ = (m00_ * m11_ - m10_ * m01_) * invDet;
     ret.m23_ = -(m03_ * ret.m20_ + m13_ * ret.m21_ + m23_ * ret.m22_);
-    
+
     return ret;
 }
 

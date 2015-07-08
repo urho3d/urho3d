@@ -23,9 +23,9 @@
 #pragma once
 
 #include "../../Container/ArrayPtr.h"
-#include "../../Math/Color.h"
 #include "../../Graphics/GPUObject.h"
 #include "../../Graphics/GraphicsDefs.h"
+#include "../../Math/Color.h"
 #include "../../Resource/Resource.h"
 
 namespace Urho3D
@@ -44,7 +44,7 @@ public:
     Texture(Context* context);
     /// Destruct.
     virtual ~Texture();
-    
+
     /// Set number of requested mip levels. Needs to be called before setting size.
     void SetNumLevels(unsigned levels);
     /// Set filtering mode.
@@ -61,31 +61,43 @@ public:
     void SetBackupTexture(Texture* texture);
     /// Set mip levels to skip on a quality setting when loading. Ensures higher quality levels do not skip more.
     void SetMipsToSkip(int quality, int mips);
-    
+
     /// Return texture format.
     unsigned GetFormat() const { return format_; }
+
     /// Return whether the texture format is compressed.
     bool IsCompressed() const;
+
     /// Return number of mip levels.
     unsigned GetLevels() const { return levels_; }
+
     /// Return width.
     int GetWidth() const { return width_; }
+
     /// Return height.
     int GetHeight() const { return height_; }
+
     /// Return height.
     int GetDepth() const { return depth_; }
+
     /// Return filtering mode.
     TextureFilterMode GetFilterMode() const { return filterMode_; }
+
     /// Return addressing mode by texture coordinate.
     TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressMode_[coord]; }
+
     /// Return whether shadow compare is enabled.
     bool GetShadowCompare() const { return shadowCompare_; }
+
     /// Return border color.
     const Color& GetBorderColor() const { return borderColor_; }
+
     /// Return whether is using sRGB sampling and writing.
     bool GetSRGB() const { return sRGB_; }
+
     /// Return backup texture.
     Texture* GetBackupTexture() const { return backupTexture_; }
+
     /// Return mip levels to skip on a quality setting when loading.
     int GetMipsToSkip(int quality) const;
     /// Return mip level width, or 0 if level does not exist.
@@ -94,8 +106,10 @@ public:
     int GetLevelHeight(unsigned level) const;
     /// Return mip level depth, or 0 if level does not exist.
     int GetLevelDepth(unsigned level) const;
+
     /// Return texture usage type.
     TextureUsage GetUsage() const { return usage_; }
+
     /// Return data size in bytes for a rectangular region.
     unsigned GetDataSize(int width, int height) const;
     /// Return data size in bytes for a volume region.
@@ -104,6 +118,7 @@ public:
     unsigned GetRowDataSize(int width) const;
     /// Return number of image components required to receive pixel data from GetData(), or 0 for compressed images.
     unsigned GetComponents() const;
+
     /// Return whether the parameters are dirty.
     bool GetParametersDirty() const { return parametersDirty_ || !sampler_; }
 
@@ -115,11 +130,13 @@ public:
     void SetParametersDirty();
     /// Create sampler state object after parameters have been changed. Called by Graphics when assigning the texture.
     void UpdateParameters();
+
     /// Return shader resource view.
     void* GetShaderResourceView() const { return shaderResourceView_; }
+
     /// Return sampler state object.
     void* GetSampler() const { return sampler_; }
-    
+
     /// Check maximum allowed mip levels for a specific texture size.
     static unsigned CheckMaxLevels(int width, int height, unsigned requestedLevels);
     /// Check maximum allowed mip levels for a specific 3D texture size.
@@ -134,7 +151,7 @@ public:
 protected:
     /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references.
     void CheckTextureBudget(StringHash type);
-    
+
     /// Shader resource view.
     void* shaderResourceView_;
     /// Sampler state object.

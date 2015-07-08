@@ -20,9 +20,9 @@
 // THE SOFTWARE.
 //
 
-#include "../Input/Controls.h"
+#include "../Precompiled.h"
 
-#include "../DebugNew.h"
+#include "../Input/Controls.h"
 
 namespace Urho3D
 {

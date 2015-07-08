@@ -20,12 +20,14 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/IndexBuffer.h"
+#include "../Graphics/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../Math/Ray.h"
-#include "../Graphics/VertexBuffer.h"
 
 #include "../DebugNew.h"
 
@@ -108,7 +110,7 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     if (indexBuffer_ && indexStart + indexCount > indexBuffer_->GetIndexCount())
     {
         LOGERROR("Illegal draw range " + String(indexStart) + " to " + String(indexStart + indexCount - 1) + ", index buffer has " +
-            String(indexBuffer_->GetIndexCount()) + " indices");
+                 String(indexBuffer_->GetIndexCount()) + " indices");
         return false;
     }
 
@@ -134,7 +136,8 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     return true;
 }
 
-bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, bool checkIllegal)
+bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
+    bool checkIllegal)
 {
     if (indexBuffer_)
     {
@@ -142,7 +145,7 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
         if (checkIllegal && indexStart + indexCount > indexBuffer_->GetIndexCount())
         {
             LOGERROR("Illegal draw range " + String(indexStart) + " to " + String(indexStart + indexCount - 1) +
-                ", index buffer has " + String(indexBuffer_->GetIndexCount()) + " indices");
+                     ", index buffer has " + String(indexBuffer_->GetIndexCount()) + " indices");
             return false;
         }
     }
@@ -361,8 +364,9 @@ float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outU
                 uvOffset = VertexBuffer::GetElementOffset(elementMask, ELEMENT_TEXCOORD1);
         }
 
-        return indexData ? ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_, outNormal, outUV, uvOffset) :
-            ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_, outNormal, outUV, uvOffset);
+        return indexData ? ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_, outNormal, outUV,
+            uvOffset) :
+               ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_, outNormal, outUV, uvOffset);
     }
 
     return M_INFINITY;
@@ -379,7 +383,7 @@ bool Geometry::IsInside(const Ray& ray) const
     GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
 
     return vertexData ? (indexData ? ray.InsideGeometry(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_) :
-        ray.InsideGeometry(vertexData, vertexSize, vertexStart_, vertexCount_)) : false;
+                         ray.InsideGeometry(vertexData, vertexSize, vertexStart_, vertexCount_)) : false;
 }
 
 void Geometry::GetPositionBufferIndex()

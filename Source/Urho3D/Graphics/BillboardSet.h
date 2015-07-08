@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "../Math/Color.h"
 #include "../Graphics/Drawable.h"
+#include "../IO/VectorBuffer.h"
+#include "../Math/Color.h"
 #include "../Math/Matrix3x4.h"
 #include "../Math/Rect.h"
-#include "../IO/VectorBuffer.h"
 
 namespace Urho3D
 {
@@ -96,20 +96,28 @@ public:
 
     /// Return material.
     Material* GetMaterial() const;
+
     /// Return number of billboards.
     unsigned GetNumBillboards() const { return billboards_.Size(); }
+
     /// Return all billboards.
     PODVector<Billboard>& GetBillboards() { return billboards_; }
+
     /// Return billboard by index.
     Billboard* GetBillboard(unsigned index);
+
     /// Return whether billboards are relative to the scene node.
     bool IsRelative() const { return relative_; }
+
     /// Return whether scene node scale affects billboards' size.
     bool IsScaled() const { return scaled_; }
+
     /// Return whether billboards are sorted.
     bool IsSorted() const { return sorted_; }
+
     /// Return how the billboards rotate in relation to the camera.
     FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
+
     /// Return animation LOD bias.
     float GetAnimationLodBias() const { return animationLodBias_; }
 

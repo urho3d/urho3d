@@ -20,9 +20,11 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
-#include "../UI/BorderImage.h"
 #include "../Input/InputEvents.h"
+#include "../UI/BorderImage.h"
 #include "../UI/ScrollBar.h"
 #include "../UI/ScrollView.h"
 #include "../UI/Slider.h"
@@ -127,7 +129,7 @@ void ScrollView::Update(float timeStep)
     {
         Vector<UIElement*> dragElements = GetSubsystem<UI>()->GetDragElements();
 
-        for (unsigned i = 0; i< dragElements.Size(); i++)
+        for (unsigned i = 0; i < dragElements.Size(); i++)
         {
             UIElement* dragElement = dragElements[i];
             int dragButtons = dragElement->GetDragButtonCombo();
@@ -148,7 +150,8 @@ void ScrollView::Update(float timeStep)
                 dragParent = dragParent->GetParent();
             }
 
-            if (!dragElementIsChild || dragElement == horizontalScrollBar_->GetSlider() || dragElement == verticalScrollBar_->GetSlider())
+            if (!dragElementIsChild || dragElement == horizontalScrollBar_->GetSlider() ||
+                dragElement == verticalScrollBar_->GetSlider())
             {
                 touchScrollSpeed_ = Vector2::ZERO;
                 touchScrollSpeedMax_ = Vector2::ZERO;
@@ -254,6 +257,8 @@ void ScrollView::OnKey(int key, int buttons, int qualifiers)
         if (verticalScrollBar_->IsVisible())
             verticalScrollBar_->ChangeValue(pageStep_);
         break;
+
+    default: break;
     }
 }
 
@@ -262,7 +267,7 @@ void ScrollView::OnResize()
     UpdatePanelSize();
     UpdateViewSize();
 
-    // If scrollbar autovisibility is enabled, check whether scrollbars should be visible.
+    // If scrollbar auto visibility is enabled, check whether scrollbars should be visible.
     // This may force another update of the panel size
     if (scrollBarsAutoVisible_)
     {
@@ -475,8 +480,8 @@ void ScrollView::UpdateView(const IntVector2& position)
 {
     IntVector2 oldPosition = viewPosition_;
     IntRect panelBorder = scrollPanel_->GetClipBorder();
-    IntVector2 panelSize(scrollPanel_->GetWidth() - panelBorder.left_ - panelBorder.right_, scrollPanel_->GetHeight() -
-        panelBorder.top_ - panelBorder.bottom_);
+    IntVector2 panelSize(scrollPanel_->GetWidth() - panelBorder.left_ - panelBorder.right_,
+        scrollPanel_->GetHeight() - panelBorder.top_ - panelBorder.bottom_);
 
     viewPosition_.x_ = Clamp(position.x_, 0, viewSize_.x_ - panelSize.x_);
     viewPosition_.y_ = Clamp(position.y_, 0, viewSize_.y_ - panelSize.y_);
@@ -583,12 +588,12 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
 
         barScrolling_ = false;
         scrollTouchDown_ = false;
-        if (Abs(touchScrollSpeedMax_.x_) > scrollSnapEpsilon_ )
+        if (Abs(touchScrollSpeedMax_.x_) > scrollSnapEpsilon_)
             touchScrollSpeed_.x_ = touchScrollSpeedMax_.x_;
         else
             touchScrollSpeed_.x_ = 0;
 
-        if (Abs(touchScrollSpeedMax_.y_) > scrollSnapEpsilon_ )
+        if (Abs(touchScrollSpeedMax_.y_) > scrollSnapEpsilon_)
             touchScrollSpeed_.y_ = touchScrollSpeedMax_.y_;
         else
             touchScrollSpeed_.y_ = 0;

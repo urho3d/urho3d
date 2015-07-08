@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "../Math/Frustum.h"
-#include "../Scene/Component.h"
 #include "../Graphics/GraphicsDefs.h"
+#include "../Math/Frustum.h"
 #include "../Math/Ray.h"
+#include "../Scene/Component.h"
 
 namespace Urho3D
 {
@@ -97,28 +97,40 @@ public:
 
     /// Return far clip distance.
     float GetFarClip() const { return farClip_; }
+
     /// Return near clip distance.
     float GetNearClip() const;
+
     /// Return vertical field of view in degrees.
     float GetFov() const { return fov_; }
+
     /// Return orthographic mode size.
     float GetOrthoSize() const { return orthoSize_; }
+
     /// Return aspect ratio.
     float GetAspectRatio() const { return aspectRatio_; }
+
     /// Return zoom.
     float GetZoom() const { return zoom_; }
+
     /// Return LOD bias.
     float GetLodBias() const { return lodBias_; }
+
     /// Return view mask.
     unsigned GetViewMask() const { return viewMask_; }
+
     /// Return view override flags.
     unsigned GetViewOverrideFlags() const { return viewOverrideFlags_; }
+
     /// Return fill mode.
     FillMode GetFillMode() const { return fillMode_; }
+
     /// Return orthographic flag.
     bool IsOrthographic() const { return orthographic_; }
+
     /// Return auto aspect ratio flag.
     bool GetAutoAspectRatio() const { return autoAspectRatio_; }
+
     /// Return frustum in world space.
     const Frustum& GetFrustum() const;
     /// Return API-specific projection matrix.
@@ -143,20 +155,28 @@ public:
     Vector2 WorldToScreenPoint(const Vector3& worldPos) const;
     // Convert normalized screen coordinates (0.0 - 1.0) and depth to a world space point.
     Vector3 ScreenToWorldPoint(const Vector3& screenPos) const;
+
     /// Return projection offset.
     const Vector2& GetProjectionOffset() const { return projectionOffset_; }
+
     /// Return whether is using reflection.
     bool GetUseReflection() const { return useReflection_; }
+
     /// Return the reflection plane.
     const Plane& GetReflectionPlane() const { return reflectionPlane_; }
+
     /// Return whether is using a custom clipping plane.
     bool GetUseClipping() const { return useClipping_; }
+
     /// Return the custom clipping plane.
     const Plane& GetClipPlane() const { return clipPlane_; }
+
     /// Return vertical flipping mode.
     bool GetFlipVertical() const { return flipVertical_; }
+
     /// Return whether to reverse culling; affected by vertical flipping and reflection.
     bool GetReverseCulling() const { return flipVertical_ ^ useReflection_; }
+
     /// Return distance to position. In orthographic mode uses only Z coordinate.
     float GetDistance(const Vector3& worldPos) const;
     /// Return squared distance to position. In orthographic mode uses only Z coordinate.

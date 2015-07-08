@@ -20,9 +20,9 @@
 // THE SOFTWARE.
 //
 
-#include "../Container/RefCounted.h"
+#include "../Precompiled.h"
 
-#include <cassert>
+#include "../Container/RefCounted.h"
 
 #include "../DebugNew.h"
 
@@ -41,13 +41,13 @@ RefCounted::~RefCounted()
     assert(refCount_);
     assert(refCount_->refs_ == 0);
     assert(refCount_->weakRefs_ > 0);
-    
+
     // Mark object as expired, release the self weak ref and delete the refcount if no other weak refs exist
     refCount_->refs_ = -1;
     (refCount_->weakRefs_)--;
     if (!refCount_->weakRefs_)
         delete refCount_;
-    
+
     refCount_ = 0;
 }
 

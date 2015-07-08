@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../LuaScript/LuaFunction.h"
 #include "../LuaScript/LuaScriptEventInvoker.h"
 #include "../LuaScript/LuaScriptInstance.h"
@@ -29,13 +31,13 @@
 namespace Urho3D
 {
 
-LuaScriptEventInvoker::LuaScriptEventInvoker(Context* context) : 
+LuaScriptEventInvoker::LuaScriptEventInvoker(Context* context) :
     Object(context)
 {
 }
 
-LuaScriptEventInvoker::LuaScriptEventInvoker(LuaScriptInstance* instance) : 
-    Object(instance->GetContext()), 
+LuaScriptEventInvoker::LuaScriptEventInvoker(LuaScriptInstance* instance) :
+    Object(instance->GetContext()),
     instance_(instance)
 {
 }

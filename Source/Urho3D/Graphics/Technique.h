@@ -46,7 +46,7 @@ public:
     Pass(const String& passName);
     /// Destruct.
     ~Pass();
-    
+
     /// Set blend mode.
     void SetBlendMode(BlendMode mode);
     /// Set depth compare mode.
@@ -71,38 +71,52 @@ public:
     void ReleaseShaders();
     /// Mark shaders loaded this frame.
     void MarkShadersLoaded(unsigned frameNumber);
-    
+
     /// Return pass name.
     const String& GetName() const { return name_; }
+
     /// Return pass index. This is used for optimal render-time pass queries that avoid map lookups.
     unsigned GetIndex() const { return index_; }
+
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
+
     /// Return depth compare mode.
     CompareMode GetDepthTestMode() const { return depthTestMode_; }
+
     /// Return pass lighting mode.
     PassLightingMode GetLightingMode() const { return lightingMode_; }
+
     /// Return last shaders loaded frame number.
     unsigned GetShadersLoadedFrameNumber() const { return shadersLoadedFrameNumber_; }
+
     /// Return depth write mode.
     bool GetDepthWrite() const { return depthWrite_; }
+
     /// Return alpha masking hint.
     bool GetAlphaMask() const { return alphaMask_; }
+
     /// Return whether requires desktop level hardware.
     bool IsDesktop() const { return isDesktop_; }
+
     /// Return vertex shader name.
     const String& GetVertexShader() const { return vertexShaderName_; }
+
     /// Return pixel shader name.
     const String& GetPixelShader() const { return pixelShaderName_; }
+
     /// Return vertex shader defines.
     const String& GetVertexShaderDefines() const { return vertexShaderDefines_; }
+
     /// Return pixel shader defines.
     const String& GetPixelShaderDefines() const { return pixelShaderDefines_; }
+
     /// Return vertex shaders.
     Vector<SharedPtr<ShaderVariation> >& GetVertexShaders() { return vertexShaders_; }
+
     /// Return pixel shaders.
     Vector<SharedPtr<ShaderVariation> >& GetPixelShaders() { return pixelShaders_; }
-    
+
 private:
     /// Pass index.
     unsigned index_;
@@ -140,9 +154,9 @@ private:
 class URHO3D_API Technique : public Resource
 {
     OBJECT(Technique);
-    
+
     friend class Renderer;
-    
+
 public:
     /// Construct.
     Technique(Context* context);
@@ -150,10 +164,10 @@ public:
     ~Technique();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
-    
+
     /// Set whether requires desktop level hardware.
     void SetIsDesktop(bool enable);
     /// Create a new pass.
@@ -162,20 +176,25 @@ public:
     void RemovePass(const String& passName);
     /// Reset shader pointers in all passes.
     void ReleaseShaders();
-    
+
     /// Return whether requires desktop level hardware.
     bool IsDesktop() const { return isDesktop_; }
+
     /// Return whether technique is supported by the current hardware.
     bool IsSupported() const { return !isDesktop_ || desktopSupport_; }
+
     /// Return whether has a pass.
     bool HasPass(unsigned passIndex) const { return passIndex < passes_.Size() && passes_[passIndex].Get() != 0; }
+
     /// Return whether has a pass by name. This overload should not be called in time-critical rendering loops; use a pre-acquired pass index instead.
     bool HasPass(const String& passName) const;
+
     /// Return a pass, or null if not found.
     Pass* GetPass(unsigned passIndex) const { return passIndex < passes_.Size() ? passes_[passIndex].Get() : 0; }
+
     /// Return a pass by name, or null if not found. This overload should not be called in time-critical rendering loops; use a pre-acquired pass index instead.
     Pass* GetPass(const String& passName) const;
-    
+
     /// Return a pass that is supported for rendering, or null if not found.
     Pass* GetSupportedPass(unsigned passIndex) const
     {
@@ -185,7 +204,7 @@ public:
 
     /// Return a supported pass by name. This overload should not be called in time-critical rendering loops; use a pre-acquired pass index instead.
     Pass* GetSupportedPass(const String& passName) const;
-    
+
     /// Return number of passes.
     unsigned GetNumPasses() const;
     /// Return all pass names.

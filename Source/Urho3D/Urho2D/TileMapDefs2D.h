@@ -41,7 +41,7 @@ enum Orientation2D
     O_STAGGERED
 };
 
-/// Tile map infomation.
+/// Tile map information.
 struct URHO3D_API TileMapInfo2D
 {
     /// Orientation.
@@ -125,6 +125,7 @@ public:
 
     /// Return gid.
     int GetGid() const { return gid_; }
+
     /// Return sprite.
     Sprite2D* GetSprite() const;
     /// Return has property.
@@ -151,20 +152,27 @@ public:
 
     /// Return type.
     TileMapObjectType2D GetObjectType() const { return objectType_; }
+
     /// Return name.
     const String& GetName() const { return name_; }
+
     /// Return type.
     const String& GetType() const { return type_; }
+
     /// Return position.
     const Vector2& GetPosition() const { return position_; }
+
     /// Return size (for rectangle and ellipse).
     const Vector2& GetSize() const { return size_; }
+
     /// Return number of points (use for script).
     unsigned GetNumPoints() const;
     /// Return point at index (use for script).
     const Vector2& GetPoint(unsigned index) const;
+
     /// Return tile Gid.
     int GetTileGid() const { return gid_; }
+
     /// Return tile sprite.
     Sprite2D* GetTileSprite() const;
     /// Return has property.

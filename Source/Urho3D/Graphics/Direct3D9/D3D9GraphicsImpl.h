@@ -34,22 +34,26 @@ namespace Urho3D
 class URHO3D_API GraphicsImpl
 {
     friend class Graphics;
-    
+
 public:
     /// Construct.
     GraphicsImpl();
-    
+
     /// Return Direct3D device.
     IDirect3DDevice9* GetDevice() const { return device_; }
+
     /// Return device capabilities.
     const D3DCAPS9& GetDeviceCaps() const { return deviceCaps_; }
+
     /// Return window.
     SDL_Window* GetWindow() const { return window_; }
+
     /// Return adapter identifier.
     const D3DADAPTER_IDENTIFIER9& GetAdapterIdentifier() const { return adapterIdentifier_; }
+
     /// Return whether a texture format and usage is supported.
     bool CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCETYPE type);
-    
+
 private:
     /// SDL window.
     SDL_Window* window_;

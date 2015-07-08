@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Scene/Component.h"
 #include "../Core/Context.h"
 #include "../Navigation/CrowdAgent.h"
@@ -418,7 +420,7 @@ bool DetourCrowdManager::SetAgentTarget(CrowdAgent* agent, Vector3 target)
     return !dtStatusFailed(status) && crowd_->requestMoveTarget(agent->GetAgentCrowdId(), polyRef, nearestPos);
 }
 
-bool DetourCrowdManager::SetAgentTarget(CrowdAgent* agent, Vector3 target, unsigned int& targetRef)
+bool DetourCrowdManager::SetAgentTarget(CrowdAgent* agent, Vector3 target, unsigned& targetRef)
 {
     if (crowd_ == 0)
         return false;

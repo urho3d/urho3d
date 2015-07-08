@@ -37,16 +37,16 @@ class FileSystem;
 class URHO3D_API FileWatcher : public Object, public Thread
 {
     OBJECT(FileWatcher);
-    
+
 public:
     /// Construct.
     FileWatcher(Context* context);
     /// Destruct.
     virtual ~FileWatcher();
-    
+
     /// Directory watching loop.
     virtual void ThreadFunction();
-    
+
     /// Start watching a directory. Return true if successful.
     bool StartWatching(const String& pathName, bool watchSubDirs);
     /// Stop watching the directory.
@@ -57,12 +57,13 @@ public:
     void AddChange(const String& fileName);
     /// Return a file change (true if was found, false if not.)
     bool GetNextChange(String& dest);
-    
+
     /// Return the path being watched, or empty if not watching.
     const String& GetPath() const { return path_; }
+
     /// Return the delay in seconds for notifying file changes.
-    float GetDelay() const { return delay_;}
-    
+    float GetDelay() const { return delay_; }
+
 private:
     /// Filesystem.
     SharedPtr<FileSystem> fileSystem_;

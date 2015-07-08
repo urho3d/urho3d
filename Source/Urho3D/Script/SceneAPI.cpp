@@ -20,14 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "../Script/APITemplates.h"
-#include "../Scene/Animatable.h"
+#include "../Precompiled.h"
+
 #include "../Graphics/DebugRenderer.h"
-#include "../Scene/ObjectAnimation.h"
 #include "../IO/PackageFile.h"
+#include "../Script/APITemplates.h"
+#include "../Scene/ObjectAnimation.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SmoothedTransform.h"
-#include "../Container/Sort.h"
 #include "../Scene/SplinePath.h"
 #include "../Scene/ValueAnimation.h"
 
@@ -264,7 +264,7 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterEnumValue("LoadMode", "LOAD_RESOURCES_ONLY", LOAD_RESOURCES_ONLY);
     engine->RegisterEnumValue("LoadMode", "LOAD_SCENE", LOAD_SCENE);
     engine->RegisterEnumValue("LoadMode", "LOAD_SCENE_AND_RESOURCES", LOAD_SCENE_AND_RESOURCES);
-    
+
     engine->RegisterGlobalProperty("const uint FIRST_REPLICATED_ID", (void*)&FIRST_REPLICATED_ID);
     engine->RegisterGlobalProperty("const uint LAST_REPLICATED_ID", (void*)&LAST_REPLICATED_ID);
     engine->RegisterGlobalProperty("const uint FIRST_LOCAL_ID", (void*)&FIRST_LOCAL_ID);

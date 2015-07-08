@@ -20,12 +20,14 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../IO/Deserializer.h"
 #include "../IO/Log.h"
 #include "../IO/Serializer.h"
-#include "../Scene/UnknownComponent.h"
 #include "../Resource/XMLElement.h"
+#include "../Scene/UnknownComponent.h"
 
 #include "../DebugNew.h"
 
@@ -39,41 +41,41 @@ static String GenerateNameFromType(StringHash typeHash)
 {
     if (unknownTypeToName.Contains(typeHash))
         return unknownTypeToName[typeHash];
-    
+
     String test;
-    
+
     // Begin brute-force search
     unsigned numLetters = letters.Length();
     unsigned combinations = numLetters;
     bool found = false;
-    
+
     for (unsigned i = 1; i < 6; ++i)
     {
         test.Resize(i);
-        
+
         for (unsigned j = 0; j < combinations; ++j)
         {
             unsigned current = j;
-            
+
             for (unsigned k = 0; k < i; ++k)
             {
                 test[k] = letters[current % numLetters];
                 current /= numLetters;
             }
-            
+
             if (StringHash(test) == typeHash)
             {
                 found = true;
                 break;
             }
         }
-        
+
         if (found)
             break;
-        
+
         combinations *= numLetters;
     }
-    
+
     unknownTypeToName[typeHash] = test;
     return test;
 }
@@ -94,7 +96,7 @@ bool UnknownComponent::Load(Deserializer& source, bool setInstanceDefault)
     useXML_ = false;
     xmlAttributes_.Clear();
     xmlAttributeInfos_.Clear();
-    
+
     // Assume we are reading from a component data buffer, and the type has already been read
     unsigned dataSize = source.GetSize() - source.GetPosition();
     binaryAttributes_.Resize(dataSize);
@@ -107,7 +109,7 @@ bool UnknownComponent::LoadXML(const XMLElement& source, bool setInstanceDefault
     xmlAttributes_.Clear();
     xmlAttributeInfos_.Clear();
     binaryAttributes_.Clear();
-    
+
     XMLElement attrElem = source.GetChild("attribute");
     while (attrElem)
     {
@@ -115,7 +117,7 @@ bool UnknownComponent::LoadXML(const XMLElement& source, bool setInstanceDefault
         attr.mode_ = AM_FILE;
         attr.name_ = attrElem.GetAttribute("name");
         attr.type_ = VAR_STRING;
-        
+
         if (!attr.name_.Empty())
         {
             String attrValue = attrElem.GetAttribute("value");
@@ -123,14 +125,14 @@ bool UnknownComponent::LoadXML(const XMLElement& source, bool setInstanceDefault
             xmlAttributeInfos_.Push(attr);
             xmlAttributes_.Push(attrValue);
         }
-        
+
         attrElem = attrElem.GetNext("attribute");
     }
-    
+
     // Fix up pointers to the attributes after all have been read
     for (unsigned i = 0; i < xmlAttributeInfos_.Size(); ++i)
         xmlAttributeInfos_[i].ptr_ = &xmlAttributes_[i];
-    
+
     return true;
 }
 
@@ -138,13 +140,13 @@ bool UnknownComponent::Save(Serializer& dest) const
 {
     if (useXML_)
         LOGWARNING("UnknownComponent loaded in XML mode, attributes will be empty for binary save");
-    
+
     // Write type and ID
     if (!dest.WriteStringHash(GetType()))
         return false;
     if (!dest.WriteUInt(id_))
         return false;
-    
+
     if (!binaryAttributes_.Size())
         return true;
     else
@@ -158,23 +160,23 @@ bool UnknownComponent::SaveXML(XMLElement& dest) const
         LOGERROR("Could not save " + GetTypeName() + ", null destination element");
         return false;
     }
-    
+
     if (!useXML_)
         LOGWARNING("UnknownComponent loaded in binary mode, attributes will be empty for XML save");
-    
+
     // Write type and ID
     if (!dest.SetString("type", GetTypeName()))
         return false;
     if (!dest.SetInt("id", id_))
         return false;
-    
+
     for (unsigned i = 0; i < xmlAttributeInfos_.Size(); ++i)
     {
         XMLElement attrElem = dest.CreateChild("attribute");
         attrElem.SetAttribute("name", xmlAttributeInfos_[i].name_);
         attrElem.SetAttribute("value", xmlAttributes_[i]);
     }
-    
+
     return true;
 }
 

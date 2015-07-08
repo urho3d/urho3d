@@ -46,7 +46,7 @@ class Variant;
 class URHO3D_API ScriptFile : public Resource, public ScriptEventListener
 {
     OBJECT(ScriptFile);
-    
+
 public:
     /// Construct.
     ScriptFile(Context* context);
@@ -54,7 +54,7 @@ public:
     virtual ~ScriptFile();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
     /// Finish resource loading. Always called from the main thread. Return true if successful.
@@ -74,32 +74,38 @@ public:
     virtual void RemoveEventHandlers();
     /// Remove all scripted event handlers, except those listed.
     virtual void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions);
-    
+
     /// Query for a function by declaration and execute if found.
     bool Execute(const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
     /// Execute a function.
     bool Execute(asIScriptFunction* function, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
     /// Query for an object method by declaration and execute if found.
-    bool Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
+    bool Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector,
+        bool unprepare = true);
     /// Execute an object method.
-    bool Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
+    bool Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters = Variant::emptyVariantVector,
+        bool unprepare = true);
     /// Add a delay-executed function call, optionally repeating.
-    void DelayedExecute(float delay, bool repeat, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector);
+    void DelayedExecute
+        (float delay, bool repeat, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector);
     /// Clear pending delay-executed function calls. If empty declaration given, clears all.
     void ClearDelayedExecute(const String& declaration = String::EMPTY);
     /// Create a script object. Optionally search for the first class in the module that implements the specified interface.
     asIScriptObject* CreateObject(const String& className, bool useInterface = false);
     /// Save the script bytecode. Return true if successful.
     bool SaveByteCode(Serializer& dest);
-    
+
     /// Return script module.
     asIScriptModule* GetScriptModule() const { return scriptModule_; }
+
     /// Return a function by declaration. Will be stored to a search cache so that further searches should be faster.
     asIScriptFunction* GetFunction(const String& declaration);
     /// Return an object method by declaration.
     asIScriptFunction* GetMethod(asIScriptObject* object, const String& declaration);
+
     /// Return whether script compiled successfully.
     bool IsCompiled() const { return compiled_; }
+
     /// Clean up an event invoker object when its associated script object no longer exists
     void CleanupEventInvoker(asIScriptObject* object);
 
@@ -114,7 +120,7 @@ private:
     void ReleaseModule();
     /// Handle application update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    
+
     /// Script subsystem.
     SharedPtr<Script> script_;
     /// Script module.
@@ -154,6 +160,7 @@ public:
 
     /// Get the asIScriptObject to call the method on, can be null.
     asIScriptObject* GetObject() const { return object_; }
+
     /// Returns whether the ScriptObject is still alive. Will return true if there is no reference and object.
     bool IsObjectAlive() const;
     /// Handle an event in script.

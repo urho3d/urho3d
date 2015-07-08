@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "../IO/File.h"
 #include "../Container/HashSet.h"
 #include "../Container/List.h"
 #include "../Core/Mutex.h"
+#include "../IO/File.h"
 #include "../Resource/Resource.h"
 
 namespace Urho3D
@@ -47,7 +47,7 @@ struct ResourceGroup
         memoryUse_(0)
     {
     }
-    
+
     /// Memory budget.
     unsigned memoryBudget_;
     /// Current memory use.
@@ -72,7 +72,7 @@ public:
         Object(context)
     {
     }
-    
+
     /// Process the resource request and optionally modify the resource name string. Empty name string means the resource is not found or not allowed.
     virtual void Route(String& name, ResourceRequest requestType) = 0;
 };
@@ -81,13 +81,13 @@ public:
 class URHO3D_API ResourceCache : public Object
 {
     OBJECT(ResourceCache);
-    
+
 public:
     /// Construct.
     ResourceCache(Context* context);
     /// Destruct. Free all resources.
     virtual ~ResourceCache();
-    
+
     /// Add a resource load directory. Optional priority parameter which will control search order.
     bool AddResourceDir(const String& pathName, unsigned priority = PRIORITY_LAST);
     /// Add a package file for loading resources from. Optional priority parameter which will control search order.
@@ -115,20 +115,23 @@ public:
     /// Reload a resource. Return true on success. The resource will not be removed from the cache in case of failure.
     bool ReloadResource(Resource* resource);
     /// Reload a resource based on filename. Causes also reload of dependent resources if necessary.
-    void ReloadResourceWithDependencies(const String &fileName);
+    void ReloadResourceWithDependencies(const String& fileName);
     /// Set memory budget for a specific resource type, default 0 is unlimited.
     void SetMemoryBudget(StringHash type, unsigned budget);
     /// Enable or disable automatic reloading of resources as files are modified. Default false.
     void SetAutoReloadResources(bool enable);
     /// Enable or disable returning resources that failed to load. Default false. This may be useful in editing to not lose resource ref attributes.
     void SetReturnFailedResources(bool enable);
+
     /// Define whether when getting resources should check package files or directories first. True for packages, false for directories.
     void SetSearchPackagesFirst(bool value) { searchPackagesFirst_ = value; }
+
     /// Set how many milliseconds maximum per frame to spend on finishing background loaded resources.
     void SetFinishBackgroundResourcesMs(int ms) { finishBackgroundResourcesMs_ = Max(ms, 1); }
+
     /// Set the resource router object. By default there is none, so the routing process is skipped.
     void SetResourceRouter(ResourceRouter* router) { resourceRouter_ = router; }
-    
+
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails. Can be called from outside the main thread.
     SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
     /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called. Can be called only from the main thread.
@@ -143,12 +146,16 @@ public:
     void GetResources(PODVector<Resource*>& result, StringHash type) const;
     /// Return an already loaded resource of specific type & name, or null if not found. Will not load if does not exist.
     Resource* GetExistingResource(StringHash type, const String& name);
+
     /// Return all loaded resources.
     const HashMap<StringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
+
     /// Return added resource load directories.
     const Vector<String>& GetResourceDirs() const { return resourceDirs_; }
+
     /// Return added package files.
     const Vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
+
     /// Template version of returning a resource by name.
     template <class T> T* GetResource(const String& name, bool sendEventOnFailure = true);
     /// Template version of returning an existing resource by name.
@@ -169,14 +176,19 @@ public:
     unsigned GetTotalMemoryUse() const;
     /// Return full absolute file name of resource if possible.
     String GetResourceFileName(const String& name) const;
+
     /// Return whether automatic resource reloading is enabled.
     bool GetAutoReloadResources() const { return autoReloadResources_; }
+
     /// Return whether resources that failed to load are returned.
     bool GetReturnFailedResources() const { return returnFailedResources_; }
+
     /// Return whether when getting resources should check package files or directories first.
     bool GetSearchPackagesFirst() const { return searchPackagesFirst_; }
+
     /// Return how many milliseconds maximum to spend on finishing background loaded resources.
     int GetFinishBackgroundResourcesMs() const { return finishBackgroundResourcesMs_; }
+
     /// Return the resource router.
     ResourceRouter* GetResourceRouter() const { return resourceRouter_; }
 
@@ -190,7 +202,7 @@ public:
     void StoreResourceDependency(Resource* resource, const String& dependency);
     /// Reset dependencies for a resource.
     void ResetDependencies(Resource* resource);
-    
+
 private:
     /// Find a resource.
     const SharedPtr<Resource>& FindResource(StringHash type, StringHash nameHash);
@@ -206,7 +218,7 @@ private:
     File* SearchResourceDirs(const String& nameIn);
     /// Search resource packages for file.
     File* SearchPackages(const String& nameIn);
-    
+
     /// Mutex for thread-safe access to the resource directories, resource packages and resource dependencies.
     mutable Mutex resourceMutex_;
     /// Resources by type.
@@ -262,7 +274,7 @@ template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
     PODVector<Resource*>& resources = reinterpret_cast<PODVector<Resource*>&>(result);
     StringHash type = T::GetTypeStatic();
     GetResources(resources, type);
-    
+
     // Perform conversion of the returned pointers
     for (unsigned i = 0; i < result.Size(); ++i)
     {

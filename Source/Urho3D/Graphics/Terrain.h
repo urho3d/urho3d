@@ -90,14 +90,19 @@ public:
 
     /// Return patch quads per side.
     int GetPatchSize() const { return patchSize_; }
+
     /// Return vertex and height spacing.
     const Vector3& GetSpacing() const { return spacing_; }
+
     /// Return heightmap size in vertices.
     const IntVector2& GetNumVertices() const { return numVertices_; }
+
     /// Return heightmap size in patches.
     const IntVector2& GetNumPatches() const { return numPatches_; }
+
     /// Return whether smoothing is in use.
     bool GetSmoothing() const { return smoothing_; }
+
     /// Return heightmap image.
     Image* GetHeightMap() const;
     /// Return material.
@@ -112,30 +117,43 @@ public:
     Vector3 GetNormal(const Vector3& worldPosition) const;
     /// Convert world position to heightmap pixel position. Note that the internal height data representation is reversed vertically, but in the heightmap image north is at the top.
     IntVector2 WorldToHeightMap(const Vector3& worldPosition) const;
+
     /// Return raw height data.
     SharedArrayPtr<float> GetHeightData() const { return heightData_; }
+
     /// Return draw distance.
     float GetDrawDistance() const { return drawDistance_; }
+
     /// Return shadow draw distance.
     float GetShadowDistance() const { return shadowDistance_; }
+
     /// Return LOD bias.
     float GetLodBias() const { return lodBias_; }
+
     /// Return view mask.
     unsigned GetViewMask() const { return viewMask_; }
+
     /// Return light mask.
     unsigned GetLightMask() const { return lightMask_; }
+
     /// Return shadow mask.
     unsigned GetShadowMask() const { return shadowMask_; }
+
     /// Return zone mask.
     unsigned GetZoneMask() const { return zoneMask_; }
+
     /// Return maximum number of per-pixel lights.
     unsigned GetMaxLights() const { return maxLights_; }
+
     /// Return visible flag.
     bool IsVisible() const { return visible_; }
+
     /// Return shadowcaster flag.
     bool GetCastShadows() const { return castShadows_; }
+
     /// Return occluder flag.
     bool IsOccluder() const { return occluder_; }
+
     /// Return occludee flag.
     bool IsOccludee() const { return occludee_; }
 

@@ -20,13 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include "../Script/APITemplates.h"
-#include "../Math/Color.h"
+#include "../Precompiled.h"
+
 #include "../Math/Frustum.h"
 #include "../Math/Polyhedron.h"
 #include "../Math/Ray.h"
-
-#include <AngelScript/angelscript.h>
+#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {
@@ -37,7 +36,7 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterEnumValue("Intersection", "OUTSIDE", OUTSIDE);
     engine->RegisterEnumValue("Intersection", "INTERSECTS", INTERSECTS);
     engine->RegisterEnumValue("Intersection", "INSIDE", INSIDE);
-    
+
     engine->RegisterGlobalProperty("const float M_INFINITY", (void*)&M_INFINITY);
     engine->RegisterGlobalProperty("const float M_EPSILON", (void*)&M_EPSILON);
     engine->RegisterGlobalProperty("const float M_LARGE_EPSILON", (void*)&M_LARGE_EPSILON);
@@ -51,7 +50,7 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int M_MAX_INT", (void*)&M_MAX_INT);
     engine->RegisterGlobalProperty("const uint M_MIN_UNSIGNED", (void*)&M_MIN_UNSIGNED);
     engine->RegisterGlobalProperty("const uint M_MAX_UNSIGNED", (void*)&M_MAX_UNSIGNED);
-    
+
     engine->RegisterGlobalFunction("bool Equals(float, float)", asFUNCTION(Equals), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool IsNaN(float)", asFUNCTION(IsNaN), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Sin(float)", asFUNCTION(Sin), asCALL_CDECL);
@@ -683,7 +682,7 @@ static void RegisterMatrix3x4(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Matrix3x4", "float m21", offsetof(Matrix3x4, m21_));
     engine->RegisterObjectProperty("Matrix3x4", "float m22", offsetof(Matrix3x4, m22_));
     engine->RegisterObjectProperty("Matrix3x4", "float m23", offsetof(Matrix3x4, m23_));
-    
+
     engine->RegisterObjectMethod("Matrix4", "Matrix4 opMul(const Matrix3x4&) const", asMETHODPR(Matrix4, operator *, (const Matrix3x4&) const, Matrix4), asCALL_THISCALL);
 }
 
@@ -948,7 +947,7 @@ void PolyhedronAddFaceArray(CScriptArray* arr, Polyhedron* ptr)
 {
     PODVector<Vector3> face;
     unsigned numVertices = arr->GetSize();
-    
+
     face.Resize(numVertices);
     for (unsigned i = 0; i < numVertices; ++i)
         face[i] = *((Vector3*)arr->At(i));
@@ -981,7 +980,7 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectType("Frustum", sizeof(Frustum), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectType("Polyhedron", sizeof(Polyhedron), asOBJ_VALUE | asOBJ_APP_CLASS_CDK);
     engine->RegisterObjectType("Sphere", sizeof(Sphere), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
-    
+
     engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructBoundingBox), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f(const BoundingBox&in)", asFUNCTION(ConstructBoundingBoxCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f(const Rect&in)", asFUNCTION(ConstructBoundingBoxRect), asCALL_CDECL_OBJLAST);
@@ -1021,7 +1020,7 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectProperty("BoundingBox", "Vector3 min", offsetof(BoundingBox, min_));
     engine->RegisterObjectProperty("BoundingBox", "Vector3 max", offsetof(BoundingBox, max_));
     engine->RegisterObjectProperty("BoundingBox", "bool defined", offsetof(BoundingBox, defined_));
-    
+
     engine->RegisterObjectBehaviour("Frustum", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructFrustum), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Frustum", asBEHAVE_CONSTRUCT, "void f(const Frustum&in)", asFUNCTION(ConstructFrustumCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Frustum", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructFrustum), asCALL_CDECL_OBJLAST);
@@ -1039,7 +1038,7 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Frustum", "Frustum Transformed(const Matrix3&in) const", asMETHODPR(Frustum, Transformed, (const Matrix3&) const, Frustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("Frustum", "Frustum Transformed(const Matrix3x4&in) const", asMETHODPR(Frustum, Transformed, (const Matrix3x4&) const, Frustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("Frustum", "Vector3 get_vertices(uint) const", asFUNCTION(FrustumGetVertex), asCALL_CDECL_OBJLAST);
-    
+
     engine->RegisterObjectBehaviour("Polyhedron", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructPolyhedron), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Polyhedron", asBEHAVE_CONSTRUCT, "void f(const Polyhedron&in)", asFUNCTION(ConstructPolyhedronCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Polyhedron", asBEHAVE_CONSTRUCT, "void f(const BoundingBox&in)", asFUNCTION(ConstructPolyhedronBoundingBox), asCALL_CDECL_OBJLAST);
@@ -1060,7 +1059,7 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Polyhedron", "Polyhedron Transformed(const Matrix3x4&in) const", asMETHODPR(Polyhedron, Transformed, (const Matrix3x4&) const, Polyhedron), asCALL_THISCALL);
     engine->RegisterObjectMethod("Polyhedron", "uint get_numFaces() const", asFUNCTION(PolyhedronGetNumFaces), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Polyhedron", "Array<Vector3>@ get_face(uint) const", asFUNCTION(PolyhedronGetFace), asCALL_CDECL_OBJLAST);
-    
+
     engine->RegisterObjectBehaviour("Sphere", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructSphere), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Sphere", asBEHAVE_CONSTRUCT, "void f(const Sphere&in)", asFUNCTION(ConstructSphereCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Sphere", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, float)", asFUNCTION(ConstructSphereInit), asCALL_CDECL_OBJLAST);

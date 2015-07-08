@@ -20,15 +20,15 @@
 // THE SOFTWARE.
 //
 
-#include "../../IO/FileSystem.h"
-#include "../../IO/Log.h"
+#include "../../Precompiled.h"
+
+#include "../../Core/Profiler.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/Material.h"
-#include "../../Core/Profiler.h"
+#include "../../IO/FileSystem.h"
+#include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
-#include "../../Core/StringUtils.h"
-#include "../../Graphics/Texture.h"
 #include "../../Resource/XMLFile.h"
 
 #include "../../DebugNew.h"
@@ -67,7 +67,7 @@ static const D3D11_FILTER d3dFilterMode[] =
     D3D11_FILTER_COMPARISON_ANISOTROPIC
 };
 
-static const D3D11_TEXTURE_ADDRESS_MODE d3dAddressMode[] = 
+static const D3D11_TEXTURE_ADDRESS_MODE d3dAddressMode[] =
 {
     D3D11_TEXTURE_ADDRESS_WRAP,
     D3D11_TEXTURE_ADDRESS_MIRROR,
@@ -95,7 +95,7 @@ Texture::Texture(Context* context) :
     for (int i = 0; i < MAX_COORDS; ++i)
         addressMode_[i] = ADDRESS_WRAP;
     for (int i = 0; i < MAX_TEXTURE_QUALITY_LEVELS; ++i)
-        mipsToSkip_[i] = MAX_TEXTURE_QUALITY_LEVELS - 1 - i;
+        mipsToSkip_[i] = (unsigned)(MAX_TEXTURE_QUALITY_LEVELS - 1 - i);
 }
 
 Texture::~Texture()
@@ -138,7 +138,7 @@ void Texture::SetSRGB(bool enable)
 {
     if (graphics_)
         enable &= graphics_->GetSRGBSupport();
-    
+
     // Note: on D3D11 sRGB only affects the texture before creation
     sRGB_ = enable;
 }
@@ -152,8 +152,8 @@ void Texture::SetMipsToSkip(int quality, int mips)
 {
     if (quality >= QUALITY_LOW && quality < MAX_TEXTURE_QUALITY_LEVELS)
     {
-        mipsToSkip_[quality] = mips;
-        
+        mipsToSkip_[quality] = (unsigned)mips;
+
         // Make sure a higher quality level does not actually skip more mips
         for (int i = 1; i < MAX_TEXTURE_QUALITY_LEVELS; ++i)
         {
@@ -213,13 +213,13 @@ unsigned Texture::GetRowDataSize(int width) const
     {
     case DXGI_FORMAT_R8_UNORM:
     case DXGI_FORMAT_A8_UNORM:
-        return width;
-    
+        return (unsigned)width;
+
     case DXGI_FORMAT_R8G8_UNORM:
     case DXGI_FORMAT_R16_UNORM:
     case DXGI_FORMAT_R16_FLOAT:
     case DXGI_FORMAT_R16_TYPELESS:
-        return width * 2;
+        return (unsigned)(width * 2);
 
     case DXGI_FORMAT_R8G8B8A8_UNORM:
     case DXGI_FORMAT_R16G16_UNORM:
@@ -227,22 +227,22 @@ unsigned Texture::GetRowDataSize(int width) const
     case DXGI_FORMAT_R32_FLOAT:
     case DXGI_FORMAT_R24G8_TYPELESS:
     case DXGI_FORMAT_R32_TYPELESS:
-        return width * 4;
-        
+        return (unsigned)(width * 4);
+
     case DXGI_FORMAT_R16G16B16A16_UNORM:
     case DXGI_FORMAT_R16G16B16A16_FLOAT:
-        return width * 8;
-        
+        return (unsigned)(width * 8);
+
     case DXGI_FORMAT_R32G32B32A32_FLOAT:
-        return width * 16;
-        
+        return (unsigned)(width * 16);
+
     case DXGI_FORMAT_BC1_UNORM:
-        return ((width + 3) >> 2) * 8;
-        
+        return (unsigned)(((width + 3) >> 2) * 8);
+
     case DXGI_FORMAT_BC2_UNORM:
     case DXGI_FORMAT_BC3_UNORM:
-        return ((width + 3) >> 2) * 16;
-        
+        return (unsigned)(((width + 3) >> 2) * 16);
+
     default:
         return 0;
     }
@@ -260,7 +260,7 @@ void Texture::SetParameters(XMLFile* file)
 {
     if (!file)
         return;
-    
+
     XMLElement rootElem = file->GetRoot();
     SetParameters(rootElem);
 }
@@ -271,7 +271,7 @@ void Texture::SetParameters(const XMLElement& element)
     while (paramElem)
     {
         String name = paramElem.GetName();
-        
+
         if (name == "address")
         {
             String coord = paramElem.GetAttributeLower("coord");
@@ -282,19 +282,19 @@ void Texture::SetParameters(const XMLElement& element)
                 SetAddressMode(coordIndex, (TextureAddressMode)GetStringListIndex(mode.CString(), addressModeNames, ADDRESS_WRAP));
             }
         }
-        
+
         if (name == "border")
             SetBorderColor(paramElem.GetColor("color"));
-        
+
         if (name == "filter")
         {
             String mode = paramElem.GetAttributeLower("mode");
             SetFilterMode((TextureFilterMode)GetStringListIndex(mode.CString(), filterModeNames, FILTER_DEFAULT));
         }
-        
+
         if (name == "mipmap")
             SetNumLevels(paramElem.GetBool("enable") ? 0 : 1);
-        
+
         if (name == "quality")
         {
             if (paramElem.HasAttribute("low"))
@@ -309,7 +309,7 @@ void Texture::SetParameters(const XMLElement& element)
 
         if (name == "srgb")
             SetSRGB(paramElem.GetBool("enable"));
-        
+
         paramElem = paramElem.GetNext();
     }
 }
@@ -433,7 +433,7 @@ void Texture::CheckTextureBudget(StringHash type)
     unsigned textureUse = cache->GetMemoryUse(type);
     if (!textureBudget)
         return;
-    
+
     // If textures are over the budget, they likely can not be freed directly as materials still refer to them.
     // Therefore free unused materials first
     if (textureUse > textureBudget)

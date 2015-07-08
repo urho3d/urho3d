@@ -51,9 +51,9 @@ public:
         pooled_(false)
     {
     }
-    
+
     /// Work function. Called with the work item and thread index (0 = main thread) as parameters.
-    void (*workFunction_)(const WorkItem*, unsigned);
+    void (* workFunction_)(const WorkItem*, unsigned);
     /// Data start pointer.
     void* start_;
     /// Data end pointer.
@@ -75,15 +75,15 @@ private:
 class URHO3D_API WorkQueue : public Object
 {
     OBJECT(WorkQueue);
-    
+
     friend class WorkerThread;
-    
+
 public:
     /// Construct.
     WorkQueue(Context* context);
     /// Destruct.
     ~WorkQueue();
-    
+
     /// Create worker threads. Can only be called once.
     void CreateThreads(unsigned numThreads);
     /// Get pointer to an usable WorkItem from the item pool. Allocate one if no more free items.
@@ -100,20 +100,25 @@ public:
     void Resume();
     /// Finish all queued work which has at least the specified priority. Main thread will also execute priority work. Pause worker threads if no more work remains.
     void Complete(unsigned priority);
+
     /// Set the pool telerance before it starts deleting pool items.
     void SetTolerance(int tolerance) { tolerance_ = tolerance; }
+
     /// Set how many milliseconds maximum per frame to spend on low-priority work, when there are no worker threads.
     void SetNonThreadedWorkMs(int ms) { maxNonThreadedWorkMs_ = Max(ms, 1); }
-    
+
     /// Return number of worker threads.
     unsigned GetNumThreads() const { return threads_.Size(); }
+
     /// Return whether all work with at least the specified priority is finished.
     bool IsCompleted(unsigned priority) const;
+
     /// Return the pool tolerance.
     int GetTolerance() const { return tolerance_; }
+
     /// Return how many milliseconds maximum to spend on non-threaded low-priority work.
     int GetNonThreadedWorkMs() const { return maxNonThreadedWorkMs_; }
-    
+
 private:
     /// Process work items until shut down. Called by the worker threads.
     void ProcessItems(unsigned threadIndex);
@@ -125,7 +130,7 @@ private:
     void ReturnToPool(SharedPtr<WorkItem>& item);
     /// Handle frame start event. Purge completed work from the main thread queue, and perform work if no threads at all.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
-    
+
     /// Worker threads.
     Vector<SharedPtr<WorkerThread> > threads_;
     /// Work item pool for reuse to cut down on allocation. The bool is a flag for item pooling and whether it is available or not.

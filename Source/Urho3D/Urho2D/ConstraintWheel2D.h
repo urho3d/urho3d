@@ -34,7 +34,7 @@ class URHO3D_API ConstraintWheel2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintWheel2D(Context* scontext);
+    ConstraintWheel2D(Context* context);
     /// Destruct.
     virtual ~ConstraintWheel2D();
     /// Register object factory.
@@ -57,19 +57,25 @@ public:
 
     /// Return anchor.
     const Vector2& GetAnchor() const { return anchor_; }
+
     /// Return axis.
     const Vector2& GetAxis() const { return axis_; }
+
     /// Return enable motor.
     bool GetEnableMotor() const { return jointDef_.enableMotor; }
+
     /// Return maxMotor torque.
     float GetMaxMotorTorque() const { return jointDef_.maxMotorTorque; }
+
     /// Return motor speed.
     float GetMotorSpeed() const { return jointDef_.motorSpeed; }
+
     /// Return frequency Hz.
     float GetFrequencyHz() const { return jointDef_.frequencyHz; }
+
     /// Return damping ratio.
     float GetDampingRatio() const { return jointDef_.dampingRatio; }
-   
+
 private:
     /// Return joint def.
     virtual b2JointDef* GetJointDef();

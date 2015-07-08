@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "../../Graphics/GPUObject.h"
-#include "../../Graphics/GraphicsDefs.h"
 #include "../../Container/HashMap.h"
 #include "../../Container/RefCounted.h"
+#include "../../Graphics/GPUObject.h"
+#include "../../Graphics/GraphicsDefs.h"
 
 namespace Urho3D
 {
@@ -59,30 +59,34 @@ public:
     ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader);
     /// Destruct.
     ~ShaderProgram();
-    
+
     /// Mark the GPU resource destroyed on context destruction.
     virtual void OnDeviceLost();
     /// Release shader program.
     virtual void Release();
-    
+
     /// Link the shaders and examine the uniforms and samplers used. Return true if successful.
     bool Link();
-    
+
     /// Return the vertex shader.
     ShaderVariation* GetVertexShader() const;
     /// Return the pixel shader.
     ShaderVariation* GetPixelShader() const;
     /// Return whether uses a shader parameter.
     bool HasParameter(StringHash param) const;
+
     /// Return whether uses a texture unit.
     bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
+
     /// Return the info for a shader parameter, or null if does not exist.
     const ShaderParameter* GetParameter(StringHash param) const;
+
     /// Return linker output.
     const String& GetLinkerOutput() const { return linkerOutput_; }
+
     /// Return all constant buffers.
     const SharedPtr<ConstantBuffer>* GetConstantBuffers() const { return &constantBuffers_[0]; }
-    
+
     /// Check whether a shader parameter group needs update. Does not actually check whether parameters exist in the shaders.
     bool NeedParameterUpdate(ShaderParameterGroup group, const void* source);
     /// Clear a parameter source. Affects only the current shader program if appropriate.

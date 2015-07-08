@@ -20,12 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include "../Script/APITemplates.h"
+#include "../Precompiled.h"
+
 #include "../IO/Compression.h"
 #include "../IO/FileSystem.h"
-#include "../IO/Log.h"
 #include "../IO/PackageFile.h"
-#include "../Core/ProcessUtils.h"
+#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {
@@ -181,10 +181,10 @@ static void ConstructVectorBufferCopy(const VectorBuffer& buffer, VectorBuffer* 
 
 static void ConstructVectorBufferFromStream(Deserializer* src, unsigned size, VectorBuffer* ptr)
 {
-    if (!src)
-        size = 0;
-
-    new(ptr) VectorBuffer(*src, size);
+    if (src)
+        new(ptr) VectorBuffer(*src, size);
+    else
+        new(ptr) VectorBuffer();
 }
 
 static void DestructVectorBuffer(VectorBuffer* ptr)
@@ -320,7 +320,7 @@ static void RegisterSerialization(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const VectorBuffer&in)", asFUNCTION(VariantAssignBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "VectorBuffer GetBuffer() const", asFUNCTION(VariantGetBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const VectorBuffer&in) const", asFUNCTION(VariantEqualsBuffer), asCALL_CDECL_OBJLAST);
-    
+
     // Register VectorBuffer compression functions
     engine->RegisterGlobalFunction("VectorBuffer CompressVectorBuffer(VectorBuffer&in)", asFUNCTION(CompressVectorBuffer), asCALL_CDECL);
     engine->RegisterGlobalFunction("VectorBuffer DecompressVectorBuffer(VectorBuffer&in)", asFUNCTION(DecompressVectorBuffer), asCALL_CDECL);

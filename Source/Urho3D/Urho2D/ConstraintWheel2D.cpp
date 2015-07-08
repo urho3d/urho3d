@@ -20,8 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "../Urho2D/ConstraintWheel2D.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Urho2D/ConstraintWheel2D.h"
 #include "../Urho2D/PhysicsUtils2D.h"
 #include "../Urho2D/RigidBody2D.h"
 
@@ -44,7 +46,7 @@ ConstraintWheel2D::~ConstraintWheel2D()
 void ConstraintWheel2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ConstraintWheel2D>();
-    
+
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Axis", GetAxis, SetAxis, Vector2, Vector2::RIGHT, AM_DEFAULT);
@@ -55,6 +57,7 @@ void ConstraintWheel2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Damping Ratio", GetDampingRatio, SetDampingRatio, float, 0.7f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Constraint2D);
 }
+
 void ConstraintWheel2D::SetAnchor(const Vector2& anchor)
 {
     if (anchor == anchor_)
@@ -142,7 +145,7 @@ b2JointDef* ConstraintWheel2D::GetJointDef()
     b2Body* bodyB = otherBody_->GetBody();
     if (!bodyA || !bodyB)
         return 0;
-    
+
     jointDef_.Initialize(bodyA, bodyB, ToB2Vec2(anchor_), ToB2Vec2(axis_));
 
     return &jointDef_;

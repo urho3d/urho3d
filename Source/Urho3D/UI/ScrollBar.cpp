@@ -20,9 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "../UI/Button.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Input/InputEvents.h"
+#include "../UI/Button.h"
 #include "../UI/ScrollBar.h"
 #include "../UI/Slider.h"
 #include "../UI/UIEvents.h"
@@ -242,10 +244,8 @@ bool ScrollBar::FilterImplicitAttributes(XMLElement& dest) const
         return false;
 
     childElem = childElem.GetNext("element");
-    if (!FilterButtonImplicitAttributes(childElem, "SB_Forward"))
-        return false;
+    return FilterButtonImplicitAttributes(childElem, "SB_Forward");
 
-    return true;
 }
 
 bool ScrollBar::FilterButtonImplicitAttributes(XMLElement& dest, const String& name) const
@@ -305,16 +305,20 @@ void ScrollBar::HandleSliderPaged(StringHash eventType, VariantMap& eventData)
     if (eventData[P_PRESSED].GetBool())
     {
         if (eventData[P_OFFSET].GetInt() < 0)
-            backButton_->OnClickBegin(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, MOUSEB_LEFT, 0, 0);
+            backButton_->OnClickBegin(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO),
+                MOUSEB_LEFT, MOUSEB_LEFT, 0, 0);
         else
-            forwardButton_->OnClickBegin(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, MOUSEB_LEFT, 0, 0);
+            forwardButton_->OnClickBegin(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO),
+                MOUSEB_LEFT, MOUSEB_LEFT, 0, 0);
     }
     else
     {
         if (eventData[P_OFFSET].GetInt() < 0)
-            backButton_->OnClickEnd(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, 0, 0, 0, backButton_);
+            backButton_->OnClickEnd(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO),
+                MOUSEB_LEFT, 0, 0, 0, backButton_);
         else
-            forwardButton_->OnClickEnd(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, 0, 0, 0, forwardButton_);
+            forwardButton_->OnClickEnd(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO),
+                MOUSEB_LEFT, 0, 0, 0, forwardButton_);
     }
 }
 

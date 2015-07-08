@@ -23,8 +23,8 @@
 #pragma once
 
 #include "../Math/Color.h"
-#include "../Graphics/GraphicsDefs.h"
 #include "../Math/Rect.h"
+#include "../Graphics/GraphicsDefs.h"
 
 namespace Urho3D
 {
@@ -45,7 +45,7 @@ public:
     UIBatch();
     /// Construct.
     UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData);
-    
+
     /// Set new color for the batch. Overrides gradient.
     void SetColor(const Color& color, bool overrideAlpha = false);
     /// Restore UI element's default color.
@@ -53,14 +53,15 @@ public:
     /// Add a quad.
     void AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0);
     /// Add a quad using a transform matrix.
-    void AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0);
+    void AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth = 0,
+        int texHeight = 0);
     /// Add a quad with tiled texture.
     void AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled);
     /// Merge with another batch.
     bool Merge(const UIBatch& batch);
     /// Return an interpolated color for the UI element.
     unsigned GetInterpolatedColor(int x, int y);
-    
+
     /// Add or merge a batch.
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);
 

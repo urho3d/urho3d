@@ -20,21 +20,22 @@
 // THE SOFTWARE.
 //
 
+#include "../Precompiled.h"
+
+#include "../Core/Context.h"
+#include "../Core/Profiler.h"
 #include "../Graphics/Batch.h"
 #include "../Graphics/BillboardSet.h"
 #include "../Graphics/Camera.h"
-#include "../Core/Context.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/IndexBuffer.h"
 #include "../Graphics/Material.h"
-#include "../IO/MemoryBuffer.h"
-#include "../Scene/Node.h"
 #include "../Graphics/OctreeQuery.h"
-#include "../Core/Profiler.h"
-#include "../Resource/ResourceCache.h"
-#include "../Container/Sort.h"
 #include "../Graphics/VertexBuffer.h"
+#include "../IO/MemoryBuffer.h"
+#include "../Resource/ResourceCache.h"
+#include "../Scene/Node.h"
 
 #include "../DebugNew.h"
 
@@ -96,7 +97,8 @@ void BillboardSet::RegisterObject(Context* context)
     context->RegisterFactory<BillboardSet>(GEOMETRY_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
+        AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Relative Position", IsRelative, SetRelative, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Relative Scale", IsScaled, SetScaled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
@@ -107,8 +109,10 @@ void BillboardSet::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Drawable);
-    MIXED_ACCESSOR_ATTRIBUTE("Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector,
+        AM_FILE);
+    ACCESSOR_ATTRIBUTE("Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>,
+        Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
 void BillboardSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
@@ -162,13 +166,13 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
         sortThisFrame_ = false;
         sortFrameNumber_ = frame.frameNumber_;
     }
-    
+
     Vector3 worldPos = node_->GetWorldPosition();
     Vector3 offset = (worldPos - frame.camera_->GetNode()->GetWorldPosition());
     // Sort if position relative to camera has changed
     if (offset != previousOffset_ & sorted_)
         sortThisFrame_ = true;
-    
+
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
 
     // Calculate scaled distance for animation LOD
@@ -195,7 +199,7 @@ void BillboardSet::UpdateGeometry(const FrameInfo& frame)
 
     if (bufferDirty_ || sortThisFrame_ || vertexBuffer_->IsDataLost())
         UpdateVertexBuffer(frame);
-    
+
     // If using camera facing, re-update the rotation for the current view now
     if (faceCameraMode_ != FC_NONE)
     {
@@ -432,8 +436,12 @@ void BillboardSet::UpdateBufferSize()
     unsigned vertexIndex = 0;
     while (numBillboards--)
     {
-        dest[0] = vertexIndex; dest[1] = vertexIndex + 1; dest[2] = vertexIndex + 2;
-        dest[3] = vertexIndex + 2; dest[4] = vertexIndex + 3; dest[5] = vertexIndex;
+        dest[0] = (unsigned short)vertexIndex;
+        dest[1] = (unsigned short)(vertexIndex + 1);
+        dest[2] = (unsigned short)(vertexIndex + 2);
+        dest[3] = (unsigned short)(vertexIndex + 2);
+        dest[4] = (unsigned short)(vertexIndex + 3);
+        dest[5] = (unsigned short)vertexIndex;
 
         dest += 6;
         vertexIndex += 4;
@@ -501,7 +509,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         // Store the "last sorted position" now
         previousOffset_ = (worldPos - frame.camera_->GetNode()->GetWorldPosition());
     }
-    
+
     float* dest = (float*)vertexBuffer_->Lock(0, enabledBillboards * 4, true);
     if (!dest)
         return;
@@ -519,27 +527,39 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         rotationMatrix[1][0] = -rotationMatrix[0][1];
         rotationMatrix[1][1] = rotationMatrix[0][0];
 
-        dest[0] = billboard.position_.x_; dest[1] = billboard.position_.y_; dest[2] = billboard.position_.z_;
+        dest[0] = billboard.position_.x_;
+        dest[1] = billboard.position_.y_;
+        dest[2] = billboard.position_.z_;
         ((unsigned&)dest[3]) = color;
-        dest[4] = billboard.uv_.min_.x_; dest[5] = billboard.uv_.min_.y_;
+        dest[4] = billboard.uv_.min_.x_;
+        dest[5] = billboard.uv_.min_.y_;
         dest[6] = -size.x_ * rotationMatrix[0][0] + size.y_ * rotationMatrix[0][1];
         dest[7] = -size.x_ * rotationMatrix[1][0] + size.y_ * rotationMatrix[1][1];
 
-        dest[8] = billboard.position_.x_; dest[9] = billboard.position_.y_; dest[10] = billboard.position_.z_;
+        dest[8] = billboard.position_.x_;
+        dest[9] = billboard.position_.y_;
+        dest[10] = billboard.position_.z_;
         ((unsigned&)dest[11]) = color;
-        dest[12] = billboard.uv_.max_.x_; dest[13] = billboard.uv_.min_.y_;
+        dest[12] = billboard.uv_.max_.x_;
+        dest[13] = billboard.uv_.min_.y_;
         dest[14] = size.x_ * rotationMatrix[0][0] + size.y_ * rotationMatrix[0][1];
         dest[15] = size.x_ * rotationMatrix[1][0] + size.y_ * rotationMatrix[1][1];
 
-        dest[16] = billboard.position_.x_; dest[17] = billboard.position_.y_; dest[18] = billboard.position_.z_;
+        dest[16] = billboard.position_.x_;
+        dest[17] = billboard.position_.y_;
+        dest[18] = billboard.position_.z_;
         ((unsigned&)dest[19]) = color;
-        dest[20] = billboard.uv_.max_.x_; dest[21] = billboard.uv_.max_.y_;
+        dest[20] = billboard.uv_.max_.x_;
+        dest[21] = billboard.uv_.max_.y_;
         dest[22] = size.x_ * rotationMatrix[0][0] - size.y_ * rotationMatrix[0][1];
         dest[23] = size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
 
-        dest[24] = billboard.position_.x_; dest[25] = billboard.position_.y_; dest[26] = billboard.position_.z_;
+        dest[24] = billboard.position_.x_;
+        dest[25] = billboard.position_.y_;
+        dest[26] = billboard.position_.z_;
         ((unsigned&)dest[27]) = color;
-        dest[28] = billboard.uv_.min_.x_; dest[29] = billboard.uv_.max_.y_;
+        dest[28] = billboard.uv_.min_.x_;
+        dest[29] = billboard.uv_.max_.y_;
         dest[30] = -size.x_ * rotationMatrix[0][0] - size.y_ * rotationMatrix[0][1];
         dest[31] = -size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
 

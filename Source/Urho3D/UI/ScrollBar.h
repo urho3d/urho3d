@@ -34,7 +34,7 @@ class Slider;
 class URHO3D_API ScrollBar : public UIElement
 {
     OBJECT(ScrollBar);
-    
+
 public:
     /// Construct.
     ScrollBar(Context* context);
@@ -42,14 +42,14 @@ public:
     virtual ~ScrollBar();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
     /// React to resize.
     virtual void OnResize();
     /// React to editable status change.
     virtual void OnSetEditable();
-    
+
     /// Set orientation type.
     void SetOrientation(Orientation orientation);
     /// Set slider range maximum value (minimum value is always 0.)
@@ -66,26 +66,32 @@ public:
     void StepBack();
     /// Scroll forward one step.
     void StepForward();
-    
+
     /// Return scrollbar orientation.
     Orientation GetOrientation() const;
     /// Return slider range.
     float GetRange() const;
     /// Return slider current value.
     float GetValue() const;
+
     /// Return button scroll step.
     float GetScrollStep() const { return scrollStep_; }
+
     /// Return button step factor.
     float GetStepFactor() const { return stepFactor_; }
+
     /// Return scroll step multiplied by factor.
     float GetEffectiveScrollStep() const;
+
     /// Return back button element.
     Button* GetBackButton() const { return backButton_; }
+
     /// Return forward button element.
     Button* GetForwardButton() const { return forwardButton_; }
+
     /// Return slider element.
     Slider* GetSlider() const { return slider_; }
-    
+
 protected:
     /// Filter implicit attributes in serialization process.
     virtual bool FilterImplicitAttributes(XMLElement& dest) const;
@@ -110,7 +116,7 @@ protected:
     IntRect upRect_;
     /// Down button image rect.
     IntRect downRect_;
-    
+
 private:
     /// Handle back button pressed.
     void HandleBackButtonPressed(StringHash eventType, VariantMap& eventData);

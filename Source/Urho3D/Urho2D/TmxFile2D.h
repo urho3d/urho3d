@@ -43,16 +43,22 @@ public:
 
     /// Return tmx file.
     TmxFile2D* GetTmxFile() const;
+
     /// Return type.
     TileMapLayerType2D GetType() const { return type_; }
+
     /// Return name.
     const String& GetName() const { return name_; }
+
     /// Return width.
     int GetWidth() const { return width_; }
+
     /// Return height.
     int GetHeight() const { return height_; }
+
     /// Return is visible.
     bool IsVisible() const { return visible_; }
+
     /// Return has property (use for script).
     bool HasProperty(const String& name) const;
     /// Return property value (use for script).
@@ -105,8 +111,10 @@ public:
 
     /// Load from XML element.
     bool Load(const XMLElement& element, const TileMapInfo2D& info);
+
     /// Return number of objects.
     unsigned GetNumObjects() const { return objects_.Size(); }
+
     /// Return tile map object at index.
     TileMapObject2D* GetObject(unsigned index) const;
 
@@ -123,10 +131,13 @@ public:
 
     /// Load from XML element.
     bool Load(const XMLElement& element, const TileMapInfo2D& info);
+
     /// Return position.
     const Vector2& GetPosition() const { return position_; }
+
     /// Return source.
     const String& GetSource() const { return source_; }
+
     /// Return sprite.
     Sprite2D* GetSprite() const;
 
@@ -159,12 +170,15 @@ public:
 
     /// Return information.
     const TileMapInfo2D& GetInfo() const { return info_; }
+
     /// Return tile sprite by gid, if not exist return 0.
     Sprite2D* GetTileSprite(int gid) const;
     /// Return tile property set by gid, if not exist return 0.
     PropertySet2D* GetTilePropertySet(int gid) const;
+
     /// Return number of layers.
     unsigned GetNumLayers() const { return layers_.Size(); }
+
     /// Return layer at index.
     const TmxLayer2D* GetLayer(unsigned index) const;
 

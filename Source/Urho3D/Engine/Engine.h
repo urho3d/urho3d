@@ -35,13 +35,13 @@ class DebugHud;
 class URHO3D_API Engine : public Object
 {
     OBJECT(Engine);
-    
+
 public:
     /// Construct.
     Engine(Context* context);
     /// Destruct. Free all subsystems.
     virtual ~Engine();
-    
+
     /// Initialize engine using parameters given and show the application window. Return true if successful.
     bool Initialize(const VariantMap& parameters);
     /// Run one frame.
@@ -72,48 +72,58 @@ public:
     void DumpResources(bool dumpFileName = false);
     /// Dump information of all memory allocations to the log. Supported in MSVC debug mode only.
     void DumpMemory();
-    
+
     /// Get timestep of the next frame. Updated by ApplyFrameLimit().
     float GetNextTimeStep() const { return timeStep_; }
+
     /// Return the minimum frames per second.
     int GetMinFps() const { return minFps_; }
+
     /// Return the maximum frames per second.
     int GetMaxFps() const { return maxFps_; }
+
     /// Return the maximum frames per second when the application does not have input focus.
     int GetMaxInactiveFps() const { return maxInactiveFps_; }
+
     /// Return how many frames to average for timestep smoothing.
     int GetTimeStepSmoothing() const { return timeStepSmoothing_; }
+
     /// Return whether to pause update events and audio when minimized.
     bool GetPauseMinimized() const { return pauseMinimized_; }
+
     /// Return whether to exit automatically on exit request.
     bool GetAutoExit() const { return autoExit_; }
+
     /// Return whether engine has been initialized.
     bool IsInitialized() const { return initialized_; }
+
     /// Return whether exit has been requested.
     bool IsExiting() const { return exiting_; }
+
     /// Return whether the engine has been created in headless mode.
     bool IsHeadless() const { return headless_; }
-    
+
     /// Send frame update events.
     void Update();
     /// Render after frame update.
     void Render();
     /// Get the timestep for the next frame and sleep for frame limiting if necessary.
     void ApplyFrameLimit();
-    
+
     /// Parse the engine startup parameters map from command line arguments.
     static VariantMap ParseParameters(const Vector<String>& arguments);
     /// Return whether startup parameters contains a specific parameter.
     static bool HasParameter(const VariantMap& parameters, const String& parameter);
     /// Get an engine startup parameter, with default value if missing.
-    static const Variant& GetParameter(const VariantMap& parameters, const String& parameter, const Variant& defaultValue = Variant::EMPTY);
-    
+    static const Variant
+        & GetParameter(const VariantMap& parameters, const String& parameter, const Variant& defaultValue = Variant::EMPTY);
+
 private:
     /// Handle exit requested event. Auto-exit if enabled.
     void HandleExitRequested(StringHash eventType, VariantMap& eventData);
     /// Actually perform the exit actions.
     void DoExit();
-    
+
     /// Frame update timer.
     HiresTimer frameTimer_;
     /// Previous timesteps for smoothing.
