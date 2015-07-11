@@ -546,6 +546,28 @@ void PostEditAttribute(Serializable@ serializable, uint index)
         if (staticModel !is null)
             staticModel.ApplyMaterialList();
     }
+    
+    // If a CollisionShape changed the shape type to trimesh or convex, and a collision model is not set,
+    // try to get it from a StaticModel in the same node
+    if (serializable.typeName == "CollisionShape" && serializable.attributeInfos[index].name == "Shape Type")
+    {
+        int shapeType = serializable.GetAttribute("Shape Type").GetInt();
+        if ((shapeType == 6 || shapeType == 7) && serializable.GetAttribute("CustomGeometry NodeID").GetInt() == 0 &&
+            serializable.GetAttribute("Model").GetResourceRef().name.Trimmed().length == 0)
+        {
+            Node@ ownerNode = cast<Component>(serializable).node;
+            if (ownerNode !is null)
+            {
+                StaticModel@ staticModel = ownerNode.GetComponent("StaticModel");
+                if (staticModel !is null)
+                {
+                    serializable.SetAttribute("Model", staticModel.GetAttribute("Model"));
+                    serializable.ApplyAttributes();
+                }
+            }
+        }
+    }
+
 }
 
 /// Store the IDs of the actual serializable objects into user-defined variable of the 'attribute editor' (e.g. line-edit, drop-down-list, etc).
