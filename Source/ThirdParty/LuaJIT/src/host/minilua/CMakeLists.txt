@@ -31,11 +31,8 @@ if (NOT MSVC)
     set (LIBS m)
 endif ()
 
-# All tools must be natively built and output to bin/tool subdir to differentiate them from platform-specific binaries in the bin directory
-set_output_directories (${CMAKE_BINARY_DIR}/bin/tool RUNTIME PDB)
-if (DEST_RUNTIME_DIR STREQUAL bin)
-    set (DEST_RUNTIME_DIR bin/tool)
-endif ()
+# All tools must be natively built and output to bin/tool subdir to differentiate them from target platfrom binaries in the bin directory
+set_tool_output_directories ()
 
 # Setup target
 setup_executable (NODEPS)
