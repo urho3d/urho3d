@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
+#include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
@@ -180,6 +181,8 @@ void AnimatedSprite2D::OnSceneSet(Scene* scene)
 
     if (scene)
     {
+        if (scene == node_)
+            LOGWARNING(GetTypeName() + " should not be created to the root scene node");
         if (IsEnabledEffective())
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimatedSprite2D, HandleScenePostUpdate));
     }
