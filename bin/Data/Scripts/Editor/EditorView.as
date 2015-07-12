@@ -340,7 +340,6 @@ float viewFov = 45.0;
 float cameraBaseSpeed = 10;
 float cameraBaseRotationSpeed = 0.2;
 float cameraShiftSpeedMultiplier = 5;
-float newNodeDistance = 20;
 float moveStep = 0.5;
 float rotateStep = 5;
 float scaleStep = 0.1;
@@ -363,6 +362,16 @@ enum MouseOrbitMode
 
 bool toggledMouseLock = false;
 int mouseOrbitMode = ORBIT_RELATIVE;
+
+enum NewNodeMode
+{
+    NEW_NODE_CAMERA_DIST = 0,
+    NEW_NODE_IN_CENTER,
+    NEW_NODE_RAYCAST
+}
+
+float newNodeDistance = 20;
+int newNodeMode = NEW_NODE_CAMERA_DIST;
 
 bool showGrid = true;
 bool grid2DMode = false;
@@ -1638,6 +1647,15 @@ void ViewRaycast(bool mouseClick)
 
 Vector3 GetNewNodePosition()
 {
+    if (newNodeMode == NEW_NODE_IN_CENTER)
+        return Vector3(0, 0, 0);
+    if (newNodeMode == NEW_NODE_RAYCAST)
+    {
+        Ray cameraRay = camera.GetScreenRay(0.5, 0.5);
+        Vector3 position, normal;
+        if (GetSpawnPosition(cameraRay, camera.farClip, position, normal, 0, false))
+            return position;
+    }
     return cameraNode.position + cameraNode.worldRotation * Vector3(0, 0, newNodeDistance);
 }
 
