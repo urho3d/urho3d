@@ -1656,7 +1656,7 @@ Vector3 GetNewNodePosition()
         if (GetSpawnPosition(cameraRay, camera.farClip, position, normal, 0, false))
             return position;
     }
-    return cameraNode.position + cameraNode.worldRotation * Vector3(0, 0, newNodeDistance);
+    return cameraNode.worldPosition + cameraNode.worldRotation * Vector3(0, 0, newNodeDistance);
 }
 
 int GetShadowResolution()

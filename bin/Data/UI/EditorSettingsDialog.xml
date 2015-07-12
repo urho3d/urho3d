@@ -135,7 +135,7 @@
                                             <attribute name="Text" value="In center" />
                                         </element>
                                         <element type="Text" style="FileSelectorFilterText">
-                                            <attribute name="Text" value="Reycast" />
+                                            <attribute name="Text" value="Raycast" />
                                         </element>
                                     </element>
                                 </element>
