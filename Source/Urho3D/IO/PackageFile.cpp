@@ -109,7 +109,7 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
         if (!compressed_ && newEntry.offset_ + newEntry.size_ > totalSize_)
             LOGERROR("File entry " + entryName + " outside package file");
         else
-            entries_[entryName.ToLower()] = newEntry;
+            entries_[entryName] = newEntry;
     }
 
     return true;
@@ -117,16 +117,45 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
 
 bool PackageFile::Exists(const String& fileName) const
 {
-    return entries_.Find(fileName.ToLower()) != entries_.End();
+    bool found = entries_.Find(fileName) != entries_.End();
+
+#ifdef WIN32
+    // On Windows perform a fallback case-insensitive search
+    if (!found)
+    {
+        for (HashMap<String, PackageEntry>::ConstIterator i = entries_.Begin(); i != entries_.End(); ++i)
+        {
+            if (!i->first_.Compare(fileName, false))
+            {
+                found = true;
+                break;
+            }
+        }
+    }
+#endif
+
+    return found;
 }
 
 const PackageEntry* PackageFile::GetEntry(const String& fileName) const
 {
-    HashMap<String, PackageEntry>::ConstIterator i = entries_.Find(fileName.ToLower());
+    HashMap<String, PackageEntry>::ConstIterator i = entries_.Find(fileName);
     if (i != entries_.End())
         return &i->second_;
+    
+#ifdef WIN32
+    // On Windows perform a fallback case-insensitive search
     else
-        return 0;
+    {
+        for (HashMap<String, PackageEntry>::ConstIterator j = entries_.Begin(); j != entries_.End(); ++j)
+        {
+            if (!j->first_.Compare(fileName, false))
+                return &j->second_;
+        }
+    }
+#endif
+
+    return 0;
 }
 
 }

@@ -53,9 +53,9 @@ public:
 
     /// Open the package file. Return true if successful.
     bool Open(const String& fileName, unsigned startOffset = 0);
-    /// Check if a file exists within the package file.
+    /// Check if a file exists within the package file. This will be case-insensitive on Windows and case-sensitive on other platforms.
     bool Exists(const String& fileName) const;
-    /// Return the file entry corresponding to the name, or null if not found.
+    /// Return the file entry corresponding to the name, or null if not found. This will be case-insensitive on Windows and case-sensitive on other platforms.
     const PackageEntry* GetEntry(const String& fileName) const;
 
     /// Return all file entries.
@@ -79,7 +79,7 @@ public:
     /// Return whether the files are compressed.
     bool IsCompressed() const { return compressed_; }
 
-    /// Return list of entry names
+    /// Return list of file names in the package.
     const Vector<String> GetEntryNames() const { return entries_.Keys(); }
 
 private:
