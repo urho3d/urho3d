@@ -26,8 +26,9 @@ void CreateParticleEffectEditor()
     InitParticleEffectBasicAttributes();
     RefreshParticleEffectEditor();
 
-    int height = Min(ui.root.height - 60, 500);
-    particleEffectWindow.SetSize(300, height);
+    int width = Min(ui.root.width - 60, 800);
+    int height = Min(ui.root.height - 60, 600);
+    particleEffectWindow.SetSize(width, height);
     CenterDialog(particleEffectWindow);
 
     HideParticleEffectEditor();
@@ -797,13 +798,13 @@ void InitParticleEffectPreview()
     zone.ambientColor = Color(0.15, 0.15, 0.15);
     zone.fogColor = Color(0, 0, 0);
     zone.fogStart = 10.0;
-    zone.fogEnd = 100.0;
+    zone.fogEnd = 1000.0;
 
     particlePreviewCameraNode = particlePreviewScene.CreateChild("PreviewCamera");
-    particlePreviewCameraNode.position = Vector3(0, 0, -2.5);
+    particlePreviewCameraNode.position = Vector3(0, 0, -5);
     Camera@ camera = particlePreviewCameraNode.CreateComponent("Camera");
     camera.nearClip = 0.1f;
-    camera.farClip = 100.0f;
+    camera.farClip = 1000.0f;
 
     particlePreviewLightNode = particlePreviewScene.CreateChild("particlePreviewLight");
     particlePreviewLightNode.direction = Vector3(0.5, -0.5, 0.5);
@@ -825,10 +826,9 @@ void InitParticleEffectPreview()
     particleEffectEmitter.effect = editParticleEffect;
 
     particleEffectPreview = particleEffectWindow.GetChild("ParticleEffectPreview", true);
-    particleEffectPreview.SetFixedHeight(100);
     particleEffectPreview.SetView(particlePreviewScene, camera);
 
-    SubscribeToEvent(particleEffectPreview, "DragMove", "RotateParticleEffectPreview");
+    SubscribeToEvent(particleEffectPreview, "DragMove", "NavigateParticleEffectPreview");
 }
 
 ParticleEffect@ CreateNewParticleEffect()
@@ -1312,17 +1312,24 @@ void RefreshParticleEffectMaterial()
     SubscribeToEvent(pickButton, "Released", "PickEditParticleEffectMaterial");
 }
 
-void RotateParticleEffectPreview(StringHash eventType, VariantMap& eventData)
+void NavigateParticleEffectPreview(StringHash eventType, VariantMap& eventData)
 {
-    int elemX = eventData["ElementX"].GetInt();
-    int elemY = eventData["ElementY"].GetInt();
+    int dx = eventData["DX"].GetInt();
+    int dy = eventData["DY"].GetInt();
     
     if (particleEffectPreview.height > 0 && particleEffectPreview.width > 0)
     {
-        float yaw = ((particleEffectPreview.height / 2) - elemY) * (90.0 / particleEffectPreview.height);
-        float pitch = ((particleEffectPreview.width / 2) - elemX) * (90.0 / particleEffectPreview.width);
-
-        particleEffectPreviewNode.rotation = particleEffectPreviewNode.rotation.Slerp(Quaternion(yaw, pitch, 0), 0.1);
+        if (!input.keyDown[KEY_LSHIFT])
+        {
+            float yaw = dy * 20 * time.timeStep;
+            float pitch = dx * 20 * time.timeStep;
+            particleEffectPreviewNode.Rotate(Quaternion(yaw, pitch, 0));
+        }
+        else
+        {
+            particleEffectPreviewNode.Translate(Vector3(0, 0, 1) * dx * 1.5 * time.timeStep);
+            particleEffectPreviewNode.Translate(Vector3(0, 0, 1) * dy * 1.5 * time.timeStep);
+        }
         particleEffectPreview.QueueUpdate();
     }
 }
