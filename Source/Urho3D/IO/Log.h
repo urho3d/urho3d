@@ -153,4 +153,5 @@ private:
 #define LOGERRORF(...) ((void)0)
 #define LOGRAWF(...) ((void)0)
 #endif
+
 }
