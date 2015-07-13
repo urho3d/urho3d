@@ -1327,8 +1327,8 @@ void NavigateParticleEffectPreview(StringHash eventType, VariantMap& eventData)
         }
         else
         {
-            particleEffectPreviewNode.Translate(Vector3(0, 0, 1) * dx * 1.5 * time.timeStep);
-            particleEffectPreviewNode.Translate(Vector3(0, 0, 1) * dy * 1.5 * time.timeStep);
+            particleEffectPreviewNode.Translate(Vector3(0, 0, 1) * dx * 1.5 * time.timeStep, TS_WORLD);
+            particleEffectPreviewNode.Translate(Vector3(0, 0, 1) * dy * 1.5 * time.timeStep, TS_WORLD);
         }
         particleEffectPreview.QueueUpdate();
     }
