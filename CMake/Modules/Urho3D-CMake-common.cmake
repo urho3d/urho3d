@@ -100,7 +100,7 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
         set (URHO3D_DEFAULT_LUA_RAW TRUE)
     endif ()
     cmake_dependent_option (URHO3D_LUA_RAW_SCRIPT_LOADER "Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)" ${URHO3D_DEFAULT_LUA_RAW} "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
- 
+
     option (URHO3D_SAMPLES "Build sample applications")
     cmake_dependent_option (URHO3D_TOOLS "Build tools (native and RPI only)" TRUE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     cmake_dependent_option (URHO3D_EXTRAS "Build extras (native and RPI only)" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
@@ -526,6 +526,14 @@ macro (set_output_directories OUTPUT_PATH)
             set (CMAKE_${TYPE}_OUTPUT_DIRECTORY_${CONFIG} ${OUTPUT_PATH})
         endforeach ()
     endforeach ()
+endmacro ()
+
+# Macro for setting runtime output directories for tools
+macro (set_tool_output_directories)
+    set_output_directories (${CMAKE_BINARY_DIR}/bin/tool RUNTIME PDB)
+    if (DEST_RUNTIME_DIR STREQUAL bin)
+        set (DEST_RUNTIME_DIR bin/tool)
+    endif ()
 endmacro ()
 
 # Set common binary output directory for all platforms

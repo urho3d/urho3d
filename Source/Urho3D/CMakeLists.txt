@@ -25,8 +25,18 @@ set (TARGET_NAME Urho3D)
 
 add_definitions (-DURHO3D_IS_BUILDING)
 
+# Windows platform has its own naming convention for library
+set (LIB_NAME ${TARGET_NAME})
 if (WIN32)
     set (CMAKE_DEBUG_POSTFIX _d)
+    if (CMAKE_BUILD_TYPE STREQUAL Debug)
+        set (LIB_NAME ${LIB_NAME}_d)
+    endif ()
+    if (URHO3D_LIB_TYPE STREQUAL SHARED)
+        set (LIB_NAME ${LIB_NAME}.dll)
+        # When building shared library, a copy of the library must be available in the tool directory for the tools to work correctly as there is no RPATH for Windows platform
+        create_symlink (${CMAKE_BINARY_DIR}/bin/${LIB_NAME} ${CMAKE_BINARY_DIR}/bin/tool/${LIB_NAME})
+    endif ()
 endif ()
 
 # Define generated source files
@@ -316,15 +326,6 @@ list (REMOVE_ITEM URHO3D_COMPILE_DEFINITIONS HAVE_STDINT_H GLEW_STATIC GLEW_NO_G
 if (ABSOLUTE_PATH_LIBS)
     string (REPLACE ";" "\" \"" URHO3D_ABS_PATH_LIBS "\"${ABSOLUTE_PATH_LIBS}\"")   # Note: need to always "stringify" a variable in list context for replace to work correctly, besides the list could be empty
     string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" URHO3D_ABS_PATH_LIBS "${URHO3D_ABS_PATH_LIBS}")
-endif ()
-set (LIB_NAME ${TARGET_NAME})
-if (MINGW)
-    if (CMAKE_BUILD_TYPE STREQUAL Debug)
-        set (LIB_NAME ${LIB_NAME}_d)
-    endif ()
-    if (URHO3D_LIB_TYPE STREQUAL SHARED)
-        set (LIB_NAME ${LIB_NAME}.dll)
-    endif ()
 endif ()
 if (MSVC)
     # todo: Add a post build command to adjust the LIB_NAME when in Debug configuration (CMake/VS generator is multi-config)

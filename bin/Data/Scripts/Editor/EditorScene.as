@@ -293,8 +293,7 @@ Node@ CreateNode(CreateMode mode)
         newNode = editNode.CreateChild("", mode);
     else
         newNode = editorScene.CreateChild("", mode);
-    // Set the new node a certain distance from the camera
-    newNode.position = GetNewNodePosition();
+    newNode.worldPosition = GetNewNodePosition();
 
     // Create an undo action for the create
     CreateNodeAction action;

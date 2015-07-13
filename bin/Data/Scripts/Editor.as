@@ -178,6 +178,7 @@ void LoadConfig()
 
     if (!objectElem.isNull)
     {
+        if (objectElem.HasAttribute("newnodemode")) newNodeMode = objectElem.GetInt("newnodemode");
         if (objectElem.HasAttribute("newnodedistance")) newNodeDistance = objectElem.GetFloat("newnodedistance");
         if (objectElem.HasAttribute("movestep")) moveStep = objectElem.GetFloat("movestep");
         if (objectElem.HasAttribute("rotatestep")) rotateStep = objectElem.GetFloat("rotatestep");
@@ -302,6 +303,7 @@ void SaveConfig()
     cameraElem.SetUInt("viewportmode", viewportMode);
     cameraElem.SetInt("mouseorbitmode", mouseOrbitMode);
 
+    objectElem.SetInt("newnodemode", newNodeMode);
     objectElem.SetFloat("newnodedistance", newNodeDistance);
     objectElem.SetFloat("movestep", moveStep);
     objectElem.SetFloat("rotatestep", rotateStep);
