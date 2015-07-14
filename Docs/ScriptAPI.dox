@@ -13429,6 +13429,8 @@ Properties:
 ### InterpolationMode
 
 - BEZIER_CURVE
+- CATMULL_ROM_CURVE
+- LINEAR_CURVE
 
 
 ### Intersection

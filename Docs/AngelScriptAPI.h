@@ -12764,6 +12764,8 @@ IM_SPLINE,
 enum InterpolationMode
 {
 BEZIER_CURVE,
+CATMULL_ROM_CURVE,
+LINEAR_CURVE,
 };
 
 enum Intersection

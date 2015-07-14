@@ -7298,6 +7298,8 @@ Properties:
 ### InterpolationMode
 
 - int BEZIER_CURVE
+- int CATMULL_ROM_CURVE
+- int LINEAR_CURVE
 
 ### Intersection
 
