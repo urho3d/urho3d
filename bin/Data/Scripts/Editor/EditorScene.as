@@ -1036,10 +1036,50 @@ bool SceneAddChildrenStaticModelGroup()
         smg.AddInstanceNode(children[i]);
 
     EditAttributeAction action;
-    action.Define(smg, attrIndex, oldValue);;
+    action.Define(smg, attrIndex, oldValue);
     SaveEditAction(action);
     SetSceneModified();
     FocusComponent(smg);
+    
+    return true;
+}
+
+bool SceneSetChildrenSplinePath(bool makeCycle)
+{
+    SplinePath@ sp = cast<SplinePath>(editComponents.length > 0 ? editComponents[0] : null);
+    if (sp is null && editNode !is null)
+        sp = editNode.GetComponent("SplinePath");
+
+    if (sp is null)
+    {
+        MessageBox("Must have a SplinePath component selected.");
+        return false;
+    }
+
+    uint attrIndex = GetAttributeIndex(sp, "Control Points");
+    Variant oldValue = sp.attributes[attrIndex];
+
+    Array<Node@> children = sp.node.GetChildren(true);
+    if (children.length >= 2)
+    {
+        sp.ClearControlPoints();
+        for (uint i = 0; i < children.length; ++i)
+            sp.AddControlPoint(children[i]);
+    }
+    else
+    {
+        MessageBox("You must have a minimum two children Nodes in selected Node.");
+        return false;
+    }
+
+    if (makeCycle)
+        sp.AddControlPoint(children[0]);
+
+    EditAttributeAction action;
+    action.Define(sp, attrIndex, oldValue);;
+    SaveEditAction(action);
+    SetSceneModified();
+    FocusComponent(sp);
     
     return true;
 }

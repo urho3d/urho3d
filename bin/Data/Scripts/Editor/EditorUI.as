@@ -342,6 +342,11 @@ void CreateMenuBar()
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Rebuild navigation data", @SceneRebuildNavigation));
         popup.AddChild(CreateMenuItem("Add children to SM-group", @SceneAddChildrenStaticModelGroup));
+        Menu@ childMenu = CreateMenuItem("Set children as spline path", null, SHOW_POPUP_INDICATOR);
+        Window@ childPopup = CreatePopup(childMenu);
+        childPopup.AddChild(CreateMenuItem("Non-cyclic", @SetSplinePath, 0, 0, true, "Set non-cyclic spline path"));
+        childPopup.AddChild(CreateMenuItem("Cyclic", @SetSplinePath, 0, 0, true, "Set cyclic spline path"));
+        popup.AddChild(childMenu);
         FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
     }
@@ -1478,4 +1483,14 @@ XMLFile@ GetEditorUIXMLFile(const String&in fileName)
 UIElement@ LoadEditorUI(const String&in fileName)
 {
     return ui.LoadLayout(GetEditorUIXMLFile(fileName));
+}
+
+/// Set node children as a spline path, either cyclic or non-cyclic
+bool SetSplinePath()
+{
+    Menu@ menu = GetEventSender();
+    if (menu is null)
+        return false;
+
+    return SceneSetChildrenSplinePath(menu.name == "Cyclic");
 }
