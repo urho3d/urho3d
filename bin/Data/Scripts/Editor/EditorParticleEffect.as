@@ -7,11 +7,13 @@ bool inParticleEffectRefresh = false;
 View3D@ particleEffectPreview;
 Scene@ particlePreviewScene;
 Node@ particleEffectPreviewNode;
+Node@ particleEffectPreviewGizmoNode;
 Node@ particlePreviewCameraNode;
 Node@ particlePreviewLightNode;
 Light@ particlePreviewLight;
 ParticleEmitter@ particleEffectEmitter;
 float particleResetTimer;
+bool showParticlePreviewAxes = true;
 
 void CreateParticleEffectEditor()
 {
@@ -26,8 +28,9 @@ void CreateParticleEffectEditor()
     InitParticleEffectBasicAttributes();
     RefreshParticleEffectEditor();
 
-    int height = Min(ui.root.height - 60, 500);
-    particleEffectWindow.SetSize(300, height);
+    int width = Min(ui.root.width - 60, 800);
+    int height = Min(ui.root.height - 60, 600);
+    particleEffectWindow.SetSize(width, height);
     CenterDialog(particleEffectWindow);
 
     HideParticleEffectEditor();
@@ -115,7 +118,24 @@ void CreateParticleEffectEditor()
     SubscribeToEvent(particleEffectWindow.GetChild("Scaled", true), "Toggled", "EditParticleEffectScaled");
     SubscribeToEvent(particleEffectWindow.GetChild("Sorted", true), "Toggled", "EditParticleEffectSorted");
     SubscribeToEvent(particleEffectWindow.GetChild("Relative", true), "Toggled", "EditParticleEffectRelative");
+    
+    SubscribeToEvent(particleEffectWindow.GetChild("ResetViewport", true), "Released", "ParticleEffectResetViewport");
+    SubscribeToEvent(particleEffectWindow.GetChild("ShowAxes", true), "Toggled", "ParticleEffectShowAxes");
+}
 
+void ParticleEffectResetViewport(StringHash eventType, VariantMap& eventData)
+{
+    particleEffectPreviewNode.rotation = Quaternion(0, 0, 0);
+    particleEffectPreviewNode.worldPosition = Vector3(0, 0, 0);
+    particleEffectPreview.QueueUpdate();
+}
+
+void ParticleEffectShowAxes(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ element = eventData["Element"].GetPtr();
+    showParticlePreviewAxes = element.checked;
+    particleEffectPreviewGizmoNode.enabled = showParticlePreviewAxes;
+    particleEffectPreview.QueueUpdate();
 }
 
 void EditParticleEffectColorFrameNew(StringHash eventType, VariantMap& eventData)
@@ -797,13 +817,13 @@ void InitParticleEffectPreview()
     zone.ambientColor = Color(0.15, 0.15, 0.15);
     zone.fogColor = Color(0, 0, 0);
     zone.fogStart = 10.0;
-    zone.fogEnd = 100.0;
+    zone.fogEnd = 1000.0;
 
     particlePreviewCameraNode = particlePreviewScene.CreateChild("PreviewCamera");
-    particlePreviewCameraNode.position = Vector3(0, 0, -2.5);
+    particlePreviewCameraNode.position = Vector3(0, 0, -5);
     Camera@ camera = particlePreviewCameraNode.CreateComponent("Camera");
     camera.nearClip = 0.1f;
-    camera.farClip = 100.0f;
+    camera.farClip = 1000.0f;
 
     particlePreviewLightNode = particlePreviewScene.CreateChild("particlePreviewLight");
     particlePreviewLightNode.direction = Vector3(0.5, -0.5, 0.5);
@@ -813,7 +833,8 @@ void InitParticleEffectPreview()
 
     particleEffectPreviewNode = particlePreviewScene.CreateChild("PreviewEmitter");
     particleEffectPreviewNode.rotation = Quaternion(0, 0, 0);
-    StaticModel@ gizmo = particleEffectPreviewNode.CreateComponent("StaticModel");
+    particleEffectPreviewGizmoNode = particleEffectPreviewNode.CreateChild("Gizmo");
+    StaticModel@ gizmo = particleEffectPreviewGizmoNode.CreateComponent("StaticModel");
     gizmo.model = cache.GetResource("Model", "Models/Editor/Axes.mdl");
     gizmo.materials[0] = cache.GetResource("Material", "Materials/Editor/RedUnlit.xml");
     gizmo.materials[1] = cache.GetResource("Material", "Materials/Editor/GreenUnlit.xml");
@@ -825,10 +846,9 @@ void InitParticleEffectPreview()
     particleEffectEmitter.effect = editParticleEffect;
 
     particleEffectPreview = particleEffectWindow.GetChild("ParticleEffectPreview", true);
-    particleEffectPreview.SetFixedHeight(100);
     particleEffectPreview.SetView(particlePreviewScene, camera);
 
-    SubscribeToEvent(particleEffectPreview, "DragMove", "RotateParticleEffectPreview");
+    SubscribeToEvent(particleEffectPreview, "DragMove", "NavigateParticleEffectPreview");
 }
 
 ParticleEffect@ CreateNewParticleEffect()
@@ -1195,6 +1215,7 @@ void RefreshParticleEffectPreview()
 {
     if (particleEffectEmitter is null || editParticleEffect is null)
         return;
+    cast<CheckBox>(particleEffectWindow.GetChild("ShowAxes", true)).checked = showParticlePreviewAxes;
     particleEffectEmitter.effect = editParticleEffect;
     particleEffectEmitter.Reset();
     particleEffectPreview.QueueUpdate();
@@ -1312,17 +1333,24 @@ void RefreshParticleEffectMaterial()
     SubscribeToEvent(pickButton, "Released", "PickEditParticleEffectMaterial");
 }
 
-void RotateParticleEffectPreview(StringHash eventType, VariantMap& eventData)
+void NavigateParticleEffectPreview(StringHash eventType, VariantMap& eventData)
 {
-    int elemX = eventData["ElementX"].GetInt();
-    int elemY = eventData["ElementY"].GetInt();
+    int dx = eventData["DX"].GetInt();
+    int dy = eventData["DY"].GetInt();
     
     if (particleEffectPreview.height > 0 && particleEffectPreview.width > 0)
     {
-        float yaw = ((particleEffectPreview.height / 2) - elemY) * (90.0 / particleEffectPreview.height);
-        float pitch = ((particleEffectPreview.width / 2) - elemX) * (90.0 / particleEffectPreview.width);
-
-        particleEffectPreviewNode.rotation = particleEffectPreviewNode.rotation.Slerp(Quaternion(yaw, pitch, 0), 0.1);
+        if (!input.keyDown[KEY_LSHIFT])
+        {
+            float yaw = dy * 20 * time.timeStep;
+            float pitch = dx * 20 * time.timeStep;
+            particleEffectPreviewNode.Rotate(Quaternion(yaw, pitch, 0));
+        }
+        else
+        {
+            particleEffectPreviewNode.Translate(Vector3(0, 0, 1) * dx * 1.5 * time.timeStep, TS_WORLD);
+            particleEffectPreviewNode.Translate(Vector3(0, 0, 1) * dy * 1.5 * time.timeStep, TS_WORLD);
+        }
         particleEffectPreview.QueueUpdate();
     }
 }
