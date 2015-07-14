@@ -1076,7 +1076,7 @@ bool SceneSetChildrenSplinePath(bool makeCycle)
         sp.AddControlPoint(children[0]);
 
     EditAttributeAction action;
-    action.Define(sp, attrIndex, oldValue);;
+    action.Define(sp, attrIndex, oldValue);
     SaveEditAction(action);
     SetSceneModified();
     FocusComponent(sp);
