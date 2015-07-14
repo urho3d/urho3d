@@ -1,8 +1,8 @@
 <renderpath>
     <rendertarget name="depth" sizedivisor="1 1" format="lineardepth" />
-    <command type="clear" color="1 1 1 1" depth="1.0" output="depth" />
+    <command type="clear" color="1 1 1 1" depth="1.0" stencil="0" output="depth" />
     <command type="scenepass" pass="depth" output="depth" />
-    <command type="clear" color="fog" depth="1.0" stencil="0" />
+    <command type="clear" color="fog" />
     <command type="scenepass" pass="base" vertexlights="true" metadata="base" />
     <command type="forwardlights" pass="light" />
     <command type="scenepass" pass="postopaque" />

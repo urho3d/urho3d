@@ -1259,7 +1259,7 @@ An example render path for readable hardware depth exists in bin/CoreData/Render
 
 The render path starts by allocating a readable depth-stencil texture the same size as the destination viewport, clearing its depth, then rendering a depth-only pass to it. Next the destination color rendertarget is cleared normally, while the readable depth texture is used as the depth-stencil for that and all subsequent commands. Any command after the depth render pass could now bind the depth texture to an unit for sampling, for example for smooth particle or SSAO effects.
 
-The ForwardDepth.xml render path does the same, but using a linear depth rendertarget instead of a hardware depth texture. The advantage is better compatibility (guaranteed to work without checking \ref Graphics::GetReadableDepthSupport "GetReadableDepthSupport()") but it has worse performance as it will fill the hardware depth-stencil twice.
+The ForwardDepth.xml render path does the same, but using a linear depth rendertarget instead of a hardware depth texture. The advantage is better compatibility (guaranteed to work without checking \ref Graphics::GetReadableDepthSupport "GetReadableDepthSupport()") but it has worse performance as it will perform an additional full scene rendering pass.
 
 \section RenderPaths_ForwardLighting Forward lighting special considerations
 
