@@ -7,11 +7,13 @@ bool inParticleEffectRefresh = false;
 View3D@ particleEffectPreview;
 Scene@ particlePreviewScene;
 Node@ particleEffectPreviewNode;
+Node@ particleEffectPreviewGizmoNode;
 Node@ particlePreviewCameraNode;
 Node@ particlePreviewLightNode;
 Light@ particlePreviewLight;
 ParticleEmitter@ particleEffectEmitter;
 float particleResetTimer;
+bool showParticlePreviewAxes = true;
 
 void CreateParticleEffectEditor()
 {
@@ -116,7 +118,24 @@ void CreateParticleEffectEditor()
     SubscribeToEvent(particleEffectWindow.GetChild("Scaled", true), "Toggled", "EditParticleEffectScaled");
     SubscribeToEvent(particleEffectWindow.GetChild("Sorted", true), "Toggled", "EditParticleEffectSorted");
     SubscribeToEvent(particleEffectWindow.GetChild("Relative", true), "Toggled", "EditParticleEffectRelative");
+    
+    SubscribeToEvent(particleEffectWindow.GetChild("ResetViewport", true), "Released", "ParticleEffectResetViewport");
+    SubscribeToEvent(particleEffectWindow.GetChild("ShowAxes", true), "Toggled", "ParticleEffectShowAxes");
+}
 
+void ParticleEffectResetViewport(StringHash eventType, VariantMap& eventData)
+{
+    particleEffectPreviewNode.rotation = Quaternion(0, 0, 0);
+    particleEffectPreviewNode.worldPosition = Vector3(0, 0, 0);
+    particleEffectPreview.QueueUpdate();
+}
+
+void ParticleEffectShowAxes(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ element = eventData["Element"].GetPtr();
+    showParticlePreviewAxes = element.checked;
+    particleEffectPreviewGizmoNode.enabled = showParticlePreviewAxes;
+    particleEffectPreview.QueueUpdate();
 }
 
 void EditParticleEffectColorFrameNew(StringHash eventType, VariantMap& eventData)
@@ -814,7 +833,8 @@ void InitParticleEffectPreview()
 
     particleEffectPreviewNode = particlePreviewScene.CreateChild("PreviewEmitter");
     particleEffectPreviewNode.rotation = Quaternion(0, 0, 0);
-    StaticModel@ gizmo = particleEffectPreviewNode.CreateComponent("StaticModel");
+    particleEffectPreviewGizmoNode = particleEffectPreviewNode.CreateChild("Gizmo");
+    StaticModel@ gizmo = particleEffectPreviewGizmoNode.CreateComponent("StaticModel");
     gizmo.model = cache.GetResource("Model", "Models/Editor/Axes.mdl");
     gizmo.materials[0] = cache.GetResource("Material", "Materials/Editor/RedUnlit.xml");
     gizmo.materials[1] = cache.GetResource("Material", "Materials/Editor/GreenUnlit.xml");
@@ -1195,6 +1215,7 @@ void RefreshParticleEffectPreview()
 {
     if (particleEffectEmitter is null || editParticleEffect is null)
         return;
+    cast<CheckBox>(particleEffectWindow.GetChild("ShowAxes", true)).checked = showParticlePreviewAxes;
     particleEffectEmitter.effect = editParticleEffect;
     particleEffectEmitter.Reset();
     particleEffectPreview.QueueUpdate();

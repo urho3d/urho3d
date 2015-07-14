@@ -20,10 +20,49 @@
     <element type="BorderImage" style="EditorDivider" />
     <element>
         <attribute name="Layout Mode" value="Horizontal" />
-        <element type="View3D">
-            <attribute name="Name" value="ParticleEffectPreview" />
-            <attribute name="Use Derived Opacity" value="false" />
+        <element>
+            <attribute name="Layout Mode" value="Vertical" />
+            <element type="View3D">
+                <attribute name="Name" value="ParticleEffectPreview" />
+                <attribute name="Use Derived Opacity" value="false" />
+            </element>
+            <element type="BorderImage" style="EditorDivider" />
+            <element>
+                <attribute name="Layout Mode" value="Horizontal" />
+                <attribute name="Min Size" value="0 16" />
+                <attribute name="Max Size" value="2147483647 16" />
+                <attribute name="Layout Spacing" value="4" />
+                <element type="Button">
+                    <attribute name="Name" value="ResetViewport" />
+                    <attribute name="Layout Mode" value="Horizontal" />
+                    <attribute name="Layout Border" value="1 1 1 1" />
+                    <element type="Text">
+                        <attribute name="Text" value="Reset Viewport" />
+                        <attribute name="Text Alignment" value="Center" />
+                    </element>
+                </element>
+                <element type="BorderImage" style="EditorVerticalDivider" />
+                <element>
+                    <attribute name="Min Size" value="0 16" />
+                    <attribute name="Max Size" value="2147483647 16" />
+                    <attribute name="Layout Mode" value="Horizontal" />
+                    <attribute name="Layout Spacing" value="10" />
+                    <element type="Text" style="EditorAttributeText">
+                        <attribute name="Text" value="Show Axes" />
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="1" />
+                        <element type="CheckBox">
+                            <attribute name="Name" value="ShowAxes" />
+                        </element>
+                    </element>
+                </element>
+            </element>
         </element>
+        <element type="BorderImage" style="EditorVerticalDivider" />
         <element>
             <attribute name="Layout Mode" value="Vertical" />
             <element>
