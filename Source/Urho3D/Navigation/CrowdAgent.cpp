@@ -22,19 +22,15 @@
 
 #include "../Precompiled.h"
 
-#include "../Scene/Component.h"
 #include "../Core/Context.h"
-#include "../Navigation/CrowdAgent.h"
-#include "../Navigation/CrowdManager.h"
+#include "../Core/Profiler.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Navigation/NavigationEvents.h"
+#include "../Navigation/CrowdAgent.h"
 #include "../Scene/Node.h"
-#include "../Core/Profiler.h"
 #include "../Scene/Scene.h"
-#include "../Scene/Serializable.h"
-#include "../Core/Variant.h"
 
 #include <Detour/DetourCommon.h>
 #include <DetourCrowd/DetourCrowd.h>
@@ -109,7 +105,8 @@ void CrowdAgent::RegisterObject(Context* context)
 
     ATTRIBUTE("Target Position", Vector3, targetPosition_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE("Target Velocity", Vector3, targetVelocity_, Vector3::ZERO, AM_DEFAULT);
-    ENUM_ATTRIBUTE("Requested Target Type", requestedTargetType_, crowdAgentRequestedTargetTypeNames, DEFAULT_AGENT_REQUEST_TARGET_TYPE, AM_DEFAULT);
+    ENUM_ATTRIBUTE("Requested Target Type", requestedTargetType_, crowdAgentRequestedTargetTypeNames,
+        DEFAULT_AGENT_REQUEST_TARGET_TYPE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Update Node Position", GetUpdateNodePosition, SetUpdateNodePosition, bool, true, AM_DEFAULT);
     ATTRIBUTE("Max Accel", float, maxAccel_, DEFAULT_AGENT_MAX_ACCEL, AM_DEFAULT);
     ATTRIBUTE("Max Speed", float, maxSpeed_, DEFAULT_AGENT_MAX_SPEED, AM_DEFAULT);
@@ -137,7 +134,8 @@ void CrowdAgent::ApplyAttributes()
     CrowdAgentRequestedTarget requestedTargetType = requestedTargetType_;
     if (CA_REQUESTEDTARGET_NONE != requestedTargetType_)
     {
-        requestedTargetType_ = CA_REQUESTEDTARGET_NONE;     // Assign a dummy value such that the value check in the setter method passes
+        // Assign a dummy value such that the value check in the setter method passes
+        requestedTargetType_ = CA_REQUESTEDTARGET_NONE;
         if (requestedTargetType == CA_REQUESTEDTARGET_POSITION)
             SetTargetPosition(targetPosition_);
         else
@@ -199,28 +197,28 @@ void CrowdAgent::UpdateParameters(unsigned scope)
             {
             case NAVIGATIONQUALITY_LOW:
                 params.updateFlags = 0
-                    | DT_CROWD_OPTIMIZE_VIS
-                    | DT_CROWD_ANTICIPATE_TURNS;
+                                     | DT_CROWD_OPTIMIZE_VIS
+                                     | DT_CROWD_ANTICIPATE_TURNS;
                 break;
 
             case NAVIGATIONQUALITY_MEDIUM:
                 params.updateFlags = 0
-                    | DT_CROWD_OPTIMIZE_TOPO
-                    | DT_CROWD_OPTIMIZE_VIS
-                    | DT_CROWD_ANTICIPATE_TURNS
-                    | DT_CROWD_SEPARATION;
+                                     | DT_CROWD_OPTIMIZE_TOPO
+                                     | DT_CROWD_OPTIMIZE_VIS
+                                     | DT_CROWD_ANTICIPATE_TURNS
+                                     | DT_CROWD_SEPARATION;
                 break;
 
             case NAVIGATIONQUALITY_HIGH:
                 params.updateFlags = 0
-                    // Path finding
-                    | DT_CROWD_OPTIMIZE_TOPO
-                    | DT_CROWD_OPTIMIZE_VIS
-                    // Steering
-                    | DT_CROWD_ANTICIPATE_TURNS
-                    | DT_CROWD_SEPARATION
-                    // Velocity planning
-                    | DT_CROWD_OBSTACLE_AVOIDANCE;
+                                     // Path finding
+                                     | DT_CROWD_OPTIMIZE_TOPO
+                                     | DT_CROWD_OPTIMIZE_VIS
+                                     // Steering
+                                     | DT_CROWD_ANTICIPATE_TURNS
+                                     | DT_CROWD_SEPARATION
+                                     // Velocity planning
+                                     | DT_CROWD_OBSTACLE_AVOIDANCE;
                 break;
             }
         }
@@ -413,7 +411,8 @@ void CrowdAgent::SetQueryFilterType(unsigned queryFilterType)
     {
         if (queryFilterType >= DT_CROWD_MAX_QUERY_FILTER_TYPE)
         {
-            LOGERRORF("The specified filter type index (%d) exceeds the maximum allowed value (%d)", queryFilterType, DT_CROWD_MAX_QUERY_FILTER_TYPE);
+            LOGERRORF("The specified filter type index (%d) exceeds the maximum allowed value (%d)", queryFilterType,
+                DT_CROWD_MAX_QUERY_FILTER_TYPE);
             return;
         }
 
@@ -429,7 +428,8 @@ void CrowdAgent::SetObstacleAvoidanceType(unsigned obstacleAvoidanceType)
     {
         if (obstacleAvoidanceType >= DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS)
         {
-            LOGERRORF("The specified obstacle avoidance type index (%d) exceeds the maximum allowed value (%d)", obstacleAvoidanceType, DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS);
+            LOGERRORF("The specified obstacle avoidance type index (%d) exceeds the maximum allowed value (%d)",
+                obstacleAvoidanceType, DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS);
             return;
         }
 
@@ -493,9 +493,9 @@ bool CrowdAgent::HasArrived() const
 {
     // Is the agent at or near the end of its path and within its own radius of the goal?
     const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    return agent && (!agent->ncorners ||
-        (agent->cornerFlags[agent->ncorners - 1] & DT_STRAIGHTPATH_END &&
-            dtVdist2D(agent->npos, &agent->cornerVerts[(agent->ncorners - 1) * 3]) <= agent->params.radius));
+    return agent && (!agent->ncorners || (agent->cornerFlags[agent->ncorners - 1] & DT_STRAIGHTPATH_END &&
+                                          dtVdist2D(agent->npos, &agent->cornerVerts[(agent->ncorners - 1) * 3]) <=
+                                          agent->params.radius));
 }
 
 bool CrowdAgent::IsInCrowd() const

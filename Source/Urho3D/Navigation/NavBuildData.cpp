@@ -24,10 +24,6 @@
 
 #include "../Navigation/NavBuildData.h"
 
-#include <Detour/DetourNavMesh.h>
-#include <Detour/DetourNavMeshBuilder.h>
-#include <Detour/DetourNavMeshQuery.h>
-#include <DetourTileCache/DetourTileCache.h>
 #include <DetourTileCache/DetourTileCacheBuilder.h>
 #include <Recast/Recast.h>
 

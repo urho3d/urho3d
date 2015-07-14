@@ -60,12 +60,16 @@ public:
 
     /// Return endpoint node.
     Node* GetEndPoint() const;
+
     /// Return radius.
     float GetRadius() const { return radius_; }
+
     /// Return whether is bidirectional.
     bool IsBidirectional() const { return bidirectional_; }
+
     /// Return the user assigned mask
     unsigned GetMask() const { return mask_; }
+
     /// Return the user assigned area ID
     unsigned GetAreaID() const { return areaId_; }
 

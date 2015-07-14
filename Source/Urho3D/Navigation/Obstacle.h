@@ -34,6 +34,7 @@ class DynamicNavigationMesh;
 class URHO3D_API Obstacle : public Component
 {
     OBJECT(Obstacle)
+
     friend class DynamicNavigationMesh;
 
 public:
@@ -50,10 +51,13 @@ public:
 
     /// Get the height of this obstacle.
     float GetHeight() const { return height_; }
+
     /// Set the height of this obstacle.
     void SetHeight(float);
+
     /// Get the blocking radius of this obstacle.
     float GetRadius() const { return radius_; }
+
     /// Set the blocking radius of this obstacle.
     void SetRadius(float);
 

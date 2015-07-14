@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "../Scene/Component.h"
 #include "../Navigation/CrowdManager.h"
+#include "../Scene/Component.h"
 
 namespace Urho3D
 {
@@ -123,47 +123,58 @@ public:
     Vector3 GetDesiredVelocity() const;
     /// Return the agent's actual velocity.
     Vector3 GetActualVelocity() const;
+
     /// Return the agent's requested target position.
     const Vector3& GetTargetPosition() const { return targetPosition_; }
+
     /// Return the agent's requested target velocity.
     const Vector3& GetTargetVelocity() const { return targetVelocity_; }
+
     /// Return the agent's requested target type, if any.
     CrowdAgentRequestedTarget GetRequestedTargetType() const { return requestedTargetType_; }
+
     /// Return the agent's  state.
     CrowdAgentState GetAgentState() const;
     /// Return the agent's target state.
     CrowdAgentTargetState GetTargetState() const;
+
     /// Return true when the node's position should be updated by the CrowdManager.
     bool GetUpdateNodePosition() const { return updateNodePosition_; }
+
     /// Return the agent id.
     int GetAgentCrowdId() const { return agentCrowdId_; }
+
     /// Get the agent's max acceleration.
     float GetMaxAccel() const { return maxAccel_; }
+
     /// Get the agent's max velocity.
     float GetMaxSpeed() const { return maxSpeed_; }
+
     /// Get the agent's radius.
     float GetRadius() const { return radius_; }
+
     /// Get the agent's height.
     float GetHeight() const { return height_; }
+
     /// Get the agent's query filter type.
     unsigned GetQueryFilterType() const { return queryFilterType_; }
+
     /// Get the agent's obstacle avoidance type.
     unsigned GetObstacleAvoidanceType() const { return obstacleAvoidanceType_; }
+
     /// Get the agent's navigation quality.
-    NavigationQuality GetNavigationQuality() const {return navQuality_; }
+    NavigationQuality GetNavigationQuality() const { return navQuality_; }
+
     /// Get the agent's navigation pushiness.
-    NavigationPushiness GetNavigationPushiness() const {return navPushiness_; }
+    NavigationPushiness GetNavigationPushiness() const { return navPushiness_; }
+
     /// Return true when the agent has a target.
     bool HasRequestedTarget() const { return requestedTargetType_ != CA_REQUESTEDTARGET_NONE; }
+
     /// Return true when the agent has arrived at its target.
     bool HasArrived() const;
     /// Return true when the agent is in crowd (being managed by a crowd manager).
     bool IsInCrowd() const;
-
-    /// Get serialized data of internal state.
-    PODVector<unsigned char> GetAgentDataAttr() const;
-    /// Set serialized data of internal state.
-    void SetAgentDataAttr(const PODVector<unsigned char>& value);
 
 protected:
     /// Handle crowd agent being updated. It is called by CrowdManager::Update() via callback.
@@ -188,8 +199,6 @@ private:
     WeakPtr<CrowdManager> crowdManager_;
     /// Crowd manager reference to this agent.
     int agentCrowdId_;
-    /// Reference to poly closest to requested target position.
-    unsigned targetRef_;
     /// Requested target position.
     Vector3 targetPosition_;
     /// Requested target velocity.

@@ -22,23 +22,19 @@
 
 #include "../Precompiled.h"
 
-#include "../Scene/Component.h"
 #include "../Core/Context.h"
+#include "../Core/Profiler.h"
+#include "../Graphics/DebugRenderer.h"
+#include "../IO/Log.h"
 #include "../Navigation/CrowdAgent.h"
 #include "../Navigation/CrowdManager.h"
-#include "../Graphics/DebugRenderer.h"
 #include "../Navigation/DynamicNavigationMesh.h"
-#include "../IO/Log.h"
 #include "../Navigation/NavigationEvents.h"
-#include "../Navigation/NavigationMesh.h"
 #include "../Scene/Node.h"
-#include "../Core/Profiler.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
-#include "../Container/Vector.h"
 
 #include <DetourCrowd/DetourCrowd.h>
-#include <Recast/Recast.h>
 
 #include "../DebugNew.h"
 
@@ -84,14 +80,16 @@ void CrowdManager::RegisterObject(Context* context)
     ATTRIBUTE("Max Agents", unsigned, maxAgents_, DEFAULT_MAX_AGENTS, AM_DEFAULT);
     ATTRIBUTE("Max Agent Radius", float, maxAgentRadius_, DEFAULT_MAX_AGENT_RADIUS, AM_DEFAULT);
     ATTRIBUTE("Navigation Mesh", unsigned, navigationMeshId_, 0, AM_DEFAULT | AM_COMPONENTID);
-    MIXED_ACCESSOR_ATTRIBUTE("Filter Types", GetQueryFilterTypesAttr, SetQueryFilterTypesAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Obstacle Avoidance Types", GetObstacleAvoidanceTypesAttr, SetObstacleAvoidanceTypesAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Filter Types", GetQueryFilterTypesAttr, SetQueryFilterTypesAttr, VariantVector,
+        Variant::emptyVariantVector, AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Obstacle Avoidance Types", GetObstacleAvoidanceTypesAttr, SetObstacleAvoidanceTypesAttr,
+        VariantVector, Variant::emptyVariantVector, AM_DEFAULT);
 }
 
 void CrowdManager::ApplyAttributes()
 {
     // Values from Editor, saved-file, or network must be checked before applying
-    maxAgents_ = Max(1, maxAgents_);
+    maxAgents_ = (unsigned)Max(1, maxAgents_);
     maxAgentRadius_ = Max(0.f, maxAgentRadius_);
 
     bool navMeshChange = false;
@@ -105,7 +103,8 @@ void CrowdManager::ApplyAttributes()
             navigationMesh_ = navMesh;
         }
     }
-    navigationMeshId_ = navigationMesh_ ? navigationMesh_->GetID() : 0;     // In case of receiving an invalid component id, revert it back to the existing navmesh component id (if any)
+    // In case of receiving an invalid component id, revert it back to the existing navmesh component id (if any)
+    navigationMeshId_ = navigationMesh_ ? navigationMesh_->GetID() : 0;
 
     // If the Detour crowd initialization parameters have changed then recreate it
     if (crowd_ && (navMeshChange || crowd_->getAgentCount() != maxAgents_ || crowd_->getMaxAgentRadius() != maxAgentRadius_))
@@ -359,12 +358,15 @@ Vector3 CrowdManager::FindNearestPoint(const Vector3& point, int queryFilterType
 {
     if (nearestRef)
         *nearestRef = 0;
-    return crowd_ && navigationMesh_ ? navigationMesh_->FindNearestPoint(point, crowd_->getQueryExtents(), crowd_->getFilter(queryFilterType), nearestRef) : point;
+    return crowd_ && navigationMesh_ ?
+        navigationMesh_->FindNearestPoint(point, crowd_->getQueryExtents(), crowd_->getFilter(queryFilterType), nearestRef) : point;
 }
 
 Vector3 CrowdManager::MoveAlongSurface(const Vector3& start, const Vector3& end, int queryFilterType, int maxVisited)
 {
-    return crowd_ && navigationMesh_ ? navigationMesh_->MoveAlongSurface(start, end, crowd_->getQueryExtents(), maxVisited, crowd_->getFilter(queryFilterType)) : end;
+    return crowd_ && navigationMesh_ ?
+        navigationMesh_->MoveAlongSurface(start, end, crowd_->getQueryExtents(), maxVisited, crowd_->getFilter(queryFilterType)) :
+        end;
 }
 
 void CrowdManager::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, int queryFilterType)
@@ -377,14 +379,17 @@ Vector3 CrowdManager::GetRandomPoint(int queryFilterType, dtPolyRef* randomRef)
 {
     if (randomRef)
         *randomRef = 0;
-    return crowd_ && navigationMesh_ ? navigationMesh_->GetRandomPoint(crowd_->getFilter(queryFilterType), randomRef) : Vector3::ZERO;
+    return crowd_ && navigationMesh_ ? navigationMesh_->GetRandomPoint(crowd_->getFilter(queryFilterType), randomRef) :
+        Vector3::ZERO;
 }
 
 Vector3 CrowdManager::GetRandomPointInCircle(const Vector3& center, float radius, int queryFilterType, dtPolyRef* randomRef)
 {
     if (randomRef)
         *randomRef = 0;
-    return crowd_ && navigationMesh_ ? navigationMesh_->GetRandomPointInCircle(center, radius, crowd_->getQueryExtents(), crowd_->getFilter(queryFilterType), randomRef) : center;
+    return crowd_ && navigationMesh_ ?
+        navigationMesh_->GetRandomPointInCircle(center, radius, crowd_->getQueryExtents(), crowd_->getFilter(queryFilterType),
+            randomRef) : center;
 }
 
 float CrowdManager::GetDistanceToWall(const Vector3& point, float radius, int queryFilterType, Vector3* hitPos, Vector3* hitNormal)
@@ -393,14 +398,17 @@ float CrowdManager::GetDistanceToWall(const Vector3& point, float radius, int qu
         *hitPos = Vector3::ZERO;
     if (hitNormal)
         *hitNormal = Vector3::DOWN;
-    return crowd_ && navigationMesh_ ? navigationMesh_->GetDistanceToWall(point, radius, crowd_->getQueryExtents(), crowd_->getFilter(queryFilterType), hitPos, hitNormal) : radius;
+    return crowd_ && navigationMesh_ ?
+        navigationMesh_->GetDistanceToWall(point, radius, crowd_->getQueryExtents(), crowd_->getFilter(queryFilterType), hitPos,
+            hitNormal) : radius;
 }
 
 Vector3 CrowdManager::Raycast(const Vector3& start, const Vector3& end, int queryFilterType, Vector3* hitNormal)
 {
     if (hitNormal)
         *hitNormal = Vector3::DOWN;
-    return crowd_ && navigationMesh_ ? navigationMesh_->Raycast(start, end, crowd_->getQueryExtents(), crowd_->getFilter(queryFilterType), hitNormal) : end;
+    return crowd_ && navigationMesh_ ?
+        navigationMesh_->Raycast(start, end, crowd_->getQueryExtents(), crowd_->getFilter(queryFilterType), hitNormal) : end;
 }
 
 unsigned CrowdManager::GetNumAreas(unsigned queryFilterType) const
@@ -441,23 +449,27 @@ VariantVector CrowdManager::GetQueryFilterTypesAttr() const
 unsigned short CrowdManager::GetIncludeFlags(unsigned queryFilterType) const
 {
     if (queryFilterType >= numQueryFilterTypes_)
-        LOGWARNINGF("Query filter type %d is not configured yet, returning the default include flags initialized by dtCrowd", queryFilterType);
+        LOGWARNINGF("Query filter type %d is not configured yet, returning the default include flags initialized by dtCrowd",
+            queryFilterType);
     const dtQueryFilter* filter = GetDetourQueryFilter(queryFilterType);
-    return filter ? filter->getIncludeFlags() : 0xffff;
+    return (unsigned short)(filter ? filter->getIncludeFlags() : 0xffff);
 }
 
 unsigned short CrowdManager::GetExcludeFlags(unsigned queryFilterType) const
 {
     if (queryFilterType >= numQueryFilterTypes_)
-        LOGWARNINGF("Query filter type %d is not configured yet, returning the default exclude flags initialized by dtCrowd", queryFilterType);
+        LOGWARNINGF("Query filter type %d is not configured yet, returning the default exclude flags initialized by dtCrowd",
+            queryFilterType);
     const dtQueryFilter* filter = GetDetourQueryFilter(queryFilterType);
-    return filter ? filter->getExcludeFlags() : 0;
+    return (unsigned short)(filter ? filter->getExcludeFlags() : 0);
 }
 
 float CrowdManager::GetAreaCost(unsigned queryFilterType, unsigned areaID) const
 {
     if (queryFilterType >= numQueryFilterTypes_ || areaID >= numAreas_[queryFilterType])
-        LOGWARNINGF("Query filter type %d and/or area id %d are not configured yet, returning the default area cost initialized by dtCrowd", queryFilterType, areaID);
+        LOGWARNINGF(
+            "Query filter type %d and/or area id %d are not configured yet, returning the default area cost initialized by dtCrowd",
+            queryFilterType, areaID);
     const dtQueryFilter* filter = GetDetourQueryFilter(queryFilterType);
     return filter ? filter->getAreaCost((int)areaID) : 1.f;
 }

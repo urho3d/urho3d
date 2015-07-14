@@ -118,14 +118,19 @@ public:
     float GetDistanceToWall(const Vector3& point, float radius, int queryFilterType, Vector3* hitPos = 0, Vector3* hitNormal = 0);
     /// Perform a walkability raycast on the navigation mesh between start and end using the crowd initialized query extent (based on maxAgentRadius) and the specified query filter type. Return the point where a wall was hit, or the end point if no walls.
     Vector3 Raycast(const Vector3& start, const Vector3& end, int queryFilterType, Vector3* hitNormal = 0);
+
     /// Get the maximum number of agents.
     unsigned GetMaxAgents() const { return maxAgents_; }
+
     /// Get the maximum radius of any agent.
     float GetMaxAgentRadius() const { return maxAgentRadius_; }
+
     /// Get the Navigation mesh assigned to the crowd.
     NavigationMesh* GetNavigationMesh() const { return navigationMesh_; }
+
     /// Get the number of configured query filter types.
     unsigned GetNumQueryFilterTypes() const { return numQueryFilterTypes_; }
+
     /// Get the number of configured area in the specified query filter type.
     unsigned GetNumAreas(unsigned queryFilterType) const;
     /// Return all the filter types configured in the crowd as attribute.
@@ -136,8 +141,10 @@ public:
     unsigned short GetExcludeFlags(unsigned queryFilterType) const;
     /// Get the cost of an area for the specified query filter type.
     float GetAreaCost(unsigned queryFilterType, unsigned areaID) const;
+
     /// Get the number of configured obstacle avoidance types.
     unsigned GetNumObstacleAvoidanceTypes() const { return numObstacleAvoidanceTypes_; }
+
     /// Return all the obstacle avoidance types configured in the crowd as attribute.
     VariantVector GetObstacleAvoidanceTypesAttr() const;
     /// Get the params for the specified obstacle avoidance type.
@@ -160,6 +167,7 @@ protected:
     const dtCrowdAgent* GetDetourCrowdAgent(int agent) const;
     /// Get the detour query filter.
     const dtQueryFilter* GetDetourQueryFilter(unsigned queryFilterType) const;
+
     /// Get the internal detour crowd component.
     dtCrowd* GetCrowd() const { return crowd_; }
 
