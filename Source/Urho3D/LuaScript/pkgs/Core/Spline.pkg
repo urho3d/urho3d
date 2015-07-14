@@ -2,7 +2,9 @@ $#include "Core/Spline.h"
 
 enum InterpolationMode
 {
-    BEZIER_CURVE
+    BEZIER_CURVE,
+    CATMULL_ROM_CURVE,
+    LINEAR_CURVE
 };
 
 class Spline
@@ -10,7 +12,7 @@ class Spline
     Spline();
     Spline(InterpolationMode mode);
     Spline(const Spline& rhs);
-    // When export constructor, the destructor must export also. otherwise Lua will not collect the oject.
+    // When export constructor, the destructor must export also. otherwise Lua will not collect the object.
     ~Spline();
     
     void operator = (const Spline& rhs);
