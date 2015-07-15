@@ -47,6 +47,7 @@ Urho3D development, contributions and bugfixes by:
 - Magic.Lixin
 - Mike3D
 - Modanung
+- MonkeyFirst
 - OvermindDL1
 - Skrylar
 - 1vanK
