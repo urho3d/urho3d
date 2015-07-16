@@ -30,6 +30,7 @@
 #include "../UI/Font.h"
 #include "../UI/FontFace.h"
 #include "../UI/Text.h"
+#include "../Resource/Localization.h"
 
 #include "../DebugNew.h"
 
@@ -56,6 +57,7 @@ Text::Text(Context* context) :
     textAlignment_(HA_LEFT),
     rowSpacing_(1.0f),
     wordWrap_(false),
+    autoLocalizable_(false),
     charLocationsDirty_(true),
     selectionStart_(0),
     selectionLength_(0),
@@ -86,6 +88,7 @@ void Text::RegisterObject(Context* context)
     ENUM_ATTRIBUTE("Text Alignment", textAlignment_, horizontalAlignments, HA_LEFT, AM_FILE);
     ATTRIBUTE("Row Spacing", float, rowSpacing_, 1.0f, AM_FILE);
     ATTRIBUTE("Word Wrap", bool, wordWrap_, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Auto Localizable", GetAutoLocalizable, SetAutoLocalizable, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE("Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::TRANSPARENT, AM_FILE);
     ACCESSOR_ATTRIBUTE("Hover Color", GetHoverColor, SetHoverColor, Color, Color::TRANSPARENT, AM_FILE);
     ENUM_ATTRIBUTE("Text Effect", textEffect_, textEffects, TE_NONE, AM_FILE);
@@ -99,10 +102,7 @@ void Text::ApplyAttributes()
 {
     UIElement::ApplyAttributes();
 
-    // Decode to Unicode now
-    unicodeText_.Clear();
-    for (unsigned i = 0; i < text_.Length();)
-        unicodeText_.Push(text_.NextUTF8Char(i));
+    DecodeToUnicode();
 
     fontSize_ = Max(fontSize_, 1);
     ValidateSelection();
@@ -252,15 +252,30 @@ bool Text::SetFont(Font* font, int size)
     return true;
 }
 
-void Text::SetText(const String& text)
+void Text::DecodeToUnicode()
 {
-    text_ = text;
-
-    // Decode to Unicode now
     unicodeText_.Clear();
     for (unsigned i = 0; i < text_.Length();)
         unicodeText_.Push(text_.NextUTF8Char(i));
+}
 
+void Text::SetText(const String& text)
+{
+    if (autoLocalizable_)
+    {
+        stringId_ = text;
+        if (!stringId_.Empty())
+        {
+            Localization* l10n = GetSubsystem<Localization>();
+            text_ = l10n->Get(stringId_);
+        }
+    }
+    else
+    {
+        text_ = text;
+    }
+
+    DecodeToUnicode();
     ValidateSelection();
     UpdateText();
 }
@@ -290,6 +305,44 @@ void Text::SetWordwrap(bool enable)
         wordWrap_ = enable;
         UpdateText();
     }
+}
+
+void Text::SetAutoLocalizable(bool enable)
+{
+    if (enable != autoLocalizable_)
+    {
+        autoLocalizable_ = enable;
+        if (enable)
+        {
+            stringId_ = text_;
+            if (!stringId_.Empty())
+            {
+                Localization* l10n = GetSubsystem<Localization>();
+                text_ = l10n->Get(stringId_);
+            }
+            SubscribeToEvent(E_CHANGELANGUAGE, HANDLER(Text, HandleChangeLanguage));
+        }
+        else
+        {
+            text_ = stringId_;
+            stringId_ = "";
+            UnsubscribeFromEvent(E_CHANGELANGUAGE);
+        }
+        DecodeToUnicode();
+        ValidateSelection();
+        UpdateText();
+    }
+}
+
+void Text::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
+{
+    if (!autoLocalizable_ || stringId_.Empty())
+        return;
+    Localization* l10n = GetSubsystem<Localization>();
+    text_ = l10n->Get(stringId_);
+    DecodeToUnicode();
+    ValidateSelection();
+    UpdateText();
 }
 
 void Text::SetSelection(unsigned start, unsigned length)

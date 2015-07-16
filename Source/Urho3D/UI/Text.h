@@ -105,6 +105,8 @@ public:
     void SetRowSpacing(float spacing);
     /// Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely.
     void SetWordwrap(bool enable);
+    /// The text will be automatically translated. The text value used as string identifier.
+    void SetAutoLocalizable(bool enable);
     /// Set selection. When length is not provided, select until the text ends.
     void SetSelection(unsigned start, unsigned length = M_MAX_UNSIGNED);
     /// Clear selection.
@@ -135,6 +137,9 @@ public:
 
     /// Return wordwrap mode.
     bool GetWordwrap() const { return wordWrap_; }
+
+    /// Return auto localizable mode.
+    bool GetAutoLocalizable() const { return autoLocalizable_; }
 
     /// Return selection start.
     unsigned GetSelectionStart() const { return selectionStart_; }
@@ -245,6 +250,15 @@ protected:
     Vector<PODVector<GlyphLocation> > pageGlyphLocations_;
     /// Cached locations of each character in the text.
     PODVector<CharLocation> charLocations_;
+    /// The text will be automatically translated.
+    bool autoLocalizable_;
+    /// Storage string id.
+    String stringId_;
+    /// Handle change Language;
+    void HandleChangeLanguage(StringHash eventType, VariantMap& eventData);
+
+private:
+    void DecodeToUnicode();
 };
 
 }

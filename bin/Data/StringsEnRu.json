@@ -1,0 +1,18 @@
+{
+	"lang":{
+		"en":"Language: English",
+		"ru":"Язык: Русский"
+	},
+	"quit":{
+		"en":"Quit",
+		"ru":"Выйти"
+	},
+	"long text":{
+		"en":"Some long text blah blah blah",
+		"ru":"Некоторый длинный текст бла бла бла"
+	},
+	"title":{
+		"en":"Title",
+		"ru":"Заголовок"
+	}
+}
