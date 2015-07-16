@@ -2913,7 +2913,7 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 
 - Mark all application-usable classes, structs and functions with the macro URHO3D_API so that they are exported correctly in a shared library build.
 
-- When you add a new third-party library, insert its license statement to the License.txt in the root directory.
+- When you add a new third-party library, insert its license statement to the License.txt in the root directory. Only libraries with permissive licenses such as BSD/MIT/zlib are accepted, because complying for example with the LGPL is difficult on mobile platforms, and would leave the application in a legal grey area.
 
 - Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs.
 */
