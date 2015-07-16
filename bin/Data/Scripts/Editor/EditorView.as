@@ -1245,6 +1245,17 @@ void UpdateView(float timeStep)
         }
     }
 
+	if (input.keyDown[KEY_HOME])
+	{
+		if(selectedNodes.length > 0 || selectedComponents.length > 0)
+		{
+			Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
+			Vector3 centerPoint = SelectedNodesCenterPoint();
+			Vector3 d = cameraNode.worldPosition - centerPoint;
+			cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0,10);
+		}
+	}
+	
     // Rotate/orbit/pan camera
     if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE])
     {
