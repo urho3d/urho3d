@@ -7300,6 +7300,7 @@ Properties:
 - int BEZIER_CURVE
 - int CATMULL_ROM_CURVE
 - int LINEAR_CURVE
+- int CATMULL_ROM_FULL_CURVE
 
 ### Intersection
 

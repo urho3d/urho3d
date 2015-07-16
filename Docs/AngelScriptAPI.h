@@ -12766,6 +12766,7 @@ enum InterpolationMode
 BEZIER_CURVE,
 CATMULL_ROM_CURVE,
 LINEAR_CURVE,
+CATMULL_ROM_FULL_CURVE,
 };
 
 enum Intersection
