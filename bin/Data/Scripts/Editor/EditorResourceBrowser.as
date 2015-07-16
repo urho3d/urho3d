@@ -88,7 +88,10 @@ const StringHash EXTENSION_TYPE_DDS(".dds");
 const StringHash EXTENSION_TYPE_PNG(".png");
 const StringHash EXTENSION_TYPE_JPG(".jpg");
 const StringHash EXTENSION_TYPE_JPEG(".jpeg");
+const StringHash EXTENSION_TYPE_BMP(".bmp");
 const StringHash EXTENSION_TYPE_TGA(".tga");
+const StringHash EXTENSION_TYPE_KTX(".ktx");
+const StringHash EXTENSION_TYPE_PVR(".pvr");
 const StringHash EXTENSION_TYPE_OBJ(".obj");
 const StringHash EXTENSION_TYPE_FBX(".fbx");
 const StringHash EXTENSION_TYPE_COLLADA(".dae");
@@ -1094,7 +1097,13 @@ int GetResourceType(StringHash fileType)
         return RESOURCE_TYPE_IMAGE;
     else if(fileType == EXTENSION_TYPE_JPEG)
         return RESOURCE_TYPE_IMAGE;
+    else if(fileType == EXTENSION_TYPE_BMP)
+        return RESOURCE_TYPE_IMAGE;
     else if(fileType == EXTENSION_TYPE_TGA)
+        return RESOURCE_TYPE_IMAGE;
+    else if(fileType == EXTENSION_TYPE_KTX)
+        return RESOURCE_TYPE_IMAGE;
+    else if(fileType == EXTENSION_TYPE_PVR)
         return RESOURCE_TYPE_IMAGE;
     else if(fileType == EXTENSION_TYPE_OBJ)
         return RESOURCE_TYPE_UNUSABLE;
@@ -1139,8 +1148,14 @@ bool GetExtensionType(String path, StringHash &out fileType)
         fileType = EXTENSION_TYPE_JPG;
     else if(type == EXTENSION_TYPE_JPEG)
         fileType = EXTENSION_TYPE_JPEG;
+    else if(type == EXTENSION_TYPE_BMP)
+        fileType = EXTENSION_TYPE_BMP;
     else if(type == EXTENSION_TYPE_TGA)
         fileType = EXTENSION_TYPE_TGA;
+    else if(type == EXTENSION_TYPE_KTX)
+        fileType = EXTENSION_TYPE_KTX;
+    else if(type == EXTENSION_TYPE_PVR)
+        fileType = EXTENSION_TYPE_PVR;
     else if(type == EXTENSION_TYPE_OBJ)
         fileType = EXTENSION_TYPE_OBJ;
     else if(type == EXTENSION_TYPE_FBX)
