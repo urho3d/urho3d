@@ -43,9 +43,12 @@ void UpdateEditorSettingsDialog()
     DropDownList@ mouseOrbitEdit = settingsDialog.GetChild("MouseOrbitEdit", true);
     mouseOrbitEdit.selection = mouseOrbitMode;
 
+    CheckBox@ middleMousePanToggle = settingsDialog.GetChild("MiddleMousePanToggle", true);
+    middleMousePanToggle.checked = mmbPanMode;
+
     DropDownList@ newNodeModeEdit = settingsDialog.GetChild("NewNodeModeEdit", true);
     newNodeModeEdit.selection = newNodeMode;
-	
+
     LineEdit@ distanceEdit = settingsDialog.GetChild("DistanceEdit", true);
     distanceEdit.text = String(newNodeDistance);
 
@@ -117,6 +120,7 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(speedEdit, "TextFinished", "EditCameraSpeed");
         SubscribeToEvent(limitRotationToggle, "Toggled", "EditLimitRotation");
         SubscribeToEvent(mouseWheelCameraPositionToggle, "Toggled", "EditMouseWheelCameraPosition");
+        SubscribeToEvent(middleMousePanToggle, "Toggled", "EditMiddleMousePan");
         SubscribeToEvent(mouseOrbitEdit, "ItemSelected", "EditMouseOrbitMode");
         SubscribeToEvent(newNodeModeEdit, "ItemSelected", "EditNewNodeMode");
         SubscribeToEvent(distanceEdit, "TextChanged", "EditNewNodeDistance");
@@ -215,6 +219,11 @@ void EditMouseOrbitMode(StringHash eventType, VariantMap& eventData)
 {
     DropDownList@ edit = eventData["Element"].GetPtr();
     mouseOrbitMode = edit.selection;
+}
+
+void EditMiddleMousePan(StringHash eventType, VariantMap& eventData)
+{
+    mmbPanMode = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
 }
 
 void EditNewNodeMode(StringHash eventType, VariantMap& eventData)

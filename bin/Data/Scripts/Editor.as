@@ -173,6 +173,7 @@ void LoadConfig()
         if (cameraElem.HasAttribute("mousewheelcameraposition")) mouseWheelCameraPosition = cameraElem.GetBool("mousewheelcameraposition");
         if (cameraElem.HasAttribute("viewportmode")) viewportMode = cameraElem.GetUInt("viewportmode");
         if (cameraElem.HasAttribute("mouseorbitmode")) mouseOrbitMode = cameraElem.GetInt("mouseorbitmode");
+        if (cameraElem.HasAttribute("mmbpan")) mmbPanMode = cameraElem.GetBool("mmbpan");
         UpdateViewParameters();
     }
 
@@ -231,7 +232,6 @@ void LoadConfig()
     {
         if (uiElem.HasAttribute("minopacity")) uiMinOpacity = uiElem.GetFloat("minopacity");
         if (uiElem.HasAttribute("maxopacity")) uiMaxOpacity = uiElem.GetFloat("maxopacity");
-		if (uiElem.HasAttribute("mmbpan")) uiMmbPan = uiElem.GetBool("mmbpan");
     }
 
     if (!hierarchyElem.isNull)
@@ -303,6 +303,7 @@ void SaveConfig()
     cameraElem.SetBool("mousewheelcameraposition", mouseWheelCameraPosition);
     cameraElem.SetUInt("viewportmode", viewportMode);
     cameraElem.SetInt("mouseorbitmode", mouseOrbitMode);
+    cameraElem.SetBool("mmbpan", mmbPanMode);
 
     objectElem.SetInt("newnodemode", newNodeMode);
     objectElem.SetFloat("newnodedistance", newNodeDistance);
@@ -339,7 +340,6 @@ void SaveConfig()
 
     uiElem.SetFloat("minopacity", uiMinOpacity);
     uiElem.SetFloat("maxopacity", uiMaxOpacity);
-	uiElem.SetBool("mmbpan", uiMmbPan);
 
     hierarchyElem.SetBool("showinternaluielement", showInternalUIElement);
     hierarchyElem.SetBool("showtemporaryobject", showTemporaryObject);

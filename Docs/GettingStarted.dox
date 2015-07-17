@@ -729,7 +729,7 @@ E                  - Ascend
 Q                  - Descend
 Shift+E,Q          - Ascend or descend faster
 
-Home                 - Center view on currently selected object
+Home               - Center view on currently selected object
 Numpad5            - Toggle orthographic / perspective camera
 Numpad1            - Front view
 Numpad3            - Right hand view
@@ -775,13 +775,13 @@ F12                - Toggle UI
 
 Press right mouse button in the 3D view if you want to defocus the active window without changing the object selection.
 
-An option in the preferences (Pan using MMB) changes the default behavior of the MMB and RMB to pan the camera, and require using Shift to use camera orbit and rotation.
+An option in the settings (Pan using MMB) changes the default behavior of the MMB and RMB to pan the camera, and to require using Shift to use camera orbit and rotation.
 
 \verbatim
-Right mouse            -  Hold down pans the camera
-Middle mouse          -  Hold down pans the camera
-Shift+Right mouse    - Hold down and move mouse to rotate camera
-Shift+Middle mouse  - Hold down orbits the camera around selected objects
+Right mouse        - Hold down pans the camera
+Middle mouse       - Hold down pans the camera
+Shift+Right mouse  - Hold down and move mouse to rotate camera
+Shift+Middle mouse - Hold down orbits the camera around selected objects
 \endverbatim
 
 \section EditorInstructions_Workflow Workflow

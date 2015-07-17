@@ -51,16 +51,6 @@
                         <attribute name="Max Size" value="50 2147483647" />
                     </element>
                 </element>
-				<element style="ListRow">
-                    <attribute name="Layout Border" value="20 0 0 0" />
-                    <attribute name="Layout Spacing" value="8" />
-                    <element type="CheckBox">
-                        <attribute name="Name" value="UIMiddleMousePan" />
-                    </element>
-                    <element type="Text">
-                        <attribute name="Text" value="Pan using MiddleMouseButton" />
-                    </element>
-                </element>
                 <element type="BorderImage" style="EditorDivider" />
                 <element style="ListRow">
                     <element type="Text">

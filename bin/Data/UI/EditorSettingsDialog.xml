@@ -88,6 +88,15 @@
                 </element>
                 <element style="ListRow">
                     <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="MiddleMousePanToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Pan using middle mouse button" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
                     <element type="Text">
                         <attribute name="Text" value="Mouse orbit and drag behavior" />
                     </element>
