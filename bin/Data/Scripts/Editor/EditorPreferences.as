@@ -91,6 +91,9 @@ void UpdateEditorPreferencesDialog()
     LineEdit@ uiMaxOpacityEdit = preferencesDialog.GetChild("UIMaxOpacity", true);
     uiMaxOpacityEdit.text = String(uiMaxOpacity);
 
+	CheckBox@ middleMousePanToggle = preferencesDialog.GetChild("UIMiddleMousePan", true);
+    middleMousePanToggle.checked = uiMmbPan;	
+	
     CheckBox@ showInternalUIElementToggle = preferencesDialog.GetChild("ShowInternalUIElement", true);
     showInternalUIElementToggle.checked = showInternalUIElement;
 
@@ -159,6 +162,7 @@ void UpdateEditorPreferencesDialog()
     {
         SubscribeToEvent(uiMinOpacityEdit, "TextFinished", "EditUIMinOpacity");
         SubscribeToEvent(uiMaxOpacityEdit, "TextFinished", "EditUIMaxOpacity");
+		SubscribeToEvent(middleMousePanToggle, "Toggled", "ToggleMiddleMousePan");
         SubscribeToEvent(showInternalUIElementToggle, "Toggled", "ToggleShowInternalUIElement");
         SubscribeToEvent(showTemporaryObjectToggle, "Toggled", "ToggleShowTemporaryObject");
         SubscribeToEvent(nodeItemTextColorEditR, "TextFinished", "EditNodeTextColor");
@@ -230,6 +234,12 @@ void EditUIMaxOpacity(StringHash eventType, VariantMap& eventData)
     edit.text = String(uiMaxOpacity);
     FadeUI();
     UnfadeUI();
+}
+
+void ToggleMiddleMousePan(StringHash eventType, VariantMap& eventData)
+{
+    bool mmbPanEnabled = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
+    SetMMBPan(mmbPanEnabled);
 }
 
 void ToggleShowInternalUIElement(StringHash eventType, VariantMap& eventData)

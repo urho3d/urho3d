@@ -56,6 +56,7 @@ bool uiFaded = false;
 float uiMinOpacity = 0.3;
 float uiMaxOpacity = 0.7;
 bool uiHidden = false;
+bool uiMmbPan = false;
 
 void CreateUI()
 {

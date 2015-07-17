@@ -999,6 +999,11 @@ void UpdateViewParameters()
     }
 }
 
+void SetMMBPan(bool enableMMBPan)
+{
+	uiMmbPan  = enableMMBPan;
+}
+
 void CreateGrid()
 {
     if (gridNode !is null)
@@ -1245,15 +1250,33 @@ void UpdateView(float timeStep)
         }
     }
 
+	if (input.keyDown[KEY_HOME])
+	{
+		if(selectedNodes.length > 0 || selectedComponents.length > 0)
+		{
+			Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
+			Vector3 centerPoint = SelectedNodesCenterPoint();
+			Vector3 d = cameraNode.worldPosition - centerPoint;
+			cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0,10);
+		}
+	}
+
     // Rotate/orbit/pan camera
-    if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE])
+	bool changeCamViewButton = input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE];
+    if (changeCamViewButton)
     {
         SetMouseLock();
 
         IntVector2 mouseMove = input.mouseMove;
         if (mouseMove.x != 0 || mouseMove.y != 0)
         {
-            if (input.keyDown[KEY_LSHIFT] && input.mouseButtonDown[MOUSEB_MIDDLE])
+			bool panTheCamera = false;
+			if(uiMmbPan)
+				panTheCamera = !(changeCamViewButton && input.keyDown[KEY_LSHIFT]);
+			else
+				panTheCamera = (changeCamViewButton && input.keyDown[KEY_LSHIFT]);
+			
+            if (panTheCamera)
             {
                 cameraNode.Translate(Vector3(-mouseMove.x, mouseMove.y, 0) * timeStep * cameraBaseSpeed * 0.5);
             }
@@ -1267,6 +1290,7 @@ void UpdateView(float timeStep)
 
                 Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
                 cameraNode.rotation = q;
+						
                 if (input.mouseButtonDown[MOUSEB_MIDDLE] && (selectedNodes.length > 0 || selectedComponents.length > 0))
                 {
                     Vector3 centerPoint = SelectedNodesCenterPoint();
