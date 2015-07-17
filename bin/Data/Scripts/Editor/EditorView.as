@@ -6,7 +6,6 @@ Camera@ camera;
 
 Node@ gridNode;
 CustomGeometry@ grid;
-bool mmbPan = false;
 
 UIElement@ viewportUI; // holds the viewport ui, convienent for clearing and hiding
 uint setViewportCursor = 0; // used to set cursor in post update
@@ -1002,7 +1001,7 @@ void UpdateViewParameters()
 
 void SetMMBPan(bool enableMMBPan)
 {
-	mmbPan = enableMMBPan;
+	uiMmbPan  = enableMMBPan;
 }
 
 void CreateGrid()
@@ -1272,7 +1271,7 @@ void UpdateView(float timeStep)
         if (mouseMove.x != 0 || mouseMove.y != 0)
         {
 			bool panTheCamera = false;
-			if(mmbPan)
+			if(uiMmbPan)
 				panTheCamera = !(changeCamViewButton && input.keyDown[KEY_LSHIFT]);
 			else
 				panTheCamera = (changeCamViewButton && input.keyDown[KEY_LSHIFT]);

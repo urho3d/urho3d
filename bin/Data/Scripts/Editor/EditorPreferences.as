@@ -92,8 +92,7 @@ void UpdateEditorPreferencesDialog()
     uiMaxOpacityEdit.text = String(uiMaxOpacity);
 
 	CheckBox@ middleMousePanToggle = preferencesDialog.GetChild("UIMiddleMousePan", true);
-    middleMousePanToggle.checked = mmbPan;
-	
+    middleMousePanToggle.checked = uiMmbPan;	
 	
     CheckBox@ showInternalUIElementToggle = preferencesDialog.GetChild("ShowInternalUIElement", true);
     showInternalUIElementToggle.checked = showInternalUIElement;

@@ -231,6 +231,7 @@ void LoadConfig()
     {
         if (uiElem.HasAttribute("minopacity")) uiMinOpacity = uiElem.GetFloat("minopacity");
         if (uiElem.HasAttribute("maxopacity")) uiMaxOpacity = uiElem.GetFloat("maxopacity");
+		if (uiElem.HasAttribute("mmbpan")) uiMmbPan = uiElem.GetBool("mmbpan");
     }
 
     if (!hierarchyElem.isNull)
@@ -338,6 +339,7 @@ void SaveConfig()
 
     uiElem.SetFloat("minopacity", uiMinOpacity);
     uiElem.SetFloat("maxopacity", uiMaxOpacity);
+	uiElem.SetBool("mmbpan", uiMmbPan);
 
     hierarchyElem.SetBool("showinternaluielement", showInternalUIElement);
     hierarchyElem.SetBool("showtemporaryobject", showTemporaryObject);
