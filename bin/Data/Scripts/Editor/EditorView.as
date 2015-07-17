@@ -19,6 +19,7 @@ RenderPath@ renderPath; // Renderpath to use on all views
 String renderPathName;
 bool mouseWheelCameraPosition = false;
 bool contextMenuActionWaitFrame = false;
+bool cameraFlyMode = true;
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
 const uint VIEWPORT_BORDER_H1    = 0x00000002;
@@ -1129,7 +1130,8 @@ void UpdateStats(float timeStep)
         "  Axis: " + axisModeText[axisMode] +
         "  Pick: " + pickModeText[pickMode] +
         "  Fill: " + fillModeText[fillMode] +
-        "  Updates: " + (runUpdate ? "Running" : "Paused"));
+        "  Updates: " + (runUpdate ? "Running" : "Paused") +
+        "  CameraFlyMode: " + (cameraFlyMode ? "True" : "False"));
 
     renderStatsText.text = String(
         "Tris: " + renderer.numPrimitives +
@@ -1193,14 +1195,24 @@ void UpdateView(float timeStep)
         ReleaseMouseLock();
         return;
     }
-
+    
+    // Check for camara fly mode
+    if (input.keyDown[KEY_LSHIFT] && input.keyPress[KEY_F])
+    {
+        cameraFlyMode = !cameraFlyMode;
+    }
+    
     // Move camera
     if (!input.keyDown[KEY_LCTRL])
     {
         float speedMultiplier = 1.0;
         if (input.keyDown[KEY_LSHIFT])
             speedMultiplier = cameraShiftSpeedMultiplier;
-
+        
+        
+        
+        if (cameraFlyMode) 
+        {
         if (input.keyDown['W'] || input.keyDown[KEY_UP])
         {
             cameraNode.Translate(Vector3(0, 0, cameraBaseSpeed) * timeStep * speedMultiplier);
@@ -1231,9 +1243,10 @@ void UpdateView(float timeStep)
             cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
             FadeUI();
         }
+        }
         if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
         {
-            if (mouseWheelCameraPosition)
+            if (mouseWheelCameraPosition && !camera.orthographic)
             {
                 cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep *
                     speedMultiplier);

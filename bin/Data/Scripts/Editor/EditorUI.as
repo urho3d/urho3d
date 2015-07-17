@@ -1185,15 +1185,68 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         activeViewport.ToggleOrthographic();
     }
 
-    else if (eventData["Qualifiers"].GetInt() == QUAL_CTRL)
+   
+    else if ((ui.focusElement is null) && (selectedNodes.length > 0) && !cameraFlyMode) 
     {
-        if (key == '1')
-            editMode = EDIT_MOVE;
-        else if (key == '2')
-            editMode = EDIT_ROTATE;
-        else if (key == '3')
-            editMode = EDIT_SCALE;
-        else if (key == '4')
+         if (eventData["Qualifiers"].GetInt() == QUAL_ALT)
+         {
+            if (key == KEY_G)
+                selectedNodes[0].position = Vector3(0,0,0);
+            else if (key == KEY_R)
+                selectedNodes[0].rotation = Quaternion(0,0,0);
+            else if (key == KEY_S)
+                selectedNodes[0].scale = Vector3(1,1,1); 
+            else if (key == KEY_F) 
+            {
+                 Vector3 center = Vector3(0,0,0);
+                 
+                 if (selectedNodes.length > 0)
+                    center = SelectedNodesCenterPoint();
+                 
+                 cameraNode.LookAt(center);  
+                 cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed * cameraBaseSpeed * time.timeStep ));
+                 ReacquireCameraYawPitch();
+            }    
+            toolBarDirty = true;   
+         }
+         else 
+         {
+                if (key == KEY_G) 
+                {
+                    editMode = EDIT_MOVE; 
+                    axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
+                
+                }
+                else if (key == KEY_R) 
+                {
+                    editMode = EDIT_ROTATE;
+                    axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
+                
+                }
+                else if (key == KEY_S) 
+                {
+                    editMode = EDIT_SCALE;
+                    axisMode = AxisMode(axisMode ^ AXIS_LOCAL); 
+                
+                }
+                else if (key == KEY_F) 
+                {
+                    Vector3 center = Vector3(0,0,0);
+                    
+                    if (selectedNodes.length > 0)
+                        center = SelectedNodesCenterPoint(); 
+                    
+                    cameraNode.LookAt(center);
+                    cameraNode.Translate(Vector3(0, 0, cameraBaseSpeed * cameraBaseSpeed * time.timeStep ));
+                    ReacquireCameraYawPitch(); 
+                }
+                toolBarDirty = true; 
+         }  
+
+   }
+   else if (eventData["Qualifiers"].GetInt() == QUAL_CTRL) 
+   {
+       if (key == '4')
             editMode = EDIT_SELECT;
         else if (key == '5')
             axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
