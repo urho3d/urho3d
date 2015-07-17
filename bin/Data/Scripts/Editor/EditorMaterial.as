@@ -22,10 +22,11 @@ void CreateMaterialEditor()
     materialWindow.opacity = uiMaxOpacity;
 
     InitMaterialPreview();
+    InitModelPreviewList();
     RefreshMaterialEditor();
 
-    int height = Min(ui.root.height - 60, 500);
-    materialWindow.SetSize(300, height);
+    int height = Min(ui.root.height - 60, 600);
+    materialWindow.SetSize(400, height);
     CenterDialog(materialWindow);
 
     HideMaterialEditor();
@@ -99,6 +100,15 @@ void InitMaterialPreview()
     materialPreview.autoUpdate = false;
 
     SubscribeToEvent(materialPreview, "DragMove", "RotateMaterialPreview");
+}
+
+void InitModelPreviewList()
+{
+    DropDownList@ modelPreview = materialWindow.GetChild("ModelPreview", true);
+    
+    SubscribeToEvent(materialWindow.GetChild("ModelPreview", true), "ItemSelected", "EditModelPreviewChange");
+    
+
 }
 
 void EditMaterial(Material@ mat)
@@ -471,6 +481,42 @@ void SaveMaterialAsDone(StringHash eventType, VariantMap& eventData)
         if (newMat !is null)
             EditMaterial(newMat);
     }
+}
+
+void EditModelPreviewChange(StringHash eventType, VariantMap& eventData)
+{
+    if (materialPreview is null)
+        return;
+        
+    previewModelNode.scale = Vector3(1.0, 1.0, 1.0);
+    
+    DropDownList@ element = eventData["Element"].GetPtr();
+    
+    switch (element.selection)
+    {
+        case 0:
+            previewModel.model = cache.GetResource("Model", "Models/Box.mdl");
+            break;
+        case 1:
+            previewModel.model = cache.GetResource("Model", "Models/Sphere.mdl");
+            break;
+        case 2:
+            previewModel.model = cache.GetResource("Model", "Models/Plane.mdl");
+            break;
+        case 3:
+            previewModel.model = cache.GetResource("Model", "Models/Cylinder.mdl");
+            previewModelNode.scale = Vector3(0.8, 0.8, 0.8);
+            break;
+        case 4:
+            previewModel.model = cache.GetResource("Model", "Models/Cone.mdl");
+            break;
+        case 5:
+            previewModel.model = cache.GetResource("Model", "Models/TeaPot.mdl");
+            break;
+    }
+        
+    materialPreview.QueueUpdate();
+    
 }
 
 void EditShaderParameter(StringHash eventType, VariantMap& eventData)
