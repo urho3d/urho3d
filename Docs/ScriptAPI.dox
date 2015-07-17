@@ -6463,10 +6463,10 @@ Methods:
 - bool Resize(int, int)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- void SaveBMP(const String&) const
-- void SaveJPG(const String&, int) const
-- void SavePNG(const String&) const
-- void SaveTGA(const String&) const
+- bool SaveBMP(const String&) const
+- bool SaveJPG(const String&, int) const
+- bool SavePNG(const String&) const
+- bool SaveTGA(const String&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetPixel(int, int, const Color&)
 - void SetPixel(int, int, int, const Color&)
