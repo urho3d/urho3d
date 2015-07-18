@@ -18,6 +18,7 @@ CreateMode instantiateMode = REPLICATED;
 bool sceneModified = false;
 bool runUpdate = false;
 
+Node@ lastSelectedNode;
 Array<Node@> selectedNodes;
 Array<Component@> selectedComponents;
 Node@ editNode;
@@ -753,6 +754,54 @@ bool SceneUnparent()
         group.actions.Push(action);
 
         SceneChangeParent(sourceNode, editorScene, false);
+        changedNodes.Push(sourceNode);
+    }
+
+    // Reselect the changed nodes at their new position in the list
+    for (uint i = 0; i < changedNodes.length; ++i)
+        hierarchyList.AddSelection(GetListIndex(changedNodes[i]));
+
+    SaveEditActionGroup(group);
+    SetSceneModified();
+
+    return true;
+}
+
+bool NodesParentToLastSelected()
+{
+    if (lastSelectedNode is null)
+        return false;
+        
+    if (!CheckHierarchyWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
+        return false;
+
+    ui.cursor.shape = CS_BUSY;
+
+    // Group for storing undo actions
+    EditActionGroup group;
+
+    // Parent selected nodes to root
+    Array<Node@> changedNodes;
+    
+    // Find new parent node it selected last
+    Node@ lastNode = lastSelectedNode;
+    
+    for (uint i = 0; i < selectedNodes.length; ++i)
+    {
+        
+        Node@ sourceNode = selectedNodes[i];
+        if ( sourceNode.id == lastNode.id)
+            continue; // Skip last node it is parent
+        
+        if (sourceNode.parent.id == lastNode.id)
+            continue; // Root or already parented to root
+
+        // Perform the reparenting, continue loop even if action fails
+        ReparentNodeAction action;
+        action.Define(sourceNode, lastNode);
+        group.actions.Push(action);
+
+        SceneChangeParent(sourceNode, lastNode, false);
         changedNodes.Push(sourceNode);
     }
 

@@ -367,9 +367,19 @@ void CreateMenuBar()
         else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
             popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'P', QUAL_ALT));
 
-        
+        if ( hotKeyMode == HOT_KEYS_MODE_STANDART )
+            popup.AddChild(CreateMenuItem("Parent to last", @NodesParentToLastSelected, 'U'));
+        else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+            popup.AddChild(CreateMenuItem("Parent to last", @NodesParentToLastSelected, 'P', QUAL_CTRL));
+
         CreateChildDivider(popup);
-        popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
+        
+        if ( hotKeyMode == HOT_KEYS_MODE_STANDART )
+            popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
+        //else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+        //    popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
+        
+        
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Rebuild navigation data", @SceneRebuildNavigation));
