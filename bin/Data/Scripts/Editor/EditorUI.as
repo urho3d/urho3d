@@ -323,20 +323,51 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Redo", @Redo, 'Y', QUAL_CTRL));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Cut", @Cut, 'X', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_CTRL));
+        
+        if ( hotKeyMode == HOT_KEYS_MODE_STANDART )
+            popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_CTRL));
+        else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+          popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_SHIFT ));
+        
         popup.AddChild(CreateMenuItem("Copy", @Copy, 'C', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Paste", @Paste, 'V', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Delete", @Delete, KEY_DELETE, QUAL_ANY));
+        
+        if ( hotKeyMode == HOT_KEYS_MODE_STANDART )
+            popup.AddChild(CreateMenuItem("Delete", @Delete, KEY_DELETE, QUAL_ANY));
+        else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+            popup.AddChild(CreateMenuItem("Delete", @Delete, 'X', QUAL_ANY));
+        
         popup.AddChild(CreateMenuItem("Select all", @SelectAll, 'A', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Deselect all", @DeselectAll, 'A', QUAL_SHIFT | QUAL_CTRL));
+        
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Reset to default", @ResetToDefault));
         CreateChildDivider(popup);
-        popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition));
-        popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation));
-        popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale));
-        popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'E', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'U', QUAL_CTRL));
+        
+        if ( hotKeyMode == HOT_KEYS_MODE_STANDART )    
+        {
+            popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition));
+            popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation));
+            popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale));
+        }
+        else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+        { 
+            popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition, 'G' , QUAL_ALT));
+            popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation, 'R', QUAL_ALT ));
+            popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale, 'S', QUAL_ALT));
+        }
+        
+        if ( hotKeyMode == HOT_KEYS_MODE_STANDART )    
+            popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'E', QUAL_CTRL));
+        else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+            popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'H'));
+
+        if ( hotKeyMode == HOT_KEYS_MODE_STANDART )
+            popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'U', QUAL_CTRL));
+        else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+            popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'P', QUAL_ALT));
+
+        
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
@@ -1094,11 +1125,192 @@ void HandleUIElementDefaultStyle(StringHash eventType, VariantMap& eventData)
     SetUIElementDefaultStyle(ExtractFileName(eventData));
 }
 
-void HandleKeyDown(StringHash eventType, VariantMap& eventData)
+void HandleHotKeysBlender( VariantMap& eventData ) 
 {
     int key = eventData["Key"].GetInt();
     int viewDirection = eventData["Qualifiers"].GetInt() == QUAL_CTRL ? -1 : 1;
+    
+    if (key == KEY_ESC)
+    {
+        if (uiHidden)
+            UnhideUI();
+        else if (console.visible)
+            console.visible = false;
+        else if (contextMenu.visible)
+            CloseContextMenu();
+        else if (quickMenu.visible)
+        {
+            quickMenu.visible = false;
+            quickMenu.enabled = false;
+        }
+        else
+        {
+            UIElement@ front = ui.frontElement;
+            if (front is settingsDialog || front is preferencesDialog)
+            {
+                ui.focusElement = null;
+                front.visible = false;
+            }
+        }
+    }
+    // Ignore other keys when UI has a modal element
+    else if (ui.HasModalElement())
+        return;
 
+    else if (key == KEY_F1)
+        console.Toggle();
+    else if (key == KEY_F2)
+        ToggleRenderingDebug();
+    else if (key == KEY_F3)
+        TogglePhysicsDebug();
+    else if (key == KEY_F4)
+        ToggleOctreeDebug();
+    else if (key == KEY_F11)
+    {
+        Image@ screenshot = Image();
+        graphics.TakeScreenShot(screenshot);
+        if (!fileSystem.DirExists(screenshotDir))
+            fileSystem.CreateDir(screenshotDir);
+        screenshot.SavePNG(screenshotDir + "/Screenshot_" +
+                time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
+    }   
+    else if (key == KEY_KP_1 && ui.focusElement is null) // Front view
+    {
+        Vector3 center = Vector3(0,0,0);
+        if (selectedNodes.length > 0 || selectedComponents.length > 0)
+            center = SelectedNodesCenterPoint();
+            
+        Vector3 pos = cameraNode.worldPosition - center;
+        cameraNode.worldPosition = center - Vector3(0.0, 0.0, pos.length * viewDirection);
+        cameraNode.direction = Vector3(0, 0, viewDirection);
+        ReacquireCameraYawPitch();
+    }
+
+    else if (key == KEY_KP_3 && ui.focusElement is null) // Side view
+    {
+        Vector3 center = Vector3(0,0,0);
+        if (selectedNodes.length > 0 || selectedComponents.length > 0)
+            center = SelectedNodesCenterPoint();
+            
+        Vector3 pos = cameraNode.worldPosition - center;
+        cameraNode.worldPosition = center - Vector3(pos.length * -viewDirection, 0.0, 0.0);
+        cameraNode.direction = Vector3(-viewDirection, 0, 0);
+        ReacquireCameraYawPitch();
+    }
+
+    else if (key == KEY_KP_7 && ui.focusElement is null) // Top view
+    {
+        Vector3 center = Vector3(0,0,0);
+        if (selectedNodes.length > 0 || selectedComponents.length > 0)
+            center = SelectedNodesCenterPoint();
+            
+        Vector3 pos = cameraNode.worldPosition - center;
+        cameraNode.worldPosition = center - Vector3(0.0, pos.length * -viewDirection, 0.0);
+        cameraNode.direction = Vector3(0, -viewDirection, 0);
+        ReacquireCameraYawPitch();
+    }
+    else if (key == KEY_KP_5 && ui.focusElement is null)
+    {
+        activeViewport.ToggleOrthographic();
+    }
+    else if (key == '4')
+        editMode = EDIT_SELECT;
+    else if (key == '5')
+        axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
+    else if (key == '6')
+    {
+        --pickMode;
+        if (pickMode < PICK_GEOMETRIES)
+                pickMode = MAX_PICK_MODES - 1;
+    }
+    else if (key == '7')
+    {
+        ++pickMode;
+        if (pickMode >= MAX_PICK_MODES)
+            pickMode = PICK_GEOMETRIES;
+    }
+    else if (key == 'Z' && eventData["Qualifiers"].GetInt() != QUAL_CTRL)
+    {
+        fillMode = FillMode(fillMode + 1);
+        if (fillMode > FILL_POINT)
+            fillMode = FILL_SOLID;
+
+        // Update camera fill mode
+        SetFillMode(fillMode);
+    }
+    else if (key == KEY_SPACE)
+    {
+        if (ui.cursor.visible)
+            ToggleQuickMenu();
+    }
+    else 
+    {
+        SteppedObjectManipulation(key);
+    }
+        
+    if ((ui.focusElement is null) && (selectedNodes.length > 0) && !cameraFlyMode) 
+    {
+         if (eventData["Qualifiers"].GetInt() == QUAL_ALT) // reset transformations
+         {
+            if (key == KEY_G)
+                selectedNodes[0].position = Vector3(0,0,0);
+            else if (key == KEY_R)
+                selectedNodes[0].rotation = Quaternion(0,0,0);
+            else if (key == KEY_S)
+                selectedNodes[0].scale = Vector3(1,1,1); 
+            else if (key == KEY_F) 
+            {
+                 Vector3 center = Vector3(0,0,0);
+                 
+                 if (selectedNodes.length > 0)
+                    center = SelectedNodesCenterPoint();
+                 
+                 cameraNode.LookAt(center);  
+                 //cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed * cameraBaseSpeed * time.timeStep ));
+                 ReacquireCameraYawPitch();
+            } 
+         }
+         else if ( eventData["Qualifiers"].GetInt() != QUAL_CTRL) // set transformations
+         {
+                if (key == KEY_G) 
+                {
+                    editMode = EDIT_MOVE; 
+                    axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
+                
+                }
+                else if (key == KEY_R) 
+                {
+                    editMode = EDIT_ROTATE;
+                    axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
+                
+                }
+                else if (key == KEY_S) 
+                {
+                    editMode = EDIT_SCALE;
+                    axisMode = AxisMode(axisMode ^ AXIS_LOCAL); 
+                }
+                else if (key == KEY_F) 
+                {
+                    Vector3 center = Vector3(0,0,0);
+                    
+                    if (selectedNodes.length > 0)
+                        center = SelectedNodesCenterPoint(); 
+                    
+                    cameraNode.LookAt(center);
+                    //cameraNode.Translate(Vector3(0, 0, cameraBaseSpeed * cameraBaseSpeed * time.timeStep ));
+                    ReacquireCameraYawPitch(); 
+                }
+         }  
+    }
+    
+    toolBarDirty = true;
+}
+
+void HandleHotKeysStandart ( VariantMap& eventData) 
+{
+    int key = eventData["Key"].GetInt();
+    int viewDirection = eventData["Qualifiers"].GetInt() == QUAL_CTRL ? -1 : 1;
+    
     if (key == KEY_ESC)
     {
         if (uiHidden)
@@ -1184,69 +1396,15 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     {
         activeViewport.ToggleOrthographic();
     }
-
-   
-    else if ((ui.focusElement is null) && (selectedNodes.length > 0) && !cameraFlyMode) 
+    else if (eventData["Qualifiers"].GetInt() == QUAL_CTRL) 
     {
-         if (eventData["Qualifiers"].GetInt() == QUAL_ALT)
-         {
-            if (key == KEY_G)
-                selectedNodes[0].position = Vector3(0,0,0);
-            else if (key == KEY_R)
-                selectedNodes[0].rotation = Quaternion(0,0,0);
-            else if (key == KEY_S)
-                selectedNodes[0].scale = Vector3(1,1,1); 
-            else if (key == KEY_F) 
-            {
-                 Vector3 center = Vector3(0,0,0);
-                 
-                 if (selectedNodes.length > 0)
-                    center = SelectedNodesCenterPoint();
-                 
-                 cameraNode.LookAt(center);  
-                 cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed * cameraBaseSpeed * time.timeStep ));
-                 ReacquireCameraYawPitch();
-            }    
-            toolBarDirty = true;   
-         }
-         else 
-         {
-                if (key == KEY_G) 
-                {
-                    editMode = EDIT_MOVE; 
-                    axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
-                
-                }
-                else if (key == KEY_R) 
-                {
-                    editMode = EDIT_ROTATE;
-                    axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
-                
-                }
-                else if (key == KEY_S) 
-                {
-                    editMode = EDIT_SCALE;
-                    axisMode = AxisMode(axisMode ^ AXIS_LOCAL); 
-                
-                }
-                else if (key == KEY_F) 
-                {
-                    Vector3 center = Vector3(0,0,0);
-                    
-                    if (selectedNodes.length > 0)
-                        center = SelectedNodesCenterPoint(); 
-                    
-                    cameraNode.LookAt(center);
-                    cameraNode.Translate(Vector3(0, 0, cameraBaseSpeed * cameraBaseSpeed * time.timeStep ));
-                    ReacquireCameraYawPitch(); 
-                }
-                toolBarDirty = true; 
-         }  
-
-   }
-   else if (eventData["Qualifiers"].GetInt() == QUAL_CTRL) 
-   {
-       if (key == '4')
+        if (key == '1') 
+            editMode = EDIT_MOVE; 
+        else if (key == '2') 
+            editMode = EDIT_ROTATE;
+        else if (key == '3') 
+            editMode = EDIT_SCALE;
+        else if (key == '4')
             editMode = EDIT_SELECT;
         else if (key == '5')
             axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
@@ -1278,7 +1436,20 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         }
         else
             SteppedObjectManipulation(key);
+            
         toolBarDirty = true;
+    }
+}
+
+void HandleKeyDown(StringHash eventType, VariantMap& eventData)
+{
+    if ( hotKeyMode == HOT_KEYS_MODE_STANDART)
+    {
+        HandleHotKeysStandart( eventData );
+    }
+    else if( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+    {
+        HandleHotKeysBlender ( eventData );
     }
 }
 

@@ -20,6 +20,7 @@ String renderPathName;
 bool mouseWheelCameraPosition = false;
 bool contextMenuActionWaitFrame = false;
 bool cameraFlyMode = true;
+int hotKeyMode = 0; // used for checking that kind of style manipulation user are prefer ( see HotKeysMode )
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
 const uint VIEWPORT_BORDER_H1    = 0x00000002;
@@ -49,6 +50,12 @@ const uint VIEWPORT_BOTTOM_ANY   = 0x0000c200;
 const uint VIEWPORT_LEFT_ANY     = 0x00005400;
 const uint VIEWPORT_RIGHT_ANY    = 0x0000c800;
 const uint VIEWPORT_QUAD         = 0x0000f000;
+
+enum HotKeysMode
+{
+    HOT_KEYS_MODE_STANDART = 0,
+    HOT_KEYS_MODE_BLENDER
+}
 
 enum EditMode
 {
@@ -1125,14 +1132,17 @@ void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment
 
 void UpdateStats(float timeStep)
 {
+    String adding = "";
+    if (hotKeyMode == HOT_KEYS_MODE_BLENDER)
+       adding = "  CameraFlyMode: " + (cameraFlyMode ? "True" : "False");
+    
     editorModeText.text = String(
         "Mode: " + editModeText[editMode] +
         "  Axis: " + axisModeText[axisMode] +
         "  Pick: " + pickModeText[pickMode] +
         "  Fill: " + fillModeText[fillMode] +
-        "  Updates: " + (runUpdate ? "Running" : "Paused") +
-        "  CameraFlyMode: " + (cameraFlyMode ? "True" : "False"));
-
+        "  Updates: " + (runUpdate ? "Running" : "Paused") + adding);
+        
     renderStatsText.text = String(
         "Tris: " + renderer.numPrimitives +
         "  Batches: " + renderer.numBatches +
@@ -1197,10 +1207,11 @@ void UpdateView(float timeStep)
     }
     
     // Check for camara fly mode
-    if (input.keyDown[KEY_LSHIFT] && input.keyPress[KEY_F])
-    {
-        cameraFlyMode = !cameraFlyMode;
-    }
+    if (hotKeyMode == HOT_KEYS_MODE_BLENDER )
+        if (input.keyDown[KEY_LSHIFT] && input.keyPress[KEY_F])
+        {
+            cameraFlyMode = !cameraFlyMode;
+        }
     
     // Move camera
     if (!input.keyDown[KEY_LCTRL])
@@ -1209,9 +1220,7 @@ void UpdateView(float timeStep)
         if (input.keyDown[KEY_LSHIFT])
             speedMultiplier = cameraShiftSpeedMultiplier;
         
-        
-        
-        if (cameraFlyMode) 
+        if (cameraFlyMode || hotKeyMode == HOT_KEYS_MODE_STANDART) 
         {
         if (input.keyDown['W'] || input.keyDown[KEY_UP])
         {
@@ -1246,16 +1255,33 @@ void UpdateView(float timeStep)
         }
         if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
         {
-            if (mouseWheelCameraPosition && !camera.orthographic)
+            if ( hotKeyMode == HOT_KEYS_MODE_STANDART) 
             {
-                cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep *
+                if (mouseWheelCameraPosition)
+                {
+                    cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep *
                     speedMultiplier);
+                }
+                else
+                {
+                    float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
+                    camera.zoom = Clamp(zoom, .1, 30);
+                }
             }
-            else
+            else if (hotKeyMode == HOT_KEYS_MODE_BLENDER) 
             {
-                float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
-                camera.zoom = Clamp(zoom, .1, 30);
+                if (mouseWheelCameraPosition && !camera.orthographic )
+                {
+                    cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep *
+                    speedMultiplier);
+                }
+                else
+                {
+                    float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
+                    camera.zoom = Clamp(zoom, .1, 30);
+                }
             }
+            
         }
     }
 

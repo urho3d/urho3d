@@ -46,6 +46,9 @@ void UpdateEditorSettingsDialog()
     CheckBox@ middleMousePanToggle = settingsDialog.GetChild("MiddleMousePanToggle", true);
     middleMousePanToggle.checked = mmbPanMode;
 
+    DropDownList@ hotKeysModeEdit = settingsDialog.GetChild("HotKeysModeEdit", true);
+    hotKeysModeEdit.selection = hotKeyMode;
+
     DropDownList@ newNodeModeEdit = settingsDialog.GetChild("NewNodeModeEdit", true);
     newNodeModeEdit.selection = newNodeMode;
 
@@ -122,6 +125,7 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(mouseWheelCameraPositionToggle, "Toggled", "EditMouseWheelCameraPosition");
         SubscribeToEvent(middleMousePanToggle, "Toggled", "EditMiddleMousePan");
         SubscribeToEvent(mouseOrbitEdit, "ItemSelected", "EditMouseOrbitMode");
+        SubscribeToEvent(hotKeysModeEdit, "ItemSelected", "EditHotKeyMode");
         SubscribeToEvent(newNodeModeEdit, "ItemSelected", "EditNewNodeMode");
         SubscribeToEvent(distanceEdit, "TextChanged", "EditNewNodeDistance");
         SubscribeToEvent(distanceEdit, "TextFinished", "EditNewNodeDistance");
@@ -224,6 +228,14 @@ void EditMouseOrbitMode(StringHash eventType, VariantMap& eventData)
 void EditMiddleMousePan(StringHash eventType, VariantMap& eventData)
 {
     mmbPanMode = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
+}
+
+void EditHotKeyMode(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList@ edit = eventData["Element"].GetPtr();
+    hotKeyMode = edit.selection;
+    MessageBox("Please, restart Urho editor for applying changes.\n", " Notify ");
+    
 }
 
 void EditNewNodeMode(StringHash eventType, VariantMap& eventData)

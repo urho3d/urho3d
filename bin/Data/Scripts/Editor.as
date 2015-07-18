@@ -179,6 +179,8 @@ void LoadConfig()
 
     if (!objectElem.isNull)
     {
+        if (objectElem.HasAttribute("cameraflymode")) cameraFlyMode = objectElem.GetBool("cameraflymode");
+        if (objectElem.HasAttribute("hotkeymode")) hotKeyMode = objectElem.GetInt("hotkeymode");
         if (objectElem.HasAttribute("newnodemode")) newNodeMode = objectElem.GetInt("newnodemode");
         if (objectElem.HasAttribute("newnodedistance")) newNodeDistance = objectElem.GetFloat("newnodedistance");
         if (objectElem.HasAttribute("movestep")) moveStep = objectElem.GetFloat("movestep");
@@ -305,6 +307,8 @@ void SaveConfig()
     cameraElem.SetInt("mouseorbitmode", mouseOrbitMode);
     cameraElem.SetBool("mmbpan", mmbPanMode);
 
+    objectElem.SetBool("cameraflymode", cameraFlyMode);
+    objectElem.SetInt("hotkeymode", hotKeyMode);
     objectElem.SetInt("newnodemode", newNodeMode);
     objectElem.SetFloat("newnodedistance", newNodeDistance);
     objectElem.SetFloat("movestep", moveStep);
