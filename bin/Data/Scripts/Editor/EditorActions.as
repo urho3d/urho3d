@@ -14,6 +14,46 @@ class EditActionGroup
     Array<EditAction@> actions;
 }
 
+class CreateDrawableMaskAction : EditAction
+{
+    uint nodeID;
+    uint drawableID;
+    int oldViewMask;
+    int redoViewMask;
+
+    void Define(Drawable@ drawable)
+    {
+        drawableID = drawable.id;
+        nodeID = drawable.node.id;
+        oldViewMask = drawable.viewMask;
+        redoViewMask = oldViewMask;
+    }
+
+    void Undo()
+    {
+        Node@ node = editorScene.GetNode(nodeID);
+        Drawable@ drawable = editorScene.GetComponent(drawableID);
+        if (node !is null && drawable !is null)
+        {
+            redoViewMask = drawable.viewMask;
+            drawable.viewMask = oldViewMask;
+        }
+    }
+
+    void Redo()
+    {
+        Node@ node = editorScene.GetNode(nodeID);
+        Drawable@ drawable = editorScene.GetComponent(drawableID);
+        if (node !is null && drawable !is null)
+        {
+            oldViewMask = drawable.viewMask;
+            drawable.viewMask = redoViewMask;
+        }
+    }
+
+
+}
+
 class CreateNodeAction : EditAction
 {
     uint nodeID;

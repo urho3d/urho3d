@@ -519,6 +519,11 @@ bool ToggleSceneUpdate()
     return true;
 }
 
+bool ShowLayerMover()
+{
+  return ShowLayerEditor();
+}
+
 void SetSceneModified()
 {
     if (!sceneModified)

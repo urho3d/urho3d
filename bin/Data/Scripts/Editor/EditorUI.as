@@ -87,6 +87,7 @@ void CreateUI()
     CreateDebugHud();
     CreateResourceBrowser();
     CreateCamera();
+    CreateLayerEditor();
 
     SubscribeToEvent("ScreenMode", "ResizeUI");
     SubscribeToEvent("MenuSelected", "HandleMenuSelected");
@@ -327,7 +328,7 @@ void CreateMenuBar()
         if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
             popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_CTRL));
         else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
-          popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_SHIFT ));
+            popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_SHIFT ));
         
         popup.AddChild(CreateMenuItem("Copy", @Copy, 'C', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Paste", @Paste, 'V', QUAL_CTRL));
@@ -385,6 +386,8 @@ void CreateMenuBar()
         //else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
         //    popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
         
+        if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+             popup.AddChild(CreateMenuItem("Move to layer", @ShowLayerMover, 'M'));
         
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
         CreateChildDivider(popup);
@@ -1256,7 +1259,7 @@ void HandleHotKeysBlender( VariantMap& eventData )
     }
     else if (key == KEY_SPACE)
     {
-        if (ui.cursor.visible)
+        if (ui.cursor.visible && ui.focusElement is null)
             ToggleQuickMenu();
     }
     else 
