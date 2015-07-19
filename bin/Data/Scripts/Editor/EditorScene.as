@@ -861,6 +861,60 @@ bool SceneToggleEnable()
     return true;
 }
 
+bool SceneEnableAllNodes()
+{
+    if (!CheckHierarchyWindowFocus())
+        return false;
+
+    ui.cursor.shape = CS_BUSY;
+
+    EditActionGroup group;
+
+    // Toggle enabled state of nodes recursively
+    Array<Node@> allNodes;
+    allNodes = editorScene.GetChildren(true);
+    
+    for (uint i = 0; i < allNodes.length; ++i)
+    {
+        // Do not attempt to disable the Scene
+        if (allNodes[i].typeName == "Node")
+        {
+            bool oldEnabled = allNodes[i].enabled;
+            if (oldEnabled == false)
+              allNodes[i].SetEnabledRecursive(true);
+
+            // Create undo action
+            ToggleNodeEnabledAction action;
+            action.Define(allNodes[i], oldEnabled);
+            group.actions.Push(action);
+        }
+    }
+    
+    Array<Component@> allComponents;
+    allComponents = editorScene.GetComponents();
+    
+    for (uint i = 0; i < allComponents.length; ++i)
+    {
+        // Some components purposefully do not expose the Enabled attribute, and it does not affect them in any way
+        // (Octree, PhysicsWorld). Check that the first attribute is in fact called "Is Enabled"
+        if (allComponents[i].numAttributes > 0 && allComponents[i].attributeInfos[0].name == "Is Enabled")
+        {
+            bool oldEnabled = allComponents[i].enabled;
+            allComponents[i].enabled = true;
+
+            // Create undo action
+            EditAttributeAction action;
+            action.Define(allComponents[i], 0, Variant(oldEnabled));
+            group.actions.Push(action);
+        }
+    }
+
+    SaveEditActionGroup(group);
+    SetSceneModified();
+
+    return true;
+}
+
 bool SceneChangeParent(Node@ sourceNode, Node@ targetNode, bool createUndoAction = true)
 {
     // Create undo action if requested

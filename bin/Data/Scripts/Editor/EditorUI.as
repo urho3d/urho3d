@@ -357,11 +357,17 @@ void CreateMenuBar()
             popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale, 'S', QUAL_ALT));
         }
         
-        if ( hotKeyMode == HOT_KEYS_MODE_STANDART )    
+        if ( hotKeyMode == HOT_KEYS_MODE_STANDART ) 
+        {
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'E', QUAL_CTRL));
-        else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+            popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'E', QUAL_ALT));
+        }
+        else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER ) 
+        {
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'H'));
-
+            popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'H', QUAL_ALT));
+        }
+        
         if ( hotKeyMode == HOT_KEYS_MODE_STANDART )
             popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'U', QUAL_CTRL));
         else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
