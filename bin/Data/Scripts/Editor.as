@@ -17,6 +17,8 @@
 #include "Scripts/Editor/EditorResourceBrowser.as"
 #include "Scripts/Editor/EditorSpawn.as"
 #include "Scripts/Editor/EditorSoundType.as"
+#include "Scripts/Editor/EditorLayers.as"
+
 
 String configFileName;
 
