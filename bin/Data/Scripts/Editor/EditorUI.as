@@ -324,17 +324,17 @@ void CreateMenuBar()
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Cut", @Cut, 'X', QUAL_CTRL));
         
-        if ( hotKeyMode == HOT_KEYS_MODE_STANDART )
+        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
             popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_CTRL));
-        else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
           popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_SHIFT ));
         
         popup.AddChild(CreateMenuItem("Copy", @Copy, 'C', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Paste", @Paste, 'V', QUAL_CTRL));
         
-        if ( hotKeyMode == HOT_KEYS_MODE_STANDART )
+        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
             popup.AddChild(CreateMenuItem("Delete", @Delete, KEY_DELETE, QUAL_ANY));
-        else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
             popup.AddChild(CreateMenuItem("Delete", @Delete, 'X', QUAL_ANY));
         
         popup.AddChild(CreateMenuItem("Select all", @SelectAll, 'A', QUAL_CTRL));
@@ -344,43 +344,43 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Reset to default", @ResetToDefault));
         CreateChildDivider(popup);
         
-        if ( hotKeyMode == HOT_KEYS_MODE_STANDART )    
+        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )    
         {
             popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition));
             popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation));
             popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale));
         }
-        else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
         { 
             popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition, 'G' , QUAL_ALT));
             popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation, 'R', QUAL_ALT ));
             popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale, 'S', QUAL_ALT));
         }
         
-        if ( hotKeyMode == HOT_KEYS_MODE_STANDART ) 
+        if ( hotKeyMode == HOTKEYS_MODE_STANDARD ) 
         {
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'E', QUAL_CTRL));
             popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'E', QUAL_ALT));
         }
-        else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER ) 
+        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) 
         {
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'H'));
             popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'H', QUAL_ALT));
         }
         
-        if ( hotKeyMode == HOT_KEYS_MODE_STANDART )
+        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
             popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'U', QUAL_CTRL));
-        else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
             popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'P', QUAL_ALT));
 
-        if ( hotKeyMode == HOT_KEYS_MODE_STANDART )
+        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
             popup.AddChild(CreateMenuItem("Parent to last", @NodesParentToLastSelected, 'U'));
-        else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
             popup.AddChild(CreateMenuItem("Parent to last", @NodesParentToLastSelected, 'P', QUAL_CTRL));
 
         CreateChildDivider(popup);
         
-        if ( hotKeyMode == HOT_KEYS_MODE_STANDART )
+        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
             popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
         //else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
         //    popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
@@ -1459,11 +1459,11 @@ void HandleHotKeysStandart ( VariantMap& eventData)
 
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-    if ( hotKeyMode == HOT_KEYS_MODE_STANDART)
+    if ( hotKeyMode == HOTKEYS_MODE_STANDARD)
     {
         HandleHotKeysStandart( eventData );
     }
-    else if( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+    else if( hotKeyMode == HOTKEYS_MODE_BLENDER )
     {
         HandleHotKeysBlender ( eventData );
     }

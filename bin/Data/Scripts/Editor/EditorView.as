@@ -53,8 +53,8 @@ const uint VIEWPORT_QUAD         = 0x0000f000;
 
 enum HotKeysMode
 {
-    HOT_KEYS_MODE_STANDART = 0,
-    HOT_KEYS_MODE_BLENDER
+    HOTKEYS_MODE_STANDARD = 0,
+    HOTKEYS_MODE_BLENDER
 }
 
 enum EditMode
@@ -1133,7 +1133,7 @@ void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment
 void UpdateStats(float timeStep)
 {
     String adding = "";
-    if (hotKeyMode == HOT_KEYS_MODE_BLENDER)
+    if (hotKeyMode == HOTKEYS_MODE_BLENDER)
        adding = "  CameraFlyMode: " + (cameraFlyMode ? "True" : "False");
     
     editorModeText.text = String(
@@ -1207,7 +1207,7 @@ void UpdateView(float timeStep)
     }
     
     // Check for camara fly mode
-    if (hotKeyMode == HOT_KEYS_MODE_BLENDER )
+    if (hotKeyMode == HOTKEYS_MODE_BLENDER )
         if (input.keyDown[KEY_LSHIFT] && input.keyPress[KEY_F])
         {
             cameraFlyMode = !cameraFlyMode;
@@ -1220,7 +1220,7 @@ void UpdateView(float timeStep)
         if (input.keyDown[KEY_LSHIFT])
             speedMultiplier = cameraShiftSpeedMultiplier;
         
-        if (cameraFlyMode || hotKeyMode == HOT_KEYS_MODE_STANDART) 
+        if (cameraFlyMode || hotKeyMode == HOTKEYS_MODE_STANDARD) 
         {
         if (input.keyDown['W'] || input.keyDown[KEY_UP])
         {
@@ -1255,7 +1255,7 @@ void UpdateView(float timeStep)
         }
         if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
         {
-            if ( hotKeyMode == HOT_KEYS_MODE_STANDART) 
+            if ( hotKeyMode == HOTKEYS_MODE_STANDARD) 
             {
                 if (mouseWheelCameraPosition)
                 {
@@ -1268,7 +1268,7 @@ void UpdateView(float timeStep)
                     camera.zoom = Clamp(zoom, .1, 30);
                 }
             }
-            else if (hotKeyMode == HOT_KEYS_MODE_BLENDER) 
+            else if (hotKeyMode == HOTKEYS_MODE_BLENDER) 
             {
                 if (mouseWheelCameraPosition && !camera.orthographic )
                 {
