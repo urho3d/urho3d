@@ -31,6 +31,7 @@
 #include "../UI/FontFace.h"
 #include "../UI/Text.h"
 #include "../Resource/Localization.h"
+#include "../Resource/ResourceEvents.h"
 
 #include "../DebugNew.h"
 
@@ -264,11 +265,8 @@ void Text::SetText(const String& text)
     if (autoLocalizable_)
     {
         stringId_ = text;
-        if (!stringId_.Empty())
-        {
-            Localization* l10n = GetSubsystem<Localization>();
-            text_ = l10n->Get(stringId_);
-        }
+        Localization* l10n = GetSubsystem<Localization>();
+        text_ = l10n->Get(stringId_);
     }
     else
     {
@@ -315,11 +313,8 @@ void Text::SetAutoLocalizable(bool enable)
         if (enable)
         {
             stringId_ = text_;
-            if (!stringId_.Empty())
-            {
-                Localization* l10n = GetSubsystem<Localization>();
-                text_ = l10n->Get(stringId_);
-            }
+            Localization* l10n = GetSubsystem<Localization>();
+            text_ = l10n->Get(stringId_);
             SubscribeToEvent(E_CHANGELANGUAGE, HANDLER(Text, HandleChangeLanguage));
         }
         else
@@ -336,8 +331,6 @@ void Text::SetAutoLocalizable(bool enable)
 
 void Text::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
 {
-    if (!autoLocalizable_ || stringId_.Empty())
-        return;
     Localization* l10n = GetSubsystem<Localization>();
     text_ = l10n->Get(stringId_);
     DecodeToUnicode();

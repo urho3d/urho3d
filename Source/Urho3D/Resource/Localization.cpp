@@ -25,6 +25,7 @@
 #include "../Resource/Localization.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/JSONFile.h"
+#include "../Resource/ResourceEvents.h"
 #include "../IO/Log.h"
 
 #include "../DebugNew.h"
@@ -35,6 +36,10 @@ namespace Urho3D
 Localization::Localization(Context* context) :
     Object(context),
     languageIndex_(-1)
+{
+}
+
+Localization::~Localization()
 {
 }
 
@@ -79,10 +84,14 @@ void Localization::SetLanguage(const String &language)
 
 String Localization::Get(const String &id)
 {
-    assert(!id.Empty());
+    if (id.Empty())
+        return String::EMPTY;
     String result = strings_[StringHash(GetLanguage())][StringHash(id)];
     if (result.Empty())
-        LOGWARNING("Localization::Get returns empty result: language=" + GetLanguage() + ", id=" + id);
+    {
+        LOGWARNING("Localization::Get(\"" + id + "\") not found translation, language=\"" + GetLanguage() + "\"");
+        return id;
+    }
     return result;
 }
 

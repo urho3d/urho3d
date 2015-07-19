@@ -252,12 +252,11 @@ protected:
     PODVector<CharLocation> charLocations_;
     /// The text will be automatically translated.
     bool autoLocalizable_;
-    /// Storage string id.
+    /// Storage string id. Used when enabled autoLocalizable.
     String stringId_;
-    /// Handle change Language;
+    /// Handle change Language.
     void HandleChangeLanguage(StringHash eventType, VariantMap& eventData);
-
-private:
+    /// UTF8 to Unicode.
     void DecodeToUnicode();
 };
 

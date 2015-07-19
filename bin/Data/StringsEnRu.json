@@ -7,9 +7,9 @@
 		"en":"Quit",
 		"ru":"Выйти"
 	},
-	"long text":{
-		"en":"Some long text blah blah blah",
-		"ru":"Некоторый длинный текст бла бла бла"
+	"Press this button":{
+		"en":"Press this button",
+		"ru":"Нажмите эту кнопку"
 	},
 	"title":{
 		"en":"Title",

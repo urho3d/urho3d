@@ -392,6 +392,10 @@ When writing new resource types, the background loading mechanism requires imple
 
 If a resource depends on other resources, writing efficient threaded loading for it can be hard, as calling GetResource() is not allowed inside BeginLoad() when background loading. There are a few options: it is allowed to queue new background load requests by calling BackgroundLoadResource() within BeginLoad(), or if the needed resource does not need to be permanently stored in the cache and is safe to load outside the main thread (for example Image or XMLFile, which do not possess any GPU-side data), \ref ResourceCache::GetTempResource "GetTempResource()" can be called inside BeginLoad.
 
+\page Localization Localization
+
+TODO About Localization.
+
 \page Scripting Scripting
 
 To enable AngelScript scripting support, the Script subsystem needs to be created and registered after initializing the Engine. This is accomplished by the following code, seen eg. in Tools/Urho3DPlayer/Urho3DPlayer.cpp:

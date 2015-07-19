@@ -35,6 +35,7 @@
 #include <Urho3D/UI/Text3D.h>
 #include <Urho3D/UI/UIEvents.h>
 #include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Resource/ResourceEvents.h>
 
 #include "L10n.h"
 
@@ -55,70 +56,75 @@ void L10n::Start()
     // Enable OS cursor
     GetSubsystem<Input>()->SetMouseVisible(true);
 
-    // Load strings
-    Localization* l10n = GetSubsystem<Localization>();
-    l10n->LoadJSONFile("StringsEnRu.json");
-    l10n->LoadJSONFile("StringsDe.json");
-    SubscribeToEvent(E_CHANGELANGUAGE, HANDLER(L10n, HandleChangeLanguage));
+    // Load strings from JSON files and subscribe to the change language event
+    InitLocalizationSystem();
 
+    // Init the 3D space
     CreateScene();
-    CreateGUI();
 
-    SubscribeToEvent(E_UPDATE, HANDLER(L10n, HandleUpdate));
+    // Init the user interface
+    CreateGUI();
+}
+
+void L10n::InitLocalizationSystem()
+{
+    Localization* l10n = GetSubsystem<Localization>();
+    // JSON files must be in UTF8 encoding without BOM
+    // The first founded language will be set as current
+    l10n->LoadJSONFile("StringsEnRu.json");
+    // You can load multiple files
+    l10n->LoadJSONFile("StringsDe.json");
+    // Hook up to the change language
+    SubscribeToEvent(E_CHANGELANGUAGE, HANDLER(L10n, HandleChangeLanguage));
 }
 
 void L10n::CreateGUI()
 {
+    // Get localization subsystem
     Localization* l10n = GetSubsystem<Localization>();
+    
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-
     UIElement* root = GetSubsystem<UI>()->GetRoot();
-    // Load the style sheet from xml
     root->SetDefaultStyle(cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
 
-    // Create the Window and add it to the UI's root node
     Window* window = new Window(context_);
     root->AddChild(window);
-
-    // Set Window size and layout settings
     window->SetMinSize(384, 192);
     window->SetLayout(LM_VERTICAL, 6, IntRect(6, 6, 6, 6));
     window->SetAlignment(HA_CENTER, VA_CENTER);
-    window->SetName("Window");
+    window->SetStyleAuto();
 
-    // Create Window 'titlebar' container
-    UIElement* titleBar = new UIElement(context_);
-    titleBar->SetMinSize(0, 24);
-    titleBar->SetVerticalAlignment(VA_TOP);
-    titleBar->SetLayoutMode(LM_HORIZONTAL);
-
-    // Create the Window title Text
     Text* windowTitle = new Text(context_);
     windowTitle->SetName("WindowTitle");
-    windowTitle->SetText(l10n->Get("title") + " (" + l10n->GetLanguage() + ")");
-
-    // Add text to the title bar
-    titleBar->AddChild(windowTitle);
-
-    // Add the title bar to the Window
-    window->AddChild(titleBar);
-
-    // Apply styles
-    window->SetStyleAuto();
     windowTitle->SetStyleAuto();
+    window->AddChild(windowTitle);
 
+    // In this place the current language is "en" because it was found first when loading the JSON files
+    String langName = l10n->GetLanguage();
+    // Languages are numbered in the loading order
+    int langIndex = l10n->GetLanguageIndex(); // == 0 at the beginning
+    // Get string with identifier "title" in the current language
+    String localizedString = l10n->Get("title");
+    // Localization::Get returns String::EMPTY if the id is empty.
+    // Localization::Get returns the id if translation is not found and will be added a warning into the log.
 
-    // Create buttons
+    windowTitle->SetText(localizedString + " (" + String(langIndex) + " " + langName + ")");
+
     Button* b = new Button(context_);
     window->AddChild(b);
     b->SetStyle("Button");
     b->SetMinHeight(24);
-    Text* t = b->CreateChild<Text>("ButtonTextLanguage");
+    
+    Text* t = b->CreateChild<Text>("ButtonTextChangeLang");
+    // The showing text value will automatically change when language is changed
+    t->SetAutoLocalizable(true);
+    // The text value used as a string identifier in this mode.
+    // Remember that a letter case of the id and of the lang name is important.
+    t->SetText("Press this button");
+    
     t->SetAlignment(HA_CENTER, VA_CENTER);
     t->SetStyle("Text");
-    t->SetAutoLocalizable(true);
-    t->SetText("lang");
-    SubscribeToEvent(b, E_RELEASED, HANDLER(L10n, HandleLangButtonPressed));
+    SubscribeToEvent(b, E_RELEASED, HANDLER(L10n, HandleChangeLangButtonPressed));
 
     b = new Button(context_);
     window->AddChild(b);
@@ -127,47 +133,52 @@ void L10n::CreateGUI()
     t = b->CreateChild<Text>("ButtonTextQuit");
     t->SetAlignment(HA_CENTER, VA_CENTER);
     t->SetStyle("Text");
+    
+    // Manually set text in the current language
     t->SetText(l10n->Get("quit"));
+    
     SubscribeToEvent(b, E_RELEASED, HANDLER(L10n, HandleQuitButtonPressed));
-
 }
 
 void L10n::CreateScene()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    // Get localization subsystem
     Localization* l10n = GetSubsystem<Localization>();
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     scene_ = new Scene(context_);
     scene_->CreateComponent<Octree>();
     
-    Node* zoneNode = scene_->CreateChild("Zone");
-    Zone* zone = zoneNode->CreateComponent<Zone>();
+    Zone* zone = scene_->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
-    zone->SetAmbientColor(Color(0.15f, 0.15f, 0.15f));
-    zone->SetFogColor(Color(0.5f, 0.5f, 0.7f));
-    zone->SetFogStart(100.0f);
-    zone->SetFogEnd(300.0f);
+    zone->SetAmbientColor(Color(0.5f, 0.5f, 0.5f));
+    zone->SetFogColor(Color(0.4f, 0.5f, 0.8f));
+    zone->SetFogStart(1.0f);
+    zone->SetFogEnd(100.0f);
 
     Node* planeNode = scene_->CreateChild("Plane");
-    planeNode->SetScale(Vector3(200.0f, 1.0f, 200.0f));
+    planeNode->SetScale(Vector3(300.0f, 1.0f, 300.0f));
     StaticModel* planeObject = planeNode->CreateComponent<StaticModel>();
     planeObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
     planeObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
 
     Node* lightNode = scene_->CreateChild("DirectionalLight");
-    lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f)); // The direction vector does not need to be normalized
+    lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f));
     Light* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
+    light->SetColor(Color(0.8f, 0.8f, 0.8f));
 
     cameraNode_ = scene_->CreateChild("Camera");
     cameraNode_->CreateComponent<Camera>();
-
-    // Set an initial position for the camera scene node above the plane
     cameraNode_->SetPosition(Vector3(0.0f, 10.0f, -30.0f));
 
     Node* text3DNode = scene_->CreateChild("Text3D");
-    text3DNode->SetPosition(Vector3(0.0f, 0.0f, 30.0f));
+    text3DNode->SetPosition(Vector3(0.0f, 0.1f, 30.0f));
     Text3D* text3D = text3DNode->CreateComponent<Text3D>();
-    text3D->SetText(l10n->Get("long text"));
+
+    // Manually set text in the current language.
+    text3D->SetText(l10n->Get("lang"));
+
     text3D->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 30);
     text3D->SetColor(Color::BLACK);
     text3D->SetAlignment(HA_CENTER, VA_BOTTOM);
@@ -176,35 +187,28 @@ void L10n::CreateScene()
     Renderer* renderer = GetSubsystem<Renderer>();
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
     renderer->SetViewport(0, viewport);
+
+    SubscribeToEvent(E_UPDATE, HANDLER(L10n, HandleUpdate));
 }
 
 void L10n::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
     float timeStep = eventData[P_TIMESTEP].GetFloat();
-    MoveCamera(timeStep);
-}
-
-void L10n::MoveCamera(float timeStep)
-{
     Input* input = GetSubsystem<Input>();
-
     const float MOUSE_SENSITIVITY = 0.1f;
-
-    // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     IntVector2 mouseMove = input->GetMouseMove();
     yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
     pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
     pitch_ = Clamp(pitch_, -90.0f, 90.0f);
-
-    // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
     cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
 }
 
-void L10n::HandleLangButtonPressed(StringHash eventType, VariantMap& eventData)
+void L10n::HandleChangeLangButtonPressed(StringHash eventType, VariantMap& eventData)
 {
     Localization* l10n = GetSubsystem<Localization>();
-    unsigned lang = l10n->GetLanguageIndex();
+    // Languages are numbered in the loading order
+    int lang = l10n->GetLanguageIndex();
     lang++;
     if (lang >= l10n->GetNumLanguages())
         lang = 0;
@@ -216,15 +220,20 @@ void L10n::HandleQuitButtonPressed(StringHash eventType, VariantMap& eventData)
     engine_->Exit();
 }
 
+// You can manually change texts, sprites and other aspects of the game when language is changed
 void L10n::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
 {
     Localization* l10n = GetSubsystem<Localization>();
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
     UIElement* uiRoot = GetSubsystem<UI>()->GetRoot();
+
     Text* windowTitle = static_cast<Text*>(uiRoot->GetChild("WindowTitle", true));
-    windowTitle->SetText(l10n->Get("title") + " (" + l10n->GetLanguage() + ")");
+    windowTitle->SetText(l10n->Get("title") + " (" + String(l10n->GetLanguageIndex()) + " " + l10n->GetLanguage() + ")");
+
     Text* buttonText = static_cast<Text*>(uiRoot->GetChild("ButtonTextQuit", true));
     buttonText->SetText(l10n->Get("quit"));
+
     Text3D* text3D = scene_->GetChild("Text3D")->GetComponent<Text3D>();
-    text3D->SetText(l10n->Get("long text"));
+    text3D->SetText(l10n->Get("lang"));
+
+    // A text on the button "Press this button" changes automatically
 }
