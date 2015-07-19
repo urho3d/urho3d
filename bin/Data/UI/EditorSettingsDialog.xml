@@ -139,10 +139,10 @@
                                 <element type="BorderImage" internal="true" style="none">
                                     <element internal="true" style="none">
                                         <element type="Text" style="FileSelectorFilterText">
-                                            <attribute name="Text" value="Standart hot keys" />
+                                            <attribute name="Text" value="Standard hotkeys" />
                                         </element>
                                         <element type="Text" style="FileSelectorFilterText">
-                                            <attribute name="Text" value="Blender hot keys" />
+                                            <attribute name="Text" value="Blender hotkeys" />
                                         </element>
                                     </element>
                                 </element>
