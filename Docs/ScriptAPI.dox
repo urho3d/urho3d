@@ -413,6 +413,8 @@ namespace Urho3D
 - %Success : bool
 - %Resource : Resource pointer
 
+### ChangeLanguage
+
 ## %Scene events
 
 ### SceneUpdate
@@ -1925,6 +1927,7 @@ namespace Urho3D
 - %Text %Alignment : int
 - %Row %Spacing : float
 - %Word %Wrap : bool
+- %Auto %Localizable : bool
 - %Selection %Color : Color
 - %Hover %Color : Color
 - %Text %Effect : int
@@ -2242,6 +2245,7 @@ namespace Urho3D
 <a href="#Class_Light"><b>Light</b></a>
 <a href="#Class_LineEdit"><b>LineEdit</b></a>
 <a href="#Class_ListView"><b>ListView</b></a>
+<a href="#Class_Localization"><b>Localization</b></a>
 <a href="#Class_Log"><b>Log</b></a>
 <a href="#Class_Material"><b>Material</b></a>
 <a href="#Class_Matrix3"><b>Matrix3</b></a>
@@ -7216,6 +7220,34 @@ Properties:
 - int weakRefs // readonly
 - int width
 
+<a name="Class_Localization"></a>
+
+### Localization
+
+Methods:
+
+- String Get(const String&)
+- String GetLanguage(int)
+- int GetLanguageIndex(const String&)
+- void LoadJSON(const JSONValue&)
+- void LoadJSONFile(const String&)
+- void Reset()
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetLanguage(const String&)
+- void SetLanguage(int)
+
+Properties:
+
+- StringHash baseType // readonly
+- String category // readonly
+- String language // readonly
+- int languageIndex // readonly
+- int numLanguages // readonly
+- int refs // readonly
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
 <a name="Class_Log"></a>
 
 ### Log
@@ -11398,6 +11430,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
+- bool autoLocalizable
 - StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
@@ -13833,6 +13866,7 @@ Properties:
 - FileSystem@ fileSystem
 - Graphics@ graphics
 - Input@ input
+- Localization@ localization
 - Log@ log
 - Network@ network
 - Node@ node

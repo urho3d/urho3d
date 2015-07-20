@@ -394,7 +394,90 @@ If a resource depends on other resources, writing efficient threaded loading for
 
 \page Localization Localization
 
-TODO About Localization.
+The Localization subsystem provides a simple way to creating multilingual applications.
+
+\section LocalizationInit Initialization
+
+Before using the subsystem must load a collection of strings. A common practice is to make it into function Start(). Allowed loading of multiple files.
+
+\code
+Localization* l10n = GetSubsystem<Localization>();
+l10n->LoadJSONFile("StringsEnRu.json");
+l10n->LoadJSONFile("StringsDe.json");
+\endcode
+
+JSON files must be in UTF8 encoding without BOM. Sample files are in a directory Data. The JSON files have the following format:
+
+\code
+{
+	"string id 1":{
+		"language 1":"value11",
+		"language 2":"value12",
+		"language 3":"value13"
+	},
+	"string id 2":{
+		"language 1":"value21",
+		"language 2":"value22",
+		"language 3":"value23"
+	}
+}
+\endcode
+
+It can be defined any number of languages. Remember that language names and string identifiers are case sensitive. "En" and "en" are considered different languages.
+During the loading process languages are numbered in order of finding. Indexing starts from zero. The first founded language immediately appointed as the current language.
+
+When initialization is usually also need to hook a function to be called when you change the language.
+
+\code
+SubscribeToEvent(E_CHANGELANGUAGE, HANDLER(ClassName, HandleChangeLanguage));
+\endcode
+
+\section LocalizationUsing Using
+
+The Get function returns a string with the specified string identifier in the current language.
+
+\code
+Text* t = new Text(context_);
+t->SetName("Text1");
+Localization* l10n = GetSubsystem<Localization>();
+t->SetText(l10n->Get("string 1"));
+\endcode
+
+This function returns String::EMPTY if the string id is empty. This function returns the id if translation is not found and will be added a warning into the log.
+
+It is also necessary to implement a reaction to change the language.
+
+\code
+void Game::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
+{
+    Localization* l10n = GetSubsystem<Localization>();
+    ...
+    Text* t = static_cast<Text*>(uiRoot->GetChild("Text1", true));
+    t->SetText(l10n->Get("string 1"));
+}
+\endcode
+
+Like that You can change texts, sprites and other aspects of the game when language is changed.
+
+For Text elements is possible automatic translations.
+
+\code
+Text* t2 = new Text(context_);
+t2->SetText("string 2");
+t2->SetAutoLocalizable(true);
+\endcode
+
+Wherein text value is used as an identifier. In this case, the change of text in HandleChangeLanguage is not necessary.
+
+Change the language allows function SetLanguage().
+
+\code
+Localization* l10n = GetSubsystem<Localization>();
+l10n->SetLanguage("language 2");
+l10n->SetLanguage(0);
+\endcode
+
+Also see the example 40_Localization.
 
 \page Scripting Scripting
 
