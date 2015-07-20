@@ -45,7 +45,16 @@ Localization::~Localization()
 
 int Localization::GetLanguageIndex(const String &language)
 {
-    assert(GetNumLanguages() > 0 && !language.Empty());
+    if (language.Empty())
+    {
+        LOGWARNING("Localization::GetLanguageIndex(language): language name is empty");
+        return -1;
+    }
+    if (GetNumLanguages() == 0)
+    {
+        LOGWARNING("Localization::GetLanguageIndex(language): no loaded languages");
+        return -1;
+    }
     for (int i = 0; i < GetNumLanguages(); i++)
     {
         if (languages_[i] == language)
@@ -56,19 +65,41 @@ int Localization::GetLanguageIndex(const String &language)
 
 String Localization::GetLanguage()
 {
-    assert(languageIndex_ != -1);
+    if (languageIndex_ == -1)
+    {
+        LOGWARNING("Localization::GetLanguage(): no loaded languages");
+        return String::EMPTY;
+    }
     return languages_[languageIndex_];
 }
 
 String Localization::GetLanguage(int index)
 {
-    assert(index >= 0 && index < GetNumLanguages());
+    if (GetNumLanguages() == 0)
+    {
+        LOGWARNING("Localization::GetLanguage(index): no loaded languages");
+        return String::EMPTY;
+    }
+    if (index < 0 || index >= GetNumLanguages())
+    {
+        LOGWARNING("Localization::GetLanguage(index): index out of range");
+        return String::EMPTY;
+    }
     return languages_[index];
 }
 
 void Localization::SetLanguage(int index)
 {
-    assert(index >= 0 && index < GetNumLanguages());
+    if (GetNumLanguages() == 0)
+    {
+        LOGWARNING("Localization::SetLanguage(index): no loaded languages");
+        return;
+    }
+    if (index < 0 || index >= GetNumLanguages())
+    {
+        LOGWARNING("Localization::SetLanguage(index): index out of range");
+        return;
+    }
     if (index != languageIndex_)
     {
         languageIndex_ = index;
@@ -79,13 +110,34 @@ void Localization::SetLanguage(int index)
 
 void Localization::SetLanguage(const String &language)
 {
-    SetLanguage(GetLanguageIndex(language));
+    if (language.Empty())
+    {
+        LOGWARNING("Localization::SetLanguage(language): language name is empty");
+        return;
+    }
+    if (GetNumLanguages() == 0)
+    {
+        LOGWARNING("Localization::SetLanguage(language): no loaded languages");
+        return;
+    }
+    int index = GetLanguageIndex(language);
+    if (index == -1)
+    {
+        LOGWARNING("Localization::SetLanguage(language): language not found");
+        return;
+    }
+    SetLanguage(index);
 }
 
 String Localization::Get(const String &id)
 {
     if (id.Empty())
         return String::EMPTY;
+    if (GetNumLanguages() == 0)
+    {
+        LOGWARNING("Localization::Get(id): no loaded languages");
+        return id;
+    }
     String result = strings_[StringHash(GetLanguage())][StringHash(id)];
     if (result.Empty())
     {
