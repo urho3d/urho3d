@@ -1272,11 +1272,11 @@ void HandleHotKeysBlender( VariantMap& eventData )
          if (eventData["Qualifiers"].GetInt() == QUAL_ALT) // reset transformations
          {
             if (key == KEY_G)
-                selectedNodes[0].position = Vector3(0,0,0);
+                SceneResetPosition();
             else if (key == KEY_R)
-                selectedNodes[0].rotation = Quaternion(0,0,0);
+                SceneResetRotation();
             else if (key == KEY_S)
-                selectedNodes[0].scale = Vector3(1,1,1); 
+                SceneResetScale();
             else if (key == KEY_F) 
             {
                  Vector3 center = Vector3(0,0,0);
@@ -1285,7 +1285,6 @@ void HandleHotKeysBlender( VariantMap& eventData )
                     center = SelectedNodesCenterPoint();
                  
                  cameraNode.LookAt(center);  
-                 //cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed * cameraBaseSpeed * time.timeStep ));
                  ReacquireCameraYawPitch();
             } 
          }
@@ -1316,7 +1315,6 @@ void HandleHotKeysBlender( VariantMap& eventData )
                         center = SelectedNodesCenterPoint(); 
                     
                     cameraNode.LookAt(center);
-                    //cameraNode.Translate(Vector3(0, 0, cameraBaseSpeed * cameraBaseSpeed * time.timeStep ));
                     ReacquireCameraYawPitch(); 
                 }
          }  

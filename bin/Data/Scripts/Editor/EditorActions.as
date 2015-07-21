@@ -18,15 +18,33 @@ class CreateDrawableMaskAction : EditAction
 {
     uint nodeID;
     uint drawableID;
-    int oldViewMask;
-    int redoViewMask;
+    int oldMask;
+    int redoMask;
+    int typeMask;
 
-    void Define(Drawable@ drawable)
+    void Define(Drawable@ drawable, int editMaskType)
     {
         drawableID = drawable.id;
         nodeID = drawable.node.id;
-        oldViewMask = drawable.viewMask;
-        redoViewMask = oldViewMask;
+        
+        switch (editMaskType) 
+        {
+            case EDIT_VIEW_MASK:
+                oldMask = drawable.viewMask;
+                break;
+            case EDIT_LIGHT_MASK:
+                oldMask = drawable.lightMask;
+                break;
+            case EDIT_SHADOW_MASK:
+                oldMask = drawable.shadowMask;
+                break;
+            case EDIT_ZONE_MASK:
+                oldMask = drawable.zoneMask;
+                break;
+        } 
+                
+        typeMask = editMaskType;
+        redoMask = oldMask;
     }
 
     void Undo()
@@ -35,8 +53,25 @@ class CreateDrawableMaskAction : EditAction
         Drawable@ drawable = editorScene.GetComponent(drawableID);
         if (node !is null && drawable !is null)
         {
-            redoViewMask = drawable.viewMask;
-            drawable.viewMask = oldViewMask;
+            switch (typeMask) 
+            {
+            case EDIT_VIEW_MASK:
+                redoMask = drawable.viewMask;
+                drawable.viewMask = oldMask;
+                break;
+            case EDIT_LIGHT_MASK:
+                redoMask = drawable.lightMask;
+                drawable.lightMask = oldMask;
+                break;
+            case EDIT_SHADOW_MASK:
+                redoMask = drawable.shadowMask;
+                drawable.shadowMask = oldMask;
+                break;
+            case EDIT_ZONE_MASK:
+                redoMask = drawable.zoneMask;
+                drawable.zoneMask = oldMask;
+                break;
+            }
         }
     }
 
@@ -46,12 +81,27 @@ class CreateDrawableMaskAction : EditAction
         Drawable@ drawable = editorScene.GetComponent(drawableID);
         if (node !is null && drawable !is null)
         {
-            oldViewMask = drawable.viewMask;
-            drawable.viewMask = redoViewMask;
+            switch (typeMask) 
+            {
+            case EDIT_VIEW_MASK:
+                oldMask = drawable.viewMask;
+                drawable.viewMask = redoMask;
+                break;
+            case EDIT_LIGHT_MASK:
+                oldMask = drawable.lightMask;
+                drawable.lightMask = redoMask;
+                break;
+            case EDIT_SHADOW_MASK:
+                oldMask = drawable.shadowMask;
+                drawable.shadowMask = redoMask;
+                break;
+            case EDIT_ZONE_MASK:
+                oldMask = drawable.zoneMask;
+                drawable.zoneMask = redoMask;
+                break;
+            }
         }
     }
-
-
 }
 
 class CreateNodeAction : EditAction
