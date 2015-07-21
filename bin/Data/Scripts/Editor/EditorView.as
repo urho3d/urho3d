@@ -1318,7 +1318,7 @@ void UpdateView(float timeStep)
     {  
         changeCamViewButton = input.mouseButtonDown[MOUSEB_MIDDLE] || cameraFlyMode;
         
-        if (input.mouseButtonPress[MOUSEB_RIGHT]) 
+        if (input.mouseButtonPress[MOUSEB_RIGHT] || input.keyDown[KEY_ESC]) 
             cameraFlyMode = false;
     }
     
@@ -1330,8 +1330,11 @@ void UpdateView(float timeStep)
         if (mouseMove.x != 0 || mouseMove.y != 0)
         {
             bool panTheCamera = false;
-            if(mmbPanMode)
-                panTheCamera = !(changeCamViewButton && input.keyDown[KEY_LSHIFT]);
+            if(mmbPanMode || (hotKeyMode == HOTKEYS_MODE_BLENDER))
+                if ( hotKeyMode == HOTKEYS_MODE_STANDARD) 
+                    panTheCamera = !(changeCamViewButton && input.keyDown[KEY_LSHIFT]);
+                else if (hotKeyMode == HOTKEYS_MODE_BLENDER && cameraFlyMode == true )
+                    panTheCamera = false;
             else
                 panTheCamera = (changeCamViewButton && input.keyDown[KEY_LSHIFT]);
 
