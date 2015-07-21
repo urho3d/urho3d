@@ -24,6 +24,7 @@ void Start()
 {
     // Assign the value ASAP because configFileName is needed on exit, including exit on error
     configFileName = fileSystem.GetAppPreferencesDir("urho3d", "Editor") + "Config.xml";
+    localization.LoadJSONFile("EditorStrings.json");
 
     if (engine.headless)
     {
@@ -87,6 +88,14 @@ void ParseArguments()
             if (++i < arguments.length)
             {
                 loaded = LoadScene(arguments[i]);
+                break;
+            }
+        }
+        if (arguments[i].ToLower() == "-language")
+        {
+            if (++i < arguments.length)
+            {
+                localization.SetLanguage(arguments[i]);
                 break;
             }
         }

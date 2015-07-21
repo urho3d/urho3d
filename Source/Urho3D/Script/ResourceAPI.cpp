@@ -26,6 +26,7 @@
 #include "../Resource/Image.h"
 #include "../Resource/JSONFile.h"
 #include "../Resource/ResourceCache.h"
+#include "../Resource/Localization.h"
 #include "../Script/APITemplates.h"
 
 namespace Urho3D
@@ -101,6 +102,28 @@ static CScriptArray* ResourceCacheGetPackageFiles(ResourceCache* ptr)
 static bool ResourceCacheBackgroundLoadResource(const String& type, const String& name, bool sendEventOnFailure, ResourceCache* ptr)
 {
     return ptr->BackgroundLoadResource(type, name, sendEventOnFailure);
+}
+
+static Localization* GetLocalization()
+{
+    return GetScriptContext()->GetSubsystem<Localization>();
+}
+
+static void RegisterLocalization(asIScriptEngine* engine)
+{
+    RegisterObject<Localization>(engine, "Localization");
+    engine->RegisterObjectMethod("Localization", "int get_numLanguages() const", asMETHOD(Localization, GetNumLanguages), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "int get_languageIndex() const", asMETHODPR(Localization, GetLanguageIndex, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "int GetLanguageIndex(const String&in)", asMETHODPR(Localization, GetLanguageIndex, (const String&), int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "String get_language()", asMETHODPR(Localization, GetLanguage, (), String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "String GetLanguage(int)", asMETHODPR(Localization, GetLanguage, (int), String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "void SetLanguage(int)", asMETHODPR(Localization, SetLanguage, (int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "void SetLanguage(const String&in)", asMETHODPR(Localization, SetLanguage, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "String Get(const String&in)", asMETHOD(Localization, Get), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "void Reset()", asMETHOD(Localization, Reset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "void LoadJSON(const JSONValue&in)", asMETHOD(Localization, LoadJSON), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "void LoadJSONFile(const String&in)", asMETHOD(Localization, LoadJSONFile), asCALL_THISCALL);
+    engine->RegisterGlobalFunction("Localization@+ get_localization()", asFUNCTION(GetLocalization), asCALL_CDECL);
 }
 
 static void RegisterResourceCache(asIScriptEngine* engine)
@@ -562,6 +585,7 @@ void RegisterResourceAPI(asIScriptEngine* engine)
     RegisterJSONFile(engine);
     RegisterXMLElement(engine);
     RegisterXMLFile(engine);
+    RegisterLocalization(engine);
 }
 
 }

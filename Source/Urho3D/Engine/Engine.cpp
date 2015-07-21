@@ -47,6 +47,7 @@
 #include "../Physics/PhysicsWorld.h"
 #endif
 #include "../Resource/ResourceCache.h"
+#include "../Resource/Localization.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
 #include "../UI/UI.h"
@@ -119,6 +120,7 @@ Engine::Engine(Context* context) :
     context_->RegisterSubsystem(new Log(context_));
 #endif
     context_->RegisterSubsystem(new ResourceCache(context_));
+    context_->RegisterSubsystem(new Localization(context_));
 #ifdef URHO3D_NETWORK
     context_->RegisterSubsystem(new Network(context_));
 #endif

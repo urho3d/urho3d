@@ -376,6 +376,8 @@ static void RegisterText(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text", "float get_rowSpacing() const", asMETHOD(Text, GetRowSpacing), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void set_wordwrap(bool)", asMETHOD(Text, SetWordwrap), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "bool get_wordwrap() const", asMETHOD(Text, GetWordwrap), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "void set_autoLocalizable(bool)", asMETHOD(Text, SetAutoLocalizable), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "bool get_autoLocalizable() const", asMETHOD(Text, GetAutoLocalizable), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "uint get_selectionStart() const", asMETHOD(Text, GetSelectionStart), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "uint get_selectionLength() const", asMETHOD(Text, GetSelectionLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void set_selectionColor(const Color&in)", asMETHOD(Text, SetSelectionColor), asCALL_THISCALL);

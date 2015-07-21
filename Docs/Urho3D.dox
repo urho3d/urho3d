@@ -25,6 +25,7 @@ For further reference, see:
 \ref MainLoop "Engine initialization and main loop" <br>
 \ref SceneModel "Scene model" <br>
 \ref Resources "Resources" <br>
+\ref Localization "Localization" <br>
 \ref Scripting "Scripting" <br>
 \ref LuaScripting "Lua scripting" <br>
 \ref Rendering "Rendering" <br>

@@ -92,6 +92,7 @@ void CreateUI()
     SubscribeToEvent("KeyDown", "HandleKeyDown");
     SubscribeToEvent("KeyUp", "UnfadeUI");
     SubscribeToEvent("MouseButtonUp", "UnfadeUI");
+    SubscribeToEvent("ChangeLanguage", "HandleChangeLanguage");
 }
 
 void ResizeUI()
@@ -707,6 +708,7 @@ Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int 
     menu.AddChild(menuText);
     menuText.style = "EditorMenuText";
     menuText.text = title;
+    menuText.autoLocalizable = true;
 
     if (addToQuickMenu)
         AddQuickMenuItem(callback, quickMenuText.empty ? title : quickMenuText);
@@ -796,10 +798,29 @@ Window@ CreatePopup(Menu@ baseMenu)
 Menu@ CreateMenu(const String&in title)
 {
     Menu@ menu = CreateMenuItem(title);
-    menu.SetFixedWidth(menu.width);
+    Text@ text = menu.children[0];
+    menu.maxWidth = text.width + 20;
     CreatePopup(menu);
 
     return menu;
+}
+
+void HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
+{
+    Array<UIElement@> children = uiMenuBar.GetChildren();
+
+    for (uint i = 0; i < children.length - 2; ++i) // last 2 elements is not menu
+    {
+        // dirty hack: force recalc text size
+        children[i].maxWidth = 1000;
+        Text@ text = children[i].children[0];
+        text.minWidth = 0;
+        text.maxWidth = 1;
+        text.ApplyAttributes();
+        children[i].maxWidth = text.width + 20;
+    }
+
+    RebuildResourceDatabase();
 }
 
 Text@ CreateAccelKeyText(int accelKey, int accelQual)

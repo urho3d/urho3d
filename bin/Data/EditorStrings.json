@@ -1,0 +1,310 @@
+{
+	"Open scene...":{
+		"en":"Open scene...",
+		"ru":"Открыть сцену..."
+	},
+	"Save scene":{
+		"en":"Save scene",
+		"ru":"Сохранить сцену"
+	},
+	"Save scene as...":{
+		"en":"Save scene as...",
+		"ru":"Сохранить сцену как..."
+	},
+	"Open recent scene":{
+		"en":"Open recent scene",
+		"ru":"Открыть прежнюю сцену"
+	},
+	"Load node":{
+		"en":"Load node",
+		"ru":"Загрузить ноду"
+	},
+	"As replicated...":{
+		"en":"As replicated...",
+		"ru":"Реплицируемую..."
+	},
+	"As local...":{
+		"en":"As local...",
+		"ru":"Локальную..."
+	},
+	"Save node as...":{
+		"en":"Save node as...",
+		"ru":"Сохранить ноду как..."
+	},
+	"Import model...":{
+		"en":"Import model...",
+		"ru":"Импортировать модель..."
+	},
+	"Import scene...":{
+		"en":"Import scene...",
+		"ru":"Импортировать сцену..."
+	},
+	"Run script...":{
+		"en":"Run script...",
+		"ru":"Запустить скрипт..."
+	},
+	"Set resource path...":{
+		"en":"Set resource path...",
+		"ru":"Указать путь к ресурсам..."
+	},
+	"Exit":{
+		"en":"Exit",
+		"ru":"Выход"
+	},
+	"Edit":{
+		"en":"Edit",
+		"ru":"Редактирование"
+	},
+	"Undo":{
+		"en":"Undo",
+		"ru":"Отменить"
+	},
+	"Redo":{
+		"en":"Redo",
+		"ru":"Повторить"
+	},
+	"Cut":{
+		"en":"Cut",
+		"ru":"Вырезать"
+	},
+	"Duplicate":{
+		"en":"Duplicate",
+		"ru":"Дублировать"
+	},
+	"Copy":{
+		"en":"Copy",
+		"ru":"Копировать"
+	},
+	"Paste":{
+		"en":"Paste",
+		"ru":"Вставить"
+	},
+	"Delete":{
+		"en":"Delete",
+		"ru":"Удалить"
+	},
+	"Select all":{
+		"en":"Select all",
+		"ru":"Выделить всё"
+	},
+	"Deselect all":{
+		"en":"Deselect all",
+		"ru":"Снять все выделения"
+	},
+	"Reset to default":{
+		"en":"Reset to default",
+		"ru":"Сбросить"
+	},
+	"Reset position":{
+		"en":"Reset position",
+		"ru":"Сбросить положение"
+	},
+	"Reset rotation":{
+		"en":"Reset rotation",
+		"ru":"Сбросить поворот"
+	},
+	"Reset scale":{
+		"en":"Reset scale",
+		"ru":"Сбросить масштаб"
+	},
+	"Enable/disable":{
+		"en":"Enable/disable",
+		"ru":"Включить/Отключить"
+	},
+	"Unparent":{
+		"en":"Unparent",
+		"ru":"Разорвать родительскую связь"
+	},
+	"Toggle update":{
+		"en":"Toggle update",
+		"ru":"Вкл/откл обновление"
+	},
+	"Stop test animation":{
+		"en":"Stop test animation",
+		"ru":"Остановить тестовую анимацию"
+	},
+	"Rebuild navigation data":{
+		"en":"Rebuild navigation data",
+		"ru":"Реконструировать навигационные данные"
+	},
+	"Add children to SM-group":{
+		"en":"Add children to SM-group",
+		"ru":"Добавить потомка к StaticModelGroup"
+	},
+	"Set children as spline path":{
+		"en":"Set children as spline path",
+		"ru":"Установить потомка как сплайновый путь"
+	},
+	"Non-cyclic":{
+		"en":"Non-cyclic",
+		"ru":"Нецикличный"
+	},
+	"Cyclic":{
+		"en":"Cyclic",
+		"ru":"Цикличный"
+	},
+	"Create":{
+		"en":"Create",
+		"ru":"Создать"
+	},
+	"Replicated node":{
+		"en":"Replicated node",
+		"ru":"Реплицируемую ноду"
+	},
+	"Local node":{
+		"en":"Local node",
+		"ru":"Локальную ноду"
+	},
+	"Component":{
+		"en":"Component",
+		"ru":"Компонент"
+	},
+	"Audio":{
+		"en":"Audio",
+		"ru":"Аудио"
+	},
+	"Geometry":{
+		"en":"Geometry",
+		"ru":"Геометрия"
+	},
+	"Logic":{
+		"en":"Logic",
+		"ru":"Логика"
+	},
+	"Navigation":{
+		"en":"Navigation",
+		"ru":"Навигация"
+	},
+	"Network":{
+		"en":"Network",
+		"ru":"Сеть"
+	},
+	"Physics":{
+		"en":"Physics",
+		"ru":"Физика"
+	},
+	"Scene":{
+		"en":"Scene",
+		"ru":"Сцена"
+	},
+	"Subsystem":{
+		"en":"Subsystem",
+		"ru":"Подсистема"
+	},
+	"Urho2D":{
+		"en":"Urho2D",
+		"ru":"Urho2D"
+	},
+	"Builtin object":{
+		"en":"Builtin object",
+		"ru":"Встроенный объект"
+	},
+	"UI-element":{
+		"en":"UI-element",
+		"ru":"Элемент интерфейса"
+	},
+	"UI-layout":{
+		"en":"UI-layout",
+		"ru":"Разметка интерфейса"
+	},
+	"Open UI-layout...":{
+		"en":"Open UI-layout...",
+		"ru":"Открыть разметку..."
+	},
+	"Save UI-layout":{
+		"en":"Save UI-layout",
+		"ru":"Сохранить разметку"
+	},
+	"Save UI-layout as...":{
+		"en":"Save UI-layout as...",
+		"ru":"Сохранить разметку как..."
+	},
+	"Close UI-layout":{
+		"en":"Close UI-layout",
+		"ru":"Закрыть разметку"
+	},
+	"Close all UI-layouts":{
+		"en":"Close all UI-layouts",
+		"ru":"Закрыть все разметки"
+	},
+	"Load child element...":{
+		"en":"Load child element...",
+		"ru":"Загрузить дочерний элемент..."
+	},
+	"Save child element as...":{
+		"en":"Save child element as...",
+		"ru":"Сохранить дочерний элемент как..."
+	},
+	"Set default style...":{
+		"en":"Set default style...",
+		"ru":"Установить стандартный стиль..."
+	},
+	"View":{
+		"en":"View",
+		"ru":"Вид"
+	},
+	"Hierarchy":{
+		"en":"Hierarchy",
+		"ru":"Иерархия"
+	},
+	"Attribute inspector":{
+		"en":"Attribute inspector",
+		"ru":"Аттрибуты"
+	},
+	"Material editor":{
+		"en":"Material editor",
+		"ru":"Редактор материалов"
+	},
+	"Particle editor":{
+		"en":"Particle editor",
+		"ru":"Редактор частиц"
+	},
+	"Spawn editor":{
+		"en":"Spawn editor",
+		"ru":"Редактор спауна"
+	},
+	"Sound Type editor":{
+		"en":"Sound Type editor",
+		"ru":"Тип звука"
+	},
+	"Editor settings":{
+		"en":"Editor settings",
+		"ru":"Настройки редактора"
+	},
+	"Editor preferences":{
+		"en":"Editor preferences",
+		"ru":"Установки редактора"
+	},
+	"Hide editor":{
+		"en":"Hide editor",
+		"ru":"Скрыть редактор"
+	},
+	"Resource Browser":{
+		"en":"Resource Browser",
+		"ru":"Браузер ресурсов"
+	},
+	"New scene":{
+		"en":"New scene",
+		"ru":"Создать новую сцену"
+	},
+	"Files left to scan: ":{
+		"en":"Files left to scan: ",
+		"ru":"Файлов до конца сканирования: "
+	},
+	"Scan complete":{
+		"en":"Scan complete",
+		"ru":"Сканирование окончено"
+	},
+	"Root":{
+		"en":"Root",
+		"ru":"Корень"
+	},
+	"Showing files: ":{
+		"en":"Showing files: ",
+		"ru":"Показано файлов: "
+	},
+	"File":{
+		"en":"File",
+		"ru":"Файл"
+	}
+}

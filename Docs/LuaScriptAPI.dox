@@ -98,6 +98,7 @@ namespace Urho3D
 <a href="#Class_Light"><b>Light</b></a>
 <a href="#Class_LineEdit"><b>LineEdit</b></a>
 <a href="#Class_ListView"><b>ListView</b></a>
+<a href="#Class_Localization"><b>Localization</b></a>
 <a href="#Class_Log"><b>Log</b></a>
 <a href="#Class_LuaScriptInstance"><b>LuaScriptInstance</b></a>
 <a href="#Class_Material"><b>Material</b></a>
@@ -2983,6 +2984,29 @@ Properties:
 - bool hierarchyMode
 - int baseIndent
 
+<a name="Class_Localization"></a>
+### Localization : Object
+
+Methods:
+
+- int GetNumLanguages() const
+- int GetLanguageIndex() const
+- int GetLanguageIndex(const String language)
+- String GetLanguage()
+- String GetLanguage(int index)
+- void SetLanguage(int index)
+- void SetLanguage(const String language)
+- String Get(const String id)
+- void Reset()
+- void LoadJSON(const JSONValue& source)
+- void LoadJSONFile(const String name)
+
+Properties:
+
+- int numLanguages (readonly)
+- int languageIndex (readonly)
+- String language (readonly)
+
 <a name="Class_Log"></a>
 ### Log : Object
 
@@ -5707,6 +5731,8 @@ Methods:
 - void SetHoverColor(const Color& color)
 - void SetTextEffect(TextEffect textEffect)
 - void SetEffectColor(const Color& effectColor)
+- bool GetAutoLocalizable() const
+- void SetAutoLocalizable(bool enable)
 - Font* GetFont() const
 - int GetFontSize() const
 - const String GetText() const
@@ -5736,6 +5762,7 @@ Properties:
 - HorizontalAlignment textAlignment
 - float rowSpacing
 - bool wordwrap
+- bool autoLocalizable
 - unsigned selectionStart (readonly)
 - unsigned selectionLength (readonly)
 - Color& selectionColor
@@ -7632,6 +7659,7 @@ Properties:
 - Graphics* GetGraphics()
 - Input* GetInput()
 - String GetInternalPath(const String pathName)
+- Localization* GetLocalization()
 - Log* GetLog()
 - String GetNativePath(const String pathName)
 - Network* GetNetwork()
@@ -7659,11 +7687,11 @@ Properties:
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
-- float Random()
-- float Random(float min, float max)
 - float Random(float range)
-- int RandomInt(int min, int max)
+- float Random(float min, float max)
+- float Random()
 - int RandomInt(int range)
+- int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
@@ -7674,8 +7702,8 @@ Properties:
 - float Sign(float value)
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
-- void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
 - void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
+- void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
 - float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
@@ -7698,8 +7726,8 @@ Properties:
 - Vector4 ToVector4(const String source, bool allowMissingCoords = false)
 - void UnsubscribeFromAllEvents()
 - void UnsubscribeFromAllEventsExcept(const Vector<String>& exceptionNames)
-- void UnsubscribeFromEvent(Object* sender, const String eventName)
 - void UnsubscribeFromEvent(const String eventName)
+- void UnsubscribeFromEvent(Object* sender, const String eventName)
 - void UnsubscribeFromEvents(Object* sender)
 
 
@@ -7712,6 +7740,7 @@ Properties:
 - FileSystem* fileSystem (readonly)
 - Graphics* graphics (readonly)
 - Input* input (readonly)
+- Localization* localization (readonly)
 - Log* log (readonly)
 - Network* network (readonly)
 - Renderer* renderer (readonly)
