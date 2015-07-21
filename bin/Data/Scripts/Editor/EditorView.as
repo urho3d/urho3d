@@ -1214,12 +1214,12 @@ void UpdateView(float timeStep)
         }
     
     // Move camera
+    float speedMultiplier = 1.0;
+    if (input.keyDown[KEY_LSHIFT])
+        speedMultiplier = cameraShiftSpeedMultiplier;
+    
     if (!input.keyDown[KEY_LCTRL])
-    {
-        float speedMultiplier = 1.0;
-        if (input.keyDown[KEY_LSHIFT])
-            speedMultiplier = cameraShiftSpeedMultiplier;
-        
+    {        
         if (hotKeyMode == HOTKEYS_MODE_STANDARD ||  (hotKeyMode == HOTKEYS_MODE_BLENDER && cameraFlyMode && !input.keyDown[KEY_LSHIFT]) ) 
         {
             if (input.keyDown['W'] || input.keyDown[KEY_UP])
@@ -1253,37 +1253,42 @@ void UpdateView(float timeStep)
                 FadeUI();
             }
         } 
-        if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
-        {
-            if ( hotKeyMode == HOTKEYS_MODE_STANDARD) 
-            {
-                if (mouseWheelCameraPosition)
-                {
-                    cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep *
-                    speedMultiplier);
-                }
-                else
-                {
-                    float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
-                    camera.zoom = Clamp(zoom, .1, 30);
-                }
-            }
-            else if (hotKeyMode == HOTKEYS_MODE_BLENDER) 
-            {
-                if (mouseWheelCameraPosition && !camera.orthographic )
-                {
-                    cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep *
-                    speedMultiplier);
-                }
-                else
-                {
-                    float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
-                    camera.zoom = Clamp(zoom, .1, 30);
-                }
-            }
-            
-        }
     }
+    
+    if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
+    {
+        if ( hotKeyMode == HOTKEYS_MODE_STANDARD) 
+        {
+            if (mouseWheelCameraPosition)
+            {
+                cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep *
+                speedMultiplier);
+            }
+            else
+            {
+                float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
+                camera.zoom = Clamp(zoom, .1, 30);
+            }
+        }
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER) 
+        {
+            if (mouseWheelCameraPosition && !camera.orthographic )
+            {   if (input.keyDown[KEY_LSHIFT])
+                    cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * -input.mouseMoveWheel* 5* timeStep * speedMultiplier);
+                else if (input.keyDown[KEY_LCTRL])
+                    cameraNode.Translate(Vector3(-cameraBaseSpeed,0, 0) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+                else
+                    cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+            }
+            else
+            {
+                float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
+                camera.zoom = Clamp(zoom, .1, 30);
+            }
+        }
+        
+    }
+
 
     if (input.keyDown[KEY_HOME])
     {
@@ -1295,9 +1300,20 @@ void UpdateView(float timeStep)
             cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0,10);
         }
     }
-
+    
     // Rotate/orbit/pan camera
-    bool changeCamViewButton = input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE];
+    bool changeCamViewButton = false;
+    
+    if ( hotKeyMode == HOTKEYS_MODE_STANDARD) 
+        changeCamViewButton = input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE];
+    else if (hotKeyMode == HOTKEYS_MODE_BLENDER) 
+    {  
+        changeCamViewButton = input.mouseButtonDown[MOUSEB_MIDDLE] || cameraFlyMode;
+        
+        if (input.mouseButtonPress[MOUSEB_RIGHT]) 
+            cameraFlyMode = false;
+    }
+    
     if (changeCamViewButton)
     {
         SetMouseLock();
@@ -1672,13 +1688,31 @@ void ViewRaycast(bool mouseClick)
             selectedComponent = body;
         }
     }
-
-    if (mouseClick && input.mouseButtonPress[MOUSEB_LEFT])
+    
+    bool multiselect = false;
+    bool componentSelectQualifier = false;
+    bool mouseButtonPressRL = false;
+    
+    if (hotKeyMode == HOTKEYS_MODE_STANDARD) 
     {
-        bool multiselect = input.qualifierDown[QUAL_CTRL];
+        mouseButtonPressRL = input.mouseButtonPress[MOUSEB_LEFT];
+        componentSelectQualifier = input.qualifierDown[QUAL_SHIFT];
+        multiselect = input.qualifierDown[QUAL_CTRL];
+    }
+    else if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) 
+    {
+        mouseButtonPressRL = input.mouseButtonPress[MOUSEB_RIGHT];
+        componentSelectQualifier = input.qualifierDown[QUAL_CTRL];
+        multiselect = input.qualifierDown[QUAL_SHIFT];
+    }
+    
+    if (mouseClick && mouseButtonPressRL)
+    {
+       
+        
         if (selectedComponent !is null)
         {
-            if (input.qualifierDown[QUAL_SHIFT])
+            if (componentSelectQualifier)
             {
                 // If we are selecting components, but have nodes in existing selection, do not multiselect to prevent confusion
                 if (!selectedNodes.empty)
