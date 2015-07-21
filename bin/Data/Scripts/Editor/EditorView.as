@@ -1220,39 +1220,39 @@ void UpdateView(float timeStep)
         if (input.keyDown[KEY_LSHIFT])
             speedMultiplier = cameraShiftSpeedMultiplier;
         
-        if (cameraFlyMode || hotKeyMode == HOTKEYS_MODE_STANDARD) 
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD ||  (hotKeyMode == HOTKEYS_MODE_BLENDER && cameraFlyMode && !input.keyDown[KEY_LSHIFT]) ) 
         {
-        if (input.keyDown['W'] || input.keyDown[KEY_UP])
-        {
-            cameraNode.Translate(Vector3(0, 0, cameraBaseSpeed) * timeStep * speedMultiplier);
-            FadeUI();
-        }
-        if (input.keyDown['S'] || input.keyDown[KEY_DOWN])
-        {
-            cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * timeStep * speedMultiplier);
-            FadeUI();
-        }
-        if (input.keyDown['A'] || input.keyDown[KEY_LEFT])
-        {
-            cameraNode.Translate(Vector3(-cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
-            FadeUI();
-        }
-        if (input.keyDown['D'] || input.keyDown[KEY_RIGHT])
-        {
-            cameraNode.Translate(Vector3(cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
-            FadeUI();
-        }
-        if (input.keyDown['E'] || input.keyDown[KEY_PAGEUP])
-        {
-            cameraNode.Translate(Vector3(0, cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
-            FadeUI();
-        }
-        if (input.keyDown['Q'] || input.keyDown[KEY_PAGEDOWN])
-        {
-            cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
-            FadeUI();
-        }
-        }
+            if (input.keyDown['W'] || input.keyDown[KEY_UP])
+            {
+                cameraNode.Translate(Vector3(0, 0, cameraBaseSpeed) * timeStep * speedMultiplier);
+                FadeUI();
+            }
+            if (input.keyDown['S'] || input.keyDown[KEY_DOWN])
+            {
+                cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * timeStep * speedMultiplier);
+                FadeUI();
+            }
+            if (input.keyDown['A'] || input.keyDown[KEY_LEFT])
+            {
+                cameraNode.Translate(Vector3(-cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
+                FadeUI();
+            }
+            if (input.keyDown['D'] || input.keyDown[KEY_RIGHT])
+            {
+                cameraNode.Translate(Vector3(cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
+                FadeUI();
+            }
+            if (input.keyDown['E'] || input.keyDown[KEY_PAGEUP])
+            {
+                cameraNode.Translate(Vector3(0, cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
+                FadeUI();
+            }
+            if (input.keyDown['Q'] || input.keyDown[KEY_PAGEDOWN])
+            {
+                cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
+                FadeUI();
+            }
+        } 
         if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
         {
             if ( hotKeyMode == HOTKEYS_MODE_STANDARD) 
