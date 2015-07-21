@@ -1273,17 +1273,25 @@ void UpdateView(float timeStep)
         else if (hotKeyMode == HOTKEYS_MODE_BLENDER) 
         {
             if (mouseWheelCameraPosition && !camera.orthographic )
-            {   if (input.keyDown[KEY_LSHIFT])
-                    cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * -input.mouseMoveWheel* 5* timeStep * speedMultiplier);
+            {   
+                if (input.keyDown[KEY_LSHIFT])
+                    cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * -input.mouseMoveWheel*5* timeStep * speedMultiplier);
                 else if (input.keyDown[KEY_LCTRL])
                     cameraNode.Translate(Vector3(-cameraBaseSpeed,0, 0) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
                 else
                     cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
             }
             else
-            {
-                float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
-                camera.zoom = Clamp(zoom, .1, 30);
+            {   
+                if (input.keyDown[KEY_LSHIFT])
+                    cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * -input.mouseMoveWheel*5* timeStep * speedMultiplier);
+                else if (input.keyDown[KEY_LCTRL])
+                    cameraNode.Translate(Vector3(-cameraBaseSpeed,0, 0) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+                else 
+                {
+                    float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
+                    camera.zoom = Clamp(zoom, .1, 30);
+                }
             }
         }
         
