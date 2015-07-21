@@ -52,7 +52,7 @@ public:
     void SetLanguage(int index);
     /// Set current language.
     void SetLanguage(const String &language);
-    /// Return a string in the current language. Returns String::EMPTY if id is empty. Returns id if translation is not found.
+    /// Return a string in the current language. Returns String::EMPTY if id is empty. Returns id if translation is not found and logs a warning.
     String Get(const String &id);
     /// Clear all loaded strings.
     void Reset();

@@ -398,7 +398,7 @@ The Localization subsystem provides a simple way to creating multilingual applic
 
 \section LocalizationInit Initialization
 
-Before using the subsystem must load a collection of strings. A common practice is to make it into function Start(). Allowed loading of multiple files.
+Before using the subsystem, the localization string collection(s) need to be loaded. A common practice is to do this at application startup. Multiple collection files can be loaded, and each can define either just one or several languages. For example:
 
 \code
 Localization* l10n = GetSubsystem<Localization>();
@@ -406,7 +406,7 @@ l10n->LoadJSONFile("StringsEnRu.json");
 l10n->LoadJSONFile("StringsDe.json");
 \endcode
 
-JSON files must be in UTF8 encoding without BOM. Sample files are in a directory Data. The JSON files have the following format:
+JSON files must be in UTF8 encoding without BOM. Sample files are in the bin/Data directory. The JSON files have the following format:
 
 \code
 {
@@ -423,14 +423,8 @@ JSON files must be in UTF8 encoding without BOM. Sample files are in a directory
 }
 \endcode
 
-It can be defined any number of languages. Remember that language names and string identifiers are case sensitive. "En" and "en" are considered different languages.
-During the loading process languages are numbered in order of finding. Indexing starts from zero. The first founded language immediately appointed as the current language.
-
-When initialization is usually also need to hook a function to be called when you change the language.
-
-\code
-SubscribeToEvent(E_CHANGELANGUAGE, HANDLER(ClassName, HandleChangeLanguage));
-\endcode
+Any number of languages can be defined. Remember that language names and string identifiers are case sensitive. "En" and "en" are considered different languages.
+During the loading process languages are numbered in order of finding. Indexing starts from zero. The first found language is set to be initially active.
 
 \section LocalizationUsing Using
 
@@ -443,11 +437,20 @@ Localization* l10n = GetSubsystem<Localization>();
 t->SetText(l10n->Get("string 1"));
 \endcode
 
-This function returns String::EMPTY if the string id is empty. This function returns the id if translation is not found and will be added a warning into the log.
+If the string id is empty, an empty string will be returned. If the translation is not found, the id will be returned unmodified and a warning will be logged.
 
-It is also necessary to implement a reaction to change the language.
+Use SetLanguage() function to change language at runtime.
 
 \code
+Localization* l10n = GetSubsystem<Localization>();
+l10n->SetLanguage("language 2");
+\endcode
+
+When the language is changed, the E_CHANGELANGUAGE event will be sent. Subscribe to it to perform the necessary relocalization of your user interface (texts, sprites etc.)
+
+\code
+SubscribeToEvent(E_CHANGELANGUAGE, HANDLER(Game, HandleChangeLanguage));
+
 void Game::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
 {
     Localization* l10n = GetSubsystem<Localization>();
@@ -457,9 +460,7 @@ void Game::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
 }
 \endcode
 
-Like that You can change texts, sprites and other aspects of the game when language is changed.
-
-For Text elements is possible automatic translations.
+Text %UI elements also support automatic translation to avoid manual work.
 
 \code
 Text* t2 = new Text(context_);
@@ -467,15 +468,7 @@ t2->SetText("string 2");
 t2->SetAutoLocalizable(true);
 \endcode
 
-Wherein text value is used as an identifier. In this case, the change of text in HandleChangeLanguage is not necessary.
-
-Change the language allows function SetLanguage().
-
-\code
-Localization* l10n = GetSubsystem<Localization>();
-l10n->SetLanguage("language 2");
-l10n->SetLanguage(0);
-\endcode
+Wherein text value is used as an identifier.
 
 Also see the example 40_Localization.
 
