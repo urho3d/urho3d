@@ -315,7 +315,7 @@
     </element>
     <element type="EditorMenuText" style="Text" auto="false" />
     <element type="EditorAttributeText" auto="false">
-        <attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
+        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
         <attribute name="Font Size" value="9" />
     </element>
     <element type="EditorEnumAttributeText" style="EditorAttributeText" auto="false">
@@ -359,7 +359,7 @@
         <attribute name="Border" value="6 2 2 2" />
     </element>
     <element type="ToolTipText" style="Text">
-        <attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
+        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
         <attribute name="Font Size" value="9" />
     </element>
     <element type="ViewportBorder" style="BorderImage">
