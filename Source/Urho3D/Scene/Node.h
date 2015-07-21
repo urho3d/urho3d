@@ -264,10 +264,12 @@ public:
     void RemoveComponent(Component* component);
     /// Remove the first component of specific type from this node.
     void RemoveComponent(StringHash type);
-    /// Remove all components from this node.
-    void RemoveAllComponents();
     /// Remove components that match criteria.
     void RemoveComponents(bool removeReplicated, bool removeLocal);
+    /// Remove all components of specific type.
+    void RemoveComponents(StringHash type);
+    /// Remove all components from this node.
+    void RemoveAllComponents();
     /// Clone scene node, components and child nodes. Return the clone.
     Node* Clone(CreateMode mode = REPLICATED);
     /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion.
@@ -286,6 +288,8 @@ public:
     template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
     /// Template version of removing a component.
     template <class T> void RemoveComponent();
+    /// Template version of removing all components of specific type.
+    template <class T> void RemoveComponents();
 
     /// Return ID.
     unsigned GetID() const { return id_; }
@@ -639,6 +643,8 @@ template <class T> T* Node::GetOrCreateComponent(CreateMode mode, unsigned id)
 }
 
 template <class T> void Node::RemoveComponent() { RemoveComponent(T::GetTypeStatic()); }
+
+template <class T> void Node::RemoveComponents() { RemoveComponents(T::GetTypeStatic()); }
 
 template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive) const
 {

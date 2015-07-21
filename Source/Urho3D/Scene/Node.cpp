@@ -792,11 +792,6 @@ void Node::RemoveComponent(StringHash type)
     }
 }
 
-void Node::RemoveAllComponents()
-{
-    RemoveComponents(true, true);
-}
-
 void Node::RemoveComponents(bool removeReplicated, bool removeLocal)
 {
     unsigned numRemoved = 0;
@@ -821,6 +816,29 @@ void Node::RemoveComponents(bool removeReplicated, bool removeLocal)
     // Mark node dirty in all replication states
     if (numRemoved)
         MarkReplicationDirty();
+}
+
+void Node::RemoveComponents(StringHash type)
+{
+    unsigned numRemoved = 0;
+
+    for (unsigned i = components_.Size() - 1; i < components_.Size(); --i)
+    {
+        if (components_[i]->GetType() == type)
+        {
+            RemoveComponent(components_.Begin() + i);
+            ++numRemoved;
+        }
+    }
+
+    // Mark node dirty in all replication states
+    if (numRemoved)
+        MarkReplicationDirty();
+}
+
+void Node::RemoveAllComponents()
+{
+    RemoveComponents(true, true);
 }
 
 Node* Node::Clone(CreateMode mode)

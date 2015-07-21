@@ -94,9 +94,9 @@ class Node : public Animatable
     void RemoveComponent(Component* component);
     void RemoveComponent(StringHash type);
     void RemoveComponent(const String type);
-
-    void RemoveAllComponents();
     void RemoveComponents(bool removeReplicated, bool removeLocal);
+    void RemoveComponents(const String type);
+    void RemoveAllComponents();
 
     Node* Clone(CreateMode mode = REPLICATED);
 
