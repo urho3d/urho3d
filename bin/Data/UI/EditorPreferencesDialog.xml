@@ -40,12 +40,6 @@
                             <element type="ListView" internal="true" style="none">
                                 <element type="BorderImage" internal="true" style="none">
                                     <element internal="true" style="none">
-                                        <element type="Text" style="FileSelectorFilterText">
-                                            <attribute name="Text" value="en" />
-                                        </element>
-                                        <element type="Text" style="FileSelectorFilterText">
-                                            <attribute name="Text" value="ru" />
-                                        </element>
                                     </element>
                                 </element>
                             </element>

@@ -45,6 +45,15 @@ void CreateEditorPreferencesDialog()
     preferencesDialog.height = 440;
     CenterDialog(preferencesDialog);
 
+    DropDownList@ languageSelector = preferencesDialog.GetChild("LanguageSelector", true);
+    for (int i = 0; i < localization.numLanguages; i++)
+    {
+        Text@ choice = Text();
+        languageSelector.AddItem(choice);
+        choice.style = "FileSelectorFilterText";
+        choice.text = localization.GetLanguage(i);
+    }
+    
     nodeItemTextColorEditR = preferencesDialog.GetChild("NodeItemTextColor.r", true);
     nodeItemTextColorEditG = preferencesDialog.GetChild("NodeItemTextColor.g", true);
     nodeItemTextColorEditB = preferencesDialog.GetChild("NodeItemTextColor.b", true);
