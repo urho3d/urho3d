@@ -1,4 +1,8 @@
 {
+	"Language":{
+		"en":"Language",
+		"ru":"Язык"
+	},
 	"Open scene...":{
 		"en":"Open scene...",
 		"ru":"Открыть сцену..."
