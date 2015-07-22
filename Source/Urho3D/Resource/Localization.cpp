@@ -160,12 +160,28 @@ void Localization::LoadJSON(const JSONValue &source)
     for (unsigned i = 0; i < ids.Size(); i++)
     {
         String id = ids[i];
+        if (id.Empty())
+        {
+            LOGWARNING("Localization::LoadJSON(source): string ID is empty");
+            continue;
+        }
         JSONValue value = source.GetChild(id);
         Vector<String> langs = value.GetValueNames();
         for (unsigned j = 0; j < langs.Size(); j++)
         {
             String lang = langs[j];
+            if (lang.Empty())
+            {
+                LOGWARNING("Localization::LoadJSON(source): language name is empty, string ID=\"" + id + "\"");
+                continue;
+            }
             String string = value.GetString(lang);
+            if (string.Empty())
+            {
+                LOGWARNING("Localization::LoadJSON(source): translation is empty, string ID=\"" + id +
+                           "\", language=\"" + lang + "\"");
+                continue;
+            }
             strings_[StringHash(lang)][StringHash(id)] = string;
             if (!languages_.Contains(lang))
                 languages_.Push(lang);

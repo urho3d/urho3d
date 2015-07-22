@@ -168,6 +168,7 @@ UIElement@ CreateToolTip(UIElement@ parent, const String&in title, const IntVect
 
     Text@ toolTipText = textHolder.CreateChild("Text");
     toolTipText.SetStyle("ToolTipText");
+    toolTipText.autoLocalizable = true;
     toolTipText.text = title;
 
     return toolTip;

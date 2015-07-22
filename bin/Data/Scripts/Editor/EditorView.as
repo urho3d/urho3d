@@ -1125,18 +1125,18 @@ void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment
 void UpdateStats(float timeStep)
 {
     editorModeText.text = String(
-        "Mode: " + editModeText[editMode] +
-        "  Axis: " + axisModeText[axisMode] +
-        "  Pick: " + pickModeText[pickMode] +
-        "  Fill: " + fillModeText[fillMode] +
-        "  Updates: " + (runUpdate ? "Running" : "Paused"));
+        localization.Get("Mode: ") + localization.Get(editModeText[editMode]) +
+        localization.Get("  Axis: ") + localization.Get(axisModeText[axisMode]) +
+        localization.Get("  Pick: ") + localization.Get(pickModeText[pickMode]) +
+        localization.Get("  Fill: ") + localization.Get(fillModeText[fillMode]) +
+        localization.Get("  Updates: ") + (runUpdate ? localization.Get("Running") : localization.Get("Paused")));
 
     renderStatsText.text = String(
-        "Tris: " + renderer.numPrimitives +
-        "  Batches: " + renderer.numBatches +
-        "  Lights: " + renderer.numLights[true] +
-        "  Shadowmaps: " + renderer.numShadowMaps[true] +
-        "  Occluders: " + renderer.numOccluders[true]);
+        localization.Get("Tris: ") + renderer.numPrimitives +
+        localization.Get("  Batches: ") + renderer.numBatches +
+        localization.Get("  Lights: ") + renderer.numLights[true] +
+        localization.Get("  Shadowmaps: ") + renderer.numShadowMaps[true] +
+        localization.Get("  Occluders: ") + renderer.numOccluders[true]);
 
     editorModeText.size = editorModeText.minSize;
     renderStatsText.size = renderStatsText.minSize;

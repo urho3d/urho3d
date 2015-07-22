@@ -12,6 +12,7 @@
         <attribute name="Layout Mode" value="Horizontal" />
         <element type="Text">
             <attribute name="Text" value="Material editor" />
+            <attribute name="Auto Localizable" value="true" />
         </element>
         <element type="Button" style="CloseButton">
             <attribute name="Name" value="CloseButton" />

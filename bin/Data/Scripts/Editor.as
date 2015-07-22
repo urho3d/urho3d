@@ -241,6 +241,7 @@ void LoadConfig()
     {
         if (uiElem.HasAttribute("minopacity")) uiMinOpacity = uiElem.GetFloat("minopacity");
         if (uiElem.HasAttribute("maxopacity")) uiMaxOpacity = uiElem.GetFloat("maxopacity");
+        if (uiElem.HasAttribute("languageindex")) localization.SetLanguage(uiElem.GetInt("languageindex"));
     }
 
     if (!hierarchyElem.isNull)
@@ -349,6 +350,7 @@ void SaveConfig()
 
     uiElem.SetFloat("minopacity", uiMinOpacity);
     uiElem.SetFloat("maxopacity", uiMaxOpacity);
+    uiElem.SetInt("languageindex", localization.languageIndex);
 
     hierarchyElem.SetBool("showinternaluielement", showInternalUIElement);
     hierarchyElem.SetBool("showtemporaryobject", showTemporaryObject);

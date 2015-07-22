@@ -1,4 +1,8 @@
 {
+	"Language":{
+		"en":"Language",
+		"ru":"Язык"
+	},
 	"Open scene...":{
 		"en":"Open scene...",
 		"ru":"Открыть сцену..."
@@ -149,11 +153,11 @@
 	},
 	"Replicated node":{
 		"en":"Replicated node",
-		"ru":"Реплицируемую ноду"
+		"ru":"Реплицируемая нода"
 	},
 	"Local node":{
 		"en":"Local node",
-		"ru":"Локальную ноду"
+		"ru":"Локальная нода"
 	},
 	"Component":{
 		"en":"Component",
@@ -263,9 +267,133 @@
 		"en":"Spawn editor",
 		"ru":"Редактор спауна"
 	},
+	"Spawn settings":{
+		"en":"Spawn settings",
+		"ru":"Настройки спауна"
+	},
 	"Sound Type editor":{
 		"en":"Sound Type editor",
 		"ru":"Тип звука"
+	},
+	"Expand":{
+		"en":"Expand",
+		"ru":"Развернуть"
+	},
+	"Collapse":{
+		"en":"Collapse",
+		"ru":"Свернуть"
+	},
+	"All":{
+		"en":"All",
+		"ru":"Все"
+	},
+	"Mode: ":{
+		"en":"Mode: ",
+		"ru":"Режим: "
+	},
+	"  Axis: ":{
+		"en":"  Axis: ",
+		"ru":"  Оси: "
+	},
+	"  Pick: ":{
+		"en":"  Pick: ",
+		"ru":"  Выбор: "
+	},
+	"  Fill: ":{
+		"en":"  Fill: ",
+		"ru":"  Отображение: "
+	},
+	"  Updates: ":{
+		"en":"  Updates: ",
+		"ru":"  Обновления: "
+	},
+	"Running":{
+		"en":"Running",
+		"ru":"Запущены"
+	},
+	"Paused":{
+		"en":"Paused",
+		"ru":"На паузе"
+	},
+	"Tris: ":{
+		"en":"Tris: ",
+		"ru":"Треуг-в: "
+	},
+	"  Batches: ":{
+		"en":"  Batches: ",
+		"ru":"  Батчей: "
+	},
+	"  Lights: ":{
+		"en":"  Lights: ",
+		"ru":"  Ист-в света: "
+	},
+	"  Shadowmaps: ":{
+		"en":"  Shadowmaps: ",
+		"ru":"  Теневых карт: "
+	},
+	"  Occluders: ":{
+		"en":"  Occluders: ",
+		"ru":"  Окклюдеров: "
+	},
+	"Move":{
+		"en":"Move",
+		"ru":"Перемещение"
+	},
+	"Rotate":{
+		"en":"Rotate",
+		"ru":"Вращение"
+	},
+	"Scale":{
+		"en":"Scale",
+		"ru":"Масштабирование"
+	},
+	"Select":{
+		"en":"Select",
+		"ru":"Выделение"
+	},
+	"Spawn":{
+		"en":"Spawn",
+		"ru":"Спаун"
+	},
+	"World":{
+		"en":"World",
+		"ru":"Мировые"
+	},
+	"Local":{
+		"en":"Local",
+		"ru":"Локальные"
+	},
+	"Geometries":{
+		"en":"Geometries",
+		"ru":"Геометрия"
+	},
+	"Lights":{
+		"en":"Lights",
+		"ru":"Источники света"
+	},
+	"Zones":{
+		"en":"Zones",
+		"ru":"Зоны"
+	},
+	"Rigidbodies":{
+		"en":"Rigidbodies",
+		"ru":"Твердые тела"
+	},
+	"UI-elements":{
+		"en":"UI-elements",
+		"ru":"Элементы интерфейса"
+	},
+	"Solid":{
+		"en":"Solid",
+		"ru":"Материал"
+	},
+	"Wire":{
+		"en":"Wire",
+		"ru":"Сетка"
+	},
+	"Point":{
+		"en":"Point",
+		"ru":"Вершины"
 	},
 	"Editor settings":{
 		"en":"Editor settings",
@@ -302,6 +430,182 @@
 	"Showing files: ":{
 		"en":"Showing files: ",
 		"ru":"Показано файлов: "
+	},
+	"Camera":{
+		"en":"Camera",
+		"ru":"Камера"
+	},
+	"RunUpdatePlay":{
+		"en":"RunUpdatePlay",
+		"ru":"Запустить"
+	},
+	"RunUpdatePause":{
+		"en":"RunUpdatePause",
+		"ru":"Пауза"
+	},
+	"RevertOnPause":{
+		"en":"RevertOnPause",
+		"ru":"Вернуться на паузе"
+	},
+	"EditMove":{
+		"en":"EditMove",
+		"ru":"Перемещение"
+	},
+	"EditRotate":{
+		"en":"EditRotate",
+		"ru":"Вращение"
+	},
+	"EditScale":{
+		"en":"EditScale",
+		"ru":"Масштабирование"
+	},
+	"EditSelect":{
+		"en":"EditSelect",
+		"ru":"Выделение"
+	},
+	"AxisWorld":{
+		"en":"AxisWorld",
+		"ru":"Мировые оси"
+	},
+	"AxisLocal":{
+		"en":"AxisLocal",
+		"ru":"Локальные оси"
+	},
+	"MoveSnap":{
+		"en":"MoveSnap",
+		"ru":"Дискретное перемещение"
+	},
+	"RotateSnap":{
+		"en":"RotateSnap",
+		"ru":"Дискретное вращение"
+	},
+	"ScaleSnap":{
+		"en":"ScaleSnap",
+		"ru":"Дискретное масштабирование"
+	},
+	"SnapScaleHalf":{
+		"en":"SnapScaleHalf",
+		"ru":"Половина дискретного масштабирования"
+	},
+	"SnapScaleQuarter":{
+		"en":"SnapScaleQuarter",
+		"ru":"Четверть дискретного масштабирования"
+	},
+	"PickGeometries":{
+		"en":"PickGeometries",
+		"ru":"Выделении геометрии"
+	},
+	"PickLights":{
+		"en":"PickLights",
+		"ru":"Выделение источников света"
+	},
+	"PickZones":{
+		"en":"PickZones",
+		"ru":"Выделение зон"
+	},
+	"PickRigidBodies":{
+		"en":"PickRigidBodies",
+		"ru":"Выделение твердых тел"
+	},
+	"PickUIElements":{
+		"en":"PickUIElements",
+		"ru":"Выделение элементов интерфейса"
+	},
+	"FillPoint":{
+		"en":"FillPoint",
+		"ru":"Отображать вершины"
+	},
+	"FillWireFrame":{
+		"en":"FillWireFrame",
+		"ru":"Отображать сетку"
+	},
+	"FillSolid":{
+		"en":"FillSolid",
+		"ru":"Отображать материалы"
+	},
+	"Light":{
+		"en":"Light",
+		"ru":"Источник света"
+	},
+	"Zone":{
+		"en":"Zone",
+		"ru":"Зона"
+	},
+	"StaticModel":{
+		"en":"StaticModel",
+		"ru":"Статическая модель"
+	},
+	"AnimatedModel":{
+		"en":"AnimatedModel",
+		"ru":"Анимированная модель"
+	},
+	"BillboardSet":{
+		"en":"BillboardSet",
+		"ru":"Набор билбордов"
+	},
+	"ParticleEmitter":{
+		"en":"ParticleEmitter",
+		"ru":"Излучатель частиц"
+	},
+	"Skybox":{
+		"en":"Skybox",
+		"ru":"Скайбокс"
+	},
+	"Terrain":{
+		"en":"Terrain",
+		"ru":"Ландшафт"
+	},
+	"Text3D":{
+		"en":"Text3D",
+		"ru":"Текст 3D"
+	},
+	"SoundListener":{
+		"en":"SoundListener",
+		"ru":"Звукоприемник"
+	},
+	"SoundSource3D":{
+		"en":"SoundSource3D",
+		"ru":"Источник звука 3D"
+	},
+	"SoundSource":{
+		"en":"SoundSource",
+		"ru":"Источник звука"
+	},
+	"RigidBody":{
+		"en":"RigidBody",
+		"ru":"Твердое тело"
+	},
+	"CollisionShape":{
+		"en":"CollisionShape",
+		"ru":"КолижнШейп"
+	},
+	"Constraint":{
+		"en":"Constraint",
+		"ru":"Ограничитель"
+	},
+	"AnimationController":{
+		"en":"AnimationController",
+		"ru":"Контроллер анимации"
+	},
+	"ScriptInstance":{
+		"en":"ScriptInstance",
+		"ru":"Скрипт"
+	},
+	"Navigable":{
+		"en":"Navigable",
+		"ru":"Navigable"
+	},
+	"NavigationMesh":{
+		"en":"NavigationMesh",
+		"ru":"NavigationMesh"
+	},
+	"OffMeshConnection":{
+		"en":"OffMeshConnection",
+		"ru":"OffMeshConnection"
+	},
+	"NetworkPriority":{
+		"en":"NetworkPriority",
+		"ru":"Сетевой приоритет"
 	},
 	"File":{
 		"en":"File",

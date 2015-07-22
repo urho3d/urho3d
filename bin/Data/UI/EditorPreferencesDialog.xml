@@ -14,6 +14,7 @@
         <attribute name="Layout Mode" value="Horizontal" />
         <element type="Text">
             <attribute name="Text" value="Editor preferences" />
+            <attribute name="Auto Localizable" value="true" />
         </element>
         <element type="Button" style="CloseButton">
             <attribute name="Name" value="CloseButton" />
@@ -24,6 +25,28 @@
         <attribute name="Min Size" value="0 60" />
         <element type="BorderImage" internal="true">
             <element internal="true">
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Language" />
+                        <attribute name="Auto Localizable" value="true" />
+                    </element>
+                    <element type="DropDownList">
+                        <attribute name="Name" value="LanguageSelector" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                        <attribute name="Resize Popup" value="true" />
+                        <element type="Window" internal="true" popup="true" style="none">
+                            <element type="ListView" internal="true" style="none">
+                                <element type="BorderImage" internal="true" style="none">
+                                    <element internal="true" style="none">
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                </element>
+                <element type="BorderImage" style="EditorDivider" />
                 <element style="ListRow">
                     <element type="Text">
                         <attribute name="Text" value="User interface" />
