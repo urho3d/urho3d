@@ -43,6 +43,7 @@ endif ()
 
 # Define all supported build options
 include (CMakeDependentOption)
+option (URHO3D_C++11 "Enable C++11 standard")
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
 if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the initial configure step
     # On non-MSVC compiler, default to build 64-bit when the host system has a 64-bit build environment
@@ -93,20 +94,20 @@ cmake_dependent_option (URHO3D_SSE "Enable SSE instruction set" ${URHO3D_DEFAULT
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
     cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
-
     if (CMAKE_BUILD_TYPE STREQUAL Release OR CMAKE_CONFIGURATION_TYPES)
         set (URHO3D_DEFAULT_LUA_RAW FALSE)
     else ()
         set (URHO3D_DEFAULT_LUA_RAW TRUE)
     endif ()
     cmake_dependent_option (URHO3D_LUA_RAW_SCRIPT_LOADER "Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)" ${URHO3D_DEFAULT_LUA_RAW} "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
-
     option (URHO3D_SAMPLES "Build sample applications")
     cmake_dependent_option (URHO3D_TOOLS "Build tools (native and RPI only)" TRUE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     cmake_dependent_option (URHO3D_EXTRAS "Build extras (native and RPI only)" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     option (URHO3D_DOCS "Generate documentation as part of normal build")
     option (URHO3D_DOCS_QUIET "Generate documentation as part of normal build, suppress generation process from sending anything to stdout")
     option (URHO3D_PCH "Enable PCH support" TRUE)
+    option (URHO3D_DATABASE_ODBC "Enable Database support with ODBC, requires vendor-specific ODBC driver" FALSE)
+    option (URHO3D_DATABASE_SQLITE "Enable Database support with SQLite embedded" FALSE)
     cmake_dependent_option (URHO3D_MINIDUMPS "Enable minidumps on crash (VS only)" TRUE "MSVC" FALSE)
     option (URHO3D_FILEWATCHER "Enable filewatcher support" TRUE)
     if (CPACK_SYSTEM_NAME STREQUAL Linux)
@@ -353,6 +354,15 @@ if (URHO3D_URHO2D)
     add_definitions (-DURHO3D_URHO2D)
 endif ()
 
+# Add definition for Database
+if (URHO3D_DATABASE_ODBC)
+    set (URHO3D_C++11 1)
+    add_definitions (-DURHO3D_DATABASE -DURHO3D_DATABASE_ODBC)
+endif ()
+if (URHO3D_DATABASE_SQLITE)
+    add_definitions (-DURHO3D_DATABASE -DURHO3D_DATABASE_SQLITE)
+endif ()
+
 # Default library type is STATIC
 if (URHO3D_LIB_TYPE)
     string (TOUPPER ${URHO3D_LIB_TYPE} URHO3D_LIB_TYPE)
@@ -377,6 +387,29 @@ if (RPI)
 endif ()
 
 # Platform and compiler specific options
+if (URHO3D_C++11)
+    add_definitions (-DURHO3D_CPP11)   # Note the define is NOT 'URHO3D_C++11'!
+    if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
+        # Use gnu++11/gnu++0x instead of c++11/c++0x as the latter does not work as expected when cross compiling
+        foreach (STANDARD gnu++11 gnu++0x)  # Fallback to gnu++0x on older GCC version
+            execute_process (COMMAND echo COMMAND ${CMAKE_CXX_COMPILER} -E - RESULT_VARIABLE GCC_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+            if (GCC_EXIT_CODE EQUAL 0)
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=${STANDARD}")
+                break ()
+            endif ()
+        endforeach ()
+        if (NOT GCC_EXIT_CODE EQUAL 0)
+            execute_process (COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION ERROR_QUIET)
+            message (FATAL_ERROR "Your GCC version ${GCC_VERSION} is too old to enable C++11 standard")
+        endif ()
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES Clang)
+        # Cannot set CMAKE_CXX_FLAGS here directly because CMake uses the same flags for both C++ and Object-C languages, the latter does not support c++11 standard
+        # Workaround the problem by setting the compiler flags in the source properties for C++ language only in the setup_target() macro
+        set (CLANG_CXX_FLAGS -std=c++11)
+    elseif (MSVC80)
+        message (FATAL_ERROR "Your MSVC version is too told to enable C++11 standard")
+    endif ()
+endif ()
 if (IOS)
     # IOS-specific setup
     add_definitions (-DIOS)
@@ -672,7 +705,7 @@ macro (enable_pch HEADER_PATHNAME)
             foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
                 # Generate *.rsp containing configuration specific compiler flags
                 string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
-                file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES} -c -x c++-header")
+                file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${CLANG_CXX_FLAGS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES} -c -x c++-header")
                 execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp)
                 file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new)
                 # Determine the dependency list
@@ -764,6 +797,15 @@ macro (setup_target)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND mkdir -p ${DIRECTORY} && ln -sf $<TARGET_FILE:${TARGET_NAME}> ${DIRECTORY}/$<TARGET_FILE_NAME:${TARGET_NAME}>
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/build)
+    endif ()
+
+    # Workaround CMake problem of sharing CMAKE_CXX_FLAGS for both C++ and Objective-C languages
+    if (CLANG_CXX_FLAGS)
+        foreach (FILE ${SOURCE_FILES})
+            if (FILE MATCHES \\.cpp$|\\.cc$)
+                set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " ${CLANG_CXX_FLAGS}")
+            endif ()
+        endforeach ()
     endif ()
 endmacro ()
 

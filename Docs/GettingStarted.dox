@@ -70,6 +70,7 @@ A number of build options can be defined when invoking the build scripts or when
 |ANDROID              |0|Configure project using Android cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only)|
 |RPI                  |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only)|
 |WIN32                |0|Configure project using MinGW cross-compiler toolchain (cmake_generic.sh only); also applicable when cross-compiling 64-bit Windows platform|
+|URHO3D_C++11         |0|Enable C++11 standard|
 |IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only)|
 |URHO3D_64BIT         |*|Enable 64-bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system|
 |URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
@@ -88,6 +89,8 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_DOCS          |0|Generate documentation as part of normal build (the 'doc' builtin target can be used to generate documentation regardless of this option's value)|
 |URHO3D_DOCS_QUIET    |0|Generate documentation as part of normal build, suppress generation process from sending anything to stdout|
 |URHO3D_PCH           |1|Enable PCH support|
+|URHO3D_DATABASE_ODBC |0|Enable Database support with ODBC, requires vendor-specific ODBC driver|
+|URHO3D_DATABASE_SQLITE|0|Enable Database support with SQLite embedded|
 |URHO3D_SSE           |1|Enable SSE instruction set|
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
