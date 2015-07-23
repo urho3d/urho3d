@@ -21,6 +21,8 @@ bool mouseWheelCameraPosition = false;
 bool contextMenuActionWaitFrame = false;
 bool cameraFlyMode = true;
 int hotKeyMode = 0; // used for checking that kind of style manipulation user are prefer ( see HotKeysMode )
+Vector3 lastSelectedNodesCenterPoint = Vector3(0,0,0); // for Blender mode to avoid own origin rotation when no nodes are selected. preserve last center for this
+
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
 const uint VIEWPORT_BORDER_H1    = 0x00000002;
@@ -1351,12 +1353,31 @@ void UpdateView(float timeStep)
                 Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
                 cameraNode.rotation = q;
 
-                if (input.mouseButtonDown[MOUSEB_MIDDLE] && (selectedNodes.length > 0 || selectedComponents.length > 0))
+                if ( hotKeyMode == HOTKEYS_MODE_STANDARD)
+                { 
+                    if (input.mouseButtonDown[MOUSEB_MIDDLE] && (selectedNodes.length > 0 || selectedComponents.length > 0))
+                    {                        
+                        Vector3 centerPoint = SelectedNodesCenterPoint();
+                        Vector3 d = cameraNode.worldPosition - centerPoint;
+                        cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, d.length);
+                        orbiting = true;
+                    }    
+                }
+                else if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) 
                 {
-                    Vector3 centerPoint = SelectedNodesCenterPoint();
-                    Vector3 d = cameraNode.worldPosition - centerPoint;
-                    cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, d.length);
-                    orbiting = true;
+                    if (input.mouseButtonDown[MOUSEB_MIDDLE])
+                    {
+                        Vector3 centerPoint = Vector3(0,0,0);
+                        
+                        if ((selectedNodes.length > 0 || selectedComponents.length > 0))
+                            centerPoint = SelectedNodesCenterPoint();
+                        else
+                            centerPoint = lastSelectedNodesCenterPoint;
+                            
+                        Vector3 d = cameraNode.worldPosition - centerPoint;
+                        cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, d.length);
+                        orbiting = true;
+                    }
                 }
             }
         }
@@ -1858,10 +1879,16 @@ Vector3 SelectedNodesCenterPoint()
             centerPoint += selectedComponents[i].node.worldPosition;
     }
 
-    if (count > 0)
+    if (count > 0) 
+    {
+        lastSelectedNodesCenterPoint = centerPoint / count;
         return centerPoint / count;
-    else
+    }
+    else 
+    {
+        lastSelectedNodesCenterPoint = centerPoint;
         return centerPoint;
+    }
 }
 
 Vector3 GetScreenCollision(IntVector2 pos)

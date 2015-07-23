@@ -713,7 +713,7 @@ All the \ref Running_Commandline "command line options" supported by Urho3D play
 
 Hint: to get more content to look at, run the Physics sample application (bin/Data/Scripts/11_Physics.as), and press F5. This saves a scene file called Physics.xml into the Data/Scenes subdirectory, which can be loaded in the editor. Scenes utilized by the NinjaSnowWar and SceneAndUILoad examples also exist in the Data/Scenes subdirectory, and the NinjaSnowWar object "prefabs" are in the Data/Objects subdirectory.
 
-\section EditorInstructions_Controls Controls (standard hotkeys)
+\section EditorInstructions_Controls Controls (standard style hotkeys)
 
 \verbatim
 Left mouse         - Select nodes or drag the node transform gizmo. Hold Shift to
@@ -773,7 +773,7 @@ F11                - Captures a screenshot
 F12                - Toggle UI
 \endverbatim
 
-\section EditorInstructions_Controls Controls (blender hotkeys)
+\section EditorInstructions_Controls2 Controls (blender style hotkeys)
 
 Hotkeys list show only differences with standard style
 
