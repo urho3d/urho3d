@@ -123,8 +123,6 @@
                         </element>
                     </element>
                 </element>
-                <element type="BorderImage" style="EditorDivider" />
-                
                 <element style="ListRow">
                     <attribute name="Layout Spacing" value="8" />
                     <element type="Text">
@@ -132,18 +130,18 @@
                     </element>
                     <element type="DropDownList">
                         <attribute name="Name" value="HotKeysModeEdit" />
-                        <attribute name="Min Size" value="160 0" />
-                        <attribute name="Max Size" value="160 2147483647" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
                         <attribute name="Resize Popup" value="true" />
                         <element type="Window" internal="true" popup="true" style="none">
                             <element type="ListView" internal="true" style="none">
                                 <element type="BorderImage" internal="true" style="none">
                                     <element internal="true" style="none">
                                         <element type="Text" style="FileSelectorFilterText">
-                                            <attribute name="Text" value="Standard hotkeys" />
+                                            <attribute name="Text" value="Standard" />
                                         </element>
                                         <element type="Text" style="FileSelectorFilterText">
-                                            <attribute name="Text" value="Blender hotkeys" />
+                                            <attribute name="Text" value="Blender" />
                                         </element>
                                     </element>
                                 </element>
@@ -151,7 +149,7 @@
                         </element>
                     </element>
                 </element>
-                
+                <element type="BorderImage" style="EditorDivider" />
                 <element style="ListRow">
                     <attribute name="Layout Spacing" value="8" />
                     <element type="Text">
