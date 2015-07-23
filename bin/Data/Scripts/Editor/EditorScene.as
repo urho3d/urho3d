@@ -20,6 +20,7 @@ bool runUpdate = false;
 
 Node@ lastSelectedNode;
 Drawable@ lastSelectedDrawable;
+Component@ lastSelectedComponent;
 
 Array<Node@> selectedNodes;
 Array<Component@> selectedComponents;

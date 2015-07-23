@@ -1390,6 +1390,13 @@ void UpdateView(float timeStep)
         orbiting = false;
 
     // Move/rotate/scale object
+    if ( hotKeyMode == HOTKEYS_MODE_BLENDER) // force to select component node for manipulation if selected only component and not his node
+    {    if ((editMode != EDIT_SELECT && editNodes.empty) && lastSelectedComponent !is null )
+        {
+                SelectNode(lastSelectedComponent.node, false);
+        }   
+    }
+    
     if (!editNodes.empty && editMode != EDIT_SELECT && input.keyDown[KEY_LCTRL])
     {
         Vector3 adjust(0, 0, 0);
@@ -1694,6 +1701,7 @@ void ViewRaycast(bool mouseClick)
                 {
                     lastSelectedNode = drawable.node;
                     lastSelectedDrawable = drawable;
+                    lastSelectedComponent = drawable;
                 }
             }
             else if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) {
@@ -1701,6 +1709,7 @@ void ViewRaycast(bool mouseClick)
                 {
                     lastSelectedNode = drawable.node;
                     lastSelectedDrawable = drawable;
+                    lastSelectedComponent = drawable;
                 }
             }
              
