@@ -26,6 +26,46 @@
         <attribute name="Is Resizable" value="true" />
         <attribute name="Fixed Height Resizing" value="true" />
         <attribute name="Resize Border" value="0 6 0 6" />
+        <element type="DropDownList">
+                            <attribute name="Name" value="ModelPreview" />
+                            <attribute name="Min Size" value="80 16" />
+                            <attribute name="Max Size" value="80 16" />
+                            <attribute name="Resize Popup" value="true" />
+                            <attribute name="Horiz Alignment" value="Right" />
+                            <attribute name="Vert Alignment" value="Bottom" />
+                            <element type="Window" internal="true" popup="true" style="none">
+                                    <element type="ListView" internal="true" style="none">
+                                        <element type="BorderImage" internal="true" style="none">
+                                            <element internal="true" style="none">
+                                                <element type="Text" style="FileSelectorFilterText">
+                                                    <attribute name="Text" value="Box" />
+                                                    <attribute name="Text Alignment" value="Center" />
+                                                </element>
+                                                <element type="Text" style="FileSelectorFilterText">
+                                                    <attribute name="Text" value="Sphere" />
+                                                    <attribute name="Text Alignment" value="Center" />
+                                                </element>
+                                                <element type="Text" style="FileSelectorFilterText">
+                                                    <attribute name="Text" value="Plane" />
+                                                    <attribute name="Text Alignment" value="Center" />
+                                                </element>
+                                                <element type="Text" style="FileSelectorFilterText">
+                                                    <attribute name="Text" value="Cylinder" />
+                                                    <attribute name="Text Alignment" value="Center" />
+                                                </element>
+                                                <element type="Text" style="FileSelectorFilterText">
+                                                    <attribute name="Text" value="Cone" />
+                                                    <attribute name="Text Alignment" value="Center" />
+                                                </element>
+                                                <element type="Text" style="FileSelectorFilterText">
+                                                    <attribute name="Text" value="TeaPot" />
+                                                    <attribute name="Text Alignment" value="Center" />
+                                                </element>
+                                            </element>
+                                        </element>
+                                    </element>
+                                </element>                           
+         </element>
     </element>
     <element type="BorderImage" style="EditorDivider" />
     <element>

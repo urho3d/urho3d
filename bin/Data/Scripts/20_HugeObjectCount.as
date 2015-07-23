@@ -56,6 +56,25 @@ void CreateScene()
     lightNode.direction = Vector3(-0.6f, -1.0f, -0.8f); // The direction vector does not need to be normalized
     Light@ light = lightNode.CreateComponent("Light");
     light.lightType = LIGHT_DIRECTIONAL;
+    light.castShadows = true;
+
+    {
+        // Create a floor object, 1000 x 1000 world units. Adjust position so that the ground is at zero Y
+        Node@ floorNode = scene_.CreateChild("Floor");
+        floorNode.position = Vector3(0.0f, -2.0f, 0.0f);
+        floorNode.scale = Vector3(100.0f, 1.0f, 100.0f);
+        StaticModel@ floorObject = floorNode.CreateComponent("StaticModel");
+        floorObject.model = cache.GetResource("Model", "Models/Box.mdl");
+
+        // Make the floor physical by adding RigidBody and CollisionShape components. The RigidBody's default
+        // parameters make the object static (zero mass.) Note that a CollisionShape by itself will not participate
+        // in the physics simulation
+        RigidBody@ body = floorNode.CreateComponent("RigidBody");
+        CollisionShape@ shape = floorNode.CreateComponent("CollisionShape");
+        // Set a box shape of size 1 x 1 x 1 for collision. The shape will be scaled with the scene node scale, so the
+        // rendering and physics representation sizes should match (the box model is also 1 x 1 x 1.)
+        shape.SetBox(Vector3(1.0f, 1.0f, 1.0f));
+    }
 
     if (!useGroups)
     {
@@ -70,7 +89,9 @@ void CreateScene()
                 boxNode.position = Vector3(x * 0.3f, 0.0f, y * 0.3f);
                 boxNode.SetScale(0.25f);
                 StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
-                boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
+                boxObject.castShadows = true;
+                boxObject.model = cache.GetResource("Model", "Models/Plane.mdl");
+                boxObject.material = cache.GetResource("Material", "Materials/List.xml");
                 boxNodes.Push(boxNode);
             }
         }
@@ -94,7 +115,9 @@ void CreateScene()
                 {
                     Node@ boxGroupNode = scene_.CreateChild("BoxGroup");
                     lastGroup = boxGroupNode.CreateComponent("StaticModelGroup");
-                    lastGroup.model = cache.GetResource("Model", "Models/Box.mdl");
+                    lastGroup.model = cache.GetResource("Model", "Models/Plane.mdl");
+                    lastGroup.material = cache.GetResource("Material", "Materials/List.xml");
+                    lastGroup.castShadows = true;
                 }
 
                 Node@ boxNode = scene_.CreateChild("Box");

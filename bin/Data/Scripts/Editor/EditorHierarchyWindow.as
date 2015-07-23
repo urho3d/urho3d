@@ -497,6 +497,7 @@ void SelectNode(Node@ node, bool multiselect)
         return;
     }
 
+    lastSelectedNode = node;
     uint index = GetListIndex(node);
     uint numItems = hierarchyList.numItems;
 
