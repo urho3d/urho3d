@@ -386,9 +386,11 @@ void CreateMenuBar()
         //else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
         //    popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
         
-        if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+        if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) 
+        {
              popup.AddChild(CreateMenuItem("Move to layer", @ShowLayerMover, 'M'));
-        
+             popup.AddChild(CreateMenuItem("Instance StaticModel", @CreateSMGInstance, 'D', QUAL_ALT)); 
+        }
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Rebuild navigation data", @SceneRebuildNavigation));

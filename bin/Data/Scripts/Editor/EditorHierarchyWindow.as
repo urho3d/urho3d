@@ -496,8 +496,7 @@ void SelectNode(Node@ node, bool multiselect)
         hierarchyList.ClearSelection();
         return;
     }
-
-    lastSelectedNode = node;
+    
     uint index = GetListIndex(node);
     uint numItems = hierarchyList.numItems;
 
@@ -626,7 +625,7 @@ void HandleHierarchyListSelectionChange()
         else if (type == ITEM_NODE)
         {
             Node@ node = GetListNode(index);
-            if (node !is null)
+            if (node !is null) 
                 selectedNodes.Push(node);
         }
         else if (type == ITEM_UI_ELEMENT)
@@ -636,7 +635,7 @@ void HandleHierarchyListSelectionChange()
                 selectedUIElements.Push(element);
         }
     }
-
+    
     // If only one node/UIElement selected, use it for editing
     if (selectedNodes.length == 1)
         editNode = selectedNodes[0];

@@ -1137,7 +1137,7 @@ void UpdateStats(float timeStep)
     String adding = "";
     // Todo: add localization
     if (hotKeyMode == HOTKEYS_MODE_BLENDER)
-       adding = "  CameraFlyMode: " + (cameraFlyMode ? "True" : "False");
+        adding = localization.Get("  CameraFlyMode: ") + (cameraFlyMode ? "True" : "False");
     
     editorModeText.text = String(
         localization.Get("Mode: ") + localization.Get(editModeText[editMode]) +
@@ -1683,9 +1683,27 @@ void ViewRaycast(bool mouseClick)
 
         RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
             pickModeDrawableFlags[pickMode], 0x7fffffff);
+        
         if (result.drawable !is null)
-        {
+        {            
             Drawable@ drawable = result.drawable;
+            
+            // for actual last selected node or component in both modes
+            if ( hotKeyMode == HOTKEYS_MODE_STANDARD ) {
+                if (input.mouseButtonDown[MOUSEB_LEFT]) 
+                {
+                    lastSelectedNode = drawable.node;
+                    lastSelectedDrawable = drawable;
+                }
+            }
+            else if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) {
+                if (input.mouseButtonDown[MOUSEB_RIGHT]) 
+                {
+                    lastSelectedNode = drawable.node;
+                    lastSelectedDrawable = drawable;
+                }
+            }
+             
             // If selecting a terrain patch, select the parent terrain instead
             if (drawable.typeName != "TerrainPatch")
             {

@@ -610,5 +610,13 @@
 	"File":{
 		"en":"File",
 		"ru":"Файл"
+	},
+	    "Please, use only nodes with one StaticModel for instansing":{
+		"en":"Please, use only nodes with one StaticModel for instansing",
+		"ru":"Пожалуйста, используйте только ноду с одной статической моделью для инстансинга"
+	},
+	"  CameraFlyMode: ":{
+		"en":"  CameraFlyMode: ",
+		"ru":"  Камера в режиме полета: "
 	}
 }

@@ -14,6 +14,48 @@ class EditActionGroup
     Array<EditAction@> actions;
 }
 
+class CreateStaticModelGroupIndexListAction : EditAction 
+{
+    uint nodeID;
+    uint drawableID;
+    uint instanceNodeID;
+    
+    void Define(Drawable@ drawable, Node@ instanceNode)
+    {
+        drawableID = drawable.id;
+        nodeID = drawable.node.id;
+        instanceNodeID = instanceNode.id;    
+    }
+    
+    void Undo()
+    {
+        Node@ node = editorScene.GetNode(nodeID);
+        Drawable@ drawable = editorScene.GetComponent(drawableID);
+        if (node !is null && drawable !is null)
+        {
+            Node@ instanceNode = editorScene.GetNode(instanceNodeID);
+            StaticModelGroup@ smg = cast<StaticModelGroup>(drawable);
+            if (smg.numInstanceNodes > 2) 
+            { 
+                smg.RemoveInstanceNode(instanceNode);
+                editorScene.RemoveChild(instanceNode);
+            }
+        }
+    }
+    
+    void Redo()
+    {
+        Node@ node = editorScene.GetNode(nodeID);
+        Drawable@ drawable = editorScene.GetComponent(drawableID);
+        if (node !is null && drawable !is null)
+        {
+        
+        }
+    }
+    
+
+}
+
 class CreateDrawableMaskAction : EditAction
 {
     uint nodeID;

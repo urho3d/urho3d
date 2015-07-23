@@ -19,6 +19,8 @@ bool sceneModified = false;
 bool runUpdate = false;
 
 Node@ lastSelectedNode;
+Drawable@ lastSelectedDrawable;
+
 Array<Node@> selectedNodes;
 Array<Component@> selectedComponents;
 Node@ editNode;
@@ -789,7 +791,7 @@ bool NodesParentToLastSelected()
     Array<Node@> changedNodes;
     
     // Find new parent node it selected last
-    Node@ lastNode = lastSelectedNode;
+    Node@ lastNode = lastSelectedNode;//GetListNode(hierarchyList.selection);
     
     for (uint i = 0; i < selectedNodes.length; ++i)
     {
@@ -817,6 +819,88 @@ bool NodesParentToLastSelected()
     SaveEditActionGroup(group);
     SetSceneModified();
 
+    return true;
+}
+
+bool CreateSMGInstance() 
+{      
+    if (!CheckHierarchyWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
+    {
+        return false;
+    }
+    
+    
+    Node@ node = lastSelectedNode;    
+    Node@ parent = node.parent;
+        
+    bool isModel = false;
+    bool isInstance = false;
+    bool isSMG = false;
+    
+    StaticModel@ modelNode = node.GetComponent("StaticModel");
+    StaticModelGroup@ smgNode = node.GetComponent("StaticModelGroup");
+    StaticModelGroup@ smgParent;
+    
+    if (parent !is null) 
+        smgParent = parent.GetComponent("StaticModelGroup");
+    
+    if (modelNode !is null ) 
+        isModel = true;
+    else if (((modelNode is null) && (smgNode !is null)) || smgParent !is null) 
+        isSMG = true;
+    else if (((modelNode is null) && (smgNode is null)) && smgParent is null)
+    {
+        MessageBox(localization.Get("Please, use only nodes with one StaticModel for instansing"));
+        //MessageBox(("Please, use only nodes with one StaticModel for instansing"));
+        
+        return false;
+    }
+    
+    Node@ newInstance;
+        
+    if (isSMG) 
+    {     
+        newInstance = CreateNode(LOCAL);
+        Vector3 offset = Vector3(0,0,0);
+        
+        // Smart offset between two last instances
+        if (node.numChildren > 1)        
+        {          
+            Vector3 posLast = node.children[node.numChildren-1].worldPosition;
+            Vector3 posBeforeLast = node.children[node.numChildren-2].worldPosition;
+            offset =  posLast - posBeforeLast;
+        }
+        
+        Vector3 lastInstancePosition = node.children[node.numChildren-1].worldPosition;
+        newInstance.worldPosition = lastInstancePosition + offset;
+        SceneChangeParent(newInstance, node);
+        newInstance.name = node.name + "Instance" + String(smgNode.numInstanceNodes);
+        smgNode.AddInstanceNode(newInstance);
+        
+        CreateStaticModelGroupIndexListAction action;
+        action.Define(smgNode, newInstance);
+        SaveEditAction(action);
+        SetSceneModified();    
+    }
+    else if (isModel) 
+    {
+        StaticModelGroup@ smg = node.CreateComponent("StaticModelGroup");
+        smg.model = modelNode.model;
+        smg.materials[0] = modelNode.materials[0];
+        node.RemoveComponent(modelNode); 
+        newInstance = CreateNode(LOCAL);
+        newInstance.worldPosition = node.worldPosition;
+        
+        SceneChangeParent(newInstance, node);
+        newInstance.name = node.name + "Instance" + String(smg.numInstanceNodes); 
+        smg.AddInstanceNode(newInstance);   
+        
+        CreateStaticModelGroupIndexListAction action;
+        action.Define(smg, newInstance);
+        SaveEditAction(action);
+        SetSceneModified(); 
+    }
+       
     return true;
 }
 
