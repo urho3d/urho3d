@@ -47,6 +47,8 @@ DatabaseDemo::DatabaseDemo(Context* context) :
 
 DatabaseDemo::~DatabaseDemo()
 {
+    // Although the managed database connection will be disconnected by Database subsystem automatically in its destructor,
+    // it is a good practice for a class to balance the number of connect() and disconnect() calls.
     GetSubsystem<Database>()->Disconnect(connection_);
 }
 
@@ -81,7 +83,9 @@ void DatabaseDemo::Start()
     OpenConsoleWindow();
 
     // Connect to a temporary in-memory database
-    connection_ = GetSubsystem<Database>()->Connect("file://");
+    Database* database = GetSubsystem<Database>();
+    database->SetUsePooling(false);
+    connection_ = database->Connect("file://");
 
     // Subscribe to database cursor event to loop through query resultset
     SubscribeToEvent(connection_, E_DBCURSOR, HANDLER(DatabaseDemo, HandleDbCursor));

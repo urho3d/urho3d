@@ -25,6 +25,10 @@ set (TARGET_NAME SQLite)
 
 # https://www.sqlite.org/compile.html#use_uri
 add_definitions (-DSQLITE_USE_URI=1)
+# Do not use pthread and dl libraries for Emscripten
+if (EMSCRIPTEN)
+    add_definitions (-DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION)
+endif ()
 
 # Define source files
 set (SOURCE_FILES src/sqlite3.c)
