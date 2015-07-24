@@ -1402,17 +1402,14 @@ void UpdateView(float timeStep)
         
         if ( selectedNodes.length <= 1 )
         {
-            centerPoint = lastSelectedDrawable.node.worldPosition;
             bb = lastSelectedDrawable.boundingBox;
-            bb.Merge(lastSelectedDrawable.node.worldPosition);   
+            centerPoint = lastSelectedDrawable.node.worldPosition;
         }
         else 
         {
-            bb.Merge(lastSelectedDrawable.node.worldPosition);
-            
             for (int i = 0; i < selectedNodes.length; i++) 
             {
-                    bb.Merge(selectedNodes[i].worldPosition);
+                    bb.Merge(selectedNodes[i].position);
             }
                   
             centerPoint = SelectedNodesCenterPoint();
@@ -1421,7 +1418,7 @@ void UpdateView(float timeStep)
         float maxSide = bb.size.length;
         Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
         cameraNode.rotation = q;
-        cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, maxSide);
+        cameraNode.worldPosition = centerPoint -  cameraNode.worldDirection * maxSide;
         
         viewCloser =  false;
     }
