@@ -389,7 +389,7 @@ void CreateMenuBar()
         if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) 
         {
              popup.AddChild(CreateMenuItem("Move to layer", @ShowLayerMover, 'M'));
-             popup.AddChild(CreateMenuItem("Instance StaticModel", @CreateSMGInstance, 'D', QUAL_ALT));
+             popup.AddChild(CreateMenuItem("Smart Duplicate", @SceneSmartDuplicateNode, 'D', QUAL_ALT));
              popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_KP_PERIOD));        
         }
         

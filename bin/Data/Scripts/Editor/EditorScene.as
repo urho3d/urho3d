@@ -819,85 +819,57 @@ bool NodesParentToLastSelected()
     return true;
 }
 
-bool CreateSMGInstance() 
+bool SceneSmartDuplicateNode() 
 {      
     if (!CheckHierarchyWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
     {
         return false;
     }
     
-    
-    Node@ node = lastSelectedNode;    
+    Node@ node = lastSelectedNode;
     Node@ parent = node.parent;
-        
-    bool isModel = false;
-    bool isInstance = false;
-    bool isSMG = false;
+    Vector3 offset = Vector3(0,0,0);
     
-    StaticModel@ modelNode = node.GetComponent("StaticModel");
-    StaticModelGroup@ smgNode = node.GetComponent("StaticModelGroup");
-    StaticModelGroup@ smgParent;
-    
-    if (parent !is null) 
-        smgParent = parent.GetComponent("StaticModelGroup");
-    
-    if (modelNode !is null ) 
-        isModel = true;
-    else if (((modelNode is null) && (smgNode !is null)) || smgParent !is null) 
-        isSMG = true;
-    else if (((modelNode is null) && (smgNode is null)) && smgParent is null)
+    if (parent is editorScene) // if parent of selected node is Scene make empty parent for it and place in same position; 
     {
-        MessageBox(localization.Get("Please, use only nodes with one StaticModel for instansing"));
-        //MessageBox(("Please, use only nodes with one StaticModel for instansing"));
+        parent = CreateNode(LOCAL);
+        SceneChangeParent(parent, editorScene, false);
+        parent.worldPosition = node.worldPosition;
+        //node.worldPosition = Vector3(0.0, 0.0, 0.0);
+        SceneChangeParent(node, parent, false);
+        parent = node.parent;
+        parent.name = node.name + "Group";
+        node.name = parent.name + "Instance" + String(parent.numChildren);
+    } 
+    else
+    {  
+        Node@ lastChild = parent.children[parent.numChildren-1];
+        Node@ beforeLastChild;
         
-        return false;
-    }
-    
-    Node@ newInstance;
-        
-    if (isSMG) 
-    {     
-        newInstance = CreateNode(LOCAL);
-        Vector3 offset = Vector3(0,0,0);
-        
-        // Smart offset between two last instances
-        if (node.numChildren > 1)        
-        {          
-            Vector3 posLast = node.children[node.numChildren-1].worldPosition;
-            Vector3 posBeforeLast = node.children[node.numChildren-2].worldPosition;
-            offset =  posLast - posBeforeLast;
+        if (parent.numChildren == 1)  // make first offset in step of object side size
+        {   
+            Drawable@ drawable = GetFirstDrawable(lastChild);
+            if (drawable !is null) 
+            {
+                BoundingBox bb = drawable.boundingBox;
+                float side =  bb.size.length ;
+                offset = Vector3(0.0, 0.0, side); 
+            } 
+        }      
+        else if (parent.numChildren > 1) 
+        {  
+            beforeLastChild = parent.children[parent.numChildren-2];
+            offset = lastChild.worldPosition - beforeLastChild.worldPosition;
         }
         
-        Vector3 lastInstancePosition = node.children[node.numChildren-1].worldPosition;
+        Vector3 lastInstancePosition = lastChild.worldPosition;
+        SelectNode(lastChild, false);
+        SceneDuplicate();
+        Node@ newInstance = parent.children[parent.numChildren-1];
+        SelectNode(newInstance, false);
         newInstance.worldPosition = lastInstancePosition + offset;
-        SceneChangeParent(newInstance, node);
-        newInstance.name = node.name + "Instance" + String(smgNode.numInstanceNodes);
-        smgNode.AddInstanceNode(newInstance);
-        
-        CreateStaticModelGroupIndexListAction action;
-        action.Define(smgNode, newInstance);
-        SaveEditAction(action);
-        SetSceneModified();    
+        newInstance.name = parent.name + "Instance" + String(parent.numChildren);
     }
-    else if (isModel) 
-    {
-        StaticModelGroup@ smg = node.CreateComponent("StaticModelGroup");
-        smg.model = modelNode.model;
-        smg.materials[0] = modelNode.materials[0];
-        node.RemoveComponent(modelNode); 
-        newInstance = CreateNode(LOCAL);
-        newInstance.worldPosition = node.worldPosition;
-        
-        SceneChangeParent(newInstance, node);
-        newInstance.name = node.name + "Instance" + String(smg.numInstanceNodes); 
-        smg.AddInstanceNode(newInstance);   
-        
-        CreateStaticModelGroupIndexListAction action;
-        action.Define(smg, newInstance);
-        SaveEditAction(action);
-        SetSceneModified(); 
-    }
-       
     return true;
 }
 
