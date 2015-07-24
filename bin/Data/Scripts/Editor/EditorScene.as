@@ -18,10 +18,6 @@ CreateMode instantiateMode = REPLICATED;
 bool sceneModified = false;
 bool runUpdate = false;
 
-Node@ lastSelectedNode;
-Drawable@ lastSelectedDrawable;
-Component@ lastSelectedComponent;
-
 Array<Node@> selectedNodes;
 Array<Component@> selectedComponents;
 Node@ editNode;
@@ -904,6 +900,12 @@ bool CreateSMGInstance()
        
     return true;
 }
+
+bool ViewCloser()
+{
+    return (viewCloser = true);
+}
+
 
 bool SceneToggleEnable()
 {

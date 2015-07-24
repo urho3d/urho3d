@@ -22,6 +22,10 @@ bool contextMenuActionWaitFrame = false;
 bool cameraFlyMode = true;
 int hotKeyMode = 0; // used for checking that kind of style manipulation user are prefer ( see HotKeysMode )
 Vector3 lastSelectedNodesCenterPoint = Vector3(0,0,0); // for Blender mode to avoid own origin rotation when no nodes are selected. preserve last center for this
+Node@ lastSelectedNode;
+Drawable@ lastSelectedDrawable;
+Component@ lastSelectedComponent;
+bool viewCloser = false;
 
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
@@ -1300,7 +1304,6 @@ void UpdateView(float timeStep)
         
     }
 
-
     if (input.keyDown[KEY_HOME])
     {
         if (selectedNodes.length > 0 || selectedComponents.length > 0)
@@ -1388,6 +1391,43 @@ void UpdateView(float timeStep)
 
     if (orbiting && !input.mouseButtonDown[MOUSEB_MIDDLE])
         orbiting = false;
+    
+    // View closer on KP_PERIOD
+    if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+    if ( viewCloser && lastSelectedDrawable !is null) 
+    {
+        SetMouseLock();
+        BoundingBox bb;
+        Vector3 centerPoint;
+        
+        if ( selectedNodes.length <= 1 )
+        {
+            centerPoint = lastSelectedDrawable.node.worldPosition;
+            bb = lastSelectedDrawable.boundingBox;
+            bb.Merge(lastSelectedDrawable.node.worldPosition);   
+        }
+        else 
+        {
+            bb.Merge(lastSelectedDrawable.node.worldPosition);
+            
+            for (int i = 0; i < selectedNodes.length; i++) 
+            {
+                    bb.Merge(selectedNodes[i].worldPosition);
+            }
+                  
+            centerPoint = SelectedNodesCenterPoint();
+        }
+        
+        float maxSide = bb.size.length;
+        Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
+        cameraNode.rotation = q;
+        cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, maxSide);
+        
+        viewCloser =  false;
+    }
+    else 
+        viewCloser =  false;
+         
 
     // Move/rotate/scale object
     if ( hotKeyMode == HOTKEYS_MODE_BLENDER) // force to select component node for manipulation if selected only component and not his node
