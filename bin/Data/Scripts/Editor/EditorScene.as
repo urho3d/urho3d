@@ -37,6 +37,8 @@ uint undoStackPos = 0;
 bool revertOnPause = false;
 XMLFile@ revertData;
 
+Vector3 lastOffsetForSmartDuplicate;
+
 void ClearSceneSelection()
 {
     selectedNodes.Clear();
@@ -820,56 +822,74 @@ bool NodesParentToLastSelected()
 }
 
 bool SceneSmartDuplicateNode() 
-{      
+{       
+    const float minOffset = 0.1;
+    
     if (!CheckHierarchyWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
-    {
         return false;
-    }
     
     Node@ node = lastSelectedNode;
     Node@ parent = node.parent;
-    Vector3 offset = Vector3(0,0,0);
+    Vector3 offset = Vector3(1,0,0); // default offset
     
     if (parent is editorScene) // if parent of selected node is Scene make empty parent for it and place in same position; 
     {
         parent = CreateNode(LOCAL);
         SceneChangeParent(parent, editorScene, false);
         parent.worldPosition = node.worldPosition;
-        //node.worldPosition = Vector3(0.0, 0.0, 0.0);
-        SceneChangeParent(node, parent, false);
-        parent = node.parent;
         parent.name = node.name + "Group";
         node.name = parent.name + "Instance" + String(parent.numChildren);
+        SceneChangeParent(node, parent, false);
+        parent = node.parent;
+        SelectNode(node, false);
     } 
-    else
-    {  
-        Node@ lastChild = parent.children[parent.numChildren-1];
-        Node@ beforeLastChild;
-        
-        if (parent.numChildren == 1)  // make first offset in step of object side size
-        {   
-            Drawable@ drawable = GetFirstDrawable(lastChild);
-            if (drawable !is null) 
-            {
-                BoundingBox bb = drawable.boundingBox;
-                float side =  bb.size.length ;
-                offset = Vector3(0.0, 0.0, side); 
-            } 
-        }      
-        else if (parent.numChildren > 1) 
-        {  
-            beforeLastChild = parent.children[parent.numChildren-2];
-            offset = lastChild.worldPosition - beforeLastChild.worldPosition;
-        }
-        
-        Vector3 lastInstancePosition = lastChild.worldPosition;
-        SelectNode(lastChild, false);
-        SceneDuplicate();
-        Node@ newInstance = parent.children[parent.numChildren-1];
-        SelectNode(newInstance, false);
-        newInstance.worldPosition = lastInstancePosition + offset;
-        newInstance.name = parent.name + "Instance" + String(parent.numChildren);
+
+    Node@ lastChild = lastSelectedNode;
+    Node@ beforeLastChild;
+    float sideSize = 0;
+    Vector3 size;
+    BoundingBox bb;
+    
+    // get bb for offset  
+    Drawable@ drawable = GetFirstDrawable(lastChild);
+    if (drawable !is null) 
+    {
+        bb = drawable.boundingBox;
+        size =  bb.size * drawable.node.worldScale;
+        offset = Vector3(size.x, 0, 0); 
+    } 
+    
+    // make offset on axis that select user by mouse
+    if (gizmoAxisX.selected)
+    {
+        if (size.x < minOffset) size.x = minOffset;
+        offset = lastChild.rotation * Vector3(size.x,0,0);
     }
+    else if (gizmoAxisY.selected)
+    {
+        if (size.y < minOffset) size.y = minOffset;
+        offset = lastChild.rotation * Vector3(0,size.y,0);
+    }
+    else if (gizmoAxisZ.selected)
+    {
+        if (size.z < minOffset) size.z = minOffset;
+        offset = lastChild.rotation * Vector3(0,0,size.z);
+    }
+    else
+        offset = lastOffsetForSmartDuplicate;    
+    
+    Vector3 lastInstancePosition = lastChild.worldPosition;
+    
+    SelectNode(lastChild, false);
+    SceneDuplicate();
+    Node@ newInstance = parent.children[parent.numChildren-1];
+    SelectNode(newInstance, false);
+    newInstance.worldPosition = lastInstancePosition;
+    newInstance.Translate(offset, TS_WORLD);
+    newInstance.name = parent.name + "Instance" + String(parent.numChildren-1);
+    
+    lastOffsetForSmartDuplicate = offset;
+
     return true;
 }
 

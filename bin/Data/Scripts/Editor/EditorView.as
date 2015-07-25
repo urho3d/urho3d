@@ -27,7 +27,6 @@ Drawable@ lastSelectedDrawable;
 Component@ lastSelectedComponent;
 bool viewCloser = false;
 
-
 const uint VIEWPORT_BORDER_H     = 0x00000001;
 const uint VIEWPORT_BORDER_H1    = 0x00000002;
 const uint VIEWPORT_BORDER_H2    = 0x00000004;
@@ -1300,8 +1299,7 @@ void UpdateView(float timeStep)
                     camera.zoom = Clamp(zoom, .1, 30);
                 }
             }
-        }
-        
+        }       
     }
 
     if (input.keyDown[KEY_HOME])
@@ -1391,8 +1389,7 @@ void UpdateView(float timeStep)
 
     if (orbiting && !input.mouseButtonDown[MOUSEB_MIDDLE])
         orbiting = false;
-    
-    // View closer on KP_PERIOD
+        
     if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
     if ( viewCloser && lastSelectedDrawable !is null) 
     {
@@ -1409,7 +1406,7 @@ void UpdateView(float timeStep)
         {
             for (int i = 0; i < selectedNodes.length; i++) 
             {
-                    bb.Merge(selectedNodes[i].position);
+                bb.Merge(selectedNodes[i].position);
             }
                   
             centerPoint = SelectedNodesCenterPoint();
@@ -1424,8 +1421,7 @@ void UpdateView(float timeStep)
     }
     else 
         viewCloser =  false;
-         
-
+    
     // Move/rotate/scale object
     if ( hotKeyMode == HOTKEYS_MODE_BLENDER) // force to select component node for manipulation if selected only component and not his node
     {    if ((editMode != EDIT_SELECT && editNodes.empty) && lastSelectedComponent !is null )

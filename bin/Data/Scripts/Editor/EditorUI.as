@@ -390,7 +390,7 @@ void CreateMenuBar()
         {
              popup.AddChild(CreateMenuItem("Move to layer", @ShowLayerMover, 'M'));
              popup.AddChild(CreateMenuItem("Smart Duplicate", @SceneSmartDuplicateNode, 'D', QUAL_ALT));
-             popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_KP_PERIOD));        
+             popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_KP_PERIOD));                     
         }
         
         CreateChildDivider(popup);
