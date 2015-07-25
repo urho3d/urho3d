@@ -363,7 +363,7 @@ void CreateMenuBar()
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'E', QUAL_CTRL));
             popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'E', QUAL_ALT));
         }
-        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) 
+        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
         {
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'H'));
             popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'H', QUAL_ALT));
@@ -740,7 +740,7 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
         menuCallbacks[variant.GetUInt()]();
 }
 
-Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int accelKey = 0, int accelQual = 0, bool addToQuickMenu = true, String quickMenuText="")
+Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int accelKey = 0, int accelQual = 0, bool addToQuickMenu = true, String quickMenuText="", bool autoLocalize = true)
 {
     Menu@ menu = Menu(title);
     menu.defaultStyle = uiStyle;
@@ -758,7 +758,7 @@ Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int 
     menu.AddChild(menuText);
     menuText.style = "EditorMenuText";
     menuText.text = title;
-    menuText.autoLocalizable = true;
+    menuText.autoLocalizable = autoLocalize;
 
     if (addToQuickMenu)
         AddQuickMenuItem(callback, quickMenuText.empty ? title : quickMenuText);
@@ -1637,7 +1637,7 @@ void PopulateMruScenes()
     {
         recentSceneMenu.enabled = true;
         for (uint i=0; i < uiRecentScenes.length; ++i)
-            mruScenesPopup.AddChild(CreateMenuItem(uiRecentScenes[i], @LoadMostRecentScene, 0, 0, false));
+            mruScenesPopup.AddChild(CreateMenuItem(uiRecentScenes[i], @LoadMostRecentScene, 0, 0, false, "", false));
     }
     else
         recentSceneMenu.enabled = false;
