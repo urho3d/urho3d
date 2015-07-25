@@ -845,8 +845,6 @@ bool SceneSmartDuplicateNode()
     } 
 
     Node@ lastChild = lastSelectedNode;
-    Node@ beforeLastChild;
-    float sideSize = 0;
     Vector3 size;
     BoundingBox bb;
     
