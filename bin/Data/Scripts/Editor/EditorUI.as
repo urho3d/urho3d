@@ -1335,13 +1335,20 @@ void HandleHotKeysBlender( VariantMap& eventData )
                 }
                 else if (key == KEY_F) 
                 {
-                    Vector3 center = Vector3(0,0,0);
-                    
-                    if (selectedNodes.length > 0)
-                        center = SelectedNodesCenterPoint(); 
-                    
-                    cameraNode.LookAt(center);
-                    ReacquireCameraYawPitch(); 
+                    if (camera.orthographic) 
+                    {
+                        viewCloser = true;
+                    }
+                    else
+                    {
+                        Vector3 center = Vector3(0,0,0);
+                        
+                        if (selectedNodes.length > 0)
+                            center = SelectedNodesCenterPoint(); 
+                        
+                        cameraNode.LookAt(center);
+                        ReacquireCameraYawPitch();
+                    } 
                 }
          }  
     }

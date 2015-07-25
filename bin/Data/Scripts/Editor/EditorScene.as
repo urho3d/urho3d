@@ -861,17 +861,17 @@ bool SceneSmartDuplicateNode()
     if (gizmoAxisX.selected)
     {
         if (size.x < minOffset) size.x = minOffset;
-        offset = lastChild.rotation * Vector3(size.x,0,0);
+        offset = lastChild.worldRotation * Vector3(size.x,0,0);
     }
     else if (gizmoAxisY.selected)
     {
         if (size.y < minOffset) size.y = minOffset;
-        offset = lastChild.rotation * Vector3(0,size.y,0);
+        offset = lastChild.worldRotation * Vector3(0,size.y,0);
     }
     else if (gizmoAxisZ.selected)
     {
         if (size.z < minOffset) size.z = minOffset;
-        offset = lastChild.rotation * Vector3(0,0,size.z);
+        offset = lastChild.worldRotation * Vector3(0,0,size.z);
     }
     else
         offset = lastOffsetForSmartDuplicate;    
@@ -887,7 +887,7 @@ bool SceneSmartDuplicateNode()
     newInstance.name = parent.name + "Instance" + String(parent.numChildren-1);
     
     lastOffsetForSmartDuplicate = offset;
-
+    UpdateNodeAttributes();
     return true;
 }
 

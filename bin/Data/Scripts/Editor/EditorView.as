@@ -1281,7 +1281,7 @@ void UpdateView(float timeStep)
             if (mouseWheelCameraPosition && !camera.orthographic )
             {   
                 if (input.keyDown[KEY_LSHIFT])
-                    cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * -input.mouseMoveWheel*5* timeStep * speedMultiplier);
+                    cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * -input.mouseMoveWheel*20* timeStep * speedMultiplier);
                 else if (input.keyDown[KEY_LCTRL])
                     cameraNode.Translate(Vector3(-cameraBaseSpeed,0, 0) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
                 else
@@ -1289,14 +1289,25 @@ void UpdateView(float timeStep)
             }
             else
             {   
-                if (input.keyDown[KEY_LSHIFT])
-                    cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * -input.mouseMoveWheel*5* timeStep * speedMultiplier);
-                else if (input.keyDown[KEY_LCTRL])
+                if (input.keyDown[KEY_LSHIFT]) 
+                {
+                    cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * -input.mouseMoveWheel*20* timeStep * speedMultiplier);
+                }
+                else if (input.keyDown[KEY_LCTRL]) 
+                {
                     cameraNode.Translate(Vector3(-cameraBaseSpeed,0, 0) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+                }
                 else 
                 {
-                    float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
-                    camera.zoom = Clamp(zoom, .1, 30);
+                    if (input.qualifierDown[QUAL_ALT]) 
+                    {
+                        float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
+                        camera.zoom = Clamp(zoom, .1, 30);
+                    }
+                    else 
+                    {
+                        cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+                    }    
                 }
             }
         }       
@@ -1334,14 +1345,24 @@ void UpdateView(float timeStep)
         if (mouseMove.x != 0 || mouseMove.y != 0)
         {
             bool panTheCamera = false;
+            
             if(mmbPanMode || (hotKeyMode == HOTKEYS_MODE_BLENDER))
                 if ( hotKeyMode == HOTKEYS_MODE_STANDARD) 
                     panTheCamera = !(changeCamViewButton && input.keyDown[KEY_LSHIFT]);
-                else if (hotKeyMode == HOTKEYS_MODE_BLENDER && cameraFlyMode == true )
+                else if (hotKeyMode == HOTKEYS_MODE_BLENDER && cameraFlyMode) 
+                {
                     panTheCamera = false;
-            else
-                panTheCamera = (changeCamViewButton && input.keyDown[KEY_LSHIFT]);
-
+                    //else if (camera.orthographic)
+                    //    panTheCamera = true;     
+                }
+            else 
+            {
+                if (!camera.orthographic)
+                    panTheCamera = changeCamViewButton && input.keyDown[KEY_LSHIFT];
+                else
+                    panTheCamera = changeCamViewButton && !input.keyDown[KEY_LSHIFT];
+            }
+                
             if (panTheCamera)
                 cameraNode.Translate(Vector3(-mouseMove.x, mouseMove.y, 0) * timeStep * cameraBaseSpeed * 0.5);
             else
@@ -1412,11 +1433,14 @@ void UpdateView(float timeStep)
             centerPoint = SelectedNodesCenterPoint();
         }
         
-        float maxSide = bb.size.length;
+        float distance = bb.size.length;
+        if (camera.orthographic) // if we use viewCloser for 2D get current distance to avoid near clip
+            distance = cameraNode.worldPosition.length;
+        
         Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
         cameraNode.rotation = q;
-        cameraNode.worldPosition = centerPoint -  cameraNode.worldDirection * maxSide;
-        
+        cameraNode.worldPosition = centerPoint -  cameraNode.worldDirection * distance;
+        ReacquireCameraYawPitch();
         viewCloser =  false;
     }
     else 
