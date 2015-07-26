@@ -47,6 +47,37 @@ extern "C" unsigned char* stbi_write_png_to_mem(unsigned char* pixels, int strid
 #define FOURCC_DXT3 (MAKEFOURCC('D','X','T','3'))
 #define FOURCC_DXT4 (MAKEFOURCC('D','X','T','4'))
 #define FOURCC_DXT5 (MAKEFOURCC('D','X','T','5'))
+#define FOURCC_DX10 (MAKEFOURCC('D','X','1','0'))
+
+static const unsigned DDSCAPS_COMPLEX = 0x00000008U;
+static const unsigned DDSCAPS_TEXTURE = 0x00001000U;
+static const unsigned DDSCAPS_MIPMAP = 0x00400000U;
+static const unsigned DDSCAPS2_VOLUME = 0x00200000U;
+static const unsigned DDSCAPS2_CUBEMAP = 0x00000200U;
+
+static const unsigned DDSCAPS2_CUBEMAP_POSITIVEX = 0x00000400U;
+static const unsigned DDSCAPS2_CUBEMAP_NEGATIVEX = 0x00000800U;
+static const unsigned DDSCAPS2_CUBEMAP_POSITIVEY = 0x00001000U;
+static const unsigned DDSCAPS2_CUBEMAP_NEGATIVEY = 0x00002000U;
+static const unsigned DDSCAPS2_CUBEMAP_POSITIVEZ = 0x00004000U;
+static const unsigned DDSCAPS2_CUBEMAP_NEGATIVEZ = 0x00008000U;
+static const unsigned DDSCAPS2_CUBEMAP_ALL_FACES = 0x0000FC00U;
+
+// DX10 flags
+static const unsigned DDS_DIMENSION_TEXTURE1D = 2;
+static const unsigned DDS_DIMENSION_TEXTURE2D = 3;
+static const unsigned DDS_DIMENSION_TEXTURE3D = 4;
+
+static const unsigned DDS_RESOURCE_MISC_TEXTURECUBE = 0x4;
+
+static const unsigned DDS_DXGI_FORMAT_R8G8B8A8_UNORM = 28;
+static const unsigned DDS_DXGI_FORMAT_R8G8B8A8_UNORM_SRGB = 26;
+static const unsigned DDS_DXGI_FORMAT_BC1_UNORM = 71;
+static const unsigned DDS_DXGI_FORMAT_BC1_UNORM_SRGB = 72;
+static const unsigned DDS_DXGI_FORMAT_BC2_UNORM = 74;
+static const unsigned DDS_DXGI_FORMAT_BC2_UNORM_SRGB = 75;
+static const unsigned DDS_DXGI_FORMAT_BC3_UNORM = 77;
+static const unsigned DDS_DXGI_FORMAT_BC3_UNORM_SRGB = 78;
 
 namespace Urho3D
 {
@@ -123,6 +154,15 @@ struct DDSCaps2
         unsigned dwCaps4_;
         unsigned dwVolumeDepth_;
     };
+};
+
+struct DDSHeader10
+{
+    unsigned dxgiFormat;
+    unsigned resourceDimension;
+    unsigned miscFlag;
+    unsigned arraySize;
+    unsigned reserved;
 };
 
 /// DirectDraw surface description.
@@ -203,7 +243,10 @@ Image::Image(Context* context) :
     width_(0),
     height_(0),
     depth_(0),
-    components_(0)
+    components_(0),
+    cubemap_(false),
+    array_(false),
+    sRGB_(false)
 {
 }
 
@@ -226,8 +269,51 @@ bool Image::BeginLoad(Deserializer& source)
         // DDS compressed format
         DDSurfaceDesc2 ddsd;
         source.Read(&ddsd, sizeof(ddsd));
+        
+        // DDS DX10+
+        const bool hasDXGI = ddsd.ddpfPixelFormat_.dwFourCC_ == FOURCC_DX10;
+        DDSHeader10 dxgiHeader;
+        if (hasDXGI)
+            source.Read(&dxgiHeader, sizeof(dxgiHeader));
 
-        switch (ddsd.ddpfPixelFormat_.dwFourCC_)
+        unsigned fourCC = ddsd.ddpfPixelFormat_.dwFourCC_;
+        
+        // If the DXGI header is available then remap formats and check sRGB
+        if (hasDXGI)
+        {
+            switch (dxgiHeader.dxgiFormat)
+            {
+            case DDS_DXGI_FORMAT_BC1_UNORM:
+            case DDS_DXGI_FORMAT_BC1_UNORM_SRGB:
+                fourCC = FOURCC_DXT1;
+                break;
+            case DDS_DXGI_FORMAT_BC2_UNORM:
+            case DDS_DXGI_FORMAT_BC2_UNORM_SRGB:
+                fourCC = FOURCC_DXT3;
+                break;
+            case DDS_DXGI_FORMAT_BC3_UNORM:
+            case DDS_DXGI_FORMAT_BC3_UNORM_SRGB:
+                fourCC = FOURCC_DXT5;
+                break;
+            case DDS_DXGI_FORMAT_R8G8B8A8_UNORM:
+            case DDS_DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
+                fourCC = 0;
+                break;
+            default:
+                LOGERROR("Unrecognized DDS DXGI image format");
+                return false;
+            }
+
+            // Check the internal sRGB formats
+            if (dxgiHeader.dxgiFormat == DDS_DXGI_FORMAT_BC1_UNORM_SRGB ||
+                dxgiHeader.dxgiFormat == DDS_DXGI_FORMAT_BC2_UNORM_SRGB ||
+                dxgiHeader.dxgiFormat == DDS_DXGI_FORMAT_BC3_UNORM_SRGB ||
+                dxgiHeader.dxgiFormat == DDS_DXGI_FORMAT_R8G8B8A8_UNORM_SRGB)
+            {
+                sRGB_ = true;
+            }
+        }
+        switch (fourCC)
         {
         case FOURCC_DXT1:
             compressedFormat_ = CF_DXT1;
@@ -260,105 +346,175 @@ bool Image::BeginLoad(Deserializer& source)
             return false;
         }
 
-        unsigned dataSize = source.GetSize() - source.GetPosition();
-        data_ = new unsigned char[dataSize];
-        width_ = ddsd.dwWidth_;
-        height_ = ddsd.dwHeight_;
-        depth_ = ddsd.dwDepth_;
-        numCompressedLevels_ = ddsd.dwMipMapCount_;
-        if (!numCompressedLevels_)
-            numCompressedLevels_ = 1;
-        SetMemoryUse(dataSize);
-        source.Read(data_.Get(), dataSize);
+        // Is it a cube map or texture array? If so determine the size of the image chain.
+        cubemap_ = (ddsd.ddsCaps_.dwCaps2_ & DDSCAPS2_CUBEMAP_ALL_FACES) != 0 || (hasDXGI && (dxgiHeader.miscFlag & DDS_RESOURCE_MISC_TEXTURECUBE) != 0);
+        unsigned imageChainCount = 1;
+        if (cubemap_)
+            imageChainCount = 6;
+        else if (hasDXGI && dxgiHeader.arraySize > 1)
+        {
+            imageChainCount = dxgiHeader.arraySize;
+            array_ = true;
+        }
 
+        // Calculate the size of the data
+        unsigned dataSize = 0;
+        if (compressedFormat_ != CF_RGBA)
+        {
+            const unsigned blockSize = compressedFormat_ == CF_DXT1 ? 8 : 16; //DXT1/BC1 is 8 bytes, DXT3/BC2 and DXT5/BC3 are 16 bytes
+            // Add 3 to ensure valid block: ie 2x2 fits uses a whole 4x4 block
+            unsigned blocksWide = (ddsd.dwWidth_ + 3) / 4;
+            unsigned blocksHeight = (ddsd.dwHeight_ + 3) / 4;
+            dataSize = blocksWide * blocksHeight * blockSize;
+            
+            // Calculate mip data size
+            unsigned x = ddsd.dwWidth_ / 2;
+            unsigned y = ddsd.dwHeight_ / 2;
+            unsigned z = ddsd.dwDepth_ / 2;
+            for (unsigned level = ddsd.dwMipMapCount_; level > 0; x /= 2, y /= 2, z /= 2, level -= 1)
+            {
+                blocksWide = (x + 3) / 4;
+                blocksHeight = (y + 3) / 4;
+                dataSize += blockSize * blocksWide * blocksWide * Max(z, 1);
+            }
+        }
+        else
+        {
+            dataSize = (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * ddsd.dwWidth_ * ddsd.dwHeight_ * Max(ddsd.dwDepth_, 1);
+            // Calculate mip data size
+            unsigned x = ddsd.dwWidth_ / 2;
+            unsigned y = ddsd.dwHeight_ / 2;
+            unsigned z = ddsd.dwDepth_ / 2;
+            for (unsigned level = ddsd.dwMipMapCount_; level > 0; x /= 2, y /= 2, z /= 2, level -= 1)
+                dataSize += (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * x * y * Max(z, 1);
+        }
+
+        SharedPtr<Image> currentImage(this);
+
+        for (unsigned faceIndex = 0; faceIndex < imageChainCount; ++faceIndex)
+        {                
+            currentImage->data_ = new unsigned char[dataSize];
+            currentImage->cubemap_ = cubemap_;
+            currentImage->array_ = array_;
+            currentImage->components_ = components_;
+            currentImage->compressedFormat_ = compressedFormat_;
+            currentImage->width_ = ddsd.dwWidth_;
+            currentImage->height_ = ddsd.dwHeight_;
+            currentImage->depth_ = ddsd.dwDepth_;
+
+            currentImage->numCompressedLevels_ = ddsd.dwMipMapCount_;
+            if (!currentImage->numCompressedLevels_)
+                currentImage->numCompressedLevels_ = 1;
+                
+            if (faceIndex == 0)
+                currentImage->SetMemoryUse(dataSize * imageChainCount);
+            else
+                currentImage->SetMemoryUse(dataSize);
+
+            source.Read(currentImage->data_.Get(), dataSize);
+
+            if (faceIndex < imageChainCount - 1)
+            {
+                // Build the image chain
+                SharedPtr<Image> nextImage(new Image(context_));
+                currentImage->nextSibling_ = nextImage;
+                currentImage = nextImage;
+            }
+        }
+        
         // If uncompressed DDS, convert the data to 8bit RGBA as the texture classes can not currently use eg. RGB565 format
         if (compressedFormat_ == CF_RGBA)
         {
             PROFILE(ConvertDDSToRGBA);
 
-            unsigned sourcePixelByteSize = ddsd.ddpfPixelFormat_.dwRGBBitCount_ >> 3;
-            unsigned numPixels = dataSize / sourcePixelByteSize;
-
-            #define ADJUSTSHIFT(mask, l, r) \
-                if (mask && mask >= 0x100) \
-                { \
-                    while ((mask >> r) >= 0x100) \
-                        ++r; \
-                } \
-                else if (mask && mask < 0x80) \
-                { \
-                    while ((mask << l) < 0x80) \
-                        ++l; \
-                }
-
-            unsigned rShiftL = 0, gShiftL = 0, bShiftL = 0, aShiftL = 0;
-            unsigned rShiftR = 0, gShiftR = 0, bShiftR = 0, aShiftR = 0;
-            unsigned rMask = ddsd.ddpfPixelFormat_.dwRBitMask_;
-            unsigned gMask = ddsd.ddpfPixelFormat_.dwGBitMask_;
-            unsigned bMask = ddsd.ddpfPixelFormat_.dwBBitMask_;
-            unsigned aMask = ddsd.ddpfPixelFormat_.dwRGBAlphaBitMask_;
-            ADJUSTSHIFT(rMask, rShiftL, rShiftR)
-            ADJUSTSHIFT(gMask, gShiftL, gShiftR)
-            ADJUSTSHIFT(bMask, bShiftL, bShiftR)
-            ADJUSTSHIFT(aMask, aShiftL, aShiftR)
-
-            SharedArrayPtr<unsigned char> rgbaData(new unsigned char[numPixels * 4]);
-            SetMemoryUse(numPixels * 4);
-
-            switch (sourcePixelByteSize)
+            SharedPtr<Image> currentImage(this);
+            while (currentImage.NotNull())
             {
-            case 4:
+                unsigned sourcePixelByteSize = ddsd.ddpfPixelFormat_.dwRGBBitCount_ >> 3;
+                unsigned numPixels = dataSize / sourcePixelByteSize;
+
+#define ADJUSTSHIFT(mask, l, r) \
+                if (mask && mask >= 0x100) \
+                                { \
+                                                    while ((mask >> r) >= 0x100) \
+                        ++r; \
+                                } \
+                        else if (mask && mask < 0x80) \
+                                { \
+                                                    while ((mask << l) < 0x80) \
+                        ++l; \
+                                }
+
+                unsigned rShiftL = 0, gShiftL = 0, bShiftL = 0, aShiftL = 0;
+                unsigned rShiftR = 0, gShiftR = 0, bShiftR = 0, aShiftR = 0;
+                unsigned rMask = ddsd.ddpfPixelFormat_.dwRBitMask_;
+                unsigned gMask = ddsd.ddpfPixelFormat_.dwGBitMask_;
+                unsigned bMask = ddsd.ddpfPixelFormat_.dwBBitMask_;
+                unsigned aMask = ddsd.ddpfPixelFormat_.dwRGBAlphaBitMask_;
+                ADJUSTSHIFT(rMask, rShiftL, rShiftR)
+                ADJUSTSHIFT(gMask, gShiftL, gShiftR)
+                ADJUSTSHIFT(bMask, bShiftL, bShiftR)
+                ADJUSTSHIFT(aMask, aShiftL, aShiftR)
+                
+                SharedArrayPtr<unsigned char> rgbaData(new unsigned char[numPixels * 4]);
+                SetMemoryUse(numPixels * 4);
+
+                switch (sourcePixelByteSize)
                 {
-                    unsigned* src = (unsigned*)data_.Get();
+                case 4:
+                {
+                    unsigned* src = (unsigned*)currentImage->data_.Get();
                     unsigned char* dest = rgbaData.Get();
 
                     while (numPixels--)
                     {
                         unsigned pixels = *src++;
-                        *dest++ = (unsigned char)(((pixels & rMask) << rShiftL) >> rShiftR);
-                        *dest++ = (unsigned char)(((pixels & gMask) << gShiftL) >> gShiftR);
-                        *dest++ = (unsigned char)(((pixels & bMask) << bShiftL) >> bShiftR);
-                        *dest++ = (unsigned char)(((pixels & aMask) << aShiftL) >> aShiftR);
+                        *dest++ = ((pixels & rMask) << rShiftL) >> rShiftR;
+                        *dest++ = ((pixels & gMask) << gShiftL) >> gShiftR;
+                        *dest++ = ((pixels & bMask) << bShiftL) >> bShiftR;
+                        *dest++ = ((pixels & aMask) << aShiftL) >> aShiftR;
                     }
                 }
                 break;
 
-            case 3:
+                case 3:
                 {
-                    unsigned char* src = data_.Get();
+                    unsigned char* src = currentImage->data_.Get();
                     unsigned char* dest = rgbaData.Get();
 
                     while (numPixels--)
                     {
                         unsigned pixels = src[0] | (src[1] << 8) | (src[2] << 16);
                         src += 3;
-                        *dest++ = (unsigned char)(((pixels & rMask) << rShiftL) >> rShiftR);
-                        *dest++ = (unsigned char)(((pixels & gMask) << gShiftL) >> gShiftR);
-                        *dest++ = (unsigned char)(((pixels & bMask) << bShiftL) >> bShiftR);
-                        *dest++ = (unsigned char)(((pixels & aMask) << aShiftL) >> aShiftR);
+                        *dest++ = ((pixels & rMask) << rShiftL) >> rShiftR;
+                        *dest++ = ((pixels & gMask) << gShiftL) >> gShiftR;
+                        *dest++ = ((pixels & bMask) << bShiftL) >> bShiftR;
+                        *dest++ = ((pixels & aMask) << aShiftL) >> aShiftR;
                     }
                 }
                 break;
 
-            default:
+                default:
                 {
-                    unsigned short* src = (unsigned short*)data_.Get();
+                    unsigned short* src = (unsigned short*)currentImage->data_.Get();
                     unsigned char* dest = rgbaData.Get();
 
                     while (numPixels--)
                     {
                         unsigned short pixels = *src++;
-                        *dest++ = (unsigned char)(((pixels & rMask) << rShiftL) >> rShiftR);
-                        *dest++ = (unsigned char)(((pixels & gMask) << gShiftL) >> gShiftR);
-                        *dest++ = (unsigned char)(((pixels & bMask) << bShiftL) >> bShiftR);
-                        *dest++ = (unsigned char)(((pixels & aMask) << aShiftL) >> aShiftR);
+                        *dest++ = ((pixels & rMask) << rShiftL) >> rShiftR;
+                        *dest++ = ((pixels & gMask) << gShiftL) >> gShiftR;
+                        *dest++ = ((pixels & bMask) << bShiftL) >> bShiftR;
+                        *dest++ = ((pixels & aMask) << aShiftL) >> aShiftR;
                     }
                 }
                 break;
-            }
+                }
 
-            // Replace with converted data
-            data_ = rgbaData;
+                // Replace with converted data
+                currentImage->data_ = rgbaData;
+                currentImage = currentImage->GetNextSibling();
+            }
         }
     }
     else if (fileID == "\253KTX")
