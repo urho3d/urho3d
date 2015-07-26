@@ -1530,6 +1530,20 @@ bool Paste()
     return false;
 }
 
+bool BlenderModeDelete() 
+{
+    // In this place maybe placed avoidance flags that not allow delete in some cases
+    
+    Array<UIElement@> actions;
+    actions.Push(CreateContextMenuItem("Delete?", "HandleBlenderModeDelete"));
+    if (actions.length > 0) {
+        ActivateContextMenu(actions);
+        return true;
+    }
+
+    return false;
+}
+
 bool Delete()
 {
     if (CheckHierarchyWindowFocus())
@@ -1663,6 +1677,11 @@ void HandleHierarchyContextCut()
 }
 
 void HandleHierarchyContextDelete()
+{
+    Delete();
+}
+
+void HandleBlenderModeDelete() 
 {
     Delete();
 }

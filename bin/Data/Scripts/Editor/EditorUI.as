@@ -336,7 +336,7 @@ void CreateMenuBar()
         if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
             popup.AddChild(CreateMenuItem("Delete", @Delete, KEY_DELETE, QUAL_ANY));
         else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
-            popup.AddChild(CreateMenuItem("Delete", @Delete, 'X', QUAL_ANY));
+            popup.AddChild(CreateMenuItem("Delete", @BlenderModeDelete, 'X', QUAL_ANY));
         
         popup.AddChild(CreateMenuItem("Select all", @SelectAll, 'A', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Deselect all", @DeselectAll, 'A', QUAL_SHIFT | QUAL_CTRL));
@@ -1256,6 +1256,7 @@ void HandleHotKeysBlender( VariantMap& eventData )
     }
     else if (key == KEY_KP_5 && ui.focusElement is null)
     {
+        activeViewport.camera.zoom = 1;
         activeViewport.ToggleOrthographic();
     }
     else if (key == '4')
@@ -1504,7 +1505,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 }
 
 void UnfadeUI()
-{
+{    
     FadeUI(false);
 }
 

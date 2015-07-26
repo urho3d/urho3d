@@ -22,9 +22,9 @@ bool contextMenuActionWaitFrame = false;
 bool cameraFlyMode = true;
 int hotKeyMode = 0; // used for checking that kind of style manipulation user are prefer ( see HotKeysMode )
 Vector3 lastSelectedNodesCenterPoint = Vector3(0,0,0); // for Blender mode to avoid own origin rotation when no nodes are selected. preserve last center for this
-Node@ lastSelectedNode;
-Drawable@ lastSelectedDrawable;
-Component@ lastSelectedComponent;
+WeakHandle lastSelectedNode = null;
+WeakHandle lastSelectedDrawable = null;
+WeakHandle lastSelectedComponent = null;
 bool viewCloser = false;
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
@@ -1412,7 +1412,7 @@ void UpdateView(float timeStep)
         orbiting = false;
         
     if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
-    if ( viewCloser && lastSelectedDrawable !is null) 
+    if ( viewCloser && lastSelectedDrawable.Get() !is null) 
     {
         SetMouseLock();
         BoundingBox bb;
@@ -1420,8 +1420,12 @@ void UpdateView(float timeStep)
         
         if ( selectedNodes.length <= 1 )
         {
-            bb = lastSelectedDrawable.boundingBox;
-            centerPoint = lastSelectedDrawable.node.worldPosition;
+            Drawable@ drawable = lastSelectedDrawable.Get();
+            if (drawable !is null) 
+            {  
+                bb = drawable.boundingBox;
+                centerPoint = drawable.node.worldPosition;
+            }
         }
         else 
         {
@@ -1440,7 +1444,7 @@ void UpdateView(float timeStep)
         Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
         cameraNode.rotation = q;
         cameraNode.worldPosition = centerPoint -  cameraNode.worldDirection * distance;
-        ReacquireCameraYawPitch();
+        // ReacquireCameraYawPitch();
         viewCloser =  false;
     }
     else 
@@ -1448,9 +1452,14 @@ void UpdateView(float timeStep)
     
     // Move/rotate/scale object
     if ( hotKeyMode == HOTKEYS_MODE_BLENDER) // force to select component node for manipulation if selected only component and not his node
-    {    if ((editMode != EDIT_SELECT && editNodes.empty) && lastSelectedComponent !is null )
-        {
-                SelectNode(lastSelectedComponent.node, false);
+    {   
+        if ((editMode != EDIT_SELECT && editNodes.empty) && lastSelectedComponent.Get() !is null )
+        {   
+            if (lastSelectedComponent.Get() !is null) 
+            {
+                Component@ component  = lastSelectedComponent.Get();
+                SelectNode(component.node, false);
+            }
         }   
     }
     

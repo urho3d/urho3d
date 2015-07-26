@@ -775,7 +775,7 @@ bool SceneUnparent()
 
 bool NodesParentToLastSelected()
 {
-    if (lastSelectedNode is null)
+    if (lastSelectedNode.Get() is null)
         return false;
         
     if (!CheckHierarchyWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
@@ -790,7 +790,7 @@ bool NodesParentToLastSelected()
     Array<Node@> changedNodes;
     
     // Find new parent node it selected last
-    Node@ lastNode = lastSelectedNode;//GetListNode(hierarchyList.selection);
+    Node@ lastNode = lastSelectedNode.Get(); //GetListNode(hierarchyList.selection);
     
     for (uint i = 0; i < selectedNodes.length; ++i)
     {
@@ -825,10 +825,12 @@ bool SceneSmartDuplicateNode()
 {       
     const float minOffset = 0.1;
     
-    if (!CheckHierarchyWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
+    if (!CheckHierarchyWindowFocus() || !selectedComponents.empty 
+        || selectedNodes.empty || lastSelectedNode.Get() is null)
         return false;
     
-    Node@ node = lastSelectedNode;
+    
+    Node@ node = lastSelectedNode.Get();
     Node@ parent = node.parent;
     Vector3 offset = Vector3(1,0,0); // default offset
     
@@ -843,13 +845,12 @@ bool SceneSmartDuplicateNode()
         parent = node.parent;
         SelectNode(node, false);
     } 
-
-    Node@ lastChild = lastSelectedNode;
+    
     Vector3 size;
     BoundingBox bb;
     
     // get bb for offset  
-    Drawable@ drawable = GetFirstDrawable(lastChild);
+    Drawable@ drawable = GetFirstDrawable(node);
     if (drawable !is null) 
     {
         bb = drawable.boundingBox;
@@ -861,24 +862,24 @@ bool SceneSmartDuplicateNode()
     if (gizmoAxisX.selected)
     {
         if (size.x < minOffset) size.x = minOffset;
-        offset = lastChild.worldRotation * Vector3(size.x,0,0);
+        offset = node.worldRotation * Vector3(size.x,0,0);
     }
     else if (gizmoAxisY.selected)
     {
         if (size.y < minOffset) size.y = minOffset;
-        offset = lastChild.worldRotation * Vector3(0,size.y,0);
+        offset = node.worldRotation * Vector3(0,size.y,0);
     }
     else if (gizmoAxisZ.selected)
     {
         if (size.z < minOffset) size.z = minOffset;
-        offset = lastChild.worldRotation * Vector3(0,0,size.z);
+        offset = node.worldRotation * Vector3(0,0,size.z);
     }
     else
         offset = lastOffsetForSmartDuplicate;    
     
-    Vector3 lastInstancePosition = lastChild.worldPosition;
+    Vector3 lastInstancePosition = node.worldPosition;
     
-    SelectNode(lastChild, false);
+    SelectNode(node, false);
     SceneDuplicate();
     Node@ newInstance = parent.children[parent.numChildren-1];
     SelectNode(newInstance, false);
