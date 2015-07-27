@@ -19,7 +19,7 @@
 		"en":"Open recent scene",
 		"ru":"Открыть прежнюю сцену"
 	},
-	"Load node":{
+	"menu Load node":{
 		"en":"Load node",
 		"ru":"Загрузить ноду"
 	},
@@ -683,7 +683,7 @@
 		"en":"Save scene as",
 		"ru":"Сохранить сцену как..."
 	},
-	"Load node":{
+	"fileSelector Load node":{
 		"en":"Load node",
 		"ru":"Загрузка ноды"
 	},

@@ -298,7 +298,7 @@ void CreateMenuBar()
         PopulateMruScenes();
         CreateChildDivider(popup);
 
-        Menu@ childMenu = CreateMenuItem("Load node", null, SHOW_POPUP_INDICATOR);
+        Menu@ childMenu = CreateMenuItem("menu Load node", null, SHOW_POPUP_INDICATOR);
         Window@ childPopup = CreatePopup(childMenu);
         childPopup.AddChild(CreateMenuItem("As replicated...", @PickFile, 0, 0, true, "Load node as replicated..."));
         childPopup.AddChild(CreateMenuItem("As local...", @PickFile, 0, 0, true, "Load node as local..."));
@@ -572,7 +572,7 @@ bool PickFile()
     else if (action == "As replicated..." || action == "Load node as replicated...")
     {
         instantiateMode = REPLICATED;
-        CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
+        CreateFileSelector("fileSelector Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
         SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
     }
     else if (action == "As local..." || action == "Load node as local...")
