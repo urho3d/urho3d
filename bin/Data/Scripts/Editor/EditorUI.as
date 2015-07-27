@@ -961,15 +961,20 @@ void FinalizedPopupMenu(Window@ popup)
 }
 
 void CreateFileSelector(const String&in title, const String&in ok, const String&in cancel, const String&in initialPath, Array<String>@ filters,
-    uint initialFilter)
+    uint initialFilter, bool autoLocalizeTitle = true)
 {
     // Within the editor UI, the file selector is a kind of a "singleton". When the previous one is overwritten, also
     // the events subscribed from it are disconnected, so new ones are safe to subscribe.
     uiFileSelector = FileSelector();
     uiFileSelector.defaultStyle = uiStyle;
     uiFileSelector.title = title;
+    uiFileSelector.titleText.autoLocalizable = autoLocalizeTitle;
     uiFileSelector.path = initialPath;
     uiFileSelector.SetButtonTexts(ok, cancel);
+    Text@ okText = cast<Text>(uiFileSelector.okButton.children[0]);
+    okText.autoLocalizable = true;
+    Text@ cancelText = cast<Text>(uiFileSelector.cancelButton.children[0]);
+    cancelText.autoLocalizable = true;
     uiFileSelector.SetFilters(filters, initialFilter);
     CenterDialog(uiFileSelector.window);
 }
