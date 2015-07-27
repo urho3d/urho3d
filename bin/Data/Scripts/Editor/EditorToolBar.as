@@ -123,6 +123,7 @@ void CreateToolBarIcon(UIElement@ element)
     icon.defaultStyle = iconStyle;
     icon.style = element.name;
     icon.SetFixedSize(30, 30);
+    icon.blendMode = BLEND_ALPHA;
     element.AddChild(icon);
 }
 
