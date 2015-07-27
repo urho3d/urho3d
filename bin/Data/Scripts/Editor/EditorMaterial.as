@@ -150,7 +150,7 @@ void RefreshMaterialName()
         nameEdit.text = editMaterial.name;
     SubscribeToEvent(nameEdit, "TextFinished", "EditMaterialName");
 
-    Button@ pickButton = CreateResourcePickerButton(container, null, 0, 0, "Pick");
+    Button@ pickButton = CreateResourcePickerButton(container, null, 0, 0, "smallButtonPick");
     SubscribeToEvent(pickButton, "Released", "PickEditMaterial");
 }
 
@@ -177,9 +177,9 @@ void RefreshMaterialTechniques(bool fullUpdate = true)
             LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, i, 0);
             nameEdit.name = "TechniqueNameEdit" + String(i);
 
-            Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "Pick");
+            Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "smallButtonPick");
             SubscribeToEvent(pickButton, "Released", "PickMaterialTechnique");
-            Button@ openButton = CreateResourcePickerButton(container, null, i, 0, "Open");
+            Button@ openButton = CreateResourcePickerButton(container, null, i, 0, "smallButtonOpen");
             SubscribeToEvent(openButton, "Released", "OpenResource");
 
             if (entry.technique !is null)
@@ -246,9 +246,9 @@ void RefreshMaterialTextures(bool fullUpdate = true)
             LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, i, 0);
             nameEdit.name = "TextureNameEdit" + String(i);
 
-            Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "Pick");
+            Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "smallButtonPick");
             SubscribeToEvent(pickButton, "Released", "PickMaterialTexture");
-            Button@ openButton = CreateResourcePickerButton(container, null, i, 0, "Open");
+            Button@ openButton = CreateResourcePickerButton(container, null, i, 0, "smallButtonOpen");
             SubscribeToEvent(openButton, "Released", "OpenResource");
 
             if (editMaterial !is null)

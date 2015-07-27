@@ -730,6 +730,39 @@
 	"Parent to last":{
 		"en":"Parent to last",
 		"ru":"Сделать дочерним для последнего"
+	},
+	"Style":{
+		"en":"Style",
+		"ru":"Стиль"
+	},
+	"New":{
+		"en":"New",
+		"ru":"Нов"
+	},
+	"Del":{
+		"en":"Del",
+		"ru":"Удал"
+	},
+	"smallButtonPick":{
+		"en":"Pick",
+		"ru":"Выбр."
+	},
+	"smallButtonOpen":{
+		"en":"Open",
+		"ru":"Откр."
+	},
+	"smallButtonEdit":{
+		"en":"Edit",
+		"ru":"Ред."
+	},
+	"smallButtonTest":{
+		"en":"Test",
+		"ru":"Тест"
+	},
+	"Select editable objects":{
+		"en":"Select editable objects",
+		"ru":"Выберите редактируемый объект"
 	}
 }
+
 

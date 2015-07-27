@@ -16,6 +16,7 @@
         </element>
         <element type="Text">
             <attribute name="Text" value="New" />
+            <attribute name="Auto Localizable" value="true" />
             <attribute name="Text Alignment" value="Center" />
         </element>
         <!-- Skip style processing as the purpose of below tags is to populate the content element -->
@@ -54,6 +55,7 @@
         <attribute name="Layout Border" value="1 1 1 1" />
         <element type="Text">
             <attribute name="Text" value="Del" />
+            <attribute name="Auto Localizable" value="true" />
             <attribute name="Text Alignment" value="Center" />
         </element>
     </element>

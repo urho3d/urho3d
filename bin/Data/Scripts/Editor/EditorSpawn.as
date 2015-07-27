@@ -162,7 +162,7 @@ void RefreshPickedObjects()
         LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, i, 0);
         nameEdit.name = "TextureNameEdit" + String(i);
 
-        Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "Pick");
+        Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "smallButtonPick");
         SubscribeToEvent(pickButton, "Released", "PickSpawnedObject");
         nameEdit.text = spawnedObjectsNames[i];
 

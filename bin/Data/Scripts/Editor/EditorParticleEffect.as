@@ -1234,7 +1234,7 @@ void RefreshParticleEffectName()
         nameEdit.text = editParticleEffect.name;
     SubscribeToEvent(nameEdit, "TextFinished", "EditParticleEffectName");
 
-    Button@ pickButton = CreateResourcePickerButton(container, null, 0, 0, "Pick");
+    Button@ pickButton = CreateResourcePickerButton(container, null, 0, 0, "smallButtonPick");
     SubscribeToEvent(pickButton, "Released", "PickEditParticleEffect");
 }
 
@@ -1329,7 +1329,7 @@ void RefreshParticleEffectMaterial()
 
     SubscribeToEvent(nameEdit, "TextFinished", "EditParticleEffectMaterial");
 
-    Button@ pickButton = CreateResourcePickerButton(container, null, 0, 0, "Pick");
+    Button@ pickButton = CreateResourcePickerButton(container, null, 0, 0, "smallButtonPick");
     SubscribeToEvent(pickButton, "Released", "PickEditParticleEffectMaterial");
 }
 
