@@ -737,11 +737,11 @@
 	},
 	"New":{
 		"en":"New",
-		"ru":"Нов"
+		"ru":"Нов."
 	},
 	"Del":{
 		"en":"Del",
-		"ru":"Удал"
+		"ru":"Удал."
 	},
 	"smallButtonPick":{
 		"en":"Pick",
@@ -762,7 +762,53 @@
 	"Select editable objects":{
 		"en":"Select editable objects",
 		"ru":"Выберите редактируемый объект"
+	},
+	"Box":{
+		"en":"Box",
+		"ru":"Куб"
+	},
+	"Sphere":{
+		"en":"Sphere",
+		"ru":"Сфера"
+	},
+	"Plane":{
+		"en":"Plane",
+		"ru":"Плоскость"
+	},
+	"Cylinder":{
+		"en":"Cylinder",
+		"ru":"Цилиндр"
+	},
+	"Cone":{
+		"en":"Cone",
+		"ru":"Конус"
+	},
+	"TeaPot":{
+		"en":"TeaPot",
+		"ru":"Чайник"
+	},
+	"Techniques":{
+		"en":"Techniques",
+		"ru":"Техники"
+	},
+	"Sort":{
+		"en":"Sort",
+		"ru":"Сортировать"
+	},
+	"Textures":{
+		"en":"Textures",
+		"ru":"Текстуры"
+	},
+	"Shader parameters":{
+		"en":"Shader parameters",
+		"ru":"Параметры шейдера"
+	},
+	"Revert":{
+		"en":"Revert",
+		"ru":"Вернуть"
+	},
+	"Save as":{
+		"en":"Save as",
+		"ru":"Сохранить как"
 	}
 }
-
-

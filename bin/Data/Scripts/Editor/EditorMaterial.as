@@ -105,10 +105,8 @@ void InitMaterialPreview()
 void InitModelPreviewList()
 {
     DropDownList@ modelPreview = materialWindow.GetChild("ModelPreview", true);
-    
+    modelPreview.selection = 1;
     SubscribeToEvent(materialWindow.GetChild("ModelPreview", true), "ItemSelected", "EditModelPreviewChange");
-    
-
 }
 
 void EditMaterial(Material@ mat)
