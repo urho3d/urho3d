@@ -182,6 +182,11 @@ void Localization::LoadJSON(const JSONValue &source)
                            "\", language=\"" + lang + "\"");
                 continue;
             }
+            if (strings_[StringHash(lang)][StringHash(id)] != String::EMPTY)
+            {
+                LOGWARNING("Localization::LoadJSON(source): override translation, string ID=\"" + id +
+                           "\", language=\"" + lang + "\"");
+            }
             strings_[StringHash(lang)][StringHash(id)] = string;
             if (!languages_.Contains(lang))
                 languages_.Push(lang);
