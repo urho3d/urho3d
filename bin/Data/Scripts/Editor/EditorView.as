@@ -1213,12 +1213,14 @@ void UpdateView(float timeStep)
     }
     
     // Check for camara fly mode
-    if (hotKeyMode == HOTKEYS_MODE_BLENDER )
+    if (hotKeyMode == HOTKEYS_MODE_BLENDER)
+    {
         if (input.keyDown[KEY_LSHIFT] && input.keyPress[KEY_F])
         {
             cameraFlyMode = !cameraFlyMode;
         }
-    
+    }
+
     // Move camera
     float speedMultiplier = 1.0;
     if (input.keyDown[KEY_LSHIFT])
@@ -1226,7 +1228,7 @@ void UpdateView(float timeStep)
     
     if (!input.keyDown[KEY_LCTRL])
     {        
-        if (hotKeyMode == HOTKEYS_MODE_STANDARD ||  (hotKeyMode == HOTKEYS_MODE_BLENDER && cameraFlyMode && !input.keyDown[KEY_LSHIFT]) ) 
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD ||  (hotKeyMode == HOTKEYS_MODE_BLENDER && cameraFlyMode && !input.keyDown[KEY_LSHIFT])) 
         {
             if (input.keyDown['W'] || input.keyDown[KEY_UP])
             {
@@ -1263,7 +1265,7 @@ void UpdateView(float timeStep)
     
     if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
     {
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD) 
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD) 
         {
             if (mouseWheelCameraPosition)
             {
@@ -1278,7 +1280,7 @@ void UpdateView(float timeStep)
         }
         else if (hotKeyMode == HOTKEYS_MODE_BLENDER) 
         {
-            if (mouseWheelCameraPosition && !camera.orthographic )
+            if (mouseWheelCameraPosition && !camera.orthographic)
             {   
                 if (input.keyDown[KEY_LSHIFT])
                     cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * -input.mouseMoveWheel*20* timeStep * speedMultiplier);
@@ -1327,16 +1329,16 @@ void UpdateView(float timeStep)
     // Rotate/orbit/pan camera
     bool changeCamViewButton = false;
     
-    if ( hotKeyMode == HOTKEYS_MODE_STANDARD) 
+    if (hotKeyMode == HOTKEYS_MODE_STANDARD) 
         changeCamViewButton = input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE];
-    else if (hotKeyMode == HOTKEYS_MODE_BLENDER) 
+    else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
     {  
         changeCamViewButton = input.mouseButtonDown[MOUSEB_MIDDLE] || cameraFlyMode;
         
-        if (input.mouseButtonPress[MOUSEB_RIGHT] || input.keyDown[KEY_ESC]) 
+        if (input.mouseButtonPress[MOUSEB_RIGHT] || input.keyDown[KEY_ESC])
             cameraFlyMode = false;
     }
-    
+
     if (changeCamViewButton)
     {
         SetMouseLock();
@@ -1345,24 +1347,23 @@ void UpdateView(float timeStep)
         if (mouseMove.x != 0 || mouseMove.y != 0)
         {
             bool panTheCamera = false;
-            
-            if(mmbPanMode || (hotKeyMode == HOTKEYS_MODE_BLENDER))
-                if ( hotKeyMode == HOTKEYS_MODE_STANDARD) 
-                    panTheCamera = !(changeCamViewButton && input.keyDown[KEY_LSHIFT]);
-                else if (hotKeyMode == HOTKEYS_MODE_BLENDER && cameraFlyMode) 
-                {
-                    panTheCamera = false;
-                    //else if (camera.orthographic)
-                    //    panTheCamera = true;     
-                }
-            else 
+
+            if (hotKeyMode == HOTKEYS_MODE_STANDARD)
             {
-                if (!camera.orthographic)
-                    panTheCamera = changeCamViewButton && input.keyDown[KEY_LSHIFT];
-                else
-                    panTheCamera = changeCamViewButton && !input.keyDown[KEY_LSHIFT];
+                if (input.mouseButtonDown[MOUSEB_MIDDLE])
+                {
+                    if (mmbPanMode)
+                        panTheCamera = !input.keyDown[KEY_LSHIFT];
+                    else
+                        panTheCamera = input.keyDown[KEY_LSHIFT];
+                }
             }
-                
+            else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
+            {
+                if (!cameraFlyMode)
+                    panTheCamera = input.keyDown[KEY_LSHIFT];
+            }
+
             if (panTheCamera)
                 cameraNode.Translate(Vector3(-mouseMove.x, mouseMove.y, 0) * timeStep * cameraBaseSpeed * 0.5);
             else
@@ -1376,17 +1377,17 @@ void UpdateView(float timeStep)
                 Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
                 cameraNode.rotation = q;
 
-                if ( hotKeyMode == HOTKEYS_MODE_STANDARD)
-                { 
+                if (hotKeyMode == HOTKEYS_MODE_STANDARD)
+                {
                     if (input.mouseButtonDown[MOUSEB_MIDDLE] && (selectedNodes.length > 0 || selectedComponents.length > 0))
-                    {                        
+                    {
                         Vector3 centerPoint = SelectedNodesCenterPoint();
                         Vector3 d = cameraNode.worldPosition - centerPoint;
                         cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, d.length);
                         orbiting = true;
                     }    
                 }
-                else if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) 
+                else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
                 {
                     if (input.mouseButtonDown[MOUSEB_MIDDLE])
                     {
@@ -1411,49 +1412,51 @@ void UpdateView(float timeStep)
     if (orbiting && !input.mouseButtonDown[MOUSEB_MIDDLE])
         orbiting = false;
         
-    if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
-    if ( viewCloser && lastSelectedDrawable.Get() !is null) 
+    if (hotKeyMode == HOTKEYS_MODE_BLENDER)
     {
-        SetMouseLock();
-        BoundingBox bb;
-        Vector3 centerPoint;
-        
-        if ( selectedNodes.length <= 1 )
+        if (viewCloser && lastSelectedDrawable.Get() !is null)
         {
-            Drawable@ drawable = lastSelectedDrawable.Get();
-            if (drawable !is null) 
-            {  
-                bb = drawable.boundingBox;
-                centerPoint = drawable.node.worldPosition;
+            SetMouseLock();
+            BoundingBox bb;
+            Vector3 centerPoint;
+            
+            if (selectedNodes.length <= 1)
+            {
+                Drawable@ drawable = lastSelectedDrawable.Get();
+                if (drawable !is null) 
+                {  
+                    bb = drawable.boundingBox;
+                    centerPoint = drawable.node.worldPosition;
+                }
             }
+            else
+            {
+                for (int i = 0; i < selectedNodes.length; i++) 
+                {
+                    bb.Merge(selectedNodes[i].position);
+                }
+                      
+                centerPoint = SelectedNodesCenterPoint();
+            }
+            
+            float distance = bb.size.length;
+            if (camera.orthographic) // if we use viewCloser for 2D get current distance to avoid near clip
+                distance = cameraNode.worldPosition.length;
+            
+            Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
+            cameraNode.rotation = q;
+            cameraNode.worldPosition = centerPoint -  cameraNode.worldDirection * distance;
+            // ReacquireCameraYawPitch();
+            viewCloser =  false;
         }
         else 
-        {
-            for (int i = 0; i < selectedNodes.length; i++) 
-            {
-                bb.Merge(selectedNodes[i].position);
-            }
-                  
-            centerPoint = SelectedNodesCenterPoint();
-        }
-        
-        float distance = bb.size.length;
-        if (camera.orthographic) // if we use viewCloser for 2D get current distance to avoid near clip
-            distance = cameraNode.worldPosition.length;
-        
-        Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
-        cameraNode.rotation = q;
-        cameraNode.worldPosition = centerPoint -  cameraNode.worldDirection * distance;
-        // ReacquireCameraYawPitch();
-        viewCloser =  false;
+            viewCloser =  false;
     }
-    else 
-        viewCloser =  false;
     
     // Move/rotate/scale object
-    if ( hotKeyMode == HOTKEYS_MODE_BLENDER) // force to select component node for manipulation if selected only component and not his node
+    if (hotKeyMode == HOTKEYS_MODE_BLENDER) // force to select component node for manipulation if selected only component and not his node
     {   
-        if ((editMode != EDIT_SELECT && editNodes.empty) && lastSelectedComponent.Get() !is null )
+        if ((editMode != EDIT_SELECT && editNodes.empty) && lastSelectedComponent.Get() !is null)
         {   
             if (lastSelectedComponent.Get() !is null) 
             {
@@ -1762,7 +1765,8 @@ void ViewRaycast(bool mouseClick)
             Drawable@ drawable = result.drawable;
             
             // for actual last selected node or component in both modes
-            if ( hotKeyMode == HOTKEYS_MODE_STANDARD ) {
+            if (hotKeyMode == HOTKEYS_MODE_STANDARD) 
+            {
                 if (input.mouseButtonDown[MOUSEB_LEFT]) 
                 {
                     lastSelectedNode = drawable.node;
@@ -1770,7 +1774,8 @@ void ViewRaycast(bool mouseClick)
                     lastSelectedComponent = drawable;
                 }
             }
-            else if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) {
+            else if (hotKeyMode == HOTKEYS_MODE_BLENDER) 
+            {
                 if (input.mouseButtonDown[MOUSEB_RIGHT]) 
                 {
                     lastSelectedNode = drawable.node;
@@ -1825,7 +1830,7 @@ void ViewRaycast(bool mouseClick)
         componentSelectQualifier = input.qualifierDown[QUAL_SHIFT];
         multiselect = input.qualifierDown[QUAL_CTRL];
     }
-    else if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) 
+    else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
     {
         mouseButtonPressRL = input.mouseButtonPress[MOUSEB_RIGHT];
         componentSelectQualifier = input.qualifierDown[QUAL_CTRL];
@@ -1834,8 +1839,6 @@ void ViewRaycast(bool mouseClick)
     
     if (mouseClick && mouseButtonPressRL)
     {
-       
-        
         if (selectedComponent !is null)
         {
             if (componentSelectQualifier)
