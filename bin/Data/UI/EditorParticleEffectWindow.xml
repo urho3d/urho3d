@@ -39,6 +39,7 @@
                     <attribute name="Layout Border" value="1 1 1 1" />
                     <element type="Text">
                         <attribute name="Text" value="Reset Viewport" />
+                        <attribute name="Auto Localizable" value="true" />
                         <attribute name="Text Alignment" value="Center" />
                     </element>
                 </element>
@@ -50,6 +51,7 @@
                     <attribute name="Layout Spacing" value="10" />
                     <element type="Text" style="EditorAttributeText">
                         <attribute name="Text" value="Show Axes" />
+                        <attribute name="Auto Localizable" value="true" />
                     </element>
                     <element>
                         <attribute name="Min Size" value="0 16" />
@@ -80,6 +82,7 @@
                         <element style="Panel">
                             <element type="Text">
                                 <attribute name="Text" value="Initial" />
+                                <attribute name="Auto Localizable" value="true" />
                             </element>
                         </element>
                         <!-- Initial Attributes -->
@@ -352,6 +355,7 @@
                         <element style="Panel">
                             <element type="Text">
                                 <attribute name="Text" value="Variation" />
+                                <attribute name="Auto Localizable" value="true" />
                             </element>
                         </element>
                         <!-- Variation Attributes -->
@@ -422,6 +426,7 @@
                             <attribute name="Layout Spacing" value="10" />
                             <element type="Text" style="EditorAttributeText">
                                 <attribute name="Text" value="Color Frames" />
+                                <attribute name="Auto Localizable" value="true" />
                             </element>
                         </element>
                         <element type="ListView" style="PanelView">
@@ -443,6 +448,7 @@
                                 <element type="Text">
                                     <attribute name="Text" value="New" />
                                     <attribute name="Text Alignment" value="Center" />
+                                    <attribute name="Auto Localizable" value="true" />
                                 </element>
                             </element>
                             <element type="Button">
@@ -452,6 +458,7 @@
                                 <element type="Text">
                                     <attribute name="Text" value="Remove" />
                                     <attribute name="Text Alignment" value="Center" />
+                                    <attribute name="Auto Localizable" value="true" />
                                 </element>
                             </element>
                             <element type="Button">
@@ -461,6 +468,7 @@
                                 <element type="Text">
                                     <attribute name="Text" value="Sort" />
                                     <attribute name="Text Alignment" value="Center" />
+                                    <attribute name="Auto Localizable" value="true" />
                                 </element>
                             </element>
                         </element>
@@ -473,6 +481,7 @@
                             <attribute name="Layout Spacing" value="10" />
                             <element type="Text" style="EditorAttributeText">
                                 <attribute name="Text" value="Texture Frames" />
+                                <attribute name="Auto Localizable" value="true" />
                             </element>
                         </element>
                         <element type="ListView" style="PanelView">
@@ -493,6 +502,7 @@
                                 <element type="Text">
                                     <attribute name="Text" value="New" />
                                     <attribute name="Text Alignment" value="Center" />
+                                    <attribute name="Auto Localizable" value="true" />
                                 </element>
                             </element>
                             <element type="Button">
@@ -502,6 +512,7 @@
                                 <element type="Text">
                                     <attribute name="Text" value="Remove" />
                                     <attribute name="Text Alignment" value="Center" />
+                                    <attribute name="Auto Localizable" value="true" />
                                 </element>
                             </element>
                             <element type="Button">
@@ -511,6 +522,7 @@
                                 <element type="Text">
                                     <attribute name="Text" value="Sort" />
                                     <attribute name="Text Alignment" value="Center" />
+                                    <attribute name="Auto Localizable" value="true" />
                                 </element>
                             </element>
                         </element>
@@ -518,6 +530,7 @@
                         <element style="Panel">
                             <element type="Text">
                                 <attribute name="Text" value="Emitter" />
+                                <attribute name="Auto Localizable" value="true" />
                             </element>
                         </element>
                         <!-- Emitter Attributes -->
@@ -621,6 +634,7 @@
                         <element style="Panel">
                             <element type="Text">
                                 <attribute name="Text" value="Renderer" />
+                                <attribute name="Auto Localizable" value="true" />
                             </element>
                         </element>
                         <element style="Panel">
@@ -720,6 +734,7 @@
                     <element type="Text">
                         <attribute name="Text" value="New" />
                         <attribute name="Text Alignment" value="Center" />
+                        <attribute name="Auto Localizable" value="true" />
                     </element>
                 </element>
                 <element type="Button">
@@ -729,6 +744,7 @@
                     <element type="Text">
                         <attribute name="Text" value="Revert" />
                         <attribute name="Text Alignment" value="Center" />
+                        <attribute name="Auto Localizable" value="true" />
                     </element>
                 </element>
                 <element type="Button">
@@ -738,6 +754,7 @@
                     <element type="Text">
                         <attribute name="Text" value="Save" />
                         <attribute name="Text Alignment" value="Center" />
+                        <attribute name="Auto Localizable" value="true" />
                     </element>
                 </element>
                 <element type="Button">
@@ -747,6 +764,7 @@
                     <element type="Text">
                         <attribute name="Text" value="Save as" />
                         <attribute name="Text Alignment" value="Center" />
+                        <attribute name="Auto Localizable" value="true" />
                     </element>
                 </element>
             </element>

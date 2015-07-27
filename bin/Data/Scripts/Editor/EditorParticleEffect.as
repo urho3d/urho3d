@@ -955,6 +955,7 @@ void RefreshParticleEffectColorFrames()
         textContainer.AddChild(t);
         t.style = "Text";
         t.text = "Color";
+        t.autoLocalizable = true;
 
         UIElement@ editContainer = UIElement();
         container.AddChild(editContainer);
@@ -1076,6 +1077,7 @@ void RefreshParticleEffectTextureFrames()
         textContainer.AddChild(t);
         t.style = "Text";
         t.text = "Texture";
+        t.autoLocalizable = true;
 
         UIElement@ editContainer = UIElement();
         container.AddChild(editContainer);

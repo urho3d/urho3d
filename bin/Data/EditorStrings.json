@@ -810,5 +810,51 @@
 	"Save as":{
 		"en":"Save as",
 		"ru":"Сохранить как"
+	},
+	"Color":{
+		"en":"Color",
+		"ru":"Цвет"
+	},
+	"Texture":{
+		"en":"Texture",
+		"ru":"Текстура"
+	},
+	"Reset Viewport":{
+		"en":"Reset Viewport",
+		"ru":"Сбросить вьюпорт"
+	},
+	"Show Axes":{
+		"en":"Show Axes",
+		"ru":"Показывать оси"
+	},
+	"Initial":{
+		"en":"Initial",
+		"ru":"Начальные"
+	},
+	"Variation":{
+		"en":"Variation",
+		"ru":"Изменения"
+	},
+	"Color Frames":{
+		"en":"Color Frames",
+		"ru":"Изменение цвета"
+	},
+	"Remove":{
+		"en":"Remove",
+		"ru":"Удалить"
+	},
+	"Texture Frames":{
+		"en":"Texture Frames",
+		"ru":"Изменение текстуры"
+	},
+	"Emitter":{
+		"en":"Emitter",
+		"ru":"Излучатель"
+	},
+	"Renderer":{
+		"en":"Renderer",
+		"ru":"Рендерер"
 	}
 }
+
+	
