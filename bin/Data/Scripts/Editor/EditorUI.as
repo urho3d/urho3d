@@ -336,7 +336,7 @@ void CreateMenuBar()
         if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
             popup.AddChild(CreateMenuItem("Delete", @Delete, KEY_DELETE, QUAL_ANY));
         else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
-            popup.AddChild(CreateMenuItem("Delete", @Delete, 'X', QUAL_ANY));
+            popup.AddChild(CreateMenuItem("Delete", @BlenderModeDelete, 'X', QUAL_ANY));
         
         popup.AddChild(CreateMenuItem("Select all", @SelectAll, 'A', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Deselect all", @DeselectAll, 'A', QUAL_SHIFT | QUAL_CTRL));
@@ -386,8 +386,14 @@ void CreateMenuBar()
         //else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
         //    popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
         
-        if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+        if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) 
+        {
              popup.AddChild(CreateMenuItem("Move to layer", @ShowLayerMover, 'M'));
+             popup.AddChild(CreateMenuItem("Smart Duplicate", @SceneSmartDuplicateNode, 'D', QUAL_ALT));
+             popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_KP_PERIOD));                     
+        }
+        
+        CreateChildDivider(popup);
         
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
         CreateChildDivider(popup);
@@ -1255,6 +1261,7 @@ void HandleHotKeysBlender( VariantMap& eventData )
     }
     else if (key == KEY_KP_5 && ui.focusElement is null)
     {
+        activeViewport.camera.zoom = 1;
         activeViewport.ToggleOrthographic();
     }
     else if (key == '4')
@@ -1334,13 +1341,20 @@ void HandleHotKeysBlender( VariantMap& eventData )
                 }
                 else if (key == KEY_F) 
                 {
-                    Vector3 center = Vector3(0,0,0);
-                    
-                    if (selectedNodes.length > 0)
-                        center = SelectedNodesCenterPoint(); 
-                    
-                    cameraNode.LookAt(center);
-                    ReacquireCameraYawPitch(); 
+                    if (camera.orthographic) 
+                    {
+                        viewCloser = true;
+                    }
+                    else
+                    {
+                        Vector3 center = Vector3(0,0,0);
+                        
+                        if (selectedNodes.length > 0)
+                            center = SelectedNodesCenterPoint(); 
+                        
+                        cameraNode.LookAt(center);
+                        ReacquireCameraYawPitch();
+                    } 
                 }
          }  
     }
@@ -1496,7 +1510,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 }
 
 void UnfadeUI()
-{
+{    
     FadeUI(false);
 }
 

@@ -18,7 +18,6 @@ CreateMode instantiateMode = REPLICATED;
 bool sceneModified = false;
 bool runUpdate = false;
 
-Node@ lastSelectedNode;
 Array<Node@> selectedNodes;
 Array<Component@> selectedComponents;
 Node@ editNode;
@@ -37,6 +36,8 @@ uint undoStackPos = 0;
 
 bool revertOnPause = false;
 XMLFile@ revertData;
+
+Vector3 lastOffsetForSmartDuplicate;
 
 void ClearSceneSelection()
 {
@@ -774,7 +775,7 @@ bool SceneUnparent()
 
 bool NodesParentToLastSelected()
 {
-    if (lastSelectedNode is null)
+    if (lastSelectedNode.Get() is null)
         return false;
         
     if (!CheckHierarchyWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
@@ -789,7 +790,7 @@ bool NodesParentToLastSelected()
     Array<Node@> changedNodes;
     
     // Find new parent node it selected last
-    Node@ lastNode = lastSelectedNode;
+    Node@ lastNode = lastSelectedNode.Get(); //GetListNode(hierarchyList.selection);
     
     for (uint i = 0; i < selectedNodes.length; ++i)
     {
@@ -819,6 +820,83 @@ bool NodesParentToLastSelected()
 
     return true;
 }
+
+bool SceneSmartDuplicateNode() 
+{       
+    const float minOffset = 0.1;
+    
+    if (!CheckHierarchyWindowFocus() || !selectedComponents.empty 
+        || selectedNodes.empty || lastSelectedNode.Get() is null)
+        return false;
+    
+    
+    Node@ node = lastSelectedNode.Get();
+    Node@ parent = node.parent;
+    Vector3 offset = Vector3(1,0,0); // default offset
+    
+    if (parent is editorScene) // if parent of selected node is Scene make empty parent for it and place in same position; 
+    {
+        parent = CreateNode(LOCAL);
+        SceneChangeParent(parent, editorScene, false);
+        parent.worldPosition = node.worldPosition;
+        parent.name = node.name + "Group";
+        node.name = parent.name + "Instance" + String(parent.numChildren);
+        SceneChangeParent(node, parent, false);
+        parent = node.parent;
+        SelectNode(node, false);
+    } 
+    
+    Vector3 size;
+    BoundingBox bb;
+    
+    // get bb for offset  
+    Drawable@ drawable = GetFirstDrawable(node);
+    if (drawable !is null) 
+    {
+        bb = drawable.boundingBox;
+        size =  bb.size * drawable.node.worldScale;
+        offset = Vector3(size.x, 0, 0); 
+    } 
+    
+    // make offset on axis that select user by mouse
+    if (gizmoAxisX.selected)
+    {
+        if (size.x < minOffset) size.x = minOffset;
+        offset = node.worldRotation * Vector3(size.x,0,0);
+    }
+    else if (gizmoAxisY.selected)
+    {
+        if (size.y < minOffset) size.y = minOffset;
+        offset = node.worldRotation * Vector3(0,size.y,0);
+    }
+    else if (gizmoAxisZ.selected)
+    {
+        if (size.z < minOffset) size.z = minOffset;
+        offset = node.worldRotation * Vector3(0,0,size.z);
+    }
+    else
+        offset = lastOffsetForSmartDuplicate;    
+    
+    Vector3 lastInstancePosition = node.worldPosition;
+    
+    SelectNode(node, false);
+    SceneDuplicate();
+    Node@ newInstance = parent.children[parent.numChildren-1];
+    SelectNode(newInstance, false);
+    newInstance.worldPosition = lastInstancePosition;
+    newInstance.Translate(offset, TS_WORLD);
+    newInstance.name = parent.name + "Instance" + String(parent.numChildren-1);
+    
+    lastOffsetForSmartDuplicate = offset;
+    UpdateNodeAttributes();
+    return true;
+}
+
+bool ViewCloser()
+{
+    return (viewCloser = true);
+}
+
 
 bool SceneToggleEnable()
 {

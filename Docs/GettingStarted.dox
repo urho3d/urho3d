@@ -790,6 +790,8 @@ Z                  - Cycle through solid, wireframe and point rendering
 M                  - Show/Hide LayerEditor
 F                  - Focus on selected object (LookAt)               
 X                  - Delete node or component
+Alt+D              - Smart Duplicate (note: select one of axises on gizmo to show direction for next instance)
+Key "." or Del     - View Closer selected node(s)  
 \endverbatim
 
 Press right mouse button in the 3D view if you want to defocus the active window without changing the object selection.

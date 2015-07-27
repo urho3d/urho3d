@@ -47,10 +47,12 @@ void CreateLayerEditor()
 bool ShowLayerEditor()
 {
     // avoid to show layer window when we type text in LineEdit
-    if (ui.focusElement !is null && ui.focusElement.type == lineEditType) return false;
+    if (ui.focusElement !is null && ui.focusElement.type == lineEditType && lastSelectedNode.Get() is null) 
+        return false;
     
     // to avoid when we close dialog with selected other node
-    patternMaskNode = lastSelectedNode;
+    Node@ node = lastSelectedNode.Get(); 
+    patternMaskNode = node;
     
     // just change position if already opened
     if ( layerWindow.visible == true )

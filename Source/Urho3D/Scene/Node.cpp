@@ -289,6 +289,12 @@ void Node::SetScale(float scale)
 
 void Node::SetScale(const Vector3& scale)
 {
+    if (Urho3D::IsNaN(scale.x_) || Urho3D::IsNaN(scale.y_) || Urho3D::IsNaN(scale.z_))
+    {
+        LOGWARNING("Attempt to set NaN node scale " + scale.ToString() + ", disregarding");
+        return;
+    }
+
     scale_ = scale;
     MarkDirty();
 
