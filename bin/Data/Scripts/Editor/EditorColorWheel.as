@@ -328,6 +328,8 @@ void HandleMouseMove(StringHash eventType, VariantMap& eventData)
             if (colorSValue < ROUND_VALUE_MIN) colorSValue = 0.0;
             if (colorSValue > ROUND_VALUE_MAX) colorSValue = 1.0;
     
+            wheelColor.FromHSV(colorHValue,colorSValue,colorVValue, colorAValue);
+            SendEventChangeColor();
             UpdateColorInformation();
         }    
     }
@@ -345,6 +347,9 @@ void HandleMouseMove(StringHash eventType, VariantMap& eventData)
             
             if (colorVValue < 0.01) colorVValue = 0.0;
             if (colorVValue > 0.99) colorVValue = 1.0;
+            
+            wheelColor.FromHSV(colorHValue,colorSValue,colorVValue, colorAValue);
+            SendEventChangeColor();
         }
         
         UpdateColorInformation();      
@@ -363,6 +368,9 @@ void HandleMouseMove(StringHash eventType, VariantMap& eventData)
             // round values for min or max
             if (colorAValue < 0.01) colorAValue = 0.0;
             if (colorAValue > 0.99) colorAValue = 1.0;
+            
+            wheelColor.FromHSV(colorHValue,colorSValue,colorVValue, colorAValue);
+            SendEventChangeColor();
         }
         
         UpdateColorInformation();
@@ -383,7 +391,7 @@ void UpdateColorInformation()
     sLineEdit.text = String(colorSValue).Substring(0,5);
     vLineEdit.text = String(colorVValue).Substring(0,5);
     
-    wheelColor.FromHSV(colorHValue,colorSValue,colorVValue, colorAValue);
+    
    
     rLineEdit.text = String(wheelColor.r).Substring(0,5);
     gLineEdit.text = String(wheelColor.g).Substring(0,5);
@@ -402,10 +410,13 @@ void UpdateColorInformation()
         colorFast[colorFastSelectedIndex] = wheelColor; 
     }
     
+}
+
+void SendEventChangeColor()
+{
     VariantMap eventData;
     eventData["Color"] = wheelColor;
     SendEvent("WheelChangeColor", eventData);
-    
 }
 
 void EstablishColorWheelUIFromColor(Color c) 

@@ -97,9 +97,9 @@ void CreateUI()
     SubscribeToEvent("KeyUp", "UnfadeUI");
     SubscribeToEvent("MouseButtonUp", "UnfadeUI");
     SubscribeToEvent("ChangeLanguage", "HandleChangeLanguage");
-    
+
     SubscribeToEvent("WheelChangeColor", "HandleWheelChangeColor" );
-    SubscribeToEvent("WheelSelectColor", "HandleWheelSelectColor" );
+    //SubscribeToEvent("WheelSelectColor", "HandleWheelSelectColor" );
     SubscribeToEvent("WheelDiscardColor", "HandleWheelDiscardColor" );
 }
 
@@ -137,7 +137,7 @@ void ResizeUI()
 
     // Relayout root UI element
     editorUIElement.SetSize(graphics.width, graphics.height);
-    
+
     // Set new viewport area and reset the viewport layout
     viewportArea = IntRect(0, 0, graphics.width, graphics.height);
     SetViewportMode(viewportMode);
@@ -257,7 +257,7 @@ void CreateQuickMenu()
     quickMenu.enabled = false;
     quickMenu.visible = false;
     quickMenu.opacity = uiMaxOpacity;
-    
+
     // Handle a dummy search in the quick menu to finalize its initial size to empty
     PerformQuickMenuSearch("");
 
@@ -331,41 +331,41 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Redo", @Redo, 'Y', QUAL_CTRL));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Cut", @Cut, 'X', QUAL_CTRL));
-        
+
         if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
             popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_CTRL));
         else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
             popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_SHIFT ));
-        
+
         popup.AddChild(CreateMenuItem("Copy", @Copy, 'C', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Paste", @Paste, 'V', QUAL_CTRL));
-        
+
         if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
             popup.AddChild(CreateMenuItem("Delete", @Delete, KEY_DELETE, QUAL_ANY));
         else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
             popup.AddChild(CreateMenuItem("Delete", @BlenderModeDelete, 'X', QUAL_ANY));
-        
+
         popup.AddChild(CreateMenuItem("Select all", @SelectAll, 'A', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Deselect all", @DeselectAll, 'A', QUAL_SHIFT | QUAL_CTRL));
-        
+
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Reset to default", @ResetToDefault));
         CreateChildDivider(popup);
-        
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )    
+
+        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
         {
             popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition));
             popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation));
             popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale));
         }
         else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
-        { 
+        {
             popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition, 'G' , QUAL_ALT));
             popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation, 'R', QUAL_ALT ));
             popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale, 'S', QUAL_ALT));
         }
-        
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD ) 
+
+        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
         {
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'E', QUAL_CTRL));
             popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'E', QUAL_ALT));
@@ -375,7 +375,7 @@ void CreateMenuBar()
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'H'));
             popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'H', QUAL_ALT));
         }
-        
+
         if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
             popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'U', QUAL_CTRL));
         else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
@@ -387,22 +387,22 @@ void CreateMenuBar()
             popup.AddChild(CreateMenuItem("Parent to last", @NodesParentToLastSelected, 'P', QUAL_CTRL));
 
         CreateChildDivider(popup);
-        
+
         if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
             popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
         //else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
         //    popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
-        
-        if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) 
+
+        if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
         {
              popup.AddChild(CreateMenuItem("Move to layer", @ShowLayerMover, 'M'));
              popup.AddChild(CreateMenuItem("Smart Duplicate", @SceneSmartDuplicateNode, 'D', QUAL_ALT));
              popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_KP_PERIOD));
-             popup.AddChild(CreateMenuItem("Color wheel", @SetColorForSelectedDrawable, 'W', QUAL_ALT));                     
+             popup.AddChild(CreateMenuItem("Color wheel", @SetColorForSelectedDrawable, 'W', QUAL_ALT));
         }
-        
+
         CreateChildDivider(popup);
-        
+
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Rebuild navigation data", @SceneRebuildNavigation));
@@ -1183,11 +1183,11 @@ void HandleUIElementDefaultStyle(StringHash eventType, VariantMap& eventData)
     SetUIElementDefaultStyle(ExtractFileName(eventData));
 }
 
-void HandleHotKeysBlender( VariantMap& eventData ) 
+void HandleHotKeysBlender( VariantMap& eventData )
 {
     int key = eventData["Key"].GetInt();
     int viewDirection = eventData["Qualifiers"].GetInt() == QUAL_CTRL ? -1 : 1;
-    
+
     if (key == KEY_ESC)
     {
         if (uiHidden)
@@ -1231,13 +1231,13 @@ void HandleHotKeysBlender( VariantMap& eventData )
             fileSystem.CreateDir(screenshotDir);
         screenshot.SavePNG(screenshotDir + "/Screenshot_" +
                 time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
-    }   
+    }
     else if (key == KEY_KP_1 && ui.focusElement is null) // Front view
     {
         Vector3 center = Vector3(0,0,0);
         if (selectedNodes.length > 0 || selectedComponents.length > 0)
             center = SelectedNodesCenterPoint();
-            
+
         Vector3 pos = cameraNode.worldPosition - center;
         cameraNode.worldPosition = center - Vector3(0.0, 0.0, pos.length * viewDirection);
         cameraNode.direction = Vector3(0, 0, viewDirection);
@@ -1249,7 +1249,7 @@ void HandleHotKeysBlender( VariantMap& eventData )
         Vector3 center = Vector3(0,0,0);
         if (selectedNodes.length > 0 || selectedComponents.length > 0)
             center = SelectedNodesCenterPoint();
-            
+
         Vector3 pos = cameraNode.worldPosition - center;
         cameraNode.worldPosition = center - Vector3(pos.length * -viewDirection, 0.0, 0.0);
         cameraNode.direction = Vector3(-viewDirection, 0, 0);
@@ -1261,7 +1261,7 @@ void HandleHotKeysBlender( VariantMap& eventData )
         Vector3 center = Vector3(0,0,0);
         if (selectedNodes.length > 0 || selectedComponents.length > 0)
             center = SelectedNodesCenterPoint();
-            
+
         Vector3 pos = cameraNode.worldPosition - center;
         cameraNode.worldPosition = center - Vector3(0.0, pos.length * -viewDirection, 0.0);
         cameraNode.direction = Vector3(0, -viewDirection, 0);
@@ -1302,12 +1302,12 @@ void HandleHotKeysBlender( VariantMap& eventData )
         if (ui.cursor.visible && ui.focusElement is null)
             ToggleQuickMenu();
     }
-    else 
+    else
     {
         SteppedObjectManipulation(key);
     }
-        
-    if ((ui.focusElement is null) && (selectedNodes.length > 0) && !cameraFlyMode) 
+
+    if ((ui.focusElement is null) && (selectedNodes.length > 0) && !cameraFlyMode)
     {
          if (eventData["Qualifiers"].GetInt() == QUAL_ALT) // reset transformations
          {
@@ -1317,64 +1317,64 @@ void HandleHotKeysBlender( VariantMap& eventData )
                 SceneResetRotation();
             else if (key == KEY_S)
                 SceneResetScale();
-            else if (key == KEY_F) 
+            else if (key == KEY_F)
             {
                  Vector3 center = Vector3(0,0,0);
-                 
+
                  if (selectedNodes.length > 0)
                     center = SelectedNodesCenterPoint();
-                 
-                 cameraNode.LookAt(center);  
+
+                 cameraNode.LookAt(center);
                  ReacquireCameraYawPitch();
-            } 
+            }
          }
          else if ( eventData["Qualifiers"].GetInt() != QUAL_CTRL) // set transformations
          {
-                if (key == KEY_G) 
+                if (key == KEY_G)
                 {
-                    editMode = EDIT_MOVE; 
+                    editMode = EDIT_MOVE;
                     axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
-                
+
                 }
-                else if (key == KEY_R) 
+                else if (key == KEY_R)
                 {
                     editMode = EDIT_ROTATE;
                     axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
-                
+
                 }
-                else if (key == KEY_S) 
+                else if (key == KEY_S)
                 {
                     editMode = EDIT_SCALE;
-                    axisMode = AxisMode(axisMode ^ AXIS_LOCAL); 
+                    axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
                 }
-                else if (key == KEY_F) 
+                else if (key == KEY_F)
                 {
-                    if (camera.orthographic) 
+                    if (camera.orthographic)
                     {
                         viewCloser = true;
                     }
                     else
                     {
                         Vector3 center = Vector3(0,0,0);
-                        
+
                         if (selectedNodes.length > 0)
-                            center = SelectedNodesCenterPoint(); 
-                        
+                            center = SelectedNodesCenterPoint();
+
                         cameraNode.LookAt(center);
                         ReacquireCameraYawPitch();
-                    } 
+                    }
                 }
-         }  
+         }
     }
-    
+
     toolBarDirty = true;
 }
 
-void HandleHotKeysStandart ( VariantMap& eventData) 
+void HandleHotKeysStandart ( VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
     int viewDirection = eventData["Qualifiers"].GetInt() == QUAL_CTRL ? -1 : 1;
-    
+
     if (key == KEY_ESC)
     {
         if (uiHidden)
@@ -1419,13 +1419,13 @@ void HandleHotKeysStandart ( VariantMap& eventData)
             fileSystem.CreateDir(screenshotDir);
         screenshot.SavePNG(screenshotDir + "/Screenshot_" +
                 time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
-    }   
+    }
     else if (key == KEY_KP_1 && ui.focusElement is null) // Front view
     {
         Vector3 center = Vector3(0,0,0);
         if (selectedNodes.length > 0 || selectedComponents.length > 0)
             center = SelectedNodesCenterPoint();
-            
+
         Vector3 pos = cameraNode.worldPosition - center;
         cameraNode.worldPosition = center - Vector3(0.0, 0.0, pos.length * viewDirection);
         cameraNode.direction = Vector3(0, 0, viewDirection);
@@ -1437,7 +1437,7 @@ void HandleHotKeysStandart ( VariantMap& eventData)
         Vector3 center = Vector3(0,0,0);
         if (selectedNodes.length > 0 || selectedComponents.length > 0)
             center = SelectedNodesCenterPoint();
-            
+
         Vector3 pos = cameraNode.worldPosition - center;
         cameraNode.worldPosition = center - Vector3(pos.length * -viewDirection, 0.0, 0.0);
         cameraNode.direction = Vector3(-viewDirection, 0, 0);
@@ -1449,7 +1449,7 @@ void HandleHotKeysStandart ( VariantMap& eventData)
         Vector3 center = Vector3(0,0,0);
         if (selectedNodes.length > 0 || selectedComponents.length > 0)
             center = SelectedNodesCenterPoint();
-            
+
         Vector3 pos = cameraNode.worldPosition - center;
         cameraNode.worldPosition = center - Vector3(0.0, pos.length * -viewDirection, 0.0);
         cameraNode.direction = Vector3(0, -viewDirection, 0);
@@ -1460,13 +1460,13 @@ void HandleHotKeysStandart ( VariantMap& eventData)
     {
         activeViewport.ToggleOrthographic();
     }
-    else if (eventData["Qualifiers"].GetInt() == QUAL_CTRL) 
+    else if (eventData["Qualifiers"].GetInt() == QUAL_CTRL)
     {
-        if (key == '1') 
-            editMode = EDIT_MOVE; 
-        else if (key == '2') 
+        if (key == '1')
+            editMode = EDIT_MOVE;
+        else if (key == '2')
             editMode = EDIT_ROTATE;
-        else if (key == '3') 
+        else if (key == '3')
             editMode = EDIT_SCALE;
         else if (key == '4')
             editMode = EDIT_SELECT;
@@ -1500,7 +1500,7 @@ void HandleHotKeysStandart ( VariantMap& eventData)
         }
         else
             SteppedObjectManipulation(key);
-            
+
         toolBarDirty = true;
     }
 }
@@ -1517,122 +1517,142 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     }
 }
 
-// color was changed, update color of all colorGroup for immidiate preview; 
+// color was changed, update color of all colorGroup for immediate preview;
 void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
 {
-    //time.elapsedTime 
+    //time.elapsedTime
     if (timeToNextColoringGroupUpdate > time.systemTime) return;
-     
-    //delayColoringGroupUpdate) 
-    
-    if (coloringGroup.length > 0) 
+
+    if (coloringGroup.length > 0)
     {
-        Color c = eventData["Color"].GetColor(); 
-    
+        Color c = eventData["Color"].GetColor();
+
         //MessageBox("HandleWheelChangeColor");
         // preview new color for all
-        for (int i=0; i < coloringGroup.length; i++) 
-        {   
+        for (int i=0; i < coloringGroup.length; i++)
+        {
             Drawable@ firstDrawable = GetFirstDrawable(coloringGroup[i]);
-            if (firstDrawable.typeName  == "Light") 
+            if (firstDrawable.typeName  == "Light")
             {
                 Light@ light = cast<Light>(firstDrawable);
                 light.color = c;
             }
-            else if ( firstDrawable.typeName == "StaticModel" ) 
+            else if ( firstDrawable.typeName == "StaticModel" )
             {
-                StaticModel@ model  = cast<StaticModel>(firstDrawable);
-                if (model !is null) 
+                StaticModel@ model = cast<StaticModel>(firstDrawable);
+                if (model !is null)
                 {
                     Material@ mat = model.materials[0];
-                    if (mat !is null) 
+                    //Material@ mat = model.material;
+                    if (mat !is null)
                     {
-                        mat.shaderParameters["MatDiffColor"] = Variant(c);
+                        Variant oldValue = mat.shaderParameters["MatDiffColor"];
+                        Variant v;
+                        String valueString;
+                        valueString += String(c.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.a).Substring(0,5);
+                        v.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatDiffColor"] = v;
                     }
                 }
             }
-            else if ( firstDrawable.typeName == "Zone" ) 
+            else if ( firstDrawable.typeName == "Zone" )
             {
                 Zone@ zone  = cast<Zone>(firstDrawable);
-                if (zone !is null) 
+                if (zone !is null)
                 {
                     zone.ambientColor = c;
-                }   
+                }
             }
-                       
-            attributesDirty = true; 
-                    
-        } 
+
+            attributesDirty = true;
+
+        }
     }
-    
+
     timeToNextColoringGroupUpdate = time.systemTime + stepColoringGroupUpdate;
 }
 
-// Return old colors, wheel was closed or color discarted 
+// Return old colors, wheel was closed or color discarted
 void HandleWheelDiscardColor(StringHash eventType, VariantMap& eventData)
 {
-    if (coloringGroup.length > 0) 
+    if (coloringGroup.length > 0)
     {
-        for (int i=0; i < coloringGroup.length; i++) 
-        {  
+        for (int i=0; i < coloringGroup.length; i++)
+        {
             Drawable@ firstDrawable = GetFirstDrawable(coloringGroup[i]);
-            if (firstDrawable.typeName  == "Light") 
+            if (firstDrawable.typeName  == "Light")
             {
                 Light@ light = cast<Light>(firstDrawable);
-                if (light !is null) 
-                {    
+                if (light !is null)
+                {
                     light.color = coloringGroupOldColor[i];
-                    
                 }
             }
-            else if ( firstDrawable.typeName == "StaticModel" ) 
+            else if ( firstDrawable.typeName == "StaticModel" )
             {
                 StaticModel@ model  = cast<StaticModel>(firstDrawable);
-                if (model !is null) 
+                if (model !is null)
                 {
                     Material@ mat = model.materials[0];
-                    if (mat !is null) 
+                    if (mat !is null)
                     {
-                        mat.shaderParameters["MatDiffColor"] = Variant(coloringGroupOldColor[i]);
+                        Variant oldValue = mat.shaderParameters["MatDiffColor"];
+                        Variant v;
+                        
+                        String valueString;
+                        valueString += String(coloringGroupOldColor[i].r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(coloringGroupOldColor[i].g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(coloringGroupOldColor[i].b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(coloringGroupOldColor[i].a).Substring(0,5);
+                        v.FromString(oldValue.type, valueString);
+                        mat.shaderParameters["MatDiffColor"] = v;                        
                     }
                 }
             }
-            else if ( firstDrawable.typeName == "Zone" ) 
+            else if ( firstDrawable.typeName == "Zone" )
             {
                 Zone@ zone  = cast<Zone>(firstDrawable);
-                if (zone !is null) 
+                if (zone !is null)
                 {
                     zone.ambientColor = coloringGroupOldColor[i];
-                }   
+                }
             }
-            
-            
-            attributesDirty = true; 
+
+            attributesDirty = true;
         }
-        
+
         coloringGroupOldColor.Clear();
-        coloringGroup.Clear(); 
+        coloringGroup.Clear();
     }
 }
-
+/*
 void HandleWheelSelectColor(StringHash eventType, VariantMap& eventData)
 {
-    if (coloringGroup.length > 0) 
+    if (coloringGroup.length > 0)
     {
-        //MessageBox("HandleWheelWheelSelectColor");
-        // Assign new color for all group 
-        for (int i=0; i < coloringGroup.length; i++) 
+        // Assign new color for all group
+        for (int i=0; i < coloringGroup.length; i++)
         {
-            
+
         }
-        
+
         coloringGroupOldColor.Clear();
-        coloringGroup.Clear();         
-    } 
+        coloringGroup.Clear();
+    }
 }
+*/
 
 void UnfadeUI()
-{    
+{
     FadeUI(false);
 }
 
