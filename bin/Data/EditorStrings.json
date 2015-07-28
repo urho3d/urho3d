@@ -47,7 +47,7 @@
 	},
 	"Import model...":{
 		"en":"Import model...",
-        "ru": "Импортировать модель..."
+        "ru": "Импортировать модель...",
         "fr": "Importer un modèle..."
 	},
 	"Import scene...":{
@@ -213,7 +213,7 @@
 	"Geometry":{
 		"en":"Geometry",
         "ru": "Геометрия",
-        "fr": "Géométrie",
+        "fr": "Géométrie"
 	},
 	"Logic":{
 		"en":"Logic",
@@ -407,7 +407,7 @@
 	},
 	"  Lights: ":{
 		"en":"  Lights: ",
-        "ru": "  Ист-в света: "
+        "ru": "  Ист-в света: ",
         "fr": " Lumières:"
 	},
 	"  Shadowmaps: ":{
