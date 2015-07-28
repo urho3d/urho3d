@@ -2,6 +2,7 @@
 
 #include "Scripts/Editor/EditorHierarchyWindow.as"
 #include "Scripts/Editor/EditorInspectorWindow.as"
+#include "Scripts/Editor/EditorUI.as"
 
 const int PICK_GEOMETRIES = 0;
 const int PICK_LIGHTS = 1;
@@ -889,6 +890,74 @@ bool SceneSmartDuplicateNode()
     
     lastOffsetForSmartDuplicate = offset;
     UpdateNodeAttributes();
+    return true;
+}
+
+bool SetColorForSelectedDrawable()
+{
+    if (selectedNodes.empty && selectedComponents.empty) return false;
+    editMode = EDIT_SELECT;
+    
+    // TODO: discard color for group.lenth > 0 if color was not discard or cancel
+    
+    // Prepare new group, grab all into coloringGroup; 
+    for (int i=0; i < selectedNodes.length; i++) 
+    {
+            coloringGroup.Push(selectedNodes[i]);
+    }
+        
+    for (int i=0; i < selectedComponents.length; i++) 
+    {
+            coloringGroup.Push(selectedComponents[i].node);
+    }
+    
+    coloringGroupOldColor.Resize(coloringGroup.length);
+    
+    for (int i=0; i < coloringGroup.length; i++) 
+    {
+        Drawable@ firstDrawable = GetFirstDrawable(coloringGroup[i]);
+        if (firstDrawable is null) continue;
+        
+        if (firstDrawable.typeName  == "Light") 
+        {
+            Light@ light = cast<Light>(firstDrawable);
+            if (light !is null) 
+                coloringGroupOldColor[i] = light.color;
+        }
+        else if ( firstDrawable.typeName == "StaticModel" ) 
+        {
+            StaticModel@ model  = cast<StaticModel>(firstDrawable);
+            if (model !is null) 
+            {
+                Material@ mat = model.materials[0];
+                if (mat !is null) 
+                {
+                    //MessageBox("mat.shaderParameters");
+                    Color c = mat.shaderParameters["MatDiffColor"].GetColor();
+                    coloringGroupOldColor[i]= c;
+                } 
+            }
+        }
+        else if ( firstDrawable.typeName == "Zone" ) 
+        {
+            Zone@ zone  = cast<Zone>(firstDrawable);
+            if (zone !is null) 
+            {
+                Color c = zone.ambientColor;
+                coloringGroupOldColor[i]= c;     
+            }   
+        }     
+    }
+    
+    if (coloringGroup.length > 0) 
+    {
+        //MessageBox("coloringGroup.length" + String(coloringGroup.length));
+        //SubscribeToEvent("WheelChangeColor", "HandleWheelChangeColor" );
+        //SubscribeToEvent("WheelSelectColor", "HandleWheelWheelSelectColor" );
+        //SubscribeToEvent("WheelDiscardColor", "HandleWheelDiscardColor" );
+    }
+    
+    ShowColorWheel();    
     return true;
 }
 

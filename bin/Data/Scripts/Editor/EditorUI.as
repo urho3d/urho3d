@@ -87,6 +87,7 @@ void CreateUI()
     CreateResourceBrowser();
     CreateCamera();
     CreateLayerEditor();
+    CreateColorWheel();
 
     SubscribeToEvent("ScreenMode", "ResizeUI");
     SubscribeToEvent("MenuSelected", "HandleMenuSelected");
@@ -94,6 +95,10 @@ void CreateUI()
     SubscribeToEvent("KeyUp", "UnfadeUI");
     SubscribeToEvent("MouseButtonUp", "UnfadeUI");
     SubscribeToEvent("ChangeLanguage", "HandleChangeLanguage");
+    
+    SubscribeToEvent("WheelChangeColor", "HandleWheelChangeColor" );
+    SubscribeToEvent("WheelSelectColor", "HandleWheelWheelSelectColor" );
+    SubscribeToEvent("WheelDiscardColor", "HandleWheelDiscardColor" );
 }
 
 void ResizeUI()
@@ -390,7 +395,8 @@ void CreateMenuBar()
         {
              popup.AddChild(CreateMenuItem("Move to layer", @ShowLayerMover, 'M'));
              popup.AddChild(CreateMenuItem("Smart Duplicate", @SceneSmartDuplicateNode, 'D', QUAL_ALT));
-             popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_KP_PERIOD));                     
+             popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_KP_PERIOD));
+             popup.AddChild(CreateMenuItem("Color wheel", @SetColorForSelectedDrawable, 'W', QUAL_ALT));                     
         }
         
         CreateChildDivider(popup);
@@ -1507,6 +1513,111 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     {
         HandleHotKeysBlender ( eventData );
     }
+}
+
+// color was changed, update color of all colorGroup for immidiate preview; 
+void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
+{
+    Color c = eventData["Color"].GetColor(); 
+    
+    if (coloringGroup.length > 0) 
+    {
+        //MessageBox("HandleWheelChangeColor");
+        // preview new color for all
+        for (int i=0; i < coloringGroup.length; i++) 
+        {   
+            Drawable@ firstDrawable = GetFirstDrawable(coloringGroup[i]);
+            if (firstDrawable.typeName  == "Light") 
+            {
+                Light@ light = cast<Light>(firstDrawable);
+                light.color = c;
+            }
+            else if ( firstDrawable.typeName == "StaticModel" ) 
+            {
+                StaticModel@ model  = cast<StaticModel>(firstDrawable);
+                if (model !is null) 
+                {
+                    Material@ mat = model.materials[0];
+                    if (mat !is null) 
+                    {
+                        mat.shaderParameters["MatDiffColor"] = Variant(c);
+                    }
+                }
+            }
+            else if ( firstDrawable.typeName == "Zone" ) 
+            {
+                Zone@ zone  = cast<Zone>(firstDrawable);
+                if (zone !is null) 
+                {
+                    zone.ambientColor = c;
+                }   
+            }
+                       
+            attributesDirty = true; 
+                    
+        } 
+    }
+}
+
+// Return old colors, wheel was closed or color discarted 
+void HandleWheelDiscardColor(StringHash eventType, VariantMap& eventData)
+{
+    if (coloringGroup.length > 0) 
+    {
+        for (int i=0; i < coloringGroup.length; i++) 
+        {  
+            Drawable@ firstDrawable = GetFirstDrawable(coloringGroup[i]);
+            if (firstDrawable.typeName  == "Light") 
+            {
+                Light@ light = cast<Light>(firstDrawable);
+                if (light !is null) 
+                {    
+                    light.color = coloringGroupOldColor[i];
+                    
+                }
+            }
+            else if ( firstDrawable.typeName == "StaticModel" ) 
+            {
+                StaticModel@ model  = cast<StaticModel>(firstDrawable);
+                if (model !is null) 
+                {
+                    Material@ mat = model.materials[0];
+                    if (mat !is null) 
+                    {
+                        mat.shaderParameters["MatDiffColor"] = Variant(coloringGroupOldColor[i]);
+                    }
+                }
+            }
+            else if ( firstDrawable.typeName == "Zone" ) 
+            {
+                Zone@ zone  = cast<Zone>(firstDrawable);
+                if (zone !is null) 
+                {
+                    zone.ambientColor = coloringGroupOldColor[i];
+                }   
+            }
+            
+            attributesDirty = true; 
+        }
+        
+        coloringGroupOldColor.Clear();
+        coloringGroup.Clear(); 
+    }
+}
+void HandleWheelWheelSelectColor(StringHash eventType, VariantMap& eventData)
+{
+    if (coloringGroup.length > 0) 
+    {
+        //MessageBox("HandleWheelWheelSelectColor");
+        // Assign new color for all group 
+        for (int i=0; i < coloringGroup.length; i++) 
+        {
+            
+        }
+        
+        coloringGroupOldColor.Clear();
+        coloringGroup.Clear();         
+    } 
 }
 
 void UnfadeUI()

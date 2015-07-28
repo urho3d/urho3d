@@ -18,6 +18,7 @@
 #include "Scripts/Editor/EditorSpawn.as"
 #include "Scripts/Editor/EditorSoundType.as"
 #include "Scripts/Editor/EditorLayers.as"
+#include "Scripts/Editor/EditorColorWheel.as"
 
 
 String configFileName;
