@@ -720,9 +720,7 @@ Left mouse         - Select nodes or drag the node transform gizmo. Hold Shift t
                      select components instead. Hold Ctrl to multiselect.
 Right mouse        - Hold down and move mouse to rotate camera
 Middle mouse       - Hold down orbits the camera around selected objects
-Shift+Right mouse   - Hold down pans the camera
 Shift+Middle mouse - Hold down pans the camera
-
 WSAD or arrows     - Move
 Shift+WSAD         - Move faster
 E                  - Ascend
@@ -773,11 +771,22 @@ F11                - Captures a screenshot
 F12                - Toggle UI
 \endverbatim
 
-\section EditorInstructions_Controls2 Controls (blender style hotkeys)
+The editor setting "Pan using middle mouse button" switches the controls to the following:
+
+\verbatim
+Middle mouse       - Hold down pans the camera
+Shift+Middle mouse - Hold down orbits the camera around selected objects
+\endverbatim
+
+\section EditorInstructions_Controls2 Controls (Blender style hotkeys)
 
 Hotkeys list show only differences with standard style
 
 \verbatim
+Left mouse         - Drag the node manipulator gizmo
+Middle mouse       - Hold down orbits the camera
+Shift+middle mouse - Hold down pans the camera
+Right mouse        - Select objects
 Shift+F            - Enter/Exit camera's flying mode
 G,R,S              - Object manipulation mode: move/rotate/scale ( note: camera flying mode must be off to do this manipulation)
 Cycle press G,R,S  - Toggle between world and local axes manipulation
@@ -785,22 +794,18 @@ Shift+D            - Duplicate node or component
 H                  - Enable/disable node hierarchy or component
 Alt+H              - Enable all nodes hierarchy or component in scene
 Alt+P              - Unparent scene node
-Ctrl+P             - Parent all selected scene nodes to last selected node 
+Ctrl+P             - Parent all selected scene nodes to last selected node
 Z                  - Cycle through solid, wireframe and point rendering
 M                  - Show/Hide LayerEditor
 F                  - Focus on selected object (LookAt)               
 X                  - Delete node or component
+Alt+D              - Smart Duplicate (note: select one of axises on gizmo to show direction for next instance)
+Key "." or Del     - View Closer selected node(s)  
 \endverbatim
 
 Press right mouse button in the 3D view if you want to defocus the active window without changing the object selection.
 
-An option in the settings (Pan using MMB) changes the default behavior of the MMB and RMB to pan the camera, and to require using Shift to use camera orbit and rotation.
-
-\verbatim
-Right mouse        - Hold down pans the camera
-Middle mouse       - Hold down pans the camera
-Shift+Right mouse  - Hold down and move mouse to rotate camera
-Shift+Middle mouse - Hold down orbits the camera around selected objects
+The "Pan using middle mouse button" option has no effect in Blender hotkeys mode.
 \endverbatim
 
 \section EditorInstructions_Workflow Workflow

@@ -19,7 +19,7 @@
 		"en":"Open recent scene",
 		"ru":"Открыть прежнюю сцену"
 	},
-	"Load node":{
+	"menu Load node":{
 		"en":"Load node",
 		"ru":"Загрузить ноду"
 	},
@@ -610,5 +610,257 @@
 	"File":{
 		"en":"File",
 		"ru":"Файл"
+	},
+	"Settings":{
+		"en":"Settings",
+		"ru":"Настройки"
+	},
+	"Enable all":{
+		"en":"Enable all",
+		"ru":"Включить все"
+	},
+	"Pick ":{
+		"en":"Pick ",
+		"ru":"Выбрать "
+	},
+	"OK":{
+		"en":"OK",
+		"ru":"OK"
+	},
+	"Cancel":{
+		"en":"Cancel",
+		"ru":"Отмена"
+	},
+	"Save":{
+		"en":"Save",
+		"ru":"Сохранить"
+	},
+	"Save material as":{
+		"en":"Save material as",
+		"ru":"Сохранить материал как"
+	},
+	"Save particle effect as":{
+		"en":"Save particle effect as",
+		"ru":"Сохранить эффект из частиц как"
+	},
+	"Load":{
+		"en":"Load",
+		"ru":"Загрузить"
+	},
+	"Load render path":{
+		"en":"Load render path",
+		"ru":"Загрузить render path"
+	},
+	"Pick spawned object":{
+		"en":"Pick spawned object",
+		"ru":"Выбрать спаунищийся объект"
+	},
+	"Pick":{
+		"en":"Pick",
+		"ru":"Выбрать"
+	},
+	"Set":{
+		"en":"Set",
+		"ru":"Установить"
+	},
+	"Run":{
+		"en":"Run",
+		"ru":"Запустить"
+	},
+	"Open":{
+		"en":"Open",
+		"ru":"Открыть"
+	},
+	"Import":{
+		"en":"Import",
+		"ru":"Импорт"
+	},
+	"Open scene":{
+		"en":"Open scene",
+		"ru":"Открыть сцену"
+	},
+	"Save scene as":{
+		"en":"Save scene as",
+		"ru":"Сохранить сцену как..."
+	},
+	"fileSelector Load node":{
+		"en":"Load node",
+		"ru":"Загрузка ноды"
+	},
+	"Save node":{
+		"en":"Save node",
+		"ru":"Сохранение ноды"
+	},
+	"Import model":{
+		"en":"Import model",
+		"ru":"Импорт модели"
+	},
+	"Import scene":{
+		"en":"Import scene",
+		"ru":"Импорт сцены"
+	},
+	"Run script":{
+		"en":"Run script",
+		"ru":"Запуск скрипта"
+	},
+	"Set resource path":{
+		"en":"Set resource path",
+		"ru":"Путь к ресурсам"
+	},
+	"Open UI-layout":{
+		"en":"Open UI-layout",
+		"ru":"Открытие разметки интерфейса"
+	},
+	"Save UI-layout as":{
+		"en":"Save UI-layout as",
+		"ru":"Сохранить разметку интерфейса как"
+	},
+	"Load child element":{
+		"en":"Load child element",
+		"ru":"Загрузка дочернего элемента"
+	},
+	"Save child element":{
+		"en":"Save child element",
+		"ru":"Сохранение дочернего элемента"
+	},
+	"Set default style":{
+		"en":"Set default style",
+		"ru":"Выбор стиля по умолчанию"
+	},
+	"Parent to last":{
+		"en":"Parent to last",
+		"ru":"Сделать дочерним для последнего"
+	},
+	"Style":{
+		"en":"Style",
+		"ru":"Стиль"
+	},
+	"New":{
+		"en":"New",
+		"ru":"Нов."
+	},
+	"Del":{
+		"en":"Del",
+		"ru":"Удал."
+	},
+	"smallButtonPick":{
+		"en":"Pick",
+		"ru":"Выбр."
+	},
+	"smallButtonOpen":{
+		"en":"Open",
+		"ru":"Откр."
+	},
+	"smallButtonEdit":{
+		"en":"Edit",
+		"ru":"Ред."
+	},
+	"smallButtonTest":{
+		"en":"Test",
+		"ru":"Тест"
+	},
+	"Select editable objects":{
+		"en":"Select editable objects",
+		"ru":"Выберите редактируемый объект"
+	},
+	"Box":{
+		"en":"Box",
+		"ru":"Куб"
+	},
+	"Sphere":{
+		"en":"Sphere",
+		"ru":"Сфера"
+	},
+	"Plane":{
+		"en":"Plane",
+		"ru":"Плоскость"
+	},
+	"Cylinder":{
+		"en":"Cylinder",
+		"ru":"Цилиндр"
+	},
+	"Cone":{
+		"en":"Cone",
+		"ru":"Конус"
+	},
+	"TeaPot":{
+		"en":"TeaPot",
+		"ru":"Чайник"
+	},
+	"Techniques":{
+		"en":"Techniques",
+		"ru":"Техники"
+	},
+	"Sort":{
+		"en":"Sort",
+		"ru":"Сортировать"
+	},
+	"Textures":{
+		"en":"Textures",
+		"ru":"Текстуры"
+	},
+	"Shader parameters":{
+		"en":"Shader parameters",
+		"ru":"Параметры шейдера"
+	},
+	"Revert":{
+		"en":"Revert",
+		"ru":"Вернуть"
+	},
+	"Save as":{
+		"en":"Save as",
+		"ru":"Сохранить как"
+	},
+	"Color":{
+		"en":"Color",
+		"ru":"Цвет"
+	},
+	"Texture":{
+		"en":"Texture",
+		"ru":"Текстура"
+	},
+	"Reset Viewport":{
+		"en":"Reset Viewport",
+		"ru":"Сбросить вьюпорт"
+	},
+	"Show Axes":{
+		"en":"Show Axes",
+		"ru":"Показывать оси"
+	},
+	"Initial":{
+		"en":"Initial",
+		"ru":"Начальные"
+	},
+	"Variation":{
+		"en":"Variation",
+		"ru":"Изменения"
+	},
+	"Color Frames":{
+		"en":"Color Frames",
+		"ru":"Изменение цвета"
+	},
+	"Remove":{
+		"en":"Remove",
+		"ru":"Удалить"
+	},
+	"Texture Frames":{
+		"en":"Texture Frames",
+		"ru":"Изменение текстуры"
+	},
+	"Emitter":{
+		"en":"Emitter",
+		"ru":"Излучатель"
+	},
+	"Renderer":{
+		"en":"Renderer",
+		"ru":"Рендерер"
+	},
+	"Please, use only nodes with one StaticModel for instansing":{
+		"en":"Please, use only nodes with one StaticModel for instansing",
+		"ru":"Пожалуйста, используйте только ноду с одной статической моделью для инстансинга"
+	},
+	"  CameraFlyMode: ":{
+		"en":"  CameraFlyMode: ",
+		"ru":"  Камера в режиме полета: "
 	}
 }

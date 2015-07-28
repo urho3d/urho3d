@@ -27,45 +27,51 @@
         <attribute name="Fixed Height Resizing" value="true" />
         <attribute name="Resize Border" value="0 6 0 6" />
         <element type="DropDownList">
-                            <attribute name="Name" value="ModelPreview" />
-                            <attribute name="Min Size" value="80 16" />
-                            <attribute name="Max Size" value="80 16" />
-                            <attribute name="Resize Popup" value="true" />
-                            <attribute name="Horiz Alignment" value="Right" />
-                            <attribute name="Vert Alignment" value="Bottom" />
-                            <element type="Window" internal="true" popup="true" style="none">
-                                    <element type="ListView" internal="true" style="none">
-                                        <element type="BorderImage" internal="true" style="none">
-                                            <element internal="true" style="none">
-                                                <element type="Text" style="FileSelectorFilterText">
-                                                    <attribute name="Text" value="Box" />
-                                                    <attribute name="Text Alignment" value="Center" />
-                                                </element>
-                                                <element type="Text" style="FileSelectorFilterText">
-                                                    <attribute name="Text" value="Sphere" />
-                                                    <attribute name="Text Alignment" value="Center" />
-                                                </element>
-                                                <element type="Text" style="FileSelectorFilterText">
-                                                    <attribute name="Text" value="Plane" />
-                                                    <attribute name="Text Alignment" value="Center" />
-                                                </element>
-                                                <element type="Text" style="FileSelectorFilterText">
-                                                    <attribute name="Text" value="Cylinder" />
-                                                    <attribute name="Text Alignment" value="Center" />
-                                                </element>
-                                                <element type="Text" style="FileSelectorFilterText">
-                                                    <attribute name="Text" value="Cone" />
-                                                    <attribute name="Text Alignment" value="Center" />
-                                                </element>
-                                                <element type="Text" style="FileSelectorFilterText">
-                                                    <attribute name="Text" value="TeaPot" />
-                                                    <attribute name="Text Alignment" value="Center" />
-                                                </element>
-                                            </element>
-                                        </element>
-                                    </element>
-                                </element>                           
-         </element>
+            <attribute name="Name" value="ModelPreview" />
+            <attribute name="Min Size" value="80 16" />
+            <attribute name="Max Size" value="80 16" />
+            <attribute name="Resize Popup" value="true" />
+            <attribute name="Horiz Alignment" value="Right" />
+            <attribute name="Vert Alignment" value="Bottom" />
+            <element type="Window" internal="true" popup="true" style="none">
+                <element type="ListView" internal="true" style="none">
+                    <element type="BorderImage" internal="true" style="none">
+                        <element internal="true" style="none">
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Box" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Sphere" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Plane" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Cylinder" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Cone" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="TeaPot" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                        </element>
+                    </element>
+                </element>
+            </element>                           
+        </element>
     </element>
     <element type="BorderImage" style="EditorDivider" />
     <element>
@@ -82,6 +88,7 @@
                 <element style="Panel">
                     <element type="Text">
                         <attribute name="Text" value="Techniques" />
+                        <attribute name="Auto Localizable" value="true" />
                     </element>
                     <element type="ListView">
                         <attribute name="Name" value="TechniqueList" />
@@ -99,6 +106,7 @@
                             <attribute name="Layout Border" value="1 1 1 1" />
                             <element type="Text">
                                 <attribute name="Text" value="New" />
+                                <attribute name="Auto Localizable" value="true" />
                                 <attribute name="Text Alignment" value="Center" />
                             </element>
                         </element>
@@ -108,6 +116,7 @@
                             <attribute name="Layout Border" value="1 1 1 1" />
                             <element type="Text">
                                 <attribute name="Text" value="Del" />
+                                <attribute name="Auto Localizable" value="true" />
                                 <attribute name="Text Alignment" value="Center" />
                             </element>
                         </element>
@@ -117,6 +126,7 @@
                             <attribute name="Layout Border" value="1 1 1 1" />
                             <element type="Text">
                                 <attribute name="Text" value="Sort" />
+                                <attribute name="Auto Localizable" value="true" />
                                 <attribute name="Text Alignment" value="Center" />
                             </element>
                         </element>
@@ -126,6 +136,7 @@
                 <element style="Panel">
                     <element type="Text">
                         <attribute name="Text" value="Textures" />
+                        <attribute name="Auto Localizable" value="true" />
                     </element>
                     <element type="ListView">
                         <attribute name="Name" value="TextureList" />
@@ -136,6 +147,7 @@
                 <element style="Panel">
                     <element type="Text">
                         <attribute name="Text" value="Shader parameters" />
+                        <attribute name="Auto Localizable" value="true" />
                     </element>
                     <element type="ListView">
                         <attribute name="Name" value="ShaderParameterList" />
@@ -159,6 +171,7 @@
                             </element>
                             <element type="Text">
                                 <attribute name="Text" value="New" />
+                                <attribute name="Auto Localizable" value="true" />
                                 <attribute name="Text Alignment" value="Center" />
                             </element>
                             <!-- Skip style processing as the purpose of below tags is to populate the content element -->
@@ -191,6 +204,7 @@
                             <attribute name="Layout Border" value="1 1 1 1" />
                             <element type="Text">
                                 <attribute name="Text" value="Del" />
+                                <attribute name="Auto Localizable" value="true" />
                                 <attribute name="Text Alignment" value="Center" />
                             </element>
                         </element>
@@ -326,6 +340,7 @@
             <attribute name="Layout Border" value="1 1 1 1" />
             <element type="Text">
                 <attribute name="Text" value="New" />
+                <attribute name="Auto Localizable" value="true" />
                 <attribute name="Text Alignment" value="Center" />
             </element>
         </element>
@@ -335,6 +350,7 @@
             <attribute name="Layout Border" value="1 1 1 1" />
             <element type="Text">
                 <attribute name="Text" value="Revert" />
+                <attribute name="Auto Localizable" value="true" />
                 <attribute name="Text Alignment" value="Center" />
             </element>
         </element>
@@ -344,6 +360,7 @@
             <attribute name="Layout Border" value="1 1 1 1" />
             <element type="Text">
                 <attribute name="Text" value="Save" />
+                <attribute name="Auto Localizable" value="true" />
                 <attribute name="Text Alignment" value="Center" />
             </element>
         </element>
@@ -353,6 +370,7 @@
             <attribute name="Layout Border" value="1 1 1 1" />
             <element type="Text">
                 <attribute name="Text" value="Save as" />
+                <attribute name="Auto Localizable" value="true" />
                 <attribute name="Text Alignment" value="Center" />
             </element>
         </element>

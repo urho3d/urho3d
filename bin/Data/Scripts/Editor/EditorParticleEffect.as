@@ -701,7 +701,7 @@ void PickEditParticleEffectMaterial(StringHash eventType, VariantMap& eventData)
     String lastPath = resourcePicker.lastPath;
     if (lastPath.empty)
         lastPath = sceneResourcePath;
-    CreateFileSelector("Pick " + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
+    CreateFileSelector(localization.Get("Pick ") + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter, false);
     SubscribeToEvent(uiFileSelector, "FileSelected", "PickEditParticleEffectMaterialDone");
 }
 
@@ -955,6 +955,7 @@ void RefreshParticleEffectColorFrames()
         textContainer.AddChild(t);
         t.style = "Text";
         t.text = "Color";
+        t.autoLocalizable = true;
 
         UIElement@ editContainer = UIElement();
         container.AddChild(editContainer);
@@ -1076,6 +1077,7 @@ void RefreshParticleEffectTextureFrames()
         textContainer.AddChild(t);
         t.style = "Text";
         t.text = "Texture";
+        t.autoLocalizable = true;
 
         UIElement@ editContainer = UIElement();
         container.AddChild(editContainer);
@@ -1234,7 +1236,7 @@ void RefreshParticleEffectName()
         nameEdit.text = editParticleEffect.name;
     SubscribeToEvent(nameEdit, "TextFinished", "EditParticleEffectName");
 
-    Button@ pickButton = CreateResourcePickerButton(container, null, 0, 0, "Pick");
+    Button@ pickButton = CreateResourcePickerButton(container, null, 0, 0, "smallButtonPick");
     SubscribeToEvent(pickButton, "Released", "PickEditParticleEffect");
 }
 
@@ -1329,7 +1331,7 @@ void RefreshParticleEffectMaterial()
 
     SubscribeToEvent(nameEdit, "TextFinished", "EditParticleEffectMaterial");
 
-    Button@ pickButton = CreateResourcePickerButton(container, null, 0, 0, "Pick");
+    Button@ pickButton = CreateResourcePickerButton(container, null, 0, 0, "smallButtonPick");
     SubscribeToEvent(pickButton, "Released", "PickEditParticleEffectMaterial");
 }
 
@@ -1376,7 +1378,7 @@ void PickEditParticleEffect()
     String lastPath = resourcePicker.lastPath;
     if (lastPath.empty)
         lastPath = sceneResourcePath;
-    CreateFileSelector("Pick " + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
+    CreateFileSelector(localization.Get("Pick ") + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter, false);
     SubscribeToEvent(uiFileSelector, "FileSelected", "PickEditParticleEffectDone");
 }
 

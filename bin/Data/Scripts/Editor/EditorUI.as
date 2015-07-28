@@ -298,7 +298,7 @@ void CreateMenuBar()
         PopulateMruScenes();
         CreateChildDivider(popup);
 
-        Menu@ childMenu = CreateMenuItem("Load node", null, SHOW_POPUP_INDICATOR);
+        Menu@ childMenu = CreateMenuItem("menu Load node", null, SHOW_POPUP_INDICATOR);
         Window@ childPopup = CreatePopup(childMenu);
         childPopup.AddChild(CreateMenuItem("As replicated...", @PickFile, 0, 0, true, "Load node as replicated..."));
         childPopup.AddChild(CreateMenuItem("As local...", @PickFile, 0, 0, true, "Load node as local..."));
@@ -336,7 +336,7 @@ void CreateMenuBar()
         if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
             popup.AddChild(CreateMenuItem("Delete", @Delete, KEY_DELETE, QUAL_ANY));
         else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
-            popup.AddChild(CreateMenuItem("Delete", @Delete, 'X', QUAL_ANY));
+            popup.AddChild(CreateMenuItem("Delete", @BlenderModeDelete, 'X', QUAL_ANY));
         
         popup.AddChild(CreateMenuItem("Select all", @SelectAll, 'A', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Deselect all", @DeselectAll, 'A', QUAL_SHIFT | QUAL_CTRL));
@@ -363,7 +363,7 @@ void CreateMenuBar()
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'E', QUAL_CTRL));
             popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'E', QUAL_ALT));
         }
-        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) 
+        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
         {
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'H'));
             popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'H', QUAL_ALT));
@@ -386,8 +386,14 @@ void CreateMenuBar()
         //else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
         //    popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
         
-        if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+        if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) 
+        {
              popup.AddChild(CreateMenuItem("Move to layer", @ShowLayerMover, 'M'));
+             popup.AddChild(CreateMenuItem("Smart Duplicate", @SceneSmartDuplicateNode, 'D', QUAL_ALT));
+             popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_KP_PERIOD));                     
+        }
+        
+        CreateChildDivider(popup);
         
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
         CreateChildDivider(popup);
@@ -572,7 +578,7 @@ bool PickFile()
     else if (action == "As replicated..." || action == "Load node as replicated...")
     {
         instantiateMode = REPLICATED;
-        CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
+        CreateFileSelector("fileSelector Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
         SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
     }
     else if (action == "As local..." || action == "Load node as local...")
@@ -740,7 +746,7 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
         menuCallbacks[variant.GetUInt()]();
 }
 
-Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int accelKey = 0, int accelQual = 0, bool addToQuickMenu = true, String quickMenuText="")
+Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int accelKey = 0, int accelQual = 0, bool addToQuickMenu = true, String quickMenuText="", bool autoLocalize = true)
 {
     Menu@ menu = Menu(title);
     menu.defaultStyle = uiStyle;
@@ -758,7 +764,7 @@ Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int 
     menu.AddChild(menuText);
     menuText.style = "EditorMenuText";
     menuText.text = title;
-    menuText.autoLocalizable = true;
+    menuText.autoLocalizable = autoLocalize;
 
     if (addToQuickMenu)
         AddQuickMenuItem(callback, quickMenuText.empty ? title : quickMenuText);
@@ -961,15 +967,20 @@ void FinalizedPopupMenu(Window@ popup)
 }
 
 void CreateFileSelector(const String&in title, const String&in ok, const String&in cancel, const String&in initialPath, Array<String>@ filters,
-    uint initialFilter)
+    uint initialFilter, bool autoLocalizeTitle = true)
 {
     // Within the editor UI, the file selector is a kind of a "singleton". When the previous one is overwritten, also
     // the events subscribed from it are disconnected, so new ones are safe to subscribe.
     uiFileSelector = FileSelector();
     uiFileSelector.defaultStyle = uiStyle;
     uiFileSelector.title = title;
+    uiFileSelector.titleText.autoLocalizable = autoLocalizeTitle;
     uiFileSelector.path = initialPath;
     uiFileSelector.SetButtonTexts(ok, cancel);
+    Text@ okText = cast<Text>(uiFileSelector.okButton.children[0]);
+    okText.autoLocalizable = true;
+    Text@ cancelText = cast<Text>(uiFileSelector.cancelButton.children[0]);
+    cancelText.autoLocalizable = true;
     uiFileSelector.SetFilters(filters, initialFilter);
     CenterDialog(uiFileSelector.window);
 }
@@ -1250,6 +1261,7 @@ void HandleHotKeysBlender( VariantMap& eventData )
     }
     else if (key == KEY_KP_5 && ui.focusElement is null)
     {
+        activeViewport.camera.zoom = 1;
         activeViewport.ToggleOrthographic();
     }
     else if (key == '4')
@@ -1329,13 +1341,20 @@ void HandleHotKeysBlender( VariantMap& eventData )
                 }
                 else if (key == KEY_F) 
                 {
-                    Vector3 center = Vector3(0,0,0);
-                    
-                    if (selectedNodes.length > 0)
-                        center = SelectedNodesCenterPoint(); 
-                    
-                    cameraNode.LookAt(center);
-                    ReacquireCameraYawPitch(); 
+                    if (camera.orthographic) 
+                    {
+                        viewCloser = true;
+                    }
+                    else
+                    {
+                        Vector3 center = Vector3(0,0,0);
+                        
+                        if (selectedNodes.length > 0)
+                            center = SelectedNodesCenterPoint(); 
+                        
+                        cameraNode.LookAt(center);
+                        ReacquireCameraYawPitch();
+                    } 
                 }
          }  
     }
@@ -1491,7 +1510,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 }
 
 void UnfadeUI()
-{
+{    
     FadeUI(false);
 }
 
@@ -1637,7 +1656,7 @@ void PopulateMruScenes()
     {
         recentSceneMenu.enabled = true;
         for (uint i=0; i < uiRecentScenes.length; ++i)
-            mruScenesPopup.AddChild(CreateMenuItem(uiRecentScenes[i], @LoadMostRecentScene, 0, 0, false));
+            mruScenesPopup.AddChild(CreateMenuItem(uiRecentScenes[i], @LoadMostRecentScene, 0, 0, false, "", false));
     }
     else
         recentSceneMenu.enabled = false;

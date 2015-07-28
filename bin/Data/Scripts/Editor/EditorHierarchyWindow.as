@@ -496,7 +496,7 @@ void SelectNode(Node@ node, bool multiselect)
         hierarchyList.ClearSelection();
         return;
     }
-
+    
     lastSelectedNode = node;
     uint index = GetListIndex(node);
     uint numItems = hierarchyList.numItems;
@@ -626,7 +626,7 @@ void HandleHierarchyListSelectionChange()
         else if (type == ITEM_NODE)
         {
             Node@ node = GetListNode(index);
-            if (node !is null)
+            if (node !is null) 
                 selectedNodes.Push(node);
         }
         else if (type == ITEM_UI_ELEMENT)
@@ -636,7 +636,7 @@ void HandleHierarchyListSelectionChange()
                 selectedUIElements.Push(element);
         }
     }
-
+    
     // If only one node/UIElement selected, use it for editing
     if (selectedNodes.length == 1)
         editNode = selectedNodes[0];
@@ -1530,6 +1530,20 @@ bool Paste()
     return false;
 }
 
+bool BlenderModeDelete() 
+{
+    // In this place maybe placed avoidance flags that not allow delete in some cases
+    
+    Array<UIElement@> actions;
+    actions.Push(CreateContextMenuItem("Delete?", "HandleBlenderModeDelete"));
+    if (actions.length > 0) {
+        ActivateContextMenu(actions);
+        return true;
+    }
+
+    return false;
+}
+
 bool Delete()
 {
     if (CheckHierarchyWindowFocus())
@@ -1663,6 +1677,11 @@ void HandleHierarchyContextCut()
 }
 
 void HandleHierarchyContextDelete()
+{
+    Delete();
+}
+
+void HandleBlenderModeDelete() 
 {
     Delete();
 }

@@ -289,7 +289,7 @@ void Node::SetScale(float scale)
 
 void Node::SetScale(const Vector3& scale)
 {
-    scale_ = scale.Abs();
+    scale_ = scale;
     MarkDirty();
 
     MarkNetworkUpdate();

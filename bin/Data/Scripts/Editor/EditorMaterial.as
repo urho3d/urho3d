@@ -105,10 +105,8 @@ void InitMaterialPreview()
 void InitModelPreviewList()
 {
     DropDownList@ modelPreview = materialWindow.GetChild("ModelPreview", true);
-    
+    modelPreview.selection = 1;
     SubscribeToEvent(materialWindow.GetChild("ModelPreview", true), "ItemSelected", "EditModelPreviewChange");
-    
-
 }
 
 void EditMaterial(Material@ mat)
@@ -150,7 +148,7 @@ void RefreshMaterialName()
         nameEdit.text = editMaterial.name;
     SubscribeToEvent(nameEdit, "TextFinished", "EditMaterialName");
 
-    Button@ pickButton = CreateResourcePickerButton(container, null, 0, 0, "Pick");
+    Button@ pickButton = CreateResourcePickerButton(container, null, 0, 0, "smallButtonPick");
     SubscribeToEvent(pickButton, "Released", "PickEditMaterial");
 }
 
@@ -177,9 +175,9 @@ void RefreshMaterialTechniques(bool fullUpdate = true)
             LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, i, 0);
             nameEdit.name = "TechniqueNameEdit" + String(i);
 
-            Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "Pick");
+            Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "smallButtonPick");
             SubscribeToEvent(pickButton, "Released", "PickMaterialTechnique");
-            Button@ openButton = CreateResourcePickerButton(container, null, i, 0, "Open");
+            Button@ openButton = CreateResourcePickerButton(container, null, i, 0, "smallButtonOpen");
             SubscribeToEvent(openButton, "Released", "OpenResource");
 
             if (entry.technique !is null)
@@ -246,9 +244,9 @@ void RefreshMaterialTextures(bool fullUpdate = true)
             LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, i, 0);
             nameEdit.name = "TextureNameEdit" + String(i);
 
-            Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "Pick");
+            Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "smallButtonPick");
             SubscribeToEvent(pickButton, "Released", "PickMaterialTexture");
-            Button@ openButton = CreateResourcePickerButton(container, null, i, 0, "Open");
+            Button@ openButton = CreateResourcePickerButton(container, null, i, 0, "smallButtonOpen");
             SubscribeToEvent(openButton, "Released", "OpenResource");
 
             if (editMaterial !is null)
@@ -375,7 +373,7 @@ void PickEditMaterial()
     String lastPath = resourcePicker.lastPath;
     if (lastPath.empty)
         lastPath = sceneResourcePath;
-    CreateFileSelector("Pick " + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
+    CreateFileSelector(localization.Get("Pick ") + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter, false);
     SubscribeToEvent(uiFileSelector, "FileSelected", "PickEditMaterialDone");
 }
 
@@ -616,7 +614,7 @@ void PickMaterialTexture(StringHash eventType, VariantMap& eventData)
     String lastPath = resourcePicker.lastPath;
     if (lastPath.empty)
         lastPath = sceneResourcePath;
-    CreateFileSelector("Pick " + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
+    CreateFileSelector(localization.Get("Pick ") + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter, false);
     SubscribeToEvent(uiFileSelector, "FileSelected", "PickMaterialTextureDone");
 }
 
@@ -707,7 +705,7 @@ void PickMaterialTechnique(StringHash eventType, VariantMap& eventData)
     String lastPath = resourcePicker.lastPath;
     if (lastPath.empty)
         lastPath = sceneResourcePath;
-    CreateFileSelector("Pick " + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
+    CreateFileSelector(localization.Get("Pick ") + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter, false);
     SubscribeToEvent(uiFileSelector, "FileSelected", "PickMaterialTechniqueDone");
 }
 

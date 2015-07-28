@@ -379,22 +379,22 @@ UIElement@ CreateResourceRefAttributeEditor(ListView@ list, Array<Serializable@>
     {
         if ((picker.actions & ACTION_PICK) != 0)
         {
-            Button@ pickButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Pick");
+            Button@ pickButton = CreateResourcePickerButton(container, serializables, index, subIndex, "smallButtonPick");
             SubscribeToEvent(pickButton, "Released", "PickResource");
         }
         if ((picker.actions & ACTION_OPEN) != 0)
         {
-            Button@ openButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Open");
+            Button@ openButton = CreateResourcePickerButton(container, serializables, index, subIndex, "smallButtonOpen");
             SubscribeToEvent(openButton, "Released", "OpenResource");
         }
         if ((picker.actions & ACTION_EDIT) != 0)
         {
-            Button@ editButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Edit");
+            Button@ editButton = CreateResourcePickerButton(container, serializables, index, subIndex, "smallButtonEdit");
             SubscribeToEvent(editButton, "Released", "EditResource");
         }
         if ((picker.actions & ACTION_TEST) != 0)
         {
-            Button@ testButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Test");
+            Button@ testButton = CreateResourcePickerButton(container, serializables, index, subIndex, "smallButtonTest");
             SubscribeToEvent(testButton, "Released", "TestResource");
         }
     }
@@ -417,6 +417,7 @@ Button@ CreateResourcePickerButton(UIElement@ container, Array<Serializable@>@ s
     buttonText.style = "EditorAttributeText";
     buttonText.SetAlignment(HA_CENTER, VA_CENTER);
     buttonText.text = text;
+    buttonText.autoLocalizable = true;
 
     return button;
 }
@@ -1197,7 +1198,7 @@ void PickResource(StringHash eventType, VariantMap& eventData)
     String lastPath = resourcePicker.lastPath;
     if (lastPath.empty)
         lastPath = sceneResourcePath;
-    CreateFileSelector("Pick " + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
+    CreateFileSelector(localization.Get("Pick ") + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter, false);
     SubscribeToEvent(uiFileSelector, "FileSelected", "PickResourceDone");
 }
 
