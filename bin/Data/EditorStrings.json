@@ -1,159 +1,199 @@
 {
 	"Language":{
 		"en":"Language",
-		"ru":"Язык"
+        "ru": "Язык",
+        "fr": "Langage"
+
 	},
 	"Open scene...":{
 		"en":"Open scene...",
-		"ru":"Открыть сцену..."
+        "ru": "Открыть сцену...",
+        "fr": "Ouvrir une scène"
 	},
 	"Save scene":{
 		"en":"Save scene",
-		"ru":"Сохранить сцену"
+        "ru": "Сохранить сцену",
+        "fr": "Sauvegarder la scène"
 	},
 	"Save scene as...":{
 		"en":"Save scene as...",
-		"ru":"Сохранить сцену как..."
+        "ru": "Сохранить сцену как...",
+        "fr": "Sauvegarder la scène comme..."
 	},
 	"Open recent scene":{
 		"en":"Open recent scene",
-		"ru":"Открыть прежнюю сцену"
+        "ru": "Открыть прежнюю сцену",
+        "fr": "Ouvrir la scène récente"
 	},
 	"menu Load node":{
 		"en":"Load node",
-		"ru":"Загрузить ноду"
+        "ru": "Загрузить ноду",
+        "fr": "Charger la node"
 	},
 	"As replicated...":{
 		"en":"As replicated...",
-		"ru":"Реплицируемую..."
+        "ru": "Реплицируемую...",
+        "fr": "Duplicata..."
 	},
 	"As local...":{
 		"en":"As local...",
-		"ru":"Локальную..."
+        "ru": "Локальную...",
+        "fr": "Comme local..."
 	},
 	"Save node as...":{
 		"en":"Save node as...",
-		"ru":"Сохранить ноду как..."
+        "ru": "Сохранить ноду как...",
+        "fr": "Sauvegarder la node comme..."
 	},
 	"Import model...":{
 		"en":"Import model...",
-		"ru":"Импортировать модель..."
+        "ru": "Импортировать модель..."
+        "fr": "Importer un modèle..."
 	},
 	"Import scene...":{
 		"en":"Import scene...",
-		"ru":"Импортировать сцену..."
+        "ru": "Импортировать сцену...",
+        "fr": "Importer une scène..."
 	},
 	"Run script...":{
 		"en":"Run script...",
-		"ru":"Запустить скрипт..."
+        "ru": "Запустить скрипт...",
+        "fr": "Exécuter un script..."
 	},
 	"Set resource path...":{
 		"en":"Set resource path...",
-		"ru":"Указать путь к ресурсам..."
+        "ru": "Указать путь к ресурсам...",
+        "fr": "Fixer le chemin des ressources..."
 	},
 	"Exit":{
 		"en":"Exit",
-		"ru":"Выход"
+        "ru": "Выход",
+        "fr": "Quitter"
 	},
 	"Edit":{
 		"en":"Edit",
-		"ru":"Редактирование"
+        "ru": "Редактирование",
+        "fr": "Éditer"
 	},
 	"Undo":{
 		"en":"Undo",
-		"ru":"Отменить"
+        "ru": "Отменить",
+        "fr": "Annuler"
 	},
 	"Redo":{
 		"en":"Redo",
-		"ru":"Повторить"
+        "ru": "Повторить",
+        "fr": "Refaire"
 	},
 	"Cut":{
 		"en":"Cut",
-		"ru":"Вырезать"
+        "ru": "Вырезать",
+        "fr": "Couper"
 	},
 	"Duplicate":{
 		"en":"Duplicate",
-		"ru":"Дублировать"
+        "ru": "Дублировать",
+        "fr": "Dupliquer"
 	},
 	"Copy":{
 		"en":"Copy",
-		"ru":"Копировать"
+        "ru": "Копировать",
+        "fr": "Copier"
 	},
 	"Paste":{
 		"en":"Paste",
-		"ru":"Вставить"
+        "ru": "Вставить",
+        "fr": "Coller"
 	},
 	"Delete":{
 		"en":"Delete",
-		"ru":"Удалить"
+        "ru": "Удалить",
+        "fr": "Effacer"
 	},
 	"Select all":{
 		"en":"Select all",
-		"ru":"Выделить всё"
+        "ru": "Выделить всё",
+        "fr": "Tout sélectionner"
 	},
 	"Deselect all":{
 		"en":"Deselect all",
-		"ru":"Снять все выделения"
+        "ru": "Снять все выделения",
+        "fr": "Tout désélectionner"
 	},
 	"Reset to default":{
 		"en":"Reset to default",
-		"ru":"Сбросить"
+        "ru": "Сбросить",
+        "fr": "Ré-initiliser par défaut"
 	},
 	"Reset position":{
 		"en":"Reset position",
-		"ru":"Сбросить положение"
+        "ru": "Сбросить положение",
+        "fr": "Ré-initiliser la position"
 	},
 	"Reset rotation":{
 		"en":"Reset rotation",
-		"ru":"Сбросить поворот"
+        "ru": "Сбросить поворот",
+        "fr": "Ré-initiliser la rotation"
 	},
 	"Reset scale":{
 		"en":"Reset scale",
-		"ru":"Сбросить масштаб"
+        "ru": "Сбросить масштаб",
+        "fr": "Ré-initialiser l'échelle"
 	},
 	"Enable/disable":{
 		"en":"Enable/disable",
-		"ru":"Включить/Отключить"
+        "ru": "Включить/Отключить",
+        "fr": "Activer/Désactiver"
 	},
 	"Unparent":{
 		"en":"Unparent",
-		"ru":"Разорвать родительскую связь"
+        "ru": "Разорвать родительскую связь",
+        "fr": "Dé-parenter"
 	},
 	"Toggle update":{
 		"en":"Toggle update",
-		"ru":"Вкл/откл обновление"
+        "ru": "Вкл/откл обновление",
+        "fr": "Basculer la mise à jour"
 	},
 	"Stop test animation":{
 		"en":"Stop test animation",
-		"ru":"Остановить тестовую анимацию"
+        "ru": "Остановить тестовую анимацию",
+        "fr": "Arrêt du test d'animation"
 	},
 	"Rebuild navigation data":{
 		"en":"Rebuild navigation data",
-		"ru":"Реконструировать навигационные данные"
+        "ru": "Реконструировать навигационные данные",
+        "fr": "Recontruire les données de navigation"
 	},
 	"Add children to SM-group":{
 		"en":"Add children to SM-group",
-		"ru":"Добавить потомка к StaticModelGroup"
+        "ru": "Добавить потомка к StaticModelGroup",
+        "fr": "Ajouter l'enfant au groupe de modèle statique"
 	},
 	"Set children as spline path":{
 		"en":"Set children as spline path",
-		"ru":"Установить потомка как сплайновый путь"
+        "ru": "Установить потомка как сплайновый путь",
+        "fr": "Fixer l'enfant comme un chemin spline"
 	},
 	"Non-cyclic":{
 		"en":"Non-cyclic",
-		"ru":"Нецикличный"
+        "ru": "Нецикличный",
+        "fr": "Non-cyclique"
 	},
 	"Cyclic":{
 		"en":"Cyclic",
-		"ru":"Цикличный"
+        "ru": "Цикличный",
+        "fr": "Cyclique"
 	},
 	"Create":{
 		"en":"Create",
-		"ru":"Создать"
+        "ru": "Создать",
+        "fr": "Créer"
 	},
 	"Replicated node":{
 		"en":"Replicated node",
-		"ru":"Реплицируемая нода"
+        "ru": "Реплицируемая нода",
+        "fr": "Node répliquée"
 	},
 	"Local node":{
 		"en":"Local node",
