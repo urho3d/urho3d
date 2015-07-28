@@ -10,6 +10,8 @@ Array<QuickMenuItem@> quickMenuItems;
 FileSelector@ uiFileSelector;
 String consoleCommandInterpreter;
 Window@ contextMenu;
+float stepColoringGroupUpdate = 100; // ms
+float timeToNextColoringGroupUpdate = 0;
 
 const StringHash UI_ELEMENT_TYPE("UIElement");
 const StringHash WINDOW_TYPE("Window");
@@ -97,7 +99,7 @@ void CreateUI()
     SubscribeToEvent("ChangeLanguage", "HandleChangeLanguage");
     
     SubscribeToEvent("WheelChangeColor", "HandleWheelChangeColor" );
-    SubscribeToEvent("WheelSelectColor", "HandleWheelWheelSelectColor" );
+    SubscribeToEvent("WheelSelectColor", "HandleWheelSelectColor" );
     SubscribeToEvent("WheelDiscardColor", "HandleWheelDiscardColor" );
 }
 
@@ -1518,10 +1520,15 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 // color was changed, update color of all colorGroup for immidiate preview; 
 void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
 {
-    Color c = eventData["Color"].GetColor(); 
+    //time.elapsedTime 
+    if (timeToNextColoringGroupUpdate > time.systemTime) return;
+     
+    //delayColoringGroupUpdate) 
     
     if (coloringGroup.length > 0) 
     {
+        Color c = eventData["Color"].GetColor(); 
+    
         //MessageBox("HandleWheelChangeColor");
         // preview new color for all
         for (int i=0; i < coloringGroup.length; i++) 
@@ -1557,6 +1564,8 @@ void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
                     
         } 
     }
+    
+    timeToNextColoringGroupUpdate = time.systemTime + stepColoringGroupUpdate;
 }
 
 // Return old colors, wheel was closed or color discarted 
@@ -1597,6 +1606,7 @@ void HandleWheelDiscardColor(StringHash eventType, VariantMap& eventData)
                 }   
             }
             
+            
             attributesDirty = true; 
         }
         
@@ -1604,7 +1614,8 @@ void HandleWheelDiscardColor(StringHash eventType, VariantMap& eventData)
         coloringGroup.Clear(); 
     }
 }
-void HandleWheelWheelSelectColor(StringHash eventType, VariantMap& eventData)
+
+void HandleWheelSelectColor(StringHash eventType, VariantMap& eventData)
 {
     if (coloringGroup.length > 0) 
     {
