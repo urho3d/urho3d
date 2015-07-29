@@ -1531,17 +1531,17 @@ void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
             Light@ light = cast<Light>(coloringComponent);
             if (light !is null) 
             {          
-                if (coloringPropertyName == "Light color")
+                if (coloringPropertyName == localization.Get("Light color"))
                 {
                     light.color = c;
                 }
-                else if (coloringPropertyName == "Specular intensity")
+                else if (coloringPropertyName == localization.Get("Specular intensity"))
                 {
                    // multiply out 
                    light.specularIntensity = c.Value() * 10.0f;
 
                 }
-                else if (coloringPropertyName == "Brightness multipler")
+                else if (coloringPropertyName == localization.Get("Brightness multiplier"))
                 {
                    light.brightness = c.Value() * 10.0f;
                    
@@ -1558,7 +1558,7 @@ void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
                 Material@ mat = model.materials[0];
                 if (mat !is null) 
                 { 
-                    if (coloringPropertyName == "MatDiffColor")
+                    if (coloringPropertyName == localization.Get("Diffuse color"))
                     {   
                         Variant oldValue = mat.shaderParameters["MatDiffColor"];
                         Variant newValue;
@@ -1573,7 +1573,7 @@ void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
                         newValue.FromString(oldValue.type, valueString);    
                         mat.shaderParameters["MatDiffColor"] = newValue;
                     }
-                    else if (coloringPropertyName == "MatSpecColor")
+                    else if (coloringPropertyName == localization.Get("Specular color"))
                     { 
                         Variant oldValue = mat.shaderParameters["MatSpecColor"];
                         Variant newValue;
@@ -1588,7 +1588,7 @@ void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
                         newValue.FromString(oldValue.type, valueString);    
                         mat.shaderParameters["MatSpecColor"] = newValue;
                     }
-                    else if (coloringPropertyName == "MatEmissiveColor")
+                    else if (coloringPropertyName == localization.Get("Emissive color"))
                     {
                         Variant oldValue = mat.shaderParameters["MatEmissiveColor"];
                         Variant newValue;
@@ -1603,7 +1603,7 @@ void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
                         newValue.FromString(oldValue.type, valueString);    
                         mat.shaderParameters["MatEmissiveColor"] = newValue;
                     }
-                    else if (coloringPropertyName == "MatEnvMapColor")
+                    else if (coloringPropertyName == localization.Get("Environment map color"))
                     {
                         Variant oldValue = mat.shaderParameters["MatEnvMapColor"];
                         Variant newValue;
@@ -1626,11 +1626,11 @@ void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
             Zone@ zone  = cast<Zone>(coloringComponent);
             if (zone !is null) 
             {
-                if (coloringPropertyName == "Ambient color")
+                if (coloringPropertyName == localization.Get("Ambient color"))
                 {
                     zone.ambientColor = c;
                 }
-                else if (coloringPropertyName == "Fog color") 
+                else if (coloringPropertyName == localization.Get("Fog color")) 
                 {
                     zone.fogColor = c;
                 }
@@ -1655,16 +1655,16 @@ void HandleWheelDiscardColor(StringHash eventType, VariantMap& eventData)
             Light@ light = cast<Light>(coloringComponent);
             if (light !is null) 
             {          
-                if (coloringPropertyName == "Light color")
+                if (coloringPropertyName == localization.Get("Light color"))
                 {
                     light.color = oldColor;
                 }
-                else if (coloringPropertyName == "Specular intensity")
+                else if (coloringPropertyName == localization.Get("Specular intensity"))
                 {
                    light.specularIntensity = coloringOldScalar * 10.0f;
 
                 }
-                else if (coloringPropertyName == "Brightness multipler")
+                else if (coloringPropertyName == localization.Get("Brightness multiplier"))
                 {
                    light.brightness = coloringOldScalar * 10.0f;
                    
@@ -1681,7 +1681,7 @@ void HandleWheelDiscardColor(StringHash eventType, VariantMap& eventData)
                 Material@ mat = model.materials[0];
                 if (mat !is null) 
                 {                 
-                    if (coloringPropertyName == "MatDiffColor")
+                    if (coloringPropertyName == localization.Get("Diffuse color"))
                     {   
                         Variant oldValue = mat.shaderParameters["MatDiffColor"];
                         Variant newValue;
@@ -1696,7 +1696,7 @@ void HandleWheelDiscardColor(StringHash eventType, VariantMap& eventData)
                         newValue.FromString(oldValue.type, valueString);    
                         mat.shaderParameters["MatDiffColor"] = newValue;
                     }
-                    else if (coloringPropertyName == "MatSpecColor")
+                    else if (coloringPropertyName == localization.Get("Specular color"))
                     { 
                         Variant oldValue = mat.shaderParameters["MatSpecColor"];
                         Variant newValue;
@@ -1711,7 +1711,7 @@ void HandleWheelDiscardColor(StringHash eventType, VariantMap& eventData)
                         newValue.FromString(oldValue.type, valueString);    
                         mat.shaderParameters["MatSpecColor"] = newValue;
                     }
-                    else if (coloringPropertyName == "MatEmissiveColor")
+                    else if (coloringPropertyName == localization.Get("Emissive color"))
                     {
                         Variant oldValue = mat.shaderParameters["MatEmissiveColor"];
                         Variant newValue;
@@ -1726,7 +1726,7 @@ void HandleWheelDiscardColor(StringHash eventType, VariantMap& eventData)
                         newValue.FromString(oldValue.type, valueString);    
                         mat.shaderParameters["MatEmissiveColor"] = newValue;
                     }
-                    else if (coloringPropertyName == "MatEnvMapColor")
+                    else if (coloringPropertyName == localization.Get("Environment map color"))
                     {
                         Variant oldValue = mat.shaderParameters["MatEnvMapColor"];
                         Variant newValue;
@@ -1749,11 +1749,11 @@ void HandleWheelDiscardColor(StringHash eventType, VariantMap& eventData)
             Zone@ zone  = cast<Zone>(coloringComponent);
             if (zone !is null) 
             {
-                if (coloringPropertyName == "Ambient color")
+                if (coloringPropertyName == localization.Get("Ambient color"))
                 {
                     zone.ambientColor = oldColor;
                 }
-                else if (coloringPropertyName == "Fog color") 
+                else if (coloringPropertyName == localization.Get("Fog color")) 
                 {
                     zone.fogColor = oldColor;
                 }
@@ -1779,8 +1779,7 @@ void HandleWheelSelectColor(StringHash eventType, VariantMap& eventData)
             {
                 //BeginMaterialEdit();
                 editMaterial = mat;
-                SaveMaterial();
-                
+                SaveMaterial(); 
                 //EndMaterialEdit();
                 //RefreshMaterialShaderParameters();                        
             }
@@ -2086,28 +2085,28 @@ bool ColorWheelBuildMenuSelectTypeColor()
     if (coloringComponent.typeName == "Light") 
     {
         
-        actions.Push(CreateContextMenuItem("Light color", "HandleColorWheelMenu"));
-        actions.Push(CreateContextMenuItem("Specular intensity", "HandleColorWheelMenu"));
-        actions.Push(CreateContextMenuItem("Brightness multipler", "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem(localization.Get("Light color"), "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem(localization.Get("Specular intensity"), "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem(localization.Get("Brightness multiplier"), "HandleColorWheelMenu"));
         
-        actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem(localization.Get("Cancel"), "HandleColorWheelMenu"));
         
     }
     else if (coloringComponent.typeName == "StaticModel") 
     {
-        actions.Push(CreateContextMenuItem("MatDiffColor", "HandleColorWheelMenu"));
-        actions.Push(CreateContextMenuItem("MatSpecColor", "HandleColorWheelMenu"));
-        actions.Push(CreateContextMenuItem("MatEmissiveColor", "HandleColorWheelMenu"));
-        actions.Push(CreateContextMenuItem("MatEnvMapColor", "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem(localization.Get("Diffuse color"), "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem(localization.Get("Specular color"), "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem(localization.Get("Emissive color"), "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem(localization.Get("Environment map color"), "HandleColorWheelMenu"));
         
-        actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem(localization.Get("Cancel"), "HandleColorWheelMenu"));
     }
     else if (coloringComponent.typeName == "Zone")        
     {
-        actions.Push(CreateContextMenuItem("Ambient color", "HandleColorWheelMenu"));
-        actions.Push(CreateContextMenuItem("Fog color", "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem(localization.Get("Ambient color"), "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem(localization.Get("Fog color"), "HandleColorWheelMenu"));
         
-        actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem(localization.Get("Cancel"), "HandleColorWheelMenu"));
     }
     
     if (actions.length > 0) {

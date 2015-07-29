@@ -862,5 +862,61 @@
 	"  CameraFlyMode: ":{
 		"en":"  CameraFlyMode: ",
 		"ru":"  Камера в режиме полета: "
-	}
+	},
+	"Light color":{
+        "en":"Light color",
+        "ru":"Цвет источника света"
+	},
+    "Specular intensity":{
+        "en":"Specular intensity",
+        "ru":"Интенсивность бликов"
+	},
+    "Brightness multiplier":{
+        "en":"Brightness multiplier",
+        "ru":"Мультипликатор яркости"
+	},
+    "Ambient color":{
+        "en":"Ambient color",
+        "ru":"Цвет окружения"
+	},
+	"Fog color":{
+        "en":"Fog color",
+        "ru":"Цвет тумана"
+	},
+    "Move to layer":{
+        "en":"Move to layer",
+        "ru":"Переместить на слой"
+	},
+    "Smart Duplicate":{
+        "en":"Smart Duplicate",
+        "ru":"Дублирование со смещением"
+	},
+	"View closer":{
+        "en":"View closer",
+        "ru":"Показать поближе"
+	},
+    "Color wheel":{
+        "en":"Color wheel",
+        "ru":"Цветовое колесо"
+	},
+	"Diffuse color":{
+        "en":"Diffuse color",
+        "ru":"Диффузный цвет"
+	},
+	"Specular color":{
+        "en":"Specular color",
+        "ru":"Цвет отражения"
+	},
+    "Emissive color":{
+        "en":"Emissive color",
+        "ru":"Цвет самосвечения"
+	},
+	"Environment map color":{
+        "en":"Environment map color",
+        "ru":"Цвет карты окружения"
+	},
+	"Delete?":{
+        "en":"Delete?",
+        "ru":"Удалить?"
+	}	
 }

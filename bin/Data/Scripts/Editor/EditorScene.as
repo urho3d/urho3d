@@ -1373,31 +1373,28 @@ void CreateModelWithAnimatedModel(String filepath, Node@ parent)
 }
 
 bool ColorWheelSetupBehaviorForColoring()
-{
-    
+{    
     Menu@ menu = GetEventSender();
     if (menu is null)
         return false;
     
-    //MessageBox(menu.text);
     Text@ text = menu.children[0];
-    //MessageBox(text.text);
     
     coloringPropertyName = text.text;
     
-    if (coloringPropertyName == "Cancel") return false;
+    if (coloringPropertyName == localization.Get("Cancel")) return false;
     
     if (coloringComponent.typeName == "Light") 
     {
         Light@ light = cast<Light>(coloringComponent);
         if (light !is null) 
         {          
-            if (coloringPropertyName == "Light color")
+            if (coloringPropertyName == localization.Get("Light color"))
             {
                 coloringOldColor = light.color;
                 ShowColorWheelWithColor(coloringOldColor);
             }
-            else if (coloringPropertyName == "Specular intensity")
+            else if (coloringPropertyName == localization.Get("Specular intensity"))
             {
                coloringOldScalar = light.specularIntensity;
                 
@@ -1406,7 +1403,7 @@ bool ColorWheelSetupBehaviorForColoring()
                ShowColorWheelWithColor(Color(scaledSpecular,scaledSpecular,scaledSpecular));
 
             }
-            else if (coloringPropertyName == "Brightness multipler")
+            else if (coloringPropertyName == localization.Get("Brightness multiplier"))
             {
                coloringOldScalar = light.brightness;
                
@@ -1423,20 +1420,20 @@ bool ColorWheelSetupBehaviorForColoring()
             Material@ mat = model.materials[0];
             if (mat !is null) 
             { 
-                if (coloringPropertyName == "MatDiffColor")
+                if (coloringPropertyName == localization.Get("Diffuse color"))
                 {
                     Color color = mat.shaderParameters["MatDiffColor"].GetColor();
                     coloringOldColor = color;
                 }
-                else if (coloringPropertyName == "MatSpecColor")
+                else if (coloringPropertyName == localization.Get("Specular color"))
                 {
                     coloringOldColor = mat.shaderParameters["MatSpecColor"].GetColor();
                 }
-                else if (coloringPropertyName == "MatEmissiveColor")
+                else if (coloringPropertyName == localization.Get("Emissive color"))
                 {
                     coloringOldColor = mat.shaderParameters["MatEmissiveColor"].GetColor();
                 }
-                else if (coloringPropertyName == "MatEnvMapColor")
+                else if (coloringPropertyName == localization.Get("Environment map color"))
                 {
                     coloringOldColor = mat.shaderParameters["MatEnvMapColor"].GetColor();    
                 }
@@ -1450,11 +1447,11 @@ bool ColorWheelSetupBehaviorForColoring()
         Zone@ zone  = cast<Zone>(coloringComponent);
         if (zone !is null) 
         {
-            if (coloringPropertyName == "Ambient color")
+            if (coloringPropertyName == localization.Get("Ambient color"))
             {
                 coloringOldColor = zone.ambientColor;
             }
-            else if (coloringPropertyName == "Fog color") 
+            else if (coloringPropertyName == localization.Get("Fog color")) 
             {
                 coloringOldColor = zone.fogColor;
             }
