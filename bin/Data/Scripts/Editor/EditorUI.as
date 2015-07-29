@@ -99,7 +99,7 @@ void CreateUI()
     SubscribeToEvent("ChangeLanguage", "HandleChangeLanguage");
 
     SubscribeToEvent("WheelChangeColor", "HandleWheelChangeColor" );
-    //SubscribeToEvent("WheelSelectColor", "HandleWheelSelectColor" );
+    SubscribeToEvent("WheelSelectColor", "HandleWheelSelectColor" );
     SubscribeToEvent("WheelDiscardColor", "HandleWheelDiscardColor" );
 }
 
@@ -398,7 +398,7 @@ void CreateMenuBar()
              popup.AddChild(CreateMenuItem("Move to layer", @ShowLayerMover, 'M'));
              popup.AddChild(CreateMenuItem("Smart Duplicate", @SceneSmartDuplicateNode, 'D', QUAL_ALT));
              popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_KP_PERIOD));
-             popup.AddChild(CreateMenuItem("Color wheel", @SetColorForSelectedDrawable, 'W', QUAL_ALT));
+             popup.AddChild(CreateMenuItem("Color wheel", @ColorWheelBuildMenuSelectTypeColor, 'W', QUAL_ALT));
         }
 
         CreateChildDivider(popup);
@@ -1520,34 +1520,48 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 // color was changed, update color of all colorGroup for immediate preview;
 void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
 {
-    //time.elapsedTime
     if (timeToNextColoringGroupUpdate > time.systemTime) return;
 
-    if (coloringGroup.length > 0)
+    if (coloringComponent !is null)
     {
-        Color c = eventData["Color"].GetColor();
-
-        //MessageBox("HandleWheelChangeColor");
-        // preview new color for all
-        for (int i=0; i < coloringGroup.length; i++)
+        Color c = eventData["Color"].GetColor();  // current ColorWheel   
+        // preview new color
+        if (coloringComponent.typeName == "Light") 
         {
-            Drawable@ firstDrawable = GetFirstDrawable(coloringGroup[i]);
-            if (firstDrawable.typeName  == "Light")
-            {
-                Light@ light = cast<Light>(firstDrawable);
-                light.color = c;
-            }
-            else if ( firstDrawable.typeName == "StaticModel" )
-            {
-                StaticModel@ model = cast<StaticModel>(firstDrawable);
-                if (model !is null)
+            Light@ light = cast<Light>(coloringComponent);
+            if (light !is null) 
+            {          
+                if (coloringPropertyName == "Light color")
                 {
-                    Material@ mat = model.materials[0];
-                    //Material@ mat = model.material;
-                    if (mat !is null)
-                    {
+                    light.color = c;
+                }
+                else if (coloringPropertyName == "Specular intensity")
+                {
+                   // multiply out 
+                   light.specularIntensity = c.Value() * 10.0f;
+
+                }
+                else if (coloringPropertyName == "Brightness multipler")
+                {
+                   light.brightness = c.Value() * 10.0f;
+                   
+                }
+                
+                attributesDirty = true;   
+            }      
+        }
+        else if (coloringComponent.typeName == "StaticModel") 
+        {
+            StaticModel@ model  = cast<StaticModel>(coloringComponent);
+            if (model !is null) 
+            {            
+                Material@ mat = model.materials[0];
+                if (mat !is null) 
+                { 
+                    if (coloringPropertyName == "MatDiffColor")
+                    {   
                         Variant oldValue = mat.shaderParameters["MatDiffColor"];
-                        Variant v;
+                        Variant newValue;
                         String valueString;
                         valueString += String(c.r).Substring(0,5);
                         valueString += " ";
@@ -1556,100 +1570,224 @@ void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
                         valueString += String(c.b).Substring(0,5);
                         valueString += " ";
                         valueString += String(c.a).Substring(0,5);
-                        v.FromString(oldValue.type, valueString);    
-                        mat.shaderParameters["MatDiffColor"] = v;
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatDiffColor"] = newValue;
                     }
+                    else if (coloringPropertyName == "MatSpecColor")
+                    { 
+                        Variant oldValue = mat.shaderParameters["MatSpecColor"];
+                        Variant newValue;
+                        String valueString;                        
+                        valueString += String(c.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.a * 128).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatSpecColor"] = newValue;
+                    }
+                    else if (coloringPropertyName == "MatEmissiveColor")
+                    {
+                        Variant oldValue = mat.shaderParameters["MatEmissiveColor"];
+                        Variant newValue;
+                        String valueString;
+                        valueString += String(c.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.a).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatEmissiveColor"] = newValue;
+                    }
+                    else if (coloringPropertyName == "MatEnvMapColor")
+                    {
+                        Variant oldValue = mat.shaderParameters["MatEnvMapColor"];
+                        Variant newValue;
+                        String valueString;
+                        valueString += String(c.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.a).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatEnvMapColor"] = newValue;
+                    }                    
                 }
             }
-            else if ( firstDrawable.typeName == "Zone" )
+        }
+        else if (coloringComponent.typeName == "Zone") 
+        {
+            Zone@ zone  = cast<Zone>(coloringComponent);
+            if (zone !is null) 
             {
-                Zone@ zone  = cast<Zone>(firstDrawable);
-                if (zone !is null)
+                if (coloringPropertyName == "Ambient color")
                 {
                     zone.ambientColor = c;
                 }
+                else if (coloringPropertyName == "Fog color") 
+                {
+                    zone.fogColor = c;
+                }
+                
+                attributesDirty = true;
             }
-
-            attributesDirty = true;
-
-        }
+        }        
     }
 
     timeToNextColoringGroupUpdate = time.systemTime + stepColoringGroupUpdate;
 }
 
-// Return old colors, wheel was closed or color discarted
+// Return old colors, wheel was closed or color discarded
 void HandleWheelDiscardColor(StringHash eventType, VariantMap& eventData)
 {
-    if (coloringGroup.length > 0)
+    if (coloringComponent !is null)
     {
-        for (int i=0; i < coloringGroup.length; i++)
+        Color oldColor = eventData["Color"].GetColor(); //Old color from ColorWheel from ShowColorWheelWithColor(old)     
+        // preview new color
+        if (coloringComponent.typeName == "Light") 
         {
-            Drawable@ firstDrawable = GetFirstDrawable(coloringGroup[i]);
-            if (firstDrawable.typeName  == "Light")
-            {
-                Light@ light = cast<Light>(firstDrawable);
-                if (light !is null)
+            Light@ light = cast<Light>(coloringComponent);
+            if (light !is null) 
+            {          
+                if (coloringPropertyName == "Light color")
                 {
-                    light.color = coloringGroupOldColor[i];
+                    light.color = oldColor;
                 }
-            }
-            else if ( firstDrawable.typeName == "StaticModel" )
-            {
-                StaticModel@ model  = cast<StaticModel>(firstDrawable);
-                if (model !is null)
+                else if (coloringPropertyName == "Specular intensity")
                 {
-                    Material@ mat = model.materials[0];
-                    if (mat !is null)
-                    {
+                   light.specularIntensity = coloringOldScalar * 10.0f;
+
+                }
+                else if (coloringPropertyName == "Brightness multipler")
+                {
+                   light.brightness = coloringOldScalar * 10.0f;
+                   
+                }
+                
+                attributesDirty = true;   
+            }      
+        }
+        else if (coloringComponent.typeName == "StaticModel") 
+        {
+            StaticModel@ model  = cast<StaticModel>(coloringComponent);
+            if (model !is null) 
+            {            
+                Material@ mat = model.materials[0];
+                if (mat !is null) 
+                {                 
+                    if (coloringPropertyName == "MatDiffColor")
+                    {   
                         Variant oldValue = mat.shaderParameters["MatDiffColor"];
-                        Variant v;
-                        
+                        Variant newValue;
                         String valueString;
-                        valueString += String(coloringGroupOldColor[i].r).Substring(0,5);
+                        valueString += String(oldColor.r).Substring(0,5);
                         valueString += " ";
-                        valueString += String(coloringGroupOldColor[i].g).Substring(0,5);
+                        valueString += String(oldColor.g).Substring(0,5);
                         valueString += " ";
-                        valueString += String(coloringGroupOldColor[i].b).Substring(0,5);
+                        valueString += String(oldColor.b).Substring(0,5);
                         valueString += " ";
-                        valueString += String(coloringGroupOldColor[i].a).Substring(0,5);
-                        v.FromString(oldValue.type, valueString);
-                        mat.shaderParameters["MatDiffColor"] = v;                        
+                        valueString += String(oldColor.a).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatDiffColor"] = newValue;
                     }
+                    else if (coloringPropertyName == "MatSpecColor")
+                    { 
+                        Variant oldValue = mat.shaderParameters["MatSpecColor"];
+                        Variant newValue;
+                        String valueString;                        
+                        valueString += String(oldColor.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.a).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatSpecColor"] = newValue;
+                    }
+                    else if (coloringPropertyName == "MatEmissiveColor")
+                    {
+                        Variant oldValue = mat.shaderParameters["MatEmissiveColor"];
+                        Variant newValue;
+                        String valueString;
+                        valueString += String(oldColor.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.a).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatEmissiveColor"] = newValue;
+                    }
+                    else if (coloringPropertyName == "MatEnvMapColor")
+                    {
+                        Variant oldValue = mat.shaderParameters["MatEnvMapColor"];
+                        Variant newValue;
+                        String valueString;
+                        valueString += String(oldColor.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.a).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatEnvMapColor"] = newValue;
+                    }                                        
                 }
             }
-            else if ( firstDrawable.typeName == "Zone" )
-            {
-                Zone@ zone  = cast<Zone>(firstDrawable);
-                if (zone !is null)
-                {
-                    zone.ambientColor = coloringGroupOldColor[i];
-                }
-            }
-
-            attributesDirty = true;
         }
-
-        coloringGroupOldColor.Clear();
-        coloringGroup.Clear();
-    }
-}
-/*
-void HandleWheelSelectColor(StringHash eventType, VariantMap& eventData)
-{
-    if (coloringGroup.length > 0)
-    {
-        // Assign new color for all group
-        for (int i=0; i < coloringGroup.length; i++)
+        else if (coloringComponent.typeName == "Zone") 
         {
-
-        }
-
-        coloringGroupOldColor.Clear();
-        coloringGroup.Clear();
+            Zone@ zone  = cast<Zone>(coloringComponent);
+            if (zone !is null) 
+            {
+                if (coloringPropertyName == "Ambient color")
+                {
+                    zone.ambientColor = oldColor;
+                }
+                else if (coloringPropertyName == "Fog color") 
+                {
+                    zone.fogColor = oldColor;
+                }
+                
+                attributesDirty = true;
+            }
+        }        
     }
 }
-*/
+
+// Applying color wheel changes to material
+void HandleWheelSelectColor(StringHash eventType, VariantMap& eventData)
+{  
+    if (coloringComponent !is null)
+    if (coloringComponent.typeName == "StaticModel") 
+    {
+        Color c = eventData["Color"].GetColor(); //Selected color from ColorWheel
+        StaticModel@ model  = cast<StaticModel>(coloringComponent);
+        if (model !is null) 
+        {
+            Material@ mat = model.materials[0];
+            if (mat !is null) 
+            {
+                //BeginMaterialEdit();
+                editMaterial = mat;
+                SaveMaterial();
+                
+                //EndMaterialEdit();
+                //RefreshMaterialShaderParameters();                        
+            }
+        }
+    }
+}
+
 
 void UnfadeUI()
 {
@@ -1916,4 +2054,71 @@ bool SetSplinePath()
         return false;
 
     return SceneSetChildrenSplinePath(menu.name == "Cyclic");
+}
+
+bool ColorWheelBuildMenuSelectTypeColor() 
+{
+    if (selectedNodes.empty && selectedComponents.empty) return false;
+    editMode = EDIT_SELECT;
+    
+    // do coloring only for single selected object
+    // start with trying to find single component
+    if (selectedComponents.length == 1) 
+    {
+        coloringComponent = selectedComponents[0];    
+    }
+    // else try to get first component from selected node
+    else if (selectedNodes.length == 1) 
+    {
+        Array<Component@> components = selectedNodes[0].GetComponents();
+        if (components.length > 0) 
+        {
+            coloringComponent = components[0];
+        }
+    }
+    else
+        return false;
+        
+    if (coloringComponent is null) return false;
+    
+    Array<UIElement@> actions;
+           
+    if (coloringComponent.typeName == "Light") 
+    {
+        
+        actions.Push(CreateContextMenuItem("Light color", "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem("Specular intensity", "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem("Brightness multipler", "HandleColorWheelMenu"));
+        
+        actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu"));
+        
+    }
+    else if (coloringComponent.typeName == "StaticModel") 
+    {
+        actions.Push(CreateContextMenuItem("MatDiffColor", "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem("MatSpecColor", "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem("MatEmissiveColor", "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem("MatEnvMapColor", "HandleColorWheelMenu"));
+        
+        actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu"));
+    }
+    else if (coloringComponent.typeName == "Zone")        
+    {
+        actions.Push(CreateContextMenuItem("Ambient color", "HandleColorWheelMenu"));
+        actions.Push(CreateContextMenuItem("Fog color", "HandleColorWheelMenu"));
+        
+        actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu"));
+    }
+    
+    if (actions.length > 0) {
+        ActivateContextMenu(actions);
+        return true;
+    }
+        
+    return false;
+}
+
+void HandleColorWheelMenu() 
+{
+    ColorWheelSetupBehaviorForColoring();
 }

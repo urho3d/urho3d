@@ -893,79 +893,10 @@ bool SceneSmartDuplicateNode()
     return true;
 }
 
-bool SetColorForSelectedDrawable()
-{
-    if (selectedNodes.empty && selectedComponents.empty) return false;
-    editMode = EDIT_SELECT;
-    
-    // TODO: discard color for group.lenth > 0 if color was not discard or cancel
-    
-    // Prepare new group, grab all into coloringGroup; 
-    for (int i=0; i < selectedNodes.length; i++) 
-    {
-            coloringGroup.Push(selectedNodes[i]);
-    }
-        
-    for (int i=0; i < selectedComponents.length; i++) 
-    {
-            coloringGroup.Push(selectedComponents[i].node);
-    }
-    
-    coloringGroupOldColor.Resize(coloringGroup.length);
-    
-    for (int i=0; i < coloringGroup.length; i++) 
-    {
-        Drawable@ firstDrawable = GetFirstDrawable(coloringGroup[i]);
-        if (firstDrawable is null) continue;
-        
-        if (firstDrawable.typeName  == "Light") 
-        {
-            Light@ light = cast<Light>(firstDrawable);
-            if (light !is null) 
-                coloringGroupOldColor[i] = light.color;
-        }
-        else if ( firstDrawable.typeName == "StaticModel" ) 
-        {
-            StaticModel@ model  = cast<StaticModel>(firstDrawable);
-            if (model !is null) 
-            {
-                Material@ mat = model.materials[0];
-                if (mat !is null) 
-                {
-                    //MessageBox("mat.shaderParameters");
-                    Color c = mat.shaderParameters["MatDiffColor"].GetColor();
-                    coloringGroupOldColor[i]= c;
-                } 
-            }
-        }
-        else if ( firstDrawable.typeName == "Zone" ) 
-        {
-            Zone@ zone  = cast<Zone>(firstDrawable);
-            if (zone !is null) 
-            {
-                Color c = zone.ambientColor;
-                coloringGroupOldColor[i]= c;     
-            }   
-        }     
-    }
-    
-    if (coloringGroup.length > 0) 
-    {
-        //MessageBox("coloringGroup.length" + String(coloringGroup.length));
-        //SubscribeToEvent("WheelChangeColor", "HandleWheelChangeColor" );
-        //SubscribeToEvent("WheelSelectColor", "HandleWheelWheelSelectColor" );
-        //SubscribeToEvent("WheelDiscardColor", "HandleWheelDiscardColor" );
-    }
-    
-    ShowColorWheel();    
-    return true;
-}
-
 bool ViewCloser()
 {
     return (viewCloser = true);
 }
-
 
 bool SceneToggleEnable()
 {
@@ -1439,4 +1370,98 @@ void CreateModelWithAnimatedModel(String filepath, Node@ parent)
     AnimatedModel@ animatedModel = parent.GetOrCreateComponent("AnimatedModel");
     animatedModel.model = model;
     CreateLoadedComponent(animatedModel);
+}
+
+bool ColorWheelSetupBehaviorForColoring()
+{
+    
+    Menu@ menu = GetEventSender();
+    if (menu is null)
+        return false;
+    
+    //MessageBox(menu.text);
+    Text@ text = menu.children[0];
+    //MessageBox(text.text);
+    
+    coloringPropertyName = text.text;
+    
+    if (coloringPropertyName == "Cancel") return false;
+    
+    if (coloringComponent.typeName == "Light") 
+    {
+        Light@ light = cast<Light>(coloringComponent);
+        if (light !is null) 
+        {          
+            if (coloringPropertyName == "Light color")
+            {
+                coloringOldColor = light.color;
+                ShowColorWheelWithColor(coloringOldColor);
+            }
+            else if (coloringPropertyName == "Specular intensity")
+            {
+               coloringOldScalar = light.specularIntensity;
+                
+               // ColorWheel have only 0-1 range output of V-value(BW), and for huge-range values we devide in and multiply out 
+               float scaledSpecular = coloringOldScalar * 0.1f; 
+               ShowColorWheelWithColor(Color(scaledSpecular,scaledSpecular,scaledSpecular));
+
+            }
+            else if (coloringPropertyName == "Brightness multipler")
+            {
+               coloringOldScalar = light.brightness;
+               
+               float scaledBrightness = coloringOldScalar * 0.1f; 
+               ShowColorWheelWithColor(Color(scaledBrightness,scaledBrightness,scaledBrightness));
+            }   
+        }      
+    }
+    else if (coloringComponent.typeName == "StaticModel") 
+    {
+        StaticModel@ model  = cast<StaticModel>(coloringComponent);
+        if (model !is null) 
+        {            
+            Material@ mat = model.materials[0];
+            if (mat !is null) 
+            { 
+                if (coloringPropertyName == "MatDiffColor")
+                {
+                    Color color = mat.shaderParameters["MatDiffColor"].GetColor();
+                    coloringOldColor = color;
+                }
+                else if (coloringPropertyName == "MatSpecColor")
+                {
+                    coloringOldColor = mat.shaderParameters["MatSpecColor"].GetColor();
+                }
+                else if (coloringPropertyName == "MatEmissiveColor")
+                {
+                    coloringOldColor = mat.shaderParameters["MatEmissiveColor"].GetColor();
+                }
+                else if (coloringPropertyName == "MatEnvMapColor")
+                {
+                    coloringOldColor = mat.shaderParameters["MatEnvMapColor"].GetColor();    
+                }
+                
+                ShowColorWheelWithColor(coloringOldColor); 
+            }
+        }
+    }
+    else if (coloringComponent.typeName == "Zone") 
+    {
+        Zone@ zone  = cast<Zone>(coloringComponent);
+        if (zone !is null) 
+        {
+            if (coloringPropertyName == "Ambient color")
+            {
+                coloringOldColor = zone.ambientColor;
+            }
+            else if (coloringPropertyName == "Fog color") 
+            {
+                coloringOldColor = zone.fogColor;
+            }
+            
+            ShowColorWheelWithColor(coloringOldColor);
+        }
+    }
+          
+    return true;
 }

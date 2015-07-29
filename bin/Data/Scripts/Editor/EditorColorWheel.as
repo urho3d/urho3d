@@ -30,6 +30,8 @@ Array<Color> colorFast;
 int colorFastSelectedIndex = -1;
 int colorFastHoverIndex = -1;
 
+IntVector2 lastColorWheelWindowPosition;
+
 
 bool isColorWheelHovering = false;
 bool isBWGradientHovering = false;
@@ -54,8 +56,6 @@ const float ROUND_VALUE_MIN = 0.01f;
 String eventTypeWheelChangeColor = "WheelChangeColor";
 String eventTypeWheelSelectColor = "WheelSelectColor";
 String eventTypeWheelDiscardColor ="WheelDiscardColor";
-
-IntVector2 colorWheelWindowPosition;
 
 void CreateColorWheel()
 {
@@ -93,10 +93,12 @@ void CreateColorWheel()
     colorFastItem.Resize(8);
     colorFast.Resize(8);
     
+    // init some gragient for fast colors palette
     for (int i=0; i<8; i++) 
     {
         colorFastItem[i] = colorWheelWindow.GetChild("h"+String(i), true);
-        colorFast[i] = Color(1,1,1);
+        colorFast[i] = Color(i*0.125,i*0.125,i*0.125);
+        colorFastItem[i].color = colorFast[i]; 
     }
     
     SubscribeToEvent("MouseMove", "HandleMouseMove");
@@ -108,6 +110,8 @@ void CreateColorWheel()
     SubscribeToEvent(closeButton, "Pressed", "HandleWheelButtons");
     SubscribeToEvent(okButton, "Pressed", "HandleWheelButtons");
     SubscribeToEvent(cancelButton, "Pressed", "HandleWheelButtons");
+    
+    lastColorWheelWindowPosition = IntVector2(300,400);
         
     HideColorWheel();
 }
@@ -130,8 +134,7 @@ bool ShowColorWheel()
     EstablishColorWheelUIFromColor(wheelColor); 
          
     colorWheelWindow.opacity = 1;
-    colorWheelWindowPosition = ui.cursorPosition;
-    colorWheelWindow.position = colorWheelWindowPosition;
+    colorWheelWindow.position = lastColorWheelWindowPosition;
     colorWheelWindow.visible = true;
     colorWheelWindow.BringToFront();
     
@@ -143,6 +146,7 @@ void HideColorWheel()
     if (colorWheelWindow.visible) 
     {
         colorWheelWindow.visible = false;
+        lastColorWheelWindowPosition = colorWheelWindow.position;
     }
 }
 
@@ -220,7 +224,7 @@ void HandleMouseButton(StringHash eventType, VariantMap& eventData)
             
             colorFastSelectedIndex = colorFastHoverIndex;
             EstablishColorWheelUIFromColor(colorFast[colorFastSelectedIndex]);
-                
+            SendEventChangeColor();    
         }
     }
 }
@@ -390,9 +394,7 @@ void UpdateColorInformation()
     hLineEdit.text = String(colorHValue).Substring(0,5);
     sLineEdit.text = String(colorSValue).Substring(0,5);
     vLineEdit.text = String(colorVValue).Substring(0,5);
-    
-    
-   
+       
     rLineEdit.text = String(wheelColor.r).Substring(0,5);
     gLineEdit.text = String(wheelColor.g).Substring(0,5);
     bLineEdit.text = String(wheelColor.b).Substring(0,5);
@@ -408,8 +410,7 @@ void UpdateColorInformation()
     {
         colorFastItem[colorFastSelectedIndex].color = wheelColor;
         colorFast[colorFastSelectedIndex] = wheelColor; 
-    }
-    
+    }   
 }
 
 void SendEventChangeColor()
