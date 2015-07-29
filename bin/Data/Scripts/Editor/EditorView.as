@@ -26,8 +26,6 @@ WeakHandle lastSelectedNode = null;
 WeakHandle lastSelectedDrawable = null;
 WeakHandle lastSelectedComponent = null;
 bool viewCloser = false;
-Array<Node@> coloringGroup; // group of selected nodes to coloring with HSV Wheel
-Array<Color> coloringGroupOldColor;
 Component@ coloringComponent = null;
 String coloringTypeName;
 String coloringPropertyName;
