@@ -356,6 +356,7 @@ endif ()
 
 # Add definition for Database
 if (URHO3D_DATABASE_ODBC)
+    set (URHO3D_DATABASE_SQLITE 0)
     find_package (ODBC REQUIRED)
     set (URHO3D_C++11 1)
     add_definitions (-DURHO3D_DATABASE -DURHO3D_DATABASE_ODBC)

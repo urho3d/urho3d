@@ -177,7 +177,7 @@ void DatabaseDemo::HandleInput(const String& input)
         if (tokens[0].Trimmed() == "maxrows")
             Print(ToString("maxrows is set to %d", maxRows_));
         else
-            Print("Unrecognize setting");
+            Print("Unrecognized setting");
     }
     else
     {
