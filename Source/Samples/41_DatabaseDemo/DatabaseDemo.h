@@ -24,7 +24,7 @@
 
 #include "Sample.h"
 
-/// Database demo. This sample demonstrates how to use database subsystem to connect to a database.
+/// Database demo. This sample demonstrates how to use database subsystem to connect to a database and execute adhoc SQL statements.
 class DatabaseDemo : public Sample
 {
     OBJECT(DatabaseDemo)
@@ -69,4 +69,6 @@ private:
     DbConnection* connection_;
     /// Internal row counter.
     unsigned row_;
+    /// Maximum rows to be printed out.
+    unsigned maxRows_;
 };

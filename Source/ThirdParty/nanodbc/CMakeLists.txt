@@ -23,26 +23,16 @@
 # Define target name
 set (TARGET_NAME nanodbc)
 
-add_definitions (-DNANODBC_USE_UNICODE)
-
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS src/*.cpp GLOB_H_PATTERNS src/*.h)
 
-# On Unix-like host system, find the ODBC config tool
-if (NOT CMAKE_WIN32_HOST)
-	find_program (ODBC_CONFIG NAMES odbc_config iodbc-config DOC "ODBC config tool" NO_CMAKE_FIND_ROOT_PATH)
-	if (NOT ODBC_CONFIG)
-		message (FATAL_ERROR "Could not find ODBC config tool, please install the development package of unixODBC or libiodbc")
-	endif ()
-
-	# Get ODBC compile and link flags
-#TODO	execute_process(COMMAND ${ODBC_CONFIG} --libs OUTPUT_VARIABLE ODBC_LINK_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-	execute_process(COMMAND ${ODBC_CONFIG} --cflags OUTPUT_VARIABLE ODBC_COMPILE_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-    set (TARGET_PROPERTIES COMPILE_FLAGS ${ODBC_COMPILE_FLAGS})
+# Define dependency libs
+if (ODBC_INCLUDE_DIRS)
+    set (INCLUDE_DIRS ${ODBC_INCLUDE_DIRS})
 endif ()
 
 # Setup target
 setup_library ()
 
-# Install headers for building the Urho3D library
+# Install headers for building and using the Urho3D library
 install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/nanodbc FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant

@@ -71,6 +71,8 @@
 //! See http://www.codeguru.com/submission-guidelines.php for details.
 //! </div>
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #ifndef NANODBC_H
 #define NANODBC_H
 
@@ -269,7 +271,7 @@ public:
 
 public:
     //! \brief Creates a new un-prepared statement.
-    //! \see execute(), execute_direct(), open(), prepare()
+    //! \see execute(), just_execute(), execute_direct(), just_execute_direct(), open(), prepare()
     statement();
 
     //! \brief Constructs a statement object and associates it to the given connection.
@@ -281,7 +283,7 @@ public:
     //! \param conn The connection to use.
     //! \param query The SQL query statement.
     //! \param timeout The number in seconds before query timeout. Default is 0 indicating no timeout.
-    //! \see execute(), execute_direct(), open(), prepare()
+    //! \see execute(), just_execute(), execute_direct(), just_execute_direct(), open(), prepare()
     statement(class connection& conn, const string_type& query, long timeout = 0);
 
     //! Copy constructor.
@@ -354,14 +356,32 @@ public:
     //! \see open(), prepare(), execute(), result, transaction
     class result execute_direct(class connection& conn, const string_type& query, long batch_operations = 1, long timeout = 0);
 
+    //! \brief Execute the previously prepared query now without constructing result object.
+    //! \param batch_operations Numbers of rows to fetch per rowset, or the number of batch parameters to process.
+    //! \param timeout The number in seconds before query timeout. Default is 0 indicating no timeout.
+    //! \throws database_error
+    //! \return A result set object.
+    //! \attention You will want to use transactions if you are doing batch operations because it will prevent auto commits from occurring after each individual operation is executed.
+    //! \see open(), prepare(), execute(), execute_direct(), result, transaction
+    void just_execute_direct(class connection& conn, const string_type& query, long batch_operations = 1, long timeout = 0);
+
     //! \brief Execute the previously prepared query now.
     //! \param batch_operations Numbers of rows to fetch per rowset, or the number of batch parameters to process.
     //! \param timeout The number in seconds before query timeout. Default is 0 indicating no timeout.
     //! \throws database_error
     //! \return A result set object.
     //! \attention You will want to use transactions if you are doing batch operations because it will prevent auto commits from occurring after each individual operation is executed.
-    //! \see open(), prepare(), execute(), result, transaction
+    //! \see open(), prepare(), result, transaction
     class result execute(long batch_operations = 1, long timeout = 0);
+
+    //! \brief Execute the previously prepared query now without constructing result object.
+    //! \param batch_operations Numbers of rows to fetch per rowset, or the number of batch parameters to process.
+    //! \param timeout The number in seconds before query timeout. Default is 0 indicating no timeout.
+    //! \throws database_error
+    //! \return A result set object.
+    //! \attention You will want to use transactions if you are doing batch operations because it will prevent auto commits from occurring after each individual operation is executed.
+    //! \see open(), prepare(), execute(), result, transaction
+    void just_execute(long batch_operations = 1, long timeout = 0);
 
     //! \brief Returns the input and output paramters of the specified stored procedure.
     //! \param catalog The catalog name of the procedure.
@@ -843,11 +863,19 @@ public:
     //! \throws index_range_error
     short column(const string_type& column_name) const;
 
-    //! Returns a identifying integer value representing the C type of this column.
+    //! Returns a identifying integer value representing the SQL type of this column.
     int column_datatype(short column) const;
 
-    //! Returns a identifying integer value representing the C type of this column by name.
+    //! Returns a identifying integer value representing the SQL type of this column by name.
     int column_datatype(const string_type& column_name) const;
+
+    // Urho3D - add new methods to return C type
+
+    //! Returns a identifying integer value representing the C type of this column.
+    int column_c_datatype(short column) const;
+
+    //! Returns a identifying integer value representing the C type of this column by name.
+    int column_c_datatype(const string_type& column_name) const;
 
     //! Returns the next result, for example when stored procedure returns multiple result sets.
     bool next_result();
@@ -887,6 +915,20 @@ result execute(
     , long batch_operations = 1
     , long timeout = 0);
 
+//! \brief Immediately opens, prepares, and executes the given query directly on the given connection without creating result object.
+//! \param conn The connection where the statement will be executed.
+//! \param query The SQL query that will be executed.
+//! \param batch_operations Numbers of rows to fetch per rowset, or the number of batch parameters to process.
+//! \param timeout The number in seconds before query timeout. Default is 0 indicating no timeout.
+//! \return A result set object.
+//! \attention You will want to use transactions if you are doing batch operations because it will prevent auto commits from occurring after each individual operation is executed.
+//! \see open(), prepare(), execute(), result, transaction
+void just_execute(
+    connection& conn
+    , const string_type& query
+    , long batch_operations = 1
+    , long timeout = 0);
+
 //! \brief Execute the previously prepared query now.
 //! \param stmt The prepared statement that will be executed.
 //! \param batch_operations Numbers of rows to fetch per rowset, or the number of batch parameters to process.
@@ -896,6 +938,15 @@ result execute(
 //! \see open(), prepare(), execute(), result
 result execute(statement& stmt, long batch_operations = 1);
 
+//! \brief Execute the previously prepared query now and without creating result object.
+//! \param stmt The prepared statement that will be executed.
+//! \param batch_operations Numbers of rows to fetch per rowset, or the number of batch parameters to process.
+//! \throws database_error
+//! \return A result set object.
+//! \attention You will want to use transactions if you are doing batch operations because it will prevent auto commits from occurring after each individual operation is executed.
+//! \see open(), prepare(), execute(), result
+void just_execute(statement& stmt, long batch_operations = 1);
+
 //! \brief Execute the previously prepared query now.
 //! Executes within the context of a transaction object and commits the transaction directly after execution.
 //! \param stmt The prepared statement that will be executed in batch.
@@ -904,6 +955,15 @@ result execute(statement& stmt, long batch_operations = 1);
 //! \return A result set object.
 //! \see open(), prepare(), execute(), result, transaction
 result transact(statement& stmt, long batch_operations);
+
+//! \brief Execute the previously prepared query now and without creating result object.
+//! Executes within the context of a transaction object and commits the transaction directly after execution.
+//! \param stmt The prepared statement that will be executed in batch.
+//! \param batch_operations Numbers of rows to fetch per rowset, or the number of batch parameters to process.
+//! \throws database_error
+//! \return A result set object.
+//! \see open(), prepare(), execute(), result, transaction
+void just_transact(statement& stmt, long batch_operations);
 
 //! \brief Prepares the given statement to execute on it associated connection.
 //! If the statement is not open throws programming_error.

@@ -26,6 +26,7 @@
 #include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Database/Database.h>
 #include <Urho3D/Database/DatabaseEvents.h>
+#include <Urho3D/Database/DbResult.h>
 #include <Urho3D/Engine/Console.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Engine/EngineEvents.h>
@@ -41,7 +42,8 @@ DEFINE_APPLICATION_MAIN(DatabaseDemo)
 DatabaseDemo::DatabaseDemo(Context* context) :
     Sample(context),
     connection_(0),
-    row_(0)
+    row_(0),
+    maxRows_(50)
 {
 }
 
@@ -82,10 +84,22 @@ void DatabaseDemo::Start()
     // Open the operating system console window (for stdin / stdout) if not open yet
     OpenConsoleWindow();
 
-    // Connect to a temporary in-memory database
-    Database* database = GetSubsystem<Database>();
-    database->SetUsePooling(false);
-    connection_ = database->Connect("file://");
+    // In general, the connection string is really the only thing that need to be changed when switching underlying database API
+    //   and that when using ODBC API then the connection string must refer to an already installed ODBC driver
+    // Although it has not been tested yet but the ODBC API should be able to interface with any vendor provided ODBC drivers
+    // In this particular demo, however, when using ODBC API then the SQLite-ODBC driver need to be installed
+    // The SQLite-ODBC driver can be built from source downloaded from http://www.ch-werner.de/sqliteodbc/
+    // You can try to install other ODBC driver and modify the connection string below to match your ODBC driver
+    // Both DSN and DSN-less connection string should work
+    // The ODBC API, i.e. URHO3D_DATABASE_ODBC build option, is only available for native (including RPI) platforms
+    //   and it is designed for development of game server connecting to ODBC-compliant databases in mind
+
+    // This demo will always work when using SQLite API as the SQLite database engine is embedded inside Urho3D game engine
+    //   and this is also the case when targeting HTML5 in Emscripten build
+
+    // Connect to a temporary in-memory SQLite database
+    connection_ =
+        GetSubsystem<Database>()->Connect(Database::GetAPI() == DBAPI_ODBC ? "Driver=SQLITE3;Database=:memory:" : "file://");
 
     // Subscribe to database cursor event to loop through query resultset
     SubscribeToEvent(connection_, E_DBCURSOR, HANDLER(DatabaseDemo, HandleDbCursor));
@@ -93,6 +107,7 @@ void DatabaseDemo::Start()
     // Show instruction
     Print("This demo connects to temporary in-memory database.\n"
         "All the tables and their data will be lost after exiting the demo.\n"
+        "Enter 'quit' or 'exit' to exit the demo. Enter 'set maxrows=n' to set the maximum rows to be printed out.\n"
         "Enter a valid SQL statement in the console input and press Enter to execute.\n"
         "For example:\n ");
     HandleInput("create table tbl1(col1 varchar(10), col2 smallint)");
@@ -125,17 +140,22 @@ void DatabaseDemo::HandleEscKeyDown(StringHash eventType, VariantMap& eventData)
 
 void DatabaseDemo::HandleDbCursor(StringHash eventType, VariantMap& eventData)
 {
-    ++row_;
-
     using namespace DbCursor;
 
     // In a real application the P_SQL can be used to do the logic branching in a shared event handler
     // However, this is not required in this sample demo
     int numCols = eventData[P_NUMCOLS].GetInt();
-    const char** colValues = static_cast<const char**>(eventData[P_COLVALUES].GetVoidPtr());
-    const char** colHeaders = static_cast<const char**>(eventData[P_COLHEADERS].GetVoidPtr());
+    VariantVector* colValues = static_cast<VariantVector* >(eventData[P_COLVALUES].GetVoidPtr());
+    Vector<String>* colHeaders = static_cast<Vector<String>* >(eventData[P_COLHEADERS].GetVoidPtr());
+
+    // In this sample demo we just use db cursor to dump each row immediately so we can filter out the row to conserve memory
+    // In a real application this can be used to perform the client-side filtering logic
+    eventData[P_FILTER] = true;
+    // In this sample demo we abort the further cursor movement when maximum rows being dumped has been reached
+    eventData[P_ABORT] = ++row_ >= maxRows_;
+
     for (int i = 0; i < numCols; ++i)
-        Print(ToString("Row #%d: %s = %s", row_, colHeaders[i], colValues[i]));
+        Print(ToString("Row #%d: %s = %s", row_, colHeaders->At(i).CString(), colValues->At(i).ToString().CString()));
 }
 
 void DatabaseDemo::HandleInput(const String& input)
@@ -145,8 +165,26 @@ void DatabaseDemo::HandleInput(const String& input)
     row_ = 0;
     if (input == "quit" || input == "exit")
         engine_->Exit();
+    else if (input.StartsWith("set") || input.StartsWith("get"))
+    {
+        // We expect a key/value pair for 'set' command
+        Vector<String> tokens = input.Substring(3).Trimmed().Split('=');
+        if (input.StartsWith("set"))
+        {
+            if (tokens[0].Trimmed() == "maxrows")
+                maxRows_ = (unsigned)Max(ToUInt(tokens[1]), 1);
+        }
+        if (tokens[0].Trimmed() == "maxrows")
+            Print(ToString("maxrows is set to %d", maxRows_));
+        else
+            Print("Unrecognize setting");
+    }
     else
-        connection_->Execute(input, true);
+    {
+        DbResult result = connection_->Execute(input, true);
+        if (result.NumAffectedRows() > 0)
+            Print(ToString("Number of affected rows: %d", result.NumAffectedRows()));
+    }
     Print(" ");
 }
 

@@ -310,7 +310,7 @@ void Variant::FromString(VariantType type, const char* value)
     case VAR_MATRIX4:
         *this = ToMatrix4(value);
         break;
-        
+
     case VAR_DOUBLE:
         *this = ToDouble(value);
         break;
@@ -369,12 +369,12 @@ String Variant::ToString() const
         return *(reinterpret_cast<const String*>(&value_));
 
     case VAR_BUFFER:
-    {
-        const PODVector<unsigned char>& buffer = *(reinterpret_cast<const PODVector<unsigned char>*>(&value_));
-        String ret;
-        BufferToString(ret, buffer.Begin().ptr_, buffer.Size());
-        return ret;
-    }
+        {
+            const PODVector<unsigned char>& buffer = *(reinterpret_cast<const PODVector<unsigned char>*>(&value_));
+            String ret;
+            BufferToString(ret, buffer.Begin().ptr_, buffer.Size());
+            return ret;
+        }
 
     case VAR_VOIDPTR:
     case VAR_PTR:
@@ -387,12 +387,6 @@ String Variant::ToString() const
     case VAR_INTVECTOR2:
         return (reinterpret_cast<const IntVector2*>(&value_))->ToString();
 
-    default:
-        // VAR_RESOURCEREF, VAR_RESOURCEREFLIST, VAR_VARIANTVECTOR, VAR_VARIANTMAP
-        // Reference string serialization requires typehash-to-name mapping from the context. Can not support here
-        // Also variant map or vector string serialization is not supported. XML or binary save should be used instead
-        return String::EMPTY;
-
     case VAR_MATRIX3:
         return (reinterpret_cast<const Matrix3*>(value_.ptr_))->ToString();
 
@@ -404,6 +398,12 @@ String Variant::ToString() const
 
     case VAR_DOUBLE:
         return String(*reinterpret_cast<const double*>(&value_));
+
+    default:
+        // VAR_RESOURCEREF, VAR_RESOURCEREFLIST, VAR_VARIANTVECTOR, VAR_VARIANTMAP
+        // Reference string serialization requires typehash-to-name mapping from the context. Can not support here
+        // Also variant map or vector string serialization is not supported. XML or binary save should be used instead
+        return String::EMPTY;
     }
 }
 
@@ -482,7 +482,7 @@ bool Variant::IsZero() const
 
     case VAR_MATRIX4:
         return *reinterpret_cast<const Matrix4*>(value_.ptr_) == Matrix4::IDENTITY;
-        
+
     case VAR_DOUBLE:
         return *reinterpret_cast<const double*>(&value_) == 0.0;
 

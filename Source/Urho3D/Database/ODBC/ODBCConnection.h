@@ -25,7 +25,7 @@
 #include "../../Core/Object.h"
 #include "../../Database/DbResult.h"
 
-#include <SQLite/sqlite3.h>
+#include <nanodbc/nanodbc.h>
 
 namespace Urho3D
 {
@@ -50,16 +50,16 @@ public:
     const String& GetConnectionString() const { return connectionString_; }
 
     /// Return the underlying implementation connection object pointer. It is sqlite* when using SQLite3 or nanodbc::connection* when using ODBC.
-    const sqlite3* GetConnectionImpl() const { return connectionImpl_; }
+    const nanodbc::connection* GetConnectionImpl() const { return &connectionImpl_; }
 
     /// Return true when the connection object is connected to the associated database.
-    bool IsConnected() const { return connectionImpl_ != 0; }
+    bool IsConnected() const { return connectionImpl_.connected(); }
 
 private:
     /// The connection string for SQLite3 is using the URI format described in https://www.sqlite.org/uri.html, while the connection string for ODBC is using DSN format as per ODBC standard.
     String connectionString_;
     /// The underlying implementation connection object.
-    sqlite3* connectionImpl_;
+    nanodbc::connection connectionImpl_;
 };
 
 }

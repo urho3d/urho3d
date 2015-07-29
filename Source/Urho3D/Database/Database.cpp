@@ -20,17 +20,21 @@
 // THE SOFTWARE.
 //
 
-#include "../../Precompiled.h"
+#include "../Precompiled.h"
 
-#include "../../Core/Profiler.h"
-#include "../../Database/Database.h"
+#include "../Core/Profiler.h"
+#include "../Database/Database.h"
 
 namespace Urho3D
 {
 
 Database::Database(Context* context_) :
     Object(context_),
+#ifdef URHO3D_DATABASE_ODBC
+    usePooling_(false)
+#else
     usePooling_(true)
+#endif
 {
     // Register Database library object factories
     RegisterDatabaseLibrary(context_);
@@ -38,10 +42,21 @@ Database::Database(Context* context_) :
 
 Database::~Database()
 {
+    PROFILE(DatabaseDestruct);
+
     // Disconnect all the active and in-pool database connections
     DisconnectAll(connections_);
     for (HashMap<String, PODVector<DbConnection*> >::Iterator i = connectionsPool_.Begin(); i != connectionsPool_.End(); ++i)
-        DisconnectAll(i->second_);
+    DisconnectAll(i->second_);
+}
+
+DBAPI Database::GetAPI()
+{
+#ifdef URHO3D_DATABASE_ODBC
+    return DBAPI_ODBC;
+#else
+    return DBAPI_SQLITE;
+#endif
 }
 
 DbConnection* Database::Connect(const String& connectionString)
@@ -107,7 +122,7 @@ void Database::DisconnectAll(PODVector<DbConnection*>& collection)
 
 void URHO3D_API RegisterDatabaseLibrary(Context* context)
 {
-    // todo
+// todo
 }
 
 }

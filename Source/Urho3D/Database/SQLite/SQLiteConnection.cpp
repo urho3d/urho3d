@@ -28,55 +28,29 @@
 namespace Urho3D
 {
 
-struct DbConnectionExecuteCallbackData
-{
-    DbConnection* connection;
-    String sql;
-};
-
-int DbConnectionExecuteCallback(void* data, int numCols, char** colValues, char** colHeaders)
-{
-    DbConnectionExecuteCallbackData* callbackData = static_cast<DbConnectionExecuteCallbackData*>(data);
-    DbConnection* connection = callbackData->connection;
-
-    using namespace DbCursor;
-
-    VariantMap& eventData = connection->GetEventDataMap();
-    eventData[P_DBCONNECTION] = connection;
-    eventData[P_SQL] = callbackData->sql;
-    eventData[P_NUMCOLS] = numCols;
-    eventData[P_COLVALUES] = colValues;
-    eventData[P_COLHEADERS] = colHeaders;
-    eventData[P_ABORT] = false;     // Expect the event handler would set this to true to abort further cursor events
-
-    connection->SendEvent(E_DBCURSOR, eventData);
-
-    return eventData[P_ABORT].GetBool();
-}
-
 DbConnection::DbConnection(Context* context, const String& connectionString) :
     Object(context),
     connectionString_(connectionString),
-    connection_(0)
+    connectionImpl_(0)
 {
-    if (sqlite3_open(connectionString.CString(), &connection_) != SQLITE_OK)
+    if (sqlite3_open(connectionString.CString(), &connectionImpl_) != SQLITE_OK)
     {
-        LOGERRORF("Could not connect: %s", sqlite3_errmsg(connection_));
-        sqlite3_close(connection_);
-        connection_ = 0;
+        LOGERRORF("Could not connect: %s", sqlite3_errmsg(connectionImpl_));
+        sqlite3_close(connectionImpl_);
+        connectionImpl_ = 0;
     }
 }
 
 DbConnection::~DbConnection()
 {
     Finalize();
-    if (sqlite3_close(connection_) != SQLITE_OK)
+    if (sqlite3_close(connectionImpl_) != SQLITE_OK)
     {
         // This should not happen after finalizing the connection, log error in Release but assert in Debug
-        LOGERRORF("Could not disconnect: %s", sqlite3_errmsg(connection_));
+        LOGERRORF("Could not disconnect: %s", sqlite3_errmsg(connectionImpl_));
         assert(false);
     }
-    connection_ = 0;
+    connectionImpl_ = 0;
 }
 
 void DbConnection::Finalize()
@@ -84,21 +58,102 @@ void DbConnection::Finalize()
     // TODO
 }
 
-bool DbConnection::Execute(const String& sql, bool useCursorEvent)
+DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
 {
-    assert(connection_);
-    DbConnectionExecuteCallbackData data;
-    data.connection = this;
-    data.sql = sql;
-    char* msg;
-
-    bool rc = sqlite3_exec(connection_, sql.CString(), useCursorEvent ? &DbConnectionExecuteCallback : 0, &data, &msg) == SQLITE_OK;
-    if (!rc)
+    DbResult result;
+    const char* zLeftover = 0;
+    sqlite3_stmt* pStmt = 0;
+    assert(connectionImpl_);
+    int rc = sqlite3_prepare_v2(connectionImpl_, sql.Trimmed().CString(), -1, &pStmt, &zLeftover);
+    if (rc != SQLITE_OK)
     {
-        LOGERRORF("Could not execute: %s", msg);
-        sqlite3_free(msg);
+        LOGERRORF("Could not execute: %s", sqlite3_errmsg(connectionImpl_));
+        assert(!pStmt);
+        return result;
     }
-    return rc;
+    if (*zLeftover)
+    {
+        LOGERROR("Could not execute: only one SQL statement is allowed");
+        sqlite3_finalize(pStmt);
+        return result;
+    }
+
+    int numCols = sqlite3_column_count(pStmt);
+    result.columns_.Resize((unsigned)numCols);
+    for (int i = 0; i < numCols; ++i)
+        result.columns_[i] = sqlite3_column_name(pStmt, i);
+
+    bool filtered = false;
+    bool aborted = false;
+
+    while (1)
+    {
+        rc = sqlite3_step(pStmt);
+        if (rc == SQLITE_ROW)
+        {
+            VariantVector colValues((unsigned)numCols);
+            for (int i = 0; i < numCols; ++i)
+            {
+                int type = sqlite3_column_type(pStmt, i);
+                if (type != SQLITE_NULL)
+                {
+                    // We can only bind primitive data type that our Variant class supports
+                    switch (type)
+                    {
+                    case SQLITE_INTEGER:
+                        colValues[i] = sqlite3_column_int(pStmt, i);
+                        if (String(sqlite3_column_decltype(pStmt, i)).Compare("BOOLEAN", false) == 0)
+                            colValues[i] = colValues[i] != 0;
+                        break;
+
+                    case SQLITE_FLOAT:
+                        colValues[i] = sqlite3_column_double(pStmt, i);
+                        break;
+
+                    default:
+                        // All other types are stored using their string representation in the Variant
+                        colValues[i] = (const char*)sqlite3_column_text(pStmt, i);
+                        break;
+                    }
+                }
+            }
+
+            if (useCursorEvent)
+            {
+                using namespace DbCursor;
+
+                VariantMap& eventData = GetEventDataMap();
+                eventData[P_DBCONNECTION] = this;
+                eventData[P_RESULTIMPL] = pStmt;
+                eventData[P_SQL] = sql;
+                eventData[P_NUMCOLS] = numCols;
+                eventData[P_COLVALUES] = &colValues;
+                eventData[P_COLHEADERS] = &result.columns_;
+                eventData[P_FILTER] = false;
+                eventData[P_ABORT] = false;
+
+                SendEvent(E_DBCURSOR, eventData);
+
+                filtered = eventData[P_FILTER].GetBool();
+                aborted = eventData[P_ABORT].GetBool();
+            }
+
+            if (!filtered)
+                result.rows_.Push(colValues);
+            if (aborted)
+                break;
+        }
+        else if (rc != SQLITE_DONE)
+            LOGERRORF("Could not execute: %s", sqlite3_errmsg(connectionImpl_));
+        if (rc != SQLITE_ROW)
+        {
+            sqlite3_finalize(pStmt);
+            break;
+        }
+    }
+
+    result.numAffectedRows_ = sqlite3_stmt_readonly(pStmt) ? -1 : sqlite3_changes(connectionImpl_);
+    return result;
 }
 
 }

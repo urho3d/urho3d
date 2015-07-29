@@ -142,7 +142,9 @@ endforeach ()
 if (NOT URHO3D_DATABASE_ODBC AND NOT URHO3D_DATABASE_SQLITE)
     list (APPEND EXCLUDED_SOURCE_DIRS Database)
 endif ()
-if (NOT URHO3D_DATABASE_ODBC)
+if (URHO3D_DATABASE_ODBC)
+    list (APPEND EXCLUDED_SOURCE_DIRS Database/SQLite)
+else ()
     list (APPEND EXCLUDED_SOURCE_DIRS Database/ODBC)
 endif ()
 if (URHO3D_OPENGL)
@@ -160,10 +162,7 @@ if (APPLE AND NOT IOS)
     set (GLOB_OBJC_PATTERN *.m)     # Should only pick up MacFileWatcher.m for MacOSX platform at the moment
 endif ()
 string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
-if (URHO3D_PCH)
-    set (PCH PCH Precompiled.h)
-endif ()
-define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} EXTRA_H_FILES librevision.h Urho3D.h RECURSE GROUP ${PCH})
+define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} EXTRA_H_FILES librevision.h Urho3D.h RECURSE GROUP PCH Precompiled.h)
 list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${ALL_OBJ_FILES})
 
 # Define dependency libs
@@ -174,16 +173,17 @@ if (URHO3D_PHYSICS)
     # This is more practical than patching its header files in many places to make them work with relative path
     list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Bullet)
 endif ()
-
 if (URHO3D_NAVIGATION)
     # DetourTileCache and DetourCrowd libraries depend on Detour's include dir to be added in the header search path
     list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Detour)
 endif ()
-
 if (URHO3D_LUA)
     # Lua/LuaJIT library depends on its own include dir to be added in the header search path
     # This is more practical than patching its header files in many places to make them work with relative path
     list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Lua${JIT})
+endif ()
+if (ODBC_INCLUDE_DIRS)  # URHO3D_DATABASE_ODBC is implied
+    list (APPEND INCLUDE_DIRS ${ODBC_INCLUDE_DIRS})
 endif ()
 
 # Setup library output path
