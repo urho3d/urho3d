@@ -1648,7 +1648,9 @@ void HandleWheelDiscardColor(StringHash eventType, VariantMap& eventData)
 {
     if (coloringComponent !is null)
     {
-        Color oldColor = eventData["Color"].GetColor(); //Old color from ColorWheel from ShowColorWheelWithColor(old)     
+        //Color oldColor = eventData["Color"].GetColor(); //Old color from ColorWheel from ShowColorWheelWithColor(old)     
+        Color oldColor = coloringOldColor;
+        
         // preview new color
         if (coloringComponent.typeName == "Light") 
         {
@@ -1707,7 +1709,7 @@ void HandleWheelDiscardColor(StringHash eventType, VariantMap& eventData)
                         valueString += " ";
                         valueString += String(oldColor.b).Substring(0,5);
                         valueString += " ";
-                        valueString += String(oldColor.a).Substring(0,5);
+                        valueString += String(coloringOldScalar).Substring(0,5);
                         newValue.FromString(oldValue.type, valueString);    
                         mat.shaderParameters["MatSpecColor"] = newValue;
                     }

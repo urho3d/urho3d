@@ -1422,23 +1422,34 @@ bool ColorWheelSetupBehaviorForColoring()
             { 
                 if (coloringPropertyName == localization.Get("Diffuse color"))
                 {
-                    Color color = mat.shaderParameters["MatDiffColor"].GetColor();
-                    coloringOldColor = color;
+                    Variant oldValue = mat.shaderParameters["MatDiffColor"];
+                    Array<String> values = oldValue.ToString().Split(' ');
+                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat(),values[3].ToFloat());
+                    ShowColorWheelWithColor(coloringOldColor);
                 }
                 else if (coloringPropertyName == localization.Get("Specular color"))
                 {
-                    coloringOldColor = mat.shaderParameters["MatSpecColor"].GetColor();
+                    Variant oldValue = mat.shaderParameters["MatSpecColor"];
+                    Array<String> values = oldValue.ToString().Split(' ');
+                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat(),values[3].ToFloat());
+                    ShowColorWheelWithColor(Color(coloringOldColor.r, coloringOldColor.g, coloringOldColor.b, coloringOldScalar/128.0f));
                 }
                 else if (coloringPropertyName == localization.Get("Emissive color"))
                 {
-                    coloringOldColor = mat.shaderParameters["MatEmissiveColor"].GetColor();
+                    Variant oldValue = mat.shaderParameters["MatEmissiveColor"];
+                    Array<String> values = oldValue.ToString().Split(' ');
+                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat(),values[3].ToFloat());
+                    
+                    ShowColorWheelWithColor(coloringOldColor);
                 }
                 else if (coloringPropertyName == localization.Get("Environment map color"))
-                {
-                    coloringOldColor = mat.shaderParameters["MatEnvMapColor"].GetColor();    
-                }
-                
-                ShowColorWheelWithColor(coloringOldColor); 
+                {   
+                    Variant oldValue = mat.shaderParameters["MatEnvMapColor"];
+                    Array<String> values = oldValue.ToString().Split(' ');
+                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat(),values[3].ToFloat());
+                    
+                    ShowColorWheelWithColor(coloringOldColor);
+                }      
             }
         }
     }
