@@ -26,6 +26,11 @@ WeakHandle lastSelectedNode = null;
 WeakHandle lastSelectedDrawable = null;
 WeakHandle lastSelectedComponent = null;
 bool viewCloser = false;
+Component@ coloringComponent = null;
+String coloringTypeName;
+String coloringPropertyName;
+Color coloringOldColor;
+float coloringOldScalar;
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
 const uint VIEWPORT_BORDER_H1    = 0x00000002;
