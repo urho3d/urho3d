@@ -1135,5 +1135,13 @@
 	"Delete?":{
         "en":"Delete?",
         "ru":"Удалить?"
+	},
+	"Opacity":{
+        "en":"Opacity",
+        "ru":"Непрозрачность"
+	},
+	"Color":{
+        "en":"Color",
+        "ru":"Цвет"
 	}
 }

@@ -1718,17 +1718,18 @@ void ActivateContextMenu(Array<UIElement@> actions)
     OpenContextMenu();
 }
 
-Menu@ CreateContextMenuItem(String text, String handler, String name = "")
+Menu@ CreateContextMenuItem(String text, String handler, String menuName = "", bool autoLocalize = true)
 {
     Menu@ menu = Menu();
     menu.defaultStyle = uiStyle;
     menu.style = AUTO_STYLE;
-    menu.name = name;
+    menu.name = menuName;
     menu.SetLayout(LM_HORIZONTAL, 0, IntRect(8, 2, 8, 2));
     Text@ menuText = Text();
     menuText.style = "EditorMenuText";
     menu.AddChild(menuText);
     menuText.text = text;
+    menuText.autoLocalizable = autoLocalize;
     menu.vars[VAR_CONTEXT_MENU_HANDLER] = handler;
     SubscribeToEvent(menu, "Released", "ContextMenuEventWrapper");
     return menu;
@@ -1814,28 +1815,28 @@ bool ColorWheelBuildMenuSelectTypeColor()
            
     if (coloringComponent.typeName == "Light") 
     {
-        actions.Push(CreateContextMenuItem(localization.Get("Light color"), "HandleColorWheelMenu", "menuLightColor" ));
-        actions.Push(CreateContextMenuItem(localization.Get("Specular intensity"), "HandleColorWheelMenu", "menuSpecularIntensity"));
-        actions.Push(CreateContextMenuItem(localization.Get("Brightness multiplier"), "HandleColorWheelMenu", "menuBrightnessMultiplier" ));
+        actions.Push(CreateContextMenuItem("Light color", "HandleColorWheelMenu", "menuLightColor" ));
+        actions.Push(CreateContextMenuItem("Specular intensity", "HandleColorWheelMenu", "menuSpecularIntensity"));
+        actions.Push(CreateContextMenuItem("Brightness multiplier", "HandleColorWheelMenu", "menuBrightnessMultiplier" ));
         
-        actions.Push(CreateContextMenuItem(localization.Get("Cancel"), "HandleColorWheelMenu", "menuCancel"));
+        actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu", "menuCancel"));
         
     }
     else if (coloringComponent.typeName == "StaticModel") 
     {
-        actions.Push(CreateContextMenuItem(localization.Get("Diffuse color"), "HandleColorWheelMenu", "menuDiffuseColor"));
-        actions.Push(CreateContextMenuItem(localization.Get("Specular color"), "HandleColorWheelMenu", "menuSpecularColor"));
-        actions.Push(CreateContextMenuItem(localization.Get("Emissive color"), "HandleColorWheelMenu", "menuEmissiveColor"));
-        actions.Push(CreateContextMenuItem(localization.Get("Environment map color"), "HandleColorWheelMenu", "menuEnvironmentMapColor"));
+        actions.Push(CreateContextMenuItem("Diffuse color", "HandleColorWheelMenu", "menuDiffuseColor"));
+        actions.Push(CreateContextMenuItem("Specular color", "HandleColorWheelMenu", "menuSpecularColor"));
+        actions.Push(CreateContextMenuItem("Emissive color", "HandleColorWheelMenu", "menuEmissiveColor"));
+        actions.Push(CreateContextMenuItem("Environment map color", "HandleColorWheelMenu", "menuEnvironmentMapColor"));
         
-        actions.Push(CreateContextMenuItem(localization.Get("Cancel"), "HandleColorWheelMenu", "menuCancel"));
+        actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu", "menuCancel"));
     }
     else if (coloringComponent.typeName == "Zone")        
     {
-        actions.Push(CreateContextMenuItem(localization.Get("Ambient color"), "HandleColorWheelMenu", "menuAmbientColor"));
-        actions.Push(CreateContextMenuItem(localization.Get("Fog color"), "HandleColorWheelMenu", "menuFogColor"));
+        actions.Push(CreateContextMenuItem("Ambient color", "HandleColorWheelMenu", "menuAmbientColor"));
+        actions.Push(CreateContextMenuItem("Fog color", "HandleColorWheelMenu", "menuFogColor"));
         
-        actions.Push(CreateContextMenuItem(localization.Get("Cancel"), "HandleColorWheelMenu", "menuCancel"));
+        actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu", "menuCancel"));
     }
     
     if (actions.length > 0) {

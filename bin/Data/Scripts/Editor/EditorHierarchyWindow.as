@@ -1535,8 +1535,8 @@ bool BlenderModeDelete()
     // In this place maybe placed avoidance flags that not allow delete in some cases
     
     Array<UIElement@> actions;
-    actions.Push(CreateContextMenuItem(localization.Get("Delete?"), "HandleBlenderModeDelete"));
-    actions.Push(CreateContextMenuItem(localization.Get("Cancel"), "HandleEmpty"));
+    actions.Push(CreateContextMenuItem("Delete?", "HandleBlenderModeDelete"));
+    actions.Push(CreateContextMenuItem("Cancel", "HandleEmpty"));
     
     if (actions.length > 0) {
         ActivateContextMenu(actions);
