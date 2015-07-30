@@ -25,6 +25,7 @@
 #  ODBC_FOUND
 #  ODBC_INCLUDE_DIRS
 #  ODBC_LIBRARIES
+#  ODBC_DEFINES
 #
 
 if (ODBC_FOUND)
@@ -37,13 +38,14 @@ if (WIN32)
     set (ODBC_FOUND 1)
 else ()
     # On Unix-like host system, use the ODBC config tool
-    find_program (ODBC_CONFIG NAMES iodbc-config odbc_config DOC "ODBC config tool" NO_CMAKE_FIND_ROOT_PATH)
+    find_program (ODBC_CONFIG NAMES odbc_config iodbc-config DOC "ODBC config tool" NO_CMAKE_FIND_ROOT_PATH)
     if (ODBC_CONFIG)
         # Get ODBC compile and link flags and turn them into include dirs and libraries list
         execute_process(COMMAND ${ODBC_CONFIG} --cflags OUTPUT_VARIABLE ODBC_COMPILE_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
         execute_process(COMMAND ${ODBC_CONFIG} --libs OUTPUT_VARIABLE ODBC_LINK_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
         string (REGEX REPLACE " *-I" ";" ODBC_INCLUDE_DIRS "${ODBC_COMPILE_FLAGS}")    # Stringify in case it returns empty string
         string (REGEX REPLACE " *-l" ";" ODBC_LIBRARIES "${ODBC_LINK_FLAGS}")
+        list (GET ODBC_INCLUDE_DIRS 0 ODBC_DEFINES)     # Assume the list of defines always come before the list of include dirs
         list (REMOVE_AT ODBC_INCLUDE_DIRS 0)
         list (REMOVE_AT ODBC_LIBRARIES 0)
         set (ODBC_FOUND 1)
@@ -54,8 +56,8 @@ if (ODBC_FOUND)
     include (FindPackageMessage)
     FIND_PACKAGE_MESSAGE (ODBC "Found ODBC driver manager: ${ODBC_LIBRARIES} ${ODBC_INCLUDE_DIRS}" "[${ODBC_LIBRARIES}][${ODBC_INCLUDE_DIRS}]")
 elseif (ODBC_FIND_REQUIRED)
-    message (FATAL_ERROR "Could not find ODBC driver manager, please install the development package of iODBC or UnixODBC")
+    message (FATAL_ERROR "Could not find ODBC driver manager, please install the development package of unixODBC or libiodbc")
 endif ()
 
-mark_as_advanced (ODBC_INCLUDE_DIRS ODBC_LIBRARIES ODBC_CONFIG)
+mark_as_advanced (ODBC_INCLUDE_DIRS ODBC_LIBRARIES ODBC_DEFINES ODBC_CONFIG)
 

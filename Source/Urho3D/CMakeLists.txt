@@ -182,9 +182,6 @@ if (URHO3D_LUA)
     # This is more practical than patching its header files in many places to make them work with relative path
     list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Lua${JIT})
 endif ()
-if (ODBC_INCLUDE_DIRS)  # URHO3D_DATABASE_ODBC is implied
-    list (APPEND INCLUDE_DIRS ${ODBC_INCLUDE_DIRS})
-endif ()
 
 # Setup library output path
 if (ANDROID)

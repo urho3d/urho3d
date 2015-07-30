@@ -30,6 +30,9 @@ define_source_files (GLOB_CPP_PATTERNS src/*.cpp GLOB_H_PATTERNS src/*.h)
 if (ODBC_INCLUDE_DIRS)
     set (INCLUDE_DIRS ${ODBC_INCLUDE_DIRS})
 endif ()
+if (ODBC_DEFINES)
+    add_definitions (${ODBC_DEFINES})
+endif ()
 
 # Setup target
 setup_library ()
