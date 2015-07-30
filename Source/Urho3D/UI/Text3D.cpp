@@ -558,6 +558,8 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                 material->SetTechnique(0, tech);
                 material->SetCullMode(CULL_NONE);
                 batches_[i].material_ = material;
+
+                usingSDFShader_ = isSDFFont;
             }
             else
                 batches_[i].material_ = material_->Clone();
@@ -589,8 +591,6 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
             }
         }
     }
-
-    usingSDFShader_ = isSDFFont;
 }
 
 }
