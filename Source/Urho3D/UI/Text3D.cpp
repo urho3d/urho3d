@@ -558,11 +558,12 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                 material->SetTechnique(0, tech);
                 material->SetCullMode(CULL_NONE);
                 batches_[i].material_ = material;
-
-                usingSDFShader_ = isSDFFont;
             }
             else
                 batches_[i].material_ = material_->Clone();
+
+            // Note: custom material is assumed to use the right kind of shader; it is not modified to define SIGNED_DISTANCE_FIELD
+            usingSDFShader_ = isSDFFont;
         }
 
         Material* material = batches_[i].material_;
