@@ -14,7 +14,7 @@
 				<attribute name="Name" value="ColorWheel" />
 				<attribute name="Size" value="256 256" />
 				<attribute name="Is Enabled" value="true" />
-				<attribute name="Texture" value="Texture2D;Textures/Editor/hsv20.png" />
+				<attribute name="Texture" value="Texture2D;Textures/Editor/HSV20.png" />
 				<attribute name="Image Rect" value="0 0 256 256" />
 				<attribute name="Blend Mode" value="alpha" />
 				<element type="BorderImage">
