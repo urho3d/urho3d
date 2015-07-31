@@ -98,9 +98,9 @@ void CreateUI()
     SubscribeToEvent("MouseButtonUp", "UnfadeUI");
     SubscribeToEvent("ChangeLanguage", "HandleChangeLanguage");
     
-    SubscribeToEvent("WheelChangeColor", "HandleWheelChangeColor" );
-    SubscribeToEvent("WheelSelectColor", "HandleWheelSelectColor" );
-    SubscribeToEvent("WheelDiscardColor", "HandleWheelDiscardColor" );
+    SubscribeToEvent("WheelChangeColor", "HandleWheelChangeColor");
+    SubscribeToEvent("WheelSelectColor", "HandleWheelSelectColor");
+    SubscribeToEvent("WheelDiscardColor", "HandleWheelDiscardColor");
 }
 
 void ResizeUI()
@@ -332,17 +332,17 @@ void CreateMenuBar()
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Cut", @Cut, 'X', QUAL_CTRL));
         
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)
             popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_CTRL));
-        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
-            popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_SHIFT ));
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
+            popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_SHIFT));
         
         popup.AddChild(CreateMenuItem("Copy", @Copy, 'C', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Paste", @Paste, 'V', QUAL_CTRL));
         
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)
             popup.AddChild(CreateMenuItem("Delete", @Delete, KEY_DELETE, QUAL_ANY));
-        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
             popup.AddChild(CreateMenuItem("Delete", @BlenderModeDelete, 'X', QUAL_ANY));
         
         popup.AddChild(CreateMenuItem("Select all", @SelectAll, 'A', QUAL_CTRL));
@@ -352,55 +352,55 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Reset to default", @ResetToDefault));
         CreateChildDivider(popup);
         
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )    
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)    
         {
             popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition));
             popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation));
             popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale));
         }
-        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
         { 
             popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition, 'G' , QUAL_ALT));
-            popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation, 'R', QUAL_ALT ));
+            popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation, 'R', QUAL_ALT));
             popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale, 'S', QUAL_ALT));
         }
         
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD ) 
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD) 
         {
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'E', QUAL_CTRL));
             popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'E', QUAL_ALT));
         }
-        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
         {
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'H'));
             popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'H', QUAL_ALT));
         }
         
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)
             popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'U', QUAL_CTRL));
-        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
             popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'P', QUAL_ALT));
 
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)
             popup.AddChild(CreateMenuItem("Parent to last", @NodesParentToLastSelected, 'U'));
-        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
             popup.AddChild(CreateMenuItem("Parent to last", @NodesParentToLastSelected, 'P', QUAL_CTRL));
 
         CreateChildDivider(popup);
         
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)
             popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
-        //else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+        //else if (hotKeyMode == HOT_KEYS_MODE_BLENDER)
         //    popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
         
-        if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) 
+        if (hotKeyMode == HOTKEYS_MODE_BLENDER) 
         {
              popup.AddChild(CreateMenuItem("Move to layer", @ShowLayerMover, 'M'));
              popup.AddChild(CreateMenuItem("Smart Duplicate", @SceneSmartDuplicateNode, 'D', QUAL_ALT));
              popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_KP_PERIOD));
-             popup.AddChild(CreateMenuItem("Color wheel", @ColorWheelBuildMenuSelectTypeColor, 'W', QUAL_ALT));                     
         }
-        
+        popup.AddChild(CreateMenuItem("Color wheel", @ColorWheelBuildMenuSelectTypeColor, 'W', QUAL_ALT));
+
         CreateChildDivider(popup);
         
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
@@ -1183,7 +1183,7 @@ void HandleUIElementDefaultStyle(StringHash eventType, VariantMap& eventData)
     SetUIElementDefaultStyle(ExtractFileName(eventData));
 }
 
-void HandleHotKeysBlender( VariantMap& eventData ) 
+void HandleHotKeysBlender( VariantMap& eventData) 
 {
     int key = eventData["Key"].GetInt();
     int viewDirection = eventData["Qualifiers"].GetInt() == QUAL_CTRL ? -1 : 1;
@@ -1328,7 +1328,7 @@ void HandleHotKeysBlender( VariantMap& eventData )
                  ReacquireCameraYawPitch();
             } 
          }
-         else if ( eventData["Qualifiers"].GetInt() != QUAL_CTRL) // set transformations
+         else if (eventData["Qualifiers"].GetInt() != QUAL_CTRL) // set transformations
          {
                 if (key == KEY_G) 
                 {
@@ -1370,7 +1370,7 @@ void HandleHotKeysBlender( VariantMap& eventData )
     toolBarDirty = true;
 }
 
-void HandleHotKeysStandart ( VariantMap& eventData) 
+void HandleHotKeysStandard(VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
     int viewDirection = eventData["Qualifiers"].GetInt() == QUAL_CTRL ? -1 : 1;
@@ -1507,13 +1507,13 @@ void HandleHotKeysStandart ( VariantMap& eventData)
 
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-    if ( hotKeyMode == HOTKEYS_MODE_STANDARD)
+    if (hotKeyMode == HOTKEYS_MODE_STANDARD)
     {
-        HandleHotKeysStandart( eventData );
+        HandleHotKeysStandard(eventData);
     }
-    else if( hotKeyMode == HOTKEYS_MODE_BLENDER )
+    else if( hotKeyMode == HOTKEYS_MODE_BLENDER)
     {
-        HandleHotKeysBlender ( eventData );
+        HandleHotKeysBlender(eventData);
     }
 }
 
@@ -1815,9 +1815,9 @@ bool ColorWheelBuildMenuSelectTypeColor()
            
     if (coloringComponent.typeName == "Light") 
     {
-        actions.Push(CreateContextMenuItem("Light color", "HandleColorWheelMenu", "menuLightColor" ));
+        actions.Push(CreateContextMenuItem("Light color", "HandleColorWheelMenu", "menuLightColor"));
         actions.Push(CreateContextMenuItem("Specular intensity", "HandleColorWheelMenu", "menuSpecularIntensity"));
-        actions.Push(CreateContextMenuItem("Brightness multiplier", "HandleColorWheelMenu", "menuBrightnessMultiplier" ));
+        actions.Push(CreateContextMenuItem("Brightness multiplier", "HandleColorWheelMenu", "menuBrightnessMultiplier"));
         
         actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu", "menuCancel"));
         
