@@ -129,7 +129,7 @@ bool TextureCube::BeginLoad(Deserializer& source)
         int faceWidth, faceHeight;
         loadImages_.Resize(MAX_CUBEMAP_FACES);
 
-        if (imageElem->IsCubemap())
+        if (image->IsCubemap())
         {
             loadImages_[FACE_POSITIVE_X] = image;
             loadImages_[FACE_NEGATIVE_X] = loadImages_[FACE_POSITIVE_X]->GetNextSibling();
