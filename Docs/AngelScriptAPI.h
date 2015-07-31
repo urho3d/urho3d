@@ -4796,6 +4796,8 @@ bool SetSize(int, int, uint);
 
 // Properties:
 /* readonly */
+bool array;
+/* readonly */
 StringHash baseType;
 /* readonly */
 String category;
@@ -4805,6 +4807,8 @@ uint components;
 bool compressed;
 /* readonly */
 CompressedFormat compressedFormat;
+/* readonly */
+bool cubemap;
 /* readonly */
 int depth;
 /* readonly */
@@ -4816,6 +4820,8 @@ String name;
 uint numCompressedLevels;
 /* readonly */
 int refs;
+/* readonly */
+bool sRGB;
 /* readonly */
 StringHash type;
 /* readonly */
