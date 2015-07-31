@@ -35,6 +35,12 @@ class URHO3D_API DbResult
     friend class DbConnection;
 
 public:
+    // Default constructor constructs an empty result object.
+    DbResult() :
+        numAffectedRows_(-1)
+    {
+    }
+
     /// Return number of columns in the resultset or 0 if there is no resultset.
     int NumColumns() const { return columns_.Size(); }
 
@@ -42,7 +48,7 @@ public:
     long NumRows() const { return rows_.Size(); }
 
     /// Return number of affected rows by the DML query or -1 if the number of affected rows is not available.
-    long NumAffectedRows() const { return resultImpl_ ? resultImpl_.affected_rows() : -1; }
+    long NumAffectedRows() const { return numAffectedRows_; }
 
     /// Return the underlying implementation result object.
     const nanodbc::result& GetResultImpl() const { return resultImpl_; }
@@ -60,6 +66,8 @@ private:
     Vector<String> columns_;
     /// Fetched rows from the resultset.
     Vector<VariantVector> rows_;
+    /// Number of affected rows by recent DML query.
+    long numAffectedRows_;
 };
 
 }

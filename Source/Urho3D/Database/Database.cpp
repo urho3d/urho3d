@@ -30,7 +30,7 @@ namespace Urho3D
 
 Database::Database(Context* context_) :
     Object(context_),
-#ifdef URHO3D_DATABASE_ODBC
+#ifdef ODBC_3_OR_LATER
     usePooling_(false)
 #else
     usePooling_(true)

@@ -52,20 +52,20 @@ public:
 
     /// Create new database connection. Return 0 if failed.
     DbConnection* Connect(const String& connectionString);
-    /// Disconnect a database connection.
+    /// Disconnect a database connection. The connection object pointer should not be used anymore after this.
     void Disconnect(DbConnection* connection);
 
     /// Return true when using internal database connection pooling. The internal database pooling is managed by the Database subsystem itself and should not be confused with ODBC connection pooling option when ODBC is being used.
     bool IsUsePooling() const { return usePooling_; }
 
-    /// Set whether to use internal database connection pooling. The internal database pooling is managed by the Database subsystem itself and should not be confused with ODBC connection pooling option when ODBC is being used.
+    /// Set whether to use internal database connection pooling. The internal database pooling is managed by the Database subsystem itself and should not be confused with ODBC connection pooling option when ODBC driver manager version 3.0 or later is being used.
     void SetUsePooling(bool usePooling) { usePooling_ = usePooling; }
 
 private:
     /// Internal helper to disconnect all the database connections in the collection.
     void DisconnectAll(PODVector<DbConnection*>& collection);
 
-    /// Using database connection pool flag. Default to false when using ODBC as ODBC driver manager manages database connection pooling better.
+    /// Using database connection pool flag. Default to false when using ODBC 3.0 or later as ODBC 3.0 driver manager manages its database connection pooling.
     bool usePooling_;
     /// Active database connections.
     PODVector<DbConnection*> connections_;

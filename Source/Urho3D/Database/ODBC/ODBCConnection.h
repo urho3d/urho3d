@@ -56,6 +56,9 @@ public:
     bool IsConnected() const { return connectionImpl_.connected(); }
 
 private:
+    /// Internal helper method to handle runtime exception by logging it to stderr stream.
+    void HandleRuntimeError(const char* message, const char* cause);
+
     /// The connection string for SQLite3 is using the URI format described in https://www.sqlite.org/uri.html, while the connection string for ODBC is using DSN format as per ODBC standard.
     String connectionString_;
     /// The underlying implementation connection object.

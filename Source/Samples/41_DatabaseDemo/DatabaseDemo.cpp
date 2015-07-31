@@ -52,6 +52,7 @@ DatabaseDemo::~DatabaseDemo()
     // Although the managed database connection will be disconnected by Database subsystem automatically in its destructor,
     // it is a good practice for a class to balance the number of connect() and disconnect() calls.
     GetSubsystem<Database>()->Disconnect(connection_);
+    connection_ = 0;
 }
 
 void DatabaseDemo::Start()
@@ -97,18 +98,22 @@ void DatabaseDemo::Start()
     // This demo will always work when using SQLite API as the SQLite database engine is embedded inside Urho3D game engine
     //   and this is also the case when targeting HTML5 in Emscripten build
 
+    // We could have used #ifdef to init the connection string during compile time, but below shows how it is done during runtime
+    // The "URHO3D_DATABASE_ODBC" compiler define is set when URHO3D_DATABASE_ODBC build option is enabled
     // Connect to a temporary in-memory SQLite database
     connection_ =
         GetSubsystem<Database>()->Connect(Database::GetAPI() == DBAPI_ODBC ? "Driver=SQLITE3;Database=:memory:" : "file://");
 
     // Subscribe to database cursor event to loop through query resultset
-    SubscribeToEvent(connection_, E_DBCURSOR, HANDLER(DatabaseDemo, HandleDbCursor));
+    SubscribeToEvent(E_DBCURSOR, HANDLER(DatabaseDemo, HandleDbCursor));
 
     // Show instruction
     Print("This demo connects to temporary in-memory database.\n"
         "All the tables and their data will be lost after exiting the demo.\n"
-        "Enter 'quit' or 'exit' to exit the demo. Enter 'set maxrows=n' to set the maximum rows to be printed out.\n"
         "Enter a valid SQL statement in the console input and press Enter to execute.\n"
+        "Enter 'get/set maxrows [number]' to get/set the maximum rows to be printed out.\n"
+        "Enter 'get/set connstr [string]' to get/set the database connection string and establish a new connection to it.\n"
+        "Enter 'quit' or 'exit' to exit the demo.\n"
         "For example:\n ");
     HandleInput("create table tbl1(col1 varchar(10), col2 smallint)");
     HandleInput("insert into tbl1 values('Hello', 10)");
@@ -168,21 +173,45 @@ void DatabaseDemo::HandleInput(const String& input)
     else if (input.StartsWith("set") || input.StartsWith("get"))
     {
         // We expect a key/value pair for 'set' command
-        Vector<String> tokens = input.Substring(3).Trimmed().Split('=');
-        if (input.StartsWith("set"))
+        Vector<String> tokens = input.Substring(3).Split(' ');
+        String setting = tokens.Size() ? tokens[0] : "";
+        if (input.StartsWith("set") && tokens.Size() > 1)
         {
-            if (tokens[0].Trimmed() == "maxrows")
+            if (setting == "maxrows")
                 maxRows_ = (unsigned)Max(ToUInt(tokens[1]), 1);
+            else if (setting == "connstr")
+            {
+                String newConnectionString(input.Substring(input.Find(" ", input.Find("connstr")) + 1));
+                Database* database = GetSubsystem<Database>();
+                DbConnection* newConnection = database->Connect(newConnectionString);
+                if (newConnection)
+                {
+                    database->Disconnect(connection_);
+                    connection_ = newConnection;
+                }
+            }
         }
-        if (tokens[0].Trimmed() == "maxrows")
-            Print(ToString("maxrows is set to %d", maxRows_));
+        if (tokens.Size())
+        {
+            if (setting == "maxrows")
+                Print(ToString("maximum rows is set to %d", maxRows_));
+            else if (setting == "connstr")
+                Print(ToString("connection string is set to %s", connection_->GetConnectionString().CString()));
+            else
+                Print(ToString("Unrecognized setting: %s", setting.CString()));
+        }
         else
-            Print("Unrecognized setting");
+            Print("Missing setting paramater. Recognized settings are: maxrows, connstr");
     }
     else
     {
+        // In this sample demo we use the dbCursor event to loop through each row as it is being fetched
+        // Regardless of this event is being used or not, all the fetched rows will be made available in the DbResult object,
+        //   unless the dbCursor event handler has instructed to filter out the fetched row from the final result
         DbResult result = connection_->Execute(input, true);
-        if (result.NumAffectedRows() > 0)
+
+        // Number of affected rows is only meaningful for DML statements like insert/update/delete
+        if (result.NumAffectedRows() != -1)
             Print(ToString("Number of affected rows: %d", result.NumAffectedRows()));
     }
     Print(" ");

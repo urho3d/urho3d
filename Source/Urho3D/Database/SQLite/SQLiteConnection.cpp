@@ -86,7 +86,7 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
     bool filtered = false;
     bool aborted = false;
 
-    while (1)
+    while (numCols)
     {
         rc = sqlite3_step(pStmt);
         if (rc == SQLITE_ROW)
@@ -152,7 +152,7 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
         }
     }
 
-    result.numAffectedRows_ = sqlite3_stmt_readonly(pStmt) ? -1 : sqlite3_changes(connectionImpl_);
+    result.numAffectedRows_ = numCols ? -1 : sqlite3_changes(connectionImpl_);
     return result;
 }
 

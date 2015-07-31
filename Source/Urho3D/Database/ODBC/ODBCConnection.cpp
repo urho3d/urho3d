@@ -40,7 +40,7 @@ DbConnection::DbConnection(Context* context, const String& connectionString) :
     }
     catch (std::runtime_error& e)
     {
-        LOGERRORF("Could not connect: %s", e.what());
+        HandleRuntimeError("Could not connect", e.what());
     }
 }
 
@@ -54,7 +54,7 @@ DbConnection::~DbConnection()
     catch (std::runtime_error& e)
     {
         // This should not happen after finalizing the connection, log error in Release but assert in Debug
-        LOGERRORF("Could not disconnect: %s", e.what());
+        HandleRuntimeError("Could not disconnect", e.what());
         assert(false);
     }
 }
@@ -71,9 +71,9 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
     try
     {
         result.resultImpl_ = nanodbc::execute(connectionImpl_, sql.Trimmed().CString());
-        if (!result.resultImpl_.affected_rows())
+        short numCols = result.resultImpl_.columns();
+        if (numCols)
         {
-            short numCols = result.resultImpl_.columns();
             result.columns_.Resize((unsigned)numCols);
             for (short i = 0; i < numCols; ++i)
                 result.columns_[i] = result.resultImpl_.column_name(i).c_str();
@@ -139,13 +139,20 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
                     break;
             }
         }
+        result.numAffectedRows_ = numCols ? -1 : result.resultImpl_.affected_rows();
     }
     catch (std::runtime_error& e)
     {
-        LOGERRORF("Could not execute: %s", e.what());
+        HandleRuntimeError("Could not execute", e.what());
     }
 
     return result;
+}
+
+void DbConnection::HandleRuntimeError(const char* message, const char* cause)
+{
+    Vector<String> tokens = (String(cause) + "::").Split(':');      // Added "::" as sentinels against unexpected cause format
+    LOGERRORF("%s: nanodbc:%s:%s", message, tokens[1].CString(), tokens[2].CString());
 }
 
 }

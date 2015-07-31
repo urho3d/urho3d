@@ -24,6 +24,9 @@
 set (TARGET_NAME Urho3D)
 
 add_definitions (-DURHO3D_IS_BUILDING)
+if (ODBC_VERSION AND NOT ODBC_VERSION VERSION_LESS 3)
+    add_definitions (-DODBC_3_OR_LATER)
+endif ()
 
 # Windows platform has its own naming convention for library
 set (LIB_NAME ${TARGET_NAME})
@@ -327,7 +330,8 @@ install_header_files (FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h ${CMAKE_CU
 
 # Generate platform specific pkg-config file for the benefit of Urho3D library users via SDK without CMake
 get_directory_property (URHO3D_COMPILE_DEFINITIONS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMPILE_DEFINITIONS)
-list (REMOVE_ITEM URHO3D_COMPILE_DEFINITIONS HAVE_STDINT_H GLEW_STATIC GLEW_NO_GLU)     # Remove those defines that are only used for building the library and not needed by library user
+# Remove those defines that are only used for building the library and not needed by library user
+list (REMOVE_ITEM URHO3D_COMPILE_DEFINITIONS HAVE_STDINT_H GLEW_STATIC GLEW_NO_GLU URHO3D_IS_BUILDING ODBC_3_OR_LATER)
 if (ABSOLUTE_PATH_LIBS)
     string (REPLACE ";" "\" \"" URHO3D_ABS_PATH_LIBS "\"${ABSOLUTE_PATH_LIBS}\"")   # Note: need to always "stringify" a variable in list context for replace to work correctly, besides the list could be empty
     string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" URHO3D_ABS_PATH_LIBS "${URHO3D_ABS_PATH_LIBS}")
