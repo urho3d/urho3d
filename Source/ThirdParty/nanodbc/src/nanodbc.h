@@ -71,8 +71,6 @@
 //! See http://www.codeguru.com/submission-guidelines.php for details.
 //! </div>
 
-// Modified by Yao Wei Tjong for Urho3D
-
 #ifndef NANODBC_H
 #define NANODBC_H
 
@@ -357,6 +355,8 @@ public:
     class result execute_direct(class connection& conn, const string_type& query, long batch_operations = 1, long timeout = 0);
 
     //! \brief Execute the previously prepared query now without constructing result object.
+    //! \param conn The connection where the statement will be executed.
+    //! \param query The SQL query that will be executed.
     //! \param batch_operations Numbers of rows to fetch per rowset, or the number of batch parameters to process.
     //! \param timeout The number in seconds before query timeout. Default is 0 indicating no timeout.
     //! \throws database_error
@@ -868,8 +868,6 @@ public:
 
     //! Returns a identifying integer value representing the SQL type of this column by name.
     int column_datatype(const string_type& column_name) const;
-
-    // Urho3D - add new methods to return C type
 
     //! Returns a identifying integer value representing the C type of this column.
     int column_c_datatype(short column) const;

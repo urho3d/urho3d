@@ -1,7 +1,4 @@
 //! \file nanodbc.cpp Implementation details.
-
-// Modified by Yao Wei Tjong for Urho3D
-
 #ifndef DOXYGEN
 
 #include "nanodbc.h"
@@ -1739,8 +1736,6 @@ public:
         return col.sqltype_;
     }
 
-    // Urho3D - add new methods to return C type
-
     int column_c_datatype(short column) const
     {
         if(column >= bound_columns_size_)
@@ -1973,12 +1968,8 @@ private:
                     col.ctype_ = SQL_C_SBIGINT;
                     col.clen_ = sizeof(int64_t);
                     break;
-                // Urho3D - bind SQL_FLOAT to SQL_C_FLOAT instead of SQL_C_DOUBLE
-                case SQL_FLOAT:
-                    col.ctype_ = SQL_C_FLOAT;
-                    col.clen_ = sizeof(float);
-                    break;
                 case SQL_DOUBLE:
+                case SQL_FLOAT:
                 case SQL_DECIMAL:
                 case SQL_REAL:
                 case SQL_NUMERIC:
@@ -2980,8 +2971,6 @@ int result::column_datatype(const string_type& column_name) const
 {
     return impl_->column_datatype(column_name);
 }
-
-// Urho3D - add new methods to return C type
 
 int result::column_c_datatype(short column) const
 {
