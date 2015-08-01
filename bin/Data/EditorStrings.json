@@ -263,7 +263,7 @@
 	"UI-layout":{
 		"en":"UI-layout",
 		"ru": "Разметка интерфейса",
-		"fr": "Disposition interface utilisateur"
+		"fr": "Disposition d'interface utilisateur"
 	},
 	"Open UI-layout...":{
 		"en":"Open UI-layout...",
@@ -308,7 +308,7 @@
 	"View":{
 		"en":"View",
 		"ru": "Вид",
-		"fr": "Vue"
+		"fr": "Affichage"
 	},
 	"Hierarchy":{
 		"en":"Hierarchy",
@@ -373,12 +373,12 @@
 	"  Pick: ":{
 		"en":"  Pick: ",
 		"ru": "  Выбор: ",
-		"fr": " Prendre: "
+		"fr": " Sélection: "
 	},
 	"  Fill: ":{
 		"en":"  Fill: ",
 		"ru": "  Отображение: ",
-		"fr": " Remplir: "
+		"fr": " Remplissage: "
 	},
 	"  Updates: ":{
 		"en":"  Updates: ",
@@ -388,7 +388,7 @@
 	"Running":{
 		"en":"Running",
 		"ru": "Запущены",
-		"fr": "Fonctionnement"
+		"fr": "En marche"
 	},
 	"Paused":{
 		"en":"Paused",
@@ -438,7 +438,7 @@
 	"Select":{
 		"en":"Select",
 		"ru": "Выделение",
-		"fr": "Sélectionner"
+		"fr": "Sél."
 	},
 	"Spawn":{
 		"en":"Spawn",
@@ -448,7 +448,7 @@
 	"World":{
 		"en":"World",
 		"ru": "Мировые",
-		"fr": "Monde"
+		"fr": "Global"
 	},
 	"Local":{
 		"en":"Local",
@@ -583,7 +583,7 @@
 	"AxisWorld":{
 		"en":"AxisWorld",
 		"ru": "Мировые оси",
-		"fr": "Axe du monde"
+		"fr": "Axe global"
 	},
 	"AxisLocal":{
 		"en":"AxisLocal",
@@ -923,22 +923,22 @@
 	"New":{
 		"en":"New",
 		"ru": "Нов.",
-		"fr": "Nouveau"
+		"fr": "Nouv."
 	},
 	"Del":{
 		"en":"Del",
 		"ru": "Удал.",
-		"fr": "Effacer"
+		"fr": "Eff."
 	},
 	"smallButtonPick":{
 		"en":"Pick",
 		"ru": "Выбр.",
-		"fr": "Sélection"
+		"fr": "Sél."
 	},
 	"smallButtonOpen":{
 		"en":"Open",
 		"ru": "Откр.",
-		"fr": "Ouvrir"
+		"fr": "Ouv."
 	},
 	"smallButtonEdit":{
 		"en":"Edit",
@@ -1081,67 +1081,83 @@
 		"fr": "  Mode vol caméra: "
 	},
 	"Light color":{
-        "en":"Light color",
-        "ru":"Цвет источника света"
+		"en":"Light color",
+		"ru":"Цвет источника света",
+		"fr":"Couleur de la lumière"
 	},
-    "Specular intensity":{
-        "en":"Specular intensity",
-        "ru":"Интенсивность бликов"
+	"Specular intensity":{
+		"en":"Specular intensity",
+		"ru":"Интенсивность бликов",
+		"fr":"Intensité spéculaire"
 	},
-    "Brightness multiplier":{
-        "en":"Brightness multiplier",
-        "ru":"Мультипликатор яркости"
+	"Brightness multiplier":{
+		"en":"Brightness multiplier",
+		"ru":"Мультипликатор яркости",
+		"fr":"Multiplicateur de luminosité"
 	},
-    "Ambient color":{
-        "en":"Ambient color",
-        "ru":"Цвет окружения"
+	"Ambient color":{
+		"en":"Ambient color",
+		"ru":"Цвет окружения",
+		"fr":"Couleur ambiante"
 	},
 	"Fog color":{
-        "en":"Fog color",
-        "ru":"Цвет тумана"
+		"en":"Fog color",
+		"ru":"Цвет тумана",
+		"fr":"Couleur du brouillard"
 	},
-    "Move to layer":{
-        "en":"Move to layer",
-        "ru":"Переместить на слой"
+	"Move to layer":{
+		"en":"Move to layer",
+		"ru":"Переместить на слой",
+		"fr":"Déplacer sur un calque"
 	},
-    "Smart Duplicate":{
-        "en":"Smart Duplicate",
-        "ru":"Дублирование со смещением"
+	"Smart Duplicate":{
+		"en":"Smart Duplicate",
+		"ru":"Дублирование со смещением",
+		"fr":"Duplication intelligente"
 	},
 	"View closer":{
-        "en":"View closer",
-        "ru":"Показать поближе"
+		"en":"View closer",
+		"ru":"Показать поближе",
+		"fr":"Voir plus près"
 	},
-    "Color wheel":{
-        "en":"Color wheel",
-        "ru":"Цветовое колесо"
+	"Color wheel":{
+		"en":"Color wheel",
+		"ru":"Цветовое колесо",
+		"fr":"Palette de couleurs"
 	},
 	"Diffuse color":{
-        "en":"Diffuse color",
-        "ru":"Диффузный цвет"
+		"en":"Diffuse color",
+		"ru":"Диффузный цвет",
+		"fr":"Couleur diffuse"
 	},
 	"Specular color":{
-        "en":"Specular color",
-        "ru":"Цвет бликов"
+		"en":"Specular color",
+		"ru":"Цвет бликов",
+		"fr":"Couleur spéculaire"
 	},
-    "Emissive color":{
-        "en":"Emissive color",
-        "ru":"Цвет самосвечения"
+	"Emissive color":{
+		"en":"Emissive color",
+		"ru":"Цвет самосвечения",
+		"fr":"Couleur émissive"
 	},
 	"Environment map color":{
-        "en":"Environment map color",
-        "ru":"Цвет карты окружения"
+		"en":"Environment map color",
+		"ru":"Цвет карты окружения",
+		"fr":"Couleur map d'environement"
 	},
 	"Delete?":{
-        "en":"Delete?",
-        "ru":"Удалить?"
+		"en":"Delete?",
+		"ru":"Удалить?",
+		"fr":"Effacer?"
 	},
 	"Opacity":{
-        "en":"Opacity",
-        "ru":"Непрозрачность"
+		"en":"Opacity",
+		"ru":"Непрозрачность",
+		"fr":"Opacité"
 	},
 	"Color":{
-        "en":"Color",
-        "ru":"Цвет"
+		"en":"Color",
+		"ru":"Цвет",
+		"fr":"Couleur"
 	}
 }
