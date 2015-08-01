@@ -229,6 +229,9 @@ static void RegisterImage(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Image", "CompressedFormat get_compressedFormat() const", asMETHOD(Image, GetCompressedFormat), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "uint get_numCompressedLevels() const", asMETHOD(Image, GetNumCompressedLevels), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "Image@+ GetSubimage(const IntRect&in) const", asMETHOD(Image, GetSubimage), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool get_cubemap() const", asMETHOD(Image, IsCubemap), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool get_array() const", asMETHOD(Image, IsArray), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool get_sRGB() const", asMETHOD(Image, IsSRGB), asCALL_THISCALL);
 }
 
 static void ConstructJSONValue(JSONValue* ptr)

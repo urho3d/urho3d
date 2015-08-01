@@ -20,12 +20,17 @@ String renderPathName;
 bool mouseWheelCameraPosition = false;
 bool contextMenuActionWaitFrame = false;
 bool cameraFlyMode = true;
-int hotKeyMode = 0; // used for checking that kind of style manipulation user are prefer ( see HotKeysMode )
+int hotKeyMode = 0; // used for checking that kind of style manipulation user are prefer (see HotKeysMode)
 Vector3 lastSelectedNodesCenterPoint = Vector3(0,0,0); // for Blender mode to avoid own origin rotation when no nodes are selected. preserve last center for this
 WeakHandle lastSelectedNode = null;
 WeakHandle lastSelectedDrawable = null;
 WeakHandle lastSelectedComponent = null;
 bool viewCloser = false;
+Component@ coloringComponent = null;
+String coloringTypeName;
+String coloringPropertyName;
+Color coloringOldColor;
+float coloringOldScalar;
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
 const uint VIEWPORT_BORDER_H1    = 0x00000002;
@@ -1226,9 +1231,9 @@ void UpdateView(float timeStep)
     if (input.keyDown[KEY_LSHIFT])
         speedMultiplier = cameraShiftSpeedMultiplier;
     
-    if (!input.keyDown[KEY_LCTRL])
-    {        
-        if (hotKeyMode == HOTKEYS_MODE_STANDARD ||  (hotKeyMode == HOTKEYS_MODE_BLENDER && cameraFlyMode && !input.keyDown[KEY_LSHIFT])) 
+    if (!input.keyDown[KEY_LCTRL] && !input.keyDown[KEY_LALT])
+    {
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD || (hotKeyMode == HOTKEYS_MODE_BLENDER && cameraFlyMode && !input.keyDown[KEY_LSHIFT])) 
         {
             if (input.keyDown['W'] || input.keyDown[KEY_UP])
             {

@@ -54,7 +54,8 @@ Text3D::Text3D(Context* context) :
     customWorldTransform_(Matrix3x4::IDENTITY),
     faceCameraMode_(FC_NONE),
     textDirty_(true),
-    geometryDirty_(true)
+    geometryDirty_(true),
+    usingSDFShader_(false)
 {
     text_.SetUsedInText3D(true);
     text_.SetEffectDepthBias(DEFAULT_EFFECT_DEPTH_BIAS);
@@ -508,6 +509,9 @@ void Text3D::UpdateTextBatches()
 
 void Text3D::UpdateTextMaterials(bool forceUpdate)
 {
+    Font* font = GetFont();
+    bool isSDFFont = font ? font->IsSDFFont() : false;
+
     batches_.Resize(uiBatches_.Size());
     geometries_.Resize(uiBatches_.Size());
 
@@ -520,7 +524,7 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
             batches_[i].geometry_ = geometries_[i] = geometry;
         }
 
-        if (!batches_[i].material_ || forceUpdate)
+        if (!batches_[i].material_ || forceUpdate || isSDFFont != usingSDFShader_)
         {
             // If material not defined, create a reasonable default from scratch
             if (!material_)
@@ -531,7 +535,7 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                 pass->SetVertexShader("Text");
                 pass->SetPixelShader("Text");
 
-                if (GetFont()->IsSDFFont())
+                if (isSDFFont)
                 {
                     switch (GetTextEffect())
                     {
@@ -557,13 +561,16 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
             }
             else
                 batches_[i].material_ = material_->Clone();
+
+            // Note: custom material is assumed to use the right kind of shader; it is not modified to define SIGNED_DISTANCE_FIELD
+            usingSDFShader_ = isSDFFont;
         }
 
         Material* material = batches_[i].material_;
         Texture* texture = uiBatches_[i].texture_;
         material->SetTexture(TU_DIFFUSE, texture);
 
-        if (GetFont()->IsSDFFont())
+        if (isSDFFont)
         {
             switch (GetTextEffect())
             {

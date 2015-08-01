@@ -10,6 +10,8 @@ Array<QuickMenuItem@> quickMenuItems;
 FileSelector@ uiFileSelector;
 String consoleCommandInterpreter;
 Window@ contextMenu;
+float stepColoringGroupUpdate = 100; // ms
+float timeToNextColoringGroupUpdate = 0;
 
 const StringHash UI_ELEMENT_TYPE("UIElement");
 const StringHash WINDOW_TYPE("Window");
@@ -87,6 +89,7 @@ void CreateUI()
     CreateResourceBrowser();
     CreateCamera();
     CreateLayerEditor();
+    CreateColorWheel();
 
     SubscribeToEvent("ScreenMode", "ResizeUI");
     SubscribeToEvent("MenuSelected", "HandleMenuSelected");
@@ -94,6 +97,10 @@ void CreateUI()
     SubscribeToEvent("KeyUp", "UnfadeUI");
     SubscribeToEvent("MouseButtonUp", "UnfadeUI");
     SubscribeToEvent("ChangeLanguage", "HandleChangeLanguage");
+    
+    SubscribeToEvent("WheelChangeColor", "HandleWheelChangeColor");
+    SubscribeToEvent("WheelSelectColor", "HandleWheelSelectColor");
+    SubscribeToEvent("WheelDiscardColor", "HandleWheelDiscardColor");
 }
 
 void ResizeUI()
@@ -325,17 +332,17 @@ void CreateMenuBar()
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Cut", @Cut, 'X', QUAL_CTRL));
         
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)
             popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_CTRL));
-        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
-            popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_SHIFT ));
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
+            popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_SHIFT));
         
         popup.AddChild(CreateMenuItem("Copy", @Copy, 'C', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Paste", @Paste, 'V', QUAL_CTRL));
         
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)
             popup.AddChild(CreateMenuItem("Delete", @Delete, KEY_DELETE, QUAL_ANY));
-        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
             popup.AddChild(CreateMenuItem("Delete", @BlenderModeDelete, 'X', QUAL_ANY));
         
         popup.AddChild(CreateMenuItem("Select all", @SelectAll, 'A', QUAL_CTRL));
@@ -345,54 +352,55 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Reset to default", @ResetToDefault));
         CreateChildDivider(popup);
         
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )    
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)    
         {
             popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition));
             popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation));
             popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale));
         }
-        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
         { 
             popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition, 'G' , QUAL_ALT));
-            popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation, 'R', QUAL_ALT ));
+            popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation, 'R', QUAL_ALT));
             popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale, 'S', QUAL_ALT));
         }
         
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD ) 
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD) 
         {
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'E', QUAL_CTRL));
             popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'E', QUAL_ALT));
         }
-        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
         {
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'H'));
             popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'H', QUAL_ALT));
         }
         
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)
             popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'U', QUAL_CTRL));
-        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
             popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'P', QUAL_ALT));
 
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)
             popup.AddChild(CreateMenuItem("Parent to last", @NodesParentToLastSelected, 'U'));
-        else if ( hotKeyMode == HOTKEYS_MODE_BLENDER )
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
             popup.AddChild(CreateMenuItem("Parent to last", @NodesParentToLastSelected, 'P', QUAL_CTRL));
 
         CreateChildDivider(popup);
         
-        if ( hotKeyMode == HOTKEYS_MODE_STANDARD )
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)
             popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
-        //else if ( hotKeyMode == HOT_KEYS_MODE_BLENDER )
+        //else if (hotKeyMode == HOT_KEYS_MODE_BLENDER)
         //    popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
         
-        if ( hotKeyMode == HOTKEYS_MODE_BLENDER ) 
+        if (hotKeyMode == HOTKEYS_MODE_BLENDER) 
         {
              popup.AddChild(CreateMenuItem("Move to layer", @ShowLayerMover, 'M'));
              popup.AddChild(CreateMenuItem("Smart Duplicate", @SceneSmartDuplicateNode, 'D', QUAL_ALT));
-             popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_KP_PERIOD));                     
+             popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_KP_PERIOD));
         }
-        
+        popup.AddChild(CreateMenuItem("Color wheel", @ColorWheelBuildMenuSelectTypeColor, 'W', QUAL_ALT));
+
         CreateChildDivider(popup);
         
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
@@ -1175,7 +1183,7 @@ void HandleUIElementDefaultStyle(StringHash eventType, VariantMap& eventData)
     SetUIElementDefaultStyle(ExtractFileName(eventData));
 }
 
-void HandleHotKeysBlender( VariantMap& eventData ) 
+void HandleHotKeysBlender( VariantMap& eventData) 
 {
     int key = eventData["Key"].GetInt();
     int viewDirection = eventData["Qualifiers"].GetInt() == QUAL_CTRL ? -1 : 1;
@@ -1320,7 +1328,7 @@ void HandleHotKeysBlender( VariantMap& eventData )
                  ReacquireCameraYawPitch();
             } 
          }
-         else if ( eventData["Qualifiers"].GetInt() != QUAL_CTRL) // set transformations
+         else if (eventData["Qualifiers"].GetInt() != QUAL_CTRL) // set transformations
          {
                 if (key == KEY_G) 
                 {
@@ -1362,7 +1370,7 @@ void HandleHotKeysBlender( VariantMap& eventData )
     toolBarDirty = true;
 }
 
-void HandleHotKeysStandart ( VariantMap& eventData) 
+void HandleHotKeysStandard(VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
     int viewDirection = eventData["Qualifiers"].GetInt() == QUAL_CTRL ? -1 : 1;
@@ -1499,13 +1507,13 @@ void HandleHotKeysStandart ( VariantMap& eventData)
 
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-    if ( hotKeyMode == HOTKEYS_MODE_STANDARD)
+    if (hotKeyMode == HOTKEYS_MODE_STANDARD)
     {
-        HandleHotKeysStandart( eventData );
+        HandleHotKeysStandard(eventData);
     }
-    else if( hotKeyMode == HOTKEYS_MODE_BLENDER )
+    else if( hotKeyMode == HOTKEYS_MODE_BLENDER)
     {
-        HandleHotKeysBlender ( eventData );
+        HandleHotKeysBlender(eventData);
     }
 }
 
@@ -1710,16 +1718,18 @@ void ActivateContextMenu(Array<UIElement@> actions)
     OpenContextMenu();
 }
 
-Menu@ CreateContextMenuItem(String text, String handler)
+Menu@ CreateContextMenuItem(String text, String handler, String menuName = "", bool autoLocalize = true)
 {
     Menu@ menu = Menu();
     menu.defaultStyle = uiStyle;
     menu.style = AUTO_STYLE;
+    menu.name = menuName;
     menu.SetLayout(LM_HORIZONTAL, 0, IntRect(8, 2, 8, 2));
     Text@ menuText = Text();
     menuText.style = "EditorMenuText";
     menu.AddChild(menuText);
     menuText.text = text;
+    menuText.autoLocalizable = autoLocalize;
     menu.vars[VAR_CONTEXT_MENU_HANDLER] = handler;
     SubscribeToEvent(menu, "Released", "ContextMenuEventWrapper");
     return menu;
@@ -1774,4 +1784,339 @@ bool SetSplinePath()
         return false;
 
     return SceneSetChildrenSplinePath(menu.name == "Cyclic");
+}
+
+bool ColorWheelBuildMenuSelectTypeColor() 
+{
+    if (selectedNodes.empty && selectedComponents.empty) return false;
+    editMode = EDIT_SELECT;
+    
+    // do coloring only for single selected object
+    // start with trying to find single component
+    if (selectedComponents.length == 1) 
+    {
+        coloringComponent = selectedComponents[0];    
+    }
+    // else try to get first component from selected node
+    else if (selectedNodes.length == 1) 
+    {
+        Array<Component@> components = selectedNodes[0].GetComponents();
+        if (components.length > 0) 
+        {
+            coloringComponent = components[0];
+        }
+    }
+    else
+        return false;
+        
+    if (coloringComponent is null) return false;
+    
+    Array<UIElement@> actions;
+           
+    if (coloringComponent.typeName == "Light") 
+    {
+        actions.Push(CreateContextMenuItem("Light color", "HandleColorWheelMenu", "menuLightColor"));
+        actions.Push(CreateContextMenuItem("Specular intensity", "HandleColorWheelMenu", "menuSpecularIntensity"));
+        actions.Push(CreateContextMenuItem("Brightness multiplier", "HandleColorWheelMenu", "menuBrightnessMultiplier"));
+        
+        actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu", "menuCancel"));
+        
+    }
+    else if (coloringComponent.typeName == "StaticModel") 
+    {
+        actions.Push(CreateContextMenuItem("Diffuse color", "HandleColorWheelMenu", "menuDiffuseColor"));
+        actions.Push(CreateContextMenuItem("Specular color", "HandleColorWheelMenu", "menuSpecularColor"));
+        actions.Push(CreateContextMenuItem("Emissive color", "HandleColorWheelMenu", "menuEmissiveColor"));
+        actions.Push(CreateContextMenuItem("Environment map color", "HandleColorWheelMenu", "menuEnvironmentMapColor"));
+        
+        actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu", "menuCancel"));
+    }
+    else if (coloringComponent.typeName == "Zone")        
+    {
+        actions.Push(CreateContextMenuItem("Ambient color", "HandleColorWheelMenu", "menuAmbientColor"));
+        actions.Push(CreateContextMenuItem("Fog color", "HandleColorWheelMenu", "menuFogColor"));
+        
+        actions.Push(CreateContextMenuItem("Cancel", "HandleColorWheelMenu", "menuCancel"));
+    }
+    
+    if (actions.length > 0) {
+        ActivateContextMenu(actions);
+        return true;
+    }
+        
+    return false;
+}
+
+void HandleColorWheelMenu() 
+{
+    ColorWheelSetupBehaviorForColoring();
+}
+
+// color was changed, update color of all colorGroup for immediate preview;
+void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
+{
+    if (timeToNextColoringGroupUpdate > time.systemTime) return;
+
+    if (coloringComponent !is null)
+    {
+        Color c = eventData["Color"].GetColor();  // current ColorWheel   
+        // preview new color
+        if (coloringComponent.typeName == "Light") 
+        {
+            Light@ light = cast<Light>(coloringComponent);
+            if (light !is null) 
+            {          
+                if (coloringPropertyName == "menuLightColor")
+                {
+                    light.color = c;
+                }
+                else if (coloringPropertyName == "menuSpecularIntensity")
+                {
+                   // multiply out 
+                   light.specularIntensity = c.Value() * 10.0f;
+
+                }
+                else if (coloringPropertyName == "menuBrightnessMultiplier")
+                {
+                   light.brightness = c.Value() * 10.0f;
+                   
+                }
+                
+                attributesDirty = true;   
+            }      
+        }
+        else if (coloringComponent.typeName == "StaticModel") 
+        {
+            StaticModel@ model  = cast<StaticModel>(coloringComponent);
+            if (model !is null) 
+            {            
+                Material@ mat = model.materials[0];
+                if (mat !is null) 
+                { 
+                    if (coloringPropertyName == "menuDiffuseColor")
+                    {   
+                        Variant oldValue = mat.shaderParameters["MatDiffColor"];
+                        Variant newValue;
+                        String valueString;
+                        valueString += String(c.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.a).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatDiffColor"] = newValue;
+                    }
+                    else if (coloringPropertyName == "menuSpecularColor")
+                    { 
+                        Variant oldValue = mat.shaderParameters["MatSpecColor"];
+                        Variant newValue;
+                        String valueString;                        
+                        valueString += String(c.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.a * 128).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatSpecColor"] = newValue;
+                    }
+                    else if (coloringPropertyName == "menuEmissiveColor")
+                    {
+                        Variant oldValue = mat.shaderParameters["MatEmissiveColor"];
+                        Variant newValue;
+                        String valueString;
+                        valueString += String(c.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.a).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatEmissiveColor"] = newValue;
+                    }
+                    else if (coloringPropertyName == "menuEnvironmentMapColor")
+                    {
+                        Variant oldValue = mat.shaderParameters["MatEnvMapColor"];
+                        Variant newValue;
+                        String valueString;
+                        valueString += String(c.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(c.a).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatEnvMapColor"] = newValue;
+                    }                    
+                }
+            }
+        }
+        else if (coloringComponent.typeName == "Zone") 
+        {
+            Zone@ zone  = cast<Zone>(coloringComponent);
+            if (zone !is null) 
+            {
+                if (coloringPropertyName == "menuAmbientColor")
+                {
+                    zone.ambientColor = c;
+                }
+                else if (coloringPropertyName == "menuFogColor") 
+                {
+                    zone.fogColor = c;
+                }
+                
+                attributesDirty = true;
+            }
+        }        
+    }
+
+    timeToNextColoringGroupUpdate = time.systemTime + stepColoringGroupUpdate;
+}
+
+// Return old colors, wheel was closed or color discarded
+void HandleWheelDiscardColor(StringHash eventType, VariantMap& eventData)
+{
+    if (coloringComponent !is null)
+    {
+        //Color oldColor = eventData["Color"].GetColor(); //Old color from ColorWheel from ShowColorWheelWithColor(old)     
+        Color oldColor = coloringOldColor;
+        
+        // preview new color
+        if (coloringComponent.typeName == "Light") 
+        {
+            Light@ light = cast<Light>(coloringComponent);
+            if (light !is null) 
+            {          
+                if (coloringPropertyName == "menuLightColor")
+                {
+                    light.color = oldColor;
+                }
+                else if (coloringPropertyName == "menuSpecularIntensity")
+                {
+                   light.specularIntensity = coloringOldScalar * 10.0f;
+
+                }
+                else if (coloringPropertyName == "menuBrightnessMultiplier")
+                {
+                   light.brightness = coloringOldScalar * 10.0f;
+                   
+                }
+                
+                attributesDirty = true;   
+            }      
+        }
+        else if (coloringComponent.typeName == "StaticModel") 
+        {
+            StaticModel@ model  = cast<StaticModel>(coloringComponent);
+            if (model !is null) 
+            {            
+                Material@ mat = model.materials[0];
+                if (mat !is null) 
+                {                 
+                    if (coloringPropertyName == "menuDiffuseColor")
+                    {   
+                        Variant oldValue = mat.shaderParameters["MatDiffColor"];
+                        Variant newValue;
+                        String valueString;
+                        valueString += String(oldColor.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.a).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatDiffColor"] = newValue;
+                    }
+                    else if (coloringPropertyName == "menuSpecularColor")
+                    { 
+                        Variant oldValue = mat.shaderParameters["MatSpecColor"];
+                        Variant newValue;
+                        String valueString;                        
+                        valueString += String(oldColor.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(coloringOldScalar).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatSpecColor"] = newValue;
+                    }
+                    else if (coloringPropertyName == "menuEmissiveColor")
+                    {
+                        Variant oldValue = mat.shaderParameters["MatEmissiveColor"];
+                        Variant newValue;
+                        String valueString;
+                        valueString += String(oldColor.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.a).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatEmissiveColor"] = newValue;
+                    }
+                    else if (coloringPropertyName == "menuEnvironmentMapColor")
+                    {
+                        Variant oldValue = mat.shaderParameters["MatEnvMapColor"];
+                        Variant newValue;
+                        String valueString;
+                        valueString += String(oldColor.r).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.g).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.b).Substring(0,5);
+                        valueString += " ";
+                        valueString += String(oldColor.a).Substring(0,5);
+                        newValue.FromString(oldValue.type, valueString);    
+                        mat.shaderParameters["MatEnvMapColor"] = newValue;
+                    }                                        
+                }
+            }
+        }
+        else if (coloringComponent.typeName == "Zone") 
+        {
+            Zone@ zone  = cast<Zone>(coloringComponent);
+            if (zone !is null) 
+            {
+                if (coloringPropertyName == "menuAmbientColor")
+                {
+                    zone.ambientColor = oldColor;
+                }
+                else if (coloringPropertyName == "menuFogColor") 
+                {
+                    zone.fogColor = oldColor;
+                }
+                
+                attributesDirty = true;
+            }
+        }        
+    }
+}
+
+// Applying color wheel changes to material
+void HandleWheelSelectColor(StringHash eventType, VariantMap& eventData)
+{  
+    if (coloringComponent !is null)
+    if (coloringComponent.typeName == "StaticModel") 
+    {
+        Color c = eventData["Color"].GetColor(); //Selected color from ColorWheel
+        StaticModel@ model  = cast<StaticModel>(coloringComponent);
+        if (model !is null) 
+        {
+            Material@ mat = model.materials[0];
+            if (mat !is null) 
+            {
+                editMaterial = mat;
+                SaveMaterial();                       
+            }
+        }
+    }
 }

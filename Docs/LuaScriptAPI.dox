@@ -2498,6 +2498,9 @@ Methods:
 - CompressedFormat GetCompressedFormat() const
 - unsigned GetNumCompressedLevels() const
 - Image* GetSubimage(const IntRect& rect) const
+- bool IsCubemap() const
+- bool IsArray() const
+- bool IsSRGB() const
 
 Properties:
 
@@ -2508,6 +2511,9 @@ Properties:
 - bool compressed (readonly)
 - CompressedFormat compressedFormat (readonly)
 - unsigned numCompressedLevels (readonly)
+- bool cubemap (readonly)
+- bool array (readonly)
+- bool sRGB (readonly)
 
 <a name="Class_IndexBuffer"></a>
 ### IndexBuffer : Object

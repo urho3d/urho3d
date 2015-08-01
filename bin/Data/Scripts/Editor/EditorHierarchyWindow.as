@@ -1536,6 +1536,8 @@ bool BlenderModeDelete()
     
     Array<UIElement@> actions;
     actions.Push(CreateContextMenuItem("Delete?", "HandleBlenderModeDelete"));
+    actions.Push(CreateContextMenuItem("Cancel", "HandleEmpty"));
+    
     if (actions.length > 0) {
         ActivateContextMenu(actions);
         return true;
@@ -1684,6 +1686,11 @@ void HandleHierarchyContextDelete()
 void HandleBlenderModeDelete() 
 {
     Delete();
+}
+
+void HandleEmpty() 
+{
+    //just doing nothing
 }
 
 void HandleHierarchyContextPaste()

@@ -6485,17 +6485,20 @@ Methods:
 
 Properties:
 
+- bool array // readonly
 - StringHash baseType // readonly
 - String category // readonly
 - uint components // readonly
 - bool compressed // readonly
 - CompressedFormat compressedFormat // readonly
+- bool cubemap // readonly
 - int depth // readonly
 - int height // readonly
 - uint memoryUse // readonly
 - String name
 - uint numCompressedLevels // readonly
 - int refs // readonly
+- bool sRGB // readonly
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
