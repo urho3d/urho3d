@@ -35,6 +35,7 @@ const ResourceRef Variant::emptyResourceRef;
 const ResourceRefList Variant::emptyResourceRefList;
 const VariantMap Variant::emptyVariantMap;
 const VariantVector Variant::emptyVariantVector;
+const Vector<String> Variant::emptyStringVector;
 
 static const char* typeNames[] =
 {
@@ -61,6 +62,7 @@ static const char* typeNames[] =
     "Matrix3x4",
     "Matrix4",
     "Double",
+    "StringVector",
     0
 };
 
@@ -88,6 +90,10 @@ Variant& Variant::operator =(const Variant& rhs)
 
     case VAR_VARIANTVECTOR:
         *(reinterpret_cast<VariantVector*>(&value_)) = *(reinterpret_cast<const VariantVector*>(&rhs.value_));
+        break;
+
+    case VAR_STRINGVECTOR:
+        *(reinterpret_cast<Vector<String>*>(&value_)) = *(reinterpret_cast<const Vector<String>*>(&rhs.value_));
         break;
 
     case VAR_VARIANTMAP:
@@ -163,6 +169,9 @@ bool Variant::operator ==(const Variant& rhs) const
 
     case VAR_VARIANTVECTOR:
         return *(reinterpret_cast<const VariantVector*>(&value_)) == *(reinterpret_cast<const VariantVector*>(&rhs.value_));
+
+    case VAR_STRINGVECTOR:
+        return *(reinterpret_cast<const Vector<String>*>(&value_)) == *(reinterpret_cast<const Vector<String>*>(&rhs.value_));
 
     case VAR_VARIANTMAP:
         return *(reinterpret_cast<const VariantMap*>(&value_)) == *(reinterpret_cast<const VariantMap*>(&rhs.value_));
@@ -400,7 +409,7 @@ String Variant::ToString() const
         return String(*reinterpret_cast<const double*>(&value_));
 
     default:
-        // VAR_RESOURCEREF, VAR_RESOURCEREFLIST, VAR_VARIANTVECTOR, VAR_VARIANTMAP
+        // VAR_RESOURCEREF, VAR_RESOURCEREFLIST, VAR_VARIANTVECTOR, VAR_STRINGVECTOR, VAR_VARIANTMAP
         // Reference string serialization requires typehash-to-name mapping from the context. Can not support here
         // Also variant map or vector string serialization is not supported. XML or binary save should be used instead
         return String::EMPTY;
@@ -462,6 +471,9 @@ bool Variant::IsZero() const
     case VAR_VARIANTVECTOR:
         return reinterpret_cast<const VariantVector*>(&value_)->Empty();
 
+    case VAR_STRINGVECTOR:
+        return reinterpret_cast<const Vector<String>*>(&value_)->Empty();
+
     case VAR_VARIANTMAP:
         return reinterpret_cast<const VariantMap*>(&value_)->Empty();
 
@@ -518,6 +530,10 @@ void Variant::SetType(VariantType newType)
         (reinterpret_cast<VariantVector*>(&value_))->~VariantVector();
         break;
 
+    case VAR_STRINGVECTOR:
+        (reinterpret_cast<Vector<String>*>(&value_))->~Vector<String>();
+        break;
+
     case VAR_VARIANTMAP:
         (reinterpret_cast<VariantMap*>(&value_))->~VariantMap();
         break;
@@ -564,6 +580,10 @@ void Variant::SetType(VariantType newType)
 
     case VAR_VARIANTVECTOR:
         new(reinterpret_cast<VariantVector*>(&value_)) VariantVector();
+        break;
+
+    case VAR_STRINGVECTOR:
+        new(reinterpret_cast<Vector<String>*>(&value_)) Vector<String>();
         break;
 
     case VAR_VARIANTMAP:
@@ -704,6 +724,11 @@ template <> ResourceRefList Variant::Get<ResourceRefList>() const
 template <> VariantVector Variant::Get<VariantVector>() const
 {
     return GetVariantVector();
+}
+
+template <> Vector<String> Variant::Get<Vector<String> >() const
+{
+    return GetStringVector();
 }
 
 template <> VariantMap Variant::Get<VariantMap>() const

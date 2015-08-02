@@ -31,23 +31,11 @@ namespace Urho3D
 Database::Database(Context* context_) :
     Object(context_),
 #ifdef ODBC_3_OR_LATER
-    usePooling_(false)
+    poolSize_(0)
 #else
-    usePooling_(true)
+    poolSize_(M_MAX_UNSIGNED)
 #endif
 {
-    // Register Database library object factories
-    RegisterDatabaseLibrary(context_);
-}
-
-Database::~Database()
-{
-    PROFILE(DatabaseDestruct);
-
-    // Disconnect all the active and in-pool database connections
-    DisconnectAll(connections_);
-    for (HashMap<String, PODVector<DbConnection*> >::Iterator i = connectionsPool_.Begin(); i != connectionsPool_.End(); ++i)
-    DisconnectAll(i->second_);
 }
 
 DBAPI Database::GetAPI()
@@ -63,15 +51,17 @@ DbConnection* Database::Connect(const String& connectionString)
 {
     PROFILE(DatabaseConnect);
 
-    DbConnection* connection = 0;
-    if (usePooling_)
+    SharedPtr<DbConnection> connection;
+    if (IsPooling())
     {
-        PODVector<DbConnection*>& connectionsPool = connectionsPool_[connectionString];
-        if (!connectionsPool.Empty())
+        Vector<SharedPtr<DbConnection> >& connectionsPool = connectionsPool_[connectionString];
+        while (!connectionsPool.Empty())
         {
             connection = connectionsPool.Back();
             connectionsPool.Pop();
-            assert(connection->IsConnected());
+            if (connection->IsConnected())
+                break;
+            connection = 0;
         }
     }
     if (!connection)
@@ -82,10 +72,7 @@ DbConnection* Database::Connect(const String& connectionString)
         return connection;
     }
     else
-    {
-        delete connection;
         return 0;
-    }
 }
 
 void Database::Disconnect(DbConnection* connection)
@@ -95,34 +82,18 @@ void Database::Disconnect(DbConnection* connection)
 
     PROFILE(DatabaseDisconnect);
 
-    connections_.Remove(connection);
+    SharedPtr<DbConnection> dbConnection(connection);
+    connections_.Remove(dbConnection);
 
     // Must finalize the connection before closing the connection or returning it to the pool
     connection->Finalize();
 
-    if (usePooling_)
+    if (IsPooling())
     {
-        PODVector<DbConnection*>& connectionsPool = connectionsPool_[connection->GetConnectionString()];
-        connectionsPool.Push(connection);
+        Vector<SharedPtr<DbConnection> >& connectionsPool = connectionsPool_[connection->GetConnectionString()];
+        if (connectionsPool.Size() < poolSize_)
+            connectionsPool.Push(dbConnection);
     }
-    else
-        delete connection;
-}
-
-void Database::DisconnectAll(PODVector<DbConnection*>& collection)
-{
-    PROFILE (DatabaseDisconnectAll);
-
-    for (PODVector<DbConnection*>::Iterator i = collection.Begin(); i != collection.End(); ++i)
-    {
-        delete *i;  // The destructor ensures the connection is finalized and closed
-        *i = 0;
-    }
-}
-
-void URHO3D_API RegisterDatabaseLibrary(Context* context)
-{
-// todo
 }
 
 }

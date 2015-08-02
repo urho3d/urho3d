@@ -71,43 +71,43 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
     try
     {
         result.resultImpl_ = nanodbc::execute(connectionImpl_, sql.Trimmed().CString());
-        short numCols = result.resultImpl_.columns();
+        unsigned numCols = (unsigned)result.resultImpl_.columns();
         if (numCols)
         {
-            result.columns_.Resize((unsigned)numCols);
-            for (short i = 0; i < numCols; ++i)
-                result.columns_[i] = result.resultImpl_.column_name(i).c_str();
+            result.columns_.Resize(numCols);
+            for (unsigned i = 0; i < numCols; ++i)
+                result.columns_[i] = result.resultImpl_.column_name((short)i).c_str();
 
             bool filtered = false;
             bool aborted = false;
 
             while (result.resultImpl_.next())
             {
-                VariantVector colValues((unsigned)numCols);
-                for (short i = 0; i < numCols; ++i)
+                VariantVector colValues(numCols);
+                for (unsigned i = 0; i < numCols; ++i)
                 {
-                    if (!result.resultImpl_.is_null(i))
+                    if (!result.resultImpl_.is_null((short)i))
                     {
                         // We can only bind primitive data type that our Variant class supports
-                        switch (result.resultImpl_.column_c_datatype(i))
+                        switch (result.resultImpl_.column_c_datatype((short)i))
                         {
                         case SQL_C_LONG:
-                            colValues[i] = result.resultImpl_.get<int>(i);
-                            if (result.resultImpl_.column_datatype(i) == SQL_BIT)
+                            colValues[i] = result.resultImpl_.get<int>((short)i);
+                            if (result.resultImpl_.column_datatype((short)i) == SQL_BIT)
                                 colValues[i] = colValues[i] != 0;
                             break;
 
                         case SQL_C_FLOAT:
-                            colValues[i] = result.resultImpl_.get<float>(i);
+                            colValues[i] = result.resultImpl_.get<float>((short)i);
                             break;
 
                         case SQL_C_DOUBLE:
-                            colValues[i] = result.resultImpl_.get<double>(i);
+                            colValues[i] = result.resultImpl_.get<double>((short)i);
                             break;
 
                         default:
                             // All other types are stored using their string representation in the Variant
-                            colValues[i] = result.resultImpl_.get<nanodbc::string_type>(i).c_str();
+                            colValues[i] = result.resultImpl_.get<nanodbc::string_type>((short)i).c_str();
                             break;
                         }
                     }
@@ -122,8 +122,8 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
                     eventData[P_RESULTIMPL] = &result.resultImpl_;
                     eventData[P_SQL] = sql;
                     eventData[P_NUMCOLS] = numCols;
-                    eventData[P_COLVALUES] = &colValues;
-                    eventData[P_COLHEADERS] = &result.columns_;
+                    eventData[P_COLVALUES] = colValues;
+                    eventData[P_COLHEADERS] = result.columns_;
                     eventData[P_FILTER] = false;
                     eventData[P_ABORT] = false;
 

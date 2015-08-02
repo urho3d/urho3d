@@ -26,7 +26,6 @@
 #include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Database/Database.h>
 #include <Urho3D/Database/DatabaseEvents.h>
-#include <Urho3D/Database/DbResult.h>
 #include <Urho3D/Engine/Console.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Engine/EngineEvents.h>
@@ -102,7 +101,7 @@ void DatabaseDemo::Start()
     // The "URHO3D_DATABASE_ODBC" compiler define is set when URHO3D_DATABASE_ODBC build option is enabled
     // Connect to a temporary in-memory SQLite database
     connection_ =
-        GetSubsystem<Database>()->Connect(Database::GetAPI() == DBAPI_ODBC ? "Driver=SQLITE3;Database=:memory:" : "file://");
+        GetSubsystem<Database>()->Connect(Database::GetAPI() == DBAPI_ODBC ? "Driver=SQLite3;Database=:memory:" : "file://");
 
     // Subscribe to database cursor event to loop through query resultset
     SubscribeToEvent(E_DBCURSOR, HANDLER(DatabaseDemo, HandleDbCursor));
@@ -149,9 +148,9 @@ void DatabaseDemo::HandleDbCursor(StringHash eventType, VariantMap& eventData)
 
     // In a real application the P_SQL can be used to do the logic branching in a shared event handler
     // However, this is not required in this sample demo
-    int numCols = eventData[P_NUMCOLS].GetInt();
-    VariantVector* colValues = static_cast<VariantVector* >(eventData[P_COLVALUES].GetVoidPtr());
-    Vector<String>* colHeaders = static_cast<Vector<String>* >(eventData[P_COLHEADERS].GetVoidPtr());
+    unsigned numCols = eventData[P_NUMCOLS].GetUInt();
+    const VariantVector& colValues = eventData[P_COLVALUES].GetVariantVector();
+    const Vector<String>& colHeaders = eventData[P_COLHEADERS].GetStringVector();
 
     // In this sample demo we just use db cursor to dump each row immediately so we can filter out the row to conserve memory
     // In a real application this can be used to perform the client-side filtering logic
@@ -159,8 +158,8 @@ void DatabaseDemo::HandleDbCursor(StringHash eventType, VariantMap& eventData)
     // In this sample demo we abort the further cursor movement when maximum rows being dumped has been reached
     eventData[P_ABORT] = ++row_ >= maxRows_;
 
-    for (int i = 0; i < numCols; ++i)
-        Print(ToString("Row #%d: %s = %s", row_, colHeaders->At(i).CString(), colValues->At(i).ToString().CString()));
+    for (unsigned i = 0; i < numCols; ++i)
+        Print(ToString("Row #%d: %s = %s", row_, colHeaders[i].CString(), colValues[i].ToString().CString()));
 }
 
 void DatabaseDemo::HandleInput(const String& input)
@@ -211,8 +210,8 @@ void DatabaseDemo::HandleInput(const String& input)
         DbResult result = connection_->Execute(input, true);
 
         // Number of affected rows is only meaningful for DML statements like insert/update/delete
-        if (result.NumAffectedRows() != -1)
-            Print(ToString("Number of affected rows: %d", result.NumAffectedRows()));
+        if (result.GetNumAffectedRows() != -1)
+            Print(ToString("Number of affected rows: %d", result.GetNumAffectedRows()));
     }
     Print(" ");
 }

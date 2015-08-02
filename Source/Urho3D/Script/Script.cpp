@@ -84,6 +84,9 @@ Script::Script(Context* context) :
 #ifdef URHO3D_NETWORK
     RegisterNetworkAPI(scriptEngine_);
 #endif
+#ifdef URHO3D_DATABASE
+    RegisterDatabaseAPI(scriptEngine_);
+#endif
 #ifdef URHO3D_PHYSICS
     RegisterPhysicsAPI(scriptEngine_);
 #endif

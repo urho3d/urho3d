@@ -26,6 +26,7 @@ enum VariantType
     VAR_MATRIX3X4,
     VAR_MATRIX4,
     VAR_DOUBLE,
+    VAR_STRINGVECTOR,
     MAX_VAR_TYPES
 };
 
@@ -180,6 +181,7 @@ class VariantMap
     tolua_outside void VariantMapSetBuffer @ SetBuffer(const String key, const VectorBuffer& value);
     tolua_outside void VariantMapSetResourceRef @ SetResourceRef(const String key, const ResourceRef value);
     tolua_outside void VariantMapSetResourceRefList @ SetResourceRefList(const String key, const ResourceRefList value);
+    tolua_outside void VariantMapSetVariantVector @ SetVariantVector(const String key, const VariantVector& value);
     tolua_outside void VariantMapSetIntRect @ SetIntRect(const String key, const IntRect value);
     tolua_outside void VariantMapSetIntVector2 @ SetIntVector2(const String key, const IntVector2 value);
     tolua_outside void VariantMapSetPtr @ SetPtr(const String key, void* value);
@@ -202,6 +204,8 @@ class VariantMap
     tolua_outside VectorBuffer VariantMapGetBuffer @ GetBuffer(const String key);
     tolua_outside const ResourceRef& VariantMapGetResourceRef @ GetResourceRef(const String key);
     tolua_outside const ResourceRefList& VariantMapGetResourceRefList @ GetResourceRefList(const String key);
+    tolua_outside const VariantVector VariantMapGetVariantVector @ GetVariantVector(const String key);
+//    const Vector<String>& GetStringVector() const;
     tolua_outside const IntRect& VariantMapGetIntRect @ GetIntRect(const String key);
     tolua_outside const IntVector2& VariantMapGetIntVector2 @ GetIntVector2(const String key);
     tolua_outside const void* VariantMapGetPtr @ GetPtr(const String type, const String key);
@@ -391,6 +395,11 @@ static void VariantMapSetResourceRefList(VariantMap* vmap, const String& key, co
     (*vmap)[StringHash(key)] = value;
 }
 
+static void VariantMapSetVariantVector(VariantMap* vmap, const String& key, const VariantVector& value)
+{
+    (*vmap)[StringHash(key)] = value;
+}
+
 static void VariantMapSetIntRect(VariantMap* vmap, const String& key, const IntRect& value)
 {
     (*vmap)[StringHash(key)] = value;
@@ -501,6 +510,12 @@ static const ResourceRef& VariantMapGetResourceRef(const VariantMap* vmap, const
 static const ResourceRefList& VariantMapGetResourceRefList(const VariantMap* vmap, const String& key)
 {
     return FindVariant(vmap, key).GetResourceRefList();
+}
+
+static const VariantVector VariantMapGetVariantVector(const VariantMap* vmap, const String& key)
+{
+    // Return a new copy
+    return VariantVector(FindVariant(vmap, key).GetVariantVector());
 }
 
 static const IntRect& VariantMapGetIntRect(const VariantMap* vmap, const String& key)

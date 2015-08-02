@@ -78,21 +78,21 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
         return result;
     }
 
-    int numCols = sqlite3_column_count(pStmt);
-    result.columns_.Resize((unsigned)numCols);
-    for (int i = 0; i < numCols; ++i)
+    unsigned numCols = (unsigned)sqlite3_column_count(pStmt);
+    result.columns_.Resize(numCols);
+    for (unsigned i = 0; i < numCols; ++i)
         result.columns_[i] = sqlite3_column_name(pStmt, i);
 
     bool filtered = false;
     bool aborted = false;
 
-    while (numCols)
+    while (1)
     {
         rc = sqlite3_step(pStmt);
         if (rc == SQLITE_ROW)
         {
-            VariantVector colValues((unsigned)numCols);
-            for (int i = 0; i < numCols; ++i)
+            VariantVector colValues(numCols);
+            for (unsigned i = 0; i < numCols; ++i)
             {
                 int type = sqlite3_column_type(pStmt, i);
                 if (type != SQLITE_NULL)
@@ -127,8 +127,8 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
                 eventData[P_RESULTIMPL] = pStmt;
                 eventData[P_SQL] = sql;
                 eventData[P_NUMCOLS] = numCols;
-                eventData[P_COLVALUES] = &colValues;
-                eventData[P_COLHEADERS] = &result.columns_;
+                eventData[P_COLVALUES] = colValues;
+                eventData[P_COLHEADERS] = result.columns_;
                 eventData[P_FILTER] = false;
                 eventData[P_ABORT] = false;
 

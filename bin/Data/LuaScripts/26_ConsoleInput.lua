@@ -50,7 +50,7 @@ function Start()
     -- Show the console by default, make it large
     console.numRows = graphics.height / 16
     console.numBufferedRows = 2 * console.numRows
-    console.commandInterpreter = "LuaScript"
+    console.commandInterpreter = "LuaScriptEventInvoker"
     console.visible = true
     console.closeButton.visible = false
 
@@ -71,7 +71,7 @@ function Start()
 end
 
 function HandleConsoleCommand(eventType, eventData)
-    if eventData:GetString("Id") == "LuaScript" then
+    if eventData:GetString("Id") == "LuaScriptEventInvoker" then
         HandleInput(eventData:GetString("Command"))
     end
 end

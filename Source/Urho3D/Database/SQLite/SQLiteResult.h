@@ -42,13 +42,13 @@ public:
     }
 
     /// Return number of columns in the resultset or 0 if there is no resultset.
-    int NumColumns() const { return columns_.Size(); }
+    unsigned GetNumColumns() const { return columns_.Size(); }
 
     /// Return number of rows in the resultset or 0 if the number of rows is not available.
-    long NumRows() const { return rows_.Size(); }
+    unsigned GetNumRows() const { return rows_.Size(); }
 
     /// Return number of affected rows by the DML query or -1 if the number of affected rows is not available.
-    long NumAffectedRows() const { return numAffectedRows_; }
+    long GetNumAffectedRows() const { return numAffectedRows_; }
 
     /// Return the column headers string collection.
     const Vector<String>& GetColumns() const { return columns_; }

@@ -1,0 +1,6 @@
+$pfile "Database/DbResult.pkg"
+$pfile "Database/DbConnection.pkg"
+$pfile "Database/Database.pkg"
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)

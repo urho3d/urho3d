@@ -31,7 +31,7 @@ namespace Urho3D
 /// Supported database API.
 enum DBAPI
 {
-    DBAPI_SQLITE,
+    DBAPI_SQLITE = 0,
     DBAPI_ODBC
 };
 
@@ -45,8 +45,6 @@ class URHO3D_API Database : public Object
 public:
     /// Construct.
     Database(Context* context_);
-    /// Destruct. Disconnect database connections.
-    virtual ~Database();
     /// Return the underlying database API.
     static DBAPI GetAPI();
 
@@ -55,25 +53,22 @@ public:
     /// Disconnect a database connection. The connection object pointer should not be used anymore after this.
     void Disconnect(DbConnection* connection);
 
-    /// Return true when using internal database connection pooling. The internal database pooling is managed by the Database subsystem itself and should not be confused with ODBC connection pooling option when ODBC is being used.
-    bool IsUsePooling() const { return usePooling_; }
+    /// Return true when using internal database connection pool. The internal database pool is managed by the Database subsystem itself and should not be confused with ODBC connection pool option when ODBC is being used.
+    bool IsPooling() const { return (bool)poolSize_; }
 
-    /// Set whether to use internal database connection pooling. The internal database pooling is managed by the Database subsystem itself and should not be confused with ODBC connection pooling option when ODBC driver manager version 3.0 or later is being used.
-    void SetUsePooling(bool usePooling) { usePooling_ = usePooling; }
+    /// Get internal database connection pool size.
+    unsigned GetPoolSize() const { return poolSize_; }
+
+    /// Set internal database connection pool size.
+    void SetPoolSize(unsigned poolSize) { poolSize_ = poolSize; }
 
 private:
-    /// Internal helper to disconnect all the database connections in the collection.
-    void DisconnectAll(PODVector<DbConnection*>& collection);
-
-    /// Using database connection pool flag. Default to false when using ODBC 3.0 or later as ODBC 3.0 driver manager manages its database connection pooling.
-    bool usePooling_;
+    /// %Database connection pool size. Default to 0 when using ODBC 3.0 or later as ODBC 3.0 driver manager could manage its own database connection pool.
+    unsigned poolSize_;
     /// Active database connections.
-    PODVector<DbConnection*> connections_;
+    Vector<SharedPtr<DbConnection> > connections_;
     ///%Database connections pool.
-    HashMap<String, PODVector<DbConnection*> > connectionsPool_;
+    HashMap<String, Vector<SharedPtr<DbConnection> > > connectionsPool_;
 };
-
-/// Register database library objects.
-void URHO3D_API RegisterDatabaseLibrary(Context* context);
 
 }

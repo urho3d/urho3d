@@ -59,6 +59,7 @@ enum VariantType
     VAR_MATRIX3X4,
     VAR_MATRIX4,
     VAR_DOUBLE,
+    VAR_STRINGVECTOR,
     MAX_VAR_TYPES
 };
 
@@ -319,6 +320,13 @@ public:
         *this = value;
     }
 
+    /// Construct from a string vector.
+    Variant(const Vector<String>& value) :
+        type_ (VAR_NONE)
+    {
+        *this = value;
+    }
+
     /// Construct from an integer rect.
     Variant(const IntRect& value) :
         type_(VAR_NONE)
@@ -555,6 +563,14 @@ public:
         return *this;
     }
 
+    // Assign from a string vector.
+    Variant& operator =(const Vector<String>& rhs)
+    {
+        SetType(VAR_STRINGVECTOR);
+        *(reinterpret_cast<Vector<String>*>(&value_)) = rhs;
+        return *this;
+    }
+
     /// Assign from a variant map.
     Variant& operator =(const VariantMap& rhs)
     {
@@ -700,6 +716,12 @@ public:
         return type_ == VAR_VARIANTVECTOR ? *(reinterpret_cast<const VariantVector*>(&value_)) == rhs : false;
     }
 
+    /// Test for equality with a string vector. To return true, both the type and value must match.
+    bool operator ==(const Vector<String>& rhs) const
+    {
+        return type_ == VAR_STRINGVECTOR ? *(reinterpret_cast<const Vector<String>*>(&value_)) == rhs : false;
+    }
+
     /// Test for equality with a variant map. To return true, both the type and value must match.
     bool operator ==(const VariantMap& rhs) const
     {
@@ -797,6 +819,9 @@ public:
 
     /// Test for inequality with a variant vector.
     bool operator !=(const VariantVector& rhs) const { return !(*this == rhs); }
+
+    /// Test for inequality with a string vector.
+    bool operator !=(const Vector<String>& rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with a variant map.
     bool operator !=(const VariantMap& rhs) const { return !(*this == rhs); }
@@ -907,6 +932,12 @@ public:
         return type_ == VAR_VARIANTVECTOR ? *reinterpret_cast<const VariantVector*>(&value_) : emptyVariantVector;
     }
 
+    /// Return a string vector or empty on type mismatch.
+    const Vector<String>& GetStringVector() const
+    {
+        return type_ == VAR_STRINGVECTOR ? *reinterpret_cast<const Vector<String>*>(&value_) : emptyStringVector;
+    }
+
     /// Return a variant map or empty on type mismatch.
     const VariantMap& GetVariantMap() const
     {
@@ -971,6 +1002,9 @@ public:
     /// Return a pointer to a modifiable variant vector or null on type mismatch.
     VariantVector* GetVariantVectorPtr() { return type_ == VAR_VARIANTVECTOR ? reinterpret_cast<VariantVector*>(&value_) : 0; }
 
+    /// Return a pointer to a modifiable string vector or null on type mismatch.
+    Vector<String>* GetStringVectorPtr() { return type_ == VAR_STRINGVECTOR ? reinterpret_cast<Vector<String>*>(&value_) : 0; }
+
     /// Return a pointer to a modifiable variant map or null on type mismatch.
     VariantMap* GetVariantMapPtr() { return type_ == VAR_VARIANTMAP ? reinterpret_cast<VariantMap*>(&value_) : 0; }
 
@@ -993,6 +1027,8 @@ public:
     static const VariantMap emptyVariantMap;
     /// Empty variant vector.
     static const VariantVector emptyVariantVector;
+    /// Empty string vector.
+    static const Vector<String> emptyStringVector;
 
 private:
     /// Set new type and allocate/deallocate memory as necessary.
@@ -1039,6 +1075,8 @@ template <> inline VariantType GetVariantType<ResourceRef>() { return VAR_RESOUR
 template <> inline VariantType GetVariantType<ResourceRefList>() { return VAR_RESOURCEREFLIST; }
 
 template <> inline VariantType GetVariantType<VariantVector>() { return VAR_VARIANTVECTOR; }
+
+template <> inline VariantType GetVariantType<Vector<String> >() { return VAR_STRINGVECTOR; }
 
 template <> inline VariantType GetVariantType<VariantMap>() { return VAR_VARIANTMAP; }
 
