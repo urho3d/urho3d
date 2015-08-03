@@ -882,7 +882,9 @@ void UIElement::SetFocusMode(FocusMode mode)
 
 void UIElement::SetFocus(bool enable)
 {
-    if (focusMode_ < FM_FOCUSABLE)
+    // Invisible elements should not receive focus
+    // \todo Needs rework when/if visibility starts propagating down the UI hierarchy
+    if (focusMode_ < FM_FOCUSABLE || !visible_)
         enable = false;
 
     UI* ui = GetSubsystem<UI>();
@@ -919,6 +921,10 @@ void UIElement::SetVisible(bool enable)
         eventData[P_ELEMENT] = this;
         eventData[P_VISIBLE] = visible_;
         SendEvent(E_VISIBLECHANGED, eventData);
+
+        // Lose focus when hidden
+        if (!visible_ && HasFocus())
+            SetFocus(false);
     }
 }
 
