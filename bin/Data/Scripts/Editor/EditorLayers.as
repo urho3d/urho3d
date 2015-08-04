@@ -43,9 +43,9 @@ void CreateLayerEditor()
             SubscribeToEvent(bits[i], "Toggled", "ToggleBits");
     }
     
-    SubscribeToEvent("MouseMove", "HandleHideLayerEditor");
-    SubscribeToEvent("MouseButtonDown", "HandleHideLayerEditor");
-    SubscribeToEvent("MouseWheel", "HandleMaskTypeScroll");
+    //SubscribeToEvent("MouseMove", "HandleHideLayerEditor");
+    //SubscribeToEvent("MouseButtonDown", "HandleHideLayerEditor");
+    //SubscribeToEvent("MouseWheel", "HandleMaskTypeScroll");
 }
 
 bool ShowLayerEditor()

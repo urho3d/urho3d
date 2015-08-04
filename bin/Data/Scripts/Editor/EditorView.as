@@ -477,7 +477,7 @@ void CreateCamera()
 
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
     SubscribeToEvent("UIMouseClick", "ViewMouseClick");
-    SubscribeToEvent("MouseMove", "ViewMouseMove");
+    //SubscribeToEvent("MouseMove", "ViewMouseMove"); 
     SubscribeToEvent("UIMouseClickEnd", "ViewMouseClickEnd");
     SubscribeToEvent("BeginViewUpdate", "HandleBeginViewUpdate");
     SubscribeToEvent("EndViewUpdate", "HandleEndViewUpdate");
