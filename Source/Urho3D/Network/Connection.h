@@ -191,6 +191,24 @@ public:
     /// Return remote port.
     unsigned short GetPort() const { return port_; }
 
+    /// Return the connection's round trip time in milliseconds.
+    float GetRoundTripTime() const;
+
+    /// Return the time since last received data from the remote host in milliseconds.
+    float GetLastHeardTime() const;
+
+    /// Return bytes received per second.
+    float GetBytesInPerSec() const;
+
+    /// Return bytes sent per second.
+    float GetBytesOutPerSec() const;
+
+    /// Return packets received per second.
+    float GetPacketsInPerSec() const;
+
+    /// Return packets sent per second.
+    float GetPacketsOutPerSec() const;
+
     /// Return an address:port string.
     String ToString() const;
     /// Return number of package downloads remaining.
