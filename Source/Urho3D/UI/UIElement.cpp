@@ -883,8 +883,7 @@ void UIElement::SetFocusMode(FocusMode mode)
 void UIElement::SetFocus(bool enable)
 {
     // Invisible elements should not receive focus
-    // \todo Needs rework when/if visibility starts propagating down the UI hierarchy
-    if (focusMode_ < FM_FOCUSABLE || !visible_)
+    if (focusMode_ < FM_FOCUSABLE || !IsVisibleEffective())
         enable = false;
 
     UI* ui = GetSubsystem<UI>();
@@ -922,9 +921,13 @@ void UIElement::SetVisible(bool enable)
         eventData[P_VISIBLE] = visible_;
         SendEvent(E_VISIBLECHANGED, eventData);
 
-        // Lose focus when hidden
-        if (!visible_ && HasFocus())
-            SetFocus(false);
+        // If the focus element becomes effectively hidden, clear focus
+        if (!enable)
+        {
+            UIElement* focusElement = GetSubsystem<UI>()->GetFocusElement();
+            if (focusElement && !focusElement->IsVisibleEffective())
+                focusElement->SetFocus(false);
+        }
     }
 }
 
@@ -1421,6 +1424,21 @@ float UIElement::GetDerivedOpacity() const
 bool UIElement::HasFocus() const
 {
     return GetSubsystem<UI>()->GetFocusElement() == this;
+}
+
+bool UIElement::IsVisibleEffective() const
+{
+    bool visible = visible_;
+    const UIElement* element = parent_;
+    
+    // Traverse the parent chain
+    while (visible && element)
+    {
+        visible &= element->visible_;
+        element = element->parent_;
+    }
+    
+    return visible;
 }
 
 const String& UIElement::GetAppliedStyle() const

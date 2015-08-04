@@ -1553,6 +1553,8 @@ void HideUI(bool hide = true)
     if (uiHidden == hide)
         return;
 
+    // Note: we could set ui.root.visible = false and it would hide the whole hierarchy.
+    // However in this case we need the editorUIElement to stay visible
     bool visible = !(uiHidden = hide);
     Array<UIElement@> children = ui.root.GetChildren();
     for (uint i = 0; i < children.length; ++i)
