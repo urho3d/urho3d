@@ -873,6 +873,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -1107,6 +1109,8 @@ bool useDerivedOpacity;
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
+/* readonly */
+bool visibleEffective;
 /* readonly */
 int weakRefs;
 int width;
@@ -1403,6 +1407,8 @@ bool useDerivedOpacity;
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
+/* readonly */
+bool visibleEffective;
 /* readonly */
 int weakRefs;
 int width;
@@ -3334,6 +3340,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -4163,6 +4171,8 @@ bool useDerivedOpacity;
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
+/* readonly */
+bool visibleEffective;
 /* readonly */
 int weakRefs;
 int width;
@@ -5445,6 +5455,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -5673,6 +5685,8 @@ VerticalAlignment verticalAlignment;
 ScrollBar verticalScrollBar;
 IntVector2 viewPosition;
 bool visible;
+/* readonly */
+bool visibleEffective;
 /* readonly */
 int weakRefs;
 int width;
@@ -6096,6 +6110,8 @@ bool useDerivedOpacity;
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
+/* readonly */
+bool visibleEffective;
 /* readonly */
 int weakRefs;
 int width;
@@ -8604,6 +8620,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -8796,6 +8814,8 @@ VerticalAlignment verticalAlignment;
 ScrollBar verticalScrollBar;
 IntVector2 viewPosition;
 bool visible;
+/* readonly */
+bool visibleEffective;
 /* readonly */
 int weakRefs;
 int width;
@@ -9170,6 +9190,8 @@ float value;
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
+/* readonly */
+bool visibleEffective;
 /* readonly */
 int weakRefs;
 int width;
@@ -9751,6 +9773,8 @@ bool useDerivedOpacity;
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
+/* readonly */
+bool visibleEffective;
 /* readonly */
 int weakRefs;
 int width;
@@ -10585,6 +10609,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 bool wordwrap;
@@ -11400,6 +11426,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -11645,6 +11673,8 @@ bool useDerivedOpacity;
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
+/* readonly */
+bool visibleEffective;
 /* readonly */
 int weakRefs;
 int width;
@@ -12130,6 +12160,8 @@ VerticalAlignment verticalAlignment;
 Viewport viewport;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -12358,6 +12390,8 @@ bool useDerivedOpacity;
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
+/* readonly */
+bool visibleEffective;
 /* readonly */
 int weakRefs;
 int width;

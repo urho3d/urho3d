@@ -3116,6 +3116,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -3325,6 +3326,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -3582,6 +3584,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -5232,6 +5235,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -5949,6 +5953,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -7029,6 +7034,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -7224,6 +7230,7 @@ Properties:
 - ScrollBar@ verticalScrollBar // readonly
 - IntVector2 viewPosition
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -7609,6 +7616,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -9813,6 +9821,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -9978,6 +9987,7 @@ Properties:
 - ScrollBar@ verticalScrollBar // readonly
 - IntVector2 viewPosition
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -10307,6 +10317,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -10812,6 +10823,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -11526,6 +11538,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 - bool wordwrap
@@ -12187,6 +12200,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -12401,6 +12415,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -12842,6 +12857,7 @@ Properties:
 - VerticalAlignment verticalAlignment
 - Viewport@ viewport // readonly
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -13043,6 +13059,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 

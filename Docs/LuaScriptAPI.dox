@@ -6290,6 +6290,7 @@ Methods:
 - bool IsEditable() const
 - bool IsSelected() const
 - bool IsVisible() const
+- bool IsVisibleEffective() const
 - bool IsHovering() const
 - bool IsInternal() const
 - bool HasColorGradient() const
@@ -6363,6 +6364,7 @@ Properties:
 - bool editable
 - bool selected
 - bool visible
+- bool visibleEffective (readonly)
 - bool hovering
 - bool internal
 - bool colorGradient (readonly)
