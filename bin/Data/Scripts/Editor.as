@@ -19,6 +19,7 @@
 #include "Scripts/Editor/EditorSoundType.as"
 #include "Scripts/Editor/EditorLayers.as"
 #include "Scripts/Editor/EditorColorWheel.as"
+#include "Scripts/Editor/EditorEventsHandlers.as"
 
 
 String configFileName;
@@ -71,6 +72,7 @@ void FirstFrame()
     SubscribeToEvent("Update", "HandleUpdate");
     SubscribeToEvent("ReloadFinished", "HandleReloadFinished");
     SubscribeToEvent("ReloadFailed", "HandleReloadFailed");
+    EditorSubscribeToEvents();
 }
 
 void Stop()

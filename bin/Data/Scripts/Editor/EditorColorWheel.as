@@ -101,11 +101,10 @@ void CreateColorWheel()
         colorFastItem[i].color = colorFast[i]; 
     }
     
-    SubscribeToEvent("MouseMove", "HandleMouseMove");
-    SubscribeToEvent("MouseButtonDown", "HandleMouseButton");
-    
-    SubscribeToEvent("MouseWheel", "HandleMouseWheel");
-    SubscribeToEvent("KeyDown", "HandleKeyDownWheel");
+    //SubscribeToEvent("MouseMove", "HandleColorWheelMouseMove");
+    //SubscribeToEvent("MouseButtonDown", "HandleColorWheelMouseButtonDown");    
+    //SubscribeToEvent("MouseWheel", "HandleColorWheelMouseWheel");
+    //SubscribeToEvent("KeyDown", "HandleColorWheelKeyDown");
        
     SubscribeToEvent(closeButton, "Pressed", "HandleWheelButtons");
     SubscribeToEvent(okButton, "Pressed", "HandleWheelButtons");
@@ -181,19 +180,20 @@ void HandleWheelButtons(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void HandleKeyDownWheel(StringHash eventType, VariantMap& eventData) 
+void HandleColorWheelKeyDown(StringHash eventType, VariantMap& eventData) 
 {
     if (colorWheelWindow.visible == false) return;
+    
     int key = eventData["Key"].GetInt();
     
-    
-    MessageBox(String(key));
-    if (key == KEY_ESC)
+    if (key == KEY_ESC) 
+    {
+        SendEvent(eventTypeWheelDiscardColor, eventData);
         HideColorWheel();
-       
+    }   
 }
 
-void HandleMouseButton(StringHash eventType, VariantMap& eventData) 
+void HandleColorWheelMouseButtonDown(StringHash eventType, VariantMap& eventData) 
 {
     if (colorWheelWindow.visible == false) return;
     
@@ -230,7 +230,7 @@ void HandleMouseButton(StringHash eventType, VariantMap& eventData)
 }
 
 // handler only for BWGradient
-void HandleMouseWheel(StringHash eventType, VariantMap& eventData) 
+void HandleColorWheelMouseWheel(StringHash eventType, VariantMap& eventData) 
 {
     if (colorWheelWindow.visible == false || !isBWGradientHovering ) return;
     
@@ -255,12 +255,13 @@ void HandleMouseWheel(StringHash eventType, VariantMap& eventData)
         bwCursor.SetPosition(bwCursor.position.x, high-7);
         colorVValue = float((IMAGE_SIZE-high) / IMAGE_SIZE);
         
-        UpdateColorInformation();
-            
+        wheelColor.FromHSV(colorHValue,colorSValue,colorVValue, colorAValue);
+        SendEventChangeColor();
+        UpdateColorInformation(); 
     }     
 }
 
-void HandleMouseMove(StringHash eventType, VariantMap& eventData) 
+void HandleColorWheelMouseMove(StringHash eventType, VariantMap& eventData) 
 {
     if (colorWheelWindow.visible == false) return;
         
