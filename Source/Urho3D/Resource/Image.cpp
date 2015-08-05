@@ -373,9 +373,9 @@ bool Image::BeginLoad(Deserializer& source)
             unsigned z = ddsd.dwDepth_ / 2;
             for (unsigned level = ddsd.dwMipMapCount_; level > 0; x /= 2, y /= 2, z /= 2, level -= 1)
             {
-                blocksWide = (x + 3) / 4;
-                blocksHeight = (y + 3) / 4;
-                dataSize += blockSize * blocksWide * blocksWide * Max(z, 1);
+                blocksWide = (Max(x, 1) + 3) / 4;
+                blocksHeight = (Max(y, 1) + 3) / 4;
+                dataSize += blockSize * blocksWide * blocksHeight * Max(z, 1);
             }
         }
         else
@@ -386,13 +386,15 @@ bool Image::BeginLoad(Deserializer& source)
             unsigned y = ddsd.dwHeight_ / 2;
             unsigned z = ddsd.dwDepth_ / 2;
             for (unsigned level = ddsd.dwMipMapCount_; level > 0; x /= 2, y /= 2, z /= 2, level -= 1)
-                dataSize += (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * x * y * Max(z, 1);
+                dataSize += (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * Max(x, 1) * Max(y, 1) * Max(z, 1);
         }
 
-        SharedPtr<Image> currentImage(this);
+        // Do not use a shared ptr here, in case nothing is refcounting the image outside this function.
+        // A raw pointer is fine as the image chain (if needed) uses shared ptr's properly
+        Image* currentImage = this;
 
         for (unsigned faceIndex = 0; faceIndex < imageChainCount; ++faceIndex)
-        {                
+        {
             currentImage->data_ = new unsigned char[dataSize];
             currentImage->cubemap_ = cubemap_;
             currentImage->array_ = array_;
@@ -405,11 +407,10 @@ bool Image::BeginLoad(Deserializer& source)
             currentImage->numCompressedLevels_ = ddsd.dwMipMapCount_;
             if (!currentImage->numCompressedLevels_)
                 currentImage->numCompressedLevels_ = 1;
-                
-            if (faceIndex == 0)
-                currentImage->SetMemoryUse(dataSize * imageChainCount);
-            else
-                currentImage->SetMemoryUse(dataSize);
+            
+            // Memory use needs to be exact per image as it's used for verifying the data size in GetCompressedLevel()
+            // even though it would be more proper for the first image to report the size of all siblings combined
+            currentImage->SetMemoryUse(dataSize);
 
             source.Read(currentImage->data_.Get(), dataSize);
 
