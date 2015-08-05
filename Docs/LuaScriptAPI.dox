@@ -5699,7 +5699,6 @@ Methods:
 - void SetMaterial(Material* material)
 - void SetBoundingBox(const BoundingBox& box)
 - void SetCoordinates(const IntVector2& coordinates)
-- void SetOcclusionOffset(float offset)
 - void ResetLod()
 - Geometry* GetGeometry() const
 - Geometry* GetMaxLodGeometry() const
@@ -5712,7 +5711,6 @@ Methods:
 - TerrainPatch* GetEastPatch() const
 - const IntVector2& GetCoordinates() const
 - unsigned GetLodLevel() const
-- float GetOcclusionOffset() const
 
 Properties:
 
@@ -5728,7 +5726,6 @@ Properties:
 - BoundingBox& boundingBox
 - IntVector2& coordinates
 - unsigned lodLevel (readonly)
-- float occlusionOffset
 
 <a name="Class_Text"></a>
 ### Text : UIElement
