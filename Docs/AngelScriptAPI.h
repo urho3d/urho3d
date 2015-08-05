@@ -10308,6 +10308,7 @@ uint lightMask;
 float lodBias;
 Material material;
 uint maxLights;
+uint maxLodLevels;
 /* readonly */
 Node node;
 /* readonly */
@@ -10319,6 +10320,7 @@ IntVector2 numVertices;
 ObjectAnimation objectAnimation;
 bool occludee;
 bool occluder;
+uint occlusionLodLevel;
 int patchSize;
 /* readonly */
 Array<TerrainPatch> patches;

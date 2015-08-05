@@ -1875,6 +1875,7 @@ namespace Urho3D
 - %Material : ResourceRef
 - %Vertex %Spacing : Vector3
 - %Patch %Size : int
+- %Max %LOD %Levels : int
 - %Smooth %Height %Map : bool
 - %Is %Occluder : bool
 - %Can %Be %Occluded : bool
@@ -1887,6 +1888,7 @@ namespace Urho3D
 - %Light %Mask : int
 - %Shadow %Mask : int
 - %Zone %Mask : int
+- %Occlusion %LOD %level : int
 
 ### Text
 - %Name : String
@@ -11287,6 +11289,7 @@ Properties:
 - float lodBias
 - Material@ material
 - uint maxLights
+- uint maxLodLevels
 - Node@ node // readonly
 - uint numAttributes // readonly
 - IntVector2 numPatches // readonly
@@ -11294,6 +11297,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
+- uint occlusionLodLevel
 - int patchSize
 - TerrainPatch@[] patches // readonly
 - int refs // readonly

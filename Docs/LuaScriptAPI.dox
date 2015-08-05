@@ -5626,6 +5626,8 @@ Methods:
 
 - void SetPatchSize(int size)
 - void SetSpacing(const Vector3& spacing)
+- void SetMaxLodLevels(unsigned levels)
+- void SetOcclusionLodLevel(unsigned level)
 - void SetSmoothing(bool enable)
 - bool SetHeightMap(Image* image)
 - void SetMaterial(Material* material)
@@ -5645,6 +5647,8 @@ Methods:
 - const Vector3& GetSpacing() const
 - const IntVector2& GetNumVertices() const
 - const IntVector2& GetNumPatches() const
+- unsigned GetMaxLodLevels() const
+- unsigned GetOcclusionLodLevel() const
 - bool GetSmoothing() const
 - Image* GetHeightMap() const
 - Material* GetMaterial() const
@@ -5673,6 +5677,8 @@ Properties:
 - Vector3& spacing
 - IntVector2& numVertices (readonly)
 - IntVector2& numPatches (readonly)
+- unsigned maxLodLevels
+- unsigned occlusionLodLevel
 - bool smoothing
 - Image* heightMap
 - Material* material
@@ -5702,7 +5708,7 @@ Methods:
 - void ResetLod()
 - Geometry* GetGeometry() const
 - Geometry* GetMaxLodGeometry() const
-- Geometry* GetMinLodGeometry() const
+- Geometry* GetOcclusionGeometry() const
 - VertexBuffer* GetVertexBuffer() const
 - Terrain* GetOwner() const
 - TerrainPatch* GetNorthPatch() const
@@ -5716,7 +5722,7 @@ Properties:
 
 - Geometry* geometry (readonly)
 - Geometry* maxLodGeometry (readonly)
-- Geometry* minLodGeometry (readonly)
+- Geometry* occlusionGeometry (readonly)
 - VertexBuffer* vertexBuffer (readonly)
 - Terrain* owner
 - TerrainPatch* northPatch (readonly)
