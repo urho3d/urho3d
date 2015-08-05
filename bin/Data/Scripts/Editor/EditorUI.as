@@ -93,9 +93,9 @@ void CreateUI()
 
     SubscribeToEvent("ScreenMode", "ResizeUI");
     SubscribeToEvent("MenuSelected", "HandleMenuSelected");
-    SubscribeToEvent("KeyDown", "HandleKeyDown");
-    SubscribeToEvent("KeyUp", "UnfadeUI");
-    SubscribeToEvent("MouseButtonUp", "UnfadeUI");
+    //SubscribeToEvent("KeyDown", "HandleKeyDown");
+    //SubscribeToEvent("KeyUp", "UnfadeUI");
+    //SubscribeToEvent("MouseButtonUp", "UnfadeUI");
     SubscribeToEvent("ChangeLanguage", "HandleChangeLanguage");
     
     SubscribeToEvent("WheelChangeColor", "HandleWheelChangeColor");

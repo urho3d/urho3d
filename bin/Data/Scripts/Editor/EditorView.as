@@ -475,14 +475,14 @@ void CreateCamera()
     // Note: the camera is not inside the scene, so that it is not listed, and does not get deleted
     ResetCamera();
 
-    SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
-    SubscribeToEvent("UIMouseClick", "ViewMouseClick");
+    //SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
+    //SubscribeToEvent("UIMouseClick", "ViewMouseClick");
     //SubscribeToEvent("MouseMove", "ViewMouseMove"); 
-    SubscribeToEvent("UIMouseClickEnd", "ViewMouseClickEnd");
-    SubscribeToEvent("BeginViewUpdate", "HandleBeginViewUpdate");
-    SubscribeToEvent("EndViewUpdate", "HandleEndViewUpdate");
-    SubscribeToEvent("BeginViewRender", "HandleBeginViewRender");
-    SubscribeToEvent("EndViewRender", "HandleEndViewRender");
+    //SubscribeToEvent("UIMouseClickEnd", "ViewMouseClickEnd");
+    //SubscribeToEvent("BeginViewUpdate", "HandleBeginViewUpdate");
+    //SubscribeToEvent("EndViewUpdate", "HandleEndViewUpdate");
+    //SubscribeToEvent("BeginViewRender", "HandleBeginViewRender");
+    //SubscribeToEvent("EndViewRender", "HandleEndViewRender");
 
     // Set initial renderpath if defined
     SetRenderPath(renderPathName);
