@@ -1159,6 +1159,12 @@ Methods:
 - bool GetLogStatistics() const
 - String GetAddress() const
 - short GetPort() const
+- float GetRoundTripTime() const
+- float GetLastHeardTime() const
+- float GetBytesInPerSec() const
+- float GetBytesOutPerSec() const
+- float GetPacketsInPerSec() const
+- float GetPacketsOutPerSec() const
 - String ToString() const
 - unsigned GetNumDownloads() const
 - const String GetDownloadName() const
@@ -1179,6 +1185,12 @@ Properties:
 - bool logStatistics
 - String address (readonly)
 - short port (readonly)
+- float roundTripTime (readonly)
+- float lastHeardTime (readonly)
+- float bytesInPerSec (readonly)
+- float bytesOutPerSec (readonly)
+- float packetsInPerSec (readonly)
+- float packetsOutPerSec (readonly)
 - unsigned numDownloads (readonly)
 - String downloadName (readonly)
 - float downloadProgress (readonly)

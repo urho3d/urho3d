@@ -4165,6 +4165,8 @@ Properties:
 
 - String address // readonly
 - StringHash baseType // readonly
+- float bytesInPerSec // readonly
+- float bytesOutPerSec // readonly
 - String category // readonly
 - bool client // readonly
 - bool connectPending // readonly
@@ -4173,12 +4175,16 @@ Properties:
 - String downloadName // readonly
 - float downloadProgress // readonly
 - VariantMap identity
+- float lastHeardTime // readonly
 - bool logStatistics
 - uint numDownloads // readonly
+- float packetsInPerSec // readonly
+- float packetsOutPerSec // readonly
 - uint16 port // readonly
 - Vector3 position
 - int refs // readonly
 - Quaternion rotation
+- float roundTripTime // readonly
 - Scene@ scene
 - bool sceneLoaded // readonly
 - uint8 timeStamp

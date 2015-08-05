@@ -2080,6 +2080,10 @@ String address;
 /* readonly */
 StringHash baseType;
 /* readonly */
+float bytesInPerSec;
+/* readonly */
+float bytesOutPerSec;
+/* readonly */
 String category;
 /* readonly */
 bool client;
@@ -2093,15 +2097,23 @@ String downloadName;
 /* readonly */
 float downloadProgress;
 VariantMap identity;
+/* readonly */
+float lastHeardTime;
 bool logStatistics;
 /* readonly */
 uint numDownloads;
+/* readonly */
+float packetsInPerSec;
+/* readonly */
+float packetsOutPerSec;
 /* readonly */
 uint16 port;
 Vector3 position;
 /* readonly */
 int refs;
 Quaternion rotation;
+/* readonly */
+float roundTripTime;
 Scene scene;
 /* readonly */
 bool sceneLoaded;
