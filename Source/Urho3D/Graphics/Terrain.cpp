@@ -474,15 +474,22 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
         vertexBuffer->SetSize(row * row, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
 
     SharedArrayPtr<unsigned char> cpuVertexData(new unsigned char[row * row * sizeof(Vector3)]);
+    SharedArrayPtr<unsigned char> occlusionCpuVertexData(new unsigned char[row * row * sizeof(Vector3)]);
 
     float* vertexData = (float*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
     float* positionData = (float*)cpuVertexData.Get();
+    float* occlusionData = (float*)occlusionCpuVertexData.Get();
     BoundingBox box;
 
     if (vertexData)
     {
         const IntVector2& coords = patch->GetCoordinates();
-
+        int patchMinX = coords.x_ * patchSize_;
+        int patchMaxX = (coords.x_ + 1) * patchSize_;
+        int patchMinZ = coords.y_ * patchSize_;
+        int patchMaxZ = (coords.y_ + 1) * patchSize_;
+        int lodExpand = (1 << (numLodLevels_ - 1)) - 1;
+        
         for (int z = 0; z <= patchSize_; ++z)
         {
             for (int x = 0; x <= patchSize_; ++x)
@@ -500,6 +507,24 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
                 *positionData++ = position.z_;
 
                 box.Merge(position);
+                
+                // For vertices that are part of the lowest LOD, calculate the minimum height in the neighborhood for occlusion
+                float minHeight = position.y_;
+                if (lodExpand > 0 && (x & lodExpand) == 0 && (z & lodExpand) == 0)
+                {
+                    int minX = Max(xPos - lodExpand, patchMinX);
+                    int maxX = Min(xPos + lodExpand, patchMaxX);
+                    int minZ = Max(zPos - lodExpand, patchMinZ);
+                    int maxZ = Min(zPos + lodExpand, patchMaxZ);
+                    for (int nZ = minZ; nZ <= maxZ; ++nZ)
+                    {
+                        for (int nX = minX; nX <= maxX; ++nX)
+                            minHeight = Min(minHeight, GetRawHeight(nX, nZ));
+                    }
+                }
+                *occlusionData++ = position.x_;
+                *occlusionData++ = minHeight;
+                *occlusionData++ = position.z_;
 
                 // Normal
                 Vector3 normal = GetRawNormal(xPos, zPos);
@@ -539,11 +564,9 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
         maxLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
         minLodGeometry->SetIndexBuffer(indexBuffer_);
         minLodGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[lastDrawRange].first_, drawRanges_[lastDrawRange].second_, false);
-        minLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
+        minLodGeometry->SetRawVertexData(occlusionCpuVertexData, sizeof(Vector3), MASK_POSITION);
     }
 
-    // Offset the occlusion geometry by vertex spacing to reduce possibility of over-aggressive occlusion
-    patch->SetOcclusionOffset(-0.5f * (spacing_.x_ + spacing_.z_));
     patch->ResetLod();
 }
 

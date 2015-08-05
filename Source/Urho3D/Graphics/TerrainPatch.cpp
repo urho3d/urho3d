@@ -51,8 +51,7 @@ TerrainPatch::TerrainPatch(Context* context) :
     minLodGeometry_(new Geometry(context)),
     vertexBuffer_(new VertexBuffer(context)),
     coordinates_(IntVector2::ZERO),
-    lodLevel_(0),
-    occlusionOffset_(0.0f)
+    lodLevel_(0)
 {
     geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
     maxLodGeometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
@@ -203,13 +202,8 @@ bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
     if (!vertexData || !indexData)
         return true;
 
-    const Matrix3x4& worldTransform = node_->GetWorldTransform();
-
-    Matrix3x4 occlusionTransform(worldTransform.Translation() + worldTransform * Vector4(0.0f, occlusionOffset_, 0.0f,
-        0.0f), worldTransform.Rotation(), worldTransform.Scale());
-
     // Draw and check for running out of triangles
-    return buffer->Draw(occlusionTransform, vertexData, vertexSize, indexData, indexSize, minLodGeometry_->GetIndexStart(),
+    return buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, minLodGeometry_->GetIndexStart(),
         minLodGeometry_->GetIndexCount());
 }
 
@@ -246,11 +240,6 @@ void TerrainPatch::SetBoundingBox(const BoundingBox& box)
 void TerrainPatch::SetCoordinates(const IntVector2& coordinates)
 {
     coordinates_ = coordinates;
-}
-
-void TerrainPatch::SetOcclusionOffset(float offset)
-{
-    occlusionOffset_ = offset;
 }
 
 void TerrainPatch::ResetLod()
