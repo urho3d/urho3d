@@ -11,7 +11,7 @@ class TerrainPatch : public Drawable
     
     Geometry* GetGeometry() const;
     Geometry* GetMaxLodGeometry() const;
-    Geometry* GetMinLodGeometry() const;
+    Geometry* GetOcclusionGeometry() const;
     VertexBuffer* GetVertexBuffer() const;
     Terrain* GetOwner() const;
     TerrainPatch* GetNorthPatch() const;
@@ -23,7 +23,7 @@ class TerrainPatch : public Drawable
 
     tolua_readonly tolua_property__get_set Geometry* geometry;
     tolua_readonly tolua_property__get_set Geometry* maxLodGeometry;
-    tolua_readonly tolua_property__get_set Geometry* minLodGeometry;
+    tolua_readonly tolua_property__get_set Geometry* occlusionGeometry;
     tolua_readonly tolua_property__get_set VertexBuffer* vertexBuffer;
     tolua_property__get_set Terrain* owner;
     tolua_readonly tolua_property__get_set TerrainPatch* northPatch;

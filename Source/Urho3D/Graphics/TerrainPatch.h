@@ -76,10 +76,10 @@ public:
 
     /// Return visible geometry.
     Geometry* GetGeometry() const;
-    /// Return max LOD geometry.
+    /// Return max LOD geometry. Used for decals.
     Geometry* GetMaxLodGeometry() const;
-    /// Return min LOD geometry.
-    Geometry* GetMinLodGeometry() const;
+    /// Return geometry used for occlusion.
+    Geometry* GetOcclusionGeometry() const;
     /// Return vertex buffer.
     VertexBuffer* GetVertexBuffer() const;
     /// Return owner terrain.
@@ -118,8 +118,8 @@ private:
     SharedPtr<Geometry> geometry_;
     /// Geometry that is locked to the max LOD level. Used for decals.
     SharedPtr<Geometry> maxLodGeometry_;
-    /// Geometry that is locked to the minimum LOD level. Used for occlusion.
-    SharedPtr<Geometry> minLodGeometry_;
+    /// Geometry that is used for occlusion.
+    SharedPtr<Geometry> occlusionGeometry_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// Parent terrain.
