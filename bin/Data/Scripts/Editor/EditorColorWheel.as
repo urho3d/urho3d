@@ -93,19 +93,14 @@ void CreateColorWheel()
     colorFastItem.Resize(8);
     colorFast.Resize(8);
     
-    // init some gragient for fast colors palette
+    // Init some gradient for fast colors palette
     for (int i=0; i<8; i++) 
     {
         colorFastItem[i] = colorWheelWindow.GetChild("h"+String(i), true);
         colorFast[i] = Color(i*0.125,i*0.125,i*0.125);
         colorFastItem[i].color = colorFast[i]; 
     }
-    
-    //SubscribeToEvent("MouseMove", "HandleColorWheelMouseMove");
-    //SubscribeToEvent("MouseButtonDown", "HandleColorWheelMouseButtonDown");    
-    //SubscribeToEvent("MouseWheel", "HandleColorWheelMouseWheel");
-    //SubscribeToEvent("KeyDown", "HandleColorWheelKeyDown");
-       
+
     SubscribeToEvent(closeButton, "Pressed", "HandleWheelButtons");
     SubscribeToEvent(okButton, "Pressed", "HandleWheelButtons");
     SubscribeToEvent(cancelButton, "Pressed", "HandleWheelButtons");

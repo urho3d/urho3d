@@ -42,10 +42,6 @@ void CreateLayerEditor()
             bits[i].vars["index"] = i;
             SubscribeToEvent(bits[i], "Toggled", "ToggleBits");
     }
-    
-    //SubscribeToEvent("MouseMove", "HandleHideLayerEditor");
-    //SubscribeToEvent("MouseButtonDown", "HandleHideLayerEditor");
-    //SubscribeToEvent("MouseWheel", "HandleMaskTypeScroll");
 }
 
 bool ShowLayerEditor()
@@ -328,5 +324,3 @@ void ToggleBits(StringHash eventType, VariantMap& eventData)
     
     toggleBusy = false;
 }
-
-

@@ -1,4 +1,4 @@
-// Editor main handlers (add yours local handler in proper main handler to prevent losing events)
+// Editor main handlers (add your local handler in proper main handler to prevent losing events)
 
 void EditorSubscribeToEvents() 
 {
@@ -19,7 +19,6 @@ void EditorSubscribeToEvents()
     SubscribeToEvent("EndViewUpdate", "EditorMainHandleEndViewUpdate");
     SubscribeToEvent("BeginViewRender", "EditorMainHandleBeginViewRender");
     SubscribeToEvent("EndViewRender", "EditorMainHandleEndViewRender");
-    
 }
 
 void EditorMainHandleKeyDown(StringHash eventType, VariantMap& eventData) 
