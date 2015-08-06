@@ -366,7 +366,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
         String resourceName(resourceDesc.Name);
         if (resourceDesc.Type == D3D_SIT_CBUFFER)
             cbRegisterMap[resourceName] = resourceDesc.BindPoint;
-        else if (type_ == PS && resourceDesc.Type == D3D_SIT_SAMPLER && resourceDesc.BindPoint < MAX_TEXTURE_UNITS)
+        else if (resourceDesc.Type == D3D_SIT_SAMPLER && resourceDesc.BindPoint < MAX_TEXTURE_UNITS)
             useTextureUnit_[resourceDesc.BindPoint] = true;
     }
 
