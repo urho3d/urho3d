@@ -45,6 +45,8 @@ void CreateMaterialEditor()
     SubscribeToEvent(materialWindow.GetChild("ConstantBiasEdit", true), "TextFinished", "EditConstantBias");
     SubscribeToEvent(materialWindow.GetChild("SlopeBiasEdit", true), "TextChanged", "EditSlopeBias");
     SubscribeToEvent(materialWindow.GetChild("SlopeBiasEdit", true), "TextFinished", "EditSlopeBias");
+    SubscribeToEvent(materialWindow.GetChild("RenderOrderEdit", true), "TextChanged", "EditRenderOrder");
+    SubscribeToEvent(materialWindow.GetChild("RenderOrderEdit", true), "TextFinished", "EditRenderOrder");
     SubscribeToEvent(materialWindow.GetChild("CullModeEdit", true), "ItemSelected", "EditCullMode");
     SubscribeToEvent(materialWindow.GetChild("ShadowCullModeEdit", true), "ItemSelected", "EditShadowCullMode");
     SubscribeToEvent(materialWindow.GetChild("FillModeEdit", true), "ItemSelected", "EditFillMode");
@@ -318,15 +320,16 @@ void RefreshMaterialMiscParameters()
     if (editMaterial is null)
         return;
         
-    BiasParameters bias = editMaterial.depthBias;
-
     inMaterialRefresh = true;
 
+    BiasParameters bias = editMaterial.depthBias;
     LineEdit@ attrEdit = materialWindow.GetChild("ConstantBiasEdit", true);
     attrEdit.text = String(bias.constantBias);
     attrEdit = materialWindow.GetChild("SlopeBiasEdit", true);
     attrEdit.text = String(bias.slopeScaledBias);
-    
+    attrEdit = materialWindow.GetChild("RenderOrderEdit", true);
+    attrEdit.text = String(uint(editMaterial.renderOrder));
+
     DropDownList@ attrList = materialWindow.GetChild("CullModeEdit", true);
     attrList.selection = editMaterial.cullMode;
     attrList = materialWindow.GetChild("ShadowCullModeEdit", true);
@@ -825,6 +828,19 @@ void EditSlopeBias(StringHash eventType, VariantMap& eventData)
     BiasParameters bias = editMaterial.depthBias;
     bias.slopeScaledBias = attrEdit.text.ToFloat();
     editMaterial.depthBias = bias;
+
+    EndMaterialEdit();
+}
+
+void EditRenderOrder(StringHash eventType, VariantMap& eventData)
+{
+    if (editMaterial is null || inMaterialRefresh)
+        return;
+
+    BeginMaterialEdit();
+
+    LineEdit@ attrEdit = eventData["Element"].GetPtr();
+    editMaterial.renderOrder = attrEdit.text.ToUInt();
 
     EndMaterialEdit();
 }

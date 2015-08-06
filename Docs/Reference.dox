@@ -1004,6 +1004,7 @@ A material definition looks like this:
     <shadowcull value="cw|ccw|none" />
     <fill value="solid|wireframe|point" />
     <depthbias constant="x" slopescaled="y" />
+    <renderorder value="x" />
 </material>
 \endcode
 
@@ -1020,6 +1021,8 @@ The techniques for different LOD levels and quality settings must appear in a sp
 %Material shader parameters can be floats or vectors up to 4 components, or matrices.
 
 Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass. Note that material's depth bias settings do not apply in the shadow pass; during shadow rendering the light's depth bias is used instead.
+
+Render order is a 8-bit unsigned value that can be used to affect rendering order within a pass, overriding the state or distance sorting. The default value is 128; smaller values will render earlier, and larger values later.
 
 \section Materials_Textures Material textures
 

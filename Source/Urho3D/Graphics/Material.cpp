@@ -390,6 +390,10 @@ bool Material::Load(const XMLElement& source)
     if (depthBiasElem)
         SetDepthBias(BiasParameters(depthBiasElem.GetFloat("constant"), depthBiasElem.GetFloat("slopescaled")));
 
+    XMLElement renderOrderElem = source.GetChild("renderorder");
+    if (renderOrderElem)
+        SetRenderOrder((unsigned char)renderOrderElem.GetUInt("value"));
+
     RefreshShaderParameterHash();
     RefreshMemoryUse();
     CheckOcclusion();
@@ -467,6 +471,10 @@ bool Material::Save(XMLElement& dest) const
     XMLElement depthBiasElem = dest.CreateChild("depthbias");
     depthBiasElem.SetFloat("constant", depthBias_.constantBias_);
     depthBiasElem.SetFloat("slopescaled", depthBias_.slopeScaledBias_);
+
+    // Write render order
+    XMLElement renderOrderElem = dest.CreateChild("renderorder");
+    renderOrderElem.SetUInt("value", renderOrder_);
 
     return true;
 }
@@ -632,6 +640,11 @@ void Material::SetDepthBias(const BiasParameters& parameters)
     depthBias_.Validate();
 }
 
+void Material::SetRenderOrder(unsigned char order)
+{
+    renderOrder_ = order;
+}
+
 void Material::SetScene(Scene* scene)
 {
     UnsubscribeFromEvent(E_UPDATE);
@@ -676,6 +689,7 @@ SharedPtr<Material> Material::Clone(const String& cloneName) const
     ret->cullMode_ = cullMode_;
     ret->shadowCullMode_ = shadowCullMode_;
     ret->fillMode_ = fillMode_;
+    ret->renderOrder_ = renderOrder_;
     ret->RefreshMemoryUse();
 
     return ret;
@@ -797,6 +811,7 @@ void Material::ResetToDefaults()
     shadowCullMode_ = CULL_CCW;
     fillMode_ = FILL_SOLID;
     depthBias_ = BiasParameters(0.0f, 0.0f);
+    renderOrder_ = DEFAULT_RENDER_ORDER;
 
     RefreshShaderParameterHash();
     RefreshMemoryUse();
