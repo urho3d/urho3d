@@ -36,7 +36,7 @@ EVENT(E_DBCURSOR, DbCursor)
     PARAM(P_SQL, SQL);                      // String
     PARAM(P_NUMCOLS, NumCols);              // unsigned
     PARAM(P_COLVALUES, ColValues);          // VariantVector
-    PARAM(P_COLHEADERS, ColHeaders);        // Vector<String>
+    PARAM(P_COLHEADERS, ColHeaders);        // StringVector
     PARAM(P_FILTER, Filter);                // bool [in]
     PARAM(P_ABORT, Abort);                  // bool [in]
 }

@@ -93,6 +93,31 @@ template <> int ToluaIsVector<String>(lua_State* L, int lo, const char* type, in
     return 0;
 }
 
+template <> int ToluaIsVector<Variant>(lua_State* L, int lo, const char* type, int def, tolua_Error* err)
+{
+    if (lua_istable(L, lo))
+    {
+        size_t length = lua_objlen(L, lo);
+        for (int i = 1; i <= length; ++i)
+        {
+            lua_pushinteger(L, i);
+            lua_gettable(L, lo);
+            if (!tolua_isusertype(L, -1, "Variant", 0, err))
+            {
+                lua_pop(L, 1);
+                return 0;
+            }
+            lua_pop(L, 1);
+        }
+        return 1;
+    }
+
+    err->index = lo;
+    err->array = 0;
+    err->type = type;
+    return 0;
+}
+
 template <> void* ToluaToVector<String>(lua_State* L, int narg, void* def)
 {
     if (!lua_istable(L, narg))
@@ -122,6 +147,32 @@ template <> void* ToluaToVector<String>(lua_State* L, int narg, void* def)
     return &result;
 }
 
+template <> void* ToluaToVector<Variant>(lua_State* L, int narg, void* def)
+{
+    if (!lua_istable(L, narg))
+        return 0;
+
+    static Vector<Variant> result;
+    result.Clear();
+
+    size_t length = lua_objlen(L, narg);
+    for (int i = 1; i <= length; ++i)
+    {
+        lua_pushinteger(L, i);
+        lua_gettable(L, narg);
+        tolua_Error error;
+        if (!tolua_isusertype(L, -1, "Variant", 0, &error))
+        {
+            lua_pop(L, 1);
+            return 0;
+        }
+        result.Push((Variant*) tolua_tousertype(L, -1, 0));
+        lua_pop(L, 1);
+    }
+
+    return &result;
+}
+
 template <> int ToluaPushVector<String>(lua_State* L, void* data, const char* type)
 {
     const Vector<String>& vectorstring = *((const Vector<String>*)data);
@@ -141,6 +192,18 @@ template <> int ToluaPushVector<StringHash>(lua_State* L, void* data, const char
     for (unsigned i = 0; i < vector.Size(); ++i)
     {
         tolua_pushusertype(L, &vector[i], "StringHash");
+        lua_rawseti(L, -2, i + 1);
+    }
+    return 1;
+}
+
+template <> int ToluaPushVector<Variant>(lua_State* L, void* data, const char* type)
+{
+    lua_newtable(L);
+    Vector<Variant>& vector = *reinterpret_cast<Vector<Variant>*>(data);
+    for (unsigned i = 0; i < vector.Size(); ++i)
+    {
+        tolua_pushusertype(L, &vector[i], "Variant");
         lua_rawseti(L, -2, i + 1);
     }
     return 1;

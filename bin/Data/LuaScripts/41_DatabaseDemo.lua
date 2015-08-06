@@ -75,8 +75,8 @@ For example:]])
 end
 
 function HandleConsoleCommand(eventType, eventData)
-    if eventData:GetString("Id") == "LuaScriptEventInvoker" then
-        HandleInput(eventData:GetString("Command"))
+    if eventData["Id"]:GetString() == "LuaScriptEventInvoker" then
+        HandleInput(eventData["Command"]:GetString())
     end
 end
 
@@ -90,7 +90,7 @@ end
 
 function HandleEscKeyDown(eventType, eventData)
     -- Unlike the other samples, exiting the engine when ESC is pressed instead of just closing the console
-    if eventData:GetInt("Key") == KEY_ESC then
+    if eventData["Key"]:GetInt() == KEY_ESC then
         engine:Exit()
     end
 end
@@ -98,19 +98,18 @@ end
 function HandleDbCursor(eventType, eventData)
     -- In a real application the P_SQL can be used to do the logic branching in a shared event handler
     -- However, this is not required in this sample demo
-    local numCols = eventData:GetUInt("NumCols")
---    local colValues = eventData:GetVariantVector("ColValues")
---    local colHeaders = eventData:GetStringVector("ColHeaders")
+    local colValues = eventData["ColValues"]:GetVariantVector()
+    local colHeaders = eventData["ColHeaders"]:GetStringVector()
 
     -- In this sample demo we just use db cursor to dump each row immediately so we can filter out the row to conserve memory
     -- In a real application this can be used to perform the client-side filtering logic
-    eventData:SetBool("Filter", true)
+    eventData["Filter"] = true
     -- In this sample demo we abort the further cursor movement when maximum rows being dumped has been reached
     row = row + 1
-    eventData:SetBool("Abort", row >= maxRows)
+    eventData["Abort"] = row >= maxRows
 
-    for i = 1, numCols do
---        Print("Row #" .. row .. ": " .. colHeaders[i] .. " = " .. colValues[i]:ToString())
+    for i, colHeader in pairs(colHeaders) do
+        Print("Row #" .. row .. ": " .. colHeader .. " = " .. colValues[i]:ToString())
     end
 end
 
@@ -120,33 +119,32 @@ function HandleInput(input)
     row = 0
     if input == "quit" or input == "exit" then
         engine:Exit()
---    elseif input:StartsWith("set") or input:StartsWith("get") then
---        -- We expect a key/value pair for 'set' command
---        local tokens = input:Substring(3):Split(' ')
---        local setting = tokens.length > 0 and tokens[0] or ""
---        if input:StartsWith("set") and tokens.length > 1 then
---            if setting == "maxrows" then
---                maxRows = Max(tokens[1]:ToUInt(), 1)
---            elseif (setting == "connstr") then
---                local newConnectionString = String(input:Substring(input:Find(" ", input:Find("connstr")) + 1))
---                local newConnection = database:Connect(newConnectionString)
---                if newConnection ~= nil then
---                    database:Disconnect(connection)
---                    connection = newConnection
---                end
---            end
---        end
---        if tokens.length > 0 then
---            if setting == "maxrows" then
---                Print("maximum rows is set to " + maxRows)
---            elseif setting == "connstr" then
---                Print("connection string is set to " + connection.connectionString)
---            else
---                Print("Unrecognized setting: " + setting)
---            end
---        else
---            Print("Missing setting paramater. Recognized settings are: maxrows, connstr")
---        end
+    elseif input:find("set") or input:find("get") then
+        -- We expect a key/value pair for 'set' command
+        local command, setting, value
+        _, _, command, setting, value = input:find("([gs]et)%s*(%a*)%s*(.*)")
+        if command == "set" and value ~= nil then
+            if setting == "maxrows" then
+                maxRows = Max(value, 1)
+            elseif (setting == "connstr") then
+                local newConnection = database:Connect(value)
+                if newConnection ~= nil then
+                    database:Disconnect(connection)
+                    connection = newConnection
+                end
+            end
+        end
+        if setting ~= nil then
+            if setting == "maxrows" then
+                Print("maximum rows is set to " .. maxRows)
+            elseif setting == "connstr" then
+                Print("connection string is set to " .. connection.connectionString)
+            else
+                Print("Unrecognized setting: " .. setting)
+            end
+        else
+            Print("Missing setting paramater. Recognized settings are: maxrows, connstr")
+        end
     else
         -- In this sample demo we use the dbCursor event to loop through each row as it is being fetched
         -- Regardless of this event is being used or not, all the fetched rows will be made available in the DbResult object,

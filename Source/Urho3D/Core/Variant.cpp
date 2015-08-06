@@ -35,7 +35,7 @@ const ResourceRef Variant::emptyResourceRef;
 const ResourceRefList Variant::emptyResourceRefList;
 const VariantMap Variant::emptyVariantMap;
 const VariantVector Variant::emptyVariantVector;
-const Vector<String> Variant::emptyStringVector;
+const StringVector Variant::emptyStringVector;
 
 static const char* typeNames[] =
 {
@@ -93,7 +93,7 @@ Variant& Variant::operator =(const Variant& rhs)
         break;
 
     case VAR_STRINGVECTOR:
-        *(reinterpret_cast<Vector<String>*>(&value_)) = *(reinterpret_cast<const Vector<String>*>(&rhs.value_));
+        *(reinterpret_cast<StringVector*>(&value_)) = *(reinterpret_cast<const StringVector*>(&rhs.value_));
         break;
 
     case VAR_VARIANTMAP:
@@ -171,7 +171,7 @@ bool Variant::operator ==(const Variant& rhs) const
         return *(reinterpret_cast<const VariantVector*>(&value_)) == *(reinterpret_cast<const VariantVector*>(&rhs.value_));
 
     case VAR_STRINGVECTOR:
-        return *(reinterpret_cast<const Vector<String>*>(&value_)) == *(reinterpret_cast<const Vector<String>*>(&rhs.value_));
+        return *(reinterpret_cast<const StringVector*>(&value_)) == *(reinterpret_cast<const StringVector*>(&rhs.value_));
 
     case VAR_VARIANTMAP:
         return *(reinterpret_cast<const VariantMap*>(&value_)) == *(reinterpret_cast<const VariantMap*>(&rhs.value_));
@@ -269,7 +269,7 @@ void Variant::FromString(VariantType type, const char* value)
 
     case VAR_RESOURCEREF:
     {
-        Vector<String> values = String::Split(value, ';');
+        StringVector values = String::Split(value, ';');
         if (values.Size() == 2)
         {
             SetType(VAR_RESOURCEREF);
@@ -282,7 +282,7 @@ void Variant::FromString(VariantType type, const char* value)
 
     case VAR_RESOURCEREFLIST:
     {
-        Vector<String> values = String::Split(value, ';');
+        StringVector values = String::Split(value, ';');
         if (values.Size() >= 1)
         {
             SetType(VAR_RESOURCEREFLIST);
@@ -459,8 +459,8 @@ bool Variant::IsZero() const
 
     case VAR_RESOURCEREFLIST:
     {
-        const Vector<String>& names = reinterpret_cast<const ResourceRefList*>(&value_)->names_;
-        for (Vector<String>::ConstIterator i = names.Begin(); i != names.End(); ++i)
+        const StringVector& names = reinterpret_cast<const ResourceRefList*>(&value_)->names_;
+        for (StringVector::ConstIterator i = names.Begin(); i != names.End(); ++i)
         {
             if (!i->Empty())
                 return false;
@@ -472,7 +472,7 @@ bool Variant::IsZero() const
         return reinterpret_cast<const VariantVector*>(&value_)->Empty();
 
     case VAR_STRINGVECTOR:
-        return reinterpret_cast<const Vector<String>*>(&value_)->Empty();
+        return reinterpret_cast<const StringVector*>(&value_)->Empty();
 
     case VAR_VARIANTMAP:
         return reinterpret_cast<const VariantMap*>(&value_)->Empty();
@@ -531,7 +531,7 @@ void Variant::SetType(VariantType newType)
         break;
 
     case VAR_STRINGVECTOR:
-        (reinterpret_cast<Vector<String>*>(&value_))->~Vector<String>();
+        (reinterpret_cast<StringVector*>(&value_))->~StringVector();
         break;
 
     case VAR_VARIANTMAP:
@@ -583,7 +583,7 @@ void Variant::SetType(VariantType newType)
         break;
 
     case VAR_STRINGVECTOR:
-        new(reinterpret_cast<Vector<String>*>(&value_)) Vector<String>();
+        new(reinterpret_cast<StringVector*>(&value_)) StringVector();
         break;
 
     case VAR_VARIANTMAP:
@@ -726,7 +726,7 @@ template <> VariantVector Variant::Get<VariantVector>() const
     return GetVariantVector();
 }
 
-template <> Vector<String> Variant::Get<Vector<String> >() const
+template <> StringVector Variant::Get<StringVector >() const
 {
     return GetStringVector();
 }

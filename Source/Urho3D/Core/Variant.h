@@ -96,6 +96,17 @@ struct VariantValue
     };
 };
 
+class Variant;
+
+/// Vector of variants.
+typedef Vector<Variant> VariantVector;
+
+/// Vector of strings.
+typedef Vector<String> StringVector;
+
+/// Map of variants.
+typedef HashMap<StringHash, Variant> VariantMap;
+
 /// Typed resource reference.
 struct URHO3D_API ResourceRef
 {
@@ -151,7 +162,7 @@ struct URHO3D_API ResourceRefList
     }
 
     /// Construct with type and id list.
-    ResourceRefList(StringHash type, const Vector<String>& names) :
+    ResourceRefList(StringHash type, const StringVector& names) :
         type_(type),
         names_(names)
     {
@@ -160,7 +171,7 @@ struct URHO3D_API ResourceRefList
     /// Object type.
     StringHash type_;
     /// List of object names.
-    Vector<String> names_;
+    StringVector names_;
 
     /// Test for equality with another reference list.
     bool operator ==(const ResourceRefList& rhs) const { return type_ == rhs.type_ && names_ == rhs.names_; }
@@ -168,14 +179,6 @@ struct URHO3D_API ResourceRefList
     /// Test for inequality with another reference list.
     bool operator !=(const ResourceRefList& rhs) const { return type_ != rhs.type_ || names_ != rhs.names_; }
 };
-
-class Variant;
-
-/// Vector of variants.
-typedef Vector<Variant> VariantVector;
-
-/// Map of variants.
-typedef HashMap<StringHash, Variant> VariantMap;
 
 /// Variable that supports a fixed set of types.
 class URHO3D_API Variant
@@ -321,7 +324,7 @@ public:
     }
 
     /// Construct from a string vector.
-    Variant(const Vector<String>& value) :
+    Variant(const StringVector& value) :
         type_ (VAR_NONE)
     {
         *this = value;
@@ -564,10 +567,10 @@ public:
     }
 
     // Assign from a string vector.
-    Variant& operator =(const Vector<String>& rhs)
+    Variant& operator =(const StringVector& rhs)
     {
         SetType(VAR_STRINGVECTOR);
-        *(reinterpret_cast<Vector<String>*>(&value_)) = rhs;
+        *(reinterpret_cast<StringVector*>(&value_)) = rhs;
         return *this;
     }
 
@@ -717,9 +720,9 @@ public:
     }
 
     /// Test for equality with a string vector. To return true, both the type and value must match.
-    bool operator ==(const Vector<String>& rhs) const
+    bool operator ==(const StringVector& rhs) const
     {
-        return type_ == VAR_STRINGVECTOR ? *(reinterpret_cast<const Vector<String>*>(&value_)) == rhs : false;
+        return type_ == VAR_STRINGVECTOR ? *(reinterpret_cast<const StringVector*>(&value_)) == rhs : false;
     }
 
     /// Test for equality with a variant map. To return true, both the type and value must match.
@@ -821,7 +824,7 @@ public:
     bool operator !=(const VariantVector& rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with a string vector.
-    bool operator !=(const Vector<String>& rhs) const { return !(*this == rhs); }
+    bool operator !=(const StringVector& rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with a variant map.
     bool operator !=(const VariantMap& rhs) const { return !(*this == rhs); }
@@ -933,9 +936,9 @@ public:
     }
 
     /// Return a string vector or empty on type mismatch.
-    const Vector<String>& GetStringVector() const
+    const StringVector& GetStringVector() const
     {
-        return type_ == VAR_STRINGVECTOR ? *reinterpret_cast<const Vector<String>*>(&value_) : emptyStringVector;
+        return type_ == VAR_STRINGVECTOR ? *reinterpret_cast<const StringVector*>(&value_) : emptyStringVector;
     }
 
     /// Return a variant map or empty on type mismatch.
@@ -1003,7 +1006,7 @@ public:
     VariantVector* GetVariantVectorPtr() { return type_ == VAR_VARIANTVECTOR ? reinterpret_cast<VariantVector*>(&value_) : 0; }
 
     /// Return a pointer to a modifiable string vector or null on type mismatch.
-    Vector<String>* GetStringVectorPtr() { return type_ == VAR_STRINGVECTOR ? reinterpret_cast<Vector<String>*>(&value_) : 0; }
+    StringVector* GetStringVectorPtr() { return type_ == VAR_STRINGVECTOR ? reinterpret_cast<StringVector*>(&value_) : 0; }
 
     /// Return a pointer to a modifiable variant map or null on type mismatch.
     VariantMap* GetVariantMapPtr() { return type_ == VAR_VARIANTMAP ? reinterpret_cast<VariantMap*>(&value_) : 0; }
@@ -1028,7 +1031,7 @@ public:
     /// Empty variant vector.
     static const VariantVector emptyVariantVector;
     /// Empty string vector.
-    static const Vector<String> emptyStringVector;
+    static const StringVector emptyStringVector;
 
 private:
     /// Set new type and allocate/deallocate memory as necessary.
@@ -1076,7 +1079,7 @@ template <> inline VariantType GetVariantType<ResourceRefList>() { return VAR_RE
 
 template <> inline VariantType GetVariantType<VariantVector>() { return VAR_VARIANTVECTOR; }
 
-template <> inline VariantType GetVariantType<Vector<String> >() { return VAR_STRINGVECTOR; }
+template <> inline VariantType GetVariantType<StringVector >() { return VAR_STRINGVECTOR; }
 
 template <> inline VariantType GetVariantType<VariantMap>() { return VAR_VARIANTMAP; }
 

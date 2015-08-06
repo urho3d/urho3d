@@ -51,14 +51,14 @@ public:
     long GetNumAffectedRows() const { return numAffectedRows_; }
 
     /// Return the column headers string collection.
-    const Vector<String>& GetColumns() const { return columns_; }
+    const StringVector& GetColumns() const { return columns_; }
 
     /// Return fetched rows collection. Filtered rows are not included in the collection.
     const Vector<VariantVector>& GetRows() const { return rows_; }
 
 private:
     /// Column headers from the resultset.
-    Vector<String> columns_;
+    StringVector columns_;
     /// Fetched rows from the resultset.
     Vector<VariantVector> rows_;
     /// Number of affected rows by recent DML query.

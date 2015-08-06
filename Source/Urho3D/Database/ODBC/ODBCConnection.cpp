@@ -151,7 +151,7 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
 
 void DbConnection::HandleRuntimeError(const char* message, const char* cause)
 {
-    Vector<String> tokens = (String(cause) + "::").Split(':');      // Added "::" as sentinels against unexpected cause format
+    StringVector tokens = (String(cause) + "::").Split(':');      // Added "::" as sentinels against unexpected cause format
     LOGERRORF("%s: nanodbc:%s:%s", message, tokens[1].CString(), tokens[2].CString());
 }
 
