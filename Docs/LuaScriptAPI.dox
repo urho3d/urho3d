@@ -3093,6 +3093,7 @@ Methods:
 - void SetShadowCullMode(CullMode mode)
 - void SetFillMode(FillMode mode)
 - void SetDepthBias(const BiasParameters& parameters)
+- void SetRenderOrder(char renderOrder)
 - void SetScene(Scene* scene)
 - void RemoveShaderParameter(const String name)
 - void ReleaseShaders()
@@ -3110,15 +3111,18 @@ Methods:
 - CullMode GetShadowCullMode() const
 - FillMode GetFillMode() const
 - const BiasParameters& GetDepthBias() const
+- char GetRenderOrder() const
 - bool GetOcclusion() const
 - bool GetSpecular() const
 - Scene* GetScene() const
 
 Properties:
 
-- CullMode cullMode (readonly)
-- CullMode shadowCullMode (readonly)
-- FillMode fillMode (readonly)
+- CullMode cullMode
+- CullMode shadowCullMode
+- FillMode fillMode
+- BiasParameters depthBias
+- char renderOrder
 - bool occlusion (readonly)
 - bool specular (readonly)
 - Scene* scene

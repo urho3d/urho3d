@@ -5810,6 +5810,7 @@ uint numTechniques;
 bool occlusion;
 /* readonly */
 int refs;
+uint8 renderOrder;
 Scene scene;
 /* readonly */
 Array<String> shaderParameterNames;

@@ -7337,6 +7337,7 @@ Properties:
 - uint numTechniques
 - bool occlusion // readonly
 - int refs // readonly
+- uint8 renderOrder
 - Scene@ scene
 - String[]@ shaderParameterNames // readonly
 - Variant[] shaderParameters
