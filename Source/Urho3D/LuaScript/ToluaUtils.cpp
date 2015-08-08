@@ -66,10 +66,9 @@ template <> int ToluaIsVector<String>(lua_State* L, int lo, const char* type, in
     if (lua_istable(L, lo))
     {
         size_t length = lua_objlen(L, lo);
-        for (int i = 1; i <= length; ++i)
+        for (unsigned i = 1; i <= length; ++i)
         {
-            lua_pushinteger(L, i);
-            lua_gettable(L, lo);
+            lua_rawgeti(L, lo, i);
             if (!lua_isstring(L, -1))
             {
                 lua_pop(L, 1);
@@ -98,11 +97,10 @@ template <> int ToluaIsVector<Variant>(lua_State* L, int lo, const char* type, i
     if (lua_istable(L, lo))
     {
         size_t length = lua_objlen(L, lo);
-        for (int i = 1; i <= length; ++i)
+        for (unsigned i = 1; i <= length; ++i)
         {
-            lua_pushinteger(L, i);
-            lua_gettable(L, lo);
-            if (!tolua_isusertype(L, -1, "Variant", 0, err))
+            lua_rawgeti(L, lo, i);
+            if (!tolua_isusertype(L, -1, "Variant", def, err))
             {
                 lua_pop(L, 1);
                 return 0;
@@ -125,22 +123,16 @@ template <> void* ToluaToVector<String>(lua_State* L, int narg, void* def)
 
     static Vector<String> result;
     result.Clear();
-
-    size_t length = lua_objlen(L, narg);
-    for (int i = 1; i <= length; ++i)
+    result.Resize((unsigned)lua_objlen(L, narg));
+    for (unsigned i = 0; i < result.Size(); ++i)
     {
-        lua_pushinteger(L, i);
-        lua_gettable(L, narg);
-
+        lua_rawgeti(L, narg, i + 1);
         if (!lua_isstring(L, -1))
         {
             lua_pop(L, 1);
             return 0;
         }
-
-        String string = tolua_tourho3dstring(L, -1, "");
-        result.Push(string);
-
+        result[i] = tolua_tourho3dstring(L, -1, "");
         lua_pop(L, 1);
     }
 
@@ -154,19 +146,17 @@ template <> void* ToluaToVector<Variant>(lua_State* L, int narg, void* def)
 
     static Vector<Variant> result;
     result.Clear();
-
-    size_t length = lua_objlen(L, narg);
-    for (int i = 1; i <= length; ++i)
+    result.Resize((unsigned)lua_objlen(L, narg));
+    for (unsigned i = 0; i < result.Size(); ++i)
     {
-        lua_pushinteger(L, i);
-        lua_gettable(L, narg);
+        lua_rawgeti(L, narg, i + 1);    // Lua index starts from 1
         tolua_Error error;
         if (!tolua_isusertype(L, -1, "Variant", 0, &error))
         {
             lua_pop(L, 1);
             return 0;
         }
-        result.Push((Variant*) tolua_tousertype(L, -1, 0));
+        result[i] = *static_cast<Variant*>(tolua_tousertype(L, -1, def));
         lua_pop(L, 1);
     }
 

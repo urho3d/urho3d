@@ -97,6 +97,7 @@ struct VariantValue
 };
 
 class Variant;
+class VectorBuffer;
 
 /// Vector of variants.
 typedef Vector<Variant> VariantVector;
@@ -283,6 +284,13 @@ public:
 
     /// Construct from a buffer.
     Variant(const PODVector<unsigned char>& value) :
+        type_(VAR_NONE)
+    {
+        *this = value;
+    }
+
+    /// Construct from a %VectorBuffer and store as a buffer.
+    Variant(const VectorBuffer& value) :
         type_(VAR_NONE)
     {
         *this = value;
@@ -534,6 +542,9 @@ public:
         return *this;
     }
 
+    /// Assign from a %VectorBuffer and store as a buffer.
+    Variant& operator =(const VectorBuffer& rhs);
+
     /// Assign from a void pointer.
     Variant& operator =(void* rhs)
     {
@@ -685,10 +696,9 @@ public:
     }
 
     /// Test for equality with a buffer. To return true, both the type and value must match.
-    bool operator ==(const PODVector<unsigned char>& rhs) const
-    {
-        return type_ == VAR_BUFFER ? *(reinterpret_cast<const PODVector<unsigned char>*>(&value_)) == rhs : false;
-    }
+    bool operator ==(const PODVector<unsigned char>& rhs) const;
+    /// Test for equality with a %VectorBuffer. To return true, both the type and value must match.
+    bool operator ==(const VectorBuffer& rhs) const;
 
     /// Test for equality with a void pointer. To return true, both the type and value must match, with the exception that a RefCounted pointer is also allowed.
     bool operator ==(void* rhs) const
@@ -811,6 +821,9 @@ public:
     /// Test for inequality with a buffer.
     bool operator !=(const PODVector<unsigned char>& rhs) const { return !(*this == rhs); }
 
+    /// Test for inequality with a %VectorBuffer.
+    bool operator !=(const VectorBuffer& rhs) const { return !(*this == rhs); }
+
     /// Test for inequality with a pointer.
     bool operator !=(void* rhs) const { return !(*this == rhs); }
 
@@ -905,6 +918,9 @@ public:
     {
         return type_ == VAR_BUFFER ? *reinterpret_cast<const PODVector<unsigned char>*>(&value_) : emptyBuffer;
     }
+
+    /// Return %VectorBuffer containing the buffer or empty on type mismatch.
+    const VectorBuffer GetVectorBuffer() const;
 
     /// Return void pointer or null on type mismatch. RefCounted pointer will be converted.
     void* GetVoidPtr() const

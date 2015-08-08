@@ -113,6 +113,8 @@ public:
     bool WriteVariantData(const Variant& value);
     /// Write a variant vector.
     bool WriteVariantVector(const VariantVector& value);
+    /// Write a variant vector.
+    bool WriteStringVector(const StringVector& value);
     /// Write a variant map.
     bool WriteVariantMap(const VariantMap& value);
     /// Write a variable-length encoded unsigned integer, which can use 29 bits maximum.

@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/StringUtils.h"
+#include "../IO/VectorBuffer.h"
 
 #include <cstring>
 
@@ -124,6 +125,13 @@ Variant& Variant::operator =(const Variant& rhs)
     return *this;
 }
 
+Variant& Variant::operator =(const VectorBuffer& rhs)
+{
+    SetType(VAR_BUFFER);
+    *(reinterpret_cast<PODVector<unsigned char>*>(&value_)) = rhs.GetBuffer();
+    return *this;
+}
+
 bool Variant::operator ==(const Variant& rhs) const
 {
     if (type_ == VAR_VOIDPTR || type_ == VAR_PTR)
@@ -197,6 +205,23 @@ bool Variant::operator ==(const Variant& rhs) const
     default:
         return true;
     }
+}
+
+bool Variant::operator ==(const PODVector<unsigned char>& rhs) const
+{
+    // Use strncmp() instead of PODVector<unsigned char>::operator ==()
+    const PODVector<unsigned char>& buffer = *(reinterpret_cast<const PODVector<unsigned char>*>(&value_));
+    return type_ == VAR_BUFFER && buffer.Size() == rhs.Size() ?
+        strncmp(reinterpret_cast<const char*>(&buffer[0]), reinterpret_cast<const char*>(&rhs[0]), buffer.Size()) == 0 :
+        false;
+}
+
+bool Variant::operator ==(const VectorBuffer& rhs) const
+{
+    const PODVector<unsigned char>& buffer = *(reinterpret_cast<const PODVector<unsigned char>*>(&value_));
+    return type_ == VAR_BUFFER && buffer.Size() == rhs.GetSize() ?
+        strncmp(reinterpret_cast<const char*>(&buffer[0]), reinterpret_cast<const char*>(rhs.GetData()), buffer.Size()) == 0 :
+        false;
 }
 
 void Variant::FromString(const String& type, const String& value)
@@ -339,6 +364,11 @@ void Variant::SetBuffer(const void* data, unsigned size)
     buffer.Resize(size);
     if (size)
         memcpy(&buffer[0], data, size);
+}
+
+const VectorBuffer Variant::GetVectorBuffer() const
+{
+    return VectorBuffer(type_ == VAR_BUFFER ? *reinterpret_cast<const PODVector<unsigned char>*>(&value_) : emptyBuffer);
 }
 
 String Variant::GetTypeName() const
