@@ -10,7 +10,7 @@
         <attribute name="Name" value="NewVarDropDown" />
         <attribute name="Min Size" value="50 17" />
         <attribute name="Max Size" value="50 17" />
-        <attribute name="Resize Popup" value="true" />
+        <attribute name="Resize Popup" value="false" />
         <element internal="true">
             <attribute name="Is Visible" value="false" />
         </element>
@@ -24,6 +24,7 @@
             <element type="ListView" internal="true" style="none">
                 <element type="BorderImage" internal="true" style="none">
                     <element internal="true" style="none">
+                        <attribute name="Layout Border" value="0 0 4 0" />
                         <element type="Text" style="EditorEnumAttributeText">
                             <attribute name="Text" value="Int" />
                         </element>
