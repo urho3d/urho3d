@@ -28,7 +28,7 @@
 namespace Urho3D
 {
 
-/// Database cursor. Event handler could set P_FILTER to true to filter out a row from resultset and P_ABORT to true to stop further cursor events.
+/// %Database cursor. Event handler could set P_FILTER to true to filter out a row from resultset and P_ABORT to true to stop further cursor events.
 EVENT(E_DBCURSOR, DbCursor)
 {
     PARAM(P_DBCONNECTION, DbConnection);    // DbConnection pointer
