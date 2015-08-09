@@ -25,6 +25,18 @@ namespace Urho3D
 
 ### EndFrame
 
+## %Database events
+
+### DbCursor
+- %DbConnection : DbConnection pointer
+- %ResultImpl : Underlying result object pointer (cannot be used in scripting)
+- %SQL : String
+- %NumCols : unsigned
+- %ColValues : VariantVector
+- %ColHeaders : StringVector
+- %Filter : bool [in]
+- %Abort : bool [in]
+
 ## %Drawable events
 
 ### BoneHierarchyCreated
@@ -2215,6 +2227,9 @@ namespace Urho3D
 <a href="#Class_Cursor"><b>Cursor</b></a>
 <a href="#Class_CustomGeometry"><b>CustomGeometry</b></a>
 <a href="#Class_CustomGeometryVertex"><b>CustomGeometryVertex</b></a>
+<a href="#Class_Database"><b>Database</b></a>
+<a href="#Class_DbConnection"><b>DbConnection</b></a>
+<a href="#Class_DbResult"><b>DbResult</b></a>
 <a href="#Class_DebugHud"><b>DebugHud</b></a>
 <a href="#Class_DebugRenderer"><b>DebugRenderer</b></a>
 <a href="#Class_DecalSet"><b>DecalSet</b></a>
@@ -5340,6 +5355,59 @@ Properties:
 - Vector3 position
 - Vector4 tangent
 - Vector2 texCoord
+
+<a name="Class_Database"></a>
+
+### Database
+
+Methods:
+
+- DbConnection@ Connect(const String&)
+- void Disconnect(DbConnection@)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+
+Properties:
+
+- StringHash baseType // readonly
+- String category // readonly
+- uint poolSize
+- bool pooling // readonly
+- int refs // readonly
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+<a name="Class_DbConnection"></a>
+
+### DbConnection
+
+Methods:
+
+- DbResult Execute(const String&, bool = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+
+Properties:
+
+- StringHash baseType // readonly
+- String category // readonly
+- bool connected // readonly
+- String connectionString // readonly
+- int refs // readonly
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+<a name="Class_DbResult"></a>
+
+### DbResult
+
+Properties:
+
+- String[]@ columns // readonly
+- int64 numAffectedRows // readonly
+- uint numColumns // readonly
+- uint numRows // readonly
+- Variant[]@[] row // readonly
 
 <a name="Class_DebugHud"></a>
 
@@ -12470,13 +12538,13 @@ Methods:
 - void FromString(VariantType, const String&)
 - void FromString(const String&, const String&)
 - bool GetBool() const
-- VectorBuffer GetBuffer() const
 - double GetDouble() const
 - float GetFloat() const
 - int GetInt() const
 - RefCounted@ GetPtr() const
 - ScriptObject@ GetScriptObject() const
 - StringHash GetStringHash() const
+- String[]@ GetStringVector() const
 - uint GetUInt() const
 - Variant[]@ GetVariantVector() const
 - const IntRect& GetIntRect() const
@@ -12493,6 +12561,7 @@ Methods:
 - const Vector2& GetVector2() const
 - const Vector3& GetVector3() const
 - const Vector4& GetVector4() const
+- const VectorBuffer GetBuffer() const
 
 Properties:
 
@@ -13424,6 +13493,12 @@ Properties:
 - CS_BUSY_ARROW
 
 
+### DBAPI
+
+- DBAPI_SQLITE
+- DBAPI_ODBC
+
+
 ### DumpMode
 
 - DOXYGEN
@@ -13779,6 +13854,7 @@ Properties:
 - VAR_MATRIX3X4
 - VAR_MATRIX4
 - VAR_DOUBLE
+- VAR_STRINGVECTOR
 
 
 ### VerticalAlignment
@@ -13900,9 +13976,11 @@ Properties:
 - void UnsubscribeFromEvent(const String&)
 - void UnsubscribeFromEvents(Object@)
 \section ScriptAPI_GlobalProperties Global properties
+- DBAPI DBAPI
 - Audio@ audio
 - ResourceCache@ cache
 - Console@ console
+- Database@ database
 - DebugHud@ debugHud
 - DebugRenderer@ debugRenderer
 - Engine@ engine

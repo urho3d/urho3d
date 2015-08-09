@@ -67,6 +67,9 @@ namespace Urho3D
 <a href="#Class_Cursor"><b>Cursor</b></a>
 <a href="#Class_CustomGeometry"><b>CustomGeometry</b></a>
 <a href="#Class_CustomGeometryVertex"><b>CustomGeometryVertex</b></a>
+<a href="#Class_Database"><b>Database</b></a>
+<a href="#Class_DbConnection"><b>DbConnection</b></a>
+<a href="#Class_DbResult"><b>DbResult</b></a>
 <a href="#Class_DebugHud"><b>DebugHud</b></a>
 <a href="#Class_DebugRenderer"><b>DebugRenderer</b></a>
 <a href="#Class_DecalSet"><b>DecalSet</b></a>
@@ -1707,6 +1710,53 @@ Properties:
 - unsigned color
 - Vector2 texCoord
 - Vector4 tangent
+
+<a name="Class_Database"></a>
+### Database : Object
+
+Methods:
+
+- DbConnection* Connect(const String connectionString)
+- void Disconnect(DbConnection* connection)
+- bool IsPooling() const
+- unsigned GetPoolSize() const
+- void SetPoolSize(unsigned poolSize)
+
+Properties:
+
+- bool pooling (readonly)
+- unsigned poolSize
+
+<a name="Class_DbConnection"></a>
+### DbConnection : Object
+
+Methods:
+
+- void Finalize()
+- DbResult Execute(const String sql, bool useCursorEvent = false)
+- const String GetConnectionString() const
+- bool IsConnected() const
+
+Properties:
+
+- const String connectionString (readonly)
+- bool connected (readonly)
+
+<a name="Class_DbResult"></a>
+### DbResult
+
+
+Methods:
+
+- unsigned GetNumColumns() const
+- unsigned GetNumRows() const
+- long GetNumAffectedRows() const
+
+Properties:
+
+- unsigned numColumns (readonly)
+- unsigned numRows (readonly)
+- long numAffectedRows (readonly)
 
 <a name="Class_DebugHud"></a>
 ### DebugHud : Object
@@ -6438,6 +6488,10 @@ Methods:
 
 - Variant() (GC)
 - Variant* new()
+- Variant(void* value) (GC)
+- Variant* new(void* value)
+- Variant(RefCounted* value) (GC)
+- Variant* new(RefCounted* value)
 - Variant(int value) (GC)
 - Variant* new(int value)
 - Variant(unsigned value) (GC)
@@ -6464,10 +6518,18 @@ Methods:
 - Variant* new(const String value)
 - Variant(const char* value) (GC)
 - Variant* new(const char* value)
+- Variant(const VectorBuffer& value) (GC)
+- Variant* new(const VectorBuffer& value)
 - Variant(const ResourceRef& value) (GC)
 - Variant* new(const ResourceRef& value)
 - Variant(const ResourceRefList& value) (GC)
 - Variant* new(const ResourceRefList& value)
+- Variant(const Vector<Variant>& value) (GC)
+- Variant* new(const Vector<Variant>& value)
+- Variant(const Vector<String>& value) (GC)
+- Variant* new(const Vector<String>& value)
+- Variant(const VariantMap& value) (GC)
+- Variant* new(const VariantMap& value)
 - Variant(const IntRect& value) (GC)
 - Variant* new(const IntRect& value)
 - Variant(const IntVector2& value) (GC)
@@ -6482,12 +6544,16 @@ Methods:
 - Variant* new(const String type, const String value)
 - Variant(VariantType type, const String value) (GC)
 - Variant* new(VariantType type, const String value)
+- Variant(const char* type, const char* value) (GC)
+- Variant* new(const char* type, const char* value)
 - Variant(VariantType type, const char* value) (GC)
 - Variant* new(VariantType type, const char* value)
 - Variant(const Variant& value) (GC)
 - Variant* new(const Variant& value)
 - void delete()
 - void Clear()
+- bool operator==(void* rhs) const
+- bool operator==(RefCounted* rhs) const
 - bool operator==(const Variant& rhs) const
 - bool operator==(int rhs) const
 - bool operator==(unsigned rhs) const
@@ -6500,34 +6566,18 @@ Methods:
 - bool operator==(const Quaternion& rhs) const
 - bool operator==(const Color& rhs) const
 - bool operator==(const String rhs) const
+- bool operator==(const VectorBuffer& rhs) const
 - bool operator==(const ResourceRef& rhs) const
 - bool operator==(const ResourceRefList& rhs) const
+- bool operator==(const Vector<Variant>& rhs) const
+- bool operator==(const Vector<String>& rhs) const
+- bool operator==(const VariantMap& rhs) const
 - bool operator==(const IntRect& rhs) const
 - bool operator==(const IntVector2& rhs) const
 - bool operator==(const StringHash& rhs) const
 - bool operator==(const Matrix3& rhs) const
 - bool operator==(const Matrix3x4& rhs) const
 - bool operator==(const Matrix4& rhs) const
-- void SetInt(int value)
-- void SetUint(unsigned value)
-- void SetStringHash(const StringHash& value)
-- void SetBool(bool value)
-- void SetFloat(float value)
-- void SetDouble(double value)
-- void SetVector2(const Vector2& value)
-- void SetVector3(const Vector3& value)
-- void SetVector4(const Vector4& value)
-- void SetQuaternion(const Quaternion& value)
-- void SetColor(const Color& value)
-- void SetString(const String value)
-- void SetBuffer(const VectorBuffer& value)
-- void SetResourceRef(const ResourceRef& value)
-- void SetResourceRefList(const ResourceRefList& value)
-- void SetIntRect(const IntRect& value)
-- void SetIntVector2(const IntVector2& value)
-- void SetMatrix3(const Matrix3& value)
-- void SetMatrix3x4(const Matrix3x4& value)
-- void SetMatrix4(const Matrix4& value)
 - int GetInt() const
 - unsigned GetUInt() const
 - StringHash GetStringHash()
@@ -6540,11 +6590,16 @@ Methods:
 - const Quaternion& GetQuaternion() const
 - const Color& GetColor() const
 - const String GetString() const
-- VectorBuffer GetBuffer() const
+- const VectorBuffer GetBuffer() const
+- void* GetVoidPtr(const char* type) const
 - const ResourceRef& GetResourceRef() const
 - const ResourceRefList& GetResourceRefList() const
+- const Vector<Variant>& GetVariantVector() const
+- const VariantMap& GetVariantMap() const
+- const Vector<String>& GetStringVector() const
 - const IntRect& GetIntRect() const
 - const IntVector2& GetIntVector2() const
+- RefCounted* GetPtr(const char* type) const
 - const Matrix3& GetMatrix3() const
 - const Matrix3x4& GetMatrix3x4() const
 - const Matrix4& GetMatrix4() const
@@ -6570,48 +6625,6 @@ Methods:
 - VariantMap() (GC)
 - VariantMap* new()
 - void delete()
-- void SetInt(const String key, int value)
-- void SetUInt(const String key, unsigned value)
-- void SetStringHash(const String key, const StringHash& value)
-- void SetBool(const String key, bool value)
-- void SetFloat(const String key, float value)
-- void SetDouble(const String key, double value)
-- void SetVector2(const String key, const Vector2 value)
-- void SetVector3(const String key, const Vector3 value)
-- void SetVector4(const String key, const Vector4 value)
-- void SetQuaternion(const String key, const Quaternion value)
-- void SetColor(const String key, const Color value)
-- void SetString(const String key, const String value)
-- void SetBuffer(const String key, const VectorBuffer& value)
-- void SetResourceRef(const String key, const ResourceRef value)
-- void SetResourceRefList(const String key, const ResourceRefList value)
-- void SetIntRect(const String key, const IntRect value)
-- void SetIntVector2(const String key, const IntVector2 value)
-- void SetPtr(const String key, void* value)
-- void SetMatrix3(const String key, const Matrix3 value)
-- void SetMatrix3x4(const String key, const Matrix3x4 value)
-- void SetMatrix4(const String key, const Matrix4 value)
-- int GetInt(const String key)
-- int GetUInt(const String key)
-- StringHash GetStringHash(const String key)
-- bool GetBool(const String key)
-- float GetFloat(const String key)
-- double GetDouble(const String key)
-- const Vector2& GetVector2(const String key)
-- const Vector3& GetVector3(const String key)
-- const Vector4& GetVector4(const String key)
-- const Quaternion& GetQuaternion(const String key)
-- const Color& GetColor(const String key)
-- const String GetString(const String key)
-- VectorBuffer GetBuffer(const String key)
-- const ResourceRef& GetResourceRef(const String key)
-- const ResourceRefList& GetResourceRefList(const String key)
-- const IntRect& GetIntRect(const String key)
-- const IntVector2& GetIntVector2(const String key)
-- const void* GetPtr(const String type, const String key)
-- const Matrix3& GetMatrix3(const String key)
-- const Matrix3x4& GetMatrix3x4(const String key)
-- const Matrix4& GetMatrix4(const String key)
 
 <a name="Class_Vector2"></a>
 ### Vector2
@@ -7263,6 +7276,11 @@ Properties:
 - int CS_BUSY_ARROW
 - int CS_MAX_SHAPES
 
+### DBAPI
+
+- int DBAPI_SQLITE
+- int DBAPI_ODBC
+
 ### EmitterType
 
 - int EMITTER_SPHERE
@@ -7607,6 +7625,7 @@ Properties:
 - int VAR_MATRIX3X4
 - int VAR_MATRIX4
 - int VAR_DOUBLE
+- int VAR_STRINGVECTOR
 - int MAX_VAR_TYPES
 
 ### VertexElement
@@ -7675,6 +7694,8 @@ Properties:
 - Console* GetConsole()
 - String GetConsoleInput()
 - Context* GetContext()
+- DBAPI GetDBAPI()
+- Database* GetDatabase()
 - DebugHud* GetDebugHud()
 - Engine* GetEngine()
 - EventHandler* GetEventHandler() const
@@ -7715,11 +7736,11 @@ Properties:
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
+- float Random()
 - float Random(float range)
 - float Random(float min, float max)
-- float Random()
-- int RandomInt(int range)
 - int RandomInt(int min, int max)
+- int RandomInt(int range)
 - float RandomNormal(float meanValue, float variance)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
@@ -7730,8 +7751,8 @@ Properties:
 - float Sign(float value)
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
-- void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
 - void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
+- void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
 - float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
@@ -7754,8 +7775,8 @@ Properties:
 - Vector4 ToVector4(const String source, bool allowMissingCoords = false)
 - void UnsubscribeFromAllEvents()
 - void UnsubscribeFromAllEventsExcept(const Vector<String>& exceptionNames)
-- void UnsubscribeFromEvent(const String eventName)
 - void UnsubscribeFromEvent(Object* sender, const String eventName)
+- void UnsubscribeFromEvent(const String eventName)
 - void UnsubscribeFromEvents(Object* sender)
 
 
@@ -7763,6 +7784,7 @@ Properties:
 - Audio* audio (readonly)
 - ResourceCache* cache (readonly)
 - Console* console (readonly)
+- Database* database (readonly)
 - DebugHud* debugHud (readonly)
 - Engine* engine (readonly)
 - FileSystem* fileSystem (readonly)

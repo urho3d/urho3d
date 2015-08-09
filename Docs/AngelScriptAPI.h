@@ -3466,6 +3466,72 @@ Vector4 tangent;
 Vector2 texCoord;
 };
 
+class Database
+{
+// Methods:
+DbConnection Connect(const String&);
+void Disconnect(DbConnection);
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+
+// Properties:
+/* readonly */
+StringHash baseType;
+/* readonly */
+String category;
+uint poolSize;
+/* readonly */
+bool pooling;
+/* readonly */
+int refs;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class DbConnection
+{
+// Methods:
+DbResult Execute(const String&, bool = false);
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+
+// Properties:
+/* readonly */
+StringHash baseType;
+/* readonly */
+String category;
+/* readonly */
+bool connected;
+/* readonly */
+String connectionString;
+/* readonly */
+int refs;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class DbResult
+{
+
+// Properties:
+/* readonly */
+Array<String> columns;
+/* readonly */
+int64 numAffectedRows;
+/* readonly */
+uint numColumns;
+/* readonly */
+uint numRows;
+/* readonly */
+Array<Array<Variant>> row;
+};
+
 class DebugHud
 {
 // Methods:
@@ -11737,13 +11803,13 @@ const Color& GetColor() const;
 void FromString(VariantType, const String&);
 void FromString(const String&, const String&);
 bool GetBool() const;
-VectorBuffer GetBuffer() const;
 double GetDouble() const;
 float GetFloat() const;
 int GetInt() const;
 RefCounted GetPtr() const;
 ScriptObject GetScriptObject() const;
 StringHash GetStringHash() const;
+Array<String> GetStringVector() const;
 uint GetUInt() const;
 Array<Variant> GetVariantVector() const;
 const IntRect& GetIntRect() const;
@@ -11760,6 +11826,7 @@ const VariantMap& GetVariantMap() const;
 const Vector2& GetVector2() const;
 const Vector3& GetVector3() const;
 const Vector4& GetVector4() const;
+const VectorBuffer GetBuffer() const;
 
 // Properties:
 /* readonly */
@@ -12785,6 +12852,12 @@ CS_BUSY,
 CS_BUSY_ARROW,
 };
 
+enum DBAPI
+{
+DBAPI_SQLITE,
+DBAPI_ODBC,
+};
+
 enum DumpMode
 {
 DOXYGEN,
@@ -13140,6 +13213,7 @@ VAR_MATRIX3,
 VAR_MATRIX3X4,
 VAR_MATRIX4,
 VAR_DOUBLE,
+VAR_STRINGVECTOR,
 };
 
 enum VerticalAlignment
@@ -13263,9 +13337,11 @@ void UnsubscribeFromEvent(const String&);
 void UnsubscribeFromEvents(Object);
 
 // Global properties
+DBAPI DBAPI;
 Audio audio;
 ResourceCache cache;
 Console console;
+Database database;
 DebugHud debugHud;
 DebugRenderer debugRenderer;
 Engine engine;
