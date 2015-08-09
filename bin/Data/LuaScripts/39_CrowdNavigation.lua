@@ -369,7 +369,7 @@ end
 
 function HandleUpdate(eventType, eventData)
     -- Take the frame time step, which is stored as a float
-    local timeStep = eventData:GetFloat("TimeStep")
+    local timeStep = eventData["TimeStep"]:GetFloat()
 
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
@@ -385,8 +385,8 @@ function HandlePostRenderUpdate(eventType, eventData)
 end
 
 function HandleCrowdAgentFailure(eventType, eventData)
-    local node = eventData:GetPtr("Node", "Node")
-    local agentState = eventData:GetInt("CrowdAgentState")
+    local node = eventData["Node"]:GetPtr("Node")
+    local agentState = eventData["CrowdAgentState"]:GetInt()
 
     -- If the agent's state is invalid, likely from spawning on the side of a box, find a point in a larger area
     if agentState == CROWD_AGENT_INVALID then
@@ -400,9 +400,9 @@ end
 function HandleCrowdAgentReposition(eventType, eventData)
     local WALKING_ANI = "Models/Jack_Walk.ani"
 
-    local node = eventData:GetPtr("Node", "Node")
-    local agent = eventData:GetPtr("CrowdAgent", "CrowdAgent")
-    local velocity = eventData:GetVector3("Velocity")
+    local node = eventData["Node"]:GetPtr("Node")
+    local agent = eventData["CrowdAgent"]:GetPtr("CrowdAgent")
+    local velocity = eventData["Velocity"]:GetVector3()
 
     -- Only Jack agent has animation controller
     local animCtrl = node:GetComponent("AnimationController")

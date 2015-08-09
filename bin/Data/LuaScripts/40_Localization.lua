@@ -135,7 +135,7 @@ function CreateScene()
 end
 
 function HandleUpdate(eventType, eventData)
-    local timeStep = eventData:GetFloat("TimeStep")
+    local timeStep = eventData["TimeStep"]:GetFloat()
     local MOUSE_SENSITIVITY = 0.1
     local mouseMove = input.mouseMove
     yaw = yaw + MOUSE_SENSITIVITY * mouseMove.x

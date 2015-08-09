@@ -103,7 +103,7 @@ function InitWindow()
     buttonClose:SetStyle("CloseButton")
 
     -- Subscribe to buttonClose release (following a 'press') events
-    SubscribeToEvent(buttonClose, "Released", 
+    SubscribeToEvent(buttonClose, "Released",
         function (eventType, eventData)
             engine:Exit()
         end)
@@ -131,23 +131,23 @@ function CreateDraggableFish()
 
     -- Subscribe draggableFish to Drag Events (in order to make it draggable)
     -- See "Event list" in documentation's Main Page for reference on available Events and their eventData
-    SubscribeToEvent(draggableFish, "DragBegin", 
+    SubscribeToEvent(draggableFish, "DragBegin",
         function (eventType, eventData)
             -- Get UIElement relative position where input (touch or click) occured (top-left = IntVector2(0,0))
-            dragBeginPosition = IntVector2(eventData:GetInt("ElementX"), eventData:GetInt("ElementY"))
+            dragBeginPosition = IntVector2(eventData["ElementX"]:GetInt(), eventData["ElementY"]:GetInt())
         end)
 
-    SubscribeToEvent(draggableFish, "DragMove", 
+    SubscribeToEvent(draggableFish, "DragMove",
         function (eventType, eventData)
-            local dragCurrentPosition = IntVector2(eventData:GetInt("X"), eventData:GetInt("Y"))
+            local dragCurrentPosition = IntVector2(eventData["X"]:GetInt(), eventData["Y"]:GetInt())
             -- Get the dragged fish element
             -- Note difference to C++: in C++ we would call GetPtr() and cast the pointer to UIElement, here we must specify
             -- what kind of object we are getting. Null will be returned on type mismatch
-            local draggedElement = eventData:GetPtr("UIElement", "Element")
+            local draggedElement = eventData["Element"]:GetPtr("UIElement")
             draggedElement:SetPosition(dragCurrentPosition - dragBeginPosition)
         end)
-    
-    SubscribeToEvent(draggableFish, "DragEnd", 
+
+    SubscribeToEvent(draggableFish, "DragEnd",
         function (eventType, eventData)
         end)
 end
@@ -158,7 +158,7 @@ function HandleControlClicked(eventType, eventData)
     local windowTitle = tolua.cast(element, 'Text')
 
     -- Get control that was clicked
-    local clicked = eventData:GetPtr("UIElement", "Element")
+    local clicked = eventData["Element"]:GetPtr("UIElement")
     local name = "...?"
     if clicked ~= nil then
         -- Get the name of the control that was clicked

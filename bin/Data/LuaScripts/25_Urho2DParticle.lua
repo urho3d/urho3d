@@ -96,8 +96,8 @@ end
 
 function HandleMouseMove(eventType, eventData)
     if particleNode ~= nil then
-        local x = eventData:GetInt("x")
-        local y = eventData:GetInt("y")
+        local x = eventData["x"]:GetInt()
+        local y = eventData["y"]:GetInt()
         local camera = cameraNode:GetComponent("Camera")
         particleNode.position = camera:ScreenToWorldPoint(Vector3(x / graphics.width, y / graphics.height, 10.0))
     end
