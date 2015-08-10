@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#ifdef URHO3D_NETWORK
+#ifdef URHO3D_DATABASE
 
 #include "../Precompiled.h"
 
