@@ -15,20 +15,19 @@ class Spline
     Spline(const Spline& rhs);
     // When export constructor, the destructor must export also. otherwise Lua will not collect the object.
     ~Spline();
-    
-    void operator = (const Spline& rhs);
-    bool operator == (const Spline& rhs) const;
-    
+
+    bool operator ==(const Spline& rhs) const;
+
     Variant GetPoint(float f) const;
-    
+
     Variant GetKnot(unsigned index) const;
     void SetKnot(const Variant& knot, unsigned);
     void AddKnot(const Variant& knot);
     void AddKnot(const Variant& knot, unsigned index);
     void RemoveKnot();
     void RemoveKnot(unsigned index);
-        
+
     void Clear();
-    
+
     tolua_property__get_set InterpolationMode interpolationMode;
 };

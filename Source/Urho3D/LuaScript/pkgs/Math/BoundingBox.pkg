@@ -11,9 +11,9 @@ class BoundingBox
     BoundingBox(const Polyhedron& poly);
     BoundingBox(const Sphere& sphere);
     ~BoundingBox();
-    
-    bool operator == (const BoundingBox& rhs) const;
-    
+
+    bool operator ==(const BoundingBox& rhs) const;
+
     void Define(const BoundingBox& box);
     void Define(const Rect& rect);
     void Define(const Vector3& min, const Vector3& max);
@@ -22,38 +22,38 @@ class BoundingBox
     void Define(const Frustum& frustum);
     void Define(const Polyhedron& poly);
     void Define(const Sphere& sphere);
-    
+
     void Merge(const Vector3& point);
     void Merge(const BoundingBox& box);
     void Merge(const Frustum& frustum);
     void Merge(const Polyhedron& poly);
     void Merge(const Sphere& sphere);
-    
+
     void Clip(const BoundingBox& box);
     void Transform(const Matrix3& transform);
     void Transform(const Matrix3x4& transform);
     void Clear();
-    
+
     Vector3 Center() const;
     Vector3 Size() const;
     Vector3 HalfSize() const;
-    
+
     BoundingBox Transformed(const Matrix3& transform) const;
     BoundingBox Transformed(const Matrix3x4& transform) const;
     Rect Projected(const Matrix4& projection) const;
-    
+
     Intersection IsInside(const Vector3& point) const;
     Intersection IsInside(const BoundingBox& box) const;
     Intersection IsInsideFast(const BoundingBox& box) const;
     Intersection IsInside(const Sphere& sphere) const;
     Intersection IsInsideFast(const Sphere& sphere) const;
-    
+
     String ToString() const;
-    
+
     Vector3 min_ @ min;
     Vector3 max_ @ max;
     bool defined_ @ defined;
-    
+
     tolua_readonly tolua_property__no_prefix Vector3 center;
     tolua_readonly tolua_property__no_prefix Vector3 size;
     tolua_readonly tolua_property__no_prefix Vector3 halfSize;
