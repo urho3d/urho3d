@@ -2500,6 +2500,8 @@ Currently the implementation just supports immediate SQL statement execution. Pr
 
 A new database connection is established by calling \ref Database::Connect "Connect()" and passing it with a so-called database connection string. The database connection string does not only identify which database to connect to, but also other relevant database connection settings like: database user id, user password, host, and port number, etc. The format of the database connection string is controlled by the underlying DB API. In general the connection string is really the only thing that need to be changed when switching the underlying DB API and when switching the databases to connect to.
 
+When the connection is successfully established, a valid DbConnection object is returned. After done with the database connection, an application should disconnect the database connection by calling the \ref Database::Disconnect "Disconnect()". This is a good practise. When the Urho3D game engine exits, the destructor of the database subsystem automatically disconnects all the still active database connections.
+
 \subsection ODBC_ConnString ODBC connection string
 
 The exact format of the ODBC connection string depends on the ODBC driver for a specific database vendor. Consult the accompanying documentation of the specific ODBC driver on how to construct the database connection string. Both DSN and DSN-less connection string are supported. For the purpose of illustration, this subsection will just explain how to connect to a MySQL/MariaDB database as an example. The MySQL/MariaDB database server is assumed to be running on a localhost on a default port with database name called 'test', and user id & password are "testuser" & "testpassword".
@@ -2508,8 +2510,10 @@ The exact format of the ODBC connection string depends on the ODBC driver for a 
 
 Use the GUI tool provided by host system to define the ODBC data source. It can be user DSN or system DSN. On Linux host system, simply add the new data source entry in the '~/.odbc.ini' or '/etc/odbc.ini', respectively. Create the file if it does not exist yet. The data source entry must at least contains the following information.
 \verbatim
+# These settings assume the host system uses unixODBC as ODBC driver manager
+# Settings for iODBC driver manager would be slightly different
 [testDSN]
-Driver=MariaDB      # This is the name of the ODBC driver installed in the /etc/odbcinst.ini or its equivalent in other OS
+Driver=MariaDB      # This is the name of the ODBC driver installed in the /etc/odbcinst.ini
 Description=MariaDB test database
 Server=localhost
 Port=
@@ -2534,16 +2538,18 @@ Driver=MariaDB;Database=test;User=testuser;Password=testpassword;Option=3
 
 \subsection SQLite_ConnString SQLite connection string
 
-The SQLite database is a single disk file. The SQLite connection string is simply a path to the location of that single disk file. Both absolute and relative paths work. When the path is valid but the disk file does not exist yet then SQLite database engine will automatically create the disk file and hence create a new empty database in the process. The drawback with this approach is, there is no way to pass additional database connection settings. In order to do that, SQLite DB API also supports connection string using RFC 3986 URI format. Consult SQLite documentation on [URI format](https://www.sqlite.org/uri.html) for more detail.
+The SQLite database is a single disk file. The SQLite connection string is simply a path to the location of that single disk file. Both absolute and relative paths work. When the path is valid but the disk file does not exist yet then SQLite database engine will automatically create the disk file and hence create a new empty database in the process. The drawback with this approach is, there is no way to pass additional database connection settings. In order to do that, SQLite DB API also supports connection string using RFC 3986 URI format. Consult SQLite documentation on [URI format](https://www.sqlite.org/uri.html) for more detail. For illustration purposes, this subsection will assume the SQLite disk file is called 'test.db' located in home directory and current working directory is home directory.
 
 \subsubsection Path_ConnString Path connection string
 
-Assuming the disk file is called 'test.db' in home directory and current working directory is home directory, the following example connection strings are equal.
+With the above assumption, the following example connection strings work equally.
+
+Relative path:
 \verbatim
 test.db
 \endverbatim
 
-Or:
+Or absolute path:
 \verbatim
 /home/testuser/test.db
 \endverbatim
@@ -2560,17 +2566,23 @@ Or:
 file:///home/testuser/test.db?mode=ro&cache=shared
 \endverbatim
 
-When the connection is successfully established, a valid DbConnection object is returned. After done with the database connection, an application should disconnect the database connection by calling the \ref Database::Disconnect "Disconnect()". This is a good practise. When the Urho3D game engine exits, the destructor of the database subsystem automatically disconnects all the still active database connections.
-
 \section Immediate_Execution Immediate SQL statement execution
 
 Use the \ref DbConnection::Execute() "Execute()" to execute an SQL statement in immediate mode. In immediate mode, the SQL statement is opened, prepared, executed, and finalized in one go. It is a convenient method to perform adhoc query but it may not be good for system performance when a same query is being performed repeatedly. The method returns a DbResult object regardless of whether the query type is DML (Data Manipulation Language) or DDL (Data Definition Language). The %DbResult object only contains the resultset when the SQL statement being executed is a select query. Use the \ref DbResult::GetNumColumns() "GetNumColumns()" and \ref DbResult::GetNumRows() "GetNumRows()" to find out the size of the resultset. Use the \ref DbResult::GetColumns() "GetColumns()" and \ref DbResult::GetRows() "GetRows()" to get the actual column headers data and rows data, respectively. For DML statement, use the \ref DbResult::GetNumAffectedRows() "GetNumAffectedRows()" to find out the number of affected rows.
 
 The number of rows in the %DbResult object may be less than the actual number of rows being fetched from the database. This is because the fetched rows could be instructed to be filtered out by \ref DB_Cursor "E_DBCURSOR" event handler. The whole rows fetching process could also be aborted upon request of E_DBCURSOR event handler.
 
+\section Prepare_Bind_Execution SQL execution using prepared statements and dynamic parameter bindings
+
+Not yet supported at this moment.
+
+\section Transaction_Management Transaction Management
+
+Not yet supported at this moment. Currently all statements are auto-committed unless the database is connected as read-only (in which case DML and DDL statements would cause an error to be logged).
+
 \section DB_Cursor Database cursor event
 
-When executing an SQL statement there is an option to enable the sending of database cursor event. This event is sent on each row in the resultset as it is being fetched. i.e. the events could be sent multiple times before the Execute() method returns. %Application can subscribe to this event to influence how the resultset is being populated in the DbResult object.
+When executing an SQL statement there is an option to enable the sending of database cursor event. This event is sent on each row in the resultset as it is being fetched. i.e. the events could be sent multiple times before the Execute() method returns. %Application can subscribe to this event to influence how the resultset is being populated in the %DbResult object.
 
 The E_DBCURSOR has input and output parameters.
 
@@ -2582,13 +2594,13 @@ P_COLHEADERS Column headers in the resultset (StringVector)
 P_COLVALUES  Row data as it is being fetched (VariantVector)
 \endverbatim
 
-Input parameters:
+%Input parameters:
 \verbatim
 P_FILTER     Set to true to filter out this row from the DbResult object
 P_ABORT      Set to true to abort further fetching process
 \endverbatim
 
-The P_FILTER could be used for any additional client-side filtering logic that is otherwise difficult to be carried out at the database server-side using WHERE or HAVING clause. The P_ABORT when used does not affect rows that are already populated into DbResult object.
+The P_FILTER could be used for any additional client-side filtering logic that is otherwise difficult to be carried out at the database server-side using WHERE or HAVING clause. The P_ABORT when used does not affect rows that are already populated into %DbResult object.
 
 \page Multithreading Multithreading
 
