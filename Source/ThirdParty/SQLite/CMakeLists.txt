@@ -52,4 +52,4 @@ if (NOT IOS AND NOT EMSCRIPTEN)
 endif ()
 
 # SQLite will not work correctly with the -ffast-math option of GCC
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-fast-math")
+string (REPLACE -ffast-math "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
