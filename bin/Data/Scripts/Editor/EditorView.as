@@ -1623,6 +1623,7 @@ void HandlePostRenderUpdate()
     }
 
     ViewRaycast(false);
+    UpdateViewDebugIcons();
 }
 
 void DrawNodeDebug(Node@ node, DebugRenderer@ debug, bool drawNode = true)
