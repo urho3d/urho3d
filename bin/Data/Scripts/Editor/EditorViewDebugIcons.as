@@ -9,6 +9,7 @@ BillboardSet@ debugIconsSetSoundSources3D;
 BillboardSet@ debugIconsSetSoundListeners;
 BillboardSet@ debugIconsSetZones;
 
+Node@ debugIconsNode = null;
 
 int stepDebugIconsUpdate = 30; //ms
 int timeToNextDebugIconsUpdate = 0;
@@ -18,63 +19,62 @@ Vector2 debugIconsSize = Vector2(0.025, 0.025);
 void CreateDebugIcons() 
 {
     if (editorScene is null) return;
-     
-    debugIconsSetDirectionalLights = editorScene.CreateComponent("BillboardSet");
+    
+    debugIconsSetDirectionalLights = debugIconsNode.CreateComponent("BillboardSet");
     debugIconsSetDirectionalLights.material = cache.GetResource("Material", "Materials/Editor/DebugIconLight.xml");
     debugIconsSetDirectionalLights.material.renderOrder = 255;
     debugIconsSetDirectionalLights.sorted = true;
     debugIconsSetDirectionalLights.temporary = true;
     debugIconsSetDirectionalLights.viewMask = 0x80000000;
-
-    debugIconsSetSpotLights = editorScene.CreateComponent("BillboardSet");
+    
+    debugIconsSetSpotLights = debugIconsNode.CreateComponent("BillboardSet");
     debugIconsSetSpotLights.material = cache.GetResource("Material", "Materials/Editor/DebugIconSpotLight.xml");
     debugIconsSetSpotLights.material.renderOrder = 255;
     debugIconsSetSpotLights.sorted = true;
     debugIconsSetSpotLights.temporary = true;
     debugIconsSetSpotLights.viewMask = 0x80000000;
     
-    debugIconsSetPointLights = editorScene.CreateComponent("BillboardSet");
+    debugIconsSetPointLights = debugIconsNode.CreateComponent("BillboardSet");
     debugIconsSetPointLights.material = cache.GetResource("Material", "Materials/Editor/DebugIconPointLight.xml");
     debugIconsSetPointLights.material.renderOrder = 255;
     debugIconsSetPointLights.sorted = true;
     debugIconsSetPointLights.temporary = true;
     debugIconsSetPointLights.viewMask = 0x80000000;
         
-    debugIconsSetCameras = editorScene.CreateComponent("BillboardSet");
+    debugIconsSetCameras = debugIconsNode.CreateComponent("BillboardSet");
     debugIconsSetCameras.material = cache.GetResource("Material", "Materials/Editor/DebugIconCamera.xml");
     debugIconsSetCameras.material.renderOrder = 255;
     debugIconsSetCameras.sorted = true;
     debugIconsSetCameras.temporary = true;
     debugIconsSetCameras.viewMask = 0x80000000;
     
-    debugIconsSetSoundSources = editorScene.CreateComponent("BillboardSet");
+    debugIconsSetSoundSources = debugIconsNode.CreateComponent("BillboardSet");
     debugIconsSetSoundSources.material = cache.GetResource("Material", "Materials/Editor/DebugIconSoundSource.xml");
     debugIconsSetSoundSources.material.renderOrder = 255;
     debugIconsSetSoundSources.sorted = true;
     debugIconsSetSoundSources.temporary = true;
     debugIconsSetSoundSources.viewMask = 0x80000000;
 
-    debugIconsSetSoundSources3D = editorScene.CreateComponent("BillboardSet");
+    debugIconsSetSoundSources3D = debugIconsNode.CreateComponent("BillboardSet");
     debugIconsSetSoundSources3D.material = cache.GetResource("Material", "Materials/Editor/DebugIconSoundSource.xml");
     debugIconsSetSoundSources3D.material.renderOrder = 255;
     debugIconsSetSoundSources3D.sorted = true;
     debugIconsSetSoundSources3D.temporary = true;
     debugIconsSetSoundSources3D.viewMask = 0x80000000;
     
-    debugIconsSetSoundListeners = editorScene.CreateComponent("BillboardSet");
+    debugIconsSetSoundListeners = debugIconsNode.CreateComponent("BillboardSet");
     debugIconsSetSoundListeners.material = cache.GetResource("Material", "Materials/Editor/DebugIconSoundListener.xml");
     debugIconsSetSoundListeners.material.renderOrder = 255;
     debugIconsSetSoundListeners.sorted = true;
     debugIconsSetSoundListeners.temporary = true;
     debugIconsSetSoundListeners.viewMask = 0x80000000;
     
-    debugIconsSetZones = editorScene.CreateComponent("BillboardSet");
+    debugIconsSetZones = debugIconsNode.CreateComponent("BillboardSet");
     debugIconsSetZones.material = cache.GetResource("Material", "Materials/Editor/DebugIconZone.xml");
     debugIconsSetZones.material.renderOrder = 255;
     debugIconsSetZones.sorted = true;
     debugIconsSetZones.temporary = true;
     debugIconsSetZones.viewMask = 0x80000000;
-    
 }
 
 void UpdateViewDebugIcons() 
@@ -82,8 +82,18 @@ void UpdateViewDebugIcons()
     if (timeToNextDebugIconsUpdate > time.systemTime) return; 
     
     if (editorScene is null) return;
-    // Checkout if scene do not have BBS component, add it once
-    BillboardSet@ bbs = editorScene.GetComponent("BillboardSet");
+    
+    debugIconsNode = editorScene.GetChild("DebugIconsContainer", true);
+    
+    if (debugIconsNode is null) 
+    {
+        debugIconsNode = editorScene.CreateChild("DebugIconsContainer", LOCAL);
+        debugIconsNode.temporary = true;
+    } 
+    
+    // Checkout if debugIconsNode do not have any BBS component, add they at once
+    BillboardSet@ bbs = debugIconsNode.GetComponent("BillboardSet");
+    
     if (bbs is null) 
     {
         CreateDebugIcons();
