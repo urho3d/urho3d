@@ -139,7 +139,6 @@ public:
     /// Return number of animation trigger points.
     unsigned GetNumTriggers() const { return triggers_.Size(); }
 
->>>>>>> upstream/master
 private:
     /// Animation name.
     String animationName_;
