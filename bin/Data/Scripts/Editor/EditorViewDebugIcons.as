@@ -29,6 +29,10 @@ Vector2 debugIconsSizeSmall = debugIconsSize / 1.5;
 Vector2 debugIconsSizeBig = debugIconsSize * 1.5;
 
 
+Vector2 Max(Vector2 a, Vector2 b) 
+{
+    return (a.length > b.length ? a : b); 
+}
 
 void CreateDebugIcons() 
 {
@@ -194,7 +198,7 @@ void UpdateViewDebugIcons()
                     bb.position = nodes[i].worldPosition;
                     bb.color = light.effectiveColor;
                     float distance = (camPos - nodes[i].worldPosition).length;
-                    bb.size = debugIconsSize * distance;
+                    bb.size = Max(debugIconsSize * distance, debugIconsSize);  
                     bb.enabled = true;
                 }
                 else if (light.lightType == LIGHT_DIRECTIONAL) 
@@ -203,7 +207,7 @@ void UpdateViewDebugIcons()
                     bb.position = nodes[i].worldPosition;
                     bb.color = light.effectiveColor;
                     float distance = (camPos - nodes[i].worldPosition).length;
-                    bb.size = debugIconsSize * distance;
+                    bb.size = Max(debugIconsSize * distance, debugIconsSize);
                     bb.enabled = true;
                 }
                 else if (light.lightType == LIGHT_SPOT) 
@@ -212,7 +216,7 @@ void UpdateViewDebugIcons()
                     bb.position = nodes[i].worldPosition;
                     bb.color = light.effectiveColor;
                     float distance = (camPos - nodes[i].worldPosition).length;
-                    bb.size = debugIconsSize * distance;
+                    bb.size = Max(debugIconsSize * distance, debugIconsSize);
                     bb.enabled = true;
                 }
             }
@@ -240,7 +244,7 @@ void UpdateViewDebugIcons()
                 
                 // if mainCamera enough closer to selected camera then make bb size relative to distance
                 float distance = (camPos - nodes[i].worldPosition).length;
-                bb.size = debugIconsSize * distance;  
+                bb.size = Max(debugIconsSize * distance, debugIconsSize);  
                 bb.enabled = true;
             }
             
@@ -261,7 +265,7 @@ void UpdateViewDebugIcons()
                 Billboard@ bb = debugIconsSetSoundSources.billboards[i];
                 bb.position = nodes[i].worldPosition;
                 float distance = (camPos - nodes[i].worldPosition).length;
-                bb.size = debugIconsSize * distance;
+                bb.size = Max(debugIconsSize * distance, debugIconsSize);
                 bb.enabled = component.enabled;
             }
             
@@ -282,7 +286,7 @@ void UpdateViewDebugIcons()
                 Billboard@ bb = debugIconsSetSoundSources3D.billboards[i];
                 bb.position = nodes[i].worldPosition;
                 float distance = (camPos - nodes[i].worldPosition).length;
-                bb.size = debugIconsSize * distance;
+                bb.size = Max(debugIconsSize * distance, debugIconsSize);
                 bb.enabled = component.enabled;
             }
             
@@ -303,7 +307,7 @@ void UpdateViewDebugIcons()
                 Billboard@ bb = debugIconsSetSoundListeners.billboards[i];
                 bb.position = nodes[i].worldPosition;
                 float distance = (camPos - nodes[i].worldPosition).length;
-                bb.size = debugIconsSize * distance;
+                bb.size = Max(debugIconsSize * distance, debugIconsSize);
                 bb.enabled = component.enabled;
             }
             
@@ -323,7 +327,7 @@ void UpdateViewDebugIcons()
             Billboard@ bb = debugIconsSetZones.billboards[0];
             bb.position = Vector3(0,0,0);
             float distance = (camPos - bb.position).length;
-            bb.size = debugIconsSize * distance;
+            bb.size = Max(debugIconsSize * distance, debugIconsSize);
             //bb.color = zone.ambientColor;
             bb.enabled = zone.enabled; 
         }
@@ -337,7 +341,7 @@ void UpdateViewDebugIcons()
                 Billboard@ bb = debugIconsSetZones.billboards[i+1];
                 bb.position = nodes[i].worldPosition;
                 float distance = (camPos - nodes[i].worldPosition).length;
-                bb.size = debugIconsSize * distance;
+                bb.size = Max(debugIconsSize * distance, debugIconsSize);
                 //bb.color = zone.ambientColor;
                 bb.enabled = zone.enabled;
             }
@@ -345,7 +349,6 @@ void UpdateViewDebugIcons()
             debugIconsSetZones.Commit();
         }
     }
-    
     
     if (timeToNextDebugIconsUpdateSplinePath < time.systemTime) 
     {
@@ -376,22 +379,21 @@ void UpdateViewDebugIcons()
                             int index = (i * splinePathResolution) + step;    
                             Billboard@ bb = debugIconsSetSplinesPoints.billboards[index];
                             bb.position = splinePoint;
-                            bb.size = debugIconsSizeSmall * distance;
                             
                             if (step == 0) 
                             {
                                 bb.color = Color(1,1,0);
-                                bb.size = debugIconsSize * distance;
+                                bb.size = Max(debugIconsSize * distance, debugIconsSize);
                             }
                             else if ((step+1) >= (splinePathResolution - splineStep))
                             {
                                 bb.color = Color(0,1,0);
-                                bb.size = debugIconsSize * distance;
+                                bb.size = Max(debugIconsSize * distance, debugIconsSize);
                             }
                             else
                             {
                                 bb.color = Color(1,1,1);
-                                bb.size = debugIconsSizeSmall * distance;
+                                bb.size = Max(debugIconsSizeSmall * distance, debugIconsSizeSmall);
                             }    
                             bb.enabled = sp.enabled;
                         }
@@ -418,7 +420,7 @@ void UpdateViewDebugIcons()
                         Billboard@ bb = debugIconsSetTriggers.billboards[i];
                         bb.position = nodes[i].worldPosition;
                         float distance = (camPos - nodes[i].worldPosition).length;
-                        bb.size = debugIconsSize * distance;
+                        bb.size = Max(debugIconsSize * distance, debugIconsSize);
                         bb.enabled = rigidbody.enabled;
                     }
                 }
@@ -442,7 +444,7 @@ void UpdateViewDebugIcons()
                     Billboard@ bb = debugIconsSetCustomGeometry.billboards[i];
                     bb.position = nodes[i].worldPosition;
                     float distance = (camPos - nodes[i].worldPosition).length;
-                    bb.size = debugIconsSize * distance;
+                    bb.size = Max(debugIconsSize * distance, debugIconsSize);
                     bb.enabled = customGeometry.enabled;
                 }
                 
@@ -465,7 +467,7 @@ void UpdateViewDebugIcons()
                     Billboard@ bb = debugIconsSetParticleEmitters.billboards[i];
                     bb.position = nodes[i].worldPosition;
                     float distance = (camPos - nodes[i].worldPosition).length;
-                    bb.size = debugIconsSizeBig * distance;
+                    bb.size = Max(debugIconsSizeBig * distance, debugIconsSizeBig);
                     bb.enabled = particleEmitter.enabled;
                 }
                 
