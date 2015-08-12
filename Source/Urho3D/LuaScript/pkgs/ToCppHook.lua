@@ -57,11 +57,9 @@ function post_output_hook(package)
             end
         until not e
         result = currentString..string.sub(result, nxt)
-        --if k == 0 then print('Pattern not replaced', pattern) end
     end
 
     replace("\t", "  ")
-
     replace([[#ifndef __cplusplus
 #include "stdlib.h"
 #endif
@@ -103,6 +101,11 @@ function post_output_hook(package)
 #include <Urho3D/LuaScript/ToluaUtils.h>]])
     end
 
+    -- Special handling for vector to table conversion which would simply the implementation of the template functions
+    result = string.gsub(result, "ToluaIs(P?O?D?)Vector([^\"]-)\"c?o?n?s?t? ?P?O?D?Vector<([^*>]-)%*?>\"", "ToluaIs%1Vector%2\"%3\"")
+    result = string.gsub(result, "ToluaPush(P?O?D?)Vector([^\"]-)\"c?o?n?s?t? ?P?O?D?Vector<([^*>]-)%*?>\"", "ToluaPush%1Vector%2\"%3\"")
+    result = string.gsub(result, "@([^(]+)%(", "(\"%1\",")      -- RefCounted* overload
+
     WRITE(result)
     WRITE([[
 #if __clang__
@@ -132,11 +135,12 @@ function get_push_function(t)
     if not urho3d_is_vector(t) then
         return old_get_push_function(t)
     end
-    
+
+    local T = t:match("<.*>")
     if not urho3d_is_podvector(t) then
-        return "ToluaPushVector" .. t:match("<.*>")
+        return "ToluaPushVector" .. T
     else
-        return "ToluaPushPODVector" .. t:match("<.*>")
+        return "ToluaPushPODVector" .. T .. (T:match("%*>") and "@" .. T:match("<([^*]+)%*>") or "")     -- may be overloadded
     end
 end
 
@@ -144,11 +148,12 @@ function get_to_function(t)
     if not urho3d_is_vector(t) then
         return old_get_to_function(t)
     end
-    
+
+    local T = t:match("<.*>")
     if not urho3d_is_podvector(t) then
-        return "ToluaToVector" .. t:match("<.*>")
+        return "ToluaToVector" .. T
     else
-        return "ToluaToPODVector" .. t:match("<.*>")
+        return "ToluaToPODVector" .. T
     end
 end
 
@@ -156,11 +161,12 @@ function get_is_function(t)
     if not urho3d_is_vector(t) then
         return old_get_is_function(t)
     end
-    
+
+    local T = t:match("<.*>")
     if not urho3d_is_podvector(t) then
-        return "ToluaIsVector" .. t:match("<.*>")
+        return "ToluaIsVector" .. T
     else
-        return "ToluaIsPODVector" .. t:match("<.*>")
+        return "ToluaIsPODVector" .. T
     end
 end
 
@@ -169,17 +175,17 @@ function get_property_methods_hook(ptype, name)
         local Name = string.upper(string.sub(name, 1, 1))..string.sub(name, 2)
         return "Get"..Name, "Set"..Name
     end
-    
+
     if ptype == "is_set" then
         local Name = string.upper(string.sub(name, 1, 1))..string.sub(name, 2)
         return "Is"..Name, "Set"..Name
     end
-    
+
     if ptype == "has_set" then
         local Name = string.upper(string.sub(name, 1, 1))..string.sub(name, 2)
         return "Has"..Name, "Set"..Name
     end
-    
+
     if ptype == "no_prefix" then
         local Name = string.upper(string.sub(name, 1, 1))..string.sub(name, 2)
         return Name, "Set"..Name

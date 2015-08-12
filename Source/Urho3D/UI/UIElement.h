@@ -276,7 +276,7 @@ public:
     void SetFocus(bool enable);
     /// Set selected mode. Actual meaning is element dependent, for example constant hover or pressed effect.
     void SetSelected(bool enable);
-    /// Set whether is visible.
+    /// Set whether is visible. Visibility propagates to child elements.
     void SetVisible(bool enable);
     /// Set focus mode.
     void SetFocusMode(FocusMode mode);
@@ -438,8 +438,11 @@ public:
     /// Return whether is selected. Actual meaning is element dependent.
     bool IsSelected() const { return selected_; }
 
-    /// Return whether is visible.
+    /// Return whether element itself should be visible. Elements can be also hidden due to the parent being not visible, use IsVisibleEffective() to check.
     bool IsVisible() const { return visible_; }
+    
+    /// Return whether element is effectively visible (parent element chain is visible.)
+    bool IsVisibleEffective() const;
 
     /// Return whether the cursor is hovering on this element.
     bool IsHovering() const { return hovering_; }

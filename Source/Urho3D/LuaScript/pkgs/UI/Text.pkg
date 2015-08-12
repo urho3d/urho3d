@@ -27,6 +27,9 @@ class Text : public UIElement
     void SetTextEffect(TextEffect textEffect);
     void SetEffectColor(const Color& effectColor);
     
+    bool GetAutoLocalizable() const;
+    void SetAutoLocalizable(bool enable);
+    
     Font* GetFont() const;
     int GetFontSize() const;
     const String GetText() const;
@@ -55,6 +58,7 @@ class Text : public UIElement
     tolua_property__get_set HorizontalAlignment textAlignment;
     tolua_property__get_set float rowSpacing;
     tolua_property__get_set bool wordwrap;
+    tolua_property__get_set bool autoLocalizable;
     tolua_readonly tolua_property__get_set unsigned selectionStart;
     tolua_readonly tolua_property__get_set unsigned selectionLength;
     tolua_property__get_set Color& selectionColor;

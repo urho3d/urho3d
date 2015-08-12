@@ -8,11 +8,11 @@ class Color
     Color(float r, float g, float b);
     Color(float r, float g, float b, float a);
     ~Color();
-    
-    bool operator == (const Color& rhs) const;
+
+    bool operator ==(const Color& rhs) const;
     Color operator * (float rhs) const;
     Color operator + (const Color& rhs);
-    
+
     unsigned ToUInt() const;
     Vector3 ToHSL() const;
     Vector3 ToHSV() const;
@@ -44,7 +44,7 @@ class Color
     bool Equals(const Color& rhs) const;
 
     String ToString() const;
-    
+
     float r_ @ r;
     float g_ @ g;
     float b_ @ b;

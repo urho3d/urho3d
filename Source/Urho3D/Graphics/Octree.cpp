@@ -25,6 +25,7 @@
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
 #include "../Core/Profiler.h"
+#include "../Core/Thread.h"
 #include "../Core/WorkQueue.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Graphics/Graphics.h"
@@ -514,8 +515,8 @@ void Octree::Raycast(RayOctreeQuery& query) const
 
     WorkQueue* queue = GetSubsystem<WorkQueue>();
 
-    // If no worker threads or no triangle-level testing, do not create work items
-    if (!queue->GetNumThreads() || query.level_ < RAY_TRIANGLE)
+    // If no worker threads or no triangle-level testing, or we are being called from a worker thread do not create work items
+    if (query.level_ < RAY_TRIANGLE || !queue->GetNumThreads() || !Thread::IsMainThread() || queue->IsCompleting())
         GetDrawablesInternal(query);
     else
     {

@@ -21,6 +21,7 @@ class Material : public Resource
     void SetShadowCullMode(CullMode mode);
     void SetFillMode(FillMode mode);
     void SetDepthBias(const BiasParameters& parameters);
+    void SetRenderOrder(unsigned char renderOrder);
     void SetScene(Scene* scene);
     void RemoveShaderParameter(const String name);
     void ReleaseShaders();
@@ -46,13 +47,16 @@ class Material : public Resource
     CullMode GetShadowCullMode() const;
     FillMode GetFillMode() const;
     const BiasParameters& GetDepthBias() const;
+    unsigned char GetRenderOrder() const;
     bool GetOcclusion() const;
     bool GetSpecular() const;
     Scene* GetScene() const;
 
-    tolua_readonly tolua_property__get_set CullMode cullMode;
-    tolua_readonly tolua_property__get_set CullMode shadowCullMode;
-    tolua_readonly tolua_property__get_set FillMode fillMode;
+    tolua_property__get_set CullMode cullMode;
+    tolua_property__get_set CullMode shadowCullMode;
+    tolua_property__get_set FillMode fillMode;
+    tolua_property__get_set BiasParameters depthBias;
+    tolua_property__get_set unsigned char renderOrder;
     tolua_readonly tolua_property__get_set bool occlusion;
     tolua_readonly tolua_property__get_set bool specular;
     tolua_property__get_set Scene* scene;

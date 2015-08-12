@@ -9,8 +9,8 @@ class Vector3
     Vector3(float x, float y, float z);
     Vector3(float x, float y);
     ~Vector3();
-    
-    bool operator == (const Vector3& rhs) const;
+
+    bool operator ==(const Vector3& rhs) const;
     Vector3 operator + (const Vector3& rhs) const;
     Vector3 operator - () const;
     Vector3 operator - (const Vector3& rhs) const;
@@ -30,13 +30,13 @@ class Vector3
     bool IsNaN() const;
     float Angle(const Vector3& rhs) const;
     Vector3 Normalized() const;
-    
+
     String ToString() const;
-    
+
     float x_ @ x;
     float y_ @ y;
     float z_ @ z;
-    
+
     static const Vector3 ZERO;
     static const Vector3 LEFT;
     static const Vector3 RIGHT;

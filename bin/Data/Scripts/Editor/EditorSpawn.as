@@ -95,7 +95,7 @@ void PickSpawnObject()
     String lastPath = resourcePicker.lastPath;
     if (lastPath.empty)
         lastPath = sceneResourcePath;
-    CreateFileSelector("Pick " + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
+    CreateFileSelector(localization.Get("Pick ") + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter, false);
     SubscribeToEvent(uiFileSelector, "FileSelected", "PickSpawnObjectDone");
 }
 
@@ -162,7 +162,7 @@ void RefreshPickedObjects()
         LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, i, 0);
         nameEdit.name = "TextureNameEdit" + String(i);
 
-        Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "Pick");
+        Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "smallButtonPick");
         SubscribeToEvent(pickButton, "Released", "PickSpawnedObject");
         nameEdit.text = spawnedObjectsNames[i];
 

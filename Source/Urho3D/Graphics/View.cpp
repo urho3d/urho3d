@@ -1854,33 +1854,50 @@ bool View::CheckPingpong(unsigned index)
 
 void View::AllocateScreenBuffers()
 {
+    bool hasScenePassToRTs = false;
+    bool hasCustomDepth = false;
+    bool hasViewportRead = false;
+    bool hasPingpong = false;
     bool needSubstitute = false;
     unsigned numViewportTextures = 0;
     depthOnlyDummyTexture_ = 0;
+
+    // Check for commands with special meaning: has custom depth, renders a scene pass to other than the destination viewport,
+    // read the viewport, or pingpong between viewport textures. These may trigger the need to substitute the destination RT
+    for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
+    {
+        const RenderPathCommand& command = renderPath_->commands_[i];
+        if (!IsNecessary(command))
+            continue;
+        if (!hasViewportRead && CheckViewportRead(command))
+            hasViewportRead = true;
+        if (!hasPingpong && CheckPingpong(i))
+            hasPingpong = true;
+        if (command.depthStencilName_.Length())
+            hasCustomDepth = true;
+        if (!hasScenePassToRTs && command.type_ == CMD_SCENEPASS)
+        {
+            for (unsigned j = 0; j < command.outputs_.Size(); ++j)
+            {
+                if (command.outputs_[j].first_.Compare("viewport", false))
+                {
+                    hasScenePassToRTs = true;
+                    break;
+                }
+            }
+        }
+    }
 
 #ifdef URHO3D_OPENGL
     // Due to FBO limitations, in OpenGL deferred modes need to render to texture first and then blit to the backbuffer
     // Also, if rendering to a texture with full deferred rendering, it must be RGBA to comply with the rest of the buffers,
     // unless using OpenGL 3
-    if ((deferred_ && !renderTarget_) || (!Graphics::GetGL3Support() && deferredAmbient_ && renderTarget_ &&
-                                          renderTarget_->GetParentTexture()->GetFormat() != Graphics::GetRGBAFormat()))
-        needSubstitute = true;
+    if (((deferred_ || hasScenePassToRTs) && !renderTarget_) || (!Graphics::GetGL3Support() && deferredAmbient_ && renderTarget_ 
+        && renderTarget_->GetParentTexture()->GetFormat() != Graphics::GetRGBAFormat()))
+            needSubstitute = true;
     // Also need substitute if rendering to backbuffer using a custom (readable) depth buffer
-    if (!renderTarget_ && !needSubstitute)
-    {
-        for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
-        {
-            const RenderPathCommand& command = renderPath_->commands_[i];
-            if (!IsNecessary(command))
-                continue;
-            if (command.depthStencilName_.Length() && command.outputs_.Size() && !command.outputs_[0].first_.Compare("viewport",
-                false))
-            {
-                needSubstitute = true;
-                break;
-            }
-        }
-    }
+    if (!renderTarget_ && hasCustomDepth)
+        needSubstitute = true;
 #endif
     // If backbuffer is antialiased when using deferred rendering, need to reserve a buffer
     if (deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1)
@@ -1889,34 +1906,8 @@ void View::AllocateScreenBuffers()
     // textures will be sized equal to the viewport
     if (viewSize_.x_ < rtSize_.x_ || viewSize_.y_ < rtSize_.y_)
     {
-        if (deferred_)
+        if (deferred_ || hasScenePassToRTs || hasCustomDepth)
             needSubstitute = true;
-        else if (!needSubstitute)
-        {
-            // Check also if using MRT without deferred rendering and rendering to the viewport and another texture,
-            // or using custom depth
-            for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
-            {
-                const RenderPathCommand& command = renderPath_->commands_[i];
-                if (!IsNecessary(command))
-                    continue;
-                if (command.depthStencilName_.Length())
-                    needSubstitute = true;
-                if (!needSubstitute && command.outputs_.Size() > 1)
-                {
-                    for (unsigned j = 0; j < command.outputs_.Size(); ++j)
-                    {
-                        if (!command.outputs_[j].first_.Compare("viewport", false))
-                        {
-                            needSubstitute = true;
-                            break;
-                        }
-                    }
-                }
-                if (needSubstitute)
-                    break;
-            }
-        }
     }
 
     // Follow final rendertarget format, or use RGB to match the backbuffer format
@@ -1934,21 +1925,6 @@ void View::AllocateScreenBuffers()
     if (deferred_ && !renderer_->GetHDRRendering() && !Graphics::GetGL3Support())
         format = Graphics::GetRGBAFormat();
 #endif
-
-    // Check for commands which read the viewport, or pingpong between viewport textures
-    bool hasViewportRead = false;
-    bool hasPingpong = false;
-
-    for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
-    {
-        const RenderPathCommand& command = renderPath_->commands_[i];
-        if (!IsNecessary(command))
-            continue;
-        if (CheckViewportRead(command))
-            hasViewportRead = true;
-        if (!hasPingpong && CheckPingpong(i))
-            hasPingpong = true;
-    }
 
     if (hasViewportRead)
     {

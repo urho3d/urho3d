@@ -270,6 +270,7 @@ void JSONValue::SetVariantValue(const String& name, const Variant& value)
         break;
 
     case VAR_VARIANTVECTOR:
+    case VAR_STRINGVECTOR:
     case VAR_VARIANTMAP:
         LOGERROR("Unsupported value type");
         break;
@@ -471,7 +472,7 @@ Variant JSONValue::GetVariantValue(const String& name, VariantType type) const
         ret = GetResourceRef(name);
     else if (type == VAR_RESOURCEREFLIST)
         ret = GetResourceRefList(name);
-    else if (type == VAR_VARIANTVECTOR || type == VAR_VARIANTMAP)
+    else if (type == VAR_VARIANTVECTOR || type == VAR_STRINGVECTOR || type == VAR_VARIANTMAP)
         LOGERROR("Unsupported value type");
     else
         ret.FromString(type, GetCString(name));
@@ -652,6 +653,7 @@ void JSONValue::AddVariantValue(const Variant& value)
         break;
 
     case VAR_VARIANTVECTOR:
+    case VAR_STRINGVECTOR:
     case VAR_VARIANTMAP:
         LOGERROR("Unsupported value type");
         break;
@@ -829,7 +831,7 @@ Variant JSONValue::GetVariantValue(unsigned index, VariantType type) const
         ret = GetResourceRef(index);
     else if (type == VAR_RESOURCEREFLIST)
         ret = GetResourceRefList(index);
-    else if (type == VAR_VARIANTVECTOR || type == VAR_VARIANTMAP)
+    else if (type == VAR_VARIANTVECTOR || type == VAR_STRINGVECTOR || type == VAR_VARIANTMAP)
         LOGERROR("Unsupported value type");
     else
         ret.FromString(type, GetCString(index));

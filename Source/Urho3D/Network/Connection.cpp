@@ -996,6 +996,36 @@ bool Connection::IsConnected() const
     return connection_->GetConnectionState() == kNet::ConnectionOK;
 }
 
+float Connection::GetRoundTripTime() const
+{
+    return connection_->RoundTripTime();
+}
+
+float Connection::GetLastHeardTime() const
+{
+    return connection_->LastHeardTime();
+}
+
+float Connection::GetBytesInPerSec() const
+{
+    return connection_->BytesInPerSec();
+}
+
+float Connection::GetBytesOutPerSec() const
+{
+    return connection_->BytesOutPerSec();
+}
+
+float Connection::GetPacketsInPerSec() const
+{
+    return connection_->PacketsInPerSec();
+}
+
+float Connection::GetPacketsOutPerSec() const
+{
+    return connection_->PacketsOutPerSec();
+}
+
 String Connection::ToString() const
 {
     return GetAddress() + ":" + String(GetPort());

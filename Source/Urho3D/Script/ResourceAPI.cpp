@@ -26,6 +26,7 @@
 #include "../Resource/Image.h"
 #include "../Resource/JSONFile.h"
 #include "../Resource/ResourceCache.h"
+#include "../Resource/Localization.h"
 #include "../Script/APITemplates.h"
 
 namespace Urho3D
@@ -101,6 +102,28 @@ static CScriptArray* ResourceCacheGetPackageFiles(ResourceCache* ptr)
 static bool ResourceCacheBackgroundLoadResource(const String& type, const String& name, bool sendEventOnFailure, ResourceCache* ptr)
 {
     return ptr->BackgroundLoadResource(type, name, sendEventOnFailure);
+}
+
+static Localization* GetLocalization()
+{
+    return GetScriptContext()->GetSubsystem<Localization>();
+}
+
+static void RegisterLocalization(asIScriptEngine* engine)
+{
+    RegisterObject<Localization>(engine, "Localization");
+    engine->RegisterObjectMethod("Localization", "int get_numLanguages() const", asMETHOD(Localization, GetNumLanguages), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "int get_languageIndex() const", asMETHODPR(Localization, GetLanguageIndex, () const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "int GetLanguageIndex(const String&in)", asMETHODPR(Localization, GetLanguageIndex, (const String&), int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "String get_language()", asMETHODPR(Localization, GetLanguage, (), String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "String GetLanguage(int)", asMETHODPR(Localization, GetLanguage, (int), String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "void SetLanguage(int)", asMETHODPR(Localization, SetLanguage, (int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "void SetLanguage(const String&in)", asMETHODPR(Localization, SetLanguage, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "String Get(const String&in)", asMETHOD(Localization, Get), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "void Reset()", asMETHOD(Localization, Reset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "void LoadJSON(const JSONValue&in)", asMETHOD(Localization, LoadJSON), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Localization", "void LoadJSONFile(const String&in)", asMETHOD(Localization, LoadJSONFile), asCALL_THISCALL);
+    engine->RegisterGlobalFunction("Localization@+ get_localization()", asFUNCTION(GetLocalization), asCALL_CDECL);
 }
 
 static void RegisterResourceCache(asIScriptEngine* engine)
@@ -188,10 +211,10 @@ static void RegisterImage(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Image", "bool Resize(int, int)", asMETHOD(Image, Resize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void Clear(const Color&in)", asMETHOD(Image, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void ClearInt(uint)", asMETHOD(Image, ClearInt), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "void SaveBMP(const String&in) const", asMETHOD(Image, SaveBMP), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "void SavePNG(const String&in) const", asMETHOD(Image, SavePNG), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "void SaveTGA(const String&in) const", asMETHOD(Image, SaveTGA), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Image", "void SaveJPG(const String&in, int) const", asMETHOD(Image, SaveJPG), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SaveBMP(const String&in) const", asMETHOD(Image, SaveBMP), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SavePNG(const String&in) const", asMETHOD(Image, SavePNG), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SaveTGA(const String&in) const", asMETHOD(Image, SaveTGA), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SaveJPG(const String&in, int) const", asMETHOD(Image, SaveJPG), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "Color GetPixel(int, int) const", asMETHODPR(Image, GetPixel, (int, int) const, Color), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "Color GetPixel(int, int, int) const", asMETHODPR(Image, GetPixel, (int, int, int) const, Color), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "uint GetPixelInt(int, int) const", asMETHODPR(Image, GetPixelInt, (int, int) const, unsigned), asCALL_THISCALL);
@@ -206,6 +229,9 @@ static void RegisterImage(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Image", "CompressedFormat get_compressedFormat() const", asMETHOD(Image, GetCompressedFormat), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "uint get_numCompressedLevels() const", asMETHOD(Image, GetNumCompressedLevels), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "Image@+ GetSubimage(const IntRect&in) const", asMETHOD(Image, GetSubimage), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool get_cubemap() const", asMETHOD(Image, IsCubemap), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool get_array() const", asMETHOD(Image, IsArray), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool get_sRGB() const", asMETHOD(Image, IsSRGB), asCALL_THISCALL);
 }
 
 static void ConstructJSONValue(JSONValue* ptr)
@@ -562,6 +588,7 @@ void RegisterResourceAPI(asIScriptEngine* engine)
     RegisterJSONFile(engine);
     RegisterXMLElement(engine);
     RegisterXMLFile(engine);
+    RegisterLocalization(engine);
 }
 
 }

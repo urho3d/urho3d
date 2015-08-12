@@ -164,7 +164,7 @@ public:
     bool NeedParameterUpdate(ShaderParameterGroup group, const void* source);
     /// Check whether a shader parameter exists on the currently set shaders.
     bool HasShaderParameter(StringHash param);
-    /// Check whether the current pixel shader uses a texture unit.
+    /// Check whether the current shader program uses a texture unit.
     bool HasTextureUnit(TextureUnit unit);
     /// Clear remembered shader parameter source group.
     void ClearParameterSource(ShaderParameterGroup group);

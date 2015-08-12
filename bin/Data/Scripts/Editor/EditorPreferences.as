@@ -45,6 +45,15 @@ void CreateEditorPreferencesDialog()
     preferencesDialog.height = 440;
     CenterDialog(preferencesDialog);
 
+    DropDownList@ languageSelector = preferencesDialog.GetChild("LanguageSelector", true);
+    for (int i = 0; i < localization.numLanguages; i++)
+    {
+        Text@ choice = Text();
+        languageSelector.AddItem(choice);
+        choice.style = "FileSelectorFilterText";
+        choice.text = localization.GetLanguage(i);
+    }
+    
     nodeItemTextColorEditR = preferencesDialog.GetChild("NodeItemTextColor.r", true);
     nodeItemTextColorEditG = preferencesDialog.GetChild("NodeItemTextColor.g", true);
     nodeItemTextColorEditB = preferencesDialog.GetChild("NodeItemTextColor.b", true);
@@ -84,6 +93,9 @@ void UpdateEditorPreferencesDialog()
 {
     if (preferencesDialog is null)
         return;
+    
+    DropDownList@ languageSelector = preferencesDialog.GetChild("LanguageSelector", true);
+    languageSelector.selection = localization.languageIndex;
 
     LineEdit@ uiMinOpacityEdit = preferencesDialog.GetChild("UIMinOpacity", true);
     uiMinOpacityEdit.text = String(uiMinOpacity);
@@ -193,12 +205,19 @@ void UpdateEditorPreferencesDialog()
         SubscribeToEvent(gridColorEditR, "TextFinished", "EditGridColor");
         SubscribeToEvent(gridColorEditG, "TextFinished", "EditGridColor");
         SubscribeToEvent(gridColorEditB, "TextFinished", "EditGridColor");
+        SubscribeToEvent(languageSelector, "ItemSelected", "EditLanguageSelector");
         SubscribeToEvent(gridSubdivisionColorEditR, "TextFinished", "EditGridSubdivisionColor");
         SubscribeToEvent(gridSubdivisionColorEditG, "TextFinished", "EditGridSubdivisionColor");
         SubscribeToEvent(gridSubdivisionColorEditB, "TextFinished", "EditGridSubdivisionColor");
         SubscribeToEvent(preferencesDialog.GetChild("CloseButton", true), "Released", "HideEditorPreferencesDialog");
         subscribedToEditorPreferences = true;
     }
+}
+
+void EditLanguageSelector(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList@ edit = eventData["Element"].GetPtr();
+    localization.SetLanguage(edit.selection);
 }
 
 bool ShowEditorPreferencesDialog()

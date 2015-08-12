@@ -271,6 +271,8 @@ private:
     btCompoundShape* shiftedCompoundShape_;
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
+    /// Smoothed transform, if has one.
+    WeakPtr<SmoothedTransform> smoothedTransform_;
     /// Constraints that refer to this rigid body.
     PODVector<Constraint*> constraints_;
     /// Gravity override vector.
@@ -297,8 +299,6 @@ private:
     bool trigger_;
     /// Use gravity flag.
     bool useGravity_;
-    /// Smoothed transform mode.
-    bool hasSmoothedTransform_;
     /// Readd body to world flag.
     bool readdBody_;
     /// Body exists in world flag.

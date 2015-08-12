@@ -7,12 +7,11 @@ class TerrainPatch : public Drawable
     void SetMaterial(Material* material);
     void SetBoundingBox(const BoundingBox& box);
     void SetCoordinates(const IntVector2& coordinates);
-    void SetOcclusionOffset(float offset);
     void ResetLod();
     
     Geometry* GetGeometry() const;
     Geometry* GetMaxLodGeometry() const;
-    Geometry* GetMinLodGeometry() const;
+    Geometry* GetOcclusionGeometry() const;
     VertexBuffer* GetVertexBuffer() const;
     Terrain* GetOwner() const;
     TerrainPatch* GetNorthPatch() const;
@@ -21,11 +20,10 @@ class TerrainPatch : public Drawable
     TerrainPatch* GetEastPatch() const;
     const IntVector2& GetCoordinates() const;
     unsigned GetLodLevel() const;
-    float GetOcclusionOffset() const;
-    
+
     tolua_readonly tolua_property__get_set Geometry* geometry;
     tolua_readonly tolua_property__get_set Geometry* maxLodGeometry;
-    tolua_readonly tolua_property__get_set Geometry* minLodGeometry;
+    tolua_readonly tolua_property__get_set Geometry* occlusionGeometry;
     tolua_readonly tolua_property__get_set VertexBuffer* vertexBuffer;
     tolua_property__get_set Terrain* owner;
     tolua_readonly tolua_property__get_set TerrainPatch* northPatch;
@@ -35,5 +33,4 @@ class TerrainPatch : public Drawable
     tolua_property__get_set BoundingBox& boundingBox;
     tolua_property__get_set IntVector2& coordinates;
     tolua_readonly tolua_property__get_set unsigned lodLevel;
-    tolua_property__get_set float occlusionOffset;
 };

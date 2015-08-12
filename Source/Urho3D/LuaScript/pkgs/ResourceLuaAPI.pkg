@@ -5,6 +5,7 @@ $pfile "Resource/JSONFile.pkg"
 $pfile "Resource/XMLElement.pkg"
 $pfile "Resource/XMLFile.pkg"
 $pfile "Resource/ResourceCache.pkg"
+$pfile "Resource/Localization.pkg"
 
 $using namespace Urho3D;
 $#pragma warning(disable:4800)

@@ -209,26 +209,15 @@ static unsigned char* VectorBufferAt(unsigned index, VectorBuffer* ptr)
     return ptr->GetModifiableData() + index;
 }
 
-static void ConstructVariantBuffer(const VectorBuffer& buffer, Variant* ptr)
+static void ConstructVariantVectorBuffer(const VectorBuffer& value, Variant* ptr)
 {
-    new(ptr) Variant(buffer.GetBuffer());
-}
-
-static Variant& VariantAssignBuffer(const VectorBuffer& buffer, Variant* ptr)
-{
-    *ptr = buffer.GetBuffer();
-    return *ptr;
+    new(ptr) Variant(value);
 }
 
 static VectorBuffer VariantGetBuffer(Variant* ptr)
 {
     VectorBuffer ret(ptr->GetBuffer());
     return ret;
-}
-
-static bool VariantEqualsBuffer(const VectorBuffer& buffer, Variant* ptr)
-{
-    return (*ptr) == buffer.GetBuffer();
 }
 
 static FileSystem* GetFileSystem()
@@ -316,10 +305,10 @@ static void RegisterSerialization(asIScriptEngine* engine)
     RegisterDeserializer<VectorBuffer>(engine, "VectorBuffer");
 
     // Register VectorBuffer conversions to Variant
-    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", asFUNCTION(ConstructVariantBuffer), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const VectorBuffer&in)", asFUNCTION(VariantAssignBuffer), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Variant", "VectorBuffer GetBuffer() const", asFUNCTION(VariantGetBuffer), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Variant", "bool opEquals(const VectorBuffer&in) const", asFUNCTION(VariantEqualsBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", asFUNCTION(ConstructVariantVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const VectorBuffer&in)", asMETHODPR(Variant, operator =, (const VectorBuffer&), Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const VectorBuffer&in) const", asMETHODPR(Variant, operator ==, (const VectorBuffer&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "const VectorBuffer GetBuffer() const", asMETHOD(Variant, GetVectorBuffer), asCALL_THISCALL);
 
     // Register VectorBuffer compression functions
     engine->RegisterGlobalFunction("VectorBuffer CompressVectorBuffer(VectorBuffer&in)", asFUNCTION(CompressVectorBuffer), asCALL_CDECL);

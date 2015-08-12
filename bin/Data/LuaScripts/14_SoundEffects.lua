@@ -143,12 +143,12 @@ function HandleStopMusic(eventType, eventData)
 end
 
 function HandleSoundVolume(eventType, eventData)
-    local newVolume = eventData:GetFloat("Value")
+    local newVolume = eventData["Value"]:GetFloat()
     audio:SetMasterGain(SOUND_EFFECT, newVolume)
 end
 
 function HandleMusicVolume(eventType, eventData)
-    local newVolume = eventData:GetFloat("Value")
+    local newVolume = eventData["Value"]:GetFloat()
     audio:SetMasterGain(SOUND_MUSIC, newVolume)
 end
 

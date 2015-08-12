@@ -74,7 +74,7 @@ end
 function classEnumerate:print(ident,close)
   local enumerate = {}
   enumerate.name = self.name
-  
+
   local i = 1
   while self[i] do
     if self[i] ~= "" then
@@ -182,7 +182,7 @@ function classVariable:print(ident,close)
   property.name = self.lname
   property.def  = self.def
   property.ret  = self.ret
-  
+
   if currentClass == nil then
     if property.mod:find("tolua_property__") == nil then
       table.insert(globalConstants, property)
@@ -198,7 +198,7 @@ function classVariable:print(ident,close)
   end
 end
 
-function classVerbatim:print(ident,close)  
+function classVerbatim:print(ident,close)
 end
 
 function sortByName(t)
@@ -512,7 +512,11 @@ function writeEnumerates(file)
   end
 end
 
-function writeFunction(file, func)  
+function writeFunction(file, func)
+  if func.name:match("^_") then
+    -- Skip internal functions
+    return
+  end
   local line = "- "
   -- construct function
   if func.type == "" and func.ptr == "" then
@@ -536,7 +540,7 @@ function writeFunction(file, func)
 
       if i ~= count then
         line = line .. ", "
-      end      
+      end
     end
   end
 
@@ -558,12 +562,12 @@ function writeGlobalConstants(file)
     file:write(line .. "\n")
   end
 
-  file:write("\n")  
+  file:write("\n")
 end
 
-function writeGlobalFunctions(file)  
+function writeGlobalFunctions(file)
   sortByName(globalFunctions)
-  file:write("\n\\section LuaScriptAPI_GlobalFunctions Global functions\n")  
+  file:write("\n\\section LuaScriptAPI_GlobalFunctions Global functions\n")
 
   for i, func in ipairs(globalFunctions) do
     writeFunction(file, func)
@@ -593,7 +597,7 @@ end
 
 function classPackage:print()
   curDir = getCurrentDirectory()
-  
+
   if flags.o == nil then
     print("Invalid output filename");
     return
@@ -622,7 +626,7 @@ function classPackage:print()
   writeGlobalFunctions(file)
   writeGlobalProperties(file)
   writeGlobalConstants(file)
-  
+
   file:write("*/\n")
   file:write("\n")
   file:write("}\n")

@@ -9,31 +9,31 @@ class Sphere
     Sphere(const Frustum& frustum);
     Sphere(const Polyhedron& poly);
     ~Sphere();
-    
-    bool operator == (const Sphere& rhs) const;
-    
+
+    bool operator ==(const Sphere& rhs) const;
+
     void Define(const Sphere& sphere);
     void Define(const Vector3& center, float radius);
     void Define(const BoundingBox& box);
     void Define(const Frustum& frustum);
     void Define(const Polyhedron& poly);
-    
+
     void Merge(const Vector3& point);
     void Merge(const BoundingBox& box);
     void Merge(const Frustum& frustum);
     void Merge(const Polyhedron& poly);
     void Merge(const Sphere& sphere);
-    
+
     void Clear();
-    
+
     Intersection IsInside(const Vector3& point) const;
     Intersection IsInside(const Sphere& sphere) const;
     Intersection IsInsideFast(const Sphere& sphere) const;
     Intersection IsInside(const BoundingBox& box) const;
     Intersection IsInsideFast(const BoundingBox& box) const;
-    
+
     float Distance(const Vector3& point) const;
-    
+
     Vector3 center_ @ center;
     float radius_ @ radius;
     bool defined_ @ defined;

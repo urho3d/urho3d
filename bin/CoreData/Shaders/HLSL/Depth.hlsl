@@ -12,7 +12,7 @@ void VS(float4 iPos : POSITION,
     #endif
     float2 iTexCoord : TEXCOORD0,
     out float3 oTexCoord : TEXCOORD0,
-    out float4 oPos : POSITION)
+    out float4 oPos : OUTPOSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
@@ -22,10 +22,10 @@ void VS(float4 iPos : POSITION,
 
 void PS(
     float3 iTexCoord : TEXCOORD0,
-    out float4 oColor : COLOR0)
+    out float4 oColor : OUTCOLOR0)
 {
     #ifdef ALPHAMASK
-        float alpha = tex2D(sDiffMap, iTexCoord.xy).a;
+        float alpha = Sample2D(sDiffMap, iTexCoord.xy).a;
         if (alpha < 0.5)
             discard;
     #endif

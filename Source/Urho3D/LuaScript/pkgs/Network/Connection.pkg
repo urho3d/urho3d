@@ -42,6 +42,12 @@ class Connection : public Object
     bool GetLogStatistics() const;
     String GetAddress() const;
     unsigned short GetPort() const;
+    float GetRoundTripTime() const;
+    float GetLastHeardTime() const;
+    float GetBytesInPerSec() const;
+    float GetBytesOutPerSec() const;
+    float GetPacketsInPerSec() const;
+    float GetPacketsOutPerSec() const;
     String ToString() const;
     unsigned GetNumDownloads() const;
     const String GetDownloadName() const;
@@ -60,6 +66,12 @@ class Connection : public Object
     tolua_property__get_set bool logStatistics;
     tolua_readonly tolua_property__get_set String address;
     tolua_readonly tolua_property__get_set unsigned short port;
+    tolua_readonly tolua_property__get_set float roundTripTime;
+    tolua_readonly tolua_property__get_set float lastHeardTime;
+    tolua_readonly tolua_property__get_set float bytesInPerSec;
+    tolua_readonly tolua_property__get_set float bytesOutPerSec;
+    tolua_readonly tolua_property__get_set float packetsInPerSec;
+    tolua_readonly tolua_property__get_set float packetsOutPerSec;
     tolua_readonly tolua_property__get_set unsigned numDownloads;
     tolua_readonly tolua_property__get_set String downloadName;
     tolua_readonly tolua_property__get_set float downloadProgress;

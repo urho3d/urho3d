@@ -17,6 +17,10 @@
 #include "Scripts/Editor/EditorResourceBrowser.as"
 #include "Scripts/Editor/EditorSpawn.as"
 #include "Scripts/Editor/EditorSoundType.as"
+#include "Scripts/Editor/EditorLayers.as"
+#include "Scripts/Editor/EditorColorWheel.as"
+#include "Scripts/Editor/EditorEventsHandlers.as"
+
 
 String configFileName;
 
@@ -24,6 +28,7 @@ void Start()
 {
     // Assign the value ASAP because configFileName is needed on exit, including exit on error
     configFileName = fileSystem.GetAppPreferencesDir("urho3d", "Editor") + "Config.xml";
+    localization.LoadJSONFile("EditorStrings.json");
 
     if (engine.headless)
     {
@@ -67,6 +72,7 @@ void FirstFrame()
     SubscribeToEvent("Update", "HandleUpdate");
     SubscribeToEvent("ReloadFinished", "HandleReloadFinished");
     SubscribeToEvent("ReloadFailed", "HandleReloadFailed");
+    EditorSubscribeToEvents();
 }
 
 void Stop()
@@ -87,6 +93,14 @@ void ParseArguments()
             if (++i < arguments.length)
             {
                 loaded = LoadScene(arguments[i]);
+                break;
+            }
+        }
+        if (arguments[i].ToLower() == "-language")
+        {
+            if (++i < arguments.length)
+            {
+                localization.SetLanguage(arguments[i]);
                 break;
             }
         }
@@ -173,11 +187,14 @@ void LoadConfig()
         if (cameraElem.HasAttribute("mousewheelcameraposition")) mouseWheelCameraPosition = cameraElem.GetBool("mousewheelcameraposition");
         if (cameraElem.HasAttribute("viewportmode")) viewportMode = cameraElem.GetUInt("viewportmode");
         if (cameraElem.HasAttribute("mouseorbitmode")) mouseOrbitMode = cameraElem.GetInt("mouseorbitmode");
+        if (cameraElem.HasAttribute("mmbpan")) mmbPanMode = cameraElem.GetBool("mmbpan");
         UpdateViewParameters();
     }
 
     if (!objectElem.isNull)
     {
+        if (objectElem.HasAttribute("cameraflymode")) cameraFlyMode = objectElem.GetBool("cameraflymode");
+        if (objectElem.HasAttribute("hotkeymode")) hotKeyMode = objectElem.GetInt("hotkeymode");
         if (objectElem.HasAttribute("newnodemode")) newNodeMode = objectElem.GetInt("newnodemode");
         if (objectElem.HasAttribute("newnodedistance")) newNodeDistance = objectElem.GetFloat("newnodedistance");
         if (objectElem.HasAttribute("movestep")) moveStep = objectElem.GetFloat("movestep");
@@ -231,6 +248,7 @@ void LoadConfig()
     {
         if (uiElem.HasAttribute("minopacity")) uiMinOpacity = uiElem.GetFloat("minopacity");
         if (uiElem.HasAttribute("maxopacity")) uiMaxOpacity = uiElem.GetFloat("maxopacity");
+        if (uiElem.HasAttribute("languageindex")) localization.SetLanguage(uiElem.GetInt("languageindex"));
     }
 
     if (!hierarchyElem.isNull)
@@ -302,7 +320,10 @@ void SaveConfig()
     cameraElem.SetBool("mousewheelcameraposition", mouseWheelCameraPosition);
     cameraElem.SetUInt("viewportmode", viewportMode);
     cameraElem.SetInt("mouseorbitmode", mouseOrbitMode);
+    cameraElem.SetBool("mmbpan", mmbPanMode);
 
+    objectElem.SetBool("cameraflymode", cameraFlyMode);
+    objectElem.SetInt("hotkeymode", hotKeyMode);
     objectElem.SetInt("newnodemode", newNodeMode);
     objectElem.SetFloat("newnodedistance", newNodeDistance);
     objectElem.SetFloat("movestep", moveStep);
@@ -338,6 +359,7 @@ void SaveConfig()
 
     uiElem.SetFloat("minopacity", uiMinOpacity);
     uiElem.SetFloat("maxopacity", uiMaxOpacity);
+    uiElem.SetInt("languageindex", localization.languageIndex);
 
     hierarchyElem.SetBool("showinternaluielement", showInternalUIElement);
     hierarchyElem.SetBool("showtemporaryobject", showTemporaryObject);

@@ -69,6 +69,13 @@ if (URHO3D_NETWORK)
     add_subdirectory (ThirdParty/kNet)
 endif ()
 
+if (URHO3D_DATABASE_ODBC)
+    add_subdirectory (ThirdParty/nanodbc)
+endif ()
+if (URHO3D_DATABASE_SQLITE)
+    add_subdirectory (ThirdParty/SQLite)
+endif ()
+
 if (URHO3D_NAVIGATION)
     add_subdirectory (ThirdParty/Detour)
     add_subdirectory (ThirdParty/DetourCrowd)

@@ -71,17 +71,15 @@ public:
     void SetBoundingBox(const BoundingBox& box);
     /// Set patch coordinates.
     void SetCoordinates(const IntVector2& coordinates);
-    /// Set vertical offset for occlusion geometry. Should be negative.
-    void SetOcclusionOffset(float offset);
     /// Reset to LOD level 0.
     void ResetLod();
 
     /// Return visible geometry.
     Geometry* GetGeometry() const;
-    /// Return max LOD geometry.
+    /// Return max LOD geometry. Used for decals.
     Geometry* GetMaxLodGeometry() const;
-    /// Return min LOD geometry.
-    Geometry* GetMinLodGeometry() const;
+    /// Return geometry used for occlusion.
+    Geometry* GetOcclusionGeometry() const;
     /// Return vertex buffer.
     VertexBuffer* GetVertexBuffer() const;
     /// Return owner terrain.
@@ -108,9 +106,6 @@ public:
     /// Return current LOD level.
     unsigned GetLodLevel() const { return lodLevel_; }
 
-    /// Return vertical offset for occlusion geometry..
-    float GetOcclusionOffset() const { return occlusionOffset_; }
-
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
@@ -123,8 +118,8 @@ private:
     SharedPtr<Geometry> geometry_;
     /// Geometry that is locked to the max LOD level. Used for decals.
     SharedPtr<Geometry> maxLodGeometry_;
-    /// Geometry that is locked to the minimum LOD level. Used for occlusion.
-    SharedPtr<Geometry> minLodGeometry_;
+    /// Geometry that is used for occlusion.
+    SharedPtr<Geometry> occlusionGeometry_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// Parent terrain.
@@ -143,8 +138,6 @@ private:
     IntVector2 coordinates_;
     /// Current LOD level.
     unsigned lodLevel_;
-    /// Vertical offset for occlusion geometry.
-    float occlusionOffset_;
 };
 
 }

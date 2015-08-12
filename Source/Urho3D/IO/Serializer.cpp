@@ -282,6 +282,9 @@ bool Serializer::WriteVariantData(const Variant& value)
     case VAR_VARIANTVECTOR:
         return WriteVariantVector(value.GetVariantVector());
 
+    case VAR_STRINGVECTOR:
+        return WriteStringVector(value.GetStringVector());
+
     case VAR_VARIANTMAP:
         return WriteVariantMap(value.GetVariantMap());
 
@@ -299,7 +302,7 @@ bool Serializer::WriteVariantData(const Variant& value)
 
     case VAR_MATRIX4:
         return WriteMatrix4(value.GetMatrix4());
-        
+
     case VAR_DOUBLE:
         return WriteDouble(value.GetDouble());
 
@@ -314,6 +317,15 @@ bool Serializer::WriteVariantVector(const VariantVector& value)
     success &= WriteVLE(value.Size());
     for (VariantVector::ConstIterator i = value.Begin(); i != value.End(); ++i)
         success &= WriteVariant(*i);
+    return success;
+}
+
+bool Serializer::WriteStringVector(const StringVector& value)
+{
+    bool success = true;
+    success &= WriteVLE(value.Size());
+    for (StringVector::ConstIterator i = value.Begin(); i != value.End(); ++i)
+        success &= WriteString(*i);
     return success;
 }
 

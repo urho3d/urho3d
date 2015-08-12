@@ -31,6 +31,9 @@ namespace Urho3D
 const char* interpolationModeNames[] =
 {
     "Bezier",
+    "Catmull-Rom",
+    "Linear",
+    "Catmull-Rom Full",
     0
 };
 
@@ -70,6 +73,33 @@ Variant Spline::GetPoint(float f) const
     {
     case BEZIER_CURVE:
         return BezierInterpolation(knots_, f);
+    case CATMULL_ROM_CURVE:
+        return CatmullRomInterpolation(knots_, f);
+    case LINEAR_CURVE:
+        return LinearInterpolation(knots_, f);
+    case CATMULL_ROM_FULL_CURVE:
+        {
+            /// \todo Do not allocate a new vector each time
+            Vector<Variant> fullKnots;
+            if (knots_.Size() > 1)
+            {
+                // Non-cyclic case: duplicate start and end
+                if (knots_.Front() != knots_.Back())
+                {
+                    fullKnots.Push(knots_.Front());
+                    fullKnots.Push(knots_);
+                    fullKnots.Push(knots_.Back());
+                }
+                // Cyclic case: smooth the tangents
+                else
+                {
+                    fullKnots.Push(knots_[knots_.Size() - 2]);
+                    fullKnots.Push(knots_);
+                    fullKnots.Push(knots_[1]);
+                }
+            }
+            return CatmullRomInterpolation(fullKnots, f);
+        }
 
     default:
         LOGERROR("Unsupported interpolation mode");
@@ -135,6 +165,7 @@ Variant Spline::BezierInterpolation(const Vector<Variant>& knots, float t) const
     }
     else
     {
+        /// \todo Do not allocate a new vector each time
         Vector<Variant> interpolatedKnots;
         for (unsigned i = 1; i < knots.Size(); i++)
         {
@@ -153,6 +184,68 @@ Variant Spline::BezierInterpolation(const Vector<Variant>& knots, float t) const
             }
         }
         return BezierInterpolation(interpolatedKnots, t);
+    }
+}
+
+template <typename T> Variant CalculateCatmullRom(const T& p0, const T& p1, const T& p2, const T& p3, float t, float t2, float t3)
+{
+    return Variant(0.5f * ((2.0f * p1) + (-p0 + p2) * t +
+        (2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2 +
+        (-p0 + 3.0f * p1 - 3.0f * p2 + p3) * t3));
+}
+
+Variant Spline::CatmullRomInterpolation(const Vector<Variant>& knots, float t) const
+{
+    if (knots.Size() < 4)
+        return Variant::EMPTY;
+    else
+    {
+        if (t >= 1.f)
+            return knots[knots.Size() - 2];
+
+        int originIndex = t * (knots.Size() - 3);
+        t = fmodf(t * (knots.Size() - 3), 1.f);
+        float t2 = t * t;
+        float t3 = t2 * t;
+
+        switch (knots[originIndex].GetType())
+        {
+        case VAR_FLOAT:
+            return CalculateCatmullRom(knots[originIndex].GetFloat(), knots[originIndex + 1].GetFloat(),
+                knots[originIndex + 2].GetFloat(), knots[originIndex + 3].GetFloat(), t, t2, t3);
+        case VAR_VECTOR2:
+            return CalculateCatmullRom(knots[originIndex].GetVector2(), knots[originIndex + 1].GetVector2(),
+                knots[originIndex + 2].GetVector2(), knots[originIndex + 3].GetVector2(), t, t2, t3);
+        case VAR_VECTOR3:
+            return CalculateCatmullRom(knots[originIndex].GetVector3(), knots[originIndex + 1].GetVector3(),
+                knots[originIndex + 2].GetVector3(), knots[originIndex + 3].GetVector3(), t, t2, t3);
+        case VAR_VECTOR4:
+            return CalculateCatmullRom(knots[originIndex].GetVector4(), knots[originIndex + 1].GetVector4(),
+                knots[originIndex + 2].GetVector4(), knots[originIndex + 3].GetVector4(), t, t2, t3);
+        case VAR_COLOR:
+            return CalculateCatmullRom(knots[originIndex].GetColor(), knots[originIndex + 1].GetColor(),
+                knots[originIndex + 2].GetColor(), knots[originIndex + 3].GetColor(), t, t2, t3);
+        case VAR_DOUBLE:
+            return CalculateCatmullRom(knots[originIndex].GetDouble(), knots[originIndex + 1].GetDouble(),
+                knots[originIndex + 2].GetDouble(), knots[originIndex + 3].GetDouble(), t, t2, t3);
+        default:
+            return Variant::EMPTY;
+        }
+    }
+}
+
+Variant Spline::LinearInterpolation(const Vector<Variant>& knots, float t) const
+{
+    if (knots.Size() < 2)
+        return Variant::EMPTY;
+    else
+    {
+        if (t >= 1.f)
+            return knots.Back();
+
+        int originIndex = Clamp((int)(t * (knots.Size() - 1)), 0, (int)(knots.Size() - 2));
+        t = fmodf(t * (knots.Size() - 1), 1.f);
+        return LinearInterpolation(knots[originIndex], knots[originIndex + 1], t);
     }
 }
 

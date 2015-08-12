@@ -1,3 +1,12 @@
+#ifdef D3D11
+// Make sampling macros also available for VS on D3D11
+#define Sample2D(tex, uv) t##tex.Sample(s##tex, uv)
+#define Sample2DProj(tex, uv) t##tex.Sample(s##tex, uv.xy / uv.w)
+#define Sample2DLod0(tex, uv) t##tex.SampleLevel(s##tex, uv, 0.0)
+#define SampleCube(tex, uv) t##tex.Sample(s##tex, uv)
+#define SampleShadow(tex, uv) t##tex.SampleCmpLevelZero(s##tex, uv.xy, uv.z)
+#endif
+
 #ifdef COMPILEPS
 
 #ifndef D3D11
@@ -75,12 +84,6 @@ SamplerState sDepthBuffer : register(s13);
 SamplerState sLightBuffer : register(s14);
 SamplerState sZoneCubeMap : register(s15);
 SamplerState sZoneVolumeMap : register(s15);
-
-#define Sample2D(tex, uv) t##tex.Sample(s##tex, uv)
-#define Sample2DProj(tex, uv) t##tex.Sample(s##tex, uv.xy / uv.w)
-#define Sample2DLod0(tex, uv) t##tex.SampleLevel(s##tex, uv, 0.0)
-#define SampleCube(tex, uv) t##tex.Sample(s##tex, uv)
-#define SampleShadow(tex, uv) t##tex.SampleCmpLevelZero(s##tex, uv.xy, uv.z)
 
 #endif
 

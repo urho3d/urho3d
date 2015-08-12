@@ -356,6 +356,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         // No editables, insert a dummy component container to show the information
         Text@ titleText = GetComponentContainer(0).GetChild("TitleText");
         titleText.text = "Select editable objects";
+        titleText.autoLocalizable = true;
         UIElement@ panel = titleText.GetChild("IconsPanel");
         panel.visible = false;
     }

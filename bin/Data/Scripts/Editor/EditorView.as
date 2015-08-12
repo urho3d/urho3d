@@ -19,6 +19,18 @@ RenderPath@ renderPath; // Renderpath to use on all views
 String renderPathName;
 bool mouseWheelCameraPosition = false;
 bool contextMenuActionWaitFrame = false;
+bool cameraFlyMode = true;
+int hotKeyMode = 0; // used for checking that kind of style manipulation user are prefer (see HotKeysMode)
+Vector3 lastSelectedNodesCenterPoint = Vector3(0,0,0); // for Blender mode to avoid own origin rotation when no nodes are selected. preserve last center for this
+WeakHandle lastSelectedNode = null;
+WeakHandle lastSelectedDrawable = null;
+WeakHandle lastSelectedComponent = null;
+bool viewCloser = false;
+Component@ coloringComponent = null;
+String coloringTypeName;
+String coloringPropertyName;
+Color coloringOldColor;
+float coloringOldScalar;
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
 const uint VIEWPORT_BORDER_H1    = 0x00000002;
@@ -48,6 +60,12 @@ const uint VIEWPORT_BOTTOM_ANY   = 0x0000c200;
 const uint VIEWPORT_LEFT_ANY     = 0x00005400;
 const uint VIEWPORT_RIGHT_ANY    = 0x0000c800;
 const uint VIEWPORT_QUAD         = 0x0000f000;
+
+enum HotKeysMode
+{
+    HOTKEYS_MODE_STANDARD = 0,
+    HOTKEYS_MODE_BLENDER
+}
 
 enum EditMode
 {
@@ -362,6 +380,7 @@ enum MouseOrbitMode
 
 bool toggledMouseLock = false;
 int mouseOrbitMode = ORBIT_RELATIVE;
+bool mmbPanMode = false;
 
 enum NewNodeMode
 {
@@ -455,15 +474,6 @@ void CreateCamera()
 
     // Note: the camera is not inside the scene, so that it is not listed, and does not get deleted
     ResetCamera();
-
-    SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
-    SubscribeToEvent("UIMouseClick", "ViewMouseClick");
-    SubscribeToEvent("MouseMove", "ViewMouseMove");
-    SubscribeToEvent("UIMouseClickEnd", "ViewMouseClickEnd");
-    SubscribeToEvent("BeginViewUpdate", "HandleBeginViewUpdate");
-    SubscribeToEvent("EndViewUpdate", "HandleEndViewUpdate");
-    SubscribeToEvent("BeginViewRender", "HandleBeginViewRender");
-    SubscribeToEvent("EndViewRender", "HandleEndViewRender");
 
     // Set initial renderpath if defined
     SetRenderPath(renderPathName);
@@ -1123,19 +1133,24 @@ void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment
 
 void UpdateStats(float timeStep)
 {
+    String adding = "";
+    // Todo: add localization
+    if (hotKeyMode == HOTKEYS_MODE_BLENDER)
+        adding = localization.Get("  CameraFlyMode: ") + (cameraFlyMode ? "True" : "False");
+    
     editorModeText.text = String(
-        "Mode: " + editModeText[editMode] +
-        "  Axis: " + axisModeText[axisMode] +
-        "  Pick: " + pickModeText[pickMode] +
-        "  Fill: " + fillModeText[fillMode] +
-        "  Updates: " + (runUpdate ? "Running" : "Paused"));
+        localization.Get("Mode: ") + localization.Get(editModeText[editMode]) +
+        localization.Get("  Axis: ") + localization.Get(axisModeText[axisMode]) +
+        localization.Get("  Pick: ") + localization.Get(pickModeText[pickMode]) +
+        localization.Get("  Fill: ") + localization.Get(fillModeText[fillMode]) +
+        localization.Get("  Updates: ") + (runUpdate ? localization.Get("Running") : localization.Get("Paused") + adding));
 
     renderStatsText.text = String(
-        "Tris: " + renderer.numPrimitives +
-        "  Batches: " + renderer.numBatches +
-        "  Lights: " + renderer.numLights[true] +
-        "  Shadowmaps: " + renderer.numShadowMaps[true] +
-        "  Occluders: " + renderer.numOccluders[true]);
+        localization.Get("Tris: ") + renderer.numPrimitives +
+        localization.Get("  Batches: ") + renderer.numBatches +
+        localization.Get("  Lights: ") + renderer.numLights[true] +
+        localization.Get("  Shadowmaps: ") + renderer.numShadowMaps[true] +
+        localization.Get("  Occluders: ") + renderer.numOccluders[true]);
 
     editorModeText.size = editorModeText.minSize;
     renderStatsText.size = renderStatsText.minSize;
@@ -1192,50 +1207,66 @@ void UpdateView(float timeStep)
         ReleaseMouseLock();
         return;
     }
+    
+    // Check for camara fly mode
+    if (hotKeyMode == HOTKEYS_MODE_BLENDER)
+    {
+        if (input.keyDown[KEY_LSHIFT] && input.keyPress[KEY_F])
+        {
+            cameraFlyMode = !cameraFlyMode;
+        }
+    }
 
     // Move camera
-    if (!input.keyDown[KEY_LCTRL])
+    float speedMultiplier = 1.0;
+    if (input.keyDown[KEY_LSHIFT])
+        speedMultiplier = cameraShiftSpeedMultiplier;
+    
+    if (!input.keyDown[KEY_LCTRL] && !input.keyDown[KEY_LALT])
     {
-        float speedMultiplier = 1.0;
-        if (input.keyDown[KEY_LSHIFT])
-            speedMultiplier = cameraShiftSpeedMultiplier;
-
-        if (input.keyDown['W'] || input.keyDown[KEY_UP])
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD || (hotKeyMode == HOTKEYS_MODE_BLENDER && cameraFlyMode && !input.keyDown[KEY_LSHIFT])) 
         {
-            cameraNode.Translate(Vector3(0, 0, cameraBaseSpeed) * timeStep * speedMultiplier);
-            FadeUI();
-        }
-        if (input.keyDown['S'] || input.keyDown[KEY_DOWN])
-        {
-            cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * timeStep * speedMultiplier);
-            FadeUI();
-        }
-        if (input.keyDown['A'] || input.keyDown[KEY_LEFT])
-        {
-            cameraNode.Translate(Vector3(-cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
-            FadeUI();
-        }
-        if (input.keyDown['D'] || input.keyDown[KEY_RIGHT])
-        {
-            cameraNode.Translate(Vector3(cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
-            FadeUI();
-        }
-        if (input.keyDown['E'] || input.keyDown[KEY_PAGEUP])
-        {
-            cameraNode.Translate(Vector3(0, cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
-            FadeUI();
-        }
-        if (input.keyDown['Q'] || input.keyDown[KEY_PAGEDOWN])
-        {
-            cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
-            FadeUI();
-        }
-        if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
+            if (input.keyDown['W'] || input.keyDown[KEY_UP])
+            {
+                cameraNode.Translate(Vector3(0, 0, cameraBaseSpeed) * timeStep * speedMultiplier);
+                FadeUI();
+            }
+            if (input.keyDown['S'] || input.keyDown[KEY_DOWN])
+            {
+                cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * timeStep * speedMultiplier);
+                FadeUI();
+            }
+            if (input.keyDown['A'] || input.keyDown[KEY_LEFT])
+            {
+                cameraNode.Translate(Vector3(-cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
+                FadeUI();
+            }
+            if (input.keyDown['D'] || input.keyDown[KEY_RIGHT])
+            {
+                cameraNode.Translate(Vector3(cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
+                FadeUI();
+            }
+            if (input.keyDown['E'] || input.keyDown[KEY_PAGEUP])
+            {
+                cameraNode.Translate(Vector3(0, cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
+                FadeUI();
+            }
+            if (input.keyDown['Q'] || input.keyDown[KEY_PAGEDOWN])
+            {
+                cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
+                FadeUI();
+            }
+        } 
+    }
+    
+    if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
+    {
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD) 
         {
             if (mouseWheelCameraPosition)
             {
                 cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep *
-                    speedMultiplier);
+                speedMultiplier);
             }
             else
             {
@@ -1243,20 +1274,94 @@ void UpdateView(float timeStep)
                 camera.zoom = Clamp(zoom, .1, 30);
             }
         }
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER) 
+        {
+            if (mouseWheelCameraPosition && !camera.orthographic)
+            {   
+                if (input.keyDown[KEY_LSHIFT])
+                    cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * -input.mouseMoveWheel*20* timeStep * speedMultiplier);
+                else if (input.keyDown[KEY_LCTRL])
+                    cameraNode.Translate(Vector3(-cameraBaseSpeed,0, 0) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+                else
+                    cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+            }
+            else
+            {   
+                if (input.keyDown[KEY_LSHIFT]) 
+                {
+                    cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * -input.mouseMoveWheel*20* timeStep * speedMultiplier);
+                }
+                else if (input.keyDown[KEY_LCTRL]) 
+                {
+                    cameraNode.Translate(Vector3(-cameraBaseSpeed,0, 0) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+                }
+                else 
+                {
+                    if (input.qualifierDown[QUAL_ALT]) 
+                    {
+                        float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
+                        camera.zoom = Clamp(zoom, .1, 30);
+                    }
+                    else 
+                    {
+                        cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+                    }    
+                }
+            }
+        }       
     }
 
+    if (input.keyDown[KEY_HOME])
+    {
+        if (selectedNodes.length > 0 || selectedComponents.length > 0)
+        {
+            Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
+            Vector3 centerPoint = SelectedNodesCenterPoint();
+            Vector3 d = cameraNode.worldPosition - centerPoint;
+            cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0,10);
+        }
+    }
+    
     // Rotate/orbit/pan camera
-    if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE])
+    bool changeCamViewButton = false;
+    
+    if (hotKeyMode == HOTKEYS_MODE_STANDARD) 
+        changeCamViewButton = input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE];
+    else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
+    {  
+        changeCamViewButton = input.mouseButtonDown[MOUSEB_MIDDLE] || cameraFlyMode;
+        
+        if (input.mouseButtonPress[MOUSEB_RIGHT] || input.keyDown[KEY_ESC])
+            cameraFlyMode = false;
+    }
+
+    if (changeCamViewButton)
     {
         SetMouseLock();
 
         IntVector2 mouseMove = input.mouseMove;
         if (mouseMove.x != 0 || mouseMove.y != 0)
         {
-            if (input.keyDown[KEY_LSHIFT] && input.mouseButtonDown[MOUSEB_MIDDLE])
+            bool panTheCamera = false;
+
+            if (hotKeyMode == HOTKEYS_MODE_STANDARD)
             {
-                cameraNode.Translate(Vector3(-mouseMove.x, mouseMove.y, 0) * timeStep * cameraBaseSpeed * 0.5);
+                if (input.mouseButtonDown[MOUSEB_MIDDLE])
+                {
+                    if (mmbPanMode)
+                        panTheCamera = !input.keyDown[KEY_LSHIFT];
+                    else
+                        panTheCamera = input.keyDown[KEY_LSHIFT];
+                }
             }
+            else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
+            {
+                if (!cameraFlyMode)
+                    panTheCamera = input.keyDown[KEY_LSHIFT];
+            }
+
+            if (panTheCamera)
+                cameraNode.Translate(Vector3(-mouseMove.x, mouseMove.y, 0) * timeStep * cameraBaseSpeed * 0.5);
             else
             {
                 activeViewport.cameraYaw += mouseMove.x * cameraBaseRotationSpeed;
@@ -1267,12 +1372,32 @@ void UpdateView(float timeStep)
 
                 Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
                 cameraNode.rotation = q;
-                if (input.mouseButtonDown[MOUSEB_MIDDLE] && (selectedNodes.length > 0 || selectedComponents.length > 0))
+
+                if (hotKeyMode == HOTKEYS_MODE_STANDARD)
                 {
-                    Vector3 centerPoint = SelectedNodesCenterPoint();
-                    Vector3 d = cameraNode.worldPosition - centerPoint;
-                    cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, d.length);
-                    orbiting = true;
+                    if (input.mouseButtonDown[MOUSEB_MIDDLE] && (selectedNodes.length > 0 || selectedComponents.length > 0))
+                    {
+                        Vector3 centerPoint = SelectedNodesCenterPoint();
+                        Vector3 d = cameraNode.worldPosition - centerPoint;
+                        cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, d.length);
+                        orbiting = true;
+                    }    
+                }
+                else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
+                {
+                    if (input.mouseButtonDown[MOUSEB_MIDDLE])
+                    {
+                        Vector3 centerPoint = Vector3(0,0,0);
+                        
+                        if ((selectedNodes.length > 0 || selectedComponents.length > 0))
+                            centerPoint = SelectedNodesCenterPoint();
+                        else
+                            centerPoint = lastSelectedNodesCenterPoint;
+                            
+                        Vector3 d = cameraNode.worldPosition - centerPoint;
+                        cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, d.length);
+                        orbiting = true;
+                    }
                 }
             }
         }
@@ -1282,8 +1407,61 @@ void UpdateView(float timeStep)
 
     if (orbiting && !input.mouseButtonDown[MOUSEB_MIDDLE])
         orbiting = false;
-
+        
+    if (hotKeyMode == HOTKEYS_MODE_BLENDER)
+    {
+        if (viewCloser && lastSelectedDrawable.Get() !is null)
+        {
+            SetMouseLock();
+            BoundingBox bb;
+            Vector3 centerPoint;
+            
+            if (selectedNodes.length <= 1)
+            {
+                Drawable@ drawable = lastSelectedDrawable.Get();
+                if (drawable !is null) 
+                {  
+                    bb = drawable.boundingBox;
+                    centerPoint = drawable.node.worldPosition;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < selectedNodes.length; i++) 
+                {
+                    bb.Merge(selectedNodes[i].position);
+                }
+                      
+                centerPoint = SelectedNodesCenterPoint();
+            }
+            
+            float distance = bb.size.length;
+            if (camera.orthographic) // if we use viewCloser for 2D get current distance to avoid near clip
+                distance = cameraNode.worldPosition.length;
+            
+            Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
+            cameraNode.rotation = q;
+            cameraNode.worldPosition = centerPoint -  cameraNode.worldDirection * distance;
+            // ReacquireCameraYawPitch();
+            viewCloser =  false;
+        }
+        else 
+            viewCloser =  false;
+    }
+    
     // Move/rotate/scale object
+    if (hotKeyMode == HOTKEYS_MODE_BLENDER) // force to select component node for manipulation if selected only component and not his node
+    {   
+        if ((editMode != EDIT_SELECT && editNodes.empty) && lastSelectedComponent.Get() !is null)
+        {   
+            if (lastSelectedComponent.Get() !is null) 
+            {
+                Component@ component  = lastSelectedComponent.Get();
+                SelectNode(component.node, false);
+            }
+        }   
+    }
+    
     if (!editNodes.empty && editMode != EDIT_SELECT && input.keyDown[KEY_LCTRL])
     {
         Vector3 adjust(0, 0, 0);
@@ -1577,9 +1755,31 @@ void ViewRaycast(bool mouseClick)
 
         RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
             pickModeDrawableFlags[pickMode], 0x7fffffff);
+        
         if (result.drawable !is null)
-        {
+        {            
             Drawable@ drawable = result.drawable;
+            
+            // for actual last selected node or component in both modes
+            if (hotKeyMode == HOTKEYS_MODE_STANDARD) 
+            {
+                if (input.mouseButtonDown[MOUSEB_LEFT]) 
+                {
+                    lastSelectedNode = drawable.node;
+                    lastSelectedDrawable = drawable;
+                    lastSelectedComponent = drawable;
+                }
+            }
+            else if (hotKeyMode == HOTKEYS_MODE_BLENDER) 
+            {
+                if (input.mouseButtonDown[MOUSEB_RIGHT]) 
+                {
+                    lastSelectedNode = drawable.node;
+                    lastSelectedDrawable = drawable;
+                    lastSelectedComponent = drawable;
+                }
+            }
+             
             // If selecting a terrain patch, select the parent terrain instead
             if (drawable.typeName != "TerrainPatch")
             {
@@ -1615,13 +1815,29 @@ void ViewRaycast(bool mouseClick)
             selectedComponent = body;
         }
     }
-
-    if (mouseClick && input.mouseButtonPress[MOUSEB_LEFT])
+    
+    bool multiselect = false;
+    bool componentSelectQualifier = false;
+    bool mouseButtonPressRL = false;
+    
+    if (hotKeyMode == HOTKEYS_MODE_STANDARD) 
     {
-        bool multiselect = input.qualifierDown[QUAL_CTRL];
+        mouseButtonPressRL = input.mouseButtonPress[MOUSEB_LEFT];
+        componentSelectQualifier = input.qualifierDown[QUAL_SHIFT];
+        multiselect = input.qualifierDown[QUAL_CTRL];
+    }
+    else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
+    {
+        mouseButtonPressRL = input.mouseButtonPress[MOUSEB_RIGHT];
+        componentSelectQualifier = input.qualifierDown[QUAL_CTRL];
+        multiselect = input.qualifierDown[QUAL_SHIFT];
+    }
+    
+    if (mouseClick && mouseButtonPressRL)
+    {
         if (selectedComponent !is null)
         {
-            if (input.qualifierDown[QUAL_SHIFT])
+            if (componentSelectQualifier)
             {
                 // If we are selecting components, but have nodes in existing selection, do not multiselect to prevent confusion
                 if (!selectedNodes.empty)
@@ -1756,10 +1972,16 @@ Vector3 SelectedNodesCenterPoint()
             centerPoint += selectedComponents[i].node.worldPosition;
     }
 
-    if (count > 0)
+    if (count > 0) 
+    {
+        lastSelectedNodesCenterPoint = centerPoint / count;
         return centerPoint / count;
-    else
+    }
+    else 
+    {
+        lastSelectedNodesCenterPoint = centerPoint;
         return centerPoint;
+    }
 }
 
 Vector3 GetScreenCollision(IntVector2 pos)

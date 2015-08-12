@@ -67,9 +67,10 @@ The following subsystems are optional, so GetSubsystem() may return null if they
 - Script: Provides the AngelScript execution environment. Needs to be created and registered manually.
 - Console: provides an interactive AngelScript console and log display. Created by calling \ref Engine::CreateConsole "CreateConsole()".
 - DebugHud: displays rendering mode information and statistics and profiling data. Created by calling \ref Engine::CreateDebugHud "CreateDebugHud()".
+- Database: Manages database connections. The build option for the database support needs to be enabled when building the library.
 
 In script, the subsystems are available through the following global properties:
-time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, renderer, script, console, debugHud. Note that WorkQueue and Profiler are not available to script due to their low-level nature.
+time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, renderer, script, console, debugHud, database. Note that WorkQueue and Profiler are not available to script due to their low-level nature.
 
 
 \page Events Events
@@ -371,7 +372,7 @@ The same in script would look like this (note the use of a property instead of a
 healthBar.texture = cache.GetResource("Texture2D", "Textures/HealthBarBorder.png");
 \endcode
 
-Resources can also be created manually and stored to the resource cache as if they had been loaded from disk. 
+Resources can also be created manually and stored to the resource cache as if they had been loaded from disk.
 
 Memory budgets can be set per resource type: if resources consume more memory than allowed, the oldest resources will be removed from the cache if not in use anymore. By default the memory budgets are set to unlimited.
 
@@ -391,6 +392,86 @@ Finally the maximum time (in milliseconds) spent each frame on finishing backgro
 When writing new resource types, the background loading mechanism requires implementing two functions: \ref Resource::BeginLoad "BeginLoad()" and \ref Resource::EndLoad "EndLoad()". BeginLoad() is potentially called in a background thread and should do as much work (such as file I/O) as possible without violating the \ref Multithreading "multithreading" rules. EndLoad() should perform the main thread finishing step, such as GPU upload. Either step can return false to indicate failure to load the resource.
 
 If a resource depends on other resources, writing efficient threaded loading for it can be hard, as calling GetResource() is not allowed inside BeginLoad() when background loading. There are a few options: it is allowed to queue new background load requests by calling BackgroundLoadResource() within BeginLoad(), or if the needed resource does not need to be permanently stored in the cache and is safe to load outside the main thread (for example Image or XMLFile, which do not possess any GPU-side data), \ref ResourceCache::GetTempResource "GetTempResource()" can be called inside BeginLoad.
+
+\page Localization Localization
+
+The Localization subsystem provides a simple way to creating multilingual applications.
+
+\section LocalizationInit Initialization
+
+Before using the subsystem, the localization string collection(s) need to be loaded. A common practice is to do this at application startup. Multiple collection files can be loaded, and each can define either just one or several languages. For example:
+
+\code
+Localization* l10n = GetSubsystem<Localization>();
+l10n->LoadJSONFile("StringsEnRu.json");
+l10n->LoadJSONFile("StringsDe.json");
+\endcode
+
+JSON files must be in UTF8 encoding without BOM. Sample files are in the bin/Data directory. The JSON files have the following format:
+
+\code
+{
+	"string id 1":{
+		"language 1":"value11",
+		"language 2":"value12",
+		"language 3":"value13"
+	},
+	"string id 2":{
+		"language 1":"value21",
+		"language 2":"value22",
+		"language 3":"value23"
+	}
+}
+\endcode
+
+Any number of languages can be defined. Remember that language names and string identifiers are case sensitive. "En" and "en" are considered different languages.
+During the loading process languages are numbered in order of finding. Indexing starts from zero. The first found language is set to be initially active.
+
+\section LocalizationUsing Using
+
+The Get function returns a string with the specified string identifier in the current language.
+
+\code
+Text* t = new Text(context_);
+t->SetName("Text1");
+Localization* l10n = GetSubsystem<Localization>();
+t->SetText(l10n->Get("string 1"));
+\endcode
+
+If the string id is empty, an empty string will be returned. If the translation is not found, the id will be returned unmodified and a warning will be logged.
+
+Use SetLanguage() function to change language at runtime.
+
+\code
+Localization* l10n = GetSubsystem<Localization>();
+l10n->SetLanguage("language 2");
+\endcode
+
+When the language is changed, the E_CHANGELANGUAGE event will be sent. Subscribe to it to perform the necessary relocalization of your user interface (texts, sprites etc.)
+
+\code
+SubscribeToEvent(E_CHANGELANGUAGE, HANDLER(Game, HandleChangeLanguage));
+
+void Game::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
+{
+    Localization* l10n = GetSubsystem<Localization>();
+    ...
+    Text* t = static_cast<Text*>(uiRoot->GetChild("Text1", true));
+    t->SetText(l10n->Get("string 1"));
+}
+\endcode
+
+Text %UI elements also support automatic translation to avoid manual work.
+
+\code
+Text* t2 = new Text(context_);
+t2->SetText("string 2");
+t2->SetAutoLocalizable(true);
+\endcode
+
+Wherein text value is used as an identifier.
+
+Also see the example 40_Localization.
 
 \page Scripting Scripting
 
@@ -611,11 +692,11 @@ After that, the functions in the script file are available for calling. Use \ref
 
 \subsection LuaScripting_Debugging Debugging script files
 
-Debugging Lua scripts embedded in an application can be done by attaching to a remote debugger, after first injecting a client into the application (for example, see <a href="https://wiki.eclipse.org/LDT/User_Area/User_Guides/User_Guide_1.2#Attach_session">eclipse LDT's remote debugger</a>). 
+Debugging Lua scripts embedded in an application can be done by attaching to a remote debugger, after first injecting a client into the application (for example, see <a href="https://wiki.eclipse.org/LDT/User_Area/User_Guides/User_Guide_1.2#Attach_session">eclipse LDT's remote debugger</a>).
 
 However, Lua script files in Urho3D are loaded into the interpreter via Urho3D's resource cache, which loads the script file into a memory buffer before passing that buffer to the interpreter. This is good for performance and cross platform compatibility, but means that the source file is not available to debuggers and so, for example, breakpoints may not work and the code cannot be meaningfully stepped through.
 
-For a single script that you wish to step through, you can use \ref LuaScript::ExecuteRawFile "ExecuteRawFile()", which will load the script from the file system directly into the Lua interpreter, making the source available to debuggers that rely on it. There are a couple of caveats with this: 
+For a single script that you wish to step through, you can use \ref LuaScript::ExecuteRawFile "ExecuteRawFile()", which will load the script from the file system directly into the Lua interpreter, making the source available to debuggers that rely on it. There are a couple of caveats with this:
 - The file has has to be on the file system, within a resource directory, and not packaged.
 - If the script uses `require()` to import a second script, then that second script will not be available for the debugger in the same way, since internally the second script is passed to Lua via the resource cache.
 
@@ -924,6 +1005,7 @@ A material definition looks like this:
     <shadowcull value="cw|ccw|none" />
     <fill value="solid|wireframe|point" />
     <depthbias constant="x" slopescaled="y" />
+    <renderorder value="x" />
 </material>
 \endcode
 
@@ -940,6 +1022,8 @@ The techniques for different LOD levels and quality settings must appear in a sp
 %Material shader parameters can be floats or vectors up to 4 components, or matrices.
 
 Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass. Note that material's depth bias settings do not apply in the shadow pass; during shadow rendering the light's depth bias is used instead.
+
+Render order is a 8-bit unsigned value that can be used to affect rendering order within a pass, overriding the state or distance sorting. The default value is 128; smaller values will render earlier, and larger values later.
 
 \section Materials_Textures Material textures
 
@@ -1009,7 +1093,7 @@ A technique definition looks like this:
         lighting="unlit|pervertex|perpixel"
         blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha|subtract|subtractalpha"
         depthtest="always|equal|less|lessequal|greater|greaterequal"
-        depthwrite="true|false" 
+        depthwrite="true|false"
         alphamask="true|false" />
     <pass ... />
     <pass ... />
@@ -1130,7 +1214,7 @@ vec3 worldPos = GetWorldPos(modelMatrix);
 gl_Position = GetClipPos(worldPos);
 \endcode
 
-On both Direct3D and OpenGL the vertex and pixel shaders are written into the same file, and the entrypoint functions must be called VS() and PS(). In OpenGL mode one of these is transformed to the main() function required by GLSL behind the scenes. When compiling a vertex shader, the compilation define "COMPILEVS" is always present, and likewise "COMPILEPS" when compiling a pixel shader. These are heavily used in the shader include files to prevent constructs that are illegal for the "wrong" type of shader, and to reduce compilation time.
+On both Direct3D and OpenGL the vertex and pixel shaders are written into the same file, and the entrypoint functions must be called VS() and PS(). In OpenGL mode one of these is transformed behind the scenes to the main() function required by GLSL. When compiling a vertex shader, the compilation define "COMPILEVS" is always present, and likewise "COMPILEPS" when compiling a pixel shader. These are heavily used in the shader include files to prevent constructs that are illegal for the "wrong" type of shader, and to reduce compilation time.
 
 The uniforms must be prefixed in a certain way so that the engine understands them:
 
@@ -1156,7 +1240,8 @@ When HLSL shaders are compiled for Direct3D11, the define D3D11 is present, and 
 
 - Uniforms are organized into constant buffers. See the file Uniforms.hlsl for the built-in uniforms. See TerrainBlend.hlsl for an example of defining your own uniforms into the "custom" constant buffer slot.
 - Both textures and samplers are defined for each texture unit. The macros in Samplers.hlsl (Sample2D, SampleCube etc.) can be used to write code that works on both APIs. These take the texture unit name without the 's' prefix.
-- Vertex shader output position and pixel shader output color need to use the SV_POSITION and SV_TARGET semantics. The macros OUTPOSITION and OUTCOLOR0-3 can be used to select the correct semantic on both APIs. In the vertex shader, the output position should be specified last, as otherwise other interpolator outputs may not function correctly.
+- Vertex shader output position and pixel shader output color need to use the SV_POSITION and SV_TARGET semantics. The macros OUTPOSITION and OUTCOLOR0-3 can be used to select the correct semantic on both APIs. In the vertex shader, the output position should be specified last, as otherwise other output semantics may not function correctly. In general, it is necessary that the output semantics defined by the vertex shader are defined as pixel shader inputs in the same order. Otherwise the Direct3D shader compiler may assign the semantics wrong.
+
 - On Direct3D11 the clip plane coordinate must be calculated manually. This is indicated by the CLIPPLANE compilation define, which is added automatically by the Graphics class. See for example the LitSolid.hlsl shader.
 - Direct3D11 does not support luminance and luminance-alpha texture formats, but rather uses the R and RG channels. Therefore be prepared to perform swizzling in the texture reads as appropriate.
 - Direct3D11 will fail to render if the vertex shader refers to vertex elements that don't exist in the vertex buffers.
@@ -1228,7 +1313,7 @@ For examples of renderpath definitions, see the default forward, deferred and li
 
 Normally needed depth-stencil surfaces are automatically allocated when the render path is executed.
 
-The special "lineardepth" (synonym "depth") format is intended for storing scene depth in deferred rendering. It is not an actual hardware depth-stencil texture, but a 32-bit single channel (R) float rendertarget. (On OpenGL2 it's RGBA instead, due to the limitation of all color buffers having to be the same format. The shader include file Samplers.glsl in bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB.) 
+The special "lineardepth" (synonym "depth") format is intended for storing scene depth in deferred rendering. It is not an actual hardware depth-stencil texture, but a 32-bit single channel (R) float rendertarget. (On OpenGL2 it's RGBA instead, due to the limitation of all color buffers having to be the same format. The shader include file Samplers.glsl in bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB.)
 
 Writing depth manually to a rendertarget, while using a non-readable depth-stencil surface ensures best compatibility and prevents any conflicts from using both depth test and manual depth sampling at the same time.
 
@@ -1259,7 +1344,7 @@ An example render path for readable hardware depth exists in bin/CoreData/Render
 
 The render path starts by allocating a readable depth-stencil texture the same size as the destination viewport, clearing its depth, then rendering a depth-only pass to it. Next the destination color rendertarget is cleared normally, while the readable depth texture is used as the depth-stencil for that and all subsequent commands. Any command after the depth render pass could now bind the depth texture to an unit for sampling, for example for smooth particle or SSAO effects.
 
-The ForwardDepth.xml render path does the same, but using a linear depth rendertarget instead of a hardware depth texture. The advantage is better compatibility (guaranteed to work without checking \ref Graphics::GetReadableDepthSupport "GetReadableDepthSupport()") but it has worse performance as it will fill the hardware depth-stencil twice.
+The ForwardDepth.xml render path does the same, but using a linear depth rendertarget instead of a hardware depth texture. The advantage is better compatibility (guaranteed to work without checking \ref Graphics::GetReadableDepthSupport "GetReadableDepthSupport()") but it has worse performance as it will perform an additional full scene rendering pass.
 
 \section RenderPaths_ForwardLighting Forward lighting special considerations
 
@@ -1409,7 +1494,7 @@ Like with skeletal animations, there are two ways to play back node animations:
 
 \page Particles Particle systems
 
-The ParticleEmitter class derives from BillboardSet to implement a particle system that updates automatically. 
+The ParticleEmitter class derives from BillboardSet to implement a particle system that updates automatically.
 
 The parameters of the particle system are stored in a ParticleEffect resource class, which uses XML format. Call \ref ParticleEmitter::SetEffect "SetEffect()" to assign the effect resource to the emitter. Most of the parameters can take either a single value, or minimum and maximum values to allow for random variation. See below for all supported parameters:
 
@@ -1442,7 +1527,7 @@ The parameters of the particle system are stored in a ParticleEffect resource cl
 </particleemitter>
 \endcode
 
-Notes: 
+Notes:
 
 - Zero active or inactive time period means infinite.
 - Interval is the reciprocal of emission rate. Either can be used to define the rate at which new particles are emitted.
@@ -1867,7 +1952,7 @@ There are a number of reserved names that are used for the OS defaults:
     - RejectDrop
     - Busy
     - BusyArrow
-	
+
 Cursor Shapes can be define in a number of different ways:
 
 XML:
@@ -1879,13 +1964,13 @@ XML:
 				<variant type="ResourceRef" value="Image;Textures/UI.png" />
 				<variant type="IntRect" value="0 0 12 24" />
 				<variant type="IntVector2" value="0 0" />
-			</variant>  
+			</variant>
 			<variant type="VariantVector" >
 				<variant type="String" value="Custom" />
 				<variant type="ResourceRef" value="Image;Textures/UI.png" />
 				<variant type="IntRect" value="12 0 12 36" />
 				<variant type="IntVector2" value="0 0" />
-			</variant>  
+			</variant>
 		</atrribute>
 	</element>
 \endcode
@@ -1915,7 +2000,7 @@ Angelcode:
 		cursor.DefineShape(CS_NORMAL, image, IntRect(0, 0, 12, 24), IntVector2(0, 0));
 		cursor.DefineShape("Custom", image, IntRect(12, 0, 12, 36), IntVector2(0, 0));
 	}
-		
+
 	ui.SetCursor(cursor);
 \endcode
 
@@ -2405,6 +2490,118 @@ In addition to UDP messaging, the network subsystem allows to make HTTP requests
 
 The Network subsystem can optionally add delay to sending packets, as well as simulate packet loss. See \ref Network::SetSimulatedLatency "SetSimulatedLatency()" and \ref Network::SetSimulatedPacketLoss "SetSimulatedPacketLoss()".
 
+\page Database Database
+
+The Database subsystem is built into the Urho3D library only when one of these two \ref Build_Options "build options" are enabled: URHO3D_DATABASE_ODBC and URHO3D_DATABASE_SQLITE. When both options are enabled then URHO3D_DATABASE_ODBC takes precedence. These build options determine which database API the subsystem will use. The ODBC DB API is more suitable for native application, especially the game server, where it allows the app to establish connection to any ODBC compliant databases like SQLite, MySQL/MariaDB, PostgreSQL, Sybase SQL, Oracle, etc. The SQLite DB API, on the other hand, is suitable for mobile application which embeds the SQLite database and its engine into the app itself. The Database subsystem wraps the underlying DB API using a unified URHO3D API, so no or minimal code changes are required to the library user when switching between these two build options.
+
+Currently the implementation just supports immediate SQL statement execution. Prepared statements and transaction management will be added later when the need arises. The subsystem has a simple database connection pooling capability. This internal database connection pool should not be confused with ODBC connection pool option when ODBC DB API is being used. The internal pooling is enabled by default, except when ODBC DB API is being used and when ODBC driver manager 3.0 or later is being detected in the host system, in which case the ODBC connection pool option should be used instead to manage the database connection pooling.
+
+\section Establish_DbConnection Establishing database connection
+
+A new database connection is established by calling \ref Database::Connect "Connect()" and passing it with a so-called database connection string. The database connection string does not only identify which database to connect to, but also other relevant database connection settings like: database user id, user password, host, and port number, etc. The format of the database connection string is controlled by the underlying DB API. In general the connection string is really the only thing that need to be changed when switching the underlying DB API and when switching the databases to connect to.
+
+When the connection is successfully established, a valid DbConnection object is returned. After done with the database connection, an application should disconnect the database connection by calling the \ref Database::Disconnect "Disconnect()". This is a good practise. When the Urho3D game engine exits, the destructor of the database subsystem automatically disconnects all the still active database connections.
+
+\subsection ODBC_ConnString ODBC connection string
+
+The exact format of the ODBC connection string depends on the ODBC driver for a specific database vendor. Consult the accompanying documentation of the specific ODBC driver on how to construct the database connection string. Both DSN and DSN-less connection string are supported. For the purpose of illustration, this subsection will just explain how to connect to a MySQL/MariaDB database as an example. The MySQL/MariaDB database server is assumed to be running on a localhost on a default port with database name called 'test', and user id & password are "testuser" & "testpassword".
+
+\subsubsection DSN_ConnString DSN connection string
+
+Use the GUI tool provided by host system to define the ODBC data source. It can be user DSN or system DSN. On Linux host system, simply add the new data source entry in the '~/.odbc.ini' or '/etc/odbc.ini', respectively. Create the file if it does not exist yet. The data source entry must at least contains the following information.
+\verbatim
+# These settings assume the host system uses unixODBC as ODBC driver manager
+# Settings for iODBC driver manager would be slightly different
+[testDSN]
+Driver=MariaDB      # This is the name of the ODBC driver installed in the /etc/odbcinst.ini
+Description=MariaDB test database
+Server=localhost
+Port=
+User=testuser
+Password=testpassword
+Database=test
+Option=3
+Socket=
+\endverbatim
+
+To connect to this data source, use the following connection string:
+\verbatim
+DSN=testDSN
+\endverbatim
+
+\subsubsection DSN_less_ConnString DSN-less connection string
+
+To connect to the same database above without pre-configuring it as an ODBC data source, use the connection string like this:
+\verbatim
+Driver=MariaDB;Database=test;User=testuser;Password=testpassword;Option=3
+\endverbatim
+
+\subsection SQLite_ConnString SQLite connection string
+
+The SQLite database is a single disk file. The SQLite connection string is simply a path to the location of that single disk file. Both absolute and relative paths work. When the path is valid but the disk file does not exist yet then SQLite database engine will automatically create the disk file and hence create a new empty database in the process. The drawback with this approach is, there is no way to pass additional database connection settings. In order to do that, SQLite DB API also supports connection string using RFC 3986 URI format. Consult SQLite documentation on [URI format](https://www.sqlite.org/uri.html) for more detail. For illustration purposes, this subsection will assume the SQLite disk file is called 'test.db' located in home directory and current working directory is home directory.
+
+\subsubsection Path_ConnString Path connection string
+
+With the above assumption, the following example connection strings work equally.
+
+Relative path:
+\verbatim
+test.db
+\endverbatim
+
+Or absolute path:
+\verbatim
+/home/testuser/test.db
+\endverbatim
+
+\subsubsection URI_ConnString URI connection string
+
+In this format the additional database connection setting can be passed as query parameters. As an example, to connect to the same database as above but in read-only and shared-cache mode then the connection string can be rewritten as:
+\verbatim
+file:./test.db?mode=ro&cache=shared
+\endverbatim
+
+Or:
+\verbatim
+file:///home/testuser/test.db?mode=ro&cache=shared
+\endverbatim
+
+\section Immediate_Execution Immediate SQL statement execution
+
+Use the \ref DbConnection::Execute() "Execute()" to execute an SQL statement in immediate mode. In immediate mode, the SQL statement is opened, prepared, executed, and finalized in one go. It is a convenient method to perform adhoc query but it may not be good for system performance when a same query is being performed repeatedly. The method returns a DbResult object regardless of whether the query type is DML (Data Manipulation Language) or DDL (Data Definition Language). The %DbResult object only contains the resultset when the SQL statement being executed is a select query. Use the \ref DbResult::GetNumColumns() "GetNumColumns()" and \ref DbResult::GetNumRows() "GetNumRows()" to find out the size of the resultset. Use the \ref DbResult::GetColumns() "GetColumns()" and \ref DbResult::GetRows() "GetRows()" to get the actual column headers data and rows data, respectively. For DML statement, use the \ref DbResult::GetNumAffectedRows() "GetNumAffectedRows()" to find out the number of affected rows.
+
+The number of rows in the %DbResult object may be less than the actual number of rows being fetched from the database. This is because the fetched rows could be instructed to be filtered out by \ref DB_Cursor "E_DBCURSOR" event handler. The whole rows fetching process could also be aborted upon request of E_DBCURSOR event handler.
+
+\section Prepare_Bind_Execution SQL execution using prepared statements and dynamic parameter bindings
+
+Not yet supported at this moment.
+
+\section Transaction_Management Transaction Management
+
+Not yet supported at this moment. Currently all statements are auto-committed unless the database is connected as read-only (in which case DML and DDL statements would cause an error to be logged).
+
+\section DB_Cursor Database cursor event
+
+When executing an SQL statement there is an option to enable the sending of database cursor event. This event is sent on each row in the resultset as it is being fetched. i.e. the events could be sent multiple times before the Execute() method returns. %Application can subscribe to this event to influence how the resultset is being populated in the %DbResult object.
+
+The E_DBCURSOR has input and output parameters.
+
+Output parameters:
+\verbatim
+P_SQL        SQL query string currently being executed (String)
+P_NUMCOLS    Number of columns in the resultset (unsigned)
+P_COLHEADERS Column headers in the resultset (StringVector)
+P_COLVALUES  Row data as it is being fetched (VariantVector)
+\endverbatim
+
+%Input parameters:
+\verbatim
+P_FILTER     Set to true to filter out this row from the DbResult object
+P_ABORT      Set to true to abort further fetching process
+\endverbatim
+
+The P_FILTER could be used for any additional client-side filtering logic that is otherwise difficult to be carried out at the database server-side using WHERE or HAVING clause. The P_ABORT when used does not affect rows that are already populated into %DbResult object.
+
 \page Multithreading Multithreading
 
 Urho3D uses a task-based multithreading model. The WorkQueue subsystem can be supplied with tasks described by the WorkItem structure, by calling \ref WorkQueue::AddWorkItem "AddWorkItem()". These will be executed in background worker threads. The function \ref WorkQueue::Complete "Complete()" will complete all currently pending tasks, and execute them also in the main thread to make them finish faster.
@@ -2441,7 +2638,7 @@ colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
 colorAnimation->SetKeyFrame(2.0f, Color::YELLOW);
 colorAnimation->SetKeyFrame(4.0f, Color::WHITE);
 
-light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP); 
+light->SetAttributeAnimation("Color", colorAnimation, WM_LOOP);
 \endcode
 
 In the above code, we first create an ValueAnimation object call colorAnimation, and set three key frame values to it, then assign it to light's color attribute. (Note here: in order to make animation look correct, the last key frame must equal to the first key frame for loop mode).
@@ -2913,7 +3110,7 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 
 - Mark all application-usable classes, structs and functions with the macro URHO3D_API so that they are exported correctly in a shared library build.
 
-- When you add a new third-party library, insert its license statement to the License.txt in the root directory.
+- When you add a new third-party library, insert its license statement to the License.txt in the root directory. Only libraries with permissive licenses such as BSD/MIT/zlib are accepted, because complying for example with the LGPL is difficult on mobile platforms, and would leave the application in a legal grey area.
 
 - Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs.
 */

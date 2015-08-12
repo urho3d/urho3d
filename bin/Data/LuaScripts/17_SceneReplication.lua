@@ -363,7 +363,7 @@ end
 
 function HandleClientConnected(eventType, eventData)
     -- When a client connects, assign to scene to begin scene replication
-    local newConnection = eventData:GetPtr("Connection", "Connection")
+    local newConnection = eventData["Connection"]:GetPtr("Connection")
     newConnection.scene = scene_
 
     -- Then create a controllable object for that client
@@ -381,7 +381,7 @@ end
 
 function HandleClientDisconnected(eventType, eventData)
     -- When a client disconnects, remove the controlled object
-    local connection = eventData:GetPtr("Connection", "Connection")
+    local connection = eventData["Connection"]:GetPtr("Connection")
     for i, v in ipairs(clients) do
         if v.connection == connection then
             v.object:Remove()
@@ -392,7 +392,7 @@ function HandleClientDisconnected(eventType, eventData)
 end
 
 function HandleClientObjectID(eventType, eventData)
-    clientObjectID = eventData:GetUInt("ID")
+    clientObjectID = eventData["ID"]:GetUInt()
 end
 
 -- Create XML patch instructions for screen joystick layout specific to this sample app

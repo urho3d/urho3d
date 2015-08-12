@@ -49,6 +49,9 @@ generated/
 # JetBrains IDE project settings
 /.idea/
 
+# Custom rake tasks
+/.rake/
+
 # Android project settings
 /Android/project.properties
 /Android/local.properties

@@ -140,6 +140,10 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
         *(reinterpret_cast<VariantVector*>(dest)) = src.GetVariantVector();
         break;
 
+    case VAR_STRINGVECTOR:
+        *(reinterpret_cast<StringVector*>(dest)) = src.GetStringVector();
+        break;
+
     case VAR_VARIANTMAP:
         *(reinterpret_cast<VariantMap*>(dest)) = src.GetVariantMap();
         break;
@@ -234,6 +238,10 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) cons
 
     case VAR_VARIANTVECTOR:
         dest = *(reinterpret_cast<const VariantVector*>(src));
+        break;
+
+    case VAR_STRINGVECTOR:
+        dest = *(reinterpret_cast<const StringVector*>(src));
         break;
 
     case VAR_VARIANTMAP:

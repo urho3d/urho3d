@@ -68,7 +68,6 @@ elseif (MSVC_VERSION LESS 1700 OR NOT URHO3D_D3D11)
         "$ENV{DIRECTX_ROOT}/Include"
         "$ENV{DXSDK_DIR}/Include")
     find_path (DIRECT3D_INCLUDE_DIRS NAMES d3dcompiler.h PATHS ${DIRECTX_INC_SEARCH_PATH})
-
     if (CMAKE_CL_64)
         set (DIRECTX_LIB_SEARCH_PATH
             "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x64"

@@ -4,6 +4,8 @@ class Terrain : public Component
 {
     void SetPatchSize(int size);
     void SetSpacing(const Vector3& spacing);
+    void SetMaxLodLevels(unsigned levels);
+    void SetOcclusionLodLevel(unsigned level);
     void SetSmoothing(bool enable);
     bool SetHeightMap(Image* image);
     void SetMaterial(Material* material);
@@ -24,6 +26,8 @@ class Terrain : public Component
     const Vector3& GetSpacing() const;
     const IntVector2& GetNumVertices() const;
     const IntVector2& GetNumPatches() const;
+    unsigned GetMaxLodLevels() const;
+    unsigned GetOcclusionLodLevel() const;
     bool GetSmoothing() const;
     Image* GetHeightMap() const;
     Material* GetMaterial() const;
@@ -50,6 +54,8 @@ class Terrain : public Component
     tolua_property__get_set Vector3& spacing;
     tolua_readonly tolua_property__get_set IntVector2& numVertices;
     tolua_readonly tolua_property__get_set IntVector2& numPatches;
+    tolua_property__get_set unsigned maxLodLevels;
+    tolua_property__get_set unsigned occlusionLodLevel;
     tolua_property__get_set bool smoothing;
     tolua_property__get_set Image* heightMap;
     tolua_property__get_set Material* material;

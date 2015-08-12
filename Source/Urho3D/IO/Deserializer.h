@@ -122,6 +122,8 @@ public:
     Variant ReadVariant(VariantType type);
     /// Read a variant vector.
     VariantVector ReadVariantVector();
+    /// Read a string vector.
+    StringVector ReadStringVector();
     /// Read a variant map.
     VariantMap ReadVariantMap();
     /// Read a variable-length encoded unsigned integer, which can use 29 bits maximum.

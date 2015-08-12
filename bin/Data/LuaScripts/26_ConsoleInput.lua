@@ -50,7 +50,7 @@ function Start()
     -- Show the console by default, make it large
     console.numRows = graphics.height / 16
     console.numBufferedRows = 2 * console.numRows
-    console.commandInterpreter = "LuaScript"
+    console.commandInterpreter = "LuaScriptEventInvoker"
     console.visible = true
     console.closeButton.visible = false
 
@@ -71,8 +71,8 @@ function Start()
 end
 
 function HandleConsoleCommand(eventType, eventData)
-    if eventData:GetString("Id") == "LuaScript" then
-        HandleInput(eventData:GetString("Command"))
+    if eventData["Id"]:GetString() == "LuaScriptEventInvoker" then
+        HandleInput(eventData["Command"]:GetString())
     end
 end
 
@@ -86,7 +86,7 @@ end
 
 function HandleEscKeyDown(eventType, eventData)
     -- Unlike the other samples, exiting the engine when ESC is pressed instead of just closing the console
-    if eventData:GetInt("Key") == KEY_ESC then
+    if eventData["Key"]:GetInt() == KEY_ESC then
         engine:Exit()
     end
 end

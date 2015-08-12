@@ -25,6 +25,18 @@ namespace Urho3D
 
 ### EndFrame
 
+## %Database events
+
+### DbCursor
+- %DbConnection : DbConnection pointer
+- %ResultImpl : Underlying result object pointer (cannot be used in scripting)
+- %SQL : String
+- %NumCols : unsigned
+- %ColValues : VariantVector
+- %ColHeaders : StringVector
+- %Filter : bool [in]
+- %Abort : bool [in]
+
 ## %Drawable events
 
 ### BoneHierarchyCreated
@@ -412,6 +424,8 @@ namespace Urho3D
 - %ResourceName : String
 - %Success : bool
 - %Resource : Resource pointer
+
+### ChangeLanguage
 
 ## %Scene events
 
@@ -1873,6 +1887,7 @@ namespace Urho3D
 - %Material : ResourceRef
 - %Vertex %Spacing : Vector3
 - %Patch %Size : int
+- %Max %LOD %Levels : int
 - %Smooth %Height %Map : bool
 - %Is %Occluder : bool
 - %Can %Be %Occluded : bool
@@ -1885,6 +1900,7 @@ namespace Urho3D
 - %Light %Mask : int
 - %Shadow %Mask : int
 - %Zone %Mask : int
+- %Occlusion %LOD %level : int
 
 ### Text
 - %Name : String
@@ -1925,6 +1941,7 @@ namespace Urho3D
 - %Text %Alignment : int
 - %Row %Spacing : float
 - %Word %Wrap : bool
+- %Auto %Localizable : bool
 - %Selection %Color : Color
 - %Hover %Color : Color
 - %Text %Effect : int
@@ -2210,6 +2227,9 @@ namespace Urho3D
 <a href="#Class_Cursor"><b>Cursor</b></a>
 <a href="#Class_CustomGeometry"><b>CustomGeometry</b></a>
 <a href="#Class_CustomGeometryVertex"><b>CustomGeometryVertex</b></a>
+<a href="#Class_Database"><b>Database</b></a>
+<a href="#Class_DbConnection"><b>DbConnection</b></a>
+<a href="#Class_DbResult"><b>DbResult</b></a>
 <a href="#Class_DebugHud"><b>DebugHud</b></a>
 <a href="#Class_DebugRenderer"><b>DebugRenderer</b></a>
 <a href="#Class_DecalSet"><b>DecalSet</b></a>
@@ -2242,6 +2262,7 @@ namespace Urho3D
 <a href="#Class_Light"><b>Light</b></a>
 <a href="#Class_LineEdit"><b>LineEdit</b></a>
 <a href="#Class_ListView"><b>ListView</b></a>
+<a href="#Class_Localization"><b>Localization</b></a>
 <a href="#Class_Log"><b>Log</b></a>
 <a href="#Class_Material"><b>Material</b></a>
 <a href="#Class_Matrix3"><b>Matrix3</b></a>
@@ -3112,6 +3133,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -3133,6 +3155,8 @@ Methods:
 - Intersection IsInside(const BoundingBox&) const
 - Intersection IsInside(const Sphere&) const
 - Intersection IsInside(const Vector3&) const
+- Intersection IsInsideFast(const BoundingBox&) const
+- Intersection IsInsideFast(const Sphere&) const
 - void Merge(const BoundingBox&)
 - void Merge(const Frustum&)
 - void Merge(const Polyhedron&)
@@ -3319,6 +3343,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -3576,6 +3601,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -4156,6 +4182,8 @@ Properties:
 
 - String address // readonly
 - StringHash baseType // readonly
+- float bytesInPerSec // readonly
+- float bytesOutPerSec // readonly
 - String category // readonly
 - bool client // readonly
 - bool connectPending // readonly
@@ -4164,12 +4192,16 @@ Properties:
 - String downloadName // readonly
 - float downloadProgress // readonly
 - VariantMap identity
+- float lastHeardTime // readonly
 - bool logStatistics
 - uint numDownloads // readonly
+- float packetsInPerSec // readonly
+- float packetsOutPerSec // readonly
 - uint16 port // readonly
 - Vector3 position
 - int refs // readonly
 - Quaternion rotation
+- float roundTripTime // readonly
 - Scene@ scene
 - bool sceneLoaded // readonly
 - uint8 timeStamp
@@ -5226,6 +5258,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -5322,6 +5355,59 @@ Properties:
 - Vector3 position
 - Vector4 tangent
 - Vector2 texCoord
+
+<a name="Class_Database"></a>
+
+### Database
+
+Methods:
+
+- DbConnection@ Connect(const String&)
+- void Disconnect(DbConnection@)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+
+Properties:
+
+- StringHash baseType // readonly
+- String category // readonly
+- uint poolSize
+- bool pooling // readonly
+- int refs // readonly
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+<a name="Class_DbConnection"></a>
+
+### DbConnection
+
+Methods:
+
+- DbResult Execute(const String&, bool = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+
+Properties:
+
+- StringHash baseType // readonly
+- String category // readonly
+- bool connected // readonly
+- String connectionString // readonly
+- int refs // readonly
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+<a name="Class_DbResult"></a>
+
+### DbResult
+
+Properties:
+
+- String[]@ columns // readonly
+- int64 numAffectedRows // readonly
+- uint numColumns // readonly
+- uint numRows // readonly
+- Variant[]@[] row // readonly
 
 <a name="Class_DebugHud"></a>
 
@@ -5943,6 +6029,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -6284,6 +6371,8 @@ Methods:
 - Intersection IsInside(const BoundingBox&)
 - Intersection IsInside(const Sphere&)
 - Intersection IsInside(const Vector3&)
+- Intersection IsInsideFast(const BoundingBox&) const
+- Intersection IsInsideFast(const Sphere&) const
 - void Transform(const Matrix3&)
 - void Transform(const Matrix3x4&)
 - Frustum Transformed(const Matrix3&) const
@@ -6463,10 +6552,10 @@ Methods:
 - bool Resize(int, int)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
-- void SaveBMP(const String&) const
-- void SaveJPG(const String&, int) const
-- void SavePNG(const String&) const
-- void SaveTGA(const String&) const
+- bool SaveBMP(const String&) const
+- bool SaveJPG(const String&, int) const
+- bool SavePNG(const String&) const
+- bool SaveTGA(const String&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetPixel(int, int, const Color&)
 - void SetPixel(int, int, int, const Color&)
@@ -6477,17 +6566,20 @@ Methods:
 
 Properties:
 
+- bool array // readonly
 - StringHash baseType // readonly
 - String category // readonly
 - uint components // readonly
 - bool compressed // readonly
 - CompressedFormat compressedFormat // readonly
+- bool cubemap // readonly
 - int depth // readonly
 - int height // readonly
 - uint memoryUse // readonly
 - String name
 - uint numCompressedLevels // readonly
 - int refs // readonly
+- bool sRGB // readonly
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
@@ -7018,6 +7110,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -7213,8 +7306,37 @@ Properties:
 - ScrollBar@ verticalScrollBar // readonly
 - IntVector2 viewPosition
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
+
+<a name="Class_Localization"></a>
+
+### Localization
+
+Methods:
+
+- String Get(const String&)
+- String GetLanguage(int)
+- int GetLanguageIndex(const String&)
+- void LoadJSON(const JSONValue&)
+- void LoadJSONFile(const String&)
+- void Reset()
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetLanguage(const String&)
+- void SetLanguage(int)
+
+Properties:
+
+- StringHash baseType // readonly
+- String category // readonly
+- String language // readonly
+- int languageIndex // readonly
+- int numLanguages // readonly
+- int refs // readonly
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
 
 <a name="Class_Log"></a>
 
@@ -7283,6 +7405,7 @@ Properties:
 - uint numTechniques
 - bool occlusion // readonly
 - int refs // readonly
+- uint8 renderOrder
 - Scene@ scene
 - String[]@ shaderParameterNames // readonly
 - Variant[] shaderParameters
@@ -7570,6 +7693,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -7959,6 +8083,7 @@ Methods:
 - void RemoveComponent(Component@)
 - void RemoveComponent(const String&)
 - void RemoveComponents(bool, bool)
+- void RemoveComponents(const String&)
 - void RemoveInstanceDefault()
 - void ResetDeepEnabled()
 - void ResetToDefault()
@@ -9388,6 +9513,7 @@ Methods:
 - void RemoveComponent(Component@)
 - void RemoveComponent(const String&)
 - void RemoveComponents(bool, bool)
+- void RemoveComponents(const String&)
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - void Roll(float, TransformSpace = TS_LOCAL)
@@ -9772,6 +9898,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -9937,6 +10064,7 @@ Properties:
 - ScrollBar@ verticalScrollBar // readonly
 - IntVector2 viewPosition
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -10266,6 +10394,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -10561,6 +10690,8 @@ Methods:
 - Intersection IsInside(const BoundingBox&) const
 - Intersection IsInside(const Sphere&) const
 - Intersection IsInside(const Vector3&) const
+- Intersection IsInsideFast(const BoundingBox&) const
+- Intersection IsInsideFast(const Sphere&) const
 - void Merge(const BoundingBox&)
 - void Merge(const Frustum&)
 - void Merge(const Sphere&)
@@ -10769,6 +10900,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -11226,6 +11358,7 @@ Properties:
 - float lodBias
 - Material@ material
 - uint maxLights
+- uint maxLodLevels
 - Node@ node // readonly
 - uint numAttributes // readonly
 - IntVector2 numPatches // readonly
@@ -11233,6 +11366,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
+- uint occlusionLodLevel
 - int patchSize
 - TerrainPatch@[] patches // readonly
 - int refs // readonly
@@ -11398,6 +11532,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
+- bool autoLocalizable
 - StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
@@ -11482,6 +11617,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 - bool wordwrap
@@ -12143,6 +12279,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -12357,6 +12494,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -12400,13 +12538,13 @@ Methods:
 - void FromString(VariantType, const String&)
 - void FromString(const String&, const String&)
 - bool GetBool() const
-- VectorBuffer GetBuffer() const
 - double GetDouble() const
 - float GetFloat() const
 - int GetInt() const
 - RefCounted@ GetPtr() const
 - ScriptObject@ GetScriptObject() const
 - StringHash GetStringHash() const
+- String[]@ GetStringVector() const
 - uint GetUInt() const
 - Variant[]@ GetVariantVector() const
 - const IntRect& GetIntRect() const
@@ -12423,6 +12561,7 @@ Methods:
 - const Vector2& GetVector2() const
 - const Vector3& GetVector3() const
 - const Vector4& GetVector4() const
+- const VectorBuffer GetBuffer() const
 
 Properties:
 
@@ -12455,6 +12594,7 @@ Properties:
 
 Methods:
 
+- Vector2 Abs() const
 - float AbsDotProduct(const Vector2&) const
 - float DotProduct(const Vector2&) const
 - bool Equals(const Vector2&) const
@@ -12478,6 +12618,7 @@ Properties:
 
 Methods:
 
+- Vector3 Abs() const
 - float AbsDotProduct(const Vector3&) const
 - float Angle(const Vector3&) const
 - Vector3 CrossProduct(const Vector3&) const
@@ -12504,6 +12645,7 @@ Properties:
 
 Methods:
 
+- Vector4 Abs() const
 - float AbsDotProduct(const Vector4&) const
 - float DotProduct(const Vector4&) const
 - bool Equals(const Vector4&) const
@@ -12795,6 +12937,7 @@ Properties:
 - VerticalAlignment verticalAlignment
 - Viewport@ viewport // readonly
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -12996,6 +13139,7 @@ Properties:
 - VariantMap vars // readonly
 - VerticalAlignment verticalAlignment
 - bool visible
+- bool visibleEffective // readonly
 - int weakRefs // readonly
 - int width
 
@@ -13349,6 +13493,12 @@ Properties:
 - CS_BUSY_ARROW
 
 
+### DBAPI
+
+- DBAPI_SQLITE
+- DBAPI_ODBC
+
+
 ### DumpMode
 
 - DOXYGEN
@@ -13429,6 +13579,9 @@ Properties:
 ### InterpolationMode
 
 - BEZIER_CURVE
+- CATMULL_ROM_CURVE
+- LINEAR_CURVE
+- CATMULL_ROM_FULL_CURVE
 
 
 ### Intersection
@@ -13701,6 +13854,7 @@ Properties:
 - VAR_MATRIX3X4
 - VAR_MATRIX4
 - VAR_DOUBLE
+- VAR_STRINGVECTOR
 
 
 ### VerticalAlignment
@@ -13822,15 +13976,18 @@ Properties:
 - void UnsubscribeFromEvent(const String&)
 - void UnsubscribeFromEvents(Object@)
 \section ScriptAPI_GlobalProperties Global properties
+- DBAPI DBAPI
 - Audio@ audio
 - ResourceCache@ cache
 - Console@ console
+- Database@ database
 - DebugHud@ debugHud
 - DebugRenderer@ debugRenderer
 - Engine@ engine
 - FileSystem@ fileSystem
 - Graphics@ graphics
 - Input@ input
+- Localization@ localization
 - Log@ log
 - Network@ network
 - Node@ node
