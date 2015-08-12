@@ -21,6 +21,7 @@ int timeToNextDebugIconsUpdateSplinePath = 0;
 
 const int splinePathResolution = 16;
 bool debugIconsShow = true;
+bool supressDebugIconsShow = false;
 Vector2 debugIconsSize = Vector2(0.025, 0.025);
 Vector2 debugIconsSizeSmall = debugIconsSize / 2.0;
 
@@ -98,11 +99,12 @@ void CreateDebugIcons()
 
 void UpdateViewDebugIcons() 
 {
-    if (timeToNextDebugIconsUpdate > time.systemTime) return; 
-    
     if (editorScene is null) return;
     
+    if (timeToNextDebugIconsUpdate > time.systemTime) return; 
+    
     debugIconsNode = editorScene.GetChild("DebugIconsContainer", true);
+    
     
     if (debugIconsNode is null) 
     {
@@ -118,15 +120,26 @@ void UpdateViewDebugIcons()
     {
         CreateDebugIcons();
     }
-    
-    Vector3 camPos = cameraNode.worldPosition;
         
     if (debugIconsSetPointLights !is null) 
     {
         debugIconsSetDirectionalLights.enabled = debugIconsShow;
         debugIconsSetSpotLights.enabled = debugIconsShow;
         debugIconsSetPointLights.enabled = debugIconsShow;
+        debugIconsSetCameras.enabled = debugIconsShow;
+        debugIconsSetSoundSources.enabled = debugIconsShow;
+        debugIconsSetSoundSources3D.enabled = debugIconsShow;
+        debugIconsSetSoundListeners.enabled = debugIconsShow;
+        debugIconsSetZones.enabled = debugIconsShow;
+        debugIconsSetSplinesPoints.enabled = debugIconsShow;
+    }
+    
+    if (debugIconsShow == false) return; 
+    
+    Vector3 camPos = activeViewport.cameraNode.worldPosition;
         
+    if (debugIconsSetPointLights !is null) 
+    {
         Array<Node@> nodes = editorScene.GetChildrenWithComponent("Light", true);
         
         if (nodes.length > 0) 
@@ -138,7 +151,6 @@ void UpdateViewDebugIcons()
             debugIconsSetPointLights.Commit();
             debugIconsSetSpotLights.Commit();
             debugIconsSetDirectionalLights.Commit();
-            
             
             debugIconsSetDirectionalLights.numBillboards = nodes.length;
             debugIconsSetSpotLights.numBillboards = nodes.length;
@@ -187,7 +199,6 @@ void UpdateViewDebugIcons()
     
     if (debugIconsSetCameras !is null) 
     {
-        debugIconsSetCameras.enabled = debugIconsShow;
         Array<Node@> nodes = editorScene.GetChildrenWithComponent("Camera", true);
 
         if (nodes.length > 0) 
@@ -211,9 +222,7 @@ void UpdateViewDebugIcons()
     }
     
     if (debugIconsSetSoundSources !is null) 
-    {
-        debugIconsSetSoundSources.enabled = debugIconsShow;
-        
+    {   
         Array<Node@> nodes = editorScene.GetChildrenWithComponent("SoundSource", true);
 
         if (nodes.length > 0) 
@@ -234,9 +243,7 @@ void UpdateViewDebugIcons()
     }
     
     if (debugIconsSetSoundSources3D !is null) 
-    {
-        debugIconsSetSoundSources3D.enabled = debugIconsShow;
-        
+    {   
         Array<Node@> nodes = editorScene.GetChildrenWithComponent("SoundSource3D", true);
 
         if (nodes.length > 0) 
@@ -258,7 +265,6 @@ void UpdateViewDebugIcons()
     
     if (debugIconsSetSoundListeners !is null) 
     {
-        debugIconsSetSoundListeners.enabled = debugIconsShow;
         Array<Node@> nodes = editorScene.GetChildrenWithComponent("SoundListener" , true);
 
         if (nodes.length > 0) 
@@ -280,8 +286,6 @@ void UpdateViewDebugIcons()
     
     if (debugIconsSetZones !is null) 
     {
-        debugIconsSetZones.enabled = debugIconsShow;
-
         // Collect all scene's Zones and add it
         Array<Node@> nodes = editorScene.GetChildrenWithComponent("Zone", true);
         
@@ -320,8 +324,6 @@ void UpdateViewDebugIcons()
     {
         if (debugIconsSetSplinesPoints !is null) 
         {
-            debugIconsSetSplinesPoints.enabled = debugIconsShow;
-
             // Collect all scene's SplinePath and add it
             Array<Node@> nodes = editorScene.GetChildrenWithComponent("SplinePath", true);
             
@@ -376,6 +378,5 @@ void UpdateViewDebugIcons()
         timeToNextDebugIconsUpdateSplinePath = time.systemTime + stepDebugIconsUpdateSplinePath;
     }
     
-      
     timeToNextDebugIconsUpdate = time.systemTime + stepDebugIconsUpdate;
 }
