@@ -13,7 +13,7 @@ BillboardSet@ debugIconsSetSplinesPoints;
 
 Node@ debugIconsNode = null;
 
-int stepDebugIconsUpdate = 30; //ms
+int stepDebugIconsUpdate = 40; //ms
 int timeToNextDebugIconsUpdate = 0;
 const int splinePathResolution = 16;
 bool debugIconsShow = true;
@@ -341,7 +341,22 @@ void UpdateViewDebugIcons()
                         Billboard@ bb = debugIconsSetSplinesPoints.billboards[index];
                         bb.position = splinePoint;
                         bb.size = debugIconsSizeSmall * distance;
-                        //bb.color = Color(1,1,0);
+                        
+                        if (step == 0) 
+                        {
+                            bb.color = Color(1,1,0);
+                            bb.size = debugIconsSize * distance;
+                        }
+                        else if ((step+1) >= (splinePathResolution - splineStep))
+                        {
+                            bb.color = Color(0,1,0);
+                            bb.size = debugIconsSize * distance;
+                        }
+                        else
+                        {
+                            bb.color = Color(1,1,1);
+                            bb.size = debugIconsSizeSmall * distance;
+                        }    
                         bb.enabled = sp.enabled;
                     }
                 }                                       
