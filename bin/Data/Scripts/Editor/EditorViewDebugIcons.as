@@ -25,7 +25,7 @@ const int splinePathResolution = 16;
 bool debugIconsShow = true;
 bool supressDebugIconsShow = false;
 Vector2 debugIconsSize = Vector2(0.025, 0.025);
-Vector2 debugIconsSizeSmall = debugIconsSize / 2.0;
+Vector2 debugIconsSizeSmall = debugIconsSize / 1.5;
 Vector2 debugIconsSizeBig = debugIconsSize * 1.5;
 
 
