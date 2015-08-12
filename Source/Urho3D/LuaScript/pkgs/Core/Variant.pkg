@@ -219,7 +219,7 @@ static int tolua_CoreLuaAPI_Variant__Setup00(lua_State* tolua_S)
 // The auto-generated code are almost correct, except for the tolua_isnoobj() always return false for third index,
 //   probably due to another tolua++ bug not setting the stack correctly, instead of noobj, 3rd index contains first table member
 
-// Forward declaration,
+// Forward declaration
 static int tolua_CoreLuaAPI_Variant_new00(lua_State* tolua_S);
 static int tolua_CoreLuaAPI_Variant_new00_local(lua_State* tolua_S);
 

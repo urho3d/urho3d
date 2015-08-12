@@ -141,7 +141,10 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
             if (!filtered)
                 result.rows_.Push(colValues);
             if (aborted)
+            {
+                sqlite3_finalize(pStmt);
                 break;
+            }
         }
         else if (rc != SQLITE_DONE)
             LOGERRORF("Could not execute: %s", sqlite3_errmsg(connectionImpl_));

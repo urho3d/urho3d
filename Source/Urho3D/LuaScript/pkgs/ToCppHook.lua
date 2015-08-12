@@ -101,10 +101,11 @@ function post_output_hook(package)
 #include <Urho3D/LuaScript/ToluaUtils.h>]])
     end
 
-    -- Special handling for vector to table conversion which would simply the implementation of the template functions
+    -- Special handling for vector to table conversion which would simplify the implementation of the template functions
     result = string.gsub(result, "ToluaIs(P?O?D?)Vector([^\"]-)\"c?o?n?s?t? ?P?O?D?Vector<([^*>]-)%*?>\"", "ToluaIs%1Vector%2\"%3\"")
     result = string.gsub(result, "ToluaPush(P?O?D?)Vector([^\"]-)\"c?o?n?s?t? ?P?O?D?Vector<([^*>]-)%*?>\"", "ToluaPush%1Vector%2\"%3\"")
-    result = string.gsub(result, "@([^(]+)%(", "(\"%1\",")      -- RefCounted* overload
+    result = string.gsub(result, "@1%(", "(\"\",")      -- is_pointer overload uses const char* as signature
+    result = string.gsub(result, "@2%(", "(0.f,")       -- is_arithmetic overload uses double as signature
 
     WRITE(result)
     WRITE([[
@@ -131,6 +132,21 @@ local old_get_push_function = get_push_function
 local old_get_to_function = get_to_function
 local old_get_is_function = get_is_function
 
+function is_pointer(t)
+    return t:find("*>")
+end
+
+function is_arithmetic(t)
+    for _, type in pairs({ "char", "short", "int", "unsigned", "long", "float", "double", "bool" }) do
+        if t:find(type) then return true end
+    end
+    return false
+end
+
+function overload_if_necessary(t)
+    return is_pointer(t) and "@1" or (is_arithmetic(t) and "@2" or "")
+end
+
 function get_push_function(t)
     if not urho3d_is_vector(t) then
         return old_get_push_function(t)
@@ -140,7 +156,7 @@ function get_push_function(t)
     if not urho3d_is_podvector(t) then
         return "ToluaPushVector" .. T
     else
-        return "ToluaPushPODVector" .. T .. (T:match("%*>") and "@" .. T:match("<([^*]+)%*>") or "")     -- may be overloadded
+        return "ToluaPushPODVector" .. T .. overload_if_necessary(T)
     end
 end
 
@@ -153,7 +169,7 @@ function get_to_function(t)
     if not urho3d_is_podvector(t) then
         return "ToluaToVector" .. T
     else
-        return "ToluaToPODVector" .. T
+        return "ToluaToPODVector" .. T .. overload_if_necessary(T)
     end
 end
 
@@ -166,7 +182,7 @@ function get_is_function(t)
     if not urho3d_is_podvector(t) then
         return "ToluaIsVector" .. T
     else
-        return "ToluaIsPODVector" .. T
+        return "ToluaIsPODVector" .. T .. overload_if_necessary(T)
     end
 end
 

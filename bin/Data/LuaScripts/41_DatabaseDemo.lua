@@ -108,7 +108,7 @@ function HandleDbCursor(eventType, eventData)
     row = row + 1
     eventData["Abort"] = row >= maxRows
 
-    for i, colHeader in pairs(colHeaders) do
+    for i, colHeader in ipairs(colHeaders) do
         Print("Row #" .. row .. ": " .. colHeader .. " = " .. colValues[i])
     end
 end
