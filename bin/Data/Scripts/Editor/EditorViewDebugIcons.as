@@ -8,13 +8,19 @@ BillboardSet@ debugIconsSetSoundSources;
 BillboardSet@ debugIconsSetSoundSources3D;
 BillboardSet@ debugIconsSetSoundListeners;
 BillboardSet@ debugIconsSetZones;
+BillboardSet@ debugIconsSetSplinesPoints;
+
 
 Node@ debugIconsNode = null;
 
 int stepDebugIconsUpdate = 30; //ms
 int timeToNextDebugIconsUpdate = 0;
+const int splinePathResolution = 16;
 bool debugIconsShow = true;
 Vector2 debugIconsSize = Vector2(0.025, 0.025);
+Vector2 debugIconsSizeSmall = debugIconsSize / 2.0;
+
+
 
 void CreateDebugIcons() 
 {
@@ -75,6 +81,15 @@ void CreateDebugIcons()
     debugIconsSetZones.sorted = true;
     debugIconsSetZones.temporary = true;
     debugIconsSetZones.viewMask = 0x80000000;
+    
+    debugIconsSetSplinesPoints = debugIconsNode.CreateComponent("BillboardSet");
+    debugIconsSetSplinesPoints.material = cache.GetResource("Material", "Materials/Editor/DebugIconSplinePathPoint.xml");
+    debugIconsSetSplinesPoints.material.renderOrder = 255;
+    debugIconsSetSplinesPoints.sorted = true;
+    debugIconsSetSplinesPoints.temporary = true;
+    debugIconsSetSplinesPoints.viewMask = 0x80000000;
+
+
 }
 
 void UpdateViewDebugIcons() 
@@ -90,6 +105,7 @@ void UpdateViewDebugIcons()
         debugIconsNode = editorScene.CreateChild("DebugIconsContainer", LOCAL);
         debugIconsNode.temporary = true;
     } 
+    
     
     // Checkout if debugIconsNode do not have any BBS component, add they at once
     BillboardSet@ bbs = debugIconsNode.GetComponent("BillboardSet");
@@ -294,6 +310,47 @@ void UpdateViewDebugIcons()
             debugIconsSetZones.Commit();
         }
     }
+    
+    if (debugIconsSetSplinesPoints !is null) 
+    {
+        debugIconsSetSplinesPoints.enabled = debugIconsShow;
+
+        // Collect all scene's SplinePath and add it
+        Array<Node@> nodes = editorScene.GetChildrenWithComponent("SplinePath", true);
+        
+        if (nodes.length > 0) 
+        {
+            debugIconsSetSplinesPoints.numBillboards = nodes.length * splinePathResolution;
+            
+            float splineStep = 1.0f / splinePathResolution;
+                                    
+            for(int i=0; i < nodes.length; i++) 
+            {
+                
+                SplinePath@ sp = nodes[i].GetComponent("SplinePath");
+                if(sp !is null) 
+                {
+                    Vector3 splinePoint;
+                    // Create path
+                    for(int step=0; step < splinePathResolution; step++) 
+                    {
+                        splinePoint = sp.GetPoint(splineStep * step);
+                        
+                        float distance = (camPos - splinePoint).length;
+                        int index = (i * splinePathResolution) + step;    
+                        Billboard@ bb = debugIconsSetSplinesPoints.billboards[index];
+                        bb.position = splinePoint;
+                        bb.size = debugIconsSizeSmall * distance;
+                        //bb.color = Color(1,1,0);
+                        bb.enabled = sp.enabled;
+                    }
+                }                                       
+            }
+            
+            debugIconsSetSplinesPoints.Commit();   
+        }
+    }
+    
       
     timeToNextDebugIconsUpdate = time.systemTime + stepDebugIconsUpdate;
 }
