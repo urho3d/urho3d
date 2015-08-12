@@ -1136,6 +1136,8 @@ bool GetExtensionType(String path, StringHash &out fileType)
     StringHash type = StringHash(GetExtension(path));
     if (type == EXTENSION_TYPE_TTF)
         fileType = EXTENSION_TYPE_TTF;
+    else if (type == EXTENSION_TYPE_OTF)
+        fileType = EXTENSION_TYPE_OTF;
     else if (type == EXTENSION_TYPE_OGG)
         fileType = EXTENSION_TYPE_OGG;
     else if(type == EXTENSION_TYPE_WAV)
