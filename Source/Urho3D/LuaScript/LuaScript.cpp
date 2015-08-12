@@ -60,6 +60,9 @@ extern int tolua_NavigationLuaAPI_open(lua_State*);
 #ifdef URHO3D_NETWORK
 extern int tolua_NetworkLuaAPI_open(lua_State*);
 #endif
+#ifdef URHO3D_DATABASE
+extern int tolua_DatabaseLuaAPI_open(lua_State*);
+#endif
 #ifdef URHO3D_PHYSICS
 extern int tolua_PhysicsLuaAPI_open(lua_State*);
 #endif
@@ -105,25 +108,22 @@ LuaScript::LuaScript(Context* context) :
     tolua_EngineLuaAPI_open(luaState_);
     tolua_GraphicsLuaAPI_open(luaState_);
     tolua_InputLuaAPI_open(luaState_);
-
 #ifdef URHO3D_NAVIGATION
     tolua_NavigationLuaAPI_open(luaState_);
 #endif
-
 #ifdef URHO3D_NETWORK
     tolua_NetworkLuaAPI_open(luaState_);
 #endif
-
+#ifdef URHO3D_DATABASE
+    tolua_DatabaseLuaAPI_open(luaState_);
+#endif
 #ifdef URHO3D_PHYSICS
     tolua_PhysicsLuaAPI_open(luaState_);
 #endif
-
     tolua_UILuaAPI_open(luaState_);
-
 #ifdef URHO3D_URHO2D
     tolua_Urho2DLuaAPI_open(luaState_);
 #endif
-
     tolua_LuaScriptLuaAPI_open(luaState_);
 
     eventInvoker_ = new LuaScriptEventInvoker(context_);

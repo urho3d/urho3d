@@ -43,6 +43,15 @@ void UpdateEditorSettingsDialog()
     DropDownList@ mouseOrbitEdit = settingsDialog.GetChild("MouseOrbitEdit", true);
     mouseOrbitEdit.selection = mouseOrbitMode;
 
+    CheckBox@ middleMousePanToggle = settingsDialog.GetChild("MiddleMousePanToggle", true);
+    middleMousePanToggle.checked = mmbPanMode;
+
+    DropDownList@ hotKeysModeEdit = settingsDialog.GetChild("HotKeysModeEdit", true);
+    hotKeysModeEdit.selection = hotKeyMode;
+
+    DropDownList@ newNodeModeEdit = settingsDialog.GetChild("NewNodeModeEdit", true);
+    newNodeModeEdit.selection = newNodeMode;
+
     LineEdit@ distanceEdit = settingsDialog.GetChild("DistanceEdit", true);
     distanceEdit.text = String(newNodeDistance);
 
@@ -114,7 +123,10 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(speedEdit, "TextFinished", "EditCameraSpeed");
         SubscribeToEvent(limitRotationToggle, "Toggled", "EditLimitRotation");
         SubscribeToEvent(mouseWheelCameraPositionToggle, "Toggled", "EditMouseWheelCameraPosition");
+        SubscribeToEvent(middleMousePanToggle, "Toggled", "EditMiddleMousePan");
         SubscribeToEvent(mouseOrbitEdit, "ItemSelected", "EditMouseOrbitMode");
+        SubscribeToEvent(hotKeysModeEdit, "ItemSelected", "EditHotKeyMode");
+        SubscribeToEvent(newNodeModeEdit, "ItemSelected", "EditNewNodeMode");
         SubscribeToEvent(distanceEdit, "TextChanged", "EditNewNodeDistance");
         SubscribeToEvent(distanceEdit, "TextFinished", "EditNewNodeDistance");
         SubscribeToEvent(moveStepEdit, "TextChanged", "EditMoveStep");
@@ -211,6 +223,25 @@ void EditMouseOrbitMode(StringHash eventType, VariantMap& eventData)
 {
     DropDownList@ edit = eventData["Element"].GetPtr();
     mouseOrbitMode = edit.selection;
+}
+
+void EditMiddleMousePan(StringHash eventType, VariantMap& eventData)
+{
+    mmbPanMode = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
+}
+
+void EditHotKeyMode(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList@ edit = eventData["Element"].GetPtr();
+    hotKeyMode = edit.selection;
+    MessageBox("Please, restart Urho editor for applying changes.\n", " Notify ");
+    
+}
+
+void EditNewNodeMode(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList@ edit = eventData["Element"].GetPtr();
+    newNodeMode = edit.selection;
 }
 
 void EditNewNodeDistance(StringHash eventType, VariantMap& eventData)

@@ -91,7 +91,7 @@ function MoveSprites(timeStep)
 end
 
 function HandleUpdate(eventType, eventData)
-    local timeStep = eventData:GetFloat("TimeStep")
+    local timeStep = eventData["TimeStep"]:GetFloat()
 
     MoveSprites(timeStep)
 end

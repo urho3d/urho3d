@@ -405,7 +405,8 @@ void UI::RenderUpdate()
     vertexData_.Clear();
     const IntVector2& rootSize = rootElement_->GetSize();
     IntRect currentScissor = IntRect(0, 0, rootSize.x_, rootSize.y_);
-    GetBatches(rootElement_, currentScissor);
+    if (rootElement_->IsVisible())
+        GetBatches(rootElement_, currentScissor);
 
     // Save the batch size of the non-modal batches for later use
     nonModalBatchSize_ = batches_.Size();

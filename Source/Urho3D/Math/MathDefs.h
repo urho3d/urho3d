@@ -62,6 +62,9 @@ inline bool Equals(float lhs, float rhs) { return lhs + M_EPSILON >= rhs && lhs 
 /// Linear interpolation between two float values.
 inline float Lerp(float lhs, float rhs, float t) { return lhs * (1.0f - t) + rhs * t; }
 
+/// Linear interpolation between two double values.
+inline double Lerp(double lhs, double rhs, float t) { return lhs * (1.0f - t) + rhs * t; }
+
 /// Return the smaller of two floats.
 inline float Min(float lhs, float rhs) { return lhs < rhs ? lhs : rhs; }
 
@@ -196,5 +199,48 @@ inline int Random(int min, int max) { return (Rand() * (max - min - 1) + 16384) 
 
 /// Return a random normal distributed number with the given mean value and variance.
 inline float RandomNormal(float meanValue, float variance) { return RandStandardNormal() * sqrtf(variance) + meanValue; }
+
+/// Convert float to half float. From https://gist.github.com/martinkallman/5049614
+inline unsigned short FloatToHalf(float value)
+{
+    unsigned inu = *((unsigned*)&value);
+    unsigned t1 = inu & 0x7fffffff;         // Non-sign bits
+    unsigned t2 = inu & 0x80000000;         // Sign bit
+    unsigned t3 = inu & 0x7f800000;         // Exponent
+
+    t1 >>= 13;                              // Align mantissa on MSB
+    t2 >>= 16;                              // Shift sign bit into position
+
+    t1 -= 0x1c000;                          // Adjust bias
+
+    t1 = (t3 < 0x38800000) ? 0 : t1;        // Flush-to-zero
+    t1 = (t3 > 0x47000000) ? 0x7bff : t1;   // Clamp-to-max
+    t1 = (t3 == 0 ? 0 : t1);                // Denormals-as-zero
+
+    t1 |= t2;                               // Re-insert sign bit
+
+    return (unsigned short)t1;
+}
+
+/// Convert half float to float. From https://gist.github.com/martinkallman/5049614
+inline float HalfToFloat(unsigned short value)
+{
+    unsigned t1 = value & 0x7fff;           // Non-sign bits
+    unsigned t2 = value & 0x8000;           // Sign bit
+    unsigned t3 = value & 0x7c00;           // Exponent
+
+    t1 <<= 13;                              // Align mantissa on MSB
+    t2 <<= 16;                              // Shift sign bit into position
+
+    t1 += 0x38000000;                       // Adjust bias
+
+    t1 = (t3 == 0 ? 0 : t1);                // Denormals-as-zero
+
+    t1 |= t2;                               // Re-insert sign bit
+
+    float out;
+    *((unsigned*)&out) = t1;
+    return out;
+}
 
 }

@@ -65,7 +65,7 @@ void ValueAnimation::RegisterObject(Context* context)
     context->RegisterFactory<ValueAnimation>();
 }
 
-bool ValueAnimation::Load(Deserializer& source)
+bool ValueAnimation::BeginLoad(Deserializer& source)
 {
     XMLFile xmlFile(context_);
     if (!xmlFile.Load(source))

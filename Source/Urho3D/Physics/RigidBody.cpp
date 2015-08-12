@@ -77,7 +77,6 @@ RigidBody::RigidBody(Context* context) :
     kinematic_(false),
     trigger_(false),
     useGravity_(true),
-    hasSmoothedTransform_(false),
     readdBody_(false),
     inWorld_(false),
     enableMassUpdate_(true)
@@ -714,14 +713,10 @@ void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quate
     physicsWorld_->SetApplyingTransforms(true);
 
     // Apply transform to the SmoothedTransform component instead of node transform if available
-    SmoothedTransform* transform = 0;
-    if (hasSmoothedTransform_)
-        transform = GetComponent<SmoothedTransform>();
-
-    if (transform)
+    if (smoothedTransform_)
     {
-        transform->SetTargetWorldPosition(newWorldPosition);
-        transform->SetTargetWorldRotation(newWorldRotation);
+        smoothedTransform_->SetTargetWorldPosition(newWorldPosition);
+        smoothedTransform_->SetTargetWorldRotation(newWorldRotation);
         lastPosition_ = newWorldPosition;
         lastRotation_ = newWorldRotation;
     }
@@ -885,7 +880,7 @@ void RigidBody::OnMarkedDirty(Node* node)
     // is in use, because in that case the node transform will be constantly updated into smoothed, possibly non-physical
     // states; rather follow the SmoothedTransform target transform directly
     // Also, for kinematic objects Bullet asks the position from us, so we do not need to apply ourselves
-    if (!kinematic_ && (!physicsWorld_ || !physicsWorld_->IsApplyingTransforms()) && !hasSmoothedTransform_)
+    if (!kinematic_ && (!physicsWorld_ || !physicsWorld_->IsApplyingTransforms()) && !smoothedTransform_)
     {
         // Physics operations are not safe from worker threads
         Scene* scene = GetScene();
@@ -960,12 +955,11 @@ void RigidBody::AddBodyToWorld()
 
         // Check for existence of the SmoothedTransform component, which should be created by now in network client mode.
         // If it exists, subscribe to its change events
-        SmoothedTransform* transform = GetComponent<SmoothedTransform>();
-        if (transform)
+        smoothedTransform_ = GetComponent<SmoothedTransform>();
+        if (smoothedTransform_)
         {
-            hasSmoothedTransform_ = true;
-            SubscribeToEvent(transform, E_TARGETPOSITION, HANDLER(RigidBody, HandleTargetPosition));
-            SubscribeToEvent(transform, E_TARGETROTATION, HANDLER(RigidBody, HandleTargetRotation));
+            SubscribeToEvent(smoothedTransform_, E_TARGETPOSITION, HANDLER(RigidBody, HandleTargetPosition));
+            SubscribeToEvent(smoothedTransform_, E_TARGETROTATION, HANDLER(RigidBody, HandleTargetRotation));
         }
 
         // Check if CollisionShapes already exist in the node and add them to the compound shape.

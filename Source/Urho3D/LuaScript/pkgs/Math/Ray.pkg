@@ -7,24 +7,24 @@ class Ray
     Ray(const Ray& ray);
     ~Ray();
 
-    bool operator == (const Ray& rhs) const;
-    
+    bool operator ==(const Ray& rhs) const;
+
     void Define(const Vector3& origin, const Vector3& direction);
-    
+
     Vector3 Project(const Vector3& point) const;
     float Distance(const Vector3& point) const;
     Vector3 ClosestPoint(const Ray& ray) const;
-    
+
     float HitDistance(const Plane& plane) const;
     float HitDistance(const BoundingBox& box) const;
-    
+
     float HitDistance(const Frustum& frustum, bool solidInside = true) const;
-    
+
     float HitDistance(const Sphere& sphere) const;
     float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
-    
+
     Ray Transformed(const Matrix3x4& transform) const;
-    
+
     Vector3 origin_ @ origin;
     Vector3 direction_ @ direction;
 };

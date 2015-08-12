@@ -123,6 +123,7 @@ void CreateToolBarIcon(UIElement@ element)
     icon.defaultStyle = iconStyle;
     icon.style = element.name;
     icon.SetFixedSize(30, 30);
+    icon.blendMode = BLEND_ALPHA;
     element.AddChild(icon);
 }
 
@@ -168,6 +169,7 @@ UIElement@ CreateToolTip(UIElement@ parent, const String&in title, const IntVect
 
     Text@ toolTipText = textHolder.CreateChild("Text");
     toolTipText.SetStyle("ToolTipText");
+    toolTipText.autoLocalizable = true;
     toolTipText.text = title;
 
     return toolTip;

@@ -11,11 +11,11 @@ class Matrix4
             float v30, float v31, float v32, float v33);
     ~Matrix4();
 
-    bool operator == (const Matrix4& rhs) const;
+    bool operator ==(const Matrix4& rhs) const;
 
     Vector3 operator * (const Vector3& rhs) const;
     Vector4 operator * (const Vector4& rhs) const;
-    
+
     Matrix4 operator + (const Matrix4& rhs) const;
     Matrix4 operator - (const Matrix4& rhs) const;
 
@@ -27,21 +27,21 @@ class Matrix4
     void SetRotation(const Matrix3& rotation);
     void SetScale(const Vector3& scale);
     void SetScale(float scale);
-    
+
     Matrix3 ToMatrix3() const;
     Matrix3 RotationMatrix() const;
     Vector3 Translation() const;
     Quaternion Rotation() const;
     Vector3 Scale() const;
     Matrix4 Transpose() const;
-    
+
     bool Equals(const Matrix4& rhs) const;
     void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
-    
+
     Matrix4 Inverse() const;
-    
+
     String ToString() const;
-    
+
     float m00_ @ m00;
     float m01_ @ m01;
     float m02_ @ m02;
@@ -58,7 +58,7 @@ class Matrix4
     float m31_ @ m31;
     float m32_ @ m32;
     float m33_ @ m33;
-    
+
     static const Matrix4 ZERO;
     static const Matrix4 IDENTITY;
 };

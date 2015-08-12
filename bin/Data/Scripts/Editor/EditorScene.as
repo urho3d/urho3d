@@ -37,6 +37,8 @@ uint undoStackPos = 0;
 bool revertOnPause = false;
 XMLFile@ revertData;
 
+Vector3 lastOffsetForSmartDuplicate;
+
 void ClearSceneSelection()
 {
     selectedNodes.Clear();
@@ -293,8 +295,7 @@ Node@ CreateNode(CreateMode mode)
         newNode = editNode.CreateChild("", mode);
     else
         newNode = editorScene.CreateChild("", mode);
-    // Set the new node a certain distance from the camera
-    newNode.position = GetNewNodePosition();
+    newNode.worldPosition = GetNewNodePosition();
 
     // Create an undo action for the create
     CreateNodeAction action;
@@ -517,6 +518,11 @@ bool ToggleSceneUpdate()
     else
         StopSceneUpdate();
     return true;
+}
+
+bool ShowLayerMover()
+{
+  return ShowLayerEditor();
 }
 
 void SetSceneModified()
@@ -767,6 +773,131 @@ bool SceneUnparent()
     return true;
 }
 
+bool NodesParentToLastSelected()
+{
+    if (lastSelectedNode.Get() is null)
+        return false;
+        
+    if (!CheckHierarchyWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
+        return false;
+
+    ui.cursor.shape = CS_BUSY;
+
+    // Group for storing undo actions
+    EditActionGroup group;
+
+    // Parent selected nodes to root
+    Array<Node@> changedNodes;
+    
+    // Find new parent node it selected last
+    Node@ lastNode = lastSelectedNode.Get(); //GetListNode(hierarchyList.selection);
+    
+    for (uint i = 0; i < selectedNodes.length; ++i)
+    {
+        
+        Node@ sourceNode = selectedNodes[i];
+        if ( sourceNode.id == lastNode.id)
+            continue; // Skip last node it is parent
+        
+        if (sourceNode.parent.id == lastNode.id)
+            continue; // Root or already parented to root
+
+        // Perform the reparenting, continue loop even if action fails
+        ReparentNodeAction action;
+        action.Define(sourceNode, lastNode);
+        group.actions.Push(action);
+
+        SceneChangeParent(sourceNode, lastNode, false);
+        changedNodes.Push(sourceNode);
+    }
+
+    // Reselect the changed nodes at their new position in the list
+    for (uint i = 0; i < changedNodes.length; ++i)
+        hierarchyList.AddSelection(GetListIndex(changedNodes[i]));
+
+    SaveEditActionGroup(group);
+    SetSceneModified();
+
+    return true;
+}
+
+bool SceneSmartDuplicateNode() 
+{       
+    const float minOffset = 0.1;
+    
+    if (!CheckHierarchyWindowFocus() || !selectedComponents.empty 
+        || selectedNodes.empty || lastSelectedNode.Get() is null)
+        return false;
+    
+    
+    Node@ node = lastSelectedNode.Get();
+    Node@ parent = node.parent;
+    Vector3 offset = Vector3(1,0,0); // default offset
+    
+    if (parent is editorScene) // if parent of selected node is Scene make empty parent for it and place in same position; 
+    {
+        parent = CreateNode(LOCAL);
+        SceneChangeParent(parent, editorScene, false);
+        parent.worldPosition = node.worldPosition;
+        parent.name = node.name + "Group";
+        node.name = parent.name + "Instance" + String(parent.numChildren);
+        SceneChangeParent(node, parent, false);
+        parent = node.parent;
+        SelectNode(node, false);
+    } 
+    
+    Vector3 size;
+    BoundingBox bb;
+    
+    // get bb for offset  
+    Drawable@ drawable = GetFirstDrawable(node);
+    if (drawable !is null) 
+    {
+        bb = drawable.boundingBox;
+        size =  bb.size * drawable.node.worldScale;
+        offset = Vector3(size.x, 0, 0); 
+    } 
+    
+    // make offset on axis that select user by mouse
+    if (gizmoAxisX.selected)
+    {
+        if (size.x < minOffset) size.x = minOffset;
+        offset = node.worldRotation * Vector3(size.x,0,0);
+    }
+    else if (gizmoAxisY.selected)
+    {
+        if (size.y < minOffset) size.y = minOffset;
+        offset = node.worldRotation * Vector3(0,size.y,0);
+    }
+    else if (gizmoAxisZ.selected)
+    {
+        if (size.z < minOffset) size.z = minOffset;
+        offset = node.worldRotation * Vector3(0,0,size.z);
+    }
+    else
+        offset = lastOffsetForSmartDuplicate;    
+    
+    Vector3 lastInstancePosition = node.worldPosition;
+    
+    SelectNode(node, false);
+    SceneDuplicate();
+    Node@ newInstance = parent.children[parent.numChildren-1];
+    SelectNode(newInstance, false);
+    newInstance.worldPosition = lastInstancePosition;
+    newInstance.Translate(offset, TS_WORLD);
+    newInstance.name = parent.name + "Instance" + String(parent.numChildren-1);
+    
+    lastOffsetForSmartDuplicate = offset;
+    UpdateNodeAttributes();
+    return true;
+}
+
+bool ViewCloser()
+{
+    return (viewCloser = true);
+}
+
+
 bool SceneToggleEnable()
 {
     if (!CheckHierarchyWindowFocus())
@@ -803,6 +934,60 @@ bool SceneToggleEnable()
             // Create undo action
             EditAttributeAction action;
             action.Define(selectedComponents[i], 0, Variant(oldEnabled));
+            group.actions.Push(action);
+        }
+    }
+
+    SaveEditActionGroup(group);
+    SetSceneModified();
+
+    return true;
+}
+
+bool SceneEnableAllNodes()
+{
+    if (!CheckHierarchyWindowFocus())
+        return false;
+
+    ui.cursor.shape = CS_BUSY;
+
+    EditActionGroup group;
+
+    // Toggle enabled state of nodes recursively
+    Array<Node@> allNodes;
+    allNodes = editorScene.GetChildren(true);
+    
+    for (uint i = 0; i < allNodes.length; ++i)
+    {
+        // Do not attempt to disable the Scene
+        if (allNodes[i].typeName == "Node")
+        {
+            bool oldEnabled = allNodes[i].enabled;
+            if (oldEnabled == false)
+              allNodes[i].SetEnabledRecursive(true);
+
+            // Create undo action
+            ToggleNodeEnabledAction action;
+            action.Define(allNodes[i], oldEnabled);
+            group.actions.Push(action);
+        }
+    }
+    
+    Array<Component@> allComponents;
+    allComponents = editorScene.GetComponents();
+    
+    for (uint i = 0; i < allComponents.length; ++i)
+    {
+        // Some components purposefully do not expose the Enabled attribute, and it does not affect them in any way
+        // (Octree, PhysicsWorld). Check that the first attribute is in fact called "Is Enabled"
+        if (allComponents[i].numAttributes > 0 && allComponents[i].attributeInfos[0].name == "Is Enabled")
+        {
+            bool oldEnabled = allComponents[i].enabled;
+            allComponents[i].enabled = true;
+
+            // Create undo action
+            EditAttributeAction action;
+            action.Define(allComponents[i], 0, Variant(oldEnabled));
             group.actions.Push(action);
         }
     }
@@ -1037,10 +1222,50 @@ bool SceneAddChildrenStaticModelGroup()
         smg.AddInstanceNode(children[i]);
 
     EditAttributeAction action;
-    action.Define(smg, attrIndex, oldValue);;
+    action.Define(smg, attrIndex, oldValue);
     SaveEditAction(action);
     SetSceneModified();
     FocusComponent(smg);
+    
+    return true;
+}
+
+bool SceneSetChildrenSplinePath(bool makeCycle)
+{
+    SplinePath@ sp = cast<SplinePath>(editComponents.length > 0 ? editComponents[0] : null);
+    if (sp is null && editNode !is null)
+        sp = editNode.GetComponent("SplinePath");
+
+    if (sp is null)
+    {
+        MessageBox("Must have a SplinePath component selected.");
+        return false;
+    }
+
+    uint attrIndex = GetAttributeIndex(sp, "Control Points");
+    Variant oldValue = sp.attributes[attrIndex];
+
+    Array<Node@> children = sp.node.GetChildren(true);
+    if (children.length >= 2)
+    {
+        sp.ClearControlPoints();
+        for (uint i = 0; i < children.length; ++i)
+            sp.AddControlPoint(children[i]);
+    }
+    else
+    {
+        MessageBox("You must have a minimum two children Nodes in selected Node.");
+        return false;
+    }
+
+    if (makeCycle)
+        sp.AddControlPoint(children[0]);
+
+    EditAttributeAction action;
+    action.Define(sp, attrIndex, oldValue);
+    SaveEditAction(action);
+    SetSceneModified();
+    FocusComponent(sp);
     
     return true;
 }
@@ -1146,3 +1371,104 @@ void CreateModelWithAnimatedModel(String filepath, Node@ parent)
     animatedModel.model = model;
     CreateLoadedComponent(animatedModel);
 }
+
+bool ColorWheelSetupBehaviorForColoring()
+{    
+    Menu@ menu = GetEventSender();
+    if (menu is null)
+        return false;
+    
+    coloringPropertyName = menu.name;
+    
+    if (coloringPropertyName == "menuCancel") return false;
+    
+    if (coloringComponent.typeName == "Light") 
+    {
+        Light@ light = cast<Light>(coloringComponent);
+        if (light !is null) 
+        {          
+            if (coloringPropertyName == "menuLightColor")
+            {
+                coloringOldColor = light.color;
+                ShowColorWheelWithColor(coloringOldColor);
+            }
+            else if (coloringPropertyName == "menuSpecularIntensity")
+            {
+               // ColorWheel have only 0-1 range output of V-value(BW), and for huge-range values we devide in and multiply out 
+               float scaledSpecular = light.specularIntensity * 0.1f; 
+               coloringOldScalar = scaledSpecular;
+               ShowColorWheelWithColor(Color(scaledSpecular,scaledSpecular,scaledSpecular));
+
+            }
+            else if (coloringPropertyName == "menuBrightnessMultiplier")
+            { 
+               float scaledBrightness = light.brightness * 0.1f;
+               coloringOldScalar = scaledBrightness;
+               ShowColorWheelWithColor(Color(scaledBrightness,scaledBrightness,scaledBrightness));
+            }   
+        }      
+    }
+    else if (coloringComponent.typeName == "StaticModel") 
+    {
+        StaticModel@ model  = cast<StaticModel>(coloringComponent);
+        if (model !is null) 
+        {            
+            Material@ mat = model.materials[0];
+            if (mat !is null) 
+            { 
+                if (coloringPropertyName == "menuDiffuseColor")
+                {
+                    Variant oldValue = mat.shaderParameters["MatDiffColor"];
+                    Array<String> values = oldValue.ToString().Split(' ');
+                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat(),values[3].ToFloat()); //RGBA
+                    ShowColorWheelWithColor(coloringOldColor);
+                }
+                else if (coloringPropertyName == "menuSpecularColor")
+                {
+                    Variant oldValue = mat.shaderParameters["MatSpecColor"];
+                    Array<String> values = oldValue.ToString().Split(' ');
+                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat());
+                    coloringOldScalar = values[3].ToFloat();
+                    ShowColorWheelWithColor(Color(coloringOldColor.r, coloringOldColor.g, coloringOldColor.b, coloringOldScalar/128.0f)); //RGB + shine
+                }
+                else if (coloringPropertyName == "menuEmissiveColor")
+                {
+                    Variant oldValue = mat.shaderParameters["MatEmissiveColor"];
+                    Array<String> values = oldValue.ToString().Split(' ');
+                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat()); // RGB
+                    
+                    
+                    ShowColorWheelWithColor(coloringOldColor);
+                }
+                else if (coloringPropertyName == "menuEnvironmentMapColor")
+                {   
+                    Variant oldValue = mat.shaderParameters["MatEnvMapColor"];
+                    Array<String> values = oldValue.ToString().Split(' ');
+                    coloringOldColor = Color(values[0].ToFloat(),values[1].ToFloat(),values[2].ToFloat()); //RGB
+                    
+                    ShowColorWheelWithColor(coloringOldColor);
+                }      
+            }
+        }
+    }
+    else if (coloringComponent.typeName == "Zone") 
+    {
+        Zone@ zone  = cast<Zone>(coloringComponent);
+        if (zone !is null) 
+        {
+            if (coloringPropertyName == "menuAmbientColor")
+            {
+                coloringOldColor = zone.ambientColor;
+            }
+            else if (coloringPropertyName == "menuFogColor") 
+            {
+                coloringOldColor = zone.fogColor;
+            }
+            
+            ShowColorWheelWithColor(coloringOldColor);
+        }
+    }
+          
+    return true;
+}
+

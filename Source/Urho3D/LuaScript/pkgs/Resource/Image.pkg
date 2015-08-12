@@ -51,6 +51,9 @@ class Image : public Resource
     CompressedFormat GetCompressedFormat() const;
     unsigned GetNumCompressedLevels() const;
     Image* GetSubimage(const IntRect& rect) const;
+    bool IsCubemap() const;
+    bool IsArray() const;
+    bool IsSRGB() const;
 
     tolua_readonly tolua_property__get_set int width;
     tolua_readonly tolua_property__get_set int height;
@@ -59,6 +62,9 @@ class Image : public Resource
     tolua_readonly tolua_property__is_set bool compressed;
     tolua_readonly tolua_property__get_set CompressedFormat compressedFormat;
     tolua_readonly tolua_property__get_set unsigned numCompressedLevels;
+    tolua_readonly tolua_property__is_set bool cubemap;
+    tolua_readonly tolua_property__is_set bool array;
+    tolua_readonly tolua_property__is_set bool sRGB;
 };
 
 ${

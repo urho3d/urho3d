@@ -89,6 +89,8 @@ Terrain::Terrain(Context* context) :
     patchSize_(DEFAULT_PATCH_SIZE),
     lastPatchSize_(0),
     numLodLevels_(1),
+    maxLodLevels_(MAX_LOD_LEVELS),
+    occlusionLodLevel_(M_MAX_UNSIGNED),
     smoothing_(false),
     visible_(true),
     castShadows_(false),
@@ -122,6 +124,7 @@ void Terrain::RegisterObject(Context* context)
         AM_DEFAULT);
     ATTRIBUTE("Vertex Spacing", Vector3, spacing_, DEFAULT_SPACING, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Patch Size", GetPatchSize, SetPatchSizeAttr, int, DEFAULT_PATCH_SIZE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Max LOD Levels", GetMaxLodLevels, SetMaxLodLevelsAttr, unsigned, MAX_LOD_LEVELS, AM_DEFAULT);
     ATTRIBUTE("Smooth Height Map", bool, smoothing_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Is Occluder", IsOccluder, SetOccluder, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
@@ -134,6 +137,7 @@ void Terrain::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Light Mask", GetLightMask, SetLightMask, unsigned, DEFAULT_LIGHTMASK, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Shadow Mask", GetShadowMask, SetShadowMask, unsigned, DEFAULT_SHADOWMASK, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
 }
 
 void Terrain::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -182,6 +186,31 @@ void Terrain::SetSpacing(const Vector3& spacing)
     {
         spacing_ = spacing;
 
+        CreateGeometry();
+        MarkNetworkUpdate();
+    }
+}
+
+void Terrain::SetMaxLodLevels(unsigned levels)
+{
+    levels = Clamp((int)levels, 1, MAX_LOD_LEVELS);
+    if (levels != maxLodLevels_)
+    {
+        maxLodLevels_ = levels;
+        lastPatchSize_ = 0; // Force full recreate
+        
+        CreateGeometry();
+        MarkNetworkUpdate();
+    }
+}
+
+void Terrain::SetOcclusionLodLevel(unsigned level)
+{
+    if (level != occlusionLodLevel_)
+    {
+        occlusionLodLevel_ = level;
+        lastPatchSize_ = 0; // Force full recreate
+        
         CreateGeometry();
         MarkNetworkUpdate();
     }
@@ -468,21 +497,29 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
     VertexBuffer* vertexBuffer = patch->GetVertexBuffer();
     Geometry* geometry = patch->GetGeometry();
     Geometry* maxLodGeometry = patch->GetMaxLodGeometry();
-    Geometry* minLodGeometry = patch->GetMinLodGeometry();
+    Geometry* occlusionGeometry = patch->GetOcclusionGeometry();
 
     if (vertexBuffer->GetVertexCount() != row * row)
         vertexBuffer->SetSize(row * row, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
 
     SharedArrayPtr<unsigned char> cpuVertexData(new unsigned char[row * row * sizeof(Vector3)]);
+    SharedArrayPtr<unsigned char> occlusionCpuVertexData(new unsigned char[row * row * sizeof(Vector3)]);
 
     float* vertexData = (float*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
     float* positionData = (float*)cpuVertexData.Get();
+    float* occlusionData = (float*)occlusionCpuVertexData.Get();
     BoundingBox box;
+
+    unsigned occlusionLevel = occlusionLodLevel_;
+    if (occlusionLevel > numLodLevels_ - 1)
+        occlusionLevel = numLodLevels_ - 1;
 
     if (vertexData)
     {
         const IntVector2& coords = patch->GetCoordinates();
-
+        int lodExpand = (1 << (occlusionLevel)) - 1;
+        int halfLodExpand = (1 << (occlusionLevel)) / 2;
+        
         for (int z = 0; z <= patchSize_; ++z)
         {
             for (int x = 0; x <= patchSize_; ++x)
@@ -500,6 +537,25 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
                 *positionData++ = position.z_;
 
                 box.Merge(position);
+                
+                // For vertices that are part of the occlusion LOD, calculate the minimum height in the neighborhood
+                // to prevent false positive occlusion due to inaccuracy between occlusion LOD & visible LOD
+                float minHeight = position.y_;
+                if (halfLodExpand > 0 && (x & lodExpand) == 0 && (z & lodExpand) == 0)
+                {
+                    int minX = Max(xPos - halfLodExpand, 0);
+                    int maxX = Min(xPos + halfLodExpand, numVertices_.x_ - 1);
+                    int minZ = Max(zPos - halfLodExpand, 0);
+                    int maxZ = Min(zPos + halfLodExpand, numVertices_.y_ - 1);
+                    for (int nZ = minZ; nZ <= maxZ; ++nZ)
+                    {
+                        for (int nX = minX; nX <= maxX; ++nX)
+                            minHeight = Min(minHeight, GetRawHeight(nX, nZ));
+                    }
+                }
+                *occlusionData++ = position.x_;
+                *occlusionData++ = minHeight;
+                *occlusionData++ = position.z_;
 
                 // Normal
                 Vector3 normal = GetRawNormal(xPos, zPos);
@@ -529,7 +585,7 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 
     if (drawRanges_.Size())
     {
-        unsigned lastDrawRange = drawRanges_.Size() - 1;
+        unsigned occlusionDrawRange = occlusionLevel << 4;
 
         geometry->SetIndexBuffer(indexBuffer_);
         geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
@@ -537,13 +593,11 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
         maxLodGeometry->SetIndexBuffer(indexBuffer_);
         maxLodGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
         maxLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
-        minLodGeometry->SetIndexBuffer(indexBuffer_);
-        minLodGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[lastDrawRange].first_, drawRanges_[lastDrawRange].second_, false);
-        minLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
+        occlusionGeometry->SetIndexBuffer(indexBuffer_);
+        occlusionGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[occlusionDrawRange].first_, drawRanges_[occlusionDrawRange].second_, false);
+        occlusionGeometry->SetRawVertexData(occlusionCpuVertexData, sizeof(Vector3), MASK_POSITION);
     }
 
-    // Offset the occlusion geometry by vertex spacing to reduce possibility of over-aggressive occlusion
-    patch->SetOcclusionOffset(-0.5f * (spacing_.x_ + spacing_.z_));
     patch->ResetLod();
 }
 
@@ -600,6 +654,28 @@ void Terrain::SetPatchSizeAttr(int value)
     }
 }
 
+void Terrain::SetMaxLodLevelsAttr(unsigned value)
+{
+    value = Clamp((int)value, 1, MAX_LOD_LEVELS);
+    
+    if (value != maxLodLevels_)
+    {
+        maxLodLevels_ = value;
+        lastPatchSize_ = 0; // Force full recreate
+        recreateTerrain_ = true;
+    }
+}
+
+void Terrain::SetOcclusionLodLevelAttr(unsigned value)
+{
+    if (value != occlusionLodLevel_)
+    {
+        occlusionLodLevel_ = value;
+        lastPatchSize_ = 0; // Force full recreate
+        recreateTerrain_ = true;
+    }
+}
+
 ResourceRef Terrain::GetMaterialAttr() const
 {
     return GetResourceRef(material_, Material::GetTypeStatic());
@@ -624,7 +700,7 @@ void Terrain::CreateGeometry()
     // Determine number of LOD levels
     unsigned lodSize = (unsigned)patchSize_;
     numLodLevels_ = 1;
-    while (lodSize > MIN_PATCH_SIZE && numLodLevels_ < MAX_LOD_LEVELS)
+    while (lodSize > MIN_PATCH_SIZE && numLodLevels_ < maxLodLevels_)
     {
         lodSize >>= 1;
         ++numLodLevels_;

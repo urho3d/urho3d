@@ -12,39 +12,39 @@ class Matrix3x4
     Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale);
     Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale);
     ~Matrix3x4();
-    
-    bool operator == (const Matrix3x4& rhs) const;
-    
+
+    bool operator ==(const Matrix3x4& rhs) const;
+
     Vector3 operator * (const Vector3& rhs) const;
     Vector3 operator * (const Vector4& rhs) const;
-    
+
     Matrix3x4 operator + (const Matrix3x4& rhs) const;
     Matrix3x4 operator - (const Matrix3x4& rhs) const;
-    
+
     Matrix3x4 operator * (float rhs) const;
     Matrix3x4 operator * (const Matrix3x4& rhs) const;
     Matrix4 operator * (const Matrix4& rhs) const;
-    
+
     void SetTranslation(const Vector3& translation);
     void SetRotation(const Matrix3& rotation);
     void SetScale(const Vector3& scale);
     void SetScale(float scale);
-    
+
     Matrix3 ToMatrix3() const;
     Matrix4 ToMatrix4() const;
     Matrix3 RotationMatrix() const;
     Vector3 Translation() const;
     Quaternion Rotation() const;
     Vector3 Scale() const;
-    
+
     bool Equals(const Matrix3x4& rhs) const;
-    
+
     void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
 
     Matrix3x4 Inverse() const;
-    
+
     String ToString() const;
-    
+
     float m00_ @ m00;
     float m01_ @ m01;
     float m02_ @ m02;
@@ -57,7 +57,7 @@ class Matrix3x4
     float m21_ @ m21;
     float m22_ @ m22;
     float m23_ @ m23;
-    
+
     static const Matrix3x4 ZERO;
     static const Matrix3x4 IDENTITY;
 };

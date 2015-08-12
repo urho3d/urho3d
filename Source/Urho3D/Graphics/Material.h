@@ -40,6 +40,8 @@ class Texture2D;
 class TextureCube;
 class ValueAnimationInfo;
 
+static const unsigned char DEFAULT_RENDER_ORDER = 128;
+
 /// %Material's shader parameter definition.
 struct MaterialShaderParameter
 {
@@ -148,6 +150,8 @@ public:
     void SetFillMode(FillMode mode);
     /// Set depth bias.
     void SetDepthBias(const BiasParameters& parameters);
+    /// Set 8-bit render order within pass. Default 128. Lower values will render earlier and higher values later, taking precedence over e.g. state and distance sorting.
+    void SetRenderOrder(unsigned char order);
     /// Associate the material with a scene to ensure that shader parameter animation happens in sync with scene update, respecting the scene time scale. If no scene is set, the global update events will be used.
     void SetScene(Scene* scene);
     /// Remove shader parameter.
@@ -203,6 +207,9 @@ public:
     /// Return depth bias.
     const BiasParameters& GetDepthBias() const { return depthBias_; }
 
+    /// Return render order.
+    unsigned char GetRenderOrder() const { return renderOrder_; }
+    
     /// Return last auxiliary view rendered frame number.
     unsigned GetAuxViewFrameNumber() const { return auxViewFrameNumber_; }
 
@@ -255,6 +262,8 @@ private:
     FillMode fillMode_;
     /// Depth bias parameters.
     BiasParameters depthBias_;
+    /// Render order value.
+    unsigned char renderOrder_;
     /// Last auxiliary view rendered frame number.
     unsigned auxViewFrameNumber_;
     /// Shader parameter hash value.

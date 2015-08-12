@@ -144,10 +144,18 @@ static const String& ResourceRefListGetName(unsigned index, ResourceRefList* ptr
 
 void ArrayToVariantVector(CScriptArray* arr, VariantVector& dest)
 {
-    unsigned numVariants = arr->GetSize();
-    dest.Resize(numVariants);
-    for (unsigned i = 0; i < numVariants; ++i)
+    unsigned size = arr->GetSize();
+    dest.Resize(size);
+    for (unsigned i = 0; i < size; ++i)
         dest[i] = *(static_cast<Variant*>(arr->At(i)));
+}
+
+void ArrayToStringVector(CScriptArray* arr, StringVector& dest)
+{
+    unsigned size = arr->GetSize();
+    dest.Resize(size);
+    for (unsigned i = 0; i < size; ++i)
+        dest[i] = *(static_cast<String*>(arr->At(i)));
 }
 
 static void ConstructVariant(Variant* ptr)
@@ -237,6 +245,13 @@ static void ConstructVariantVariantVector(CScriptArray* value, Variant* ptr)
     new(ptr) Variant(vector);
 }
 
+static void ConstructVariantStringVector(CScriptArray* value, Variant* ptr)
+{
+    StringVector vector;
+    ArrayToStringVector(value, vector);
+    new(ptr) Variant(vector);
+}
+
 static void ConstructVariantVariantMap(const VariantMap& value, Variant* ptr)
 {
     new(ptr) Variant(value);
@@ -309,6 +324,14 @@ static Variant& VariantAssignVariantVector(CScriptArray* value, Variant* ptr)
     return *ptr;
 }
 
+static Variant& VariantAssignStringVector(CScriptArray* value, Variant* ptr)
+{
+    StringVector vector;
+    ArrayToStringVector(value, vector);
+    *ptr = vector;
+    return *ptr;
+}
+
 static bool VariantEqualsVariantVector(CScriptArray* value, Variant* ptr)
 {
     VariantVector vector;
@@ -316,9 +339,21 @@ static bool VariantEqualsVariantVector(CScriptArray* value, Variant* ptr)
     return *ptr == vector;
 }
 
+static bool VariantEqualsStringVector(CScriptArray* value, Variant* ptr)
+{
+    StringVector vector;
+    ArrayToStringVector(value, vector);
+    return *ptr == vector;
+}
+
 static CScriptArray* VariantGetVariantVector(Variant* ptr)
 {
     return VectorToArray<Variant>(ptr->GetVariantVector(), "Array<Variant>");
+}
+
+static CScriptArray* VariantGetStringVector(Variant* ptr)
+{
+    return VectorToArray<String>(ptr->GetStringVector(), "Array<String>");
 }
 
 static asIScriptObject* VariantGetScriptObject(Variant* ptr)
@@ -415,6 +450,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterEnumValue("VariantType", "VAR_MATRIX3X4", VAR_MATRIX3X4);
     engine->RegisterEnumValue("VariantType", "VAR_MATRIX4", VAR_MATRIX4);
     engine->RegisterEnumValue("VariantType", "VAR_DOUBLE", VAR_DOUBLE);
+    engine->RegisterEnumValue("VariantType", "VAR_STRINGVECTOR", VAR_STRINGVECTOR);
 
     engine->RegisterObjectType("ResourceRef", sizeof(ResourceRef), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CK);
     engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructResourceRef), asCALL_CDECL_OBJLAST);
@@ -440,6 +476,8 @@ static void RegisterVariant(asIScriptEngine* engine)
 
     RegisterRefCounted<RefCounted>(engine, "RefCounted");
 
+    // Note: Some of the variant bindings are registered in IOAPI::RegisterSerialization() due to dependency to VectorBuffer
+
     engine->RegisterObjectType("Variant", sizeof(Variant), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectType("VariantMap", sizeof(VariantMap), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVariant), asCALL_CDECL_OBJLAST);
@@ -459,6 +497,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const ResourceRef&in)", asFUNCTION(ConstructVariantResourceRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const ResourceRefList&in)", asFUNCTION(ConstructVariantResourceRefList), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Array<Variant>@+)", asFUNCTION(ConstructVariantVariantVector), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Array<String>@+)", asFUNCTION(ConstructVariantStringVector), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const VariantMap&in)", asFUNCTION(ConstructVariantVariantMap), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const IntRect&in)", asFUNCTION(ConstructVariantIntRect), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const IntVector2&in)", asFUNCTION(ConstructVariantIntVector2), asCALL_CDECL_OBJLAST);
@@ -487,6 +526,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const ResourceRef&in)", asMETHODPR(Variant, operator =, (const ResourceRef&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const ResourceRefList&in)", asMETHODPR(Variant, operator =, (const ResourceRefList&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Array<Variant>@+)", asFUNCTION(VariantAssignVariantVector), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const Array<String>@+)", asFUNCTION(VariantAssignStringVector), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const VariantMap&in)", asMETHODPR(Variant, operator =, (const VariantMap&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const IntRect&in)", asMETHODPR(Variant, operator =, (const IntRect&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const IntVector2&in)", asMETHODPR(Variant, operator =, (const IntVector2&), Variant&), asCALL_THISCALL);
@@ -511,6 +551,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "bool opEquals(const ResourceRef&in) const", asMETHODPR(Variant, operator ==, (const ResourceRef&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const ResourceRefList&in) const", asMETHODPR(Variant, operator ==, (const ResourceRefList&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Array<Variant>@+)", asFUNCTION(VariantEqualsVariantVector), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Array<String>@+)", asFUNCTION(VariantEqualsStringVector), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const VariantMap&in) const", asMETHODPR(Variant, operator ==, (const VariantMap&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const IntRect&in) const", asMETHODPR(Variant, operator ==, (const IntRect&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const IntVector2&in) const", asMETHODPR(Variant, operator ==, (const IntVector2&) const, bool), asCALL_THISCALL);
@@ -534,6 +575,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "const ResourceRef& GetResourceRef() const", asMETHOD(Variant, GetResourceRef), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "const ResourceRefList& GetResourceRefList() const", asMETHOD(Variant, GetResourceRefList), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Array<Variant>@ GetVariantVector() const", asFUNCTION(VariantGetVariantVector), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "Array<String>@ GetStringVector() const", asFUNCTION(VariantGetStringVector), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "const VariantMap& GetVariantMap() const", asMETHOD(Variant, GetVariantMap), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "const IntRect& GetIntRect() const", asMETHOD(Variant, GetIntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "const IntVector2& GetIntVector2() const", asMETHOD(Variant, GetIntVector2), asCALL_THISCALL);
@@ -607,6 +649,9 @@ static void RegisterSpline(asIScriptEngine* engine)
 {
     engine->RegisterEnum("InterpolationMode");
     engine->RegisterEnumValue("InterpolationMode", "BEZIER_CURVE", BEZIER_CURVE);
+    engine->RegisterEnumValue("InterpolationMode", "CATMULL_ROM_CURVE", CATMULL_ROM_CURVE);
+    engine->RegisterEnumValue("InterpolationMode", "LINEAR_CURVE", LINEAR_CURVE);
+    engine->RegisterEnumValue("InterpolationMode", "CATMULL_ROM_FULL_CURVE", CATMULL_ROM_FULL_CURVE);
 
     engine->RegisterObjectType("Spline", sizeof(Spline), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
     engine->RegisterObjectBehaviour("Spline", asBEHAVE_CONSTRUCT, "void f()", asFUNCTIONPR(ConstructSpline, (Spline*), void), asCALL_CDECL_OBJLAST);

@@ -343,7 +343,7 @@ function Character:Save(serializer)
 end
 
 function Character:HandleNodeCollision(eventType, eventData)
-    local contacts = eventData:GetBuffer("Contacts")
+    local contacts = eventData["Contacts"]:GetBuffer()
 
     while not contacts.eof do
         local contactPosition = contacts:ReadVector3()

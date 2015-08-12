@@ -70,6 +70,7 @@ A number of build options can be defined when invoking the build scripts or when
 |ANDROID              |0|Configure project using Android cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only)|
 |RPI                  |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only)|
 |WIN32                |0|Configure project using MinGW cross-compiler toolchain (cmake_generic.sh only); also applicable when cross-compiling 64-bit Windows platform|
+|URHO3D_C++11         |0|Enable C++11 standard|
 |IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only)|
 |URHO3D_64BIT         |*|Enable 64-bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system|
 |URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
@@ -88,6 +89,8 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_DOCS          |0|Generate documentation as part of normal build (the 'doc' builtin target can be used to generate documentation regardless of this option's value)|
 |URHO3D_DOCS_QUIET    |0|Generate documentation as part of normal build, suppress generation process from sending anything to stdout|
 |URHO3D_PCH           |1|Enable PCH support|
+|URHO3D_DATABASE_ODBC |0|Enable Database support with ODBC, requires vendor-specific ODBC driver|
+|URHO3D_DATABASE_SQLITE|0|Enable Database support with SQLite embedded|
 |URHO3D_SSE           |1|Enable SSE instruction set|
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
@@ -713,7 +716,7 @@ All the \ref Running_Commandline "command line options" supported by Urho3D play
 
 Hint: to get more content to look at, run the Physics sample application (bin/Data/Scripts/11_Physics.as), and press F5. This saves a scene file called Physics.xml into the Data/Scenes subdirectory, which can be loaded in the editor. Scenes utilized by the NinjaSnowWar and SceneAndUILoad examples also exist in the Data/Scenes subdirectory, and the NinjaSnowWar object "prefabs" are in the Data/Objects subdirectory.
 
-\section EditorInstructions_Controls Controls
+\section EditorInstructions_Controls Controls (standard style hotkeys)
 
 \verbatim
 Left mouse         - Select nodes or drag the node transform gizmo. Hold Shift to
@@ -721,13 +724,13 @@ Left mouse         - Select nodes or drag the node transform gizmo. Hold Shift t
 Right mouse        - Hold down and move mouse to rotate camera
 Middle mouse       - Hold down orbits the camera around selected objects
 Shift+Middle mouse - Hold down pans the camera
-
 WSAD or arrows     - Move
 Shift+WSAD         - Move faster
 E                  - Ascend
 Q                  - Descend
 Shift+E,Q          - Ascend or descend faster
 
+Home               - Center view on currently selected object
 Numpad5            - Toggle orthographic / perspective camera
 Numpad1            - Front view
 Numpad3            - Right hand view
@@ -761,6 +764,7 @@ Ctrl+W             - Cycle through solid, wireframe and point rendering
 Ctrl+Z             - Undo
 Ctrl+Y             - Redo
 Ctrl+Space         - Open quick menu
+Alt+W              - Open color wheel menu
 ESC                - Close the file selector or editor settings window
 DEL                - Delete node or component
 F1                 - Toggle console
@@ -771,7 +775,42 @@ F11                - Captures a screenshot
 F12                - Toggle UI
 \endverbatim
 
+The editor setting "Pan using middle mouse button" switches the controls to the following:
+
+\verbatim
+Middle mouse       - Hold down pans the camera
+Shift+Middle mouse - Hold down orbits the camera around selected objects
+\endverbatim
+
+\section EditorInstructions_Controls2 Controls (Blender style hotkeys)
+
+Hotkeys list show only differences with standard style
+
+\verbatim
+Left mouse         - Drag the node manipulator gizmo
+Middle mouse       - Hold down orbits the camera
+Shift+middle mouse - Hold down pans the camera
+Right mouse        - Select objects
+Shift+F            - Enter/Exit camera's flying mode
+G,R,S              - Object manipulation mode: move/rotate/scale ( note: camera flying mode must be off to do this manipulation)
+Cycle press G,R,S  - Toggle between world and local axes manipulation
+Shift+D            - Duplicate node or component
+H                  - Enable/disable node hierarchy or component
+Alt+H              - Enable all nodes hierarchy or component in scene
+Alt+P              - Unparent scene node
+Ctrl+P             - Parent all selected scene nodes to last selected node
+Z                  - Cycle through solid, wireframe and point rendering
+M                  - Show/Hide LayerEditor
+F                  - Focus on selected object (LookAt)
+X                  - Delete node or component
+Alt+D              - Smart Duplicate (note: select one of axises on gizmo to show direction for next instance)
+Key "." or Del     - View Closer selected node(s)
+\endverbatim
+
 Press right mouse button in the 3D view if you want to defocus the active window without changing the object selection.
+
+The "Pan using middle mouse button" option has no effect in Blender hotkeys mode.
+\endverbatim
 
 \section EditorInstructions_Workflow Workflow
 

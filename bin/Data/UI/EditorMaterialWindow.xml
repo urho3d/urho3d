@@ -12,6 +12,7 @@
         <attribute name="Layout Mode" value="Horizontal" />
         <element type="Text">
             <attribute name="Text" value="Material editor" />
+            <attribute name="Auto Localizable" value="true" />
         </element>
         <element type="Button" style="CloseButton">
             <attribute name="Name" value="CloseButton" />
@@ -25,6 +26,52 @@
         <attribute name="Is Resizable" value="true" />
         <attribute name="Fixed Height Resizing" value="true" />
         <attribute name="Resize Border" value="0 6 0 6" />
+        <element type="DropDownList">
+            <attribute name="Name" value="ModelPreview" />
+            <attribute name="Min Size" value="80 16" />
+            <attribute name="Max Size" value="80 16" />
+            <attribute name="Resize Popup" value="true" />
+            <attribute name="Horiz Alignment" value="Right" />
+            <attribute name="Vert Alignment" value="Bottom" />
+            <element type="Window" internal="true" popup="true" style="none">
+                <element type="ListView" internal="true" style="none">
+                    <element type="BorderImage" internal="true" style="none">
+                        <element internal="true" style="none">
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Box" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Sphere" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Plane" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Cylinder" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Cone" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="TeaPot" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                        </element>
+                    </element>
+                </element>
+            </element>                           
+        </element>
     </element>
     <element type="BorderImage" style="EditorDivider" />
     <element>
@@ -41,6 +88,7 @@
                 <element style="Panel">
                     <element type="Text">
                         <attribute name="Text" value="Techniques" />
+                        <attribute name="Auto Localizable" value="true" />
                     </element>
                     <element type="ListView">
                         <attribute name="Name" value="TechniqueList" />
@@ -58,6 +106,7 @@
                             <attribute name="Layout Border" value="1 1 1 1" />
                             <element type="Text">
                                 <attribute name="Text" value="New" />
+                                <attribute name="Auto Localizable" value="true" />
                                 <attribute name="Text Alignment" value="Center" />
                             </element>
                         </element>
@@ -67,6 +116,7 @@
                             <attribute name="Layout Border" value="1 1 1 1" />
                             <element type="Text">
                                 <attribute name="Text" value="Del" />
+                                <attribute name="Auto Localizable" value="true" />
                                 <attribute name="Text Alignment" value="Center" />
                             </element>
                         </element>
@@ -76,6 +126,7 @@
                             <attribute name="Layout Border" value="1 1 1 1" />
                             <element type="Text">
                                 <attribute name="Text" value="Sort" />
+                                <attribute name="Auto Localizable" value="true" />
                                 <attribute name="Text Alignment" value="Center" />
                             </element>
                         </element>
@@ -85,6 +136,7 @@
                 <element style="Panel">
                     <element type="Text">
                         <attribute name="Text" value="Textures" />
+                        <attribute name="Auto Localizable" value="true" />
                     </element>
                     <element type="ListView">
                         <attribute name="Name" value="TextureList" />
@@ -95,6 +147,7 @@
                 <element style="Panel">
                     <element type="Text">
                         <attribute name="Text" value="Shader parameters" />
+                        <attribute name="Auto Localizable" value="true" />
                     </element>
                     <element type="ListView">
                         <attribute name="Name" value="ShaderParameterList" />
@@ -112,12 +165,13 @@
                             <attribute name="Name" value="NewParameterDropDown" />
                             <attribute name="Min Size" value="50 17" />
                             <attribute name="Max Size" value="50 17" />
-                            <attribute name="Resize Popup" value="true" />
+                            <attribute name="Resize Popup" value="false" />
                             <element internal="true">
                                 <attribute name="Is Visible" value="false" />
                             </element>
                             <element type="Text">
                                 <attribute name="Text" value="New" />
+                                <attribute name="Auto Localizable" value="true" />
                                 <attribute name="Text Alignment" value="Center" />
                             </element>
                             <!-- Skip style processing as the purpose of below tags is to populate the content element -->
@@ -125,6 +179,7 @@
                                 <element type="ListView" internal="true" style="none">
                                     <element type="BorderImage" internal="true" style="none">
                                         <element internal="true" style="none">
+                                            <attribute name="Layout Border" value="0 0 4 0" />
                                             <element type="Text" style="EditorEnumAttributeText">
                                                 <attribute name="Text" value="Float" />
                                             </element>
@@ -150,6 +205,7 @@
                             <attribute name="Layout Border" value="1 1 1 1" />
                             <element type="Text">
                                 <attribute name="Text" value="Del" />
+                                <attribute name="Auto Localizable" value="true" />
                                 <attribute name="Text Alignment" value="Center" />
                             </element>
                         </element>
@@ -173,6 +229,18 @@
                         </element>
                         <element type="LineEdit">
                             <attribute name="Name" value="SlopeBiasEdit" />
+                        </element>
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="10" />
+                        <element type="Text" style="EditorAttributeText">
+                            <attribute name="Text" value="Render order" />
+                        </element>
+                        <element type="LineEdit">
+                            <attribute name="Name" value="RenderOrderEdit" />
                         </element>
                     </element>
                     <element>
@@ -285,6 +353,7 @@
             <attribute name="Layout Border" value="1 1 1 1" />
             <element type="Text">
                 <attribute name="Text" value="New" />
+                <attribute name="Auto Localizable" value="true" />
                 <attribute name="Text Alignment" value="Center" />
             </element>
         </element>
@@ -294,6 +363,7 @@
             <attribute name="Layout Border" value="1 1 1 1" />
             <element type="Text">
                 <attribute name="Text" value="Revert" />
+                <attribute name="Auto Localizable" value="true" />
                 <attribute name="Text Alignment" value="Center" />
             </element>
         </element>
@@ -303,6 +373,7 @@
             <attribute name="Layout Border" value="1 1 1 1" />
             <element type="Text">
                 <attribute name="Text" value="Save" />
+                <attribute name="Auto Localizable" value="true" />
                 <attribute name="Text Alignment" value="Center" />
             </element>
         </element>
@@ -312,6 +383,7 @@
             <attribute name="Layout Border" value="1 1 1 1" />
             <element type="Text">
                 <attribute name="Text" value="Save as" />
+                <attribute name="Auto Localizable" value="true" />
                 <attribute name="Text Alignment" value="Center" />
             </element>
         </element>

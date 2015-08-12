@@ -296,6 +296,12 @@
         <attribute name="Min Size" value="0 11" />
         <attribute name="Max Size" value="2147483647 11" />
     </element>
+    <element type="EditorVerticalDivider" style="BorderImage" auto="false">
+        <attribute name="Image Rect" value="144 64 155 80" />
+        <attribute name="Border" value="4 4 4 4" />
+        <attribute name="Min Size" value="11 0" />
+        <attribute name="Max Size" value="11 2147483647" />
+    </element>
     <element type="EditorDragSlider" style="BorderImage">
 	    <attribute name="Image Rect" value="240 64 256 80" />
     </element>
@@ -309,7 +315,7 @@
     </element>
     <element type="EditorMenuText" style="Text" auto="false" />
     <element type="EditorAttributeText" auto="false">
-        <attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
+        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
         <attribute name="Font Size" value="9" />
     </element>
     <element type="EditorEnumAttributeText" style="EditorAttributeText" auto="false">
@@ -353,7 +359,7 @@
         <attribute name="Border" value="6 2 2 2" />
     </element>
     <element type="ToolTipText" style="Text">
-        <attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
+        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
         <attribute name="Font Size" value="9" />
     </element>
     <element type="ViewportBorder" style="BorderImage">

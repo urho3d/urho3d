@@ -23,36 +23,15 @@
 #pragma once
 
 #include "../Core/Context.h"
-#include "../Graphics/OctreeQuery.h"
-#include "../Math/Vector2.h"
-#include "../Math/Vector3.h"
-#ifdef URHO3D_PHYSICS
-#include "../Physics/PhysicsWorld.h"
-#endif
-#ifdef URHO3D_URHO2D
-#include "../Urho2D/PhysicsWorld2D.h"
-#endif
 
 struct lua_State;
-
-namespace Urho3D
-{
-class Component;
-class Context;
-#ifdef URHO3D_NAVIGATION
-class CrowdAgent;
-#endif
-class Pass;
-class SoundSource;
-class UIElement;
-}
 
 using namespace Urho3D;
 
 /// Check is String.
 #define tolua_isurho3dstring tolua_isstring
 /// Push String.
-#define tolua_pushurho3dstring(x, y) tolua_pushstring(x, y.CString())
+#define tolua_pushurho3dstring(L, s) tolua_pushstring(L, s.CString())
 /// Convert to String.
 const char* tolua_tourho3dstring(lua_State* L, int narg, const char* str);
 /// Convert to String.
@@ -89,83 +68,122 @@ template <typename T> int ToluaGetSubsystem(lua_State* tolua_S)
 }
 
 /// Check is Vector<T>.
-template <typename T> int ToluaIsVector(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
-/// Check is Vector<String>.
-template <> int ToluaIsVector<String>(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
+template <typename T> int ToluaIsVector(lua_State* L, int lo, const char* type, int def, tolua_Error* err)
+{
+    return tolua_isusertypearray(L, lo, type, -1, def, err);
+}
 
-/// Convert to Vector<T>.
-template <typename T> void* ToluaToVector(lua_State* L, int narg, void* def);
-/// Convert to Vector<String>.
-template <> void* ToluaToVector<String>(lua_State* L, int narg, void* def);
+/// Convert to Vector<T>. This function is not thread-safe.
+template <typename T> void* ToluaToVector(lua_State* L, int narg, void* def)
+{
+    if (!lua_istable(L, narg))
+        return 0;
+    static Vector<T> result;
+    result.Clear();
+    result.Resize((unsigned)lua_objlen(L, narg));
+    for (unsigned i = 0; i < result.Size(); ++i)
+    {
+        lua_rawgeti(L, narg, i + 1);    // Lua index starts from 1
+        result[i] = *static_cast<T*>(tolua_tousertype(L, -1, def));
+        lua_pop(L, 1);
+    }
+    return &result;
+}
 
 /// Push Vector<T> to Lua as a table.
-template <typename T> int ToluaPushVector(lua_State* L, void* data, const char* type);
-/// Push Vector<String> to Lua as a table.
-template <> int ToluaPushVector<String>(lua_State* L, void* data, const char* type);
-/// Push Vector<StringHash> to Lua as a table.
-template <> int ToluaPushVector<StringHash>(lua_State* L, void* data, const char* type);
+template <typename T> int ToluaPushVector(lua_State* L, void* data, const char* type)
+{
+    lua_newtable(L);
+    Vector<T>& vector = *static_cast<Vector<T>*>(data);
+    for (unsigned i = 0; i < vector.Size(); ++i)
+    {
+        tolua_pushusertype(L, &vector[i], type);
+        lua_rawseti(L, -2, i + 1);
+    }
+    return 1;
+}
 
 /// Check is PODVector<T>.
-template <typename T> int ToluaIsPODVector(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
-/// Check is PODVector<unsigned>.
-template <> int ToluaIsPODVector<unsigned>(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
-/// Check is PODVector<Vector2>.
-template <> int ToluaIsPODVector<Vector2>(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
+template <typename T> int ToluaIsPODVector(lua_State* L, int lo, const char* type, int def, tolua_Error* err)
+{
+    // Whether it is POD or non-POD, on Lua side they are just usertype object, so we can reuse the same function
+    return ToluaIsVector<T>(L, lo, type, def, err);
+}
 
-/// Convert to PODVector<T>.
-template <typename T> void* ToluaToPODVector(lua_State* L, int narg, void* def);
-/// Convert PODVector<unsigned>.
-template <> void* ToluaToPODVector<unsigned>(lua_State* L, int narg, void* def);
-/// Convert PODVector<Vector2>.
-template <> void* ToluaToPODVector<Vector2>(lua_State* L, int narg, void* def);
+/// Check is PODVector<T, is_arithmetic<T>>. Use template function overload as non-type partial template specialization is not allowed.
+template <typename T> int ToluaIsPODVector(double /*overload*/, lua_State* L, int lo, const char* /*type*/, int def, tolua_Error* err)
+{
+    return tolua_isnumberarray(L, lo, -1, def, err);
+}
+
+/// Convert to PODVector<T>. This function is not thread-safe.
+template <typename T> void* ToluaToPODVector(lua_State* L, int narg, void* def)
+{
+    return ToluaToVector<T>(L, narg, def);
+}
+
+/// Convert to PODVector<T, is_arithmetic<T>>. This function is not thread-safe. Use template function overload as non-type partial template specialization is not allowed.
+template <typename T> void* ToluaToPODVector(double /*overload*/, lua_State* L, int narg, void* /*def*/)
+{
+    if (!lua_istable(L, narg))
+        return 0;
+    static PODVector<T> result;
+    result.Clear();
+    result.Resize((unsigned)lua_objlen(L, narg));
+    for (unsigned i = 0; i < result.Size(); ++i)
+    {
+        lua_rawgeti(L, narg, i + 1);
+        result[i] = (T)tolua_tonumber(L, -1, 0);
+        lua_pop(L, 1);
+    }
+    return &result;
+}
 
 /// Push PODVector<T> to Lua as a table.
-template <typename T> int ToluaPushPODVector(lua_State* L, void* data, const char* type);
-/// Push PODVector<int> to Lua as a table.
-template <> int ToluaPushPODVector<int>(lua_State* L, void* data, const char* type);
-/// Push PODVector<unsigned> to Lua as a table.
-template <> int ToluaPushPODVector<unsigned>(lua_State* L, void* data, const char* type);
+template <typename T> int ToluaPushPODVector(lua_State* L, void* data, const char* type)
+{
+    return ToluaPushVector<T>(L, data, type);
+}
 
-/// Push PODVector<Component*> to Lua as a table.
-template <> int ToluaPushPODVector<Component*>(lua_State* L, void* data, const char* type);
+/// Push PODVector<T, is_pointer<T>> to Lua as a table. Use template function overload as non-type partial template specialization is not allowed.
+template <typename T> int ToluaPushPODVector(const char* /*overload*/, lua_State* L, void* data, const char* type)
+{
+    lua_newtable(L);
+    const PODVector<T>& vector = *static_cast<const PODVector<T>*>(data);
+    for (unsigned i = 0; i < vector.Size(); ++i)
+    {
+        tolua_pushusertype(L, vector[i], type);
+        lua_rawseti(L, -2, i + 1);
+    }
+    return 1;
+}
 
-/// Push PODVector<Node*> to Lua as a table.
-template <> int ToluaPushPODVector<Node*>(lua_State* L, void* data, const char* type);
+/// Push PODVector<T, is_arithmetic<T>> to Lua as a table. Use template function overload as non-type partial template specialization is not allowed.
+template <typename T> int ToluaPushPODVector(double /*overload*/, lua_State* L, void* data, const char* /*type*/)
+{
+    lua_newtable(L);
+    const PODVector<T>& vector = *static_cast<const PODVector<T>*>(data);
+    for (unsigned i = 0; i < vector.Size(); ++i)
+    {
+        lua_pushnumber(L, vector[i]);
+        lua_rawseti(L, -2, i + 1);
+    }
+    return 1;
+}
 
-/// Push PODVector<SoundSource*> to Lua as a table.
-template <> int ToluaPushPODVector<SoundSource*>(lua_State* L, void* data, const char* type);
-/// Push PODVector<UIElement*> to Lua as a table.
-template <> int ToluaPushPODVector<UIElement*>(lua_State* L, void* data, const char* type);
-#ifdef URHO3D_PHYSICS
-/// Push PODVector<RigidBody*> to Lua as a table.
-template <> int ToluaPushPODVector<RigidBody*>(lua_State* L, void* data, const char* type);
-#endif
-#ifdef URHO3D_URHO2D
-/// Push PODVector<RigidBody2D*> to Lua as a table.
-template <> int ToluaPushPODVector<RigidBody2D*>(lua_State* L, void* data, const char* type);
-#endif
-/// Push PODVector<Vector3> to Lua as a table.
-template <> int ToluaPushPODVector<Vector3>(lua_State* L, void* data, const char* type);
-/// Push PODVector<IntVector2> to Lua as a table.
-template <> int ToluaPushPODVector<IntVector2>(lua_State* L, void* data, const char* type);
-/// Push PODVector<OctreeQueryResult> to Lua as a table.
-template <> int ToluaPushPODVector<OctreeQueryResult>(lua_State* L, void* data, const char* type);
-#ifdef URHO3D_NAVIGATION
-/// Push PODVector<CrowdAgent*> to Lua as a table.
-template <> int ToluaPushPODVector<CrowdAgent*>(lua_State* L, void* data, const char* type);
-#endif
-#ifdef URHO3D_PHYSICS
-/// Push PODVector<PhysicsRaycastResult> to Lua as a table.
-template <> int ToluaPushPODVector<PhysicsRaycastResult>(lua_State* L, void* data, const char* type);
-#endif
-#ifdef URHO3D_URHO2D
-/// Push PODVector<PhysicsRaycastResult2D> to Lua as a table.
-template <> int ToluaPushPODVector<PhysicsRaycastResult2D>(lua_State* L, void* data, const char* type);
-#endif
-/// Push PODVector<RayQueryResult> to Lua as a table.
-template <> int ToluaPushPODVector<RayQueryResult>(lua_State* L, void* data, const char* type);
-/// Push PODVector<Pass*> to Lua as a table.
-template <> int ToluaPushPODVector<Pass*>(lua_State* L, void* data, const char* type);
+// GCC and Clang does not follow the C++ standard in expecting explicit template specialization shall be declared before first use,
+//   both compilers are able to avoid the multiple definitions of template instantiation symbol during linking by using weak symbol
+// MSVC and MinGW, however, follow the standard strictly, hence we need to declare all the explicit template specializations below
+//   to keep these two compilers happy
+// We do not use #ifdef MSVC/MINGW here because GCC and Clang are happy to comply with the C++ standard too
+
+template <> int ToluaIsVector<String>(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
+template <> void* ToluaToVector<String>(lua_State* L, int narg, void* def);
+template <> int ToluaPushVector<String>(lua_State* L, void* data, const char* type);
+
+template <> int ToluaIsPODVector<bool>(double /*overload*/, lua_State* L, int lo, const char* type, int def, tolua_Error* err);
+template <> void* ToluaToPODVector<bool>(double /*overload*/, lua_State* L, int narg, void* def);
+template <> int ToluaPushPODVector<bool>(double /*overload*/, lua_State* L, void* data, const char* type);
+
 /// Push Object to Lua.
 void ToluaPushObject(lua_State* L, void* data, const char* type);
-

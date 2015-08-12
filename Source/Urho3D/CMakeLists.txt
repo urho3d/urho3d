@@ -24,13 +24,28 @@
 set (TARGET_NAME Urho3D)
 
 add_definitions (-DURHO3D_IS_BUILDING)
+if (ODBC_VERSION AND NOT ODBC_VERSION VERSION_LESS 3)
+    add_definitions (-DODBC_3_OR_LATER)
+endif ()
 
+# Windows platform has its own naming convention for library
+set (LIB_NAME ${TARGET_NAME})
 if (WIN32)
     set (CMAKE_DEBUG_POSTFIX _d)
+    if (CMAKE_BUILD_TYPE STREQUAL Debug)
+        set (LIB_NAME ${LIB_NAME}_d)
+    endif ()
+    if (URHO3D_LIB_TYPE STREQUAL SHARED)
+        set (LIB_NAME ${LIB_NAME}.dll)
+        # When building shared library, a copy of the library must be available in the tool directory for the tools to work correctly as there is no RPATH for Windows platform
+        create_symlink (${CMAKE_BINARY_DIR}/bin/${LIB_NAME} ${CMAKE_BINARY_DIR}/bin/tool/${LIB_NAME})
+    endif ()
 endif ()
 
 # Define generated source files
-execute_process (COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
+if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
+    execute_process (COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
+endif ()
 add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrho3DRevision.cmake
     DEPENDS ${STATIC_LIBRARY_TARGETS} ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake
@@ -57,7 +72,7 @@ if (URHO3D_LUA)
     # Use the host tool to generate source files for tolua++ API binding
     file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/LuaScript/generated)
     file (GLOB API_PKG_FILES LuaScript/pkgs/*.pkg)
-    foreach (DIR Navigation Network Physics Urho2D)
+    foreach (DIR Navigation Network Database Physics Urho2D)
         string (TOUPPER URHO3D_${DIR} OPT)
         if (NOT ${OPT})
             list (REMOVE_ITEM API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/LuaScript/pkgs/${DIR}LuaAPI.pkg)
@@ -127,6 +142,15 @@ foreach (DIR Navigation Network Physics Urho2D)
         list (APPEND EXCLUDED_SOURCE_DIRS ${DIR})
     endif ()
 endforeach ()
+if (URHO3D_DATABASE)
+    if (URHO3D_DATABASE_ODBC)
+        list (APPEND EXCLUDED_SOURCE_DIRS Database/SQLite)
+    else ()
+        list (APPEND EXCLUDED_SOURCE_DIRS Database/ODBC)
+    endif ()
+else ()
+    list (APPEND EXCLUDED_SOURCE_DIRS Database)
+endif ()
 if (URHO3D_OPENGL)
     # Exclude the opposite source directory
     list (APPEND EXCLUDED_SOURCE_DIRS Graphics/Direct3D9 Graphics/Direct3D11)
@@ -142,10 +166,7 @@ if (APPLE AND NOT IOS)
     set (GLOB_OBJC_PATTERN *.m)     # Should only pick up MacFileWatcher.m for MacOSX platform at the moment
 endif ()
 string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
-if (URHO3D_PCH)
-    set (PCH PCH Precompiled.h)
-endif ()
-define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} EXTRA_H_FILES librevision.h Urho3D.h RECURSE GROUP ${PCH})
+define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} EXTRA_H_FILES librevision.h Urho3D.h RECURSE GROUP PCH Precompiled.h)
 list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${ALL_OBJ_FILES})
 if (APPLE)
     set (AMALG_EXCLUDES_PLATFORM_SPECIFIC |MathAPI|Urho2DAPI)
@@ -165,12 +186,10 @@ if (URHO3D_PHYSICS)
     # This is more practical than patching its header files in many places to make them work with relative path
     list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Bullet)
 endif ()
-
 if (URHO3D_NAVIGATION)
     # DetourTileCache and DetourCrowd libraries depend on Detour's include dir to be added in the header search path
     list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Detour)
 endif ()
-
 if (URHO3D_LUA)
     # Lua/LuaJIT library depends on its own include dir to be added in the header search path
     # This is more practical than patching its header files in many places to make them work with relative path
@@ -327,19 +346,11 @@ install_header_files (FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h ${CMAKE_CU
 
 # Generate platform specific pkg-config file for the benefit of Urho3D library users via SDK without CMake
 get_directory_property (URHO3D_COMPILE_DEFINITIONS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMPILE_DEFINITIONS)
-list (REMOVE_ITEM URHO3D_COMPILE_DEFINITIONS HAVE_STDINT_H GLEW_STATIC GLEW_NO_GLU)     # Remove those defines that are only used for building the library and not needed by library user
+# Remove those defines that are only used for building the library and not needed by library user
+list (REMOVE_ITEM URHO3D_COMPILE_DEFINITIONS HAVE_STDINT_H GLEW_STATIC GLEW_NO_GLU URHO3D_IS_BUILDING ODBC_3_OR_LATER)
 if (ABSOLUTE_PATH_LIBS)
     string (REPLACE ";" "\" \"" URHO3D_ABS_PATH_LIBS "\"${ABSOLUTE_PATH_LIBS}\"")   # Note: need to always "stringify" a variable in list context for replace to work correctly, besides the list could be empty
     string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" URHO3D_ABS_PATH_LIBS "${URHO3D_ABS_PATH_LIBS}")
-endif ()
-set (LIB_NAME ${TARGET_NAME})
-if (MINGW)
-    if (CMAKE_BUILD_TYPE STREQUAL Debug)
-        set (LIB_NAME ${LIB_NAME}_d)
-    endif ()
-    if (URHO3D_LIB_TYPE STREQUAL SHARED)
-        set (LIB_NAME ${LIB_NAME}.dll)
-    endif ()
 endif ()
 if (MSVC)
     # todo: Add a post build command to adjust the LIB_NAME when in Debug configuration (CMake/VS generator is multi-config)

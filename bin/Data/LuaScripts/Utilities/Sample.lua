@@ -122,7 +122,7 @@ function CreateConsoleAndDebugHud()
 end
 
 function HandleKeyDown(eventType, eventData)
-    local key = eventData:GetInt("Key")
+    local key = eventData["Key"]:GetInt()
     -- Close console (if open) or exit when ESC is pressed
     if key == KEY_ESC then
         if not console:IsVisible() then

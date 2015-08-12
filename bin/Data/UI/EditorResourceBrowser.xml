@@ -21,6 +21,7 @@
 			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
 			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
 			<attribute name="Text" value="Resource Browser" />
+			<attribute name="Auto Localizable" value="true" />
 		</element>
 		<element type="LineEdit">
 			<attribute name="Name" value="Search" />

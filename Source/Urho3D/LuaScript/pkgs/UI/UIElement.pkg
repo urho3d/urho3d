@@ -181,6 +181,7 @@ class UIElement : public Animatable
     bool IsEditable() const;
     bool IsSelected() const;
     bool IsVisible() const;
+    bool IsVisibleEffective() const;
     bool IsHovering() const;
     bool IsInternal() const;
     bool HasColorGradient() const;
@@ -255,6 +256,7 @@ class UIElement : public Animatable
     tolua_property__is_set bool editable;
     tolua_property__is_set bool selected;
     tolua_property__is_set bool visible;
+    tolua_readonly tolua_property__is_set bool visibleEffective;
     tolua_property__is_set bool hovering;
     tolua_property__is_set bool internal;
     tolua_readonly tolua_property__has_set bool colorGradient;

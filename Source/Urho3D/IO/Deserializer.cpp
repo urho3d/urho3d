@@ -330,6 +330,9 @@ Variant Deserializer::ReadVariant(VariantType type)
     case VAR_VARIANTVECTOR:
         return Variant(ReadVariantVector());
 
+    case VAR_STRINGVECTOR:
+        return Variant(ReadStringVector());
+
     case VAR_VARIANTMAP:
         return Variant(ReadVariantMap());
 
@@ -347,7 +350,7 @@ Variant Deserializer::ReadVariant(VariantType type)
 
     case VAR_MATRIX4:
         return Variant(ReadMatrix4());
-        
+
     case VAR_DOUBLE:
         return Variant(ReadDouble());
 
@@ -361,6 +364,14 @@ VariantVector Deserializer::ReadVariantVector()
     VariantVector ret(ReadVLE());
     for (unsigned i = 0; i < ret.Size(); ++i)
         ret[i] = ReadVariant();
+    return ret;
+}
+
+StringVector Deserializer::ReadStringVector()
+{
+    StringVector ret(ReadVLE());
+    for (unsigned i = 0; i < ret.Size(); ++i)
+        ret[i] = ReadString();
     return ret;
 }
 

@@ -322,7 +322,7 @@ unsigned Texture::GetRowDataSize(int width) const
 #ifndef GL_ES_VERSION_2_0
     case GL_DEPTH24_STENCIL8_EXT:
     case GL_RG16:
-    case GL_R16F:
+    case GL_RG16F:
     case GL_R32F:
 #endif
         return (unsigned)(width * 4);
@@ -332,12 +332,13 @@ unsigned Texture::GetRowDataSize(int width) const
         return (unsigned)width;
 
     case GL_RG8:
+    case GL_R16F:
         return (unsigned)(width * 2);
 
     case GL_RGBA16:
+    case GL_RGBA16F_ARB:
         return (unsigned)(width * 8);
 
-    case GL_RGBA16F_ARB:
     case GL_RGBA32F_ARB:
         return (unsigned)(width * 16);
 #endif
@@ -406,9 +407,10 @@ unsigned Texture::GetDataType(unsigned format)
         return GL_UNSIGNED_INT_24_8_EXT;
     else if (format == GL_RG16 || format == GL_RGBA16)
         return GL_UNSIGNED_SHORT;
-    else if (format == GL_RGBA16F_ARB || format == GL_RGBA32F_ARB || format == GL_RG16F || format == GL_RG32F ||
-             format == GL_R16F || format == GL_R32F)
+    else if (format == GL_RGBA32F_ARB || format == GL_RG32F || format == GL_R32F)
         return GL_FLOAT;
+    else if (format == GL_RGBA16F_ARB || format == GL_RG16F || format == GL_R16F)
+        return GL_HALF_FLOAT_ARB;
     else
         return GL_UNSIGNED_BYTE;
 #else

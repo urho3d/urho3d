@@ -15,11 +15,11 @@ function Start()
     else
         OpenConsoleWindow()
     end
-    
+
     ParseNetworkArguments()
 
     InitScene()
-    
+
     SubscribeToEvent("Update", "HandleUpdate")
     SubscribeToEvent("KeyDown", "HandleKeyDown")
     SubscribeToEvent("MouseMove", "HandleMouseMove")
@@ -28,9 +28,9 @@ function Start()
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate")
     SubscribeToEvent("SpawnBox", "HandleSpawnBox")
     SubscribeToEvent("PhysicsCollision", "HandlePhysicsCollision")
-    
+
     network:RegisterRemoteEvent("SpawnBox")
-    
+
     if runServer then
         network:StartServer(serverPort)
         SubscribeToEvent("ClientConnected", "HandleClientConnected")
@@ -38,7 +38,7 @@ function Start()
         -- Disable physics interpolation to ensure clients get sent physically correct transforms
         testScene:GetComponent("PhysicsWorld"):SetInterpolation(false)
     end
-    
+
     if runClient then
         network:Connect(serverAddress, serverPort, testScene)
     end
@@ -63,12 +63,12 @@ end
 
 function InitUI()
     local uiStyle = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
-    
+
     local newCursor = Cursor:new()
     newCursor.styleAuto = uiStyle
     newCursor.position = IntVector2(graphics:GetWidth()/ 2, graphics:GetHeight() / 2)
     ui.cursor = newCursor
-    
+
     if GetPlatform() == "Android" or GetPlatform() == "iOS" then
         ui.cursor.visible = false
     end
@@ -76,7 +76,7 @@ end
 
 function InitScene()
     testScene = Scene()
-    
+
     -- Create the camera outside the scene so it is unaffected by scene load/save
     cameraNode = Node()
     camera = cameraNode:CreateComponent("Camera")
@@ -84,7 +84,7 @@ function InitScene()
 
     if not engine:IsHeadless() then
         renderer:SetViewport(0, Viewport:new(testScene, camera))
-        
+
         -- Add bloom & FXAA effects to the renderpath. Clone the default renderpath so that we don't affect it
         -- local newRenderPathPtr = renderer:GetViewport(0):GetRenderPath():Clone()
         -- local newRenderPath = newRenderPathPtr:Get()
@@ -96,7 +96,7 @@ function InitScene()
         renderer:GetViewport(0):SetRenderPath(newRenderPath)
         audio:SetListener(cameraNode:CreateComponent("SoundListener"))
     end
-    
+
     if runClient then
         return
     end
@@ -112,11 +112,11 @@ function InitScene()
     zone.fogStart = 100.0
     zone.fogEnd = 300.0
     zone.boundingBox = BoundingBox(-1000, 1000)
-    
+
     if true then
         local lightNode = testScene:CreateChild("GlobalLight")
         lightNode.direction = Vector3(0.3, -0.5, 0.425)
-        
+
         local light = lightNode:CreateComponent("Light")
         light.lightType = LIGHT_DIRECTIONAL
         light.castShadows = true
@@ -129,7 +129,7 @@ function InitScene()
         local objectNode = testScene:CreateChild("Floor")
         objectNode.position = Vector3(0, -0.5, 0)
         objectNode.scale = Vector3(200, 1, 200)
-        
+
         local object = objectNode:CreateComponent("StaticModel")
         object.model = cache:GetResource("Model", "Models/Box.mdl")
         object.material = cache:GetResource("Material", "Materials/StoneTiled.xml")
@@ -170,9 +170,9 @@ function InitScene()
         local shape = objectNode:CreateComponent("CollisionShape")
         shape:SetBox(Vector3(1, 1, 1))
     end
-    
-    
-    
+
+
+
     for i = 1, 50 do
         local objectNode = testScene:CreateChild("Mushroom")
         objectNode.position = Vector3(Random() * 180 - 90, 0, Random() * 180 - 90)
@@ -189,7 +189,7 @@ function InitScene()
         shape:SetTriangleMesh(object:GetModel())
     end
 
-    
+
     for i = 1, 50 do
         local objectNode = testScene:CreateChild("Jack")
         objectNode:SetPosition(Vector3(Random() * 180 - 90, 0, Random() * 180 - 90))
@@ -199,11 +199,11 @@ function InitScene()
         object.model = cache:GetResource("Model", "Models/Jack.mdl")
         object.material = cache:GetResource("Material", "Materials/Jack.xml")
         object.castShadows = true
-        
+
         -- Create a capsule shape for detecting collisions
         local body = objectNode:CreateComponent("RigidBody")
         body.trigger = true
-        
+
         local shape = objectNode:CreateComponent("CollisionShape")
         shape:SetCapsule(0.7, 1.8, Vector3(0.0, 0.9, 0.0))
         local ctrl = objectNode:CreateComponent("AnimationController")
@@ -212,19 +212,19 @@ function InitScene()
 end
 
 function HandleUpdate(eventType, eventData)
-    local timeStep = eventData:GetFloat("TimeStep")
-    
+    local timeStep = eventData["TimeStep"]:GetFloat()
+
     if ui:GetFocusElement() == nil then
         local speedMultiplier = 1.0
         if input:GetKeyDown(KEY_LSHIFT) then
             speedMultiplier = 5.0
-        end        
+        end
         if input:GetKeyDown(KEY_LCTRL) then
             speedMultiplier = 0.1
         end
-        
+
         local speed = timeStep * speedMultiplier
-        
+
         if input:GetKeyDown(KEY_W) then
             cameraNode:Translate(Vector3(0, 0, 10) * speed)
         end
@@ -237,11 +237,11 @@ function HandleUpdate(eventType, eventData)
         if input:GetKeyDown(KEY_D) then
             cameraNode:Translate(Vector3(10, 0, 0) * speed)
         end
-    end    
+    end
 end
 
 function HandleKeyDown(eventType, eventData)
-    local key = eventData:GetInt("Key")
+    local key = eventData["Key"]:GetInt()
 
     if key == KEY_ESC then
         if ui:GetFocusElement() == nil then
@@ -254,7 +254,7 @@ function HandleKeyDown(eventType, eventData)
     if key == KEY_F1 then
         console:Toggle()
     end
-    
+
     if ui:GetFocusElement() == nil then
         if key == KEY_1 then
             local quality = renderer:GetTextureQuality()
@@ -264,7 +264,7 @@ function HandleKeyDown(eventType, eventData)
             end
             renderer:SetTextureQuality(quality)
         end
-        
+
         if key == KEY_2 then
             local quality = renderer:GetMaterialQuality()
             quality = quality + 1
@@ -273,7 +273,7 @@ function HandleKeyDown(eventType, eventData)
             end
             renderer:SetMaterialQuality(quality)
         end
-        
+
         if key == KEY_3 then
             renderer:SetSpecularLighting(not renderer:GetSpecularLighting())
         end
@@ -304,7 +304,7 @@ function HandleKeyDown(eventType, eventData)
                 renderer:SetMaxOccluderTriangles(0)
             end
         end
-        
+
         if key == KEY_8 then
             renderer:SetDynamicInstancing(not renderer:GetDynamicInstancing())
         end
@@ -331,23 +331,23 @@ function HandleKeyDown(eventType, eventData)
         if key == KEY_T then
             debugHud:Toggle(DEBUGHUD_SHOW_PROFILER)
         end
-        
-        
+
+
         if key == KEY_F5  then
             testScene:SaveXML(fileSystem:GetProgramDir() + "Data/Scenes/LuaTestScene.xml")
         end
-        
+
         if key == KEY_F7 then
             testScene:LoadXML(fileSystem:GetProgramDir() + "Data/Scenes/LuaTestScene.xml")
         end
-    end    
+    end
 end
 
 function HandleMouseMove(eventType, eventData)
-    local buttons = eventData:GetInt("Buttons")
+    local buttons = eventData["Buttons"]:GetInt()
     if buttons == MOUSEB_RIGHT then
-        local mousedx = eventData:GetInt("DX")
-        local mousedy = eventData:GetInt("DY")
+        local mousedx = eventData["DX"]:GetInt()
+        local mousedy = eventData["DY"]:GetInt()
         yaw = yaw + (mousedx / 10.0)
         pitch = pitch + (mousedy / 10.0)
         if pitch < -90.0 then
@@ -362,12 +362,12 @@ end
 
 
 function HandleMouseButtonDown(eventType, eventData)
-    local button = eventData:GetInt("Button")
+    local button = eventData["Button"]:GetInt()
     if button == MOUSEB_RIGHT then
         local cursor = ui:GetCursor()
-        cursor:SetVisible(false)        
-    end    
-    
+        cursor:SetVisible(false)
+    end
+
     -- Test either creating a new physics object or painting a decal (SHIFT down)
     if button == MOUSEB_LEFT and ui:GetElementAt(ui:GetCursorPosition(), true) == nil and ui:GetFocusElement() == nil then
         if not input:GetQualifierDown(QUAL_SHIFT) then
@@ -407,14 +407,14 @@ function HandleMouseButtonDown(eventType, eventData)
 end
 
 function HandleSpawnBox(eventType, eventData)
-    local position = eventData:GetVector3("Pos")
-    local rotation = eventData:GetQuaternion("Rot")
-    
+    local position = eventData["Pos"]:GetVector3()
+    local rotation = eventData["Rot"]:GetQuaternion()
+
     local newNode = testScene:CreateChild("")
     newNode.position = position
     newNode.rotation =rotation
     newNode:SetScale(0.2)
-    
+
     local body = newNode:CreateComponent("RigidBody")
     body.mass = 1.0
     body.friction = 1.0
@@ -432,7 +432,7 @@ function HandleSpawnBox(eventType, eventData)
 end
 
 function HandleMouseButtonUp(eventType, eventData)
-    if eventData:GetInt("Button") == MOUSEB_RIGHT then
+    if eventData["Button"]:GetInt() == MOUSEB_RIGHT then
         ui:GetCursor():SetVisible(true)
     end
 end
@@ -441,7 +441,7 @@ function HandlePostRenderUpdate()
     if engine.headless then
         return
     end
-    
+
     -- Draw rendering debug geometry without depth test to see the effect of occlusion
     if drawDebug == 1 then
         renderer:DrawDebugGeometry(true)
@@ -449,7 +449,7 @@ function HandlePostRenderUpdate()
     if drawDebug == 2 then
         testScene:GetComponent("PhysicsWorld"):DrawDebugGeometry(true)
     end
-    
+
     local pos = ui.cursorPosition
     if ui:GetElementAt(pos, true) == nil and testScene:GetComponent("Octree") ~= nil then
         local cameraRay = camera:GetScreenRay(pos.x / graphics:GetWidth(), pos.y / graphics:GetHeight())
@@ -463,7 +463,7 @@ function HandlePostRenderUpdate()
 end
 
 function HandleClientConnected(eventType, eventData)
-    local connection = eventData:GetPtr("Connection", "Connection")
+    local connection = eventData["Connection"]:GetPtr("Connection")
     connection.scene = testScene -- Begin scene replication to the client
     connection.logStatistics = true
 end
@@ -471,8 +471,8 @@ end
 
 function HandlePhysicsCollision(eventType, eventData)
     -- Check if either of the nodes has an AnimatedModel component
-    local nodeA = eventData:GetPtr("Node", "NodeA")
-    local nodeB = eventData:GetPtr("Node", "NodeB")
+    local nodeA = eventData["NodeA"]:GetPtr("Node")
+    local nodeB = eventData["NodeB"]:GetPtr("Node")
     if nodeA:HasComponent("AnimatedModel") then
         HandleHit(nodeA)
     elseif nodeB:HasComponent("AnimatedModel") then
@@ -500,7 +500,7 @@ function CreateRagdoll(model)
     CreateRagdollBone(root, "Bip01_R_UpperArm", SHAPE_CAPSULE, Vector3(0.15, 0.35, 0.15), Vector3(0.1, 0, 0), Quaternion(0, 0, 90))
     CreateRagdollBone(root, "Bip01_L_Forearm", SHAPE_CAPSULE, Vector3(0.125, 0.4, 0.125), Vector3(0.2, 0, 0), Quaternion(0, 0, 90))
     CreateRagdollBone(root, "Bip01_R_Forearm", SHAPE_CAPSULE, Vector3(0.125, 0.4, 0.125), Vector3(0.2, 0, 0), Quaternion(0, 0, 90))
-    
+
     CreateRagdollConstraint(root, "Bip01_L_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0, 0, -1), Vector3(0, 0, 1), Vector2(45, 45), Vector2(0, 0), true)
     CreateRagdollConstraint(root, "Bip01_R_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0, 0, -1), Vector3(0, 0, 1), Vector2(45, 45), Vector2(0, 0), true)
     CreateRagdollConstraint(root, "Bip01_L_Calf", "Bip01_L_Thigh", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0), true)

@@ -9,7 +9,7 @@
 -- the author has no obligation to provide maintenance, support, updates,
 -- enhancements, or modifications.
 
--- Modified by Aster Jian for Urho3D
+-- Modified by Aster Jian and Yao Wei Tjong for Urho3D
 
 -- Variable class
 -- Represents a extern variable or a public member of a class.
@@ -295,12 +295,13 @@ function classVariable:register (pre)
 	end
  pre = pre or ''
  local parent = self:inmodule() or self:innamespace() or self:inclass()
- if not parent then
-  if classVariable._warning==nil then
-   warning("Mapping variable to global may degrade performance")
-   classVariable._warning = 1
-  end
- end
+-- Urho3D - suppress warnings
+-- if not parent then
+--  if classVariable._warning==nil then
+--   warning("Mapping variable to global may degrade performance")
+--   classVariable._warning = 1
+--  end
+-- end
  if self.csetname then
   output(pre..'tolua_variable(tolua_S,"'..self.lname..'",'..self.cgetname..','..self.csetname..');')
  else
