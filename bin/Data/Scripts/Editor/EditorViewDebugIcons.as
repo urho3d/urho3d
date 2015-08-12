@@ -9,21 +9,24 @@ BillboardSet@ debugIconsSetSoundSources3D;
 BillboardSet@ debugIconsSetSoundListeners;
 BillboardSet@ debugIconsSetZones;
 BillboardSet@ debugIconsSetSplinesPoints;
+BillboardSet@ debugIconsSetTriggers;
+BillboardSet@ debugIconsSetCustomGeometry;
+BillboardSet@ debugIconsSetParticleEmitters;
+
+
 
 
 Node@ debugIconsNode = null;
-
 int stepDebugIconsUpdate = 60; //ms
 int timeToNextDebugIconsUpdate = 0;
-
 int stepDebugIconsUpdateSplinePath = 500; //ms
 int timeToNextDebugIconsUpdateSplinePath = 0;
-
 const int splinePathResolution = 16;
 bool debugIconsShow = true;
 bool supressDebugIconsShow = false;
 Vector2 debugIconsSize = Vector2(0.025, 0.025);
 Vector2 debugIconsSizeSmall = debugIconsSize / 2.0;
+Vector2 debugIconsSizeBig = debugIconsSize * 1.5;
 
 
 
@@ -93,6 +96,27 @@ void CreateDebugIcons()
     debugIconsSetSplinesPoints.sorted = true;
     debugIconsSetSplinesPoints.temporary = true;
     debugIconsSetSplinesPoints.viewMask = 0x80000000;
+    
+    debugIconsSetTriggers = debugIconsNode.CreateComponent("BillboardSet");
+    debugIconsSetTriggers.material = cache.GetResource("Material", "Materials/Editor/DebugIconCollisionTrigger.xml");
+    debugIconsSetTriggers.material.renderOrder = 255;
+    debugIconsSetTriggers.sorted = true;
+    debugIconsSetTriggers.temporary = true;
+    debugIconsSetTriggers.viewMask = 0x80000000;
+    
+    debugIconsSetCustomGeometry = debugIconsNode.CreateComponent("BillboardSet");
+    debugIconsSetCustomGeometry.material = cache.GetResource("Material", "Materials/Editor/DebugIconCustomGeometry.xml");
+    debugIconsSetCustomGeometry.material.renderOrder = 255;
+    debugIconsSetCustomGeometry.sorted = true;
+    debugIconsSetCustomGeometry.temporary = true;
+    debugIconsSetCustomGeometry.viewMask = 0x80000000;
+    
+    debugIconsSetParticleEmitters = debugIconsNode.CreateComponent("BillboardSet");
+    debugIconsSetParticleEmitters.material = cache.GetResource("Material", "Materials/Editor/DebugIconParticleEmitter.xml");
+    debugIconsSetParticleEmitters.material.renderOrder = 255;
+    debugIconsSetParticleEmitters.sorted = true;
+    debugIconsSetParticleEmitters.temporary = true;
+    debugIconsSetParticleEmitters.viewMask = 0x80000000; 
 
 
 }
@@ -132,6 +156,10 @@ void UpdateViewDebugIcons()
         debugIconsSetSoundListeners.enabled = debugIconsShow;
         debugIconsSetZones.enabled = debugIconsShow;
         debugIconsSetSplinesPoints.enabled = debugIconsShow;
+        debugIconsSetTriggers.enabled = debugIconsShow;
+        debugIconsSetCustomGeometry.enabled = debugIconsShow;
+        debugIconsSetParticleEmitters.enabled = debugIconsShow;
+           
     }
     
     if (debugIconsShow == false) return; 
@@ -212,8 +240,7 @@ void UpdateViewDebugIcons()
                 
                 // if mainCamera enough closer to selected camera then make bb size relative to distance
                 float distance = (camPos - nodes[i].worldPosition).length;
-                bb.size = debugIconsSize * distance;
-                
+                bb.size = debugIconsSize * distance;  
                 bb.enabled = true;
             }
             
@@ -372,6 +399,77 @@ void UpdateViewDebugIcons()
                 }
                 
                 debugIconsSetSplinesPoints.Commit();   
+            }
+        }
+        
+        if (debugIconsSetTriggers !is null) 
+        {
+            // Collect all scene's RigidBody and add it
+            Array<Node@> nodes = editorScene.GetChildrenWithComponent("RigidBody", true);
+            
+            if (nodes.length > 0) 
+            {
+                debugIconsSetTriggers.numBillboards = nodes.length;
+                for (int i=0;i<nodes.length; i++) 
+                {
+                    RigidBody@ rigidbody = nodes[i].GetComponent("RigidBody");
+                    if (rigidbody.trigger) 
+                    {
+                        Billboard@ bb = debugIconsSetTriggers.billboards[i];
+                        bb.position = nodes[i].worldPosition;
+                        float distance = (camPos - nodes[i].worldPosition).length;
+                        bb.size = debugIconsSize * distance;
+                        bb.enabled = rigidbody.enabled;
+                    }
+                }
+                
+                debugIconsSetTriggers.Commit();   
+            }
+        }
+        
+        if (debugIconsSetCustomGeometry !is null) 
+        {
+            // Collect all scene's CustomGeometry and add it
+            Array<Node@> nodes = editorScene.GetChildrenWithComponent("CustomGeometry", true);
+            
+            if (nodes.length > 0) 
+            {
+                debugIconsSetCustomGeometry.numBillboards = nodes.length;
+                for (int i=0;i<nodes.length; i++) 
+                {
+                    CustomGeometry@ customGeometry = nodes[i].GetComponent("CustomGeometry");
+
+                    Billboard@ bb = debugIconsSetCustomGeometry.billboards[i];
+                    bb.position = nodes[i].worldPosition;
+                    float distance = (camPos - nodes[i].worldPosition).length;
+                    bb.size = debugIconsSize * distance;
+                    bb.enabled = customGeometry.enabled;
+                }
+                
+                debugIconsSetCustomGeometry.Commit();   
+            }
+        }
+        
+        if (debugIconsSetParticleEmitters !is null) 
+        {
+            // Collect all scene's ParticleEmitter and add it
+            Array<Node@> nodes = editorScene.GetChildrenWithComponent("ParticleEmitter", true);
+            
+            if (nodes.length > 0) 
+            {
+                debugIconsSetParticleEmitters.numBillboards = nodes.length;
+                for (int i=0;i<nodes.length; i++) 
+                {
+                    ParticleEmitter@ particleEmitter = nodes[i].GetComponent("ParticleEmitter");
+
+                    Billboard@ bb = debugIconsSetParticleEmitters.billboards[i];
+                    bb.position = nodes[i].worldPosition;
+                    float distance = (camPos - nodes[i].worldPosition).length;
+                    bb.size = debugIconsSizeBig * distance;
+                    bb.enabled = particleEmitter.enabled;
+                }
+                
+                debugIconsSetParticleEmitters.Commit();   
             }
         }
         
