@@ -13,8 +13,12 @@ BillboardSet@ debugIconsSetSplinesPoints;
 
 Node@ debugIconsNode = null;
 
-int stepDebugIconsUpdate = 40; //ms
+int stepDebugIconsUpdate = 60; //ms
 int timeToNextDebugIconsUpdate = 0;
+
+int stepDebugIconsUpdateSplinePath = 500; //ms
+int timeToNextDebugIconsUpdateSplinePath = 0;
+
 const int splinePathResolution = 16;
 bool debugIconsShow = true;
 Vector2 debugIconsSize = Vector2(0.025, 0.025);
@@ -311,59 +315,65 @@ void UpdateViewDebugIcons()
         }
     }
     
-    if (debugIconsSetSplinesPoints !is null) 
+    
+    if (timeToNextDebugIconsUpdateSplinePath < time.systemTime) 
     {
-        debugIconsSetSplinesPoints.enabled = debugIconsShow;
-
-        // Collect all scene's SplinePath and add it
-        Array<Node@> nodes = editorScene.GetChildrenWithComponent("SplinePath", true);
-        
-        if (nodes.length > 0) 
+        if (debugIconsSetSplinesPoints !is null) 
         {
-            debugIconsSetSplinesPoints.numBillboards = nodes.length * splinePathResolution;
+            debugIconsSetSplinesPoints.enabled = debugIconsShow;
+
+            // Collect all scene's SplinePath and add it
+            Array<Node@> nodes = editorScene.GetChildrenWithComponent("SplinePath", true);
             
-            float splineStep = 1.0f / splinePathResolution;
-                                    
-            for(int i=0; i < nodes.length; i++) 
+            if (nodes.length > 0) 
             {
+                debugIconsSetSplinesPoints.numBillboards = nodes.length * splinePathResolution;
                 
-                SplinePath@ sp = nodes[i].GetComponent("SplinePath");
-                if(sp !is null) 
+                float splineStep = 1.0f / splinePathResolution;
+                                        
+                for(int i=0; i < nodes.length; i++) 
                 {
-                    Vector3 splinePoint;
-                    // Create path
-                    for(int step=0; step < splinePathResolution; step++) 
+                    
+                    SplinePath@ sp = nodes[i].GetComponent("SplinePath");
+                    if(sp !is null) 
                     {
-                        splinePoint = sp.GetPoint(splineStep * step);
-                        
-                        float distance = (camPos - splinePoint).length;
-                        int index = (i * splinePathResolution) + step;    
-                        Billboard@ bb = debugIconsSetSplinesPoints.billboards[index];
-                        bb.position = splinePoint;
-                        bb.size = debugIconsSizeSmall * distance;
-                        
-                        if (step == 0) 
+                        Vector3 splinePoint;
+                        // Create path
+                        for(int step=0; step < splinePathResolution; step++) 
                         {
-                            bb.color = Color(1,1,0);
-                            bb.size = debugIconsSize * distance;
-                        }
-                        else if ((step+1) >= (splinePathResolution - splineStep))
-                        {
-                            bb.color = Color(0,1,0);
-                            bb.size = debugIconsSize * distance;
-                        }
-                        else
-                        {
-                            bb.color = Color(1,1,1);
+                            splinePoint = sp.GetPoint(splineStep * step);
+                            
+                            float distance = (camPos - splinePoint).length;
+                            int index = (i * splinePathResolution) + step;    
+                            Billboard@ bb = debugIconsSetSplinesPoints.billboards[index];
+                            bb.position = splinePoint;
                             bb.size = debugIconsSizeSmall * distance;
-                        }    
-                        bb.enabled = sp.enabled;
-                    }
-                }                                       
+                            
+                            if (step == 0) 
+                            {
+                                bb.color = Color(1,1,0);
+                                bb.size = debugIconsSize * distance;
+                            }
+                            else if ((step+1) >= (splinePathResolution - splineStep))
+                            {
+                                bb.color = Color(0,1,0);
+                                bb.size = debugIconsSize * distance;
+                            }
+                            else
+                            {
+                                bb.color = Color(1,1,1);
+                                bb.size = debugIconsSizeSmall * distance;
+                            }    
+                            bb.enabled = sp.enabled;
+                        }
+                    }                                       
+                }
+                
+                debugIconsSetSplinesPoints.Commit();   
             }
-            
-            debugIconsSetSplinesPoints.Commit();   
         }
+        
+        timeToNextDebugIconsUpdateSplinePath = time.systemTime + stepDebugIconsUpdateSplinePath;
     }
     
       
