@@ -124,6 +124,7 @@ void UpdateViewDebugIcons()
     if (debugIconsShow == false) return;
     
     Vector3 camPos = activeViewport.cameraNode.worldPosition;
+    bool isOrthographic = activeViewport.camera.orthographic;
     debugIconsPlacement.Clear();
      
     for(int iconType=0; iconType<ICON_COUNT; iconType++)
@@ -155,6 +156,7 @@ void UpdateViewDebugIcons()
                     Billboard@ bb = null;
                     Color finalIconColor = debugIconsColors[ICON_COLOR_DEFAULT];
                     float distance = (camPos - nodes[i].worldPosition).length;
+                    if (isOrthographic) distance = 15.0f;
                     int iconsOffset = debugIconsPlacement[StringHash(nodes[i].id)].GetInt();
                     float iconsYPos = 0;
                      
@@ -169,6 +171,7 @@ void UpdateViewDebugIcons()
                                 Vector3 splinePoint = sp.GetPoint(splineStep * step);
                                 Billboard@ bb = debugIconsSet[ICON_SPLINE_PATH].billboards[index];
                                 float stepDistance = (camPos - splinePoint).length;
+                                if (isOrthographic) stepDistance = 15.0f;
                                 
                                 if(step == 0) // SplinePath start
                                 {
