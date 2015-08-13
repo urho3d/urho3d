@@ -390,7 +390,7 @@ public:
     /// Return substrings split by a separator char.
     Vector<String> Split(char separator) const;
     /// Join substrings with a 'glue' string.
-    void Join(const Vector<String>& subStrings, String glue);
+    void Join(const Vector<String>& subStrings, const String& glue);
     /// Return index to the first occurrence of a string, or NPOS if not found.
     unsigned Find(const String& str, unsigned startPos = 0, bool caseSensitive = true) const;
     /// Return index to the first occurrence of a character, or NPOS if not found.
@@ -465,7 +465,7 @@ public:
     /// Return substrings split by a separator char.
     static Vector<String> Split(const char* str, char separator);
     /// Return a string by joining substrings with a 'glue' string.
-    static String Joined(const Vector<String>& subStrings, String glue);
+    static String Joined(const Vector<String>& subStrings, const String& glue);
     /// Encode Unicode character to UTF8. Pointer will be incremented.
     static void EncodeUTF8(char*& dest, unsigned unicodeChar);
     /// Decode Unicode character from UTF8. Pointer will be incremented.

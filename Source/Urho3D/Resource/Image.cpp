@@ -1659,7 +1659,7 @@ SharedPtr<Image> Image::ConvertToRGBA() const
     switch (components_)
     {
     case 1:
-        for (unsigned i = 0; i < width_ * height_ * depth_; ++i)
+        for (unsigned i = 0; i < static_cast<unsigned>(width_ * height_ * depth_); ++i)
         {
             unsigned char pixel = *src++;
             *dest++ = pixel;
@@ -1670,7 +1670,7 @@ SharedPtr<Image> Image::ConvertToRGBA() const
         break;
 
     case 2:
-        for (unsigned i = 0; i < width_ * height_ * depth_; ++i)
+        for (unsigned i = 0; i < static_cast<unsigned>(width_ * height_ * depth_); ++i)
         {
             unsigned char pixel = *src++;
             *dest++ = pixel;
@@ -1681,7 +1681,7 @@ SharedPtr<Image> Image::ConvertToRGBA() const
         break;
 
     case 3:
-        for (unsigned i = 0; i < width_ * height_ * depth_; ++i)
+        for (unsigned i = 0; i < static_cast<unsigned>(width_ * height_ * depth_); ++i)
         {
             *dest++ = *src++;
             *dest++ = *src++;
