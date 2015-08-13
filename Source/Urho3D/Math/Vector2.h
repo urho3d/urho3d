@@ -253,6 +253,14 @@ public:
     {
     }
 
+    /// Assign from another vector.
+    IntVector2& operator =(const IntVector2& rhs)
+    {
+        x_ = rhs.x_;
+        y_ = rhs.y_;
+        return *this;
+    }
+
     /// Test for equality with another vector.
     bool operator ==(const IntVector2& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_; }
 
