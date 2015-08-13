@@ -69,6 +69,13 @@ public:
     /// Destruct.
     ~Polyhedron();
 
+    /// Assign from another polyhedron.
+    Polyhedron& operator =(const Polyhedron& rhs)
+    {
+        faces_ = rhs.faces_;
+        return *this;
+    }
+
     /// Define from a bounding box.
     void Define(const BoundingBox& box);
     /// Define from a frustum.
