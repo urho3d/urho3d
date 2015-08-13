@@ -55,7 +55,6 @@ Array<String> ComponentTypes = {"Light",
                                 "ParticleEmitter"}; 
                                      
 Array<BillboardSet@> debugIconsSet(ICON_COUNT);
-
 Node@ debugIconsNode = null;
 int stepDebugIconsUpdate = 100; //ms
 int timeToNextDebugIconsUpdate = 0;
@@ -174,17 +173,13 @@ void UpdateViewDebugIcons()
                                 if(step == 0) // SplinePath start
                                 {
                                     bb.color = debugIconsColors[ICON_COLOR_SPLINE_PATH_BEGIN];
-                                    bb.size = ClampToIconMaxSize(Max(debugIconsSize * stepDistance, debugIconsSize));
-                                    
-                                    
+                                    bb.size = ClampToIconMaxSize(Max(debugIconsSize * stepDistance, debugIconsSize));    
                                     bb.position = splinePoint;
                                 }
                                 else if((step+1) >= (splinePathResolution - splineStep)) // SplinePath end
                                 {
                                     bb.color = debugIconsColors[ICON_COLOR_SPLINE_PATH_END];
-                                    bb.size = ClampToIconMaxSize(Max(debugIconsSize * stepDistance, debugIconsSize));
-                                    
-                                    
+                                    bb.size = ClampToIconMaxSize(Max(debugIconsSize * stepDistance, debugIconsSize));    
                                     bb.position = splinePoint;
                                 }
                                 else // SplinePath middle points
@@ -198,7 +193,6 @@ void UpdateViewDebugIcons()
                                 bb.color = Color(bb.color.r, bb.color.g, bb.color.b, 1.2f - 1.0f / (debugIconsMaxSize.x / bb.size.x));
                                 if (bb.color.a < 0.25f) bb.enabled = false;   
                             }
-                            //IncrementIconPlacement(sp.enabled, nodes[i], bb.size.y);
                         }
                     }
                     else
@@ -235,8 +229,7 @@ void UpdateViewDebugIcons()
                             }
                         }
                         
-                        bb.position = nodes[i].worldPosition;
-                           
+                        bb.position = nodes[i].worldPosition;   
                         // Blend Icon relatively by distance to it
                         bb.color = Color(finalIconColor.r, finalIconColor.g, finalIconColor.b, 1.2f - 1.0f / (debugIconsMaxSize.x / bb.size.x));
                         bb.enabled = component.enabled;
