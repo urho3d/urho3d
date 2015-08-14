@@ -221,7 +221,7 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
         oldImages.Push(SaveFaceTexture(fontFace->textures_[i]));
 
     Vector<SharedPtr<Image> > newImages(numPages);
-    for (int i = 0; i < numPages; ++i)
+    for (unsigned i = 0; i < numPages; ++i)
     {
         SharedPtr<Image> image(new Image(font_->GetContext()));
 
