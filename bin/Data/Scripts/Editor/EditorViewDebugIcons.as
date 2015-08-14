@@ -39,9 +39,8 @@ Array<String> IconsTypesMaterials = {"DebugIconPointLight.xml",
                                      "DebugIconCollisionTrigger.xml",
                                      "DebugIconCustomGeometry.xml",
                                      "DebugIconParticleEmitter.xml"};
-                                     
-                                     
-Array<String> ComponentTypes = {"Light", 
+
+Array<String> ComponentTypes = {"Light",
                                 "Light",
                                 "Light",
                                 "Camera",
@@ -52,8 +51,8 @@ Array<String> ComponentTypes = {"Light",
                                 "SplinePath",
                                 "RigidBody",
                                 "CustomGeometry",
-                                "ParticleEmitter"}; 
-                                     
+                                "ParticleEmitter"};
+
 Array<BillboardSet@> debugIconsSet(ICON_COUNT);
 Node@ debugIconsNode = null;
 int stepDebugIconsUpdate = 100; //ms
@@ -63,7 +62,6 @@ int timeToNextDebugIconsUpdateSplinePath = 0;
 const int splinePathResolution = 16;
 const float splineStep = 1.0f / splinePathResolution;
 bool debugIconsShow = true;
-bool supressDebugIconsShow = false;
 Vector2 debugIconsSize = Vector2(0.025, 0.025);
 Vector2 debugIconsSizeSmall = debugIconsSize / 1.5;
 Vector2 debugIconsSizeBig = debugIconsSize * 1.5;
@@ -90,7 +88,7 @@ void CreateDebugIcons(Node@ tempNode)
 {
     if (editorScene is null) return;
     debugIconsSet.Resize(ICON_COUNT);
-    for (int i=0;i<ICON_COUNT;i++) 
+    for (int i = 0; i < ICON_COUNT; i++)
     {
         debugIconsSet[i] = tempNode.CreateComponent("BillboardSet");
         debugIconsSet[i].material = cache.GetResource("Material", "Materials/Editor/" + IconsTypesMaterials[i]);
@@ -114,28 +112,28 @@ void UpdateViewDebugIcons()
     // Checkout if debugIconsNode do not have any BBS component, add all at once
     BillboardSet@ isBSExist = debugIconsNode.GetComponent("BillboardSet");
     if (isBSExist is null) CreateDebugIcons(debugIconsNode);
-    
-    if (debugIconsSet[ICON_POINT_LIGHT] !is null) 
+
+    if (debugIconsSet[ICON_POINT_LIGHT] !is null)
     {
         for(int i=0; i < ICON_COUNT; i++)
             debugIconsSet[i].enabled = debugIconsShow;
     }
-    
+
     if (debugIconsShow == false) return;
-    
+
     Vector3 camPos = activeViewport.cameraNode.worldPosition;
     bool isOrthographic = activeViewport.camera.orthographic;
     debugIconsPlacement.Clear();
-     
+
     for(int iconType=0; iconType<ICON_COUNT; iconType++)
     {
-        if(debugIconsSet[iconType] !is null) 
+        if(debugIconsSet[iconType] !is null)
         {
             // SplinePath update resolution
             if(iconType == ICON_SPLINE_PATH && timeToNextDebugIconsUpdateSplinePath > time.systemTime) continue;
-            
+
             Array<Node@> nodes = editorScene.GetChildrenWithComponent(ComponentTypes[iconType], true);
-            if(nodes.length > 0) 
+            if(nodes.length > 0)
             {
                 // Clear old data
                 if(iconType == ICON_SPLINE_PATH)
@@ -146,43 +144,43 @@ void UpdateViewDebugIcons()
                     ClearCommit(ICON_SOUND_SOURCE, ICON_SOUND_SOURCE_3D+1, nodes.length);
                 else
                     ClearCommit(iconType, iconType+1, nodes.length);
-            
+
                 // Fill with new data
-                for(int i=0;i<nodes.length; i++) 
-                {                    
+                for(int i=0;i<nodes.length; i++)
+                {
                     Component@ component = nodes[i].GetComponent(ComponentTypes[iconType]);
                     if (component is null) continue;
-                    
+
                     Billboard@ bb = null;
                     Color finalIconColor = debugIconsColors[ICON_COLOR_DEFAULT];
                     float distance = (camPos - nodes[i].worldPosition).length;
                     if (isOrthographic) distance = 15.0f;
                     int iconsOffset = debugIconsPlacement[StringHash(nodes[i].id)].GetInt();
                     float iconsYPos = 0;
-                     
-                    if(iconType==ICON_SPLINE_PATH) 
-                    {    
+
+                    if(iconType==ICON_SPLINE_PATH)
+                    {
                         SplinePath@ sp = cast<SplinePath>(component);
                         if(sp !is null)
-                        {    
-                            for(int step=0; step < splinePathResolution; step++) 
+                        {
+                            for(int step=0; step < splinePathResolution; step++)
                             {
                                 int index = (i * splinePathResolution) + step;
                                 Vector3 splinePoint = sp.GetPoint(splineStep * step);
                                 Billboard@ bb = debugIconsSet[ICON_SPLINE_PATH].billboards[index];
                                 float stepDistance = (camPos - splinePoint).length;
                                 if (isOrthographic) stepDistance = 15.0f;
-                                
+
                                 if(step == 0) // SplinePath start
                                 {
                                     bb.color = debugIconsColors[ICON_COLOR_SPLINE_PATH_BEGIN];
-                                    bb.size = ClampToIconMaxSize(Max(debugIconsSize * stepDistance, debugIconsSize));    
+                                    bb.size = ClampToIconMaxSize(Max(debugIconsSize * stepDistance, debugIconsSize));
                                     bb.position = splinePoint;
                                 }
                                 else if((step+1) >= (splinePathResolution - splineStep)) // SplinePath end
                                 {
                                     bb.color = debugIconsColors[ICON_COLOR_SPLINE_PATH_END];
-                                    bb.size = ClampToIconMaxSize(Max(debugIconsSize * stepDistance, debugIconsSize));    
+                                    bb.size = ClampToIconMaxSize(Max(debugIconsSize * stepDistance, debugIconsSize));
                                     bb.position = splinePoint;
                                 }
                                 else // SplinePath middle points
@@ -194,7 +192,7 @@ void UpdateViewDebugIcons()
                                 bb.enabled = sp.enabled;
                                 // Blend Icon relatively by distance to it
                                 bb.color = Color(bb.color.r, bb.color.g, bb.color.b, 1.2f - 1.0f / (debugIconsMaxSize.x / bb.size.x));
-                                if (bb.color.a < 0.25f) bb.enabled = false;   
+                                if (bb.color.a < 0.25f) bb.enabled = false;
                             }
                         }
                     }
@@ -202,7 +200,7 @@ void UpdateViewDebugIcons()
                     {
                         bb = debugIconsSet[iconType].billboards[i];
                         bb.size = ClampToIconMaxSize(Max(debugIconsSize * distance, debugIconsSize));
-                        
+
                         if(iconType==ICON_PARTICLE_EMITTER)
                         {
                             bb.size = ClampToIconMaxSize(Max(debugIconsSizeBig * distance, debugIconsSizeBig));
@@ -220,37 +218,37 @@ void UpdateViewDebugIcons()
                             Light@ light = cast<Light>(component);
                             if(light !is null)
                             {
-                                if(light.lightType == LIGHT_POINT) 
+                                if(light.lightType == LIGHT_POINT)
                                     bb = debugIconsSet[ICON_POINT_LIGHT].billboards[i];
-                                else if(light.lightType == LIGHT_DIRECTIONAL) 
+                                else if(light.lightType == LIGHT_DIRECTIONAL)
                                     bb = debugIconsSet[ICON_DIRECTIONAL_LIGHT].billboards[i];
                                 else if(light.lightType == LIGHT_SPOT)
                                     bb = debugIconsSet[ICON_SPOT_LIGHT].billboards[i];
-                                
+
                                 bb.size = ClampToIconMaxSize(Max(debugIconsSize * distance, debugIconsSize));
-                                finalIconColor = light.effectiveColor; 
+                                finalIconColor = light.effectiveColor;
                             }
                         }
-                        
-                        bb.position = nodes[i].worldPosition;   
+
+                        bb.position = nodes[i].worldPosition;
                         // Blend Icon relatively by distance to it
                         bb.color = Color(finalIconColor.r, finalIconColor.g, finalIconColor.b, 1.2f - 1.0f / (debugIconsMaxSize.x / bb.size.x));
                         bb.enabled = component.enabled;
                         // Discard billboard if it almost transparent
                         if (bb.color.a < 0.25f) bb.enabled = false;
-                        IncrementIconPlacement(bb.enabled, nodes[i], 1 );   
-                    }   
+                        IncrementIconPlacement(bb.enabled, nodes[i], 1 );
+                    }
                 }
                 Commit(iconType, iconType+1);
                 // SplinePath update resolution
                 if(iconType == ICON_SPLINE_PATH) timeToNextDebugIconsUpdateSplinePath = time.systemTime + stepDebugIconsUpdateSplinePath;
             }
         }
-    }   
+    }
     timeToNextDebugIconsUpdate = time.systemTime + stepDebugIconsUpdate;
 }
 
-void ClearCommit(int begin, int end, int newlength) 
+void ClearCommit(int begin, int end, int newlength)
 {
     for(int i=begin;i<end;i++)
     {
@@ -260,7 +258,7 @@ void ClearCommit(int begin, int end, int newlength)
     }
 }
 
-void Commit(int begin, int end) 
+void Commit(int begin, int end)
 {
     for(int i=begin;i<end;i++)
     {

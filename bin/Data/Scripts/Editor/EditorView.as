@@ -2038,7 +2038,7 @@ Drawable@ GetDrawableAtMousePostion()
 
 void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // Hide gizmo and grid from any camera other then active viewport
+    // Hide gizmo, grid and debug icons from any camera other then active viewport
     if (eventData["Camera"].GetPtr() !is camera)
     {
         if (gizmo !is null)
@@ -2048,6 +2048,8 @@ void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
     {
         if (grid !is null)
             grid.viewMask = 0;
+        if (debugIconsNode !is null)
+            debugIconsNode.enabled = false;
     }
 }
 
@@ -2063,6 +2065,8 @@ void HandleEndViewUpdate(StringHash eventType, VariantMap& eventData)
     {
         if (grid !is null)
             grid.viewMask = 0x80000000;
+        if (debugIconsNode !is null)
+            debugIconsNode.enabled = true;
     }
 }
 
