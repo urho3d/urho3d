@@ -37,8 +37,8 @@ class PhysicsWorld2D;
 enum BodyType2D
 {
     BT_STATIC = b2_staticBody,
-    BT_DYNAMIC = b2_dynamicBody,
     BT_KINEMATIC = b2_kinematicBody,
+    BT_DYNAMIC = b2_dynamicBody
 };
 
 /// 2D rigid body component.

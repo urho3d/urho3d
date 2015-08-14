@@ -298,8 +298,8 @@ static void RegisterRigidBody2D(asIScriptEngine* engine)
 {
     engine->RegisterEnum("BodyType2D");
     engine->RegisterEnumValue("BodyType2D", "BT_STATIC", BT_STATIC);
-    engine->RegisterEnumValue("BodyType2D", "BT_DYNAMIC", BT_DYNAMIC);
     engine->RegisterEnumValue("BodyType2D", "BT_KINEMATIC", BT_KINEMATIC);
+    engine->RegisterEnumValue("BodyType2D", "BT_DYNAMIC", BT_DYNAMIC);
 
     RegisterComponent<RigidBody2D>(engine, "RigidBody2D");
     engine->RegisterObjectMethod("RigidBody2D", "void set_bodyType(BodyType2D)", asMETHOD(RigidBody2D, SetBodyType), asCALL_THISCALL);
