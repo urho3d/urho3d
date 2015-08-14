@@ -738,12 +738,12 @@ SubscribeToEvent("Update", "HandleUpdate")
 ...
 
 function HandleUpdate(eventType, eventData)
-    local timeStep = eventData:GetFloat("TimeStep")
+    local timeStep = eventData["TimeStep"]:GetFloat()
     ...
 end
 \endcode
 
-When subscribing a script object to receive an event, use the form self:SubscribeToEvent instead. The function to use as the handler is given as "ClassName:FunctionName". For example subscribing to the NodeCollision physics event, and getting the participating other scene node and the contact point VectorBuffer in the handler function. Note that in Lua retrieving an object pointer from a VariantMap requires the object type as the first parameter:
+When subscribing a script object to receive an event, use the form self:SubscribeToEvent() instead. The function to use as the handler is given as "ClassName:FunctionName". For example subscribing to the NodeCollision physics event, and getting the participating other scene node and the contact point VectorBuffer in the handler function. Note that in Lua retrieving an object pointer from a VariantMap requires the object type as the first parameter:
 
 \code
 CollisionDetector = ScriptObject()
@@ -753,8 +753,8 @@ function CollisionDetector:Start()
 end
 
 function CollisionDetector:HandleNodeCollision(eventType, eventData)
-    local otherNode = eventData:GetPtr("Node", "OtherNode")
-    local contacts = eventData:GetBuffer("Contacts")
+    local otherNode = eventData["OtherNode"]:GetPtr("Node")
+    local contacts = eventData["Contacts"]:GetBuffer()
     ...
 end
 \endcode
@@ -763,7 +763,30 @@ end
 
 The binding of Urho3D C++ classes is accomplished with the tolua++ library, which for the most part binds the exact same function parameters as C++. Compared to the AngelScript API, you will always have the classes' Get / Set functions available, but in addition convenience properties also exist.
 
-As seen above from the event handling examples, VariantMap handling has some differences to both C++ and AngelScript. To get a value, supply its key name as a string. To get a pointer to an object, supply first the object type, then the key name.
+As seen above from the event handling examples, VariantMap handling is similar to both C++ and AngelScript. To get a variant object back from a map, index the map by its key as a string. A nil value is returned when the map's key does not exist. Then use one of the variant getter method to return the actual Lua object stored inside the variant object. These getter methods normally do not take any parameter, except GetPtr() and GetVoidPtr() which take a string parameter representing a Lua user type that the method would use to cast the return object into. The GetPtr() is used to get a reference counted object while the GetVoidPtr() is used to get a POD value object.
+
+You can also use the VariantMap as a pseudo Lua table to store any variant value objects in your script. The VariantMap class would try its best to convert any Lua object into a variant object and store the variant object using the provided key as index. The key can be a string or an unsigned integer. When a particular data type conversion is not being supported yet, an empty variant object would be stored instead. So, be careful if you are using this feature.
+
+\code
+local myMap = VariantMap()
+
+myMap[1] = Spline(LINEAR_CURVE)     -- LINEAR_CURVE = 2
+print(myMap[1].typeName, myMap[1]:GetVoidPtr("Spline").interpolationMode)
+-- output: VoidPtr    2
+
+myMap["I am a table"] = { 100, 200, 255 }
+print(myMap["I am a table"].typeName, myMap["I am a table"]:GetBuffer():ReadByte())
+-- output: Buffer    100
+print(myMap["I am a table"]:GetRawBuffer()[3], myMap["I am a table"]:GetRawBuffer()[2])
+-- output: 255    200
+
+local hash = StringHash("secret key")
+myMap[hash.value] = Vector2(3, 4)
+print(myMap[hash.value].typeName, myMap[hash.value]:GetVector2():Length())
+-- output: Vector2    5
+\endcode
+
+As shown in the above example, you can either use GetRawBuffer() or GetBuffer() to get the unsigned char array stored in a variant object. It also shows that VariantMap is capable of converting a Lua table containing an array of unsigned char to a variant object stored as buffer. You may want to know that it is capable of converting a Lua table containing an array of variant objects or an array of string objects to be stored as VariantVector and StringVector, respectively, as well. It also converts any Lua primitive data types and all Urho3D classes that are exposed to Lua like all the math classes, reference counted classes, POD classes, resource reference class. etc.
 
 For the rest of the functions and classes, see the generated \ref LuaScriptAPI "Lua script API reference". Also, look at the Lua counterparts of the sample applications in the bin/Data/LuaScripts directory and compare them to the C++ and AngelScript versions to familiarize yourself with how things are done on the Lua side.
 
@@ -771,7 +794,7 @@ For the rest of the functions and classes, see the generated \ref LuaScriptAPI "
 
 There are two ways to allocate a C++ object in Lua scripting, which behave differently with respect to Lua's automatic garbage collection:
 
-1) Call object's contructor:
+1) Call class constructor:
 \code
 local scene = Scene()
 \endcode
@@ -779,8 +802,9 @@ tolua++ will register this C++ object with garbage collection, and Lua will coll
 object to an object hierarchy that is kept alive on the C++ side with SharedPtr's, for example child scene nodes or %UI child elements.
 Otherwise the object will be double-deleted, resulting in a crash.
 
+Note that calling class constructor in this way is equivalent to calling class new_local() function.
 
-2) Call the new function:
+2) Call class new() function:
 \code
 local text = Text:new()
 \endcode

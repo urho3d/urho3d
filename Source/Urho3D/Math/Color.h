@@ -89,6 +89,16 @@ public:
         a_(data[3])
     {
     }
+    
+    /// Assign from another color.
+    Color& operator =(const Color& rhs)
+    {
+        r_ = rhs.r_;
+        g_ = rhs.g_;
+        b_ = rhs.b_;
+        a_ = rhs.a_;
+        return *this;
+    }    
 
     /// Test for equality with another color without epsilon.
     bool operator ==(const Color& rhs) const { return r_ == rhs.r_ && g_ == rhs.g_ && b_ == rhs.b_ && a_ == rhs.a_; }

@@ -63,6 +63,15 @@ public:
         Define(plane);
     }
 
+    /// Assign from another plane.
+    Plane& operator =(const Plane& rhs)
+    {
+        normal_ = rhs.normal_;
+        absNormal_ = rhs.absNormal_;
+        d_ = rhs.d_;
+        return *this;
+    }
+
     /// Define from 3 vertices.
     void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2)
     {
