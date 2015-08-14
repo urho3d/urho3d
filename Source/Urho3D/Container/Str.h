@@ -421,7 +421,7 @@ public:
     /// Return comparison result with a C string.
     int Compare(const char* str, bool caseSensitive = true) const;
 
-    /// Return whether contains a specific occurence of a string.
+    /// Return whether contains a specific occurrence of a string.
     bool Contains(const String& str, bool caseSensitive = true) const { return Find(str, 0, caseSensitive) != NPOS; }
 
     /// Return whether contains a specific character.
