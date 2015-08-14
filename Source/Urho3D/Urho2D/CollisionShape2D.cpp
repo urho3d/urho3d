@@ -212,7 +212,11 @@ void CollisionShape2D::CreateFixture()
         return;
 
     if (!rigidBody_)
-        return;
+    {
+        rigidBody_ = node_->GetComponent<RigidBody2D>(); // RigidBody2D can be created after CollisionShape2D
+        if (!rigidBody_)
+            return;
+    }
 
     b2Body* body = rigidBody_->GetBody();
     if (!body)
@@ -284,8 +288,6 @@ void CollisionShape2D::OnNodeSet(Node* node)
             CreateFixture();
             rigidBody_->AddCollisionShape2D(this);
         }
-        else
-            LOGERROR("No right body component in node, can not create collision shape");
     }
 }
 
