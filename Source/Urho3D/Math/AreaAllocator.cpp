@@ -161,7 +161,7 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
     return true;
 }
 
-bool AreaAllocator::SplitRect(IntRect original, const IntRect& reserve)
+bool AreaAllocator::SplitRect(const IntRect& original, const IntRect& reserve)
 {
     if (reserve.right_ > original.left_ && reserve.left_ < original.right_ && reserve.bottom_ > original.top_ &&
         reserve.top_ < original.bottom_)

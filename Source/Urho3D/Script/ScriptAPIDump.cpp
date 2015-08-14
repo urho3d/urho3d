@@ -156,7 +156,7 @@ bool ComparePropertyInfos(const PropertyInfo& lhs, const PropertyInfo& rhs)
     return String::Compare(lhs.name_.CString(), rhs.name_.CString(), true) < 0;
 }
 
-void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference, String separator)
+void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference, const String& separator)
 {
     String out(row);
     out.Replace("&in", "&");
