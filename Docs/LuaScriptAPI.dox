@@ -7178,8 +7178,8 @@ Properties:
 ### BodyType2D
 
 - int BT_STATIC
-- int BT_DYNAMIC
 - int BT_KINEMATIC
+- int BT_DYNAMIC
 
 ### CollisionEventMode
 

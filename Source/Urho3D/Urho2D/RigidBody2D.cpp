@@ -42,8 +42,8 @@ static const BodyType2D DEFAULT_BODYTYPE = BT_STATIC;
 static const char* bodyTypeNames[] =
 {
     "Static",
-    "Dynamic",
     "Kinematic",
+    "Dynamic",
     0
 };
 

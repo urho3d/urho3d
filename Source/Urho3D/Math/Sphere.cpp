@@ -25,6 +25,8 @@
 #include "../Math/Frustum.h"
 #include "../Math/Polyhedron.h"
 
+#include "../DebugNew.h"
+
 namespace Urho3D
 {
 
