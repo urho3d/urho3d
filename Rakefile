@@ -234,11 +234,12 @@ task :ci_setup_cache do
     # Do not abort even when it fails here
     system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then if ! [ #{base_mirror} ] || ! `git clone -q --depth 1 --branch #{base_mirror}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null; fi && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi"
     # Make a backup of .git directory if necessary
-    `tar cfz ~/git.tar.gz ~/.ccache/.git` if clear && ENV['OSX'].to_i != 1
+    `tar cfz ~/git.tar.gz -C ~ .ccache/.git` if clear && ENV['OSX'].to_i != 1
   end
   # Clear ccache on demand
   system "ccache -z -M #{ENV['CCACHE_MAXSIZE']} #{clear ? '-C' : ''}"
-  `tar xfz ~/git.tar.gz -C ~ && rm ~/git.tar.gz` if clear && ENV['OSX'].to_i != 1
+  # Restore the .git backup if it exists
+  `if [ -e ~/git.tar.gz ]; then tar xfz ~/git.tar.gz -C ~ && rm ~/git.tar.gz; fi`
 end
 
 # Usage: NOT intended to be used manually
