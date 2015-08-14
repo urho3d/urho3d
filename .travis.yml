@@ -34,7 +34,7 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
-    - URHO3D_MODERN_CPP=0
+    - URHO3D_C++11=0
     - URHO3D_AMALG=0
 matrix:
   fast_finish: true
@@ -169,7 +169,7 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
-    - URHO3D_MODERN_CPP=0
+    - URHO3D_C++11=0
     - URHO3D_AMALG=0
 matrix:
   fast_finish: true
@@ -237,7 +237,7 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
-    - URHO3D_MODERN_CPP=0
+    - URHO3D_C++11=0
     - URHO3D_AMALG=0
 matrix:
   fast_finish: true
@@ -272,7 +272,7 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=300M
-    - URHO3D_MODERN_CPP=0
+    - URHO3D_C++11=0
     - URHO3D_AMALG=0
   matrix:
     - MAKEFILE=1    URHO3D_LIB_TYPE=STATIC
@@ -317,7 +317,7 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
-    - URHO3D_MODERN_CPP=0
+    - URHO3D_C++11=0
     - URHO3D_AMALG=0
   matrix:
     - URHO3D_LIB_TYPE=STATIC
