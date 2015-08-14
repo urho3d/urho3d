@@ -223,6 +223,7 @@ end
 # Usage: NOT intended to be used manually
 desc 'Setup build cache'
 task :ci_setup_cache do
+  clear = /\[ccache clear\]/ =~ ENV['COMMIT_MESSAGE']
   # Use internal cache store instead of using Travis CI one (this is a workaround for using ccache on Travis CI legacy build infra)
   if ENV['USE_CCACHE'].to_i == 2
     puts 'Setting up build cache'
@@ -232,9 +233,12 @@ task :ci_setup_cache do
     base_mirror = matched ? matched[1] : nil
     # Do not abort even when it fails here
     system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then if ! [ #{base_mirror} ] || ! `git clone -q --depth 1 --branch #{base_mirror}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null; fi && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi"
+    # Make a backup of .git directory if necessary
+    `tar cfz ~/git.tar.gz ~/.ccache/.git` if clear && ENV['OSX'].to_i != 1
   end
   # Clear ccache on demand
-  system "ccache -z -M #{ENV['CCACHE_MAXSIZE']} #{/\[ccache clear\]/ =~ ENV['COMMIT_MESSAGE'] ? '-C' : ''}"
+  system "ccache -z -M #{ENV['CCACHE_MAXSIZE']} #{clear ? '-C' : ''}"
+  `tar xfz ~/git.tar.gz -C ~ && rm ~/git.tar.gz` if clear && ENV['OSX'].to_i != 1
 end
 
 # Usage: NOT intended to be used manually
