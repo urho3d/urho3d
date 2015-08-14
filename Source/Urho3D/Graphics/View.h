@@ -85,8 +85,6 @@ struct ScenePassInfo
     bool allowInstancing_;
     /// Mark to stencil flag.
     bool markToStencil_;
-    /// Light scissor optimization flag.
-    bool useScissor_;
     /// Vertex light flag.
     bool vertexLights_;
     /// Batch queue.

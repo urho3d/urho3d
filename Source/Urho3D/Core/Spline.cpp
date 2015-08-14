@@ -203,7 +203,7 @@ Variant Spline::CatmullRomInterpolation(const Vector<Variant>& knots, float t) c
         if (t >= 1.f)
             return knots[knots.Size() - 2];
 
-        int originIndex = t * (knots.Size() - 3);
+        int originIndex = static_cast<int>(t * (knots.Size() - 3));
         t = fmodf(t * (knots.Size() - 3), 1.f);
         float t2 = t * t;
         float t3 = t2 * t;

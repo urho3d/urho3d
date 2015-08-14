@@ -1877,7 +1877,7 @@ int UIElement::CalculateLayoutParentSize(const PODVector<int>& sizes, int begin,
 void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes,
     const PODVector<int>& maxSizes, const PODVector<float>& flexScales, int targetSize, int begin, int end, int spacing)
 {
-    int numChildren = sizes.Size();
+    unsigned numChildren = sizes.Size();
     if (!numChildren)
         return;
     int targetTotalSize = targetSize - begin - end - (numChildren - 1) * spacing;
@@ -1889,7 +1889,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
     float acc = 0.0f;
 
     // Initial pass
-    for (int i = 0; i < numChildren; ++i)
+    for (unsigned i = 0; i < numChildren; ++i)
     {
         int targetSize = (int)(targetChildSize * flexScales[i]);
         if (remainder)
@@ -1909,7 +1909,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
     for (;;)
     {
         int actualTotalSize = 0;
-        for (int i = 0; i < numChildren; ++i)
+        for (unsigned i = 0; i < numChildren; ++i)
             actualTotalSize += sizes[i];
         int error = targetTotalSize - actualTotalSize;
         // Break if no error
@@ -1957,7 +1957,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
     layoutMinSize_ = M_MAX_INT;
     layoutMaxSize_ = 0;
     int position = begin;
-    for (int i = 0; i < numChildren; ++i)
+    for (unsigned i = 0; i < numChildren; ++i)
     {
         positions[i] = position;
         position += sizes[i] + spacing;

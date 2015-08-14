@@ -6522,6 +6522,8 @@ Methods:
 - Variant* new(const String value)
 - Variant(const char* value) (GC)
 - Variant* new(const char* value)
+- Variant(const PODVector<unsigned char>& value) (GC)
+- Variant* new(const PODVector<unsigned char>& value)
 - Variant(const VectorBuffer& value) (GC)
 - Variant* new(const VectorBuffer& value)
 - Variant(const ResourceRef& value) (GC)
@@ -6566,6 +6568,7 @@ Methods:
 - bool operator==(const Quaternion& rhs) const
 - bool operator==(const Color& rhs) const
 - bool operator==(const String rhs) const
+- bool operator==(const PODVector<unsigned char>& rhs) const
 - bool operator==(const VectorBuffer& rhs) const
 - bool operator==(const ResourceRef& rhs) const
 - bool operator==(const ResourceRefList& rhs) const
@@ -6590,6 +6593,7 @@ Methods:
 - const Quaternion& GetQuaternion() const
 - const Color& GetColor() const
 - const String GetString() const
+- const PODVector<unsigned char>& GetRawBuffer() const
 - const VectorBuffer GetBuffer() const
 - void* GetVoidPtr(const char* type) const
 - const ResourceRef& GetResourceRef() const

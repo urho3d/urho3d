@@ -80,6 +80,7 @@ class Variant
     Variant(const Color& value);
     Variant(const String value);
     Variant(const char* value);
+    Variant(const PODVector<unsigned char>& value);
     Variant(const VectorBuffer& value);
     Variant(const ResourceRef& value);
     Variant(const ResourceRefList& value);
@@ -112,6 +113,7 @@ class Variant
     bool operator ==(const Quaternion& rhs) const;
     bool operator ==(const Color& rhs) const;
     bool operator ==(const String rhs) const;
+    bool operator ==(const PODVector<unsigned char>& rhs) const;
     bool operator ==(const VectorBuffer& rhs) const;
     bool operator ==(const ResourceRef& rhs) const;
     bool operator ==(const ResourceRefList& rhs) const;
@@ -137,7 +139,8 @@ class Variant
     const Quaternion& GetQuaternion() const;
     const Color& GetColor() const;
     const String GetString() const;
-    const VectorBuffer GetVectorBuffer @ GetBuffer() const;
+    const PODVector<unsigned char>& GetBuffer @ GetRawBuffer() const;
+    const VectorBuffer GetVectorBuffer @ GetBuffer() const;     // For backward compatibility reason, keep the old alias
     void* GetVoidPtr(const char* type) const;
     const ResourceRef& GetResourceRef() const;
     const ResourceRefList& GetResourceRefList() const;
@@ -559,7 +562,9 @@ static int VariantMapNewIndexEventHandler(lua_State* tolua_S)
     case LUA_TTABLE:
         {
             tolua_Error error;
-            if (ToluaIsVector<Variant>(tolua_S, 3, "Variant", 0, &error))
+            if (ToluaIsPODVector<unsigned char>(0.f, tolua_S, 3, "unsigned char", 0, &error))
+                variant = *static_cast<PODVector<unsigned char>*>(ToluaToPODVector<unsigned char>(0.f, tolua_S, 3, 0));
+            else if (ToluaIsVector<Variant>(tolua_S, 3, "Variant", 0, &error))
                 variant = *static_cast<VariantVector*>(ToluaToVector<Variant>(tolua_S, 3, 0));
             else if (ToluaIsVector<String>(tolua_S, 3, "String", 0, &error))
                 variant = *static_cast<StringVector*>(ToluaToVector<String>(tolua_S, 3, 0));
