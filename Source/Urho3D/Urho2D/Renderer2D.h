@@ -125,6 +125,8 @@ private:
     const Frustum* frustum_;
     /// Frustum bounding box for current frame.
     BoundingBox frustumBoundingBox_;
+    /// View mask of current camera for visibility checking.
+    unsigned viewMask_;
     /// Cached materials.
     HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > > cachedMaterials_;
     /// Cached techniques per blend mode.

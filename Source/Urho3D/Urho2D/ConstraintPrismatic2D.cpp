@@ -32,6 +32,8 @@
 namespace Urho3D
 {
 
+extern const char* URHO2D_CATEGORY;
+
 ConstraintPrismatic2D::ConstraintPrismatic2D(Context* context) :
     Constraint2D(context),
     anchor_(Vector2::ZERO),
@@ -45,7 +47,7 @@ ConstraintPrismatic2D::~ConstraintPrismatic2D()
 
 void ConstraintPrismatic2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintPrismatic2D>();
+    context->RegisterFactory<ConstraintPrismatic2D>(URHO2D_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);

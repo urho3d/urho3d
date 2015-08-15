@@ -32,6 +32,8 @@
 namespace Urho3D
 {
 
+extern const char* URHO2D_CATEGORY;
+
 ConstraintGear2D::ConstraintGear2D(Context* context) :
     Constraint2D(context)
 {
@@ -43,7 +45,7 @@ ConstraintGear2D::~ConstraintGear2D()
 
 void ConstraintGear2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintGear2D>();
+    context->RegisterFactory<ConstraintGear2D>(URHO2D_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Ratio", GetRatio, SetRatio, float, 0.0f, AM_DEFAULT);

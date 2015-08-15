@@ -32,6 +32,8 @@
 namespace Urho3D
 {
 
+extern const char* URHO2D_CATEGORY;
+
 ConstraintRope2D::ConstraintRope2D(Context* context) :
     Constraint2D(context),
     ownerBodyAnchor_(Vector2::ZERO),
@@ -46,7 +48,7 @@ ConstraintRope2D::~ConstraintRope2D()
 
 void ConstraintRope2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintRope2D>();
+    context->RegisterFactory<ConstraintRope2D>(URHO2D_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Owner Body Anchor", GetOwnerBodyAnchor, SetOwnerBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
