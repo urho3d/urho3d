@@ -65,7 +65,7 @@ public:
 		value = rhs.value;
 
 		rhs.TearDown();
-        return *this;
+		return *this;       // Urho3D
 	}
 
 	~Lock()
@@ -121,7 +121,7 @@ public:
 		value = rhs.value;
 
 		rhs.TearDown();
-        return *this;
+		return *this;       // Urho3D
 	}
 
 	~ConstLock()

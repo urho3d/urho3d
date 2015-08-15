@@ -233,13 +233,13 @@ task :ci_setup_cache do
     base_mirror = matched ? matched[1] : nil
     # Do not abort even when it fails here
     system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then if ! [ #{base_mirror} ] || ! `git clone -q --depth 1 --branch #{base_mirror}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null; fi && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi"
-    # Make a backup of .git directory if necessary
-    `tar cfz ~/git.tar.gz -C ~ .ccache/.git` if clear && ENV['OSX'].to_i != 1
+    # Preserving .git directory before clearing the cache on Linux host system (ccache on Mac OSX does not have this problem)
+    `mv ~/.ccache/.git /tmp` if clear && ENV['OSX'].to_i != 1
   end
   # Clear ccache on demand
   system "ccache -z -M #{ENV['CCACHE_MAXSIZE']} #{clear ? '-C' : ''}"
-  # Restore the .git backup if it exists
-  `if [ -e ~/git.tar.gz ]; then tar xfz ~/git.tar.gz -C ~ && rm ~/git.tar.gz; fi`
+  # Restoring .git directory if its backup exists
+  `if [ -e /tmp/.git ]; then mv /tmp/.git ~/.ccache; fi`
 end
 
 # Usage: NOT intended to be used manually
