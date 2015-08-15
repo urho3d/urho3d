@@ -107,7 +107,10 @@ void Renderer2D::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuery
 {
     unsigned resultSize = results.Size();
     for (unsigned i = 0; i < drawables_.Size(); ++i)
-        drawables_[i]->ProcessRayQuery(query, results);
+    {
+        if (drawables_[i]->GetViewMask() & query.viewMask_)
+            drawables_[i]->ProcessRayQuery(query, results);
+    }
 
     if (results.Size() != resultSize)
         Sort(results.Begin() + resultSize, results.End(), CompareRayQueryResults);
@@ -265,6 +268,9 @@ Material* Renderer2D::GetMaterial(Texture2D* texture, BlendMode blendMode)
 
 bool Renderer2D::CheckVisibility(Drawable2D* drawable) const
 {
+    if ((viewMask_ & drawable->GetViewMask()) == 0)
+        return false;
+
     const BoundingBox& box = drawable->GetWorldBoundingBox();
     if (frustum_)
         return frustum_->IsInsideFast(box) != OUTSIDE;
@@ -336,6 +342,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
         frustumBoundingBox_.Define(frustum_->vertices_[2], frustum_->vertices_[4]);
         frustum_ = 0;
     }
+    viewMask_ = camera->GetViewMask();
 
     // Check visibility
     {

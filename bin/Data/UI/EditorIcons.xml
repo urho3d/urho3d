@@ -51,6 +51,50 @@
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="112 0 126 14" />
     </element>
+    <element type="ConstraintDistance2D">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
+    <element type="ConstraintFriction2D">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
+    <element type="ConstraintGear2D">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
+    <element type="ConstraintMotor2D">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
+    <element type="ConstraintMouse2D">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
+    <element type="ConstraintPrismatic2D">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
+    <element type="ConstraintPulley2D">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
+    <element type="ConstraintRevolute2D">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
+    <element type="ConstraintRope2D">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
+    <element type="ConstraintWeld2D">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
+    <element type="ConstraintWheel2D">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="112 0 126 14" />
+    </element>
     <element type="CustomGeometry">
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="32 0 46 14" />
