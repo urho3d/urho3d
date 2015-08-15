@@ -32,6 +32,8 @@
 namespace Urho3D
 {
 
+extern const char* URHO2D_CATEGORY;
+
 ConstraintRevolute2D::ConstraintRevolute2D(Context* context) :
     Constraint2D(context),
     anchor_(Vector2::ZERO)
@@ -44,7 +46,7 @@ ConstraintRevolute2D::~ConstraintRevolute2D()
 
 void ConstraintRevolute2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintRevolute2D>();
+    context->RegisterFactory<ConstraintRevolute2D>(URHO2D_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);

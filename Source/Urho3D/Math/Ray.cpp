@@ -26,6 +26,8 @@
 #include "../Math/Frustum.h"
 #include "../Math/Ray.h"
 
+#include "../DebugNew.h"
+
 namespace Urho3D
 {
 

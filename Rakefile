@@ -224,6 +224,7 @@ end
 # Usage: NOT intended to be used manually
 desc 'Setup build cache'
 task :ci_setup_cache do
+  clear = /\[ccache clear\]/ =~ ENV['COMMIT_MESSAGE']
   # Use internal cache store instead of using Travis CI one (this is a workaround for using ccache on Travis CI legacy build infra)
   if ENV['USE_CCACHE'].to_i == 2
     puts 'Setting up build cache'
@@ -233,9 +234,13 @@ task :ci_setup_cache do
     base_mirror = matched ? matched[1] : nil
     # Do not abort even when it fails here
     system "if ! `git clone -q --depth 1 --branch #{ENV['TRAVIS_BRANCH']}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then if ! [ #{base_mirror} ] || ! `git clone -q --depth 1 --branch #{base_mirror}#{job_number} https://github.com/#{repo_slug} ~/.ccache 2>/dev/null`; then git clone -q --depth 1 https://github.com/#{repo_slug} ~/.ccache 2>/dev/null; fi && cd ~/.ccache && git checkout -qf -b #{ENV['TRAVIS_BRANCH']}#{job_number}; fi"
+    # Preserving .git directory before clearing the cache on Linux host system (ccache on Mac OSX does not have this problem)
+    `mv ~/.ccache/.git /tmp` if clear && ENV['OSX'].to_i != 1
   end
   # Clear ccache on demand
-  system "ccache -z -M #{ENV['CCACHE_MAXSIZE']} #{/\[ccache clear\]/ =~ ENV['COMMIT_MESSAGE'] ? '-C' : ''}"
+  system "ccache -z -M #{ENV['CCACHE_MAXSIZE']} #{clear ? '-C' : ''}"
+  # Restoring .git directory if its backup exists
+  `if [ -e /tmp/.git ]; then mv /tmp/.git ~/.ccache; fi`
 end
 
 # Usage: NOT intended to be used manually

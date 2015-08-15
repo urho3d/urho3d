@@ -24,6 +24,8 @@
 
 #include "../Math/AreaAllocator.h"
 
+#include "../DebugNew.h"
+
 namespace Urho3D
 {
 
@@ -147,7 +149,7 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
         // Remove the reserved area from all free areas
         for (unsigned i = 0; i < freeAreas_.Size();)
         {
-            if (SplitRect(freeAreas_[i], reserved))
+            if (SplitRect(i, reserved))
                 freeAreas_.Erase(i);
             else
                 ++i;
@@ -159,8 +161,11 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
     return true;
 }
 
-bool AreaAllocator::SplitRect(IntRect original, const IntRect& reserve)
+bool AreaAllocator::SplitRect(unsigned freeAreaIndex, const IntRect& reserve)
 {
+    // Make a copy, as the vector will be modified
+    IntRect original = freeAreas_[freeAreaIndex];
+
     if (reserve.right_ > original.left_ && reserve.left_ < original.right_ && reserve.bottom_ > original.top_ &&
         reserve.top_ < original.bottom_)
     {

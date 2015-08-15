@@ -3,6 +3,12 @@
 #include "Transform.hlsl"
 
 void VS(float4 iPos : POSITION,
+    #ifdef DIFFMAP
+        float2 iTexCoord : TEXCOORD0,
+    #endif
+    #ifdef VERTEXCOLOR
+        float4 iColor : COLOR0,
+    #endif
     #ifdef SKINNED
         float4 iBlendWeights : BLENDWEIGHT,
         int4 iBlendIndices : BLENDINDICES,
@@ -14,14 +20,10 @@ void VS(float4 iPos : POSITION,
         float2 iSize : TEXCOORD1,
     #endif
     #ifdef DIFFMAP
-        float2 iTexCoord : TEXCOORD0,
+        out float2 oTexCoord : TEXCOORD0,
     #endif
     #ifdef VERTEXCOLOR
-        float4 iColor : COLOR0,
         out float4 oColor : COLOR0,
-    #endif
-    #ifdef DIFFMAP
-        out float2 oTexCoord : TEXCOORD0,
     #endif
     #if defined(D3D11) && defined(CLIPPLANE)
         out float oClip : SV_CLIPDISTANCE0,
@@ -45,15 +47,15 @@ void VS(float4 iPos : POSITION,
 }
 
 void PS(
-    #ifdef VERTEXCOLOR
-        float4 iColor : COLOR0,
-    #endif
     #if defined(DIFFMAP) || defined(ALPHAMAP)
         float2 iTexCoord : TEXCOORD0,
     #endif
+    #ifdef VERTEXCOLOR
+        float4 iColor : COLOR0,
+    #endif
     #if defined(D3D11) && defined(CLIPPLANE)
         float iClip : SV_CLIPDISTANCE0,
-    #endif    
+    #endif
     out float4 oColor : OUTCOLOR0)
 {
     float4 diffColor = cMatDiffColor;

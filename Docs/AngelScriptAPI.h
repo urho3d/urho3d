@@ -12743,8 +12743,8 @@ BLEND_SUBTRACTALPHA,
 enum BodyType2D
 {
 BT_STATIC,
-BT_DYNAMIC,
 BT_KINEMATIC,
+BT_DYNAMIC,
 };
 
 enum CollisionEventMode

@@ -28,6 +28,11 @@
 #include <cstring>
 #include <new>
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:6293)
+#endif
+
 namespace Urho3D
 {
 
@@ -956,3 +961,7 @@ template <class T> typename Urho3D::PODVector<T>::Iterator begin(Urho3D::PODVect
 template <class T> typename Urho3D::PODVector<T>::Iterator end(Urho3D::PODVector<T>& v) { return v.End(); }
 
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
