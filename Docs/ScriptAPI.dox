@@ -770,6 +770,7 @@ namespace Urho3D
 - %Is %Enabled : bool
 - %Layer : int
 - %Order %in %Layer : int
+- %View %Mask : int
 - %Blend %Mode : int
 - %Flip X : bool
 - %Flip Y : bool
@@ -1544,6 +1545,7 @@ namespace Urho3D
 - %Is %Enabled : bool
 - %Layer : int
 - %Order %in %Layer : int
+- %View %Mask : int
 - %Particle %Effect : ResourceRef
 - %Sprite : ResourceRef
 - %Blend %Mode : int
@@ -1874,6 +1876,7 @@ namespace Urho3D
 - %Is %Enabled : bool
 - %Layer : int
 - %Order %in %Layer : int
+- %View %Mask : int
 - %Sprite : ResourceRef
 - %Blend %Mode : int
 - %Flip X : bool
