@@ -397,6 +397,7 @@ void CreateMenuBar()
              popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_KP_PERIOD));
         }
         popup.AddChild(CreateMenuItem("Color wheel", @ColorWheelBuildMenuSelectTypeColor, 'W', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Show components icons", @ViewDebugIcons, 'I', QUAL_ALT));
 
         CreateChildDivider(popup);
         
@@ -2118,4 +2119,10 @@ void HandleWheelSelectColor(StringHash eventType, VariantMap& eventData)
             }
         }
     }
+}
+
+bool ViewDebugIcons() 
+{
+    debugIconsShow = !debugIconsShow;
+    return true;
 }

@@ -20,7 +20,7 @@
 #include "Scripts/Editor/EditorLayers.as"
 #include "Scripts/Editor/EditorColorWheel.as"
 #include "Scripts/Editor/EditorEventsHandlers.as"
-
+#include "Scripts/Editor/EditorViewDebugIcons.as"
 
 String configFileName;
 

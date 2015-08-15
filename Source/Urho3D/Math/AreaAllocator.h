@@ -54,7 +54,7 @@ public:
 
 private:
     /// Remove space from a free rectangle. Return true if the original rectangle should be erased from the free list. Not called in fast mode.
-    bool SplitRect(IntRect original, const IntRect& reserve);
+    bool SplitRect(unsigned freeAreaIndex, const IntRect& reserve);
     /// Clean up redundant free space. Not called in fast mode.
     void Cleanup();
 

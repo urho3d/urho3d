@@ -475,7 +475,18 @@ float RigidBody2D::GetAngularVelocity() const
 void RigidBody2D::OnNodeSet(Node* node)
 {
     if (node)
+    {
         node->AddListener(this);
+
+        PODVector<CollisionShape2D*> shapes;
+        node_->GetDerivedComponents<CollisionShape2D>(shapes);
+
+        for (PODVector<CollisionShape2D*>::Iterator i = shapes.Begin(); i != shapes.End(); ++i)
+        {
+            (*i)->CreateFixture();
+            AddCollisionShape2D(*i);
+        }
+    }
 }
 
 void RigidBody2D::OnSceneSet(Scene* scene)

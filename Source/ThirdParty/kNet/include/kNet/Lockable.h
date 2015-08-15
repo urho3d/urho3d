@@ -65,6 +65,7 @@ public:
 		value = rhs.value;
 
 		rhs.TearDown();
+        return *this;
 	}
 
 	~Lock()
@@ -120,6 +121,7 @@ public:
 		value = rhs.value;
 
 		rhs.TearDown();
+        return *this;
 	}
 
 	~ConstLock()

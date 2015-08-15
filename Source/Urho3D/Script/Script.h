@@ -114,7 +114,7 @@ private:
     /// Return a script function/method execution context for the current execution nesting level.
     asIScriptContext* GetScriptFileContext();
     /// Output a sanitated row of script API. No-ops when URHO3D_LOGGING not defined.
-    void OutputAPIRow(DumpMode mode, const String& row, bool removeReference = false, String separator = ";");
+    void OutputAPIRow(DumpMode mode, const String& row, bool removeReference = false, const String& separator = ";");
     /// Handle a console command event.
     void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
 
