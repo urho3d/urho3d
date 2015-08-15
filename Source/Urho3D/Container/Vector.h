@@ -170,7 +170,15 @@ public:
     }
 
     /// Add an element at the end.
+#ifndef COVERITY_SCAN
     void Push(const T& value) { Resize(size_ + 1, &value); }
+#else
+    void Push(const T& value)
+    {
+        T array[] = {value};
+        Resize(size_ + 1, array);
+    }
+#endif
 
     /// Add another vector at the end.
     void Push(const Vector<T>& vector) { Resize(size_ + vector.size_, vector.Buffer()); }
