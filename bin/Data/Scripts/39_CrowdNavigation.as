@@ -112,14 +112,21 @@ void CreateScene()
     for (uint i = 0; i < 100; ++i)
         CreateMushroom(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
 
-    // Create a DetourCrowdManager component to the scene root (mandatory for crowd agents)
-    scene_.CreateComponent("DetourCrowdManager");
+    // Create a CrowdManager component to the scene root (mandatory for crowd agents)
+    CrowdManager@ crowdManager = scene_.CreateComponent("CrowdManager");
+    CrowdObstacleAvoidanceParams params = crowdManager.GetObstacleAvoidanceParams(0);
+    // Set the params to "High (66)" setting
+    params.velBias = 0.5f;
+    params.adaptiveDivs = 7;
+    params.adaptiveRings = 3;
+    params.adaptiveDepth = 3;
+    crowdManager.SetObstacleAvoidanceParams(0, params);
 
     // Create some movable barrels. We create them as crowd agents, as for moving entities it is less expensive and more convenient than using obstacles
     CreateMovingBarrels(navMesh);
 
     // Create Jack node as crowd agent
-    SpawnJack(Vector3(-5.0f, 0, 20.0f));
+    SpawnJack(Vector3(-5.0f, 0, 20.0f), scene_.CreateChild("Jacks"));
 
     // Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
     // the scene, because we want it to be unaffected by scene load / save
@@ -185,6 +192,9 @@ void SubscribeToEvents()
 
     // Subscribe HandleCrowdAgentReposition() function for controlling the animation
     SubscribeToEvent("CrowdAgentReposition", "HandleCrowdAgentReposition");
+
+    // Subscribe HandleCrowdAgentFormation() function for positioning agent into a formation
+    SubscribeToEvent("CrowdAgentFormation", "HandleCrowdAgentFormation");
 }
 
 void CreateMushroom(const Vector3& pos)
@@ -204,9 +214,9 @@ void CreateMushroom(const Vector3& pos)
     obstacle.height = mushroomNode.scale.y;
 }
 
-void SpawnJack(const Vector3& pos)
+void SpawnJack(const Vector3& pos, Node@ jackGroup)
 {
-    Node@ jackNode = scene_.CreateChild("Jack");
+    Node@ jackNode = jackGroup.CreateChild("Jack");
     jackNode.position = pos;
     AnimatedModel@ modelObject = jackNode.CreateComponent("AnimatedModel");
     modelObject.model = cache.GetResource("Model", "Models/Jack.mdl");
@@ -260,6 +270,7 @@ void CreateMovingBarrels(DynamicNavigationMesh@ navMesh)
         CrowdAgent@ agent = clone.CreateComponent("CrowdAgent");
         agent.radius = clone.scale.x * 0.5f;
         agent.height = size;
+        agent.navigationQuality = NAVIGATIONQUALITY_LOW;
     }
     barrel.Remove();
 }
@@ -273,12 +284,13 @@ void SetPathPoint(bool spawning)
     {
         DynamicNavigationMesh@ navMesh = scene_.GetComponent("DynamicNavigationMesh");
         Vector3 pathPos = navMesh.FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
+        Node@ jackGroup = scene_.GetChild("Jacks");
         if (spawning)
             // Spawn a jack at the target position
-            SpawnJack(pathPos);
+            SpawnJack(pathPos, jackGroup);
         else
             // Set crowd agents target position
-            cast<DetourCrowdManager>(scene_.GetComponent("DetourCrowdManager")).SetCrowdTarget(pathPos);
+            cast<CrowdManager>(scene_.GetComponent("CrowdManager")).SetCrowdTarget(pathPos, jackGroup);
     }
 }
 
@@ -410,7 +422,7 @@ void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
         // Visualize navigation mesh, obstacles and off-mesh connections
         cast<DynamicNavigationMesh>(scene_.GetComponent("DynamicNavigationMesh")).DrawDebugGeometry(true);
         // Visualize agents' path and position to reach
-        cast<DetourCrowdManager>(scene_.GetComponent("DetourCrowdManager")).DrawDebugGeometry(true);
+        cast<CrowdManager>(scene_.GetComponent("CrowdManager")).DrawDebugGeometry(true);
     }
 }
 
@@ -420,12 +432,27 @@ void HandleCrowdAgentFailure(StringHash eventType, VariantMap& eventData)
     int state = eventData["CrowdAgentState"].GetInt();
 
     // If the agent's state is invalid, likely from spawning on the side of a box, find a point in a larger area
-    if (state == CrowdAgentState::CROWD_AGENT_INVALID)
+    if (state == CrowdAgentState::CA_STATE_INVALID)
     {
         // Get a point on the navmesh using more generous extents
         Vector3 newPos = cast<DynamicNavigationMesh>(scene_.GetComponent("DynamicNavigationMesh")).FindNearestPoint(node.position, Vector3(5.0f,5.0f,5.0f));
         // Set the new node position, CrowdAgent component will automatically reset the state of the agent
         node.position = newPos;
+    }
+}
+
+void HandleCrowdAgentFormation(StringHash eventType, VariantMap& eventData)
+{
+    uint index = eventData["Index"].GetUInt();
+    uint size = eventData["Size"].GetUInt();
+    Vector3 position = eventData["Position"].GetVector3();
+
+    // The first agent will always move to the exact position, all other agents will select a random point nearby
+    if (index > 0)
+    {
+        CrowdManager@ crowdManager =GetEventSender();
+        CrowdAgent@ agent = eventData["CrowdAgent"].GetPtr();
+        eventData["Position"] = crowdManager.GetRandomPointInCircle(position, agent.radius, agent.queryFilterType);
     }
 }
 
@@ -437,6 +464,7 @@ void HandleCrowdAgentReposition(StringHash eventType, VariantMap& eventData)
     Node@ node = eventData["Node"].GetPtr();
     CrowdAgent@ agent = eventData["CrowdAgent"].GetPtr();
     Vector3 velocity = eventData["Velocity"].GetVector3();
+    float timeStep = eventData["TimeStep"].GetFloat();
 
     // Only Jack agent has animation controller
     AnimationController@ animCtrl = node.GetComponent("AnimationController");
@@ -446,8 +474,8 @@ void HandleCrowdAgentReposition(StringHash eventType, VariantMap& eventData)
         if (animCtrl.IsPlaying(WALKING_ANI))
         {
             float speedRatio = speed / agent.maxSpeed;
-            // Face the direction of its velocity but moderate the turning speed based on the speed ratio as we do not have timeStep here
-            node.rotation = node.rotation.Slerp(Quaternion(FORWARD, velocity), 0.1f * speedRatio);
+            // Face the direction of its velocity but moderate the turning speed based on the speed ratio and timeStep
+            node.rotation = node.rotation.Slerp(Quaternion(FORWARD, velocity), 10.f * timeStep * speedRatio);
             // Throttle the animation speed based on agent speed ratio (ratio = 1 is full throttle)
             animCtrl.SetSpeed(WALKING_ANI, speedRatio);
         }

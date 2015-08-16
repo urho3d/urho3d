@@ -288,7 +288,7 @@ UIElement@ CreateNumAttributeEditor(ListView@ list, Array<Serializable@>@ serial
     {
         LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
         attrEdit.vars["Coordinate"] = i;
-        
+
         CreateDragSlider(attrEdit);
 
         SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
@@ -422,6 +422,10 @@ Button@ CreateResourcePickerButton(UIElement@ container, Array<Serializable@>@ s
     return button;
 }
 
+// Use internally for nested variant vector
+uint nestedSubIndex;
+Array<Variant>@ nestedVector;
+
 UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const AttributeInfo&in info, uint index, uint subIndex, bool suppressedSeparatedLabel = false)
 {
     UIElement@ parent;
@@ -451,22 +455,61 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
     }
     else if (type == VAR_VARIANTVECTOR)
     {
-        VectorStruct@ vectorStruct = GetVectorStruct(serializables, index);
+        uint nameIndex = 0;
+        uint repeat = M_MAX_UNSIGNED;
+
+        VectorStruct@ vectorStruct;
+        Array<Variant>@ vector;
+        bool emptyNestedVector = false;
+        if (info.name.Contains('>'))
+        {
+            @vector = @nestedVector;
+            vectorStruct = GetNestedVectorStruct(serializables, info.name);
+            repeat = vector[subIndex].GetUInt();    // Nested VariantVector must have a predefined repeat count at the start of the vector
+            emptyNestedVector = repeat == 0;
+        }
+        else
+        {
+            @vector = serializables[0].attributes[index].GetVariantVector();
+            vectorStruct = GetVectorStruct(serializables, index);
+            subIndex = 0;
+        }
         if (vectorStruct is null)
             return null;
-        uint nameIndex = 0;
 
-        Array<Variant>@ vector = serializables[0].attributes[index].GetVariantVector();
-        for (uint i = 0; i < vector.length; ++i)
+        for (uint i = subIndex; i < vector.length; ++i)
         {
             // The individual variant in the vector is not an attribute of the serializable, the structure is reused for convenience
             AttributeInfo vectorInfo;
-            vectorInfo.name = vectorStruct.variableNames[nameIndex];
-            vectorInfo.type = vector[i].type;
+            vectorInfo.name = vectorStruct.variableNames[nameIndex++];
+            bool nested = vectorInfo.name.Contains('>');
+            if (nested)
+            {
+                vectorInfo.type = VAR_VARIANTVECTOR;
+                @nestedVector = @vector;
+            }
+            else
+                vectorInfo.type = vector[i].type;
             CreateAttributeEditor(list, serializables, vectorInfo, index, i);
-            ++nameIndex;
+            if (nested)
+            {
+                i = nestedSubIndex;
+                @nestedVector = null;
+            }
+            if (emptyNestedVector)
+            {
+                nestedSubIndex = i;
+                break;
+            }
             if (nameIndex >= vectorStruct.variableNames.length)
+            {
+                if (--repeat == 0)
+                {
+                    nestedSubIndex = i;
+                    break;
+                }
                 nameIndex = vectorStruct.restartIndex;
+            }
         }
     }
     else if (type == VAR_VARIANTMAP)
@@ -990,7 +1033,7 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     StoreAttributeEditor(parent, serializables, index, subIndex, coordinate);
     for (uint i = 0; i < serializables.length; ++i)
         serializables[i].ApplyAttributes();
-    
+
     if (!dragEditAttribute)
     {
         // Do the editor post logic after attribute has been modified.
@@ -1321,7 +1364,7 @@ String GetResourceNameFromFullName(const String&in resourceName)
             continue;
         return resourceName.Substring(resourceDirs[i].length);
     }
-    
+
     return ""; // Not found
 }
 
@@ -1379,7 +1422,7 @@ void TestResource(StringHash eventType, VariantMap& eventData)
     LineEdit@ attrEdit = button.parent.children[0];
 
     StringHash resourceType(attrEdit.vars[TYPE_VAR].GetUInt());
-    
+
     // For now only Animations can be tested
     StringHash animType("Animation");
     if (resourceType == animType)
@@ -1494,6 +1537,35 @@ void InitVectorStructs()
         "   NodeID"
     };
     vectorStructs.Push(VectorStruct("SplinePath", "Control Points", splinePathInstanceVariables, 1));
+
+    Array<String> crowdManagerFilterTypeVariables = {
+        "Query Filter Type Count",
+        "   Include Flags",
+        "   Exclude Flags",
+        "   >AreaCost"
+    };
+    vectorStructs.Push(VectorStruct("CrowdManager", "Filter Types", crowdManagerFilterTypeVariables, 1));
+
+    Array<String> crowdManagerAreaCostVariables = {
+        "   Area Count",
+        "      Cost"
+    };
+    vectorStructs.Push(VectorStruct("CrowdManager", "   >AreaCost", crowdManagerAreaCostVariables, 1));
+
+    Array<String> crowdManagerObstacleAvoidanceTypeVariables = {
+        "Obstacle Avoid. Type Count",
+        "   Velocity Bias",
+        "   Desired Velocity Weight",
+        "   Current Velocity Weight",
+        "   Side Bias Weight",
+        "   Time of Impact Weight",
+        "   Time Horizon",
+        "   Grid Size",
+        "   Adaptive Divs",
+        "   Adaptive Rings",
+        "   Adaptive Depth"
+    };
+    vectorStructs.Push(VectorStruct("CrowdManager", "Obstacle Avoidance Types", crowdManagerObstacleAvoidanceTypeVariables, 1));
 }
 
 VectorStruct@ GetVectorStruct(Array<Serializable@>@ serializables, uint index)
@@ -1507,6 +1579,16 @@ VectorStruct@ GetVectorStruct(Array<Serializable@>@ serializables, uint index)
     return null;
 }
 
+VectorStruct@ GetNestedVectorStruct(Array<Serializable@>@ serializables, const String&in name)
+{
+    for (uint i = 0; i < vectorStructs.length; ++i)
+    {
+        if (vectorStructs[i].componentTypeName == serializables[0].typeName && vectorStructs[i].attributeName == name)
+            return vectorStructs[i];
+    }
+    return null;
+}
+
 int GetAttributeIndex(Serializable@ serializable, const String&in attrName)
 {
     for (uint i = 0; i < serializable.numAttributes; ++i)
@@ -1514,6 +1596,6 @@ int GetAttributeIndex(Serializable@ serializable, const String&in attrName)
         if (serializable.attributeInfos[i].name.Compare(attrName, false) == 0)
             return i;
     }
-    
+
     return -1;
 }

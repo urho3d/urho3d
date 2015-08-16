@@ -247,8 +247,10 @@ if (URHO3D_TESTING)
     enable_testing ()
     add_definitions (-DURHO3D_TESTING)
 endif ()
+
+# Enable coverity scan modeling
 if ($ENV{COVERITY_SCAN_BRANCH})
-    add_definitions (-DCOVERITY_SCAN)
+    add_definitions (-DCOVERITY_SCAN_MODEL)
 endif ()
 
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.

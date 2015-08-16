@@ -175,9 +175,11 @@ public:
     }
 
     /// Add an element at the end.
-#ifndef COVERITY_SCAN
+#ifndef COVERITY_SCAN_MODEL
     void Push(const T& value) { Resize(size_ + 1, &value); }
 #else
+    // FIXME: Attempt had been made to use this model in the Coverity-Scan model file without any success
+    // Probably because the model had generated a different mangled name than the one used by static analyzer
     void Push(const T& value)
     {
         T array[] = {value};

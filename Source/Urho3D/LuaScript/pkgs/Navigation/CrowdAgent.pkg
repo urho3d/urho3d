@@ -1,67 +1,100 @@
 $#include "Navigation/CrowdAgent.h"
 
-enum CrowdTargetState
+enum CrowdAgentRequestedTarget
 {
-    CROWD_AGENT_TARGET_NONE = 0,
-    CROWD_AGENT_TARGET_FAILED,
-    CROWD_AGENT_TARGET_VALID,
-    CROWD_AGENT_TARGET_REQUESTING,
-    CROWD_AGENT_TARGET_WAITINGFORQUEUE,
-    CROWD_AGENT_TARGET_WAITINGFORPATH,
-    CROWD_AGENT_TARGET_VELOCITY
+    CA_REQUESTEDTARGET_NONE = 0,
+    CA_REQUESTEDTARGET_POSITION,
+    CA_REQUESTEDTARGET_VELOCITY
+};
+
+enum CrowdAgentTargetState
+{
+    CA_TARGET_NONE = 0,
+    CA_TARGET_FAILED,
+    CA_TARGET_VALID,
+    CA_TARGET_REQUESTING,
+    CA_TARGET_WAITINGFORQUEUE,
+    CA_TARGET_WAITINGFORPATH,
+    CA_TARGET_VELOCITY
 };
 
 enum CrowdAgentState
 {
-    CROWD_AGENT_INVALID = 0,
-    CROWD_AGENT_READY,
-    CROWD_AGENT_TRAVERSINGLINK
+    CA_STATE_INVALID = 0,
+    CA_STATE_WALKING,
+    CA_STATE_OFFMESH
 };
 
+enum NavigationQuality
+{
+    NAVIGATIONQUALITY_LOW = 0,
+    NAVIGATIONQUALITY_MEDIUM,
+    NAVIGATIONQUALITY_HIGH
+};
 
+enum NavigationPushiness
+{
+    NAVIGATIONPUSHINESS_LOW = 0,
+    NAVIGATIONPUSHINESS_MEDIUM,
+    NAVIGATIONPUSHINESS_HIGH
+};
 
 class CrowdAgent : public Component
 {
-    void SetNavigationFilterType(unsigned filterID);
-    void SetMoveTarget(const Vector3& position);
-    void SetMoveVelocity(const Vector3& velocity);
+    void DrawDebugGeometry(bool depthTest);
+
+    void SetTargetPosition(const Vector3& position);
+    void SetTargetVelocity(const Vector3& velocity);
+    void ResetTarget();
     void SetUpdateNodePosition(bool unodepos);
-    void SetMaxAccel(float val);
-    void SetMaxSpeed(float val);
-    void SetNavigationQuality(NavigationQuality val);
-    void SetNavigationPushiness(NavigationPushiness val);
+    void SetMaxAccel(float maxAccel);
+    void SetMaxSpeed(float maxSpeed);
     void SetRadius(float radius);
     void SetHeight(float height);
+    void SetQueryFilterType(unsigned queryFilterType);
+    void SetObstacleAvoidanceType(unsigned obstacleOvoidanceType);
+    void SetNavigationQuality(NavigationQuality val);
+    void SetNavigationPushiness(NavigationPushiness val);
 
-    unsigned GetNavigationFilterType() const;
+    Vector3 GetPosition() const;
     Vector3 GetDesiredVelocity() const;
     Vector3 GetActualVelocity() const;
     const Vector3& GetTargetPosition() const;
+    const Vector3& GetTargetVelocity() const;
+    CrowdAgentRequestedTarget GetRequestedTargetType() const;
     CrowdAgentState GetAgentState() const;
-    CrowdTargetState GetTargetState() const;
+    CrowdAgentTargetState GetTargetState() const;
     bool GetUpdateNodePosition() const;
-    float GetMaxSpeed() const;
     float GetMaxAccel() const;
-    NavigationQuality GetNavigationQuality() const;
-    NavigationPushiness GetNavigationPushiness() const;
-    bool HasArrived() const;
+    float GetMaxSpeed() const;
     float GetRadius() const;
     float GetHeight() const;
-    Vector3 GetPosition() const;
-    void DrawDebugGeometry(bool depthTest);
+    unsigned GetQueryFilterType() const;
+    unsigned GetObstacleAvoidanceType() const;
+    NavigationQuality GetNavigationQuality() const;
+    NavigationPushiness GetNavigationPushiness() const;
+    bool HasRequestedTarget() const;
+    bool HasArrived() const;
+    bool IsInCrowd() const;
 
+    tolua_property__get_set Vector3 targetPosition;
+    tolua_property__get_set Vector3 targetVelocity;
     tolua_property__get_set bool updateNodePosition;
-    tolua_property__get_set NavigationQuality navigationQuality;
-    tolua_property__get_set NavigationPushiness navigationPushiness;
-    tolua_property__get_set float maxSpeed;
     tolua_property__get_set float maxAccel;
+    tolua_property__get_set float maxSpeed;
     tolua_property__get_set float radius;
     tolua_property__get_set float height;
-    tolua_property__get_set unsigned navigationFilterType;
+    tolua_property__get_set unsigned queryFilterType;
+    tolua_property__get_set unsigned obstacleAvoidanceType;
+    tolua_property__get_set NavigationQuality navigationQuality;
+    tolua_property__get_set NavigationPushiness navigationPushiness;
+    tolua_readonly tolua_property__get_set Vector3 position;
     tolua_readonly tolua_property__get_set Vector3 desiredVelocity;
     tolua_readonly tolua_property__get_set Vector3 actualVelocity;
-    tolua_readonly tolua_property__get_set Vector3 targetPosition;
-    tolua_readonly tolua_property__get_set Vector3 position;
+    tolua_readonly tolua_property__get_set CrowdAgentRequestedTarget requestedTargetType;
     tolua_readonly tolua_property__get_set CrowdAgentState agentState;
-    tolua_readonly tolua_property__get_set CrowdTargetState targetState;
+    tolua_readonly tolua_property__get_set CrowdAgentTargetState targetState;
+    tolua_readonly tolua_property__has_set bool requestedTarget;
+    tolua_readonly tolua_property__has_set bool arrived;
+    tolua_readonly tolua_property__is_set bool inCrowd;
 };

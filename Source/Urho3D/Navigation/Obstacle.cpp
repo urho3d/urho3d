@@ -22,12 +22,11 @@
 
 #include "../Precompiled.h"
 
-#include "../Navigation/Obstacle.h"
-
 #include "../Core/Context.h"
 #include "../Graphics/DebugRenderer.h"
-#include "../Navigation/DynamicNavigationMesh.h"
 #include "../IO/Log.h"
+#include "../Navigation/DynamicNavigationMesh.h"
+#include "../Navigation/Obstacle.h"
 #include "../Navigation/NavigationEvents.h"
 #include "../Scene/Scene.h"
 

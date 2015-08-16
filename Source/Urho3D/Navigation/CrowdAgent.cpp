@@ -22,19 +22,15 @@
 
 #include "../Precompiled.h"
 
-#include "../Scene/Component.h"
 #include "../Core/Context.h"
-#include "../Navigation/CrowdAgent.h"
+#include "../Core/Profiler.h"
 #include "../Graphics/DebugRenderer.h"
-#include "../Navigation/DetourCrowdManager.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Navigation/NavigationEvents.h"
+#include "../Navigation/CrowdAgent.h"
 #include "../Scene/Node.h"
-#include "../Core/Profiler.h"
 #include "../Scene/Scene.h"
-#include "../Scene/Serializable.h"
-#include "../Core/Variant.h"
 
 #include <Detour/DetourCommon.h>
 #include <DetourCrowd/DetourCrowd.h>
@@ -46,42 +42,54 @@ namespace Urho3D
 
 extern const char* NAVIGATION_CATEGORY;
 
-static const unsigned DEFAULT_AGENT_NAVIGATION_FILTER_TYPE = 0;
+static const CrowdAgentRequestedTarget DEFAULT_AGENT_REQUEST_TARGET_TYPE = CA_REQUESTEDTARGET_NONE;
 static const float DEFAULT_AGENT_MAX_SPEED = 0.f;
 static const float DEFAULT_AGENT_MAX_ACCEL = 0.f;
+static const unsigned DEFAULT_AGENT_QUERY_FILTER_TYPE = 0;
+static const unsigned DEFAULT_AGENT_OBSTACLE_AVOIDANCE_TYPE = 0;
 static const NavigationQuality DEFAULT_AGENT_AVOIDANCE_QUALITY = NAVIGATIONQUALITY_HIGH;
-static const NavigationPushiness DEFAULT_AGENT_NAVIGATION_PUSHINESS = PUSHINESS_MEDIUM;
+static const NavigationPushiness DEFAULT_AGENT_NAVIGATION_PUSHINESS = NAVIGATIONPUSHINESS_MEDIUM;
 
-const char* crowdAgentAvoidanceQualityNames[] = {
+static const unsigned SCOPE_NAVIGATION_QUALITY_PARAMS = 1;
+static const unsigned SCOPE_NAVIGATION_PUSHINESS_PARAMS = 2;
+static const unsigned SCOPE_BASE_PARAMS = M_MAX_UNSIGNED & ~SCOPE_NAVIGATION_QUALITY_PARAMS & ~SCOPE_NAVIGATION_PUSHINESS_PARAMS;
+
+static const char* crowdAgentRequestedTargetTypeNames[] = {
+    "none",
+    "position",
+    "velocity",
+    0
+};
+
+static const char* crowdAgentAvoidanceQualityNames[] = {
     "low",
     "medium",
     "high",
     0
 };
 
-const char* crowdAgentPushinessNames[] = {
+static const char* crowdAgentPushinessNames[] = {
     "low",
     "medium",
     "high",
     0
 };
-
 
 CrowdAgent::CrowdAgent(Context* context) :
     Component(context),
-    inCrowd_(false),
     agentCrowdId_(-1),
-    targetRef_(-1),
+    requestedTargetType_(DEFAULT_AGENT_REQUEST_TARGET_TYPE),
     updateNodePosition_(true),
     maxAccel_(DEFAULT_AGENT_MAX_ACCEL),
     maxSpeed_(DEFAULT_AGENT_MAX_SPEED),
     radius_(0.0f),
     height_(0.0f),
-    filterType_(DEFAULT_AGENT_NAVIGATION_FILTER_TYPE),
+    queryFilterType_(DEFAULT_AGENT_QUERY_FILTER_TYPE),
+    obstacleAvoidanceType_(DEFAULT_AGENT_OBSTACLE_AVOIDANCE_TYPE),
     navQuality_(DEFAULT_AGENT_AVOIDANCE_QUALITY),
     navPushiness_(DEFAULT_AGENT_NAVIGATION_PUSHINESS),
-    previousTargetState_(CROWD_AGENT_TARGET_NONE),
-    previousAgentState_(CROWD_AGENT_READY),
+    previousTargetState_(CA_TARGET_NONE),
+    previousAgentState_(CA_STATE_WALKING),
     ignoreTransformChanges_(false)
 {
 }
@@ -95,43 +103,58 @@ void CrowdAgent::RegisterObject(Context* context)
 {
     context->RegisterFactory<CrowdAgent>(NAVIGATION_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Max Accel", GetMaxAccel, SetMaxAccel, float, DEFAULT_AGENT_MAX_ACCEL, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Max Speed", GetMaxSpeed, SetMaxSpeed, float, DEFAULT_AGENT_MAX_SPEED, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Height", GetHeight, SetHeight, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Target Position", GetTargetPosition, SetMoveTarget, Vector3, Vector3::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Navigation Filter", GetNavigationFilterType, SetNavigationFilterType, unsigned, DEFAULT_AGENT_NAVIGATION_FILTER_TYPE, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Navigation Pushiness", GetNavigationPushiness, SetNavigationPushiness, NavigationPushiness, crowdAgentPushinessNames, PUSHINESS_LOW, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Navigation Quality", GetNavigationQuality, SetNavigationQuality, NavigationQuality, crowdAgentAvoidanceQualityNames, NAVIGATIONQUALITY_LOW, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Agent Data", GetAgentDataAttr, SetAgentDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE("Target Position", Vector3, targetPosition_, Vector3::ZERO, AM_DEFAULT);
+    ATTRIBUTE("Target Velocity", Vector3, targetVelocity_, Vector3::ZERO, AM_DEFAULT);
+    ENUM_ATTRIBUTE("Requested Target Type", requestedTargetType_, crowdAgentRequestedTargetTypeNames,
+        DEFAULT_AGENT_REQUEST_TARGET_TYPE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Update Node Position", GetUpdateNodePosition, SetUpdateNodePosition, bool, true, AM_DEFAULT);
+    ATTRIBUTE("Max Accel", float, maxAccel_, DEFAULT_AGENT_MAX_ACCEL, AM_DEFAULT);
+    ATTRIBUTE("Max Speed", float, maxSpeed_, DEFAULT_AGENT_MAX_SPEED, AM_DEFAULT);
+    ATTRIBUTE("Radius", float, radius_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE("Height", float, height_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE("Query Filter Type", unsigned, queryFilterType_, DEFAULT_AGENT_QUERY_FILTER_TYPE, AM_DEFAULT);
+    ATTRIBUTE("Obstacle Avoidance Type", unsigned, obstacleAvoidanceType_, DEFAULT_AGENT_OBSTACLE_AVOIDANCE_TYPE, AM_DEFAULT);
+    ENUM_ATTRIBUTE("Navigation Pushiness", navPushiness_, crowdAgentPushinessNames, DEFAULT_AGENT_NAVIGATION_PUSHINESS, AM_DEFAULT);
+    ENUM_ATTRIBUTE("Navigation Quality", navQuality_, crowdAgentAvoidanceQualityNames, DEFAULT_AGENT_AVOIDANCE_QUALITY, AM_DEFAULT);
 }
 
-void CrowdAgent::OnNodeSet(Node* node)
+void CrowdAgent::ApplyAttributes()
 {
-    if (node)
-        node->AddListener(this);
-}
+    // Values from Editor, saved-file, or network must be checked before applying
+    maxAccel_ = Max(0.f, maxAccel_);
+    maxSpeed_ = Max(0.f, maxSpeed_);
+    radius_ = Max(0.f, radius_);
+    height_ = Max(0.f, height_);
+    queryFilterType_ = Min(queryFilterType_, DT_CROWD_MAX_QUERY_FILTER_TYPE - 1);
+    obstacleAvoidanceType_ = Min(obstacleAvoidanceType_, DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS - 1);
 
-void CrowdAgent::OnSceneSet(Scene* scene)
-{
-    if (scene)
+    UpdateParameters();
+
+    // Set or reset target after we have attributes applied to the agent's parameters.
+    CrowdAgentRequestedTarget requestedTargetType = requestedTargetType_;
+    if (CA_REQUESTEDTARGET_NONE != requestedTargetType_)
     {
-        if (scene == node_)
-            LOGERROR(GetTypeName() + " should not be created to the root scene node");
-        crowdManager_ = scene->GetOrCreateComponent<DetourCrowdManager>();
-        AddAgentToCrowd();
+        // Assign a dummy value such that the value check in the setter method passes
+        requestedTargetType_ = CA_REQUESTEDTARGET_NONE;
+        if (requestedTargetType == CA_REQUESTEDTARGET_POSITION)
+            SetTargetPosition(targetPosition_);
+        else
+            SetTargetVelocity(targetVelocity_);
     }
     else
-        RemoveAgentFromCrowd();
+    {
+        requestedTargetType_ = CA_REQUESTEDTARGET_POSITION;
+        ResetTarget();
+    }
 }
 
 void CrowdAgent::OnSetEnabled()
 {
     bool enabled = IsEnabledEffective();
 
-    if (enabled && !inCrowd_)
+    if (enabled && !IsInCrowd())
         AddAgentToCrowd();
-    else if (!enabled && inCrowd_)
+    else if (!enabled && IsInCrowd())
         RemoveAgentFromCrowd();
 }
 
@@ -161,44 +184,112 @@ void CrowdAgent::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     }
 }
 
-const dtCrowdAgent* CrowdAgent::GetDetourCrowdAgent() const
+void CrowdAgent::UpdateParameters(unsigned scope)
 {
-    return crowdManager_ && inCrowd_ ? crowdManager_->GetCrowdAgent(agentCrowdId_) : 0;
+    const dtCrowdAgent* agent = GetDetourCrowdAgent();
+    if (agent)
+    {
+        dtCrowdAgentParams params = agent->params;
+
+        if (scope & SCOPE_NAVIGATION_QUALITY_PARAMS)
+        {
+            switch (navQuality_)
+            {
+            case NAVIGATIONQUALITY_LOW:
+                params.updateFlags = 0
+                                     | DT_CROWD_OPTIMIZE_VIS
+                                     | DT_CROWD_ANTICIPATE_TURNS;
+                break;
+
+            case NAVIGATIONQUALITY_MEDIUM:
+                params.updateFlags = 0
+                                     | DT_CROWD_OPTIMIZE_TOPO
+                                     | DT_CROWD_OPTIMIZE_VIS
+                                     | DT_CROWD_ANTICIPATE_TURNS
+                                     | DT_CROWD_SEPARATION;
+                break;
+
+            case NAVIGATIONQUALITY_HIGH:
+                params.updateFlags = 0
+                                     // Path finding
+                                     | DT_CROWD_OPTIMIZE_TOPO
+                                     | DT_CROWD_OPTIMIZE_VIS
+                                     // Steering
+                                     | DT_CROWD_ANTICIPATE_TURNS
+                                     | DT_CROWD_SEPARATION
+                                     // Velocity planning
+                                     | DT_CROWD_OBSTACLE_AVOIDANCE;
+                break;
+            }
+        }
+
+        if (scope & SCOPE_NAVIGATION_PUSHINESS_PARAMS)
+        {
+            switch (navPushiness_)
+            {
+            case NAVIGATIONPUSHINESS_LOW:
+                params.separationWeight = 4.0f;
+                params.collisionQueryRange = radius_ * 16.0f;
+                break;
+
+            case NAVIGATIONPUSHINESS_MEDIUM:
+                params.separationWeight = 2.0f;
+                params.collisionQueryRange = radius_ * 8.0f;
+                break;
+
+            case NAVIGATIONPUSHINESS_HIGH:
+                params.separationWeight = 0.5f;
+                params.collisionQueryRange = radius_ * 1.0f;
+                break;
+            }
+        }
+
+        if (scope & SCOPE_BASE_PARAMS)
+        {
+            params.radius = radius_;
+            params.height = height_;
+            params.maxAcceleration = maxAccel_;
+            params.maxSpeed = maxSpeed_;
+            params.pathOptimizationRange = radius_ * 30.0f;
+            params.queryFilterType = (unsigned char)queryFilterType_;
+            params.obstacleAvoidanceType = (unsigned char)obstacleAvoidanceType_;
+        }
+
+        crowdManager_->GetCrowd()->updateAgentParameters(agentCrowdId_, &params);
+    }
 }
 
-void CrowdAgent::AddAgentToCrowd()
+int CrowdAgent::AddAgentToCrowd(bool force)
 {
-    if (!crowdManager_ || !crowdManager_->crowd_ || !node_)
-        return;
+    if (!node_ || !crowdManager_ || !crowdManager_->crowd_)
+        return -1;
 
-    PROFILE(AddAgentToCrowd);
-
-    if (!inCrowd_)
+    if (force || !IsInCrowd())
     {
-        inCrowd_ = true;
+        PROFILE(AddAgentToCrowd);
+
         agentCrowdId_ = crowdManager_->AddAgent(this, node_->GetPosition());
         if (agentCrowdId_ == -1)
-        {
-            inCrowd_ = false;
-            LOGERROR("AddAgentToCrowd: Could not add agent to crowd");
-            return;
-        }
-        crowdManager_->UpdateAgentNavigationQuality(this, navQuality_);
-        crowdManager_->UpdateAgentPushiness(this, navPushiness_);
+            return -1;
+
+        ApplyAttributes();
+
         previousAgentState_ = GetAgentState();
         previousTargetState_ = GetTargetState();
 
         // Agent created, but initial state is invalid and needs to be addressed
-        if (previousAgentState_ == CROWD_AGENT_INVALID)
+        if (previousAgentState_ == CA_STATE_INVALID)
         {
-            VariantMap& map = GetContext()->GetEventDataMap();
-            map[CrowdAgentFailure::P_NODE] = GetNode();
-            map[CrowdAgentFailure::P_CROWD_AGENT] = this;
-            map[CrowdAgentFailure::P_CROWD_TARGET_STATE] = previousTargetState_;
-            map[CrowdAgentFailure::P_CROWD_AGENT_STATE] = previousAgentState_;
-            map[CrowdAgentFailure::P_POSITION] = GetPosition();
-            map[CrowdAgentFailure::P_VELOCITY] = GetActualVelocity();
-            SendEvent(E_CROWD_AGENT_FAILURE, map);
+            using namespace CrowdAgentFailure;
+
+            VariantMap& map = GetEventDataMap();
+            map[P_NODE] = GetNode();
+            map[P_CROWD_AGENT] = this;
+            map[P_CROWD_TARGET_STATE] = previousTargetState_;
+            map[P_CROWD_AGENT_STATE] = previousAgentState_;
+            map[P_POSITION] = GetPosition();
+            map[P_VELOCITY] = GetActualVelocity();
+            crowdManager_->SendEvent(E_CROWD_AGENT_FAILURE, map);
 
             // Reevaluate states as handling of event may have resulted in changes
             previousAgentState_ = GetAgentState();
@@ -208,133 +299,162 @@ void CrowdAgent::AddAgentToCrowd()
         // Save the initial position to prevent CrowdAgentReposition event being triggered unnecessarily
         previousPosition_ = GetPosition();
     }
+
+    return agentCrowdId_;
 }
 
 void CrowdAgent::RemoveAgentFromCrowd()
 {
-    if (crowdManager_ && agentCrowdId_ != -1 && inCrowd_)
+    if (IsInCrowd())
     {
         crowdManager_->RemoveAgent(this);
-        inCrowd_ = false;
         agentCrowdId_ = -1;
     }
 }
 
-void CrowdAgent::SetNavigationFilterType(unsigned filterType)
+void CrowdAgent::SetTargetPosition(const Vector3& position)
 {
-    filterType_ = filterType;
-    if (crowdManager_ && inCrowd_)
+    if (position != targetPosition_ || CA_REQUESTEDTARGET_POSITION != requestedTargetType_)
     {
-        // If in the crowd it's necessary to force the update of the query filter
-        dtCrowdAgentParams params = crowdManager_->GetCrowdAgent(agentCrowdId_)->params;
-        params.queryFilterType = (unsigned char)filterType;
-        crowdManager_->GetCrowd()->updateAgentParameters(agentCrowdId_, &params);
-        MarkNetworkUpdate();
-    }
-}
-
-void CrowdAgent::SetMoveTarget(const Vector3& position)
-{
-    if (crowdManager_) {
-        if (!inCrowd_)
-            AddAgentToCrowd();
         targetPosition_ = position;
-        if (crowdManager_->SetAgentTarget(this, position, targetRef_))
-            MarkNetworkUpdate();
+        requestedTargetType_ = CA_REQUESTEDTARGET_POSITION;
+        MarkNetworkUpdate();
+
+        if (!IsInCrowd())
+            AddAgentToCrowd();
+        if (IsInCrowd())   // Make sure the previous method call is successful
+        {
+            dtPolyRef nearestRef;
+            Vector3 nearestPos = crowdManager_->FindNearestPoint(position, queryFilterType_, &nearestRef);
+            crowdManager_->GetCrowd()->requestMoveTarget(agentCrowdId_, nearestRef, nearestPos.Data());
+        }
     }
 }
 
-void CrowdAgent::ResetMoveTarget()
+void CrowdAgent::SetTargetVelocity(const Vector3& velocity)
 {
-    const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    if (agent && agent->active)
+    if (velocity != targetVelocity_ || CA_REQUESTEDTARGET_VELOCITY != requestedTargetType_)
     {
-        targetPosition_ = Vector3::ZERO;
-        crowdManager_->GetCrowd()->resetMoveTarget(agentCrowdId_);
+        targetVelocity_ = velocity;
+        requestedTargetType_ = CA_REQUESTEDTARGET_VELOCITY;
+        MarkNetworkUpdate();
+
+        if (IsInCrowd())
+            crowdManager_->GetCrowd()->requestMoveVelocity(agentCrowdId_, velocity.Data());
+    }
+}
+
+void CrowdAgent::ResetTarget()
+{
+    if (CA_REQUESTEDTARGET_NONE != requestedTargetType_)
+    {
+        requestedTargetType_ = CA_REQUESTEDTARGET_NONE;
+        MarkNetworkUpdate();
+
+        if (IsInCrowd())
+            crowdManager_->GetCrowd()->resetMoveTarget(agentCrowdId_);
+    }
+}
+
+void CrowdAgent::SetUpdateNodePosition(bool unodepos)
+{
+    if (unodepos != updateNodePosition_)
+    {
+        updateNodePosition_ = unodepos;
         MarkNetworkUpdate();
     }
 }
 
-void CrowdAgent::SetMoveVelocity(const Vector3& velocity)
+void CrowdAgent::SetMaxAccel(float maxAccel)
 {
-    const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    if (agent && agent->active)
+    if (maxAccel != maxAccel_ && maxAccel >= 0.f)
     {
-        crowdManager_->GetCrowd()->requestMoveVelocity(agentCrowdId_, velocity.Data());
+        maxAccel_ = maxAccel;
+        UpdateParameters(SCOPE_BASE_PARAMS);
         MarkNetworkUpdate();
     }
 }
 
-void CrowdAgent::SetMaxSpeed(float speed)
+void CrowdAgent::SetMaxSpeed(float maxSpeed)
 {
-    const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    if (agent)
+    if (maxSpeed != maxSpeed_ && maxSpeed >= 0.f)
     {
-        maxSpeed_ = speed;
-        dtCrowdAgentParams params = agent->params;
-        params.maxSpeed = speed;
-        crowdManager_->GetCrowd()->updateAgentParameters(agentCrowdId_, &params);
-        MarkNetworkUpdate();
-    }
-}
-
-void CrowdAgent::SetMaxAccel(float accel)
-{
-    const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    if (agent)
-    {
-        maxAccel_ = accel;
-        dtCrowdAgentParams params = agent->params;
-        params.maxAcceleration = accel;
-        crowdManager_->GetCrowd()->updateAgentParameters(agentCrowdId_, &params);
+        maxSpeed_ = maxSpeed;
+        UpdateParameters(SCOPE_BASE_PARAMS);
         MarkNetworkUpdate();
     }
 }
 
 void CrowdAgent::SetRadius(float radius)
 {
-    const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    if (agent)
+    if (radius != radius_ && radius > 0.f)
     {
         radius_ = radius;
-        dtCrowdAgentParams params = agent->params;
-        params.radius = radius;
-        crowdManager_->GetCrowd()->updateAgentParameters(agentCrowdId_, &params);
+        UpdateParameters(SCOPE_BASE_PARAMS | SCOPE_NAVIGATION_PUSHINESS_PARAMS);
         MarkNetworkUpdate();
     }
 }
 
 void CrowdAgent::SetHeight(float height)
 {
-    const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    if (agent)
+    if (height != height_ && height > 0.f)
     {
         height_ = height;
-        dtCrowdAgentParams params = agent->params;
-        params.height = height;
-        crowdManager_->GetCrowd()->updateAgentParameters(agentCrowdId_, &params);
+        UpdateParameters(SCOPE_BASE_PARAMS);
+        MarkNetworkUpdate();
+    }
+}
+
+void CrowdAgent::SetQueryFilterType(unsigned queryFilterType)
+{
+    if (queryFilterType != queryFilterType_)
+    {
+        if (queryFilterType >= DT_CROWD_MAX_QUERY_FILTER_TYPE)
+        {
+            LOGERRORF("The specified filter type index (%d) exceeds the maximum allowed value (%d)", queryFilterType,
+                DT_CROWD_MAX_QUERY_FILTER_TYPE);
+            return;
+        }
+
+        queryFilterType_ = queryFilterType;
+        UpdateParameters(SCOPE_BASE_PARAMS);
+        MarkNetworkUpdate();
+    }
+}
+
+void CrowdAgent::SetObstacleAvoidanceType(unsigned obstacleAvoidanceType)
+{
+    if (obstacleAvoidanceType != obstacleAvoidanceType_)
+    {
+        if (obstacleAvoidanceType >= DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS)
+        {
+            LOGERRORF("The specified obstacle avoidance type index (%d) exceeds the maximum allowed value (%d)",
+                obstacleAvoidanceType, DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS);
+            return;
+        }
+
+        obstacleAvoidanceType_ = obstacleAvoidanceType;
+        UpdateParameters(SCOPE_BASE_PARAMS);
         MarkNetworkUpdate();
     }
 }
 
 void CrowdAgent::SetNavigationQuality(NavigationQuality val)
 {
-    const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    if (agent)
+    if (val != navQuality_)
     {
         navQuality_ = val;
-        crowdManager_->UpdateAgentNavigationQuality(this, navQuality_);
+        UpdateParameters(SCOPE_NAVIGATION_QUALITY_PARAMS);
         MarkNetworkUpdate();
     }
 }
 
 void CrowdAgent::SetNavigationPushiness(NavigationPushiness val)
 {
-    const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    if (agent)
+    if (val != navPushiness_)
     {
         navPushiness_ = val;
-        crowdManager_->UpdateAgentPushiness(this, navPushiness_);
+        UpdateParameters(SCOPE_NAVIGATION_PUSHINESS_PARAMS);
         MarkNetworkUpdate();
     }
 }
@@ -342,64 +462,70 @@ void CrowdAgent::SetNavigationPushiness(NavigationPushiness val)
 Vector3 CrowdAgent::GetPosition() const
 {
     const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    return agent && agent->active ? Vector3(agent->npos) : node_->GetPosition();
+    return agent ? Vector3(agent->npos) : node_->GetPosition();
 }
 
 Vector3 CrowdAgent::GetDesiredVelocity() const
 {
     const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    return agent && agent->active ? Vector3(agent->dvel) : Vector3::ZERO;
+    return agent ? Vector3(agent->dvel) : Vector3::ZERO;
 }
 
 Vector3 CrowdAgent::GetActualVelocity() const
 {
     const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    return agent && agent->active ? Vector3(agent->vel) : Vector3::ZERO;
+    return agent ? Vector3(agent->vel) : Vector3::ZERO;
 }
 
-Urho3D::CrowdAgentState CrowdAgent::GetAgentState() const
+CrowdAgentState CrowdAgent::GetAgentState() const
 {
     const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    return agent && agent->active ? (CrowdAgentState)agent->state : CROWD_AGENT_INVALID;
+    return agent ? (CrowdAgentState)agent->state : CA_STATE_INVALID;
 }
 
-Urho3D::CrowdTargetState CrowdAgent::GetTargetState() const
+CrowdAgentTargetState CrowdAgent::GetTargetState() const
 {
     const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    return agent && agent->active ? (CrowdTargetState)agent->targetState : CROWD_AGENT_TARGET_NONE;
+    return agent ? (CrowdAgentTargetState)agent->targetState : CA_TARGET_NONE;
 }
 
 bool CrowdAgent::HasArrived() const
 {
-    // Is the agent at or near the end of its path?
+    // Is the agent at or near the end of its path and within its own radius of the goal?
     const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    return agent && agent->active && (!agent->ncorners ||
-        (agent->cornerFlags[agent->ncorners - 1] & DT_STRAIGHTPATH_END &&
-            Equals(dtVdist2D(agent->npos, &agent->cornerVerts[(agent->ncorners - 1) * 3]), 0.f)));
+    return agent && (!agent->ncorners || (agent->cornerFlags[agent->ncorners - 1] & DT_STRAIGHTPATH_END &&
+                                          dtVdist2D(agent->npos, &agent->cornerVerts[(agent->ncorners - 1) * 3]) <=
+                                          agent->params.radius));
 }
 
-void CrowdAgent::SetUpdateNodePosition(bool unodepos)
+bool CrowdAgent::IsInCrowd() const
 {
-    updateNodePosition_ = unodepos;
-    MarkNetworkUpdate();
+    return crowdManager_ && agentCrowdId_ != -1;
 }
 
-void CrowdAgent::OnCrowdAgentReposition(const Vector3& newPos, const Vector3& newVel)
+void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
 {
+    assert (ag);
     if (node_)
     {
+        Vector3 newPos(ag->npos);
+        Vector3 newVel(ag->vel);
+
         // Notify parent node of the reposition
         if (newPos != previousPosition_)
         {
             previousPosition_ = newPos;
 
-            VariantMap& map = GetContext()->GetEventDataMap();
-            map[CrowdAgentReposition::P_NODE] = GetNode();
-            map[CrowdAgentReposition::P_CROWD_AGENT] = this;
-            map[CrowdAgentReposition::P_POSITION] = newPos;
-            map[CrowdAgentReposition::P_VELOCITY] = newVel;
-            map[CrowdAgentReposition::P_ARRIVED] = HasArrived();
-            SendEvent(E_CROWD_AGENT_REPOSITION, map);
+            using namespace CrowdAgentReposition;
+
+            VariantMap& map = GetEventDataMap();
+            map[P_NODE] = node_;
+            map[P_CROWD_AGENT] = this;
+            map[P_POSITION] = newPos;
+            map[P_VELOCITY] = newVel;
+            map[P_ARRIVED] = HasArrived();
+            map[P_TIMESTEP] = dt;
+            crowdManager_->SendEvent(E_CROWD_AGENT_REPOSITION, map);
 
             if (updateNodePosition_)
             {
@@ -410,30 +536,32 @@ void CrowdAgent::OnCrowdAgentReposition(const Vector3& newPos, const Vector3& ne
         }
 
         // Send a notification event if we've reached the destination
-        CrowdTargetState newTargetState = GetTargetState();
+        CrowdAgentTargetState newTargetState = GetTargetState();
         CrowdAgentState newAgentState = GetAgentState();
         if (newAgentState != previousAgentState_ || newTargetState != previousTargetState_)
         {
-            VariantMap& map = GetContext()->GetEventDataMap();
-            map[CrowdAgentStateChanged::P_NODE] = GetNode();
-            map[CrowdAgentStateChanged::P_CROWD_AGENT] = this;
-            map[CrowdAgentStateChanged::P_CROWD_TARGET_STATE] = newTargetState;
-            map[CrowdAgentStateChanged::P_CROWD_AGENT_STATE] = newAgentState;
-            map[CrowdAgentStateChanged::P_POSITION] = newPos;
-            map[CrowdAgentStateChanged::P_VELOCITY] = newVel;
-            SendEvent(E_CROWD_AGENT_STATE_CHANGED, map);
+            using namespace CrowdAgentStateChanged;
+
+            VariantMap& map = GetEventDataMap();
+            map[P_NODE] = node_;
+            map[P_CROWD_AGENT] = this;
+            map[P_CROWD_TARGET_STATE] = newTargetState;
+            map[P_CROWD_AGENT_STATE] = newAgentState;
+            map[P_POSITION] = newPos;
+            map[P_VELOCITY] = newVel;
+            crowdManager_->SendEvent(E_CROWD_AGENT_STATE_CHANGED, map);
 
             // Send a failure event if either state is a failed status
-            if (newAgentState == CROWD_AGENT_INVALID || newTargetState == CROWD_AGENT_TARGET_FAILED)
+            if (newAgentState == CA_STATE_INVALID || newTargetState == CA_TARGET_FAILED)
             {
-                VariantMap& map = GetContext()->GetEventDataMap();
-                map[CrowdAgentFailure::P_NODE] = GetNode();
-                map[CrowdAgentFailure::P_CROWD_AGENT] = this;
-                map[CrowdAgentFailure::P_CROWD_TARGET_STATE] = newTargetState;
-                map[CrowdAgentFailure::P_CROWD_AGENT_STATE] = newAgentState;
-                map[CrowdAgentFailure::P_POSITION] = newPos;
-                map[CrowdAgentFailure::P_VELOCITY] = newVel;
-                SendEvent(E_CROWD_AGENT_FAILURE, map);
+                VariantMap& map = GetEventDataMap();
+                map[P_NODE] = node_;
+                map[P_CROWD_AGENT] = this;
+                map[P_CROWD_TARGET_STATE] = newTargetState;
+                map[P_CROWD_AGENT_STATE] = newAgentState;
+                map[P_POSITION] = newPos;
+                map[P_VELOCITY] = newVel;
+                crowdManager_->SendEvent(E_CROWD_AGENT_FAILURE, map);
             }
 
             // State may have been altered during the handling of the event
@@ -443,43 +571,23 @@ void CrowdAgent::OnCrowdAgentReposition(const Vector3& newPos, const Vector3& ne
     }
 }
 
-PODVector<unsigned char> CrowdAgent::GetAgentDataAttr() const
+void CrowdAgent::OnNodeSet(Node* node)
 {
-    const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    if (!agent)
-        return Variant::emptyBuffer;
-
-    // Reading it back in isn't this simple, see SetAgentDataAttr
-    VectorBuffer ret;
-    ret.Write(agent, sizeof(dtCrowdAgent));
-
-    return ret.GetBuffer();
+    if (node)
+        node->AddListener(this);
 }
 
-void CrowdAgent::SetAgentDataAttr(const PODVector<unsigned char>& value)
+void CrowdAgent::OnSceneSet(Scene* scene)
 {
-    if (value.Empty())
-        return;
-
-    dtCrowdAgent* agent = const_cast<dtCrowdAgent*>(GetDetourCrowdAgent());
-    if (!agent)
-        return;
-
-    MemoryBuffer buffer(value);
-
-    // Path corridor is tricky
-    char corridorData[sizeof(dtPathCorridor)];
-    // Duplicate the existing path corridor into a block
-    memcpy(corridorData, &agent->corridor, sizeof(dtPathCorridor));
-
-    // Read the entire block of the crowd agent
-    buffer.Read(agent, sizeof(dtCrowdAgent));
-    // Restore the values of the original path corridor
-    memcpy(&agent->corridor, corridorData, sizeof(dtPathCorridor));
-    // Tell the path corridor to rebuild the path, it will reevaluate the path, existing velocities maintained
-    agent->corridor.reset(agent->targetRef, agent->targetPos);
-
-    agent->params.userData = this;
+    if (scene)
+    {
+        if (scene == node_)
+            LOGERROR(GetTypeName() + " should not be created to the root scene node");
+        crowdManager_ = scene->GetOrCreateComponent<CrowdManager>();
+        AddAgentToCrowd();
+    }
+    else
+        RemoveAgentFromCrowd();
 }
 
 void CrowdAgent::OnMarkedDirty(Node* node)
@@ -492,10 +600,15 @@ void CrowdAgent::OnMarkedDirty(Node* node)
             memcpy(agent->npos, node->GetWorldPosition().Data(), sizeof(float) * 3);
 
             // If the node has been externally altered, provide the opportunity for DetourCrowd to reevaluate the crowd agent
-            if (agent->state == CROWD_AGENT_INVALID)
-                agent->state = CROWD_AGENT_READY;
+            if (agent->state == CA_STATE_INVALID)
+                agent->state = CA_STATE_WALKING;
         }
     }
+}
+
+const dtCrowdAgent* CrowdAgent::GetDetourCrowdAgent() const
+{
+    return IsInCrowd() ? crowdManager_->GetDetourCrowdAgent(agentCrowdId_) : 0;
 }
 
 }

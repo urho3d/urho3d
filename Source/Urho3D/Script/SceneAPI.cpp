@@ -292,8 +292,8 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "void RegisterVar(const String&in)", asMETHOD(Scene, RegisterVar), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void UnregisterVar(const String&in)", asMETHOD(Scene, UnregisterVar), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void UnregisterAllVars(const String&in)", asMETHOD(Scene, UnregisterAllVars), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Component@+ GetComponent(uint)", asMETHODPR(Scene, GetComponent, (unsigned) const, Component*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Node@+ GetNode(uint)", asMETHOD(Scene, GetNode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Component@+ GetComponent(uint) const", asMETHODPR(Scene, GetComponent, (unsigned) const, Component*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Node@+ GetNode(uint) const", asMETHOD(Scene, GetNode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "const String& GetVarName(StringHash) const", asMETHOD(Scene, GetVarName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void Update(float)", asMETHOD(Scene, Update), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_updateEnabled(bool)", asMETHOD(Scene, SetUpdateEnabled), asCALL_THISCALL);

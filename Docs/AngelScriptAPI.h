@@ -3098,6 +3098,7 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveInstanceDefault();
+void ResetTarget();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -3108,8 +3109,6 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetInterceptNetworkUpdate(const String&, bool);
-void SetMoveTarget(const Vector3&);
-void SetMoveVelocity(const Vector3&);
 
 // Properties:
 /* readonly */
@@ -3136,25 +3135,32 @@ bool enabledEffective;
 float height;
 /* readonly */
 uint id;
+/* readonly */
+bool inCrowd;
 float maxAccel;
 float maxSpeed;
-uint navigationFilterType;
 NavigationPushiness navigationPushiness;
-NavigationAvoidanceQuality navigationQuality;
+NavigationQuality navigationQuality;
 /* readonly */
 Node node;
 /* readonly */
 uint numAttributes;
 ObjectAnimation objectAnimation;
+uint obstacleAvoidanceType;
 /* readonly */
 Vector3 position;
+uint queryFilterType;
 float radius;
 /* readonly */
 int refs;
 /* readonly */
+bool requestedTarget;
+/* readonly */
+CrowdAgentRequestedTarget requestedTargetType;
 Vector3 targetPosition;
 /* readonly */
-CrowdTargetState targetState;
+CrowdAgentTargetState targetState;
+Vector3 targetVelocity;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -3163,6 +3169,110 @@ String typeName;
 bool updateNodePosition;
 /* readonly */
 int weakRefs;
+};
+
+class CrowdManager
+{
+// Methods:
+void ApplyAttributes();
+const CrowdObstacleAvoidanceParams& GetObstacleAvoidanceParams(uint);
+void DrawDebugGeometry(DebugRenderer, bool);
+void DrawDebugGeometry(bool);
+Vector3 FindNearestPoint(const Vector3&, int);
+Array<CrowdAgent> GetAgents(Node = null, bool = true);
+float GetAreaCost(uint, uint);
+Variant GetAttribute(const String&) const;
+ValueAnimation GetAttributeAnimation(const String&) const;
+float GetAttributeAnimationSpeed(const String&) const;
+WrapMode GetAttributeAnimationWrapMode(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+float GetDistanceToWall(const Vector3&, float, int);
+uint16 GetExcludeFlags(uint);
+uint16 GetIncludeFlags(uint);
+bool GetInterceptNetworkUpdate(const String&) const;
+Vector3 GetRandomPoint(int);
+Vector3 GetRandomPointInCircle(const Vector3&, float, int);
+bool Load(File, bool = false);
+bool Load(VectorBuffer&, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+Vector3 MoveAlongSurface(const Vector3&, const Vector3&, int, uint = 3);
+Vector3 Raycast(const Vector3&, const Vector3&, int);
+void Remove();
+void RemoveInstanceDefault();
+void ResetCrowdTarget(Node = null);
+void ResetToDefault();
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAreaCost(uint, uint, float);
+bool SetAttribute(const String&, const Variant&);
+void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetCrowdTarget(const Vector3&, Node = null);
+void SetCrowdVelocity(const Vector3&, Node = null);
+void SetExcludeFlags(uint, uint16);
+void SetIncludeFlags(uint, uint16);
+void SetInterceptNetworkUpdate(const String&, bool);
+void SetObstacleAvoidanceParams(uint, const CrowdObstacleAvoidanceParams&);
+
+// Properties:
+bool animationEnabled;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+StringHash baseType;
+/* readonly */
+String category;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+float maxAgentRadius;
+int maxAgents;
+NavigationMesh navMesh;
+/* readonly */
+Node node;
+/* readonly */
+Array<uint> numAreas;
+/* readonly */
+uint numAttributes;
+/* readonly */
+uint numObstacleAvoidanceTypes;
+/* readonly */
+uint numQueryFilterTypes;
+ObjectAnimation objectAnimation;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class CrowdObstacleAvoidanceParams
+{
+
+// Properties:
+uint8 adaptiveDepth;
+uint8 adaptiveDivs;
+uint8 adaptiveRings;
+uint8 gridSize;
+float horizTime;
+float velBias;
+float weightCurVel;
+float weightDesVel;
+float weightSide;
+float weightToi;
 };
 
 class Cursor
@@ -3778,76 +3888,6 @@ String name;
 uint position;
 /* readonly */
 uint size;
-};
-
-class DetourCrowdManager
-{
-// Methods:
-void ApplyAttributes();
-void CreateCrowd();
-void DrawDebugGeometry(DebugRenderer, bool);
-void DrawDebugGeometry(bool);
-Array<CrowdAgent> GetActiveAgents();
-float GetAreaCost(uint, uint);
-Variant GetAttribute(const String&) const;
-ValueAnimation GetAttributeAnimation(const String&) const;
-float GetAttributeAnimationSpeed(const String&) const;
-WrapMode GetAttributeAnimationWrapMode(const String&) const;
-Variant GetAttributeDefault(const String&) const;
-bool GetInterceptNetworkUpdate(const String&) const;
-bool Load(File, bool = false);
-bool Load(VectorBuffer&, bool = false);
-bool LoadXML(const XMLElement&, bool = false);
-void MarkNetworkUpdate() const;
-void Remove();
-void RemoveInstanceDefault();
-void ResetCrowdTarget(int = 0, int = M_MAX_INT);
-void ResetToDefault();
-bool Save(File) const;
-bool Save(VectorBuffer&) const;
-bool SaveXML(XMLElement&) const;
-void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetAreaCost(uint, uint, float);
-bool SetAttribute(const String&, const Variant&);
-void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
-void SetAttributeAnimationSpeed(const String&, float);
-void SetAttributeAnimationWrapMode(const String&, WrapMode);
-void SetCrowdTarget(const Vector3&, int = 0, int = M_MAX_INT);
-void SetCrowdVelocity(const Vector3&, int = 0, int = M_MAX_INT);
-void SetInterceptNetworkUpdate(const String&, bool);
-
-// Properties:
-bool animationEnabled;
-/* readonly */
-Array<Variant> attributeDefaults;
-/* readonly */
-Array<AttributeInfo> attributeInfos;
-Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
-/* readonly */
-String category;
-bool enabled;
-/* readonly */
-bool enabledEffective;
-/* readonly */
-uint id;
-int maxAgents;
-NavigationMesh navMesh;
-/* readonly */
-Node node;
-/* readonly */
-uint numAttributes;
-ObjectAnimation objectAnimation;
-/* readonly */
-int refs;
-bool temporary;
-/* readonly */
-StringHash type;
-/* readonly */
-String typeName;
-/* readonly */
-int weakRefs;
 };
 
 class Dictionary
@@ -6612,7 +6652,7 @@ Array<Node> GetChildren(bool = false) const;
 Array<Node> GetChildrenWithComponent(const String&, bool = false) const;
 Array<Node> GetChildrenWithScript(bool = false) const;
 Array<Node> GetChildrenWithScript(const String&, bool = false) const;
-Component GetComponent(const String&) const;
+Component GetComponent(const String&, bool = false) const;
 Array<Component> GetComponents() const;
 Array<Component> GetComponents(const String&, bool = false) const;
 bool GetInterceptNetworkUpdate(const String&) const;
@@ -8196,12 +8236,12 @@ Array<Node> GetChildren(bool = false) const;
 Array<Node> GetChildrenWithComponent(const String&, bool = false) const;
 Array<Node> GetChildrenWithScript(bool = false) const;
 Array<Node> GetChildrenWithScript(const String&, bool = false) const;
-Component GetComponent(const String&) const;
-Component GetComponent(uint);
+Component GetComponent(const String&, bool = false) const;
+Component GetComponent(uint) const;
 Array<Component> GetComponents() const;
 Array<Component> GetComponents(const String&, bool = false) const;
 bool GetInterceptNetworkUpdate(const String&) const;
-Node GetNode(uint);
+Node GetNode(uint) const;
 Component GetOrCreateComponent(const String&, CreateMode = REPLICATED, uint = 0);
 ScriptObject GetScriptObject() const;
 ScriptObject GetScriptObject(const String&) const;
@@ -12801,22 +12841,29 @@ REPLICATED,
 LOCAL,
 };
 
-enum CrowdAgentState
+enum CrowdAgentRequestedTarget
 {
-CROWD_AGENT_INVALID,
-CROWD_AGENT_READY,
-CROWD_AGENT_TRAVERSINGLINK,
+CA_REQUESTEDTARGET_NONE,
+CA_REQUESTEDTARGET_POSITION,
+CA_REQUESTEDTARGET_VELOCITY,
 };
 
-enum CrowdTargetState
+enum CrowdAgentState
 {
-CROWD_AGENT_TARGET_NONE,
-CROWD_AGENT_TARGET_FAILED,
-CROWD_AGENT_TARGET_VALID,
-CROWD_AGENT_TARGET_REQUESTING,
-CROWD_AGENT_TARGET_WAITINGFORQUEUE,
-CROWD_AGENT_TARGET_WAITINGFORPATH,
-CROWD_AGENT_TARGET_VELOCITY,
+CA_STATE_INVALID,
+CA_STATE_WALKING,
+CA_STATE_OFFMESH,
+};
+
+enum CrowdAgentTargetState
+{
+CA_TARGET_NONE,
+CA_TARGET_FAILED,
+CA_TARGET_VALID,
+CA_TARGET_REQUESTING,
+CA_TARGET_WAITINGFORQUEUE,
+CA_TARGET_WAITINGFORPATH,
+CA_TARGET_VELOCITY,
 };
 
 enum CubeMapFace
@@ -12992,18 +13039,18 @@ MM_RELATIVE,
 MM_WRAP,
 };
 
-enum NavigationAvoidanceQuality
+enum NavigationPushiness
+{
+NAVIGATIONPUSHINESS_LOW,
+NAVIGATIONPUSHINESS_MEDIUM,
+NAVIGATIONPUSHINESS_HIGH,
+};
+
+enum NavigationQuality
 {
 NAVIGATIONQUALITY_LOW,
 NAVIGATIONQUALITY_MEDIUM,
 NAVIGATIONQUALITY_HIGH,
-};
-
-enum NavigationPushiness
-{
-PUSHINESS_LOW,
-PUSHINESS_MEDIUM,
-PUSHINESS_HIGH,
 };
 
 enum NavmeshPartitionType

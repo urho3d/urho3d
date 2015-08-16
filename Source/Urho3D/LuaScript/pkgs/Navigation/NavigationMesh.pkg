@@ -14,7 +14,6 @@ struct NavigationGeometryInfo
     BoundingBox boundingBox_ @ boundingBox;
 };
 
-
 class NavigationMesh : public Component
 {
     void SetTileSize(int size);
@@ -39,12 +38,9 @@ class NavigationMesh : public Component
     void SetDrawNavAreas(bool enable);
 
     Vector3 FindNearestPoint(const Vector3& point, const Vector3& extents = Vector3::ONE);
-    Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents=Vector3::ONE, int maxVisited=3);
-    // void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
+    Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, int maxVisited = 3);
     tolua_outside const PODVector<Vector3>& NavigationMeshFindPath @ FindPath(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
-
     Vector3 GetRandomPoint();
-
     Vector3 GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents = Vector3::ONE);
     float GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents = Vector3::ONE);
     Vector3 Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);

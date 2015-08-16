@@ -23,22 +23,20 @@
 #pragma once
 
 #include "../Container/ArrayPtr.h"
-#include "../Math/BoundingBox.h"
-#include "../Scene/Component.h"
 #include "../Container/HashSet.h"
+#include "../Math/BoundingBox.h"
 #include "../Math/Matrix3x4.h"
+#include "../Scene/Component.h"
+
+#ifdef DT_POLYREF64
+typedef uint64_t dtPolyRef;
+#else
+typedef unsigned int dtPolyRef;
+#endif
 
 class dtNavMesh;
 class dtNavMeshQuery;
 class dtQueryFilter;
-struct dtNavMeshCreateParams;
-class rcContext;
-struct rcHeightfield;
-struct rcCompactHeightfield;
-struct rcContourSet;
-struct rcPolyMesh;
-struct rcPolyMeshDetail;
-struct rcHeightFieldLayerSet;
 
 namespace Urho3D
 {
@@ -71,7 +69,8 @@ struct NavigationGeometryInfo
 class URHO3D_API NavigationMesh : public Component
 {
     OBJECT(NavigationMesh);
-    friend class DetourCrowdManager;
+
+    friend class CrowdManager;
 
 public:
     /// Construct.
@@ -118,68 +117,98 @@ public:
     virtual bool Build();
     /// Rebuild part of the navigation mesh contained by the world-space bounding box. Return true if successful.
     virtual bool Build(const BoundingBox& boundingBox);
-    /// Find the nearest point on the navigation mesh to a given point. Extens specifies how far out from the specified point to check along each axis.
-    Vector3 FindNearestPoint(const Vector3& point, const Vector3& extents=Vector3::ONE);
+    /// Find the nearest point on the navigation mesh to a given point. Extents specifies how far out from the specified point to check along each axis.
+    Vector3 FindNearestPoint
+        (const Vector3& point, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = 0, dtPolyRef* nearestRef = 0);
     /// Try to move along the surface from one point to another.
-    Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents=Vector3::ONE, int maxVisited=3);
+    Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, int maxVisited = 3,
+        const dtQueryFilter* filter = 0);
     /// Find a path between world space points. Return non-empty list of points if successful. Extents specifies how far off the navigation mesh the points can be.
-    void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
+    void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE,
+        const dtQueryFilter* filter = 0);
     /// Return a random point on the navigation mesh.
-    Vector3 GetRandomPoint();
+    Vector3 GetRandomPoint(const dtQueryFilter* filter = 0, dtPolyRef* randomRef = 0);
     /// Return a random point on the navigation mesh within a circle. The circle radius is only a guideline and in practice the returned point may be further away.
-    Vector3 GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents = Vector3::ONE);
+    Vector3 GetRandomPointInCircle
+        (const Vector3& center, float radius, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = 0,
+            dtPolyRef* randomRef = 0);
     /// Return distance to wall from a point. Maximum search radius must be specified.
-    float GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents = Vector3::ONE);
+    float GetDistanceToWall
+        (const Vector3& point, float radius, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = 0,
+            Vector3* hitPos = 0, Vector3* hitNormal = 0);
     /// Perform a walkability raycast on the navigation mesh between start and end and return the point where a wall was hit, or the end point if no walls.
-    Vector3 Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
+    Vector3 Raycast
+        (const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = 0,
+            Vector3* hitNormal = 0);
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
 
     /// Return the given name of this navigation mesh.
     String GetMeshName() const { return meshName_; }
+
     /// Set the name of this navigation mesh.
     void SetMeshName(const String& newName);
+
     /// Return tile size.
     int GetTileSize() const { return tileSize_; }
+
     /// Return cell size.
     float GetCellSize() const { return cellSize_; }
+
     /// Return cell height.
     float GetCellHeight() const { return cellHeight_; }
+
     /// Return navigation agent height.
     float GetAgentHeight() const { return agentHeight_; }
+
     /// Return navigation agent radius.
     float GetAgentRadius() const { return agentRadius_; }
+
     /// Return navigation agent max vertical climb.
     float GetAgentMaxClimb() const { return agentMaxClimb_; }
+
     /// Return navigation agent max slope.
     float GetAgentMaxSlope() const { return agentMaxSlope_; }
+
     /// Return region minimum size.
     float GetRegionMinSize() const { return regionMinSize_; }
+
     /// Return region merge size.
     float GetRegionMergeSize() const { return regionMergeSize_; }
+
     /// Return edge max length.
     float GetEdgeMaxLength() const { return edgeMaxLength_; }
+
     /// Return edge max error.
     float GetEdgeMaxError() const { return edgeMaxError_; }
+
     /// Return detail sampling distance.
     float GetDetailSampleDistance() const { return detailSampleDistance_; }
+
     /// Return detail sampling maximum error.
     float GetDetailSampleMaxError() const { return detailSampleMaxError_; }
+
     /// Return navigation mesh bounding box padding.
     const Vector3& GetPadding() const { return padding_; }
+
     /// Get the current cost of an area
     float GetAreaCost(unsigned areaID) const;
+
     /// Return whether has been initialized with valid navigation data.
     bool IsInitialized() const { return navMesh_ != 0; }
+
     /// Return local space bounding box of the navigation mesh.
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
+
     /// Return world space bounding box of the navigation mesh.
     BoundingBox GetWorldBoundingBox() const;
+
     /// Return number of tiles.
     IntVector2 GetNumTiles() const { return IntVector2(numTilesX_, numTilesZ_); }
 
     /// Set the partition type used for polygon generation.
     void SetPartitionType(NavmeshPartitionType aType);
+
     /// Return Partition Type.
     NavmeshPartitionType GetPartitionType() const { return partitionType_; }
 
@@ -190,11 +219,13 @@ public:
 
     /// Draw debug geometry for OffMeshConnection components.
     void SetDrawOffMeshConnections(bool enable) { drawOffMeshConnections_ = enable; }
+
     /// Return whether to draw OffMeshConnection components.
     bool GetDrawOffMeshConnections() const { return drawOffMeshConnections_; }
 
     /// Draw debug geometry for NavArea components.
     void SetDrawNavAreas(bool enable) { drawNavAreas_ = enable; }
+
     /// Return whether to draw NavArea components.
     bool GetDrawNavAreas() const { return drawNavAreas_; }
 
@@ -202,7 +233,8 @@ protected:
     /// Collect geometry from under Navigable components.
     void CollectGeometries(Vector<NavigationGeometryInfo>& geometryList);
     /// Visit nodes and collect navigable geometry.
-    void CollectGeometries(Vector<NavigationGeometryInfo>& geometryList, Node* node, HashSet<Node*>& processedNodes, bool recursive);
+    void
+        CollectGeometries(Vector<NavigationGeometryInfo>& geometryList, Node* node, HashSet<Node*>& processedNodes, bool recursive);
     /// Get geometry data within a bounding box.
     void GetTileGeometry(NavBuildData* build, Vector<NavigationGeometryInfo>& geometryList, BoundingBox& box);
     /// Add a triangle mesh to the geometry data.
@@ -263,8 +295,6 @@ protected:
     NavmeshPartitionType partitionType_;
     /// Keep internal build resources for debug draw modes.
     bool keepInterResults_;
-    /// Internal build resources for creating the navmesh.
-    HashMap<Pair<int, int>, NavBuildData*> builds_;
 
     /// Debug draw OffMeshConnection components.
     bool drawOffMeshConnections_;

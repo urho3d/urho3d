@@ -207,7 +207,7 @@
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="240 0 254 14" />
     </element>
-    <element type="DetourCrowdManager">
+    <element type="CrowdManager">
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="128 16 142 30" />
     </element>
@@ -218,10 +218,6 @@
     <element type="Obstacle">
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="160 16 174 30" />
-    </element>
-    <element type="NavigationMesh">
-        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
-        <attribute name="Image Rect" value="64 16 78 30" />
     </element>
     <element type="Text3D">
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
