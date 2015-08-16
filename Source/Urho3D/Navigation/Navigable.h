@@ -42,6 +42,7 @@ public:
 
     /// Set whether geometry is automatically collected from child nodes. Default true.
     void SetRecursive(bool enable);
+
     /// Return whether geometry is automatically collected from child nodes.
     bool IsRecursive() const { return recursive_; }
 

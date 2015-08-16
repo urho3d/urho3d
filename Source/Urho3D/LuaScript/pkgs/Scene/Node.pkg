@@ -173,7 +173,7 @@ class Node : public Animatable
     const VariantMap& GetVars() const;
 
     // template <class T> T* GetComponent() const;
-    Component* GetComponent(const String type) const;
+    Component* GetComponent(const String type, bool recursive = false) const;
 
     // template <class T> void GetComponents(PODVector<T*>& dest, bool recursive = false) const;
     tolua_outside const PODVector<Component*>& NodeGetComponentsWithType @ GetComponents(const String type, bool recursive = false);

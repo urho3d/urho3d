@@ -43,6 +43,16 @@ EVENT(E_NAVIGATION_AREA_REBUILT, NavigationAreaRebuilt)
     PARAM(P_BOUNDSMAX, BoundsMax); // Vector3
 }
 
+/// Crowd agent formation.
+EVENT(E_CROWD_AGENT_FORMATION, CrowdAgentFormation)
+{
+    PARAM(P_NODE, Node); // Node pointer
+    PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    PARAM(P_INDEX, Index); // unsigned
+    PARAM(P_SIZE, Size); // unsigned
+    PARAM(P_POSITION, Position); // Vector3 [in/out]
+}
+
 /// Crowd agent has been repositioned.
 EVENT(E_CROWD_AGENT_REPOSITION, CrowdAgentReposition)
 {
@@ -51,9 +61,10 @@ EVENT(E_CROWD_AGENT_REPOSITION, CrowdAgentReposition)
     PARAM(P_POSITION, Position); // Vector3
     PARAM(P_VELOCITY, Velocity); // Vector3
     PARAM(P_ARRIVED, Arrived); // bool
+    PARAM(P_TIMESTEP, TimeStep); // float
 }
 
-/// Crowd agent's internal state has become invalidated.
+/// Crowd agent's internal state has become invalidated. This is a special case of CrowdAgentStateChanged event.
 EVENT(E_CROWD_AGENT_FAILURE, CrowdAgentFailure)
 {
     PARAM(P_NODE, Node); // Node pointer

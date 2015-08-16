@@ -37,7 +37,7 @@
 #include <Urho3D/Math/MathDefs.h>
 #include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Navigation/CrowdAgent.h>
-#include <Urho3D/Navigation/DetourCrowdManager.h>
+#include <Urho3D/Navigation/CrowdManager.h>
 #include <Urho3D/Navigation/DynamicNavigationMesh.h>
 #include <Urho3D/Navigation/Navigable.h>
 #include <Urho3D/Navigation/NavigationEvents.h>
@@ -167,14 +167,21 @@ void CrowdNavigation::CreateScene()
     for (unsigned i = 0; i < 100; ++i)
         CreateMushroom(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
 
-    // Create a DetourCrowdManager component to the scene root
-    scene_->CreateComponent<DetourCrowdManager>();
+    // Create a CrowdManager component to the scene root
+    CrowdManager* crowdManager = scene_->CreateComponent<CrowdManager>();
+    CrowdObstacleAvoidanceParams params = crowdManager->GetObstacleAvoidanceParams(0);
+    // Set the params to "High (66)" setting
+    params.velBias = 0.5f;
+    params.adaptiveDivs = 7;
+    params.adaptiveRings = 3;
+    params.adaptiveDepth = 3;
+    crowdManager->SetObstacleAvoidanceParams(0, params);
 
     // Create some movable barrels. We create them as crowd agents, as for moving entities it is less expensive and more convenient than using obstacles
     CreateMovingBarrels(navMesh);
 
     // Create Jack node as crowd agent
-    SpawnJack(Vector3(-5.0f, 0.0f, 20.0f));
+    SpawnJack(Vector3(-5.0f, 0.0f, 20.0f), scene_->CreateChild("Jacks"));
 
     // Create the camera. Set far clip to match the fog. Note: now we actually create the camera node outside the scene, because
     // we want it to be unaffected by scene load / save
@@ -248,12 +255,15 @@ void CrowdNavigation::SubscribeToEvents()
 
     // Subscribe HandleCrowdAgentReposition() function for controlling the animation
     SubscribeToEvent(E_CROWD_AGENT_REPOSITION, HANDLER(CrowdNavigation, HandleCrowdAgentReposition));
+
+    // Subscribe HandleCrowdAgentFormation() function for positioning agent into a formation
+    SubscribeToEvent(E_CROWD_AGENT_FORMATION, HANDLER(CrowdNavigation, HandleCrowdAgentFormation));
 }
 
-void CrowdNavigation::SpawnJack(const Vector3& pos)
+void CrowdNavigation::SpawnJack(const Vector3& pos, Node* jackGroup)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SharedPtr<Node> jackNode(scene_->CreateChild("Jack"));
+    SharedPtr<Node> jackNode(jackGroup->CreateChild("Jack"));
     jackNode->SetPosition(pos);
     AnimatedModel* modelObject = jackNode->CreateComponent<AnimatedModel>();
     modelObject->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
@@ -327,6 +337,7 @@ void CrowdNavigation::CreateMovingBarrels(DynamicNavigationMesh* navMesh)
         CrowdAgent* agent = clone->CreateComponent<CrowdAgent>();
         agent->SetRadius(clone->GetScale().x_ * 0.5f);
         agent->SetHeight(size);
+        agent->SetNavigationQuality(NAVIGATIONQUALITY_LOW);
     }
     barrel->Remove();
 }
@@ -340,12 +351,13 @@ void CrowdNavigation::SetPathPoint(bool spawning)
     {
         DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
         Vector3 pathPos = navMesh->FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
+        Node* jackGroup = scene_->GetChild("Jacks");
         if (spawning)
             // Spawn a jack at the target position
-            SpawnJack(pathPos);
+            SpawnJack(pathPos, jackGroup);
         else
             // Set crowd agents target position
-            scene_->GetComponent<DetourCrowdManager>()->SetCrowdTarget(pathPos);
+            scene_->GetComponent<CrowdManager>()->SetCrowdTarget(pathPos, jackGroup);
     }
 }
 
@@ -485,7 +497,7 @@ void CrowdNavigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& e
         // Visualize navigation mesh, obstacles and off-mesh connections
         scene_->GetComponent<DynamicNavigationMesh>()->DrawDebugGeometry(true);
         // Visualize agents' path and position to reach
-        scene_->GetComponent<DetourCrowdManager>()->DrawDebugGeometry(true);
+        scene_->GetComponent<CrowdManager>()->DrawDebugGeometry(true);
     }
 }
 
@@ -497,7 +509,7 @@ void CrowdNavigation::HandleCrowdAgentFailure(StringHash eventType, VariantMap& 
     CrowdAgentState agentState = (CrowdAgentState)eventData[P_CROWD_AGENT_STATE].GetInt();
 
     // If the agent's state is invalid, likely from spawning on the side of a box, find a point in a larger area
-    if (agentState == CROWD_AGENT_INVALID)
+    if (agentState == CA_STATE_INVALID)
     {
         // Get a point on the navmesh using more generous extents
         Vector3 newPos = scene_->GetComponent<DynamicNavigationMesh>()->FindNearestPoint(node->GetPosition(), Vector3(5.0f, 5.0f, 5.0f));
@@ -515,6 +527,7 @@ void CrowdNavigation::HandleCrowdAgentReposition(StringHash eventType, VariantMa
     Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
     CrowdAgent* agent = static_cast<CrowdAgent*>(eventData[P_CROWD_AGENT].GetPtr());
     Vector3 velocity = eventData[P_VELOCITY].GetVector3();
+    float timeStep = eventData[P_TIMESTEP].GetFloat();
 
     // Only Jack agent has animation controller
     AnimationController* animCtrl = node->GetComponent<AnimationController>();
@@ -524,8 +537,8 @@ void CrowdNavigation::HandleCrowdAgentReposition(StringHash eventType, VariantMa
         if (animCtrl->IsPlaying(WALKING_ANI))
         {
             float speedRatio = speed / agent->GetMaxSpeed();
-            // Face the direction of its velocity but moderate the turning speed based on the speed ratio as we do not have timeStep here
-            node->SetRotation(node->GetRotation().Slerp(Quaternion(Vector3::FORWARD, velocity), 0.1f * speedRatio));
+            // Face the direction of its velocity but moderate the turning speed based on the speed ratio and timeStep
+            node->SetRotation(node->GetRotation().Slerp(Quaternion(Vector3::FORWARD, velocity), 10.0f * timeStep * speedRatio));
             // Throttle the animation speed based on agent speed ratio (ratio = 1 is full throttle)
             animCtrl->SetSpeed(WALKING_ANI, speedRatio);
         }
@@ -535,5 +548,22 @@ void CrowdNavigation::HandleCrowdAgentReposition(StringHash eventType, VariantMa
         // If speed is too low then stopping the animation
         if (speed < agent->GetRadius())
             animCtrl->Stop(WALKING_ANI, 0.8f);
+    }
+}
+
+void CrowdNavigation::HandleCrowdAgentFormation(StringHash eventType, VariantMap& eventData)
+{
+    using namespace CrowdAgentFormation;
+
+    unsigned index = eventData[P_INDEX].GetUInt();
+    unsigned size = eventData[P_SIZE].GetUInt();
+    Vector3 position = eventData[P_POSITION].GetVector3();
+
+    // The first agent will always move to the exact position, all other agents will select a random point nearby
+    if (index)
+    {
+        CrowdManager* crowdManager = static_cast<CrowdManager*>(GetEventSender());
+        CrowdAgent* agent = static_cast<CrowdAgent*>(eventData[P_CROWD_AGENT].GetPtr());
+        eventData[P_POSITION] = crowdManager->GetRandomPointInCircle(position, agent->GetRadius(), agent->GetQueryFilterType());
     }
 }

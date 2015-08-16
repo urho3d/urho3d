@@ -63,7 +63,8 @@ Renderer2D::Renderer2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     material_(new Material(context)),
     indexBuffer_(new IndexBuffer(context_)),
-    frustum_(0)
+    frustum_(0),
+    viewMask_(DEFAULT_VIEWMASK)
 {
     material_->SetName("Urho2D");
 

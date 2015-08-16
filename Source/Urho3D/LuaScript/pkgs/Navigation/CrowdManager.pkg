@@ -1,0 +1,50 @@
+$#include "Navigation/CrowdManager.h"
+
+class CrowdManager : public Component
+{
+    void DrawDebugGeometry(bool depthTest);
+
+    void SetCrowdTarget(const Vector3& position, Node* node = 0);
+    void SetCrowdVelocity(const Vector3& velocity, Node* node = 0);
+    void ResetCrowdTarget(Node* node = 0);
+    void SetMaxAgents(unsigned agentCt);
+    void SetMaxAgentRadius(float maxAgentRadius);
+    void SetNavigationMesh(NavigationMesh *navMesh);
+    void SetIncludeFlags(unsigned queryFilterType, unsigned short flags);
+    void SetExcludeFlags(unsigned queryFilterType, unsigned short flags);
+    void SetAreaCost(unsigned queryFilterType, unsigned areaID, float cost);
+    void SetObstacleAvoidanceParams(unsigned obstacleAvoidanceType, const CrowdObstacleAvoidanceParams& params);
+
+    PODVector<CrowdAgent*> GetAgents(Node* node = 0, bool inCrowdFilter = true) const;
+    Vector3 FindNearestPoint(const Vector3& point, int queryFilterType);
+    Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, int queryFilterType, int maxVisited = 3);
+    tolua_outside const PODVector<Vector3>& CrowdManagerFindPath @ FindPath(const Vector3& start, const Vector3& end, int queryFilterType);
+    Vector3 GetRandomPoint(int queryFilterType);
+    Vector3 GetRandomPointInCircle(const Vector3& center, float radius, int queryFilterType);
+    float GetDistanceToWall(const Vector3& point, float radius, int queryFilterType, Vector3* hitPos = 0, Vector3* hitNormal = 0);
+    Vector3 Raycast(const Vector3& start, const Vector3& end, int queryFilterType, Vector3* hitNormal = 0);
+    unsigned GetMaxAgents() const;
+    float GetMaxAgentRadius() const;
+    NavigationMesh* GetNavigationMesh() const;
+    unsigned GetNumQueryFilterTypes() const;
+    unsigned GetNumAreas(unsigned queryFilterType) const;
+    unsigned short GetIncludeFlags(unsigned queryFilterType) const;
+    unsigned short GetExcludeFlags(unsigned queryFilterType) const;
+    float GetAreaCost(unsigned queryFilterType, unsigned areaID) const;
+    unsigned GetNumObstacleAvoidanceTypes() const;
+    const CrowdObstacleAvoidanceParams& GetObstacleAvoidanceParams(unsigned obstacleAvoidanceType) const;
+
+    tolua_property__get_set int maxAgents;
+    tolua_property__get_set float maxAgentRadius;
+    tolua_property__get_set NavigationMesh* navigationMesh;
+};
+
+${
+const PODVector<Vector3>& CrowdManagerFindPath(CrowdManager* crowdManager, const Vector3& start, const Vector3& end, int queryFilterType)
+{
+    static PODVector<Vector3> dest;
+    dest.Clear();
+    crowdManager->FindPath(dest, start, end, queryFilterType);
+    return dest;
+}
+$}

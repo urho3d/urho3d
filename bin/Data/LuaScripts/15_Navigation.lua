@@ -111,8 +111,10 @@ function CreateScene()
     local camera = cameraNode:CreateComponent("Camera")
     camera.farClip = 300.0
 
-    -- Set an initial position for the camera scene node above the plane
-    cameraNode.position = Vector3(0.0, 5.0, 0.0)
+    -- Set an initial position for the camera scene node above the plane and looking down
+    cameraNode.position = Vector3(0.0, 50.0, 0.0)
+    pitch = 80.0
+    cameraNode.rotation = Quaternion(pitch, yaw, 0.0)
 end
 
 function CreateUI()

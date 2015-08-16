@@ -64,6 +64,7 @@ namespace Urho3D
 <a href="#Class_Context"><b>Context</b></a>
 <a href="#Class_Controls"><b>Controls</b></a>
 <a href="#Class_CrowdAgent"><b>CrowdAgent</b></a>
+<a href="#Class_CrowdManager"><b>CrowdManager</b></a>
 <a href="#Class_Cursor"><b>Cursor</b></a>
 <a href="#Class_CustomGeometry"><b>CustomGeometry</b></a>
 <a href="#Class_CustomGeometryVertex"><b>CustomGeometryVertex</b></a>
@@ -74,7 +75,6 @@ namespace Urho3D
 <a href="#Class_DebugRenderer"><b>DebugRenderer</b></a>
 <a href="#Class_DecalSet"><b>DecalSet</b></a>
 <a href="#Class_Deserializer"><b>Deserializer</b></a>
-<a href="#Class_DetourCrowdManager"><b>DetourCrowdManager</b></a>
 <a href="#Class_Drawable"><b>Drawable</b></a>
 <a href="#Class_Drawable2D"><b>Drawable2D</b></a>
 <a href="#Class_DropDownList"><b>DropDownList</b></a>
@@ -1604,49 +1604,103 @@ Properties:
 
 Methods:
 
-- void SetNavigationFilterType(unsigned filterID)
-- void SetMoveTarget(const Vector3& position)
-- void SetMoveVelocity(const Vector3& velocity)
+- void DrawDebugGeometry(bool depthTest)
+- void SetTargetPosition(const Vector3& position)
+- void SetTargetVelocity(const Vector3& velocity)
+- void ResetTarget()
 - void SetUpdateNodePosition(bool unodepos)
-- void SetMaxAccel(float val)
-- void SetMaxSpeed(float val)
-- void SetNavigationQuality(NavigationQuality val)
-- void SetNavigationPushiness(NavigationPushiness val)
+- void SetMaxAccel(float maxAccel)
+- void SetMaxSpeed(float maxSpeed)
 - void SetRadius(float radius)
 - void SetHeight(float height)
-- unsigned GetNavigationFilterType() const
+- void SetQueryFilterType(unsigned queryFilterType)
+- void SetObstacleAvoidanceType(unsigned obstacleOvoidanceType)
+- void SetNavigationQuality(NavigationQuality val)
+- void SetNavigationPushiness(NavigationPushiness val)
+- Vector3 GetPosition() const
 - Vector3 GetDesiredVelocity() const
 - Vector3 GetActualVelocity() const
 - const Vector3& GetTargetPosition() const
+- const Vector3& GetTargetVelocity() const
+- CrowdAgentRequestedTarget GetRequestedTargetType() const
 - CrowdAgentState GetAgentState() const
-- CrowdTargetState GetTargetState() const
+- CrowdAgentTargetState GetTargetState() const
 - bool GetUpdateNodePosition() const
-- float GetMaxSpeed() const
 - float GetMaxAccel() const
-- NavigationQuality GetNavigationQuality() const
-- NavigationPushiness GetNavigationPushiness() const
-- bool HasArrived() const
+- float GetMaxSpeed() const
 - float GetRadius() const
 - float GetHeight() const
-- Vector3 GetPosition() const
-- void DrawDebugGeometry(bool depthTest)
+- unsigned GetQueryFilterType() const
+- unsigned GetObstacleAvoidanceType() const
+- NavigationQuality GetNavigationQuality() const
+- NavigationPushiness GetNavigationPushiness() const
+- bool HasRequestedTarget() const
+- bool HasArrived() const
+- bool IsInCrowd() const
 
 Properties:
 
+- Vector3 targetPosition
+- Vector3 targetVelocity
 - bool updateNodePosition
-- NavigationQuality navigationQuality
-- NavigationPushiness navigationPushiness
-- float maxSpeed
 - float maxAccel
+- float maxSpeed
 - float radius
 - float height
-- unsigned navigationFilterType
+- unsigned queryFilterType
+- unsigned obstacleAvoidanceType
+- NavigationQuality navigationQuality
+- NavigationPushiness navigationPushiness
+- Vector3 position (readonly)
 - Vector3 desiredVelocity (readonly)
 - Vector3 actualVelocity (readonly)
-- Vector3 targetPosition (readonly)
-- Vector3 position (readonly)
+- CrowdAgentRequestedTarget requestedTargetType (readonly)
 - CrowdAgentState agentState (readonly)
-- CrowdTargetState targetState (readonly)
+- CrowdAgentTargetState targetState (readonly)
+- bool requestedTarget (readonly)
+- bool arrived (readonly)
+- bool inCrowd (readonly)
+
+<a name="Class_CrowdManager"></a>
+### CrowdManager : Component
+
+Methods:
+
+- void DrawDebugGeometry(bool depthTest)
+- void SetCrowdTarget(const Vector3& position, Node* node = 0)
+- void SetCrowdVelocity(const Vector3& velocity, Node* node = 0)
+- void ResetCrowdTarget(Node* node = 0)
+- void SetMaxAgents(unsigned agentCt)
+- void SetMaxAgentRadius(float maxAgentRadius)
+- void SetNavigationMesh(NavigationMesh* navMesh)
+- void SetIncludeFlags(unsigned queryFilterType, short flags)
+- void SetExcludeFlags(unsigned queryFilterType, short flags)
+- void SetAreaCost(unsigned queryFilterType, unsigned areaID, float cost)
+- void SetObstacleAvoidanceParams(unsigned obstacleAvoidanceType, const CrowdObstacleAvoidanceParams& params)
+- PODVector<CrowdAgent*> GetAgents(Node* node = 0, bool inCrowdFilter = true) const
+- Vector3 FindNearestPoint(const Vector3& point, int queryFilterType)
+- Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, int queryFilterType, int maxVisited = 3)
+- const PODVector<Vector3>& FindPath(const Vector3& start, const Vector3& end, int queryFilterType)
+- Vector3 GetRandomPoint(int queryFilterType)
+- Vector3 GetRandomPointInCircle(const Vector3& center, float radius, int queryFilterType)
+- float GetDistanceToWall(const Vector3& point, float radius, int queryFilterType, Vector3* hitPos = 0, Vector3* hitNormal = 0)
+- Vector3 Raycast(const Vector3& start, const Vector3& end, int queryFilterType, Vector3* hitNormal = 0)
+- unsigned GetMaxAgents() const
+- float GetMaxAgentRadius() const
+- NavigationMesh* GetNavigationMesh() const
+- unsigned GetNumQueryFilterTypes() const
+- unsigned GetNumAreas(unsigned queryFilterType) const
+- short GetIncludeFlags(unsigned queryFilterType) const
+- short GetExcludeFlags(unsigned queryFilterType) const
+- float GetAreaCost(unsigned queryFilterType, unsigned areaID) const
+- unsigned GetNumObstacleAvoidanceTypes() const
+- const CrowdObstacleAvoidanceParams& GetObstacleAvoidanceParams(unsigned obstacleAvoidanceType) const
+
+Properties:
+
+- int maxAgents
+- float maxAgentRadius
+- NavigationMesh* navigationMesh
 
 <a name="Class_Cursor"></a>
 ### Cursor : BorderImage
@@ -1909,31 +1963,6 @@ Properties:
 - unsigned position (readonly)
 - unsigned size (readonly)
 - bool eof (readonly)
-
-<a name="Class_DetourCrowdManager"></a>
-### DetourCrowdManager : Component
-
-Methods:
-
-- bool CreateCrowd()
-- void DrawDebugGeometry(bool depthTest)
-- void SetNavigationMesh(NavigationMesh* navMesh)
-- void SetAreaCost(unsigned filterID, unsigned areaID, float cost)
-- void SetMaxAgents(unsigned agentCt)
-- void SetCrowdTarget(const Vector3& position, int startId = 0, int endId = M_MAX_INT)
-- void ResetCrowdTarget(int startId = 0, int endId = M_MAX_INT)
-- void SetCrowdVelocity(const Vector3& velocity, int startId = 0, int endId = M_MAX_INT)
-- NavigationMesh* GetNavigationMesh() const
-- unsigned GetMaxAgents() const
-- float GetAreaCost(unsigned filterID, unsigned areaID) const
-- unsigned GetAgentCount() const
-- const PODVector<CrowdAgent*>& GetActiveAgents() const
-
-Properties:
-
-- NavigationMesh* navigationMesh
-- int maxAgents
-- unsigned agentCount (readonly)
 
 <a name="Class_Drawable"></a>
 ### Drawable : Component
@@ -3753,7 +3782,7 @@ Methods:
 - bool HasComponent(const String type) const
 - const Variant& GetVar(StringHash key) const
 - const VariantMap& GetVars() const
-- Component* GetComponent(const String type) const
+- Component* GetComponent(const String type, bool recursive = false) const
 - const PODVector<Component*>& GetComponents(const String type, bool recursive = false)
 - const PODVector<Node*>& GetChildren(bool recursive = false)
 - const PODVector<Node*>& GetChildrenWithComponent(const String type, bool recursive = false)
@@ -7231,21 +7260,27 @@ Properties:
 - int REPLICATED
 - int LOCAL
 
+### CrowdAgentRequestedTarget
+
+- int CA_REQUESTEDTARGET_NONE
+- int CA_REQUESTEDTARGET_POSITION
+- int CA_REQUESTEDTARGET_VELOCITY
+
 ### CrowdAgentState
 
-- int CROWD_AGENT_INVALID
-- int CROWD_AGENT_READY
-- int CROWD_AGENT_TRAVERSINGLINK
+- int CA_STATE_INVALID
+- int CA_STATE_WALKING
+- int CA_STATE_OFFMESH
 
-### CrowdTargetState
+### CrowdAgentTargetState
 
-- int CROWD_AGENT_TARGET_NONE
-- int CROWD_AGENT_TARGET_FAILED
-- int CROWD_AGENT_TARGET_VALID
-- int CROWD_AGENT_TARGET_REQUESTING
-- int CROWD_AGENT_TARGET_WAITINGFORQUEUE
-- int CROWD_AGENT_TARGET_WAITINGFORPATH
-- int CROWD_AGENT_TARGET_VELOCITY
+- int CA_TARGET_NONE
+- int CA_TARGET_FAILED
+- int CA_TARGET_VALID
+- int CA_TARGET_REQUESTING
+- int CA_TARGET_WAITINGFORQUEUE
+- int CA_TARGET_WAITINGFORPATH
+- int CA_TARGET_VELOCITY
 
 ### CubeMapFace
 
@@ -7430,9 +7465,9 @@ Properties:
 
 ### NavigationPushiness
 
-- int PUSHINESS_LOW
-- int PUSHINESS_MEDIUM
-- int PUSHINESS_HIGH
+- int NAVIGATIONPUSHINESS_LOW
+- int NAVIGATIONPUSHINESS_MEDIUM
+- int NAVIGATIONPUSHINESS_HIGH
 
 ### NavigationQuality
 

@@ -110,14 +110,21 @@ function CreateScene()
         CreateMushroom(Vector3(Random(90.0) - 45.0, 0.0, Random(90.0) - 45.0))
     end
 
-    -- Create a DetourCrowdManager component to the scene root (mandatory for crowd agents)
-    scene_:CreateComponent("DetourCrowdManager")
+    -- Create a CrowdManager component to the scene root (mandatory for crowd agents)
+    local crowdManager = scene_:CreateComponent("CrowdManager")
+    local params = crowdManager:GetObstacleAvoidanceParams(0)
+    -- Set the params to "High (66)" setting
+    params.velBias = 0.5
+    params.adaptiveDivs = 7
+    params.adaptiveRings = 3
+    params.adaptiveDepth = 3
+    crowdManager:SetObstacleAvoidanceParams(0, params)
 
     -- Create some movable barrels. We create them as crowd agents, as for moving entities it is less expensive and more convenient than using obstacles
     CreateMovingBarrels(navMesh)
 
     -- Create Jack node as crowd agent
-    SpawnJack(Vector3(-5, 0, 20))
+    SpawnJack(Vector3(-5, 0, 20), scene_:CreateChild("Jacks"))
 
     -- Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
     -- the scene, because we want it to be unaffected by scene load / save
@@ -179,10 +186,13 @@ function SubscribeToEvents()
 
     -- Subscribe HandleCrowdAgentReposition() function for controlling the animation
     SubscribeToEvent("CrowdAgentReposition", "HandleCrowdAgentReposition")
+
+    -- Subscribe HandleCrowdAgentFormation() function for positioning agent into a formation
+    SubscribeToEvent("CrowdAgentFormation", "HandleCrowdAgentFormation")
 end
 
-function SpawnJack(pos)
-    local jackNode = scene_:CreateChild("Jack")
+function SpawnJack(pos, jackGroup)
+    local jackNode = jackGroup:CreateChild("Jack")
     jackNode.position = pos
     local modelObject = jackNode:CreateComponent("AnimatedModel")
     modelObject.model = cache:GetResource("Model", "Models/Jack.mdl")
@@ -246,6 +256,7 @@ function CreateMovingBarrels(navMesh)
         local agent = clone:CreateComponent("CrowdAgent")
         agent.radius = clone.scale.x * 0.5
         agent.height = size
+        agent.navigationQuality = NAVIGATIONQUALITY_LOW
     end
     barrel:Remove()
 end
@@ -256,13 +267,13 @@ function SetPathPoint(spawning)
     if hitDrawable then
         local navMesh = scene_:GetComponent("DynamicNavigationMesh")
         local pathPos = navMesh:FindNearestPoint(hitPos, Vector3.ONE)
-
+        local jackGroup = scene_:GetChild("Jacks")
         if spawning then
             -- Spawn a jack at the target position
-            SpawnJack(pathPos)
+            SpawnJack(pathPos, jackGroup)
         else
             -- Set crowd agents target position
-            scene_:GetComponent("DetourCrowdManager"):SetCrowdTarget(pathPos)
+            scene_:GetComponent("CrowdManager"):SetCrowdTarget(pathPos, jackGroup)
         end
     end
 end
@@ -380,7 +391,7 @@ function HandlePostRenderUpdate(eventType, eventData)
         -- Visualize navigation mesh, obstacles and off-mesh connections
         scene_:GetComponent("DynamicNavigationMesh"):DrawDebugGeometry(true)
         -- Visualize agents' path and position to reach
-        scene_:GetComponent("DetourCrowdManager"):DrawDebugGeometry(true)
+        scene_:GetComponent("CrowdManager"):DrawDebugGeometry(true)
     end
 end
 
@@ -389,7 +400,7 @@ function HandleCrowdAgentFailure(eventType, eventData)
     local agentState = eventData["CrowdAgentState"]:GetInt()
 
     -- If the agent's state is invalid, likely from spawning on the side of a box, find a point in a larger area
-    if agentState == CROWD_AGENT_INVALID then
+    if agentState == CA_STATE_INVALID then
         -- Get a point on the navmesh using more generous extents
         local newPos = scene_:GetComponent("DynamicNavigationMesh"):FindNearestPoint(node.position, Vector3(5, 5, 5))
         -- Set the new node position, CrowdAgent component will automatically reset the state of the agent
@@ -403,6 +414,7 @@ function HandleCrowdAgentReposition(eventType, eventData)
     local node = eventData["Node"]:GetPtr("Node")
     local agent = eventData["CrowdAgent"]:GetPtr("CrowdAgent")
     local velocity = eventData["Velocity"]:GetVector3()
+    local timeStep = eventData["TimeStep"]:GetFloat()
 
     -- Only Jack agent has animation controller
     local animCtrl = node:GetComponent("AnimationController")
@@ -410,8 +422,8 @@ function HandleCrowdAgentReposition(eventType, eventData)
         local speed = velocity:Length()
         if animCtrl:IsPlaying(WALKING_ANI) then
             local speedRatio = speed / agent.maxSpeed
-            -- Face the direction of its velocity but moderate the turning speed based on the speed ratio as we do not have timeStep here
-            node.rotation = node.rotation:Slerp(Quaternion(Vector3.FORWARD, velocity), 0.1 * speedRatio)
+            -- Face the direction of its velocity but moderate the turning speed based on the speed ratio and timeStep
+            node.rotation = node.rotation:Slerp(Quaternion(Vector3.FORWARD, velocity), 10.0 * timeStep * speedRatio)
             -- Throttle the animation speed based on agent speed ratio (ratio = 1 is full throttle)
             animCtrl:SetSpeed(WALKING_ANI, speedRatio)
         else
@@ -422,6 +434,19 @@ function HandleCrowdAgentReposition(eventType, eventData)
         if speed < agent.radius then
             animCtrl:Stop(WALKING_ANI, 0.8)
         end
+    end
+end
+
+function HandleCrowdAgentFormation(eventType, eventData)
+    local index = eventData:GetUInt("Index")
+    local size = eventData:GetUInt("Size")
+    local position = eventData:GetVector3("Position")
+
+    -- The first agent will always move to the exact position, all other agents will select a random point nearby
+    if index > 0 then
+        local crowdManager = GetEventSender()
+        local agent = eventData:GetPtr("CrowdAgent", "CrowdAgent")
+        eventData:SetVector3("Position", crowdManager:GetRandomPointInCircle(position, agent.radius, agent.queryFilterType))
     end
 end
 

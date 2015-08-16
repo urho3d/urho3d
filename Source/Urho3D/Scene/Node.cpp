@@ -1086,13 +1086,24 @@ const Variant& Node::GetVar(StringHash key) const
     return i != vars_.End() ? i->second_ : Variant::EMPTY;
 }
 
-Component* Node::GetComponent(StringHash type) const
+Component* Node::GetComponent(StringHash type, bool recursive) const
 {
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         if ((*i)->GetType() == type)
             return *i;
     }
+
+    if (recursive)
+    {
+        for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        {
+            Component* component = (*i)->GetComponent(type, true);
+            if (component)
+                return component;
+        }
+    }
+
     return 0;
 }
 

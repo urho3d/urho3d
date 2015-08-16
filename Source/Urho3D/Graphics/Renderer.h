@@ -194,7 +194,7 @@ public:
     void SetMinInstances(int instances);
     /// Set maximum number of sorted instances per batch group. If exceeded, instances are rendered unsorted.
     void SetMaxSortedInstances(int instances);
-    /// Set maximum number of occluder trianges.
+    /// Set maximum number of occluder triangles.
     void SetMaxOccluderTriangles(int triangles);
     /// Set occluder buffer width.
     void SetOcclusionBufferSize(int size);

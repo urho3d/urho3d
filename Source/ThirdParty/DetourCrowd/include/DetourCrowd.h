@@ -16,6 +16,8 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #ifndef DETOURCROWD_H
 #define DETOURCROWD_H
 
@@ -198,10 +200,15 @@ struct dtCrowdAgentDebugInfo
 	dtObstacleAvoidanceDebugData* vod;
 };
 
+// Urho3D: Add update callback support
+/// Type for the update callback.
+typedef void (*dtUpdateCallback)(dtCrowdAgent* ag, float dt);
+
 /// Provides local steering behaviors for a group of agents. 
 /// @ingroup crowd
 class dtCrowd
 {
+	dtUpdateCallback m_updateCallback;
 	int m_maxAgents;
 	dtCrowdAgent* m_agents;
 	dtCrowdAgent** m_activeAgents;
@@ -236,17 +243,19 @@ class dtCrowd
 	bool requestMoveTargetReplan(const int idx, dtPolyRef ref, const float* pos);
 
 	void purge();
-	
+
 public:
 	dtCrowd();
 	~dtCrowd();
 	
+	// Urho3D: Add update callback support
 	/// Initializes the crowd.  
 	///  @param[in]		maxAgents		The maximum number of agents the crowd can manage. [Limit: >= 1]
 	///  @param[in]		maxAgentRadius	The maximum radius of any agent that will be added to the crowd. [Limit: > 0]
 	///  @param[in]		nav				The navigation mesh to use for planning.
+	///  @param[in]		cb				The update callback.
 	/// @return True if the initialization succeeded.
-	bool init(const int maxAgents, const float maxAgentRadius, dtNavMesh* nav);
+	bool init(const int maxAgents, const float maxAgentRadius, dtNavMesh* nav, dtUpdateCallback cb = 0);
 	
 	/// Sets the shared avoidance configuration for the specified index.
 	///  @param[in]		idx		The index. [Limits: 0 <= value < #DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS]
@@ -272,6 +281,11 @@ public:
 	/// The maximum number of agents that can be managed by the object.
 	/// @return The maximum number of agents.
 	int getAgentCount() const;
+
+	// Urho3D: Add missing getter
+	/// The maximum radius of any agent that will be added to the crowd.
+	/// @return The maximum radius of any agent.
+	float getMaxAgentRadius() const { return m_maxAgentRadius; }
 	
 	/// Adds a new agent to the crowd.
 	///  @param[in]		pos		The requested position of the agent. [(x, y, z)]
