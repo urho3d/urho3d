@@ -30,6 +30,11 @@
 #include "../Math/Rect.h"
 #include "../Math/StringHash.h"
 
+#ifdef URHO3D_LUA
+struct lua_State;
+int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S);
+#endif
+
 namespace Urho3D
 {
 
@@ -184,6 +189,10 @@ struct URHO3D_API ResourceRefList
 /// Variable that supports a fixed set of types.
 class URHO3D_API Variant
 {
+#ifdef URHO3D_LUA
+    friend int ::tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S);
+#endif
+
 public:
     /// Construct empty.
     Variant() :

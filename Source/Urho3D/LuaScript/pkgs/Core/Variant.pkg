@@ -406,7 +406,7 @@ static int tolua_CoreLuaAPI_Variant_GetPtr00(lua_State* tolua_S)
 }
 
 #define TOLUA_DISABLE_tolua_CoreLuaAPI_Variant_Get00
-static int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S)
+int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -428,11 +428,20 @@ static int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S)
     switch (self->GetType())
     {
     case VAR_INT:
-        tolua_pushnumber(tolua_S, (lua_Number)self->GetInt());
+        if (type == "UInt" || type == "unsigned" || type == "unsigned int")
+            tolua_pushnumber(tolua_S, (lua_Number)self->GetUInt());
+        else if (type == "StringHash")
+        {
+            // Make a new local copy
+            tolua_pushusertype(tolua_S, Mtolua_new(StringHash(self->GetStringHash())), "StringHash");
+            tolua_register_gc(tolua_S, lua_gettop(tolua_S));
+        }
+        else
+            tolua_pushnumber(tolua_S, (lua_Number)self->GetInt());
         break;
 
     case VAR_BOOL:
-        tolua_pushboolean(tolua_S,(int)self->GetBool());
+        tolua_pushboolean(tolua_S, (int)self->GetBool());
         break;
 
     case VAR_FLOAT:
@@ -444,23 +453,16 @@ static int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S)
         break;
 
     case VAR_VECTOR2:
-        tolua_pushusertype(tolua_S, (void*)&self->GetVector2(), "const Vector2");
-        break;
-
     case VAR_VECTOR3:
-        tolua_pushusertype(tolua_S, (void*)&self->GetVector3(), "const Vector3");
-        break;
-
     case VAR_VECTOR4:
-        tolua_pushusertype(tolua_S, (void*)&self->GetVector4(), "const Vector4");
-        break;
-
     case VAR_QUATERNION:
-        tolua_pushusertype(tolua_S, (void*)&self->GetQuaternion(), "const Quaternion");
-        break;
-
     case VAR_COLOR:
-        tolua_pushusertype(tolua_S, (void*)&self->GetColor(), "const Color");
+    case VAR_RESOURCEREF:
+    case VAR_RESOURCEREFLIST:
+    case VAR_VARIANTMAP:
+    case VAR_INTRECT:
+    case VAR_INTVECTOR2:
+        tolua_pushusertype(tolua_S, (void*)&self->value_, self->GetTypeName().CString());
         break;
 
     case VAR_STRING:
@@ -470,8 +472,7 @@ static int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S)
     case VAR_BUFFER:
         if (type == "VectorBufer")
         {
-            // Make a new local copy
-            tolua_pushusertype(tolua_S, Mtolua_new(VectorBuffer(self->GetVectorBuffer())), "const VectorBuffer");
+            tolua_pushusertype(tolua_S, Mtolua_new(VectorBuffer(self->GetVectorBuffer())), "VectorBuffer");
             tolua_register_gc(tolua_S, lua_gettop(tolua_S));
         }
         else
@@ -484,44 +485,18 @@ static int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S)
     case VAR_PTR:
         return tolua_CoreLuaAPI_Variant_GetPtr00(tolua_S);
 
-    case VAR_RESOURCEREF:
-        tolua_pushusertype(tolua_S, (void*)&self->GetResourceRef(), "const ResourceRef");
-        break;
-
-    case VAR_RESOURCEREFLIST:
-        tolua_pushusertype(tolua_S, (void*)&self->GetResourceRefList(), "const ResourceRefList");
-        break;
-
     case VAR_VARIANTVECTOR:
         ToluaPushVector<Variant>(tolua_S, (void*)&self->GetVariantVector(), "Variant");
-        break;
-
-    case VAR_VARIANTMAP:
-        tolua_pushusertype(tolua_S, (void*)&self->GetVariantMap(), "const VariantMap");
         break;
 
     case VAR_STRINGVECTOR:
         ToluaPushVector<String>(tolua_S, (void*)&self->GetStringVector(), "String");
         break;
 
-    case VAR_INTRECT:
-        tolua_pushusertype(tolua_S, (void*)&self->GetIntRect(), "const IntRect");
-        break;
-
-    case VAR_INTVECTOR2:
-        tolua_pushusertype(tolua_S, (void*)&self->GetIntVector2(), "const IntVector2");
-        break;
-
     case VAR_MATRIX3:
-        tolua_pushusertype(tolua_S, (void*)&self->GetMatrix3(), "const Matrix3");
-        break;
-
     case VAR_MATRIX3X4:
-        tolua_pushusertype(tolua_S, (void*)&self->GetMatrix3x4(), "const Matrix3x4");
-        break;
-
     case VAR_MATRIX4:
-        tolua_pushusertype(tolua_S, (void*)&self->GetMatrix4(), "const Matrix4");
+        tolua_pushusertype(tolua_S, (void*)self->value_.ptr_, self->GetTypeName().CString());
         break;
 
     default:
