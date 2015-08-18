@@ -150,13 +150,20 @@ void Quaternion::FromRotationMatrix(const Matrix3& matrix)
 
 bool Quaternion::FromLookRotation(const Vector3& direction, const Vector3& upDirection)
 {
-    Vector3 forward = direction.Normalized();
-    Vector3 v = forward.CrossProduct(upDirection).Normalized();
-    Vector3 up = v.CrossProduct(forward);
-    Vector3 right = up.CrossProduct(forward);
-
     Quaternion ret;
-    ret.FromAxes(right, up, forward);
+    Vector3 forward = direction.Normalized();
+
+    Vector3 v = forward.CrossProduct(upDirection);
+    // If direction & upDirection are parallel and crossproduct becomes zero, use FromRotationTo() fallback
+    if (v.LengthSquared() >= M_EPSILON)
+    {
+        v.Normalize();
+        Vector3 up = v.CrossProduct(forward);
+        Vector3 right = up.CrossProduct(forward);
+        ret.FromAxes(right, up, forward);
+    }
+    else
+        ret.FromRotationTo(Vector3::FORWARD, forward);
 
     if (!ret.IsNaN())
     {
