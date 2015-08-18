@@ -1957,11 +1957,27 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
             for (unsigned j = 0; j < bone->mNumWeights; ++j)
             {
                 unsigned vertex = bone->mWeights[j].mVertexId;
-                blendIndices[vertex].Push(globalIndex);
-                blendWeights[vertex].Push(bone->mWeights[j].mWeight);
-                if (blendWeights[vertex].Size() > 4)
-                    ErrorExit("More than 4 bone influences on vertex");
+                if (blendWeights[vertex].Size() < 4)
+                {
+                    blendIndices[vertex].Push(globalIndex);
+                    blendWeights[vertex].Push(bone->mWeights[j].mWeight);
+                }
+                else
+                    PrintLine("Warning: more than 4 bone influences in vertex " + String(vertex));
             }
+        }
+    }
+
+    // Normalize weights now if necessary
+    for (unsigned i = 0; i < blendWeights.Size(); ++i)
+    {
+        float sum = 0.0f;
+        for (unsigned j = 0; j < blendWeights[i].Size(); ++j)
+            sum += blendWeights[i][j];
+        if (sum != 1.0f && sum != 0.0f)
+        {
+            for (unsigned j = 0; j < blendWeights[i].Size(); ++j)
+                blendWeights[i][j] /= sum;
         }
     }
 }
