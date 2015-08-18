@@ -1940,8 +1940,6 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
                 unsigned vertex = bone->mWeights[j].mVertexId;
                 blendIndices[vertex].Push(i);
                 blendWeights[vertex].Push(bone->mWeights[j].mWeight);
-                if (blendWeights[vertex].Size() > 4)
-                    ErrorExit("More than 4 bone influences on vertex");
             }
         }
     }
@@ -1957,20 +1955,36 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
             for (unsigned j = 0; j < bone->mNumWeights; ++j)
             {
                 unsigned vertex = bone->mWeights[j].mVertexId;
-                if (blendWeights[vertex].Size() < 4)
-                {
-                    blendIndices[vertex].Push(globalIndex);
-                    blendWeights[vertex].Push(bone->mWeights[j].mWeight);
-                }
-                else
-                    PrintLine("Warning: more than 4 bone influences in vertex " + String(vertex));
+                blendIndices[vertex].Push(globalIndex);
+                blendWeights[vertex].Push(bone->mWeights[j].mWeight);
             }
         }
     }
 
-    // Normalize weights now if necessary
+    // Normalize weights now if necessary, also remove too many influences
     for (unsigned i = 0; i < blendWeights.Size(); ++i)
     {
+        if (blendWeights[i].Size() > 4)
+        {
+            PrintLine("Warning: more than 4 bone influences in vertex " + String(i));
+
+            while (blendWeights[i].Size() > 4)
+            {
+                unsigned lowestIndex = 0;
+                float lowest = M_INFINITY;
+                for (unsigned j = 0; j < blendWeights[i].Size(); ++j)
+                {
+                    if (blendWeights[i][j] < lowest)
+                    {
+                        lowest = blendWeights[i][j];
+                        lowestIndex = j;
+                    }
+                }
+                blendWeights[i].Erase(lowestIndex);
+                blendIndices[i].Erase(lowestIndex);
+            }
+        }
+
         float sum = 0.0f;
         for (unsigned j = 0; j < blendWeights[i].Size(); ++j)
             sum += blendWeights[i][j];
