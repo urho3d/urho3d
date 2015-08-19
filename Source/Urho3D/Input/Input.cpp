@@ -773,7 +773,11 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                 if (keyBinding.Contains(' '))   // e.g.: "UP DOWN LEFT RIGHT"
                     keyBindings = keyBinding.Split(' ');    // Attempt to split the text using ' ' as separator
                 else
-                    keyBindings = keyBinding.Split(' ');
+                {
+                    keyBindings.Resize(4);      // e.g.: "WSAD"
+                    for (unsigned i = 0; i < 4; ++i)
+                        keyBindings[i] = keyBinding.Substring(i, 1);
+                }
                 if (keyBindings.Size() == 4)
                 {
                     PopulateKeyBindingMap(keyBindingMap);
@@ -788,7 +792,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                             if (i != keyBindingMap.End())
                                 mappedKeyBinding[j] = i->second_;
                             else
-                                LOGERRORF("%s - %s cannot be mapped, fallback to '%c'", name.CString(), keyBindings[j],
+                                LOGERRORF("%s - %s cannot be mapped, fallback to '%c'", name.CString(), keyBindings[j].CString(),
                                     mappedKeyBinding[j]);
                         }
                     }
