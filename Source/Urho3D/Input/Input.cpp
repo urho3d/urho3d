@@ -772,7 +772,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                 Vector<String> keyBindings;
                 if (keyBinding.Contains(' '))   // e.g.: "UP DOWN LEFT RIGHT"
                     keyBindings = keyBinding.Split(' ');    // Attempt to split the text using ' ' as separator
-                else
+                else if (keyBinding.Length() == 4)
                 {
                     keyBindings.Resize(4);      // e.g.: "WSAD"
                     for (unsigned i = 0; i < 4; ++i)
