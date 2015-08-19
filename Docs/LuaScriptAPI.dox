@@ -6612,7 +6612,7 @@ Methods:
 - bool operator==(const Matrix4& rhs) const
 - int GetInt() const
 - unsigned GetUInt() const
-- StringHash GetStringHash()
+- StringHash GetStringHash() const
 - bool GetBool() const
 - float GetFloat() const
 - double GetDouble() const
@@ -6636,6 +6636,7 @@ Methods:
 - const Matrix3& GetMatrix3() const
 - const Matrix3x4& GetMatrix3x4() const
 - const Matrix4& GetMatrix4() const
+- void* Get(const char* type = 0) const
 - VariantType GetType() const
 - String GetTypeName() const
 - String ToString() const

@@ -129,7 +129,7 @@ class Variant
 
     int GetInt() const;
     unsigned GetUInt() const;
-    StringHash GetStringHash();
+    StringHash GetStringHash() const;
     bool GetBool() const;
     float GetFloat() const;
     double GetDouble() const;
@@ -153,6 +153,8 @@ class Variant
     const Matrix3& GetMatrix3() const;
     const Matrix3x4& GetMatrix3x4() const;
     const Matrix4& GetMatrix4() const;
+
+    void* Get(const char* type = 0) const;      // "Generic" get which is only possible in Lua scripting
 
     VariantType GetType() const;
     String GetTypeName() const;
@@ -341,8 +343,17 @@ static int tolua_CoreLuaAPI_Variant_GetVoidPtr00(lua_State* tolua_S)
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetVoidPtr'", NULL);
 #endif
  {
-     void* tolua_ret = self->GetVoidPtr();
-     tolua_pushusertype(tolua_S, tolua_ret, type);
+     if (type)
+     {
+         luaL_getmetatable(tolua_S, type);
+         if (!lua_isnil(tolua_S, -1))
+         {
+             lua_pop(tolua_S, 1);
+             tolua_pushusertype(tolua_S, static_cast<void*>(self->GetVoidPtr()), type);
+         }
+     }
+     else
+         lua_pushnil(tolua_S);
  }
  }
  return 1;
@@ -373,14 +384,131 @@ static int tolua_CoreLuaAPI_Variant_GetPtr00(lua_State* tolua_S)
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetPtr'", NULL);
 #endif
  {
-     RefCounted* tolua_ret = self->GetPtr();
-     tolua_pushusertype(tolua_S, (void*)tolua_ret, type);
+     if (type)
+     {
+         luaL_getmetatable(tolua_S, type);
+         if (!lua_isnil(tolua_S, -1))
+         {
+             lua_pop(tolua_S, 1);
+             tolua_pushusertype(tolua_S, static_cast<void*>(self->GetPtr()), type);
+         }
+     }
+     else
+         lua_pushnil(tolua_S);
  }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetPtr'.",&tolua_err);
+ return 0;
+#endif
+}
+
+#define TOLUA_DISABLE_tolua_CoreLuaAPI_Variant_Get00
+int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"const Variant",0,&tolua_err) ||
+ !tolua_isstring(tolua_S,2,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  const Variant* self = (const Variant*)  tolua_tousertype(tolua_S,1,0);
+  String type = String(tolua_tostring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Get'", NULL);
+#endif
+ {
+    switch (self->GetType())
+    {
+    case VAR_INT:
+        if (type == "UInt" || type == "unsigned" || type == "unsigned int")
+            tolua_pushnumber(tolua_S, (lua_Number)self->GetUInt());
+        else if (type == "StringHash")
+        {
+            // Make a new local copy
+            tolua_pushusertype(tolua_S, Mtolua_new(StringHash(self->GetStringHash())), "StringHash");
+            tolua_register_gc(tolua_S, lua_gettop(tolua_S));
+        }
+        else
+            tolua_pushnumber(tolua_S, (lua_Number)self->GetInt());
+        break;
+
+    case VAR_BOOL:
+        tolua_pushboolean(tolua_S, (int)self->GetBool());
+        break;
+
+    case VAR_FLOAT:
+        tolua_pushnumber(tolua_S, (lua_Number)self->GetFloat());
+        break;
+
+    case VAR_DOUBLE:
+        tolua_pushnumber(tolua_S, (lua_Number)self->GetDouble());
+        break;
+
+    case VAR_VECTOR2:
+    case VAR_VECTOR3:
+    case VAR_VECTOR4:
+    case VAR_QUATERNION:
+    case VAR_COLOR:
+    case VAR_RESOURCEREF:
+    case VAR_RESOURCEREFLIST:
+    case VAR_VARIANTMAP:
+    case VAR_INTRECT:
+    case VAR_INTVECTOR2:
+        tolua_pushusertype(tolua_S, (void*)&self->value_, self->GetTypeName().CString());
+        break;
+
+    case VAR_STRING:
+        tolua_pushurho3dstring(tolua_S, (const char*)self->GetString());
+        break;
+
+    case VAR_BUFFER:
+        if (type == "VectorBufer")
+        {
+            tolua_pushusertype(tolua_S, Mtolua_new(VectorBuffer(self->GetVectorBuffer())), "VectorBuffer");
+            tolua_register_gc(tolua_S, lua_gettop(tolua_S));
+        }
+        else
+            ToluaPushPODVector<unsigned char>(0.f, tolua_S, (void*)&self->GetBuffer(), "unsigned char");
+        break;
+
+    case VAR_VOIDPTR:
+        return tolua_CoreLuaAPI_Variant_GetVoidPtr00(tolua_S);
+
+    case VAR_PTR:
+        return tolua_CoreLuaAPI_Variant_GetPtr00(tolua_S);
+
+    case VAR_VARIANTVECTOR:
+        ToluaPushVector<Variant>(tolua_S, (void*)&self->GetVariantVector(), "Variant");
+        break;
+
+    case VAR_STRINGVECTOR:
+        ToluaPushVector<String>(tolua_S, (void*)&self->GetStringVector(), "String");
+        break;
+
+    case VAR_MATRIX3:
+    case VAR_MATRIX3X4:
+    case VAR_MATRIX4:
+        tolua_pushusertype(tolua_S, (void*)self->value_.ptr_, self->GetTypeName().CString());
+        break;
+
+    default:
+        lua_pushnil(tolua_S);
+        break;
+    }
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
  return 0;
 #endif
 }
@@ -411,12 +539,13 @@ static int VariantMapIndexEventHandler(lua_State* tolua_S)
         key = StringHash(lua_tostring(tolua_S, 2));
     else if (t == LUA_TNUMBER)
         key = StringHash((unsigned)lua_tonumber(tolua_S, 2));
-    else
+    else if (t == LUA_TUSERDATA)
     {
-        lua_pushnil(tolua_S);
-        return 1;
+        tolua_Error error;
+        if (tolua_isusertype(tolua_S, 2, "StringHash", 0, &error))
+            key = *static_cast<StringHash*>(tolua_tousertype(tolua_S, 2, 0));
     }
-    Variant* variant = static_cast<const VariantMap*>(tolua_tousertype(tolua_S, 1, 0))->operator [](key);
+    Variant* variant = key ? static_cast<const VariantMap*>(tolua_tousertype(tolua_S, 1, 0))->operator [](key) : 0;
     if (variant)
         tolua_pushusertype(tolua_S, variant, "Variant");
     else
@@ -432,6 +561,14 @@ static int VariantMapNewIndexEventHandler(lua_State* tolua_S)
         key = StringHash(lua_tostring(tolua_S, 2));
     else if (t == LUA_TNUMBER)
         key = StringHash((unsigned)lua_tonumber(tolua_S, 2));
+    else if (t == LUA_TUSERDATA)
+    {
+        tolua_Error error;
+        if (tolua_isusertype(tolua_S, 2, "StringHash", 0, &error))
+            key = *static_cast<StringHash*>(tolua_tousertype(tolua_S, 2, 0));
+        else
+            return 0;
+    }
     else
         return 0;
     Variant& variant = static_cast<VariantMap*>(tolua_tousertype(tolua_S, 1, 0))->operator [](key);     // autovivification
