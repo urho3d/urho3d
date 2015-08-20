@@ -163,47 +163,52 @@ bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info
         if (objectElem.HasAttribute("type"))
             object->type_ = objectElem.GetAttribute("type");
 
-        Vector2 position(objectElem.GetFloat("x"), objectElem.GetFloat("y"));
+        if (objectElem.HasAttribute("gid"))
+            object->objectType_ = OT_TILE;
+        else if (objectElem.HasChild("polygon"))
+            object->objectType_ = OT_POLYGON;
+        else if (objectElem.HasChild("polyline"))
+            object->objectType_ = OT_POLYLINE;
+        else if (objectElem.HasChild("ellipse"))
+            object->objectType_ = OT_ELLIPSE;
+        else
+            object->objectType_ = OT_RECTANGLE;
 
-        if (objectElem.HasAttribute("width") || objectElem.HasAttribute("height"))
-        {
-            if (!objectElem.HasChild("ellipse"))
-                object->objectType_ = OT_RECTANGLE;
-            else
-                object->objectType_ = OT_ELLIPSE;
+        const Vector2 position(objectElem.GetFloat("x"), objectElem.GetFloat("y"));
+        const Vector2 size(objectElem.GetFloat("width"), objectElem.GetFloat("height"));
 
-            Vector2 size(objectElem.GetFloat("width"), objectElem.GetFloat("height"));
-
+        switch (object->objectType_) {
+        case OT_RECTANGLE:
+        case OT_ELLIPSE:
             object->position_ = info.ConvertPosition(Vector2(position.x_, position.y_ + size.y_));
             object->size_ = Vector2(size.x_ * PIXEL_SIZE, size.y_ * PIXEL_SIZE);
-        }
-        else if (objectElem.HasAttribute("gid"))
-        {
-            object->objectType_ = OT_TILE;
+            break;
+
+        case OT_TILE:
             object->position_ = info.ConvertPosition(position);
             object->gid_ = objectElem.GetInt("gid");
             object->sprite_ = tmxFile_->GetTileSprite(object->gid_);
-        }
-        else
+
+            if (objectElem.HasAttribute("width") || objectElem.HasAttribute("height"))
+            {
+                object->size_ = Vector2(size.x_ * PIXEL_SIZE, size.y_ * PIXEL_SIZE);
+            }
+            else if (object->sprite_)
+            {
+                IntVector2 spriteSize = object->sprite_->GetRectangle().Size();
+                object->size_ = Vector2(spriteSize.x_, spriteSize.y_);
+            }
+
+            break;
+
+        case OT_POLYGON:
+        case OT_POLYLINE:
         {
             Vector<String> points;
 
-            if (objectElem.HasChild("polygon"))
-            {
-                object->objectType_ = OT_POLYGON;
-
-                XMLElement polygonElem = objectElem.GetChild("polygon");
-                points = polygonElem.GetAttribute("points").Split(' ');
-            }
-            else if (objectElem.HasChild("polyline"))
-            {
-                object->objectType_ = OT_POLYLINE;
-
-                XMLElement polylineElem = objectElem.GetChild("polyline");
-                points = polylineElem.GetAttribute("points").Split(' ');
-            }
-            else
-                return false;
+            const char *name = object->objectType_ == OT_POLYGON ? "polygon" : "polyline";
+            XMLElement polygonElem = objectElem.GetChild(name);
+            points = polygonElem.GetAttribute("points").Split(' ');
 
             if (points.Size() <= 1)
                 continue;
@@ -216,6 +221,9 @@ bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info
                 Vector2 point = position + ToVector2(points[i]);
                 object->points_[i] = info.ConvertPosition(point);
             }
+
+            break;
+        }
         }
 
         if (objectElem.HasChild("properties"))
