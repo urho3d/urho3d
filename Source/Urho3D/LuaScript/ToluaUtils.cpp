@@ -36,27 +36,23 @@ const char* tolua_tourho3dstring(lua_State* L, int narg, const String& str)
     return tolua_tourho3dstring(L, narg, str.CString());
 }
 
-// Lua state to context mapping
-static HashMap<void*, Context*> contextMapping;
-
 void SetContext(lua_State* L, Context* context)
 {
-    if (context == 0)
-        contextMapping.Erase(L);
-    else
-        contextMapping[L] = context;
+    assert(L && context);
+    tolua_pushusertype(L, static_cast<void*>(context), "Context");
+    lua_setglobal(L, ".context");   // This property is internal, the exposed 'context' property is obtained via GetContext() call
 }
 
 Context* GetContext(lua_State* L)
 {
-    HashMap<void*, Context*>::ConstIterator i = contextMapping.Find(L);
-    if (i == contextMapping.End())
+    lua_getglobal(L, ".context");
+    if (lua_isnil(L, -1))
     {
         lua_State* L1 = lua_getmainthread(L);
         return (L == L1) ? 0 : GetContext(L1);
     }
-
-    return i->second_;
+    tolua_Error error;      // Ensure we are indeed getting a Context object before casting
+    return tolua_isusertype(L, -1, "Context", 0, &error) ? static_cast<Context*>(tolua_tousertype(L, -1, 0)) : 0;
 }
 
 // Explicit template specialization only required for StringVector

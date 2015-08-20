@@ -91,8 +91,6 @@ LuaScript::LuaScript(Context* context) :
         return;
     }
 
-    SetContext(luaState_, context_);
-
     lua_atpanic(luaState_, &LuaScript::AtPanic);
 
     luaL_openlibs(luaState_);
@@ -126,6 +124,8 @@ LuaScript::LuaScript(Context* context) :
 #endif
     tolua_LuaScriptLuaAPI_open(luaState_);
 
+    SetContext(luaState_, context_);
+
     eventInvoker_ = new LuaScriptEventInvoker(context_);
 
     coroutineUpdate_ = GetFunction("coroutine.update");
@@ -144,8 +144,6 @@ LuaScript::~LuaScript()
 
     lua_State* luaState = luaState_;
     luaState_ = 0;
-
-    SetContext(luaState_, 0);
 
     if (luaState)
         lua_close(luaState);
