@@ -172,7 +172,11 @@ static void ToRapidjsonValue(rapidjson::Value& rapidjsonValue, const JSONValue& 
             rapidjsonValue.Reserve(jsonArray.Size(), allocator);
 
             for (unsigned i = 0; i < jsonArray.Size(); ++i)
+            {
+                rapidjson::Value value;
+                rapidjsonValue.PushBack(value, allocator);
                 ToRapidjsonValue(rapidjsonValue[i], jsonArray[i], allocator);
+            }
         }
         break;
 

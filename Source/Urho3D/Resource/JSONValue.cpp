@@ -81,8 +81,8 @@ void JSONValue::SetType(JSONValueType valueType)
 
 JSONValue& JSONValue::operator =(bool rhs)
 {
-    SetType(JSON_NUMBER);
-    numberValue_ = rhs;
+    SetType(JSON_BOOL);
+    boolValue_ = rhs;
 
     return *this;
 }
