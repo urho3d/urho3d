@@ -364,6 +364,16 @@ static int tolua_CoreLuaAPI_Variant_GetVoidPtr00(lua_State* tolua_S)
 #endif
 }
 
+namespace Urho3D
+{
+
+template <> const VariantValue* Variant::Get<const VariantValue*>() const
+{
+    return &value_;
+}
+
+}
+
 #define TOLUA_DISABLE_tolua_CoreLuaAPI_Variant_GetPtr00
 static int tolua_CoreLuaAPI_Variant_GetPtr00(lua_State* tolua_S)
 {
@@ -406,7 +416,7 @@ static int tolua_CoreLuaAPI_Variant_GetPtr00(lua_State* tolua_S)
 }
 
 #define TOLUA_DISABLE_tolua_CoreLuaAPI_Variant_Get00
-int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S)
+static int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -462,7 +472,7 @@ int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S)
     case VAR_VARIANTMAP:
     case VAR_INTRECT:
     case VAR_INTVECTOR2:
-        tolua_pushusertype(tolua_S, (void*)&self->value_, self->GetTypeName().CString());
+        tolua_pushusertype(tolua_S, (void*)self->Get<const VariantValue*>(), self->GetTypeName().CString());
         break;
 
     case VAR_STRING:
@@ -496,7 +506,7 @@ int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S)
     case VAR_MATRIX3:
     case VAR_MATRIX3X4:
     case VAR_MATRIX4:
-        tolua_pushusertype(tolua_S, (void*)self->value_.ptr_, self->GetTypeName().CString());
+        tolua_pushusertype(tolua_S, (void*)self->Get<const VariantValue*>()->ptr_, self->GetTypeName().CString());
         break;
 
     default:

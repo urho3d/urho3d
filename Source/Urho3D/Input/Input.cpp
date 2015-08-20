@@ -768,44 +768,38 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
             {
                 text->SetVisible(false);
                 String keyBinding = text->GetText();
+                int mappedKeyBinding[4] = {'W', 'S', 'A', 'D'};
+                Vector<String> keyBindings;
                 if (keyBinding.Contains(' '))   // e.g.: "UP DOWN LEFT RIGHT"
+                    keyBindings = keyBinding.Split(' ');    // Attempt to split the text using ' ' as separator
+                else if (keyBinding.Length() == 4)
                 {
-                    // Attempt to split the text using ' ' as separator
-                    Vector<String> keyBindings(keyBinding.Split(' '));
-                    String mappedKeyBinding;
-                    if (keyBindings.Size() == 4)
-                    {
-                        PopulateKeyBindingMap(keyBindingMap);
+                    keyBindings.Resize(4);      // e.g.: "WSAD"
+                    for (unsigned i = 0; i < 4; ++i)
+                        keyBindings[i] = keyBinding.Substring(i, 1);
+                }
+                if (keyBindings.Size() == 4)
+                {
+                    PopulateKeyBindingMap(keyBindingMap);
 
-                        for (unsigned j = 0; j < 4; ++j)
+                    for (unsigned j = 0; j < 4; ++j)
+                    {
+                        if (keyBindings[j].Length() == 1)
+                            mappedKeyBinding[j] = keyBindings[j][0];
+                        else
                         {
-                            if (keyBindings[j].Length() == 1)
-                                mappedKeyBinding.Append(keyBindings[j][0]);
+                            HashMap<String, int>::Iterator i = keyBindingMap.Find(keyBindings[j]);
+                            if (i != keyBindingMap.End())
+                                mappedKeyBinding[j] = i->second_;
                             else
-                            {
-                                HashMap<String, int>::Iterator i = keyBindingMap.Find(keyBindings[j]);
-                                if (i != keyBindingMap.End())
-                                    mappedKeyBinding.Append((char)i->second_);
-                                else
-                                    break;
-                            }
+                                LOGERRORF("%s - %s cannot be mapped, fallback to '%c'", name.CString(), keyBindings[j].CString(),
+                                    mappedKeyBinding[j]);
                         }
                     }
-                    if (mappedKeyBinding.Length() != 4)
-                    {
-                        LOGERRORF("%s has invalid key binding %s, fallback to WSAD", name.CString(), keyBinding.CString());
-                        keyBinding = "WSAD";
-                    }
-                    else
-                        keyBinding = mappedKeyBinding;
                 }
-                else if (keyBinding.Length() != 4)
-                {
+                else
                     LOGERRORF("%s has invalid key binding %s, fallback to WSAD", name.CString(), keyBinding.CString());
-                    keyBinding = "WSAD";
-                }
-
-                element->SetVar(VAR_BUTTON_KEY_BINDING, keyBinding);
+                element->SetVar(VAR_BUTTON_KEY_BINDING, IntRect(mappedKeyBinding));
             }
         }
 
@@ -2124,8 +2118,8 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
         }
         else
         {
-            // Hat is binded by 4 keys, like 'WASD'
-            String keyBinding = keyBindingVar.GetString();
+            // Hat is binded by 4 integers representing keysyms for 'W', 'S', 'A', 'D' or something similar
+            IntRect keyBinding = keyBindingVar.GetIntRect();
 
             if (eventType == E_TOUCHEND)
             {
@@ -2141,13 +2135,13 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
                 evt.type = SDL_KEYDOWN;
                 IntVector2 relPosition = position - element->GetScreenPosition() - element->GetSize() / 2;
                 if (relPosition.y_ < 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
-                    evt.key.keysym.sym = keyBinding[0];
+                    evt.key.keysym.sym = keyBinding.left_;      // The integers are encoded in WSAD order to l-t-r-b
                 else if (relPosition.y_ > 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
-                    evt.key.keysym.sym = keyBinding[1];
+                    evt.key.keysym.sym = keyBinding.top_;
                 else if (relPosition.x_ < 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
-                    evt.key.keysym.sym = keyBinding[2];
+                    evt.key.keysym.sym = keyBinding.right_;
                 else if (relPosition.x_ > 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
-                    evt.key.keysym.sym = keyBinding[3];
+                    evt.key.keysym.sym = keyBinding.bottom_;
                 else
                     return;
 

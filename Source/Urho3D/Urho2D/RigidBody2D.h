@@ -59,13 +59,13 @@ public:
 
     /// Set body type.
     void SetBodyType(BodyType2D bodyType);
-    /// Set Mass.
+    /// Set mass.
     void SetMass(float mass);
     /// Set inertia.
     void SetInertia(float inertia);
     /// Set mass center.
     void SetMassCenter(const Vector2& center);
-    /// Use fixture mass (default is true).
+    /// Set whether to automatically calculate mass and inertia from collision shapes. Default true.
     void SetUseFixtureMass(bool useFixtureMass);
     /// Set linear damping.
     void SetLinearDamping(float linearDamping);
@@ -75,7 +75,7 @@ public:
     void SetAllowSleep(bool allowSleep);
     /// Set fixed rotation.
     void SetFixedRotation(bool fixedRotation);
-    /// Set bullet.
+    /// Set bullet mode.
     void SetBullet(bool bullet);
     /// Set gravity scale.
     void SetGravityScale(float gravityScale);
@@ -115,14 +115,14 @@ public:
     /// Return body type.
     BodyType2D GetBodyType() const { return (BodyType2D)bodyDef_.type; }
 
-    /// Return Mass.
+    /// Return mass.
     float GetMass() const;
     /// Return inertia.
     float GetInertia() const;
     /// Return mass center.
     Vector2 GetMassCenter() const;
 
-    /// Return use fixture mass.
+    /// Return whether to calculate mass and inertia from collision shapes automatically.
     bool GetUseFixtureMass() const { return useFixtureMass_; }
 
     /// Return linear damping.
@@ -137,7 +137,7 @@ public:
     /// Return fixed rotation.
     bool IsFixedRotation() const { return bodyDef_.fixedRotation; }
 
-    /// Return bullet.
+    /// Return bullet mode.
     bool IsBullet() const { return bodyDef_.bullet; }
 
     /// Return gravity scale.
@@ -167,7 +167,7 @@ private:
     b2BodyDef bodyDef_;
     /// Box2D mass data.
     b2MassData massData_;
-    /// Use fixture mass.
+    /// Use fixture mass (calculate mass & inertia from collision shapes automatically.)
     bool useFixtureMass_;
     /// Box2D body.
     b2Body* body_;

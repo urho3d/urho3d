@@ -235,6 +235,15 @@ bool XMLElement::SetValue(const char* value)
         return false;
 
     const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
+
+    // Search for existing value first
+    for (pugi::xml_node child = node.first_child(); child; child = child.next_sibling())
+    {
+        if (child.type() == pugi::node_pcdata)
+            return const_cast<pugi::xml_node&>(child).set_value(value);
+    }
+
+    // If no previous value found, append new
     return const_cast<pugi::xml_node&>(node).append_child(pugi::node_pcdata).set_value(value);
 }
 
