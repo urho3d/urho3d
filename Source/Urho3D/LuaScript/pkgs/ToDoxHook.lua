@@ -565,6 +565,20 @@ function writeGlobalConstants(file)
   file:write("\n")
 end
 
+function writeToluaFunctions(file)
+  file:write("\n\\section LuaScriptAPI_toluaFunctions tolua functions\n")
+
+  file:write("- lua_usertype cast(lua_usertype object, const char* typename)\n")
+  file:write("- lua_table getpeer(lua_userdata object)\n")
+  file:write("- void inherit(lua_table table, lua_usertype c_instance)\n")
+  file:write("- bool releaseownership(lua_usertype object)\n")
+  file:write("- void setpeer(lua_userdata object, lua_table table)\n")
+  file:write("- bool takeownership(lua_usertype object)\n")
+  file:write("- const char* type(lua_object object)\n")
+
+  file:write("\n")
+end
+
 function writeGlobalFunctions(file)
   sortByName(globalFunctions)
   file:write("\n\\section LuaScriptAPI_GlobalFunctions Global functions\n")
@@ -623,6 +637,7 @@ function classPackage:print()
   writeClassList(file)
   writeClasses(file)
   writeEnumerates(file)
+  writeToluaFunctions(file)
   writeGlobalFunctions(file)
   writeGlobalProperties(file)
   writeGlobalConstants(file)
