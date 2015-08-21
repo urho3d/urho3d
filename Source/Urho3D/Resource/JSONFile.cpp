@@ -136,7 +136,7 @@ bool JSONFile::BeginLoad(Deserializer& source)
         return false;
     }
 
-    document.GetAllocator();    
+    document.GetAllocator();
     ToJSONValue(root_, document);
 
     SetMemoryUse(dataSize);

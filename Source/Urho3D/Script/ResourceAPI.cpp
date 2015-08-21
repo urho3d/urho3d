@@ -274,16 +274,6 @@ static void ConstructJSONValueCString(const char* value, JSONValue* ptr)
     new (ptr) JSONValue(value);
 }
 
-static void ConstructJSONValueArray(const JSONArray& value, JSONValue* ptr)
-{
-    new (ptr) JSONValue(value);
-}
-
-static void ConstructJSONValueObject(const JSONObject& value, JSONValue* ptr)
-{
-    new (ptr) JSONValue(value);
-}
-
 static void ConstructJSONValueCopy(const JSONValue& value, JSONValue* ptr)
 {
     new(ptr) JSONValue(value);
@@ -321,10 +311,7 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f(uint)", asFUNCTION(ConstructJSONValueUnsigned), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f(float)", asFUNCTION(ConstructJSONValueFloat), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f(double)", asFUNCTION(ConstructJSONValueDouble), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f(string)", asFUNCTION(ConstructJSONValueString), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f(const char*)", asFUNCTION(ConstructJSONValueCString), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f(const JSONArray&)", asFUNCTION(ConstructJSONValueArray), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f(const JSONObject&)", asFUNCTION(ConstructJSONValueObject), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f(const String&)", asFUNCTION(ConstructJSONValueString), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f(const JSONValue&)", asFUNCTION(ConstructJSONValueCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructJSONValue), asCALL_CDECL_OBJLAST);
 
@@ -333,10 +320,7 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(uint)", asMETHODPR(JSONValue, operator =, (unsigned), JSONValue&), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(float)", asMETHODPR(JSONValue, operator =, (float), JSONValue&), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(double)", asMETHODPR(JSONValue, operator =, (double), JSONValue&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(string)", asMETHODPR(JSONValue, operator =, (const String&), JSONValue&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(const char*)", asMETHODPR(JSONValue, operator =, (const char*), JSONValue&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(const JSONArray&in)", asMETHODPR(JSONValue, operator =, (const JSONArray&), JSONValue&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(const JSONObject&in)", asMETHODPR(JSONValue, operator =, (const JSONObject&), JSONValue&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(const String&)", asMETHODPR(JSONValue, operator =, (const String&), JSONValue&), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(const JSONValue&in)", asMETHODPR(JSONValue, operator =, (const JSONValue&), JSONValue&), asCALL_THISCALL);
 
     engine->RegisterObjectMethod("JSONValue", "JSONValueType get_type() const", asMETHOD(JSONValue, GetType), asCALL_THISCALL);
@@ -353,13 +337,9 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "float GetFloat() const", asMETHOD(JSONValue, GetFloat), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "double GetDouble() const", asMETHOD(JSONValue, GetDouble), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "const String& GetString() const", asMETHOD(JSONValue, GetString), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "const char* GetCString() const", asMETHOD(JSONValue, GetCString), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "const JSONArray& GetArray() const", asMETHOD(JSONValue, GetArray), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "const JSONObject& GetObject() const", asMETHOD(JSONValue, GetObject), asCALL_THISCALL);
-
     
-    engine->RegisterObjectMethod("JSONValue", "JSONValue& opIndex(unsigned)", asFUNCTION(JSONValueAtPosition), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("JSONValue", "const JSONValue& opIndex(unsigned) const", asFUNCTION(JSONValueAtPosition), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("JSONValue", "JSONValue& opIndex(uint)", asFUNCTION(JSONValueAtPosition), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("JSONValue", "const JSONValue& opIndex(uint) const", asFUNCTION(JSONValueAtPosition), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("JSONValue", "void Push(const JSONValue&in)", asMETHOD(JSONValue, Push), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "void Pop()", asMETHOD(JSONValue, Pop), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "void Insert(uint, const JSONValue&in)", asMETHODPR(JSONValue, Insert, (unsigned, const JSONValue&), void), asCALL_THISCALL);
