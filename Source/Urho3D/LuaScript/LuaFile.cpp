@@ -47,12 +47,10 @@ LuaFile::LuaFile(Context* context) :
     hasLoaded_(false),
     hasExecuted_(false)
 {
-
 }
 
 LuaFile::~LuaFile()
 {
-
 }
 
 void LuaFile::RegisterObject(Context* context)
@@ -93,10 +91,7 @@ bool LuaFile::LoadChunk(lua_State* luaState)
     if (hasLoaded_)
         return true;
 
-    if (size_ == 0)
-        return false;
-
-    if (!luaState)
+    if (size_ == 0 || !luaState)
         return false;
 
     int top = lua_gettop(luaState);
@@ -132,16 +127,15 @@ bool LuaFile::LoadAndExecute(lua_State* luaState)
     if (!LoadChunk(luaState))
         return false;
 
-    int top = lua_gettop(luaState);
-
     if (lua_pcall(luaState, 0, 0, 0))
     {
         const char* message = lua_tostring(luaState, -1);
         LOGERROR("Lua Execute failed for " + GetName() + ": " + String(message));
-        lua_settop(luaState, top);
+        lua_pop(luaState, 1);
         return false;
     }
 
+    LOGINFO("Executed Lua script " + GetName());
     hasExecuted_ = true;
 
     return true;

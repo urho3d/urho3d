@@ -343,17 +343,7 @@ static int tolua_CoreLuaAPI_Variant_GetVoidPtr00(lua_State* tolua_S)
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetVoidPtr'", NULL);
 #endif
  {
-     if (type)
-     {
-         luaL_getmetatable(tolua_S, type);
-         if (!lua_isnil(tolua_S, -1))
-         {
-             lua_pop(tolua_S, 1);
-             tolua_pushusertype(tolua_S, static_cast<void*>(self->GetVoidPtr()), type);
-         }
-     }
-     else
-         lua_pushnil(tolua_S);
+     ToluaPushRegisteredUserType(tolua_S, static_cast<void*>(self->GetVoidPtr()), type);
  }
  }
  return 1;
@@ -362,16 +352,6 @@ static int tolua_CoreLuaAPI_Variant_GetVoidPtr00(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'GetVoidPtr'.",&tolua_err);
  return 0;
 #endif
-}
-
-namespace Urho3D
-{
-
-template <> const VariantValue* Variant::Get<const VariantValue*>() const
-{
-    return &value_;
-}
-
 }
 
 #define TOLUA_DISABLE_tolua_CoreLuaAPI_Variant_GetPtr00
@@ -394,17 +374,7 @@ static int tolua_CoreLuaAPI_Variant_GetPtr00(lua_State* tolua_S)
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetPtr'", NULL);
 #endif
  {
-     if (type)
-     {
-         luaL_getmetatable(tolua_S, type);
-         if (!lua_isnil(tolua_S, -1))
-         {
-             lua_pop(tolua_S, 1);
-             tolua_pushusertype(tolua_S, static_cast<void*>(self->GetPtr()), type);
-         }
-     }
-     else
-         lua_pushnil(tolua_S);
+     ToluaPushRegisteredUserType(tolua_S, static_cast<void*>(self->GetPtr()), type);
  }
  }
  return 1;
@@ -430,89 +400,12 @@ static int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S)
 #endif
  {
   const Variant* self = (const Variant*)  tolua_tousertype(tolua_S,1,0);
-  String type = String(tolua_tostring(tolua_S,2,0));
+  const char* type = ((const char*)  tolua_tostring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Get'", NULL);
 #endif
  {
-    switch (self->GetType())
-    {
-    case VAR_INT:
-        if (type == "UInt" || type == "unsigned" || type == "unsigned int")
-            tolua_pushnumber(tolua_S, (lua_Number)self->GetUInt());
-        else if (type == "StringHash")
-        {
-            // Make a new local copy
-            tolua_pushusertype(tolua_S, Mtolua_new(StringHash(self->GetStringHash())), "StringHash");
-            tolua_register_gc(tolua_S, lua_gettop(tolua_S));
-        }
-        else
-            tolua_pushnumber(tolua_S, (lua_Number)self->GetInt());
-        break;
-
-    case VAR_BOOL:
-        tolua_pushboolean(tolua_S, (int)self->GetBool());
-        break;
-
-    case VAR_FLOAT:
-        tolua_pushnumber(tolua_S, (lua_Number)self->GetFloat());
-        break;
-
-    case VAR_DOUBLE:
-        tolua_pushnumber(tolua_S, (lua_Number)self->GetDouble());
-        break;
-
-    case VAR_VECTOR2:
-    case VAR_VECTOR3:
-    case VAR_VECTOR4:
-    case VAR_QUATERNION:
-    case VAR_COLOR:
-    case VAR_RESOURCEREF:
-    case VAR_RESOURCEREFLIST:
-    case VAR_VARIANTMAP:
-    case VAR_INTRECT:
-    case VAR_INTVECTOR2:
-        tolua_pushusertype(tolua_S, (void*)self->Get<const VariantValue*>(), self->GetTypeName().CString());
-        break;
-
-    case VAR_STRING:
-        tolua_pushurho3dstring(tolua_S, (const char*)self->GetString());
-        break;
-
-    case VAR_BUFFER:
-        if (type == "VectorBufer")
-        {
-            tolua_pushusertype(tolua_S, Mtolua_new(VectorBuffer(self->GetVectorBuffer())), "VectorBuffer");
-            tolua_register_gc(tolua_S, lua_gettop(tolua_S));
-        }
-        else
-            ToluaPushPODVector<unsigned char>(0.f, tolua_S, (void*)&self->GetBuffer(), "unsigned char");
-        break;
-
-    case VAR_VOIDPTR:
-        return tolua_CoreLuaAPI_Variant_GetVoidPtr00(tolua_S);
-
-    case VAR_PTR:
-        return tolua_CoreLuaAPI_Variant_GetPtr00(tolua_S);
-
-    case VAR_VARIANTVECTOR:
-        ToluaPushVector<Variant>(tolua_S, (void*)&self->GetVariantVector(), "Variant");
-        break;
-
-    case VAR_STRINGVECTOR:
-        ToluaPushVector<String>(tolua_S, (void*)&self->GetStringVector(), "String");
-        break;
-
-    case VAR_MATRIX3:
-    case VAR_MATRIX3X4:
-    case VAR_MATRIX4:
-        tolua_pushusertype(tolua_S, (void*)self->Get<const VariantValue*>()->ptr_, self->GetTypeName().CString());
-        break;
-
-    default:
-        lua_pushnil(tolua_S);
-        break;
-    }
+     ToluaPushVariant(tolua_S, self, type);
  }
  }
  return 1;
@@ -582,144 +475,7 @@ static int VariantMapNewIndexEventHandler(lua_State* tolua_S)
     else
         return 0;
     Variant& variant = static_cast<VariantMap*>(tolua_tousertype(tolua_S, 1, 0))->operator [](key);     // autovivification
-    switch (lua_type(tolua_S, 3))   // Use the type of lua object to determine the final variant type
-    {
-    case LUA_TNIL:
-        variant = Variant::EMPTY;
-        break;
-
-    case LUA_TBOOLEAN:
-        variant = (bool)lua_toboolean(tolua_S, 3);     // Still need to cast to bool as Lua/LuaJIT return it as int
-        break;
-
-    case LUA_TNUMBER:
-        {
-            // Use the original variant type to further determine the final variant type
-            // CAVEAT: if lhs has integral data type and double is desired then lhs needs to be reset first before assigning
-            double value = lua_tonumber(tolua_S, 3);
-            switch (variant.GetType())
-            {
-            case VAR_INT:
-                variant = (int)value;
-                break;
-
-            case VAR_BOOL:
-                variant = value != 0.0f;
-                break;
-
-            case VAR_FLOAT:
-                variant = (float)value;
-                break;
-
-            default:
-                variant = value;
-            }
-        }
-        break;
-
-    case LUA_TSTRING:
-        variant = lua_tostring(tolua_S, 3);
-        break;
-
-    case LUA_TUSERDATA:
-        {
-            if (lua_getmetatable(tolua_S, 3))
-            {
-                lua_rawget(tolua_S, LUA_REGISTRYINDEX);     // registry[mt]
-                const char* typeName = lua_tostring(tolua_S, -1);
-                lua_pop(tolua_S, 1);
-
-                void* value = tolua_tousertype(tolua_S, 3, 0);
-                switch (Variant::GetTypeFromName(typeName))
-                {
-                case VAR_NONE:
-                    // Handle special cases
-                    if (typeName)
-                    {
-                        tolua_Error error;
-                        if (strcmp(typeName, "Variant") == 0)
-                            variant = *static_cast<Variant*>(value);
-                        else if (strcmp(typeName, "VectorBuffer") == 0)
-                            variant = *static_cast<VectorBuffer*>(value);
-                        else if (tolua_isusertype(tolua_S, 3, "RefCounted", 0, &error))
-                            variant = static_cast<RefCounted*>(value);
-                        else
-                            variant = value;    // void*
-                    }
-                    break;
-
-                case VAR_VECTOR2:
-                    variant = *static_cast<Vector2*>(value);
-                    break;
-
-                case VAR_VECTOR3:
-                    variant = *static_cast<Vector3*>(value);
-                    break;
-
-                case VAR_VECTOR4:
-                    variant = *static_cast<Vector4*>(value);
-                    break;
-
-                case VAR_QUATERNION:
-                    variant = *static_cast<Quaternion*>(value);
-                    break;
-
-                case VAR_COLOR:
-                    variant = *static_cast<Color*>(value);
-                    break;
-
-                case VAR_INTRECT:
-                    variant = *static_cast<IntRect*>(value);
-                    break;
-
-                case VAR_INTVECTOR2:
-                    variant = *static_cast<IntVector2*>(value);
-                    break;
-
-                case VAR_MATRIX3:
-                    variant = *static_cast<Matrix3*>(value);
-                    break;
-
-                case VAR_MATRIX3X4:
-                    variant = *static_cast<Matrix3x4*>(value);
-                    break;
-
-                case VAR_MATRIX4:
-                    variant = *static_cast<Matrix4*>(value);
-                    break;
-
-                case VAR_RESOURCEREF:
-                    variant = *static_cast<ResourceRef*>(value);
-                    break;
-
-                case VAR_RESOURCEREFLIST:
-                    variant = *static_cast<ResourceRefList*>(value);
-                    break;
-
-                case VAR_VARIANTMAP:
-                    variant = *static_cast<VariantMap*>(value);
-                    break;
-
-                default: break;
-                }
-            };
-        }
-        break;
-
-    case LUA_TTABLE:
-        {
-            tolua_Error error;
-            if (ToluaIsPODVector<unsigned char>(0.f, tolua_S, 3, "unsigned char", 0, &error))
-                variant = *static_cast<PODVector<unsigned char>*>(ToluaToPODVector<unsigned char>(0.f, tolua_S, 3, 0));
-            else if (ToluaIsVector<Variant>(tolua_S, 3, "Variant", 0, &error))
-                variant = *static_cast<VariantVector*>(ToluaToVector<Variant>(tolua_S, 3, 0));
-            else if (ToluaIsVector<String>(tolua_S, 3, "String", 0, &error))
-                variant = *static_cast<StringVector*>(ToluaToVector<String>(tolua_S, 3, 0));
-        }
-        break;
-
-    default: break;
-    }
+    ToluaToVariant(tolua_S, 3, 0, variant);
     return 0;
 }
 

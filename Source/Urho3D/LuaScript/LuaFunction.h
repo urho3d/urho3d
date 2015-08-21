@@ -44,10 +44,8 @@ public:
 
     /// Check that function is valid.
     bool IsValid() const;
-    /// Begin function call.
-    bool BeginCall();
-    /// Begin script object's function call.
-    bool BeginCall(const LuaScriptInstance* instance);
+    /// Begin function call. When a script object is given then pass it as self argument (first parameter) to the function call.
+    bool BeginCall(const LuaScriptInstance* instance = 0);
     /// End call and actually execute the function.
     bool EndCall(int numReturns = 0);
     /// Push int to stack.
@@ -56,6 +54,8 @@ public:
     void PushBool(bool value);
     /// Push float to stack.
     void PushFloat(float value);
+    /// Push double to stack.
+    void PushDouble(double value);
     /// Push string to stack.
     void PushString(const String& string);
     /// Push user type to stack.
@@ -86,9 +86,9 @@ public:
     }
 
     /// Push variant to stack.
-    bool PushVariant(const Variant& variant);
-    /// Push Lua table to stack.
-    bool PushLuaTable(const String& tableName);
+    void PushVariant(const Variant& variant, const char* asType = 0);
+    /// Push Lua table to stack. When the specified table is not found then a nil is pushed instead.
+    void PushLuaTable(const String& tableName);
 
     /// Return function ref.
     int GetFunctionRef() const { return functionRef_; }
@@ -100,9 +100,7 @@ private:
     int functionRef_;
     /// Need unref.
     bool needUnref_;
-    /// Lua stack top.
-    int stackTop_;
-    /// Number of arguments.
+    /// Number of arguments being pushed so far. For internal use only.
     int numArguments_;
 };
 

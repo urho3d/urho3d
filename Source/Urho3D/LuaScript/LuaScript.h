@@ -48,12 +48,12 @@ public:
     /// Destruct.
     ~LuaScript();
 
-    /// Add a scripted event handler by function.
-    virtual void AddEventHandler(const String& eventName, int functionIndex);
+    /// Add a scripted event handler by function at the given stack index.
+    virtual void AddEventHandler(const String& eventName, int index);
     /// Add a scripted event handler by function name.
     virtual void AddEventHandler(const String& eventName, const String& functionName);
-    /// Add a scripted event handler by function for a specific sender.
-    virtual void AddEventHandler(Object* sender, const String& eventName, int functionIndex);
+    /// Add a scripted event handler by function at the given stack index for a specific sender.
+    virtual void AddEventHandler(Object* sender, const String& eventName, int index);
     /// Add a scripted event handler by function name for a specific sender.
     virtual void AddEventHandler(Object* sender, const String& eventName, const String& functionName);
     /// Remove a scripted event handler.
@@ -77,18 +77,16 @@ public:
     bool ExecuteRawFile(const String& fileName);
     /// Execute script function.
     bool ExecuteFunction(const String& functionName);
-    /// Send event.
-    void SendEvent(const String& eventName, VariantMap& eventData);
     /// Set whether to execute engine console commands as script code.
     void SetExecuteConsoleCommands(bool enable);
 
     /// Return Lua state.
     lua_State* GetState() const { return luaState_; }
 
-    /// Return Lua function by function stack index.
-    LuaFunction* GetFunction(int functionIndex);
+    /// Return Lua function at the given stack index.
+    LuaFunction* GetFunction(int index);
     /// Return Lua function by function name.
-    LuaFunction* GetFunction(const String& functionName, bool silentIfNotfound = false);
+    LuaFunction* GetFunction(const String& functionName, bool silentIfNotFound = false);
 
     /// Return whether is executing engine console commands as script code.
     bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
@@ -102,8 +100,8 @@ private:
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle a console command event.
     void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
-    /// Push script function.
-    bool PushScriptFunction(const String& functionName, bool silentIfNotfound = false);
+    /// Push script function to stack.
+    bool PushScriptFunction(const String& functionName, bool silentIfNotFound = false);
 
     /// At panic.
     static int AtPanic(lua_State* L);
@@ -114,7 +112,7 @@ private:
 
     /// Lua state.
     lua_State* luaState_;
-    /// Event invoker.
+    /// Procedural event invoker.
     SharedPtr<LuaScriptEventInvoker> eventInvoker_;
     /// Coroutine update function.
     LuaFunction* coroutineUpdate_;

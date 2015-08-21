@@ -185,5 +185,14 @@ template <> int ToluaIsPODVector<bool>(double /*overload*/, lua_State* L, int lo
 template <> void* ToluaToPODVector<bool>(double /*overload*/, lua_State* L, int narg, void* def);
 template <> int ToluaPushPODVector<bool>(double /*overload*/, lua_State* L, void* data, const char* type);
 
+/// Convert object at the given index and store it in Variant. This function is not thread-safe.
+void ToluaToVariant(lua_State* L, int narg, void* def, Variant& variant);
+
+/// Push object stored in a Variant to stack. Empty variant value is pushed as nil.
+void ToluaPushVariant(lua_State* L, const Variant* variant, const char* type = 0);
+
+/// Push a registered Lua user type to stack. If the specified type is not yet registered, a nil is pushed instead.
+void ToluaPushRegisteredUserType(lua_State* L, void* data, const char* type);
+
 /// Push Object to Lua.
 void ToluaPushObject(lua_State* L, void* data, const char* type);
