@@ -154,38 +154,36 @@ void Localization::Reset()
     strings_.Clear();
 }
 
-void Localization::LoadJSON(const JSONValue &source)
+void Localization::LoadJSON(const JSONValue& source)
 {
-    Vector<String> ids = source.GetChildNames();
-    for (unsigned i = 0; i < ids.Size(); i++)
+    for (JSONObject::ConstIterator i = source.Begin(); i != source.End(); ++i)
     {
-        String id = ids[i];
+        String id = i->first_;
         if (id.Empty())
         {
             LOGWARNING("Localization::LoadJSON(source): string ID is empty");
             continue;
         }
-        JSONValue value = source.GetChild(id);
-        Vector<String> langs = value.GetValueNames();
-        for (unsigned j = 0; j < langs.Size(); j++)
+        const JSONValue& langs = i->second_;
+        for (JSONObject::ConstIterator j = langs.Begin(); j != langs.End(); ++j)
         {
-            String lang = langs[j];
+            const String& lang = j->first_;
             if (lang.Empty())
             {
                 LOGWARNING("Localization::LoadJSON(source): language name is empty, string ID=\"" + id + "\"");
                 continue;
             }
-            String string = value.GetString(lang);
+            const String& string = j->second_.GetString();
             if (string.Empty())
             {
                 LOGWARNING("Localization::LoadJSON(source): translation is empty, string ID=\"" + id +
-                           "\", language=\"" + lang + "\"");
+                    "\", language=\"" + lang + "\"");
                 continue;
             }
             if (strings_[StringHash(lang)][StringHash(id)] != String::EMPTY)
             {
                 LOGWARNING("Localization::LoadJSON(source): override translation, string ID=\"" + id +
-                           "\", language=\"" + lang + "\"");
+                    "\", language=\"" + lang + "\"");
             }
             strings_[StringHash(lang)][StringHash(id)] = string;
             if (!languages_.Contains(lang))
