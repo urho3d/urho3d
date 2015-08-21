@@ -12,7 +12,7 @@ enum JSONValueType
 
 class JSONValue
 {
-	JSONValue();
+    JSONValue();
     JSONValue(bool value);
     JSONValue(int value);
     JSONValue(unsigned value);
@@ -21,7 +21,7 @@ class JSONValue
     JSONValue(const String value);
     JSONValue(const char* value);
     JSONValue(const JSONArray& value);
-    JSONValue(const JSONObject& value);    
+    JSONValue(const JSONObject& value);
     JSONValue(const JSONValue& value);
     ~JSONValue();
 

@@ -48,6 +48,10 @@ class JSONValue;
 typedef Vector<JSONValue> JSONArray;
 /// JSON object type.
 typedef HashMap<String, JSONValue> JSONObject;
+/// JSON object iterator.
+typedef JSONObject::Iterator JSONObjectIterator;
+/// Constant JSON object iterator.
+typedef JSONObject::ConstIterator ConstJSONObjectIterator;
 
 /// JSON value class.
 class URHO3D_API JSONValue
@@ -177,11 +181,11 @@ public:
     /// Return C string value.
     const char* GetCString() const { return IsString() ? stringValue_->CString() : 0;}
     /// Return JSON array value.
-    const JSONArray& GetArray() const { return IsArray() ? *arrayValue_ : EMPTY_ARRAY; }
+    const JSONArray& GetArray() const { return IsArray() ? *arrayValue_ : emptyArray; }
     /// Return JSON object value.
-    const JSONObject& GetObject() const { return IsObject() ? *objectValue_ : EMPTY_OBJECT; }
+    const JSONObject& GetObject() const { return IsObject() ? *objectValue_ : emptyObject; }
 
-	// JSON array functions
+    // JSON array functions
     /// Return JSON value at index.
     JSONValue& operator [](unsigned index);
     /// Return JSON value at index.
@@ -203,7 +207,7 @@ public:
     /// Return size of array .
     unsigned Size() const;
 
-	// JSON object functions
+    // JSON object functions
     /// Return JSON value with key.
     JSONValue& operator [](const String& key);
     /// Return JSON value with key.
@@ -216,16 +220,24 @@ public:
     bool Erase(const String& key);
     /// Return whether contains a pair with key.
     bool Contains(const String& key) const;
-    
-    /// Clear array or object (user for array and object types).
+    /// Return iterator to the beginning.
+    JSONObjectIterator Begin();
+    /// Return iterator to the beginning.
+    ConstJSONObjectIterator Begin() const;
+    /// Return iterator to the end.
+    JSONObjectIterator End();
+    /// Return iterator to the beginning.
+    ConstJSONObjectIterator End() const;
+
+    /// Clear array or object.
     void Clear();
 
     /// Empty JSON value.
     static const JSONValue EMPTY;
     /// Empty JSON array.
-    static const JSONArray EMPTY_ARRAY;
+    static const JSONArray emptyArray;
     /// Empty JSON object.
-    static const JSONObject EMPTY_OBJECT;
+    static const JSONObject emptyObject;
 
 private:
     /// Value type.

@@ -32,8 +32,8 @@ namespace Urho3D
 {
 
 const JSONValue JSONValue::EMPTY;
-const JSONArray JSONValue::EMPTY_ARRAY;
-const JSONObject JSONValue::EMPTY_OBJECT;
+const JSONArray JSONValue::emptyArray;
+const JSONObject JSONValue::emptyObject;
 
 void JSONValue::SetType(JSONValueType valueType)
 {
@@ -287,7 +287,7 @@ void JSONValue::Set(const String& key, const JSONValue& value)
     // Convert to object type
     SetType(JSON_OBJECT);
 
-    objectValue_->Insert(MakePair<String, JSONValue>(key, value));
+    (*objectValue_)[key] = value;
 }
 
 const JSONValue& JSONValue::Get(const String& key) const
@@ -316,6 +316,38 @@ bool JSONValue::Contains(const String& key) const
         return false;
 
     return objectValue_->Contains(key);
+}
+
+JSONObjectIterator JSONValue::Begin()
+{
+    // Convert to object type.
+    SetType(JSON_OBJECT);
+
+    return objectValue_->Begin();
+}
+
+ConstJSONObjectIterator JSONValue::Begin() const
+{
+    if (valueType_ != JSON_OBJECT)
+        return emptyObject.Begin();
+
+    return objectValue_->Begin();
+}
+
+JSONObjectIterator JSONValue::End()
+{
+    // Convert to object type.
+    SetType(JSON_OBJECT);
+
+    return objectValue_->Begin();
+}
+
+ConstJSONObjectIterator JSONValue::End() const
+{
+    if (valueType_ != JSON_OBJECT)
+        return emptyObject.End();
+
+    return objectValue_->End();
 }
 
 void JSONValue::Clear()

@@ -156,8 +156,7 @@ void Localization::Reset()
 
 void Localization::LoadJSON(const JSONValue& source)
 {
-    const JSONObject& ids = source.GetObject();
-    for (JSONObject::ConstIterator i = ids.Begin(); i != ids.End(); ++i)
+    for (JSONObject::ConstIterator i = source.Begin(); i != source.End(); ++i)
     {
         String id = i->first_;
         if (id.Empty())
@@ -165,7 +164,7 @@ void Localization::LoadJSON(const JSONValue& source)
             LOGWARNING("Localization::LoadJSON(source): string ID is empty");
             continue;
         }
-        const JSONObject& langs = i->second_.GetObject();
+        const JSONValue& langs = i->second_;
         for (JSONObject::ConstIterator j = langs.Begin(); j != langs.End(); ++j)
         {
             const String& lang = j->first_;
