@@ -190,10 +190,6 @@ public:
     JSONValue& operator [](unsigned index);
     /// Return JSON value at index.
     const JSONValue& operator [](unsigned index) const;
-    /// Return JSON value at index.
-    JSONValue& At(unsigned index);
-    /// Return JSON value at index.
-    const JSONValue& At(unsigned index) const;
     /// Add JSON value at end.
     void Push(const JSONValue& value);
     /// Remove the last JSON value.
@@ -204,7 +200,7 @@ public:
     void Erase(unsigned pos, unsigned length = 1);
     /// Resize array.
     void Resize(unsigned newSize);
-    /// Return size of array .
+    /// Return size of array.
     unsigned Size() const;
 
     // JSON object functions
@@ -231,7 +227,7 @@ public:
 
     /// Clear array or object.
     void Clear();
-
+    
     /// Empty JSON value.
     static const JSONValue EMPTY;
     /// Empty JSON array.
