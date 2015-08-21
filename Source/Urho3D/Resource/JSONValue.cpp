@@ -202,22 +202,6 @@ const JSONValue& JSONValue::operator [](unsigned index) const
     return (*arrayValue_)[index];
 }
 
-JSONValue& JSONValue::At(unsigned index)
-{
-    // Convert to array type
-    SetType(JSON_ARRAY);
-
-    return arrayValue_->At(index);
-}
-
-const JSONValue& JSONValue::At(unsigned index) const
-{
-    if (valueType_ != JSON_ARRAY)
-        return EMPTY;
-
-    return arrayValue_->At(index);
-}
-
 void JSONValue::Push(const JSONValue& value)
 {
     // Convert to array type

@@ -26,16 +26,14 @@ class JSONValue
     ~JSONValue();
 
     void SetType(JSONValueType valueType);
-    // JSONValue& operator =(bool rhs);
-    // JSONValue& operator =(int rhs);
-    // JSONValue& operator =(unsigned rhs);
-    // JSONValue& operator =(float rhs);
-    // JSONValue& operator =(double rhs);
-    // JSONValue& operator =(const String rhs);
-    // JSONValue& operator =(const char* rhs);
-    // JSONValue& operator =(const JSONArray& rhs);
-    // JSONValue& operator =(const JSONObject& rhs);
-    // JSONValue& operator =(const JSONValue& rhs);
+    tolua_outside void JSONValueSetBool @ SetBool(bool value);
+    tolua_outside void JSONValueSetInt @ SetInt(int value);
+    tolua_outside void JSONValueSetUint @ SetUint(unsigned value);
+    tolua_outside void JSONValueSetFloat @ SetFloat(float value);
+    tolua_outside void JSONValueSetDouble @ SetDouble(double value);
+    tolua_outside void JSONValueSetString @ SetString(const String value);
+    tolua_outside void JSONValueSetArray @ SetArray(const JSONArray& value);
+    tolua_outside void JSONValueSetObject @ SetObject(const JSONObject& value);
 
     JSONValueType GetType() const;
     bool IsNull() const;
@@ -51,14 +49,11 @@ class JSONValue
     float GetFloat() const;
     double GetDouble() const;
     const String GetString() const;
-    const char* GetCString() const;
     const JSONArray& GetArray() const;
     const JSONObject& GetObject() const;
 
     JSONValue& operator [](unsigned index);
     const JSONValue& operator [](unsigned index) const;
-    JSONValue& At(unsigned index);
-    const JSONValue& At(unsigned index) const;
     void Push(const JSONValue& value);
     void Pop();
     void Insert(unsigned pos, const JSONValue& value);
@@ -81,3 +76,46 @@ class JSONValue
 
     tolua_readonly tolua_property__is_set bool null;
 };
+
+${
+static void JSONValueSetBool(JSONValue* jsonValue, bool value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetInt(JSONValue* jsonValue, int value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetUint(JSONValue* jsonValue, unsigned value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetFloat(JSONValue* jsonValue, float value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetDouble(JSONValue* jsonValue, double value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetString(JSONValue* jsonValue, const String& value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetArray(JSONValue* jsonValue, const JSONArray& value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetObject(JSONValue* jsonValue, const JSONObject& value)
+{
+    (*jsonValue) = value;
+}
+
+$}

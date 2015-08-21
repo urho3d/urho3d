@@ -190,10 +190,6 @@ public:
     JSONValue& operator [](unsigned index);
     /// Return JSON value at index.
     const JSONValue& operator [](unsigned index) const;
-    /// Return JSON value at index.
-    JSONValue& At(unsigned index);
-    /// Return JSON value at index.
-    const JSONValue& At(unsigned index) const;
     /// Add JSON value at end.
     void Push(const JSONValue& value);
     /// Remove the last JSON value.
