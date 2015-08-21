@@ -107,7 +107,8 @@ function writeFunctionArgs(file, declarations)
       if declaration.def ~= "" then
         param_str = param_str .. " = " .. declaration.def
       end
-      file:write(param_str)
+      local fixedParamStr = param_str:gsub([[(")]], [[\%1]])
+      file:write(fixedParamStr)
     end
     if i ~= count then
       file:write(", ")

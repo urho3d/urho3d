@@ -5118,7 +5118,7 @@ int y;
 class JSONFile
 {
 // Methods:
-const JSONValue& GetRoot();
+const JSONValue& GetRoot() const;
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
