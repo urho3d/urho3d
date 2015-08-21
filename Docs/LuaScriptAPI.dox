@@ -2808,6 +2808,14 @@ Methods:
 - JSONValue* new(const JSONValue& value)
 - void delete()
 - void SetType(JSONValueType valueType)
+- void SetBool(bool value)
+- void SetInt(int value)
+- void SetUint(unsigned value)
+- void SetFloat(float value)
+- void SetDouble(double value)
+- void SetString(const String value)
+- void SetArray(const JSONArray& value)
+- void SetObject(const JSONObject& value)
 - JSONValueType GetType() const
 - bool IsNull() const
 - bool IsBool() const
@@ -2821,14 +2829,11 @@ Methods:
 - float GetFloat() const
 - double GetDouble() const
 - const String GetString() const
-- const char* GetCString() const
 - const JSONArray& GetArray() const
 - const JSONObject& GetObject() const
 - JSONValue operator&[](unsigned index, JSONValue tolua_value)
 - JSONValue operator[](unsigned index)
 - const JSONValue operator[](unsigned index) const
-- JSONValue& At(unsigned index)
-- const JSONValue& At(unsigned index) const
 - void Push(const JSONValue& value)
 - void Pop()
 - void Insert(unsigned pos, const JSONValue& value)
