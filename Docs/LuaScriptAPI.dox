@@ -9,6 +9,7 @@ namespace Urho3D
 \ref LuaScriptAPI_ClassList "Class list"<br>
 \ref LuaScriptAPI_Classes "Classes"<br>
 \ref LuaScriptAPI_Enums "Enumerations"<br>
+\ref LuaScriptAPI_toluaFunctions "tolua functions"<br>
 \ref LuaScriptAPI_GlobalFunctions "Global functions"<br>
 \ref LuaScriptAPI_GlobalProperties "Global properties"<br>
 \ref LuaScriptAPI_GlobalConstants "Global constants"<br>
