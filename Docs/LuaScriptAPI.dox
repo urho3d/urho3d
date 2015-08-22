@@ -9,6 +9,7 @@ namespace Urho3D
 \ref LuaScriptAPI_ClassList "Class list"<br>
 \ref LuaScriptAPI_Classes "Classes"<br>
 \ref LuaScriptAPI_Enums "Enumerations"<br>
+\ref LuaScriptAPI_toluaFunctions "tolua functions"<br>
 \ref LuaScriptAPI_GlobalFunctions "Global functions"<br>
 \ref LuaScriptAPI_GlobalProperties "Global properties"<br>
 \ref LuaScriptAPI_GlobalConstants "Global constants"<br>
@@ -7681,6 +7682,16 @@ Properties:
 - int WM_CLAMP
 
 
+\section LuaScriptAPI_toluaFunctions tolua functions
+- lua_usertype cast(lua_usertype object, const char* typename)
+- lua_table getpeer(lua_userdata object)
+- void inherit(lua_table table, lua_usertype c_instance)
+- bool releaseownership(lua_usertype object)
+- void setpeer(lua_userdata object, lua_table table)
+- bool takeownership(lua_usertype object)
+- const char* type(lua_object object)
+
+
 \section LuaScriptAPI_GlobalFunctions Global functions
 - float Abs(float value)
 - int AbsInt(int value)
@@ -7794,9 +7805,12 @@ Properties:
 - Audio* audio (readonly)
 - ResourceCache* cache (readonly)
 - Console* console (readonly)
+- Context* context (readonly)
 - Database* database (readonly)
 - DebugHud* debugHud (readonly)
 - Engine* engine (readonly)
+- EventHandler* eventHandler (readonly)
+- EventSender* eventSender (readonly)
 - FileSystem* fileSystem (readonly)
 - Graphics* graphics (readonly)
 - Input* input (readonly)
