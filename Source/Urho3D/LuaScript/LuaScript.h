@@ -91,6 +91,9 @@ public:
     /// Return whether is executing engine console commands as script code.
     bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
 
+    /// Push Lua function to stack. Return true if is successful. Return false on any error and an error string is pushed instead.
+    static bool PushLuaFunction(lua_State* L, const String& functionName);
+
 private:
     /// Register loader.
     void RegisterLoader();
@@ -100,8 +103,6 @@ private:
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle a console command event.
     void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
-    /// Push script function to stack.
-    bool PushScriptFunction(const String& functionName, bool silentIfNotFound = false);
 
     /// At panic.
     static int AtPanic(lua_State* L);

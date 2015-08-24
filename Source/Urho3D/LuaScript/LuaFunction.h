@@ -46,7 +46,7 @@ public:
     bool IsValid() const;
     /// Begin function call. When a script object is given then pass it as self argument (first parameter) to the function call.
     bool BeginCall(const LuaScriptInstance* instance = 0);
-    /// End call and actually execute the function.
+    /// End call and actually execute the function. The return values, if any, are still left in the stack when this call returns.
     bool EndCall(int numReturns = 0);
     /// Push int to stack.
     void PushInt(int value);

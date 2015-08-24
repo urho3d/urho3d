@@ -327,7 +327,7 @@ void ToluaPushVariant(lua_State* L, const Variant* variant, const char* type)
         break;
 
     case VAR_BUFFER:
-        if (typeName == "VectorBufer")
+        if (typeName == "VectorBuffer")
         {
             tolua_pushusertype(L, Mtolua_new(VectorBuffer(variant->GetVectorBuffer())), "VectorBuffer");
             tolua_register_gc(L, lua_gettop(L));
