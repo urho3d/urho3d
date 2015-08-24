@@ -43,7 +43,7 @@ Localization::~Localization()
 {
 }
 
-int Localization::GetLanguageIndex(const String &language)
+int Localization::GetLanguageIndex(const String& language)
 {
     if (language.Empty())
     {
@@ -108,7 +108,7 @@ void Localization::SetLanguage(int index)
     }
 }
 
-void Localization::SetLanguage(const String &language)
+void Localization::SetLanguage(const String& language)
 {
     if (language.Empty())
     {
@@ -129,7 +129,7 @@ void Localization::SetLanguage(const String &language)
     SetLanguage(index);
 }
 
-String Localization::Get(const String &id)
+String Localization::Get(const String& id)
 {
     if (id.Empty())
         return String::EMPTY;
@@ -176,14 +176,14 @@ void Localization::LoadJSON(const JSONValue& source)
             const String& string = j->second_.GetString();
             if (string.Empty())
             {
-                LOGWARNING("Localization::LoadJSON(source): translation is empty, string ID=\"" + id +
-                    "\", language=\"" + lang + "\"");
+                LOGWARNING(
+                    "Localization::LoadJSON(source): translation is empty, string ID=\"" + id + "\", language=\"" + lang + "\"");
                 continue;
             }
             if (strings_[StringHash(lang)][StringHash(id)] != String::EMPTY)
             {
-                LOGWARNING("Localization::LoadJSON(source): override translation, string ID=\"" + id +
-                    "\", language=\"" + lang + "\"");
+                LOGWARNING(
+                    "Localization::LoadJSON(source): override translation, string ID=\"" + id + "\", language=\"" + lang + "\"");
             }
             strings_[StringHash(lang)][StringHash(id)] = string;
             if (!languages_.Contains(lang))
@@ -194,7 +194,7 @@ void Localization::LoadJSON(const JSONValue& source)
     }
 }
 
-void Localization::LoadJSONFile(const String &name)
+void Localization::LoadJSONFile(const String& name)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     JSONFile* jsonFile = cache->GetResource<JSONFile>(name);

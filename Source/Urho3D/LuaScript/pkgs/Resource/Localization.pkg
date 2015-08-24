@@ -4,15 +4,15 @@ class Localization : public Object
 {
     int GetNumLanguages() const;
     int GetLanguageIndex() const;
-    int GetLanguageIndex(const String &language);
+    int GetLanguageIndex(const String language);
     String GetLanguage();
     String GetLanguage(int index);
+    void SetLanguage(const String language);
     void SetLanguage(int index);
-    void SetLanguage(const String &language);
-    String Get(const String &id);
+    String Get(const String id);
     void Reset();
-    void LoadJSON(const JSONValue &source);
-    void LoadJSONFile(const String &name);
+    void LoadJSON(const JSONValue& source);
+    void LoadJSONFile(const String name);
 
     tolua_readonly tolua_property__get_set int numLanguages;
     tolua_readonly tolua_property__get_set int languageIndex;
