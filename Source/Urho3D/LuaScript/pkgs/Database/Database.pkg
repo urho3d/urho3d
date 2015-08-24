@@ -8,7 +8,7 @@ enum DBAPI
 
 class Database : public Object
 {
-    DbConnection* Connect(const String& connectionString);
+    DbConnection* Connect(const String connectionString);
     void Disconnect(DbConnection* connection);
     bool IsPooling() const;
     unsigned GetPoolSize() const;

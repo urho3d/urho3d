@@ -2046,10 +2046,12 @@ void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
     }
     if (eventData["Camera"].GetPtr() is previewCamera.Get())
     {
+        suppressSceneChanges = true;
         if (grid !is null)
             grid.viewMask = 0;
         if (debugIconsNode !is null)
             debugIconsNode.enabled = false;
+        suppressSceneChanges = false;
     }
 }
 
@@ -2063,10 +2065,12 @@ void HandleEndViewUpdate(StringHash eventType, VariantMap& eventData)
     }
     if (eventData["Camera"].GetPtr() is previewCamera.Get())
     {
+        suppressSceneChanges = true;
         if (grid !is null)
             grid.viewMask = 0x80000000;
         if (debugIconsNode !is null)
             debugIconsNode.enabled = true;
+        suppressSceneChanges = false;
     }
 }
 
