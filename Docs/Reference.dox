@@ -698,9 +698,9 @@ However, Lua script files in Urho3D are loaded into the interpreter via Urho3D's
 
 For a single script that you wish to step through, you can use \ref LuaScript::ExecuteRawFile "ExecuteRawFile()", which will load the script from the file system directly into the Lua interpreter, making the source available to debuggers that rely on it. There are a couple of caveats with this:
 - The file has has to be on the file system, within a resource directory, and not packaged.
-- If the script uses `require()` to import a second script, then that second script will not be available for the debugger in the same way, since internally the second script is passed to Lua via the resource cache.
+- If the script uses require() to import a second script, then that second script will not be available for the debugger in the same way, since internally the second script is passed to Lua via the resource cache.
 
-To get around the second caveat, and avoid changing method calls, use the CMake flag `URHO3D_LUA_RAW_SCRIPT_LOADER`.  This will force Urho3D to attempt to load scripts from the file system by default, before falling back on the resource cache.  You can then use \ref LuaScript::ExecuteFile "ExecuteFile()", as above, and disable the CMake option for production if required.
+To get around the second caveat, and avoid changing method calls, use the URHO3D_LUA_RAW_SCRIPT_LOADER build option.  This will force Urho3D to attempt to load scripts from the file system by default, before falling back on the resource cache.  You can then use \ref LuaScript::ExecuteFile "ExecuteFile()", as above, and disable the CMake option for production if required.
 
 \section LuaScripting_ScriptObjects Script objects
 
@@ -796,6 +796,8 @@ print(myMap["I am a table"]:Get("VectorBuffer"):ReadByte())
 print(myMap["I am a table"]:Get()[2])
 print(myMap[hash]:Get():Length())
 \endcode
+
+There is also a generic Set() method for %Variant class to cope with Lua does not support assignment operator overload. The Set() method takes a single parameter which can be anything in Lua that is convertible into a %Variant, including nil value which is stored as an empty %Variant. Use this method when you need to assign a value into an existing %Variant object.
 
 For the rest of the functions and classes, see the generated \ref LuaScriptAPI "Lua script API reference". Also, look at the Lua counterparts of the sample applications in the bin/Data/LuaScripts directory and compare them to the C++ and AngelScript versions to familiarize yourself with how things are done on the Lua side.
 

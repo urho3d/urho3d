@@ -236,13 +236,11 @@ bool LuaScript::ExecuteString(const String& string)
 {
     PROFILE(ExecuteString);
 
-    int top = lua_gettop(luaState_);
-
-    if (luaL_dostring(luaState_, string.CString()) != 0)
+    if (luaL_dostring(luaState_, string.CString()))
     {
         const char* message = lua_tostring(luaState_, -1);
-        LOGERROR("Execute Lua string failed: " + String(message));
-        lua_settop(luaState_, top);
+        LOGERRORF("Execute Lua string failed: %s", message);
+        lua_pop(luaState_, 1);
         return false;
     }
 
@@ -268,13 +266,11 @@ bool LuaScript::LoadRawFile(const String& fileName)
 
     LOGINFO("Loading Lua file from file system: " + filePath);
 
-    int top = lua_gettop(luaState_);
-
     if (luaL_loadfile(luaState_, filePath.CString()))
     {
         const char* message = lua_tostring(luaState_, -1);
-        LOGERROR("Load Lua file failed: " + String(message));
-        lua_settop(luaState_, top);
+        LOGERRORF("Load Lua file failed: %s", message);
+        lua_pop(luaState_, 1);
         return false;
     }
 
@@ -287,16 +283,14 @@ bool LuaScript::ExecuteRawFile(const String& fileName)
 {
     PROFILE(ExecuteRawFile);
 
-    int top = lua_gettop(luaState_);
-
     if (!LoadRawFile(fileName))
         return false;
 
     if (lua_pcall(luaState_, 0, 0, 0))
     {
         const char* message = lua_tostring(luaState_, -1);
-        LOGERROR("Execute Lua file failed: " + String(message));
-        lua_settop(luaState_, top);
+        LOGERRORF("Execute Lua file failed: %s", message);
+        lua_pop(luaState_, 1);
         return false;
     }
 
@@ -386,32 +380,29 @@ void LuaScript::ReplacePrint()
 
 int LuaScript::Print(lua_State* L)
 {
-    String string;
     int n = lua_gettop(L);
+    Vector<String> strings((unsigned)n);
+
+    // Call the tostring function repeatedly for each arguments in the stack
     lua_getglobal(L, "tostring");
-    for (int i = 1; i <= n; i++)
+    for (int i = 1; i <= n; ++i)
     {
-        const char* s;
-        // Function to be called
         lua_pushvalue(L, -1);
-        // Value to print
         lua_pushvalue(L, i);
         lua_call(L, 1, 1);
-        // Get result
-        s = lua_tostring(L, -1);
-        if (s == NULL)
-            return luaL_error(L, LUA_QL("tostring") " must return a string to " LUA_QL("print"));
-
-        if (i > 1)
-            string.Append("    ");
-
-        string.Append(s);
-        // Pop result
+        const char* s = lua_tostring(L, -1);
         lua_pop(L, 1);
+        if (s)
+            strings[i - 1] = s;
+        else
+        {
+            lua_pop(L, 1);
+            return luaL_error(L, LUA_QL("tostring") " failed at index %d to return a string to " LUA_QL("print"), i);
+        }
     }
+    lua_pop(L, 1);
 
-    LOGRAW(string + "\n");
-
+    LOGRAWF("%s\n", String::Joined(strings, "    ").CString());
     return 0;
 }
 
@@ -446,15 +437,16 @@ LuaFunction* LuaScript::GetFunction(const String& functionName, bool silentIfNot
     if (i != functionNameToFunctionMap_.End())
         return i->second_;
 
-    int top = lua_gettop(luaState_);
-
     SharedPtr<LuaFunction> function;
-    if (PushScriptFunction(functionName, silentIfNotFound))
+    if (PushLuaFunction(luaState_, functionName))
+    {
         function = GetFunction(-1);
+        functionNameToFunctionMap_[functionName] = function;
+    }
+    else if (!silentIfNotFound)
+        LOGERRORF("%s", lua_tostring(luaState_, -1));
+    lua_pop(luaState_, 1);
 
-    lua_settop(luaState_, top);
-
-    functionNameToFunctionMap_[functionName] = function;
     return function;
 }
 
@@ -482,12 +474,12 @@ void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData
         ExecuteString(eventData[P_COMMAND].GetString());
 }
 
-bool LuaScript::PushScriptFunction(const String& functionName, bool silentIfNotFound)
+bool LuaScript::PushLuaFunction(lua_State* L, const String& functionName)
 {
     Vector<String> splitNames = functionName.Split('.');
 
     String currentName = splitNames.Front();
-    lua_getglobal(luaState_, currentName.CString());
+    lua_getglobal(L, currentName.CString());
 
     if (splitNames.Size() > 1)
     {
@@ -496,24 +488,26 @@ bool LuaScript::PushScriptFunction(const String& functionName, bool silentIfNotF
             if (i)
             {
                 currentName = currentName + "." + splitNames[i];
-                lua_getfield(luaState_, -1, splitNames[i].CString());
+                lua_getfield(L, -1, splitNames[i].CString());
+                lua_replace(L, -2);
             }
-            if (!lua_istable(luaState_, -1))
+            if (!lua_istable(L, -1))
             {
-                if (!silentIfNotFound)
-                    LOGERROR("Could not find Lua table: Table name = '" + currentName + "'");
+                lua_pop(L, 1);
+                lua_pushstring(L, ("Could not find Lua table: Table name = '" + currentName + "'").CString());
                 return false;
             }
         }
 
         currentName = currentName + "." + splitNames.Back();
-        lua_getfield(luaState_, -1, splitNames.Back().CString());
+        lua_getfield(L, -1, splitNames.Back().CString());
+        lua_replace(L, -2);
     }
 
-    if (!lua_isfunction(luaState_, -1))
+    if (!lua_isfunction(L, -1))
     {
-        if (!silentIfNotFound)
-            LOGERROR("Could not find Lua function: Function name = '" + currentName + "'");
+        lua_pop(L, 1);
+        lua_pushstring(L, ("Could not find Lua function: Function name = '" + currentName + "'").CString());
         return false;
     }
 

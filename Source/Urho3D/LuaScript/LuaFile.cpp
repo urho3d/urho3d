@@ -94,22 +94,17 @@ bool LuaFile::LoadChunk(lua_State* luaState)
     if (size_ == 0 || !luaState)
         return false;
 
-    int top = lua_gettop(luaState);
-
     // Get file base name
     String name = GetName();
     unsigned extPos = name.FindLast('.');
     if (extPos != String::NPOS)
-    {
         name = name.Substring(0, extPos);
-    }
 
-    int error = luaL_loadbuffer(luaState, data_, size_, name.CString());
-    if (error)
+    if (luaL_loadbuffer(luaState, data_, size_, name.CString()))
     {
         const char* message = lua_tostring(luaState, -1);
-        LOGERROR("Load Buffer failed for " + GetName() + ": " + String(message));
-        lua_settop(luaState, top);
+        LOGERRORF("Load Buffer failed for %s: %s", GetName().CString(), message);
+        lua_pop(luaState, 1);
         return false;
     }
 
@@ -130,7 +125,7 @@ bool LuaFile::LoadAndExecute(lua_State* luaState)
     if (lua_pcall(luaState, 0, 0, 0))
     {
         const char* message = lua_tostring(luaState, -1);
-        LOGERROR("Lua Execute failed for " + GetName() + ": " + String(message));
+        LOGERRORF("Lua Execute failed for %s: %s", GetName().CString(), message);
         lua_pop(luaState, 1);
         return false;
     }

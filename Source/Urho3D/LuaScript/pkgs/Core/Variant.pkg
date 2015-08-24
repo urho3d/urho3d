@@ -59,74 +59,20 @@ class Variant
 {
     static void _Setup(const char* type);
 
+    // NOTE: do not change the constructor overloads order without also changing the manually coded implementation below
     Variant();
-
-    //NOTE: do not change the constructor overloads order without also changing the special case handling below
-    Variant(const Vector<Variant>& value);  // VariantVector and StringVector are special cases as they are converted to Lua tables
-    Variant(const Vector<String>& value);
-    Variant(void* value);                   // Non-specific types must be declared first so that they get considered last
-    Variant(RefCounted* value);
-
-    Variant(int value);
-    Variant(unsigned value);
-    Variant(const StringHash& value);
-    Variant(bool value);
-    Variant(float value);
-    Variant(double value);
-    Variant(const Vector2& value);
-    Variant(const Vector3& value);
-    Variant(const Vector4& value);
-    Variant(const Quaternion& value);
-    Variant(const Color& value);
-    Variant(const String value);
-    Variant(const char* value);
-    Variant(const PODVector<unsigned char>& value);
-    Variant(const VectorBuffer& value);
-    Variant(const ResourceRef& value);
-    Variant(const ResourceRefList& value);
-    Variant(const VariantMap& value);
-    Variant(const IntRect& value);
-    Variant(const IntVector2& value);
-    Variant(const Matrix3& value);
-    Variant(const Matrix3x4& value);
-    Variant(const Matrix4& value);
-    Variant(const String type, const String value);
-    Variant(VariantType type, const String value);
-    Variant(const char* type, const char* value);
+    Variant(const Variant& value);      // This overload works for all Lua types that are convertible into a Variant
+    Variant(const char* type, const char* value);   // For storing a numerical type into Variant , value could be just a number
     Variant(VariantType type, const char* value);
-    Variant(const Variant& value);
     ~Variant();
 
     void Clear();
 
-    bool operator ==(void* rhs) const;
-    bool operator ==(RefCounted* rhs) const;
-    bool operator ==(const Variant& rhs) const;
-    bool operator ==(int rhs) const;
-    bool operator ==(unsigned rhs) const;
-    bool operator ==(bool rhs) const;
-    bool operator ==(float rhs) const;
-    bool operator ==(double rhs) const;
-    bool operator ==(const Vector2& rhs);
-    bool operator ==(const Vector3& rhs) const;
-    bool operator ==(const Vector4& rhs) const;
-    bool operator ==(const Quaternion& rhs) const;
-    bool operator ==(const Color& rhs) const;
-    bool operator ==(const String rhs) const;
-    bool operator ==(const PODVector<unsigned char>& rhs) const;
-    bool operator ==(const VectorBuffer& rhs) const;
-    bool operator ==(const ResourceRef& rhs) const;
-    bool operator ==(const ResourceRefList& rhs) const;
-    bool operator ==(const Vector<Variant>& rhs) const;
-    bool operator ==(const Vector<String>& rhs) const;
-    bool operator ==(const VariantMap& rhs) const;
-    bool operator ==(const IntRect& rhs) const;
-    bool operator ==(const IntVector2& rhs) const;
-    bool operator ==(const StringHash& rhs) const;
-    bool operator ==(const Matrix3& rhs) const;
-    bool operator ==(const Matrix3x4& rhs) const;
-    bool operator ==(const Matrix4& rhs) const;
+    bool operator ==(const Variant& rhs) const;     // rhs can be any Lua types convertible into a Variant
+    void Set(const Variant& rhs);                   // rhs can be any Lua types convertible into a Variant
+    void* Get(const char* type = 0) const;          // "Generic" get which is only possible in Lua scripting
 
+    // All below getters are preserved for backward compatibility and for compatibility with C++ and AngelScript API
     int GetInt() const;
     unsigned GetUInt() const;
     StringHash GetStringHash() const;
@@ -153,8 +99,6 @@ class Variant
     const Matrix3& GetMatrix3() const;
     const Matrix3x4& GetMatrix3x4() const;
     const Matrix4& GetMatrix4() const;
-
-    void* Get(const char* type = 0) const;      // "Generic" get which is only possible in Lua scripting
 
     VariantType GetType() const;
     String GetTypeName() const;
@@ -220,107 +164,118 @@ static int tolua_CoreLuaAPI_Variant__Setup00(lua_State* tolua_S)
 }
 
 // NOTE: the index number must match with the above variant constructor overloads order)
-// Special cases handling for converted VariantVector and StringVector as Lua table
-// The auto-generated code are almost correct, except for the tolua_isnoobj() always return false for third index,
-//   probably due to another tolua++ bug not setting the stack correctly, instead of noobj, 3rd index contains first table member
 
 // Forward declaration
 static int tolua_CoreLuaAPI_Variant_new00(lua_State* tolua_S);
 static int tolua_CoreLuaAPI_Variant_new00_local(lua_State* tolua_S);
 
-// Correct auto-generated code
+static bool VariantNewImpl(lua_State* tolua_S, bool gc)
+{
+    tolua_Error tolua_err;
+    if (tolua_isusertable(tolua_S, 1, "Variant", 0, &tolua_err) && lua_gettop(tolua_S) == 2)
+    {
+        Variant* tolua_ret = Mtolua_new(Variant());
+        ToluaToVariant(tolua_S, 2, 0, *tolua_ret);
+        tolua_pushusertype(tolua_S, static_cast<void*>(tolua_ret), "Variant");
+        if (gc)
+            tolua_register_gc(tolua_S, lua_gettop(tolua_S));
+        return true;
+    }
+    return false;
+}
+
 #define TOLUA_DISABLE_tolua_CoreLuaAPI_Variant_new01
 static int tolua_CoreLuaAPI_Variant_new01(lua_State* tolua_S)
 {
- tolua_Error tolua_err;
- if (
- !tolua_isusertable(tolua_S,1,"Variant",0,&tolua_err) ||
- (tolua_isvaluenil(tolua_S,2,&tolua_err) || !ToluaIsVector<Variant>(tolua_S,2,"const Vector<Variant>",0,&tolua_err)) /*||
- !tolua_isnoobj(tolua_S,3,&tolua_err)*/
- )
- goto tolua_lerror;
- else
- {
-  const Vector<Variant>* value = ((const Vector<Variant>*)  ToluaToVector<Variant>(tolua_S,2,0));
- {
-  Variant* tolua_ret = (Variant*)  Mtolua_new((Variant)(*value));
-  tolua_pushusertype(tolua_S,(void*)tolua_ret,"Variant");
- }
- }
- return 1;
-tolua_lerror:
- return tolua_CoreLuaAPI_Variant_new00(tolua_S);
+    return VariantNewImpl(tolua_S, false) ? 1 : tolua_CoreLuaAPI_Variant_new00(tolua_S);
 }
 
 #define TOLUA_DISABLE_tolua_CoreLuaAPI_Variant_new01_local
 static int tolua_CoreLuaAPI_Variant_new01_local(lua_State* tolua_S)
 {
- tolua_Error tolua_err;
- if (
- !tolua_isusertable(tolua_S,1,"Variant",0,&tolua_err) ||
- (tolua_isvaluenil(tolua_S,2,&tolua_err) || !ToluaIsVector<Variant>(tolua_S,2,"const Vector<Variant>",0,&tolua_err)) /*||
- !tolua_isnoobj(tolua_S,3,&tolua_err)*/
- )
- goto tolua_lerror;
- else
- {
-  const Vector<Variant>* value = ((const Vector<Variant>*)  ToluaToVector<Variant>(tolua_S,2,0));
- {
-  Variant* tolua_ret = (Variant*)  Mtolua_new((Variant)(*value));
-  tolua_pushusertype(tolua_S,(void*)tolua_ret,"Variant");
- tolua_register_gc(tolua_S,lua_gettop(tolua_S));
- }
- }
- return 1;
-tolua_lerror:
- return tolua_CoreLuaAPI_Variant_new00_local(tolua_S);
+    return VariantNewImpl(tolua_S, true) ? 1 : tolua_CoreLuaAPI_Variant_new00_local(tolua_S);
 }
 
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_Variant_new02
-static int tolua_CoreLuaAPI_Variant_new02(lua_State* tolua_S)
+#define TOLUA_DISABLE_tolua_CoreLuaAPI_Variant__eq00
+static int tolua_CoreLuaAPI_Variant__eq00(lua_State* tolua_S)
 {
- tolua_Error tolua_err;
- if (
- !tolua_isusertable(tolua_S,1,"Variant",0,&tolua_err) ||
- (tolua_isvaluenil(tolua_S,2,&tolua_err) || !ToluaIsVector<String>(tolua_S,2,"const Vector<String>",0,&tolua_err)) /*||
- !tolua_isnoobj(tolua_S,3,&tolua_err)*/
- )
- goto tolua_lerror;
- else
- {
-  const Vector<String>* value = ((const Vector<String>*)  ToluaToVector<String>(tolua_S,2,0));
- {
-  Variant* tolua_ret = (Variant*)  Mtolua_new((Variant)(*value));
-  tolua_pushusertype(tolua_S,(void*)tolua_ret,"Variant");
- }
- }
- return 1;
-tolua_lerror:
- return tolua_CoreLuaAPI_Variant_new01(tolua_S);
+#ifndef TOLUA_RELEASE
+    tolua_Error tolua_err;
+    if (tolua_isusertype(tolua_S, 1, "const Variant", 0, &tolua_err) && lua_gettop(tolua_S) == 2)
+#endif
+    {
+        const Variant* self = static_cast<const Variant*>(tolua_tousertype(tolua_S, 1, 0));
+        Variant rhs;
+        ToluaToVariant(tolua_S, 2, 0, rhs);
+#ifndef TOLUA_RELEASE
+        if (!self)
+            tolua_error(tolua_S, "invalid 'self' in function 'operator=='", NULL);
+        else
+#endif
+        {
+            tolua_pushboolean(tolua_S, self->operator ==(rhs));
+            return 1;
+        }
+    }
+#ifndef TOLUA_RELEASE
+    tolua_error(tolua_S, "#ferror in function '.eq'.", &tolua_err);
+    return 0;
+#endif
 }
 
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_Variant_new02_local
-static int tolua_CoreLuaAPI_Variant_new02_local(lua_State* tolua_S)
+#define TOLUA_DISABLE_tolua_CoreLuaAPI_Variant_Set00
+static int tolua_CoreLuaAPI_Variant_Set00(lua_State* tolua_S)
 {
- tolua_Error tolua_err;
- if (
- !tolua_isusertable(tolua_S,1,"Variant",0,&tolua_err) ||
- (tolua_isvaluenil(tolua_S,2,&tolua_err) || !ToluaIsVector<String>(tolua_S,2,"const Vector<String>",0,&tolua_err)) /*||
- !tolua_isnoobj(tolua_S,3,&tolua_err)*/
- )
- goto tolua_lerror;
- else
- {
-  const Vector<String>* value = ((const Vector<String>*)  ToluaToVector<String>(tolua_S,2,0));
- {
-  Variant* tolua_ret = (Variant*)  Mtolua_new((Variant)(*value));
-  tolua_pushusertype(tolua_S,(void*)tolua_ret,"Variant");
- tolua_register_gc(tolua_S,lua_gettop(tolua_S));
- }
- }
- return 1;
-tolua_lerror:
- return tolua_CoreLuaAPI_Variant_new01_local(tolua_S);
+#ifndef TOLUA_RELEASE
+    tolua_Error tolua_err;
+    if (tolua_isusertype(tolua_S, 1, "Variant", 0, &tolua_err) && lua_gettop(tolua_S) == 2)
+#endif
+    {
+        Variant * self = static_cast<Variant*>(tolua_tousertype(tolua_S, 1, 0));
+        Variant rhs;
+        ToluaToVariant(tolua_S, 2, 0, rhs);
+        const char* type = tolua_tostring(tolua_S, 3, 0);
+#ifndef TOLUA_RELEASE
+        if (!self)
+            tolua_error(tolua_S, "invalid 'self' in function 'Set'", NULL);
+        else
+#endif
+        {
+            *self = rhs;
+            return 0;
+        }
+    }
+#ifndef TOLUA_RELEASE
+    tolua_error(tolua_S, "#ferror in function 'Set'.", &tolua_err);
+    return 0;
+#endif
+}
+
+#define TOLUA_DISABLE_tolua_CoreLuaAPI_Variant_Get00
+static int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+    tolua_Error tolua_err;
+    if (tolua_isusertype(tolua_S, 1, "const Variant", 0, &tolua_err) && tolua_isstring(tolua_S, 2, 1, &tolua_err) &&
+        tolua_isnoobj(tolua_S, 3, &tolua_err))
+#endif
+    {
+        const Variant* self = static_cast<const Variant*>(tolua_tousertype(tolua_S, 1, 0));
+        const char* type = tolua_tostring(tolua_S, 2, 0);
+#ifndef TOLUA_RELEASE
+        if (!self)
+            tolua_error(tolua_S, "invalid 'self' in function 'Get'", NULL);
+        else
+#endif
+        {
+            ToluaPushVariant(tolua_S, self, type);
+            return 1;
+        }
+    }
+#ifndef TOLUA_RELEASE
+    tolua_error(tolua_S, "#ferror in function 'Get'.", &tolua_err);
+    return 0;
+#endif
 }
 
 #define TOLUA_DISABLE_tolua_CoreLuaAPI_Variant_GetVoidPtr00
@@ -343,6 +298,7 @@ static int tolua_CoreLuaAPI_Variant_GetVoidPtr00(lua_State* tolua_S)
  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetVoidPtr'", NULL);
 #endif
  {
+     // Use the safer version which first check the type provided through Lua script to prevent VM crashes on invalid type
      ToluaPushRegisteredUserType(tolua_S, static_cast<void*>(self->GetVoidPtr()), type);
  }
  }
@@ -381,37 +337,6 @@ static int tolua_CoreLuaAPI_Variant_GetPtr00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetPtr'.",&tolua_err);
- return 0;
-#endif
-}
-
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_Variant_Get00
-static int tolua_CoreLuaAPI_Variant_Get00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertype(tolua_S,1,"const Variant",0,&tolua_err) ||
- !tolua_isstring(tolua_S,2,1,&tolua_err) ||
- !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  const Variant* self = (const Variant*)  tolua_tousertype(tolua_S,1,0);
-  const char* type = ((const char*)  tolua_tostring(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Get'", NULL);
-#endif
- {
-     ToluaPushVariant(tolua_S, self, type);
- }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
  return 0;
 #endif
 }

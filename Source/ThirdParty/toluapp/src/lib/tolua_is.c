@@ -232,9 +232,7 @@ TOLUA_API int tolua_isnumber (lua_State* L, int lo, int def, tolua_Error* err)
 {
 	if (def && lua_gettop(L)<abs(lo))
 		return 1;
-    // Modified by Aster Jian for Urho3D.
-    // if (lua_isnumber(L,lo))
-    if (lua_type(L, lo) == LUA_TNUMBER)
+    if (lua_isnumber(L,lo))
 		return 1;
 	err->index = lo;
 	err->array = 0;
@@ -246,9 +244,7 @@ TOLUA_API int tolua_isstring (lua_State* L, int lo, int def, tolua_Error* err)
 {
     if (def && lua_gettop(L)<abs(lo))
         return 1;
-    // Modified by Aster Jian for Urho3D.
-    // if (lua_isnil(L,lo) || lua_isstring(L,lo))
-    if (lua_isnil(L,lo) || lua_type(L,lo) == LUA_TSTRING)
+    if (lua_isnil(L,lo) || lua_isstring(L,lo))
         return 1;
     err->index = lo;
     err->array = 0;

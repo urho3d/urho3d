@@ -61,7 +61,7 @@ function Start()
     SubscribeToEvent("DbCursor", "HandleDbCursor")
 
     -- Show instruction
-    Print([[This demo connects to temporary in-memory database.
+    print([[This demo connects to temporary in-memory database.
 All the tables and their data will be lost after exiting the demo.
 Enter a valid SQL statement in the console input and press Enter to execute.
 Enter 'get/set maxrows [number]' to get/set the maximum rows to be printed out.
@@ -109,13 +109,13 @@ function HandleDbCursor(eventType, eventData)
     eventData["Abort"] = row >= maxRows
 
     for i, colHeader in ipairs(colHeaders) do
-        Print("Row #" .. row .. ": " .. colHeader .. " = " .. colValues[i])
+        print("Row #" .. row .. ": " .. colHeader .. " = " .. colValues[i])
     end
 end
 
 function HandleInput(input)
     -- Echo input string to stdout
-    Print(input)
+    print(input)
     row = 0
     if input == "quit" or input == "exit" then
         engine:Exit()
@@ -136,14 +136,14 @@ function HandleInput(input)
         end
         if setting ~= nil then
             if setting == "maxrows" then
-                Print("maximum rows is set to " .. maxRows)
+                print("maximum rows is set to " .. maxRows)
             elseif setting == "connstr" then
-                Print("connection string is set to " .. connection.connectionString)
+                print("connection string is set to " .. connection.connectionString)
             else
-                Print("Unrecognized setting: " .. setting)
+                print("Unrecognized setting: " .. setting)
             end
         else
-            Print("Missing setting paramater. Recognized settings are: maxrows, connstr")
+            print("Missing setting paramater. Recognized settings are: maxrows, connstr")
         end
     else
         -- In this sample demo we use the dbCursor event to loop through each row as it is being fetched
@@ -153,15 +153,10 @@ function HandleInput(input)
 
         -- Number of affected rows is only meaningful for DML statements like insert/update/delete
         if result.numAffectedRows ~= -1 then
-            Print("Number of affected rows: " .. result.numAffectedRows)
+            print("Number of affected rows: " .. result.numAffectedRows)
         end
     end
-    Print(" ")
-end
-
-function Print(input)
-    -- Logging appears both in the engine console and stdout
-    Log:WriteRaw(input .. "\n")
+    print(" ")
 end
 
 -- Create XML patch instructions for screen joystick layout specific to this sample app

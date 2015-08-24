@@ -97,8 +97,7 @@ function post_output_hook(package)
 #pragma clang diagnostic ignored "-Wunused-function"
 #endif]])
     if not _extra_parameters["Urho3D"] then
-        replace([[#include "LuaScript/ToluaUtils.h"]], [[#include <Urho3D/Urho3D.h>
-#include <Urho3D/LuaScript/ToluaUtils.h>]])
+        replace([[#include "LuaScript/ToluaUtils.h"]], [[#include <Urho3D/LuaScript/ToluaUtils.h>]])
     end
 
     -- Special handling for vector to table conversion which would simplify the implementation of the template functions
