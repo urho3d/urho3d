@@ -1270,9 +1270,22 @@ void BuildAndSaveAnimations(OutModel* model)
                         Quaternion q = kf.rotation_ * fristKey.rotation_.Inverse();
                         Vector3 euler = q.EulerAngles();
                         motionKeys_[k].rotation_ = euler.z_;
+
+                        Vector3 pelvisRightAxis = Vector3(1, 0, 0);
+                        Vector3 firstDir =  fristKey.rotation_ * pelvisRightAxis;
+                        Vector3 curDir = kf.rotation_ * pelvisRightAxis;
+                        Quaternion q1;
+                        q1.FromRotationTo(firstDir, curDir);
+
                         PrintLine("motion rotation:" + String(q.EulerAngles()));
-                        q.FromEulerAngles(euler.x_, euler.y_, 0);
-                        kf.rotation_ = q * fristKey.rotation_;
+                        PrintLine("motion rotation1:" + String(q1.EulerAngles()));
+
+                        q.FromRotationTo(firstDir, pelvisRightAxis);
+                        kf.rotation_ = kf.rotation_ * q;
+
+                        //PrintLine("axis direction: " + String(q * pelvisRightAxis));
+                        // q.FromEulerAngles(euler.x_, euler.y_, 0);
+                        //kf.rotation_ = q * fristKey.rotation_;
                     }
                 }
 
