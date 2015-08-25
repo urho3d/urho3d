@@ -4,8 +4,8 @@ class StringHash
 {
     StringHash();
     StringHash(const StringHash& rhs);
+    StringHash(const char* str);            // This works for Lua string and Urho3D:String
     explicit StringHash(unsigned value);
-    StringHash(const String str);
     ~StringHash();
 
     StringHash operator + (const StringHash& rhs) const;
