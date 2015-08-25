@@ -152,7 +152,6 @@ struct MontionKey
     float           rotation_;
     float           time_;
 };
-Vector<MontionKey>   motionKeys_;
 SharedPtr<Model> model_;
 //====================================================================
 
@@ -1056,15 +1055,21 @@ Vector3 GetProjectedAxis(Node* root, Node* n, const Vector3& axis)
 void BuildAndSaveAnimations(OutModel* model)
 {
     SharedPtr<Scene> animScene(new Scene(context_));
-    Node* n = animScene->CreateChild("Character");
-    AnimatedModel* object = n->CreateComponent<AnimatedModel>();
-    object->SetModel(model_);
+    Node* n = NULL;
+
+    if (rootMotionFlag_ & kMotionYaw_Rotation)
+    {
+        n = animScene->CreateChild("Character");
+        AnimatedModel* object = n->CreateComponent<AnimatedModel>();
+        object->SetModel(model_);
+    }
 
     const PODVector<aiAnimation*>& animations = model ? model->animations_ : sceneAnimations_;
 
     for (unsigned i = 0; i < animations.Size(); ++i)
     {
         aiAnimation* anim = animations[i];
+        Vector<MontionKey>   motionKeys;
 
         float duration = (float)anim->mDuration;
         String animName = FromAIString(anim->mName);
@@ -1261,30 +1266,30 @@ void BuildAndSaveAnimations(OutModel* model)
                         fristKey = kf;
 
                     if (isTranslateBone) {
-                        motionKeys_.Resize(keyFrames);
-                        motionKeys_[k].time_ = kf.time_;
+                        motionKeys.Resize(keyFrames);
+                        motionKeys[k].time_ = kf.time_;
                         Vector3 translation = kf.position_ - fristKey.position_;
                         if (rootMotionFlag_ & kMotionX_Translation)
                         {
-                            motionKeys_[k].translation_.x_ = translation.x_;
+                            motionKeys[k].translation_.x_ = translation.x_;
                             kf.position_.x_ = fristKey.position_.x_;
                         }
                         if (rootMotionFlag_ & kMotionY_Translation)
                         {
                             //translation.y_ = kf.position_.y_;
                             //kf.position_.y_ = 0;
-                            motionKeys_[k].translation_.y_ = translation.z_;
+                            motionKeys[k].translation_.y_ = translation.z_;
                             kf.position_.z_ = fristKey.position_.z_;
                         }
                         if (rootMotionFlag_ & kMotionZ_Translation)
                         {
                             //translation.z_ = kf.position_.z_;
                             //kf.position_.z_ = 0;
-                            motionKeys_[k].translation_.z_ = translation.y_;
+                            motionKeys[k].translation_.z_ = translation.y_;
                             kf.position_.y_ = fristKey.position_.y_;
                         }
                         // motionKeys_[k].translation_ -= motionKeys_[0].translation_;
-                        PrintLine("motion translation:" + String(motionKeys_[k].translation_));
+                        PrintLine("motion translation:" + String(motionKeys[k].translation_));
                     }
 
                     if (isRotateBone && (rootMotionFlag_ & kMotionYaw_Rotation)) {
@@ -1301,7 +1306,7 @@ void BuildAndSaveAnimations(OutModel* model)
                         q1.FromRotationTo(startAxis, curAxis);
                         //PrintLine("motion rotation:" + String(q1.EulerAngles()));
                         PrintLine("motion rotation:" + String(rotateNode->GetWorldRotation().EulerAngles()));
-                        motionKeys_[k].rotation_ = q1.EulerAngles().y_;
+                        motionKeys[k].rotation_ = q1.EulerAngles().y_;
 
                         //q1.FromRotationTo(curAxis, Vector3(0, 0, 1));
                         Quaternion wq = rotateNode->GetWorldRotation();
@@ -1323,6 +1328,29 @@ void BuildAndSaveAnimations(OutModel* model)
         if (!outFile.Open(animOutName, FILE_WRITE))
             ErrorExit("Could not open output file " + animOutName);
         outAnim->Save(outFile);
+
+
+        if (rootMotionFlag_)
+        {
+            XMLFile outMotion(context_);
+            XMLElement root = outMotion.CreateRoot("motion_keys");
+
+            for (size_t i=0; i<motionKeys.Size(); ++i)
+            {
+                const MontionKey& mk = motionKeys[i];
+                XMLElement mkXML = root.CreateChild("key");
+                mkXML.SetFloat("time", mk.time_);
+                mkXML.SetVector3("translation", mk.translation_);
+                mkXML.SetFloat("rotation", mk.rotation_);
+            }
+
+            File outFile(context_);
+            String motionOutName = GetPath(animOutName) + GetFileName(animOutName) + "_motion.xml";
+            PrintLine(motionOutName);
+            if (!outFile.Open(motionOutName, FILE_WRITE))
+                ErrorExit("Could not open output file " + motionOutName);
+            outMotion.Save(outFile);
+        }
     }
 }
 
