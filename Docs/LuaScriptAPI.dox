@@ -415,8 +415,8 @@ Properties:
 Methods:
 
 - unsigned GetNumAnimations() const
-- Animation2D* GetAnimation(unsigned index) const
 - Animation2D* GetAnimation(const String name) const
+- Animation2D* GetAnimation(unsigned index) const
 
 Properties:
 
@@ -2757,7 +2757,6 @@ Methods:
 - IntVector2 operator-() const
 - IntVector2 operator-(const IntVector2& rhs) const
 - IntVector2 operator*(int rhs) const
-- IntVector2 operator/(int rhs) const
 - IntVector2 operator/(int rhs) const
 - String ToString() const
 
