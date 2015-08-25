@@ -153,6 +153,8 @@ struct MontionKey
     float           time_;
 };
 Vector<MontionKey>   motionKeys_;
+SharedPtr<Model> model_;
+//====================================================================
 
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
@@ -807,6 +809,7 @@ void BuildAndSaveModel(OutModel& model)
     SharedPtr<Model> outModel(new Model(context_));
     Vector<PODVector<unsigned> > allBoneMappings;
     BoundingBox box;
+    model_ = outModel;
 
     unsigned numValidGeometries = 0;
 
@@ -1037,8 +1040,26 @@ void BuildAndSaveModel(OutModel& model)
     }
 }
 
+
+Vector3 GetProjectedAxis(Node* root, Node* n, const Vector3& axis)
+{
+    Quaternion q = n->GetWorldRotation();
+    Vector3 p = q * axis;
+    p.Normalize();
+    Quaternion invQ = root->GetWorldRotation().Inverse();
+    Vector3 ret = invQ * p;
+    ret.Normalize();
+    ret.y_ = 0;
+    return ret;
+}
+
 void BuildAndSaveAnimations(OutModel* model)
 {
+    SharedPtr<Scene> animScene(new Scene(context_));
+    Node* n = animScene->CreateChild("Character");
+    AnimatedModel* object = n->CreateComponent<AnimatedModel>();
+    object->SetModel(model_);
+
     const PODVector<aiAnimation*>& animations = model ? model->animations_ : sceneAnimations_;
 
     for (unsigned i = 0; i < animations.Size(); ++i)
@@ -1267,25 +1288,26 @@ void BuildAndSaveAnimations(OutModel* model)
                     }
 
                     if (isRotateBone && (rootMotionFlag_ & kMotionYaw_Rotation)) {
-                        Quaternion q = kf.rotation_ * fristKey.rotation_.Inverse();
-                        Vector3 euler = q.EulerAngles();
-                        motionKeys_[k].rotation_ = euler.z_;
 
+                        Node* rotateNode = n->GetChild(rotateBone_, true);
                         Vector3 pelvisRightAxis = Vector3(1, 0, 0);
-                        Vector3 firstDir =  fristKey.rotation_ * pelvisRightAxis;
-                        Vector3 curDir = kf.rotation_ * pelvisRightAxis;
+
+                        rotateNode->SetTransform(fristKey.position_, fristKey.rotation_);
+                        Vector3 startAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
+                        rotateNode->SetTransform(kf.position_, kf.rotation_);
+                        Vector3 curAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
+
                         Quaternion q1;
-                        q1.FromRotationTo(firstDir, curDir);
+                        q1.FromRotationTo(startAxis, curAxis);
+                        //PrintLine("motion rotation:" + String(q1.EulerAngles()));
+                        PrintLine("motion rotation:" + String(rotateNode->GetWorldRotation().EulerAngles()));
+                        motionKeys_[k].rotation_ = q1.EulerAngles().y_;
 
-                        PrintLine("motion rotation:" + String(q.EulerAngles()));
-                        PrintLine("motion rotation1:" + String(q1.EulerAngles()));
-
-                        q.FromRotationTo(firstDir, pelvisRightAxis);
-                        kf.rotation_ = kf.rotation_ * q;
-
-                        //PrintLine("axis direction: " + String(q * pelvisRightAxis));
-                        // q.FromEulerAngles(euler.x_, euler.y_, 0);
-                        //kf.rotation_ = q * fristKey.rotation_;
+                        //q1.FromRotationTo(curAxis, Vector3(0, 0, 1));
+                        Quaternion wq = rotateNode->GetWorldRotation();
+                        wq = q1.Inverse() * wq;
+                        rotateNode->SetWorldRotation(wq);
+                        kf.rotation_ = rotateNode->GetRotation();
                     }
                 }
 
