@@ -453,7 +453,16 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, CollisionShape* shap
         proxy->m_collisionFilterGroup = 0;
     }
 
-    ConvexCast(result, shape->GetCollisionShape(), startPos, startRot, endPos, endRot, collisionMask);
+    // Take the shape's offset position & rotation into account
+    Node* shapeNode = shape->GetNode();
+    Matrix3x4 startTransform(startPos, startRot, shapeNode ? shapeNode->GetWorldScale() : Vector3::ONE);
+    Matrix3x4 endTransform(endPos, endRot, shapeNode ? shapeNode->GetWorldScale() : Vector3::ONE);
+    Vector3 effectiveStartPos = startTransform * shape->GetPosition();
+    Vector3 effectiveEndPos = endTransform * shape->GetPosition();
+    Quaternion effectiveStartRot = startRot * shape->GetRotation();
+    Quaternion effectiveEndRot = endRot * shape->GetRotation();
+
+    ConvexCast(result, shape->GetCollisionShape(), effectiveStartPos, effectiveStartRot, effectiveEndPos, effectiveEndRot, collisionMask);
 
     // Restore the collision group
     if (proxy)

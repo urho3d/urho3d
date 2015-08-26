@@ -36,8 +36,6 @@ class URHO3D_API JSONFile : public Resource
 public:
     /// Construct.
     JSONFile(Context* context);
-    /// Construct with a JSON value.
-    JSONFile(Context* context, const JSONValue& value);
     /// Destruct.
     virtual ~JSONFile();
     /// Register object factory.
@@ -50,8 +48,8 @@ public:
     /// Save resource with user-defined indentation, only the first character (if any) of the string is used and the length of the string defines the character count. Return true if successful.
     bool Save(Serializer& dest, const String& indendation) const;
 
-    /// Set root value.
-    void SetRoot(const JSONValue& root) { root_ = root; }
+    /// Return root value.
+    JSONValue& GetRoot() { return root_; }
     /// Return root value.
     const JSONValue& GetRoot() const { return root_; }
 

@@ -318,7 +318,7 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(const String&in)", asMETHODPR(JSONValue, operator =, (const String&), JSONValue&), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(const JSONValue&in)", asMETHODPR(JSONValue, operator =, (const JSONValue&), JSONValue&), asCALL_THISCALL);
 
-    engine->RegisterObjectMethod("JSONValue", "JSONValueType get_type() const", asMETHOD(JSONValue, GetType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "JSONValueType get_valueType() const", asMETHOD(JSONValue, GetValueType), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool get_isNull() const", asMETHOD(JSONValue, IsNull), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool get_isBool() const", asMETHOD(JSONValue, IsBool), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool get_isNumber() const", asMETHOD(JSONValue, IsNumber), asCALL_THISCALL);
@@ -328,7 +328,7 @@ static void RegisterJSONValue(asIScriptEngine* engine)
 
     engine->RegisterObjectMethod("JSONValue", "bool GetBool() const", asMETHOD(JSONValue, GetBool), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "int GetInt() const", asMETHOD(JSONValue, GetInt), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "uint GetUint() const", asMETHOD(JSONValue, GetUint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "uint GetUInt() const", asMETHOD(JSONValue, GetUInt), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "float GetFloat() const", asMETHOD(JSONValue, GetFloat), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "double GetDouble() const", asMETHOD(JSONValue, GetDouble), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "const String& GetString() const", asMETHOD(JSONValue, GetString), asCALL_THISCALL);
@@ -360,8 +360,7 @@ static bool JSONFileSave(File* file, const String& indendation, JSONFile* ptr)
 static void RegisterJSONFile(asIScriptEngine* engine)
 {
     RegisterResource<JSONFile>(engine, "JSONFile");
-    engine->RegisterObjectMethod("JSONFile", "void SetRoot(const JSONValue&in)", asMETHOD(JSONFile, SetRoot), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONFile", "const JSONValue& GetRoot() const", asMETHOD(JSONFile, GetRoot), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONFile", "const JSONValue& GetRoot() const", asMETHODPR(JSONFile, GetRoot, () const, const JSONValue&), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONFile", "bool Save(File@+, const String&in) const", asFUNCTION(JSONFileSave), asCALL_CDECL_OBJLAST);
 }
 

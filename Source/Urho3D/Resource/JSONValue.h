@@ -42,6 +42,19 @@ enum JSONValueType
     JSON_OBJECT,
 };
 
+/// JSON number type.
+enum JSONNumberType
+{
+    /// Not a number.
+    JSONNT_NAN = 0,
+    /// Integer.
+    JSONNT_INT,
+    /// Unsigned integer.
+    JSONNT_UINT,
+    /// Float or double.
+    JSONNT_FLOAT_DOUBLE,
+};
+
 class JSONValue;
 
 /// JSON array type.
@@ -59,66 +72,66 @@ class URHO3D_API JSONValue
 public:
     /// Construct null value.
     JSONValue() : 
-        valueType_(JSON_NULL)
+        type_(0)
     {
     }
     /// Construct with a boolean.
     JSONValue(bool value) :
-        valueType_(JSON_NULL)
+        type_(0)
     {
         *this = value;
     }
     /// Construct with a integer.
     JSONValue(int value) :
-        valueType_(JSON_NULL)
+        type_(0)
     {
         *this = value;
     }
     /// Construct with a unsigned integer.
     JSONValue(unsigned value) :
-        valueType_(JSON_NULL)
+        type_(0)
     {
         *this = value;
     }
     /// Construct with a float.
     JSONValue(float value) :
-        valueType_(JSON_NULL)
+        type_(0)
     {
         *this = value;
     }
     /// Construct with a double.
     JSONValue(double value) :
-        valueType_(JSON_NULL)
+        type_(0)
     {
         *this = value;
     }
     /// Construct with a string.
     JSONValue(const String& value) :
-        valueType_(JSON_NULL)
+        type_(0)
     {
         *this = value;
     }
     /// Construct with a C string.
     JSONValue(const char* value) :
-        valueType_(JSON_NULL)
+        type_(0)
     {
         *this = value;
     }
     /// Construct with a JSON array.
     JSONValue(const JSONArray& value) :
-        valueType_(JSON_NULL)
+        type_(0)
     {
         *this = value;
     }
     /// Construct with a JSON object.
     JSONValue(const JSONObject& value) :
-        valueType_(JSON_NULL)
+        type_(0)
     {
         *this = value;
     }    
     /// Copy-construct from another JSON value.
     JSONValue(const JSONValue& value) :
-        valueType_(JSON_NULL)
+        type_(0)
     {
         *this = value;
     }
@@ -128,8 +141,6 @@ public:
         SetType(JSON_NULL);
     }
 
-    /// Set value type.
-    void SetType(JSONValueType valueType);
     /// Assign from a boolean.
     JSONValue& operator =(bool rhs);
     /// Assign from an integer.
@@ -152,26 +163,28 @@ public:
     JSONValue& operator =(const JSONValue& rhs);
 
     /// Return value type.
-    JSONValueType GetType() const { return valueType_; }
+    JSONValueType GetValueType() const;
+    /// Return number type.
+    JSONNumberType GetNumberType() const;
     /// Check is null.
-    bool IsNull() const { return valueType_ == JSON_NULL; }
+    bool IsNull() const { return GetValueType() == JSON_NULL; }
     /// Check is boolean.
-    bool IsBool() const { return valueType_ == JSON_BOOL; }
+    bool IsBool() const { return GetValueType() == JSON_BOOL; }
     /// Check is number.
-    bool IsNumber() const { return valueType_ == JSON_NUMBER; }
+    bool IsNumber() const { return GetValueType() == JSON_NUMBER; }
     /// Check is string.
-    bool IsString() const { return valueType_ == JSON_STRING; }
+    bool IsString() const { return GetValueType() == JSON_STRING; }
     /// Check is array.
-    bool IsArray() const { return valueType_ == JSON_ARRAY; }
+    bool IsArray() const { return GetValueType() == JSON_ARRAY; }
     /// Check is object.
-    bool IsObject() const { return valueType_ == JSON_OBJECT; }
+    bool IsObject() const { return GetValueType() == JSON_OBJECT; }
 
     /// Return boolean value.
     bool GetBool() const { return IsBool() ? boolValue_ : false;}
     /// Return integer value.
     int GetInt() const { return IsNumber() ? (int)numberValue_ : 0; }
     /// Return unsigned integer value.
-    unsigned GetUint() const { return IsNumber() ? (unsigned)numberValue_ : 0; }
+    unsigned GetUInt() const { return IsNumber() ? (unsigned)numberValue_ : 0; }
     /// Return float value.
     float GetFloat() const { return IsNumber() ? (float)numberValue_ : 0.0f; }
     /// Return double value.
@@ -227,7 +240,18 @@ public:
 
     /// Clear array or object.
     void Clear();
-    
+
+    /// Internal functions.
+    void SetType(JSONValueType valueType, JSONNumberType numberType = JSONNT_NAN);
+    void SetVariant(const Variant& variant, Context* context = 0);
+    void GetVariant(Variant& variant) const;
+    void SetVariantValue(const Variant& variant, Context* context = 0);
+    void GetVariantValue(Variant& variant, VariantType type) const;
+    void SetVariantMap(const VariantMap& variantMap, Context* context = 0);
+    void GetVariantMap(VariantMap& variantMap) const;
+    void SetVariantVector(const VariantVector& variantVector, Context* context = 0);
+    void GetVariantVector(VariantVector& variantVector) const;
+
     /// Empty JSON value.
     static const JSONValue EMPTY;
     /// Empty JSON array.
@@ -236,9 +260,8 @@ public:
     static const JSONObject emptyObject;
 
 private:
-    /// Value type.
-    JSONValueType valueType_;
-    /// Values.
+    /// type.
+    unsigned type_;
     union
     {
         /// Boolean value.
