@@ -1304,8 +1304,7 @@ void BuildAndSaveAnimations(OutModel* model)
 
                         Quaternion q1;
                         q1.FromRotationTo(startAxis, curAxis);
-                        //PrintLine("motion rotation:" + String(q1.EulerAngles()));
-                        PrintLine("motion rotation:" + String(rotateNode->GetWorldRotation().EulerAngles()));
+                        PrintLine("motion rotation:" + String(q1.EulerAngles()));
                         motionKeys[k].rotation_ = q1.EulerAngles().y_;
 
                         //q1.FromRotationTo(curAxis, Vector3(0, 0, 1));
