@@ -38,7 +38,7 @@ if (WIN32)
     if (URHO3D_LIB_TYPE STREQUAL SHARED)
         set (LIB_NAME ${LIB_NAME}.dll)
         # When building shared library, a copy of the library must be available in the tool directory for the tools to work correctly as there is no RPATH for Windows platform
-        create_symlink (${CMAKE_BINARY_DIR}/bin/${LIB_NAME} ${CMAKE_BINARY_DIR}/bin/tool/${LIB_NAME})
+        create_symlink (${CMAKE_BINARY_DIR}/bin/${LIB_NAME} ${CMAKE_BINARY_DIR}/bin/tool/${LIB_NAME} FALLBACK_TO_COPY)
     endif ()
 endif ()
 
