@@ -43,14 +43,7 @@ namespace Urho3D
 
 JSONFile::JSONFile(Context* context) :
     Resource(context)
-    // , document_(new Document())
 {
-}
-
-JSONFile::JSONFile(Context* context, const JSONValue& value) :
-    Resource(context)
-{
-    SetRoot(value);
 }
 
 JSONFile::~JSONFile()
@@ -68,6 +61,7 @@ static void ToJSONValue(JSONValue& jsonValue, const rapidjson::Value& rapidjsonV
     switch (rapidjsonValue.GetType())
     {
     case kNullType:
+        // Reset to null type
         jsonValue.SetType(JSON_NULL);
         break;
 
@@ -80,7 +74,12 @@ static void ToJSONValue(JSONValue& jsonValue, const rapidjson::Value& rapidjsonV
         break;
 
     case kNumberType:
-        jsonValue = rapidjsonValue.GetDouble();
+        if (rapidjsonValue.IsInt())
+            jsonValue = rapidjsonValue.GetInt();
+        else if (rapidjsonValue.IsUint())
+            jsonValue = rapidjsonValue.GetUint();
+        else
+            jsonValue = rapidjsonValue.GetDouble();
         break;
 
     case kStringType:
@@ -89,9 +88,7 @@ static void ToJSONValue(JSONValue& jsonValue, const rapidjson::Value& rapidjsonV
 
     case kArrayType:
         {
-            // JSON value will convert to array type
             jsonValue.Resize(rapidjsonValue.Size());
-
             for (unsigned i = 0; i < rapidjsonValue.Size(); ++i)
             {
                 ToJSONValue(jsonValue[i], rapidjsonValue[i]);
@@ -101,7 +98,7 @@ static void ToJSONValue(JSONValue& jsonValue, const rapidjson::Value& rapidjsonV
 
     case kObjectType:
         {
-            // JSON value will convert to object type
+            jsonValue.SetType(JSON_OBJECT);
             for (rapidjson::Value::ConstMemberIterator i = rapidjsonValue.MemberBegin(); i != rapidjsonValue.MemberEnd(); ++i)
             {
                 JSONValue& value = jsonValue[String(i->name.GetString())];
@@ -145,7 +142,7 @@ bool JSONFile::BeginLoad(Deserializer& source)
 
 static void ToRapidjsonValue(rapidjson::Value& rapidjsonValue, const JSONValue& jsonValue, rapidjson::MemoryPoolAllocator<>& allocator)
 {
-    switch (jsonValue.GetType())
+    switch (jsonValue.GetValueType())
     {
     case JSON_NULL:
         rapidjsonValue.SetNull();
@@ -156,7 +153,22 @@ static void ToRapidjsonValue(rapidjson::Value& rapidjsonValue, const JSONValue& 
         break;
 
     case JSON_NUMBER:
-        rapidjsonValue.SetDouble(jsonValue.GetDouble());
+        {
+            switch (jsonValue.GetNumberType())
+            {
+            case JSONNumberType::JSONNT_INT:
+                rapidjsonValue.SetInt(jsonValue.GetInt());
+                break;
+
+            case JSONNumberType::JSONNT_UINT:
+                rapidjsonValue.SetUint(jsonValue.GetUInt());
+                break;
+
+            default:
+                rapidjsonValue.SetDouble(jsonValue.GetDouble());
+                break;
+            }
+        }
         break;
 
     case JSON_STRING:

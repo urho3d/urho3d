@@ -21,7 +21,6 @@ class JSONValue
     JSONValue(const JSONValue& value);
     ~JSONValue();
 
-    void SetType(JSONValueType valueType);
     tolua_outside void JSONValueSetBool @ SetBool(bool value);
     tolua_outside void JSONValueSetInt @ SetInt(int value);
     tolua_outside void JSONValueSetUint @ SetUint(unsigned value);
@@ -31,7 +30,7 @@ class JSONValue
     tolua_outside void JSONValueSetArray @ SetArray(const JSONArray& value);
     tolua_outside void JSONValueSetObject @ SetObject(const JSONObject& value);
 
-    JSONValueType GetType() const;
+    JSONValueType GetValueType() const;
     bool IsNull() const;
     bool IsBool() const;
     bool IsNumber() const;
@@ -41,7 +40,7 @@ class JSONValue
 
     bool GetBool() const;
     int GetInt() const;
-    unsigned GetUint() const;
+    unsigned GetUInt() const;
     float GetFloat() const;
     double GetDouble() const;
     const String GetString() const;

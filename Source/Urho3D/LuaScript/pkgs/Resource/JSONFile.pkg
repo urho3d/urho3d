@@ -3,10 +3,8 @@ $#include "Resource/JSONFile.h"
 class JSONFile : Resource
 {
     JSONFile();
-    // JSONFile(const JSONValue& value);
     ~JSONFile();
 
-    void SetRoot(const JSONValue& root);
     const JSONValue& GetRoot() const;
 
     tolua_outside bool JSONFileSave @ Save(const String fileName, const String indentation = "\t") const;
