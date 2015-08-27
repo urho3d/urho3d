@@ -23,13 +23,13 @@
 #include <Urho3D/Urho3D.h>
 
 #include <Urho3D/Audio/BufferedSoundStream.h>
+#include <Urho3D/Audio/SoundSource.h>
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
-#include <Urho3D/UI/Font.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/IO/Log.h>
 #include <Urho3D/Scene/Node.h>
-#include <Urho3D/Audio/SoundSource.h>
+#include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/UI.h>
 

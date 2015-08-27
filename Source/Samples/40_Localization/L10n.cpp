@@ -22,20 +22,20 @@
 
 #include <Urho3D/Urho3D.h>
 
-#include <Urho3D/Resource/Localization.h>
 #include <Urho3D/Core/CoreEvents.h>
-#include <Urho3D/UI/Window.h>
-#include <Urho3D/UI/Text.h>
-#include <Urho3D/UI/Button.h>
-#include <Urho3D/UI/Font.h>
-#include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/Graphics/Material.h>
 #include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Resource/Localization.h>
+#include <Urho3D/Resource/ResourceEvents.h>
+#include <Urho3D/UI/Button.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/Text3D.h>
 #include <Urho3D/UI/UIEvents.h>
-#include <Urho3D/Graphics/Zone.h>
-#include <Urho3D/Resource/ResourceEvents.h>
+#include <Urho3D/UI/Window.h>
 
 #include "L10n.h"
 

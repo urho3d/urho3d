@@ -24,9 +24,9 @@
 
 #include <Urho3D/Graphics/AnimatedModel.h>
 #include <Urho3D/IO/Log.h>
-#include <Urho3D/Scene/Node.h>
-#include <Urho3D/Physics/RigidBody.h>
 #include <Urho3D/Physics/PhysicsEvents.h>
+#include <Urho3D/Physics/RigidBody.h>
+#include <Urho3D/Scene/Node.h>
 
 #include "CreateRagdoll.h"
 
