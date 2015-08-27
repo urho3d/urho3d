@@ -1056,12 +1056,17 @@ void BuildAndSaveAnimations(OutModel* model)
 {
     SharedPtr<Scene> animScene(new Scene(context_));
     Node* n = NULL;
+    Node* rotateNode = NULL;
+    Node* translateNode = NULL;
 
     if (rootMotionFlag_ & kMotionYaw_Rotation)
     {
         n = animScene->CreateChild("Character");
         AnimatedModel* object = n->CreateComponent<AnimatedModel>();
         object->SetModel(model_);
+
+        rotateNode = n->GetChild(rotateBone_, true);
+        translateNode = n->GetChild(translateBone_, true);
     }
 
     const PODVector<aiAnimation*>& animations = model ? model->animations_ : sceneAnimations_;
@@ -1265,37 +1270,42 @@ void BuildAndSaveAnimations(OutModel* model)
                     if (k == 0)
                         fristKey = kf;
 
+                    Vector3 pelvisRightAxis = Vector3(1, 0, 0);
+
+
                     if (isTranslateBone) {
                         motionKeys.Resize(keyFrames);
                         motionKeys[k].time_ = kf.time_;
-                        Vector3 translation = kf.position_ - fristKey.position_;
+
+                        translateNode->SetTransform(fristKey.position_, fristKey.rotation_);
+                        Vector3 t1_ws = translateNode->GetWorldPosition();
+                        translateNode->SetTransform(kf.position_, kf.rotation_);
+                        Vector3 t2_ws = translateNode->GetWorldPosition();
+
+                        Vector3 translation = t2_ws - t1_ws;
                         if (rootMotionFlag_ & kMotionX_Translation)
                         {
                             motionKeys[k].translation_.x_ = translation.x_;
-                            kf.position_.x_ = fristKey.position_.x_;
+                            t2_ws.x_  = t1_ws.x_;
                         }
                         if (rootMotionFlag_ & kMotionY_Translation)
                         {
-                            //translation.y_ = kf.position_.y_;
-                            //kf.position_.y_ = 0;
-                            motionKeys[k].translation_.y_ = translation.z_;
-                            kf.position_.z_ = fristKey.position_.z_;
+                            motionKeys[k].translation_.y_ = translation.y_;
+                            t2_ws.y_ = t1_ws.y_;
                         }
                         if (rootMotionFlag_ & kMotionZ_Translation)
                         {
-                            //translation.z_ = kf.position_.z_;
-                            //kf.position_.z_ = 0;
-                            motionKeys[k].translation_.z_ = translation.y_;
-                            kf.position_.y_ = fristKey.position_.y_;
+                            motionKeys[k].translation_.z_ = translation.z_;
+                            t2_ws.z_ = t1_ws.z_;
                         }
-                        // motionKeys_[k].translation_ -= motionKeys_[0].translation_;
-                        PrintLine("motion translation:" + String(motionKeys[k].translation_));
+
+                        translateNode->SetWorldPosition(t2_ws);
+                        Vector3 local_pos = translateNode->GetPosition();
+                        PrintLine("local position from " + String(kf.position_) + " to " + String(local_pos));
+                        kf.position_ = local_pos;
                     }
 
                     if (isRotateBone && (rootMotionFlag_ & kMotionYaw_Rotation)) {
-
-                        Node* rotateNode = n->GetChild(rotateBone_, true);
-                        Vector3 pelvisRightAxis = Vector3(1, 0, 0);
 
                         rotateNode->SetTransform(fristKey.position_, fristKey.rotation_);
                         Vector3 startAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
@@ -1304,14 +1314,15 @@ void BuildAndSaveAnimations(OutModel* model)
 
                         Quaternion q1;
                         q1.FromRotationTo(startAxis, curAxis);
-                        PrintLine("motion rotation:" + String(q1.EulerAngles()));
                         motionKeys[k].rotation_ = q1.EulerAngles().y_;
 
-                        //q1.FromRotationTo(curAxis, Vector3(0, 0, 1));
                         Quaternion wq = rotateNode->GetWorldRotation();
                         wq = q1.Inverse() * wq;
                         rotateNode->SetWorldRotation(wq);
-                        kf.rotation_ = rotateNode->GetRotation();
+
+                        Quaternion lq = rotateNode->GetRotation();
+                        PrintLine("local rotation from " + String(kf.rotation_.EulerAngles()) + " to " + String(lq.EulerAngles()));
+                        kf.rotation_ = lq;
                     }
                 }
 
@@ -1341,6 +1352,7 @@ void BuildAndSaveAnimations(OutModel* model)
                 mkXML.SetFloat("time", mk.time_);
                 mkXML.SetVector3("translation", mk.translation_);
                 mkXML.SetFloat("rotation", mk.rotation_);
+                PrintLine("motion translation=" + String(mk.translation_) + " rotation=" + String(mk.rotation_));
             }
 
             File outFile(context_);
