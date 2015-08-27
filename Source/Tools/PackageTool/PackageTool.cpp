@@ -20,20 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Container/ArrayPtr.h>
+#include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/IO/File.h>
 #include <Urho3D/IO/FileSystem.h>
-#include <Urho3D/Core/ProcessUtils.h>
 
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-#include <cstdio>
-#include <cstring>
 #include <LZ4/lz4.h>
 #include <LZ4/lz4hc.h>
 

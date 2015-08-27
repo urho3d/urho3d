@@ -209,8 +209,6 @@ The Application class provides a minimal framework for a Urho3D C++ application 
 will instantiate the Context object and then the user-specified application class. A minimal example, which would just display a blank rendering window and exit by pressing ESC:
 
 \code
-#include <Urho3D/Urho3D.h>
-
 #include <Urho3D/Engine/Application.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Input/InputEvents.h>

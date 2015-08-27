@@ -20,13 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
+#include <Urho3D/Core/Main.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/IO/Log.h>
-#include <Urho3D/Core/Main.h>
-#include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Resource/ResourceEvents.h>
 
@@ -194,7 +191,7 @@ void Urho3DPlayer::Stop()
     {
     }
 #endif
-    
+
 #ifdef URHO3D_LUA
     else
     {
