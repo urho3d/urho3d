@@ -5125,7 +5125,6 @@ bool Save(File) const;
 bool Save(File, const String&) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetRoot(const JSONValue&);
 
 // Properties:
 /* readonly */
@@ -5158,7 +5157,7 @@ bool GetBool() const;
 double GetDouble() const;
 float GetFloat() const;
 int GetInt() const;
-uint GetUint() const;
+uint GetUInt() const;
 void Insert(uint, const JSONValue&);
 const JSONValue& Get(const String&) const;
 void Pop();
@@ -5183,7 +5182,7 @@ bool isString;
 /* readonly */
 uint size;
 /* readonly */
-JSONValueType type;
+JSONValueType valueType;
 };
 
 class JoystickState

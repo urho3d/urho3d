@@ -6778,7 +6778,6 @@ Methods:
 - bool Save(File@, const String&) const
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
-- void SetRoot(const JSONValue&)
 
 Properties:
 
@@ -6806,7 +6805,7 @@ Methods:
 - double GetDouble() const
 - float GetFloat() const
 - int GetInt() const
-- uint GetUint() const
+- uint GetUInt() const
 - void Insert(uint, const JSONValue&)
 - const JSONValue& Get(const String&) const
 - void Pop()
@@ -6824,7 +6823,7 @@ Properties:
 - bool isObject // readonly
 - bool isString // readonly
 - uint size // readonly
-- JSONValueType type // readonly
+- JSONValueType valueType // readonly
 
 <a name="Class_JoystickState"></a>
 
