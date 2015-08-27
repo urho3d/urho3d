@@ -25,9 +25,9 @@
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Graphics/Texture2D.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/UI/Sprite.h>
-#include <Urho3D/Graphics/Texture2D.h>
 #include <Urho3D/UI/UI.h>
 
 #include "Sprites.h"
