@@ -2774,7 +2774,6 @@ Methods:
 - JSONFile() (GC)
 - JSONFile* new()
 - void delete()
-- void SetRoot(const JSONValue& root)
 - const JSONValue& GetRoot() const
 - bool Save(const String fileName, const String indentation = "\t") const
 
@@ -2799,7 +2798,6 @@ Methods:
 - JSONValue(const JSONValue& value) (GC)
 - JSONValue* new(const JSONValue& value)
 - void delete()
-- void SetType(JSONValueType valueType)
 - void SetBool(bool value)
 - void SetInt(int value)
 - void SetUint(unsigned value)
@@ -2808,7 +2806,7 @@ Methods:
 - void SetString(const String value)
 - void SetArray(const JSONArray& value)
 - void SetObject(const JSONObject& value)
-- JSONValueType GetType() const
+- JSONValueType GetValueType() const
 - bool IsNull() const
 - bool IsBool() const
 - bool IsNumber() const
@@ -2817,7 +2815,7 @@ Methods:
 - bool IsObject() const
 - bool GetBool() const
 - int GetInt() const
-- unsigned GetUint() const
+- unsigned GetUInt() const
 - float GetFloat() const
 - double GetDouble() const
 - const String GetString() const
