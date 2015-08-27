@@ -63,7 +63,6 @@ static const char* methodDeclarations[] = {
 
 ScriptInstance::ScriptInstance(Context* context) :
     Component(context),
-    script_(GetSubsystem<Script>()),
     scriptObject_(0),
     subscribed_(false),
     subscribedPostFixed_(false)
