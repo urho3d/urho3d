@@ -522,10 +522,10 @@ bool ToggleSceneUpdate()
 
 bool ShowLayerMover()
 {
-  if(ui.focusElement is null) 
-    return ShowLayerEditor();
-  else
-    return false;
+    if (ui.focusElement is null)
+        return ShowLayerEditor();
+    else
+        return false;
 }
 
 void SetSceneModified()
