@@ -20,31 +20,23 @@
 // THE SOFTWARE.
 //
 
-#include <limits.h>
-
-#define STBRP_LARGE_RECTS
-#define STB_RECT_PACK_IMPLEMENTATION
-#include "stb_rect_pack.h"
-
-#include <Urho3D/Urho3D.h>
-
 #include <Urho3D/Core/Context.h>
-#include <Urho3D/Container/Vector.h>
 #include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Core/StringUtils.h>
-#include <Urho3D/Math/MathDefs.h>
-
-#include <Urho3D/Resource/Image.h>
-#include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/IO/File.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/IO/Log.h>
+#include <Urho3D/Resource/Image.h>
 #include <Urho3D/Resource/XMLElement.h>
 #include <Urho3D/Resource/XMLFile.h>
-#include <Urho3D/IO/Log.h>
-#include <Urho3D/Math/Color.h>
 
 #ifdef WIN32
 #include <windows.h>
 #endif
+
+#define STBRP_LARGE_RECTS
+#define STB_RECT_PACK_IMPLEMENTATION
+#include "stb_rect_pack.h"
 
 #include <Urho3D/DebugNew.h>
 

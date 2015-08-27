@@ -20,11 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
 #include <Urho3D/Container/Vector.h>
 #include <Urho3D/Core/CoreEvents.h>
-#include <Urho3D/DebugNew.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/DebugRenderer.h>
@@ -62,6 +59,8 @@
 #include <Urho3D/Urho2D/StaticSprite2D.h>
 
 #include "Urho2DConstraints.h"
+
+#include <Urho3D/DebugNew.h>
 
 DEFINE_APPLICATION_MAIN(Urho2DConstraints)
 

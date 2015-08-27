@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Graphics/Camera.h>
@@ -33,7 +31,6 @@
 #include <Urho3D/Graphics/Renderer.h>
 #include <Urho3D/Graphics/RenderSurface.h>
 #include <Urho3D/Graphics/Skybox.h>
-#include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/Graphics/Terrain.h>
 #include <Urho3D/Graphics/Texture2D.h>
 #include <Urho3D/Graphics/Zone.h>

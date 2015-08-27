@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Graphics/Camera.h>
@@ -120,7 +118,7 @@ void SignedDistanceFieldText::CreateScene()
         mushroomTitleText->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 24);
 
         mushroomTitleText->SetColor(Color::RED);
-        
+
         if (i % 3 == 1)
         {
             mushroomTitleText->SetColor(Color::GREEN);

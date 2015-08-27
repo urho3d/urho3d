@@ -20,36 +20,29 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
+#include <Urho3D/Core/Context.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Core/StringUtils.h>
+#include <Urho3D/Core/WorkQueue.h>
 #include <Urho3D/Graphics/AnimatedModel.h>
 #include <Urho3D/Graphics/Animation.h>
-#include <Urho3D/Core/Context.h>
 #include <Urho3D/Graphics/DebugRenderer.h>
-#include <Urho3D/IO/File.h>
-#include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/Graphics/Geometry.h>
 #include <Urho3D/Graphics/Graphics.h>
 #include <Urho3D/Graphics/IndexBuffer.h>
 #include <Urho3D/Graphics/Light.h>
 #include <Urho3D/Graphics/Material.h>
-#include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/VertexBuffer.h>
+#include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/FileSystem.h>
 #ifdef URHO3D_PHYSICS
 #include <Urho3D/Physics/PhysicsWorld.h>
 #endif
-#include <Urho3D/Core/ProcessUtils.h>
-#include <Urho3D/Math/Quaternion.h>
 #include <Urho3D/Resource/ResourceCache.h>
-#include <Urho3D/Scene/Scene.h>
-#include <Urho3D/Core/StringUtils.h>
-#include <Urho3D/Math/Vector3.h>
-#include <Urho3D/Graphics/VertexBuffer.h>
-#include <Urho3D/Core/WorkQueue.h>
 #include <Urho3D/Resource/XMLFile.h>
-#include <Urho3D/Graphics/Zone.h>
-
-#include <Urho3D/Container/Sort.h>
+#include <Urho3D/Scene/Scene.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -59,8 +52,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <assimp/DefaultLogger.hpp>
-
-#include <cstring>
 
 #include <Urho3D/DebugNew.h>
 
@@ -1075,7 +1066,6 @@ void BuildAndSaveAnimations(OutModel* model)
     {
         aiAnimation* anim = animations[i];
         Vector<MontionKey>   motionKeys;
-
         float duration = (float)anim->mDuration;
         String animName = FromAIString(anim->mName);
         String animOutName;
@@ -1264,6 +1254,7 @@ void BuildAndSaveAnimations(OutModel* model)
                 if (track.channelMask_ & CHANNEL_SCALE)
                     kf.scale_ = ToVector3(scale);
 
+<<<<<<< HEAD
                 if (rootMotionFlag_)
                 {
                     static AnimationKeyFrame fristKey;
