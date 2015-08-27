@@ -975,6 +975,7 @@ void BuildAndSaveModel(OutModel& model)
 
             Bone newBone;
             newBone.name_ = boneName;
+            newBone.nameHash_ = StringHash(boneName);
 
             aiMatrix4x4 transform = boneNode->mTransformation;
             // Make the root bone transform relative to the model's root node, if it is not already
@@ -1050,7 +1051,8 @@ void BuildAndSaveAnimations(OutModel* model)
     Node* rotateNode = NULL;
     Node* translateNode = NULL;
 
-    if (rootMotionFlag_ & kMotionYaw_Rotation)
+    Vector3 pelvisRightAxis = Vector3(1, 0, 0);
+    if (rootMotionFlag_)
     {
         n = animScene->CreateChild("Character");
         AnimatedModel* object = n->CreateComponent<AnimatedModel>();
@@ -1058,6 +1060,10 @@ void BuildAndSaveAnimations(OutModel* model)
 
         rotateNode = n->GetChild(rotateBone_, true);
         translateNode = n->GetChild(translateBone_, true);
+
+        Bone* b = model_->GetSkeleton().GetBone(rotateBone_);
+        pelvisRightAxis = b->initialRotation_ * Vector3::RIGHT;
+        PrintLine("pelvisRightAxis = " + String(pelvisRightAxis));
     }
 
     const PODVector<aiAnimation*>& animations = model ? model->animations_ : sceneAnimations_;
@@ -1254,15 +1260,11 @@ void BuildAndSaveAnimations(OutModel* model)
                 if (track.channelMask_ & CHANNEL_SCALE)
                     kf.scale_ = ToVector3(scale);
 
-<<<<<<< HEAD
                 if (rootMotionFlag_)
                 {
                     static AnimationKeyFrame fristKey;
                     if (k == 0)
                         fristKey = kf;
-
-                    Vector3 pelvisRightAxis = Vector3(1, 0, 0);
-
 
                     if (isTranslateBone) {
                         motionKeys.Resize(keyFrames);
