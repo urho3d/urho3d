@@ -6,6 +6,7 @@ function Rotator:Start()
 end
 
 function Rotator:SetRotationSpeed(speed)
+    -- Need to make a copy of the speed object because in this sample demo the speed object is transient on C++ side
     self.rotationSpeed = Vector3(speed)
 end
 

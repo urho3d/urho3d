@@ -419,10 +419,7 @@ LuaFunction* LuaScript::GetFunction(int index)
     if (i != functionPointerToFunctionMap_.End())
         return i->second_;
 
-    lua_pushvalue(luaState_, index);
-    int functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
-
-    SharedPtr<LuaFunction> function(new LuaFunction(luaState_, functionRef, false));
+    SharedPtr<LuaFunction> function(new LuaFunction(luaState_, index));
     functionPointerToFunctionMap_[functionPointer] = function;
 
     return function;
