@@ -144,6 +144,7 @@ struct MontionKey
     float           time_;
 };
 SharedPtr<Model> model_;
+bool noModel_ = false;
 //====================================================================
 
 int main(int argc, char** argv);
@@ -264,6 +265,7 @@ void Run(const Vector<String>& arguments)
             "-ctn        Check and do not overwrite if texture has newer timestamp\n"
             "-am         Export all meshes even if identical (scene mode only)\n"
             "-motion     Export root motion (model mode only)\n"
+            "-nomodel    Do not output model (model mode only)\n"
         );
     }
 
@@ -419,6 +421,8 @@ void Run(const Vector<String>& arguments)
                 }
                 PrintLine("Motion FLags is " + value + " (" + String(rootMotionFlag_) + ")");
             }
+            else if (argument == "nomodel")
+                noModel_ = true;
         }
     }
 
@@ -1010,6 +1014,9 @@ void BuildAndSaveModel(OutModel& model)
         if (model.bones_.Size() > maxBones_)
             outModel->SetGeometryBoneMappings(allBoneMappings);
     }
+
+    if (noModel_)
+        return;
 
     File outFile(context_);
     if (!outFile.Open(model.outName_, FILE_WRITE))
