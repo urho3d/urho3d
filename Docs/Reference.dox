@@ -799,6 +799,8 @@ There is also a generic Set() method for %Variant class to cope with Lua does no
 
 For the rest of the functions and classes, see the generated \ref LuaScriptAPI "Lua script API reference". Also, look at the Lua counterparts of the sample applications in the bin/Data/LuaScripts directory and compare them to the C++ and AngelScript versions to familiarize yourself with how things are done on the Lua side.
 
+One more thing to note about our Lua scripting implementation is its two-way conversion between C++ collection containers (Vector and PODVector) and Lua arrays (table of non-POD and table of POD objects, respectively). The conversion is done automatically when the collection crosses the C++/Lua boundary. The generated \ref LuaScriptAPI "Lua script API reference" page does not reflect this fact correctly. When obtaining a collection of objects using the Lua script API, you should treat it as a Lua table despite the documentation page stated a Vector or PODVector user type is being returned.
+
 \section LuaScripting_Allocation Object allocation & Lua garbage collection
 
 There are two ways to allocate a C++ object in Lua scripting, which behave differently with respect to Lua's automatic garbage collection:

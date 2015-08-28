@@ -117,7 +117,7 @@ public:
     /// Return script object type.
     const String& GetScriptObjectType() const { return scriptObjectType_; }
 
-    /// Return script object ref.
+    /// Return Lua reference to script object.
     int GetScriptObjectRef() const { return scriptObjectRef_; }
 
     /// Get script file serialization attribute by calling a script function.
@@ -172,7 +172,7 @@ private:
     String scriptObjectType_;
     /// Attributes, including script object variables.
     Vector<AttributeInfo> attributeInfos_;
-    /// Script object ref.
+    /// Lua reference to script object.
     int scriptObjectRef_;
     /// Script object method.
     LuaFunction* scriptObjectMethods_[MAX_LUA_SCRIPT_OBJECT_METHODS];

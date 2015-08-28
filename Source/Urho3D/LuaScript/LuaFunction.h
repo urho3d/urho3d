@@ -25,6 +25,7 @@
 #include "../Container/RefCounted.h"
 
 struct lua_State;
+typedef int (*lua_CFunction) (lua_State *L);
 
 namespace Urho3D
 {
@@ -33,12 +34,14 @@ class LuaScript;
 class LuaScriptInstance;
 class Variant;
 
-/// Lua function.
+/// C++ representation of Lua function object.
 class URHO3D_API LuaFunction : public RefCounted
 {
 public:
-    /// Construct.
-    LuaFunction(lua_State* lusState, int functionRef, bool needUnref = true);
+    /// Construct from a Lua function object at the specified stack index.
+    LuaFunction(lua_State* L, int index);
+    /// Construct from a C function.
+    LuaFunction(lua_State* L, lua_CFunction func);
     /// Destruct.
     ~LuaFunction();
 
@@ -88,7 +91,9 @@ public:
     /// Push variant to stack.
     void PushVariant(const Variant& variant, const char* asType = 0);
     /// Push Lua table to stack. When the specified table is not found then a nil is pushed instead.
-    void PushLuaTable(const String& tableName);
+    void PushLuaTable(const char* tableName);
+    /// Push Lua table to stack. When the specified table is not found then a nil is pushed instead.
+    void PushLuaTable(const String& tableName) { PushLuaTable(tableName.CString()); }
 
     /// Return function ref.
     int GetFunctionRef() const { return functionRef_; }
@@ -96,12 +101,10 @@ public:
 private:
     /// Lua state.
     lua_State* luaState_;
-    /// Function ref.
-    int functionRef_;
-    /// Need unref.
-    bool needUnref_;
     /// Number of arguments being pushed so far. For internal use only.
     int numArguments_;
+    /// Lua reference to function object.
+    int functionRef_;
 };
 
 }
