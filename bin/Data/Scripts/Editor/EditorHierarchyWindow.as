@@ -24,6 +24,7 @@ Color componentTextColor(0.7f, 1.0f, 0.7f);
 
 Window@ hierarchyWindow;
 ListView@ hierarchyList;
+bool showID = true;
 
 // UIElement does not have unique ID, so use a running number to generate a new ID each time an item is inserted into hierarchy list
 const uint UI_ELEMENT_BASE_ID = 1;
@@ -77,6 +78,8 @@ void CreateHierarchyWindow()
     SubscribeToEvent(hierarchyWindow.GetChild("CloseButton", true), "Released", "HideHierarchyWindow");
     SubscribeToEvent(hierarchyWindow.GetChild("ExpandButton", true), "Released", "ExpandCollapseHierarchy");
     SubscribeToEvent(hierarchyWindow.GetChild("CollapseButton", true), "Released", "ExpandCollapseHierarchy");
+    SubscribeToEvent(hierarchyWindow.GetChild("ResetButton", true), "Released", "CollapseHierarchy");
+    SubscribeToEvent(hierarchyWindow.GetChild("ShowID", true), "Toggled", "HandleShowID");
     SubscribeToEvent(hierarchyList, "SelectionChanged", "HandleHierarchyListSelectionChange");
     SubscribeToEvent(hierarchyList, "ItemDoubleClicked", "HandleHierarchyListDoubleClick");
     SubscribeToEvent(hierarchyList, "ItemClicked", "HandleHierarchyItemClick");
@@ -464,28 +467,33 @@ String GetNodeTitle(Node@ node)
         ret = node.typeName;
     else
         ret = node.name;
+    
+    if (showID) 
+    {
+        if (node.id >= FIRST_LOCAL_ID)
+            ret += " (Local " + String(node.id) + ")";
+        else
+            ret += " (" + String(node.id) + ")";
 
-    if (node.id >= FIRST_LOCAL_ID)
-        ret += " (Local " + String(node.id) + ")";
-    else
-        ret += " (" + String(node.id) + ")";
-
-    if (node.temporary)
-        ret += " (Temp)";
-
+        if (node.temporary)
+            ret += " (Temp)";
+    }
+    
     return ret;
 }
 
 String GetComponentTitle(Component@ component)
 {
     String ret = component.typeName;
+    
+    if (showID) 
+    {
+        if (component.id >= FIRST_LOCAL_ID)
+            ret += " (Local)";
 
-    if (component.id >= FIRST_LOCAL_ID)
-        ret += " (Local)";
-
-    if (component.temporary)
-        ret += " (Temp)";
-
+        if (component.temporary)
+            ret += " (Temp)";
+    }
     return ret;
 }
 
@@ -744,6 +752,14 @@ void HandleHierarchyListDoubleClick(StringHash eventType, VariantMap& eventData)
     {
         Node@ node = editorScene.GetNode(item.vars[NODE_ID_VAR].GetUInt());
         LocateNode(node);
+    }
+    
+    bool isExpanded = hierarchyList.IsExpanded(hierarchyList.selection);
+    
+    if (!isExpanded && eventData["Button"].GetInt() == MOUSEB_LEFT) 
+    {
+        isExpanded = !isExpanded;  
+        hierarchyList.Expand(hierarchyList.selection, isExpanded, false); 
     }
 }
 
@@ -1535,15 +1551,17 @@ bool BlenderModeDelete()
 {
     // In this place maybe placed avoidance flags that not allow delete in some cases
     
-    Array<UIElement@> actions;
-    actions.Push(CreateContextMenuItem("Delete?", "HandleBlenderModeDelete"));
-    actions.Push(CreateContextMenuItem("Cancel", "HandleEmpty"));
-    
-    if (actions.length > 0) {
-        ActivateContextMenu(actions);
-        return true;
+    if (ui.focusElement is null) 
+    {    
+        Array<UIElement@> actions;
+        actions.Push(CreateContextMenuItem("Delete?", "HandleBlenderModeDelete"));
+        actions.Push(CreateContextMenuItem("Cancel", "HandleEmpty"));
+        
+        if (actions.length > 0) {
+            ActivateContextMenu(actions);
+            return true;
+        }
     }
-
     return false;
 }
 
@@ -1737,4 +1755,33 @@ void HandleHierarchyContextUIElementCloseUILayout()
 void HandleHierarchyContextUIElementCloseAllUILayouts()
 {
     CloseAllUILayouts();
+}
+
+void CollapseHierarchy() 
+{
+    Array<uint> oldSelections = hierarchyList.selections;    
+    Array<uint> selections = {0};
+    
+    hierarchyList.SetSelections(selections);
+    
+    for (uint i = 0; i < selections.length; ++i)
+        hierarchyList.Expand(selections[i], false, true);  
+            
+    // only scene's scope expand by default
+    hierarchyList.Expand(0, true, false);
+    
+    hierarchyList.SetSelections(oldSelections);
+}
+
+void CollapseHierarchy(StringHash eventType, VariantMap& eventData)
+{
+    CollapseHierarchy();
+}
+
+void HandleShowID(StringHash eventType, VariantMap& eventData) 
+{
+    CheckBox@ checkBox = eventData["Element"].GetPtr();
+    showID = checkBox.checked;
+    UpdateHierarchyItem(editorScene, false);
+    CollapseHierarchy();
 }
