@@ -122,6 +122,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     UpdateTestAnimation(timeStep);
     UpdateGizmo();
     UpdateDirtyUI();
+    UpdateViewDebugIcons();
 
     // Handle Particle Editor looping.
     if (particleEffectWindow !is null and particleEffectWindow.visible)
