@@ -229,6 +229,7 @@ bool LoadScene(const String&in fileName)
     UpdateWindowTitle();
     DisableInspectorLock();
     UpdateHierarchyItem(editorScene, true);
+    CollapseHierarchy();
     ClearEditActions();
 
     suppressSceneChanges = false;
