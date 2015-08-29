@@ -125,6 +125,7 @@ float defaultTicksPerSecond_ = 4800.0f;
 //====================================================================
 String translateBone_ = "Bip01_$AssimpFbx$_Translation";
 String rotateBone_ = "Bip01_$AssimpFbx$_Rotation";
+String preRotateBone_ = "RootNode";
 enum RootMotionFlag
 {
     kMotion_None         = 0,
@@ -145,6 +146,7 @@ struct MontionKey
 };
 SharedPtr<Model> model_;
 bool noModel_ = false;
+bool flipPreRotateBone_ = false;
 //====================================================================
 
 int main(int argc, char** argv);
@@ -266,6 +268,7 @@ void Run(const Vector<String>& arguments)
             "-am         Export all meshes even if identical (scene mode only)\n"
             "-motion     Export root motion (model mode only)\n"
             "-nomodel    Do not output model (model mode only)\n"
+            "-flipbone  Flip Pre Rotate Bone (model mode only)\n"
         );
     }
 
@@ -423,6 +426,8 @@ void Run(const Vector<String>& arguments)
             }
             else if (argument == "nomodel")
                 noModel_ = true;
+            else if (argument == "flipbone")
+                flipPreRotateBone_ = true;
         }
     }
 
@@ -988,6 +993,13 @@ void BuildAndSaveModel(OutModel& model)
 
             GetPosRotScale(transform, newBone.initialPosition_, newBone.initialRotation_, newBone.initialScale_);
 
+            if (flipPreRotateBone_ && boneName == preRotateBone_)
+            {
+                Vector3 eulerAngles = newBone.initialRotation_.EulerAngles();
+                newBone.initialRotation_.FromEulerAngles(eulerAngles.x_, eulerAngles.y_ + 180, eulerAngles.z_);
+                PrintLine("PreRotation bone from " + eulerAngles.ToString() + " to " + newBone.initialRotation_.EulerAngles().ToString());
+            }
+
             // Get offset information if exists
             newBone.offsetMatrix_ = GetOffsetMatrix(model, boneName);
             newBone.radius_ = model.boneRadii_[i];
@@ -1128,6 +1140,7 @@ void BuildAndSaveAnimations(OutModel* model)
             bool isRootBone = false;
             bool isTranslateBone = channelName == translateBone_;
             bool isRotateBone = channelName == rotateBone_;
+            bool isPreRotateBone = channelName == preRotateBone_;
 
             if (model)
             {
@@ -1267,6 +1280,13 @@ void BuildAndSaveAnimations(OutModel* model)
                 if (track.channelMask_ & CHANNEL_SCALE)
                     kf.scale_ = ToVector3(scale);
 
+                if (flipPreRotateBone_ && isPreRotateBone)
+                {
+                    Vector3 eulerAngles = kf.rotation_.EulerAngles();
+                    eulerAngles.z_ += 180;
+                    kf.rotation_.FromEulerAngles(eulerAngles.x_, eulerAngles.y_, eulerAngles.z_);
+                }
+
                 if (rootMotionFlag_)
                 {
                     static AnimationKeyFrame fristKey;
@@ -1301,7 +1321,7 @@ void BuildAndSaveAnimations(OutModel* model)
 
                         translateNode->SetWorldPosition(t2_ws);
                         Vector3 local_pos = translateNode->GetPosition();
-                        PrintLine("local position from " + String(kf.position_) + " to " + String(local_pos));
+                        //PrintLine("local position from " + String(kf.position_) + " to " + String(local_pos));
                         kf.position_ = local_pos;
                     }
 
@@ -1321,7 +1341,7 @@ void BuildAndSaveAnimations(OutModel* model)
                         rotateNode->SetWorldRotation(wq);
 
                         Quaternion lq = rotateNode->GetRotation();
-                        PrintLine("local rotation from " + String(kf.rotation_.EulerAngles()) + " to " + String(lq.EulerAngles()));
+                        //PrintLine("local rotation from " + String(kf.rotation_.EulerAngles()) + " to " + String(lq.EulerAngles()));
                         kf.rotation_ = lq;
                     }
                 }
