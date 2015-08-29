@@ -67,7 +67,8 @@ Vector2 debugIconsSizeSmall = debugIconsSize / 1.5;
 Vector2 debugIconsSizeBig = debugIconsSize * 1.5;
 Vector2 debugIconsMaxSize = debugIconsSize * 50;
 VariantMap debugIconsPlacement;
-const int debugIconsPlacementIndent = 1.0;  
+const int debugIconsPlacementIndent = 1.0;
+const float debugIconsOrthoDistance = 15.0f;   
 
 Vector2 Max(Vector2 a, Vector2 b) 
 {
@@ -133,17 +134,15 @@ void UpdateViewDebugIcons()
             if(iconType == ICON_SPLINE_PATH && timeToNextDebugIconsUpdateSplinePath > time.systemTime) continue;
 
             Array<Node@> nodes = editorScene.GetChildrenWithComponent(ComponentTypes[iconType], true);
+            
+            // Clear old data
+            if(iconType == ICON_SPLINE_PATH)
+                ClearCommit(ICON_SPLINE_PATH, ICON_SPLINE_PATH+1, nodes.length * splinePathResolution);
+            else
+                ClearCommit(iconType, iconType+1, nodes.length);
+            
             if(nodes.length > 0)
             {
-                // Clear old data
-                if(iconType == ICON_SPLINE_PATH)
-                    ClearCommit(ICON_SPLINE_PATH, ICON_SPLINE_PATH+1, nodes.length * splinePathResolution);
-                else if(iconType==ICON_POINT_LIGHT || iconType==ICON_SPOT_LIGHT || iconType==ICON_DIRECTIONAL_LIGHT)
-                    ClearCommit(ICON_POINT_LIGHT, ICON_DIRECTIONAL_LIGHT+1, nodes.length);
-                else if(iconType==ICON_SOUND_SOURCE || iconType==ICON_SOUND_SOURCE_3D)
-                    ClearCommit(ICON_SOUND_SOURCE, ICON_SOUND_SOURCE_3D+1, nodes.length);
-                else
-                    ClearCommit(iconType, iconType+1, nodes.length);
 
                 // Fill with new data
                 for(int i=0;i<nodes.length; i++)
@@ -154,7 +153,7 @@ void UpdateViewDebugIcons()
                     Billboard@ bb = null;
                     Color finalIconColor = debugIconsColors[ICON_COLOR_DEFAULT];
                     float distance = (camPos - nodes[i].worldPosition).length;
-                    if (isOrthographic) distance = 15.0f;
+                    if (isOrthographic) distance = debugIconsOrthoDistance;
                     int iconsOffset = debugIconsPlacement[StringHash(nodes[i].id)].GetInt();
                     float iconsYPos = 0;
 
@@ -169,7 +168,7 @@ void UpdateViewDebugIcons()
                                 Vector3 splinePoint = sp.GetPoint(splineStep * step);
                                 Billboard@ bb = debugIconsSet[ICON_SPLINE_PATH].billboards[index];
                                 float stepDistance = (camPos - splinePoint).length;
-                                if (isOrthographic) stepDistance = 15.0f;
+                                if (isOrthographic) stepDistance = debugIconsOrthoDistance;
 
                                 if(step == 0) // SplinePath start
                                 {
