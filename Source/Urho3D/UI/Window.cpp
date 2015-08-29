@@ -280,7 +280,12 @@ void Window::SetResizeBorder(const IntRect& rect)
 
 void Window::SetModal(bool modal)
 {
-    if (GetSubsystem<UI>()->SetModalElement(this, modal))
+    UI* ui = GetSubsystem<UI>();
+    // Can be null at exit time; no-op in that case
+    if (!ui)
+        return;
+
+    if (ui->SetModalElement(this, modal))
     {
         modal_ = modal;
 
