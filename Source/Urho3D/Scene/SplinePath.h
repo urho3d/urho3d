@@ -77,6 +77,9 @@ public:
 
     /// Get the movement Speed.
     float GetSpeed() const { return speed_; }
+    
+    /// Get the length of SplinePath;
+    float GetLength() const { return length_; }
 
     /// Get the parent Node's last position on the spline.
     Vector3 GetPosition() const { return GetPoint(traveled_); }
