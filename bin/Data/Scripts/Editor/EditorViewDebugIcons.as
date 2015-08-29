@@ -161,39 +161,40 @@ void UpdateViewDebugIcons()
                     {
                         SplinePath@ sp = cast<SplinePath>(component);
                         if(sp !is null)
-                        {
-                            for(int step=0; step < splinePathResolution; step++)
+                            if(sp.length > 0.01f)
                             {
-                                int index = (i * splinePathResolution) + step;
-                                Vector3 splinePoint = sp.GetPoint(splineStep * step);
-                                Billboard@ bb = debugIconsSet[ICON_SPLINE_PATH].billboards[index];
-                                float stepDistance = (camPos - splinePoint).length;
-                                if (isOrthographic) stepDistance = debugIconsOrthoDistance;
+                                for(int step=0; step < splinePathResolution; step++)
+                                {
+                                    int index = (i * splinePathResolution) + step;
+                                    Vector3 splinePoint = sp.GetPoint(splineStep * step);
+                                    Billboard@ bb = debugIconsSet[ICON_SPLINE_PATH].billboards[index];
+                                    float stepDistance = (camPos - splinePoint).length;
+                                    if (isOrthographic) stepDistance = debugIconsOrthoDistance;
 
-                                if(step == 0) // SplinePath start
-                                {
-                                    bb.color = debugIconsColors[ICON_COLOR_SPLINE_PATH_BEGIN];
-                                    bb.size = ClampToIconMaxSize(Max(debugIconsSize * stepDistance, debugIconsSize));
-                                    bb.position = splinePoint;
+                                    if(step == 0) // SplinePath start
+                                    {
+                                        bb.color = debugIconsColors[ICON_COLOR_SPLINE_PATH_BEGIN];
+                                        bb.size = ClampToIconMaxSize(Max(debugIconsSize * stepDistance, debugIconsSize));
+                                        bb.position = splinePoint;
+                                    }
+                                    else if((step+1) >= (splinePathResolution - splineStep)) // SplinePath end
+                                    {
+                                        bb.color = debugIconsColors[ICON_COLOR_SPLINE_PATH_END];
+                                        bb.size = ClampToIconMaxSize(Max(debugIconsSize * stepDistance, debugIconsSize));
+                                        bb.position = splinePoint;
+                                    }
+                                    else // SplinePath middle points
+                                    {
+                                        bb.color = finalIconColor;
+                                        bb.size = ClampToIconMaxSize(Max(debugIconsSizeSmall * stepDistance, debugIconsSizeSmall));
+                                        bb.position = splinePoint;
+                                    }
+                                    bb.enabled = sp.enabled;
+                                    // Blend Icon relatively by distance to it
+                                    bb.color = Color(bb.color.r, bb.color.g, bb.color.b, 1.2f - 1.0f / (debugIconsMaxSize.x / bb.size.x));
+                                    if (bb.color.a < 0.25f) bb.enabled = false;
                                 }
-                                else if((step+1) >= (splinePathResolution - splineStep)) // SplinePath end
-                                {
-                                    bb.color = debugIconsColors[ICON_COLOR_SPLINE_PATH_END];
-                                    bb.size = ClampToIconMaxSize(Max(debugIconsSize * stepDistance, debugIconsSize));
-                                    bb.position = splinePoint;
-                                }
-                                else // SplinePath middle points
-                                {
-                                    bb.color = finalIconColor;
-                                    bb.size = ClampToIconMaxSize(Max(debugIconsSizeSmall * stepDistance, debugIconsSizeSmall));
-                                    bb.position = splinePoint;
-                                }
-                                bb.enabled = sp.enabled;
-                                // Blend Icon relatively by distance to it
-                                bb.color = Color(bb.color.r, bb.color.g, bb.color.b, 1.2f - 1.0f / (debugIconsMaxSize.x / bb.size.x));
-                                if (bb.color.a < 0.25f) bb.enabled = false;
                             }
-                        }
                     }
                     else
                     {
