@@ -1283,7 +1283,13 @@ void UpdateView(float timeStep)
                 else if (input.keyDown[KEY_LCTRL])
                     cameraNode.Translate(Vector3(-cameraBaseSpeed,0, 0) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
                 else
-                    cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+                {
+                    Vector3 center = SelectedNodesCenterPoint();
+                    float distance = (cameraNode.worldPosition - center).length;
+                    float ratio = distance / 40.0f;
+                    float factor = ratio < 1.0f ? ratio : 1.0f; 
+                    cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*40*factor*timeStep*speedMultiplier);
+                }
             }
             else
             {   
