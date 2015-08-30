@@ -138,6 +138,10 @@ void UpdateViewDebugIcons()
             // Clear old data
             if(iconType == ICON_SPLINE_PATH)
                 ClearCommit(ICON_SPLINE_PATH, ICON_SPLINE_PATH+1, nodes.length * splinePathResolution);
+            else if(iconType==ICON_POINT_LIGHT || iconType==ICON_SPOT_LIGHT || iconType==ICON_DIRECTIONAL_LIGHT)
+                ClearCommit(ICON_POINT_LIGHT, ICON_DIRECTIONAL_LIGHT+1, nodes.length);
+            else if(iconType==ICON_SOUND_SOURCE || iconType==ICON_SOUND_SOURCE_3D)
+                ClearCommit(ICON_SOUND_SOURCE, ICON_SOUND_SOURCE_3D+1, nodes.length);
             else
                 ClearCommit(iconType, iconType+1, nodes.length);
             
