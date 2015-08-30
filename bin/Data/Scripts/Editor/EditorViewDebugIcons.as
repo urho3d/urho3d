@@ -62,7 +62,7 @@ int timeToNextDebugIconsUpdateSplinePath = 0;
 const int splinePathResolution = 16;
 const float splineStep = 1.0f / splinePathResolution;
 bool debugIconsShow = true;
-Vector2 debugIconsSize = Vector2(0.025, 0.025);
+Vector2 debugIconsSize = Vector2(0.015, 0.015);
 Vector2 debugIconsSizeSmall = debugIconsSize / 1.5;
 Vector2 debugIconsSizeBig = debugIconsSize * 1.5;
 Vector2 debugIconsMaxSize = debugIconsSize * 50;
@@ -207,7 +207,7 @@ void UpdateViewDebugIcons()
 
                         if(iconType==ICON_PARTICLE_EMITTER)
                         {
-                            bb.size = ClampToIconMaxSize(Max(debugIconsSizeBig * distance, debugIconsSizeBig));
+                            bb.size = ClampToIconMaxSize(Max(debugIconsSize * distance, debugIconsSize));
                         }
                         else if (iconType==ICON_TRIGGER)
                         {
