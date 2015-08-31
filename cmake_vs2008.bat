@@ -20,4 +20,4 @@
 :: THE SOFTWARE.
 ::
 
-@%~dp0\cmake_generic.bat %* -VS="9 2008"
+@"%~dp0cmake_generic.bat" %* -VS="9 2008"
