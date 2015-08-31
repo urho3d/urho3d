@@ -99,12 +99,12 @@ void CreateDebugIcons(Node@ tempNode)
     }
 }
 
-void UpdateViewDebugIcons() 
-{    
+void UpdateViewDebugIcons()
+{
     if (editorScene is null || timeToNextDebugIconsUpdate > time.systemTime) return;
-    
+
     debugIconsNode = editorScene.GetChild("DebugIconsContainer", true);
-    
+
     if (debugIconsNode is null) 
     {
         debugIconsNode = editorScene.CreateChild("DebugIconsContainer", LOCAL);
@@ -128,24 +128,24 @@ void UpdateViewDebugIcons()
 
     for(int iconType=0; iconType<ICON_COUNT; iconType++)
     {
-        if(debugIconsSet[iconType] !is null)
+        if (debugIconsSet[iconType] !is null)
         {
             // SplinePath update resolution
-            if(iconType == ICON_SPLINE_PATH && timeToNextDebugIconsUpdateSplinePath > time.systemTime) continue;
+            if (iconType == ICON_SPLINE_PATH && timeToNextDebugIconsUpdateSplinePath > time.systemTime) continue;
 
             Array<Node@> nodes = editorScene.GetChildrenWithComponent(ComponentTypes[iconType], true);
-            
+
             // Clear old data
-            if(iconType == ICON_SPLINE_PATH)
+            if (iconType == ICON_SPLINE_PATH)
                 ClearCommit(ICON_SPLINE_PATH, ICON_SPLINE_PATH+1, nodes.length * splinePathResolution);
-            else if(iconType==ICON_POINT_LIGHT || iconType==ICON_SPOT_LIGHT || iconType==ICON_DIRECTIONAL_LIGHT)
+            else if (iconType==ICON_POINT_LIGHT || iconType==ICON_SPOT_LIGHT || iconType==ICON_DIRECTIONAL_LIGHT)
                 ClearCommit(ICON_POINT_LIGHT, ICON_DIRECTIONAL_LIGHT+1, nodes.length);
-            else if(iconType==ICON_SOUND_SOURCE || iconType==ICON_SOUND_SOURCE_3D)
+            else if (iconType==ICON_SOUND_SOURCE || iconType==ICON_SOUND_SOURCE_3D)
                 ClearCommit(ICON_SOUND_SOURCE, ICON_SOUND_SOURCE_3D+1, nodes.length);
             else
                 ClearCommit(iconType, iconType+1, nodes.length);
-            
-            if(nodes.length > 0)
+
+            if (nodes.length > 0)
             {
 
                 // Fill with new data
@@ -161,11 +161,11 @@ void UpdateViewDebugIcons()
                     int iconsOffset = debugIconsPlacement[StringHash(nodes[i].id)].GetInt();
                     float iconsYPos = 0;
 
-                    if(iconType==ICON_SPLINE_PATH)
+                    if (iconType==ICON_SPLINE_PATH)
                     {
                         SplinePath@ sp = cast<SplinePath>(component);
-                        if(sp !is null)
-                            if(sp.length > 0.01f)
+                        if (sp !is null)
+                            if (sp.length > 0.01f)
                             {
                                 for(int step=0; step < splinePathResolution; step++)
                                 {
@@ -175,13 +175,13 @@ void UpdateViewDebugIcons()
                                     float stepDistance = (camPos - splinePoint).length;
                                     if (isOrthographic) stepDistance = debugIconsOrthoDistance;
 
-                                    if(step == 0) // SplinePath start
+                                    if (step == 0) // SplinePath start
                                     {
                                         bb.color = debugIconsColors[ICON_COLOR_SPLINE_PATH_BEGIN];
                                         bb.size = ClampToIconMaxSize(Max(debugIconsSize * stepDistance, debugIconsSize));
                                         bb.position = splinePoint;
                                     }
-                                    else if((step+1) >= (splinePathResolution - splineStep)) // SplinePath end
+                                    else if ((step+1) >= (splinePathResolution - splineStep)) // SplinePath end
                                     {
                                         bb.color = debugIconsColors[ICON_COLOR_SPLINE_PATH_END];
                                         bb.size = ClampToIconMaxSize(Max(debugIconsSize * stepDistance, debugIconsSize));
@@ -205,7 +205,7 @@ void UpdateViewDebugIcons()
                         bb = debugIconsSet[iconType].billboards[i];
                         bb.size = ClampToIconMaxSize(Max(debugIconsSize * distance, debugIconsSize));
 
-                        if(iconType==ICON_PARTICLE_EMITTER)
+                        if (iconType==ICON_PARTICLE_EMITTER)
                         {
                             bb.size = ClampToIconMaxSize(Max(debugIconsSize * distance, debugIconsSize));
                         }
@@ -220,13 +220,13 @@ void UpdateViewDebugIcons()
                         else if (iconType==ICON_POINT_LIGHT || iconType==ICON_SPOT_LIGHT || iconType==ICON_DIRECTIONAL_LIGHT)
                         {
                             Light@ light = cast<Light>(component);
-                            if(light !is null)
+                            if (light !is null)
                             {
-                                if(light.lightType == LIGHT_POINT)
+                                if (light.lightType == LIGHT_POINT)
                                     bb = debugIconsSet[ICON_POINT_LIGHT].billboards[i];
-                                else if(light.lightType == LIGHT_DIRECTIONAL)
+                                else if (light.lightType == LIGHT_DIRECTIONAL)
                                     bb = debugIconsSet[ICON_DIRECTIONAL_LIGHT].billboards[i];
-                                else if(light.lightType == LIGHT_SPOT)
+                                else if (light.lightType == LIGHT_SPOT)
                                     bb = debugIconsSet[ICON_SPOT_LIGHT].billboards[i];
 
                                 bb.size = ClampToIconMaxSize(Max(debugIconsSize * distance, debugIconsSize));
@@ -245,7 +245,7 @@ void UpdateViewDebugIcons()
                 }
                 Commit(iconType, iconType+1);
                 // SplinePath update resolution
-                if(iconType == ICON_SPLINE_PATH) timeToNextDebugIconsUpdateSplinePath = time.systemTime + stepDebugIconsUpdateSplinePath;
+                if (iconType == ICON_SPLINE_PATH) timeToNextDebugIconsUpdateSplinePath = time.systemTime + stepDebugIconsUpdateSplinePath;
             }
         }
     }
@@ -272,7 +272,7 @@ void Commit(int begin, int end)
 
 void IncrementIconPlacement(bool componentEnabled, Node@ node, int offset)
 {
-    if(componentEnabled == true)
+    if (componentEnabled == true)
     {
         int oldPlacement = debugIconsPlacement[StringHash(node.id)].GetInt();
         debugIconsPlacement[StringHash(node.id)] = Variant(oldPlacement + offset);

@@ -325,7 +325,7 @@ void SetID(Text@ text, Serializable@ serializable, int itemType = ITEM_NONE)
 
     text.vars[TYPE_VAR] = itemType;
     text.vars[ID_VARS[itemType]] = GetID(serializable, itemType);
-    
+
     // Set node ID as drag and drop content for node ID editing
     if (itemType == ITEM_NODE)
         text.vars[DRAGDROPCONTENT_VAR] = String(text.vars[NODE_ID_VAR].GetUInt());
@@ -468,7 +468,7 @@ String GetNodeTitle(Node@ node)
     else
         ret = node.name;
     
-    if (showID) 
+    if (showID)
     {
         if (node.id >= FIRST_LOCAL_ID)
             ret += " (Local " + String(node.id) + ")";
@@ -486,7 +486,7 @@ String GetComponentTitle(Component@ component)
 {
     String ret = component.typeName;
     
-    if (showID) 
+    if (showID)
     {
         if (component.id >= FIRST_LOCAL_ID)
             ret += " (Local)";
@@ -504,7 +504,7 @@ void SelectNode(Node@ node, bool multiselect)
         hierarchyList.ClearSelection();
         return;
     }
-    
+
     lastSelectedNode = node;
     uint index = GetListIndex(node);
     uint numItems = hierarchyList.numItems;
@@ -753,9 +753,9 @@ void HandleHierarchyListDoubleClick(StringHash eventType, VariantMap& eventData)
         Node@ node = editorScene.GetNode(item.vars[NODE_ID_VAR].GetUInt());
         LocateNode(node);
     }
-    
+
     bool isExpanded = hierarchyList.IsExpanded(hierarchyList.selection);
-    
+
     if (!isExpanded && eventData["Button"].GetInt() == MOUSEB_LEFT) 
     {
         isExpanded = !isExpanded;  
@@ -1547,17 +1547,16 @@ bool Paste()
     return false;
 }
 
-bool BlenderModeDelete() 
+bool BlenderModeDelete()
 {
-    // In this place maybe placed avoidance flags that not allow delete in some cases
-    
-    if (ui.focusElement is null) 
-    {    
+    if (ui.focusElement is null)
+    {
         Array<UIElement@> actions;
         actions.Push(CreateContextMenuItem("Delete?", "HandleBlenderModeDelete"));
         actions.Push(CreateContextMenuItem("Cancel", "HandleEmpty"));
-        
-        if (actions.length > 0) {
+
+        if (actions.length > 0) 
+        {
             ActivateContextMenu(actions);
             return true;
         }
@@ -1757,16 +1756,16 @@ void HandleHierarchyContextUIElementCloseAllUILayouts()
     CloseAllUILayouts();
 }
 
-void CollapseHierarchy() 
+void CollapseHierarchy()
 {
-    Array<uint> oldSelections = hierarchyList.selections;    
+    Array<uint> oldSelections = hierarchyList.selections;
     Array<uint> selections = {0};
-    
+
     hierarchyList.SetSelections(selections);
-    
+
     for (uint i = 0; i < selections.length; ++i)
-        hierarchyList.Expand(selections[i], false, true);  
-            
+        hierarchyList.Expand(selections[i], false, true);
+
     // only scene's scope expand by default
     hierarchyList.Expand(0, true, false);
     
