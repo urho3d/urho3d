@@ -1369,6 +1369,7 @@ void BuildAndSaveAnimations(OutModel* model)
             {
                 const MontionKey& mk = motionKeys[i];
                 XMLElement mkXML = root.CreateChild("key");
+                mkXML.SetInt("frame", i);
                 mkXML.SetFloat("time", mk.time_);
                 mkXML.SetVector3("translation", mk.translation_);
                 mkXML.SetFloat("rotation", mk.rotation_);
