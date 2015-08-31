@@ -1367,13 +1367,26 @@ void BuildAndSaveAnimations(OutModel* model)
 
             for (size_t i=0; i<motionKeys.Size(); ++i)
             {
-                const MontionKey& mk = motionKeys[i];
+                MontionKey& mk = motionKeys[i];
                 XMLElement mkXML = root.CreateChild("key");
-                mkXML.SetInt("frame", i);
                 mkXML.SetFloat("time", mk.time_);
                 mkXML.SetVector3("translation", mk.translation_);
-                mkXML.SetFloat("rotation", mk.rotation_);
-                PrintLine("motion translation=" + String(mk.translation_) + " rotation=" + String(mk.rotation_));
+                float rotation = mk.rotation_;
+                if (i > 0)
+                {
+                    float diff = rotation - motionKeys[i-1].rotation_;
+                    if (diff >= 180)
+                    {
+                        if (rotation <= 0)
+                            rotation += 360;
+                        if (rotation > 0)
+                            rotation -= 360;
+                        PrintLine("frame delta rotation >= 180 flip from " + String(mk.rotation_) + " to " + String(rotation));
+                        mk.rotation_ = rotation;
+                    }
+                }
+                mkXML.SetFloat("rotation", rotation);
+                PrintLine("motion frame=" + String(i) + " translation=" + String(mk.translation_) + " rotation=" + String(mk.rotation_));
             }
 
             File outFile(context_);
