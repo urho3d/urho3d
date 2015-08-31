@@ -24,7 +24,9 @@
 
 #include "../Core/Profiler.h"
 #include "../Engine/EngineEvents.h"
+#include "../IO/FileSystem.h"
 #include "../IO/Log.h"
+#include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Script/Addons.h"
 #include "../Script/Script.h"
@@ -36,6 +38,32 @@
 
 namespace Urho3D
 {
+
+class ScriptResourceRouter : public ResourceRouter
+{
+    OBJECT(ScriptResourceRouter);
+
+    /// Construct.
+    ScriptResourceRouter(Context* context) :
+        ResourceRouter(context)
+    {
+    }
+
+    /// Check if request is for an AngelScript file and reroute to compiled version if necessary (.as file not available)
+    virtual void Route(String& name, ResourceRequest requestType)
+    {
+        String extension = GetExtension(name);
+        if (extension == ".as")
+        {
+            String replaced = ReplaceExtension(name, ".asc");
+            // Note: ResourceCache prevents recursive calls to the resource routers so this is OK, the nested Exists()
+            // check does not go through the router again
+            ResourceCache* cache = GetSubsystem<ResourceCache>();
+            if (!cache->Exists(name) && cache->Exists(replaced))
+                name = replaced;
+        }
+    }
+};
 
 Script::Script(Context* context) :
     Object(context),
@@ -101,6 +129,14 @@ Script::Script(Context* context) :
 
     // Subscribe to console commands
     SetExecuteConsoleCommands(true);
+
+    // Create and register resource router for checking for compiled AngelScript files
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    if (cache)
+    {
+        router_ = new ScriptResourceRouter(context_);
+        cache->AddResourceRouter(router_);
+    }
 }
 
 Script::~Script()
@@ -119,6 +155,10 @@ Script::~Script()
         scriptEngine_->Release();
         scriptEngine_ = 0;
     }
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    if (cache)
+        cache->RemoveResourceRouter(router_);
 }
 
 bool Script::Execute(const String& line)

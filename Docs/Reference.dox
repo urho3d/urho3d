@@ -624,11 +624,9 @@ Check the automatically built \ref ScriptAPI "Scripting API" documentation for t
 
 \section Script_Bytecode Precompiling scripts to bytecode
 
-Instead of compiling scripts from source on-the-fly during startup, they can also be precompiled to bytecode, then loaded. Use the \ref Tools_ScriptCompiler "ScriptCompiler" utility for this. In this case the resource request has to be pointed to the compiled file, which by default has the .asc extension:
+Instead of compiling scripts from source on-the-fly during startup, they can also be precompiled to bytecode, then loaded. Use the \ref Tools_ScriptCompiler "ScriptCompiler" utility for this.
 
-\code
-ScriptFile* file = GetSubsystem<ResourceCache>()->GetResource<ScriptFile>("Scripts/MyScript.asc");
-\endcode
+The Script subsystem will automatically redirect script file resource requests (.as) to the compiled versions (.asc) if the .as file does not exist. Making a final build of a scripted application could therefore involve compiling all the scripts with ScriptCompiler, then deleting the original .as files from the build.
 
 \section Scripting_Limitations Limitations
 

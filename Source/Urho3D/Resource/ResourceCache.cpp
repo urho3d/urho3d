@@ -70,6 +70,7 @@ ResourceCache::ResourceCache(Context* context) :
     autoReloadResources_(false),
     returnFailedResources_(false),
     searchPackagesFirst_(true),
+    isRouting_(false),
     finishBackgroundResourcesMs_(5)
 {
     // Register Resource library object factories
@@ -448,9 +449,31 @@ void ResourceCache::SetAutoReloadResources(bool enable)
     }
 }
 
-void ResourceCache::SetReturnFailedResources(bool enable)
+void ResourceCache::AddResourceRouter(ResourceRouter* router, bool addAsFirst)
 {
-    returnFailedResources_ = enable;
+    // Check for duplicate
+    for (unsigned i = 0; i < resourceRouters_.Size(); ++i)
+    {
+        if (resourceRouters_[i] == router)
+            return;
+    }
+
+    if (addAsFirst)
+        resourceRouters_.Insert(0, SharedPtr<ResourceRouter>(router));
+    else
+        resourceRouters_.Push(SharedPtr<ResourceRouter>(router));
+}
+
+void ResourceCache::RemoveResourceRouter(ResourceRouter* router)
+{
+    for (unsigned i = 0; i < resourceRouters_.Size(); ++i)
+    {
+        if (resourceRouters_[i] == router)
+        {
+            resourceRouters_.Erase(i);
+            return;
+        }
+    }
 }
 
 SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFailure)
@@ -458,9 +481,14 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFai
     MutexLock lock(resourceMutex_);
 
     String name = SanitateResourceName(nameIn);
-    if (resourceRouter_)
-        resourceRouter_->Route(name, RESOURCE_GETFILE);
-
+    if (!isRouting_)
+    {
+        isRouting_ = true;
+        for (unsigned i = 0; i < resourceRouters_.Size(); ++i)
+            resourceRouters_[i]->Route(name, RESOURCE_GETFILE);
+        isRouting_ = false;
+    }
+    
     if (name.Length())
     {
         File* file = 0;
@@ -484,7 +512,7 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFai
 
     if (sendEventOnFailure)
     {
-        if (resourceRouter_ && name.Empty() && !nameIn.Empty())
+        if (resourceRouters_.Size() && name.Empty() && !nameIn.Empty())
             LOGERROR("Resource request " + nameIn + " was blocked");
         else
             LOGERROR("Could not find resource " + name);
@@ -686,8 +714,13 @@ bool ResourceCache::Exists(const String& nameIn) const
     MutexLock lock(resourceMutex_);
 
     String name = SanitateResourceName(nameIn);
-    if (resourceRouter_)
-        resourceRouter_->Route(name, RESOURCE_CHECKEXISTS);
+    if (!isRouting_)
+    {
+        isRouting_ = true;
+        for (unsigned i = 0; i < resourceRouters_.Size(); ++i)
+            resourceRouters_[i]->Route(name, RESOURCE_CHECKEXISTS);
+        isRouting_ = false;
+    }
 
     if (name.Empty())
         return false;
@@ -741,6 +774,11 @@ String ResourceCache::GetResourceFileName(const String& name) const
     }
 
     return String();
+}
+
+ResourceRouter* ResourceCache::GetResourceRouter(unsigned index) const
+{
+    return index < resourceRouters_.Size() ? resourceRouters_[index] : (ResourceRouter*)0;
 }
 
 String ResourceCache::GetPreferredResourceDir(const String& path) const

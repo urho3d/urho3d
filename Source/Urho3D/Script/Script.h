@@ -37,6 +37,7 @@ namespace Urho3D
 
 extern const char* LOGIC_CATEGORY;
 
+class ResourceRouter;
 class Scene;
 class ScriptFile;
 class ScriptInstance;
@@ -130,6 +131,8 @@ private:
     Vector<asIScriptContext*> scriptFileContexts_;
     /// Search cache for inbuilt object types.
     HashMap<const char*, asIObjectType*> objectTypes_;
+    /// AngelScript resource router.
+    SharedPtr<ResourceRouter> router_;
     /// Script module create/delete mutex.
     Mutex moduleMutex_;
     /// Current script execution nesting level.
