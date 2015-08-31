@@ -62,6 +62,8 @@ Naturally you have to specify a fully qualified path to the build script for thi
 
 Our CMakeLists.txt files are designed to work with most of the generators supported by CMake: Makefile, Xcode, VS, and even Ninja. Which build script to use is determined by which CMake generator (and toolchain) you intend to use in your build tree. For native build, you can just use cmake_generic.sh or cmake_generic.bat to let CMake to detect and decide which generator to use automatically. CMake should default to use "Unix Makefiles" generator on Linux and Mac host systems and it should default to use 32-bit "Visual Studio" generator on Windows host system when it is installed.
 
+For Windows & Visual Studio, the path to Urho3D project or build tree should not contain spaces. Otherwise the build can be expected to fail.
+
 \section Build_Options Build options
 
 A number of build options can be defined when invoking the build scripts or when configurating the project interactively using cmake-gui. To use one of these build options on the command line interface, pass it in this format "-DOPTION=VALUE" without the quotes. Most of the build options are boolean variables where setting their values to 0 means disabling a feature or setting an option to false, while 1 means enabling a feature or setting an option to true. The table below shows all the available build options and their default values. Non-boolean build options generally do not have any default values and are marked with '-' in the table. However, a few build options marked with '*' have their default values set differently based on the value of other variables or external factors.
