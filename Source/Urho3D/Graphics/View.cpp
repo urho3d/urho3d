@@ -295,6 +295,7 @@ View::View(Context* context) :
     camera_(0),
     cameraZone_(0),
     farClipZone_(0),
+    occlusionBuffer_(0),
     renderTarget_(0),
     substituteRenderTarget_(0)
 {
@@ -644,7 +645,6 @@ void View::Render()
     octree_ = 0;
     cameraZone_ = 0;
     farClipZone_ = 0;
-    occlusionBuffer_ = 0;
     frame_.camera_ = 0;
 }
 
