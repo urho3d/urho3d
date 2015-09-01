@@ -133,7 +133,7 @@ public:
         
         return newBlock;
     }
-    
+private:
     /// Block name.
     char* name_;
     /// High-resolution timer for measuring the block duration.
