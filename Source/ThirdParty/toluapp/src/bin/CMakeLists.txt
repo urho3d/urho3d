@@ -60,7 +60,7 @@ if (EXISTS ${CMAKE_BINARY_DIR}/bin/tool/tolua++)
     file (GLOB TOLUA lua/*.lua)
     add_custom_command (OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/toluabind.c
         COMMAND ${CMAKE_BINARY_DIR}/bin/tool/tolua++ -o toluabind.c -H toluabind.h -n tolua tolua_scons.pkg
-        DEPENDS ${TOLUA}
+        DEPENDS ${TOLUA} tolua_scons.pkg
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating toluabind.c and toluabind.h")
 endif ()
