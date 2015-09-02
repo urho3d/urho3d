@@ -887,6 +887,10 @@ void UIElement::SetFocus(bool enable)
         enable = false;
 
     UI* ui = GetSubsystem<UI>();
+    // Can be null at exit time; no-op in that case
+    if (!ui)
+        return;
+
     if (enable)
     {
         if (ui->GetFocusElement() != this)
@@ -906,6 +910,11 @@ void UIElement::SetSelected(bool enable)
 
 void UIElement::SetVisible(bool enable)
 {
+    UI* ui = GetSubsystem<UI>();
+    // Can be null at exit time; no-op in that case
+    if (!ui)
+        return;
+
     if (enable != visible_)
     {
         visible_ = enable;
@@ -924,7 +933,7 @@ void UIElement::SetVisible(bool enable)
         // If the focus element becomes effectively hidden, clear focus
         if (!enable)
         {
-            UIElement* focusElement = GetSubsystem<UI>()->GetFocusElement();
+            UIElement* focusElement = ui->GetFocusElement();
             if (focusElement && !focusElement->IsVisibleEffective())
                 focusElement->SetFocus(false);
         }
@@ -1423,7 +1432,8 @@ float UIElement::GetDerivedOpacity() const
 
 bool UIElement::HasFocus() const
 {
-    return GetSubsystem<UI>()->GetFocusElement() == this;
+    UI* ui = GetSubsystem<UI>();
+    return ui ? ui->GetFocusElement() == this : false;
 }
 
 bool UIElement::IsVisibleEffective() const

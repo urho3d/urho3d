@@ -9,10 +9,10 @@ require "LuaScripts/Utilities/Sample"
 function Start()
     -- Execute the common startup for samples
     SampleStart()
-    
+
     -- Enable OS cursor
     input.mouseVisible = true
-    
+
     -- Load strings from JSON files and subscribe to the change language event
     InitLocalizationSystem()
 
@@ -63,14 +63,14 @@ function CreateGUI()
     window:AddChild(b)
     b:SetStyle("Button")
     b.minHeight = 24
-    
+
     local t = b:CreateChild("Text", "ButtonTextChangeLang")
     -- The showing text value will automatically change when language is changed
     t.autoLocalizable = true
     -- The text value used as a string identifier in this mode.
     -- Remember that a letter case of the id and of the lang name is important.
     t.text = "Press this button"
-    
+
     t:SetAlignment(HA_CENTER, VA_CENTER)
     t:SetStyle("Text")
     SubscribeToEvent(b, "Released", "HandleChangeLangButtonPressed")
@@ -82,17 +82,17 @@ function CreateGUI()
     t = b:CreateChild("Text", "ButtonTextQuit")
     t:SetAlignment(HA_CENTER, VA_CENTER)
     t:SetStyle("Text")
-    
+
     -- Manually set text in the current language
     t.text = localization:Get("quit")
-    
+
     SubscribeToEvent(b, "Released", "HandleQuitButtonPressed")
 end
 
 function CreateScene()
     scene_ = Scene:new()
     scene_:CreateComponent("Octree")
-    
+
     local zone = scene_:CreateComponent("Zone")
     zone.boundingBox = BoundingBox:new(-1000.0, 1000.0)
     zone.ambientColor = Color:new(0.5, 0.5, 0.5)

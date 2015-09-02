@@ -121,7 +121,7 @@ public:
     /// Enable or disable automatic reloading of resources as files are modified. Default false.
     void SetAutoReloadResources(bool enable);
     /// Enable or disable returning resources that failed to load. Default false. This may be useful in editing to not lose resource ref attributes.
-    void SetReturnFailedResources(bool enable);
+    void SetReturnFailedResources(bool enable) { returnFailedResources_ = enable; }
 
     /// Define whether when getting resources should check package files or directories first. True for packages, false for directories.
     void SetSearchPackagesFirst(bool value) { searchPackagesFirst_ = value; }
@@ -129,8 +129,10 @@ public:
     /// Set how many milliseconds maximum per frame to spend on finishing background loaded resources.
     void SetFinishBackgroundResourcesMs(int ms) { finishBackgroundResourcesMs_ = Max(ms, 1); }
 
-    /// Set the resource router object. By default there is none, so the routing process is skipped.
-    void SetResourceRouter(ResourceRouter* router) { resourceRouter_ = router; }
+    /// Add a resource router object. By default there is none, so the routing process is skipped.
+    void AddResourceRouter(ResourceRouter* router, bool addAsFirst = false);
+    /// Remove a resource router object.
+    void RemoveResourceRouter(ResourceRouter* router);
 
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails. Can be called from outside the main thread.
     SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
@@ -189,8 +191,8 @@ public:
     /// Return how many milliseconds maximum to spend on finishing background loaded resources.
     int GetFinishBackgroundResourcesMs() const { return finishBackgroundResourcesMs_; }
 
-    /// Return the resource router.
-    ResourceRouter* GetResourceRouter() const { return resourceRouter_; }
+    /// Return a resource router by index.
+    ResourceRouter* GetResourceRouter(unsigned index) const;
 
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories.
     String GetPreferredResourceDir(const String& path) const;
@@ -233,14 +235,16 @@ private:
     HashMap<StringHash, HashSet<StringHash> > dependentResources_;
     /// Resource background loader.
     SharedPtr<BackgroundLoader> backgroundLoader_;
-    /// Resource router.
-    SharedPtr<ResourceRouter> resourceRouter_;
+    /// Resource routers.
+    Vector<SharedPtr<ResourceRouter> > resourceRouters_;
     /// Automatic resource reloading flag.
     bool autoReloadResources_;
     /// Return failed resources flag.
     bool returnFailedResources_;
     /// Search priority flag.
     bool searchPackagesFirst_;
+    /// Resource routing flag to prevent endless recursion.
+    mutable bool isRouting_;
     /// How many milliseconds maximum per frame to spend on finishing background loaded resources.
     int finishBackgroundResourcesMs_;
 };

@@ -48,9 +48,9 @@ public:
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
 
-    /// Load buffer as chunk.
+    /// Load buffer as chunk. Return true if the resource is successfully loaded as a Lua function on top of the stack.
     bool LoadChunk(lua_State* luaState);
-    /// Load buffer as chunk and execute.
+    /// Load buffer as chunk and execute. Return true if successful.
     bool LoadAndExecute(lua_State* luaState);
 
 private:

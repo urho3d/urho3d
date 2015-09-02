@@ -38,7 +38,7 @@ if (WIN32)
     if (URHO3D_LIB_TYPE STREQUAL SHARED)
         set (LIB_NAME ${LIB_NAME}.dll)
         # When building shared library, a copy of the library must be available in the tool directory for the tools to work correctly as there is no RPATH for Windows platform
-        create_symlink (${CMAKE_BINARY_DIR}/bin/${LIB_NAME} ${CMAKE_BINARY_DIR}/bin/tool/${LIB_NAME})
+        create_symlink (${CMAKE_BINARY_DIR}/bin/${LIB_NAME} ${CMAKE_BINARY_DIR}/bin/tool/${LIB_NAME} FALLBACK_TO_COPY)
     endif ()
 endif ()
 
@@ -254,7 +254,7 @@ foreach (TARGET ${STATIC_LIBRARY_TARGETS})
             set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${FORCE_LOAD} ${ARCHIVE})    # Only works in Apple (Xcode and Makefile) and GCC while building shared library
         endif ()
         if (XCODE OR MSVC)
-            set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " ${ARCHIVE}")  # Only works in Apple (Xcode only) and MSVC while building static library
+            set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " \"${ARCHIVE}\"")  # Only works in Apple (Xcode only) and MSVC while building static library
         else ()
             list (APPEND ARCHIVES ${ARCHIVE})
         endif ()
@@ -272,18 +272,20 @@ if (NOT XCODE AND NOT MSVC)
                 COMMAND libtool -static $<TARGET_FILE:${TARGET_NAME}>.engine ${ARCHIVES} -o $<TARGET_FILE:${TARGET_NAME}>
                 COMMAND rm $<TARGET_FILE:${TARGET_NAME}>.engine
                 COMMENT "Merging all archives into a single static library using libtool")
-        elseif (EMSCRIPTEN)
+        elseif (EMSCRIPTEN OR CMAKE_BINARY_DIR MATCHES " ")
             # Emscripten emar (llvm-ar) neither takes archives directly as input nor supports MRI-style script, so do it the hard way by first extracting the object (bitcode) files and appending them to final archive
+            # Also do that when the build tree path contains spaces because MRI script does not support it (even with proper escape)
+            get_filename_component (AR ${CMAKE_AR} NAME_WE)
             if (CMAKE_HOST_WIN32)
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E remove_directory archives
-                    COMMAND ${CMAKE_COMMAND} -E echo "Merging all archives into a single static library using emar.bat")
+                    COMMAND ${CMAKE_COMMAND} -E echo "Merging all archives into a single static library using ${AR}")
                 foreach (ARCHIVE ${ARCHIVES})
                     # Merge per library because Window cmd shell does not handle long argument list
                     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory archives)
                     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                         COMMAND ${CMAKE_AR} x ${ARCHIVE}
-                        COMMAND ${CMAKE_COMMAND} -E echo_append "\\\"${CMAKE_AR}\\\"" q $<TARGET_FILE:${TARGET_NAME}>" " >merge.bat
+                        COMMAND ${CMAKE_COMMAND} -E echo_append "\\\"${CMAKE_AR}\\\"" q \\\"$<TARGET_FILE:${TARGET_NAME}>\\\" " " >merge.bat
                         COMMAND for /F %%i in ('dir /B') do ${CMAKE_COMMAND} -E echo_append %%i" " >>merge.bat
                         COMMAND merge.bat WORKING_DIRECTORY archives)
                     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E remove_directory archives)
@@ -292,7 +294,7 @@ if (NOT XCODE AND NOT MSVC)
             else ()
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E remove_directory archives
-                    COMMAND ${CMAKE_COMMAND} -E make_directory archives COMMENT "Merging all archives into a single static library using emar")
+                    COMMAND ${CMAKE_COMMAND} -E make_directory archives COMMENT "Merging all archives into a single static library using ${AR}")
                 foreach (ARCHIVE ${ARCHIVES})
                     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_AR} x ${ARCHIVE} WORKING_DIRECTORY archives)
                 endforeach ()

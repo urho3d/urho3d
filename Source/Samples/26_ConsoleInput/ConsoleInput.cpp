@@ -20,18 +20,15 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
-#include <Urho3D/UI/Button.h>
-#include <Urho3D/Engine/Console.h>
 #include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Core/Timer.h>
+#include <Urho3D/Engine/Console.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Engine/EngineEvents.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/IO/Log.h>
-#include <Urho3D/Core/ProcessUtils.h>
-#include <Urho3D/Math/Random.h>
-#include <Urho3D/Core/Timer.h>
+#include <Urho3D/UI/Button.h>
 
 #include "ConsoleInput.h"
 

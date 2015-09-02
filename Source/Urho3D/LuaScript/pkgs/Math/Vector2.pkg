@@ -55,7 +55,6 @@ class IntVector2
     IntVector2 operator - (const IntVector2& rhs) const;
     IntVector2 operator * (int rhs) const;
     IntVector2 operator / (int rhs) const;
-    IntVector2 operator / (int rhs) const;
 
     String ToString() const;
 

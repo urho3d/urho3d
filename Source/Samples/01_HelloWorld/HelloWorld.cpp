@@ -20,13 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
 #include <Urho3D/Core/CoreEvents.h>
-#include <Urho3D/Engine/Engine.h>
-#include <Urho3D/UI/Font.h>
-#include <Urho3D/Input/Input.h>
 #include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/UI.h>
 

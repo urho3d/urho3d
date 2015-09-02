@@ -209,8 +209,6 @@ The Application class provides a minimal framework for a Urho3D C++ application 
 will instantiate the Context object and then the user-specified application class. A minimal example, which would just display a blank rendering window and exit by pressing ESC:
 
 \code
-#include <Urho3D/Urho3D.h>
-
 #include <Urho3D/Engine/Application.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Input/InputEvents.h>
@@ -626,11 +624,9 @@ Check the automatically built \ref ScriptAPI "Scripting API" documentation for t
 
 \section Script_Bytecode Precompiling scripts to bytecode
 
-Instead of compiling scripts from source on-the-fly during startup, they can also be precompiled to bytecode, then loaded. Use the \ref Tools_ScriptCompiler "ScriptCompiler" utility for this. In this case the resource request has to be pointed to the compiled file, which by default has the .asc extension:
+Instead of compiling scripts from source on-the-fly during startup, they can also be precompiled to bytecode, then loaded. Use the \ref Tools_ScriptCompiler "ScriptCompiler" utility for this.
 
-\code
-ScriptFile* file = GetSubsystem<ResourceCache>()->GetResource<ScriptFile>("Scripts/MyScript.asc");
-\endcode
+The Script subsystem will automatically redirect script file resource requests (.as) to the compiled versions (.asc) if the .as file does not exist. Making a final build of a scripted application could therefore involve compiling all the scripts with ScriptCompiler, then deleting the original .as files from the build.
 
 \section Scripting_Limitations Limitations
 
@@ -698,9 +694,9 @@ However, Lua script files in Urho3D are loaded into the interpreter via Urho3D's
 
 For a single script that you wish to step through, you can use \ref LuaScript::ExecuteRawFile "ExecuteRawFile()", which will load the script from the file system directly into the Lua interpreter, making the source available to debuggers that rely on it. There are a couple of caveats with this:
 - The file has has to be on the file system, within a resource directory, and not packaged.
-- If the script uses `require()` to import a second script, then that second script will not be available for the debugger in the same way, since internally the second script is passed to Lua via the resource cache.
+- If the script uses require() to import a second script, then that second script will not be available for the debugger in the same way, since internally the second script is passed to Lua via the resource cache.
 
-To get around the second caveat, and avoid changing method calls, use the CMake flag `URHO3D_LUA_RAW_SCRIPT_LOADER`.  This will force Urho3D to attempt to load scripts from the file system by default, before falling back on the resource cache.  You can then use \ref LuaScript::ExecuteFile "ExecuteFile()", as above, and disable the CMake option for production if required.
+To get around the second caveat, and avoid changing method calls, use the URHO3D_LUA_RAW_SCRIPT_LOADER build option.  This will force Urho3D to attempt to load scripts from the file system by default, before falling back on the resource cache.  You can then use \ref LuaScript::ExecuteFile "ExecuteFile()", as above, and disable the CMake option for production if required.
 
 \section LuaScripting_ScriptObjects Script objects
 
@@ -765,7 +761,7 @@ The binding of Urho3D C++ classes is accomplished with the tolua++ library, whic
 
 As seen above from the event handling examples, VariantMap handling is similar to both C++ and AngelScript. To get a variant object back from a map, index the map by its key as a string. A nil value is returned when the map's key does not exist. Then use one of the variant getter method to return the actual Lua object stored inside the variant object. These getter methods normally do not take any parameter, except GetPtr() and GetVoidPtr() which take a string parameter representing a Lua user type that the method would use to cast the return object into. The GetPtr() is used to get a reference counted object while the GetVoidPtr() is used to get a POD value object.
 
-You can also use the VariantMap as a pseudo Lua table to store any variant value objects in your script. The VariantMap class would try its best to convert any Lua object into a variant object and store the variant object using the provided key as index. The key can be a string or an unsigned integer. When a particular data type conversion is not being supported yet, an empty variant object would be stored instead. So, be careful if you are using this feature.
+You can also use the VariantMap as a pseudo Lua table to store any variant value objects in your script. The VariantMap class would try its best to convert any Lua object into a variant object and store the variant object using the provided key as index. The key can be a string or an unsigned integer or even a StringHash object. When a particular data type conversion is not being supported yet, an empty variant object would be stored instead. So, be careful if you are using this feature. You can also use one of the Variant class constructors to construct a %Variant object first before assigning it to the VariantMap, but this operation would be slower than direct conversion. The purpose of using VariantMap in this way is to facilitate objects passing between Lua and C++ as has been shown in the event handling mechanism above. When creating objects on Lua side, you have to make sure they are not garbage collected by Lua while there are still references pointing to them on C++ side, especially when the objects are not reference counted.
 
 \code
 local myMap = VariantMap()
@@ -781,14 +777,27 @@ print(myMap["I am a table"]:GetRawBuffer()[3], myMap["I am a table"]:GetRawBuffe
 -- output: 255    200
 
 local hash = StringHash("secret key")
-myMap[hash.value] = Vector2(3, 4)
-print(myMap[hash.value].typeName, myMap[hash.value]:GetVector2():Length())
+myMap[hash] = Vector2(3, 4)
+print(myMap[hash].typeName, myMap[hash]:GetVector2():Length())
 -- output: Vector2    5
 \endcode
 
 As shown in the above example, you can either use GetRawBuffer() or GetBuffer() to get the unsigned char array stored in a variant object. It also shows that VariantMap is capable of converting a Lua table containing an array of unsigned char to a variant object stored as buffer. You may want to know that it is capable of converting a Lua table containing an array of variant objects or an array of string objects to be stored as VariantVector and StringVector, respectively, as well. It also converts any Lua primitive data types and all Urho3D classes that are exposed to Lua like all the math classes, reference counted classes, POD classes, resource reference class. etc.
 
+Inline with C++ and AngelScript, in Lua you have to call one of the %Variant's getter method to "unbox" the actual object stored inside a %Variant object. However, specifically in Lua, there is a generic Get() method which takes advantage of Lua being type less, so the method can unbox a %Variant object and return the stored object as a type less Lua object. It takes one optional string parameter representing a Lua user type that the method would use to cast the return object into. The parameter is used for cases where a type casting is required when returning object from %Variant object storing a void pointer or a refcounted pointer. The type casting could also be optional such as for the case of requesting a %VectorBuffer to be returned for %Variant object storing an unsigned char buffer or requesting an unsigned or %StringHash to be returned for %Variant object storing an integer value. The parameter is ignored for all other cases. Following up to use the same example above, we can index the map and access the stored objects as so:
+
+\code
+print(myMap[1]:Get("Spline").interpolationMode)
+print(myMap["I am a table"]:Get("VectorBuffer"):ReadByte())
+print(myMap["I am a table"]:Get()[2])
+print(myMap[hash]:Get():Length())
+\endcode
+
+There is also a generic Set() method for %Variant class to cope with Lua does not support assignment operator overload. The Set() method takes a single parameter which can be anything in Lua that is convertible into a %Variant, including nil value which is stored as an empty %Variant. Use this method when you need to assign a value into an existing %Variant object.
+
 For the rest of the functions and classes, see the generated \ref LuaScriptAPI "Lua script API reference". Also, look at the Lua counterparts of the sample applications in the bin/Data/LuaScripts directory and compare them to the C++ and AngelScript versions to familiarize yourself with how things are done on the Lua side.
+
+One more thing to note about our Lua scripting implementation is its two-way conversion between C++ collection containers (Vector and PODVector) and Lua arrays (table of non-POD and table of POD objects, respectively). The conversion is done automatically when the collection crosses the C++/Lua boundary. The generated \ref LuaScriptAPI "Lua script API reference" page does not reflect this fact correctly. When obtaining a collection of objects using the Lua script API, you should treat it as a Lua table despite the documentation page stated a Vector or PODVector user type is being returned.
 
 \section LuaScripting_Allocation Object allocation & Lua garbage collection
 

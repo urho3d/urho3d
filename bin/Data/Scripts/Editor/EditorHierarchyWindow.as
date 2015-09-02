@@ -1404,6 +1404,7 @@ void HandleTemporaryChanged(StringHash eventType, VariantMap& eventData)
     Component@ component = cast<Component>(serializable);
     if (component !is null && component.node !is null && component.node.scene is editorScene)
     {
+        node = component.node;
         if (showTemporaryObject)
             UpdateHierarchyItemText(GetComponentListIndex(component), node.enabled);
         else if (!component.temporary && GetComponentListIndex(component) == NO_ITEM)

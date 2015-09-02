@@ -39,3 +39,23 @@
  */
 
 #define URHO3D_API __attribute__((visibility("default")))
+
+namespace Urho3D
+{
+
+// Suppressing false positive due to (ARRAY_VS_SINGLETON) out-of-bound access
+//
+// FIXME: For some reasons below does not work, probably it generated a different mangled name than the one it supposes to replace
+//
+class URHO3D_API VectorBase {};
+template <class T> class Vector : public VectorBase
+{
+public:
+    void Push(const T& value)
+    {
+        T array[] = {value};
+        Resize(size_ + 1, array);
+    }
+};
+
+}

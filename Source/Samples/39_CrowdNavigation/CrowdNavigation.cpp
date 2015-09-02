@@ -20,38 +20,30 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Graphics/AnimatedModel.h>
 #include <Urho3D/Graphics/AnimationController.h>
 #include <Urho3D/Graphics/Camera.h>
-#include <Urho3D/Core/CoreEvents.h>
-#include <Urho3D/UI/Cursor.h>
 #include <Urho3D/Graphics/DebugRenderer.h>
-#include <Urho3D/Engine/Engine.h>
-#include <Urho3D/UI/Font.h>
 #include <Urho3D/Graphics/Graphics.h>
-#include <Urho3D/Input/Input.h>
 #include <Urho3D/Graphics/Light.h>
 #include <Urho3D/Graphics/Material.h>
-#include <Urho3D/Math/MathDefs.h>
-#include <Urho3D/Graphics/Model.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Input/Input.h>
 #include <Urho3D/Navigation/CrowdAgent.h>
-#include <Urho3D/Navigation/CrowdManager.h>
 #include <Urho3D/Navigation/DynamicNavigationMesh.h>
 #include <Urho3D/Navigation/Navigable.h>
 #include <Urho3D/Navigation/NavigationEvents.h>
 #include <Urho3D/Navigation/Obstacle.h>
-#include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Navigation/OffMeshConnection.h>
-#include <Urho3D/Graphics/Renderer.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
-#include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/UI.h>
-#include <Urho3D/Resource/XMLFile.h>
-#include <Urho3D/Graphics/Zone.h>
 
 #include "CrowdNavigation.h"
 

@@ -343,6 +343,9 @@ void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& r
 {
     PROFILE(PhysicsRaycast);
 
+    if (maxDistance >= M_INFINITY)
+        LOGWARNING("Infinite maxDistance in physics raycast is not supported");
+
     btCollisionWorld::AllHitsRayResultCallback
         rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ + maxDistance * ray.direction_));
     rayCallback.m_collisionFilterGroup = (short)0xffff;
@@ -366,6 +369,9 @@ void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& r
 void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask)
 {
     PROFILE(PhysicsRaycastSingle);
+
+    if (maxDistance >= M_INFINITY)
+        LOGWARNING("Infinite maxDistance in physics raycast is not supported");
 
     btCollisionWorld::ClosestRayResultCallback
         rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ + maxDistance * ray.direction_));
@@ -393,6 +399,9 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
 void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask)
 {
     PROFILE(PhysicsSphereCast);
+
+    if (maxDistance >= M_INFINITY)
+        LOGWARNING("Infinite maxDistance in physics sphere cast is not supported");
 
     btSphereShape shape(radius);
 
@@ -444,7 +453,16 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, CollisionShape* shap
         proxy->m_collisionFilterGroup = 0;
     }
 
-    ConvexCast(result, shape->GetCollisionShape(), startPos, startRot, endPos, endRot, collisionMask);
+    // Take the shape's offset position & rotation into account
+    Node* shapeNode = shape->GetNode();
+    Matrix3x4 startTransform(startPos, startRot, shapeNode ? shapeNode->GetWorldScale() : Vector3::ONE);
+    Matrix3x4 endTransform(endPos, endRot, shapeNode ? shapeNode->GetWorldScale() : Vector3::ONE);
+    Vector3 effectiveStartPos = startTransform * shape->GetPosition();
+    Vector3 effectiveEndPos = endTransform * shape->GetPosition();
+    Quaternion effectiveStartRot = startRot * shape->GetRotation();
+    Quaternion effectiveEndRot = endRot * shape->GetRotation();
+
+    ConvexCast(result, shape->GetCollisionShape(), effectiveStartPos, effectiveStartRot, effectiveEndPos, effectiveEndRot, collisionMask);
 
     // Restore the collision group
     if (proxy)

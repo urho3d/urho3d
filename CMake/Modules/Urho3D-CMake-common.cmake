@@ -755,7 +755,7 @@ macro (enable_pch HEADER_PATHNAME)
                     endif ()
                 endif ()
                 string (REPLACE ";" " -D" COMPILE_DEFINITIONS "-D${COMPILE_DEFINITIONS}")
-                string (REPLACE ";" " -I" INCLUDE_DIRECTORIES "-I${INCLUDE_DIRECTORIES}")
+                string (REPLACE ";" "\" -I\"" INCLUDE_DIRECTORIES "-I\"${INCLUDE_DIRECTORIES}\"")
                 # Make sure the precompiled headers are not stale by creating custom rules to re-compile the header as necessary
                 file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
                 foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
@@ -775,7 +775,8 @@ macro (enable_pch HEADER_PATHNAME)
                             "However, if you think there is something wrong with our build system then kindly file a bug report to the project devs.")
                     endif ()
                     file (STRINGS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps DEPS)
-                    string (REGEX REPLACE "^deps: *| *\\; +" ";" DEPS ${DEPS})
+                    string (REGEX REPLACE "^deps: *| *\\; *" ";" DEPS ${DEPS})
+                    string (REGEX REPLACE "\\\\ " "\ " DEPS "${DEPS}")  # Need to stringify the second time to preserve the semicolons
                     # Create the rule that depends on the included headers
                     add_custom_command (OUTPUT ${HEADER_FILENAME}.${CONFIG}.pch.trigger
                         COMMAND ${CMAKE_${LANG}_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${ABS_HEADER_PATHNAME}
@@ -794,7 +795,7 @@ macro (enable_pch HEADER_PATHNAME)
                     if (FILE MATCHES \\.${EXT}$)
                         get_property (NO_PCH SOURCE ${FILE} PROPERTY NO_PCH)
                         if (NOT NO_PCH)
-                            set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -include ${ABS_PATH_PCH}")
+                            set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -include \"${ABS_PATH_PCH}\"")
                         endif ()
                     endif ()
                 endforeach ()

@@ -874,11 +874,31 @@ public:
     /// Set buffer type from a memory area.
     void SetBuffer(const void* data, unsigned size);
 
-    /// Return int or zero on type mismatch.
-    int GetInt() const { return type_ == VAR_INT ? value_.int_ : 0; }
+    /// Return int or zero on type mismatch. Floats and doubles are converted.
+    int GetInt() const
+    {
+        if (type_ == VAR_INT)
+            return value_.int_;
+        else if (type_ == VAR_FLOAT)
+            return (int)value_.float_;
+        else if (type_ == VAR_DOUBLE)
+            return (int)*reinterpret_cast<const double*>(&value_);
+        else
+            return 0;
+    }
 
-    /// Return unsigned int or zero on type mismatch.
-    unsigned GetUInt() const { return type_ == VAR_INT ? (unsigned)value_.int_ : 0; }
+    /// Return unsigned int or zero on type mismatch. Floats and doubles are converted.
+    unsigned GetUInt() const
+    {
+        if (type_ == VAR_INT)
+            return value_.int_;
+        else if (type_ == VAR_FLOAT)
+            return (unsigned)value_.float_;
+        else if (type_ == VAR_DOUBLE)
+            return (unsigned)*reinterpret_cast<const double*>(&value_);
+        else
+            return 0;
+    }
 
     /// Return StringHash or zero on type mismatch.
     StringHash GetStringHash() const { return StringHash(GetUInt()); }
@@ -886,11 +906,31 @@ public:
     /// Return bool or false on type mismatch.
     bool GetBool() const { return type_ == VAR_BOOL ? value_.bool_ : false; }
 
-    /// Return float or zero on type mismatch.
-    float GetFloat() const { return type_ == VAR_FLOAT ? value_.float_ : 0.0f; }
+    /// Return float or zero on type mismatch. Ints and doubles are converted.
+    float GetFloat() const
+    {
+        if (type_ == VAR_FLOAT)
+            return value_.float_;
+        else if (type_ == VAR_DOUBLE)
+            return (float)*reinterpret_cast<const double*>(&value_);
+        else if (type_ == VAR_INT)
+            return (float)value_.int_;
+        else
+            return 0.0f;
+    }
 
-    /// Return double or zero on type mismatch.
-    double GetDouble() const { return type_ == VAR_DOUBLE ? *reinterpret_cast<const double*>(&value_) : 0.0; }
+    /// Return double or zero on type mismatch. Ints and floats are converted.
+    double GetDouble() const
+    {
+        if (type_ == VAR_DOUBLE)
+            return *reinterpret_cast<const double*>(&value_);
+        else if (type_ == VAR_FLOAT)
+            return (double)value_.float_;
+        else if (type_ == VAR_INT)
+            return (double)value_.int_;
+        else
+            return 0.0;
+    }
 
     /// Return Vector2 or zero on type mismatch.
     const Vector2& GetVector2() const { return type_ == VAR_VECTOR2 ? *reinterpret_cast<const Vector2*>(&value_) : Vector2::ZERO; }

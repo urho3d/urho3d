@@ -20,22 +20,18 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
-#include <Urho3D/UI/Button.h>
-#include <Urho3D/UI/BorderImage.h>
-#include <Urho3D/UI/CheckBox.h>
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Graphics/Graphics.h>
-#include <Urho3D/Input/Input.h>
-#include <Urho3D/UI/LineEdit.h>
-#include <Urho3D/Resource/ResourceCache.h>
-#include <Urho3D/UI/Text.h>
 #include <Urho3D/Graphics/Texture2D.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/UI/Button.h>
+#include <Urho3D/UI/CheckBox.h>
+#include <Urho3D/UI/LineEdit.h>
+#include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/ToolTip.h>
 #include <Urho3D/UI/UI.h>
-#include <Urho3D/UI/UIElement.h>
 #include <Urho3D/UI/UIEvents.h>
 #include <Urho3D/UI/Window.h>
 
@@ -69,7 +65,7 @@ void HelloGUI::Start()
 
     // Initialize Window
     InitWindow();
-    
+
     // Create and add some controls to the Window
     InitControls();
 
@@ -145,7 +141,7 @@ void HelloGUI::InitWindow()
 
     // Subscribe to buttonClose release (following a 'press') events
     SubscribeToEvent(buttonClose, E_RELEASED, HANDLER(HelloGUI, HandleClosePressed));
-    
+
     // Subscribe also to all UI mouse clicks just to see where we have clicked
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(HelloGUI, HandleControlClicked));
 }

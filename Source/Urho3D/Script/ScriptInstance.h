@@ -179,8 +179,6 @@ private:
     /// Handle script file reload finished.
     void HandleScriptFileReloadFinished(StringHash eventType, VariantMap& eventData);
 
-    /// Script subsystem.
-    SharedPtr<Script> script_;
     /// Script file.
     WeakPtr<ScriptFile> scriptFile_;
     /// Script object.
