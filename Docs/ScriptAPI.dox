@@ -10761,6 +10761,7 @@ Properties:
 - uint id // readonly
 - InterpolationMode interpolationMode
 - bool isFinished // readonly
+- float length // readonly
 - Node@ node // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
