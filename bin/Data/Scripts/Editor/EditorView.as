@@ -1137,7 +1137,7 @@ void UpdateStats(float timeStep)
     // Todo: add localization
     if (hotKeyMode == HOTKEYS_MODE_BLENDER)
         adding = localization.Get("  CameraFlyMode: ") + (cameraFlyMode ? "True" : "False");
-    
+
     editorModeText.text = String(
         localization.Get("Mode: ") + localization.Get(editModeText[editMode]) +
         localization.Get("  Axis: ") + localization.Get(axisModeText[axisMode]) +
@@ -1261,7 +1261,7 @@ void UpdateView(float timeStep)
     
     if (input.mouseMoveWheel != 0 && ui.GetElementAt(ui.cursor.position) is null)
     {
-        if (hotKeyMode == HOTKEYS_MODE_STANDARD) 
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)
         {
             if (mouseWheelCameraPosition)
             {
@@ -1283,21 +1283,27 @@ void UpdateView(float timeStep)
                 else if (input.keyDown[KEY_LCTRL])
                     cameraNode.Translate(Vector3(-cameraBaseSpeed,0, 0) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
                 else
-                    cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+                {
+                    Vector3 center = SelectedNodesCenterPoint();
+                    float distance = (cameraNode.worldPosition - center).length;
+                    float ratio = distance / 40.0f;
+                    float factor = ratio < 1.0f ? ratio : 1.0f;
+                    cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*40*factor*timeStep*speedMultiplier);
+                }
             }
             else
             {   
-                if (input.keyDown[KEY_LSHIFT]) 
+                if (input.keyDown[KEY_LSHIFT])
                 {
                     cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * -input.mouseMoveWheel*20* timeStep * speedMultiplier);
                 }
-                else if (input.keyDown[KEY_LCTRL]) 
+                else if (input.keyDown[KEY_LCTRL])
                 {
                     cameraNode.Translate(Vector3(-cameraBaseSpeed,0, 0) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
                 }
                 else 
                 {
-                    if (input.qualifierDown[QUAL_ALT]) 
+                    if (input.qualifierDown[QUAL_ALT])
                     {
                         float zoom = camera.zoom + -input.mouseMoveWheel *.1 * speedMultiplier;
                         camera.zoom = Clamp(zoom, .1, 30);
@@ -1305,10 +1311,10 @@ void UpdateView(float timeStep)
                     else 
                     {
                         cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
-                    }    
+                    }
                 }
             }
-        }       
+        }
     }
 
     if (input.keyDown[KEY_HOME])
@@ -1324,13 +1330,13 @@ void UpdateView(float timeStep)
     
     // Rotate/orbit/pan camera
     bool changeCamViewButton = false;
-    
+
     if (hotKeyMode == HOTKEYS_MODE_STANDARD) 
         changeCamViewButton = input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE];
     else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
-    {  
+    {
         changeCamViewButton = input.mouseButtonDown[MOUSEB_MIDDLE] || cameraFlyMode;
-        
+
         if (input.mouseButtonPress[MOUSEB_RIGHT] || input.keyDown[KEY_ESC])
             cameraFlyMode = false;
     }
@@ -1407,7 +1413,7 @@ void UpdateView(float timeStep)
 
     if (orbiting && !input.mouseButtonDown[MOUSEB_MIDDLE])
         orbiting = false;
-        
+
     if (hotKeyMode == HOTKEYS_MODE_BLENDER)
     {
         if (viewCloser && lastSelectedDrawable.Get() !is null)
@@ -1415,30 +1421,30 @@ void UpdateView(float timeStep)
             SetMouseLock();
             BoundingBox bb;
             Vector3 centerPoint;
-            
+
             if (selectedNodes.length <= 1)
             {
                 Drawable@ drawable = lastSelectedDrawable.Get();
                 if (drawable !is null) 
-                {  
+                {
                     bb = drawable.boundingBox;
                     centerPoint = drawable.node.worldPosition;
                 }
             }
             else
             {
-                for (int i = 0; i < selectedNodes.length; i++) 
+                for (int i = 0; i < selectedNodes.length; i++)
                 {
                     bb.Merge(selectedNodes[i].position);
                 }
-                      
+
                 centerPoint = SelectedNodesCenterPoint();
             }
-            
+
             float distance = bb.size.length;
             if (camera.orthographic) // if we use viewCloser for 2D get current distance to avoid near clip
                 distance = cameraNode.worldPosition.length;
-            
+
             Quaternion q = Quaternion(activeViewport.cameraPitch, activeViewport.cameraYaw, 0);
             cameraNode.rotation = q;
             cameraNode.worldPosition = centerPoint -  cameraNode.worldDirection * distance;
@@ -1448,20 +1454,20 @@ void UpdateView(float timeStep)
         else 
             viewCloser =  false;
     }
-    
+
     // Move/rotate/scale object
     if (hotKeyMode == HOTKEYS_MODE_BLENDER) // force to select component node for manipulation if selected only component and not his node
-    {   
+    {
         if ((editMode != EDIT_SELECT && editNodes.empty) && lastSelectedComponent.Get() !is null)
-        {   
-            if (lastSelectedComponent.Get() !is null) 
+        {
+            if (lastSelectedComponent.Get() !is null)
             {
                 Component@ component  = lastSelectedComponent.Get();
                 SelectNode(component.node, false);
             }
-        }   
+        }
     }
-    
+
     if (!editNodes.empty && editMode != EDIT_SELECT && input.keyDown[KEY_LCTRL])
     {
         Vector3 adjust(0, 0, 0);
@@ -1623,7 +1629,6 @@ void HandlePostRenderUpdate()
     }
 
     ViewRaycast(false);
-    UpdateViewDebugIcons();
 }
 
 void DrawNodeDebug(Node@ node, DebugRenderer@ debug, bool drawNode = true)
