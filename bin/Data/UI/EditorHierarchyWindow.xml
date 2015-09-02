@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <element type="Window">
 	<attribute name="Name" value="HierarchyWindow" />
-	<attribute name="Position" value="474 221" />
-	<attribute name="Size" value="344 462" />
 	<attribute name="Layout Mode" value="Vertical" />
 	<attribute name="Layout Spacing" value="4" />
 	<attribute name="Layout Border" value="6 6 6 6" />
