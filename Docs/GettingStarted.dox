@@ -67,9 +67,10 @@ Our CMakeLists.txt files are designed to work with most of the generators suppor
 A number of build options can be defined when invoking the build scripts or when configurating the project interactively using cmake-gui. To use one of these build options on the command line interface, pass it in this format "-DOPTION=VALUE" without the quotes. Most of the build options are boolean variables where setting their values to 0 means disabling a feature or setting an option to false, while 1 means enabling a feature or setting an option to true. The table below shows all the available build options and their default values. Non-boolean build options generally do not have any default values and are marked with '-' in the table. However, a few build options marked with '*' have their default values set differently based on the value of other variables or external factors.
 |Build Option         |Value|Description          |
 |---------------------|-----|---------------------|
-|ANDROID              |0|Configure project using Android cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only)|
-|RPI                  |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only)|
-|WIN32                |0|Configure project using MinGW cross-compiler toolchain (cmake_generic.sh only); also applicable when cross-compiling 64-bit Windows platform|
+|ANDROID              |0|Configure project using Android cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify Android toolchain file for cross-compiling explicitly|
+|RPI                  |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify RPI toolchain file for cross-compiling explicitly|
+|WIN32                |0|Configure project using MinGW (32-bit or 64-bit) cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify MinGW toolchain file for cross-compiling explicitly|
+|EMSCRIPTEN           |0|Configure project using Emscripten cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify Emscripten toolchain file for cross-compiling explicitly|
 |URHO3D_C++11         |0|Enable C++11 standard|
 |IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only)|
 |URHO3D_64BIT         |*|Enable 64-bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system|

@@ -201,16 +201,17 @@ task :ci do
   else
     $configuration = ENV['CI'] && ENV['USE_CCACHE'].to_i > 0 ? 'Release' : 'Debug'  # Aways use a same build configuration to keep ccache's cache size small when on Travis CI
     # Only 64-bit Linux environment with virtual framebuffer X server support and not MinGW build; or OSX build environment and not iOS build; or Emscripten build environment are capable to run tests
-    $testing = (ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && ENV['IOS'].to_i != 1) || ENV['EMSCRIPTEN'] ? 1 : 0
+    $testing = (ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && ENV['IOS'].to_i != 1) || ENV['HTML5'] ? 1 : 0
     if $testing
       ENV['URHO3D_PREFIX_PATH'] = `pwd`.chomp + '/bin'
     end
   end
   # Define the build option string only when the override environment variable is given
   $build_options = "-DWIN32=#{ENV['WINDOWS']}" if ENV['WINDOWS']
+  $build_options = "-DEMSCRIPTEN=#{ENV['HTML5']}" if ENV['HTML5']
   $build_options = "#{$build_options} -DANDROID_ABI=#{ENV['ABI']}" if ENV['ABI']
   $build_options = "#{$build_options} -DANDROID_NATIVE_API_LEVEL=#{ENV['API']}" if ENV['API']
-  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TEST_TIMEOUT', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var| $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var] }
+  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TEST_TIMEOUT', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var| $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var] }
   if ENV['XCODE']
     # xcodebuild
     xcode_ci
@@ -493,7 +494,7 @@ EOF
 end
 
 def makefile_ci
-  if (ENV['WINDOWS'] && ENV['CI']) || (ENV['ANDROID'] && ENV['ABI'] == 'arm64-v8a') || ENV['EMSCRIPTEN']
+  if (ENV['WINDOWS'] && ENV['CI']) || (ENV['ANDROID'] && ENV['ABI'] == 'arm64-v8a') || ENV['HTML5']
     # LuaJIT on MinGW build is not possible on Ubuntu 12.04 LTS as its GCC cross-compiler version is too old
     # The upstream LuaJIT library does not support Android arm64-v8a ABI at the moment
     # LuaJIT on Emscripten is not possible
@@ -511,7 +512,7 @@ def makefile_ci
   # For Emscripten CI build, skip make test and/or scaffolding test if Travis-CI VM took too long to get here, as otherwise overall build time may exceed 50 minutes time limit
   test = $testing == 1 ? '&& make test' : ''
   system "cd ../Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
-  unless ENV['CI'] && ENV['EMSCRIPTEN'] && ENV['PACKAGE_UPLOAD']  # For Emscripten, skip scaffolding test when packaging
+  unless ENV['CI'] && ENV['HTML5'] && ENV['PACKAGE_UPLOAD']  # For Emscripten, skip scaffolding test when packaging
     # Create a new project on the fly that uses newly built Urho3D library in the build tree
     scaffolding "../Build/generated/UsingBuildTree"
     system "cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_generic.sh . #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
