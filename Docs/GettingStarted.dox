@@ -20,7 +20,7 @@ Although all required third-party libraries are included as source code, there a
 
 - For Android, the Android SDK and Android NDK (minimum API level 12) need to be installed.
 
-- For Emscripten, the Emscripten SDK need to be installed (on Windows also MinGW toolchain is required.)
+- For Emscripten, the Emscripten SDK need to be installed (on Windows also MinGW-W64 compiler toolchain is required).
 
 To run Urho3D, the minimum system requirements are:
 
@@ -235,9 +235,9 @@ Execute cmake_mingw.sh then go to the build tree to execute make command. After 
 >    - Networking. Javascript can only use http and websockets protocols so it's not likely that kNet will ever function.
 >    - AngelScript scripting support.
 
-This section assumes you have already updated, installed, and activated the latest Emscripten (trans-)compiler toolchain on your host system as per described in http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html.
+This section assumes you have already updated, installed, and activated the latest Emscripten cross-compiler toolchain on your host system as per described in http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html.
 
-Set the EMSCRIPTEN_ROOT_PATH environment variable or build option to point to the root path of Emscripten cross-compiler tools. The Emscripten sysroot path will be derived from the root path, usually from 'system' subdir relative to the root path. However, you can optionally set the EMSCRIPTEN_SYSROOT environment variable or build option to point to another system root path.
+Set the EMSCRIPTEN_ROOT_PATH environment variable or build option to point to the root path of Emscripten cross-compiler tools. Alternatively, call the emsdk_env script to set the EMSCRIPTEN environment variable for you. The Emscripten sysroot path will be derived from the root path, usually from 'system' subdir relative to the root path. However, you can optionally set the EMSCRIPTEN_SYSROOT environment variable or build option to point to another system root path.
 
 On Windows host, execute cmake_emscripten.bat. On OS X or Linux host, execute cmake_emscripten.sh. Then go to the build tree and execute the 'make' command to start the build as usual. You may want to set the URHO3D_SAMPLES build option to build all the samples. You may also optionally set the URHO3D_LUA build option to enable Lua scripting support. If you encounter "Too many open files" warning when archiving the Urho3D static library, follow by "Unresolved symbol" errors on OS X then you have to increase the soft-limit in your host system before rebuilding the library and all the main targets.
 
@@ -246,11 +246,11 @@ For example, to double the limit (which normally defaults to 256 on OS X):
 ulimit -Sn 512
 \endverbatim
 
-After the commands finish successfully, the HTMLs and its correspondng data files should have been generated in the build tree's "bin" subdirectory, from where it can be launched in a browser.
+After the commands finish successfully, the HTMLs and its corresponding data files should have been generated in the build tree's "bin" subdirectory, from where it can be launched in a browser.
 
 On Windows building with Emscripten requires a MinGW toolchain. The one that can be installed through emsdk may not work correctly, but for example http://sourceforge.net/projects/mingw-w64/ with the default install settings has been known to work.
 
-If CMake complains that emcc is not able to compile a test program, try reactivating your current Emscripten cross-compiler tools with 'emsdk activate <your-tools-version>', clear all generated *.cmake files as well as the CMake cache, and retry running CMake.
+If CMake complains that emcc is not able to compile a test program, try reactivating your current Emscripten cross-compiler tools with 'emsdk activate <sdk-version>', clear all generated *.cmake files as well as the CMake cache, and retry running CMake.
 
 \section Building_64bit Native 64bit build
 
