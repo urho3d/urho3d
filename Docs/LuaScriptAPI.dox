@@ -5444,18 +5444,24 @@ Methods:
 - void AddControlPoint(Node* point, unsigned index = M_MAX_UNSIGNED)
 - void RemoveControlPoint(Node* point)
 - void ClearControlPoints()
-- Vector3 GetPoint(float factor) const
-- InterpolationMode GetInterpolationMode() const
-- Vector3 GetPosition() const
 - void SetInterpolationMode(InterpolationMode mode)
 - void SetPosition(float factor)
+- void SetControlledNode(Node* controlled)
+- InterpolationMode GetInterpolationMode() const
+- float GetSpeed() const
+- float GetLength() const
+- Vector3 GetPosition() const
+- Node* GetControlledNode() const
+- Vector3 GetPoint(float factor) const
 - void Move(float timeStep)
 - void Reset()
 - bool IsFinished() const
 
 Properties:
 
+- InterpolationMode interpolationMode
 - float speed
+- float length (readonly)
 - Node* controlledNode
 
 <a name="Class_Sprite"></a>

@@ -251,6 +251,7 @@ static void RegisterSplinePath(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SplinePath", "void set_controlledNode(Node@+)", asMETHOD(SplinePath, GetControlledNode), asCALL_THISCALL);
     engine->RegisterObjectMethod("SplinePath", "InterpolationMode get_interpolationMode() const", asMETHOD(SplinePath, GetInterpolationMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("SplinePath", "float get_speed() const", asMETHOD(SplinePath, GetSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "float get_length() const", asMETHOD(SplinePath, GetLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("SplinePath", "Vector3 get_position() const", asMETHOD(SplinePath, GetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("SplinePath", "Node@ get_controlledNode() const", asMETHOD(SplinePath, GetControlledNode), asCALL_THISCALL);
     engine->RegisterObjectMethod("SplinePath", "void Move(float)", asMETHOD(SplinePath, Move), asCALL_THISCALL);

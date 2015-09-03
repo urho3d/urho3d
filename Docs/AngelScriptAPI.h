@@ -9680,6 +9680,8 @@ InterpolationMode interpolationMode;
 /* readonly */
 bool isFinished;
 /* readonly */
+float length;
+/* readonly */
 Node node;
 /* readonly */
 uint numAttributes;
