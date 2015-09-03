@@ -122,6 +122,50 @@ PODVector<aiAnimation*> sceneAnimations_;
 
 float defaultTicksPerSecond_ = 4800.0f;
 
+//====================================================================
+String translateBone_ = "Bip01_$AssimpFbx$_Translation";
+String rotateBone_ = "Bip01_$AssimpFbx$_Rotation";
+String preRotateBone_ = "RootNode";
+enum RootMotionFlag
+{
+    kMotion_None         = 0,
+    kMotionX_Translation = (1 << 0),
+    kMotionY_Translation = (1 << 1),
+    kMotionZ_Translation = (1 << 2),
+    kMotionYaw_Rotation  = (1 << 3),
+};
+int rootMotionFlag_ = kMotion_None;
+struct MontionKey
+{
+    MontionKey(): translation_(Vector3::ZERO),
+        rotation_(0),
+        time_(0) {};
+    Vector3         translation_;
+    float           rotation_;
+    float           time_;
+};
+SharedPtr<Model> model_;
+bool noModel_ = false;
+bool flipPreRotateBone_ = false;
+int moveToOriginFlag_ = kMotion_None;
+static int ParseMotionFlag(const String& value)
+{
+    int flag = kMotion_None;
+    int flags[255] = { 0 };
+    memset(flags, 0x00, sizeof(flags));
+    flags['x'] = kMotionX_Translation;
+    flags['y'] = kMotionY_Translation;
+    flags['z'] = kMotionZ_Translation;
+    flags['r'] = kMotionYaw_Rotation;
+    for (size_t i=0; i<value.Length(); ++i)
+    {
+        flag |= flags[value[i]];
+    }
+    return flag;
+}
+Vector3 originAlignTo = Vector3::ZERO;
+//====================================================================
+
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 void DumpNodes(aiNode* rootNode, unsigned level);
@@ -239,6 +283,11 @@ void Run(const Vector<String>& arguments)
             "-ct         Check and do not overwrite if texture exists\n"
             "-ctn        Check and do not overwrite if texture has newer timestamp\n"
             "-am         Export all meshes even if identical (scene mode only)\n"
+            "-motion     Export root motion (x|y|z|r) (model mode only)\n"
+            "-nomodel    Do not output model (model mode only)\n"
+            "-flipbone   Flip Pre Rotate Bone (model mode only)\n"
+            "-origin     Move the translate bone to origin flags (x|y|z) (model mode only)\n"
+            "-align      Align to origin Vector3 (model mode only)\n"
         );
     }
 
@@ -380,6 +429,25 @@ void Run(const Vector<String>& arguments)
                 noOverwriteNewerTexture_ = true;
             else if (argument == "am")
                 checkUniqueModel_ = false;
+            else if (argument == "motion" && !value.Empty())
+            {
+                rootMotionFlag_ = ParseMotionFlag(value);
+                PrintLine("Motion FLag is " + value + " (" + String(rootMotionFlag_) + ")");
+            }
+            else if (argument == "nomodel")
+                noModel_ = true;
+            else if (argument == "flipbone")
+                flipPreRotateBone_ = true;
+            else if (argument == "origin" && !value.Empty())
+            {
+                moveToOriginFlag_ = ParseMotionFlag(value);
+                PrintLine("MoveToOrigin FLags i " + value + " (" + String(moveToOriginFlag_) + ")");
+            }
+            else if (argument == "align")
+            {
+                originAlignTo = ToVector3(value);
+                PrintLine("Origin set to " + originAlignTo.ToString());
+            }
         }
     }
 
@@ -760,6 +828,7 @@ void BuildAndSaveModel(OutModel& model)
     SharedPtr<Model> outModel(new Model(context_));
     Vector<PODVector<unsigned> > allBoneMappings;
     BoundingBox box;
+    model_ = outModel;
 
     unsigned numValidGeometries = 0;
 
@@ -935,6 +1004,7 @@ void BuildAndSaveModel(OutModel& model)
 
             Bone newBone;
             newBone.name_ = boneName;
+            newBone.nameHash_ = StringHash(boneName);
 
             aiMatrix4x4 transform = boneNode->mTransformation;
             // Make the root bone transform relative to the model's root node, if it is not already
@@ -943,6 +1013,16 @@ void BuildAndSaveModel(OutModel& model)
 
             GetPosRotScale(transform, newBone.initialPosition_, newBone.initialRotation_, newBone.initialScale_);
 
+            if (flipPreRotateBone_ && boneName == preRotateBone_)
+            {
+                Vector3 eulerAngles = newBone.initialRotation_.EulerAngles();
+                newBone.initialRotation_.FromEulerAngles(eulerAngles.x_, eulerAngles.y_ + 180, eulerAngles.z_);
+                PrintLine("PreRotation bone from " + eulerAngles.ToString() + " to " + newBone.initialRotation_.EulerAngles().ToString());
+            }
+
+            //if (boneName == translateBone_)
+            //    PrintLine("Translation Bone " + newBone.name_ + " t=" + String(newBone.initialPosition_) + " r=" + String(newBone.initialRotation_));
+
             // Get offset information if exists
             newBone.offsetMatrix_ = GetOffsetMatrix(model, boneName);
             newBone.radius_ = model.boneRadii_[i];
@@ -950,7 +1030,10 @@ void BuildAndSaveModel(OutModel& model)
             newBone.collisionMask_ = BONECOLLISION_SPHERE | BONECOLLISION_BOX;
             newBone.parentIndex_ = i;
             bones.Push(newBone);
+
+            // PrintLine("Bone " + newBone.name_ + " t=" + String(newBone.initialPosition_) + " r=" + String(newBone.initialRotation_));
         }
+
         // Set the bone hierarchy
         for (unsigned i = 1; i < model.bones_.Size(); ++i)
         {
@@ -969,6 +1052,9 @@ void BuildAndSaveModel(OutModel& model)
         if (model.bones_.Size() > maxBones_)
             outModel->SetGeometryBoneMappings(allBoneMappings);
     }
+
+    if (noModel_)
+        return;
 
     File outFile(context_);
     if (!outFile.Open(model.outName_, FILE_WRITE))
@@ -990,14 +1076,67 @@ void BuildAndSaveModel(OutModel& model)
     }
 }
 
+
+Vector3 GetProjectedAxis(Node* root, Node* n, const Vector3& axis)
+{
+    Quaternion q = n->GetWorldRotation();
+    Vector3 p = q * axis;
+    p.Normalize();
+    Quaternion invQ = root->GetWorldRotation().Inverse();
+    Vector3 ret = invQ * p;
+    ret.Normalize();
+    ret.y_ = 0;
+    return ret;
+}
+
 void BuildAndSaveAnimations(OutModel* model)
 {
+    SharedPtr<Scene> animScene(new Scene(context_));
+    Node* n = NULL;
+    Node* rotateNode = NULL;
+    Node* translateNode = NULL;
+    Vector3 pelvisRightAxis = Vector3::RIGHT;
+    Vector3 translateOrignWS = originAlignTo;
+
+    if (rootMotionFlag_ || moveToOriginFlag_)
+    {
+        n = animScene->CreateChild("Character");
+        AnimatedModel* object = n->CreateComponent<AnimatedModel>();
+        object->SetModel(model_);
+
+        rotateNode = n->GetChild(rotateBone_, true);
+        translateNode = n->GetChild(translateBone_, true);
+
+        Bone* b = model_->GetSkeleton().GetBone(rotateBone_);
+        if (b) {
+            pelvisRightAxis = b->initialRotation_ * Vector3::RIGHT;
+        }
+        PrintLine("pelvisRightAxis = " + String(pelvisRightAxis));
+
+        b = model_->GetSkeleton().GetBone(translateBone_);
+        if (b && translateNode && originAlignTo == Vector3::ZERO) {
+            translateOrignWS = translateNode->GetWorldPosition();
+        }
+
+#if 0
+        for (unsigned i=0; i<model_->GetSkeleton().GetNumBones(); ++i)
+        {
+            Bone* bone = model_->GetSkeleton().GetBone(i);
+            Node* node = n->GetChild(bone->name_, true);
+            if (node) {
+                PrintLine("bone " + bone->name_ + " tWS=" + node->GetWorldPosition().ToString() + " rWS=" + node->GetWorldRotation().EulerAngles().ToString());
+            }
+        }
+#endif
+
+    }
+
     const PODVector<aiAnimation*>& animations = model ? model->animations_ : sceneAnimations_;
 
     for (unsigned i = 0; i < animations.Size(); ++i)
     {
         aiAnimation* anim = animations[i];
-
+        Vector<MontionKey>   motionKeys;
         float duration = (float)anim->mDuration;
         String animName = FromAIString(anim->mName);
         String animOutName;
@@ -1008,6 +1147,9 @@ void BuildAndSaveAnimations(OutModel* model)
             animOutName = GetPath(model->outName_) + GetFileName(model->outName_) + "_" + SanitateAssetName(animName) + ".ani";
         else
             animOutName = outPath_ + SanitateAssetName(animName) + ".ani";
+
+        if (animations.Size() == 1)
+            animOutName = GetPath(model->outName_) + GetFileName(model->outName_) + ".ani";
 
         float ticksPerSecond = (float)anim->mTicksPerSecond;
         // If ticks per second not specified, it's probably a .X file. In this case use the default tick rate
@@ -1042,6 +1184,9 @@ void BuildAndSaveAnimations(OutModel* model)
             String channelName = FromAIString(channel->mNodeName);
             aiNode* boneNode = 0;
             bool isRootBone = false;
+            bool isTranslateBone = channelName == translateBone_;
+            bool isRotateBone = channelName == rotateBone_;
+            bool isPreRotateBone = channelName == preRotateBone_;
 
             if (model)
             {
@@ -1181,6 +1326,100 @@ void BuildAndSaveAnimations(OutModel* model)
                 if (track.channelMask_ & CHANNEL_SCALE)
                     kf.scale_ = ToVector3(scale);
 
+                if (flipPreRotateBone_ && isPreRotateBone)
+                {
+                    Vector3 eulerAngles = kf.rotation_.EulerAngles();
+                    eulerAngles.z_ += 180;
+                    kf.rotation_.FromEulerAngles(eulerAngles.x_, eulerAngles.y_, eulerAngles.z_);
+                }
+
+                static Vector3 originDiffLS = Vector3::ZERO;
+                if (k == 0 && moveToOriginFlag_ && isTranslateBone)
+                {
+                    translateNode->SetWorldPosition(kf.position_);
+                    Vector3 currentWS = translateNode->GetWorldPosition();
+                    if (moveToOriginFlag_ & kMotionX_Translation)
+                        currentWS.x_ = translateOrignWS.x_;
+                    if (moveToOriginFlag_ & kMotionY_Translation)
+                        currentWS.y_ = translateOrignWS.y_;
+                    if (moveToOriginFlag_ & kMotionZ_Translation)
+                        currentWS.z_ = translateOrignWS.z_;
+                    translateNode->SetWorldPosition(currentWS);
+                    Vector3 currentLS = translateNode->GetPosition();
+                    originDiffLS = currentLS - kf.position_;
+                    PrintLine("originDiffLS = " + originDiffLS.ToString());
+                }
+
+                if (moveToOriginFlag_ && isTranslateBone)
+                {
+                    Vector3 old = kf.position_;
+                    kf.position_ += originDiffLS;
+                    PrintLine("MoveToOrigin from " + old.ToString() + " to " + kf.position_.ToString());
+                }
+
+                if (rootMotionFlag_)
+                {
+                    static AnimationKeyFrame fristKey;
+                    if (k == 0)
+                        fristKey = kf;
+
+                    if (isTranslateBone) {
+                        if (motionKeys.Empty())
+                            motionKeys.Resize(keyFrames);
+                        motionKeys[k].time_ = kf.time_;
+
+                        translateNode->SetTransform(fristKey.position_, fristKey.rotation_);
+                        Vector3 t1_ws = translateNode->GetWorldPosition();
+                        translateNode->SetTransform(kf.position_, kf.rotation_);
+                        Vector3 t2_ws = translateNode->GetWorldPosition();
+
+                        Vector3 translation = t2_ws - t1_ws;
+                        if (rootMotionFlag_ & kMotionX_Translation)
+                        {
+                            motionKeys[k].translation_.x_ = translation.x_;
+                            t2_ws.x_  = t1_ws.x_;
+                        }
+                        if (rootMotionFlag_ & kMotionY_Translation)
+                        {
+                            motionKeys[k].translation_.y_ = translation.y_;
+                            t2_ws.y_ = t1_ws.y_;
+                        }
+                        if (rootMotionFlag_ & kMotionZ_Translation)
+                        {
+                            motionKeys[k].translation_.z_ = translation.z_;
+                            t2_ws.z_ = t1_ws.z_;
+                        }
+
+                        translateNode->SetWorldPosition(t2_ws);
+                        Vector3 local_pos = translateNode->GetPosition();
+                        //PrintLine("local position from " + String(kf.position_) + " to " + String(local_pos));
+                        kf.position_ = local_pos;
+                    }
+
+                    if (isRotateBone && (rootMotionFlag_ & kMotionYaw_Rotation)) {
+
+                        if (motionKeys.Empty())
+                            motionKeys.Resize(keyFrames);
+
+                        rotateNode->SetTransform(fristKey.position_, fristKey.rotation_);
+                        Vector3 startAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
+                        rotateNode->SetTransform(kf.position_, kf.rotation_);
+                        Vector3 curAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
+
+                        Quaternion q1;
+                        q1.FromRotationTo(startAxis, curAxis);
+                        motionKeys[k].rotation_ = q1.EulerAngles().y_;
+
+                        Quaternion wq = rotateNode->GetWorldRotation();
+                        wq = q1.Inverse() * wq;
+                        rotateNode->SetWorldRotation(wq);
+
+                        Quaternion lq = rotateNode->GetRotation();
+                        //PrintLine("local rotation from " + String(kf.rotation_.EulerAngles()) + " to " + String(lq.EulerAngles()));
+                        kf.rotation_ = lq;
+                    }
+                }
+
                 track.keyFrames_.Push(kf);
             }
 
@@ -1193,6 +1432,44 @@ void BuildAndSaveAnimations(OutModel* model)
         if (!outFile.Open(animOutName, FILE_WRITE))
             ErrorExit("Could not open output file " + animOutName);
         outAnim->Save(outFile);
+
+
+        if (rootMotionFlag_)
+        {
+            XMLFile outMotion(context_);
+            XMLElement root = outMotion.CreateRoot("motion_keys");
+
+            for (size_t i=0; i<motionKeys.Size(); ++i)
+            {
+                MontionKey& mk = motionKeys[i];
+                XMLElement mkXML = root.CreateChild("key");
+                mkXML.SetFloat("time", mk.time_);
+                mkXML.SetVector3("translation", mk.translation_);
+                float rotation = mk.rotation_;
+                if (i > 0)
+                {
+                    float diff = rotation - motionKeys[i-1].rotation_;
+                    if (diff >= 180)
+                    {
+                        if (rotation <= 0)
+                            rotation += 360;
+                        if (rotation > 0)
+                            rotation -= 360;
+                        PrintLine("frame delta rotation >= 180 flip from " + String(mk.rotation_) + " to " + String(rotation));
+                        mk.rotation_ = rotation;
+                    }
+                }
+                mkXML.SetFloat("rotation", rotation);
+                PrintLine("motion frame=" + String(i) + " translation=" + String(mk.translation_) + " rotation=" + String(mk.rotation_));
+            }
+
+            File outFile(context_);
+            String motionOutName = GetPath(animOutName) + GetFileName(animOutName) + "_motion.xml";
+            PrintLine(motionOutName);
+            if (!outFile.Open(motionOutName, FILE_WRITE))
+                ErrorExit("Could not open output file " + motionOutName);
+            outMotion.Save(outFile);
+        }
     }
 }
 
