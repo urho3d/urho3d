@@ -636,7 +636,7 @@ include (GenerateExportHeader)
 
 # Macro for precompiling header (On MSVC, the dummy C++ or C implementation file for precompiling the header file would be generated if not already exists)
 # This macro should be called before the CMake target has been added
-# Typically, user should indirectly call this macro by using the 'PCH' option when calling define_source_file() macro
+# Typically, user should indirectly call this macro by using the 'PCH' option when calling define_source_files() macro
 macro (enable_pch HEADER_PATHNAME)
     # No op when PCH support is not enabled
     if (URHO3D_PCH)
