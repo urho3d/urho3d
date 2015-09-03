@@ -240,7 +240,11 @@ foreach (TARGET ${STATIC_LIBRARY_TARGETS})
             set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${FORCE_LOAD} ${ARCHIVE})    # Only works in Apple (Xcode and Makefile) and GCC while building shared library
         endif ()
         if (XCODE OR MSVC)
-            set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " \"${ARCHIVE}\"")  # Only works in Apple (Xcode only) and MSVC while building static library
+            if (NOT MSVC OR MSVC_VERSION GREATER 1500)
+                set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " \"${ARCHIVE}\"")  # Only works in Apple (Xcode only) and MSVC while building static library
+            else ()
+                set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " ${ARCHIVE}") # Fallback for VS2008
+            endif ()
         else ()
             list (APPEND ARCHIVES ${ARCHIVE})
         endif ()
