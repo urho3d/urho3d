@@ -48,7 +48,7 @@ struct AnimationControl
         setWeight_(0),
         setTimeRev_(0),
         setWeightRev_(0),
-        removeOnCompletion_(false)
+        removeOnCompletion_(true)
     {
     }
 
