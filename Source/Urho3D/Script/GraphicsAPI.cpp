@@ -1,3 +1,18 @@
+Skip to content
+This repository  
+Pull requests
+Issues
+Gist
+ @hjmediastudios
+ Unwatch 1
+  Star 0
+  Fork 218
+hjmediastudios/Urho3D
+forked from urho3d/Urho3D
+Branch: master  Urho3D/Source/Urho3D/Script/GraphicsAPI.cpp
+@cadavercadaver 28 days ago 8-bit render order support in materials. This adjusts the drawing ord…
+4 contributors @cadaver @weitjong @nemerle @hdunderscore
+RawBlameHistory    1815 lines (1650 sloc)  161.002 kB
 //
 // Copyright (c) 2008-2015 the Urho3D project.
 //
@@ -1195,6 +1210,8 @@ static void RegisterAnimationController(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationController", "float GetFadeTarget(const String&in) const", asMETHOD(AnimationController, GetFadeTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "AnimationState@+ GetAnimationState(const String&in) const", asMETHODPR(AnimationController, GetAnimationState, (const String&) const, AnimationState*), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "AnimationState@+ GetAnimationState(StringHash) const", asMETHODPR(AnimationController, GetAnimationState, (StringHash) const, AnimationState*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool SetRemoveOnCompletion(const String&in, bool)", asMETHOD(AnimationController, SetRemoveOnCompletion), asCALL_THISCALL);
+
 }
 
 static void RegisterBillboardSet(asIScriptEngine* engine)
@@ -1812,3 +1829,5 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
 }
 
 }
+Status API Training Shop Blog About Pricing
+© 2015 GitHub, Inc. Terms Privacy Security Contact Help
