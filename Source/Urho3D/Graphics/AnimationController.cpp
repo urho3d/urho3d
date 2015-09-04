@@ -362,6 +362,19 @@ bool AnimationController::SetWeight(const String& name, float weight)
     return true;
 }
 
+bool AnimationController::SetRemoveOnCompletion(const String& name, bool removeOnCompletion)
+{
+    unsigned index;
+    AnimationState* state;
+    FindAnimation(name, index, state);
+    if (index == M_MAX_UNSIGNED || !state)
+        return false;
+
+    animations_[index].removeOnCompletion_ = removeOnCompletion;
+    MarkNetworkUpdate();
+    return true;    
+}
+
 bool AnimationController::SetLooped(const String& name, bool enable)
 {
     AnimationState* state = GetAnimationState(name);
