@@ -1,18 +1,3 @@
-Skip to content
-This repository  
-Pull requests
-Issues
-Gist
- @hjmediastudios
- Unwatch 1
-  Star 0
-  Fork 218
-hjmediastudios/Urho3D
-forked from urho3d/Urho3D
-Branch: master  Urho3D/Source/Urho3D/Script/GraphicsAPI.cpp
-@cadavercadaver 28 days ago 8-bit render order support in materials. This adjusts the drawing ord…
-4 contributors @cadaver @weitjong @nemerle @hdunderscore
-RawBlameHistory    1815 lines (1650 sloc)  161.002 kB
 //
 // Copyright (c) 2008-2015 the Urho3D project.
 //
@@ -1829,5 +1814,3 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
 }
 
 }
-Status API Training Shop Blog About Pricing
-© 2015 GitHub, Inc. Terms Privacy Security Contact Help
