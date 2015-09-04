@@ -1,0 +1,41 @@
+$#include "UI/Button.h"
+
+class Button : public BorderImage
+{
+    Button();
+    virtual ~Button();
+    
+    void SetPressedOffset(const IntVector2& offset);
+    void SetPressedOffset(int x, int y);
+    void SetPressedChildOffset(const IntVector2& offset);
+    void SetPressedChildOffset(int x, int y);
+    void SetRepeat(float delay, float rate);
+    void SetRepeatDelay(float delay);
+    void SetRepeatRate(float rate);
+    
+    const IntVector2& GetPressedOffset() const;
+    const IntVector2& GetPressedChildOffset() const;
+    float GetRepeatDelay() const;
+    float GetRepeatRate() const;
+    bool IsPressed() const;
+    
+    tolua_property__get_set IntVector2& pressedOffset;
+    tolua_property__get_set IntVector2& pressedChildOffset;
+    tolua_property__get_set float repeatDelay;
+    tolua_property__get_set float repeatRate;
+    tolua_readonly tolua_property__is_set bool pressed;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_Button_new00
+static int tolua_UILuaAPI_Button_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Button>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_Button_new00_local
+static int tolua_UILuaAPI_Button_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Button>(tolua_S);
+}
+$}

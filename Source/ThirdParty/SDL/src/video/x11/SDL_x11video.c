@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_X11
 
@@ -45,6 +45,7 @@
 #include "SDL_loadso.h"
 static const char *dbus_library = "libdbus-1.so.3";
 static void *dbus_handle = NULL;
+static unsigned int screensaver_cookie = 0;
 
 /* !!! FIXME: this is kinda ugly. */
 static SDL_bool
@@ -63,10 +64,13 @@ load_dbus_sym(const char *fn, void **addr)
 static DBusConnection *(*DBUS_dbus_bus_get_private)(DBusBusType, DBusError *) = NULL;
 static void (*DBUS_dbus_connection_set_exit_on_disconnect)(DBusConnection *, dbus_bool_t) = NULL;
 static dbus_bool_t (*DBUS_dbus_connection_send)(DBusConnection *, DBusMessage *, dbus_uint32_t *) = NULL;
+static DBusMessage *(*DBUS_dbus_connection_send_with_reply_and_block)(DBusConnection *, DBusMessage *, int, DBusError *) = NULL;
 static void (*DBUS_dbus_connection_close)(DBusConnection *) = NULL;
 static void (*DBUS_dbus_connection_unref)(DBusConnection *) = NULL;
 static void (*DBUS_dbus_connection_flush)(DBusConnection *) = NULL;
 static DBusMessage *(*DBUS_dbus_message_new_method_call)(const char *, const char *, const char *, const char *) = NULL;
+static dbus_bool_t (*DBUS_dbus_message_append_args)(DBusMessage *, int, ...) = NULL;
+static dbus_bool_t (*DBUS_dbus_message_get_args)(DBusMessage *, DBusError *, int, ...) = NULL;
 static void (*DBUS_dbus_message_unref)(DBusMessage *) = NULL;
 static void (*DBUS_dbus_error_init)(DBusError *) = NULL;
 static dbus_bool_t (*DBUS_dbus_error_is_set)(const DBusError *) = NULL;
@@ -82,9 +86,12 @@ load_dbus_syms(void)
     SDL_DBUS_SYM(dbus_bus_get_private);
     SDL_DBUS_SYM(dbus_connection_set_exit_on_disconnect);
     SDL_DBUS_SYM(dbus_connection_send);
+    SDL_DBUS_SYM(dbus_connection_send_with_reply_and_block);
     SDL_DBUS_SYM(dbus_connection_close);
     SDL_DBUS_SYM(dbus_connection_unref);
     SDL_DBUS_SYM(dbus_connection_flush);
+    SDL_DBUS_SYM(dbus_message_append_args);
+    SDL_DBUS_SYM(dbus_message_get_args);
     SDL_DBUS_SYM(dbus_message_new_method_call);
     SDL_DBUS_SYM(dbus_message_unref);
     SDL_DBUS_SYM(dbus_error_init);
@@ -172,6 +179,76 @@ SDL_dbus_screensaver_tickle(_THIS)
             }
             DBUS_dbus_message_unref(msg);
         }
+    }
+}
+
+SDL_bool
+SDL_dbus_screensaver_inhibit(_THIS)
+{
+    const SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
+    DBusConnection *conn = data->dbus;
+
+    if (conn == NULL)
+        return SDL_FALSE;
+
+    if (_this->suspend_screensaver &&
+        screensaver_cookie != 0)
+        return SDL_TRUE;
+    if (!_this->suspend_screensaver &&
+        screensaver_cookie == 0)
+        return SDL_TRUE;
+
+    if (_this->suspend_screensaver) {
+        const char *app = "My SDL application";
+        const char *reason = "Playing a game";
+
+        DBusMessage *msg = DBUS_dbus_message_new_method_call("org.freedesktop.ScreenSaver",
+                                                             "/org/freedesktop/ScreenSaver",
+                                                             "org.freedesktop.ScreenSaver",
+                                                             "Inhibit");
+        if (msg != NULL) {
+            DBUS_dbus_message_append_args (msg,
+                                           DBUS_TYPE_STRING, &app,
+                                           DBUS_TYPE_STRING, &reason,
+                                           DBUS_TYPE_INVALID);
+        }
+
+        if (msg != NULL) {
+            DBusMessage *reply;
+
+            reply = DBUS_dbus_connection_send_with_reply_and_block(conn, msg, 300, NULL);
+            if (reply) {
+                if (!DBUS_dbus_message_get_args(reply, NULL,
+                                                DBUS_TYPE_UINT32, &screensaver_cookie,
+                                                DBUS_TYPE_INVALID))
+                    screensaver_cookie = 0;
+                DBUS_dbus_message_unref(reply);
+            }
+
+            DBUS_dbus_message_unref(msg);
+        }
+
+        if (screensaver_cookie == 0) {
+            return SDL_FALSE;
+        }
+        return SDL_TRUE;
+    } else {
+        DBusMessage *msg = DBUS_dbus_message_new_method_call("org.freedesktop.ScreenSaver",
+                                                             "/org/freedesktop/ScreenSaver",
+                                                             "org.freedesktop.ScreenSaver",
+                                                             "UnInhibit");
+        DBUS_dbus_message_append_args (msg,
+                                       DBUS_TYPE_UINT32, &screensaver_cookie,
+                                       DBUS_TYPE_INVALID);
+        if (msg != NULL) {
+            if (DBUS_dbus_connection_send(conn, msg, NULL)) {
+                DBUS_dbus_connection_flush(conn);
+            }
+            DBUS_dbus_message_unref(msg);
+        }
+
+        screensaver_cookie = 0;
+        return SDL_TRUE;
     }
 }
 #endif
@@ -440,8 +517,8 @@ X11_CheckWindowManager(_THIS)
     Atom _NET_SUPPORTING_WM_CHECK;
     int status, real_format;
     Atom real_type;
-    unsigned long items_read, items_left;
-    unsigned char *propdata;
+    unsigned long items_read = 0, items_left = 0;
+    unsigned char *propdata = NULL;
     Window wm_window = 0;
 #ifdef DEBUG_WINDOW_MANAGER
     char *wm_name;
@@ -453,11 +530,14 @@ X11_CheckWindowManager(_THIS)
 
     _NET_SUPPORTING_WM_CHECK = X11_XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", False);
     status = X11_XGetWindowProperty(display, DefaultRootWindow(display), _NET_SUPPORTING_WM_CHECK, 0L, 1L, False, XA_WINDOW, &real_type, &real_format, &items_read, &items_left, &propdata);
-    if (status == Success && items_read) {
-        wm_window = ((Window*)propdata)[0];
-    }
-    if (propdata) {
-        X11_XFree(propdata);
+    if (status == Success) {
+        if (items_read) {
+            wm_window = ((Window*)propdata)[0];
+        }
+        if (propdata) {
+            X11_XFree(propdata);
+            propdata = NULL;
+        }
     }
 
     if (wm_window) {
@@ -465,8 +545,9 @@ X11_CheckWindowManager(_THIS)
         if (status != Success || !items_read || wm_window != ((Window*)propdata)[0]) {
             wm_window = None;
         }
-        if (propdata) {
+        if (status == Success && propdata) {
             X11_XFree(propdata);
+            propdata = NULL;
         }
     }
 

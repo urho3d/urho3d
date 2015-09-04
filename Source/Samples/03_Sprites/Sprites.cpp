@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,23 +20,22 @@
 // THE SOFTWARE.
 //
 
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "Graphics.h"
-#include "ResourceCache.h"
-#include "Sprite.h"
-#include "Texture2D.h"
-#include "UI.h"
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Graphics/Texture2D.h>
+#include <Urho3D/UI/Sprite.h>
+#include <Urho3D/UI/UI.h>
 
 #include "Sprites.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 // Number of sprites to draw
 static const unsigned NUM_SPRITES = 100;
 
 // Custom variable identifier for storing sprite velocity within the UI element
-static const ShortStringHash VAR_VELOCITY("Velocity");
+static const StringHash VAR_VELOCITY("Velocity");
 
 DEFINE_APPLICATION_MAIN(Sprites)
 
@@ -116,7 +115,7 @@ void Sprites::MoveSprites(float timeStep)
         // Rotate
         float newRot = sprite->GetRotation() + timeStep * 30.0f;
         sprite->SetRotation(newRot);
-        
+
         // Move, wrap around rendering window edges
         Vector2 newPos = sprite->GetPosition() + sprite->GetVar(VAR_VELOCITY).GetVector2() * timeStep;
         if (newPos.x_ < 0.0f)
@@ -143,7 +142,7 @@ void Sprites::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Take the frame time step, which is stored as a float
     float timeStep = eventData[P_TIMESTEP].GetFloat();
-    
+
     // Move sprites, scale movement with time step
     MoveSprites(timeStep);
 }

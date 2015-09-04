@@ -1,10 +1,42 @@
+#
+# Copyright (c) 2008-2015 the Urho3D project.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
 # Define target name
 set (TARGET_NAME SDL)
+
+if (EMSCRIPTEN)
+    # Emscripten has its own SDL2 port, so just create a custom target to:
+    #  1) Fetch this SDL2 port from its GitHub repository
+    #  2) Install SDL2 headers to the build tree in the post-build step (Note: current configuration uses our own SDL2 header files instead of the ones provided by Emscripten port for no special reason)
+    add_custom_target (${TARGET_NAME} ALL ${CMAKE_COMMAND} -E touch dummy.cpp && ${CMAKE_CXX_COMPILER} -s USE_SDL=2 -o dummy.html dummy.cpp && ${CMAKE_COMMAND} -E remove dummy.*)
+    set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
+    install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
+    return ()
+endif ()
 
 # Define source files
 file (GLOB C_FILES
     src/*.c src/atomic/*.c src/audio/*.c src/audio/disk/*.c src/audio/dummy/*.c src/cpuinfo/*.c src/events/*.c src/file/*.c
-    src/haptic/*.c src/joystick/*.c src/libm/*.c src/power/*.c src/stdlib/*.c 
+    src/haptic/*.c src/joystick/*.c src/libm/*.c src/power/*.c src/stdlib/*.c
     src/thread/*.c src/timer/*.c src/video/*.c src/video/dummy/*.c
 )
 
@@ -48,24 +80,19 @@ elseif (ANDROID)
         src/thread/pthread/*.c src/timer/unix/*.c src/video/android/*.c src/haptic/dummy/*.c src/filesystem/dummy/*.c
     )
 else ()
-    # On Linux, make sure development libraries exist, and use their include file directories  
-    if (RASPI)
-        file (GLOB VIDEO_DRIVER_C_FILES src/video/raspberry/*.c src/core/linux/*.c src/input/evdev/*.c)
+    # On Linux, make sure development libraries exist, and use their include file directories
+    if (RPI)
+        file (GLOB VIDEO_DRIVER_C_FILES src/video/raspberry/*.c src/core/linux/*.c)
     else ()
         find_package (OpenGL REQUIRED)
         include_directories (${OpenGL_INCLUDE_DIRS})
-        
+
         find_package (X11 REQUIRED)
         if (NOT X11_Xrandr_FOUND)
             message (FATAL_ERROR "Could not find XRandR (libxrandr-dev)")
         endif ()
-        include_directories (${X11_INCLUDE_DIRS})  
+        include_directories (${X11_INCLUDE_DIRS})
 
-        if (NOT DEFINED HAVE_CONST_XEXT_ADDDISPLAY)
-            message (STATUS "Following tests check whether X11 library installed in this system uses _Xconst in below functions")
-            message (STATUS "A failed test result simply means the installed X11 library does not use _Xconst")
-            message (STATUS "It is OK to proceed to build Urho3D regardless of the test result")
-        endif ()
         include (CheckCSourceCompiles)
         set  (CMAKE_REQUIRED_LIBRARIES ${X11_LIB} ${X11_LIB})
         check_c_source_compiles ("
@@ -86,10 +113,17 @@ else ()
             add_definitions (-DSDL_VIDEO_DRIVER_X11_CONST_PARAM_XDATA32)
         endif ()
         set (CMAKE_REQUIRED_LIBRARIES)
-        
+
         file (GLOB VIDEO_DRIVER_C_FILES src/video/x11/*.c)
     endif ()
     find_package (ALSA REQUIRED)
+    # todo: remove this fix when the minimum CMake version has been raised to higher than 2.8.7
+    # There is a bug in older version of FindALSA.cmake module where it erroneously include 'alsa' directory component into the variable
+    # For cross-compiling build to work correctly, this extra directory component must be removed
+    if (ALSA_INCLUDE_DIRS MATCHES .*/alsa)
+        get_filename_component (ALSA_INCLUDE_DIRS ${ALSA_INCLUDE_DIRS} PATH)
+    endif ()
+    # end todo
     include_directories (${ALSA_INCLUDE_DIRS})
 
     file (GLOB SYS_C_FILES
@@ -105,13 +139,18 @@ file (GLOB H_FILES include/*.h)
 set_source_files_properties (${C_FILES} PROPERTIES LANGUAGE C)
 set_source_files_properties (${SYS_C_FILES} PROPERTIES LANGUAGE C)
 set (SOURCE_FILES ${C_FILES} ${SYS_C_FILES} ${H_FILES})
-# Install dependency for SDL_android_main.c, D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h
-install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/SDL USE_SOURCE_PERMISSIONS FILES_MATCHING PATTERN *.h)     # Note: the trailing slash is significant
-set (INSTALL_INCLUDE_DIRS ${INSTALL_INCLUDE_DIRS} SDL PARENT_SCOPE)
-install (FILES src/main/android/SDL_android_main.c DESTINATION ${DEST_SHARE_DIR}/templates/android)
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY include)
+set (INCLUDE_DIRS include)
 
 # Setup target
 setup_library ()
+
+# Install headers for building and using the Urho3D library (install dependency for D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h)
+install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
+# Install dependency for SDL_android_main.c
+if (ANDROID)
+    install_header_files (DIRECTORY src/main/android DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL)
+    install_header_files (FILES src/SDL_internal.h DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL)
+    install_header_files (DIRECTORY src/dynapi DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h)
+endif ()

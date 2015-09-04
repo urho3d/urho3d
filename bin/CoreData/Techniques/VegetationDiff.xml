@@ -1,0 +1,10 @@
+<technique vs="Vegetation" ps="LitSolid" psdefines="DIFFMAP" >
+    <pass name="base" />
+    <pass name="litbase" psdefines="AMBIENT" />
+    <pass name="light" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" psdefines="PREPASS" />
+    <pass name="material" psdefines="MATERIAL" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" psdefines="DEFERRED" />
+    <pass name="depth" vs="VegetationDepth" ps="Depth" />
+    <pass name="shadow" vs="VegetationShadow" ps="Shadow" />
+</technique>

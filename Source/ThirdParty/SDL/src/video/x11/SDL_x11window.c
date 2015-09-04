@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_X11
 
@@ -563,6 +563,7 @@ X11_CreateWindow(_THIS, SDL_Window * window)
         && ( !_this->gl_data || ! _this->gl_data->HAS_GLX_EXT_create_context_es2_profile )
 #endif  
     ) {
+#if SDL_VIDEO_OPENGL_EGL  
         if (!_this->egl_data) {
             X11_XDestroyWindow(display, w);
             return -1;
@@ -575,6 +576,9 @@ X11_CreateWindow(_THIS, SDL_Window * window)
             X11_XDestroyWindow(display, w);
             return SDL_SetError("Could not create GLES window surface");
         }
+#else
+        return SDL_SetError("Could not create GLES window surface (no EGL support available)");
+#endif /* SDL_VIDEO_OPENGL_EGL */
     }
 #endif
     

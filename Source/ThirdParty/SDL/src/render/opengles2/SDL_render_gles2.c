@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_RENDER_OGL_ES2 && !SDL_RENDER_DISABLED
 
@@ -27,6 +27,12 @@
 #include "../SDL_sysrender.h"
 #include "../../video/SDL_blit.h"
 #include "SDL_shaders_gles2.h"
+
+/* To prevent unnecessary window recreation, 
+ * these should match the defaults selected in SDL_GL_ResetAttributes 
+ */
+#define RENDERER_CONTEXT_MAJOR 2
+#define RENDERER_CONTEXT_MINOR 0
 
 /* Used to re-create the window with OpenGL ES capability */
 extern int SDL_RecreateWindow(SDL_Window * window, Uint32 flags);
@@ -724,8 +730,8 @@ GLES2_CacheProgram(SDL_Renderer *renderer, GLES2_ShaderCacheEntry *vertex,
     entry->uniform_locations[GLES2_UNIFORM_COLOR] =
         data->glGetUniformLocation(entry->id, "u_color");
 
-    entry->modulation_r = entry->modulation_g = entry->modulation_b = entry->modulation_a = 1.0f;
-    entry->color_r = entry->color_g = entry->color_b = entry->color_a = 1.0f;
+    entry->modulation_r = entry->modulation_g = entry->modulation_b = entry->modulation_a = 255;
+    entry->color_r = entry->color_g = entry->color_b = entry->color_a = 255;
 
     data->glUseProgram(entry->id);
     data->glUniformMatrix4fv(entry->uniform_locations[GLES2_UNIFORM_PROJECTION], 1, GL_FALSE, (GLfloat *)entry->projection);
@@ -1043,16 +1049,33 @@ CompareColors(Uint8 r1, Uint8 g1, Uint8 b1, Uint8 a1,
 static int
 GLES2_RenderClear(SDL_Renderer * renderer)
 {
+    Uint8 r, g, b, a;
+
     GLES2_DriverContext *data = (GLES2_DriverContext *)renderer->driverdata;
 
     GLES2_ActivateRenderer(renderer);
 
     if (!CompareColors(data->clear_r, data->clear_g, data->clear_b, data->clear_a,
                         renderer->r, renderer->g, renderer->b, renderer->a)) {
-        data->glClearColor((GLfloat) renderer->r * inv255f,
-                     (GLfloat) renderer->g * inv255f,
-                     (GLfloat) renderer->b * inv255f,
-                     (GLfloat) renderer->a * inv255f);
+
+       /* Select the color to clear with */
+       g = renderer->g;
+       a = renderer->a;
+   
+       if (renderer->target &&
+            (renderer->target->format == SDL_PIXELFORMAT_ARGB8888 ||
+             renderer->target->format == SDL_PIXELFORMAT_RGB888)) {
+           r = renderer->b;
+           b = renderer->r;
+        } else {
+           r = renderer->r;
+           b = renderer->b;
+        }
+
+        data->glClearColor((GLfloat) r * inv255f,
+                     (GLfloat) g * inv255f,
+                     (GLfloat) b * inv255f,
+                     (GLfloat) a * inv255f);
         data->clear_r = renderer->r;
         data->clear_g = renderer->g;
         data->clear_b = renderer->b;
@@ -1723,15 +1746,25 @@ GLES2_CreateRenderer(SDL_Window *window, Uint32 flags)
     Uint32 windowFlags;
     GLint window_framebuffer;
     GLint value;
+    int profile_mask, major, minor;
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile_mask);
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major);
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor);
 
     windowFlags = SDL_GetWindowFlags(window);
-    if (!(windowFlags & SDL_WINDOW_OPENGL)) {
+    if (!(windowFlags & SDL_WINDOW_OPENGL) ||
+        profile_mask != SDL_GL_CONTEXT_PROFILE_ES || major != RENDERER_CONTEXT_MAJOR || minor != RENDERER_CONTEXT_MINOR) {
+        
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, RENDERER_CONTEXT_MAJOR);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, RENDERER_CONTEXT_MINOR);
+
         if (SDL_RecreateWindow(window, windowFlags | SDL_WINDOW_OPENGL) < 0) {
             /* Uh oh, better try to put it back... */
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, profile_mask);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, major);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minor);
             SDL_RecreateWindow(window, windowFlags);
             return NULL;
         }
@@ -1751,7 +1784,7 @@ GLES2_CreateRenderer(SDL_Window *window, Uint32 flags)
         return NULL;
     }
     renderer->info = GLES2_RenderDriver.info;
-    renderer->info.flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE;
+    renderer->info.flags = (SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
     renderer->driverdata = data;
     renderer->window = window;
 
@@ -1771,6 +1804,14 @@ GLES2_CreateRenderer(SDL_Window *window, Uint32 flags)
         GLES2_DestroyRenderer(renderer);
         return NULL;
     }
+
+#if __WINRT__
+    /* DLudwig, 2013-11-29: ANGLE for WinRT doesn't seem to work unless VSync
+     * is turned on.  Not doing so will freeze the screen's contents to that
+     * of the first drawn frame.
+     */
+    flags |= SDL_RENDERER_PRESENTVSYNC;
+#endif
 
     if (flags & SDL_RENDERER_PRESENTVSYNC) {
         SDL_GL_SetSwapInterval(1);

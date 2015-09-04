@@ -1,0 +1,31 @@
+$#include "UI/CheckBox.h"
+
+class CheckBox : public BorderImage
+{
+    CheckBox();
+    virtual ~CheckBox();
+    
+    void SetChecked(bool enable);
+    void SetCheckedOffset(const IntVector2& rect);
+    void SetCheckedOffset(int x, int y);
+    
+    bool IsChecked() const;
+    const IntVector2& GetCheckedOffset() const;
+    
+    tolua_property__is_set bool checked;
+    tolua_property__get_set IntVector2& checkedOffset;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_CheckBox_new00
+static int tolua_UILuaAPI_CheckBox_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<CheckBox>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_CheckBox_new00_local
+static int tolua_UILuaAPI_CheckBox_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<CheckBox>(tolua_S);
+}
+$}

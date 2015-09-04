@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -369,30 +369,23 @@ int asCObjectType::GetTypeId() const
 // interface
 int asCObjectType::GetSubTypeId(asUINT subtypeIndex) const
 {
-	if( flags & asOBJ_TEMPLATE )
-	{
-		if( subtypeIndex >= templateSubTypes.GetLength() )
-			return asINVALID_ARG;
+	// This method is only supported for templates and template specializations
+	if( templateSubTypes.GetLength() == 0 )
+		return asERROR;
 
-		return engine->GetTypeIdFromDataType(templateSubTypes[subtypeIndex]);
-	}
+	if( subtypeIndex >= templateSubTypes.GetLength() )
+		return asINVALID_ARG;
 
-	// Only template types have sub types
-	return asERROR;
+	return engine->GetTypeIdFromDataType(templateSubTypes[subtypeIndex]);
 }
 
 // interface
 asIObjectType *asCObjectType::GetSubType(asUINT subtypeIndex) const
 {
-	if( flags & asOBJ_TEMPLATE )
-	{
-		if( subtypeIndex >= templateSubTypes.GetLength() )
-			return 0;
+	if( subtypeIndex >= templateSubTypes.GetLength() )
+		return 0;
 
-		return templateSubTypes[subtypeIndex].GetObjectType();
-	}
-
-	return 0;
+	return templateSubTypes[subtypeIndex].GetObjectType();
 }
 
 asUINT asCObjectType::GetSubTypeCount() const
@@ -720,7 +713,7 @@ asDWORD asCObjectType::GetAccessMask() const
 asCObjectProperty *asCObjectType::AddPropertyToClass(const asCString &name, const asCDataType &dt, bool isPrivate)
 {
 	asASSERT( flags & asOBJ_SCRIPT_OBJECT );
-	asASSERT( dt.CanBeInstanciated() );
+	asASSERT( dt.CanBeInstantiated() );
 	asASSERT( !IsInterface() );
 
 	// Store the properties in the object type descriptor
@@ -738,9 +731,18 @@ asCObjectProperty *asCObjectType::AddPropertyToClass(const asCString &name, cons
 	int propSize;
 	if( dt.IsObject() )
 	{
-		propSize = dt.GetSizeOnStackDWords()*4;
-		if( !dt.IsObjectHandle() )
-			prop->type.MakeReference(true);
+		// Non-POD value types can't be allocated inline,
+		// because there is a risk that the script might
+		// try to access the content without knowing that
+		// it hasn't been initialized yet.
+		if( dt.GetObjectType()->flags & asOBJ_POD )
+			propSize = dt.GetSizeInMemoryBytes();
+		else
+		{
+			propSize = dt.GetSizeOnStackDWords()*4;
+			if( !dt.IsObjectHandle() )
+				prop->type.MakeReference(true);
+		}
 	}
 	else
 		propSize = dt.GetSizeInMemoryBytes();

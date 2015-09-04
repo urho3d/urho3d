@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../SDL_internal.h"
 
 /*
    Code to load and save surfaces in Windows BMP format.
@@ -150,6 +150,8 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
         biBitCount = SDL_ReadLE16(src);
         biCompression = BI_RGB;
     } else {
+        const unsigned int headerSize = 40;
+
         biWidth = SDL_ReadLE32(src);
         biHeight = SDL_ReadLE32(src);
         /* biPlanes = */ SDL_ReadLE16(src);
@@ -160,6 +162,10 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
         /* biYPelsPerMeter = */ SDL_ReadLE32(src);
         biClrUsed = SDL_ReadLE32(src);
         /* biClrImportant = */ SDL_ReadLE32(src);
+
+        if (biSize > headerSize) {
+            SDL_RWseek(src, (biSize - headerSize), RW_SEEK_CUR);
+        }
     }
     if (biHeight < 0) {
         topDown = SDL_TRUE;

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -134,6 +134,9 @@ typedef enum
     /* Drag and drop events */
     SDL_DROPFILE        = 0x1000, /**< The system requests a file open */
 
+    /* Render events */
+    SDL_RENDER_TARGETS_RESET = 0x2000, /**< The render targets have been reset */
+
     /** Events ::SDL_USEREVENT through ::SDL_LASTEVENT are for your use,
      *  and should be allocated with SDL_RegisterEvents()
      */
@@ -239,8 +242,8 @@ typedef struct SDL_MouseButtonEvent
     Uint32 which;       /**< The mouse instance id, or SDL_TOUCH_MOUSEID */
     Uint8 button;       /**< The mouse button index */
     Uint8 state;        /**< ::SDL_PRESSED or ::SDL_RELEASED */
+    Uint8 clicks;       /**< 1 for single-click, 2 for double-click, etc. */
     Uint8 padding1;
-    Uint8 padding2;
     Sint32 x;           /**< X coordinate, relative to window */
     Sint32 y;           /**< Y coordinate, relative to window */
 } SDL_MouseButtonEvent;
@@ -254,8 +257,8 @@ typedef struct SDL_MouseWheelEvent
     Uint32 timestamp;
     Uint32 windowID;    /**< The window with mouse focus, if any */
     Uint32 which;       /**< The mouse instance id, or SDL_TOUCH_MOUSEID */
-    Sint32 x;           /**< The amount scrolled horizontally */
-    Sint32 y;           /**< The amount scrolled vertically */
+    Sint32 x;           /**< The amount scrolled horizontally, positive to the right and negative to the left */
+    Sint32 y;           /**< The amount scrolled vertically, positive away from the user and negative toward the user */
 } SDL_MouseWheelEvent;
 
 /**

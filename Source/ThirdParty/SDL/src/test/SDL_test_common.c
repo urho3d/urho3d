@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,7 +27,7 @@
 #include <stdio.h>
 
 #define VIDEO_USAGE \
-"[--video driver] [--renderer driver] [--gldebug] [--info all|video|modes|render|event] [--log all|error|system|audio|video|render|input] [--display N] [--fullscreen | --fullscreen-desktop | --windows N] [--title title] [--icon icon.bmp] [--center | --position X,Y] [--geometry WxH] [--min-geometry WxH] [--max-geometry WxH] [--logical WxH] [--scale N] [--depth N] [--refresh R] [--vsync] [--noframe] [--resize] [--minimize] [--maximize] [--grab] [--allow-hidpi]"
+"[--video driver] [--renderer driver] [--gldebug] [--info all|video|modes|render|event] [--log all|error|system|audio|video|render|input] [--display N] [--fullscreen | --fullscreen-desktop | --windows N] [--title title] [--icon icon.bmp] [--center | --position X,Y] [--geometry WxH] [--min-geometry WxH] [--max-geometry WxH] [--logical WxH] [--scale N] [--depth N] [--refresh R] [--vsync] [--noframe] [--resize] [--minimize] [--maximize] [--grab] [--allow-highdpi]"
 
 #define AUDIO_USAGE \
 "[--rate N] [--format U8|S8|U16|U16LE|U16BE|S16|S16LE|S16BE] [--channels N] [--samples N]"
@@ -706,6 +706,7 @@ SDLTest_CommonInit(SDLTest_CommonState * state)
             Uint32 Rmask, Gmask, Bmask, Amask;
 #if SDL_VIDEO_DRIVER_WINDOWS
 			int adapterIndex = 0;
+			int outputIndex = 0;
 #endif
             n = SDL_GetNumVideoDisplays();
             fprintf(stderr, "Number of displays: %d\n", n);
@@ -761,9 +762,13 @@ SDLTest_CommonInit(SDLTest_CommonState * state)
                 }
 
 #if SDL_VIDEO_DRIVER_WINDOWS
-				/* Print the adapter index */
+				/* Print the D3D9 adapter index */
 				adapterIndex = SDL_Direct3D9GetAdapterIndex( i );
-				fprintf( stderr, "Adapter Index: %d", adapterIndex );
+				fprintf( stderr, "D3D9 Adapter Index: %d", adapterIndex );
+
+				/* Print the DXGI adapter and output indices */
+				SDL_DXGIGetOutputInfo(i, &adapterIndex, &outputIndex);
+				fprintf( stderr, "DXGI Adapter Index: %d  Output Index: %d", adapterIndex, outputIndex );
 #endif
             }
         }
@@ -809,6 +814,9 @@ SDLTest_CommonInit(SDLTest_CommonState * state)
         state->renderers =
             (SDL_Renderer **) SDL_malloc(state->num_windows *
                                         sizeof(*state->renderers));
+        state->targets =
+            (SDL_Texture **) SDL_malloc(state->num_windows *
+                                        sizeof(*state->targets));
         if (!state->windows || !state->renderers) {
             fprintf(stderr, "Out of memory!\n");
             return SDL_FALSE;
@@ -861,6 +869,7 @@ SDLTest_CommonInit(SDLTest_CommonState * state)
             SDL_ShowWindow(state->windows[i]);
 
             state->renderers[i] = NULL;
+            state->targets[i] = NULL;
 
             if (!state->skip_renderer
                 && (state->renderdriver
@@ -942,6 +951,51 @@ SDLTest_CommonInit(SDLTest_CommonState * state)
     return SDL_TRUE;
 }
 
+static const char *
+ControllerAxisName(const SDL_GameControllerAxis axis)
+{
+    switch (axis)
+    {
+#define AXIS_CASE(ax) case SDL_CONTROLLER_AXIS_##ax: return #ax
+        AXIS_CASE(INVALID);
+        AXIS_CASE(LEFTX);
+        AXIS_CASE(LEFTY);
+        AXIS_CASE(RIGHTX);
+        AXIS_CASE(RIGHTY);
+        AXIS_CASE(TRIGGERLEFT);
+        AXIS_CASE(TRIGGERRIGHT);
+#undef AXIS_CASE
+default: return "???";
+    }
+}
+
+static const char *
+ControllerButtonName(const SDL_GameControllerButton button)
+{
+    switch (button)
+    {
+#define BUTTON_CASE(btn) case SDL_CONTROLLER_BUTTON_##btn: return #btn
+        BUTTON_CASE(INVALID);
+        BUTTON_CASE(A);
+        BUTTON_CASE(B);
+        BUTTON_CASE(X);
+        BUTTON_CASE(Y);
+        BUTTON_CASE(BACK);
+        BUTTON_CASE(GUIDE);
+        BUTTON_CASE(START);
+        BUTTON_CASE(LEFTSTICK);
+        BUTTON_CASE(RIGHTSTICK);
+        BUTTON_CASE(LEFTSHOULDER);
+        BUTTON_CASE(RIGHTSHOULDER);
+        BUTTON_CASE(DPAD_UP);
+        BUTTON_CASE(DPAD_DOWN);
+        BUTTON_CASE(DPAD_LEFT);
+        BUTTON_CASE(DPAD_RIGHT);
+#undef BUTTON_CASE
+default: return "???";
+    }
+}
+
 static void
 SDLTest_PrintEvent(SDL_Event * event)
 {
@@ -950,164 +1004,193 @@ SDLTest_PrintEvent(SDL_Event * event)
         return;
     }
 
-    fprintf(stderr, "SDL EVENT: ");
     switch (event->type) {
     case SDL_WINDOWEVENT:
         switch (event->window.event) {
         case SDL_WINDOWEVENT_SHOWN:
-            fprintf(stderr, "Window %d shown", event->window.windowID);
+            SDL_Log("SDL EVENT: Window %d shown", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_HIDDEN:
-            fprintf(stderr, "Window %d hidden", event->window.windowID);
+            SDL_Log("SDL EVENT: Window %d hidden", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_EXPOSED:
-            fprintf(stderr, "Window %d exposed", event->window.windowID);
+            SDL_Log("SDL EVENT: Window %d exposed", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_MOVED:
-            fprintf(stderr, "Window %d moved to %d,%d",
+            SDL_Log("SDL EVENT: Window %d moved to %d,%d",
                     event->window.windowID, event->window.data1,
                     event->window.data2);
             break;
         case SDL_WINDOWEVENT_RESIZED:
-            fprintf(stderr, "Window %d resized to %dx%d",
+            SDL_Log("SDL EVENT: Window %d resized to %dx%d",
                     event->window.windowID, event->window.data1,
                     event->window.data2);
             break;
         case SDL_WINDOWEVENT_SIZE_CHANGED:
-            fprintf(stderr, "Window %d changed size to %dx%d",
+            SDL_Log("SDL EVENT: Window %d changed size to %dx%d",
                     event->window.windowID, event->window.data1,
                     event->window.data2);
             break;
         case SDL_WINDOWEVENT_MINIMIZED:
-            fprintf(stderr, "Window %d minimized", event->window.windowID);
+            SDL_Log("SDL EVENT: Window %d minimized", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_MAXIMIZED:
-            fprintf(stderr, "Window %d maximized", event->window.windowID);
+            SDL_Log("SDL EVENT: Window %d maximized", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_RESTORED:
-            fprintf(stderr, "Window %d restored", event->window.windowID);
+            SDL_Log("SDL EVENT: Window %d restored", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_ENTER:
-            fprintf(stderr, "Mouse entered window %d",
+            SDL_Log("SDL EVENT: Mouse entered window %d",
                     event->window.windowID);
             break;
         case SDL_WINDOWEVENT_LEAVE:
-            fprintf(stderr, "Mouse left window %d", event->window.windowID);
+            SDL_Log("SDL EVENT: Mouse left window %d", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_FOCUS_GAINED:
-            fprintf(stderr, "Window %d gained keyboard focus",
+            SDL_Log("SDL EVENT: Window %d gained keyboard focus",
                     event->window.windowID);
             break;
         case SDL_WINDOWEVENT_FOCUS_LOST:
-            fprintf(stderr, "Window %d lost keyboard focus",
+            SDL_Log("SDL EVENT: Window %d lost keyboard focus",
                     event->window.windowID);
             break;
         case SDL_WINDOWEVENT_CLOSE:
-            fprintf(stderr, "Window %d closed", event->window.windowID);
+            SDL_Log("SDL EVENT: Window %d closed", event->window.windowID);
             break;
         default:
-            fprintf(stderr, "Window %d got unknown event %d",
+            SDL_Log("SDL EVENT: Window %d got unknown event %d",
                     event->window.windowID, event->window.event);
             break;
         }
         break;
     case SDL_KEYDOWN:
-        fprintf(stderr,
-                "Keyboard: key pressed  in window %d: scancode 0x%08X = %s, keycode 0x%08X = %s",
+        SDL_Log("SDL EVENT: Keyboard: key pressed  in window %d: scancode 0x%08X = %s, keycode 0x%08X = %s",
                 event->key.windowID,
                 event->key.keysym.scancode,
                 SDL_GetScancodeName(event->key.keysym.scancode),
                 event->key.keysym.sym, SDL_GetKeyName(event->key.keysym.sym));
         break;
     case SDL_KEYUP:
-        fprintf(stderr,
-                "Keyboard: key released in window %d: scancode 0x%08X = %s, keycode 0x%08X = %s",
+        SDL_Log("SDL EVENT: Keyboard: key released in window %d: scancode 0x%08X = %s, keycode 0x%08X = %s",
                 event->key.windowID,
                 event->key.keysym.scancode,
                 SDL_GetScancodeName(event->key.keysym.scancode),
                 event->key.keysym.sym, SDL_GetKeyName(event->key.keysym.sym));
         break;
     case SDL_TEXTINPUT:
-        fprintf(stderr, "Keyboard: text input \"%s\" in window %d",
+        SDL_Log("SDL EVENT: Keyboard: text input \"%s\" in window %d",
                 event->text.text, event->text.windowID);
         break;
     case SDL_MOUSEMOTION:
-        fprintf(stderr, "Mouse: moved to %d,%d (%d,%d) in window %d",
+        SDL_Log("SDL EVENT: Mouse: moved to %d,%d (%d,%d) in window %d",
                 event->motion.x, event->motion.y,
                 event->motion.xrel, event->motion.yrel,
                 event->motion.windowID);
         break;
     case SDL_MOUSEBUTTONDOWN:
-        fprintf(stderr, "Mouse: button %d pressed at %d,%d in window %d",
-                event->button.button, event->button.x, event->button.y,
+        SDL_Log("SDL EVENT: Mouse: button %d pressed at %d,%d with click count %d in window %d",
+                event->button.button, event->button.x, event->button.y, event->button.clicks,
                 event->button.windowID);
         break;
     case SDL_MOUSEBUTTONUP:
-        fprintf(stderr, "Mouse: button %d released at %d,%d in window %d",
-                event->button.button, event->button.x, event->button.y,
+        SDL_Log("SDL EVENT: Mouse: button %d released at %d,%d with click count %d in window %d",
+                event->button.button, event->button.x, event->button.y, event->button.clicks,
                 event->button.windowID);
         break;
     case SDL_MOUSEWHEEL:
-        fprintf(stderr,
-                "Mouse: wheel scrolled %d in x and %d in y in window %d",
+        SDL_Log("SDL EVENT: Mouse: wheel scrolled %d in x and %d in y in window %d",
                 event->wheel.x, event->wheel.y, event->wheel.windowID);
         break;
+    case SDL_JOYDEVICEADDED:
+        SDL_Log("SDL EVENT: Joystick index %d attached",
+            event->jdevice.which);
+        break;
+    case SDL_JOYDEVICEREMOVED:
+        SDL_Log("SDL EVENT: Joystick %d removed",
+            event->jdevice.which);
+        break;
     case SDL_JOYBALLMOTION:
-        fprintf(stderr, "Joystick %d: ball %d moved by %d,%d",
+        SDL_Log("SDL EVENT: Joystick %d: ball %d moved by %d,%d",
                 event->jball.which, event->jball.ball, event->jball.xrel,
                 event->jball.yrel);
         break;
     case SDL_JOYHATMOTION:
-        fprintf(stderr, "Joystick %d: hat %d moved to ", event->jhat.which,
-                event->jhat.hat);
-        switch (event->jhat.value) {
-        case SDL_HAT_CENTERED:
-            fprintf(stderr, "CENTER");
-            break;
-        case SDL_HAT_UP:
-            fprintf(stderr, "UP");
-            break;
-        case SDL_HAT_RIGHTUP:
-            fprintf(stderr, "RIGHTUP");
-            break;
-        case SDL_HAT_RIGHT:
-            fprintf(stderr, "RIGHT");
-            break;
-        case SDL_HAT_RIGHTDOWN:
-            fprintf(stderr, "RIGHTDOWN");
-            break;
-        case SDL_HAT_DOWN:
-            fprintf(stderr, "DOWN");
-            break;
-        case SDL_HAT_LEFTDOWN:
-            fprintf(stderr, "LEFTDOWN");
-            break;
-        case SDL_HAT_LEFT:
-            fprintf(stderr, "LEFT");
-            break;
-        case SDL_HAT_LEFTUP:
-            fprintf(stderr, "LEFTUP");
-            break;
-        default:
-            fprintf(stderr, "UNKNOWN");
-            break;
+        {
+            const char *position = "UNKNOWN";
+            switch (event->jhat.value) {
+            case SDL_HAT_CENTERED:
+                position = "CENTER";
+                break;
+            case SDL_HAT_UP:
+                position = "UP";
+                break;
+            case SDL_HAT_RIGHTUP:
+                position = "RIGHTUP";
+                break;
+            case SDL_HAT_RIGHT:
+                position = "RIGHT";
+                break;
+            case SDL_HAT_RIGHTDOWN:
+                position = "RIGHTDOWN";
+                break;
+            case SDL_HAT_DOWN:
+                position = "DOWN";
+                break;
+            case SDL_HAT_LEFTDOWN:
+                position = "LEFTDOWN";
+                break;
+            case SDL_HAT_LEFT:
+                position = "LEFT";
+                break;
+            case SDL_HAT_LEFTUP:
+                position = "LEFTUP";
+                break;
+            }
+            SDL_Log("SDL EVENT: Joystick %d: hat %d moved to %s", event->jhat.which,
+                event->jhat.hat, position);
         }
         break;
     case SDL_JOYBUTTONDOWN:
-        fprintf(stderr, "Joystick %d: button %d pressed",
+        SDL_Log("SDL EVENT: Joystick %d: button %d pressed",
                 event->jbutton.which, event->jbutton.button);
         break;
     case SDL_JOYBUTTONUP:
-        fprintf(stderr, "Joystick %d: button %d released",
+        SDL_Log("SDL EVENT: Joystick %d: button %d released",
                 event->jbutton.which, event->jbutton.button);
         break;
+    case SDL_CONTROLLERDEVICEADDED:
+        SDL_Log("SDL EVENT: Controller index %d attached",
+            event->cdevice.which);
+        break;
+    case SDL_CONTROLLERDEVICEREMOVED:
+        SDL_Log("SDL EVENT: Controller %d removed",
+            event->cdevice.which);
+        break;
+    case SDL_CONTROLLERAXISMOTION:
+        SDL_Log("SDL EVENT: Controller %d axis %d ('%s') value: %d",
+            event->caxis.which,
+            event->caxis.axis,
+            ControllerAxisName((SDL_GameControllerAxis)event->caxis.axis),
+            event->caxis.value);
+        break;
+    case SDL_CONTROLLERBUTTONDOWN:
+        SDL_Log("SDL EVENT: Controller %d button %d ('%s') down",
+            event->cbutton.which, event->cbutton.button,
+            ControllerButtonName((SDL_GameControllerButton)event->cbutton.button));
+        break;
+    case SDL_CONTROLLERBUTTONUP:
+        SDL_Log("SDL EVENT: Controller %d button %d ('%s') up",
+            event->cbutton.which, event->cbutton.button,
+            ControllerButtonName((SDL_GameControllerButton)event->cbutton.button));
+        break;
     case SDL_CLIPBOARDUPDATE:
-        fprintf(stderr, "Clipboard updated");
+        SDL_Log("SDL EVENT: Clipboard updated");
         break;
 
     case SDL_FINGERDOWN:
     case SDL_FINGERUP:
-        fprintf(stderr, "Finger: %s touch=%ld, finger=%ld, x=%f, y=%f, dx=%f, dy=%f, pressure=%f",
+        SDL_Log("SDL EVENT: Finger: %s touch=%ld, finger=%ld, x=%f, y=%f, dx=%f, dy=%f, pressure=%f",
                 (event->type == SDL_FINGERDOWN) ? "down" : "up",
                 (long) event->tfinger.touchId,
                 (long) event->tfinger.fingerId,
@@ -1116,16 +1199,15 @@ SDLTest_PrintEvent(SDL_Event * event)
         break;
 
     case SDL_QUIT:
-        fprintf(stderr, "Quit requested");
+        SDL_Log("SDL EVENT: Quit requested");
         break;
     case SDL_USEREVENT:
-        fprintf(stderr, "User event %d", event->user.code);
+        SDL_Log("SDL EVENT: User event %d", event->user.code);
         break;
     default:
-        fprintf(stderr, "Unknown event %d", event->type);
+        SDL_Log("Unknown event %d", event->type);
         break;
     }
-    fprintf(stderr, "\n");
 }
 
 static void
@@ -1204,9 +1286,17 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
             {
                 SDL_Window *window = SDL_GetWindowFromID(event->window.windowID);
                 if (window) {
-                    SDL_DestroyWindow(window);
                     for (i = 0; i < state->num_windows; ++i) {
                         if (window == state->windows[i]) {
+                            if (state->targets[i]) {
+                                SDL_DestroyTexture(state->targets[i]);
+                                state->targets[i] = NULL;
+                            }
+                            if (state->renderers[i]) {
+                                SDL_DestroyRenderer(state->renderers[i]);
+                                state->renderers[i] = NULL;
+                            }
+                            SDL_DestroyWindow(state->windows[i]);
                             state->windows[i] = NULL;
                             break;
                         }
@@ -1216,7 +1306,11 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
             break;
         }
         break;
-    case SDL_KEYDOWN:
+    case SDL_KEYDOWN: {
+        SDL_bool withControl = !!(event->key.keysym.mod & KMOD_CTRL);
+        SDL_bool withShift = !!(event->key.keysym.mod & KMOD_SHIFT);
+        SDL_bool withAlt = !!(event->key.keysym.mod & KMOD_ALT);
+
         switch (event->key.keysym.sym) {
             /* Add hotkeys here */
         case SDLK_PRINTSCREEN: {
@@ -1231,7 +1325,7 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
             }
             break;
         case SDLK_EQUALS:
-            if (event->key.keysym.mod & KMOD_CTRL) {
+            if (withControl) {
                 /* Ctrl-+ double the size of the window */
                 SDL_Window *window = SDL_GetWindowFromID(event->key.windowID);
                 if (window) {
@@ -1242,7 +1336,7 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
             }
             break;
         case SDLK_MINUS:
-            if (event->key.keysym.mod & KMOD_CTRL) {
+            if (withControl) {
                 /* Ctrl-- half the size of the window */
                 SDL_Window *window = SDL_GetWindowFromID(event->key.windowID);
                 if (window) {
@@ -1253,12 +1347,12 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
             }
             break;
         case SDLK_c:
-            if (event->key.keysym.mod & KMOD_CTRL) {
+            if (withControl) {
                 /* Ctrl-C copy awesome text! */
                 SDL_SetClipboardText("SDL rocks!\nYou know it!");
                 printf("Copied text to clipboard\n");
             }
-            if (event->key.keysym.mod & KMOD_ALT) {
+            if (withAlt) {
                 /* Alt-C toggle a render clip rectangle */
                 for (i = 0; i < state->num_windows; ++i) {
                     int w, h;
@@ -1280,7 +1374,7 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
             }
             break;
         case SDLK_v:
-            if (event->key.keysym.mod & KMOD_CTRL) {
+            if (withControl) {
                 /* Ctrl-V paste awesome text! */
                 char *text = SDL_GetClipboardText();
                 if (*text) {
@@ -1292,7 +1386,7 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
             }
             break;
         case SDLK_g:
-            if (event->key.keysym.mod & KMOD_CTRL) {
+            if (withControl) {
                 /* Ctrl-G toggle grab */
                 SDL_Window *window = SDL_GetWindowFromID(event->key.windowID);
                 if (window) {
@@ -1301,7 +1395,7 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
             }
             break;
         case SDLK_m:
-            if (event->key.keysym.mod & KMOD_CTRL) {
+            if (withControl) {
                 /* Ctrl-M maximize */
                 SDL_Window *window = SDL_GetWindowFromID(event->key.windowID);
                 if (window) {
@@ -1315,13 +1409,13 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
             }
             break;
         case SDLK_r:
-            if (event->key.keysym.mod & KMOD_CTRL) {
+            if (withControl) {
                 /* Ctrl-R toggle mouse relative mode */
                 SDL_SetRelativeMouseMode(!SDL_GetRelativeMouseMode() ? SDL_TRUE : SDL_FALSE);
             }
             break;
         case SDLK_z:
-            if (event->key.keysym.mod & KMOD_CTRL) {
+            if (withControl) {
                 /* Ctrl-Z minimize */
                 SDL_Window *window = SDL_GetWindowFromID(event->key.windowID);
                 if (window) {
@@ -1330,7 +1424,7 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
             }
             break;
         case SDLK_RETURN:
-            if (event->key.keysym.mod & KMOD_CTRL) {
+            if (withControl) {
                 /* Ctrl-Enter toggle fullscreen */
                 SDL_Window *window = SDL_GetWindowFromID(event->key.windowID);
                 if (window) {
@@ -1338,10 +1432,10 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
                     if (flags & SDL_WINDOW_FULLSCREEN) {
                         SDL_SetWindowFullscreen(window, SDL_FALSE);
                     } else {
-                        SDL_SetWindowFullscreen(window, SDL_TRUE);
+                        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
                     }
                 }
-            } else if (event->key.keysym.mod & KMOD_ALT) {
+            } else if (withAlt) {
                 /* Alt-Enter toggle fullscreen desktop */
                 SDL_Window *window = SDL_GetWindowFromID(event->key.windowID);
                 if (window) {
@@ -1352,10 +1446,22 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
                         SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
                     }
                 }
+            } else if (withShift) {
+                /* Shift-Enter toggle fullscreen desktop / fullscreen */
+                SDL_Window *window = SDL_GetWindowFromID(event->key.windowID);
+                if (window) {
+                    Uint32 flags = SDL_GetWindowFlags(window);
+                    if ((flags & SDL_WINDOW_FULLSCREEN_DESKTOP) == SDL_WINDOW_FULLSCREEN_DESKTOP) {
+                        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+                    } else {
+                        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                    }
+                }
             }
+
             break;
         case SDLK_b:
-            if (event->key.keysym.mod & KMOD_CTRL) {
+            if (withControl) {
                 /* Ctrl-B toggle window border */
                 SDL_Window *window = SDL_GetWindowFromID(event->key.windowID);
                 if (window) {
@@ -1366,18 +1472,18 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
             }
             break;
         case SDLK_0:
-            if (event->key.keysym.mod & KMOD_CTRL) {
+            if (withControl) {
                 SDL_Window *window = SDL_GetWindowFromID(event->key.windowID);
                 SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Test Message", "You're awesome!", window);
             }
             break;
         case SDLK_1:
-            if (event->key.keysym.mod & KMOD_CTRL) {
+            if (withControl) {
                 FullscreenTo(0, event->key.windowID);
             }
             break;
         case SDLK_2:
-            if (event->key.keysym.mod & KMOD_CTRL) {
+            if (withControl) {
                 FullscreenTo(1, event->key.windowID);
             }
             break;
@@ -1397,6 +1503,7 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
             break;
         }
         break;
+    }
     case SDL_QUIT:
         *done = 1;
         break;
@@ -1412,6 +1519,14 @@ SDLTest_CommonQuit(SDLTest_CommonState * state)
     int i;
 
     SDL_free(state->windows);
+    if (state->targets) {
+        for (i = 0; i < state->num_windows; ++i) {
+            if (state->targets[i]) {
+                SDL_DestroyTexture(state->targets[i]);
+            }
+        }
+        SDL_free(state->targets);
+    }
     if (state->renderers) {
         for (i = 0; i < state->num_windows; ++i) {
             if (state->renderers[i]) {
@@ -1427,6 +1542,7 @@ SDLTest_CommonQuit(SDLTest_CommonState * state)
         SDL_AudioQuit();
     }
     SDL_free(state);
+    SDL_Quit();
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

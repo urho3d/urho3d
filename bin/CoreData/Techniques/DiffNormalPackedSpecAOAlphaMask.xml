@@ -1,0 +1,9 @@
+<technique vs="LitSolid" ps="LitSolid" psdefines="DIFFMAP ALPHAMASK" alphamask="true" >
+    <pass name="base" vsdefines="AO" psdefines="AO" />
+    <pass name="light" vsdefines="NORMALMAP" psdefines="NORMALMAP PACKEDNORMAL SPECMAP" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" vsdefines="NORMALMAP" psdefines="PREPASS NORMALMAP PACKEDNORMAL SPECMAP" />
+    <pass name="material" vsdefines="AO" psdefines="MATERIAL SPECMAP AO" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vsdefines="NORMALMAP AO" psdefines="DEFERRED NORMALMAP PACKEDNORMAL SPECMAP AO" />
+    <pass name="depth" vs="Depth" ps="Depth" psdefines="ALPHAMASK" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" psdefines="ALPHAMASK" />
+</technique>

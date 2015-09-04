@@ -1,17 +1,24 @@
-# Build directories
-Build/
-*-Build/
-
 # Output directories
-Bin/*
-!Bin/**/
-!Bin/*.bat
-!Bin/*.sh
-Bin/*.app/
-Bin/*.app.dSYM/
-*-Bin/
-Lib/
-*-Lib/
+/bin/*
+!/bin/**/
+!/bin/*.bat
+!/bin/*.sh
+/bin/*.app/
+/bin/*.app.dSYM/
+/bin/jit/
+/bin/Screenshots/
+/bin/tool/
+/include/
+/lib*/
+generated/
+
+# Output files
+/Source/**/*.a
+/Source/ThirdParty/LuaJIT/src/host/buildvm_arch.h
+/Source/Urho3D/Urho3D.h
+/Source/Urho3D/Urho3D.pc
+/Source/Urho3D/librevision.h
+/Source/Urho3D/Precompiled.cpp
 
 # Compiled shaders
 *.vs2
@@ -22,32 +29,57 @@ Lib/
 # Compiled AngelScript
 *.asc
 
+# Compiled Lua script
+*.luc
+
 # Generated documentation
-Docs/html/
-Docs/Doxyfile
-Docs/minimal-*
+/Docs/html/
+/Docs/qch/
+/Docs/Doxyfile
 
 # Eclipse project settings
-Source/.*project
-Source/.settings
+/.*project
+/.settings
 
-# Android in-the-source project settings
-Source/Android/project.properties
-Source/Android/local.properties
-Source/Android/proguard-project.txt
+# KDevelop project settings
+/*.kdev?
 
-# Android in-the-source build and output directories
-Source/Android/Engine
-Source/Android/ThirdParty
-Source/Android/libs
+# Qt Creator project settings
+/CMakeLists.txt.user
 
-# Android in-the-source CMake build files
+# JetBrains IDE project settings
+/.idea/
+
+# Custom rake tasks
+/.rake/
+
+# Android project settings
+/Android/project.properties
+/Android/local.properties
+/Android/proguard-project.txt
+
+# Android output directories
+/Android/Urho3D/
+/Android/ThirdParty/
+/Android/libs/
+
+# CMake generated build files
 CMakeCache.txt
 CMakeFiles/
 CMakeScripts/
 Makefile
 cmake_install.cmake
 install_manifest.txt
+CPackConfig.cmake
+CPackSourceConfig.cmake
+CTestTestfile.cmake
+/Source/**/*.cmake
+/Docs/**/*.cmake
+
+# Precompiled header files
+*.gch/
+*.pch/
+*.pch.*
 
 # Misc.
 configure*
@@ -56,3 +88,4 @@ configure*
 .DS_Store
 *.log
 *.bak
+Thumbs.db

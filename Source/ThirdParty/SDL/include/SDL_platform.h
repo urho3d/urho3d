@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,6 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 /**
  *  \file SDL_platform.h
  *
@@ -31,10 +33,6 @@
 #if defined(_AIX)
 #undef __AIX__
 #define __AIX__     1
-#endif
-#if defined(__BEOS__)
-#undef __BEOS__
-#define __BEOS__    1
 #endif
 #if defined(__HAIKU__)
 #undef __HAIKU__
@@ -64,7 +62,7 @@
 #undef __LINUX__
 #define __LINUX__   1
 #endif
-#if defined(ANDROID)
+#if defined(ANDROID) || defined(__ANDROID__)
 #undef __ANDROID__
 #undef __LINUX__ /* do we need to do this? */
 #define __ANDROID__ 1
@@ -86,9 +84,6 @@
 #if MAC_OS_X_VERSION_MIN_REQUIRED < 1050
 # error SDL for Mac OS X only supports deploying on 10.5 and above.
 #endif /* MAC_OS_X_VERSION_MIN_REQUIRED < 1050 */
-#if MAC_OS_X_VERSION_MAX_ALLOWED < 1060
-# error SDL for Mac OS X must be built with a 10.6 SDK or above.
-#endif /* MAC_OS_X_VERSION_MAX_ALLOWED < 1060 */
 #endif /* TARGET_OS_IPHONE */
 #endif /* defined(__APPLE__) */
 
@@ -120,10 +115,28 @@
 #undef __SOLARIS__
 #define __SOLARIS__ 1
 #endif
+
 #if defined(WIN32) || defined(_WIN32) || defined(__CYGWIN__)
+/* Try to find out if we're compiling for WinRT or non-WinRT */
+/* If _USING_V110_SDK71_ is defined it means we are using the v110_xp or v120_xp toolset. */
+// Urho3D: not all MinGW versions contain the winapifamily.h include file. Only check for WinRT
+// on Visual Studio
+#if (defined(_MSC_VER) && (_MSC_VER >= 1700) && !_USING_V110_SDK71_)	/* _MSC_VER==1700 for MSVC 2012 */
+#include <winapifamily.h>
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 #undef __WINDOWS__
 #define __WINDOWS__   1
+/* See if we're compiling for WinRT: */
+#elif WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
+#undef __WINRT__
+#define __WINRT__ 1
 #endif
+#else
+#undef __WINDOWS__
+#define __WINDOWS__   1
+#endif /* _MSC_VER < 1700 */
+#endif /* defined(WIN32) || defined(_WIN32) || defined(__CYGWIN__) */
+
 #if defined(__WINDOWS__)
 #undef __WIN32__
 #define __WIN32__ 1

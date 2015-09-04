@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<node id="3">
+	<attribute name="Name" value="SnowCrate" />
+	<attribute name="Position" value="0 0 0" />
+	<attribute name="Rotation" value="1 0 0 0" />
+	<attribute name="Scale" value="1 1 1" />
+	<attribute name="Variables" />
+	<component type="ScriptInstance" id="16777219">
+		<attribute name="Delayed Method Calls" value="0" />
+		<attribute name="Script File" value="ScriptFile;Scripts/NinjaSnowWar.as" />
+		<attribute name="Class Name" value="SnowCrate" />
+		<attribute name="Script Data" value="" />
+	</component>
+	<component type="NetworkPriority" id="16777220">
+		<attribute name="Base Priority" value="100" />
+		<attribute name="Distance Factor" value="4" />
+		<attribute name="Minimum Priority" value="15" />
+		<attribute name="Always Update Owner" value="true" />
+	</component>
+	<component type="StaticModel" id="11">
+		<attribute name="Model" value="Model;Models/NinjaSnowWar/SnowCrate.mdl" />
+		<attribute name="Material" value="Material;Materials/NinjaSnowWar/SnowCrate.xml" />
+		<attribute name="Is Occluder" value="false" />
+		<attribute name="Can Be Occluded" value="true" />
+		<attribute name="Cast Shadows" value="true" />
+		<attribute name="Draw Distance" value="0" />
+		<attribute name="Shadow Distance" value="0" />
+		<attribute name="LOD Bias" value="1" />
+		<attribute name="Max Lights" value="0" />
+		<attribute name="View Mask" value="-1" />
+		<attribute name="Light Mask" value="-1" />
+		<attribute name="Shadow Mask" value="-1" />
+		<attribute name="Zone Mask" value="-1" />
+	</component>
+	<component type="CollisionShape" id="12">
+		<attribute name="Shape Type" value="Box" />
+		<attribute name="Size" value="0.8 0.8 0.8" />
+		<attribute name="Offset Position" value="0 0 0" />
+		<attribute name="Offset Rotation" value="1 0 0 0" />
+		<attribute name="Collision Margin" value="0.01" />
+		<attribute name="Model" value="Model;" />
+		<attribute name="LOD Level" value="0" />
+	</component>
+	<component type="RigidBody" id="13">
+		<attribute name="Physics Position" value="0 0 0" />
+		<attribute name="Physics Rotation" value="1 0 0 0" />
+		<attribute name="Mass" value="200" />
+		<attribute name="Friction" value="0.5" />
+		<attribute name="Restitution" value="0" />
+		<attribute name="Linear Velocity" value="0 0 0" />
+		<attribute name="Angular Velocity" value="0 0 0" />
+		<attribute name="Linear Factor" value="1 1 1" />
+		<attribute name="Angular Factor" value="1 1 1" />
+		<attribute name="Linear Damping" value="0" />
+		<attribute name="Angular Damping" value="0" />
+		<attribute name="Linear Rest Threshold" value="0.01" />
+		<attribute name="Angular Rest Threshold" value="1" />
+		<attribute name="Collision Layer" value="2" />
+		<attribute name="Collision Mask" value="3" />
+		<attribute name="Collision Event Mode" value="When Active" />
+		<attribute name="Use Gravity" value="true" />
+		<attribute name="Is Kinematic" value="false" />
+		<attribute name="Is Trigger" value="false" />
+	</component>
+</node>

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,21 @@ public:
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
 
+protected:
+    /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
+    virtual String GetScreenJoystickPatchString() const { return
+        "<patch>"
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />"
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>"
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">"
+        "        <element type=\"Text\">"
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />"
+        "            <attribute name=\"Text\" value=\"SPACE\" />"
+        "        </element>"
+        "    </add>"
+        "</patch>";
+    }
+
 private:
     /// Construct the scene content.
     void CreateScene();
@@ -66,14 +81,6 @@ private:
     /// Handle the post-render update event.
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
     
-    /// Scene.
-    SharedPtr<Scene> scene_;
-    /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
-    /// Camera yaw angle.
-    float yaw_;
-    /// Camera pitch angle.
-    float pitch_;
     /// Flag for drawing debug geometry.
     bool drawDebug_;
 };

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -56,12 +56,11 @@ public:
 	asCGarbageCollector();
 	~asCGarbageCollector();
 
-	int    GarbageCollect(asDWORD flags);
+	int    GarbageCollect(asDWORD flags, asUINT iterations);
 	void   GetStatistics(asUINT *currentSize, asUINT *totalDestroyed, asUINT *totalDetected, asUINT *newObjects, asUINT *totalNewDestroyed) const;
 	void   GCEnumCallback(void *reference);
 	int    AddScriptObjectToGC(void *obj, asCObjectType *objType);
 	int    GetObjectInGC(asUINT idx, asUINT *seqNbr, void **obj, asIObjectType **type);
-	bool   IsObjectInGC(void *obj);
 
 	int    ReportAndReleaseUndestroyedObjects();
 
@@ -105,6 +104,7 @@ protected:
 	void           RemoveNewObjectAtIdx(int idx);
 	void           RemoveOldObjectAtIdx(int idx);
 	void           MoveObjectToOldList(int idx);
+	void           MoveAllObjectsToOldList();
 
 	// Holds all the objects known by the garbage collector
 	asCArray<asSObjTypePair>           gcNewObjects;

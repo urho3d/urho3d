@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<scene id="1">
+	<attribute name="Name" value="NinjaSnowWar" />
+	<attribute name="Time Scale" value="1" />
+	<attribute name="Smoothing Constant" value="50" />
+	<attribute name="Snap Threshold" value="500" />
+	<attribute name="Elapsed Time" value="0" />
+	<attribute name="Next Replicated Node ID" value="2" />
+	<attribute name="Next Replicated Component ID" value="1" />
+	<attribute name="Next Local Node ID" value="16777220" />
+	<attribute name="Next Local Component ID" value="16777223" />
+	<attribute name="Variables" />
+	<attribute name="Variable Names" value="" />
+	<component type="Octree" id="16777216">
+		<attribute name="Bounding Box Min" value="-200 -200 -200" />
+		<attribute name="Bounding Box Max" value="200 200 200" />
+		<attribute name="Number of Levels" value="7" />
+	</component>
+	<component type="PhysicsWorld" id="16777217">
+		<attribute name="Physics FPS" value="100" />
+	</component>
+	<component type="DebugRenderer" id="16777218" />
+	<node id="16777216">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Zone" />
+		<attribute name="Position" value="0 0 0" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="Zone" id="16777219">
+			<attribute name="Bounding Box Min" value="-1000 -1000 -1000" />
+			<attribute name="Bounding Box Max" value="1000 1000 1000" />
+			<attribute name="Ambient Color" value="0.2 0.2 0.7 1" />
+			<attribute name="Fog Color" value="0.2 0.2 0.7 1" />
+			<attribute name="Fog Start" value="50" />
+			<attribute name="Fog End" value="150" />
+		</component>
+	</node>
+	<node id="16777217">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="GlobalLight" />
+		<attribute name="Position" value="0 0 0" />
+		<attribute name="Rotation" value="0.888074 0.325058 -0.325058 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="Light" id="16777220">
+			<attribute name="Light Type" value="Directional" />
+			<attribute name="Specular Intensity" value="0" />
+			<attribute name="Cast Shadows" value="true" />
+			<attribute name="CSM Splits" value="10 20 50 0" />
+			<attribute name="View Size Quantize" value="1" />
+			<attribute name="View Size Minimum" value="5" />
+			<attribute name="Depth Constant Bias" value="0.00025" />
+			<attribute name="Depth Slope Bias" value="0.001" />
+		</component>
+	</node>
+	<node id="16777218">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Static" />
+		<attribute name="Position" value="0 0 0" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="StaticModel" id="16777221">
+			<attribute name="Model" value="Model;Models/NinjaSnowWar/Level.mdl" />
+			<attribute name="Material" value="Material;Materials/NinjaSnowWar/Snow.xml" />
+		</component>
+		<component type="CollisionShape" id="16777222">
+			<attribute name="Shape Type" value="TriangleMesh" />
+			<attribute name="Model" value="Model;Models/NinjaSnowWar/Level.mdl" />
+			<attribute name="Collision Margin" value="0.01" />
+		</component>
+		<component type="RigidBody" id="16777223">
+			<attribute name="Collision Layer" value="2" />
+			<attribute name="Collision Mask" value="3" />
+		</component>
+	</node>
+	<node id="16777219">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Sky" />
+		<attribute name="Position" value="0 30 0" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="300 1 300" />
+		<attribute name="Variables" />
+		<component type="Skybox" id="16777224">
+			<attribute name="Model" value="Model;Models/NinjaSnowWar/CloudPlane.mdl" />
+			<attribute name="Material" value="Material;Materials/NinjaSnowWar/CloudPlane.xml" />
+		</component>
+	</node>
+</scene>

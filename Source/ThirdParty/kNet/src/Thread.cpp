@@ -56,7 +56,7 @@ void Thread::Hold()
 		if (success)
 			break;
 	}
-	LOG(LogWaits, "Thread::Hold: Took %f msecs.", timer.MSecsElapsed());
+	KNET_LOG(LogWaits, "Thread::Hold: Took %f msecs.", timer.MSecsElapsed());
 }
 
 /// Resumes the thread that is being held.
@@ -71,7 +71,7 @@ void Thread::CheckHold()
 {
 	if (threadHoldEvent.Test())
 	{
-		LOG(LogVerbose, "Thread::CheckHold(): suspending thread. this: %p.", this);
+		KNET_LOG(LogVerbose, "Thread::CheckHold(): suspending thread. this: %p.", this);
 
 		PolledTimer timer;
 		while(!ShouldQuit())
@@ -81,7 +81,7 @@ void Thread::CheckHold()
 			if (success)
 				break;
 		}
-		LOG(LogWaits, "Thread::CheckHold: Slept for %f msecs.", timer.MSecsElapsed());
+		KNET_LOG(LogWaits, "Thread::CheckHold: Slept for %f msecs.", timer.MSecsElapsed());
 		threadHoldEventAcked.Reset();
 	}
 }

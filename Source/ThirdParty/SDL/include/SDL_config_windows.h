@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -120,6 +120,8 @@ typedef unsigned int uintptr_t;
 #define HAVE__STRNICMP 1
 #define HAVE_ATAN 1
 #define HAVE_ATAN2 1
+#define HAVE_ACOS  1
+#define HAVE_ASIN  1
 #define HAVE_CEIL 1
 #define HAVE_COS 1
 #define HAVE_COSF 1
@@ -132,7 +134,7 @@ typedef unsigned int uintptr_t;
 #define HAVE_SQRT 1
 #if _MSC_VER >= 1800
 #define HAVE_STRTOLL 1
-#define HAVE_SSCANF 1
+#define HAVE_VSSCANF 1
 #define HAVE_COPYSIGN 1
 #define HAVE_SCALBN 1
 #endif
@@ -173,6 +175,9 @@ typedef unsigned int uintptr_t;
 #ifndef SDL_VIDEO_RENDER_D3D
 #define SDL_VIDEO_RENDER_D3D    1
 #endif
+#ifndef SDL_VIDEO_RENDER_D3D11
+#define SDL_VIDEO_RENDER_D3D11	0
+#endif
 
 /* Enable OpenGL support */
 #ifndef SDL_VIDEO_OPENGL
@@ -184,6 +189,17 @@ typedef unsigned int uintptr_t;
 #ifndef SDL_VIDEO_RENDER_OGL
 #define SDL_VIDEO_RENDER_OGL    1
 #endif
+// Urho3D: Disable OpenGL ES on Windows
+#ifndef SDL_VIDEO_RENDER_OGL_ES2
+#define SDL_VIDEO_RENDER_OGL_ES2    0
+#endif
+#ifndef SDL_VIDEO_OPENGL_ES2
+#define SDL_VIDEO_OPENGL_ES2    0
+#endif
+#ifndef SDL_VIDEO_OPENGL_EGL
+#define SDL_VIDEO_OPENGL_EGL    0
+#endif
+
 
 /* Enable system power support */
 #define SDL_POWER_WINDOWS 1

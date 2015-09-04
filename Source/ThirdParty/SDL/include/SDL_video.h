@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,7 +20,6 @@
 */
 
 // Modified by Lasse Oorni for Urho3D
-
 /**
  *  \file SDL_video.h
  *
@@ -867,6 +866,11 @@ extern DECLSPEC void SDLCALL SDL_GL_UnloadLibrary(void);
  */
 extern DECLSPEC SDL_bool SDLCALL SDL_GL_ExtensionSupported(const char
                                                            *extension);
+
+/**
+ *  \brief Reset all previously set OpenGL context attributes to their default values
+ */
+extern DECLSPEC void SDLCALL SDL_GL_ResetAttributes(void);
 
 /**
  *  \brief Set an OpenGL window attribute before window creation.

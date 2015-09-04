@@ -23,7 +23,7 @@ following conditions are met:
   derived from this software without specific prior
   written permission of the assimp team.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ASSIMP_BUILD_NO_FBX_IMPORTER
 
 #include <iterator>
+#include <sstream>
 #include <boost/tuple/tuple.hpp>
 
 #include "FBXParser.h"
@@ -62,7 +63,6 @@ namespace FBX {
 
 
 #define MAGIC_NODE_TAG "_$AssimpFbx$"
-#define MAGIC_NULL_TAG "_$AssimpFbxNull$"
 
 #define CONVERT_FBX_TIME(time) static_cast<double>(time) / 46186158000L
 
@@ -88,11 +88,12 @@ public:
 		TransformationComp_ScalingPivot,
 		TransformationComp_Scaling,
 		TransformationComp_ScalingPivotInverse,
+		TransformationComp_GeometricTranslation,
+		TransformationComp_GeometricRotation,
+		TransformationComp_GeometricScaling,
 
 		TransformationComp_MAXIMUM
 	};
-
-
 
 public:
 
@@ -120,7 +121,7 @@ public:
 				if(mat) {
 
 					if (materials_converted.find(mat) == materials_converted.end()) {
-						ConvertMaterial(*mat);
+						ConvertMaterial(*mat, 0);
 					}
 				}
 			}
@@ -220,6 +221,9 @@ private:
 						name_carrier = nodes_chain.back();
 					}
 
+					//setup metadata on newest node
+					SetupNodeMetadata(*model, *nodes_chain.back());
+
 					// link all nodes in a row
 					aiNode* last_parent = &parent;
 					BOOST_FOREACH(aiNode* prenode, nodes_chain) {
@@ -249,14 +253,6 @@ private:
 
 					if(doc.Settings().readCameras) {
 						ConvertCameras(*model);
-					}
-
-					// preserve the info that a node was marked as Null node
-					// in the original file.
-					if(model->IsNull()) {
-						const std::string& new_name = original_name + MAGIC_NULL_TAG;
-						RenameNode(original_name, new_name);
-						name_carrier->mName.Set( new_name.c_str() );
 					}
 
 					nodes.push_back(nodes_chain.front());	
@@ -382,10 +378,11 @@ private:
 
 		out_camera->mName.Set(FixNodeName(model.Name()));
 
-		out_camera->mAspect = cam.AspectWidth();
+		out_camera->mAspect = cam.AspectWidth() / cam.AspectHeight();
 		out_camera->mPosition = cam.Position();
 		out_camera->mLookAt = cam.InterestPosition() - out_camera->mPosition;
 
+		// BUG HERE cam.FieldOfView() returns 1.0f every time.  1.0f is default value.
 		out_camera->mHorizontalFOV = AI_DEG_TO_RAD(cam.FieldOfView());
 	}
 
@@ -419,6 +416,12 @@ private:
 			return "Scaling";
 		case TransformationComp_ScalingPivotInverse:
 			return "ScalingPivotInverse";
+		case TransformationComp_GeometricScaling:
+			return "GeometricScaling";
+		case TransformationComp_GeometricRotation:
+			return "GeometricRotation";
+		case TransformationComp_GeometricTranslation:
+			return "GeometricTranslation";
 		case TransformationComp_MAXIMUM: // this is to silence compiler warnings
 			break;
 		}
@@ -456,6 +459,12 @@ private:
 			return "Lcl Scaling";
 		case TransformationComp_ScalingPivotInverse:
 			return "ScalingPivotInverse";
+		case TransformationComp_GeometricScaling:
+			return "GeometricScaling";
+		case TransformationComp_GeometricRotation:
+			return "GeometricRotation";
+		case TransformationComp_GeometricTranslation:
+			return "GeometricTranslation";
 		case TransformationComp_MAXIMUM: // this is to silence compiler warnings
 			break;
 		}
@@ -577,9 +586,8 @@ private:
 		for (size_t i = 0; i < TransformationComp_MAXIMUM; ++i) {
 			const TransformationComp comp = static_cast<TransformationComp>(i);
 
-			if(comp == TransformationComp_Rotation || comp == TransformationComp_Scaling || 
-				comp == TransformationComp_Translation) {
-
+			if( comp == TransformationComp_Rotation || comp == TransformationComp_Scaling || comp == TransformationComp_Translation ||
+				comp == TransformationComp_GeometricScaling || comp == TransformationComp_GeometricRotation || comp == TransformationComp_GeometricTranslation ) { 
 				continue;
 			}
 
@@ -676,6 +684,21 @@ private:
 		if(ok && Rotation.SquareLength() > zero_epsilon) {
 			GetRotationMatrix(rot, Rotation, chain[TransformationComp_Rotation]);
 		}
+		
+		const aiVector3D& GeometricScaling = PropertyGet<aiVector3D>(props, "GeometricScaling", ok);
+		if (ok && fabs(GeometricScaling.SquareLength() - 1.0f) > zero_epsilon) {
+			aiMatrix4x4::Scaling(GeometricScaling, chain[TransformationComp_GeometricScaling]);
+		}
+		
+		const aiVector3D& GeometricRotation = PropertyGet<aiVector3D>(props, "GeometricRotation", ok);
+		if (ok && GeometricRotation.SquareLength() > zero_epsilon) {
+			GetRotationMatrix(rot, GeometricRotation, chain[TransformationComp_GeometricRotation]);
+		}
+
+		const aiVector3D& GeometricTranslation = PropertyGet<aiVector3D>(props, "GeometricTranslation", ok);
+		if (ok && GeometricTranslation.SquareLength() > zero_epsilon){
+			aiMatrix4x4::Translation(GeometricTranslation, chain[TransformationComp_GeometricTranslation]);
+		}
 
 		// is_complex needs to be consistent with NeedsComplexTransformationChain()
 		// or the interplay between this code and the animation converter would
@@ -725,7 +748,49 @@ private:
 			nd->mTransformation = nd->mTransformation * chain[i];
 		}
 	}
+	
+	// ------------------------------------------------------------------------------------------------
 
+	void SetupNodeMetadata(const Model& model, aiNode& nd)
+	{
+		const PropertyTable& props = model.Props();
+		DirectPropertyMap unparsedProperties = props.GetUnparsedProperties();
+
+		// create metadata on node
+		std::size_t numStaticMetaData = 2;
+		aiMetadata* data = new aiMetadata();
+		data->mNumProperties = unparsedProperties.size() + numStaticMetaData;
+		data->mKeys = new aiString[data->mNumProperties]();
+		data->mValues = new aiMetadataEntry[data->mNumProperties]();
+		nd.mMetaData = data;
+		int index = 0;
+
+		// find user defined properties (3ds Max)
+		data->Set(index++, "UserProperties", aiString(PropertyGet<std::string>(props, "UDP3DSMAX", "")));
+		unparsedProperties.erase("UDP3DSMAX");
+		// preserve the info that a node was marked as Null node in the original file.
+		data->Set(index++, "IsNull", model.IsNull() ? true : false);
+
+		// add unparsed properties to the node's metadata
+		BOOST_FOREACH(const DirectPropertyMap::value_type& prop, unparsedProperties) {
+
+			// Interpret the property as a concrete type
+			if (const TypedProperty<bool>* interpreted = prop.second->As<TypedProperty<bool> >())
+				data->Set(index++, prop.first, interpreted->Value());
+			else if (const TypedProperty<int>* interpreted = prop.second->As<TypedProperty<int> >())
+				data->Set(index++, prop.first, interpreted->Value());
+			else if (const TypedProperty<uint64_t>* interpreted = prop.second->As<TypedProperty<uint64_t> >())
+				data->Set(index++, prop.first, interpreted->Value());
+			else if (const TypedProperty<float>* interpreted = prop.second->As<TypedProperty<float> >())
+				data->Set(index++, prop.first, interpreted->Value());
+			else if (const TypedProperty<std::string>* interpreted = prop.second->As<TypedProperty<std::string> >())
+				data->Set(index++, prop.first, aiString(interpreted->Value()));
+			else if (const TypedProperty<aiVector3D>* interpreted = prop.second->As<TypedProperty<aiVector3D> >())
+				data->Set(index++, prop.first, interpreted->Value());
+			else
+				assert(false);
+		}
+	}
 
 	// ------------------------------------------------------------------------------------------------
 	void ConvertModel(const Model& model, aiNode& nd, const aiMatrix4x4& node_global_transform)
@@ -1316,7 +1381,7 @@ private:
 			return;
 		}
 
-		out->mMaterialIndex = ConvertMaterial(*mat);	
+		out->mMaterialIndex = ConvertMaterial(*mat, &geo);	
 		materials_converted[mat] = out->mMaterialIndex;
 	}
 
@@ -1346,7 +1411,7 @@ private:
 
 	// ------------------------------------------------------------------------------------------------
 	// Material -> aiMaterial
-	unsigned int ConvertMaterial(const Material& material)
+	unsigned int ConvertMaterial(const Material& material, const MeshGeometry* const mesh)
 	{
 		const PropertyTable& props = material.Props();
 
@@ -1375,7 +1440,8 @@ private:
 		SetShadingPropertiesCommon(out_mat,props);
 	
 		// texture assignments
-		SetTextureProperties(out_mat,material.Textures());
+		SetTextureProperties(out_mat,material.Textures(), mesh);
+		SetTextureProperties(out_mat,material.LayeredTextures(), mesh);
 
 		return static_cast<unsigned int>(materials.size() - 1);
 	}
@@ -1384,7 +1450,7 @@ private:
 	// ------------------------------------------------------------------------------------------------
 	void TrySetTextureProperties(aiMaterial* out_mat, const TextureMap& textures, 
 		const std::string& propName, 
-		aiTextureType target)
+		aiTextureType target, const MeshGeometry* const mesh)
 	{
 		TextureMap::const_iterator it = textures.find(propName);
 		if(it == textures.end()) {
@@ -1392,7 +1458,128 @@ private:
 		}
 
 		const Texture* const tex = (*it).second;
-		
+		if(tex !=0 )
+		{
+			aiString path;
+			path.Set(tex->RelativeFilename());
+
+			out_mat->AddProperty(&path,_AI_MATKEY_TEXTURE_BASE,target,0);
+
+			aiUVTransform uvTrafo;
+			// XXX handle all kinds of UV transformations
+			uvTrafo.mScaling = tex->UVScaling();
+			uvTrafo.mTranslation = tex->UVTranslation();
+			out_mat->AddProperty(&uvTrafo,1,_AI_MATKEY_UVTRANSFORM_BASE,target,0);
+
+			const PropertyTable& props = tex->Props();
+
+			int uvIndex = 0;
+
+			bool ok;
+			const std::string& uvSet = PropertyGet<std::string>(props,"UVSet",ok);
+			if(ok) {
+				// "default" is the name which usually appears in the FbxFileTexture template
+				if(uvSet != "default" && uvSet.length()) {
+					// this is a bit awkward - we need to find a mesh that uses this
+					// material and scan its UV channels for the given UV name because
+					// assimp references UV channels by index, not by name.
+
+					// XXX: the case that UV channels may appear in different orders
+					// in meshes is unhandled. A possible solution would be to sort
+					// the UV channels alphabetically, but this would have the side
+					// effect that the primary (first) UV channel would sometimes
+					// be moved, causing trouble when users read only the first
+					// UV channel and ignore UV channel assignments altogether.
+
+					const unsigned int matIndex = static_cast<unsigned int>(std::distance(materials.begin(), 
+						std::find(materials.begin(),materials.end(),out_mat)
+					));
+
+
+          uvIndex = -1;
+          if (!mesh)
+          {					
+					  BOOST_FOREACH(const MeshMap::value_type& v,meshes_converted) {
+						  const MeshGeometry* const mesh = dynamic_cast<const MeshGeometry*> (v.first);
+						  if(!mesh) {
+							  continue;
+						  }
+
+						  const MatIndexArray& mats = mesh->GetMaterialIndices();
+						  if(std::find(mats.begin(),mats.end(),matIndex) == mats.end()) {
+							  continue;
+						  }
+
+						  int index = -1;
+						  for (unsigned int i = 0; i < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++i) {
+							  if(mesh->GetTextureCoords(i).empty()) {
+								  break;
+							  }
+							  const std::string& name = mesh->GetTextureCoordChannelName(i);
+							  if(name == uvSet) {
+								  index = static_cast<int>(i);
+								  break;
+							  }
+						  }
+						  if(index == -1) {
+							  FBXImporter::LogWarn("did not find UV channel named " + uvSet + " in a mesh using this material");
+							  continue;
+						  }
+
+						  if(uvIndex == -1) {
+							  uvIndex = index;
+						  }
+						  else {
+							  FBXImporter::LogWarn("the UV channel named " + uvSet + 
+								  " appears at different positions in meshes, results will be wrong");
+						  }
+					  }
+          }
+          else
+          {
+						int index = -1;
+						for (unsigned int i = 0; i < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++i) {
+							if(mesh->GetTextureCoords(i).empty()) {
+								break;
+							}
+							const std::string& name = mesh->GetTextureCoordChannelName(i);
+							if(name == uvSet) {
+								index = static_cast<int>(i);
+								break;
+							}
+						}
+						if(index == -1) {
+							FBXImporter::LogWarn("did not find UV channel named " + uvSet + " in a mesh using this material");
+						}
+
+						if(uvIndex == -1) {
+							uvIndex = index;
+						}
+          }
+
+					if(uvIndex == -1) {
+						FBXImporter::LogWarn("failed to resolve UV channel " + uvSet + ", using first UV channel");
+						uvIndex = 0;
+					}
+				}
+			}
+
+			out_mat->AddProperty(&uvIndex,1,_AI_MATKEY_UVWSRC_BASE,target,0);
+		}
+	}
+
+	// ------------------------------------------------------------------------------------------------
+	void TrySetTextureProperties(aiMaterial* out_mat, const LayeredTextureMap& layeredTextures, 
+		const std::string& propName, 
+		aiTextureType target, const MeshGeometry* const mesh)
+	{
+		LayeredTextureMap::const_iterator it = layeredTextures.find(propName);
+		if(it == layeredTextures.end()) {
+			return;
+		}
+
+		const Texture* const tex = (*it).second->getTexture();
+
 		aiString path;
 		path.Set(tex->RelativeFilename());
 
@@ -1426,20 +1613,49 @@ private:
 
 				const unsigned int matIndex = static_cast<unsigned int>(std::distance(materials.begin(), 
 					std::find(materials.begin(),materials.end(),out_mat)
-				));
+					));
 
-				uvIndex = -1;
-				BOOST_FOREACH(const MeshMap::value_type& v,meshes_converted) {
-					const MeshGeometry* const mesh = dynamic_cast<const MeshGeometry*> (v.first);
-					if(!mesh) {
-						continue;
+			  uvIndex = -1;
+        if (!mesh)
+        {					
+					BOOST_FOREACH(const MeshMap::value_type& v,meshes_converted) {
+						const MeshGeometry* const mesh = dynamic_cast<const MeshGeometry*> (v.first);
+						if(!mesh) {
+							continue;
+						}
+
+						const MatIndexArray& mats = mesh->GetMaterialIndices();
+						if(std::find(mats.begin(),mats.end(),matIndex) == mats.end()) {
+							continue;
+						}
+
+						int index = -1;
+						for (unsigned int i = 0; i < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++i) {
+							if(mesh->GetTextureCoords(i).empty()) {
+								break;
+							}
+							const std::string& name = mesh->GetTextureCoordChannelName(i);
+							if(name == uvSet) {
+								index = static_cast<int>(i);
+								break;
+							}
+						}
+						if(index == -1) {
+							FBXImporter::LogWarn("did not find UV channel named " + uvSet + " in a mesh using this material");
+							continue;
+						}
+
+						if(uvIndex == -1) {
+							uvIndex = index;
+						}
+						else {
+							FBXImporter::LogWarn("the UV channel named " + uvSet + 
+								" appears at different positions in meshes, results will be wrong");
+						}
 					}
-
-					const MatIndexArray& mats = mesh->GetMaterialIndices();
-					if(std::find(mats.begin(),mats.end(),matIndex) == mats.end()) {
-						continue;
-					}
-
+        }
+        else
+        {
 					int index = -1;
 					for (unsigned int i = 0; i < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++i) {
 						if(mesh->GetTextureCoords(i).empty()) {
@@ -1453,17 +1669,12 @@ private:
 					}
 					if(index == -1) {
 						FBXImporter::LogWarn("did not find UV channel named " + uvSet + " in a mesh using this material");
-						continue;
 					}
 
 					if(uvIndex == -1) {
 						uvIndex = index;
 					}
-					else {
-						FBXImporter::LogWarn("the UV channel named " + uvSet + 
-							" appears at different positions in meshes, results will be wrong");
-					}
-				}
+        }
 
 				if(uvIndex == -1) {
 					FBXImporter::LogWarn("failed to resolve UV channel " + uvSet + ", using first UV channel");
@@ -1475,21 +1686,35 @@ private:
 		out_mat->AddProperty(&uvIndex,1,_AI_MATKEY_UVWSRC_BASE,target,0);
 	}
 
-
 	// ------------------------------------------------------------------------------------------------
-	void SetTextureProperties(aiMaterial* out_mat, const TextureMap& textures)
+	void SetTextureProperties(aiMaterial* out_mat, const TextureMap& textures, const MeshGeometry* const mesh)
 	{
-		TrySetTextureProperties(out_mat, textures, "DiffuseColor", aiTextureType_DIFFUSE);
-		TrySetTextureProperties(out_mat, textures, "AmbientColor", aiTextureType_AMBIENT);
-		TrySetTextureProperties(out_mat, textures, "EmissiveColor", aiTextureType_EMISSIVE);
-		TrySetTextureProperties(out_mat, textures, "SpecularColor", aiTextureType_SPECULAR);
-		TrySetTextureProperties(out_mat, textures, "TransparentColor", aiTextureType_OPACITY);
-		TrySetTextureProperties(out_mat, textures, "ReflectionColor", aiTextureType_REFLECTION);
-		TrySetTextureProperties(out_mat, textures, "DisplacementColor", aiTextureType_DISPLACEMENT);
-		TrySetTextureProperties(out_mat, textures, "NormalMap", aiTextureType_NORMALS);
-		TrySetTextureProperties(out_mat, textures, "Bump", aiTextureType_HEIGHT);
+		TrySetTextureProperties(out_mat, textures, "DiffuseColor", aiTextureType_DIFFUSE, mesh);
+		TrySetTextureProperties(out_mat, textures, "AmbientColor", aiTextureType_AMBIENT, mesh);
+		TrySetTextureProperties(out_mat, textures, "EmissiveColor", aiTextureType_EMISSIVE, mesh);
+		TrySetTextureProperties(out_mat, textures, "SpecularColor", aiTextureType_SPECULAR, mesh);
+		TrySetTextureProperties(out_mat, textures, "TransparentColor", aiTextureType_OPACITY, mesh);
+		TrySetTextureProperties(out_mat, textures, "ReflectionColor", aiTextureType_REFLECTION, mesh);
+		TrySetTextureProperties(out_mat, textures, "DisplacementColor", aiTextureType_DISPLACEMENT, mesh);
+		TrySetTextureProperties(out_mat, textures, "NormalMap", aiTextureType_NORMALS, mesh);
+		TrySetTextureProperties(out_mat, textures, "Bump", aiTextureType_HEIGHT, mesh);
+		TrySetTextureProperties(out_mat, textures, "ShininessExponent", aiTextureType_SHININESS, mesh);
 	}
 
+	// ------------------------------------------------------------------------------------------------
+	void SetTextureProperties(aiMaterial* out_mat, const LayeredTextureMap& layeredTextures, const MeshGeometry* const mesh)
+	{
+		TrySetTextureProperties(out_mat, layeredTextures, "DiffuseColor", aiTextureType_DIFFUSE, mesh);
+		TrySetTextureProperties(out_mat, layeredTextures, "AmbientColor", aiTextureType_AMBIENT, mesh);
+		TrySetTextureProperties(out_mat, layeredTextures, "EmissiveColor", aiTextureType_EMISSIVE, mesh);
+		TrySetTextureProperties(out_mat, layeredTextures, "SpecularColor", aiTextureType_SPECULAR, mesh);
+		TrySetTextureProperties(out_mat, layeredTextures, "TransparentColor", aiTextureType_OPACITY, mesh);
+		TrySetTextureProperties(out_mat, layeredTextures, "ReflectionColor", aiTextureType_REFLECTION, mesh);
+		TrySetTextureProperties(out_mat, layeredTextures, "DisplacementColor", aiTextureType_DISPLACEMENT, mesh);
+		TrySetTextureProperties(out_mat, layeredTextures, "NormalMap", aiTextureType_NORMALS, mesh);
+		TrySetTextureProperties(out_mat, layeredTextures, "Bump", aiTextureType_HEIGHT, mesh);
+		TrySetTextureProperties(out_mat, layeredTextures, "ShininessExponent", aiTextureType_SHININESS, mesh);
+	}
 
 
 	// ------------------------------------------------------------------------------------------------
@@ -1838,7 +2063,7 @@ private:
 		ai_assert(curves.size());
 
 		// sanity check whether the input is ok
-#ifdef _DEBUG
+#ifdef ASSIMP_BUILD_DEBUG
 		{ const Object* target = NULL;
 		BOOST_FOREACH(const AnimationCurveNode* node, curves) {
 			if(!target) {
@@ -1900,9 +2125,9 @@ private:
 
 				has_any = true;
 
-				if (comp != TransformationComp_Rotation && comp != TransformationComp_Scaling &&
-					comp != TransformationComp_Translation) {
-
+				if (comp != TransformationComp_Rotation && comp != TransformationComp_Scaling && comp != TransformationComp_Translation &&
+					comp != TransformationComp_GeometricScaling && comp != TransformationComp_GeometricRotation && comp != TransformationComp_GeometricTranslation )
+				{
 					has_complex = true;
 				}
 			}
@@ -1955,6 +2180,7 @@ private:
 				case TransformationComp_Rotation:
 				case TransformationComp_PreRotation:
 				case TransformationComp_PostRotation:
+				case TransformationComp_GeometricRotation:
 					na = GenerateRotationNodeAnim(chain_name, 
 						target, 
 						(*chain[i]).second,
@@ -1969,6 +2195,7 @@ private:
 				case TransformationComp_ScalingOffset:
 				case TransformationComp_ScalingPivot:
 				case TransformationComp_Translation:
+				case TransformationComp_GeometricTranslation:
 					na = GenerateTranslationNodeAnim(chain_name, 
 						target, 
 						(*chain[i]).second,
@@ -2017,6 +2244,7 @@ private:
 					break;
 
 				case TransformationComp_Scaling:
+				case TransformationComp_GeometricScaling:
 					na = GenerateScalingNodeAnim(chain_name, 
 						target, 
 						(*chain[i]).second,

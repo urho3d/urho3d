@@ -1,5 +1,5 @@
 ::
-:: Copyright (c) 2008-2013 the Urho3D project.
+:: Copyright (c) 2008-2015 the Urho3D project.
 ::
 :: Permission is hereby granted, free of charge, to any person obtaining a copy
 :: of this software and associated documentation files (the "Software"), to deal
@@ -20,11 +20,4 @@
 :: THE SOFTWARE.
 ::
 
-@echo off
-pushd %~dp0
-cmake -E make_directory Build
-echo on
-:: \todo suppress policy warning (for 2.8.12 early adopters), remove this option when CMake minimum version is 2.8.12
-set "OPT=-Wno-dev"
-cmake -E chdir Build cmake %OPT% -G "MinGW Makefiles" %* ..\Source
-@popd
+@"%~dp0cmake_generic.bat" %* -G "MinGW Makefiles"

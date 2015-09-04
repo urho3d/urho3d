@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -264,10 +264,10 @@ void asCMap<KEY, VAL>::BalanceInsert(asSMapNode<KEY, VAL> *node)
 
 				if( node == node->parent->right ) 
 				{
-                    // Make the node a left child
-                    node = node->parent;
-                    RotateLeft(node);
-                }
+					// Make the node a left child
+					node = node->parent;
+					RotateLeft(node);
+				}
 
 				// Change color on parent and grand parent
 				// Then rotate grand parent to the right
@@ -300,10 +300,10 @@ void asCMap<KEY, VAL>::BalanceInsert(asSMapNode<KEY, VAL> *node)
 
 				if( node == node->parent->left ) 
 				{
-                    // Make the node a right child
-                    node = node->parent;
-                    RotateRight(node);
-                }
+					// Make the node a right child
+					node = node->parent;
+					RotateRight(node);
+				}
 				
 				// Change color on parent and grand parent
 				// Then rotate grand parent to the right
@@ -405,15 +405,15 @@ asSMapNode<KEY,VAL> *asCMap<KEY, VAL>::Remove(asSMapNode<KEY,VAL> *cursor)
 		child = remove->right;
 
 	if( child ) child->parent = remove->parent;
-    if( remove->parent )
+	if( remove->parent )
 	{
-        if( remove == remove->parent->left )
-            remove->parent->left = child;
-        else
-            remove->parent->right = child;
+		if( remove == remove->parent->left )
+			remove->parent->left = child;
+		else
+			remove->parent->right = child;
 	}
 	else
-        root = child;
+		root = child;
 
 	// If we remove a black node we must make sure the tree is balanced
 	if( ISBLACK(remove) )
@@ -516,17 +516,17 @@ void asCMap<KEY, VAL>::BalanceErase(asSMapNode<KEY, VAL> *child, asSMapNode<KEY,
 				if( ISBLACK(brother->right) )
 				{
 					brother->left->isRed = false;
-                    brother->isRed = true;
-                    RotateRight(brother);
-                    brother = parent->right;
+					brother->isRed = true;
+					RotateRight(brother);
+					brother = parent->right;
 				}
 
 				// Case 4
 				brother->isRed = parent->isRed;
-                parent->isRed = false;
-                brother->right->isRed = false;
-                RotateLeft(parent);
-                break;
+				parent->isRed = false;
+				brother->right->isRed = false;
+				RotateLeft(parent);
+				break;
 			}
 		}
 		else
@@ -564,17 +564,17 @@ void asCMap<KEY, VAL>::BalanceErase(asSMapNode<KEY, VAL> *child, asSMapNode<KEY,
 				if( ISBLACK(brother->left) )
 				{
 					brother->right->isRed = false;
-                    brother->isRed = true;
-                    RotateLeft(brother);
-                    brother = parent->left;
+					brother->isRed = true;
+					RotateLeft(brother);
+					brother = parent->left;
 				}
 
 				// Case 4
 				brother->isRed = parent->isRed;
-                parent->isRed = false;
-                brother->left->isRed = false;
-                RotateRight(parent);
-                break;
+				parent->isRed = false;
+				brother->left->isRed = false;
+				RotateRight(parent);
+				break;
 			}
 		}
 	}

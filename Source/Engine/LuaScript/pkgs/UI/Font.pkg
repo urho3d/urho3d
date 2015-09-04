@@ -1,5 +1,0 @@
-$#include "Font.h"
-
-class Font : public Resource
-{
-};

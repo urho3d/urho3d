@@ -1,3 +1,0 @@
-<technique>
-    <pass name="prealpha" vs="Unlit" ps="Unlit_Diff" depthwrite="false" />
-</technique>

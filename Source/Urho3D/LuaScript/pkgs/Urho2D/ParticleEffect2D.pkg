@@ -1,0 +1,11 @@
+$#include "Urho2D/ParticleEffect2D.h"
+
+enum EmitterType2D
+{
+    EMITTER_TYPE_GRAVITY = 0,
+    EMITTER_TYPE_RADIAL
+};
+
+class ParticleEffect2D : public Resource
+{
+};

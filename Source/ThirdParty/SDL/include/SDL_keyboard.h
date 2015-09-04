@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,6 +18,8 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by OvermindDL1 for Urho3D
 
 /**
  *  \file SDL_keyboard.h
@@ -49,7 +51,7 @@ typedef struct SDL_Keysym
     SDL_Scancode scancode;      /**< SDL physical key code - see ::SDL_Scancode for details */
     SDL_Keycode sym;            /**< SDL virtual key code - see ::SDL_Keycode for details */
     Uint16 mod;                 /**< current key modifiers */
-    Uint32 unused;
+    Uint32 raw;
 } SDL_Keysym;
 
 /* Function prototypes */

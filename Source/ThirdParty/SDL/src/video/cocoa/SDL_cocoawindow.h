@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #ifndef _SDL_cocoawindow_h
 #define _SDL_cocoawindow_h
@@ -27,17 +27,38 @@
 
 typedef struct SDL_WindowData SDL_WindowData;
 
+typedef enum
+{
+    PENDING_OPERATION_NONE,
+    PENDING_OPERATION_ENTER_FULLSCREEN,
+    PENDING_OPERATION_LEAVE_FULLSCREEN,
+    PENDING_OPERATION_MINIMIZE
+} PendingWindowOperation;
+
 @interface Cocoa_WindowListener : NSResponder <NSWindowDelegate> {
     SDL_WindowData *_data;
     BOOL observingVisible;
     BOOL wasCtrlLeft;
     BOOL wasVisible;
+    BOOL isFullscreenSpace;
+    BOOL inFullscreenTransition;
+    PendingWindowOperation pendingWindowOperation;
+    BOOL isMoving;
+    int pendingWindowWarpX, pendingWindowWarpY;
 }
 
 -(void) listen:(SDL_WindowData *) data;
 -(void) pauseVisibleObservation;
 -(void) resumeVisibleObservation;
+-(BOOL) setFullscreenSpace:(BOOL) state;
+-(BOOL) isInFullscreenSpace;
+-(BOOL) isInFullscreenSpaceTransition;
+-(void) addPendingWindowOperation:(PendingWindowOperation) operation;
 -(void) close;
+
+-(BOOL) isMoving;
+-(void) setPendingMoveX:(int)x Y:(int)y;
+-(void) windowDidFinishMoving;
 
 /* Window delegate functionality */
 -(BOOL) windowShouldClose:(id) sender;
@@ -48,6 +69,11 @@ typedef struct SDL_WindowData SDL_WindowData;
 -(void) windowDidDeminiaturize:(NSNotification *) aNotification;
 -(void) windowDidBecomeKey:(NSNotification *) aNotification;
 -(void) windowDidResignKey:(NSNotification *) aNotification;
+-(void) windowWillEnterFullScreen:(NSNotification *) aNotification;
+-(void) windowDidEnterFullScreen:(NSNotification *) aNotification;
+-(void) windowWillExitFullScreen:(NSNotification *) aNotification;
+-(void) windowDidExitFullScreen:(NSNotification *) aNotification;
+-(NSApplicationPresentationOptions)window:(NSWindow *)window willUseFullScreenPresentationOptions:(NSApplicationPresentationOptions)proposedOptions;
 
 /* Window event handling */
 -(void) mouseDown:(NSEvent *) theEvent;
@@ -86,6 +112,7 @@ struct SDL_WindowData
     NSWindow *nswindow;
     NSMutableArray *nscontexts;
     SDL_bool created;
+    SDL_bool inWindowMove;
     Cocoa_WindowListener *listener;
     struct SDL_VideoData *videodata;
 };

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -864,7 +864,6 @@ void asCByteCode::OptimizeLocally(const asCArray<int> &tempVariableOffsets)
 
 				instr = GoForward(curr);
 			}
-
 		}
 		else if( currOp == asBC_RDSPtr )
 		{
@@ -1553,6 +1552,7 @@ int asCByteCode::GetSize()
 
 void asCByteCode::AddCode(asCByteCode *bc)
 {
+	if( bc == this ) return;
 	if( bc->first )
 	{
 		if( first == 0 )
@@ -2079,7 +2079,9 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 	fprintf(file, "Variables: \n");
 	for( n = 0; n < func->scriptData->variables.GetLength(); n++ )
 	{
-		fprintf(file, " %.3d: %s %s\n", func->scriptData->variables[n]->stackOffset, func->scriptData->variables[n]->type.Format().AddressOf(), func->scriptData->variables[n]->name.AddressOf());
+		int idx = func->scriptData->objVariablePos.IndexOf(func->scriptData->variables[n]->stackOffset);
+		bool isOnHeap = asUINT(idx) < func->scriptData->objVariablesOnHeap ? true : false;
+		fprintf(file, " %.3d: %s%s %s\n", func->scriptData->variables[n]->stackOffset, isOnHeap ? "(heap) " : "", func->scriptData->variables[n]->type.Format().AddressOf(), func->scriptData->variables[n]->name.AddressOf());
 	}
 	asUINT offset = 0;
 	if( func->objectType )
@@ -2099,7 +2101,11 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 			}
 		}
 		if( !found )
-			fprintf(file, " %.3d: %s {noname param}\n", offset, func->parameterTypes[n].Format().AddressOf());
+		{
+			int idx = func->scriptData->objVariablePos.IndexOf(offset);
+			bool isOnHeap = asUINT(idx) < func->scriptData->objVariablesOnHeap ? true : false;
+			fprintf(file, " %.3d: %s%s {noname param}\n", offset, isOnHeap ? "(heap) " : "", func->parameterTypes[n].Format().AddressOf());
+		}
 
 		offset -= func->parameterTypes[n].GetSizeOnStackDWords();
 	}
@@ -2115,7 +2121,16 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 			}
 		}
 		if( !found )
-			fprintf(file, " %.3d: %s {noname}\n", func->scriptData->objVariablePos[n], func->scriptData->objVariableTypes[n]->name.AddressOf());
+		{
+			if( func->scriptData->objVariableTypes[n] )
+			{
+				int idx = func->scriptData->objVariablePos.IndexOf(func->scriptData->objVariablePos[n]);
+				bool isOnHeap = asUINT(idx) < func->scriptData->objVariablesOnHeap ? true : false;
+				fprintf(file, " %.3d: %s%s {noname}\n", func->scriptData->objVariablePos[n], isOnHeap ? "(heap) " : "", func->scriptData->objVariableTypes[n]->name.AddressOf());
+			}
+			else
+				fprintf(file, " %.3d: null handle {noname}\n", func->scriptData->objVariablePos[n]);
+		}
 	}
 	fprintf(file, "\n\n");
 

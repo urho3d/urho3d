@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../SDL_internal.h"
 
 /* General event handling code for SDL */
 
@@ -503,17 +503,28 @@ SDL_GetEventFilter(SDL_EventFilter * filter, void **userdata)
 void
 SDL_AddEventWatch(SDL_EventFilter filter, void *userdata)
 {
-    SDL_EventWatcher *watcher;
+    SDL_EventWatcher *watcher, *tail;
 
     watcher = (SDL_EventWatcher *)SDL_malloc(sizeof(*watcher));
     if (!watcher) {
         /* Uh oh... */
         return;
     }
+
+    /* create the watcher */
     watcher->callback = filter;
     watcher->userdata = userdata;
-    watcher->next = SDL_event_watchers;
-    SDL_event_watchers = watcher;
+    watcher->next = NULL;
+
+    /* add the watcher to the end of the list */
+    if (SDL_event_watchers) {
+        for (tail = SDL_event_watchers; tail->next; tail = tail->next) {
+            continue;
+        }
+        tail->next = watcher;
+    } else {
+        SDL_event_watchers = watcher;
+    }
 }
 
 /* FIXME: This is not thread-safe yet */

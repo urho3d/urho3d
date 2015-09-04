@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ class Scene;
 }
 
 /// Huge object count example.
-///  This sample demonstrates:
+/// This sample demonstrates:
 ///     - Creating a scene with 250 x 250 simple objects
 ///     - Competing with http://yosoygames.com.ar/wp/2013/07/ogre-2-0-is-up-to-3x-faster/ :)
 ///     - Allowing examination of performance hotspots in the rendering code
@@ -50,6 +50,29 @@ public:
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
 
+protected:
+    /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
+    virtual String GetScreenJoystickPatchString() const { return
+        "<patch>"
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />"
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Group</replace>"
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">"
+        "        <element type=\"Text\">"
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />"
+        "            <attribute name=\"Text\" value=\"G\" />"
+        "        </element>"
+        "    </add>"
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />"
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Animation</replace>"
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">"
+        "        <element type=\"Text\">"
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />"
+        "            <attribute name=\"Text\" value=\"SPACE\" />"
+        "        </element>"
+        "    </add>"
+        "</patch>";
+    }
+
 private:
     /// Construct the scene content.
     void CreateScene();
@@ -59,23 +82,15 @@ private:
     void SetupViewport();
     /// Subscribe to application-wide logic update events.
     void SubscribeToEvents();
-    /// Read input and moves the camera.
+    /// Read input and move the camera.
     void MoveCamera(float timeStep);
     /// Animate the scene.
     void AnimateObjects(float timeStep);
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
-    /// Scene.
-    SharedPtr<Scene> scene_;
-    /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
     /// Box scene nodes.
     Vector<SharedPtr<Node> > boxNodes_;
-    /// Camera yaw angle.
-    float yaw_;
-    /// Camera pitch angle.
-    float pitch_;
     /// Animation flag.
     bool animate_;
     /// Group optimization flag.

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,6 +18,8 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by OvermindDL1 for Urho3D
 
 /* Being a null driver, there's no event stream. We just define stubs for
    most of the API. */
@@ -97,7 +99,7 @@ void PSP_PumpEvents(_THIS)
                             &sym);
         */
                 SDL_SendKeyboardKey((keys & keymap_psp[i].id) ?
-                                    SDL_PRESSED : SDL_RELEASED, SDL_GetScancodeFromKey(keymap_psp[i].sym));
+                                    SDL_PRESSED : SDL_RELEASED, (Uint32)(keymap_psp[i].sym), SDL_GetScancodeFromKey(keymap_psp[i].sym));
             }
         }
     }
@@ -121,7 +123,7 @@ void PSP_PumpEvents(_THIS)
                 /* not tested */
                 /* SDL_PrivateKeyboard(pressed?SDL_PRESSED:SDL_RELEASED, &sym); */
                 SDL_SendKeyboardKey((keys & keymap_psp[i].id) ?
-                                    SDL_PRESSED : SDL_RELEASED, SDL_GetScancodeFromKey(keymap[raw]);
+                                    SDL_PRESSED : SDL_RELEASED, (Uint32)(keymap[raw]), SDL_GetScancodeFromKey(keymap[raw]);
 
                 }
             }

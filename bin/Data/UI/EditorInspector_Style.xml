@@ -1,0 +1,31 @@
+<element index="2">
+    <attribute name="Name" value="StyleContainer" />
+    <attribute name="Max Size" value="2147483647 17" />
+    <attribute name="Layout Mode" value="Horizontal" />
+    <attribute name="Layout Spacing" value="4" />
+    <element type="Text" style="EditorAttributeText">
+        <attribute name="Name" value="StyleDropDownLabel" />
+        <attribute name="Text" value="Style" />
+        <attribute name="Auto Localizable" value="true" />
+    </element>
+    <element type="DropDownList">
+        <attribute name="Name" value="StyleDropDown" />
+        <attribute name="Resize Popup" value="true" />
+        <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+        <element type="Window" internal="true" popup="true" style="none">
+            <element type="ListView" internal="true" style="none">
+                <element type="BorderImage" internal="true" style="none">
+                    <element internal="true" style="none">
+                        <element type="Text" style="EditorEnumAttributeText">
+                            <attribute name="Text" value="auto" />
+                        </element>
+                        <element type="Text" style="EditorEnumAttributeText">
+                            <attribute name="Text" value="none" />
+                        </element>
+                        <element type="BorderImage" style="EditorDivider" />
+                    </element>
+                </element>
+            </element>
+        </element>
+    </element>
+</element>

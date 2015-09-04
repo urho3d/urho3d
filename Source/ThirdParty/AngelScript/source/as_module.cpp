@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -75,8 +75,15 @@ asCModule::~asCModule()
 	if( engine )
 	{
 		// Clean the user data
-		if( userData && engine->cleanModuleFunc )
-			engine->cleanModuleFunc(this);
+		for( asUINT n = 0; n < userData.GetLength(); n += 2 )
+		{
+			if( userData[n+1] )
+			{
+				for( asUINT c = 0; c < engine->cleanModuleFuncs.GetLength(); c++ )
+					if( engine->cleanModuleFuncs[c].type == userData[n] )
+						engine->cleanModuleFuncs[c].cleanFunc(this);
+			}
+		}
 
 		// Remove the module from the engine
 		if( engine->lastModule == this )
@@ -92,17 +99,55 @@ void asCModule::Discard()
 }
 
 // interface
-void *asCModule::SetUserData(void *data)
+void *asCModule::SetUserData(void *data, asPWORD type)
 {
-	void *oldData = userData;
-	userData = data;
-	return oldData;
+	// As a thread might add a new new user data at the same time as another
+	// it is necessary to protect both read and write access to the userData member
+	ACQUIREEXCLUSIVE(engine->engineRWLock);
+
+	// It is not intended to store a lot of different types of userdata,
+	// so a more complex structure like a associative map would just have
+	// more overhead than a simple array.
+	for( asUINT n = 0; n < userData.GetLength(); n += 2 )
+	{
+		if( userData[n] == type )
+		{
+			void *oldData = reinterpret_cast<void*>(userData[n+1]);
+			userData[n+1] = reinterpret_cast<asPWORD>(data);
+
+			RELEASEEXCLUSIVE(engine->engineRWLock);
+
+			return oldData;
+		}
+	}
+
+	userData.PushLast(type);
+	userData.PushLast(reinterpret_cast<asPWORD>(data));
+
+	RELEASEEXCLUSIVE(engine->engineRWLock);
+
+	return 0;
 }
 
 // interface
-void *asCModule::GetUserData() const
+void *asCModule::GetUserData(asPWORD type) const
 {
-	return userData;
+	// There may be multiple threads reading, but when
+	// setting the user data nobody must be reading.
+	ACQUIRESHARED(engine->engineRWLock);
+
+	for( asUINT n = 0; n < userData.GetLength(); n += 2 )
+	{
+		if( userData[n] == type )
+		{
+			RELEASESHARED(engine->engineRWLock);
+			return reinterpret_cast<void*>(userData[n+1]);
+		}
+	}
+
+	RELEASESHARED(engine->engineRWLock);
+
+	return 0;
 }
 
 // interface
@@ -306,8 +351,8 @@ int asCModule::CallInit(asIScriptContext *myCtx)
 		{
 			if( ctx == 0 )
 			{
-				r = engine->CreateContext(&ctx, true);
-				if( r < 0 )
+				ctx = engine->RequestContext();
+				if( ctx == 0 )
 					break;
 			}
 
@@ -346,7 +391,7 @@ int asCModule::CallInit(asIScriptContext *myCtx)
 
 	if( ctx && !myCtx )
 	{
-		ctx->Release();
+		engine->ReturnContext(ctx);
 		ctx = 0;
 	}
 
@@ -469,6 +514,8 @@ void asCModule::InternalReset()
 
 	// Allow the engine to clean up what is not used
 	engine->CleanupAfterDiscardModule();
+
+	asASSERT( IsEmpty() );
 }
 
 // interface
@@ -743,6 +790,24 @@ int asCModule::GetTypeIdByDecl(const char *decl) const
 }
 
 // interface
+asIObjectType *asCModule::GetObjectTypeByDecl(const char *decl) const
+{
+	asCDataType dt;
+
+	// This const cast is safe since we know the engine won't be modified
+	asCBuilder bld(engine, const_cast<asCModule*>(this));
+
+	// Don't write parser errors to the message callback
+	bld.silent = true;
+
+	int r = bld.ParseDataType(decl, &dt, defaultNamespace);
+	if( r < 0 )
+		return 0;
+
+	return dt.GetObjectType();
+}
+
+// interface
 asUINT asCModule::GetEnumCount() const
 {
 	return (asUINT)enumTypes.GetLength();
@@ -825,7 +890,7 @@ int asCModule::GetNextImportedFunctionId()
 
 #ifndef AS_NO_COMPILER
 // internal
-int asCModule::AddScriptFunction(int sectionIdx, int declaredAt, int id, const asCString &name, const asCDataType &returnType, const asCArray<asCDataType> &params, const asCArray<asETypeModifiers> &inOutFlags, const asCArray<asCString *> &defaultArgs, bool isInterface, asCObjectType *objType, bool isConstMethod, bool isGlobalFunction, bool isPrivate, bool isFinal, bool isOverride, bool isShared, asSNameSpace *ns)
+int asCModule::AddScriptFunction(int sectionIdx, int declaredAt, int id, const asCString &name, const asCDataType &returnType, const asCArray<asCDataType> &params, const asCArray<asCString> &paramNames, const asCArray<asETypeModifiers> &inOutFlags, const asCArray<asCString *> &defaultArgs, bool isInterface, asCObjectType *objType, bool isConstMethod, bool isGlobalFunction, bool isPrivate, bool isFinal, bool isOverride, bool isShared, asSNameSpace *ns)
 {
 	asASSERT(id >= 0);
 
@@ -858,6 +923,7 @@ int asCModule::AddScriptFunction(int sectionIdx, int declaredAt, int id, const a
 		func->scriptData->declaredAt = declaredAt;
 	}
 	func->parameterTypes   = params;
+	func->parameterNames   = paramNames;
 	func->inOutFlags       = inOutFlags;
 	func->defaultArgs      = defaultArgs;
 	func->objectType       = objType;
@@ -1125,6 +1191,21 @@ asCGlobalProperty *asCModule::AllocateGlobalProperty(const char *name, const asC
 	return prop;
 }
 
+// internal
+bool asCModule::IsEmpty() const
+{
+	if( scriptFunctions.GetLength()  ) return false;
+	if( globalFunctions.GetSize()    ) return false;
+	if( bindInformations.GetLength() ) return false;
+	if( scriptGlobals.GetSize()      ) return false;
+	if( classTypes.GetLength()       ) return false;
+	if( enumTypes.GetLength()        ) return false;
+	if( typeDefs.GetLength()         ) return false;
+	if( funcDefs.GetLength()         ) return false;
+
+	return true;
+}
+
 // interface
 int asCModule::SaveByteCode(asIBinaryStream *out, bool stripDebugInfo) const
 {
@@ -1134,6 +1215,10 @@ int asCModule::SaveByteCode(asIBinaryStream *out, bool stripDebugInfo) const
 	return asNOT_SUPPORTED;
 #else
 	if( out == 0 ) return asINVALID_ARG;
+
+	// Make sure there is actually something to save
+	if( IsEmpty() )
+		return asERROR;
 
 	asCWriter write(const_cast<asCModule*>(this), out, engine, stripDebugInfo);
 	return write.Write();
@@ -1154,7 +1239,7 @@ int asCModule::LoadByteCode(asIBinaryStream *in, bool *wasDebugInfoStripped)
 	asCReader read(this, in, engine);
 	r = read.Read(wasDebugInfoStripped);
 
-    JITCompile();
+	JITCompile();
 
 #ifdef AS_DEBUG
 	// Verify that there are no unwanted gaps in the scriptFunctions array.

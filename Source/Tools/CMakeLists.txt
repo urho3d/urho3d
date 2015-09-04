@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2013 the Urho3D project.
+# Copyright (c) 2008-2015 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,33 +25,41 @@ project (Urho3D-Tools)
 
 # Find Urho3D library
 find_package (Urho3D REQUIRED)
-include_directories (${URHO3D_INCLUDE_DIR})
+include_directories (${URHO3D_INCLUDE_DIRS})
 
-# Urho3DPlayer application
-add_subdirectory (Urho3DPlayer)
-
-# Do not build tools for Raspberry Pi unless it is explicitly enabled
-if (NOT DEFINED ENABLE_TOOLS)
-    if (RASPI)
-        set (ENABLE_TOOLS 0)
-    else ()
-        set (ENABLE_TOOLS 1)
-    endif ()
+# Urho3DPlayer target is rather special, although it is here, it is not a tool because it is built into target platform binary as opposed to host platform
+if (NOT EMSCRIPTEN)
+    add_subdirectory (Urho3DPlayer)
 endif ()
 
-# Do not build tools for iOS and Android regardless of the ENABLE_TOOLS build option
-if (NOT IOS AND NOT ANDROID AND ENABLE_TOOLS)
+# Build PackageTool using host compiler toolchain
+if ((CMAKE_CROSSCOMPILING OR IOS) AND URHO3D_PACKAGING)
+    # When cross-compiling, build the host tool as external project
+    include (ExternalProject)
+    if (IOS)
+        # For iOS target, ensure the host environment is cleared first; Also workaround a known CMake/Xcode generator bug which prevents it from installing binaries correctly
+        set (IOS_FIX CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
+    endif ()
+    ExternalProject_Add (PackageTool
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Tools/PackageTool
+        CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DBAKED_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} ${IOS_FIX})
+    install (PROGRAMS ${CMAKE_BINARY_DIR}/bin/tool/PackageTool DESTINATION ${DEST_RUNTIME_DIR}/tool)
+endif ()
+
+# All tools must be natively built and output to bin/tool subdir to differentiate them from target platfrom binaries in the bin directory
+set_tool_output_directories ()
+
+if (URHO3D_TOOLS)
     # Urho3D tools
     add_subdirectory (AssetImporter)
     add_subdirectory (OgreImporter)
     add_subdirectory (PackageTool)
     add_subdirectory (RampGenerator)
-    if (ENABLE_ANGELSCRIPT)
+    add_subdirectory (SpritePacker)
+    if (URHO3D_ANGELSCRIPT)
         add_subdirectory (ScriptCompiler)
     endif ()
-
-    # Urho3D non-OpenGL tools
-    if (NOT USE_OPENGL)
-        add_subdirectory (ShaderCompiler)
-    endif ()
+elseif ((NOT CMAKE_CROSSCOMPILING AND NOT IOS) AND URHO3D_PACKAGING)
+    # PackageTool target is required but we are not cross-compiling, so build it as per normal
+    add_subdirectory (PackageTool)
 endif ()

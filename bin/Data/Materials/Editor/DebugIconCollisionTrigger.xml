@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<material>
+	<technique name="Techniques/BasicVColUnlitAlpha.xml" />
+	<texture unit="diffuse" name="Textures/Editor/IconCollisionTrigger.png" />
+</material>

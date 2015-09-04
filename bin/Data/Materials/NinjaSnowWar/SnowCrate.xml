@@ -1,0 +1,5 @@
+<material>
+    <technique name="Techniques/Diff.xml" />
+    <texture unit="diffuse" name="Textures/NinjaSnowWar/SnowCrate.dds" />
+    <parameter name="MatSpecColor" value="0.15 0.15 0.15 16" />
+</material>

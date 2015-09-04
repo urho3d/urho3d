@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,32 +20,29 @@
 // THE SOFTWARE.
 //
 
-#include "AnimatedModel.h"
-#include "Animation.h"
-#include "Context.h"
-#include "DebugRenderer.h"
-#include "File.h"
-#include "FileSystem.h"
-#include "Geometry.h"
-#include "Graphics.h"
-#include "IndexBuffer.h"
-#include "Light.h"
-#include "Material.h"
-#include "Model.h"
-#include "Octree.h"
-#include "PhysicsWorld.h"
-#include "ProcessUtils.h"
-#include "Quaternion.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "StringUtils.h"
-#include "Vector3.h"
-#include "VertexBuffer.h"
-#include "WorkQueue.h"
-#include "XMLFile.h"
-#include "Zone.h"
-
-#include "Sort.h"
+#include <Urho3D/Core/Context.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Core/StringUtils.h>
+#include <Urho3D/Core/WorkQueue.h>
+#include <Urho3D/Graphics/AnimatedModel.h>
+#include <Urho3D/Graphics/Animation.h>
+#include <Urho3D/Graphics/DebugRenderer.h>
+#include <Urho3D/Graphics/Geometry.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Graphics/IndexBuffer.h>
+#include <Urho3D/Graphics/Light.h>
+#include <Urho3D/Graphics/Material.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/VertexBuffer.h>
+#include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/FileSystem.h>
+#ifdef URHO3D_PHYSICS
+#include <Urho3D/Physics/PhysicsWorld.h>
+#endif
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Resource/XMLFile.h>
+#include <Urho3D/Scene/Scene.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -56,9 +53,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/DefaultLogger.hpp>
 
-#include <cstring>
-
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 using namespace Urho3D;
 
@@ -70,7 +65,7 @@ struct OutModel
         totalIndices_(0)
     {
     }
-    
+
     String outName_;
     aiNode* rootNode_;
     HashSet<unsigned> meshIndices_;
@@ -97,6 +92,7 @@ struct OutScene
 SharedPtr<Context> context_(new Context());
 const aiScene* scene_ = 0;
 aiNode* rootNode_ = 0;
+String inputName_;
 String resourcePath_;
 String outPath_;
 bool useSubdirs_ = true;
@@ -108,6 +104,7 @@ bool noHierarchy_ = false;
 bool noMaterials_ = false;
 bool noTextures_ = false;
 bool noMaterialDiffuseColor_ = false;
+bool noEmptyNodes_ = false;
 bool saveMaterialList_ = false;
 bool includeNonSkinningBones_ = false;
 bool verboseLog_ = false;
@@ -115,6 +112,8 @@ bool emissiveAO_ = false;
 bool noOverwriteMaterial_ = false;
 bool noOverwriteTexture_ = false;
 bool noOverwriteNewerTexture_ = false;
+bool checkUniqueModel_ = true;
+unsigned maxBones_ = 64;
 Vector<String> nonSkinningBoneIncludes_;
 Vector<String> nonSkinningBoneExcludes_;
 
@@ -127,9 +126,9 @@ int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 void DumpNodes(aiNode* rootNode, unsigned level);
 
-void ExportModel(const String& outName);
+void ExportModel(const String& outName, bool animationOnly);
 void CollectMeshes(OutModel& model, aiNode* node);
-void CollectBones(OutModel& model);
+void CollectBones(OutModel& model, bool animationOnly = false);
 void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
 void CollectAnimations(OutModel* model = 0);
 void BuildBoneCollisionInfo(OutModel& model);
@@ -138,7 +137,8 @@ void BuildAndSaveAnimations(OutModel* model = 0);
 
 void ExportScene(const String& outName, bool asPrefab);
 void CollectSceneModels(OutScene& scene, aiNode* node);
-Node* CreateSceneNode(Scene* scene, aiNode* srcNode, HashMap<aiNode*, WeakPtr<Node> >& nodeMapping);
+void CreateHierarchy(Scene* scene, aiNode* srcNode, HashMap<aiNode*, Node*>& nodeMapping);
+Node* CreateSceneNode(Scene* scene, aiNode* srcNode, HashMap<aiNode*, Node*>& nodeMapping);
 void BuildAndSaveScene(OutScene& scene, bool asPrefab);
 
 void ExportMaterials(HashSet<String>& usedTextures);
@@ -155,6 +155,9 @@ Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName);
 void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
     blendIndices, Vector<PODVector<float> >& blendWeights);
 String GetMeshMaterialName(aiMesh* mesh);
+String GetMaterialTextureName(const String& nameIn);
+String GenerateMaterialName(aiMaterial* material);
+String GenerateTextureName(unsigned texIndex);
 unsigned GetNumValidFaces(aiMesh* mesh);
 
 void WriteShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset);
@@ -180,13 +183,13 @@ String SanitateAssetName(const String& name);
 int main(int argc, char** argv)
 {
     Vector<String> arguments;
-    
+
     #ifdef WIN32
     arguments = ParseArguments(GetCommandLineW());
     #else
     arguments = ParseArguments(argc, argv);
     #endif
-    
+
     Run(arguments);
     return 0;
 }
@@ -219,6 +222,8 @@ void Run(const Vector<String>& arguments)
             "-ns         Do not create subdirectories for resources\n"
             "-nz         Do not create a zone and a directional light (scene mode only)\n"
             "-nf         Do not fix infacing normals\n"
+            "-ne         Do not save empty nodes (scene mode only)\n"
+            "-mb <x>     Maximum number of bones per submesh. Default 64\n"
             "-p <path>   Set path for scene resources. Default is output file path\n"
             "-r <name>   Use the named scene node as root node\n"
             "-f <freq>   Animation tick frequency to use if unspecified. Default 4800\n"
@@ -233,20 +238,23 @@ void Run(const Vector<String>& arguments)
             "-cm         Check and do not overwrite if material exists\n"
             "-ct         Check and do not overwrite if texture exists\n"
             "-ctn        Check and do not overwrite if texture has newer timestamp\n"
+            "-am         Export all meshes even if identical (scene mode only)\n"
         );
     }
-    
+
     context_->RegisterSubsystem(new FileSystem(context_));
     context_->RegisterSubsystem(new ResourceCache(context_));
     context_->RegisterSubsystem(new WorkQueue(context_));
     RegisterSceneLibrary(context_);
     RegisterGraphicsLibrary(context_);
+#ifdef URHO3D_PHYSICS
     RegisterPhysicsLibrary(context_);
-    
+#endif
+
     String command = arguments[0].ToLower();
     String rootNodeName;
-    
-    unsigned flags = 
+
+    unsigned flags =
         aiProcess_ConvertToLeftHanded |
         aiProcess_JoinIdenticalVertices |
         aiProcess_Triangulate |
@@ -259,14 +267,14 @@ void Run(const Vector<String>& arguments)
         aiProcess_GenUVCoords |
         aiProcess_FindInstances |
         aiProcess_OptimizeMeshes;
-    
+
     for (unsigned i = 2; i < arguments.Size(); ++i)
     {
         if (arguments[i].Length() > 1 && arguments[i][0] == '-')
         {
             String argument = arguments[i].Substring(1).ToLower();
             String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
-            
+
             if (argument == "b")
                 saveBinary_ = true;
             else if (argument == "h")
@@ -289,11 +297,11 @@ void Run(const Vector<String>& arguments)
                 case 'a':
                     noAnimations_ = true;
                     break;
-                    
+
                 case 'c':
                     noMaterialDiffuseColor_ = true;
                     break;
-                    
+
                 case 'm':
                     noMaterials_ = true;
                     break;
@@ -302,22 +310,33 @@ void Run(const Vector<String>& arguments)
                     noHierarchy_ = true;
                     break;
 
+                case 'e':
+                    noEmptyNodes_ = true;
+                    break;
+
                 case 's':
                     useSubdirs_ = false;
                     break;
-                    
+
                 case 't':
                     noTextures_ = true;
                     break;
-                    
+
                 case 'z':
                     createZone_ = false;
                     break;
-                    
+
                 case 'f':
                     flags &= ~aiProcess_FixInfacingNormals;
                     break;
                 }
+            }
+            else if (argument == "mb" && !value.Empty())
+            {
+                maxBones_ = ToUInt(value);
+                if (maxBones_ < 1)
+                    maxBones_ = 1;
+                ++i;
             }
             else if (argument == "p" && !value.Empty())
             {
@@ -359,18 +378,21 @@ void Run(const Vector<String>& arguments)
                 noOverwriteTexture_ = true;
             else if (argument == "ctn")
                 noOverwriteNewerTexture_ = true;
+            else if (argument == "am")
+                checkUniqueModel_ = false;
         }
     }
-    
+
     if (command == "model" || command == "scene" || command == "node" || command == "dump")
     {
         String inFile = arguments[1];
         String outFile;
         if (arguments.Size() > 2 && arguments[2][0] != '-')
             outFile = GetInternalPath(arguments[2]);
-        
+
+        inputName_ = GetFileName(inFile);
         outPath_ = GetPath(outFile);
-        
+
         if (resourcePath_.Empty())
         {
             resourcePath_ = outPath_;
@@ -383,23 +405,23 @@ void Run(const Vector<String>& arguments)
             if (resourcePath_.Empty())
                 resourcePath_ = "./";
         }
-        
+
         resourcePath_ = AddTrailingSlash(resourcePath_);
-        
+
         if (command != "dump" && outFile.Empty())
             ErrorExit("No output file defined");
-        
+
         if (verboseLog_)
             Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE, aiDefaultLogStream_STDOUT);
-        
+
         PrintLine("Reading file " + inFile);
         scene_ = aiImportFile(GetNativePath(inFile).CString(), flags);
         if (!scene_)
-            ErrorExit("Could not open or parse input file " + inFile);
-        
+            ErrorExit("Could not open or parse input file " + inFile + ": " + String(aiGetErrorString()));
+
         if (verboseLog_)
             Assimp::DefaultLogger::kill();
-        
+
         rootNode_ = scene_->mRootNode;
         if (!rootNodeName.Empty())
         {
@@ -407,16 +429,16 @@ void Run(const Vector<String>& arguments)
             if (!rootNode_)
                 ErrorExit("Could not find scene node " + rootNodeName);
         }
-        
+
         if (command == "dump")
         {
             DumpNodes(rootNode_, 0);
             return;
         }
-        
+
         if (command == "model")
-            ExportModel(outFile);
-        
+            ExportModel(outFile, scene_->mFlags & AI_SCENE_FLAGS_INCOMPLETE);
+
         if (command == "scene" || command == "node")
         {
             bool asPrefab = command == "node";
@@ -425,7 +447,7 @@ void Run(const Vector<String>& arguments)
                 noHierarchy_ = false;
             ExportScene(outFile, asPrefab);
         }
-        
+
         if (!noMaterials_)
         {
             HashSet<String> usedTextures;
@@ -439,7 +461,7 @@ void Run(const Vector<String>& arguments)
         PODVector<float> lodDistances;
         Vector<String> modelNames;
         String outFile;
-        
+
         unsigned numLodArguments = 0;
         for (unsigned i = 1; i < arguments.Size(); ++i)
         {
@@ -451,7 +473,7 @@ void Run(const Vector<String>& arguments)
             ErrorExit("Must define at least 2 LOD levels");
         if (!(numLodArguments & 1))
             ErrorExit("No output file defined");
-        
+
         for (unsigned i = 1; i < numLodArguments + 1; ++i)
         {
             if (i == numLodArguments)
@@ -464,13 +486,13 @@ void Run(const Vector<String>& arguments)
                     modelNames.Push(GetInternalPath(arguments[i]));
             }
         }
-        
+
         if (lodDistances[0] != 0.0f)
         {
             PrintLine("Warning: first LOD distance forced to 0");
             lodDistances[0] = 0.0f;
         }
-        
+
         CombineLods(lodDistances, modelNames, outFile);
     }
     else
@@ -481,42 +503,42 @@ void DumpNodes(aiNode* rootNode, unsigned level)
 {
     if (!rootNode)
         return;
-    
+
     String indent(' ', level * 2);
     Vector3 pos, scale;
     Quaternion rot;
     aiMatrix4x4 transform = GetDerivedTransform(rootNode, rootNode_);
     GetPosRotScale(transform, pos, rot, scale);
-    
+
     PrintLine(indent + "Node " + FromAIString(rootNode->mName) + " pos " + String(pos));
-    
+
     if (rootNode->mNumMeshes == 1)
         PrintLine(indent + "  " + String(rootNode->mNumMeshes) + " geometry");
     if (rootNode->mNumMeshes > 1)
         PrintLine(indent + "  " + String(rootNode->mNumMeshes) + " geometries");
-    
+
     for (unsigned i = 0; i < rootNode->mNumChildren; ++i)
         DumpNodes(rootNode->mChildren[i], level + 1);
 }
 
-void ExportModel(const String& outName)
+void ExportModel(const String& outName, bool animationOnly)
 {
     if (outName.Empty())
         ErrorExit("No output file defined");
-    
+
     OutModel model;
     model.rootNode_ = rootNode_;
     model.outName_ = outName;
-    
+
     CollectMeshes(model, model.rootNode_);
-    CollectBones(model);
+    CollectBones(model, animationOnly);
     BuildBoneCollisionInfo(model);
     BuildAndSaveModel(model);
     if (!noAnimations_)
     {
         CollectAnimations(&model);
         BuildAndSaveAnimations(&model);
-        
+
         // Save scene-global animations
         CollectAnimations();
         BuildAndSaveAnimations();
@@ -536,30 +558,30 @@ void CollectMeshes(OutModel& model, aiNode* node)
                 break;
             }
         }
-        
+
         model.meshIndices_.Insert(node->mMeshes[i]);
         model.meshes_.Push(mesh);
         model.meshNodes_.Push(node);
         model.totalVertices_ += mesh->mNumVertices;
         model.totalIndices_ += GetNumValidFaces(mesh) * 3;
     }
-    
+
     for (unsigned i = 0; i < node->mNumChildren; ++i)
         CollectMeshes(model, node->mChildren[i]);
 }
 
-void CollectBones(OutModel& model)
+void CollectBones(OutModel& model, bool animationOnly)
 {
     HashSet<aiNode*> necessary;
     HashSet<aiNode*> rootNodes;
-    
+
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         aiMesh* mesh = model.meshes_[i];
         aiNode* meshNode = model.meshNodes_[i];
         aiNode* meshParentNode = meshNode->mParent;
         aiNode* rootNode = 0;
-        
+
         for (unsigned j = 0; j < mesh->mNumBones; ++j)
         {
             aiBone* bone = mesh->mBones[j];
@@ -569,21 +591,21 @@ void CollectBones(OutModel& model)
                 ErrorExit("Could not find scene node for bone " + boneName);
             necessary.Insert(boneNode);
             rootNode = boneNode;
-            
+
             for (;;)
             {
                 boneNode = boneNode->mParent;
-                if (!boneNode || boneNode == meshNode || boneNode == meshParentNode)
+                if (!boneNode || ((boneNode == meshNode || boneNode == meshParentNode) && !animationOnly))
                     break;
                 rootNode = boneNode;
                 necessary.Insert(boneNode);
             }
-            
+
             if (rootNodes.Find(rootNode) == rootNodes.End())
                 rootNodes.Insert(rootNode);
         }
     }
-    
+
     // If we find multiple root nodes, try to remedy by using their parent instead
     if (rootNodes.Size() > 1)
     {
@@ -600,10 +622,10 @@ void CollectBones(OutModel& model)
         rootNodes.Insert(commonParent);
         necessary.Insert(commonParent);
     }
-    
+
     if (rootNodes.Empty())
         return;
-    
+
     model.rootBone_ = *rootNodes.Begin();
     CollectBonesFinal(model.bones_, necessary, model.rootBone_);
     // Initialize the bone collision info
@@ -620,14 +642,14 @@ void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessa
 {
     bool includeBone = necessary.Find(node) != necessary.End();
     String boneName = FromAIString(node->mName);
-    
+
     // Check include/exclude filters for non-skinned bones
     if (!includeBone && includeNonSkinningBones_)
     {
         // If no includes specified, include by default but check for excludes
         if (nonSkinningBoneIncludes_.Empty())
             includeBone = true;
-        
+
         // Check against includes/excludes
         for (unsigned i = 0; i < nonSkinningBoneIncludes_.Size(); ++i)
         {
@@ -645,14 +667,14 @@ void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessa
                 break;
             }
         }
-        
+
         if (includeBone)
             PrintLine("Including non-skinning bone " + boneName);
     }
-    
+
     if (includeBone)
         dest.Push(node);
-        
+
     for (unsigned i = 0; i < node->mNumChildren; ++i)
         CollectBonesFinal(dest, necessary, node->mChildren[i]);
 }
@@ -665,7 +687,7 @@ void CollectAnimations(OutModel* model)
         aiAnimation* anim = scene->mAnimations[i];
         if (allAnimations_.Contains(anim))
             continue;
-        
+
         if (model)
         {
             bool modelBoneFound = false;
@@ -691,7 +713,7 @@ void CollectAnimations(OutModel* model)
             allAnimations_.Insert(anim);
         }
     }
-    
+
     /// \todo Vertex morphs are ignored for now
 }
 
@@ -732,15 +754,15 @@ void BuildAndSaveModel(OutModel& model)
     String rootNodeName = FromAIString(model.rootNode_->mName);
     if (!model.meshes_.Size())
         ErrorExit("No geometries found starting from node " + rootNodeName);
-    
+
     PrintLine("Writing model " + rootNodeName);
-    
+
     SharedPtr<Model> outModel(new Model(context_));
     Vector<PODVector<unsigned> > allBoneMappings;
     BoundingBox box;
-    
+
     unsigned numValidGeometries = 0;
-    
+
     bool combineBuffers = true;
     // Check if buffers can be combined (same vertex element mask, under 65535 vertices)
     unsigned elementMask = GetElementMask(model.meshes_[0]);
@@ -768,7 +790,7 @@ void BuildAndSaveModel(OutModel& model)
         if (allUnder65k == true)
             combineBuffers = false;
     }
-    
+
     SharedPtr<IndexBuffer> ib;
     SharedPtr<VertexBuffer> vb;
     Vector<SharedPtr<VertexBuffer> > vbVector;
@@ -776,9 +798,9 @@ void BuildAndSaveModel(OutModel& model)
     unsigned startVertexOffset = 0;
     unsigned startIndexOffset = 0;
     unsigned destGeomIndex = 0;
-    
+
     outModel->SetNumGeometries(numValidGeometries);
-    
+
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         aiMesh* mesh = model.meshes_[i];
@@ -786,19 +808,19 @@ void BuildAndSaveModel(OutModel& model)
         unsigned validFaces = GetNumValidFaces(mesh);
         if (!validFaces)
             continue;
-        
+
         bool largeIndices;
         if (combineBuffers)
             largeIndices = model.totalIndices_ > 65535;
         else
             largeIndices = mesh->mNumVertices > 65535;
-        
+
         // Create new buffers if necessary
         if (!combineBuffers || vbVector.Empty())
         {
             vb = new VertexBuffer(context_);
             ib = new IndexBuffer(context_);
-            
+
             if (combineBuffers)
             {
                 ib->SetSize(model.totalIndices_, largeIndices);
@@ -809,13 +831,13 @@ void BuildAndSaveModel(OutModel& model)
                 ib->SetSize(validFaces * 3, largeIndices);
                 vb->SetSize(mesh->mNumVertices, elementMask);
             }
-            
+
             vbVector.Push(vb);
             ibVector.Push(ib);
             startVertexOffset = 0;
             startIndexOffset = 0;
         }
-        
+
         // Get the world transform of the mesh for baking into the vertices
         Matrix3x4 vertexTransform;
         Matrix3 normalTransform;
@@ -824,15 +846,15 @@ void BuildAndSaveModel(OutModel& model)
         GetPosRotScale(GetMeshBakingTransform(model.meshNodes_[i], model.rootNode_), pos, rot, scale);
         vertexTransform = Matrix3x4(pos, rot, scale);
         normalTransform = rot.RotationMatrix();
-        
+
         SharedPtr<Geometry> geom(new Geometry(context_));
-        
+
         PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
             String(validFaces * 3) + " indices");
-        
+
         unsigned char* vertexData = vb->GetShadowData();
         unsigned char* indexData = ib->GetShadowData();
-        
+
         // Build the index data
         if (!largeIndices)
         {
@@ -846,7 +868,7 @@ void BuildAndSaveModel(OutModel& model)
             for (unsigned j = 0; j < mesh->mNumFaces; ++j)
                 WriteLargeIndices(dest, mesh, j, startVertexOffset);
         }
-        
+
         // Build the vertex data
         // If there are bones, get blend data
         Vector<PODVector<unsigned char> > blendIndices;
@@ -854,11 +876,11 @@ void BuildAndSaveModel(OutModel& model)
         PODVector<unsigned> boneMappings;
         if (model.bones_.Size())
             GetBlendData(model, mesh, boneMappings, blendIndices, blendWeights);
-        
+
         float* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->GetVertexSize());
         for (unsigned j = 0; j < mesh->mNumVertices; ++j)
             WriteVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform, blendIndices, blendWeights);
-        
+
         // Calculate the geometry center
         Vector3 center = Vector3::ZERO;
         if (validFaces)
@@ -872,10 +894,10 @@ void BuildAndSaveModel(OutModel& model)
                     center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[2]]);
                 }
             }
-            
+
             center /= (float)validFaces * 3;
         }
-        
+
         // Define the geometry
         geom->SetIndexBuffer(ib);
         geom->SetVertexBuffer(0, vb);
@@ -883,44 +905,44 @@ void BuildAndSaveModel(OutModel& model)
         outModel->SetNumGeometryLodLevels(destGeomIndex, 1);
         outModel->SetGeometry(destGeomIndex, 0, geom);
         outModel->SetGeometryCenter(destGeomIndex, center);
-        if (model.bones_.Size() > MAX_SKIN_MATRICES)
+        if (model.bones_.Size() > maxBones_)
             allBoneMappings.Push(boneMappings);
-        
+
         startVertexOffset += mesh->mNumVertices;
         startIndexOffset += validFaces * 3;
         ++destGeomIndex;
     }
-    
+
     // Define the model buffers and bounding box
     PODVector<unsigned> emptyMorphRange;
     outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
     outModel->SetIndexBuffers(ibVector);
     outModel->SetBoundingBox(box);
-    
+
     // Build skeleton if necessary
     if (model.bones_.Size() && model.rootBone_)
     {
         PrintLine("Writing skeleton with " + String(model.bones_.Size()) + " bones, rootbone " +
             FromAIString(model.rootBone_->mName));
-        
+
         Skeleton skeleton;
         Vector<Bone>& bones = skeleton.GetModifiableBones();
-        
+
         for (unsigned i = 0; i < model.bones_.Size(); ++i)
         {
             aiNode* boneNode = model.bones_[i];
             String boneName(FromAIString(boneNode->mName));
-            
+
             Bone newBone;
             newBone.name_ = boneName;
-            
+
             aiMatrix4x4 transform = boneNode->mTransformation;
             // Make the root bone transform relative to the model's root node, if it is not already
             if (boneNode == model.rootBone_)
                 transform = GetDerivedTransform(boneNode, model.rootNode_);
-            
+
             GetPosRotScale(transform, newBone.initialPosition_, newBone.initialRotation_, newBone.initialScale_);
-            
+
             // Get offset information if exists
             newBone.offsetMatrix_ = GetOffsetMatrix(model, boneName);
             newBone.radius_ = model.boneRadii_[i];
@@ -942,17 +964,17 @@ void BuildAndSaveModel(OutModel& model)
                 }
             }
         }
-        
+
         outModel->SetSkeleton(skeleton);
-        if (model.bones_.Size() > MAX_SKIN_MATRICES)
+        if (model.bones_.Size() > maxBones_)
             outModel->SetGeometryBoneMappings(allBoneMappings);
     }
-    
+
     File outFile(context_);
     if (!outFile.Open(model.outName_, FILE_WRITE))
         ErrorExit("Could not open output file " + model.outName_);
     outModel->Save(outFile);
-    
+
     // If exporting materials, also save material list for use by the editor
     if (!noMaterials_ && saveMaterialList_)
     {
@@ -971,28 +993,47 @@ void BuildAndSaveModel(OutModel& model)
 void BuildAndSaveAnimations(OutModel* model)
 {
     const PODVector<aiAnimation*>& animations = model ? model->animations_ : sceneAnimations_;
-    
+
     for (unsigned i = 0; i < animations.Size(); ++i)
     {
         aiAnimation* anim = animations[i];
+
+        float duration = (float)anim->mDuration;
         String animName = FromAIString(anim->mName);
+        String animOutName;
+
         if (animName.Empty())
             animName = "Anim" + String(i + 1);
-        String animOutName;
         if (model)
             animOutName = GetPath(model->outName_) + GetFileName(model->outName_) + "_" + SanitateAssetName(animName) + ".ani";
         else
             animOutName = outPath_ + SanitateAssetName(animName) + ".ani";
-            
-        SharedPtr<Animation> outAnim(new Animation(context_));
+
         float ticksPerSecond = (float)anim->mTicksPerSecond;
         // If ticks per second not specified, it's probably a .X file. In this case use the default tick rate
         if (ticksPerSecond < M_EPSILON)
             ticksPerSecond = defaultTicksPerSecond_;
         float tickConversion = 1.0f / ticksPerSecond;
+
+        // Find out the start time of animation from each channel's first keyframe for adjusting the keyframe times
+        // to start from zero
+        float startTime = duration;
+        for (unsigned j = 0; j < anim->mNumChannels; ++j)
+        {
+            aiNodeAnim* channel = anim->mChannels[j];
+            if (channel->mNumPositionKeys > 0)
+                startTime = Min(startTime, (float)channel->mPositionKeys[0].mTime);
+            if (channel->mNumRotationKeys > 0)
+                startTime = Min(startTime, (float)channel->mRotationKeys[0].mTime);
+            if (channel->mScalingKeys > 0)
+                startTime = Min(startTime, (float)channel->mScalingKeys[0].mTime);
+        }
+        duration -= startTime;
+
+        SharedPtr<Animation> outAnim(new Animation(context_));
         outAnim->SetAnimationName(animName);
-        outAnim->SetLength((float)anim->mDuration * tickConversion);
-        
+        outAnim->SetLength(duration * tickConversion);
+
         PrintLine("Writing animation " + animName + " length " + String(outAnim->GetLength()));
         Vector<AnimationTrack> tracks;
         for (unsigned j = 0; j < anim->mNumChannels; ++j)
@@ -1001,7 +1042,7 @@ void BuildAndSaveAnimations(OutModel* model)
             String channelName = FromAIString(channel->mNodeName);
             aiNode* boneNode = 0;
             bool isRootBone = false;
-            
+
             if (model)
             {
                 unsigned boneIndex = GetBoneIndex(*model, channelName);
@@ -1022,18 +1063,34 @@ void BuildAndSaveAnimations(OutModel* model)
                     continue;
                 }
             }
-            
+
+            // To export single frame animation, check if first key frame is identical to bone transformation
+            aiVector3D bonePos, boneScale;
+            aiQuaternion boneRot;
+            boneNode->mTransformation.Decompose(boneScale, boneRot, bonePos);
+
+            bool posEqual = true;
+            bool scaleEqual = true;
+            bool rotEqual = true;
+
+            if (channel->mNumPositionKeys > 0 && !ToVector3(bonePos).Equals(ToVector3(channel->mPositionKeys[0].mValue)))
+                posEqual = false;
+            if (channel->mNumScalingKeys > 0 && !ToVector3(boneScale).Equals(ToVector3(channel->mScalingKeys[0].mValue)))
+                scaleEqual = false;
+            if (channel->mNumRotationKeys > 0 && !ToQuaternion(boneRot).Equals(ToQuaternion(channel->mRotationKeys[0].mValue)))
+                rotEqual = false;
+
             AnimationTrack track;
             track.name_ = channelName;
             track.nameHash_ = channelName;
-            
+
             // Check which channels are used
             track.channelMask_ = 0;
-            if (channel->mNumPositionKeys > 1)
+            if (channel->mNumPositionKeys > 1 || !posEqual)
                 track.channelMask_ |= CHANNEL_POSITION;
-            if (channel->mNumRotationKeys > 1)
+            if (channel->mNumRotationKeys > 1 || !rotEqual)
                 track.channelMask_ |= CHANNEL_ROTATION;
-            if (channel->mNumScalingKeys > 1)
+            if (channel->mNumScalingKeys > 1 || !scaleEqual)
                 track.channelMask_ |= CHANNEL_SCALE;
             // Check for redundant identity scale in all keyframes and remove in that case
             if (track.channelMask_ & CHANNEL_SCALE)
@@ -1053,10 +1110,10 @@ void BuildAndSaveAnimations(OutModel* model)
                 if (redundantScale)
                     track.channelMask_ &= ~CHANNEL_SCALE;
             }
-            
+
             if (!track.channelMask_)
                 PrintLine("Warning: skipping animation track " + channelName + " with no keyframes");
-            
+
             // Currently only same amount of keyframes is supported
             // Note: should also check the times of individual keyframes for match
             if ((channel->mNumPositionKeys > 1 && channel->mNumRotationKeys > 1 && channel->mNumPositionKeys != channel->mNumRotationKeys) ||
@@ -1066,13 +1123,13 @@ void BuildAndSaveAnimations(OutModel* model)
                 PrintLine("Warning: differing amounts of channel keyframes, skipping animation track " + channelName);
                 continue;
             }
-            
+
             unsigned keyFrames = channel->mNumPositionKeys;
             if (channel->mNumRotationKeys > keyFrames)
                 keyFrames = channel->mNumRotationKeys;
             if (channel->mNumScalingKeys > keyFrames)
                 keyFrames = channel->mNumScalingKeys;
-            
+
             for (unsigned k = 0; k < keyFrames; ++k)
             {
                 AnimationKeyFrame kf;
@@ -1080,15 +1137,18 @@ void BuildAndSaveAnimations(OutModel* model)
                 kf.position_ = Vector3::ZERO;
                 kf.rotation_ = Quaternion::IDENTITY;
                 kf.scale_ = Vector3::ONE;
-                
-                // Get time for the keyframe
+
+                // Get time for the keyframe. Adjust with animation's start time
                 if (track.channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
-                    kf.time_ = (float)channel->mPositionKeys[k].mTime * tickConversion;
+                    kf.time_ = ((float)channel->mPositionKeys[k].mTime - startTime) * tickConversion;
                 else if (track.channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
-                    kf.time_ = (float)channel->mRotationKeys[k].mTime * tickConversion;
+                    kf.time_ = ((float)channel->mRotationKeys[k].mTime - startTime) * tickConversion;
                 else if (track.channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
-                    kf.time_ = (float)channel->mScalingKeys[k].mTime * tickConversion;
-                
+                    kf.time_ = ((float)channel->mScalingKeys[k].mTime - startTime) * tickConversion;
+
+                // Make sure time stays positive
+                kf.time_ = Max(kf.time_, 0.0f);
+
                 // Start with the bone's base transform
                 aiMatrix4x4 boneTransform = boneNode->mTransformation;
                 aiVector3D pos, scale;
@@ -1101,7 +1161,7 @@ void BuildAndSaveAnimations(OutModel* model)
                     rot = channel->mRotationKeys[k].mValue;
                 if (track.channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
                     scale = channel->mScalingKeys[k].mValue;
-                
+
                 // If root bone, transform with the model root node transform
                 if (model && isRootBone)
                 {
@@ -1113,22 +1173,22 @@ void BuildAndSaveAnimations(OutModel* model)
                     tform = GetDerivedTransform(tform, boneNode, model->rootNode_);
                     tform.Decompose(scale, rot, pos);
                 }
-                
+
                 if (track.channelMask_ & CHANNEL_POSITION)
                     kf.position_ = ToVector3(pos);
                 if (track.channelMask_ & CHANNEL_ROTATION)
                     kf.rotation_ = ToQuaternion(rot);
                 if (track.channelMask_ & CHANNEL_SCALE)
                     kf.scale_ = ToVector3(scale);
-                
+
                 track.keyFrames_.Push(kf);
             }
-            
+
             tracks.Push(track);
         }
-        
+
         outAnim->SetTracks(tracks);
-        
+
         File outFile(context_);
         if (!outFile.Open(animOutName, FILE_WRITE))
             ErrorExit("Could not open output file " + animOutName);
@@ -1141,23 +1201,23 @@ void ExportScene(const String& outName, bool asPrefab)
     OutScene outScene;
     outScene.outName_ = outName;
     outScene.rootNode_ = rootNode_;
-    
+
     if (useSubdirs_)
         context_->GetSubsystem<FileSystem>()->CreateDir(resourcePath_ + "Models");
-    
+
     CollectSceneModels(outScene, rootNode_);
-    
+
     // Save models, their material lists and animations
     for (unsigned i = 0; i < outScene.models_.Size(); ++i)
         BuildAndSaveModel(outScene.models_[i]);
-    
+
     // Save scene-global animations
     if (!noAnimations_)
     {
         CollectAnimations();
         BuildAndSaveAnimations();
     }
-    
+
     // Save scene
     BuildAndSaveScene(outScene, asPrefab);
 }
@@ -1166,7 +1226,7 @@ void CollectSceneModels(OutScene& scene, aiNode* node)
 {
     Vector<Pair<aiNode*, aiMesh*> > meshes;
     GetMeshesUnderNode(meshes, node);
-    
+
     if (meshes.Size())
     {
         OutModel model;
@@ -1182,18 +1242,21 @@ void CollectSceneModels(OutScene& scene, aiNode* node)
             model.totalVertices_ += mesh->mNumVertices;
             model.totalIndices_ += GetNumValidFaces(mesh) * 3;
         }
-        
+
         // Check if a model with identical mesh indices already exists. If yes, do not export twice
         bool unique = true;
-        for (unsigned i = 0; i < scene.models_.Size(); ++i)
+        if (checkUniqueModel_)
         {
-            if (scene.models_[i].meshIndices_ == model.meshIndices_)
+            for (unsigned i = 0; i < scene.models_.Size(); ++i)
             {
-                PrintLine("Added node " + FromAIString(node->mName));
-                scene.nodes_.Push(node);
-                scene.nodeModelIndices_.Push(i);
-                unique = false;
-                break;
+                if (scene.models_[i].meshIndices_ == model.meshIndices_)
+                {
+                    PrintLine("Added node " + FromAIString(node->mName));
+                    scene.nodes_.Push(node);
+                    scene.nodeModelIndices_.Push(i);
+                    unique = false;
+                    break;
+                }
             }
         }
         if (unique)
@@ -1207,15 +1270,22 @@ void CollectSceneModels(OutScene& scene, aiNode* node)
                 CollectAnimations(&model);
                 BuildAndSaveAnimations(&model);
             }
-            
+
             scene.models_.Push(model);
             scene.nodes_.Push(node);
             scene.nodeModelIndices_.Push(scene.models_.Size() - 1);
         }
     }
-    
+
     for (unsigned i = 0; i < node->mNumChildren; ++i)
         CollectSceneModels(scene, node->mChildren[i]);
+}
+
+void CreateHierarchy(Scene* scene, aiNode* srcNode, HashMap<aiNode*, Node*>& nodeMapping)
+{
+    CreateSceneNode(scene, srcNode, nodeMapping);
+    for (unsigned i = 0; i < srcNode->mNumChildren; ++i)
+        CreateHierarchy(scene, srcNode->mChildren[i], nodeMapping);
 }
 
 Node* CreateSceneNode(Scene* scene, aiNode* srcNode, HashMap<aiNode*, Node*>& nodeMapping)
@@ -1251,7 +1321,7 @@ Node* CreateSceneNode(Scene* scene, aiNode* srcNode, HashMap<aiNode*, Node*>& no
         // Ensure the existence of the parent chain as in the original file
         if (!nodeMapping.Contains(srcNode->mParent))
             CreateSceneNode(scene, srcNode->mParent, nodeMapping);
-        
+
         Node* parent = nodeMapping[srcNode->mParent];
         Node* outNode = parent->CreateChild(FromAIString(srcNode->mName), localIDs_ ? LOCAL : REPLICATED);
         Vector3 pos, scale;
@@ -1272,24 +1342,26 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
         PrintLine("Writing node hierarchy");
 
     SharedPtr<Scene> outScene(new Scene(context_));
-    
+
     if (!asPrefab)
     {
+        #ifdef URHO3D_PHYSICS
         /// \todo Make the physics properties configurable
         outScene->CreateComponent<PhysicsWorld>();
-    
+        #endif
+
         /// \todo Make the octree properties configurable, or detect from the scene contents
         outScene->CreateComponent<Octree>();
 
         outScene->CreateComponent<DebugRenderer>();
-        
+
         if (createZone_)
         {
             Node* zoneNode = outScene->CreateChild("Zone", localIDs_ ? LOCAL : REPLICATED);
             Zone* zone = zoneNode->CreateComponent<Zone>();
             zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.f));
             zone->SetAmbientColor(Color(0.25f, 0.25f, 0.25f));
-            
+
             // Create default light only if scene does not define them
             if (!scene_->HasLights())
             {
@@ -1304,17 +1376,30 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
     ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
 
     HashMap<aiNode*, Node*> nodeMapping;
+
     Node* outRootNode = 0;
-    if (asPrefab || !noHierarchy_)
+    if (asPrefab)
         outRootNode = CreateSceneNode(outScene, rootNode_, nodeMapping);
-    
+    else
+    {
+        // If not saving as a prefab, associate the root node with the scene first to prevent unnecessary creation of a root
+        // However do not do that if the root node does not have an identity matrix, or itself contains a model
+        // (models at the Urho scene root are not preferable)
+        if (ToMatrix3x4(rootNode_->mTransformation).Equals(Matrix3x4::IDENTITY) && !scene.nodes_.Contains(rootNode_))
+           nodeMapping[rootNode_] = outScene;
+    }
+
+    // If is allowed to export empty nodes, export the full Assimp node hierarchy first
+    if (!noHierarchy_ && !noEmptyNodes_)
+        CreateHierarchy(outScene, rootNode_, nodeMapping);
+
     // Create geometry nodes
     for (unsigned i = 0; i < scene.nodes_.Size(); ++i)
     {
         const OutModel& model = scene.models_[scene.nodeModelIndices_[i]];
         Node* modelNode = CreateSceneNode(outScene, scene.nodes_[i], nodeMapping);
         StaticModel* staticModel = model.bones_.Empty() ? modelNode->CreateComponent<StaticModel>() : modelNode->CreateComponent<AnimatedModel>();
-        
+
         // Create a dummy model so that the reference can be stored
         String modelName = (useSubdirs_ ? "Models/" : "") + GetFileNameAndExtension(model.outName_);
         if (!cache->Exists(modelName))
@@ -1325,25 +1410,22 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
             cache->AddManualResource(dummyModel);
         }
         staticModel->SetModel(cache->GetResource<Model>(modelName));
-        
+
         // Set materials if they are known
         for (unsigned j = 0; j < model.meshes_.Size(); ++j)
         {
             String matName = GetMeshMaterialName(model.meshes_[j]);
-            if (!matName.Empty())
+            // Create a dummy material so that the reference can be stored
+            if (!cache->Exists(matName))
             {
-                // Create a dummy material so that the reference can be stored
-                if (!cache->Exists(matName))
-                {
-                    Material* dummyMat = new Material(context_);
-                    dummyMat->SetName(matName);
-                    cache->AddManualResource(dummyMat);
-                }
-                staticModel->SetMaterial(j, cache->GetResource<Material>(matName));
+                Material* dummyMat = new Material(context_);
+                dummyMat->SetName(matName);
+                cache->AddManualResource(dummyMat);
             }
+            staticModel->SetMaterial(j, cache->GetResource<Material>(matName));
         }
     }
-    
+
     // Create lights
     if (!asPrefab)
     {
@@ -1368,7 +1450,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
 
             Light* outLight = outNode->CreateComponent<Light>();
             outLight->SetColor(Color(light->mColorDiffuse.r, light->mColorDiffuse.g, light->mColorDiffuse.b));
-            
+
             switch (light->mType)
             {
             case aiLightSource_DIRECTIONAL:
@@ -1376,7 +1458,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
                 break;
             case aiLightSource_SPOT:
                 outLight->SetLightType(LIGHT_SPOT);
-                outLight->SetFov(light->mAngleOuterCone * M_RADTODEG);
+                outLight->SetFov(light->mAngleOuterCone * 0.5f * M_RADTODEG);
                 break;
             case aiLightSource_POINT:
                 outLight->SetLightType(LIGHT_POINT);
@@ -1384,7 +1466,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
             default:
                 break;
             }
-            
+
             // Calculate range from attenuation parameters so that light intensity has been reduced to 10% at that distance
             if (light->mType != aiLightSource_DIRECTIONAL)
             {
@@ -1402,7 +1484,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
             }
         }
     }
-    
+
     File file(context_);
     if (!file.Open(scene.outName_, FILE_WRITE))
         ErrorExit("Could not open output file " + scene.outName_);
@@ -1426,24 +1508,23 @@ void ExportMaterials(HashSet<String>& usedTextures)
 {
     if (useSubdirs_)
         context_->GetSubsystem<FileSystem>()->CreateDir(resourcePath_ + "Materials");
-    
+
     for (unsigned i = 0; i < scene_->mNumMaterials; ++i)
         BuildAndSaveMaterial(scene_->mMaterials[i], usedTextures);
 }
 
 void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
 {
-    // Material must have name so it can be successfully saved
     aiString matNameStr;
     material->Get(AI_MATKEY_NAME, matNameStr);
     String matName = SanitateAssetName(FromAIString(matNameStr));
-    if (matName.Empty())
-        return;
-    
+    if (matName.Trimmed().Empty())
+        matName = GenerateMaterialName(material);
+
     // Do not actually create a material instance, but instead craft an xml file manually
     XMLFile outMaterial(context_);
     XMLElement materialElem = outMaterial.CreateRoot("material");
-    
+
     String diffuseTexName;
     String normalTexName;
     String specularTexName;
@@ -1455,12 +1536,12 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     bool hasAlpha = false;
     bool twoSided = false;
     float specPower = 1.0f;
-    
+
     aiString stringVal;
     float floatVal;
     int intVal;
     aiColor3D colorVal;
-    
+
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), stringVal) == AI_SUCCESS)
         diffuseTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, 0), stringVal) == AI_SUCCESS)
@@ -1468,7 +1549,7 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_SPECULAR, 0), stringVal) == AI_SUCCESS)
         specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_LIGHTMAP, 0), stringVal) == AI_SUCCESS)
-        specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
+        lightmapTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_EMISSIVE, 0), stringVal) == AI_SUCCESS)
         emissiveTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (!noMaterialDiffuseColor_)
@@ -1493,7 +1574,7 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         specPower = floatVal;
     if (material->Get(AI_MATKEY_TWOSIDED, intVal) == AI_SUCCESS)
         twoSided = (intVal != 0);
-    
+
     String techniqueName = "Techniques/NoTexture";
     if (!diffuseTexName.Empty())
     {
@@ -1510,46 +1591,46 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     }
     if (hasAlpha)
         techniqueName += "Alpha";
-    
+
     XMLElement techniqueElem = materialElem.CreateChild("technique");
     techniqueElem.SetString("name", techniqueName + ".xml");
-    
+
     if (!diffuseTexName.Empty())
     {
         XMLElement diffuseElem = materialElem.CreateChild("texture");
         diffuseElem.SetString("unit", "diffuse");
-        diffuseElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + diffuseTexName);
+        diffuseElem.SetString("name", GetMaterialTextureName(diffuseTexName));
         usedTextures.Insert(diffuseTexName);
     }
     if (!normalTexName.Empty())
     {
         XMLElement normalElem = materialElem.CreateChild("texture");
         normalElem.SetString("unit", "normal");
-        normalElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + normalTexName);
+        normalElem.SetString("name", GetMaterialTextureName(normalTexName));
         usedTextures.Insert(normalTexName);
     }
     if (!specularTexName.Empty())
     {
         XMLElement specularElem = materialElem.CreateChild("texture");
         specularElem.SetString("unit", "specular");
-        specularElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + specularTexName);
+        specularElem.SetString("name", GetMaterialTextureName(specularTexName));
         usedTextures.Insert(specularTexName);
     }
     if (!lightmapTexName.Empty())
     {
         XMLElement lightmapElem = materialElem.CreateChild("texture");
         lightmapElem.SetString("unit", "emissive");
-        lightmapElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + lightmapTexName);
+        lightmapElem.SetString("name", GetMaterialTextureName(lightmapTexName));
         usedTextures.Insert(lightmapTexName);
     }
     if (!emissiveTexName.Empty())
     {
         XMLElement emissiveElem = materialElem.CreateChild("texture");
         emissiveElem.SetString("unit", "emissive");
-        emissiveElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + emissiveTexName);
+        emissiveElem.SetString("name", GetMaterialTextureName(emissiveTexName));
         usedTextures.Insert(emissiveTexName);
     }
-    
+
     XMLElement diffuseColorElem = materialElem.CreateChild("parameter");
     diffuseColorElem.SetString("name", "MatDiffColor");
     diffuseColorElem.SetColor("value", diffuseColor);
@@ -1559,7 +1640,7 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     XMLElement emissiveColorElem = materialElem.CreateChild("parameter");
     emissiveColorElem.SetString("name", "MatEmissiveColor");
     emissiveColorElem.SetColor("value", emissiveColor);
-    
+
     if (twoSided)
     {
         XMLElement cullElem = materialElem.CreateChild("cull");
@@ -1567,18 +1648,18 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         cullElem.SetString("value", "none");
         shadowCullElem.SetString("value", "none");
     }
-    
+
     FileSystem* fileSystem = context_->GetSubsystem<FileSystem>();
-    
+
     String outFileName = resourcePath_ + (useSubdirs_ ? "Materials/" : "" ) + matName + ".xml";
     if (noOverwriteMaterial_ && fileSystem->FileExists(outFileName))
     {
         PrintLine("Skipping save of existing material " + matName);
         return;
     }
-    
+
     PrintLine("Writing material " + matName);
-    
+
     File outFile(context_);
     if (!outFile.Open(outFileName, FILE_WRITE))
         ErrorExit("Could not open output file " + outFileName);
@@ -1588,44 +1669,81 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
 void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
 {
     FileSystem* fileSystem = context_->GetSubsystem<FileSystem>();
-    
+
     if (useSubdirs_)
         fileSystem->CreateDir(resourcePath_ + "Textures");
-    
+
     for (HashSet<String>::ConstIterator i = usedTextures.Begin(); i != usedTextures.End(); ++i)
     {
-        String fullSourceName = sourcePath + *i;
-        String fullDestName = resourcePath_ + (useSubdirs_ ? "Textures/" : "") + *i;
-        
-        if (!fileSystem->FileExists(fullSourceName))
+        // Handle assimp embedded textures
+        if (i->Length() && i->At(0) == '*')
         {
-            PrintLine("Skipping copy of nonexisting material texture " + *i);
-            continue;
-        }
-        {
-            File test(context_, fullSourceName);
-            if (!test.GetSize())
+            unsigned texIndex = ToInt(i->Substring(1));
+            if (texIndex >= scene_->mNumTextures)
+                PrintLine("Skipping out of range texture index " + String(texIndex));
+            else
             {
-                PrintLine("Skipping copy of zero-size material texture " + *i);
-                continue;
+                aiTexture* tex = scene_->mTextures[texIndex];
+                String fullDestName = resourcePath_ + GenerateTextureName(texIndex);
+                bool destExists = fileSystem->FileExists(fullDestName);
+                if (destExists && noOverwriteTexture_)
+                {
+                    PrintLine("Skipping copy of existing embedded texture " + GetFileNameAndExtension(fullDestName));
+                    continue;
+                }
+                // Encoded texture
+                if (!tex->mHeight)
+                {
+                    PrintLine("Saving embedded texture " + GetFileNameAndExtension(fullDestName));
+                    File dest(context_, fullDestName, FILE_WRITE);
+                    dest.Write((const void*)tex->pcData, tex->mWidth);
+                }
+                // RGBA8 texture
+                else
+                {
+                    PrintLine("Saving embedded RGBA texture " + GetFileNameAndExtension(fullDestName));
+                    Image image(context_);
+                    image.SetSize(tex->mWidth, tex->mHeight, 4);
+                    memcpy(image.GetData(), (const void*)tex->pcData, tex->mWidth * tex->mHeight * 4);
+                    image.SavePNG(fullDestName);
+                }
             }
         }
-        
-        bool destExists = fileSystem->FileExists(fullDestName);
-        if (destExists && noOverwriteTexture_)
+        else
         {
-            PrintLine("Skipping copy of existing texture " + *i);
-            continue;
-        }
-        if (destExists && noOverwriteNewerTexture_ && fileSystem->GetLastModifiedTime(fullDestName) >
-            fileSystem->GetLastModifiedTime(fullSourceName))
-        {
-            PrintLine("Skipping copying of material texture " + *i + ", destination is newer");
-            continue;
-        }
+            String fullSourceName = sourcePath + *i;
+            String fullDestName = resourcePath_ + (useSubdirs_ ? "Textures/" : "") + *i;
 
-        PrintLine("Copying material texture " + *i);
-        fileSystem->Copy(fullSourceName, fullDestName);
+            if (!fileSystem->FileExists(fullSourceName))
+            {
+                PrintLine("Skipping copy of nonexisting material texture " + *i);
+                continue;
+            }
+            {
+                File test(context_, fullSourceName);
+                if (!test.GetSize())
+                {
+                    PrintLine("Skipping copy of zero-size material texture " + *i);
+                    continue;
+                }
+            }
+
+            bool destExists = fileSystem->FileExists(fullDestName);
+            if (destExists && noOverwriteTexture_)
+            {
+                PrintLine("Skipping copy of existing texture " + *i);
+                continue;
+            }
+            if (destExists && noOverwriteNewerTexture_ && fileSystem->GetLastModifiedTime(fullDestName) >
+                fileSystem->GetLastModifiedTime(fullSourceName))
+            {
+                PrintLine("Skipping copying of material texture " + *i + ", destination is newer");
+                continue;
+            }
+
+            PrintLine("Copying material texture " + *i);
+            fileSystem->Copy(fullSourceName, fullDestName);
+        }
     }
 }
 
@@ -1643,7 +1761,7 @@ void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& mod
             ErrorExit("Could not load input model " + modelNames[i]);
         srcModels.Push(srcModel);
     }
-    
+
     // Check that none of the models already has LOD levels
     for (unsigned i = 0; i < srcModels.Size(); ++i)
     {
@@ -1653,14 +1771,14 @@ void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& mod
                 ErrorExit(modelNames[i] + " already has multiple LOD levels defined");
         }
     }
-    
+
     // Check for number of geometries (need to have same amount for now)
     for (unsigned i = 1; i < srcModels.Size(); ++i)
     {
         if (srcModels[i]->GetNumGeometries() != srcModels[0]->GetNumGeometries())
             ErrorExit(modelNames[i] + " has different amount of geometries than " + modelNames[0]);
     }
-    
+
     // If there are bones, check for compatibility (need to have exact match for now)
     for (unsigned i = 1; i < srcModels.Size(); ++i)
     {
@@ -1674,11 +1792,11 @@ void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& mod
         if (srcModels[i]->GetGeometryBoneMappings() != srcModels[0]->GetGeometryBoneMappings())
             ErrorExit(modelNames[i] + " has different per-geometry bone mappings than " + modelNames[0]);
     }
-    
+
     Vector<SharedPtr<VertexBuffer> > vbVector;
     Vector<SharedPtr<IndexBuffer> > ibVector;
     PODVector<unsigned> emptyMorphRange;
-    
+
     // Create the final model
     SharedPtr<Model> outModel(new Model(context_));
     outModel->SetNumGeometries(srcModels[0]->GetNumGeometries());
@@ -1690,27 +1808,27 @@ void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& mod
             Geometry* geometry = srcModels[j]->GetGeometry(i, 0);
             geometry->SetLodDistance(lodDistances[j]);
             outModel->SetGeometry(i, j, geometry);
-            
+
             for (unsigned k = 0; k < geometry->GetNumVertexBuffers(); ++k)
             {
                 SharedPtr<VertexBuffer> vb(geometry->GetVertexBuffer(k));
                 if (!vbVector.Contains(vb))
                     vbVector.Push(vb);
             }
-            
+
             SharedPtr<IndexBuffer> ib(geometry->GetIndexBuffer());
             if (!ibVector.Contains(ib))
                 ibVector.Push(ib);
         }
     }
-    
+
     outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
     outModel->SetIndexBuffers(ibVector);
     outModel->SetSkeleton(srcModels[0]->GetSkeleton());
     outModel->SetGeometryBoneMappings(srcModels[0]->GetGeometryBoneMappings());
     outModel->SetBoundingBox(srcModels[0]->GetBoundingBox());
     /// \todo Vertex morphs are ignored for now
-    
+
     // Save the final model
     PrintLine("Writing output model");
     File outFile(context_);
@@ -1788,12 +1906,17 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
     blendIndices.Resize(mesh->mNumVertices);
     blendWeights.Resize(mesh->mNumVertices);
     boneMappings.Clear();
-    
+
     // If model has more bones than can fit vertex shader parameters, write the per-geometry mappings
-    if (model.bones_.Size() > MAX_SKIN_MATRICES)
+    if (model.bones_.Size() > maxBones_)
     {
-        if (mesh->mNumBones > MAX_SKIN_MATRICES)
-            ErrorExit("Geometry has too many bone influences");
+        if (mesh->mNumBones > maxBones_)
+        {
+            ErrorExit(
+                "Geometry (submesh) has over " + String(maxBones_) + " bone influences. Try splitting to more submeshes\n"
+                "that each stay at " + String(maxBones_) + " bones or below."
+            );
+        }
         boneMappings.Resize(mesh->mNumBones);
         for (unsigned i = 0; i < mesh->mNumBones; ++i)
         {
@@ -1808,8 +1931,6 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
                 unsigned vertex = bone->mWeights[j].mVertexId;
                 blendIndices[vertex].Push(i);
                 blendWeights[vertex].Push(bone->mWeights[j].mWeight);
-                if (blendWeights[vertex].Size() > 4)
-                    ErrorExit("More than 4 bone influences on vertex");
             }
         }
     }
@@ -1827,9 +1948,41 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
                 unsigned vertex = bone->mWeights[j].mVertexId;
                 blendIndices[vertex].Push(globalIndex);
                 blendWeights[vertex].Push(bone->mWeights[j].mWeight);
-                if (blendWeights[vertex].Size() > 4)
-                    ErrorExit("More than 4 bone influences on vertex");
             }
+        }
+    }
+
+    // Normalize weights now if necessary, also remove too many influences
+    for (unsigned i = 0; i < blendWeights.Size(); ++i)
+    {
+        if (blendWeights[i].Size() > 4)
+        {
+            PrintLine("Warning: more than 4 bone influences in vertex " + String(i));
+
+            while (blendWeights[i].Size() > 4)
+            {
+                unsigned lowestIndex = 0;
+                float lowest = M_INFINITY;
+                for (unsigned j = 0; j < blendWeights[i].Size(); ++j)
+                {
+                    if (blendWeights[i][j] < lowest)
+                    {
+                        lowest = blendWeights[i][j];
+                        lowestIndex = j;
+                    }
+                }
+                blendWeights[i].Erase(lowestIndex);
+                blendIndices[i].Erase(lowestIndex);
+            }
+        }
+
+        float sum = 0.0f;
+        for (unsigned j = 0; j < blendWeights[i].Size(); ++j)
+            sum += blendWeights[i][j];
+        if (sum != 1.0f && sum != 0.0f)
+        {
+            for (unsigned j = 0; j < blendWeights[i].Size(); ++j)
+                blendWeights[i][j] /= sum;
         }
     }
 }
@@ -1840,22 +1993,59 @@ String GetMeshMaterialName(aiMesh* mesh)
     aiString matNameStr;
     material->Get(AI_MATKEY_NAME, matNameStr);
     String matName = SanitateAssetName(FromAIString(matNameStr));
-    if (matName.Empty())
-        return matName;
+    if (matName.Trimmed().Empty())
+        matName = GenerateMaterialName(material);
+
+    return (useSubdirs_ ? "Materials/" : "") + matName + ".xml";
+}
+
+String GenerateMaterialName(aiMaterial* material)
+{
+    for (unsigned i = 0; i < scene_->mNumMaterials; ++i)
+    {
+        if (scene_->mMaterials[i] == material)
+            return inputName_ + "_Material" + String(i);
+    }
+
+    // Should not go here
+    return String::EMPTY;
+}
+
+String GetMaterialTextureName(const String& nameIn)
+{
+    // Detect assimp embedded texture
+    if (nameIn.Length() && nameIn[0] == '*')
+        return GenerateTextureName(ToInt(nameIn.Substring(1)));
     else
-        return (useSubdirs_ ? "Materials/" : "") + matName + ".xml";
+        return (useSubdirs_ ? "Textures/" : "") + nameIn;
+}
+
+String GenerateTextureName(unsigned texIndex)
+{
+    if (texIndex < scene_->mNumTextures)
+    {
+        // If embedded texture contains encoded data, use the format hint for file extension. Else save RGBA8 data as PNG
+        aiTexture* tex = scene_->mTextures[texIndex];
+        if (!tex->mHeight)
+            return (useSubdirs_ ? "Textures/" : "") + inputName_ + "_Texture" + String(texIndex) + "." + tex->achFormatHint;
+        else
+            return (useSubdirs_ ? "Textures/" : "") + inputName_ + "_Texture" + String(texIndex) + ".png";
+    }
+
+    // Should not go here
+    return String::EMPTY;
 }
 
 unsigned GetNumValidFaces(aiMesh* mesh)
 {
     unsigned ret = 0;
-    
+
     for (unsigned j = 0; j < mesh->mNumFaces; ++j)
     {
         if (mesh->mFaces[j].mNumIndices == 3)
             ++ret;
     }
-    
+
     return ret;
 }
 
@@ -1922,7 +2112,7 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
         float w = 1.0f;
         if ((tangent.CrossProduct(normal)).DotProduct(bitangent) < 0.5f)
             w = -1.0f;
-        
+
         *dest++ = tangent.x_;
         *dest++ = tangent.y_;
         *dest++ = tangent.z_;
@@ -2063,6 +2253,6 @@ String SanitateAssetName(const String& name)
     fixedName.Replace("/", "");
     fixedName.Replace("\\", "");
     fixedName.Replace("|", "");
-    
+
     return fixedName;
 }

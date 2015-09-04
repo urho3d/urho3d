@@ -1,7 +1,7 @@
 /* include/SDL_config.h.  Generated from SDL_config.h.in by configure.  */
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -275,7 +275,7 @@
 #define SDL_VIDEO_DRIVER_X11_HAS_XKBKEYCODETOKEYSYM 1
 
 // Urho3D: Use OpenGL ES 2 implementation from Broadcom VideoCore for Raspberry Pi
-#ifdef RASPI
+#ifdef RPI
 #undef SDL_VIDEO_DRIVER_X11			/* No X */
 #define SDL_VIDEO_DRIVER_RPI 1
 
@@ -316,6 +316,9 @@
 /* #undef SDL_POWER_MACOSX */
 /* #undef SDL_POWER_BEOS */
 /* #undef SDL_POWER_HARDWIRED */
+
+/* Enable filesystem support */
+#define SDL_FILESYSTEM_UNIX 1
 
 /* Enable assembly routines */
 #define SDL_ASSEMBLY_ROUTINES 1

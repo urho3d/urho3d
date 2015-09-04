@@ -1,0 +1,44 @@
+<node id="7">
+    <attribute name="Name" value="LightFlash" />
+    <attribute name="Position" value="0 0 0" />
+    <attribute name="Rotation" value="1 0 0 0" />
+    <attribute name="Scale" value="1 1 1" />
+    <attribute name="Variables" />
+    <component type="ScriptInstance" id="16777217">
+        <attribute name="Delayed Method Calls" value="0" />
+        <attribute name="Script File" value="ScriptFile;Scripts/NinjaSnowWar.as" />
+        <attribute name="Class Name" value="LightFlash" />
+        <attribute name="Script Data" value="" />
+    </component>
+    <component type="Light" id="12">
+        <attribute name="Light Type" type="Enum" value="Point" />
+        <attribute name="Color" value="2 2 2 1" />
+        <attribute name="Specular Intensity" value="0" />
+        <attribute name="Range" value="5" />
+        <attribute name="Spot FOV" value="30" />
+        <attribute name="Spot Aspect Ratio" value="1" />
+        <attribute name="Attenuation Texture" value="Texture2D;Textures/RampWide.png" />
+        <attribute name="Light Shape Texture" value="Texture2D;" />
+        <attribute name="Can Be Occluded" value="true" />
+        <attribute name="Cast Shadows" value="true" />
+        <attribute name="Per Vertex" value="false" />
+        <attribute name="Draw Distance" value="0" />
+        <attribute name="Fade Distance" value="0" />
+        <attribute name="Shadow Distance" value="0" />
+        <attribute name="Shadow Fade Distance" value="0" />
+        <attribute name="Shadow Intensity" value="0" />
+        <attribute name="Shadow Resolution" value="0.25" />
+        <attribute name="Focus To Scene" value="true" />
+        <attribute name="Non-uniform View" value="true" />
+        <attribute name="Auto-Reduce Size" value="true" />
+        <attribute name="CSM Splits" value="1e+008 0 0 0" />
+        <attribute name="CSM Fade Start" value="0.8" />
+        <attribute name="View Size Quantize" value="0.5" />
+        <attribute name="View Size Minimum" value="3" />
+        <attribute name="Depth Constant Bias" value="0.0001" />
+        <attribute name="Depth Slope Bias" value="0.5" />
+        <attribute name="Near/Farclip Ratio" value="0.002" />
+        <attribute name="View Mask" value="-1" />
+        <attribute name="Light Mask" value="-1" />
+    </component>
+</node>

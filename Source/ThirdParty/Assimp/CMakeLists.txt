@@ -8,6 +8,14 @@
 
 # Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
+if (MINGW)
+    # The IFCReaderGen.cpp.obj has too many sections in DEBUG configuration build
+    # Since GCC does not support /bigobj compiler flags as in MSVC, we use optimization flags to reduce the object file size
+    set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O1")
+    set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O1")
+endif ()
+
+INCLUDE_DIRECTORIES( code )
 INCLUDE_DIRECTORIES( include )
 INCLUDE_DIRECTORIES( code/BoostWorkaround )
 INCLUDE_DIRECTORIES( contrib/unzip )
@@ -150,6 +158,8 @@ SET( Common_SRCS
 	code/TinyFormatter.h
 	code/Profiler.h
 	code/LogAux.h
+	code/Bitmap.cpp
+	code/Bitmap.h
 )
 SOURCE_GROUP(Common FILES ${Common_SRCS})
 
@@ -331,12 +341,16 @@ SET( Obj_SRCS
 SOURCE_GROUP( Obj FILES ${Obj_SRCS})
 
 SET( Ogre_SRCS
-	code/OgreImporter.hpp
-	code/OgreXmlHelper.hpp
+	code/OgreImporter.h
+	code/OgreStructs.h
+	code/OgreParsingUtils.h
+	code/OgreBinarySerializer.h
+	code/OgreXmlSerializer.h
 	code/OgreImporter.cpp
+	code/OgreStructs.cpp
+	code/OgreBinarySerializer.cpp
+	code/OgreXmlSerializer.cpp
 	code/OgreMaterial.cpp
-	code/OgreMesh.cpp
-	code/OgreSkeleton.cpp
 )
 SOURCE_GROUP( Ogre FILES ${Ogre_SRCS})
 
@@ -702,18 +716,10 @@ SET( CONTRIB_FILES
 	${Boost_SRCS}
 )
 
-if (MSVC)
-    foreach(FILE ${SOURCE_FILES})
-        if (${FILE} MATCHES "[A-Za-z0-9 _/]*[.]cpp")
-            if (${FILE} MATCHES "AssimpPCH.cpp$")
-                set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "/YcAssimpPCH.h")
-            else ()
-                set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "/YuAssimpPCH.h")
-            endif ()
-        endif ()
-    endforeach ()
-endif ()
-
 set (TARGET_NAME Assimp)
 list (APPEND SOURCE_FILES ${CONTRIB_FILES} ${PUBLIC_HEADERS} ${COMPILER_HEADERS})
+
+set_source_files_properties (contrib/clipper/clipper.cpp contrib/irrXML/irrXML.cpp PROPERTIES NO_PCH TRUE)
+enable_pch (code/AssimpPCH.h)
+
 setup_library ()

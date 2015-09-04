@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "SDL_config.h"
+#include "../SDL_internal.h"
 
 #include "SDL_haptic.h"
 
@@ -54,6 +54,7 @@ struct _SDL_Haptic
 
     int rumble_id;              /* ID of rumble effect for simple rumble API. */
     SDL_HapticEffect rumble_effect; /* Rumble effect. */
+    struct _SDL_Haptic *next; /* pointer to next haptic we have allocated */
 };
 
 /*
@@ -62,6 +63,9 @@ struct _SDL_Haptic
  * Returns number of devices on success, -1 on error.
  */
 extern int SDL_SYS_HapticInit(void);
+
+/* Function to return the number of haptic devices plugged in right now */
+extern int SDL_SYS_NumHaptics();
 
 /*
  * Gets the device dependent name of the haptic device
@@ -201,3 +205,6 @@ extern int SDL_SYS_HapticUnpause(SDL_Haptic * haptic);
  * Returns 0 on success, -1 on error.
  */
 extern int SDL_SYS_HapticStopAll(SDL_Haptic * haptic);
+
+/* vi: set ts=4 sw=4 expandtab: */
+

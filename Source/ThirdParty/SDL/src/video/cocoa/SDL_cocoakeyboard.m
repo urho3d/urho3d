@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,10 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+
+// Modified by OvermindDL1 for Urho3D
+
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_COCOA
 
@@ -198,45 +201,6 @@
 
 @end
 
-/* This is the original behavior, before support was added for
- * differentiating between left and right versions of the keys.
- */
-static void
-DoUnsidedModifiers(unsigned short scancode,
-                   unsigned int oldMods, unsigned int newMods)
-{
-    const int mapping[] = {
-        SDL_SCANCODE_CAPSLOCK,
-        SDL_SCANCODE_LSHIFT,
-        SDL_SCANCODE_LCTRL,
-        SDL_SCANCODE_LALT,
-        SDL_SCANCODE_LGUI
-    };
-    unsigned int i, bit;
-
-    /* Iterate through the bits, testing each against the current modifiers */
-    for (i = 0, bit = NSAlphaShiftKeyMask; bit <= NSCommandKeyMask; bit <<= 1, ++i) {
-        unsigned int oldMask, newMask;
-
-        oldMask = oldMods & bit;
-        newMask = newMods & bit;
-
-        if (oldMask && oldMask != newMask) {        /* modifier up event */
-            /* If this was Caps Lock, we need some additional voodoo to make SDL happy */
-            if (bit == NSAlphaShiftKeyMask) {
-                SDL_SendKeyboardKey(SDL_PRESSED, mapping[i]);
-            }
-            SDL_SendKeyboardKey(SDL_RELEASED, mapping[i]);
-        } else if (newMask && oldMask != newMask) { /* modifier down event */
-            SDL_SendKeyboardKey(SDL_PRESSED, mapping[i]);
-            /* If this was Caps Lock, we need some additional voodoo to make SDL happy */
-            if (bit == NSAlphaShiftKeyMask) {
-                SDL_SendKeyboardKey(SDL_RELEASED, mapping[i]);
-            }
-        }
-    }
-}
-
 /* This is a helper function for HandleModifierSide. This
  * function reverts back to behavior before the distinction between
  * sides was made.
@@ -256,9 +220,9 @@ HandleNonDeviceModifier(unsigned int device_independent_mask,
     newMask = newMods & device_independent_mask;
 
     if (oldMask && oldMask != newMask) {
-        SDL_SendKeyboardKey(SDL_RELEASED, scancode);
+		SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(scancode), scancode);
     } else if (newMask && oldMask != newMask) {
-        SDL_SendKeyboardKey(SDL_PRESSED, scancode);
+		SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(scancode), scancode);
     }
 }
 
@@ -283,9 +247,9 @@ HandleModifierOneSide(unsigned int oldMods, unsigned int newMods,
      * find out which it is.
      */
     if (new_dep_mask && old_dep_mask != new_dep_mask) {
-        SDL_SendKeyboardKey(SDL_PRESSED, scancode);
+		SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(scancode), scancode);
     } else {
-        SDL_SendKeyboardKey(SDL_RELEASED, scancode);
+		SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(scancode), scancode);
     }
 }
 
@@ -356,7 +320,7 @@ ReleaseModifierSide(unsigned int device_independent_mask,
         /* In this case, we can't detect the keyboard, so use the left side
          * to represent both, and release it.
          */
-        SDL_SendKeyboardKey(SDL_RELEASED, left_scancode);
+		SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(left_scancode), left_scancode);
         return;
     }
 
@@ -367,10 +331,10 @@ ReleaseModifierSide(unsigned int device_independent_mask,
      * so I hope this doesn't cause other problems.
      */
     if ( left_device_dependent_mask & oldMods ) {
-        SDL_SendKeyboardKey(SDL_RELEASED, left_scancode);
+		SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(left_scancode), left_scancode);
     }
     if ( right_device_dependent_mask & oldMods ) {
-        SDL_SendKeyboardKey(SDL_RELEASED, right_scancode);
+		SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(right_scancode), right_scancode);
     }
 }
 
@@ -387,8 +351,8 @@ HandleCapsLock(unsigned short scancode,
     newMask = newMods & NSAlphaShiftKeyMask;
 
     if (oldMask != newMask) {
-        SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_CAPSLOCK);
-        SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_CAPSLOCK);
+		SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(SDL_SCANCODE_CAPSLOCK), SDL_SCANCODE_CAPSLOCK);
+		SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(SDL_SCANCODE_CAPSLOCK), SDL_SCANCODE_CAPSLOCK);
     }
 }
 
@@ -458,15 +422,7 @@ HandleModifiers(_THIS, unsigned short scancode, unsigned int modifierFlags)
         return;
     }
 
-    /*
-     * Starting with Panther (10.3.0), the ability to distinguish between
-     * left side and right side modifiers is available.
-     */
-    if (data->osversion >= 0x1030) {
-        DoSidedModifiers(scancode, data->modifierFlags, modifierFlags);
-    } else {
-        DoUnsidedModifiers(scancode, data->modifierFlags, modifierFlags);
-    }
+    DoSidedModifiers(scancode, data->modifierFlags, modifierFlags);
     data->modifierFlags = modifierFlags;
 }
 
@@ -553,7 +509,12 @@ Cocoa_StartTextInput(_THIS)
 {
     SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    NSView *parentView = [[NSApp keyWindow] contentView];
+    SDL_Window *window = SDL_GetKeyboardFocus();
+    NSWindow *nswindow = nil;
+    if (window)
+        nswindow = ((SDL_WindowData*)window->driverdata)->nswindow;
+
+    NSView *parentView = [nswindow contentView];
 
     /* We only keep one field editor per process, since only the front most
      * window can receive text input events, so it make no sense to keep more
@@ -570,7 +531,7 @@ Cocoa_StartTextInput(_THIS)
         /* DEBUG_IME(@"add fieldEdit to window contentView"); */
         [data->fieldEdit removeFromSuperview];
         [parentView addSubview: data->fieldEdit];
-        [[NSApp keyWindow] makeFirstResponder: data->fieldEdit];
+        [nswindow makeFirstResponder: data->fieldEdit];
     }
 
     [pool release];
@@ -632,7 +593,7 @@ Cocoa_HandleKeyEvent(_THIS, NSEvent *event)
             UpdateKeymap(data);
         }
 
-        SDL_SendKeyboardKey(SDL_PRESSED, code);
+        SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(code), code);
 #if 1
         if (code == SDL_SCANCODE_UNKNOWN) {
             fprintf(stderr, "The key you just pressed is not recognized by SDL. To help get this fixed, report this to the SDL mailing list <sdl@libsdl.org> or to Christian Walther <cwalther@gmx.ch>. Mac virtual key code is %d.\n", scancode);
@@ -651,7 +612,7 @@ Cocoa_HandleKeyEvent(_THIS, NSEvent *event)
         }
         break;
     case NSKeyUp:
-        SDL_SendKeyboardKey(SDL_RELEASED, code);
+		SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(code), code);
         break;
     case NSFlagsChanged:
         /* FIXME CW 2007-08-14: check if this whole mess that takes up half of this file is really necessary */

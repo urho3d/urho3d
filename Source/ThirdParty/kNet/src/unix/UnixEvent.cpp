@@ -63,20 +63,20 @@ void Event::Create(EventWaitType type_)
 	{
 		if (pipe(fd) == -1)
 		{
-			LOG(LogError, "Error in Event::Create: %s(%d)!", strerror(errno), errno);
+			KNET_LOG(LogError, "Error in Event::Create: %s(%d)!", strerror(errno), errno);
 			return;
 		}
 
 		int ret = fcntl(fd[0], F_SETFL, O_NONBLOCK);
 		if (ret == -1)
 		{
-			LOG(LogError, "Event::Create: fcntl failed to set fd[0] in nonblocking mode: %s(%d)", strerror(errno), errno);
+			KNET_LOG(LogError, "Event::Create: fcntl failed to set fd[0] in nonblocking mode: %s(%d)", strerror(errno), errno);
 			return;
 		}
 		ret = fcntl(fd[1], F_SETFL, O_NONBLOCK);
 		if (ret == -1)
 		{
-			LOG(LogError, "Event::Create: fcntl failed to set fd[1] in nonblocking mode: %s(%d)", strerror(errno), errno);
+			KNET_LOG(LogError, "Event::Create: fcntl failed to set fd[1] in nonblocking mode: %s(%d)", strerror(errno), errno);
 			return;
 		}
 	}
@@ -109,7 +109,7 @@ void Event::Reset()
 {
 	if (IsNull())
 	{
-		LOG(LogError, "Event::Reset() failed! Tried to reset an uninitialized Event!");
+		KNET_LOG(LogError, "Event::Reset() failed! Tried to reset an uninitialized Event!");
 		return;
 	}
 	if (type == EventWaitDummy)
@@ -126,28 +126,28 @@ void Event::Reset()
 		{
 			ret = read(fd[0], &val, sizeof(val));
 			if (ret == -1 && errno != EAGAIN)
-				LOG(LogError, "Event::Reset() read() failed: %s(%d)!", strerror(errno), (int)errno);
+				KNET_LOG(LogError, "Event::Reset() read() failed: %s(%d)!", strerror(errno), (int)errno);
 		}
 	}
 	else
-		LOG(LogError, "Event::Reset() called on an Event of type %d! (should have been of type EventWaitSignal)", (int)type); ///\todo int to string.
+		KNET_LOG(LogError, "Event::Reset() called on an Event of type %d! (should have been of type EventWaitSignal)", (int)type); ///\todo int to string.
 }
 
 void Event::Set()
 {
 	if (IsNull())
 	{
-		LOG(LogError, "Event::Set() failed! Tried to set an uninitialized Event!");
+		KNET_LOG(LogError, "Event::Set() failed! Tried to set an uninitialized Event!");
 		return;
 	}
 	if (type != EventWaitSignal)
 	{
-		LOG(LogError, "Event::Set() failed! Tried to set an event that is of type %d (should have been of type EventWaitSignal)", (int)type);
+		KNET_LOG(LogError, "Event::Set() failed! Tried to set an event that is of type %d (should have been of type EventWaitSignal)", (int)type);
 		return;
 	}
 	if (fd[1] == -1)
 	{
-		LOG(LogError, "Event::Set() failed! Tried to set a read-only Event! (This event is probably a Socket read descriptor");
+		KNET_LOG(LogError, "Event::Set() failed! Tried to set a read-only Event! (This event is probably a Socket read descriptor");
 		return;
 	}
 
@@ -161,7 +161,7 @@ void Event::Set()
 	int ret = write(fd[1], &val, sizeof(val));
 	if (ret == -1)
 	{
-		LOG(LogError, "Event::Set() write() failed: %s(%d)!", strerror(errno), (int)errno);
+		KNET_LOG(LogError, "Event::Set() write() failed: %s(%d)!", strerror(errno), (int)errno);
 		return;
 	}
 }
@@ -194,7 +194,7 @@ bool Event::Wait(unsigned long msecs) const
 		int ret = select(fd[0]+1, &fds, NULL, NULL, &tv); // http://linux.die.net/man/2/select
 		if (ret == -1)
 		{
-			LOG(LogError, "Event::Wait: select() failed on a pipe: %s(%d)!", strerror(errno), (int)errno);
+			KNET_LOG(LogError, "Event::Wait: select() failed on a pipe: %s(%d)!", strerror(errno), (int)errno);
 			return false;
 		}
 		return ret != 0;
@@ -204,14 +204,14 @@ bool Event::Wait(unsigned long msecs) const
 		int ret = select(fd[0]+1, NULL, &fds, NULL, &tv);
 		if (ret == -1)
 		{
-			LOG(LogError, "Event::Wait: select() failed for Event of type EventWaitWrite: %s(%d)!", strerror(errno), (int)errno);
+			KNET_LOG(LogError, "Event::Wait: select() failed for Event of type EventWaitWrite: %s(%d)!", strerror(errno), (int)errno);
 			return false;
 		}
 		return ret != 0;
 	}
 	else
 	{
-		LOG(LogError, "Event::Wait called for even of invalid type %d!", (int)type);
+		KNET_LOG(LogError, "Event::Wait called for even of invalid type %d!", (int)type);
 		return false;
 	}
 }

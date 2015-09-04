@@ -1,0 +1,4 @@
+<material>
+    <technique name="Techniques/NoTextureOverlay.xml" />
+    <parameter name="MatDiffColor" value="0 0 1 1" />
+</material>

@@ -1,0 +1,103 @@
+$#include "Navigation/NavigationMesh.h"
+
+enum NavmeshPartitionType
+{
+    NAVMESH_PARTITION_WATERSHED = 0,
+    NAVMESH_PARTITION_MONOTONE
+};
+
+struct NavigationGeometryInfo
+{
+    Component* component_ @ component;
+    unsigned lodLevel_ @ lodLevel;
+    Matrix3x4 transform_ @ transform;
+    BoundingBox boundingBox_ @ boundingBox;
+};
+
+class NavigationMesh : public Component
+{
+    void SetTileSize(int size);
+    void SetCellSize(float size);
+    void SetCellHeight(float height);
+    void SetAgentHeight(float height);
+    void SetAgentRadius(float radius);
+    void SetAgentMaxClimb(float maxClimb);
+    void SetAgentMaxSlope(float maxSlope);
+    void SetRegionMinSize(float size);
+    void SetRegionMergeSize(float size);
+    void SetEdgeMaxLength(float length);
+    void SetEdgeMaxError(float error);
+    void SetDetailSampleDistance(float distance);
+    void SetDetailSampleMaxError(float error);
+    void SetPadding(const Vector3& padding);
+    void SetAreaCost(unsigned areaID, float cost);
+    bool Build();
+    bool Build(const BoundingBox& boundingBox);
+    void SetPartitionType(NavmeshPartitionType aType);
+    void SetDrawOffMeshConnections(bool enable);
+    void SetDrawNavAreas(bool enable);
+
+    Vector3 FindNearestPoint(const Vector3& point, const Vector3& extents = Vector3::ONE);
+    Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE, int maxVisited = 3);
+    tolua_outside const PODVector<Vector3>& NavigationMeshFindPath @ FindPath(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
+    Vector3 GetRandomPoint();
+    Vector3 GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents = Vector3::ONE);
+    float GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents = Vector3::ONE);
+    Vector3 Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
+    void DrawDebugGeometry(bool depthTest);
+
+    int GetTileSize() const;
+    float GetCellSize() const;
+    float GetCellHeight() const;
+    float GetAgentHeight() const;
+    float GetAgentRadius() const;
+    float GetAgentMaxClimb() const;
+    float GetAgentMaxSlope() const;
+    float GetRegionMinSize() const;
+    float GetRegionMergeSize() const;
+    float GetEdgeMaxLength() const;
+    float GetEdgeMaxError() const;
+    float GetDetailSampleDistance() const;
+    float GetDetailSampleMaxError() const;
+    const Vector3& GetPadding() const;
+    float GetAreaCost(unsigned areaID) const;
+    bool IsInitialized() const;
+    const BoundingBox& GetBoundingBox() const;
+    BoundingBox GetWorldBoundingBox() const;
+    IntVector2 GetNumTiles() const;
+    NavmeshPartitionType GetPartitionType();
+    bool GetDrawOffMeshConnections() const;
+    bool GetDrawNavAreas() const;
+
+    tolua_property__get_set int tileSize;
+    tolua_property__get_set float cellSize;
+    tolua_property__get_set float cellHeight;
+    tolua_property__get_set float agentHeight;
+    tolua_property__get_set float agentRadius;
+    tolua_property__get_set float agentMaxClimb;
+    tolua_property__get_set float agentMaxSlope;
+    tolua_property__get_set float regionMinSize;
+    tolua_property__get_set float regionMergeSize;
+    tolua_property__get_set float edgeMaxLength;
+    tolua_property__get_set float edgeMaxError;
+    tolua_property__get_set float detailSampleDistance;
+    tolua_property__get_set float detailSampleMaxError;
+    tolua_property__get_set Vector3& padding;
+    tolua_property__get_set NavmeshPartitionType partitionType;
+    tolua_property__get_set bool drawOffMeshConnections;
+    tolua_property__get_set bool drawNavAreas;
+    tolua_readonly tolua_property__is_set bool initialized;
+    tolua_readonly tolua_property__get_set BoundingBox& boundingBox;
+    tolua_readonly tolua_property__get_set BoundingBox worldBoundingBox;
+    tolua_readonly tolua_property__get_set IntVector2 numTiles;
+};
+
+${
+const PODVector<Vector3>& NavigationMeshFindPath(NavigationMesh* navMesh, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE)
+{
+    static PODVector<Vector3> dest;
+    dest.Clear();
+    navMesh->FindPath(dest, start, end, extents);
+    return dest;
+}
+$}

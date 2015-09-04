@@ -7,6 +7,8 @@
  *  This file written by Ryan C. Gordon.
  */
 
+// Modified by Lasse Oorni for Urho3D
+
 #ifndef _INCL_MOJOSHADER_H_
 #define _INCL_MOJOSHADER_H_
 
@@ -15,9 +17,12 @@ extern "C" {
 #endif
 
 /* You can define this if you aren't generating mojoshader_version.h */
+// Urho3D: commented out to avoid the define
+/*
 #ifndef MOJOSHADER_NO_VERSION_INCLUDE
 #include "mojoshader_version.h"
 #endif
+*/
 
 #ifndef MOJOSHADER_VERSION
 #define MOJOSHADER_VERSION -1

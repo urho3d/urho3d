@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../SDL_internal.h"
 
 /* These are functions that need to be implemented by a port of SDL */
 
@@ -50,6 +50,9 @@ extern int SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority);
    allocated by SDL_SYS_CreateThread()
  */
 extern void SDL_SYS_WaitThread(SDL_Thread * thread);
+
+/* Mark thread as cleaned up as soon as it exits, without joining. */
+extern void SDL_SYS_DetachThread(SDL_Thread * thread);
 
 /* Get the thread local storage for this thread */
 extern SDL_TLSData *SDL_SYS_GetTLSData();

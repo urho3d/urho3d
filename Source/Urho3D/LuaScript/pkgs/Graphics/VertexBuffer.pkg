@@ -1,0 +1,72 @@
+$#include "Graphics/VertexBuffer.h"
+
+class VertexBuffer : public Object
+{
+    VertexBuffer();
+    ~VertexBuffer();
+
+    void SetShadowed(bool enable);
+    bool SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic = false);
+    tolua_outside bool VertexBufferSetData @ SetData(VectorBuffer& data);
+    tolua_outside bool VertexBufferSetDataRange @ SetDataRange(VectorBuffer& data, unsigned start, unsigned count, bool discard = false);
+    tolua_outside VectorBuffer VertexBufferGetData @ GetData();
+
+    bool IsShadowed() const;
+    bool IsDynamic() const;
+    unsigned GetVertexCount() const;
+    unsigned GetVertexSize() const;
+    unsigned GetElementMask() const;
+
+    tolua_property__is_set bool shadowed;
+    tolua_readonly tolua_property__is_set bool dynamic;
+    tolua_readonly tolua_property__get_set unsigned vertexCount;
+    tolua_readonly tolua_property__get_set unsigned vertexSize;
+    tolua_readonly tolua_property__get_set unsigned elementMask;
+};
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_VertexBuffer_new00
+static int tolua_GraphicsLuaAPI_VertexBuffer_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<VertexBuffer>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_VertexBuffer_new00_local
+static int tolua_GraphicsLuaAPI_VertexBuffer_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<VertexBuffer>(tolua_S);
+}
+
+static bool VertexBufferSetData(VertexBuffer* dest, VectorBuffer& src)
+{
+    // Make sure there is enough data
+    if (dest->GetVertexCount() && src.GetSize() >= dest->GetVertexCount() * dest->GetVertexSize())
+        return dest->SetData(&src.GetBuffer()[0]);
+    else
+        return false;
+}
+
+static bool VertexBufferSetDataRange(VertexBuffer* dest, VectorBuffer& src, unsigned start, unsigned count, bool discard)
+{
+    // Make sure there is enough data
+    if (dest->GetVertexCount() && src.GetSize() >= count * dest->GetVertexSize())
+        return dest->SetDataRange(&src.GetBuffer()[0], start, count, discard);
+    else
+        return false;
+}
+
+static VectorBuffer VertexBufferGetData(VertexBuffer* src)
+{
+    VectorBuffer ret;
+    void* data = src->Lock(0, src->GetVertexCount(), false);
+
+    if (data)
+    {
+        ret.Write(data, src->GetVertexCount() * src->GetVertexSize());
+        ret.Seek(0);
+        src->Unlock();
+    }
+
+    return ret;
+}
+$}

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,10 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+
+// Modified by Lasse Oorni for Urho3D
+
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
 
@@ -121,11 +124,8 @@
 
 - (BOOL)prefersStatusBarHidden
 {
-    if (self->window->flags & (SDL_WINDOW_FULLSCREEN|SDL_WINDOW_BORDERLESS)) {
-        return YES;
-    } else {
-        return NO;
-    }
+    // Urho3D: always prefer the status bar hidden
+    return YES;
 }
 
 @end

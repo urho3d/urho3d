@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -83,7 +83,15 @@ enum internalCallConv
 	ICC_CDECL_OBJFIRST,
 	ICC_CDECL_OBJFIRST_RETURNINMEM,
 	ICC_GENERIC_METHOD,
-	ICC_GENERIC_METHOD_RETURNINMEM // never used
+	ICC_GENERIC_METHOD_RETURNINMEM, // never used
+	ICC_THISCALL_OBJLAST,
+	ICC_THISCALL_OBJLAST_RETURNINMEM,
+	ICC_VIRTUAL_THISCALL_OBJLAST,
+	ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM,
+	ICC_THISCALL_OBJFIRST,
+	ICC_THISCALL_OBJFIRST_RETURNINMEM,
+	ICC_VIRTUAL_THISCALL_OBJFIRST,
+	ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM
 };
 
 struct asSSystemFunctionInterface

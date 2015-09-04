@@ -1,3 +1,0 @@
-<technique>
-    <pass name="alpha" vs="Unlit" ps="Unlit_Diff" />
-</technique>

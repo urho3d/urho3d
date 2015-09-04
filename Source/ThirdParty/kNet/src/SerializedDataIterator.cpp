@@ -26,7 +26,7 @@ namespace kNet
 
 BasicSerializedDataType SerializedDataIterator::NextElementType() const
 {
-	if (currentElementStack.size() == 0)
+	if (currentElementStack.empty())
 		return SerialInvalid;
 
 	assert(currentElementStack.back().elem);
@@ -41,12 +41,12 @@ BasicSerializedDataType SerializedDataIterator::NextElementType() const
 
 const SerializedElementDesc *SerializedDataIterator::NextElementDesc() const
 {
-	return currentElementStack.size() > 0 ? currentElementStack.back().elem : 0;
+	return currentElementStack.empty() ? 0 : currentElementStack.back().elem;
 }
 
 void SerializedDataIterator::ProceedToNextVariable()
 {
-	if (currentElementStack.size() == 0)
+	if (currentElementStack.empty())
 		return;
 
 	ElemInfo &nextVar = currentElementStack.back();

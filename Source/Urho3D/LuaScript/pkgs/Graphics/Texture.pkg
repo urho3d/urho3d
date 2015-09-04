@@ -1,0 +1,42 @@
+$#include "Graphics/Texture.h"
+
+class Texture : public Resource
+{
+    void SetNumLevels(unsigned levels);
+    void SetFilterMode(TextureFilterMode filter);
+    void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
+    void SetBorderColor(const Color& color);
+    void SetSRGB(bool enable);
+    void SetBackupTexture(Texture* texture);
+    void SetMipsToSkip(int quality, int mips);
+    
+    unsigned GetFormat() const;
+    bool IsCompressed() const;
+    unsigned GetLevels() const;
+    int GetWidth() const;
+    int GetHeight() const;
+    TextureFilterMode GetFilterMode() const;
+    TextureAddressMode GetAddressMode(TextureCoordinate coord) const;
+    const Color& GetBorderColor() const;
+    bool GetSRGB() const;
+    Texture* GetBackupTexture() const;
+    int GetMipsToSkip(int quality) const;
+    int GetLevelWidth(unsigned level) const;
+    int GetLevelHeight(unsigned level) const;
+    TextureUsage GetUsage() const;
+    unsigned GetDataSize(int width, int height) const;
+    unsigned GetRowDataSize(int width) const;
+    unsigned GetComponents() const;
+
+    tolua_readonly tolua_property__get_set unsigned format;
+    tolua_readonly tolua_property__is_set bool compressed;
+    tolua_readonly tolua_property__get_set unsigned levels;
+    tolua_readonly tolua_property__get_set int width;
+    tolua_readonly tolua_property__get_set int height;
+    tolua_readonly tolua_property__get_set unsigned components;
+    tolua_property__get_set TextureFilterMode filterMode;
+    tolua_property__get_set Color& borderColor;
+    tolua_property__get_set bool sRGB;
+    tolua_property__get_set Texture* backupTexture;
+    tolua_readonly tolua_property__get_set TextureUsage usage;
+};

@@ -68,6 +68,9 @@ private:
 	std::vector<ElemInfo> currentElementStack;
 	/// The type of the message we are building.
 	const SerializedMessageDesc &desc;
+
+	void operator =(const SerializedDataIterator&);
+	SerializedDataIterator(const SerializedDataIterator&);
 };
 
 } // ~kNet

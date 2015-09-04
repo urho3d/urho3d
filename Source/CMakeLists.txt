@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2013 the Urho3D project.
+# Copyright (c) 2008-2015 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,6 @@
 # THE SOFTWARE.
 #
 
-# Set project name
-project (Urho3D)
-
-# Set minimum version
-cmake_minimum_required (VERSION 2.8.6)
-
-if (COMMAND cmake_policy)
-    cmake_policy (SET CMP0003 NEW)
-endif ()
-
-# Set CMake modules search path
-set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
-
-# Include Urho3D cmake module
-include (Urho3D-CMake-magic)
-
 # Check existence of stdint.h for LibCpuId
 include (CheckIncludeFiles)
 CHECK_INCLUDE_FILES (stdint.h HAVE_STDINT_H)
@@ -43,77 +27,93 @@ if (HAVE_STDINT_H)
     add_definitions (-DHAVE_STDINT_H)
 endif ()
 
-# Setup SDK install destinations
-if (WIN32)
-    # CMake already automatically prepends "Urho3D" to CMAKE_INSTALL_PREFIX on Windows platform
-    set (SCRIPT_PATTERN *.bat)
-else ()
-    set (PATH_SUFFIX /Urho3D)
-    if (ENABLE_64BIT)   # TODO: Revisit this again when ARM also supports 64bit, for now ARM architecture ignores ENABLE_64BIT build option
-        if (NOT CMAKE_CROSSCOMPILING AND EXISTS /usr/lib64)
-            # Probably target system is a RedHat-based distro
-            set (LIB_SUFFIX 64)
+# Setup RPATH settings
+if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS AND NOT EMSCRIPTEN)
+    # Add RPATH entries when building
+    set (CMAKE_SKIP_BUILD_RPATH FALSE)
+    # But don't set them yet in the build tree
+    set (CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+    if (APPLE)
+        if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
+            set (CMAKE_MACOSX_RPATH TRUE)
         endif ()
+        set (ORIGIN @loader_path)
+    else ()
+        set (ORIGIN $ORIGIN)
     endif ()
-    if (IOS)
-        # Use 'ios' arch subdirectory to differentiate, in case both Mac OS X and iOS build are installed at the same destination
-        set (LIB_SUFFIX ${LIB_SUFFIX}/ios)
+    # When installing/packaging set the first RPATH entry to the library location relative to the executable
+    set (CMAKE_INSTALL_RPATH ${ORIGIN}/../lib${LIB_SUFFIX}/${PATH_SUFFIX})    # The library location is based on SDK install destination
+    # The second entry to the install destination of the library, if the destination location is not in the system default search path
+    list (FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX} isSystemDir)
+    if (isSystemDir STREQUAL -1)
+        list (APPEND CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${DEST_LIBRARY_DIR})
     endif ()
-    set (SCRIPT_PATTERN *.sh)
 endif ()
-set (DEST_INCLUDE_DIR include${PATH_SUFFIX})
-set (DEST_SHARE_DIR share${PATH_SUFFIX})
-set (DEST_RUNTIME_DIR ${DEST_SHARE_DIR}/Bin)
-set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})   # Note to Linux package maintainer: ${PATH_SUFFIX} for library could be patched out if the suffix is not desirable
-set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
-# Install application launcher scripts
-file (GLOB APP_SCRIPTS ${PROJECT_ROOT_DIR}/Bin/${SCRIPT_PATTERN})
-install (FILES ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR} PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)   # 755
-# Install resource directories required by applications built with Urho3D library
-install (DIRECTORY ${PROJECT_ROOT_DIR}/Bin/CoreData ${PROJECT_ROOT_DIR}/Bin/Data DESTINATION ${DEST_RUNTIME_DIR} USE_SOURCE_PERMISSIONS)
-# Install CMake modules and toolchains provided by and for Urho3D
-install (DIRECTORY ${PROJECT_ROOT_DIR}/Source/CMake/ DESTINATION ${DEST_SHARE_DIR}/CMake USE_SOURCE_PERMISSIONS)    # Note: the trailing slash is significant
-# Install CMake launcher scripts
-file (GLOB CMAKE_SCRIPTS ${PROJECT_ROOT_DIR}/${SCRIPT_PATTERN})
-install (FILES ${CMAKE_SCRIPTS} DESTINATION ${DEST_SHARE_DIR}/Scripts PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 # Add targets
-foreach (TARGET Bullet Civetweb Detour FreeType JO kNet LZ4 PugiXml Recast SDL StanHull STB)
+foreach (TARGET FreeType JO LZ4 PugiXml rapidjson SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
-if (ENABLE_ANGELSCRIPT)
+
+if (URHO3D_ANGELSCRIPT)
     add_subdirectory (ThirdParty/AngelScript)
 endif ()
-if (ENABLE_LUA)
-    add_subdirectory (Engine/LuaScript)
+
+if (URHO3D_LUA)
     add_subdirectory (ThirdParty/Lua${JIT})
     add_subdirectory (ThirdParty/toluapp/src/lib)
 endif ()
-if (NOT IOS AND NOT ANDROID AND NOT RASPI)
-    if (USE_OPENGL)
+
+if (URHO3D_NETWORK)
+    add_subdirectory (ThirdParty/Civetweb)
+    add_subdirectory (ThirdParty/kNet)
+endif ()
+
+if (URHO3D_DATABASE_ODBC)
+    add_subdirectory (ThirdParty/nanodbc)
+endif ()
+if (URHO3D_DATABASE_SQLITE)
+    add_subdirectory (ThirdParty/SQLite)
+endif ()
+
+if (URHO3D_NAVIGATION)
+    add_subdirectory (ThirdParty/Detour)
+    add_subdirectory (ThirdParty/DetourCrowd)
+    add_subdirectory (ThirdParty/DetourTileCache)
+    add_subdirectory (ThirdParty/Recast)
+endif ()
+
+if (URHO3D_URHO2D)
+    add_subdirectory (ThirdParty/Box2D)
+endif ()
+
+if (URHO3D_PHYSICS)
+    add_subdirectory (ThirdParty/Bullet)
+endif ()
+
+if (NOT IOS AND NOT ANDROID AND NOT RPI AND NOT EMSCRIPTEN)
+    if (URHO3D_OPENGL)
         add_subdirectory (ThirdParty/GLEW)
+    elseif (NOT URHO3D_D3D11)
+        add_subdirectory (ThirdParty/MojoShader)
     endif ()
     add_subdirectory (ThirdParty/LibCpuId)
 endif ()
 
 # Urho3D game engine library
-add_subdirectory (Engine)
+add_subdirectory (Urho3D)
 
 # Urho3D tools
 add_subdirectory (Tools)
 
 # Urho3D samples
-# Samples are built on iOS platform too when enabled
-# Although samples should also work for Android platform, currently there is no available mechanism to package each sample apps into individual *.apk
-if (NOT ANDROID AND ENABLE_SAMPLES)
+# Samples are built on iOS platform too when enabled. Currently there is no available mechanism to package each sample apps into individual *.apk
+# for Android platform, so we deploy all samples into one apk and use a simple list view activity launcher to select the sample to run
+if (URHO3D_SAMPLES)
     add_subdirectory (Samples)
 endif ()
 
 # Urho3D extras
-# Do not build extras for iOS and Android regardless of its build option 
-if (NOT IOS AND NOT ANDROID AND ENABLE_EXTRAS)   
+if (URHO3D_EXTRAS)
     add_subdirectory (Extras)
 endif ()
-
-# Urho3D documentation
-add_subdirectory (../Docs ${PROJECT_BINARY_DIR}/Docs)

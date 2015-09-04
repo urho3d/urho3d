@@ -1,13 +1,12 @@
 BlenderExporter
 
-- Contributed by reattiva. Read installation instructions from the Readme.txt
-  file within the subdirectory
+- Has moved to https://github.com/reattiva/Urho3D-Blender
 
 OgreBatchConverter
 
 - Contributed by Carlo Carollo. Converts multiple Ogre .mesh.xml files (also from
   subdirectories) by invoking the OgreImporter tool. Use the CMake option
-  ENABLE_EXTRAS to include in the build.
+  URHO3D_EXTRAS to include in the build.
 
 OgreMaxscriptExport
 

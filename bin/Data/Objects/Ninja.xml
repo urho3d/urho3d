@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<node id="2">
+	<attribute name="Name" value="Ninja" />
+	<attribute name="Position" value="0 0 0" />
+	<attribute name="Rotation" value="1 0 0 0" />
+	<attribute name="Scale" value="1 1 1" />
+	<attribute name="Variables" />
+	<component type="ScriptInstance" id="16777216">
+		<attribute name="Delayed Method Calls" value="0" />
+		<attribute name="Script File" value="ScriptFile;Scripts/NinjaSnowWar.as" />
+		<attribute name="Class Name" value="Ninja" />
+		<attribute name="Script Data" value="" />
+	</component>
+	<component type="NetworkPriority" id="16777217">
+		<attribute name="Base Priority" value="110" />
+		<attribute name="Distance Factor" value="2" />
+		<attribute name="Minimum Priority" value="50" />
+		<attribute name="Always Update Owner" value="true" />
+	</component>
+	<component type="CollisionShape" id="4">
+		<attribute name="Shape Type" value="Capsule" />
+		<attribute name="Size" value="0.7 1.8 0.7" />
+		<attribute name="Offset Position" value="0 0 0" />
+		<attribute name="Offset Rotation" value="1 0 0 0" />
+		<attribute name="Collision Margin" value="0.01" />
+		<attribute name="Model" value="Model;" />
+		<attribute name="LOD Level" value="0" />
+	</component>
+	<component type="RigidBody" id="5">
+		<attribute name="Physics Position" value="0 0 0" />
+		<attribute name="Physics Rotation" value="1 0 0 0" />
+		<attribute name="Mass" value="80" />
+		<attribute name="Friction" value="0.5" />
+		<attribute name="Restitution" value="0" />
+		<attribute name="Linear Velocity" value="0 0 0" />
+		<attribute name="Angular Velocity" value="0 0 0" />
+		<attribute name="Linear Factor" value="1 1 1" />
+		<attribute name="Angular Factor" value="0 0 0" />
+		<attribute name="Linear Damping" value="0" />
+		<attribute name="Angular Damping" value="0" />
+		<attribute name="Linear Rest Threshold" value="0.01" />
+		<attribute name="Angular Rest Threshold" value="1" />
+		<attribute name="Collision Layer" value="1" />
+		<attribute name="Collision Mask" value="3" />
+		<attribute name="Collision Event Mode" value="Always" />
+		<attribute name="Use Gravity" value="true" />
+		<attribute name="Is Kinematic" value="false" />
+		<attribute name="Is Trigger" value="false" />
+	</component>
+	<node id="3">
+		<attribute name="Name" value="" />
+		<attribute name="Position" value="0 -0.95 0" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="AnimatedModel" id="6">
+			<attribute name="Model" value="Model;Models/NinjaSnowWar/Ninja.mdl" />
+			<attribute name="Material" value="Material;Materials/NinjaSnowWar/Ninja.xml;Materials/NinjaSnowWar/Ninja.xml" />
+			<attribute name="Is Occluder" value="false" />
+			<attribute name="Can Be Occluded" value="true" />
+			<attribute name="Cast Shadows" value="true" />
+			<attribute name="Draw Distance" value="0" />
+			<attribute name="Shadow Distance" value="0" />
+			<attribute name="LOD Bias" value="1" />
+			<attribute name="Animation LOD Bias" value="1" />
+			<attribute name="Max Lights" value="0" />
+			<attribute name="View Mask" value="-1" />
+			<attribute name="Light Mask" value="-1" />
+			<attribute name="Shadow Mask" value="-1" />
+			<attribute name="Zone Mask" value="-1" />
+			<attribute name="Bone Animation Enabled">
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+			</attribute>
+			<attribute name="Animation States" />
+			<attribute name="Morphs" value="" />
+		</component>
+		<component type="AnimationController" id="7">
+			<attribute name="Animations" />
+		</component>
+    	<component type="ScriptInstance" id="8">
+    		<attribute name="Delayed Method Calls" value="0" />
+    		<attribute name="Script File" value="ScriptFile;Scripts/NinjaSnowWar.as" />
+    		<attribute name="Class Name" value="FootSteps" />
+    		<attribute name="Script Data" value="" />
+    	</component>
+	</node>
+</node>

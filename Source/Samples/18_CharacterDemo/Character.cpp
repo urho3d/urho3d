@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,81 +20,52 @@
 // THE SOFTWARE.
 //
 
-#include "AnimationController.h"
+#include <Urho3D/Core/Context.h>
+#include <Urho3D/Graphics/AnimationController.h>
+#include <Urho3D/IO/MemoryBuffer.h>
+#include <Urho3D/Physics/PhysicsEvents.h>
+#include <Urho3D/Physics/PhysicsWorld.h>
+#include <Urho3D/Physics/RigidBody.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Scene/SceneEvents.h>
+
 #include "Character.h"
-#include "Context.h"
-#include "MemoryBuffer.h"
-#include "PhysicsEvents.h"
-#include "PhysicsWorld.h"
-#include "RigidBody.h"
-#include "Scene.h"
-#include "SceneEvents.h"
 
 Character::Character(Context* context) :
-    Component(context),
+    LogicComponent(context),
     onGround_(false),
     okToJump_(true),
     inAirTimer_(0.0f)
 {
+    // Only the physics update event is needed: unsubscribe from the rest for optimization
+    SetUpdateEventMask(USE_FIXEDUPDATE);
 }
 
 void Character::RegisterObject(Context* context)
 {
     context->RegisterFactory<Character>();
-    
+
     // These macros register the class attributes to the Context for automatic load / save handling.
     // We specify the Default attribute mode which means it will be used both for saving into file, and network replication
-    ATTRIBUTE(Character, VAR_FLOAT, "Controls Yaw", controls_.yaw_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE(Character, VAR_FLOAT, "Controls Pitch", controls_.pitch_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE(Character, VAR_BOOL, "On Ground", onGround_, false, AM_DEFAULT);
-    ATTRIBUTE(Character, VAR_BOOL, "OK To Jump", okToJump_, true, AM_DEFAULT);
-    ATTRIBUTE(Character, VAR_FLOAT, "In Air Timer", inAirTimer_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE("Controls Yaw", float, controls_.yaw_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE("Controls Pitch", float, controls_.pitch_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE("On Ground", bool, onGround_, false, AM_DEFAULT);
+    ATTRIBUTE("OK To Jump", bool, okToJump_, true, AM_DEFAULT);
+    ATTRIBUTE("In Air Timer", float, inAirTimer_, 0.0f, AM_DEFAULT);
 }
 
-void Character::OnNodeSet(Node* node)
+void Character::Start()
 {
-    if (node)
-    {
-        // Component has been inserted into its scene node. Subscribe to events now
-        SubscribeToEvent(node, E_NODECOLLISION, HANDLER(Character, HandleNodeCollision));
-        SubscribeToEvent(GetScene()->GetComponent<PhysicsWorld>(), E_PHYSICSPRESTEP, HANDLER(Character, HandleFixedUpdate));
-    }
+    // Component has been inserted into its scene node. Subscribe to events now
+    SubscribeToEvent(GetNode(), E_NODECOLLISION, HANDLER(Character, HandleNodeCollision));
 }
 
-void Character::HandleNodeCollision(StringHash eventType, VariantMap& eventData)
+void Character::FixedUpdate(float timeStep)
 {
-    // Check collision contacts and see if character is standing on ground (look for a contact that has near vertical normal)
-    using namespace NodeCollision;
-    
-    MemoryBuffer contacts(eventData[P_CONTACTS].GetBuffer());
-    
-    while (!contacts.IsEof())
-    {
-        Vector3 contactPosition = contacts.ReadVector3();
-        Vector3 contactNormal = contacts.ReadVector3();
-        float contactDistance = contacts.ReadFloat();
-        float contactImpulse = contacts.ReadFloat();
-        
-        // If contact is below node center and mostly vertical, assume it's a ground contact
-        if (contactPosition.y_ < (node_->GetPosition().y_ + 1.0f))
-        {
-            float level = Abs(contactNormal.y_);
-            if (level > 0.75)
-                onGround_ = true;
-        }
-    }
-}
-
-void Character::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
-{
-    using namespace PhysicsPreStep;
-    
-    float timeStep = eventData[P_TIMESTEP].GetFloat();
-    
     /// \todo Could cache the components for faster access instead of finding them each frame
     RigidBody* body = GetComponent<RigidBody>();
     AnimationController* animCtrl = GetComponent<AnimationController>();
-    
+
     // Update the in air timer. Reset if grounded
     if (!onGround_)
         inAirTimer_ += timeStep;
@@ -102,14 +73,14 @@ void Character::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
         inAirTimer_ = 0.0f;
     // When character has been in air less than 1/10 second, it's still interpreted as being on ground
     bool softGrounded = inAirTimer_ < INAIR_THRESHOLD_TIME;
-    
+
     // Update movement & animation
     const Quaternion& rot = node_->GetRotation();
     Vector3 moveDir = Vector3::ZERO;
     const Vector3& velocity = body->GetLinearVelocity();
     // Velocity on the XZ plane
     Vector3 planeVelocity(velocity.x_, 0.0f, velocity.z_);
-    
+
     if (controls_.IsDown(CTRL_FORWARD))
         moveDir += Vector3::FORWARD;
     if (controls_.IsDown(CTRL_BACK))
@@ -118,20 +89,20 @@ void Character::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
         moveDir += Vector3::LEFT;
     if (controls_.IsDown(CTRL_RIGHT))
         moveDir += Vector3::RIGHT;
-    
+
     // Normalize move vector so that diagonal strafing is not faster
     if (moveDir.LengthSquared() > 0.0f)
         moveDir.Normalize();
-    
+
     // If in air, allow control, but slower than when on ground
     body->ApplyImpulse(rot * moveDir * (softGrounded ? MOVE_FORCE : INAIR_MOVE_FORCE));
-    
+
     if (softGrounded)
     {
         // When on ground, apply a braking force to limit maximum ground velocity
         Vector3 brakeForce = -planeVelocity * BRAKE_FORCE;
         body->ApplyImpulse(brakeForce);
-        
+
         // Jump. Must release jump control inbetween jumps
         if (controls_.IsDown(CTRL_JUMP))
         {
@@ -144,7 +115,7 @@ void Character::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
         else
             okToJump_ = true;
     }
-    
+
     // Play walk animation if moving on ground, otherwise fade it out
     if (softGrounded && !moveDir.Equals(Vector3::ZERO))
         animCtrl->PlayExclusive("Models/Jack_Walk.ani", 0, true, 0.2f);
@@ -152,7 +123,31 @@ void Character::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
         animCtrl->Stop("Models/Jack_Walk.ani", 0.2f);
     // Set walk animation speed proportional to velocity
     animCtrl->SetSpeed("Models/Jack_Walk.ani", planeVelocity.Length() * 0.3f);
-    
+
     // Reset grounded flag for next frame
     onGround_ = false;
+}
+
+void Character::HandleNodeCollision(StringHash eventType, VariantMap& eventData)
+{
+    // Check collision contacts and see if character is standing on ground (look for a contact that has near vertical normal)
+    using namespace NodeCollision;
+
+    MemoryBuffer contacts(eventData[P_CONTACTS].GetBuffer());
+
+    while (!contacts.IsEof())
+    {
+        Vector3 contactPosition = contacts.ReadVector3();
+        Vector3 contactNormal = contacts.ReadVector3();
+        /*float contactDistance = */contacts.ReadFloat();
+        /*float contactImpulse = */contacts.ReadFloat();
+
+        // If contact is below node center and mostly vertical, assume it's a ground contact
+        if (contactPosition.y_ < (node_->GetPosition().y_ + 1.0f))
+        {
+            float level = Abs(contactNormal.y_);
+            if (level > 0.75)
+                onGround_ = true;
+        }
+    }
 }

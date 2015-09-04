@@ -1,0 +1,130 @@
+$#include "UI/UI.h"
+
+class UI : public Object
+{
+    void SetCursor(Cursor* cursor);
+    void SetFocusElement(UIElement* element, bool byKey = false);
+    bool SetModalElement(UIElement* modalElement, bool enable);
+    void Clear();
+    void DebugDraw(UIElement* element);
+    tolua_outside UIElement* UILoadLayout @ LoadLayout(File* source, XMLFile* styleFile = 0);
+    tolua_outside UIElement* UILoadLayout @ LoadLayout(const String fileName, XMLFile* styleFile = 0);
+    tolua_outside UIElement* UILoadLayout @ LoadLayout(XMLFile* file, XMLFile* styleFile = 0);
+    bool SaveLayout(Serializer& dest, UIElement* element);
+
+    void SetClipboardText(const String text);
+    void SetDoubleClickInterval(float interval);
+    void SetDragBeginInterval(float interval);
+    void SetDragBeginDistance(int pixels);
+    void SetDefaultToolTipDelay(float delay);
+    void SetMaxFontTextureSize(int size);
+    void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
+    void SetUseSystemClipboard(bool enable);
+    void SetUseScreenKeyboard(bool enable);
+    void SetUseMutableGlyphs(bool enable);
+    void SetForceAutoHint(bool enable);
+
+    UIElement* GetRoot() const;
+    UIElement* GetRootModalElement() const;
+    Cursor* GetCursor() const;
+    IntVector2 GetCursorPosition() const;
+    UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true);
+    UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
+
+    UIElement* GetFocusElement() const;
+    UIElement* GetFrontElement() const;
+    UIElement* GetDragElement(unsigned index);
+    const String GetClipboardText() const;
+    float GetDoubleClickInterval() const;
+    float GetDragBeginInterval() const;
+    int GetDragBeginDistance() const;
+    float GetDefaultToolTipDelay() const;
+    int GetMaxFontTextureSize() const;
+    bool IsNonFocusedMouseWheel() const;
+    bool GetUseSystemClipboard() const;
+    bool GetUseScreenKeyboard() const;
+    bool GetUseMutableGlyphs() const;
+    bool GetForceAutoHint() const;
+    bool HasModalElement() const;
+    bool IsDragging() const;
+
+    tolua_readonly tolua_property__get_set UIElement* root;
+    tolua_readonly tolua_property__get_set UIElement* rootModalElement;
+    tolua_property__get_set Cursor* cursor;
+    tolua_readonly tolua_property__get_set IntVector2 cursorPosition;
+    tolua_readonly tolua_property__get_set UIElement* focusElement;
+    tolua_readonly tolua_property__get_set UIElement* frontElement;
+
+    tolua_property__get_set String clipboardText;
+    tolua_property__get_set float doubleClickInterval;
+    tolua_property__get_set float dragBeginInterval;
+    tolua_property__get_set int dragBeginDistance;
+    tolua_property__get_set float defaultToolTipDelay;
+    tolua_property__get_set int maxFontTextureSize;
+    tolua_property__is_set bool nonFocusedMouseWheel;
+    tolua_property__get_set bool useSystemClipboard;
+    tolua_property__get_set bool useScreenKeyboard;
+    tolua_property__get_set bool useMutableGlyphs;
+    tolua_property__get_set bool forceAutoHint;
+    tolua_readonly tolua_property__has_set bool modalElement;
+};
+
+UI* GetUI();
+tolua_readonly tolua_property__get_set UI* ui;
+
+${
+static UIElement* UILoadLayout(UI* ui, File* source, XMLFile* styleFile)
+{
+    if (!source)
+        return 0;
+
+    SharedPtr<UIElement> elementPtr = ui->LoadLayout(*source, styleFile);
+    if (!elementPtr)
+        return 0;
+
+    UIElement* element = elementPtr.Get();
+    elementPtr.Detach();
+
+    return element;
+}
+
+static UIElement* UILoadLayout(UI* ui, const String& fileName, XMLFile* styleFile)
+{
+    File file(ui->GetContext(), fileName, FILE_READ);
+    if (!file.IsOpen())
+        return 0;
+
+    SharedPtr<UIElement> elementPtr = ui->LoadLayout(file, styleFile);
+    if (!elementPtr)
+        return 0;
+
+    UIElement* element = elementPtr.Get();
+    elementPtr.Detach();
+
+    return element;
+}
+
+static UIElement* UILoadLayout(UI* ui, XMLFile* source, XMLFile* styleFile)
+{
+    if (!source)
+        return 0;
+
+    SharedPtr<UIElement> elementPtr = ui->LoadLayout(source, styleFile);
+    if (!elementPtr)
+        return 0;
+
+    UIElement* element = elementPtr.Get();
+    elementPtr.Detach();
+
+    return element;
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_GetUI00
+static int tolua_UILuaAPI_GetUI00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<UI>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_ui_ptr
+#define tolua_get_ui_ptr tolua_UILuaAPI_GetUI00
+$}

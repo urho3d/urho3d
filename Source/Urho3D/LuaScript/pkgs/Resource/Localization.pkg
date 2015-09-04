@@ -1,0 +1,36 @@
+$#include "Resource/Localization.h"
+
+class Localization : public Object
+{
+    int GetNumLanguages() const;
+    int GetLanguageIndex() const;
+    int GetLanguageIndex(const String language);
+    String GetLanguage();
+    String GetLanguage(int index);
+    void SetLanguage(const String language);
+    void SetLanguage(int index);
+    String Get(const String id);
+    void Reset();
+    void LoadJSON(const JSONValue& source);
+    void LoadJSONFile(const String name);
+
+    tolua_readonly tolua_property__get_set int numLanguages;
+    tolua_readonly tolua_property__get_set int languageIndex;
+    tolua_readonly tolua_property__get_set String language;
+};
+
+Localization* GetLocalization();
+tolua_readonly tolua_property__get_set Localization* localization;
+
+${
+
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_GetLocalization00
+static int tolua_ResourceLuaAPI_GetLocalization00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Localization>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_localization_ptr
+#define tolua_get_localization_ptr tolua_ResourceLuaAPI_GetLocalization00
+
+$}

@@ -231,7 +231,7 @@ private:
 //	typedef OrderedHashTable<PacketAckTrack, PacketAckTrack> PacketAckTrackTable;
 //	PacketAckTrackTable outboundPacketAckTrack;
 
-	static int BiasedBinarySearchFindPacketIndex(UDPMessageConnection::PacketAckTrackQueue &queue, int packetID);
+	static int BiasedBinarySearchFindPacketIndex(UDPMessageConnection::PacketAckTrackQueue &queue, packet_id_t packetID);
 
 	WaitFreeQueue<Datagram> queuedInboundDatagrams;
 

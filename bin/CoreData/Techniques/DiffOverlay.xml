@@ -1,0 +1,3 @@
+<technique vs="Basic" ps="Basic" vsdefines="DIFFMAP" psdefines="DIFFMAP">
+    <pass name="postalpha" depthtest="always" depthwrite="false"/>
+</technique>

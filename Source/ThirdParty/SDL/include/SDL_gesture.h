@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,6 +18,8 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
 
 /**
  *  \file SDL_gesture.h
@@ -58,14 +60,14 @@ extern DECLSPEC int SDLCALL SDL_RecordGesture(SDL_TouchID touchId);
  *
  *
  */
-extern DECLSPEC int SDLCALL SDL_SaveAllDollarTemplates(SDL_RWops *src);
+extern DECLSPEC int SDLCALL SDL_SaveAllDollarTemplates(SDL_RWops *dst);
 
 /**
  *  \brief Save a currently loaded Dollar Gesture template
  *
  *
  */
-extern DECLSPEC int SDLCALL SDL_SaveDollarTemplate(SDL_GestureID gestureId,SDL_RWops *src);
+extern DECLSPEC int SDLCALL SDL_SaveDollarTemplate(SDL_GestureID gestureId,SDL_RWops *dst);
 
 
 /**
@@ -75,6 +77,10 @@ extern DECLSPEC int SDLCALL SDL_SaveDollarTemplate(SDL_GestureID gestureId,SDL_R
  */
 extern DECLSPEC int SDLCALL SDL_LoadDollarTemplates(SDL_TouchID touchId, SDL_RWops *src);
 
+
+// Urho3d: added functions
+extern DECLSPEC int SDLCALL SDL_RemoveDollarTemplate(SDL_GestureID gestureId);
+extern DECLSPEC void SDLCALL SDL_RemoveAllDollarTemplates(void);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus

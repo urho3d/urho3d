@@ -1,0 +1,14 @@
+$#include "Urho2D/CollisionPolygon2D.h"
+
+class CollisionPolygon2D : CollisionShape2D
+{
+    void SetVertexCount(unsigned count);
+    void SetVertex(unsigned index, const Vector2& vertex);
+    void SetVertices(const PODVector<Vector2>& vertices);
+
+    unsigned GetVertexCount() const;
+    const Vector2& GetVertex(unsigned index) const;
+    // const PODVector<Vector2>& GetVertices() const;
+
+    tolua_property__get_set unsigned vertexCount;
+};

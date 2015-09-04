@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../SDL_internal.h"
 
 #ifndef _SDL_sysvideo_h
 #define _SDL_sysvideo_h
@@ -79,6 +79,7 @@ struct SDL_Window
     int min_w, min_h;
     int max_w, max_h;
     Uint32 flags;
+    Uint32 last_fullscreen_flags;
 
     /* Stored position and size for windowed mode */
     SDL_Rect windowed;
@@ -91,6 +92,8 @@ struct SDL_Window
 
     SDL_Surface *surface;
     SDL_bool surface_valid;
+
+    SDL_bool is_destroying;
 
     SDL_WindowShaper *shaper;
 
@@ -342,14 +345,20 @@ extern VideoBootStrap COCOA_bootstrap;
 #if SDL_VIDEO_DRIVER_X11
 extern VideoBootStrap X11_bootstrap;
 #endif
+#if SDL_VIDEO_DRIVER_MIR
+extern VideoBootStrap MIR_bootstrap;
+#endif
 #if SDL_VIDEO_DRIVER_DIRECTFB
 extern VideoBootStrap DirectFB_bootstrap;
 #endif
 #if SDL_VIDEO_DRIVER_WINDOWS
 extern VideoBootStrap WINDOWS_bootstrap;
 #endif
-#if SDL_VIDEO_DRIVER_BWINDOW
-extern VideoBootStrap BWINDOW_bootstrap;
+#if SDL_VIDEO_DRIVER_WINRT
+extern VideoBootStrap WINRT_bootstrap;
+#endif
+#if SDL_VIDEO_DRIVER_HAIKU
+extern VideoBootStrap HAIKU_bootstrap;
 #endif
 #if SDL_VIDEO_DRIVER_PANDORA
 extern VideoBootStrap PND_bootstrap;
@@ -368,6 +377,9 @@ extern VideoBootStrap RPI_bootstrap;
 #endif
 #if SDL_VIDEO_DRIVER_DUMMY
 extern VideoBootStrap DUMMY_bootstrap;
+#endif
+#if SDL_VIDEO_DRIVER_WAYLAND
+extern VideoBootStrap Wayland_bootstrap;
 #endif
 
 extern SDL_VideoDevice *SDL_GetVideoDevice(void);

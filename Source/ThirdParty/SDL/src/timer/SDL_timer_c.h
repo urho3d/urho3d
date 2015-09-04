@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../SDL_internal.h"
 
 /* Useful functions and variables from SDL_timer.c */
 #include "SDL_timer.h"
@@ -26,7 +26,8 @@
 #define ROUND_RESOLUTION(X) \
     (((X+TIMER_RESOLUTION-1)/TIMER_RESOLUTION)*TIMER_RESOLUTION)
 
-extern void SDL_InitTicks(void);
+extern void SDL_TicksInit(void);
+extern void SDL_TicksQuit(void);
 extern int SDL_TimerInit(void);
 extern void SDL_TimerQuit(void);
 

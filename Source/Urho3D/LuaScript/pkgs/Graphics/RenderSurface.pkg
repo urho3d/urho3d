@@ -1,0 +1,34 @@
+$#include "Graphics/RenderSurface.h"
+
+class RenderSurface
+{
+    RenderSurface(Texture* parentTexture);
+    ~RenderSurface();
+
+    void SetNumViewports(unsigned num);
+    void SetViewport(unsigned index, Viewport* viewport);
+    void SetUpdateMode(RenderSurfaceUpdateMode mode);
+    void SetLinkedRenderTarget(RenderSurface* renderTarget);
+    void SetLinkedDepthStencil(RenderSurface* depthStencil);
+    void QueueUpdate();
+    void Release();
+    
+    Texture* GetParentTexture() const;
+    int GetWidth() const;
+    int GetHeight() const;
+    TextureUsage GetUsage() const;
+    unsigned GetNumViewports() const;
+    Viewport* GetViewport(unsigned index) const;
+    RenderSurfaceUpdateMode GetUpdateMode() const;
+    RenderSurface* GetLinkedRenderTarget() const;
+    RenderSurface* GetLinkedDepthStencil() const;
+    
+    tolua_readonly tolua_property__get_set Texture* parentTexture;
+    tolua_readonly tolua_property__get_set int width;
+    tolua_readonly tolua_property__get_set int height;
+    tolua_readonly tolua_property__get_set TextureUsage usage;
+    tolua_property__get_set unsigned numViewports;
+    tolua_property__get_set RenderSurfaceUpdateMode updateMode;
+    tolua_property__get_set RenderSurface* linkedRenderTarget;
+    tolua_property__get_set RenderSurface* linkedDepthStencil;
+};

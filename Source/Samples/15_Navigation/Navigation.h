@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,8 @@ class Scene;
 ///     - Performing path queries to the navigation mesh
 ///     - Rebuilding the navigation mesh partially when adding or removing objects
 ///     - Visualizing custom debug geometry
+///     - Raycasting drawable components
+///     - Making a node follow the Detour path
 class Navigation : public Sample
 {
     OBJECT(Navigation);
@@ -49,6 +51,79 @@ public:
 
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
+
+protected:
+    /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
+    virtual String GetScreenJoystickPatchString() const { return
+        "<patch>"
+        "    <add sel=\"/element\">"
+        "        <element type=\"Button\">"
+        "            <attribute name=\"Name\" value=\"Button3\" />"
+        "            <attribute name=\"Position\" value=\"-120 -120\" />"
+        "            <attribute name=\"Size\" value=\"96 96\" />"
+        "            <attribute name=\"Horiz Alignment\" value=\"Right\" />"
+        "            <attribute name=\"Vert Alignment\" value=\"Bottom\" />"
+        "            <attribute name=\"Texture\" value=\"Texture2D;Textures/TouchInput.png\" />"
+        "            <attribute name=\"Image Rect\" value=\"96 0 192 96\" />"
+        "            <attribute name=\"Hover Image Offset\" value=\"0 0\" />"
+        "            <attribute name=\"Pressed Image Offset\" value=\"0 0\" />"
+        "            <element type=\"Text\">"
+        "                <attribute name=\"Name\" value=\"Label\" />"
+        "                <attribute name=\"Horiz Alignment\" value=\"Center\" />"
+        "                <attribute name=\"Vert Alignment\" value=\"Center\" />"
+        "                <attribute name=\"Color\" value=\"0 0 0 1\" />"
+        "                <attribute name=\"Text\" value=\"Teleport\" />"
+        "            </element>"
+        "            <element type=\"Text\">"
+        "                <attribute name=\"Name\" value=\"KeyBinding\" />"
+        "                <attribute name=\"Text\" value=\"LSHIFT\" />"
+        "            </element>"
+        "            <element type=\"Text\">"
+        "                <attribute name=\"Name\" value=\"MouseButtonBinding\" />"
+        "                <attribute name=\"Text\" value=\"LEFT\" />"
+        "            </element>"
+        "        </element>"
+        "        <element type=\"Button\">"
+        "            <attribute name=\"Name\" value=\"Button4\" />"
+        "            <attribute name=\"Position\" value=\"-120 -12\" />"
+        "            <attribute name=\"Size\" value=\"96 96\" />"
+        "            <attribute name=\"Horiz Alignment\" value=\"Right\" />"
+        "            <attribute name=\"Vert Alignment\" value=\"Bottom\" />"
+        "            <attribute name=\"Texture\" value=\"Texture2D;Textures/TouchInput.png\" />"
+        "            <attribute name=\"Image Rect\" value=\"96 0 192 96\" />"
+        "            <attribute name=\"Hover Image Offset\" value=\"0 0\" />"
+        "            <attribute name=\"Pressed Image Offset\" value=\"0 0\" />"
+        "            <element type=\"Text\">"
+        "                <attribute name=\"Name\" value=\"Label\" />"
+        "                <attribute name=\"Horiz Alignment\" value=\"Center\" />"
+        "                <attribute name=\"Vert Alignment\" value=\"Center\" />"
+        "                <attribute name=\"Color\" value=\"0 0 0 1\" />"
+        "                <attribute name=\"Text\" value=\"Obstacles\" />"
+        "            </element>"
+        "            <element type=\"Text\">"
+        "                <attribute name=\"Name\" value=\"MouseButtonBinding\" />"
+        "                <attribute name=\"Text\" value=\"MIDDLE\" />"
+        "            </element>"
+        "        </element>"
+        "    </add>"
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/attribute[@name='Is Visible']\" />"
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Set</replace>"
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button0']]\">"
+        "        <element type=\"Text\">"
+        "            <attribute name=\"Name\" value=\"MouseButtonBinding\" />"
+        "            <attribute name=\"Text\" value=\"LEFT\" />"
+        "        </element>"
+        "    </add>"
+        "    <remove sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/attribute[@name='Is Visible']\" />"
+        "    <replace sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value\">Debug</replace>"
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button1']]\">"
+        "        <element type=\"Text\">"
+        "            <attribute name=\"Name\" value=\"KeyBinding\" />"
+        "            <attribute name=\"Text\" value=\"SPACE\" />"
+        "        </element>"
+        "    </add>"
+        "</patch>";
+    }
 
 private:
     /// Construct the scene content.
@@ -69,31 +144,19 @@ private:
     Node* CreateMushroom(const Vector3& pos);
     /// Utility function to raycast to the cursor position. Return true if hit
     bool Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable);
-    /// Recalculate path. Requires both start and endpoint defined.
-    void RecalculatePath();
+    /// Make Jack follow the Detour path.
+    void FollowPath(float timeStep);
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle the post-render update event.
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
-    
-    /// Scene.
-    SharedPtr<Scene> scene_;
-    /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
+
     /// Last calculated path.
     PODVector<Vector3> currentPath_;
-    /// Path start position.
-    Vector3 startPos_;
     /// Path end position.
     Vector3 endPos_;
-    /// Start position defined flag.
-    bool startPosDefined_;
-    /// End position defined flag.
-    bool endPosDefined_;
-    /// Camera yaw angle.
-    float yaw_;
-    /// Camera pitch angle.
-    float pitch_;
+    /// Jack scene node.
+    SharedPtr<Node> jackNode_;
     /// Flag for drawing debug geometry.
     bool drawDebug_;
 };

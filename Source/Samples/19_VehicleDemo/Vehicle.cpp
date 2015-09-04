@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,44 +20,41 @@
 // THE SOFTWARE.
 //
 
-#include "CollisionShape.h"
-#include "Constraint.h"
-#include "Context.h"
-#include "Material.h"
-#include "Model.h"
-#include "PhysicsEvents.h"
-#include "PhysicsWorld.h"
-#include "ResourceCache.h"
-#include "RigidBody.h"
-#include "Scene.h"
-#include "StaticModel.h"
+#include <Urho3D/Core/Context.h>
+#include <Urho3D/Graphics/Material.h>
+#include <Urho3D/Graphics/Model.h>
+#include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/Physics/CollisionShape.h>
+#include <Urho3D/Physics/Constraint.h>
+#include <Urho3D/Physics/PhysicsEvents.h>
+#include <Urho3D/Physics/PhysicsWorld.h>
+#include <Urho3D/Physics/RigidBody.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+
 #include "Vehicle.h"
 
 Vehicle::Vehicle(Context* context) :
-    Component(context),
+    LogicComponent(context),
     steering_(0.0f)
 {
+    // Only the physics update event is needed: unsubscribe from the rest for optimization
+    SetUpdateEventMask(USE_FIXEDUPDATE);
 }
 
 void Vehicle::RegisterObject(Context* context)
 {
     context->RegisterFactory<Vehicle>();
-    
-    ATTRIBUTE(Vehicle, VAR_FLOAT, "Controls Yaw", controls_.yaw_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE(Vehicle, VAR_FLOAT, "Controls Pitch", controls_.pitch_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE(Vehicle, VAR_FLOAT, "Steering", steering_, 0.0f, AM_DEFAULT);
+
+    ATTRIBUTE("Controls Yaw", float, controls_.yaw_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE("Controls Pitch", float, controls_.pitch_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE("Steering", float, steering_, 0.0f, AM_DEFAULT);
     // Register wheel node IDs as attributes so that the wheel nodes can be reaquired on deserialization. They need to be tagged
     // as node ID's so that the deserialization code knows to rewrite the IDs in case they are different on load than on save
-    ATTRIBUTE(Vehicle, VAR_INT, "Front Left Node", frontLeftID_, 0, AM_DEFAULT | AM_NODEID);
-    ATTRIBUTE(Vehicle, VAR_INT, "Front Right Node", frontRightID_, 0, AM_DEFAULT | AM_NODEID);
-    ATTRIBUTE(Vehicle, VAR_INT, "Rear Left Node", rearLeftID_, 0, AM_DEFAULT | AM_NODEID);
-    ATTRIBUTE(Vehicle, VAR_INT, "Rear Right Node", rearRightID_, 0, AM_DEFAULT | AM_NODEID);
-}
-
-void Vehicle::OnNodeSet(Node* node)
-{
-    if (node)
-        SubscribeToEvent(GetScene()->GetComponent<PhysicsWorld>(), E_PHYSICSPRESTEP, HANDLER(Vehicle, HandleFixedUpdate));
+    ATTRIBUTE("Front Left Node", int, frontLeftID_, 0, AM_DEFAULT | AM_NODEID);
+    ATTRIBUTE("Front Right Node", int, frontRightID_, 0, AM_DEFAULT | AM_NODEID);
+    ATTRIBUTE("Rear Left Node", int, rearLeftID_, 0, AM_DEFAULT | AM_NODEID);
+    ATTRIBUTE("Rear Right Node", int, rearRightID_, 0, AM_DEFAULT | AM_NODEID);
 }
 
 void Vehicle::ApplyAttributes()
@@ -65,92 +62,17 @@ void Vehicle::ApplyAttributes()
     // This function is called on each Serializable after the whole scene has been loaded. Reacquire wheel nodes from ID's
     // as well as all required physics components
     Scene* scene = GetScene();
-    
+
     frontLeft_ = scene->GetNode(frontLeftID_);
     frontRight_ = scene->GetNode(frontRightID_);
     rearLeft_ = scene->GetNode(rearLeftID_);
     rearRight_ = scene->GetNode(rearRightID_);
     hullBody_ = node_->GetComponent<RigidBody>();
-    
+
     GetWheelComponents();
 }
 
-void Vehicle::Init()
-{
-    // This function is called only from the main program when initially creating the vehicle, not on scene load
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
-    StaticModel* hullObject = node_->CreateComponent<StaticModel>();
-    hullBody_ = node_->CreateComponent<RigidBody>();
-    CollisionShape* hullShape = node_->CreateComponent<CollisionShape>();
-
-    node_->SetScale(Vector3(1.5f, 1.0f, 3.0f));
-    hullObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
-    hullObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
-    hullObject->SetCastShadows(true);
-    hullShape->SetBox(Vector3::ONE);
-    hullBody_->SetMass(4.0f);
-    hullBody_->SetLinearDamping(0.2f); // Some air resistance
-    hullBody_->SetAngularDamping(0.5f);
-    hullBody_->SetCollisionLayer(1);
-    
-    InitWheel("FrontLeft", Vector3(-0.6f, -0.4f, 0.3f), frontLeft_, frontLeftID_);
-    InitWheel("FrontRight", Vector3(0.6f, -0.4f, 0.3f), frontRight_, frontRightID_);
-    InitWheel("RearLeft", Vector3(-0.6f, -0.4f, -0.3f), rearLeft_, rearLeftID_);
-    InitWheel("RearRight", Vector3(0.6f, -0.4f, -0.3f), rearRight_, rearRightID_);
-    
-    GetWheelComponents();
-}
-
-void Vehicle::InitWheel(const String& name, const Vector3& offset, WeakPtr<Node>& wheelNode, unsigned& wheelNodeID)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
-    // Note: do not parent the wheel to the hull scene node. Instead create it on the root level and let the physics
-    // constraint keep it together
-    wheelNode = GetScene()->CreateChild(name);
-    wheelNode->SetPosition(node_->LocalToWorld(offset));
-    wheelNode->SetRotation(node_->GetRotation() * (offset.x_ >= 0.0 ? Quaternion(0.0f, 0.0f, -90.0f) :
-        Quaternion(0.0f, 0.0f, 90.0f)));
-    wheelNode->SetScale(Vector3(0.8f, 0.5f, 0.8f));
-    // Remember the ID for serialization
-    wheelNodeID = wheelNode->GetID();
-    
-    StaticModel* wheelObject = wheelNode->CreateComponent<StaticModel>();
-    RigidBody* wheelBody = wheelNode->CreateComponent<RigidBody>();
-    CollisionShape* wheelShape = wheelNode->CreateComponent<CollisionShape>();
-    Constraint* wheelConstraint = wheelNode->CreateComponent<Constraint>();
-
-    wheelObject->SetModel(cache->GetResource<Model>("Models/Cylinder.mdl"));
-    wheelObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
-    wheelObject->SetCastShadows(true);
-    wheelShape->SetSphere(1.0f);
-    wheelBody->SetFriction(1.0f);
-    wheelBody->SetMass(1.0f);
-    wheelBody->SetLinearDamping(0.2f); // Some air resistance
-    wheelBody->SetAngularDamping(0.75f); // Could also use rolling friction
-    wheelBody->SetCollisionLayer(1);
-    wheelConstraint->SetConstraintType(CONSTRAINT_HINGE);
-    wheelConstraint->SetOtherBody(GetComponent<RigidBody>()); // Connect to the hull body
-    wheelConstraint->SetWorldPosition(wheelNode->GetPosition()); // Set constraint's both ends at wheel's location
-    wheelConstraint->SetAxis(Vector3::UP); // Wheel rotates around its local Y-axis
-    wheelConstraint->SetOtherAxis(offset.x_ >= 0.0 ? Vector3::RIGHT : Vector3::LEFT); // Wheel's hull axis points either left or right
-    wheelConstraint->SetLowLimit(Vector2(-180.0f, 0.0f)); // Let the wheel rotate freely around the axis
-    wheelConstraint->SetHighLimit(Vector2(180.0f, 0.0f));
-    wheelConstraint->SetDisableCollision(true); // Let the wheel intersect the vehicle hull
-}
-
-void Vehicle::GetWheelComponents()
-{
-    frontLeftAxis_ = frontLeft_->GetComponent<Constraint>();
-    frontRightAxis_ = frontRight_->GetComponent<Constraint>();
-    frontLeftBody_ = frontLeft_->GetComponent<RigidBody>();
-    frontRightBody_ = frontRight_->GetComponent<RigidBody>();
-    rearLeftBody_ = rearLeft_->GetComponent<RigidBody>();
-    rearRightBody_ = rearRight_->GetComponent<RigidBody>();
-}
-
-void Vehicle::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
+void Vehicle::FixedUpdate(float timeStep)
 {
     float newSteering = 0.0f;
     float accelerator = 0.0f;
@@ -185,7 +107,7 @@ void Vehicle::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
     {
         // Torques are applied in world space, so need to take the vehicle & wheel rotation into account
         Vector3 torqueVec = Vector3(ENGINE_POWER * accelerator, 0.0f, 0.0f);
-        
+
         frontLeftBody_->ApplyTorque(hullRot * steeringRot * torqueVec);
         frontRightBody_->ApplyTorque(hullRot * steeringRot * torqueVec);
         rearLeftBody_->ApplyTorque(hullRot * torqueVec);
@@ -195,4 +117,79 @@ void Vehicle::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
     // Apply downforce proportional to velocity
     Vector3 localVelocity = hullRot.Inverse() * hullBody_->GetLinearVelocity();
     hullBody_->ApplyForce(hullRot * Vector3::DOWN * Abs(localVelocity.z_) * DOWN_FORCE);
+}
+
+void Vehicle::Init()
+{
+    // This function is called only from the main program when initially creating the vehicle, not on scene load
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    StaticModel* hullObject = node_->CreateComponent<StaticModel>();
+    hullBody_ = node_->CreateComponent<RigidBody>();
+    CollisionShape* hullShape = node_->CreateComponent<CollisionShape>();
+
+    node_->SetScale(Vector3(1.5f, 1.0f, 3.0f));
+    hullObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
+    hullObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
+    hullObject->SetCastShadows(true);
+    hullShape->SetBox(Vector3::ONE);
+    hullBody_->SetMass(4.0f);
+    hullBody_->SetLinearDamping(0.2f); // Some air resistance
+    hullBody_->SetAngularDamping(0.5f);
+    hullBody_->SetCollisionLayer(1);
+
+    InitWheel("FrontLeft", Vector3(-0.6f, -0.4f, 0.3f), frontLeft_, frontLeftID_);
+    InitWheel("FrontRight", Vector3(0.6f, -0.4f, 0.3f), frontRight_, frontRightID_);
+    InitWheel("RearLeft", Vector3(-0.6f, -0.4f, -0.3f), rearLeft_, rearLeftID_);
+    InitWheel("RearRight", Vector3(0.6f, -0.4f, -0.3f), rearRight_, rearRightID_);
+
+    GetWheelComponents();
+}
+
+void Vehicle::InitWheel(const String& name, const Vector3& offset, WeakPtr<Node>& wheelNode, unsigned& wheelNodeID)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    // Note: do not parent the wheel to the hull scene node. Instead create it on the root level and let the physics
+    // constraint keep it together
+    wheelNode = GetScene()->CreateChild(name);
+    wheelNode->SetPosition(node_->LocalToWorld(offset));
+    wheelNode->SetRotation(node_->GetRotation() * (offset.x_ >= 0.0 ? Quaternion(0.0f, 0.0f, -90.0f) :
+        Quaternion(0.0f, 0.0f, 90.0f)));
+    wheelNode->SetScale(Vector3(0.8f, 0.5f, 0.8f));
+    // Remember the ID for serialization
+    wheelNodeID = wheelNode->GetID();
+
+    StaticModel* wheelObject = wheelNode->CreateComponent<StaticModel>();
+    RigidBody* wheelBody = wheelNode->CreateComponent<RigidBody>();
+    CollisionShape* wheelShape = wheelNode->CreateComponent<CollisionShape>();
+    Constraint* wheelConstraint = wheelNode->CreateComponent<Constraint>();
+
+    wheelObject->SetModel(cache->GetResource<Model>("Models/Cylinder.mdl"));
+    wheelObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
+    wheelObject->SetCastShadows(true);
+    wheelShape->SetSphere(1.0f);
+    wheelBody->SetFriction(1.0f);
+    wheelBody->SetMass(1.0f);
+    wheelBody->SetLinearDamping(0.2f); // Some air resistance
+    wheelBody->SetAngularDamping(0.75f); // Could also use rolling friction
+    wheelBody->SetCollisionLayer(1);
+    wheelConstraint->SetConstraintType(CONSTRAINT_HINGE);
+    wheelConstraint->SetOtherBody(GetComponent<RigidBody>()); // Connect to the hull body
+    wheelConstraint->SetWorldPosition(wheelNode->GetPosition()); // Set constraint's both ends at wheel's location
+    wheelConstraint->SetAxis(Vector3::UP); // Wheel rotates around its local Y-axis
+    wheelConstraint->SetOtherAxis(offset.x_ >= 0.0 ? Vector3::RIGHT : Vector3::LEFT); // Wheel's hull axis points either left or right
+    wheelConstraint->SetLowLimit(Vector2(-180.0f, 0.0f)); // Let the wheel rotate freely around the axis
+    wheelConstraint->SetHighLimit(Vector2(180.0f, 0.0f));
+    wheelConstraint->SetDisableCollision(true); // Let the wheel intersect the vehicle hull
+}
+
+void Vehicle::GetWheelComponents()
+{
+    frontLeftAxis_ = frontLeft_->GetComponent<Constraint>();
+    frontRightAxis_ = frontRight_->GetComponent<Constraint>();
+    frontLeftBody_ = frontLeft_->GetComponent<RigidBody>();
+    frontRightBody_ = frontRight_->GetComponent<RigidBody>();
+    rearLeftBody_ = rearLeft_->GetComponent<RigidBody>();
+    rearRightBody_ = rearRight_->GetComponent<RigidBody>();
 }

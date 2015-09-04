@@ -1,0 +1,91 @@
+$#include "IO/File.h"
+$#include "Audio/Sound.h"
+
+class Sound : public Resource
+{
+    Sound();
+    ~Sound();
+    
+    bool LoadRaw(Deserializer& source);
+    bool LoadWav(Deserializer& source);
+    bool LoadOggVorbis(Deserializer& source);
+    tolua_outside bool SoundLoadRaw @ LoadRaw(const String fileName);
+    tolua_outside bool SoundLoadWav @ LoadWav(const String fileName);
+    tolua_outside bool SoundLoadOggVorbis @ LoadOggVorbis(const String fileName);
+
+    void SetSize(unsigned dataSize);
+    void SetData(const void* data, unsigned dataSize);
+    void SetFormat(unsigned frequency, bool sixteenBit, bool stereo);
+    void SetLooped(bool enable);
+    void SetLoop(unsigned repeatOffset, unsigned endOffset);
+    void FixInterpolation();
+    float GetLength() const;
+    unsigned GetDataSize() const;
+    unsigned GetSampleSize() const;
+    float GetFrequency() const;
+    unsigned GetIntFrequency() const;
+    bool IsLooped() const;
+    bool IsSixteenBit() const;
+    bool IsStereo() const;
+    bool IsCompressed() const;
+
+    tolua_readonly tolua_property__get_set float length;
+    tolua_readonly tolua_property__get_set unsigned dataSize;
+    tolua_readonly tolua_property__get_set unsigned sampleSize;
+    tolua_readonly tolua_property__get_set float frequency;
+    tolua_readonly tolua_property__get_set int intFrequency;
+    tolua_property__is_set bool looped;
+    tolua_readonly tolua_property__is_set bool sixteenBit;
+    tolua_readonly tolua_property__is_set bool stereo;
+    tolua_readonly tolua_property__is_set bool compressed;
+};
+
+${
+#define TOLUA_DISABLE_tolua_AudioLuaAPI_Sound_new00
+static int tolua_AudioLuaAPI_Sound_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Sound>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_AudioLuaAPI_Sound_new00_local
+static int tolua_AudioLuaAPI_Sound_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Sound>(tolua_S);
+}
+
+static bool SoundLoadRaw(Sound* sound, const String& fileName)
+{
+    if (!sound)
+        return false;
+
+    File file(sound->GetContext());
+    if (!file.Open(fileName, FILE_READ))
+        return false;
+
+    return sound->LoadRaw(file);
+}
+
+static bool SoundLoadWav(Sound* sound, const String& fileName)
+{
+    if (!sound)
+        return false;
+
+    File file(sound->GetContext());
+    if (!file.Open(fileName, FILE_READ))
+        return false;
+
+    return sound->LoadWav(file);
+}
+
+static bool SoundLoadOggVorbis(Sound* sound, const String& fileName)
+{
+    if (!sound)
+        return false;
+
+    File file(sound->GetContext());
+    if (!file.Open(fileName, FILE_READ))
+        return false;
+
+    return sound->LoadOggVorbis(file);
+}
+$}

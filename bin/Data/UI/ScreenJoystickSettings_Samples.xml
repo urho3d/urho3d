@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<element inherit="UI/ScreenJoystickSettings.xml">
+    <replace sel="/element/element[./attribute[@name='Name' and @value='Button0']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value">S-Quality</replace>
+    <add sel="/element/element[./attribute[@name='Name' and @value='Button0']]">
+        <element type="Text">
+            <attribute name="Name" value="KeyBinding" />
+            <attribute name="Text" value="6" />
+        </element>
+    </add>
+    <replace sel="/element/element[./attribute[@name='Name' and @value='Button1']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value">S-Size</replace>
+    <add sel="/element/element[./attribute[@name='Name' and @value='Button1']]">
+        <element type="Text">
+            <attribute name="Name" value="KeyBinding" />
+            <attribute name="Text" value="5" />
+        </element>
+    </add>
+    <replace sel="/element/element[./attribute[@name='Name' and @value='Button2']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value">Shadow</replace>
+    <add sel="/element/element[./attribute[@name='Name' and @value='Button2']]">
+        <element type="Text">
+            <attribute name="Name" value="KeyBinding" />
+            <attribute name="Text" value="4" />
+        </element>
+    </add>
+    <replace sel="/element/element[./attribute[@name='Name' and @value='Button3']]/element[./attribute[@name='Name' and @value='Label']]/attribute[@name='Text']/@value">Console</replace>
+    <add sel="/element/element[./attribute[@name='Name' and @value='Button3']]">
+        <element type="Text">
+            <attribute name="Name" value="KeyBinding" />
+            <attribute name="Text" value="F1" />
+        </element>
+    </add>
+    <add sel="/element">
+        <element type="Button">
+            <attribute name="Name" value="Button4" />
+            <attribute name="Position" value="-12 180" />
+            <attribute name="Size" value="96 96" />
+            <attribute name="Horiz Alignment" value="Right" />
+            <attribute name="Texture" value="Texture2D;Textures/TouchInput.png" />
+            <attribute name="Image Rect" value="96 0 192 96" />
+            <attribute name="Hover Image Offset" value="0 0" />
+            <attribute name="Pressed Image Offset" value="0 0" />
+            <element type="Text">
+                <attribute name="Name" value="Label" />
+                <attribute name="Horiz Alignment" value="Center" />
+                <attribute name="Vert Alignment" value="Center" />
+                <attribute name="Color" value="0 0 0 1" />
+                <attribute name="Text" value="Occlusion" />
+            </element>
+            <element type="Text">
+                <attribute name="Name" value="KeyBinding" />
+                <attribute name="Text" value="7" />
+            </element>
+        </element>
+        <element type="Button">
+            <attribute name="Name" value="Button5" />
+            <attribute name="Position" value="-120 180" />
+            <attribute name="Size" value="96 96" />
+            <attribute name="Horiz Alignment" value="Right" />
+            <attribute name="Texture" value="Texture2D;Textures/TouchInput.png" />
+            <attribute name="Image Rect" value="96 0 192 96" />
+            <attribute name="Hover Image Offset" value="0 0" />
+            <attribute name="Pressed Image Offset" value="0 0" />
+            <element type="Text">
+                <attribute name="Name" value="Label" />
+                <attribute name="Horiz Alignment" value="Center" />
+                <attribute name="Vert Alignment" value="Center" />
+                <attribute name="Color" value="0 0 0 1" />
+                <attribute name="Text" value="Specular" />
+            </element>
+            <element type="Text">
+                <attribute name="Name" value="KeyBinding" />
+                <attribute name="Text" value="3" />
+            </element>
+        </element>
+        <element type="Button">
+            <attribute name="Name" value="Button6" />
+            <attribute name="Position" value="-228 180" />
+            <attribute name="Size" value="96 96" />
+            <attribute name="Horiz Alignment" value="Right" />
+            <attribute name="Texture" value="Texture2D;Textures/TouchInput.png" />
+            <attribute name="Image Rect" value="96 0 192 96" />
+            <attribute name="Hover Image Offset" value="0 0" />
+            <attribute name="Pressed Image Offset" value="0 0" />
+            <element type="Text">
+                <attribute name="Name" value="Label" />
+                <attribute name="Horiz Alignment" value="Center" />
+                <attribute name="Vert Alignment" value="Center" />
+                <attribute name="Color" value="0 0 0 1" />
+                <attribute name="Text" value="Material" />
+            </element>
+            <element type="Text">
+                <attribute name="Name" value="KeyBinding" />
+                <attribute name="Text" value="2" />
+            </element>
+        </element>
+        <element type="Button">
+            <attribute name="Name" value="Button7" />
+            <attribute name="Position" value="-336 180" />
+            <attribute name="Size" value="96 96" />
+            <attribute name="Horiz Alignment" value="Right" />
+            <attribute name="Texture" value="Texture2D;Textures/TouchInput.png" />
+            <attribute name="Image Rect" value="96 0 192 96" />
+            <attribute name="Hover Image Offset" value="0 0" />
+            <attribute name="Pressed Image Offset" value="0 0" />
+            <element type="Text">
+                <attribute name="Name" value="Label" />
+                <attribute name="Horiz Alignment" value="Center" />
+                <attribute name="Vert Alignment" value="Center" />
+                <attribute name="Color" value="0 0 0 1" />
+                <attribute name="Text" value="HUD" />
+            </element>
+            <element type="Text">
+                <attribute name="Name" value="KeyBinding" />
+                <attribute name="Text" value="F2" />
+            </element>
+        </element>
+    </add>
+</element>

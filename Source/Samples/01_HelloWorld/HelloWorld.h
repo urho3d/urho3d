@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,16 @@ public:
 
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
+
+protected:
+    /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
+    virtual String GetScreenJoystickPatchString() const { return
+        "<patch>"
+        "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Hat0']]\">"
+        "        <attribute name=\"Is Visible\" value=\"false\" />"
+        "    </add>"
+        "</patch>";
+    }
 
 private:
     /// Construct a new Text instance, containing the 'Hello World' String, and add it to the UI root element.

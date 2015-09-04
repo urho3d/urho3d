@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 #include "vector3.h"
 
+#include <cmath>
+
 // ------------------------------------------------------------------------------------------------
 /** Transformation of a vector by a 3x3 matrix */
 template <typename TReal>
@@ -90,7 +92,7 @@ AI_FORCE_INLINE TReal aiVector3t<TReal>::SquareLength() const {
 // ------------------------------------------------------------------------------------------------
 template <typename TReal>
 AI_FORCE_INLINE TReal aiVector3t<TReal>::Length() const {
-	return sqrt( SquareLength()); 
+	return ::sqrt( SquareLength()); 
 }
 // ------------------------------------------------------------------------------------------------
 template <typename TReal>
@@ -146,6 +148,19 @@ AI_FORCE_INLINE bool aiVector3t<TReal>::operator== (const aiVector3t<TReal>& oth
 template <typename TReal>
 AI_FORCE_INLINE bool aiVector3t<TReal>::operator!= (const aiVector3t<TReal>& other) const {
 	return x != other.x || y != other.y || z != other.z;
+}
+// ---------------------------------------------------------------------------
+template<typename TReal>
+AI_FORCE_INLINE bool aiVector3t<TReal>::Equal(const aiVector3t<TReal>& other, TReal epsilon) const {
+	return
+		std::abs(x - other.x) <= epsilon &&
+		std::abs(y - other.y) <= epsilon &&
+		std::abs(z - other.z) <= epsilon;
+}
+// ------------------------------------------------------------------------------------------------
+template <typename TReal>
+AI_FORCE_INLINE bool aiVector3t<TReal>::operator < (const aiVector3t<TReal>& other) const {
+	return x != other.x ? x < other.x : y != other.y ? y < other.y : z < other.z;
 }
 // ------------------------------------------------------------------------------------------------
 template <typename TReal>
@@ -207,6 +222,7 @@ AI_FORCE_INLINE  aiVector3t<TReal> operator - ( const aiVector3t<TReal>& v)	{
 	return aiVector3t<TReal>( -v.x, -v.y, -v.z);
 }
 
+// ------------------------------------------------------------------------------------------------
 
 #endif // __cplusplus
 #endif // AI_VECTOR3D_INL_INC

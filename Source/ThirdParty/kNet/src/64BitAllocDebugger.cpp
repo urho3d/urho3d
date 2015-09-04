@@ -18,10 +18,13 @@
 	
 	Idea and code taken from http://randomascii.wordpress.com/2012/02/14/64-bit-made-easy/ */
 
+// Modified by Lasse Oorni for Urho3D
+
 #ifdef _WIN64
 #include "kNet/64BitAllocDebugger.h"
 #include <stdio.h>
-#include <Windows.h>
+// Urho3D: windows.h in lowercase to fix MinGW cross-compiling on a case-sensitive system
+#include <windows.h>
 #include <vector>
 
 BottomMemoryAllocator::BottomMemoryAllocator()

@@ -1,0 +1,5 @@
+<technique vs="LitSolid" ps="LitSolid" vsdefines="NOUV" >
+    <pass name="alpha"  depthwrite="false" blend="alpha" />
+    <pass name="litalpha" depthwrite="false" blend="addalpha" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>

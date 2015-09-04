@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<element type="Window">
+	<attribute name="Name" value="Resource Browser" />
+	<attribute name="Position" value="400 200" />
+	<attribute name="Size" value="758 260" />
+	<attribute name="Layout Mode" value="Vertical" />
+	<attribute name="Layout Spacing" value="4" />
+	<attribute name="Layout Border" value="6 6 6 6" />
+	<attribute name="Resize Border" value="6 6 6 6" />
+	<attribute name="Is Movable" value="true" />
+	<attribute name="Is Resizable" value="true" />
+	<element>
+		<attribute name="Name" value="Title Bar" />
+		<attribute name="Min Size" value="184 16" />
+		<attribute name="Max Size" value="2147483647 16" />
+		<attribute name="Layout Mode" value="Horizontal" />
+		<attribute name="Layout Spacing" value="8" />
+		<element type="Text">
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Text" value="Resource Browser" />
+			<attribute name="Auto Localizable" value="true" />
+		</element>
+		<element type="LineEdit">
+			<attribute name="Name" value="Search" />
+			<element type="Text" internal="true" style="none">
+				<attribute name="Top Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Top Right Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+			</element>
+			<element type="BorderImage" internal="true" style="none">
+				<attribute name="Size" value="4 15" />
+			</element>
+		</element>
+		<element type="Button">
+			<attribute name="Name" value="RescanButton" />
+			<attribute name="Min Size" value="16 16" />
+			<attribute name="Max Size" value="16 16" />
+			<attribute name="Layout Mode" value="Horizontal" />
+			<element type="BorderImage">
+				<attribute name="Image Rect" value="128 32 144 48" />
+			</element>
+		</element>
+		<element type="Button">
+			<attribute name="Name" value="FilterButton" />
+			<attribute name="Min Size" value="16 16" />
+			<attribute name="Max Size" value="16 16" />
+			<attribute name="Layout Mode" value="Horizontal" />
+			<element type="BorderImage">
+				<attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+				<attribute name="Image Rect" value="240 80 254 94" />
+			</element>
+		</element>
+		<element type="Button" style="CloseButton">
+			<attribute name="Name" value="CloseButton" />
+		</element>
+	</element>
+	<element style="Panel">
+		<attribute name="Layout Mode" value="Horizontal" />
+		<attribute name="Layout Spacing" value="10" />
+		<attribute name="Layout Border" value="0 4 0 4" />
+		<element type="ListView" style="HierarchyListView">
+			<attribute name="Name" value="DirectoryList" />
+			<attribute name="Max Size" value="400 2147483647" />
+			<attribute name="Highlight Mode" value="Always" />
+			<element type="ScrollBar" internal="true" style="none">
+				<attribute name="Size" value="230 16" />
+				<element type="Button" internal="true" style="none" />
+				<element type="Slider" internal="true" style="none">
+					<attribute name="Position" value="16 0" />
+					<attribute name="Size" value="198 16" />
+					<element type="BorderImage" internal="true" style="none" />
+				</element>
+				<element type="Button" internal="true" style="none">
+					<attribute name="Position" value="214 0" />
+				</element>
+			</element>
+			<element type="ScrollBar" internal="true" style="none">
+				<attribute name="Size" value="16 200" />
+				<element type="Button" internal="true" style="none" />
+				<element type="Slider" internal="true" style="none">
+					<attribute name="Position" value="0 16" />
+					<attribute name="Size" value="16 168" />
+					<element type="BorderImage" internal="true" style="none" />
+				</element>
+				<element type="Button" internal="true" style="none">
+					<attribute name="Position" value="0 184" />
+				</element>
+			</element>
+			<element type="BorderImage" internal="true" style="none">
+				<element type="HierarchyContainer" internal="true" style="HierarchyContainer" />
+			</element>
+			<element internal="true" style="none" />
+		</element>
+		<element type="ListView" style="PanelView">
+			<attribute name="Name" value="FileList" />
+			<attribute name="Min Size" value="0 200" />
+			<attribute name="Max Size" value="1200 1000" />
+			<attribute name="Indent Spacing" value="0" />
+			<element type="ScrollBar" internal="true" style="none">
+				<attribute name="Size" value="230 16" />
+				<element type="Button" internal="true" style="none" />
+				<element type="Slider" internal="true" style="none">
+					<attribute name="Position" value="16 0" />
+					<attribute name="Size" value="198 16" />
+					<element type="BorderImage" internal="true" style="none" />
+				</element>
+				<element type="Button" internal="true" style="none">
+					<attribute name="Position" value="214 0" />
+				</element>
+			</element>
+			<element type="ScrollBar" internal="true" style="none">
+				<attribute name="Size" value="16 200" />
+				<element type="Button" internal="true" style="none" />
+				<element type="Slider" internal="true" style="none">
+					<attribute name="Position" value="0 16" />
+					<attribute name="Size" value="16 168" />
+					<element type="BorderImage" internal="true" style="none" />
+				</element>
+				<element type="Button" internal="true" style="none">
+					<attribute name="Position" value="0 184" />
+				</element>
+			</element>
+			<element type="BorderImage" internal="true" style="none">
+				<element internal="true" style="none" />
+			</element>
+		</element>
+		<element>
+			<attribute name="Min Size" value="266 200" />
+			<attribute name="Max Size" value="266 200" />
+			<element type="View3D" style="View3D">
+				<attribute name="Name" value="ResourceBrowserPreview" />
+			</element>
+		</element>
+	</element>
+	<element>
+		<attribute name="Name" value="StatusBar" />
+		<attribute name="Min Size" value="0 16" />
+		<attribute name="Max Size" value="2147483647 16" />
+		<element type="Text">
+			<attribute name="Name" value="ResultsMessage" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+		</element>
+		<element type="Text">
+			<attribute name="Name" value="StatusMessage" />
+			<attribute name="Horiz Alignment" value="Right" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+		</element>
+	</element>
+</element>

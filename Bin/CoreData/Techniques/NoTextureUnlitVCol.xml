@@ -1,3 +1,0 @@
-<technique>
-    <pass name="alpha" vs="Basic_VCol" ps="Basic_VCol" />
-</technique>

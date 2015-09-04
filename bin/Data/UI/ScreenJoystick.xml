@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<element>
+    <attribute name="Name" value="ScreenJoystick" />
+    <attribute name="Size" value="800 600" />
+    <element type="Button">
+        <attribute name="Name" value="Button0" />
+        <attribute name="Position" value="-12 -120" />
+        <attribute name="Size" value="96 96" />
+        <attribute name="Horiz Alignment" value="Right" />
+        <attribute name="Vert Alignment" value="Bottom" />
+        <attribute name="Texture" value="Texture2D;Textures/TouchInput.png" />
+        <attribute name="Image Rect" value="96 0 192 96" />
+        <attribute name="Hover Image Offset" value="0 0" />
+        <attribute name="Pressed Image Offset" value="0 0" />
+        <element type="Text">
+            <attribute name="Name" value="Label" />
+            <attribute name="Horiz Alignment" value="Center" />
+            <attribute name="Vert Alignment" value="Center" />
+            <attribute name="Color" value="0 0 0 1" />
+            <attribute name="Text" value="Button0" />
+        </element>
+    </element>
+    <element type="Button">
+        <attribute name="Name" value="Button1" />
+        <attribute name="Position" value="-12 -12" />
+        <attribute name="Size" value="96 96" />
+        <attribute name="Horiz Alignment" value="Right" />
+        <attribute name="Vert Alignment" value="Bottom" />
+        <attribute name="Texture" value="Texture2D;Textures/TouchInput.png" />
+        <attribute name="Image Rect" value="96 0 192 96" />
+        <attribute name="Hover Image Offset" value="0 0" />
+        <attribute name="Pressed Image Offset" value="0 0" />
+        <element type="Text">
+            <attribute name="Name" value="Label" />
+            <attribute name="Horiz Alignment" value="Center" />
+            <attribute name="Vert Alignment" value="Center" />
+            <attribute name="Color" value="0 0 0 1" />
+            <attribute name="Text" value="Button1" />
+        </element>
+    </element>
+    <element type="Button">
+        <attribute name="Name" value="Button2" />
+        <attribute name="Position" value="-12 12" />
+        <attribute name="Size" value="48 48" />
+        <attribute name="Horiz Alignment" value="Right" />
+        <attribute name="Opacity" value="0.5" />
+        <attribute name="Texture" value="Texture2D;Textures/TouchInput.png" />
+        <attribute name="Image Rect" value="192 0 240 48" />
+        <attribute name="Hover Image Offset" value="0 0" />
+        <attribute name="Pressed Image Offset" value="0 0" />
+    </element>
+    <element type="Button">
+        <attribute name="Name" value="Hat0" />
+        <attribute name="Position" value="12 -12" />
+        <attribute name="Size" value="96 96" />
+        <attribute name="Vert Alignment" value="Bottom" />
+        <attribute name="Texture" value="Texture2D;Textures/TouchInput.png" />
+        <attribute name="Image Rect" value="0 0 96 96" />
+        <attribute name="Hover Image Offset" value="0 0" />
+        <attribute name="Pressed Image Offset" value="0 0" />
+    </element>
+</element>

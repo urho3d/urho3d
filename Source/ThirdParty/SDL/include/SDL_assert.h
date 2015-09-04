@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -120,7 +120,16 @@ typedef struct SDL_assert_data
 /* Never call this directly. Use the SDL_assert* macros. */
 extern DECLSPEC SDL_assert_state SDLCALL SDL_ReportAssertion(SDL_assert_data *,
                                                              const char *,
-                                                             const char *, int);
+                                                             const char *, int)
+#if defined(__clang__)
+#if __has_feature(attribute_analyzer_noreturn)
+/* this tells Clang's static analysis that we're a custom assert function,
+   and that the analyzer should assume the condition was always true past this
+   SDL_assert test. */
+   __attribute__((analyzer_noreturn))
+#endif
+#endif
+;
 
 /* the do {} while(0) avoids dangling else problems:
     if (x) SDL_assert(y); else blah();
@@ -201,6 +210,35 @@ typedef SDL_assert_state (SDLCALL *SDL_AssertionHandler)(
 extern DECLSPEC void SDLCALL SDL_SetAssertionHandler(
                                             SDL_AssertionHandler handler,
                                             void *userdata);
+
+/**
+ *  \brief Get the default assertion handler.
+ *
+ *  This returns the function pointer that is called by default when an
+ *   assertion is triggered. This is an internal function provided by SDL,
+ *   that is used for assertions when SDL_SetAssertionHandler() hasn't been
+ *   used to provide a different function.
+ *
+ *  \return The default SDL_AssertionHandler that is called when an assert triggers.
+ */
+extern DECLSPEC SDL_AssertionHandler SDLCALL SDL_GetDefaultAssertionHandler(void);
+
+/**
+ *  \brief Get the current assertion handler.
+ *
+ *  This returns the function pointer that is called when an assertion is
+ *   triggered. This is either the value last passed to
+ *   SDL_SetAssertionHandler(), or if no application-specified function is
+ *   set, is equivalent to calling SDL_GetDefaultAssertionHandler().
+ *
+ *   \param puserdata Pointer to a void*, which will store the "userdata"
+ *                    pointer that was passed to SDL_SetAssertionHandler().
+ *                    This value will always be NULL for the default handler.
+ *                    If you don't care about this data, it is safe to pass
+ *                    a NULL pointer to this function to ignore it.
+ *  \return The SDL_AssertionHandler that is called when an assert triggers.
+ */
+extern DECLSPEC SDL_AssertionHandler SDLCALL SDL_GetAssertionHandler(void **puserdata);
 
 /**
  *  \brief Get a list of all assertion failures.

@@ -1,0 +1,5 @@
+<technique vs="LitSolid" ps="LitSolid" psdefines="DIFFMAP">
+    <pass name="alpha" vsdefines="NORMALMAP ENVCUBEMAP" psdefines="NORMALMAP ENVCUBEMAP" depthwrite="false" blend="alpha" />
+    <pass name="litalpha" vsdefines="NORMALMAP" psdefines="NORMALMAP" depthwrite="false" blend="addalpha" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>

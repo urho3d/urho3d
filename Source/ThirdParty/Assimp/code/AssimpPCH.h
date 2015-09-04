@@ -43,6 +43,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  PCH master include. Every unit in Assimp has to include it.
  */
 
+// Modified by Yao Wei Tjong for Urho3D
+// Urho3D: only include C++ headers when the compiler is a C++ compiler
+#ifdef __cplusplus
+
 #ifndef ASSIMP_PCH_INCLUDED
 #define ASSIMP_PCH_INCLUDED
 #define ASSIMP_INTERNAL_BUILD
@@ -56,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Include our stdint.h replacement header for MSVC, take the global header for gcc/mingw
 #if defined( _MSC_VER) && (_MSC_VER < 1600)
-#	include "pstdint.h"
+#	include "../include/assimp/Compiler/pstdint.h"
 #else
 #	include <stdint.h>
 #endif
@@ -74,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Helper macro to set a pointer to NULL in debug builds
  */
-#if (defined _DEBUG)
+#if (defined ASSIMP_BUILD_DEBUG)
 #	define AI_DEBUG_INVALIDATE_PTR(x) x = NULL;
 #else
 #	define AI_DEBUG_INVALIDATE_PTR(x)
@@ -160,3 +164,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #endif // !! ASSIMP_PCH_INCLUDED
+
+#endif // !! Urho3D: __cpluscplus

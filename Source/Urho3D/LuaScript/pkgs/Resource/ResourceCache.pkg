@@ -1,0 +1,80 @@
+$#include "Resource/ResourceCache.h"
+
+class ResourceCache
+{    
+    void ReleaseAllResources(bool force = false);
+    bool ReloadResource(Resource* resource);
+    void ReloadResourceWithDependencies(const String fileName);
+
+    void SetMemoryBudget(StringHash type, unsigned budget);
+    void SetMemoryBudget(const String type, unsigned budget);
+    
+    void SetAutoReloadResources(bool enable);
+    void SetReturnFailedResources(bool enable);
+    void SetSearchPackagesFirst(bool value);
+    void SetFinishBackgroundResourcesMs(int ms);
+
+    tolua_outside File* ResourceCacheGetFile @ GetFile(const String name);
+
+    Resource* GetResource(const String type, const String name, bool sendEventOnFailure = true);
+    Resource* GetExistingResource(const String type, const String name);
+    tolua_outside bool ResourceCacheBackgroundLoadResource @ BackgroundLoadResource(const String type, const String name, bool sendEventOnFailure = true);
+    unsigned GetNumBackgroundLoadResources() const;
+    const Vector<String>& GetResourceDirs() const;
+
+    bool Exists(const String name) const;
+    unsigned GetMemoryBudget(StringHash type) const;
+    unsigned GetMemoryUse(StringHash type) const;
+    unsigned GetTotalMemoryUse() const;
+    String GetResourceFileName(const String name) const;
+
+    bool GetAutoReloadResources() const;
+    bool GetReturnFailedResources() const;
+    bool GetSearchPackagesFirst() const;
+    int GetFinishBackgroundResourcesMs() const;
+
+    String GetPreferredResourceDir(const String path) const;
+    String SanitateResourceName(const String name) const;
+    String SanitateResourceDirName(const String name) const;
+
+    tolua_readonly tolua_property__get_set unsigned totalMemoryUse;
+    tolua_property__get_set bool autoReloadResources;
+    tolua_property__get_set bool returnFailedResources;
+    tolua_property__get_set bool searchPackagesFirst;
+    tolua_readonly tolua_property__get_set unsigned numBackgroundLoadResources;
+    tolua_readonly tolua_property__get_set Vector<String>& resourceDirs;
+    tolua_property__get_set int finishBackgroundResourcesMs;
+};
+
+ResourceCache* GetCache();
+tolua_readonly tolua_property__get_set ResourceCache* cache;
+
+${
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_GetCache00
+static int tolua_ResourceLuaAPI_GetCache00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<ResourceCache>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_cache_ptr
+#define tolua_get_cache_ptr tolua_ResourceLuaAPI_GetCache00
+
+static File* ResourceCacheGetFile(ResourceCache* cache, const String& fileName)
+{
+    SharedPtr<File> filePtr = cache->GetFile(fileName);
+    if (!filePtr)
+        return 0;
+
+    File* file = filePtr.Get();
+    filePtr.Detach();
+
+    return file;
+}
+
+static bool ResourceCacheBackgroundLoadResource(ResourceCache* cache, StringHash type, const String& fileName, bool sendEventOnFailure)
+{
+    return cache->BackgroundLoadResource(type, fileName, sendEventOnFailure);
+}
+
+
+$}

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<element inherit="UI/ScreenJoystick.xml">
+    <add sel="/element/element[./attribute[@name='Name' and @value='Button0']]">
+        <attribute name="Is Visible" value="false" />
+    </add>
+    <add sel="/element/element[./attribute[@name='Name' and @value='Button1']]">
+        <attribute name="Is Visible" value="false" />
+    </add>
+    <add sel="/element/element[./attribute[@name='Name' and @value='Button2']]">
+        <element type="Text">
+            <attribute name="Name" value="KeyBinding" />
+            <attribute name="Text" value="SELECT" />
+        </element>
+    </add>
+    <replace sel="/element/element[./attribute[@name='Name' and @value='Hat0']]/attribute[@name='Position']/@value">12 -76</replace>
+    <add sel="/element/element[./attribute[@name='Name' and @value='Hat0']]">
+        <element type="Text">
+            <attribute name="Name" value="KeyBinding" />
+            <attribute name="Text" value="WSAD" />
+        </element>
+    </add>
+</element>

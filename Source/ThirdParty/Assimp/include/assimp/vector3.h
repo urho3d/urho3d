@@ -44,8 +44,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef AI_VECTOR3D_H_INC
 #define AI_VECTOR3D_H_INC
 
-#include <math.h>
-
+#ifdef __cplusplus
+#   include <cmath>
+#else
+#   include <math.h>
+#endif
 
 #include "./Compiler/pushpack1.h"
 
@@ -85,6 +88,9 @@ public:
 	// comparison
 	bool operator== (const aiVector3t& other) const;
 	bool operator!= (const aiVector3t& other) const;
+	bool operator < (const aiVector3t& other) const;
+
+	bool Equal(const aiVector3t& other, TReal epsilon = 1e-6) const;
 
 	template <typename TOther>
 	operator aiVector3t<TOther> () const;

@@ -15,6 +15,11 @@
 /** @file Clock.cpp
 	@brief */
 
+// Modified by Lasse Oorni for Urho3D
+
+// Urho3D: ensure that kNetBuildConfig.h is included for WinXP compatibility
+#include "kNetBuildConfig.h"
+
 #if defined(__unix__) || defined(__native_client__) || defined(EMSCRIPTEN) || defined(ANDROID) || defined(__APPLE__) || defined (__CYGWIN__)
 #include <time.h>
 #include <errno.h>
@@ -31,7 +36,6 @@
 #include <emscripten.h>
 #endif
 
-#include "kNetBuildConfig.h"
 #include "kNet/Clock.h"
 #include "kNet/NetworkLogging.h"
 
@@ -54,13 +58,13 @@ void Clock::InitClockData()
 #ifdef WIN32
 	if (!QueryPerformanceFrequency(&ddwTimerFrequency))
 	{
-		LOG(LogError, "The system doesn't support high-resolution timers!");
+		KNET_LOG(LogError, "The system doesn't support high-resolution timers!");
 		ddwTimerFrequency.HighPart = (unsigned long)-1;
 		ddwTimerFrequency.LowPart = (unsigned long)-1;
 	}
 
 	if (ddwTimerFrequency.HighPart > 0)
-		LOG(LogError, "Warning: Clock::TicksPerSec will yield invalid timing data!");
+		KNET_LOG(LogError, "Warning: Clock::TicksPerSec will yield invalid timing data!");
 
 	if (appStartTime == 0)
 	{
@@ -93,7 +97,7 @@ void Clock::Sleep(int milliseconds)
 	ts.tv_nsec = (milliseconds - ts.tv_sec * 1000) * 1000 * 1000;
 	int ret = nanosleep(&ts, NULL);
 	if (ret == -1)
-		LOG(LogError, "nanosleep returned -1! Reason: %s(%d).", strerror(errno), (int)errno);
+		KNET_LOG(LogError, "nanosleep returned -1! Reason: %s(%d).", strerror(errno), (int)errno);
 #else
 #warning Clock::Sleep has not been implemented!
 #endif

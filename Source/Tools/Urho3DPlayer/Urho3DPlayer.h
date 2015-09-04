@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Application.h"
+#include <Urho3D/Engine/Application.h>
 
 using namespace Urho3D;
 
@@ -53,7 +53,7 @@ private:
     /// Script file name.
     String scriptFileName_;
     
-#ifdef ENABLE_ANGELSCRIPT
+#ifdef URHO3D_ANGELSCRIPT
     /// Script file.
     SharedPtr<ScriptFile> scriptFile_;
 #endif

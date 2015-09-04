@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,10 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+
+// Modified by OvermindDL1 for Urho3D
+
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_ANDROID
 
@@ -262,6 +265,7 @@ static SDL_Scancode Android_Keycodes[] = {
     SDL_SCANCODE_UNKNOWN, /* AKEYCODE_ASSIST */
     SDL_SCANCODE_BRIGHTNESSDOWN, /* AKEYCODE_BRIGHTNESS_DOWN */
     SDL_SCANCODE_BRIGHTNESSUP, /* AKEYCODE_BRIGHTNESS_UP */
+    SDL_SCANCODE_UNKNOWN, /* AKEYCODE_MEDIA_AUDIO_TRACK */
 };
 
 static SDL_Scancode
@@ -281,13 +285,13 @@ TranslateKeycode(int keycode)
 int
 Android_OnKeyDown(int keycode)
 {
-    return SDL_SendKeyboardKey(SDL_PRESSED, TranslateKeycode(keycode));
+    return SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(keycode), TranslateKeycode(keycode));
 }
 
 int
 Android_OnKeyUp(int keycode)
 {
-    return SDL_SendKeyboardKey(SDL_RELEASED, TranslateKeycode(keycode));
+    return SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(keycode), TranslateKeycode(keycode));
 }
 
 SDL_bool

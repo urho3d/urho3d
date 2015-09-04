@@ -1,0 +1,27 @@
+$#include "Urho2D/AnimatedSprite2D.h"
+
+enum LoopMode2D
+{
+    LM_DEFAULT = 0,
+    LM_FORCE_LOOPED,
+    LM_FORCE_CLAMPED
+};
+
+class AnimatedSprite2D : StaticSprite2D
+{
+    void SetSpeed(float speed);
+    void SetAnimation(AnimationSet2D* animationSet, const String name, LoopMode2D loopMode = LM_DEFAULT);
+    void SetAnimation(const String name, LoopMode2D loopMode = LM_DEFAULT);
+    void SetAnimationSet(AnimationSet2D* animationSet);
+    void SetLoopMode(LoopMode2D loopMode);
+
+    float GetSpeed() const;
+    const String GetAnimation() const;
+    AnimationSet2D* GetAnimationSet() const;
+    LoopMode2D GetLoopMode() const;
+
+    tolua_property__get_set float speed;
+    tolua_property__get_set String animation;
+    tolua_property__get_set AnimationSet2D* animationSet;
+    tolua_property__get_set LoopMode2D loopMode;
+};

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,10 +18,14 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #ifndef _SDL_windowswindow_h
 #define _SDL_windowswindow_h
+
+#if SDL_VIDEO_OPENGL_EGL   
+#include "../SDL_egl_c.h"
+#endif
 
 typedef struct
 {
@@ -33,7 +37,13 @@ typedef struct
     WNDPROC wndproc;
     SDL_bool created;
     WPARAM mouse_button_flags;
+    BOOL expected_resize;
+    SDL_bool in_title_click;
+    SDL_bool in_modal_loop;
     struct SDL_VideoData *videodata;
+#if SDL_VIDEO_OPENGL_EGL  
+    EGLSurface egl_surface;
+#endif
 } SDL_WindowData;
 
 extern int WIN_CreateWindow(_THIS, SDL_Window * window);
@@ -57,6 +67,7 @@ extern void WIN_DestroyWindow(_THIS, SDL_Window * window);
 extern SDL_bool WIN_GetWindowWMInfo(_THIS, SDL_Window * window,
                                     struct SDL_SysWMinfo *info);
 extern void WIN_OnWindowEnter(_THIS, SDL_Window * window);
+extern void WIN_UpdateClipCursor(SDL_Window *window);
 
 #endif /* _SDL_windowswindow_h */
 

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../SDL_internal.h"
 
 /* This file contains portable string manipulation functions for SDL */
 
@@ -43,7 +43,7 @@ static int UTF8_TrailingBytes(unsigned char c)
         return 0;
 }
 
-#if !defined(HAVE_SSCANF) || !defined(HAVE_STRTOL)
+#if !defined(HAVE_VSSCANF) || !defined(HAVE_STRTOL)
 static size_t
 SDL_ScanLong(const char *text, int radix, long *valuep)
 {
@@ -84,7 +84,7 @@ SDL_ScanLong(const char *text, int radix, long *valuep)
 }
 #endif
 
-#if !defined(HAVE_SSCANF) || !defined(HAVE_STRTOUL) || !defined(HAVE_STRTOD)
+#if !defined(HAVE_VSSCANF) || !defined(HAVE_STRTOUL) || !defined(HAVE_STRTOD)
 static size_t
 SDL_ScanUnsignedLong(const char *text, int radix, unsigned long *valuep)
 {
@@ -116,7 +116,7 @@ SDL_ScanUnsignedLong(const char *text, int radix, unsigned long *valuep)
 }
 #endif
 
-#ifndef HAVE_SSCANF
+#ifndef HAVE_VSSCANF
 static size_t
 SDL_ScanUintPtrT(const char *text, int radix, uintptr_t * valuep)
 {
@@ -148,7 +148,7 @@ SDL_ScanUintPtrT(const char *text, int radix, uintptr_t * valuep)
 }
 #endif
 
-#if !defined(HAVE_SSCANF) || !defined(HAVE_STRTOLL)
+#if !defined(HAVE_VSSCANF) || !defined(HAVE_STRTOLL)
 static size_t
 SDL_ScanLongLong(const char *text, int radix, Sint64 * valuep)
 {
@@ -189,7 +189,7 @@ SDL_ScanLongLong(const char *text, int radix, Sint64 * valuep)
 }
 #endif
 
-#if !defined(HAVE_SSCANF) || !defined(HAVE_STRTOULL)
+#if !defined(HAVE_VSSCANF) || !defined(HAVE_STRTOULL)
 static size_t
 SDL_ScanUnsignedLongLong(const char *text, int radix, Uint64 * valuep)
 {
@@ -221,7 +221,7 @@ SDL_ScanUnsignedLongLong(const char *text, int radix, Uint64 * valuep)
 }
 #endif
 
-#if !defined(HAVE_SSCANF) || !defined(HAVE_STRTOD)
+#if !defined(HAVE_VSSCANF) || !defined(HAVE_STRTOD)
 static size_t
 SDL_ScanFloat(const char *text, double *valuep)
 {
@@ -665,23 +665,9 @@ SDL_ltoa(long value, char *string, int radix)
 
     if (value < 0) {
         *bufp++ = '-';
-        value = -value;
-    }
-    if (value) {
-        while (value > 0) {
-            *bufp++ = ntoa_table[value % radix];
-            value /= radix;
-        }
+        SDL_ultoa(-value, bufp, radix);
     } else {
-        *bufp++ = '0';
-    }
-    *bufp = '\0';
-
-    /* The numbers went into the string backwards. :) */
-    if (*string == '-') {
-        SDL_strrev(string + 1);
-    } else {
-        SDL_strrev(string);
+        SDL_ultoa(value, bufp, radix);
     }
 
     return string;
@@ -723,23 +709,9 @@ SDL_lltoa(Sint64 value, char *string, int radix)
 
     if (value < 0) {
         *bufp++ = '-';
-        value = -value;
-    }
-    if (value) {
-        while (value > 0) {
-            *bufp++ = ntoa_table[value % radix];
-            value /= radix;
-        }
+        SDL_ulltoa(-value, bufp, radix);
     } else {
-        *bufp++ = '0';
-    }
-    *bufp = '\0';
-
-    /* The numbers went into the string backwards. :) */
-    if (*string == '-') {
-        SDL_strrev(string + 1);
-    } else {
-        SDL_strrev(string);
+        SDL_ulltoa(value, bufp, radix);
     }
 
     return string;
@@ -995,25 +967,29 @@ SDL_strncasecmp(const char *str1, const char *str2, size_t maxlen)
 #endif /* HAVE_STRNCASECMP */
 }
 
-#ifdef HAVE_SSCANF
 int
 SDL_sscanf(const char *text, const char *fmt, ...)
 {
     int rc;
     va_list ap;
     va_start(ap, fmt);
-    rc = vsscanf(text, fmt, ap);
+    rc = SDL_vsscanf(text, fmt, ap);
     va_end(ap);
     return rc;
 }
+
+#ifdef HAVE_VSSCANF
+int
+SDL_vsscanf(const char *text, const char *fmt, va_list ap)
+{
+    return vsscanf(text, fmt, ap);
+}
 #else
 int
-SDL_sscanf(const char *text, const char *fmt, ...)
+SDL_vsscanf(const char *text, const char *fmt, va_list ap)
 {
-    va_list ap;
     int retval = 0;
 
-    va_start(ap, fmt);
     while (*fmt) {
         if (*fmt == ' ') {
             while (SDL_isspace((unsigned char) *text)) {
@@ -1267,11 +1243,10 @@ SDL_sscanf(const char *text, const char *fmt, ...)
         /* Text didn't match format specifier */
         break;
     }
-    va_end(ap);
 
     return retval;
 }
-#endif /* HAVE_SSCANF */
+#endif /* HAVE_VSSCANF */
 
 int
 SDL_snprintf(char *text, size_t maxlen, const char *fmt, ...)

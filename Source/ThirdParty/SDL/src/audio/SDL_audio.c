@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../SDL_internal.h"
 
 /* Allow access to a raw mixing buffer */
 
@@ -56,7 +56,7 @@ extern AudioBootStrap XAUDIO2_bootstrap;
 extern AudioBootStrap DSOUND_bootstrap;
 extern AudioBootStrap WINMM_bootstrap;
 extern AudioBootStrap PAUDIO_bootstrap;
-extern AudioBootStrap BEOSAUDIO_bootstrap;
+extern AudioBootStrap HAIKUAUDIO_bootstrap;
 extern AudioBootStrap COREAUDIO_bootstrap;
 extern AudioBootStrap SNDMGR_bootstrap;
 extern AudioBootStrap DISKAUD_bootstrap;
@@ -113,8 +113,8 @@ static const AudioBootStrap *const bootstrap[] = {
 #if SDL_AUDIO_DRIVER_PAUDIO
     &PAUDIO_bootstrap,
 #endif
-#if SDL_AUDIO_DRIVER_BEOSAUDIO
-    &BEOSAUDIO_bootstrap,
+#if SDL_AUDIO_DRIVER_HAIKU
+    &HAIKUAUDIO_bootstrap,
 #endif
 #if SDL_AUDIO_DRIVER_COREAUDIO
     &COREAUDIO_bootstrap,
@@ -722,10 +722,16 @@ SDL_GetAudioDeviceName(int index, int iscapture)
     }
 
     if ((iscapture) && (current_audio.impl.OnlyHasDefaultInputDevice)) {
+        if (index > 0) {
+            goto no_such_device;
+        }
         return DEFAULT_INPUT_DEVNAME;
     }
 
     if ((!iscapture) && (current_audio.impl.OnlyHasDefaultOutputDevice)) {
+        if (index > 0) {
+            goto no_such_device;
+        }
         return DEFAULT_OUTPUT_DEVNAME;
     }
 
@@ -1030,7 +1036,11 @@ open_audio_device(const char *devname, int iscapture,
 /* !!! FIXME: this is nasty. */
 #if defined(__WIN32__) && !defined(HAVE_LIBC)
 #undef SDL_CreateThread
+#if SDL_DYNAMIC_API
+        device->thread = SDL_CreateThread_REAL(SDL_RunAudio, name, device, NULL, NULL);
+#else
         device->thread = SDL_CreateThread(SDL_RunAudio, name, device, NULL, NULL);
+#endif
 #else
         device->thread = SDL_CreateThread(SDL_RunAudio, name, device);
 #endif

@@ -1,0 +1,82 @@
+$#include "Urho2D/TileMapDefs2D.h"
+
+enum Orientation2D
+{
+    O_ORTHOGONAL,
+    O_ISOMETRIC,
+    O_STAGGERED
+};
+
+struct TileMapInfo2D
+{
+    Orientation2D orientation_ @ orientation;
+    int width_ @ width;
+    int height_ @ height;
+    float tileWidth_ @ tileWidth;
+    float tileHeight_ @ tileHeight;
+
+    float GetMapWidth() const;
+    float GetMapHeight() const;
+
+    tolua_readonly tolua_property__get_set float mapWidth;
+    tolua_readonly tolua_property__get_set float mapHeight;
+};
+
+enum TileMapLayerType2D
+{
+    LT_TILE_LAYER,
+    LT_OBJECT_GROUP,
+    LT_IMAGE_LAYER,
+    LT_INVALID
+};
+
+enum TileMapObjectType2D
+{
+    OT_RECTANGLE,
+    OT_ELLIPSE,
+    OT_POLYGON,
+    OT_POLYLINE,
+    OT_TILE,
+    OT_INVALID
+};
+
+class PropertySet2D
+{
+    bool HasProperty(const String name) const;
+    const String GetProperty(const String name) const;
+};
+
+class Tile2D
+{
+    int GetGid() const;
+    Sprite2D* GetSprite() const;
+    bool HasProperty(const String name) const;
+    const String GetProperty(const String name) const;
+
+    tolua_readonly tolua_property__get_set int gid;
+    tolua_readonly tolua_property__get_set Sprite2D* sprite;
+};
+
+class TileMapObject2D
+{
+    TileMapObjectType2D GetObjectType() const;
+    const String GetName() const;
+    const String GetType() const;
+    const Vector2& GetPosition() const;
+    const Vector2& GetSize() const;
+    unsigned GetNumPoints() const;
+    const Vector2& GetPoint(unsigned index) const;
+    int GetTileGid() const;
+    Sprite2D* GetTileSprite() const;
+    bool HasProperty(const String name) const;
+    const String GetProperty(const String name) const;
+
+    tolua_readonly tolua_property__get_set TileMapObjectType2D objectType;
+    tolua_readonly tolua_property__get_set String name;
+    tolua_readonly tolua_property__get_set String type;
+    tolua_readonly tolua_property__get_set Vector2 position;
+    tolua_readonly tolua_property__get_set Vector2 size;
+    tolua_readonly tolua_property__get_set unsigned numPoints;
+    tolua_readonly tolua_property__get_set int tileGid;
+    tolua_readonly tolua_property__get_set Sprite2D* tileSprite;
+};

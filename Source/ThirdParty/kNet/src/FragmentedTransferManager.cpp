@@ -46,7 +46,7 @@ bool FragmentedSendManager::FragmentedTransfer::RemoveMessage(NetworkMessage *me
 		{
 			message->transfer = 0;
 			fragments.erase(iter);
-			LOG(LogVerbose, "Removing message with seqnum %d (fragnum %d) from transfer ID %d (%p).", (int)message->messageNumber, (int)message->fragmentIndex, id, this);
+			KNET_LOG(LogVerbose, "Removing message with seqnum %d (fragnum %d) from transfer ID %d (%p).", (int)message->messageNumber, (int)message->fragmentIndex, id, this);
 			return true;
 		}
 	return false;
@@ -59,7 +59,7 @@ FragmentedSendManager::FragmentedTransfer *FragmentedSendManager::AllocateNewFra
 	transfer->id = -1;
 	transfer->totalNumFragments = 0;
 
-	LOG(LogObjectAlloc, "Allocated new fragmented transfer %p.", transfer);
+	KNET_LOG(LogObjectAlloc, "Allocated new fragmented transfer %p.", transfer);
 
 	return transfer;
 }
@@ -74,10 +74,10 @@ void FragmentedSendManager::FreeFragmentedTransfer(FragmentedTransfer *transfer)
 		if (&*iter == transfer)
 		{
 			transfers.erase(iter);
-			LOG(LogObjectAlloc, "Freed fragmented transfer ID=%d, numFragments: %d (%p).", transfer->id, (int)transfer->totalNumFragments, transfer);
+			KNET_LOG(LogObjectAlloc, "Freed fragmented transfer ID=%d, numFragments: %d (%p).", transfer->id, (int)transfer->totalNumFragments, transfer);
 			return;
 		}
-	LOG(LogError, "Tried to free a fragmented send struct that didn't exist!");
+	KNET_LOG(LogError, "Tried to free a fragmented send struct that didn't exist!");
 }
 
 void FragmentedSendManager::RemoveMessage(FragmentedTransfer *transfer, NetworkMessage *message)
@@ -85,7 +85,7 @@ void FragmentedSendManager::RemoveMessage(FragmentedTransfer *transfer, NetworkM
 	bool success = transfer->RemoveMessage(message);
 	if (!success)
 	{
-		LOG(LogError, "Tried to remove a nonexisting message from a fragmented send struct!");
+		KNET_LOG(LogError, "Tried to remove a nonexisting message from a fragmented send struct!");
 		return;
 	}
 
@@ -119,32 +119,32 @@ bool FragmentedSendManager::AllocateFragmentedTransferID(FragmentedTransfer &tra
 		return false;
 	transfer.id = transferID;
 
-	LOG(LogObjectAlloc, "Allocated a transferID %d to a transfer of %d fragments.", transfer.id, (int)transfer.totalNumFragments);
+	KNET_LOG(LogObjectAlloc, "Allocated a transferID %d to a transfer of %d fragments.", transfer.id, (int)transfer.totalNumFragments);
 
 	return true;
 }
 
 void FragmentedSendManager::FreeAllTransfers()
 {
-	while(transfers.size() > 0)
+	while(!transfers.empty())
 		FreeFragmentedTransfer(&transfers.front());
 }
 
 void FragmentedReceiveManager::NewFragmentStartReceived(int transferID, int numTotalFragments, const char *data, size_t numBytes)
 {
 	assert(data);
-	LOG(LogVerbose, "Received a fragmentStart of size %db (#total fragments %d) for a transfer with ID %d.", (int)numBytes, numTotalFragments, transferID);
+	KNET_LOG(LogVerbose, "Received a fragmentStart of size %db (#total fragments %d) for a transfer with ID %d.", (int)numBytes, numTotalFragments, transferID);
 
 	if (numBytes == 0 || numTotalFragments <= 1)
 	{
-		LOG(LogError, "Discarding degenerate fragmentStart of size %db and numTotalFragments=%db!", (int)numBytes, numTotalFragments);
+		KNET_LOG(LogError, "Discarding degenerate fragmentStart of size %db and numTotalFragments=%db!", (int)numBytes, numTotalFragments);
 		return;
 	}
 
 	for(size_t i = 0; i < transfers.size(); ++i)
 		if (transfers[i].transferID == transferID)
 		{
-			LOG(LogError, "An existing transfer with ID %d existed! Deleting it.", transferID);
+			KNET_LOG(LogError, "An existing transfer with ID %d existed! Deleting it.", transferID);
 			transfers.erase(transfers.begin() + i);
 			--i;
 		}
@@ -160,11 +160,11 @@ void FragmentedReceiveManager::NewFragmentStartReceived(int transferID, int numT
 
 bool FragmentedReceiveManager::NewFragmentReceived(int transferID, int fragmentNumber, const char *data, size_t numBytes)
 {
-	LOG(LogVerbose, "Received a fragment of size %db (index %d) for a transfer with ID %d.", (int)numBytes, fragmentNumber, transferID);
+	KNET_LOG(LogVerbose, "Received a fragment of size %db (index %d) for a transfer with ID %d.", (int)numBytes, fragmentNumber, transferID);
 
 	if (numBytes == 0)
 	{
-		LOG(LogError, "Discarding fragment of size 0!");
+		KNET_LOG(LogError, "Discarding fragment of size 0!");
 		return false;
 	}
 
@@ -176,7 +176,7 @@ bool FragmentedReceiveManager::NewFragmentReceived(int transferID, int fragmentN
 			for(size_t j = 0; j < transfer.fragments.size(); ++j)
 				if (transfer.fragments[j].fragmentIndex == fragmentNumber)
 				{
-					LOG(LogError, "A fragment with fragmentNumber %d already exists for transferID %d. Discarding the new fragment! Old size: %db, discarded size: %db",
+					KNET_LOG(LogError, "A fragment with fragmentNumber %d already exists for transferID %d. Discarding the new fragment! Old size: %db, discarded size: %db",
 						fragmentNumber, transferID, (int)transfer.fragments[j].data.size(), (int)numBytes);
 					return false;
 				}
@@ -188,14 +188,14 @@ bool FragmentedReceiveManager::NewFragmentReceived(int transferID, int fragmentN
 
 			if (transfer.fragments.size() >= (size_t)transfer.numTotalFragments)
 			{
-				LOG(LogData, "Finished receiving a fragmented transfer that consisted of %d fragments (transferID=%d).",
+				KNET_LOG(LogData, "Finished receiving a fragmented transfer that consisted of %d fragments (transferID=%d).",
 					(int)transfer.fragments.size(), transfer.transferID);
 				return true;
 			}
 			else
 				return false;
 		}
-	LOG(LogError, "Received a fragment of size %db (index %d) for a transfer with ID %d, but that transfer had not been initiated!",
+	KNET_LOG(LogError, "Received a fragment of size %db (index %d) for a transfer with ID %d, but that transfer had not been initiated!",
 		(int)numBytes, fragmentNumber, transferID);
 	return false;
 }

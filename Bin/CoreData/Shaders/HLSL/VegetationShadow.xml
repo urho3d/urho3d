@@ -1,6 +1,0 @@
-<shaders>
-    <shader type="vs">
-        <variation name="" />
-        <variation name="Instanced" define="INSTANCED" require="SM3" />
-    </shader>
-</shaders>

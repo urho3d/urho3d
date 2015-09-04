@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #ifndef _SDL_x11video_h
 #define _SDL_x11video_h
@@ -120,6 +120,9 @@ typedef struct SDL_VideoData
 } SDL_VideoData;
 
 extern SDL_bool X11_UseDirectColorVisuals(void);
+
+SDL_bool SDL_dbus_screensaver_inhibit(_THIS);
+void SDL_dbus_screensaver_tickle(_THIS);
 
 #endif /* _SDL_x11video_h */
 

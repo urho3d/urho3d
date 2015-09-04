@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,7 +21,7 @@
 
 // Modified by Lasse Oorni for Urho3D
 
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
 
@@ -44,8 +44,9 @@ static char **forward_argv;
 static int exit_status;
 static UIWindow *launch_window;
 
-// Urho3D: added variable
+// Urho3D: added variables
 const char* resource_dir = 0;
+const char* documents_dir = 0;
 
 int main(int argc, char **argv)
 {
@@ -88,11 +89,27 @@ const char* SDL_IOS_GetResourceDir()
     if (!resource_dir)
     {
         const char *temp = [[[NSBundle mainBundle] resourcePath] UTF8String];
-        resource_dir = malloc(strlen(temp + 1));
+        resource_dir = malloc(strlen(temp) + 1);
         strcpy(resource_dir, temp);
     }
     
     return resource_dir;
+}
+
+// Urho3D: added function
+const char* SDL_IOS_GetDocumentsDir()
+{
+    if (!documents_dir)
+    {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+        
+        const char *temp = [basePath UTF8String];
+        documents_dir = malloc(strlen(temp) + 1);
+        strcpy(documents_dir, temp);
+    }
+    
+    return documents_dir;
 }
 
 static void

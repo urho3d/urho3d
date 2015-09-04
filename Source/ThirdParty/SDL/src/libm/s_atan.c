@@ -112,3 +112,4 @@ double atan(double x)
 	}
 }
 libm_hidden_def(atan)
+

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -596,7 +596,7 @@ extern DECLSPEC void SDLCALL SDL_RenderGetScale(SDL_Renderer * renderer,
  *
  *  \return 0 on success, or -1 on error
  */
-extern DECLSPEC int SDL_SetRenderDrawColor(SDL_Renderer * renderer,
+extern DECLSPEC int SDLCALL SDL_SetRenderDrawColor(SDL_Renderer * renderer,
                                            Uint8 r, Uint8 g, Uint8 b,
                                            Uint8 a);
 
@@ -612,7 +612,7 @@ extern DECLSPEC int SDL_SetRenderDrawColor(SDL_Renderer * renderer,
  *
  *  \return 0 on success, or -1 on error
  */
-extern DECLSPEC int SDL_GetRenderDrawColor(SDL_Renderer * renderer,
+extern DECLSPEC int SDLCALL SDL_GetRenderDrawColor(SDL_Renderer * renderer,
                                            Uint8 * r, Uint8 * g, Uint8 * b,
                                            Uint8 * a);
 

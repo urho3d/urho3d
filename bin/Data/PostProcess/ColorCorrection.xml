@@ -1,0 +1,6 @@
+<renderpath>
+    <command type="quad" tag="ColorCorrection" vs="ColorCorrection" ps="ColorCorrection" output="viewport">
+        <texture unit="diffuse" name="viewport" />
+        <texture unit="volume" name="Textures/LUTIdentity.xml" />
+    </command>
+</renderpath>

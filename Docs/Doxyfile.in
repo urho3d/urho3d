@@ -153,7 +153,7 @@ STRIP_FROM_INC_PATH    =
 # (but less readable) file names. This can be useful if your file system 
 # doesn't support long names like on DOS, Mac, or CD-ROM.
 
-SHORT_NAMES            = YES
+SHORT_NAMES            = NO
 
 # If the JAVADOC_AUTOBRIEF tag is set to YES then Doxygen 
 # will interpret the first line (until the first dot) of a JavaDoc-style 
@@ -665,8 +665,9 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = ../Source/Engine \
-                         .
+INPUT                  = @CMAKE_SOURCE_DIR@/Source/Urho3D \
+                         @CMAKE_SOURCE_DIR@/Source/ThirdParty/rapidjson/include/rapidjson \
+                         @CMAKE_CURRENT_SOURCE_DIR@
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
@@ -980,52 +981,52 @@ HTML_INDEX_NUM_ENTRIES = 100
 # See http://developer.apple.com/tools/creatingdocsetswithdoxygen.html 
 # for more information.
 
-GENERATE_DOCSET        = NO
+GENERATE_DOCSET        = @XCODE_HELP@
 
 # When GENERATE_DOCSET tag is set to YES, this tag determines the name of the 
 # feed. A documentation feed provides an umbrella under which multiple 
 # documentation sets from a single provider (such as a company or product suite) 
 # can be grouped.
 
-DOCSET_FEEDNAME        = "Doxygen generated docs"
+DOCSET_FEEDNAME        = "Urho3D Documentation"
 
 # When GENERATE_DOCSET tag is set to YES, this tag specifies a string that 
 # should uniquely identify the documentation set bundle. This should be a 
 # reverse domain-name style string, e.g. com.mycompany.MyDocSet. Doxygen 
 # will append .docset to the name.
 
-DOCSET_BUNDLE_ID       = org.doxygen.Project
+DOCSET_BUNDLE_ID       = com.github.urho3d.Urho3D.@URHO3D_VERSION@
 
 # When GENERATE_PUBLISHER_ID tag specifies a string that should uniquely identify 
 # the documentation publisher. This should be a reverse domain-name style 
 # string, e.g. com.mycompany.MyDocSet.documentation.
 
-DOCSET_PUBLISHER_ID    = org.doxygen.Publisher
+DOCSET_PUBLISHER_ID    = com.github.urho3d.Urho3D
 
 # The GENERATE_PUBLISHER_NAME tag identifies the documentation publisher.
 
-DOCSET_PUBLISHER_NAME  = Publisher
+DOCSET_PUBLISHER_NAME  = urho3d
 
 # If the GENERATE_HTMLHELP tag is set to YES, additional index files 
 # will be generated that can be used as input for tools like the 
 # Microsoft HTML help workshop to generate a compiled HTML help file (.chm) 
 # of the generated HTML documentation.
 
-GENERATE_HTMLHELP      = NO
+GENERATE_HTMLHELP      = @MSVC_HELP@
 
 # If the GENERATE_HTMLHELP tag is set to YES, the CHM_FILE tag can 
 # be used to specify the file name of the resulting .chm file. You 
 # can add a path in front of the file if the result should not be 
 # written to the html output directory.
 
-CHM_FILE               = 
+CHM_FILE               = Urho3D_Documentation_@URHO3D_VERSION@.chm
 
 # If the GENERATE_HTMLHELP tag is set to YES, the HHC_LOCATION tag can 
 # be used to specify the location (absolute path including file name) of 
 # the HTML help compiler (hhc.exe). If non-empty doxygen will try to run 
 # the HTML help compiler on the generated index.hhp.
 
-HHC_LOCATION           = 
+HHC_LOCATION           = C:\Program Files\HTML Help Workshop\hhc.exe
 
 # If the GENERATE_HTMLHELP tag is set to YES, the GENERATE_CHI flag 
 # controls if a separate .chi index file is generated (YES) or that 
@@ -1055,19 +1056,19 @@ TOC_EXPAND             = NO
 # that can be used as input for Qt's qhelpgenerator to generate a 
 # Qt Compressed Help (.qch) of the generated HTML documentation.
 
-GENERATE_QHP           = NO
+GENERATE_QHP           = @CodeBlocks_HELP@
 
 # If the QHG_LOCATION tag is specified, the QCH_FILE tag can 
 # be used to specify the file name of the resulting .qch file. 
 # The path specified is relative to the HTML output folder.
 
-QCH_FILE               = 
+QCH_FILE               =
 
 # The QHP_NAMESPACE tag specifies the namespace to use when generating 
 # Qt Help Project output. For more information please see 
 # http://doc.trolltech.com/qthelpproject.html#namespace
 
-QHP_NAMESPACE          = org.doxygen.Project
+QHP_NAMESPACE          = com.github.urho3d.Urho3D.@URHO3D_VERSION@
 
 # The QHP_VIRTUAL_FOLDER tag specifies the namespace to use when generating 
 # Qt Help Project output. For more information please see 
@@ -1101,7 +1102,7 @@ QHP_SECT_FILTER_ATTRS  =
 # If non-empty doxygen will try to run qhelpgenerator on the generated 
 # .qhp file.
 
-QHG_LOCATION           = 
+QHG_LOCATION           = /usr/bin/qhelpgenerator
 
 # If the GENERATE_ECLIPSEHELP tag is set to YES, additional index files  
 # will be generated, which together with the HTML files, form an Eclipse help 
@@ -1112,13 +1113,13 @@ QHG_LOCATION           =
 # the ECLIPSE_DOC_ID value. After copying Eclipse needs to be restarted before 
 # the help appears.
 
-GENERATE_ECLIPSEHELP   = NO
+GENERATE_ECLIPSEHELP   = @Eclipse_HELP@
 
 # A unique identifier for the eclipse help plugin. When installing the plugin 
 # the directory name containing the HTML and XML files should also have 
 # this name.
 
-ECLIPSE_DOC_ID         = org.doxygen.Project
+ECLIPSE_DOC_ID         = com.github.urho3d.Urho3D.@URHO3D_VERSION@
 
 # The DISABLE_INDEX tag can be used to turn on/off the condensed index (tabs) 
 # at top of each HTML page. The value NO (the default) enables the index and 
@@ -1592,7 +1593,7 @@ CLASS_DIAGRAMS         = YES
 # the mscgen tool resides. If left empty the tool is assumed to be found in the 
 # default search path.
 
-MSCGEN_PATH            = 
+MSCGEN_PATH            = @DOXYGEN_DOT_PATH@
 
 # If set to YES, the inheritance and collaboration graphs will hide 
 # inheritance and usage relations if the target is undocumented 
@@ -1736,7 +1737,7 @@ INTERACTIVE_SVG        = NO
 # The tag DOT_PATH can be used to specify the path where the dot tool can be 
 # found. If left blank, it is assumed the dot tool can be found in the path.
 
-DOT_PATH               = 
+DOT_PATH               = @DOXYGEN_DOT_PATH@
 
 # The DOTFILE_DIRS tag can be used to specify one or more directories that 
 # contain dot files that are included in the documentation (see the 
