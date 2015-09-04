@@ -47,7 +47,8 @@ struct AnimationControl
         setTime_(0),
         setWeight_(0),
         setTimeRev_(0),
-        setWeightRev_(0)
+        setWeightRev_(0),
+        removeOnCompletion_(false)
     {
     }
 
@@ -75,6 +76,8 @@ struct AnimationControl
     unsigned char setTimeRev_;
     /// Set weight command revision.
     unsigned char setWeightRev_;
+    /// Sets whether this should automatically be removed when it finishes playing.
+    bool removeOnCompletion_;
 };
 
 /// %Component that drives an AnimatedModel's animations.
