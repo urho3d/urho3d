@@ -64,7 +64,7 @@ if (URHO3D_LUA)
         endif ()
         ExternalProject_Add (tolua++
             SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
-            CMAKE_ARGS -DURHO3D_LUAJIT=${URHO3D_LUAJIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${IOS_FIX})
+            CMAKE_ARGS -DURHO3D_NOABI=1 -DURHO3D_LUAJIT=${URHO3D_LUAJIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${IOS_FIX})
     else ()
         # Otherwise, build it internally as per normal
         add_subdirectory (../ThirdParty/toluapp/src/bin ../ThirdParty/toluapp/src/bin)
@@ -239,7 +239,12 @@ foreach (TARGET ${STATIC_LIBRARY_TARGETS})
         if (NOT MSVC)
             set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${FORCE_LOAD} ${ARCHIVE})    # Only works in Apple (Xcode and Makefile) and GCC while building shared library
         endif ()
-        if (XCODE OR MSVC)
+        if (MSVC_VERSION VERSION_EQUAL 1500)
+            if (ARCHIVE MATCHES " ")
+                message (FATAL_ERROR "CMake/VS2008 generator does not support spaces in the source and/or build tree path")
+            endif ()
+            set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " ${ARCHIVE}")  # Fallback for VS2008
+        elseif (XCODE OR MSVC)
             set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " \"${ARCHIVE}\"")  # Only works in Apple (Xcode only) and MSVC while building static library
         else ()
             list (APPEND ARCHIVES ${ARCHIVE})
