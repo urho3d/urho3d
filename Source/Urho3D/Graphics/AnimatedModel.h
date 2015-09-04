@@ -250,6 +250,8 @@ private:
     bool loading_;
     /// Bone nodes assignment pending flag.
     bool assignBonesPending_;
+    /// Force animation update after becoming visible flag.
+    bool forceAnimationUpdate_;
 };
 
 }
