@@ -44,7 +44,7 @@ endif ()
 # Define all supported build options
 include (CMakeDependentOption)
 option (URHO3D_C++11 "Enable C++11 standard")
-option (URHO3D_NOABI "If set then do not explicitly specify the ABI compiler flag for code generation (GCC and Clang only)")
+cmake_dependent_option (URHO3D_NOABI "If set then do not explicitly specify the ABI compiler flag for code generation (GCC and Clang only)" FALSE "NOT MSVC" FALSE)
 mark_as_advanced (URHO3D_NOABI)
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
 if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the initial configure step
