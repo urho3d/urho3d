@@ -86,11 +86,7 @@ if (DOXYGEN_FOUND)
     # If URHO3D_DOCS build option is set then add the custom 'doc' target into the default 'all' target, i.e. a normal build would not only build the software but also the documentation
     if (URHO3D_DOCS_QUIET)
         set (URHO3D_DOCS 1)
-        if (CMAKE_HOST_WIN32)
-            set (REDIRECT_STDOUT 1>nul)     # In quiet mode, redirect standard output stream of Doxygen to a null device
-        else ()
-            set (REDIRECT_STDOUT 1>/dev/null)
-        endif ()
+        set (REDIRECT_STDOUT 1>${NULL_DEVICE})     # In quiet mode, redirect standard output stream of Doxygen to a null device
     endif ()
     if (URHO3D_DOCS)
         set (ALL ALL)

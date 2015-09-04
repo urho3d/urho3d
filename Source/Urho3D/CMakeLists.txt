@@ -239,12 +239,13 @@ foreach (TARGET ${STATIC_LIBRARY_TARGETS})
         if (NOT MSVC)
             set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${FORCE_LOAD} ${ARCHIVE})    # Only works in Apple (Xcode and Makefile) and GCC while building shared library
         endif ()
-        if (XCODE OR MSVC)
-            if (NOT MSVC OR MSVC_VERSION GREATER 1500)
-                set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " \"${ARCHIVE}\"")  # Only works in Apple (Xcode only) and MSVC while building static library
-            else ()
-                set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " ${ARCHIVE}") # Fallback for VS2008
+        if (MSVC_VERSION VERSION_EQUAL 1500)
+            if (ARCHIVE MATCHES " ")
+                message (FATAL_ERROR "CMake/VS2008 generator does not support spaces in the source and/or build tree path")
             endif ()
+            set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " ${ARCHIVE}")  # Fallback for VS2008
+        elseif (XCODE OR MSVC)
+            set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " \"${ARCHIVE}\"")  # Only works in Apple (Xcode only) and MSVC while building static library
         else ()
             list (APPEND ARCHIVES ${ARCHIVE})
         endif ()
