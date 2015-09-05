@@ -207,6 +207,9 @@ if (NOT ANDROID AND NOT EMSCRIPTEN)
     else ()
         message (FATAL_ERROR "The .soversion file is corrupted. It should contain a version number with this format major(0xFFFF).minor(0xFF).patch-level(0xFF). e.g.: 0.1.2")
     endif ()
+elseif (EMSCRIPTEN)
+    # Emscripten does not support generation of shared library in a conventional sense, it just produces "linked" LLVM bitcode
+    set (CMAKE_SHARED_LIBRARY_SUFFIX ".bc")
 endif ()
 install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
 

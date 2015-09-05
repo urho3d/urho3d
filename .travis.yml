@@ -335,10 +335,13 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
-  matrix:
-    - URHO3D_LIB_TYPE=STATIC
 matrix:
   fast_finish: true
+  include:
+    - compiler: gcc-archived-bitcode
+      env: URHO3D_LIB_TYPE=STATIC
+    - compiler: gcc-linked-bitcode
+      env: URHO3D_LIB_TYPE=SHARED
 before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
@@ -350,7 +353,7 @@ before_script:
   - rake ci_setup_cache
 script:
   - rake ci
-  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && rake ci_emscripten_samples_update || ! [ $RELEASE_TAG ]; fi
+  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && if [ "$URHO3D_LIB_TYPE" == "SHARED" ]; then rake ci_emscripten_samples_update; fi || ! [ $RELEASE_TAG ]; fi
 after_script: rake ci_teardown_cache
 
 ...
