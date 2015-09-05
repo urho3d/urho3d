@@ -50,9 +50,9 @@ function CreateScene()
         return
     end
 
-    spriteNode = scene_:CreateChild("SpriterAnimation")
+    spriterNode = scene_:CreateChild("SpriterAnimation")
 
-    local spriterAnimatedSprite = spriteNode:CreateComponent("AnimatedSprite2D")
+    local spriterAnimatedSprite = spriterNode:CreateComponent("AnimatedSprite2D")
     spriterAnimatedSprite:SetAnimation(spriterAnimationSet, spriterAnimationSet:GetAnimation(animationIndex), LM_FORCE_LOOPED)
 end
 
@@ -129,7 +129,7 @@ function HandleUpdate(eventType, eventData)
 end
 
 function HandleMouseButtonDown(eventType, eventData)
-    local spriterAnimatedSprite = spriteNode:GetComponent("AnimatedSprite2D")
+    local spriterAnimatedSprite = spriterNode:GetComponent("AnimatedSprite2D")
     local spriterAnimationSet = spriterAnimatedSprite.animationSet
     spriterAnimationIndex = (spriterAnimationIndex + 1) % spriterAnimationSet.numAnimations
     spriterAnimatedSprite:SetAnimation(spriterAnimationSet:GetAnimation(spriterAnimationIndex), LM_FORCE_LOOPED)
