@@ -53,6 +53,11 @@ if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_FOUND_LIB_TYPE)
     endif ()
 endif ()
 
+# Cater for the shared library extension in Emscripten build has been changed to ".bc"
+if (EMSCRIPTEN)
+    string (REPLACE .so .bc CMAKE_FIND_LIBRARY_SUFFIXES "${CMAKE_FIND_LIBRARY_SUFFIXES}")   # Stringify for string replacement
+endif ()
+
 set (PATH_SUFFIX Urho3D)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
     # Library location is already known to be in the build tree
