@@ -53,8 +53,8 @@ void CreateScene()
         return;
 
     spriterNode = scene_.CreateChild("SpriterAnimation");
-    AnimatedSprite2D@ animatedSprite = spriterNode.CreateComponent("AnimatedSprite2D");
-    animatedSprite.SetAnimation(spriterAnimationSet, spriterAnimationSet.GetAnimation(spriterAnimationIndex), LM_FORCE_LOOPED);
+    AnimatedSprite2D@ spriterAnimatedSprite = spriterNode.CreateComponent("AnimatedSprite2D");
+    spriterAnimatedSprite.SetAnimation(spriterAnimationSet, spriterAnimationSet.GetAnimation(spriterAnimationIndex), LM_FORCE_LOOPED);
 }
 
 void CreateInstructions()
