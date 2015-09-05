@@ -16,7 +16,7 @@ set SOLUTION=%~dp0\.build\vs2008\Urho3D.sln
 :: Setup the Visual Studio environment variables
 :: call %VCVARS32%
 
-msbuild %SOLUTION% /t:Build
+msbuild %SOLUTION% /t:Build /p:Configuration=RELEASE
 
 :: Run the packaging script
 :: python %PACKAGE%
