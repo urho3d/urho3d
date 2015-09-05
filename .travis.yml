@@ -320,7 +320,6 @@ after_script: rake ci_teardown_cache
 
 branch: {name: Emscripten-CI, active: yes, description: For Travis CI - switch CI build to use Emscripten build environment.}
 language: cpp
-compiler: gcc
 cache: ccache
 sudo: false
 addons: {apt: {sources: [george-edison55-precise-backports, kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, doxygen, graphviz, g++-4.9, libasound2-dev]}}
