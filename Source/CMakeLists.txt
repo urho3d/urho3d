@@ -85,6 +85,10 @@ endif ()
 
 if (URHO3D_URHO2D)
     add_subdirectory (ThirdParty/Box2D)
+    if (URHO3D_SPINE)
+    	add_subdirectory (ThirdParty/Spine)
+    endif ()
+    add_subdirectory (ThirdParty/Spriter)
 endif ()
 
 if (URHO3D_PHYSICS)
