@@ -85,8 +85,10 @@ endif ()
 
 if (URHO3D_URHO2D)
     add_subdirectory (ThirdParty/Box2D)
-    if (URHO3D_SPINE)
-    	add_subdirectory (ThirdParty/Spine)
+    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/spine)
+        add_subdirectory (ThirdParty/spine)
+        # Add definition for Spine
+        add_definitions (-DURHO3D_SPINE)
     endif ()
     add_subdirectory (ThirdParty/Spriter)
 endif ()

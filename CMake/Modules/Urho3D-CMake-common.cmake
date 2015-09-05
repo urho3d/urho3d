@@ -81,7 +81,6 @@ cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT EMS
 cmake_dependent_option (URHO3D_DATABASE_ODBC "Enable Database support with ODBC, requires vendor-specific ODBC driver" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
 option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
-option (URHO3D_SPINE "Enable spine support" FALSE)
 if (MINGW AND NOT DEFINED URHO3D_SSE)
     # Certain MinGW versions fail to compile SSE code. This is the initial guess for known "bad" version range, and can be tightened later
     execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION ERROR_QUIET)
@@ -364,11 +363,7 @@ endif ()
 
 # Add definition for Urho2D
 if (URHO3D_URHO2D)
-    add_definitions (-DURHO3D_URHO2D)
-    # Add definition for Spine
-    if (URHO3D_SPINE)
-        add_definitions (-DURHO3D_SPINE)
-    endif ()
+    add_definitions (-DURHO3D_URHO2D)    
 endif ()
 
 # Add definition for Database
