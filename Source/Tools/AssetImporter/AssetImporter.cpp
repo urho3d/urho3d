@@ -1274,12 +1274,15 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
     if (rootMotionFlag_)
     {
         XMLFile outMotion(context_);
-        XMLElement root = outMotion.CreateRoot("motion_keys");
+        XMLElement root = outMotion.CreateRoot("motion");
+
+        XMLElement child1 = root.CreateChild("motion_keys");
+        XMLElement child2 = root.CreateChild("property");
 
         for (size_t i=0; i<motionKeys.Size(); ++i)
         {
             MontionKey& mk = motionKeys[i];
-            XMLElement mkXML = root.CreateChild("key");
+            XMLElement mkXML = child1.CreateChild("key");
             mkXML.SetFloat("time", mk.time_);
             mkXML.SetVector3("translation", mk.translation_);
             float rotation = mk.rotation_;
@@ -1300,8 +1303,7 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
             PrintLine("motion frame=" + String(i) + " translation=" + String(mk.translation_) + " rotation=" + String(mk.rotation_));
         }
 
-        XMLElement root1 = outMotion.CreateRoot("property");
-        root1.SetFloat("distanceToOrign", distanceToOrign);
+        child2.SetFloat("distanceToOrign", distanceToOrign);
 
         File outFile(context_);
         String motionOutName = GetPath(animOutName) + GetFileName(animOutName) + "_motion.xml";
