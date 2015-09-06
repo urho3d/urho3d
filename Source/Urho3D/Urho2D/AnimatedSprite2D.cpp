@@ -358,7 +358,7 @@ void AnimatedSprite2D::UpdateSourceBatchesSpine()
 
                 sourceBatches_[0].vertices_.Push(vertex);
                 // Add padding vertex
-                if (i % 3 == 2)
+                if (j % 3 == 2)
                     sourceBatches_[0].vertices_.Push(vertex);
             }
         }
@@ -380,7 +380,7 @@ void AnimatedSprite2D::UpdateSourceBatchesSpine()
 
                 sourceBatches_[0].vertices_.Push(vertex);
                 // Add padding vertex
-                if (i % 3 == 2)
+                if (j % 3 == 2)
                     sourceBatches_[0].vertices_.Push(vertex);
             }
         }
