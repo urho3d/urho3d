@@ -44,15 +44,49 @@ before_script:
   do touch -d "2015-09-01 00:00:00 +0800" $f; done
 - rake ci_setup_cache
 script:
-- rake ci
-- if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && rake ci_emscripten_samples_update
-  || ! [ $RELEASE_TAG ]; fi
-after_script:
-- rake ci_teardown_cache
-- rake ci_delete_mirror
-notifications:
-  email:
-    on_success: never
-    on_failure: change
-    recipients:
-    - weitjong@gmail.com
+  - rake ci
+  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload || ! [ $RELEASE_TAG ]; fi
+after_script: rake ci_teardown_cache
+
+---
+
+branch: {name: Emscripten-CI, active: yes, description: For Travis CI - switch CI build to use Emscripten build environment.}
+language: cpp
+cache: ccache
+sudo: false
+addons: {apt: {sources: [george-edison55-precise-backports, kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, doxygen, graphviz, g++-4.9, libasound2-dev]}}
+env:
+  global:
+    - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
+    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
+    - NUMJOBS=3
+    - HTML5=1
+    - EMSCRIPTEN_SHARE_DATA=1
+    - USE_CCACHE=1
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
+matrix:
+  fast_finish: true
+  include:
+    - compiler: gcc-archived-bitcode
+      env: URHO3D_LIB_TYPE=STATIC
+    - compiler: gcc-linked-bitcode
+      env: URHO3D_LIB_TYPE=SHARED
+before_script:
+  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - if [ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
+  - export DISPLAY=:99.0; bash -e /etc/init.d/xvfb start
+  - git clone --depth 1 https://github.com/urho3d/emscripten-sdk.git && emscripten-sdk/emsdk activate --build=Release sdk-master-64bit && source emscripten-sdk/emsdk_env.sh
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH; for f in $EMSCRIPTEN/{emcc,em++}; do touch -d "2015-09-01 00:00:00 +0800" $f; done
+  - rake ci_setup_cache
+script:
+  - rake ci
+  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && if [ "$URHO3D_LIB_TYPE" == "SHARED" ]; then rake ci_emscripten_samples_update; fi || ! [ $RELEASE_TAG ]; fi
+after_script: rake ci_teardown_cache
+
+...
+
+# vi: set ts=2 sw=2 expandtab:
