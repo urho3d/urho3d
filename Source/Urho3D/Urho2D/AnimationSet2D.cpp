@@ -324,18 +324,19 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
     return true;
 }
 
+struct SpriteInfo
+{
+    int x;
+    int y;
+    Spriter::File* file_;
+    SharedPtr<Image> image_;
+};
+
 bool AnimationSet2D::EndLoadSpriter()
 {
     if (!spriterData_)
         return false;
-
-    struct SpriteInfo
-    {
-        int x;
-        int y;
-        Spriter::File* file_;
-        SharedPtr<Image> image_;        
-    };
+    
     Vector<SpriteInfo> spriteInfos;
     
     String parentPath = GetParentPath(GetName());

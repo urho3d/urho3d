@@ -36,7 +36,7 @@
 #ifdef URHO3D_SPINE
 #include <spine/spine.h>
 #endif 
-#include <spriter/SpriterInstance.h>
+#include <Spriter/SpriterInstance.h>
 
 namespace Urho3D
 {
