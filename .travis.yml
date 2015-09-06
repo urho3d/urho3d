@@ -1,48 +1,316 @@
+#
+# Copyright (c) 2008-2015 the Urho3D project.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
 ---
+
+language: cpp
+cache: ccache
+sudo: false
+addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz]}}
+env:
+  global:
+    - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
+    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
+    - NUMJOBS=4
+    - USE_CCACHE=1
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
+matrix:
+  fast_finish: true
+  include:
+    - &Linux-64bit
+      addons: {apt: {sources: *default_sources, packages: &linux_packages [*default_packages, libasound2-dev, rpm]}}
+      compiler: gcc-64bit-static
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC COVERITY_SCAN_THRESHOLD=100 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
+    - &Linux-64bit-shared
+      <<: *Linux-64bit
+      compiler: gcc-64bit-shared
+      env: LINUX=1 URHO3D_LIB_TYPE=SHARED
+    - <<: *Linux-64bit
+      compiler: clang-64bit-static
+    - <<: *Linux-64bit-shared
+      compiler: clang-64bit-shared
+    - &Linux-32bit
+      compiler: gcc-32bit-static
+      addons: {apt: {sources: *default_sources, packages: [*linux_packages, g++-multilib, "libxrandr-dev:i386", "libglapi-mesa:i386", "libgl1-mesa-glx:i386", "libgl1-mesa-dev:i386", "libxext-dev:i386", "libxrender-dev:i386"]}}
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
+    - &Linux-32bit-shared
+      <<: *Linux-32bit
+      compiler: gcc-32bit-shared
+      env: LINUX=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
+    - <<: *Linux-32bit
+      compiler: clang-32bit-static
+    - <<: *Linux-32bit-shared
+      compiler: clang-32bit-shared
+    - &MinGW-64bit
+      compiler: x86_64-w64-mingw32-gcc-static
+      addons: {apt: {sources: *default_sources, packages: [*default_packages, gcc-mingw-w64-x86-64, g++-mingw-w64-x86-64, binutils-mingw-w64-x86-64]}}
+      env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC SF_DEFAULT=windows:Windows-64bit-STATIC.zip
+    - <<: *MinGW-64bit
+      compiler: x86_64-w64-mingw32-gcc-shared
+      env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED
+    - <<: *MinGW-64bit
+      compiler: x86_64-w64-mingw32-gcc-d3d9-static
+      env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_OPENGL=0
+    - <<: *MinGW-64bit
+      compiler: x86_64-w64-mingw32-gcc-d3d9-shared
+      env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_OPENGL=0
+    # Ubuntu 12.04 LTS does not have up-to-date D3D11 headers, disable the CI build jobs for D3D11 for now until Travis-CI upgrades their OS to 14.04 LTS or better
+    # <<: *MinGW-64bit
+    # compiler: x86_64-w64-mingw32-gcc-d3d11-static
+    # env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_D3D11=1
+    # <<: *MinGW-64bit
+    # compiler: x86_64-w64-mingw32-gcc-d3d11-shared
+    # env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_D3D11=1
+    - &MinGW-32bit
+      compiler: i686-w64-mingw32-gcc-static
+      addons: {apt: {sources: *default_sources, packages: [*default_packages, gcc-mingw-w64-i686, g++-mingw-w64-i686, binutils-mingw-w64-i686]}}
+      env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
+    - <<: *MinGW-32bit
+      compiler: i686-w64-mingw32-gcc-shared
+      env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
+    - <<: *MinGW-32bit
+      compiler: i686-w64-mingw32-gcc-d3d9-static
+      env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_OPENGL=0
+    - <<: *MinGW-32bit
+      compiler: i686-w64-mingw32-gcc-d3d9-shared
+      env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_OPENGL=0
+    # <<: *MinGW-32bit
+    # compiler: i686-w64-mingw32-gcc-d3d11-static
+    # env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_D3D11=1
+    # <<: *MinGW-32bit
+    # compiler: i686-w64-mingw32-gcc-d3d11-shared
+    # env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_D3D11=1
+before_script:
+  - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - if [ $RELEASE_TAG ] || ([ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]); then if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ]; then export SITE_UPDATE=1; fi; if [ "$CC" == "gcc" ] && ([ $RELEASE_TAG ] || echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi; fi
+  - if [ $LINUX ]; then if [ "$URHO3D_64BIT" == "0" ]; then export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu; else export DISPLAY=:99.0; bash -e /etc/init.d/xvfb start; fi; fi
+  - if [ $WINDOWS ]; then if [ "$URHO3D_64BIT" == "0" ]; then export ARCH=i686; else export ARCH=x86_64; fi && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
+  # MinGW package on Ubuntu 12.04 LTS does not come with d3dcompiler.h file which is required by our CI build with URHO3D_OPENGL=0.
+  # Temporarily workaround the problem by downloading the missing header from Ubuntu 14.04 LTS source package.
+  - if [ $URHO3D_OPENGL ]; then mkdir -p ../Build/{,generated/{UsingBuildTree,UsingSDK}/}include/Urho3D/ThirdParty && wget -P ../Build/include/Urho3D/ThirdParty http://bazaar.launchpad.net/~ubuntu-branches/ubuntu/trusty/mingw-w64/trusty/download/package-import%40ubuntu.com-20130624192537-vzn12bb7qd5w3iy8/d3dcompiler.h-20120402093420-bk10a737hzitlkgj-65/d3dcompiler.h && for d in UsingBuildTree UsingSDK; do bash -c "cd ../Build/generated/$d/include/Urho3D/ThirdParty && ln -s ../../../../../include/Urho3D/ThirdParty/d3dcompiler.h ."; done; fi
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH
+  # For some reason clang compiler toolchain installation in Travis CI VM does not have symlink in the ccache symlinks directory, so workaround it
+  - if [ "$CC"  == "clang" ]; then ln -s $(which ccache) $HOME/clang && ln -s $(which ccache) $HOME/clang++ && export PATH=$HOME:$PATH; fi
+  - rake ci_setup_cache
+script:
+  - rake ci
+  - if [ $SITE_UPDATE ]; then rake ci_site_update || ! [ $RELEASE_TAG ]; fi
+  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && if [ $LINUX ] && [ ! "$URHO3D_64BIT" == "0" ]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi || ! [ $RELEASE_TAG ]; fi
+after_script:
+  - rake ci_teardown_cache
+  - if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_create_mirrors; fi
+notifications: {email: {on_success: never, on_failure: change}}
+
+---
+
+branch: {name: Coverity-Scan, active: no, description: For Travis CI - switch CI build to enable Coverity Scan addon.}
 language: cpp
 compiler: gcc
 cache: ccache
 sudo: false
 addons:
   apt:
-    sources:
-    - george-edison55-precise-backports
-    - kubuntu-backports
-    - ubuntu-toolchain-r-test
-    packages:
-    - cmake
-    - doxygen
-    - graphviz
-    - g++-4.9
-    - libasound2-dev
+    packages: libasound2-dev
+  coverity_scan:
+    project:
+      name: urho3d/Urho3D
+      description: Urho3D is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE and Horde3D.
+    notification_email: urho3d.travis.ci@gmail.com
+    build_command_prepend: rake cmake URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 URHO3D_SAMPLES=1 URHO3D_TOOLS=1 URHO3D_EXTRAS=1 URHO3D_DATABASE_SQLITE=1 URHO3D_LIB_TYPE=SHARED
+    build_command: rake make numjobs=4
+    branch_pattern: .*Coverity-Scan$
 env:
   global:
-  - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
-  - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
-  - NUMJOBS=3
-  - HTML5=1
-  - EMSCRIPTEN_SHARE_DATA=1
-  - USE_CCACHE=1
-  - CCACHE_SLOPPINESS=pch_defines,time_macros
-  - CCACHE_COMPRESS=1
-  - CCACHE_MAXSIZE=100M
+    - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
+    - secure: itgWNvH4Zj0hQpkUctVxMwJwVX3hIluVuvUbzO2XG7dxQaMMfcLGwVKgq8X1HOf4dJCUv5WL0jcSMWXbdc8tvqQJwBb5R2Z2JJYpTTAgtmLy7TNn6zgetZtGrYEJuTlxSItbS/NF4iPDO25ih7j5Ma0ffXRpBnlURQaytfYfFaQ=
+    - LINUX=1
+    - USE_CCACHE=1
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
+before_script:
+  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH
+  - rake ci_setup_cache
+script: true
+after_script: rake ci_teardown_cache
+
+---
+
+branch: {name: Android-CI, active: yes, description: For Travis CI - switch CI build to use Android build environment.}
+language: android
+android: {components: [build-tools-22.0.1]}
+cache: {directories: $HOME/.ccache}
+sudo: false
+addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz, libasound2-dev, g++-multilib]}}
+env:
+  global:
+    - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
+    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
+    - NUMJOBS=4
+    - ANDROID=1
+    - ANDROID_TMP=~/tmp
+    - PACKAGE_JOB_END=9
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
+matrix:
+  fast_finish: true
+  include:
+    # x86 and x86_64 emulation currently requires hardware acceleration which Travis-CI cannot provide, so skip AVD for now
+    # env: API=21 ABI=x86_64      URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21 AVD=test_21_x86_64 USE_CCACHE=2
+    # env: API=21 ABI=x86         URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21 AVD=test_21_x86       USE_CCACHE=2
+
+    # Travis CI does not create one cache per job at the moment, so workaround it to have still high cache hit/miss ratio
+    # We use jdk key as the cache storage differentiator! Our library is compiled using NDK so it should not be affected by JDK version
+    # We have to ensure those jobs with AVD test are run using the correct JDK version, i.e. Oracle JDK 7 which is the default
+    # We can only cache 5 jobs due to limited supply of valid JDK versions when using Travis CI native ccache support
+    # The other 5 jobs are cached using our own cache store (originally designed for Travis CI legacy build infra)
+    - &cache1
+      jdk: oraclejdk8
+      env: API=21 ABI=x86_64      URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21     USE_CCACHE=1
+    - &alternative-cache
+      cache: false
+      env: API=21 ABI=x86_64      URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21     USE_CCACHE=2
+    - &cache2
+      jdk: openjdk7
+      env: API=21 ABI=x86         URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86-android-21        USE_CCACHE=1
+    - <<: *alternative-cache
+      env: API=21 ABI=x86         URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21        USE_CCACHE=2
+    - &cache3
+      jdk: openjdk6
+      env: API=21 ABI=arm64-v8a   URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1                       USE_CCACHE=1
+    - <<: *alternative-cache
+      env: API=21 ABI=arm64-v8a   URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1                       USE_CCACHE=2
+    - <<: *alternative-cache
+      env: API=21 ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC                                       USE_CCACHE=2
+    - &cache4
+      jdk: oraclejdk7
+      env: API=21 ABI=armeabi-v7a URHO3D_LIB_TYPE=SHARED AVD=test_21_armeabi-v7a               USE_CCACHE=1
+    - <<: *alternative-cache
+      env: API=19 ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC                                       USE_CCACHE=2
+    - &cache5
+      env: API=19 ABI=armeabi-v7a URHO3D_LIB_TYPE=SHARED AVD=test_19_armeabi-v7a               USE_CCACHE=1
+before_script:
+  - git clone --depth 1 --branch strip https://github.com/urho3d/android-ndk.git && export ANDROID_NDK=$(pwd)/android-ndk && if ([ $AVD ] || [ $PACKAGE_UPLOAD ]) && [ $INSTALL ]; then (while :; do echo 'y'; sleep 1; done) |android update sdk --no-ui --all --filter $INSTALL; fi
+  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
+  - export COMMIT_MESSAGE=$(git log --format=%B -n1 $TRAVIS_COMMIT)
+  - if [ ${TRAVIS_JOB_NUMBER##*.} -lt $PACKAGE_JOB_END ] && ([ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
+  - if [ "$ABI" == "x86_64" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/x86_64-4.9/prebuilt/linux-x86_64/bin C_PREFIX=x86_64-linux-android; fi
+  - if [ "$ABI" == "x86" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/x86-4.9/prebuilt/linux-x86_64/bin C_PREFIX=i686-linux-android; fi
+  - if [ "$ABI" == "arm64-v8a" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin C_PREFIX=aarch64-linux-android; fi
+  - if [ "$ABI" == "armeabi-v7a" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin C_PREFIX=arm-linux-androideabi; fi
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$C_PATH:$PATH; for f in $C_PATH/$C_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
+  - rake ci_setup_cache
+script:
+  - rake ci
+  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload || ! [ $RELEASE_TAG ]; fi
+after_script: rake ci_teardown_cache
+
+---
+
+branch: {name: RPI-CI, active: yes, description: For Travis CI - switch CI build to use Raspberry-Pi build environment.}
+language: cpp
+cache: ccache
+sudo: false
+addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz, libasound2-dev, g++-multilib, rpm]}}
+env:
+  global:
+    - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
+    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
+    - NUMJOBS=4
+    - RPI=1
+    - USE_CCACHE=1
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
+matrix:
+  fast_finish: true
+  include:
+    - compiler: gcc-armeabi-v6-static
+      env: URHO3D_LIB_TYPE=STATIC
+    - compiler: gcc-armeabi-v6-shared
+      env: URHO3D_LIB_TYPE=SHARED
+    - compiler: gcc-armeabi-v7a-static
+      env: URHO3D_LIB_TYPE=STATIC RPI_ABI=armeabi-v7a
+    - compiler: gcc-armeabi-v7a-shared
+      env: URHO3D_LIB_TYPE=SHARED RPI_ABI=armeabi-v7a
+before_script:
+  - git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export RPI_PREFIX=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf && git clone --depth 1 --branch strip https://github.com/urho3d/rpi-sysroot.git && export RPI_SYSROOT=$(pwd)/rpi-sysroot && for f in $RPI_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
+  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - if [ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):${RPI_PREFIX%/*}:$PATH
+  - rake ci_setup_cache
+script:
+  - rake ci
+  - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload || ! [ $RELEASE_TAG ]; fi
+after_script: rake ci_teardown_cache
+
+---
+
+branch: {name: OSX-CI, active: yes, description: For Travis CI - switch CI build to use OS X build environment.}
+language: objective-c
+env:
+  global:
+    - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
+    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
+    - NUMJOBS=3
+    - OSX=1
+    - USE_CCACHE=2
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=300M
   matrix:
-  - URHO3D_LIB_TYPE=STATIC
+    - MAKEFILE=1    URHO3D_LIB_TYPE=STATIC
+    - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED
+    - MAKEFILE=1    URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
+    - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
+    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.8 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
+    - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.8
+    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.8 URHO3D_64BIT=0
+    - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.8 URHO3D_64BIT=0
+    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=7.0  URHO3D_64BIT=0
+    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=7.0
 matrix:
   fast_finish: true
 before_script:
-- export TRAVIS_COMMIT=$TRAVIS_COMMIT~
-- export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG
-  =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
-- export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
-- if [ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE
-  |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
-- export DISPLAY=:99.0; bash -e /etc/init.d/xvfb start
-- git clone --depth 1 https://github.com/urho3d/emscripten-sdk.git && emscripten-sdk/emsdk
-  activate --build=Release sdk-master-64bit && source emscripten-sdk/emsdk_env.sh
-- export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH; for f in $EMSCRIPTEN/{emcc,em++};
-  do touch -d "2015-09-01 00:00:00 +0800" $f; done
-- rake ci_setup_cache
+  - if [ $IOS ]; then export CI_START_TIME=$(date +%s); fi
+  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - if [ $XCODE ] && ([ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
+  - if [ $XCODE ]; then rvm gemset use global && travis_retry gem install xcpretty; fi
+  - travis_retry brew update >/dev/null && travis_retry brew install ccache
+  - if [ $PACKAGE_UPLOAD ]; then travis_retry brew install doxygen graphviz; fi
+  - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
+  - if [ $XCODE ]; then cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && ln -s ccache $path; done; fi
+  - rake ci_setup_cache
 script:
   - rake ci
   - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload || ! [ $RELEASE_TAG ]; fi
