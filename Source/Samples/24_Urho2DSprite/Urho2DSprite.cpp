@@ -126,9 +126,10 @@ void Urho2DSprite::CreateScene()
     SharedPtr<Node> spriteNode(scene_->CreateChild("AnimatedSprite2D"));
     spriteNode->SetPosition(Vector3(0.0f, 0.0f, -1.0f));
 
-    AnimatedSprite2D* animatedSprite = spriteNode->CreateComponent<AnimatedSprite2D>();
+    AnimatedSprite2D* animatedSprite = spriteNode->CreateComponent<AnimatedSprite2D>();    
     // Set animation
-    animatedSprite->SetAnimation(animationSet, "idle");
+    animatedSprite->SetAnimationSet(animationSet);
+    animatedSprite->SetAnimation("idle");
 }
 
 void Urho2DSprite::CreateInstructions()

@@ -89,7 +89,8 @@ void Urho2DSpriterAnimation::CreateScene()
 
     spriterNode_ = scene_->CreateChild("SpriterAnimation");
     AnimatedSprite2D* spriterAnimatedSprite = spriterNode_->CreateComponent<AnimatedSprite2D>();
-    spriterAnimatedSprite->SetAnimation(spriterAnimationSet, spriterAnimationSet->GetAnimation(spriterAnimationIndex_));
+    spriterAnimatedSprite->SetAnimationSet(spriterAnimationSet);
+    spriterAnimatedSprite->SetAnimation(spriterAnimationSet->GetAnimation(spriterAnimationIndex_));
 }
 
 void Urho2DSpriterAnimation::CreateInstructions()

@@ -100,56 +100,13 @@ void AnimatedSprite2D::OnSetEnabled()
     }
 }
 
-void AnimatedSprite2D::SetSpeed(float speed)
-{
-    speed_ = speed;
-    MarkNetworkUpdate();
-}
-
-void AnimatedSprite2D::SetEntity(const String& entity)
-{
-    if (entity == entity_)
-        return;
-
-    entity_ = entity;
-
-#ifdef URHO3D_SPINE
-    if (skeleton_)
-        spSkeleton_setSkinByName(skeleton_, entity_.CString());
-#endif
-    if (spriterInstance_)
-        spriterInstance_->SetEntity(entity_.CString());    
-}
-
-void AnimatedSprite2D::SetAnimation(AnimationSet2D* animationSet, const String& name, LoopMode2D loopMode)
-{
-    SetAnimationSet(animationSet);
-    SetAnimation(name, loopMode);
-}
-
-void AnimatedSprite2D::SetAnimation(const String& name, LoopMode2D loopMode)
-{
-    animationName_ = name;
-    loopMode_ = loopMode;
-
-    if (!animationSet_ || !animationSet_->HasAnimation(animationName_))
-        return;
-
-#ifdef URHO3D_SPINE
-    if (skeleton_)
-        SetSpineAnimation();    
-#endif
-    if (spriterInstance_)
-        SetSpriterAnimation();
-}
-
 void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
 {
     if (animationSet == animationSet_) 
         return;
 
     Dispose();
-    
+
     animationSet_ = animationSet;    
     if (!animationSet_)
         return;
@@ -168,6 +125,7 @@ void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
 
         if (skeleton_->data->skinsCount > 0)
         {
+            // If entity is empty use first skin in spine
             if (entity_.Empty())
                 entity_ = skeleton_->data->skins[0]->name;
             spSkeleton_setSkinByName(skeleton_, entity_.CString());
@@ -177,11 +135,52 @@ void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
     }
 #endif
     if (animationSet_->GetSpriterData())
+    {
         spriterInstance_ = new Spriter::SpriterInstance(animationSet_->GetSpriterData());
+
+        if (animationSet_->GetSpriterData()->entities_.empty())
+        {
+            // If entity is empty use first entity in spriter
+            if (entity_.Empty())
+                entity_ = animationSet_->GetSpriterData()->entities_[0]->name_.c_str();
+            spriterInstance_->SetEntity(entity_.CString());
+        }
+    }
 
     // Clear animation name
     animationName_.Clear();
     loopMode_ = LM_DEFAULT;
+}
+
+void AnimatedSprite2D::SetEntity(const String& entity)
+{
+    if (entity == entity_)
+        return;
+
+    entity_ = entity;
+
+#ifdef URHO3D_SPINE
+    if (skeleton_)
+        spSkeleton_setSkinByName(skeleton_, entity_.CString());
+#endif
+    if (spriterInstance_)
+        spriterInstance_->SetEntity(entity_.CString());
+}
+
+void AnimatedSprite2D::SetAnimation(const String& name, LoopMode2D loopMode)
+{
+    animationName_ = name;
+    loopMode_ = loopMode;
+
+    if (!animationSet_ || !animationSet_->HasAnimation(animationName_))
+        return;
+
+#ifdef URHO3D_SPINE
+    if (skeleton_)
+        SetSpineAnimation();    
+#endif
+    if (spriterInstance_)
+        SetSpriterAnimation();
 }
 
 void AnimatedSprite2D::SetLoopMode(LoopMode2D loopMode)
@@ -189,14 +188,15 @@ void AnimatedSprite2D::SetLoopMode(LoopMode2D loopMode)
     loopMode_ = loopMode;
 }
 
+void AnimatedSprite2D::SetSpeed(float speed)
+{
+    speed_ = speed;
+    MarkNetworkUpdate();
+}
+
 AnimationSet2D* AnimatedSprite2D::GetAnimationSet() const
 {
     return animationSet_;
-}
-
-Node* AnimatedSprite2D::GetRootNode() const
-{
-    return 0;
 }
 
 void AnimatedSprite2D::SetAnimationSetAttr(const ResourceRef& value)

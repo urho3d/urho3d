@@ -67,31 +67,27 @@ public:
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
 
-    /// Set speed.
-    void SetSpeed(float speed);
-    /// Set entity name (skin name for spine, entity name for spriter).
-    void SetEntity(const String& name);
-    /// Set animation by animation set, name and loop mode.
-    void SetAnimation(AnimationSet2D* animationSet, const String& name, LoopMode2D loopMode = LM_DEFAULT);
-    /// Set animation by name and loop mode.
-    void SetAnimation(const String& name, LoopMode2D loopMode = LM_DEFAULT);
     /// Set animation set.
     void SetAnimationSet(AnimationSet2D* animationSet);
+    /// Set entity name (skin name for spine, entity name for spriter).
+    void SetEntity(const String& name);
+    /// Set animation by name and loop mode.
+    void SetAnimation(const String& name, LoopMode2D loopMode = LM_DEFAULT);
     /// Set loop mode.
     void SetLoopMode(LoopMode2D loopMode);
+    /// Set speed.
+    void SetSpeed(float speed);
 
-    /// Return speed.
-    float GetSpeed() const { return speed_; }
+    /// Return animation.
+    AnimationSet2D* GetAnimationSet() const;
     /// Return entity name.
     const String& GetEntity() const { return entity_; }
     /// Return animation name.
     const String& GetAnimation() const { return animationName_; }
-    /// Return animation.
-    AnimationSet2D* GetAnimationSet() const;
     /// Return loop mode.
     LoopMode2D GetLoopMode() const { return loopMode_; }
-    /// Return root node.
-    Node* GetRootNode() const;
+    /// Return speed.
+    float GetSpeed() const { return speed_; }
 
     /// Set animation set attribute.
     void SetAnimationSetAttr(const ResourceRef& value);

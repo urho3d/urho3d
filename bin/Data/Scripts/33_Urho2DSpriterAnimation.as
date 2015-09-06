@@ -54,7 +54,8 @@ void CreateScene()
 
     spriterNode = scene_.CreateChild("SpriterAnimation");
     AnimatedSprite2D@ spriterAnimatedSprite = spriterNode.CreateComponent("AnimatedSprite2D");
-    spriterAnimatedSprite.SetAnimation(spriterAnimationSet, spriterAnimationSet.GetAnimation(spriterAnimationIndex), LM_FORCE_LOOPED);
+    spriterAnimatedSprite.animationSet = spriterAnimationSet;
+    spriterAnimatedSprite.SetAnimation(spriterAnimationSet.GetAnimation(spriterAnimationIndex), LM_FORCE_LOOPED);
 }
 
 void CreateInstructions()
