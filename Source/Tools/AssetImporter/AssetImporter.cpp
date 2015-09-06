@@ -1082,13 +1082,22 @@ Vector3 GetProjectedAxis(Node* root, Node* n, const Vector3& axis)
 
 void PostProcessAnimation(Animation* outAnim, const String& animOutName)
 {
-    if (!rootMotionFlag_ && !moveToOriginFlag_)
-        return;
-
     AnimationTrack* translateTrack = const_cast<AnimationTrack*>(outAnim->GetTrack(translateBone_));
     AnimationTrack* rotateTrack = const_cast<AnimationTrack*>(outAnim->GetTrack(rotateBone_));
 
     if (!translateTrack && !rotateTrack)
+        return;
+
+    float distanceToOrign = 0.0f;
+    if (translateTrack)
+    {
+        Vector3 pos = translateTrack->keyFrames_[0].position_;
+        pos.y_ = 0;
+        distanceToOrign = pos.Length();
+        PrintLine("distanceToOrign = " + String(distanceToOrign));
+    }
+
+    if (!rootMotionFlag_ && !moveToOriginFlag_)
         return;
 
     SharedPtr<Scene> animScene(new Scene(context_));
@@ -1129,7 +1138,6 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
     PrintLine("pelvisOrign=" + String(pelvisOrign) + " pelvis=" + pelvisWS.ToString() + " left_foot=" + lfWS.ToString() + " right_foot=" + rfWS.ToString());
 
     Quaternion firstKeyInvRot;
-
     // pre process rotate key frames
     if ((moveToOriginFlag_ & kMotionYaw_Rotation) && rotateTrack)
     {
@@ -1162,7 +1170,6 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
             PrintLine("RotateOrigin change pos from " + oldPos.ToString() + " to " + kf.position_.ToString());
         }
     }
-
 
     // process rotate key frames first
     if ((rootMotionFlag_ & kMotionYaw_Rotation) && rotateTrack)
@@ -1200,6 +1207,7 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
         translateNode->SetPosition(firstKeyPos);
         Vector3 currentWS = translateNode->GetWorldPosition();
         Vector3 oldWS = currentWS;
+
         if (moveToOriginFlag_ & kMotionX_Translation)
             currentWS.x_ = pelvisOrign.x_;
         if (moveToOriginFlag_ & kMotionY_Translation)
@@ -1291,6 +1299,9 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
             mkXML.SetFloat("rotation", rotation);
             PrintLine("motion frame=" + String(i) + " translation=" + String(mk.translation_) + " rotation=" + String(mk.rotation_));
         }
+
+        XMLElement root1 = outMotion.CreateRoot("property");
+        root1.SetFloat("distanceToOrign", distanceToOrign);
 
         File outFile(context_);
         String motionOutName = GetPath(animOutName) + GetFileName(animOutName) + "_motion.xml";
