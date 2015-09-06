@@ -77,6 +77,7 @@ void AnimatedSprite2D::RegisterObject(Context* context)
     COPY_BASE_ATTRIBUTES(StaticSprite2D);
     REMOVE_ATTRIBUTE("Sprite");
     ACCESSOR_ATTRIBUTE("Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Entity", GetEntity, SetEntity, String, String::EMPTY, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Animation Set", GetAnimationSetAttr, SetAnimationSetAttr, ResourceRef,
         ResourceRef(AnimatedSprite2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Animation", GetAnimation, SetAnimationAttr, String, String::EMPTY, AM_DEFAULT);
@@ -103,6 +104,21 @@ void AnimatedSprite2D::SetSpeed(float speed)
 {
     speed_ = speed;
     MarkNetworkUpdate();
+}
+
+void AnimatedSprite2D::SetEntity(const String& entity)
+{
+    if (entity == entity_)
+        return;
+
+    entity_ = entity;
+
+#ifdef URHO3D_SPINE
+    if (skeleton_)
+        spSkeleton_setSkinByName(skeleton_, entity_.CString());
+#endif
+    if (spriterInstance_)
+        spriterInstance_->SetEntity(entity_.CString());    
 }
 
 void AnimatedSprite2D::SetAnimation(AnimationSet2D* animationSet, const String& name, LoopMode2D loopMode)
@@ -149,6 +165,14 @@ void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
         skeleton_ = spSkeleton_create(skeletonData);
         skeleton_->flipX = flipX_;
         skeleton_->flipY = flipY_;
+
+        if (skeleton_->data->skinsCount > 0)
+        {
+            if (entity_.Empty())
+                entity_ = skeleton_->data->skins[0]->name;
+            spSkeleton_setSkinByName(skeleton_, entity_.CString());
+        }
+
         spSkeleton_updateWorldTransform(skeleton_);
     }
 #endif
@@ -395,8 +419,11 @@ void AnimatedSprite2D::SetSpriterAnimation()
     if (!spriterInstance_)
         spriterInstance_ = new Spriter::SpriterInstance(animationSet_->GetSpriterData());
 
-    // Use first entity
-    if (!spriterInstance_->SetEntity(0))
+    // Use entity is empty first entity
+    if (entity_.Empty())
+        entity_ = animationSet_->GetSpriterData()->entities_[0]->name_.c_str();
+
+    if (!spriterInstance_->SetEntity(entity_.CString()))
     {
         LOGERROR("Set entity failed");
         return;

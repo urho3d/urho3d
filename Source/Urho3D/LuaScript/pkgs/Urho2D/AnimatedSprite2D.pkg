@@ -10,17 +10,20 @@ enum LoopMode2D
 class AnimatedSprite2D : StaticSprite2D
 {
     void SetSpeed(float speed);
+    void SetEntity(const String entity);
     void SetAnimation(AnimationSet2D* animationSet, const String name, LoopMode2D loopMode = LM_DEFAULT);
     void SetAnimation(const String name, LoopMode2D loopMode = LM_DEFAULT);
     void SetAnimationSet(AnimationSet2D* animationSet);
     void SetLoopMode(LoopMode2D loopMode);
 
     float GetSpeed() const;
+    const String GetEntity() const;
     const String GetAnimation() const;
     AnimationSet2D* GetAnimationSet() const;
     LoopMode2D GetLoopMode() const;
 
     tolua_property__get_set float speed;
+    tolua_property__get_set String entity;
     tolua_property__get_set String animation;
     tolua_property__get_set AnimationSet2D* animationSet;
     tolua_property__get_set LoopMode2D loopMode;

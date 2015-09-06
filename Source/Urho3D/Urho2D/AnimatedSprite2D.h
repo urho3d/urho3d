@@ -69,6 +69,8 @@ public:
 
     /// Set speed.
     void SetSpeed(float speed);
+    /// Set entity name (skin name for spine, entity name for spriter).
+    void SetEntity(const String& name);
     /// Set animation by animation set, name and loop mode.
     void SetAnimation(AnimationSet2D* animationSet, const String& name, LoopMode2D loopMode = LM_DEFAULT);
     /// Set animation by name and loop mode.
@@ -80,6 +82,8 @@ public:
 
     /// Return speed.
     float GetSpeed() const { return speed_; }
+    /// Return entity name.
+    const String& GetEntity() const { return entity_; }
     /// Return animation name.
     const String& GetAnimation() const { return animationName_; }
     /// Return animation.
@@ -126,6 +130,8 @@ protected:
 
     /// Speed.
     float speed_;
+    /// Entity name.
+    String entity_;
     /// Animation set.
     SharedPtr<AnimationSet2D> animationSet_;
     /// Animation name.

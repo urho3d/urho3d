@@ -148,6 +148,8 @@ static void RegisterAnimatedSprite2D(asIScriptEngine* engine)
     RegisterStaticSprite2D<AnimatedSprite2D>(engine, "AnimatedSprite2D");
     engine->RegisterObjectMethod("AnimatedSprite2D", "void set_speed(float)", asMETHOD(AnimatedSprite2D, SetSpeed), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "float get_speed() const", asMETHOD(AnimatedSprite2D, GetSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "void set_entity(const String&in)", asMETHOD(AnimatedSprite2D, SetEntity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite2D", "const String& get_entity() const", asMETHOD(AnimatedSprite2D, GetEntity), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "void SetAnimation(AnimationSet2D@+, const String&, LoopMode2D loopMode=LM_DEFAULT)", asMETHODPR(AnimatedSprite2D, SetAnimation, (AnimationSet2D*, const String&, LoopMode2D), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "void SetAnimation(const String&, LoopMode2D loopMode=LM_DEFAULT)", asMETHODPR(AnimatedSprite2D, SetAnimation, (const String&, LoopMode2D), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedSprite2D", "void set_animation(const String&)", asMETHODPR(AnimatedSprite2D, SetAnimationAttr, (const String&), void), asCALL_THISCALL);
