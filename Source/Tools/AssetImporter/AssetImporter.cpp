@@ -1151,8 +1151,6 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
         }
     }
 
-    // firstKeyInvRot = Quaternion(0, -180, 0);
-
     // pre process translate key frames
     if ((moveToOriginFlag_ & kMotionYaw_Rotation) && translateTrack)
     {
@@ -1160,7 +1158,6 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
         {
             AnimationKeyFrame& kf = translateTrack->keyFrames_[i];
             Vector3 oldPos = kf.position_;
-            // translateNode->SetTransform(kf.position_, )
             kf.position_ = firstKeyInvRot * oldPos;
             PrintLine("RotateOrigin change pos from " + oldPos.ToString() + " to " + kf.position_.ToString());
         }
