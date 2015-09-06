@@ -1091,9 +1091,7 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
     float distanceToOrign = 0.0f;
     if (translateTrack)
     {
-        Vector3 pos = translateTrack->keyFrames_[0].position_;
-        pos.y_ = 0;
-        distanceToOrign = pos.Length();
+        distanceToOrign = translateTrack->keyFrames_[0].position_.z_; // hack!!!!
         PrintLine("distanceToOrign = " + String(distanceToOrign));
     }
 
@@ -1137,23 +1135,17 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
     pelvisOrign.y_ = Max(diff1, diff2);
     PrintLine("pelvisOrign=" + String(pelvisOrign) + " pelvis=" + pelvisWS.ToString() + " left_foot=" + lfWS.ToString() + " right_foot=" + rfWS.ToString());
 
-    Quaternion firstKeyInvRot;
+    // ==============================================================
     // pre process rotate key frames
     if ((moveToOriginFlag_ & kMotionYaw_Rotation) && rotateTrack)
     {
-        Quaternion firstKeyRotation = rotateTrack->keyFrames_[0].rotation_;
-        rotateNode->SetRotation(firstKeyRotation);
-        Quaternion q;
-        q.FromRotationTo(Vector3::RIGHT, GetProjectedAxis(n, rotateNode, pelvisRightAxis));
-        PrintLine("first key rotation in xz plane = " + q.EulerAngles().ToString());
-        firstKeyInvRot = q.Inverse();
-
+        Quaternion q = Quaternion(0, -180, 0); // hack !!!
         for (unsigned i=0; i<rotateTrack->keyFrames_.Size(); ++i)
         {
             AnimationKeyFrame& kf = rotateTrack->keyFrames_[i];
             rotateNode->SetRotation(kf.rotation_);
             Quaternion wq = rotateNode->GetWorldRotation();
-            wq = q.Inverse() * wq;
+            wq = q * wq;
             rotateNode->SetWorldRotation(wq);
             kf.rotation_ = rotateNode->GetRotation();
         }
@@ -1166,8 +1158,9 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
         {
             AnimationKeyFrame& kf = translateTrack->keyFrames_[i];
             Vector3 oldPos = kf.position_;
-            kf.position_ = firstKeyInvRot * oldPos;
-            PrintLine("RotateOrigin change pos from " + oldPos.ToString() + " to " + kf.position_.ToString());
+            Quaternion q = Quaternion(0, -180, 0);
+            kf.position_ = q * oldPos;
+            // PrintLine("RotateOrigin change pos from " + oldPos.ToString() + " to " + kf.position_.ToString());
         }
     }
 
@@ -1225,7 +1218,7 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
             AnimationKeyFrame& kf = translateTrack->keyFrames_[i];
             Vector3 old = kf.position_;
             kf.position_ += originDiffLS;
-            PrintLine("MoveToOrigin from " + old.ToString() + " to " + kf.position_.ToString());
+            // PrintLine("MoveToOrigin from " + old.ToString() + " to " + kf.position_.ToString());
         }
     }
 
@@ -1264,7 +1257,7 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
 
             translateNode->SetWorldPosition(t2_ws);
             Vector3 local_pos = translateNode->GetPosition();
-            PrintLine("local position from " + String(kf.position_) + " to " + String(local_pos));
+            // PrintLine("local position from " + String(kf.position_) + " to " + String(local_pos));
             kf.position_ = local_pos;
         }
     }
@@ -1300,7 +1293,7 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
                 }
             }
             mkXML.SetFloat("rotation", rotation);
-            PrintLine("motion frame=" + String(i) + " translation=" + String(mk.translation_) + " rotation=" + String(mk.rotation_));
+            // PrintLine("motion frame=" + String(i) + " translation=" + String(mk.translation_) + " rotation=" + String(mk.rotation_));
         }
 
         child2.SetFloat("distanceToOrign", distanceToOrign);
