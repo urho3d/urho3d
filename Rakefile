@@ -161,8 +161,8 @@ task :make do
   system "cd \"#{build_tree}\" && #{ccache_envvar} cmake --build . #{cmake_build_options} -- #{build_options} #{filter}" or abort
 end
 
-# Usage: rake android [parameter='--es pickedLibrary Urho3DPlayer'] [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='sleep 30'] [api=19] [abi=armeabi-v7a] [avd=test_#{api}_#{abi}] [retries=10] [retry_interval=10]
-desc 'Test run already installed APK in Android (virtual) device, default to Urho3D Samples APK if no parameter is given'
+# Usage: rake android [parameter='--es pickedLibrary Urho3DPlayer'] [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='sleep 30'] [api=19] [abi=armeabi-v7a] [avd=test_#{api}_#{abi}] [retries=10] [retry_interval=10] [install]
+desc 'Test run APK in Android (virtual) device, default to Urho3D Samples APK if no parameter is given'
 task :android do
   parameter = ENV['parameter'] || '--es pickedLibrary Urho3DPlayer'
   intent = ENV['intent'] || '.SampleLauncher'
@@ -174,8 +174,23 @@ task :android do
   avd = ENV['avd'] || "test_#{api}_#{abi}"
   retries = ENV['retries'] || 10 # minutes
   retry_interval = ENV['retry_interval'] || 10 # seconds
+  build_tree = ENV['android_build_tree'] || ENV['build_tree'] || '../android-Build'
+  install = false
+  ARGV.each { |option|
+    task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
+    case option
+    when 'install'
+      install = true
+    end
+  }
   android_prepare_device api, abi, avd or abort 'Failed to prepare Android (virtual) device for test run'
+  if install
+    system "cd \"#{build_tree}\" && android update project -p . -t $(android list target |grep android-#{api} |cut -d ' ' -f2) && ant debug" or abort 'Failed to generate APK'
+  end
   android_wait_for_device retries, retry_interval or abort 'Failed to start Android (virtual) device'
+  if install
+    system "cd \"#{build_tree}\" && ant -Dadb.device.arg='-s #{$specific_device}' installd" or abort 'Failed to install APK'
+  end
   android_test_run parameter, intent, package, success_indicator, payload or abort "Failed to test run #{package}/#{intent}, make sure the APK has been installed"
 end
 
