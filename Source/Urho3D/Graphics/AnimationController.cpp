@@ -127,7 +127,7 @@ void AnimationController::Update(float timeStep)
             }
 
             // Remove if weight zero and target weight zero
-            if (state->GetWeight() == 0.0f && (targetWeight == 0.0f || fadeTime == 0.0f))
+            if (state->GetWeight() == 0.0f && (targetWeight == 0.0f || fadeTime == 0.0f) && i->removeOnCompletion_)
                 remove = true;
         }
 
@@ -360,6 +360,19 @@ bool AnimationController::SetWeight(const String& name, float weight)
     ++animations_[index].setWeightRev_;
     MarkNetworkUpdate();
     return true;
+}
+
+bool AnimationController::SetRemoveOnCompletion(const String& name, bool removeOnCompletion)
+{
+    unsigned index;
+    AnimationState* state;
+    FindAnimation(name, index, state);
+    if (index == M_MAX_UNSIGNED || !state)
+        return false;
+
+    animations_[index].removeOnCompletion_ = removeOnCompletion;
+    MarkNetworkUpdate();
+    return true;    
 }
 
 bool AnimationController::SetLooped(const String& name, bool enable)
