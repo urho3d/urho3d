@@ -2356,8 +2356,6 @@ An %Image layer node or an %Object layer node are accessible using \ref TileMapL
 
 Tiled \ref TileMapObject2D "objects" are wire shapes (Rectangle, Ellipse, Polygon, Polyline) and sprites (Tile) that are freely positionable in the tile map.
 
-IMPORTANT: make sure that 'Rectangle' and 'Ellipse' objects' size is not zero, otherwise your whole scene won't render and you won't have any clue to debug (this is due to the fact that 'width' and 'height' fields are not saved in the tmx file when their value is zero).
-
 Accessing Tiled objects : from a \ref TileMapLayer2D "TileMapLayer2D layer", objects are accessed by their index using \ref TileMapLayer2D::GetObject "GetObject()". \ref TileMapLayer2D::GetNumObjects "GetNumObjects()" returns the number of objects contained in the object layer (tile and image layers will return 0 as they don't hold objects).
 
 Use \ref TileMapObject2D::GetObjectType "GetObjectType()" to get the nature of the selected object (TileMapObjectType2D: OT_RECTANGLE for Rectangle, OT_ELLIPSE for Ellipse, OT_POLYGON for Polygon, OT_POLYLINE for PolyLine, OT_TILE for Tile and OT_INVALID if not a valid object).
