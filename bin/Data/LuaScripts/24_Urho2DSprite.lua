@@ -102,7 +102,8 @@ function CreateScene()
 
     local animatedSprite = spriteNode:CreateComponent("AnimatedSprite2D")
     -- Set animation
-    animatedSprite:SetAnimation(animationSet, "idle")
+    animatedSprite.animationSet = animationSet
+    animatedSprite.animation = "idle"
 end
 
 function CreateInstructions()
