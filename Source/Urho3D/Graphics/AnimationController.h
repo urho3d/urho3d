@@ -127,7 +127,7 @@ public:
     bool SetSpeed(const String& name, float speed);
     /// Set animation autofade at end (non-looped animations only.) Zero time disables. Return true on success.
     bool SetAutoFade(const String& name, float fadeOutTime);
-    /// Set whether an animation auto-removes on completion
+    /// Set whether an animation auto-removes on completion.
     bool SetRemoveOnCompletion(const String& name, bool removeOnCompletion);
 
     /// Return whether an animation is active. Note that non-looping animations that are being clamped at the end also return true.
@@ -160,6 +160,8 @@ public:
     float GetFadeTime(const String& name) const;
     /// Return animation autofade time.
     float GetAutoFade(const String& name) const;
+    /// Return whether animation auto-removes on completion, or false if no such animation.
+    bool GetRemoveOnCompletion(const String& name) const;
     /// Find an animation state by animation name.
     AnimationState* GetAnimationState(const String& name) const;
     /// Find an animation state by animation name hash
