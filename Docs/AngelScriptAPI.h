@@ -195,7 +195,6 @@ bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetAnimation(AnimationSet2D, const String&, LoopMode2D = LM_DEFAULT);
 void SetAnimation(const String&, LoopMode2D = LM_DEFAULT);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
@@ -228,6 +227,7 @@ float drawDistance;
 bool enabled;
 /* readonly */
 bool enabledEffective;
+String entity;
 bool flipX;
 bool flipY;
 Vector2 hotSpot;
@@ -305,22 +305,6 @@ StringHash type;
 String typeName;
 /* readonly */
 uint useTimer;
-/* readonly */
-int weakRefs;
-};
-
-class Animation2D
-{
-
-// Properties:
-/* readonly */
-float length;
-/* readonly */
-bool looped;
-/* readonly */
-String name;
-/* readonly */
-int refs;
 /* readonly */
 int weakRefs;
 };
@@ -417,8 +401,7 @@ int weakRefs;
 class AnimationSet2D
 {
 // Methods:
-Animation2D GetAnimation(const String&) const;
-Animation2D GetAnimation(uint) const;
+String GetAnimation(uint) const;
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
