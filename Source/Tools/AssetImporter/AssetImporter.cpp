@@ -1280,23 +1280,53 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
         }
     }
 
+    Quaternion firstKeyRot;
+    if (rotateTrack)
+    {
+        Node* preRotateNode = n->GetChild(preRotateBone_, true);
+        Quaternion preR = preRotateNode->GetRotation();
+        Vector3 a = preRotateNode->GetRotation().EulerAngles();
+        // preRotateNode->SetRotation(Quaternion(a.x_, a.y_ - 180, a.z_));
+
+        Quaternion initQ(0, 0, -90);
+        AnimationKeyFrame k = rotateTrack->keyFrames_.Front();
+        rotateNode->SetTransform(k.position_, initQ);
+        Vector3 startAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
+        rotateNode->SetTransform(k.position_, k.rotation_);
+        Vector3 curAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
+
+        Quaternion q, q1;
+        q.FromRotationTo(startAxis, curAxis);
+        k = rotateTrack->keyFrames_.Back();
+        rotateNode->SetTransform(k.position_, k.rotation_);
+        curAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
+        q1.FromRotationTo(startAxis, curAxis);
+
+        PrintLine("FirstKey rotation=" + q.EulerAngles().ToString() + " LastKey rotation=" + q1.EulerAngles().ToString());
+
+        preRotateNode->SetRotation(preR);
+        firstKeyRot = q;
+    }
+
     // process rotate key frames first
     if ((rootMotionFlag_ & kMotionYaw_Rotation) && rotateTrack)
     {
         motionKeys.Resize(rotateTrack->keyFrames_.Size());
-        AnimationKeyFrame fristKey = rotateTrack->keyFrames_[0];
+        AnimationKeyFrame firstKey = rotateTrack->keyFrames_[0];
 
         for (unsigned i=0; i<rotateTrack->keyFrames_.Size(); ++i)
         {
             AnimationKeyFrame& kf = rotateTrack->keyFrames_[i];
-
-            rotateNode->SetTransform(fristKey.position_, fristKey.rotation_);
+            rotateNode->SetTransform(firstKey.position_, firstKey.rotation_);
             Vector3 startAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
             rotateNode->SetTransform(kf.position_, kf.rotation_);
             Vector3 curAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
 
             Quaternion q1;
-            q1.FromRotationTo(startAxis, curAxis);
+            if (i == 0)
+                q1 = firstKeyRot;
+            else
+                q1.FromRotationTo(startAxis, curAxis);
             motionKeys[i].rotation_ = q1.EulerAngles().y_;
 
             Quaternion wq = rotateNode->GetWorldRotation();
