@@ -6,19 +6,8 @@
 
 #include "Scripts/Utilities/Sample.as"
 
-Node@ spriteNode;
-int animationIndex = 0;
-
-Array<String> animationNames = 
-{
-    "idle",
-    "run",
-    "attack",
-    "hit",
-    "dead",
-    "dead2",
-    "dead3",
-};
+Node@ spriterNode;
+int spriterAnimationIndex = 0;
 
 void Start()
 {
@@ -59,14 +48,14 @@ void CreateScene()
     camera.orthoSize = graphics.height * PIXEL_SIZE;
     camera.zoom = 1.5f * Min(graphics.width / 1280.0f, graphics.height / 800.0f); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.5) is set for full visibility at 1280x800 resolution)
 
-    AnimationSet2D@ animationSet = cache.GetResource("AnimationSet2D", "Urho2D/imp/imp.scml");
-    if (animationSet is null)
+    AnimationSet2D@ spriterAnimationSet = cache.GetResource("AnimationSet2D", "Urho2D/imp/imp.scml");
+    if (spriterAnimationSet is null)
         return;
 
-    spriteNode = scene_.CreateChild("SpriterAnimation");
-
-    AnimatedSprite2D@ animatedSprite = spriteNode.CreateComponent("AnimatedSprite2D");
-    animatedSprite.SetAnimation(animationSet, animationNames[animationIndex]);
+    spriterNode = scene_.CreateChild("SpriterAnimation");
+    AnimatedSprite2D@ spriterAnimatedSprite = spriterNode.CreateComponent("AnimatedSprite2D");
+    spriterAnimatedSprite.animationSet = spriterAnimationSet;
+    spriterAnimatedSprite.SetAnimation(spriterAnimationSet.GetAnimation(spriterAnimationIndex), LM_FORCE_LOOPED);
 }
 
 void CreateInstructions()
@@ -145,9 +134,10 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
-    AnimatedSprite2D@ animatedSprite = spriteNode.GetComponent("AnimatedSprite2D");
-    animationIndex = (animationIndex + 1) % 7;
-    animatedSprite.SetAnimation(animationNames[animationIndex], LM_FORCE_LOOPED);
+    AnimatedSprite2D@ spriterAnimatedSprite = spriterNode.GetComponent("AnimatedSprite2D");
+    AnimationSet2D@ spriterAnimationSet = spriterAnimatedSprite.animationSet;
+    spriterAnimationIndex = (spriterAnimationIndex + 1) % spriterAnimationSet.numAnimations;
+    spriterAnimatedSprite.SetAnimation(spriterAnimationSet.GetAnimation(spriterAnimationIndex), LM_FORCE_LOOPED);
 }
 
 // Create XML patch instructions for screen joystick layout specific to this sample app

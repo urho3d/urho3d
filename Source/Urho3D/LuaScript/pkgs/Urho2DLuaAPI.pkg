@@ -3,7 +3,6 @@ $pfile "Urho2D/SpriteSheet2D.pkg"
 $pfile "Urho2D/Drawable2D.pkg"
 $pfile "Urho2D/StaticSprite2D.pkg"
 
-$pfile "Urho2D/Animation2D.pkg"
 $pfile "Urho2D/AnimationSet2D.pkg"
 $pfile "Urho2D/AnimatedSprite2D.pkg"
 

@@ -86,7 +86,8 @@ void CreateScene()
 
     AnimatedSprite2D@ animatedSprite = spriteNode.CreateComponent("AnimatedSprite2D");
     // Set animation
-    animatedSprite.SetAnimation(animationSet, "idle");
+    animatedSprite.animationSet = animationSet;
+    animatedSprite.animation = "idle";
 }
 
 void CreateInstructions()
