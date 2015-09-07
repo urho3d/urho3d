@@ -785,6 +785,7 @@ namespace Urho3D
 - %Color : Color
 - %Custom %material : ResourceRef
 - %Speed : float
+- %Entity : String
 - %Animation %Set : ResourceRef
 - %Animation : String
 - %Loop %Mode : int
@@ -2198,7 +2199,6 @@ namespace Urho3D
 <a href="#Class_AnimatedModel"><b>AnimatedModel</b></a>
 <a href="#Class_AnimatedSprite2D"><b>AnimatedSprite2D</b></a>
 <a href="#Class_Animation"><b>Animation</b></a>
-<a href="#Class_Animation2D"><b>Animation2D</b></a>
 <a href="#Class_AnimationController"><b>AnimationController</b></a>
 <a href="#Class_AnimationSet2D"><b>AnimationSet2D</b></a>
 <a href="#Class_AnimationState"><b>AnimationState</b></a>
@@ -2563,7 +2563,6 @@ Methods:
 - bool Save(VectorBuffer&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
-- void SetAnimation(AnimationSet2D@, const String&, LoopMode2D = LM_DEFAULT)
 - void SetAnimation(const String&, LoopMode2D = LM_DEFAULT)
 - bool SetAttribute(const String&, const Variant&)
 - void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
@@ -2591,6 +2590,7 @@ Properties:
 - float drawDistance
 - bool enabled
 - bool enabledEffective // readonly
+- String entity
 - bool flipX
 - bool flipY
 - Vector2 hotSpot
@@ -2651,18 +2651,6 @@ Properties:
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
-- int weakRefs // readonly
-
-<a name="Class_Animation2D"></a>
-
-### Animation2D
-
-Properties:
-
-- float length // readonly
-- bool looped // readonly
-- String name // readonly
-- int refs // readonly
 - int weakRefs // readonly
 
 <a name="Class_AnimationController"></a>
@@ -2751,8 +2739,7 @@ Properties:
 
 Methods:
 
-- Animation2D@ GetAnimation(const String&) const
-- Animation2D@ GetAnimation(uint) const
+- String GetAnimation(uint) const
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const

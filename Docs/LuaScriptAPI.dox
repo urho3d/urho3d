@@ -20,7 +20,6 @@ namespace Urho3D
 <a href="#Class_AnimatedModel"><b>AnimatedModel</b></a>
 <a href="#Class_AnimatedSprite2D"><b>AnimatedSprite2D</b></a>
 <a href="#Class_Animation"><b>Animation</b></a>
-<a href="#Class_Animation2D"><b>Animation2D</b></a>
 <a href="#Class_AnimationControl"><b>AnimationControl</b></a>
 <a href="#Class_AnimationController"><b>AnimationController</b></a>
 <a href="#Class_AnimationKeyFrame"><b>AnimationKeyFrame</b></a>
@@ -283,19 +282,21 @@ Properties:
 
 Methods:
 
-- void SetSpeed(float speed)
-- void SetAnimation(AnimationSet2D* animationSet, const String name, LoopMode2D loopMode = LM_DEFAULT)
-- void SetAnimation(const String name, LoopMode2D loopMode = LM_DEFAULT)
 - void SetAnimationSet(AnimationSet2D* animationSet)
+- void SetEntity(const String entity)
+- void SetAnimation(const String name, LoopMode2D loopMode = LM_DEFAULT)
 - void SetLoopMode(LoopMode2D loopMode)
-- float GetSpeed() const
-- const String GetAnimation() const
+- void SetSpeed(float speed)
 - AnimationSet2D* GetAnimationSet() const
+- const String GetEntity() const
+- const String GetAnimation() const
 - LoopMode2D GetLoopMode() const
+- float GetSpeed() const
 
 Properties:
 
 - float speed
+- String entity
 - String animation
 - AnimationSet2D* animationSet
 - LoopMode2D loopMode
@@ -321,21 +322,6 @@ Properties:
 - float length (readonly)
 - unsigned numTracks (readonly)
 - unsigned numTriggers (readonly)
-
-<a name="Class_Animation2D"></a>
-### Animation2D : RefCounted
-
-Methods:
-
-- const String GetName() const
-- float GetLength() const
-- bool IsLooped() const
-
-Properties:
-
-- String name (readonly)
-- float length (readonly)
-- bool looped (readonly)
 
 <a name="Class_AnimationControl"></a>
 ### AnimationControl
@@ -415,8 +401,7 @@ Properties:
 Methods:
 
 - unsigned GetNumAnimations() const
-- Animation2D* GetAnimation(const String name) const
-- Animation2D* GetAnimation(unsigned index) const
+- String GetAnimation(unsigned index) const
 
 Properties:
 
