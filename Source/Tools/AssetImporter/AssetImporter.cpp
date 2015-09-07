@@ -125,7 +125,7 @@ float defaultTicksPerSecond_ = 4800.0f;
 //====================================================================
 String translateBone_ = "Bip01_$AssimpFbx$_Translation";
 String rotateBone_ = "Bip01_$AssimpFbx$_Rotation";
-String scaleBone_ = "Bip01_$AssimpFbx$_Scale";
+String scaleBone_ = "Bip01_$AssimpFbx$_Scaling";
 String preRotateBone_ = "RootNode";
 enum RootMotionFlag
 {
@@ -164,6 +164,8 @@ static int ParseMotionFlag(const String& value)
     }
     return flag;
 }
+bool mirrorAnimation_ = false;
+bool dumpBoneList_ = false;
 //====================================================================
 
 int main(int argc, char** argv);
@@ -287,6 +289,8 @@ void Run(const Vector<String>& arguments)
             "-nomodel    Do not output model (model mode only)\n"
             "-flipbone   Flip Pre Rotate Bone (model mode only)\n"
             "-origin     Move and rotate the translate bone to origin flags (x|y|z|r) (model mode only)\n"
+            "-mirror     Mirror animation in x axis (model mode only)\n"
+            "-dumpbone   Dump skelton bone list (model mode only)\n"
         );
     }
 
@@ -442,6 +446,10 @@ void Run(const Vector<String>& arguments)
                 moveToOriginFlag_ = ParseMotionFlag(value);
                 PrintLine("MoveToOrigin FLags i " + value + " (" + String(moveToOriginFlag_) + ")");
             }
+            else if (argument == "mirror")
+                mirrorAnimation_ = true;
+            else if (argument == "dumpbone")
+                dumpBoneList_ = true;
         }
     }
 
@@ -1022,7 +1030,12 @@ void BuildAndSaveModel(OutModel& model)
             newBone.parentIndex_ = i;
             bones.Push(newBone);
 
-            // PrintLine("Bone " + newBone.name_ + " t=" + String(newBone.initialPosition_) + " r=" + String(newBone.initialRotation_));
+            if (dumpBoneList_) {
+                PrintLine("Bone " + newBone.name_ +
+                " t=" + String(newBone.initialPosition_) +
+                " r=" + String(newBone.initialRotation_) +
+                " s=" + String(newBone.initialScale_));
+            }
         }
 
         // Set the bone hierarchy
@@ -1080,6 +1093,17 @@ Vector3 GetProjectedAxis(Node* root, Node* n, const Vector3& axis)
     return ret;
 }
 
+int FindBoneIndex(Skeleton& skeleton, const String& boneName)
+{
+    for (unsigned i=0; i<skeleton.GetNumBones(); ++i)
+    {
+        Bone* b = skeleton.GetBone(i);
+        if (b->name_ == boneName)
+            return i;
+    }
+    return -1;
+}
+
 void PostProcessAnimation(Animation* outAnim, const String& animOutName)
 {
     AnimationTrack* translateTrack = const_cast<AnimationTrack*>(outAnim->GetTrack(translateBone_));
@@ -1088,15 +1112,19 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
     if (!translateTrack && !rotateTrack)
         return;
 
-    float distanceToOrign = 0.0f;
+    Vector3 startFromOrigin = Vector3::ZERO;
     if (translateTrack)
-    {
-        distanceToOrign = translateTrack->keyFrames_[0].position_.z_; // hack!!!!
-        PrintLine("distanceToOrign = " + String(distanceToOrign));
-    }
+        startFromOrigin = translateTrack->keyFrames_[0].position_;
 
-    if (!rootMotionFlag_ && !moveToOriginFlag_)
+    if (!rootMotionFlag_ && !moveToOriginFlag_ && !mirrorAnimation_) {
+         PrintLine("\n *********** " + GetFileName(animOutName) +
+              " FIRST startFromOrigin = (" +
+              String(startFromOrigin.x_) + ", " +
+              String(startFromOrigin.y_) + ", " +
+              String(startFromOrigin.z_)
+              + ") ***********\n");
         return;
+    }
 
     SharedPtr<Scene> animScene(new Scene(context_));
     Node* n = NULL;
@@ -1118,6 +1146,8 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
     Node* scaleNode = n->GetChild(scaleBone_, true);
     if (scaleNode)
         scale = scaleNode->GetScale().x_;
+    else
+        PrintLine("Do not find scale bone");
 
     PrintLine("Export Scale = " + String(scale));
 
@@ -1125,6 +1155,92 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
     if (b)
         pelvisRightAxis = b->initialRotation_ * Vector3::RIGHT;
     PrintLine("pelvisRightAxis = " + String(pelvisRightAxis));
+
+
+    // pre process for the bug of assimp or FBX
+    if (startFromOrigin.Length() > 1.0f/scale)
+    {
+        PrintLine("\n\n !!!!!!!!!!!!!!!! BUG Scale do not applied to translate bone !!!!!!!!!!!!!!!!!! \n\n");
+        for (unsigned i=0; i<translateTrack->keyFrames_.Size(); ++i)
+        {
+            AnimationKeyFrame& kf = translateTrack->keyFrames_[i];
+            kf.position_ *= scale;
+        }
+    }
+
+    // pre rocess for mirroring !!!
+    if (mirrorAnimation_)
+    {
+        // flip keyframes in x-axis
+        for (unsigned i=0; i<outAnim->GetNumTracks(); ++i)
+        {
+            AnimationTrack* track = const_cast<AnimationTrack*>(outAnim->GetTrack(i));
+            for (unsigned j=0; j<track->keyFrames_.Size(); ++j)
+            {
+                AnimationKeyFrame& kf = track->keyFrames_[j];
+                kf.position_.x_ *= -1;
+                // assume FBX is exported in D3D LH
+                kf.rotation_.y_ *= -1;
+                kf.rotation_.z_ *= -1;
+            }
+        }
+
+        // bone mapping swap with _L & _R
+        String leftBone = "_L";
+        String rightBone = "_R";
+        const int max_bone_num = 512;
+        int left_to_right_mapping[max_bone_num];
+        for (int i=0; i<max_bone_num; ++i)
+            left_to_right_mapping[i] = -1;
+
+        for (unsigned i=0; i<model_->GetSkeleton().GetNumBones(); ++i)
+        {
+            Bone* b = model_->GetSkeleton().GetBone(i);
+            if (b->name_.Contains(leftBone))
+            {
+                String mapName = b->name_.Replaced(leftBone, rightBone);
+                int mapIndex = FindBoneIndex(model_->GetSkeleton(), mapName);
+                if (mapIndex < 0) {
+                    PrintLine("Warning: " + b->name_ + " do not find the mapped bone " + mapName);
+                    continue;
+                }
+                left_to_right_mapping[i] = mapIndex;
+            }
+        }
+
+#if 1
+        for (int i=0; i<max_bone_num; ++i)
+        {
+            int index = left_to_right_mapping[i];
+            if (index < 0)
+                continue;
+
+            Bone* b_left = model_->GetSkeleton().GetBone(i);
+            Bone* b_right = model_->GetSkeleton().GetBone(index);
+            PrintLine("[MIRROR.MAP] " + b_left->name_ + " vs " + b_right->name_);
+
+            AnimationTrack* leftTrack = const_cast<AnimationTrack*>(outAnim->GetTrack(b_left->name_));
+            AnimationTrack* rightTrack = const_cast<AnimationTrack*>(outAnim->GetTrack(b_right->name_));
+
+            if (leftTrack)
+            {
+                leftTrack->name_ = b_right->name_;
+                leftTrack->nameHash_ = leftTrack->name_;
+            }
+
+            if (rightTrack)
+            {
+                rightTrack->name_ = b_left->name_;
+                rightTrack->nameHash_ = rightTrack->name_;
+            }
+        }
+#endif
+
+    }
+
+    if (translateTrack)
+        startFromOrigin = translateTrack->keyFrames_[0].position_;
+
 
     // make the left and right foot always on ground
     Vector3 lfWS =  n->GetChild("Bip01_L_Toe0", true)->GetWorldPosition();
@@ -1139,7 +1255,7 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
     // pre process rotate key frames
     if ((moveToOriginFlag_ & kMotionYaw_Rotation) && rotateTrack)
     {
-        Quaternion q = Quaternion(0, -180, 0); // hack !!!
+        Quaternion q = Quaternion(0, 180, 0); // hack !!!
         for (unsigned i=0; i<rotateTrack->keyFrames_.Size(); ++i)
         {
             AnimationKeyFrame& kf = rotateTrack->keyFrames_[i];
@@ -1158,7 +1274,7 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
         {
             AnimationKeyFrame& kf = translateTrack->keyFrames_[i];
             Vector3 oldPos = kf.position_;
-            Quaternion q = Quaternion(0, -180, 0);
+            Quaternion q = Quaternion(0, 180, 0);
             kf.position_ = q * oldPos;
             // PrintLine("RotateOrigin change pos from " + oldPos.ToString() + " to " + kf.position_.ToString());
         }
@@ -1262,7 +1378,6 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
         }
     }
 
-
     // post process steps for reset orgin and root motion extraction
     if (rootMotionFlag_)
     {
@@ -1296,7 +1411,7 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
             // PrintLine("motion frame=" + String(i) + " translation=" + String(mk.translation_) + " rotation=" + String(mk.rotation_));
         }
 
-        child2.SetFloat("distanceToOrign", distanceToOrign);
+        child2.SetVector3("startFromOrigin", startFromOrigin);
 
         File outFile(context_);
         String motionOutName = GetPath(animOutName) + GetFileName(animOutName) + "_motion.xml";
@@ -1305,6 +1420,13 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
             ErrorExit("Could not open output file " + motionOutName);
         outMotion.Save(outFile);
     }
+
+    PrintLine("\n *********** " + GetFileName(animOutName) +
+              " FINNAL startFromOrigin = (" +
+              String(startFromOrigin.x_) + ", " +
+              String(startFromOrigin.y_) + ", " +
+              String(startFromOrigin.z_)
+              + ") ***********\n");
 }
 
 void BuildAndSaveAnimations(OutModel* model)
