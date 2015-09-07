@@ -34,6 +34,7 @@ class AnimationController : public Component
     bool SetLooped(const String name, bool enable);
     bool SetSpeed(const String name, float speed);
     bool SetAutoFade(const String name, float fadeOutTime);
+    bool SetRemoveOnCompletion(const String name, bool removeOnCompletion);
     bool IsPlaying(const String name) const;
     bool IsFadingIn(const String name) const;
     bool IsFadingOut(const String name) const;
@@ -50,6 +51,7 @@ class AnimationController : public Component
     float GetFadeTarget(const String name) const;
     float GetFadeTime(const String name) const;
     float GetAutoFade(const String name) const;
+    bool GetRemoveOnCompletion(const String name) const;
     
     AnimationState* GetAnimationState(const String name) const;
     AnimationState* GetAnimationState(StringHash nameHash) const;

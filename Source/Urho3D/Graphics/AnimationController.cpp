@@ -44,6 +44,7 @@ static const unsigned char CTRL_STARTBONE = 0x2;
 static const unsigned char CTRL_AUTOFADE = 0x4;
 static const unsigned char CTRL_SETTIME = 0x08;
 static const unsigned char CTRL_SETWEIGHT = 0x10;
+static const unsigned char CTRL_REMOVEONCOMPLETION = 0x20;
 static const float EXTRA_ANIM_FADEOUT_TIME = 0.1f;
 static const float COMMAND_STAY_TIME = 0.25f;
 static const unsigned MAX_NODE_ANIMATION_STATES = 256;
@@ -127,7 +128,7 @@ void AnimationController::Update(float timeStep)
             }
 
             // Remove if weight zero and target weight zero
-            if (state->GetWeight() == 0.0f && (targetWeight == 0.0f || fadeTime == 0.0f))
+            if (state->GetWeight() == 0.0f && (targetWeight == 0.0f || fadeTime == 0.0f) && i->removeOnCompletion_)
                 remove = true;
         }
 
@@ -362,6 +363,19 @@ bool AnimationController::SetWeight(const String& name, float weight)
     return true;
 }
 
+bool AnimationController::SetRemoveOnCompletion(const String& name, bool removeOnCompletion)
+{
+    unsigned index;
+    AnimationState* state;
+    FindAnimation(name, index, state);
+    if (index == M_MAX_UNSIGNED || !state)
+        return false;
+
+    animations_[index].removeOnCompletion_ = removeOnCompletion;
+    MarkNetworkUpdate();
+    return true;
+}
+
 bool AnimationController::SetLooped(const String& name, bool enable)
 {
     AnimationState* state = GetAnimationState(name);
@@ -502,6 +516,14 @@ float AnimationController::GetAutoFade(const String& name) const
     return index != M_MAX_UNSIGNED ? animations_[index].autoFadeTime_ : 0.0f;
 }
 
+bool AnimationController::GetRemoveOnCompletion(const String& name) const
+{
+    unsigned index;
+    AnimationState* state;
+    FindAnimation(name, index, state);
+    return index != M_MAX_UNSIGNED ? animations_[index].removeOnCompletion_ : false;
+}
+
 AnimationState* AnimationController::GetAnimationState(const String& name) const
 {
     return GetAnimationState(StringHash(name));
@@ -604,6 +626,9 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
             animations_[index].autoFadeTime_ = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade
         else
             animations_[index].autoFadeTime_ = 0.0f;
+        
+        animations_[index].removeOnCompletion_ = (ctrl & CTRL_REMOVEONCOMPLETION) != 0;
+        
         if (ctrl & CTRL_SETTIME)
         {
             unsigned char setTimeRev = buf.ReadUByte();
@@ -716,6 +741,8 @@ const PODVector<unsigned char>& AnimationController::GetNetAnimationsAttr() cons
             ctrl |= CTRL_STARTBONE;
         if (i->autoFadeTime_ > 0.0f)
             ctrl |= CTRL_AUTOFADE;
+        if (i->removeOnCompletion_)
+            ctrl |= CTRL_REMOVEONCOMPLETION;
         if (i->setTimeTtl_ > 0.0f)
             ctrl |= CTRL_SETTIME;
         if (i->setWeightTtl_ > 0.0f)
