@@ -30,11 +30,6 @@ struct spAnimationStateData;
 struct spSkeleton;
 #endif
 
-namespace Spriter
-{
-    class SpriterInstance;
-}
-
 /// Loop mode.
 enum LoopMode2D
 {
@@ -48,6 +43,11 @@ enum LoopMode2D
 
 namespace Urho3D
 {
+
+namespace Spriter
+{
+    class SpriterInstance;
+}
 
 class AnimationSet2D;
 

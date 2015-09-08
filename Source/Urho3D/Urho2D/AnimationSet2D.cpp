@@ -33,6 +33,7 @@
 #include "../Resource/XMLFile.h"
 #include "../Urho2D/AnimationSet2D.h"
 #include "../Urho2D/Sprite2D.h"
+#include "../Urho2D/SpriterData2D.h"
 
 #include "../DebugNew.h"
 
@@ -40,7 +41,6 @@
 #include <spine/spine.h>
 #include <spine/extension.h>
 #endif
-#include <Spriter/SpriterData.h>
 
 #ifdef URHO3D_SPINE
 // Current animation set
@@ -159,8 +159,8 @@ unsigned AnimationSet2D::GetNumAnimations() const
     if (skeletonData_)
         return (unsigned)skeletonData_->animationsCount;
 #endif
-    if (spriterData_ && !spriterData_->entities_.empty())
-        return (unsigned)spriterData_->entities_[0]->animations_.size();
+    if (spriterData_ && !spriterData_->entities_.Empty())
+        return (unsigned)spriterData_->entities_[0]->animations_.Size();
     return 0;
 }
 
@@ -173,8 +173,8 @@ String AnimationSet2D::GetAnimation(unsigned index) const
     if (skeletonData_)
         return skeletonData_->animations[index]->name;
 #endif
-    if (spriterData_ && !spriterData_->entities_.empty())
-        return spriterData_->entities_[0]->animations_[index]->name_.c_str();
+    if (spriterData_ && !spriterData_->entities_.Empty())
+        return spriterData_->entities_[0]->animations_[index]->name_;
 
     return String::EMPTY;
 }
@@ -191,12 +191,12 @@ bool AnimationSet2D::HasAnimation(const String& animationName) const
         }
     }
 #endif    
-    if (spriterData_ && !spriterData_->entities_.empty())
+    if (spriterData_ && !spriterData_->entities_.Empty())
     {
-        const std::vector<Spriter::Animation*>& animations = spriterData_->entities_[0]->animations_;
-        for (size_t i = 0; i < animations.size(); ++i)
+        const PODVector<Spriter::Animation*>& animations = spriterData_->entities_[0]->animations_;
+        for (size_t i = 0; i < animations.Size(); ++i)
         {
-            if (animationName == animations[i]->name_.c_str())
+            if (animationName == animations[i]->name_)
                 return true;
         }
     }
@@ -306,13 +306,13 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
     {
         String parentPath = GetParentPath(GetName());
         ResourceCache* cache = GetSubsystem<ResourceCache>();
-        for (size_t i = 0; i < spriterData_->folders_.size(); ++i)
+        for (size_t i = 0; i < spriterData_->folders_.Size(); ++i)
         {
             Spriter::Folder* folder = spriterData_->folders_[i];
-            for (size_t j = 0; j < folder->files_.size(); ++j)
+            for (size_t j = 0; j < folder->files_.Size(); ++j)
             {
                 Spriter::File* file = folder->files_[j];
-                String imagePath = parentPath + file->name_.c_str();
+                String imagePath = parentPath + file->name_;
                 cache->BackgroundLoadResource<Image>(imagePath, true, this);
             }
         }
@@ -341,13 +341,13 @@ bool AnimationSet2D::EndLoadSpriter()
     
     String parentPath = GetParentPath(GetName());
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    for (unsigned i = 0; i < spriterData_->folders_.size(); ++i)
+    for (unsigned i = 0; i < spriterData_->folders_.Size(); ++i)
     {
         Spriter::Folder* folder = spriterData_->folders_[i];
-        for (unsigned j = 0; j < folder->files_.size(); ++j)
+        for (unsigned j = 0; j < folder->files_.Size(); ++j)
         {
             Spriter::File* file = folder->files_[j];
-            String imagePath = parentPath + file->name_.c_str();
+            String imagePath = parentPath + file->name_;
             SharedPtr<Image> image(cache->GetResource<Image>(imagePath));
             if (!image)
             {
