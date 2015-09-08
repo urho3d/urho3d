@@ -1467,7 +1467,7 @@ void BuildAndSaveAnimations(OutModel* model)
         else
             animOutName = outPath_ + SanitateAssetName(animName) + ".ani";
 
-        if (animations.Size() == 1)
+        if (animations.Size() == 1 && model)
             animOutName = GetPath(model->outName_) + GetFileName(model->outName_) + ".ani";
 
         float ticksPerSecond = (float)anim->mTicksPerSecond;
@@ -1651,7 +1651,8 @@ void BuildAndSaveAnimations(OutModel* model)
 
         outAnim->SetTracks(tracks);
 
-        PostProcessAnimation(outAnim, animOutName);
+        if (model)
+            PostProcessAnimation(outAnim, animOutName);
 
         File outFile(context_);
         if (!outFile.Open(animOutName, FILE_WRITE))
