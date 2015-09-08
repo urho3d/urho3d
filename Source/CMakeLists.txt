@@ -90,7 +90,6 @@ if (URHO3D_URHO2D)
         # Add definition for Spine
         add_definitions (-DURHO3D_SPINE)
     endif ()
-    add_subdirectory (ThirdParty/Spriter)
 endif ()
 
 if (URHO3D_PHYSICS)

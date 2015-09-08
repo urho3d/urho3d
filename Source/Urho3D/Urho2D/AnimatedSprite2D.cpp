@@ -30,13 +30,13 @@
 #include "../Urho2D/AnimatedSprite2D.h"
 #include "../Urho2D/AnimationSet2D.h"
 #include "../Urho2D/Sprite2D.h"
+#include "../Urho2D/SpriterInstance2D.h"
 
 #include "../DebugNew.h"
 
 #ifdef URHO3D_SPINE
 #include <spine/spine.h>
 #endif 
-#include <Spriter/SpriterInstance.h>
 
 namespace Urho3D
 {
@@ -138,11 +138,11 @@ void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
     {
         spriterInstance_ = new Spriter::SpriterInstance(animationSet_->GetSpriterData());
 
-        if (animationSet_->GetSpriterData()->entities_.empty())
+        if (animationSet_->GetSpriterData()->entities_.Empty())
         {
             // If entity is empty use first entity in spriter
             if (entity_.Empty())
-                entity_ = animationSet_->GetSpriterData()->entities_[0]->name_.c_str();
+                entity_ = animationSet_->GetSpriterData()->entities_[0]->name_;
             spriterInstance_->SetEntity(entity_.CString());
         }
     }
@@ -421,7 +421,7 @@ void AnimatedSprite2D::SetSpriterAnimation()
 
     // Use entity is empty first entity
     if (entity_.Empty())
-        entity_ = animationSet_->GetSpriterData()->entities_[0]->name_.c_str();
+        entity_ = animationSet_->GetSpriterData()->entities_[0]->name_;
 
     if (!spriterInstance_->SetEntity(entity_.CString()))
     {
@@ -462,8 +462,8 @@ void AnimatedSprite2D::UpdateSourceBatchesSpriter()
     Vertex2D vertex2;
     Vertex2D vertex3;
 
-    const std::vector<Spriter::SpatialTimelineKey*>& timelineKeys = spriterInstance_->GetTimelineKeys();
-    for (size_t i = 0; i < timelineKeys.size(); ++i)
+    const PODVector<Spriter::SpatialTimelineKey*>& timelineKeys = spriterInstance_->GetTimelineKeys();
+    for (size_t i = 0; i < timelineKeys.Size(); ++i)
     {
         if (timelineKeys[i]->GetObjectType() != Spriter::SPRITE)
             continue;

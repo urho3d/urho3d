@@ -31,13 +31,13 @@ struct spSkeletonData;
 struct spAnimationStateData;
 #endif
 
+namespace Urho3D
+{
+
 namespace Spriter
 {
     struct SpriterData;
 }
-
-namespace Urho3D
-{
 
 class Sprite2D;
 
