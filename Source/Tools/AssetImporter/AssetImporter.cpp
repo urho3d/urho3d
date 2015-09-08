@@ -166,6 +166,7 @@ static int ParseMotionFlag(const String& value)
 }
 bool mirrorAnimation_ = false;
 bool dumpBoneList_ = false;
+bool cutRotation_ = false;
 //====================================================================
 
 int main(int argc, char** argv);
@@ -291,6 +292,7 @@ void Run(const Vector<String>& arguments)
             "-origin     Move and rotate the translate bone to origin flags (x|y|z|r) (model mode only)\n"
             "-mirror     Mirror animation in x axis (model mode only)\n"
             "-dumpbone   Dump skelton bone list (model mode only)\n"
+            "-cutrot     Cut rotation (model mode only)\n"
         );
     }
 
@@ -450,6 +452,8 @@ void Run(const Vector<String>& arguments)
                 mirrorAnimation_ = true;
             else if (argument == "dumpbone")
                 dumpBoneList_ = true;
+            else if (argument == "cutrot")
+                cutRotation_ = true;
         }
     }
 
@@ -1104,6 +1108,15 @@ int FindBoneIndex(Skeleton& skeleton, const String& boneName)
     return -1;
 }
 
+Quaternion GetRotationInXZPlane(Node* rootNode, Node* rotateNode, const Quaternion& startLocalRot, const Quaternion& curLocalRot, const Vector3& pelvisRightAxis)
+{
+    rotateNode->SetRotation(startLocalRot);
+    Vector3 startAxis = GetProjectedAxis(rootNode, rotateNode, pelvisRightAxis);
+    rotateNode->SetRotation(curLocalRot);
+    Vector3 curAxis = GetProjectedAxis(rootNode, rotateNode, pelvisRightAxis);
+    return Quaternion(startAxis, curAxis);
+}
+
 void PostProcessAnimation(Animation* outAnim, const String& animOutName)
 {
     AnimationTrack* translateTrack = const_cast<AnimationTrack*>(outAnim->GetTrack(translateBone_));
@@ -1280,32 +1293,16 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
         }
     }
 
-    Quaternion firstKeyRot;
+    Quaternion initQ(0, 0, -90);
+
     if (rotateTrack)
     {
-        Node* preRotateNode = n->GetChild(preRotateBone_, true);
-        Quaternion preR = preRotateNode->GetRotation();
-        Vector3 a = preRotateNode->GetRotation().EulerAngles();
-        // preRotateNode->SetRotation(Quaternion(a.x_, a.y_ - 180, a.z_));
-
-        Quaternion initQ(0, 0, -90);
-        AnimationKeyFrame k = rotateTrack->keyFrames_.Front();
-        rotateNode->SetTransform(k.position_, initQ);
-        Vector3 startAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
-        rotateNode->SetTransform(k.position_, k.rotation_);
-        Vector3 curAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
-
-        Quaternion q, q1;
-        q.FromRotationTo(startAxis, curAxis);
-        k = rotateTrack->keyFrames_.Back();
-        rotateNode->SetTransform(k.position_, k.rotation_);
-        curAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
-        q1.FromRotationTo(startAxis, curAxis);
-
-        PrintLine("FirstKey rotation=" + q.EulerAngles().ToString() + " LastKey rotation=" + q1.EulerAngles().ToString());
-
-        preRotateNode->SetRotation(preR);
-        firstKeyRot = q;
+        for (unsigned i=0; i<rotateTrack->keyFrames_.Size(); ++i)
+        {
+            Quaternion q = GetRotationInXZPlane(n, rotateNode, initQ, rotateTrack->keyFrames_[i].rotation_, pelvisRightAxis);
+            if (i == 0 || i == rotateTrack->keyFrames_.Size() - 1)
+                PrintLine("frame=" + String(i) + " rotation from identical in xz plane=" + q.EulerAngles().ToString());
+        }
     }
 
     // process rotate key frames first
@@ -1317,25 +1314,18 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
         for (unsigned i=0; i<rotateTrack->keyFrames_.Size(); ++i)
         {
             AnimationKeyFrame& kf = rotateTrack->keyFrames_[i];
-            rotateNode->SetTransform(firstKey.position_, firstKey.rotation_);
-            Vector3 startAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
-            rotateNode->SetTransform(kf.position_, kf.rotation_);
-            Vector3 curAxis = GetProjectedAxis(n, rotateNode, pelvisRightAxis);
+            Quaternion q;
 
-            Quaternion q1;
-            if (i == 0)
-                q1 = firstKeyRot;
+            if (cutRotation_)
+                q = GetRotationInXZPlane(n, rotateNode, initQ, kf.rotation_, pelvisRightAxis);
             else
-                q1.FromRotationTo(startAxis, curAxis);
-            motionKeys[i].rotation_ = q1.EulerAngles().y_;
+                q = GetRotationInXZPlane(n, rotateNode, firstKey.rotation_, kf.rotation_, pelvisRightAxis);
 
+            motionKeys[i].rotation_ = q.EulerAngles().y_;
             Quaternion wq = rotateNode->GetWorldRotation();
-            wq = q1.Inverse() * wq;
+            wq = q.Inverse() * wq;
             rotateNode->SetWorldRotation(wq);
-
-            Quaternion lq = rotateNode->GetRotation();
-            //PrintLine("local rotation from " + String(kf.rotation_.EulerAngles()) + " to " + String(lq.EulerAngles()));
-            kf.rotation_ = lq;
+            kf.rotation_ = rotateNode->GetRotation();
         }
     }
 
