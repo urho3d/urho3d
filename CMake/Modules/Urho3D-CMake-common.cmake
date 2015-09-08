@@ -1575,7 +1575,7 @@ if (ANDROID)
             create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
         endif ()
     endforeach ()
-    foreach (I AndroidManifest.xml build.xml src res assets jni)
+    foreach (I AndroidManifest.xml build.xml custom_rules.xml src res assets jni)
         if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
             create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
         endif ()
