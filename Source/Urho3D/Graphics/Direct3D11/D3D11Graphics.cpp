@@ -316,6 +316,11 @@ Graphics::~Graphics()
         impl_->defaultDepthTexture_->Release();
         impl_->defaultDepthTexture_ = 0;
     }
+    if (impl_->resolveTexture_)
+    {
+        impl_->resolveTexture_->Release();
+        impl_->resolveTexture_ = 0;
+    }
     if (impl_->swapChain_)
     {
         impl_->swapChain_->Release();
@@ -592,21 +597,18 @@ bool Graphics::TakeScreenShot(Image& destImage)
     if (multiSample_ > 1)
     {
         // If backbuffer is multisampled, need another DEFAULT usage texture to resolve the data to first
-        textureDesc.Usage = D3D11_USAGE_DEFAULT;
-        textureDesc.CPUAccessFlags = 0;
-        ID3D11Texture2D* resolveTexture = 0;
+        CreateResolveTexture();
 
-        impl_->device_->CreateTexture2D(&textureDesc, 0, &resolveTexture);
-        if (!resolveTexture)
+        if (!impl_->resolveTexture_)
         {
             LOGERROR("Could not create intermediate texture for multisampled screenshot");
             stagingTexture->Release();
+            source->Release();
             return false;
         }
 
-        impl_->deviceContext_->ResolveSubresource(resolveTexture, 0, source, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
-        impl_->deviceContext_->CopyResource(stagingTexture, resolveTexture);
-        resolveTexture->Release();
+        impl_->deviceContext_->ResolveSubresource(impl_->resolveTexture_, 0, source, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+        impl_->deviceContext_->CopyResource(stagingTexture, impl_->resolveTexture_);
     }
     else
         impl_->deviceContext_->CopyResource(stagingTexture, source);
@@ -768,29 +770,42 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     if (vpCopy.bottom_ <= vpCopy.top_)
         vpCopy.bottom_ = vpCopy.top_ + 1;
 
-    /// \todo These rects are not used! Would need to work around copying less than a full viewport
-    RECT rect;
-    rect.left = Clamp(vpCopy.left_, 0, width_);
-    rect.top = Clamp(vpCopy.top_, 0, height_);
-    rect.right = Clamp(vpCopy.right_, 0, width_);
-    rect.bottom = Clamp(vpCopy.bottom_, 0, height_);
-
-    RECT destRect;
-    destRect.left = 0;
-    destRect.top = 0;
-    destRect.right = destination->GetWidth();
-    destRect.bottom = destination->GetHeight();
+    D3D11_BOX srcBox;
+    srcBox.left = Clamp(vpCopy.left_, 0, width_);
+    srcBox.top = Clamp(vpCopy.top_, 0, height_);
+    srcBox.right = Clamp(vpCopy.right_, 0, width_);
+    srcBox.bottom = Clamp(vpCopy.bottom_, 0, height_);
+    srcBox.front = 0;
+    srcBox.back = 1;
 
     ID3D11Resource* source = 0;
     bool resolve = multiSample_ > 1;
     impl_->defaultRenderTargetView_->GetResource(&source);
 
     if (!resolve)
-        impl_->deviceContext_->CopyResource((ID3D11Resource*)destination->GetGPUObject(), source);
+    {
+        if (!srcBox.left && !srcBox.top && srcBox.right == width_ && srcBox.bottom == height_)
+            impl_->deviceContext_->CopyResource((ID3D11Resource*)destination->GetGPUObject(), source);
+        else
+            impl_->deviceContext_->CopySubresourceRegion((ID3D11Resource*)destination->GetGPUObject(), 0, 0, 0, 0, source, 0, &srcBox);
+    }
     else
     {
-        impl_->deviceContext_->ResolveSubresource((ID3D11Resource*)destination->GetGPUObject(), 0, source, 0, (DXGI_FORMAT)
-            destination->GetFormat());
+        if (!srcBox.left && !srcBox.top && srcBox.right == width_ && srcBox.bottom == height_)
+        {
+            impl_->deviceContext_->ResolveSubresource((ID3D11Resource*)destination->GetGPUObject(), 0, source, 0, (DXGI_FORMAT)
+                destination->GetFormat());
+        }
+        else
+        {
+            CreateResolveTexture();
+
+            if (impl_->resolveTexture_)
+            {
+                impl_->deviceContext_->ResolveSubresource(impl_->resolveTexture_, 0, source, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+                impl_->deviceContext_->CopySubresourceRegion((ID3D11Resource*)destination->GetGPUObject(), 0, 0, 0, 0, impl_->resolveTexture_, 0, &srcBox);
+            }
+        }
     }
 
     source->Release();
@@ -2317,6 +2332,11 @@ bool Graphics::UpdateSwapChain(int width, int height)
         impl_->defaultDepthTexture_->Release();
         impl_->defaultDepthTexture_ = 0;
     }
+    if (impl_->resolveTexture_)
+    {
+        impl_->resolveTexture_->Release();
+        impl_->resolveTexture_ = 0;
+    }
 
     impl_->depthStencilView_ = 0;
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
@@ -2676,6 +2696,26 @@ void Graphics::PrepareDraw()
     for (unsigned i = 0; i < dirtyConstantBuffers_.Size(); ++i)
         dirtyConstantBuffers_[i]->Apply();
     dirtyConstantBuffers_.Clear();
+}
+
+void Graphics::CreateResolveTexture()
+{
+    if (impl_->resolveTexture_)
+        return;
+
+    D3D11_TEXTURE2D_DESC textureDesc;
+    memset(&textureDesc, 0, sizeof textureDesc);
+    textureDesc.Width = (UINT)width_;
+    textureDesc.Height = (UINT)height_;
+    textureDesc.MipLevels = 1;
+    textureDesc.ArraySize = 1;
+    textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    textureDesc.SampleDesc.Count = 1;
+    textureDesc.SampleDesc.Quality = 0;
+    textureDesc.Usage = D3D11_USAGE_DEFAULT;
+    textureDesc.CPUAccessFlags = 0;
+
+    impl_->device_->CreateTexture2D(&textureDesc, 0, &impl_->resolveTexture_);
 }
 
 void Graphics::SetTextureUnitMappings()

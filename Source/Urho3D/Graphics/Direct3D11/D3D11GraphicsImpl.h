@@ -78,6 +78,8 @@ private:
     HashMap<unsigned, ID3D11DepthStencilState*> depthStates_;
     /// Created rasterizer state objects.
     HashMap<unsigned, ID3D11RasterizerState*> rasterizerStates_;
+    /// Intermediate texture for multisampled screenshots and less than whole viewport multisampled resolve, created on demand.
+    ID3D11Texture2D* resolveTexture_;
     /// Bound shader resource views.
     ID3D11ShaderResourceView* shaderResourceViews_[MAX_TEXTURE_UNITS];
     /// Bound sampler state objects.

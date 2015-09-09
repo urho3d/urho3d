@@ -1937,12 +1937,6 @@ void View::AllocateScreenBuffers()
             needSubstitute = true;
 #endif
 
-        // If D3D11 and viewport is less than full screen, cannot use resolve (not supported)
-#ifdef URHO3D_D3D11
-        if (!renderTarget_ && (hasViewportRead || hasPingpong) && (viewSize_.x_ < graphics_->GetWidth() || viewSize_.y_ < graphics_->GetHeight()))
-            needSubstitute = true;
-#endif
-
         // If we have viewport read and target is a cube map, must allocate a substitute target instead as BlitFramebuffer()
         // does not support reading a cube map
         if (renderTarget_ && renderTarget_->GetParentTexture()->GetType() == TextureCube::GetTypeStatic())
