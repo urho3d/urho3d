@@ -28,8 +28,10 @@
 
 namespace Urho3D
 {
+
 namespace Spriter
 {
+
 SpriterInstance::SpriterInstance(SpriterData* spriteData) : 
     spriterData_(spriteData),
     entity_(0),
@@ -260,7 +262,7 @@ TimelineKey* SpriterInstance::GetTimelineKey(Ref* ref) const
         nextTimelineKeyTime += animation_->length_;
     }
 
-    float t = (currentTime_ - timelineKey->time_) / (nextTimelineKeyTime - timelineKey->time_);
+    float t = timelineKey->GetTByCurveType(currentTime_, nextTimelineKeyTime);
     timelineKey->Interpolate(*nextTimelineKey, t);
 
     return timelineKey;
@@ -278,6 +280,8 @@ void SpriterInstance::Clear()
         }
         timelineKeys_.Clear();
     }
-}   
 }
+
+}
+
 }
