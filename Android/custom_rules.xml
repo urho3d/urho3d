@@ -23,10 +23,13 @@ DEALINGS IN THE SOFTWARE.
 <project name="Urho3D_custom_rules" default="help">
 
     <!--
-        Patch assets directories to have a trailing '_' character in their names for easy identification
+        Patch assets directories to have a trailing indicator character(s) in their names for easy identification
+        The default indicator is a single '_' character if it is not explicitly set using ASSET_DIR_INDICATOR environment variable
     -->
-    <property name="patched-asset.dir" value="assets_" />
-    <property name="asset.absolute.dir" location="${patched-asset.dir}" />
+    <property environment="env"/>
+    <property name="env.ASSET_DIR_INDICATOR" value="_"/>
+    <property name="patched-asset.dir" value="assets${env.ASSET_DIR_INDICATOR}"/>
+    <property name="asset.absolute.dir" location="${patched-asset.dir}"/>
 
     <target name="-pre-build">
         <delete dir="${patched-asset.dir}"/>
@@ -35,13 +38,13 @@ DEALINGS IN THE SOFTWARE.
             <targetfile/>
             <dirset dir="${asset.dir}"/>
             <chainedmapper>
-                <regexpmapper from="(.+)" to="\1_"/>
+                <regexpmapper from="(.+)" to="\1${env.ASSET_DIR_INDICATOR}"/>
                 <firstmatchmapper>
                     <filtermapper>
-                        <replacestring from="/" to="_/"/>
+                        <replacestring from="/" to="${env.ASSET_DIR_INDICATOR}/"/>
                     </filtermapper>
                     <filtermapper>
-                        <replacestring from="\\" to="_\\"/>
+                        <replacestring from="\\" to="${env.ASSET_DIR_INDICATOR}\\"/>
                     </filtermapper>
                 </firstmatchmapper>
             </chainedmapper>
@@ -52,10 +55,10 @@ DEALINGS IN THE SOFTWARE.
             </fileset>
             <firstmatchmapper>
                 <filtermapper>
-                    <replacestring from="/" to="_/"/>
+                    <replacestring from="/" to="${env.ASSET_DIR_INDICATOR}/"/>
                 </filtermapper>
                 <filtermapper>
-                    <replacestring from="\\" to="_\\"/>
+                    <replacestring from="\\" to="${env.ASSET_DIR_INDICATOR}\\"/>
                 </filtermapper>
             </firstmatchmapper>
         </copy>
