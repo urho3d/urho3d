@@ -34,6 +34,13 @@
 namespace Urho3D
 {
 
+#ifdef ANDROID
+extern const char* APK;
+
+// Macro for truncating the APK prefix string from the asset path name and at the same time patching the directory name components (see custom_rules.xml)
+#define ASSET(p) p.Substring(5).Replaced("/", "_/").CString()
+#endif
+
 /// File open mode.
 enum FileMode
 {

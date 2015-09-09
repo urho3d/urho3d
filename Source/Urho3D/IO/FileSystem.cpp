@@ -60,13 +60,17 @@
 #include <mach-o/dyld.h>
 #endif
 
+extern "C"
+{
 #ifdef ANDROID
-extern "C" const char* SDL_Android_GetFilesDir();
+const char* SDL_Android_GetFilesDir();
+char** SDL_Android_GetFileList(const char* path, int* count);
+void SDL_Android_FreeFileList(char*** array, int* count);
+#elif IOS
+const char* SDL_IOS_GetResourceDir();
+const char* SDL_IOS_GetDocumentsDir();
 #endif
-#ifdef IOS
-extern "C" const char* SDL_IOS_GetResourceDir();
-extern "C" const char* SDL_IOS_GetDocumentsDir();
-#endif
+}
 
 #include "../DebugNew.h"
 
@@ -131,7 +135,7 @@ int DoSystemRun(const String& fileName, const Vector<String>& arguments)
     // Add .exe extension if no extension defined
     if (GetExtension(fixedFileName).Empty())
         fixedFileName += ".exe";
-    
+
     String commandLine = "\"" + fixedFileName + "\"";
     for (unsigned i = 0; i < arguments.Size(); ++i)
         commandLine += " " + arguments[i];
@@ -558,12 +562,10 @@ bool FileSystem::FileExists(const String& fileName) const
     if (!CheckAccess(GetPath(fileName)))
         return false;
 
-    String fixedName = GetNativePath(RemoveTrailingSlash(fileName));
-
 #ifdef ANDROID
-    if (fixedName.StartsWith("/apk/"))
+    if (fileName.StartsWith(APK))
     {
-        SDL_RWops* rwOps = SDL_RWFromFile(fileName.Substring(5).CString(), "rb");
+        SDL_RWops* rwOps = SDL_RWFromFile(ASSET(fileName), "rb");
         if (rwOps)
         {
             SDL_RWclose(rwOps);
@@ -573,6 +575,8 @@ bool FileSystem::FileExists(const String& fileName) const
             return false;
     }
 #endif
+
+    String fixedName = GetNativePath(RemoveTrailingSlash(fileName));
 
 #ifdef WIN32
     DWORD attributes = GetFileAttributesW(WString(fixedName).CString());
@@ -598,13 +602,36 @@ bool FileSystem::DirExists(const String& pathName) const
         return true;
 #endif
 
-    String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
-
 #ifdef ANDROID
-    /// \todo Actually check for existence, now true is always returned for directories within the APK
-    if (fixedName.StartsWith("/apk/"))
-        return true;
+    if (pathName.StartsWith(APK))
+    {
+        // Split the path name into two components: the longest directory path and the last name component
+        String assetPath(ASSET(pathName));
+        String parentPath;
+        unsigned pos = assetPath.FindLast('/');
+        if (pos != String::NPOS)
+        {
+            parentPath = assetPath.Substring(0, pos - 1);
+            assetPath = assetPath.Substring(pos + 1);
+        }
+        // The last name component is a directory name, so need to patch the name with trailing '_' here (see custom_rules.xml)
+        assetPath.Append('_');
+
+        bool exist = false;
+        int count;
+        char** list = SDL_Android_GetFileList(parentPath.CString(), &count);
+        for (int i = 0; i < count; ++i)
+        {
+            exist = assetPath == list[i];
+            if (exist)
+                break;
+        }
+        SDL_Android_FreeFileList(&list, &count);
+        return exist;
+    }
 #endif
+
+    String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
 
 #ifdef WIN32
     DWORD attributes = GetFileAttributesW(WString(fixedName).CString());
@@ -639,7 +666,7 @@ String FileSystem::GetProgramDir() const
 #if defined(ANDROID)
     // This is an internal directory specifier pointing to the assets in the .apk
     // Files from this directory will be opened using special handling
-    programDir_ = "/apk/";
+    programDir_ = APK;
     return programDir_;
 #elif defined(IOS)
     programDir_ = AddTrailingSlash(SDL_IOS_GetResourceDir());
@@ -756,6 +783,39 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     if (filterExtension.Contains('*'))
         filterExtension.Clear();
 
+#ifdef ANDROID
+    if (path.StartsWith(APK))
+    {
+        String assetPath(ASSET(path));
+        assetPath.Resize(assetPath.Length() - 1);       // AssetManager does not like trailing slash
+        int count;
+        char** list = SDL_Android_GetFileList(assetPath.CString(), &count);
+        for (int i = 0; i < count; ++i)
+        {
+            String fileName(list[i]);
+            if (!(flags & SCAN_HIDDEN) && fileName.StartsWith("."))
+                continue;
+
+            // Patch the directory name back after retrieving the directory flag
+            bool isDirectory = fileName.EndsWith("_");
+            if (isDirectory)
+            {
+                fileName.Resize(fileName.Length() - 1);
+                if (flags & SCAN_DIRS)
+                    result.Push(deltaPath + fileName);
+                if (recursive)
+                    ScanDirInternal(result, path + fileName, startPath, filter, flags, recursive);
+            }
+            else if (flags & SCAN_FILES)
+            {
+                if (filterExtension.Empty() || fileName.EndsWith(filterExtension))
+                    result.Push(deltaPath + fileName);
+            }
+        }
+        SDL_Android_FreeFileList(&list, &count);
+        return;
+    }
+#endif
 #ifdef WIN32
     WIN32_FIND_DATAW info;
     HANDLE handle = FindFirstFileW(WString(path + "*").CString(), &info);

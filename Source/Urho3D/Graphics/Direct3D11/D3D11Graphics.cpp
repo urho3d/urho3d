@@ -768,6 +768,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     if (vpCopy.bottom_ <= vpCopy.top_)
         vpCopy.bottom_ = vpCopy.top_ + 1;
 
+    /// \todo These rects are not used! Would need to work around copying less than a full viewport
     RECT rect;
     rect.left = Clamp(vpCopy.left_, 0, width_);
     rect.top = Clamp(vpCopy.top_, 0, height_);
@@ -781,17 +782,8 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     destRect.bottom = destination->GetHeight();
 
     ID3D11Resource* source = 0;
-    bool resolve = false;
-    bool needRelease = false;
-
-    if (renderTargets_[0])
-        source = (ID3D11Resource*)renderTargets_[0]->GetParentTexture()->GetGPUObject();
-    else
-    {
-        impl_->defaultRenderTargetView_->GetResource(&source);
-        resolve = multiSample_ > 1;
-        needRelease = true;
-    }
+    bool resolve = multiSample_ > 1;
+    impl_->defaultRenderTargetView_->GetResource(&source);
 
     if (!resolve)
         impl_->deviceContext_->CopyResource((ID3D11Resource*)destination->GetGPUObject(), source);
@@ -801,8 +793,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
             destination->GetFormat());
     }
 
-    if (needRelease)
-        source->Release();
+    source->Release();
 
     return true;
 }
