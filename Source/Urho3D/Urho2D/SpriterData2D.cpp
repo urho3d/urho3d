@@ -33,8 +33,10 @@ using namespace pugi;
 
 namespace Urho3D
 {
+
 namespace Spriter
 {
+
 SpriterData::SpriterData()
 {
 }
@@ -461,22 +463,20 @@ bool TimelineKey::Load(const pugi::xml_node& node)
     id_ = node.attribute("id").as_int();
     time_ = node.attribute("time").as_float() * 0.001f;
 
-    /*
-    String curveTypeString = node.attribute("curve_type").as_string("linear");
-    if (curveTypeString == "linear")
-        curveType = LINEAR;
-    else if (curveTypeString == "quadratic")
-        curveType = QUADRATIC;
-    else if (curveTypeString == "cubic")
-        curveType = CUBIC;
-    */
-    // Force linear
-    curveType_ = LINEAR;
+    String curveType = node.attribute("curve_type").as_string("linear");
+    if (curveType == "instant")
+        curveType_ = INSTANT;
+    else if (curveType == "linear")
+        curveType_ = LINEAR;
+    else if (curveType == "quadratic")
+        curveType_ = QUADRATIC;
+    else if (curveType == "cubic")
+        curveType_ = CUBIC;
+    else
+        curveType_ = LINEAR;
 
     c1_ = node.attribute("c1").as_float();
     c2_ = node.attribute("c2").as_float();
-    c3_ = node.attribute("c2").as_float();
-    c4_ = node.attribute("c2").as_float();
 
     return true;
 }
@@ -488,37 +488,47 @@ TimelineKey& TimelineKey::operator=(const TimelineKey& rhs)
     curveType_ = rhs.curveType_;
     c1_ = rhs.c1_;
     c2_ = rhs.c2_;
-    c3_ = rhs.c3_;
-    c4_ = rhs.c4_;
     return *this;
 }
 
-void TimelineKey::Interpolate(const TimelineKey& other, float t)
-{
+// From http://www.brashmonkey.com/ScmlDocs/ScmlReference.html
 
+inline float Linear(float a, float b, float t)
+{
+    return a + (b - a) * t;
 }
 
-float toRadians(float deg)
+inline float Quadratic(float a, float b, float c, float t)
 {
-    const float PI = 3.141592653589793f;
-    return deg * PI / 180.0f;
+    return Linear(Linear(a, b, t), Linear(b, c, t), t);
 }
 
-float under360(float rotation)
+inline float Cubic(float a, float b, float c, float d, float t)
 {
-    while (rotation > 360.0f)
+    return Linear(Quadratic(a, b, c, t), Quadratic(b, c, d, t), t);
+}
+
+float TimelineKey::GetTByCurveType(float currentTime, float nextTimelineTime) const
+{
+    if (curveType_ == INSTANT)
+        return 0.0f;
+
+    float t = (currentTime - time_) / (nextTimelineTime - time_);
+    switch (curveType_)
     {
-        rotation -= 360.0f;
-    }
+    case LINEAR:
+        return t;
 
-    while (rotation < 0.0f)
-    {
-        rotation += 360.0f;
-    }
+    case QUADRATIC:
+        return Quadratic(0.0f, c1_, 1.0f, t);
 
-    return rotation;
+    case CUBIC:
+        return Cubic(0.0f, c1_, c2_, 1.0f, t);
+
+    default:
+        return 0.0f;
+    }
 }
-
 
 SpatialInfo::SpatialInfo(float x, float y, float angle, float scale_x, float scale_y, float a, int spin)
 {
@@ -544,11 +554,7 @@ SpatialInfo SpatialInfo::UnmapFromParent(const SpatialInfo& parentInfo) const
     {
         float preMultX = x_ * parentInfo.scaleX_;
         float preMultY = y_ * parentInfo.scaleY_;
-            
-        // float parentRad = toRadians(under360(parentInfo.angle_));
 
-        // float s = sinf(parentRad);
-        // float c = cosf(parentRad);
         float s = Sin(parentInfo.angle_);
         float c = Cos(parentInfo.angle_);
 
@@ -564,32 +570,27 @@ SpatialInfo SpatialInfo::UnmapFromParent(const SpatialInfo& parentInfo) const
     return SpatialInfo(unmappedX, unmappedY, unmappedAngle, unmappedScaleX, unmappedScaleY, unmappedAlpha, spin);
 }
 
-inline float linear(float a, float b, float t)
-{
-    return a + (b - a) * t;
-}
-
 void SpatialInfo::Interpolate(const SpatialInfo& other, float t)
 {
-    x_ = linear(x_, other.x_, t);
-    y_ = linear(y_, other.y_, t);
+    x_ = Linear(x_, other.x_, t);
+    y_ = Linear(y_, other.y_, t);
 
     if (spin > 0.0f && (other.angle_ - angle_ < 0.0f))
     {
-        angle_ = linear(angle_, other.angle_ + 360.0f, t);
+        angle_ = Linear(angle_, other.angle_ + 360.0f, t);
     }
     else if (spin < 0.0f && (other.angle_ - angle_ > 0.0f))
     {
-        angle_ = linear(angle_, other.angle_ - 360.0f, t);
+        angle_ = Linear(angle_, other.angle_ - 360.0f, t);
     }
     else
     {
-        angle_ = linear(angle_, other.angle_, t);
+        angle_ = Linear(angle_, other.angle_, t);
     }
 
-    scaleX_ = linear(scaleX_, other.scaleX_, t);
-    scaleY_ = linear(scaleY_, other.scaleY_, t);
-    alpha_ = linear(alpha_, other.alpha_, t);
+    scaleX_ = Linear(scaleX_, other.scaleX_, t);
+    scaleY_ = Linear(scaleY_, other.scaleY_, t);
+    alpha_ = Linear(alpha_, other.alpha_, t);
 }
 
 SpatialTimelineKey::SpatialTimelineKey(Timeline* timeline) : 
@@ -681,8 +682,8 @@ void BoneTimelineKey::Interpolate(const TimelineKey& other, float t)
     SpatialTimelineKey::Interpolate(other, t);
 
     const BoneTimelineKey& o = (const BoneTimelineKey&)other;
-    length_ = linear(length_, o.length_, t);
-    width_ = linear(width_, o.width_, t);
+    length_ = Linear(length_, o.length_, t);
+    width_ = Linear(width_, o.width_, t);
 }
 
 TimelineKey* SpriteTimelineKey::Clone() const
@@ -730,8 +731,8 @@ void SpriteTimelineKey::Interpolate(const TimelineKey& other, float t)
     SpatialTimelineKey::Interpolate(other, t);
         
     const SpriteTimelineKey& o = (const SpriteTimelineKey&)other;
-    pivotX_ = linear(pivotX_, o.pivotX_, t);
-    pivotY_ = linear(pivotY_, o.pivotY_, t);
+    pivotX_ = Linear(pivotX_, o.pivotX_, t);
+    pivotY_ = Linear(pivotY_, o.pivotY_, t);
 }
 
 SpriteTimelineKey& SpriteTimelineKey::operator=(const SpriteTimelineKey& rhs)
@@ -748,4 +749,5 @@ SpriteTimelineKey& SpriteTimelineKey::operator=(const SpriteTimelineKey& rhs)
 }
 
 }
+
 }

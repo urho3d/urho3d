@@ -29,8 +29,10 @@ class xml_node;
 
 namespace Urho3D
 {
+
 namespace Spriter
 {
+
 struct Animation;
 struct BoneTimelineKey;
 struct CharacterMap;
@@ -225,8 +227,9 @@ struct TimelineKey
     virtual ObjectType GetObjectType() const = 0;
     virtual TimelineKey* Clone() const = 0;
     virtual bool Load(const pugi::xml_node& node);
-    virtual void Interpolate(const TimelineKey& other, float t);
+    virtual void Interpolate(const TimelineKey& other, float t) = 0;
     TimelineKey& operator=(const TimelineKey& rhs);
+    float GetTByCurveType(float currentTime, float nextTimelineTime) const;
 
     Timeline* timeline_;
     int id_;
@@ -234,8 +237,6 @@ struct TimelineKey
     CurveType curveType_;
     float c1_;
     float c2_;
-    float c3_;
-    float c4_;
 };
 
 /// Spatial info.
@@ -304,5 +305,7 @@ struct SpriteTimelineKey : SpatialTimelineKey
     virtual void Interpolate(const TimelineKey& other, float t);
     SpriteTimelineKey& operator=(const SpriteTimelineKey& rhs);
 };
+
 }
+
 }

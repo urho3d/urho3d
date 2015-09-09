@@ -26,8 +26,11 @@
 
 namespace Urho3D
 {
+
 namespace Spriter
 {
+
+/// Loop Mode.
 enum LoopMode
 {
     Default = 0,
@@ -100,5 +103,7 @@ private:
     PODVector<SpatialTimelineKey*> timelineKeys_;
         
 };
+
 }
+
 }

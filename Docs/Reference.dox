@@ -1090,7 +1090,7 @@ The sRGB flag controls both whether the texture should be sampled with sRGB to l
 
 \section Materials_CubeMapTextures Cube map textures
 
-Using cube map textures requires an XML file to define the cube map face textures or layout. In this case the XML file *is* the texture resource name in material scripts or in LoadResource() calls.
+Using cube map textures requires an XML file to define the cube map face images, or a single image with layout. In this case the XML file *is* the texture resource name in material scripts or in LoadResource() calls.
 
 Individual face textures are defined in the XML like this: (see bin/Data/Textures/Skybox.xml for an example)
 
@@ -1114,6 +1114,18 @@ Using a single image texture and a layout is used like this:
 \endcode
 
 For the layout definitions, see http://www.cgtextures.com/content.php?action=tutorial&name=cubemaps and http://en.wikibooks.org/wiki/Blender_3D:_Noob_to_Pro/Build_a_skybox
+
+\section Materials_3DTextures 3D textures
+
+3D textures likewise require an XML file to describe how they should be loaded. The XML should contain either a "volume" or "colorlut" element, which defines the image to load with its "name" attribute. The "volume" mode requires that the image is in a format that supports 3D (volume) textures directly, for example DDS. The "colorlut" mode allows any format, and instead spreads out the Z slices of the volume image horizontally in a 2D image from the left to the right: for example LUTIdentity.png has 16 16x16 slices for a total image size 256x16.
+
+\code
+<texture3d>
+    <colorlut name="LUTIdentity.png" />
+</texture3d>
+\endcode
+
+Using a 3D texture for color correction postprocess (see bin/Data/PostProcess/ColorCorrection.xml) requires the 3D texture to be assigned to the "volume" texture unit, so that the effect knows to load the texture as the correct type. The lookup for the corrected color happens by using the original color's red channel as the X coordinate, the green channel as the Y coordinate, and blue as the Z. Therefore the identity LUT's slices (which shouldn't transform the color at all) grow red from left to right and green from top to bottom, and finally the slices themselves turn blue from left to right.
 
 \section Materials_Techniques Techniques and passes
 

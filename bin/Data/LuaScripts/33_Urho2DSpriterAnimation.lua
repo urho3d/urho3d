@@ -54,7 +54,7 @@ function CreateScene()
 
     local spriterAnimatedSprite = spriterNode:CreateComponent("AnimatedSprite2D")
     spriterAnimatedSprite.animationSet = spriterAnimationSet
-    spriterAnimatedSprite:SetAnimation(spriterAnimationSet:GetAnimation(animationIndex), LM_FORCE_LOOPED)
+    spriterAnimatedSprite:SetAnimation(spriterAnimationSet:GetAnimation(spriterAnimationIndex), LM_FORCE_LOOPED)
 end
 
 function CreateInstructions()
