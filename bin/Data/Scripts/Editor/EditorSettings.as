@@ -110,6 +110,13 @@ void UpdateEditorSettingsDialog()
 
     CheckBox@ frameLimiterToggle = settingsDialog.GetChild("FrameLimiterToggle", true);
     frameLimiterToggle.checked = engine.maxFps > 0;
+    
+    LineEdit@ cubemapPath = settingsDialog.GetChild("CubeMapGenPath", true);
+    cubemapPath.text = cubeMapGen_Path;
+    LineEdit@ cubemapName = settingsDialog.GetChild("CubeMapGenKey", true);
+    cubemapName.text = cubeMapGen_Name;
+    LineEdit@ cubemapSize = settingsDialog.GetChild("CubeMapGenSize", true);
+    cubemapSize.text = String(cubeMapGen_Size);
 
     if (!subscribedToEditorSettings)
     {
@@ -155,6 +162,14 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(dynamicInstancingToggle, "Toggled", "EditDynamicInstancing");
         SubscribeToEvent(frameLimiterToggle, "Toggled", "EditFrameLimiter");
         SubscribeToEvent(settingsDialog.GetChild("CloseButton", true), "Released", "HideEditorSettingsDialog");
+        
+        SubscribeToEvent(cubemapPath, "TextChanged",  "EditCubemapPath");
+        SubscribeToEvent(cubemapPath, "TextFinished", "EditCubemapPath");
+        SubscribeToEvent(cubemapName, "TextChanged",  "EditCubemapName");
+        SubscribeToEvent(cubemapName, "TextFinished", "EditCubemapName");
+        SubscribeToEvent(cubemapSize, "TextChanged",  "EditCubemapSize");
+        SubscribeToEvent(cubemapSize, "TextFinished", "EditCubemapSize");
+        
         subscribedToEditorSettings = true;
     }
 }
@@ -389,4 +404,22 @@ void EditFrameLimiter(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetPtr();
     engine.maxFps = edit.checked ? 200 : 0;
+}
+
+void EditCubemapPath(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ edit = eventData["Element"].GetPtr();
+    cubeMapGen_Path = edit.text;
+}
+
+void EditCubemapName(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ edit = eventData["Element"].GetPtr();
+    cubeMapGen_Name = edit.text;
+}
+
+void EditCubemapSize(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ edit = eventData["Element"].GetPtr();
+    cubeMapGen_Size = edit.text.ToInt();
 }

@@ -499,6 +499,42 @@
                         <attribute name="Text" value="Frame limiter" />
                     </element>
                 </element>
+                
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="20" />
+                    <element type="Text">
+                        <attribute name="Text" value="Cubemap Gen Path" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="CubeMapGenPath" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                     </element>
+                </element>
+                
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="20" />
+                    <element type="Text">
+                        <attribute name="Text" value="Cubemap Key" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="CubeMapGenKey" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                     </element>
+                </element>
+                
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="20" />
+                    <element type="Text">
+                        <attribute name="Text" value="Cubemap Size" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="CubeMapGenSize" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                     </element>
+                </element>
             </element>
         </element>
     </element>
