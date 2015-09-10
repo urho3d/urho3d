@@ -211,7 +211,7 @@ void Java_org_libsdl_app_SDLActivity_onNativeHat(
 
 int Java_org_libsdl_app_SDLActivity_nativeAddJoystick(
     JNIEnv* env, jclass jcls,
-    jint device_id, jstring device_name, jint is_accelerometer, 
+    jint device_id, jstring device_name, jint is_accelerometer,
     jint nbuttons, jint naxes, jint nhats, jint nballs)
 {
     int retval;
@@ -220,7 +220,7 @@ int Java_org_libsdl_app_SDLActivity_nativeAddJoystick(
     retval = Android_AddJoystick(device_id, name, (SDL_bool) is_accelerometer, nbuttons, naxes, nhats, nballs);
 
     (*env)->ReleaseStringUTFChars(env, device_name, name);
-    
+
     return retval;
 }
 
@@ -240,10 +240,10 @@ void Java_org_libsdl_app_SDLActivity_onNativeSurfaceChanged(JNIEnv* env, jclass 
     if (Android_Window == NULL || Android_Window->driverdata == NULL ) {
         return;
     }
-    
+
     _this =  SDL_GetVideoDevice();
     data =  (SDL_WindowData *) Android_Window->driverdata;
-    
+
     /* If the surface has been previously destroyed by onNativeSurfaceDestroyed, recreate it here */
     if (data->egl_surface == EGL_NO_SURFACE) {
         if(data->native_window) {
@@ -252,9 +252,9 @@ void Java_org_libsdl_app_SDLActivity_onNativeSurfaceChanged(JNIEnv* env, jclass 
         data->native_window = Android_JNI_GetNativeWindow();
         data->egl_surface = SDL_EGL_CreateSurface(_this, (NativeWindowType) data->native_window);
     }
-    
+
     /* GL Context handling is done in the event loop because this function is run from the Java thread */
-    
+
 }
 
 /* Surface Destroyed */
@@ -266,20 +266,20 @@ void Java_org_libsdl_app_SDLActivity_onNativeSurfaceDestroyed(JNIEnv* env, jclas
      */
     SDL_WindowData *data;
     SDL_VideoDevice *_this;
-    
+
     if (Android_Window == NULL || Android_Window->driverdata == NULL ) {
         return;
     }
-    
+
     _this =  SDL_GetVideoDevice();
     data = (SDL_WindowData *) Android_Window->driverdata;
-    
+
     if (data->egl_surface != EGL_NO_SURFACE) {
         SDL_EGL_MakeCurrent(_this, NULL, NULL);
         SDL_EGL_DestroySurface(_this, data->egl_surface);
         data->egl_surface = EGL_NO_SURFACE;
     }
-    
+
     /* GL Context handling is done in the event loop because this function is run from the Java thread */
 
 }
@@ -368,8 +368,8 @@ void Java_org_libsdl_app_SDLActivity_nativePause(
         SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_MINIMIZED, 0, 0);
         SDL_SendAppEvent(SDL_APP_WILLENTERBACKGROUND);
         SDL_SendAppEvent(SDL_APP_DIDENTERBACKGROUND);
-    
-        /* *After* sending the relevant events, signal the pause semaphore 
+
+        /* *After* sending the relevant events, signal the pause semaphore
          * so the event loop knows to pause and (optionally) block itself */
         if (!SDL_SemValue(Android_PauseSem)) SDL_SemPost(Android_PauseSem);
     }
@@ -466,7 +466,7 @@ static void LocalReferenceHolder_Cleanup(struct LocalReferenceHolder *refholder)
 
 static SDL_bool LocalReferenceHolder_IsActive()
 {
-    return s_active > 0;    
+    return s_active > 0;
 }
 
 ANativeWindow* Android_JNI_GetNativeWindow(void)
@@ -478,7 +478,7 @@ ANativeWindow* Android_JNI_GetNativeWindow(void)
     s = (*env)->CallStaticObjectMethod(env, mActivityClass, midGetNativeSurface);
     anw = ANativeWindow_fromSurface(env, s);
     (*env)->DeleteLocalRef(env, s);
-  
+
     return anw;
 }
 
@@ -800,7 +800,7 @@ fallback:
          * android/apis/content/ReadAsset.java imply that Android's
          * AssetInputStream.available() /will/ always return the total file size
         */
-        
+
         /* size = inputStream.available(); */
         mid = (*mEnv)->GetMethodID(mEnv, (*mEnv)->GetObjectClass(mEnv, inputStream),
                 "available", "()I");
@@ -848,7 +848,7 @@ failure:
         }
 
     }
-    
+
     LocalReferenceHolder_Cleanup(&refs);
     return result;
 }
@@ -861,7 +861,7 @@ int Android_JNI_FileOpen(SDL_RWops* ctx,
     int retval;
 
     if (!LocalReferenceHolder_Init(&refs, mEnv)) {
-        LocalReferenceHolder_Cleanup(&refs);        
+        LocalReferenceHolder_Cleanup(&refs);
         return -1;
     }
 
@@ -910,7 +910,7 @@ size_t Android_JNI_FileRead(SDL_RWops* ctx, void* buffer,
 
         JNIEnv *mEnv = Android_JNI_GetEnv();
         if (!LocalReferenceHolder_Init(&refs, mEnv)) {
-            LocalReferenceHolder_Cleanup(&refs);            
+            LocalReferenceHolder_Cleanup(&refs);
             return 0;
         }
 
@@ -923,7 +923,7 @@ size_t Android_JNI_FileRead(SDL_RWops* ctx, void* buffer,
             int result = (*mEnv)->CallIntMethod(mEnv, readableByteChannel, readMethod, byteBuffer);
 
             if (Android_JNI_ExceptionOccurred(false)) {
-                LocalReferenceHolder_Cleanup(&refs);            
+                LocalReferenceHolder_Cleanup(&refs);
                 return 0;
             }
 
@@ -935,7 +935,7 @@ size_t Android_JNI_FileRead(SDL_RWops* ctx, void* buffer,
             bytesRead += result;
             ctx->hidden.androidio.position += result;
         }
-        LocalReferenceHolder_Cleanup(&refs);                    
+        LocalReferenceHolder_Cleanup(&refs);
         return bytesRead / size;
     }
 }
@@ -1170,7 +1170,7 @@ char* Android_JNI_GetClipboardText()
         }
     }
 
-    CLEANUP_CLIPBOARD();    
+    CLEANUP_CLIPBOARD();
 
     return SDL_strdup("");
 }
@@ -1184,7 +1184,7 @@ SDL_bool Android_JNI_HasClipboardText()
     (*env)->DeleteGlobalRef(env, clipboard);
 
     CLEANUP_CLIPBOARD();
-    
+
     return has ? SDL_TRUE : SDL_FALSE;
 }
 
@@ -1314,7 +1314,7 @@ int Android_JNI_GetTouchDeviceIds(int **ids) {
 void Android_JNI_PollInputDevices()
 {
     JNIEnv *env = Android_JNI_GetEnv();
-    (*env)->CallStaticVoidMethod(env, mActivityClass, midPollInputDevices);    
+    (*env)->CallStaticVoidMethod(env, mActivityClass, midPollInputDevices);
 }
 
 /* sends message to be handled on the UI event dispatch thread */
@@ -1407,8 +1407,7 @@ char** SDL_Android_GetFileList(const char* path, int* count)
         (*mEnv)->ReleaseStringUTFChars(mEnv, string, cString);
     }
 
-    if (count != NULL)
-        *count = arrayLength;
+    *count = arrayLength;
 
     LocalReferenceHolder_Cleanup(&refs);
     return cStringArray;

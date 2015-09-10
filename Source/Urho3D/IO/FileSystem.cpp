@@ -563,7 +563,7 @@ bool FileSystem::FileExists(const String& fileName) const
         return false;
 
 #ifdef ANDROID
-    if (fileName.StartsWith(APK))
+    if (IS_ASSET(fileName))
     {
         SDL_RWops* rwOps = SDL_RWFromFile(ASSET(fileName), "rb");
         if (rwOps)
@@ -602,20 +602,21 @@ bool FileSystem::DirExists(const String& pathName) const
         return true;
 #endif
 
+    String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
+
 #ifdef ANDROID
-    if (pathName.StartsWith(APK))
+    if (IS_ASSET(fixedName))
     {
-        // Split the path name into two components: the longest directory path and the last name component
-        String assetPath(ASSET(pathName));
+        // Split the pathname into two components: the longest parent directory path and the last name component
+        String assetPath(ASSET((fixedName + '/')));
         String parentPath;
-        unsigned pos = assetPath.FindLast('/');
+        unsigned pos = assetPath.FindLast('/', assetPath.Length() - 2);
         if (pos != String::NPOS)
         {
             parentPath = assetPath.Substring(0, pos - 1);
             assetPath = assetPath.Substring(pos + 1);
         }
-        // The last name component is a directory name, so need to patch the name with trailing '_' here (see custom_rules.xml)
-        assetPath.Append('_');
+        assetPath.Resize(assetPath.Length() - 1);
 
         bool exist = false;
         int count;
@@ -630,8 +631,6 @@ bool FileSystem::DirExists(const String& pathName) const
         return exist;
     }
 #endif
-
-    String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
 
 #ifdef WIN32
     DWORD attributes = GetFileAttributesW(WString(fixedName).CString());
@@ -784,10 +783,10 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
         filterExtension.Clear();
 
 #ifdef ANDROID
-    if (path.StartsWith(APK))
+    if (IS_ASSET(path))
     {
         String assetPath(ASSET(path));
-        assetPath.Resize(assetPath.Length() - 1);       // AssetManager does not like trailing slash
+        assetPath.Resize(assetPath.Length() - 1);       // AssetManager.list() does not like trailing slash
         int count;
         char** list = SDL_Android_GetFileList(assetPath.CString(), &count);
         for (int i = 0; i < count; ++i)
@@ -797,10 +796,10 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
                 continue;
 
             // Patch the directory name back after retrieving the directory flag
-            bool isDirectory = fileName.EndsWith("_");
+            bool isDirectory = fileName.EndsWith(ASSET_DIR_INDICATOR);
             if (isDirectory)
             {
-                fileName.Resize(fileName.Length() - 1);
+                fileName.Resize(fileName.Length() - sizeof(ASSET_DIR_INDICATOR) / sizeof(char) + 1);
                 if (flags & SCAN_DIRS)
                     result.Push(deltaPath + fileName);
                 if (recursive)

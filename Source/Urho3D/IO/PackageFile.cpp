@@ -53,7 +53,7 @@ PackageFile::~PackageFile()
 bool PackageFile::Open(const String& fileName, unsigned startOffset)
 {
 #ifdef ANDROID
-    if (fileName.StartsWith(APK))
+    if (IS_ASSET(fileName))
     {
         LOGERROR("Package files within the apk are not supported on Android");
         return false;

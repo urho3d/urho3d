@@ -510,6 +510,8 @@ private:
     void SetTextureUnitMappings();
     /// Process dirtied state before draw.
     void PrepareDraw();
+    /// Create intermediate texture for multisampled backbuffer resolve. No-op if already exists.
+    void CreateResolveTexture();
 
     /// Mutex for accessing the GPU objects vector from several threads.
     Mutex gpuObjectMutex_;

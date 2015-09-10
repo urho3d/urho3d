@@ -741,6 +741,7 @@ macro (enable_pch HEADER_PATHNAME)
                     endif ()
                 endif ()
                 string (REPLACE ";" " -D" COMPILE_DEFINITIONS "-D${COMPILE_DEFINITIONS}")
+                string (REPLACE "\"" "\\\"" COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS})
                 string (REPLACE ";" "\" -I\"" INCLUDE_DIRECTORIES "-I\"${INCLUDE_DIRECTORIES}\"")
                 # Make sure the precompiled headers are not stale by creating custom rules to re-compile the header as necessary
                 file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
