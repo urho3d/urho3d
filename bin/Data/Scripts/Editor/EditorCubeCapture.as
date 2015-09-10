@@ -4,7 +4,7 @@ String cubeMapGen_Name;
 String cubeMapGen_Path;
 int cubeMapGen_Size;
 
-Array<EditorCubeCapture@> activeCubeCapture; // Editor capture tasks in progress
+Array<EditorCubeCapture@> activeCubeCapture; // Editor capture tasks in progress, Stop() method of EditorCubeCapture moves forward through the queue as captures are finished
 Array<Zone@> cloneZones; // Duplicate zones constructed to prevent IBL doubling
 Array<Zone@> disabledZones; // Zones that were disabled to prevent IBL doubling
 String cubemapOutputPath = "Data/Textures/Cubemaps";
@@ -43,6 +43,13 @@ void PrepareZonesForCubeRendering()
             disabledZones.Push(srcZone);
         }
     }
+    
+    // Hide grid and debugIcons until bake
+    if (grid !is null)
+        grid.viewMask = 0;
+    if (debugIconsNode !is null)
+        debugIconsNode.enabled = false;
+    debugRenderDisabled = true;
 }
 
 void UnprepareZonesForCubeRendering()
@@ -56,6 +63,13 @@ void UnprepareZonesForCubeRendering()
     for (int i = 0; i < disabledZones.length; ++i)
         disabledZones[i].enabled = true;
     disabledZones.Clear();
+    
+    // Show grid and debug icons    
+    if (grid !is null)
+        grid.viewMask = 0x80000000;
+    if (debugIconsNode !is null)
+        debugIconsNode.enabled = true;
+    debugRenderDisabled = false;
 }
 
 class EditorCubeCapture : ScriptObject // script object in order to get events
@@ -75,7 +89,7 @@ class EditorCubeCapture : ScriptObject // script object in order to get events
     {
         PrepareZonesForCubeRendering();
         
-        // Store name and path because if we have a lot of zones it could take long enough to queue another go
+        // Store name and path because if we have a lot of zones it could take long enough to queue another go, and it may have different settings
         name_ = cubeMapGen_Name;
         path_ = cubeMapGen_Path;
     
@@ -86,17 +100,12 @@ class EditorCubeCapture : ScriptObject // script object in order to get events
         camNode_ = scene.CreateChild("RenderCamera");
         camera_ = camNode_.GetOrCreateComponent("Camera");
         camera_.fov = 90.0f;
+        camera_.nearClip = 0.0001f;
+        camera_.aspectRatio = 1.0f;
         camNode_.worldPosition = forZone.node.worldPosition;
         
         viewport_ = Viewport(scene, camera_);
         viewport_.renderPath = renderer.viewports[0].renderPath;
-        
-        renderImage_ = Texture2D();
-        renderImage_.SetSize(cubeMapGen_Size, cubeMapGen_Size, GetRGBAFormat(), TEXTURE_RENDERTARGET);
-        
-        renderSurface_ = renderImage_.renderSurface;
-        renderSurface_.viewports[0] = viewport_;
-        renderSurface_.updateMode = SURFACE_UPDATEALWAYS;
         
         updateCycle_ = 0;
     }
@@ -108,6 +117,14 @@ class EditorCubeCapture : ScriptObject // script object in order to get events
     
     void Start()
     {
+        // Construct render surface 
+        renderImage_ = Texture2D();
+        renderImage_.SetSize(cubeMapGen_Size, cubeMapGen_Size, GetRGBAFormat(), TEXTURE_RENDERTARGET);
+        
+        renderSurface_ = renderImage_.renderSurface;
+        renderSurface_.viewports[0] = viewport_;
+        renderSurface_.updateMode = SURFACE_UPDATEALWAYS;
+    
         SubscribeToEvent("BeginFrame", "HandlePreRender");
         SubscribeToEvent("EndFrame", "HandlePostRender");
     }
@@ -125,6 +142,7 @@ class EditorCubeCapture : ScriptObject // script object in order to get events
         WriteXML();
         
         // Remove ourselves from the processing list and if necessary clean things up
+        // If others are pending in the queue then start the next one
         activeCubeCapture.Erase(activeCubeCapture.FindByRef(this));
         if (activeCubeCapture.length == 0)
             UnprepareZonesForCubeRendering();
@@ -140,7 +158,7 @@ class EditorCubeCapture : ScriptObject // script object in order to get events
             ++updateCycle_;
         
             if (updateCycle_ < 7)
-                camNode_.rotation = RotationOf(GetFaceForCycle(updateCycle_));
+                camNode_.worldRotation = RotationOf(GetFaceForCycle(updateCycle_));
             else
                 Stop();
         }
@@ -159,8 +177,8 @@ class EditorCubeCapture : ScriptObject // script object in order to get events
     
     private void WriteXML()
     {
-        String sceneName = editorScene.name.length > 0 ? editorScene.name + "/" : "";
-        String basePath = path_ + "/" + sceneName;
+        String sceneName = editorScene.name.length > 0 ? "/" + editorScene.name + "/" : "";
+        String basePath = path_ + sceneName;
         String cubeName = name_.length > 0 ? (name_ + "_") : "";
         String xmlPath = basePath + "/" + name_ + String(target_.id) + ".xml";
         XMLFile@ file = XMLFile();
@@ -214,19 +232,19 @@ class EditorCubeCapture : ScriptObject // script object in order to get events
     
     private String GetFaceName(CubeMapFace face)
     {
-        switch (updateCycle_)
+        switch (face)
         {
-        case 1:
+        case FACE_POSITIVE_X:
             return "PosX";
-        case 2:                                  
+        case FACE_POSITIVE_Y:                                  
             return "PosY";                                   
-        case 3:                                  
+        case FACE_POSITIVE_Z:                                  
             return "PosZ";
-        case 4:
+        case FACE_NEGATIVE_X:
             return "NegX";
-        case 5:
+        case FACE_NEGATIVE_Y:
             return "NegY";
-        case 6:
+        case FACE_NEGATIVE_Z:
             return "NegZ";
         }
         return "PosX";
