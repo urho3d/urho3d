@@ -894,21 +894,6 @@ static void DestructAnimationKeyFrame(AnimationKeyFrame* ptr)
     ptr->~AnimationKeyFrame();
 }
 
-static void ConstructAnimationTrack(AnimationTrack* ptr)
-{
-    new(ptr)AnimationTrack();
-}
-
-static void ConstructAnimationTrackCopy(const AnimationTrack& track, AnimationTrack* ptr)
-{
-    new(ptr)AnimationTrack(track);
-}
-
-static void DestructAnimationTrack(AnimationTrack* ptr)
-{
-    ptr->~AnimationTrack();
-}
-
 static AnimationKeyFrame* AnimationTrackGetKeyFrame(unsigned index, AnimationTrack* ptr)
 {
     if (index >= ptr->GetNumKeyFrames())
