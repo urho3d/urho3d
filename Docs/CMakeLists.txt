@@ -36,20 +36,36 @@ endmacro ()
 # As a workaround, we unset CMAKE_FIND_ROOT_PATH (even when we are cross-compiling) but in this scope ONLY in order to always do a non-rooted search for Doxygen package
 unset (CMAKE_FIND_ROOT_PATH)
 # Find Doxygen and DOT packages
-find_package (Doxygen QUIET)
+if (URHO3D_DOCS OR URHO3D_DOCS_QUIET)
+    set (DOXYGEN_OPT REQUIRED)
+else ()
+    set (DOXYGEN_OPT QUIET)
+endif ()
+find_package (Doxygen ${DOXYGEN_OPT})
 
-if (DOXYGEN_FOUND)
+if (DOXYGEN_FOUND)      # When DOT is not found, the documentation build should still proceed without producing any graphs
     # Generate platform specific Doxyfile automatically
     if (NOT URHO3D_OPENGL EQUAL DOXYFILE_URHO3D_OPENGL OR ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in IS_NEWER_THAN ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
         set (DOXYFILE_URHO3D_OPENGL ${URHO3D_OPENGL} CACHE INTERNAL "URHO3D_OPENGL build option when Doxyfile was last generated")
         if (URHO3D_OPENGL)
             set (EXCLUDE_GRAPHICS_API Direct3D9)
+            set (EXCLUDE_GRAPHICS_API2 Direct3D11)
         else ()
             set (EXCLUDE_GRAPHICS_API OpenGL)
+            if (URHO3D_D3D11)
+                set (EXCLUDE_GRAPHICS_API2 Direct3D9)
+            else ()
+                set (EXCLUDE_GRAPHICS_API2 Direct3D11)
+            endif ()
         endif ()
         foreach (IDE XCODE MSVC Eclipse CodeBlocks)
             enable_help (${IDE})
         endforeach ()
+        if (MSVC)
+            # There could be a bug in CMake findHTMLHelp.cmake module which would prevent it to find the hhc.exe in "Program Files (x86)" in a 64-bit Windows
+            # To woraround this problem, you may have to append the paths being searched in your local copy of findHTMLHelp.cmake module to include the above path
+            find_package (HTMLHelp REQUIRED)    # All or nothing
+        endif ()
         configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
     endif ()
 
