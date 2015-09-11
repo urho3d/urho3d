@@ -1035,7 +1035,6 @@ void BuildAndSaveAnimations(OutModel* model)
         outAnim->SetLength(duration * tickConversion);
 
         PrintLine("Writing animation " + animName + " length " + String(outAnim->GetLength()));
-        Vector<AnimationTrack> tracks;
         for (unsigned j = 0; j < anim->mNumChannels; ++j)
         {
             aiNodeAnim* channel = anim->mChannels[j];
@@ -1049,6 +1048,7 @@ void BuildAndSaveAnimations(OutModel* model)
                 if (boneIndex == M_MAX_UNSIGNED)
                 {
                     PrintLine("Warning: skipping animation track " + channelName + " not found in model skeleton");
+                    outAnim->RemoveTrack(channelName);
                     continue;
                 }
                 boneNode = model->bones_[boneIndex];
@@ -1060,6 +1060,7 @@ void BuildAndSaveAnimations(OutModel* model)
                 if (!boneNode)
                 {
                     PrintLine("Warning: skipping animation track " + channelName + " whose scene node was not found");
+                    outAnim->RemoveTrack(channelName);
                     continue;
                 }
             }
@@ -1080,20 +1081,18 @@ void BuildAndSaveAnimations(OutModel* model)
             if (channel->mNumRotationKeys > 0 && !ToQuaternion(boneRot).Equals(ToQuaternion(channel->mRotationKeys[0].mValue)))
                 rotEqual = false;
 
-            AnimationTrack track;
-            track.name_ = channelName;
-            track.nameHash_ = channelName;
+            AnimationTrack* track = outAnim->CreateTrack(channelName);
 
             // Check which channels are used
-            track.channelMask_ = 0;
+            track->channelMask_ = 0;
             if (channel->mNumPositionKeys > 1 || !posEqual)
-                track.channelMask_ |= CHANNEL_POSITION;
+                track->channelMask_ |= CHANNEL_POSITION;
             if (channel->mNumRotationKeys > 1 || !rotEqual)
-                track.channelMask_ |= CHANNEL_ROTATION;
+                track->channelMask_ |= CHANNEL_ROTATION;
             if (channel->mNumScalingKeys > 1 || !scaleEqual)
-                track.channelMask_ |= CHANNEL_SCALE;
+                track->channelMask_ |= CHANNEL_SCALE;
             // Check for redundant identity scale in all keyframes and remove in that case
-            if (track.channelMask_ & CHANNEL_SCALE)
+            if (track->channelMask_ & CHANNEL_SCALE)
             {
                 bool redundantScale = true;
                 for (unsigned k = 0; k < channel->mNumScalingKeys; ++k)
@@ -1108,11 +1107,15 @@ void BuildAndSaveAnimations(OutModel* model)
                     }
                 }
                 if (redundantScale)
-                    track.channelMask_ &= ~CHANNEL_SCALE;
+                    track->channelMask_ &= ~CHANNEL_SCALE;
             }
 
-            if (!track.channelMask_)
+            if (!track->channelMask_)
+            {
                 PrintLine("Warning: skipping animation track " + channelName + " with no keyframes");
+                outAnim->RemoveTrack(channelName);
+                continue;
+            }
 
             // Currently only same amount of keyframes is supported
             // Note: should also check the times of individual keyframes for match
@@ -1121,6 +1124,7 @@ void BuildAndSaveAnimations(OutModel* model)
                 (channel->mNumRotationKeys > 1 && channel->mNumScalingKeys > 1 && channel->mNumRotationKeys != channel->mNumScalingKeys))
             {
                 PrintLine("Warning: differing amounts of channel keyframes, skipping animation track " + channelName);
+                outAnim->RemoveTrack(channelName);
                 continue;
             }
 
@@ -1139,11 +1143,11 @@ void BuildAndSaveAnimations(OutModel* model)
                 kf.scale_ = Vector3::ONE;
 
                 // Get time for the keyframe. Adjust with animation's start time
-                if (track.channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
+                if (track->channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
                     kf.time_ = ((float)channel->mPositionKeys[k].mTime - startTime) * tickConversion;
-                else if (track.channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
+                else if (track->channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
                     kf.time_ = ((float)channel->mRotationKeys[k].mTime - startTime) * tickConversion;
-                else if (track.channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
+                else if (track->channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
                     kf.time_ = ((float)channel->mScalingKeys[k].mTime - startTime) * tickConversion;
 
                 // Make sure time stays positive
@@ -1155,11 +1159,11 @@ void BuildAndSaveAnimations(OutModel* model)
                 aiQuaternion rot;
                 boneTransform.Decompose(scale, rot, pos);
                 // Then apply the active channels
-                if (track.channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
+                if (track->channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
                     pos = channel->mPositionKeys[k].mValue;
-                if (track.channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
+                if (track->channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
                     rot = channel->mRotationKeys[k].mValue;
-                if (track.channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
+                if (track->channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
                     scale = channel->mScalingKeys[k].mValue;
 
                 // If root bone, transform with the model root node transform
@@ -1174,20 +1178,16 @@ void BuildAndSaveAnimations(OutModel* model)
                     tform.Decompose(scale, rot, pos);
                 }
 
-                if (track.channelMask_ & CHANNEL_POSITION)
+                if (track->channelMask_ & CHANNEL_POSITION)
                     kf.position_ = ToVector3(pos);
-                if (track.channelMask_ & CHANNEL_ROTATION)
+                if (track->channelMask_ & CHANNEL_ROTATION)
                     kf.rotation_ = ToQuaternion(rot);
-                if (track.channelMask_ & CHANNEL_SCALE)
+                if (track->channelMask_ & CHANNEL_SCALE)
                     kf.scale_ = ToVector3(scale);
 
-                track.keyFrames_.Push(kf);
+                track->keyFrames_.Push(kf);
             }
-
-            tracks.Push(track);
         }
-
-        outAnim->SetTracks(tracks);
 
         File outFile(context_);
         if (!outFile.Open(animOutName, FILE_WRITE))

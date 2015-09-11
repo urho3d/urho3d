@@ -72,14 +72,14 @@ AnimationState::AnimationState(Node* node, Animation* animation) :
         // Setup animation track to scene node mapping
         if (node_)
         {
-            const Vector<AnimationTrack>& tracks = animation_->GetTracks();
+            const HashMap<StringHash, AnimationTrack>& tracks = animation_->GetTracks();
             stateTracks_.Clear();
 
-            for (unsigned i = 0; i < tracks.Size(); ++i)
+            for (HashMap<StringHash, AnimationTrack>::ConstIterator i = tracks.Begin(); i != tracks.End(); ++i)
             {
-                const StringHash& nameHash = tracks[i].nameHash_;
+                const StringHash& nameHash = i->second_.nameHash_;
                 AnimationStateTrack stateTrack;
-                stateTrack.track_ = &tracks[i];
+                stateTrack.track_ = &i->second_;
 
                 if (node_->GetNameHash() == nameHash || tracks.Size() == 1)
                     stateTrack.node_ = node_;
@@ -89,7 +89,7 @@ AnimationState::AnimationState(Node* node, Animation* animation) :
                     if (targetNode)
                         stateTrack.node_ = targetNode;
                     else
-                        LOGWARNING("Node " + tracks[i].name_ + " not found for node animation " + animation_->GetName());
+                        LOGWARNING("Node " + i->second_.name_ + " not found for node animation " + animation_->GetName());
                 }
 
                 if (stateTrack.node_)
@@ -124,20 +124,20 @@ void AnimationState::SetStartBone(Bone* startBone)
 
     startBone_ = startBone;
 
-    const Vector<AnimationTrack>& tracks = animation_->GetTracks();
+    const HashMap<StringHash, AnimationTrack>& tracks = animation_->GetTracks();
     stateTracks_.Clear();
 
     if (!startBone->node_)
         return;
 
-    for (unsigned i = 0; i < tracks.Size(); ++i)
+    for (HashMap<StringHash, AnimationTrack>::ConstIterator i = tracks.Begin(); i != tracks.End(); ++i)
     {
         AnimationStateTrack stateTrack;
-        stateTrack.track_ = &tracks[i];
+        stateTrack.track_ = &i->second_;
 
         // Include those tracks that are either the start bone itself, or its children
         Bone* trackBone = 0;
-        const StringHash& nameHash = tracks[i].nameHash_;
+        const StringHash& nameHash = i->second_.nameHash_;
 
         if (nameHash == startBone->nameHash_)
             trackBone = startBone;

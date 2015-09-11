@@ -1,5 +1,9 @@
 $#include "Graphics/Animation.h"
 
+static const unsigned char CHANNEL_POSITION;
+static const unsigned char CHANNEL_ROTATION;
+static const unsigned char CHANNEL_SCALE;
+
 struct AnimationKeyFrame
 {
     float time_ @ time;
@@ -8,14 +12,23 @@ struct AnimationKeyFrame
     Vector3 scale_ @ scale;
 };
 
-/*
 struct AnimationTrack
 {
-    void GetKeyFrameIndex(float time, unsigned& index) const;
-    String name_ @ name;
-    StringHash nameHash_ @ nameHash;
-    unsigned char channelMask_ @ channelMas;
+    void SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame);
+    void AddKeyFrame(const AnimationKeyFrame& keyFrame);
+    void InsertKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame);
+    void RemoveKeyFrame(unsigned index);
+    void RemoveAllKeyFrames();
+
+    AnimationKeyFrame* GetKeyFrame(unsigned index);
+    unsigned GetNumKeyFrames() const { return keyFrames_.Size(); }
+
+    const String name_ @ name;
+    const StringHash nameHash_ @ nameHash;
+    unsigned char channelMask_ @ channelMask;
     Vector<AnimationKeyFrame> keyFrames_ @ keyFrames;
+
+    tolua_readonly tolua_property__get_set unsigned numKeyFrames;
 };
 
 struct AnimationTriggerPoint
@@ -24,26 +37,30 @@ struct AnimationTriggerPoint
     float time_ @ time;
     Variant data_ @ data;
 };
-*/
-
-static const unsigned char CHANNEL_POSITION;
-static const unsigned char CHANNEL_ROTATION;
-static const unsigned char CHANNEL_SCALE;
 
 class Animation : public Resource
 {
+    void SetAnimationName(const String name);
+    void SetLength(float length);
+    AnimationTrack* CreateTrack(const String name);
+    bool RemoveTrack(const String name);
+    void RemoveAllTracks();
+    void SetTrigger(unsigned index, const AnimationTriggerPoint& trigger);
+    void AddTrigger(const AnimationTriggerPoint& trigger);
+    void AddTrigger(float time, bool timeIsNormalized, const Variant& data);
+    void RemoveTrigger(unsigned index);
+    void RemoveAllTriggers();
+
     const String GetAnimationName() const;
-    StringHash GetAnimationNameHash() const;
     float GetLength() const;
     unsigned GetNumTracks() const;
-    const AnimationTrack* GetTrack(const String name) const;
-    const AnimationTrack* GetTrack(StringHash nameHash) const;
-    const AnimationTrack* GetTrack(unsigned index) const;
+    AnimationTrack* GetTrack(const String name);
+    AnimationTrack* GetTrack(StringHash nameHash);
     unsigned GetNumTriggers() const;
+    AnimationTriggerPoint* GetTrigger(unsigned index);
 
-    tolua_readonly tolua_property__get_set String animationName;
-    tolua_readonly tolua_property__get_set StringHash animationNameHash;
-    tolua_readonly tolua_property__get_set float length;
+    tolua_property__get_set String animationName;
+    tolua_property__get_set float length;
     tolua_readonly tolua_property__get_set unsigned numTracks;
     tolua_readonly tolua_property__get_set unsigned numTriggers;
 };
