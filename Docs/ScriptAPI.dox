@@ -2200,8 +2200,10 @@ namespace Urho3D
 <a href="#Class_AnimatedSprite2D"><b>AnimatedSprite2D</b></a>
 <a href="#Class_Animation"><b>Animation</b></a>
 <a href="#Class_AnimationController"><b>AnimationController</b></a>
+<a href="#Class_AnimationKeyFrame"><b>AnimationKeyFrame</b></a>
 <a href="#Class_AnimationSet2D"><b>AnimationSet2D</b></a>
 <a href="#Class_AnimationState"><b>AnimationState</b></a>
+<a href="#Class_AnimationTrack"><b>AnimationTrack</b></a>
 <a href="#Class_AnimationTriggerPoint"><b>AnimationTriggerPoint</b></a>
 <a href="#Class_Array"><b>Array</b></a>
 <a href="#Class_AttributeInfo"><b>AttributeInfo</b></a>
@@ -2627,10 +2629,14 @@ Properties:
 
 Methods:
 
+- void AddTrigger(const AnimationTriggerPoint&)
 - void AddTrigger(float, bool, const Variant&)
+- AnimationTrack@ CreateTrack(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
+- bool RemoveAllTracks()
 - void RemoveAllTriggers()
+- bool RemoveTrack(const String&)
 - void RemoveTrigger(uint)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -2638,16 +2644,17 @@ Methods:
 
 Properties:
 
-- String animationName // readonly
+- String animationName
 - StringHash baseType // readonly
 - String category // readonly
-- float length // readonly
+- float length
 - uint memoryUse // readonly
 - String name
 - uint numTracks // readonly
 - uint numTriggers
 - int refs // readonly
-- AnimationTriggerPoint@[] triggers // readonly
+- AnimationTrack@[] tracks // readonly
+- AnimationTriggerPoint[] triggers
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
@@ -2736,6 +2743,17 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 
+<a name="Class_AnimationKeyFrame"></a>
+
+### AnimationKeyFrame
+
+Properties:
+
+- Vector3 position
+- Quaternion rotation
+- Vector3 scale
+- float time
+
 <a name="Class_AnimationSet2D"></a>
 
 ### AnimationSet2D
@@ -2794,6 +2812,25 @@ Properties:
 - float time
 - int weakRefs // readonly
 - float weight
+
+<a name="Class_AnimationTrack"></a>
+
+### AnimationTrack
+
+Methods:
+
+- void AddKeyFrame(const AnimationKeyFrame&)
+- void InsertKeyFrame(uint, const AnimationKeyFrame&)
+- void RemoveAllKeyFrames()
+- void RemoveKeyFrame(uint)
+
+Properties:
+
+- uint8 channelMask
+- AnimationKeyFrame[] keyFrames
+- String name
+- StringHash nameHash
+- uint numKeyFrames // readonly
 
 <a name="Class_AnimationTriggerPoint"></a>
 
@@ -14002,6 +14039,9 @@ Properties:
 - uint AM_NOEDIT
 - Color BLACK
 - Color BLUE
+- uint8 CHANNEL_POSITION
+- uint8 CHANNEL_ROTATION
+- uint8 CHANNEL_SCALE
 - uint CLEAR_COLOR
 - uint CLEAR_DEPTH
 - uint CLEAR_STENCIL

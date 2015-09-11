@@ -25,6 +25,8 @@ namespace Urho3D
 <a href="#Class_AnimationKeyFrame"><b>AnimationKeyFrame</b></a>
 <a href="#Class_AnimationSet2D"><b>AnimationSet2D</b></a>
 <a href="#Class_AnimationState"><b>AnimationState</b></a>
+<a href="#Class_AnimationTrack"><b>AnimationTrack</b></a>
+<a href="#Class_AnimationTriggerPoint"><b>AnimationTriggerPoint</b></a>
 <a href="#Class_Audio"><b>Audio</b></a>
 <a href="#Class_BiasParameters"><b>BiasParameters</b></a>
 <a href="#Class_Billboard"><b>Billboard</b></a>
@@ -306,20 +308,28 @@ Properties:
 
 Methods:
 
+- void SetAnimationName(const String name)
+- void SetLength(float length)
+- AnimationTrack* CreateTrack(const String name)
+- bool RemoveTrack(const String name)
+- void RemoveAllTracks()
+- void SetTrigger(unsigned index, const AnimationTriggerPoint& trigger)
+- void AddTrigger(const AnimationTriggerPoint& trigger)
+- void AddTrigger(float time, bool timeIsNormalized, const Variant& data)
+- void RemoveTrigger(unsigned index)
+- void RemoveAllTriggers()
 - const String GetAnimationName() const
-- StringHash GetAnimationNameHash() const
 - float GetLength() const
 - unsigned GetNumTracks() const
-- const AnimationTrack* GetTrack(const String name) const
-- const AnimationTrack* GetTrack(StringHash nameHash) const
-- const AnimationTrack* GetTrack(unsigned index) const
+- AnimationTrack* GetTrack(const String name)
+- AnimationTrack* GetTrack(StringHash nameHash)
 - unsigned GetNumTriggers() const
+- AnimationTriggerPoint* GetTrigger(unsigned index)
 
 Properties:
 
-- String animationName (readonly)
-- StringHash animationNameHash (readonly)
-- float length (readonly)
+- String animationName
+- float length
 - unsigned numTracks (readonly)
 - unsigned numTriggers (readonly)
 
@@ -454,6 +464,42 @@ Properties:
 - float time
 - float length (readonly)
 - char layer
+
+<a name="Class_AnimationTrack"></a>
+### AnimationTrack
+
+
+Methods:
+
+- void SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame)
+- void AddKeyFrame(const AnimationKeyFrame& keyFrame)
+- void InsertKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame)
+- void RemoveKeyFrame(unsigned index)
+- void RemoveAllKeyFrames()
+- AnimationKeyFrame* GetKeyFrame(unsigned index)
+- unsigned GetNumKeyFrames() const
+
+Properties:
+
+- const String name
+- const StringHash nameHash
+- char channelMask
+- Vector<AnimationKeyFrame> keyFrames
+- unsigned numKeyFrames (readonly)
+
+<a name="Class_AnimationTriggerPoint"></a>
+### AnimationTriggerPoint
+
+
+Methods:
+
+- AnimationTriggerPoint() (GC)
+- AnimationTriggerPoint* new()
+
+Properties:
+
+- float time
+- Variant data
 
 <a name="Class_Audio"></a>
 ### Audio : Object
