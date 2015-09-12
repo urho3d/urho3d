@@ -88,26 +88,28 @@ void AnimationController::OnSetEnabled()
 void AnimationController::Update(float timeStep)
 {
     // Loop through animations
-    for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End();)
+    for (unsigned i = 0; i < animations_.Size();)
     {
+        AnimationControl& ctrl = animations_[i];
+        AnimationState* state = GetAnimationState(ctrl.hash_);
         bool remove = false;
-        AnimationState* state = GetAnimationState(i->hash_);
+
         if (!state)
             remove = true;
         else
         {
             // Advance the animation
-            if (i->speed_ != 0.0f)
-                state->AddTime(i->speed_ * timeStep);
+            if (ctrl.speed_ != 0.0f)
+                state->AddTime(ctrl.speed_ * timeStep);
 
-            float targetWeight = i->targetWeight_;
-            float fadeTime = i->fadeTime_;
+            float targetWeight = ctrl.targetWeight_;
+            float fadeTime = ctrl.fadeTime_;
 
             // If non-looped animation at the end, activate autofade as applicable
-            if (!state->IsLooped() && state->GetTime() >= state->GetLength() && i->autoFadeTime_ > 0.0f)
+            if (!state->IsLooped() && state->GetTime() >= state->GetLength() && ctrl.autoFadeTime_ > 0.0f)
             {
                 targetWeight = 0.0f;
-                fadeTime = i->autoFadeTime_;
+                fadeTime = ctrl.autoFadeTime_;
             }
 
             // Process weight fade
@@ -128,21 +130,21 @@ void AnimationController::Update(float timeStep)
             }
 
             // Remove if weight zero and target weight zero
-            if (state->GetWeight() == 0.0f && (targetWeight == 0.0f || fadeTime == 0.0f) && i->removeOnCompletion_)
+            if (state->GetWeight() == 0.0f && (targetWeight == 0.0f || fadeTime == 0.0f) && ctrl.removeOnCompletion_)
                 remove = true;
         }
 
         // Decrement the command time-to-live values
-        if (i->setTimeTtl_ > 0.0f)
-            i->setTimeTtl_ = Max(i->setTimeTtl_ - timeStep, 0.0f);
-        if (i->setWeightTtl_ > 0.0f)
-            i->setWeightTtl_ = Max(i->setWeightTtl_ - timeStep, 0.0f);
+        if (ctrl.setTimeTtl_ > 0.0f)
+            ctrl.setTimeTtl_ = Max(ctrl.setTimeTtl_ - timeStep, 0.0f);
+        if (ctrl.setWeightTtl_ > 0.0f)
+            ctrl.setWeightTtl_ = Max(ctrl.setWeightTtl_ - timeStep, 0.0f);
 
         if (remove)
         {
             if (state)
                 RemoveAnimationState(state);
-            i = animations_.Erase(i);
+            animations_.Erase(i);
             MarkNetworkUpdate();
         }
         else
