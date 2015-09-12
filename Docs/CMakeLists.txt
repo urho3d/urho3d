@@ -61,11 +61,9 @@ if (DOXYGEN_FOUND)      # When DOT is not found, the documentation build should 
         foreach (IDE XCODE MSVC Eclipse CodeBlocks)
             enable_help (${IDE})
         endforeach ()
-        if (MSVC)
-            # There could be a bug in CMake findHTMLHelp.cmake module which would prevent it to find the hhc.exe in "Program Files (x86)" in a 64-bit Windows
-            # To woraround this problem, you may have to append the paths being searched in your local copy of findHTMLHelp.cmake module to include the above path
-            find_package (HTMLHelp REQUIRED)    # All or nothing
-        endif ()
+        # There could be a bug in CMake findHTMLHelp.cmake module which would prevent it to find the hhc.exe in "Program Files (x86)" in a 64-bit Windows
+        # To woraround this problem, you may have to append the paths being searched in your local copy of findHTMLHelp.cmake module to include the above path
+        find_package (HTMLHelp)
         configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
     endif ()
 
