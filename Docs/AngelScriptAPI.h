@@ -271,23 +271,25 @@ uint zoneMask;
 class Animation
 {
 // Methods:
+void AddTrigger(const AnimationTriggerPoint&);
 void AddTrigger(float, bool, const Variant&);
+AnimationTrack CreateTrack(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
+bool RemoveAllTracks();
 void RemoveAllTriggers();
+bool RemoveTrack(const String&);
 void RemoveTrigger(uint);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
 String animationName;
 /* readonly */
 StringHash baseType;
 /* readonly */
 String category;
-/* readonly */
 float length;
 /* readonly */
 uint memoryUse;
@@ -298,6 +300,7 @@ uint numTriggers;
 /* readonly */
 int refs;
 /* readonly */
+Array<AnimationTrack> tracks;
 Array<AnimationTriggerPoint> triggers;
 /* readonly */
 StringHash type;
@@ -401,6 +404,16 @@ String typeName;
 int weakRefs;
 };
 
+class AnimationKeyFrame
+{
+
+// Properties:
+Vector3 position;
+Quaternion rotation;
+Vector3 scale;
+float time;
+};
+
 class AnimationSet2D
 {
 // Methods:
@@ -468,6 +481,23 @@ float time;
 /* readonly */
 int weakRefs;
 float weight;
+};
+
+class AnimationTrack
+{
+// Methods:
+void AddKeyFrame(const AnimationKeyFrame&);
+void InsertKeyFrame(uint, const AnimationKeyFrame&);
+void RemoveAllKeyFrames();
+void RemoveKeyFrame(uint);
+
+// Properties:
+uint8 channelMask;
+Array<AnimationKeyFrame> keyFrames;
+String name;
+StringHash nameHash;
+/* readonly */
+uint numKeyFrames;
 };
 
 class AnimationTriggerPoint
@@ -13348,6 +13378,9 @@ uint AM_NODEIDVECTOR;
 uint AM_NOEDIT;
 Color BLACK;
 Color BLUE;
+uint8 CHANNEL_POSITION;
+uint8 CHANNEL_ROTATION;
+uint8 CHANNEL_SCALE;
 uint CLEAR_COLOR;
 uint CLEAR_DEPTH;
 uint CLEAR_STENCIL;

@@ -1119,8 +1119,8 @@ Quaternion GetRotationInXZPlane(Node* rootNode, Node* rotateNode, const Quaterni
 
 void PostProcessAnimation(Animation* outAnim, const String& animOutName)
 {
-    AnimationTrack* translateTrack = const_cast<AnimationTrack*>(outAnim->GetTrack(translateBone_));
-    AnimationTrack* rotateTrack = const_cast<AnimationTrack*>(outAnim->GetTrack(rotateBone_));
+    AnimationTrack* translateTrack = outAnim->GetTrack(translateBone_);
+    AnimationTrack* rotateTrack = outAnim->GetTrack(rotateBone_);
 
     if (!translateTrack && !rotateTrack)
         return;
@@ -1179,76 +1179,6 @@ void PostProcessAnimation(Animation* outAnim, const String& animOutName)
             AnimationKeyFrame& kf = translateTrack->keyFrames_[i];
             kf.position_ *= scale;
         }
-    }
-
-    // pre rocess for mirroring !!!
-    if (mirrorAnimation_)
-    {
-        // flip keyframes in x-axis
-        for (unsigned i=0; i<outAnim->GetNumTracks(); ++i)
-        {
-            AnimationTrack* track = const_cast<AnimationTrack*>(outAnim->GetTrack(i));
-            for (unsigned j=0; j<track->keyFrames_.Size(); ++j)
-            {
-                AnimationKeyFrame& kf = track->keyFrames_[j];
-                kf.position_.x_ *= -1;
-                // assume FBX is exported in D3D LH
-                kf.rotation_.y_ *= -1;
-                kf.rotation_.z_ *= -1;
-            }
-        }
-
-        // bone mapping swap with _L & _R
-        String leftBone = "_L";
-        String rightBone = "_R";
-        const int max_bone_num = 512;
-        int left_to_right_mapping[max_bone_num];
-        for (int i=0; i<max_bone_num; ++i)
-            left_to_right_mapping[i] = -1;
-
-        for (unsigned i=0; i<model_->GetSkeleton().GetNumBones(); ++i)
-        {
-            Bone* b = model_->GetSkeleton().GetBone(i);
-            if (b->name_.Contains(leftBone))
-            {
-                String mapName = b->name_.Replaced(leftBone, rightBone);
-                int mapIndex = FindBoneIndex(model_->GetSkeleton(), mapName);
-                if (mapIndex < 0) {
-                    PrintLine("Warning: " + b->name_ + " do not find the mapped bone " + mapName);
-                    continue;
-                }
-                left_to_right_mapping[i] = mapIndex;
-            }
-        }
-
-#if 1
-        for (int i=0; i<max_bone_num; ++i)
-        {
-            int index = left_to_right_mapping[i];
-            if (index < 0)
-                continue;
-
-            Bone* b_left = model_->GetSkeleton().GetBone(i);
-            Bone* b_right = model_->GetSkeleton().GetBone(index);
-            PrintLine("[MIRROR.MAP] " + b_left->name_ + " vs " + b_right->name_);
-
-            AnimationTrack* leftTrack = const_cast<AnimationTrack*>(outAnim->GetTrack(b_left->name_));
-            AnimationTrack* rightTrack = const_cast<AnimationTrack*>(outAnim->GetTrack(b_right->name_));
-
-            if (leftTrack)
-            {
-                leftTrack->name_ = b_right->name_;
-                leftTrack->nameHash_ = leftTrack->name_;
-            }
-
-            if (rightTrack)
-            {
-                rightTrack->name_ = b_left->name_;
-                rightTrack->nameHash_ = rightTrack->name_;
-            }
-        }
-#endif
-
     }
 
     if (translateTrack)
@@ -1496,8 +1426,6 @@ void BuildAndSaveAnimations(OutModel* model)
         outAnim->SetLength(duration * tickConversion);
 
         PrintLine("Writing animation " + animName + " length " + String(outAnim->GetLength()));
-        Vector<AnimationTrack> tracks;
-
         for (unsigned j = 0; j < anim->mNumChannels; ++j)
         {
             aiNodeAnim* channel = anim->mChannels[j];
@@ -1511,6 +1439,7 @@ void BuildAndSaveAnimations(OutModel* model)
                 if (boneIndex == M_MAX_UNSIGNED)
                 {
                     PrintLine("Warning: skipping animation track " + channelName + " not found in model skeleton");
+                    outAnim->RemoveTrack(channelName);
                     continue;
                 }
                 boneNode = model->bones_[boneIndex];
@@ -1522,6 +1451,7 @@ void BuildAndSaveAnimations(OutModel* model)
                 if (!boneNode)
                 {
                     PrintLine("Warning: skipping animation track " + channelName + " whose scene node was not found");
+                    outAnim->RemoveTrack(channelName);
                     continue;
                 }
             }
@@ -1542,20 +1472,18 @@ void BuildAndSaveAnimations(OutModel* model)
             if (channel->mNumRotationKeys > 0 && !ToQuaternion(boneRot).Equals(ToQuaternion(channel->mRotationKeys[0].mValue)))
                 rotEqual = false;
 
-            AnimationTrack track;
-            track.name_ = channelName;
-            track.nameHash_ = channelName;
+            AnimationTrack* track = outAnim->CreateTrack(channelName);
 
             // Check which channels are used
-            track.channelMask_ = 0;
+            track->channelMask_ = 0;
             if (channel->mNumPositionKeys > 1 || !posEqual)
-                track.channelMask_ |= CHANNEL_POSITION;
+                track->channelMask_ |= CHANNEL_POSITION;
             if (channel->mNumRotationKeys > 1 || !rotEqual)
-                track.channelMask_ |= CHANNEL_ROTATION;
+                track->channelMask_ |= CHANNEL_ROTATION;
             if (channel->mNumScalingKeys > 1 || !scaleEqual)
-                track.channelMask_ |= CHANNEL_SCALE;
+                track->channelMask_ |= CHANNEL_SCALE;
             // Check for redundant identity scale in all keyframes and remove in that case
-            if (track.channelMask_ & CHANNEL_SCALE)
+            if (track->channelMask_ & CHANNEL_SCALE)
             {
                 bool redundantScale = true;
                 for (unsigned k = 0; k < channel->mNumScalingKeys; ++k)
@@ -1570,11 +1498,15 @@ void BuildAndSaveAnimations(OutModel* model)
                     }
                 }
                 if (redundantScale)
-                    track.channelMask_ &= ~CHANNEL_SCALE;
+                    track->channelMask_ &= ~CHANNEL_SCALE;
             }
 
-            if (!track.channelMask_)
+            if (!track->channelMask_)
+            {
                 PrintLine("Warning: skipping animation track " + channelName + " with no keyframes");
+                outAnim->RemoveTrack(channelName);
+                continue;
+            }
 
             // Currently only same amount of keyframes is supported
             // Note: should also check the times of individual keyframes for match
@@ -1583,6 +1515,7 @@ void BuildAndSaveAnimations(OutModel* model)
                 (channel->mNumRotationKeys > 1 && channel->mNumScalingKeys > 1 && channel->mNumRotationKeys != channel->mNumScalingKeys))
             {
                 PrintLine("Warning: differing amounts of channel keyframes, skipping animation track " + channelName);
+                outAnim->RemoveTrack(channelName);
                 continue;
             }
 
@@ -1601,11 +1534,11 @@ void BuildAndSaveAnimations(OutModel* model)
                 kf.scale_ = Vector3::ONE;
 
                 // Get time for the keyframe. Adjust with animation's start time
-                if (track.channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
+                if (track->channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
                     kf.time_ = ((float)channel->mPositionKeys[k].mTime - startTime) * tickConversion;
-                else if (track.channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
+                else if (track->channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
                     kf.time_ = ((float)channel->mRotationKeys[k].mTime - startTime) * tickConversion;
-                else if (track.channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
+                else if (track->channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
                     kf.time_ = ((float)channel->mScalingKeys[k].mTime - startTime) * tickConversion;
 
                 // Make sure time stays positive
@@ -1617,11 +1550,11 @@ void BuildAndSaveAnimations(OutModel* model)
                 aiQuaternion rot;
                 boneTransform.Decompose(scale, rot, pos);
                 // Then apply the active channels
-                if (track.channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
+                if (track->channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
                     pos = channel->mPositionKeys[k].mValue;
-                if (track.channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
+                if (track->channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
                     rot = channel->mRotationKeys[k].mValue;
-                if (track.channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
+                if (track->channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
                     scale = channel->mScalingKeys[k].mValue;
 
                 // If root bone, transform with the model root node transform
@@ -1636,20 +1569,16 @@ void BuildAndSaveAnimations(OutModel* model)
                     tform.Decompose(scale, rot, pos);
                 }
 
-                if (track.channelMask_ & CHANNEL_POSITION)
+                if (track->channelMask_ & CHANNEL_POSITION)
                     kf.position_ = ToVector3(pos);
-                if (track.channelMask_ & CHANNEL_ROTATION)
+                if (track->channelMask_ & CHANNEL_ROTATION)
                     kf.rotation_ = ToQuaternion(rot);
-                if (track.channelMask_ & CHANNEL_SCALE)
+                if (track->channelMask_ & CHANNEL_SCALE)
                     kf.scale_ = ToVector3(scale);
 
-                track.keyFrames_.Push(kf);
+                track->keyFrames_.Push(kf);
             }
-
-            tracks.Push(track);
         }
-
-        outAnim->SetTracks(tracks);
 
         if (model)
             PostProcessAnimation(outAnim, animOutName);

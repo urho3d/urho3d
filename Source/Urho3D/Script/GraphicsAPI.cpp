@@ -879,30 +879,116 @@ static void RegisterModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Model", "uint get_numMorphs() const", asMETHOD(Model, GetNumMorphs), asCALL_THISCALL);
 }
 
-static AnimationTriggerPoint* AnimationGetTrigger(unsigned index, Animation* animation)
+static void ConstructAnimationKeyFrame(AnimationKeyFrame* ptr)
 {
-    const Vector<AnimationTriggerPoint>& points = animation->GetTriggers();
-    return index < points.Size() ? const_cast<AnimationTriggerPoint*>(&points[index]) : (AnimationTriggerPoint*)0;
+    new(ptr)AnimationKeyFrame();
+}
+
+static void ConstructAnimationKeyFrameCopy(const AnimationKeyFrame& track, AnimationKeyFrame* ptr)
+{
+    new(ptr)AnimationKeyFrame(track);
+}
+
+static void DestructAnimationKeyFrame(AnimationKeyFrame* ptr)
+{
+    ptr->~AnimationKeyFrame();
+}
+
+static AnimationKeyFrame* AnimationTrackGetKeyFrame(unsigned index, AnimationTrack* ptr)
+{
+    if (index >= ptr->GetNumKeyFrames())
+    {
+        asIScriptContext* context = asGetActiveContext();
+        if (context)
+            context->SetException("Index out of bounds");
+        return 0;
+    }
+    else
+        return ptr->GetKeyFrame(index);
+}
+
+static void ConstructAnimationTriggerPoint(AnimationTriggerPoint* ptr)
+{
+    new(ptr)AnimationTriggerPoint();
+}
+
+static void ConstructAnimationTriggerPointCopy(const AnimationTriggerPoint& trigger, AnimationTriggerPoint* ptr)
+{
+    new(ptr)AnimationTriggerPoint(trigger);
+}
+
+static void DestructAnimationTriggerPoint(AnimationTriggerPoint* ptr)
+{
+    ptr->~AnimationTriggerPoint();
+}
+
+static AnimationTriggerPoint* AnimationGetTrigger(unsigned index, Animation* ptr)
+{
+    if (index >= ptr->GetNumTriggers())
+    {
+        asIScriptContext* context = asGetActiveContext();
+        if (context)
+            context->SetException("Index out of bounds");
+        return 0;
+    }
+    else
+        return ptr->GetTrigger(index);
 }
 
 static void RegisterAnimation(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("AnimationTriggerPoint", 0, asOBJ_REF);
-    engine->RegisterObjectBehaviour("AnimationTriggerPoint", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("AnimationTriggerPoint", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterGlobalProperty("const uint8 CHANNEL_POSITION", (void*)&CHANNEL_POSITION);
+    engine->RegisterGlobalProperty("const uint8 CHANNEL_ROTATION", (void*)&CHANNEL_ROTATION);
+    engine->RegisterGlobalProperty("const uint8 CHANNEL_SCALE", (void*)&CHANNEL_SCALE);
+
+    engine->RegisterObjectType("AnimationKeyFrame", sizeof(AnimationKeyFrame), asOBJ_VALUE | asOBJ_APP_CLASS_C);
+    engine->RegisterObjectBehaviour("AnimationKeyFrame", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructAnimationKeyFrame), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("AnimationKeyFrame", asBEHAVE_CONSTRUCT, "void f(const AnimationKeyFrame&in)", asFUNCTION(ConstructAnimationKeyFrameCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("AnimationKeyFrame", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructAnimationKeyFrame), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("AnimationKeyFrame", "float time", offsetof(AnimationKeyFrame, time_));
+    engine->RegisterObjectProperty("AnimationKeyFrame", "Vector3 position", offsetof(AnimationKeyFrame, position_));
+    engine->RegisterObjectProperty("AnimationKeyFrame", "Quaternion rotation", offsetof(AnimationKeyFrame, rotation_));
+    engine->RegisterObjectProperty("AnimationKeyFrame", "Vector3 scale", offsetof(AnimationKeyFrame, scale_));
+
+    engine->RegisterObjectType("AnimationTrack", sizeof(AnimationTrack), asOBJ_REF);
+    engine->RegisterObjectBehaviour("AnimationTrack", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("AnimationTrack", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("AnimationTrack", "void AddKeyFrame(const AnimationKeyFrame&in)", asMETHOD(AnimationTrack, AddKeyFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationTrack", "void InsertKeyFrame(uint, const AnimationKeyFrame&in)", asMETHOD(AnimationTrack, InsertKeyFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationTrack", "void RemoveKeyFrame(uint)", asMETHOD(AnimationTrack, RemoveKeyFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationTrack", "void RemoveAllKeyFrames()", asMETHOD(AnimationTrack, RemoveAllKeyFrames), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationTrack", "void set_keyFrames(uint, const AnimationKeyFrame&in)", asMETHOD(AnimationTrack, SetKeyFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationTrack", "const AnimationKeyFrame& get_keyFrames(uint) const", asMETHOD(AnimationTrack, GetKeyFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationTrack", "uint get_numKeyFrames() const", asMETHOD(AnimationTrack, GetNumKeyFrames), asCALL_THISCALL);
+    engine->RegisterObjectProperty("AnimationTrack", "uint8 channelMask", offsetof(AnimationTrack, channelMask_));
+    engine->RegisterObjectProperty("AnimationTrack", "const String name", offsetof(AnimationTrack, name_));
+    engine->RegisterObjectProperty("AnimationTrack", "const StringHash nameHash", offsetof(AnimationTrack, nameHash_));
+
+    engine->RegisterObjectType("AnimationTriggerPoint", sizeof(AnimationTriggerPoint), asOBJ_VALUE | asOBJ_APP_CLASS_C);
+    engine->RegisterObjectBehaviour("AnimationTriggerPoint", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructAnimationTriggerPoint), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("AnimationTriggerPoint", asBEHAVE_CONSTRUCT, "void f(const AnimationTriggerPoint&in)", asFUNCTION(ConstructAnimationTriggerPointCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("AnimationTriggerPoint", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructAnimationTriggerPoint), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("AnimationTriggerPoint", "float time", offsetof(AnimationTriggerPoint, time_));
     engine->RegisterObjectProperty("AnimationTriggerPoint", "Variant data", offsetof(AnimationTriggerPoint, data_));
 
     RegisterResource<Animation>(engine, "Animation");
-    engine->RegisterObjectMethod("Animation", "const String& get_animationName() const", asMETHOD(Animation, GetAnimationName), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "void AddTrigger(float, bool, const Variant&in)", asMETHOD(Animation, AddTrigger), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ CreateTrack(const String&in)", asMETHOD(Animation, CreateTrack), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "bool RemoveTrack(const String&in)", asMETHOD(Animation, RemoveTrack), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "bool RemoveAllTracks()", asMETHOD(Animation, RemoveAllTracks), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void AddTrigger(const AnimationTriggerPoint&in)", asMETHODPR(Animation, AddTrigger, (const AnimationTriggerPoint&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void AddTrigger(float, bool, const Variant&in)", asMETHODPR(Animation, AddTrigger, (float, bool, const Variant&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "void RemoveTrigger(uint)", asMETHOD(Animation, RemoveTrigger), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "void RemoveAllTriggers()", asMETHOD(Animation, RemoveAllTriggers), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void set_animationName(const String&in) const", asMETHOD(Animation, SetAnimationName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "const String& get_animationName() const", asMETHOD(Animation, GetAnimationName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void set_length(float)", asMETHOD(Animation, SetLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "float get_length() const", asMETHOD(Animation, GetLength), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ get_tracks(const String&in)", asMETHODPR(Animation, GetTrack, (const String&), AnimationTrack*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "uint get_numTracks() const", asMETHOD(Animation, GetNumTracks), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "void set_numTriggers(uint)", asMETHOD(Animation, SetNumTriggers), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "AnimationTriggerPoint@+ get_triggers(uint) const", asFUNCTION(AnimationGetTrigger), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Animation", "uint get_numTriggers() const", asMETHOD(Animation, GetNumTriggers), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "void set_triggers(uint, const AnimationTriggerPoint&in)", asMETHOD(Animation, SetTrigger), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "const AnimationTriggerPoint& get_triggers(uint) const", asFUNCTION(AnimationGetTrigger), asCALL_CDECL_OBJLAST);
 }
 
 static void RegisterDrawable(asIScriptEngine* engine)
