@@ -795,6 +795,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
             if (!(flags & SCAN_HIDDEN) && fileName.StartsWith("."))
                 continue;
 
+#ifdef ASSET_DIR_INDICATOR
             // Patch the directory name back after retrieving the directory flag
             bool isDirectory = fileName.EndsWith(ASSET_DIR_INDICATOR);
             if (isDirectory)
@@ -806,6 +807,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
                     ScanDirInternal(result, path + fileName, startPath, filter, flags, recursive);
             }
             else if (flags & SCAN_FILES)
+#endif
             {
                 if (filterExtension.Empty() || fileName.EndsWith(filterExtension))
                     result.Push(deltaPath + fileName);
