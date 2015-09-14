@@ -10864,6 +10864,7 @@ class Texture2D
 {
 // Methods:
 void ClearDataLost();
+Image GetImage() const;
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
