@@ -178,7 +178,8 @@ before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - git clone --depth 1 https://github.com/urho3d/fastcomp-clang.git && export FASTCOMP_CLANG_ROOT=$(pwd)/fastcomp-clang
-  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH
+  - export CXX=g++-4.9 CC=gcc-4.9
+  - for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done && export PATH=$HOME:$PATH
   - rake ci_setup_cache
 script: rake annotate
 after_script: rake ci_teardown_cache
