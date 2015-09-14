@@ -320,6 +320,14 @@ bool FileSystem::CreateDir(const String& pathName)
         return false;
     }
 
+    // Create each of the parents if necessary
+    String parentPath = GetParentPath(pathName);
+    if (parentPath.Length() > 1 && !DirExists(parentPath))
+    {
+        if (!CreateDir(parentPath))
+            return false;
+    }
+
 #ifdef WIN32
     bool success = (CreateDirectoryW(GetWideNativePath(RemoveTrailingSlash(pathName)).CString(), 0) == TRUE) ||
         (GetLastError() == ERROR_ALREADY_EXISTS);
