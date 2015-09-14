@@ -299,13 +299,13 @@ void LoadConfig()
     if (!cubeMapElem.isNull)
     {
         cubeMapGen_Name = cubeMapElem.HasAttribute("name") ? cubeMapElem.GetAttribute("name") : "";
-        cubeMapGen_Path = cubeMapElem.HasAttribute("path") ? cubeMapElem.GetAttribute("path") : "Data/Textures/Cubemaps";
+        cubeMapGen_Path = cubeMapElem.HasAttribute("path") ? cubeMapElem.GetAttribute("path") : cubemapDefaultOutputPath;
         cubeMapGen_Size = cubeMapElem.HasAttribute("size") ? cubeMapElem.GetInt("size") : 128;
     }
     else
     {
         cubeMapGen_Name = "";
-        cubeMapGen_Path = "Data/Textures/Cubemaps";
+        cubeMapGen_Path = cubemapDefaultOutputPath;
         cubeMapGen_Size = 128;
     }
 }

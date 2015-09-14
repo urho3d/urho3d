@@ -7,7 +7,7 @@ int cubeMapGen_Size;
 Array<EditorCubeCapture@> activeCubeCapture; // Editor capture tasks in progress, Stop() method of EditorCubeCapture moves forward through the queue as captures are finished
 Array<Zone@> cloneZones; // Duplicate zones constructed to prevent IBL doubling
 Array<Zone@> disabledZones; // Zones that were disabled to prevent IBL doubling
-String cubemapOutputPath = "Data/Textures/Cubemaps";
+const String cubemapDefaultOutputPath = "Textures/Cubemaps";
 
 void PrepareZonesForCubeRendering()
 {
@@ -91,8 +91,8 @@ class EditorCubeCapture : ScriptObject // script object in order to get events
         
         // Store name and path because if we have a lot of zones it could take long enough to queue another go, and it may have different settings
         name_ = cubeMapGen_Name;
-        path_ = cubeMapGen_Path;
-    
+        path_ = sceneResourcePath + cubeMapGen_Path;
+
         updateCycle_ = 0;
     
         target_ = forZone;
@@ -178,35 +178,23 @@ class EditorCubeCapture : ScriptObject // script object in order to get events
     private void WriteXML()
     {
         String sceneName = editorScene.name.length > 0 ? "/" + editorScene.name + "/" : "";
-        String basePath = path_ + sceneName;
+        String basePath = AddTrailingSlash(path_ + sceneName);
         String cubeName = name_.length > 0 ? (name_ + "_") : "";
         String xmlPath = basePath + "/" + name_ + String(target_.id) + ".xml";
         XMLFile@ file = XMLFile();
         XMLElement rootElem = file.CreateRoot("cubemap");
         
-        XMLElement posXElem = rootElem.CreateChild("face");
-        posXElem.SetAttribute("name", basePath + "/" + cubeName + String(target_.id) + "_" + GetFaceName(FACE_POSITIVE_X) + ".png");
-        
-        XMLElement negXElem = rootElem.CreateChild("face");
-        negXElem.SetAttribute("name", basePath + "/" + cubeName + String(target_.id) + "_" + GetFaceName(FACE_NEGATIVE_X) + ".png");
-        
-        XMLElement posYElem = rootElem.CreateChild("face");
-        posYElem.SetAttribute("name", basePath + "/" + cubeName + String(target_.id) + "_" + GetFaceName(FACE_POSITIVE_Y) + ".png");
-        
-        XMLElement negYElem = rootElem.CreateChild("face");
-        negYElem.SetAttribute("name", basePath + "/" + cubeName + String(target_.id) + "_" + GetFaceName(FACE_NEGATIVE_Y) + ".png");
-        
-        XMLElement posZElem = rootElem.CreateChild("face");
-        posZElem.SetAttribute("name", basePath + "/" + cubeName + String(target_.id) + "_" + GetFaceName(FACE_POSITIVE_Z) + ".png");
-        
-        XMLElement negZElem = rootElem.CreateChild("face");
-        negZElem.SetAttribute("name", basePath + "/" + cubeName + String(target_.id) + "_" + GetFaceName(FACE_NEGATIVE_Z) + ".png");
-        
+        for (int i = 0; i < 6; ++i)
+        {
+            XMLElement faceElem = rootElem.CreateChild("face");
+            faceElem.SetAttribute("name", GetResourceNameFromFullName(basePath + cubeName + String(target_.id) + "_" + GetFaceName(CubeMapFace(i)) + ".png"));
+        }
+
         file.Save(File(xmlPath, FILE_WRITE), "    ");
-        
+
         ResourceRef ref;
         ref.type = StringHash("TextureCube");
-        ref.name = xmlPath;
+        ref.name = GetResourceNameFromFullName(xmlPath);
         target_.SetAttribute("Zone Texture", Variant(ref));
     }
     
