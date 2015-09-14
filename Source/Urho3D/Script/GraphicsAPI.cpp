@@ -181,12 +181,15 @@ static Image* Texture2DGetImage(Texture2D* tex2d)
     const unsigned texSize = tex2d->GetDataSize(tex2d->GetWidth(), tex2d->GetHeight());
     const unsigned format = tex2d->GetFormat();
 
-    if (format == Graphics::GetRGBAFormat() || format == Graphics::GetRGBA16Format() || format == Graphics::GetRGBAFloat32Format())
+    if (format == Graphics::GetRGBAFormat())
         rawImage->SetSize(tex2d->GetWidth(), tex2d->GetHeight(), 4);
     else if (format == Graphics::GetRGBFormat())
         rawImage->SetSize(tex2d->GetWidth(), tex2d->GetHeight(), 3);
     else
-        return SharedPtr<Image>();
+    {
+        delete rawImage;
+        return 0;
+    }
 
     tex2d->GetData(0, rawImage->GetData());
     return rawImage;
