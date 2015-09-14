@@ -289,6 +289,12 @@ When building for Direct3D9 with the Windows 8 SDK (Visual Studio 2012+), copy d
 
 OpenGL does not depend on a separate shader compiler DLL.
 
+\section Building_Clang_tools Clang-tools build
+
+If "URHO3D_CLANG_TOOLS" build option is set then CMake would generate a special build tree for the purpose of developing the Clang-tools. Normal build targets won't work in this special build tree. Before doing this, the development software package of LLVM/Clang or Fastcomp/Clang (from Emscripten-SDK) must be already installed in the host system. If using Fastcomp/Clang and it is not installed in the system-wide installation location then use the FASTCOMP_CLANG_ROOT environment variable to point to the root path of this custom location (the root is the parent directory containing the bin, lib, include and share subdirectories).
+
+Check the Source/Clang-Tools/CMakeLists.txt to get the list of targets currently available or under development. See also https://github.com/urho3d/Urho3D/issues/887 to find out more about the current development plan and leave a comment there if you would like to help to contribute the development.
+
 \section Using_ccache Using ccache
 
 ccache is a compiler cache software available on Linux and Mac OS X host systems. It speeds up the build by bypassing the actual compilation and reusing the result from previous compilation when the cache is hit. As such, this is optional in the build process. In order to enable ccache support and make it work correctly when building/using Urho3D library with GCC/Clang precompiled header enabled, the following environment variables must be set:
