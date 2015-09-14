@@ -296,14 +296,19 @@ void AnimationState::AddTime(float delta)
             {
                 using namespace AnimationTrigger;
 
-                Node* senderNode = model_ ? model_->GetNode() : node_;
+                WeakPtr<AnimationState> self(this);
+                WeakPtr<Node> senderNode(model_ ? model_->GetNode() : node_);
 
                 VariantMap& eventData = senderNode->GetEventDataMap();
                 eventData[P_NODE] = senderNode;
                 eventData[P_NAME] = animation_->GetAnimationName();
                 eventData[P_TIME] = i->time_;
                 eventData[P_DATA] = i->data_;
+
+                // Note: this may cause arbitrary deletion of animation states, including the one we are currently processing
                 senderNode->SendEvent(E_ANIMATIONTRIGGER, eventData);
+                if (senderNode.Expired() || self.Expired())
+                    return;
             }
         }
     }

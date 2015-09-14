@@ -23,15 +23,17 @@ DEALINGS IN THE SOFTWARE.
 <project name="Urho3D_custom_rules" default="help">
 
     <!--
-        Patch assets directories to have a trailing indicator character(s) in their names for easy identification
-        The default indicator is a single '_' character if it is not explicitly set using ASSET_DIR_INDICATOR environment variable
+        Optionally patch assets directories to have a trailing indicator character(s) in their names for easy identification
+        The patch is done when ASSET_DIR_INDICATOR environment variable is set
+        Without the patch, the FileSystem::DirExist() reduces its accuracy and the FileSystem::ScanDir() only scans for files
     -->
     <property environment="env"/>
-    <property name="env.ASSET_DIR_INDICATOR" value="_"/>
-    <property name="patched-asset.dir" value="assets${env.ASSET_DIR_INDICATOR}"/>
+    <condition property="patched-asset.dir" value="assets${env.ASSET_DIR_INDICATOR}" else="assets">
+        <isset property="env.ASSET_DIR_INDICATOR"/>
+    </condition>
     <property name="asset.absolute.dir" location="${patched-asset.dir}"/>
 
-    <target name="-pre-build">
+    <target name="-pre-build" if="env.ASSET_DIR_INDICATOR">
         <delete dir="${patched-asset.dir}"/>
         <mkdir dir="${patched-asset.dir}"/>
         <apply executable="mkdir" dest="${patched-asset.dir}" addsourcefile="false">
@@ -64,7 +66,7 @@ DEALINGS IN THE SOFTWARE.
         </copy>
     </target>
 
-    <target name="-post-build">
+    <target name="-post-build" if="env.ASSET_DIR_INDICATOR">
         <delete dir="${patched-asset.dir}"/>
     </target>
 

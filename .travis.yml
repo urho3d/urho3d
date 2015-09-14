@@ -160,6 +160,30 @@ after_script: rake ci_teardown_cache
 
 ---
 
+branch: {name: Annotate, active: no, description: For Travis CI - switch CI build to use Clang tools for annotation.}
+language: cpp
+compiler: gcc
+cache: ccache
+sudo: false
+env:
+  global:
+    - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
+    - NUMJOBS=3
+    - USE_CCACHE=1
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
+before_script:
+  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - git clone --depth 1 https://github.com/urho3d/emscripten-sdk.git && export CLANG_LIB=emscripten-sdk/clang/fastcomp/build_master_64/lib && export CLANG_INCLUDE=emscripten-sdk/clang/fastcomp/src/tools/clang/include
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH
+  - rake ci_setup_cache
+script: rake annotate
+after_script: rake ci_teardown_cache
+
+---
+
 branch: {name: Android-CI, active: yes, description: For Travis CI - switch CI build to use Android build environment.}
 language: android
 android: {components: [build-tools-22.0.1]}
