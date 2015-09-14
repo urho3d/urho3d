@@ -23,6 +23,19 @@
 # Define target name
 set (TARGET_NAME Urho3D)
 
+# Generate JSON compilation database format specification
+if (URHO3D_CLANG_TOOLS)
+    if (DEFINED ENV{FASTCOMP_CLANG_ROOT})
+        set (FASTCOMP_CLANG_ROOT $ENV{FASTCOMP_CLANG_ROOT})
+    else ()
+        set (FASTCOMP_CLANG_ROOT /usr/local)    # FIXME: Not sure where is the default system-wide location on Windows
+    endif ()
+    file (STRINGS ${FASTCOMP_CLANG_ROOT}/include/clang/Basic/Version.inc CLANG_VERSION REGEX "#define CLANG_VERSION ")
+    string (REPLACE "#define CLANG_VERSION " "" CLANG_VERSION ${CLANG_VERSION})
+    include_directories (${FASTCOMP_CLANG_ROOT}/lib/clang/${CLANG_VERSION}/include)
+    set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
+endif ()
+
 add_definitions (-DURHO3D_IS_BUILDING)
 if (ODBC_VERSION AND NOT ODBC_VERSION VERSION_LESS 3)
     add_definitions (-DODBC_3_OR_LATER)

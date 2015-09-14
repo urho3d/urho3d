@@ -104,6 +104,8 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     endif ()
     cmake_dependent_option (URHO3D_LUA_RAW_SCRIPT_LOADER "Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)" ${URHO3D_DEFAULT_LUA_RAW} "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
     option (URHO3D_SAMPLES "Build sample applications")
+    cmake_dependent_option (URHO3D_CLANG_TOOLS "Build Clang tools (native only)" FALSE "NOT RPI AND NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
+    mark_as_advanced (URHO3D_CLANG_TOOLS)
     cmake_dependent_option (URHO3D_TOOLS "Build tools (native and RPI only)" TRUE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     cmake_dependent_option (URHO3D_EXTRAS "Build extras (native and RPI only)" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     option (URHO3D_DOCS "Generate documentation as part of normal build")
@@ -323,6 +325,15 @@ if (NOT IOS AND NOT ANDROID AND NOT RPI AND URHO3D_OPENGL)
     add_definitions (-DGLEW_STATIC -DGLEW_NO_GLU)
 endif ()
 
+# Default library type is STATIC
+if (URHO3D_LIB_TYPE)
+    string (TOUPPER ${URHO3D_LIB_TYPE} URHO3D_LIB_TYPE)
+endif ()
+if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
+    set (URHO3D_LIB_TYPE STATIC)
+    add_definitions (-DURHO3D_STATIC_DEFINE)
+endif ()
+
 # Add definition for AngelScript
 if (URHO3D_ANGELSCRIPT)
     add_definitions (-DURHO3D_ANGELSCRIPT)
@@ -379,13 +390,10 @@ if (URHO3D_DATABASE_SQLITE)
     add_definitions (-DURHO3D_DATABASE -DURHO3D_DATABASE_SQLITE)
 endif ()
 
-# Default library type is STATIC
-if (URHO3D_LIB_TYPE)
-    string (TOUPPER ${URHO3D_LIB_TYPE} URHO3D_LIB_TYPE)
-endif ()
-if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
-    set (URHO3D_LIB_TYPE STATIC)
-    add_definitions (-DURHO3D_STATIC_DEFINE)
+# Clang tools building requires C++11 standard
+if (URHO3D_CLANG_TOOLS)
+    set (URHO3D_C++11 1)
+    set (URHO3D_PCH 0)
 endif ()
 
 # Find Direct3D include & library directories in MS Windows SDK or DirectX SDK when not using OpenGL.

@@ -165,6 +165,7 @@ language: cpp
 compiler: gcc
 cache: ccache
 sudo: false
+addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9]}}
 env:
   global:
     - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
@@ -176,7 +177,7 @@ env:
 before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
-  - git clone --depth 1 https://github.com/urho3d/emscripten-sdk.git && export CLANG_LIB=emscripten-sdk/clang/fastcomp/build_master_64/lib && export CLANG_INCLUDE=emscripten-sdk/clang/fastcomp/src/tools/clang/include
+  - git clone --depth 1 https://github.com/urho3d/fastcomp-clang.git && export FASTCOMP_CLANG_ROOT=$(pwd)/fastcomp-clang
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH
   - rake ci_setup_cache
 script: rake annotate
