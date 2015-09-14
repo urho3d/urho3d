@@ -64,18 +64,48 @@ static CScriptArray* CrowdManagerGetAgents(Node* node, bool inCrowdFilter, Crowd
     return VectorToHandleArray<CrowdAgent>(agents, "Array<CrowdAgent@>");
 }
 
+static Vector3 NavigationMeshFindNearestPoint(const Vector3& point, const Vector3& extents, NavigationMesh* ptr)
+{
+    return ptr->FindNearestPoint(point, extents);
+}
+
+static Vector3 NavigationMeshMoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents, int maxVisited, NavigationMesh* ptr)
+{
+    return ptr->MoveAlongSurface(start, end, extents, maxVisited);
+}
+
+static Vector3 NavigationMeshGetRandomPoint(NavigationMesh* ptr)
+{
+    return ptr->GetRandomPoint();
+}
+
+static Vector3 NavigationMeshGetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents, NavigationMesh* ptr)
+{
+    return ptr->GetRandomPointInCircle(center, radius, extents);
+}
+
+static float NavigationMeshGetDistanceToWall(const Vector3& point, float radius, const Vector3& extents, NavigationMesh* ptr)
+{
+    return ptr->GetDistanceToWall(point, radius, extents);
+}
+
+static Vector3 NavigationMeshRaycast(const Vector3& start, const Vector3& end, const Vector3& extents, NavigationMesh* ptr)
+{
+    return ptr->Raycast(start, end, extents);
+}
+
 template<class T> static void RegisterNavMeshBase(asIScriptEngine* engine, const char* name)
 {
     engine->RegisterObjectMethod(name, "bool Build()", asMETHODPR(T, Build, (void), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "bool Build(const BoundingBox&in)", asMETHODPR(T, Build, (const BoundingBox&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "void SetAreaCost(uint, float)", asMETHOD(T, SetAreaCost), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "float GetAreaCost(uint) const", asMETHOD(T, GetAreaCost), asCALL_THISCALL);
-    engine->RegisterObjectMethod(name, "Vector3 FindNearestPoint(const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asMETHOD(T, FindNearestPoint), asCALL_THISCALL);
-    engine->RegisterObjectMethod(name, "Vector3 MoveAlongSurface(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0), uint maxVisited = 3)", asMETHOD(T, MoveAlongSurface), asCALL_THISCALL);
-    engine->RegisterObjectMethod(name, "Vector3 GetRandomPoint()", asMETHOD(T, GetRandomPoint), asCALL_THISCALL);
-    engine->RegisterObjectMethod(name, "Vector3 GetRandomPointInCircle(const Vector3&in, float, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asMETHOD(T, GetRandomPointInCircle), asCALL_THISCALL);
-    engine->RegisterObjectMethod(name, "float GetDistanceToWall(const Vector3&in, float, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asMETHOD(T, GetDistanceToWall), asCALL_THISCALL);
-    engine->RegisterObjectMethod(name, "Vector3 Raycast(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asMETHOD(T, Raycast), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "Vector3 FindNearestPoint(const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshFindNearestPoint), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(name, "Vector3 MoveAlongSurface(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0), int maxVisited = 3)", asFUNCTION(NavigationMeshMoveAlongSurface), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(name, "Vector3 GetRandomPoint()", asFUNCTION(NavigationMeshGetRandomPoint), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(name, "Vector3 GetRandomPointInCircle(const Vector3&in, float, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshGetRandomPointInCircle), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(name, "float GetDistanceToWall(const Vector3&in, float, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshGetDistanceToWall), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(name, "Vector3 Raycast(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshRaycast), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(name, "void DrawDebugGeometry(bool)", asMETHODPR(NavigationMesh, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "void set_tileSize(int)", asMETHOD(T, SetTileSize), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "int get_tileSize() const", asMETHOD(T, GetTileSize), asCALL_THISCALL);
