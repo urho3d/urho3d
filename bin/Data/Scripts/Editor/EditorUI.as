@@ -404,6 +404,7 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Rebuild navigation data", @SceneRebuildNavigation));
+        popup.AddChild(CreateMenuItem("Render Zone Cubemap", @SceneRenderZoneCubemaps));
         popup.AddChild(CreateMenuItem("Add children to SM-group", @SceneAddChildrenStaticModelGroup));
         Menu@ childMenu = CreateMenuItem("Set children as spline path", null, SHOW_POPUP_INDICATOR);
         Window@ childPopup = CreatePopup(childMenu);

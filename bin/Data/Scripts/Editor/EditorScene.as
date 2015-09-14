@@ -2,6 +2,7 @@
 
 #include "Scripts/Editor/EditorHierarchyWindow.as"
 #include "Scripts/Editor/EditorInspectorWindow.as"
+#include "Scripts/Editor/EditorCubeCapture.as"
 
 const int PICK_GEOMETRIES = 0;
 const int PICK_LIGHTS = 1;
@@ -1204,6 +1205,50 @@ bool SceneRebuildNavigation()
     }
 
     return success;
+}
+
+bool SceneRenderZoneCubemaps()
+{
+    bool success = false;
+    Array<Zone@> capturedThisCall;
+    bool alreadyCapturing = activeCubeCapture.length > 0; // May have managed to quickly queue up a second round of zones to render cubemaps for
+    
+    for (int i = 0; i < selectedNodes.length; ++i)
+    {
+        Array<Component@>@ zones = selectedNodes[i].GetComponents("Zone", true);
+        for (int z = 0; z < zones.length; ++z)
+        {
+            Zone@ zone = cast<Zone>(zones[z]);
+            if (zone !is null)
+            {
+                activeCubeCapture.Push(EditorCubeCapture(zone));
+                capturedThisCall.Push(zone);
+            }
+        }
+    }
+    
+    for (int i = 0; i < selectedComponents.length; ++i)
+    {
+        Zone@ zone = cast<Zone>(selectedComponents[i]);
+        if (zone !is null)
+        {
+            if (capturedThisCall.FindByRef(zone) < 0)
+            {
+                activeCubeCapture.Push(EditorCubeCapture(zone));
+                capturedThisCall.Push(zone);
+            }
+        }
+    }
+    
+    // Start rendering cubemaps if there are any to render and the queue isn't already running
+    if (activeCubeCapture.length > 0 && !alreadyCapturing)
+        activeCubeCapture[0].Start();
+
+    if (capturedThisCall.length <= 0)
+    {
+        MessageBox("No zones selected to render cubemaps for/");
+    }
+    return capturedThisCall.length > 0;
 }
 
 bool SceneAddChildrenStaticModelGroup()
