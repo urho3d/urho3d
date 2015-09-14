@@ -46,7 +46,7 @@ get_target_property (SOURCES Urho3D SOURCES)
 string (REGEX REPLACE "[^;]+\\.h" "" SOURCES "${SOURCES}")   # Stringify to preserve the semicolons
 string (REGEX REPLACE "[^;]+generated[^;]+\\.cpp" "" SOURCES "${SOURCES}")
 add_custom_target (annotate
-    COMMAND ${CMAKE_BINARY_DIR}/bin/tool/Annotator -ast-dump -ast-dump-filter=Urho3D -p ${CMAKE_BINARY_DIR} ${SOURCES}
+    COMMAND ${CMAKE_BINARY_DIR}/bin/tool/Annotator -ast-dump -ast-dump-filter=Urho3D::Audio -p ${CMAKE_BINARY_DIR} ${SOURCES}
     DEPENDS Annotator
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
     COMMENT "Annotating Urho3D library source files")

@@ -31,7 +31,7 @@ set (LIBS clangRewriteFrontend clangStaticAnalyzerFrontend clangTooling clangSta
         clangFrontend clangDriver clangParse clangSerialization clangSema clangEdit clangAnalysis clangASTMatchers clangAST
         clangToolingCore clangRewrite clangLex clangBasic
         LLVMBitReader LLVMCore LLVMMC LLVMOption LLVMMCParser LLVMSupport
-        z)
+        z tinfo)
 
 # Setup target
 if (APPLE)
