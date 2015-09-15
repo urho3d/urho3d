@@ -139,7 +139,7 @@ public:
     /// Add a cross
     void AddCross(const Vector3& center, float size, const Color& color, bool depthTest = true);
     /// Add a quad
-    void AddQuad(const Vector3& center, float with, float height, const Color& color, bool depthTest = true);
+    void AddQuad(const Vector3& center, float width, float height, const Color& color, bool depthTest = true);
 
     /// Update vertex buffer and render all debug lines. The viewport and rendertarget should be set before.
     void Render();

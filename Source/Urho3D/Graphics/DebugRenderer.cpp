@@ -342,13 +342,11 @@ void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize,
 
 void DebugRenderer::AddCirCle(const Vector3& center, const Vector3& normal, float radius, const Color& color, int steps, bool depthTest)
 {
-    Vector3 d = normal.Normalized();
     Quaternion orientation;
-    orientation.FromRotationTo(Vector3::UP, d);
-    Vector3 p = orientation * Vector3(radius, 0, 0);
-    p += center;
+    orientation.FromRotationTo(Vector3::UP, normal.Normalized());
+    Vector3 p = orientation * Vector3(radius, 0, 0) + center;
 
-    for(int i=1; i<=steps; ++i)
+    for(int i = 1; i <= steps; ++i)
     {
         const float angle = (float)i / (float)steps * 360.0f;
         Vector3 v(radius * Cos(angle), 0, radius * Sin(angle));
@@ -363,8 +361,8 @@ void DebugRenderer::AddCirCle(const Vector3& center, const Vector3& normal, floa
 
 void DebugRenderer::AddCross(const Vector3& center, float size, const Color& color, bool depthTest)
 {
-    float halfSize = size/2.0f;
-    for (int i=0; i<3; ++i)
+    float halfSize = size / 2.0f;
+    for (int i = 0; i < 3; ++i)
     {
         float start[3] = { center.x_, center.y_, center.z_ };
         float end[3] = { center.x_, center.y_, center.z_ };
@@ -374,12 +372,12 @@ void DebugRenderer::AddCross(const Vector3& center, float size, const Color& col
     }
 }
 
-void DebugRenderer::AddQuad(const Vector3& center, float with, float height, const Color& color, bool depthTest)
+void DebugRenderer::AddQuad(const Vector3& center, float width, float height, const Color& color, bool depthTest)
 {
-    Vector3 v0(center.x_ - with/2, center.y_, center.z_ - height/2);
-    Vector3 v1(center.x_ + with/2, center.y_, center.z_ - height/2);
-    Vector3 v2(center.x_ + with/2, center.y_, center.z_ + height/2);
-    Vector3 v3(center.x_ - with/2, center.y_, center.z_ + height/2);
+    Vector3 v0(center.x_ - width / 2, center.y_, center.z_ - height / 2);
+    Vector3 v1(center.x_ + width / 2, center.y_, center.z_ - height / 2);
+    Vector3 v2(center.x_ + width / 2, center.y_, center.z_ + height / 2);
+    Vector3 v3(center.x_ - width / 2, center.y_, center.z_ + height / 2);
     AddLine(v0, v1, color, depthTest);
     AddLine(v1, v2, color, depthTest);
     AddLine(v2, v3, color, depthTest);
