@@ -108,6 +108,11 @@ endif ()
 # Urho3D game engine library
 add_subdirectory (Urho3D)
 
+# Urho3D Clang tools
+if (URHO3D_CLANG_TOOLS)
+    add_subdirectory (Clang-Tools)
+endif ()
+
 # Urho3D tools
 add_subdirectory (Tools)
 

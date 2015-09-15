@@ -31,6 +31,7 @@ String coloringTypeName;
 String coloringPropertyName;
 Color coloringOldColor;
 float coloringOldScalar;
+bool debugRenderDisabled = false;
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
 const uint VIEWPORT_BORDER_H1    = 0x00000002;
@@ -1599,7 +1600,7 @@ void SteppedObjectManipulation(int key)
 void HandlePostRenderUpdate()
 {
     DebugRenderer@ debug = editorScene.debugRenderer;
-    if (debug is null || orbiting)
+    if (debug is null || orbiting || debugRenderDisabled)
         return;
 
     // Visualize the currently selected nodes

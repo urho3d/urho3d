@@ -177,6 +177,7 @@ void LoadConfig()
     XMLElement consoleElem = configElem.GetChild("console");
     XMLElement varNamesElem = configElem.GetChild("varnames");
     XMLElement soundTypesElem = configElem.GetChild("soundtypes");
+    XMLElement cubeMapElem = configElem.GetChild("cubegen");
 
     if (!cameraElem.isNull)
     {
@@ -295,6 +296,18 @@ void LoadConfig()
     if (!soundTypesElem.isNull)
         LoadSoundTypes(soundTypesElem);
 
+    if (!cubeMapElem.isNull)
+    {
+        cubeMapGen_Name = cubeMapElem.HasAttribute("name") ? cubeMapElem.GetAttribute("name") : "";
+        cubeMapGen_Path = cubeMapElem.HasAttribute("path") ? cubeMapElem.GetAttribute("path") : cubemapDefaultOutputPath;
+        cubeMapGen_Size = cubeMapElem.HasAttribute("size") ? cubeMapElem.GetInt("size") : 128;
+    }
+    else
+    {
+        cubeMapGen_Name = "";
+        cubeMapGen_Path = cubemapDefaultOutputPath;
+        cubeMapGen_Size = 128;
+    }
 }
 
 void SaveConfig()
@@ -312,6 +325,7 @@ void SaveConfig()
     XMLElement consoleElem = configElem.CreateChild("console");
     XMLElement varNamesElem = configElem.CreateChild("varnames");
     XMLElement soundTypesElem = configElem.CreateChild("soundtypes");
+    XMLElement cubeGenElem = configElem.CreateChild("cubegen");
 
     cameraElem.SetFloat("nearclip", viewNearClip);
     cameraElem.SetFloat("farclip", viewFarClip);
@@ -387,6 +401,10 @@ void SaveConfig()
     consoleElem.SetAttribute("commandinterpreter", console.commandInterpreter);
 
     varNamesElem.SetVariantMap(globalVarNames);
+    
+    cubeGenElem.SetAttribute("name", cubeMapGen_Name);
+    cubeGenElem.SetAttribute("path", cubeMapGen_Path);
+    cubeGenElem.SetAttribute("size", cubeMapGen_Size);
 
     SaveSoundTypes(soundTypesElem);
 

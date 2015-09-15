@@ -141,9 +141,9 @@ static void RegisterSkeleton(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Bone", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Bone", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("Bone", "const String name", offsetof(Bone, name_));
-    engine->RegisterObjectProperty("Bone", "const Vector3 initialPosition", offsetof(Bone, initialPosition_));
-    engine->RegisterObjectProperty("Bone", "const Quaternion initialRotation", offsetof(Bone, initialRotation_));
-    engine->RegisterObjectProperty("Bone", "const Vector3 initialScale", offsetof(Bone, initialScale_));
+    engine->RegisterObjectProperty("Bone", "Vector3 initialPosition", offsetof(Bone, initialPosition_));
+    engine->RegisterObjectProperty("Bone", "Quaternion initialRotation", offsetof(Bone, initialRotation_));
+    engine->RegisterObjectProperty("Bone", "Vector3 initialScale", offsetof(Bone, initialScale_));
     engine->RegisterObjectProperty("Bone", "bool animated", offsetof(Bone, animated_));
     engine->RegisterObjectProperty("Bone", "float radius", offsetof(Bone, radius_));
     engine->RegisterObjectProperty("Bone", "const BoundingBox boundingBox", offsetof(Bone, boundingBox_));
@@ -173,6 +173,26 @@ static Viewport* ConstructViewportSceneCamera(Scene* scene, Camera* camera, Rend
 static Viewport* ConstructViewportSceneCameraRect(Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath)
 {
     return new Viewport(GetScriptContext(), scene, camera, rect, renderPath);
+}
+
+static Image* Texture2DGetImage(Texture2D* tex2d)
+{
+    Image* rawImage = new Image(tex2d->GetContext());
+    const unsigned texSize = tex2d->GetDataSize(tex2d->GetWidth(), tex2d->GetHeight());
+    const unsigned format = tex2d->GetFormat();
+
+    if (format == Graphics::GetRGBAFormat())
+        rawImage->SetSize(tex2d->GetWidth(), tex2d->GetHeight(), 4);
+    else if (format == Graphics::GetRGBFormat())
+        rawImage->SetSize(tex2d->GetWidth(), tex2d->GetHeight(), 3);
+    else
+    {
+        delete rawImage;
+        return 0;
+    }
+
+    tex2d->GetData(0, rawImage->GetData());
+    return rawImage;
 }
 
 static bool Texture2DSetData(Image* image, bool useAlpha, Texture2D* ptr)
@@ -483,6 +503,7 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Texture2D", "bool SetSize(int, int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(Texture2D, SetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Texture2D", "bool SetData(Image@+, bool useAlpha = false)", asFUNCTION(Texture2DSetData), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Texture2D", "RenderSurface@+ get_renderSurface() const", asMETHOD(Texture2D, GetRenderSurface), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture2D", "Image@+ GetImage() const", asFUNCTION(Texture2DGetImage), asCALL_CDECL_OBJLAST);
 
     RegisterTexture<Texture3D>(engine, "Texture3D");
     engine->RegisterObjectMethod("Texture3D", "bool SetSize(int, int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(Texture3D, SetSize), asCALL_THISCALL);
