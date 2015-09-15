@@ -340,27 +340,30 @@ void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize,
     }
 }
 
-void DebugRenderer::AddCirCle(const Vector3& center, const Vector3& normal, float radius, const Color& color, int steps, bool depthTest)
+void DebugRenderer::AddCircle(const Vector3& center, const Vector3& normal, float radius, const Color& color, int steps, bool depthTest)
 {
     Quaternion orientation;
     orientation.FromRotationTo(Vector3::UP, normal.Normalized());
     Vector3 p = orientation * Vector3(radius, 0, 0) + center;
+    unsigned uintColor = color.ToUInt();
 
     for(int i = 1; i <= steps; ++i)
     {
         const float angle = (float)i / (float)steps * 360.0f;
         Vector3 v(radius * Cos(angle), 0, radius * Sin(angle));
         Vector3 c = orientation * v + center;
-        AddLine(p, c, color, depthTest);
+        AddLine(p, c, uintColor, depthTest);
         p = c;
     }
 
     p = center + normal * (radius / 4.0f);
-    AddLine(center, p, color, depthTest);
+    AddLine(center, p, uintColor, depthTest);
 }
 
 void DebugRenderer::AddCross(const Vector3& center, float size, const Color& color, bool depthTest)
 {
+    unsigned uintColor = color.ToUInt();
+
     float halfSize = size / 2.0f;
     for (int i = 0; i < 3; ++i)
     {
@@ -368,20 +371,22 @@ void DebugRenderer::AddCross(const Vector3& center, float size, const Color& col
         float end[3] = { center.x_, center.y_, center.z_ };
         start[i] -= halfSize;
         end[i] += halfSize;
-        AddLine(start, end, color, depthTest);
+        AddLine(start, end, uintColor, depthTest);
     }
 }
 
 void DebugRenderer::AddQuad(const Vector3& center, float width, float height, const Color& color, bool depthTest)
 {
+    unsigned uintColor = color.ToUInt();
+
     Vector3 v0(center.x_ - width / 2, center.y_, center.z_ - height / 2);
     Vector3 v1(center.x_ + width / 2, center.y_, center.z_ - height / 2);
     Vector3 v2(center.x_ + width / 2, center.y_, center.z_ + height / 2);
     Vector3 v3(center.x_ - width / 2, center.y_, center.z_ + height / 2);
-    AddLine(v0, v1, color, depthTest);
-    AddLine(v1, v2, color, depthTest);
-    AddLine(v2, v3, color, depthTest);
-    AddLine(v3, v0, color, depthTest);
+    AddLine(v0, v1, uintColor, depthTest);
+    AddLine(v1, v2, uintColor, depthTest);
+    AddLine(v2, v3, uintColor, depthTest);
+    AddLine(v3, v0, uintColor, depthTest);
 }
 
 void DebugRenderer::Render()
