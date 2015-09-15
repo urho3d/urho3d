@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
+// Modified by Lasse Oorni for Urho3D
 
 /** @file Defines the helper data structures for importing XFiles */
 #ifndef AI_XFILEHELPER_H_INC
@@ -45,7 +46,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <vector>
+// Urho3D: VS2008 compatibility
+#if (__STDC_VERSION__ >= 199901L) || (_MSC_VER >= 1600)
 #include <stdint.h>
+#else
+#include "../include/assimp/Compiler/pstdint.h"
+#endif
 
 #include "../include/assimp/types.h"
 #include "../include/assimp/quaternion.h"

@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 /** @file  FBXDocument.h
  *  @brief FBX DOM
  */
@@ -47,7 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <map>
 #include <string>
+// Urho3D: VS2008 compatibility
+#if (__STDC_VERSION__ >= 199901L) || (_MSC_VER >= 1600)
 #include <stdint.h>
+#else
+#include "../include/assimp/Compiler/pstdint.h"
+#endif
 #include <numeric>
 #include <boost/scoped_ptr.hpp>
 #include "../include/assimp/ai_assert.h"

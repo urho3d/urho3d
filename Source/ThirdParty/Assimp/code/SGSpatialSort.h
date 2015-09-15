@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 /** Small helper classes to optimise finding vertizes close to a given location
  */
 #ifndef AI_D3DSSPATIALSORT_H_INC
@@ -45,7 +47,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../include/assimp/types.h"
 #include <vector>
+// Urho3D: VS2008 compatibility
+#if (__STDC_VERSION__ >= 199901L) || (_MSC_VER >= 1600)
 #include <stdint.h>
+#else
+#include "../include/assimp/Compiler/pstdint.h"
+#endif
 
 namespace Assimp    {
 

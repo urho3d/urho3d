@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 /** @file metadata.h
  *  @brief Defines the data structures for holding node meta information.
  */

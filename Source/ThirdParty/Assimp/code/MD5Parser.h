@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
+// Modified by Lasse Oorni for Urho3D
 
 /** @file  MD5Parser.h
  *  @brief Definition of the .MD5 parser class.
@@ -49,7 +50,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../include/assimp/types.h"
 #include "ParsingUtils.h"
 #include <vector>
+// Urho3D: VS2008 compatibility
+#if (__STDC_VERSION__ >= 199901L) || (_MSC_VER >= 1600)
 #include <stdint.h>
+#else
+#include "../include/assimp/Compiler/pstdint.h"
+#endif
 
 struct aiFace;
 

@@ -20,6 +20,9 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -----------------------------------------------------------------------------------------------*/
+
+// Modified by Lasse Oorni for Urho3D
+
 #pragma once
 
 #include <cstddef>
@@ -50,6 +53,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define USE_ODDLPARSER_NS   using namespace ODDLParser;
 
 BEGIN_ODDLPARSER_NS
+
+// Urho3D: modified to not use C++11
+#define OPENDDL_NO_USE_CPP11
 
 // We will use C++11 optional
 #ifndef OPENDDL_NO_USE_CPP11

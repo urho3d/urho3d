@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 /** @file  IFCUtil.cpp
  *  @brief Implementation of conversion routines for some common Ifc helper entities.
  */
@@ -311,7 +313,8 @@ void TempMesh::FixupFaceOrientation()
         }
 
         // calculate its normal and reverse the poly if its facing towards the mesh center
-        IfcVector3 farthestNormal = ComputePolygonNormal(verts.data() + faceStartIndices[farthestIndex], vertcnt[farthestIndex]);
+        // Urho3D: modified to not use C++11
+        IfcVector3 farthestNormal = ComputePolygonNormal(&verts[0] + faceStartIndices[farthestIndex], vertcnt[farthestIndex]);
         IfcVector3 farthestCenter = std::accumulate(verts.begin() + faceStartIndices[farthestIndex],
             verts.begin() + faceStartIndices[farthestIndex] + vertcnt[farthestIndex], IfcVector3(0.0))
             / IfcFloat(vertcnt[farthestIndex]);

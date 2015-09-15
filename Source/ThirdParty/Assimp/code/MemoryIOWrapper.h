@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 /** @file MemoryIOWrapper.h
  *  Handy IOStream/IOSystem implemetation to read directly from a memory buffer */
 #ifndef AI_MEMORYIOSTREAM_H_INC
@@ -46,7 +48,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../include/assimp/IOStream.hpp"
 #include "../include/assimp/IOSystem.hpp"
 #include "../include/assimp/ai_assert.h"
+// Urho3D: VS2008 compatibility
+#if (__STDC_VERSION__ >= 199901L) || (_MSC_VER >= 1600)
 #include <stdint.h>
+#else
+#include "../include/assimp/Compiler/pstdint.h"
+#endif
 
 namespace Assimp    {
 #define AI_MEMORYIO_MAGIC_FILENAME "$$$___magic___$$$"

@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 /** @file  IFCOpenings.cpp
  *  @brief Implements a subset of Ifc CSG operations for pouring
   *    holes for windows and doors into walls.
@@ -902,11 +904,12 @@ size_t CloseWindows(ContourVector& contours,
             curmesh.vertcnt.reserve(curmesh.vertcnt.size() + (*it).contour.size());
 
             // compare base poly normal and contour normal to detect if we need to reverse the face winding
-            IfcVector3 basePolyNormal = TempMesh::ComputePolygonNormal( curmesh.verts.data(), curmesh.vertcnt.front());
+            // Urho3D: modified to not use C++11
+            IfcVector3 basePolyNormal = TempMesh::ComputePolygonNormal( &curmesh.verts[0], curmesh.vertcnt.front());
             std::vector<IfcVector3> worldSpaceContourVtx( it->contour.size());
             for( size_t a = 0; a < it->contour.size(); ++a )
                 worldSpaceContourVtx[a] = minv * IfcVector3( it->contour[a].x, it->contour[a].y, 0.0);
-            IfcVector3 contourNormal = TempMesh::ComputePolygonNormal( worldSpaceContourVtx.data(), worldSpaceContourVtx.size());
+            IfcVector3 contourNormal = TempMesh::ComputePolygonNormal( &worldSpaceContourVtx[0], worldSpaceContourVtx.size());
             bool reverseCountourFaces = (contourNormal * basePolyNormal) > 0.0;
 
             // XXX this algorithm is really a bit inefficient - both in terms

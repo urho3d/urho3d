@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 /** @file  IFCBoolean.cpp
  *  @brief Implements a subset of Ifc boolean operations
  */
@@ -109,7 +111,8 @@ void FilterPolygon(std::vector<IfcVector3>& resultpoly)
     }
 
     IfcVector3 vmin, vmax;
-    ArrayBounds(resultpoly.data(), resultpoly.size(), vmin, vmax);
+    // Urho3D: modified to not use C++11
+    ArrayBounds(&resultpoly[0], resultpoly.size(), vmin, vmax);
 
     // filter our IfcFloat points - those may happen if a point lies
     // directly on the intersection line or directly on the clipping plane
@@ -420,7 +423,8 @@ void ProcessPolygonalBoundedBooleanHalfSpaceDifference(const IfcPolygonalBounded
     }
 
     // determine winding order by calculating the normal.
-    IfcVector3 profileNormal = TempMesh::ComputePolygonNormal(profile->verts.data(), profile->verts.size());
+    // Urho3D: modified to not use C++11
+    IfcVector3 profileNormal = TempMesh::ComputePolygonNormal(&profile->verts[0], profile->verts.size());
 
     IfcMatrix4 proj_inv;
     ConvertAxisPlacement(proj_inv,hs->Position);
@@ -603,7 +607,8 @@ void ProcessPolygonalBoundedBooleanHalfSpaceDifference(const IfcPolygonalBounded
 
             // determine the direction in which we're marching along the boundary polygon. If the src poly is faced upwards
             // and the boundary is also winded this way, we need to march *backwards* on the boundary.
-            const IfcVector3 polyNormal = IfcMatrix3(proj) * TempMesh::ComputePolygonNormal(blackside.data(), blackside.size());
+            // Urho3D: modified to not use C++11
+            const IfcVector3 polyNormal = IfcMatrix3(proj) * TempMesh::ComputePolygonNormal(&blackside[0], blackside.size());
             bool marchBackwardsOnBoundary = (profileNormal * polyNormal) >= 0.0;
 
             // Build closed loops from these intersections. Starting from an intersection leaving the boundary we

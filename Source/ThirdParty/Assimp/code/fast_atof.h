@@ -11,23 +11,23 @@
 //     to ensure long numbers are handled correctly
 // ------------------------------------------------------------------------------------
 
+// Modified by Lasse Oorni for Urho3D
 
 #ifndef __FAST_A_TO_F_H_INCLUDED__
 #define __FAST_A_TO_F_H_INCLUDED__
 
 #include <cmath>
 #include <limits>
+// Urho3D: VS2008 compatibility
+#if (__STDC_VERSION__ >= 199901L) || (_MSC_VER >= 1600)
 #include <stdint.h>
-#include <stdexcept>
-
-#include "StringComparison.h"
-
-
-#ifdef _MSC_VER
-#  include <stdint.h>
 #else
 #include "../include/assimp/Compiler/pstdint.h"
 #endif
+
+#include <stdexcept>
+
+#include "StringComparison.h"
 
 namespace Assimp
 {

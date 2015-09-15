@@ -1,4 +1,5 @@
 
+// Modified by Lasse Oorni for Urho3D
 
 /** @file  IRRShared.h
   * @brief Shared utilities for the IRR and IRRMESH loaders
@@ -9,7 +10,12 @@
 
 #include "irrXMLWrapper.h"
 #include "BaseImporter.h"
+// Urho3D: VS2008 compatibility
+#if (__STDC_VERSION__ >= 199901L) || (_MSC_VER >= 1600)
 #include <stdint.h>
+#else
+#include "../include/assimp/Compiler/pstdint.h"
+#endif
 
 struct aiMaterial;
 

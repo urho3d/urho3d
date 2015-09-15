@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 /** @file Declares a helper class, "SceneCombiner" providing various
  *  utilities to merge scenes.
  */
@@ -50,8 +52,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stddef.h>
 #include <set>
 #include <list>
+// Urho3D: VS2008 compatibility
+#if (__STDC_VERSION__ >= 199901L) || (_MSC_VER >= 1600)
 #include <stdint.h>
-//#include "../include/assimp/Compiler/pstdint.h"
+#else
+#include "../include/assimp/Compiler/pstdint.h"
+#endif
 
 #include <vector>
 

@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 /** @file Provides cheat implementations for IOSystem and IOStream to
  *  redirect exporter output to a blob chain.*/
 
@@ -50,7 +52,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "./../include/assimp/IOSystem.hpp"
 #include "./../include/assimp/DefaultLogger.hpp"
 #include <boost/foreach.hpp>
+// Urho3D: VS2008 compatibility
+#if (__STDC_VERSION__ >= 199901L) || (_MSC_VER >= 1600)
 #include <stdint.h>
+#else
+#include "../include/assimp/Compiler/pstdint.h"
+#endif
 #include <set>
 #include <vector>
 
