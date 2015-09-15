@@ -40,6 +40,7 @@ namespace Spriter
 }
 
 class Sprite2D;
+class SpriteSheet2D;
 
 /// Spriter animation set, it includes one or more animations, for more information please refer to http://www.esotericsoftware.com and http://www.brashmonkey.com/spriter.htm.
 class URHO3D_API AnimationSet2D : public Resource
@@ -109,6 +110,12 @@ private:
     
     /// Spriter data.
     Spriter::SpriterData* spriterData_;
+    /// Has sprite sheet.
+    bool hasSpriteSheet_;
+    /// Sprite sheet file path.
+    String spriteSheetFilePath_;
+    /// Sprite sheet.
+    SharedPtr<SpriteSheet2D> spriteSheet_;
     /// Spriter sprites.
     HashMap<int, SharedPtr<Sprite2D> > spriterFileSprites_;
 };
