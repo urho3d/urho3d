@@ -182,7 +182,7 @@ before_script:
   - export CXX=g++-4.9 CC=gcc-4.9
   - for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done && export PATH=$HOME:$PATH
   - rake ci_setup_cache
-script: rake annotate
+script: rake cmake URHO3D_CLANG_TOOLS=1 && rake make annotate
 after_script: rake ci_teardown_cache
 
 ---

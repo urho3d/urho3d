@@ -31,33 +31,35 @@ using namespace llvm;
 
 static cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 static cl::extrahelp MoreHelp(
-    "\tFor example, to run Annotator on all files in a subtree of the\n"
+    "\tFor example, to run ScriptBindingExtractor on all files in a subtree of the\n"
     "\tsource tree, use:\n"
     "\n"
-    "\t  find path/in/substree -name '*.cpp'|xargs Annotator -p build/path\n"
+    "\t  find path/in/substree -name '*.cpp'|xargs ScriptBindingExtractor -p build/path\n"
     "\n"
     "\tNote, that path/in/subtree and current directory should follow the\n"
     "\trules described above.\n"
     "\n"
 );
 
-static cl::OptionCategory AnnotatorCategory("Annotator options");
+static cl::OptionCategory ScriptAPIExtractorCategory("ScriptBindingExtractor options");
 static std::unique_ptr<opt::OptTable> Options(createDriverOptTable());
-static cl::opt<std::string> BindingsFile
-    ("b", cl::desc("Bindings file in JSON format (output of ScriptBindingExtractor tool)"), cl::cat(AnnotatorCategory));
 
-class AnnotateFrontendAction : public ASTFrontendAction
+class ExtractASTConsumer : public ASTConsumer
+{
+};
+
+class ExtractFrontendAction : public ASTFrontendAction
 {
 protected:
     virtual std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance& CI, StringRef InFile)
     {
-        return make_unique<ASTConsumer>();
+        return make_unique<ExtractASTConsumer>();
     }
 };
 
 int main(int argc, const char** argv)
 {
-    CommonOptionsParser OptionsParser(argc, argv, AnnotatorCategory);
+    CommonOptionsParser OptionsParser(argc, argv, ScriptAPIExtractorCategory);
     ClangTool Tool(OptionsParser.getCompilations(), OptionsParser.getSourcePathList());
-    return Tool.run(newFrontendActionFactory<AnnotateFrontendAction>().get());
+    return Tool.run(newFrontendActionFactory<ExtractFrontendAction>().get());
 }
