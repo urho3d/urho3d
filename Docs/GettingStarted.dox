@@ -283,17 +283,17 @@ If "URHO3D_DOCS" build option is set then a normal build would not only build Ur
 
 The prerequisites are Doxygen and Graphviz. Tools to dump the \ref ScriptAPI "AngelScript API" for the default \ref Script "scripting" subsystem and the \ref LuaScriptAPI "LuaScript API" (when the LuaScript subsystem is also enabled) are being built at the same time when all the native tools are built.
 
+\section Building_Clang_tools Clang-tools build
+
+If "URHO3D_CLANG_TOOLS" build option is set then CMake would generate a special build tree for the purpose of developing the Clang-tools. Before doing this, the development software package of LLVM/Clang must be already installed in the host system. Alternatively you can use built it from source and install it into the host system. If it is not installed in a system-wide installation location then use the LLVM_CLANG_ROOT environment variable to point to the root path of this custom location (the root is the parent directory containing the bin, lib, include and share subdirectories). If you have built Emscripten-SDK from its source in your host system then you can also just install the Fastcomp/Clang found inside the Emscripten-SDK by navigating to the Fastcomp/Clang build tree and issuing a 'make install' command as usual. Using Fastcomp/Clang is fine because we are only interested in using Clang as 3rd-party library instead of as compiler.
+
+Check the Source/Clang-Tools/CMakeLists.txt to get the list of targets currently available or under development. Normal build targets won't work properly in this special build tree. See also https://github.com/urho3d/Urho3D/issues/887 to find out more about the current development plan and leave a comment there if you would like to help to contribute the development.
+
 \section Building_Shaders Compiling Direct3D shaders
 
 When building for Direct3D9 with the Windows 8 SDK (Visual Studio 2012+), copy d3dcompiler_46.dll from "C:\Program Files (x86)\Windows Kits\8.0\bin\x86" to build tree's "bin" directory so that Urho3D executables will run correctly. When building for Direct3D11, copy d3dcompiler_47.dll from "C:\Program Files (x86)\Windows Kits\8.1\bin\x86" to the "bin" directory. In both cases, if compiling Urho3D as 64-bit, copy from the "bin\x64" directory instead.
 
 OpenGL does not depend on a separate shader compiler DLL.
-
-\section Building_Clang_tools Clang-tools build
-
-If "URHO3D_CLANG_TOOLS" build option is set then CMake would generate a special build tree for the purpose of developing the Clang-tools. Normal build targets won't work in this special build tree. Before doing this, the development software package of LLVM/Clang or Fastcomp/Clang (from Emscripten-SDK) must be already installed in the host system. If using Fastcomp/Clang and it is not installed in the system-wide installation location then use the FASTCOMP_CLANG_ROOT environment variable to point to the root path of this custom location (the root is the parent directory containing the bin, lib, include and share subdirectories).
-
-Check the Source/Clang-Tools/CMakeLists.txt to get the list of targets currently available or under development. See also https://github.com/urho3d/Urho3D/issues/887 to find out more about the current development plan and leave a comment there if you would like to help to contribute the development.
 
 \section Using_ccache Using ccache
 

@@ -26,13 +26,6 @@ set (TARGET_NAME Annotator)
 # Define source files
 define_source_files ()
 
-# Define dependency libs
-set (LIBS clangRewriteFrontend clangStaticAnalyzerFrontend clangTooling clangStaticAnalyzerCheckers clangStaticAnalyzerCore
-        clangFrontend clangDriver clangParse clangSerialization clangSema clangEdit clangAnalysis clangASTMatchers clangAST
-        clangToolingCore clangRewrite clangLex clangBasic
-        LLVMBitReader LLVMCore LLVMMC LLVMOption LLVMMCParser LLVMSupport
-        z tinfo)
-
 # Setup target
 if (APPLE)
     setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)

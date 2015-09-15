@@ -45,7 +45,7 @@ endif ()
 include (CMakeDependentOption)
 option (URHO3D_C++11 "Enable C++11 standard")
 cmake_dependent_option (URHO3D_NOABI "If set then do not explicitly specify the ABI compiler flag for code generation (GCC and Clang only)" FALSE "NOT MSVC" FALSE)
-mark_as_advanced (URHO3D_NOABI)
+mark_as_advanced (URHO3D_C++11 URHO3D_NOABI)
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
 if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the initial configure step
     # On non-MSVC compiler, default to build 64-bit when the host system has a 64-bit build environment
@@ -250,6 +250,25 @@ if (CMAKE_VERSION VERSION_GREATER 2.8 OR CMAKE_VERSION VERSION_EQUAL 2.8)
     endif ()
 endif()
 
+# Clang tools building
+if (URHO3D_CLANG_TOOLS)
+    # Ensure LLVM/Clang is installed
+    find_program (LLVM_CONFIG NAMES llvm-config llvm-config-64 llvm-config-32 HINTS $ENV{LLVM_CLANG_ROOT}/bin DOC "LLVM config tool" NO_CMAKE_FIND_ROOT_PATH)
+    if (NOT LLVM_CONFIG)
+        message (FATAL_ERROR "Could not find LLVM/Clang installation")
+    endif ()
+    # Require C++11 standard and no precompiled-header
+    set (URHO3D_C++11 1)
+    set (URHO3D_PCH 0)
+    # Set build options that would maximise the AST of Urho3D library
+    foreach (OPT URHO3D_ANGELSCRIPT URHO3D_LUA URHO3D_FILEWATCHER URHO3D_PROFILING URHO3D_LOGGING URHO3D_NAVIGATION URHO3D_NETWORK URHO3D_PHYSICS URHO3D_URHO2D URHO3D_DATABASE_SQLITE)
+        set (${OPT} 1)
+    endforeach()
+    foreach (OPT URHO3D_TESTING URHO3D_LUAJIT URHO3D_DATABASE_ODBC)
+        set (${OPT} 0)
+    endforeach()
+endif ()
+
 # Enable testing
 if (URHO3D_TESTING)
     enable_testing ()
@@ -388,12 +407,6 @@ endif ()
 if (URHO3D_DATABASE_SQLITE)
     set (URHO3D_DATABASE 1)
     add_definitions (-DURHO3D_DATABASE -DURHO3D_DATABASE_SQLITE)
-endif ()
-
-# Clang tools building requires C++11 standard
-if (URHO3D_CLANG_TOOLS)
-    set (URHO3D_C++11 1)
-    set (URHO3D_PCH 0)
 endif ()
 
 # Find Direct3D include & library directories in MS Windows SDK or DirectX SDK when not using OpenGL.
@@ -573,7 +586,7 @@ else ()
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics -Qunused-arguments")
         endif ()
         # Temporary workaround for Travis CI VM as Ubuntu 12.04 LTS still uses old glibc header files that do not have the necessary patch for Clang to work correctly
-        # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS (or hopefully it will be CentOS :)
+        # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS
         if (DEFINED ENV{CI} AND "$ENV{LINUX}")
             add_definitions (-D__extern_always_inline=inline)
         endif ()

@@ -25,15 +25,15 @@ set (TARGET_NAME Urho3D)
 
 # Generate JSON compilation database format specification
 if (URHO3D_CLANG_TOOLS)
-    if (DEFINED ENV{FASTCOMP_CLANG_ROOT})
-        set (FASTCOMP_CLANG_ROOT $ENV{FASTCOMP_CLANG_ROOT})
-    else ()
-        set (FASTCOMP_CLANG_ROOT /usr/local)    # FIXME: Not sure where is the default system-wide location on Windows
-    endif ()
-    file (STRINGS ${FASTCOMP_CLANG_ROOT}/include/clang/Basic/Version.inc CLANG_VERSION REGEX "#define CLANG_VERSION ")
-    string (REPLACE "#define CLANG_VERSION " "" CLANG_VERSION ${CLANG_VERSION})
-    include_directories (${FASTCOMP_CLANG_ROOT}/lib/clang/${CLANG_VERSION}/include)
     set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
+    execute_process (COMMAND ${LLVM_CONFIG} --version OUTPUT_VARIABLE LLVM_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+    string (REGEX REPLACE "([.0123456789]+).*" \\1 LLVM_VERSION "${LLVM_VERSION}")      # Stringify against empty output variable
+    execute_process (COMMAND ${LLVM_CONFIG} --libdir OUTPUT_VARIABLE LLVM_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+    include_directories (${LLVM_LIBDIR}/clang/${LLVM_VERSION}/include)
+    # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS
+    if (DEFINED ENV{CI})
+        add_definitions (-D__extern_always_inline=inline)
+    endif ()
 endif ()
 
 add_definitions (-DURHO3D_IS_BUILDING)
