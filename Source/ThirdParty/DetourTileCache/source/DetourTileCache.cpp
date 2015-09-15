@@ -1,3 +1,5 @@
+// Modified by Lasse Oorni for Urho3D
+
 #include "DetourTileCache.h"
 #include "DetourTileCacheBuilder.h"
 #include "DetourNavMeshBuilder.h"
@@ -81,14 +83,19 @@ dtTileCache::dtTileCache() :
 	
 dtTileCache::~dtTileCache()
 {
-	for (int i = 0; i < m_params.maxTiles; ++i)
+	// Urho3D: added null check for tile allocation
+	if (m_tiles)
 	{
-		if (m_tiles[i].flags & DT_COMPRESSEDTILE_FREE_DATA)
+		for (int i = 0; i < m_params.maxTiles; ++i)
 		{
-			dtFree(m_tiles[i].data);
-			m_tiles[i].data = 0;
+			if (m_tiles[i].flags & DT_COMPRESSEDTILE_FREE_DATA)
+			{
+				dtFree(m_tiles[i].data);
+				m_tiles[i].data = 0;
+			}
 		}
 	}
+	
 	dtFree(m_obstacles);
 	m_obstacles = 0;
 	dtFree(m_posLookup);
