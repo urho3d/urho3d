@@ -746,6 +746,4 @@ ELSE (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
 ENDIF (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
 
 set (TARGET_NAME Assimp)
-set_source_files_properties (contrib/clipper/clipper.cpp contrib/irrXML/irrXML.cpp PROPERTIES NO_PCH TRUE)
-
 setup_library ()
