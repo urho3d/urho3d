@@ -13859,3 +13859,4 @@ uint VO_LOW_MATERIAL_QUALITY;
 uint VO_NONE;
 Color WHITE;
 Color YELLOW;
+VariantMap globalVars;

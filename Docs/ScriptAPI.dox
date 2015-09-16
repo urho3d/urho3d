@@ -14520,6 +14520,7 @@ Properties:
 - uint VO_NONE
 - Color WHITE
 - Color YELLOW
+- VariantMap globalVars
 */
 
 }
