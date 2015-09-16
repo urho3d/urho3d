@@ -251,7 +251,7 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
         unsigned elementMask;
 
         geom->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-        if (!vertexData || !indexData)
+        if (!vertexData)
         {
             LOGWARNING("Skipping geometry with no CPU-side geometry data for convex hull collision");
             continue;
