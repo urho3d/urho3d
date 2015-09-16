@@ -21,7 +21,7 @@
 #
 
 # Define target name
-set (TARGET_NAME Annotator)
+set (TARGET_NAME ScriptBindingExtractor)
 
 # Define source files
 define_source_files ()

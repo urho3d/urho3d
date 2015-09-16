@@ -34,6 +34,7 @@
 #include "../Urho2D/AnimationSet2D.h"
 #include "../Urho2D/Sprite2D.h"
 #include "../Urho2D/SpriterData2D.h"
+#include "../Urho2D/SpriteSheet2D.h"
 
 #include "../DebugNew.h"
 
@@ -108,13 +109,14 @@ AnimationSet2D::AnimationSet2D(Context* context) :
     skeletonData_(0),
     atlas_(0),
 #endif
-    spriterData_(0)
+    spriterData_(0),
+    hasSpriteSheet_(false)
 {
 }
 
 AnimationSet2D::~AnimationSet2D()
 {
-    Dispose();    
+    Dispose();
 }
 
 void AnimationSet2D::RegisterObject(Context* context)
@@ -124,6 +126,8 @@ void AnimationSet2D::RegisterObject(Context* context)
 
 bool AnimationSet2D::BeginLoad(Deserializer& source)
 {
+    Dispose();
+
     if (GetName().Empty())
         SetName(source.GetName());
 
@@ -134,7 +138,6 @@ bool AnimationSet2D::BeginLoad(Deserializer& source)
 #endif
     if (extension == ".scml")
         return BeginLoadSpriter(source);
-    
 
     LOGERROR("Unsupport animation set file: " + source.GetName());
 
@@ -222,8 +225,6 @@ Sprite2D* AnimationSet2D::GetSpriterFileSprite(int folderId, int fileId) const
 #ifdef URHO3D_SPINE
 bool AnimationSet2D::BeginLoadSpine(Deserializer& source)
 {
-    Dispose();
-
     if (GetName().Empty())
         SetName(source.GetName());
 
@@ -302,18 +303,33 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
         return false;
     }
 
+    // Check has sprite sheet
+    String parentPath = GetParentPath(GetName());
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    spriteSheetFilePath_ = parentPath + GetFileName(GetName()) + ".xml";
+    hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_);
+    if (!hasSpriteSheet_)
+    {
+        spriteSheetFilePath_ = parentPath + GetFileName(GetName()) + ".plist";
+        hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_);
+    }
+
     if (GetAsyncLoadState() == ASYNC_LOADING)
     {
-        String parentPath = GetParentPath(GetName());
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
-        for (size_t i = 0; i < spriterData_->folders_.Size(); ++i)
+        if (hasSpriteSheet_)
+            cache->BackgroundLoadResource<SpriteSheet2D>(spriteSheetFilePath_, true, this);
+        else
         {
-            Spriter::Folder* folder = spriterData_->folders_[i];
-            for (size_t j = 0; j < folder->files_.Size(); ++j)
+            for (size_t i = 0; i < spriterData_->folders_.Size(); ++i)
             {
-                Spriter::File* file = folder->files_[j];
-                String imagePath = parentPath + file->name_;
-                cache->BackgroundLoadResource<Image>(imagePath, true, this);
+                Spriter::Folder* folder = spriterData_->folders_[i];
+                for (size_t j = 0; j < folder->files_.Size(); ++j)
+                {
+                    Spriter::File* file = folder->files_[j];
+                    String imagePath = parentPath + file->name_;
+                    cache->BackgroundLoadResource<Image>(imagePath, true, this);
+                }
             }
         }
     }
@@ -337,98 +353,144 @@ bool AnimationSet2D::EndLoadSpriter()
     if (!spriterData_)
         return false;
     
-    Vector<SpriteInfo> spriteInfos;
-    
-    String parentPath = GetParentPath(GetName());
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    for (unsigned i = 0; i < spriterData_->folders_.Size(); ++i)
+    if (hasSpriteSheet_)
     {
-        Spriter::Folder* folder = spriterData_->folders_[i];
-        for (unsigned j = 0; j < folder->files_.Size(); ++j)
+        spriteSheet_ = cache->GetResource<SpriteSheet2D>(spriteSheetFilePath_);
+        if (!spriteSheet_)
+            return false;
+
+        for (unsigned i = 0; i < spriterData_->folders_.Size(); ++i)
         {
-            Spriter::File* file = folder->files_[j];
-            String imagePath = parentPath + file->name_;
-            SharedPtr<Image> image(cache->GetResource<Image>(imagePath));
-            if (!image)
+            Spriter::Folder* folder = spriterData_->folders_[i];
+            for (unsigned j = 0; j < folder->files_.Size(); ++j)
             {
-                LOGERROR("Could not load image");
-                return false;
+                Spriter::File* file = folder->files_[j];
+                SharedPtr<Sprite2D> sprite(spriteSheet_->GetSprite(GetFileName(file->name_)));
+                if (!sprite)
+                {
+                    LOGERROR("Could not load sprite " + file->name_);
+                    return false;                
+                }
+
+                Vector2 hotSpot(file->pivotX_, file->pivotY_);
+
+                // If sprite is trimmed, recalculate hot spot
+                const IntVector2& offset = sprite->GetOffset();
+                if (offset != IntVector2::ZERO)
+                {
+                    float pivotX = file->width_ * hotSpot.x_;
+                    float pivotY = file->height_ * (1.0f - hotSpot.y_);
+
+                    const IntRect& rectangle = sprite->GetRectangle();
+                    hotSpot.x_ = (offset.x_ + pivotX) / rectangle.Width();
+                    hotSpot.y_ = 1.0f - (offset.y_ + pivotY) / rectangle.Height();
+                }
+
+                sprite->SetHotSpot(hotSpot);
+
+                if (!sprite_)
+                    sprite_ = sprite;
+
+                int key = (folder->id_ << 16) + file->id_;
+                spriterFileSprites_[key] = sprite;
             }
-            if (image->IsCompressed())
-            {
-                LOGERROR("Compressed image is not support");
-                return false;
-            }
-            if (image->GetComponents() != 4)
-            {
-                LOGERROR("Only support image with 4 components");
-                return false;
-            }
-
-            SpriteInfo def;
-            def.file_ = file;
-            def.image_ = image;
-            spriteInfos.Push(def);
-        }
-    }
-
-    if (spriteInfos.Empty())
-        return false;
-
-    if (spriteInfos.Size() > 1)
-    {
-        AreaAllocator allocator(128, 128, 2048, 2048);
-        for (unsigned i = 0; i < spriteInfos.Size(); ++i)
-        {
-            SpriteInfo& info = spriteInfos[i];
-            Image* image = info.image_;
-            if (!allocator.Allocate(image->GetWidth(), image->GetHeight(), info.x, info.y))
-            {
-                LOGERROR("Could not allocate area");
-                return false;
-            }
-        }
-
-        SharedPtr<Texture2D> texture(new Texture2D(context_));
-        texture->SetMipsToSkip(QUALITY_LOW, 0);
-        texture->SetNumLevels(1);
-        texture->SetSize(allocator.GetWidth(), allocator.GetHeight(), Graphics::GetRGBAFormat());
-
-        sprite_ = new Sprite2D(context_);
-        sprite_->SetTexture(texture);
-
-        for (unsigned i = 0; i < spriteInfos.Size(); ++i)
-        {
-            SpriteInfo& info = spriteInfos[i];
-            Image* image = info.image_;
-            
-            texture->SetData(0, info.x, info.y, image->GetWidth(), image->GetHeight(), image->GetData());
-
-            SharedPtr<Sprite2D> sprite(new Sprite2D(context_));
-            sprite->SetTexture(texture);
-            sprite->SetRectangle(IntRect(info.x, info.y, info.x + image->GetWidth(), info.y + image->GetHeight()));
-            sprite->SetHotSpot(Vector2(info.file_->pivotX_, info.file_->pivotY_));
-
-            int key = (info.file_->folder_->id_ << 16) + info.file_->id_;
-            spriterFileSprites_[key] = sprite;
         }
     }
     else
     {
-        SharedPtr<Texture2D> texture(new Texture2D(context_));        
-        texture->SetMipsToSkip(QUALITY_LOW, 0);
-        texture->SetNumLevels(1);
+        Vector<SpriteInfo> spriteInfos;
+        String parentPath = GetParentPath(GetName());
 
-        SpriteInfo& info = spriteInfos[0];        
-        texture->SetData(info.image_, true);
+        for (unsigned i = 0; i < spriterData_->folders_.Size(); ++i)
+        {
+            Spriter::Folder* folder = spriterData_->folders_[i];
+            for (unsigned j = 0; j < folder->files_.Size(); ++j)
+            {
+                Spriter::File* file = folder->files_[j];
+                String imagePath = parentPath + file->name_;
+                SharedPtr<Image> image(cache->GetResource<Image>(imagePath));
+                if (!image)
+                {
+                    LOGERROR("Could not load image");
+                    return false;
+                }
+                if (image->IsCompressed())
+                {
+                    LOGERROR("Compressed image is not support");
+                    return false;
+                }
+                if (image->GetComponents() != 4)
+                {
+                    LOGERROR("Only support image with 4 components");
+                    return false;
+                }
 
-        sprite_ = new Sprite2D(context_);
-        sprite_->SetTexture(texture);
-        sprite_->SetRectangle(IntRect(info.x, info.y, info.x + info.image_->GetWidth(), info.y + info.image_->GetHeight()));
-        sprite_->SetHotSpot(Vector2(info.file_->pivotX_, info.file_->pivotY_));
+                SpriteInfo def;
+                def.file_ = file;
+                def.image_ = image;
+                spriteInfos.Push(def);
+            }
+        }
 
-        int key = (info.file_->folder_->id_ << 16) + info.file_->id_;
-        spriterFileSprites_[key] = sprite_;
+        if (spriteInfos.Empty())
+            return false;
+
+        if (spriteInfos.Size() > 1)
+        {
+            AreaAllocator allocator(128, 128, 2048, 2048);
+            for (unsigned i = 0; i < spriteInfos.Size(); ++i)
+            {
+                SpriteInfo& info = spriteInfos[i];
+                Image* image = info.image_;
+                if (!allocator.Allocate(image->GetWidth(), image->GetHeight(), info.x, info.y))
+                {
+                    LOGERROR("Could not allocate area");
+                    return false;
+                }
+            }
+
+            SharedPtr<Texture2D> texture(new Texture2D(context_));
+            texture->SetMipsToSkip(QUALITY_LOW, 0);
+            texture->SetNumLevels(1);
+            texture->SetSize(allocator.GetWidth(), allocator.GetHeight(), Graphics::GetRGBAFormat());
+
+            sprite_ = new Sprite2D(context_);
+            sprite_->SetTexture(texture);
+
+            for (unsigned i = 0; i < spriteInfos.Size(); ++i)
+            {
+                SpriteInfo& info = spriteInfos[i];
+                Image* image = info.image_;
+
+                texture->SetData(0, info.x, info.y, image->GetWidth(), image->GetHeight(), image->GetData());
+
+                SharedPtr<Sprite2D> sprite(new Sprite2D(context_));
+                sprite->SetTexture(texture);
+                sprite->SetRectangle(IntRect(info.x, info.y, info.x + image->GetWidth(), info.y + image->GetHeight()));
+                sprite->SetHotSpot(Vector2(info.file_->pivotX_, info.file_->pivotY_));
+
+                int key = (info.file_->folder_->id_ << 16) + info.file_->id_;
+                spriterFileSprites_[key] = sprite;
+            }
+        }
+        else
+        {
+            SharedPtr<Texture2D> texture(new Texture2D(context_));        
+            texture->SetMipsToSkip(QUALITY_LOW, 0);
+            texture->SetNumLevels(1);
+
+            SpriteInfo& info = spriteInfos[0];        
+            texture->SetData(info.image_, true);
+
+            sprite_ = new Sprite2D(context_);
+            sprite_->SetTexture(texture);
+            sprite_->SetRectangle(IntRect(info.x, info.y, info.x + info.image_->GetWidth(), info.y + info.image_->GetHeight()));
+            sprite_->SetHotSpot(Vector2(info.file_->pivotX_, info.file_->pivotY_));
+
+            int key = (info.file_->folder_->id_ << 16) + info.file_->id_;
+            spriterFileSprites_[key] = sprite_;
+        }
     }
 
     return true;
@@ -456,6 +518,8 @@ void AnimationSet2D::Dispose()
         spriterData_ = 0;
     }
 
+    sprite_.Reset();
+    spriteSheet_.Reset();
     spriterFileSprites_.Clear();
 }
 

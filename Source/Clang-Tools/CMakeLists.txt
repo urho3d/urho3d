@@ -23,10 +23,11 @@
 # Set project name
 project (Urho3D-Clang-Tools)
 
-# Fastcomp/Clang libs and headers are assumed to be installed in system-wide location when not explicitily defined using env-var
-if (DEFINED ENV{FASTCOMP_CLANG_ROOT})
-    link_directories ($ENV{FASTCOMP_CLANG_ROOT}/lib)
-    include_directories ($ENV{FASTCOMP_CLANG_ROOT}/include)
+# LLVM/Clang is assumed to be installed in a system-wide location when not explicitily defined using env-var
+if (DEFINED ENV{LLVM_CLANG_ROOT})
+    link_directories ($ENV{LLVM_CLANG_ROOT}/lib)
+    include_directories ($ENV{LLVM_CLANG_ROOT}/include)
+    set (BINDIR $ENV{LLVM_CLANG_ROOT}/bin/)
 endif ()
 
 # No exception and no RTTI
@@ -39,14 +40,31 @@ endif ()
 # All tools must be natively built and output to bin/tool subdir to differentiate them from target platfrom binaries in the bin directory
 set_tool_output_directories ()
 
-add_subdirectory (Annotator)
-
-# Add a custom target to start the annotate task
+# Define source files for the tools
 get_target_property (SOURCES Urho3D SOURCES)
 string (REGEX REPLACE "[^;]+\\.h" "" SOURCES "${SOURCES}")   # Stringify to preserve the semicolons
 string (REGEX REPLACE "[^;]+generated[^;]+\\.cpp" "" SOURCES "${SOURCES}")
+file (GLOB API_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}/Source/Urho3D ${CMAKE_SOURCE_DIR}/Source/Urho3D/Script/*API.cpp)
+
+# Define common dependency libs
+set (LIBS clangTooling clangFrontend clangDriver clangParse clangSerialization clangSema clangEdit clangAnalysis clangLex clangAST clangBasic
+        LLVMBitReader LLVMMC LLVMOption LLVMMCParser LLVMSupport)
+execute_process (COMMAND ${LLVM_CONFIG} --system-libs OUTPUT_VARIABLE LLVM_SYSLIBS OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+string (REGEX REPLACE " *-l" ";" LLVM_SYSLIBS "${LLVM_SYSLIBS}")   # Stringify against empty output variable
+list (APPEND LIBS ${LLVM_SYSLIBS})
+
+# List of tools
+add_subdirectory (ScriptBindingExtractor)
+add_subdirectory (Annotator)
+
+# List of targets
+add_custom_target (ast      # Possible options are: dump|list|print; example usage: opt=dump make ast
+    COMMAND ${BINDIR}clang-check -p ${CMAKE_BINARY_DIR} -ast-$$opt ${API_SOURCES}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
+    COMMENT "Executing clang-check on AngelScript API bindings source files")
 add_custom_target (annotate
-    COMMAND ${CMAKE_BINARY_DIR}/bin/tool/Annotator -ast-dump -ast-dump-filter=Urho3D::Audio -p ${CMAKE_BINARY_DIR} Audio/Audio.cpp   # just dump Audio.cpp for now -- ${SOURCES}
-    DEPENDS Annotator
+    COMMAND ${CMAKE_BINARY_DIR}/bin/tool/ScriptBindingExtractor -p ${CMAKE_BINARY_DIR} ${API_SOURCES} >${CMAKE_BINARY_DIR}/bindings.json
+    COMMAND ${CMAKE_BINARY_DIR}/bin/tool/Annotator -p ${CMAKE_BINARY_DIR} -b ${CMAKE_BINARY_DIR}/bindings.json ${SOURCES}
+    DEPENDS ScriptBindingExtractor Annotator
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
     COMMENT "Annotating Urho3D library source files")

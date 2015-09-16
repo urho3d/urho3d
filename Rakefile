@@ -194,12 +194,6 @@ task :android do
   android_test_run parameter, intent, package, success_indicator, payload or abort "Failed to test run #{package}/#{intent}, make sure the APK has been installed"
 end
 
-# Usage: NOT intended to be used manually
-desc 'Build and run the annotate migration tool'
-task :annotate do
-  system 'rake cmake URHO3D_CLANG_TOOLS=1 URHO3D_LUA=1 URHO3D_DATABASE_SQLITE=1 && rake make annotate' or abort 'Failed to annotate'
-end
-
 # Usage: NOT intended to be used manually (if you insist then try: rake ci)
 desc 'Configure, build, and test Urho3D project'
 task :ci do

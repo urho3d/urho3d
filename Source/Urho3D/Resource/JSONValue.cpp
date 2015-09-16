@@ -364,10 +364,10 @@ void JSONValue::SetVariant(const Variant& variant, Context* context)
     (*this)["value"].SetVariantValue(variant, context);
 }
 
-void JSONValue::GetVariant(Variant& variant) const
+Variant JSONValue::GetVariant() const
 {
     VariantType type = Variant::GetTypeFromName((*this)["type"].GetString());
-    (*this)["value"].GetVariantValue(variant, type);    
+    return (*this)["value"].GetVariantValue(type);    
 }
 
 void JSONValue::SetVariantValue(const Variant& variant, Context* context)
@@ -453,45 +453,38 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
     }
 }
 
-void JSONValue::GetVariantValue(Variant& variant, VariantType type) const
+Variant JSONValue::GetVariantValue(VariantType type) const
 {
+    Variant variant;
     switch (type)
     {
     case VAR_BOOL:
         variant = GetBool();
-        return;
+        break;
 
     case VAR_INT:
         variant = GetInt();
-        return;
+        break;
 
     case VAR_FLOAT:
         variant = GetFloat();
-        return;
+        break;
 
     case VAR_DOUBLE:
         variant = GetDouble();
-        return;
+        break;
 
     case VAR_STRING:
         variant = GetString();
-        return;
+        break;
 
     case VAR_VARIANTVECTOR:
-        {
-            VariantVector vector;
-            GetVariantVector(vector);
-            variant = vector;
-        }
-        return;
+        variant = GetVariantVector();
+        break;
 
     case VAR_VARIANTMAP:
-        {
-            VariantMap map;
-            GetVariantMap(map);
-            variant = map;
-        }
-        return;
+        variant = GetVariantMap();
+        break;
 
     case VAR_RESOURCEREF:
         {
@@ -504,7 +497,7 @@ void JSONValue::GetVariantValue(Variant& variant, VariantType type) const
             }
             variant = ref;
         }
-        return;
+        break;
 
     case VAR_RESOURCEREFLIST:
         {
@@ -519,7 +512,7 @@ void JSONValue::GetVariantValue(Variant& variant, VariantType type) const
             }
             variant = refList;
         }
-        return;
+        break;
 
     case VAR_STRINGVECTOR:
         {
@@ -528,12 +521,13 @@ void JSONValue::GetVariantValue(Variant& variant, VariantType type) const
                 vector.Push((*this)[i].GetString());
             variant = vector;
         }
-        return;
+        break;
 
     default:
         variant.FromString(type, GetString());
-        return;
     }
+
+    return variant;
 }
 
 void JSONValue::SetVariantMap(const VariantMap& variantMap, Context* context)
@@ -543,21 +537,23 @@ void JSONValue::SetVariantMap(const VariantMap& variantMap, Context* context)
         (*this)[i->first_.ToString()].SetVariant(i->second_);
 }
 
-void JSONValue::GetVariantMap(VariantMap& variantMap) const
+VariantMap JSONValue::GetVariantMap() const
 {
+    VariantMap variantMap;
     if (!IsObject())
     {
         LOGERROR("JSONValue is not a object");
-        return;
+        return variantMap;
     }
 
     for (ConstJSONObjectIterator i = Begin(); i != End(); ++i)
     {
         StringHash key(ToUInt(i->first_));
-        Variant variant;
-        i->second_.GetVariant(variant);
+        Variant variant = i->second_.GetVariant();
         variantMap[key] = variant;
     }
+
+    return variantMap;
 }
 
 void JSONValue::SetVariantVector(const VariantVector& variantVector, Context* context)
@@ -567,20 +563,22 @@ void JSONValue::SetVariantVector(const VariantVector& variantVector, Context* co
         (*this)[i].SetVariant(variantVector[i]);
 }
 
-void JSONValue::GetVariantVector(VariantVector& variantVector) const
+VariantVector JSONValue::GetVariantVector() const
 {
+    VariantVector variantVector;
     if (!IsArray())
     {
         LOGERROR("JSONValue is not a array");
-        return;
+        return variantVector;
     }
 
     for (unsigned i = 0; i < Size(); ++i)
     {
-        Variant variant;
-        (*this)[i].GetVariant(variant);
+        Variant variant = (*this)[i].GetVariant();
         variantVector.Push(variant);
     }
+
+    return variantVector;
 }
 
 }
