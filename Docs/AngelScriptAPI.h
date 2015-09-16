@@ -3700,10 +3700,13 @@ class DebugRenderer
 {
 // Methods:
 void AddBoundingBox(const BoundingBox&, const Color&, bool = true);
+void AddCircle(const Vector3&, const Vector3&, float, const Color&, int = 64, bool = true);
+void AddCross(const Vector3&, float, const Color&, bool = true);
 void AddFrustum(const Frustum&, const Color&, bool = true);
 void AddLine(const Vector3&, const Vector3&, const Color&, bool = true);
 void AddNode(Node, float = 1.0, bool = true);
 void AddPolyhedron(const Polyhedron&, const Color&, bool = true);
+void AddQuad(const Vector3&, float, float, const Color&, bool = true);
 void AddSkeleton(Skeleton, const Color&, bool = true);
 void AddSphere(const Sphere&, const Color&, bool = true);
 void AddTriangle(const Vector3&, const Vector3&, const Vector3&, const Color&, bool = true);
