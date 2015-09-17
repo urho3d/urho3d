@@ -20,11 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include <clang/Driver/Options.h>
+#include <clang/ASTMatchers/ASTMatchFinder.h>
 #include <clang/Tooling/CommonOptionsParser.h>
-#include <clang/Tooling/Tooling.h>
+#include <clang/Tooling/Refactoring.h>
 
 using namespace clang;
+using namespace clang::ast_matchers;
 using namespace clang::driver;
 using namespace clang::tooling;
 using namespace llvm;
@@ -39,25 +40,52 @@ static cl::extrahelp MoreHelp(
     "\tNote, that path/in/subtree and current directory should follow the\n"
     "\trules described above.\n"
     "\n"
+    "Most probably you want to invoke 'annotate' built-in target instead of invoking this tool\n"
+    "directly. The 'annotate' target invokes this tool in a right context prepared by build system.\n"
+    "\n"
 );
 
 static cl::OptionCategory AnnotatorCategory("Annotator options");
-static std::unique_ptr<opt::OptTable> Options(createDriverOptTable());
-static cl::opt<std::string> BindingsFile
-    ("b", cl::desc("Bindings file in JSON format (output of ScriptBindingExtractor tool)"), cl::cat(AnnotatorCategory));
 
-class AnnotateFrontendAction : public ASTFrontendAction
+class BindingCallback : public MatchFinder::MatchCallback
 {
-protected:
-    virtual std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance& CI, StringRef InFile)
+public :
+    virtual void run(const MatchFinder::MatchResult& result)
     {
-        return make_unique<ASTConsumer>();
+        ASTContext* context = result.Context;
+        const StringLiteral* stringLiteral = result.Nodes.getNodeAs<StringLiteral>("StringLiteral");
+        if (stringLiteral)
+            // TODO: Store the exposed class name in a global hashset
+            outs() << stringLiteral->getString() << "\n";
+    }
+
+    virtual void onStartOfTranslationUnit()
+    {
+        outs() << '.';
     }
 };
 
 int main(int argc, const char** argv)
 {
     CommonOptionsParser OptionsParser(argc, argv, AnnotatorCategory);
-    ClangTool Tool(OptionsParser.getCompilations(), OptionsParser.getSourcePathList());
-    return Tool.run(newFrontendActionFactory<AnnotateFrontendAction>().get());
+    ClangTool bindingExtractor(OptionsParser.getCompilations(), OptionsParser.getSourcePathList());
+    RefactoringTool annotator(OptionsParser.getCompilations(), OptionsParser.getSourcePathList());
+    BindingCallback bindingCallback;
+    MatchFinder bindingFinder;
+    bindingFinder.addMatcher(
+        memberCallExpr(
+            callee(
+                methodDecl(hasName("RegisterObjectType"))),
+            hasArgument(0, stringLiteral().bind("StringLiteral"))), &bindingCallback);
+    bindingFinder.addMatcher(
+        callExpr(
+            hasDeclaration(
+                functionDecl(hasParameter(1, hasName("className")))),
+            hasArgument(1, stringLiteral().bind("StringLiteral"))), &bindingCallback);
+    MatchFinder annotateFinder;
+    return (outs() << "Extracting", true) &&
+           bindingExtractor.run(newFrontendActionFactory(&bindingFinder).get()) == EXIT_SUCCESS &&
+           (outs() << "\nAnnotating", true) &&
+           annotator.runAndSave(newFrontendActionFactory(&annotateFinder).get()) == EXIT_SUCCESS &&
+           (outs() << "\n", true) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

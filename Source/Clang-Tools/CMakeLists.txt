@@ -44,27 +44,32 @@ set_tool_output_directories ()
 get_target_property (SOURCES Urho3D SOURCES)
 string (REGEX REPLACE "[^;]+\\.h" "" SOURCES "${SOURCES}")   # Stringify to preserve the semicolons
 string (REGEX REPLACE "[^;]+generated[^;]+\\.cpp" "" SOURCES "${SOURCES}")
-file (GLOB API_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}/Source/Urho3D ${CMAKE_SOURCE_DIR}/Source/Urho3D/Script/*API.cpp)
+file (GLOB BINDING_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}/Source/Urho3D ${CMAKE_SOURCE_DIR}/Source/Urho3D/Script/*API.cpp)
 
 # Define common dependency libs
-set (LIBS clangTooling clangFrontend clangDriver clangParse clangSerialization clangSema clangEdit clangAnalysis clangLex clangAST clangBasic
-        LLVMBitReader LLVMMC LLVMOption LLVMMCParser LLVMSupport)
+set (LIBS clangTooling clangFrontend clangDriver clangParse clangSerialization clangSema clangEdit clangAnalysis clangToolingCore
+        clangRewrite clangLex clangASTMatchers clangAST clangBasic
+        LLVMBitReader LLVMMC LLVMMCParser LLVMOption LLVMSupport)
 execute_process (COMMAND ${LLVM_CONFIG} --system-libs OUTPUT_VARIABLE LLVM_SYSLIBS OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 string (REGEX REPLACE " *-l" ";" LLVM_SYSLIBS "${LLVM_SYSLIBS}")   # Stringify against empty output variable
 list (APPEND LIBS ${LLVM_SYSLIBS})
 
 # List of tools
-add_subdirectory (ScriptBindingExtractor)
 add_subdirectory (Annotator)
 
 # List of targets
-add_custom_target (ast      # Possible options are: dump|list|print; example usage: opt=dump make ast
-    COMMAND ${BINDIR}clang-check -p ${CMAKE_BINARY_DIR} -ast-$$opt ${API_SOURCES}
+add_custom_target (ast
+    COMMAND ${CMAKE_COMMAND} -E echo "Usage: option=-help make ast"
+    COMMAND ${BINDIR}clang-check -p ${CMAKE_BINARY_DIR} $$option ${SOURCES}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
-    COMMENT "Executing clang-check on AngelScript API bindings source files")
+    COMMENT "Executing clang-check on Urho3D library source files")
+add_custom_target (binding-ast
+    COMMAND ${CMAKE_COMMAND} -E echo "Usage: option=-help make binding-ast"
+    COMMAND ${BINDIR}clang-check -p ${CMAKE_BINARY_DIR} $$option ${BINDING_SOURCES}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
+    COMMENT "Executing clang-check on (existing) AngelScript API bindings source files")
 add_custom_target (annotate
-    COMMAND ${CMAKE_BINARY_DIR}/bin/tool/ScriptBindingExtractor -p ${CMAKE_BINARY_DIR} ${API_SOURCES} >${CMAKE_BINARY_DIR}/bindings.json
-    COMMAND ${CMAKE_BINARY_DIR}/bin/tool/Annotator -p ${CMAKE_BINARY_DIR} -b ${CMAKE_BINARY_DIR}/bindings.json ${SOURCES}
-    DEPENDS ScriptBindingExtractor Annotator
+    COMMAND ${CMAKE_BINARY_DIR}/bin/tool/Annotator -p ${CMAKE_BINARY_DIR} ${SOURCES}
+    DEPENDS Annotator
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
     COMMENT "Annotating Urho3D library source files")
