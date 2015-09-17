@@ -33,9 +33,9 @@
 namespace Urho3D
 {
 
-IndexBuffer::IndexBuffer(Context* context) :
+IndexBuffer::IndexBuffer(Context* context, bool forceHeadless) :
     Object(context),
-    GPUObject(GetSubsystem<Graphics>()),
+    GPUObject(forceHeadless ? (Graphics*)0 : GetSubsystem<Graphics>()),
     indexCount_(0),
     indexSize_(0),
     pool_(D3DPOOL_MANAGED),

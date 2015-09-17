@@ -251,7 +251,7 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
         unsigned elementMask;
 
         geom->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-        if (!vertexData || !indexData)
+        if (!vertexData)
         {
             LOGWARNING("Skipping geometry with no CPU-side geometry data for convex hull collision");
             continue;
@@ -444,7 +444,7 @@ void CollisionShape::RegisterObject(Context* context)
     MIXED_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE("LOD Level", int, lodLevel_, 0, AM_DEFAULT);
     ATTRIBUTE("Collision Margin", float, margin_, DEFAULT_COLLISION_MARGIN, AM_DEFAULT);
-    ATTRIBUTE("CustomGeometry NodeID", unsigned, customGeometryID_, 0, AM_DEFAULT | AM_NODEID);
+    ATTRIBUTE("CustomGeometry ComponentID", unsigned, customGeometryID_, 0, AM_DEFAULT | AM_COMPONENTID);
 }
 
 void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -642,9 +642,9 @@ void CollisionShape::SetCustomTriangleMesh(CustomGeometry* custom, const Vector3
         LOGERROR("Null custom geometry, can not set triangle mesh");
         return;
     }
-    if (!custom->GetNode())
+    if (custom->GetScene() != GetScene())
     {
-        LOGERROR("Custom geometry has null scene node, can not set triangle mesh");
+        LOGERROR("Custom geometry is not in the same scene as the collision shape, can not set triangle mesh");
         return;
     }
 
@@ -657,7 +657,7 @@ void CollisionShape::SetCustomTriangleMesh(CustomGeometry* custom, const Vector3
     size_ = scale;
     position_ = position;
     rotation_ = rotation;
-    customGeometryID_ = custom->GetNode()->GetID();
+    customGeometryID_ = custom->GetID();
 
     UpdateShape();
     NotifyRigidBody();
@@ -697,9 +697,9 @@ void CollisionShape::SetCustomConvexHull(CustomGeometry* custom, const Vector3& 
         LOGERROR("Null custom geometry, can not set convex hull");
         return;
     }
-    if (!custom->GetNode())
+    if (custom->GetScene() != GetScene())
     {
-        LOGERROR("Custom geometry has null scene node, can not set convex hull");
+        LOGERROR("Custom geometry is not in the same scene as the collision shape, can not set convex hull");
         return;
     }
 
@@ -712,7 +712,7 @@ void CollisionShape::SetCustomConvexHull(CustomGeometry* custom, const Vector3& 
     size_ = scale;
     position_ = position;
     rotation_ = rotation;
-    customGeometryID_ = custom->GetNode()->GetID();
+    customGeometryID_ = custom->GetID();
 
     UpdateShape();
     NotifyRigidBody();
@@ -1029,6 +1029,7 @@ void CollisionShape::UpdateShape()
 
     if (node_)
     {
+        Scene* scene = GetScene();
         Vector3 newWorldScale = node_->GetWorldScale();
 
         switch (shapeType_)
@@ -1064,10 +1065,9 @@ void CollisionShape::UpdateShape()
 
         case SHAPE_TRIANGLEMESH:
             size_ = size_.Abs();
-            if (customGeometryID_ && GetScene())
+            if (customGeometryID_ && scene)
             {
-                Node* node = GetScene()->GetNode(customGeometryID_);
-                CustomGeometry* custom = node ? node->GetComponent<CustomGeometry>() : 0;
+                CustomGeometry* custom = dynamic_cast<CustomGeometry*>(scene->GetComponent(customGeometryID_));
                 if (custom)
                 {
                     geometry_ = new TriangleMeshData(custom);
@@ -1075,7 +1075,7 @@ void CollisionShape::UpdateShape()
                     shape_ = new btScaledBvhTriangleMeshShape(triMesh->shape_, ToBtVector3(newWorldScale * size_));
                 }
                 else
-                    LOGWARNING("Could not find custom geometry component from node ID " + String(customGeometryID_) +
+                    LOGWARNING("Could not find custom geometry component ID " + String(customGeometryID_) +
                                " for triangle mesh shape creation");
             }
             else if (model_ && model_->GetNumGeometries())
@@ -1103,10 +1103,9 @@ void CollisionShape::UpdateShape()
 
         case SHAPE_CONVEXHULL:
             size_ = size_.Abs();
-            if (customGeometryID_ && GetScene())
+            if (customGeometryID_ && scene)
             {
-                Node* node = GetScene()->GetNode(customGeometryID_);
-                CustomGeometry* custom = node ? node->GetComponent<CustomGeometry>() : 0;
+                CustomGeometry* custom = dynamic_cast<CustomGeometry*>(scene->GetComponent(customGeometryID_));
                 if (custom)
                 {
                     geometry_ = new ConvexData(custom);
@@ -1115,7 +1114,7 @@ void CollisionShape::UpdateShape()
                     shape_->setLocalScaling(ToBtVector3(newWorldScale * size_));
                 }
                 else
-                    LOGWARNING("Could not find custom geometry component from node ID " + String(customGeometryID_) +
+                    LOGWARNING("Could not find custom geometry component ID " + String(customGeometryID_) +
                                " for convex shape creation");
             }
             else if (model_ && model_->GetNumGeometries())

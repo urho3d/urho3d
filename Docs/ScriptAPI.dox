@@ -1030,7 +1030,7 @@ namespace Urho3D
 - %Model : ResourceRef
 - %LOD %Level : int
 - %Collision %Margin : float
-- %CustomGeometry %NodeID : int
+- %CustomGeometry %ComponentID : int
 
 ### Constraint
 - %Is %Enabled : bool
@@ -14520,6 +14520,7 @@ Properties:
 - uint VO_NONE
 - Color WHITE
 - Color YELLOW
+- VariantMap globalVars
 */
 
 }

@@ -36,7 +36,7 @@ class URHO3D_API VertexBuffer : public Object, public GPUObject
 
 public:
     /// Construct.
-    VertexBuffer(Context* context);
+    VertexBuffer(Context* context, bool forceHeadless = false);
     /// Destruct.
     virtual ~VertexBuffer();
 

@@ -277,7 +277,7 @@ private:
     Vector3 cachedWorldScale_;
     /// Model LOD level.
     unsigned lodLevel_;
-    /// CustomGeometry component ID for convex hull mode. 0 if not creating the convex hull from a CustomGeometry.
+    /// CustomGeometry component ID. 0 if not creating the convex hull / triangle mesh from a CustomGeometry.
     unsigned customGeometryID_;
     /// Collision margin.
     float margin_;

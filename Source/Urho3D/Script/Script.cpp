@@ -65,6 +65,8 @@ class ScriptResourceRouter : public ResourceRouter
     }
 };
 
+VariantMap Script::globalVars;
+
 Script::Script(Context* context) :
     Object(context),
     scriptEngine_(0),
