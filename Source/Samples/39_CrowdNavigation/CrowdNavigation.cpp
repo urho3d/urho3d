@@ -173,7 +173,7 @@ void CrowdNavigation::CreateScene()
     CreateMovingBarrels(navMesh);
 
     // Create Jack node as crowd agent
-    SpawnJack(Vector3(-5.0f, 0.0f, 20.0f), scene_->CreateChild("Jacks"));
+    mainJackNode_ = SpawnJack(Vector3(-5.0f, 0.0f, 20.0f), scene_->CreateChild("Jacks"));
 
     // Create the camera. Set far clip to match the fog. Note: now we actually create the camera node outside the scene, because
     // we want it to be unaffected by scene load / save
@@ -252,7 +252,7 @@ void CrowdNavigation::SubscribeToEvents()
     SubscribeToEvent(E_CROWD_AGENT_FORMATION, HANDLER(CrowdNavigation, HandleCrowdAgentFormation));
 }
 
-void CrowdNavigation::SpawnJack(const Vector3& pos, Node* jackGroup)
+Node* CrowdNavigation::SpawnJack(const Vector3& pos, Node* jackGroup)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SharedPtr<Node> jackNode(jackGroup->CreateChild("Jack"));
@@ -268,6 +268,7 @@ void CrowdNavigation::SpawnJack(const Vector3& pos, Node* jackGroup)
     agent->SetHeight(2.0f);
     agent->SetMaxSpeed(3.0f);
     agent->SetMaxAccel(3.0f);
+    return jackNode;
 }
 
 void CrowdNavigation::CreateMushroom(const Vector3& pos)
@@ -343,13 +344,23 @@ void CrowdNavigation::SetPathPoint(bool spawning)
     {
         DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
         Vector3 pathPos = navMesh->FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
-        Node* jackGroup = scene_->GetChild("Jacks");
-        if (spawning)
-            // Spawn a jack at the target position
-            SpawnJack(pathPos, jackGroup);
+
+        if (GetSubsystem<Input>()->GetQualifierDown(QUAL_CTRL))
+        {
+            // Teleport main agent
+            mainJackNode_->LookAt(Vector3(pathPos.x_, mainJackNode_->GetPosition().y_, pathPos.z_), Vector3::UP);
+            mainJackNode_->SetPosition(pathPos);
+        }
         else
-            // Set crowd agents target position
-            scene_->GetComponent<CrowdManager>()->SetCrowdTarget(pathPos, jackGroup);
+        {
+            Node* jackGroup = scene_->GetChild("Jacks");
+            if (spawning)
+                // Spawn a jack at the target position
+                SpawnJack(pathPos, jackGroup);
+            else
+                // Set crowd agents target position
+                scene_->GetComponent<CrowdManager>()->SetCrowdTarget(pathPos, jackGroup);
+        }
     }
 }
 
