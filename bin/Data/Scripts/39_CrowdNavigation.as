@@ -156,7 +156,6 @@ void CreateUI()
     instructionText.text =
         "Use WASD keys to move, RMB to rotate view\n"
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"
-        "CTRL+LMB to teleport main agent\n"
         "MMB to add obstacles or remove obstacles/agents\n"
         "F5 to save scene, F7 to load\n"
         "Space to toggle debug geometry\n"

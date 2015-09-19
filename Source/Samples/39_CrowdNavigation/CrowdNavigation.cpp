@@ -208,7 +208,6 @@ void CrowdNavigation::CreateUI()
     instructionText->SetText(
         "Use WASD keys to move, RMB to rotate view\n"
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"
-        "CTRL+LMB to teleport main agent\n"
         "MMB to add obstacles or remove obstacles/agents\n"
         "F5 to save scene, F7 to load\n"
         "Space to toggle debug geometry\n"
@@ -325,7 +324,7 @@ void CrowdNavigation::CreateMovingBarrels(DynamicNavigationMesh* navMesh)
         Node* clone = barrel->Clone();
         float size = 0.5f + Random(1.0f);
         clone->SetScale(Vector3(size / 1.5f, size * 2.0f, size / 1.5f));
-        clone->SetPosition(navMesh->FindNearestPoint(Vector3(Random(80.0f) - 40.0, size * 0.5 , Random(80.0f) - 40.0)));
+        clone->SetPosition(navMesh->FindNearestPoint(Vector3(Random(80.0f) - 40.0f, size * 0.5f, Random(80.0f) - 40.0f)));
         CrowdAgent* agent = clone->CreateComponent<CrowdAgent>();
         agent->SetRadius(clone->GetScale().x_ * 0.5f);
         agent->SetHeight(size);
