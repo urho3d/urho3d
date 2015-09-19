@@ -143,7 +143,7 @@ private:
     /// Add new obstacle or remove existing obstacle/agent.
     void AddOrRemoveObject();
     /// Create a "Jack" object at position.
-    void SpawnJack(const Vector3& pos, Node* jackGroup);
+    Node* SpawnJack(const Vector3& pos, Node* jackGroup);
     /// Create a mushroom object at position.
     void CreateMushroom(const Vector3& pos);
     /// Create an off-mesh connection for each box to make it climbable.
@@ -165,4 +165,6 @@ private:
 
     /// Flag for drawing debug geometry.
     bool drawDebug_;
+    /// Main Jack node.
+    SharedPtr<Node> mainJackNode_;
 };
