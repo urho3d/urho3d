@@ -58,6 +58,11 @@ list (APPEND LIBS ${LLVM_SYSLIBS})
 add_subdirectory (Annotator)
 
 # List of targets
+add_custom_target (ast-query
+    COMMAND ${CMAKE_COMMAND} -E echo "Building AST for query, please be patient..."
+    COMMAND ${BINDIR}clang-query -p ${CMAKE_BINARY_DIR} $$option ${SOURCES}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
+    COMMENT "Executing clang-query on Urho3D library source files")
 add_custom_target (ast
     COMMAND ${CMAKE_COMMAND} -E echo "Usage: option=-help make ast"
     COMMAND ${BINDIR}clang-check -p ${CMAKE_BINARY_DIR} $$option ${SOURCES}

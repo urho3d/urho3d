@@ -22,7 +22,9 @@
 
 #include <clang/ASTMatchers/ASTMatchFinder.h>
 #include <clang/Tooling/CommonOptionsParser.h>
-#include <clang/Tooling/Refactoring.h>
+#include <clang/Tooling/RefactoringCallbacks.h>
+
+#include <unordered_set>
 
 using namespace clang;
 using namespace clang::ast_matchers;
@@ -45,18 +47,59 @@ static cl::extrahelp MoreHelp(
     "\n"
 );
 
-static cl::OptionCategory AnnotatorCategory("Annotator options");
+static cl::OptionCategory annotatorCategory("Annotator options");
 
-class BindingCallback : public MatchFinder::MatchCallback
+// ClangTool only takes a reference to the array list without owning it, so we need to keep the filtered list ourselves
+class PathFilter
+{
+public:
+    template <typename Fn>
+    PathFilter(const std::vector<std::string> sourcePaths, Fn fn)
+    {
+        std::copy_if(sourcePaths.begin(), sourcePaths.end(), std::back_inserter(pathList_), fn);
+    }
+
+    std::vector<std::string> GetPathList() {
+        return pathList_;
+    }
+
+private:
+    std::vector<std::string> pathList_;
+};
+
+static std::unordered_set<std::string> classNames_;
+
+class ExtractCallback : public MatchFinder::MatchCallback
 {
 public :
     virtual void run(const MatchFinder::MatchResult& result)
     {
-        ASTContext* context = result.Context;
-        const StringLiteral* stringLiteral = result.Nodes.getNodeAs<StringLiteral>("StringLiteral");
-        if (stringLiteral)
-            // TODO: Store the exposed class name in a global hashset
-            outs() << stringLiteral->getString() << "\n";
+        auto className = result.Nodes.getNodeAs<StringLiteral>("className");
+        if (className)
+            classNames_.insert(className->getString());
+    }
+
+    virtual void onStartOfTranslationUnit()
+    {
+        outs() << '.';      // Sending a heart beat
+    }
+};
+
+static std::unordered_set<std::string> annotatedClassNames_;
+
+class AnnotateCallback : public RefactoringCallback
+{
+public :
+    virtual void run(const MatchFinder::MatchResult& result)
+    {
+        auto className = result.Nodes.getNodeAs<RecordDecl>("className");
+        if (className && annotatedClassNames_.find(className->getName()) == annotatedClassNames_.end() &&
+            classNames_.find(className->getName()) == classNames_.end())
+        {
+            Replacement replacement(*result.SourceManager, className->getLocStart(), 0, "!!!TODO: WIP");
+            getReplacements().insert(replacement);
+            annotatedClassNames_.insert(className->getName());
+        }
     }
 
     virtual void onStartOfTranslationUnit()
@@ -67,25 +110,52 @@ public :
 
 int main(int argc, const char** argv)
 {
-    CommonOptionsParser OptionsParser(argc, argv, AnnotatorCategory);
-    ClangTool bindingExtractor(OptionsParser.getCompilations(), OptionsParser.getSourcePathList());
-    RefactoringTool annotator(OptionsParser.getCompilations(), OptionsParser.getSourcePathList());
-    BindingCallback bindingCallback;
+    // Parse the arguments and pass them to the the internal sub-tools
+    CommonOptionsParser optionsParser(argc, argv, annotatorCategory);
+    PathFilter bindingPathFilter
+        (optionsParser.getSourcePathList(), [](const std::string& path) { return path.find("API.cpp") != std::string::npos; });
+    PathFilter nonBindingPathFilter
+        (optionsParser.getSourcePathList(), [](const std::string& path) { return path.find("API.cpp") == std::string::npos; });
+    ClangTool bindingExtractor(optionsParser.getCompilations(), bindingPathFilter.GetPathList());
+    RefactoringTool annotator(optionsParser.getCompilations(), nonBindingPathFilter.GetPathList());
+
+    // Setup finder to match against AST nodes from existing AngelScript binding source files
+    ExtractCallback extractCallback;
     MatchFinder bindingFinder;
+    // Find exposed class names (they are registered through RegisterObjectType(), RegisterRefCounted(), RegisterObject(), etc)
     bindingFinder.addMatcher(
         memberCallExpr(
             callee(
                 methodDecl(hasName("RegisterObjectType"))),
-            hasArgument(0, stringLiteral().bind("StringLiteral"))), &bindingCallback);
+            hasArgument(0, stringLiteral().bind("className"))), &extractCallback);
     bindingFinder.addMatcher(
         callExpr(
             hasDeclaration(
                 functionDecl(hasParameter(1, hasName("className")))),
-            hasArgument(1, stringLiteral().bind("StringLiteral"))), &bindingCallback);
+            hasArgument(1, stringLiteral().bind("className"))), &extractCallback);
+
+    // Setup finder to match against AST nodes for annotating Urho3D library source files
+    AnnotateCallback annotateCallback;
     MatchFinder annotateFinder;
+    // Find exported class declaration with Urho3D namespace
+    annotateFinder.addMatcher(
+        recordDecl(
+#ifndef _MSC_VER
+            hasAttr(attr::Visibility),
+#else
+            hasAttr(attr::DLLExport),
+#endif
+            matchesName("Urho3D::")).bind("className"), &annotateCallback);
+
+    // Unbuffered stdout stream to keep the Travis-CI's log flowing and thus prevent it from killing a potentially long running job
+    outs().SetUnbuffered();
+
+    // Success when both sub-tools are run successfully
     return (outs() << "Extracting", true) &&
            bindingExtractor.run(newFrontendActionFactory(&bindingFinder).get()) == EXIT_SUCCESS &&
-           (outs() << "\nAnnotating", true) &&
+           (outs() << "\nExtracted " << classNames_.size() << " bound class names\n"
+            << "Annotating", true) &&
            annotator.runAndSave(newFrontendActionFactory(&annotateFinder).get()) == EXIT_SUCCESS &&
-           (outs() << "\n", true) ? EXIT_SUCCESS : EXIT_FAILURE;
+           (outs() << "\nAnnotated " << annotatedClassNames_.size() << " exported class names as non-scriptable\n", true) ?
+        EXIT_SUCCESS : EXIT_FAILURE;
 }

@@ -260,6 +260,7 @@ if (URHO3D_CLANG_TOOLS)
     # Require C++11 standard and no precompiled-header
     set (URHO3D_C++11 1)
     set (URHO3D_PCH 0)
+    set (URHO3D_LIB_TYPE SHARED)
     # Set build options that would maximise the AST of Urho3D library
     foreach (OPT URHO3D_ANGELSCRIPT URHO3D_LUA URHO3D_FILEWATCHER URHO3D_PROFILING URHO3D_LOGGING URHO3D_NAVIGATION URHO3D_NETWORK URHO3D_PHYSICS URHO3D_URHO2D URHO3D_DATABASE_SQLITE)
         set (${OPT} 1)
