@@ -22,7 +22,7 @@
 
 #include <clang/ASTMatchers/ASTMatchFinder.h>
 #include <clang/Tooling/CommonOptionsParser.h>
-#include <clang/Tooling/RefactoringCallbacks.h>
+#include <clang/Tooling/Refactoring.h>
 
 #include <unordered_set>
 
@@ -87,25 +87,33 @@ public :
 
 static std::unordered_set<std::string> annotatedClassNames_;
 
-class AnnotateCallback : public RefactoringCallback
+class AnnotateCallback : public MatchFinder::MatchCallback
 {
 public :
+    AnnotateCallback(Replacements& replacements) :
+        replacements_(replacements)
+    {
+    }
+
     virtual void run(const MatchFinder::MatchResult& result)
     {
         auto className = result.Nodes.getNodeAs<RecordDecl>("className");
         if (className && annotatedClassNames_.find(className->getName()) == annotatedClassNames_.end() &&
             classNames_.find(className->getName()) == classNames_.end())
         {
-            Replacement replacement(*result.SourceManager, className->getLocStart(), 0, "!!!TODO: WIP");
-            getReplacements().insert(replacement);
+            replacements_.insert(Replacement(*result.SourceManager, className->getLocation(), 0, "NONSCRIPTABLE "));
             annotatedClassNames_.insert(className->getName());
         }
     }
 
     virtual void onStartOfTranslationUnit()
     {
-        outs() << '.';
+        static unsigned count = sizeof("Annotating") / sizeof(char) - 1;
+        outs() << '.' << (++count % 100 ? "" : "\n");
     }
+
+private:
+    Replacements& replacements_;
 };
 
 int main(int argc, const char** argv)
@@ -135,7 +143,7 @@ int main(int argc, const char** argv)
             hasArgument(1, stringLiteral().bind("className"))), &extractCallback);
 
     // Setup finder to match against AST nodes for annotating Urho3D library source files
-    AnnotateCallback annotateCallback;
+    AnnotateCallback annotateCallback(annotator.getReplacements());
     MatchFinder annotateFinder;
     // Find exported class declaration with Urho3D namespace
     annotateFinder.addMatcher(
@@ -145,7 +153,7 @@ int main(int argc, const char** argv)
 #else
             hasAttr(attr::DLLExport),
 #endif
-            matchesName("Urho3D::")).bind("className"), &annotateCallback);
+            matchesName("^::Urho3D::")).bind("className"), &annotateCallback);
 
     // Unbuffered stdout stream to keep the Travis-CI's log flowing and thus prevent it from killing a potentially long running job
     outs().SetUnbuffered();

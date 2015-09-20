@@ -27,8 +27,8 @@ project (Urho3D-Clang-Tools)
 if (DEFINED ENV{LLVM_CLANG_ROOT})
     link_directories ($ENV{LLVM_CLANG_ROOT}/lib)
     include_directories ($ENV{LLVM_CLANG_ROOT}/include)
-    set (BINDIR $ENV{LLVM_CLANG_ROOT}/bin/)
 endif ()
+execute_process (COMMAND ${LLVM_CONFIG} --bindir OUTPUT_VARIABLE LLVM_BINDIR OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 
 # No exception and no RTTI
 if (MSVC)
@@ -58,19 +58,21 @@ list (APPEND LIBS ${LLVM_SYSLIBS})
 add_subdirectory (Annotator)
 
 # List of targets
-add_custom_target (ast-query
-    COMMAND ${CMAKE_COMMAND} -E echo "Building AST for query, please be patient..."
-    COMMAND ${BINDIR}clang-query -p ${CMAKE_BINARY_DIR} $$option ${SOURCES}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
-    COMMENT "Executing clang-query on Urho3D library source files")
+if (EXISTS ${LLVM_BINDIR}/clang-query)  # This tool is from clang-tools-extra repository which user may have not installed
+    add_custom_target (ast-query
+        COMMAND ${CMAKE_COMMAND} -E echo "Building AST for query, please be patient..."
+        COMMAND ${LLVM_BINDIR}/clang-query -p ${CMAKE_BINARY_DIR} $$option ${SOURCES}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
+        COMMENT "Executing clang-query on Urho3D library source files")
+endif ()
 add_custom_target (ast
     COMMAND ${CMAKE_COMMAND} -E echo "Usage: option=-help make ast"
-    COMMAND ${BINDIR}clang-check -p ${CMAKE_BINARY_DIR} $$option ${SOURCES}
+    COMMAND ${LLVM_BINDIR}/clang-check -p ${CMAKE_BINARY_DIR} $$option ${SOURCES}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
     COMMENT "Executing clang-check on Urho3D library source files")
 add_custom_target (binding-ast
     COMMAND ${CMAKE_COMMAND} -E echo "Usage: option=-help make binding-ast"
-    COMMAND ${BINDIR}clang-check -p ${CMAKE_BINARY_DIR} $$option ${BINDING_SOURCES}
+    COMMAND ${LLVM_BINDIR}/clang-check -p ${CMAKE_BINARY_DIR} $$option ${BINDING_SOURCES}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
     COMMENT "Executing clang-check on (existing) AngelScript API bindings source files")
 add_custom_target (annotate

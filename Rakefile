@@ -194,6 +194,13 @@ task :android do
   android_test_run parameter, intent, package, success_indicator, payload or abort "Failed to test run #{package}/#{intent}, make sure the APK has been installed"
 end
 
+# Usage: NOT intended to be used manually
+desc 'Build and run the annotate migration tool'
+task :ci_annotate do
+  system 'rake cmake URHO3D_CLANG_TOOLS=1 && rake make annotate' or abort 'Failed to annotate'
+  system "git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && if git fetch origin annotated:annotated 2>/dev/null; then git push -qf origin --delete annotated; fi && git checkout -B annotated && git add -A . && git commit -qm 'Result of annotate rake task. [ci skip]' && git push -qf -u origin annotated >/dev/null 2>&1" or abort 'Failed to push annotated branch'
+end
+
 # Usage: NOT intended to be used manually (if you insist then try: rake ci)
 desc 'Configure, build, and test Urho3D project'
 task :ci do
