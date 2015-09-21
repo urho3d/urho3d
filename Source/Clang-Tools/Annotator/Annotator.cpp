@@ -148,6 +148,7 @@ int main(int argc, const char** argv)
     // Find exported class declaration with Urho3D namespace
     annotateFinder.addMatcher(
         recordDecl(
+            unless(hasAttr(attr::Annotate)),
 #ifndef _MSC_VER
             hasAttr(attr::Visibility),
 #else
