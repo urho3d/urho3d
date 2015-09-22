@@ -5,7 +5,8 @@ enum MouseMode
 {
     MM_ABSOLUTE = 0,
     MM_RELATIVE,
-    MM_WRAP
+    MM_WRAP,
+    MM_FREE
 };
 
 struct TouchState

@@ -37,7 +37,8 @@ enum MouseMode
 {
     MM_ABSOLUTE = 0,
     MM_RELATIVE,
-    MM_WRAP
+    MM_WRAP,
+    MM_FREE
 };
 
 class Deserializer;
@@ -169,6 +170,9 @@ public:
      *
      *  MM_WRAP grabs the mouse from the operating system and confines the operating system cursor to the window, wrapping the cursor when it is near the edges.
      *  SetMouseMode(MM_WRAP) will call SetMouseGrabbed(true).
+     *
+     *  MM_FREE does not grab/confine the mouse cursor even when it is hidden. This can be used for cases where the cursor should render using the operating system
+     *  outside the window, and perform custom rendering (with SetMouseVisible(false)) inside.
     */
     void SetMouseMode(MouseMode mode);
     /// Add screen joystick.

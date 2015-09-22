@@ -284,7 +284,7 @@ void Input::Update()
     {
 #ifdef REQUIRE_CLICK_TO_FOCUS
         // When using the "click to focus" mechanism, only focus automatically in fullscreen or non-hidden mouse mode
-        if (!inputFocus_ && (mouseVisible_ || graphics_->GetFullscreen() || screenModeChanged_) && (flags & SDL_WINDOW_INPUT_FOCUS))
+        if (!inputFocus_ && ((mouseVisible_ || mouseMode_ == MM_FREE) || graphics_->GetFullscreen() || screenModeChanged_) && (flags & SDL_WINDOW_INPUT_FOCUS))
 #else
         if (!inputFocus_ && (flags & SDL_WINDOW_INPUT_FOCUS))
 #endif
@@ -361,7 +361,7 @@ void Input::Update()
     // Check for relative mode mouse move
     // Note that Emscripten will use SDL mouse move events for relative mode instead
 #ifndef EMSCRIPTEN
-    if (!touchEmulation_ && (graphics_->GetExternalWindow() || (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))))
+    if (!touchEmulation_ && (graphics_->GetExternalWindow() || ((!mouseVisible_ && mouseMode_ != MM_FREE) && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))))
 #else
     if (!touchEmulation_ && mouseMode_ != MM_RELATIVE && (graphics_->GetExternalWindow() || (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))))
 #endif
@@ -444,11 +444,14 @@ void Input::SetMouseVisible(bool enable, bool suppressEvent)
             {
                 SDL_ShowCursor(SDL_FALSE);
 #ifndef EMSCRIPTEN
-                // Recenter the mouse cursor manually when hiding it to avoid erratic mouse move for one frame
-                lastVisibleMousePosition_ = GetMousePosition();
-                IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-                SetMousePosition(center);
-                lastMousePosition_ = center;
+                if (mouseMode_ != MM_FREE)
+                {
+                    // Recenter the mouse cursor manually when hiding it to avoid erratic mouse move for one frame
+                    lastVisibleMousePosition_ = GetMousePosition();
+                    IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+                    SetMousePosition(center);
+                    lastMousePosition_ = center;
+                }
 #else
                 lastVisibleMousePosition_ = GetMousePosition();
                 lastMousePosition_ = lastVisibleMousePosition_;
@@ -557,7 +560,7 @@ void Input::SetMouseMode(MouseMode mode)
 #endif
 
         // Handle changing to new mode
-        if (mode == MM_ABSOLUTE)
+        if (mode == MM_ABSOLUTE || mode == MM_FREE)
         {
 #ifndef EMSCRIPTEN
             SetMouseGrabbed(false);
@@ -1565,9 +1568,9 @@ void Input::HandleSDLEvent(void* sdlEvent)
         // Emscripten will use SDL mouse move events for relative mode, as repositioning the mouse and
         // measuring distance from window center is not supported
 #ifndef EMSCRIPTEN
-        if (mouseVisible_ && !touchEmulation_)
+        if ((mouseVisible_ || mouseMode_ == MM_FREE) && !touchEmulation_)
 #else
-        if ((mouseVisible_ || mouseMode_ == MM_RELATIVE) && !touchEmulation_)
+        if ((mouseVisible_ || mouseMode_ == MM_RELATIVE || mouseMode_ == MM_FREE) && !touchEmulation_)
 #endif
         {
             mouseMove_.x_ += evt.motion.xrel;
@@ -1997,7 +2000,7 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     windowID_ = SDL_GetWindowID(window);
 
     // If screen mode happens due to mouse drag resize, do not recenter the mouse as that would lead to erratic window sizes
-    if (!mouseVisible_ && !inResize_)
+    if (!mouseVisible_ && mouseMode_ != MM_FREE && !inResize_)
     {
         IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
         SetMousePosition(center);
