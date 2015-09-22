@@ -24,6 +24,7 @@
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Refactoring.h>
 
+#include <unordered_map>
 #include <unordered_set>
 
 using namespace clang;
@@ -53,8 +54,7 @@ static cl::OptionCategory annotatorCategory("Annotator options");
 class PathFilter
 {
 public:
-    template <typename Fn>
-    PathFilter(const std::vector<std::string> sourcePaths, Fn fn)
+    template <typename Fn> PathFilter(const std::vector<std::string> sourcePaths, Fn fn)
     {
         std::copy_if(sourcePaths.begin(), sourcePaths.end(), std::back_inserter(pathList_), fn);
     }
@@ -67,25 +67,34 @@ private:
     std::vector<std::string> pathList_;
 };
 
-static std::unordered_set<std::string> classNames_;
+struct Data
+{
+    std::unordered_set<std::string> exposedSymbols_;
+    std::unordered_set<std::string> annotatedSymbols_;
+};
+
+static std::vector<std::string> categories_ = {"class", "enum"};
+static std::unordered_map<std::string, Data> categoryData_;
 
 class ExtractCallback : public MatchFinder::MatchCallback
 {
 public :
     virtual void run(const MatchFinder::MatchResult& result)
     {
-        auto className = result.Nodes.getNodeAs<StringLiteral>("className");
-        if (className)
-            classNames_.insert(className->getString());
+        for (auto& i: categories_)
+        {
+            auto symbol = result.Nodes.getNodeAs<StringLiteral>(i);
+            if (symbol)
+                categoryData_[i].exposedSymbols_.insert(symbol->getString());
+        }
     }
 
     virtual void onStartOfTranslationUnit()
     {
-        outs() << '.';      // Sending a heart beat
+        static unsigned count = sizeof("Extracting") / sizeof(char) - 1;
+        outs() << '.' << (++count % 100 ? "" : "\n");   // Sending a heart beat
     }
 };
-
-static std::unordered_set<std::string> annotatedClassNames_;
 
 class AnnotateCallback : public MatchFinder::MatchCallback
 {
@@ -97,12 +106,19 @@ public :
 
     virtual void run(const MatchFinder::MatchResult& result)
     {
-        auto className = result.Nodes.getNodeAs<RecordDecl>("className");
-        if (className && annotatedClassNames_.find(className->getName()) == annotatedClassNames_.end() &&
-            classNames_.find(className->getName()) == classNames_.end())
+        for (auto& i: categories_)
         {
-            replacements_.insert(Replacement(*result.SourceManager, className->getLocation(), 0, "NONSCRIPTABLE "));
-            annotatedClassNames_.insert(className->getName());
+            auto symbol = result.Nodes.getNodeAs<NamedDecl>(i);
+            if (symbol)
+            {
+                auto& data = categoryData_[i];
+                if (data.annotatedSymbols_.find(symbol->getName()) == data.annotatedSymbols_.end() &&
+                    data.exposedSymbols_.find(symbol->getName()) == data.exposedSymbols_.end())
+                {
+                    replacements_.insert(Replacement(*result.SourceManager, symbol->getLocation(), 0, "NONSCRIPTABLE "));
+                    data.annotatedSymbols_.insert(symbol->getName());
+                }
+            }
         }
     }
 
@@ -130,22 +146,28 @@ int main(int argc, const char** argv)
     // Setup finder to match against AST nodes from existing AngelScript binding source files
     ExtractCallback extractCallback;
     MatchFinder bindingFinder;
-    // Find exposed class names (they are registered through RegisterObjectType(), RegisterRefCounted(), RegisterObject(), etc)
+    // Find exposed classes (they are registered through RegisterObjectType(), RegisterRefCounted(), RegisterObject(), etc)
     bindingFinder.addMatcher(
         memberCallExpr(
             callee(
                 methodDecl(hasName("RegisterObjectType"))),
-            hasArgument(0, stringLiteral().bind("className"))), &extractCallback);
+            hasArgument(0, stringLiteral().bind("class"))), &extractCallback);
     bindingFinder.addMatcher(
         callExpr(
             hasDeclaration(
                 functionDecl(hasParameter(1, hasName("className")))),
-            hasArgument(1, stringLiteral().bind("className"))), &extractCallback);
+            hasArgument(1, stringLiteral().bind("class"))), &extractCallback);
+    // Find exposed enums
+    bindingFinder.addMatcher(
+        memberCallExpr(
+            callee(
+                methodDecl(hasName("RegisterEnum"))),
+            hasArgument(0, stringLiteral().bind("enum"))), &extractCallback);
 
     // Setup finder to match against AST nodes for annotating Urho3D library source files
     AnnotateCallback annotateCallback(annotator.getReplacements());
     MatchFinder annotateFinder;
-    // Find exported class declaration with Urho3D namespace
+    // Find exported class declarations with Urho3D namespace
     annotateFinder.addMatcher(
         recordDecl(
             unless(hasAttr(attr::Annotate)),
@@ -154,7 +176,12 @@ int main(int argc, const char** argv)
 #else
             hasAttr(attr::DLLExport),
 #endif
-            matchesName("^::Urho3D::")).bind("className"), &annotateCallback);
+            matchesName("^::Urho3D::")).bind("class"), &annotateCallback);
+    // Find enum declarations with Urho3D namespace
+    annotateFinder.addMatcher(
+        enumDecl(
+            unless(hasAttr(attr::Annotate)),
+            matchesName("^::Urho3D::")).bind("enum"), &annotateCallback);
 
     // Unbuffered stdout stream to keep the Travis-CI's log flowing and thus prevent it from killing a potentially long running job
     outs().SetUnbuffered();
@@ -162,9 +189,8 @@ int main(int argc, const char** argv)
     // Success when both sub-tools are run successfully
     return (outs() << "Extracting", true) &&
            bindingExtractor.run(newFrontendActionFactory(&bindingFinder).get()) == EXIT_SUCCESS &&
-           (outs() << "\nExtracted " << classNames_.size() << " bound class names\n"
-            << "Annotating", true) &&
+           (outs() << "\nAnnotating", true) &&
            annotator.runAndSave(newFrontendActionFactory(&annotateFinder).get()) == EXIT_SUCCESS &&
-           (outs() << "\nAnnotated " << annotatedClassNames_.size() << " exported class names as non-scriptable\n", true) ?
+           (outs() << "\n", true) ?
         EXIT_SUCCESS : EXIT_FAILURE;
 }
