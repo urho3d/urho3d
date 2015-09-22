@@ -7382,6 +7382,7 @@ Properties:
 - int MM_ABSOLUTE
 - int MM_RELATIVE
 - int MM_WRAP
+- int MM_FREE
 
 ### NavigationPushiness
 
