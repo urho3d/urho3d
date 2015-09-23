@@ -198,7 +198,7 @@ end
 desc 'Build and run the annotate migration tool'
 task :ci_annotate do
   system 'rake cmake URHO3D_CLANG_TOOLS=1 && rake make annotate' or abort 'Failed to annotate'
-  system "git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && if git fetch origin annotated:annotated 2>/dev/null; then git push -qf origin --delete annotated; fi && git checkout -B annotated && git stash -q && git reset --hard HEAD~ && git stash pop -q && git add -A Source/Urho3D && git commit -qm 'Result of annotate rake task. [ci skip]' && git push -qf -u origin annotated >/dev/null 2>&1" or abort 'Failed to push annotated branch'
+  system "git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && if git fetch origin annotated:annotated 2>/dev/null; then git push -qf origin --delete annotated; fi && git checkout -B annotated && git stash -q && git reset --hard HEAD~ && git stash pop -q && sed -i \"s/- USE_CCACHE/- URHO3D_BINDINGS=1\\n    - USE_CCACHE/g\" .travis.yml && git add -A .travis.yml Source/Urho3D && git commit -qm 'Result of annotate rake task. [ci only: annotated]' && git push -qf -u origin annotated >/dev/null 2>&1" or abort 'Failed to push annotated branch'
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake ci)
@@ -233,7 +233,7 @@ task :ci do
   $build_options = "-DEMSCRIPTEN=#{ENV['HTML5']}" if ENV['HTML5']
   $build_options = "#{$build_options} -DANDROID_ABI=#{ENV['ABI']}" if ENV['ABI']
   $build_options = "#{$build_options} -DANDROID_NATIVE_API_LEVEL=#{ENV['API']}" if ENV['API']
-  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TEST_TIMEOUT', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var| $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var] }
+  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TEST_TIMEOUT', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var| $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var] }
   if ENV['XCODE']
     # xcodebuild
     xcode_ci
@@ -352,7 +352,7 @@ task :ci_create_mirrors do
   stream = YAML::load_stream(File.open('.travis.yml'))
   notifications = stream[0]['notifications']
   notifications['email']['recipients'] = get_root_commit_and_recipients().last unless notifications['email']['recipients']
-  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; ci_branch = ENV['RELEASE_TAG'] || (ENV['TRAVIS_BRANCH'] == 'master' && ENV['TRAVIS_PULL_REQUEST'] == 'false') ? ci : (ENV['TRAVIS_PULL_REQUEST'] == 'false' ? "#{ENV['TRAVIS_BRANCH']}-#{ci}" : "PR ##{ENV['TRAVIS_PULL_REQUEST']}-#{ci}"); unless (ci_only && ci_only.map { |i| /#{i}/ =~ ci }.any?) || (!ci_only && (branch['active'] || (scan && /Scan/ =~ ci) || (annotate && /Annotate/ =~ ci))); system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch}; fi"; next; end; lastjob = doc['matrix'] && doc['matrix']['include'] ? doc['matrix']['include'].length : (doc['env']['matrix'] ? doc['env']['matrix'].length : 1); doc['after_script'] = [*doc['after_script']] << (lastjob == 1 ? '%s' : "if [ ${TRAVIS_JOB_NUMBER##*.} == #{lastjob} ]; then %s; fi") % 'rake ci_delete_mirror'; doc['notifications'] = notifications unless doc['notifications']; File.open('.travis.yml.doc', 'w') { |file| file.write doc.to_yaml }; system "git checkout -B #{ci_branch} && rm .travis.yml && mv .travis.yml.doc .travis.yml && git add -A . && git commit -qm '#{branch['description']}' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1 && git checkout -q -" or abort "Failed to create #{ci_branch} mirror branch" }
+  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; ci_branch = ENV['RELEASE_TAG'] || (ENV['TRAVIS_BRANCH'] == 'master' && ENV['TRAVIS_PULL_REQUEST'] == 'false') ? ci : (ENV['TRAVIS_PULL_REQUEST'] == 'false' ? "#{ENV['TRAVIS_BRANCH']}-#{ci}" : "PR ##{ENV['TRAVIS_PULL_REQUEST']}-#{ci}"); unless (ci_only && ci_only.map { |i| /#{i}/ =~ ci }.any?) || (!ci_only && (branch['active'] || (scan && /Scan/ =~ ci) || (annotate && /Annotate/ =~ ci))); system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch}; fi"; next; end; lastjob = doc['matrix'] && doc['matrix']['include'] ? doc['matrix']['include'].length : (doc['env']['matrix'] ? doc['env']['matrix'].length : 1); doc['after_script'] = [*doc['after_script']] << (lastjob == 1 ? '%s' : "if [ ${TRAVIS_JOB_NUMBER##*.} == #{lastjob} ]; then %s; fi") % 'rake ci_delete_mirror'; doc['notifications'] = notifications unless doc['notifications']; File.open('.travis.yml.doc', 'w') { |file| file.write doc.to_yaml }; system "git checkout -B #{ci_branch} && rm .travis.yml && mv .travis.yml.doc .travis.yml && git add -A . && git commit -qm '#{ENV['COMMIT_MESSAGE']}' && git push -qf -u origin #{ci_branch} >/dev/null 2>&1 && git checkout -q -" or abort "Failed to create #{ci_branch} mirror branch" }
 end
 
 # Usage: NOT intended to be used manually
