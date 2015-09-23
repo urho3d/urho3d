@@ -1566,6 +1566,11 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     }
     if (material->Get(AI_MATKEY_OPACITY, floatVal) == AI_SUCCESS)
     {
+        /// \hack New Assimp behavior - some materials may return 0 opacity, which is invisible.
+        /// Revert to full opacity in that case
+        if (floatVal < M_EPSILON)
+            floatVal = 1.0f;
+
         if (floatVal < 1.0f)
             hasAlpha = true;
         diffuseColor.a_ = floatVal;

@@ -1658,7 +1658,7 @@ In AngelScript, the polling API is accessed via properties: input.keyDown[], inp
 
 \section InputMouseModes Mouse modes
 
-The operating system mouse cursor can be used in three modes which can be switched with \ref Input::SetMouseMode() "SetMouseMode()".
+The operating system mouse cursor can be used in four modes which can be switched with \ref Input::SetMouseMode() "SetMouseMode()".
 
 - MM_ABSOLUTE is the default behaviour, allowing the toggling of operating system cursor visibility and allowing the cursor to escape the window when visible.
   When the operating system cursor is invisible in absolute mouse mode, the mouse is confined to the window.
@@ -1672,6 +1672,9 @@ The operating system mouse cursor can be used in three modes which can be switch
 
 - MM_WRAP grabs the mouse from the operating system and confines the operating system cursor to the window, wrapping the cursor when it is near the edges.
   SetMouseMode(MM_WRAP) will call SetMouseGrabbed(true).
+  
+- MM_FREE does not grab/confine the mouse cursor even when it is hidden. This can be used for cases where the cursor should render using the operating system
+  outside the window, and perform custom rendering (with SetMouseVisible(false)) inside.
 
 \section InputJoystick Joystick input
 

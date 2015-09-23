@@ -503,6 +503,7 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterEnumValue("MouseMode", "MM_ABSOLUTE", MM_ABSOLUTE);
     engine->RegisterEnumValue("MouseMode", "MM_RELATIVE", MM_RELATIVE);
     engine->RegisterEnumValue("MouseMode", "MM_WRAP", MM_WRAP);
+    engine->RegisterEnumValue("MouseMode", "MM_FREE", MM_FREE);
 
     engine->RegisterObjectType("TouchState", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("TouchState", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);

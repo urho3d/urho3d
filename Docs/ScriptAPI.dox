@@ -13661,6 +13661,7 @@ Properties:
 - MM_ABSOLUTE
 - MM_RELATIVE
 - MM_WRAP
+- MM_FREE
 
 
 ### NavigationPushiness

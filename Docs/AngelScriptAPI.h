@@ -12997,6 +12997,7 @@ enum MouseMode
 MM_ABSOLUTE,
 MM_RELATIVE,
 MM_WRAP,
+MM_FREE,
 };
 
 enum NavigationPushiness
