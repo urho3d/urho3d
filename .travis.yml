@@ -125,7 +125,7 @@ notifications: {email: {on_success: never, on_failure: change}}
 
 ---
 
-branch: {name: Coverity-Scan, active: no, description: For Travis CI - switch CI build to enable Coverity Scan addon.}
+branch: {name: Coverity-Scan, active: no}
 language: cpp
 compiler: gcc
 cache: ccache
@@ -160,7 +160,7 @@ after_script: rake ci_teardown_cache
 
 ---
 
-branch: {name: Annotate, active: no, description: For Travis CI - switch CI build to use Clang tools for annotation.}
+branch: {name: Annotate, active: no}
 language: cpp
 compiler: gcc
 cache: ccache
@@ -187,7 +187,7 @@ after_script: rake ci_teardown_cache
 
 ---
 
-branch: {name: Android-CI, active: yes, description: For Travis CI - switch CI build to use Android build environment.}
+branch: {name: Android-CI, active: yes}
 language: android
 android: {components: [build-tools-22.0.1]}
 cache: {directories: $HOME/.ccache}
@@ -259,7 +259,7 @@ after_script: rake ci_teardown_cache
 
 ---
 
-branch: {name: RPI-CI, active: yes, description: For Travis CI - switch CI build to use Raspberry-Pi build environment.}
+branch: {name: RPI-CI, active: yes}
 language: cpp
 cache: ccache
 sudo: false
@@ -299,7 +299,7 @@ after_script: rake ci_teardown_cache
 
 ---
 
-branch: {name: OSX-CI, active: yes, description: For Travis CI - switch CI build to use OS X build environment.}
+branch: {name: OSX-CI, active: yes}
 language: objective-c
 env:
   global:
@@ -342,7 +342,7 @@ after_script: rake ci_teardown_cache
 
 ---
 
-branch: {name: Emscripten-CI, active: yes, description: For Travis CI - switch CI build to use Emscripten build environment.}
+branch: {name: Emscripten-CI, active: yes}
 language: cpp
 cache: ccache
 sudo: false
