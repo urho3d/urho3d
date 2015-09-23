@@ -39,7 +39,7 @@ matrix:
   fast_finish: true
   include:
     - &Linux-64bit
-      addons: {apt: {sources: *default_sources, packages: &linux_packages [*default_packages, libasound2-dev, rpm]}}
+      addons: {apt: {sources: [*default_sources, kubuntu-backports, ubuntu-toolchain-r-test], packages: &linux_packages [*default_packages, cmake, g++-4.9, libasound2-dev, rpm]}}
       compiler: gcc-64bit-static
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC COVERITY_SCAN_THRESHOLD=100 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
     - &Linux-64bit-shared
@@ -111,6 +111,7 @@ before_script:
   # Temporarily workaround the problem by downloading the missing header from Ubuntu 14.04 LTS source package.
   - if [ $URHO3D_OPENGL ]; then mkdir -p ../Build/{,generated/{UsingBuildTree,UsingSDK}/}include/Urho3D/ThirdParty && wget -P ../Build/include/Urho3D/ThirdParty http://bazaar.launchpad.net/~ubuntu-branches/ubuntu/trusty/mingw-w64/trusty/download/package-import%40ubuntu.com-20130624192537-vzn12bb7qd5w3iy8/d3dcompiler.h-20120402093420-bk10a737hzitlkgj-65/d3dcompiler.h && for d in UsingBuildTree UsingSDK; do bash -c "cd ../Build/generated/$d/include/Urho3D/ThirdParty && ln -s ../../../../../include/Urho3D/ThirdParty/d3dcompiler.h ."; done; fi
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH
+  - if [ $URHO3D_BINDINGS ]; then git clone --depth 1 https://github.com/urho3d/fastcomp-clang.git && export LLVM_CLANG_ROOT=$(pwd)/fastcomp-clang && export CXX=g++-4.9 CC=gcc-4.9 && for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done && export PATH=$HOME:$PATH; fi
   # For some reason clang compiler toolchain installation in Travis CI VM does not have symlink in the ccache symlinks directory, so workaround it
   - if [ "$CC"  == "clang" ]; then ln -s $(which ccache) $HOME/clang && ln -s $(which ccache) $HOME/clang++ && export PATH=$HOME:$PATH; fi
   - rake ci_setup_cache
@@ -118,6 +119,8 @@ script: rake ci
 after_success:
   - if [ $SITE_UPDATE ]; then rake ci_site_update || ! [ $RELEASE_TAG ]; fi
   - if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && if [ $LINUX ] && [ ! "$URHO3D_64BIT" == "0" ]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi || ! [ $RELEASE_TAG ]; fi
+  # Temporarily put the logic here until everything else are in their places
+  - if [ $URHO3D_BINDINGS ]; then rake ci_push_bindings; fi
 after_script:
   - rake ci_teardown_cache
   - if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_create_mirrors; fi
