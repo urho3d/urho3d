@@ -39,15 +39,16 @@ matrix:
   fast_finish: true
   include:
     - &Linux-64bit
-      addons: {apt: {sources: [*default_sources, kubuntu-backports, ubuntu-toolchain-r-test], packages: &linux_packages [*default_packages, cmake, g++-4.9, libasound2-dev, rpm]}}
+      addons: {apt: {sources: [*default_sources, kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, &linux_packages [*default_packages, libasound2-dev, rpm]]}}
       compiler: gcc-64bit-static
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC COVERITY_SCAN_THRESHOLD=100 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
     - &Linux-64bit-shared
-      <<: *Linux-64bit
+      addons: {apt: {sources: *default_sources, packages: *linux_packages}}
       compiler: gcc-64bit-shared
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED
-    - <<: *Linux-64bit
+    - <<: *Linux-64bit-shared
       compiler: clang-64bit-static
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC
     - <<: *Linux-64bit-shared
       compiler: clang-64bit-shared
     - &Linux-32bit
