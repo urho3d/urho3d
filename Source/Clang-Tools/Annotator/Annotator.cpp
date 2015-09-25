@@ -33,8 +33,8 @@ using namespace clang::driver;
 using namespace clang::tooling;
 using namespace llvm;
 
-static cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
-static cl::extrahelp MoreHelp(
+static cl::extrahelp commonHelp(CommonOptionsParser::HelpMessage);
+static cl::extrahelp moreHelp(
     "\tFor example, to run Annotator on all files in a subtree of the\n"
     "\tsource tree, use:\n"
     "\n"
@@ -73,7 +73,7 @@ struct Data
     std::unordered_set<std::string> annotatedSymbols_;
 };
 
-static std::vector<std::string> categories_ = {"class", "enum"};
+static const std::string categories_[] = {"class", "enum"};
 static std::unordered_map<std::string, Data> categoryData_;
 
 class ExtractCallback : public MatchFinder::MatchCallback

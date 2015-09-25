@@ -104,8 +104,9 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     endif ()
     cmake_dependent_option (URHO3D_LUA_RAW_SCRIPT_LOADER "Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)" ${URHO3D_DEFAULT_LUA_RAW} "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
     option (URHO3D_SAMPLES "Build sample applications")
+    option (URHO3D_BINDINGS "Enable API binding generation support for script subystems")
     cmake_dependent_option (URHO3D_CLANG_TOOLS "Build Clang tools (native only)" FALSE "NOT RPI AND NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
-    mark_as_advanced (URHO3D_CLANG_TOOLS)
+    mark_as_advanced (URHO3D_CLANG_TOOLS URHO3D_BINDINGS)
     cmake_dependent_option (URHO3D_TOOLS "Build tools (native and RPI only)" TRUE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     cmake_dependent_option (URHO3D_EXTRAS "Build extras (native and RPI only)" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     option (URHO3D_DOCS "Generate documentation as part of normal build")
@@ -251,12 +252,14 @@ if (CMAKE_VERSION VERSION_GREATER 2.8 OR CMAKE_VERSION VERSION_EQUAL 2.8)
 endif()
 
 # Clang tools building
-if (URHO3D_CLANG_TOOLS)
+if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
     # Ensure LLVM/Clang is installed
     find_program (LLVM_CONFIG NAMES llvm-config llvm-config-64 llvm-config-32 HINTS $ENV{LLVM_CLANG_ROOT}/bin DOC "LLVM config tool" NO_CMAKE_FIND_ROOT_PATH)
     if (NOT LLVM_CONFIG)
         message (FATAL_ERROR "Could not find LLVM/Clang installation")
     endif ()
+endif ()
+if (URHO3D_CLANG_TOOLS)
     # Require C++11 standard and no precompiled-header
     set (URHO3D_C++11 1)
     set (URHO3D_PCH 0)
@@ -607,9 +610,9 @@ endmacro ()
 
 # Macro for setting runtime output directories for tools
 macro (set_tool_output_directories)
-    set_output_directories (${CMAKE_BINARY_DIR}/bin/tool RUNTIME PDB)
+    set_output_directories (${CMAKE_BINARY_DIR}/bin/tool/${ARGN} RUNTIME PDB)
     if (DEST_RUNTIME_DIR STREQUAL bin)
-        set (DEST_RUNTIME_DIR bin/tool)
+        set (DEST_RUNTIME_DIR bin/tool/${ARGN})
     endif ()
 endmacro ()
 

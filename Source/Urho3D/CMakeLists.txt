@@ -24,13 +24,17 @@
 set (TARGET_NAME Urho3D)
 
 # Generate JSON compilation database format specification
-if (URHO3D_CLANG_TOOLS)
+if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
     set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
+    # Clang assumes all their tools to be installed in a relative path to their libs but this is not the case for our own Clang-tools
+    # Clang has a hard-coded way to search for their headers (see http://clang.llvm.org/docs/LibTooling.html#builtin-includes)
+    # In order for our Clang-tools to work correctly we need to make this Clang's assumption to be true
     execute_process (COMMAND ${LLVM_CONFIG} --version OUTPUT_VARIABLE LLVM_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
     string (REGEX REPLACE "([.0123456789]+).*" \\1 LLVM_VERSION "${LLVM_VERSION}")      # Stringify against empty output variable
     execute_process (COMMAND ${LLVM_CONFIG} --libdir OUTPUT_VARIABLE LLVM_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-    include_directories (${LLVM_LIBDIR}/clang/${LLVM_VERSION}/include)
-    # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS
+    execute_process (COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/tool/lib/clang/${LLVM_VERSION})
+    create_symlink (${LLVM_LIBDIR}/clang/${LLVM_VERSION}/include ${CMAKE_BINARY_DIR}/bin/tool/lib/clang/${LLVM_VERSION}/include)
+    # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS (ancient glibc header has incorrect defines)
     if (DEFINED ENV{CI})
         add_definitions (-D__extern_always_inline=inline)
     endif ()
@@ -69,13 +73,28 @@ add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
 
+if (URHO3D_ANGELSCRIPT)
+    if (URHO3D_BINDINGS)
+        # Build the Clang-tools as external project (even when we are not cross-compiling) for auto-binding generation
+        include (ExternalProject)
+        if (IOS)
+            # For iOS target, ensure the host environment is cleared first; Also workaround a known CMake/Xcode generator bug which prevents it from installing binaries correctly
+            set (IOS_FIX CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
+        endif ()
+        ExternalProject_Add (AutoBinder
+            SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Clang-Tools
+            CMAKE_ARGS -DURHO3D_NOABI=1 -DURHO3D_CLANG_TOOLS=AutoBinder -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -DDEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${IOS_FIX})
+    endif ()
+else ()
+    list (APPEND EXCLUDED_SOURCE_DIRS Script)
+endif ()
+
 if (URHO3D_LUA)
     # The host tool must be built natively
     if (CMAKE_CROSSCOMPILING OR IOS)
         # When cross-compiling, build the host tool as external project
         include (ExternalProject)
         if (IOS)
-            # For iOS target, ensure the host environment is cleared first; Also workaround a known CMake/Xcode generator bug which prevents it from installing binaries correctly
             set (IOS_FIX CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
         endif ()
         ExternalProject_Add (tolua++
@@ -155,9 +174,6 @@ if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have forc
 endif ()
 
 # Define source files
-if (NOT URHO3D_ANGELSCRIPT)
-    list (APPEND EXCLUDED_SOURCE_DIRS Script)
-endif ()
 foreach (DIR Navigation Network Physics Urho2D)
     string (TOUPPER URHO3D_${DIR} OPT)
     if (NOT ${OPT})
