@@ -198,7 +198,7 @@ end
 desc 'Build and run the Annotate tool (temporary)'
 task :ci_annotate do
   system 'rake cmake URHO3D_CLANG_TOOLS=1 && rake make annotate' or abort 'Failed to annotate'
-  system "git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && if git fetch origin clang-tools:clang-tools 2>/dev/null; then git push -qf origin --delete clang-tools; fi && git checkout -B clang-tools && git stash -q && git reset --hard HEAD~ && git stash pop -q && sed -i \"s/COVERITY_SCAN_THRESHOLD/URHO3D_BINDINGS=1 COVERITY_SCAN_THRESHOLD/g\" .travis.yml && git add -A .travis.yml Source/Urho3D && if git commit -qm 'Result of Annotator tool. [ci only: clang-tools]'; then git push -q -u origin clang-tools >/dev/null 2>&1; fi" or abort 'Failed to push clang-tools branch'
+  system "git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && if git fetch origin clang-tools:clang-tools 2>/dev/null; then git push -qf origin --delete clang-tools; fi && git checkout -B clang-tools && git stash -q && git reset --hard HEAD~ && git stash pop -q && sed -i \"s/COVERITY_SCAN_THRESHOLD/URHO3D_PCH=0 URHO3D_BINDINGS=1 COVERITY_SCAN_THRESHOLD/g\" .travis.yml && git add -A .travis.yml Source/Urho3D && if git commit -qm 'Result of Annotator tool. [ci only: clang-tools]'; then git push -q -u origin clang-tools >/dev/null 2>&1; fi" or abort 'Failed to push clang-tools branch'
 end
 
 # Usage: NOT intended to be used manually
@@ -240,7 +240,7 @@ task :ci do
   $build_options = "-DEMSCRIPTEN=#{ENV['HTML5']}" if ENV['HTML5']
   $build_options = "#{$build_options} -DANDROID_ABI=#{ENV['ABI']}" if ENV['ABI']
   $build_options = "#{$build_options} -DANDROID_NATIVE_API_LEVEL=#{ENV['API']}" if ENV['API']
-  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TEST_TIMEOUT', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var| $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var] }
+  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_PCH', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TEST_TIMEOUT', 'ANDROID', 'RPI', 'RPI_ABI', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var| $build_options = "#{$build_options} -D#{var}=#{ENV[var]}" if ENV[var] }
   if ENV['XCODE']
     # xcodebuild
     xcode_ci
