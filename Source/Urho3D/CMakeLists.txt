@@ -128,7 +128,7 @@ if (URHO3D_BINDINGS)
         list (APPEND TEMPLATES AngelScript)
         list (APPEND OUTPUT_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/AngelScriptAPI.cpp)
     endif ()
-    string (REGEX REPLACE "[^;]+API[^;]+\\.cpp" "" ANNOTATED_SOURCES "${CPP_FILES}")    # Stringify to preserve the semicolons
+    string (REGEX REPLACE "[^;]+API\\.cpp" "" ANNOTATED_SOURCES "${CPP_FILES}")    # Stringify to preserve the semicolons
     add_custom_command (OUTPUT ${OUTPUT_FILES}
         COMMAND ${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder -p ${CMAKE_BINARY_DIR} -t "${TEMPLATES}" -o ${CMAKE_CURRENT_BINARY_DIR}/generated ${ANNOTATED_SOURCES}
         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT_FILES}   # TODO: fake the output - WIP

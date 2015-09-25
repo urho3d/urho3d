@@ -96,7 +96,6 @@ int main(int argc, const char** argv)
     CommonOptionsParser optionsParser(argc, argv, autobinderCategory);
     ClangTool bindingExtractor(optionsParser.getCompilations(), optionsParser.getSourcePathList());
 
-
     // Setup finder to match against AST nodes from Urho3D library source files
     ExtractCallback extractCallback;
     MatchFinder bindingFinder;
