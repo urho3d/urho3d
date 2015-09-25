@@ -62,6 +62,45 @@ if (WIN32)
     endif ()
 endif ()
 
+# Define source files
+foreach (DIR Navigation Network Physics Urho2D)
+    string (TOUPPER URHO3D_${DIR} OPT)
+    if (NOT ${OPT})
+        list (APPEND EXCLUDED_SOURCE_DIRS ${DIR})
+    endif ()
+endforeach ()
+if (NOT URHO3D_ANGELSCRIPT)
+    list (APPEND EXCLUDED_SOURCE_DIRS Script)
+endif ()
+if (NOT URHO3D_LUA)
+    list (APPEND EXCLUDED_SOURCE_DIRS LuaScript)
+endif ()
+if (URHO3D_DATABASE)
+    if (URHO3D_DATABASE_ODBC)
+        list (APPEND EXCLUDED_SOURCE_DIRS Database/SQLite)
+    else ()
+        list (APPEND EXCLUDED_SOURCE_DIRS Database/ODBC)
+    endif ()
+else ()
+    list (APPEND EXCLUDED_SOURCE_DIRS Database)
+endif ()
+if (URHO3D_OPENGL)
+    # Exclude the opposite source directory
+    list (APPEND EXCLUDED_SOURCE_DIRS Graphics/Direct3D9 Graphics/Direct3D11)
+else ()
+    list (APPEND EXCLUDED_SOURCE_DIRS Graphics/OpenGL)
+    if (URHO3D_D3D11)
+        list (APPEND EXCLUDED_SOURCE_DIRS Graphics/Direct3D9)
+    else ()
+        list (APPEND EXCLUDED_SOURCE_DIRS Graphics/Direct3D11)
+    endif ()
+endif ()
+if (APPLE AND NOT IOS)
+    set (GLOB_OBJC_PATTERN *.m)     # Should only pick up MacFileWatcher.m for MacOSX platform at the moment
+endif ()
+string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
+define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} RECURSE GROUP PCH Precompiled.h)
+
 # Define generated source files
 if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
     execute_process (COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrho3DRevision.cmake
@@ -73,22 +112,31 @@ add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
 
-if (URHO3D_ANGELSCRIPT)
-    if (URHO3D_BINDINGS)
-        # Build the Clang-tools as external project (even when we are not cross-compiling) for auto-binding generation
-        include (ExternalProject)
-        if (IOS)
-            # For iOS target, ensure the host environment is cleared first; Also workaround a known CMake/Xcode generator bug which prevents it from installing binaries correctly
-            set (IOS_FIX CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
-        endif ()
-        ExternalProject_Add (AutoBinder
+# Use the AutoBinder tool to generate source files for binding script subsystems
+if (URHO3D_BINDINGS)
+    # Build the Clang-tools as external project (even when we are not cross-compiling because it needs C++11 standard on) for auto-binding generation
+    include (ExternalProject)
+    if (IOS)
+        # For iOS target, ensure the host environment is cleared first; Also workaround a known CMake/Xcode generator bug which prevents it from installing binaries correctly
+        set (IOS_FIX CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
+    endif ()
+    ExternalProject_Add (AutoBinder
             SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Clang-Tools
             CMAKE_ARGS -DURHO3D_NOABI=1 -DURHO3D_CLANG_TOOLS=AutoBinder -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -DDEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${IOS_FIX})
+    file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/generated)
+    if (URHO3D_ANGELSCRIPT)
+        list (APPEND TEMPLATES AngelScript)
+        list (APPEND OUTPUT_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/AngelScriptAPI.cpp)
     endif ()
-else ()
-    list (APPEND EXCLUDED_SOURCE_DIRS Script)
+    string (REGEX REPLACE "[^;]+API[^;]+\\.cpp" "" ANNOTATED_SOURCES "${CPP_FILES}")    # Stringify to preserve the semicolons
+    add_custom_command (OUTPUT ${OUTPUT_FILES}
+        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder -p ${CMAKE_BINARY_DIR} -t "${TEMPLATES}" -o ${CMAKE_CURRENT_BINARY_DIR}/generated ${ANNOTATED_SOURCES}
+        COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT_FILES}   # TODO: fake the output - WIP
+        DEPENDS AutoBinder ${SOURCE_FILES}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Generating source files for binding script subsystems")
+    list (APPEND GEN_CPP_FILES ${OUTPUT_FILES})
 endif ()
-
 if (URHO3D_LUA)
     # The host tool must be built natively
     if (CMAKE_CROSSCOMPILING OR IOS)
@@ -104,7 +152,6 @@ if (URHO3D_LUA)
         # Otherwise, build it internally as per normal
         add_subdirectory (../ThirdParty/toluapp/src/bin ../ThirdParty/toluapp/src/bin)
     endif ()
-
     # Use the host tool to generate source files for tolua++ API binding
     file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/LuaScript/generated)
     file (GLOB API_PKG_FILES LuaScript/pkgs/*.pkg)
@@ -126,8 +173,6 @@ if (URHO3D_LUA)
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/LuaScript/pkgs
             COMMENT "Generating tolua++ API binding on the fly for ${DIR}")
     endforeach ()
-else ()
-    list (APPEND EXCLUDED_SOURCE_DIRS LuaScript)
 endif ()
 
 # Generate platform specific export header file
@@ -173,39 +218,8 @@ if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have forc
     set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 endif ()
 
-# Define source files
-foreach (DIR Navigation Network Physics Urho2D)
-    string (TOUPPER URHO3D_${DIR} OPT)
-    if (NOT ${OPT})
-        list (APPEND EXCLUDED_SOURCE_DIRS ${DIR})
-    endif ()
-endforeach ()
-if (URHO3D_DATABASE)
-    if (URHO3D_DATABASE_ODBC)
-        list (APPEND EXCLUDED_SOURCE_DIRS Database/SQLite)
-    else ()
-        list (APPEND EXCLUDED_SOURCE_DIRS Database/ODBC)
-    endif ()
-else ()
-    list (APPEND EXCLUDED_SOURCE_DIRS Database)
-endif ()
-if (URHO3D_OPENGL)
-    # Exclude the opposite source directory
-    list (APPEND EXCLUDED_SOURCE_DIRS Graphics/Direct3D9 Graphics/Direct3D11)
-else ()
-    list (APPEND EXCLUDED_SOURCE_DIRS Graphics/OpenGL)
-    if (URHO3D_D3D11)
-        list (APPEND EXCLUDED_SOURCE_DIRS Graphics/Direct3D9)
-    else ()
-        list (APPEND EXCLUDED_SOURCE_DIRS Graphics/Direct3D11)
-    endif ()
-endif ()
-if (APPLE AND NOT IOS)
-    set (GLOB_OBJC_PATTERN *.m)     # Should only pick up MacFileWatcher.m for MacOSX platform at the moment
-endif ()
-string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
-define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} EXTRA_H_FILES librevision.h Urho3D.h RECURSE GROUP PCH Precompiled.h)
-list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${ALL_OBJ_FILES})
+# Aggregate all source files
+list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${ALL_OBJ_FILES} librevision.h Urho3D.h)
 
 # Define dependency libs
 # Add include directories to find the precompiled header, export header, and installed headers from thirdparty libs
