@@ -33,4 +33,4 @@ add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/../../ThirdParty/Mustache Mustache
 if (APPLE)
     setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
 endif ()
-setup_executable ()
+setup_executable (NODEPS)
