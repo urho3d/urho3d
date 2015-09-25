@@ -27,7 +27,6 @@
 
 #include <Mustache/mustache.hpp>
 
-#include <unordered_map>
 #include <unordered_set>
 
 using namespace clang;

@@ -89,6 +89,7 @@ else ()
     string (REGEX REPLACE "[^;]+\\.h" "" SOURCES "${SOURCES}")   # Stringify to preserve the semicolons
     string (REGEX REPLACE "[^;]+generated[^;]+\\.cpp" "" SOURCES "${SOURCES}")
     file (GLOB BINDING_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}/Source/Urho3D ${CMAKE_SOURCE_DIR}/Source/Urho3D/Script/*API.cpp)
+    string (REGEX REPLACE "[^;]+API[^;]+\\.cpp" "" ANNOTATED_SOURCES "${SOURCES}")
 
     # List of tools
     add_subdirectory (Annotator)
@@ -119,7 +120,7 @@ else ()
         COMMENT "Annotating Urho3D library source files")
     add_custom_target (autobinder-as
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/Source/Urho3D/generated
-        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder -p ${CMAKE_BINARY_DIR} -t AngelScript -o ${CMAKE_BINARY_DIR}/Source/Urho3D/generated ${SOURCES}
+        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder -p ${CMAKE_BINARY_DIR} -t AngelScript -o ${CMAKE_BINARY_DIR}/Source/Urho3D/generated ${ANNOTATED_SOURCES}
         DEPENDS AutoBinder
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
         COMMENT "Auto-binding for AngelScript")
