@@ -543,6 +543,12 @@ def makefile_ci
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
     android_prepare_device ENV['API'], ENV['ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
   end
+  # Temporarily put the logic here for clang-tools migration until everything else are in their places
+  if ENV['URHO3D_BINDINGS']
+    system "cd ../Build && make -j$NUMJOBS" or abort 'Failed to build or test Urho3D library with annotated source files'
+    system 'rake ci_push_bindings' or abort
+    return 0
+  end
   # For Emscripten CI build, skip make test and/or scaffolding test if Travis-CI VM took too long to get here, as otherwise overall build time may exceed 50 minutes time limit
   test = $testing == 1 ? '&& make test' : ''
   system "cd ../Build && make -j$NUMJOBS #{test}" or abort 'Failed to build or test Urho3D library'
