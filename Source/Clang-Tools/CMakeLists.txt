@@ -89,7 +89,7 @@ else ()
     string (REGEX REPLACE "[^;]+\\.h" "" SOURCES "${SOURCES}")   # Stringify to preserve the semicolons
     string (REGEX REPLACE "[^;]+generated[^;]+\\.cpp" "" SOURCES "${SOURCES}")
     file (GLOB BINDING_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}/Source/Urho3D ${CMAKE_SOURCE_DIR}/Source/Urho3D/Script/*API.cpp)
-    string (REGEX REPLACE "[^;]+API[^;]+\\.cpp" "" ANNOTATED_SOURCES "${SOURCES}")
+    string (REGEX REPLACE "[^;]+API\\.cpp" "" ANNOTATED_SOURCES "${SOURCES}")
 
     # List of tools
     add_subdirectory (Annotator)
