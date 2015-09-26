@@ -332,6 +332,11 @@ if (NOT WIN32)
     add_definitions (-DKNET_UNIX)
 endif ()
 
+# Add definitions for Emscripten
+if (EMSCRIPTEN)
+    add_definitions (-DNO_POPEN)
+endif ()
+
 # Add definition for Direct3D11
 if (URHO3D_D3D11)
     set (URHO3D_OPENGL 0)

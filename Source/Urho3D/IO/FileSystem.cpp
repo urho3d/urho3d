@@ -79,9 +79,12 @@ namespace Urho3D
 
 int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* context)
 {
+#if !defined(NO_POPEN)
     if (!redirectToLog)
+#endif
         return system(commandLine.CString());
 
+#if !defined(NO_POPEN)
     // Get a platform-agnostic temporary file name for stderr redirection
     String stderrFilename;
     String adjustedCommandLine(commandLine);
@@ -125,6 +128,7 @@ int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* cont
     }
 
     return exitCode;
+#endif
 }
 
 int DoSystemRun(const String& fileName, const Vector<String>& arguments)
