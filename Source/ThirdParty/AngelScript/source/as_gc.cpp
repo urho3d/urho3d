@@ -217,17 +217,7 @@ int asCGarbageCollector::GarbageCollect(asDWORD flags, asUINT iterations)
 				if( count != (unsigned int)(gcOldObjects.GetLength()) )
 					count = (unsigned int)(gcOldObjects.GetLength());
 				else
-				{
-					// Let the engine destroy the types that reached refCount 0
-					// If none were destroyed, then leave the GC
-					// TODO: The asCObjectType should destroy its content when refCount reaches 0
-					//       since no-one is using them. The registered types should have their
-					//       refcount increased by the config groups. Doing it like that will allow 
-					//       me to remove this call to ClearUnusedTypes() that the GC really 
-					//       shouldn't be calling.
-					if( engine->ClearUnusedTypes() == 0 )
-						break;
-				}
+					break;
 			}
 
 			isProcessing = false;

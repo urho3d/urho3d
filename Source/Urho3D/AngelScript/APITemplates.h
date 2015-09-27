@@ -218,11 +218,11 @@ template <class T, class U> void RegisterSubclass(asIScriptEngine* engine, const
     if (!strcmp(classNameT, classNameU))
         return;
 
-    String declReturnT(String(classNameT) + "@+ f()");
-    String declReturnU(String(classNameU) + "@+ f()");
+    String declReturnT(String(classNameT) + "@+ opImplCast()");
+    String declReturnU(String(classNameU) + "@+ opImplCast()");
 
-    engine->RegisterObjectBehaviour(classNameT, asBEHAVE_IMPLICIT_REF_CAST, declReturnU.CString(), asFUNCTION((RefCast<T, U>)), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour(classNameU, asBEHAVE_IMPLICIT_REF_CAST, declReturnT.CString(), asFUNCTION((RefCast<U, T>)), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(classNameT, declReturnU.CString(), asFUNCTION((RefCast<T, U>)), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(classNameU, declReturnT.CString(), asFUNCTION((RefCast<U, T>)), asCALL_CDECL_OBJLAST);
 }
 
 /// Template function for writing to a serializer from an array.

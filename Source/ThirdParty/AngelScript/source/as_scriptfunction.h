@@ -138,6 +138,7 @@ public:
 	const char          *GetDeclaration(bool includeObjectName = true, bool includeNamespace = false, bool includeParamNames = false) const;
 	bool                 IsReadOnly() const;
 	bool                 IsPrivate() const;
+	bool                 IsProtected() const;
 	bool                 IsFinal() const;
 	bool                 IsOverride() const;
 	bool                 IsShared() const;
@@ -178,6 +179,11 @@ public:
 	asCScriptFunction(asCScriptEngine *engine, asCModule *mod, asEFuncType funcType);
 	~asCScriptFunction();
 
+	// Keep an internal reference counter to separate references coming from 
+	// application or script objects and references coming from the script code
+	int AddRefInternal();
+	int ReleaseInternal();
+
 	void     DestroyHalfCreated();
 
 	// TODO: 2.29.0: operator==
@@ -189,7 +195,6 @@ public:
 	//bool      operator==(const asCScriptFunction &other) const;
 
 	void      DestroyInternal();
-	void      Orphan(asIScriptModule *mod);
 
 	void      AddVariable(asCString &name, asCDataType &type, int stackOffset);
 
@@ -224,7 +229,7 @@ public:
 
 	asCGlobalProperty *GetPropertyByGlobalVarPtr(void *gvarPtr);
 
-	// GC methods
+	// GC methods (for delegates)
 	int  GetRefCount();
 	void SetFlag();
 	bool GetFlag();
@@ -235,7 +240,8 @@ public:
 	//-----------------------------------
 	// Properties
 
-	mutable asCAtomic            refCount;
+	mutable asCAtomic            externalRefCount; // Used for external referneces
+	        asCAtomic            internalRefCount; // Used for internal references
 	mutable bool                 gcFlag;
 	asCScriptEngine             *engine;
 	asCModule                   *module;
@@ -251,6 +257,7 @@ public:
 	asCArray<asCString *>        defaultArgs;
 	bool                         isReadOnly;
 	bool                         isPrivate;
+	bool                         isProtected;
 	bool                         isFinal;
 	bool                         isOverride;
 	asCObjectType               *objectType;
@@ -305,7 +312,7 @@ public:
 		asCArray<int>                   lineNumbers;
 		// Store the script section where the code was declared
 		int                             scriptSectionIdx;
-		// Store the location where the function was declared
+		// Store the location where the function was declared  (row in the lower 20 bits, and column in the upper 12)
 		int                             declaredAt;
 		// Store position/index pairs if the bytecode is compiled from multiple script sections
 		asCArray<int>                   sectionIdxs;

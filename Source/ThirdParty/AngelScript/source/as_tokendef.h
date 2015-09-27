@@ -171,6 +171,7 @@ enum eTokenType
 	ttEnum,                // enum
 	ttCast,                // cast
 	ttPrivate,             // private
+	ttProtected,           // protected
 	ttNamespace,           // namespace
 	ttMixin,               // mixin
 	ttAuto                 // auto
@@ -279,6 +280,7 @@ sTokenWord const tokenWords[] =
 	asTokenDef("or"        , ttOr),
 	asTokenDef("out"       , ttOut),
 	asTokenDef("private"   , ttPrivate),
+	asTokenDef("protected" , ttProtected),
 	asTokenDef("return"    , ttReturn),
 	asTokenDef("switch"    , ttSwitch),
 	asTokenDef("true"      , ttTrue),
