@@ -134,17 +134,32 @@ public:
 
 #endif
 
+// interface
 AS_API asIScriptContext *asGetActiveContext()
 {
 	asCThreadLocalData *tld = asCThreadManager::GetLocalData();
-	if( tld->activeContexts.GetLength() == 0 )
+
+	// tld can be 0 if asGetActiveContext is called before any engine has been created.
+
+	// Observe! I've seen a case where an application linked with the library twice
+	// and thus ended up with two separate instances of the code and global variables.
+	// The application somehow mixed the two instances so that a function called from
+	// a script ended up calling asGetActiveContext from the other instance that had
+	// never been initialized.
+
+	if( tld == 0 || tld->activeContexts.GetLength() == 0 )
 		return 0;
 	return tld->activeContexts[tld->activeContexts.GetLength()-1];
 }
 
+// internal
+// Note: There is no asPopActiveContext(), just call tld->activeContexts.PopLast() instead
 asCThreadLocalData *asPushActiveContext(asIScriptContext *ctx)
 {
 	asCThreadLocalData *tld = asCThreadManager::GetLocalData();
+	asASSERT( tld );
+	if( tld == 0 )
+		return 0;
 	tld->activeContexts.PushLast(ctx);
 	return tld;
 }
@@ -1304,8 +1319,9 @@ int asCContext::Execute()
 	}
 
 	// Pop the active context
-	asASSERT(tld->activeContexts[tld->activeContexts.GetLength()-1] == this);
-	tld->activeContexts.PopLast();
+	asASSERT(tld && tld->activeContexts[tld->activeContexts.GetLength()-1] == this);
+	if( tld )
+		tld->activeContexts.PopLast();
 
 	if( m_status == asEXECUTION_FINISHED )
 	{
@@ -4948,7 +4964,7 @@ int asCContext::GetExceptionLineNumber(int *column, const char **sectionName)
 
 	if( sectionName )
 	{
-		// The section index can be -1 if the exception was raised in a generated function, e.g. factstub for templates
+		// The section index can be -1 if the exception was raised in a generated function, e.g. $fact for templates
 		if( m_exceptionSectionIdx >= 0 )
 			*sectionName = m_engine->scriptSectionNames[m_exceptionSectionIdx]->AddressOf();
 		else
