@@ -22,6 +22,7 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/APITemplates.h"
 #include "../Graphics/AnimatedModel.h"
 #include "../Graphics/Animation.h"
 #include "../Graphics/AnimationController.h"
@@ -50,7 +51,6 @@
 #include "../Graphics/Skybox.h"
 #include "../Graphics/VertexBuffer.h"
 #include "../Graphics/Zone.h"
-#include "../Script/APITemplates.h"
 #include "../Scene/Scene.h"
 
 #ifdef _MSC_VER

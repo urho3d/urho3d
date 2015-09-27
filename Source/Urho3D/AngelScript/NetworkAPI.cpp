@@ -24,10 +24,10 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/APITemplates.h"
 #include "../Network/HttpRequest.h"
 #include "../Network/Network.h"
 #include "../Network/NetworkPriority.h"
-#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {

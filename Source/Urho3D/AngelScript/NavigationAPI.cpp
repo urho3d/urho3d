@@ -24,15 +24,13 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/APITemplates.h"
 #include "../Navigation/Navigable.h"
 #include "../Navigation/CrowdAgent.h"
-#include "../Navigation/CrowdManager.h"
 #include "../Navigation/DynamicNavigationMesh.h"
 #include "../Navigation/NavArea.h"
-#include "../Navigation/NavigationMesh.h"
 #include "../Navigation/Obstacle.h"
 #include "../Navigation/OffMeshConnection.h"
-#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {

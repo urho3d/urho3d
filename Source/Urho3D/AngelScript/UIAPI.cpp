@@ -22,8 +22,8 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/APITemplates.h"
 #include "../Input/Input.h"
-#include "../Script/APITemplates.h"
 #include "../UI/CheckBox.h"
 #include "../UI/DropDownList.h"
 #include "../UI/FileSelector.h"

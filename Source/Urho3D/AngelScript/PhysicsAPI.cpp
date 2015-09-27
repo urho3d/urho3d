@@ -24,11 +24,11 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/APITemplates.h"
 #include "../Physics/CollisionShape.h"
 #include "../Physics/Constraint.h"
 #include "../Physics/PhysicsWorld.h"
 #include "../Physics/RigidBody.h"
-#include "../Script/APITemplates.h"
 #include "../Scene/Scene.h"
 
 namespace Urho3D

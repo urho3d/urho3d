@@ -24,7 +24,7 @@
 
 #include "../Precompiled.h"
 
-#include "../Script/APITemplates.h"
+#include "../AngelScript/APITemplates.h"
 #include "../Scene/Scene.h"
 #include "../Urho2D/AnimatedSprite2D.h"
 #include "../Urho2D/AnimationSet2D.h"

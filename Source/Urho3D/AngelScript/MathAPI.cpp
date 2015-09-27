@@ -22,10 +22,10 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/APITemplates.h"
 #include "../Math/Frustum.h"
 #include "../Math/Polyhedron.h"
 #include "../Math/Ray.h"
-#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {

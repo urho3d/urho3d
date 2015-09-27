@@ -22,9 +22,9 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/APITemplates.h"
 #include "../Input/Controls.h"
 #include "../Input/Input.h"
-#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {

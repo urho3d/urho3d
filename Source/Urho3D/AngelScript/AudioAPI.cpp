@@ -22,11 +22,11 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/APITemplates.h"
 #include "../Audio/Audio.h"
 #include "../Audio/Sound.h"
 #include "../Audio/SoundListener.h"
 #include "../Audio/SoundSource3D.h"
-#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {

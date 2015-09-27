@@ -22,6 +22,9 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/Script.h"
+#include "../AngelScript/ScriptFile.h"
+#include "../AngelScript/ScriptInstance.h"
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
 #include "../IO/Log.h"
@@ -34,9 +37,6 @@
 #include "../Resource/ResourceEvents.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
-#include "../Script/Script.h"
-#include "../Script/ScriptFile.h"
-#include "../Script/ScriptInstance.h"
 
 #include <AngelScript/angelscript.h>
 

@@ -22,17 +22,17 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/Addons.h"
+#include "../AngelScript/Script.h"
+#include "../AngelScript/ScriptAPI.h"
+#include "../AngelScript/ScriptFile.h"
+#include "../AngelScript/ScriptInstance.h"
 #include "../Core/Profiler.h"
 #include "../Engine/EngineEvents.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
-#include "../Script/Addons.h"
-#include "../Script/Script.h"
-#include "../Script/ScriptAPI.h"
-#include "../Script/ScriptFile.h"
-#include "../Script/ScriptInstance.h"
 
 #include "../DebugNew.h"
 

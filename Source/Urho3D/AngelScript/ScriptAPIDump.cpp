@@ -22,11 +22,11 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/Script.h"
 #include "../Core/Context.h"
 #include "../IO/File.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
-#include "../Script/Script.h"
 
 #include <AngelScript/angelscript.h>
 
@@ -196,7 +196,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
     // and of Log subsystem availability
 
     // Dump event descriptions and attribute definitions in Doxygen mode. For events, this means going through the header files,
-    // as the information is not available otherwise. 
+    // as the information is not available otherwise.
     /// \todo Dump events + attributes before the actual script API because the remarks (readonly / writeonly) seem to throw off
     // Doxygen parsing and the following page definition(s) may not be properly recognized
     if (mode == DOXYGEN)

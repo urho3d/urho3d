@@ -22,6 +22,9 @@
 
 #pragma once
 
+#include "../AngelScript/Addons.h"
+#include "../AngelScript/Script.h"
+#include "../AngelScript/ScriptInstance.h"
 #include "../Audio/SoundSource.h"
 #include "../Core/Context.h"
 #include "../Container/HashSet.h"
@@ -33,11 +36,8 @@
 #include "../IO/Log.h"
 #include "../IO/VectorBuffer.h"
 #include "../Resource/Resource.h"
-#include "../Script/Addons.h"
 #include "../Scene/Animatable.h"
 #include "../Scene/Node.h"
-#include "../Script/Script.h"
-#include "../Script/ScriptInstance.h"
 #include "../UI/BorderImage.h"
 
 #include <AngelScript/angelscript.h>
