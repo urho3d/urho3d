@@ -142,6 +142,7 @@
 #define TXT_INVALID_CONTINUE                       "Invalid 'continue'"
 #define TXT_INVALID_ESCAPE_SEQUENCE                "Invalid escape sequence"
 #define TXT_INVALID_EXPRESSION_AMBIGUOUS_NAME      "Invalid expression: ambiguous name"
+#define TXT_INVALID_EXPRESSION_LAMBDA              "Invalid expression: stand-alone anonymous function"
 #define TXT_INVALID_OP_ON_METHOD                   "Invalid operation on method"
 #define TXT_INVALID_REF_PROP_ACCESS                "Invalid reference. Property accessors cannot be used in combined read/write operations"
 #define TXT_INVALID_SCOPE                          "Invalid scope resolution"
