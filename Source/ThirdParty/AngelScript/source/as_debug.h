@@ -46,6 +46,8 @@
 #ifndef _WIN32_WCE
 // Neither does WinCE
 
+#ifndef AS_PSVITA
+// Possible on PSVita, but requires SDK access
 
 #if defined(__GNUC__) || defined( AS_MARMALADE )
 
@@ -256,6 +258,9 @@ END_AS_NAMESPACE
 
 
 
+
+
+#endif // AS_PSVITA
 #endif // _WIN32_WCE
 #endif // AS_WII
 

@@ -178,6 +178,7 @@ public:
 
 	void InternalReset();
 	bool IsEmpty() const;
+	bool HasExternalReferences(bool shuttingDown);
 
 	int  CallInit(asIScriptContext *ctx);
 	void CallExit();
@@ -185,7 +186,7 @@ public:
 	void JITCompile();
 
 #ifndef AS_NO_COMPILER
-	int  AddScriptFunction(int sectionIdx, int declaredAt, int id, const asCString &name, const asCDataType &returnType, const asCArray<asCDataType> &params, const asCArray<asCString> &paramNames, const asCArray<asETypeModifiers> &inOutFlags, const asCArray<asCString *> &defaultArgs, bool isInterface, asCObjectType *objType = 0, bool isConstMethod = false, bool isGlobalFunction = false, bool isPrivate = false, bool isFinal = false, bool isOverride = false, bool isShared = false, asSNameSpace *ns = 0);
+	int  AddScriptFunction(int sectionIdx, int declaredAt, int id, const asCString &name, const asCDataType &returnType, const asCArray<asCDataType> &params, const asCArray<asCString> &paramNames, const asCArray<asETypeModifiers> &inOutFlags, const asCArray<asCString *> &defaultArgs, bool isInterface, asCObjectType *objType = 0, bool isConstMethod = false, bool isGlobalFunction = false, bool isPrivate = false, bool isProtected = false, bool isFinal = false, bool isOverride = false, bool isShared = false, asSNameSpace *ns = 0);
 	int  AddScriptFunction(asCScriptFunction *func);
 	int  AddImportedFunction(int id, const asCString &name, const asCDataType &returnType, const asCArray<asCDataType> &params, const asCArray<asETypeModifiers> &inOutFlags, const asCArray<asCString *> &defaultArgs, asSNameSpace *ns, const asCString &moduleName);
 	int  AddFuncDef(const asCString &name, asSNameSpace *ns);
@@ -204,25 +205,29 @@ public:
 	asDWORD           accessMask;
 	asSNameSpace     *defaultNamespace;
 
-	// This array holds all functions, class members, factories, etc that were compiled with the module
-	asCArray<asCScriptFunction *>     scriptFunctions;
-	// This array holds global functions declared in the module
-	asCSymbolTable<asCScriptFunction> globalFunctions;
-	// This array holds imported functions in the module
-	asCArray<sBindInfo *>             bindInformations;
+	// This array holds all functions, class members, factories, etc that were compiled with the module.
+	// These references hold an internal reference to the function object.
+	asCArray<asCScriptFunction *>     scriptFunctions; // increases ref count
+	// This array holds global functions declared in the module. These references are not counted, 
+	// as the same pointer is always present in the scriptFunctions array too.
+	asCSymbolTable<asCScriptFunction> globalFunctions; // doesn't increase ref count
+	// This array holds imported functions in the module.
+	asCArray<sBindInfo *>             bindInformations; // increases ref count
+	// This array holds template instance types created for the module's object types
+	asCArray<asCObjectType*>          templateInstances; // increases ref count
 
 	// This array holds the global variables declared in the script
-	asCSymbolTable<asCGlobalProperty> scriptGlobals;
+	asCSymbolTable<asCGlobalProperty> scriptGlobals; // increases ref count
 	bool                              isGlobalVarInitialized;
 
 	// This array holds class and interface types
-	asCArray<asCObjectType*>       classTypes;
+	asCArray<asCObjectType*>       classTypes; // increases ref count
 	// This array holds enum types
-	asCArray<asCObjectType*>       enumTypes;
+	asCArray<asCObjectType*>       enumTypes; // increases ref count
 	// This array holds typedefs
-	asCArray<asCObjectType*>       typeDefs;
+	asCArray<asCObjectType*>       typeDefs; // increases ref count
 	// This array holds the funcdefs declared in the module
-	asCArray<asCScriptFunction*>   funcDefs;
+	asCArray<asCScriptFunction*>   funcDefs; // increases ref count
 };
 
 END_AS_NAMESPACE

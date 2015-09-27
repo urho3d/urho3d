@@ -575,7 +575,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     unsigned pos = 0;
     while (pos < dataSize)
     {
-        int len;
+        unsigned len;
         asETokenClass t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
         if (t == asTC_COMMENT || t == asTC_WHITESPACE)
         {
@@ -632,7 +632,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
         // Don't search includes within statement blocks or between tokens in statements
         else
         {
-            int len;
+            unsigned len;
             // Skip until ; or { whichever comes first
             while (pos < dataSize && buffer[pos] != ';' && buffer[pos] != '{')
             {
