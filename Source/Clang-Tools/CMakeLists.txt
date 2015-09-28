@@ -118,10 +118,28 @@ else ()
         DEPENDS Annotator
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
         COMMENT "Annotating Urho3D library source files")
-    add_custom_target (autobinder-as
+    add_custom_target (autobinder
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/Source/Urho3D/generated
-        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder -p ${CMAKE_BINARY_DIR} -t AngelScript -o ${CMAKE_BINARY_DIR}/Source/Urho3D/generated ${ANNOTATED_SOURCES}
+        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder -p ${CMAKE_BINARY_DIR} -t ${CMAKE_CURRENT_SOURCE_DIR}/AutoBinder/Templates -o ${CMAKE_BINARY_DIR}/Source/Urho3D/generated -s AngelScript -s LuaScript -s JavaScript ${ANNOTATED_SOURCES}
+        DEPENDS AutoBinder
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
+        COMMENT "Auto-binding for all script subsystems")
+    add_custom_target (autobinder-angelscript
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/Source/Urho3D/generated
+        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder -p ${CMAKE_BINARY_DIR} -t ${CMAKE_CURRENT_SOURCE_DIR}/AutoBinder/Templates -o ${CMAKE_BINARY_DIR}/Source/Urho3D/generated -s AngelScript ${ANNOTATED_SOURCES}
         DEPENDS AutoBinder
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
         COMMENT "Auto-binding for AngelScript")
+    add_custom_target (autobinder-luascript
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/Source/Urho3D/generated
+        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder -p ${CMAKE_BINARY_DIR} -t ${CMAKE_CURRENT_SOURCE_DIR}/AutoBinder/Templates -o ${CMAKE_BINARY_DIR}/Source/Urho3D/generated -s LuaScript ${ANNOTATED_SOURCES}
+        DEPENDS AutoBinder
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
+        COMMENT "Auto-binding for LuaScript")
+    add_custom_target (autobinder-javascript
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/Source/Urho3D/generated
+        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder -p ${CMAKE_BINARY_DIR} -t ${CMAKE_CURRENT_SOURCE_DIR}/AutoBinder/Templates -o ${CMAKE_BINARY_DIR}/Source/Urho3D/generated -s JavaScript ${ANNOTATED_SOURCES}
+        DEPENDS AutoBinder
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D
+        COMMENT "Auto-binding for JavaScript")
 endif ()

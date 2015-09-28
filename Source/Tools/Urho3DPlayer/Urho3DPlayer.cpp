@@ -20,21 +20,19 @@
 // THE SOFTWARE.
 //
 
+#ifdef URHO3D_ANGELSCRIPT
+#include <Urho3D/AngelScript/ScriptFile.h>
+#include <Urho3D/AngelScript/Script.h>
+#endif
 #include <Urho3D/Core/Main.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/IO/Log.h>
-#include <Urho3D/Resource/ResourceCache.h>
-#include <Urho3D/Resource/ResourceEvents.h>
-
-#ifdef URHO3D_ANGELSCRIPT
-#include <Urho3D/Script/ScriptFile.h>
-#include <Urho3D/Script/Script.h>
-#endif
-
 #ifdef URHO3D_LUA
 #include <Urho3D/LuaScript/LuaScript.h>
 #endif
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Resource/ResourceEvents.h>
 
 #include "Urho3DPlayer.h"
 

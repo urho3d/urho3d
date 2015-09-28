@@ -22,9 +22,9 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/APITemplates.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../IO/PackageFile.h"
-#include "../Script/APITemplates.h"
 #include "../Scene/ObjectAnimation.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SmoothedTransform.h"

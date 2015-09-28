@@ -585,9 +585,15 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody
          i != currentCollisions_.End(); ++i)
     {
         if (i->first_.first_ == body)
-            result.Push(i->first_.second_);
+        {
+            if (i->first_.second_)
+                result.Push(i->first_.second_);
+        }
         else if (i->first_.second_ == body)
-            result.Push(i->first_.first_);
+        {
+            if (i->first_.first_)
+                result.Push(i->first_.first_);
+        }
     }
 }
 

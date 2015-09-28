@@ -70,7 +70,7 @@ foreach (DIR Navigation Network Physics Urho2D)
     endif ()
 endforeach ()
 if (NOT URHO3D_ANGELSCRIPT)
-    list (APPEND EXCLUDED_SOURCE_DIRS Script)
+    list (APPEND EXCLUDED_SOURCE_DIRS AngelScript)
 endif ()
 if (NOT URHO3D_LUA)
     list (APPEND EXCLUDED_SOURCE_DIRS LuaScript)
@@ -124,18 +124,20 @@ if (URHO3D_BINDINGS)
             SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Clang-Tools
             CMAKE_ARGS -DURHO3D_NOABI=1 -DURHO3D_CLANG_TOOLS=AutoBinder -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -DDEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${IOS_FIX})
     file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/generated)
-    if (URHO3D_ANGELSCRIPT)
-        list (APPEND TEMPLATES AngelScript)
-        list (APPEND OUTPUT_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/AngelScriptAPI.cpp)
-    endif ()
+    foreach (SCRIPT AngelScript LuaScript JavaScript)
+        string (TOUPPER URHO3D_${SCRIPT} OPT)
+        if (${OPT})
+            list (APPEND SCRIPT_SUBSYSTEMS -s ${SCRIPT})
+            list (APPEND GEN_CPP_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/${SCRIPT}API.cpp)
+        endif ()
+    endforeach ()
     string (REGEX REPLACE "[^;]+API\\.cpp" "" ANNOTATED_SOURCES "${CPP_FILES}")    # Stringify to preserve the semicolons
-    add_custom_command (OUTPUT ${OUTPUT_FILES}
-        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder -p ${CMAKE_BINARY_DIR} -t "${TEMPLATES}" -o ${CMAKE_CURRENT_BINARY_DIR}/generated ${ANNOTATED_SOURCES}
-        COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT_FILES}   # TODO: fake the output - WIP
-        DEPENDS AutoBinder ${SOURCE_FILES}
+    add_custom_command (OUTPUT ${GEN_CPP_FILES}
+        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder -p ${CMAKE_BINARY_DIR} -t ${CMAKE_BINARY_DIR}/bin/tool/clang/Templates -o ${CMAKE_CURRENT_BINARY_DIR}/generated ${SCRIPT_SUBSYSTEMS} ${ANNOTATED_SOURCES}
+        COMMAND ${CMAKE_COMMAND} -E touch ${GEN_CPP_FILES}   # TODO: fake the output - WIP
+        DEPENDS AutoBinder ${H_FILES}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating source files for binding script subsystems")
-    list (APPEND GEN_CPP_FILES ${OUTPUT_FILES})
 endif ()
 if (URHO3D_LUA)
     # The host tool must be built natively

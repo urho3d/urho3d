@@ -22,9 +22,9 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/APITemplates.h"
 #include "../Core/ProcessUtils.h"
 #include "../Core/Spline.h"
-#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {

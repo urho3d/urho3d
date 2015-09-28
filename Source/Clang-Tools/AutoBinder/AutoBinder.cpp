@@ -41,20 +41,21 @@ static cl::extrahelp moreHelp(
     "\tsource tree, use:\n"
     "\n"
     "\t  find path/in/substree -name '*.cpp'|xargs AutoBinder -p build/path \\\n"
-    "\t  -t template-name -o output/path\n"
+    "\t  -t template/path -o output/path -s script0 -s script1\n"
     "\n"
     "\tNote, that path/in/subtree and current directory should follow the\n"
     "\trules described above.\n"
     "\n"
-    "Most probably you want to invoke 'autobinder-*' built-in target instead of invoking this tool\n"
-    "directly. The 'autobinder-*' target invokes this tool in a right context prepared by build system.\n"
+    "Most probably you want to invoke 'autobinder' built-in target instead of invoking this tool\n"
+    "directly. The 'autobinder' target invokes this tool in a right context prepared by build system.\n"
     "\n"
 );
 
 static cl::OptionCategory autobinderCategory("AutoBinder options");
 static std::unique_ptr<opt::OptTable> options(createDriverOptTable());
-static cl::opt<std::string> templateName("t", cl::desc("Template name"), cl::cat(autobinderCategory));
+static cl::opt<std::string> templatePath("t", cl::desc("Template path"), cl::cat(autobinderCategory));
 static cl::opt<std::string> outputPath("o", cl::desc("Output path"), cl::cat(autobinderCategory));
+static cl::list<std::string> scripts("s", cl::desc("Script subsystems"), cl::cat(autobinderCategory));
 
 struct Data
 {

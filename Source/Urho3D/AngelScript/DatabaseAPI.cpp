@@ -24,8 +24,8 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/APITemplates.h"
 #include "../Database/Database.h"
-#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {

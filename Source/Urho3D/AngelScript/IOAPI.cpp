@@ -22,10 +22,10 @@
 
 #include "../Precompiled.h"
 
+#include "../AngelScript/APITemplates.h"
 #include "../IO/Compression.h"
 #include "../IO/FileSystem.h"
 #include "../IO/PackageFile.h"
-#include "../Script/APITemplates.h"
 
 namespace Urho3D
 {

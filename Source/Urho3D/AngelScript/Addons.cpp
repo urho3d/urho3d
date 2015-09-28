@@ -22,7 +22,7 @@
 
 #include "../Precompiled.h"
 
-#include "../Script/Addons.h"
+#include "../AngelScript/Addons.h"
 
 #include <cstring>
 #include <new>
@@ -411,7 +411,7 @@ CScriptArray::CScriptArray(const CScriptArray &other)
     if( objType->GetFlags() & asOBJ_GC )
         objType->GetEngine()->NotifyGarbageCollectorOfNewObject(this, objType);
     */
-    
+
     CreateBuffer(&buffer, 0);
 
     // Copy the content
@@ -449,7 +449,7 @@ CScriptArray::CScriptArray(asUINT length, void *defVal, asIObjectType *ot)
     if( objType->GetFlags() & asOBJ_GC )
         objType->GetEngine()->NotifyGarbageCollectorOfNewObject(this, objType);
     */
-    
+
     // Initialize the elements with the default value
     for( asUINT n = 0; n < GetSize(); n++ )
         SetValue(n, defVal);
@@ -778,7 +778,7 @@ void CScriptArray::Construct(SArrayBuffer *buf, asUINT start, asUINT end)
             *d = (void*)engine->CreateScriptObject(subType);
             if( *d == 0 )
             {
-                // Set the remaining entries to null so the destructor 
+                // Set the remaining entries to null so the destructor
                 // won't attempt to destroy invalid objects later
                 memset(d, 0, sizeof(void*)*(max-d));
 
@@ -1642,8 +1642,8 @@ CScriptDictionary::CScriptDictionary(asIScriptEngine *engine)
     gcFlag = false;
 
     // Keep a reference to the engine for as long as we live
-    // We don't increment the reference counter, because the 
-    // engine will hold a pointer to the object. 
+    // We don't increment the reference counter, because the
+    // engine will hold a pointer to the object.
     this->engine = engine;
 
     // Urho3D: garbage collection disabled
@@ -1678,7 +1678,7 @@ CScriptDictionary::CScriptDictionary(asBYTE *buffer)
 
     while( length-- )
     {
-        // Align the buffer pointer on a 4 byte boundary in 
+        // Align the buffer pointer on a 4 byte boundary in
         // case previous value was smaller than 4 bytes
         if( asPWORD(buffer) & 0x3 )
             buffer += 4 - (asPWORD(buffer) & 0x3);
@@ -1712,7 +1712,7 @@ CScriptDictionary::CScriptDictionary(asBYTE *buffer)
             case asTYPEID_FLOAT: d = *(float*)ref; break;
             case asTYPEID_DOUBLE: d = *(double*)ref; break;
             }
-            
+
             if( typeId >= asTYPEID_FLOAT )
                 Set(name, d);
             else
@@ -1720,8 +1720,8 @@ CScriptDictionary::CScriptDictionary(asBYTE *buffer)
         }
         else
         {
-            if( (typeId & asTYPEID_MASK_OBJECT) && 
-                !(typeId & asTYPEID_OBJHANDLE) && 
+            if( (typeId & asTYPEID_MASK_OBJECT) &&
+                !(typeId & asTYPEID_OBJHANDLE) &&
                 (engine->GetObjectTypeById(typeId)->GetFlags() & asOBJ_REF) )
             {
                 // Dereference the pointer to get the reference to the actual object
@@ -1804,7 +1804,7 @@ void CScriptDictionary::EnumReferences(asIScriptEngine *engine)
 
 void CScriptDictionary::ReleaseAllReferences(asIScriptEngine * /*engine*/)
 {
-    // We're being told to release all references in 
+    // We're being told to release all references in
     // order to break circular references for dead objects
     DeleteAll();
 }
@@ -1836,7 +1836,7 @@ CScriptDictValue *CScriptDictionary::operator[](const String &key)
     it = dict.Find(key);
     if( it == dict.End() )
         it = dict.Insert(MakePair(key, CScriptDictValue()));
-    
+
     return &it->second_;
 }
 
@@ -1869,16 +1869,16 @@ void CScriptDictionary::Set(const String &key, void *value, int typeId)
 // This overloaded method is implemented so that all integer and
 // unsigned integers types will be stored in the dictionary as int64
 // through implicit conversions. This simplifies the management of the
-// numeric types when the script retrieves the stored value using a 
+// numeric types when the script retrieves the stored value using a
 // different type.
 void CScriptDictionary::Set(const String &key, const asINT64 &value)
 {
     Set(key, const_cast<asINT64*>(&value), asTYPEID_INT64);
 }
 
-// This overloaded method is implemented so that all floating point types 
-// will be stored in the dictionary as double through implicit conversions. 
-// This simplifies the management of the numeric types when the script 
+// This overloaded method is implemented so that all floating point types
+// will be stored in the dictionary as double through implicit conversions.
+// This simplifies the management of the numeric types when the script
 // retrieves the stored value using a different type.
 void CScriptDictionary::Set(const String &key, const double &value)
 {
@@ -1894,7 +1894,7 @@ bool CScriptDictionary::Get(const String &key, void *value, int typeId) const
         return it->second_.Get(engine, value, typeId);
 
     // AngelScript has already initialized the value with a default value,
-    // so we don't have to do anything if we don't find the element, or if 
+    // so we don't have to do anything if we don't find the element, or if
     // the element is incompatible with the requested type.
 
     return false;
@@ -1966,10 +1966,10 @@ void CScriptDictionary::DeleteAll()
 
 CScriptArray* CScriptDictionary::GetKeys() const
 {
-    // TODO: optimize: The string array type should only be determined once. 
+    // TODO: optimize: The string array type should only be determined once.
     //                 It should be recomputed when registering the dictionary class.
     //                 Only problem is if multiple engines are used, as they may not
-    //                 share the same type id. Alternatively it can be stored in the 
+    //                 share the same type id. Alternatively it can be stored in the
     //                 user data for the dictionary type.
     asIObjectType *ot = engine->GetObjectTypeByDecl("Array<String>");
 
@@ -2058,16 +2058,16 @@ void CScriptDictValue::Set(asIScriptEngine *engine, void *value, int typeId)
 // This overloaded method is implemented so that all integer and
 // unsigned integers types will be stored in the dictionary as int64
 // through implicit conversions. This simplifies the management of the
-// numeric types when the script retrieves the stored value using a 
+// numeric types when the script retrieves the stored value using a
 // different type.
 void CScriptDictValue::Set(asIScriptEngine *engine, const asINT64 &value)
 {
     Set(engine, const_cast<asINT64*>(&value), asTYPEID_INT64);
 }
 
-// This overloaded method is implemented so that all floating point types 
-// will be stored in the dictionary as double through implicit conversions. 
-// This simplifies the management of the numeric types when the script 
+// This overloaded method is implemented so that all floating point types
+// will be stored in the dictionary as double through implicit conversions.
+// This simplifies the management of the numeric types when the script
 // retrieves the stored value using a different type.
 void CScriptDictValue::Set(asIScriptEngine *engine, const double &value)
 {
@@ -2081,7 +2081,7 @@ bool CScriptDictValue::Get(asIScriptEngine *engine, void *value, int typeId) con
     {
         // A handle can be retrieved if the stored type is a handle of same or compatible type
         // or if the stored type is an object that implements the interface that the handle refer to.
-        if( (m_typeId & asTYPEID_MASK_OBJECT) && 
+        if( (m_typeId & asTYPEID_MASK_OBJECT) &&
             engine->IsHandleCompatibleWithObject(m_valueObj, m_typeId, typeId) )
         {
             engine->AddRefScriptObject(m_valueObj, engine->GetObjectTypeById(m_typeId));
@@ -2478,7 +2478,7 @@ void RegisterString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("String", "bool Contains(const String&in, bool caseSensitive = true) const", asMETHODPR(String, Contains, (const String&, bool) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "bool Contains(uint8, bool caseSensitive = true) const", asMETHODPR(String, Contains, (char, bool) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "void Clear()", asMETHOD(String, Clear), asCALL_THISCALL);
-    
+
     // Register automatic conversion functions for convenience
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(int)", asFUNCTION(ConstructStringInt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(uint)", asFUNCTION(ConstructStringUInt), asCALL_CDECL_OBJLAST);
