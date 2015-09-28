@@ -1146,6 +1146,14 @@ String& String::AppendWithFormatArgs(const char* formatString, va_list args)
                 break;
             }
 
+        // Unsigned long
+        case 'l':
+            {
+                unsigned long arg = va_arg(args, unsigned long);
+                Append(String(arg));
+                break;
+            }
+
         // Real
         case 'f':
             {

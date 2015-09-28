@@ -12,6 +12,7 @@ class Octree : public Component
     tolua_outside const PODVector<OctreeQueryResult>& OctreeGetDrawablesBoundingBox @ GetDrawables(const BoundingBox& box, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const;
     tolua_outside const PODVector<OctreeQueryResult>& OctreeGetDrawablesFrustum @ GetDrawables(const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const;
     tolua_outside const PODVector<OctreeQueryResult>& OctreeGetDrawablesSphere @ GetDrawables(const Sphere& sphere, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const;
+    tolua_outside const PODVector<OctreeQueryResult>& OctreeGetAllDrawables @ GetAllDrawables(unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const;
 
     // void Raycast(RayOctreeQuery& query) const;
     tolua_outside const PODVector<RayQueryResult>& OctreeRaycast @ Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags, unsigned viewMask = DEFAULT_VIEWMASK) const;
@@ -79,6 +80,22 @@ static const PODVector<OctreeQueryResult>& OctreeGetDrawablesSphere(const Octree
 {
     PODVector<Drawable*> drawableResult;
     SphereOctreeQuery query(drawableResult, sphere, drawableFlags, viewMask);
+    octree->GetDrawables(query);
+
+    static PODVector<OctreeQueryResult> result;
+    result.Resize(drawableResult.Size());
+    for (unsigned i = 0; i < drawableResult.Size(); ++i)
+    {
+        result[i].drawable_ = drawableResult[i];
+        result[i].node_ = drawableResult[i]->GetNode();
+    }
+    return result;
+}
+
+static const PODVector<OctreeQueryResult>& OctreeGetAllDrawables(const Octree* octree, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK)
+{
+    PODVector<Drawable*> drawableResult;
+    AllContentOctreeQuery query(drawableResult, drawableFlags, viewMask);
     octree->GetDrawables(query);
 
     static PODVector<OctreeQueryResult> result;
