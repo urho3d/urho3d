@@ -23,6 +23,10 @@
 # Set project name
 project (Urho3D-Docs)
 
+if (URHO3D_DOCS_QUIET)
+    set (URHO3D_DOCS 1)
+endif ()
+
 # Macro for enabling IDE-specific integration with Urho3D documentation (See comments in Doxyfile for more detail instructions)
 macro (enable_help IDE)
     if (${IDE} OR CMAKE_EXTRA_GENERATOR MATCHES ${IDE})
@@ -36,14 +40,18 @@ endmacro ()
 # As a workaround, we unset CMAKE_FIND_ROOT_PATH (even when we are cross-compiling) but in this scope ONLY in order to always do a non-rooted search for Doxygen package
 unset (CMAKE_FIND_ROOT_PATH)
 # Find Doxygen and DOT packages
-if (URHO3D_DOCS OR URHO3D_DOCS_QUIET)
+if (URHO3D_DOCS)
     set (DOXYGEN_OPT REQUIRED)
 else ()
     set (DOXYGEN_OPT QUIET)
 endif ()
 find_package (Doxygen ${DOXYGEN_OPT})
+if (URHO3D_DOCS)
+    # It is not a fatal error when DOT is not found, instead just switching off the Doxygen's HAVE_DOT option
+    find_package_handle_standard_args (Dot REQUIRED_VARS DOXYGEN_DOT_EXECUTABLE)
+endif ()
 
-if (DOXYGEN_FOUND)      # When DOT is not found, the documentation build should still proceed without producing any graphs
+if (DOXYGEN_FOUND)      # When DOT is not found, the documentation build should still proceed without using DOT
     # Generate platform specific Doxyfile automatically
     if (NOT URHO3D_OPENGL EQUAL DOXYFILE_URHO3D_OPENGL OR ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in IS_NEWER_THAN ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
         set (DOXYFILE_URHO3D_OPENGL ${URHO3D_OPENGL} CACHE INTERNAL "URHO3D_OPENGL build option when Doxyfile was last generated")
@@ -61,9 +69,13 @@ if (DOXYGEN_FOUND)      # When DOT is not found, the documentation build should 
         foreach (IDE XCODE MSVC Eclipse CodeBlocks)
             enable_help (${IDE})
         endforeach ()
-        # There could be a bug in CMake findHTMLHelp.cmake module which would prevent it to find the hhc.exe in "Program Files (x86)" in a 64-bit Windows
-        # To woraround this problem, you may have to append the paths being searched in your local copy of findHTMLHelp.cmake module to include the above path
-        find_package (HTMLHelp)
+        if (CMAKE_HOST_WIN32)
+            find_package (HTMLHelp)
+            find_package_handle_standard_args (HTMLHelp REQUIRED_VARS HTML_HELP_COMPILER HTML_HELP_INCLUDE_PATH HTML_HELP_LIBRARY)
+            if (NOT HTMLHelp_FOUND)     # Only consider it as found when all the required variables are found
+                unset (HTML_HELP_COMPILER)
+            endif ()
+        endif ()
         configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
     endif ()
 
@@ -99,7 +111,6 @@ if (DOXYGEN_FOUND)      # When DOT is not found, the documentation build should 
 
     # If URHO3D_DOCS build option is set then add the custom 'doc' target into the default 'all' target, i.e. a normal build would not only build the software but also the documentation
     if (URHO3D_DOCS_QUIET)
-        set (URHO3D_DOCS 1)
         set (REDIRECT_STDOUT 1>${NULL_DEVICE})     # In quiet mode, redirect standard output stream of Doxygen to a null device
     endif ()
     if (URHO3D_DOCS)
