@@ -37,6 +37,7 @@ Array<String> uiAllFilters = {"*.*"};
 Array<String> uiScriptFilters = {"*.as", "*.*"};
 Array<String> uiParticleFilters = {"*.xml"};
 Array<String> uiRenderPathFilters = {"*.xml"};
+Array<String> uiExportPathFilters = {"*.obj"};
 uint uiSceneFilter = 0;
 uint uiElementFilter = 0;
 uint uiNodeFilter = 0;
@@ -44,10 +45,12 @@ uint uiImportFilter = 0;
 uint uiScriptFilter = 0;
 uint uiParticleFilter = 0;
 uint uiRenderPathFilter = 0;
+uint uiExportFilter = 0;
 String uiScenePath = fileSystem.programDir + "Data/Scenes";
 String uiElementPath = fileSystem.programDir + "Data/UI";
 String uiNodePath = fileSystem.programDir + "Data/Objects";
 String uiImportPath;
+String uiExportPath;
 String uiScriptPath = fileSystem.programDir + "Data/Scripts";
 String uiParticlePath = fileSystem.programDir + "Data/Particles";
 String uiRenderPathPath = fileSystem.programDir + "CoreData/RenderPaths";
@@ -312,6 +315,9 @@ void CreateMenuBar()
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Import model...", @PickFile));
         popup.AddChild(CreateMenuItem("Import scene...", @PickFile));
+        CreateChildDivider(popup);
+        popup.AddChild(CreateMenuItem("Export scene to OBJ...", @PickFile));
+        popup.AddChild(CreateMenuItem("Export selected to OBJ...", @PickFile));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Run script...", @PickFile));
         popup.AddChild(CreateMenuItem("Set resource path...", @PickFile));
@@ -612,6 +618,16 @@ bool PickFile()
     {
         CreateFileSelector("Import scene", "Import", "Cancel", uiImportPath, uiAllFilters, uiImportFilter);
         SubscribeToEvent(uiFileSelector, "FileSelected", "HandleImportScene");
+    }
+    else if (action == "Export scene to OBJ...")
+    {
+        CreateFileSelector("Export scene to OBJ", "Save", "Cancel", uiExportPath, uiExportPathFilters, uiExportFilter);
+        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleExportSceneOBJ");
+    }
+    else if (action == "Export selected to OBJ...")
+    {
+        CreateFileSelector("Export selected to OBJ", "Save", "Cancel", uiExportPath, uiExportPathFilters, uiExportFilter);
+        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleExportSelectedOBJ");
     }
     else if (action == "Run script...")
     {
@@ -1117,6 +1133,18 @@ void HandleImportScene(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiImportFilter, uiImportPath);
     ImportScene(ExtractFileName(eventData));
+}
+
+void HandleExportSceneOBJ(StringHash eventType, VariantMap& eventData)
+{
+    CloseFileSelector(uiExportFilter, uiExportPath);
+    ExportSceneToOBJ(ExtractFileName(eventData));
+}
+
+void HandleExportSelectedOBJ(StringHash eventType, VariantMap& eventData)
+{
+    CloseFileSelector(uiExportFilter, uiExportPath);
+    ExportSelectedToOBJ(ExtractFileName(eventData));
 }
 
 

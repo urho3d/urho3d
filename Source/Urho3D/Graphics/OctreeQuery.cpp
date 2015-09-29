@@ -117,4 +117,21 @@ void FrustumOctreeQuery::TestDrawables(Drawable** start, Drawable** end, bool in
     }
 }
 
+
+Intersection AllContentOctreeQuery::TestOctant(const BoundingBox& box, bool inside)
+{
+    return INSIDE;
+}
+
+void AllContentOctreeQuery::TestDrawables(Drawable** start, Drawable** end, bool inside)
+{
+    while (start != end)
+    {
+        Drawable* drawable = *start++;
+
+        if ((drawable->GetDrawableFlags() & drawableFlags_) && (drawable->GetViewMask() & viewMask_))
+            result_.Push(drawable);
+    }
+}
+
 }
