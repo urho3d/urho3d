@@ -6886,6 +6886,7 @@ void AddManualDrawable(Drawable);
 void ApplyAttributes();
 void DrawDebugGeometry(DebugRenderer, bool);
 void DrawDebugGeometry(bool) const;
+Array<Drawable> GetAllDrawables(uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
@@ -13343,6 +13344,7 @@ void UnsubscribeFromAllEventsExcept(Array<String>);
 void UnsubscribeFromEvent(Object, const String&);
 void UnsubscribeFromEvent(const String&);
 void UnsubscribeFromEvents(Object);
+bool WriteDrawablesToOBJ(Array<Drawable>, File, bool = false);
 
 // Global properties
 DBAPI DBAPI;
