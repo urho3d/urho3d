@@ -23,7 +23,9 @@ void ExportSceneToOBJ(String fileName)
         MessageBox("No drawables to export in the scene");
         return;
     }
-        
+
+    RemoveDebugDrawables(drawables);
+
     File@ file = File(fileName, FILE_WRITE);
     if (WriteDrawablesToOBJ(drawables, file))
     {
@@ -70,7 +72,9 @@ void ExportSelectedToOBJ(String fileName)
                 drawables.Push(drawable);
         }
     }
-    
+
+    RemoveDebugDrawables(drawables);
+
     if (drawables.length > 0)
     {
         File@ file = File(fileName, FILE_WRITE);
@@ -90,5 +94,17 @@ void ExportSelectedToOBJ(String fileName)
     else
     {
         MessageBox("No selected drawables to export to OBJ");
+    }
+}
+
+void RemoveDebugDrawables(Array<Drawable@>@ drawables)
+{
+    for (uint i = 0; i < drawables.length;)
+    {
+        if (drawables[i].node !is null && (drawables[i].node.name == "EditorGizmo" || drawables[i].node.name == "DebugIconsContainer"
+            || drawables[i].node.name == "EditorGrid"))
+            drawables.Erase(i);
+        else
+            ++i;
     }
 }
