@@ -551,13 +551,13 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                         {
                             output.AppendWithFormat("%l/%l/%l %l/%l/%l %l/%l/%l",
                                 currentPositionIndex + longIndices[0],
-                                currentPositionIndex + longIndices[0],
-                                currentPositionIndex + longIndices[0],
+                                currentUVIndex + longIndices[0],
+                                currentNormalIndex + longIndices[0],
+                                currentPositionIndex + longIndices[1],
                                 currentUVIndex + longIndices[1],
-                                currentUVIndex + longIndices[1],
-                                currentUVIndex + longIndices[1],
-                                currentNormalIndex + longIndices[2],
-                                currentNormalIndex + longIndices[2],
+                                currentNormalIndex + longIndices[1],
+                                currentPositionIndex + longIndices[2],
+                                currentUVIndex + longIndices[2],
                                 currentNormalIndex + longIndices[2]);
                         }
                         else if (hasNormals || hasUV)
