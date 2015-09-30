@@ -41,7 +41,7 @@ matrix:
     - &Linux-64bit
       addons: {apt: {sources: [*default_sources, kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, &linux_packages [*default_packages, libasound2-dev, rpm]]}}
       compiler: gcc-64bit-static
-      env: LINUX=1 URHO3D_LIB_TYPE=STATIC COVERITY_SCAN_THRESHOLD=100 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_UPDATE_SOURCE_TREE=1 COVERITY_SCAN_THRESHOLD=100 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
     - &Linux-64bit-shared
       addons: {apt: {sources: *default_sources, packages: *linux_packages}}
       compiler: gcc-64bit-shared
