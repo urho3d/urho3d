@@ -84,6 +84,7 @@ void CreateGizmo()
     gizmo.enabled = false;
     gizmo.viewMask = 0x80000000; // Editor raycasts use viewmask 0x7fffffff
     gizmo.occludee = false;
+    gizmoNode.name = "EditorGizmo";
 
     gizmoAxisX.lastSelected = false;
     gizmoAxisY.lastSelected = false;

@@ -1016,6 +1016,7 @@ void CreateGrid()
         gridNode.Remove();
 
     gridNode = Node();
+    gridNode.name = "EditorGrid";
     grid = gridNode.CreateComponent("CustomGeometry");
     grid.numGeometries = 1;
     grid.material = cache.GetResource("Material", "Materials/VColUnlit.xml");

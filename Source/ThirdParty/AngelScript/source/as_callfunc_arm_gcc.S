@@ -1,6 +1,6 @@
 /*
   AngelCode Scripting Library
-  Copyright (c) 2003-2013 Andreas Jonsson
+  Copyright (c) 2003-2015 Andreas Jonsson
 
   This software is provided 'as-is', without any express or implied
   warranty. In no event will the authors be held liable for any
@@ -39,11 +39,13 @@
    The assembler routines for Linux were written by Carlos Luna in December 2012
 */
 
+#if !defined(AS_MAX_PORTABILITY)
+
 #if defined(__arm__) || defined(__ARM__) || defined(I3D_ARCH_ARM)
 
 #if !defined(__linux__) || defined(__ANDROID__) || defined(ANDROID) || defined(__SOFTFP__)
 
-/* iOS, Android, and Marmalade goes here */
+/* iOS, Android, Marmalade, and Linux with soft-float ABI goes here */
 
 .global armFunc
 .global armFuncR0
@@ -85,7 +87,12 @@ stackargsloop:
     bne     stackargsloop
     mov     sp, r12
 nomoreargs:
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+    mov    lr, pc   /* older ARM didn't support blx */
+    mov    pc, r4
+#else
     blx     r4
+#endif
     add     sp, sp, r8
     ldmia   sp!, {r4-r8, pc}
 
@@ -133,7 +140,12 @@ stackargslooparmFuncObjLast:
     bne     stackargslooparmFuncObjLast
     mov     sp, r12
 nomoreargsarmFuncObjLast:
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+    mov    lr, pc   /* older ARM didn't support blx */
+    mov    pc, r4
+#else
     blx     r4
+#endif
     add     sp, sp, r8
     ldmia   sp!, {r4-r8, pc}
 
@@ -180,7 +192,12 @@ stackargslooparmFuncR0ObjLast:
     bne     stackargslooparmFuncR0ObjLast
     mov     sp, r12
 nomoreargsarmFuncR0ObjLast:
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+    mov    lr, pc   /* older ARM didn't support blx */
+    mov    pc, r4
+#else
     blx     r4
+#endif
     add     sp, sp, r8
     ldmia   sp!, {r4-r8, pc}
 
@@ -218,7 +235,12 @@ stackargslooparmFuncR0:
     bne     stackargslooparmFuncR0
     mov     sp, r12
 nomoreargsarmFuncR0:
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+    mov    lr, pc   /* older ARM didn't support blx */
+    mov    pc, r4
+#else
     blx     r4
+#endif
     add     sp, sp, r8
     ldmia   sp!, {r4-r8, pc}
 
@@ -255,14 +277,19 @@ stackargslooparmFuncR0R1:
     bne     stackargslooparmFuncR0R1
     mov     sp, r12
 nomoreargsarmFuncR0R1:
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+    mov    lr, pc   /* older ARM didn't support blx */
+    mov    pc, r4
+#else
     blx     r4
+#endif
     add     sp, sp, r8
     ldmia   sp!, {r4-r8, pc}
 
 /* --------------------------------------------------------------------------------------------*/
 #elif defined(__linux__) && !defined(__SOFTFP__)
 
-/* The Linux code goes here */
+/* The Linux with hard-float ABI code goes here */
 
 
 /* These codes are suitable for armeabi + vfp  / armeabihf */
@@ -340,7 +367,7 @@ stackargsloop:
     mov     sp, r12
 
 nomoreargs:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
     mov    lr, pc   /* older ARM didn't support blx */
     mov    pc, r4
 #else
@@ -427,8 +454,8 @@ stackargslooparmFuncObjLast:
     mov     sp, r12
 
 nomoreargsarmFuncObjLast:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
-    mov    lr, pc
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+    mov    lr, pc   /* older ARM didn't support blx */
     mov    pc, r4
 #else
     blx     r4
@@ -488,6 +515,7 @@ armFuncR0ObjLast:
     strge   r7, [r6, #8]
 
     str     r5, [r6, #12]           /* Put objlast in r6 + 12 */
+    mov     r5, #0
 
     movge   r5, #4                  /* Set r5 with an offset of #4 if there´s one last arg that couldn´t be placed in r registers */
     add     r5, r5, #4              /* Set r5 with an offset of + #4, so objlast can be loaded into the stack */
@@ -520,8 +548,8 @@ stackargslooparmFuncR0ObjLast:
     mov     sp, r12
 
 nomoreargsarmFuncR0ObjLast:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
-    mov    lr, pc
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+    mov    lr, pc   /* older ARM didn't support blx */
     mov    pc, r4
 #else
     blx     r4
@@ -596,8 +624,8 @@ stackargslooparmFuncR0:
     mov     sp, r12
 
 nomoreargsarmFuncR0:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
-    mov    lr, pc
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+    mov    lr, pc   /* older ARM didn't support blx */
     mov    pc, r4
 #else
     blx     r4
@@ -676,8 +704,8 @@ stackargslooparmFuncR0R1:
     mov     sp, r12
 
 nomoreargsarmFuncR0R1:
-#if defined (___ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
-    mov    lr, pc
+#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
+    mov    lr, pc   /* older ARM didn't support blx */
     mov    pc, r4
 #else
     blx     r4
@@ -695,4 +723,7 @@ nomoreargsarmFuncR0R1:
 #endif
 
 #endif /* arm */
+
+#endif /* !AS_MAX_PORTABILITY */
+
 

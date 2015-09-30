@@ -1837,7 +1837,7 @@ static CScriptArray* OctreeGetDrawablesFrustum(const Frustum& frustum, unsigned 
     PODVector<Drawable*> result;
     FrustumOctreeQuery query(result, frustum, drawableFlags, viewMask);
     ptr->GetDrawables(query);
-    return VectorToHandleArray<Drawable>(result, "Array<Node@>");
+    return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
 }
 
 static CScriptArray* OctreeGetDrawablesSphere(const Sphere& sphere, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
@@ -1845,7 +1845,15 @@ static CScriptArray* OctreeGetDrawablesSphere(const Sphere& sphere, unsigned cha
     PODVector<Drawable*> result;
     SphereOctreeQuery query(result, sphere, drawableFlags, viewMask);
     ptr->GetDrawables(query);
-    return VectorToHandleArray<Drawable>(result, "Array<Node@>");
+    return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
+}
+
+static CScriptArray* OctreeGetAllDrawables(unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
+{
+    PODVector<Drawable*> result;
+    AllContentOctreeQuery query(result, drawableFlags, viewMask);
+    ptr->GetDrawables(query);
+    return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
 }
 
 static Octree* SceneGetOctree(Scene* ptr)
@@ -1888,10 +1896,22 @@ static void RegisterOctree(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Octree", "Array<Drawable@>@ GetDrawables(const BoundingBox&in, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeGetDrawablesBox), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Octree", "Array<Drawable@>@ GetDrawables(const Frustum&in, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeGetDrawablesFrustum), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Octree", "Array<Drawable@>@ GetDrawables(const Sphere&in, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeGetDrawablesSphere), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "Array<Drawable@>@ GetAllDrawables(uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeGetAllDrawables), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Octree", "const BoundingBox& get_worldBoundingBox() const", asMETHODPR(Octree, GetWorldBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "uint get_numLevels() const", asMETHOD(Octree, GetNumLevels), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Octree@+ get_octree() const", asFUNCTION(SceneGetOctree), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("Octree@+ get_octree()", asFUNCTION(GetOctree), asCALL_CDECL);
+}
+
+bool ObjWriteDrawablesToOBJ(CScriptArray* drawablesArray, File* file, bool writeLightmapUV)
+{
+    PODVector<Drawable*> drawables = ArrayToPODVector<Drawable*>(drawablesArray);
+    return WriteDrawablesToOBJ(drawables, file, writeLightmapUV);
+}
+
+static void RegisterOBJExport(asIScriptEngine* engine)
+{
+    engine->RegisterGlobalFunction("bool WriteDrawablesToOBJ(Array<Drawable@>@, File@+, bool = false)", asFUNCTION(ObjWriteDrawablesToOBJ), asCALL_CDECL);
 }
 
 void RegisterGraphicsAPI(asIScriptEngine* engine)
@@ -1922,6 +1942,7 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
     RegisterOctree(engine);
     RegisterGraphics(engine);
     RegisterRenderer(engine);
+    RegisterOBJExport(engine);
 }
 
 }

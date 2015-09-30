@@ -42,6 +42,7 @@ static const int MAX_VERTEX_LIGHTS = 4;
 static const float ANIMATION_LOD_BASESCALE = 2500.0f;
 
 class Camera;
+class File;
 class Geometry;
 class Light;
 class Material;
@@ -382,5 +383,7 @@ inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)
 {
     return lhs->GetSortValue() < rhs->GetSortValue();
 }
+
+URHO3D_API bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool writeLightmapUV = false);
 
 }
