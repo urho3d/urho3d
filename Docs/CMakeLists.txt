@@ -87,8 +87,10 @@ if (DOXYGEN_FOUND)      # When DOT is not found, the documentation build should 
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
             COMMENT "Dumping AngelScript API to ScriptAPI.dox")
     else ()
-        execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/ScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/ScriptAPI.dox)
-        execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/AngelScriptAPI.h ${CMAKE_CURRENT_BINARY_DIR}/generated/AngelScriptAPI.h)
+        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/ScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/AngelScriptAPI.h
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/ScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/ScriptAPI.dox
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/AngelScriptAPI.h ${CMAKE_CURRENT_BINARY_DIR}/generated/AngelScriptAPI.h
+            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ScriptAPI.dox ${CMAKE_CURRENT_SOURCE_DIR}/AngelScriptAPI.h)
     endif ()
     if (TARGET tolua++)
         file (GLOB PKGS RELATIVE ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs/*.pkg)
@@ -99,6 +101,7 @@ if (DOXYGEN_FOUND)      # When DOT is not found, the documentation build should 
         endforeach ()
         file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt.new ${PKGLIST})
         execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt.new ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt)
+        execute_process (COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt.new)
         file (GLOB_RECURSE API_PKG_FILES ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs/*.pkg)
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox
             COMMAND ${CMAKE_BINARY_DIR}/bin/tool/tolua++ -L ToDoxHook.lua -P -o ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt
@@ -106,7 +109,9 @@ if (DOXYGEN_FOUND)      # When DOT is not found, the documentation build should 
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs
             COMMENT "Dumping LuaScript API to LuaScriptAPI.dox")
     else ()
-        execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox)
+        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox
+            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox)
     endif ()
 
     # In quiet mode, redirect standard output stream of Doxygen to a null device
@@ -124,9 +129,10 @@ if (DOXYGEN_FOUND)      # When DOT is not found, the documentation build should 
             list (APPEND UPDATE_COMMANDS COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/generated/${FILE} ${CMAKE_CURRENT_SOURCE_DIR}/${FILE})
         endforeach ()
     endif ()
+    file (GLOB DOX_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.dox)
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/html/index.html
         COMMAND ${DOXYGEN_EXECUTABLE} generated/Doxyfile ${REDIRECT_STDOUT}
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/ScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/Doxyfile ${DOX_FILES} ${CMAKE_CURRENT_BINARY_DIR}/generated/ScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox
         COMMENT "Generating documentation with Doxygen")
     add_custom_target (doc ${ALL}
         ${UPDATE_COMMANDS}

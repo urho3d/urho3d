@@ -122,6 +122,9 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     endif ()
 else ()
     set (URHO3D_HOME "" CACHE PATH "Path to Urho3D build tree or SDK installation location (external project only)")
+    if (URHO3D_PCH OR URHO3D_UPDATE_SOURCE_TREE)
+        # Just reference it to suppress "unused variable" CMake warning on external projects using this CMake module
+    endif ()
 endif ()
 option (URHO3D_PACKAGING "Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0" ${EMSCRIPTEN})
 option (URHO3D_PROFILING "Enable profiling support" TRUE)
@@ -965,6 +968,10 @@ macro (setup_executable)
         # Make a copy of the D3D DLL to the runtime directory in the build tree
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DIRECT3D_DLL} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     endif ()
+    if (NOT ARG_NODEPS AND URHO3D_LIB_TYPE STREQUAL SHARED AND NOT DEST_RUNTIME_DIR STREQUAL bin)
+        # Make a copy of the Urho3D DLL to the runtime directory in the build tree
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Urho3D> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    endif ()
     # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
     if (DEST_RUNTIME_DIR)
         if (EMSCRIPTEN)
@@ -982,6 +989,10 @@ macro (setup_executable)
             install (FILES ${FILES} DESTINATION ${DEST_BUNDLE_DIR} OPTIONAL)    # We get html.map or html.mem depend on the build configuration
         else ()
             install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_BUNDLE_DIR})
+            if (NOT ARG_NODEPS AND URHO3D_LIB_TYPE STREQUAL SHARED AND NOT URHO3D_DLL_INSTALLED AND NOT DEST_RUNTIME_DIR STREQUAL bin)
+                install (FILES $<TARGET_FILE:Urho3D> DESTINATION ${DEST_RUNTIME_DIR})
+                set (URHO3D_DLL_INSTALLED TRUE)
+            endif ()
             if (DIRECT3D_DLL AND NOT DIRECT3D_DLL_INSTALLED)
                 # Make a copy of the D3D DLL to the runtime directory in the installed location
                 install (FILES ${DIRECT3D_DLL} DESTINATION ${DEST_RUNTIME_DIR})
