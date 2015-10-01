@@ -3050,7 +3050,7 @@ uint       Bytecode size
 byte[]     Bytecode
 \endverbatim
 
-\section FileFormats_Shader Direct3D11 binary shader format (.vs4, .ps4)
+\section FileFormats_Shader4 Direct3D11 binary shader format (.vs4, .ps4)
 
 \verbatim
 byte[4]    Identifier "USHD"
