@@ -71,10 +71,7 @@ if (DOXYGEN_FOUND)      # When DOT is not found, the documentation build should 
         endforeach ()
         if (MSVC_HELP)
             find_package (HTMLHelp)
-            find_package_handle_standard_args (HTMLHelp REQUIRED_VARS HTML_HELP_COMPILER HTML_HELP_INCLUDE_PATH HTML_HELP_LIBRARY)
-            if (NOT HTMLHelp_FOUND)     # Only consider it as found when all the required variables are found
-                unset (HTML_HELP_COMPILER)
-            endif ()
+            find_package_handle_standard_args (HTMLHelp REQUIRED_VARS HTML_HELP_COMPILER)
         endif ()
         configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/generated/Doxyfile)
     endif ()
