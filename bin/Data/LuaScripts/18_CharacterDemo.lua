@@ -240,6 +240,8 @@ function HandleUpdate(eventType, eventData)
         end
         -- Limit pitch
         character.controls.pitch = Clamp(character.controls.pitch, -80.0, 80.0)
+        -- Set rotation already here so that it's updated every rendering frame instead of every physics frame
+        characterNode.rotation = Quaternion(character.controls.yaw, Vector3(0.0, 1.0, 0.0))
 
         -- Switch between 1st and 3rd person
         if input:GetKeyPress(KEY_F) then
@@ -265,9 +267,6 @@ function HandleUpdate(eventType, eventData)
             end
         end
     end
-
-    -- Set rotation already here so that it's updated every rendering frame instead of every physics frame
-    characterNode.rotation = Quaternion(character.controls.yaw, Vector3(0.0, 1.0, 0.0))
 end
 
 function HandlePostUpdate(eventType, eventData)

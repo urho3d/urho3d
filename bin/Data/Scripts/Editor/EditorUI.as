@@ -21,6 +21,7 @@ const StringHash CURSOR_TYPE("Cursor");
 
 const String AUTO_STYLE("");    // Empty string means auto style, i.e. applying style according to UI-element's type automatically
 const String TEMP_SCENE_NAME("_tempscene_.xml");
+const String TEMP_BINARY_SCENE_NAME("_tempscene_.bin");
 const StringHash CALLBACK_VAR("Callback");
 const StringHash INDENT_MODIFIED_BY_ICON_VAR("IconIndented");
 
@@ -1053,7 +1054,7 @@ void CreateContextMenu()
 void UpdateWindowTitle()
 {
     String sceneName = GetFileNameAndExtension(editorScene.fileName);
-    if (sceneName.empty || sceneName == TEMP_SCENE_NAME)
+    if (sceneName.empty || sceneName == TEMP_SCENE_NAME || sceneName == TEMP_BINARY_SCENE_NAME)
         sceneName = "Untitled";
     if (sceneModified)
         sceneName += "*";
