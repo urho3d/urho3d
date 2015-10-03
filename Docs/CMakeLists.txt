@@ -44,10 +44,11 @@ if (URHO3D_DOCS)
     set (REQUIRED REQUIRED)
 endif ()
 find_package (Doxygen ${REQUIRED})
-# It is not a error when DOT is not found, instead just switching off the Doxygen's HAVE_DOT option
-find_package_handle_standard_args (Dot REQUIRED_VARS DOXYGEN_DOT_EXECUTABLE)
 
-if (DOXYGEN_FOUND)      # When DOT is not found, the documentation build should still proceed without using DOT
+if (DOXYGEN_FOUND)
+    # It is not an error when DOT is not found, instead just switching off the Doxygen's HAVE_DOT option
+    find_package_handle_standard_args (Dot REQUIRED_VARS DOXYGEN_DOT_EXECUTABLE)
+
     # Generate platform specific Doxyfile automatically
     if (NOT URHO3D_OPENGL EQUAL DOXYFILE_URHO3D_OPENGL OR ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in IS_NEWER_THAN ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
         set (DOXYFILE_URHO3D_OPENGL ${URHO3D_OPENGL} CACHE INTERNAL "URHO3D_OPENGL build option when Doxyfile was last generated")
@@ -67,7 +68,7 @@ if (DOXYGEN_FOUND)      # When DOT is not found, the documentation build should 
         endforeach ()
         if (MSVC_HELP)
             find_package (HTMLHelp)
-            # It is not a error when HTML help compiler is not found, instead just switching off the Doxygen's HHC option
+            # It is not an error when HTML help compiler is not found, instead just switching off the Doxygen's HHC option
             find_package_handle_standard_args (HTMLHelp REQUIRED_VARS HTML_HELP_COMPILER)
         endif ()
         configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/generated/Doxyfile)
