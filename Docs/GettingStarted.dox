@@ -279,9 +279,9 @@ Urho3D should be built as a shared library if your application consists of multi
 
 \section Building_Docs Documentation build
 
-If "URHO3D_DOCS" build option is set then a normal build would not only build Urho3D binaries but also Urho3D documentation automatically. If the option is not set then the documentation can still be built by manually invoking 'make doc' command or using its equivalent built-in target in IDE.
+If "URHO3D_DOCS" or "URHO3D_DOCS_QUIET" build option is set then a normal build would not only build Urho3D binaries but also Urho3D documentation automatically. If the option is not set then the documentation can still be built by manually invoking 'make doc' command or using its equivalent built-in target in IDE.
 
-The prerequisites are Doxygen and Graphviz. Tools to dump the \ref ScriptAPI "AngelScript API" for the default \ref Script "scripting" subsystem and the \ref LuaScriptAPI "LuaScript API" (when the LuaScript subsystem is also enabled) are being built at the same time when all the native tools are built.
+The additional prerequisite for documentation build is Doxygen. Also Graphviz (optional) if you wish to generate graphical diagrams in the documentation. MSVC users on Windows host system may install HTML help compiler tool (optional) in order to get the compressed help file (*.chm). When optional tool is not available in the host system, the corresponding build process is skipped accordingly. The internal host tools to dump the \ref ScriptAPI "AngelScript API" for the default \ref Script "scripting" subsystem and the \ref LuaScriptAPI "LuaScript API" (when the LuaScript subsystem is also enabled) are being built at the same time when all the native tools are built. When the build tree is being configured not to build any host tools then the 'doc' target will simply instruct Doxygen to process the existing API dump files that are already pre-generated in the repository.
 
 \section Building_Clang_tools Clang-tools build (EXPERIMENTAL)
 
