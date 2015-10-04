@@ -12104,6 +12104,8 @@ void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetFullImageRect();
+void SetHoverOffset(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
@@ -12128,6 +12130,8 @@ Array<Variant> attributes;
 bool autoUpdate;
 /* readonly */
 StringHash baseType;
+BlendMode blendMode;
+IntRect border;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -12175,8 +12179,11 @@ FocusMode focusMode;
 uint format;
 int height;
 HorizontalAlignment horizontalAlignment;
+IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
+IntRect imageRect;
 int indent;
 int indentSpacing;
 /* readonly */
@@ -12227,6 +12234,8 @@ IntVector2 size;
 bool sortChildren;
 String style;
 bool temporary;
+Texture texture;
+bool tiled;
 TraversalMode traversalMode;
 /* readonly */
 StringHash type;
@@ -12348,6 +12357,8 @@ void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetFullImageRect();
+void SetHoverOffset(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
@@ -12370,6 +12381,8 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
 StringHash baseType;
+BlendMode blendMode;
+IntRect border;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -12412,8 +12425,11 @@ bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
+IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
+IntRect imageRect;
 int indent;
 int indentSpacing;
 /* readonly */
@@ -12460,6 +12476,8 @@ IntVector2 size;
 bool sortChildren;
 String style;
 bool temporary;
+Texture texture;
+bool tiled;
 TraversalMode traversalMode;
 /* readonly */
 StringHash type;

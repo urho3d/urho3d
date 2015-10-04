@@ -12854,6 +12854,8 @@ Methods:
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
+- void SetFullImageRect()
+- void SetHoverOffset(int, int)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void SetMaxSize(int, int)
@@ -12876,6 +12878,8 @@ Properties:
 - Variant[] attributes
 - bool autoUpdate
 - StringHash baseType // readonly
+- BlendMode blendMode
+- IntRect border
 - bool bringToBack
 - bool bringToFront
 - Node@ cameraNode // readonly
@@ -12908,7 +12912,10 @@ Properties:
 - uint format
 - int height
 - HorizontalAlignment horizontalAlignment
+- IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
+- IntRect imageRect
 - int indent
 - int indentSpacing
 - int indentWidth // readonly
@@ -12950,6 +12957,8 @@ Properties:
 - bool sortChildren
 - String style
 - bool temporary
+- Texture@ texture
+- bool tiled
 - TraversalMode traversalMode
 - StringHash type // readonly
 - String typeName // readonly
@@ -13064,6 +13073,8 @@ Methods:
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
+- void SetFullImageRect()
+- void SetHoverOffset(int, int)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void SetMaxSize(int, int)
@@ -13084,6 +13095,8 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - StringHash baseType // readonly
+- BlendMode blendMode
+- IntRect border
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -13113,7 +13126,10 @@ Properties:
 - FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
+- IntVector2 hoverOffset
 - bool hovering // readonly
+- IntRect imageBorder
+- IntRect imageRect
 - int indent
 - int indentSpacing
 - int indentWidth // readonly
@@ -13153,6 +13169,8 @@ Properties:
 - bool sortChildren
 - String style
 - bool temporary
+- Texture@ texture
+- bool tiled
 - TraversalMode traversalMode
 - StringHash type // readonly
 - String typeName // readonly
