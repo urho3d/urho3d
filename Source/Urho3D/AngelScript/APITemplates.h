@@ -1193,7 +1193,7 @@ template <class T> void RegisterBorderImage(asIScriptEngine* engine, const char*
 /// Template function for registering a class derived from Window.
 template <class T> void RegisterWindow(asIScriptEngine* engine, const char* className)
 {
-    RegisterUIElement<T>(engine, className);
+    RegisterBorderImage<T>(engine, className);
     engine->RegisterObjectMethod(className, "void set_movable(bool)", asMETHOD(T, SetMovable), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_movable() const", asMETHOD(T, IsMovable), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_resizable(bool)", asMETHOD(T, SetResizable), asCALL_THISCALL);
