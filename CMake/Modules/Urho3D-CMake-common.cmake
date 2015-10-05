@@ -660,12 +660,11 @@ macro (create_symlink SOURCE DESTINATION)
             else ()
                 set (COMMAND COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ABS_SOURCE} ${ABS_DESTINATION})
             endif ()
+            # Fallback to copy only one time
+            execute_process (${COMMAND})
             if (TARGET ${TARGET_NAME})
                 # Fallback to copy everytime the target is built
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD ${COMMAND})
-            else ()
-                # Fallback to copy only one time
-                execute_process (${COMMAND})
             endif ()
         else ()
             message (WARNING "Unable to create symbolic link on this host system, you may need to manually copy file/dir from \"${SOURCE}\" to \"${DESTINATION}\"")
