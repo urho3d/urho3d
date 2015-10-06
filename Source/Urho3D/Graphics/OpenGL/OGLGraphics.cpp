@@ -1429,30 +1429,19 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
         if (texture)
         {
             unsigned glType = texture->GetTarget();
-            if (glType != textureTypes_[index])
-            {
-                if (textureTypes_[index])
-                {
-                    if (textures_[index])
-                        glBindTexture(textureTypes_[index], 0);
-                    if (!gl3Support)
-                        glDisable(textureTypes_[index]);
-                }
-
-                if (!gl3Support)
-                    glEnable(glType);
-                textureTypes_[index] = glType;
-            }
-
+            // Unbind old texture type if necessary
+            if (textureTypes_[index] && textureTypes_[index] != glType)
+                glBindTexture(textureTypes_[index], 0);
             glBindTexture(glType, texture->GetGPUObject());
+            textureTypes_[index] = glType;
 
             if (texture->GetParametersDirty())
                 texture->UpdateParameters();
         }
-        else
+        else if (textureTypes_[index])
         {
-            if (textureTypes_[index])
-                glBindTexture(textureTypes_[index], 0);
+            glBindTexture(textureTypes_[index], 0);
+            textureTypes_[index] = 0;
         }
 
         textures_[index] = texture;
@@ -1481,7 +1470,12 @@ void Graphics::SetTextureForUpdate(Texture* texture)
         impl_->activeTexture_ = 0;
     }
 
-    glBindTexture(texture->GetTarget(), texture->GetGPUObject());
+    unsigned glType = texture->GetTarget();
+    // Unbind old texture type if necessary
+    if (textureTypes_[0] && textureTypes_[0] != glType)
+        glBindTexture(textureTypes_[0], 0);
+    glBindTexture(glType, texture->GetGPUObject());
+    textureTypes_[0] = glType;
     textures_[0] = texture;
 }
 
