@@ -28,4 +28,4 @@ add_custom_target (${TARGET_NAME} ALL)   # Dummy target just so that its post-bu
 set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
 
 # Install headers for building the Urho3D library
-install_header_files (DIRECTORY ./ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/Mustache FILES_MATCHING PATTERN *.hpp BUILD_TREE_ONLY)
+install_header_files (DIRECTORY ./ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/Mustache FILES_MATCHING PATTERN *.hpp USE_FILE_SYMLINK BUILD_TREE_ONLY)
