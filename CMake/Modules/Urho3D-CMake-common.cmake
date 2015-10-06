@@ -167,6 +167,12 @@ if (CMAKE_HOST_WIN32)
             file (REMOVE ${CMAKE_BINARY_DIR}/test-link)
         else ()
             set (URHO3D_MKLINK FALSE)
+            message (WARNING "Could not use MKLINK to setup symbolic links as this Windows user account does not have the privilege to do so. "
+                "When MKLINK is not available then the build system will fallback to use file/directory copy of the library headers from source tree to build tree. "
+                "In order to prevent stale headers being used in the build, this file/directory copy will be redone also as a post-build step for each library targets. "
+                "This may slow down the build unnecessarily or even cause other unforseen issues due to incomplete or stale headers in the build tree. "
+                "Request your Windows Administrator to grant your user account to have privilege to create symlink via MKLINK command. "
+                "You are NOT advised to use the Administrator account directly to generate build tree in all cases.")
         endif ()
         set (URHO3D_MKLINK ${URHO3D_MKLINK} CACHE INTERNAL "MKLINK capability on the Windows host system")
     endif ()
