@@ -680,6 +680,7 @@ void Engine::ApplyFrameLimit()
 
     long long elapsed = 0;
 
+#ifndef EMSCRIPTEN
     // Perform waiting loop if maximum FPS set
     if (maxFps)
     {
@@ -701,6 +702,7 @@ void Engine::ApplyFrameLimit()
             }
         }
     }
+#endif
 
     elapsed = frameTimer_.GetUSec(true);
 #ifdef URHO3D_TESTING

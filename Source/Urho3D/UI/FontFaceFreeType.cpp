@@ -178,6 +178,10 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     memset(imageData, 0, (size_t)(image->GetWidth() * image->GetHeight()));
     allocator_.Reset(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, textureWidth, textureHeight);
 
+    // Attempt to load space glyph first regardless if it's listed or not
+    // In some fonts (Consola) it is missing
+    LoadCharGlyph(32, image);
+
     for (unsigned i = 0; i < numGlyphs; ++i)
     {
         unsigned charCode = charCodes[i];

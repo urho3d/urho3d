@@ -862,8 +862,7 @@ String ResourceCache::SanitateResourceDirName(const String& nameIn) const
 
 void ResourceCache::StoreResourceDependency(Resource* resource, const String& dependency)
 {
-    // If resource reloading is not on, do not create the dependency data structure (saves memory)
-    if (!resource || !autoReloadResources_)
+    if (!resource)
         return;
 
     MutexLock lock(resourceMutex_);
@@ -875,7 +874,7 @@ void ResourceCache::StoreResourceDependency(Resource* resource, const String& de
 
 void ResourceCache::ResetDependencies(Resource* resource)
 {
-    if (!resource || !autoReloadResources_)
+    if (!resource)
         return;
 
     MutexLock lock(resourceMutex_);
