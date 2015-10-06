@@ -36,10 +36,10 @@
 namespace Urho3D
 {
 
-#if defined(IOS) || defined(EMSCRIPTEN)
+#if defined(IOS) || defined(__EMSCRIPTEN__)
 // Code for supporting SDL_iPhoneSetAnimationCallback() and emscripten_set_main_loop_arg()
-#if defined(EMSCRIPTEN)
-#include <emscripten.h>
+#if defined(__EMSCRIPTEN__)
+#include <emscripten/emscripten.h>
 #endif
 void RunFrame(void* data)
 {
@@ -81,8 +81,8 @@ int Application::Run()
         if (exitCode_)
             return exitCode_;
 
-        // Platforms other than iOS and EMSCRIPTEN run a blocking main loop
-#if !defined(IOS) && !defined(EMSCRIPTEN)
+        // Platforms other than iOS and Emscripten run a blocking main loop
+#if !defined(IOS) && !defined(__EMSCRIPTEN__)
         while (!engine_->IsExiting())
             engine_->RunFrame();
 
@@ -92,7 +92,7 @@ int Application::Run()
 #else
 #if defined(IOS)
         SDL_iPhoneSetAnimationCallback(GetSubsystem<Graphics>()->GetImpl()->GetWindow(), 1, &RunFrame, engine_);
-#elif defined(EMSCRIPTEN)
+#elif defined(__EMSCRIPTEN__)
         emscripten_set_main_loop_arg(RunFrame, engine_, 0, 1);
 #endif
 #endif

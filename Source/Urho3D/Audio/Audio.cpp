@@ -85,7 +85,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     desired.freq = mixRate;
 
 // The concept behind the emscripten audio port is to treat it as 16 bit until the final accumulation form the clip buffer
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     desired.format = AUDIO_F32LSB;
 #else
     desired.format = AUDIO_S16;
@@ -107,7 +107,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
         return false;
     }
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     if (obtained.format != AUDIO_F32LSB && obtained.format != AUDIO_F32MSB && obtained.format != AUDIO_F32SYS)
     {
         LOGERROR("Could not initialize audio output, 32-bit float buffer format not supported");
@@ -272,7 +272,7 @@ void Audio::MixOutput(void* dest, unsigned samples)
             (*i)->Mix(clipPtr, workSamples, mixRate_, stereo_, interpolation_);
 
         // Copy output from clip buffer to destination
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
         float* destPtr = (float*)dest;
         while (clipSamples--)
             *destPtr++ = (float)Clamp(*clipPtr++, -32768, 32767) / 32768.0f;

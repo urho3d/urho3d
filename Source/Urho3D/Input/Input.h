@@ -127,7 +127,7 @@ struct JoystickState
     PODVector<int> hats_;
 };
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 class EmscriptenInput;
 #endif
 
@@ -136,7 +136,7 @@ class URHO3D_API Input : public Object
 {
     OBJECT(Input);
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     friend class EmscriptenInput;
 #endif
 
@@ -322,7 +322,7 @@ private:
     void SetMouseButton(int button, bool newState);
     /// Handle a key change.
     void SetKey(int key, int scancode, unsigned raw, bool newState);
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     /// Set whether the operating system mouse cursor is visible (Emscripten platform only).
     void SetMouseVisibleEmscripten(bool enable);
     /// Set mouse mode (Emscripten platform only).
@@ -401,7 +401,7 @@ private:
     bool screenModeChanged_;
     /// Initialized flag.
     bool initialized_;
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     /// Emscripten Input glue instance.
     EmscriptenInput* emscriptenInput_;
     /// Flag used to detect mouse jump when exiting pointer lock.

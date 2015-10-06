@@ -34,7 +34,7 @@
 #if defined(IOS)
 #include "../Math/MathDefs.h"
 #include <mach/mach_host.h>
-#elif !defined(ANDROID) && !defined(RPI) && !defined(EMSCRIPTEN)
+#elif !defined(ANDROID) && !defined(RPI) && !defined(__EMSCRIPTEN__)
 #include <LibCpuId/libcpuid.h>
 #endif
 
@@ -47,7 +47,7 @@
 
 #if defined(_MSC_VER)
 #include <float.h>
-#elif !defined(ANDROID) && !defined(IOS) && !defined(RPI) && !defined(EMSCRIPTEN)
+#elif !defined(ANDROID) && !defined(IOS) && !defined(RPI) && !defined(__EMSCRIPTEN__)
 // From http://stereopsis.com/FPU.html
 
 #define FPU_CW_PREC_MASK        0x0300
@@ -94,7 +94,7 @@ static void GetCPUData(host_basic_info_data_t* data)
     infoCount = HOST_BASIC_INFO_COUNT;
     host_info(mach_host_self(), HOST_BASIC_INFO, (host_info_t)data, &infoCount);
 }
-#elif !defined(ANDROID) && !defined(RPI) && !defined(EMSCRIPTEN)
+#elif !defined(ANDROID) && !defined(RPI) && !defined(__EMSCRIPTEN__)
 
 static void GetCPUData(struct cpu_id_t* data)
 {
@@ -109,7 +109,7 @@ static void GetCPUData(struct cpu_id_t* data)
 
 void InitFPU()
 {
-#if !defined(URHO3D_LUAJIT) && !defined(ANDROID) && !defined(IOS) && !defined(RPI) && !defined(__x86_64__) && !defined(_M_AMD64) && !defined(EMSCRIPTEN)
+#if !defined(URHO3D_LUAJIT) && !defined(ANDROID) && !defined(IOS) && !defined(RPI) && !defined(__x86_64__) && !defined(_M_AMD64) && !defined(__EMSCRIPTEN__)
     // Make sure FPU is in round-to-nearest, single precision mode
     // This ensures Direct3D and OpenGL behave similarly, and all threads behave similarly
 #ifdef _MSC_VER
@@ -358,7 +358,7 @@ String GetPlatform()
     return "Mac OS X";
 #elif defined(RPI)
     return "Raspberry Pi";
-#elif defined(EMSCRIPTEN)
+#elif defined(__EMSCRIPTEN__)
     return "HTML5";
 #elif defined(__linux__)
     return "Linux";
@@ -404,7 +404,7 @@ unsigned GetNumPhysicalCPUs()
 #endif
 #elif defined(ANDROID) || defined(RPI)
     return GetArmCPUCount();
-#elif !defined(EMSCRIPTEN)
+#elif !defined(__EMSCRIPTEN__)
     struct cpu_id_t data;
     GetCPUData(&data);
     return (unsigned)data.num_cores;
@@ -426,7 +426,7 @@ unsigned GetNumLogicalCPUs()
 #endif
 #elif defined(ANDROID) || defined (RPI)
     return GetArmCPUCount();
-#elif !defined(EMSCRIPTEN)
+#elif !defined(__EMSCRIPTEN__)
     struct cpu_id_t data;
     GetCPUData(&data);
     return (unsigned)data.num_logical_cpus;
