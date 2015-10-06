@@ -47,6 +47,13 @@ SoundSynthesis::SoundSynthesis(Context* context) :
 {
 }
 
+void SoundSynthesis::Setup()
+{
+    // Modify engine startup parameters
+    Sample::Setup();
+    engineParameters_["Sound"] = true;
+}
+
 void SoundSynthesis::Start()
 {
     // Execute base class startup

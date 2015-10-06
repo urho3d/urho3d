@@ -43,6 +43,8 @@ public:
     /// Construct.
     SoundSynthesis(Context* context);
 
+    /// Setup before engine initialization. Modifies the engine parameters.
+    virtual void Setup();
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
 
