@@ -2753,6 +2753,78 @@ Attribute animation uses either linear or spline interpolation for floating poin
 - ObjectAnimation: Includes one or more attribute animations and their wrap modes and speeds for an Animatable object.
 - ValueAnimationInfo: Base class for runtime instances of an attribute animation, which includes the referred animation, wrap mode, speed and time position.
 
+\page SplinePath Spline path
+
+\section SplinePath_Intro The SplinePath component
+SplinePath is a component that allows to move a node along a path defined from a series of nodes acting as 'control points'. The node to move is called 'controlled node'.
+
+\subsection SplinePath_BuildPath Building the path
+A path is built from ordered points. When setting the points from nodes using \ref SplinePath::AddControlPoint "AddControlPoint()", an index is used to order them. At least two nodes are required to build a path.
+
+\subsection SplinePath_RemovePoints Removing points from the path
+Points can be removed:
+- either individually using \ref SplinePath::RemoveControlPoint "RemoveControlPoint()".
+- or globally using \ref SplinePath::ClearControlPoints "ClearControlPoints()".
+
+\subsection SplinePath_ControlNode Assigning the controlled node
+The controlled node is assigned using \ref SplinePath::SetControlledNode "SetControlledNode()".
+
+\subsection SplinePath_Moving Moving the controlled node along the path
+The controlled node is moved manually according to a time step, using \ref SplinePath::Move "Move()" in your update function.
+
+\subsection SplinePath_BehaviorSettings Behavior controls
+The behavior of the node is mainly influenced by its:
+- \ref SplinePath::SetSpeed "speed".
+- \ref SplinePath::SetInterpolationMode "interpolation mode" used to follow the path. Available modes are BEZIER_CURVE, CATMULL_ROM_CURVE, LINEAR_CURVE and CATMULL_ROM_FULL_CURVE.
+
+\subsection SplinePath_ManualControl Taking manual control of the controlled node
+The control node position can be:
+- reset to the starting position (first point in the path) using \ref SplinePath::Reset "Reset()".
+- set to a given position of the path using \ref SplinePath::SetPosition "SetPosition()". Position is expressed from 0.f to 1.f, where 0 is the start and 1 is the end of the path.
+
+\subsection SplinePath_Queries Querying spline path informations
+
+At any time you can query:
+- the \ref SplinePath::GetSpeed "speed".
+- the \ref SplinePath::GetLength "path length".
+- the \ref SplinePath::GetPosition "parent node's last position on the spline".
+- the \ref SplinePath::GetControlledNode "controlled node".
+- \ref SplinePath::GetPoint "a point on the spline path" from 0.f to 1.f,  where 0 is the start of the path and 1 is the end.
+- whether the \ref SplinePath::IsFinished "destination (last point of the path) is reached".
+
+\subsection SplinePath_Debug Debugging
+As for any component, a \ref SplinePath::DrawDebugGeometry "debugging function" is supplied to visually check the component.
+
+\subsection SplinePath_SampleCode Sample code
+
+The following sample demonstrates how to build a path from 2 points, assign a controlled node and move it along the path according to speed and interpolation mode.
+\code
+	// Initial point
+	Node* startNode = scene_->CreateChild("Start");
+	startNode->SetPosition(Vector3(-20.0f, 0.0f, -20.0f));
+
+	// Target point
+	Node* targetNode = scene_->CreateChild("Target");
+	targetNode->SetPosition(Vector3(20.0f, 2.0f, 20.0f));
+
+	// Node to move along the path ('controlled node')
+	Node* movingNode =  scene_->CreateChild("MovingNode");
+	
+	// Spline path
+	Node* pathNode = scene_->CreateChild("PathNode");
+	SplinePath* path = pathNode->CreateComponent<SplinePath>();
+	path->AddControlPoint(startNode, 0);
+	path->AddControlPoint(targetNode, 1);
+	path->SetInterpolationMode(LINEAR_CURVE);
+	path->SetSpeed(10.0f);
+	path->SetControlledNode(movingNode);
+\endcode
+
+In your update function, move the controlled node using \ref SplinePath::Move "Move()":
+\code
+    path->Move(eventData[P_TIMESTEP].GetFloat());
+\endcode
+
 \page Tools Tools
 
 \section Tools_AssetImporter AssetImporter
