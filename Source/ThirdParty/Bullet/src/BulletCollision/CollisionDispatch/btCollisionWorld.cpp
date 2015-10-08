@@ -1257,6 +1257,10 @@ void btCollisionWorld::debugDrawObject(const btTransform& worldTransform, const 
 		getDebugDrawer()->drawTransform(worldTransform,1);
 	}
 
+	// Urho3D: never draw heightfields as they are potentially huge
+	if (shape->getShapeType() == TERRAIN_SHAPE_PROXYTYPE)
+		return;
+
 	if (shape->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
 	{
 		const btCompoundShape* compoundShape = static_cast<const btCompoundShape*>(shape);
