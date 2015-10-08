@@ -12,7 +12,7 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-
+// Modified by Lasse Oorni for Urho3D
 
 #ifndef BT_SCALAR_H
 #define BT_SCALAR_H
@@ -74,7 +74,8 @@ inline int	btGetVersion()
 
 #if defined (_M_ARM)
             //Do not turn SSE on for ARM (may want to turn on BT_USE_NEON however)
-#elif (defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400) && (!defined (BT_USE_DOUBLE_PRECISION))
+// Urho3D: allow to disable SSE
+#elif (defined (URHO3D_SSE) && defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400) && (!defined (BT_USE_DOUBLE_PRECISION))
 			#if _MSC_VER>1400
 				#define BT_USE_SIMD_VECTOR3
 			#endif
@@ -173,7 +174,8 @@ inline int	btGetVersion()
 #else
 	//non-windows systems
 
-#if (defined (__APPLE__) && (!defined (BT_USE_DOUBLE_PRECISION)))
+// Urho3D: allow to disable SSE
+#if (defined (URHO3D_SSE) && defined (__APPLE__) && (!defined (BT_USE_DOUBLE_PRECISION)))
     #if defined (__i386__) || defined (__x86_64__)
 		#define BT_USE_SIMD_VECTOR3
 		#define BT_USE_SSE
