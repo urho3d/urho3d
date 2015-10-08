@@ -1546,12 +1546,15 @@ void Node::OnAttributeAnimationRemoved()
         UnsubscribeFromEvent(GetScene(), E_ATTRIBUTEANIMATIONUPDATE);
 }
 
-void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed)
+Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outName)
 {
     Vector<String> names = name.Split('/');
     // Only attribute name
     if (names.Size() == 1)
-        SetAttributeAnimation(name, attributeAnimation, wrapMode, speed);
+    {
+        outName = name;
+        return this;
+    }
     else
     {
         // Name must in following format: "#0/#1/@component#0/attribute"
@@ -1567,20 +1570,20 @@ void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attri
             if (!node)
             {
                 LOGERROR("Could not find node by name " + name);
-                return;
+                return 0;
             }
         }
 
         if (i == names.Size() - 1)
         {
-            node->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
-            return;
+            outName = names.Back();
+            return node;
         }
 
         if (i != names.Size() - 2 || names[i].Front() != '@')
         {
             LOGERROR("Invalid name " + name);
-            return;
+            return 0;
         }
 
         String componentName = names[i].Substring(1, names[i].Length() - 1);
@@ -1591,10 +1594,11 @@ void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attri
             if (!component)
             {
                 LOGERROR("Could not find component by name " + name);
-                return;
+                return 0;
             }
 
-            component->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
+            outName = names.Back();
+            return component;
         }
         else
         {
@@ -1604,10 +1608,11 @@ void Node::SetObjectAttributeAnimation(const String& name, ValueAnimation* attri
             if (index >= components.Size())
             {
                 LOGERROR("Could not find component by name " + name);
-                return;
+                return 0;
             }
 
-            components[index]->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
+            outName = names.Back();
+            return components[index];
         }
     }
 }

@@ -473,6 +473,11 @@ template <class T> void RegisterAnimatable(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "WrapMode GetAttributeAnimationWrapMode(const String&in) const", asMETHODPR(T, GetAttributeAnimationWrapMode, (const String&) const, WrapMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetAttributeAnimationSpeed(const String&in, float)", asMETHODPR(T, SetAttributeAnimationSpeed, (const String&, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float GetAttributeAnimationSpeed(const String&in) const", asMETHODPR(T, GetAttributeAnimationSpeed, (const String&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void RemoveObjectAnimation()", asMETHODPR(T, RemoveObjectAnimation, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void RemoveAttributeAnimation(const String&in)", asMETHODPR(T, RemoveAttributeAnimation, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetAnimationTime(float time)", asMETHODPR(T, SetAnimationTime, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(T, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(T, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
 }
 
 /// Template function for registering a class derived from Component.
