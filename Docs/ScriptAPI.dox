@@ -10758,6 +10758,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetPoint(float) const
+- Vector3 GetPosition() const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -10777,6 +10778,7 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
+- void SetPosition(float)
 
 Properties:
 
@@ -10796,7 +10798,6 @@ Properties:
 - Node@ node // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
-- Vector3 position
 - int refs // readonly
 - float speed
 - bool temporary

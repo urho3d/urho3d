@@ -9659,6 +9659,7 @@ WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetPoint(float) const;
+Vector3 GetPosition() const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
@@ -9678,6 +9679,7 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetInterceptNetworkUpdate(const String&, bool);
+void SetPosition(float);
 
 // Properties:
 bool animationEnabled;
@@ -9706,7 +9708,6 @@ Node node;
 /* readonly */
 uint numAttributes;
 ObjectAnimation objectAnimation;
-Vector3 position;
 /* readonly */
 int refs;
 float speed;
