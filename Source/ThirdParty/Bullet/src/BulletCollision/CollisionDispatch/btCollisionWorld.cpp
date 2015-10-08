@@ -1227,10 +1227,12 @@ public:
 		  wv0 = m_worldTrans*triangle[0];
 		  wv1 = m_worldTrans*triangle[1];
 		  wv2 = m_worldTrans*triangle[2];
-		  btVector3 center = (wv0+wv1+wv2)*btScalar(1./3.);
           
           if (m_debugDrawer->getDebugMode() & btIDebugDraw::DBG_DrawNormals )
           {
+			// Urho3D: calculate center only if needed
+			btVector3 center = (wv0+wv1+wv2)*btScalar(1./3.);
+
 		    btVector3 normal = (wv1-wv0).cross(wv2-wv0);
 		    normal.normalize();
 		    btVector3 normalColor(1,1,0);
