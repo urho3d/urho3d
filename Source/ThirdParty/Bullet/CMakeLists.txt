@@ -1,50 +1,292 @@
-#
-# Copyright (c) 2008-2015 the Urho3D project.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
+cmake_minimum_required(VERSION 2.4.3)
+set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
-# Define target name
-set (TARGET_NAME Bullet)
+#this line has to appear before 'PROJECT' in order to be able to disable incremental linking
+SET(MSVC_INCREMENTAL_DEFAULT ON)
 
-# Define source files
-file (GLOB CPP_FILES src/BulletCollision/BroadphaseCollision/*.cpp 
-    src/BulletCollision/CollisionDispatch/*.cpp src/BulletCollision/CollisionShapes/*.cpp 
-    src/BulletCollision/Gimpact/*.cpp src/BulletCollision/NarrowPhaseCollision/*.cpp 
-    src/BulletDynamics/Character/*.cpp src/BulletDynamics/ConstraintSolver/*.cpp
-    src/BulletDynamics/Dynamics/*.cpp src/BulletDynamics/Vehicle/*.cpp src/BulletSoftBody/*.cpp
-    src/BulletDynamics/Featherstone/*.cpp src/BulletDynamics/MLCPSolvers/*.cpp
-    src/LinearMath/*.cpp)
-file (GLOB H_FILES *.h src/BulletCollision/BroadphaseCollision/*.h
-    src/BulletCollision/CollisionDispatch/*.h src/BulletCollision/CollisionShapes/*.h
-    src/BulletCollision/Gimpact/*.h src/BulletCollision/NarrowPhaseCollision/*.h
-    src/BulletDynamics/Character/*.h src/BulletDynamics/ConstraintSolver/*.h
-    src/BulletDynamics/Dynamics/*.h src/BulletDynamics/Vehicle/*.h src/BulletSoftBody/*.h 
-    src/BulletDynamics/Featherstone/*.h src/BulletDynamics/MLCPSolvers/*.h
-    src/LinearMath/*.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+PROJECT(BULLET_PHYSICS)
+SET(BULLET_VERSION 2.83)
 
-# Define dependency libs
-set (INCLUDE_DIRS src)
+IF(COMMAND cmake_policy)
+   cmake_policy(SET CMP0003 NEW)
+ENDIF(COMMAND cmake_policy)
 
-# Setup target
-setup_library ()
 
-# Install headers for building and using the Urho3D library (install dependency for Urho3D/Physics/PhysicsWorld.h, Urho3D/Physics/RigidBody.h, and Urho3D/Physics/PhysicsUtils.h)
-install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/Bullet FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant
+IF (NOT CMAKE_BUILD_TYPE)
+# SET(CMAKE_BUILD_TYPE "Debug")
+ SET(CMAKE_BUILD_TYPE "Release")
+ENDIF (NOT CMAKE_BUILD_TYPE) 
+
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
+#MESSAGE("CMAKE_CXX_FLAGS_DEBUG="+${CMAKE_CXX_FLAGS_DEBUG})
+
+OPTION(USE_DOUBLE_PRECISION "Use double precision"	OFF)
+OPTION(USE_GRAPHICAL_BENCHMARK "Use Graphical Benchmark" ON)
+OPTION(BUILD_SHARED_LIBS "Use shared libraries" OFF)
+
+OPTION(USE_MSVC_INCREMENTAL_LINKING "Use MSVC Incremental Linking" OFF)
+OPTION(USE_CUSTOM_VECTOR_MATH "Use custom vectormath library" OFF)
+
+#statically linking VC++ isn't supported for WindowsPhone/WindowsStore
+IF (CMAKE_SYSTEM_NAME STREQUAL WindowsPhone OR CMAKE_SYSTEM_NAME STREQUAL WindowsStore)
+	OPTION(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC Runtime Library DLL (/MD or /MDd)" ON)
+ELSE ()
+	OPTION(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC Runtime Library DLL (/MD or /MDd)" OFF)
+ENDIF (CMAKE_SYSTEM_NAME STREQUAL WindowsPhone OR CMAKE_SYSTEM_NAME STREQUAL WindowsStore)
+
+#SET(CMAKE_EXE_LINKER_FLAGS_INIT    "/STACK:10000000 /INCREMENTAL:NO")	
+#SET(CMAKE_EXE_LINKER_FLAGS    "/STACK:10000000 /INCREMENTAL:NO")	
+
+#MESSAGE("MSVC_INCREMENTAL_YES_FLAG"+${MSVC_INCREMENTAL_YES_FLAG})
+
+
+IF(MSVC)
+	IF (NOT USE_MSVC_INCREMENTAL_LINKING)
+		#MESSAGE("MSVC_INCREMENTAL_DEFAULT"+${MSVC_INCREMENTAL_DEFAULT})
+		SET( MSVC_INCREMENTAL_YES_FLAG "/INCREMENTAL:NO")
+	
+		STRING(REPLACE "INCREMENTAL:YES" "INCREMENTAL:NO" replacementFlags ${CMAKE_EXE_LINKER_FLAGS_DEBUG}) 
+		SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "/INCREMENTAL:NO ${replacementFlags}" )
+		MESSAGE("CMAKE_EXE_LINKER_FLAGS_DEBUG=${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
+	
+		STRING(REPLACE "INCREMENTAL:YES" "INCREMENTAL:NO" replacementFlags2 ${CMAKE_EXE_LINKER_FLAGS}) 
+		
+		SET(CMAKE_EXE_LINKER_FLAGS ${replacementFlag2}) 
+		STRING(REPLACE "INCREMENTAL:YES" "" replacementFlags3 "${CMAKE_EXTRA_LINK_FLAGS}") 
+
+		SET(CMAKE_EXTRA_LINK_FLAGS ${replacementFlag3}) 
+		
+		
+		STRING(REPLACE "INCREMENTAL:YES" "INCREMENTAL:NO" replacementFlags3 "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO}")
+		SET(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO ${replacementFlags3}) 
+		SET(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "/INCREMENTAL:NO ${replacementFlags3}" )
+	
+	ENDIF (NOT USE_MSVC_INCREMENTAL_LINKING)
+
+	IF (NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
+		#We statically link to reduce dependancies
+		FOREACH(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO )
+			IF(${flag_var} MATCHES "/MD")
+				STRING(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+			ENDIF(${flag_var} MATCHES "/MD")
+			IF(${flag_var} MATCHES "/MDd")
+				STRING(REGEX REPLACE "/MDd" "/MTd" ${flag_var} "${${flag_var}}")
+			ENDIF(${flag_var} MATCHES "/MDd")
+		ENDFOREACH(flag_var)
+	ENDIF (NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
+
+	IF (CMAKE_CL_64)
+	  ADD_DEFINITIONS(-D_WIN64)
+	ELSE()
+	  OPTION(USE_MSVC_SSE "Use MSVC /arch:sse option"	ON)
+	  IF (USE_MSVC_SSE)
+		ADD_DEFINITIONS(/arch:SSE)
+	  ENDIF()
+	ENDIF()
+	OPTION(USE_MSVC_FAST_FLOATINGPOINT "Use MSVC /fp:fast option"	ON)
+	IF (USE_MSVC_FAST_FLOATINGPOINT)
+		ADD_DEFINITIONS(/fp:fast)
+  ENDIF()
+ENDIF(MSVC)
+
+
+
+IF (WIN32)
+OPTION(INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES "Create MSVC projectfiles that can be distributed" OFF)
+
+IF (INTERNAL_CREATE_DISTRIBUTABLE_MSVC_PROJECTFILES)
+	SET (LIBRARY_OUTPUT_PATH ${BULLET_PHYSICS_SOURCE_DIR}/lib CACHE PATH "Single output directory for building all libraries.")
+	SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BULLET_PHYSICS_SOURCE_DIR})
+	SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BULLET_PHYSICS_SOURCE_DIR})
+	SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${BULLET_PHYSICS_SOURCE_DIR})
+	SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${BULLET_PHYSICS_SOURCE_DIR})
+	SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${BULLET_PHYSICS_SOURCE_DIR})
+ELSE()
+	SET (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib CACHE PATH "Single output directory for building all libraries.")
+ENDIF()
+
+
+
+OPTION(INTERNAL_CREATE_MSVC_RELATIVE_PATH_PROJECTFILES "Create MSVC projectfiles with relative paths" OFF)
+OPTION(INTERNAL_ADD_POSTFIX_EXECUTABLE_NAMES "Add MSVC postfix for executable names (_Debug)" OFF)
+
+SET(CMAKE_DEBUG_POSTFIX "_Debug" CACHE STRING "Adds a postfix for debug-built libraries.")
+SET(CMAKE_MINSIZEREL_POSTFIX "_MinsizeRel" CACHE STRING "Adds a postfix for MinsizeRelease-built libraries.")
+SET(CMAKE_RELWITHDEBINFO_POSTFIX "_RelWithDebugInfo" CACHE STRING "Adds a postfix for ReleaseWithDebug-built libraries.")
+
+
+
+
+
+IF (INTERNAL_CREATE_MSVC_RELATIVE_PATH_PROJECTFILES)
+SET(CMAKE_SUPPRESS_REGENERATION  1)
+SET(CMAKE_USE_RELATIVE_PATHS 1)
+ENDIF(INTERNAL_CREATE_MSVC_RELATIVE_PATH_PROJECTFILES)
+
+ENDIF (WIN32)
+
+
+OPTION(BUILD_CPU_DEMOS "Build original Bullet CPU examples"        ON)
+
+
+
+OPTION(INTERNAL_UPDATE_SERIALIZATION_STRUCTURES "Internal update serialization structures" OFF)
+IF (INTERNAL_UPDATE_SERIALIZATION_STRUCTURES)
+ADD_DEFINITIONS( -DBT_INTERNAL_UPDATE_SERIALIZATION_STRUCTURES)
+ENDIF (INTERNAL_UPDATE_SERIALIZATION_STRUCTURES)
+
+IF (USE_DOUBLE_PRECISION)
+ADD_DEFINITIONS( -DBT_USE_DOUBLE_PRECISION)
+SET( BULLET_DOUBLE_DEF "-DBT_USE_DOUBLE_PRECISION")
+ENDIF (USE_DOUBLE_PRECISION)
+
+IF(USE_GRAPHICAL_BENCHMARK)
+ADD_DEFINITIONS( -DUSE_GRAPHICAL_BENCHMARK)
+ENDIF (USE_GRAPHICAL_BENCHMARK)
+
+IF (WIN32)
+OPTION(USE_GLUT "Use Glut"	ON)
+ADD_DEFINITIONS( -D_CRT_SECURE_NO_WARNINGS )
+ADD_DEFINITIONS( -D_CRT_SECURE_NO_DEPRECATE )
+ADD_DEFINITIONS( -D_SCL_SECURE_NO_WARNINGS )
+
+IF (USE_GLUT AND MSVC)
+        string (REPLACE "/D_WINDOWS" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+        remove_definitions(-D_WINDOWS )
+ENDIF()
+
+
+
+ELSE(WIN32)
+OPTION(USE_GLUT "Use Glut"	ON)
+ENDIF(WIN32)
+
+   
+IF(COMMAND cmake_policy)
+   cmake_policy(SET CMP0003 NEW)
+ENDIF(COMMAND cmake_policy)
+   
+
+# This is the shortcut to finding GLU, GLUT and OpenGL if they are properly installed on your system
+# This should be the case.
+
+FIND_PACKAGE(OpenGL)
+IF (OPENGL_FOUND)
+	MESSAGE("OPENGL FOUND")
+	MESSAGE(${OPENGL_LIBRARIES})
+ELSE (OPENGL_FOUND)
+	MESSAGE("OPENGL NOT FOUND")
+	SET(OPENGL_gl_LIBRARY opengl32)
+	SET(OPENGL_glu_LIBRARY glu32)
+ENDIF (OPENGL_FOUND)
+
+
+#FIND_PACKAGE(GLU)
+
+
+
+
+IF (APPLE)
+  FIND_LIBRARY(COCOA_LIBRARY Cocoa)
+ENDIF()
+
+OPTION(BUILD_BULLET3 "Set when you want to build Bullet 3" ON)
+
+IF(BUILD_BULLET3)
+	 IF(APPLE)
+                MESSAGE("Mac OSX Version is ${_CURRENT_OSX_VERSION}")
+                IF(_CURRENT_OSX_VERSION  VERSION_LESS 10.9)
+                        MESSAGE("Mac OSX below 10.9 has no OpenGL 3 support so please disable the BUILD_OPENGL3_DEMOS option")
+                        #unset(BUILD_OPENGL3_DEMOS CACHE)
+
+                        OPTION(BUILD_OPENGL3_DEMOS "Set when you want to build the OpenGL3+ demos" OFF)
+                ELSE()
+                        OPTION(BUILD_OPENGL3_DEMOS "Set when you want to build the OpenGL3+ demos" ON)
+                ENDIF()
+        ELSE()
+                OPTION(BUILD_OPENGL3_DEMOS "Set when you want to build Bullet 3 OpenGL3+ demos" ON)
+        ENDIF()
+ELSE(BUILD_BULLET3)
+	unset(BUILD_OPENGL3_DEMOS CACHE)
+	OPTION(BUILD_OPENGL3_DEMOS "Set when you want to build Bullet 3 OpenGL3+ demos" OFF)
+ENDIF(BUILD_BULLET3)
+IF(BUILD_OPENGL3_DEMOS)
+	IF(EXISTS ${BULLET_PHYSICS_SOURCE_DIR}/Demos3 AND IS_DIRECTORY ${BULLET_PHYSICS_SOURCE_DIR}/Demos3)
+		SUBDIRS(Demos3)
+	ENDIF()
+ELSE()
+	ADD_DEFINITIONS(-DNO_OPENGL3)
+ENDIF(BUILD_OPENGL3_DEMOS)
+
+OPTION(BUILD_BULLET2_DEMOS "Set when you want to build the Bullet 2 demos" ON)
+IF(BUILD_BULLET2_DEMOS)
+
+        IF(EXISTS ${BULLET_PHYSICS_SOURCE_DIR}/examples AND IS_DIRECTORY ${BULLET_PHYSICS_SOURCE_DIR}/examples)
+                SUBDIRS(examples)
+        ENDIF()
+ENDIF(BUILD_BULLET2_DEMOS)
+
+
+
+OPTION(BUILD_EXTRAS "Set when you want to build the extras" ON)
+IF(BUILD_EXTRAS)
+  SUBDIRS(Extras)
+ENDIF(BUILD_EXTRAS)
+
+
+#Maya Dynamica plugin is moved to http://dynamica.googlecode.com
+
+SUBDIRS(src)
+
+IF("${CMAKE_GENERATOR}" MATCHES "Unix Makefiles")
+	OPTION(INSTALL_LIBS "Set when you want to install libraries" ON)
+ELSE()
+	IF(APPLE AND FRAMEWORK)
+		OPTION(INSTALL_LIBS "Set when you want to install libraries" ON)
+	ELSE()
+#by default, don't enable the 'INSTALL' option for Xcode and MSVC projectfiles
+		OPTION(INSTALL_LIBS "Set when you want to install libraries" OFF)
+	ENDIF()
+ENDIF()
+
+IF(INSTALL_LIBS)
+	SET (LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
+	SET (LIB_DESTINATION "lib${LIB_SUFFIX}" CACHE STRING "Library directory name")
+	## the following are directories where stuff will be installed to
+	SET(INCLUDE_INSTALL_DIR      "include/bullet/" CACHE PATH "The subdirectory to the header prefix")
+	SET(PKGCONFIG_INSTALL_PREFIX "lib${LIB_SUFFIX}/pkgconfig/" CACHE STRING "Base directory for pkgconfig files")
+	IF(NOT MSVC)
+	  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/bullet.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/bullet.pc @ONLY)
+  	INSTALL(
+	    FILES
+    	${CMAKE_CURRENT_BINARY_DIR}/bullet.pc
+    	DESTINATION
+    	${PKGCONFIG_INSTALL_PREFIX})
+	ENDIF(NOT MSVC)
+ENDIF(INSTALL_LIBS)
+
+#INSTALL of other files requires CMake 2.6
+IF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
+	OPTION(INSTALL_EXTRA_LIBS "Set when you want extra libraries installed" OFF)
+ENDIF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.5)
+
+OPTION(BUILD_UNIT_TESTS "Build Unit Tests"	ON)
+
+IF (BUILD_UNIT_TESTS)
+	SUBDIRS(test)
+ENDIF()
+
+set (BULLET_CONFIG_CMAKE_PATH lib${LIB_SUFFIX}/cmake/bullet )
+list (APPEND BULLET_LIBRARIES LinearMath)
+list (APPEND BULLET_LIBRARIES BulletCollision)
+list (APPEND BULLET_LIBRARIES BulletDynamics)
+list (APPEND BULLET_LIBRARIES BulletSoftBody)
+set (BULLET_USE_FILE ${BULLET_CONFIG_CMAKE_PATH}/UseBullet.cmake)
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/BulletConfig.cmake.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/BulletConfig.cmake
+                 @ONLY ESCAPE_QUOTES
+               )
+install ( FILES ${CMAKE_CURRENT_SOURCE_DIR}/UseBullet.cmake
+                ${CMAKE_CURRENT_BINARY_DIR}/BulletConfig.cmake
+          DESTINATION ${BULLET_CONFIG_CMAKE_PATH}
+        )

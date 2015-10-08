@@ -1,5 +1,6 @@
 /*
-Copyright (c) 2003-2010 Erwin Coumans  http://continuousphysics.com/Bullet/
+Bullet Continuous Collision Detection and Physics Library
+Copyright (c) 2003-2014 Erwin Coumans http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -13,6 +14,28 @@ subject to the following restrictions:
 */
 
 
-Free for commercial use, please report projects in the forum at http://www.bulletphysics.org
+#ifndef GJK_COLLISION_DESCRIPTION_H
+#define GJK_COLLISION_DESCRIPTION_H
 
-In case you want to display a Bullet logo in your software: you can download the Bullet logo in various vector formats and high resolution at the download section in http://bullet.googlecode.com
+#include "LinearMath/btVector3.h"
+
+struct btGjkCollisionDescription
+{
+    btVector3	m_firstDir;
+    int			m_maxGjkIterations;
+    btScalar	m_maximumDistanceSquared;
+    btScalar	m_gjkRelError2;
+    btGjkCollisionDescription()
+    :m_firstDir(0,1,0),
+    m_maxGjkIterations(1000),
+    m_maximumDistanceSquared(1e30f),
+    m_gjkRelError2(1.0e-6)
+    {
+    }
+    virtual ~btGjkCollisionDescription()
+    {
+    }
+};
+
+#endif //GJK_COLLISION_DESCRIPTION_H
+

@@ -16,8 +16,7 @@
 #define BT_QUICK_PROF_H
 
 //To disable built-in profiling, please comment out next line
-// Urho3D: disable profiling, as Urho has its own hierarchic profiler
-#define BT_NO_PROFILE 1
+//#define BT_NO_PROFILE 1
 #ifndef BT_NO_PROFILE
 #include <stdio.h>//@todo remove this, backwards compatibility
 #include "btScalar.h"
@@ -53,6 +52,11 @@ public:
 	/// Returns the time in us since the last call to reset or since 
 	/// the Clock was created.
 	unsigned long int getTimeMicroseconds();
+	
+	/// Returns the time in s since the last call to reset or since 
+	/// the Clock was created.
+	btScalar getTimeSeconds();
+	
 private:
 	struct btClockData* m_data;
 };
