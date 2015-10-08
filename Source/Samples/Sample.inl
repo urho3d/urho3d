@@ -58,6 +58,7 @@ void Sample::Setup()
     engineParameters_["LogName"]     = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs") + GetTypeName() + ".log";
     engineParameters_["FullScreen"]  = false;
     engineParameters_["Headless"]    = false;
+    engineParameters_["Sound"]       = false;
 }
 
 void Sample::Start()
@@ -143,10 +144,10 @@ void Sample::CreateLogo()
 
     // Set logo sprite alignment
     logoSprite_->SetAlignment(HA_LEFT, VA_BOTTOM);
-    
+
     // Make logo not fully opaque to show the scene underneath
     logoSprite_->SetOpacity(0.75f);
-    
+
     // Set a low priority for the logo so that other UI elements can be drawn on top
     logoSprite_->SetPriority(-100);
 }
@@ -195,16 +196,16 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     // Toggle console with F1
     else if (key == KEY_F1)
         GetSubsystem<Console>()->Toggle();
-    
+
     // Toggle debug HUD with F2
     else if (key == KEY_F2)
         GetSubsystem<DebugHud>()->ToggleAll();
-    
+
     // Common rendering quality controls, only when UI has no focused element
     else if (!GetSubsystem<UI>()->GetFocusElement())
     {
         Renderer* renderer = GetSubsystem<Renderer>();
-        
+
         // Preferences / Pause
         if (key == KEY_SELECT && touchEnabled_)
         {
@@ -230,7 +231,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 quality = QUALITY_LOW;
             renderer->SetTextureQuality(quality);
         }
-        
+
         // Material quality
         else if (key == '2')
         {
@@ -240,15 +241,15 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 quality = QUALITY_LOW;
             renderer->SetMaterialQuality(quality);
         }
-        
+
         // Specular lighting
         else if (key == '3')
             renderer->SetSpecularLighting(!renderer->GetSpecularLighting());
-        
+
         // Shadow rendering
         else if (key == '4')
             renderer->SetDrawShadows(!renderer->GetDrawShadows());
-        
+
         // Shadow map resolution
         else if (key == '5')
         {
@@ -258,7 +259,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 shadowMapSize = 512;
             renderer->SetShadowMapSize(shadowMapSize);
         }
-        
+
         // Shadow depth and filtering quality
         else if (key == '6')
         {
@@ -268,7 +269,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 quality = SHADOWQUALITY_LOW_16BIT;
             renderer->SetShadowQuality(quality);
         }
-        
+
         // Occlusion culling
         else if (key == '7')
         {
@@ -276,11 +277,11 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             occlusion = !occlusion;
             renderer->SetMaxOccluderTriangles(occlusion ? 5000 : 0);
         }
-        
+
         // Instancing
         else if (key == '8')
             renderer->SetDynamicInstancing(!renderer->GetDynamicInstancing());
-        
+
         // Take screenshot
         else if (key == '9')
         {

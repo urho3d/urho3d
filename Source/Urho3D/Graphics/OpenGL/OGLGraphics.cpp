@@ -337,7 +337,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         return true;
     }
 
-    // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. 
+    // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size.
     // If zero in fullscreen, use desktop mode
     if (!width || !height)
     {
@@ -457,7 +457,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
                 impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
             else
             {
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
                 if (!impl_->window_)
                     impl_->window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
                 fullscreen = false;
@@ -1429,30 +1429,19 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
         if (texture)
         {
             unsigned glType = texture->GetTarget();
-            if (glType != textureTypes_[index])
-            {
-                if (textureTypes_[index])
-                {
-                    if (textures_[index])
-                        glBindTexture(textureTypes_[index], 0);
-                    if (!gl3Support)
-                        glDisable(textureTypes_[index]);
-                }
-
-                if (!gl3Support)
-                    glEnable(glType);
-                textureTypes_[index] = glType;
-            }
-
+            // Unbind old texture type if necessary
+            if (textureTypes_[index] && textureTypes_[index] != glType)
+                glBindTexture(textureTypes_[index], 0);
             glBindTexture(glType, texture->GetGPUObject());
+            textureTypes_[index] = glType;
 
             if (texture->GetParametersDirty())
                 texture->UpdateParameters();
         }
-        else
+        else if (textureTypes_[index])
         {
-            if (textureTypes_[index])
-                glBindTexture(textureTypes_[index], 0);
+            glBindTexture(textureTypes_[index], 0);
+            textureTypes_[index] = 0;
         }
 
         textures_[index] = texture;
@@ -1481,7 +1470,12 @@ void Graphics::SetTextureForUpdate(Texture* texture)
         impl_->activeTexture_ = 0;
     }
 
-    glBindTexture(texture->GetTarget(), texture->GetGPUObject());
+    unsigned glType = texture->GetTarget();
+    // Unbind old texture type if necessary
+    if (textureTypes_[0] && textureTypes_[0] != glType)
+        glBindTexture(textureTypes_[0], 0);
+    glBindTexture(glType, texture->GetGPUObject());
+    textureTypes_[0] = glType;
     textures_[0] = texture;
 }
 
@@ -1995,7 +1989,7 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
     case CF_DXT1:
         return dxtTextureSupport_ ? GL_COMPRESSED_RGBA_S3TC_DXT1_EXT : 0;
 
-#if !defined(GL_ES_VERSION_2_0) || defined(EMSCRIPTEN)
+#if !defined(GL_ES_VERSION_2_0) || defined(__EMSCRIPTEN__)
     case CF_DXT3:
         return dxtTextureSupport_ ? GL_COMPRESSED_RGBA_S3TC_DXT3_EXT : 0;
 
@@ -2005,16 +1999,16 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
 #ifdef GL_ES_VERSION_2_0
     case CF_ETC1:
         return etcTextureSupport_ ? GL_ETC1_RGB8_OES : 0;
-        
+
     case CF_PVRTC_RGB_2BPP:
         return pvrtcTextureSupport_ ? COMPRESSED_RGB_PVRTC_2BPPV1_IMG : 0;
-        
+
     case CF_PVRTC_RGB_4BPP:
         return pvrtcTextureSupport_ ? COMPRESSED_RGB_PVRTC_4BPPV1_IMG : 0;
-        
+
     case CF_PVRTC_RGBA_2BPP:
         return pvrtcTextureSupport_ ? COMPRESSED_RGBA_PVRTC_2BPPV1_IMG : 0;
-        
+
     case CF_PVRTC_RGBA_4BPP:
         return pvrtcTextureSupport_ ? COMPRESSED_RGBA_PVRTC_4BPPV1_IMG : 0;
 #endif
@@ -2784,8 +2778,10 @@ void Graphics::CheckFeatureSupport()
 #endif
 #else
     // Check for supported compressed texture formats
-    #ifdef EMSCRIPTEN
-    dxtTextureSupport_ = CheckExtension("WEBGL_compressed_texture_s3tc");
+    #ifdef __EMSCRIPTEN__
+    dxtTextureSupport_ = CheckExtension("WEBGL_compressed_texture_s3tc"); // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
+    etcTextureSupport_ = CheckExtension("WEBGL_compressed_texture_etc1"); // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/
+    pvrtcTextureSupport_ = CheckExtension("WEBGL_compressed_texture_pvrtc"); // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/
 #else
     dxtTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
     etcTextureSupport_ = CheckExtension("OES_compressed_ETC1_RGB8_texture");
@@ -2797,7 +2793,7 @@ void Graphics::CheckFeatureSupport()
         glesDepthStencilFormat = GL_DEPTH_COMPONENT24_OES;
     if (CheckExtension("GL_OES_packed_depth_stencil"))
         glesDepthStencilFormat = GL_DEPTH24_STENCIL8_OES;
-    #ifdef EMSCRIPTEN
+    #ifdef __EMSCRIPTEN__
     if (!CheckExtension("WEBGL_depth_texture"))
 #else
     if (!CheckExtension("GL_OES_depth_texture"))
@@ -2817,7 +2813,7 @@ void Graphics::CheckFeatureSupport()
         shadowMapFormat_ = GL_DEPTH_COMPONENT;
         hiresShadowMapFormat_ = 0;
         // WebGL shadow map rendering seems to be extremely slow without an attached dummy color texture
-        #ifdef EMSCRIPTEN
+        #ifdef __EMSCRIPTEN__
         dummyColorFormat_ = GetRGBAFormat();
 #endif
     }
