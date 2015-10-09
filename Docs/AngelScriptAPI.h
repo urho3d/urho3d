@@ -6862,6 +6862,7 @@ Vector3 LocalToWorld(const Vector3&) const;
 Vector3 LocalToWorld(const Vector4&) const;
 Vector2 LocalToWorld2D(const Vector2&) const;
 bool LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ), TransformSpace = TS_WORLD);
+void MarkDirty();
 void MarkNetworkUpdate() const;
 void Pitch(float, TransformSpace = TS_LOCAL);
 void Remove();
