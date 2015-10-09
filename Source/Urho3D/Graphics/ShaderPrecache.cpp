@@ -119,7 +119,11 @@ void ShaderPrecache::LoadShaders(Graphics* graphics, Deserializer& source)
 
         // Check for illegal variations on OpenGL ES and skip them
 #ifdef GL_ES_VERSION_2_0
-        if (vsDefines.Contains("INSTANCED") || (psDefines.Contains("POINTLIGHT") && psDefines.Contains("SHADOW")))
+        if (
+#ifndef __EMSCRIPTEN__
+            vsDefines.Contains("INSTANCED") ||
+#endif
+            (psDefines.Contains("POINTLIGHT") && psDefines.Contains("SHADOW")))
         {
             shader = shader.GetNext("shader");
             continue;

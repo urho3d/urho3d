@@ -127,7 +127,7 @@ bool ShaderProgram::Link()
     glBindAttribLocation(object_, 7, "iBlendIndices");
     glBindAttribLocation(object_, 8, "iCubeTexCoord");
     glBindAttribLocation(object_, 9, "iCubeTexCoord2");
-#ifndef GL_ES_VERSION_2_0
+#if !defined(GL_ES_VERSION_2_0) || defined(__EMSCRIPTEN__)
     glBindAttribLocation(object_, 10, "iInstanceMatrix1");
     glBindAttribLocation(object_, 11, "iInstanceMatrix2");
     glBindAttribLocation(object_, 12, "iInstanceMatrix3");
