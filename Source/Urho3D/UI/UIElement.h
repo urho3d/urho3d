@@ -565,9 +565,8 @@ protected:
     virtual void OnAttributeAnimationAdded();
     /// Handle attribute animation removed.
     virtual void OnAttributeAnimationRemoved();
-    /// Set object attribute animation internal.
-    virtual void
-        SetObjectAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed);
+    /// Find target of an attribute animation from object hierarchy by name.
+    virtual Animatable* FindAttributeAnimationTarget(const String& name, String& outName);
     /// Mark screen position as needing an update.
     void MarkDirty();
     /// Remove child XML element by matching attribute name.

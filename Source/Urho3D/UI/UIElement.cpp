@@ -1720,12 +1720,15 @@ void UIElement::OnAttributeAnimationRemoved()
         UnsubscribeFromEvent(E_POSTUPDATE);
 }
 
-void UIElement::SetObjectAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed)
+Animatable* UIElement::FindAttributeAnimationTarget(const String& name, String& outName)
 {
     Vector<String> names = name.Split('/');
     // Only attribute name
     if (names.Size() == 1)
-        SetAttributeAnimation(name, attributeAnimation, wrapMode, speed);
+    {
+        outName = name;
+        return this;
+    }
     else
     {
         // Name must in following format: "#0/#1/attribute"
@@ -1735,7 +1738,7 @@ void UIElement::SetObjectAttributeAnimation(const String& name, ValueAnimation* 
             if (names[i].Front() != '#')
             {
                 LOGERROR("Invalid name " + name);
-                return;
+                return 0;
             }
 
             unsigned index = (unsigned)ToInt(names[i].Substring(1, names[i].Length() - 1));
@@ -1743,11 +1746,12 @@ void UIElement::SetObjectAttributeAnimation(const String& name, ValueAnimation* 
             if (!element)
             {
                 LOGERROR("Could not find element by name " + name);
-                return;
+                return 0;
             }
         }
 
-        element->SetAttributeAnimation(names.Back(), attributeAnimation, wrapMode, speed);
+        outName = names.Back();
+        return element;
     }
 }
 
