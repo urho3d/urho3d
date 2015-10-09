@@ -238,6 +238,8 @@ Matrix3 Quaternion::RotationMatrix() const
 
 Quaternion Quaternion::Slerp(Quaternion rhs, float t) const
 {
+    // Use fast approximation for Emscripten builds
+#ifdef __EMSCRIPTEN__
     float angle = DotProduct(rhs);
     float sign = 1.f; // Multiply by a sign of +/-1 to guarantee we rotate the shorter arc.
     if (angle < 0.f)
@@ -267,6 +269,34 @@ Quaternion Quaternion::Slerp(Quaternion rhs, float t) const
     }
     // Lerp and renormalize.
     return (*this * (a * sign) + rhs * b).Normalized();
+#else
+    // Favor accuracy for native code builds
+    float cosAngle = DotProduct(rhs);
+    // Enable shortest path rotation
+    if (cosAngle < 0.0f)
+    {
+        cosAngle = -cosAngle;
+        rhs = -rhs;
+    }
+
+    float angle = acosf(cosAngle);
+    float sinAngle = sinf(angle);
+    float t1, t2;
+
+    if (sinAngle > 0.001f)
+    {
+        float invSinAngle = 1.0f / sinAngle;
+        t1 = sinf((1.0f - t) * angle) * invSinAngle;
+        t2 = sinf(t * angle) * invSinAngle;
+    }
+    else
+    {
+        t1 = 1.0f - t;
+        t2 = t;
+    }
+
+    return *this * t1 + rhs * t2;
+#endif
 }
 
 Quaternion Quaternion::Nlerp(Quaternion rhs, float t, bool shortestPath) const
