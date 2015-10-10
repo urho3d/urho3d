@@ -358,18 +358,20 @@ void CreateMenuBar()
         
         if (hotKeyMode == HOTKEYS_MODE_STANDARD)    
         {
-            popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition));
-            popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation));
-            popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale));
+            popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition, '1' , QUAL_ALT));
+            popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation, '2' , QUAL_ALT));
+            popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale, '3' , QUAL_ALT));
+            popup.AddChild(CreateMenuItem("Reset transform", @SceneResetTransform, 'Q' , QUAL_ALT));
         }
         else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
-        { 
+        {
             popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition, 'G' , QUAL_ALT));
             popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation, 'R', QUAL_ALT));
             popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale, 'S', QUAL_ALT));
+            popup.AddChild(CreateMenuItem("Reset transform", @SceneResetTransform, 'Q' , QUAL_ALT));            
         }
-        
-        if (hotKeyMode == HOTKEYS_MODE_STANDARD) 
+
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)
         {
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'E', QUAL_CTRL));
             popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'E', QUAL_ALT));
@@ -379,7 +381,7 @@ void CreateMenuBar()
             popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'H'));
             popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'H', QUAL_ALT));
         }
-        
+
         if (hotKeyMode == HOTKEYS_MODE_STANDARD)
             popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'U', QUAL_CTRL));
         else if (hotKeyMode == HOTKEYS_MODE_BLENDER)

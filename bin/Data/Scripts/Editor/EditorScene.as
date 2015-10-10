@@ -1119,6 +1119,30 @@ bool SceneResetScale()
         return false;
 }
 
+bool SceneResetTransform()
+{
+    if (editNode !is null)
+    {
+        Transform oldTransform;
+        oldTransform.Define(editNode);
+
+        editNode.position = Vector3(0.0, 0.0, 0.0);
+        editNode.rotation = Quaternion();
+        editNode.scale = Vector3(1.0, 1.0, 1.0);
+
+        // Create undo action
+        EditNodeTransformAction action;
+        action.Define(editNode, oldTransform);
+        SaveEditAction(action);
+        SetSceneModified();
+
+        UpdateNodeAttributes();
+        return true;
+    }
+    else
+        return false;
+}
+
 bool SceneSelectAll()
 {
     BeginSelectionModify();

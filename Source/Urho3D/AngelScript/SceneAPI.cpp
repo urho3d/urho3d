@@ -123,6 +123,7 @@ static void RegisterNode(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Node", "void SetDeepEnabled(bool)", asMETHOD(Node, SetDeepEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "void ResetDeepEnabled()", asMETHOD(Node, ResetDeepEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "void SetEnabledRecursive(bool)", asMETHOD(Node, SetEnabledRecursive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Node", "void MarkDirty()", asMETHOD(Node, MarkDirty), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "void set_enabled(bool)", asMETHODPR(Node, SetEnabled, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "bool get_enabled() const", asMETHOD(Node, IsEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "bool get_enabledSelf() const", asMETHOD(Node, IsEnabledSelf), asCALL_THISCALL);

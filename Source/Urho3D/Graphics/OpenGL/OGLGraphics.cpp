@@ -69,6 +69,18 @@
 #define glClearDepth glClearDepthf
 #endif
 
+#ifdef __EMSCRIPTEN__
+// Emscripten provides even all GL extension functions via static linking. However there is
+// no GLES2-specific extension header at the moment to include instanced rendering declarations,
+// so declare them manually from GLES3 gl2ext.h. Emscripten will provide these when linking final output.
+extern "C"
+{
+    GL_APICALL void GL_APIENTRY glDrawArraysInstancedANGLE (GLenum mode, GLint first, GLsizei count, GLsizei primcount);
+    GL_APICALL void GL_APIENTRY glDrawElementsInstancedANGLE (GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei primcount);
+    GL_APICALL void GL_APIENTRY glVertexAttribDivisorANGLE (GLuint index, GLuint divisor);
+}
+#endif
+
 #ifdef WIN32
 // Prefer the high-performance GPU on switchable GPU systems
 #include <windows.h>
@@ -785,7 +797,7 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
     unsigned instanceCount)
 {
-#ifndef GL_ES_VERSION_2_0
+#if !defined(GL_ES_VERSION_2_0) || defined(__EMSCRIPTEN__)
     if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject() || !instancingSupport_)
         return;
 
@@ -797,6 +809,10 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 
     GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
     GLenum indexType = indexSize == sizeof(unsigned short) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+#ifdef __EMSCRIPTEN__
+    glDrawElementsInstancedANGLE(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
+        instanceCount);
+#else
     if (gl3Support)
     {
         glDrawElementsInstanced(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
@@ -807,6 +823,7 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
         glDrawElementsInstancedARB(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
             instanceCount);
     }
+#endif
 
     numPrimitives_ += instanceCount * primitiveCount;
     ++numBatches_;
@@ -2778,10 +2795,19 @@ void Graphics::CheckFeatureSupport()
 #endif
 #else
     // Check for supported compressed texture formats
-    #ifdef __EMSCRIPTEN__
+#ifdef __EMSCRIPTEN__
     dxtTextureSupport_ = CheckExtension("WEBGL_compressed_texture_s3tc"); // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
     etcTextureSupport_ = CheckExtension("WEBGL_compressed_texture_etc1"); // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/
     pvrtcTextureSupport_ = CheckExtension("WEBGL_compressed_texture_pvrtc"); // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/
+    // Instancing is in core in WebGL 2, so the extension may not be present anymore. In WebGL 1, find https://www.khronos.org/registry/webgl/extensions/ANGLE_instanced_arrays/
+    // TODO: In the distant future, this may break if WebGL 3 is introduced, so either improve the GL_VERSION parsing here, or keep track of which WebGL version we attempted to initialize.
+    instancingSupport_ = (strstr((const char *)glGetString(GL_VERSION), "WebGL 2.") != 0) || CheckExtension("ANGLE_instanced_arrays");
+    if (instancingSupport_)
+    {
+        glVertexAttribDivisorANGLE(ELEMENT_INSTANCEMATRIX1, 1);
+        glVertexAttribDivisorANGLE(ELEMENT_INSTANCEMATRIX2, 1);
+        glVertexAttribDivisorANGLE(ELEMENT_INSTANCEMATRIX3, 1);
+    }
 #else
     dxtTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
     etcTextureSupport_ = CheckExtension("OES_compressed_ETC1_RGB8_texture");
