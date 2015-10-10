@@ -134,6 +134,7 @@ endif ()
 option (URHO3D_PACKAGING "Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0" ${EMSCRIPTEN})
 option (URHO3D_PROFILING "Enable profiling support" TRUE)
 option (URHO3D_LOGGING "Enable logging support" TRUE)
+cmake_dependent_option (URHO3D_THREADING "Enable threading support" TRUE "NOT EMSCRIPTEN" FALSE)
 option (URHO3D_TESTING "Enable testing support")
 if (URHO3D_TESTING)
     if (EMSCRIPTEN)
@@ -340,6 +341,11 @@ endif ()
 # Enable logging by default. If disabled, LOGXXXX macros become no-ops and the Log subsystem is not instantiated.
 if (URHO3D_LOGGING)
     add_definitions (-DURHO3D_LOGGING)
+endif ()
+
+# Enable threading by default, except for Emscripten.
+if (URHO3D_THREADING)
+    add_definitions (-DURHO3D_THREADING)
 endif ()
 
 # If not on Windows platform, enable Unix mode for kNet library

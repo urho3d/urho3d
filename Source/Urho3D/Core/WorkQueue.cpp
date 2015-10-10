@@ -85,6 +85,7 @@ WorkQueue::~WorkQueue()
 
 void WorkQueue::CreateThreads(unsigned numThreads)
 {
+#ifdef URHO3D_THREADING
     // Other subsystems may initialize themselves according to the number of threads.
     // Therefore allow creating the threads only once, after which the amount is fixed
     if (!threads_.Empty())
@@ -99,6 +100,9 @@ void WorkQueue::CreateThreads(unsigned numThreads)
         thread->Run();
         threads_.Push(thread);
     }
+#else
+    LOGERROR("Can not create worker threads as threading is disabled");
+#endif
 }
 
 SharedPtr<WorkItem> WorkQueue::GetFreeItem()

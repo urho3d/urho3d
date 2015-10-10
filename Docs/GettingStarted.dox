@@ -97,6 +97,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_PACKAGING     |*|Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0|
 |URHO3D_PROFILING     |1|Enable profiling support|
 |URHO3D_LOGGING       |1|Enable logging support|
+|URHO3D_THREADING     |*|Enable thread support, on Emscripten default to 0, on other platforms default to 1|
 |URHO3D_TESTING       |0|Enable testing support|
 |URHO3D_TEST_TIMEOUT  |*|Number of seconds to test run the executables (when testing support is enabled only), default to 10 on Emscripten platform and 5 on other platforms|
 |URHO3D_OPENGL        |0|Use OpenGL instead of Direct3D (Windows platform only)|
