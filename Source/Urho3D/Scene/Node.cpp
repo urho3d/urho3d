@@ -558,23 +558,50 @@ void Node::SetOwner(Connection* owner)
 
 void Node::MarkDirty()
 {
-    dirty_ = true;
-
-    // Notify listener components first, then mark child nodes
-    for (Vector<WeakPtr<Component> >::Iterator i = listeners_.Begin(); i != listeners_.End();)
+    Node *cur = this;
+    for (;;)
     {
-        if (*i)
-        {
-            (*i)->OnMarkedDirty(this);
-            ++i;
-        }
-        // If listener has expired, erase from list
-        else
-            i = listeners_.Erase(i);
-    }
+        // Precondition:
+        // a) whenever a node is marked dirty, all its children are marked dirty as well.
+        // b) whenever a node is cleared from being dirty, all its parents must have been
+        //    cleared as well.
+        // Therefore if we are recursing here to mark this node dirty, and it already was,
+        // then all children of this node must also be already dirty, and we don't need to
+        // reflag them again.
+        if (cur->dirty_) return;
+        cur->dirty_ = true;
 
-    for (Vector<SharedPtr<Node> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
-        (*i)->MarkDirty();
+        // Notify listener components first, then mark child nodes
+        for (Vector<WeakPtr<Component> >::Iterator i = cur->listeners_.Begin(); i != cur->listeners_.End();)
+        {
+            Component *c = *i;
+            if (c)
+            {
+                c->OnMarkedDirty(cur);
+                ++i;
+            }
+            // If listener has expired, erase from list (swap with the last element to avoid O(n^2) behavior)
+            else
+            {
+                *i = cur->listeners_.Back();
+                cur->listeners_.Pop();
+            }
+        }
+
+        // Tail call optimization: Don't recurse to mark the first child dirty, but
+        // instead process it in the context of the current function. If there are more
+        // than one child, then recurse to the excess children.
+        Vector<SharedPtr<Node> >::Iterator i = cur->children_.Begin();
+        if (i != cur->children_.End())
+        {
+            Node *next = *i;
+            for (++i; i != cur->children_.End(); ++i)
+                (*i)->MarkDirty();
+            cur = next;
+        }
+        else
+            return;
+    }
 }
 
 Node* Node::CreateChild(const String& name, CreateMode mode, unsigned id)
