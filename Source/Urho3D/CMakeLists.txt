@@ -313,8 +313,9 @@ if (NOT XCODE AND NOT MSVC)
                 COMMAND rm $<TARGET_FILE:${TARGET_NAME}>.engine
                 COMMENT "Merging all archives into a single static library using libtool")
         elseif (EMSCRIPTEN OR CMAKE_BINARY_DIR MATCHES " ")
-            # Emscripten emar (llvm-ar) neither takes archives directly as input nor supports MRI-style script, so do it the hard way by first extracting the object (bitcode) files and appending them to final archive
-            # Also do that when the build tree path contains spaces because MRI script does not support it (even with proper escape)
+            # Do it the hard way by first extracting the object (bitcode) files and appending them to final archive:
+            # a) For Emscripten build as Emscripten emar (llvm-ar) neither takes archives directly as input nor supports MRI-style script
+            # b) When the build tree path contains spaces because MRI script does not support spaces in path even with proper escape
             get_filename_component (AR ${CMAKE_AR} NAME_WE)
             if (CMAKE_HOST_WIN32)
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
@@ -326,7 +327,7 @@ if (NOT XCODE AND NOT MSVC)
                     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                         COMMAND ${CMAKE_AR} x ${ARCHIVE}
                         COMMAND ${CMAKE_COMMAND} -E echo_append "\\\"${CMAKE_AR}\\\"" q \\\"$<TARGET_FILE:${TARGET_NAME}>\\\" " " >merge.bat
-                        COMMAND for /F %%i in ('dir /B') do ${CMAKE_COMMAND} -E echo_append %%i" " >>merge.bat
+                        COMMAND for /F %%i in ('dir /B *.o*') do ${CMAKE_COMMAND} -E echo_append %%i" " >>merge.bat
                         COMMAND merge.bat WORKING_DIRECTORY archives)
                     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E remove_directory archives)
                 endforeach ()
