@@ -59,7 +59,7 @@ if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the i
     set (URHO3D_DEFAULT_64BIT ${URHO3D_DEFAULT_64BIT} CACHE INTERNAL "Default value for URHO3D_64BIT build option")
     # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
     # When ANDROID is true and ARM is not then we are targeting Android on Intel Atom
-    string (REGEX MATCH "#define +__arm__ +1" matched "${PREDEFINED_MACROS}")
+    string (REGEX MATCH "#define +__(arm|arm64|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
     if (matched)
         set (ARM TRUE)
     else ()
