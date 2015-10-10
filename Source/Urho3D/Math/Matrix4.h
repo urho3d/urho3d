@@ -234,7 +234,9 @@ public:
         c0 = _mm_and_ps(c0, c2);
         __m128 hi = _mm_movehl_ps(c0, c0);
         c0 = _mm_and_ps(c0, hi);
-        return _mm_cvtsi128_si64(_mm_castps_si128(c0)) == -1LL;
+        hi = _mm_shuffle_ps(c0, c0, _MM_SHUFFLE(1, 1, 1, 1));
+        c0 = _mm_and_ps(c0, hi);
+        return !_mm_ucomige_ss(c0, c0);
 #else
         const float* leftData = Data();
         const float* rightData = rhs.Data();
