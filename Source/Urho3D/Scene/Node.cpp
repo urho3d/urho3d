@@ -568,7 +568,8 @@ void Node::MarkDirty()
         // Therefore if we are recursing here to mark this node dirty, and it already was,
         // then all children of this node must also be already dirty, and we don't need to
         // reflag them again.
-        if (cur->dirty_) return;
+        if (cur->dirty_)
+            return;
         cur->dirty_ = true;
 
         // Notify listener components first, then mark child nodes
