@@ -91,7 +91,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_PCH           |1|Enable PCH support|
 |URHO3D_DATABASE_ODBC |0|Enable Database support with ODBC, requires vendor-specific ODBC driver|
 |URHO3D_DATABASE_SQLITE|0|Enable Database support with SQLite embedded|
-|URHO3D_SSE           |1|Enable SSE instruction set (Intel platform only including Android on Intel Atom)|
+|URHO3D_SSE           |1|Enable SSE2 instruction set (Intel platform only including Android on Intel Atom)|
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
 |URHO3D_PACKAGING     |*|Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0|
