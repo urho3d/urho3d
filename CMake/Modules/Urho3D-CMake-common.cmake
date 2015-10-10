@@ -58,13 +58,18 @@ if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the i
     endif ()
     set (URHO3D_DEFAULT_64BIT ${URHO3D_DEFAULT_64BIT} CACHE INTERNAL "Default value for URHO3D_64BIT build option")
     # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
+    # When ANDROID is true and ARM is not then we are targeting Android on Intel Atom
+    string (REGEX MATCH "#define +__arm__ +1" matched "${PREDEFINED_MACROS}")
+    if (matched)
+        set (ARM TRUE)
+    else ()
+        set (ARM FALSE)
+    endif ()
+    set (ARM ${ARM} CACHE INTERNAL "Targeting ARM platform")
     # The other arm platform that Urho3D supports that is not Android is Raspberry Pi at the moment
-    if (NOT ANDROID AND NOT EMSCRIPTEN)
-        string (REGEX MATCH "#define +__arm__ +1" matched "${PREDEFINED_MACROS}")
-        if (matched)
-            # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too on the Raspberry-Pi device itself
-            set (RPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
-        endif ()
+    if (NOT ANDROID AND ARM)
+        # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too on the Raspberry-Pi device itself
+        set (RPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
     endif ()
 endif ()
 if (ANDROID OR RPI OR EMSCRIPTEN)
@@ -93,7 +98,7 @@ if (MINGW AND NOT DEFINED URHO3D_SSE)
 else ()
     set (URHO3D_DEFAULT_SSE TRUE)
 endif ()
-cmake_dependent_option (URHO3D_SSE "Enable SSE instruction set" ${URHO3D_DEFAULT_SSE} "NOT RPI AND NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
+cmake_dependent_option (URHO3D_SSE "Enable SSE instruction set (Intel platform only including Android on Intel Atom)" ${URHO3D_DEFAULT_SSE} "NOT ARM AND NOT EMSCRIPTEN" FALSE)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
     cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
