@@ -82,6 +82,7 @@ function CreateScene()
         -- Enable full blending weight and looping
         state.weight = 1.0
         state.looped = true
+        state.time = Random(walkAnimation.length)
 
         -- Create our Mover script object that will move & animate the model during each frame's update.
 
