@@ -636,7 +636,7 @@ There are some complexities of the scripting system one has to watch out for:
 
 - When the resource request for a particular ScriptFile is initially made, the script file and the files it includes are compiled into an AngelScript script module. Each script module has its own class hierarchy that is not usable from other script modules, unless the classes are declared shared. See AngelScript documentation for more details.
 
-- If a ScriptFile resource is reloaded, all the script objects created from it will be destroyed, then recreated. They will lose any stored state as their constructors and Start() methods will be run again. This is rarely useful when running an actual game, but may be helpful during development. 
+- If a ScriptFile resource is reloaded, all the script objects created from it will be destroyed, then recreated. They will lose any stored state as their constructors and Start() methods will be run again. This is rarely useful when running an actual game, but may be helpful during development.
 
 A global VariantMap, globalVars, can be accessed by all scripts to store shared data or to preserve data through script file reloads.
 
@@ -1672,7 +1672,7 @@ The operating system mouse cursor can be used in four modes which can be switche
 
 - MM_WRAP grabs the mouse from the operating system and confines the operating system cursor to the window, wrapping the cursor when it is near the edges.
   SetMouseMode(MM_WRAP) will call SetMouseGrabbed(true).
-  
+
 - MM_FREE does not grab/confine the mouse cursor even when it is hidden. This can be used for cases where the cursor should render using the operating system
   outside the window, and perform custom rendering (with SetMouseVisible(false)) inside.
 
@@ -2859,6 +2859,7 @@ Options:
 -ns         Do not create subdirectories for resources
 -nz         Do not create a zone and a directional light (scene mode only)
 -nf         Do not fix infacing normals
+-ne         Do not save empty nodes (scene mode only)
 -mb <x>     Maximum number of bones per submesh. Default 64
 -p <path>   Set path for scene resources. Default is output file path
 -r <name>   Use the named scene node as root node\n"
@@ -2875,6 +2876,7 @@ Options:
 -ct         Check and do not overwrite if texture exists
 -ctn        Check and do not overwrite if texture has newer timestamp
 -am         Export all meshes even if identical (scene mode only)
+-bp         Move bones to bind pose before saving model
 \endverbatim
 
 The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, StaticModelGroup, AnimatedModel or Skybox component, and can also be manually invoked by calling \ref StaticModel::ApplyMaterialList "ApplyMaterialList()". The list files can safely be deleted if not needed.
