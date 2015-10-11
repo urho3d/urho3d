@@ -572,6 +572,7 @@ else ()
             if (NOT URHO3D_NOABI)
                 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DASH_MBIT}")
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DASH_MBIT}")
+                # Required only when cross-compling from i686 to x86_64, in other cases the flag is redundantly duplicated during linking phase for shared lib
                 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${DASH_MBIT}")
             endif ()
         endif ()
@@ -582,7 +583,6 @@ else ()
             if (URHO3D_THREADING)
                 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s USE_PTHREADS=1")
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_PTHREADS=1")
-                set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -s USE_PTHREADS=1")
             endif ()
             # Prior to version 1.31.3 emcc does not consistently add the cpp standard and remove Emscripten-specific compiler flags
             # before passing on the work to the underlying LLVM/Clang compiler, this has resulted in preprocessing error when enabling the PCH and ccache
