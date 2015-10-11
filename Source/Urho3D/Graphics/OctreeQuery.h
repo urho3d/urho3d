@@ -256,4 +256,19 @@ private:
     RayOctreeQuery& operator =(const RayOctreeQuery& rhs);
 };
 
+class URHO3D_API AllContentOctreeQuery : public OctreeQuery
+{
+public:
+    /// Construct.
+    AllContentOctreeQuery(PODVector<Drawable*>& result, unsigned char drawableFlags, unsigned viewMask) :
+        OctreeQuery(result, drawableFlags, viewMask)
+    {
+    }
+
+    /// Intersection test for an octant.
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside);
+    /// Intersection test for drawables.
+    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside);
+};
+
 }

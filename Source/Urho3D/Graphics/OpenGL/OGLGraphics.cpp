@@ -69,6 +69,18 @@
 #define glClearDepth glClearDepthf
 #endif
 
+#ifdef __EMSCRIPTEN__
+// Emscripten provides even all GL extension functions via static linking. However there is
+// no GLES2-specific extension header at the moment to include instanced rendering declarations,
+// so declare them manually from GLES3 gl2ext.h. Emscripten will provide these when linking final output.
+extern "C"
+{
+    GL_APICALL void GL_APIENTRY glDrawArraysInstancedANGLE (GLenum mode, GLint first, GLsizei count, GLsizei primcount);
+    GL_APICALL void GL_APIENTRY glDrawElementsInstancedANGLE (GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei primcount);
+    GL_APICALL void GL_APIENTRY glVertexAttribDivisorANGLE (GLuint index, GLuint divisor);
+}
+#endif
+
 #ifdef WIN32
 // Prefer the high-performance GPU on switchable GPU systems
 #include <windows.h>
@@ -337,7 +349,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         return true;
     }
 
-    // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. 
+    // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size.
     // If zero in fullscreen, use desktop mode
     if (!width || !height)
     {
@@ -361,9 +373,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     if (fullscreen)
     {
         PODVector<IntVector2> resolutions = GetResolutions();
-        if (resolutions.Empty())
-            fullscreen = false;
-        else
+        if (resolutions.Size())
         {
             unsigned best = 0;
             unsigned bestError = M_MAX_UNSIGNED;
@@ -457,7 +467,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
                 impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
             else
             {
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
                 if (!impl_->window_)
                     impl_->window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
                 fullscreen = false;
@@ -785,7 +795,7 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
     unsigned instanceCount)
 {
-#ifndef GL_ES_VERSION_2_0
+#if !defined(GL_ES_VERSION_2_0) || defined(__EMSCRIPTEN__)
     if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject() || !instancingSupport_)
         return;
 
@@ -797,6 +807,10 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 
     GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
     GLenum indexType = indexSize == sizeof(unsigned short) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+#ifdef __EMSCRIPTEN__
+    glDrawElementsInstancedANGLE(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
+        instanceCount);
+#else
     if (gl3Support)
     {
         glDrawElementsInstanced(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
@@ -807,6 +821,7 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
         glDrawElementsInstancedARB(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
             instanceCount);
     }
+#endif
 
     numPrimitives_ += instanceCount * primitiveCount;
     ++numBatches_;
@@ -1429,30 +1444,19 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
         if (texture)
         {
             unsigned glType = texture->GetTarget();
-            if (glType != textureTypes_[index])
-            {
-                if (textureTypes_[index])
-                {
-                    if (textures_[index])
-                        glBindTexture(textureTypes_[index], 0);
-                    if (!gl3Support)
-                        glDisable(textureTypes_[index]);
-                }
-
-                if (!gl3Support)
-                    glEnable(glType);
-                textureTypes_[index] = glType;
-            }
-
+            // Unbind old texture type if necessary
+            if (textureTypes_[index] && textureTypes_[index] != glType)
+                glBindTexture(textureTypes_[index], 0);
             glBindTexture(glType, texture->GetGPUObject());
+            textureTypes_[index] = glType;
 
             if (texture->GetParametersDirty())
                 texture->UpdateParameters();
         }
-        else
+        else if (textureTypes_[index])
         {
-            if (textureTypes_[index])
-                glBindTexture(textureTypes_[index], 0);
+            glBindTexture(textureTypes_[index], 0);
+            textureTypes_[index] = 0;
         }
 
         textures_[index] = texture;
@@ -1481,7 +1485,12 @@ void Graphics::SetTextureForUpdate(Texture* texture)
         impl_->activeTexture_ = 0;
     }
 
-    glBindTexture(texture->GetTarget(), texture->GetGPUObject());
+    unsigned glType = texture->GetTarget();
+    // Unbind old texture type if necessary
+    if (textureTypes_[0] && textureTypes_[0] != glType)
+        glBindTexture(textureTypes_[0], 0);
+    glBindTexture(glType, texture->GetGPUObject());
+    textureTypes_[0] = glType;
     textures_[0] = texture;
 }
 
@@ -1936,6 +1945,8 @@ IntVector2 Graphics::GetWindowPosition() const
 PODVector<IntVector2> Graphics::GetResolutions() const
 {
     PODVector<IntVector2> ret;
+    // Emscripten is not able to return a valid list
+#ifndef __EMSCRIPTEN__
     unsigned numModes = (unsigned)SDL_GetNumDisplayModes(0);
 
     for (unsigned i = 0; i < numModes; ++i)
@@ -1959,6 +1970,7 @@ PODVector<IntVector2> Graphics::GetResolutions() const
         if (unique)
             ret.Push(IntVector2(width, height));
     }
+#endif
 
     return ret;
 }
@@ -1995,7 +2007,7 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
     case CF_DXT1:
         return dxtTextureSupport_ ? GL_COMPRESSED_RGBA_S3TC_DXT1_EXT : 0;
 
-#if !defined(GL_ES_VERSION_2_0) || defined(EMSCRIPTEN)
+#if !defined(GL_ES_VERSION_2_0) || defined(__EMSCRIPTEN__)
     case CF_DXT3:
         return dxtTextureSupport_ ? GL_COMPRESSED_RGBA_S3TC_DXT3_EXT : 0;
 
@@ -2005,16 +2017,16 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
 #ifdef GL_ES_VERSION_2_0
     case CF_ETC1:
         return etcTextureSupport_ ? GL_ETC1_RGB8_OES : 0;
-        
+
     case CF_PVRTC_RGB_2BPP:
         return pvrtcTextureSupport_ ? COMPRESSED_RGB_PVRTC_2BPPV1_IMG : 0;
-        
+
     case CF_PVRTC_RGB_4BPP:
         return pvrtcTextureSupport_ ? COMPRESSED_RGB_PVRTC_4BPPV1_IMG : 0;
-        
+
     case CF_PVRTC_RGBA_2BPP:
         return pvrtcTextureSupport_ ? COMPRESSED_RGBA_PVRTC_2BPPV1_IMG : 0;
-        
+
     case CF_PVRTC_RGBA_4BPP:
         return pvrtcTextureSupport_ ? COMPRESSED_RGBA_PVRTC_4BPPV1_IMG : 0;
 #endif
@@ -2784,8 +2796,19 @@ void Graphics::CheckFeatureSupport()
 #endif
 #else
     // Check for supported compressed texture formats
-    #ifdef EMSCRIPTEN
-    dxtTextureSupport_ = CheckExtension("WEBGL_compressed_texture_s3tc");
+#ifdef __EMSCRIPTEN__
+    dxtTextureSupport_ = CheckExtension("WEBGL_compressed_texture_s3tc"); // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
+    etcTextureSupport_ = CheckExtension("WEBGL_compressed_texture_etc1"); // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/
+    pvrtcTextureSupport_ = CheckExtension("WEBGL_compressed_texture_pvrtc"); // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/
+    // Instancing is in core in WebGL 2, so the extension may not be present anymore. In WebGL 1, find https://www.khronos.org/registry/webgl/extensions/ANGLE_instanced_arrays/
+    // TODO: In the distant future, this may break if WebGL 3 is introduced, so either improve the GL_VERSION parsing here, or keep track of which WebGL version we attempted to initialize.
+    instancingSupport_ = (strstr((const char *)glGetString(GL_VERSION), "WebGL 2.") != 0) || CheckExtension("ANGLE_instanced_arrays");
+    if (instancingSupport_)
+    {
+        glVertexAttribDivisorANGLE(ELEMENT_INSTANCEMATRIX1, 1);
+        glVertexAttribDivisorANGLE(ELEMENT_INSTANCEMATRIX2, 1);
+        glVertexAttribDivisorANGLE(ELEMENT_INSTANCEMATRIX3, 1);
+    }
 #else
     dxtTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
     etcTextureSupport_ = CheckExtension("OES_compressed_ETC1_RGB8_texture");
@@ -2797,7 +2820,7 @@ void Graphics::CheckFeatureSupport()
         glesDepthStencilFormat = GL_DEPTH_COMPONENT24_OES;
     if (CheckExtension("GL_OES_packed_depth_stencil"))
         glesDepthStencilFormat = GL_DEPTH24_STENCIL8_OES;
-    #ifdef EMSCRIPTEN
+    #ifdef __EMSCRIPTEN__
     if (!CheckExtension("WEBGL_depth_texture"))
 #else
     if (!CheckExtension("GL_OES_depth_texture"))
@@ -2817,7 +2840,7 @@ void Graphics::CheckFeatureSupport()
         shadowMapFormat_ = GL_DEPTH_COMPONENT;
         hiresShadowMapFormat_ = 0;
         // WebGL shadow map rendering seems to be extremely slow without an attached dummy color texture
-        #ifdef EMSCRIPTEN
+        #ifdef __EMSCRIPTEN__
         dummyColorFormat_ = GetRGBAFormat();
 #endif
     }

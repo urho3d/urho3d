@@ -58,8 +58,8 @@
 #include "../Urho2D/Urho2D.h"
 #endif
 
-#if defined(EMSCRIPTEN) && defined(URHO3D_TESTING)
-#include <emscripten.h>
+#if defined(__EMSCRIPTEN__) && defined(URHO3D_TESTING)
+#include <emscripten/emscripten.h>
 #endif
 
 #include "../DebugNew.h"
@@ -198,6 +198,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 
     // Set amount of worker threads according to the available physical CPU cores. Using also hyperthreaded cores results in
     // unpredictable extra synchronization overhead. Also reserve one core for the main thread
+#ifdef URHO3D_THREADING
     unsigned numThreads = GetParameter(parameters, "WorkerThreads", true).GetBool() ? GetNumPhysicalCPUs() - 1 : 0;
     if (numThreads)
     {
@@ -205,6 +206,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         LOGINFOF("Created %u worker thread%s", numThreads, numThreads > 1 ? "s" : "");
     }
+#endif
 
     // Add resource paths
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -680,6 +682,7 @@ void Engine::ApplyFrameLimit()
 
     long long elapsed = 0;
 
+#ifndef __EMSCRIPTEN__
     // Perform waiting loop if maximum FPS set
     if (maxFps)
     {
@@ -701,6 +704,7 @@ void Engine::ApplyFrameLimit()
             }
         }
     }
+#endif
 
     elapsed = frameTimer_.GetUSec(true);
 #ifdef URHO3D_TESTING
@@ -916,7 +920,7 @@ void Engine::DoExit()
         graphics->Close();
 
     exiting_ = true;
-#if defined(EMSCRIPTEN) && defined(URHO3D_TESTING)
+#if defined(__EMSCRIPTEN__) && defined(URHO3D_TESTING)
     emscripten_force_exit(EXIT_SUCCESS);    // Some how this is required to signal emrun to stop
 #endif
 }

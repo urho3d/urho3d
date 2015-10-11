@@ -90,17 +90,23 @@ void ImportScene(const String&in fileName)
     else
     {
         // Export scene to a temp file, then load and delete it if successful
-        String tempSceneName = sceneResourcePath + TEMP_SCENE_NAME;
+        Array<String> options = importOptions.Trimmed().Split(' ');
+        bool isBinary = false;
+        for (uint i = 0; i < options.length; ++i)
+            if (options[i] == "-b")
+                isBinary = true;
+        String tempSceneName = sceneResourcePath + (isBinary ? TEMP_BINARY_SCENE_NAME : TEMP_SCENE_NAME);
+
         Array<String> args;
         args.Push("scene");
         args.Push("\"" + fileName + "\"");
         args.Push("\"" + tempSceneName + "\"");
         args.Push("-p \"" + sceneResourcePath + "\"");
-        Array<String> options = importOptions.Trimmed().Split(' ');
         for (uint i = 0; i < options.length; ++i)
             args.Push(options[i]);
         if (applyMaterialList)
             args.Push("-l");
+
         if (ExecuteAssetImporter(args) == 0)
         {
             skipMruScene = true; // set to avoid adding tempscene to mru

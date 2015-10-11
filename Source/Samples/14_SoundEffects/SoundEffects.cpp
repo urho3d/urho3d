@@ -62,6 +62,13 @@ SoundEffects::SoundEffects(Context* context) :
 {
 }
 
+void SoundEffects::Setup()
+{
+    // Modify engine startup parameters
+    Sample::Setup();
+    engineParameters_["Sound"] = true;
+}
+
 void SoundEffects::Start()
 {
     // Execute base class startup

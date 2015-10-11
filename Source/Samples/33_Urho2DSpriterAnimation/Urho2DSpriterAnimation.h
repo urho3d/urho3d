@@ -84,9 +84,9 @@ private:
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle mouse button down event.
     void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData);
-
-    /// Sprite nodes.
-    SharedPtr<Node> spriteNode_;
-    /// Animation index.
-    int animationIndex_;
+    
+    /// Spriter nodes.
+    SharedPtr<Node> spriterNode_;
+    /// Spriter animation index.
+    int spriterAnimationIndex_;
 };

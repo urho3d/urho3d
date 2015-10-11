@@ -177,7 +177,8 @@ bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info
         const Vector2 position(objectElem.GetFloat("x"), objectElem.GetFloat("y"));
         const Vector2 size(objectElem.GetFloat("width"), objectElem.GetFloat("height"));
 
-        switch (object->objectType_) {
+        switch (object->objectType_)
+        {
         case OT_RECTANGLE:
         case OT_ELLIPSE:
             object->position_ = info.ConvertPosition(Vector2(position.x_, position.y_ + size.y_));
@@ -198,32 +199,32 @@ bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info
                 IntVector2 spriteSize = object->sprite_->GetRectangle().Size();
                 object->size_ = Vector2(spriteSize.x_, spriteSize.y_);
             }
-
             break;
 
         case OT_POLYGON:
         case OT_POLYLINE:
-        {
-            Vector<String> points;
-
-            const char *name = object->objectType_ == OT_POLYGON ? "polygon" : "polyline";
-            XMLElement polygonElem = objectElem.GetChild(name);
-            points = polygonElem.GetAttribute("points").Split(' ');
-
-            if (points.Size() <= 1)
-                continue;
-
-            object->points_.Resize(points.Size());
-
-            for (unsigned i = 0; i < points.Size(); ++i)
             {
-                points[i].Replace(',', ' ');
-                Vector2 point = position + ToVector2(points[i]);
-                object->points_[i] = info.ConvertPosition(point);
-            }
+                Vector<String> points;
 
+                const char* name = object->objectType_ == OT_POLYGON ? "polygon" : "polyline";
+                XMLElement polygonElem = objectElem.GetChild(name);
+                points = polygonElem.GetAttribute("points").Split(' ');
+
+                if (points.Size() <= 1)
+                    continue;
+
+                object->points_.Resize(points.Size());
+
+                for (unsigned i = 0; i < points.Size(); ++i)
+                {
+                    points[i].Replace(',', ' ');
+                    Vector2 point = position + ToVector2(points[i]);
+                    object->points_[i] = info.ConvertPosition(point);
+                }
+            }
             break;
-        }
+
+        default: break;
         }
 
         if (objectElem.HasChild("properties"))

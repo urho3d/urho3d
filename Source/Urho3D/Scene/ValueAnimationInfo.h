@@ -45,8 +45,10 @@ public:
     /// Destruct.
     ~ValueAnimationInfo();
 
-    /// Update. Return true when the animation is finished. No-op when the target object is not defined.
+    /// Advance time position and apply. Return true when the animation is finished. No-op when the target object is not defined.
     bool Update(float timeStep);
+    /// Set time position and apply. Return true when the animation is finished. No-op when the target object is not defined.
+    bool SetTime(float time);
 
     /// Set wrap mode.
     void SetWrapMode(WrapMode wrapMode) { wrapMode_ = wrapMode; }
@@ -62,6 +64,9 @@ public:
 
     /// Return wrap mode.
     WrapMode GetWrapMode() const { return wrapMode_; }
+
+    /// Return time position.
+    float GetTime() const { return currentTime_; }
 
     /// Return speed.
     float GetSpeed() const { return speed_; }

@@ -77,6 +77,12 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #ifndef D3DPRESENT_LINEAR_CONTENT
 #define D3DPRESENT_LINEAR_CONTENT 0x00000002L
 #endif
+#ifndef D3DSTREAMSOURCE_INDEXEDDATA
+#define D3DSTREAMSOURCE_INDEXEDDATA (1<<30)
+#endif
+#ifndef D3DSTREAMSOURCE_INSTANCEDATA
+#define D3DSTREAMSOURCE_INSTANCEDATA (2<<30)
+#endif
 
 namespace Urho3D
 {
@@ -444,9 +450,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     if (fullscreen)
     {
         PODVector<IntVector2> resolutions = GetResolutions();
-        if (resolutions.Empty())
-            fullscreen = false;
-        else
+        if (resolutions.Size())
         {
             unsigned best = 0;
             unsigned bestError = M_MAX_UNSIGNED;

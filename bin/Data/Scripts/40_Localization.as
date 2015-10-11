@@ -129,7 +129,7 @@ void CreateScene()
     text3D.text = localization.Get("lang");
 
     text3D.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 30);
-    text3D.color = Color::BLACK;
+    text3D.color = BLACK;
     text3D.SetAlignment(HA_CENTER, VA_BOTTOM);
 
     Viewport@ viewport = Viewport(scene_, cameraNode.GetComponent("Camera"));

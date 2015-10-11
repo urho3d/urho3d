@@ -134,6 +134,13 @@ public:
     void AddTriangleMesh
         (const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart,
             unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true);
+    /// Add a circle.
+    void AddCircle(const Vector3& center, const Vector3& normal, float radius, const Color& color, int steps = 64, bool depthTest = true);
+    /// Add a cross.
+    void AddCross(const Vector3& center, float size, const Color& color, bool depthTest = true);
+    /// Add a quad on the XZ plane.
+    void AddQuad(const Vector3& center, float width, float height, const Color& color, bool depthTest = true);
+
     /// Update vertex buffer and render all debug lines. The viewport and rendertarget should be set before.
     void Render();
 

@@ -44,6 +44,7 @@ static const unsigned char CTRL_STARTBONE = 0x2;
 static const unsigned char CTRL_AUTOFADE = 0x4;
 static const unsigned char CTRL_SETTIME = 0x08;
 static const unsigned char CTRL_SETWEIGHT = 0x10;
+static const unsigned char CTRL_REMOVEONCOMPLETION = 0x20;
 static const float EXTRA_ANIM_FADEOUT_TIME = 0.1f;
 static const float COMMAND_STAY_TIME = 0.25f;
 static const unsigned MAX_NODE_ANIMATION_STATES = 256;
@@ -87,26 +88,28 @@ void AnimationController::OnSetEnabled()
 void AnimationController::Update(float timeStep)
 {
     // Loop through animations
-    for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End();)
+    for (unsigned i = 0; i < animations_.Size();)
     {
+        AnimationControl& ctrl = animations_[i];
+        AnimationState* state = GetAnimationState(ctrl.hash_);
         bool remove = false;
-        AnimationState* state = GetAnimationState(i->hash_);
+
         if (!state)
             remove = true;
         else
         {
             // Advance the animation
-            if (i->speed_ != 0.0f)
-                state->AddTime(i->speed_ * timeStep);
+            if (ctrl.speed_ != 0.0f)
+                state->AddTime(ctrl.speed_ * timeStep);
 
-            float targetWeight = i->targetWeight_;
-            float fadeTime = i->fadeTime_;
+            float targetWeight = ctrl.targetWeight_;
+            float fadeTime = ctrl.fadeTime_;
 
             // If non-looped animation at the end, activate autofade as applicable
-            if (!state->IsLooped() && state->GetTime() >= state->GetLength() && i->autoFadeTime_ > 0.0f)
+            if (!state->IsLooped() && state->GetTime() >= state->GetLength() && ctrl.autoFadeTime_ > 0.0f)
             {
                 targetWeight = 0.0f;
-                fadeTime = i->autoFadeTime_;
+                fadeTime = ctrl.autoFadeTime_;
             }
 
             // Process weight fade
@@ -127,21 +130,21 @@ void AnimationController::Update(float timeStep)
             }
 
             // Remove if weight zero and target weight zero
-            if (state->GetWeight() == 0.0f && (targetWeight == 0.0f || fadeTime == 0.0f))
+            if (state->GetWeight() == 0.0f && (targetWeight == 0.0f || fadeTime == 0.0f) && ctrl.removeOnCompletion_)
                 remove = true;
         }
 
         // Decrement the command time-to-live values
-        if (i->setTimeTtl_ > 0.0f)
-            i->setTimeTtl_ = Max(i->setTimeTtl_ - timeStep, 0.0f);
-        if (i->setWeightTtl_ > 0.0f)
-            i->setWeightTtl_ = Max(i->setWeightTtl_ - timeStep, 0.0f);
+        if (ctrl.setTimeTtl_ > 0.0f)
+            ctrl.setTimeTtl_ = Max(ctrl.setTimeTtl_ - timeStep, 0.0f);
+        if (ctrl.setWeightTtl_ > 0.0f)
+            ctrl.setWeightTtl_ = Max(ctrl.setWeightTtl_ - timeStep, 0.0f);
 
         if (remove)
         {
             if (state)
                 RemoveAnimationState(state);
-            i = animations_.Erase(i);
+            animations_.Erase(i);
             MarkNetworkUpdate();
         }
         else
@@ -362,6 +365,19 @@ bool AnimationController::SetWeight(const String& name, float weight)
     return true;
 }
 
+bool AnimationController::SetRemoveOnCompletion(const String& name, bool removeOnCompletion)
+{
+    unsigned index;
+    AnimationState* state;
+    FindAnimation(name, index, state);
+    if (index == M_MAX_UNSIGNED || !state)
+        return false;
+
+    animations_[index].removeOnCompletion_ = removeOnCompletion;
+    MarkNetworkUpdate();
+    return true;
+}
+
 bool AnimationController::SetLooped(const String& name, bool enable)
 {
     AnimationState* state = GetAnimationState(name);
@@ -502,6 +518,14 @@ float AnimationController::GetAutoFade(const String& name) const
     return index != M_MAX_UNSIGNED ? animations_[index].autoFadeTime_ : 0.0f;
 }
 
+bool AnimationController::GetRemoveOnCompletion(const String& name) const
+{
+    unsigned index;
+    AnimationState* state;
+    FindAnimation(name, index, state);
+    return index != M_MAX_UNSIGNED ? animations_[index].removeOnCompletion_ : false;
+}
+
 AnimationState* AnimationController::GetAnimationState(const String& name) const
 {
     return GetAnimationState(StringHash(name));
@@ -604,6 +628,9 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
             animations_[index].autoFadeTime_ = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade
         else
             animations_[index].autoFadeTime_ = 0.0f;
+        
+        animations_[index].removeOnCompletion_ = (ctrl & CTRL_REMOVEONCOMPLETION) != 0;
+        
         if (ctrl & CTRL_SETTIME)
         {
             unsigned char setTimeRev = buf.ReadUByte();
@@ -716,6 +743,8 @@ const PODVector<unsigned char>& AnimationController::GetNetAnimationsAttr() cons
             ctrl |= CTRL_STARTBONE;
         if (i->autoFadeTime_ > 0.0f)
             ctrl |= CTRL_AUTOFADE;
+        if (i->removeOnCompletion_)
+            ctrl |= CTRL_REMOVEONCOMPLETION;
         if (i->setTimeTtl_ > 0.0f)
             ctrl |= CTRL_SETTIME;
         if (i->setWeightTtl_ > 0.0f)

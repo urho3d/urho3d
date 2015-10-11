@@ -15,13 +15,16 @@ class DebugRenderer : public Component
     void AddSphere(const Sphere& sphere, const Color& color, bool depthTest = true);
     void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true);
     void AddTriangleMesh(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true);
+    void AddCircle(const Vector3& center, const Vector3& normal, float radius, const Color& color, int steps = 64, bool depthTest = true);
+    void AddCross(const Vector3& center, float size, const Color& color, bool depthTest = true);
+    void AddQuad(const Vector3& center, float width, float height, const Color& color, bool depthTest = true);
     void Render();
-    
+
     const Matrix3x4& GetView() const;
     const Matrix4& GetProjection() const;
     const Frustum& GetFrustum() const;
     bool IsInside(const BoundingBox& box) const;
-    
+
     tolua_readonly tolua_property__get_set Matrix3x4& view;
     tolua_readonly tolua_property__get_set Matrix4& projection;
     tolua_readonly tolua_property__get_set Frustum& frustum;

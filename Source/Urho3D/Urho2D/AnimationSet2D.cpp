@@ -23,27 +23,100 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
+#include "../Graphics/Graphics.h"
+#include "../Graphics/Texture2D.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
+#include "../Math/AreaAllocator.h"
+#include "../Resource/Image.h"
 #include "../Resource/ResourceCache.h"
-#include "../Urho2D/Animation2D.h"
+#include "../Resource/XMLFile.h"
 #include "../Urho2D/AnimationSet2D.h"
 #include "../Urho2D/Sprite2D.h"
+#include "../Urho2D/SpriterData2D.h"
 #include "../Urho2D/SpriteSheet2D.h"
-#include "../Resource/XMLFile.h"
 
 #include "../DebugNew.h"
+
+#ifdef URHO3D_SPINE
+#include <spine/spine.h>
+#include <spine/extension.h>
+#endif
+
+#ifdef URHO3D_SPINE
+// Current animation set
+static Urho3D::AnimationSet2D* currentAnimationSet = 0;
+
+void _spAtlasPage_createTexture(spAtlasPage* self, const char* path)
+{
+    using namespace Urho3D;
+    if (!currentAnimationSet)
+        return;
+
+    ResourceCache* cache = currentAnimationSet->GetSubsystem<ResourceCache>();
+    Sprite2D* sprite = cache->GetResource<Sprite2D>(path);
+    // Add reference
+    if (sprite)
+        sprite->AddRef();
+
+    self->width = sprite->GetTexture()->GetWidth();
+    self->height = sprite->GetTexture()->GetHeight();
+
+    self->rendererObject = sprite;
+}
+
+void _spAtlasPage_disposeTexture(spAtlasPage* self)
+{
+    using namespace Urho3D;
+    Sprite2D* sprite = static_cast<Sprite2D*>(self->rendererObject);
+    if (sprite)
+        sprite->ReleaseRef();
+
+    self->rendererObject = 0;
+}
+
+char* _spUtil_readFile(const char* path, int* length)
+{
+    using namespace Urho3D;
+    
+    if (!currentAnimationSet)
+        return 0;
+
+    ResourceCache* cache = currentAnimationSet->GetSubsystem<ResourceCache>();
+    SharedPtr<File> file = cache->GetFile(path);
+    if (!file)
+        return 0;
+
+    unsigned size = file->GetSize();
+
+    char* data = MALLOC(char, size + 1);
+    file->Read(data, size);
+    data[size] = '\0';
+    
+    file.Reset();
+    *length = size;
+
+    return data;
+}
+#endif
 
 namespace Urho3D
 {
 
 AnimationSet2D::AnimationSet2D(Context* context) :
-    Resource(context)
+    Resource(context),
+#ifdef URHO3D_SPINE
+    skeletonData_(0),
+    atlas_(0),
+#endif
+    spriterData_(0),
+    hasSpriteSheet_(false)
 {
 }
 
 AnimationSet2D::~AnimationSet2D()
 {
+    Dispose();
 }
 
 void AnimationSet2D::RegisterObject(Context* context)
@@ -53,10 +126,16 @@ void AnimationSet2D::RegisterObject(Context* context)
 
 bool AnimationSet2D::BeginLoad(Deserializer& source)
 {
+    Dispose();
+
     if (GetName().Empty())
         SetName(source.GetName());
 
     String extension = GetExtension(source.GetName());
+#ifdef URHO3D_SPINE
+    if (extension == ".json")
+        return BeginLoadSpine(source);
+#endif
     if (extension == ".scml")
         return BeginLoadSpriter(source);
 
@@ -67,7 +146,11 @@ bool AnimationSet2D::BeginLoad(Deserializer& source)
 
 bool AnimationSet2D::EndLoad()
 {
-    if (spriterFile_)
+#ifdef URHO3D_SPINE
+    if (jsonData_)
+        return EndLoadSpine();
+#endif
+    if (spriterData_)
         return EndLoadSpriter();
 
     return false;
@@ -75,168 +158,229 @@ bool AnimationSet2D::EndLoad()
 
 unsigned AnimationSet2D::GetNumAnimations() const
 {
-    return animations_.Size();
-}
-
-Animation2D* AnimationSet2D::GetAnimation(unsigned index) const
-{
-    if (index < animations_.Size())
-        return animations_[index];
+#ifdef URHO3D_SPINE
+    if (skeletonData_)
+        return (unsigned)skeletonData_->animationsCount;
+#endif
+    if (spriterData_ && !spriterData_->entities_.Empty())
+        return (unsigned)spriterData_->entities_[0]->animations_.Size();
     return 0;
 }
 
-Animation2D* AnimationSet2D::GetAnimation(const String& name) const
+String AnimationSet2D::GetAnimation(unsigned index) const
 {
-    for (unsigned i = 0; i < animations_.Size(); ++i)
+    if (index >= GetNumAnimations())
+        return String::EMPTY;
+
+#ifdef URHO3D_SPINE
+    if (skeletonData_)
+        return skeletonData_->animations[index]->name;
+#endif
+    if (spriterData_ && !spriterData_->entities_.Empty())
+        return spriterData_->entities_[0]->animations_[index]->name_;
+
+    return String::EMPTY;
+}
+
+bool AnimationSet2D::HasAnimation(const String& animationName) const
+{
+#ifdef URHO3D_SPINE
+    if (skeletonData_)
     {
-        if (animations_[i]->GetName() == name)
-            return animations_[i];
+        for (int i = 0; i < skeletonData_->animationsCount; ++i)
+        {
+            if (animationName == skeletonData_->animations[i]->name)
+                return true;
+        }
     }
+#endif    
+    if (spriterData_ && !spriterData_->entities_.Empty())
+    {
+        const PODVector<Spriter::Animation*>& animations = spriterData_->entities_[0]->animations_;
+        for (size_t i = 0; i < animations.Size(); ++i)
+        {
+            if (animationName == animations[i]->name_)
+                return true;
+        }
+    }
+
+    return false;
+}
+
+Sprite2D* AnimationSet2D::GetSprite() const
+{
+    return sprite_;
+}
+
+Sprite2D* AnimationSet2D::GetSpriterFileSprite(int folderId, int fileId) const
+{
+    int key = (folderId << 16) + fileId;
+    HashMap<int, SharedPtr<Sprite2D> >::ConstIterator i = spriterFileSprites_.Find(key);
+    if (i != spriterFileSprites_.End())
+        return i->second_;
+
     return 0;
 }
 
-Sprite2D* AnimationSet2D::GetSprite(const StringHash& hash) const
+#ifdef URHO3D_SPINE
+bool AnimationSet2D::BeginLoadSpine(Deserializer& source)
 {
-    HashMap<StringHash, SharedPtr<Sprite2D> >::ConstIterator i = sprites_.Find(hash);
-    if (i != sprites_.End())
-        return i->second_;
-    return 0;
+    if (GetName().Empty())
+        SetName(source.GetName());
+
+    unsigned size = source.GetSize();
+    jsonData_ = new char[size + 1];
+    source.Read(jsonData_, size);
+    jsonData_[size] = '\0';
+
+    return true;
 }
+
+bool AnimationSet2D::EndLoadSpine()
+{
+    currentAnimationSet = this;
+
+    String atlasFileName = ReplaceExtension(GetName(), ".atlas");
+    atlas_ = spAtlas_createFromFile(atlasFileName.CString(), 0);
+    if (!atlas_)
+    {
+        LOGERROR("Create spine atlas failed");
+        return false;
+    }
+
+    int numAtlasPages = 0;
+    spAtlasPage* atlasPage = atlas_->pages;
+    while (atlasPage)
+    {
+        ++numAtlasPages;
+        atlasPage = atlasPage->next;
+    }
+
+    if (numAtlasPages > 1)
+    {
+        LOGERROR("Only one page is supported in Urho3D");
+        return false;
+    }
+
+    sprite_ = static_cast<Sprite2D*>(atlas_->pages->rendererObject);
+
+    spSkeletonJson* skeletonJson = spSkeletonJson_create(atlas_);
+    if (!skeletonJson)
+    {
+        LOGERROR("Create skeleton Json failed");
+        return false;
+    }
+
+    skeletonJson->scale = 0.01f; // PIXEL_SIZE;
+    skeletonData_ = spSkeletonJson_readSkeletonData(skeletonJson, &jsonData_[0]);
+
+    spSkeletonJson_dispose(skeletonJson);
+    jsonData_.Reset();
+
+    currentAnimationSet = 0;
+
+    return true;
+}
+#endif
 
 bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
 {
-    spriterFile_ = new XMLFile(context_);
-    if (!spriterFile_->Load(source))
+    unsigned dataSize = source.GetSize();
+    if (!dataSize && !source.GetName().Empty())
     {
-        LOGERROR("Load XML failed " + source.GetName());
-        spriterFile_.Reset();
+        LOGERROR("Zero sized XML data in " + source.GetName());
         return false;
     }
 
-    XMLElement rootElem = spriterFile_->GetRoot("spriter_data");
-    if (!rootElem)
+    SharedArrayPtr<char> buffer(new char[dataSize]);
+    if (source.Read(buffer.Get(), dataSize) != dataSize)
+        return false;
+
+    spriterData_ = new Spriter::SpriterData();
+    if (!spriterData_->Load(buffer.Get(), dataSize))
     {
-        LOGERROR("Invalid spriter file " + source.GetName());
-        spriterFile_.Reset();
+        LOGERROR("Could not spriter data from " + source.GetName());
         return false;
     }
 
-    // When async loading, preprocess folders for spritesheet / sprite files and request them for background loading
+    // Check has sprite sheet
+    String parentPath = GetParentPath(GetName());
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    spriteSheetFilePath_ = parentPath + GetFileName(GetName()) + ".xml";
+    hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_);
+    if (!hasSpriteSheet_)
+    {
+        spriteSheetFilePath_ = parentPath + GetFileName(GetName()) + ".plist";
+        hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_);
+    }
+
     if (GetAsyncLoadState() == ASYNC_LOADING)
     {
-        if (!LoadSpriterFolders(rootElem))
+        if (hasSpriteSheet_)
+            cache->BackgroundLoadResource<SpriteSheet2D>(spriteSheetFilePath_, true, this);
+        else
         {
-            spriterFile_.Reset();
-            return false;
+            for (size_t i = 0; i < spriterData_->folders_.Size(); ++i)
+            {
+                Spriter::Folder* folder = spriterData_->folders_[i];
+                for (size_t j = 0; j < folder->files_.Size(); ++j)
+                {
+                    Spriter::File* file = folder->files_[j];
+                    String imagePath = parentPath + file->name_;
+                    cache->BackgroundLoadResource<Image>(imagePath, true, this);
+                }
+            }
         }
     }
 
+    // Note: this probably does not reflect internal data structure size accurately
+    SetMemoryUse(dataSize);
+
     return true;
 }
+
+struct SpriteInfo
+{
+    int x;
+    int y;
+    Spriter::File* file_;
+    SharedPtr<Image> image_;
+};
 
 bool AnimationSet2D::EndLoadSpriter()
 {
-    XMLElement rootElem = spriterFile_->GetRoot("spriter_data");
-    if (!LoadSpriterFolders(rootElem))
-    {
-        spriterFile_.Reset();
+    if (!spriterData_)
         return false;
-    }
-
-    XMLElement entityElem = rootElem.GetChild("entity");
-    if (!entityElem)
-    {
-        LOGERROR("Could not find entity");
-        spriterFile_.Reset();
-        return false;
-    }
-
-    for (XMLElement animationElem = entityElem.GetChild("animation"); animationElem;
-         animationElem = animationElem.GetNext("animation"))
-    {
-        if (!LoadSpriterAnimation(animationElem))
-        {
-            spriterFile_.Reset();
-            return false;
-        }
-    }
-
-    spriterFile_.Reset();
-    return true;
-}
-
-bool AnimationSet2D::LoadSpriterFolders(const XMLElement& rootElem)
-{
+    
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-
-    bool async = GetAsyncLoadState() == ASYNC_LOADING;
-
-    String parentPath = GetParentPath(GetName());
-    String spriteSheetFilePathPList = parentPath + GetFileName(GetName()) + ".plist";
-    String spriteSheetFilePathXML = parentPath + GetFileName(GetName()) + ".xml";
-    SpriteSheet2D* spriteSheet = 0;
-    bool hasSpriteSheet = false;
-
-    // When async loading, request the sprite sheet for background loading but do not actually get it
-    if (!async)
+    if (hasSpriteSheet_)
     {
-        spriteSheet = cache->GetResource<SpriteSheet2D>(spriteSheetFilePathPList, false);
-        if (!spriteSheet)
-            spriteSheet = cache->GetResource<SpriteSheet2D>(spriteSheetFilePathXML, false);
-    }
-    else
-    {
-        hasSpriteSheet = cache->Exists(spriteSheetFilePathPList);
-        if (hasSpriteSheet)
-            cache->BackgroundLoadResource<SpriteSheet2D>(spriteSheetFilePathPList, false, this);
-        else
+        spriteSheet_ = cache->GetResource<SpriteSheet2D>(spriteSheetFilePath_);
+        if (!spriteSheet_)
+            return false;
+
+        for (unsigned i = 0; i < spriterData_->folders_.Size(); ++i)
         {
-            hasSpriteSheet = cache->Exists(spriteSheetFilePathXML);
-            if (hasSpriteSheet)
-                cache->BackgroundLoadResource<SpriteSheet2D>(spriteSheetFilePathXML, false, this);
-        }
-    }
-
-    for (XMLElement folderElem = rootElem.GetChild("folder"); folderElem; folderElem = folderElem.GetNext("folder"))
-    {
-        unsigned folderId = folderElem.GetUInt("id");
-
-        for (XMLElement fileElem = folderElem.GetChild("file"); fileElem; fileElem = fileElem.GetNext("file"))
-        {
-            unsigned fileId = fileElem.GetUInt("id");
-            String fileName = fileElem.GetAttribute("name");
-
-            // When async loading, request the sprites for background loading but do not actually get them
-            if (!async)
+            Spriter::Folder* folder = spriterData_->folders_[i];
+            for (unsigned j = 0; j < folder->files_.Size(); ++j)
             {
-                SharedPtr<Sprite2D> sprite;
-
-                if (spriteSheet)
-                    sprite = spriteSheet->GetSprite(GetFileName(fileName));
-                else
-                    sprite = (cache->GetResource<Sprite2D>(parentPath + fileName));
-
+                Spriter::File* file = folder->files_[j];
+                SharedPtr<Sprite2D> sprite(spriteSheet_->GetSprite(GetFileName(file->name_)));
                 if (!sprite)
                 {
-                    LOGERROR("Could not load sprite " + fileName);
-                    return false;
+                    LOGERROR("Could not load sprite " + file->name_);
+                    return false;                
                 }
 
-                Vector2 hotSpot(0.0f, 1.0f);
-                if (fileElem.HasAttribute("pivot_x"))
-                    hotSpot.x_ = fileElem.GetFloat("pivot_x");
-                if (fileElem.HasAttribute("pivot_y"))
-                    hotSpot.y_ = fileElem.GetFloat("pivot_y");
+                Vector2 hotSpot(file->pivotX_, file->pivotY_);
 
                 // If sprite is trimmed, recalculate hot spot
                 const IntVector2& offset = sprite->GetOffset();
                 if (offset != IntVector2::ZERO)
                 {
-                    int width = fileElem.GetInt("width");
-                    int height = fileElem.GetInt("height");
-
-                    float pivotX = width * hotSpot.x_;
-                    float pivotY = height * (1.0f - hotSpot.y_);
+                    float pivotX = file->width_ * hotSpot.x_;
+                    float pivotY = file->height_ * (1.0f - hotSpot.y_);
 
                     const IntRect& rectangle = sprite->GetRectangle();
                     hotSpot.x_ = (offset.x_ + pivotX) / rectangle.Width();
@@ -245,287 +389,138 @@ bool AnimationSet2D::LoadSpriterFolders(const XMLElement& rootElem)
 
                 sprite->SetHotSpot(hotSpot);
 
-                sprites_[StringHash((folderId << 16) + fileId)] = sprite;
+                if (!sprite_)
+                    sprite_ = sprite;
+
+                int key = (folder->id_ << 16) + file->id_;
+                spriterFileSprites_[key] = sprite;
             }
-            else if (!hasSpriteSheet)
-                cache->BackgroundLoadResource<Sprite2D>(parentPath + fileName, true, this);
+        }
+    }
+    else
+    {
+        Vector<SpriteInfo> spriteInfos;
+        String parentPath = GetParentPath(GetName());
+
+        for (unsigned i = 0; i < spriterData_->folders_.Size(); ++i)
+        {
+            Spriter::Folder* folder = spriterData_->folders_[i];
+            for (unsigned j = 0; j < folder->files_.Size(); ++j)
+            {
+                Spriter::File* file = folder->files_[j];
+                String imagePath = parentPath + file->name_;
+                SharedPtr<Image> image(cache->GetResource<Image>(imagePath));
+                if (!image)
+                {
+                    LOGERROR("Could not load image");
+                    return false;
+                }
+                if (image->IsCompressed())
+                {
+                    LOGERROR("Compressed image is not support");
+                    return false;
+                }
+                if (image->GetComponents() != 4)
+                {
+                    LOGERROR("Only support image with 4 components");
+                    return false;
+                }
+
+                SpriteInfo def;
+                def.file_ = file;
+                def.image_ = image;
+                spriteInfos.Push(def);
+            }
+        }
+
+        if (spriteInfos.Empty())
+            return false;
+
+        if (spriteInfos.Size() > 1)
+        {
+            AreaAllocator allocator(128, 128, 2048, 2048);
+            for (unsigned i = 0; i < spriteInfos.Size(); ++i)
+            {
+                SpriteInfo& info = spriteInfos[i];
+                Image* image = info.image_;
+                if (!allocator.Allocate(image->GetWidth(), image->GetHeight(), info.x, info.y))
+                {
+                    LOGERROR("Could not allocate area");
+                    return false;
+                }
+            }
+
+            SharedPtr<Texture2D> texture(new Texture2D(context_));
+            texture->SetMipsToSkip(QUALITY_LOW, 0);
+            texture->SetNumLevels(1);
+            texture->SetSize(allocator.GetWidth(), allocator.GetHeight(), Graphics::GetRGBAFormat());
+
+            sprite_ = new Sprite2D(context_);
+            sprite_->SetTexture(texture);
+
+            for (unsigned i = 0; i < spriteInfos.Size(); ++i)
+            {
+                SpriteInfo& info = spriteInfos[i];
+                Image* image = info.image_;
+
+                texture->SetData(0, info.x, info.y, image->GetWidth(), image->GetHeight(), image->GetData());
+
+                SharedPtr<Sprite2D> sprite(new Sprite2D(context_));
+                sprite->SetTexture(texture);
+                sprite->SetRectangle(IntRect(info.x, info.y, info.x + image->GetWidth(), info.y + image->GetHeight()));
+                sprite->SetHotSpot(Vector2(info.file_->pivotX_, info.file_->pivotY_));
+
+                int key = (info.file_->folder_->id_ << 16) + info.file_->id_;
+                spriterFileSprites_[key] = sprite;
+            }
+        }
+        else
+        {
+            SharedPtr<Texture2D> texture(new Texture2D(context_));        
+            texture->SetMipsToSkip(QUALITY_LOW, 0);
+            texture->SetNumLevels(1);
+
+            SpriteInfo& info = spriteInfos[0];        
+            texture->SetData(info.image_, true);
+
+            sprite_ = new Sprite2D(context_);
+            sprite_->SetTexture(texture);
+            sprite_->SetRectangle(IntRect(info.x, info.y, info.x + info.image_->GetWidth(), info.y + info.image_->GetHeight()));
+            sprite_->SetHotSpot(Vector2(info.file_->pivotX_, info.file_->pivotY_));
+
+            int key = (info.file_->folder_->id_ << 16) + info.file_->id_;
+            spriterFileSprites_[key] = sprite_;
         }
     }
 
     return true;
 }
 
-// Spriter object type.
-enum SpriterObjectType2D
+void AnimationSet2D::Dispose()
 {
-    SOT_BONE = 0,
-    SOT_SPRITE,
-};
-
-// Spriter timeline key.
-struct SpriterTimelineKey2D
-{
-    SpriterTimelineKey2D() :
-        time_(0.0f),
-        angle_(0.0f),
-        spin_(1),
-        scale_(1.0f, 1.0f),
-        alpha_(1.0f),
-        useHotSpot_(false)
+#ifdef URHO3D_SPINE
+    if (skeletonData_)
     {
+        spSkeletonData_dispose(skeletonData_);
+        skeletonData_ = 0;
     }
 
-    float time_;
-    Vector2 position_;
-    float angle_;
-    int spin_;
-    Vector2 scale_;
-    SharedPtr<Sprite2D> sprite_;
-    float alpha_;
-    bool useHotSpot_;
-    Vector2 hotSpot_;
-};
-
-// Spriter timeline.
-struct SpriterTimeline2D
-{
-    SpriterTimeline2D() :
-        parent_(-1),
-        type_(SOT_BONE)
+    if (atlas_)
     {
+        spAtlas_dispose(atlas_);
+        atlas_ = 0;
+    }
+#endif
+
+    if (spriterData_)
+    {
+        delete spriterData_;
+        spriterData_ = 0;
     }
 
-    String name_;
-    int parent_;
-    SpriterObjectType2D type_;
-    Vector<SpriterTimelineKey2D> timelineKeys_;
-};
-
-// Spriter reference.
-struct SpriterReference2D
-{
-    SpriterReference2D() :
-        type_(SOT_BONE),
-        timeline_(-1),
-        key_(-1),
-        zIndex_(0)
-    {
-    }
-
-    SpriterObjectType2D type_;
-    int timeline_;
-    int key_;
-    int zIndex_;
-};
-
-// Spriter mainline Key.
-struct SpriterMainlineKey2D
-{
-    float time_;
-    PODVector<SpriterReference2D> references_;
-};
-
-bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
-{
-    String name = animationElem.GetAttribute("name");
-    float length = animationElem.GetFloat("length") * 0.001f;
-    bool looped = true;
-    if (animationElem.HasAttribute("looping"))
-        looped = animationElem.GetBool("looping");
-
-    float highestKeyTime = 0.0f;
-
-    // Load timelines
-    Vector<SpriterTimeline2D> timelines;
-    for (XMLElement timelineElem = animationElem.GetChild("timeline"); timelineElem;
-         timelineElem = timelineElem.GetNext("timeline"))
-    {
-        SpriterTimeline2D timeline;
-        timeline.name_ = timelineElem.GetAttribute("name");
-        if (timelineElem.GetAttribute("object_type") == "bone")
-            timeline.type_ = SOT_BONE;
-        else
-            timeline.type_ = SOT_SPRITE;
-
-        for (XMLElement keyElem = timelineElem.GetChild("key"); keyElem; keyElem = keyElem.GetNext("key"))
-        {
-            SpriterTimelineKey2D key;
-            key.time_ = keyElem.GetFloat("time") * 0.001f;
-            if (keyElem.HasAttribute("spin"))
-                key.spin_ = keyElem.GetInt("spin");
-
-            XMLElement childElem = keyElem.GetChild();
-
-            key.position_.x_ = childElem.GetFloat("x");
-            key.position_.y_ = childElem.GetFloat("y");
-
-            key.angle_ = childElem.GetFloat("angle");
-
-            if (childElem.HasAttribute("scale_x"))
-                key.scale_.x_ = childElem.GetFloat("scale_x");
-
-            if (childElem.HasAttribute("scale_y"))
-                key.scale_.y_ = childElem.GetFloat("scale_y");
-
-            if (timeline.type_ == SOT_SPRITE)
-            {
-                int folder = childElem.GetUInt("folder");
-                int file = childElem.GetUInt("file");
-                key.sprite_ = GetSprite(StringHash((unsigned)((folder << 16) + file)));
-                if (!key.sprite_)
-                {
-                    LOGERROR("Could not find sprite");
-                    return false;
-                }
-
-                if (childElem.HasAttribute("pivot_x") && childElem.HasAttribute("pivot_y"))
-                {
-                    key.useHotSpot_ = true;
-                    key.hotSpot_.x_ = childElem.GetFloat("pivot_x");
-                    key.hotSpot_.y_ = childElem.GetFloat("pivot_y");
-                }
-
-                if (childElem.HasAttribute("a"))
-                    key.alpha_ = childElem.GetFloat("a");
-            }
-
-            timeline.timelineKeys_.Push(key);
-        }
-
-        timelines.Push(timeline);
-    }
-
-    // Load main line
-    Vector<SpriterMainlineKey2D> mainlineKeys;
-    XMLElement mainlineElem = animationElem.GetChild("mainline");
-    for (XMLElement keyElem = mainlineElem.GetChild("key"); keyElem; keyElem = keyElem.GetNext("key"))
-    {
-        SpriterMainlineKey2D mainlineKey;
-        mainlineKey.time_ = keyElem.GetFloat("time") * 0.001f;
-
-        for (XMLElement refElem = keyElem.GetChild(); refElem; refElem = refElem.GetNext())
-        {
-            SpriterReference2D ref;
-            if (refElem.GetName() == "bone_ref")
-                ref.type_ = SOT_BONE;
-            else
-                ref.type_ = SOT_SPRITE;
-
-            ref.timeline_ = refElem.GetInt("timeline");
-            ref.key_ = refElem.GetInt("key");
-
-            if (refElem.HasAttribute("parent"))
-            {
-                int parent = refElem.GetInt("parent");
-                int parentTimeline = mainlineKey.references_[parent].timeline_;
-                timelines[ref.timeline_].parent_ = parentTimeline;
-            }
-
-            if (refElem.GetName() == "object_ref")
-                ref.zIndex_ = refElem.GetInt("z_index");
-
-            mainlineKey.references_.Push(ref);
-        }
-
-        mainlineKeys.Push(mainlineKey);
-    }
-
-    unsigned numTimelines = timelines.Size();
-    unsigned numMainlineKeys = mainlineKeys.Size();
-    if (numTimelines == 0 || numMainlineKeys == 0)
-    {
-        LOGERROR("Invalid animation");
-        return false;
-    }
-
-    // Create animation
-    SharedPtr<Animation2D> animation(new Animation2D(this));
-    animation->SetName(name);
-    animation->SetLength(length);
-    animation->SetLooped(looped);
-
-    Vector<AnimationTrack2D>& tracks = animation->GetAllTracks();
-    tracks.Resize(numTimelines);
-
-    // Setup animation track key frames
-    for (unsigned i = 0; i < numTimelines; ++i)
-    {
-        SpriterTimeline2D& timeline = timelines[i];
-        AnimationTrack2D& track = tracks[i];
-
-        track.name_ = timeline.name_;
-        track.hasSprite_ = timeline.type_ == SOT_SPRITE;
-
-        unsigned numTimelineKeys = timeline.timelineKeys_.Size();
-        tracks[i].keyFrames_.Resize(numTimelineKeys);
-
-        for (unsigned j = 0; j < numTimelineKeys; ++j)
-        {
-            SpriterTimelineKey2D& timelineKey = timeline.timelineKeys_[j];
-            AnimationKeyFrame2D& keyFrame = track.keyFrames_[j];
-
-            keyFrame.time_ = timelineKey.time_;
-            highestKeyTime = Max(highestKeyTime, keyFrame.time_);
-
-            // Set disabled
-            keyFrame.enabled_ = false;
-            keyFrame.parent_ = timeline.parent_;
-            keyFrame.transform_ = Transform2D(timelineKey.position_, timelineKey.angle_, timelineKey.scale_);
-            keyFrame.spin_ = timelineKey.spin_;
-
-            if (track.hasSprite_)
-            {
-                keyFrame.sprite_ = timelineKey.sprite_;
-                keyFrame.alpha_ = timelineKey.alpha_;
-                keyFrame.useHotSpot_ = timelineKey.useHotSpot_;
-                if (timelineKey.useHotSpot_)
-                    keyFrame.hotSpot_ = timelineKey.hotSpot_;
-            }
-        }
-    }
-
-    // Set animation key frame enabled and set draw order
-    for (unsigned i = 0; i < numMainlineKeys; ++i)
-    {
-        SpriterMainlineKey2D& mainlineKey = mainlineKeys[i];
-        PODVector<SpriterReference2D>& references = mainlineKey.references_;
-        for (unsigned j = 0; j < references.Size(); ++j)
-        {
-            SpriterReference2D& ref = references[j];
-            AnimationKeyFrame2D& keyFrame = tracks[ref.timeline_].keyFrames_[ref.key_];
-
-            // Set enabled
-            keyFrame.enabled_ = true;
-
-            // Set draw order
-            keyFrame.zIndex_ = ref.zIndex_;
-        }
-    }
-
-    // Fix looped animation
-    if (looped)
-    {
-        for (unsigned i = 0; i < numTimelines; ++i)
-        {
-            Vector<AnimationKeyFrame2D>& keyFrames = tracks[i].keyFrames_;
-            if (keyFrames.Front().time_ < 0.01f && !Equals(keyFrames.Back().time_, length))
-            {
-                AnimationKeyFrame2D keyFrame = keyFrames.Front();
-                keyFrame.time_ = length;
-                keyFrames.Push(keyFrame);
-            }
-        }
-    }
-    else
-    {
-        // Crop non-looped animation length if longer than the last keyframe
-        if (length > highestKeyTime)
-            animation->SetLength(highestKeyTime);
-    }
-
-    animations_.Push(animation);
-
-    return true;
+    sprite_.Reset();
+    spriteSheet_.Reset();
+    spriterFileSprites_.Clear();
 }
 
 }

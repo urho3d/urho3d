@@ -53,8 +53,8 @@ elseif (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
 
     # Unescape the variables
     foreach (ESCAPED_VAR HOST_XCFLAGS TARGET_ARCH DASM_FLAGS DASM_ARCH)
-        string (REPLACE +D -D ${ESCAPED_VAR} ${${ESCAPED_VAR}})
-        string (REPLACE , ";" ${ESCAPED_VAR} ${${ESCAPED_VAR}})
+        string (REPLACE +D -D ${ESCAPED_VAR} "${${ESCAPED_VAR}}")       # Stringify against empty variable
+        string (REPLACE , ";" ${ESCAPED_VAR} "${${ESCAPED_VAR}}")
     endforeach ()
 endif ()
 

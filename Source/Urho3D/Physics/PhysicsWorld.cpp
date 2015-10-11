@@ -507,7 +507,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
         result.body_ = static_cast<RigidBody*>(convexCallback.m_hitCollisionObject->getUserPointer());
         result.position_ = ToVector3(convexCallback.m_hitPointWorld);
         result.normal_ = ToVector3(convexCallback.m_hitNormalWorld);
-        result.distance_ = (result.position_ - startPos).Length();
+        result.distance_ = convexCallback.m_closestHitFraction * (endPos - startPos).Length();
     }
     else
     {
@@ -585,9 +585,15 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody
          i != currentCollisions_.End(); ++i)
     {
         if (i->first_.first_ == body)
-            result.Push(i->first_.second_);
+        {
+            if (i->first_.second_)
+                result.Push(i->first_.second_);
+        }
         else if (i->first_.second_ == body)
-            result.Push(i->first_.first_);
+        {
+            if (i->first_.first_)
+                result.Push(i->first_.first_);
+        }
     }
 }
 

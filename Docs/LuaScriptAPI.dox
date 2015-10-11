@@ -20,12 +20,13 @@ namespace Urho3D
 <a href="#Class_AnimatedModel"><b>AnimatedModel</b></a>
 <a href="#Class_AnimatedSprite2D"><b>AnimatedSprite2D</b></a>
 <a href="#Class_Animation"><b>Animation</b></a>
-<a href="#Class_Animation2D"><b>Animation2D</b></a>
 <a href="#Class_AnimationControl"><b>AnimationControl</b></a>
 <a href="#Class_AnimationController"><b>AnimationController</b></a>
 <a href="#Class_AnimationKeyFrame"><b>AnimationKeyFrame</b></a>
 <a href="#Class_AnimationSet2D"><b>AnimationSet2D</b></a>
 <a href="#Class_AnimationState"><b>AnimationState</b></a>
+<a href="#Class_AnimationTrack"><b>AnimationTrack</b></a>
+<a href="#Class_AnimationTriggerPoint"><b>AnimationTriggerPoint</b></a>
 <a href="#Class_Audio"><b>Audio</b></a>
 <a href="#Class_BiasParameters"><b>BiasParameters</b></a>
 <a href="#Class_Billboard"><b>Billboard</b></a>
@@ -220,15 +221,20 @@ namespace Urho3D
 Methods:
 
 - void SetAnimationEnabled(bool enable)
+- void SetAnimationTime(float time)
 - void SetObjectAnimation(ObjectAnimation* objectAnimation)
 - void SetAttributeAnimation(const String name, ValueAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f)
 - void SetAttributeAnimationWrapMode(const String name, WrapMode wrapMode)
 - void SetAttributeAnimationSpeed(const String name, float speed)
+- void SetAttributeAnimationTime(const String name, float time)
+- void RemoveObjectAnimation()
+- void RemoveAttributeAnimation(const String name)
 - bool GetAnimationEnabled() const
 - ObjectAnimation* GetObjectAnimation() const
 - ValueAnimation* GetAttributeAnimation(const String name) const
 - WrapMode GetAttributeAnimationWrapMode(const String name) const
 - float GetAttributeAnimationSpeed(const String name) const
+- float GetAttributeAnimationTime(const String name) const
 
 Properties:
 
@@ -283,19 +289,21 @@ Properties:
 
 Methods:
 
-- void SetSpeed(float speed)
-- void SetAnimation(AnimationSet2D* animationSet, const String name, LoopMode2D loopMode = LM_DEFAULT)
-- void SetAnimation(const String name, LoopMode2D loopMode = LM_DEFAULT)
 - void SetAnimationSet(AnimationSet2D* animationSet)
+- void SetEntity(const String entity)
+- void SetAnimation(const String name, LoopMode2D loopMode = LM_DEFAULT)
 - void SetLoopMode(LoopMode2D loopMode)
-- float GetSpeed() const
-- const String GetAnimation() const
+- void SetSpeed(float speed)
 - AnimationSet2D* GetAnimationSet() const
+- const String GetEntity() const
+- const String GetAnimation() const
 - LoopMode2D GetLoopMode() const
+- float GetSpeed() const
 
 Properties:
 
 - float speed
+- String entity
 - String animation
 - AnimationSet2D* animationSet
 - LoopMode2D loopMode
@@ -305,37 +313,30 @@ Properties:
 
 Methods:
 
+- void SetAnimationName(const String name)
+- void SetLength(float length)
+- AnimationTrack* CreateTrack(const String name)
+- bool RemoveTrack(const String name)
+- void RemoveAllTracks()
+- void SetTrigger(unsigned index, const AnimationTriggerPoint& trigger)
+- void AddTrigger(const AnimationTriggerPoint& trigger)
+- void AddTrigger(float time, bool timeIsNormalized, const Variant& data)
+- void RemoveTrigger(unsigned index)
+- void RemoveAllTriggers()
 - const String GetAnimationName() const
-- StringHash GetAnimationNameHash() const
 - float GetLength() const
 - unsigned GetNumTracks() const
-- const AnimationTrack* GetTrack(const String name) const
-- const AnimationTrack* GetTrack(StringHash nameHash) const
-- const AnimationTrack* GetTrack(unsigned index) const
+- AnimationTrack* GetTrack(const String name)
+- AnimationTrack* GetTrack(StringHash nameHash)
 - unsigned GetNumTriggers() const
+- AnimationTriggerPoint* GetTrigger(unsigned index)
 
 Properties:
 
-- String animationName (readonly)
-- StringHash animationNameHash (readonly)
-- float length (readonly)
+- String animationName
+- float length
 - unsigned numTracks (readonly)
 - unsigned numTriggers (readonly)
-
-<a name="Class_Animation2D"></a>
-### Animation2D : RefCounted
-
-Methods:
-
-- const String GetName() const
-- float GetLength() const
-- bool IsLooped() const
-
-Properties:
-
-- String name (readonly)
-- float length (readonly)
-- bool looped (readonly)
 
 <a name="Class_AnimationControl"></a>
 ### AnimationControl
@@ -380,6 +381,7 @@ Methods:
 - bool SetLooped(const String name, bool enable)
 - bool SetSpeed(const String name, float speed)
 - bool SetAutoFade(const String name, float fadeOutTime)
+- bool SetRemoveOnCompletion(const String name, bool removeOnCompletion)
 - bool IsPlaying(const String name) const
 - bool IsFadingIn(const String name) const
 - bool IsFadingOut(const String name) const
@@ -395,6 +397,7 @@ Methods:
 - float GetFadeTarget(const String name) const
 - float GetFadeTime(const String name) const
 - float GetAutoFade(const String name) const
+- bool GetRemoveOnCompletion(const String name) const
 - AnimationState* GetAnimationState(const String name) const
 - AnimationState* GetAnimationState(StringHash nameHash) const
 
@@ -415,8 +418,7 @@ Properties:
 Methods:
 
 - unsigned GetNumAnimations() const
-- Animation2D* GetAnimation(const String name) const
-- Animation2D* GetAnimation(unsigned index) const
+- String GetAnimation(unsigned index) const
 
 Properties:
 
@@ -467,6 +469,42 @@ Properties:
 - float time
 - float length (readonly)
 - char layer
+
+<a name="Class_AnimationTrack"></a>
+### AnimationTrack
+
+
+Methods:
+
+- void SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame)
+- void AddKeyFrame(const AnimationKeyFrame& keyFrame)
+- void InsertKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame)
+- void RemoveKeyFrame(unsigned index)
+- void RemoveAllKeyFrames()
+- AnimationKeyFrame* GetKeyFrame(unsigned index)
+- unsigned GetNumKeyFrames() const
+
+Properties:
+
+- const String name
+- const StringHash nameHash
+- char channelMask
+- Vector<AnimationKeyFrame> keyFrames
+- unsigned numKeyFrames (readonly)
+
+<a name="Class_AnimationTriggerPoint"></a>
+### AnimationTriggerPoint
+
+
+Methods:
+
+- AnimationTriggerPoint() (GC)
+- AnimationTriggerPoint* new()
+
+Properties:
+
+- float time
+- Variant data
 
 <a name="Class_Audio"></a>
 ### Audio : Object
@@ -1868,6 +1906,9 @@ Methods:
 - void AddSphere(const Sphere& sphere, const Color& color, bool depthTest = true)
 - void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true)
 - void AddTriangleMesh(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true)
+- void AddCircle(const Vector3& center, const Vector3& normal, float radius, const Color& color, int steps = 64, bool depthTest = true)
+- void AddCross(const Vector3& center, float size, const Color& color, bool depthTest = true)
+- void AddQuad(const Vector3& center, float width, float height, const Color& color, bool depthTest = true)
 - void Render()
 - const Matrix3x4& GetView() const
 - const Matrix4& GetProjection() const
@@ -3844,6 +3885,7 @@ Methods:
 - const PODVector<OctreeQueryResult>& GetDrawables(const BoundingBox& box, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
 - const PODVector<OctreeQueryResult>& GetDrawables(const Frustum& frustum, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
 - const PODVector<OctreeQueryResult>& GetDrawables(const Sphere& sphere, char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
+- const PODVector<OctreeQueryResult>& GetAllDrawables(char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
 - const PODVector<RayQueryResult>& Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, char drawableFlags, unsigned viewMask = DEFAULT_VIEWMASK) const
 - RayQueryResult RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, char drawableFlags, unsigned viewMask = DEFAULT_VIEWMASK) const
 - unsigned GetNumLevels() const
@@ -5444,18 +5486,24 @@ Methods:
 - void AddControlPoint(Node* point, unsigned index = M_MAX_UNSIGNED)
 - void RemoveControlPoint(Node* point)
 - void ClearControlPoints()
-- Vector3 GetPoint(float factor) const
-- InterpolationMode GetInterpolationMode() const
-- Vector3 GetPosition() const
 - void SetInterpolationMode(InterpolationMode mode)
 - void SetPosition(float factor)
+- void SetControlledNode(Node* controlled)
+- InterpolationMode GetInterpolationMode() const
+- float GetSpeed() const
+- float GetLength() const
+- Vector3 GetPosition() const
+- Node* GetControlledNode() const
+- Vector3 GetPoint(float factor) const
 - void Move(float timeStep)
 - void Reset()
 - bool IsFinished() const
 
 Properties:
 
+- InterpolationMode interpolationMode
 - float speed
+- float length (readonly)
 - Node* controlledNode
 
 <a name="Class_Sprite"></a>
@@ -7340,6 +7388,7 @@ Properties:
 - int MM_ABSOLUTE
 - int MM_RELATIVE
 - int MM_WRAP
+- int MM_FREE
 
 ### NavigationPushiness
 

@@ -303,6 +303,8 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
             }
             // Limit pitch
             character_->controls_.pitch_ = Clamp(character_->controls_.pitch_, -80.0f, 80.0f);
+            // Set rotation already here so that it's updated every rendering frame instead of every physics frame
+            character_->GetNode()->SetRotation(Quaternion(character_->controls_.yaw_, Vector3::UP));
 
             // Switch between 1st and 3rd person
             if (input->GetKeyPress('F'))
@@ -329,9 +331,6 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
                     character_ = characterNode->GetComponent<Character>();
             }
         }
-
-        // Set rotation already here so that it's updated every rendering frame instead of every physics frame
-        character_->GetNode()->SetRotation(Quaternion(character_->controls_.yaw_, Vector3::UP));
     }
 }
 

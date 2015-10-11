@@ -167,7 +167,7 @@ static asQWORD GetReturnedDouble()
 	return ret;
 }
 
-asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &/*retQW2*/)
+asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &/*retQW2*/, void *secondObject)
 {
 	asCScriptEngine *engine = context->m_engine;
 	asSSystemFunctionInterface *sysFunc = descr->sysFuncIntf;
@@ -197,11 +197,6 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		callConv == ICC_VIRTUAL_THISCALL ||
 		callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM )
 #else
-	// Unpack the two object pointers
-	void **objectsPtrs  = (void**)obj;
-	void  *secondObject = objectsPtrs[1];
-	obj                 = objectsPtrs[0];
-
 	// Optimization to avoid check 12 values (all ICC_ that contains THISCALL)
 	if( (callConv >= ICC_THISCALL && callConv <= ICC_VIRTUAL_THISCALL_RETURNINMEM) ||
 		(callConv >= ICC_THISCALL_OBJLAST && callConv <= ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM) )

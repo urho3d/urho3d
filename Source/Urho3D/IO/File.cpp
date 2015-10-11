@@ -56,6 +56,7 @@ static const char* openMode[] =
 #endif
 
 #ifdef ANDROID
+const char* APK = "/apk/";
 static const unsigned READ_BUFFER_SIZE = 32768;
 #endif
 static const unsigned SKIP_BUFFER_SIZE = 1024;
@@ -130,7 +131,7 @@ bool File::Open(const String& fileName, FileMode mode)
     }
 
 #ifdef ANDROID
-    if (fileName.StartsWith("/apk/"))
+    if (IS_ASSET(fileName))
     {
         if (mode != FILE_READ)
         {
@@ -138,7 +139,7 @@ bool File::Open(const String& fileName, FileMode mode)
             return false;
         }
 
-        assetHandle_ = SDL_RWFromFile(fileName.Substring(5).CString(), "rb");
+        assetHandle_ = SDL_RWFromFile(ASSET(fileName), "rb");
         if (!assetHandle_)
         {
             LOGERRORF("Could not open asset file %s", fileName.CString());

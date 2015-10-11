@@ -100,9 +100,9 @@ const unsigned VertexBuffer::elementNormalize[] =
     GL_FALSE // Instancematrix3
 };
 
-VertexBuffer::VertexBuffer(Context* context) :
+VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
     Object(context),
-    GPUObject(GetSubsystem<Graphics>()),
+    GPUObject(forceHeadless ? (Graphics*)0 : GetSubsystem<Graphics>()),
     vertexCount_(0),
     elementMask_(0),
     lockState_(LOCK_NONE),

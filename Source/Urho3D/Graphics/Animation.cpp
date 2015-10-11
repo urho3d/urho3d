@@ -22,6 +22,7 @@
 
 #include "../Precompiled.h"
 
+#include "../Container/Sort.h"
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
 #include "../Graphics/Animation.h"
@@ -40,6 +41,51 @@ namespace Urho3D
 inline bool CompareTriggers(AnimationTriggerPoint& lhs, AnimationTriggerPoint& rhs)
 {
     return lhs.time_ < rhs.time_;
+}
+
+inline bool CompareKeyFrames(AnimationKeyFrame& lhs, AnimationKeyFrame& rhs)
+{
+    return lhs.time_ < rhs.time_;
+}
+
+void AnimationTrack::SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame)
+{
+    if (index < keyFrames_.Size())
+    {
+        keyFrames_[index] = keyFrame;
+        Urho3D::Sort(keyFrames_.Begin(), keyFrames_.End(), CompareKeyFrames);
+    }
+    else if (index == keyFrames_.Size())
+        AddKeyFrame(keyFrame);
+}
+
+void AnimationTrack::AddKeyFrame(const AnimationKeyFrame& keyFrame)
+{
+    bool needSort = keyFrames_.Size() ? keyFrames_.Back().time_ > keyFrame.time_ : false;
+    keyFrames_.Push(keyFrame);
+    if (needSort)
+        Urho3D::Sort(keyFrames_.Begin(), keyFrames_.End(), CompareKeyFrames);
+}
+
+void AnimationTrack::InsertKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame)
+{
+    keyFrames_.Insert(index, keyFrame);
+    Urho3D::Sort(keyFrames_.Begin(), keyFrames_.End(), CompareKeyFrames);
+}
+
+void AnimationTrack::RemoveKeyFrame(unsigned index)
+{
+    keyFrames_.Erase(index);
+}
+
+void AnimationTrack::RemoveAllKeyFrames()
+{
+    keyFrames_.Clear();
+}
+
+AnimationKeyFrame* AnimationTrack::GetKeyFrame(unsigned index)
+{
+    return index < keyFrames_.Size() ? &keyFrames_[index] : (AnimationKeyFrame*)0;
 }
 
 void AnimationTrack::GetKeyFrameIndex(float time, unsigned& index) const
@@ -92,31 +138,28 @@ bool Animation::BeginLoad(Deserializer& source)
     tracks_.Clear();
 
     unsigned tracks = source.ReadUInt();
-    tracks_.Resize(tracks);
     memoryUse += tracks * sizeof(AnimationTrack);
 
     // Read tracks
     for (unsigned i = 0; i < tracks; ++i)
     {
-        AnimationTrack& newTrack = tracks_[i];
-        newTrack.name_ = source.ReadString();
-        newTrack.nameHash_ = newTrack.name_;
-        newTrack.channelMask_ = source.ReadUByte();
+        AnimationTrack* newTrack = CreateTrack(source.ReadString());
+        newTrack->channelMask_ = source.ReadUByte();
 
         unsigned keyFrames = source.ReadUInt();
-        newTrack.keyFrames_.Resize(keyFrames);
+        newTrack->keyFrames_.Resize(keyFrames);
         memoryUse += keyFrames * sizeof(AnimationKeyFrame);
 
         // Read keyframes of the track
         for (unsigned j = 0; j < keyFrames; ++j)
         {
-            AnimationKeyFrame& newKeyFrame = newTrack.keyFrames_[j];
+            AnimationKeyFrame& newKeyFrame = newTrack->keyFrames_[j];
             newKeyFrame.time_ = source.ReadFloat();
-            if (newTrack.channelMask_ & CHANNEL_POSITION)
+            if (newTrack->channelMask_ & CHANNEL_POSITION)
                 newKeyFrame.position_ = source.ReadVector3();
-            if (newTrack.channelMask_ & CHANNEL_ROTATION)
+            if (newTrack->channelMask_ & CHANNEL_ROTATION)
                 newKeyFrame.rotation_ = source.ReadQuaternion();
-            if (newTrack.channelMask_ & CHANNEL_SCALE)
+            if (newTrack->channelMask_ & CHANNEL_SCALE)
                 newKeyFrame.scale_ = source.ReadVector3();
         }
     }
@@ -156,9 +199,9 @@ bool Animation::Save(Serializer& dest) const
 
     // Write tracks
     dest.WriteUInt(tracks_.Size());
-    for (unsigned i = 0; i < tracks_.Size(); ++i)
+    for (HashMap<StringHash, AnimationTrack>::ConstIterator i = tracks_.Begin(); i != tracks_.End(); ++i)
     {
-        const AnimationTrack& track = tracks_[i];
+        const AnimationTrack& track = i->second_;
         dest.WriteString(track.name_);
         dest.WriteUByte(track.channelMask_);
         dest.WriteUInt(track.keyFrames_.Size());
@@ -216,9 +259,52 @@ void Animation::SetLength(float length)
     length_ = Max(length, 0.0f);
 }
 
-void Animation::SetTracks(const Vector<AnimationTrack>& tracks)
+AnimationTrack* Animation::CreateTrack(const String& name)
 {
-    tracks_ = tracks;
+    /// \todo When tracks / keyframes are created dynamically, memory use is not updated
+    StringHash nameHash(name);
+    AnimationTrack* oldTrack = GetTrack(nameHash);
+    if (oldTrack)
+        return oldTrack;
+
+    AnimationTrack& newTrack = tracks_[nameHash];
+    newTrack.name_ = name;
+    newTrack.nameHash_ = nameHash;
+    return &newTrack;
+}
+
+bool Animation::RemoveTrack(const String& name)
+{
+    HashMap<StringHash, AnimationTrack>::Iterator i = tracks_.Find(StringHash(name));
+    if (i != tracks_.End())
+    {
+        tracks_.Erase(i);
+        return true;
+    }
+    else
+        return false;
+}
+
+void Animation::RemoveAllTracks()
+{
+    tracks_.Clear();
+}
+
+void Animation::SetTrigger(unsigned index, const AnimationTriggerPoint& trigger)
+{
+    if (index == triggers_.Size())
+        AddTrigger(trigger);
+    else if (index < triggers_.Size())
+    {
+        triggers_[index] = trigger;
+        Sort(triggers_.Begin(), triggers_.End(), CompareTriggers);
+    }
+}
+
+void Animation::AddTrigger(const AnimationTriggerPoint& trigger)
+{
+    triggers_.Push(trigger);
+    Sort(triggers_.Begin(), triggers_.End(), CompareTriggers);
 }
 
 void Animation::AddTrigger(float time, bool timeIsNormalized, const Variant& data)
@@ -247,31 +333,21 @@ void Animation::SetNumTriggers(unsigned num)
     triggers_.Resize(num);
 }
 
-const AnimationTrack* Animation::GetTrack(unsigned index) const
+AnimationTrack* Animation::GetTrack(const String& name)
 {
-    return index < tracks_.Size() ? &tracks_[index] : 0;
+    HashMap<StringHash, AnimationTrack>::Iterator i = tracks_.Find(StringHash(name));
+    return i != tracks_.End() ? &i->second_ : (AnimationTrack*)0;
 }
 
-const AnimationTrack* Animation::GetTrack(const String& name) const
+AnimationTrack* Animation::GetTrack(StringHash nameHash)
 {
-    for (Vector<AnimationTrack>::ConstIterator i = tracks_.Begin(); i != tracks_.End(); ++i)
-    {
-        if (i->name_ == name)
-            return &(*i);
-    }
-
-    return 0;
+    HashMap<StringHash, AnimationTrack>::Iterator i = tracks_.Find(nameHash);
+    return i != tracks_.End() ? &i->second_ : (AnimationTrack*)0;
 }
 
-const AnimationTrack* Animation::GetTrack(StringHash nameHash) const
+AnimationTriggerPoint* Animation::GetTrigger(unsigned index)
 {
-    for (Vector<AnimationTrack>::ConstIterator i = tracks_.Begin(); i != tracks_.End(); ++i)
-    {
-        if (i->nameHash_ == nameHash)
-            return &(*i);
-    }
-
-    return 0;
+    return index < triggers_.Size() ? &triggers_[index] : (AnimationTriggerPoint*)0;
 }
 
 }

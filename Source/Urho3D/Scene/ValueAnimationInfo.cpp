@@ -71,7 +71,15 @@ bool ValueAnimationInfo::Update(float timeStep)
     if (!animation_ || !target_)
         return true;
 
-    currentTime_ += timeStep * speed_;
+    return SetTime(currentTime_ + timeStep * speed_);
+}
+
+bool ValueAnimationInfo::SetTime(float time)
+{
+    if (!animation_ || !target_)
+        return true;
+
+    currentTime_ = time;
 
     if (!animation_->IsValid())
         return true;

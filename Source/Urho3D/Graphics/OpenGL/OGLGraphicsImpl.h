@@ -26,7 +26,7 @@
 #include "../../Core/Timer.h"
 #include "../../Math/Color.h"
 
-#if defined(ANDROID) || defined (RPI) || defined (EMSCRIPTEN)
+#if defined(ANDROID) || defined (RPI) || defined (__EMSCRIPTEN__)
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #elif defined(IOS)
@@ -42,7 +42,7 @@
 #ifndef GL_COMPRESSED_RGBA_S3TC_DXT3_EXT
 #define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT 0x83f2
 #endif
-#ifndef GL_COMPRESSED_RGBA_S3TC_DXT5_EXT 
+#ifndef GL_COMPRESSED_RGBA_S3TC_DXT5_EXT
 #define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT 0x83f3
 #endif
 #ifndef GL_ETC1_RGB8_OES

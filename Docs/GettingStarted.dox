@@ -20,7 +20,7 @@ Although all required third-party libraries are included as source code, there a
 
 - For Android, the Android SDK and Android NDK (minimum API level 12) need to be installed.
 
-- For Emscripten, the Emscripten SDK need to be installed (on Windows also MinGW toolchain is required.)
+- For Emscripten, the Emscripten SDK need to be installed (on Windows also MinGW-W64 compiler toolchain is required).
 
 To run Urho3D, the minimum system requirements are:
 
@@ -38,7 +38,7 @@ To run Urho3D, the minimum system requirements are:
 
 SSE requirement can be eliminated by disabling the use of SSE instruction set, see URHO3D_SSE build option below.
 
-CMake (http://www.cmake.org) is required to configure and generate the Urho3D project build tree. The minimum required version is 2.8.6. However, it is recommended to use the latest CMake version avaiable out there, especially when targeting Mac OS X and iOS platforms using the latest Xcode version available. This is because Apple is known to change the internal working of Xcode with little regards to other third party build tools, such as CMake.
+CMake (http://www.cmake.org) is required to configure and generate the Urho3D project build tree. The minimum required version is 2.8.6. However, it is recommended to use the latest CMake version available out there, especially when targeting Mac OS X and iOS platforms using the latest Xcode version available. This is because Apple is known to change the internal working of Xcode with little regards to other third party build tools, such as CMake.
 
 \section Build_Scripts Build scripts
 
@@ -67,10 +67,10 @@ Our CMakeLists.txt files are designed to work with most of the generators suppor
 A number of build options can be defined when invoking the build scripts or when configurating the project interactively using cmake-gui. To use one of these build options on the command line interface, pass it in this format "-DOPTION=VALUE" without the quotes. Most of the build options are boolean variables where setting their values to 0 means disabling a feature or setting an option to false, while 1 means enabling a feature or setting an option to true. The table below shows all the available build options and their default values. Non-boolean build options generally do not have any default values and are marked with '-' in the table. However, a few build options marked with '*' have their default values set differently based on the value of other variables or external factors.
 |Build Option         |Value|Description          |
 |---------------------|-----|---------------------|
-|ANDROID              |0|Configure project using Android cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only)|
-|RPI                  |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only)|
-|WIN32                |0|Configure project using MinGW cross-compiler toolchain (cmake_generic.sh only); also applicable when cross-compiling 64-bit Windows platform|
-|URHO3D_C++11         |0|Enable C++11 standard|
+|ANDROID              |0|Configure project using Android cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify Android toolchain file for cross-compiling explicitly|
+|RPI                  |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify RPI toolchain file for cross-compiling explicitly|
+|WIN32                |0|Configure project using MinGW (32-bit or 64-bit) cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify MinGW toolchain file for cross-compiling explicitly|
+|EMSCRIPTEN           |0|Configure project using Emscripten cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify Emscripten toolchain file for cross-compiling explicitly|
 |IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only)|
 |URHO3D_64BIT         |*|Enable 64-bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system|
 |URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
@@ -91,12 +91,13 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_PCH           |1|Enable PCH support|
 |URHO3D_DATABASE_ODBC |0|Enable Database support with ODBC, requires vendor-specific ODBC driver|
 |URHO3D_DATABASE_SQLITE|0|Enable Database support with SQLite embedded|
-|URHO3D_SSE           |1|Enable SSE instruction set|
+|URHO3D_SSE           |1|Enable SSE instruction set (Intel platform only including Android on Intel Atom)|
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
 |URHO3D_PACKAGING     |*|Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0|
 |URHO3D_PROFILING     |1|Enable profiling support|
 |URHO3D_LOGGING       |1|Enable logging support|
+|URHO3D_THREADING     |*|Enable thread support, on Emscripten default to 0, on other platforms default to 1|
 |URHO3D_TESTING       |0|Enable testing support|
 |URHO3D_TEST_TIMEOUT  |*|Number of seconds to test run the executables (when testing support is enabled only), default to 10 on Emscripten platform and 5 on other platforms|
 |URHO3D_OPENGL        |0|Use OpenGL instead of Direct3D (Windows platform only)|
@@ -106,6 +107,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_MACOSX_BUNDLE |0|Use MACOSX_BUNDLE when setting up Mac OS X executable targets (Xcode native build only)|
 |URHO3D_LIB_TYPE      |STATIC|Specify Urho3D library type, possible values are STATIC (default) and SHARED|
 |URHO3D_SCP_TO_TARGET |-|Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
+|URHO3D_UPDATE_SOURCE_TREE|0|Enable commands to copy back some of the generated build artifacts from build tree to source tree to facilitate devs to push them as part of a commit (for library devs with push right only)|
 |URHO3D_USE_LIB64_RPM |0|Enable 64-bit RPM CPack generator using /usr/lib64 and disable all other generators (Debian-based host only, which uses /usr/lib by default)|
 |URHO3D_USE_LIB_DEB   |0|Enable 64-bit DEB CPack generator using /usr/lib and disable all other generators (Redhat-based host only, which uses /usr/lib64 by default)|
 |URHO3D_HOME          |-|Path to Urho3D build tree or SDK installation location (external project only)|
@@ -234,9 +236,9 @@ Execute cmake_mingw.sh then go to the build tree to execute make command. After 
 >    - Networking. Javascript can only use http and websockets protocols so it's not likely that kNet will ever function.
 >    - AngelScript scripting support.
 
-This section assumes you have already updated, installed, and activated the latest Emscripten (trans-)compiler toolchain on your host system as per described in http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html.
+This section assumes you have already updated, installed, and activated the latest Emscripten cross-compiler toolchain on your host system as per described in http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html.
 
-Set the EMSCRIPTEN_ROOT_PATH environment variable or build option to point to the root path of Emscripten cross-compiler tools. The Emscripten sysroot path will be derived from the root path, usually from 'system' subdir relative to the root path. However, you can optionally set the EMSCRIPTEN_SYSROOT environment variable or build option to point to another system root path.
+Set the EMSCRIPTEN_ROOT_PATH environment variable or build option to point to the root path of Emscripten cross-compiler tools. Alternatively, call the emsdk_env script to set the EMSCRIPTEN environment variable for you. The Emscripten sysroot path will be derived from the root path, usually from 'system' subdir relative to the root path. However, you can optionally set the EMSCRIPTEN_SYSROOT environment variable or build option to point to another system root path.
 
 On Windows host, execute cmake_emscripten.bat. On OS X or Linux host, execute cmake_emscripten.sh. Then go to the build tree and execute the 'make' command to start the build as usual. You may want to set the URHO3D_SAMPLES build option to build all the samples. You may also optionally set the URHO3D_LUA build option to enable Lua scripting support. If you encounter "Too many open files" warning when archiving the Urho3D static library, follow by "Unresolved symbol" errors on OS X then you have to increase the soft-limit in your host system before rebuilding the library and all the main targets.
 
@@ -245,11 +247,11 @@ For example, to double the limit (which normally defaults to 256 on OS X):
 ulimit -Sn 512
 \endverbatim
 
-After the commands finish successfully, the HTMLs and its correspondng data files should have been generated in the build tree's "bin" subdirectory, from where it can be launched in a browser.
+After the commands finish successfully, the HTMLs and its corresponding data files should have been generated in the build tree's "bin" subdirectory, from where it can be launched in a browser.
 
 On Windows building with Emscripten requires a MinGW toolchain. The one that can be installed through emsdk may not work correctly, but for example http://sourceforge.net/projects/mingw-w64/ with the default install settings has been known to work.
 
-If CMake complains that emcc is not able to compile a test program, try reactivating your current Emscripten cross-compiler tools with 'emsdk activate <your-tools-version>', clear all generated *.cmake files as well as the CMake cache, and retry running CMake.
+If CMake complains that emcc is not able to compile a test program, try reactivating your current Emscripten cross-compiler tools with 'emsdk activate <sdk-version>', clear all generated *.cmake files as well as the CMake cache, and retry running CMake.
 
 \section Building_64bit Native 64bit build
 
@@ -278,9 +280,19 @@ Urho3D should be built as a shared library if your application consists of multi
 
 \section Building_Docs Documentation build
 
-If "URHO3D_DOCS" build option is set then a normal build would not only build Urho3D binaries but also Urho3D documentation automatically. If the option is not set then the documentation can still be built by manually invoking 'make doc' command or using its equivalent built-in target in IDE.
+If "URHO3D_DOCS" or "URHO3D_DOCS_QUIET" build option is set then a normal build would not only build Urho3D binaries but also Urho3D documentation automatically. If the option is not set then the documentation can still be built by manually invoking 'make doc' command or using its equivalent built-in target in IDE.
 
-The prerequisites are Doxygen and Graphviz. Tools to dump the \ref ScriptAPI "AngelScript API" for the default \ref Script "scripting" subsystem and the \ref LuaScriptAPI "LuaScript API" (when the LuaScript subsystem is also enabled) are being built at the same time when all the native tools are built.
+The additional prerequisite for documentation build is Doxygen. Also Graphviz (optional) if you wish to generate graphical diagrams in the documentation. MSVC users on Windows host system may install HTML help compiler tool (optional) in order to get the compressed help file (*.chm). When optional tool is not available in the host system, the corresponding build process is skipped accordingly. The internal host tools to dump the \ref ScriptAPI "AngelScript API" for the default \ref Script "scripting" subsystem and the \ref LuaScriptAPI "LuaScript API" (when the LuaScript subsystem is also enabled) are being built at the same time when all the native tools are built. When the build tree is being configured not to build any host tools then the 'doc' target will simply instruct Doxygen to process the existing API dump files that are already pre-generated in the repository.
+
+\section Building_Clang_tools Clang-tools build (EXPERIMENTAL)
+
+If "URHO3D_CLANG_TOOLS" build option is set then CMake would generate a special build tree for the purpose of developing the Clang-tools. Before doing this, the development software package of LLVM/Clang version 3.7.0 must be already installed in the host system. Alternatively, you can download LLVM/Clang source files from Clang's SVN repo, build and install it into the host system. If it is not installed in a system-wide installation location then use the LLVM_CLANG_ROOT environment variable to point to the root path of this custom location (the root is the parent directory containing the bin, lib, include and share subdirectories). You may want to follow the [Clang's Getting Started instruction](http://clang.llvm.org/get_started.html) to guide you through this. However, it is recommended to checkout "extra Clang tools" from our own Urho3D repo [here](https://github.com/urho3d/clang-tools-extra) instead of Clang's SVN repo as it contains a patch to fix a tool installation issue.
+
+Perhaps the easiest way to get Clang installed is by using Emscripten-SDK. If you have already built Emscripten-SDK in your host system then you can also use the SDK to install the Fastcomp/Clang by navigating to the Fastcomp/Clang build tree (e.g. emsdk_portable/clang/fastcomp/build_master_64) and issuing a 'make install' command. However, Emscripten-SDK does not automatically checkout "extra Clang tools", so before issuing a 'make install' you may want to take a step back to manually checkout the "extra Clang tools" into the corresponding subdirectory in the Fastcomp/Clang source tree (e.g. emsdk_portable/clang/fastcomp/src/tools/clang/tools/extra), then rebuild and install as usual. Using Fastcomp/Clang is fine for our purpose because we are only interested in using Clang as 3rd-party library instead of as compiler.
+
+A special note to Linux users, install the development software package for 'libedit' when you want full command line interface features like command history and command editing in clang-query tool. Install it before generating any of the LLVM/Clang or Fastcomp/Clang build tree.
+
+Check the Source/Clang-Tools/CMakeLists.txt to get the list of targets currently available or under development. Normal build targets won't work properly in this special build tree. See also https://github.com/urho3d/Urho3D/issues/887 to find out more about the current development plan and leave a comment there if you would like to help to contribute the development.
 
 \section Building_Shaders Compiling Direct3D shaders
 

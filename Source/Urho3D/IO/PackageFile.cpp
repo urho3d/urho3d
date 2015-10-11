@@ -53,7 +53,7 @@ PackageFile::~PackageFile()
 bool PackageFile::Open(const String& fileName, unsigned startOffset)
 {
 #ifdef ANDROID
-    if (fileName.StartsWith("/apk/"))
+    if (IS_ASSET(fileName))
     {
         LOGERROR("Package files within the apk are not supported on Android");
         return false;
@@ -142,7 +142,7 @@ const PackageEntry* PackageFile::GetEntry(const String& fileName) const
     HashMap<String, PackageEntry>::ConstIterator i = entries_.Find(fileName);
     if (i != entries_.End())
         return &i->second_;
-    
+
 #ifdef WIN32
     // On Windows perform a fallback case-insensitive search
     else

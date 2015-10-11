@@ -26,7 +26,10 @@
 #  URHO3D_INCLUDE_DIRS
 #  URHO3D_LIBRARIES
 #  URHO3D_LIBRARIES_REL (WIN32 only)
-#  URHO3D_LIBRARIES_DBG (WIN32 Only)
+#  URHO3D_LIBRARIES_DBG (WIN32 only)
+#  URHO3D_DLL (WIN32 only)
+#  URHO3D_DLL_REL (WIN32 only)
+#  URHO3D_DLL_DBG (WIN32 only)
 #
 #
 # For internal Urho3D project, the Urho3D "build tree" path is already known.
@@ -51,6 +54,11 @@ if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_FOUND_LIB_TYPE)
     if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
         list (REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
     endif ()
+endif ()
+
+# Cater for the shared library extension in Emscripten build has been changed to ".bc"
+if (EMSCRIPTEN)
+    string (REPLACE .so .bc CMAKE_FIND_LIBRARY_SUFFIXES "${CMAKE_FIND_LIBRARY_SUFFIXES}")   # Stringify for string replacement
 endif ()
 
 set (PATH_SUFFIX Urho3D)
@@ -95,21 +103,6 @@ else ()
         set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)
     endif ()
     find_path (URHO3D_INCLUDE_DIRS Urho3D.h PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT})
-    find_library (URHO3D_LIBRARIES NAMES Urho3D ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT})
-    if (WIN32)
-        # For Windows platform, give a second chance to search for a debug version of the library
-        find_library (URHO3D_LIBRARIES_DBG NAMES Urho3D_d ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT})
-        # If both the non-debug and debug version of the libraries are found then use them both
-        set (URHO3D_LIBRARIES_REL ${URHO3D_LIBRARIES})
-        # Otherwise, URHO3D_LIBRARIES variable should have the path to either one of the version
-        if (URHO3D_LIBRARIES)
-            if (URHO3D_LIBRARIES_DBG)
-                list (APPEND URHO3D_LIBRARIES ${URHO3D_LIBRARIES_DBG})
-            endif ()
-        else ()
-            set (URHO3D_LIBRARIES ${URHO3D_LIBRARIES_DBG})
-        endif ()
-    endif ()
     if (URHO3D_INCLUDE_DIRS)
         set (BASE_INCLUDE_DIR ${URHO3D_INCLUDE_DIRS})   # Preserve the base include dir because the original variable will be turned into a list below
         get_filename_component (PATH ${URHO3D_INCLUDE_DIRS} PATH)
@@ -124,6 +117,32 @@ else ()
             # URHO3D_HOME is not set when using SDK installed on system-wide default location, so set it now
             get_filename_component (PATH ${PATH} PATH)
             set (URHO3D_HOME ${PATH})
+        endif ()
+    endif ()
+    find_library (URHO3D_LIBRARIES NAMES Urho3D ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT})
+    if (WIN32)
+        # For Windows platform, give a second chance to search for a debug version of the library
+        find_library (URHO3D_LIBRARIES_DBG NAMES Urho3D_d ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT})
+        # If both the non-debug and debug version of the libraries are found then use them both
+        set (URHO3D_LIBRARIES_REL ${URHO3D_LIBRARIES})
+        # Otherwise, URHO3D_LIBRARIES variable should have the path to either one of the version
+        if (URHO3D_LIBRARIES)
+            if (URHO3D_LIBRARIES_DBG)
+                list (APPEND URHO3D_LIBRARIES ${URHO3D_LIBRARIES_DBG})
+            endif ()
+        else ()
+            set (URHO3D_LIBRARIES ${URHO3D_LIBRARIES_DBG})
+        endif ()
+        # For shared library type, also initialize the URHO3D_DLL variable for later use
+        if (URHO3D_LIB_TYPE STREQUAL SHARED AND URHO3D_HOME)
+            find_file (URHO3D_DLL_REL Urho3D.dll HINTS ${URHO3D_HOME}/bin NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+            if (URHO3D_DLL_REL)
+                list (APPEND URHO3D_DLL ${URHO3D_DLL_REL})
+            endif ()
+            find_file (URHO3D_DLL_DBG Urho3D_d.dll HINTS ${URHO3D_HOME}/bin NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+            if (URHO3D_DLL_DBG)
+                list (APPEND URHO3D_DLL ${URHO3D_DLL_DBG})
+            endif ()
         endif ()
     endif ()
 endif ()
@@ -145,4 +164,4 @@ elseif (Urho3D_FIND_REQUIRED)
         "Use URHO3D_HOME environment variable or build option to specify the location of the build tree or SDK installation. ${NOT_FOUND_MESSAGE}")
 endif ()
 
-mark_as_advanced (URHO3D_INCLUDE_DIRS URHO3D_LIBRARIES URHO3D_LIBRARIES_REL URHO3D_LIBRARIES_DBG URHO3D_HOME)
+mark_as_advanced (URHO3D_INCLUDE_DIRS URHO3D_LIBRARIES URHO3D_LIBRARIES_REL URHO3D_LIBRARIES_DBG URHO3D_DLL URHO3D_DLL_REL URHO3D_DLL_DBG URHO3D_HOME)

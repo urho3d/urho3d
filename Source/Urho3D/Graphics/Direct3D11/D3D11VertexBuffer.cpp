@@ -100,9 +100,9 @@ const unsigned VertexBuffer::elementFormats[] =
     DXGI_FORMAT_R32G32B32A32_FLOAT
 };
 
-VertexBuffer::VertexBuffer(Context* context) :
+VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
     Object(context),
-    GPUObject(GetSubsystem<Graphics>()),
+    GPUObject(forceHeadless ? (Graphics*)0 : GetSubsystem<Graphics>()),
     vertexCount_(0),
     elementMask_(0),
     lockState_(LOCK_NONE),

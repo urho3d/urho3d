@@ -113,6 +113,7 @@ bool noOverwriteMaterial_ = false;
 bool noOverwriteTexture_ = false;
 bool noOverwriteNewerTexture_ = false;
 bool checkUniqueModel_ = true;
+bool moveToBindPose_ = false;
 unsigned maxBones_ = 64;
 Vector<String> nonSkinningBoneIncludes_;
 Vector<String> nonSkinningBoneExcludes_;
@@ -130,6 +131,7 @@ void ExportModel(const String& outName, bool animationOnly);
 void CollectMeshes(OutModel& model, aiNode* node);
 void CollectBones(OutModel& model, bool animationOnly = false);
 void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
+void MoveToBindPose(OutModel& model, aiNode* current);
 void CollectAnimations(OutModel* model = 0);
 void BuildBoneCollisionInfo(OutModel& model);
 void BuildAndSaveModel(OutModel& model);
@@ -178,6 +180,7 @@ Vector3 ToVector3(const aiVector3D& vec);
 Vector2 ToVector2(const aiVector2D& vec);
 Quaternion ToQuaternion(const aiQuaternion& quat);
 Matrix3x4 ToMatrix3x4(const aiMatrix4x4& mat);
+aiMatrix4x4 ToAIMatrix4x4(const Matrix3x4& mat);
 String SanitateAssetName(const String& name);
 
 int main(int argc, char** argv)
@@ -239,6 +242,7 @@ void Run(const Vector<String>& arguments)
             "-ct         Check and do not overwrite if texture exists\n"
             "-ctn        Check and do not overwrite if texture has newer timestamp\n"
             "-am         Export all meshes even if identical (scene mode only)\n"
+            "-bp         Move bones to bind pose before saving model\n"
         );
     }
 
@@ -380,6 +384,8 @@ void Run(const Vector<String>& arguments)
                 noOverwriteNewerTexture_ = true;
             else if (argument == "am")
                 checkUniqueModel_ = false;
+            else if (argument == "bp")
+                moveToBindPose_ = true;
         }
     }
 
@@ -627,6 +633,14 @@ void CollectBones(OutModel& model, bool animationOnly)
         return;
 
     model.rootBone_ = *rootNodes.Begin();
+
+    // Move the model to bind pose now if requested
+    if (moveToBindPose_)
+    {
+        PrintLine("Moving bones to bind pose");
+        MoveToBindPose(model, model.rootBone_);
+    }
+
     CollectBonesFinal(model.bones_, necessary, model.rootBone_);
     // Initialize the bone collision info
     model.boneRadii_.Resize(model.bones_.Size());
@@ -636,6 +650,27 @@ void CollectBones(OutModel& model, bool animationOnly)
         model.boneRadii_[i] = 0.0f;
         model.boneHitboxes_[i] = BoundingBox(0.0f, 0.0f);
     }
+}
+
+void MoveToBindPose(OutModel& model, aiNode* current)
+{
+    String nodeName(FromAIString(current->mName));
+    Matrix3x4 bindWorldTransform = GetOffsetMatrix(model, nodeName).Inverse();
+    // Skip if we get an identity offset matrix (bone lookup failed)
+    if (!bindWorldTransform.Equals(Matrix3x4::IDENTITY))
+    {
+        if (current->mParent && current != model.rootNode_)
+        {
+            aiMatrix4x4 parentWorldTransform = GetDerivedTransform(current->mParent, model.rootNode_, true);
+            Matrix3x4 parentInverse = ToMatrix3x4(parentWorldTransform).Inverse();
+            current->mTransformation = ToAIMatrix4x4(parentInverse * bindWorldTransform);
+        }
+        else
+            current->mTransformation = ToAIMatrix4x4(bindWorldTransform);
+    }
+
+    for (unsigned i = 0; i < current->mNumChildren; ++i)
+        MoveToBindPose(model, current->mChildren[i]);
 }
 
 void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node)
@@ -1035,7 +1070,6 @@ void BuildAndSaveAnimations(OutModel* model)
         outAnim->SetLength(duration * tickConversion);
 
         PrintLine("Writing animation " + animName + " length " + String(outAnim->GetLength()));
-        Vector<AnimationTrack> tracks;
         for (unsigned j = 0; j < anim->mNumChannels; ++j)
         {
             aiNodeAnim* channel = anim->mChannels[j];
@@ -1049,6 +1083,7 @@ void BuildAndSaveAnimations(OutModel* model)
                 if (boneIndex == M_MAX_UNSIGNED)
                 {
                     PrintLine("Warning: skipping animation track " + channelName + " not found in model skeleton");
+                    outAnim->RemoveTrack(channelName);
                     continue;
                 }
                 boneNode = model->bones_[boneIndex];
@@ -1060,6 +1095,7 @@ void BuildAndSaveAnimations(OutModel* model)
                 if (!boneNode)
                 {
                     PrintLine("Warning: skipping animation track " + channelName + " whose scene node was not found");
+                    outAnim->RemoveTrack(channelName);
                     continue;
                 }
             }
@@ -1080,20 +1116,18 @@ void BuildAndSaveAnimations(OutModel* model)
             if (channel->mNumRotationKeys > 0 && !ToQuaternion(boneRot).Equals(ToQuaternion(channel->mRotationKeys[0].mValue)))
                 rotEqual = false;
 
-            AnimationTrack track;
-            track.name_ = channelName;
-            track.nameHash_ = channelName;
+            AnimationTrack* track = outAnim->CreateTrack(channelName);
 
             // Check which channels are used
-            track.channelMask_ = 0;
+            track->channelMask_ = 0;
             if (channel->mNumPositionKeys > 1 || !posEqual)
-                track.channelMask_ |= CHANNEL_POSITION;
+                track->channelMask_ |= CHANNEL_POSITION;
             if (channel->mNumRotationKeys > 1 || !rotEqual)
-                track.channelMask_ |= CHANNEL_ROTATION;
+                track->channelMask_ |= CHANNEL_ROTATION;
             if (channel->mNumScalingKeys > 1 || !scaleEqual)
-                track.channelMask_ |= CHANNEL_SCALE;
+                track->channelMask_ |= CHANNEL_SCALE;
             // Check for redundant identity scale in all keyframes and remove in that case
-            if (track.channelMask_ & CHANNEL_SCALE)
+            if (track->channelMask_ & CHANNEL_SCALE)
             {
                 bool redundantScale = true;
                 for (unsigned k = 0; k < channel->mNumScalingKeys; ++k)
@@ -1108,11 +1142,15 @@ void BuildAndSaveAnimations(OutModel* model)
                     }
                 }
                 if (redundantScale)
-                    track.channelMask_ &= ~CHANNEL_SCALE;
+                    track->channelMask_ &= ~CHANNEL_SCALE;
             }
 
-            if (!track.channelMask_)
+            if (!track->channelMask_)
+            {
                 PrintLine("Warning: skipping animation track " + channelName + " with no keyframes");
+                outAnim->RemoveTrack(channelName);
+                continue;
+            }
 
             // Currently only same amount of keyframes is supported
             // Note: should also check the times of individual keyframes for match
@@ -1121,6 +1159,7 @@ void BuildAndSaveAnimations(OutModel* model)
                 (channel->mNumRotationKeys > 1 && channel->mNumScalingKeys > 1 && channel->mNumRotationKeys != channel->mNumScalingKeys))
             {
                 PrintLine("Warning: differing amounts of channel keyframes, skipping animation track " + channelName);
+                outAnim->RemoveTrack(channelName);
                 continue;
             }
 
@@ -1139,11 +1178,11 @@ void BuildAndSaveAnimations(OutModel* model)
                 kf.scale_ = Vector3::ONE;
 
                 // Get time for the keyframe. Adjust with animation's start time
-                if (track.channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
+                if (track->channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
                     kf.time_ = ((float)channel->mPositionKeys[k].mTime - startTime) * tickConversion;
-                else if (track.channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
+                else if (track->channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
                     kf.time_ = ((float)channel->mRotationKeys[k].mTime - startTime) * tickConversion;
-                else if (track.channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
+                else if (track->channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
                     kf.time_ = ((float)channel->mScalingKeys[k].mTime - startTime) * tickConversion;
 
                 // Make sure time stays positive
@@ -1155,11 +1194,11 @@ void BuildAndSaveAnimations(OutModel* model)
                 aiQuaternion rot;
                 boneTransform.Decompose(scale, rot, pos);
                 // Then apply the active channels
-                if (track.channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
+                if (track->channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
                     pos = channel->mPositionKeys[k].mValue;
-                if (track.channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
+                if (track->channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
                     rot = channel->mRotationKeys[k].mValue;
-                if (track.channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
+                if (track->channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
                     scale = channel->mScalingKeys[k].mValue;
 
                 // If root bone, transform with the model root node transform
@@ -1174,20 +1213,16 @@ void BuildAndSaveAnimations(OutModel* model)
                     tform.Decompose(scale, rot, pos);
                 }
 
-                if (track.channelMask_ & CHANNEL_POSITION)
+                if (track->channelMask_ & CHANNEL_POSITION)
                     kf.position_ = ToVector3(pos);
-                if (track.channelMask_ & CHANNEL_ROTATION)
+                if (track->channelMask_ & CHANNEL_ROTATION)
                     kf.rotation_ = ToQuaternion(rot);
-                if (track.channelMask_ & CHANNEL_SCALE)
+                if (track->channelMask_ & CHANNEL_SCALE)
                     kf.scale_ = ToVector3(scale);
 
-                track.keyFrames_.Push(kf);
+                track->keyFrames_.Push(kf);
             }
-
-            tracks.Push(track);
         }
-
-        outAnim->SetTracks(tracks);
 
         File outFile(context_);
         if (!outFile.Open(animOutName, FILE_WRITE))
@@ -1566,6 +1601,11 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     }
     if (material->Get(AI_MATKEY_OPACITY, floatVal) == AI_SUCCESS)
     {
+        /// \hack New Assimp behavior - some materials may return 0 opacity, which is invisible.
+        /// Revert to full opacity in that case
+        if (floatVal < M_EPSILON)
+            floatVal = 1.0f;
+
         if (floatVal < 1.0f)
             hasAlpha = true;
         diffuseColor.a_ = floatVal;
@@ -2238,6 +2278,13 @@ Matrix3x4 ToMatrix3x4(const aiMatrix4x4& mat)
 {
     Matrix3x4 ret;
     memcpy(&ret.m00_, &mat.a1, sizeof(Matrix3x4));
+    return ret;
+}
+
+aiMatrix4x4 ToAIMatrix4x4(const Matrix3x4& mat)
+{
+    aiMatrix4x4 ret;
+    memcpy(&ret.a1, &mat.m00_, sizeof(Matrix3x4));
     return ret;
 }
 

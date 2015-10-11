@@ -40,13 +40,15 @@ matrix:
   fast_finish: true
   include:
     - &Linux-64bit
+      addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [*native_deps, cmake, g++-4.9]}}
       compiler: gcc-64bit-static
-      env: LINUX=1 URHO3D_LIB_TYPE=STATIC COVERITY_SCAN_THRESHOLD=100 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_UPDATE_SOURCE_TREE=1 COVERITY_SCAN_THRESHOLD=100 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
     - &Linux-64bit-shared
       compiler: gcc-64bit-shared
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED
-    - <<: *Linux-64bit
+    - <<: *Linux-64bit-shared
       compiler: clang-64bit-static
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC
     - <<: *Linux-64bit-shared
       compiler: clang-64bit-shared
     - &Linux-32bit
@@ -108,6 +110,7 @@ before_script:
   # Temporarily workaround the problem by downloading the missing header from Ubuntu 14.04 LTS source package.
   - if [ $URHO3D_OPENGL ]; then mkdir -p ../Build/{,generated/{UsingBuildTree,UsingSDK}/}include/Urho3D/ThirdParty && wget -P ../Build/include/Urho3D/ThirdParty http://bazaar.launchpad.net/~ubuntu-branches/ubuntu/trusty/mingw-w64/trusty/download/package-import%40ubuntu.com-20130624192537-vzn12bb7qd5w3iy8/d3dcompiler.h-20120402093420-bk10a737hzitlkgj-65/d3dcompiler.h && for d in UsingBuildTree UsingSDK; do bash -c "cd ../Build/generated/$d/include/Urho3D/ThirdParty && ln -s ../../../../../include/Urho3D/ThirdParty/d3dcompiler.h ."; done; fi
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH
+  - if [ $URHO3D_BINDINGS ]; then git clone --depth 1 https://github.com/urho3d/fastcomp-clang.git && export LLVM_CLANG_ROOT=$(pwd)/fastcomp-clang && export CXX=g++-4.9 CC=gcc-4.9 && for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done && export PATH=$HOME:$PATH; fi
   # For some reason clang compiler toolchain installation in Travis CI VM does not have symlink in the ccache symlinks directory, so workaround it
   - if [ "$CC"  == "clang" ]; then ln -s $(which ccache) $HOME/clang && ln -s $(which ccache) $HOME/clang++ && export PATH=$HOME:$PATH; fi
   - rake ci_setup_cache
@@ -119,7 +122,7 @@ notifications: {email: {on_success: never, on_failure: change}}
 
 ---
 
-branch: {name: Coverity-Scan, active: no, description: For Travis CI - switch CI build to enable Coverity Scan addon.}
+branch: {name: Coverity-Scan, active: no}
 language: cpp
 compiler: gcc
 cache: ccache
@@ -154,7 +157,34 @@ after_script: rake ci_teardown_cache
 
 ---
 
-branch: {name: Android-CI, active: yes, description: For Travis CI - switch CI build to use Android build environment.}
+branch: {name: Annotate, active: no}
+language: cpp
+compiler: gcc
+cache: ccache
+sudo: false
+addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, libasound2-dev]}}
+env:
+  global:
+    - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
+    - NUMJOBS=4
+    - USE_CCACHE=1
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
+before_script:
+  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - git clone --depth 1 https://github.com/urho3d/fastcomp-clang.git && export LLVM_CLANG_ROOT=$(pwd)/fastcomp-clang
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH
+  - export CXX=g++-4.9 CC=gcc-4.9
+  - for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done && export PATH=$HOME:$PATH
+  - rake ci_setup_cache
+script: rake ci_annotate
+after_script: rake ci_teardown_cache
+
+---
+
+branch: {name: Android-CI, active: yes}
 language: android
 android: {components: [build-tools-22.0.1]}
 cache: {directories: $HOME/.ccache}
@@ -223,7 +253,7 @@ after_script: rake ci_teardown_cache
 
 ---
 
-branch: {name: RPI-CI, active: yes, description: For Travis CI - switch CI build to use Raspberry-Pi build environment.}
+branch: {name: RPI-CI, active: yes}
 language: cpp
 cache: ccache
 sudo: false
@@ -261,7 +291,7 @@ after_script: rake ci_teardown_cache
 
 ---
 
-branch: {name: OSX-CI, active: yes, description: For Travis CI - switch CI build to use OS X build environment.}
+branch: {name: OSX-CI, active: yes}
 language: objective-c
 env:
   global:
@@ -301,9 +331,8 @@ after_script: rake ci_teardown_cache
 
 ---
 
-branch: {name: Emscripten-CI, active: yes, description: For Travis CI - switch CI build to use Emscripten build environment.}
+branch: {name: Emscripten-CI, active: yes}
 language: cpp
-compiler: gcc
 cache: ccache
 sudo: false
 addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, libasound2-dev]}}
@@ -311,7 +340,7 @@ env:
   global:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
     - NUMJOBS=3
-    - EMSCRIPTEN=1
+    - HTML5=1
     - EMSCRIPTEN_SHARE_DATA=1
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
@@ -319,16 +348,19 @@ env:
     - CCACHE_MAXSIZE=100M
     - URHO3D_C++11=0
     - URHO3D_AMALG=0
-  matrix:
-    - URHO3D_LIB_TYPE=STATIC
 matrix:
   fast_finish: true
+  include:
+    - compiler: gcc-archived-bitcode
+      env: URHO3D_LIB_TYPE=STATIC
+    - compiler: gcc-linked-bitcode
+      env: URHO3D_LIB_TYPE=SHARED
 before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export DISPLAY=:99.0; bash -e /etc/init.d/xvfb start
-  - git clone --depth 1 https://github.com/urho3d/emscripten-sdk.git && emscripten-sdk/emsdk activate --build=Release sdk-master-64bit && source emscripten-sdk/emsdk_env.sh && export EMSCRIPTEN_ROOT_PATH=$EMSCRIPTEN && export EMSCRIPTEN=1
-  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH; for f in $EMSCRIPTEN_ROOT_PATH/{emcc,em++}; do touch -d "2015-09-01 00:00:00 +0800" $f; done
+  - git clone --depth 1 https://github.com/urho3d/emscripten-sdk.git && emscripten-sdk/emsdk activate --build=Release sdk-master-64bit && source emscripten-sdk/emsdk_env.sh
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH; for f in $EMSCRIPTEN/{emcc,em++}; do touch -d "2015-09-01 00:00:00 +0800" $f; done
   - rake ci_setup_cache
 script: rake ci
 after_script: rake ci_teardown_cache

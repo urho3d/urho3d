@@ -393,8 +393,17 @@ void RigidBody2D::ReleaseBody()
 
 void RigidBody2D::ApplyWorldTransform()
 {
-    if (!body_)
-        return;
+	if (!body_)
+		return;
+
+	if (!body_->IsActive())
+		return; 
+	
+	if (body_->GetType() == b2_staticBody)
+		return;
+
+	if (!body_->IsAwake())
+		return;
 
     physicsWorld_->SetApplyingTransforms(true);
 
