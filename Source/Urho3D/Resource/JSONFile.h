@@ -31,7 +31,7 @@ namespace Urho3D
 /// JSON document resource.
 class URHO3D_API JSONFile : public Resource
 {
-    OBJECT(JSONFile);
+    OBJECT(JSONFile, Resource);
 
 public:
     /// Construct.

@@ -107,7 +107,7 @@ struct GeometryDesc
 /// 3D model resource.
 class URHO3D_API Model : public Resource
 {
-    OBJECT(Model);
+    OBJECT(Model, Resource);
 
 public:
     /// Construct.

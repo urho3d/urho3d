@@ -38,7 +38,7 @@ static const int STREAM_BUFFER_LENGTH = 100;
 /// %Sound source component with stereo position.
 class URHO3D_API SoundSource : public Component
 {
-    OBJECT(SoundSource);
+    OBJECT(SoundSource, Component);
 
 public:
     /// Construct.

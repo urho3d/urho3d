@@ -36,7 +36,7 @@ struct ComponentReplicationState;
 /// Base class for components. Components can be created to scene nodes.
 class URHO3D_API Component : public Animatable
 {
-    OBJECT(Component);
+    OBJECT(Component, Animatable);
     BASEOBJECT(Component);
 
     friend class Node;

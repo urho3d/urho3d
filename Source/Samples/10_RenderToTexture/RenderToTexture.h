@@ -38,7 +38,7 @@ class Scene;
 ///     - Creating rendertarget texture and material programmatically
 class RenderToTexture : public Sample
 {
-    OBJECT(RenderToTexture);
+    OBJECT(RenderToTexture, Sample);
 
 public:
     /// Construct.

@@ -34,7 +34,7 @@ class Engine;
 /// Base class for creating applications which initialize the Urho3D engine and run a main loop until exited.
 class URHO3D_API Application : public Object
 {
-    OBJECT(Application);
+    OBJECT(Application, Object);
 
 public:
     /// Construct. Parse default engine parameters from the command line, and create the engine in an uninitialized state.

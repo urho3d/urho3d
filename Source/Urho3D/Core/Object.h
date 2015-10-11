@@ -31,7 +31,7 @@ namespace Urho3D
 class Context;
 class EventHandler;
 
-#define OBJECT(typeName) \
+#define OBJECT(typeName, baseTypeName) \
     public: \
         typedef typeName ClassName; \
         virtual Urho3D::StringHash GetType() const { return GetTypeStatic(); } \

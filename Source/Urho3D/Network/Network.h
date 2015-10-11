@@ -46,7 +46,7 @@ template <class T> unsigned MakeHash(kNet::MessageConnection* value)
 /// %Network subsystem. Manages client-server communications using the UDP protocol.
 class URHO3D_API Network : public Object, public kNet::IMessageHandler, public kNet::INetworkServerListener
 {
-    OBJECT(Network);
+    OBJECT(Network, Object);
 
 public:
     /// Construct.

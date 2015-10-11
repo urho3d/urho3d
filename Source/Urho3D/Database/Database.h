@@ -40,7 +40,7 @@ class DbConnection;
 /// %Database subsystem. Manage database connections.
 class URHO3D_API Database : public Object
 {
-    OBJECT(Database);
+    OBJECT(Database, Object);
 
 public:
     /// Construct.

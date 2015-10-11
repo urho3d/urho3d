@@ -41,7 +41,7 @@ struct StaticModelGeometryData
 /// Static model component.
 class URHO3D_API StaticModel : public Drawable
 {
-    OBJECT(StaticModel);
+    OBJECT(StaticModel, Drawable);
 
 public:
     /// Construct.
