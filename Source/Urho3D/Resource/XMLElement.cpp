@@ -709,7 +709,6 @@ BoundingBox XMLElement::GetBoundingBox() const
 
     ret.min_ = GetVector3("min");
     ret.max_ = GetVector3("max");
-    ret.defined_ = true;
     return ret;
 }
 
