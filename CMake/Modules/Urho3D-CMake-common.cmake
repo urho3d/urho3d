@@ -59,15 +59,15 @@ if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the i
     set (URHO3D_DEFAULT_64BIT ${URHO3D_DEFAULT_64BIT} CACHE INTERNAL "Default value for URHO3D_64BIT build option")
     # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
     # When ANDROID is true and ARM is not then we are targeting Android on Intel Atom
-    string (REGEX MATCH "#define +__(arm|arm64|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
-    if (matched)
+    string (REGEX MATCH "#define +__(arm|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
+    if (matched OR IOS)     # Assume iOS is always on ARM for now
         set (ARM TRUE)
     else ()
         set (ARM FALSE)
     endif ()
     set (ARM ${ARM} CACHE INTERNAL "Targeting ARM platform")
-    # The other arm platform that Urho3D supports that is not Android is Raspberry Pi at the moment
-    if (NOT ANDROID AND ARM)
+    # The other arm platform that Urho3D supports that is not Android/iOS is Raspberry Pi at the moment
+    if (ARM AND NOT ANDROID AND NOT IOS)
         # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too on the Raspberry-Pi device itself
         set (RPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
     endif ()
