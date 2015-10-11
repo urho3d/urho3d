@@ -112,7 +112,6 @@ class ResourceCache;
 class URHO3D_API UIElement : public Animatable
 {
     OBJECT(UIElement, Animatable);
-    BASEOBJECT(UIElement);
 
 public:
     /// Construct.
@@ -709,7 +708,7 @@ private:
 
 template <class T> T* UIElement::CreateChild(const String& name, unsigned index)
 {
-    return static_cast<T*>(CreateChild(T::GetTypeStatic(), name, index));
+    return static_cast<T*>(CreateChild(T::GetTypeInfoStatic()->GetType(), name, index));
 }
 
 }

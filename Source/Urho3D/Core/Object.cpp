@@ -1,3 +1,4 @@
+
 //
 // Copyright (c) 2008-2015 the Urho3D project.
 //
@@ -30,6 +31,34 @@
 
 namespace Urho3D
 {
+
+bool TypeInfo::IsTypeOf(StringHash theType) const
+{
+    const TypeInfo* typeInfo = this;
+    while (typeInfo)
+    {
+        if (typeInfo->GetType() == theType)
+            return true;
+
+        typeInfo = typeInfo->GetBaseTypeInfo();
+    }
+
+    return false;
+}
+
+bool TypeInfo::IsTypeOf(const TypeInfo* theTypeInfo) const
+{
+    const TypeInfo* typeInfo = this;
+    while (typeInfo)
+    {
+        if (typeInfo == theTypeInfo)
+            return true;
+
+        typeInfo = typeInfo->GetBaseTypeInfo();
+    }
+
+    return false;
+}
 
 Object::Object(Context* context) :
     context_(context)
@@ -81,6 +110,26 @@ void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData
         nonSpecific->Invoke(eventData);
         context->SetEventHandler(0);
     }
+}
+
+bool Object::IsTypeOf(StringHash type)
+{
+    return GetTypeInfoStatic()->IsTypeOf(type);
+}
+
+bool Object::IsTypeOf(const TypeInfo* typeInfo)
+{
+    return GetTypeInfoStatic()->IsTypeOf(typeInfo);
+}
+
+bool Object::IsInstanceOf(StringHash type) const
+{
+    return GetTypeInfo()->IsTypeOf(type);
+}
+
+bool Object::IsInstanceOf(const TypeInfo* typeInfo) const
+{
+    return GetTypeInfo()->IsTypeOf(typeInfo);
 }
 
 void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler)

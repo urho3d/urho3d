@@ -3,14 +3,12 @@ $#include "Core/Object.h"
 class Object : public RefCounted
 {
     StringHash GetType() const;
-    StringHash GetBaseType() const;
     const String GetTypeName() const;
     const String GetCategory() const;
 
     tolua_outside void ObjectSendEvent @ SendEvent(const String eventName, VariantMap* eventData = 0);
     
     tolua_readonly tolua_property__get_set StringHash type;
-    tolua_readonly tolua_property__get_set StringHash baseType;
     tolua_readonly tolua_property__get_set const String typeName;
     tolua_readonly tolua_property__get_set const String category;
 };

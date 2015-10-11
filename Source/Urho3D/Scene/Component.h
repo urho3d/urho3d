@@ -37,7 +37,6 @@ struct ComponentReplicationState;
 class URHO3D_API Component : public Animatable
 {
     OBJECT(Component, Animatable);
-    BASEOBJECT(Component);
 
     friend class Node;
     friend class Scene;

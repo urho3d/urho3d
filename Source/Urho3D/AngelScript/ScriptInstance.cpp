@@ -642,18 +642,18 @@ void ScriptInstance::GetScriptAttributes()
             if (j != factories.End())
             {
                 // Check base class type. Node & Component are supported as ID attributes, Resource as a resource reference
-                StringHash baseType = j->second_->GetBaseType();
-                if (baseType == Node::GetTypeStatic())
+                const TypeInfo* typeInfo = j->second_->GetTypeInfo();
+                if (typeInfo->IsTypeOf<Node>())
                 {
                     info.mode_ |= AM_NODEID;
                     info.type_ = VAR_INT;
                 }
-                else if (baseType == Component::GetTypeStatic())
+                else if (typeInfo->IsTypeOf<Component>())
                 {
                     info.mode_ |= AM_COMPONENTID;
                     info.type_ = VAR_INT;
                 }
-                else if (baseType == Resource::GetTypeStatic())
+                else if (typeInfo->IsTypeOf<Resource>())
                 {
                     info.type_ = VAR_RESOURCEREF;
                     info.defaultValue_ = ResourceRef(typeHash);

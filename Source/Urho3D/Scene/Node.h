@@ -55,7 +55,6 @@ enum TransformSpace
 class URHO3D_API Node : public Animatable
 {
     OBJECT(Node, Animatable);
-    BASEOBJECT(Node);
 
     friend class Connection;
 

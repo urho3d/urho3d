@@ -31,24 +31,59 @@ namespace Urho3D
 class Context;
 class EventHandler;
 
+/// Type info.
+class URHO3D_API TypeInfo
+{
+public:
+    /// Construct.
+    TypeInfo(const char* typeName, const TypeInfo* baseTypeInfo) :
+        type_(typeName),
+        typeName_(typeName),
+        baseTypeInfo_(baseTypeInfo)
+    {
+    }
+    /// Destruct.
+    ~TypeInfo()
+    {
+    }
+
+    /// Return is type of.
+    bool IsTypeOf(StringHash theType) const;
+    /// Return is type of.
+    bool IsTypeOf(const TypeInfo* theTypeInfo) const;
+    /// Return is type of.
+    template<typename T> bool IsTypeOf() const { return IsTypeOf(T::GetTypeInfoStatic()); }
+    
+    /// Return type.
+    StringHash GetType() const { return type_; }
+    /// Return type name.
+    const String& GetTypeName() const { return typeName_;}
+    /// Return base type info.
+    const TypeInfo* GetBaseTypeInfo() const { return baseTypeInfo_; }
+
+private:
+    /// Type.
+    StringHash type_;
+    /// Type name.
+    String typeName_;
+    /// Base class type info.
+    const TypeInfo* baseTypeInfo_;
+};
+
 #define OBJECT(typeName, baseTypeName) \
     public: \
         typedef typeName ClassName; \
-        virtual Urho3D::StringHash GetType() const { return GetTypeStatic(); } \
-        virtual Urho3D::StringHash GetBaseType() const { return GetBaseTypeStatic(); } \
-        virtual const Urho3D::String& GetTypeName() const { return GetTypeNameStatic(); } \
-        static Urho3D::StringHash GetTypeStatic() { static const Urho3D::StringHash typeStatic(#typeName); return typeStatic; } \
-        static const Urho3D::String& GetTypeNameStatic() { static const Urho3D::String typeNameStatic(#typeName); return typeNameStatic; } \
-
-#define BASEOBJECT(typeName) \
-    public: \
-        static Urho3D::StringHash GetBaseTypeStatic() { static const Urho3D::StringHash baseTypeStatic(#typeName); return baseTypeStatic; } \
+        typedef baseTypeName BaseClassName; \
+        virtual Urho3D::StringHash GetType() const { return GetTypeInfoStatic()->GetType(); } \
+        virtual const Urho3D::String& GetTypeName() const { return GetTypeInfoStatic()->GetTypeName(); } \
+        virtual const Urho3D::TypeInfo* GetTypeInfo() const { return GetTypeInfoStatic(); } \
+        static Urho3D::StringHash GetTypeStatic() { return GetTypeInfoStatic()->GetType(); } \
+        static const Urho3D::String& GetTypeNameStatic() { return GetTypeInfoStatic()->GetTypeName(); } \
+        static const Urho3D::TypeInfo* GetTypeInfoStatic() { static const Urho3D::TypeInfo typeInfoStatic(#typeName, BaseClassName::GetTypeInfoStatic()); return &typeInfoStatic; } \
 
 /// Base class for objects with type identification, subsystem access and event sending/receiving capability.
 class URHO3D_API Object : public RefCounted
 {
-    BASEOBJECT(Object);
-
     friend class Context;
 
 public:
@@ -58,13 +93,28 @@ public:
     virtual ~Object();
 
     /// Return type hash.
-    virtual Urho3D::StringHash GetType() const = 0;
-    /// Return base class type hash.
-    virtual Urho3D::StringHash GetBaseType() const = 0;
+    virtual StringHash GetType() const = 0;
     /// Return type name.
-    virtual const Urho3D::String& GetTypeName() const = 0;
+    virtual const String& GetTypeName() const = 0;
+    /// Return type info.
+    virtual const TypeInfo* GetTypeInfo() const = 0;
     /// Handle event.
     virtual void OnEvent(Object* sender, StringHash eventType, VariantMap& eventData);
+
+    /// Return type info static.
+    static const TypeInfo* GetTypeInfoStatic() { return 0; }
+    /// Check current type is type of.
+    static bool IsTypeOf(StringHash type);
+    /// Check current type is type of.
+    static bool IsTypeOf(const TypeInfo* typeInfo);
+    /// Check current type is type of T.
+    template<typename T> static bool IsTypeOf() { return IsTypeOf(T::GetTypeInfoStatic()); }
+    /// Check current instance is type of.
+    bool IsInstanceOf(StringHash type) const;
+    /// Check current instance is type of.
+    bool IsInstanceOf(const TypeInfo* typeInfo) const;
+    /// Check current instance is type of T.
+    template<typename T> bool IsInstanceOf() const { return IsInstanceOf(T::GetTypeInfoStatic()); }
 
     /// Subscribe to an event that can be sent by any sender.
     void SubscribeToEvent(StringHash eventType, EventHandler* handler);
@@ -146,24 +196,20 @@ public:
     /// Return execution context.
     Context* GetContext() const { return context_; }
 
-    /// Return type hash of objects created by this factory.
-    StringHash GetType() const { return type_; }
+    /// Return type info of objects created by this factory.
+    const TypeInfo* GetTypeInfo() const { return typeInfo_; }
 
-    /// Return base type hash of objects created by this factory.
-    StringHash GetBaseType() const { return baseType_; }
+    /// Return type hash of objects created by this factory.
+    StringHash GetType() const { return typeInfo_->GetType(); }
 
     /// Return type name of objects created by this factory.
-    const String& GetTypeName() const { return typeName_; }
+    const String& GetTypeName() const { return typeInfo_->GetTypeName(); }
 
 protected:
     /// Execution context.
     Context* context_;
-    /// Object type.
-    StringHash type_;
-    /// Object base type.
-    StringHash baseType_;
-    /// Object type name.
-    String typeName_;
+    /// Type info.
+    const TypeInfo* typeInfo_;
 };
 
 /// Template implementation of the object factory.
@@ -174,9 +220,7 @@ public:
     ObjectFactoryImpl(Context* context) :
         ObjectFactory(context)
     {
-        type_ = T::GetTypeStatic();
-        baseType_ = T::GetBaseTypeStatic();
-        typeName_ = T::GetTypeNameStatic();
+        typeInfo_ = T::GetTypeInfoStatic();
     }
 
     /// Create an object of the specific type.
