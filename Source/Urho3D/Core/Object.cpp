@@ -33,9 +33,9 @@ namespace Urho3D
 {
 
 TypeInfo::TypeInfo(const char* typeName, const TypeInfo* baseTypeInfo) :
-	type_(typeName),
-	typeName_(typeName),
-	baseTypeInfo_(baseTypeInfo)
+    type_(typeName),
+    typeName_(typeName),
+    baseTypeInfo_(baseTypeInfo)
 {
 }
 

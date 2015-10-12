@@ -40,11 +40,11 @@ public:
     /// Destruct.
     ~TypeInfo();
 
-	/// Check current type is type of specified type.
+    /// Check current type is type of specified type.
     bool IsTypeOf(StringHash type) const;
-	/// Check current type is type of specified type.
+    /// Check current type is type of specified type.
     bool IsTypeOf(const TypeInfo* typeInfo) const;
-	/// Check current type is type of specified class type.
+    /// Check current type is type of specified class type.
     template<typename T> bool IsTypeOf() const { return IsTypeOf(T::GetTypeInfoStatic()); }
     
     /// Return type.
@@ -96,17 +96,17 @@ public:
 
     /// Return type info static.
     static const TypeInfo* GetTypeInfoStatic() { return 0; }
-	/// Check current type is type of specified type.
+    /// Check current type is type of specified type.
     static bool IsTypeOf(StringHash type);
-	/// Check current type is type of specified type.
+    /// Check current type is type of specified type.
     static bool IsTypeOf(const TypeInfo* typeInfo);
-	/// Check current type is type of specified class.
+    /// Check current type is type of specified class.
     template<typename T> static bool IsTypeOf() { return IsTypeOf(T::GetTypeInfoStatic()); }
     /// Check current instance is type of specified type.
     bool IsInstanceOf(StringHash type) const;
-	/// Check current instance is type of specified type.
+    /// Check current instance is type of specified type.
     bool IsInstanceOf(const TypeInfo* typeInfo) const;
-	/// Check current instance is type of specified class.
+    /// Check current instance is type of specified class.
     template<typename T> bool IsInstanceOf() const { return IsInstanceOf(T::GetTypeInfoStatic()); }
 
     /// Subscribe to an event that can be sent by any sender.

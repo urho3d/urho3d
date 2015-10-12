@@ -226,7 +226,7 @@ void PhysicsWorld2D::DrawTransform(const b2Transform& xf)
 
 void PhysicsWorld2D::Update(float timeStep)
 {
-	PROFILE(UpdatePhysics2D);
+    PROFILE(UpdatePhysics2D);
 
     using namespace PhysicsPreStep2D;
 
