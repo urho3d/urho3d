@@ -32,29 +32,40 @@
 namespace Urho3D
 {
 
-bool TypeInfo::IsTypeOf(StringHash theType) const
+TypeInfo::TypeInfo(const char* typeName, const TypeInfo* baseTypeInfo) :
+	type_(typeName),
+	typeName_(typeName),
+	baseTypeInfo_(baseTypeInfo)
 {
-    const TypeInfo* typeInfo = this;
-    while (typeInfo)
+}
+
+TypeInfo::~TypeInfo()
+{
+}
+
+bool TypeInfo::IsTypeOf(StringHash type) const
+{
+    const TypeInfo* current = this;
+    while (current)
     {
-        if (typeInfo->GetType() == theType)
+        if (current->GetType() == type)
             return true;
 
-        typeInfo = typeInfo->GetBaseTypeInfo();
+        current = current->GetBaseTypeInfo();
     }
 
     return false;
 }
 
-bool TypeInfo::IsTypeOf(const TypeInfo* theTypeInfo) const
+bool TypeInfo::IsTypeOf(const TypeInfo* typeInfo) const
 {
-    const TypeInfo* typeInfo = this;
-    while (typeInfo)
+    const TypeInfo* current = this;
+    while (current)
     {
-        if (typeInfo == theTypeInfo)
+        if (current == typeInfo)
             return true;
 
-        typeInfo = typeInfo->GetBaseTypeInfo();
+        current = current->GetBaseTypeInfo();
     }
 
     return false;
