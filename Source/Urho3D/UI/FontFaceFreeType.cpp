@@ -44,7 +44,7 @@ namespace Urho3D
 /// FreeType library subsystem.
 class FreeTypeLibrary : public Object
 {
-    OBJECT(FreeTypeLibrary);
+    OBJECT(FreeTypeLibrary, Object);
 
 public:
     /// Construct.

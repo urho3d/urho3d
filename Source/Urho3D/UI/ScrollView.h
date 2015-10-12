@@ -33,7 +33,7 @@ class ScrollBar;
 /// Scrollable %UI element for showing a (possibly large) child element.
 class URHO3D_API ScrollView : public UIElement
 {
-    OBJECT(ScrollView);
+    OBJECT(ScrollView, UIElement);
 
 public:
     /// Construct.

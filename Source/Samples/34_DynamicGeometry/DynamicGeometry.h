@@ -39,7 +39,7 @@ class Scene;
 ///     - Creating a Model resource and its buffer data from scratch
 class DynamicGeometry : public Sample
 {
-    OBJECT(DynamicGeometry);
+    OBJECT(DynamicGeometry, Sample);
 
 public:
     /// Construct.

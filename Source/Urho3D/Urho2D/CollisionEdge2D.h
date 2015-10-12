@@ -30,7 +30,7 @@ namespace Urho3D
 /// 2D edge collision component.
 class URHO3D_API CollisionEdge2D : public CollisionShape2D
 {
-    OBJECT(CollisionEdge2D);
+    OBJECT(CollisionEdge2D, CollisionShape2D);
 
 public:
     /// Construct.

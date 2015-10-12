@@ -40,7 +40,7 @@ class UIElement;
 ///     - Implementing simple chat functionality with network messages
 class Chat : public Sample
 {
-    OBJECT(Chat);
+    OBJECT(Chat, Sample);
 
 public:
     /// Construct.

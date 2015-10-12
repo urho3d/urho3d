@@ -35,7 +35,7 @@ class PhysicsWorld2D;
 /// 2D physics constraint component.
 class URHO3D_API Constraint2D : public Component
 {
-    OBJECT(Constraint2D);
+    OBJECT(Constraint2D, Component);
 
 public:
     /// Construct.

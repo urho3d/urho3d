@@ -40,7 +40,7 @@ class Scene;
 ///     - Handling keyboard and mouse input to move a freelook camera
 class SignedDistanceFieldText : public Sample
 {
-    OBJECT(SignedDistanceFieldText);
+    OBJECT(SignedDistanceFieldText, Sample);
 
 public:
     /// Construct.

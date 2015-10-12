@@ -32,7 +32,7 @@
 class Sprites : public Sample
 {
     // Enable type information.
-    OBJECT(Sprites);
+    OBJECT(Sprites, Sample);
 
 public:
     /// Construct.

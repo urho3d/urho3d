@@ -39,7 +39,7 @@ class Scene;
 ///     - Attaching a light to an object (the camera)
 class AnimatingScene : public Sample
 {
-    OBJECT(AnimatingScene);
+    OBJECT(AnimatingScene, Sample);
 
 public:
     /// Construct.

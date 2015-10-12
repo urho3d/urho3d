@@ -99,7 +99,7 @@ static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
 /// Physics simulation world component. Should be added only to the root scene node.
 class URHO3D_API PhysicsWorld : public Component, public btIDebugDraw
 {
-    OBJECT(PhysicsWorld);
+    OBJECT(PhysicsWorld, Component);
 
     friend void InternalPreTickCallback(btDynamicsWorld* world, btScalar timeStep);
     friend void InternalTickCallback(btDynamicsWorld* world, btScalar timeStep);

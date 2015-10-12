@@ -30,7 +30,7 @@ namespace Urho3D
 
 class URHO3D_API NavArea : public Component
 {
-    OBJECT(NavArea);
+    OBJECT(NavArea, Component);
 
 public:
     /// Construct.

@@ -27,7 +27,7 @@
 /// Database demo. This sample demonstrates how to use database subsystem to connect to a database and execute adhoc SQL statements.
 class DatabaseDemo : public Sample
 {
-    OBJECT(DatabaseDemo)
+    OBJECT(DatabaseDemo, Sample)
 
 public:
     /// Construct.

@@ -40,7 +40,7 @@ namespace Urho3D
 /// XML document resource.
 class URHO3D_API XMLFile : public Resource
 {
-    OBJECT(XMLFile);
+    OBJECT(XMLFile, Resource);
 
 public:
     /// Construct.

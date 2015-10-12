@@ -42,7 +42,7 @@ class Window;
 ///     - Accessing available Events data (eventData)
 class HelloGUI : public Sample
 {
-    OBJECT(HelloGUI);
+    OBJECT(HelloGUI, Sample);
 
 public:
     /// Construct.

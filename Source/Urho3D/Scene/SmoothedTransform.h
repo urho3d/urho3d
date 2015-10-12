@@ -37,7 +37,7 @@ static const unsigned SMOOTH_ROTATION = 2;
 /// Transform smoothing component for network updates.
 class URHO3D_API SmoothedTransform : public Component
 {
-    OBJECT(SmoothedTransform);
+    OBJECT(SmoothedTransform, Component);
 
 public:
     /// Construct.

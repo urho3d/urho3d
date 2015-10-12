@@ -34,7 +34,7 @@ class Image;
 /// 3D texture resource.
 class URHO3D_API Texture3D : public Texture
 {
-    OBJECT(Texture3D);
+    OBJECT(Texture3D, Texture);
 
 public:
     /// Construct.

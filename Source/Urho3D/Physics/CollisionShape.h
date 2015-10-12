@@ -128,7 +128,7 @@ struct HeightfieldData : public CollisionGeometryData
 /// Physics collision shape component.
 class URHO3D_API CollisionShape : public Component
 {
-    OBJECT(CollisionShape);
+    OBJECT(CollisionShape, Component);
 
 public:
     /// Construct.
