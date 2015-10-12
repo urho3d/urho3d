@@ -2443,7 +2443,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
@@ -2510,7 +2509,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -2597,7 +2595,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -2660,7 +2657,6 @@ Methods:
 Properties:
 
 - String animationName
-- StringHash baseType // readonly
 - String category // readonly
 - float length
 - uint memoryUse // readonly
@@ -2749,7 +2745,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -2789,7 +2784,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -2915,7 +2909,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool initialized // readonly
 - bool interpolation // readonly
@@ -2997,7 +2990,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - Billboard@[] billboards // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -3136,7 +3128,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -3346,7 +3337,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -3480,7 +3470,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoAspectRatio
-- StringHash baseType // readonly
 - String category // readonly
 - Plane clipPlane
 - Matrix3x4 effectiveWorldTransform // readonly
@@ -3617,7 +3606,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -3742,7 +3730,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - Vector2 center
@@ -3814,7 +3801,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - float density
@@ -3883,7 +3869,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - Vector2 center
@@ -3952,7 +3937,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - float density
@@ -4024,7 +4008,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - float density
@@ -4103,7 +4086,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -4167,7 +4149,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - int categoryBits
 - float density
@@ -4282,7 +4263,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -4313,7 +4293,6 @@ Methods:
 Properties:
 
 - String address // readonly
-- StringHash baseType // readonly
 - float bytesInPerSec // readonly
 - float bytesOutPerSec // readonly
 - String category // readonly
@@ -4356,7 +4335,6 @@ Properties:
 
 - bool autoVisibleOnError
 - BorderImage@ background // readonly
-- StringHash baseType // readonly
 - String category // readonly
 - Button@ closeButton // readonly
 - String commandInterpreter
@@ -4417,7 +4395,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - Vector3 axis // writeonly
-- StringHash baseType // readonly
 - String category // readonly
 - float cfm
 - ConstraintType constraintType
@@ -4487,7 +4464,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -4546,7 +4522,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float dampingRatio
@@ -4610,7 +4585,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -4671,7 +4645,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -4734,7 +4707,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float correctionFactor
@@ -4797,7 +4769,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float dampingRatio
@@ -4862,7 +4833,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - Vector2 axis
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enableLimit
@@ -4927,7 +4897,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -4992,7 +4961,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enableLimit
@@ -5057,7 +5025,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - bool enabled
@@ -5120,7 +5087,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float dampingRatio
@@ -5183,7 +5149,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - Vector2 axis
-- StringHash baseType // readonly
 - String category // readonly
 - bool collideConnected
 - float dampingRatio
@@ -5270,7 +5235,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - Vector3 desiredVelocity // readonly
 - bool enabled
@@ -5362,7 +5326,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -5491,7 +5454,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -5624,7 +5586,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -5682,7 +5643,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint poolSize
 - bool pooling // readonly
@@ -5702,7 +5662,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool connected // readonly
 - String connectionString // readonly
@@ -5740,7 +5699,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - XMLFile@ defaultStyle
 - uint mode
@@ -5808,7 +5766,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -5868,7 +5825,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -6020,7 +5976,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -6091,7 +6046,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -6222,7 +6176,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -6372,7 +6325,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - String category // readonly
 - float cellHeight
@@ -6423,7 +6375,6 @@ Methods:
 Properties:
 
 - bool autoExit
-- StringHash baseType // readonly
 - String category // readonly
 - bool exiting // readonly
 - bool headless // readonly
@@ -6515,7 +6466,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint checksum // readonly
 - bool eof // readonly
@@ -6543,7 +6493,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - Button@ cancelButton // readonly
 - String category // readonly
 - XMLFile@ defaultStyle
@@ -6590,7 +6539,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - String currentDir
 - bool executeConsoleCommands
@@ -6632,7 +6580,6 @@ Methods:
 Properties:
 
 - IntVector2 absoluteGlyphOffset
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -6682,7 +6629,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool empty // readonly
 - IndexBuffer@ indexBuffer
@@ -6723,7 +6669,6 @@ Methods:
 Properties:
 
 - String apiName // readonly
-- StringHash baseType // readonly
 - bool borderless // readonly
 - String category // readonly
 - bool deferredSupport // readonly
@@ -6853,7 +6798,6 @@ Methods:
 Properties:
 
 - bool array // readonly
-- StringHash baseType // readonly
 - String category // readonly
 - uint components // readonly
 - bool compressed // readonly
@@ -6886,7 +6830,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool dynamic // readonly
 - uint indexCount // readonly
@@ -6926,7 +6869,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool focus // readonly
 - JoystickState@[] joysticks // readonly
@@ -7011,7 +6953,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -7116,7 +7057,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - float brightness
 - bool castShadows
@@ -7254,7 +7194,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -7451,7 +7390,6 @@ Properties:
 - bool autoDisableChildren
 - float autoDisableThreshold
 - int baseIndent
-- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -7561,7 +7499,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - String language // readonly
 - int languageIndex // readonly
@@ -7588,7 +7525,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - String lastMessage // readonly
 - int level
@@ -7628,7 +7564,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - CullMode cullMode
 - BiasParameters depthBias
@@ -7849,7 +7784,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -7945,7 +7879,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - String message
 - int refs // readonly
@@ -7972,7 +7905,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - BoundingBox boundingBox
 - String category // readonly
 - Vector3[] geometryCenters
@@ -8031,7 +7963,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox
 - String category // readonly
 - bool enabled
@@ -8089,7 +8020,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -8162,7 +8092,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - String category // readonly
 - float cellHeight
@@ -8217,7 +8146,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - Connection@[]@ clientConnections // readonly
 - String packageCacheDir
@@ -8275,7 +8203,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - float basePriority
-- StringHash baseType // readonly
 - String category // readonly
 - float distanceFactor
 - bool enabled
@@ -8400,7 +8327,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - Node@[] children // readonly
 - Component@[] components // readonly
@@ -8454,7 +8380,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - int refs // readonly
 - StringHash type // readonly
@@ -8482,7 +8407,6 @@ Methods:
 Properties:
 
 - Variant[] attributeAnimations // readonly
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -8537,7 +8461,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -8607,7 +8530,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -8666,7 +8588,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - bool bidirectional
 - String category // readonly
 - bool enabled
@@ -8698,7 +8619,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint checksum // readonly
 - String name // readonly
@@ -8739,7 +8659,6 @@ Properties:
 
 - float activeTime
 - float animationLodBias
-- StringHash baseType // readonly
 - String category // readonly
 - Vector3 constantForce
 - float dampingForce
@@ -8792,7 +8711,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -8851,7 +8769,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - Billboard@[] billboards // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -8934,7 +8851,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -9061,7 +8977,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -9132,7 +9047,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoClearForces
-- StringHash baseType // readonly
 - String category // readonly
 - bool continuousPhysics
 - bool drawAabb
@@ -9445,7 +9359,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - Material@ defaultLightRamp // readonly
 - Material@ defaultLightSpot // readonly
@@ -9499,7 +9412,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -9545,7 +9457,6 @@ Methods:
 Properties:
 
 - bool autoReloadResources
-- StringHash baseType // readonly
 - String category // readonly
 - int finishBackgroundResourcesMs
 - uint[] memoryBudget
@@ -9648,7 +9559,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - float ccdMotionThreshold
 - float ccdRadius
@@ -9734,7 +9644,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool awake
-- StringHash baseType // readonly
 - BodyType2D bodyType
 - bool bullet
 - String category // readonly
@@ -9887,7 +9796,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - uint checksum // readonly
 - Node@[] children // readonly
@@ -9951,7 +9859,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - Scene@ defaultScene
 - ScriptFile@ defaultScriptFile
@@ -9978,7 +9885,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool compiled // readonly
 - uint memoryUse // readonly
@@ -10037,7 +9943,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - String className
 - bool enabled
@@ -10148,7 +10053,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - Button@ backButton // readonly
-- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -10317,7 +10221,6 @@ Properties:
 - Variant[] attributes
 - bool autoDisableChildren
 - float autoDisableThreshold
-- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -10426,7 +10329,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - uint numAttributes // readonly
 - int refs // readonly
@@ -10533,7 +10435,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -10655,7 +10556,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -10781,7 +10681,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -10814,7 +10713,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool compressed // readonly
 - float frequency // readonly
@@ -10873,7 +10771,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -10936,7 +10833,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoRemove
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -11008,7 +10904,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoRemove
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -11132,7 +11027,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - Node@ controlledNode
 - bool enabled
@@ -11230,7 +11124,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - bool bringToBack
 - bool bringToFront
@@ -11290,7 +11183,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - Vector2 hotSpot
 - uint memoryUse // readonly
@@ -11320,7 +11212,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -11377,7 +11268,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -11457,7 +11347,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -11538,7 +11427,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -11666,7 +11554,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool desktop
 - uint memoryUse // readonly
@@ -11738,7 +11625,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - bool castShadows
 - String category // readonly
 - float drawDistance
@@ -11816,7 +11702,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -11935,7 +11820,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoLocalizable
-- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -12070,7 +11954,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
@@ -12139,7 +12022,6 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
 - uint components // readonly
@@ -12184,7 +12066,6 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
 - uint components // readonly
@@ -12229,7 +12110,6 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
 - uint components // readonly
@@ -12274,7 +12154,6 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - Texture@ backupTexture
-- StringHash baseType // readonly
 - Color borderColor
 - String category // readonly
 - uint components // readonly
@@ -12369,7 +12248,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -12448,7 +12326,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - String category // readonly
 - int drawOrder
 - bool enabled
@@ -12502,7 +12379,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - float elapsedTime // readonly
 - uint frameNumber // readonly
@@ -12538,7 +12414,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -12634,7 +12509,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -12745,7 +12619,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - String clipBoardText
 - Cursor@ cursor
@@ -12855,7 +12728,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
@@ -12942,7 +12814,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - InterpMethod interpolationMethod
 - uint memoryUse // readonly
@@ -13186,7 +13057,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - bool dynamic // readonly
 - uint elementMask // readonly
@@ -13289,7 +13159,6 @@ Properties:
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - bool autoUpdate
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -13397,7 +13266,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - Camera@ camera
 - String category // readonly
 - bool drawDebug
@@ -13511,7 +13379,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BlendMode blendMode
 - IntRect border
 - bool bringToBack
@@ -13699,7 +13566,6 @@ Methods:
 
 Properties:
 
-- StringHash baseType // readonly
 - String category // readonly
 - uint memoryUse // readonly
 - String name
@@ -13789,7 +13655,6 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- StringHash baseType // readonly
 - BoundingBox boundingBox
 - bool castShadows
 - String category // readonly

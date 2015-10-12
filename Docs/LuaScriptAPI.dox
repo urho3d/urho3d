@@ -3829,7 +3829,6 @@ Properties:
 Methods:
 
 - StringHash GetType() const
-- StringHash GetBaseType() const
 - const String GetTypeName() const
 - const String GetCategory() const
 - void SendEvent(const String eventName, VariantMap* eventData = 0)
@@ -3837,7 +3836,6 @@ Methods:
 Properties:
 
 - StringHash type (readonly)
-- StringHash baseType (readonly)
 - const String typeName (readonly)
 - const String category (readonly)
 
