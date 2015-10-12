@@ -24,9 +24,9 @@ Although all required third-party libraries are included as source code, there a
 
 To run Urho3D, the minimum system requirements are:
 
-- Windows: CPU with SSE instructions support, Windows XP or newer, DirectX 9.0c, GPU with %Shader %Model 3 support.
+- Windows: CPU with SSE2 instructions support, Windows XP or newer, DirectX 9.0c, GPU with %Shader %Model 3 support.
 
-- Linux & Mac OS X: CPU with SSE instructions support, GPU with OpenGL 2.0 support, EXT_framebuffer_object and EXT_packed_depth_stencil extensions.
+- Linux & Mac OS X: CPU with SSE2 instructions support, GPU with OpenGL 2.0 support, EXT_framebuffer_object and EXT_packed_depth_stencil extensions.
 
 - Raspberry Pi: %Model B revision 2.0 with at least 128 MB of 512 MB SDRAM allocated for GPU.
 
@@ -36,7 +36,7 @@ To run Urho3D, the minimum system requirements are:
 
 - Emscripten: modern browsers with fast JavaScript engine and HTML5 and WebGL support.
 
-SSE requirement can be eliminated by disabling the use of SSE instruction set, see URHO3D_SSE build option below.
+SSE2 requirement can be eliminated by disabling the use of SSE instruction set, see URHO3D_SSE build option below.
 
 CMake (http://www.cmake.org) is required to configure and generate the Urho3D project build tree. The minimum required version is 2.8.6. However, it is recommended to use the latest CMake version available out there, especially when targeting Mac OS X and iOS platforms using the latest Xcode version available. This is because Apple is known to change the internal working of Xcode with little regards to other third party build tools, such as CMake.
 
