@@ -438,9 +438,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     if (fullscreen)
     {
         PODVector<IntVector2> resolutions = GetResolutions();
-        if (resolutions.Empty())
-            fullscreen = false;
-        else
+        if (resolutions.Size())
         {
             unsigned best = 0;
             unsigned bestError = M_MAX_UNSIGNED;

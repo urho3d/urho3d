@@ -53,8 +53,12 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
 
     LOGDEBUG("HTTP " + verb_ + " request to URL " + url_);
 
+#ifdef URHO3D_THREADING
     // Start the worker thread to actually create the connection and read the response data.
     Run();
+#else
+    LOGERROR("HTTP request will not execute as threading is disabled");
+#endif
 }
 
 HttpRequest::~HttpRequest()
@@ -194,6 +198,7 @@ void HttpRequest::ThreadFunction()
 
 unsigned HttpRequest::Read(void* dest, unsigned size)
 {
+#ifdef URHO3D_THREADING
     mutex_.Acquire();
 
     unsigned char* destPtr = (unsigned char*)dest;
@@ -246,6 +251,10 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
     CheckEofAndAvailableSize();
     mutex_.Release();
     return totalRead;
+#else
+    // Threading disabled, nothing to read
+    return 0;
+#endif
 }
 
 unsigned HttpRequest::Seek(unsigned position)

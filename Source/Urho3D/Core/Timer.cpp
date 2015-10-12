@@ -30,7 +30,7 @@
 #ifdef WIN32
 #include <windows.h>
 #include <mmsystem.h>
-#elif defined(__EMSCRIPTEN__)
+#elif __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
 #else
 #include <sys/time.h>
@@ -73,7 +73,7 @@ static unsigned Tick()
 {
 #ifdef WIN32
     return (unsigned)timeGetTime();
-#elif defined (__EMSCRIPTEN__)
+#elif __EMSCRIPTEN__
     return (unsigned)emscripten_get_now();
 #else
     struct timeval time;
@@ -93,7 +93,7 @@ static long long HiresTick()
     }
     else
         return timeGetTime();
-#elif defined (__EMSCRIPTEN__)
+#elif __EMSCRIPTEN__
     return (unsigned)(emscripten_get_now()*1000.0);
 #else
     struct timeval time;

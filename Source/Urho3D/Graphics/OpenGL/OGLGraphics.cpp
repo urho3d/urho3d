@@ -373,9 +373,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     if (fullscreen)
     {
         PODVector<IntVector2> resolutions = GetResolutions();
-        if (resolutions.Empty())
-            fullscreen = false;
-        else
+        if (resolutions.Size())
         {
             unsigned best = 0;
             unsigned bestError = M_MAX_UNSIGNED;
@@ -1947,6 +1945,8 @@ IntVector2 Graphics::GetWindowPosition() const
 PODVector<IntVector2> Graphics::GetResolutions() const
 {
     PODVector<IntVector2> ret;
+    // Emscripten is not able to return a valid list
+#ifndef __EMSCRIPTEN__
     unsigned numModes = (unsigned)SDL_GetNumDisplayModes(0);
 
     for (unsigned i = 0; i < numModes; ++i)
@@ -1970,6 +1970,7 @@ PODVector<IntVector2> Graphics::GetResolutions() const
         if (unique)
             ret.Push(IntVector2(width, height));
     }
+#endif
 
     return ret;
 }

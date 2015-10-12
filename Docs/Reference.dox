@@ -540,7 +540,7 @@ The Start() and Stop() methods do not have direct counterparts in C++ components
 
 When a scene node hierarchy with script objects is instantiated (such as when loading a scene) any child nodes may not have been created yet when Start() is executed, and can thus not be relied upon for initialization. The DelayedStart() method can be used in this case instead: if defined, it is called immediately before any of the Update() calls.
 
-TransformChanged() is called whenever the scene node transform changes, similar to C++ components' OnMarkedDirty() function.
+TransformChanged() is called whenever the scene node transform changes and the node was not dirty before, similar to C++ components' OnMarkedDirty() function. The function should read the node's world transform (or rotation / position / scale) to reset the dirty status and ensure the next dirty notification is also sent.
 
 Subscribing to \ref Events "events" in script behaves differently depending on whether \ref Object::SubscribeToEvent "SubscribeToEvent()" is called from a script object's method, or from a procedural script function. If called from an instantiated script object, the ScriptInstance becomes the event receiver on the C++ side, and calls the specified handler method when the event arrives. If called from a function, the ScriptFile will be the event receiver and the handler must be a free function in the same script file. The third case is if the event is subscribed to from a script object that does not belong to a ScriptInstance. In that case the ScriptFile will create a proxy C++ object on demand to be able to forward the event to the script object.
 
@@ -636,7 +636,7 @@ There are some complexities of the scripting system one has to watch out for:
 
 - When the resource request for a particular ScriptFile is initially made, the script file and the files it includes are compiled into an AngelScript script module. Each script module has its own class hierarchy that is not usable from other script modules, unless the classes are declared shared. See AngelScript documentation for more details.
 
-- If a ScriptFile resource is reloaded, all the script objects created from it will be destroyed, then recreated. They will lose any stored state as their constructors and Start() methods will be run again. This is rarely useful when running an actual game, but may be helpful during development. 
+- If a ScriptFile resource is reloaded, all the script objects created from it will be destroyed, then recreated. They will lose any stored state as their constructors and Start() methods will be run again. This is rarely useful when running an actual game, but may be helpful during development.
 
 A global VariantMap, globalVars, can be accessed by all scripts to store shared data or to preserve data through script file reloads.
 
@@ -1672,7 +1672,7 @@ The operating system mouse cursor can be used in four modes which can be switche
 
 - MM_WRAP grabs the mouse from the operating system and confines the operating system cursor to the window, wrapping the cursor when it is near the edges.
   SetMouseMode(MM_WRAP) will call SetMouseGrabbed(true).
-  
+
 - MM_FREE does not grab/confine the mouse cursor even when it is hidden. This can be used for cases where the cursor should render using the operating system
   outside the window, and perform custom rendering (with SetMouseVisible(false)) inside.
 
@@ -2859,6 +2859,7 @@ Options:
 -ns         Do not create subdirectories for resources
 -nz         Do not create a zone and a directional light (scene mode only)
 -nf         Do not fix infacing normals
+-ne         Do not save empty nodes (scene mode only)
 -mb <x>     Maximum number of bones per submesh. Default 64
 -p <path>   Set path for scene resources. Default is output file path
 -r <name>   Use the named scene node as root node\n"
@@ -2875,6 +2876,7 @@ Options:
 -ct         Check and do not overwrite if texture exists
 -ctn        Check and do not overwrite if texture has newer timestamp
 -am         Export all meshes even if identical (scene mode only)
+-bp         Move bones to bind pose before saving model
 \endverbatim
 
 The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, StaticModelGroup, AnimatedModel or Skybox component, and can also be manually invoked by calling \ref StaticModel::ApplyMaterialList "ApplyMaterialList()". The list files can safely be deleted if not needed.
@@ -3230,9 +3232,17 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 
 - Mark all application-usable classes, structs and functions with the macro URHO3D_API so that they are exported correctly in a shared library build.
 
+- Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs.
+
+\section ContributionThirdParty Third party library considerations
+
 - When you add a new third-party library, insert its license statement to the License.txt in the root directory. Only libraries with permissive licenses such as BSD/MIT/zlib are accepted, because complying for example with the LGPL is difficult on mobile platforms, and would leave the application in a legal grey area.
 
-- Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs.
+- Prefer small and well-focused libraries for the Urho3D runtime. For example we use stb_image instead of FreeImage to load images, as it's assumed that the application developer can control the data and do offline conversion to supported formats as necessary.
+
+- For libraries that would be mandatorily part of the Urho3D build (not switchable off via CMake options), use of C++11 features is not yet acceptable. The same applies to your own code.
+
+- Third-party libraries should not leak C++ exceptions or use of STL containers into the Urho3D public API. Do a wrapping for example on the subsystem level if necessary.
 */
 
 }

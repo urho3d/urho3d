@@ -76,8 +76,10 @@ ResourceCache::ResourceCache(Context* context) :
     // Register Resource library object factories
     RegisterResourceLibrary(context_);
 
+#ifdef URHO3D_THREADING
     // Create resource background loader. Its thread will start on the first background request
     backgroundLoader_ = new BackgroundLoader(this);
+#endif
 
     // Subscribe BeginFrame for handling directory watchers and background loaded resource finalization
     SubscribeToEvent(E_BEGINFRAME, HANDLER(ResourceCache, HandleBeginFrame));
@@ -85,8 +87,10 @@ ResourceCache::ResourceCache(Context* context) :
 
 ResourceCache::~ResourceCache()
 {
+#ifdef URHO3D_THREADING
     // Shut down the background loader first
     backgroundLoader_.Reset();
+#endif
 }
 
 bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
@@ -566,8 +570,10 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
 
     StringHash nameHash(name);
 
+#ifdef URHO3D_THREADING
     // Check if the resource is being background loaded but is now needed immediately
     backgroundLoader_->WaitForResource(type, nameHash);
+#endif
 
     const SharedPtr<Resource>& existing = FindResource(type, nameHash);
     if (existing)
@@ -626,6 +632,7 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
 
 bool ResourceCache::BackgroundLoadResource(StringHash type, const String& nameIn, bool sendEventOnFailure, Resource* caller)
 {
+#ifdef URHO3D_THREADING
     // If empty name, fail immediately
     String name = SanitateResourceName(nameIn);
     if (name.Empty())
@@ -637,6 +644,10 @@ bool ResourceCache::BackgroundLoadResource(StringHash type, const String& nameIn
         return false;
 
     return backgroundLoader_->QueueResource(type, name, sendEventOnFailure, caller);
+#else
+    // When threading not supported, fall back to synchronous loading
+    return GetResource(type, nameIn, sendEventOnFailure);
+#endif
 }
 
 SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String& nameIn, bool sendEventOnFailure)
@@ -694,7 +705,11 @@ SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String
 
 unsigned ResourceCache::GetNumBackgroundLoadResources() const
 {
+#ifdef URHO3D_THREADING
     return backgroundLoader_->GetNumQueuedResources();
+#else
+    return 0;
+#endif
 }
 
 void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) const
@@ -1010,10 +1025,12 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
     }
 
     // Check for background loaded resources that can be finished
+#ifdef URHO3D_THREADING
     {
         PROFILE(FinishBackgroundResources);
         backgroundLoader_->FinishResources(finishBackgroundResourcesMs_);
     }
+#endif
 }
 
 File* ResourceCache::SearchResourceDirs(const String& nameIn)

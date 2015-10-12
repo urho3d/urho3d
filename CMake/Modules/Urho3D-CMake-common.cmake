@@ -58,13 +58,18 @@ if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the i
     endif ()
     set (URHO3D_DEFAULT_64BIT ${URHO3D_DEFAULT_64BIT} CACHE INTERNAL "Default value for URHO3D_64BIT build option")
     # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
-    # The other arm platform that Urho3D supports that is not Android is Raspberry Pi at the moment
-    if (NOT ANDROID AND NOT EMSCRIPTEN)
-        string (REGEX MATCH "#define +__arm__ +1" matched "${PREDEFINED_MACROS}")
-        if (matched)
-            # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too on the Raspberry-Pi device itself
-            set (RPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
-        endif ()
+    # When ANDROID is true and ARM is not then we are targeting Android on Intel Atom
+    string (REGEX MATCH "#define +__(arm|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
+    if (matched OR IOS)     # Assume iOS is always on ARM for now
+        set (ARM TRUE)
+    else ()
+        set (ARM FALSE)
+    endif ()
+    set (ARM ${ARM} CACHE INTERNAL "Targeting ARM platform")
+    # The other arm platform that Urho3D supports that is not Android/iOS is Raspberry Pi at the moment
+    if (ARM AND NOT ANDROID AND NOT IOS)
+        # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too on the Raspberry-Pi device itself
+        set (RPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
     endif ()
 endif ()
 if (ANDROID OR RPI OR EMSCRIPTEN)
@@ -93,7 +98,7 @@ if (MINGW AND NOT DEFINED URHO3D_SSE)
 else ()
     set (URHO3D_DEFAULT_SSE TRUE)
 endif ()
-cmake_dependent_option (URHO3D_SSE "Enable SSE instruction set" ${URHO3D_DEFAULT_SSE} "NOT EMSCRIPTEN" FALSE)
+cmake_dependent_option (URHO3D_SSE "Enable SSE instruction set (Intel platform only including Android on Intel Atom)" ${URHO3D_DEFAULT_SSE} "NOT ARM AND NOT EMSCRIPTEN" FALSE)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
     cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
@@ -129,6 +134,12 @@ endif ()
 option (URHO3D_PACKAGING "Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0" ${EMSCRIPTEN})
 option (URHO3D_PROFILING "Enable profiling support" TRUE)
 option (URHO3D_LOGGING "Enable logging support" TRUE)
+# Emscripten thread support is yet experimental; default false
+if (NOT EMSCRIPTEN)
+    option (URHO3D_THREADING "Enable threading support" TRUE)
+else ()
+    option (URHO3D_THREADING "Enable threading support" FALSE)
+endif ()
 option (URHO3D_TESTING "Enable testing support")
 if (URHO3D_TESTING)
     if (EMSCRIPTEN)
@@ -335,6 +346,11 @@ endif ()
 # Enable logging by default. If disabled, LOGXXXX macros become no-ops and the Log subsystem is not instantiated.
 if (URHO3D_LOGGING)
     add_definitions (-DURHO3D_LOGGING)
+endif ()
+
+# Enable threading by default, except for Emscripten.
+if (URHO3D_THREADING)
+    add_definitions (-DURHO3D_THREADING)
 endif ()
 
 # If not on Windows platform, enable Unix mode for kNet library
@@ -556,6 +572,7 @@ else ()
             if (NOT URHO3D_NOABI)
                 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DASH_MBIT}")
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DASH_MBIT}")
+                # Required only when cross-compling from i686 to x86_64, in other cases the flag is redundantly duplicated during linking phase for shared lib
                 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${DASH_MBIT}")
             endif ()
         endif ()
@@ -563,6 +580,10 @@ else ()
             # Emscripten-specific setup
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
+            if (URHO3D_THREADING)
+                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s USE_PTHREADS=1")
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_PTHREADS=1")
+            endif ()
             # Prior to version 1.31.3 emcc does not consistently add the cpp standard and remove Emscripten-specific compiler flags
             # before passing on the work to the underlying LLVM/Clang compiler, this has resulted in preprocessing error when enabling the PCH and ccache
             # (See https://github.com/kripken/emscripten/issues/3365 for more detail)
