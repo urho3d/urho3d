@@ -105,12 +105,8 @@ void BoundingBox::Clip(const BoundingBox& box)
     if (box.max_.z_ < max_.z_)
         max_.z_ = box.max_.z_;
 
-    if (min_.x_ > max_.x_)
-        Swap(min_.x_, max_.x_);
-    if (min_.y_ > max_.y_)
-        Swap(min_.y_, max_.y_);
-    if (min_.z_ > max_.z_)
-        Swap(min_.z_, max_.z_);
+    if (min_.x_ > max_.x_ || min_.y_ > max_.y_ || min_.z_ > max_.z_)
+        defined_ = false;
 }
 
 void BoundingBox::Transform(const Matrix3& transform)
