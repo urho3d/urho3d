@@ -31,7 +31,7 @@
 ///     - Subscribing to and handling of update events
 class HelloWorld : public Sample
 {
-    OBJECT(HelloWorld);
+    OBJECT(HelloWorld, Sample);
 
 public:
     /// Construct.

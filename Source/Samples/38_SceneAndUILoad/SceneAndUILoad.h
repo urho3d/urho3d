@@ -40,7 +40,7 @@ class Scene;
 ///      - Subscribing to the UI layout's events
 class SceneAndUILoad : public Sample
 {
-    OBJECT(SceneAndUILoad);
+    OBJECT(SceneAndUILoad, Sample);
 
 public:
     /// Construct.

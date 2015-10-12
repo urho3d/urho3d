@@ -56,7 +56,7 @@ enum LuaScriptObjectMethod
 /// Lua script object component.
 class URHO3D_API LuaScriptInstance : public Component, public LuaScriptEventListener
 {
-    OBJECT(LuaScriptInstance);
+    OBJECT(LuaScriptInstance, Component);
 
 public:
     /// Construct.

@@ -33,7 +33,7 @@ namespace Urho3D
 /// Hardware constant buffer.
 class URHO3D_API ConstantBuffer : public Object, public GPUObject
 {
-    OBJECT(ConstantBuffer);
+    OBJECT(ConstantBuffer, Object);
 
 public:
     /// Construct.

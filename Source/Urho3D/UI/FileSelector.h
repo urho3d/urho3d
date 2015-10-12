@@ -50,7 +50,7 @@ struct FileSelectorEntry
 /// %File selector dialog.
 class URHO3D_API FileSelector : public Object
 {
-    OBJECT(FileSelector);
+    OBJECT(FileSelector, Object);
 
 public:
     /// Construct.

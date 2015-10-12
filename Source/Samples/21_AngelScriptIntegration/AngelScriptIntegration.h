@@ -38,7 +38,7 @@ class Scene;
 ///     - Creating a 3D scene and using a script object to animate the objects
 class AngelScriptIntegration : public Sample
 {
-    OBJECT(AngelScriptIntegration);
+    OBJECT(AngelScriptIntegration, Sample);
 
 public:
     /// Construct.

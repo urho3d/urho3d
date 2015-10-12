@@ -45,7 +45,7 @@ class Touch;
 ///     - Using touch inputs/gyroscope for iOS/Android (implemented through an external file)
 class CharacterDemo : public Sample
 {
-    OBJECT(CharacterDemo);
+    OBJECT(CharacterDemo, Sample);
 
 public:
     /// Construct.

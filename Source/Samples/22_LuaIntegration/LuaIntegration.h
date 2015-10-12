@@ -38,7 +38,7 @@ class Scene;
 ///     - Creating a 3D scene and using a script object to animate the objects
 class LuaIntegration : public Sample
 {
-    OBJECT(LuaIntegration);
+    OBJECT(LuaIntegration, Sample);
 
 public:
     /// Construct.

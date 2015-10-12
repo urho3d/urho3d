@@ -35,7 +35,7 @@ class XMLFile;
 /// Sprite sheet.
 class URHO3D_API SpriteSheet2D : public Resource
 {
-    OBJECT(SpriteSheet2D);
+    OBJECT(SpriteSheet2D, Resource);
 
 public:
     /// Construct.

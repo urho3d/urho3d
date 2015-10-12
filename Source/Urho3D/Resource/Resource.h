@@ -49,8 +49,7 @@ enum AsyncLoadState
 /// Base class for resources.
 class URHO3D_API Resource : public Object
 {
-    OBJECT(Resource);
-    BASEOBJECT(Resource);
+    OBJECT(Resource, Object);
 
 public:
     /// Construct.

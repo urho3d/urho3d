@@ -33,7 +33,7 @@ namespace Urho3D
 /// Lua file.
 class URHO3D_API LuaFile : public Resource
 {
-    OBJECT(LuaFile);
+    OBJECT(LuaFile, Resource);
 
 public:
     /// Construct.

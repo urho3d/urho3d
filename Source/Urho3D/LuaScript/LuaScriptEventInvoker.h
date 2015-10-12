@@ -33,7 +33,7 @@ class LuaScriptInstance;
 /// Lua script event invoker.
 class LuaScriptEventInvoker : public Object
 {
-    OBJECT(LuaScriptEventInvoker);
+    OBJECT(LuaScriptEventInvoker, Object);
 
 public:
     /// Construct.

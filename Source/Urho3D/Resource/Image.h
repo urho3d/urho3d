@@ -89,7 +89,7 @@ struct CompressedLevel
 /// %Image resource.
 class URHO3D_API Image : public Resource
 {
-    OBJECT(Image);
+    OBJECT(Image, Resource);
 
 public:
     /// Construct empty.

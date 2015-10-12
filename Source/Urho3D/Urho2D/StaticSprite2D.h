@@ -32,7 +32,7 @@ class Sprite2D;
 /// Static sprite component.
 class URHO3D_API StaticSprite2D : public Drawable2D
 {
-    OBJECT(StaticSprite2D);
+    OBJECT(StaticSprite2D, Drawable2D);
 
 public:
     /// Construct.

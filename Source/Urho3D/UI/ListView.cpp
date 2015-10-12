@@ -73,7 +73,7 @@ void SetItemHierarchyParent(UIElement* item, bool enable)
 /// Hierarchy container (used by ListView internally when in hierarchy mode).
 class HierarchyContainer : public UIElement
 {
-    OBJECT(HierarchyContainer);
+    OBJECT(HierarchyContainer, UIElement);
 
 public:
     /// Construct.
