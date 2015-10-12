@@ -45,7 +45,7 @@ class Variant;
 /// %Script file resource.
 class URHO3D_API ScriptFile : public Resource, public ScriptEventListener
 {
-    OBJECT(ScriptEventInvoker, Object);
+    OBJECT(ScriptEventInvoker, Resource);
 
 public:
     /// Construct.
