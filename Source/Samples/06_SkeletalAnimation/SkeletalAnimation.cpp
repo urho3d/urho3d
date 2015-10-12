@@ -137,6 +137,7 @@ void SkeletalAnimation::CreateScene()
             // Enable full blending weight and looping
             state->SetWeight(1.0f);
             state->SetLooped(true);
+            state->SetTime(Random(walkAnimation->GetLength()));
         }
 
         // Create our custom Mover component that will move & animate the model during each frame's update
