@@ -231,7 +231,7 @@ public:
     void Merge(const Polyhedron& poly);
     /// Merge a sphere.
     void Merge(const Sphere& sphere);
-    /// Clip with another bounding box.
+    /// Clip with another bounding box. The box can become degenerate (undefined) as a result.
     void Clip(const BoundingBox& box);
     /// Transform with a 3x3 matrix.
     void Transform(const Matrix3& transform);
