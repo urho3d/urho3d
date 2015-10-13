@@ -2243,7 +2243,7 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
     const Matrix4& lightProj = shadowCamera->GetProjection();
     LightType type = light->GetLightType();
 
-    query.shadowCasterBox_[splitIndex].defined_ = false;
+    query.shadowCasterBox_[splitIndex].Clear();
 
     // Transform scene frustum into shadow camera's view space for shadow caster visibility check. For point & spot lights,
     // we can use the whole scene frustum. For directional lights, use the intersection of the scene frustum and the split
@@ -2489,7 +2489,7 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
                 (GetLightMask(drawable) & light->GetLightMask()))
                 litGeometriesBox.Merge(drawable->GetWorldBoundingBox());
         }
-        if (litGeometriesBox.defined_)
+        if (litGeometriesBox.Defined())
         {
             frustumVolume.Clip(litGeometriesBox);
             // If volume became empty, restore it to avoid zero size

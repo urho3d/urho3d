@@ -1001,6 +1001,7 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BoundingBox", "void Define(const Frustum&in)", asMETHODPR(BoundingBox, Define, (const Frustum&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "void Define(const Polyhedron&in)", asMETHODPR(BoundingBox, Define, (const Polyhedron&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "void Define(const Sphere&in)", asMETHODPR(BoundingBox, Define, (const Sphere&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BoundingBox", "bool Defined() const", asMETHOD(BoundingBox, Defined), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "void Merge(const Vector3&in)", asMETHODPR(BoundingBox, Merge, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "void Merge(const BoundingBox&in)", asMETHODPR(BoundingBox, Merge, (const BoundingBox&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "void Merge(const Frustum&in)", asMETHODPR(BoundingBox, Merge, (const Frustum&), void), asCALL_THISCALL);
@@ -1024,7 +1025,6 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BoundingBox", "Vector3 get_halfSize() const", asMETHOD(BoundingBox, HalfSize), asCALL_THISCALL);
     engine->RegisterObjectProperty("BoundingBox", "Vector3 min", offsetof(BoundingBox, min_));
     engine->RegisterObjectProperty("BoundingBox", "Vector3 max", offsetof(BoundingBox, max_));
-    engine->RegisterObjectProperty("BoundingBox", "bool defined", offsetof(BoundingBox, defined_));
 
     engine->RegisterObjectBehaviour("Frustum", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructFrustum), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Frustum", asBEHAVE_CONSTRUCT, "void f(const Frustum&in)", asFUNCTION(ConstructFrustumCopy), asCALL_CDECL_OBJLAST);

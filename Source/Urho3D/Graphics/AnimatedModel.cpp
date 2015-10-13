@@ -1183,7 +1183,7 @@ void AnimatedModel::UpdateBoneBoundingBox()
     if (skeleton_.GetNumBones())
     {
         // The bone bounding box is in local space, so need the node's inverse transform
-        boneBoundingBox_.defined_ = false;
+        boneBoundingBox_.Clear();
         Matrix3x4 inverseNodeTransform = node_->GetWorldTransform().Inverse();
 
         const Vector<Bone>& bones = skeleton_.GetBones();
