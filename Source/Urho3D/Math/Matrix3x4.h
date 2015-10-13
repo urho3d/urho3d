@@ -25,7 +25,7 @@
 #include "../Math/Matrix4.h"
 
 #ifdef URHO3D_SSE
-#include <xmmintrin.h>
+#include <emmintrin.h>
 #endif
 
 namespace Urho3D
@@ -144,7 +144,7 @@ public:
     }
 
     /// Construct from a float array.
-    Matrix3x4(const float* data)
+    explicit Matrix3x4(const float* data)
 #ifndef URHO3D_SSE
        :m00_(data[0]),
         m01_(data[1]),
@@ -168,9 +168,32 @@ public:
     }
 
     /// Construct from translation, rotation and uniform scale.
-    Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale);
+    Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale)
+    {
+#ifdef URHO3D_SSE
+        __m128 t = _mm_set_ps(1.f, translation.z_, translation.y_, translation.x_);
+        __m128 q = _mm_loadu_ps(&rotation.w_);
+        __m128 s = _mm_set_ps(1.f, scale, scale, scale);
+        SetFromTRS(t, q, s);
+#else
+        SetRotation(rotation.RotationMatrix() * scale);
+        SetTranslation(translation);
+#endif
+    }
+
     /// Construct from translation, rotation and nonuniform scale.
-    Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale);
+    Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
+    {
+#ifdef URHO3D_SSE
+        __m128 t = _mm_set_ps(1.f, translation.z_, translation.y_, translation.x_);
+        __m128 q = _mm_loadu_ps(&rotation.w_);
+        __m128 s = _mm_set_ps(1.f, scale.z_, scale.y_, scale.x_);
+        SetFromTRS(t, q, s);
+#else
+        SetRotation(rotation.RotationMatrix().Scaled(scale));
+        SetTranslation(translation);
+#endif
+    }
 
     /// Assign from another matrix.
     Matrix3x4& operator =(const Matrix3x4& rhs)
@@ -674,6 +697,35 @@ public:
     static const Matrix3x4 ZERO;
     /// Identity matrix.
     static const Matrix3x4 IDENTITY;
+
+#ifdef URHO3D_SSE
+private:
+    // Sets this matrix from the given translation, rotation (as quaternion (w,x,y,z)), and nonuniform scale (x,y,z) parameters.
+    // Note: the w component of the scale parameter passed to this function must be 1.
+    void inline SetFromTRS(__m128 t, __m128 q, __m128 s)
+    {
+        q = _mm_shuffle_ps(q, q, _MM_SHUFFLE(0, 3, 2, 1));
+        __m128 one = _mm_set_ps(0, 0, 0, 1);
+        const __m128 sseX1 = _mm_castsi128_ps(_mm_set_epi32((int)0x80000000UL, (int)0x80000000UL, 0, (int)0x80000000UL));
+        __m128 q2 = _mm_add_ps(q, q);
+        __m128 t2 = _mm_add_ss(_mm_xor_ps(_mm_mul_ps(_mm_shuffle_ps(q, q, _MM_SHUFFLE(3, 3, 3, 2)), _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(0, 1, 2, 2))), sseX1), one);
+        const __m128 sseX0 = _mm_shuffle_ps(sseX1, sseX1, _MM_SHUFFLE(0, 3, 2, 1));
+        __m128 t0 = _mm_mul_ps(_mm_shuffle_ps(q, q, _MM_SHUFFLE(1, 0, 0, 1)), _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(2, 2, 1, 1)));
+        __m128 t1 = _mm_xor_ps(t0, sseX0);
+        __m128 r0 = _mm_sub_ps(t2, t1);
+        __m128 xx2 = _mm_mul_ss(q, q2);
+        __m128 r1 = _mm_sub_ps(_mm_xor_ps(t2, sseX0), _mm_move_ss(t1, xx2));
+        r1 = _mm_shuffle_ps(r1, r1, _MM_SHUFFLE(2, 3, 0, 1));
+        __m128 r2 = _mm_shuffle_ps(_mm_movehl_ps(r0, r1), _mm_sub_ss(_mm_sub_ss(one, xx2), t0), _MM_SHUFFLE(2, 0, 3, 1));
+        __m128 tmp0 = _mm_unpacklo_ps(r0, r1);
+        __m128 tmp2 = _mm_unpacklo_ps(r2, t);
+        __m128 tmp1 = _mm_unpackhi_ps(r0, r1);
+        __m128 tmp3 = _mm_unpackhi_ps(r2, t);
+        _mm_storeu_ps(&m00_, _mm_mul_ps(_mm_movelh_ps(tmp0, tmp2), s));
+        _mm_storeu_ps(&m10_, _mm_mul_ps(_mm_movehl_ps(tmp2, tmp0), s));
+        _mm_storeu_ps(&m20_, _mm_mul_ps(_mm_movelh_ps(tmp1, tmp3), s));
+    }
+#endif
 };
 
 /// Multiply a 3x4 matrix with a scalar.

@@ -68,7 +68,7 @@ public:
     }
 
     /// Construct from a float array.
-    Vector4(const float* data) :
+    explicit Vector4(const float* data) :
         x_(data[0]),
         y_(data[1]),
         z_(data[2]),
