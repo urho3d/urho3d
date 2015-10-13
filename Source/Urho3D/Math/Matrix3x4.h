@@ -144,7 +144,7 @@ public:
     }
 
     /// Construct from a float array.
-    Matrix3x4(const float* data)
+    explicit Matrix3x4(const float* data)
 #ifndef URHO3D_SSE
        :m00_(data[0]),
         m01_(data[1]),

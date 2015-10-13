@@ -63,7 +63,7 @@ public:
     }
 
     /// Construct from a float array.
-    Quaternion(const float* data) :
+    explicit Quaternion(const float* data) :
         w_(data[0]),
         x_(data[1]),
         y_(data[2]),
@@ -78,7 +78,7 @@ public:
     }
 
     /// Construct from an angle (in degrees, for Urho2D).
-    Quaternion(float angle)
+    explicit Quaternion(float angle)
     {
         FromAngleAxis(angle, Vector3::FORWARD);
     }
@@ -102,7 +102,7 @@ public:
     }
 
     /// Construct from a rotation matrix.
-    Quaternion(const Matrix3& matrix)
+    explicit Quaternion(const Matrix3& matrix)
     {
         FromRotationMatrix(matrix);
     }
