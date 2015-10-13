@@ -919,6 +919,7 @@ void Define(const Sphere&);
 void Define(const Vector3&);
 void Define(const Vector3&, const Vector3&);
 void Define(float, float);
+bool Defined() const;
 Intersection IsInside(const BoundingBox&) const;
 Intersection IsInside(const Sphere&) const;
 Intersection IsInside(const Vector3&) const;
@@ -939,7 +940,6 @@ BoundingBox Transformed(const Matrix3x4&) const;
 // Properties:
 /* readonly */
 Vector3 center;
-bool defined;
 /* readonly */
 Vector3 halfSize;
 Vector3 max;
