@@ -56,9 +56,27 @@ SourceBatch::SourceBatch() :
 {
 }
 
+SourceBatch::SourceBatch(const SourceBatch& batch)
+{
+    *this = batch;
+}
+
 SourceBatch::~SourceBatch()
 {
 }
+
+SourceBatch& SourceBatch::operator =(const SourceBatch& rhs)
+{
+    distance_ = rhs.distance_;
+    geometry_ = rhs.geometry_;
+    material_ = rhs.material_;
+    worldTransform_ = rhs.worldTransform_;
+    numWorldTransforms_ = rhs.numWorldTransforms_;
+    geometryType_ = rhs.geometryType_;
+
+    return *this;
+}
+
 
 Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     Component(context),
