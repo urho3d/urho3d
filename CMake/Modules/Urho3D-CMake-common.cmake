@@ -576,8 +576,6 @@ else ()
             if (NOT URHO3D_NOABI)
                 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DASH_MBIT}")
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DASH_MBIT}")
-                # Required only when cross-compling from i686 to x86_64, in other cases the flag is redundantly duplicated during linking phase for shared lib
-                set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${DASH_MBIT}")
             endif ()
         endif ()
         if (EMSCRIPTEN)
