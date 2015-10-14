@@ -158,14 +158,19 @@ void AnimationController::Update(float timeStep)
 
 bool AnimationController::Play(const String& name, unsigned char layer, bool looped, float fadeInTime)
 {
+    // Get the animation resource first to be able to get the canonical resource name
+    // (avoids potential adding of duplicate animations)
+    Animation* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(name);
+    if (!newAnimation)
+        return false;
+
     // Check if already exists
     unsigned index;
     AnimationState* state;
-    FindAnimation(name, index, state);
+    FindAnimation(newAnimation->GetName(), index, state);
 
     if (!state)
     {
-        Animation* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(name);
         state = AddAnimationState(newAnimation);
         if (!state)
             return false;
@@ -174,9 +179,8 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
     if (index == M_MAX_UNSIGNED)
     {
         AnimationControl newControl;
-        Animation* animation = state->GetAnimation();
-        newControl.name_ = animation->GetName();
-        newControl.hash_ = animation->GetNameHash();
+        newControl.name_ = newAnimation->GetName();
+        newControl.hash_ = newAnimation->GetNameHash();
         animations_.Push(newControl);
         index = animations_.Size() - 1;
     }
