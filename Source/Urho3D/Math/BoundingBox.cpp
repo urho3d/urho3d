@@ -32,21 +32,23 @@ namespace Urho3D
 
 void BoundingBox::Define(const Vector3* vertices, unsigned count)
 {
+    Clear();
+
     if (!count)
         return;
 
-    defined_ = false;
     Merge(vertices, count);
 }
 
 void BoundingBox::Define(const Frustum& frustum)
 {
+    Clear();
     Define(frustum.vertices_, NUM_FRUSTUM_VERTICES);
 }
 
 void BoundingBox::Define(const Polyhedron& poly)
 {
-    defined_ = false;
+    Clear();
     Merge(poly);
 }
 
@@ -57,7 +59,6 @@ void BoundingBox::Define(const Sphere& sphere)
 
     min_ = center + Vector3(-radius, -radius, -radius);
     max_ = center + Vector3(radius, radius, radius);
-    defined_ = true;
 }
 
 void BoundingBox::Merge(const Vector3* vertices, unsigned count)
@@ -106,7 +107,10 @@ void BoundingBox::Clip(const BoundingBox& box)
         max_.z_ = box.max_.z_;
 
     if (min_.x_ > max_.x_ || min_.y_ > max_.y_ || min_.z_ > max_.z_)
-        defined_ = false;
+    {
+        min_ = Vector3(M_INFINITY, M_INFINITY, M_INFINITY);
+        max_ = Vector3(-M_INFINITY, -M_INFINITY, -M_INFINITY);
+    }
 }
 
 void BoundingBox::Transform(const Matrix3& transform)

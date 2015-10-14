@@ -691,6 +691,7 @@ Methods:
 - void Define(const Frustum& frustum)
 - void Define(const Polyhedron& poly)
 - void Define(const Sphere& sphere)
+- bool Defined() const
 - void Merge(const Vector3& point)
 - void Merge(const BoundingBox& box)
 - void Merge(const Frustum& frustum)
@@ -717,7 +718,6 @@ Properties:
 
 - Vector3 min
 - Vector3 max
-- bool defined
 - Vector3 center (readonly)
 - Vector3 size (readonly)
 - Vector3 halfSize (readonly)

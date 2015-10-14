@@ -3220,6 +3220,7 @@ Methods:
 - void Define(const Vector3&)
 - void Define(const Vector3&, const Vector3&)
 - void Define(float, float)
+- bool Defined() const
 - Intersection IsInside(const BoundingBox&) const
 - Intersection IsInside(const Sphere&) const
 - Intersection IsInside(const Vector3&) const
@@ -3240,7 +3241,6 @@ Methods:
 Properties:
 
 - Vector3 center // readonly
-- bool defined
 - Vector3 halfSize // readonly
 - Vector3 max
 - Vector3 min

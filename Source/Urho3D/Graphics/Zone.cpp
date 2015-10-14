@@ -336,7 +336,7 @@ void Zone::OnRemoveFromOctree()
 
 void Zone::ClearDrawablesZone()
 {
-    if (octant_ && lastWorldBoundingBox_.defined_)
+    if (octant_ && lastWorldBoundingBox_.Defined())
     {
         PODVector<Drawable*> result;
         BoxOctreeQuery query(result, lastWorldBoundingBox_, DRAWABLE_GEOMETRY | DRAWABLE_ZONE);

@@ -491,8 +491,7 @@ void Text3D::UpdateTextBatches()
         break;
     }
 
-    boundingBox_.defined_ = false;
-    boundingBox_.min_ = boundingBox_.max_ = Vector3::ZERO;
+    boundingBox_.Clear();
 
     for (unsigned i = 0; i < uiVertexData_.Size(); i += UI_VERTEX_SIZE)
     {

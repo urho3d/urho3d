@@ -1383,8 +1383,7 @@ void NavigationMesh::ReleaseNavigationMesh()
 
     numTilesX_ = 0;
     numTilesZ_ = 0;
-    boundingBox_.min_ = boundingBox_.max_ = Vector3::ZERO;
-    boundingBox_.defined_ = false;
+    boundingBox_.Clear();
 }
 
 void NavigationMesh::SetPartitionType(NavmeshPartitionType ptype)

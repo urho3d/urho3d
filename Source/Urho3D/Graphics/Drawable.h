@@ -75,12 +75,17 @@ struct FrameInfo
 };
 
 /// Source data for a 3D geometry draw call.
-struct SourceBatch
+struct URHO3D_API SourceBatch
 {
     /// Construct with defaults.
     SourceBatch();
+    /// Copy-construct.
+    SourceBatch(const SourceBatch& batch);
     /// Destruct.
     ~SourceBatch();
+
+    /// Assignment operator.
+    SourceBatch& operator =(const SourceBatch& rhs);
 
     /// Distance from camera.
     float distance_;

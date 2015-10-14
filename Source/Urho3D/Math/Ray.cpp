@@ -71,7 +71,7 @@ float Ray::HitDistance(const Plane& plane) const
 float Ray::HitDistance(const BoundingBox& box) const
 {
     // If undefined, no hit (infinite distance)
-    if (!box.defined_)
+    if (!box.Defined())
         return M_INFINITY;
 
     // Check for ray origin being inside the box
