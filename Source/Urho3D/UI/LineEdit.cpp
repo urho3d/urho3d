@@ -53,7 +53,7 @@ LineEdit::LineEdit(Context* context) :
     cursorMovable_(true),
     textSelectable_(true),
     textCopyable_(true),
-	multiLine_(true)
+	multiLine_(false)
 {
     clipChildren_ = true;
     SetEnabled(true);
