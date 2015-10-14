@@ -43,6 +43,8 @@ LineEdit::LineEdit(Context* context) :
     lastFont_(0),
     lastFontSize_(0),
     cursorPosition_(0),
+	cursorPosition_x(0),
+	cursorPosition_y(0),
     dragBeginCursor_(M_MAX_UNSIGNED),
     cursorBlinkRate_(1.0f),
     cursorBlinkTimer_(0.0f),
@@ -50,7 +52,8 @@ LineEdit::LineEdit(Context* context) :
     echoCharacter_(0),
     cursorMovable_(true),
     textSelectable_(true),
-    textCopyable_(true)
+    textCopyable_(true),
+	multiLine_(false)
 {
     clipChildren_ = true;
     SetEnabled(true);
@@ -354,7 +357,60 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         break;
 
     case KEY_UP:
+		if (multiLine_ && cursorMovable_ && cursorPosition_ > 0) {
+			// get substring from start to cursor position
+			String substring = line_.SubstringUTF8(0,cursorPosition_);
+			// find nearest new line before cursor position
+			unsigned lastlinepos = substring.FindLast("\n");
+			// get substring from start to above new line
+			String substring2 = substring.SubstringUTF8(0, (lastlinepos - 1));
+			// find position of new line directly before previous
+			unsigned lastlinepos2 = substring2.FindLast("\n");
+			// move cursor to above position depending on width of above line
+			if (lastlinepos - lastlinepos2 >= cursorPosition_ - lastlinepos) {
+				cursorPosition_ = lastlinepos2 + (cursorPosition_ - lastlinepos);
+			}
+			else {
+				cursorPosition_ = lastlinepos;
+			}
+			
+		}
+		changed = true;
+		break;
+
     case KEY_DOWN:
+		if (multiLine_ && cursorMovable_ && cursorPosition_ > 0) {
+			// get substring from start to cursor position
+			String substring = line_.SubstringUTF8(0, cursorPosition_);
+			// find nearest new line before cursor position
+			unsigned lastlinepos = substring.FindLast("\n");
+			// get substring from cursor position to end
+			String substring2 = line_.SubstringUTF8(cursorPosition_);
+			// find position of new line after cursor postion
+			unsigned nextlinepos = substring2.Find("\n") + cursorPosition_;
+			// get substring from new line after cursor to end
+			String substring3 = line_.SubstringUTF8(nextlinepos+1);
+			// find position of new line after previous new line (width of line below cursor)
+			unsigned widthofbelow = substring3.Find("\n")+1;
+			// move cursor according to cursor position and width of below line
+			if (substring3.Find("\n") == 0xffffffff) {
+				if (line_.Length() - nextlinepos >= cursorPosition_ - lastlinepos) {
+					cursorPosition_ = nextlinepos + (cursorPosition_ - lastlinepos);
+				}
+				else {
+					cursorPosition_ = line_.Length();
+				}
+			}
+			else if (cursorPosition_ - lastlinepos >= widthofbelow) {
+				cursorPosition_ = nextlinepos + widthofbelow;
+			}
+			else {
+				cursorPosition_ = nextlinepos + (cursorPosition_ - lastlinepos);
+			}
+
+		}
+		changed = true;
+		break;
     case KEY_PAGEUP:
     case KEY_PAGEDOWN:
         {
@@ -401,7 +457,23 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         break;
 
     case KEY_RETURN:
+		if (editable_ && multiLine_)
+		{
+			line_.Insert(cursorPosition_, "\n");
+			cursorPosition_ += 1;
+		}
+		changed = true;
+		break;
+	
+
     case KEY_RETURN2:
+		if (editable_ && multiLine_)
+		{
+			line_.Insert(cursorPosition_, "\n");
+			cursorPosition_ += 1;
+		}
+		changed = true;
+		break;
     case KEY_KP_ENTER:
         {
             // If using the on-screen keyboard, defocus this element to hide it now
@@ -492,6 +564,10 @@ void LineEdit::SetText(const String& text)
         UpdateText();
         UpdateCursor();
     }
+}
+
+void LineEdit::SetMultiLine(bool enable) {
+	multiLine_ = enable;
 }
 
 void LineEdit::SetCursorPosition(unsigned position)
@@ -598,9 +674,11 @@ void LineEdit::UpdateText()
 void LineEdit::UpdateCursor()
 {
     int x = text_->GetCharPosition(cursorPosition_).x_;
+	int y = text_->GetCharPosition(cursorPosition_).y_;
+
 
     text_->SetPosition(GetIndentWidth() + clipBorder_.left_, clipBorder_.top_);
-    cursor_->SetPosition(text_->GetPosition() + IntVector2(x, 0));
+    cursor_->SetPosition(text_->GetPosition() + IntVector2(x, y));
     cursor_->SetSize(cursor_->GetWidth(), text_->GetRowHeight());
 
     // Scroll if necessary
