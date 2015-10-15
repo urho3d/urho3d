@@ -299,10 +299,15 @@ public:
         __m128 vec = _mm_set_ps(1.f, rhs.z_, rhs.y_, rhs.x_);
         __m128 r0 = _mm_mul_ps(_mm_loadu_ps(&m00_), vec);
         __m128 r1 = _mm_mul_ps(_mm_loadu_ps(&m10_), vec);
+        __m128 t0 = _mm_unpacklo_ps(r0, r1);
+        __m128 t1 = _mm_unpackhi_ps(r0, r1);
+        t0 = _mm_add_ps(t0, t1);
         __m128 r2 = _mm_mul_ps(_mm_loadu_ps(&m20_), vec);
         __m128 r3 = _mm_setzero_ps();
-        _MM_TRANSPOSE4_PS(r0, r1, r2, r3);
-        vec = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+        __m128 t2 = _mm_unpacklo_ps(r2, r3);
+        __m128 t3 = _mm_unpackhi_ps(r2, r3);
+        t2 = _mm_add_ps(t2, t3);
+        vec = _mm_add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
 
         return Vector3(
             _mm_cvtss_f32(vec),
@@ -324,10 +329,15 @@ public:
         __m128 vec = _mm_loadu_ps(&rhs.x_);
         __m128 r0 = _mm_mul_ps(_mm_loadu_ps(&m00_), vec);
         __m128 r1 = _mm_mul_ps(_mm_loadu_ps(&m10_), vec);
+        __m128 t0 = _mm_unpacklo_ps(r0, r1);
+        __m128 t1 = _mm_unpackhi_ps(r0, r1);
+        t0 = _mm_add_ps(t0, t1);
         __m128 r2 = _mm_mul_ps(_mm_loadu_ps(&m20_), vec);
-        __m128 r3 = _mm_set_ps(1.f, 0.f, 0.f, 0.f);
-        _MM_TRANSPOSE4_PS(r0, r1, r2, r3);
-        vec = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+        __m128 r3 = _mm_setzero_ps();
+        __m128 t2 = _mm_unpacklo_ps(r2, r3);
+        __m128 t3 = _mm_unpackhi_ps(r2, r3);
+        t2 = _mm_add_ps(t2, t3);
+        vec = _mm_add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
 
         return Vector3(
             _mm_cvtss_f32(vec),

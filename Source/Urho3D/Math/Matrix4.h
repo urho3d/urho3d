@@ -261,12 +261,16 @@ public:
         __m128 vec = _mm_set_ps(1.f, rhs.z_, rhs.y_, rhs.x_);
         __m128 r0 = _mm_mul_ps(_mm_loadu_ps(&m00_), vec);
         __m128 r1 = _mm_mul_ps(_mm_loadu_ps(&m10_), vec);
+        __m128 t0 = _mm_unpacklo_ps(r0, r1);
+        __m128 t1 = _mm_unpackhi_ps(r0, r1);
+        t0 = _mm_add_ps(t0, t1);
         __m128 r2 = _mm_mul_ps(_mm_loadu_ps(&m20_), vec);
         __m128 r3 = _mm_mul_ps(_mm_loadu_ps(&m30_), vec);
-        _MM_TRANSPOSE4_PS(r0, r1, r2, r3);
-        vec = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+        __m128 t2 = _mm_unpacklo_ps(r2, r3);
+        __m128 t3 = _mm_unpackhi_ps(r2, r3);
+        t2 = _mm_add_ps(t2, t3);
+        vec = _mm_add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
         vec = _mm_div_ps(vec, _mm_shuffle_ps(vec, vec, _MM_SHUFFLE(3, 3, 3, 3)));
-
         return Vector3(
             _mm_cvtss_f32(vec),
             _mm_cvtss_f32(_mm_shuffle_ps(vec, vec, _MM_SHUFFLE(1, 1, 1, 1))),
@@ -289,10 +293,15 @@ public:
         __m128 vec = _mm_loadu_ps(&rhs.x_);
         __m128 r0 = _mm_mul_ps(_mm_loadu_ps(&m00_), vec);
         __m128 r1 = _mm_mul_ps(_mm_loadu_ps(&m10_), vec);
+        __m128 t0 = _mm_unpacklo_ps(r0, r1);
+        __m128 t1 = _mm_unpackhi_ps(r0, r1);
+        t0 = _mm_add_ps(t0, t1);
         __m128 r2 = _mm_mul_ps(_mm_loadu_ps(&m20_), vec);
         __m128 r3 = _mm_mul_ps(_mm_loadu_ps(&m30_), vec);
-        _MM_TRANSPOSE4_PS(r0, r1, r2, r3);
-        vec = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+        __m128 t2 = _mm_unpacklo_ps(r2, r3);
+        __m128 t3 = _mm_unpackhi_ps(r2, r3);
+        t2 = _mm_add_ps(t2, t3);
+        vec = _mm_add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
 
         Vector4 ret;
         _mm_storeu_ps(&ret.x_, vec);

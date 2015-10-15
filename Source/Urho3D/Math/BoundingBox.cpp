@@ -131,8 +131,9 @@ BoundingBox BoundingBox::Transformed(const Matrix3& transform) const
 BoundingBox BoundingBox::Transformed(const Matrix3x4& transform) const
 {
 #ifdef URHO3D_SSE
-    __m128 minPt = _mm_set_ps(1.f, min_.z_, min_.y_, min_.x_);
-    __m128 maxPt = _mm_set_ps(1.f, max_.z_, max_.y_, max_.x_);
+    const __m128 one = _mm_set_ss(1.f);
+    __m128 minPt = _mm_movelh_ps(_mm_loadl_pi(_mm_setzero_ps(), (const __m64*)&min_.x_), _mm_unpacklo_ps(_mm_set_ss(min_.z_), one));
+    __m128 maxPt = _mm_movelh_ps(_mm_loadl_pi(_mm_setzero_ps(), (const __m64*)&max_.x_), _mm_unpacklo_ps(_mm_set_ss(max_.z_), one));
     __m128 centerPoint = _mm_mul_ps(_mm_add_ps(minPt, maxPt), _mm_set1_ps(0.5f));
     __m128 halfSize = _mm_sub_ps(centerPoint, minPt);
     __m128 m0 = _mm_loadu_ps(&transform.m00_);
@@ -140,27 +141,19 @@ BoundingBox BoundingBox::Transformed(const Matrix3x4& transform) const
     __m128 m2 = _mm_loadu_ps(&transform.m20_);
     __m128 r0 = _mm_mul_ps(m0, centerPoint);
     __m128 r1 = _mm_mul_ps(m1, centerPoint);
+    __m128 t0 = _mm_add_ps(_mm_unpacklo_ps(r0, r1), _mm_unpackhi_ps(r0, r1));
     __m128 r2 = _mm_mul_ps(m2, centerPoint);
-    __m128 r3 = _mm_setzero_ps();
-    _MM_TRANSPOSE4_PS(r0, r1, r2, r3);
-    __m128 newCenter = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
-    __m128 absMask = _mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF));
+    const __m128 zero = _mm_setzero_ps();
+    __m128 t2 = _mm_add_ps(_mm_unpacklo_ps(r2, zero), _mm_unpackhi_ps(r2, zero));
+    __m128 newCenter = _mm_add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
+    const __m128 absMask = _mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF));
     __m128 x = _mm_and_ps(absMask, _mm_mul_ps(m0, halfSize));
     __m128 y = _mm_and_ps(absMask, _mm_mul_ps(m1, halfSize));
     __m128 z = _mm_and_ps(absMask, _mm_mul_ps(m2, halfSize));
-    __m128 w = _mm_setzero_ps();
-    _MM_TRANSPOSE4_PS(x, y, z, w);
-    __m128 newDir = _mm_add_ps(_mm_add_ps(x, y), _mm_add_ps(z, w));
-    __m128 boxMin = _mm_sub_ps(newCenter, newDir);
-    __m128 boxMax = _mm_add_ps(newCenter, newDir);
-
-    return BoundingBox(
-        Vector3(_mm_cvtss_f32(boxMin),
-                _mm_cvtss_f32(_mm_shuffle_ps(boxMin, boxMin, _MM_SHUFFLE(1, 1, 1, 1))),
-                _mm_cvtss_f32(_mm_movehl_ps(boxMin, boxMin))),
-        Vector3(_mm_cvtss_f32(boxMax),
-                _mm_cvtss_f32(_mm_shuffle_ps(boxMax, boxMax, _MM_SHUFFLE(1, 1, 1, 1))),
-                _mm_cvtss_f32(_mm_movehl_ps(boxMax, boxMax))));
+    t0 = _mm_add_ps(_mm_unpacklo_ps(x, y), _mm_unpackhi_ps(x, y));
+    t2 = _mm_add_ps(_mm_unpacklo_ps(z, zero), _mm_unpackhi_ps(z, zero));
+    __m128 newDir = _mm_add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
+    return BoundingBox(_mm_sub_ps(newCenter, newDir), _mm_add_ps(newCenter, newDir));
 #else
     Vector3 newCenter = transform * Center();
     Vector3 oldEdge = Size() * 0.5f;
