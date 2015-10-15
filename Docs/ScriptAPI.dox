@@ -13268,6 +13268,7 @@ Properties:
 
 - Camera@ camera
 - String category // readonly
+- Camera@ cullCamera
 - bool drawDebug
 - IntRect rect
 - int refs // readonly

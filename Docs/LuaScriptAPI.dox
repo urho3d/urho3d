@@ -6893,12 +6893,14 @@ Methods:
 - void delete()
 - void SetScene(Scene* scene)
 - void SetCamera(Camera* camera)
+- void SetCullCamera(Camera* camera)
 - void SetRect(const IntRect& rect)
 - void SetRenderPath(RenderPath* path)
 - void SetRenderPath(XMLFile* file)
 - void SetDrawDebug(bool enable)
 - Scene* GetScene() const
 - Camera* GetCamera() const
+- Camera* GetCullCamera() const
 - const IntRect& GetRect() const
 - RenderPath* GetRenderPath() const
 - bool GetDrawDebug() const
@@ -6910,6 +6912,7 @@ Properties:
 
 - Scene* scene
 - Camera* camera
+- Camera* cullCamera
 - IntRect& rect
 - RenderPath* renderPath
 - bool drawDebug
