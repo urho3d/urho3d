@@ -364,6 +364,9 @@ public:
     /// Return a scissor rectangle for a light.
     const Rect& GetLightScissor(Light* light, Camera* camera);
 
+    /// Return a view or its source view if it uses one. Used internally for render statistics.
+    static View* GetActualView(View* view);
+
 private:
     /// Initialize when screen mode initially set.
     void Initialize();

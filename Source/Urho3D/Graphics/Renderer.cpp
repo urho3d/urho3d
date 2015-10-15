@@ -495,12 +495,10 @@ unsigned Renderer::GetNumGeometries(bool allViews) const
 
     for (unsigned i = 0; i < lastView; ++i)
     {
-        View* view = views_[i];
+        // Use the source view's statistics if applicable
+        View* view = GetActualView(views_[i]);
         if (!view)
             continue;
-        // Use the source view's statistics if applicable
-        if (view->GetSourceView())
-            view = view->GetSourceView();
 
         numGeometries += view->GetGeometries().Size();
     }
@@ -515,11 +513,9 @@ unsigned Renderer::GetNumLights(bool allViews) const
 
     for (unsigned i = 0; i < lastView; ++i)
     {
-        View* view = views_[i];
+        View* view = GetActualView(views_[i]);
         if (!view)
             continue;
-        if (view->GetSourceView())
-            view = view->GetSourceView();
 
         numLights += view->GetLights().Size();
     }
@@ -534,14 +530,11 @@ unsigned Renderer::GetNumShadowMaps(bool allViews) const
 
     for (unsigned i = 0; i < lastView; ++i)
     {
-        View* view = views_[i];
+        View* view = GetActualView(views_[i]);
         if (!view)
             continue;
-        if (view->GetSourceView())
-            view = view->GetSourceView();
 
         const Vector<LightBatchQueue>& lightQueues = view->GetLightQueues();
-
         for (Vector<LightBatchQueue>::ConstIterator i = lightQueues.Begin(); i != lightQueues.End(); ++i)
         {
             if (i->shadowMap_)
@@ -559,11 +552,9 @@ unsigned Renderer::GetNumOccluders(bool allViews) const
 
     for (unsigned i = 0; i < lastView; ++i)
     {
-        View* view = views_[i];
+        View* view = GetActualView(views_[i]);
         if (!view)
             continue;
-        if (view->GetSourceView())
-            view = view->GetSourceView();
 
         numOccluders += view->GetOccluders().Size();
     }
@@ -1092,6 +1083,14 @@ View* Renderer::GetPreparedView(Camera* camera)
 {
     HashMap<Camera*, WeakPtr<View> >::Iterator i = preparedViews_.Find(camera);
     return i != preparedViews_.End() ? i->second_ : (View*)0;
+}
+
+View* Renderer::GetActualView(View* view)
+{
+    if (view && view->GetSourceView())
+        return view->GetSourceView();
+    else
+        return view;
 }
 
 void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
