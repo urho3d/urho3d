@@ -54,7 +54,7 @@ public:
 
     /// Set scene.
     void SetScene(Scene* scene);
-    /// Set camera.
+    /// Set viewport camera.
     void SetCamera(Camera* camera);
     /// Set rectangle.
     void SetRect(const IntRect& rect);
@@ -64,10 +64,12 @@ public:
     void SetRenderPath(XMLFile* file);
     /// Set whether to render debug geometry. Default true.
     void SetDrawDebug(bool enable);
+    /// Set separate camera to use for culling. Sharing a culling camera between several viewports allows to prepare the view only once, saving in CPU use. The culling camera's frustum should cover all the viewport cameras' frusta or else objects may be missing from the rendered view.
+    void SetCullCamera(Camera* camera);
 
     /// Return scene.
     Scene* GetScene() const;
-    /// Return camera.
+    /// Return viewport camera.
     Camera* GetCamera() const;
     /// Return the internal rendering structure. May be null if the viewport has not been rendered yet.
     View* GetView() const;
@@ -80,6 +82,9 @@ public:
 
     /// Return whether to draw debug geometry.
     bool GetDrawDebug() const { return drawDebug_; }
+
+    /// Return the culling camera. If null, the viewport camera will be used for culling (normal case.)
+    Camera* GetCullCamera() const;
 
     /// Return ray corresponding to normalized screen coordinates.
     Ray GetScreenRay(int x, int y) const;
@@ -96,6 +101,8 @@ private:
     WeakPtr<Scene> scene_;
     /// Camera pointer.
     WeakPtr<Camera> camera_;
+    /// Culling camera pointer.
+    WeakPtr<Camera> cullCamera_;
     /// Viewport rectangle.
     IntRect rect_;
     /// Rendering path.

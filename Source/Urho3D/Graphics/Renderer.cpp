@@ -495,8 +495,14 @@ unsigned Renderer::GetNumGeometries(bool allViews) const
 
     for (unsigned i = 0; i < lastView; ++i)
     {
-        if (views_[i])
-            numGeometries += views_[i]->GetGeometries().Size();
+        View* view = views_[i];
+        if (!view)
+            continue;
+        // Use the source view's statistics if applicable
+        if (view->GetSourceView())
+            view = view->GetSourceView();
+
+        numGeometries += view->GetGeometries().Size();
     }
 
     return numGeometries;
@@ -509,8 +515,13 @@ unsigned Renderer::GetNumLights(bool allViews) const
 
     for (unsigned i = 0; i < lastView; ++i)
     {
-        if (views_[i])
-            numLights += views_[i]->GetLights().Size();
+        View* view = views_[i];
+        if (!view)
+            continue;
+        if (view->GetSourceView())
+            view = view->GetSourceView();
+
+        numLights += view->GetLights().Size();
     }
 
     return numLights;
@@ -523,10 +534,13 @@ unsigned Renderer::GetNumShadowMaps(bool allViews) const
 
     for (unsigned i = 0; i < lastView; ++i)
     {
-        if (!views_[i])
+        View* view = views_[i];
+        if (!view)
             continue;
+        if (view->GetSourceView())
+            view = view->GetSourceView();
 
-        const Vector<LightBatchQueue>& lightQueues = views_[i]->GetLightQueues();
+        const Vector<LightBatchQueue>& lightQueues = view->GetLightQueues();
 
         for (Vector<LightBatchQueue>::ConstIterator i = lightQueues.Begin(); i != lightQueues.End(); ++i)
         {
@@ -545,8 +559,13 @@ unsigned Renderer::GetNumOccluders(bool allViews) const
 
     for (unsigned i = 0; i < lastView; ++i)
     {
-        if (views_[i])
-            numOccluders += views_[i]->GetOccluders().Size();
+        View* view = views_[i];
+        if (!view)
+            continue;
+        if (view->GetSourceView())
+            view = view->GetSourceView();
+
+        numOccluders += view->GetOccluders().Size();
     }
 
     return numOccluders;
@@ -557,6 +576,7 @@ void Renderer::Update(float timeStep)
     PROFILE(UpdateViews);
 
     views_.Clear();
+    preparedViews_.Clear();
 
     // If device lost, do not perform update. This is because any dynamic vertex/index buffer updates happen already here,
     // and if the device is lost, the updates queue up, causing memory use to rise constantly
@@ -1062,6 +1082,18 @@ Camera* Renderer::GetShadowCamera()
     return camera;
 }
 
+void Renderer::StorePreparedView(View* view, Camera* camera)
+{
+    if (view && camera)
+        preparedViews_[camera] = view;
+}
+
+View* Renderer::GetPreparedView(Camera* camera)
+{
+    HashMap<Camera*, WeakPtr<View> >::Iterator i = preparedViews_.Find(camera);
+    return i != preparedViews_.End() ? i->second_ : (View*)0;
+}
+
 void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
 {
     // Check if shaders are unloaded or need reloading
@@ -1172,7 +1204,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
     }
 }
 
-void Renderer::SetLightVolumeBatchShaders(Batch& batch, const String& vsName, const String& psName, const String& vsDefines,
+void Renderer::SetLightVolumeBatchShaders(Batch& batch, Camera* camera, const String& vsName, const String& psName, const String& vsDefines,
     const String& psDefines)
 {
     assert(deferredLightPSVariations_.Size());
@@ -1205,7 +1237,7 @@ void Renderer::SetLightVolumeBatchShaders(Batch& batch, const String& vsName, co
     if (specularLighting_ && light->GetSpecularIntensity() > 0.0f)
         psi += DLPS_SPEC;
 
-    if (batch.camera_->IsOrthographic())
+    if (camera->IsOrthographic())
     {
         vsi += DLVS_ORTHO;
         psi += DLPS_ORTHO;
