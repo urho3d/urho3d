@@ -613,6 +613,11 @@ else ()
             # Reduce GCC optimization level from -O3 to -O2 for stability in RELEASE build configuration
             set (CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
             set (CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
+            # SSE requires force-aligned stack
+            if (URHO3D_SSE)
+                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mstackrealign")
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mstackrealign")
+            endif ()
         else ()
             # Not Android and not Emscripten and not MinGW derivative
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")     # This will emit '-DREENTRANT' to compiler and '-lpthread' to linker on Linux and Mac OSX platform
