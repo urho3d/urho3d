@@ -365,6 +365,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             deferredAmbient_ = sourceView_->deferredAmbient_;
             useLitBase_ = sourceView_->useLitBase_;
             hasScenePasses_ = sourceView_->hasScenePasses_;
+            noStencil_ = sourceView_->noStencil_;
             lightVolumeCommand_ = sourceView_->lightVolumeCommand_;
             octree_ = sourceView_->octree_;
             return true;
@@ -388,10 +389,10 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     deferredAmbient_ = false;
     useLitBase_ = false;
     hasScenePasses_ = false;
+    noStencil_ = false;
     lightVolumeCommand_ = 0;
 
     scenePasses_.Clear();
-    noStencil_ = false;
     geometriesUpdated_ = false;
 
 #ifdef URHO3D_OPENGL
