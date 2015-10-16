@@ -340,11 +340,15 @@ public:
     OcclusionBuffer* GetOcclusionBuffer(Camera* camera);
     /// Allocate a temporary shadow camera and a scene node for it. Is thread-safe.
     Camera* GetShadowCamera();
+    /// Mark a view as prepared by the specified culling camera.
+    void StorePreparedView(View* view, Camera* cullCamera);
+    /// Return a prepared view if exists for the specified camera. Used to avoid duplicate view preparation CPU work.
+    View* GetPreparedView(Camera* cullCamera);
     /// Choose shaders for a forward rendering batch.
     void SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows = true);
     /// Choose shaders for a deferred light volume batch.
     void SetLightVolumeBatchShaders
-        (Batch& batch, const String& vsName, const String& psName, const String& vsDefines, const String& psDefines);
+        (Batch& batch, Camera* camera, const String& vsName, const String& psName, const String& vsDefines, const String& psDefines);
     /// Set cull mode while taking possible projection flipping into account.
     void SetCullMode(CullMode mode, Camera* camera);
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
@@ -359,6 +363,9 @@ public:
     void OptimizeLightByStencil(Light* light, Camera* camera);
     /// Return a scissor rectangle for a light.
     const Rect& GetLightScissor(Light* light, Camera* camera);
+
+    /// Return a view or its source view if it uses one. Used internally for render statistics.
+    static View* GetActualView(View* view);
 
 private:
     /// Initialize when screen mode initially set.
@@ -442,6 +449,8 @@ private:
     Vector<Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> > > queuedViewports_;
     /// Views that have been processed this frame.
     Vector<WeakPtr<View> > views_;
+    /// Prepared views by culling camera.
+    HashMap<Camera*, WeakPtr<View> > preparedViews_;
     /// Octrees that have been updated during the frame.
     HashSet<Octree*> updatedOctrees_;
     /// Techniques for which missing shader error has been displayed.

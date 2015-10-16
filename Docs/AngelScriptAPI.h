@@ -12418,6 +12418,7 @@ Vector2 WorldToScreenPoint(const Vector3&) const;
 Camera camera;
 /* readonly */
 String category;
+Camera cullCamera;
 bool drawDebug;
 IntRect rect;
 /* readonly */
