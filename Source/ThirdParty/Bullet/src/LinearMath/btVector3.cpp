@@ -825,7 +825,9 @@ long _mindot_large( const float *vv, const float *vec, unsigned long count, floa
 #define ARM_NEON_GCC_COMPATIBILITY  1
 #include <arm_neon.h>
 #include <sys/types.h>
+#ifdef __APPLE__
 #include <sys/sysctl.h> //for sysctlbyname
+#endif //__APPLE__
 
 static long _maxdot_large_v0( const float *vv, const float *vec, unsigned long count, float *dotResult );
 static long _maxdot_large_v1( const float *vv, const float *vec, unsigned long count, float *dotResult );
@@ -845,12 +847,14 @@ static inline uint32_t btGetCpuCapabilities( void )
 
     if( 0 == testedCapabilities)
     {
+#ifdef __APPLE__
         uint32_t hasFeature = 0;
         size_t featureSize = sizeof( hasFeature );
         int err = sysctlbyname( "hw.optional.neon_hpfp", &hasFeature, &featureSize, NULL, 0 );
 
         if( 0 == err && hasFeature)
             capabilities |= 0x2000;
+#endif //__APPLE__
 
 		testedCapabilities = true;
     }
@@ -885,7 +889,7 @@ static long _mindot_large_sel( const float *vv, const float *vec, unsigned long 
 
 
 
-#if defined __arm__
+#if defined __arm__ && __APPLE__
 # define vld1q_f32_aligned_postincrement( _ptr ) ({ float32x4_t _r; asm( "vld1.f32 {%0}, [%1, :128]!\n" : "=w" (_r), "+r" (_ptr) ); /*return*/ _r; })
 #else
 //support 64bit arm

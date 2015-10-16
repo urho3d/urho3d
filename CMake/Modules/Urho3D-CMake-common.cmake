@@ -102,7 +102,12 @@ if (NOT DEFINED URHO3D_DEFAULT_SSE)
     endif ()
     set (URHO3D_DEFAULT_SSE ${URHO3D_DEFAULT_SSE} CACHE INTERNAL "Default value for URHO3D_SSE build option")
 endif ()
-cmake_dependent_option (URHO3D_SSE "Enable SSE2 instruction set (HTML5 and Intel platforms only including Android on Intel Atom)" ${URHO3D_DEFAULT_SSE} "NOT ARM" FALSE)
+cmake_dependent_option (URHO3D_SSE "Enable SSE2 instruction set (HTML5 and Intel platforms only including Android on Intel Atom); default to true on Intel and false on HTML5; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET build option" ${URHO3D_DEFAULT_SSE} "NOT ARM" FALSE)
+if (IOS OR (RPI AND "RPI_ABI" MATCHES NEON))    # Stringify in case RPI_ABI is not set explicitly
+    # The 'NEON' CMake variable is already set by android.toolchain.cmake when the chosen ANDROID_ABI uses NEON
+    set (NEON TRUE)
+endif ()
+cmake_dependent_option (URHO3D_NEON "Enable NEON instruction set (ARM platforms with NEON only)" TRUE "NEON" FALSE)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
     cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
@@ -312,6 +317,11 @@ endif ()
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
 if (URHO3D_SSE)
     add_definitions (-DURHO3D_SSE)
+endif ()
+
+# Enable NEON instruction set.
+if (URHO3D_NEON)
+    add_definitions (-DURHO3D_NEON -DSTBI_NEON)     # BT_USE_NEON is already being self-defined by Bullet library as appropriate
 endif ()
 
 # Enable structured exception handling and minidumps on MSVC only.
@@ -529,8 +539,8 @@ if (MSVC)
     set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${DEBUG_RUNTIME}")
     set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} ${RELEASE_RUNTIME} /fp:fast /Zi /GS- /D _SECURE_SCL=0")
     set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
-    # In Visual Studio, SSE2 flag is redundant if already compiling as 64bit.
-    if (URHO3D_SSE AND NOT URHO3D_64BIT)
+    # In Visual Studio, SSE2 flag is redundant if already compiling as 64bit; it is already the default for VS2012 (onward) on 32bit
+    if (URHO3D_SSE AND NOT URHO3D_64BIT AND MSVC_VERSION LESS 1700)
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /arch:SSE2")
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
     endif ()
@@ -562,10 +572,16 @@ else ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${RPI_CFLAGS}")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${RPI_CFLAGS}")
         else ()
+            if (NOT XCODE AND NOT EMSCRIPTEN)
+                # This may influence the effective SSE level when URHO3D_SSE is on as well
+                set (URHO3D_DEPLOYMENT_TARGET native CACHE STRING "Specify the minimum CPU type on which the target binaries are to be deployed, see GCC/Clang's -march option for possible values (GCC/Clang desktop platform only)")
+                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=${URHO3D_DEPLOYMENT_TARGET}")
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${URHO3D_DEPLOYMENT_TARGET}")
+            endif ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
             if (URHO3D_64BIT)
-                set (DASH_MBIT -m64)    # This variable is intentionally not defined on Android and RPI platform
+                set (DASH_MBIT -m64)    # This variable is intentionally not defined on Android and RPI platform, it is used again in LuaJIT library build
             else ()
                 set (DASH_MBIT -m32)
                 if (URHO3D_SSE)
