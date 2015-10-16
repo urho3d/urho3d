@@ -12,7 +12,7 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
+// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
 
 #ifndef BT_SCALAR_H
@@ -175,9 +175,9 @@ inline int	btGetVersion()
 #else
 	//non-windows systems
 
-// Urho3D: allow to disable SSE
-#if (defined (URHO3D_SSE) && defined (__APPLE__) && (!defined (BT_USE_DOUBLE_PRECISION)))
-    #if defined (__i386__) || defined (__x86_64__)
+// Urho3D - allow to disable SSE/NEON and let Linux & Android platforms in besides Apple
+#if (!defined (_WIN32) && !defined (BT_USE_DOUBLE_PRECISION))
+    #if defined (URHO3D_SSE) && (defined (__i386__) || defined (__x86_64__))
 		#define BT_USE_SIMD_VECTOR3
 		#define BT_USE_SSE
 		//BT_USE_SSE_IN_API is enabled on Mac OSX by default, because memory is automatically aligned on 16-byte boundaries
@@ -195,15 +195,13 @@ inline int	btGetVersion()
                 #include <emmintrin.h>
             #endif
         #endif //BT_USE_SSE
-    #elif defined( __ARM_NEON__ )
-        #ifdef __clang__
+    #elif defined (URHO3D_NEON) && defined( __ARM_NEON__ )
             #define BT_USE_NEON 1
 			#define BT_USE_SIMD_VECTOR3
 		
-            #if defined BT_USE_NEON && defined (__clang__)
+            #ifdef BT_USE_NEON
                 #include <arm_neon.h>
             #endif//BT_USE_NEON
-       #endif //__clang__
     #endif//__arm__
 
 	#define SIMD_FORCE_INLINE inline __attribute__ ((always_inline))

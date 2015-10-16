@@ -191,7 +191,7 @@ task :android do
   if install
     system "cd \"#{build_tree}\" && ant -Dadb.device.arg='-s #{$specific_device}' installd" or abort 'Failed to install APK'
   end
-  android_test_run parameter, intent, package, success_indicator, payload or abort "Failed to test run #{package}/#{intent}, make sure the APK has been installed"
+  android_test_run parameter, intent, package, success_indicator, payload or abort "Failed to test run #{package}/#{intent}"
 end
 
 # Usage: NOT intended to be used manually
@@ -592,14 +592,16 @@ end
 def android_find_device api = nil, abi = nil
   # Return the previously found matching device or if not found yet then try to find the matching device now
   return $specific_device if $specific_device
-  wait = api ? '' : 'wait-for-device'
   $specific_api = api.to_s if api
   $specific_abi = abi.to_s if abi
-  for i in `adb #{wait} devices |tail -n +2`.split "\n"
-    device = i.split.first
-    if `adb -s #{device} wait-for-device shell getprop ro.build.version.sdk`.chomp == $specific_api && `adb -s #{device} shell getprop ro.product.cpu.abi`.chomp == $specific_abi
-      return $specific_device = device
+  loop do
+    for i in `adb devices |tail -n +2`.split "\n"
+      device = i.split.first
+      if `adb -s #{device} wait-for-device shell getprop ro.build.version.sdk`.chomp == $specific_api && `adb -s #{device} shell getprop ro.product.cpu.abi`.chomp == $specific_abi
+        return $specific_device = device
+      end
     end
+    break if api
   end
   nil
 end
