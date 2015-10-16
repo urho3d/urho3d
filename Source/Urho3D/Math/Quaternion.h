@@ -26,6 +26,8 @@
 
 #ifdef URHO3D_SSE
 #include <emmintrin.h>
+#elif URHO3D_NEON && __ARM_NEON__
+#include <SSE2NEON/SSE2NEON.h>
 #endif
 
 namespace Urho3D
@@ -128,7 +130,7 @@ public:
         FromRotationMatrix(matrix);
     }
 
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
     explicit Quaternion(__m128 wxyz)
     {
         _mm_storeu_ps(&w_, wxyz);
@@ -236,7 +238,7 @@ public:
     /// Multiply a quaternion.
     Quaternion operator *(const Quaternion& rhs) const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 q1 = _mm_loadu_ps(&w_);
         __m128 q2 = _mm_loadu_ps(&rhs.w_);
         q2 = _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(0, 3, 2, 1));
@@ -261,7 +263,7 @@ public:
     /// Multiply a Vector3.
     Vector3 operator *(const Vector3& rhs) const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 q = _mm_loadu_ps(&w_);
         q = _mm_shuffle_ps(q, q, _MM_SHUFFLE(0, 3, 2, 1));
         __m128 v = _mm_set_ps(0.f, rhs.z_, rhs.y_, rhs.x_);
@@ -306,7 +308,7 @@ public:
     /// Normalize to unit length.
     void Normalize()
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 q = _mm_loadu_ps(&w_);
         __m128 n = _mm_mul_ps(q, q);
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 3, 0, 1)));
@@ -332,7 +334,7 @@ public:
     /// Return normalized to unit length.
     Quaternion Normalized() const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 q = _mm_loadu_ps(&w_);
         __m128 n = _mm_mul_ps(q, q);
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 3, 0, 1)));
@@ -357,7 +359,7 @@ public:
     /// Return inverse.
     Quaternion Inverse() const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 q = _mm_loadu_ps(&w_);
         __m128 n = _mm_mul_ps(q, q);
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 3, 0, 1)));
@@ -377,7 +379,7 @@ public:
     /// Return squared length.
     float LengthSquared() const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 q = _mm_loadu_ps(&w_);
         __m128 n = _mm_mul_ps(q, q);
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 3, 0, 1)));
@@ -391,7 +393,7 @@ public:
     /// Calculate dot product.
     float DotProduct(const Quaternion& rhs) const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 q1 = _mm_loadu_ps(&w_);
         __m128 q2 = _mm_loadu_ps(&rhs.w_);
         __m128 n = _mm_mul_ps(q1, q2);

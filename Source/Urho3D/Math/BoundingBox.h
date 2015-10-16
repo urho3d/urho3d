@@ -27,6 +27,8 @@
 
 #ifdef URHO3D_SSE
 #include <xmmintrin.h>
+#elif URHO3D_NEON && __ARM_NEON__
+#include <SSE2NEON/SSE2NEON.h>
 #endif
 
 namespace Urho3D
@@ -78,7 +80,7 @@ public:
     {
     }
 
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
     BoundingBox(__m128 min, __m128 max)
     {
         _mm_storeu_ps(&min_.x_, min);

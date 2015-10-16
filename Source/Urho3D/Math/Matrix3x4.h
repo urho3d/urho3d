@@ -26,6 +26,8 @@
 
 #ifdef URHO3D_SSE
 #include <emmintrin.h>
+#elif URHO3D_NEON && __ARM_NEON__
+#include <SSE2NEON/SSE2NEON.h>
 #endif
 
 namespace Urho3D
@@ -171,7 +173,7 @@ public:
     /// Construct from translation, rotation and uniform scale.
     Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale)
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 t = _mm_set_ps(1.f, translation.z_, translation.y_, translation.x_);
         __m128 q = _mm_loadu_ps(&rotation.w_);
         __m128 s = _mm_set_ps(1.f, scale, scale, scale);
@@ -185,7 +187,7 @@ public:
     /// Construct from translation, rotation and nonuniform scale.
     Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 t = _mm_set_ps(1.f, translation.z_, translation.y_, translation.x_);
         __m128 q = _mm_loadu_ps(&rotation.w_);
         __m128 s = _mm_set_ps(1.f, scale.z_, scale.y_, scale.x_);
@@ -265,7 +267,7 @@ public:
     /// Test for equality with another matrix without epsilon.
     bool operator ==(const Matrix3x4& rhs) const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 c0 = _mm_cmpeq_ps(_mm_loadu_ps(&m00_), _mm_loadu_ps(&rhs.m00_));
         __m128 c1 = _mm_cmpeq_ps(_mm_loadu_ps(&m10_), _mm_loadu_ps(&rhs.m10_));
         c0 = _mm_and_ps(c0, c1);
@@ -296,7 +298,7 @@ public:
     /// Multiply a Vector3 which is assumed to represent position.
     Vector3 operator *(const Vector3& rhs) const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 vec = _mm_set_ps(1.f, rhs.z_, rhs.y_, rhs.x_);
         __m128 r0 = _mm_mul_ps(_mm_loadu_ps(&m00_), vec);
         __m128 r1 = _mm_mul_ps(_mm_loadu_ps(&m10_), vec);
@@ -326,7 +328,7 @@ public:
     /// Multiply a Vector4.
     Vector3 operator *(const Vector4& rhs) const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 vec = _mm_loadu_ps(&rhs.x_);
         __m128 r0 = _mm_mul_ps(_mm_loadu_ps(&m00_), vec);
         __m128 r1 = _mm_mul_ps(_mm_loadu_ps(&m10_), vec);
@@ -438,7 +440,7 @@ public:
     /// Multiply a matrix.
     Matrix3x4 operator *(const Matrix3x4& rhs) const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         Matrix3x4 out;
 
         __m128 r0 = _mm_loadu_ps(&rhs.m00_);
@@ -489,7 +491,7 @@ public:
     /// Multiply a 4x4 matrix.
     Matrix4 operator *(const Matrix4& rhs) const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         Matrix4 out;
 
         __m128 r0 = _mm_loadu_ps(&rhs.m00_);
@@ -608,7 +610,6 @@ public:
         _mm_storeu_ps(&ret.m30_, _mm_set_ps(1.f, 0.f, 0.f, 0.f));
         return ret;
 #else
-
         return Matrix4(
             m00_,
             m01_,
@@ -709,7 +710,7 @@ public:
     /// Identity matrix.
     static const Matrix3x4 IDENTITY;
 
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
 private:
     // Sets this matrix from the given translation, rotation (as quaternion (w,x,y,z)), and nonuniform scale (x,y,z) parameters.
     // Note: the w component of the scale parameter passed to this function must be 1.

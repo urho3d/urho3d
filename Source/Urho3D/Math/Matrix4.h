@@ -27,6 +27,8 @@
 
 #ifdef URHO3D_SSE
 #include <emmintrin.h>
+#elif URHO3D_NEON && __ARM_NEON__
+#include <SSE2NEON/SSE2NEON.h>
 #endif
 
 namespace Urho3D
@@ -224,7 +226,7 @@ public:
     /// Test for equality with another matrix without epsilon.
     bool operator ==(const Matrix4& rhs) const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 c0 = _mm_cmpeq_ps(_mm_loadu_ps(&m00_), _mm_loadu_ps(&rhs.m00_));
         __m128 c1 = _mm_cmpeq_ps(_mm_loadu_ps(&m10_), _mm_loadu_ps(&rhs.m10_));
         c0 = _mm_and_ps(c0, c1);
@@ -257,7 +259,7 @@ public:
     /// Multiply a Vector3 which is assumed to represent position.
     Vector3 operator *(const Vector3& rhs) const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 vec = _mm_set_ps(1.f, rhs.z_, rhs.y_, rhs.x_);
         __m128 r0 = _mm_mul_ps(_mm_loadu_ps(&m00_), vec);
         __m128 r1 = _mm_mul_ps(_mm_loadu_ps(&m10_), vec);
@@ -289,7 +291,7 @@ public:
     /// Multiply a Vector4.
     Vector4 operator *(const Vector4& rhs) const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 vec = _mm_loadu_ps(&rhs.x_);
         __m128 r0 = _mm_mul_ps(_mm_loadu_ps(&m00_), vec);
         __m128 r1 = _mm_mul_ps(_mm_loadu_ps(&m10_), vec);
@@ -416,7 +418,7 @@ public:
     /// Multiply a matrix.
     Matrix4 operator *(const Matrix4& rhs) const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         Matrix4 out;
 
         __m128 r0 = _mm_loadu_ps(&rhs.m00_);
@@ -570,7 +572,7 @@ public:
     /// Return transpose
     Matrix4 Transpose() const
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
         __m128 m0 = _mm_loadu_ps(&m00_);
         __m128 m1 = _mm_loadu_ps(&m10_);
         __m128 m2 = _mm_loadu_ps(&m20_);
@@ -652,7 +654,7 @@ public:
     {
         for (unsigned i = 0; i < count; ++i)
         {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) || defined(SSE2NEON_H)
             __m128 m0 = _mm_loadu_ps(src);
             __m128 m1 = _mm_loadu_ps(src + 4);
             __m128 m2 = _mm_loadu_ps(src + 8);

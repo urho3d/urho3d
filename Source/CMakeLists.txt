@@ -112,6 +112,10 @@ if (NOT ANDROID AND NOT ARM AND NOT WEB)
     endif ()
 endif ()
 
+if (URHO3D_NEON)
+    add_subdirectory (ThirdParty/SSE2NEON)
+endif ()
+
 # Urho3D game engine library
 add_subdirectory (Urho3D)
 
