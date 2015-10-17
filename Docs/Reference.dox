@@ -911,11 +911,19 @@ The following techniques will be used to reduce the amount of CPU and GPU work w
 
 - Software rasterized occlusion: after the octree has been queried for visible objects, the objects that are marked as occluders are rendered on the CPU to a small hierarchical-depth buffer, and it will be used to test the non-occluders for visibility. Use \ref Renderer::SetMaxOccluderTriangles "SetMaxOccluderTriangles()" and \ref Renderer::SetOccluderSizeThreshold "SetOccluderSizeThreshold()" to configure the occlusion rendering.
 
-- Hardware instancing: rendering operations with the same geometry, material and light will be grouped together and performed as one draw call. Objects with a large amount of triangles will not be rendered as instanced, as that could actually be detrimental to performance. Use \ref Renderer::SetMaxInstanceTriangles "SetMaxInstanceTriangles()" to set the threshold. Note that even when instancing is not available, or the triangle count of objects is too large, they still benefit from the grouping, as render state only needs to be set once before rendering each group, reducing the CPU cost.
+- Hardware instancing: rendering operations with the same geometry, material and light will be grouped together and performed as one draw call if supported. Note that even when instancing is not available, they still benefit from the grouping, as render state only needs to be checked & set once before rendering each group, reducing the CPU cost.
 
 - %Light stencil masking: in forward rendering, before objects lit by a spot or point light are re-rendered additively, the light's bounding shape is rendered to the stencil buffer to ensure pixels outside the light range are not processed.
 
 Note that many more optimization opportunities are possible at the content level, for example using geometry & material LOD, grouping many static objects into one object for less draw calls, minimizing the amount of subgeometries (submeshes) per object for less draw calls, using texture atlases to avoid render state changes, using compressed (and smaller) textures, and setting maximum draw distances for objects, lights and shadows.
+
+\section Rendering_ReuseView Reusing view preparation
+
+In some applications, like stereoscopic VR rendering, one needs to render a slightly different view of the world to separate viewports. Normally this results in the view preparation process (described above) being repeated for each view, which can be costly for CPU performance.
+
+To eliminate the duplicate view preparation cost, you can use \ref Viewport::SetCullCamera "SetCullCamera()" to instruct a Viewport to use a different camera for culling than rendering. When multiple viewports share the same culling camera, the view preparation will be performed only once.
+
+To work properly, the culling camera's frustum should cover all the views you are rendering using it, or else missing objects may be present. The culling camera should not be using the auto aspect ratio mode, to ensure you stay in full control of its view frustum.
 
 \section Rendering_GPUResourceLoss Handling GPU resource loss
 

@@ -78,6 +78,14 @@ public:
     {
     }
 
+#ifdef URHO3D_SSE
+    BoundingBox(__m128 min, __m128 max)
+    {
+        _mm_storeu_ps(&min_.x_, min);
+        _mm_storeu_ps(&max_.x_, max);
+    }
+#endif
+
     /// Construct from an array of vertices.
     BoundingBox(const Vector3* vertices, unsigned count) :
         min_(M_INFINITY, M_INFINITY, M_INFINITY),
