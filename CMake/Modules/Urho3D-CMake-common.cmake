@@ -103,7 +103,7 @@ if (NOT DEFINED URHO3D_DEFAULT_SSE)
     set (URHO3D_DEFAULT_SSE ${URHO3D_DEFAULT_SSE} CACHE INTERNAL "Default value for URHO3D_SSE build option")
 endif ()
 cmake_dependent_option (URHO3D_SSE "Enable SSE2 instruction set (HTML5 and Intel platforms only including Android on Intel Atom); default to true on Intel and false on HTML5; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET build option" ${URHO3D_DEFAULT_SSE} "NOT ARM" FALSE)
-if (IOS OR (RPI AND "RPI_ABI" MATCHES NEON))    # Stringify in case RPI_ABI is not set explicitly
+if (IOS OR (RPI AND "${RPI_ABI}" MATCHES NEON))    # Stringify in case RPI_ABI is not set explicitly
     # The 'NEON' CMake variable is already set by android.toolchain.cmake when the chosen ANDROID_ABI uses NEON
     set (NEON TRUE)
 endif ()
