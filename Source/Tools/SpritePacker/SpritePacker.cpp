@@ -73,7 +73,9 @@ public:
         offsetX(0),
         offsetY(0),
         frameX(0),
-        frameY(0)
+        frameY(0),
+        frameWidth(0),
+        frameHeight(0)
     {
     }
 
