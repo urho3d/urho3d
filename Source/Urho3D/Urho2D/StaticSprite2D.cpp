@@ -103,8 +103,6 @@ void StaticSprite2D::SetFlip(bool flipX, bool flipY)
     flipY_ = flipY;
     sourceBatchesDirty_ = true;
 
-    OnFlipChanged();
-
     MarkNetworkUpdate();
 }
 
@@ -211,27 +209,13 @@ ResourceRef StaticSprite2D::GetCustomMaterialAttr() const
 void StaticSprite2D::OnWorldBoundingBoxUpdate()
 {
     boundingBox_.Clear();
+    worldBoundingBox_.Clear();
 
-    if (sprite_)
-    {
-        const IntRect& rectangle_ = sprite_->GetRectangle();
-        float width = (float)rectangle_.Width() * PIXEL_SIZE;     // Compute width and height in pixels
-        float height = (float)rectangle_.Height() * PIXEL_SIZE;
+    const Vector<SourceBatch2D>& sourceBatches = GetSourceBatches();
+    for (unsigned i = 0; i < sourceBatches[0].vertices_.Size(); i += 2)
+        worldBoundingBox_.Merge(sourceBatches[0].vertices_[i].position_);
 
-        const Vector2& hotSpot = sprite_->GetHotSpot();
-        float hotSpotX = flipX_ ? (1.0f - hotSpot.x_) : hotSpot.x_;
-        float hotSpotY = flipY_ ? (1.0f - hotSpot.y_) : hotSpot.y_;
-
-        float leftX = -width * hotSpotX;
-        float rightX = width * (1.0f - hotSpotX);
-        float bottomY = -height * hotSpotY;
-        float topY = height * (1.0f - hotSpotY);
-
-        boundingBox_.Merge(Vector3(leftX, bottomY, 0.0f));
-        boundingBox_.Merge(Vector3(rightX, topY, 0.0f));
-    }
-
-    worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
+    boundingBox_ = worldBoundingBox_.Transformed(node_->GetWorldTransform().Inverse());
 }
 
 void StaticSprite2D::OnDrawOrderChanged()
@@ -300,11 +284,6 @@ void StaticSprite2D::UpdateSourceBatches()
     vertices.Push(vertex3);
 
     sourceBatchesDirty_ = false;
-}
-
-void StaticSprite2D::OnFlipChanged()
-{
-
 }
 
 void StaticSprite2D::UpdateMaterial()

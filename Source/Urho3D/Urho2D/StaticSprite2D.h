@@ -106,8 +106,6 @@ protected:
     virtual void OnDrawOrderChanged();
     /// Update source batches.
     virtual void UpdateSourceBatches();
-    /// Handle flip changed.
-    virtual void OnFlipChanged();
     /// Update material.
     void UpdateMaterial();
 

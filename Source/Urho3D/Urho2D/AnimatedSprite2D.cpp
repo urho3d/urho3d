@@ -231,18 +231,6 @@ void AnimatedSprite2D::SetAnimationAttr(const String& name)
     SetAnimation(animationName_, loopMode_);
 }
 
-void AnimatedSprite2D::OnWorldBoundingBoxUpdate()
-{
-    boundingBox_.Clear();
-    worldBoundingBox_.Clear();
-
-    const Vector<SourceBatch2D>& sourceBatches = GetSourceBatches();
-    for (unsigned i = 0; i < sourceBatches[0].vertices_.Size(); ++i)
-        worldBoundingBox_.Merge(sourceBatches[0].vertices_[i].position_);
-
-    boundingBox_ = worldBoundingBox_.Transformed(node_->GetWorldTransform().Inverse());
-}
-
 void AnimatedSprite2D::UpdateSourceBatches()
 {
 #ifdef URHO3D_SPINE
