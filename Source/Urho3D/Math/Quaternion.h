@@ -313,7 +313,11 @@ public:
         __m128 n = _mm_mul_ps(q, q);
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 3, 0, 1)));
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(0, 1, 2, 3)));
-        _mm_storeu_ps(&w_, _mm_mul_ps(q, _mm_rsqrt_ps(n)));
+        __m128 e = _mm_rsqrt_ps(n);
+        __m128 e3 = _mm_mul_ps(_mm_mul_ps(e, e), e);
+        __m128 half = _mm_set1_ps(0.5f);
+        n = _mm_add_ps(e, _mm_mul_ps(half, _mm_sub_ps(e, _mm_mul_ps(n, e3))));
+        _mm_storeu_ps(&w_, _mm_mul_ps(q, n));
 #else
         float lenSquared = LengthSquared();
         if (!Urho3D::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
@@ -335,8 +339,12 @@ public:
         __m128 n = _mm_mul_ps(q, q);
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 3, 0, 1)));
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(0, 1, 2, 3)));
+        __m128 e = _mm_rsqrt_ps(n);
+        __m128 e3 = _mm_mul_ps(_mm_mul_ps(e, e), e);
+        __m128 half = _mm_set1_ps(0.5f);
+        n = _mm_add_ps(e, _mm_mul_ps(half, _mm_sub_ps(e, _mm_mul_ps(n, e3))));
         Quaternion quat;
-        _mm_storeu_ps(&quat.w_, _mm_mul_ps(q, _mm_rsqrt_ps(n)));
+        _mm_storeu_ps(&quat.w_, _mm_mul_ps(q, n));
         return quat;
 #else
         float lenSquared = LengthSquared();
@@ -359,7 +367,7 @@ public:
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 3, 0, 1)));
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(0, 1, 2, 3)));
         Quaternion quat;
-        _mm_storeu_ps(&quat.w_, _mm_mul_ps(_mm_xor_ps(q, _mm_castsi128_ps(_mm_set_epi32((int)0x80000000UL, (int)0x80000000UL, (int)0x80000000UL, 0))), _mm_rcp_ps(n)));
+        _mm_storeu_ps(&quat.w_, _mm_div_ps(_mm_xor_ps(q, _mm_castsi128_ps(_mm_set_epi32((int)0x80000000UL, (int)0x80000000UL, (int)0x80000000UL, 0))), n));
         return quat;
 #else
         float lenSquared = LengthSquared();
