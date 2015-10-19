@@ -54,6 +54,7 @@
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
 #include "../UI/UI.h"
+#include "../IMUI/IMUI.h"
 #ifdef URHO3D_URHO2D
 #include "../Urho2D/Urho2D.h"
 #endif
@@ -429,6 +430,9 @@ bool Engine::Initialize(const VariantMap& parameters)
         EventProfiler::SetActive(true);
     }
 #endif
+	if(GetParameter(parameters, "UseIMUI", true).GetBool())
+		context_->RegisterSubsystem(new IMUI(context_));
+
     frameTimer_.Reset();
 
     URHO3D_LOGINFO("Initialized engine");

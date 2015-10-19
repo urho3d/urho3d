@@ -26,7 +26,8 @@
 
 namespace Urho3D
 {
-
+/// Count elements. 
+URHO3D_API	unsigned CountElements(const char* buffer, char separator);
 /// Parse a bool from a string. Check for the first non-empty character (converted to lowercase) being either 't', 'y' or '1'.
 URHO3D_API bool ToBool(const String& source);
 /// Parse a bool from a C string. Check for the first non-empty character (converted to lowercase) being either 't', 'y' or '1'.
