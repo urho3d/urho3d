@@ -96,7 +96,7 @@ void Obstacle::OnSceneSet(Scene* scene)
             return;
         }
         if (!ownerMesh_)
-            ownerMesh_ = node_->GetParentComponent<DynamicNavigationMesh>();
+            ownerMesh_ = node_->GetParentComponent<DynamicNavigationMesh>(true);
         if (ownerMesh_)
             ownerMesh_->AddObstacle(this);
     }
