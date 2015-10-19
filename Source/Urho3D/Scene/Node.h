@@ -657,7 +657,7 @@ template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, b
 
 template <class T> T* Node::GetComponent(bool recursive) const { return static_cast<T*>(GetComponent(T::GetTypeStatic(), recursive)); }
 
-template <class T> T* Node::GetParentComponent(bool fullTraversal) const { return static_cast<T*>(GetComponent(T::GetTypeStatic(), fullTraversal)); }
+template <class T> T* Node::GetParentComponent(bool fullTraversal) const { return static_cast<T*>(GetParentComponent(T::GetTypeStatic(), fullTraversal)); }
 
 template <class T> void Node::GetComponents(PODVector<T*>& dest, bool recursive) const
 {
