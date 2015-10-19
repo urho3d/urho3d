@@ -231,28 +231,16 @@ void AnimatedSprite2D::SetAnimationAttr(const String& name)
     SetAnimation(animationName_, loopMode_);
 }
 
-void AnimatedSprite2D::OnWorldBoundingBoxUpdate()
-{
-    boundingBox_.Clear();
-    worldBoundingBox_.Clear();
-
-    for (unsigned i = 0; i < sourceBatches_[0].vertices_.Size(); ++i)
-        worldBoundingBox_.Merge(sourceBatches_[0].vertices_[i].position_);
-
-    boundingBox_ = worldBoundingBox_.Transformed(node_->GetWorldTransform().Inverse());
-}
-
 void AnimatedSprite2D::UpdateSourceBatches()
 {
-    sourceBatchesDirty_ = false;
-
 #ifdef URHO3D_SPINE
     if (skeleton_ && animationState_)
         UpdateSourceBatchesSpine();
 #endif
     if (spriterInstance_ && spriterInstance_->GetAnimation())
         UpdateSourceBatchesSpriter();
-    
+
+    sourceBatchesDirty_ = false;   
 }
 
 void AnimatedSprite2D::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
@@ -316,6 +304,7 @@ void AnimatedSprite2D::UpdateSpineAnimation(float timeStep)
     spSkeleton_updateWorldTransform(skeleton_);
 
     sourceBatchesDirty_ = true;
+    worldBoundingBoxDirty_ = true;
 }
 
 void AnimatedSprite2D::UpdateSourceBatchesSpine()
@@ -411,8 +400,6 @@ void AnimatedSprite2D::UpdateSourceBatchesSpine()
             }
         }
     }
-
-    worldBoundingBoxDirty_ = true;
 }
 #endif
 
@@ -445,8 +432,8 @@ void AnimatedSprite2D::UpdateSpriterAnimation(float timeStep)
 {
     spriterInstance_->Update(timeStep * speed_);
     sourceBatchesDirty_ = true;
+    worldBoundingBoxDirty_ = true;
 }
-
 
 void AnimatedSprite2D::UpdateSourceBatchesSpriter()
 {
@@ -517,8 +504,6 @@ void AnimatedSprite2D::UpdateSourceBatchesSpriter()
         vertices.Push(vertex2);
         vertices.Push(vertex3);
     }
-
-    worldBoundingBoxDirty_ = true;
 }
 
 void AnimatedSprite2D::Dispose()

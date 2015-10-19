@@ -15,6 +15,8 @@
  This source version has been altered.
  */
 
+ // Modified by Yao Wei Tjong for Urho3D
+
 #if defined (_WIN32) || defined (__i386__)
 #define BT_USE_SSE_IN_API
 #endif
@@ -825,6 +827,7 @@ long _mindot_large( const float *vv, const float *vec, unsigned long count, floa
 #define ARM_NEON_GCC_COMPATIBILITY  1
 #include <arm_neon.h>
 #include <sys/types.h>
+// Urho3D - enable NEON on generic ARM
 #ifdef __APPLE__
 #include <sys/sysctl.h> //for sysctlbyname
 #endif //__APPLE__
@@ -847,6 +850,7 @@ static inline uint32_t btGetCpuCapabilities( void )
 
     if( 0 == testedCapabilities)
     {
+// Urho3D - enable NEON on generic ARM
 #ifdef __APPLE__
         uint32_t hasFeature = 0;
         size_t featureSize = sizeof( hasFeature );
@@ -888,11 +892,11 @@ static long _mindot_large_sel( const float *vv, const float *vec, unsigned long 
 }
 
 
-
+// Urho3D - enable NEON on generic ARM
 #if defined __arm__ && __APPLE__
 # define vld1q_f32_aligned_postincrement( _ptr ) ({ float32x4_t _r; asm( "vld1.f32 {%0}, [%1, :128]!\n" : "=w" (_r), "+r" (_ptr) ); /*return*/ _r; })
 #else
-//support 64bit arm
+//support 64bit (and generic) arm
 # define vld1q_f32_aligned_postincrement( _ptr) ({ float32x4_t _r = ((float32x4_t*)(_ptr))[0]; (_ptr) = (const float*) ((const char*)(_ptr) + 16L); /*return*/ _r; })
 #endif
 

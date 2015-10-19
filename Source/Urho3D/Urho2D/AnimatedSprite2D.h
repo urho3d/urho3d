@@ -99,8 +99,6 @@ public:
 protected:
     /// Handle scene being assigned.
     virtual void OnSceneSet(Scene* scene);
-    /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate();
     /// Handle update vertices.
     virtual void UpdateSourceBatches();
     /// Handle scene post update.

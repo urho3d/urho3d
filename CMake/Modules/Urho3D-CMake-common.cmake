@@ -102,8 +102,8 @@ if (NOT DEFINED URHO3D_DEFAULT_SSE)
     endif ()
     set (URHO3D_DEFAULT_SSE ${URHO3D_DEFAULT_SSE} CACHE INTERNAL "Default value for URHO3D_SSE build option")
 endif ()
-cmake_dependent_option (URHO3D_SSE "Enable SSE2 instruction set (HTML5 and Intel platforms only including Android on Intel Atom); default to true on Intel and false on HTML5; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET build option" ${URHO3D_DEFAULT_SSE} "NOT ARM" FALSE)
-if (IOS OR (RPI AND "RPI_ABI" MATCHES NEON))    # Stringify in case RPI_ABI is not set explicitly
+cmake_dependent_option (URHO3D_SSE "Enable SSE2 instruction set (HTML5 and Intel platforms only including Android on Intel Atom); default to true on Intel and false on HTML5; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options" ${URHO3D_DEFAULT_SSE} "NOT ARM" FALSE)
+if (IOS OR (RPI AND "${RPI_ABI}" MATCHES NEON))    # Stringify in case RPI_ABI is not set explicitly
     # The 'NEON' CMake variable is already set by android.toolchain.cmake when the chosen ANDROID_ABI uses NEON
     set (NEON TRUE)
 endif ()
@@ -574,7 +574,7 @@ else ()
         else ()
             if (NOT XCODE AND NOT EMSCRIPTEN)
                 # This may influence the effective SSE level when URHO3D_SSE is on as well
-                set (URHO3D_DEPLOYMENT_TARGET native CACHE STRING "Specify the minimum CPU type on which the target binaries are to be deployed, see GCC/Clang's -march option for possible values (GCC/Clang desktop platform only)")
+                set (URHO3D_DEPLOYMENT_TARGET native CACHE STRING "Specify the minimum CPU type on which the target binaries are to be deployed (Linux and non-Xcode OSX desktop build only), see GCC/Clang's -march option for possible values")
                 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=${URHO3D_DEPLOYMENT_TARGET}")
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${URHO3D_DEPLOYMENT_TARGET}")
             endif ()
