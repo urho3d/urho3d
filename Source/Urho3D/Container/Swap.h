@@ -31,7 +31,7 @@ class String;
 class VectorBase;
 
 /// Swap two values.
-template <class T> inline void Swap(T& first, T& second)
+template <class T> URHO3D_API inline void Swap(T& first, T& second)
 {
     T temp = first;
     first = second;
