@@ -163,7 +163,7 @@ void Constraint::GetDependencyNodes(PODVector<Node*>& dest)
 
 void Constraint::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (debug && physicsWorld_ && constraint_ && IsEnabledEffective())
+    if (debug && physicsWorld_ && constraint_)
     {
         physicsWorld_->SetDebugRenderer(debug);
         physicsWorld_->SetDebugDepthTest(depthTest);

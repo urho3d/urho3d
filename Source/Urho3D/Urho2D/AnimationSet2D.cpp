@@ -427,6 +427,8 @@ bool AnimationSet2D::EndLoadSpriter()
                 }
 
                 SpriteInfo def;
+                def.x = 0;
+                def.y = 0;
                 def.file_ = file;
                 def.image_ = image;
                 spriteInfos.Push(def);
