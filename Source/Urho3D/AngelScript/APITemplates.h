@@ -532,6 +532,11 @@ static Component* NodeGetComponentWithType(const String& typeName, bool recursiv
     return ptr->GetComponent(typeName, recursive);
 }
 
+static Component* NodeGetParentComponentWithType(const String& typeName, bool fullTraversal, Node* ptr)
+{
+    return ptr->GetParentComponent(typeName, fullTraversal);
+}
+
 static CScriptArray* NodeGetComponents(Node* ptr)
 {
     return VectorToHandleArray<Component>(ptr->GetComponents(), "Array<Component@>");
@@ -679,6 +684,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents() const", asFUNCTION(NodeGetComponents), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents(const String&in, bool recursive = false) const", asFUNCTION(NodeGetComponentsWithType), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(const String&in, bool recursive = false) const", asFUNCTION(NodeGetComponentWithType), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Component@+ GetParentComponent(const String&in, bool fullTraversal = false) const", asFUNCTION(NodeGetParentComponentWithType), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool HasComponent(const String&in) const", asFUNCTION(NodeHasComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Vector3 LocalToWorld(const Vector3&in) const", asMETHODPR(T, LocalToWorld, (const Vector3&) const, Vector3), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 LocalToWorld(const Vector4&in) const", asMETHODPR(T, LocalToWorld, (const Vector4&) const, Vector3), asCALL_THISCALL);

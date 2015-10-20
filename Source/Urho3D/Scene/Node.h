@@ -475,6 +475,8 @@ public:
     void GetComponents(PODVector<Component*>& dest, StringHash type, bool recursive = false) const;
     /// Return component by type. If there are several, returns the first.
     Component* GetComponent(StringHash type, bool recursive = false) const;
+    /// Return component in parent node. If there are several, returns the first. May optional traverse up to the root node.
+    Component* GetParentComponent(StringHash type, bool fullTraversal = false) const;
     /// Return whether has a specific component.
     bool HasComponent(StringHash type) const;
 
@@ -489,12 +491,16 @@ public:
 
     /// Return first component derived from class.
     template <class T> T* GetDerivedComponent(bool recursive = false) const;
+    /// Return first component derived from class in the parent node, or if fully traversing then the first node up the tree with one.
+    template <class T> T* GetParentDerivedComponent(bool fullTraversal = false) const;
     /// Return components derived from class.
     template <class T> void GetDerivedComponents(PODVector<T*>& dest, bool recursive = false, bool clearVector = true) const;
     /// Template version of returning child nodes with a specific component.
     template <class T> void GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive = false) const;
     /// Template version of returning a component by type.
     template <class T> T* GetComponent(bool recursive = false) const;
+    /// Template version of returning a parent's component by type.
+    template <class T> T* GetParentComponent(bool fullTraversal = false) const;
     /// Template version of returning all components of type.
     template <class T> void GetComponents(PODVector<T*>& dest, bool recursive = false) const;
     /// Template version of checking whether has a specific component.
@@ -651,6 +657,8 @@ template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, b
 
 template <class T> T* Node::GetComponent(bool recursive) const { return static_cast<T*>(GetComponent(T::GetTypeStatic(), recursive)); }
 
+template <class T> T* Node::GetParentComponent(bool fullTraversal) const { return static_cast<T*>(GetParentComponent(T::GetTypeStatic(), fullTraversal)); }
+
 template <class T> void Node::GetComponents(PODVector<T*>& dest, bool recursive) const
 {
     GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic(), recursive);
@@ -677,6 +685,23 @@ template <class T> T* Node::GetDerivedComponent(bool recursive) const
         }
     }
 
+    return 0;
+}
+
+template <class T> T* Node::GetParentDerivedComponent(bool fullTraversal) const
+{
+    Node* current = GetParent();
+    while (current)
+    {
+        T* soughtComponent = current->GetDerivedComponent<T>();
+        if (soughtComponent)
+            return soughtComponent;
+
+        if (fullTraversal)
+            current = current->GetParent();
+        else
+            break;
+    }
     return 0;
 }
 
