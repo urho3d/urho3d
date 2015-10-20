@@ -3781,6 +3781,7 @@ Methods:
 - const Variant& GetVar(StringHash key) const
 - const VariantMap& GetVars() const
 - Component* GetComponent(const String type, bool recursive = false) const
+- Component* GetParentComponent(const String type, bool recursive = false) const
 - const PODVector<Component*>& GetComponents(const String type, bool recursive = false)
 - const PODVector<Node*>& GetChildren(bool recursive = false)
 - const PODVector<Node*>& GetChildrenWithComponent(const String type, bool recursive = false)
