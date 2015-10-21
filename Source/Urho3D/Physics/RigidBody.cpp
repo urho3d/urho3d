@@ -958,8 +958,8 @@ void RigidBody::AddBodyToWorld()
         smoothedTransform_ = GetComponent<SmoothedTransform>();
         if (smoothedTransform_)
         {
-            SubscribeToEvent(smoothedTransform_, E_TARGETPOSITION, HANDLER(RigidBody, HandleTargetPosition));
-            SubscribeToEvent(smoothedTransform_, E_TARGETROTATION, HANDLER(RigidBody, HandleTargetRotation));
+            SubscribeToEvent(smoothedTransform_, E_TARGETPOSITION, URHO3D_HANDLER(RigidBody, HandleTargetPosition));
+            SubscribeToEvent(smoothedTransform_, E_TARGETROTATION, URHO3D_HANDLER(RigidBody, HandleTargetRotation));
         }
 
         // Check if CollisionShapes already exist in the node and add them to the compound shape.

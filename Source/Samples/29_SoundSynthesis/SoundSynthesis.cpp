@@ -133,7 +133,7 @@ void SoundSynthesis::CreateInstructions()
 void SoundSynthesis::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(SoundSynthesis, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(SoundSynthesis, HandleUpdate));
 }
 
 void SoundSynthesis::HandleUpdate(StringHash eventType, VariantMap& eventData)

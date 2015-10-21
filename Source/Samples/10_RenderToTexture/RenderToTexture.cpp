@@ -268,7 +268,7 @@ void RenderToTexture::MoveCamera(float timeStep)
 void RenderToTexture::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(RenderToTexture, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(RenderToTexture, HandleUpdate));
 }
 
 void RenderToTexture::HandleUpdate(StringHash eventType, VariantMap& eventData)

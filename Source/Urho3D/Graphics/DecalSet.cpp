@@ -1139,7 +1139,7 @@ void DecalSet::UpdateEventSubscription(bool checkAllDecals)
 
     if (enabled && !subscribed_)
     {
-        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(DecalSet, HandleScenePostUpdate));
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(DecalSet, HandleScenePostUpdate));
         subscribed_ = true;
     }
     else if (!enabled && subscribed_)

@@ -363,7 +363,7 @@ void ScriptFile::DelayedExecute(float delay, bool repeat, const String& declarat
     // Make sure we are registered to the application update event, because delayed calls are executed there
     if (!subscribed_)
     {
-        SubscribeToEvent(E_UPDATE, HANDLER(ScriptFile, HandleUpdate));
+        SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(ScriptFile, HandleUpdate));
         subscribed_ = true;
     }
 }

@@ -61,8 +61,8 @@ DropDownList::DropDownList(Context* context) :
     text->SetInternal(true);
     text->SetVisible(false);
 
-    SubscribeToEvent(listView_, E_ITEMCLICKED, HANDLER(DropDownList, HandleItemClicked));
-    SubscribeToEvent(listView_, E_UNHANDLEDKEY, HANDLER(DropDownList, HandleListViewKey));
+    SubscribeToEvent(listView_, E_ITEMCLICKED, URHO3D_HANDLER(DropDownList, HandleItemClicked));
+    SubscribeToEvent(listView_, E_UNHANDLEDKEY, URHO3D_HANDLER(DropDownList, HandleListViewKey));
 }
 
 DropDownList::~DropDownList()

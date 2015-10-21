@@ -206,11 +206,11 @@ void Navigation::SetupViewport()
 void Navigation::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Navigation, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Navigation, HandleUpdate));
 
     // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request
     // debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Navigation, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, URHO3D_HANDLER(Navigation, HandlePostRenderUpdate));
 }
 
 void Navigation::MoveCamera(float timeStep)

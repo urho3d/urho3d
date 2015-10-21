@@ -341,7 +341,7 @@ Octree::Octree(Context* context) :
     // If the engine is running headless, subscribe to RenderUpdate events for manually updating the octree
     // to allow raycasts and animation update
     if (!GetSubsystem<Graphics>())
-        SubscribeToEvent(E_RENDERUPDATE, HANDLER(Octree, HandleRenderUpdate));
+        SubscribeToEvent(E_RENDERUPDATE, URHO3D_HANDLER(Octree, HandleRenderUpdate));
 }
 
 Octree::~Octree()

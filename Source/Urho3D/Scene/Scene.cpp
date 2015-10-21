@@ -74,8 +74,8 @@ Scene::Scene(Context* context) :
     SetID(GetFreeNodeID(REPLICATED));
     NodeAdded(this);
 
-    SubscribeToEvent(E_UPDATE, HANDLER(Scene, HandleUpdate));
-    SubscribeToEvent(E_RESOURCEBACKGROUNDLOADED, HANDLER(Scene, HandleResourceBackgroundLoaded));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Scene, HandleUpdate));
+    SubscribeToEvent(E_RESOURCEBACKGROUNDLOADED, URHO3D_HANDLER(Scene, HandleResourceBackgroundLoaded));
 }
 
 Scene::~Scene()

@@ -81,7 +81,7 @@ DebugHud::DebugHud(Context* context) :
     profilerText_->SetVisible(false);
     uiRoot->AddChild(profilerText_);
 
-    SubscribeToEvent(E_POSTUPDATE, HANDLER(DebugHud, HandlePostUpdate));
+    SubscribeToEvent(E_POSTUPDATE, URHO3D_HANDLER(DebugHud, HandlePostUpdate));
 }
 
 DebugHud::~DebugHud()

@@ -64,7 +64,7 @@ Audio::Audio(Context* context) :
     // Register Audio library object factories
     RegisterAudioLibrary(context_);
 
-    SubscribeToEvent(E_RENDERUPDATE, HANDLER(Audio, HandleRenderUpdate));
+    SubscribeToEvent(E_RENDERUPDATE, URHO3D_HANDLER(Audio, HandleRenderUpdate));
 }
 
 Audio::~Audio()

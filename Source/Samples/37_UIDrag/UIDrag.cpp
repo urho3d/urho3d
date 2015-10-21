@@ -73,10 +73,10 @@ void UIDrag::CreateGUI()
         b->SetSize(300, 100);
         b->SetPosition(IntVector2(50*i, 50*i));
 
-        SubscribeToEvent(b, E_DRAGMOVE, HANDLER(UIDrag, HandleDragMove));
-        SubscribeToEvent(b, E_DRAGBEGIN, HANDLER(UIDrag, HandleDragBegin));
-        SubscribeToEvent(b, E_DRAGCANCEL, HANDLER(UIDrag, HandleDragCancel));
-        SubscribeToEvent(b, E_DRAGEND, HANDLER(UIDrag, HandleDragEnd));
+        SubscribeToEvent(b, E_DRAGMOVE, URHO3D_HANDLER(UIDrag, HandleDragMove));
+        SubscribeToEvent(b, E_DRAGBEGIN, URHO3D_HANDLER(UIDrag, HandleDragBegin));
+        SubscribeToEvent(b, E_DRAGCANCEL, URHO3D_HANDLER(UIDrag, HandleDragCancel));
+        SubscribeToEvent(b, E_DRAGEND, URHO3D_HANDLER(UIDrag, HandleDragEnd));
 
         {
             Text* t = new Text(context_);
@@ -134,7 +134,7 @@ void UIDrag::CreateInstructions()
 
 void UIDrag::SubscribeToEvents()
 {
-    SubscribeToEvent(E_UPDATE, HANDLER(UIDrag, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(UIDrag, HandleUpdate));
 }
 
 void UIDrag::HandleDragBegin(StringHash eventType, VariantMap& eventData)

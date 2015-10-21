@@ -58,11 +58,11 @@ void DatabaseDemo::Start()
     Sample::Start();
 
     // Subscribe to console commands and the frame update
-    SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(DatabaseDemo, HandleConsoleCommand));
-    SubscribeToEvent(E_UPDATE, HANDLER(DatabaseDemo, HandleUpdate));
+    SubscribeToEvent(E_CONSOLECOMMAND, URHO3D_HANDLER(DatabaseDemo, HandleConsoleCommand));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(DatabaseDemo, HandleUpdate));
 
     // Subscribe key down event
-    SubscribeToEvent(E_KEYDOWN, HANDLER(DatabaseDemo, HandleEscKeyDown));
+    SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(DatabaseDemo, HandleEscKeyDown));
 
     // Hide logo to make room for the console
     SetLogoVisible(false);
@@ -102,7 +102,7 @@ void DatabaseDemo::Start()
         GetSubsystem<Database>()->Connect(Database::GetAPI() == DBAPI_ODBC ? "Driver=SQLite3;Database=:memory:" : "file://");
 
     // Subscribe to database cursor event to loop through query resultset
-    SubscribeToEvent(E_DBCURSOR, HANDLER(DatabaseDemo, HandleDbCursor));
+    SubscribeToEvent(E_DBCURSOR, URHO3D_HANDLER(DatabaseDemo, HandleDbCursor));
 
     // Show instruction
     Print("This demo connects to temporary in-memory database.\n"

@@ -212,8 +212,8 @@ void ScriptInstance::SetScriptFile(ScriptFile* scriptFile)
     }
     if (scriptFile)
     {
-        SubscribeToEvent(scriptFile, E_RELOADSTARTED, HANDLER(ScriptInstance, HandleScriptFileReload));
-        SubscribeToEvent(scriptFile, E_RELOADFINISHED, HANDLER(ScriptInstance, HandleScriptFileReloadFinished));
+        SubscribeToEvent(scriptFile, E_RELOADSTARTED, URHO3D_HANDLER(ScriptInstance, HandleScriptFileReload));
+        SubscribeToEvent(scriptFile, E_RELOADFINISHED, URHO3D_HANDLER(ScriptInstance, HandleScriptFileReloadFinished));
     }
 
     scriptFile_ = scriptFile;
@@ -681,14 +681,14 @@ void ScriptInstance::UpdateEventSubscription()
     {
         if (!subscribed_ && (methods_[METHOD_UPDATE] || methods_[METHOD_DELAYEDSTART] || delayedCalls_.Size()))
         {
-            SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
+            SubscribeToEvent(scene, E_SCENEUPDATE, URHO3D_HANDLER(ScriptInstance, HandleSceneUpdate));
             subscribed_ = true;
         }
 
         if (!subscribedPostFixed_)
         {
             if (methods_[METHOD_POSTUPDATE])
-                SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ScriptInstance, HandleScenePostUpdate));
+                SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(ScriptInstance, HandleScenePostUpdate));
 
 #ifdef URHO3D_PHYSICS
             if (methods_[METHOD_FIXEDUPDATE] || methods_[METHOD_FIXEDPOSTUPDATE])
@@ -697,9 +697,9 @@ void ScriptInstance::UpdateEventSubscription()
                 if (world)
                 {
                     if (methods_[METHOD_FIXEDUPDATE])
-                        SubscribeToEvent(world, E_PHYSICSPRESTEP, HANDLER(ScriptInstance, HandlePhysicsPreStep));
+                        SubscribeToEvent(world, E_PHYSICSPRESTEP, URHO3D_HANDLER(ScriptInstance, HandlePhysicsPreStep));
                     if (methods_[METHOD_FIXEDPOSTUPDATE])
-                        SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(ScriptInstance, HandlePhysicsPostStep));
+                        SubscribeToEvent(world, E_PHYSICSPOSTSTEP, URHO3D_HANDLER(ScriptInstance, HandlePhysicsPostStep));
                 }
                 else
                     LOGERROR("No physics world, can not subscribe script object to fixed update events");

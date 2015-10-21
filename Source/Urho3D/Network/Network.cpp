@@ -60,8 +60,8 @@ Network::Network(Context* context) :
     // Register Network library object factories
     RegisterNetworkLibrary(context_);
 
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(Network, HandleBeginFrame));
-    SubscribeToEvent(E_RENDERUPDATE, HANDLER(Network, HandleRenderUpdate));
+    SubscribeToEvent(E_BEGINFRAME, URHO3D_HANDLER(Network, HandleBeginFrame));
+    SubscribeToEvent(E_RENDERUPDATE, URHO3D_HANDLER(Network, HandleRenderUpdate));
 
     // Blacklist remote events which are not to be allowed to be registered in any case
     blacklistedRemoteEvents_.Insert(E_CONSOLECOMMAND);

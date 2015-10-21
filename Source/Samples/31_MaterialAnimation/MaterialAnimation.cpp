@@ -197,7 +197,7 @@ void MaterialAnimation::MoveCamera(float timeStep)
 void MaterialAnimation::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(MaterialAnimation, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(MaterialAnimation, HandleUpdate));
 }
 
 void MaterialAnimation::HandleUpdate(StringHash eventType, VariantMap& eventData)

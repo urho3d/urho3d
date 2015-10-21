@@ -39,7 +39,7 @@ void CreateRagdoll::OnNodeSet(Node* node)
     // If the node pointer is non-null, this component has been created into a scene node. Subscribe to physics collisions that
     // concern this scene node
     if (node)
-        SubscribeToEvent(node, E_NODECOLLISION, HANDLER(CreateRagdoll, HandleNodeCollision));
+        SubscribeToEvent(node, E_NODECOLLISION, URHO3D_HANDLER(CreateRagdoll, HandleNodeCollision));
 }
 
 void CreateRagdoll::HandleNodeCollision(StringHash eventType, VariantMap& eventData)

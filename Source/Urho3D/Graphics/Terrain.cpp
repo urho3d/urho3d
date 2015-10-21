@@ -1265,7 +1265,7 @@ bool Terrain::SetHeightMapInternal(Image* image, bool recreateNow)
     if (heightMap_)
         UnsubscribeFromEvent(heightMap_, E_RELOADFINISHED);
     if (image)
-        SubscribeToEvent(image, E_RELOADFINISHED, HANDLER(Terrain, HandleHeightMapReloadFinished));
+        SubscribeToEvent(image, E_RELOADFINISHED, URHO3D_HANDLER(Terrain, HandleHeightMapReloadFinished));
 
     heightMap_ = image;
 

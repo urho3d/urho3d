@@ -145,7 +145,7 @@ Engine::Engine(Context* context) :
     RegisterNavigationLibrary(context_);
 #endif
 
-    SubscribeToEvent(E_EXITREQUESTED, HANDLER(Engine, HandleExitRequested));
+    SubscribeToEvent(E_EXITREQUESTED, URHO3D_HANDLER(Engine, HandleExitRequested));
 }
 
 Engine::~Engine()

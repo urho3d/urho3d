@@ -1711,7 +1711,7 @@ UIElement* UIElement::GetElementEventSender() const
 void UIElement::OnAttributeAnimationAdded()
 {
     if (attributeAnimationInfos_.Size() == 1)
-        SubscribeToEvent(E_POSTUPDATE, HANDLER(UIElement, HandlePostUpdate));
+        SubscribeToEvent(E_POSTUPDATE, URHO3D_HANDLER(UIElement, HandlePostUpdate));
 }
 
 void UIElement::OnAttributeAnimationRemoved()

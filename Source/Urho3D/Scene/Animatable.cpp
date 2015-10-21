@@ -221,8 +221,8 @@ void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation)
     if (objectAnimation_)
     {
         OnObjectAnimationAdded(objectAnimation_);
-        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONADDED, HANDLER(Animatable, HandleAttributeAnimationAdded));
-        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONREMOVED, HANDLER(Animatable, HandleAttributeAnimationRemoved));
+        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONADDED, URHO3D_HANDLER(Animatable, HandleAttributeAnimationAdded));
+        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONREMOVED, URHO3D_HANDLER(Animatable, HandleAttributeAnimationRemoved));
     }
 }
 

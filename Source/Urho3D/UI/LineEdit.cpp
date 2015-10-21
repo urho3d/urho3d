@@ -62,9 +62,9 @@ LineEdit::LineEdit(Context* context) :
     cursor_->SetInternal(true);
     cursor_->SetPriority(1); // Show over text
 
-    SubscribeToEvent(this, E_FOCUSED, HANDLER(LineEdit, HandleFocused));
-    SubscribeToEvent(this, E_DEFOCUSED, HANDLER(LineEdit, HandleDefocused));
-    SubscribeToEvent(this, E_LAYOUTUPDATED, HANDLER(LineEdit, HandleLayoutUpdated));
+    SubscribeToEvent(this, E_FOCUSED, URHO3D_HANDLER(LineEdit, HandleFocused));
+    SubscribeToEvent(this, E_DEFOCUSED, URHO3D_HANDLER(LineEdit, HandleDefocused));
+    SubscribeToEvent(this, E_LAYOUTUPDATED, URHO3D_HANDLER(LineEdit, HandleLayoutUpdated));
 }
 
 LineEdit::~LineEdit()

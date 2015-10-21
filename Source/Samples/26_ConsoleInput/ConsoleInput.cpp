@@ -65,11 +65,11 @@ void ConsoleInput::Start()
     Sample::Start();
 
     // Subscribe to console commands and the frame update
-    SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(ConsoleInput, HandleConsoleCommand));
-    SubscribeToEvent(E_UPDATE, HANDLER(ConsoleInput, HandleUpdate));
+    SubscribeToEvent(E_CONSOLECOMMAND, URHO3D_HANDLER(ConsoleInput, HandleConsoleCommand));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(ConsoleInput, HandleUpdate));
 
     // Subscribe key down event
-    SubscribeToEvent(E_KEYDOWN, HANDLER(ConsoleInput, HandleEscKeyDown));
+    SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(ConsoleInput, HandleEscKeyDown));
 
     // Hide logo to make room for the console
     SetLogoVisible(false);

@@ -602,19 +602,19 @@ void LuaScriptInstance::SubscribeToScriptMethodEvents()
     Scene* scene = GetScene();
 
     if (scene && scriptObjectMethods_[LSOM_UPDATE])
-        SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(LuaScriptInstance, HandleUpdate));
+        SubscribeToEvent(scene, E_SCENEUPDATE, URHO3D_HANDLER(LuaScriptInstance, HandleUpdate));
 
     if (scene && scriptObjectMethods_[LSOM_POSTUPDATE])
-        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(LuaScriptInstance, HandlePostUpdate));
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(LuaScriptInstance, HandlePostUpdate));
 
 #ifdef URHO3D_PHYSICS
     PhysicsWorld* physicsWorld = scene ? scene->GetComponent<PhysicsWorld>() : 0;
 
     if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDUPDATE])
-        SubscribeToEvent(physicsWorld, E_PHYSICSPRESTEP, HANDLER(LuaScriptInstance, HandleFixedUpdate));
+        SubscribeToEvent(physicsWorld, E_PHYSICSPRESTEP, URHO3D_HANDLER(LuaScriptInstance, HandleFixedUpdate));
 
     if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDPOSTUPDATE])
-        SubscribeToEvent(physicsWorld, E_PHYSICSPOSTSTEP, HANDLER(LuaScriptInstance, HandlePostFixedUpdate));
+        SubscribeToEvent(physicsWorld, E_PHYSICSPOSTSTEP, URHO3D_HANDLER(LuaScriptInstance, HandlePostFixedUpdate));
 #endif
 
     if (node_ && scriptObjectMethods_[LSOM_TRANSFORMCHANGED])

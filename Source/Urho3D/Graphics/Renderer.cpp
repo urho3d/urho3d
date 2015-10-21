@@ -284,7 +284,7 @@ Renderer::Renderer(Context* context) :
     initialized_(false),
     resetViews_(false)
 {
-    SubscribeToEvent(E_SCREENMODE, HANDLER(Renderer, HandleScreenMode));
+    SubscribeToEvent(E_SCREENMODE, URHO3D_HANDLER(Renderer, HandleScreenMode));
 
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
@@ -1490,7 +1490,7 @@ void Renderer::Initialize()
     shadersDirty_ = true;
     initialized_ = true;
 
-    SubscribeToEvent(E_RENDERUPDATE, HANDLER(Renderer, HandleRenderUpdate));
+    SubscribeToEvent(E_RENDERUPDATE, URHO3D_HANDLER(Renderer, HandleRenderUpdate));
 
     LOGINFO("Initialized renderer");
 }

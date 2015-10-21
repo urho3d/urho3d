@@ -50,10 +50,10 @@ Menu::Menu(Context* context) :
 {
     focusMode_ = FM_NOTFOCUSABLE;
 
-    SubscribeToEvent(this, E_PRESSED, HANDLER(Menu, HandlePressedReleased));
-    SubscribeToEvent(this, E_RELEASED, HANDLER(Menu, HandlePressedReleased));
-    SubscribeToEvent(E_UIMOUSECLICK, HANDLER(Menu, HandleFocusChanged));
-    SubscribeToEvent(E_FOCUSCHANGED, HANDLER(Menu, HandleFocusChanged));
+    SubscribeToEvent(this, E_PRESSED, URHO3D_HANDLER(Menu, HandlePressedReleased));
+    SubscribeToEvent(this, E_RELEASED, URHO3D_HANDLER(Menu, HandlePressedReleased));
+    SubscribeToEvent(E_UIMOUSECLICK, URHO3D_HANDLER(Menu, HandleFocusChanged));
+    SubscribeToEvent(E_FOCUSCHANGED, URHO3D_HANDLER(Menu, HandleFocusChanged));
 }
 
 Menu::~Menu()
@@ -337,7 +337,7 @@ void Menu::SetAccelerator(int key, int qualifiers)
     acceleratorQualifiers_ = qualifiers;
 
     if (key)
-        SubscribeToEvent(E_KEYDOWN, HANDLER(Menu, HandleKeyDown));
+        SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(Menu, HandleKeyDown));
     else
         UnsubscribeFromEvent(E_KEYDOWN);
 }

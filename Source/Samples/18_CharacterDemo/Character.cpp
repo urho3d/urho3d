@@ -57,7 +57,7 @@ void Character::RegisterObject(Context* context)
 void Character::Start()
 {
     // Component has been inserted into its scene node. Subscribe to events now
-    SubscribeToEvent(GetNode(), E_NODECOLLISION, HANDLER(Character, HandleNodeCollision));
+    SubscribeToEvent(GetNode(), E_NODECOLLISION, URHO3D_HANDLER(Character, HandleNodeCollision));
 }
 
 void Character::FixedUpdate(float timeStep)

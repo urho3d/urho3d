@@ -117,7 +117,7 @@ void LogicComponent::UpdateEventSubscription()
     bool needUpdate = enabled && ((updateEventMask_ & USE_UPDATE) || !delayedStartCalled_);
     if (needUpdate && !(currentEventMask_ & USE_UPDATE))
     {
-        SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(LogicComponent, HandleSceneUpdate));
+        SubscribeToEvent(scene, E_SCENEUPDATE, URHO3D_HANDLER(LogicComponent, HandleSceneUpdate));
         currentEventMask_ |= USE_UPDATE;
     }
     else if (!needUpdate && (currentEventMask_ & USE_UPDATE))
@@ -129,7 +129,7 @@ void LogicComponent::UpdateEventSubscription()
     bool needPostUpdate = enabled && (updateEventMask_ & USE_POSTUPDATE);
     if (needPostUpdate && !(currentEventMask_ & USE_POSTUPDATE))
     {
-        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(LogicComponent, HandleScenePostUpdate));
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(LogicComponent, HandleScenePostUpdate));
         currentEventMask_ |= USE_POSTUPDATE;
     }
     else if (!needUpdate && (currentEventMask_ & USE_POSTUPDATE))
@@ -146,7 +146,7 @@ void LogicComponent::UpdateEventSubscription()
     bool needFixedUpdate = enabled && (updateEventMask_ & USE_FIXEDUPDATE);
     if (needFixedUpdate && !(currentEventMask_ & USE_FIXEDUPDATE))
     {
-        SubscribeToEvent(world, E_PHYSICSPRESTEP, HANDLER(LogicComponent, HandlePhysicsPreStep));
+        SubscribeToEvent(world, E_PHYSICSPRESTEP, URHO3D_HANDLER(LogicComponent, HandlePhysicsPreStep));
         currentEventMask_ |= USE_FIXEDUPDATE;
     }
     else if (!needFixedUpdate && (currentEventMask_ & USE_FIXEDUPDATE))
@@ -158,7 +158,7 @@ void LogicComponent::UpdateEventSubscription()
     bool needFixedPostUpdate = enabled && (updateEventMask_ & USE_FIXEDPOSTUPDATE);
     if (needFixedPostUpdate && !(currentEventMask_ & USE_FIXEDPOSTUPDATE))
     {
-        SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(LogicComponent, HandlePhysicsPostStep));
+        SubscribeToEvent(world, E_PHYSICSPOSTSTEP, URHO3D_HANDLER(LogicComponent, HandlePhysicsPostStep));
         currentEventMask_ |= USE_FIXEDPOSTUPDATE;
     }
     else if (!needFixedPostUpdate && (currentEventMask_ & USE_FIXEDPOSTUPDATE))

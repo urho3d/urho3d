@@ -82,7 +82,7 @@ Cursor::Cursor(Context* context) :
         shapeInfos_[shapeNames[i]] = CursorShapeInfo(i);
 
     // Subscribe to OS mouse cursor visibility changes to be able to reapply the cursor shape
-    SubscribeToEvent(E_MOUSEVISIBLECHANGED, HANDLER(Cursor, HandleMouseVisibleChanged));
+    SubscribeToEvent(E_MOUSEVISIBLECHANGED, URHO3D_HANDLER(Cursor, HandleMouseVisibleChanged));
 }
 
 Cursor::~Cursor()

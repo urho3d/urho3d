@@ -232,7 +232,7 @@ void LightAnimation::MoveCamera(float timeStep)
 void LightAnimation::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(LightAnimation, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(LightAnimation, HandleUpdate));
 }
 
 void LightAnimation::HandleUpdate(StringHash eventType, VariantMap& eventData)

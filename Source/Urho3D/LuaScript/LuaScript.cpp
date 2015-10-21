@@ -130,7 +130,7 @@ LuaScript::LuaScript(Context* context) :
     coroutineUpdate_ = GetFunction("coroutine.update");
 
     // Subscribe to post update
-    SubscribeToEvent(E_POSTUPDATE, HANDLER(LuaScript, HandlePostUpdate));
+    SubscribeToEvent(E_POSTUPDATE, URHO3D_HANDLER(LuaScript, HandlePostUpdate));
 
     // Subscribe to console commands
     SetExecuteConsoleCommands(true);
@@ -310,7 +310,7 @@ void LuaScript::SetExecuteConsoleCommands(bool enable)
 
     executeConsoleCommands_ = enable;
     if (enable)
-        SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(LuaScript, HandleConsoleCommand));
+        SubscribeToEvent(E_CONSOLECOMMAND, URHO3D_HANDLER(LuaScript, HandleConsoleCommand));
     else
         UnsubscribeFromEvent(E_CONSOLECOMMAND);
 }

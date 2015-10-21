@@ -192,7 +192,7 @@ void HugeObjectCount::SetupViewport()
 void HugeObjectCount::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(HugeObjectCount, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(HugeObjectCount, HandleUpdate));
 }
 
 void HugeObjectCount::MoveCamera(float timeStep)
