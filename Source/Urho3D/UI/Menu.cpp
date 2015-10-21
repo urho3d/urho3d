@@ -68,7 +68,7 @@ void Menu::RegisterObject(Context* context)
 
     URHO3D_COPY_BASE_ATTRIBUTES(Button);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_NOTFOCUSABLE);
-    ACCESSOR_ATTRIBUTE("Popup Offset", GetPopupOffset, SetPopupOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Popup Offset", GetPopupOffset, SetPopupOffset, IntVector2, IntVector2::ZERO, AM_FILE);
 }
 
 void Menu::Update(float timeStep)

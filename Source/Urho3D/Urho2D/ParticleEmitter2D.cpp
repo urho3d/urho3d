@@ -61,7 +61,7 @@ void ParticleEmitter2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ParticleEmitter2D>(URHO2D_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable2D);
     MIXED_ACCESSOR_ATTRIBUTE("Particle Effect", GetParticleEffectAttr, SetParticleEffectAttr, ResourceRef,
         ResourceRef(ParticleEffect2D::GetTypeStatic()), AM_DEFAULT);

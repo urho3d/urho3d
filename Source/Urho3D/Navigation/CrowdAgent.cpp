@@ -107,7 +107,7 @@ void CrowdAgent::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Target Velocity", Vector3, targetVelocity_, Vector3::ZERO, AM_DEFAULT);
     URHO3D_ENUM_ATTRIBUTE("Requested Target Type", requestedTargetType_, crowdAgentRequestedTargetTypeNames,
         DEFAULT_AGENT_REQUEST_TARGET_TYPE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Update Node Position", GetUpdateNodePosition, SetUpdateNodePosition, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Update Node Position", GetUpdateNodePosition, SetUpdateNodePosition, bool, true, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Max Accel", float, maxAccel_, DEFAULT_AGENT_MAX_ACCEL, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Max Speed", float, maxSpeed_, DEFAULT_AGENT_MAX_SPEED, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Radius", float, radius_, 0.0f, AM_DEFAULT);

@@ -59,7 +59,7 @@ Constraint2D::~Constraint2D()
 
 void Constraint2D::RegisterObject(Context* context)
 {
-    ACCESSOR_ATTRIBUTE("Collide Connected", GetCollideConnected, SetCollideConnected, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Collide Connected", GetCollideConnected, SetCollideConnected, bool, false, AM_DEFAULT);
 }
 
 void Constraint2D::OnSetEnabled()
