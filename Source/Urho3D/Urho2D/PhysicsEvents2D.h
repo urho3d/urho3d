@@ -28,21 +28,21 @@ namespace Urho3D
 {
 
 /// Physics world is about to be stepped.
-EVENT(E_PHYSICSPRESTEP2D, PhysicsPreStep2D)
+URHO3D_EVENT(E_PHYSICSPRESTEP2D, PhysicsPreStep2D)
 {
     PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
     PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Physics world has been stepped.
-EVENT(E_PHYSICSPOSTSTEP2D, PhysicsPostStep2D)
+URHO3D_EVENT(E_PHYSICSPOSTSTEP2D, PhysicsPostStep2D)
 {
     PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
     PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Physics begin contact.
-EVENT(E_PHYSICSBEGINCONTACT2D, PhysicsBeginContact2D)
+URHO3D_EVENT(E_PHYSICSBEGINCONTACT2D, PhysicsBeginContact2D)
 {
     PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
     PARAM(P_BODYA, BodyA);                  // RigidBody2D pointer
@@ -52,7 +52,7 @@ EVENT(E_PHYSICSBEGINCONTACT2D, PhysicsBeginContact2D)
 }
 
 /// Physics end contact.
-EVENT(E_PHYSICSENDCONTACT2D, PhysicsEndContact2D)
+URHO3D_EVENT(E_PHYSICSENDCONTACT2D, PhysicsEndContact2D)
 {
     PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
     PARAM(P_BODYA, BodyA);                  // RigidBody2D pointer

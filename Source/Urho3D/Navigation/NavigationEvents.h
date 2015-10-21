@@ -28,14 +28,14 @@ namespace Urho3D
 {
 
 /// Complete rebuild of navigation mesh.
-EVENT(E_NAVIGATION_MESH_REBUILT, NavigationMeshRebuilt)
+URHO3D_EVENT(E_NAVIGATION_MESH_REBUILT, NavigationMeshRebuilt)
 {
     PARAM(P_NODE, Node); // Node pointer
     PARAM(P_MESH, Mesh); // NavigationMesh pointer
 }
 
 /// Partial bounding box rebuild of navigation mesh.
-EVENT(E_NAVIGATION_AREA_REBUILT, NavigationAreaRebuilt)
+URHO3D_EVENT(E_NAVIGATION_AREA_REBUILT, NavigationAreaRebuilt)
 {
     PARAM(P_NODE, Node); // Node pointer
     PARAM(P_MESH, Mesh); // NavigationMesh pointer
@@ -44,7 +44,7 @@ EVENT(E_NAVIGATION_AREA_REBUILT, NavigationAreaRebuilt)
 }
 
 /// Crowd agent formation.
-EVENT(E_CROWD_AGENT_FORMATION, CrowdAgentFormation)
+URHO3D_EVENT(E_CROWD_AGENT_FORMATION, CrowdAgentFormation)
 {
     PARAM(P_NODE, Node); // Node pointer
     PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
@@ -54,7 +54,7 @@ EVENT(E_CROWD_AGENT_FORMATION, CrowdAgentFormation)
 }
 
 /// Crowd agent has been repositioned.
-EVENT(E_CROWD_AGENT_REPOSITION, CrowdAgentReposition)
+URHO3D_EVENT(E_CROWD_AGENT_REPOSITION, CrowdAgentReposition)
 {
     PARAM(P_NODE, Node); // Node pointer
     PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
@@ -65,7 +65,7 @@ EVENT(E_CROWD_AGENT_REPOSITION, CrowdAgentReposition)
 }
 
 /// Crowd agent's internal state has become invalidated. This is a special case of CrowdAgentStateChanged event.
-EVENT(E_CROWD_AGENT_FAILURE, CrowdAgentFailure)
+URHO3D_EVENT(E_CROWD_AGENT_FAILURE, CrowdAgentFailure)
 {
     PARAM(P_NODE, Node); // Node pointer
     PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
@@ -76,7 +76,7 @@ EVENT(E_CROWD_AGENT_FAILURE, CrowdAgentFailure)
 }
 
 /// Crowd agent's state has been changed.
-EVENT(E_CROWD_AGENT_STATE_CHANGED, CrowdAgentStateChanged)
+URHO3D_EVENT(E_CROWD_AGENT_STATE_CHANGED, CrowdAgentStateChanged)
 {
     PARAM(P_NODE, Node); // Node pointer
     PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
@@ -87,7 +87,7 @@ EVENT(E_CROWD_AGENT_STATE_CHANGED, CrowdAgentStateChanged)
 }
 
 /// Addition of obstacle to dynamic navigation mesh.
-EVENT(E_NAVIGATION_OBSTACLE_ADDED, NavigationObstacleAdded)
+URHO3D_EVENT(E_NAVIGATION_OBSTACLE_ADDED, NavigationObstacleAdded)
 {
     PARAM(P_NODE, Node); // Node pointer
     PARAM(P_OBSTACLE, Obstacle); // Obstacle pointer
@@ -97,7 +97,7 @@ EVENT(E_NAVIGATION_OBSTACLE_ADDED, NavigationObstacleAdded)
 }
 
 /// Removal of obstacle from dynamic navigation mesh.
-EVENT(E_NAVIGATION_OBSTACLE_REMOVED, NavigationObstacleRemoved)
+URHO3D_EVENT(E_NAVIGATION_OBSTACLE_REMOVED, NavigationObstacleRemoved)
 {
     PARAM(P_NODE, Node); // Node pointer
     PARAM(P_OBSTACLE, Obstacle); // Obstacle pointer

@@ -28,21 +28,21 @@ namespace Urho3D
 {
 
 /// Physics world is about to be stepped.
-EVENT(E_PHYSICSPRESTEP, PhysicsPreStep)
+URHO3D_EVENT(E_PHYSICSPRESTEP, PhysicsPreStep)
 {
     PARAM(P_WORLD, World);                  // PhysicsWorld pointer
     PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Physics world has been stepped.
-EVENT(E_PHYSICSPOSTSTEP, PhysicsPostStep)
+URHO3D_EVENT(E_PHYSICSPOSTSTEP, PhysicsPostStep)
 {
     PARAM(P_WORLD, World);                  // PhysicsWorld pointer
     PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Physics collision started.
-EVENT(E_PHYSICSCOLLISIONSTART, PhysicsCollisionStart)
+URHO3D_EVENT(E_PHYSICSCOLLISIONSTART, PhysicsCollisionStart)
 {
     PARAM(P_WORLD, World);                  // PhysicsWorld pointer
     PARAM(P_NODEA, NodeA);                  // Node pointer
@@ -54,7 +54,7 @@ EVENT(E_PHYSICSCOLLISIONSTART, PhysicsCollisionStart)
 }
 
 /// Physics collision ongoing.
-EVENT(E_PHYSICSCOLLISION, PhysicsCollision)
+URHO3D_EVENT(E_PHYSICSCOLLISION, PhysicsCollision)
 {
     PARAM(P_WORLD, World);                  // PhysicsWorld pointer
     PARAM(P_NODEA, NodeA);                  // Node pointer
@@ -66,7 +66,7 @@ EVENT(E_PHYSICSCOLLISION, PhysicsCollision)
 }
 
 /// Physics collision ended.
-EVENT(E_PHYSICSCOLLISIONEND, PhysicsCollisionEnd)
+URHO3D_EVENT(E_PHYSICSCOLLISIONEND, PhysicsCollisionEnd)
 {
     PARAM(P_WORLD, World);                  // PhysicsWorld pointer
     PARAM(P_NODEA, NodeA);                  // Node pointer
@@ -77,7 +77,7 @@ EVENT(E_PHYSICSCOLLISIONEND, PhysicsCollisionEnd)
 }
 
 /// Physics collision started (sent to the participating scene nodes.)
-EVENT(E_NODECOLLISIONSTART, NodeCollisionStart)
+URHO3D_EVENT(E_NODECOLLISIONSTART, NodeCollisionStart)
 {
     PARAM(P_BODY, Body);                    // RigidBody pointer
     PARAM(P_OTHERNODE, OtherNode);          // Node pointer
@@ -87,7 +87,7 @@ EVENT(E_NODECOLLISIONSTART, NodeCollisionStart)
 }
 
 /// Physics collision ongoing (sent to the participating scene nodes.)
-EVENT(E_NODECOLLISION, NodeCollision)
+URHO3D_EVENT(E_NODECOLLISION, NodeCollision)
 {
     PARAM(P_BODY, Body);                    // RigidBody pointer
     PARAM(P_OTHERNODE, OtherNode);          // Node pointer
@@ -97,7 +97,7 @@ EVENT(E_NODECOLLISION, NodeCollision)
 }
 
 /// Physics collision ended (sent to the participating scene nodes.)
-EVENT(E_NODECOLLISIONEND, NodeCollisionEnd)
+URHO3D_EVENT(E_NODECOLLISIONEND, NodeCollisionEnd)
 {
     PARAM(P_BODY, Body);                    // RigidBody pointer
     PARAM(P_OTHERNODE, OtherNode);          // Node pointer

@@ -30,7 +30,7 @@ namespace Urho3D
 {
 
 /// Work item completed event.
-EVENT(E_WORKITEMCOMPLETED, WorkItemCompleted)
+URHO3D_EVENT(E_WORKITEMCOMPLETED, WorkItemCompleted)
 {
     PARAM(P_ITEM, Item);                        // WorkItem ptr
 }

@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 /// A command has been entered on the console.
-EVENT(E_CONSOLECOMMAND, ConsoleCommand)
+URHO3D_EVENT(E_CONSOLECOMMAND, ConsoleCommand)
 {
     PARAM(P_COMMAND, Command);              // String
     PARAM(P_ID, Id);                        // String
