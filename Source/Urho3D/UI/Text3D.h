@@ -185,6 +185,8 @@ private:
     bool geometryDirty_;
     /// Flag for whether currently using SDF shader defines in the generated material.
     bool usingSDFShader_;
+    /// Font texture data lost flag.
+    bool fontDataLost_;
 };
 
 }
