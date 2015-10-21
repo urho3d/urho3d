@@ -71,7 +71,7 @@ void ParticleEmitter::RegisterObject(Context* context)
     ATTRIBUTE("Is Emitting", bool, emitting_, true, AM_FILE);
     ATTRIBUTE("Period Timer", float, periodTimer_, 0.0f, AM_FILE | AM_NOEDIT);
     ATTRIBUTE("Emission Timer", float, emissionTimer_, 0.0f, AM_FILE | AM_NOEDIT);
-    COPY_BASE_ATTRIBUTES(Drawable);
+    URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
     MIXED_ACCESSOR_ATTRIBUTE("Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, Variant::emptyVariantVector,
         AM_FILE | AM_NOEDIT);
     MIXED_ACCESSOR_ATTRIBUTE("Billboards", GetParticleBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector,

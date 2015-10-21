@@ -56,7 +56,7 @@ void ConstraintRevolute2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Enable Motor", GetEnableMotor, SetEnableMotor, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Motor Speed", GetMotorSpeed, SetMotorSpeed, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Max Motor Torque", GetMaxMotorTorque, SetMaxMotorTorque, float, 0.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Constraint2D);
+    URHO3D_COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
 void ConstraintRevolute2D::SetAnchor(const Vector2& anchor)

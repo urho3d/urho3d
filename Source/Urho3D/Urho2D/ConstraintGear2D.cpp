@@ -49,7 +49,7 @@ void ConstraintGear2D::RegisterObject(Context* context)
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Ratio", GetRatio, SetRatio, float, 0.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Constraint2D);
+    URHO3D_COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
 void ConstraintGear2D::SetOwnerConstraint(Constraint2D* constraint)

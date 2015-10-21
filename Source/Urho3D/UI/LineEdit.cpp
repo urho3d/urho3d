@@ -75,7 +75,7 @@ void LineEdit::RegisterObject(Context* context)
 {
     context->RegisterFactory<LineEdit>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(BorderImage);
+    URHO3D_COPY_BASE_ATTRIBUTES(BorderImage);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);

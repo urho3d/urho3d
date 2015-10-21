@@ -79,7 +79,7 @@ void ScrollBar::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScrollBar>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(UIElement);
+    URHO3D_COPY_BASE_ATTRIBUTES(UIElement);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
     ENUM_ACCESSOR_ATTRIBUTE("Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
     ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, 1.0f, AM_FILE);

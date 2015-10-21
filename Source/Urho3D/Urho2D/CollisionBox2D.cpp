@@ -58,7 +58,7 @@ void CollisionBox2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, Vector2, DEFAULT_BOX_SIZE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Center", GetCenter, SetCenter, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Angle", GetAngle, SetAngle, float, 0.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(CollisionShape2D);
+    URHO3D_COPY_BASE_ATTRIBUTES(CollisionShape2D);
 }
 
 void CollisionBox2D::SetSize(const Vector2& size)

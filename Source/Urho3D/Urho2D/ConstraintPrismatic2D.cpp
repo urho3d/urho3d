@@ -58,7 +58,7 @@ void ConstraintPrismatic2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Enable Motor", GetEnableMotor, SetEnableMotor, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Max Motor Force", GetMaxMotorForce, SetMaxMotorForce, float, 2.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Motor Speed", GetMotorSpeed, SetMotorSpeed, float, 0.7f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Constraint2D);
+    URHO3D_COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
 void ConstraintPrismatic2D::SetAnchor(const Vector2& anchor)

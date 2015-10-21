@@ -161,7 +161,7 @@ private:
 
 void HierarchyContainer::RegisterObject(Context* context)
 {
-    COPY_BASE_ATTRIBUTES(UIElement);
+    URHO3D_COPY_BASE_ATTRIBUTES(UIElement);
 }
 
 ListView::ListView(Context* context) :
@@ -196,7 +196,7 @@ void ListView::RegisterObject(Context* context)
 
     HierarchyContainer::RegisterObject(context);
 
-    COPY_BASE_ATTRIBUTES(ScrollView);
+    URHO3D_COPY_BASE_ATTRIBUTES(ScrollView);
     ENUM_ACCESSOR_ATTRIBUTE("Highlight Mode", GetHighlightMode, SetHighlightMode, HighlightMode, highlightModes, HM_FOCUS, AM_FILE);
     ACCESSOR_ATTRIBUTE("Multiselect", GetMultiselect, SetMultiselect, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE("Hierarchy Mode", GetHierarchyMode, SetHierarchyMode, bool, false, AM_FILE);

@@ -190,7 +190,7 @@ void DecalSet::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Max Indices", GetMaxIndices, SetMaxIndices, unsigned, DEFAULT_MAX_INDICES, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Drawable);
+    URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
     MIXED_ACCESSOR_ATTRIBUTE("Decals", GetDecalsAttr, SetDecalsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
         AM_FILE | AM_NOEDIT);
 }

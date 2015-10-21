@@ -94,7 +94,7 @@ void Text3D::RegisterObject(Context* context)
     ENUM_ATTRIBUTE("Text Effect", text_.textEffect_, textEffects, TE_NONE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_DEFAULT);
     ATTRIBUTE("Effect Depth Bias", float, text_.effectDepthBias_, DEFAULT_EFFECT_DEPTH_BIAS, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Drawable);
+    URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
 }
 
 void Text3D::ApplyAttributes()

@@ -55,7 +55,7 @@ void ConstraintMotor2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Max Force", GetMaxForce, SetMaxForce, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Max Torque", GetMaxTorque, SetMaxTorque, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Correction Factor", GetCorrectionFactor, SetCorrectionFactor, float, 0.3f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Constraint2D);
+    URHO3D_COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
 void ConstraintMotor2D::SetLinearOffset(const Vector2& linearOffset)

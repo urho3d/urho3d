@@ -52,7 +52,7 @@ void ConstraintWeld2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Frequency Hz", GetFrequencyHz, SetFrequencyHz, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Damping Ratio", GetDampingRatio, SetDampingRatio, float, 0.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Constraint2D);
+    URHO3D_COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
 void ConstraintWeld2D::SetAnchor(const Vector2& anchor)

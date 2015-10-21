@@ -60,7 +60,7 @@ void StaticSprite2D::RegisterObject(Context* context)
     context->RegisterFactory<StaticSprite2D>(URHO2D_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Drawable2D);
+    URHO3D_COPY_BASE_ATTRIBUTES(Drawable2D);
     MIXED_ACCESSOR_ATTRIBUTE("Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()),
         AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);

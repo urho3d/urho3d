@@ -54,7 +54,7 @@ void CollisionCircle2D::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, DEFAULT_CLRCLE_RADIUS, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Center", GetCenter, SetCenter, Vector2, Vector2::ZERO, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(CollisionShape2D);
+    URHO3D_COPY_BASE_ATTRIBUTES(CollisionShape2D);
 }
 
 void CollisionCircle2D::SetRadius(float radius)

@@ -54,7 +54,7 @@ void BorderImage::RegisterObject(Context* context)
 {
     context->RegisterFactory<BorderImage>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(UIElement);
+    URHO3D_COPY_BASE_ATTRIBUTES(UIElement);
     MIXED_ACCESSOR_ATTRIBUTE("Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()),
         AM_FILE);
     ACCESSOR_ATTRIBUTE("Image Rect", GetImageRect, SetImageRect, IntRect, IntRect::ZERO, AM_FILE);

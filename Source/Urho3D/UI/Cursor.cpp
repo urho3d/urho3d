@@ -101,7 +101,7 @@ void Cursor::RegisterObject(Context* context)
 {
     context->RegisterFactory<Cursor>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(BorderImage);
+    URHO3D_COPY_BASE_ATTRIBUTES(BorderImage);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE("Priority", M_MAX_INT);
     ACCESSOR_ATTRIBUTE("Use System Shapes", GetUseSystemShapes, SetUseSystemShapes, bool, false, AM_FILE);
     MIXED_ACCESSOR_ATTRIBUTE("Shapes", GetShapesAttr, SetShapesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);

@@ -263,7 +263,7 @@ public:
 // A variable called "context" needs to exist in the current scope and point to a valid Context object.
 
 /// Copy attributes from a base class.
-#define COPY_BASE_ATTRIBUTES(sourceClassName) context->CopyBaseAttributes<sourceClassName, ClassName>()
+#define URHO3D_COPY_BASE_ATTRIBUTES(sourceClassName) context->CopyBaseAttributes<sourceClassName, ClassName>()
 /// Remove attribute by name.
 #define REMOVE_ATTRIBUTE(name) context->RemoveAttribute<ClassName>(name)
 /// Define an attribute that points to a memory offset in the object.

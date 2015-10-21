@@ -74,7 +74,7 @@ void AnimatedSprite2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimatedSprite2D>(URHO2D_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(StaticSprite2D);
+    URHO3D_COPY_BASE_ATTRIBUTES(StaticSprite2D);
     REMOVE_ATTRIBUTE("Sprite");
     ACCESSOR_ATTRIBUTE("Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Entity", GetEntity, SetEntity, String, String::EMPTY, AM_DEFAULT);

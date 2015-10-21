@@ -56,7 +56,7 @@ void Button::RegisterObject(Context* context)
 {
     context->RegisterFactory<Button>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(BorderImage);
+    URHO3D_COPY_BASE_ATTRIBUTES(BorderImage);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE);
     ACCESSOR_ATTRIBUTE("Pressed Image Offset", GetPressedOffset, SetPressedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
