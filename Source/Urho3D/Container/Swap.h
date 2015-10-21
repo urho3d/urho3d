@@ -38,9 +38,9 @@ template <class T> inline void Swap(T& first, T& second)
     second = temp;
 }
 
-template <> void Swap<String>(String& first, String& second);
-template <> void Swap<VectorBase>(VectorBase& first, VectorBase& second);
-template <> void Swap<ListBase>(ListBase& first, ListBase& second);
-template <> void Swap<HashBase>(HashBase& first, HashBase& second);
+template <> URHO3D_API void Swap<String>(String& first, String& second);
+template <> URHO3D_API void Swap<VectorBase>(VectorBase& first, VectorBase& second);
+template <> URHO3D_API void Swap<ListBase>(ListBase& first, ListBase& second);
+template <> URHO3D_API void Swap<HashBase>(HashBase& first, HashBase& second);
 
 }
