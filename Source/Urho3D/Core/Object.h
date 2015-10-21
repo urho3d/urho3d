@@ -63,7 +63,7 @@ private:
     const TypeInfo* baseTypeInfo_;
 };
 
-#define OBJECT(typeName, baseTypeName) \
+#define URHO3D_OBJECT(typeName, baseTypeName) \
     public: \
         typedef typeName ClassName; \
         typedef baseTypeName BaseClassName; \

@@ -41,7 +41,7 @@ class Scene;
 ///     - Displaying renderer debug geometry
 class SkeletalAnimation : public Sample
 {
-    OBJECT(SkeletalAnimation, Sample);
+    URHO3D_OBJECT(SkeletalAnimation, Sample);
 
 public:
     /// Construct.

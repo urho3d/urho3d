@@ -41,7 +41,7 @@ class XMLFile;
 /// %Console window with log history and command line prompt.
 class URHO3D_API Console : public Object
 {
-    OBJECT(Console, Object);
+    URHO3D_OBJECT(Console, Object);
 
 public:
     /// Construct.

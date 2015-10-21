@@ -33,7 +33,7 @@ class LuaScriptInstance;
 /// Lua script event invoker.
 class LuaScriptEventInvoker : public Object
 {
-    OBJECT(LuaScriptEventInvoker, Object);
+    URHO3D_OBJECT(LuaScriptEventInvoker, Object);
 
 public:
     /// Construct.

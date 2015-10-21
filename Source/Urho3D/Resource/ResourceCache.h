@@ -80,7 +80,7 @@ public:
 /// %Resource cache subsystem. Loads resources on demand and stores them for later access.
 class URHO3D_API ResourceCache : public Object
 {
-    OBJECT(ResourceCache, Object);
+    URHO3D_OBJECT(ResourceCache, Object);
 
 public:
     /// Construct.

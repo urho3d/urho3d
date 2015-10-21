@@ -104,7 +104,7 @@ struct URHO3D_API SourceBatch
 /// Base class for visible components.
 class URHO3D_API Drawable : public Component
 {
-    OBJECT(Drawable, Component);
+    URHO3D_OBJECT(Drawable, Component);
 
     friend class Octant;
     friend class Octree;

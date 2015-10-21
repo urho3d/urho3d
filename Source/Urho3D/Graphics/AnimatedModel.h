@@ -35,7 +35,7 @@ class AnimationState;
 /// Animated model component.
 class URHO3D_API AnimatedModel : public StaticModel
 {
-    OBJECT(AnimatedModel, StaticModel);
+    URHO3D_OBJECT(AnimatedModel, StaticModel);
 
     friend class AnimationState;
 

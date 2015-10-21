@@ -41,7 +41,7 @@ enum EmitterType2D
 /// 2D particle effect resource.
 class URHO3D_API ParticleEffect2D : public Resource
 {
-    OBJECT(ParticleEffect2D, Resource);
+    URHO3D_OBJECT(ParticleEffect2D, Resource);
 
 public:
     /// Construct.

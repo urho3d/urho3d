@@ -42,7 +42,7 @@ struct ReplicationState;
 /// Base class for objects with automatic serialization through attributes.
 class URHO3D_API Serializable : public Object
 {
-    OBJECT(Serializable, Object);
+    URHO3D_OBJECT(Serializable, Object);
 
 public:
     /// Construct.

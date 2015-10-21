@@ -102,7 +102,7 @@ template <> inline unsigned MakeHash(const TextureUnit& value)
 /// Describes how to render 3D geometries.
 class URHO3D_API Material : public Resource
 {
-    OBJECT(Material, Resource);
+    URHO3D_OBJECT(Material, Resource);
 
 public:
     /// Construct.

@@ -153,7 +153,7 @@ private:
 /// %Material technique. Consists of several passes.
 class URHO3D_API Technique : public Resource
 {
-    OBJECT(Technique, Resource);
+    URHO3D_OBJECT(Technique, Resource);
 
     friend class Renderer;
 

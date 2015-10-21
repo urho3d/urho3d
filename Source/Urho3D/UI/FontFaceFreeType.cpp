@@ -49,7 +49,7 @@ inline int RoundToPixels(FT_Pos value)
 /// FreeType library subsystem.
 class FreeTypeLibrary : public Object
 {
-    OBJECT(FreeTypeLibrary, Object);
+    URHO3D_OBJECT(FreeTypeLibrary, Object);
 
 public:
     /// Construct.
