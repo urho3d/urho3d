@@ -308,7 +308,7 @@ void ScriptInstance::AddEventHandler(StringHash eventType, const String& handler
         }
     }
 
-    SubscribeToEvent(eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*)method));
+    SubscribeToEvent(eventType, URHO3D_HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*)method));
 }
 
 void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const String& handlerName)
@@ -335,7 +335,7 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
         }
     }
 
-    SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*)method));
+    SubscribeToEvent(sender, eventType, URHO3D_HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*)method));
 }
 
 void ScriptInstance::RemoveEventHandler(StringHash eventType)

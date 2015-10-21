@@ -327,6 +327,6 @@ private:
 /// Convenience macro to construct an EventHandler that points to a receiver object and its member function.
 #define HANDLER(className, function) (new Urho3D::EventHandlerImpl<className>(this, &className::function))
 /// Convenience macro to construct an EventHandler that points to a receiver object and its member function, and also defines a userdata pointer.
-#define HANDLER_USERDATA(className, function, userData) (new Urho3D::EventHandlerImpl<className>(this, &className::function, userData))
+#define URHO3D_HANDLER_USERDATA(className, function, userData) (new Urho3D::EventHandlerImpl<className>(this, &className::function, userData))
 
 }
