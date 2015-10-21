@@ -45,34 +45,34 @@ URHO3D_EVENT(E_CONNECTFAILED, ConnectFailed)
 /// New client connection established.
 URHO3D_EVENT(E_CLIENTCONNECTED, ClientConnected)
 {
-    PARAM(P_CONNECTION, Connection);        // Connection pointer
+    URHO3D_PARAM(P_CONNECTION, Connection);        // Connection pointer
 }
 
 /// Client connection disconnected.
 URHO3D_EVENT(E_CLIENTDISCONNECTED, ClientDisconnected)
 {
-    PARAM(P_CONNECTION, Connection);        // Connection pointer
+    URHO3D_PARAM(P_CONNECTION, Connection);        // Connection pointer
 }
 
 /// Client has sent identity: identity map is in the event data.
 URHO3D_EVENT(E_CLIENTIDENTITY, ClientIdentity)
 {
-    PARAM(P_CONNECTION, Connection);        // Connection pointer
-    PARAM(P_ALLOW, Allow);                  // bool
+    URHO3D_PARAM(P_CONNECTION, Connection);        // Connection pointer
+    URHO3D_PARAM(P_ALLOW, Allow);                  // bool
 }
 
 /// Client has informed to have loaded the scene.
 URHO3D_EVENT(E_CLIENTSCENELOADED, ClientSceneLoaded)
 {
-    PARAM(P_CONNECTION, Connection);        // Connection pointer
+    URHO3D_PARAM(P_CONNECTION, Connection);        // Connection pointer
 }
 
 /// Unhandled network message received.
 URHO3D_EVENT(E_NETWORKMESSAGE, NetworkMessage)
 {
-    PARAM(P_CONNECTION, Connection);        // Connection pointer
-    PARAM(P_MESSAGEID, MessageID);          // int
-    PARAM(P_DATA, Data);                    // Buffer
+    URHO3D_PARAM(P_CONNECTION, Connection);        // Connection pointer
+    URHO3D_PARAM(P_MESSAGEID, MessageID);          // int
+    URHO3D_PARAM(P_DATA, Data);                    // Buffer
 }
 
 /// About to send network update on the client or server.
@@ -88,13 +88,13 @@ URHO3D_EVENT(E_NETWORKUPDATESENT, NetworkUpdateSent)
 /// Scene load failed, either due to file not found or checksum error.
 URHO3D_EVENT(E_NETWORKSCENELOADFAILED, NetworkSceneLoadFailed)
 {
-    PARAM(P_CONNECTION, Connection);      // Connection pointer
+    URHO3D_PARAM(P_CONNECTION, Connection);      // Connection pointer
 }
 
 /// Remote event: adds Connection parameter to the event data
 URHO3D_EVENT(E_REMOTEEVENTDATA, RemoteEventData)
 {
-    PARAM(P_CONNECTION, Connection);      // Connection pointer
+    URHO3D_PARAM(P_CONNECTION, Connection);      // Connection pointer
 }
 
 }

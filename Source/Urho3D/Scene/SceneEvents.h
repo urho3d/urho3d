@@ -30,29 +30,29 @@ namespace Urho3D
 /// Variable timestep scene update.
 URHO3D_EVENT(E_SCENEUPDATE, SceneUpdate)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Scene subsystem update.
 URHO3D_EVENT(E_SCENESUBSYSTEMUPDATE, SceneSubsystemUpdate)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Scene transform smoothing update.
 URHO3D_EVENT(E_UPDATESMOOTHING, UpdateSmoothing)
 {
-    PARAM(P_CONSTANT, Constant);            // float
-    PARAM(P_SQUAREDSNAPTHRESHOLD, SquaredSnapThreshold);  // float
+    URHO3D_PARAM(P_CONSTANT, Constant);            // float
+    URHO3D_PARAM(P_SQUAREDSNAPTHRESHOLD, SquaredSnapThreshold);  // float
 }
 
 /// Scene drawable update finished. Custom animation (eg. IK) can be done at this point.
 URHO3D_EVENT(E_SCENEDRAWABLEUPDATEFINISHED, SceneDrawableUpdateFinished)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// SmoothedTransform target position changed.
@@ -68,116 +68,116 @@ URHO3D_EVENT(E_TARGETROTATION, TargetRotationChanged)
 /// Scene attribute animation update.
 URHO3D_EVENT(E_ATTRIBUTEANIMATIONUPDATE, AttributeAnimationUpdate)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Attribute animation added to object animation.
 URHO3D_EVENT(E_ATTRIBUTEANIMATIONADDED, AttributeAnimationAdded)
 {
-    PARAM(P_OBJECTANIMATION, ObjectAnimation);               // Object animation pointer
-    PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String
+    URHO3D_PARAM(P_OBJECTANIMATION, ObjectAnimation);               // Object animation pointer
+    URHO3D_PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String
 }
 
 /// Attribute animation removed from object animation.
 URHO3D_EVENT(E_ATTRIBUTEANIMATIONREMOVED, AttributeAnimationRemoved)
 {
-    PARAM(P_OBJECTANIMATION, ObjectAnimation);               // Object animation pointer
-    PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String
+    URHO3D_PARAM(P_OBJECTANIMATION, ObjectAnimation);               // Object animation pointer
+    URHO3D_PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String
 }
 
 /// Variable timestep scene post-update.
 URHO3D_EVENT(E_SCENEPOSTUPDATE, ScenePostUpdate)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Asynchronous scene loading progress.
 URHO3D_EVENT(E_ASYNCLOADPROGRESS, AsyncLoadProgress)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_PROGRESS, Progress);            // float
-    PARAM(P_LOADEDNODES, LoadedNodes);      // int
-    PARAM(P_TOTALNODES, TotalNodes);        // int
-    PARAM(P_LOADEDRESOURCES, LoadedResources); // int
-    PARAM(P_TOTALRESOURCES, TotalResources);   // int
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_PROGRESS, Progress);            // float
+    URHO3D_PARAM(P_LOADEDNODES, LoadedNodes);      // int
+    URHO3D_PARAM(P_TOTALNODES, TotalNodes);        // int
+    URHO3D_PARAM(P_LOADEDRESOURCES, LoadedResources); // int
+    URHO3D_PARAM(P_TOTALRESOURCES, TotalResources);   // int
 };
 
 /// Asynchronous scene loading finished.
 URHO3D_EVENT(E_ASYNCLOADFINISHED, AsyncLoadFinished)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
 };
 
 /// A child node has been added to a parent node.
 URHO3D_EVENT(E_NODEADDED, NodeAdded)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_PARENT, Parent);                // Node pointer
-    PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_PARENT, Parent);                // Node pointer
+    URHO3D_PARAM(P_NODE, Node);                    // Node pointer
 }
 
 /// A child node is about to be removed from a parent node.
 URHO3D_EVENT(E_NODEREMOVED, NodeRemoved)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_PARENT, Parent);                // Node pointer
-    PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_PARENT, Parent);                // Node pointer
+    URHO3D_PARAM(P_NODE, Node);                    // Node pointer
 }
 
 /// A component has been created to a node.
 URHO3D_EVENT(E_COMPONENTADDED, ComponentAdded)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_NODE, Node);                    // Node pointer
-    PARAM(P_COMPONENT, Component);          // Component pointer
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_COMPONENT, Component);          // Component pointer
 }
 
 /// A component is about to be removed from a node.
 URHO3D_EVENT(E_COMPONENTREMOVED, ComponentRemoved)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_NODE, Node);                    // Node pointer
-    PARAM(P_COMPONENT, Component);          // Component pointer
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_COMPONENT, Component);          // Component pointer
 }
 
 /// A node's name has changed.
 URHO3D_EVENT(E_NODENAMECHANGED, NodeNameChanged)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_NODE, Node);                    // Node pointer
 }
 
 /// A node's enabled state has changed.
 URHO3D_EVENT(E_NODEENABLEDCHANGED, NodeEnabledChanged)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_NODE, Node);                    // Node pointer
 }
 
 /// A component's enabled state has changed.
 URHO3D_EVENT(E_COMPONENTENABLEDCHANGED, ComponentEnabledChanged)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_NODE, Node);                    // Node pointer
-    PARAM(P_COMPONENT, Component);          // Component pointer
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_COMPONENT, Component);          // Component pointer
 }
 
 /// A serializable's temporary state has changed.
 URHO3D_EVENT(E_TEMPORARYCHANGED, TemporaryChanged)
 {
-    PARAM(P_SERIALIZABLE, Serializable);    // Serializable pointer
+    URHO3D_PARAM(P_SERIALIZABLE, Serializable);    // Serializable pointer
 }
 
 /// A network attribute update from the server has been intercepted.
 URHO3D_EVENT(E_INTERCEPTNETWORKUPDATE, InterceptNetworkUpdate)
 {
-    PARAM(P_SERIALIZABLE, Serializable);    // Serializable pointer
-    PARAM(P_TIMESTAMP, TimeStamp);          // unsigned (0-255)
-    PARAM(P_INDEX, Index);                  // unsigned
-    PARAM(P_NAME, Name);                    // String
-    PARAM(P_VALUE, Value);                  // Variant
+    URHO3D_PARAM(P_SERIALIZABLE, Serializable);    // Serializable pointer
+    URHO3D_PARAM(P_TIMESTAMP, TimeStamp);          // unsigned (0-255)
+    URHO3D_PARAM(P_INDEX, Index);                  // unsigned
+    URHO3D_PARAM(P_NAME, Name);                    // String
+    URHO3D_PARAM(P_VALUE, Value);                  // Variant
 }
 
 }

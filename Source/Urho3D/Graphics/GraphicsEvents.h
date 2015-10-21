@@ -30,18 +30,18 @@ namespace Urho3D
 /// New screen mode set.
 URHO3D_EVENT(E_SCREENMODE, ScreenMode)
 {
-    PARAM(P_WIDTH, Width);                  // int
-    PARAM(P_HEIGHT, Height);                // int
-    PARAM(P_FULLSCREEN, Fullscreen);        // bool
-    PARAM(P_RESIZABLE, Resizable);          // bool
-    PARAM(P_BORDERLESS, Borderless);        // bool
+    URHO3D_PARAM(P_WIDTH, Width);                  // int
+    URHO3D_PARAM(P_HEIGHT, Height);                // int
+    URHO3D_PARAM(P_FULLSCREEN, Fullscreen);        // bool
+    URHO3D_PARAM(P_RESIZABLE, Resizable);          // bool
+    URHO3D_PARAM(P_BORDERLESS, Borderless);        // bool
 }
 
 /// Window position changed.
 URHO3D_EVENT(E_WINDOWPOS, WindowPos)
 {
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
 }
 
 /// Request for queuing autoupdated rendersurfaces.
@@ -62,41 +62,41 @@ URHO3D_EVENT(E_ENDRENDERING, EndRendering)
 /// Update of a view started.
 URHO3D_EVENT(E_BEGINVIEWUPDATE, BeginViewUpdate)
 {
-    PARAM(P_VIEW, View);                    // View pointer
-    PARAM(P_TEXTURE, Texture);              // Texture pointer
-    PARAM(P_SURFACE, Surface);              // RenderSurface pointer
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_CAMERA, Camera);                // Camera pointer
+    URHO3D_PARAM(P_VIEW, View);                    // View pointer
+    URHO3D_PARAM(P_TEXTURE, Texture);              // Texture pointer
+    URHO3D_PARAM(P_SURFACE, Surface);              // RenderSurface pointer
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_CAMERA, Camera);                // Camera pointer
 }
 
 /// Update of a view ended.
 URHO3D_EVENT(E_ENDVIEWUPDATE, EndViewUpdate)
 {
-    PARAM(P_VIEW, View);                    // View pointer
-    PARAM(P_TEXTURE, Texture);              // Texture pointer
-    PARAM(P_SURFACE, Surface);              // RenderSurface pointer
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_CAMERA, Camera);                // Camera pointer
+    URHO3D_PARAM(P_VIEW, View);                    // View pointer
+    URHO3D_PARAM(P_TEXTURE, Texture);              // Texture pointer
+    URHO3D_PARAM(P_SURFACE, Surface);              // RenderSurface pointer
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_CAMERA, Camera);                // Camera pointer
 }
 
 /// Render of a view started.
 URHO3D_EVENT(E_BEGINVIEWRENDER, BeginViewRender)
 {
-    PARAM(P_VIEW, View);                    // View pointer
-    PARAM(P_TEXTURE, Texture);              // Texture pointer
-    PARAM(P_SURFACE, Surface);              // RenderSurface pointer
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_CAMERA, Camera);                // Camera pointer
+    URHO3D_PARAM(P_VIEW, View);                    // View pointer
+    URHO3D_PARAM(P_TEXTURE, Texture);              // Texture pointer
+    URHO3D_PARAM(P_SURFACE, Surface);              // RenderSurface pointer
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_CAMERA, Camera);                // Camera pointer
 }
 
 /// Render of a view ended.
 URHO3D_EVENT(E_ENDVIEWRENDER, EndViewRender)
 {
-    PARAM(P_VIEW, View);                    // View pointer
-    PARAM(P_TEXTURE, Texture);              // Texture pointer
-    PARAM(P_SURFACE, Surface);              // RenderSurface pointer
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_CAMERA, Camera);                // Camera pointer
+    URHO3D_PARAM(P_VIEW, View);                    // View pointer
+    URHO3D_PARAM(P_TEXTURE, Texture);              // Texture pointer
+    URHO3D_PARAM(P_SURFACE, Surface);              // RenderSurface pointer
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_CAMERA, Camera);                // Camera pointer
 }
 
 /// Graphics context has been lost. Some or all (depending on the API) GPU objects have lost their contents.
