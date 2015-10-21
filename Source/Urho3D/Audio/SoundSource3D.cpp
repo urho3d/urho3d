@@ -118,8 +118,8 @@ void SoundSource3D::RegisterObject(Context* context)
 
     URHO3D_COPY_BASE_ATTRIBUTES(SoundSource);
     // Remove Attenuation and Panning as attribute as they are constantly being updated
-    REMOVE_ATTRIBUTE("Attenuation");
-    REMOVE_ATTRIBUTE("Panning");
+    URHO3D_REMOVE_ATTRIBUTE("Attenuation");
+    URHO3D_REMOVE_ATTRIBUTE("Panning");
     ATTRIBUTE("Near Distance", float, nearDistance_, DEFAULT_NEARDISTANCE, AM_DEFAULT);
     ATTRIBUTE("Far Distance", float, farDistance_, DEFAULT_FARDISTANCE, AM_DEFAULT);
     ATTRIBUTE("Inner Angle", float, innerAngle_, DEFAULT_ANGLE, AM_DEFAULT);
