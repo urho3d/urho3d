@@ -441,7 +441,7 @@ void CollisionShape::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Size", Vector3, size_, Vector3::ONE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Offset Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Offset Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
     URHO3D_ATTRIBUTE("LOD Level", int, lodLevel_, 0, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Collision Margin", float, margin_, DEFAULT_COLLISION_MARGIN, AM_DEFAULT);
     URHO3D_ATTRIBUTE("CustomGeometry ComponentID", unsigned, customGeometryID_, 0, AM_DEFAULT | AM_COMPONENTID);

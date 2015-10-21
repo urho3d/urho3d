@@ -85,7 +85,7 @@ void Zone::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Override Mode", bool, override_, false, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Ambient Gradient", bool, ambientGradient_, false, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Priority", int, priority_, 0, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr, ResourceRef,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr, ResourceRef,
         ResourceRef(TextureCube::GetTypeStatic()), AM_DEFAULT);
     URHO3D_ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Shadow Mask", int, shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);

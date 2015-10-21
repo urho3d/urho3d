@@ -158,7 +158,7 @@ void NavigationMesh::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Detail Sample Max Error", GetDetailSampleMaxError, SetDetailSampleMaxError, float,
         DEFAULT_DETAIL_SAMPLE_MAX_ERROR, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Bounding Box Padding", GetPadding, SetPadding, Vector3, Vector3::ONE, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Navigation Data", GetNavigationDataAttr, SetNavigationDataAttr, PODVector<unsigned char>,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Navigation Data", GetNavigationDataAttr, SetNavigationDataAttr, PODVector<unsigned char>,
         Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Partition Type", GetPartitionType, SetPartitionType, NavmeshPartitionType, navmeshPartitionTypeNames,
         NAVMESH_PARTITION_WATERSHED, AM_DEFAULT);
