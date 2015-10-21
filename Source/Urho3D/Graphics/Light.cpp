@@ -113,7 +113,7 @@ void Light::RegisterObject(Context* context)
     context->RegisterFactory<Light>(SCENE_CATEGORY);
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_SPECULARINTENSITY,
         AM_DEFAULT);

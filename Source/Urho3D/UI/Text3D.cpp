@@ -82,9 +82,9 @@ void Text3D::RegisterObject(Context* context)
     URHO3D_ENUM_ATTRIBUTE("Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_NONE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Width", GetWidth, SetWidth, int, 0, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment,
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment,
         horizontalAlignments, HA_LEFT, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments,
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments,
         VA_TOP, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Top Left Color", Color, text_.color_[0], Color::WHITE, AM_DEFAULT);

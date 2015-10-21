@@ -67,7 +67,7 @@ void ParticleEmitter2D::RegisterObject(Context* context)
         ResourceRef(ParticleEffect2D::GetTypeStatic()), AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Sprite ", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()),
         AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
 }
 
 void ParticleEmitter2D::OnSetEnabled()
