@@ -84,7 +84,7 @@ void LineEdit::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Is Text Selectable", IsTextSelectable, SetTextSelectable, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE("Is Text Copyable", IsTextCopyable, SetTextCopyable, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE("Cursor Blink Rate", GetCursorBlinkRate, SetCursorBlinkRate, float, 1.0f, AM_FILE);
-    ATTRIBUTE("Echo Character", int, echoCharacter_, 0, AM_FILE);
+    URHO3D_ATTRIBUTE("Echo Character", int, echoCharacter_, 0, AM_FILE);
 }
 
 void LineEdit::ApplyAttributes()
