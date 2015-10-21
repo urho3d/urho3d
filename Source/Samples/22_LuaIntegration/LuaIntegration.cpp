@@ -45,7 +45,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(LuaIntegration)
+URHO3D_DEFINE_APPLICATION_MAIN(LuaIntegration)
 
 LuaIntegration::LuaIntegration(Context* context) :
     Sample(context)

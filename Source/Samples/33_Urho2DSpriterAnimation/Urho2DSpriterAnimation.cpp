@@ -39,7 +39,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(Urho2DSpriterAnimation)
+URHO3D_DEFINE_APPLICATION_MAIN(Urho2DSpriterAnimation)
 
 Urho2DSpriterAnimation::Urho2DSpriterAnimation(Context* context) :
     Sample(context),

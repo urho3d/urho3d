@@ -51,7 +51,7 @@
 
 const float CAMERA_DISTANCE = 10.0f;
 
-DEFINE_APPLICATION_MAIN(VehicleDemo)
+URHO3D_DEFINE_APPLICATION_MAIN(VehicleDemo)
 
 VehicleDemo::VehicleDemo(Context* context) :
     Sample(context)

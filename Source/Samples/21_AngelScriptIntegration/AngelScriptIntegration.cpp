@@ -44,7 +44,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(AngelScriptIntegration)
+URHO3D_DEFINE_APPLICATION_MAIN(AngelScriptIntegration)
 
 AngelScriptIntegration::AngelScriptIntegration(Context* context) :
     Sample(context)

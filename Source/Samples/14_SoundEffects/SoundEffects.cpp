@@ -55,7 +55,7 @@ static String soundResourceNames[] = {
     "Sounds/Powerup.wav"
 };
 
-DEFINE_APPLICATION_MAIN(SoundEffects)
+URHO3D_DEFINE_APPLICATION_MAIN(SoundEffects)
 
 SoundEffects::SoundEffects(Context* context) :
     Sample(context)

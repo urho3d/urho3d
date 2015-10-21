@@ -42,7 +42,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(AnimatingScene)
+URHO3D_DEFINE_APPLICATION_MAIN(AnimatingScene)
 
 AnimatingScene::AnimatingScene(Context* context) :
     Sample(context)

@@ -47,7 +47,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(Water)
+URHO3D_DEFINE_APPLICATION_MAIN(Water)
 
 Water::Water(Context* context) :
     Sample(context)

@@ -34,7 +34,7 @@
 #include "DatabaseDemo.h"
 
 // Expands to this example's entry-point
-DEFINE_APPLICATION_MAIN(DatabaseDemo)
+URHO3D_DEFINE_APPLICATION_MAIN(DatabaseDemo)
 
 DatabaseDemo::DatabaseDemo(Context* context) :
     Sample(context),

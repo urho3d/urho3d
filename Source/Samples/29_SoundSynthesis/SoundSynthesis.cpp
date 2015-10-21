@@ -36,7 +36,7 @@
 #include <Urho3D/DebugNew.h>
 
 // Expands to this example's entry-point
-DEFINE_APPLICATION_MAIN(SoundSynthesis)
+URHO3D_DEFINE_APPLICATION_MAIN(SoundSynthesis)
 
 SoundSynthesis::SoundSynthesis(Context* context) :
     Sample(context),

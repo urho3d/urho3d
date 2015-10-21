@@ -35,7 +35,7 @@
 #include <Urho3D/DebugNew.h>
 
 // Expands to this example's entry-point
-DEFINE_APPLICATION_MAIN(ConsoleInput)
+URHO3D_DEFINE_APPLICATION_MAIN(ConsoleInput)
 
 // Hunger level descriptions
 String hungerLevels[] = {

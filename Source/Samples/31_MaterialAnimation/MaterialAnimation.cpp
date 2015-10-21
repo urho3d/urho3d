@@ -41,7 +41,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(MaterialAnimation)
+URHO3D_DEFINE_APPLICATION_MAIN(MaterialAnimation)
 
 MaterialAnimation::MaterialAnimation(Context* context) :
     Sample(context)

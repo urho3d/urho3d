@@ -46,7 +46,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(DynamicGeometry)
+URHO3D_DEFINE_APPLICATION_MAIN(DynamicGeometry)
 
 DynamicGeometry::DynamicGeometry(Context* context) :
     Sample(context),
