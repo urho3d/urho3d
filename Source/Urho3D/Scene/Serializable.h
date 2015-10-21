@@ -277,6 +277,6 @@ public:
 /// Define an attribute that uses get and set functions, where the get function returns by value, but the set function uses a reference.
 #define URHO3D_MIXED_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(GetVariantType<typeName >(), name, new Urho3D::AttributeAccessorImpl<ClassName, typeName, MixedAttributeTrait<typeName > >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
 /// Update the default value of an already registered attribute.
-#define UPDATE_ATTRIBUTE_DEFAULT_VALUE(name, defaultValue) context->UpdateAttributeDefaultValue<ClassName>(name, defaultValue)
+#define URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE(name, defaultValue) context->UpdateAttributeDefaultValue<ClassName>(name, defaultValue)
 
 }

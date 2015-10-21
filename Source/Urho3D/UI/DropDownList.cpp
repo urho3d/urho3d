@@ -74,7 +74,7 @@ void DropDownList::RegisterObject(Context* context)
     context->RegisterFactory<DropDownList>(UI_CATEGORY);
 
     URHO3D_COPY_BASE_ATTRIBUTES(Menu);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
     URHO3D_ACCESSOR_ATTRIBUTE("Selection", GetSelection, SetSelectionAttr, unsigned, 0, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Resize Popup", GetResizePopup, SetResizePopup, bool, false, AM_FILE);
 }

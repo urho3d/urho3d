@@ -82,7 +82,7 @@ void Text::RegisterObject(Context* context)
     context->RegisterFactory<Text>(UI_CATEGORY);
 
     URHO3D_COPY_BASE_ATTRIBUTES(UIElement);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Use Derived Opacity", false);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Use Derived Opacity", false);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
     URHO3D_ATTRIBUTE("Font Size", int, fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
     URHO3D_ATTRIBUTE("Text", String, text_, String::EMPTY, AM_FILE);

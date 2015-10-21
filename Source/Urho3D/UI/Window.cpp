@@ -66,9 +66,9 @@ void Window::RegisterObject(Context* context)
     context->RegisterFactory<Window>(UI_CATEGORY);
 
     URHO3D_COPY_BASE_ATTRIBUTES(BorderImage);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Bring To Front", true);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Bring To Front", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
     URHO3D_ACCESSOR_ATTRIBUTE("Resize Border", GetResizeBorder, SetResizeBorder, IntRect, IntRect(DEFAULT_RESIZE_BORDER, \
         DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER), AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Movable", IsMovable, SetMovable, bool, false, AM_FILE);

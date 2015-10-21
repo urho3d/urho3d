@@ -96,9 +96,9 @@ void ScrollView::RegisterObject(Context* context)
     context->RegisterFactory<ScrollView>(UI_CATEGORY);
 
     URHO3D_COPY_BASE_ATTRIBUTES(UIElement);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
     URHO3D_ACCESSOR_ATTRIBUTE("View Position", GetViewPosition, SetViewPositionAttr, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Scroll Step", GetScrollStep, SetScrollStep, float, 0.1f, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Page Step", GetPageStep, SetPageStep, float, 1.0f, AM_FILE);

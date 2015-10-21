@@ -76,9 +76,9 @@ void LineEdit::RegisterObject(Context* context)
     context->RegisterFactory<LineEdit>(UI_CATEGORY);
 
     URHO3D_COPY_BASE_ATTRIBUTES(BorderImage);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Length", GetMaxLength, SetMaxLength, unsigned, 0, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Cursor Movable", IsCursorMovable, SetCursorMovable, bool, true, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Text Selectable", IsTextSelectable, SetTextSelectable, bool, true, AM_FILE);
