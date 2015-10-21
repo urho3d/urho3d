@@ -285,7 +285,7 @@ bool ScriptFile::Execute(const String& declaration, const VariantVector& paramet
 
 bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& parameters, bool unprepare)
 {
-    PROFILE(ExecuteFunction);
+    URHO3D_PROFILE(ExecuteFunction);
 
     if (!compiled_ || !function)
         return false;
@@ -326,7 +326,7 @@ bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, con
 
 bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, bool unprepare)
 {
-    PROFILE(ExecuteMethod);
+    URHO3D_PROFILE(ExecuteMethod);
 
     if (!compiled_ || !object || !method)
         return false;
@@ -386,7 +386,7 @@ void ScriptFile::ClearDelayedExecute(const String& declaration)
 
 asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInterface)
 {
-    PROFILE(CreateObject);
+    URHO3D_PROFILE(CreateObject);
 
     if (!compiled_)
         return 0;

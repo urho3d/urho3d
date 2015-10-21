@@ -112,7 +112,7 @@ void Scene::RegisterObject(Context* context)
 
 bool Scene::Load(Deserializer& source, bool setInstanceDefault)
 {
-    PROFILE(LoadScene);
+    URHO3D_PROFILE(LoadScene);
 
     StopAsyncLoading();
 
@@ -139,7 +139,7 @@ bool Scene::Load(Deserializer& source, bool setInstanceDefault)
 
 bool Scene::Save(Serializer& dest) const
 {
-    PROFILE(SaveScene);
+    URHO3D_PROFILE(SaveScene);
 
     // Write ID first
     if (!dest.WriteFileID("USCN"))
@@ -163,7 +163,7 @@ bool Scene::Save(Serializer& dest) const
 
 bool Scene::LoadXML(const XMLElement& source, bool setInstanceDefault)
 {
-    PROFILE(LoadSceneXML);
+    URHO3D_PROFILE(LoadSceneXML);
 
     StopAsyncLoading();
 
@@ -198,7 +198,7 @@ void Scene::AddReplicationState(NodeReplicationState* state)
 
 bool Scene::LoadXML(Deserializer& source)
 {
-    PROFILE(LoadSceneXML);
+    URHO3D_PROFILE(LoadSceneXML);
 
     StopAsyncLoading();
 
@@ -221,7 +221,7 @@ bool Scene::LoadXML(Deserializer& source)
 
 bool Scene::SaveXML(Serializer& dest, const String& indentation) const
 {
-    PROFILE(SaveSceneXML);
+    URHO3D_PROFILE(SaveSceneXML);
 
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     XMLElement rootElem = xml->CreateRoot("scene");
@@ -282,7 +282,7 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
         // Preload resources if appropriate, then return to the original position for loading the scene content
         if (mode != LOAD_SCENE)
         {
-            PROFILE(FindResourcesToPreload);
+            URHO3D_PROFILE(FindResourcesToPreload);
 
             unsigned currentPos = file->GetPosition();
             PreloadResources(file, isSceneFile);
@@ -305,7 +305,7 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
     }
     else
     {
-        PROFILE(FindResourcesToPreload);
+        URHO3D_PROFILE(FindResourcesToPreload);
 
         LOGINFO("Preloading resources from " + file->GetName());
         PreloadResources(file, isSceneFile);
@@ -348,7 +348,7 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
         // Preload resources if appropriate
         if (mode != LOAD_SCENE)
         {
-            PROFILE(FindResourcesToPreload);
+            URHO3D_PROFILE(FindResourcesToPreload);
 
             PreloadResourcesXML(rootElement);
         }
@@ -374,7 +374,7 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
     }
     else
     {
-        PROFILE(FindResourcesToPreload);
+        URHO3D_PROFILE(FindResourcesToPreload);
 
         LOGINFO("Preloading resources from " + file->GetName());
         PreloadResourcesXML(xml->GetRoot());
@@ -395,7 +395,7 @@ void Scene::StopAsyncLoading()
 
 Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode)
 {
-    PROFILE(Instantiate);
+    URHO3D_PROFILE(Instantiate);
 
     SceneResolver resolver;
     unsigned nodeID = source.ReadUInt();
@@ -418,7 +418,7 @@ Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Qu
 
 Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, const Quaternion& rotation, CreateMode mode)
 {
-    PROFILE(InstantiateXML);
+    URHO3D_PROFILE(InstantiateXML);
 
     SceneResolver resolver;
     unsigned nodeID = source.GetUInt("id");
@@ -590,7 +590,7 @@ void Scene::Update(float timeStep)
             return;
     }
 
-    PROFILE(UpdateScene);
+    URHO3D_PROFILE(UpdateScene);
 
     timeStep *= timeScale_;
 
@@ -611,7 +611,7 @@ void Scene::Update(float timeStep)
 
     // Update transform smoothing
     {
-        PROFILE(UpdateSmoothing);
+        URHO3D_PROFILE(UpdateSmoothing);
 
         float constant = 1.0f - Clamp(powf(2.0f, -timeStep * smoothingConstant_), 0.0f, 1.0f);
         float squaredSnapThreshold = snapThreshold_ * snapThreshold_;
@@ -648,7 +648,7 @@ void Scene::EndThreadedUpdate()
 
     if (!delayedDirtyComponents_.Empty())
     {
-        PROFILE(EndThreadedUpdate);
+        URHO3D_PROFILE(EndThreadedUpdate);
 
         for (PODVector<Component*>::ConstIterator i = delayedDirtyComponents_.Begin(); i != delayedDirtyComponents_.End(); ++i)
             (*i)->OnMarkedDirty((*i)->GetNode());
@@ -984,7 +984,7 @@ void Scene::HandleResourceBackgroundLoaded(StringHash eventType, VariantMap& eve
 
 void Scene::UpdateAsyncLoading()
 {
-    PROFILE(UpdateAsyncLoading);
+    URHO3D_PROFILE(UpdateAsyncLoading);
 
     // If resources left to load, do not load nodes yet
     if (asyncProgress_.loadedResources_ < asyncProgress_.totalResources_)

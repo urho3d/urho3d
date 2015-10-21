@@ -387,7 +387,7 @@ void Graphics::SetWindowPosition(int x, int y)
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer,
     int multiSample)
 {
-    PROFILE(SetScreenMode);
+    URHO3D_PROFILE(SetScreenMode);
 
     bool maximize = false;
 
@@ -616,7 +616,7 @@ void Graphics::Close()
 
 bool Graphics::TakeScreenShot(Image& destImage)
 {
-    PROFILE(TakeScreenShot);
+    URHO3D_PROFILE(TakeScreenShot);
 
     if (!impl_->device_)
         return false;
@@ -756,7 +756,7 @@ bool Graphics::BeginFrame()
     HRESULT hr = impl_->device_->TestCooperativeLevel();
     if (hr != D3D_OK)
     {
-        PROFILE(DeviceLost);
+        URHO3D_PROFILE(DeviceLost);
 
         deviceLost_ = true;
 
@@ -797,7 +797,7 @@ void Graphics::EndFrame()
         return;
 
     {
-        PROFILE(Present);
+        URHO3D_PROFILE(Present);
 
         SendEvent(E_ENDRENDERING);
 
@@ -811,7 +811,7 @@ void Graphics::EndFrame()
     {
         if (queryIssued_)
         {
-            PROFILE(FlushGPU);
+            URHO3D_PROFILE(FlushGPU);
 
             while (impl_->frameQuery_->GetData(0, 0, D3DGETDATA_FLUSH) == S_FALSE)
             {
@@ -849,7 +849,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     if (!destination || !destination->GetRenderSurface())
         return false;
 
-    PROFILE(ResolveToTexture);
+    URHO3D_PROFILE(ResolveToTexture);
 
     IntRect vpCopy = viewport;
     if (vpCopy.right_ <= vpCopy.left_)
@@ -1053,7 +1053,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         {
             if (vs->GetCompilerOutput().Empty())
             {
-                PROFILE(CompileVertexShader);
+                URHO3D_PROFILE(CompileVertexShader);
 
                 bool success = vs->Create();
                 if (!success)
@@ -1083,7 +1083,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         {
             if (ps->GetCompilerOutput().Empty())
             {
-                PROFILE(CompilePixelShader);
+                URHO3D_PROFILE(CompilePixelShader);
 
                 bool success = ps->Create();
                 if (!success)
@@ -1868,7 +1868,7 @@ void Graphics::EndDumpShaders()
 
 void Graphics::PrecacheShaders(Deserializer& source)
 {
-    PROFILE(PrecacheShaders);
+    URHO3D_PROFILE(PrecacheShaders);
 
     ShaderPrecache::LoadShaders(this, source);
 }

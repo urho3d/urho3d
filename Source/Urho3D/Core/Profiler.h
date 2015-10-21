@@ -256,9 +256,9 @@ private:
 };
 
 #ifdef URHO3D_PROFILING
-#define PROFILE(name) Urho3D::AutoProfileBlock profile_ ## name (GetSubsystem<Urho3D::Profiler>(), #name)
+#define URHO3D_PROFILE(name) Urho3D::AutoProfileBlock profile_ ## name (GetSubsystem<Urho3D::Profiler>(), #name)
 #else
-#define PROFILE(name)
+#define URHO3D_PROFILE(name)
 #endif
 
 }

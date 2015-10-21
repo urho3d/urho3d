@@ -166,7 +166,7 @@ Script::~Script()
 bool Script::Execute(const String& line)
 {
     // Note: compiling code each time is slow. Not to be used for performance-critical or repeating activity
-    PROFILE(ExecuteImmediate);
+    URHO3D_PROFILE(ExecuteImmediate);
 
     ClearObjectTypeCache();
 

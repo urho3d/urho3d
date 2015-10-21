@@ -786,7 +786,7 @@ void View::GetDrawables()
     if (!octree_ || !cullCamera_)
         return;
 
-    PROFILE(GetDrawables);
+    URHO3D_PROFILE(GetDrawables);
 
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     PODVector<Drawable*>& tempDrawables = tempDrawables_[0];
@@ -852,7 +852,7 @@ void View::GetDrawables()
         UpdateOccluders(occluders_, cullCamera_);
         if (occluders_.Size())
         {
-            PROFILE(DrawOcclusion);
+            URHO3D_PROFILE(DrawOcclusion);
 
             occlusionBuffer_ = renderer_->GetOcclusionBuffer(cullCamera_);
             DrawOccluders(occlusionBuffer_, occluders_);
@@ -969,7 +969,7 @@ void View::GetBatches()
 void View::ProcessLights()
 {
     // Process lit geometries and shadow casters for each light
-    PROFILE(ProcessLights);
+    URHO3D_PROFILE(ProcessLights);
 
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     lightQueryResults_.Resize(lights_.Size());
@@ -998,7 +998,7 @@ void View::GetLightBatches()
 
     // Build light queues and lit batches
     {
-        PROFILE(GetLightBatches);
+        URHO3D_PROFILE(GetLightBatches);
 
         // Preallocate light queues: per-pixel lights which have lit geometries
         unsigned numLightQueues = 0;
@@ -1151,7 +1151,7 @@ void View::GetLightBatches()
     // Process drawables with limited per-pixel light count
     if (maxLightsDrawables_.Size())
     {
-        PROFILE(GetMaxLightsBatches);
+        URHO3D_PROFILE(GetMaxLightsBatches);
 
         for (HashSet<Drawable*>::Iterator i = maxLightsDrawables_.Begin(); i != maxLightsDrawables_.End(); ++i)
         {
@@ -1173,7 +1173,7 @@ void View::GetLightBatches()
 
 void View::GetBaseBatches()
 {
-    PROFILE(GetBaseBatches);
+    URHO3D_PROFILE(GetBaseBatches);
 
     for (PODVector<Drawable*>::ConstIterator i = geometries_.Begin(); i != geometries_.End(); ++i)
     {
@@ -1268,7 +1268,7 @@ void View::UpdateGeometries()
         return;
     }
 
-    PROFILE(SortAndUpdateGeometry);
+    URHO3D_PROFILE(SortAndUpdateGeometry);
 
     WorkQueue* queue = GetSubsystem<WorkQueue>();
 
@@ -1436,7 +1436,7 @@ void View::ExecuteRenderPathCommands()
     // If not reusing shadowmaps, render all of them first
     if (!renderer_->GetReuseShadowMaps() && renderer_->GetDrawShadows() && !actualView->lightQueues_.Empty())
     {
-        PROFILE(RenderShadowMaps);
+        URHO3D_PROFILE(RenderShadowMaps);
 
         for (Vector<LightBatchQueue>::Iterator i = actualView->lightQueues_.Begin(); i != actualView->lightQueues_.End(); ++i)
         {
@@ -1446,7 +1446,7 @@ void View::ExecuteRenderPathCommands()
     }
 
     {
-        PROFILE(ExecuteRenderPath);
+        URHO3D_PROFILE(ExecuteRenderPath);
 
         // Set for safety in case of empty renderpath
         currentRenderTarget_ = substituteRenderTarget_ ? substituteRenderTarget_ : renderTarget_;
@@ -1546,7 +1546,7 @@ void View::ExecuteRenderPathCommands()
             {
             case CMD_CLEAR:
                 {
-                    PROFILE(ClearRenderTarget);
+                    URHO3D_PROFILE(ClearRenderTarget);
 
                     Color clearColor = command.clearColor_;
                     if (command.useFogColor_)
@@ -1562,7 +1562,7 @@ void View::ExecuteRenderPathCommands()
                     BatchQueue& queue = actualView->batchQueues_[command.passIndex_];
                     if (!queue.IsEmpty())
                     {
-                        PROFILE(RenderScenePass);
+                        URHO3D_PROFILE(RenderScenePass);
 
                         SetRenderTargets(command);
                         bool allowDepthWrite = SetTextures(command);
@@ -1575,7 +1575,7 @@ void View::ExecuteRenderPathCommands()
 
             case CMD_QUAD:
                 {
-                    PROFILE(RenderQuad);
+                    URHO3D_PROFILE(RenderQuad);
 
                     SetRenderTargets(command);
                     SetTextures(command);
@@ -1587,7 +1587,7 @@ void View::ExecuteRenderPathCommands()
                 // Render shadow maps + opaque objects' additive lighting
                 if (!actualView->lightQueues_.Empty())
                 {
-                    PROFILE(RenderLights);
+                    URHO3D_PROFILE(RenderLights);
 
                     SetRenderTargets(command);
 
@@ -1626,7 +1626,7 @@ void View::ExecuteRenderPathCommands()
                 // Render shadow maps + light volumes
                 if (!actualView->lightQueues_.Empty())
                 {
-                    PROFILE(RenderLightVolumes);
+                    URHO3D_PROFILE(RenderLightVolumes);
 
                     SetRenderTargets(command);
                     for (Vector<LightBatchQueue>::Iterator i = actualView->lightQueues_.Begin(); i != actualView->lightQueues_.End(); ++i)
@@ -2044,7 +2044,7 @@ void View::BlitFramebuffer(Texture* source, RenderSurface* destination, bool dep
     if (!source)
         return;
 
-    PROFILE(BlitFramebuffer);
+    URHO3D_PROFILE(BlitFramebuffer);
 
     // If blitting to the destination rendertarget, use the actual viewport. Intermediate textures on the other hand
     // are always viewport-sized
@@ -2830,7 +2830,7 @@ void View::PrepareInstancingBuffer()
         return;
     }
 
-    PROFILE(PrepareInstancingBuffer);
+    URHO3D_PROFILE(PrepareInstancingBuffer);
 
     unsigned totalInstances = 0;
 
@@ -2918,7 +2918,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
 
 void View::RenderShadowMap(const LightBatchQueue& queue)
 {
-    PROFILE(RenderShadowMap);
+    URHO3D_PROFILE(RenderShadowMap);
 
     Texture2D* shadowMap = queue.shadowMap_;
     graphics_->SetTexture(TU_SHADOWMAP, 0);

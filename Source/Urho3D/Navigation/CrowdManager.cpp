@@ -641,7 +641,7 @@ void CrowdManager::OnSceneSet(Scene* scene)
 void CrowdManager::Update(float delta)
 {
     assert(crowd_ && navigationMesh_);
-    PROFILE(UpdateCrowd);
+    URHO3D_PROFILE(UpdateCrowd);
     crowd_->update(delta, 0);
 }
 

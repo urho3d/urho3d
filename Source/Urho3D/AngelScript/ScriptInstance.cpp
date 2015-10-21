@@ -519,7 +519,7 @@ void ScriptInstance::CreateObject()
     if (!scriptFile_ || className_.Empty())
         return;
 
-    PROFILE(CreateScriptObject);
+    URHO3D_PROFILE(CreateScriptObject);
 
     scriptObject_ = scriptFile_->CreateObject(className_);
     if (scriptObject_)

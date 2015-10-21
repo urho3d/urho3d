@@ -293,7 +293,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive, float normalCutoff,
     unsigned subGeometry)
 {
-    PROFILE(AddDecal);
+    URHO3D_PROFILE(AddDecal);
 
     // Do not add decals in headless mode
     if (!node_ || !GetSubsystem<Graphics>())

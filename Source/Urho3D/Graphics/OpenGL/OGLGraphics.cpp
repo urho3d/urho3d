@@ -322,7 +322,7 @@ void Graphics::SetWindowPosition(int x, int y)
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer,
     int multiSample)
 {
-    PROFILE(SetScreenMode);
+    URHO3D_PROFILE(SetScreenMode);
 
     bool maximize = false;
 
@@ -615,7 +615,7 @@ void Graphics::Close()
 
 bool Graphics::TakeScreenShot(Image& destImage)
 {
-    PROFILE(TakeScreenShot);
+    URHO3D_PROFILE(TakeScreenShot);
 
     ResetRenderTargets();
 
@@ -666,7 +666,7 @@ void Graphics::EndFrame()
     if (!IsInitialized())
         return;
 
-    PROFILE(Present);
+    URHO3D_PROFILE(Present);
 
     SendEvent(E_ENDRENDERING);
 
@@ -733,7 +733,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     if (!destination || !destination->GetRenderSurface())
         return false;
 
-    PROFILE(ResolveToTexture);
+    URHO3D_PROFILE(ResolveToTexture);
 
     IntRect vpCopy = viewport;
     if (vpCopy.right_ <= vpCopy.left_)
@@ -961,7 +961,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     {
         if (vs->GetCompilerOutput().Empty())
         {
-            PROFILE(CompileVertexShader);
+            URHO3D_PROFILE(CompileVertexShader);
 
             bool success = vs->Create();
             if (success)
@@ -980,7 +980,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     {
         if (ps->GetCompilerOutput().Empty())
         {
-            PROFILE(CompilePixelShader);
+            URHO3D_PROFILE(CompilePixelShader);
 
             bool success = ps->Create();
             if (success)
@@ -1027,7 +1027,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         else
         {
             // Link a new combination
-            PROFILE(LinkShaders);
+            URHO3D_PROFILE(LinkShaders);
 
             SharedPtr<ShaderProgram> newProgram(new ShaderProgram(this, vs, ps));
             if (newProgram->Link())
@@ -1914,7 +1914,7 @@ void Graphics::EndDumpShaders()
 
 void Graphics::PrecacheShaders(Deserializer& source)
 {
-    PROFILE(PrecacheShaders);
+    URHO3D_PROFILE(PrecacheShaders);
 
     ShaderPrecache::LoadShaders(this, source);
 }

@@ -205,7 +205,7 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
 
 bool Network::Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity)
 {
-    PROFILE(Connect);
+    URHO3D_PROFILE(Connect);
 
     // If a previous connection already exists, disconnect it and wait for some time for the connection to terminate
     if (serverConnection_)
@@ -239,7 +239,7 @@ void Network::Disconnect(int waitMSec)
     if (!serverConnection_)
         return;
 
-    PROFILE(Disconnect);
+    URHO3D_PROFILE(Disconnect);
     serverConnection_->Disconnect(waitMSec);
 }
 
@@ -248,7 +248,7 @@ bool Network::StartServer(unsigned short port)
     if (IsServerRunning())
         return true;
 
-    PROFILE(StartServer);
+    URHO3D_PROFILE(StartServer);
 
     if (network_->StartServer(port, kNet::SocketOverUDP, this, true) != 0)
     {
@@ -267,7 +267,7 @@ void Network::StopServer()
     if (!IsServerRunning())
         return;
 
-    PROFILE(StopServer);
+    URHO3D_PROFILE(StopServer);
 
     clientConnections_.Clear();
     network_->StopServer();
@@ -404,7 +404,7 @@ void Network::SendPackageToClients(Scene* scene, PackageFile* package)
 SharedPtr<HttpRequest> Network::MakeHttpRequest(const String& url, const String& verb, const Vector<String>& headers,
     const String& postData)
 {
-    PROFILE(MakeHttpRequest);
+    URHO3D_PROFILE(MakeHttpRequest);
 
     // The initialization of the request will take time, can not know at this point if it has an error or not
     SharedPtr<HttpRequest> request(new HttpRequest(url, verb, headers, postData));
@@ -452,7 +452,7 @@ bool Network::CheckRemoteEvent(StringHash eventType) const
 
 void Network::Update(float timeStep)
 {
-    PROFILE(UpdateNetwork);
+    URHO3D_PROFILE(UpdateNetwork);
 
     // Process server connection if it exists
     if (serverConnection_)
@@ -483,7 +483,7 @@ void Network::Update(float timeStep)
 
 void Network::PostUpdate(float timeStep)
 {
-    PROFILE(PostUpdateNetwork);
+    URHO3D_PROFILE(PostUpdateNetwork);
 
     // Check if periodic update should happen now
     updateAcc_ += timeStep;
@@ -499,7 +499,7 @@ void Network::PostUpdate(float timeStep)
         {
             // Collect and prepare all networked scenes
             {
-                PROFILE(PrepareServerUpdate);
+                URHO3D_PROFILE(PrepareServerUpdate);
 
                 networkScenes_.Clear();
                 for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
@@ -515,7 +515,7 @@ void Network::PostUpdate(float timeStep)
             }
 
             {
-                PROFILE(SendServerUpdate);
+                URHO3D_PROFILE(SendServerUpdate);
 
                 // Then send server updates for each client connection
                 for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();

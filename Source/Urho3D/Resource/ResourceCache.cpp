@@ -1027,7 +1027,7 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
     // Check for background loaded resources that can be finished
 #ifdef URHO3D_THREADING
     {
-        PROFILE(FinishBackgroundResources);
+        URHO3D_PROFILE(FinishBackgroundResources);
         backgroundLoader_->FinishResources(finishBackgroundResourcesMs_);
     }
 #endif

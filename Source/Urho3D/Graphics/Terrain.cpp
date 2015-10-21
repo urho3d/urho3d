@@ -491,7 +491,7 @@ IntVector2 Terrain::WorldToHeightMap(const Vector3& worldPosition) const
 
 void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 {
-    PROFILE(CreatePatchGeometry);
+    URHO3D_PROFILE(CreatePatchGeometry);
 
     unsigned row = (unsigned)(patchSize_ + 1);
     VertexBuffer* vertexBuffer = patch->GetVertexBuffer();
@@ -693,7 +693,7 @@ void Terrain::CreateGeometry()
     if (!node_)
         return;
 
-    PROFILE(CreateTerrainGeometry);
+    URHO3D_PROFILE(CreateTerrainGeometry);
 
     unsigned prevNumPatches = patches_.Size();
 
@@ -749,7 +749,7 @@ void Terrain::CreateGeometry()
     // Remove old patch nodes which are not needed
     if (updateAll)
     {
-        PROFILE(RemoveOldPatches);
+        URHO3D_PROFILE(RemoveOldPatches);
 
         PODVector<Node*> oldPatchNodes;
         node_->GetChildrenWithComponent<TerrainPatch>(oldPatchNodes);
@@ -788,7 +788,7 @@ void Terrain::CreateGeometry()
 
         if (imgComps == 1)
         {
-            PROFILE(CopyHeightData);
+            URHO3D_PROFILE(CopyHeightData);
 
             for (int z = 0; z < numVertices_.y_; ++z)
             {
@@ -813,7 +813,7 @@ void Terrain::CreateGeometry()
         }
         else
         {
-            PROFILE(CopyHeightData);
+            URHO3D_PROFILE(CopyHeightData);
 
             // If more than 1 component, use the green channel for more accuracy
             for (int z = 0; z < numVertices_.y_; ++z)
@@ -865,7 +865,7 @@ void Terrain::CreateGeometry()
         bool enabled = IsEnabledEffective();
 
         {
-            PROFILE(CreatePatches);
+            URHO3D_PROFILE(CreatePatches);
 
             // Create patches and set node transforms
             for (int z = 0; z < numPatches_.y_; ++z)
@@ -921,7 +921,7 @@ void Terrain::CreateGeometry()
         // Create vertex data for patches. First update smoothing to ensure normals are calculated correctly across patch borders
         if (smoothing_)
         {
-            PROFILE(UpdateSmoothing);
+            URHO3D_PROFILE(UpdateSmoothing);
 
             for (unsigned i = 0; i < patches_.Size(); ++i)
             {
@@ -978,7 +978,7 @@ void Terrain::CreateGeometry()
 
 void Terrain::CreateIndexData()
 {
-    PROFILE(CreateIndexData);
+    URHO3D_PROFILE(CreateIndexData);
 
     PODVector<unsigned short> indices;
     drawRanges_.Clear();
@@ -1207,7 +1207,7 @@ Vector3 Terrain::GetRawNormal(int x, int z) const
 
 void Terrain::CalculateLodErrors(TerrainPatch* patch)
 {
-    PROFILE(CalculateLodErrors);
+    URHO3D_PROFILE(CalculateLodErrors);
 
     const IntVector2& coords = patch->GetCoordinates();
     PODVector<float>& lodErrors = patch->GetLodErrors();

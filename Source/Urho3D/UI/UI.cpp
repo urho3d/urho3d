@@ -299,7 +299,7 @@ void UI::Update(float timeStep)
 {
     assert(rootElement_ && rootModalElement_);
 
-    PROFILE(UpdateUI);
+    URHO3D_PROFILE(UpdateUI);
 
     // Expire hovers
     for (HashMap<WeakPtr<UIElement>, bool>::Iterator i = hoveredElements_.Begin(); i != hoveredElements_.End(); ++i)
@@ -393,7 +393,7 @@ void UI::RenderUpdate()
 {
     assert(rootElement_ && rootModalElement_ && graphics_);
 
-    PROFILE(GetUIBatches);
+    URHO3D_PROFILE(GetUIBatches);
 
     uiRendered_ = false;
 
@@ -429,7 +429,7 @@ void UI::Render(bool resetRenderTargets)
     if (resetRenderTargets && uiRendered_)
         return;
 
-    PROFILE(RenderUI);
+    URHO3D_PROFILE(RenderUI);
 
     // If the OS cursor is visible, apply its shape now if changed
     bool osCursorVisible = GetSubsystem<Input>()->IsMouseVisible();
@@ -473,7 +473,7 @@ SharedPtr<UIElement> UI::LoadLayout(Deserializer& source, XMLFile* styleFile)
 
 SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
 {
-    PROFILE(LoadUILayout);
+    URHO3D_PROFILE(LoadUILayout);
 
     SharedPtr<UIElement> root;
 
@@ -516,7 +516,7 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
 
 bool UI::SaveLayout(Serializer& dest, UIElement* element)
 {
-    PROFILE(SaveUILayout);
+    URHO3D_PROFILE(SaveUILayout);
 
     return element && element->SaveXML(dest);
 }
@@ -693,7 +693,7 @@ void UI::Initialize()
     if (!graphics || !graphics->IsInitialized())
         return;
 
-    PROFILE(InitUI);
+    URHO3D_PROFILE(InitUI);
 
     graphics_ = graphics;
     UIBatch::posAdjust = Vector3(Graphics::GetPixelUVOffset(), 0.0f);

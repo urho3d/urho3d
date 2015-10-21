@@ -890,7 +890,7 @@ Node* Node::Clone(CreateMode mode)
         return 0;
     }
 
-    PROFILE(CloneNode);
+    URHO3D_PROFILE(CloneNode);
 
     SceneResolver resolver;
     Node* clone = CloneRecursive(parent_, resolver, mode);

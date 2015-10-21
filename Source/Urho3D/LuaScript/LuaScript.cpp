@@ -220,7 +220,7 @@ void LuaScript::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
 
 bool LuaScript::ExecuteFile(const String& fileName)
 {
-    PROFILE(ExecuteFile);
+    URHO3D_PROFILE(ExecuteFile);
 
 #ifdef URHO3D_LUA_RAW_SCRIPT_LOADER
     if (ExecuteRawFile(fileName))
@@ -234,7 +234,7 @@ bool LuaScript::ExecuteFile(const String& fileName)
 
 bool LuaScript::ExecuteString(const String& string)
 {
-    PROFILE(ExecuteString);
+    URHO3D_PROFILE(ExecuteString);
 
     if (luaL_dostring(luaState_, string.CString()))
     {
@@ -249,7 +249,7 @@ bool LuaScript::ExecuteString(const String& string)
 
 bool LuaScript::LoadRawFile(const String& fileName)
 {
-    PROFILE(LoadRawFile);
+    URHO3D_PROFILE(LoadRawFile);
 
     LOGINFO("Finding Lua file on file system: " + fileName);
 
@@ -281,7 +281,7 @@ bool LuaScript::LoadRawFile(const String& fileName)
 
 bool LuaScript::ExecuteRawFile(const String& fileName)
 {
-    PROFILE(ExecuteRawFile);
+    URHO3D_PROFILE(ExecuteRawFile);
 
     if (!LoadRawFile(fileName))
         return false;
@@ -459,7 +459,7 @@ void LuaScript::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 
     // Collect garbage
     {
-        PROFILE(LuaCollectGarbage);
+        URHO3D_PROFILE(LuaCollectGarbage);
         lua_gc(luaState_, LUA_GCCOLLECT, 0);
     }
 }

@@ -333,7 +333,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
 
     frame_ = static_cast<View*>(eventData[P_VIEW].GetPtr())->GetFrameInfo();
 
-    PROFILE(UpdateRenderer2D);
+    URHO3D_PROFILE(UpdateRenderer2D);
 
     Camera* camera = static_cast<Camera*>(eventData[P_CAMERA].GetPtr());
     frustum_ = &camera->GetFrustum();
@@ -347,7 +347,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
 
     // Check visibility
     {
-        PROFILE(CheckDrawableVisibility);
+        URHO3D_PROFILE(CheckDrawableVisibility);
 
         WorkQueue* queue = GetSubsystem<WorkQueue>();
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread

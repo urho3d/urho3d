@@ -328,7 +328,7 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
 
 bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data)
 {
-    PROFILE(SetTextureData);
+    URHO3D_PROFILE(SetTextureData);
 
     if (!object_)
     {

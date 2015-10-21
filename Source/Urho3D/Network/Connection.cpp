@@ -300,7 +300,7 @@ void Connection::SendRemoteEvents()
     if (remoteEvents_.Empty())
         return;
 
-    PROFILE(SendRemoteEvents);
+    URHO3D_PROFILE(SendRemoteEvents);
 
     for (Vector<RemoteEvent>::ConstIterator i = remoteEvents_.Begin(); i != remoteEvents_.End(); ++i)
     {

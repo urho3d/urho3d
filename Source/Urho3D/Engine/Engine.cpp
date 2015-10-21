@@ -157,7 +157,7 @@ bool Engine::Initialize(const VariantMap& parameters)
     if (initialized_)
         return true;
 
-    PROFILE(InitEngine);
+    URHO3D_PROFILE(InitEngine);
 
     // Set headless mode
     headless_ = GetParameter(parameters, "Headless", false).GetBool();
@@ -634,7 +634,7 @@ void Engine::DumpMemory()
 
 void Engine::Update()
 {
-    PROFILE(Update);
+    URHO3D_PROFILE(Update);
 
     // Logic update event
     using namespace Update;
@@ -658,7 +658,7 @@ void Engine::Render()
     if (headless_)
         return;
 
-    PROFILE(Render);
+    URHO3D_PROFILE(Render);
 
     // If device is lost, BeginFrame will fail and we skip rendering
     Graphics* graphics = GetSubsystem<Graphics>();
@@ -686,7 +686,7 @@ void Engine::ApplyFrameLimit()
     // Perform waiting loop if maximum FPS set
     if (maxFps)
     {
-        PROFILE(ApplyFrameLimit);
+        URHO3D_PROFILE(ApplyFrameLimit);
 
         long long targetMax = 1000000LL / maxFps;
 

@@ -319,7 +319,7 @@ void DynamicGeometry::MoveCamera(float timeStep)
 
 void DynamicGeometry::AnimateObjects(float timeStep)
 {
-    PROFILE(AnimateObjects);
+    URHO3D_PROFILE(AnimateObjects);
 
     time_ += timeStep * 100.0f;
 

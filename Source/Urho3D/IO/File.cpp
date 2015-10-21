@@ -466,7 +466,7 @@ unsigned File::GetChecksum()
 #endif
         return 0;
 
-    PROFILE(CalculateFileChecksum);
+    URHO3D_PROFILE(CalculateFileChecksum);
 
     unsigned oldPos = position_;
     checksum_ = 0;

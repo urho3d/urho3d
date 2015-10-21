@@ -242,7 +242,7 @@ bool Texture3D::SetSize(int width, int height, int depth, unsigned format, Textu
 
 bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data)
 {
-    PROFILE(SetTextureData);
+    URHO3D_PROFILE(SetTextureData);
 
     if (!object_ || !graphics_)
     {

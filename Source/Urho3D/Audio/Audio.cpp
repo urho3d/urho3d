@@ -141,7 +141,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
 
 void Audio::Update(float timeStep)
 {
-    PROFILE(UpdateAudio);
+    URHO3D_PROFILE(UpdateAudio);
 
     // Update in reverse order, because sound sources might remove themselves
     for (unsigned i = soundSources_.Size() - 1; i < soundSources_.Size(); --i)

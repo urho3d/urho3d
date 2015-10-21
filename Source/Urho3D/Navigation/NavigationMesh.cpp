@@ -338,7 +338,7 @@ void NavigationMesh::SetPadding(const Vector3& padding)
 
 bool NavigationMesh::Build()
 {
-    PROFILE(BuildNavigationMesh);
+    URHO3D_PROFILE(BuildNavigationMesh);
 
     // Release existing navigation data and zero the bounding box
     ReleaseNavigationMesh();
@@ -364,7 +364,7 @@ bool NavigationMesh::Build()
     boundingBox_.max_ += padding_;
 
     {
-        PROFILE(BuildNavigationMesh);
+        URHO3D_PROFILE(BuildNavigationMesh);
 
         // Calculate number of tiles
         int gridW = 0, gridH = 0;
@@ -435,7 +435,7 @@ bool NavigationMesh::Build()
 
 bool NavigationMesh::Build(const BoundingBox& boundingBox)
 {
-    PROFILE(BuildPartialNavigationMesh);
+    URHO3D_PROFILE(BuildPartialNavigationMesh);
 
     if (!node_)
         return false;
@@ -525,7 +525,7 @@ Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& en
 void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents,
     const dtQueryFilter* filter)
 {
-    PROFILE(FindPath);
+    URHO3D_PROFILE(FindPath);
 
     dest.Clear();
 
@@ -813,7 +813,7 @@ PODVector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
 
 void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryList)
 {
-    PROFILE(CollectNavigationGeometry);
+    URHO3D_PROFILE(CollectNavigationGeometry);
 
     // Get Navigable components from child nodes, not from whole scene. This makes it possible to partition
     // the scene into several navigation meshes
@@ -1112,7 +1112,7 @@ void NavigationMesh::AddTriMeshGeometry(NavBuildData* build, Geometry* geometry,
 
 bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int x, int z)
 {
-    PROFILE(BuildNavigationMeshTile);
+    URHO3D_PROFILE(BuildNavigationMeshTile);
 
     // Remove previous tile (if any)
     navMesh_->removeTile(navMesh_->getTileRefAt(x, z, 0), 0, 0);

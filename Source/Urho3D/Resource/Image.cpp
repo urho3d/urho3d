@@ -426,7 +426,7 @@ bool Image::BeginLoad(Deserializer& source)
         // If uncompressed DDS, convert the data to 8bit RGBA as the texture classes can not currently use eg. RGB565 format
         if (compressedFormat_ == CF_RGBA)
         {
-            PROFILE(ConvertDDSToRGBA);
+            URHO3D_PROFILE(ConvertDDSToRGBA);
 
             SharedPtr<Image> currentImage(this);
             while (currentImage.NotNull())
@@ -752,7 +752,7 @@ bool Image::BeginLoad(Deserializer& source)
 
 bool Image::Save(Serializer& dest) const
 {
-    PROFILE(SaveImage);
+    URHO3D_PROFILE(SaveImage);
 
     if (IsCompressed())
     {
@@ -1041,7 +1041,7 @@ bool Image::FlipVertical()
 
 bool Image::Resize(int width, int height)
 {
-    PROFILE(ResizeImage);
+    URHO3D_PROFILE(ResizeImage);
 
     if (IsCompressed())
     {
@@ -1103,7 +1103,7 @@ void Image::Clear(const Color& color)
 
 void Image::ClearInt(unsigned uintColor)
 {
-    PROFILE(ClearImage);
+    URHO3D_PROFILE(ClearImage);
 
     if (!data_)
         return;
@@ -1121,7 +1121,7 @@ void Image::ClearInt(unsigned uintColor)
 
 bool Image::SaveBMP(const String& fileName) const
 {
-    PROFILE(SaveImageBMP);
+    URHO3D_PROFILE(SaveImageBMP);
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
@@ -1144,7 +1144,7 @@ bool Image::SaveBMP(const String& fileName) const
 
 bool Image::SavePNG(const String& fileName) const
 {
-    PROFILE(SaveImagePNG);
+    URHO3D_PROFILE(SaveImagePNG);
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
@@ -1167,7 +1167,7 @@ bool Image::SavePNG(const String& fileName) const
 
 bool Image::SaveTGA(const String& fileName) const
 {
-    PROFILE(SaveImageTGA);
+    URHO3D_PROFILE(SaveImageTGA);
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
@@ -1190,7 +1190,7 @@ bool Image::SaveTGA(const String& fileName) const
 
 bool Image::SaveJPG(const String& fileName, int quality) const
 {
-    PROFILE(SaveImageJPG);
+    URHO3D_PROFILE(SaveImageJPG);
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
@@ -1343,7 +1343,7 @@ SharedPtr<Image> Image::GetNextLevel() const
     if (nextLevel_)
         return nextLevel_;
 
-    PROFILE(CalculateImageMipLevel);
+    URHO3D_PROFILE(CalculateImageMipLevel);
 
     int widthOut = width_ / 2;
     int heightOut = height_ / 2;
@@ -2012,7 +2012,7 @@ void Image::PrecalculateLevels()
     if (!data_ || IsCompressed())
         return;
 
-    PROFILE(PrecalculateImageMipLevels);
+    URHO3D_PROFILE(PrecalculateImageMipLevels);
 
     nextLevel_.Reset();
 

@@ -250,7 +250,7 @@ void Input::Update()
 {
     assert(initialized_);
 
-    PROFILE(UpdateInput);
+    URHO3D_PROFILE(UpdateInput);
 
     // Reset input accumulation for this frame
     keyPress_.Clear();
