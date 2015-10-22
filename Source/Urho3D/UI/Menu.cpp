@@ -205,7 +205,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanc
                 }
 
                 if (!child)
-                    LOGWARNING("Could not find matching internal child element of type " + typeName + " in " + GetTypeName());
+                    URHO3D_LOGWARNING("Could not find matching internal child element of type " + typeName + " in " + GetTypeName());
             }
         }
 

@@ -217,7 +217,7 @@ void AnimatedSprite2D::OnSceneSet(Scene* scene)
     if (scene)
     {
         if (scene == node_)
-            LOGWARNING(GetTypeName() + " should not be created to the root scene node");
+            URHO3D_LOGWARNING(GetTypeName() + " should not be created to the root scene node");
         if (IsEnabledEffective())
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(AnimatedSprite2D, HandleScenePostUpdate));
     }

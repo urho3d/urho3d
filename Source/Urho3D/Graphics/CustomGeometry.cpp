@@ -132,7 +132,7 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQ
         break;
 
     case RAY_TRIANGLE_UV:
-        LOGWARNING("RAY_TRIANGLE_UV query level is not supported for CustomGeometry component");
+        URHO3D_LOGWARNING("RAY_TRIANGLE_UV query level is not supported for CustomGeometry component");
         break;
     }
 }

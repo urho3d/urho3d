@@ -221,7 +221,7 @@ void PhysicsWorld::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void PhysicsWorld::reportErrorWarning(const char* warningString)
 {
-    LOGWARNING("Physics: " + String(warningString));
+    URHO3D_LOGWARNING("Physics: " + String(warningString));
 }
 
 void PhysicsWorld::drawContactPoint(const btVector3& pointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime,
@@ -344,7 +344,7 @@ void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& r
     URHO3D_PROFILE(PhysicsRaycast);
 
     if (maxDistance >= M_INFINITY)
-        LOGWARNING("Infinite maxDistance in physics raycast is not supported");
+        URHO3D_LOGWARNING("Infinite maxDistance in physics raycast is not supported");
 
     btCollisionWorld::AllHitsRayResultCallback
         rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ + maxDistance * ray.direction_));
@@ -371,7 +371,7 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
     URHO3D_PROFILE(PhysicsRaycastSingle);
 
     if (maxDistance >= M_INFINITY)
-        LOGWARNING("Infinite maxDistance in physics raycast is not supported");
+        URHO3D_LOGWARNING("Infinite maxDistance in physics raycast is not supported");
 
     btCollisionWorld::ClosestRayResultCallback
         rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ + maxDistance * ray.direction_));
@@ -401,7 +401,7 @@ void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, floa
     URHO3D_PROFILE(PhysicsSphereCast);
 
     if (maxDistance >= M_INFINITY)
-        LOGWARNING("Infinite maxDistance in physics sphere cast is not supported");
+        URHO3D_LOGWARNING("Infinite maxDistance in physics sphere cast is not supported");
 
     btSphereShape shape(radius);
 

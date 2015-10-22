@@ -232,7 +232,7 @@ void Script::MessageCallback(const asSMessageInfo* msg)
         break;
 
     case asMSGTYPE_WARNING:
-        LOGWARNING(message);
+        URHO3D_LOGWARNING(message);
         break;
 
     default:

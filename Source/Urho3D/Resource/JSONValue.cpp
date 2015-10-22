@@ -357,7 +357,7 @@ void JSONValue::SetVariant(const Variant& variant, Context* context)
 {
     if (!IsNull())
     {
-        LOGWARNING("JsonValue is not null");
+        URHO3D_LOGWARNING("JsonValue is not null");
     }
 
     (*this)["type"] = variant.GetTypeName();
@@ -374,7 +374,7 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
 {
     if (!IsNull())
     {
-        LOGWARNING("JsonValue is not null");
+        URHO3D_LOGWARNING("JsonValue is not null");
     }
 
     switch (variant.GetType())

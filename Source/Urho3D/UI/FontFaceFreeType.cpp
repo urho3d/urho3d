@@ -273,7 +273,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
             }
         }
         else
-            LOGWARNING("Can not read kerning information: not version 0");
+            URHO3D_LOGWARNING("Can not read kerning information: not version 0");
     }
 
     if (loadAllGlyphs)

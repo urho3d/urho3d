@@ -302,7 +302,7 @@ void Constraint::SetWorldPosition(const Vector3& position)
         MarkNetworkUpdate();
     }
     else
-        LOGWARNING("Constraint not created, world position could not be stored");
+        URHO3D_LOGWARNING("Constraint not created, world position could not be stored");
 }
 
 void Constraint::SetHighLimit(const Vector2& limit)
@@ -454,7 +454,7 @@ void Constraint::OnSceneSet(Scene* scene)
     if (scene)
     {
         if (scene == node_)
-            LOGWARNING(GetTypeName() + " should not be created to the root scene node");
+            URHO3D_LOGWARNING(GetTypeName() + " should not be created to the root scene node");
 
         physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld>();
         physicsWorld_->AddConstraint(this);

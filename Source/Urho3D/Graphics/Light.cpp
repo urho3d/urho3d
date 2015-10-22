@@ -203,7 +203,7 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
         break;
 
     case RAY_TRIANGLE_UV:
-        LOGWARNING("RAY_TRIANGLE_UV query level is not supported for Light component");
+        URHO3D_LOGWARNING("RAY_TRIANGLE_UV query level is not supported for Light component");
         return;
     }
 

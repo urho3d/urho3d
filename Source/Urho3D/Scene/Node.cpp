@@ -1206,7 +1206,7 @@ void Node::SetNetParentAttr(const PODVector<unsigned char>& value)
     Node* baseNode = scene->GetNode(baseNodeID);
     if (!baseNode)
     {
-        LOGWARNING("Failed to find parent node " + String(baseNodeID));
+        URHO3D_LOGWARNING("Failed to find parent node " + String(baseNodeID));
         return;
     }
 
@@ -1219,7 +1219,7 @@ void Node::SetNetParentAttr(const PODVector<unsigned char>& value)
         StringHash nameHash = buf.ReadStringHash();
         Node* parentNode = baseNode->GetChild(nameHash, true);
         if (!parentNode)
-            LOGWARNING("Failed to find parent node with name hash " + nameHash.ToString());
+            URHO3D_LOGWARNING("Failed to find parent node with name hash " + nameHash.ToString());
         else
             parentNode->AddChild(this);
     }
@@ -1510,7 +1510,7 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
     components_.Push(SharedPtr<Component>(component));
 
     if (component->GetNode())
-        LOGWARNING("Component " + component->GetTypeName() + " already belongs to a node!");
+        URHO3D_LOGWARNING("Component " + component->GetTypeName() + " already belongs to a node!");
 
     component->SetNode(this);
 
@@ -1742,7 +1742,7 @@ Component* Node::SafeCreateComponent(const String& typeName, StringHash type, Cr
         return CreateComponent(type, mode, id);
     else
     {
-        LOGWARNING("Component type " + type.ToString() + " not known, creating UnknownComponent as placeholder");
+        URHO3D_LOGWARNING("Component type " + type.ToString() + " not known, creating UnknownComponent as placeholder");
         // Else create as UnknownComponent
         SharedPtr<UnknownComponent> newComponent(new UnknownComponent(context_));
         if (typeName.Empty() || typeName.StartsWith("Unknown", false))

@@ -78,7 +78,7 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
             window->SetPosition((graphics->GetWidth() - size.x_) / 2, (graphics->GetHeight() - size.y_) / 2);
         }
         else
-            LOGWARNING("Instantiating a modal window in headless mode!");
+            URHO3D_LOGWARNING("Instantiating a modal window in headless mode!");
 
         window->SetModal(true);
         SubscribeToEvent(window, E_MODALCHANGED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));

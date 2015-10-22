@@ -269,7 +269,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
             }
 
             if (!child)
-                LOGWARNING("Could not find matching internal child element of type " + typeName + " in " + GetTypeName());
+                URHO3D_LOGWARNING("Could not find matching internal child element of type " + typeName + " in " + GetTypeName());
         }
 
         if (child)
@@ -742,7 +742,7 @@ void UIElement::SetHorizontalAlignment(HorizontalAlignment align)
 {
     if (align != HA_LEFT && parent_ && parent_->GetLayoutMode() == LM_HORIZONTAL)
     {
-        LOGWARNING("Forcing left alignment because parent element has horizontal layout");
+        URHO3D_LOGWARNING("Forcing left alignment because parent element has horizontal layout");
         align = HA_LEFT;
     }
 
@@ -757,7 +757,7 @@ void UIElement::SetVerticalAlignment(VerticalAlignment align)
 {
     if (align != VA_TOP && parent_ && parent_->GetLayoutMode() == LM_VERTICAL)
     {
-        LOGWARNING("Forcing top alignment because parent element has vertical layout");
+        URHO3D_LOGWARNING("Forcing top alignment because parent element has vertical layout");
         align = VA_TOP;
     }
 
@@ -1800,7 +1800,7 @@ bool UIElement::FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styl
         {
             if (!dest.RemoveAttribute("style"))
             {
-                LOGWARNING("Could not remove style attribute");
+                URHO3D_LOGWARNING("Could not remove style attribute");
                 return false;
             }
         }

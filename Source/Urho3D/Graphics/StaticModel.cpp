@@ -236,7 +236,7 @@ void StaticModel::SetModel(Model* model)
     // If script erroneously calls StaticModel::SetModel on an AnimatedModel, warn and redirect
     if (GetType() == AnimatedModel::GetTypeStatic())
     {
-        LOGWARNING("StaticModel::SetModel() called on AnimatedModel. Redirecting to AnimatedModel::SetModel()");
+        URHO3D_LOGWARNING("StaticModel::SetModel() called on AnimatedModel. Redirecting to AnimatedModel::SetModel()");
         AnimatedModel* animatedModel = static_cast<AnimatedModel*>(this);
         animatedModel->SetModel(model);
         return;

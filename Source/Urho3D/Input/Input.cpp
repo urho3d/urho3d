@@ -145,7 +145,7 @@ bool EmscriptenInput::IsVisible()
         return visibilityStatus.hidden >= EM_TRUE ? false : true;
 
     // Assume visible
-    LOGWARNING("Could not determine visibility status.");
+    URHO3D_LOGWARNING("Could not determine visibility status.");
     return true;
 }
 
@@ -669,7 +669,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 
     if (!graphics_)
     {
-        LOGWARNING("Cannot add screen joystick in headless mode");
+        URHO3D_LOGWARNING("Cannot add screen joystick in headless mode");
         return -1;
     }
 
@@ -760,7 +760,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
             ++numAxes;
 
             ///\todo Axis emulation for screen joystick is not fully supported yet.
-            LOGWARNING("Axis emulation for screen joystick is not fully supported yet");
+            URHO3D_LOGWARNING("Axis emulation for screen joystick is not fully supported yet");
         }
         else if (name.StartsWith("Hat"))
         {

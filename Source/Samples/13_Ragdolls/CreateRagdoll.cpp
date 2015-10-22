@@ -119,7 +119,7 @@ void CreateRagdoll::CreateRagdollBone(const String& boneName, ShapeType type, co
     Node* boneNode = node_->GetChild(boneName, true);
     if (!boneNode)
     {
-        LOGWARNING("Could not find bone " + boneName + " for creating ragdoll physics components");
+        URHO3D_LOGWARNING("Could not find bone " + boneName + " for creating ragdoll physics components");
         return;
     }
 
@@ -149,12 +149,12 @@ void CreateRagdoll::CreateRagdollConstraint(const String& boneName, const String
     Node* parentNode = node_->GetChild(parentName, true);
     if (!boneNode)
     {
-        LOGWARNING("Could not find bone " + boneName + " for creating ragdoll constraint");
+        URHO3D_LOGWARNING("Could not find bone " + boneName + " for creating ragdoll constraint");
         return;
     }
     if (!parentNode)
     {
-        LOGWARNING("Could not find bone " + parentName + " for creating ragdoll constraint");
+        URHO3D_LOGWARNING("Could not find bone " + parentName + " for creating ragdoll constraint");
         return;
     }
 

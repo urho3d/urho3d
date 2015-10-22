@@ -426,14 +426,14 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
 
     if (newDecal.vertices_.Size() > maxVertices_)
     {
-        LOGWARNING("Can not add decal, vertex count " + String(newDecal.vertices_.Size()) + " exceeds maximum " +
+        URHO3D_LOGWARNING("Can not add decal, vertex count " + String(newDecal.vertices_.Size()) + " exceeds maximum " +
                    String(maxVertices_));
         decals_.Pop();
         return false;
     }
     if (newDecal.indices_.Size() > maxIndices_)
     {
-        LOGWARNING("Can not add decal, index count " + String(newDecal.indices_.Size()) + " exceeds maximum " +
+        URHO3D_LOGWARNING("Can not add decal, index count " + String(newDecal.indices_.Size()) + " exceeds maximum " +
                    String(maxIndices_));
         decals_.Pop();
         return false;
@@ -747,7 +747,7 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
         geometry->GetRawData(positionData, positionStride, indexData, indexStride, elementMask);
         if (!positionData)
         {
-            LOGWARNING("Can not add decal, target drawable has no CPU-side geometry data");
+            URHO3D_LOGWARNING("Can not add decal, target drawable has no CPU-side geometry data");
             return;
         }
     }
@@ -896,7 +896,7 @@ bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blen
 
             if (!bone)
             {
-                LOGWARNING("Out of range bone index for skinned decal");
+                URHO3D_LOGWARNING("Out of range bone index for skinned decal");
                 return false;
             }
 
@@ -921,7 +921,7 @@ bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blen
             {
                 if (bones_.Size() >= Graphics::GetMaxBones())
                 {
-                    LOGWARNING("Maximum skinned decal bone count reached");
+                    URHO3D_LOGWARNING("Maximum skinned decal bone count reached");
                     return false;
                 }
                 else

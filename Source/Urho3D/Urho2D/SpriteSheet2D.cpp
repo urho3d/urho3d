@@ -155,7 +155,7 @@ bool SpriteSheet2D::EndLoadFromPListFile()
         const PListValueMap& frameInfo = i->second_.GetValueMap();
         if (frameInfo["rotated"]->GetBool())
         {
-            LOGWARNING("Rotated sprite is not support now");
+            URHO3D_LOGWARNING("Rotated sprite is not support now");
             continue;
         }
 

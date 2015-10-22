@@ -148,7 +148,7 @@ bool IndexBuffer::SetData(const void* data)
         }
         else
         {
-            LOGWARNING("Index buffer data assignment while device is lost");
+            URHO3D_LOGWARNING("Index buffer data assignment while device is lost");
             dataPending_ = true;
         }
     }
@@ -198,7 +198,7 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
         }
         else
         {
-            LOGWARNING("Index buffer data assignment while device is lost");
+            URHO3D_LOGWARNING("Index buffer data assignment while device is lost");
             dataPending_ = true;
         }
     }
@@ -327,7 +327,7 @@ bool IndexBuffer::Create()
     {
         if (graphics_->IsDeviceLost())
         {
-            LOGWARNING("Index buffer creation while device is lost");
+            URHO3D_LOGWARNING("Index buffer creation while device is lost");
             return true;
         }
 

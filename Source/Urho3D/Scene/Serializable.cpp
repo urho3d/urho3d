@@ -378,7 +378,7 @@ bool Serializable::LoadXML(const XMLElement& source, bool setInstanceDefault)
                     if (enumFound)
                         varValue = enumValue;
                     else
-                        LOGWARNING("Unknown enum value " + value + " in attribute " + attr.name_);
+                        URHO3D_LOGWARNING("Unknown enum value " + value + " in attribute " + attr.name_);
                 }
                 else
                     varValue = attrElem.GetVariantValue(attr.type_);
@@ -402,7 +402,7 @@ bool Serializable::LoadXML(const XMLElement& source, bool setInstanceDefault)
         }
 
         if (!attempts)
-            LOGWARNING("Unknown attribute " + name + " in XML data");
+            URHO3D_LOGWARNING("Unknown attribute " + name + " in XML data");
 
         attrElem = attrElem.GetNext("attribute");
     }

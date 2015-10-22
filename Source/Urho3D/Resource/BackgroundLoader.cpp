@@ -152,7 +152,7 @@ bool BackgroundLoader::QueueResource(StringHash type, const String& name, bool s
             callerItem.dependencies_.Insert(key);
         }
         else
-            LOGWARNING("Resource " + caller->GetName() +
+            URHO3D_LOGWARNING("Resource " + caller->GetName() +
                        " requested for a background loaded resource but was not in the background load queue");
     }
 

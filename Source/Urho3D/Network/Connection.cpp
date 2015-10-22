@@ -450,7 +450,7 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
 {
     if (IsClient())
     {
-        LOGWARNING("Received unexpected LoadScene message from client " + ToString());
+        URHO3D_LOGWARNING("Received unexpected LoadScene message from client " + ToString());
         return;
     }
 
@@ -498,7 +498,7 @@ void Connection::ProcessSceneChecksumError(int msgID, MemoryBuffer& msg)
 {
     if (IsClient())
     {
-        LOGWARNING("Received unexpected SceneChecksumError message from client " + ToString());
+        URHO3D_LOGWARNING("Received unexpected SceneChecksumError message from client " + ToString());
         return;
     }
 
@@ -512,7 +512,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     /// while the application is minimized
     if (IsClient())
     {
-        LOGWARNING("Received unexpected SceneUpdate message from client " + ToString());
+        URHO3D_LOGWARNING("Received unexpected SceneUpdate message from client " + ToString());
         return;
     }
 
@@ -599,7 +599,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 }
             }
             else
-                LOGWARNING("NodeDeltaUpdate message received for missing node " + String(nodeID));
+                URHO3D_LOGWARNING("NodeDeltaUpdate message received for missing node " + String(nodeID));
         }
         break;
 
@@ -663,7 +663,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 component->ApplyAttributes();
             }
             else
-                LOGWARNING("CreateComponent message received for missing node " + String(nodeID));
+                URHO3D_LOGWARNING("CreateComponent message received for missing node " + String(nodeID));
         }
         break;
 
@@ -677,7 +677,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 component->ApplyAttributes();
             }
             else
-                LOGWARNING("ComponentDeltaUpdate message received for missing component " + String(componentID));
+                URHO3D_LOGWARNING("ComponentDeltaUpdate message received for missing component " + String(componentID));
         }
         break;
 
@@ -721,7 +721,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
     case MSG_REQUESTPACKAGE:
         if (!IsClient())
         {
-            LOGWARNING("Received unexpected RequestPackage message from server");
+            URHO3D_LOGWARNING("Received unexpected RequestPackage message from server");
             return;
         }
         else
@@ -730,7 +730,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
 
             if (!scene_)
             {
-                LOGWARNING("Received a RequestPackage message without an assigned scene from client " + ToString());
+                URHO3D_LOGWARNING("Received a RequestPackage message without an assigned scene from client " + ToString());
                 return;
             }
 
@@ -747,7 +747,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                     // Do not restart upload if already exists
                     if (uploads_.Contains(nameHash))
                     {
-                        LOGWARNING("Received a request for package " + name + " already in transfer");
+                        URHO3D_LOGWARNING("Received a request for package " + name + " already in transfer");
                         return;
                     }
 
@@ -779,7 +779,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
     case MSG_PACKAGEDATA:
         if (IsClient())
         {
-            LOGWARNING("Received unexpected PackageData message from client");
+            URHO3D_LOGWARNING("Received unexpected PackageData message from client");
             return;
         }
         else
@@ -859,7 +859,7 @@ void Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
 {
     if (!IsClient())
     {
-        LOGWARNING("Received unexpected Identity message from server");
+        URHO3D_LOGWARNING("Received unexpected Identity message from server");
         return;
     }
 
@@ -881,7 +881,7 @@ void Connection::ProcessControls(int msgID, MemoryBuffer& msg)
 {
     if (!IsClient())
     {
-        LOGWARNING("Received unexpected Controls message from server");
+        URHO3D_LOGWARNING("Received unexpected Controls message from server");
         return;
     }
 
@@ -905,13 +905,13 @@ void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
 {
     if (!IsClient())
     {
-        LOGWARNING("Received unexpected SceneLoaded message from server");
+        URHO3D_LOGWARNING("Received unexpected SceneLoaded message from server");
         return;
     }
 
     if (!scene_)
     {
-        LOGWARNING("Received a SceneLoaded message without an assigned scene from client " + ToString());
+        URHO3D_LOGWARNING("Received a SceneLoaded message without an assigned scene from client " + ToString());
         return;
     }
 
@@ -945,7 +945,7 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
         StringHash eventType = msg.ReadStringHash();
         if (!GetSubsystem<Network>()->CheckRemoteEvent(eventType))
         {
-            LOGWARNING("Discarding not allowed remote event " + eventType.ToString());
+            URHO3D_LOGWARNING("Discarding not allowed remote event " + eventType.ToString());
             return;
         }
 
@@ -965,7 +965,7 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
         StringHash eventType = msg.ReadStringHash();
         if (!GetSubsystem<Network>()->CheckRemoteEvent(eventType))
         {
-            LOGWARNING("Discarding not allowed remote event " + eventType.ToString());
+            URHO3D_LOGWARNING("Discarding not allowed remote event " + eventType.ToString());
             return;
         }
 
@@ -973,7 +973,7 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
         Node* sender = scene_->GetNode(nodeID);
         if (!sender)
         {
-            LOGWARNING("Missing sender for remote node event, discarding");
+            URHO3D_LOGWARNING("Missing sender for remote node event, discarding");
             return;
         }
         eventData[P_CONNECTION] = this;
@@ -1268,7 +1268,7 @@ void Connection::ProcessExistingNode(Node* node, NodeReplicationState& nodeState
                 else
                 {
                     // Variable has been marked dirty, but is removed (which is unsupported): send a dummy variable in place
-                    LOGWARNING("Sending dummy user variable as original value was removed");
+                    URHO3D_LOGWARNING("Sending dummy user variable as original value was removed");
                     msg_.WriteStringHash(StringHash());
                     msg_.WriteVariant(Variant::EMPTY);
                 }
@@ -1539,7 +1539,7 @@ void Connection::ProcessPackageInfo(int msgID, MemoryBuffer& msg)
 
     if (IsClient())
     {
-        LOGWARNING("Received unexpected packages info message from client");
+        URHO3D_LOGWARNING("Received unexpected packages info message from client");
         return;
     }
 

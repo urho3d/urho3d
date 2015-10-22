@@ -755,7 +755,7 @@ String FileSystem::GetAppPreferencesDir(const String& org, const String& app) co
         SDL_free(prefPath);
     }
     else
-        LOGWARNING("Could not get application preferences directory");
+        URHO3D_LOGWARNING("Could not get application preferences directory");
 
     return dir;
 }

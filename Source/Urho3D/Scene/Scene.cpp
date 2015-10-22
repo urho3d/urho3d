@@ -752,7 +752,7 @@ void Scene::NodeAdded(Node* node)
         HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Find(id);
         if (i != replicatedNodes_.End() && i->second_ != node)
         {
-            LOGWARNING("Overwriting node with ID " + String(id));
+            URHO3D_LOGWARNING("Overwriting node with ID " + String(id));
             NodeRemoved(i->second_);
         }
 
@@ -766,7 +766,7 @@ void Scene::NodeAdded(Node* node)
         HashMap<unsigned, Node*>::Iterator i = localNodes_.Find(id);
         if (i != localNodes_.End() && i->second_ != node)
         {
-            LOGWARNING("Overwriting node with ID " + String(id));
+            URHO3D_LOGWARNING("Overwriting node with ID " + String(id));
             NodeRemoved(i->second_);
         }
         localNodes_[id] = node;
@@ -825,7 +825,7 @@ void Scene::ComponentAdded(Component* component)
         HashMap<unsigned, Component*>::Iterator i = replicatedComponents_.Find(id);
         if (i != replicatedComponents_.End() && i->second_ != component)
         {
-            LOGWARNING("Overwriting component with ID " + String(id));
+            URHO3D_LOGWARNING("Overwriting component with ID " + String(id));
             ComponentRemoved(i->second_);
         }
 
@@ -836,7 +836,7 @@ void Scene::ComponentAdded(Component* component)
         HashMap<unsigned, Component*>::Iterator i = localComponents_.Find(id);
         if (i != localComponents_.End() && i->second_ != component)
         {
-            LOGWARNING("Overwriting component with ID " + String(id));
+            URHO3D_LOGWARNING("Overwriting component with ID " + String(id));
             ComponentRemoved(i->second_);
         }
 

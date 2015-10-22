@@ -356,7 +356,7 @@ float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outU
             if ((elementMask & MASK_TEXCOORD1) == 0)
             {
                 // requested UV output, but no texture data in vertex buffer
-                LOGWARNING("Illegal GetHitDistance call: UV return requested on vertex buffer without UV coords");
+                URHO3D_LOGWARNING("Illegal GetHitDistance call: UV return requested on vertex buffer without UV coords");
                 *outUV = Vector2::ZERO;
                 outUV = 0;
             }

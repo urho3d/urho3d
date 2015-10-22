@@ -242,7 +242,7 @@ bool Animation::Save(Serializer& dest) const
             xml->Save(xmlFile);
         }
         else
-            LOGWARNING("Can not save animation trigger data when not saving into a file");
+            URHO3D_LOGWARNING("Can not save animation trigger data when not saving into a file");
     }
 
     return true;

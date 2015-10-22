@@ -223,7 +223,7 @@ bool VertexBuffer::SetData(const void* data)
         }
         else
         {
-            LOGWARNING("Vertex buffer data assignment while device is lost");
+            URHO3D_LOGWARNING("Vertex buffer data assignment while device is lost");
             dataPending_ = true;
         }
     }
@@ -273,7 +273,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
         }
         else
         {
-            LOGWARNING("Vertex buffer data assignment while device is lost");
+            URHO3D_LOGWARNING("Vertex buffer data assignment while device is lost");
             dataPending_ = true;
         }
     }
@@ -398,7 +398,7 @@ bool VertexBuffer::Create()
     {
         if (graphics_->IsDeviceLost())
         {
-            LOGWARNING("Vertex buffer creation while device is lost");
+            URHO3D_LOGWARNING("Vertex buffer creation while device is lost");
             return true;
         }
 

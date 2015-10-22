@@ -140,7 +140,7 @@ void Network::HandleMessage(kNet::MessageConnection* source, kNet::packet_id_t p
         connection->SendEvent(E_NETWORKMESSAGE, eventData);
     }
     else
-        LOGWARNING("Discarding message from unknown MessageConnection " + ToString((void*)source));
+        URHO3D_LOGWARNING("Discarding message from unknown MessageConnection " + ToString((void*)source));
 }
 
 u32 Network::ComputeContentID(kNet::message_id_t msgId, const char* data, size_t numBytes)

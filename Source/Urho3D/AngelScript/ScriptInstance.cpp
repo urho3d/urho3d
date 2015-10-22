@@ -671,7 +671,7 @@ void ScriptInstance::UpdateEventSubscription()
     Scene* scene = GetScene();
     if (!scene)
     {
-        LOGWARNING("Node is detached from scene, can not subscribe script object to update events");
+        URHO3D_LOGWARNING("Node is detached from scene, can not subscribe script object to update events");
         return;
     }
 
