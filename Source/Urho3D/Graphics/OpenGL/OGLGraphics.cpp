@@ -487,7 +487,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
                 }
                 else
                 {
-                    LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
+                    URHO3D_LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
                     return false;
                 }
             }
@@ -2440,7 +2440,7 @@ void Graphics::Restore()
 
         if (!impl_->context_)
         {
-            LOGERRORF("Could not create OpenGL context, root cause '%s'", SDL_GetError());
+            URHO3D_LOGERRORF("Could not create OpenGL context, root cause '%s'", SDL_GetError());
             return;
         }
 
@@ -2452,7 +2452,7 @@ void Graphics::Restore()
         GLenum err = glewInit();
         if (GLEW_OK != err)
         {
-            LOGERRORF("Could not initialize OpenGL extensions, root cause: '%s'", glewGetErrorString(err));
+            URHO3D_LOGERRORF("Could not initialize OpenGL extensions, root cause: '%s'", glewGetErrorString(err));
             return;
         }
 

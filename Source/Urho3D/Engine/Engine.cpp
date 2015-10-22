@@ -249,7 +249,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         if (!success)
         {
-            LOGERRORF("Failed to add resource path '%s', check the documentation on how to set the 'resource prefix path'",
+            URHO3D_LOGERRORF("Failed to add resource path '%s', check the documentation on how to set the 'resource prefix path'",
                 resourcePaths[i].CString());
             return false;
         }
@@ -263,7 +263,7 @@ bool Engine::Initialize(const VariantMap& parameters)
         {
             if (!cache->AddPackageFile(packageName))
             {
-                LOGERRORF("Failed to add resource package '%s', check the documentation on how to set the 'resource prefix path'",
+                URHO3D_LOGERRORF("Failed to add resource package '%s', check the documentation on how to set the 'resource prefix path'",
                     resourcePackages[i].CString());
                 return false;
             }
@@ -295,7 +295,7 @@ bool Engine::Initialize(const VariantMap& parameters)
                 String autoResourceDir = autoLoadPath + "/" + dir;
                 if (!cache->AddResourceDir(autoResourceDir, 0))
                 {
-                    LOGERRORF(
+                    URHO3D_LOGERRORF(
                         "Failed to add resource directory '%s' in autoload path %s, check the documentation on how to set the 'resource prefix path'",
                         dir.CString(), autoLoadPaths[i].CString());
                     return false;
@@ -314,7 +314,7 @@ bool Engine::Initialize(const VariantMap& parameters)
                 String autoPackageName = autoLoadPath + "/" + pak;
                 if (!cache->AddPackageFile(autoPackageName, 0))
                 {
-                    LOGERRORF(
+                    URHO3D_LOGERRORF(
                         "Failed to add package file '%s' in autoload path %s, check the documentation on how to set the 'resource prefix path'",
                         pak.CString(), autoLoadPaths[i].CString());
                     return false;

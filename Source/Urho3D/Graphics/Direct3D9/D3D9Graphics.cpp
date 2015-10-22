@@ -2378,7 +2378,7 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
 
     if (!impl_->window_)
     {
-        LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
+        URHO3D_LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
         return false;
     }
 

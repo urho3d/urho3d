@@ -126,7 +126,7 @@ bool File::Open(const String& fileName, FileMode mode)
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
-        LOGERRORF("Access denied to %s", fileName.CString());
+        URHO3D_LOGERRORF("Access denied to %s", fileName.CString());
         return false;
     }
 
@@ -142,7 +142,7 @@ bool File::Open(const String& fileName, FileMode mode)
         assetHandle_ = SDL_RWFromFile(URHO3D_ASSET(fileName), "rb");
         if (!assetHandle_)
         {
-            LOGERRORF("Could not open asset file %s", fileName.CString());
+            URHO3D_LOGERRORF("Could not open asset file %s", fileName.CString());
             return false;
         }
         else
@@ -185,7 +185,7 @@ bool File::Open(const String& fileName, FileMode mode)
 
     if (!handle_)
     {
-        LOGERRORF("Could not open file %s", fileName.CString());
+        URHO3D_LOGERRORF("Could not open file %s", fileName.CString());
         return false;
     }
 
@@ -203,7 +203,7 @@ bool File::Open(const String& fileName, FileMode mode)
     fseek((FILE*)handle_, 0, SEEK_SET);
     if (size > M_MAX_UNSIGNED)
     {
-        LOGERRORF("Could not open file %s which is larger than 4GB", fileName.CString());
+        URHO3D_LOGERRORF("Could not open file %s which is larger than 4GB", fileName.CString());
         Close();
         size_ = 0;
         return false;

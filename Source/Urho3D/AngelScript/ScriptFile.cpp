@@ -433,7 +433,7 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInter
 
     if (!found)
     {
-        LOGERRORF("Script class %s does not implement the ScriptObject interface", type->GetName());
+        URHO3D_LOGERRORF("Script class %s does not implement the ScriptObject interface", type->GetName());
         return 0;
     }
 

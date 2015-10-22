@@ -239,7 +239,7 @@ bool LuaScript::ExecuteString(const String& string)
     if (luaL_dostring(luaState_, string.CString()))
     {
         const char* message = lua_tostring(luaState_, -1);
-        LOGERRORF("Execute Lua string failed: %s", message);
+        URHO3D_LOGERRORF("Execute Lua string failed: %s", message);
         lua_pop(luaState_, 1);
         return false;
     }
@@ -269,7 +269,7 @@ bool LuaScript::LoadRawFile(const String& fileName)
     if (luaL_loadfile(luaState_, filePath.CString()))
     {
         const char* message = lua_tostring(luaState_, -1);
-        LOGERRORF("Load Lua file failed: %s", message);
+        URHO3D_LOGERRORF("Load Lua file failed: %s", message);
         lua_pop(luaState_, 1);
         return false;
     }
@@ -289,7 +289,7 @@ bool LuaScript::ExecuteRawFile(const String& fileName)
     if (lua_pcall(luaState_, 0, 0, 0))
     {
         const char* message = lua_tostring(luaState_, -1);
-        LOGERRORF("Execute Lua file failed: %s", message);
+        URHO3D_LOGERRORF("Execute Lua file failed: %s", message);
         lua_pop(luaState_, 1);
         return false;
     }
@@ -441,7 +441,7 @@ LuaFunction* LuaScript::GetFunction(const String& functionName, bool silentIfNot
         functionNameToFunctionMap_[functionName] = function;
     }
     else if (!silentIfNotFound)
-        LOGERRORF("%s", lua_tostring(luaState_, -1));
+        URHO3D_LOGERRORF("%s", lua_tostring(luaState_, -1));
     lua_pop(luaState_, 1);
 
     return function;

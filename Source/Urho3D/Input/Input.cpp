@@ -731,7 +731,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                         keyBinding = i->second_;
                     else
                     {
-                        LOGERRORF("Unsupported key binding: %s", key.CString());
+                        URHO3D_LOGERRORF("Unsupported key binding: %s", key.CString());
                         keyBinding = M_MAX_INT;
                     }
                 }
@@ -752,7 +752,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                 if (i != mouseButtonBindingMap.End())
                     element->SetVar(VAR_BUTTON_MOUSE_BUTTON_BINDING, i->second_);
                 else
-                    LOGERRORF("Unsupported mouse button binding: %s", mouseButton.CString());
+                    URHO3D_LOGERRORF("Unsupported mouse button binding: %s", mouseButton.CString());
             }
         }
         else if (name.StartsWith("Axis"))
@@ -795,13 +795,13 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                             if (i != keyBindingMap.End())
                                 mappedKeyBinding[j] = i->second_;
                             else
-                                LOGERRORF("%s - %s cannot be mapped, fallback to '%c'", name.CString(), keyBindings[j].CString(),
+                                URHO3D_LOGERRORF("%s - %s cannot be mapped, fallback to '%c'", name.CString(), keyBindings[j].CString(),
                                     mappedKeyBinding[j]);
                         }
                     }
                 }
                 else
-                    LOGERRORF("%s has invalid key binding %s, fallback to WSAD", name.CString(), keyBinding.CString());
+                    URHO3D_LOGERRORF("%s has invalid key binding %s, fallback to WSAD", name.CString(), keyBinding.CString());
                 element->SetVar(VAR_BUTTON_KEY_BINDING, IntRect(mappedKeyBinding));
             }
         }
@@ -830,14 +830,14 @@ bool Input::RemoveScreenJoystick(SDL_JoystickID id)
 {
     if (!joysticks_.Contains(id))
     {
-        LOGERRORF("Failed to remove non-existing screen joystick ID #%d", id);
+        URHO3D_LOGERRORF("Failed to remove non-existing screen joystick ID #%d", id);
         return false;
     }
 
     JoystickState& state = joysticks_[id];
     if (!state.screenJoystick_)
     {
-        LOGERRORF("Failed to remove joystick with ID #%d which is not a screen joystick", id);
+        URHO3D_LOGERRORF("Failed to remove joystick with ID #%d which is not a screen joystick", id);
         return false;
     }
 
@@ -954,7 +954,7 @@ SDL_JoystickID Input::OpenJoystick(unsigned index)
     SDL_Joystick* joystick = SDL_JoystickOpen(index);
     if (!joystick)
     {
-        LOGERRORF("Cannot open joystick #%d", index);
+        URHO3D_LOGERRORF("Cannot open joystick #%d", index);
         return -1;
     }
 
