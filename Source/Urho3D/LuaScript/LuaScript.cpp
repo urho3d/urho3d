@@ -402,7 +402,7 @@ int LuaScript::Print(lua_State* L)
     }
     lua_pop(L, 1);
 
-    LOGRAWF("%s\n", String::Joined(strings, "    ").CString());
+    URHO3D_LOGRAWF("%s\n", String::Joined(strings, "    ").CString());
     return 0;
 }
 

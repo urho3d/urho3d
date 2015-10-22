@@ -140,7 +140,7 @@ private:
 #define URHO3D_LOGINFOF(format, ...) Urho3D::Log::Write(Urho3D::LOG_INFO, Urho3D::ToString(format, ##__VA_ARGS__))
 #define URHO3D_LOGWARNINGF(format, ...) Urho3D::Log::Write(Urho3D::LOG_WARNING, Urho3D::ToString(format, ##__VA_ARGS__))
 #define URHO3D_LOGERRORF(format, ...) Urho3D::Log::Write(Urho3D::LOG_ERROR, Urho3D::ToString(format, ##__VA_ARGS__))
-#define LOGRAWF(format, ...) Urho3D::Log::WriteRaw(Urho3D::ToString(format, ##__VA_ARGS__))
+#define URHO3D_LOGRAWF(format, ...) Urho3D::Log::WriteRaw(Urho3D::ToString(format, ##__VA_ARGS__))
 #else
 #define URHO3D_LOGDEBUG(message) ((void)0)
 #define URHO3D_LOGINFO(message) ((void)0)
@@ -151,7 +151,7 @@ private:
 #define URHO3D_LOGINFOF(...) ((void)0)
 #define URHO3D_LOGWARNINGF(...) ((void)0)
 #define URHO3D_LOGERRORF(...) ((void)0)
-#define LOGRAWF(...) ((void)0)
+#define URHO3D_LOGRAWF(...) ((void)0)
 #endif
 
 }
