@@ -1135,6 +1135,23 @@ Component* Node::GetComponent(StringHash type, bool recursive) const
     return 0;
 }
 
+Component* Node::GetParentComponent(StringHash type, bool fullTraversal) const
+{
+    Node* current = GetParent();
+    while (current)
+    {
+        Component* soughtComponent = current->GetComponent(type);
+        if (soughtComponent)
+            return soughtComponent;
+
+        if (fullTraversal)
+            current = current->GetParent();
+        else
+            break;
+    }
+    return 0;
+}
+
 void Node::SetID(unsigned id)
 {
     id_ = id;

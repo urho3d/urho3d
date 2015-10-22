@@ -41,6 +41,11 @@
 namespace Urho3D
 {
 
+inline int RoundToPixels(FT_Pos value)
+{
+    return (int)(value >> 6) + (((value & 0x3f) >= 0x20) ? 1 : 0);
+}
+
 /// FreeType library subsystem.
 class FreeTypeLibrary : public Object
 {
@@ -151,8 +156,8 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
 
     // Load each of the glyphs to see the sizes & store other information
     loadMode_ = (int)(ui->GetForceAutoHint() ? FT_LOAD_FORCE_AUTOHINT : FT_LOAD_DEFAULT);
-    ascender_ = (int)(face->size->metrics.ascender >> 6);
-    int descender = (int)(face->size->metrics.descender >> 6);
+    ascender_ = RoundToPixels(face->size->metrics.ascender);
+    int descender = RoundToPixels(face->size->metrics.descender);
 
     // Check if the font's OS/2 info gives different (larger) values for ascender & descender
     TT_OS2* os2Info = (TT_OS2*)FT_Get_Sfnt_Table(face, ft_sfnt_os2);
@@ -166,7 +171,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
 
     // Store point size and row height. Use the maximum of ascender + descender, or the face's stored default row height
     pointSize_ = pointSize;
-    rowHeight_ = (int)Max(ascender_ + descender, face->size->metrics.height >> 6);
+    rowHeight_ = (int)Max(ascender_ + descender, RoundToPixels(face->size->metrics.height));
 
     int textureWidth = maxTextureSize;
     int textureHeight = maxTextureSize;
@@ -249,7 +254,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
                     {
                         unsigned leftIndex = deserializer.ReadUShort();
                         unsigned rightIndex = deserializer.ReadUShort();
-                        short amount = deserializer.ReadShort() >> 6;
+                        short amount = RoundToPixels(deserializer.ReadShort());
 
                         unsigned leftCharCode = leftIndex < numGlyphs ? charCodes[leftIndex] : 0;
                         unsigned rightCharCode = rightIndex < numGlyphs ? charCodes[rightIndex] : 0;
@@ -323,8 +328,8 @@ bool FontFaceFreeType::CanLoadAllGlyphs(const PODVector<unsigned>& charCodes, in
         FT_Error error = FT_Load_Char(face, charCode, loadMode_);
         if (!error)
         {
-            int width = (int)Max(slot->metrics.width >> 6, slot->bitmap.width);
-            int height = (int)Max(slot->metrics.height >> 6, slot->bitmap.rows);
+            int width = Max(RoundToPixels(slot->metrics.width), slot->bitmap.width);
+            int height = Max(RoundToPixels(slot->metrics.height), slot->bitmap.rows);
             int x, y;
             if (!allocator.Allocate(width + 1, height + 1, x, y))
                 return false;
@@ -368,10 +373,10 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
     if (!error)
     {
         // Note: position within texture will be filled later
-        fontGlyph.width_ = (short)Max(slot->metrics.width >> 6, slot->bitmap.width);
-        fontGlyph.height_ = (short)Max(slot->metrics.height >> 6, slot->bitmap.rows);
-        fontGlyph.offsetX_ = (short)(slot->metrics.horiBearingX >> 6);
-        fontGlyph.offsetY_ = (short)(ascender_ - (slot->metrics.horiBearingY >> 6));
+        fontGlyph.width_ = (short)Max(RoundToPixels(slot->metrics.width), slot->bitmap.width);
+        fontGlyph.height_ = (short)Max(RoundToPixels(slot->metrics.height), slot->bitmap.rows);
+        fontGlyph.offsetX_ = (short)(RoundToPixels(slot->metrics.horiBearingX));
+        fontGlyph.offsetY_ = (short)(ascender_ - RoundToPixels(slot->metrics.horiBearingY));
         fontGlyph.advanceX_ = (short)(slot->metrics.horiAdvance >> 6);
 
         if (fontGlyph.width_ > 0 && fontGlyph.height_ > 0)
@@ -407,23 +412,23 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
             FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
             if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
             {
-                for (int y = 0; y < slot->bitmap.rows; ++y)
+                for (unsigned y = 0; y < slot->bitmap.rows; ++y)
                 {
                     unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
                     unsigned char* rowDest = dest + y * pitch;
 
-                    for (int x = 0; x < slot->bitmap.width; ++x)
+                    for (unsigned x = 0; x < slot->bitmap.width; ++x)
                         rowDest[x] = (unsigned char)((src[x >> 3] & (0x80 >> (x & 7))) ? 255 : 0);
                 }
             }
             else
             {
-                for (int y = 0; y < slot->bitmap.rows; ++y)
+                for (unsigned y = 0; y < slot->bitmap.rows; ++y)
                 {
                     unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
                     unsigned char* rowDest = dest + y * pitch;
 
-                    for (int x = 0; x < slot->bitmap.width; ++x)
+                    for (unsigned x = 0; x < slot->bitmap.width; ++x)
                         rowDest[x] = src[x];
                 }
             }

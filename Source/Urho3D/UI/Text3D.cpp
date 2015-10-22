@@ -55,7 +55,8 @@ Text3D::Text3D(Context* context) :
     faceCameraMode_(FC_NONE),
     textDirty_(true),
     geometryDirty_(true),
-    usingSDFShader_(false)
+    usingSDFShader_(false),
+    fontDataLost_(false)
 {
     text_.SetUsedInText3D(true);
     text_.SetEffectDepthBias(DEFAULT_EFFECT_DEPTH_BIAS);
@@ -122,10 +123,27 @@ void Text3D::UpdateBatches(const FrameInfo& frame)
         batches_[i].distance_ = distance_;
         batches_[i].worldTransform_ = faceCameraMode_ != FC_NONE ? &customWorldTransform_ : &node_->GetWorldTransform();
     }
+
+    for (unsigned i = 0; i < uiBatches_.Size(); ++i)
+    {
+        if (uiBatches_[i].texture_ && uiBatches_[i].texture_->IsDataLost())
+        {
+            fontDataLost_ = true;
+            break;
+        }
+    }
 }
 
 void Text3D::UpdateGeometry(const FrameInfo& frame)
 {
+    if (fontDataLost_)
+    {
+        // Re-evaluation of the text triggers the font face to reload itself
+        UpdateTextBatches();
+        UpdateTextMaterials();
+        fontDataLost_ = false;
+    }
+
     if (geometryDirty_)
     {
         for (unsigned i = 0; i < batches_.Size(); ++i)
@@ -149,7 +167,7 @@ void Text3D::UpdateGeometry(const FrameInfo& frame)
 
 UpdateGeometryType Text3D::GetUpdateGeometryType()
 {
-    if (geometryDirty_ || vertexBuffer_->IsDataLost())
+    if (geometryDirty_ || fontDataLost_ || vertexBuffer_->IsDataLost())
         return UPDATE_MAIN_THREAD;
     else
         return UPDATE_NONE;
