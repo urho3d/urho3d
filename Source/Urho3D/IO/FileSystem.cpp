@@ -1068,4 +1068,30 @@ bool IsAbsolutePath(const String& pathName)
     return false;
 }
 
+/// Convert a memory size into a formatted size string, of the style "1.5 Mb"
+String GetFileSizeString(unsigned long memorySize)
+{
+    const char* memorySizeStrings = "kMGTPE";
+
+    String output;
+
+    if (memorySize < 1024)
+    {
+        output = String(memorySize) + " b";
+    }
+    else
+    {
+        const int exponent = (int)(log(memorySize) / log(1024));
+        const double majorValue = ((double)memorySize) / pow(1024, exponent);
+        char buffer[64];
+        memset(buffer, 0, 64);
+        sprintf(buffer, "%.1f", majorValue);
+        output = buffer;
+        output += " ";
+        output += (char)(memorySizeStrings[exponent - 1]);
+    }
+
+    return output;
+}
+
 }
