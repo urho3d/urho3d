@@ -1909,7 +1909,7 @@ void View::AllocateScreenBuffers()
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
-        if (actualView->IsNecessary(command))
+        if (!actualView->IsNecessary(command))
             continue;
         if (!hasViewportRead && CheckViewportRead(command))
             hasViewportRead = true;
