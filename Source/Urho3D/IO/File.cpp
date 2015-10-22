@@ -131,7 +131,7 @@ bool File::Open(const String& fileName, FileMode mode)
     }
 
 #ifdef ANDROID
-    if (IS_ASSET(fileName))
+    if (URHO3D_IS_ASSET(fileName))
     {
         if (mode != FILE_READ)
         {

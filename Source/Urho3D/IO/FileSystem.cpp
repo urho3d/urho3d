@@ -585,7 +585,7 @@ bool FileSystem::FileExists(const String& fileName) const
         return false;
 
 #ifdef ANDROID
-    if (IS_ASSET(fileName))
+    if (URHO3D_IS_ASSET(fileName))
     {
         SDL_RWops* rwOps = SDL_RWFromFile(URHO3D_ASSET(fileName), "rb");
         if (rwOps)
@@ -627,7 +627,7 @@ bool FileSystem::DirExists(const String& pathName) const
     String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
 
 #ifdef ANDROID
-    if (IS_ASSET(fixedName))
+    if (URHO3D_IS_ASSET(fixedName))
     {
         // Split the pathname into two components: the longest parent directory path and the last name component
         String assetPath(URHO3D_ASSET((fixedName + '/')));
@@ -805,7 +805,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
         filterExtension.Clear();
 
 #ifdef ANDROID
-    if (IS_ASSET(path))
+    if (URHO3D_IS_ASSET(path))
     {
         String assetPath(URHO3D_ASSET(path));
         assetPath.Resize(assetPath.Length() - 1);       // AssetManager.list() does not like trailing slash
