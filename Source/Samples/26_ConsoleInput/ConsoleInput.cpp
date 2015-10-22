@@ -269,5 +269,5 @@ void ConsoleInput::HandleInput(const String& input)
 void ConsoleInput::Print(const String& output)
 {
     // Logging appears both in the engine console and stdout
-    LOGRAW(output + "\n");
+    URHO3D_LOGRAW(output + "\n");
 }

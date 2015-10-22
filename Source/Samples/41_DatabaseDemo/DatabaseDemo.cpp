@@ -217,5 +217,5 @@ void DatabaseDemo::HandleInput(const String& input)
 void DatabaseDemo::Print(const String& output)
 {
     // Logging appears both in the engine console and stdout
-    LOGRAW(output + "\n");
+    URHO3D_LOGRAW(output + "\n");
 }

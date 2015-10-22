@@ -544,7 +544,7 @@ void Engine::DumpProfiler()
 {
     Profiler* profiler = GetSubsystem<Profiler>();
     if (profiler)
-        LOGRAW(profiler->GetData(true, true) + "\n");
+        URHO3D_LOGRAW(profiler->GetData(true, true) + "\n");
 }
 
 void Engine::DumpResources(bool dumpFileName)
@@ -552,11 +552,11 @@ void Engine::DumpResources(bool dumpFileName)
 #ifdef URHO3D_LOGGING
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     const HashMap<StringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
-    LOGRAW("\n");
+    URHO3D_LOGRAW("\n");
 
     if (dumpFileName)
     {
-        LOGRAW("Used resources:\n");
+        URHO3D_LOGRAW("Used resources:\n");
     }
 
     for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
@@ -568,7 +568,7 @@ void Engine::DumpResources(bool dumpFileName)
             for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = resources.Begin();
                  j != resources.End(); ++j)
             {
-                LOGRAW(j->second_->GetName() + "\n");
+                URHO3D_LOGRAW(j->second_->GetName() + "\n");
             }
 
         }
@@ -579,7 +579,7 @@ void Engine::DumpResources(bool dumpFileName)
 
             if (num)
             {
-                LOGRAW("Resource type " + resources.Begin()->second_->GetTypeName() +
+                URHO3D_LOGRAW("Resource type " + resources.Begin()->second_->GetTypeName() +
                        ": count " + String(num) + " memory use " + String(memoryUse) + "\n");
             }
         }
@@ -587,7 +587,7 @@ void Engine::DumpResources(bool dumpFileName)
 
     if (!dumpFileName)
     {
-        LOGRAW("Total memory use of all resources " + String(cache->GetTotalMemoryUse()) + "\n\n");
+        URHO3D_LOGRAW("Total memory use of all resources " + String(cache->GetTotalMemoryUse()) + "\n\n");
     }
 #endif
 }
@@ -615,9 +615,9 @@ void Engine::DumpMemory()
         if (block->nBlockUse > 0)
         {
             if (block->szFileName)
-                LOGRAW("Block " + String((int)block->lRequest) + ": " + String(block->nDataSize) + " bytes, file " + String(block->szFileName) + " line " + String(block->nLine) + "\n");
+                URHO3D_LOGRAW("Block " + String((int)block->lRequest) + ": " + String(block->nDataSize) + " bytes, file " + String(block->szFileName) + " line " + String(block->nLine) + "\n");
             else
-                LOGRAW("Block " + String((int)block->lRequest) + ": " + String(block->nDataSize) + " bytes\n");
+                URHO3D_LOGRAW("Block " + String((int)block->lRequest) + ": " + String(block->nDataSize) + " bytes\n");
 
             total += block->nDataSize;
             ++blocks;
@@ -625,9 +625,9 @@ void Engine::DumpMemory()
         block = block->pBlockHeaderPrev;
     }
 
-    LOGRAW("Total allocated memory " + String(total) + " bytes in " + String(blocks) + " blocks\n\n");
+    URHO3D_LOGRAW("Total allocated memory " + String(total) + " bytes in " + String(blocks) + " blocks\n\n");
 #else
-    LOGRAW("DumpMemory() supported on MSVC debug mode only\n\n");
+    URHO3D_LOGRAW("DumpMemory() supported on MSVC debug mode only\n\n");
 #endif
 #endif
 }

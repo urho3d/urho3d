@@ -192,7 +192,7 @@ void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference
 
 void Script::DumpAPI(DumpMode mode, const String& sourceTree)
 {
-    // Does not use LOGRAW macro here to ensure the messages are always dumped regardless of URHO3D_LOGGING compiler directive
+    // Does not use URHO3D_LOGRAW macro here to ensure the messages are always dumped regardless of URHO3D_LOGGING compiler directive
     // and of Log subsystem availability
 
     // Dump event descriptions and attribute definitions in Doxygen mode. For events, this means going through the header files,

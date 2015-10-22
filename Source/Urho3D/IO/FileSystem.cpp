@@ -111,7 +111,7 @@ int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* cont
     while (!feof(file))
     {
         if (fgets(buffer, sizeof(buffer), file))
-            LOGRAW(String(buffer));
+            URHO3D_LOGRAW(String(buffer));
     }
     int exitCode = pclose(file);
 
