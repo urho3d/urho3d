@@ -140,7 +140,7 @@ float ValueAnimationInfo::CalculateScaledTime(float currentTime, bool& finished)
         return Clamp(currentTime, beginTime, endTime);
 
     default:
-        LOGERROR("Unsupported attribute animation wrap mode");
+        URHO3D_LOGERROR("Unsupported attribute animation wrap mode");
         return beginTime;
     }
 }

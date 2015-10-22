@@ -109,13 +109,13 @@ bool IndexBuffer::SetData(const void* data)
 {
     if (!data)
     {
-        LOGERROR("Null pointer for index buffer data");
+        URHO3D_LOGERROR("Null pointer for index buffer data");
         return false;
     }
 
     if (!indexSize_)
     {
-        LOGERROR("Index size not defined, can not set index buffer data");
+        URHO3D_LOGERROR("Index size not defined, can not set index buffer data");
         return false;
     }
 
@@ -159,19 +159,19 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
 
     if (!data)
     {
-        LOGERROR("Null pointer for index buffer data");
+        URHO3D_LOGERROR("Null pointer for index buffer data");
         return false;
     }
 
     if (!indexSize_)
     {
-        LOGERROR("Index size not defined, can not set index buffer data");
+        URHO3D_LOGERROR("Index size not defined, can not set index buffer data");
         return false;
     }
 
     if (start + count > indexCount_)
     {
-        LOGERROR("Illegal range for setting new index buffer data");
+        URHO3D_LOGERROR("Illegal range for setting new index buffer data");
         return false;
     }
 
@@ -215,19 +215,19 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
 {
     if (lockState_ != LOCK_NONE)
     {
-        LOGERROR("Index buffer already locked");
+        URHO3D_LOGERROR("Index buffer already locked");
         return 0;
     }
 
     if (!indexSize_)
     {
-        LOGERROR("Index size not defined, can not lock index buffer");
+        URHO3D_LOGERROR("Index size not defined, can not lock index buffer");
         return 0;
     }
 
     if (start + count > indexCount_)
     {
-        LOGERROR("Illegal range for locking index buffer");
+        URHO3D_LOGERROR("Illegal range for locking index buffer");
         return 0;
     }
 
@@ -284,13 +284,13 @@ bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& m
 {
     if (!shadowData_)
     {
-        LOGERROR("Used vertex range can only be queried from an index buffer with shadow data");
+        URHO3D_LOGERROR("Used vertex range can only be queried from an index buffer with shadow data");
         return false;
     }
 
     if (start + count > indexCount_)
     {
-        LOGERROR("Illegal index range for querying used vertices");
+        URHO3D_LOGERROR("Illegal index range for querying used vertices");
         return false;
     }
 
@@ -346,7 +346,7 @@ bool IndexBuffer::Create()
 
         if (!object_)
         {
-            LOGERROR("Failed to create index buffer");
+            URHO3D_LOGERROR("Failed to create index buffer");
             return false;
         }
     }
@@ -375,7 +375,7 @@ void* IndexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
             D3D11_MAP_WRITE, 0, &mappedData);
         hwData = mappedData.pData;
         if (!hwData)
-            LOGERROR("Failed to map index buffer");
+            URHO3D_LOGERROR("Failed to map index buffer");
         else
             lockState_ = LOCK_HARDWARE;
     }

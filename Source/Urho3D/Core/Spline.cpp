@@ -102,7 +102,7 @@ Variant Spline::GetPoint(float f) const
         }
 
     default:
-        LOGERROR("Unsupported interpolation mode");
+        URHO3D_LOGERROR("Unsupported interpolation mode");
         return Variant::EMPTY;
     }
 }

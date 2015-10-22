@@ -900,7 +900,7 @@ bool Input::RecordGesture()
     // If have no touch devices, fail
     if (!SDL_GetNumTouchDevices())
     {
-        LOGERROR("Can not record gesture: no touch devices");
+        URHO3D_LOGERROR("Can not record gesture: no touch devices");
         return false;
     }
 
@@ -924,7 +924,7 @@ unsigned Input::LoadGestures(Deserializer& source)
     // If have no touch devices, fail
     if (!SDL_GetNumTouchDevices())
     {
-        LOGERROR("Can not load gestures: no touch devices");
+        URHO3D_LOGERROR("Can not load gestures: no touch devices");
         return 0;
     }
 

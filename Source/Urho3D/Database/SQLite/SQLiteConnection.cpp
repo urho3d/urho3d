@@ -73,7 +73,7 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
     }
     if (*zLeftover)
     {
-        LOGERROR("Could not execute: only one SQL statement is allowed");
+        URHO3D_LOGERROR("Could not execute: only one SQL statement is allowed");
         sqlite3_finalize(pStmt);
         return result;
     }

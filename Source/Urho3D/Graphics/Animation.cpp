@@ -127,7 +127,7 @@ bool Animation::BeginLoad(Deserializer& source)
     // Check ID
     if (source.ReadFileID() != "UANI")
     {
-        LOGERROR(source.GetName() + " is not a valid animation file");
+        URHO3D_LOGERROR(source.GetName() + " is not a valid animation file");
         return false;
     }
 

@@ -169,7 +169,7 @@ bool ShaderVariation::LoadByteCode(PODVector<unsigned>& byteCode, const String& 
     SharedPtr<File> file = cache->GetFile(binaryShaderName);
     if (!file || file->ReadFileID() != "USHD")
     {
-        LOGERROR(binaryShaderName + " is not a valid shader bytecode file");
+        URHO3D_LOGERROR(binaryShaderName + " is not a valid shader bytecode file");
         return false;
     }
 
@@ -213,7 +213,7 @@ bool ShaderVariation::LoadByteCode(PODVector<unsigned>& byteCode, const String& 
     }
     else
     {
-        LOGERROR(binaryShaderName + " has zero length bytecode");
+        URHO3D_LOGERROR(binaryShaderName + " has zero length bytecode");
         return false;
     }
 }

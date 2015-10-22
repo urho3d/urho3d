@@ -735,7 +735,7 @@ Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
     SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type));
     if (!newComponent)
     {
-        LOGERROR("Could not create unknown component type " + type.ToString());
+        URHO3D_LOGERROR("Could not create unknown component type " + type.ToString());
         return 0;
     }
 
@@ -756,7 +756,7 @@ Component* Node::CloneComponent(Component* component, unsigned id)
 {
     if (!component)
     {
-        LOGERROR("Null source component given for CloneComponent");
+        URHO3D_LOGERROR("Null source component given for CloneComponent");
         return 0;
     }
 
@@ -767,14 +767,14 @@ Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned 
 {
     if (!component)
     {
-        LOGERROR("Null source component given for CloneComponent");
+        URHO3D_LOGERROR("Null source component given for CloneComponent");
         return 0;
     }
 
     Component* cloneComponent = SafeCreateComponent(component->GetTypeName(), component->GetType(), mode, 0);
     if (!cloneComponent)
     {
-        LOGERROR("Could not clone component " + component->GetTypeName());
+        URHO3D_LOGERROR("Could not clone component " + component->GetTypeName());
         return 0;
     }
 
@@ -886,7 +886,7 @@ Node* Node::Clone(CreateMode mode)
     // The scene itself can not be cloned
     if (this == scene_ || !parent_)
     {
-        LOGERROR("Can not clone node without a parent");
+        URHO3D_LOGERROR("Can not clone node without a parent");
         return 0;
     }
 
@@ -1614,7 +1614,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
             node = node->GetChild(index);
             if (!node)
             {
-                LOGERROR("Could not find node by name " + name);
+                URHO3D_LOGERROR("Could not find node by name " + name);
                 return 0;
             }
         }
@@ -1627,7 +1627,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
 
         if (i != names.Size() - 2 || names[i].Front() != '@')
         {
-            LOGERROR("Invalid name " + name);
+            URHO3D_LOGERROR("Invalid name " + name);
             return 0;
         }
 
@@ -1638,7 +1638,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
             Component* component = node->GetComponent(StringHash(componentNames.Front()));
             if (!component)
             {
-                LOGERROR("Could not find component by name " + name);
+                URHO3D_LOGERROR("Could not find component by name " + name);
                 return 0;
             }
 
@@ -1652,7 +1652,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
             node->GetComponents(components, StringHash(componentNames.Front()));
             if (index >= components.Size())
             {
-                LOGERROR("Could not find component by name " + name);
+                URHO3D_LOGERROR("Could not find component by name " + name);
                 return 0;
             }
 
@@ -1667,7 +1667,7 @@ void Node::SetEnabled(bool enable, bool recursive, bool storeSelf)
     // The enabled state of the whole scene can not be changed. SetUpdateEnabled() is used instead to start/stop updates.
     if (GetType() == Scene::GetTypeStatic())
     {
-        LOGERROR("Can not change enabled state of the Scene");
+        URHO3D_LOGERROR("Can not change enabled state of the Scene");
         return;
     }
 

@@ -97,20 +97,20 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsig
     // Make sure not to use kNet internal message ID's
     if (msgID <= 0x4 || msgID >= 0x3ffffffe)
     {
-        LOGERROR("Can not send message with reserved ID");
+        URHO3D_LOGERROR("Can not send message with reserved ID");
         return;
     }
 
     if (numBytes && !data)
     {
-        LOGERROR("Null pointer supplied for network message data");
+        URHO3D_LOGERROR("Null pointer supplied for network message data");
         return;
     }
 
     kNet::NetworkMessage* msg = connection_->StartNewMessage((unsigned long)msgID, numBytes);
     if (!msg)
     {
-        LOGERROR("Can not start new network message");
+        URHO3D_LOGERROR("Can not start new network message");
         return;
     }
 
@@ -138,17 +138,17 @@ void Connection::SendRemoteEvent(Node* node, StringHash eventType, bool inOrder,
 {
     if (!node)
     {
-        LOGERROR("Null sender node for remote node event");
+        URHO3D_LOGERROR("Null sender node for remote node event");
         return;
     }
     if (node->GetScene() != scene_)
     {
-        LOGERROR("Sender node is not in the connection's scene, can not send remote node event");
+        URHO3D_LOGERROR("Sender node is not in the connection's scene, can not send remote node event");
         return;
     }
     if (node->GetID() >= FIRST_LOCAL_ID)
     {
-        LOGERROR("Sender node has a local ID, can not send remote node event");
+        URHO3D_LOGERROR("Sender node has a local ID, can not send remote node event");
         return;
     }
 
@@ -456,7 +456,7 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
 
     if (!scene_)
     {
-        LOGERROR("Can not handle LoadScene message without an assigned scene");
+        URHO3D_LOGERROR("Can not handle LoadScene message without an assigned scene");
         return;
     }
 
@@ -502,7 +502,7 @@ void Connection::ProcessSceneChecksumError(int msgID, MemoryBuffer& msg)
         return;
     }
 
-    LOGERROR("Scene checksum error");
+    URHO3D_LOGERROR("Scene checksum error");
     OnSceneLoadFailed();
 }
 
@@ -570,7 +570,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 // If was unable to create the component, would desync the message and therefore have to abort
                 if (!component)
                 {
-                    LOGERROR("CreateNode message parsing aborted due to unknown component");
+                    URHO3D_LOGERROR("CreateNode message parsing aborted due to unknown component");
                     return;
                 }
 
@@ -654,7 +654,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 // If was unable to create the component, would desync the message and therefore have to abort
                 if (!component)
                 {
-                    LOGERROR("CreateComponent message parsing aborted due to unknown component");
+                    URHO3D_LOGERROR("CreateComponent message parsing aborted due to unknown component");
                     return;
                 }
 
@@ -755,7 +755,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                     SharedPtr<File> file(new File(context_, packageFullName));
                     if (!file->IsOpen())
                     {
-                        LOGERROR("Failed to transmit package file " + name);
+                        URHO3D_LOGERROR("Failed to transmit package file " + name);
                         SendPackageError(name);
                         return;
                     }
@@ -769,7 +769,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                 }
             }
 
-            LOGERROR("Client requested an unexpected package file " + name);
+            URHO3D_LOGERROR("Client requested an unexpected package file " + name);
             // Send the name hash only to indicate a failed download
             SendPackageError(name);
             return;
@@ -957,7 +957,7 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
     {
         if (!scene_)
         {
-            LOGERROR("Can not receive remote node event without an assigned scene");
+            URHO3D_LOGERROR("Can not receive remote node event without an assigned scene");
             return;
         }
 
@@ -1063,12 +1063,12 @@ void Connection::SendPackageToClient(PackageFile* package)
 
     if (!IsClient())
     {
-        LOGERROR("SendPackageToClient can be called on the server only");
+        URHO3D_LOGERROR("SendPackageToClient can be called on the server only");
         return;
     }
     if (!package)
     {
-        LOGERROR("Null package specified for SendPackageToClient");
+        URHO3D_LOGERROR("Null package specified for SendPackageToClient");
         return;
     }
 
@@ -1412,7 +1412,7 @@ bool Connection::RequestNeededPackages(unsigned numPackages, MemoryBuffer& msg)
         {
             if (packageCacheDir.Empty())
             {
-                LOGERROR("Can not check/download required packages, as package cache directory is not set");
+                URHO3D_LOGERROR("Can not check/download required packages, as package cache directory is not set");
                 return false;
             }
 
@@ -1489,7 +1489,7 @@ void Connection::OnSceneLoadFailed()
 
 void Connection::OnPackageDownloadFailed(const String& name)
 {
-    LOGERROR("Download of package " + name + " failed");
+    URHO3D_LOGERROR("Download of package " + name + " failed");
     // As one package failed, we can not join the scene in any case. Clear the downloads
     downloads_.Clear();
     OnSceneLoadFailed();

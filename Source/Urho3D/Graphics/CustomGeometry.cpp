@@ -242,7 +242,7 @@ void CustomGeometry::BeginGeometry(unsigned index, PrimitiveType type)
 {
     if (index > geometries_.Size())
     {
-        LOGERROR("Geometry index out of bounds");
+        URHO3D_LOGERROR("Geometry index out of bounds");
         return;
     }
 
@@ -305,7 +305,7 @@ void CustomGeometry::DefineGeometry(unsigned index, PrimitiveType type, unsigned
 {
     if (index > geometries_.Size())
     {
-        LOGERROR("Geometry index out of bounds");
+        URHO3D_LOGERROR("Geometry index out of bounds");
         return;
     }
 
@@ -394,7 +394,7 @@ void CustomGeometry::Commit()
             vertexBuffer_->Unlock();
         }
         else
-            LOGERROR("Failed to lock custom geometry vertex buffer");
+            URHO3D_LOGERROR("Failed to lock custom geometry vertex buffer");
     }
     else
     {
@@ -420,7 +420,7 @@ bool CustomGeometry::SetMaterial(unsigned index, Material* material)
 {
     if (index >= batches_.Size())
     {
-        LOGERROR("Material index out of bounds");
+        URHO3D_LOGERROR("Material index out of bounds");
         return false;
     }
 

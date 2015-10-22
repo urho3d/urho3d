@@ -103,7 +103,7 @@ void DynamicGeometry::CreateScene()
     Model* originalModel = cache->GetResource<Model>("Models/Box.mdl");
     if (!originalModel)
     {
-        LOGERROR("Model not found, cannot initialize example scene");
+        URHO3D_LOGERROR("Model not found, cannot initialize example scene");
         return;
     }
     // Get the vertex buffer from the first geometry's first LOD level
@@ -138,7 +138,7 @@ void DynamicGeometry::CreateScene()
     }
     else
     {
-        LOGERROR("Failed to lock the model vertex buffer to get original vertices");
+        URHO3D_LOGERROR("Failed to lock the model vertex buffer to get original vertices");
         return;
     }
 

@@ -296,19 +296,19 @@ bool FileSystem::SetCurrentDir(const String& pathName)
 {
     if (!CheckAccess(pathName))
     {
-        LOGERROR("Access denied to " + pathName);
+        URHO3D_LOGERROR("Access denied to " + pathName);
         return false;
     }
 #ifdef WIN32
     if (SetCurrentDirectoryW(GetWideNativePath(pathName).CString()) == FALSE)
     {
-        LOGERROR("Failed to change directory to " + pathName);
+        URHO3D_LOGERROR("Failed to change directory to " + pathName);
         return false;
     }
 #else
     if (chdir(GetNativePath(pathName).CString()) != 0)
     {
-        LOGERROR("Failed to change directory to " + pathName);
+        URHO3D_LOGERROR("Failed to change directory to " + pathName);
         return false;
     }
 #endif
@@ -320,7 +320,7 @@ bool FileSystem::CreateDir(const String& pathName)
 {
     if (!CheckAccess(pathName))
     {
-        LOGERROR("Access denied to " + pathName);
+        URHO3D_LOGERROR("Access denied to " + pathName);
         return false;
     }
 
@@ -342,7 +342,7 @@ bool FileSystem::CreateDir(const String& pathName)
     if (success)
         URHO3D_LOGDEBUG("Created directory " + pathName);
     else
-        LOGERROR("Failed to create directory " + pathName);
+        URHO3D_LOGERROR("Failed to create directory " + pathName);
 
     return success;
 }
@@ -365,7 +365,7 @@ int FileSystem::SystemCommand(const String& commandLine, bool redirectStdOutToLo
         return DoSystemCommand(commandLine, redirectStdOutToLog, context_);
     else
     {
-        LOGERROR("Executing an external command is not allowed");
+        URHO3D_LOGERROR("Executing an external command is not allowed");
         return -1;
     }
 }
@@ -376,7 +376,7 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
         return DoSystemRun(fileName, arguments);
     else
     {
-        LOGERROR("Executing an external command is not allowed");
+        URHO3D_LOGERROR("Executing an external command is not allowed");
         return -1;
     }
 }
@@ -393,11 +393,11 @@ unsigned FileSystem::SystemCommandAsync(const String& commandLine)
     }
     else
     {
-        LOGERROR("Executing an external command is not allowed");
+        URHO3D_LOGERROR("Executing an external command is not allowed");
         return M_MAX_UNSIGNED;
     }
 #else
-    LOGERROR("Can not execute an asynchronous command as threading is disabled");
+    URHO3D_LOGERROR("Can not execute an asynchronous command as threading is disabled");
     return M_MAX_UNSIGNED;
 #endif
 }
@@ -414,11 +414,11 @@ unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>
     }
     else
     {
-        LOGERROR("Executing an external command is not allowed");
+        URHO3D_LOGERROR("Executing an external command is not allowed");
         return M_MAX_UNSIGNED;
     }
 #else
-    LOGERROR("Can not run asynchronously as threading is disabled");
+    URHO3D_LOGERROR("Can not run asynchronously as threading is disabled");
     return M_MAX_UNSIGNED;
 #endif
 }
@@ -429,7 +429,7 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
     {
         if (!FileExists(fileName) && !DirExists(fileName))
         {
-            LOGERROR("File or directory " + fileName + " not found");
+            URHO3D_LOGERROR("File or directory " + fileName + " not found");
             return false;
         }
 
@@ -448,12 +448,12 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
             arguments) == 0;
 #endif
         if (!success)
-            LOGERROR("Failed to open " + fileName + " externally");
+            URHO3D_LOGERROR("Failed to open " + fileName + " externally");
         return success;
     }
     else
     {
-        LOGERROR("Opening a file externally is not allowed");
+        URHO3D_LOGERROR("Opening a file externally is not allowed");
         return false;
     }
 }
@@ -462,12 +462,12 @@ bool FileSystem::Copy(const String& srcFileName, const String& destFileName)
 {
     if (!CheckAccess(GetPath(srcFileName)))
     {
-        LOGERROR("Access denied to " + srcFileName);
+        URHO3D_LOGERROR("Access denied to " + srcFileName);
         return false;
     }
     if (!CheckAccess(GetPath(destFileName)))
     {
-        LOGERROR("Access denied to " + destFileName);
+        URHO3D_LOGERROR("Access denied to " + destFileName);
         return false;
     }
 
@@ -490,12 +490,12 @@ bool FileSystem::Rename(const String& srcFileName, const String& destFileName)
 {
     if (!CheckAccess(GetPath(srcFileName)))
     {
-        LOGERROR("Access denied to " + srcFileName);
+        URHO3D_LOGERROR("Access denied to " + srcFileName);
         return false;
     }
     if (!CheckAccess(GetPath(destFileName)))
     {
-        LOGERROR("Access denied to " + destFileName);
+        URHO3D_LOGERROR("Access denied to " + destFileName);
         return false;
     }
 
@@ -510,7 +510,7 @@ bool FileSystem::Delete(const String& fileName)
 {
     if (!CheckAccess(GetPath(fileName)))
     {
-        LOGERROR("Access denied to " + fileName);
+        URHO3D_LOGERROR("Access denied to " + fileName);
         return false;
     }
 

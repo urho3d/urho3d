@@ -420,12 +420,12 @@ void Drawable::AddToOctree()
         if (octree)
             octree->InsertDrawable(this);
         else
-            LOGERROR("No Octree component in scene, drawable will not render");
+            URHO3D_LOGERROR("No Octree component in scene, drawable will not render");
     }
     else
     {
         // We have a mechanism for adding detached nodes to an octree manually, so do not log this error
-        //LOGERROR("Node is detached from scene, drawable will not render");
+        //URHO3D_LOGERROR("Node is detached from scene, drawable will not render");
     }
 }
 

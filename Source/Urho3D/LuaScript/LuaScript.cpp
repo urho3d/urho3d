@@ -87,7 +87,7 @@ LuaScript::LuaScript(Context* context) :
     luaState_ = luaL_newstate();
     if (!luaState_)
     {
-        LOGERROR("Could not create Lua state");
+        URHO3D_LOGERROR("Could not create Lua state");
         return;
     }
 
@@ -331,7 +331,7 @@ void LuaScript::RegisterLoader()
 int LuaScript::AtPanic(lua_State* L)
 {
     String errorMessage = luaL_checkstring(L, -1);
-    LOGERROR("Lua error: Error message = '" + errorMessage + "'");
+    URHO3D_LOGERROR("Lua error: Error message = '" + errorMessage + "'");
     lua_pop(L, 1);
     return 0;
 }

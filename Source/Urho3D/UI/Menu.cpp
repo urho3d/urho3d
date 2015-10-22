@@ -179,7 +179,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanc
                 // Do not add the popup element as a child even temporarily, as that can break layouts
                 SharedPtr<UIElement> popup = DynamicCast<UIElement>(context_->CreateObject(typeName));
                 if (!popup)
-                    LOGERROR("Could not create popup element type " + typeName);
+                    URHO3D_LOGERROR("Could not create popup element type " + typeName);
                 else
                 {
                     child = popup;
@@ -247,7 +247,7 @@ bool Menu::SaveXML(XMLElement& dest) const
         // Filter popup implicit attributes
         if (!FilterPopupImplicitAttributes(childElem))
         {
-            LOGERROR("Could not remove popup implicit attributes");
+            URHO3D_LOGERROR("Could not remove popup implicit attributes");
             return false;
         }
     }
@@ -263,7 +263,7 @@ void Menu::SetPopup(UIElement* popup)
     // Currently only allow popup 'window'
     if (popup->GetType() != Window::GetTypeStatic())
     {
-        LOGERROR("Could not set popup element of type " + popup->GetTypeName() + ", only support popup window for now");
+        URHO3D_LOGERROR("Could not set popup element of type " + popup->GetTypeName() + ", only support popup window for now");
         return;
     }
 

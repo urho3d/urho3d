@@ -71,7 +71,7 @@ bool OcclusionBuffer::SetSize(int width, int height)
 
     if (!IsPowerOfTwo((unsigned)width))
     {
-        LOGERROR("Width is not a power of two");
+        URHO3D_LOGERROR("Width is not a power of two");
         return false;
     }
 

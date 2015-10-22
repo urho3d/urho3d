@@ -57,7 +57,7 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
     // Start the worker thread to actually create the connection and read the response data.
     Run();
 #else
-    LOGERROR("HTTP request will not execute as threading is disabled");
+    URHO3D_LOGERROR("HTTP request will not execute as threading is disabled");
 #endif
 }
 

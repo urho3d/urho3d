@@ -479,7 +479,7 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
 
     if (!file)
     {
-        LOGERROR("Null UI layout XML file");
+        URHO3D_LOGERROR("Null UI layout XML file");
         return root;
     }
 
@@ -488,7 +488,7 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
     XMLElement rootElem = file->GetRoot("element");
     if (!rootElem)
     {
-        LOGERROR("No root UI element in " + file->GetName());
+        URHO3D_LOGERROR("No root UI element in " + file->GetName());
         return root;
     }
 
@@ -499,7 +499,7 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
     root = DynamicCast<UIElement>(context_->CreateObject(typeName));
     if (!root)
     {
-        LOGERROR("Could not create unknown UI element " + typeName);
+        URHO3D_LOGERROR("Could not create unknown UI element " + typeName);
         return root;
     }
 

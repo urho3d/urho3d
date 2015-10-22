@@ -355,7 +355,7 @@ void Graphics::SetExternalWindow(void* window)
     if (!impl_->window_)
         externalWindow_ = window;
     else
-        LOGERROR("Window already opened, can not set external window");
+        URHO3D_LOGERROR("Window already opened, can not set external window");
 }
 
 void Graphics::SetWindowTitle(const String& windowTitle)
@@ -585,7 +585,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
     impl_->device_->CreateTexture2D(&textureDesc, 0, &stagingTexture);
     if (!stagingTexture)
     {
-        LOGERROR("Could not create staging texture for screenshot");
+        URHO3D_LOGERROR("Could not create staging texture for screenshot");
         return false;
     }
 
@@ -599,7 +599,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
         if (!impl_->resolveTexture_)
         {
-            LOGERROR("Could not create intermediate texture for multisampled screenshot");
+            URHO3D_LOGERROR("Could not create intermediate texture for multisampled screenshot");
             stagingTexture->Release();
             source->Release();
             return false;
@@ -638,7 +638,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
     }
     else
     {
-        LOGERROR("Could not map staging texture for screenshot");
+        URHO3D_LOGERROR("Could not map staging texture for screenshot");
         stagingTexture->Release();
         return false;
     }
@@ -893,12 +893,12 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
 {
     if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
-        LOGERROR("Too many vertex buffers");
+        URHO3D_LOGERROR("Too many vertex buffers");
         return false;
     }
     if (buffers.Size() != elementMasks.Size())
     {
-        LOGERROR("Amount of element masks and vertex buffers does not match");
+        URHO3D_LOGERROR("Amount of element masks and vertex buffers does not match");
         return false;
     }
 
@@ -999,7 +999,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 bool success = vs->Create();
                 if (!success)
                 {
-                    LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
+                    URHO3D_LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
                     vs = 0;
                 }
             }
@@ -1023,7 +1023,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 bool success = ps->Create();
                 if (!success)
                 {
-                    LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
+                    URHO3D_LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
                     ps = 0;
                 }
             }
@@ -2248,7 +2248,7 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
 
         if (!impl_->device_ || !impl_->deviceContext_)
         {
-            LOGERROR("Failed to create D3D11 device");
+            URHO3D_LOGERROR("Failed to create D3D11 device");
             return false;
         }
 
@@ -2304,7 +2304,7 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     }
     else
     {
-        LOGERROR("Failed to create D3D11 swap chain");
+        URHO3D_LOGERROR("Failed to create D3D11 swap chain");
         return false;
     }
 }
@@ -2353,7 +2353,7 @@ bool Graphics::UpdateSwapChain(int width, int height)
     }
     else
     {
-        LOGERROR("Failed to get backbuffer texture");
+        URHO3D_LOGERROR("Failed to get backbuffer texture");
         success = false;
     }
 
@@ -2376,7 +2376,7 @@ bool Graphics::UpdateSwapChain(int width, int height)
         impl_->device_->CreateDepthStencilView(impl_->defaultDepthTexture_, 0, &impl_->defaultDepthStencilView_);
     else
     {
-        LOGERROR("Failed to create backbuffer depth-stencil texture");
+        URHO3D_LOGERROR("Failed to create backbuffer depth-stencil texture");
         success = false;
     }
 
@@ -2577,7 +2577,7 @@ void Graphics::PrepareDraw()
                 ID3D11BlendState* newBlendState = 0;
                 impl_->device_->CreateBlendState(&stateDesc, &newBlendState);
                 if (!newBlendState)
-                    LOGERROR("Failed to create blend state");
+                    URHO3D_LOGERROR("Failed to create blend state");
 
                 i = impl_->blendStates_.Insert(MakePair(newBlendStateHash, newBlendState));
             }
@@ -2622,7 +2622,7 @@ void Graphics::PrepareDraw()
                 ID3D11DepthStencilState* newDepthState = 0;
                 impl_->device_->CreateDepthStencilState(&stateDesc, &newDepthState);
                 if (!newDepthState)
-                    LOGERROR("Failed to create depth state");
+                    URHO3D_LOGERROR("Failed to create depth state");
 
                 i = impl_->depthStates_.Insert(MakePair(newDepthStateHash, newDepthState));
             }
@@ -2668,7 +2668,7 @@ void Graphics::PrepareDraw()
                 ID3D11RasterizerState* newRasterizerState = 0;
                 impl_->device_->CreateRasterizerState(&stateDesc, &newRasterizerState);
                 if (!newRasterizerState)
-                    LOGERROR("Failed to create rasterizer state");
+                    URHO3D_LOGERROR("Failed to create rasterizer state");
 
                 i = impl_->rasterizerStates_.Insert(MakePair(newRasterizerStateHash, newRasterizerState));
             }

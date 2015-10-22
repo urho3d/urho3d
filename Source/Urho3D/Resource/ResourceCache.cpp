@@ -100,7 +100,7 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (!fileSystem || !fileSystem->DirExists(pathName))
     {
-        LOGERROR("Could not open directory " + pathName);
+        URHO3D_LOGERROR("Could not open directory " + pathName);
         return false;
     }
 
@@ -158,14 +158,14 @@ bool ResourceCache::AddManualResource(Resource* resource)
 {
     if (!resource)
     {
-        LOGERROR("Null manual resource");
+        URHO3D_LOGERROR("Null manual resource");
         return false;
     }
 
     const String& name = resource->GetName();
     if (name.Empty())
     {
-        LOGERROR("Manual resource with empty name, can not add");
+        URHO3D_LOGERROR("Manual resource with empty name, can not add");
         return false;
     }
 
@@ -517,9 +517,9 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFai
     if (sendEventOnFailure)
     {
         if (resourceRouters_.Size() && name.Empty() && !nameIn.Empty())
-            LOGERROR("Resource request " + nameIn + " was blocked");
+            URHO3D_LOGERROR("Resource request " + nameIn + " was blocked");
         else
-            LOGERROR("Could not find resource " + name);
+            URHO3D_LOGERROR("Could not find resource " + name);
 
         if (Thread::IsMainThread())
         {
@@ -540,7 +540,7 @@ Resource* ResourceCache::GetExistingResource(StringHash type, const String& name
 
     if (!Thread::IsMainThread())
     {
-        LOGERROR("Attempted to get resource " + name + " from outside the main thread");
+        URHO3D_LOGERROR("Attempted to get resource " + name + " from outside the main thread");
         return 0;
     }
 
@@ -560,7 +560,7 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
 
     if (!Thread::IsMainThread())
     {
-        LOGERROR("Attempted to get resource " + name + " from outside the main thread");
+        URHO3D_LOGERROR("Attempted to get resource " + name + " from outside the main thread");
         return 0;
     }
 
@@ -584,7 +584,7 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
     resource = DynamicCast<Resource>(context_->CreateObject(type));
     if (!resource)
     {
-        LOGERROR("Could not load unknown resource type " + String(type));
+        URHO3D_LOGERROR("Could not load unknown resource type " + String(type));
 
         if (sendEventOnFailure)
         {
@@ -663,7 +663,7 @@ SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String
     resource = DynamicCast<Resource>(context_->CreateObject(type));
     if (!resource)
     {
-        LOGERROR("Could not load unknown resource type " + String(type));
+        URHO3D_LOGERROR("Could not load unknown resource type " + String(type));
 
         if (sendEventOnFailure)
         {

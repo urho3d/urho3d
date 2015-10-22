@@ -413,7 +413,7 @@ AnimationState* AnimatedModel::AddAnimationState(Animation* animation)
 {
     if (!isMaster_)
     {
-        LOGERROR("Can not add animation state to non-master model");
+        URHO3D_LOGERROR("Can not add animation state to non-master model");
         return 0;
     }
 
@@ -666,7 +666,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
 {
     if (!node_ && createBones)
     {
-        LOGERROR("AnimatedModel not attached to a scene node, can not create bone nodes");
+        URHO3D_LOGERROR("AnimatedModel not attached to a scene node, can not create bone nodes");
         return;
     }
 

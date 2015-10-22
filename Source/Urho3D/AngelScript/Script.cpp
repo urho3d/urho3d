@@ -77,7 +77,7 @@ Script::Script(Context* context) :
     scriptEngine_ = asCreateScriptEngine(ANGELSCRIPT_VERSION);
     if (!scriptEngine_)
     {
-        LOGERROR("Could not create AngelScript engine");
+        URHO3D_LOGERROR("Could not create AngelScript engine");
         return;
     }
 
@@ -228,7 +228,7 @@ void Script::MessageCallback(const asSMessageInfo* msg)
     switch (msg->type)
     {
     case asMSGTYPE_ERROR:
-        LOGERROR(message);
+        URHO3D_LOGERROR(message);
         break;
 
     case asMSGTYPE_WARNING:

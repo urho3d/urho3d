@@ -553,7 +553,7 @@ bool CrowdManager::CreateCrowd()
         maxAgentRadius_ = navigationMesh_->GetAgentRadius();
     if (!crowd_->init(maxAgents_, maxAgentRadius_, navigationMesh_->navMesh_, CrowdAgentUpdateCallback))
     {
-        LOGERROR("Could not initialize DetourCrowd");
+        URHO3D_LOGERROR("Could not initialize DetourCrowd");
         return false;
     }
 
@@ -610,7 +610,7 @@ void CrowdManager::OnSceneSet(Scene* scene)
     {
         if (scene != node_)
         {
-            LOGERROR("CrowdManager is a scene component and should only be attached to the scene node");
+            URHO3D_LOGERROR("CrowdManager is a scene component and should only be attached to the scene node");
             return;
         }
 

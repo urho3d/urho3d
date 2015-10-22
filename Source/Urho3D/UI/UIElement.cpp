@@ -296,7 +296,7 @@ bool UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFile, bo
     bool internalElem = childElem.GetBool("internal");
     if (internalElem)
     {
-        LOGERROR("Loading internal child element is not supported");
+        URHO3D_LOGERROR("Loading internal child element is not supported");
         return false;
     }
 
@@ -573,7 +573,7 @@ bool UIElement::FilterAttributes(XMLElement& dest) const
     // Filter implicit attributes
     if (!FilterImplicitAttributes(dest))
     {
-        LOGERROR("Could not remove implicit attributes");
+        URHO3D_LOGERROR("Could not remove implicit attributes");
         return false;
     }
 
@@ -1223,7 +1223,7 @@ UIElement* UIElement::CreateChild(StringHash type, const String& name, unsigned 
     SharedPtr<UIElement> newElement = DynamicCast<UIElement>(context_->CreateObject(type));
     if (!newElement)
     {
-        LOGERROR("Could not create unknown UI element type " + type.ToString());
+        URHO3D_LOGERROR("Could not create unknown UI element type " + type.ToString());
         return 0;
     }
 
@@ -1737,7 +1737,7 @@ Animatable* UIElement::FindAttributeAnimationTarget(const String& name, String& 
         {
             if (names[i].Front() != '#')
             {
-                LOGERROR("Invalid name " + name);
+                URHO3D_LOGERROR("Invalid name " + name);
                 return 0;
             }
 
@@ -1745,7 +1745,7 @@ Animatable* UIElement::FindAttributeAnimationTarget(const String& name, String& 
             element = element->GetChild(index);
             if (!element)
             {
-                LOGERROR("Could not find element by name " + name);
+                URHO3D_LOGERROR("Could not find element by name " + name);
                 return 0;
             }
         }
@@ -1813,7 +1813,7 @@ bool UIElement::FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styl
     {
         if (!childElem.GetBool("internal"))
         {
-            LOGERROR("Invalid style file, style element can only contain internal child elements");
+            URHO3D_LOGERROR("Invalid style file, style element can only contain internal child elements");
             return false;
         }
         if (!FilterUIStyleAttributes(childDest, childElem))

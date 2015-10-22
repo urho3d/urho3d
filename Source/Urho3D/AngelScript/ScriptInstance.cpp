@@ -242,7 +242,7 @@ bool ScriptInstance::Execute(const String& declaration, const VariantVector& par
     asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
     if (!method)
     {
-        LOGERROR("Method " + declaration + " not found in class " + className_);
+        URHO3D_LOGERROR("Method " + declaration + " not found in class " + className_);
         return false;
     }
 
@@ -303,7 +303,7 @@ void ScriptInstance::AddEventHandler(StringHash eventType, const String& handler
         method = scriptFile_->GetMethod(scriptObject_, handlerName);
         if (!method)
         {
-            LOGERROR("Event handler method " + handlerName + " not found in " + scriptFile_->GetName());
+            URHO3D_LOGERROR("Event handler method " + handlerName + " not found in " + scriptFile_->GetName());
             return;
         }
     }
@@ -318,7 +318,7 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
 
     if (!sender)
     {
-        LOGERROR("Null event sender for event " + String(eventType) + ", handler " + handlerName);
+        URHO3D_LOGERROR("Null event sender for event " + String(eventType) + ", handler " + handlerName);
         return;
     }
 
@@ -330,7 +330,7 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
         method = scriptFile_->GetMethod(scriptObject_, handlerName);
         if (!method)
         {
-            LOGERROR("Event handler method " + handlerName + " not found in " + scriptFile_->GetName());
+            URHO3D_LOGERROR("Event handler method " + handlerName + " not found in " + scriptFile_->GetName());
             return;
         }
     }
@@ -535,7 +535,7 @@ void ScriptInstance::CreateObject()
             scriptFile_->Execute(scriptObject_, methods_[METHOD_START]);
     }
     else
-        LOGERROR("Failed to create object of class " + className_ + " from " + scriptFile_->GetName());
+        URHO3D_LOGERROR("Failed to create object of class " + className_ + " from " + scriptFile_->GetName());
 }
 
 void ScriptInstance::ReleaseObject()
@@ -702,7 +702,7 @@ void ScriptInstance::UpdateEventSubscription()
                         SubscribeToEvent(world, E_PHYSICSPOSTSTEP, URHO3D_HANDLER(ScriptInstance, HandlePhysicsPostStep));
                 }
                 else
-                    LOGERROR("No physics world, can not subscribe script object to fixed update events");
+                    URHO3D_LOGERROR("No physics world, can not subscribe script object to fixed update events");
             }
 #endif
             subscribedPostFixed_ = true;

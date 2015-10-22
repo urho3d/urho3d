@@ -125,7 +125,7 @@ void Cursor::DefineShape(CursorShape shape, Image* image, const IntRect& imageRe
 {
     if (shape < CS_NORMAL || shape >= CS_MAX_SHAPES)
     {
-        LOGERROR("Shape index out of bounds, can not define cursor shape");
+        URHO3D_LOGERROR("Shape index out of bounds, can not define cursor shape");
         return;
     }
 
@@ -276,7 +276,7 @@ void Cursor::ApplyOSCursorShape()
             info.osCursor_ = SDL_CreateSystemCursor((SDL_SystemCursor)osCursorLookup[info.systemCursor_]);
             info.systemDefined_ = true;
             if (!info.osCursor_)
-                LOGERROR("Could not create system cursor");
+                URHO3D_LOGERROR("Could not create system cursor");
         }
         // Create from image
         else if (info.image_)
@@ -288,7 +288,7 @@ void Cursor::ApplyOSCursorShape()
                 info.osCursor_ = SDL_CreateColorCursor(surface, info.hotSpot_.x_, info.hotSpot_.y_);
                 info.systemDefined_ = false;
                 if (!info.osCursor_)
-                    LOGERROR("Could not create cursor from image " + info.image_->GetName());
+                    URHO3D_LOGERROR("Could not create cursor from image " + info.image_->GetName());
                 SDL_FreeSurface(surface);
             }
         }

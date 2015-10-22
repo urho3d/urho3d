@@ -228,7 +228,7 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
     }
     else
     {
-        LOGERROR("Failed to connect to server " + address + ":" + String(port));
+        URHO3D_LOGERROR("Failed to connect to server " + address + ":" + String(port));
         SendEvent(E_CONNECTFAILED);
         return false;
     }
@@ -257,7 +257,7 @@ bool Network::StartServer(unsigned short port)
     }
     else
     {
-        LOGERROR("Failed to start server on port " + String(port));
+        URHO3D_LOGERROR("Failed to start server on port " + String(port));
         return false;
     }
 }
@@ -285,7 +285,7 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
     // Make sure not to use kNet internal message ID's
     if (msgID <= 0x4 || msgID >= 0x3ffffffe)
     {
-        LOGERROR("Can not send message with reserved ID");
+        URHO3D_LOGERROR("Can not send message with reserved ID");
         return;
     }
 
@@ -293,7 +293,7 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
     if (server)
         server->BroadcastMessage((unsigned long)msgID, reliable, inOrder, 0, contentID, (const char*)data, numBytes);
     else
-        LOGERROR("Server not running, can not broadcast messages");
+        URHO3D_LOGERROR("Server not running, can not broadcast messages");
 }
 
 void Network::BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
@@ -317,12 +317,12 @@ void Network::BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrde
 {
     if (!node)
     {
-        LOGERROR("Null sender node for remote node event");
+        URHO3D_LOGERROR("Null sender node for remote node event");
         return;
     }
     if (node->GetID() >= FIRST_LOCAL_ID)
     {
-        LOGERROR("Sender node has a local ID, can not send remote node event");
+        URHO3D_LOGERROR("Sender node has a local ID, can not send remote node event");
         return;
     }
 
@@ -358,7 +358,7 @@ void Network::RegisterRemoteEvent(StringHash eventType)
 {
     if (blacklistedRemoteEvents_.Find(eventType) != blacklistedRemoteEvents_.End())
     {
-        LOGERROR("Attempted to register blacklisted remote event type " + String(eventType));
+        URHO3D_LOGERROR("Attempted to register blacklisted remote event type " + String(eventType));
         return;
     }
 
@@ -384,12 +384,12 @@ void Network::SendPackageToClients(Scene* scene, PackageFile* package)
 {
     if (!scene)
     {
-        LOGERROR("Null scene specified for SendPackageToClients");
+        URHO3D_LOGERROR("Null scene specified for SendPackageToClients");
         return;
     }
     if (!package)
     {
-        LOGERROR("Null package specified for SendPackageToClients");
+        URHO3D_LOGERROR("Null package specified for SendPackageToClients");
         return;
     }
 
@@ -581,7 +581,7 @@ void Network::OnServerDisconnected()
     }
     else
     {
-        LOGERROR("Failed to connect to server");
+        URHO3D_LOGERROR("Failed to connect to server");
         SendEvent(E_CONNECTFAILED);
     }
 }

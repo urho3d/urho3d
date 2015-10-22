@@ -126,7 +126,7 @@ bool ScriptFile::BeginLoad(Deserializer& source)
         scriptModule_ = engine->GetModule(GetName().CString(), asGM_ALWAYS_CREATE);
         if (!scriptModule_)
         {
-            LOGERROR("Failed to create script module " + GetName());
+            URHO3D_LOGERROR("Failed to create script module " + GetName());
             return false;
         }
     }
@@ -174,7 +174,7 @@ bool ScriptFile::EndLoad()
             success = true;
         }
         else
-            LOGERROR("Failed to compile script module " + GetName());
+            URHO3D_LOGERROR("Failed to compile script module " + GetName());
     }
 
     if (success)
@@ -203,7 +203,7 @@ void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const Str
 
     if (!sender)
     {
-        LOGERROR("Null event sender for event " + String(eventType) + ", handler " + handlerName);
+        URHO3D_LOGERROR("Null event sender for event " + String(eventType) + ", handler " + handlerName);
         return;
     }
 
@@ -276,7 +276,7 @@ bool ScriptFile::Execute(const String& declaration, const VariantVector& paramet
     asIScriptFunction* function = GetFunction(declaration);
     if (!function)
     {
-        LOGERROR("Function " + declaration + " not found in " + GetName());
+        URHO3D_LOGERROR("Function " + declaration + " not found in " + GetName());
         return false;
     }
 
@@ -317,7 +317,7 @@ bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, con
     asIScriptFunction* method = GetMethod(object, declaration);
     if (!method)
     {
-        LOGERROR("Method " + declaration + " not found in class " + String(object->GetObjectType()->GetName()));
+        URHO3D_LOGERROR("Method " + declaration + " not found in class " + String(object->GetObjectType()->GetName()));
         return false;
     }
 
@@ -534,7 +534,7 @@ void ScriptFile::AddEventHandlerInternal(Object* sender, StringHash eventType, c
 
         if (!function)
         {
-            LOGERROR("Event handler function " + handlerName + " not found in " + GetName());
+            URHO3D_LOGERROR("Event handler function " + handlerName + " not found in " + GetName());
             return;
         }
     }
@@ -675,7 +675,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
         }
         else
         {
-            LOGERROR("Could not process all the include directives in " + GetName() + ": missing " + includeFiles[i]);
+            URHO3D_LOGERROR("Could not process all the include directives in " + GetName() + ": missing " + includeFiles[i]);
             return false;
         }
     }
@@ -683,7 +683,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     // Then add this section
     if (scriptModule_->AddScriptSection(source.GetName().CString(), (const char*)buffer.Get(), dataSize) < 0)
     {
-        LOGERROR("Failed to add script section " + source.GetName());
+        URHO3D_LOGERROR("Failed to add script section " + source.GetName());
         return false;
     }
 

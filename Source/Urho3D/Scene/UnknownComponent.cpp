@@ -157,7 +157,7 @@ bool UnknownComponent::SaveXML(XMLElement& dest) const
 {
     if (dest.IsNull())
     {
-        LOGERROR("Could not save " + GetTypeName() + ", null destination element");
+        URHO3D_LOGERROR("Could not save " + GetTypeName() + ", null destination element");
         return false;
     }
 

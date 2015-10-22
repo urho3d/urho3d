@@ -354,7 +354,7 @@ void Graphics::SetExternalWindow(void* window)
     if (!impl_->window_)
         externalWindow_ = window;
     else
-        LOGERROR("Window already opened, can not set external window");
+        URHO3D_LOGERROR("Window already opened, can not set external window");
 }
 
 void Graphics::SetWindowTitle(const String& windowTitle)
@@ -647,7 +647,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
     impl_->device_->CreateOffscreenPlainSurface(surfaceWidth, surfaceHeight, surfaceDesc.Format, D3DPOOL_SYSTEMMEM, &surface, 0);
     if (!surface)
     {
-        LOGERROR("Could not create surface for taking a screenshot");
+        URHO3D_LOGERROR("Could not create surface for taking a screenshot");
         return false;
     }
 
@@ -677,7 +677,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
     surface->LockRect(&lockedRect, &sourceRect, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY);
     if (!lockedRect.pBits)
     {
-        LOGERROR("Could not lock surface for taking a screenshot");
+        URHO3D_LOGERROR("Could not lock surface for taking a screenshot");
         surface->Release();
         return false;
     }
@@ -950,12 +950,12 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
 {
     if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
-        LOGERROR("Too many vertex buffers");
+        URHO3D_LOGERROR("Too many vertex buffers");
         return false;
     }
     if (buffers.Size() != elementMasks.Size())
     {
-        LOGERROR("Amount of element masks and vertex buffers does not match");
+        URHO3D_LOGERROR("Amount of element masks and vertex buffers does not match");
         return false;
     }
 
@@ -977,7 +977,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
             SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers, elementMasks));
             if (!newDeclaration->GetDeclaration())
             {
-                LOGERROR("Failed to create vertex declaration");
+                URHO3D_LOGERROR("Failed to create vertex declaration");
                 return false;
             }
 
@@ -1058,7 +1058,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 bool success = vs->Create();
                 if (!success)
                 {
-                    LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
+                    URHO3D_LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
                     vs = 0;
                 }
             }
@@ -1088,7 +1088,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 bool success = ps->Create();
                 if (!success)
                 {
-                    LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
+                    URHO3D_LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
                     ps = 0;
                 }
             }
@@ -2430,25 +2430,25 @@ bool Graphics::CreateInterface()
     impl_->interface_ = Direct3DCreate9(D3D_SDK_VERSION);
     if (!impl_->interface_)
     {
-        LOGERROR("Could not create Direct3D9 interface");
+        URHO3D_LOGERROR("Could not create Direct3D9 interface");
         return false;
     }
 
     if (FAILED(impl_->interface_->GetDeviceCaps(impl_->adapter_, impl_->deviceType_, &impl_->deviceCaps_)))
     {
-        LOGERROR("Could not get Direct3D capabilities");
+        URHO3D_LOGERROR("Could not get Direct3D capabilities");
         return false;
     }
 
     if (FAILED(impl_->interface_->GetAdapterIdentifier(impl_->adapter_, 0, &impl_->adapterIdentifier_)))
     {
-        LOGERROR("Could not get Direct3D adapter identifier");
+        URHO3D_LOGERROR("Could not get Direct3D adapter identifier");
         return false;
     }
 
     if (impl_->deviceCaps_.PixelShaderVersion < D3DPS_VERSION(3, 0))
     {
-        LOGERROR("Shader model 3.0 display adapter is required");
+        URHO3D_LOGERROR("Shader model 3.0 display adapter is required");
         return false;
     }
 
@@ -2479,7 +2479,7 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
         &impl_->presentParams_,
         &impl_->device_)))
     {
-        LOGERROR("Could not create Direct3D9 device");
+        URHO3D_LOGERROR("Could not create Direct3D9 device");
         return false;
     }
 

@@ -434,7 +434,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, CollisionShape* shap
 {
     if (!shape || !shape->GetCollisionShape())
     {
-        LOGERROR("Null collision shape for convex cast");
+        URHO3D_LOGERROR("Null collision shape for convex cast");
         result.body_ = 0;
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
@@ -474,7 +474,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
 {
     if (!shape)
     {
-        LOGERROR("Null collision shape for convex cast");
+        URHO3D_LOGERROR("Null collision shape for convex cast");
         result.body_ = 0;
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
@@ -484,7 +484,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
 
     if (!shape->isConvex())
     {
-        LOGERROR("Can not use non-convex collision shape for convex cast");
+        URHO3D_LOGERROR("Can not use non-convex collision shape for convex cast");
         result.body_ = 0;
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;

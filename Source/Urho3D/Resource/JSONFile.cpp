@@ -117,7 +117,7 @@ bool JSONFile::BeginLoad(Deserializer& source)
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
     {
-        LOGERROR("Zero sized JSON data in " + source.GetName());
+        URHO3D_LOGERROR("Zero sized JSON data in " + source.GetName());
         return false;
     }
 
@@ -129,7 +129,7 @@ bool JSONFile::BeginLoad(Deserializer& source)
     rapidjson::Document document;
     if (document.Parse<0>(buffer).HasParseError())
     {
-        LOGERROR("Could not parse JSON data from " + source.GetName());
+        URHO3D_LOGERROR("Could not parse JSON data from " + source.GetName());
         return false;
     }
 

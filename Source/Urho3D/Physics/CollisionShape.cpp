@@ -614,7 +614,7 @@ void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vect
 {
     if (!model)
     {
-        LOGERROR("Null model, can not set triangle mesh");
+        URHO3D_LOGERROR("Null model, can not set triangle mesh");
         return;
     }
 
@@ -639,12 +639,12 @@ void CollisionShape::SetCustomTriangleMesh(CustomGeometry* custom, const Vector3
 {
     if (!custom)
     {
-        LOGERROR("Null custom geometry, can not set triangle mesh");
+        URHO3D_LOGERROR("Null custom geometry, can not set triangle mesh");
         return;
     }
     if (custom->GetScene() != GetScene())
     {
-        LOGERROR("Custom geometry is not in the same scene as the collision shape, can not set triangle mesh");
+        URHO3D_LOGERROR("Custom geometry is not in the same scene as the collision shape, can not set triangle mesh");
         return;
     }
 
@@ -669,7 +669,7 @@ void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, const Vector
 {
     if (!model)
     {
-        LOGERROR("Null model, can not set convex hull");
+        URHO3D_LOGERROR("Null model, can not set convex hull");
         return;
     }
 
@@ -694,12 +694,12 @@ void CollisionShape::SetCustomConvexHull(CustomGeometry* custom, const Vector3& 
 {
     if (!custom)
     {
-        LOGERROR("Null custom geometry, can not set convex hull");
+        URHO3D_LOGERROR("Null custom geometry, can not set convex hull");
         return;
     }
     if (custom->GetScene() != GetScene())
     {
-        LOGERROR("Custom geometry is not in the same scene as the collision shape, can not set convex hull");
+        URHO3D_LOGERROR("Custom geometry is not in the same scene as the collision shape, can not set convex hull");
         return;
     }
 
@@ -724,7 +724,7 @@ void CollisionShape::SetTerrain(unsigned lodLevel)
     Terrain* terrain = GetComponent<Terrain>();
     if (!terrain)
     {
-        LOGERROR("No terrain component, can not set terrain shape");
+        URHO3D_LOGERROR("No terrain component, can not set terrain shape");
         return;
     }
 

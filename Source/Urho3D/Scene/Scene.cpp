@@ -119,7 +119,7 @@ bool Scene::Load(Deserializer& source, bool setInstanceDefault)
     // Check ID
     if (source.ReadFileID() != "USCN")
     {
-        LOGERROR(source.GetName() + " is not a valid scene file");
+        URHO3D_LOGERROR(source.GetName() + " is not a valid scene file");
         return false;
     }
 
@@ -144,7 +144,7 @@ bool Scene::Save(Serializer& dest) const
     // Write ID first
     if (!dest.WriteFileID("USCN"))
     {
-        LOGERROR("Could not save scene, writing to stream failed");
+        URHO3D_LOGERROR("Could not save scene, writing to stream failed");
         return false;
     }
 
@@ -245,7 +245,7 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
 {
     if (!file)
     {
-        LOGERROR("Null file for async loading");
+        URHO3D_LOGERROR("Null file for async loading");
         return false;
     }
 
@@ -258,7 +258,7 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
         // In resource load mode can load also object prefabs, which have no identifier
         if (mode > LOAD_RESOURCES_ONLY)
         {
-            LOGERROR(file->GetName() + " is not a valid scene file");
+            URHO3D_LOGERROR(file->GetName() + " is not a valid scene file");
             return false;
         }
         else
@@ -318,7 +318,7 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
 {
     if (!file)
     {
-        LOGERROR("Null file for async loading");
+        URHO3D_LOGERROR("Null file for async loading");
         return false;
     }
 

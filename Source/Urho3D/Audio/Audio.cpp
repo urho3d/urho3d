@@ -103,14 +103,14 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     deviceID_ = SDL_OpenAudioDevice(0, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE);
     if (!deviceID_)
     {
-        LOGERROR("Could not initialize audio output");
+        URHO3D_LOGERROR("Could not initialize audio output");
         return false;
     }
 
 #ifdef __EMSCRIPTEN__
     if (obtained.format != AUDIO_F32LSB && obtained.format != AUDIO_F32MSB && obtained.format != AUDIO_F32SYS)
     {
-        LOGERROR("Could not initialize audio output, 32-bit float buffer format not supported");
+        URHO3D_LOGERROR("Could not initialize audio output, 32-bit float buffer format not supported");
         SDL_CloseAudioDevice(deviceID_);
         deviceID_ = 0;
         return false;
@@ -118,7 +118,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
 #else
     if (obtained.format != AUDIO_S16SYS && obtained.format != AUDIO_S16LSB && obtained.format != AUDIO_S16MSB)
     {
-        LOGERROR("Could not initialize audio output, 16-bit buffer format not supported");
+        URHO3D_LOGERROR("Could not initialize audio output, 16-bit buffer format not supported");
         SDL_CloseAudioDevice(deviceID_);
         deviceID_ = 0;
         return false;
@@ -155,7 +155,7 @@ bool Audio::Play()
 
     if (!deviceID_)
     {
-        LOGERROR("No audio mode set, can not start playback");
+        URHO3D_LOGERROR("No audio mode set, can not start playback");
         return false;
     }
 

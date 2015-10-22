@@ -130,7 +130,7 @@ void Constraint2D::OnNodeSet(Node* node)
         ownerBody_ = node->GetComponent<RigidBody2D>();
         if (!ownerBody_)
         {
-            LOGERROR("No right body component in node, can not create constraint");
+            URHO3D_LOGERROR("No right body component in node, can not create constraint");
             return;
         }
     }

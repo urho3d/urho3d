@@ -248,7 +248,7 @@ void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attri
             const Vector<AttributeInfo>* attributes = GetAttributes();
             if (!attributes)
             {
-                LOGERROR(GetTypeName() + " has no attributes");
+                URHO3D_LOGERROR(GetTypeName() + " has no attributes");
                 return;
             }
 
@@ -264,14 +264,14 @@ void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attri
 
         if (!attributeInfo)
         {
-            LOGERROR("Invalid name: " + name);
+            URHO3D_LOGERROR("Invalid name: " + name);
             return;
         }
 
         // Check value type is same with attribute type
         if (attributeAnimation->GetValueType() != attributeInfo->type_)
         {
-            LOGERROR("Invalid value type");
+            URHO3D_LOGERROR("Invalid value type");
             return;
         }
 

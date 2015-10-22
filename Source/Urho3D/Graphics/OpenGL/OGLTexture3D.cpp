@@ -133,7 +133,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
         return true;
     }
 
-    LOGERROR("Texture3D XML data for " + GetName() + " did not contain either volume or colorlut element");
+    URHO3D_LOGERROR("Texture3D XML data for " + GetName() + " did not contain either volume or colorlut element");
     return false;
 }
 
@@ -246,19 +246,19 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
 
     if (!object_ || !graphics_)
     {
-        LOGERROR("No texture created, can not set data");
+        URHO3D_LOGERROR("No texture created, can not set data");
         return false;
     }
 
     if (!data)
     {
-        LOGERROR("Null source for setting data");
+        URHO3D_LOGERROR("Null source for setting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        LOGERROR("Illegal mip level for setting data");
+        URHO3D_LOGERROR("Illegal mip level for setting data");
         return false;
     }
 
@@ -281,7 +281,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || z < 0 || z + depth > levelDepth || width <= 0 ||
         height <= 0 || depth <= 0)
     {
-        LOGERROR("Illegal dimensions for setting data");
+        URHO3D_LOGERROR("Illegal dimensions for setting data");
         return false;
     }
 
@@ -316,7 +316,7 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
 {
     if (!image)
     {
-        LOGERROR("Null image, can not set data");
+        URHO3D_LOGERROR("Null image, can not set data");
         return false;
     }
 
@@ -455,19 +455,19 @@ bool Texture3D::GetData(unsigned level, void* dest) const
 #ifndef GL_ES_VERSION_2_0
     if (!object_ || !graphics_)
     {
-        LOGERROR("No texture created, can not get data");
+        URHO3D_LOGERROR("No texture created, can not get data");
         return false;
     }
 
     if (!dest)
     {
-        LOGERROR("Null destination for getting data");
+        URHO3D_LOGERROR("Null destination for getting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        LOGERROR("Illegal mip level for getting data");
+        URHO3D_LOGERROR("Illegal mip level for getting data");
         return false;
     }
 
@@ -487,7 +487,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     graphics_->SetTexture(0, 0);
     return true;
 #else
-    LOGERROR("Getting texture data not supported");
+    URHO3D_LOGERROR("Getting texture data not supported");
     return false;
 #endif
 }
@@ -497,7 +497,7 @@ bool Texture3D::Create()
     Release();
 
 #ifdef GL_ES_VERSION_2_0
-    LOGERROR("Failed to create 3D texture, currently unsupported on OpenGL ES 2");
+    URHO3D_LOGERROR("Failed to create 3D texture, currently unsupported on OpenGL ES 2");
     return false;
 #else
     if (!graphics_ || !width_ || !height_ || !depth_)
@@ -527,7 +527,7 @@ bool Texture3D::Create()
         glTexImage3D(target_, 0, format, width_, height_, depth_, 0, externalFormat, dataType, 0);
         if (glGetError())
         {
-            LOGERROR("Failed to create texture");
+            URHO3D_LOGERROR("Failed to create texture");
             success = false;
         }
     }

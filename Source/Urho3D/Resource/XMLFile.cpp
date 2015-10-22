@@ -85,7 +85,7 @@ bool XMLFile::BeginLoad(Deserializer& source)
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
     {
-        LOGERROR("Zero sized XML data in " + source.GetName());
+        URHO3D_LOGERROR("Zero sized XML data in " + source.GetName());
         return false;
     }
 
@@ -95,7 +95,7 @@ bool XMLFile::BeginLoad(Deserializer& source)
 
     if (!document_->load_buffer(buffer.Get(), dataSize))
     {
-        LOGERROR("Could not parse XML data from " + source.GetName());
+        URHO3D_LOGERROR("Could not parse XML data from " + source.GetName());
         document_->reset();
         return false;
     }
@@ -196,7 +196,7 @@ void XMLFile::Patch(XMLElement patchElement)
         pugi::xml_attribute sel = patch->attribute("sel");
         if (sel.empty())
         {
-            LOGERROR("XML Patch failed due to node not having a sel attribute.");
+            URHO3D_LOGERROR("XML Patch failed due to node not having a sel attribute.");
             continue;
         }
 
@@ -215,7 +215,7 @@ void XMLFile::Patch(XMLElement patchElement)
         else if (strcmp(patch->name(), "remove") == 0)
             PatchRemove(original);
         else
-            LOGERROR("XMLFiles used for patching should only use 'add', 'replace' or 'remove' elements.");
+            URHO3D_LOGERROR("XMLFiles used for patching should only use 'add', 'replace' or 'remove' elements.");
     }
 }
 

@@ -268,7 +268,7 @@ void AnimatedSprite2D::SetSpineAnimation()
         animationStateData_ = spAnimationStateData_create(animationSet_->GetSkeletonData());
         if (!animationStateData_)
         {
-            LOGERROR("Create animation state data failed");
+            URHO3D_LOGERROR("Create animation state data failed");
             return;
         }
     }
@@ -278,7 +278,7 @@ void AnimatedSprite2D::SetSpineAnimation()
         animationState_ = spAnimationState_create(animationStateData_);
         if (!animationState_)
         {
-            LOGERROR("Create animation state failed");
+            URHO3D_LOGERROR("Create animation state failed");
             return;
         }
     }
@@ -414,13 +414,13 @@ void AnimatedSprite2D::SetSpriterAnimation()
 
     if (!spriterInstance_->SetEntity(entity_.CString()))
     {
-        LOGERROR("Set entity failed");
+        URHO3D_LOGERROR("Set entity failed");
         return;
     }
 
     if (!spriterInstance_->SetAnimation(animationName_.CString(), (Spriter::LoopMode)loopMode_))
     {
-        LOGERROR("Set animation failed");
+        URHO3D_LOGERROR("Set animation failed");
         return;
     }
 

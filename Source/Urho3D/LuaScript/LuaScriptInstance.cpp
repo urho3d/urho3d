@@ -191,7 +191,7 @@ void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant&
             }
             break;
         default:
-            LOGERROR("Unsupported data type");
+            URHO3D_LOGERROR("Unsupported data type");
             lua_settop(luaState_, top);
             return;
         }
@@ -268,7 +268,7 @@ void LuaScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
         dest = *((IntVector2*)tolua_tousertype(luaState_, -1, 0));
         break;
     default:
-        LOGERROR("Unsupported data type");
+        URHO3D_LOGERROR("Unsupported data type");
         return;
     }
 
@@ -386,7 +386,7 @@ void LuaScriptInstance::SetScriptFile(LuaFile* scriptFile)
         return;
 
     if (!scriptFile_->LoadAndExecute(luaState_))
-        LOGERROR("Execute Lua file failed: " + scriptFile_->GetName());
+        URHO3D_LOGERROR("Execute Lua file failed: " + scriptFile_->GetName());
 }
 
 void LuaScriptInstance::SetScriptObjectType(const String& scriptObjectType)

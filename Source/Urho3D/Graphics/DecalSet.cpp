@@ -301,7 +301,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
 
     if (!target || !target->GetNode())
     {
-        LOGERROR("Null target drawable for decal");
+        URHO3D_LOGERROR("Null target drawable for decal");
         return false;
     }
 

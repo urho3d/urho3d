@@ -239,7 +239,7 @@ bool Text::SetFont(Font* font, int size)
 {
     if (!font)
     {
-        LOGERROR("Null font for Text");
+        URHO3D_LOGERROR("Null font for Text");
         return false;
     }
 

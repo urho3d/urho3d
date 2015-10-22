@@ -174,7 +174,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
     SharedPtr<File> file = cache->GetFile(binaryShaderName);
     if (!file || file->ReadFileID() != "USHD")
     {
-        LOGERROR(binaryShaderName + " is not a valid shader bytecode file");
+        URHO3D_LOGERROR(binaryShaderName + " is not a valid shader bytecode file");
         return false;
     }
 
@@ -221,7 +221,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
     }
     else
     {
-        LOGERROR(binaryShaderName + " has zero length bytecode");
+        URHO3D_LOGERROR(binaryShaderName + " has zero length bytecode");
         return false;
     }
 }
@@ -333,7 +333,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
     D3DReflect(bufData, bufSize, IID_ID3D11ShaderReflection, (void**)&reflection);
     if (!reflection)
     {
-        LOGERROR("Failed to reflect vertex shader's input signature");
+        URHO3D_LOGERROR("Failed to reflect vertex shader's input signature");
         return;
     }
 

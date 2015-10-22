@@ -101,7 +101,7 @@ void WorkQueue::CreateThreads(unsigned numThreads)
         threads_.Push(thread);
     }
 #else
-    LOGERROR("Can not create worker threads as threading is disabled");
+    URHO3D_LOGERROR("Can not create worker threads as threading is disabled");
 #endif
 }
 
@@ -126,7 +126,7 @@ void WorkQueue::AddWorkItem(SharedPtr<WorkItem> item)
 {
     if (!item)
     {
-        LOGERROR("Null work item submitted to the work queue");
+        URHO3D_LOGERROR("Null work item submitted to the work queue");
         return;
     }
 

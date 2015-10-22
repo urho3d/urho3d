@@ -115,7 +115,7 @@ TextureUnit ParseTextureUnitName(String name)
     }
 
     if (unit == MAX_TEXTURE_UNITS)
-        LOGERROR("Unknown texture unit name " + name);
+        URHO3D_LOGERROR("Unknown texture unit name " + name);
 
     return unit;
 }
@@ -282,7 +282,7 @@ bool Material::Load(const XMLElement& source)
 
     if (source.IsNull())
     {
-        LOGERROR("Can not load material from null XML element");
+        URHO3D_LOGERROR("Can not load material from null XML element");
         return false;
     }
 
@@ -353,7 +353,7 @@ bool Material::Load(const XMLElement& source)
         SharedPtr<ValueAnimation> animation(new ValueAnimation(context_));
         if (!animation->LoadXML(parameterAnimationElem))
         {
-            LOGERROR("Could not load parameter animation");
+            URHO3D_LOGERROR("Could not load parameter animation");
             return false;
         }
 
@@ -404,7 +404,7 @@ bool Material::Save(XMLElement& dest) const
 {
     if (dest.IsNull())
     {
-        LOGERROR("Can not save material to null XML element");
+        URHO3D_LOGERROR("Can not save material to null XML element");
         return false;
     }
 
@@ -542,7 +542,7 @@ void Material::SetShaderParameterAnimation(const String& name, ValueAnimation* a
 
         if (shaderParameters_.Find(name) == shaderParameters_.End())
         {
-            LOGERROR(GetName() + " has no shader parameter: " + name);
+            URHO3D_LOGERROR(GetName() + " has no shader parameter: " + name);
             return;
         }
 
