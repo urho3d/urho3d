@@ -269,7 +269,7 @@ bool Engine::Initialize(const VariantMap& parameters)
             }
         }
         else
-            LOGDEBUGF(
+            URHO3D_LOGDEBUGF(
                 "Skip specified resource package '%s' as it does not exist, check the documentation on how to set the 'resource prefix path'",
                 resourcePackages[i].CString());
     }
@@ -322,7 +322,7 @@ bool Engine::Initialize(const VariantMap& parameters)
             }
         }
         else
-            LOGDEBUGF(
+            URHO3D_LOGDEBUGF(
                 "Skipped autoload path '%s' as it does not exist, check the documentation on how to set the 'resource prefix path'",
                 autoLoadPaths[i].CString());
     }
