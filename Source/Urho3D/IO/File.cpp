@@ -139,7 +139,7 @@ bool File::Open(const String& fileName, FileMode mode)
             return false;
         }
 
-        assetHandle_ = SDL_RWFromFile(ASSET(fileName), "rb");
+        assetHandle_ = SDL_RWFromFile(URHO3D_ASSET(fileName), "rb");
         if (!assetHandle_)
         {
             LOGERRORF("Could not open asset file %s", fileName.CString());

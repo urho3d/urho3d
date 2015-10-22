@@ -587,7 +587,7 @@ bool FileSystem::FileExists(const String& fileName) const
 #ifdef ANDROID
     if (IS_ASSET(fileName))
     {
-        SDL_RWops* rwOps = SDL_RWFromFile(ASSET(fileName), "rb");
+        SDL_RWops* rwOps = SDL_RWFromFile(URHO3D_ASSET(fileName), "rb");
         if (rwOps)
         {
             SDL_RWclose(rwOps);
@@ -630,7 +630,7 @@ bool FileSystem::DirExists(const String& pathName) const
     if (IS_ASSET(fixedName))
     {
         // Split the pathname into two components: the longest parent directory path and the last name component
-        String assetPath(ASSET((fixedName + '/')));
+        String assetPath(URHO3D_ASSET((fixedName + '/')));
         String parentPath;
         unsigned pos = assetPath.FindLast('/', assetPath.Length() - 2);
         if (pos != String::NPOS)
@@ -807,7 +807,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
 #ifdef ANDROID
     if (IS_ASSET(path))
     {
-        String assetPath(ASSET(path));
+        String assetPath(URHO3D_ASSET(path));
         assetPath.Resize(assetPath.Length() - 1);       // AssetManager.list() does not like trailing slash
         int count;
         char** list = SDL_Android_GetFileList(assetPath.CString(), &count);

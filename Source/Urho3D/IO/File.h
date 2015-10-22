@@ -41,9 +41,9 @@ extern const char* APK;
 #define IS_ASSET(p) p.StartsWith(APK)
 // Macro for truncating the APK prefix string from the asset pathname and at the same time patching the directory name components (see custom_rules.xml)
 #ifdef ASSET_DIR_INDICATOR
-#define ASSET(p) p.Substring(5).Replaced("/", ASSET_DIR_INDICATOR "/").CString()
+#define URHO3D_ASSET(p) p.Substring(5).Replaced("/", ASSET_DIR_INDICATOR "/").CString()
 #else
-#define ASSET(p) p.Substring(5).CString()
+#define URHO3D_ASSET(p) p.Substring(5).CString()
 #endif
 #endif
 
