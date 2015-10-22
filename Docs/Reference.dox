@@ -77,7 +77,7 @@ time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, rende
 
 The Urho3D event system allows for data transport and function invocation without the sender and receiver having to explicitly know of each other. Both the event sender and receiver must derive from Object. An event receiver must subscribe to each event type it wishes to receive: one can either subscribe to the event coming from any sender, or from a specific sender. The latter is useful for example when handling events from the user interface elements.
 
-Events themselves do not need to be registered. They are identified by 32-bit hashes of their names. Event parameters (the data payload) are optional and are contained inside a VariantMap, identified by 32-bit parameter name hashes. For the inbuilt Urho3D events, event type (E_UPDATE, E_KEYDOWN, E_MOUSEMOVE etc.) and parameter hashes (P_TIMESTEP, P_DX, P_DY etc.) are defined as constants inside include files such as CoreEvents.h or InputEvents.h.
+Events themselves do not need to be registered. They are identified by 32-bit hashes of their names. Event parameters (the data payload) are optional and are contained inside a VariantMap, identified by 32-bit parameter name hashes. For the inbuilt Urho3D events, event type (E_UPDATE, E_KEYDOWN, E_MOUSEMOVE etc.) and parameter hashes (P_TIMESTEP, P_DX, P_DY etc.) are defined as namespaced constants inside include files such as CoreEvents.h or InputEvents.h, using the helper macros URHO3D_EVENT & URHO3D_PARAM.
 
 When subscribing to an event, a handler function must be specified. In C++ these must have the signature void HandleEvent(StringHash eventType, VariantMap& eventData). The URHO3D_HANDLER(className, function) macro helps in defining the required class-specific function pointers. For example:
 
@@ -95,7 +95,7 @@ In C++ events must always be handled by a member function. In script procedural 
 
 Events can also be unsubscribed from. See \ref Object::UnsubscribeFromEvent "UnsubscribeFromEvent()" for details.
 
-To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Engine subsystem sends the Update event on each frame. Note how for the inbuilt Urho3D events, the parameter name hashes are always put inside a namespace (the event's name) to prevent name clashes:
+To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Engine subsystem sends the Update event on each frame. Note the parameter name hashes being inside a namespace which matches the event name:
 
 \code
 using namespace Update;
@@ -2402,7 +2402,7 @@ If need be you can access the grid id (relative to the tilesets used) of a Tile 
 
 Classes that derive from Serializable can perform automatic serialization to binary or XML format by defining \ref AttributeInfo "attributes". Attributes are stored to the Context per class. %Scene load/save and network replication are both implemented by having the Node and Component classes derive from Serializable.
 
-The supported attribute types are all those supported by Variant, excluding pointers. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
+The supported attribute types are all those supported by Variant, excluding pointers. Attributes can either refer to a variable at a memory offset in the object, or define setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
 
 To implement side effects to attributes, for example that a Node needs to dirty its world transform whenever the local transform changes, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
 
@@ -2416,6 +2416,8 @@ Each attribute can have a combination of the following flags:
 - AM_COMPONENTID: Is a component ID and may need rewriting when instantiating scene content.
 
 The default flags are AM_FILE and AM_NET. Note that it is legal to define neither AM_FILE or AM_NET, meaning the attribute has only run-time significance (perhaps for editing.)
+
+See the existing engine classes e.g. in the %Scene or %Graphics subdirectories for examples on registering attributes using the URHO3D_ATTRIBUTE family of helper macros.
 
 \page Network Networking
 
