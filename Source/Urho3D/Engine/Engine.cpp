@@ -204,7 +204,7 @@ bool Engine::Initialize(const VariantMap& parameters)
     {
         GetSubsystem<WorkQueue>()->CreateThreads(numThreads);
 
-        LOGINFOF("Created %u worker thread%s", numThreads, numThreads > 1 ? "s" : "");
+        URHO3D_LOGINFOF("Created %u worker thread%s", numThreads, numThreads > 1 ? "s" : "");
     }
 #endif
 
