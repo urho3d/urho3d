@@ -418,7 +418,7 @@ bool NavigationMesh::Build()
             }
         }
 
-        LOGDEBUG("Built navigation mesh with " + String(numTiles) + " tiles");
+        URHO3D_LOGDEBUG("Built navigation mesh with " + String(numTiles) + " tiles");
 
         // Send a notification event to concerned parties that we've been fully rebuilt
         {
@@ -472,7 +472,7 @@ bool NavigationMesh::Build(const BoundingBox& boundingBox)
         }
     }
 
-    LOGDEBUG("Rebuilt " + String(numTiles) + " tiles of the navigation mesh");
+    URHO3D_LOGDEBUG("Rebuilt " + String(numTiles) + " tiles of the navigation mesh");
     return true;
 }
 
@@ -770,7 +770,7 @@ void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value
             ++numTiles;
     }
 
-    LOGDEBUG("Created navigation mesh with " + String(numTiles) + " tiles from serialized data");
+    URHO3D_LOGDEBUG("Created navigation mesh with " + String(numTiles) + " tiles from serialized data");
 }
 
 PODVector<unsigned char> NavigationMesh::GetNavigationDataAttr() const

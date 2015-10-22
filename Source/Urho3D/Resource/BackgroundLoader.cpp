@@ -135,7 +135,7 @@ bool BackgroundLoader::QueueResource(StringHash type, const String& name, bool s
         return false;
     }
 
-    LOGDEBUG("Background loading resource " + name);
+    URHO3D_LOGDEBUG("Background loading resource " + name);
 
     item.resource_->SetName(name);
     item.resource_->SetAsyncLoadState(ASYNC_QUEUED);
@@ -193,7 +193,7 @@ void BackgroundLoader::WaitForResource(StringHash type, StringHash nameHash)
             }
 
             if (didWait)
-                LOGDEBUG("Waited " + String(waitTimer.GetUSec(false) / 1000) + " ms for background loaded resource " +
+                URHO3D_LOGDEBUG("Waited " + String(waitTimer.GetUSec(false) / 1000) + " ms for background loaded resource " +
                          resource->GetName());
         }
 
@@ -264,7 +264,7 @@ void BackgroundLoader::FinishBackgroundLoading(BackgroundLoadItem& item)
         if (profiler)
             profiler->BeginBlock(profileBlockName.CString());
 #endif
-        LOGDEBUG("Finishing background loaded resource " + resource->GetName());
+        URHO3D_LOGDEBUG("Finishing background loaded resource " + resource->GetName());
         success = resource->EndLoad();
 
 #ifdef URHO3D_PROFILING

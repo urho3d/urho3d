@@ -104,7 +104,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         watchSubDirs_ = watchSubDirs;
         Run();
         
-        LOGDEBUG("Started watching path " + pathName);
+        URHO3D_LOGDEBUG("Started watching path " + pathName);
         return true;
     }
     else
@@ -153,7 +153,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         }
         Run();
 
-        LOGDEBUG("Started watching path " + pathName);
+        URHO3D_LOGDEBUG("Started watching path " + pathName);
         return true;
     }
 #elif defined(__APPLE__) && !defined(IOS)
@@ -170,7 +170,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         watchSubDirs_ = watchSubDirs;
         Run();
         
-        LOGDEBUG("Started watching path " + pathName);
+        URHO3D_LOGDEBUG("Started watching path " + pathName);
         return true;
     }
     else
@@ -183,7 +183,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     return false;
 #endif
 #else
-    LOGDEBUG("FileWatcher feature not enabled");
+    URHO3D_LOGDEBUG("FileWatcher feature not enabled");
     return false;
 #endif
 }
@@ -213,7 +213,7 @@ void FileWatcher::StopWatching()
         CloseFileWatcher(watcher_);
 #endif
 
-        LOGDEBUG("Stopped watching path " + path_);
+        URHO3D_LOGDEBUG("Stopped watching path " + path_);
         path_.Clear();
     }
 }

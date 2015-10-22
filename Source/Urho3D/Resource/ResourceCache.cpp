@@ -397,7 +397,7 @@ void ResourceCache::ReloadResourceWithDependencies(const String& fileName)
     const SharedPtr<Resource>& resource = FindResource(fileNameHash);
     if (resource)
     {
-        LOGDEBUG("Reloading changed resource " + fileName);
+        URHO3D_LOGDEBUG("Reloading changed resource " + fileName);
         ReloadResource(resource);
     }
     // Always perform dependency resource check for resource loaded from XML file as it could be used in inheritance
@@ -421,7 +421,7 @@ void ResourceCache::ReloadResourceWithDependencies(const String& fileName)
 
             for (unsigned k = 0; k < dependents.Size(); ++k)
             {
-                LOGDEBUG("Reloading resource " + dependents[k]->GetName() + " depending on " + fileName);
+                URHO3D_LOGDEBUG("Reloading resource " + dependents[k]->GetName() + " depending on " + fileName);
                 ReloadResource(dependents[k]);
             }
         }
@@ -603,7 +603,7 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
     if (!file)
         return 0;   // Error is already logged
 
-    LOGDEBUG("Loading resource " + name);
+    URHO3D_LOGDEBUG("Loading resource " + name);
     resource->SetName(name);
 
     if (!resource->Load(*(file.Get())))
@@ -682,7 +682,7 @@ SharedPtr<Resource> ResourceCache::GetTempResource(StringHash type, const String
     if (!file)
         return SharedPtr<Resource>();  // Error is already logged
 
-    LOGDEBUG("Loading temporary resource " + name);
+    URHO3D_LOGDEBUG("Loading temporary resource " + name);
     resource->SetName(file->GetName());
 
     if (!resource->Load(*(file.Get())))
@@ -996,7 +996,7 @@ void ResourceCache::UpdateResourceGroup(StringHash type)
         if (i->second_.memoryBudget_ && i->second_.memoryUse_ > i->second_.memoryBudget_ &&
             oldestResource != i->second_.resources_.End())
         {
-            LOGDEBUG("Resource group " + oldestResource->second_->GetTypeName() + " over memory budget, releasing resource " +
+            URHO3D_LOGDEBUG("Resource group " + oldestResource->second_->GetTypeName() + " over memory budget, releasing resource " +
                      oldestResource->second_->GetName());
             i->second_.resources_.Erase(oldestResource);
         }

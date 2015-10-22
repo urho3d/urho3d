@@ -340,7 +340,7 @@ bool FileSystem::CreateDir(const String& pathName)
 #endif
 
     if (success)
-        LOGDEBUG("Created directory " + pathName);
+        URHO3D_LOGDEBUG("Created directory " + pathName);
     else
         LOGERROR("Failed to create directory " + pathName);
 

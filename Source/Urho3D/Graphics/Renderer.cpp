@@ -1010,7 +1010,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool 
         newBuffer->ResetUseTimer();
         screenBuffers_[searchKey].Push(newBuffer);
 
-        LOGDEBUG("Allocated new screen buffer size " + String(width) + "x" + String(height) + " format " + String(format));
+        URHO3D_LOGDEBUG("Allocated new screen buffer size " + String(width) + "x" + String(height) + " format " + String(format));
         return newBuffer;
     }
     else
@@ -1288,7 +1288,7 @@ bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
         return false;
     }
 
-    LOGDEBUG("Resized instancing buffer to " + String(newSize));
+    URHO3D_LOGDEBUG("Resized instancing buffer to " + String(newSize));
     return true;
 }
 
@@ -1417,7 +1417,7 @@ void Renderer::RemoveUnusedBuffers()
     {
         if (occlusionBuffers_[i]->GetUseTimer() > MAX_BUFFER_AGE)
         {
-            LOGDEBUG("Removed unused occlusion buffer");
+            URHO3D_LOGDEBUG("Removed unused occlusion buffer");
             occlusionBuffers_.Erase(i);
         }
     }
@@ -1431,7 +1431,7 @@ void Renderer::RemoveUnusedBuffers()
             Texture* buffer = buffers[j];
             if (buffer->GetUseTimer() > MAX_BUFFER_AGE)
             {
-                LOGDEBUG("Removed unused screen buffer size " + String(buffer->GetWidth()) + "x" + String(buffer->GetHeight()) +
+                URHO3D_LOGDEBUG("Removed unused screen buffer size " + String(buffer->GetWidth()) + "x" + String(buffer->GetHeight()) +
                          " format " + String(buffer->GetFormat()));
                 buffers.Erase(j);
             }
@@ -1497,7 +1497,7 @@ void Renderer::Initialize()
 
 void Renderer::LoadShaders()
 {
-    LOGDEBUG("Reloading shaders");
+    URHO3D_LOGDEBUG("Reloading shaders");
 
     // Release old material shaders, mark them for reload
     ReleaseMaterialShaders();

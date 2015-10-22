@@ -965,7 +965,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
 
             bool success = vs->Create();
             if (success)
-                LOGDEBUG("Compiled vertex shader " + vs->GetFullName());
+                URHO3D_LOGDEBUG("Compiled vertex shader " + vs->GetFullName());
             else
             {
                 LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
@@ -984,7 +984,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
 
             bool success = ps->Create();
             if (success)
-                LOGDEBUG("Compiled pixel shader " + ps->GetFullName());
+                URHO3D_LOGDEBUG("Compiled pixel shader " + ps->GetFullName());
             else
             {
                 LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
@@ -1032,7 +1032,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             SharedPtr<ShaderProgram> newProgram(new ShaderProgram(this, vs, ps));
             if (newProgram->Link())
             {
-                LOGDEBUG("Linked vertex shader " + vs->GetFullName() + " and pixel shader " + ps->GetFullName());
+                URHO3D_LOGDEBUG("Linked vertex shader " + vs->GetFullName() + " and pixel shader " + ps->GetFullName());
                 // Note: Link() calls glUseProgram() to set the texture sampler uniforms,
                 // so it is not necessary to call it again
                 shaderProgram_ = newProgram;

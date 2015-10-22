@@ -212,9 +212,9 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         file->Read(&byteCode_[0], byteCodeSize);
 
         if (type_ == VS)
-            LOGDEBUG("Loaded cached vertex shader " + GetFullName());
+            URHO3D_LOGDEBUG("Loaded cached vertex shader " + GetFullName());
         else
-            LOGDEBUG("Loaded cached pixel shader " + GetFullName());
+            URHO3D_LOGDEBUG("Loaded cached pixel shader " + GetFullName());
 
         CalculateConstantBufferSizes();
         return true;
@@ -298,9 +298,9 @@ bool ShaderVariation::Compile()
     else
     {
         if (type_ == VS)
-            LOGDEBUG("Compiled vertex shader " + GetFullName());
+            URHO3D_LOGDEBUG("Compiled vertex shader " + GetFullName());
         else
-            LOGDEBUG("Compiled pixel shader " + GetFullName());
+            URHO3D_LOGDEBUG("Compiled pixel shader " + GetFullName());
 
         unsigned char* bufData = (unsigned char*)shaderCode->GetBufferPointer();
         unsigned bufSize = (unsigned)shaderCode->GetBufferSize();

@@ -205,9 +205,9 @@ bool ShaderVariation::LoadByteCode(PODVector<unsigned>& byteCode, const String& 
         file->Read(&byteCode[0], byteCodeSize);
 
         if (type_ == VS)
-            LOGDEBUG("Loaded cached vertex shader " + GetFullName());
+            URHO3D_LOGDEBUG("Loaded cached vertex shader " + GetFullName());
         else
-            LOGDEBUG("Loaded cached pixel shader " + GetFullName());
+            URHO3D_LOGDEBUG("Loaded cached pixel shader " + GetFullName());
 
         return true;
     }
@@ -289,9 +289,9 @@ bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
     else
     {
         if (type_ == VS)
-            LOGDEBUG("Compiled vertex shader " + GetFullName());
+            URHO3D_LOGDEBUG("Compiled vertex shader " + GetFullName());
         else
-            LOGDEBUG("Compiled pixel shader " + GetFullName());
+            URHO3D_LOGDEBUG("Compiled pixel shader " + GetFullName());
 
         // Inspect the produced bytecode using MojoShader, then strip and store it
         unsigned char* bufData = (unsigned char*)shaderCode->GetBufferPointer();

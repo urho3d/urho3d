@@ -463,7 +463,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     while (decals_.Size() && (numVertices_ > maxVertices_ || numIndices_ > maxIndices_))
         RemoveDecals(1);
 
-    LOGDEBUG("Added decal with " + String(newDecal.vertices_.Size()) + " vertices");
+    URHO3D_LOGDEBUG("Added decal with " + String(newDecal.vertices_.Size()) + " vertices");
 
     // If new decal is time limited, subscribe to scene post-update
     if (newDecal.timeToLive_ > 0.0f && !subscribed_)

@@ -483,7 +483,7 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
         return root;
     }
 
-    LOGDEBUG("Loading UI layout " + file->GetName());
+    URHO3D_LOGDEBUG("Loading UI layout " + file->GetName());
 
     XMLElement rootElem = file->GetRoot("element");
     if (!rootElem)
@@ -989,7 +989,7 @@ void UI::SetCursorShape(CursorShape shape)
 
 void UI::ReleaseFontFaces()
 {
-    LOGDEBUG("Reloading font faces");
+    URHO3D_LOGDEBUG("Reloading font faces");
 
     PODVector<Font*> fonts;
     GetSubsystem<ResourceCache>()->GetResources<Font>(fonts);

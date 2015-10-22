@@ -106,7 +106,7 @@ void ShaderPrecache::StoreShaders(ShaderVariation* vs, ShaderVariation* ps)
 
 void ShaderPrecache::LoadShaders(Graphics* graphics, Deserializer& source)
 {
-    LOGDEBUG("Begin precaching shaders");
+    URHO3D_LOGDEBUG("Begin precaching shaders");
 
     XMLFile xmlFile(graphics->GetContext());
     xmlFile.Load(source);
@@ -138,7 +138,7 @@ void ShaderPrecache::LoadShaders(Graphics* graphics, Deserializer& source)
         shader = shader.GetNext("shader");
     }
 
-    LOGDEBUG("End precaching shaders");
+    URHO3D_LOGDEBUG("End precaching shaders");
 }
 
 }
