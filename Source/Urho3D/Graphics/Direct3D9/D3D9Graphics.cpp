@@ -562,7 +562,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         msg.Append(" resizable");
     if (multiSample > 1)
         msg.AppendWithFormat(" multisample %d", multiSample);
-    LOGINFO(msg);
+    URHO3D_LOGINFO(msg);
 #endif
 
     using namespace ScreenMode;
@@ -2488,7 +2488,7 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
 
     OnDeviceReset();
 
-    LOGINFO("Created Direct3D9 device");
+    URHO3D_LOGINFO("Created Direct3D9 device");
     return true;
 }
 
@@ -2588,7 +2588,7 @@ void Graphics::ResetDevice()
 
 void Graphics::OnDeviceLost()
 {
-    LOGINFO("Device lost");
+    URHO3D_LOGINFO("Device lost");
 
     if (impl_->defaultColorSurface_)
     {

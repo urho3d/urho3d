@@ -1492,7 +1492,7 @@ void Renderer::Initialize()
 
     SubscribeToEvent(E_RENDERUPDATE, URHO3D_HANDLER(Renderer, HandleRenderUpdate));
 
-    LOGINFO("Initialized renderer");
+    URHO3D_LOGINFO("Initialized renderer");
 }
 
 void Renderer::LoadShaders()

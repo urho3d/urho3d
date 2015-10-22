@@ -1184,7 +1184,7 @@ void Input::Initialize()
 
     SubscribeToEvent(E_BEGINFRAME, URHO3D_HANDLER(Input, HandleBeginFrame));
 
-    LOGINFO("Initialized input");
+    URHO3D_LOGINFO("Initialized input");
 }
 
 void Input::ResetJoysticks()

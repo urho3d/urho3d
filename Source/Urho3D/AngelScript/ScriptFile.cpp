@@ -161,7 +161,7 @@ bool ScriptFile::EndLoad()
 
         if (scriptModule_->LoadByteCode(&deserializer) >= 0)
         {
-            LOGINFO("Loaded script module " + GetName() + " from bytecode");
+            URHO3D_LOGINFO("Loaded script module " + GetName() + " from bytecode");
             success = true;
         }
     }
@@ -170,7 +170,7 @@ bool ScriptFile::EndLoad()
         int result = scriptModule_->Build();
         if (result >= 0)
         {
-            LOGINFO("Compiled script module " + GetName());
+            URHO3D_LOGINFO("Compiled script module " + GetName());
             success = true;
         }
         else

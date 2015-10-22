@@ -123,7 +123,7 @@ bool Scene::Load(Deserializer& source, bool setInstanceDefault)
         return false;
     }
 
-    LOGINFO("Loading scene from " + source.GetName());
+    URHO3D_LOGINFO("Loading scene from " + source.GetName());
 
     Clear();
 
@@ -150,7 +150,7 @@ bool Scene::Save(Serializer& dest) const
 
     Deserializer* ptr = dynamic_cast<Deserializer*>(&dest);
     if (ptr)
-        LOGINFO("Saving scene to " + ptr->GetName());
+        URHO3D_LOGINFO("Saving scene to " + ptr->GetName());
 
     if (Node::Save(dest))
     {
@@ -206,7 +206,7 @@ bool Scene::LoadXML(Deserializer& source)
     if (!xml->Load(source))
         return false;
 
-    LOGINFO("Loading scene from " + source.GetName());
+    URHO3D_LOGINFO("Loading scene from " + source.GetName());
 
     Clear();
 
@@ -230,7 +230,7 @@ bool Scene::SaveXML(Serializer& dest, const String& indentation) const
 
     Deserializer* ptr = dynamic_cast<Deserializer*>(&dest);
     if (ptr)
-        LOGINFO("Saving scene to " + ptr->GetName());
+        URHO3D_LOGINFO("Saving scene to " + ptr->GetName());
 
     if (xml->Save(dest, indentation))
     {
@@ -267,7 +267,7 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
 
     if (mode > LOAD_RESOURCES_ONLY)
     {
-        LOGINFO("Loading scene from " + file->GetName());
+        URHO3D_LOGINFO("Loading scene from " + file->GetName());
         Clear();
     }
 
@@ -307,7 +307,7 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
     {
         URHO3D_PROFILE(FindResourcesToPreload);
 
-        LOGINFO("Preloading resources from " + file->GetName());
+        URHO3D_LOGINFO("Preloading resources from " + file->GetName());
         PreloadResources(file, isSceneFile);
     }
 
@@ -330,7 +330,7 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
 
     if (mode > LOAD_RESOURCES_ONLY)
     {
-        LOGINFO("Loading scene from " + file->GetName());
+        URHO3D_LOGINFO("Loading scene from " + file->GetName());
         Clear();
     }
 
@@ -376,7 +376,7 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
     {
         URHO3D_PROFILE(FindResourcesToPreload);
 
-        LOGINFO("Preloading resources from " + file->GetName());
+        URHO3D_LOGINFO("Preloading resources from " + file->GetName());
         PreloadResourcesXML(xml->GetRoot());
     }
 

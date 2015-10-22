@@ -409,7 +409,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 
     frameTimer_.Reset();
 
-    LOGINFO("Initialized engine");
+    URHO3D_LOGINFO("Initialized engine");
     initialized_ = true;
     return true;
 }

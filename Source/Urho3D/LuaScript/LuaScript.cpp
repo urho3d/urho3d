@@ -251,20 +251,20 @@ bool LuaScript::LoadRawFile(const String& fileName)
 {
     URHO3D_PROFILE(LoadRawFile);
 
-    LOGINFO("Finding Lua file on file system: " + fileName);
+    URHO3D_LOGINFO("Finding Lua file on file system: " + fileName);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String filePath = cache->GetResourceFileName(fileName);
 
     if (filePath.Empty())
     {
-        LOGINFO("Lua file not found: " + fileName);
+        URHO3D_LOGINFO("Lua file not found: " + fileName);
         return false;
     }
 
     filePath = GetNativePath(filePath);
 
-    LOGINFO("Loading Lua file from file system: " + filePath);
+    URHO3D_LOGINFO("Loading Lua file from file system: " + filePath);
 
     if (luaL_loadfile(luaState_, filePath.CString()))
     {
@@ -274,7 +274,7 @@ bool LuaScript::LoadRawFile(const String& fileName)
         return false;
     }
 
-    LOGINFO("Lua file loaded: " + filePath);
+    URHO3D_LOGINFO("Lua file loaded: " + filePath);
 
     return true;
 }

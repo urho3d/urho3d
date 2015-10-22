@@ -489,7 +489,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         msg.Append(" resizable");
     if (multiSample > 1)
         msg.AppendWithFormat(" multisample %d", multiSample);
-    LOGINFO(msg);
+    URHO3D_LOGINFO(msg);
 #endif
 
     using namespace ScreenMode;

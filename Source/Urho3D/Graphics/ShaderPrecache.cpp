@@ -61,12 +61,12 @@ ShaderPrecache::ShaderPrecache(Context* context, const String& fileName) :
     if (!xmlFile_.GetRoot())
         xmlFile_.CreateRoot("shaders");
 
-    LOGINFO("Begin dumping shaders to " + fileName_);
+    URHO3D_LOGINFO("Begin dumping shaders to " + fileName_);
 }
 
 ShaderPrecache::~ShaderPrecache()
 {
-    LOGINFO("End dumping shaders");
+    URHO3D_LOGINFO("End dumping shaders");
 
     if (usedCombinations_.Empty())
         return;

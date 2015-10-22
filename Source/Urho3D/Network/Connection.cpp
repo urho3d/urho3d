@@ -293,7 +293,7 @@ void Connection::SendRemoteEvents()
         sprintf(statsBuffer, "RTT %.3f ms Pkt in %d Pkt out %d Data in %.3f KB/s Data out %.3f KB/s", connection_->RoundTripTime(),
             (int)connection_->PacketsInPerSec(),
             (int)connection_->PacketsOutPerSec(), connection_->BytesInPerSec() / 1000.0f, connection_->BytesOutPerSec() / 1000.0f);
-        LOGINFO(statsBuffer);
+        URHO3D_LOGINFO(statsBuffer);
     }
 #endif
 
@@ -760,7 +760,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                         return;
                     }
 
-                    LOGINFO("Transmitting package file " + name + " to client " + ToString());
+                    URHO3D_LOGINFO("Transmitting package file " + name + " to client " + ToString());
 
                     uploads_[nameHash].file_ = file;
                     uploads_[nameHash].fragment_ = 0;
@@ -827,7 +827,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
             // Check if all fragments received
             if (download.receivedFragments_.Size() == download.totalFragments_)
             {
-                LOGINFO("Package " + download.name_ + " downloaded successfully");
+                URHO3D_LOGINFO("Package " + download.name_ + " downloaded successfully");
 
                 // Instantiate the package and add to the resource system, as we will need it to load the scene
                 download.file_->Close();
@@ -841,7 +841,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                 {
                     PackageDownload& nextDownload = downloads_.Begin()->second_;
 
-                    LOGINFO("Requesting package " + nextDownload.name_ + " from server");
+                    URHO3D_LOGINFO("Requesting package " + nextDownload.name_ + " from server");
                     msg_.Clear();
                     msg_.WriteString(nextDownload.name_);
                     SendMessage(MSG_REQUESTPACKAGE, true, true, msg_);
@@ -919,7 +919,7 @@ void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
 
     if (checksum != scene_->GetChecksum())
     {
-        LOGINFO("Scene checksum error from client " + ToString());
+        URHO3D_LOGINFO("Scene checksum error from client " + ToString());
         msg_.Clear();
         SendMessage(MSG_SCENECHECKSUMERROR, true, true, msg_);
         OnSceneLoadFailed();
@@ -1461,7 +1461,7 @@ void Connection::RequestPackage(const String& name, unsigned fileSize, unsigned 
     // Start download now only if no existing downloads, else wait for the existing ones to finish
     if (downloads_.Size() == 1)
     {
-        LOGINFO("Requesting package " + name + " from server");
+        URHO3D_LOGINFO("Requesting package " + name + " from server");
         msg_.Clear();
         msg_.WriteString(name);
         SendMessage(MSG_REQUESTPACKAGE, true, true, msg_);

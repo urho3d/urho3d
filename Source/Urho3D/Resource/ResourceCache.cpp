@@ -127,7 +127,7 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned priority)
         fileWatchers_.Push(watcher);
     }
 
-    LOGINFO("Added resource path " + fixedPath);
+    URHO3D_LOGINFO("Added resource path " + fixedPath);
     return true;
 }
 
@@ -144,7 +144,7 @@ bool ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
     else
         packages_.Push(SharedPtr<PackageFile>(package));
 
-    LOGINFO("Added resource package " + package->GetName());
+    URHO3D_LOGINFO("Added resource package " + package->GetName());
     return true;
 }
 
@@ -195,7 +195,7 @@ void ResourceCache::RemoveResourceDir(const String& pathName)
                     break;
                 }
             }
-            LOGINFO("Removed resource path " + fixedPath);
+            URHO3D_LOGINFO("Removed resource path " + fixedPath);
             return;
         }
     }
@@ -211,7 +211,7 @@ void ResourceCache::RemovePackageFile(PackageFile* package, bool releaseResource
         {
             if (releaseResources)
                 ReleasePackageResources(*i, forceRelease);
-            LOGINFO("Removed resource package " + (*i)->GetName());
+            URHO3D_LOGINFO("Removed resource package " + (*i)->GetName());
             packages_.Erase(i);
             return;
         }
@@ -231,7 +231,7 @@ void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResour
         {
             if (releaseResources)
                 ReleasePackageResources(*i, forceRelease);
-            LOGINFO("Removed resource package " + (*i)->GetName());
+            URHO3D_LOGINFO("Removed resource package " + (*i)->GetName());
             packages_.Erase(i);
             return;
         }

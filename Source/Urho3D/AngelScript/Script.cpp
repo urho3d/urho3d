@@ -236,7 +236,7 @@ void Script::MessageCallback(const asSMessageInfo* msg)
         break;
 
     default:
-        LOGINFO(message);
+        URHO3D_LOGINFO(message);
         break;
     }
 }

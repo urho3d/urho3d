@@ -108,7 +108,7 @@ bool LuaFile::LoadChunk(lua_State* luaState)
         return false;
     }
 
-    LOGINFO("Loaded Lua script " + GetName());
+    URHO3D_LOGINFO("Loaded Lua script " + GetName());
     hasLoaded_ = true;
 
     return true;
@@ -130,7 +130,7 @@ bool LuaFile::LoadAndExecute(lua_State* luaState)
         return false;
     }
 
-    LOGINFO("Executed Lua script " + GetName());
+    URHO3D_LOGINFO("Executed Lua script " + GetName());
     hasExecuted_ = true;
 
     return true;

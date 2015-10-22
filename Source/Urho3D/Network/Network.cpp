@@ -173,7 +173,7 @@ void Network::NewConnectionEstablished(kNet::MessageConnection* connection)
     SharedPtr<Connection> newConnection(new Connection(context_, true, kNet::SharedPtr<kNet::MessageConnection>(connection)));
     newConnection->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
     clientConnections_[connection] = newConnection;
-    LOGINFO("Client " + newConnection->ToString() + " connected");
+    URHO3D_LOGINFO("Client " + newConnection->ToString() + " connected");
 
     using namespace ClientConnected;
 
@@ -191,7 +191,7 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
     if (i != clientConnections_.End())
     {
         Connection* connection = i->second_;
-        LOGINFO("Client " + connection->ToString() + " disconnected");
+        URHO3D_LOGINFO("Client " + connection->ToString() + " disconnected");
 
         using namespace ClientDisconnected;
 
@@ -223,7 +223,7 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
         serverConnection_->SetConnectPending(true);
         serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
 
-        LOGINFO("Connecting to server " + serverConnection_->ToString());
+        URHO3D_LOGINFO("Connecting to server " + serverConnection_->ToString());
         return true;
     }
     else
@@ -252,7 +252,7 @@ bool Network::StartServer(unsigned short port)
 
     if (network_->StartServer(port, kNet::SocketOverUDP, this, true) != 0)
     {
-        LOGINFO("Started server on port " + String(port));
+        URHO3D_LOGINFO("Started server on port " + String(port));
         return true;
     }
     else
@@ -271,7 +271,7 @@ void Network::StopServer()
 
     clientConnections_.Clear();
     network_->StopServer();
-    LOGINFO("Stopped server");
+    URHO3D_LOGINFO("Stopped server");
 }
 
 void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID)
@@ -558,7 +558,7 @@ void Network::OnServerConnected()
 {
     serverConnection_->SetConnectPending(false);
 
-    LOGINFO("Connected to server");
+    URHO3D_LOGINFO("Connected to server");
 
     // Send the identity map now
     VectorBuffer msg;
@@ -576,7 +576,7 @@ void Network::OnServerDisconnected()
 
     if (!failedConnect)
     {
-        LOGINFO("Disconnected from server");
+        URHO3D_LOGINFO("Disconnected from server");
         SendEvent(E_SERVERDISCONNECTED);
     }
     else

@@ -546,7 +546,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         msg.Append(" resizable");
     if (multiSample > 1)
         msg.AppendWithFormat(" multisample %d", multiSample);
-    LOGINFO(msg);
+    URHO3D_LOGINFO(msg);
 #endif
 
     using namespace ScreenMode;
@@ -2382,7 +2382,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     {
         // Do not log this message if we are exiting
         if (!clearGPUObjects)
-            LOGINFO("OpenGL context lost");
+            URHO3D_LOGINFO("OpenGL context lost");
 
         SDL_GL_DeleteContext(impl_->context_);
         impl_->context_ = 0;
