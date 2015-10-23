@@ -112,7 +112,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_USE_LIB64_RPM |0|Enable 64-bit RPM CPack generator using /usr/lib64 and disable all other generators (Debian-based host only, which uses /usr/lib by default)|
 |URHO3D_USE_LIB_DEB   |0|Enable 64-bit DEB CPack generator using /usr/lib and disable all other generators (Redhat-based host only, which uses /usr/lib64 by default)|
 |URHO3D_HOME          |-|Path to Urho3D build tree or SDK installation location (external project only)|
-|URHO3D_DEPLOYMENT_TARGET|native|Specify the minimum CPU type on which the target binaries are to be deployed (Linux and non-Xcode OSX desktop build only), see GCC/Clang's -march option for possible values|
+|URHO3D_DEPLOYMENT_TARGET|native|Specify the minimum CPU type on which the target binaries are to be deployed (Linux, MinGW, and non-Xcode OSX native build only), see GCC/Clang's -march option for possible values|
 |CMAKE_BUILD_TYPE     |Release|Specify CMake build configuration (single-configuration generator only), possible values are Release (default), RelWithDebInfo, and Debug|
 |CMAKE_INSTALL_PREFIX |*|Install path prefix, prepended onto install directories; default to 'c:/Program Files/Urho3D' on Windows host and '/usr/local' on all other non-Windows hosts|
 |CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify Mac OS X deployment target (OSX build only); default to current running OS X if not specified, the minimum supported target is 10.5 due to constraint from SDL library|

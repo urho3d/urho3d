@@ -75,7 +75,7 @@ if (DOXYGEN_FOUND)
     endif ()
 
     # Dump AngelScript and LuaScript API to Doxygen file if the corresponding host tool is available
-    if (TARGET ScriptCompiler)
+    if (TARGET ScriptCompiler AND NOT CMAKE_CROSSCOMPILING)
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/ScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/AngelScriptAPI.h
             COMMAND ${CMAKE_BINARY_DIR}/bin/tool/ScriptCompiler -dumpapi ${CMAKE_SOURCE_DIR} ScriptAPI.dox AngelScriptAPI.h
             DEPENDS ScriptCompiler     # ScriptCompiler implicitly depends on Urho3D already
@@ -87,7 +87,7 @@ if (DOXYGEN_FOUND)
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/AngelScriptAPI.h ${CMAKE_CURRENT_BINARY_DIR}/generated/AngelScriptAPI.h
             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ScriptAPI.dox ${CMAKE_CURRENT_SOURCE_DIR}/AngelScriptAPI.h)
     endif ()
-    if (TARGET tolua++)
+    if (TARGET tolua++ AND NOT CMAKE_CROSSCOMPILING)
         file (GLOB PKGS RELATIVE ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs/*.pkg)
         list (SORT PKGS)
         set (PKGLIST "// This is a generated file. DO NOT EDIT!\n\n")
