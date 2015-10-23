@@ -33,7 +33,7 @@ class SoundStream;
 /// %Sound resource.
 class URHO3D_API Sound : public Resource
 {
-    OBJECT(Sound, Resource);
+    URHO3D_OBJECT(Sound, Resource);
 
 public:
     /// Construct.

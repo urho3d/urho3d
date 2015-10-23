@@ -98,14 +98,14 @@ bool ParticleEffect::BeginLoad(Deserializer& source)
     XMLFile file(context_);
     if (!file.Load(source))
     {
-        LOGERROR("Load particle effect file failed");
+        URHO3D_LOGERROR("Load particle effect file failed");
         return false;
     }
 
     XMLElement rootElem = file.GetRoot();
     if (!rootElem)
     {
-        LOGERROR("Particle emitter parameter file does not have a valid root element");
+        URHO3D_LOGERROR("Particle emitter parameter file does not have a valid root element");
         return false;
     }
 
@@ -182,7 +182,7 @@ bool ParticleEffect::BeginLoad(Deserializer& source)
         else if (type == "sphere")
             emitterType_ = EMITTER_SPHERE;
         else
-            LOGERROR("Unknown particle emitter type " + type);
+            URHO3D_LOGERROR("Unknown particle emitter type " + type);
     }
 
     if (rootElem.HasChild("emittersize"))
@@ -331,7 +331,7 @@ bool ParticleEffect::Load(const XMLElement& source)
 
     if (source.IsNull())
     {
-        LOGERROR("Can not load particle effect from null XML element");
+        URHO3D_LOGERROR("Can not load particle effect from null XML element");
         return false;
     }
 
@@ -372,7 +372,7 @@ bool ParticleEffect::Load(const XMLElement& source)
         else if (type == "sphere")
             emitterType_ = EMITTER_SPHERE;
         else
-            LOGERROR("Unknown particle emitter type " + type);
+            URHO3D_LOGERROR("Unknown particle emitter type " + type);
     }
 
     if (source.HasChild("emittersize"))
@@ -485,7 +485,7 @@ bool ParticleEffect::Save(XMLElement& dest) const
 {
     if (dest.IsNull())
     {
-        LOGERROR("Can not save particle effect to null XML element");
+        URHO3D_LOGERROR("Can not save particle effect to null XML element");
         return false;
     }
 

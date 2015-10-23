@@ -70,7 +70,7 @@ WorkQueue::WorkQueue(Context* context) :
     lastSize_(0),
     maxNonThreadedWorkMs_(5)
 {
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(WorkQueue, HandleBeginFrame));
+    SubscribeToEvent(E_BEGINFRAME, URHO3D_HANDLER(WorkQueue, HandleBeginFrame));
 }
 
 WorkQueue::~WorkQueue()
@@ -101,7 +101,7 @@ void WorkQueue::CreateThreads(unsigned numThreads)
         threads_.Push(thread);
     }
 #else
-    LOGERROR("Can not create worker threads as threading is disabled");
+    URHO3D_LOGERROR("Can not create worker threads as threading is disabled");
 #endif
 }
 
@@ -126,7 +126,7 @@ void WorkQueue::AddWorkItem(SharedPtr<WorkItem> item)
 {
     if (!item)
     {
-        LOGERROR("Null work item submitted to the work queue");
+        URHO3D_LOGERROR("Null work item submitted to the work queue");
         return;
     }
 
@@ -397,7 +397,7 @@ void WorkQueue::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
     // If no worker threads, complete low-priority work here
     if (threads_.Empty() && !queue_.Empty())
     {
-        PROFILE(CompleteWorkNonthreaded);
+        URHO3D_PROFILE(CompleteWorkNonthreaded);
 
         HiresTimer timer;
 

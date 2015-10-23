@@ -30,9 +30,9 @@ namespace Urho3D
 {
 
 /// Work item completed event.
-EVENT(E_WORKITEMCOMPLETED, WorkItemCompleted)
+URHO3D_EVENT(E_WORKITEMCOMPLETED, WorkItemCompleted)
 {
-    PARAM(P_ITEM, Item);                        // WorkItem ptr
+    URHO3D_PARAM(P_ITEM, Item);                        // WorkItem ptr
 }
 
 class WorkerThread;
@@ -74,7 +74,7 @@ private:
 /// Work queue subsystem for multithreading.
 class URHO3D_API WorkQueue : public Object
 {
-    OBJECT(WorkQueue, Object);
+    URHO3D_OBJECT(WorkQueue, Object);
 
     friend class WorkerThread;
 

@@ -64,7 +64,7 @@ bool ConstantBuffer::SetSize(unsigned size)
 
     if (!size)
     {
-        LOGERROR("Can not create zero-sized constant buffer");
+        URHO3D_LOGERROR("Can not create zero-sized constant buffer");
         return false;
     }
 
@@ -91,7 +91,7 @@ bool ConstantBuffer::SetSize(unsigned size)
 
         if (!object_)
         {
-            LOGERROR("Failed to create constant buffer");
+            URHO3D_LOGERROR("Failed to create constant buffer");
             return false;
         }
     }

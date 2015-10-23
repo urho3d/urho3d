@@ -115,7 +115,7 @@ void Time::BeginFrame(float timeStep)
         profiler->BeginFrame();
 
     {
-        PROFILE(BeginFrame);
+        URHO3D_PROFILE(BeginFrame);
 
         // Frame begin event
         using namespace BeginFrame;
@@ -130,7 +130,7 @@ void Time::BeginFrame(float timeStep)
 void Time::EndFrame()
 {
     {
-        PROFILE(EndFrame);
+        URHO3D_PROFILE(EndFrame);
 
         // Frame end event
         SendEvent(E_ENDFRAME);

@@ -53,9 +53,9 @@ PackageFile::~PackageFile()
 bool PackageFile::Open(const String& fileName, unsigned startOffset)
 {
 #ifdef ANDROID
-    if (IS_ASSET(fileName))
+    if (URHO3D_IS_ASSET(fileName))
     {
-        LOGERROR("Package files within the apk are not supported on Android");
+        URHO3D_LOGERROR("Package files within the apk are not supported on Android");
         return false;
     }
 #endif
@@ -86,7 +86,7 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
 
         if (id != "UPAK" && id != "ULZ4")
         {
-            LOGERROR(fileName + " is not a valid package file");
+            URHO3D_LOGERROR(fileName + " is not a valid package file");
             return false;
         }
     }
@@ -107,7 +107,7 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
         newEntry.size_ = file->ReadUInt();
         newEntry.checksum_ = file->ReadUInt();
         if (!compressed_ && newEntry.offset_ + newEntry.size_ > totalSize_)
-            LOGERROR("File entry " + entryName + " outside package file");
+            URHO3D_LOGERROR("File entry " + entryName + " outside package file");
         else
             entries_[entryName] = newEntry;
     }

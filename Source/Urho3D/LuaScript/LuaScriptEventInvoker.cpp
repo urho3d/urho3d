@@ -52,9 +52,9 @@ void LuaScriptEventInvoker::AddEventHandler(Object* sender, const StringHash& ev
         return;
 
     if (sender)
-        SubscribeToEvent(sender, eventType, HANDLER_USERDATA(LuaScriptEventInvoker, HandleLuaScriptEvent, function));
+        SubscribeToEvent(sender, eventType, URHO3D_HANDLER_USERDATA(LuaScriptEventInvoker, HandleLuaScriptEvent, function));
     else
-        SubscribeToEvent(eventType, HANDLER_USERDATA(LuaScriptEventInvoker, HandleLuaScriptEvent, function));
+        SubscribeToEvent(eventType, URHO3D_HANDLER_USERDATA(LuaScriptEventInvoker, HandleLuaScriptEvent, function));
 }
 
 void LuaScriptEventInvoker::HandleLuaScriptEvent(StringHash eventType, VariantMap& eventData)

@@ -56,21 +56,21 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
     MemoryBuffer memoryBuffer(fontData, fontDataSize);
     if (!xmlReader->Load(memoryBuffer))
     {
-        LOGERROR("Could not load XML file");
+        URHO3D_LOGERROR("Could not load XML file");
         return false;
     }
 
     XMLElement root = xmlReader->GetRoot("font");
     if (root.IsNull())
     {
-        LOGERROR("Could not find Font element");
+        URHO3D_LOGERROR("Could not find Font element");
         return false;
     }
 
     XMLElement pagesElem = root.GetChild("pages");
     if (pagesElem.IsNull())
     {
-        LOGERROR("Could not find Pages element");
+        URHO3D_LOGERROR("Could not find Pages element");
         return false;
     }
 
@@ -92,7 +92,7 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
     {
         if (pageElem.IsNull())
         {
-            LOGERROR("Could not find Page element for page: " + String(i));
+            URHO3D_LOGERROR("Could not find Page element for page: " + String(i));
             return 0;
         }
 
@@ -104,7 +104,7 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         SharedPtr<Image> fontImage(new Image(context));
         if (!fontFile || !fontImage->Load(*fontFile))
         {
-            LOGERROR("Failed to load font image file");
+            URHO3D_LOGERROR("Failed to load font image file");
             return 0;
         }
         SharedPtr<Texture2D> texture = LoadFaceTexture(fontImage);
@@ -160,7 +160,7 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         }
     }
 
-    LOGDEBUGF("Bitmap font face %s has %d glyphs", GetFileName(font_->GetName()).CString(), count);
+    URHO3D_LOGDEBUGF("Bitmap font face %s has %d glyphs", GetFileName(font_->GetName()).CString(), count);
 
     font_->SetMemoryUse(font_->GetMemoryUse() + totalTextureSize);
     return true;
@@ -360,7 +360,7 @@ SharedPtr<Image> FontFaceBitmap::SaveFaceTexture(Texture2D* texture)
     if (!texture->GetData(0, image->GetData()))
     {
         delete image;
-        LOGERROR("Could not save texture to image resource");
+        URHO3D_LOGERROR("Could not save texture to image resource");
         return SharedPtr<Image>();
     }
     return SharedPtr<Image>(image);

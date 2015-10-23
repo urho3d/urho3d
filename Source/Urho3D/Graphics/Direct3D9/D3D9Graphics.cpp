@@ -354,7 +354,7 @@ void Graphics::SetExternalWindow(void* window)
     if (!impl_->window_)
         externalWindow_ = window;
     else
-        LOGERROR("Window already opened, can not set external window");
+        URHO3D_LOGERROR("Window already opened, can not set external window");
 }
 
 void Graphics::SetWindowTitle(const String& windowTitle)
@@ -387,7 +387,7 @@ void Graphics::SetWindowPosition(int x, int y)
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer,
     int multiSample)
 {
-    PROFILE(SetScreenMode);
+    URHO3D_PROFILE(SetScreenMode);
 
     bool maximize = false;
 
@@ -562,7 +562,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         msg.Append(" resizable");
     if (multiSample > 1)
         msg.AppendWithFormat(" multisample %d", multiSample);
-    LOGINFO(msg);
+    URHO3D_LOGINFO(msg);
 #endif
 
     using namespace ScreenMode;
@@ -616,7 +616,7 @@ void Graphics::Close()
 
 bool Graphics::TakeScreenShot(Image& destImage)
 {
-    PROFILE(TakeScreenShot);
+    URHO3D_PROFILE(TakeScreenShot);
 
     if (!impl_->device_)
         return false;
@@ -647,7 +647,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
     impl_->device_->CreateOffscreenPlainSurface(surfaceWidth, surfaceHeight, surfaceDesc.Format, D3DPOOL_SYSTEMMEM, &surface, 0);
     if (!surface)
     {
-        LOGERROR("Could not create surface for taking a screenshot");
+        URHO3D_LOGERROR("Could not create surface for taking a screenshot");
         return false;
     }
 
@@ -677,7 +677,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
     surface->LockRect(&lockedRect, &sourceRect, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY);
     if (!lockedRect.pBits)
     {
-        LOGERROR("Could not lock surface for taking a screenshot");
+        URHO3D_LOGERROR("Could not lock surface for taking a screenshot");
         surface->Release();
         return false;
     }
@@ -756,7 +756,7 @@ bool Graphics::BeginFrame()
     HRESULT hr = impl_->device_->TestCooperativeLevel();
     if (hr != D3D_OK)
     {
-        PROFILE(DeviceLost);
+        URHO3D_PROFILE(DeviceLost);
 
         deviceLost_ = true;
 
@@ -797,7 +797,7 @@ void Graphics::EndFrame()
         return;
 
     {
-        PROFILE(Present);
+        URHO3D_PROFILE(Present);
 
         SendEvent(E_ENDRENDERING);
 
@@ -811,7 +811,7 @@ void Graphics::EndFrame()
     {
         if (queryIssued_)
         {
-            PROFILE(FlushGPU);
+            URHO3D_PROFILE(FlushGPU);
 
             while (impl_->frameQuery_->GetData(0, 0, D3DGETDATA_FLUSH) == S_FALSE)
             {
@@ -849,7 +849,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     if (!destination || !destination->GetRenderSurface())
         return false;
 
-    PROFILE(ResolveToTexture);
+    URHO3D_PROFILE(ResolveToTexture);
 
     IntRect vpCopy = viewport;
     if (vpCopy.right_ <= vpCopy.left_)
@@ -950,12 +950,12 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
 {
     if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
-        LOGERROR("Too many vertex buffers");
+        URHO3D_LOGERROR("Too many vertex buffers");
         return false;
     }
     if (buffers.Size() != elementMasks.Size())
     {
-        LOGERROR("Amount of element masks and vertex buffers does not match");
+        URHO3D_LOGERROR("Amount of element masks and vertex buffers does not match");
         return false;
     }
 
@@ -977,7 +977,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
             SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers, elementMasks));
             if (!newDeclaration->GetDeclaration())
             {
-                LOGERROR("Failed to create vertex declaration");
+                URHO3D_LOGERROR("Failed to create vertex declaration");
                 return false;
             }
 
@@ -1053,12 +1053,12 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         {
             if (vs->GetCompilerOutput().Empty())
             {
-                PROFILE(CompileVertexShader);
+                URHO3D_PROFILE(CompileVertexShader);
 
                 bool success = vs->Create();
                 if (!success)
                 {
-                    LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
+                    URHO3D_LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
                     vs = 0;
                 }
             }
@@ -1083,12 +1083,12 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         {
             if (ps->GetCompilerOutput().Empty())
             {
-                PROFILE(CompilePixelShader);
+                URHO3D_PROFILE(CompilePixelShader);
 
                 bool success = ps->Create();
                 if (!success)
                 {
-                    LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
+                    URHO3D_LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
                     ps = 0;
                 }
             }
@@ -1868,7 +1868,7 @@ void Graphics::EndDumpShaders()
 
 void Graphics::PrecacheShaders(Deserializer& source)
 {
-    PROFILE(PrecacheShaders);
+    URHO3D_PROFILE(PrecacheShaders);
 
     ShaderPrecache::LoadShaders(this, source);
 }
@@ -2062,7 +2062,7 @@ void Graphics::WindowResized()
     // Reset rendertargets and viewport for the new screen size
     ResetRenderTargets();
 
-    LOGDEBUGF("Window was resized to %dx%d", width_, height_);
+    URHO3D_LOGDEBUGF("Window was resized to %dx%d", width_, height_);
 
     using namespace ScreenMode;
 
@@ -2089,7 +2089,7 @@ void Graphics::WindowMoved()
     position_.x_ = newX;
     position_.y_ = newY;
 
-    LOGDEBUGF("Window was moved to %d,%d", position_.x_, position_.y_);
+    URHO3D_LOGDEBUGF("Window was moved to %d,%d", position_.x_, position_.y_);
 
     using namespace WindowPos;
 
@@ -2156,7 +2156,7 @@ void* Graphics::ReserveScratchBuffer(unsigned size)
             i->size_ = size;
             i->reserved_ = true;
 
-            LOGDEBUG("Resized scratch buffer to size " + String(size));
+            URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(size));
 
             return i->data_.Get();
         }
@@ -2170,7 +2170,7 @@ void* Graphics::ReserveScratchBuffer(unsigned size)
     scratchBuffers_.Push(newBuffer);
     return newBuffer.data_.Get();
 
-    LOGDEBUG("Allocated scratch buffer with size " + String(size));
+    URHO3D_LOGDEBUG("Allocated scratch buffer with size " + String(size));
 }
 
 void Graphics::FreeScratchBuffer(void* buffer)
@@ -2187,7 +2187,7 @@ void Graphics::FreeScratchBuffer(void* buffer)
         }
     }
 
-    LOGWARNING("Reserved scratch buffer " + ToStringHex((unsigned)(size_t)buffer) + " not found");
+    URHO3D_LOGWARNING("Reserved scratch buffer " + ToStringHex((unsigned)(size_t)buffer) + " not found");
 }
 
 void Graphics::CleanupScratchBuffers()
@@ -2199,7 +2199,7 @@ void Graphics::CleanupScratchBuffers()
             i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : 0;
             i->size_ = maxScratchBufferRequest_;
 
-            LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));
+            URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));
         }
     }
 
@@ -2378,7 +2378,7 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
 
     if (!impl_->window_)
     {
-        LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
+        URHO3D_LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
         return false;
     }
 
@@ -2430,25 +2430,25 @@ bool Graphics::CreateInterface()
     impl_->interface_ = Direct3DCreate9(D3D_SDK_VERSION);
     if (!impl_->interface_)
     {
-        LOGERROR("Could not create Direct3D9 interface");
+        URHO3D_LOGERROR("Could not create Direct3D9 interface");
         return false;
     }
 
     if (FAILED(impl_->interface_->GetDeviceCaps(impl_->adapter_, impl_->deviceType_, &impl_->deviceCaps_)))
     {
-        LOGERROR("Could not get Direct3D capabilities");
+        URHO3D_LOGERROR("Could not get Direct3D capabilities");
         return false;
     }
 
     if (FAILED(impl_->interface_->GetAdapterIdentifier(impl_->adapter_, 0, &impl_->adapterIdentifier_)))
     {
-        LOGERROR("Could not get Direct3D adapter identifier");
+        URHO3D_LOGERROR("Could not get Direct3D adapter identifier");
         return false;
     }
 
     if (impl_->deviceCaps_.PixelShaderVersion < D3DPS_VERSION(3, 0))
     {
-        LOGERROR("Shader model 3.0 display adapter is required");
+        URHO3D_LOGERROR("Shader model 3.0 display adapter is required");
         return false;
     }
 
@@ -2479,7 +2479,7 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
         &impl_->presentParams_,
         &impl_->device_)))
     {
-        LOGERROR("Could not create Direct3D9 device");
+        URHO3D_LOGERROR("Could not create Direct3D9 device");
         return false;
     }
 
@@ -2488,7 +2488,7 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
 
     OnDeviceReset();
 
-    LOGINFO("Created Direct3D9 device");
+    URHO3D_LOGINFO("Created Direct3D9 device");
     return true;
 }
 
@@ -2588,7 +2588,7 @@ void Graphics::ResetDevice()
 
 void Graphics::OnDeviceLost()
 {
-    LOGINFO("Device lost");
+    URHO3D_LOGINFO("Device lost");
 
     if (impl_->defaultColorSurface_)
     {

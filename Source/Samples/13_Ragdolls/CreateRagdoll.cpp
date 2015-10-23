@@ -39,7 +39,7 @@ void CreateRagdoll::OnNodeSet(Node* node)
     // If the node pointer is non-null, this component has been created into a scene node. Subscribe to physics collisions that
     // concern this scene node
     if (node)
-        SubscribeToEvent(node, E_NODECOLLISION, HANDLER(CreateRagdoll, HandleNodeCollision));
+        SubscribeToEvent(node, E_NODECOLLISION, URHO3D_HANDLER(CreateRagdoll, HandleNodeCollision));
 }
 
 void CreateRagdoll::HandleNodeCollision(StringHash eventType, VariantMap& eventData)
@@ -119,7 +119,7 @@ void CreateRagdoll::CreateRagdollBone(const String& boneName, ShapeType type, co
     Node* boneNode = node_->GetChild(boneName, true);
     if (!boneNode)
     {
-        LOGWARNING("Could not find bone " + boneName + " for creating ragdoll physics components");
+        URHO3D_LOGWARNING("Could not find bone " + boneName + " for creating ragdoll physics components");
         return;
     }
 
@@ -149,12 +149,12 @@ void CreateRagdoll::CreateRagdollConstraint(const String& boneName, const String
     Node* parentNode = node_->GetChild(parentName, true);
     if (!boneNode)
     {
-        LOGWARNING("Could not find bone " + boneName + " for creating ragdoll constraint");
+        URHO3D_LOGWARNING("Could not find bone " + boneName + " for creating ragdoll constraint");
         return;
     }
     if (!parentNode)
     {
-        LOGWARNING("Could not find bone " + parentName + " for creating ragdoll constraint");
+        URHO3D_LOGWARNING("Could not find bone " + parentName + " for creating ragdoll constraint");
         return;
     }
 

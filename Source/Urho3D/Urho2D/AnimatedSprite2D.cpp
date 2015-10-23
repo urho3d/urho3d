@@ -74,14 +74,14 @@ void AnimatedSprite2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimatedSprite2D>(URHO2D_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(StaticSprite2D);
-    REMOVE_ATTRIBUTE("Sprite");
-    ACCESSOR_ATTRIBUTE("Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Entity", GetEntity, SetEntity, String, String::EMPTY, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Animation Set", GetAnimationSetAttr, SetAnimationSetAttr, ResourceRef,
+    URHO3D_COPY_BASE_ATTRIBUTES(StaticSprite2D);
+    URHO3D_REMOVE_ATTRIBUTE("Sprite");
+    URHO3D_ACCESSOR_ATTRIBUTE("Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Entity", GetEntity, SetEntity, String, String::EMPTY, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Animation Set", GetAnimationSetAttr, SetAnimationSetAttr, ResourceRef,
         ResourceRef(AnimatedSprite2D::GetTypeStatic()), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Animation", GetAnimation, SetAnimationAttr, String, String::EMPTY, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Loop Mode", GetLoopMode, SetLoopMode, LoopMode2D, loopModeNames, LM_DEFAULT, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Animation", GetAnimation, SetAnimationAttr, String, String::EMPTY, AM_DEFAULT);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Loop Mode", GetLoopMode, SetLoopMode, LoopMode2D, loopModeNames, LM_DEFAULT, AM_DEFAULT);
 }
 
 void AnimatedSprite2D::OnSetEnabled()
@@ -94,7 +94,7 @@ void AnimatedSprite2D::OnSetEnabled()
     if (scene)
     {
         if (enabled)
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimatedSprite2D, HandleScenePostUpdate));
+            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(AnimatedSprite2D, HandleScenePostUpdate));
         else
             UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
     }
@@ -217,9 +217,9 @@ void AnimatedSprite2D::OnSceneSet(Scene* scene)
     if (scene)
     {
         if (scene == node_)
-            LOGWARNING(GetTypeName() + " should not be created to the root scene node");
+            URHO3D_LOGWARNING(GetTypeName() + " should not be created to the root scene node");
         if (IsEnabledEffective())
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimatedSprite2D, HandleScenePostUpdate));
+            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(AnimatedSprite2D, HandleScenePostUpdate));
     }
     else
         UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
@@ -268,7 +268,7 @@ void AnimatedSprite2D::SetSpineAnimation()
         animationStateData_ = spAnimationStateData_create(animationSet_->GetSkeletonData());
         if (!animationStateData_)
         {
-            LOGERROR("Create animation state data failed");
+            URHO3D_LOGERROR("Create animation state data failed");
             return;
         }
     }
@@ -278,7 +278,7 @@ void AnimatedSprite2D::SetSpineAnimation()
         animationState_ = spAnimationState_create(animationStateData_);
         if (!animationState_)
         {
-            LOGERROR("Create animation state failed");
+            URHO3D_LOGERROR("Create animation state failed");
             return;
         }
     }
@@ -414,13 +414,13 @@ void AnimatedSprite2D::SetSpriterAnimation()
 
     if (!spriterInstance_->SetEntity(entity_.CString()))
     {
-        LOGERROR("Set entity failed");
+        URHO3D_LOGERROR("Set entity failed");
         return;
     }
 
     if (!spriterInstance_->SetAnimation(animationName_.CString(), (Spriter::LoopMode)loopMode_))
     {
-        LOGERROR("Set animation failed");
+        URHO3D_LOGERROR("Set animation failed");
         return;
     }
 

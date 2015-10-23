@@ -287,7 +287,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 {
     if (!Thread::IsMainThread())
     {
-        LOGERROR("Sending events is only supported from the main thread");
+        URHO3D_LOGERROR("Sending events is only supported from the main thread");
         return;
     }
 

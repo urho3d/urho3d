@@ -40,7 +40,7 @@ class Scene;
 /// Lua script subsystem.
 class URHO3D_API LuaScript : public Object, public LuaScriptEventListener
 {
-    OBJECT(LuaScript, Object);
+    URHO3D_OBJECT(LuaScript, Object);
 
 public:
     /// Construct.

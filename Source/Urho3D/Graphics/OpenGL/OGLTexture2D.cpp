@@ -64,7 +64,7 @@ bool Texture2D::BeginLoad(Deserializer& source)
     // If device is lost, retry later
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Texture load while device is lost");
+        URHO3D_LOGWARNING("Texture load while device is lost");
         dataPending_ = true;
         return true;
     }
@@ -183,7 +183,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     }
 
     if (usage == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, HANDLER(Texture2D, HandleRenderSurfaceUpdate));
+        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture2D, HandleRenderSurfaceUpdate));
     else
         UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
 
@@ -196,29 +196,29 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
 
 bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const void* data)
 {
-    PROFILE(SetTextureData);
+    URHO3D_PROFILE(SetTextureData);
 
     if (!object_ || !graphics_)
     {
-        LOGERROR("No texture created, can not set data");
+        URHO3D_LOGERROR("No texture created, can not set data");
         return false;
     }
 
     if (!data)
     {
-        LOGERROR("Null source for setting data");
+        URHO3D_LOGERROR("Null source for setting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        LOGERROR("Illegal mip level for setting data");
+        URHO3D_LOGERROR("Illegal mip level for setting data");
         return false;
     }
 
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Texture data assignment while device is lost");
+        URHO3D_LOGWARNING("Texture data assignment while device is lost");
         dataPending_ = true;
         return true;
     }
@@ -233,7 +233,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     int levelHeight = GetLevelHeight(level);
     if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || width <= 0 || height <= 0)
     {
-        LOGERROR("Illegal dimensions for setting data");
+        URHO3D_LOGERROR("Illegal dimensions for setting data");
         return false;
     }
 
@@ -265,7 +265,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
 {
     if (!image)
     {
-        LOGERROR("Null image, can not set data");
+        URHO3D_LOGERROR("Null image, can not set data");
         return false;
     }
 
@@ -399,25 +399,25 @@ bool Texture2D::GetData(unsigned level, void* dest) const
 #ifndef GL_ES_VERSION_2_0
     if (!object_ || !graphics_)
     {
-        LOGERROR("No texture created, can not get data");
+        URHO3D_LOGERROR("No texture created, can not get data");
         return false;
     }
 
     if (!dest)
     {
-        LOGERROR("Null destination for getting data");
+        URHO3D_LOGERROR("Null destination for getting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        LOGERROR("Illegal mip level for getting data");
+        URHO3D_LOGERROR("Illegal mip level for getting data");
         return false;
     }
 
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Getting texture data while device is lost");
+        URHO3D_LOGWARNING("Getting texture data while device is lost");
         return false;
     }
 
@@ -431,7 +431,7 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     graphics_->SetTexture(0, 0);
     return true;
 #else
-    LOGERROR("Getting texture data not supported");
+    URHO3D_LOGERROR("Getting texture data not supported");
     return false;
 #endif
 }
@@ -445,7 +445,7 @@ bool Texture2D::Create()
 
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Texture creation while device is lost");
+        URHO3D_LOGWARNING("Texture creation while device is lost");
         return true;
     }
 
@@ -485,7 +485,7 @@ bool Texture2D::Create()
         glTexImage2D(target_, 0, format, width_, height_, 0, externalFormat, dataType, 0);
         if (glGetError())
         {
-            LOGERROR("Failed to create texture");
+            URHO3D_LOGERROR("Failed to create texture");
             success = false;
         }
     }

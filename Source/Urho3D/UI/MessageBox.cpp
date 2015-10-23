@@ -78,10 +78,10 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
             window->SetPosition((graphics->GetWidth() - size.x_) / 2, (graphics->GetHeight() - size.y_) / 2);
         }
         else
-            LOGWARNING("Instantiating a modal window in headless mode!");
+            URHO3D_LOGWARNING("Instantiating a modal window in headless mode!");
 
         window->SetModal(true);
-        SubscribeToEvent(window, E_MODALCHANGED, HANDLER(MessageBox, HandleMessageAcknowledged));
+        SubscribeToEvent(window, E_MODALCHANGED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
     }
 
     // Bind the buttons (if any in the loaded UI layout) to event handlers
@@ -89,14 +89,14 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
     if (okButton_)
     {
         ui->SetFocusElement(okButton_);
-        SubscribeToEvent(okButton_, E_RELEASED, HANDLER(MessageBox, HandleMessageAcknowledged));
+        SubscribeToEvent(okButton_, E_RELEASED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
     }
     Button* cancelButton = dynamic_cast<Button*>(window_->GetChild("CancelButton", true));
     if (cancelButton)
-        SubscribeToEvent(cancelButton, E_RELEASED, HANDLER(MessageBox, HandleMessageAcknowledged));
+        SubscribeToEvent(cancelButton, E_RELEASED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
     Button* closeButton = dynamic_cast<Button*>(window_->GetChild("CloseButton", true));
     if (closeButton)
-        SubscribeToEvent(closeButton, E_RELEASED, HANDLER(MessageBox, HandleMessageAcknowledged));
+        SubscribeToEvent(closeButton, E_RELEASED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
 }
 
 MessageBox::~MessageBox()

@@ -91,7 +91,7 @@ void RenderTargetInfo::Load(const XMLElement& element)
     else if (element.HasAttribute("rtsizedivisor"))
     {
         // Deprecated rtsizedivisor mode, acts the same as sizedivisor mode now
-        LOGWARNING("Deprecated rtsizedivisor mode used in rendertarget definition");
+        URHO3D_LOGWARNING("Deprecated rtsizedivisor mode used in rendertarget definition");
         size_ = element.GetVector2("rtsizedivisor");
         sizeMode_ = SIZE_VIEWPORTDIVISOR;
     }

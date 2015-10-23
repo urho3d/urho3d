@@ -171,7 +171,7 @@ public:
 /// Hierarchical performance profiler subsystem.
 class URHO3D_API Profiler : public Object
 {
-    OBJECT(Profiler, Object);
+    URHO3D_OBJECT(Profiler, Object);
     
 public:
     /// Construct.
@@ -256,9 +256,9 @@ private:
 };
 
 #ifdef URHO3D_PROFILING
-#define PROFILE(name) Urho3D::AutoProfileBlock profile_ ## name (GetSubsystem<Urho3D::Profiler>(), #name)
+#define URHO3D_PROFILE(name) Urho3D::AutoProfileBlock profile_ ## name (GetSubsystem<Urho3D::Profiler>(), #name)
 #else
-#define PROFILE(name)
+#define URHO3D_PROFILE(name)
 #endif
 
 }

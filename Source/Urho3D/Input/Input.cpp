@@ -145,7 +145,7 @@ bool EmscriptenInput::IsVisible()
         return visibilityStatus.hidden >= EM_TRUE ? false : true;
 
     // Assume visible
-    LOGWARNING("Could not determine visibility status.");
+    URHO3D_LOGWARNING("Could not determine visibility status.");
     return true;
 }
 
@@ -228,7 +228,7 @@ Input::Input(Context* context) :
     for (int i = 0; i < TOUCHID_MAX; i++)
         availableTouchIDs_.Push(i);
 
-    SubscribeToEvent(E_SCREENMODE, HANDLER(Input, HandleScreenMode));
+    SubscribeToEvent(E_SCREENMODE, URHO3D_HANDLER(Input, HandleScreenMode));
 
 #ifdef __EMSCRIPTEN__
     emscriptenInput_ = new EmscriptenInput(this);
@@ -250,7 +250,7 @@ void Input::Update()
 {
     assert(initialized_);
 
-    PROFILE(UpdateInput);
+    URHO3D_PROFILE(UpdateInput);
 
     // Reset input accumulation for this frame
     keyPress_.Clear();
@@ -669,7 +669,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 
     if (!graphics_)
     {
-        LOGWARNING("Cannot add screen joystick in headless mode");
+        URHO3D_LOGWARNING("Cannot add screen joystick in headless mode");
         return -1;
     }
 
@@ -731,7 +731,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                         keyBinding = i->second_;
                     else
                     {
-                        LOGERRORF("Unsupported key binding: %s", key.CString());
+                        URHO3D_LOGERRORF("Unsupported key binding: %s", key.CString());
                         keyBinding = M_MAX_INT;
                     }
                 }
@@ -752,7 +752,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                 if (i != mouseButtonBindingMap.End())
                     element->SetVar(VAR_BUTTON_MOUSE_BUTTON_BINDING, i->second_);
                 else
-                    LOGERRORF("Unsupported mouse button binding: %s", mouseButton.CString());
+                    URHO3D_LOGERRORF("Unsupported mouse button binding: %s", mouseButton.CString());
             }
         }
         else if (name.StartsWith("Axis"))
@@ -760,7 +760,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
             ++numAxes;
 
             ///\todo Axis emulation for screen joystick is not fully supported yet.
-            LOGWARNING("Axis emulation for screen joystick is not fully supported yet");
+            URHO3D_LOGWARNING("Axis emulation for screen joystick is not fully supported yet");
         }
         else if (name.StartsWith("Hat"))
         {
@@ -795,13 +795,13 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                             if (i != keyBindingMap.End())
                                 mappedKeyBinding[j] = i->second_;
                             else
-                                LOGERRORF("%s - %s cannot be mapped, fallback to '%c'", name.CString(), keyBindings[j].CString(),
+                                URHO3D_LOGERRORF("%s - %s cannot be mapped, fallback to '%c'", name.CString(), keyBindings[j].CString(),
                                     mappedKeyBinding[j]);
                         }
                     }
                 }
                 else
-                    LOGERRORF("%s has invalid key binding %s, fallback to WSAD", name.CString(), keyBinding.CString());
+                    URHO3D_LOGERRORF("%s has invalid key binding %s, fallback to WSAD", name.CString(), keyBinding.CString());
                 element->SetVar(VAR_BUTTON_KEY_BINDING, IntRect(mappedKeyBinding));
             }
         }
@@ -819,9 +819,9 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 
     // There could be potentially more than one screen joystick, however they all will be handled by a same handler method
     // So there is no harm to replace the old handler with the new handler in each call to SubscribeToEvent()
-    SubscribeToEvent(E_TOUCHBEGIN, HANDLER(Input, HandleScreenJoystickTouch));
-    SubscribeToEvent(E_TOUCHMOVE, HANDLER(Input, HandleScreenJoystickTouch));
-    SubscribeToEvent(E_TOUCHEND, HANDLER(Input, HandleScreenJoystickTouch));
+    SubscribeToEvent(E_TOUCHBEGIN, URHO3D_HANDLER(Input, HandleScreenJoystickTouch));
+    SubscribeToEvent(E_TOUCHMOVE, URHO3D_HANDLER(Input, HandleScreenJoystickTouch));
+    SubscribeToEvent(E_TOUCHEND, URHO3D_HANDLER(Input, HandleScreenJoystickTouch));
 
     return joystickID;
 }
@@ -830,14 +830,14 @@ bool Input::RemoveScreenJoystick(SDL_JoystickID id)
 {
     if (!joysticks_.Contains(id))
     {
-        LOGERRORF("Failed to remove non-existing screen joystick ID #%d", id);
+        URHO3D_LOGERRORF("Failed to remove non-existing screen joystick ID #%d", id);
         return false;
     }
 
     JoystickState& state = joysticks_[id];
     if (!state.screenJoystick_)
     {
-        LOGERRORF("Failed to remove joystick with ID #%d which is not a screen joystick", id);
+        URHO3D_LOGERRORF("Failed to remove joystick with ID #%d which is not a screen joystick", id);
         return false;
     }
 
@@ -900,7 +900,7 @@ bool Input::RecordGesture()
     // If have no touch devices, fail
     if (!SDL_GetNumTouchDevices())
     {
-        LOGERROR("Can not record gesture: no touch devices");
+        URHO3D_LOGERROR("Can not record gesture: no touch devices");
         return false;
     }
 
@@ -924,7 +924,7 @@ unsigned Input::LoadGestures(Deserializer& source)
     // If have no touch devices, fail
     if (!SDL_GetNumTouchDevices())
     {
-        LOGERROR("Can not load gestures: no touch devices");
+        URHO3D_LOGERROR("Can not load gestures: no touch devices");
         return 0;
     }
 
@@ -954,7 +954,7 @@ SDL_JoystickID Input::OpenJoystick(unsigned index)
     SDL_Joystick* joystick = SDL_JoystickOpen(index);
     if (!joystick)
     {
-        LOGERRORF("Cannot open joystick #%d", index);
+        URHO3D_LOGERRORF("Cannot open joystick #%d", index);
         return -1;
     }
 
@@ -1182,9 +1182,9 @@ void Input::Initialize()
     ResetJoysticks();
     ResetState();
 
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(Input, HandleBeginFrame));
+    SubscribeToEvent(E_BEGINFRAME, URHO3D_HANDLER(Input, HandleBeginFrame));
 
-    LOGINFO("Initialized input");
+    URHO3D_LOGINFO("Initialized input");
 }
 
 void Input::ResetJoysticks()

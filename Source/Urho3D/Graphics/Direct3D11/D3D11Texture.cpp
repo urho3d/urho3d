@@ -349,7 +349,7 @@ void Texture::UpdateParameters()
     graphics_->GetImpl()->GetDevice()->CreateSamplerState(&samplerDesc, (ID3D11SamplerState**)&sampler_);
 
     if (!sampler_)
-        LOGERROR("Failed to create sampler state");
+        URHO3D_LOGERROR("Failed to create sampler state");
 
     parametersDirty_ = false;
 }

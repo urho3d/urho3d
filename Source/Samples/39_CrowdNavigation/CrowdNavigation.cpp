@@ -51,7 +51,7 @@
 
 static const String INSTRUCTION("instructionText");
 
-DEFINE_APPLICATION_MAIN(CrowdNavigation)
+URHO3D_DEFINE_APPLICATION_MAIN(CrowdNavigation)
 
 CrowdNavigation::CrowdNavigation(Context* context) :
     Sample(context),
@@ -235,20 +235,20 @@ void CrowdNavigation::SetupViewport()
 void CrowdNavigation::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(CrowdNavigation, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(CrowdNavigation, HandleUpdate));
 
     // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(CrowdNavigation, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, URHO3D_HANDLER(CrowdNavigation, HandlePostRenderUpdate));
 
     // Subscribe HandleCrowdAgentFailure() function for resolving invalidation issues with agents, during which we
     // use a larger extents for finding a point on the navmesh to fix the agent's position
-    SubscribeToEvent(E_CROWD_AGENT_FAILURE, HANDLER(CrowdNavigation, HandleCrowdAgentFailure));
+    SubscribeToEvent(E_CROWD_AGENT_FAILURE, URHO3D_HANDLER(CrowdNavigation, HandleCrowdAgentFailure));
 
     // Subscribe HandleCrowdAgentReposition() function for controlling the animation
-    SubscribeToEvent(E_CROWD_AGENT_REPOSITION, HANDLER(CrowdNavigation, HandleCrowdAgentReposition));
+    SubscribeToEvent(E_CROWD_AGENT_REPOSITION, URHO3D_HANDLER(CrowdNavigation, HandleCrowdAgentReposition));
 
     // Subscribe HandleCrowdAgentFormation() function for positioning agent into a formation
-    SubscribeToEvent(E_CROWD_AGENT_FORMATION, HANDLER(CrowdNavigation, HandleCrowdAgentFormation));
+    SubscribeToEvent(E_CROWD_AGENT_FORMATION, URHO3D_HANDLER(CrowdNavigation, HandleCrowdAgentFormation));
 }
 
 void CrowdNavigation::SpawnJack(const Vector3& pos, Node* jackGroup)

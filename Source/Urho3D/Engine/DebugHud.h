@@ -44,7 +44,7 @@ static const unsigned DEBUGHUD_SHOW_ALL_MEMORY = 0xB;
 /// Displays rendering stats and profiling information.
 class URHO3D_API DebugHud : public Object
 {
-    OBJECT(DebugHud, Object);
+    URHO3D_OBJECT(DebugHud, Object);
 
 public:
     /// Construct.

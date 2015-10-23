@@ -120,7 +120,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
         return true;
     }
 
-    LOGERROR("Texture3D XML data for " + GetName() + " did not contain either volume or colorlut element");
+    URHO3D_LOGERROR("Texture3D XML data for " + GetName() + " did not contain either volume or colorlut element");
     return false;
 }
 
@@ -198,7 +198,7 @@ bool Texture3D::SetSize(int width, int height, int depth, unsigned format, Textu
     }
 
     if (usage_ == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, HANDLER(Texture3D, HandleRenderSurfaceUpdate));
+        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture3D, HandleRenderSurfaceUpdate));
     else
         UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
 
@@ -212,23 +212,23 @@ bool Texture3D::SetSize(int width, int height, int depth, unsigned format, Textu
 
 bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data)
 {
-    PROFILE(SetTextureData);
+    URHO3D_PROFILE(SetTextureData);
 
     if (!object_)
     {
-        LOGERROR("No texture created, can not set data");
+        URHO3D_LOGERROR("No texture created, can not set data");
         return false;
     }
 
     if (!data)
     {
-        LOGERROR("Null source for setting data");
+        URHO3D_LOGERROR("Null source for setting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        LOGERROR("Illegal mip level for setting data");
+        URHO3D_LOGERROR("Illegal mip level for setting data");
         return false;
     }
 
@@ -238,7 +238,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || z < 0 || z + depth > levelDepth || width <= 0 ||
         height <= 0 || depth <= 0)
     {
-        LOGERROR("Illegal dimensions for setting data");
+        URHO3D_LOGERROR("Illegal dimensions for setting data");
         return false;
     }
 
@@ -286,7 +286,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         }
         else
         {
-            LOGERROR("Failed to map texture for update");
+            URHO3D_LOGERROR("Failed to map texture for update");
             return false;
         }
     }
@@ -314,7 +314,7 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
 {
     if (!image)
     {
-        LOGERROR("Null image, can not load texture");
+        URHO3D_LOGERROR("Null image, can not load texture");
         return false;
     }
 
@@ -440,19 +440,19 @@ bool Texture3D::GetData(unsigned level, void* dest) const
 {
     if (!object_)
     {
-        LOGERROR("No texture created, can not get data");
+        URHO3D_LOGERROR("No texture created, can not get data");
         return false;
     }
 
     if (!dest)
     {
-        LOGERROR("Null destination for getting data");
+        URHO3D_LOGERROR("Null destination for getting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        LOGERROR("Illegal mip level for getting data");
+        URHO3D_LOGERROR("Illegal mip level for getting data");
         return false;
     }
 
@@ -474,7 +474,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, &stagingTexture);
     if (!stagingTexture)
     {
-        LOGERROR("Failed to create staging texture for GetData");
+        URHO3D_LOGERROR("Failed to create staging texture for GetData");
         return false;
     }
 
@@ -511,7 +511,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     }
     else
     {
-        LOGERROR("Failed to map staging texture for GetData");
+        URHO3D_LOGERROR("Failed to map staging texture for GetData");
         stagingTexture->Release();
         return false;
     }
@@ -540,7 +540,7 @@ bool Texture3D::Create()
     graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, (ID3D11Texture3D**)&object_);
     if (!object_)
     {
-        LOGERROR("Failed to create texture");
+        URHO3D_LOGERROR("Failed to create texture");
         return false;
     }
 
@@ -554,7 +554,7 @@ bool Texture3D::Create()
         (ID3D11ShaderResourceView**)&shaderResourceView_);
     if (!shaderResourceView_)
     {
-        LOGERROR("Failed to create shader resource view for texture");
+        URHO3D_LOGERROR("Failed to create shader resource view for texture");
         return false;
     }
 

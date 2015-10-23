@@ -94,7 +94,7 @@ void SceneResolver::Resolve()
                         component->SetAttribute(j, Variant(newNodeID));
                     }
                     else
-                        LOGWARNING("Could not resolve node ID " + String(oldNodeID));
+                        URHO3D_LOGWARNING("Could not resolve node ID " + String(oldNodeID));
                 }
             }
             else if (info.mode_ & AM_COMPONENTID)
@@ -112,7 +112,7 @@ void SceneResolver::Resolve()
                         component->SetAttribute(j, Variant(newComponentID));
                     }
                     else
-                        LOGWARNING("Could not resolve component ID " + String(oldComponentID));
+                        URHO3D_LOGWARNING("Could not resolve component ID " + String(oldComponentID));
                 }
             }
             else if (info.mode_ & AM_NODEIDVECTOR)
@@ -138,7 +138,7 @@ void SceneResolver::Resolve()
                         {
                             // If node was not found, retain number of elements, just store ID 0
                             newIDs.Push(0);
-                            LOGWARNING("Could not resolve node ID " + String(oldNodeID));
+                            URHO3D_LOGWARNING("Could not resolve node ID " + String(oldNodeID));
                         }
                     }
 

@@ -109,7 +109,7 @@ static const unsigned char CHANNEL_SCALE = 0x4;
 /// Skeletal animation resource.
 class URHO3D_API Animation : public Resource
 {
-    OBJECT(Animation, Resource);
+    URHO3D_OBJECT(Animation, Resource);
 
 public:
     /// Construct.

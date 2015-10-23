@@ -93,7 +93,7 @@ bool TextureCube::BeginLoad(Deserializer& source)
     // If device is lost, retry later
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Texture load while device is lost");
+        URHO3D_LOGWARNING("Texture load while device is lost");
         dataPending_ = true;
         return true;
     }
@@ -318,12 +318,12 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
 {
     if (size <= 0)
     {
-        LOGERROR("Zero or negative cube texture size");
+        URHO3D_LOGERROR("Zero or negative cube texture size");
         return false;
     }
     if (usage == TEXTURE_DEPTHSTENCIL)
     {
-        LOGERROR("Depth-stencil usage not supported for cube maps");
+        URHO3D_LOGERROR("Depth-stencil usage not supported for cube maps");
         return false;
     }
 
@@ -350,7 +350,7 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
     }
 
     if (usage == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, HANDLER(TextureCube, HandleRenderSurfaceUpdate));
+        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(TextureCube, HandleRenderSurfaceUpdate));
     else
         UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
 
@@ -363,29 +363,29 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
 
 bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data)
 {
-    PROFILE(SetTextureData);
+    URHO3D_PROFILE(SetTextureData);
 
     if (!object_ || !graphics_)
     {
-        LOGERROR("No texture created, can not set data");
+        URHO3D_LOGERROR("No texture created, can not set data");
         return false;
     }
 
     if (!data)
     {
-        LOGERROR("Null source for setting data");
+        URHO3D_LOGERROR("Null source for setting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        LOGERROR("Illegal mip level for setting data");
+        URHO3D_LOGERROR("Illegal mip level for setting data");
         return false;
     }
 
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Texture data assignment while device is lost");
+        URHO3D_LOGWARNING("Texture data assignment while device is lost");
         dataPending_ = true;
         return true;
     }
@@ -400,7 +400,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     int levelHeight = GetLevelHeight(level);
     if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || width <= 0 || height <= 0)
     {
-        LOGERROR("Illegal dimensions for setting data");
+        URHO3D_LOGERROR("Illegal dimensions for setting data");
         return false;
     }
 
@@ -445,7 +445,7 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
 {
     if (!image)
     {
-        LOGERROR("Null image, can not set face data");
+        URHO3D_LOGERROR("Null image, can not set face data");
         return false;
     }
 
@@ -475,7 +475,7 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
 
         if (levelWidth != levelHeight)
         {
-            LOGERROR("Cube texture width not equal to height");
+            URHO3D_LOGERROR("Cube texture width not equal to height");
             return false;
         }
 
@@ -523,12 +523,12 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
         {
             if (!object_)
             {
-                LOGERROR("Cube texture face 0 must be loaded first");
+                URHO3D_LOGERROR("Cube texture face 0 must be loaded first");
                 return false;
             }
             if (levelWidth != width_ || format != format_)
             {
-                LOGERROR("Cube texture face does not match size or format of face 0");
+                URHO3D_LOGERROR("Cube texture face does not match size or format of face 0");
                 return false;
             }
         }
@@ -557,7 +557,7 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
 
         if (width != height)
         {
-            LOGERROR("Cube texture width not equal to height");
+            URHO3D_LOGERROR("Cube texture width not equal to height");
             return false;
         }
 
@@ -585,12 +585,12 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
         {
             if (!object_)
             {
-                LOGERROR("Cube texture face 0 must be loaded first");
+                URHO3D_LOGERROR("Cube texture face 0 must be loaded first");
                 return false;
             }
             if (width != width_ || format != format_)
             {
-                LOGERROR("Cube texture face does not match size or format of face 0");
+                URHO3D_LOGERROR("Cube texture face does not match size or format of face 0");
                 return false;
             }
         }
@@ -627,25 +627,25 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
 #ifndef GL_ES_VERSION_2_0
     if (!object_ || !graphics_)
     {
-        LOGERROR("No texture created, can not get data");
+        URHO3D_LOGERROR("No texture created, can not get data");
         return false;
     }
 
     if (!dest)
     {
-        LOGERROR("Null destination for getting data");
+        URHO3D_LOGERROR("Null destination for getting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        LOGERROR("Illegal mip level for getting data");
+        URHO3D_LOGERROR("Illegal mip level for getting data");
         return false;
     }
 
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Getting texture data while device is lost");
+        URHO3D_LOGWARNING("Getting texture data while device is lost");
         return false;
     }
 
@@ -659,7 +659,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     graphics_->SetTexture(0, 0);
     return true;
 #else
-    LOGERROR("Getting texture data not supported");
+    URHO3D_LOGERROR("Getting texture data not supported");
     return false;
 #endif
 }
@@ -673,7 +673,7 @@ bool TextureCube::Create()
 
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Texture creation while device is lost");
+        URHO3D_LOGWARNING("Texture creation while device is lost");
         return true;
     }
 
@@ -699,7 +699,7 @@ bool TextureCube::Create()
         }
     }
     if (!success)
-        LOGERROR("Failed to create texture");
+        URHO3D_LOGERROR("Failed to create texture");
 
     // Set mipmapping
     levels_ = requestedLevels_;

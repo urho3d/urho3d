@@ -74,8 +74,8 @@ Scene::Scene(Context* context) :
     SetID(GetFreeNodeID(REPLICATED));
     NodeAdded(this);
 
-    SubscribeToEvent(E_UPDATE, HANDLER(Scene, HandleUpdate));
-    SubscribeToEvent(E_RESOURCEBACKGROUNDLOADED, HANDLER(Scene, HandleResourceBackgroundLoaded));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Scene, HandleUpdate));
+    SubscribeToEvent(E_RESOURCEBACKGROUNDLOADED, URHO3D_HANDLER(Scene, HandleResourceBackgroundLoaded));
 }
 
 Scene::~Scene()
@@ -96,34 +96,34 @@ void Scene::RegisterObject(Context* context)
 {
     context->RegisterFactory<Scene>();
 
-    ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Time Scale", GetTimeScale, SetTimeScale, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Smoothing Constant", GetSmoothingConstant, SetSmoothingConstant, float, DEFAULT_SMOOTHING_CONSTANT,
+    URHO3D_ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Time Scale", GetTimeScale, SetTimeScale, float, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Smoothing Constant", GetSmoothingConstant, SetSmoothingConstant, float, DEFAULT_SMOOTHING_CONSTANT,
         AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Snap Threshold", GetSnapThreshold, SetSnapThreshold, float, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Elapsed Time", GetElapsedTime, SetElapsedTime, float, 0.0f, AM_FILE);
-    ATTRIBUTE("Next Replicated Node ID", unsigned, replicatedNodeID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE("Next Replicated Component ID", unsigned, replicatedComponentID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE("Next Local Node ID", unsigned, localNodeID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE("Next Local Component ID", unsigned, localComponentID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
-    MIXED_ACCESSOR_ATTRIBUTE("Variable Names", GetVarNamesAttr, SetVarNamesAttr, String, String::EMPTY, AM_FILE | AM_NOEDIT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Snap Threshold", GetSnapThreshold, SetSnapThreshold, float, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Elapsed Time", GetElapsedTime, SetElapsedTime, float, 0.0f, AM_FILE);
+    URHO3D_ATTRIBUTE("Next Replicated Node ID", unsigned, replicatedNodeID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
+    URHO3D_ATTRIBUTE("Next Replicated Component ID", unsigned, replicatedComponentID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
+    URHO3D_ATTRIBUTE("Next Local Node ID", unsigned, localNodeID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
+    URHO3D_ATTRIBUTE("Next Local Component ID", unsigned, localComponentID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
+    URHO3D_ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Variable Names", GetVarNamesAttr, SetVarNamesAttr, String, String::EMPTY, AM_FILE | AM_NOEDIT);
 }
 
 bool Scene::Load(Deserializer& source, bool setInstanceDefault)
 {
-    PROFILE(LoadScene);
+    URHO3D_PROFILE(LoadScene);
 
     StopAsyncLoading();
 
     // Check ID
     if (source.ReadFileID() != "USCN")
     {
-        LOGERROR(source.GetName() + " is not a valid scene file");
+        URHO3D_LOGERROR(source.GetName() + " is not a valid scene file");
         return false;
     }
 
-    LOGINFO("Loading scene from " + source.GetName());
+    URHO3D_LOGINFO("Loading scene from " + source.GetName());
 
     Clear();
 
@@ -139,18 +139,18 @@ bool Scene::Load(Deserializer& source, bool setInstanceDefault)
 
 bool Scene::Save(Serializer& dest) const
 {
-    PROFILE(SaveScene);
+    URHO3D_PROFILE(SaveScene);
 
     // Write ID first
     if (!dest.WriteFileID("USCN"))
     {
-        LOGERROR("Could not save scene, writing to stream failed");
+        URHO3D_LOGERROR("Could not save scene, writing to stream failed");
         return false;
     }
 
     Deserializer* ptr = dynamic_cast<Deserializer*>(&dest);
     if (ptr)
-        LOGINFO("Saving scene to " + ptr->GetName());
+        URHO3D_LOGINFO("Saving scene to " + ptr->GetName());
 
     if (Node::Save(dest))
     {
@@ -163,7 +163,7 @@ bool Scene::Save(Serializer& dest) const
 
 bool Scene::LoadXML(const XMLElement& source, bool setInstanceDefault)
 {
-    PROFILE(LoadSceneXML);
+    URHO3D_PROFILE(LoadSceneXML);
 
     StopAsyncLoading();
 
@@ -198,7 +198,7 @@ void Scene::AddReplicationState(NodeReplicationState* state)
 
 bool Scene::LoadXML(Deserializer& source)
 {
-    PROFILE(LoadSceneXML);
+    URHO3D_PROFILE(LoadSceneXML);
 
     StopAsyncLoading();
 
@@ -206,7 +206,7 @@ bool Scene::LoadXML(Deserializer& source)
     if (!xml->Load(source))
         return false;
 
-    LOGINFO("Loading scene from " + source.GetName());
+    URHO3D_LOGINFO("Loading scene from " + source.GetName());
 
     Clear();
 
@@ -221,7 +221,7 @@ bool Scene::LoadXML(Deserializer& source)
 
 bool Scene::SaveXML(Serializer& dest, const String& indentation) const
 {
-    PROFILE(SaveSceneXML);
+    URHO3D_PROFILE(SaveSceneXML);
 
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     XMLElement rootElem = xml->CreateRoot("scene");
@@ -230,7 +230,7 @@ bool Scene::SaveXML(Serializer& dest, const String& indentation) const
 
     Deserializer* ptr = dynamic_cast<Deserializer*>(&dest);
     if (ptr)
-        LOGINFO("Saving scene to " + ptr->GetName());
+        URHO3D_LOGINFO("Saving scene to " + ptr->GetName());
 
     if (xml->Save(dest, indentation))
     {
@@ -245,7 +245,7 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
 {
     if (!file)
     {
-        LOGERROR("Null file for async loading");
+        URHO3D_LOGERROR("Null file for async loading");
         return false;
     }
 
@@ -258,7 +258,7 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
         // In resource load mode can load also object prefabs, which have no identifier
         if (mode > LOAD_RESOURCES_ONLY)
         {
-            LOGERROR(file->GetName() + " is not a valid scene file");
+            URHO3D_LOGERROR(file->GetName() + " is not a valid scene file");
             return false;
         }
         else
@@ -267,7 +267,7 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
 
     if (mode > LOAD_RESOURCES_ONLY)
     {
-        LOGINFO("Loading scene from " + file->GetName());
+        URHO3D_LOGINFO("Loading scene from " + file->GetName());
         Clear();
     }
 
@@ -282,7 +282,7 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
         // Preload resources if appropriate, then return to the original position for loading the scene content
         if (mode != LOAD_SCENE)
         {
-            PROFILE(FindResourcesToPreload);
+            URHO3D_PROFILE(FindResourcesToPreload);
 
             unsigned currentPos = file->GetPosition();
             PreloadResources(file, isSceneFile);
@@ -305,9 +305,9 @@ bool Scene::LoadAsync(File* file, LoadMode mode)
     }
     else
     {
-        PROFILE(FindResourcesToPreload);
+        URHO3D_PROFILE(FindResourcesToPreload);
 
-        LOGINFO("Preloading resources from " + file->GetName());
+        URHO3D_LOGINFO("Preloading resources from " + file->GetName());
         PreloadResources(file, isSceneFile);
     }
 
@@ -318,7 +318,7 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
 {
     if (!file)
     {
-        LOGERROR("Null file for async loading");
+        URHO3D_LOGERROR("Null file for async loading");
         return false;
     }
 
@@ -330,7 +330,7 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
 
     if (mode > LOAD_RESOURCES_ONLY)
     {
-        LOGINFO("Loading scene from " + file->GetName());
+        URHO3D_LOGINFO("Loading scene from " + file->GetName());
         Clear();
     }
 
@@ -348,7 +348,7 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
         // Preload resources if appropriate
         if (mode != LOAD_SCENE)
         {
-            PROFILE(FindResourcesToPreload);
+            URHO3D_PROFILE(FindResourcesToPreload);
 
             PreloadResourcesXML(rootElement);
         }
@@ -374,9 +374,9 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
     }
     else
     {
-        PROFILE(FindResourcesToPreload);
+        URHO3D_PROFILE(FindResourcesToPreload);
 
-        LOGINFO("Preloading resources from " + file->GetName());
+        URHO3D_LOGINFO("Preloading resources from " + file->GetName());
         PreloadResourcesXML(xml->GetRoot());
     }
 
@@ -395,7 +395,7 @@ void Scene::StopAsyncLoading()
 
 Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode)
 {
-    PROFILE(Instantiate);
+    URHO3D_PROFILE(Instantiate);
 
     SceneResolver resolver;
     unsigned nodeID = source.ReadUInt();
@@ -418,7 +418,7 @@ Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Qu
 
 Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, const Quaternion& rotation, CreateMode mode)
 {
-    PROFILE(InstantiateXML);
+    URHO3D_PROFILE(InstantiateXML);
 
     SceneResolver resolver;
     unsigned nodeID = source.GetUInt("id");
@@ -590,7 +590,7 @@ void Scene::Update(float timeStep)
             return;
     }
 
-    PROFILE(UpdateScene);
+    URHO3D_PROFILE(UpdateScene);
 
     timeStep *= timeScale_;
 
@@ -611,7 +611,7 @@ void Scene::Update(float timeStep)
 
     // Update transform smoothing
     {
-        PROFILE(UpdateSmoothing);
+        URHO3D_PROFILE(UpdateSmoothing);
 
         float constant = 1.0f - Clamp(powf(2.0f, -timeStep * smoothingConstant_), 0.0f, 1.0f);
         float squaredSnapThreshold = snapThreshold_ * snapThreshold_;
@@ -648,7 +648,7 @@ void Scene::EndThreadedUpdate()
 
     if (!delayedDirtyComponents_.Empty())
     {
-        PROFILE(EndThreadedUpdate);
+        URHO3D_PROFILE(EndThreadedUpdate);
 
         for (PODVector<Component*>::ConstIterator i = delayedDirtyComponents_.Begin(); i != delayedDirtyComponents_.End(); ++i)
             (*i)->OnMarkedDirty((*i)->GetNode());
@@ -752,7 +752,7 @@ void Scene::NodeAdded(Node* node)
         HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Find(id);
         if (i != replicatedNodes_.End() && i->second_ != node)
         {
-            LOGWARNING("Overwriting node with ID " + String(id));
+            URHO3D_LOGWARNING("Overwriting node with ID " + String(id));
             NodeRemoved(i->second_);
         }
 
@@ -766,7 +766,7 @@ void Scene::NodeAdded(Node* node)
         HashMap<unsigned, Node*>::Iterator i = localNodes_.Find(id);
         if (i != localNodes_.End() && i->second_ != node)
         {
-            LOGWARNING("Overwriting node with ID " + String(id));
+            URHO3D_LOGWARNING("Overwriting node with ID " + String(id));
             NodeRemoved(i->second_);
         }
         localNodes_[id] = node;
@@ -825,7 +825,7 @@ void Scene::ComponentAdded(Component* component)
         HashMap<unsigned, Component*>::Iterator i = replicatedComponents_.Find(id);
         if (i != replicatedComponents_.End() && i->second_ != component)
         {
-            LOGWARNING("Overwriting component with ID " + String(id));
+            URHO3D_LOGWARNING("Overwriting component with ID " + String(id));
             ComponentRemoved(i->second_);
         }
 
@@ -836,7 +836,7 @@ void Scene::ComponentAdded(Component* component)
         HashMap<unsigned, Component*>::Iterator i = localComponents_.Find(id);
         if (i != localComponents_.End() && i->second_ != component)
         {
-            LOGWARNING("Overwriting component with ID " + String(id));
+            URHO3D_LOGWARNING("Overwriting component with ID " + String(id));
             ComponentRemoved(i->second_);
         }
 
@@ -984,7 +984,7 @@ void Scene::HandleResourceBackgroundLoaded(StringHash eventType, VariantMap& eve
 
 void Scene::UpdateAsyncLoading()
 {
-    PROFILE(UpdateAsyncLoading);
+    URHO3D_PROFILE(UpdateAsyncLoading);
 
     // If resources left to load, do not load nodes yet
     if (asyncProgress_.loadedResources_ < asyncProgress_.totalResources_)

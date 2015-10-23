@@ -30,7 +30,7 @@ namespace Urho3D
 /// %Network interest management settings component.
 class URHO3D_API NetworkPriority : public Component
 {
-    OBJECT(NetworkPriority, Component);
+    URHO3D_OBJECT(NetworkPriority, Component);
 
 public:
     /// Construct.

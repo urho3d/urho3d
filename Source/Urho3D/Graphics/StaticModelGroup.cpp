@@ -55,8 +55,8 @@ void StaticModelGroup::RegisterObject(Context* context)
 {
     context->RegisterFactory<StaticModelGroup>(GEOMETRY_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(StaticModel);
-    ACCESSOR_ATTRIBUTE("Instance Nodes", GetNodeIDsAttr, SetNodeIDsAttr, VariantVector, Variant::emptyVariantVector,
+    URHO3D_COPY_BASE_ATTRIBUTES(StaticModel);
+    URHO3D_ACCESSOR_ATTRIBUTE("Instance Nodes", GetNodeIDsAttr, SetNodeIDsAttr, VariantVector, Variant::emptyVariantVector,
         AM_DEFAULT | AM_NODEIDVECTOR);
 }
 

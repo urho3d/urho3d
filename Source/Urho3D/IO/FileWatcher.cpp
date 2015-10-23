@@ -78,7 +78,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
 {
     if (!fileSystem_)
     {
-        LOGERROR("No FileSystem, can not start watching");
+        URHO3D_LOGERROR("No FileSystem, can not start watching");
         return false;
     }
 
@@ -104,12 +104,12 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         watchSubDirs_ = watchSubDirs;
         Run();
         
-        LOGDEBUG("Started watching path " + pathName);
+        URHO3D_LOGDEBUG("Started watching path " + pathName);
         return true;
     }
     else
     {
-        LOGERROR("Failed to start watching path " + pathName);
+        URHO3D_LOGERROR("Failed to start watching path " + pathName);
         return false;
     }
 #elif defined(__linux__)
@@ -118,7 +118,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
 
     if (handle < 0)
     {
-        LOGERROR("Failed to start watching path " + pathName);
+        URHO3D_LOGERROR("Failed to start watching path " + pathName);
         return false;
     }
     else
@@ -142,7 +142,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
                 {
                     handle = inotify_add_watch(watchHandle_, subDirFullPath.CString(), (uint32_t)flags);
                     if (handle < 0)
-                        LOGERROR("Failed to start watching subdirectory path " + subDirFullPath);
+                        URHO3D_LOGERROR("Failed to start watching subdirectory path " + subDirFullPath);
                     else
                     {
                         // Store sub-directory to reconstruct later from inotify
@@ -153,13 +153,13 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         }
         Run();
 
-        LOGDEBUG("Started watching path " + pathName);
+        URHO3D_LOGDEBUG("Started watching path " + pathName);
         return true;
     }
 #elif defined(__APPLE__) && !defined(IOS)
     if (!supported_)
     {
-        LOGERROR("Individual file watching not supported by this OS version, can not start watching path " + pathName);
+        URHO3D_LOGERROR("Individual file watching not supported by this OS version, can not start watching path " + pathName);
         return false;
     }
     
@@ -170,20 +170,20 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         watchSubDirs_ = watchSubDirs;
         Run();
         
-        LOGDEBUG("Started watching path " + pathName);
+        URHO3D_LOGDEBUG("Started watching path " + pathName);
         return true;
     }
     else
     {
-        LOGERROR("Failed to start watching path " + pathName);
+        URHO3D_LOGERROR("Failed to start watching path " + pathName);
         return false;
     }
 #else
-    LOGERROR("FileWatcher not implemented, can not start watching path " + pathName);
+    URHO3D_LOGERROR("FileWatcher not implemented, can not start watching path " + pathName);
     return false;
 #endif
 #else
-    LOGDEBUG("FileWatcher feature not enabled");
+    URHO3D_LOGDEBUG("FileWatcher feature not enabled");
     return false;
 #endif
 }
@@ -213,7 +213,7 @@ void FileWatcher::StopWatching()
         CloseFileWatcher(watcher_);
 #endif
 
-        LOGDEBUG("Stopped watching path " + path_);
+        URHO3D_LOGDEBUG("Stopped watching path " + path_);
         path_.Clear();
     }
 }
