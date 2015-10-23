@@ -4795,8 +4795,8 @@ Methods:
 - void ReleaseAllResources(bool force = false)
 - bool ReloadResource(Resource* resource)
 - void ReloadResourceWithDependencies(const String fileName)
-- void SetMemoryBudget(StringHash type, unsigned budget)
-- void SetMemoryBudget(const String type, unsigned budget)
+- void SetMemoryBudget(StringHash type, long budget)
+- void SetMemoryBudget(const String type, long budget)
 - void SetAutoReloadResources(bool enable)
 - void SetReturnFailedResources(bool enable)
 - void SetSearchPackagesFirst(bool value)
@@ -4808,9 +4808,9 @@ Methods:
 - unsigned GetNumBackgroundLoadResources() const
 - const Vector<String>& GetResourceDirs() const
 - bool Exists(const String name) const
-- unsigned GetMemoryBudget(StringHash type) const
-- unsigned GetMemoryUse(StringHash type) const
-- unsigned GetTotalMemoryUse() const
+- long GetMemoryBudget(StringHash type) const
+- long GetMemoryUse(StringHash type) const
+- long GetTotalMemoryUse() const
 - String GetResourceFileName(const String name) const
 - bool GetAutoReloadResources() const
 - bool GetReturnFailedResources() const
@@ -4822,7 +4822,7 @@ Methods:
 
 Properties:
 
-- unsigned totalMemoryUse (readonly)
+- long totalMemoryUse (readonly)
 - bool autoReloadResources
 - bool returnFailedResources
 - bool searchPackagesFirst
@@ -7682,6 +7682,7 @@ Properties:
 - String GetExtension(const String fullPath, bool lowercaseExtension = true)
 - String GetFileName(const String fullPath)
 - String GetFileNameAndExtension(const String fullPath, bool lowercaseExtension = false)
+- String GetFileSizeString(long memorySize)
 - FileSystem* GetFileSystem()
 - Graphics* GetGraphics()
 - Input* GetInput()
@@ -7717,8 +7718,8 @@ Properties:
 - float Random()
 - float Random(float range)
 - float Random(float min, float max)
-- int RandomInt(int min, int max)
 - int RandomInt(int range)
+- int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
@@ -7729,8 +7730,8 @@ Properties:
 - float Sign(float value)
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
-- void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
 - void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
+- void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
 - float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
@@ -7753,8 +7754,8 @@ Properties:
 - Vector4 ToVector4(const String source, bool allowMissingCoords = false)
 - void UnsubscribeFromAllEvents()
 - void UnsubscribeFromAllEventsExcept(const Vector<String>& exceptionNames)
-- void UnsubscribeFromEvent(Object* sender, const String eventName)
 - void UnsubscribeFromEvent(const String eventName)
+- void UnsubscribeFromEvent(Object* sender, const String eventName)
 - void UnsubscribeFromEvents(Object* sender)
 
 
@@ -7812,6 +7813,7 @@ Properties:
 - unsigned DD_SOURCE_AND_TARGET
 - unsigned DD_TARGET
 - unsigned DEBUGHUD_SHOW_ALL
+- unsigned DEBUGHUD_SHOW_ALL_MEMORY
 - unsigned DEBUGHUD_SHOW_MODE
 - unsigned DEBUGHUD_SHOW_NONE
 - unsigned DEBUGHUD_SHOW_PROFILER
