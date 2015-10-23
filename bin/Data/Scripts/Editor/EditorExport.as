@@ -1,4 +1,7 @@
 
+bool objExportZUp_ = false;
+bool objExportRightHanded_ = true;
+
 void ExportSceneToOBJ(String fileName)
 {
     if (fileName.empty)
@@ -27,7 +30,7 @@ void ExportSceneToOBJ(String fileName)
     RemoveDebugDrawables(drawables);
 
     File@ file = File(fileName, FILE_WRITE);
-    if (WriteDrawablesToOBJ(drawables, file))
+    if (WriteDrawablesToOBJ(drawables, file, objExportZUp_, objExportRightHanded_))
     {
         MessageBox("OBJ file written to " + fileName, "Success");
         file.Close();
@@ -78,7 +81,7 @@ void ExportSelectedToOBJ(String fileName)
     if (drawables.length > 0)
     {
         File@ file = File(fileName, FILE_WRITE);
-        if (WriteDrawablesToOBJ(drawables, file))
+        if (WriteDrawablesToOBJ(drawables, file, objExportZUp_, objExportRightHanded_))
         {
             MessageBox("OBJ file written to " + fileName, "Success");
             file.Close();
@@ -107,4 +110,16 @@ void RemoveDebugDrawables(Array<Drawable@>@ drawables)
         else
             ++i;
     }
+}
+
+void HandleOBJZUpChanged(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ checkBox = cast<CheckBox>(eventData["Element"].GetPtr());
+    objExportZUp_ = checkBox.checked;
+}
+
+void HandleOBJRightHandedChanged(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ checkBox = cast<CheckBox>(eventData["Element"].GetPtr());
+    objExportRightHanded_ = checkBox.checked;
 }

@@ -444,7 +444,7 @@ void Drawable::RemoveFromOctree()
     }
 }
 
-bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool writeLightmapUV)
+bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
 {
     // Must track indices independently to deal with potential mismatching of drawables vertex attributes (ie. one with UV, another without, then another with)
     // Using long because 65,535 isn't enough as OBJ indices do not reset the count with each new object
@@ -508,6 +508,16 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                 {
                     Vector3 vertexPosition = *((const Vector3*)(&vertexData[(vertexStart + j) * elementSize + positionOffset]));
                     vertexPosition = transMat * vertexPosition;
+
+                    // Convert coordinates as requested
+                    if (asRightHanded)
+                        vertexPosition.x_ *= -1;
+                    if (asZUp)
+                    {
+                        float yVal = vertexPosition.y_;
+                        vertexPosition.y_ = vertexPosition.z_;
+                        vertexPosition.z_ = yVal;
+                    }
                     outputFile->WriteLine("v " + String(vertexPosition));
                 }
 
@@ -519,6 +529,16 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                         Vector3 vertexNormal = *((const Vector3*)(&vertexData[(vertexStart + j) * elementSize + positionOffset]));
                         vertexNormal = transMat * vertexNormal;
                         vertexNormal.Normalize();
+
+                        if (asRightHanded)
+                            vertexNormal.x_ *= -1;
+                        if (asZUp)
+                        {
+                            float yVal = vertexNormal.y_;
+                            vertexNormal.y_ = vertexNormal.z_;
+                            vertexNormal.z_ = yVal;
+                        }
+
                         outputFile->WriteLine("vn " + String(vertexNormal));
                     }
                 }
