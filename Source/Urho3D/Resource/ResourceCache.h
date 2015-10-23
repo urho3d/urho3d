@@ -49,9 +49,9 @@ struct ResourceGroup
     }
 
     /// Memory budget.
-    unsigned memoryBudget_;
+    unsigned long long memoryBudget_;
     /// Current memory use.
-    unsigned memoryUse_;
+    unsigned long long memoryUse_;
     /// Resources.
     HashMap<StringHash, SharedPtr<Resource> > resources_;
 };
@@ -117,7 +117,7 @@ public:
     /// Reload a resource based on filename. Causes also reload of dependent resources if necessary.
     void ReloadResourceWithDependencies(const String& fileName);
     /// Set memory budget for a specific resource type, default 0 is unlimited.
-    void SetMemoryBudget(StringHash type, unsigned budget);
+    void SetMemoryBudget(StringHash type, unsigned long long budget);
     /// Enable or disable automatic reloading of resources as files are modified. Default false.
     void SetAutoReloadResources(bool enable);
     /// Enable or disable returning resources that failed to load. Default false. This may be useful in editing to not lose resource ref attributes.
@@ -171,11 +171,11 @@ public:
     /// Return whether a file exists by name.
     bool Exists(const String& name) const;
     /// Return memory budget for a resource type.
-    unsigned GetMemoryBudget(StringHash type) const;
+    unsigned long long GetMemoryBudget(StringHash type) const;
     /// Return total memory use for a resource type.
-    unsigned GetMemoryUse(StringHash type) const;
+    unsigned long long GetMemoryUse(StringHash type) const;
     /// Return total memory use for all resources.
-    unsigned GetTotalMemoryUse() const;
+    unsigned long long GetTotalMemoryUse() const;
     /// Return full absolute file name of resource if possible.
     String GetResourceFileName(const String& name) const;
 

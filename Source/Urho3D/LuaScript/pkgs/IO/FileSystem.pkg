@@ -44,6 +44,7 @@ String GetParentPath(const String pathName);
 String GetInternalPath(const String pathName);
 String GetNativePath(const String pathName);
 bool IsAbsolutePath(const String pathName);
+String GetFileSizeString(unsigned long long memorySize);
 
 FileSystem * GetFileSystem();
 tolua_readonly tolua_property__get_set FileSystem* fileSystem;

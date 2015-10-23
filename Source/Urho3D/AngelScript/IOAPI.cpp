@@ -351,6 +351,7 @@ void RegisterFileSystem(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("String GetParentPath(const String&in)", asFUNCTION(GetParentPath), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetInternalPath(const String&in)", asFUNCTION(GetInternalPath), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool IsAbsolutePath(const String&in)", asFUNCTION(IsAbsolutePath), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String GetFileSizeString(uint64)", asFUNCTION(GetFileSizeString), asCALL_CDECL);
 }
 
 static PackageFile* ConstructPackageFile()

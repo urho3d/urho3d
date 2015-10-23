@@ -1069,7 +1069,7 @@ bool IsAbsolutePath(const String& pathName)
 }
 
 /// Convert a memory size into a formatted size string, of the style "1.5 Mb"
-String GetFileSizeString(unsigned long memorySize)
+String GetFileSizeString(unsigned long long memorySize)
 {
     const char* memorySizeStrings = "kMGTPE";
 

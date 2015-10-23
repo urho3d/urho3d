@@ -544,7 +544,7 @@ void Engine::DumpProfiler()
 {
     Profiler* profiler = GetSubsystem<Profiler>();
     if (profiler)
-        LOGRAW(profiler->GetData(true, true) + "\n");
+        LOGRAW(profiler->PrintData(true, true) + "\n");
 }
 
 void Engine::DumpResources(bool dumpFileName)
@@ -557,38 +557,20 @@ void Engine::DumpResources(bool dumpFileName)
     if (dumpFileName)
     {
         LOGRAW("Used resources:\n");
-    }
-
-    for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
-         i != resourceGroups.End(); ++i)
-    {
-        const HashMap<StringHash, SharedPtr<Resource> >& resources = i->second_.resources_;
-        if (dumpFileName)
+        for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
+            i != resourceGroups.End(); ++i)
         {
-            for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = resources.Begin();
-                 j != resources.End(); ++j)
+            const HashMap<StringHash, SharedPtr<Resource> >& resources = i->second_.resources_;
+            if (dumpFileName)
             {
-                LOGRAW(j->second_->GetName() + "\n");
-            }
-
-        }
-        else
-        {
-            unsigned num = resources.Size();
-            unsigned memoryUse = i->second_.memoryUse_;
-
-            if (num)
-            {
-                LOGRAW("Resource type " + resources.Begin()->second_->GetTypeName() +
-                       ": count " + String(num) + " memory use " + String(memoryUse) + "\n");
+                for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = resources.Begin();
+                    j != resources.End(); ++j)
+                    LOGRAW(j->second_->GetName() + "\n");
             }
         }
     }
-
-    if (!dumpFileName)
-    {
-        LOGRAW("Total memory use of all resources " + String(cache->GetTotalMemoryUse()) + "\n\n");
-    }
+    else
+        LOGRAW(cache->PrintMemoryUsage());
 #endif
 }
 

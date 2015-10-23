@@ -80,7 +80,7 @@ void Profiler::BeginInterval()
     intervalFrames_ = 0;
 }
 
-String Profiler::GetData(bool showUnused, bool showTotal, unsigned maxDepth) const
+String Profiler::PrintData(bool showUnused, bool showTotal, unsigned maxDepth) const
 {
     String output;
 
@@ -95,12 +95,12 @@ String Profiler::GetData(bool showUnused, bool showTotal, unsigned maxDepth) con
     if (!maxDepth)
         maxDepth = 1;
 
-    GetData(root_, output, 0, maxDepth, showUnused, showTotal);
+    PrintData(root_, output, 0, maxDepth, showUnused, showTotal);
 
     return output;
 }
 
-void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused,
+void Profiler::PrintData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused,
     bool showTotal) const
 {
     char line[LINE_MAX_LENGTH];
@@ -153,7 +153,7 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, uns
     }
 
     for (PODVector<ProfilerBlock*>::ConstIterator i = block->children_.Begin(); i != block->children_.End(); ++i)
-        GetData(*i, output, depth, maxDepth, showUnused, showTotal);
+        PrintData(*i, output, depth, maxDepth, showUnused, showTotal);
 }
 
 }

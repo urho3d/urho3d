@@ -432,7 +432,7 @@ void ResourceCache::ReloadResourceWithDependencies(const String& fileName)
     }
 }
 
-void ResourceCache::SetMemoryBudget(StringHash type, unsigned budget)
+void ResourceCache::SetMemoryBudget(StringHash type, unsigned long long budget)
 {
     resourceGroups_[type].memoryBudget_ = budget;
 }
@@ -761,21 +761,21 @@ bool ResourceCache::Exists(const String& nameIn) const
     return fileSystem->FileExists(name);
 }
 
-unsigned ResourceCache::GetMemoryBudget(StringHash type) const
+unsigned long long ResourceCache::GetMemoryBudget(StringHash type) const
 {
     HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
     return i != resourceGroups_.End() ? i->second_.memoryBudget_ : 0;
 }
 
-unsigned ResourceCache::GetMemoryUse(StringHash type) const
+unsigned long long ResourceCache::GetMemoryUse(StringHash type) const
 {
     HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
     return i != resourceGroups_.End() ? i->second_.memoryUse_ : 0;
 }
 
-unsigned ResourceCache::GetTotalMemoryUse() const
+unsigned long long ResourceCache::GetTotalMemoryUse() const
 {
-    unsigned total = 0;
+    unsigned long long total = 0;
     for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
         total += i->second_.memoryUse_;
     return total;
@@ -913,43 +913,59 @@ void ResourceCache::ResetDependencies(Resource* resource)
 
 String ResourceCache::PrintMemoryUsage() const
 {
-    String output = "Resource Type                            Cnt     Avg      Max     Budget    Total\n\n";
+    String output = "Resource Type                 Cnt       Avg       Max    Budget     Total\n\n";
+    char outputLine[256];
+
+    unsigned totalResourceCt = 0;
+    unsigned long long totalLargest = 0;
+    unsigned long long totalAverage = 0;
+    unsigned long long totalUse = GetTotalMemoryUse();
 
     for (HashMap<StringHash, ResourceGroup>::ConstIterator cit = resourceGroups_.Begin(); cit != resourceGroups_.End(); ++cit)
-    {        
+    {
         const unsigned resourceCt = cit->second_.resources_.Size();
-        unsigned average = 0;
+        unsigned long long average = 0;
         if (resourceCt > 0)
             average = cit->second_.memoryUse_ / resourceCt;
         else
             average = 0;
-        unsigned long largest = 0;
+        unsigned long long largest = 0;
         for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator resIt = cit->second_.resources_.Begin(); resIt != cit->second_.resources_.End(); ++resIt)
         {
             if (resIt->second_->GetMemoryUse() > largest)
                 largest = resIt->second_->GetMemoryUse();
+            if (largest > totalLargest)
+                totalLargest = largest;
         }
         
-        char outputLine[256];
-        memset(outputLine, ' ', 256);
-        outputLine[255] = 0;
+        totalResourceCt += resourceCt;
         
         const String countString(cit->second_.resources_.Size());
-
         const String memUseString = GetFileSizeString(average);
-
         const String memMaxString = GetFileSizeString(largest);
-
         const String memBudgetString = GetFileSizeString(cit->second_.memoryBudget_);
-
         const String memTotalString = GetFileSizeString(cit->second_.memoryUse_);
-
         const String resTypeName = context_->GetTypeName(cit->first_);
 
-        sprintf(outputLine, "%-38s %4s %9s %9s %9s %9s\n", resTypeName.CString(), countString.CString(), memUseString.CString(), memMaxString.CString(), memBudgetString.CString(), memTotalString.CString());
+        memset(outputLine, ' ', 256);
+        outputLine[255] = 0;
+        sprintf(outputLine, "%-28s %4s %9s %9s %9s %9s\n", resTypeName.CString(), countString.CString(), memUseString.CString(), memMaxString.CString(), memBudgetString.CString(), memTotalString.CString());
 
         output += ((const char*)outputLine);
     }
+
+    if (totalResourceCt > 0)
+        totalAverage = totalUse / totalResourceCt;
+
+    const String countString(totalResourceCt);
+    const String memUseString = GetFileSizeString(totalAverage);
+    const String memMaxString = GetFileSizeString(totalLargest);
+    const String memTotalString = GetFileSizeString(totalUse);
+
+    memset(outputLine, ' ', 256);
+    outputLine[255] = 0;
+    sprintf(outputLine, "%-28s %4s %9s %9s %9s %9s\n", "All", countString.CString(), memUseString.CString(), memMaxString.CString(), "-", memTotalString.CString());
+    output += ((const char*)outputLine);
 
     return output;
 }

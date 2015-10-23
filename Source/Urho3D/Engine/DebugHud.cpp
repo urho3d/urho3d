@@ -175,7 +175,7 @@ void DebugHud::Update()
 
             if (profilerText_->IsVisible())
             {
-                String profilerOutput = profiler->GetData(false, false, profilerMaxDepth_);
+                String profilerOutput = profiler->PrintData(false, false, profilerMaxDepth_);
                 profilerText_->SetText(profilerOutput);
             }
 
