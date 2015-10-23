@@ -144,7 +144,19 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
     // Toggle debug HUD with F2
     else if (key == KEY_F2)
-        debugHud.ToggleAll();
+    {
+        if (debugHud.mode == 0 || (debugHud.mode & DEBUGHUD_SHOW_MEMORY) > 0)
+            debugHud.mode = DEBUGHUD_SHOW_STATS | DEBUGHUD_SHOW_MODE | DEBUGHUD_SHOW_PROFILER;
+        else
+            debugHud.mode = 0;
+    }
+    else if (key == KEY_F3)
+    {
+        if (debugHud.mode == 0 || (debugHud.mode & DEBUGHUD_SHOW_PROFILER) > 0)
+            debugHud.mode = DEBUGHUD_SHOW_STATS | DEBUGHUD_SHOW_MODE | DEBUGHUD_SHOW_MEMORY;
+        else
+            debugHud.mode = 0;
+    }
 
     // Common rendering quality controls, only when UI has no focused element
     if (ui.focusElement is null)

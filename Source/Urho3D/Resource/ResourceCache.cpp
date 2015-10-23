@@ -36,9 +36,13 @@
 #include "../Resource/PListFile.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/ResourceEvents.h"
+#include "../Container/Sort.h"
 #include "../Resource/XMLFile.h"
 
 #include "../DebugNew.h"
+
+#include <cstring>
+#include <cstdio>
 
 namespace Urho3D
 {
@@ -905,6 +909,49 @@ void ResourceCache::ResetDependencies(Resource* resource)
         else
             ++i;
     }
+}
+
+String ResourceCache::PrintMemoryUsage() const
+{
+    String output = "Resource Type                            Cnt     Avg      Max     Budget    Total\n\n";
+
+    for (HashMap<StringHash, ResourceGroup>::ConstIterator cit = resourceGroups_.Begin(); cit != resourceGroups_.End(); ++cit)
+    {        
+        const unsigned resourceCt = cit->second_.resources_.Size();
+        unsigned average = 0;
+        if (resourceCt > 0)
+            average = cit->second_.memoryUse_ / resourceCt;
+        else
+            average = 0;
+        unsigned long largest = 0;
+        for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator resIt = cit->second_.resources_.Begin(); resIt != cit->second_.resources_.End(); ++resIt)
+        {
+            if (resIt->second_->GetMemoryUse() > largest)
+                largest = resIt->second_->GetMemoryUse();
+        }
+        
+        char outputLine[256];
+        memset(outputLine, ' ', 256);
+        outputLine[255] = 0;
+        
+        const String countString(cit->second_.resources_.Size());
+
+        const String memUseString = GetFileSizeString(average);
+
+        const String memMaxString = GetFileSizeString(largest);
+
+        const String memBudgetString = GetFileSizeString(cit->second_.memoryBudget_);
+
+        const String memTotalString = GetFileSizeString(cit->second_.memoryUse_);
+
+        const String resTypeName = context_->GetTypeName(cit->first_);
+
+        sprintf(outputLine, "%-38s %4s %9s %9s %9s %9s\n", resTypeName.CString(), countString.CString(), memUseString.CString(), memMaxString.CString(), memBudgetString.CString(), memTotalString.CString());
+
+        output += ((const char*)outputLine);
+    }
+
+    return output;
 }
 
 const SharedPtr<Resource>& ResourceCache::FindResource(StringHash type, StringHash nameHash)

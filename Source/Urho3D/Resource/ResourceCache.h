@@ -205,6 +205,9 @@ public:
     /// Reset dependencies for a resource.
     void ResetDependencies(Resource* resource);
 
+    /// Returns a formatted string containing the memory actively used.
+    String PrintMemoryUsage() const;
+
 private:
     /// Find a resource.
     const SharedPtr<Resource>& FindResource(StringHash type, StringHash nameHash);

@@ -150,5 +150,7 @@ URHO3D_API String GetNativePath(const String& pathName);
 URHO3D_API WString GetWideNativePath(const String& pathName);
 /// Return whether a path is absolute.
 URHO3D_API bool IsAbsolutePath(const String& pathName);
+/// Convert a memory size into a formatted size string, of the style "1.5 Mb"
+URHO3D_API String GetFileSizeString(unsigned long memorySize);
 
 }
