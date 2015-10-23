@@ -565,7 +565,7 @@ void Engine::DumpResources(bool dumpFileName)
             {
                 for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = resources.Begin();
                     j != resources.End(); ++j)
-                    LOGRAW(j->second_->GetName() + "\n");
+                    URHO3D_LOGRAW(j->second_->GetName() + "\n");
             }
         }
     }
