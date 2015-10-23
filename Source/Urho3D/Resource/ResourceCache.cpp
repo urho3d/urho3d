@@ -948,7 +948,7 @@ String ResourceCache::PrintMemoryUsage() const
 
         sprintf(outputLine, "%-38s %4s %9s %9s %9s %9s\n", resTypeName.CString(), countString.CString(), memUseString.CString(), memMaxString.CString(), memBudgetString.CString(), memTotalString.CString());
 
-        output += outputLine;
+        output += ((const char*)outputLine);
     }
 
     return output;
