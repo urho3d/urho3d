@@ -36,12 +36,10 @@
 #include "../Resource/PListFile.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/ResourceEvents.h"
-#include "../Container/Sort.h"
 #include "../Resource/XMLFile.h"
 
 #include "../DebugNew.h"
 
-#include <cstring>
 #include <cstdio>
 
 namespace Urho3D
@@ -496,7 +494,7 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFai
             resourceRouters_[i]->Route(name, RESOURCE_GETFILE);
         isRouting_ = false;
     }
-    
+
     if (name.Length())
     {
         File* file = 0;
@@ -937,9 +935,9 @@ String ResourceCache::PrintMemoryUsage() const
             if (largest > totalLargest)
                 totalLargest = largest;
         }
-        
+
         totalResourceCt += resourceCt;
-        
+
         const String countString(cit->second_.resources_.Size());
         const String memUseString = GetFileSizeString(average);
         const String memMaxString = GetFileSizeString(largest);

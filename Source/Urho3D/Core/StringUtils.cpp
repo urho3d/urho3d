@@ -667,4 +667,29 @@ unsigned ToLower(unsigned ch)
     return (unsigned)tolower(ch);
 }
 
+String GetFileSizeString(unsigned long long memorySize)
+{
+    static const char* memorySizeStrings = "kMGTPE";
+
+    String output;
+
+    if (memorySize < 1024)
+    {
+        output = String(memorySize) + " b";
+    }
+    else
+    {
+        const int exponent = (int)(log(memorySize) / log(1024));
+        const double majorValue = ((double)memorySize) / pow(1024, exponent);
+        char buffer[64];
+        memset(buffer, 0, 64);
+        sprintf(buffer, "%.1f", majorValue);
+        output = buffer;
+        output += " ";
+        output += memorySizeStrings[exponent - 1];
+    }
+
+    return output;
+}
+
 }
