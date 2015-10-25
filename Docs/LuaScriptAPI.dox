@@ -4697,6 +4697,7 @@ Methods:
 - void SetMaxOccluderTriangles(int triangles)
 - void SetOcclusionBufferSize(int size)
 - void SetOccluderSizeThreshold(float screenSize)
+- void SetThreadedOcclusion(bool enable)
 - void SetMobileShadowBiasMul(float mul)
 - void SetMobileShadowBiasAdd(float add)
 - void ReloadShaders()
@@ -4720,6 +4721,7 @@ Methods:
 - int GetMaxOccluderTriangles() const
 - int GetOcclusionBufferSize() const
 - float GetOccluderSizeThreshold() const
+- bool GetThreadedOcclusion() const
 - float GetMobileShadowBiasMul() const
 - float GetMobileShadowBiasAdd() const
 - unsigned GetNumViews() const
@@ -4756,6 +4758,7 @@ Properties:
 - int maxOccluderTriangles
 - int occlusionBufferSize
 - float occluderSizeThreshold
+- bool threadedOcclusion
 - float mobileShadowBiasMul
 - float mobileShadowBiasAdd
 - unsigned numViews (readonly)

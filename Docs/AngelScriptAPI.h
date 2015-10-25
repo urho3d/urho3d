@@ -7971,6 +7971,7 @@ bool specularLighting;
 int textureAnisotropy;
 TextureFilterMode textureFilterMode;
 int textureQuality;
+bool threadedOcclusion;
 /* readonly */
 StringHash type;
 /* readonly */

@@ -9395,6 +9395,7 @@ Properties:
 - int textureAnisotropy
 - TextureFilterMode textureFilterMode
 - int textureQuality
+- bool threadedOcclusion
 - StringHash type // readonly
 - String typeName // readonly
 - Viewport@[] viewports
