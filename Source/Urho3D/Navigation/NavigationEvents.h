@@ -28,82 +28,82 @@ namespace Urho3D
 {
 
 /// Complete rebuild of navigation mesh.
-EVENT(E_NAVIGATION_MESH_REBUILT, NavigationMeshRebuilt)
+URHO3D_EVENT(E_NAVIGATION_MESH_REBUILT, NavigationMeshRebuilt)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_MESH, Mesh); // NavigationMesh pointer
+    URHO3D_PARAM(P_NODE, Node); // Node pointer
+    URHO3D_PARAM(P_MESH, Mesh); // NavigationMesh pointer
 }
 
 /// Partial bounding box rebuild of navigation mesh.
-EVENT(E_NAVIGATION_AREA_REBUILT, NavigationAreaRebuilt)
+URHO3D_EVENT(E_NAVIGATION_AREA_REBUILT, NavigationAreaRebuilt)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_MESH, Mesh); // NavigationMesh pointer
-    PARAM(P_BOUNDSMIN, BoundsMin); // Vector3
-    PARAM(P_BOUNDSMAX, BoundsMax); // Vector3
+    URHO3D_PARAM(P_NODE, Node); // Node pointer
+    URHO3D_PARAM(P_MESH, Mesh); // NavigationMesh pointer
+    URHO3D_PARAM(P_BOUNDSMIN, BoundsMin); // Vector3
+    URHO3D_PARAM(P_BOUNDSMAX, BoundsMax); // Vector3
 }
 
 /// Crowd agent formation.
-EVENT(E_CROWD_AGENT_FORMATION, CrowdAgentFormation)
+URHO3D_EVENT(E_CROWD_AGENT_FORMATION, CrowdAgentFormation)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
-    PARAM(P_INDEX, Index); // unsigned
-    PARAM(P_SIZE, Size); // unsigned
-    PARAM(P_POSITION, Position); // Vector3 [in/out]
+    URHO3D_PARAM(P_NODE, Node); // Node pointer
+    URHO3D_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    URHO3D_PARAM(P_INDEX, Index); // unsigned
+    URHO3D_PARAM(P_SIZE, Size); // unsigned
+    URHO3D_PARAM(P_POSITION, Position); // Vector3 [in/out]
 }
 
 /// Crowd agent has been repositioned.
-EVENT(E_CROWD_AGENT_REPOSITION, CrowdAgentReposition)
+URHO3D_EVENT(E_CROWD_AGENT_REPOSITION, CrowdAgentReposition)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
-    PARAM(P_POSITION, Position); // Vector3
-    PARAM(P_VELOCITY, Velocity); // Vector3
-    PARAM(P_ARRIVED, Arrived); // bool
-    PARAM(P_TIMESTEP, TimeStep); // float
+    URHO3D_PARAM(P_NODE, Node); // Node pointer
+    URHO3D_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    URHO3D_PARAM(P_POSITION, Position); // Vector3
+    URHO3D_PARAM(P_VELOCITY, Velocity); // Vector3
+    URHO3D_PARAM(P_ARRIVED, Arrived); // bool
+    URHO3D_PARAM(P_TIMESTEP, TimeStep); // float
 }
 
 /// Crowd agent's internal state has become invalidated. This is a special case of CrowdAgentStateChanged event.
-EVENT(E_CROWD_AGENT_FAILURE, CrowdAgentFailure)
+URHO3D_EVENT(E_CROWD_AGENT_FAILURE, CrowdAgentFailure)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
-    PARAM(P_POSITION, Position); // Vector3
-    PARAM(P_VELOCITY, Velocity); // Vector3
-    PARAM(P_CROWD_AGENT_STATE, CrowdAgentState); // int
-    PARAM(P_CROWD_TARGET_STATE, CrowdTargetState); // int
+    URHO3D_PARAM(P_NODE, Node); // Node pointer
+    URHO3D_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    URHO3D_PARAM(P_POSITION, Position); // Vector3
+    URHO3D_PARAM(P_VELOCITY, Velocity); // Vector3
+    URHO3D_PARAM(P_CROWD_AGENT_STATE, CrowdAgentState); // int
+    URHO3D_PARAM(P_CROWD_TARGET_STATE, CrowdTargetState); // int
 }
 
 /// Crowd agent's state has been changed.
-EVENT(E_CROWD_AGENT_STATE_CHANGED, CrowdAgentStateChanged)
+URHO3D_EVENT(E_CROWD_AGENT_STATE_CHANGED, CrowdAgentStateChanged)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
-    PARAM(P_POSITION, Position); // Vector3
-    PARAM(P_VELOCITY, Velocity); // Vector3
-    PARAM(P_CROWD_AGENT_STATE, CrowdAgentState); // int
-    PARAM(P_CROWD_TARGET_STATE, CrowdTargetState); // int
+    URHO3D_PARAM(P_NODE, Node); // Node pointer
+    URHO3D_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    URHO3D_PARAM(P_POSITION, Position); // Vector3
+    URHO3D_PARAM(P_VELOCITY, Velocity); // Vector3
+    URHO3D_PARAM(P_CROWD_AGENT_STATE, CrowdAgentState); // int
+    URHO3D_PARAM(P_CROWD_TARGET_STATE, CrowdTargetState); // int
 }
 
 /// Addition of obstacle to dynamic navigation mesh.
-EVENT(E_NAVIGATION_OBSTACLE_ADDED, NavigationObstacleAdded)
+URHO3D_EVENT(E_NAVIGATION_OBSTACLE_ADDED, NavigationObstacleAdded)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_OBSTACLE, Obstacle); // Obstacle pointer
-    PARAM(P_POSITION, Position); // Vector3
-    PARAM(P_RADIUS, Radius); // float
-    PARAM(P_HEIGHT, Height); // float
+    URHO3D_PARAM(P_NODE, Node); // Node pointer
+    URHO3D_PARAM(P_OBSTACLE, Obstacle); // Obstacle pointer
+    URHO3D_PARAM(P_POSITION, Position); // Vector3
+    URHO3D_PARAM(P_RADIUS, Radius); // float
+    URHO3D_PARAM(P_HEIGHT, Height); // float
 }
 
 /// Removal of obstacle from dynamic navigation mesh.
-EVENT(E_NAVIGATION_OBSTACLE_REMOVED, NavigationObstacleRemoved)
+URHO3D_EVENT(E_NAVIGATION_OBSTACLE_REMOVED, NavigationObstacleRemoved)
 {
-    PARAM(P_NODE, Node); // Node pointer
-    PARAM(P_OBSTACLE, Obstacle); // Obstacle pointer
-    PARAM(P_POSITION, Position); // Vector3
-    PARAM(P_RADIUS, Radius); // float
-    PARAM(P_HEIGHT, Height); // float
+    URHO3D_PARAM(P_NODE, Node); // Node pointer
+    URHO3D_PARAM(P_OBSTACLE, Obstacle); // Obstacle pointer
+    URHO3D_PARAM(P_POSITION, Position); // Vector3
+    URHO3D_PARAM(P_RADIUS, Radius); // float
+    URHO3D_PARAM(P_HEIGHT, Height); // float
 }
 
 }

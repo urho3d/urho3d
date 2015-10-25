@@ -44,10 +44,12 @@ endif ()
 # Define all supported build options
 include (CMakeDependentOption)
 option (URHO3D_C++11 "Enable C++11 standard")
+cmake_dependent_option (URHO3D_NOABI "If set then do not explicitly specify the ABI compiler flag for code generation (GCC and Clang only)" FALSE "NOT MSVC" FALSE)
+mark_as_advanced (URHO3D_C++11 URHO3D_NOABI)
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
 if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the initial configure step
     # On non-MSVC compiler, default to build 64-bit when the host system has a 64-bit build environment
-    execute_process (COMMAND echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
+    execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
     string (REGEX MATCH "#define +__(x86_64|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
     if (matched)
         set (URHO3D_DEFAULT_64BIT TRUE)
@@ -56,13 +58,18 @@ if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the i
     endif ()
     set (URHO3D_DEFAULT_64BIT ${URHO3D_DEFAULT_64BIT} CACHE INTERNAL "Default value for URHO3D_64BIT build option")
     # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
-    # The other arm platform that Urho3D supports that is not Android is Raspberry Pi at the moment
-    if (NOT ANDROID AND NOT EMSCRIPTEN)
-        string (REGEX MATCH "#define +__arm__ +1" matched "${PREDEFINED_MACROS}")
-        if (matched)
-            # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too on the Raspberry-Pi device itself
-            set (RPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
-        endif ()
+    # When ANDROID is true and ARM is not then we are targeting Android on Intel Atom
+    string (REGEX MATCH "#define +__(arm|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
+    if (matched OR IOS)     # Assume iOS is always on ARM for now
+        set (ARM TRUE)
+    else ()
+        set (ARM FALSE)
+    endif ()
+    set (ARM ${ARM} CACHE INTERNAL "Targeting ARM platform")
+    # The other arm platform that Urho3D supports that is not Android/iOS is Raspberry Pi at the moment
+    if (ARM AND NOT ANDROID AND NOT IOS)
+        # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too on the Raspberry-Pi device itself
+        set (RPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
     endif ()
 endif ()
 if (ANDROID OR RPI OR EMSCRIPTEN)
@@ -79,19 +86,28 @@ cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT EMS
 cmake_dependent_option (URHO3D_DATABASE_ODBC "Enable Database support with ODBC, requires vendor-specific ODBC driver" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
 option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
-if (MINGW AND NOT DEFINED URHO3D_SSE)
-    # Certain MinGW versions fail to compile SSE code. This is the initial guess for known "bad" version range, and can be tightened later
-    execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION ERROR_QUIET)
-    if (GCC_VERSION VERSION_LESS 4.9.1)
-        message (WARNING "Disabling SSE by default due to MinGW version. It is recommended to upgrade to MinGW with GCC >= 4.9.1. You can also try to re-enable SSE with CMake option -DURHO3D_SSE=1, but this may result in compile errors.")
-        set (URHO3D_DEFAULT_SSE FALSE)
-    else ()
-        set (URHO3D_DEFAULT_SSE TRUE)
-    endif ()
-else ()
+if (NOT DEFINED URHO3D_DEFAULT_SSE)
+    # Set the default to true for all the platforms that support SSE except the following
     set (URHO3D_DEFAULT_SSE TRUE)
+    if (MINGW)
+        # Certain MinGW versions fail to compile SSE code. This is the initial guess for known "bad" version range, and can be tightened later
+        execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION ERROR_QUIET)
+        if (GCC_VERSION VERSION_LESS 4.9.1)
+            message (WARNING "Disabling SSE by default due to MinGW version. It is recommended to upgrade to MinGW with GCC >= 4.9.1. You can also try to re-enable SSE with CMake option -DURHO3D_SSE=1, but this may result in compile errors.")
+            set (URHO3D_DEFAULT_SSE FALSE)
+        endif ()
+    elseif (EMSCRIPTEN)
+        # In Emscripten, default to false for targeting SSE2, since the SIMD.js specification is not yet widely adopted in browsers
+        set (URHO3D_DEFAULT_SSE FALSE)
+    endif ()
+    set (URHO3D_DEFAULT_SSE ${URHO3D_DEFAULT_SSE} CACHE INTERNAL "Default value for URHO3D_SSE build option")
 endif ()
-cmake_dependent_option (URHO3D_SSE "Enable SSE instruction set" ${URHO3D_DEFAULT_SSE} "NOT EMSCRIPTEN" FALSE)
+cmake_dependent_option (URHO3D_SSE "Enable SSE2 instruction set (HTML5 and Intel platforms only including Android on Intel Atom); default to true on Intel and false on HTML5; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options" ${URHO3D_DEFAULT_SSE} "NOT ARM" FALSE)
+if (IOS OR (RPI AND "${RPI_ABI}" MATCHES NEON))    # Stringify in case RPI_ABI is not set explicitly
+    # The 'NEON' CMake variable is already set by android.toolchain.cmake when the chosen ANDROID_ABI uses NEON
+    set (NEON TRUE)
+endif ()
+cmake_dependent_option (URHO3D_NEON "Enable NEON instruction set (ARM platforms with NEON only)" TRUE "NEON" FALSE)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
     cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
@@ -102,6 +118,10 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     endif ()
     cmake_dependent_option (URHO3D_LUA_RAW_SCRIPT_LOADER "Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)" ${URHO3D_DEFAULT_LUA_RAW} "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
     option (URHO3D_SAMPLES "Build sample applications")
+    option (URHO3D_UPDATE_SOURCE_TREE "Enable commands to copy back some of the generated build artifacts from build tree to source tree to facilitate devs to push them as part of a commit (for library devs with push right only)")
+    option (URHO3D_BINDINGS "Enable API binding generation support for script subystems")
+    cmake_dependent_option (URHO3D_CLANG_TOOLS "Build Clang tools (native only)" FALSE "NOT RPI AND NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
+    mark_as_advanced (URHO3D_UPDATE_SOURCE_TREE URHO3D_BINDINGS URHO3D_CLANG_TOOLS)
     cmake_dependent_option (URHO3D_TOOLS "Build tools (native and RPI only)" TRUE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     cmake_dependent_option (URHO3D_EXTRAS "Build extras (native and RPI only)" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     option (URHO3D_DOCS "Generate documentation as part of normal build")
@@ -116,10 +136,19 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     endif ()
 else ()
     set (URHO3D_HOME "" CACHE PATH "Path to Urho3D build tree or SDK installation location (external project only)")
+    if (URHO3D_PCH OR URHO3D_UPDATE_SOURCE_TREE)
+        # Just reference it to suppress "unused variable" CMake warning on external projects using this CMake module
+    endif ()
 endif ()
 option (URHO3D_PACKAGING "Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0" ${EMSCRIPTEN})
 option (URHO3D_PROFILING "Enable profiling support" TRUE)
 option (URHO3D_LOGGING "Enable logging support" TRUE)
+# Emscripten thread support is yet experimental; default false
+if (NOT EMSCRIPTEN)
+    option (URHO3D_THREADING "Enable threading support" TRUE)
+else ()
+    option (URHO3D_THREADING "Enable threading support" FALSE)
+endif ()
 option (URHO3D_TESTING "Enable testing support")
 if (URHO3D_TESTING)
     if (EMSCRIPTEN)
@@ -149,16 +178,27 @@ cmake_dependent_option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows p
 # On Windows platform Direct3D11 can be optionally chosen
 # Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
 cmake_dependent_option (URHO3D_D3D11 "Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option" FALSE "WIN32" FALSE)
-if (CMAKE_HOST_WIN32 AND NOT DEFINED URHO3D_MKLINK)
-    # Test whether the host system is capable of setting up symbolic link
-    execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
-    if (MKLINK_EXIT_CODE EQUAL 0)
-        set (URHO3D_MKLINK TRUE)
-        file (REMOVE ${CMAKE_BINARY_DIR}/test-link)
-    else ()
-        set (URHO3D_MKLINK FALSE)
+if (CMAKE_HOST_WIN32)
+    if (NOT DEFINED URHO3D_MKLINK)
+        # Test whether the host system is capable of setting up symbolic link
+        execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+        if (MKLINK_EXIT_CODE EQUAL 0)
+            set (URHO3D_MKLINK TRUE)
+            file (REMOVE ${CMAKE_BINARY_DIR}/test-link)
+        else ()
+            set (URHO3D_MKLINK FALSE)
+            message (WARNING "Could not use MKLINK to setup symbolic links as this Windows user account does not have the privilege to do so. "
+                "When MKLINK is not available then the build system will fallback to use file/directory copy of the library headers from source tree to build tree. "
+                "In order to prevent stale headers being used in the build, this file/directory copy will be redone also as a post-build step for each library targets. "
+                "This may slow down the build unnecessarily or even cause other unforseen issues due to incomplete or stale headers in the build tree. "
+                "Request your Windows Administrator to grant your user account to have privilege to create symlink via MKLINK command. "
+                "You are NOT advised to use the Administrator account directly to generate build tree in all cases.")
+        endif ()
+        set (URHO3D_MKLINK ${URHO3D_MKLINK} CACHE INTERNAL "MKLINK capability on the Windows host system")
     endif ()
-    set (URHO3D_MKLINK ${URHO3D_MKLINK} CACHE INTERNAL "MKLINK capability on the Windows host system")
+    set (NULL_DEVICE nul)
+else ()
+    set (NULL_DEVICE /dev/null)
 endif ()
 cmake_dependent_option (URHO3D_STATIC_RUNTIME "Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)" FALSE "MSVC" FALSE)
 cmake_dependent_option (URHO3D_WIN32_CONSOLE "Use console main() as entry point when setting up Windows executable targets (Windows platform only)" FALSE "WIN32" FALSE)
@@ -241,6 +281,28 @@ if (CMAKE_VERSION VERSION_GREATER 2.8 OR CMAKE_VERSION VERSION_EQUAL 2.8)
     endif ()
 endif()
 
+# Clang tools building
+if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
+    # Ensure LLVM/Clang is installed
+    find_program (LLVM_CONFIG NAMES llvm-config llvm-config-64 llvm-config-32 HINTS $ENV{LLVM_CLANG_ROOT}/bin DOC "LLVM config tool" NO_CMAKE_FIND_ROOT_PATH)
+    if (NOT LLVM_CONFIG)
+        message (FATAL_ERROR "Could not find LLVM/Clang installation")
+    endif ()
+endif ()
+if (URHO3D_CLANG_TOOLS)
+    # Require C++11 standard and no precompiled-header
+    set (URHO3D_C++11 1)
+    set (URHO3D_PCH 0)
+    set (URHO3D_LIB_TYPE SHARED)
+    # Set build options that would maximise the AST of Urho3D library
+    foreach (OPT URHO3D_ANGELSCRIPT URHO3D_LUA URHO3D_FILEWATCHER URHO3D_PROFILING URHO3D_LOGGING URHO3D_NAVIGATION URHO3D_NETWORK URHO3D_PHYSICS URHO3D_URHO2D URHO3D_DATABASE_SQLITE)
+        set (${OPT} 1)
+    endforeach()
+    foreach (OPT URHO3D_TESTING URHO3D_LUAJIT URHO3D_DATABASE_ODBC)
+        set (${OPT} 0)
+    endforeach()
+endif ()
+
 # Enable testing
 if (URHO3D_TESTING)
     enable_testing ()
@@ -255,6 +317,11 @@ endif ()
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
 if (URHO3D_SSE)
     add_definitions (-DURHO3D_SSE)
+endif ()
+
+# Enable NEON instruction set.
+if (URHO3D_NEON)
+    add_definitions (-DURHO3D_NEON -DSTBI_NEON)     # BT_USE_NEON is already being self-defined by Bullet library as appropriate
 endif ()
 
 # Enable structured exception handling and minidumps on MSVC only.
@@ -295,9 +362,19 @@ if (URHO3D_LOGGING)
     add_definitions (-DURHO3D_LOGGING)
 endif ()
 
+# Enable threading by default, except for Emscripten.
+if (URHO3D_THREADING)
+    add_definitions (-DURHO3D_THREADING)
+endif ()
+
 # If not on Windows platform, enable Unix mode for kNet library
 if (NOT WIN32)
     add_definitions (-DKNET_UNIX)
+endif ()
+
+# Add definitions for Emscripten
+if (EMSCRIPTEN)
+    add_definitions (-DNO_POPEN)
 endif ()
 
 # Add definition for Direct3D11
@@ -314,6 +391,15 @@ endif ()
 # Add definitions for GLEW
 if (NOT IOS AND NOT ANDROID AND NOT RPI AND URHO3D_OPENGL)
     add_definitions (-DGLEW_STATIC -DGLEW_NO_GLU)
+endif ()
+
+# Default library type is STATIC
+if (URHO3D_LIB_TYPE)
+    string (TOUPPER ${URHO3D_LIB_TYPE} URHO3D_LIB_TYPE)
+endif ()
+if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
+    set (URHO3D_LIB_TYPE STATIC)
+    add_definitions (-DURHO3D_STATIC_DEFINE)
 endif ()
 
 # Add definition for AngelScript
@@ -370,15 +456,6 @@ endif ()
 if (URHO3D_DATABASE_SQLITE)
     set (URHO3D_DATABASE 1)
     add_definitions (-DURHO3D_DATABASE -DURHO3D_DATABASE_SQLITE)
-endif ()
-
-# Default library type is STATIC
-if (URHO3D_LIB_TYPE)
-    string (TOUPPER ${URHO3D_LIB_TYPE} URHO3D_LIB_TYPE)
-endif ()
-if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
-    set (URHO3D_LIB_TYPE STATIC)
-    add_definitions (-DURHO3D_STATIC_DEFINE)
 endif ()
 
 # Find Direct3D include & library directories in MS Windows SDK or DirectX SDK when not using OpenGL.
@@ -462,10 +539,10 @@ if (MSVC)
     set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${DEBUG_RUNTIME}")
     set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} ${RELEASE_RUNTIME} /fp:fast /Zi /GS- /D _SECURE_SCL=0")
     set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
-    # SSE flag is redundant if already compiling as 64bit
-    if (URHO3D_SSE AND NOT URHO3D_64BIT)
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /arch:SSE")
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE")
+    # In Visual Studio, SSE2 flag is redundant if already compiling as 64bit; it is already the default for VS2012 (onward) on 32bit
+    if (URHO3D_SSE AND NOT URHO3D_64BIT AND MSVC_VERSION LESS 1700)
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /arch:SSE2")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
     endif ()
     set (CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF /DEBUG")
     set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF")
@@ -495,25 +572,36 @@ else ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${RPI_CFLAGS}")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${RPI_CFLAGS}")
         else ()
+            if (NOT XCODE AND NOT EMSCRIPTEN)
+                # This may influence the effective SSE level when URHO3D_SSE is on as well
+                set (URHO3D_DEPLOYMENT_TARGET native CACHE STRING "Specify the minimum CPU type on which the target binaries are to be deployed (Linux, MinGW, and non-Xcode OSX native build only), see GCC/Clang's -march option for possible values")
+                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=${URHO3D_DEPLOYMENT_TARGET}")
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${URHO3D_DEPLOYMENT_TARGET}")
+            endif ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
             if (URHO3D_64BIT)
-                set (DASH_MBIT -m64)    # This variable is intentionally not defined on Android and RPI platform
+                set (DASH_MBIT -m64)    # This variable is intentionally not defined on Android and RPI platform, it is used again in LuaJIT library build
             else ()
                 set (DASH_MBIT -m32)
                 if (URHO3D_SSE)
-                    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse")
-                    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
+                    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse2")
+                    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
                 endif ()
             endif ()
-            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DASH_MBIT}")
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DASH_MBIT}")
-            set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${DASH_MBIT}")
+            if (NOT URHO3D_NOABI)
+                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DASH_MBIT}")
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DASH_MBIT}")
+            endif ()
         endif ()
         if (EMSCRIPTEN)
             # Emscripten-specific setup
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths -Wno-unknown-warning-option")
+            if (URHO3D_THREADING)
+                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s USE_PTHREADS=1")
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_PTHREADS=1")
+            endif ()
             # Prior to version 1.31.3 emcc does not consistently add the cpp standard and remove Emscripten-specific compiler flags
             # before passing on the work to the underlying LLVM/Clang compiler, this has resulted in preprocessing error when enabling the PCH and ccache
             # (See https://github.com/kripken/emscripten/issues/3365 for more detail)
@@ -541,6 +629,11 @@ else ()
             # Reduce GCC optimization level from -O3 to -O2 for stability in RELEASE build configuration
             set (CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
             set (CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
+            # 32-bit SSE requires force-aligned stack
+            if (NOT URHO3D_64BIT AND URHO3D_SSE)
+                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mstackrealign")
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mstackrealign")
+            endif ()
         else ()
             # Not Android and not Emscripten and not MinGW derivative
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")     # This will emit '-DREENTRANT' to compiler and '-lpthread' to linker on Linux and Mac OSX platform
@@ -556,7 +649,7 @@ else ()
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics -Qunused-arguments")
         endif ()
         # Temporary workaround for Travis CI VM as Ubuntu 12.04 LTS still uses old glibc header files that do not have the necessary patch for Clang to work correctly
-        # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS (or hopefully it will be CentOS :)
+        # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS
         if (DEFINED ENV{CI} AND "$ENV{LINUX}")
             add_definitions (-D__extern_always_inline=inline)
         endif ()
@@ -576,9 +669,9 @@ endmacro ()
 
 # Macro for setting runtime output directories for tools
 macro (set_tool_output_directories)
-    set_output_directories (${CMAKE_BINARY_DIR}/bin/tool RUNTIME PDB)
+    set_output_directories (${CMAKE_BINARY_DIR}/bin/tool/${ARGN} RUNTIME PDB)
     if (DEST_RUNTIME_DIR STREQUAL bin)
-        set (DEST_RUNTIME_DIR bin/tool)
+        set (DEST_RUNTIME_DIR bin/tool/${ARGN})
     endif ()
 endmacro ()
 
@@ -617,12 +710,11 @@ macro (create_symlink SOURCE DESTINATION)
             else ()
                 set (COMMAND COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ABS_SOURCE} ${ABS_DESTINATION})
             endif ()
+            # Fallback to copy only one time
+            execute_process (${COMMAND})
             if (TARGET ${TARGET_NAME})
                 # Fallback to copy everytime the target is built
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD ${COMMAND})
-            else ()
-                # Fallback to copy only one time
-                execute_process (${COMMAND})
             endif ()
         else ()
             message (WARNING "Unable to create symbolic link on this host system, you may need to manually copy file/dir from \"${SOURCE}\" to \"${DESTINATION}\"")
@@ -636,7 +728,7 @@ include (GenerateExportHeader)
 
 # Macro for precompiling header (On MSVC, the dummy C++ or C implementation file for precompiling the header file would be generated if not already exists)
 # This macro should be called before the CMake target has been added
-# Typically, user should indirectly call this macro by using the 'PCH' option when calling define_source_file() macro
+# Typically, user should indirectly call this macro by using the 'PCH' option when calling define_source_files() macro
 macro (enable_pch HEADER_PATHNAME)
     # No op when PCH support is not enabled
     if (URHO3D_PCH)
@@ -732,7 +824,8 @@ macro (enable_pch HEADER_PATHNAME)
                     endif ()
                 endif ()
                 string (REPLACE ";" " -D" COMPILE_DEFINITIONS "-D${COMPILE_DEFINITIONS}")
-                string (REPLACE ";" " -I" INCLUDE_DIRECTORIES "-I${INCLUDE_DIRECTORIES}")
+                string (REPLACE "\"" "\\\"" COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS})
+                string (REPLACE ";" "\" -I\"" INCLUDE_DIRECTORIES "-I\"${INCLUDE_DIRECTORIES}\"")
                 # Make sure the precompiled headers are not stale by creating custom rules to re-compile the header as necessary
                 file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
                 foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
@@ -752,7 +845,8 @@ macro (enable_pch HEADER_PATHNAME)
                             "However, if you think there is something wrong with our build system then kindly file a bug report to the project devs.")
                     endif ()
                     file (STRINGS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps DEPS)
-                    string (REGEX REPLACE "^deps: *| *\\; +" ";" DEPS ${DEPS})
+                    string (REGEX REPLACE "^deps: *| *\\; *" ";" DEPS ${DEPS})
+                    string (REGEX REPLACE "\\\\ " "\ " DEPS "${DEPS}")  # Need to stringify the second time to preserve the semicolons
                     # Create the rule that depends on the included headers
                     add_custom_command (OUTPUT ${HEADER_FILENAME}.${CONFIG}.pch.trigger
                         COMMAND ${CMAKE_${LANG}_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${ABS_HEADER_PATHNAME}
@@ -771,7 +865,7 @@ macro (enable_pch HEADER_PATHNAME)
                     if (FILE MATCHES \\.${EXT}$)
                         get_property (NO_PCH SOURCE ${FILE} PROPERTY NO_PCH)
                         if (NOT NO_PCH)
-                            set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -include ${ABS_PATH_PCH}")
+                            set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -include \"${ABS_PATH_PCH}\"")
                         endif ()
                     endif ()
                 endforeach ()
@@ -923,6 +1017,16 @@ macro (setup_executable)
         # Make a copy of the D3D DLL to the runtime directory in the build tree
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DIRECT3D_DLL} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     endif ()
+    if (WIN32 AND NOT ARG_NODEPS AND URHO3D_LIB_TYPE STREQUAL SHARED)
+        # Make a copy of the Urho3D DLL to the runtime directory in the build tree
+        if (TARGET Urho3D)
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Urho3D> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+        else ()
+            foreach (DLL ${URHO3D_DLL})
+                add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DLL} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+            endforeach ()
+        endif ()
+    endif ()
     # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
     if (DEST_RUNTIME_DIR)
         if (EMSCRIPTEN)
@@ -940,6 +1044,25 @@ macro (setup_executable)
             install (FILES ${FILES} DESTINATION ${DEST_BUNDLE_DIR} OPTIONAL)    # We get html.map or html.mem depend on the build configuration
         else ()
             install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_BUNDLE_DIR})
+            if (WIN32 AND NOT ARG_NODEPS AND URHO3D_LIB_TYPE STREQUAL SHARED AND NOT URHO3D_DLL_INSTALLED)
+                if (TARGET Urho3D)
+                    if (CMAKE_VERSION VERSION_LESS 3.0)
+                        get_target_property (LOCATION Urho3D LOCATION)
+                        get_filename_component (LOCATION ${LOCATION} PATH)
+                        if (CMAKE_GENERATOR MATCHES 2008)
+                            string (REPLACE /$(OutDir) "" LOCATION ${LOCATION})
+                        elseif (MSVC)
+                            string (REPLACE /$(Configuration) "" LOCATION ${LOCATION})
+                        endif ()
+                        install (FILES ${LOCATION}/Urho3D.dll ${LOCATION}/Urho3D_d.dll DESTINATION ${DEST_RUNTIME_DIR} OPTIONAL)
+                    else ()
+                        install (FILES $<TARGET_FILE:Urho3D> DESTINATION ${DEST_RUNTIME_DIR})
+                    endif ()
+                else ()
+                    install (FILES ${URHO3D_DLL} DESTINATION ${DEST_RUNTIME_DIR})
+                endif ()
+                set (URHO3D_DLL_INSTALLED TRUE)
+            endif ()
             if (DIRECT3D_DLL AND NOT DIRECT3D_DLL_INSTALLED)
                 # Make a copy of the D3D DLL to the runtime directory in the installed location
                 install (FILES ${DIRECT3D_DLL} DESTINATION ${DEST_RUNTIME_DIR})
@@ -1565,7 +1688,7 @@ if (ANDROID)
             create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
         endif ()
     endforeach ()
-    foreach (I AndroidManifest.xml build.xml src res assets jni)
+    foreach (I AndroidManifest.xml build.xml custom_rules.xml src res assets jni)
         if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
             create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
         endif ()

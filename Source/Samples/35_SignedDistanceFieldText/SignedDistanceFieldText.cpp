@@ -20,21 +20,19 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
-#include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
-#include <Urho3D/UI/Font.h>
+#include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/Graphics.h>
-#include <Urho3D/Input/Input.h>
 #include <Urho3D/Graphics/Material.h>
 #include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/Input/Input.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
-#include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/Text3D.h>
 #include <Urho3D/UI/UI.h>
@@ -43,7 +41,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(SignedDistanceFieldText)
+URHO3D_DEFINE_APPLICATION_MAIN(SignedDistanceFieldText)
 
 SignedDistanceFieldText::SignedDistanceFieldText(Context* context) :
     Sample(context)
@@ -120,7 +118,7 @@ void SignedDistanceFieldText::CreateScene()
         mushroomTitleText->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 24);
 
         mushroomTitleText->SetColor(Color::RED);
-        
+
         if (i % 3 == 1)
         {
             mushroomTitleText->SetColor(Color::GREEN);
@@ -210,7 +208,7 @@ void SignedDistanceFieldText::MoveCamera(float timeStep)
 void SignedDistanceFieldText::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(SignedDistanceFieldText, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(SignedDistanceFieldText, HandleUpdate));
 }
 
 void SignedDistanceFieldText::HandleUpdate(StringHash eventType, VariantMap& eventData)

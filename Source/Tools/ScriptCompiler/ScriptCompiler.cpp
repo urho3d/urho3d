@@ -20,17 +20,15 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
+#include <Urho3D/AngelScript/Script.h>
+#include <Urho3D/AngelScript/ScriptFile.h>
 #include <Urho3D/Core/Context.h>
+#include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/IO/File.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/IO/Log.h>
-#include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Resource/ResourceCache.h>
-#include <Urho3D/Script/Script.h>
-#include <Urho3D/Script/ScriptFile.h>
 
 #ifdef URHO3D_LUA
 #include <Urho3D/LuaScript/LuaScript.h>
@@ -81,7 +79,7 @@ int main(int argc, char** argv)
     SharedPtr<Context> context(new Context());
     SharedPtr<Engine> engine(new Engine(context));
     context->RegisterSubsystem(new Script(context));
-    
+
     // In API dumping mode initialize the engine and instantiate LuaScript system if available so that we
     // can dump attributes from as many classes as possible
     if (dumpApiMode)
@@ -97,7 +95,7 @@ int main(int argc, char** argv)
         context->RegisterSubsystem(new LuaScript(context));
     #endif
     }
-    
+
     Log* log = context->GetSubsystem<Log>();
     // Register Log subsystem manually if compiled without logging support
     if (!log)

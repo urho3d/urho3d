@@ -1146,6 +1146,14 @@ String& String::AppendWithFormatArgs(const char* formatString, va_list args)
                 break;
             }
 
+        // Unsigned long
+        case 'l':
+            {
+                unsigned long arg = va_arg(args, unsigned long);
+                Append(String(arg));
+                break;
+            }
+
         // Real
         case 'f':
             {
@@ -1197,7 +1205,7 @@ String& String::AppendWithFormatArgs(const char* formatString, va_list args)
             }
 
         default:
-            LOGWARNINGF("Unsupported format specifier: '%c'", format);
+            URHO3D_LOGWARNINGF("Unsupported format specifier: '%c'", format);
             break;
         }
     }

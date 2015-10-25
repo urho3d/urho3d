@@ -20,37 +20,34 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
-#include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
-#include <Urho3D/IO/File.h>
-#include <Urho3D/IO/FileSystem.h>
-#include <Urho3D/UI/Font.h>
+#include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/Graphics.h>
-#include <Urho3D/Input/Input.h>
 #include <Urho3D/Graphics/Light.h>
 #include <Urho3D/Graphics/Material.h>
 #include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Graphics/Renderer.h>
 #include <Urho3D/Graphics/RenderSurface.h>
+#include <Urho3D/Graphics/Skybox.h>
+#include <Urho3D/Graphics/Terrain.h>
+#include <Urho3D/Graphics/Texture2D.h>
+#include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
-#include <Urho3D/Graphics/Skybox.h>
-#include <Urho3D/Graphics/StaticModel.h>
-#include <Urho3D/Graphics/Terrain.h>
+#include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
-#include <Urho3D/Graphics/Texture2D.h>
 #include <Urho3D/UI/UI.h>
-#include <Urho3D/Graphics/Zone.h>
 
 #include "Water.h"
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(Water)
+URHO3D_DEFINE_APPLICATION_MAIN(Water)
 
 Water::Water(Context* context) :
     Sample(context)
@@ -230,7 +227,7 @@ void Water::SetupViewport()
 void Water::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Water, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Water, HandleUpdate));
 }
 
 void Water::MoveCamera(float timeStep)

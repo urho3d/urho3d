@@ -97,8 +97,7 @@ function post_output_hook(package)
 #pragma clang diagnostic ignored "-Wunused-function"
 #endif]])
     if not _extra_parameters["Urho3D"] then
-        replace([[#include "LuaScript/ToluaUtils.h"]], [[#include <Urho3D/Urho3D.h>
-#include <Urho3D/LuaScript/ToluaUtils.h>]])
+        replace([[#include "LuaScript/ToluaUtils.h"]], [[#include <Urho3D/LuaScript/ToluaUtils.h>]])
     end
 
     -- Special handling for vector to table conversion which would simplify the implementation of the template functions
@@ -138,7 +137,8 @@ end
 
 function is_arithmetic(t)
     for _, type in pairs({ "char", "short", "int", "unsigned", "long", "float", "double", "bool" }) do
-        if t:find(type) then return true end
+        _, pos = t:find(type)
+        if pos ~= nil and t:sub(pos + 1, pos + 1) ~= "*" then return true end
     end
     return false
 end
@@ -205,5 +205,23 @@ function get_property_methods_hook(ptype, name)
     if ptype == "no_prefix" then
         local Name = string.upper(string.sub(name, 1, 1))..string.sub(name, 2)
         return Name, "Set"..Name
+    end
+end
+
+-- Rudimentary checker to prevent function overloads being declared in a wrong order
+-- The checker assumes function overloads are declared in group one after another within a same pkg file
+-- The checker only checks for single argument function at the moment, but it can be extended to support more when it is necessary
+local overload_checker = {name="", has_number=false}
+function pre_call_hook(self)
+    if table.getn(self.args) ~= 1 then return end
+    if overload_checker.name ~= self.name then
+        overload_checker.name = self.name
+        overload_checker.has_number = false
+    end
+    local t = self.args[1].type
+    if overload_checker.has_number then
+        if t:find("String") or t:find("char*") then warning(self:inclass() .. ":" .. self.name .. " has potential binding problem: number overload becomes dead code if it is declared before string overload") end
+    else
+        overload_checker.has_number = t ~= "bool" and is_arithmetic(t)
     end
 end

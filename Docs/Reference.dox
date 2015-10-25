@@ -27,7 +27,7 @@ Classes that derive from Object contain type-identification, they can be created
 
 %Object factory registration and object creation through factories are directly accessible only in C++, not in script.
 
-The definition of an Object subclass must contain the OBJECT(className) macro. Type identification is available both as text (GetTypeName() or GetTypeNameStatic()) and as a 32-bit hash of the type name (GetType() or GetTypeStatic()).
+The definition of an Object subclass must contain the URHO3D_OBJECT(className, baseTypeName) macro. Type identification is available both as text (GetTypeName() or GetTypeNameStatic()) and as a 32-bit hash of the type name (GetType() or GetTypeStatic()).
 
 To register an object factory for a specific type, call the \ref Context::RegisterFactory "RegisterFactory()" template function on Context. You can get its pointer from any Object either via the \ref Object::context_ "context_" member variable, or by calling \ref Object::GetContext "GetContext()". An example:
 
@@ -77,12 +77,12 @@ time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, rende
 
 The Urho3D event system allows for data transport and function invocation without the sender and receiver having to explicitly know of each other. Both the event sender and receiver must derive from Object. An event receiver must subscribe to each event type it wishes to receive: one can either subscribe to the event coming from any sender, or from a specific sender. The latter is useful for example when handling events from the user interface elements.
 
-Events themselves do not need to be registered. They are identified by 32-bit hashes of their names. Event parameters (the data payload) are optional and are contained inside a VariantMap, identified by 32-bit parameter name hashes. For the inbuilt Urho3D events, event type (E_UPDATE, E_KEYDOWN, E_MOUSEMOVE etc.) and parameter hashes (P_TIMESTEP, P_DX, P_DY etc.) are defined as constants inside include files such as CoreEvents.h or InputEvents.h.
+Events themselves do not need to be registered. They are identified by 32-bit hashes of their names. Event parameters (the data payload) are optional and are contained inside a VariantMap, identified by 32-bit parameter name hashes. For the inbuilt Urho3D events, event type (E_UPDATE, E_KEYDOWN, E_MOUSEMOVE etc.) and parameter hashes (P_TIMESTEP, P_DX, P_DY etc.) are defined as namespaced constants inside include files such as CoreEvents.h or InputEvents.h, using the helper macros URHO3D_EVENT & URHO3D_PARAM.
 
-When subscribing to an event, a handler function must be specified. In C++ these must have the signature void HandleEvent(StringHash eventType, VariantMap& eventData). The HANDLER(className, function) macro helps in defining the required class-specific function pointers. For example:
+When subscribing to an event, a handler function must be specified. In C++ these must have the signature void HandleEvent(StringHash eventType, VariantMap& eventData). The URHO3D_HANDLER(className, function) macro helps in defining the required class-specific function pointers. For example:
 
 \code
-SubscribeToEvent(E_UPDATE, HANDLER(MyClass, MyEventHandler));
+SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(MyClass, MyEventHandler));
 \endcode
 
 In script events are identified by their string names instead of name hashes (though these are internally converted to hashes.) %Script event handlers can either have the same signature as in C++, or a simplified signature void HandleEvent() when event type and parameters are not required. The same event subscription would look like:
@@ -95,7 +95,7 @@ In C++ events must always be handled by a member function. In script procedural 
 
 Events can also be unsubscribed from. See \ref Object::UnsubscribeFromEvent "UnsubscribeFromEvent()" for details.
 
-To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Engine subsystem sends the Update event on each frame. Note how for the inbuilt Urho3D events, the parameter name hashes are always put inside a namespace (the event's name) to prevent name clashes:
+To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Engine subsystem sends the Update event on each frame. Note the parameter name hashes being inside a namespace which matches the event name:
 
 \code
 using namespace Update;
@@ -209,8 +209,6 @@ The Application class provides a minimal framework for a Urho3D C++ application 
 will instantiate the Context object and then the user-specified application class. A minimal example, which would just display a blank rendering window and exit by pressing ESC:
 
 \code
-#include <Urho3D/Urho3D.h>
-
 #include <Urho3D/Engine/Application.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Input/InputEvents.h>
@@ -233,7 +231,7 @@ public:
     virtual void Start()
     {
         // Called after engine initialization. Setup application & subscribe to events here
-        SubscribeToEvent(E_KEYDOWN, HANDLER(MyApp, HandleKeyDown));
+        SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(MyApp, HandleKeyDown));
     }
 
     virtual void Stop()
@@ -252,7 +250,7 @@ public:
     }
 };
 
-DEFINE_APPLICATION_MAIN(MyApp)
+URHO3D_DEFINE_APPLICATION_MAIN(MyApp)
 \endcode
 
 \page SceneModel Scene model
@@ -450,7 +448,7 @@ l10n->SetLanguage("language 2");
 When the language is changed, the E_CHANGELANGUAGE event will be sent. Subscribe to it to perform the necessary relocalization of your user interface (texts, sprites etc.)
 
 \code
-SubscribeToEvent(E_CHANGELANGUAGE, HANDLER(Game, HandleChangeLanguage));
+SubscribeToEvent(E_CHANGELANGUAGE, URHO3D_HANDLER(Game, HandleChangeLanguage));
 
 void Game::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
 {
@@ -542,7 +540,7 @@ The Start() and Stop() methods do not have direct counterparts in C++ components
 
 When a scene node hierarchy with script objects is instantiated (such as when loading a scene) any child nodes may not have been created yet when Start() is executed, and can thus not be relied upon for initialization. The DelayedStart() method can be used in this case instead: if defined, it is called immediately before any of the Update() calls.
 
-TransformChanged() is called whenever the scene node transform changes, similar to C++ components' OnMarkedDirty() function.
+TransformChanged() is called whenever the scene node transform changes and the node was not dirty before, similar to C++ components' OnMarkedDirty() function. The function should read the node's world transform (or rotation / position / scale) to reset the dirty status and ensure the next dirty notification is also sent.
 
 Subscribing to \ref Events "events" in script behaves differently depending on whether \ref Object::SubscribeToEvent "SubscribeToEvent()" is called from a script object's method, or from a procedural script function. If called from an instantiated script object, the ScriptInstance becomes the event receiver on the C++ side, and calls the specified handler method when the event arrives. If called from a function, the ScriptFile will be the event receiver and the handler must be a free function in the same script file. The third case is if the event is subscribed to from a script object that does not belong to a ScriptInstance. In that case the ScriptFile will create a proxy C++ object on demand to be able to forward the event to the script object.
 
@@ -626,11 +624,9 @@ Check the automatically built \ref ScriptAPI "Scripting API" documentation for t
 
 \section Script_Bytecode Precompiling scripts to bytecode
 
-Instead of compiling scripts from source on-the-fly during startup, they can also be precompiled to bytecode, then loaded. Use the \ref Tools_ScriptCompiler "ScriptCompiler" utility for this. In this case the resource request has to be pointed to the compiled file, which by default has the .asc extension:
+Instead of compiling scripts from source on-the-fly during startup, they can also be precompiled to bytecode, then loaded. Use the \ref Tools_ScriptCompiler "ScriptCompiler" utility for this.
 
-\code
-ScriptFile* file = GetSubsystem<ResourceCache>()->GetResource<ScriptFile>("Scripts/MyScript.asc");
-\endcode
+The Script subsystem will automatically redirect script file resource requests (.as) to the compiled versions (.asc) if the .as file does not exist. Making a final build of a scripted application could therefore involve compiling all the scripts with ScriptCompiler, then deleting the original .as files from the build.
 
 \section Scripting_Limitations Limitations
 
@@ -641,6 +637,8 @@ There are some complexities of the scripting system one has to watch out for:
 - When the resource request for a particular ScriptFile is initially made, the script file and the files it includes are compiled into an AngelScript script module. Each script module has its own class hierarchy that is not usable from other script modules, unless the classes are declared shared. See AngelScript documentation for more details.
 
 - If a ScriptFile resource is reloaded, all the script objects created from it will be destroyed, then recreated. They will lose any stored state as their constructors and Start() methods will be run again. This is rarely useful when running an actual game, but may be helpful during development.
+
+A global VariantMap, globalVars, can be accessed by all scripts to store shared data or to preserve data through script file reloads.
 
 \section Scripting_Modifications AngelScript modifications
 
@@ -698,9 +696,9 @@ However, Lua script files in Urho3D are loaded into the interpreter via Urho3D's
 
 For a single script that you wish to step through, you can use \ref LuaScript::ExecuteRawFile "ExecuteRawFile()", which will load the script from the file system directly into the Lua interpreter, making the source available to debuggers that rely on it. There are a couple of caveats with this:
 - The file has has to be on the file system, within a resource directory, and not packaged.
-- If the script uses `require()` to import a second script, then that second script will not be available for the debugger in the same way, since internally the second script is passed to Lua via the resource cache.
+- If the script uses require() to import a second script, then that second script will not be available for the debugger in the same way, since internally the second script is passed to Lua via the resource cache.
 
-To get around the second caveat, and avoid changing method calls, use the CMake flag `URHO3D_LUA_RAW_SCRIPT_LOADER`.  This will force Urho3D to attempt to load scripts from the file system by default, before falling back on the resource cache.  You can then use \ref LuaScript::ExecuteFile "ExecuteFile()", as above, and disable the CMake option for production if required.
+To get around the second caveat, and avoid changing method calls, use the URHO3D_LUA_RAW_SCRIPT_LOADER build option.  This will force Urho3D to attempt to load scripts from the file system by default, before falling back on the resource cache.  You can then use \ref LuaScript::ExecuteFile "ExecuteFile()", as above, and disable the CMake option for production if required.
 
 \section LuaScripting_ScriptObjects Script objects
 
@@ -765,7 +763,7 @@ The binding of Urho3D C++ classes is accomplished with the tolua++ library, whic
 
 As seen above from the event handling examples, VariantMap handling is similar to both C++ and AngelScript. To get a variant object back from a map, index the map by its key as a string. A nil value is returned when the map's key does not exist. Then use one of the variant getter method to return the actual Lua object stored inside the variant object. These getter methods normally do not take any parameter, except GetPtr() and GetVoidPtr() which take a string parameter representing a Lua user type that the method would use to cast the return object into. The GetPtr() is used to get a reference counted object while the GetVoidPtr() is used to get a POD value object.
 
-You can also use the VariantMap as a pseudo Lua table to store any variant value objects in your script. The VariantMap class would try its best to convert any Lua object into a variant object and store the variant object using the provided key as index. The key can be a string or an unsigned integer. When a particular data type conversion is not being supported yet, an empty variant object would be stored instead. So, be careful if you are using this feature.
+You can also use the VariantMap as a pseudo Lua table to store any variant value objects in your script. The VariantMap class would try its best to convert any Lua object into a variant object and store the variant object using the provided key as index. The key can be a string or an unsigned integer or even a StringHash object. When a particular data type conversion is not being supported yet, an empty variant object would be stored instead. So, be careful if you are using this feature. You can also use one of the Variant class constructors to construct a %Variant object first before assigning it to the VariantMap, but this operation would be slower than direct conversion. The purpose of using VariantMap in this way is to facilitate objects passing between Lua and C++ as has been shown in the event handling mechanism above. When creating objects on Lua side, you have to make sure they are not garbage collected by Lua while there are still references pointing to them on C++ side, especially when the objects are not reference counted.
 
 \code
 local myMap = VariantMap()
@@ -781,14 +779,27 @@ print(myMap["I am a table"]:GetRawBuffer()[3], myMap["I am a table"]:GetRawBuffe
 -- output: 255    200
 
 local hash = StringHash("secret key")
-myMap[hash.value] = Vector2(3, 4)
-print(myMap[hash.value].typeName, myMap[hash.value]:GetVector2():Length())
+myMap[hash] = Vector2(3, 4)
+print(myMap[hash].typeName, myMap[hash]:GetVector2():Length())
 -- output: Vector2    5
 \endcode
 
 As shown in the above example, you can either use GetRawBuffer() or GetBuffer() to get the unsigned char array stored in a variant object. It also shows that VariantMap is capable of converting a Lua table containing an array of unsigned char to a variant object stored as buffer. You may want to know that it is capable of converting a Lua table containing an array of variant objects or an array of string objects to be stored as VariantVector and StringVector, respectively, as well. It also converts any Lua primitive data types and all Urho3D classes that are exposed to Lua like all the math classes, reference counted classes, POD classes, resource reference class. etc.
 
+Inline with C++ and AngelScript, in Lua you have to call one of the %Variant's getter method to "unbox" the actual object stored inside a %Variant object. However, specifically in Lua, there is a generic Get() method which takes advantage of Lua being type less, so the method can unbox a %Variant object and return the stored object as a type less Lua object. It takes one optional string parameter representing a Lua user type that the method would use to cast the return object into. The parameter is used for cases where a type casting is required when returning object from %Variant object storing a void pointer or a refcounted pointer. The type casting could also be optional such as for the case of requesting a %VectorBuffer to be returned for %Variant object storing an unsigned char buffer or requesting an unsigned or %StringHash to be returned for %Variant object storing an integer value. The parameter is ignored for all other cases. Following up to use the same example above, we can index the map and access the stored objects as so:
+
+\code
+print(myMap[1]:Get("Spline").interpolationMode)
+print(myMap["I am a table"]:Get("VectorBuffer"):ReadByte())
+print(myMap["I am a table"]:Get()[2])
+print(myMap[hash]:Get():Length())
+\endcode
+
+There is also a generic Set() method for %Variant class to cope with Lua does not support assignment operator overload. The Set() method takes a single parameter which can be anything in Lua that is convertible into a %Variant, including nil value which is stored as an empty %Variant. Use this method when you need to assign a value into an existing %Variant object.
+
 For the rest of the functions and classes, see the generated \ref LuaScriptAPI "Lua script API reference". Also, look at the Lua counterparts of the sample applications in the bin/Data/LuaScripts directory and compare them to the C++ and AngelScript versions to familiarize yourself with how things are done on the Lua side.
+
+One more thing to note about our Lua scripting implementation is its two-way conversion between C++ collection containers (Vector and PODVector) and Lua arrays (table of non-POD and table of POD objects, respectively). The conversion is done automatically when the collection crosses the C++/Lua boundary. The generated Lua script API reference page does not reflect this fact correctly. When obtaining a collection of objects using the Lua script API, you should treat it as a Lua table despite the documentation page stated a %Vector or %PODVector user type is being returned.
 
 \section LuaScripting_Allocation Object allocation & Lua garbage collection
 
@@ -900,11 +911,19 @@ The following techniques will be used to reduce the amount of CPU and GPU work w
 
 - Software rasterized occlusion: after the octree has been queried for visible objects, the objects that are marked as occluders are rendered on the CPU to a small hierarchical-depth buffer, and it will be used to test the non-occluders for visibility. Use \ref Renderer::SetMaxOccluderTriangles "SetMaxOccluderTriangles()" and \ref Renderer::SetOccluderSizeThreshold "SetOccluderSizeThreshold()" to configure the occlusion rendering.
 
-- Hardware instancing: rendering operations with the same geometry, material and light will be grouped together and performed as one draw call. Objects with a large amount of triangles will not be rendered as instanced, as that could actually be detrimental to performance. Use \ref Renderer::SetMaxInstanceTriangles "SetMaxInstanceTriangles()" to set the threshold. Note that even when instancing is not available, or the triangle count of objects is too large, they still benefit from the grouping, as render state only needs to be set once before rendering each group, reducing the CPU cost.
+- Hardware instancing: rendering operations with the same geometry, material and light will be grouped together and performed as one draw call if supported. Note that even when instancing is not available, they still benefit from the grouping, as render state only needs to be checked & set once before rendering each group, reducing the CPU cost.
 
 - %Light stencil masking: in forward rendering, before objects lit by a spot or point light are re-rendered additively, the light's bounding shape is rendered to the stencil buffer to ensure pixels outside the light range are not processed.
 
 Note that many more optimization opportunities are possible at the content level, for example using geometry & material LOD, grouping many static objects into one object for less draw calls, minimizing the amount of subgeometries (submeshes) per object for less draw calls, using texture atlases to avoid render state changes, using compressed (and smaller) textures, and setting maximum draw distances for objects, lights and shadows.
+
+\section Rendering_ReuseView Reusing view preparation
+
+In some applications, like stereoscopic VR rendering, one needs to render a slightly different view of the world to separate viewports. Normally this results in the view preparation process (described above) being repeated for each view, which can be costly for CPU performance.
+
+To eliminate the duplicate view preparation cost, you can use \ref Viewport::SetCullCamera "SetCullCamera()" to instruct a Viewport to use a different camera for culling than rendering. When multiple viewports share the same culling camera, the view preparation will be performed only once.
+
+To work properly, the culling camera's frustum should cover all the views you are rendering using it, or else missing objects may be present. The culling camera should not be using the auto aspect ratio mode, to ensure you stay in full control of its view frustum.
 
 \section Rendering_GPUResourceLoss Handling GPU resource loss
 
@@ -1081,7 +1100,7 @@ The sRGB flag controls both whether the texture should be sampled with sRGB to l
 
 \section Materials_CubeMapTextures Cube map textures
 
-Using cube map textures requires an XML file to define the cube map face textures or layout. In this case the XML file *is* the texture resource name in material scripts or in LoadResource() calls.
+Using cube map textures requires an XML file to define the cube map face images, or a single image with layout. In this case the XML file *is* the texture resource name in material scripts or in LoadResource() calls.
 
 Individual face textures are defined in the XML like this: (see bin/Data/Textures/Skybox.xml for an example)
 
@@ -1105,6 +1124,18 @@ Using a single image texture and a layout is used like this:
 \endcode
 
 For the layout definitions, see http://www.cgtextures.com/content.php?action=tutorial&name=cubemaps and http://en.wikibooks.org/wiki/Blender_3D:_Noob_to_Pro/Build_a_skybox
+
+\section Materials_3DTextures 3D textures
+
+3D textures likewise require an XML file to describe how they should be loaded. The XML should contain either a "volume" or "colorlut" element, which defines the image to load with its "name" attribute. The "volume" mode requires that the image is in a format that supports 3D (volume) textures directly, for example DDS. The "colorlut" mode allows any format, and instead spreads out the Z slices of the volume image horizontally in a 2D image from the left to the right: for example LUTIdentity.png has 16 16x16 slices for a total image size 256x16.
+
+\code
+<texture3d>
+    <colorlut name="LUTIdentity.png" />
+</texture3d>
+\endcode
+
+Using a 3D texture for color correction postprocess (see bin/Data/PostProcess/ColorCorrection.xml) requires the 3D texture to be assigned to the "volume" texture unit, so that the effect knows to load the texture as the correct type. The lookup for the corrected color happens by using the original color's red channel as the X coordinate, the green channel as the Y coordinate, and blue as the Z. Therefore the identity LUT's slices (which shouldn't transform the color at all) grow red from left to right and green from top to bottom, and finally the slices themselves turn blue from left to right.
 
 \section Materials_Techniques Techniques and passes
 
@@ -1635,7 +1666,7 @@ In AngelScript, the polling API is accessed via properties: input.keyDown[], inp
 
 \section InputMouseModes Mouse modes
 
-The operating system mouse cursor can be used in three modes which can be switched with \ref Input::SetMouseMode() "SetMouseMode()".
+The operating system mouse cursor can be used in four modes which can be switched with \ref Input::SetMouseMode() "SetMouseMode()".
 
 - MM_ABSOLUTE is the default behaviour, allowing the toggling of operating system cursor visibility and allowing the cursor to escape the window when visible.
   When the operating system cursor is invisible in absolute mouse mode, the mouse is confined to the window.
@@ -1649,6 +1680,9 @@ The operating system mouse cursor can be used in three modes which can be switch
 
 - MM_WRAP grabs the mouse from the operating system and confines the operating system cursor to the window, wrapping the cursor when it is near the edges.
   SetMouseMode(MM_WRAP) will call SetMouseGrabbed(true).
+
+- MM_FREE does not grab/confine the mouse cursor even when it is hidden. This can be used for cases where the cursor should render using the operating system
+  outside the window, and perform custom rendering (with SetMouseVisible(false)) inside.
 
 \section InputJoystick Joystick input
 
@@ -2347,8 +2381,6 @@ An %Image layer node or an %Object layer node are accessible using \ref TileMapL
 
 Tiled \ref TileMapObject2D "objects" are wire shapes (Rectangle, Ellipse, Polygon, Polyline) and sprites (Tile) that are freely positionable in the tile map.
 
-IMPORTANT: make sure that 'Rectangle' and 'Ellipse' objects' size is not zero, otherwise your whole scene won't render and you won't have any clue to debug (this is due to the fact that 'width' and 'height' fields are not saved in the tmx file when their value is zero).
-
 Accessing Tiled objects : from a \ref TileMapLayer2D "TileMapLayer2D layer", objects are accessed by their index using \ref TileMapLayer2D::GetObject "GetObject()". \ref TileMapLayer2D::GetNumObjects "GetNumObjects()" returns the number of objects contained in the object layer (tile and image layers will return 0 as they don't hold objects).
 
 Use \ref TileMapObject2D::GetObjectType "GetObjectType()" to get the nature of the selected object (TileMapObjectType2D: OT_RECTANGLE for Rectangle, OT_ELLIPSE for Ellipse, OT_POLYGON for Polygon, OT_POLYLINE for PolyLine, OT_TILE for Tile and OT_INVALID if not a valid object).
@@ -2370,7 +2402,7 @@ If need be you can access the grid id (relative to the tilesets used) of a Tile 
 
 Classes that derive from Serializable can perform automatic serialization to binary or XML format by defining \ref AttributeInfo "attributes". Attributes are stored to the Context per class. %Scene load/save and network replication are both implemented by having the Node and Component classes derive from Serializable.
 
-The supported attribute types are all those supported by Variant, excluding pointers. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
+The supported attribute types are all those supported by Variant, excluding pointers. Attributes can either refer to a variable at a memory offset in the object, or define setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
 
 To implement side effects to attributes, for example that a Node needs to dirty its world transform whenever the local transform changes, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
 
@@ -2384,6 +2416,8 @@ Each attribute can have a combination of the following flags:
 - AM_COMPONENTID: Is a component ID and may need rewriting when instantiating scene content.
 
 The default flags are AM_FILE and AM_NET. Note that it is legal to define neither AM_FILE or AM_NET, meaning the attribute has only run-time significance (perhaps for editing.)
+
+See the existing engine classes e.g. in the %Scene or %Graphics subdirectories for examples on registering attributes using the URHO3D_ATTRIBUTE family of helper macros.
 
 \page Network Networking
 
@@ -2729,6 +2763,78 @@ Attribute animation uses either linear or spline interpolation for floating poin
 - ObjectAnimation: Includes one or more attribute animations and their wrap modes and speeds for an Animatable object.
 - ValueAnimationInfo: Base class for runtime instances of an attribute animation, which includes the referred animation, wrap mode, speed and time position.
 
+\page SplinePath Spline path
+
+\section SplinePath_Intro The SplinePath component
+SplinePath is a component that allows to move a node along a path defined from a series of nodes acting as 'control points'. The node to move is called 'controlled node'.
+
+\subsection SplinePath_BuildPath Building the path
+A path is built from ordered points. When setting the points from nodes using \ref SplinePath::AddControlPoint "AddControlPoint()", an index is used to order them. At least two nodes are required to build a path.
+
+\subsection SplinePath_RemovePoints Removing points from the path
+Points can be removed:
+- either individually using \ref SplinePath::RemoveControlPoint "RemoveControlPoint()".
+- or globally using \ref SplinePath::ClearControlPoints "ClearControlPoints()".
+
+\subsection SplinePath_ControlNode Assigning the controlled node
+The controlled node is assigned using \ref SplinePath::SetControlledNode "SetControlledNode()".
+
+\subsection SplinePath_Moving Moving the controlled node along the path
+The controlled node is moved manually according to a time step, using \ref SplinePath::Move "Move()" in your update function.
+
+\subsection SplinePath_BehaviorSettings Behavior controls
+The behavior of the node is mainly influenced by its:
+- \ref SplinePath::SetSpeed "speed".
+- \ref SplinePath::SetInterpolationMode "interpolation mode" used to follow the path. Available modes are BEZIER_CURVE, CATMULL_ROM_CURVE, LINEAR_CURVE and CATMULL_ROM_FULL_CURVE.
+
+\subsection SplinePath_ManualControl Taking manual control of the controlled node
+The control node position can be:
+- reset to the starting position (first point in the path) using \ref SplinePath::Reset "Reset()".
+- set to a given position of the path using \ref SplinePath::SetPosition "SetPosition()". Position is expressed from 0.f to 1.f, where 0 is the start and 1 is the end of the path.
+
+\subsection SplinePath_Queries Querying spline path informations
+
+At any time you can query:
+- the \ref SplinePath::GetSpeed "speed".
+- the \ref SplinePath::GetLength "path length".
+- the \ref SplinePath::GetPosition "parent node's last position on the spline".
+- the \ref SplinePath::GetControlledNode "controlled node".
+- \ref SplinePath::GetPoint "a point on the spline path" from 0.f to 1.f,  where 0 is the start of the path and 1 is the end.
+- whether the \ref SplinePath::IsFinished "destination (last point of the path) is reached".
+
+\subsection SplinePath_Debug Debugging
+As for any component, a \ref SplinePath::DrawDebugGeometry "debugging function" is supplied to visually check the component.
+
+\subsection SplinePath_SampleCode Sample code
+
+The following sample demonstrates how to build a path from 2 points, assign a controlled node and move it along the path according to speed and interpolation mode.
+\code
+	// Initial point
+	Node* startNode = scene_->CreateChild("Start");
+	startNode->SetPosition(Vector3(-20.0f, 0.0f, -20.0f));
+
+	// Target point
+	Node* targetNode = scene_->CreateChild("Target");
+	targetNode->SetPosition(Vector3(20.0f, 2.0f, 20.0f));
+
+	// Node to move along the path ('controlled node')
+	Node* movingNode =  scene_->CreateChild("MovingNode");
+	
+	// Spline path
+	Node* pathNode = scene_->CreateChild("PathNode");
+	SplinePath* path = pathNode->CreateComponent<SplinePath>();
+	path->AddControlPoint(startNode, 0);
+	path->AddControlPoint(targetNode, 1);
+	path->SetInterpolationMode(LINEAR_CURVE);
+	path->SetSpeed(10.0f);
+	path->SetControlledNode(movingNode);
+\endcode
+
+In your update function, move the controlled node using \ref SplinePath::Move "Move()":
+\code
+    path->Move(eventData[P_TIMESTEP].GetFloat());
+\endcode
+
 \page Tools Tools
 
 \section Tools_AssetImporter AssetImporter
@@ -2763,6 +2869,7 @@ Options:
 -ns         Do not create subdirectories for resources
 -nz         Do not create a zone and a directional light (scene mode only)
 -nf         Do not fix infacing normals
+-ne         Do not save empty nodes (scene mode only)
 -mb <x>     Maximum number of bones per submesh. Default 64
 -p <path>   Set path for scene resources. Default is output file path
 -r <name>   Use the named scene node as root node\n"
@@ -2779,6 +2886,7 @@ Options:
 -ct         Check and do not overwrite if texture exists
 -ctn        Check and do not overwrite if texture has newer timestamp
 -am         Export all meshes even if identical (scene mode only)
+-bp         Move bones to bind pose before saving model
 \endverbatim
 
 The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, StaticModelGroup, AnimatedModel or Skybox component, and can also be manually invoked by calling \ref StaticModel::ApplyMaterialList "ApplyMaterialList()". The list files can safely be deleted if not needed.
@@ -3026,7 +3134,7 @@ uint       Bytecode size
 byte[]     Bytecode
 \endverbatim
 
-\section FileFormats_Shader Direct3D11 binary shader format (.vs4, .ps4)
+\section FileFormats_Shader4 Direct3D11 binary shader format (.vs4, .ps4)
 
 \verbatim
 byte[4]    Identifier "USHD"
@@ -3134,9 +3242,19 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 
 - Mark all application-usable classes, structs and functions with the macro URHO3D_API so that they are exported correctly in a shared library build.
 
+- Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs.
+
+- Whenever you are creating a major new feature, its usage should be documented in the .dox pages in addition to the function documentation in the header files. Create a new page if necessary, and link from an appropriate place in the existing documentation. If it's for example a new rendering feature, it could be linked from the \ref Rendering page. If the feature introduces a completely new subsystem, it should be linked from the main page list in Urho3D.dox.
+
+\section ContributionThirdParty Third party library considerations
+
 - When you add a new third-party library, insert its license statement to the License.txt in the root directory. Only libraries with permissive licenses such as BSD/MIT/zlib are accepted, because complying for example with the LGPL is difficult on mobile platforms, and would leave the application in a legal grey area.
 
-- Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs.
+- Prefer small and well-focused libraries for the Urho3D runtime. For example we use stb_image instead of FreeImage to load images, as it's assumed that the application developer can control the data and do offline conversion to supported formats as necessary.
+
+- For libraries that would be mandatorily part of the Urho3D build (not switchable off via CMake options), use of C++11 features is not yet acceptable. The same applies to your own code.
+
+- Third-party libraries should not leak C++ exceptions or use of STL containers into the Urho3D public API. Do a wrapping for example on the subsystem level if necessary.
 */
 
 }

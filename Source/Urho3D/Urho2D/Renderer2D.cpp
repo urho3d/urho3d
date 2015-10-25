@@ -79,7 +79,7 @@ Renderer2D::Renderer2D(Context* context) :
     material_->SetCullMode(CULL_NONE);
 
     frame_.frameNumber_ = 0;
-    SubscribeToEvent(E_BEGINVIEWUPDATE, HANDLER(Renderer2D, HandleBeginViewUpdate));
+    SubscribeToEvent(E_BEGINVIEWUPDATE, URHO3D_HANDLER(Renderer2D, HandleBeginViewUpdate));
 }
 
 Renderer2D::~Renderer2D()
@@ -183,7 +183,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
         }
         else
         {
-            LOGERROR("Failed to lock index buffer");
+            URHO3D_LOGERROR("Failed to lock index buffer");
             return;
         }
     }
@@ -215,7 +215,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
                 vertexBuffer->Unlock();
             }
             else
-                LOGERROR("Failed to lock vertex buffer");
+                URHO3D_LOGERROR("Failed to lock vertex buffer");
         }
 
         viewBatchInfo.vertexBufferUpdateFrameNumber_ = frame_.frameNumber_;
@@ -333,7 +333,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
 
     frame_ = static_cast<View*>(eventData[P_VIEW].GetPtr())->GetFrameInfo();
 
-    PROFILE(UpdateRenderer2D);
+    URHO3D_PROFILE(UpdateRenderer2D);
 
     Camera* camera = static_cast<Camera*>(eventData[P_CAMERA].GetPtr());
     frustum_ = &camera->GetFrustum();
@@ -347,7 +347,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
 
     // Check visibility
     {
-        PROFILE(CheckDrawableVisibility);
+        URHO3D_PROFILE(CheckDrawableVisibility);
 
         WorkQueue* queue = GetSubsystem<WorkQueue>();
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread

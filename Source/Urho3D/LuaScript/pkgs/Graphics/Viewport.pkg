@@ -9,6 +9,7 @@ class Viewport
     
     void SetScene(Scene* scene);
     void SetCamera(Camera* camera);
+    void SetCullCamera(Camera* camera);
     void SetRect(const IntRect& rect);
     void SetRenderPath(RenderPath* path);
     void SetRenderPath(XMLFile* file);
@@ -16,6 +17,7 @@ class Viewport
     
     Scene* GetScene() const;
     Camera* GetCamera() const;
+    Camera* GetCullCamera() const;
     const IntRect& GetRect() const;
     RenderPath* GetRenderPath() const;
     bool GetDrawDebug() const;
@@ -25,6 +27,7 @@ class Viewport
 
     tolua_property__get_set Scene* scene;
     tolua_property__get_set Camera* camera;
+    tolua_property__get_set Camera* cullCamera;
     tolua_property__get_set IntRect& rect;
     tolua_property__get_set RenderPath* renderPath;
     tolua_property__get_set bool drawDebug;

@@ -235,6 +235,15 @@ bool XMLElement::SetValue(const char* value)
         return false;
 
     const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
+
+    // Search for existing value first
+    for (pugi::xml_node child = node.first_child(); child; child = child.next_sibling())
+    {
+        if (child.type() == pugi::node_pcdata)
+            return const_cast<pugi::xml_node&>(child).set_value(value);
+    }
+
+    // If no previous value found, append new
     return const_cast<pugi::xml_node&>(node).append_child(pugi::node_pcdata).set_value(value);
 }
 
@@ -700,7 +709,6 @@ BoundingBox XMLElement::GetBoundingBox() const
 
     ret.min_ = GetVector3("min");
     ret.max_ = GetVector3("max");
-    ret.defined_ = true;
     return ret;
 }
 
@@ -956,7 +964,7 @@ XPathResultSet& XPathResultSet::operator =(const XPathResultSet& rhs)
 XMLElement XPathResultSet::operator [](unsigned index) const
 {
     if (!resultSet_)
-        LOGERRORF(
+        URHO3D_LOGERRORF(
             "Could not return result at index: %u. Most probably this is caused by the XPathResultSet not being stored in a lhs variable.",
             index);
 

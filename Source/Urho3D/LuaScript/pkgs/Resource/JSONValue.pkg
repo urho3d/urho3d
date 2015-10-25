@@ -2,122 +2,115 @@ $#include "Resource/JSONValue.h"
 
 enum JSONValueType
 {
-    JSON_ANY = 0,
+    JSON_NULL,
+    JSON_BOOL,
+    JSON_NUMBER,
+    JSON_STRING,
+    JSON_ARRAY,
     JSON_OBJECT,
-    JSON_ARRAY
 };
 
 class JSONValue
 {
+    JSONValue();
+    JSONValue(bool value);
+    JSONValue(const char* value);           // This works for Lua string and Urho3D:String
+    JSONValue(double value);                // This works for all number types, must be declared after string overload
+    JSONValue(const JSONArray& value);
+    JSONValue(const JSONObject& value);
+    JSONValue(const JSONValue& value);
+    ~JSONValue();
+
+    tolua_outside void JSONValueSetBool @ SetBool(bool value);
+    tolua_outside void JSONValueSetInt @ SetInt(int value);
+    tolua_outside void JSONValueSetUint @ SetUint(unsigned value);
+    tolua_outside void JSONValueSetFloat @ SetFloat(float value);
+    tolua_outside void JSONValueSetDouble @ SetDouble(double value);
+    tolua_outside void JSONValueSetString @ SetString(const String value);
+    tolua_outside void JSONValueSetArray @ SetArray(const JSONArray& value);
+    tolua_outside void JSONValueSetObject @ SetObject(const JSONObject& value);
+
+    JSONValueType GetValueType() const;
     bool IsNull() const;
-    bool NotNull() const;
-    operator bool () const;
-
-    JSONValue CreateChild(const String name, JSONValueType valueType = JSON_OBJECT);
-    JSONValue GetChild(const String name, JSONValueType valueType = JSON_ANY) const;
-    void SetInt(const String name, int value);
-    void SetBool(const String name, bool value);
-    void SetFloat(const String name, float value);
-    void SetDouble(const String name, double value);
-    void SetVector2(const String name, const Vector2& value);
-    void SetVector3(const String name, const Vector3& value);
-    void SetVector4(const String name, const Vector4& value);
-    void SetVectorVariant(const String name, const Variant& value);
-    void SetQuaternion(const String name, const Quaternion& value);
-    void SetColor(const String name, const Color& value);
-    void SetString(const String name, const String value);
-    // void SetBuffer(const String name, const void* data, unsigned size);
-    // void SetBuffer(const String name, const PODVector<unsigned char>& value);
-    void SetResourceRef(const String name, const ResourceRef& value);
-    void SetResourceRefList(const String name, const ResourceRefList& value);
-    void SetIntRect(const String name, const IntRect& value);
-    void SetIntVector2(const String name, const IntVector2& value);
-    void SetMatrix3(const String name, const Matrix3& value);
-    void SetMatrix3x4(const String name, const Matrix3x4& value);
-    void SetMatrix4(const String name, const Matrix4& value);
-    void SetVariant(const String name, const Variant& value);
-    void SetVariantValue(const String name, const Variant& value);
-
-    bool IsObject() const;
-    Vector<String> GetChildNames() const;
-    Vector<String> GetValueNames() const;
-    int GetInt(const String name) const;
-    bool GetBool(const String name) const;
-    float GetFloat(const String name) const;
-    double GetDouble(const String name) const;
-    Vector2 GetVector2(const String name) const;
-    Vector3 GetVector3(const String name) const;
-    Vector4 GetVector4(const String name) const;
-    Variant GetVectorVariant(const String name) const;
-    Quaternion GetQuaternion(const String name) const;
-    Color GetColor(const String name) const;
-    String GetString(const String name) const;
-    const char* GetCString(const String name) const;
-    // PODVector<unsigned char> GetBuffer(const String name) const;
-    // bool GetBuffer(const String name, void* dest, unsigned size) const;
-    ResourceRef GetResourceRef(const String name) const;
-    ResourceRefList GetResourceRefList(const String name) const;
-    IntRect GetIntRect(const String name) const;
-    IntVector2 GetIntVector2(const String name) const;
-    Matrix3 GetMatrix3(const String name) const;
-    Matrix3x4 GetMatrix3x4(const String name) const;
-    Matrix4 GetMatrix4(const String name) const;
-    Variant GetVariant(const String name) const;
-    Variant GetVariantValue(const String name, VariantType type) const;
-
-    JSONValue CreateChild(JSONValueType valueType = JSON_OBJECT);
-    JSONValue GetChild(unsigned index, JSONValueType valueType = JSON_ANY) const;
-    void AddInt(int value);
-    void AddBool(bool value);
-    void AddFloat(float value);
-    void AddDouble(double value);
-    void AddVector2(const Vector2& value);
-    void AddVector3(const Vector3& value);
-    void AddVector4(const Vector4& value);
-    void AddVectorVariant(const Variant& value);
-    void AddQuaternion(const Quaternion& value);
-    void AddColor(const Color& value);
-    void AddString(const String value);
-    // void AddBuffer(const PODVector<unsigned char>& value);
-    // void AddBuffer(const void* data, unsigned size);
-    void AddResourceRef(const ResourceRef& value);
-    void AddResourceRefList(const ResourceRefList& value);
-    void AddIntRect(const IntRect& value);
-    void AddIntVector2(const IntVector2& value);
-    void AddMatrix3(const Matrix3& value);
-    void AddMatrix3x4(const Matrix3x4& value);
-    void AddMatrix4(const Matrix4& value);
-    void AddVariant(const Variant& value);
-    void AddVariantValue(const Variant& value);
+    bool IsBool() const;
+    bool IsNumber() const;
+    bool IsString() const;
     bool IsArray() const;
-    unsigned GetSize() const;
-    int GetInt(unsigned index) const;
-    bool GetBool(unsigned index) const;
-    float GetFloat(unsigned index) const;
-    double GetDouble(unsigned index) const;
-    Vector2 GetVector2(unsigned index) const;
-    Vector3 GetVector3(unsigned index) const;
-    Vector4 GetVector4(unsigned index) const;
-    Variant GetVectorVariant(unsigned index) const;
-    Quaternion GetQuaternion(unsigned index) const;
-    Color GetColor(unsigned index) const;
-    String GetString(unsigned index) const;
-    const char* GetCString(unsigned index) const;
-    // PODVector<unsigned char> GetBuffer(unsigned index) const;
-    // bool GetBuffer(unsigned index, void* dest, unsigned size) const;
-    ResourceRef GetResourceRef(unsigned index) const;
-    ResourceRefList GetResourceRefList(unsigned index) const;
-    IntRect GetIntRect(unsigned index) const;
-    IntVector2 GetIntVector2(unsigned index) const;
-    Matrix3 GetMatrix3(unsigned index) const;
-    Matrix3x4 GetMatrix3x4(unsigned index) const;
-    Matrix4 GetMatrix4(unsigned index) const;
-    Variant GetVariant(unsigned index) const;
-    Variant GetVariantValue(unsigned index, VariantType type) const;
+    bool IsObject() const;
+
+    bool GetBool() const;
+    int GetInt() const;
+    unsigned GetUInt() const;
+    float GetFloat() const;
+    double GetDouble() const;
+    const String GetString() const;
+    const JSONArray& GetArray() const;
+    const JSONObject& GetObject() const;
+
+    JSONValue& operator [](unsigned index);
+    const JSONValue& operator [](unsigned index) const;
+    void Push(const JSONValue& value);
+    void Pop();
+    void Insert(unsigned pos, const JSONValue& value);
+    void Erase(unsigned pos, unsigned length = 1);
+    void Resize(unsigned newSize);
+    unsigned Size() const;
+
+    // JSONValue& operator [](const String key);
+    // const JSONValue& operator [](const String key) const;
+    void Set(const String key, const JSONValue& value);
+    const JSONValue& Get(const String key) const;
+    bool Erase(const String key);
+    bool Contains(const String key) const;
+
+    void Clear();
 
     static const JSONValue EMPTY;
+    static const JSONArray emptyArray;
+    static const JSONObject emptyObject;
 
     tolua_readonly tolua_property__is_set bool null;
-    tolua_readonly tolua_property__is_set bool object;
-    tolua_readonly tolua_property__is_set bool array;
 };
+
+${
+static void JSONValueSetBool(JSONValue* jsonValue, bool value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetInt(JSONValue* jsonValue, int value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetUint(JSONValue* jsonValue, unsigned value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetFloat(JSONValue* jsonValue, float value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetDouble(JSONValue* jsonValue, double value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetString(JSONValue* jsonValue, const String& value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetArray(JSONValue* jsonValue, const JSONArray& value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetObject(JSONValue* jsonValue, const JSONObject& value)
+{
+    (*jsonValue) = value;
+}
+
+$}

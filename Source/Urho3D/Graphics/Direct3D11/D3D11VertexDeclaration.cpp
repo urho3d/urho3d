@@ -76,7 +76,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertex
     if (d3dInputLayout)
         inputLayout_ = d3dInputLayout;
     else
-        LOGERRORF("Failed to create input layout for shader %s, missing element mask %d",
+        URHO3D_LOGERRORF("Failed to create input layout for shader %s, missing element mask %d",
             vertexShader->GetFullName().CString(), vertexShader->GetElementMask() & ~vbElementMask);
 }
 

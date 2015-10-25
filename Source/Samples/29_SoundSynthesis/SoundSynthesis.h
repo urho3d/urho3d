@@ -37,12 +37,14 @@ class BufferedSoundStream;
 ///     - Playing back a sound stream produced on-the-fly by a simple CPU synthesis algorithm
 class SoundSynthesis : public Sample
 {
-    OBJECT(SoundSynthesis);
+    URHO3D_OBJECT(SoundSynthesis, Sample);
 
 public:
     /// Construct.
     SoundSynthesis(Context* context);
 
+    /// Setup before engine initialization. Modifies the engine parameters.
+    virtual void Setup();
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
 

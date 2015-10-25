@@ -179,14 +179,14 @@ void Batch::CalculateSortKey()
                (((unsigned long long)materialID) << 16) | geometryID;
 }
 
-void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) const
+void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool allowDepthWrite) const
 {
     if (!vertexShader_ || !pixelShader_)
         return;
 
     Graphics* graphics = view->GetGraphics();
     Renderer* renderer = view->GetRenderer();
-    Node* cameraNode = camera_ ? camera_->GetNode() : 0;
+    Node* cameraNode = camera ? camera->GetNode() : 0;
     Light* light = lightQueue_ ? lightQueue_->light_ : 0;
     Texture2D* shadowMap = lightQueue_ ? lightQueue_->shadowMap_ : 0;
 
@@ -208,7 +208,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
         graphics->SetBlendMode(blend);
 
         bool isShadowPass = pass_->GetIndex() == Technique::shadowPassIndex;
-        renderer->SetCullMode(isShadowPass ? material_->GetShadowCullMode() : material_->GetCullMode(), camera_);
+        renderer->SetCullMode(isShadowPass ? material_->GetShadowCullMode() : material_->GetCullMode(), camera);
         if (!isShadowPass)
         {
             const BiasParameters& depthBias = material_->GetDepthBias();
@@ -216,7 +216,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
         }
 
         // Use the "least filled" fill mode combined from camera & material
-        graphics->SetFillMode((FillMode)(Max(camera_->GetFillMode(), material_->GetFillMode())));
+        graphics->SetFillMode((FillMode)(Max(camera->GetFillMode(), material_->GetFillMode())));
         graphics->SetDepthTest(pass_->GetDepthTestMode());
         graphics->SetDepthWrite(pass_->GetDepthWrite() && allowDepthWrite);
     }
@@ -226,13 +226,13 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
         view->SetGlobalShaderParameters();
 
     // Set camera & viewport shader parameters
-    unsigned cameraHash = (unsigned)(size_t)camera_;
+    unsigned cameraHash = (unsigned)(size_t)camera;
     IntRect viewport = graphics->GetViewport();
     IntVector2 viewSize = IntVector2(viewport.Width(), viewport.Height());
     unsigned viewportHash = (unsigned)(viewSize.x_ | (viewSize.y_ << 16));
     if (graphics->NeedParameterUpdate(SP_CAMERA, reinterpret_cast<const void*>(cameraHash + viewportHash)))
     {
-        view->SetCameraShaderParameters(camera_, true);
+        view->SetCameraShaderParameters(camera, true);
         // During renderpath commands the G-Buffer or viewport texture is assumed to always be viewport-sized
         view->SetGBufferShaderParameters(viewSize, IntRect(0, 0, viewSize.x_, viewSize.y_));
     }
@@ -282,7 +282,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
         graphics->SetShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor());
         graphics->SetShaderParameter(PSP_FOGCOLOR, overrideFogColorToBlack ? Color::BLACK : zone_->GetFogColor());
 
-        float farClip = camera_->GetFarClip();
+        float farClip = camera->GetFarClip();
         float fogStart = Min(zone_->GetFogStart(), farClip);
         float fogEnd = Min(zone_->GetFogEnd(), farClip);
         if (fogStart >= fogEnd * (1.0f - M_LARGE_EPSILON))
@@ -309,7 +309,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
             // Deferred light volume batches operate in a camera-centered space. Detect from material, zone & pass all being null
             bool isLightVolume = !material_ && !pass_ && !zone_;
 
-            Matrix3x4 cameraEffectiveTransform = camera_->GetEffectiveWorldTransform();
+            Matrix3x4 cameraEffectiveTransform = camera->GetEffectiveWorldTransform();
             Vector3 cameraEffectivePos = cameraEffectiveTransform.Translation();
 
             Node* lightNode = light->GetNode();
@@ -468,7 +468,7 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
                     float r = -q * nearClip;
 
                     const CascadeParameters& parameters = light->GetShadowCascade();
-                    float viewFarClip = camera_->GetFarClip();
+                    float viewFarClip = camera->GetFarClip();
                     float shadowRange = parameters.GetShadowRange();
                     float fadeStart = parameters.fadeStart_ * shadowRange / viewFarClip;
                     float fadeEnd = shadowRange / viewFarClip;
@@ -496,11 +496,11 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
 
                 Vector4 lightSplits(M_LARGE_VALUE, M_LARGE_VALUE, M_LARGE_VALUE, M_LARGE_VALUE);
                 if (lightQueue_->shadowSplits_.Size() > 1)
-                    lightSplits.x_ = lightQueue_->shadowSplits_[0].farSplit_ / camera_->GetFarClip();
+                    lightSplits.x_ = lightQueue_->shadowSplits_[0].farSplit_ / camera->GetFarClip();
                 if (lightQueue_->shadowSplits_.Size() > 2)
-                    lightSplits.y_ = lightQueue_->shadowSplits_[1].farSplit_ / camera_->GetFarClip();
+                    lightSplits.y_ = lightQueue_->shadowSplits_[1].farSplit_ / camera->GetFarClip();
                 if (lightQueue_->shadowSplits_.Size() > 3)
-                    lightSplits.z_ = lightQueue_->shadowSplits_[2].farSplit_ / camera_->GetFarClip();
+                    lightSplits.z_ = lightQueue_->shadowSplits_[2].farSplit_ / camera->GetFarClip();
 
                 graphics->SetShaderParameter(PSP_SHADOWSPLITS, lightSplits);
             }
@@ -603,11 +603,11 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
 #endif
 }
 
-void Batch::Draw(View* view, bool allowDepthWrite) const
+void Batch::Draw(View* view, Camera* camera, bool allowDepthWrite) const
 {
     if (!geometry_->IsEmpty())
     {
-        Prepare(view, true, allowDepthWrite);
+        Prepare(view, camera, true, allowDepthWrite);
         geometry_->Draw(view->GetGraphics());
     }
 }
@@ -628,7 +628,7 @@ void BatchGroup::SetTransforms(void* lockedData, unsigned& freeIndex)
     freeIndex += instances_.Size();
 }
 
-void BatchGroup::Draw(View* view, bool allowDepthWrite) const
+void BatchGroup::Draw(View* view, Camera* camera, bool allowDepthWrite) const
 {
     Graphics* graphics = view->GetGraphics();
     Renderer* renderer = view->GetRenderer();
@@ -639,7 +639,7 @@ void BatchGroup::Draw(View* view, bool allowDepthWrite) const
         VertexBuffer* instanceBuffer = renderer->GetInstancingBuffer();
         if (!instanceBuffer || geometryType_ != GEOM_INSTANCED || startIndex_ == M_MAX_UNSIGNED)
         {
-            Batch::Prepare(view, false, allowDepthWrite);
+            Batch::Prepare(view, camera, false, allowDepthWrite);
 
             graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
             graphics->SetVertexBuffers(geometry_->GetVertexBuffers(), geometry_->GetVertexElementMasks());
@@ -655,7 +655,7 @@ void BatchGroup::Draw(View* view, bool allowDepthWrite) const
         }
         else
         {
-            Batch::Prepare(view, false, allowDepthWrite);
+            Batch::Prepare(view, camera, false, allowDepthWrite);
 
             // Get the geometry vertex buffers, then add the instancing stream buffer
             // Hack: use a const_cast to avoid dynamic allocation of new temp vectors
@@ -811,7 +811,7 @@ void BatchQueue::SetTransforms(void* lockedData, unsigned& freeIndex)
         i->second_.SetTransforms(lockedData, freeIndex);
 }
 
-void BatchQueue::Draw(View* view, bool markToStencil, bool usingLightOptimization, bool allowDepthWrite) const
+void BatchQueue::Draw(View* view, Camera* camera, bool markToStencil, bool usingLightOptimization, bool allowDepthWrite) const
 {
     Graphics* graphics = view->GetGraphics();
     Renderer* renderer = view->GetRenderer();
@@ -833,7 +833,7 @@ void BatchQueue::Draw(View* view, bool markToStencil, bool usingLightOptimizatio
         if (markToStencil)
             graphics->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, group->lightMask_);
 
-        group->Draw(view, allowDepthWrite);
+        group->Draw(view, camera, allowDepthWrite);
     }
     // Non-instanced
     for (PODVector<Batch*>::ConstIterator i = sortedBatches_.Begin(); i != sortedBatches_.End(); ++i)
@@ -845,12 +845,12 @@ void BatchQueue::Draw(View* view, bool markToStencil, bool usingLightOptimizatio
         {
             // If drawing an alpha batch, we can optimize fillrate by scissor test
             if (!batch->isBase_ && batch->lightQueue_)
-                renderer->OptimizeLightByScissor(batch->lightQueue_->light_, batch->camera_);
+                renderer->OptimizeLightByScissor(batch->lightQueue_->light_, camera);
             else
                 graphics->SetScissorTest(false);
         }
 
-        batch->Draw(view, allowDepthWrite);
+        batch->Draw(view, camera, allowDepthWrite);
     }
 }
 

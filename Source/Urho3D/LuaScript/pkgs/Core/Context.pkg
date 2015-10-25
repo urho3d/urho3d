@@ -8,31 +8,60 @@ class Context
 };
 
 Context* GetContext();
+tolua_readonly tolua_property__get_set Context* context;
 Object* GetEventSender();
+tolua_readonly tolua_property__get_set EventSender* eventSender;
 EventHandler* GetEventHandler() const;
+tolua_readonly tolua_property__get_set EventHandler* eventHandler;
 
 ${
+
 #define TOLUA_DISABLE_tolua_CoreLuaAPI_GetContext00
 static int tolua_CoreLuaAPI_GetContext00(lua_State* tolua_S)
 {
-    Context* tolua_ret = GetContext(tolua_S);
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Context");
+    tolua_pushusertype(tolua_S, (void*)GetContext(tolua_S), "Context");
     return 1;
+}
+
+#define TOLUA_DISABLE_tolua_get_context_ptr
+static int tolua_get_context_ptr(lua_State* tolua_S)
+{
+    return tolua_CoreLuaAPI_GetContext00(tolua_S);
 }
 
 #define TOLUA_DISABLE_tolua_CoreLuaAPI_GetEventSender00
 static int tolua_CoreLuaAPI_GetEventSender00(lua_State* tolua_S)
 {
+    // Could be null outside event handling
     Object* tolua_ret = GetContext(tolua_S)->GetEventSender();
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Object");
+    if (tolua_ret)
+        tolua_pushusertype(tolua_S, (void*)tolua_ret, "Object");
+    else
+        lua_pushnil(tolua_S);
     return 1;
+}
+
+#define TOLUA_DISABLE_tolua_get_eventSender_ptr
+static int tolua_get_eventSender_ptr(lua_State* tolua_S)
+{
+    return tolua_CoreLuaAPI_GetEventSender00(tolua_S);
 }
 
 #define TOLUA_DISABLE_tolua_CoreLuaAPI_GetEventHandler00
 static int tolua_CoreLuaAPI_GetEventHandler00(lua_State* tolua_S)
 {
     EventHandler* tolua_ret = GetContext(tolua_S)->GetEventHandler();
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"EventHandler");
+    if (tolua_ret)
+        tolua_pushusertype(tolua_S, (void*)tolua_ret, "EventHandler");
+    else
+        lua_pushnil(tolua_S);
     return 1;
 }
+
+#define TOLUA_DISABLE_tolua_get_eventHandler_ptr
+static int tolua_get_eventHandler_ptr(lua_State* tolua_S)
+{
+    return tolua_CoreLuaAPI_GetEventHandler00(tolua_S);
+}
+
 $}

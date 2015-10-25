@@ -514,8 +514,8 @@ unsigned Texture::GetSRGBFormat(unsigned format)
 void Texture::CheckTextureBudget(StringHash type)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    unsigned textureBudget = cache->GetMemoryBudget(type);
-    unsigned textureUse = cache->GetMemoryUse(type);
+    unsigned long long textureBudget = cache->GetMemoryBudget(type);
+    unsigned long long textureUse = cache->GetMemoryUse(type);
     if (!textureBudget)
         return;
 

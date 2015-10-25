@@ -1,4 +1,4 @@
-// Modified by Lasse Oorni for Urho3D
+// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
 #include "stb_image.h"
 #define STB_IMAGE_IMPLEMENTATION
@@ -126,8 +126,8 @@ typedef unsigned char validate_uint32[sizeof(stbi__uint32)==4 ? 1 : -1];
 #define STBI__X86_TARGET
 #endif
 
-// Urho3D: do not use SIMD instructions if URHO3D_SSE disabled
-#ifndef URHO3D_SSE
+// Urho3D: do not use SIMD instructions if both URHO3D_SSE and URHO3D_NEON are disabled
+#if !defined(URHO3D_SSE) && !defined(URHO3D_NEON)
 #define STBI_NO_SIMD
 #endif
 
@@ -206,8 +206,8 @@ static int stbi__sse2_available()
 #endif
 #endif
 
-// ARM NEON
-#if defined(STBI_NO_SIMD) && defined(STBI_NEON)
+// ARM NEON     # Urho3D - ensure the target platform supports NEON intrinsic instructions
+#if (defined(STBI_NO_SIMD) || !defined(__ARM_NEON__)) && defined(STBI_NEON)
 #undef STBI_NEON
 #endif
 

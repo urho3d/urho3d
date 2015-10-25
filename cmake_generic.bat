@@ -24,6 +24,7 @@
 
 :: Determine source tree and build tree
 set "SOURCE=%~dp0"
+set "SOURCE=%SOURCE:~0,-1%"
 set "BUILD="
 if "%~1" == "" goto :continue
 set "ARG1=%~1"
@@ -34,28 +35,35 @@ shift
 if "%BUILD%" == "" if exist "%cd%\CMakeCache.txt" (set "BUILD=%cd%") else (goto :error)
 
 :: Detect CMake toolchains directory if it is not provided explicitly
-if "%TOOLCHAINS%" == "" set "TOOLCHAINS=%SOURCE%/CMake/Toolchains"
-if not exist "%TOOLCHAINS%" if exist "%URHO3D_HOME%/share/Urho3D/CMake/Toolchains" set "TOOLCHAINS=%URHO3D_HOME%/share/Urho3D/CMake/Toolchains"
+if "%TOOLCHAINS%" == "" set "TOOLCHAINS=%SOURCE%\CMake\Toolchains"
+if not exist "%TOOLCHAINS%" if exist "%URHO3D_HOME%\share\Urho3D\CMake\Toolchains" set "TOOLCHAINS=%URHO3D_HOME%\share\Urho3D\CMake\Toolchains"
 :: BEWARE that the TOOLCHAINS variable leaks to caller's environment!
 
 :: Default to native generator and toolchain if none is specified explicitly
 set "OPTS="
+set "BUILD_OPTS="
 set "arch="
-if exist "%BUILD%\CMakeCache.txt" for /F "eol=/ delims=:= tokens=1-3" %%i in (%BUILD%\CMakeCache.txt) do if "%%i" == "URHO3D_64BIT" if "%%k" == "1" set "arch= Win64"
+set "cwd=%cd%"
+if exist "%BUILD%\CMakeCache.txt" cd "%BUILD%" && for /F "eol=/ delims=:= tokens=1-3" %%i in (CMakeCache.txt) do if "%%i" == "URHO3D_64BIT" if "%%k" == "1" set "arch= Win64"
+cd %cwd%
 :loop
 if not "%~1" == "" (
-    if "%~1" == "-DANDROID" if "%~2" == "1" set "OPTS=-G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=%TOOLCHAINS%\android.toolchain.cmake"
-    if "%~1" == "-DEMSCRIPTEN" if "%~2" == "1" set "OPTS=-G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=%TOOLCHAINS%\emscripten.toolchain.cmake"
+    if "%~1" == "-DANDROID" if "%~2" == "1" set "OPTS=-G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAINS%\android.toolchain.cmake""
+    if "%~1" == "-DEMSCRIPTEN" if "%~2" == "1" set "OPTS=-G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAINS%\emscripten.toolchain.cmake""
     if "%~1" == "-DURHO3D_64BIT" if "%~2" == "1" set "arch= Win64"
     if "%~1" == "-DURHO3D_64BIT" if "%~2" == "0" set "arch="
     if "%~1" == "-VS" set "OPTS=-G "Visual Studio %~2%arch%""
+    if "%~1" == "-G" set "OPTS=%OPTS% %~1 %2"
+    set "ARG1=%~1"
+    set "ARG2=%~2"
+    if "%ARG1:~0,2%" == "-D" set "BUILD_OPTS=%BUILD_OPTS% %ARG1%=%ARG2%"
     shift
     shift
     goto loop
 )
 
 :: Create project with the chosen CMake generator and toolchain
-cmake -E make_directory %BUILD% && cmake -E chdir %BUILD% cmake %OPTS% %* %SOURCE%
+cmake -E make_directory "%BUILD%" && cmake -E chdir "%BUILD%" cmake %OPTS% %BUILD_OPTS% "%SOURCE%"
 
 goto :eof
 :error

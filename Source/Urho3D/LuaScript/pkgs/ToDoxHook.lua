@@ -268,16 +268,16 @@ function isSameFunction(headerFunc, packageFunc, strict)
         --for _, decl in ipairs(headerFunc.declarations) do print("FuncHeader  Param: \""..decl.type.."\", \""..decl.ptr.."\", \""..decl.name.."\", \""..decl.def.."\"") end
         --for _, decl in ipairs(packageFunc.declarations) do print("FuncPackage Param: \""..decl.type.."\", \""..decl.ptr.."\", \""..decl.name.."\", \""..decl.def.."\"") end
         for i, headerDecl in ipairs(headerFunc.declarations) do
-		  if packageFunc.declarations[i] ~= nil then
-		    if not isTypeEquivalent(headerDecl.type, packageFunc.declarations[i].type) then
-		      return false
-		    end
-		  else
-		    if headerDecl.def == "" then
-		      return false
-		    end
-		  end
-		end
+      if packageFunc.declarations[i] ~= nil then
+        if not isTypeEquivalent(headerDecl.type, packageFunc.declarations[i].type) then
+          return false
+        end
+      else
+        if headerDecl.def == "" then
+          return false
+        end
+      end
+    end
         return true
       else
         return true
@@ -476,6 +476,7 @@ function writeTableOfContents(file)
   file:write("\\ref LuaScriptAPI_ClassList \"Class list\"<br>\n")
   file:write("\\ref LuaScriptAPI_Classes \"Classes\"<br>\n")
   file:write("\\ref LuaScriptAPI_Enums \"Enumerations\"<br>\n")
+  file:write("\\ref LuaScriptAPI_toluaFunctions \"tolua functions\"<br>\n")
   file:write("\\ref LuaScriptAPI_GlobalFunctions \"Global functions\"<br>\n")
   file:write("\\ref LuaScriptAPI_GlobalProperties \"Global properties\"<br>\n")
   file:write("\\ref LuaScriptAPI_GlobalConstants \"Global constants\"<br>\n")
@@ -565,6 +566,20 @@ function writeGlobalConstants(file)
   file:write("\n")
 end
 
+function writeToluaFunctions(file)
+  file:write("\n\\section LuaScriptAPI_toluaFunctions tolua functions\n")
+
+  file:write("- lua_usertype cast(lua_usertype object, const char* typename)\n")
+  file:write("- lua_table getpeer(lua_userdata object)\n")
+  file:write("- void inherit(lua_table table, lua_usertype c_instance)\n")
+  file:write("- bool releaseownership(lua_usertype object)\n")
+  file:write("- void setpeer(lua_userdata object, lua_table table)\n")
+  file:write("- bool takeownership(lua_usertype object)\n")
+  file:write("- const char* type(lua_object object)\n")
+
+  file:write("\n")
+end
+
 function writeGlobalFunctions(file)
   sortByName(globalFunctions)
   file:write("\n\\section LuaScriptAPI_GlobalFunctions Global functions\n")
@@ -623,6 +638,7 @@ function classPackage:print()
   writeClassList(file)
   writeClasses(file)
   writeEnumerates(file)
+  writeToluaFunctions(file)
   writeGlobalFunctions(file)
   writeGlobalProperties(file)
   writeGlobalConstants(file)

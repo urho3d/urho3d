@@ -280,7 +280,7 @@ bool Technique::BeginLoad(Deserializer& source)
                 newPass->SetAlphaMask(globalAlphaMask);
         }
         else
-            LOGERROR("Missing pass name");
+            URHO3D_LOGERROR("Missing pass name");
 
         passElem = passElem.GetNext("pass");
     }

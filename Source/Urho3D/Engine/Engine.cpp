@@ -58,8 +58,8 @@
 #include "../Urho2D/Urho2D.h"
 #endif
 
-#if defined(EMSCRIPTEN) && defined(URHO3D_TESTING)
-#include <emscripten.h>
+#if defined(__EMSCRIPTEN__) && defined(URHO3D_TESTING)
+#include <emscripten/emscripten.h>
 #endif
 
 #include "../DebugNew.h"
@@ -145,7 +145,7 @@ Engine::Engine(Context* context) :
     RegisterNavigationLibrary(context_);
 #endif
 
-    SubscribeToEvent(E_EXITREQUESTED, HANDLER(Engine, HandleExitRequested));
+    SubscribeToEvent(E_EXITREQUESTED, URHO3D_HANDLER(Engine, HandleExitRequested));
 }
 
 Engine::~Engine()
@@ -157,7 +157,7 @@ bool Engine::Initialize(const VariantMap& parameters)
     if (initialized_)
         return true;
 
-    PROFILE(InitEngine);
+    URHO3D_PROFILE(InitEngine);
 
     // Set headless mode
     headless_ = GetParameter(parameters, "Headless", false).GetBool();
@@ -198,13 +198,15 @@ bool Engine::Initialize(const VariantMap& parameters)
 
     // Set amount of worker threads according to the available physical CPU cores. Using also hyperthreaded cores results in
     // unpredictable extra synchronization overhead. Also reserve one core for the main thread
+#ifdef URHO3D_THREADING
     unsigned numThreads = GetParameter(parameters, "WorkerThreads", true).GetBool() ? GetNumPhysicalCPUs() - 1 : 0;
     if (numThreads)
     {
         GetSubsystem<WorkQueue>()->CreateThreads(numThreads);
 
-        LOGINFOF("Created %u worker thread%s", numThreads, numThreads > 1 ? "s" : "");
+        URHO3D_LOGINFOF("Created %u worker thread%s", numThreads, numThreads > 1 ? "s" : "");
     }
+#endif
 
     // Add resource paths
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -247,7 +249,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         if (!success)
         {
-            LOGERRORF("Failed to add resource path '%s', check the documentation on how to set the 'resource prefix path'",
+            URHO3D_LOGERRORF("Failed to add resource path '%s', check the documentation on how to set the 'resource prefix path'",
                 resourcePaths[i].CString());
             return false;
         }
@@ -261,13 +263,13 @@ bool Engine::Initialize(const VariantMap& parameters)
         {
             if (!cache->AddPackageFile(packageName))
             {
-                LOGERRORF("Failed to add resource package '%s', check the documentation on how to set the 'resource prefix path'",
+                URHO3D_LOGERRORF("Failed to add resource package '%s', check the documentation on how to set the 'resource prefix path'",
                     resourcePackages[i].CString());
                 return false;
             }
         }
         else
-            LOGDEBUGF(
+            URHO3D_LOGDEBUGF(
                 "Skip specified resource package '%s' as it does not exist, check the documentation on how to set the 'resource prefix path'",
                 resourcePackages[i].CString());
     }
@@ -293,7 +295,7 @@ bool Engine::Initialize(const VariantMap& parameters)
                 String autoResourceDir = autoLoadPath + "/" + dir;
                 if (!cache->AddResourceDir(autoResourceDir, 0))
                 {
-                    LOGERRORF(
+                    URHO3D_LOGERRORF(
                         "Failed to add resource directory '%s' in autoload path %s, check the documentation on how to set the 'resource prefix path'",
                         dir.CString(), autoLoadPaths[i].CString());
                     return false;
@@ -312,7 +314,7 @@ bool Engine::Initialize(const VariantMap& parameters)
                 String autoPackageName = autoLoadPath + "/" + pak;
                 if (!cache->AddPackageFile(autoPackageName, 0))
                 {
-                    LOGERRORF(
+                    URHO3D_LOGERRORF(
                         "Failed to add package file '%s' in autoload path %s, check the documentation on how to set the 'resource prefix path'",
                         pak.CString(), autoLoadPaths[i].CString());
                     return false;
@@ -320,7 +322,7 @@ bool Engine::Initialize(const VariantMap& parameters)
             }
         }
         else
-            LOGDEBUGF(
+            URHO3D_LOGDEBUGF(
                 "Skipped autoload path '%s' as it does not exist, check the documentation on how to set the 'resource prefix path'",
                 autoLoadPaths[i].CString());
     }
@@ -407,7 +409,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 
     frameTimer_.Reset();
 
-    LOGINFO("Initialized engine");
+    URHO3D_LOGINFO("Initialized engine");
     initialized_ = true;
     return true;
 }
@@ -542,7 +544,7 @@ void Engine::DumpProfiler()
 {
     Profiler* profiler = GetSubsystem<Profiler>();
     if (profiler)
-        LOGRAW(profiler->GetData(true, true) + "\n");
+        URHO3D_LOGRAW(profiler->PrintData(true, true) + "\n");
 }
 
 void Engine::DumpResources(bool dumpFileName)
@@ -550,43 +552,25 @@ void Engine::DumpResources(bool dumpFileName)
 #ifdef URHO3D_LOGGING
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     const HashMap<StringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
-    LOGRAW("\n");
+    URHO3D_LOGRAW("\n");
 
     if (dumpFileName)
     {
-        LOGRAW("Used resources:\n");
-    }
-
-    for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
-         i != resourceGroups.End(); ++i)
-    {
-        const HashMap<StringHash, SharedPtr<Resource> >& resources = i->second_.resources_;
-        if (dumpFileName)
+        URHO3D_LOGRAW("Used resources:\n");
+        for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
+            i != resourceGroups.End(); ++i)
         {
-            for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = resources.Begin();
-                 j != resources.End(); ++j)
+            const HashMap<StringHash, SharedPtr<Resource> >& resources = i->second_.resources_;
+            if (dumpFileName)
             {
-                LOGRAW(j->second_->GetName() + "\n");
-            }
-
-        }
-        else
-        {
-            unsigned num = resources.Size();
-            unsigned memoryUse = i->second_.memoryUse_;
-
-            if (num)
-            {
-                LOGRAW("Resource type " + resources.Begin()->second_->GetTypeName() +
-                       ": count " + String(num) + " memory use " + String(memoryUse) + "\n");
+                for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = resources.Begin();
+                    j != resources.End(); ++j)
+                    URHO3D_LOGRAW(j->second_->GetName() + "\n");
             }
         }
     }
-
-    if (!dumpFileName)
-    {
-        LOGRAW("Total memory use of all resources " + String(cache->GetTotalMemoryUse()) + "\n\n");
-    }
+    else
+        URHO3D_LOGRAW(cache->PrintMemoryUsage());
 #endif
 }
 
@@ -613,9 +597,9 @@ void Engine::DumpMemory()
         if (block->nBlockUse > 0)
         {
             if (block->szFileName)
-                LOGRAW("Block " + String((int)block->lRequest) + ": " + String(block->nDataSize) + " bytes, file " + String(block->szFileName) + " line " + String(block->nLine) + "\n");
+                URHO3D_LOGRAW("Block " + String((int)block->lRequest) + ": " + String(block->nDataSize) + " bytes, file " + String(block->szFileName) + " line " + String(block->nLine) + "\n");
             else
-                LOGRAW("Block " + String((int)block->lRequest) + ": " + String(block->nDataSize) + " bytes\n");
+                URHO3D_LOGRAW("Block " + String((int)block->lRequest) + ": " + String(block->nDataSize) + " bytes\n");
 
             total += block->nDataSize;
             ++blocks;
@@ -623,16 +607,16 @@ void Engine::DumpMemory()
         block = block->pBlockHeaderPrev;
     }
 
-    LOGRAW("Total allocated memory " + String(total) + " bytes in " + String(blocks) + " blocks\n\n");
+    URHO3D_LOGRAW("Total allocated memory " + String(total) + " bytes in " + String(blocks) + " blocks\n\n");
 #else
-    LOGRAW("DumpMemory() supported on MSVC debug mode only\n\n");
+    URHO3D_LOGRAW("DumpMemory() supported on MSVC debug mode only\n\n");
 #endif
 #endif
 }
 
 void Engine::Update()
 {
-    PROFILE(Update);
+    URHO3D_PROFILE(Update);
 
     // Logic update event
     using namespace Update;
@@ -656,7 +640,7 @@ void Engine::Render()
     if (headless_)
         return;
 
-    PROFILE(Render);
+    URHO3D_PROFILE(Render);
 
     // If device is lost, BeginFrame will fail and we skip rendering
     Graphics* graphics = GetSubsystem<Graphics>();
@@ -680,10 +664,11 @@ void Engine::ApplyFrameLimit()
 
     long long elapsed = 0;
 
+#ifndef __EMSCRIPTEN__
     // Perform waiting loop if maximum FPS set
     if (maxFps)
     {
-        PROFILE(ApplyFrameLimit);
+        URHO3D_PROFILE(ApplyFrameLimit);
 
         long long targetMax = 1000000LL / maxFps;
 
@@ -701,6 +686,7 @@ void Engine::ApplyFrameLimit()
             }
         }
     }
+#endif
 
     elapsed = frameTimer_.GetUSec(true);
 #ifdef URHO3D_TESTING
@@ -916,7 +902,7 @@ void Engine::DoExit()
         graphics->Close();
 
     exiting_ = true;
-#if defined(EMSCRIPTEN) && defined(URHO3D_TESTING)
+#if defined(__EMSCRIPTEN__) && defined(URHO3D_TESTING)
     emscripten_force_exit(EXIT_SUCCESS);    // Some how this is required to signal emrun to stop
 #endif
 }

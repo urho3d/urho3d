@@ -32,7 +32,7 @@ class Sprite2D;
 /// Static sprite component.
 class URHO3D_API StaticSprite2D : public Drawable2D
 {
-    OBJECT(StaticSprite2D);
+    URHO3D_OBJECT(StaticSprite2D, Drawable2D);
 
 public:
     /// Construct.
@@ -106,8 +106,6 @@ protected:
     virtual void OnDrawOrderChanged();
     /// Update source batches.
     virtual void UpdateSourceBatches();
-    /// Handle flip changed.
-    virtual void OnFlipChanged();
     /// Update material.
     void UpdateMaterial();
 

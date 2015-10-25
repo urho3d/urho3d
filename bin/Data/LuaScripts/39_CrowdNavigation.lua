@@ -152,7 +152,6 @@ function CreateUI()
     local instructionText = ui.root:CreateChild("Text", INSTRUCTION)
     instructionText.text = "Use WASD keys to move, RMB to rotate view\n"..
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"..
-        "CTRL+LMB to teleport main agent\n"..
         "MMB to add obstacles or remove obstacles/agents\n"..
         "F5 to save scene, F7 to load\n"..
         "Space to toggle debug geometry\n"..
@@ -438,15 +437,15 @@ function HandleCrowdAgentReposition(eventType, eventData)
 end
 
 function HandleCrowdAgentFormation(eventType, eventData)
-    local index = eventData:GetUInt("Index")
-    local size = eventData:GetUInt("Size")
-    local position = eventData:GetVector3("Position")
+    local index = eventData["Index"]:GetUInt()
+    local size = eventData["Size"]:GetUInt()
+    local position = eventData["Position"]:GetVector3()
 
     -- The first agent will always move to the exact position, all other agents will select a random point nearby
     if index > 0 then
         local crowdManager = GetEventSender()
-        local agent = eventData:GetPtr("CrowdAgent", "CrowdAgent")
-        eventData:SetVector3("Position", crowdManager:GetRandomPointInCircle(position, agent.radius, agent.queryFilterType))
+        local agent = eventData["CrowdAgent"]:GetPtr("CrowdAgent")
+        eventData["Position"] = crowdManager:GetRandomPointInCircle(position, agent.radius, agent.queryFilterType)
     end
 end
 

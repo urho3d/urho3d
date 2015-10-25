@@ -252,6 +252,8 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         }
         // Limit pitch
         character.controls.pitch = Clamp(character.controls.pitch, -80.0f, 80.0f);
+        // Set rotation already here so that it's updated every rendering frame instead of every physics frame
+        characterNode.rotation = Quaternion(character.controls.yaw, Vector3(0.0f, 1.0f, 0.0f));
 
         // Switch between 1st and 3rd person
         if (input.keyPress['F'])
@@ -278,9 +280,6 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
                 return;
         }
     }
-
-    // Set rotation already here so that it's updated every rendering frame instead of every physics frame
-    characterNode.rotation = Quaternion(character.controls.yaw, Vector3(0.0f, 1.0f, 0.0f));
 }
 
 void HandlePostUpdate(StringHash eventType, VariantMap& eventData)

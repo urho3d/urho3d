@@ -20,30 +20,25 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
+#ifdef URHO3D_ANGELSCRIPT
+#include <Urho3D/AngelScript/ScriptFile.h>
+#include <Urho3D/AngelScript/Script.h>
+#endif
+#include <Urho3D/Core/Main.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/IO/Log.h>
-#include <Urho3D/Core/Main.h>
-#include <Urho3D/Core/ProcessUtils.h>
-#include <Urho3D/Resource/ResourceCache.h>
-#include <Urho3D/Resource/ResourceEvents.h>
-
-#ifdef URHO3D_ANGELSCRIPT
-#include <Urho3D/Script/ScriptFile.h>
-#include <Urho3D/Script/Script.h>
-#endif
-
 #ifdef URHO3D_LUA
 #include <Urho3D/LuaScript/LuaScript.h>
 #endif
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Resource/ResourceEvents.h>
 
 #include "Urho3DPlayer.h"
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(Urho3DPlayer);
+URHO3D_DEFINE_APPLICATION_MAIN(Urho3DPlayer);
 
 Urho3DPlayer::Urho3DPlayer(Context* context) :
     Application(context)
@@ -147,9 +142,9 @@ void Urho3DPlayer::Start()
         if (scriptFile_ && scriptFile_->Execute("void Start()"))
         {
             // Subscribe to script's reload event to allow live-reload of the application
-            SubscribeToEvent(scriptFile_, E_RELOADSTARTED, HANDLER(Urho3DPlayer, HandleScriptReloadStarted));
-            SubscribeToEvent(scriptFile_, E_RELOADFINISHED, HANDLER(Urho3DPlayer, HandleScriptReloadFinished));
-            SubscribeToEvent(scriptFile_, E_RELOADFAILED, HANDLER(Urho3DPlayer, HandleScriptReloadFailed));
+            SubscribeToEvent(scriptFile_, E_RELOADSTARTED, URHO3D_HANDLER(Urho3DPlayer, HandleScriptReloadStarted));
+            SubscribeToEvent(scriptFile_, E_RELOADFINISHED, URHO3D_HANDLER(Urho3DPlayer, HandleScriptReloadFinished));
+            SubscribeToEvent(scriptFile_, E_RELOADFAILED, URHO3D_HANDLER(Urho3DPlayer, HandleScriptReloadFailed));
             return;
         }
 #else
@@ -194,7 +189,7 @@ void Urho3DPlayer::Stop()
     {
     }
 #endif
-    
+
 #ifdef URHO3D_LUA
     else
     {

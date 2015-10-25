@@ -20,31 +20,23 @@
 // THE SOFTWARE.
 //
 
-#include <limits.h>
-
-#define STBRP_LARGE_RECTS
-#define STB_RECT_PACK_IMPLEMENTATION
-#include "stb_rect_pack.h"
-
-#include <Urho3D/Urho3D.h>
-
 #include <Urho3D/Core/Context.h>
-#include <Urho3D/Container/Vector.h>
 #include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Core/StringUtils.h>
-#include <Urho3D/Math/MathDefs.h>
-
-#include <Urho3D/Resource/Image.h>
-#include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/IO/File.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/IO/Log.h>
+#include <Urho3D/Resource/Image.h>
 #include <Urho3D/Resource/XMLElement.h>
 #include <Urho3D/Resource/XMLFile.h>
-#include <Urho3D/IO/Log.h>
-#include <Urho3D/Math/Color.h>
 
 #ifdef WIN32
 #include <windows.h>
 #endif
+
+#define STBRP_LARGE_RECTS
+#define STB_RECT_PACK_IMPLEMENTATION
+#include "stb_rect_pack.h"
 
 #include <Urho3D/DebugNew.h>
 
@@ -80,6 +72,8 @@ public:
         y(0),
         offsetX(0),
         offsetY(0),
+        frameWidth(0),
+        frameHeight(0),
         frameX(0),
         frameY(0)
     {
@@ -180,7 +174,7 @@ void Run(Vector<String>& arguments)
     if (inputFiles.Size() > 1)
     {
         outputFile = inputFiles[inputFiles.Size() - 1];
-        LOGINFO("Output file set to " + outputFile + ".");
+        URHO3D_LOGINFO("Output file set to " + outputFile + ".");
         inputFiles.Erase(inputFiles.Size() - 1);
     }
 
@@ -194,7 +188,7 @@ void Run(Vector<String>& arguments)
     // check all input files exist
     for (unsigned i = 0; i < inputFiles.Size(); ++i)
     {
-        LOGINFO("Checking " + inputFiles[i] + " to see if file exists.");
+        URHO3D_LOGINFO("Checking " + inputFiles[i] + " to see if file exists.");
         if (!fileSystem->FileExists(inputFiles[i]))
             ErrorExit("File " + inputFiles[i] + " does not exist.");
     }
@@ -368,7 +362,7 @@ void Run(Vector<String>& arguments)
             subTexture.SetInt("offsetY", packerInfo->offsetY);
         }
 
-        LOGINFO("Transfering " + packerInfo->path + " to sprite sheet.");
+        URHO3D_LOGINFO("Transfering " + packerInfo->path + " to sprite sheet.");
 
         File file(context, packerInfo->path);
         Image image(context);
@@ -392,7 +386,7 @@ void Run(Vector<String>& arguments)
         unsigned OUTER_BOUNDS_DEBUG_COLOR = Color::BLUE.ToUInt();
         unsigned INNER_BOUNDS_DEBUG_COLOR = Color::GREEN.ToUInt();
 
-        LOGINFO("Drawing debug information.");
+        URHO3D_LOGINFO("Drawing debug information.");
         for (unsigned i = 0; i < packerInfos.Size(); ++i)
         {
             SharedPtr<PackerInfo> packerInfo = packerInfos[i];
@@ -423,10 +417,10 @@ void Run(Vector<String>& arguments)
         }
     }
 
-    LOGINFO("Saving output image.");
+    URHO3D_LOGINFO("Saving output image.");
     spriteSheetImage.SavePNG(outputFile);
 
-    LOGINFO("Saving SpriteSheet xml file.");
+    URHO3D_LOGINFO("Saving SpriteSheet xml file.");
     File spriteSheetFile(context);
     spriteSheetFile.Open(spriteSheetFileName, FILE_WRITE);
     xml.Save(spriteSheetFile);

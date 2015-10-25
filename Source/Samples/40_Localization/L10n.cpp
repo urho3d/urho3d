@@ -20,28 +20,26 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
-#include <Urho3D/Resource/Localization.h>
 #include <Urho3D/Core/CoreEvents.h>
-#include <Urho3D/UI/Window.h>
-#include <Urho3D/UI/Text.h>
-#include <Urho3D/UI/Button.h>
-#include <Urho3D/UI/Font.h>
-#include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/Graphics/Material.h>
 #include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Resource/Localization.h>
+#include <Urho3D/Resource/ResourceEvents.h>
+#include <Urho3D/UI/Button.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/Text3D.h>
 #include <Urho3D/UI/UIEvents.h>
-#include <Urho3D/Graphics/Zone.h>
-#include <Urho3D/Resource/ResourceEvents.h>
+#include <Urho3D/UI/Window.h>
 
 #include "L10n.h"
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(L10n)
+URHO3D_DEFINE_APPLICATION_MAIN(L10n)
 
 L10n::L10n(Context* context) :
     Sample(context)
@@ -75,14 +73,14 @@ void L10n::InitLocalizationSystem()
     // You can load multiple files
     l10n->LoadJSONFile("StringsDe.json");
     // Hook up to the change language
-    SubscribeToEvent(E_CHANGELANGUAGE, HANDLER(L10n, HandleChangeLanguage));
+    SubscribeToEvent(E_CHANGELANGUAGE, URHO3D_HANDLER(L10n, HandleChangeLanguage));
 }
 
 void L10n::CreateGUI()
 {
     // Get localization subsystem
     Localization* l10n = GetSubsystem<Localization>();
-    
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     UIElement* root = GetSubsystem<UI>()->GetRoot();
     root->SetDefaultStyle(cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
@@ -114,17 +112,17 @@ void L10n::CreateGUI()
     window->AddChild(b);
     b->SetStyle("Button");
     b->SetMinHeight(24);
-    
+
     Text* t = b->CreateChild<Text>("ButtonTextChangeLang");
     // The showing text value will automatically change when language is changed
     t->SetAutoLocalizable(true);
     // The text value used as a string identifier in this mode.
     // Remember that a letter case of the id and of the lang name is important.
     t->SetText("Press this button");
-    
+
     t->SetAlignment(HA_CENTER, VA_CENTER);
     t->SetStyle("Text");
-    SubscribeToEvent(b, E_RELEASED, HANDLER(L10n, HandleChangeLangButtonPressed));
+    SubscribeToEvent(b, E_RELEASED, URHO3D_HANDLER(L10n, HandleChangeLangButtonPressed));
 
     b = new Button(context_);
     window->AddChild(b);
@@ -133,11 +131,11 @@ void L10n::CreateGUI()
     t = b->CreateChild<Text>("ButtonTextQuit");
     t->SetAlignment(HA_CENTER, VA_CENTER);
     t->SetStyle("Text");
-    
+
     // Manually set text in the current language
     t->SetText(l10n->Get("quit"));
-    
-    SubscribeToEvent(b, E_RELEASED, HANDLER(L10n, HandleQuitButtonPressed));
+
+    SubscribeToEvent(b, E_RELEASED, URHO3D_HANDLER(L10n, HandleQuitButtonPressed));
 }
 
 void L10n::CreateScene()
@@ -148,7 +146,7 @@ void L10n::CreateScene()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     scene_ = new Scene(context_);
     scene_->CreateComponent<Octree>();
-    
+
     Zone* zone = scene_->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetAmbientColor(Color(0.5f, 0.5f, 0.5f));
@@ -188,7 +186,7 @@ void L10n::CreateScene()
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
     renderer->SetViewport(0, viewport);
 
-    SubscribeToEvent(E_UPDATE, HANDLER(L10n, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(L10n, HandleUpdate));
 }
 
 void L10n::HandleUpdate(StringHash eventType, VariantMap& eventData)

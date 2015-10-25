@@ -37,7 +37,7 @@ namespace Urho3D
 ///     - Handling keyboard to move and zoom 2D camera
 class Urho2DTileMap : public Sample
 {
-    OBJECT(Urho2DTileMap);
+    URHO3D_OBJECT(Urho2DTileMap, Sample);
 
 public:
     /// Construct.

@@ -349,7 +349,7 @@ void Texture::UpdateParameters()
     graphics_->GetImpl()->GetDevice()->CreateSamplerState(&samplerDesc, (ID3D11SamplerState**)&sampler_);
 
     if (!sampler_)
-        LOGERROR("Failed to create sampler state");
+        URHO3D_LOGERROR("Failed to create sampler state");
 
     parametersDirty_ = false;
 }
@@ -429,8 +429,8 @@ unsigned Texture::GetSRGBFormat(unsigned format)
 void Texture::CheckTextureBudget(StringHash type)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    unsigned textureBudget = cache->GetMemoryBudget(type);
-    unsigned textureUse = cache->GetMemoryUse(type);
+    unsigned long long textureBudget = cache->GetMemoryBudget(type);
+    unsigned long long textureUse = cache->GetMemoryUse(type);
     if (!textureBudget)
         return;
 

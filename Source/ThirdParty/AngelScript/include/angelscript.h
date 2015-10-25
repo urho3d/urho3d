@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -59,8 +59,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        22901
-#define ANGELSCRIPT_VERSION_STRING "2.29.1 WIP"
+#define ANGELSCRIPT_VERSION        23002
+#define ANGELSCRIPT_VERSION_STRING "2.30.2"
 
 // Data types
 
@@ -108,7 +108,8 @@ enum asERetCodes
 	asWRONG_CALLING_CONV                   = -24,
 	asBUILD_IN_PROGRESS                    = -25,
 	asINIT_GLOBAL_VARS_FAILED              = -26,
-	asOUT_OF_MEMORY                        = -27
+	asOUT_OF_MEMORY                        = -27,
+	asMODULE_IS_IN_USE                     = -28
 };
 
 // Engine properties
@@ -135,6 +136,9 @@ enum asEEngineProp
 	asEP_COMPILER_WARNINGS                  = 19,
 	asEP_DISALLOW_VALUE_ASSIGN_FOR_REF_TYPE = 20,
 	asEP_ALTER_SYNTAX_NAMED_ARGS            = 21,
+	asEP_DISABLE_INTEGER_DIVISION           = 22,
+	asEP_DISALLOW_EMPTY_LIST_ELEMENTS       = 23,
+	asEP_PRIVATE_PROP_AS_PROTECTED          = 24,
 
 	asEP_LAST_PROPERTY
 };
@@ -191,18 +195,19 @@ enum asEObjTypeFlags
 	asOBJ_APP_CLASS_ALLFLOATS        = (1<<17),
 	asOBJ_NOCOUNT                    = (1<<18),
 	asOBJ_APP_CLASS_ALIGN8           = (1<<19),
-	asOBJ_MASK_VALID_FLAGS           = 0x0FFFFF,
+	asOBJ_IMPLICIT_HANDLE            = (1<<20),
+	asOBJ_MASK_VALID_FLAGS           = 0x1FFFFF,
 	// Internal flags
-	asOBJ_SCRIPT_OBJECT              = (1<<20),
-	asOBJ_SHARED                     = (1<<21),
-	asOBJ_NOINHERIT                  = (1<<22),
-	asOBJ_SCRIPT_FUNCTION            = (1<<23),
-	asOBJ_IMPLICIT_HANDLE            = (1<<24),
+	asOBJ_SCRIPT_OBJECT              = (1<<21),
+	asOBJ_SHARED                     = (1<<22),
+	asOBJ_NOINHERIT                  = (1<<23),
+	asOBJ_SCRIPT_FUNCTION            = (1<<24),
 	asOBJ_LIST_PATTERN               = (1<<25),
 	asOBJ_ENUM                       = (1<<26),
 	asOBJ_TEMPLATE_SUBTYPE           = (1<<27),
 	asOBJ_TYPEDEF                    = (1<<28),
-	asOBJ_ABSTRACT                   = (1<<29)
+	asOBJ_ABSTRACT                   = (1<<29),
+	asOBJ_APP_ALIGN16                = (1<<30)
 };
 
 // Behaviours
@@ -221,10 +226,14 @@ enum asEBehaviours
 	asBEHAVE_GET_WEAKREF_FLAG,
 
 	// Object operators
+#ifdef AS_DEPRECATED
+	// Deprecated since 2.30.0, 2014-10-24
 	asBEHAVE_VALUE_CAST,
 	asBEHAVE_IMPLICIT_VALUE_CAST,
+	// Deprecated since 2.30.0, 2014-12-30
 	asBEHAVE_REF_CAST,
 	asBEHAVE_IMPLICIT_REF_CAST,
+#endif
 	asBEHAVE_TEMPLATE_CALLBACK,
 
 	// Garbage collection behaviours
@@ -365,7 +374,7 @@ typedef unsigned int   asUINT;
     typedef long asINT64;
 #else
     typedef unsigned long asDWORD;
-  #if defined(__GNUC__) || defined(__MWERKS__) || defined(__SUNPRO_CC)
+  #if defined(__GNUC__) || defined(__MWERKS__) || defined(__SUNPRO_CC) || defined(__psp2__)
     typedef uint64_t asQWORD;
     typedef int64_t asINT64;
   #else
@@ -390,6 +399,7 @@ typedef void (*asCLEANMODULEFUNC_t)(asIScriptModule *);
 typedef void (*asCLEANCONTEXTFUNC_t)(asIScriptContext *);
 typedef void (*asCLEANFUNCTIONFUNC_t)(asIScriptFunction *);
 typedef void (*asCLEANOBJECTTYPEFUNC_t)(asIObjectType *);
+typedef void (*asCLEANSCRIPTOBJECTFUNC_t)(asIScriptObject *);
 typedef asIScriptContext *(*asREQUESTCONTEXTFUNC_t)(asIScriptEngine *, void *);
 typedef void (*asRETURNCONTEXTFUNC_t)(asIScriptEngine *, asIScriptContext *, void *);
 
@@ -447,7 +457,7 @@ struct asSFuncPtr
 		// The largest known method point is 20 bytes (MSVC 64bit),
 		// but with 8byte alignment this becomes 24 bytes. So we need
 		// to be able to store at least that much.
-		char dummy[25]; 
+		char dummy[25];
 		struct {asMETHOD_t   mthd; char dummy[25-sizeof(asMETHOD_t)];} m;
 		struct {asFUNCTION_t func; char dummy[25-sizeof(asFUNCTION_t)];} f;
 	} ptr;
@@ -523,7 +533,7 @@ struct asSMessageInfo
   #else // statically linked library
     #define AS_API
   #endif
-#elif defined(__GNUC__) 
+#elif defined(__GNUC__)
   #if defined(ANGELSCRIPT_EXPORT)
     #define AS_API __attribute__((visibility ("default")))
   #else
@@ -537,7 +547,7 @@ struct asSMessageInfo
 extern "C"
 {
 	// Engine
-	AS_API asIScriptEngine *asCreateScriptEngine(asDWORD version);
+	AS_API asIScriptEngine *asCreateScriptEngine(asDWORD version = ANGELSCRIPT_VERSION);
 	AS_API const char      *asGetLibraryVersion();
 	AS_API const char      *asGetLibraryOptions();
 
@@ -578,25 +588,40 @@ BEGIN_AS_NAMESPACE
 template<typename T>
 asUINT asGetTypeTraits()
 {
-	bool hasConstructor =  std::is_default_constructible<T>::value && !std::has_trivial_default_constructor<T>::value;
-#if defined(__GNUC__) && __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8) 
-	// http://stackoverflow.com/questions/12702103/writing-code-that-works-when-has-trivial-destructor-is-defined-instead-of-is
-	bool hasDestructor = std::is_destructible<T>::value && !std::is_trivially_destructible<T>::value;
+#if defined(_MSC_VER) || defined(_LIBCPP_TYPE_TRAITS) || (__GNUC__ >= 5)
+	// MSVC, XCode/Clang, and gnuc 5+
+	// C++11 compliant code
+	bool hasConstructor        = std::is_default_constructible<T>::value && !std::is_trivially_default_constructible<T>::value;
+	bool hasDestructor         = std::is_destructible<T>::value          && !std::is_trivially_destructible<T>::value;
+	bool hasAssignmentOperator = std::is_copy_assignable<T>::value       && !std::is_trivially_copy_assignable<T>::value;
+	bool hasCopyConstructor    = std::is_copy_constructible<T>::value    && !std::is_trivially_copy_constructible<T>::value;
+#elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))
+	// gnuc 4.8 is using a mix of C++11 standard and pre-standard templates
+	bool hasConstructor        = std::is_default_constructible<T>::value && !std::has_trivial_default_constructor<T>::value;
+	bool hasDestructor         = std::is_destructible<T>::value          && !std::is_trivially_destructible<T>::value;
+	bool hasAssignmentOperator = std::is_copy_assignable<T>::value       && !std::has_trivial_copy_assign<T>::value;
+	bool hasCopyConstructor    = std::is_copy_constructible<T>::value    && !std::has_trivial_copy_constructor<T>::value;
 #else
-	bool hasDestructor = std::is_destructible<T>::value && !std::has_trivial_destructor<T>::value;
+	// All other compilers and versions are assumed to use non C++11 compliant code until proven otherwise
+	// Not fully C++11 compliant. The has_trivial checks were used while the standard was still
+	// being elaborated, but were then removed in favor of the above is_trivially checks
+	// http://stackoverflow.com/questions/12702103/writing-code-that-works-when-has-trivial-destructor-is-defined-instead-of-is
+	// https://github.com/mozart/mozart2/issues/51
+	bool hasConstructor        = std::is_default_constructible<T>::value && !std::has_trivial_default_constructor<T>::value;
+	bool hasDestructor         = std::is_destructible<T>::value          && !std::has_trivial_destructor<T>::value;
+	bool hasAssignmentOperator = std::is_copy_assignable<T>::value       && !std::has_trivial_copy_assign<T>::value;
+	bool hasCopyConstructor    = std::is_copy_constructible<T>::value    && !std::has_trivial_copy_constructor<T>::value;
 #endif
-	bool hasAssignmentOperator = std::is_copy_assignable<T>::value && !std::has_trivial_copy_assign<T>::value;
-	bool hasCopyConstructor = std::is_copy_constructible<T>::value && !std::has_trivial_copy_constructor<T>::value;
-	bool isFloat = std::is_floating_point<T>::value;
+	bool isFloat     = std::is_floating_point<T>::value;
 	bool isPrimitive = std::is_integral<T>::value || std::is_pointer<T>::value || std::is_enum<T>::value;
-	bool isClass = std::is_class<T>::value;
-	bool isArray = std::is_array<T>::value;
+	bool isClass     = std::is_class<T>::value;
+	bool isArray     = std::is_array<T>::value;
 
 	if( isFloat )
 		return asOBJ_APP_FLOAT;
 	if( isPrimitive )
 		return asOBJ_APP_PRIMITIVE;
-	
+
 	if( isClass )
 	{
 		asDWORD flags = asOBJ_APP_CLASS;
@@ -628,6 +653,7 @@ public:
 	// Memory management
 	virtual int AddRef() const = 0;
 	virtual int Release() const = 0;
+	virtual int ShutDownAndRelease() = 0;
 
 	// Engine properties
 	virtual int     SetEngineProperty(asEEngineProp property, asPWORD value) = 0;
@@ -723,10 +749,14 @@ public:
 	virtual void                  *CreateScriptObjectCopy(void *obj, const asIObjectType *type) = 0;
 	virtual void                  *CreateUninitializedScriptObject(const asIObjectType *type) = 0;
 	virtual asIScriptFunction     *CreateDelegate(asIScriptFunction *func, void *obj) = 0;
-	virtual void                   AssignScriptObject(void *dstObj, void *srcObj, const asIObjectType *type) = 0;
+	virtual int                    AssignScriptObject(void *dstObj, void *srcObj, const asIObjectType *type) = 0;
 	virtual void                   ReleaseScriptObject(void *obj, const asIObjectType *type) = 0;
 	virtual void                   AddRefScriptObject(void *obj, const asIObjectType *type) = 0;
+	virtual int                    RefCastObject(void *obj, asIObjectType *fromType, asIObjectType *toType, void **newPtr, bool useOnlyImplicitCast = false) = 0;
+#ifdef AS_DEPRECATED
+	// Deprecated since 2.30.0, 2014-11-04
 	virtual bool                   IsHandleCompatibleWithObject(void *obj, int objTypeId, int handleTypeId) const = 0;
+#endif
 	virtual asILockableSharedBool *GetWeakRefFlagOfScriptObject(void *obj, const asIObjectType *type) const = 0;
 
 	// Context pooling
@@ -735,7 +765,7 @@ public:
 	virtual int                    SetContextCallbacks(asREQUESTCONTEXTFUNC_t requestCtx, asRETURNCONTEXTFUNC_t returnCtx, void *param = 0) = 0;
 
 	// String interpretation
-	virtual asETokenClass ParseToken(const char *string, size_t stringLength = 0, int *tokenLength = 0) const = 0;
+	virtual asETokenClass ParseToken(const char *string, size_t stringLength = 0, asUINT *tokenLength = 0) const = 0;
 
 	// Garbage collection
 	virtual int  GarbageCollect(asDWORD flags = asGC_FULL_CYCLE, asUINT numIterations = 1) = 0;
@@ -752,6 +782,7 @@ public:
 	virtual void  SetContextUserDataCleanupCallback(asCLEANCONTEXTFUNC_t callback, asPWORD type = 0) = 0;
 	virtual void  SetFunctionUserDataCleanupCallback(asCLEANFUNCTIONFUNC_t callback, asPWORD type = 0) = 0;
 	virtual void  SetObjectTypeUserDataCleanupCallback(asCLEANOBJECTTYPEFUNC_t callback, asPWORD type = 0) = 0;
+	virtual void  SetScriptObjectUserDataCleanupCallback(asCLEANSCRIPTOBJECTFUNC_t callback, asPWORD type = 0) = 0;
 
 protected:
 	virtual ~asIScriptEngine() {}
@@ -824,7 +855,7 @@ public:
 	virtual int         BindAllImportedFunctions() = 0;
 	virtual int         UnbindAllImportedFunctions() = 0;
 
-	// Bytecode saving and loading
+	// Byte code saving and loading
 	virtual int SaveByteCode(asIBinaryStream *out, bool stripDebugInfo = false) const = 0;
 	virtual int LoadByteCode(asIBinaryStream *in, bool *wasDebugInfoStripped = 0) = 0;
 
@@ -869,6 +900,7 @@ public:
 	virtual int   SetArgDouble(asUINT arg, double value) = 0;
 	virtual int   SetArgAddress(asUINT arg, void *addr) = 0;
 	virtual int   SetArgObject(asUINT arg, void *obj) = 0;
+	virtual int   SetArgVarType(asUINT arg, void *ptr, int typeId) = 0;
 	virtual void *GetAddressOfArg(asUINT arg) = 0;
 
 	// Return value
@@ -958,8 +990,9 @@ class asIScriptObject
 {
 public:
 	// Memory management
-	virtual int AddRef() const = 0;
-	virtual int Release() const = 0;
+	virtual int                    AddRef() const = 0;
+	virtual int                    Release() const = 0;
+	virtual asILockableSharedBool *GetWeakRefFlag() const = 0;
 
 	// Type info
 	virtual int            GetTypeId() const = 0;
@@ -971,12 +1004,13 @@ public:
 	virtual const char *GetPropertyName(asUINT prop) const = 0;
 	virtual void       *GetAddressOfProperty(asUINT prop) = 0;
 
+	// Miscellaneous
 	virtual asIScriptEngine *GetEngine() const = 0;
 	virtual int              CopyFrom(asIScriptObject *other) = 0;
 
-	// Urho3D: added userdata
-	virtual void *SetUserData(void *data) = 0;
-	virtual void *GetUserData() const = 0;
+	// User data
+	virtual void *SetUserData(void *data, asPWORD type = 0) = 0;
+	virtual void *GetUserData(asPWORD type = 0) const = 0;
 
 protected:
 	virtual ~asIScriptObject() {}
@@ -985,6 +1019,7 @@ protected:
 class asIObjectType
 {
 public:
+	// Miscellaneous
 	virtual asIScriptEngine *GetEngine() const = 0;
 	virtual const char      *GetConfigGroup() const = 0;
 	virtual asDWORD          GetAccessMask() const = 0;
@@ -1024,7 +1059,7 @@ public:
 
 	// Properties
 	virtual asUINT      GetPropertyCount() const = 0;
-	virtual int         GetProperty(asUINT index, const char **name, int *typeId = 0, bool *isPrivate = 0, int *offset = 0, bool *isReference = 0, asDWORD *accessMask = 0) const = 0;
+	virtual int         GetProperty(asUINT index, const char **name, int *typeId = 0, bool *isPrivate = 0, bool *isProtected = 0, int *offset = 0, bool *isReference = 0, asDWORD *accessMask = 0) const = 0;
 	virtual const char *GetPropertyDeclaration(asUINT index, bool includeNamespace = false) const = 0;
 
 	// Behaviours
@@ -1065,6 +1100,7 @@ public:
 	virtual const char      *GetDeclaration(bool includeObjectName = true, bool includeNamespace = false, bool includeParamNames = false) const = 0;
 	virtual bool             IsReadOnly() const = 0;
 	virtual bool             IsPrivate() const = 0;
+	virtual bool             IsProtected() const = 0;
 	virtual bool             IsFinal() const = 0;
 	virtual bool             IsOverride() const = 0;
 	virtual bool             IsShared() const = 0;
@@ -1076,7 +1112,7 @@ public:
 #endif
 	virtual int              GetReturnTypeId(asDWORD *flags = 0) const = 0;
 
-	// Type id for function pointers 
+	// Type id for function pointers
 	virtual int              GetTypeId() const = 0;
 	virtual bool             IsCompatibleWithTypeId(int typeId) const = 0;
 
@@ -1122,7 +1158,7 @@ public:
 	// Value
 	virtual bool Get() const = 0;
 	virtual void Set(bool val) = 0;
-	
+
 	// Thread management
 	virtual void Lock() const = 0;
 	virtual void Unlock() const = 0;
@@ -1143,7 +1179,7 @@ inline asSFuncPtr asFunctionPtr(T func)
 	asSFuncPtr p(2);
 
 #ifdef AS_64BIT_PTR
-	// The size_t cast is to avoid a compiler warning with asFUNCTION(0) 
+	// The size_t cast is to avoid a compiler warning with asFUNCTION(0)
 	// on 64bit, as 0 is interpreted as a 32bit int value
 	p.ptr.f.func = reinterpret_cast<asFUNCTION_t>(size_t(func));
 #else
@@ -1239,9 +1275,9 @@ struct asSMethodPtr<SINGLE_PTR_SIZE+2*sizeof(int)>
 
 #if defined(_MSC_VER) && !defined(AS_64BIT_PTR)
 			// Method pointers for virtual inheritance is not supported,
-			// as it requires the location of the vbase table, which is 
+			// as it requires the location of the vbase table, which is
 			// only available to the C++ compiler, but not in the method
-			// pointer. 
+			// pointer.
 
 			// You can get around this by forward declaring the class and
 			// storing the sizeof its method pointer in a constant. Example:
@@ -1524,8 +1560,8 @@ enum asEBCInstr
 	asBC_POWdi			= 197,
 	asBC_POWi64			= 198,
 	asBC_POWu64			= 199,
-
-	asBC_MAXBYTECODE	= 200,
+	asBC_Thiscall1		= 200,
+	asBC_MAXBYTECODE	= 201,
 
 	// Temporary tokens. Can't be output to the final program
 	asBC_VarDecl		= 251,
@@ -1819,8 +1855,8 @@ const asSBCInfo asBCInfo[256] =
 	asBCINFO(POWdi,		wW_rW_rW_ARG,	0),
 	asBCINFO(POWi64,	wW_rW_rW_ARG,	0),
 	asBCINFO(POWu64,	wW_rW_rW_ARG,	0),
+	asBCINFO(Thiscall1, DW_ARG,			-AS_PTR_SIZE-1),
 
-	asBCINFO_DUMMY(200),
 	asBCINFO_DUMMY(201),
 	asBCINFO_DUMMY(202),
 	asBCINFO_DUMMY(203),

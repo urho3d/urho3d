@@ -28,6 +28,7 @@
 #include "../Engine/Engine.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Renderer.h"
+#include "../Resource/ResourceCache.h"
 #include "../IO/Log.h"
 #include "../UI/Font.h"
 #include "../UI/Text.h"
@@ -81,7 +82,13 @@ DebugHud::DebugHud(Context* context) :
     profilerText_->SetVisible(false);
     uiRoot->AddChild(profilerText_);
 
-    SubscribeToEvent(E_POSTUPDATE, HANDLER(DebugHud, HandlePostUpdate));
+    memoryText_ = new Text(context_);
+    memoryText_->SetAlignment(HA_RIGHT, VA_TOP);
+    memoryText_->SetPriority(100);
+    memoryText_->SetVisible(false);
+    uiRoot->AddChild(memoryText_);
+
+    SubscribeToEvent(E_POSTUPDATE, URHO3D_HANDLER(DebugHud, HandlePostUpdate));
 }
 
 DebugHud::~DebugHud()
@@ -89,6 +96,7 @@ DebugHud::~DebugHud()
     statsText_->Remove();
     modeText_->Remove();
     profilerText_->Remove();
+    memoryText_->Remove();
 }
 
 void DebugHud::Update()
@@ -167,12 +175,18 @@ void DebugHud::Update()
 
             if (profilerText_->IsVisible())
             {
-                String profilerOutput = profiler->GetData(false, false, profilerMaxDepth_);
+                String profilerOutput = profiler->PrintData(false, false, profilerMaxDepth_);
                 profilerText_->SetText(profilerOutput);
             }
 
             profiler->BeginInterval();
         }
+    }
+
+    if (memoryText_->IsVisible())
+    {
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        memoryText_->SetText(cache->PrintMemoryUsage());
     }
 }
 
@@ -187,6 +201,8 @@ void DebugHud::SetDefaultStyle(XMLFile* style)
     modeText_->SetStyle("DebugHudText");
     profilerText_->SetDefaultStyle(style);
     profilerText_->SetStyle("DebugHudText");
+    memoryText_->SetDefaultStyle(style);
+    memoryText_->SetStyle("DebugHudText");
 }
 
 void DebugHud::SetMode(unsigned mode)
@@ -194,6 +210,7 @@ void DebugHud::SetMode(unsigned mode)
     statsText_->SetVisible((mode & DEBUGHUD_SHOW_STATS) != 0);
     modeText_->SetVisible((mode & DEBUGHUD_SHOW_MODE) != 0);
     profilerText_->SetVisible((mode & DEBUGHUD_SHOW_PROFILER) != 0);
+    memoryText_->SetVisible((mode & DEBUGHUD_SHOW_MEMORY) != 0);
 
     mode_ = mode;
 }

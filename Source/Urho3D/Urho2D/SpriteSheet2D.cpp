@@ -67,7 +67,7 @@ bool SpriteSheet2D::BeginLoad(Deserializer& source)
     if (extension == ".xml")
         return BeginLoadFromXMLFile(source);
 
-    LOGERROR("Unsupported file type");
+    URHO3D_LOGERROR("Unsupported file type");
     return false;
 }
 
@@ -115,7 +115,7 @@ bool SpriteSheet2D::BeginLoadFromPListFile(Deserializer& source)
     loadPListFile_ = new PListFile(context_);
     if (!loadPListFile_->Load(source))
     {
-        LOGERROR("Could not load sprite sheet");
+        URHO3D_LOGERROR("Could not load sprite sheet");
         loadPListFile_.Reset();
         return false;
     }
@@ -140,7 +140,7 @@ bool SpriteSheet2D::EndLoadFromPListFile()
     texture_ = cache->GetResource<Texture2D>(loadTextureName_);
     if (!texture_)
     {
-        LOGERROR("Could not load texture " + loadTextureName_);
+        URHO3D_LOGERROR("Could not load texture " + loadTextureName_);
         loadXMLFile_.Reset();
         loadTextureName_.Clear();
         return false;
@@ -155,7 +155,7 @@ bool SpriteSheet2D::EndLoadFromPListFile()
         const PListValueMap& frameInfo = i->second_.GetValueMap();
         if (frameInfo["rotated"]->GetBool())
         {
-            LOGWARNING("Rotated sprite is not support now");
+            URHO3D_LOGWARNING("Rotated sprite is not support now");
             continue;
         }
 
@@ -187,7 +187,7 @@ bool SpriteSheet2D::BeginLoadFromXMLFile(Deserializer& source)
     loadXMLFile_ = new XMLFile(context_);
     if (!loadXMLFile_->Load(source))
     {
-        LOGERROR("Could not load sprite sheet");
+        URHO3D_LOGERROR("Could not load sprite sheet");
         loadXMLFile_.Reset();
         return false;
     }
@@ -197,7 +197,7 @@ bool SpriteSheet2D::BeginLoadFromXMLFile(Deserializer& source)
     XMLElement rootElem = loadXMLFile_->GetRoot("TextureAtlas");
     if (!rootElem)
     {
-        LOGERROR("Invalid sprite sheet");
+        URHO3D_LOGERROR("Invalid sprite sheet");
         loadXMLFile_.Reset();
         return false;
     }
@@ -216,7 +216,7 @@ bool SpriteSheet2D::EndLoadFromXMLFile()
     texture_ = cache->GetResource<Texture2D>(loadTextureName_);
     if (!texture_)
     {
-        LOGERROR("Could not load texture " + loadTextureName_);
+        URHO3D_LOGERROR("Could not load texture " + loadTextureName_);
         loadXMLFile_.Reset();
         loadTextureName_.Clear();
         return false;

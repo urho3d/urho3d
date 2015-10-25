@@ -33,7 +33,7 @@ class Texture2D;
 /// Sprite.
 class URHO3D_API Sprite2D : public Resource
 {
-    OBJECT(Sprite2D);
+    URHO3D_OBJECT(Sprite2D, Resource);
 
 public:
     /// Construct.

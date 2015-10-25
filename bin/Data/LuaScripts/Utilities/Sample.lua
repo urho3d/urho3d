@@ -18,6 +18,7 @@ cameraNode = nil -- Camera scene node
 yaw = 0 -- Camera yaw angle
 pitch = 0 -- Camera pitch angle
 TOUCH_SENSITIVITY = 2
+debugHudMode = 0
 
 function SampleStart()
     if GetPlatform() == "Android" or GetPlatform() == "iOS" or input.touchEmulation then
@@ -135,7 +136,17 @@ function HandleKeyDown(eventType, eventData)
         console:Toggle()
 
     elseif key == KEY_F2 then
-        debugHud:ToggleAll()
+        if debugHud:GetMode() == DEBUGHUD_SHOW_ALL_MEMORY or debugHud:GetMode() == 0 then
+            debugHud:SetMode(DEBUGHUD_SHOW_ALL)
+        else
+            debugHud:SetMode(0)
+        end
+    elseif key == KEY_F3 then
+        if debugHud:GetMode() == DEBUGHUD_SHOW_ALL or debugHud:GetMode() == 0 then
+            debugHud:SetMode(DEBUGHUD_SHOW_ALL_MEMORY)
+        else
+            debugHud:SetMode(0)
+        end
     end
 
     if ui.focusElement == nil then

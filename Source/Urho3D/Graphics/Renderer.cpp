@@ -284,7 +284,7 @@ Renderer::Renderer(Context* context) :
     initialized_(false),
     resetViews_(false)
 {
-    SubscribeToEvent(E_SCREENMODE, HANDLER(Renderer, HandleScreenMode));
+    SubscribeToEvent(E_SCREENMODE, URHO3D_HANDLER(Renderer, HandleScreenMode));
 
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
@@ -495,8 +495,12 @@ unsigned Renderer::GetNumGeometries(bool allViews) const
 
     for (unsigned i = 0; i < lastView; ++i)
     {
-        if (views_[i])
-            numGeometries += views_[i]->GetGeometries().Size();
+        // Use the source view's statistics if applicable
+        View* view = GetActualView(views_[i]);
+        if (!view)
+            continue;
+
+        numGeometries += view->GetGeometries().Size();
     }
 
     return numGeometries;
@@ -509,8 +513,11 @@ unsigned Renderer::GetNumLights(bool allViews) const
 
     for (unsigned i = 0; i < lastView; ++i)
     {
-        if (views_[i])
-            numLights += views_[i]->GetLights().Size();
+        View* view = GetActualView(views_[i]);
+        if (!view)
+            continue;
+
+        numLights += view->GetLights().Size();
     }
 
     return numLights;
@@ -523,11 +530,11 @@ unsigned Renderer::GetNumShadowMaps(bool allViews) const
 
     for (unsigned i = 0; i < lastView; ++i)
     {
-        if (!views_[i])
+        View* view = GetActualView(views_[i]);
+        if (!view)
             continue;
 
-        const Vector<LightBatchQueue>& lightQueues = views_[i]->GetLightQueues();
-
+        const Vector<LightBatchQueue>& lightQueues = view->GetLightQueues();
         for (Vector<LightBatchQueue>::ConstIterator i = lightQueues.Begin(); i != lightQueues.End(); ++i)
         {
             if (i->shadowMap_)
@@ -545,8 +552,11 @@ unsigned Renderer::GetNumOccluders(bool allViews) const
 
     for (unsigned i = 0; i < lastView; ++i)
     {
-        if (views_[i])
-            numOccluders += views_[i]->GetOccluders().Size();
+        View* view = GetActualView(views_[i]);
+        if (!view)
+            continue;
+
+        numOccluders += view->GetOccluders().Size();
     }
 
     return numOccluders;
@@ -554,9 +564,10 @@ unsigned Renderer::GetNumOccluders(bool allViews) const
 
 void Renderer::Update(float timeStep)
 {
-    PROFILE(UpdateViews);
+    URHO3D_PROFILE(UpdateViews);
 
     views_.Clear();
+    preparedViews_.Clear();
 
     // If device lost, do not perform update. This is because any dynamic vertex/index buffer updates happen already here,
     // and if the device is lost, the updates queue up, causing memory use to rise constantly
@@ -652,7 +663,7 @@ void Renderer::Render()
     // Engine does not render when window is closed or device is lost
     assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
 
-    PROFILE(RenderViews);
+    URHO3D_PROFILE(RenderViews);
 
     // If the indirection textures have lost content (OpenGL mode only), restore them now
     if (faceSelectCubeMap_ && faceSelectCubeMap_->IsDataLost())
@@ -713,7 +724,7 @@ void Renderer::Render()
 
 void Renderer::DrawDebugGeometry(bool depthTest)
 {
-    PROFILE(RendererDrawDebug);
+    URHO3D_PROFILE(RendererDrawDebug);
 
     /// \todo Because debug geometry is per-scene, if two cameras show views of the same area, occlusion is not shown correctly
     HashSet<Drawable*> processedGeometries;
@@ -999,7 +1010,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool 
         newBuffer->ResetUseTimer();
         screenBuffers_[searchKey].Push(newBuffer);
 
-        LOGDEBUG("Allocated new screen buffer size " + String(width) + "x" + String(height) + " format " + String(format));
+        URHO3D_LOGDEBUG("Allocated new screen buffer size " + String(width) + "x" + String(height) + " format " + String(format));
         return newBuffer;
     }
     else
@@ -1060,6 +1071,26 @@ Camera* Renderer::GetShadowCamera()
     camera->SetZoom(1.0f);
 
     return camera;
+}
+
+void Renderer::StorePreparedView(View* view, Camera* camera)
+{
+    if (view && camera)
+        preparedViews_[camera] = view;
+}
+
+View* Renderer::GetPreparedView(Camera* camera)
+{
+    HashMap<Camera*, WeakPtr<View> >::Iterator i = preparedViews_.Find(camera);
+    return i != preparedViews_.End() ? i->second_ : (View*)0;
+}
+
+View* Renderer::GetActualView(View* view)
+{
+    if (view && view->GetSourceView())
+        return view->GetSourceView();
+    else
+        return view;
 }
 
 void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
@@ -1167,12 +1198,12 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
         if (!shaderErrorDisplayed_.Contains(tech))
         {
             shaderErrorDisplayed_.Insert(tech);
-            LOGERROR("Technique " + tech->GetName() + " has missing shaders");
+            URHO3D_LOGERROR("Technique " + tech->GetName() + " has missing shaders");
         }
     }
 }
 
-void Renderer::SetLightVolumeBatchShaders(Batch& batch, const String& vsName, const String& psName, const String& vsDefines,
+void Renderer::SetLightVolumeBatchShaders(Batch& batch, Camera* camera, const String& vsName, const String& psName, const String& vsDefines,
     const String& psDefines)
 {
     assert(deferredLightPSVariations_.Size());
@@ -1205,7 +1236,7 @@ void Renderer::SetLightVolumeBatchShaders(Batch& batch, const String& vsName, co
     if (specularLighting_ && light->GetSpecularIntensity() > 0.0f)
         psi += DLPS_SPEC;
 
-    if (batch.camera_->IsOrthographic())
+    if (camera->IsOrthographic())
     {
         vsi += DLVS_ORTHO;
         psi += DLPS_ORTHO;
@@ -1251,13 +1282,13 @@ bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
 
     if (!instancingBuffer_->SetSize(newSize, INSTANCING_BUFFER_MASK, true))
     {
-        LOGERROR("Failed to resize instancing buffer to " + String(newSize));
+        URHO3D_LOGERROR("Failed to resize instancing buffer to " + String(newSize));
         // If failed, try to restore the old size
         instancingBuffer_->SetSize(oldSize, INSTANCING_BUFFER_MASK, true);
         return false;
     }
 
-    LOGDEBUG("Resized instancing buffer to " + String(newSize));
+    URHO3D_LOGDEBUG("Resized instancing buffer to " + String(newSize));
     return true;
 }
 
@@ -1386,7 +1417,7 @@ void Renderer::RemoveUnusedBuffers()
     {
         if (occlusionBuffers_[i]->GetUseTimer() > MAX_BUFFER_AGE)
         {
-            LOGDEBUG("Removed unused occlusion buffer");
+            URHO3D_LOGDEBUG("Removed unused occlusion buffer");
             occlusionBuffers_.Erase(i);
         }
     }
@@ -1400,7 +1431,7 @@ void Renderer::RemoveUnusedBuffers()
             Texture* buffer = buffers[j];
             if (buffer->GetUseTimer() > MAX_BUFFER_AGE)
             {
-                LOGDEBUG("Removed unused screen buffer size " + String(buffer->GetWidth()) + "x" + String(buffer->GetHeight()) +
+                URHO3D_LOGDEBUG("Removed unused screen buffer size " + String(buffer->GetWidth()) + "x" + String(buffer->GetHeight()) +
                          " format " + String(buffer->GetFormat()));
                 buffers.Erase(j);
             }
@@ -1433,7 +1464,7 @@ void Renderer::Initialize()
     if (!graphics || !graphics->IsInitialized() || !cache)
         return;
 
-    PROFILE(InitRenderer);
+    URHO3D_PROFILE(InitRenderer);
 
     graphics_ = graphics;
 
@@ -1459,14 +1490,14 @@ void Renderer::Initialize()
     shadersDirty_ = true;
     initialized_ = true;
 
-    SubscribeToEvent(E_RENDERUPDATE, HANDLER(Renderer, HandleRenderUpdate));
+    SubscribeToEvent(E_RENDERUPDATE, URHO3D_HANDLER(Renderer, HandleRenderUpdate));
 
-    LOGINFO("Initialized renderer");
+    URHO3D_LOGINFO("Initialized renderer");
 }
 
 void Renderer::LoadShaders()
 {
-    LOGDEBUG("Reloading shaders");
+    URHO3D_LOGDEBUG("Reloading shaders");
 
     // Release old material shaders, mark them for reload
     ReleaseMaterialShaders();
@@ -1489,7 +1520,7 @@ void Renderer::LoadShaders()
 
 void Renderer::LoadPassShaders(Pass* pass)
 {
-    PROFILE(LoadPassShaders);
+    URHO3D_PROFILE(LoadPassShaders);
 
     unsigned shadows = (unsigned)((graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT));
 

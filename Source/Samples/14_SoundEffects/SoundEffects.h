@@ -39,12 +39,14 @@ class Slider;
 ///     - Controlling sound and music master volume
 class SoundEffects : public Sample
 {
-    OBJECT(SoundEffects);
+    URHO3D_OBJECT(SoundEffects, Sample);
 
 public:
     /// Construct.
     SoundEffects(Context* context);
 
+    /// Setup before engine initialization. Modifies the engine parameters.
+    virtual void Setup();
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
 

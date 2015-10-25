@@ -112,7 +112,7 @@ class URHO3D_API View : public Object
     friend void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex);
     friend void ProcessLightWork(const WorkItem* item, unsigned threadIndex);
 
-    OBJECT(View);
+    URHO3D_OBJECT(View, Object);
 
 public:
     /// Construct.
@@ -138,8 +138,11 @@ public:
     /// Return octree.
     Octree* GetOctree() const { return octree_; }
 
-    /// Return camera.
+    /// Return viewport camera.
     Camera* GetCamera() const { return camera_; }
+
+    /// Return culling camera. Normally same as the viewport camera.
+    Camera* GetCullCamera() const { return cullCamera_; }
 
     /// Return information of the frame being rendered.
     const FrameInfo& GetFrameInfo() const { return frame_; }
@@ -161,6 +164,12 @@ public:
 
     /// Return light batch queues.
     const Vector<LightBatchQueue>& GetLightQueues() const { return lightQueues_; }
+
+    /// Return the last used software occlusion buffer.
+    OcclusionBuffer* GetOcclusionBuffer() const { return occlusionBuffer_; }
+
+    /// Return the source view that was already prepared. Used when viewports specify the same culling camera.
+    View* GetSourceView() const;
 
     /// Set global (per-frame) shader parameters. Called by Batch and internally by View.
     void SetGlobalShaderParameters();
@@ -288,10 +297,12 @@ private:
     Scene* scene_;
     /// Octree to use.
     Octree* octree_;
-    /// Camera to use.
+    /// Viewport (rendering) camera.
     Camera* camera_;
-    /// Camera's scene node.
-    Node* cameraNode_;
+    /// Culling camera. Usually same as the viewport camera.
+    Camera* cullCamera_;
+    /// Shared source view. Null if this view is using its own culling.
+    WeakPtr<View> sourceView_;
     /// Zone the camera is inside, or default zone if not assigned.
     Zone* cameraZone_;
     /// Zone at far clip plane.
@@ -318,6 +329,8 @@ private:
     IntVector2 rtSize_;
     /// Information of the frame being rendered.
     FrameInfo frame_;
+    /// View aspect ratio.
+    float aspectRatio_;
     /// Minimum Z value of the visible scene.
     float minZ_;
     /// Maximum Z value of the visible scene.
@@ -330,6 +343,8 @@ private:
     int minInstances_;
     /// Highest zone priority currently visible.
     int highestZonePriority_;
+    /// Geometries updated flag.
+    bool geometriesUpdated_;
     /// Camera zone's override flag.
     bool cameraZoneOverride_;
     /// Draw shadows flag.

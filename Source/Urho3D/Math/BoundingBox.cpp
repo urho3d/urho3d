@@ -32,21 +32,23 @@ namespace Urho3D
 
 void BoundingBox::Define(const Vector3* vertices, unsigned count)
 {
+    Clear();
+
     if (!count)
         return;
 
-    defined_ = false;
     Merge(vertices, count);
 }
 
 void BoundingBox::Define(const Frustum& frustum)
 {
+    Clear();
     Define(frustum.vertices_, NUM_FRUSTUM_VERTICES);
 }
 
 void BoundingBox::Define(const Polyhedron& poly)
 {
-    defined_ = false;
+    Clear();
     Merge(poly);
 }
 
@@ -57,7 +59,6 @@ void BoundingBox::Define(const Sphere& sphere)
 
     min_ = center + Vector3(-radius, -radius, -radius);
     max_ = center + Vector3(radius, radius, radius);
-    defined_ = true;
 }
 
 void BoundingBox::Merge(const Vector3* vertices, unsigned count)
@@ -105,12 +106,11 @@ void BoundingBox::Clip(const BoundingBox& box)
     if (box.max_.z_ < max_.z_)
         max_.z_ = box.max_.z_;
 
-    if (min_.x_ > max_.x_)
-        Swap(min_.x_, max_.x_);
-    if (min_.y_ > max_.y_)
-        Swap(min_.y_, max_.y_);
-    if (min_.z_ > max_.z_)
-        Swap(min_.z_, max_.z_);
+    if (min_.x_ > max_.x_ || min_.y_ > max_.y_ || min_.z_ > max_.z_)
+    {
+        min_ = Vector3(M_INFINITY, M_INFINITY, M_INFINITY);
+        max_ = Vector3(-M_INFINITY, -M_INFINITY, -M_INFINITY);
+    }
 }
 
 void BoundingBox::Transform(const Matrix3& transform)
@@ -130,6 +130,31 @@ BoundingBox BoundingBox::Transformed(const Matrix3& transform) const
 
 BoundingBox BoundingBox::Transformed(const Matrix3x4& transform) const
 {
+#ifdef URHO3D_SSE
+    const __m128 one = _mm_set_ss(1.f);
+    __m128 minPt = _mm_movelh_ps(_mm_loadl_pi(_mm_setzero_ps(), (const __m64*)&min_.x_), _mm_unpacklo_ps(_mm_set_ss(min_.z_), one));
+    __m128 maxPt = _mm_movelh_ps(_mm_loadl_pi(_mm_setzero_ps(), (const __m64*)&max_.x_), _mm_unpacklo_ps(_mm_set_ss(max_.z_), one));
+    __m128 centerPoint = _mm_mul_ps(_mm_add_ps(minPt, maxPt), _mm_set1_ps(0.5f));
+    __m128 halfSize = _mm_sub_ps(centerPoint, minPt);
+    __m128 m0 = _mm_loadu_ps(&transform.m00_);
+    __m128 m1 = _mm_loadu_ps(&transform.m10_);
+    __m128 m2 = _mm_loadu_ps(&transform.m20_);
+    __m128 r0 = _mm_mul_ps(m0, centerPoint);
+    __m128 r1 = _mm_mul_ps(m1, centerPoint);
+    __m128 t0 = _mm_add_ps(_mm_unpacklo_ps(r0, r1), _mm_unpackhi_ps(r0, r1));
+    __m128 r2 = _mm_mul_ps(m2, centerPoint);
+    const __m128 zero = _mm_setzero_ps();
+    __m128 t2 = _mm_add_ps(_mm_unpacklo_ps(r2, zero), _mm_unpackhi_ps(r2, zero));
+    __m128 newCenter = _mm_add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
+    const __m128 absMask = _mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF));
+    __m128 x = _mm_and_ps(absMask, _mm_mul_ps(m0, halfSize));
+    __m128 y = _mm_and_ps(absMask, _mm_mul_ps(m1, halfSize));
+    __m128 z = _mm_and_ps(absMask, _mm_mul_ps(m2, halfSize));
+    t0 = _mm_add_ps(_mm_unpacklo_ps(x, y), _mm_unpackhi_ps(x, y));
+    t2 = _mm_add_ps(_mm_unpacklo_ps(z, zero), _mm_unpackhi_ps(z, zero));
+    __m128 newDir = _mm_add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
+    return BoundingBox(_mm_sub_ps(newCenter, newDir), _mm_add_ps(newCenter, newDir));
+#else
     Vector3 newCenter = transform * Center();
     Vector3 oldEdge = Size() * 0.5f;
     Vector3 newEdge = Vector3(
@@ -139,6 +164,7 @@ BoundingBox BoundingBox::Transformed(const Matrix3x4& transform) const
     );
 
     return BoundingBox(newCenter - newEdge, newCenter + newEdge);
+#endif
 }
 
 Rect BoundingBox::Projected(const Matrix4& projection) const

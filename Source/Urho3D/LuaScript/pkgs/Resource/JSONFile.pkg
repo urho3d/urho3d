@@ -1,14 +1,11 @@
 $#include "Resource/JSONFile.h"
 
-enum JSONValueType {};
-
 class JSONFile : Resource
 {
     JSONFile();
     ~JSONFile();
 
-    JSONValue CreateRoot(JSONValueType valueType = JSON_OBJECT);
-    JSONValue GetRoot(JSONValueType valueType = JSON_ANY);
+    const JSONValue& GetRoot() const;
 
     tolua_outside bool JSONFileSave @ Save(const String fileName, const String indentation = "\t") const;
 };
@@ -25,9 +22,7 @@ static int tolua_ResourceLuaAPI_JSONFile_new00_local(lua_State* tolua_S)
 {
     return ToluaNewObjectGC<JSONFile>(tolua_S);
 }
-$}
 
-${
 static bool JSONFileSave(const JSONFile* resource, const String& fileName, const String& indentation)
 {
     if (!resource)

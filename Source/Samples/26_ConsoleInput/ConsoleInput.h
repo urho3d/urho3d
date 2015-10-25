@@ -30,7 +30,7 @@
 ///       and standard input.
 class ConsoleInput : public Sample
 {
-    OBJECT(ConsoleInput);
+    URHO3D_OBJECT(ConsoleInput, Sample);
 
 public:
     /// Construct.

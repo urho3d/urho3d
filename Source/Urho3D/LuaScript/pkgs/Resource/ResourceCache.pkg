@@ -6,8 +6,8 @@ class ResourceCache
     bool ReloadResource(Resource* resource);
     void ReloadResourceWithDependencies(const String fileName);
 
-    void SetMemoryBudget(StringHash type, unsigned budget);
-    void SetMemoryBudget(const String type, unsigned budget);
+    void SetMemoryBudget(StringHash type, unsigned long long budget);
+    void SetMemoryBudget(const String type, unsigned long long budget);
     
     void SetAutoReloadResources(bool enable);
     void SetReturnFailedResources(bool enable);
@@ -23,9 +23,9 @@ class ResourceCache
     const Vector<String>& GetResourceDirs() const;
 
     bool Exists(const String name) const;
-    unsigned GetMemoryBudget(StringHash type) const;
-    unsigned GetMemoryUse(StringHash type) const;
-    unsigned GetTotalMemoryUse() const;
+    unsigned long long GetMemoryBudget(StringHash type) const;
+    unsigned long long GetMemoryUse(StringHash type) const;
+    unsigned long long GetTotalMemoryUse() const;
     String GetResourceFileName(const String name) const;
 
     bool GetAutoReloadResources() const;
@@ -37,7 +37,7 @@ class ResourceCache
     String SanitateResourceName(const String name) const;
     String SanitateResourceDirName(const String name) const;
 
-    tolua_readonly tolua_property__get_set unsigned totalMemoryUse;
+    tolua_readonly tolua_property__get_set unsigned long long totalMemoryUse;
     tolua_property__get_set bool autoReloadResources;
     tolua_property__get_set bool returnFailedResources;
     tolua_property__get_set bool searchPackagesFirst;

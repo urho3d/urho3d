@@ -64,7 +64,7 @@ public:
     }
 
     /// Construct from a float array.
-    Rect(const float* data) :
+    explicit Rect(const float* data) :
         min_(data[0], data[1]),
         max_(data[2], data[3]),
         defined_(true)

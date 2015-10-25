@@ -35,7 +35,7 @@ class AnimationState;
 /// Animated model component.
 class URHO3D_API AnimatedModel : public StaticModel
 {
-    OBJECT(AnimatedModel);
+    URHO3D_OBJECT(AnimatedModel, StaticModel);
 
     friend class AnimationState;
 
@@ -250,6 +250,8 @@ private:
     bool loading_;
     /// Bone nodes assignment pending flag.
     bool assignBonesPending_;
+    /// Force animation update after becoming visible flag.
+    bool forceAnimationUpdate_;
 };
 
 }

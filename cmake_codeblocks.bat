@@ -20,4 +20,4 @@
 :: THE SOFTWARE.
 ::
 
-@%~dp0\cmake_generic.bat %* -G "CodeBlocks - MinGW Makefiles"
+@"%~dp0cmake_generic.bat" %* -G "CodeBlocks - MinGW Makefiles"

@@ -53,9 +53,9 @@ PackageFile::~PackageFile()
 bool PackageFile::Open(const String& fileName, unsigned startOffset)
 {
 #ifdef ANDROID
-    if (fileName.StartsWith("/apk/"))
+    if (URHO3D_IS_ASSET(fileName))
     {
-        LOGERROR("Package files within the apk are not supported on Android");
+        URHO3D_LOGERROR("Package files within the apk are not supported on Android");
         return false;
     }
 #endif
@@ -86,7 +86,7 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
 
         if (id != "UPAK" && id != "ULZ4")
         {
-            LOGERROR(fileName + " is not a valid package file");
+            URHO3D_LOGERROR(fileName + " is not a valid package file");
             return false;
         }
     }
@@ -107,7 +107,7 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
         newEntry.size_ = file->ReadUInt();
         newEntry.checksum_ = file->ReadUInt();
         if (!compressed_ && newEntry.offset_ + newEntry.size_ > totalSize_)
-            LOGERROR("File entry " + entryName + " outside package file");
+            URHO3D_LOGERROR("File entry " + entryName + " outside package file");
         else
             entries_[entryName] = newEntry;
     }
@@ -142,7 +142,7 @@ const PackageEntry* PackageFile::GetEntry(const String& fileName) const
     HashMap<String, PackageEntry>::ConstIterator i = entries_.Find(fileName);
     if (i != entries_.End())
         return &i->second_;
-    
+
 #ifdef WIN32
     // On Windows perform a fallback case-insensitive search
     else

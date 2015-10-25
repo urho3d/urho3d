@@ -144,18 +144,11 @@ bool Sprite2D::GetDrawRectangle(Rect& rect, const Vector2& hotSpot, bool flipX, 
     float hotSpotX = flipX ? (1.0f - hotSpot.x_) : hotSpot.x_;
     float hotSpotY = flipY ? (1.0f - hotSpot.y_) : hotSpot.y_;
 
-#ifdef URHO3D_OPENGL
     rect.min_.x_ = -width * hotSpotX;
     rect.max_.x_ = width * (1.0f - hotSpotX);
     rect.min_.y_ = -height * hotSpotY;
     rect.max_.y_ = height * (1.0f - hotSpotY);
-#else
-    const float halfPixelOffset = 0.5f * PIXEL_SIZE;
-    rect.min_.x_ = -width * hotSpotX + halfPixelOffset;
-    rect.max_.x_ = width * (1.0f - hotSpotX) + halfPixelOffset;
-    rect.min_.y_ = -height * hotSpotY + halfPixelOffset;
-    rect.max_.y_ = height * (1.0f - hotSpotY) + halfPixelOffset;
-#endif
+
     return true;
 }
 

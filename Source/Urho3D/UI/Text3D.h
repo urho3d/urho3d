@@ -35,7 +35,7 @@ class Text;
 /// 3D text component.
 class URHO3D_API Text3D : public Drawable
 {
-    OBJECT(Text3D);
+    URHO3D_OBJECT(Text3D, Drawable);
 
 public:
     /// Construct.
@@ -185,6 +185,8 @@ private:
     bool geometryDirty_;
     /// Flag for whether currently using SDF shader defines in the generated material.
     bool usingSDFShader_;
+    /// Font texture data lost flag.
+    bool fontDataLost_;
 };
 
 }

@@ -20,29 +20,27 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/Urho3D.h>
-
-#include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
-#include <Urho3D/UI/Font.h>
+#include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/Graphics.h>
-#include <Urho3D/Input/Input.h>
 #include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Input/Input.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
+#include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
-#include <Urho3D/Graphics/Zone.h>
-#include <Urho3D/Urho2D/TmxFile2D.h>
-#include <Urho3D/Urho2D/TileMap2D.h>
 #include <Urho3D/Urho2D/Drawable2D.h>
+#include <Urho3D/Urho2D/TileMap2D.h>
+#include <Urho3D/Urho2D/TmxFile2D.h>
 
 #include "Urho2DTileMap.h"
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(Urho2DTileMap)
+URHO3D_DEFINE_APPLICATION_MAIN(Urho2DTileMap)
 
 Urho2DTileMap::Urho2DTileMap(Context* context) :
     Sample(context)
@@ -166,7 +164,7 @@ void Urho2DTileMap::MoveCamera(float timeStep)
 void Urho2DTileMap::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Urho2DTileMap, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Urho2DTileMap, HandleUpdate));
 
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent(E_SCENEUPDATE);

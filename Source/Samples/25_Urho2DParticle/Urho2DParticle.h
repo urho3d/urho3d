@@ -37,7 +37,7 @@ namespace Urho3D
 //     - Handling mouse move to move particle
 class Urho2DParticle : public Sample
 {
-    OBJECT(Urho2DParticle);
+    URHO3D_OBJECT(Urho2DParticle, Sample);
 
 public:
     /// Construct.

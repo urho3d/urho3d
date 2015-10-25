@@ -28,38 +28,38 @@ namespace Urho3D
 {
 
 /// Frame begin event.
-EVENT(E_BEGINFRAME, BeginFrame)
+URHO3D_EVENT(E_BEGINFRAME, BeginFrame)
 {
-    PARAM(P_FRAMENUMBER, FrameNumber);      // unsigned
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    URHO3D_PARAM(P_FRAMENUMBER, FrameNumber);      // unsigned
+    URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Application-wide logic update event.
-EVENT(E_UPDATE, Update)
+URHO3D_EVENT(E_UPDATE, Update)
 {
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Application-wide logic post-update event.
-EVENT(E_POSTUPDATE, PostUpdate)
+URHO3D_EVENT(E_POSTUPDATE, PostUpdate)
 {
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Render update event.
-EVENT(E_RENDERUPDATE, RenderUpdate)
+URHO3D_EVENT(E_RENDERUPDATE, RenderUpdate)
 {
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Post-render update event.
-EVENT(E_POSTRENDERUPDATE, PostRenderUpdate)
+URHO3D_EVENT(E_POSTRENDERUPDATE, PostRenderUpdate)
 {
-    PARAM(P_TIMESTEP, TimeStep);            // float
+    URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
 /// Frame end event.
-EVENT(E_ENDFRAME, EndFrame)
+URHO3D_EVENT(E_ENDFRAME, EndFrame)
 {
 }
 

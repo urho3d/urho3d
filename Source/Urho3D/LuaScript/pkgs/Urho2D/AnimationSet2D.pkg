@@ -3,8 +3,7 @@ $#include "Urho2D/AnimationSet2D.h"
 class AnimationSet2D : Resource
 {
     unsigned GetNumAnimations() const;
-    Animation2D* GetAnimation(unsigned index) const;
-    Animation2D* GetAnimation(const String name) const;
-
+    String GetAnimation(unsigned index) const;
+    
     tolua_readonly tolua_property__get_set unsigned numAnimations;
 };

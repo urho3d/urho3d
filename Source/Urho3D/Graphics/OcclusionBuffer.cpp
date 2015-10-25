@@ -71,7 +71,7 @@ bool OcclusionBuffer::SetSize(int width, int height)
 
     if (!IsPowerOfTwo((unsigned)width))
     {
-        LOGERROR("Width is not a power of two");
+        URHO3D_LOGERROR("Width is not a power of two");
         return false;
     }
 
@@ -95,7 +95,7 @@ bool OcclusionBuffer::SetSize(int width, int height)
             break;
     }
 
-    LOGDEBUG("Set occlusion buffer size " + String(width_) + "x" + String(height_) + " with " +
+    URHO3D_LOGDEBUG("Set occlusion buffer size " + String(width_) + "x" + String(height_) + " with " +
              String(mipBuffers_.Size()) + " mip levels");
 
     CalculateViewport();
@@ -147,9 +147,10 @@ void OcclusionBuffer::Clear()
 
     int* dest = buffer_;
     int count = width_ * height_;
+    int fillValue = (int)OCCLUSION_Z_SCALE;
 
     while (count--)
-        *dest++ = 0x7fffffff;
+        *dest++ = fillValue;
 
     depthHierarchyDirty_ = true;
 }

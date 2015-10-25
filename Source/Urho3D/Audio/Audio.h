@@ -38,7 +38,7 @@ class SoundSource;
 /// %Audio subsystem.
 class URHO3D_API Audio : public Object
 {
-    OBJECT(Audio);
+    URHO3D_OBJECT(Audio, Object);
 
 public:
     /// Construct.
@@ -105,7 +105,7 @@ public:
     void MixOutput(void* dest, unsigned samples);
 
     /// Final multiplier for for audio byte conversion
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     static const int SAMPLE_SIZE_MUL = 2;
 #else
     static const int SAMPLE_SIZE_MUL = 1;

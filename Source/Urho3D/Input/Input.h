@@ -37,7 +37,8 @@ enum MouseMode
 {
     MM_ABSOLUTE = 0,
     MM_RELATIVE,
-    MM_WRAP
+    MM_WRAP,
+    MM_FREE
 };
 
 class Deserializer;
@@ -126,16 +127,16 @@ struct JoystickState
     PODVector<int> hats_;
 };
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 class EmscriptenInput;
 #endif
 
 /// %Input subsystem. Converts operating system window messages to input state and events.
 class URHO3D_API Input : public Object
 {
-    OBJECT(Input);
+    URHO3D_OBJECT(Input, Object);
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     friend class EmscriptenInput;
 #endif
 
@@ -169,6 +170,9 @@ public:
      *
      *  MM_WRAP grabs the mouse from the operating system and confines the operating system cursor to the window, wrapping the cursor when it is near the edges.
      *  SetMouseMode(MM_WRAP) will call SetMouseGrabbed(true).
+     *
+     *  MM_FREE does not grab/confine the mouse cursor even when it is hidden. This can be used for cases where the cursor should render using the operating system
+     *  outside the window, and perform custom rendering (with SetMouseVisible(false)) inside.
     */
     void SetMouseMode(MouseMode mode);
     /// Add screen joystick.
@@ -318,7 +322,7 @@ private:
     void SetMouseButton(int button, bool newState);
     /// Handle a key change.
     void SetKey(int key, int scancode, unsigned raw, bool newState);
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     /// Set whether the operating system mouse cursor is visible (Emscripten platform only).
     void SetMouseVisibleEmscripten(bool enable);
     /// Set mouse mode (Emscripten platform only).
@@ -397,7 +401,7 @@ private:
     bool screenModeChanged_;
     /// Initialized flag.
     bool initialized_;
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     /// Emscripten Input glue instance.
     EmscriptenInput* emscriptenInput_;
     /// Flag used to detect mouse jump when exiting pointer lock.

@@ -6,18 +6,8 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local spriteNode = nil
-local animationIndex = 0
-local animationNames = 
-{
-    "idle",
-    "run",
-    "attack",
-    "hit",
-    "dead",
-    "dead2",
-    "dead3",
-}
+local spriterNode = nil
+local spriterAnimationIndex = 0
 
 function Start()
     -- Execute the common startup for samples
@@ -55,15 +45,16 @@ function CreateScene()
     camera.orthoSize = graphics.height * PIXEL_SIZE
     camera.zoom = 1.5 * Min(graphics.width / 1280, graphics.height / 800) -- Set zoom according to user's resolution to ensure full visibility (initial zoom (1.5) is set for full visibility at 1280x800 resolution)
 
-    local animationSet = cache:GetResource("AnimationSet2D", "Urho2D/imp/imp.scml")
-    if animationSet == nil then
+    local spriterAnimationSet = cache:GetResource("AnimationSet2D", "Urho2D/imp/imp.scml")
+    if spriterAnimationSet == nil then
         return
     end
 
-    spriteNode = scene_:CreateChild("SpriterAnimation")
+    spriterNode = scene_:CreateChild("SpriterAnimation")
 
-    local animatedSprite = spriteNode:CreateComponent("AnimatedSprite2D")
-    animatedSprite:SetAnimation(animationSet, animationNames[animationIndex + 1])
+    local spriterAnimatedSprite = spriterNode:CreateComponent("AnimatedSprite2D")
+    spriterAnimatedSprite.animationSet = spriterAnimationSet
+    spriterAnimatedSprite:SetAnimation(spriterAnimationSet:GetAnimation(spriterAnimationIndex), LM_FORCE_LOOPED)
 end
 
 function CreateInstructions()
@@ -139,9 +130,10 @@ function HandleUpdate(eventType, eventData)
 end
 
 function HandleMouseButtonDown(eventType, eventData)
-    local animatedSprite = spriteNode:GetComponent("AnimatedSprite2D")
-    animationIndex = (animationIndex + 1) % 7
-    animatedSprite:SetAnimation(animationNames[animationIndex + 1], LM_FORCE_LOOPED)
+    local spriterAnimatedSprite = spriterNode:GetComponent("AnimatedSprite2D")
+    local spriterAnimationSet = spriterAnimatedSprite.animationSet
+    spriterAnimationIndex = (spriterAnimationIndex + 1) % spriterAnimationSet.numAnimations
+    spriterAnimatedSprite:SetAnimation(spriterAnimationSet:GetAnimation(spriterAnimationIndex), LM_FORCE_LOOPED)
 end
 
 -- Create XML patch instructions for screen joystick layout specific to this sample app

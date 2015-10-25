@@ -25,6 +25,10 @@
 #include "../Math/Quaternion.h"
 #include "../Math/Vector4.h"
 
+#ifdef URHO3D_SSE
+#include <emmintrin.h>
+#endif
+
 namespace Urho3D
 {
 
@@ -35,8 +39,9 @@ class URHO3D_API Matrix4
 {
 public:
     /// Construct an identity matrix.
-    Matrix4() :
-        m00_(1.0f),
+    Matrix4()
+#ifndef URHO3D_SSE
+       :m00_(1.0f),
         m01_(0.0f),
         m02_(0.0f),
         m03_(0.0f),
@@ -52,12 +57,20 @@ public:
         m31_(0.0f),
         m32_(0.0f),
         m33_(1.0f)
+#endif
     {
+#ifdef URHO3D_SSE
+        _mm_storeu_ps(&m00_, _mm_set_ps(0.f, 0.f, 0.f, 1.f));
+        _mm_storeu_ps(&m10_, _mm_set_ps(0.f, 0.f, 1.f, 0.f));
+        _mm_storeu_ps(&m20_, _mm_set_ps(0.f, 1.f, 0.f, 0.f));
+        _mm_storeu_ps(&m30_, _mm_set_ps(1.f, 0.f, 0.f, 0.f));
+#endif
     }
 
     /// Copy-construct from another matrix.
-    Matrix4(const Matrix4& matrix) :
-        m00_(matrix.m00_),
+    Matrix4(const Matrix4& matrix)
+#ifndef URHO3D_SSE
+       :m00_(matrix.m00_),
         m01_(matrix.m01_),
         m02_(matrix.m02_),
         m03_(matrix.m03_),
@@ -73,7 +86,14 @@ public:
         m31_(matrix.m31_),
         m32_(matrix.m32_),
         m33_(matrix.m33_)
+#endif
     {
+#ifdef URHO3D_SSE
+        _mm_storeu_ps(&m00_, _mm_loadu_ps(&matrix.m00_));
+        _mm_storeu_ps(&m10_, _mm_loadu_ps(&matrix.m10_));
+        _mm_storeu_ps(&m20_, _mm_loadu_ps(&matrix.m20_));
+        _mm_storeu_ps(&m30_, _mm_loadu_ps(&matrix.m30_));
+#endif
     }
 
     /// Copy-cnstruct from a 3x3 matrix and set the extra elements to identity.
@@ -122,8 +142,9 @@ public:
     }
 
     /// Construct from a float array.
-    Matrix4(const float* data) :
-        m00_(data[0]),
+    explicit Matrix4(const float* data)
+#ifndef URHO3D_SSE
+       :m00_(data[0]),
         m01_(data[1]),
         m02_(data[2]),
         m03_(data[3]),
@@ -139,12 +160,25 @@ public:
         m31_(data[13]),
         m32_(data[14]),
         m33_(data[15])
+#endif
     {
+#ifdef URHO3D_SSE
+        _mm_storeu_ps(&m00_, _mm_loadu_ps(data));
+        _mm_storeu_ps(&m10_, _mm_loadu_ps(data + 4));
+        _mm_storeu_ps(&m20_, _mm_loadu_ps(data + 8));
+        _mm_storeu_ps(&m30_, _mm_loadu_ps(data + 12));
+#endif
     }
 
     /// Assign from another matrix.
     Matrix4& operator =(const Matrix4& rhs)
     {
+#ifdef URHO3D_SSE
+        _mm_storeu_ps(&m00_, _mm_loadu_ps(&rhs.m00_));
+        _mm_storeu_ps(&m10_, _mm_loadu_ps(&rhs.m10_));
+        _mm_storeu_ps(&m20_, _mm_loadu_ps(&rhs.m20_));
+        _mm_storeu_ps(&m30_, _mm_loadu_ps(&rhs.m30_));
+#else
         m00_ = rhs.m00_;
         m01_ = rhs.m01_;
         m02_ = rhs.m02_;
@@ -161,6 +195,7 @@ public:
         m31_ = rhs.m31_;
         m32_ = rhs.m32_;
         m33_ = rhs.m33_;
+#endif
         return *this;
     }
 
@@ -189,6 +224,20 @@ public:
     /// Test for equality with another matrix without epsilon.
     bool operator ==(const Matrix4& rhs) const
     {
+#ifdef URHO3D_SSE
+        __m128 c0 = _mm_cmpeq_ps(_mm_loadu_ps(&m00_), _mm_loadu_ps(&rhs.m00_));
+        __m128 c1 = _mm_cmpeq_ps(_mm_loadu_ps(&m10_), _mm_loadu_ps(&rhs.m10_));
+        c0 = _mm_and_ps(c0, c1);
+        __m128 c2 = _mm_cmpeq_ps(_mm_loadu_ps(&m20_), _mm_loadu_ps(&rhs.m20_));
+        __m128 c3 = _mm_cmpeq_ps(_mm_loadu_ps(&m30_), _mm_loadu_ps(&rhs.m30_));
+        c2 = _mm_and_ps(c2, c3);
+        c0 = _mm_and_ps(c0, c2);
+        __m128 hi = _mm_movehl_ps(c0, c0);
+        c0 = _mm_and_ps(c0, hi);
+        hi = _mm_shuffle_ps(c0, c0, _MM_SHUFFLE(1, 1, 1, 1));
+        c0 = _mm_and_ps(c0, hi);
+        return !_mm_ucomige_ss(c0, c0);
+#else
         const float* leftData = Data();
         const float* rightData = rhs.Data();
 
@@ -199,6 +248,7 @@ public:
         }
 
         return true;
+#endif
     }
 
     /// Test for inequality with another matrix without epsilon.
@@ -207,6 +257,25 @@ public:
     /// Multiply a Vector3 which is assumed to represent position.
     Vector3 operator *(const Vector3& rhs) const
     {
+#ifdef URHO3D_SSE
+        __m128 vec = _mm_set_ps(1.f, rhs.z_, rhs.y_, rhs.x_);
+        __m128 r0 = _mm_mul_ps(_mm_loadu_ps(&m00_), vec);
+        __m128 r1 = _mm_mul_ps(_mm_loadu_ps(&m10_), vec);
+        __m128 t0 = _mm_unpacklo_ps(r0, r1);
+        __m128 t1 = _mm_unpackhi_ps(r0, r1);
+        t0 = _mm_add_ps(t0, t1);
+        __m128 r2 = _mm_mul_ps(_mm_loadu_ps(&m20_), vec);
+        __m128 r3 = _mm_mul_ps(_mm_loadu_ps(&m30_), vec);
+        __m128 t2 = _mm_unpacklo_ps(r2, r3);
+        __m128 t3 = _mm_unpackhi_ps(r2, r3);
+        t2 = _mm_add_ps(t2, t3);
+        vec = _mm_add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
+        vec = _mm_div_ps(vec, _mm_shuffle_ps(vec, vec, _MM_SHUFFLE(3, 3, 3, 3)));
+        return Vector3(
+            _mm_cvtss_f32(vec),
+            _mm_cvtss_f32(_mm_shuffle_ps(vec, vec, _MM_SHUFFLE(1, 1, 1, 1))),
+            _mm_cvtss_f32(_mm_movehl_ps(vec, vec)));
+#else
         float invW = 1.0f / (m30_ * rhs.x_ + m31_ * rhs.y_ + m32_ * rhs.z_ + m33_);
 
         return Vector3(
@@ -214,22 +283,50 @@ public:
             (m10_ * rhs.x_ + m11_ * rhs.y_ + m12_ * rhs.z_ + m13_) * invW,
             (m20_ * rhs.x_ + m21_ * rhs.y_ + m22_ * rhs.z_ + m23_) * invW
         );
+#endif
     }
 
     /// Multiply a Vector4.
     Vector4 operator *(const Vector4& rhs) const
     {
+#ifdef URHO3D_SSE
+        __m128 vec = _mm_loadu_ps(&rhs.x_);
+        __m128 r0 = _mm_mul_ps(_mm_loadu_ps(&m00_), vec);
+        __m128 r1 = _mm_mul_ps(_mm_loadu_ps(&m10_), vec);
+        __m128 t0 = _mm_unpacklo_ps(r0, r1);
+        __m128 t1 = _mm_unpackhi_ps(r0, r1);
+        t0 = _mm_add_ps(t0, t1);
+        __m128 r2 = _mm_mul_ps(_mm_loadu_ps(&m20_), vec);
+        __m128 r3 = _mm_mul_ps(_mm_loadu_ps(&m30_), vec);
+        __m128 t2 = _mm_unpacklo_ps(r2, r3);
+        __m128 t3 = _mm_unpackhi_ps(r2, r3);
+        t2 = _mm_add_ps(t2, t3);
+        vec = _mm_add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
+
+        Vector4 ret;
+        _mm_storeu_ps(&ret.x_, vec);
+        return ret;
+#else
         return Vector4(
             m00_ * rhs.x_ + m01_ * rhs.y_ + m02_ * rhs.z_ + m03_ * rhs.w_,
             m10_ * rhs.x_ + m11_ * rhs.y_ + m12_ * rhs.z_ + m13_ * rhs.w_,
             m20_ * rhs.x_ + m21_ * rhs.y_ + m22_ * rhs.z_ + m23_ * rhs.w_,
             m30_ * rhs.x_ + m31_ * rhs.y_ + m32_ * rhs.z_ + m33_ * rhs.w_
         );
+#endif
     }
 
     /// Add a matrix.
     Matrix4 operator +(const Matrix4& rhs) const
     {
+#ifdef URHO3D_SSE
+        Matrix4 ret;
+        _mm_storeu_ps(&ret.m00_, _mm_add_ps(_mm_loadu_ps(&m00_), _mm_loadu_ps(&rhs.m00_)));
+        _mm_storeu_ps(&ret.m10_, _mm_add_ps(_mm_loadu_ps(&m10_), _mm_loadu_ps(&rhs.m10_)));
+        _mm_storeu_ps(&ret.m20_, _mm_add_ps(_mm_loadu_ps(&m20_), _mm_loadu_ps(&rhs.m20_)));
+        _mm_storeu_ps(&ret.m30_, _mm_add_ps(_mm_loadu_ps(&m30_), _mm_loadu_ps(&rhs.m30_)));
+        return ret;
+#else
         return Matrix4(
             m00_ + rhs.m00_,
             m01_ + rhs.m01_,
@@ -248,11 +345,20 @@ public:
             m32_ + rhs.m32_,
             m33_ + rhs.m33_
         );
+#endif
     }
 
     /// Subtract a matrix.
     Matrix4 operator -(const Matrix4& rhs) const
     {
+#ifdef URHO3D_SSE
+        Matrix4 ret;
+        _mm_storeu_ps(&ret.m00_, _mm_sub_ps(_mm_loadu_ps(&m00_), _mm_loadu_ps(&rhs.m00_)));
+        _mm_storeu_ps(&ret.m10_, _mm_sub_ps(_mm_loadu_ps(&m10_), _mm_loadu_ps(&rhs.m10_)));
+        _mm_storeu_ps(&ret.m20_, _mm_sub_ps(_mm_loadu_ps(&m20_), _mm_loadu_ps(&rhs.m20_)));
+        _mm_storeu_ps(&ret.m30_, _mm_sub_ps(_mm_loadu_ps(&m30_), _mm_loadu_ps(&rhs.m30_)));
+        return ret;
+#else
         return Matrix4(
             m00_ - rhs.m00_,
             m01_ - rhs.m01_,
@@ -271,11 +377,21 @@ public:
             m32_ - rhs.m32_,
             m33_ - rhs.m33_
         );
+#endif
     }
 
     /// Multiply with a scalar.
     Matrix4 operator *(float rhs) const
     {
+#ifdef URHO3D_SSE
+        Matrix4 ret;
+        const __m128 mul = _mm_set1_ps(rhs);
+        _mm_storeu_ps(&ret.m00_, _mm_mul_ps(_mm_loadu_ps(&m00_), mul));
+        _mm_storeu_ps(&ret.m10_, _mm_mul_ps(_mm_loadu_ps(&m10_), mul));
+        _mm_storeu_ps(&ret.m20_, _mm_mul_ps(_mm_loadu_ps(&m20_), mul));
+        _mm_storeu_ps(&ret.m30_, _mm_mul_ps(_mm_loadu_ps(&m30_), mul));
+        return ret;
+#else
         return Matrix4(
             m00_ * rhs,
             m01_ * rhs,
@@ -294,11 +410,50 @@ public:
             m32_ * rhs,
             m33_ * rhs
         );
+#endif
     }
 
     /// Multiply a matrix.
     Matrix4 operator *(const Matrix4& rhs) const
     {
+#ifdef URHO3D_SSE
+        Matrix4 out;
+
+        __m128 r0 = _mm_loadu_ps(&rhs.m00_);
+        __m128 r1 = _mm_loadu_ps(&rhs.m10_);
+        __m128 r2 = _mm_loadu_ps(&rhs.m20_);
+        __m128 r3 = _mm_loadu_ps(&rhs.m30_);
+
+        __m128 l = _mm_loadu_ps(&m00_);
+        __m128 t0 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(0, 0, 0, 0)), r0);
+        __m128 t1 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(1, 1, 1, 1)), r1);
+        __m128 t2 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(2, 2, 2, 2)), r2);
+        __m128 t3 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(3, 3, 3, 3)), r3);
+        _mm_storeu_ps(&out.m00_, _mm_add_ps(_mm_add_ps(t0, t1), _mm_add_ps(t2, t3)));
+
+        l = _mm_loadu_ps(&m10_);
+        t0 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(0, 0, 0, 0)), r0);
+        t1 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(1, 1, 1, 1)), r1);
+        t2 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(2, 2, 2, 2)), r2);
+        t3 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(3, 3, 3, 3)), r3);
+        _mm_storeu_ps(&out.m10_, _mm_add_ps(_mm_add_ps(t0, t1), _mm_add_ps(t2, t3)));
+
+        l = _mm_loadu_ps(&m20_);
+        t0 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(0, 0, 0, 0)), r0);
+        t1 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(1, 1, 1, 1)), r1);
+        t2 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(2, 2, 2, 2)), r2);
+        t3 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(3, 3, 3, 3)), r3);
+        _mm_storeu_ps(&out.m20_, _mm_add_ps(_mm_add_ps(t0, t1), _mm_add_ps(t2, t3)));
+
+        l = _mm_loadu_ps(&m30_);
+        t0 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(0, 0, 0, 0)), r0);
+        t1 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(1, 1, 1, 1)), r1);
+        t2 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(2, 2, 2, 2)), r2);
+        t3 = _mm_mul_ps(_mm_shuffle_ps(l, l, _MM_SHUFFLE(3, 3, 3, 3)), r3);
+        _mm_storeu_ps(&out.m30_, _mm_add_ps(_mm_add_ps(t0, t1), _mm_add_ps(t2, t3)));
+
+        return out;
+#else
         return Matrix4(
             m00_ * rhs.m00_ + m01_ * rhs.m10_ + m02_ * rhs.m20_ + m03_ * rhs.m30_,
             m00_ * rhs.m01_ + m01_ * rhs.m11_ + m02_ * rhs.m21_ + m03_ * rhs.m31_,
@@ -317,6 +472,7 @@ public:
             m30_ * rhs.m02_ + m31_ * rhs.m12_ + m32_ * rhs.m22_ + m33_ * rhs.m32_,
             m30_ * rhs.m03_ + m31_ * rhs.m13_ + m32_ * rhs.m23_ + m33_ * rhs.m33_
         );
+#endif
     }
 
     /// Multiply with a 3x4 matrix.
@@ -414,6 +570,19 @@ public:
     /// Return transpose
     Matrix4 Transpose() const
     {
+#ifdef URHO3D_SSE
+        __m128 m0 = _mm_loadu_ps(&m00_);
+        __m128 m1 = _mm_loadu_ps(&m10_);
+        __m128 m2 = _mm_loadu_ps(&m20_);
+        __m128 m3 = _mm_loadu_ps(&m30_);
+        _MM_TRANSPOSE4_PS(m0, m1, m2, m3);
+        Matrix4 out;
+        _mm_storeu_ps(&out.m00_, m0);
+        _mm_storeu_ps(&out.m10_, m1);
+        _mm_storeu_ps(&out.m20_, m2);
+        _mm_storeu_ps(&out.m30_, m3);
+        return out;
+#else
         return Matrix4(
             m00_,
             m10_,
@@ -432,6 +601,7 @@ public:
             m23_,
             m33_
         );
+#endif
     }
 
     /// Test for equality with another matrix with epsilon.
@@ -482,6 +652,17 @@ public:
     {
         for (unsigned i = 0; i < count; ++i)
         {
+#ifdef URHO3D_SSE
+            __m128 m0 = _mm_loadu_ps(src);
+            __m128 m1 = _mm_loadu_ps(src + 4);
+            __m128 m2 = _mm_loadu_ps(src + 8);
+            __m128 m3 = _mm_loadu_ps(src + 12);
+            _MM_TRANSPOSE4_PS(m0, m1, m2, m3);
+            _mm_storeu_ps(dest, m0);
+            _mm_storeu_ps(dest + 4, m1);
+            _mm_storeu_ps(dest + 8, m2);
+            _mm_storeu_ps(dest + 12, m3);
+#else
             dest[0] = src[0];
             dest[1] = src[4];
             dest[2] = src[8];
@@ -498,7 +679,7 @@ public:
             dest[13] = src[7];
             dest[14] = src[11];
             dest[15] = src[15];
-
+#endif
             dest += 16;
             src += 16;
         }

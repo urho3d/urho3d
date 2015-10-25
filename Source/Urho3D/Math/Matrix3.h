@@ -76,7 +76,7 @@ public:
     }
 
     /// Construct from a float array.
-    Matrix3(const float* data) :
+    explicit Matrix3(const float* data) :
         m00_(data[0]),
         m01_(data[1]),
         m02_(data[2]),

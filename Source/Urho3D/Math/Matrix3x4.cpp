@@ -38,18 +38,6 @@ const Matrix3x4 Matrix3x4::ZERO(
 
 const Matrix3x4 Matrix3x4::IDENTITY;
 
-Matrix3x4::Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale)
-{
-    SetRotation(rotation.RotationMatrix() * scale);
-    SetTranslation(translation);
-}
-
-Matrix3x4::Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
-{
-    SetRotation(rotation.RotationMatrix().Scaled(scale));
-    SetTranslation(translation);
-}
-
 void Matrix3x4::Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
 {
     translation.x_ = m03_;

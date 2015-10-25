@@ -49,7 +49,7 @@ DBAPI Database::GetAPI()
 
 DbConnection* Database::Connect(const String& connectionString)
 {
-    PROFILE(DatabaseConnect);
+    URHO3D_PROFILE(DatabaseConnect);
 
     SharedPtr<DbConnection> connection;
     if (IsPooling())
@@ -80,7 +80,7 @@ void Database::Disconnect(DbConnection* connection)
     if (!connection)
         return;
 
-    PROFILE(DatabaseDisconnect);
+    URHO3D_PROFILE(DatabaseDisconnect);
 
     SharedPtr<DbConnection> dbConnection(connection);
     connections_.Remove(dbConnection);

@@ -71,7 +71,15 @@ bool ValueAnimationInfo::Update(float timeStep)
     if (!animation_ || !target_)
         return true;
 
-    currentTime_ += timeStep * speed_;
+    return SetTime(currentTime_ + timeStep * speed_);
+}
+
+bool ValueAnimationInfo::SetTime(float time)
+{
+    if (!animation_ || !target_)
+        return true;
+
+    currentTime_ = time;
 
     if (!animation_->IsValid())
         return true;
@@ -132,7 +140,7 @@ float ValueAnimationInfo::CalculateScaledTime(float currentTime, bool& finished)
         return Clamp(currentTime, beginTime, endTime);
 
     default:
-        LOGERROR("Unsupported attribute animation wrap mode");
+        URHO3D_LOGERROR("Unsupported attribute animation wrap mode");
         return beginTime;
     }
 }

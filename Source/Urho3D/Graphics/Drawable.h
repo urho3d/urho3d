@@ -42,6 +42,7 @@ static const int MAX_VERTEX_LIGHTS = 4;
 static const float ANIMATION_LOD_BASESCALE = 2500.0f;
 
 class Camera;
+class File;
 class Geometry;
 class Light;
 class Material;
@@ -74,12 +75,17 @@ struct FrameInfo
 };
 
 /// Source data for a 3D geometry draw call.
-struct SourceBatch
+struct URHO3D_API SourceBatch
 {
     /// Construct with defaults.
     SourceBatch();
+    /// Copy-construct.
+    SourceBatch(const SourceBatch& batch);
     /// Destruct.
     ~SourceBatch();
+
+    /// Assignment operator.
+    SourceBatch& operator =(const SourceBatch& rhs);
 
     /// Distance from camera.
     float distance_;
@@ -98,7 +104,7 @@ struct SourceBatch
 /// Base class for visible components.
 class URHO3D_API Drawable : public Component
 {
-    OBJECT(Drawable);
+    URHO3D_OBJECT(Drawable, Component);
 
     friend class Octant;
     friend class Octree;
@@ -382,5 +388,7 @@ inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)
 {
     return lhs->GetSortValue() < rhs->GetSortValue();
 }
+
+URHO3D_API bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV = false);
 
 }

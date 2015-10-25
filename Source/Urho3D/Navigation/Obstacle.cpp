@@ -54,9 +54,9 @@ Obstacle::~Obstacle()
 void Obstacle::RegisterObject(Context* context)
 {
     context->RegisterFactory<Obstacle>(NAVIGATION_CATEGORY);
-    COPY_BASE_ATTRIBUTES(Component);
-    ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, 5.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Height", GetHeight, SetHeight, float, 5.0f, AM_DEFAULT);
+    URHO3D_COPY_BASE_ATTRIBUTES(Component);
+    URHO3D_ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, 5.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Height", GetHeight, SetHeight, float, 5.0f, AM_DEFAULT);
 }
 
 void Obstacle::OnSetEnabled()
@@ -92,11 +92,11 @@ void Obstacle::OnSceneSet(Scene* scene)
     {
         if (scene == node_)
         {
-            LOGWARNING(GetTypeName() + " should not be created to the root scene node");
+            URHO3D_LOGWARNING(GetTypeName() + " should not be created to the root scene node");
             return;
         }
         if (!ownerMesh_)
-            ownerMesh_ = scene->GetComponent<DynamicNavigationMesh>();
+            ownerMesh_ = node_->GetParentComponent<DynamicNavigationMesh>(true);
         if (ownerMesh_)
             ownerMesh_->AddObstacle(this);
     }
@@ -104,6 +104,8 @@ void Obstacle::OnSceneSet(Scene* scene)
     {
         if (obstacleId_ > 0 && ownerMesh_)
             ownerMesh_->RemoveObstacle(this);
+        
+        ownerMesh_.Reset();
     }
 }
 

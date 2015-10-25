@@ -92,7 +92,7 @@ function HandleEscKeyDown(eventType, eventData)
 end
 
 function StartGame()
-    Print("Welcome to the Urho adventure game! You are the newest fish in the tank your\n" ..
+    print("Welcome to the Urho adventure game! You are the newest fish in the tank your\n" ..
           "objective is to survive as long as possible. Beware of hunger and the merciless\n" ..
           "predator cichlid Urho, who appears from time to time. Evading Urho is easier\n" ..
           "with an empty stomach. Type 'help' for available commands.")
@@ -106,8 +106,8 @@ function StartGame()
 end
 
 function EndGame(message)
-    Print(message)
-    Print("Game over! You survived " .. numTurns .. " turns.\n" ..
+    print(message)
+    print("Game over! You survived " .. numTurns .. " turns.\n" ..
           "Do you want to play again (Y/N)?")
 
     gameOn = false
@@ -127,7 +127,7 @@ function Advance()
     end
 
     if urhoThreat > 0 then
-        Print(urhoThreatLevels[urhoThreat] .. ".")
+        print(urhoThreatLevels[urhoThreat] .. ".")
     end
 
     if (numTurns % 4) == 0 and not eatenLastTurn then
@@ -136,17 +136,17 @@ function Advance()
             EndGame("You have died from starvation!")
             return
         else
-            Print("You are " .. hungerLevels[hunger + 1] .. ".")
+            print("You are " .. hungerLevels[hunger + 1] .. ".")
         end
     end
 
     eatenLastTurn = false
 
     if foodAvailable then
-        Print("The floating pieces of fish food are quickly eaten by other fish in the tank.")
+        print("The floating pieces of fish food are quickly eaten by other fish in the tank.")
         foodAvailable = false
     elseif Random() < 0.15 then
-        Print("The overhead dispenser drops pieces of delicious fish food to the water!")
+        print("The overhead dispenser drops pieces of delicious fish food to the water!")
         foodAvailable = true
     end
 
@@ -160,7 +160,7 @@ end
 function HandleInput(input)
     local inputLower = TrimInput(input:lower())
     if inputLower:len() == 0 then
-        Print("Empty input given!")
+        print("Empty input given!")
         return
     end
 
@@ -169,12 +169,12 @@ function HandleInput(input)
     elseif gameOn then
         -- Game is on
         if inputLower == "help" then
-            Print("The following commands are available: 'eat', 'hide', 'wait', 'score', 'quit'.")
+            print("The following commands are available: 'eat', 'hide', 'wait', 'score', 'quit'.")
         elseif inputLower == "score" then
-            Print("You have survived " .. numTurns .. " turns.")
+            print("You have survived " .. numTurns .. " turns.")
         elseif inputLower == "eat" then
             if foodAvailable then
-                Print("You eat several pieces of fish food.")
+                print("You eat several pieces of fish food.")
                 foodAvailable = false
                 eatenLastTurn = true
                 if hunger > 3 then
@@ -186,32 +186,32 @@ function HandleInput(input)
                     EndGame("You have killed yourself by over-eating!")
                     return
                 else
-                    Print("You are now " .. hungerLevels[hunger + 1] .. ".")
+                    print("You are now " .. hungerLevels[hunger + 1] .. ".")
                 end
             else
-                Print("There is no food available.")
+                print("There is no food available.")
             end
 
             Advance()
         elseif inputLower == "wait" then
-            Print("Time passes...")
+            print("Time passes...")
             Advance()
         elseif inputLower == "hide" then
             if urhoThreat > 0 then
                 local evadeSuccess = hunger > 2 or Random() < 0.5
                 if evadeSuccess then
-                    Print("You hide behind the thick bottom vegetation, until Urho grows bored.")
+                    print("You hide behind the thick bottom vegetation, until Urho grows bored.")
                     urhoThreat = -2
                 else
-                    Print("Your movements are too slow you are unable to hide from Urho.")
+                    print("Your movements are too slow you are unable to hide from Urho.")
                 end
             else
-                Print("There is nothing to hide from.")
+                print("There is nothing to hide from.")
             end
 
             Advance()
         else
-            Print("Cannot understand the input '" .. input .. "'.")
+            print("Cannot understand the input '" .. input .. "'.")
         end
     else
         -- Game is over, wait for (y)es or (n)o reply
@@ -221,14 +221,9 @@ function HandleInput(input)
         elseif c == 'n' then
             engine:Exit()
         else
-            Print("Please answer 'y' or 'n'.")
+            print("Please answer 'y' or 'n'.")
         end
     end
-end
-
-function Print(input)
-    -- Logging appears both in the engine console and stdout
-    Log:WriteRaw(input .. "\n")
 end
 
 -- Create XML patch instructions for screen joystick layout specific to this sample app
