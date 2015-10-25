@@ -1728,6 +1728,8 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "int get_occlusionBufferSize() const", asMETHOD(Renderer, GetOcclusionBufferSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_occluderSizeThreshold(float)", asMETHOD(Renderer, SetOccluderSizeThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "float get_occluderSizeThreshold() const", asMETHOD(Renderer, GetOccluderSizeThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void set_threadedOcclusion(bool)", asMETHOD(Renderer, SetThreadedOcclusion), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "bool get_threadedOcclusion() const", asMETHOD(Renderer, GetThreadedOcclusion), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_mobileShadowBiasMul(float)", asMETHOD(Renderer, SetMobileShadowBiasMul), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "float get_mobileShadowBiasMul() const", asMETHOD(Renderer, GetMobileShadowBiasMul), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_mobileShadowBiasAdd(float)", asMETHOD(Renderer, SetMobileShadowBiasAdd), asCALL_THISCALL);

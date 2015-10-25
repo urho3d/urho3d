@@ -204,7 +204,7 @@ bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
         return true;
 
     // Draw and check for running out of triangles
-    return buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, occlusionGeometry_->GetIndexStart(),
+    return buffer->AddTriangles(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, occlusionGeometry_->GetIndexStart(),
         occlusionGeometry_->GetIndexCount());
 }
 

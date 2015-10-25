@@ -168,6 +168,9 @@ public:
     /// Return the last used software occlusion buffer.
     OcclusionBuffer* GetOcclusionBuffer() const { return occlusionBuffer_; }
 
+    /// Return number of occluders that were actually rendered. Occluders may be rejected if running out of triangles or if behind other occluders.
+    unsigned GetNumActiveOccluders() const { return activeOccluders_; }
+
     /// Return the source view that was already prepared. Used when viewports specify the same culling camera.
     View* GetSourceView() const;
 
@@ -379,6 +382,8 @@ private:
     PODVector<Drawable*> occluders_;
     /// Lights.
     PODVector<Light*> lights_;
+    /// Number of active occluders.
+    unsigned activeOccluders_;
 
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;

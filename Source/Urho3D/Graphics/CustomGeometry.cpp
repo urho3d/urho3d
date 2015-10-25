@@ -196,7 +196,7 @@ bool CustomGeometry::DrawOcclusion(OcclusionBuffer* buffer)
             continue;
 
         // Draw and check for running out of triangles
-        success = buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, geometry->GetVertexStart(),
+        success = buffer->AddTriangles(node_->GetWorldTransform(), vertexData, vertexSize, geometry->GetVertexStart(),
             geometry->GetVertexCount());
 
         if (!success)
