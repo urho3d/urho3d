@@ -222,8 +222,20 @@ void CollisionShape2D::CreateFixture()
     if (!body)
         return;
 
-    fixture_ = body->CreateFixture(&fixtureDef_);
-    fixture_->SetUserData(this);
+    // Chain shape must have atleast two vertices before creating fixture
+    if (fixtureDef_.shape->m_type == b2Shape::e_chain)
+    {
+        if (dynamic_cast<const b2ChainShape*>(fixtureDef_.shape)->m_count >= 2)
+        {
+            fixture_ = body->CreateFixture(&fixtureDef_);
+            fixture_->SetUserData(this);
+        }
+    }
+    else
+    {
+        fixture_ = body->CreateFixture(&fixtureDef_);
+        fixture_->SetUserData(this);
+    }
 }
 
 void CollisionShape2D::ReleaseFixture()
