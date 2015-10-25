@@ -108,7 +108,8 @@ UI::UI(Context* context) :
     uiRendered_(false),
     nonModalBatchSize_(0),
     dragElementsCount_(0),
-    dragConfirmedCount_(0)
+    dragConfirmedCount_(0),
+    uiScale_(1.0f)
 {
     rootElement_->SetTraversalMode(TM_DEPTH_FIRST);
     rootModalElement_->SetTraversalMode(TM_DEPTH_FIRST);
@@ -756,9 +757,9 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
     Vector2 offset(-1.0f, 1.0f);
 
     Matrix4 projection(Matrix4::IDENTITY);
-    projection.m00_ = scale.x_;
+    projection.m00_ = scale.x_ * uiScale_;
     projection.m03_ = offset.x_;
-    projection.m11_ = scale.y_;
+    projection.m11_ = scale.y_ * uiScale_;
     projection.m13_ = offset.y_;
     projection.m22_ = 1.0f;
     projection.m23_ = 0.0f;
@@ -819,8 +820,14 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
         if (graphics_->NeedParameterUpdate(SP_MATERIAL, this))
             graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
 
+        IntRect scissor = batch.scissor_;
+        scissor.left_ = (int)(scissor.left_ * uiScale_);
+        scissor.top_ = (int)(scissor.top_ * uiScale_);
+        scissor.right_ = (int)(scissor.right_ * uiScale_);
+        scissor.bottom_ = (int)(scissor.bottom_ * uiScale_);
+
         graphics_->SetBlendMode(batch.blendMode_);
-        graphics_->SetScissorTest(true, batch.scissor_);
+        graphics_->SetScissorTest(true, scissor);
         graphics_->SetTexture(0, batch.texture_);
         graphics_->Draw(TRIANGLE_LIST, batch.vertexStart_ / UI_VERTEX_SIZE,
             (batch.vertexEnd_ - batch.vertexStart_) / UI_VERTEX_SIZE);
@@ -979,6 +986,9 @@ void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
         if (!visible && cursor_)
             pos = cursor_->GetPosition();
     }
+
+    pos.x_ = (int)(pos.x_ / uiScale_);
+    pos.y_ = (int)(pos.y_ / uiScale_);
 }
 
 void UI::SetCursorShape(CursorShape shape)
@@ -1765,6 +1775,24 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
         sendPos.y_ = dragData->sumPos.y_ / dragData->numDragButtons;
     }
     return sendPos;
+}
+
+void UI::SetWidth(float size)
+{
+    Graphics* g = GetSubsystem<Graphics>();
+    if (g)
+    {
+        uiScale_ = g->GetWidth() / size;
+    }
+}
+
+void UI::SetHeight(float size)
+{
+    Graphics* g = GetSubsystem<Graphics>();
+    if (g)
+    {
+        uiScale_ = g->GetHeight() / size;
+    }
 }
 
 void RegisterUILibrary(Context* context)
