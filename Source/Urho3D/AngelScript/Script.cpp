@@ -41,7 +41,7 @@ namespace Urho3D
 
 class ScriptResourceRouter : public ResourceRouter
 {
-    OBJECT(ScriptResourceRouter, ResourceRouter);
+    URHO3D_OBJECT(ScriptResourceRouter, ResourceRouter);
 
     /// Construct.
     ScriptResourceRouter(Context* context) :
@@ -77,7 +77,7 @@ Script::Script(Context* context) :
     scriptEngine_ = asCreateScriptEngine(ANGELSCRIPT_VERSION);
     if (!scriptEngine_)
     {
-        LOGERROR("Could not create AngelScript engine");
+        URHO3D_LOGERROR("Could not create AngelScript engine");
         return;
     }
 
@@ -166,7 +166,7 @@ Script::~Script()
 bool Script::Execute(const String& line)
 {
     // Note: compiling code each time is slow. Not to be used for performance-critical or repeating activity
-    PROFILE(ExecuteImmediate);
+    URHO3D_PROFILE(ExecuteImmediate);
 
     ClearObjectTypeCache();
 
@@ -215,7 +215,7 @@ void Script::SetExecuteConsoleCommands(bool enable)
 
     executeConsoleCommands_ = enable;
     if (enable)
-        SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(Script, HandleConsoleCommand));
+        SubscribeToEvent(E_CONSOLECOMMAND, URHO3D_HANDLER(Script, HandleConsoleCommand));
     else
         UnsubscribeFromEvent(E_CONSOLECOMMAND);
 }
@@ -228,15 +228,15 @@ void Script::MessageCallback(const asSMessageInfo* msg)
     switch (msg->type)
     {
     case asMSGTYPE_ERROR:
-        LOGERROR(message);
+        URHO3D_LOGERROR(message);
         break;
 
     case asMSGTYPE_WARNING:
-        LOGWARNING(message);
+        URHO3D_LOGWARNING(message);
         break;
 
     default:
-        LOGINFO(message);
+        URHO3D_LOGINFO(message);
         break;
     }
 }

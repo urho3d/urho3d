@@ -50,6 +50,7 @@ endif ()
 # Only need to search the DLL as a proxy for the presence of the MS Windows SDK
 # Note: do not use default paths such as the PATH variable, to potentially avoid using a wrong architecture DLL
 find_file (DIRECT3D_DLL NAMES ${DLL_NAMES} PATHS
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v10.0;InstallationFolder]/Redist/D3D/${PATH_SUFFIX}"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v8.1;InstallationFolder]/Redist/D3D/${PATH_SUFFIX}"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v8.0;InstallationFolder]/Redist/D3D/${PATH_SUFFIX}"
     NO_DEFAULT_PATH)

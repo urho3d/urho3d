@@ -341,7 +341,7 @@ Octree::Octree(Context* context) :
     // If the engine is running headless, subscribe to RenderUpdate events for manually updating the octree
     // to allow raycasts and animation update
     if (!GetSubsystem<Graphics>())
-        SubscribeToEvent(E_RENDERUPDATE, HANDLER(Octree, HandleRenderUpdate));
+        SubscribeToEvent(E_RENDERUPDATE, URHO3D_HANDLER(Octree, HandleRenderUpdate));
 }
 
 Octree::~Octree()
@@ -359,9 +359,9 @@ void Octree::RegisterObject(Context* context)
     Vector3 defaultBoundsMin = -Vector3::ONE * DEFAULT_OCTREE_SIZE;
     Vector3 defaultBoundsMax = Vector3::ONE * DEFAULT_OCTREE_SIZE;
 
-    ATTRIBUTE("Bounding Box Min", Vector3, worldBoundingBox_.min_, defaultBoundsMin, AM_DEFAULT);
-    ATTRIBUTE("Bounding Box Max", Vector3, worldBoundingBox_.max_, defaultBoundsMax, AM_DEFAULT);
-    ATTRIBUTE("Number of Levels", int, numLevels_, DEFAULT_OCTREE_LEVELS, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Bounding Box Min", Vector3, worldBoundingBox_.min_, defaultBoundsMin, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Bounding Box Max", Vector3, worldBoundingBox_.max_, defaultBoundsMax, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Number of Levels", int, numLevels_, DEFAULT_OCTREE_LEVELS, AM_DEFAULT);
 }
 
 void Octree::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -375,7 +375,7 @@ void Octree::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     if (debug)
     {
-        PROFILE(OctreeDrawDebug);
+        URHO3D_PROFILE(OctreeDrawDebug);
 
         Octant::DrawDebugGeometry(debug, depthTest);
     }
@@ -383,7 +383,7 @@ void Octree::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void Octree::SetSize(const BoundingBox& box, unsigned numLevels)
 {
-    PROFILE(ResizeOctree);
+    URHO3D_PROFILE(ResizeOctree);
 
     // If drawables exist, they are temporarily moved to the root
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
@@ -399,7 +399,7 @@ void Octree::Update(const FrameInfo& frame)
     // Let drawables update themselves before reinsertion. This can be used for animation
     if (!drawableUpdates_.Empty())
     {
-        PROFILE(UpdateDrawables);
+        URHO3D_PROFILE(UpdateDrawables);
 
         // Perform updates in worker threads. Notify the scene that a threaded update is going on and components
         // (for example physics objects) should not perform non-threadsafe work when marked dirty
@@ -450,7 +450,7 @@ void Octree::Update(const FrameInfo& frame)
     // the proper octant yet
     if (!drawableUpdates_.Empty())
     {
-        PROFILE(ReinsertToOctree);
+        URHO3D_PROFILE(ReinsertToOctree);
 
         for (PODVector<Drawable*>::Iterator i = drawableUpdates_.Begin(); i != drawableUpdates_.End(); ++i)
         {
@@ -473,7 +473,7 @@ void Octree::Update(const FrameInfo& frame)
             octant = drawable->GetOctant();
             if (octant != this && octant->GetCullingBox().IsInside(box) != INSIDE)
             {
-                LOGERROR("Drawable is not fully inside its octant's culling bounds: drawable box " + box.ToString() +
+                URHO3D_LOGERROR("Drawable is not fully inside its octant's culling bounds: drawable box " + box.ToString() +
                          " octant box " + octant->GetCullingBox().ToString());
             }
 #endif
@@ -509,7 +509,7 @@ void Octree::GetDrawables(OctreeQuery& query) const
 
 void Octree::Raycast(RayOctreeQuery& query) const
 {
-    PROFILE(Raycast);
+    URHO3D_PROFILE(Raycast);
 
     query.result_.Clear();
 
@@ -567,7 +567,7 @@ void Octree::Raycast(RayOctreeQuery& query) const
 
 void Octree::RaycastSingle(RayOctreeQuery& query) const
 {
-    PROFILE(Raycast);
+    URHO3D_PROFILE(Raycast);
 
     query.result_.Clear();
     rayQueryDrawables_.Clear();

@@ -89,13 +89,13 @@ Console::Console(Context* context) :
 
     SetNumRows(DEFAULT_CONSOLE_ROWS);
 
-    SubscribeToEvent(interpreters_, E_ITEMSELECTED, HANDLER(Console, HandleInterpreterSelected));
-    SubscribeToEvent(lineEdit_, E_TEXTFINISHED, HANDLER(Console, HandleTextFinished));
-    SubscribeToEvent(lineEdit_, E_UNHANDLEDKEY, HANDLER(Console, HandleLineEditKey));
-    SubscribeToEvent(closeButton_, E_RELEASED, HANDLER(Console, HandleCloseButtonPressed));
-    SubscribeToEvent(E_SCREENMODE, HANDLER(Console, HandleScreenMode));
-    SubscribeToEvent(E_LOGMESSAGE, HANDLER(Console, HandleLogMessage));
-    SubscribeToEvent(E_POSTUPDATE, HANDLER(Console, HandlePostUpdate));
+    SubscribeToEvent(interpreters_, E_ITEMSELECTED, URHO3D_HANDLER(Console, HandleInterpreterSelected));
+    SubscribeToEvent(lineEdit_, E_TEXTFINISHED, URHO3D_HANDLER(Console, HandleTextFinished));
+    SubscribeToEvent(lineEdit_, E_UNHANDLEDKEY, URHO3D_HANDLER(Console, HandleLineEditKey));
+    SubscribeToEvent(closeButton_, E_RELEASED, URHO3D_HANDLER(Console, HandleCloseButtonPressed));
+    SubscribeToEvent(E_SCREENMODE, URHO3D_HANDLER(Console, HandleScreenMode));
+    SubscribeToEvent(E_LOGMESSAGE, URHO3D_HANDLER(Console, HandleLogMessage));
+    SubscribeToEvent(E_POSTUPDATE, URHO3D_HANDLER(Console, HandlePostUpdate));
 }
 
 Console::~Console()

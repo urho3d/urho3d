@@ -3762,6 +3762,8 @@ void Update();
 /* readonly */
 String category;
 XMLFile defaultStyle;
+/* readonly */
+Text memoryText;
 uint mode;
 /* readonly */
 Text modeText;
@@ -7969,6 +7971,7 @@ bool specularLighting;
 int textureAnisotropy;
 TextureFilterMode textureFilterMode;
 int textureQuality;
+bool threadedOcclusion;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -8040,9 +8043,9 @@ bool autoReloadResources;
 /* readonly */
 String category;
 int finishBackgroundResourcesMs;
-Array<uint> memoryBudget;
+Array<uint64> memoryBudget;
 /* readonly */
-Array<uint> memoryUse;
+Array<uint64> memoryUse;
 /* readonly */
 uint numBackgroundLoadResources;
 /* readonly */
@@ -8057,7 +8060,7 @@ bool seachPackagesFirst;
 /* writeonly */
 bool searchPackagesFirst;
 /* readonly */
-uint totalMemoryUse;
+uint64 totalMemoryUse;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -13439,6 +13442,7 @@ Object GetEventSender();
 String GetExtension(const String&, bool = true);
 String GetFileName(const String&);
 String GetFileNameAndExtension(const String&, bool = false);
+String GetFileSizeString(uint64);
 uint GetFloat16Format();
 uint GetFloat32Format();
 uint GetFormat(const String&);
@@ -13517,7 +13521,7 @@ void UnsubscribeFromAllEventsExcept(Array<String>);
 void UnsubscribeFromEvent(Object, const String&);
 void UnsubscribeFromEvent(const String&);
 void UnsubscribeFromEvents(Object);
-bool WriteDrawablesToOBJ(Array<Drawable>, File, bool = false);
+bool WriteDrawablesToOBJ(Array<Drawable>, File, bool, bool, bool = false);
 
 // Global properties
 DBAPI DBAPI;
@@ -13591,6 +13595,8 @@ uint DD_SOURCE;
 uint DD_SOURCE_AND_TARGET;
 uint DD_TARGET;
 uint DEBUGHUD_SHOW_ALL;
+uint DEBUGHUD_SHOW_ALL_MEMORY;
+uint DEBUGHUD_SHOW_MEMORY;
 uint DEBUGHUD_SHOW_MODE;
 uint DEBUGHUD_SHOW_NONE;
 uint DEBUGHUD_SHOW_PROFILER;

@@ -39,7 +39,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(HelloGUI)
+URHO3D_DEFINE_APPLICATION_MAIN(HelloGUI)
 
 HelloGUI::HelloGUI(Context* context) :
     Sample(context),
@@ -140,10 +140,10 @@ void HelloGUI::InitWindow()
     buttonClose->SetStyle("CloseButton");
 
     // Subscribe to buttonClose release (following a 'press') events
-    SubscribeToEvent(buttonClose, E_RELEASED, HANDLER(HelloGUI, HandleClosePressed));
+    SubscribeToEvent(buttonClose, E_RELEASED, URHO3D_HANDLER(HelloGUI, HandleClosePressed));
 
     // Subscribe also to all UI mouse clicks just to see where we have clicked
-    SubscribeToEvent(E_UIMOUSECLICK, HANDLER(HelloGUI, HandleControlClicked));
+    SubscribeToEvent(E_UIMOUSECLICK, URHO3D_HANDLER(HelloGUI, HandleControlClicked));
 }
 
 void HelloGUI::CreateDraggableFish()
@@ -174,9 +174,9 @@ void HelloGUI::CreateDraggableFish()
 
     // Subscribe draggableFish to Drag Events (in order to make it draggable)
     // See "Event list" in documentation's Main Page for reference on available Events and their eventData
-    SubscribeToEvent(draggableFish, E_DRAGBEGIN, HANDLER(HelloGUI, HandleDragBegin));
-    SubscribeToEvent(draggableFish, E_DRAGMOVE, HANDLER(HelloGUI, HandleDragMove));
-    SubscribeToEvent(draggableFish, E_DRAGEND, HANDLER(HelloGUI, HandleDragEnd));
+    SubscribeToEvent(draggableFish, E_DRAGBEGIN, URHO3D_HANDLER(HelloGUI, HandleDragBegin));
+    SubscribeToEvent(draggableFish, E_DRAGMOVE, URHO3D_HANDLER(HelloGUI, HandleDragMove));
+    SubscribeToEvent(draggableFish, E_DRAGEND, URHO3D_HANDLER(HelloGUI, HandleDragEnd));
 }
 
 void HelloGUI::HandleDragBegin(StringHash eventType, VariantMap& eventData)

@@ -97,13 +97,13 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
     XMLElement dataElem = element.GetChild("data");
     if (!dataElem)
     {
-        LOGERROR("Could not find data in layer");
+        URHO3D_LOGERROR("Could not find data in layer");
         return false;
     }
 
     if (dataElem.HasAttribute("encoding") && dataElem.GetAttribute("encoding") != "xml")
     {
-        LOGERROR("Encoding not support now");
+        URHO3D_LOGERROR("Encoding not support now");
         return false;
     }
 
@@ -270,7 +270,7 @@ bool TmxImageLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
     SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
     if (!texture)
     {
-        LOGERROR("Could not load texture " + textureFilePath);
+        URHO3D_LOGERROR("Could not load texture " + textureFilePath);
         return false;
     }
 
@@ -315,7 +315,7 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
     loadXMLFile_ = new XMLFile(context_);
     if (!loadXMLFile_->Load(source))
     {
-        LOGERROR("Load XML failed " + source.GetName());
+        URHO3D_LOGERROR("Load XML failed " + source.GetName());
         loadXMLFile_.Reset();
         return false;
     }
@@ -323,7 +323,7 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
     XMLElement rootElem = loadXMLFile_->GetRoot("map");
     if (!rootElem)
     {
-        LOGERROR("Invalid tmx file " + source.GetName());
+        URHO3D_LOGERROR("Invalid tmx file " + source.GetName());
         loadXMLFile_.Reset();
         return false;
     }
@@ -374,7 +374,7 @@ bool TmxFile2D::EndLoad()
     String version = rootElem.GetAttribute("version");
     if (version != "1.0")
     {
-        LOGERROR("Invalid version");
+        URHO3D_LOGERROR("Invalid version");
         return false;
     }
 
@@ -387,7 +387,7 @@ bool TmxFile2D::EndLoad()
         info_.orientation_ = O_STAGGERED;
     else
     {
-        LOGERROR("Unsupported orientation type " + orientation);
+        URHO3D_LOGERROR("Unsupported orientation type " + orientation);
         return false;
     }
 
@@ -475,7 +475,7 @@ SharedPtr<XMLFile> TmxFile2D::LoadTSXFile(const String& source)
     SharedPtr<XMLFile> tsxXMLFile(new XMLFile(context_));
     if (!tsxFile || !tsxXMLFile->Load(*tsxFile))
     {
-        LOGERROR("Load TSX file failed " + tsxFilePath);
+        URHO3D_LOGERROR("Load TSX file failed " + tsxFilePath);
         return SharedPtr<XMLFile>();
     }
 
@@ -514,7 +514,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
     if (!texture)
     {
-        LOGERROR("Could not load texture " + textureFilePath);
+        URHO3D_LOGERROR("Could not load texture " + textureFilePath);
         return false;
     }
 

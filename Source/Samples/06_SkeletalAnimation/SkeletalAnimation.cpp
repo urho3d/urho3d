@@ -45,7 +45,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(SkeletalAnimation)
+URHO3D_DEFINE_APPLICATION_MAIN(SkeletalAnimation)
 
 SkeletalAnimation::SkeletalAnimation(Context* context) :
     Sample(context),
@@ -187,12 +187,12 @@ void SkeletalAnimation::SetupViewport()
 void SkeletalAnimation::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(SkeletalAnimation, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(SkeletalAnimation, HandleUpdate));
 
     // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, sent after Renderer subsystem is
     // done with defining the draw calls for the viewports (but before actually executing them.) We will request debug geometry
     // rendering during that event
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SkeletalAnimation, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, URHO3D_HANDLER(SkeletalAnimation, HandlePostRenderUpdate));
 }
 
 void SkeletalAnimation::MoveCamera(float timeStep)

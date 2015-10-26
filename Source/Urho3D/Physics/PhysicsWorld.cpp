@@ -182,14 +182,14 @@ void PhysicsWorld::RegisterObject(Context* context)
 {
     context->RegisterFactory<PhysicsWorld>(SUBSYSTEM_CATEGORY);
 
-    MIXED_ACCESSOR_ATTRIBUTE("Gravity", GetGravity, SetGravity, Vector3, DEFAULT_GRAVITY, AM_DEFAULT);
-    ATTRIBUTE("Physics FPS", int, fps_, DEFAULT_FPS, AM_DEFAULT);
-    ATTRIBUTE("Max Substeps", int, maxSubSteps_, 0, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Solver Iterations", GetNumIterations, SetNumIterations, int, 10, AM_DEFAULT);
-    ATTRIBUTE("Net Max Angular Vel.", float, maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
-    ATTRIBUTE("Interpolation", bool, interpolation_, true, AM_FILE);
-    ATTRIBUTE("Internal Edge Utility", bool, internalEdge_, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Split Impulse", GetSplitImpulse, SetSplitImpulse, bool, false, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Gravity", GetGravity, SetGravity, Vector3, DEFAULT_GRAVITY, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Physics FPS", int, fps_, DEFAULT_FPS, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Max Substeps", int, maxSubSteps_, 0, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Solver Iterations", GetNumIterations, SetNumIterations, int, 10, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Net Max Angular Vel.", float, maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Interpolation", bool, interpolation_, true, AM_FILE);
+    URHO3D_ATTRIBUTE("Internal Edge Utility", bool, internalEdge_, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Split Impulse", GetSplitImpulse, SetSplitImpulse, bool, false, AM_DEFAULT);
 }
 
 bool PhysicsWorld::isVisible(const btVector3& aabbMin, const btVector3& aabbMax)
@@ -210,7 +210,7 @@ void PhysicsWorld::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     if (debug)
     {
-        PROFILE(PhysicsDrawDebug);
+        URHO3D_PROFILE(PhysicsDrawDebug);
 
         debugRenderer_ = debug;
         debugDepthTest_ = depthTest;
@@ -221,7 +221,7 @@ void PhysicsWorld::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void PhysicsWorld::reportErrorWarning(const char* warningString)
 {
-    LOGWARNING("Physics: " + String(warningString));
+    URHO3D_LOGWARNING("Physics: " + String(warningString));
 }
 
 void PhysicsWorld::drawContactPoint(const btVector3& pointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime,
@@ -235,7 +235,7 @@ void PhysicsWorld::draw3dText(const btVector3& location, const char* textString)
 
 void PhysicsWorld::Update(float timeStep)
 {
-    PROFILE(UpdatePhysics);
+    URHO3D_PROFILE(UpdatePhysics);
 
     float internalTimeStep = 1.0f / fps_;
     int maxSubSteps = (int)(timeStep * fps_) + 1;
@@ -341,10 +341,10 @@ void PhysicsWorld::SetMaxNetworkAngularVelocity(float velocity)
 
 void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask)
 {
-    PROFILE(PhysicsRaycast);
+    URHO3D_PROFILE(PhysicsRaycast);
 
     if (maxDistance >= M_INFINITY)
-        LOGWARNING("Infinite maxDistance in physics raycast is not supported");
+        URHO3D_LOGWARNING("Infinite maxDistance in physics raycast is not supported");
 
     btCollisionWorld::AllHitsRayResultCallback
         rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ + maxDistance * ray.direction_));
@@ -368,10 +368,10 @@ void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& r
 
 void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask)
 {
-    PROFILE(PhysicsRaycastSingle);
+    URHO3D_PROFILE(PhysicsRaycastSingle);
 
     if (maxDistance >= M_INFINITY)
-        LOGWARNING("Infinite maxDistance in physics raycast is not supported");
+        URHO3D_LOGWARNING("Infinite maxDistance in physics raycast is not supported");
 
     btCollisionWorld::ClosestRayResultCallback
         rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ + maxDistance * ray.direction_));
@@ -398,10 +398,10 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
 
 void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask)
 {
-    PROFILE(PhysicsSphereCast);
+    URHO3D_PROFILE(PhysicsSphereCast);
 
     if (maxDistance >= M_INFINITY)
-        LOGWARNING("Infinite maxDistance in physics sphere cast is not supported");
+        URHO3D_LOGWARNING("Infinite maxDistance in physics sphere cast is not supported");
 
     btSphereShape shape(radius);
 
@@ -434,7 +434,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, CollisionShape* shap
 {
     if (!shape || !shape->GetCollisionShape())
     {
-        LOGERROR("Null collision shape for convex cast");
+        URHO3D_LOGERROR("Null collision shape for convex cast");
         result.body_ = 0;
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
@@ -474,7 +474,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
 {
     if (!shape)
     {
-        LOGERROR("Null collision shape for convex cast");
+        URHO3D_LOGERROR("Null collision shape for convex cast");
         result.body_ = 0;
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
@@ -484,7 +484,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
 
     if (!shape->isConvex())
     {
-        LOGERROR("Can not use non-convex collision shape for convex cast");
+        URHO3D_LOGERROR("Can not use non-convex collision shape for convex cast");
         result.body_ = 0;
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
@@ -492,7 +492,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
         return;
     }
 
-    PROFILE(PhysicsConvexCast);
+    URHO3D_PROFILE(PhysicsConvexCast);
 
     btCollisionWorld::ClosestConvexResultCallback convexCallback(ToBtVector3(startPos), ToBtVector3(endPos));
     convexCallback.m_collisionFilterGroup = (short)0xffff;
@@ -538,7 +538,7 @@ void PhysicsWorld::RemoveCachedGeometry(Model* model)
 
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask)
 {
-    PROFILE(PhysicsSphereQuery);
+    URHO3D_PROFILE(PhysicsSphereQuery);
 
     result.Clear();
 
@@ -558,7 +558,7 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& s
 
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask)
 {
-    PROFILE(PhysicsBoxQuery);
+    URHO3D_PROFILE(PhysicsBoxQuery);
 
     result.Clear();
 
@@ -577,7 +577,7 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingB
 
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body)
 {
-    PROFILE(GetCollidingBodies);
+    URHO3D_PROFILE(GetCollidingBodies);
 
     result.Clear();
 
@@ -690,7 +690,7 @@ void PhysicsWorld::OnSceneSet(Scene* scene)
     if (scene)
     {
         scene_ = GetScene();
-        SubscribeToEvent(scene_, E_SCENESUBSYSTEMUPDATE, HANDLER(PhysicsWorld, HandleSceneSubsystemUpdate));
+        SubscribeToEvent(scene_, E_SCENESUBSYSTEMUPDATE, URHO3D_HANDLER(PhysicsWorld, HandleSceneSubsystemUpdate));
     }
     else
         UnsubscribeFromEvent(E_SCENESUBSYSTEMUPDATE);
@@ -742,7 +742,7 @@ void PhysicsWorld::PostStep(float timeStep)
 
 void PhysicsWorld::SendCollisionEvents()
 {
-    PROFILE(SendCollisionEvents);
+    URHO3D_PROFILE(SendCollisionEvents);
 
     currentCollisions_.Clear();
     physicsCollisionData_.Clear();

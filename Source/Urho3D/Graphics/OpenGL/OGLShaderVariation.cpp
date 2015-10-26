@@ -145,7 +145,7 @@ bool ShaderVariation::Create()
 #ifdef _DEBUG
         String defineCheck = defineString.Substring(8, defineString.Find(' ', 8) - 8);
         if (originalShaderCode.Find(defineCheck) == String::NPOS)
-            LOGWARNING("Shader " + GetFullName() + " does not use the define " + defineCheck);
+            URHO3D_LOGWARNING("Shader " + GetFullName() + " does not use the define " + defineCheck);
 #endif
     }
 

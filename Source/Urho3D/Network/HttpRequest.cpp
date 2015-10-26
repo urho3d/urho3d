@@ -51,13 +51,13 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
     // to maximum value once the request is done, signaling end for Deserializer::IsEof().
     size_ = M_MAX_UNSIGNED;
 
-    LOGDEBUG("HTTP " + verb_ + " request to URL " + url_);
+    URHO3D_LOGDEBUG("HTTP " + verb_ + " request to URL " + url_);
 
 #ifdef URHO3D_THREADING
     // Start the worker thread to actually create the connection and read the response data.
     Run();
 #else
-    LOGERROR("HTTP request will not execute as threading is disabled");
+    URHO3D_LOGERROR("HTTP request will not execute as threading is disabled");
 #endif
 }
 

@@ -33,7 +33,7 @@ namespace Urho3D
 /// %Database connection.
 class URHO3D_API DbConnection : public Object
 {
-    OBJECT(DbConnection, Object);
+    URHO3D_OBJECT(DbConnection, Object);
 
 public:
     /// Construct.

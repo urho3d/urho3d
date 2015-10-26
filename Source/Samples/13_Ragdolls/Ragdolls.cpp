@@ -48,7 +48,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(Ragdolls)
+URHO3D_DEFINE_APPLICATION_MAIN(Ragdolls)
 
 Ragdolls::Ragdolls(Context* context) :
     Sample(context),
@@ -285,11 +285,11 @@ void Ragdolls::SpawnObject()
 void Ragdolls::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Ragdolls, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Ragdolls, HandleUpdate));
 
     // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request
     // debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Ragdolls, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, URHO3D_HANDLER(Ragdolls, HandlePostRenderUpdate));
 }
 
 void Ragdolls::HandleUpdate(StringHash eventType, VariantMap& eventData)

@@ -77,7 +77,7 @@ Animatable::~Animatable()
 
 void Animatable::RegisterObject(Context* context)
 {
-    MIXED_ACCESSOR_ATTRIBUTE("Object Animation", GetObjectAnimationAttr, SetObjectAnimationAttr, ResourceRef,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Object Animation", GetObjectAnimationAttr, SetObjectAnimationAttr, ResourceRef,
         ResourceRef(ObjectAnimation::GetTypeStatic()), AM_DEFAULT);
 }
 
@@ -221,8 +221,8 @@ void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation)
     if (objectAnimation_)
     {
         OnObjectAnimationAdded(objectAnimation_);
-        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONADDED, HANDLER(Animatable, HandleAttributeAnimationAdded));
-        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONREMOVED, HANDLER(Animatable, HandleAttributeAnimationRemoved));
+        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONADDED, URHO3D_HANDLER(Animatable, HandleAttributeAnimationAdded));
+        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONREMOVED, URHO3D_HANDLER(Animatable, HandleAttributeAnimationRemoved));
     }
 }
 
@@ -248,7 +248,7 @@ void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attri
             const Vector<AttributeInfo>* attributes = GetAttributes();
             if (!attributes)
             {
-                LOGERROR(GetTypeName() + " has no attributes");
+                URHO3D_LOGERROR(GetTypeName() + " has no attributes");
                 return;
             }
 
@@ -264,14 +264,14 @@ void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attri
 
         if (!attributeInfo)
         {
-            LOGERROR("Invalid name: " + name);
+            URHO3D_LOGERROR("Invalid name: " + name);
             return;
         }
 
         // Check value type is same with attribute type
         if (attributeAnimation->GetValueType() != attributeInfo->type_)
         {
-            LOGERROR("Invalid value type");
+            URHO3D_LOGERROR("Invalid value type");
             return;
         }
 

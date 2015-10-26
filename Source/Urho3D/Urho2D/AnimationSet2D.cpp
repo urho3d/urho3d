@@ -139,7 +139,7 @@ bool AnimationSet2D::BeginLoad(Deserializer& source)
     if (extension == ".scml")
         return BeginLoadSpriter(source);
 
-    LOGERROR("Unsupport animation set file: " + source.GetName());
+    URHO3D_LOGERROR("Unsupport animation set file: " + source.GetName());
 
     return false;
 }
@@ -244,7 +244,7 @@ bool AnimationSet2D::EndLoadSpine()
     atlas_ = spAtlas_createFromFile(atlasFileName.CString(), 0);
     if (!atlas_)
     {
-        LOGERROR("Create spine atlas failed");
+        URHO3D_LOGERROR("Create spine atlas failed");
         return false;
     }
 
@@ -258,7 +258,7 @@ bool AnimationSet2D::EndLoadSpine()
 
     if (numAtlasPages > 1)
     {
-        LOGERROR("Only one page is supported in Urho3D");
+        URHO3D_LOGERROR("Only one page is supported in Urho3D");
         return false;
     }
 
@@ -267,7 +267,7 @@ bool AnimationSet2D::EndLoadSpine()
     spSkeletonJson* skeletonJson = spSkeletonJson_create(atlas_);
     if (!skeletonJson)
     {
-        LOGERROR("Create skeleton Json failed");
+        URHO3D_LOGERROR("Create skeleton Json failed");
         return false;
     }
 
@@ -288,7 +288,7 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
     {
-        LOGERROR("Zero sized XML data in " + source.GetName());
+        URHO3D_LOGERROR("Zero sized XML data in " + source.GetName());
         return false;
     }
 
@@ -299,7 +299,7 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
     spriterData_ = new Spriter::SpriterData();
     if (!spriterData_->Load(buffer.Get(), dataSize))
     {
-        LOGERROR("Could not spriter data from " + source.GetName());
+        URHO3D_LOGERROR("Could not spriter data from " + source.GetName());
         return false;
     }
 
@@ -369,7 +369,7 @@ bool AnimationSet2D::EndLoadSpriter()
                 SharedPtr<Sprite2D> sprite(spriteSheet_->GetSprite(GetFileName(file->name_)));
                 if (!sprite)
                 {
-                    LOGERROR("Could not load sprite " + file->name_);
+                    URHO3D_LOGERROR("Could not load sprite " + file->name_);
                     return false;                
                 }
 
@@ -412,17 +412,17 @@ bool AnimationSet2D::EndLoadSpriter()
                 SharedPtr<Image> image(cache->GetResource<Image>(imagePath));
                 if (!image)
                 {
-                    LOGERROR("Could not load image");
+                    URHO3D_LOGERROR("Could not load image");
                     return false;
                 }
                 if (image->IsCompressed())
                 {
-                    LOGERROR("Compressed image is not support");
+                    URHO3D_LOGERROR("Compressed image is not support");
                     return false;
                 }
                 if (image->GetComponents() != 4)
                 {
-                    LOGERROR("Only support image with 4 components");
+                    URHO3D_LOGERROR("Only support image with 4 components");
                     return false;
                 }
 
@@ -447,7 +447,7 @@ bool AnimationSet2D::EndLoadSpriter()
                 Image* image = info.image_;
                 if (!allocator.Allocate(image->GetWidth(), image->GetHeight(), info.x, info.y))
                 {
-                    LOGERROR("Could not allocate area");
+                    URHO3D_LOGERROR("Could not allocate area");
                     return false;
                 }
             }

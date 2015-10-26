@@ -86,13 +86,13 @@ void LuaScriptInstance::RegisterObject(Context* context)
 {
     context->RegisterFactory<LuaScriptInstance>(LOGIC_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef,
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef,
         ResourceRef(LuaFile::GetTypeStatic()), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Script Object Type", GetScriptObjectType, SetScriptObjectType, String, String::EMPTY, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_ACCESSOR_ATTRIBUTE("Script Object Type", GetScriptObjectType, SetScriptObjectType, String, String::EMPTY, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer,
         AM_FILE | AM_NOEDIT);
-    MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
@@ -191,7 +191,7 @@ void LuaScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant&
             }
             break;
         default:
-            LOGERROR("Unsupported data type");
+            URHO3D_LOGERROR("Unsupported data type");
             lua_settop(luaState_, top);
             return;
         }
@@ -268,7 +268,7 @@ void LuaScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
         dest = *((IntVector2*)tolua_tousertype(luaState_, -1, 0));
         break;
     default:
-        LOGERROR("Unsupported data type");
+        URHO3D_LOGERROR("Unsupported data type");
         return;
     }
 
@@ -386,7 +386,7 @@ void LuaScriptInstance::SetScriptFile(LuaFile* scriptFile)
         return;
 
     if (!scriptFile_->LoadAndExecute(luaState_))
-        LOGERROR("Execute Lua file failed: " + scriptFile_->GetName());
+        URHO3D_LOGERROR("Execute Lua file failed: " + scriptFile_->GetName());
 }
 
 void LuaScriptInstance::SetScriptObjectType(const String& scriptObjectType)
@@ -602,19 +602,19 @@ void LuaScriptInstance::SubscribeToScriptMethodEvents()
     Scene* scene = GetScene();
 
     if (scene && scriptObjectMethods_[LSOM_UPDATE])
-        SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(LuaScriptInstance, HandleUpdate));
+        SubscribeToEvent(scene, E_SCENEUPDATE, URHO3D_HANDLER(LuaScriptInstance, HandleUpdate));
 
     if (scene && scriptObjectMethods_[LSOM_POSTUPDATE])
-        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(LuaScriptInstance, HandlePostUpdate));
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(LuaScriptInstance, HandlePostUpdate));
 
 #ifdef URHO3D_PHYSICS
     PhysicsWorld* physicsWorld = scene ? scene->GetComponent<PhysicsWorld>() : 0;
 
     if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDUPDATE])
-        SubscribeToEvent(physicsWorld, E_PHYSICSPRESTEP, HANDLER(LuaScriptInstance, HandleFixedUpdate));
+        SubscribeToEvent(physicsWorld, E_PHYSICSPRESTEP, URHO3D_HANDLER(LuaScriptInstance, HandleFixedUpdate));
 
     if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDPOSTUPDATE])
-        SubscribeToEvent(physicsWorld, E_PHYSICSPOSTSTEP, HANDLER(LuaScriptInstance, HandlePostFixedUpdate));
+        SubscribeToEvent(physicsWorld, E_PHYSICSPOSTSTEP, URHO3D_HANDLER(LuaScriptInstance, HandlePostFixedUpdate));
 #endif
 
     if (node_ && scriptObjectMethods_[LSOM_TRANSFORMCHANGED])

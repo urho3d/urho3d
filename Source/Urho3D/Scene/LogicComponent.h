@@ -39,7 +39,7 @@ static const unsigned char USE_FIXEDPOSTUPDATE = 0x8;
 /// Helper base class for user-defined game logic components that hooks up to update events and forwards them to virtual functions similar to ScriptInstance class.
 class URHO3D_API LogicComponent : public Component
 {
-    OBJECT(LogicComponent, Component);
+    URHO3D_OBJECT(LogicComponent, Component);
 
     /// Construct.
     LogicComponent(Context* context);

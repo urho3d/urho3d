@@ -126,7 +126,7 @@ bool ScriptFile::BeginLoad(Deserializer& source)
         scriptModule_ = engine->GetModule(GetName().CString(), asGM_ALWAYS_CREATE);
         if (!scriptModule_)
         {
-            LOGERROR("Failed to create script module " + GetName());
+            URHO3D_LOGERROR("Failed to create script module " + GetName());
             return false;
         }
     }
@@ -161,7 +161,7 @@ bool ScriptFile::EndLoad()
 
         if (scriptModule_->LoadByteCode(&deserializer) >= 0)
         {
-            LOGINFO("Loaded script module " + GetName() + " from bytecode");
+            URHO3D_LOGINFO("Loaded script module " + GetName() + " from bytecode");
             success = true;
         }
     }
@@ -170,11 +170,11 @@ bool ScriptFile::EndLoad()
         int result = scriptModule_->Build();
         if (result >= 0)
         {
-            LOGINFO("Compiled script module " + GetName());
+            URHO3D_LOGINFO("Compiled script module " + GetName());
             success = true;
         }
         else
-            LOGERROR("Failed to compile script module " + GetName());
+            URHO3D_LOGERROR("Failed to compile script module " + GetName());
     }
 
     if (success)
@@ -203,7 +203,7 @@ void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const Str
 
     if (!sender)
     {
-        LOGERROR("Null event sender for event " + String(eventType) + ", handler " + handlerName);
+        URHO3D_LOGERROR("Null event sender for event " + String(eventType) + ", handler " + handlerName);
         return;
     }
 
@@ -276,7 +276,7 @@ bool ScriptFile::Execute(const String& declaration, const VariantVector& paramet
     asIScriptFunction* function = GetFunction(declaration);
     if (!function)
     {
-        LOGERROR("Function " + declaration + " not found in " + GetName());
+        URHO3D_LOGERROR("Function " + declaration + " not found in " + GetName());
         return false;
     }
 
@@ -285,7 +285,7 @@ bool ScriptFile::Execute(const String& declaration, const VariantVector& paramet
 
 bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& parameters, bool unprepare)
 {
-    PROFILE(ExecuteFunction);
+    URHO3D_PROFILE(ExecuteFunction);
 
     if (!compiled_ || !function)
         return false;
@@ -317,7 +317,7 @@ bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, con
     asIScriptFunction* method = GetMethod(object, declaration);
     if (!method)
     {
-        LOGERROR("Method " + declaration + " not found in class " + String(object->GetObjectType()->GetName()));
+        URHO3D_LOGERROR("Method " + declaration + " not found in class " + String(object->GetObjectType()->GetName()));
         return false;
     }
 
@@ -326,7 +326,7 @@ bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, con
 
 bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, bool unprepare)
 {
-    PROFILE(ExecuteMethod);
+    URHO3D_PROFILE(ExecuteMethod);
 
     if (!compiled_ || !object || !method)
         return false;
@@ -363,7 +363,7 @@ void ScriptFile::DelayedExecute(float delay, bool repeat, const String& declarat
     // Make sure we are registered to the application update event, because delayed calls are executed there
     if (!subscribed_)
     {
-        SubscribeToEvent(E_UPDATE, HANDLER(ScriptFile, HandleUpdate));
+        SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(ScriptFile, HandleUpdate));
         subscribed_ = true;
     }
 }
@@ -386,7 +386,7 @@ void ScriptFile::ClearDelayedExecute(const String& declaration)
 
 asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInterface)
 {
-    PROFILE(CreateObject);
+    URHO3D_PROFILE(CreateObject);
 
     if (!compiled_)
         return 0;
@@ -433,7 +433,7 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInter
 
     if (!found)
     {
-        LOGERRORF("Script class %s does not implement the ScriptObject interface", type->GetName());
+        URHO3D_LOGERRORF("Script class %s does not implement the ScriptObject interface", type->GetName());
         return 0;
     }
 
@@ -534,7 +534,7 @@ void ScriptFile::AddEventHandlerInternal(Object* sender, StringHash eventType, c
 
         if (!function)
         {
-            LOGERROR("Event handler function " + handlerName + " not found in " + GetName());
+            URHO3D_LOGERROR("Event handler function " + handlerName + " not found in " + GetName());
             return;
         }
     }
@@ -675,7 +675,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
         }
         else
         {
-            LOGERROR("Could not process all the include directives in " + GetName() + ": missing " + includeFiles[i]);
+            URHO3D_LOGERROR("Could not process all the include directives in " + GetName() + ": missing " + includeFiles[i]);
             return false;
         }
     }
@@ -683,7 +683,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     // Then add this section
     if (scriptModule_->AddScriptSection(source.GetName().CString(), (const char*)buffer.Get(), dataSize) < 0)
     {
-        LOGERROR("Failed to add script section " + source.GetName());
+        URHO3D_LOGERROR("Failed to add script section " + source.GetName());
         return false;
     }
 

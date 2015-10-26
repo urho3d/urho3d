@@ -79,7 +79,7 @@ typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgra
 /// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
 class URHO3D_API Graphics : public Object
 {
-    OBJECT(Graphics, Object);
+    URHO3D_OBJECT(Graphics, Object);
 
 public:
     /// Construct.

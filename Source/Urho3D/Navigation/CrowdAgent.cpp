@@ -103,19 +103,19 @@ void CrowdAgent::RegisterObject(Context* context)
 {
     context->RegisterFactory<CrowdAgent>(NAVIGATION_CATEGORY);
 
-    ATTRIBUTE("Target Position", Vector3, targetPosition_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE("Target Velocity", Vector3, targetVelocity_, Vector3::ZERO, AM_DEFAULT);
-    ENUM_ATTRIBUTE("Requested Target Type", requestedTargetType_, crowdAgentRequestedTargetTypeNames,
+    URHO3D_ATTRIBUTE("Target Position", Vector3, targetPosition_, Vector3::ZERO, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Target Velocity", Vector3, targetVelocity_, Vector3::ZERO, AM_DEFAULT);
+    URHO3D_ENUM_ATTRIBUTE("Requested Target Type", requestedTargetType_, crowdAgentRequestedTargetTypeNames,
         DEFAULT_AGENT_REQUEST_TARGET_TYPE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Update Node Position", GetUpdateNodePosition, SetUpdateNodePosition, bool, true, AM_DEFAULT);
-    ATTRIBUTE("Max Accel", float, maxAccel_, DEFAULT_AGENT_MAX_ACCEL, AM_DEFAULT);
-    ATTRIBUTE("Max Speed", float, maxSpeed_, DEFAULT_AGENT_MAX_SPEED, AM_DEFAULT);
-    ATTRIBUTE("Radius", float, radius_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE("Height", float, height_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE("Query Filter Type", unsigned, queryFilterType_, DEFAULT_AGENT_QUERY_FILTER_TYPE, AM_DEFAULT);
-    ATTRIBUTE("Obstacle Avoidance Type", unsigned, obstacleAvoidanceType_, DEFAULT_AGENT_OBSTACLE_AVOIDANCE_TYPE, AM_DEFAULT);
-    ENUM_ATTRIBUTE("Navigation Pushiness", navPushiness_, crowdAgentPushinessNames, DEFAULT_AGENT_NAVIGATION_PUSHINESS, AM_DEFAULT);
-    ENUM_ATTRIBUTE("Navigation Quality", navQuality_, crowdAgentAvoidanceQualityNames, DEFAULT_AGENT_AVOIDANCE_QUALITY, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Update Node Position", GetUpdateNodePosition, SetUpdateNodePosition, bool, true, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Max Accel", float, maxAccel_, DEFAULT_AGENT_MAX_ACCEL, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Max Speed", float, maxSpeed_, DEFAULT_AGENT_MAX_SPEED, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Radius", float, radius_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Height", float, height_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Query Filter Type", unsigned, queryFilterType_, DEFAULT_AGENT_QUERY_FILTER_TYPE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Obstacle Avoidance Type", unsigned, obstacleAvoidanceType_, DEFAULT_AGENT_OBSTACLE_AVOIDANCE_TYPE, AM_DEFAULT);
+    URHO3D_ENUM_ATTRIBUTE("Navigation Pushiness", navPushiness_, crowdAgentPushinessNames, DEFAULT_AGENT_NAVIGATION_PUSHINESS, AM_DEFAULT);
+    URHO3D_ENUM_ATTRIBUTE("Navigation Quality", navQuality_, crowdAgentAvoidanceQualityNames, DEFAULT_AGENT_AVOIDANCE_QUALITY, AM_DEFAULT);
 }
 
 void CrowdAgent::ApplyAttributes()
@@ -266,7 +266,7 @@ int CrowdAgent::AddAgentToCrowd(bool force)
 
     if (force || !IsInCrowd())
     {
-        PROFILE(AddAgentToCrowd);
+        URHO3D_PROFILE(AddAgentToCrowd);
 
         agentCrowdId_ = crowdManager_->AddAgent(this, node_->GetPosition());
         if (agentCrowdId_ == -1)
@@ -411,7 +411,7 @@ void CrowdAgent::SetQueryFilterType(unsigned queryFilterType)
     {
         if (queryFilterType >= DT_CROWD_MAX_QUERY_FILTER_TYPE)
         {
-            LOGERRORF("The specified filter type index (%d) exceeds the maximum allowed value (%d)", queryFilterType,
+            URHO3D_LOGERRORF("The specified filter type index (%d) exceeds the maximum allowed value (%d)", queryFilterType,
                 DT_CROWD_MAX_QUERY_FILTER_TYPE);
             return;
         }
@@ -428,7 +428,7 @@ void CrowdAgent::SetObstacleAvoidanceType(unsigned obstacleAvoidanceType)
     {
         if (obstacleAvoidanceType >= DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS)
         {
-            LOGERRORF("The specified obstacle avoidance type index (%d) exceeds the maximum allowed value (%d)",
+            URHO3D_LOGERRORF("The specified obstacle avoidance type index (%d) exceeds the maximum allowed value (%d)",
                 obstacleAvoidanceType, DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS);
             return;
         }
@@ -582,7 +582,7 @@ void CrowdAgent::OnSceneSet(Scene* scene)
     if (scene)
     {
         if (scene == node_)
-            LOGERROR(GetTypeName() + " should not be created to the root scene node");
+            URHO3D_LOGERROR(GetTypeName() + " should not be created to the root scene node");
         crowdManager_ = scene->GetOrCreateComponent<CrowdManager>();
         AddAgentToCrowd();
     }

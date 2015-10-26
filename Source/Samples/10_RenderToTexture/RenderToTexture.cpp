@@ -45,7 +45,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(RenderToTexture)
+URHO3D_DEFINE_APPLICATION_MAIN(RenderToTexture)
 
 RenderToTexture::RenderToTexture(Context* context) :
     Sample(context)
@@ -268,7 +268,7 @@ void RenderToTexture::MoveCamera(float timeStep)
 void RenderToTexture::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(RenderToTexture, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(RenderToTexture, HandleUpdate));
 }
 
 void RenderToTexture::HandleUpdate(StringHash eventType, VariantMap& eventData)

@@ -32,7 +32,7 @@
 class Sprites : public Sample
 {
     // Enable type information.
-    OBJECT(Sprites, Sample);
+    URHO3D_OBJECT(Sprites, Sample);
 
 public:
     /// Construct.

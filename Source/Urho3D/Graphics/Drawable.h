@@ -104,7 +104,7 @@ struct URHO3D_API SourceBatch
 /// Base class for visible components.
 class URHO3D_API Drawable : public Component
 {
-    OBJECT(Drawable, Component);
+    URHO3D_OBJECT(Drawable, Component);
 
     friend class Octant;
     friend class Octree;
@@ -389,6 +389,6 @@ inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)
     return lhs->GetSortValue() < rhs->GetSortValue();
 }
 
-URHO3D_API bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool writeLightmapUV = false);
+URHO3D_API bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV = false);
 
 }

@@ -45,7 +45,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(LuaIntegration)
+URHO3D_DEFINE_APPLICATION_MAIN(LuaIntegration)
 
 LuaIntegration::LuaIntegration(Context* context) :
     Sample(context)
@@ -164,7 +164,7 @@ void LuaIntegration::SetupViewport()
 void LuaIntegration::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(LuaIntegration, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(LuaIntegration, HandleUpdate));
 }
 
 void LuaIntegration::MoveCamera(float timeStep)

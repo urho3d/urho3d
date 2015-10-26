@@ -55,7 +55,7 @@ static String soundResourceNames[] = {
     "Sounds/Powerup.wav"
 };
 
-DEFINE_APPLICATION_MAIN(SoundEffects)
+URHO3D_DEFINE_APPLICATION_MAIN(SoundEffects)
 
 SoundEffects::SoundEffects(Context* context) :
     Sample(context)
@@ -98,26 +98,26 @@ void SoundEffects::CreateUI()
         Button* button = CreateButton(i * 140 + 20, 20, 120, 40, soundNames[i]);
         // Store the sound effect resource name as a custom variable into the button
         button->SetVar(VAR_SOUNDRESOURCE, soundResourceNames[i]);
-        SubscribeToEvent(button, E_PRESSED, HANDLER(SoundEffects, HandlePlaySound));
+        SubscribeToEvent(button, E_PRESSED, URHO3D_HANDLER(SoundEffects, HandlePlaySound));
     }
 
     // Create buttons for playing/stopping music
     Button* button = CreateButton(20, 80, 120, 40, "Play Music");
-    SubscribeToEvent(button, E_RELEASED, HANDLER(SoundEffects, HandlePlayMusic));
+    SubscribeToEvent(button, E_RELEASED, URHO3D_HANDLER(SoundEffects, HandlePlayMusic));
 
     button = CreateButton(160, 80, 120, 40, "Stop Music");
-    SubscribeToEvent(button, E_RELEASED, HANDLER(SoundEffects, HandleStopMusic));
+    SubscribeToEvent(button, E_RELEASED, URHO3D_HANDLER(SoundEffects, HandleStopMusic));
 
     Audio* audio = GetSubsystem<Audio>();
 
     // Create sliders for controlling sound and music master volume
     Slider* slider = CreateSlider(20, 140, 200, 20, "Sound Volume");
     slider->SetValue(audio->GetMasterGain(SOUND_EFFECT));
-    SubscribeToEvent(slider, E_SLIDERCHANGED, HANDLER(SoundEffects, HandleSoundVolume));
+    SubscribeToEvent(slider, E_SLIDERCHANGED, URHO3D_HANDLER(SoundEffects, HandleSoundVolume));
 
     slider = CreateSlider(20, 200, 200, 20, "Music Volume");
     slider->SetValue(audio->GetMasterGain(SOUND_MUSIC));
-    SubscribeToEvent(slider, E_SLIDERCHANGED, HANDLER(SoundEffects, HandleMusicVolume));
+    SubscribeToEvent(slider, E_SLIDERCHANGED, URHO3D_HANDLER(SoundEffects, HandleMusicVolume));
 }
 
 Button* SoundEffects::CreateButton(int x, int y, int xSize, int ySize, const String& text)

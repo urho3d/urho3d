@@ -28,352 +28,352 @@ namespace Urho3D
 {
 
 /// Mouse click in the UI.
-EVENT(E_UIMOUSECLICK, UIMouseClick)
+URHO3D_EVENT(E_UIMOUSECLICK, UIMouseClick)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_BUTTON, Button);                // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_BUTTON, Button);                // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Mouse click end in the UI.
-EVENT(E_UIMOUSECLICKEND, UIMouseClickEnd)
+URHO3D_EVENT(E_UIMOUSECLICKEND, UIMouseClickEnd)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_BEGINELEMENT, BeginElement);    // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_BUTTON, Button);                // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_BEGINELEMENT, BeginElement);    // UIElement pointer
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_BUTTON, Button);                // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Mouse double click in the UI.
-EVENT(E_UIMOUSEDOUBLECLICK, UIMouseDoubleClick)
+URHO3D_EVENT(E_UIMOUSEDOUBLECLICK, UIMouseDoubleClick)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_BUTTON, Button);                // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_BUTTON, Button);                // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Drag and drop test.
-EVENT(E_DRAGDROPTEST, DragDropTest)
+URHO3D_EVENT(E_DRAGDROPTEST, DragDropTest)
 {
-    PARAM(P_SOURCE, Source);                // UIElement pointer
-    PARAM(P_TARGET, Target);                // UIElement pointer
-    PARAM(P_ACCEPT, Accept);                // bool
+    URHO3D_PARAM(P_SOURCE, Source);                // UIElement pointer
+    URHO3D_PARAM(P_TARGET, Target);                // UIElement pointer
+    URHO3D_PARAM(P_ACCEPT, Accept);                // bool
 };
 
 /// Drag and drop finish.
-EVENT(E_DRAGDROPFINISH, DragDropFinish)
+URHO3D_EVENT(E_DRAGDROPFINISH, DragDropFinish)
 {
-    PARAM(P_SOURCE, Source);                // UIElement pointer
-    PARAM(P_TARGET, Target);                // UIElement pointer
-    PARAM(P_ACCEPT, Accept);                // bool
+    URHO3D_PARAM(P_SOURCE, Source);                // UIElement pointer
+    URHO3D_PARAM(P_TARGET, Target);                // UIElement pointer
+    URHO3D_PARAM(P_ACCEPT, Accept);                // bool
 };
 
 /// Focus element changed.
-EVENT(E_FOCUSCHANGED, FocusChanged)
+URHO3D_EVENT(E_FOCUSCHANGED, FocusChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_CLICKEDELEMENT, ClickedElement); // UIElement pointer
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_CLICKEDELEMENT, ClickedElement); // UIElement pointer
 }
 
 /// UI element name changed.
-EVENT(E_NAMECHANGED, NameChanged)
+URHO3D_EVENT(E_NAMECHANGED, NameChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// UI element resized.
-EVENT(E_RESIZED, Resized)
+URHO3D_EVENT(E_RESIZED, Resized)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_WIDTH, Width);                  // int
-    PARAM(P_HEIGHT, Height);                // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_WIDTH, Width);                  // int
+    URHO3D_PARAM(P_HEIGHT, Height);                // int
 }
 
 /// UI element positioned.
-EVENT(E_POSITIONED, Positioned)
+URHO3D_EVENT(E_POSITIONED, Positioned)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
 }
 
 /// UI element visibility changed.
-EVENT(E_VISIBLECHANGED, VisibleChanged)
+URHO3D_EVENT(E_VISIBLECHANGED, VisibleChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_VISIBLE, Visible);              // bool
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_VISIBLE, Visible);              // bool
 }
 
 /// UI element focused.
-EVENT(E_FOCUSED, Focused)
+URHO3D_EVENT(E_FOCUSED, Focused)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_BYKEY, ByKey);                  // bool
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_BYKEY, ByKey);                  // bool
 }
 
 /// UI element defocused.
-EVENT(E_DEFOCUSED, Defocused)
+URHO3D_EVENT(E_DEFOCUSED, Defocused)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// UI element layout updated.
-EVENT(E_LAYOUTUPDATED, LayoutUpdated)
+URHO3D_EVENT(E_LAYOUTUPDATED, LayoutUpdated)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// UI button pressed.
-EVENT(E_PRESSED, Pressed)
+URHO3D_EVENT(E_PRESSED, Pressed)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// UI button was pressed, then released.
-EVENT(E_RELEASED, Released)
+URHO3D_EVENT(E_RELEASED, Released)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// UI checkbox toggled.
-EVENT(E_TOGGLED, Toggled)
+URHO3D_EVENT(E_TOGGLED, Toggled)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_STATE, State);                  // bool
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_STATE, State);                  // bool
 }
 
 /// UI slider value changed
-EVENT(E_SLIDERCHANGED, SliderChanged)
+URHO3D_EVENT(E_SLIDERCHANGED, SliderChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_VALUE, Value);                  // float
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_VALUE, Value);                  // float
 }
 
 /// UI slider being paged.
-EVENT(E_SLIDERPAGED, SliderPaged)
+URHO3D_EVENT(E_SLIDERPAGED, SliderPaged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_OFFSET, Offset);                // int
-    PARAM(P_PRESSED, Pressed);              // bool
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_OFFSET, Offset);                // int
+    URHO3D_PARAM(P_PRESSED, Pressed);              // bool
 }
 
 /// UI scrollbar value changed.
-EVENT(E_SCROLLBARCHANGED, ScrollBarChanged)
+URHO3D_EVENT(E_SCROLLBARCHANGED, ScrollBarChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_VALUE, Value);                  // float
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_VALUE, Value);                  // float
 }
 
 /// UI scrollview position changed.
-EVENT(E_VIEWCHANGED, ViewChanged)
+URHO3D_EVENT(E_VIEWCHANGED, ViewChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
 }
 
 /// UI modal changed (currently only Window has modal flag).
-EVENT(E_MODALCHANGED, ModalChanged)
+URHO3D_EVENT(E_MODALCHANGED, ModalChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_MODAL, Modal);                  // bool
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_MODAL, Modal);                  // bool
 }
 
 /// Text entry into a LineEdit. The char can be modified in the event data.
-EVENT(E_TEXTENTRY, CharEntry)
+URHO3D_EVENT(E_TEXTENTRY, CharEntry)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_TEXT, Text);                    // String
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_TEXT, Text);                    // String
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Editable text changed
-EVENT(E_TEXTCHANGED, TextChanged)
+URHO3D_EVENT(E_TEXTCHANGED, TextChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_TEXT, Text);                    // String
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_TEXT, Text);                    // String
 }
 
 /// Text editing finished (enter pressed on a LineEdit)
-EVENT(E_TEXTFINISHED, TextFinished)
+URHO3D_EVENT(E_TEXTFINISHED, TextFinished)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_TEXT, Text);                    // String
-    PARAM(P_VALUE, Value);                 // Float
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_TEXT, Text);                    // String
+    URHO3D_PARAM(P_VALUE, Value);                 // Float
 }
 
 /// Menu selected.
-EVENT(E_MENUSELECTED, MenuSelected)
+URHO3D_EVENT(E_MENUSELECTED, MenuSelected)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// Listview or DropDownList item selected.
-EVENT(E_ITEMSELECTED, ItemSelected)
+URHO3D_EVENT(E_ITEMSELECTED, ItemSelected)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_SELECTION, Selection);          // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_SELECTION, Selection);          // int
 }
 
 /// Listview item deselected.
-EVENT(E_ITEMDESELECTED, ItemDeselected)
+URHO3D_EVENT(E_ITEMDESELECTED, ItemDeselected)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_SELECTION, Selection);          // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_SELECTION, Selection);          // int
 }
 
 /// Listview selection change finished.
-EVENT(E_SELECTIONCHANGED, SelectionChanged)
+URHO3D_EVENT(E_SELECTIONCHANGED, SelectionChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// Listview item clicked. If this is a left-click, also ItemSelected event will be sent. If this is a right-click, only this event is sent.
-EVENT(E_ITEMCLICKED, ItemClicked)
+URHO3D_EVENT(E_ITEMCLICKED, ItemClicked)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_ITEM, Item);                    // UIElement pointer
-    PARAM(P_SELECTION, Selection);          // int
-    PARAM(P_BUTTON, Button);                // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_ITEM, Item);                    // UIElement pointer
+    URHO3D_PARAM(P_SELECTION, Selection);          // int
+    URHO3D_PARAM(P_BUTTON, Button);                // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Listview item double clicked.
-EVENT(E_ITEMDOUBLECLICKED, ItemDoubleClicked)
+URHO3D_EVENT(E_ITEMDOUBLECLICKED, ItemDoubleClicked)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_ITEM, Item);                    // UIElement pointer
-    PARAM(P_SELECTION, Selection);          // int
-    PARAM(P_BUTTON, Button);                // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_ITEM, Item);                    // UIElement pointer
+    URHO3D_PARAM(P_SELECTION, Selection);          // int
+    URHO3D_PARAM(P_BUTTON, Button);                // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// LineEdit or ListView unhandled key pressed.
-EVENT(E_UNHANDLEDKEY, UnhandledKey)
+URHO3D_EVENT(E_UNHANDLEDKEY, UnhandledKey)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_KEY, Key);                      // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_KEY, Key);                      // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Fileselector choice.
-EVENT(E_FILESELECTED, FileSelected)
+URHO3D_EVENT(E_FILESELECTED, FileSelected)
 {
-    PARAM(P_FILENAME, FileName);            // String
-    PARAM(P_FILTER, Filter);                // String
-    PARAM(P_OK, Ok);                        // bool
+    URHO3D_PARAM(P_FILENAME, FileName);            // String
+    URHO3D_PARAM(P_FILTER, Filter);                // String
+    URHO3D_PARAM(P_OK, Ok);                        // bool
 }
 
 /// MessageBox acknowlegement.
-EVENT(E_MESSAGEACK, MessageACK)
+URHO3D_EVENT(E_MESSAGEACK, MessageACK)
 {
-    PARAM(P_OK, Ok);                        // bool
+    URHO3D_PARAM(P_OK, Ok);                        // bool
 }
 
 /// A child element has been added to an element. Sent by the UI root element, or element-event-sender if set.
-EVENT(E_ELEMENTADDED, ElementAdded)
+URHO3D_EVENT(E_ELEMENTADDED, ElementAdded)
 {
-    PARAM(P_ROOT, Root);                    // UIElement pointer
-    PARAM(P_PARENT, Parent);                // UIElement pointer
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_ROOT, Root);                    // UIElement pointer
+    URHO3D_PARAM(P_PARENT, Parent);                // UIElement pointer
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// A child element is about to be removed from an element. Sent by the UI root element, or element-event-sender if set.
-EVENT(E_ELEMENTREMOVED, ElementRemoved)
+URHO3D_EVENT(E_ELEMENTREMOVED, ElementRemoved)
 {
-    PARAM(P_ROOT, Root);                    // UIElement pointer
-    PARAM(P_PARENT, Parent);                // UIElement pointer
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_ROOT, Root);                    // UIElement pointer
+    URHO3D_PARAM(P_PARENT, Parent);                // UIElement pointer
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// Hovering on an UI element has started
-EVENT(E_HOVERBEGIN, HoverBegin)
+URHO3D_EVENT(E_HOVERBEGIN, HoverBegin)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_ELEMENTX, ElementX);            // int
-    PARAM(P_ELEMENTY, ElementY);            // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_ELEMENTX, ElementX);            // int
+    URHO3D_PARAM(P_ELEMENTY, ElementY);            // int
 }
 
 /// Hovering on an UI element has ended
-EVENT(E_HOVEREND, HoverEnd)
+URHO3D_EVENT(E_HOVEREND, HoverEnd)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// Drag behavior of a UI Element has started
-EVENT(E_DRAGBEGIN, DragBegin)
+URHO3D_EVENT(E_DRAGBEGIN, DragBegin)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_ELEMENTX, ElementX);            // int
-    PARAM(P_ELEMENTY, ElementY);            // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_NUMBUTTONS, NumButtons);        // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_ELEMENTX, ElementX);            // int
+    URHO3D_PARAM(P_ELEMENTY, ElementY);            // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
 /// Drag behavior of a UI Element when the input device has moved
-EVENT(E_DRAGMOVE, DragMove)
+URHO3D_EVENT(E_DRAGMOVE, DragMove)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_DX, DX);                        // int
-    PARAM(P_DY, DY);                        // int
-    PARAM(P_ELEMENTX, ElementX);            // int
-    PARAM(P_ELEMENTY, ElementY);            // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_NUMBUTTONS, NumButtons);        // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_DX, DX);                        // int
+    URHO3D_PARAM(P_DY, DY);                        // int
+    URHO3D_PARAM(P_ELEMENTX, ElementX);            // int
+    URHO3D_PARAM(P_ELEMENTY, ElementY);            // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
 /// Drag behavior of a UI Element has finished
-EVENT(E_DRAGEND, DragEnd)
+URHO3D_EVENT(E_DRAGEND, DragEnd)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_ELEMENTX, ElementX);            // int
-    PARAM(P_ELEMENTY, ElementY);            // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_NUMBUTTONS, NumButtons);        // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_ELEMENTX, ElementX);            // int
+    URHO3D_PARAM(P_ELEMENTY, ElementY);            // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
 /// Drag of a UI Element was canceled by pressing ESC
-EVENT(E_DRAGCANCEL, DragCancel)
+URHO3D_EVENT(E_DRAGCANCEL, DragCancel)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_ELEMENTX, ElementX);            // int
-    PARAM(P_ELEMENTY, ElementY);            // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_NUMBUTTONS, NumButtons);        // int
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_ELEMENTX, ElementX);            // int
+    URHO3D_PARAM(P_ELEMENTY, ElementY);            // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
 /// A file was drag-dropped into the application window. Includes also coordinates and UI element if applicable
-EVENT(E_UIDROPFILE, UIDropFile)
+URHO3D_EVENT(E_UIDROPFILE, UIDropFile)
 {
-    PARAM(P_FILENAME, FileName);            // String
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_ELEMENTX, ElementX);            // int (only if element is non-null)
-    PARAM(P_ELEMENTY, ElementY);            // int (only if element is non-null)
+    URHO3D_PARAM(P_FILENAME, FileName);            // String
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_ELEMENTX, ElementX);            // int (only if element is non-null)
+    URHO3D_PARAM(P_ELEMENTY, ElementY);            // int (only if element is non-null)
 }
 
 }

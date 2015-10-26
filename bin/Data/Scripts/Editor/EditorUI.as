@@ -622,15 +622,55 @@ bool PickFile()
         CreateFileSelector("Import scene", "Import", "Cancel", uiImportPath, uiAllFilters, uiImportFilter);
         SubscribeToEvent(uiFileSelector, "FileSelected", "HandleImportScene");
     }
-    else if (action == "Export scene to OBJ...")
+    else if (action == "Export scene to OBJ..." || action == "Export selected to OBJ...")
     {
-        CreateFileSelector("Export scene to OBJ", "Save", "Cancel", uiExportPath, uiExportPathFilters, uiExportFilter);
-        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleExportSceneOBJ");
-    }
-    else if (action == "Export selected to OBJ...")
-    {
-        CreateFileSelector("Export selected to OBJ", "Save", "Cancel", uiExportPath, uiExportPathFilters, uiExportFilter);
-        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleExportSelectedOBJ");
+        // Set these up together to share the "export settings" options
+        if (action == "Export scene to OBJ...")
+        {
+            CreateFileSelector("Export scene to OBJ", "Save", "Cancel", uiExportPath, uiExportPathFilters, uiExportFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleExportSceneOBJ");
+        }
+        else if (action == "Export selected to OBJ...")
+        {
+            CreateFileSelector("Export selected to OBJ", "Save", "Cancel", uiExportPath, uiExportPathFilters, uiExportFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleExportSelectedOBJ");
+        }
+        
+        Window@ window = uiFileSelector.window;
+        
+            UIElement@ optionsGroup = UIElement();
+            optionsGroup.maxHeight = 30;
+            optionsGroup.layoutMode = LM_HORIZONTAL;
+            window.defaultStyle = uiStyle;
+            window.style = AUTO_STYLE;
+            
+                CheckBox@ checkRightHanded = CheckBox();
+                checkRightHanded.checked = objExportRightHanded_;
+                checkRightHanded.defaultStyle = uiStyle;
+                checkRightHanded.style = AUTO_STYLE;
+                SubscribeToEvent(checkRightHanded, "Toggled", "HandleOBJRightHandedChanged");
+                optionsGroup.AddChild(checkRightHanded);
+                
+                    Text@ lblRightHanded = Text();
+                    lblRightHanded.defaultStyle = uiStyle;
+                    lblRightHanded.style = AUTO_STYLE;
+                    lblRightHanded.text = "  Right handed";
+                    optionsGroup.AddChild(lblRightHanded);
+                
+                CheckBox@ checkZUp = CheckBox();
+                checkZUp.checked = objExportZUp_;
+                checkZUp.defaultStyle = uiStyle;
+                checkZUp.style = AUTO_STYLE;
+                SubscribeToEvent(checkZUp, "Toggled", "HandleOBJZUpChanged");
+                optionsGroup.AddChild(checkZUp);
+                
+                    Text@ lblZUp = Text();
+                    lblZUp.defaultStyle = uiStyle;
+                    lblZUp.style = AUTO_STYLE;
+                    lblZUp.text = " Z Axis Up";
+                    optionsGroup.AddChild(lblZUp);
+                
+            window.AddChild(optionsGroup);
     }
     else if (action == "Run script...")
     {

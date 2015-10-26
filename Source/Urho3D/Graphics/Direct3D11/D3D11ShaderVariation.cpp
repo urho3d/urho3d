@@ -174,7 +174,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
     SharedPtr<File> file = cache->GetFile(binaryShaderName);
     if (!file || file->ReadFileID() != "USHD")
     {
-        LOGERROR(binaryShaderName + " is not a valid shader bytecode file");
+        URHO3D_LOGERROR(binaryShaderName + " is not a valid shader bytecode file");
         return false;
     }
 
@@ -212,16 +212,16 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         file->Read(&byteCode_[0], byteCodeSize);
 
         if (type_ == VS)
-            LOGDEBUG("Loaded cached vertex shader " + GetFullName());
+            URHO3D_LOGDEBUG("Loaded cached vertex shader " + GetFullName());
         else
-            LOGDEBUG("Loaded cached pixel shader " + GetFullName());
+            URHO3D_LOGDEBUG("Loaded cached pixel shader " + GetFullName());
 
         CalculateConstantBufferSizes();
         return true;
     }
     else
     {
-        LOGERROR(binaryShaderName + " has zero length bytecode");
+        URHO3D_LOGERROR(binaryShaderName + " has zero length bytecode");
         return false;
     }
 }
@@ -279,7 +279,7 @@ bool ShaderVariation::Compile()
         // In debug mode, check that all defines are referenced by the shader code
 #ifdef _DEBUG
         if (sourceCode.Find(defines[i]) == String::NPOS)
-            LOGWARNING("Shader " + GetFullName() + " does not use the define " + defines[i]);
+            URHO3D_LOGWARNING("Shader " + GetFullName() + " does not use the define " + defines[i]);
 #endif
     }
 
@@ -298,9 +298,9 @@ bool ShaderVariation::Compile()
     else
     {
         if (type_ == VS)
-            LOGDEBUG("Compiled vertex shader " + GetFullName());
+            URHO3D_LOGDEBUG("Compiled vertex shader " + GetFullName());
         else
-            LOGDEBUG("Compiled pixel shader " + GetFullName());
+            URHO3D_LOGDEBUG("Compiled pixel shader " + GetFullName());
 
         unsigned char* bufData = (unsigned char*)shaderCode->GetBufferPointer();
         unsigned bufSize = (unsigned)shaderCode->GetBufferSize();
@@ -333,7 +333,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
     D3DReflect(bufData, bufSize, IID_ID3D11ShaderReflection, (void**)&reflection);
     if (!reflection)
     {
-        LOGERROR("Failed to reflect vertex shader's input signature");
+        URHO3D_LOGERROR("Failed to reflect vertex shader's input signature");
         return;
     }
 

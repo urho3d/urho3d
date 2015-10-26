@@ -56,7 +56,7 @@ enum ScriptInstanceMethod
 /// %Script object component.
 class URHO3D_API ScriptInstance : public Component, public ScriptEventListener
 {
-    OBJECT(ScriptInstance, Component);
+    URHO3D_OBJECT(ScriptInstance, Component);
 
 public:
     /// Construct.

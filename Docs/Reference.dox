@@ -27,7 +27,7 @@ Classes that derive from Object contain type-identification, they can be created
 
 %Object factory registration and object creation through factories are directly accessible only in C++, not in script.
 
-The definition of an Object subclass must contain the OBJECT(className) macro. Type identification is available both as text (GetTypeName() or GetTypeNameStatic()) and as a 32-bit hash of the type name (GetType() or GetTypeStatic()).
+The definition of an Object subclass must contain the URHO3D_OBJECT(className, baseTypeName) macro. Type identification is available both as text (GetTypeName() or GetTypeNameStatic()) and as a 32-bit hash of the type name (GetType() or GetTypeStatic()).
 
 To register an object factory for a specific type, call the \ref Context::RegisterFactory "RegisterFactory()" template function on Context. You can get its pointer from any Object either via the \ref Object::context_ "context_" member variable, or by calling \ref Object::GetContext "GetContext()". An example:
 
@@ -77,12 +77,12 @@ time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, rende
 
 The Urho3D event system allows for data transport and function invocation without the sender and receiver having to explicitly know of each other. Both the event sender and receiver must derive from Object. An event receiver must subscribe to each event type it wishes to receive: one can either subscribe to the event coming from any sender, or from a specific sender. The latter is useful for example when handling events from the user interface elements.
 
-Events themselves do not need to be registered. They are identified by 32-bit hashes of their names. Event parameters (the data payload) are optional and are contained inside a VariantMap, identified by 32-bit parameter name hashes. For the inbuilt Urho3D events, event type (E_UPDATE, E_KEYDOWN, E_MOUSEMOVE etc.) and parameter hashes (P_TIMESTEP, P_DX, P_DY etc.) are defined as constants inside include files such as CoreEvents.h or InputEvents.h.
+Events themselves do not need to be registered. They are identified by 32-bit hashes of their names. Event parameters (the data payload) are optional and are contained inside a VariantMap, identified by 32-bit parameter name hashes. For the inbuilt Urho3D events, event type (E_UPDATE, E_KEYDOWN, E_MOUSEMOVE etc.) and parameter hashes (P_TIMESTEP, P_DX, P_DY etc.) are defined as namespaced constants inside include files such as CoreEvents.h or InputEvents.h, using the helper macros URHO3D_EVENT & URHO3D_PARAM.
 
-When subscribing to an event, a handler function must be specified. In C++ these must have the signature void HandleEvent(StringHash eventType, VariantMap& eventData). The HANDLER(className, function) macro helps in defining the required class-specific function pointers. For example:
+When subscribing to an event, a handler function must be specified. In C++ these must have the signature void HandleEvent(StringHash eventType, VariantMap& eventData). The URHO3D_HANDLER(className, function) macro helps in defining the required class-specific function pointers. For example:
 
 \code
-SubscribeToEvent(E_UPDATE, HANDLER(MyClass, MyEventHandler));
+SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(MyClass, MyEventHandler));
 \endcode
 
 In script events are identified by their string names instead of name hashes (though these are internally converted to hashes.) %Script event handlers can either have the same signature as in C++, or a simplified signature void HandleEvent() when event type and parameters are not required. The same event subscription would look like:
@@ -95,7 +95,7 @@ In C++ events must always be handled by a member function. In script procedural 
 
 Events can also be unsubscribed from. See \ref Object::UnsubscribeFromEvent "UnsubscribeFromEvent()" for details.
 
-To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Engine subsystem sends the Update event on each frame. Note how for the inbuilt Urho3D events, the parameter name hashes are always put inside a namespace (the event's name) to prevent name clashes:
+To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Engine subsystem sends the Update event on each frame. Note the parameter name hashes being inside a namespace which matches the event name:
 
 \code
 using namespace Update;
@@ -231,7 +231,7 @@ public:
     virtual void Start()
     {
         // Called after engine initialization. Setup application & subscribe to events here
-        SubscribeToEvent(E_KEYDOWN, HANDLER(MyApp, HandleKeyDown));
+        SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(MyApp, HandleKeyDown));
     }
 
     virtual void Stop()
@@ -250,7 +250,7 @@ public:
     }
 };
 
-DEFINE_APPLICATION_MAIN(MyApp)
+URHO3D_DEFINE_APPLICATION_MAIN(MyApp)
 \endcode
 
 \page SceneModel Scene model
@@ -448,7 +448,7 @@ l10n->SetLanguage("language 2");
 When the language is changed, the E_CHANGELANGUAGE event will be sent. Subscribe to it to perform the necessary relocalization of your user interface (texts, sprites etc.)
 
 \code
-SubscribeToEvent(E_CHANGELANGUAGE, HANDLER(Game, HandleChangeLanguage));
+SubscribeToEvent(E_CHANGELANGUAGE, URHO3D_HANDLER(Game, HandleChangeLanguage));
 
 void Game::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
 {
@@ -909,7 +909,7 @@ Additionally there are 2D drawable components defined by the \ref Urho2D "Urho2D
 
 The following techniques will be used to reduce the amount of CPU and GPU work when rendering. By default they are all on:
 
-- Software rasterized occlusion: after the octree has been queried for visible objects, the objects that are marked as occluders are rendered on the CPU to a small hierarchical-depth buffer, and it will be used to test the non-occluders for visibility. Use \ref Renderer::SetMaxOccluderTriangles "SetMaxOccluderTriangles()" and \ref Renderer::SetOccluderSizeThreshold "SetOccluderSizeThreshold()" to configure the occlusion rendering.
+- Software rasterized occlusion: after the octree has been queried for visible objects, the objects that are marked as occluders are rendered on the CPU to a small hierarchical-depth buffer, and it will be used to test the non-occluders for visibility. Use \ref Renderer::SetMaxOccluderTriangles "SetMaxOccluderTriangles()" and \ref Renderer::SetOccluderSizeThreshold "SetOccluderSizeThreshold()" to configure the occlusion rendering. Occlusion testing will always be multithreaded, however occlusion rendering is by default singlethreaded, to allow rejecting subsequent occluders while rendering front-to-back.. Use \ref Renderer::SetThreadedOcclusion "SetThreadedOcclusion()" to enable threading also in rendering, however this can actually perform worse in e.g. terrain scenes where terrain patches act as occluders.
 
 - Hardware instancing: rendering operations with the same geometry, material and light will be grouped together and performed as one draw call if supported. Note that even when instancing is not available, they still benefit from the grouping, as render state only needs to be checked & set once before rendering each group, reducing the CPU cost.
 
@@ -2402,7 +2402,7 @@ If need be you can access the grid id (relative to the tilesets used) of a Tile 
 
 Classes that derive from Serializable can perform automatic serialization to binary or XML format by defining \ref AttributeInfo "attributes". Attributes are stored to the Context per class. %Scene load/save and network replication are both implemented by having the Node and Component classes derive from Serializable.
 
-The supported attribute types are all those supported by Variant, excluding pointers. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
+The supported attribute types are all those supported by Variant, excluding pointers. Attributes can either refer to a variable at a memory offset in the object, or define setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
 
 To implement side effects to attributes, for example that a Node needs to dirty its world transform whenever the local transform changes, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
 
@@ -2416,6 +2416,8 @@ Each attribute can have a combination of the following flags:
 - AM_COMPONENTID: Is a component ID and may need rewriting when instantiating scene content.
 
 The default flags are AM_FILE and AM_NET. Note that it is legal to define neither AM_FILE or AM_NET, meaning the attribute has only run-time significance (perhaps for editing.)
+
+See the existing engine classes e.g. in the %Scene or %Graphics subdirectories for examples on registering attributes using the URHO3D_ATTRIBUTE family of helper macros.
 
 \page Network Networking
 

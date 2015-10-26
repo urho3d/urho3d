@@ -45,7 +45,7 @@ class SpriteSheet2D;
 /// Spriter animation set, it includes one or more animations, for more information please refer to http://www.esotericsoftware.com and http://www.brashmonkey.com/spriter.htm.
 class URHO3D_API AnimationSet2D : public Resource
 {
-    OBJECT(AnimationSet2D, Resource);
+    URHO3D_OBJECT(AnimationSet2D, Resource);
 
 public:
     /// Construct.

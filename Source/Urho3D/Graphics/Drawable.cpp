@@ -115,11 +115,11 @@ Drawable::~Drawable()
 
 void Drawable::RegisterObject(Context* context)
 {
-    ATTRIBUTE("Max Lights", int, maxLights_, 0, AM_DEFAULT);
-    ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
-    ATTRIBUTE("Shadow Mask", int, shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Max Lights", int, maxLights_, 0, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Shadow Mask", int, shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
 }
 
 void Drawable::OnSetEnabled()
@@ -420,12 +420,12 @@ void Drawable::AddToOctree()
         if (octree)
             octree->InsertDrawable(this);
         else
-            LOGERROR("No Octree component in scene, drawable will not render");
+            URHO3D_LOGERROR("No Octree component in scene, drawable will not render");
     }
     else
     {
         // We have a mechanism for adding detached nodes to an octree manually, so do not log this error
-        //LOGERROR("Node is detached from scene, drawable will not render");
+        //URHO3D_LOGERROR("Node is detached from scene, drawable will not render");
     }
 }
 
@@ -444,7 +444,7 @@ void Drawable::RemoveFromOctree()
     }
 }
 
-bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool writeLightmapUV)
+bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
 {
     // Must track indices independently to deal with potential mismatching of drawables vertex attributes (ie. one with UV, another without, then another with)
     // Using long because 65,535 isn't enough as OBJ indices do not reset the count with each new object
@@ -475,7 +475,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                 continue;
             if (geo->GetPrimitiveType() != TRIANGLE_LIST)
             {
-                LOGERRORF("%s (%u) %s (%u) Geometry %u contains an unsupported geometry type %u", node->GetName().Length() > 0 ? node->GetName().CString() : "Node", node->GetID(), drawable->GetTypeName().CString(), drawable->GetID(), geoIndex, (unsigned)geo->GetPrimitiveType());
+                URHO3D_LOGERRORF("%s (%u) %s (%u) Geometry %u contains an unsupported geometry type %u", node->GetName().Length() > 0 ? node->GetName().CString() : "Node", node->GetID(), drawable->GetTypeName().CString(), drawable->GetID(), geoIndex, (unsigned)geo->GetPrimitiveType());
                 continue;
             }
 
@@ -508,6 +508,16 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                 {
                     Vector3 vertexPosition = *((const Vector3*)(&vertexData[(vertexStart + j) * elementSize + positionOffset]));
                     vertexPosition = transMat * vertexPosition;
+
+                    // Convert coordinates as requested
+                    if (asRightHanded)
+                        vertexPosition.x_ *= -1;
+                    if (asZUp)
+                    {
+                        float yVal = vertexPosition.y_;
+                        vertexPosition.y_ = vertexPosition.z_;
+                        vertexPosition.z_ = yVal;
+                    }
                     outputFile->WriteLine("v " + String(vertexPosition));
                 }
 
@@ -519,6 +529,16 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                         Vector3 vertexNormal = *((const Vector3*)(&vertexData[(vertexStart + j) * elementSize + positionOffset]));
                         vertexNormal = transMat * vertexNormal;
                         vertexNormal.Normalize();
+
+                        if (asRightHanded)
+                            vertexNormal.x_ *= -1;
+                        if (asZUp)
+                        {
+                            float yVal = vertexNormal.y_;
+                            vertexNormal.y_ = vertexNormal.z_;
+                            vertexNormal.z_ = yVal;
+                        }
+
                         outputFile->WriteLine("vn " + String(vertexNormal));
                     }
                 }

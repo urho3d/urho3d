@@ -54,7 +54,7 @@ enum TransformSpace
 /// %Scene node that may contain components and child nodes.
 class URHO3D_API Node : public Animatable
 {
-    OBJECT(Node, Animatable);
+    URHO3D_OBJECT(Node, Animatable);
 
     friend class Connection;
 

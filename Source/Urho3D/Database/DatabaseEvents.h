@@ -29,16 +29,16 @@ namespace Urho3D
 {
 
 /// %Database cursor. Event handler could set P_FILTER to true to filter out a row from resultset and P_ABORT to true to stop further cursor events.
-EVENT(E_DBCURSOR, DbCursor)
+URHO3D_EVENT(E_DBCURSOR, DbCursor)
 {
-    PARAM(P_DBCONNECTION, DbConnection);    // DbConnection pointer
-    PARAM(P_RESULTIMPL, ResultImpl);        // Underlying result object pointer (cannot be used in scripting)
-    PARAM(P_SQL, SQL);                      // String
-    PARAM(P_NUMCOLS, NumCols);              // unsigned
-    PARAM(P_COLVALUES, ColValues);          // VariantVector
-    PARAM(P_COLHEADERS, ColHeaders);        // StringVector
-    PARAM(P_FILTER, Filter);                // bool [in]
-    PARAM(P_ABORT, Abort);                  // bool [in]
+    URHO3D_PARAM(P_DBCONNECTION, DbConnection);    // DbConnection pointer
+    URHO3D_PARAM(P_RESULTIMPL, ResultImpl);        // Underlying result object pointer (cannot be used in scripting)
+    URHO3D_PARAM(P_SQL, SQL);                      // String
+    URHO3D_PARAM(P_NUMCOLS, NumCols);              // unsigned
+    URHO3D_PARAM(P_COLVALUES, ColValues);          // VariantVector
+    URHO3D_PARAM(P_COLHEADERS, ColHeaders);        // StringVector
+    URHO3D_PARAM(P_FILTER, Filter);                // bool [in]
+    URHO3D_PARAM(P_ABORT, Abort);                  // bool [in]
 }
 
 }

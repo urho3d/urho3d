@@ -49,7 +49,7 @@ mark_as_advanced (URHO3D_C++11 URHO3D_NOABI)
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
 if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the initial configure step
     # On non-MSVC compiler, default to build 64-bit when the host system has a 64-bit build environment
-    execute_process (COMMAND echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
+    execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
     string (REGEX MATCH "#define +__(x86_64|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
     if (matched)
         set (URHO3D_DEFAULT_64BIT TRUE)
@@ -574,7 +574,7 @@ else ()
         else ()
             if (NOT XCODE AND NOT EMSCRIPTEN)
                 # This may influence the effective SSE level when URHO3D_SSE is on as well
-                set (URHO3D_DEPLOYMENT_TARGET native CACHE STRING "Specify the minimum CPU type on which the target binaries are to be deployed (Linux and non-Xcode OSX desktop build only), see GCC/Clang's -march option for possible values")
+                set (URHO3D_DEPLOYMENT_TARGET native CACHE STRING "Specify the minimum CPU type on which the target binaries are to be deployed (Linux, MinGW, and non-Xcode OSX native build only), see GCC/Clang's -march option for possible values")
                 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=${URHO3D_DEPLOYMENT_TARGET}")
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${URHO3D_DEPLOYMENT_TARGET}")
             endif ()
@@ -629,8 +629,8 @@ else ()
             # Reduce GCC optimization level from -O3 to -O2 for stability in RELEASE build configuration
             set (CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
             set (CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
-            # SSE requires force-aligned stack
-            if (URHO3D_SSE)
+            # 32-bit SSE requires force-aligned stack
+            if (NOT URHO3D_64BIT AND URHO3D_SSE)
                 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mstackrealign")
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mstackrealign")
             endif ()

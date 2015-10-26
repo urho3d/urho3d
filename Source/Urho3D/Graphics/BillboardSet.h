@@ -58,7 +58,7 @@ static const unsigned MAX_BILLBOARDS = 65536 / 4;
 /// %Billboard component.
 class URHO3D_API BillboardSet : public Drawable
 {
-    OBJECT(BillboardSet, Drawable);
+    URHO3D_OBJECT(BillboardSet, Drawable);
 
 public:
     /// Construct.

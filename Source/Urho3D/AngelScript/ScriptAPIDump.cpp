@@ -192,7 +192,7 @@ void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference
 
 void Script::DumpAPI(DumpMode mode, const String& sourceTree)
 {
-    // Does not use LOGRAW macro here to ensure the messages are always dumped regardless of URHO3D_LOGGING compiler directive
+    // Does not use URHO3D_LOGRAW macro here to ensure the messages are always dumped regardless of URHO3D_LOGGING compiler directive
     // and of Log subsystem availability
 
     // Dump event descriptions and attribute definitions in Doxygen mode. For events, this means going through the header files,
@@ -241,13 +241,13 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 while (!file->IsEof())
                 {
                     String line = file->ReadLine();
-                    if (line.StartsWith("EVENT"))
+                    if (line.StartsWith("URHO3D_EVENT"))
                     {
                         Vector<String> parts = line.Split(',');
                         if (parts.Size() == 2)
                             Log::WriteRaw("\n### " + parts[1].Substring(0, parts[1].Length() - 1).Trimmed() + "\n");
                     }
-                    if (line.Contains("PARAM"))
+                    if (line.Contains("URHO3D_PARAM"))
                     {
                         Vector<String> parts = line.Split(',');
                         if (parts.Size() == 2)
