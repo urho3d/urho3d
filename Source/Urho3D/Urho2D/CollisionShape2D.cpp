@@ -35,8 +35,6 @@
 namespace Urho3D
 {
 
-extern const char* URHO2D_CATEGORY;
-
 CollisionShape2D::CollisionShape2D(Context* context) :
     Component(context),
     fixture_(0),
@@ -223,15 +221,7 @@ void CollisionShape2D::CreateFixture()
         return;
 
     // Chain shape must have atleast two vertices before creating fixture
-    if (fixtureDef_.shape->m_type == b2Shape::e_chain)
-    {
-        if (dynamic_cast<const b2ChainShape*>(fixtureDef_.shape)->m_count >= 2)
-        {
-            fixture_ = body->CreateFixture(&fixtureDef_);
-            fixture_->SetUserData(this);
-        }
-    }
-    else
+    if (fixtureDef_.shape->m_type != b2Shape::e_chain || static_cast<const b2ChainShape*>(fixtureDef_.shape)->m_count >= 2)
     {
         fixture_ = body->CreateFixture(&fixtureDef_);
         fixture_->SetUserData(this);
