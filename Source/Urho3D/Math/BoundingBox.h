@@ -172,12 +172,6 @@ public:
         min_ = max_ = point;
     }
 
-    /// Returns true if this bounding box is defined via a previous call to Define() or Merge().
-    bool Defined() const
-    {
-        return min_.x_ != M_INFINITY;
-    }
-
     /// Merge a point.
     void Merge(const Vector3& point)
     {
@@ -256,6 +250,12 @@ public:
         min_ = Vector3(M_INFINITY, M_INFINITY, M_INFINITY);
         max_ = Vector3(-M_INFINITY, -M_INFINITY, -M_INFINITY);
 #endif
+    }
+
+    /// Return true if this bounding box is defined via a previous call to Define() or Merge().
+    bool Defined() const
+    {
+        return min_.x_ != M_INFINITY;
     }
 
     /// Return center.

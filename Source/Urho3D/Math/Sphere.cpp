@@ -35,7 +35,7 @@ void Sphere::Define(const Vector3* vertices, unsigned count)
     if (!count)
         return;
 
-    defined_ = false;
+    Clear();
     Merge(vertices, count);
 }
 
@@ -44,7 +44,7 @@ void Sphere::Define(const BoundingBox& box)
     const Vector3& min = box.min_;
     const Vector3& max = box.max_;
 
-    defined_ = false;
+    Clear();
     Merge(min);
     Merge(Vector3(max.x_, min.y_, min.z_));
     Merge(Vector3(min.x_, max.y_, min.z_));
@@ -62,7 +62,7 @@ void Sphere::Define(const Frustum& frustum)
 
 void Sphere::Define(const Polyhedron& poly)
 {
-    defined_ = false;
+    Clear();
     Merge(poly);
 }
 
@@ -105,11 +105,10 @@ void Sphere::Merge(const Polyhedron& poly)
 
 void Sphere::Merge(const Sphere& sphere)
 {
-    if (!defined_)
+    if (radius_ < 0.0f)
     {
         center_ = sphere.center_;
         radius_ = sphere.radius_;
-        defined_ = true;
         return;
     }
 
