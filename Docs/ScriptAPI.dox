@@ -9216,6 +9216,7 @@ Methods:
 - void Clip(const Rect&)
 - void Define(const Vector2&)
 - void Define(const Vector2&, const Vector2&)
+- bool Defined() const
 - bool Equals(const Rect&) const
 - Intersection IsInside(const Vector2&) const
 - void Merge(const Rect&)
@@ -9226,7 +9227,6 @@ Properties:
 
 - float bottom
 - Vector2 center // readonly
-- bool defined
 - Vector2 halfSize // readonly
 - float left
 - Vector2 max
@@ -10945,6 +10945,7 @@ Methods:
 - void Define(const Polyhedron&)
 - void Define(const Sphere&)
 - void Define(const Vector3&, float)
+- bool Defined() const
 - float Distance(const Vector3&) const
 - Intersection IsInside(const BoundingBox&) const
 - Intersection IsInside(const Sphere&) const
@@ -10959,7 +10960,6 @@ Methods:
 Properties:
 
 - Vector3 center
-- bool defined
 - float radius
 
 <a name="Class_Spline"></a>

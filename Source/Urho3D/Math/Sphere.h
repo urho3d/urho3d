@@ -38,51 +38,44 @@ public:
     /// Construct undefined.
     Sphere() :
         center_(Vector3::ZERO),
-        radius_(0.0f),
-        defined_(false)
+        radius_(-M_INFINITY)
     {
     }
 
     /// Copy-construct from another sphere.
     Sphere(const Sphere& sphere) :
         center_(sphere.center_),
-        radius_(sphere.radius_),
-        defined_(sphere.defined_)
+        radius_(sphere.radius_)
     {
     }
 
     /// Construct from center and radius.
     Sphere(const Vector3& center, float radius) :
         center_(center),
-        radius_(radius),
-        defined_(true)
+        radius_(radius)
     {
     }
 
     /// Construct from an array of vertices.
-    Sphere(const Vector3* vertices, unsigned count) :
-        defined_(false)
+    Sphere(const Vector3* vertices, unsigned count)
     {
         Define(vertices, count);
     }
 
     /// Construct from a bounding box.
-    Sphere(const BoundingBox& box) :
-        defined_(false)
+    Sphere(const BoundingBox& box)
     {
         Define(box);
     }
 
     /// Construct from a frustum.
-    Sphere(const Frustum& frustum) :
-        defined_(false)
+    Sphere(const Frustum& frustum)
     {
         Define(frustum);
     }
 
     /// Construct from a polyhedron.
-    Sphere(const Polyhedron& poly) :
-        defined_(false)
+    Sphere(const Polyhedron& poly)
     {
         Define(poly);
     }
@@ -92,7 +85,6 @@ public:
     {
         center_ = rhs.center_;
         radius_ = rhs.radius_;
-        defined_ = rhs.defined_;
         return *this;
     }
 
@@ -113,7 +105,6 @@ public:
     {
         center_ = center;
         radius_ = radius;
-        defined_ = true;
     }
 
     /// Define from an array of vertices.
@@ -128,11 +119,10 @@ public:
     /// Merge a point.
     void Merge(const Vector3& point)
     {
-        if (!defined_)
+        if (radius_ < 0.0f)
         {
             center_ = point;
             radius_ = 0.0f;
-            defined_ = true;
             return;
         }
 
@@ -162,8 +152,13 @@ public:
     void Clear()
     {
         center_ = Vector3::ZERO;
-        radius_ = 0.0f;
-        defined_ = false;
+        radius_ = -M_INFINITY;
+    }
+
+    /// Return true if this sphere is defined via a previous call to Define() or Merge().
+    bool Defined() const
+    {
+        return radius_ >= 0.0f;
     }
 
     /// Test if a point is inside.
@@ -212,8 +207,6 @@ public:
     Vector3 center_;
     /// Sphere radius.
     float radius_;
-    /// Defined flag.
-    bool defined_;
 };
 
 }

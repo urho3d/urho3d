@@ -413,6 +413,9 @@ public:
     /// Clear the map.
     void Clear()
     {
+        // Prevent Find() from returning anything while the map is being cleared
+        ResetPtrs();
+
         if (Size())
         {
             for (Iterator i = Begin(); i != End();)
@@ -424,8 +427,6 @@ public:
             head_ = tail_;
             SetSize(0);
         }
-
-        ResetPtrs();
     }
 
     /// Sort pairs. After sorting the map can be iterated in order until new elements are inserted.

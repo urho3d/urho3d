@@ -855,22 +855,15 @@ class DummyEdit extends View implements View.OnKeyListener {
     public boolean onKey(View v, int keyCode, KeyEvent event) {
 
         // This handles the hardware keyboard input
-        if (event.isPrintingKey()) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                ic.commitText(String.valueOf((char) event.getUnicodeChar()), 1);
-            }
-            return true;
-        }
-
+        // Urho3D: unite input with other platforms
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             SDLActivity.onNativeKeyDown(keyCode);
-            return true;
+            ic.commitText(String.valueOf((char) event.getUnicodeChar()), 1);
         } else if (event.getAction() == KeyEvent.ACTION_UP) {
             SDLActivity.onNativeKeyUp(keyCode);
-            return true;
         }
 
-        return false;
+        return true;
     }
         
     //
