@@ -114,11 +114,11 @@ void Texture::SetBackupTexture(Texture* texture)
     backupTexture_ = texture;
 }
 
-void Texture::SetMipsToSkip(int quality, int mips)
+void Texture::SetMipsToSkip(int quality, int toSkip)
 {
     if (quality >= QUALITY_LOW && quality < MAX_TEXTURE_QUALITY_LEVELS)
     {
-        mipsToSkip_[quality] = (unsigned)mips;
+        mipsToSkip_[quality] = (unsigned)toSkip;
 
         // Make sure a higher quality level does not actually skip more mips
         for (int i = 1; i < MAX_TEXTURE_QUALITY_LEVELS; ++i)

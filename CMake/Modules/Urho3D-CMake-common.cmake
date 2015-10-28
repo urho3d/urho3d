@@ -44,11 +44,10 @@ endif ()
 # Define all supported build options
 include (CMakeDependentOption)
 option (URHO3D_C++11 "Enable C++11 standard")
-cmake_dependent_option (URHO3D_NOABI "If set then do not explicitly specify the ABI compiler flag for code generation (GCC and Clang only)" FALSE "NOT MSVC" FALSE)
-mark_as_advanced (URHO3D_C++11 URHO3D_NOABI)
+mark_as_advanced (URHO3D_C++11)
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
 if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the initial configure step
-    # On non-MSVC compiler, default to build 64-bit when the host system has a 64-bit build environment
+    # On non-MSVC compiler, default to build 64-bit when the chosen compiler toolchain in the build tree has a 64-bit build environment
     execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
     string (REGEX MATCH "#define +__(x86_64|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
     if (matched)
@@ -72,8 +71,8 @@ if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the i
         set (RPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
     endif ()
 endif ()
-if (ANDROID OR RPI OR EMSCRIPTEN)
-    # This build option is not available on Android, Raspberry-Pi, and Emscripten platforms as its value is preset by the chosen toolchain in the build tree
+if (MINGW OR ANDROID OR RPI OR EMSCRIPTEN)
+    # This build option is not available on MinGW, Android, Raspberry-Pi, and Emscripten platforms as its value is preset by the chosen compiler toolchain in the build tree
     set (URHO3D_64BIT ${URHO3D_DEFAULT_64BIT})
 else ()
     option (URHO3D_64BIT "Enable 64-bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system" ${URHO3D_DEFAULT_64BIT})
@@ -589,10 +588,8 @@ else ()
                     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
                 endif ()
             endif ()
-            if (NOT URHO3D_NOABI)
-                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DASH_MBIT}")
-                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DASH_MBIT}")
-            endif ()
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DASH_MBIT}")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DASH_MBIT}")
         endif ()
         if (EMSCRIPTEN)
             # Emscripten-specific setup

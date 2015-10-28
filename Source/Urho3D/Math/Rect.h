@@ -33,49 +33,43 @@ class URHO3D_API Rect
 public:
     /// Construct an undefined rect.
     Rect() :
-        min_(Vector2::ZERO),
-        max_(Vector2::ZERO),
-        defined_(false)
+        min_(M_INFINITY, M_INFINITY),
+        max_(-M_INFINITY, -M_INFINITY)
     {
     }
 
     /// Construct from minimum and maximum vectors.
     Rect(const Vector2& min, const Vector2& max) :
         min_(min),
-        max_(max),
-        defined_(true)
+        max_(max)
     {
     }
 
     /// Construct from coordinates.
     Rect(float left, float top, float right, float bottom) :
         min_(left, top),
-        max_(right, bottom),
-        defined_(true)
+        max_(right, bottom)
     {
     }
 
     /// Construct from a Vector4.
     Rect(const Vector4& vector) :
         min_(vector.x_, vector.y_),
-        max_(vector.z_, vector.w_),
-        defined_(true)
+        max_(vector.z_, vector.w_)
     {
     }
 
     /// Construct from a float array.
     explicit Rect(const float* data) :
         min_(data[0], data[1]),
-        max_(data[2], data[3]),
-        defined_(true)
+        max_(data[2], data[3])
     {
     }
 
     /// Copy-construct from another rect.
     Rect(const Rect& rect) :
         min_(rect.min_),
-        max_(rect.max_),
-        defined_(rect.defined_)
+        max_(rect.max_)
     {
     }
 
@@ -84,7 +78,6 @@ public:
     {
         min_ = rhs.min_;
         max_ = rhs.max_;
-        defined_ = rhs.defined_;
         return *this;
     }
 
@@ -99,7 +92,6 @@ public:
     {
         min_ = rect.min_;
         max_ = rect.max_;
-        defined_ = true;
     }
 
     /// Define from minimum and maximum vectors.
@@ -107,25 +99,17 @@ public:
     {
         min_ = min;
         max_ = max;
-        defined_ = true;
     }
 
     /// Define from a point.
     void Define(const Vector2& point)
     {
         min_ = max_ = point;
-        defined_ = true;
     }
 
     /// Merge a point.
     void Merge(const Vector2& point)
     {
-        if (!defined_)
-        {
-            min_ = max_ = point;
-            defined_ = true;
-        }
-
         if (point.x_ < min_.x_)
             min_.x_ = point.x_;
         if (point.x_ > max_.x_)
@@ -139,13 +123,6 @@ public:
     /// Merge a rect.
     void Merge(const Rect& rect)
     {
-        if (!defined_)
-        {
-            min_ = rect.min_;
-            max_ = rect.max_;
-            defined_ = true;
-        }
-
         if (rect.min_.x_ < min_.x_)
             min_.x_ = rect.min_.x_;
         if (rect.min_.y_ < min_.y_)
@@ -159,13 +136,18 @@ public:
     /// Clear to undefined state.
     void Clear()
     {
-        min_ = Vector2::ZERO;
-        max_ = Vector2::ZERO;
-        defined_ = false;
+        min_ = Vector2(M_INFINITY, M_INFINITY);
+        max_ = Vector2(-M_INFINITY, -M_INFINITY);
     }
 
     /// Clip with another rect.
     void Clip(const Rect& rect);
+
+    /// Return true if this rect is defined via a previous call to Define() or Merge().
+    bool Defined() const
+    {
+        return min_.x_ != M_INFINITY;
+    }
 
     /// Return center.
     Vector2 Center() const { return (max_ + min_) * 0.5f; }
@@ -201,8 +183,6 @@ public:
     Vector2 min_;
     /// Maximum vector.
     Vector2 max_;
-    /// Defined flag.
-    bool defined_;
 
     /// Rect in the range (-1, -1) - (1, 1)
     static const Rect FULL;
