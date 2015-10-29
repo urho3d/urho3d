@@ -924,7 +924,7 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                     {
                         int screenPos = (parentLayoutMode == LM_HORIZONTAL) ? element->GetScreenPosition().x_ :
                             element->GetScreenPosition().y_;
-                        int layoutMaxSize = current->GetLayoutMaxSize();
+                        int layoutMaxSize = current->GetLayoutElementMaxSize();
 
                         if (screenPos < 0 && layoutMaxSize > 0)
                         {

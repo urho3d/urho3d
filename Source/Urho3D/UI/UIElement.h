@@ -522,11 +522,8 @@ public:
     /// Sort child elements if sorting enabled and order dirty. Called by UI.
     void SortChildren();
 
-    /// Return minimum layout element size in the layout direction. Only valid after layout has been calculated. Used internally by UI for optimizations.
-    int GetLayoutMinSize() const { return layoutMinSize_; }
-
     /// Return maximum layout element size in the layout direction. Only valid after layout has been calculated. Used internally by UI for optimizations.
-    int GetLayoutMaxSize() const { return layoutMaxSize_; }
+    int GetLayoutElementMaxSize() const { return layoutElementMaxSize_; }
 
     /// Return horizontal indentation.
     int GetIndent() const { return indent_; }
@@ -558,6 +555,9 @@ public:
 
     /// Get element which should send child added / removed events.
     UIElement* GetElementEventSender() const;
+
+    /// Return effective minimum size, also considering layout. Used internally.
+    IntVector2 GetEffectiveMinSize() const;
 
 protected:
     /// Handle attribute animation added.
@@ -631,10 +631,8 @@ protected:
     unsigned resizeNestingLevel_;
     /// Layout update nesting level to prevent endless loop.
     unsigned layoutNestingLevel_;
-    /// Layout element minimum size in layout direction.
-    int layoutMinSize_;
     /// Layout element maximum size in layout direction.
-    int layoutMaxSize_;
+    int layoutElementMaxSize_;
     /// Horizontal indentation.
     int indent_;
     /// Indent spacing (number of pixels per indentation level).
@@ -678,6 +676,8 @@ private:
     IntVector2 maxSize_;
     /// Child elements' offset. Used internally.
     IntVector2 childOffset_;
+    /// Parent's minimum size calculated by layout. Used internally.
+    IntVector2 layoutMinSize_;
     /// Horizontal alignment.
     HorizontalAlignment horizontalAlignment_;
     /// Vertical alignment.
