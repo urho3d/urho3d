@@ -52,7 +52,7 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     velocityIterations_(DEFAULT_VELOCITY_ITERATIONS),
     positionIterations_(DEFAULT_POSITION_ITERATIONS),
     debugRenderer_(0),
-    physicsSteping_(false),
+    physicsStepping_(false),
     applyingTransforms_(false),
     updateEnabled_(true)
 {
@@ -116,8 +116,8 @@ void PhysicsWorld2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void PhysicsWorld2D::BeginContact(b2Contact* contact)
 {
-    // Only handle contact event when physics steping
-    if (!physicsSteping_)
+    // Only handle contact event while stepping the physics simulation
+    if (!physicsStepping_)
         return;
 
     b2Fixture* fixtureA = contact->GetFixtureA();
@@ -130,8 +130,7 @@ void PhysicsWorld2D::BeginContact(b2Contact* contact)
 
 void PhysicsWorld2D::EndContact(b2Contact* contact)
 {
-    // Only handle contact event when physics steping
-    if (!physicsSteping_)
+    if (!physicsStepping_)
         return;
 
     b2Fixture* fixtureA = contact->GetFixtureA();
@@ -227,9 +226,6 @@ void PhysicsWorld2D::DrawTransform(const b2Transform& xf)
 
 void PhysicsWorld2D::Update(float timeStep)
 {
-    if (!updateEnabled_)
-        return;
-
     URHO3D_PROFILE(UpdatePhysics2D);
 
     using namespace PhysicsPreStep2D;
@@ -239,9 +235,9 @@ void PhysicsWorld2D::Update(float timeStep)
     eventData[P_TIMESTEP] = timeStep;
     SendEvent(E_PHYSICSPRESTEP2D, eventData);
 
-    physicsSteping_ = true;
+    physicsStepping_ = true;
     world_->Step(timeStep, velocityIterations_, positionIterations_);
-    physicsSteping_ = false;
+    physicsStepping_ = false;
 
     for (unsigned i = 0; i < rigidBodies_.Size(); ++i)
         rigidBodies_[i]->ApplyWorldTransform();
@@ -629,6 +625,9 @@ void PhysicsWorld2D::OnSceneSet(Scene* scene)
 
 void PhysicsWorld2D::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData)
 {
+    if (!updateEnabled_)
+        return;
+
     using namespace SceneSubsystemUpdate;
     Update(eventData[P_TIMESTEP].GetFloat());
 }

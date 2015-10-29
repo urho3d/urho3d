@@ -125,6 +125,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     maxSubSteps_(0),
     timeAcc_(0.0f),
     maxNetworkAngularVelocity_(DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY),
+    updateEnabled_(true),
     interpolation_(true),
     internalEdge_(true),
     applyingTransforms_(false),
@@ -311,6 +312,11 @@ void PhysicsWorld::SetNumIterations(int num)
     world_->getSolverInfo().m_numIterations = num;
 
     MarkNetworkUpdate();
+}
+
+void PhysicsWorld::SetUpdateEnabled(bool enable)
+{
+    updateEnabled_ = enable;
 }
 
 void PhysicsWorld::SetInterpolation(bool enable)
@@ -698,8 +704,10 @@ void PhysicsWorld::OnSceneSet(Scene* scene)
 
 void PhysicsWorld::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData)
 {
-    using namespace SceneSubsystemUpdate;
+    if (!updateEnabled_)
+        return;
 
+    using namespace SceneSubsystemUpdate;
     Update(eventData[P_TIMESTEP].GetFloat());
 }
 

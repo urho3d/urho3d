@@ -145,6 +145,8 @@ public:
     void SetMaxSubSteps(int num);
     /// Set number of constraint solver iterations.
     void SetNumIterations(int num);
+    /// Enable or disable automatic physics simulation during scene update. Enabled by default.
+    void SetUpdateEnabled(bool enable);
     /// Set whether to interpolate between simulation steps.
     void SetInterpolation(bool enable);
     /// Set whether to use Bullet's internal edge utility for trimesh collisions. Disabled by default.
@@ -184,6 +186,9 @@ public:
 
     /// Return number of constraint solver iterations.
     int GetNumIterations() const;
+
+    /// Return whether physics world will automatically simulate during scene update.
+    bool IsUpdateEnabled() const { return updateEnabled_; }
 
     /// Return whether interpolation between simulation steps is enabled.
     bool GetInterpolation() const { return interpolation_; }
@@ -295,6 +300,8 @@ private:
     float timeAcc_;
     /// Maximum angular velocity for network replication.
     float maxNetworkAngularVelocity_;
+    /// Automatic simulation update enabled flag.
+    bool updateEnabled_;
     /// Interpolation flag.
     bool interpolation_;
     /// Use internal edge utility flag.
