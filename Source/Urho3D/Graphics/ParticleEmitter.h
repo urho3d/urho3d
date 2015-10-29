@@ -86,7 +86,7 @@ public:
     void ApplyEffect();
 
     /// Return particle effect.
-    ParticleEffect* GetEffect() const { return effect_; }
+    ParticleEffect* GetEffect() const;
 
     /// Return maximum number of particles.
     unsigned GetNumParticles() const { return particles_.Size(); }
