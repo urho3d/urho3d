@@ -4197,6 +4197,7 @@ Methods:
 - void SetGravity(const Vector3& gravity)
 - void SetMaxSubSteps(int num)
 - void SetNumIterations(int num)
+- void SetUpdateEnabled(bool enable)
 - void SetInterpolation(bool enable)
 - void SetInternalEdge(bool enable)
 - void SetSplitImpulse(bool enable)
@@ -4213,6 +4214,7 @@ Methods:
 - Vector3 GetGravity() const
 - int GetMaxSubSteps() const
 - int GetNumIterations() const
+- bool IsUpdateEnabled() const
 - bool GetInterpolation() const
 - bool GetInternalEdge() const
 - bool GetSplitImpulse() const
@@ -4224,6 +4226,7 @@ Properties:
 - Vector3 gravity
 - int maxSubSteps
 - int numIterations
+- bool updateEnabled
 - bool interpolation
 - bool internalEdge
 - bool splitImpulse
@@ -4237,6 +4240,7 @@ Properties:
 Methods:
 
 - void DrawDebugGeometry()
+- void SetUpdateEnabled(bool enable)
 - void SetDrawShape(bool drawShape)
 - void SetDrawJoint(bool drawJoint)
 - void SetDrawAabb(bool drawAabb)
@@ -4255,6 +4259,7 @@ Methods:
 - RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = M_MAX_UNSIGNED)
 - RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED)
 - const PODVector<RigidBody2D*>& GetRigidBodies(const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED)
+- bool IsUpdateEnabled() const
 - bool GetDrawShape() const
 - bool GetDrawJoint() const
 - bool GetDrawAabb() const
@@ -4271,6 +4276,7 @@ Methods:
 
 Properties:
 
+- bool updateEnabled
 - bool drawShape
 - bool drawJoint
 - bool drawAabb
