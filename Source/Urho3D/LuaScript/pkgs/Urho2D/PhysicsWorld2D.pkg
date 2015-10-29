@@ -14,6 +14,7 @@ struct PhysicsRaycastResult2D
 class PhysicsWorld2D : Component
 {
     void DrawDebugGeometry();
+    void SetUpdateEnabled(bool enable);
     void SetDrawShape(bool drawShape);
     void SetDrawJoint(bool drawJoint);
     void SetDrawAabb(bool drawAabb);
@@ -37,6 +38,7 @@ class PhysicsWorld2D : Component
     // void GetRigidBodies(PODVector<RigidBody2D*>& result, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
     tolua_outside const PODVector<RigidBody2D*>& PhysicsWorld2DGetRigidBodies @ GetRigidBodies(const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
 
+    bool IsUpdateEnabled() const;
     bool GetDrawShape() const;
     bool GetDrawJoint() const;
     bool GetDrawAabb() const;
@@ -51,6 +53,7 @@ class PhysicsWorld2D : Component
     int GetVelocityIterations() const;
     int GetPositionIterations() const;
 
+    tolua_property__is_set bool updateEnabled;
     tolua_property__get_set bool drawShape;
     tolua_property__get_set bool drawJoint;
     tolua_property__get_set bool drawAabb;

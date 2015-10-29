@@ -97,6 +97,8 @@ public:
     void Update(float timeStep);
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry();
+    /// Enable or disable physics update.
+    void SetUpdateEnabled(bool enable);
     /// Set draw shape.
     void SetDrawShape(bool drawShape);
     /// Set draw joint.
@@ -140,6 +142,9 @@ public:
     RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies by a box query.
     void GetRigidBodies(PODVector<RigidBody2D*>& result, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
+
+    /// Return whether updates are enabled.
+    bool IsUpdateEnabled() const { return updateEnabled_; }
 
     /// Return draw shape.
     bool GetDrawShape() const { return (m_drawFlags & e_shapeBit) != 0; }
@@ -213,6 +218,8 @@ private:
     /// Debug draw depth test mode.
     bool debugDepthTest_;
 
+    /// Physics update state.
+    bool updateEnabled_;
     /// Physics steping.
     bool physicsSteping_;
     /// Applying transforms.
