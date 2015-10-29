@@ -620,16 +620,15 @@ else ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static -static-libgcc -fno-keep-inline-dllexport")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libstdc++ -static-libgcc -fno-keep-inline-dllexport")
             set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static")
-            # Additional compiler flags for Windows ports of GCC
-            set (CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG")
-            set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG")
-            # Reduce GCC optimization level from -O3 to -O2 for stability in RELEASE build configuration
-            set (CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
-            set (CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
-            # 32-bit SSE requires force-aligned stack
-            if (NOT URHO3D_64BIT AND URHO3D_SSE)
-                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mstackrealign")
-                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mstackrealign")
+            if (NOT URHO3D_64BIT)
+                # Prevent auto-vectorize optimization when using -O3, unless stack realign is being enforced globally
+                if (URHO3D_SSE)
+                    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mstackrealign")
+                    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mstackrealign")
+                else ()
+                    set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fno-tree-loop-vectorize -fno-tree-slp-vectorize -fno-tree-vectorize")
+                    set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-tree-loop-vectorize -fno-tree-slp-vectorize -fno-tree-vectorize")
+                endif ()
             endif ()
         else ()
             # Not Android and not Emscripten and not MinGW derivative
