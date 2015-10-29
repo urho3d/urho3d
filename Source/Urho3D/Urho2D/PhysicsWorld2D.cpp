@@ -53,7 +53,8 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     positionIterations_(DEFAULT_POSITION_ITERATIONS),
     debugRenderer_(0),
     physicsSteping_(false),
-    applyingTransforms_(false)
+    applyingTransforms_(false),
+    updateEnabled_(true)
 {
     // Set default debug draw flags
     m_drawFlags = e_shapeBit;
@@ -226,6 +227,9 @@ void PhysicsWorld2D::DrawTransform(const b2Transform& xf)
 
 void PhysicsWorld2D::Update(float timeStep)
 {
+    if (!updateEnabled_)
+        return;
+
     URHO3D_PROFILE(UpdatePhysics2D);
 
     using namespace PhysicsPreStep2D;
@@ -254,6 +258,11 @@ void PhysicsWorld2D::DrawDebugGeometry()
     DebugRenderer* debug = GetComponent<DebugRenderer>();
     if (debug)
         DrawDebugGeometry(debug, false);
+}
+
+void PhysicsWorld2D::SetUpdateEnabled(bool enable)
+{
+    updateEnabled_ = enable;
 }
 
 void PhysicsWorld2D::SetDrawShape(bool drawShape)
