@@ -8997,6 +8997,7 @@ Properties:
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
+- bool updateEnabled
 - int weakRefs // readonly
 
 <a name="Class_PhysicsWorld2D"></a>
@@ -9069,6 +9070,7 @@ Properties:
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
+- bool updateEnabled
 - uint velocityIterations
 - bool warmStarting
 - int weakRefs // readonly

@@ -19,6 +19,7 @@ class PhysicsWorld : public Component
     void SetGravity(const Vector3& gravity);
     void SetMaxSubSteps(int num);
     void SetNumIterations(int num);
+    void SetUpdateEnabled(bool enable);
     void SetInterpolation(bool enable);
     void SetInternalEdge(bool enable);
     void SetSplitImpulse(bool enable);
@@ -46,6 +47,7 @@ class PhysicsWorld : public Component
     Vector3 GetGravity() const;
     int GetMaxSubSteps() const;
     int GetNumIterations() const;
+    bool IsUpdateEnabled() const;
     bool GetInterpolation() const;
     bool GetInternalEdge() const;
     bool GetSplitImpulse() const;
@@ -55,6 +57,7 @@ class PhysicsWorld : public Component
     tolua_property__get_set Vector3 gravity;
     tolua_property__get_set int maxSubSteps;
     tolua_property__get_set int numIterations;
+    tolua_property__is_set bool updateEnabled;
     tolua_property__get_set bool interpolation;
     tolua_property__get_set bool internalEdge;
     tolua_property__get_set bool splitImpulse;

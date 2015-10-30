@@ -336,6 +336,11 @@ void ParticleEmitter::ApplyEffect()
     SetAnimationLodBias(effect_->GetAnimationLodBias());
 }
 
+ParticleEffect* ParticleEmitter::GetEffect() const
+{
+    return effect_;
+}
+
 void ParticleEmitter::SetEffectAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();

@@ -113,8 +113,7 @@ UIElement::UIElement(Context* context) :
     layoutFlexScale_(Vector2::ONE),
     resizeNestingLevel_(0),
     layoutNestingLevel_(0),
-    layoutMinSize_(0),
-    layoutMaxSize_(0),
+    layoutElementMaxSize_(0),
     indent_(0),
     indentSpacing_(16),
     position_(IntVector2::ZERO),
@@ -620,8 +619,9 @@ void UIElement::SetSize(const IntVector2& size)
     ++resizeNestingLevel_;
 
     IntVector2 validatedSize;
-    validatedSize.x_ = Clamp(size.x_, minSize_.x_, maxSize_.x_);
-    validatedSize.y_ = Clamp(size.y_, minSize_.y_, maxSize_.y_);
+    IntVector2 effectiveMinSize = GetEffectiveMinSize();
+    validatedSize.x_ = Clamp(size.x_, effectiveMinSize.x_, maxSize_.x_);
+    validatedSize.y_ = Clamp(size.y_, effectiveMinSize.y_, maxSize_.y_);
 
     if (validatedSize != size_)
     {
@@ -1067,10 +1067,10 @@ void UIElement::UpdateLayout()
             positions.Push(baseIndentWidth);
             unsigned indent = (unsigned)children_[i]->GetIndentWidth();
             sizes.Push(children_[i]->GetWidth() + indent);
-            minSizes.Push(children_[i]->GetMinWidth() + indent);
+            minSizes.Push(children_[i]->GetEffectiveMinSize().x_ + indent);
             maxSizes.Push(children_[i]->GetMaxWidth() + indent);
             flexScales.Push(children_[i]->GetLayoutFlexScale().x_);
-            minChildHeight = Max(minChildHeight, children_[i]->GetMinHeight());
+            minChildHeight = Max(minChildHeight, children_[i]->GetEffectiveMinSize().y_);
         }
 
         CalculateLayout(positions, sizes, minSizes, maxSizes, flexScales, GetWidth(), layoutBorder_.left_, layoutBorder_.right_,
@@ -1078,14 +1078,9 @@ void UIElement::UpdateLayout()
 
         int width = CalculateLayoutParentSize(sizes, layoutBorder_.left_, layoutBorder_.right_, layoutSpacing_);
         int height = Max(GetHeight(), minChildHeight + layoutBorder_.top_ + layoutBorder_.bottom_);
-        int minWidth =
-            Min(CalculateLayoutParentSize(minSizes, layoutBorder_.left_, layoutBorder_.right_, layoutSpacing_), maxSize_.x_);
-        int minHeight = Min(minChildHeight + layoutBorder_.top_ + layoutBorder_.bottom_, maxSize_.y_);
-        // Respect fixed size if already set
-        if (minSize_.x_ != maxSize_.x_)
-            minSize_.x_ = minWidth;
-        if (minSize_.y_ != maxSize_.y_)
-            minSize_.y_ = minHeight;
+        int minWidth = CalculateLayoutParentSize(minSizes, layoutBorder_.left_, layoutBorder_.right_, layoutSpacing_);
+        int minHeight = minChildHeight + layoutBorder_.top_ + layoutBorder_.bottom_;
+        layoutMinSize_ = IntVector2(minWidth, minHeight);
         SetSize(width, height);
         // Validate the size before resizing child elements, in case of min/max limits
         width = size_.x_;
@@ -1111,10 +1106,10 @@ void UIElement::UpdateLayout()
                 continue;
             positions.Push(0);
             sizes.Push(children_[i]->GetHeight());
-            minSizes.Push(children_[i]->GetMinHeight());
+            minSizes.Push(children_[i]->GetEffectiveMinSize().y_);
             maxSizes.Push(children_[i]->GetMaxHeight());
             flexScales.Push(children_[i]->GetLayoutFlexScale().y_);
-            minChildWidth = Max(minChildWidth, children_[i]->GetMinWidth() + children_[i]->GetIndentWidth());
+            minChildWidth = Max(minChildWidth, children_[i]->GetEffectiveMinSize().x_ + children_[i]->GetIndentWidth());
         }
 
         CalculateLayout(positions, sizes, minSizes, maxSizes, flexScales, GetHeight(), layoutBorder_.top_, layoutBorder_.bottom_,
@@ -1122,13 +1117,9 @@ void UIElement::UpdateLayout()
 
         int height = CalculateLayoutParentSize(sizes, layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_);
         int width = Max(GetWidth(), minChildWidth + layoutBorder_.left_ + layoutBorder_.right_);
-        int minHeight =
-            Min(CalculateLayoutParentSize(minSizes, layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_), maxSize_.y_);
-        int minWidth = Min(minChildWidth + layoutBorder_.left_ + layoutBorder_.right_, maxSize_.x_);
-        if (minSize_.x_ != maxSize_.x_)
-            minSize_.x_ = minWidth;
-        if (minSize_.y_ != maxSize_.y_)
-            minSize_.y_ = minHeight;
+        int minHeight = CalculateLayoutParentSize(minSizes, layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_);
+        int minWidth = minChildWidth + layoutBorder_.left_ + layoutBorder_.right_;
+        layoutMinSize_ = IntVector2(minWidth, minHeight);
         SetSize(width, height);
         width = size_.x_;
         height = size_.y_;
@@ -1708,6 +1699,14 @@ UIElement* UIElement::GetElementEventSender() const
     return element;
 }
 
+IntVector2 UIElement::GetEffectiveMinSize() const
+{
+    if (IsFixedSize() || layoutMode_ == LM_FREE || layoutMinSize_ == IntVector2::ZERO)
+        return minSize_;
+    else
+        return IntVector2(Max(minSize_.x_, layoutMinSize_.x_), Max(minSize_.y_, layoutMinSize_.y_));
+}
+
 void UIElement::OnAttributeAnimationAdded()
 {
     if (attributeAnimationInfos_.Size() == 1)
@@ -1967,18 +1966,15 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
         }
     }
 
-    // Calculate final positions and store the minimum child element size
-    layoutMinSize_ = M_MAX_INT;
-    layoutMaxSize_ = 0;
+    // Calculate final positions and store the maximum child element size for optimizations
+    layoutElementMaxSize_ = 0;
     int position = begin;
     for (unsigned i = 0; i < numChildren; ++i)
     {
         positions[i] = position;
         position += sizes[i] + spacing;
-        if (sizes[i] < layoutMinSize_)
-            layoutMinSize_ = sizes[i];
-        if (sizes[i] > layoutMaxSize_)
-            layoutMaxSize_ = sizes[i];
+        if (sizes[i] > layoutElementMaxSize_)
+            layoutElementMaxSize_ = sizes[i];
     }
 }
 

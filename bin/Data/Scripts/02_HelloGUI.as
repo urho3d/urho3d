@@ -71,7 +71,7 @@ void InitWindow()
     ui.root.AddChild(window);
 
     // Set Window size and layout settings
-    window.SetMinSize(384, 192);
+    window.minWidth = 384;
     window.SetLayout(LM_VERTICAL, 6, IntRect(6, 6, 6, 6));
     window.SetAlignment(HA_CENTER, VA_CENTER);
     window.name = "Window";

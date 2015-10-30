@@ -961,10 +961,11 @@ void Scene::MarkReplicationDirty(Node* node)
 
 void Scene::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    using namespace Update;
+    if (!updateEnabled_)
+        return;
 
-    if (updateEnabled_)
-        Update(eventData[P_TIMESTEP].GetFloat());
+    using namespace Update;
+    Update(eventData[P_TIMESTEP].GetFloat());
 }
 
 void Scene::HandleResourceBackgroundLoaded(StringHash eventType, VariantMap& eventData)

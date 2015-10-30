@@ -41,9 +41,10 @@ inline int	btGetVersion()
 #endif
 
 
-#ifdef _WIN32
+// Urho3D - enable BT_USE_SSE for MinGW
+#if defined(_WIN32) && !defined(__MINGW32__)
 
-		#if defined(__MINGW32__) || defined(__CYGWIN__) || (defined (_MSC_VER) && _MSC_VER < 1300)
+		#if defined(__CYGWIN__) || (defined (_MSC_VER) && _MSC_VER < 1300)
 
 			#define SIMD_FORCE_INLINE inline
 			#define ATTRIBUTE_ALIGNED16(a) a
@@ -173,10 +174,10 @@ inline int	btGetVersion()
 		
 
 #else
-	//non-windows systems
+	//non-windows systems OR MinGW
 
-// Urho3D - allow to disable SSE/NEON and let Linux & Android platforms in besides Apple
-#if (!defined (_WIN32) && !defined (BT_USE_DOUBLE_PRECISION))
+// Urho3D - allow to disable SSE/NEON and let Linux, MinGW, & Android platforms in besides Apple
+#if (!defined (BT_USE_DOUBLE_PRECISION))
     #if defined (URHO3D_SSE) && (defined (__i386__) || defined (__x86_64__))
 		#define BT_USE_SIMD_VECTOR3
 		#define BT_USE_SSE
@@ -287,7 +288,7 @@ typedef __m128 btSimdFloat4;
 
 #if defined (BT_USE_SSE)
 //#if defined BT_USE_SSE_IN_API && defined (BT_USE_SSE)
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)	// Urho3D - enable BT_USE_SSE for MinGW
 
 #ifndef BT_NAN
 static int btNanMask = 0x7F800001;
