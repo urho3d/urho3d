@@ -42,7 +42,7 @@ typedef  float float4 __attribute__ ((vector_size(16)));
 //typedef  uint32_t uint4 __attribute__ ((vector_size(16)));
 
 
-#if defined BT_USE_SSE || defined _WIN32
+#if defined BT_USE_SSE //|| defined _WIN32      // Urho3D - just use BT_USE_SSE as the main switch, Urho3D allow SSE to be disabled
 
 #define LOG2_ARRAY_SIZE     6
 #define STACK_ARRAY_COUNT   (1UL << LOG2_ARRAY_SIZE)

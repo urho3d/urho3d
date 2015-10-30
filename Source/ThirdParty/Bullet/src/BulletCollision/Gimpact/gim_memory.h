@@ -32,6 +32,7 @@ email: projectileman@yahoo.com
 -----------------------------------------------------------------------------
 */
 
+// Modified by Yao Wei Tjong for Urho3D
 
 #include "gim_math.h"
 #include <string.h>
@@ -116,8 +117,8 @@ void * gim_realloc(void *ptr, size_t oldsize, size_t newsize);
 void gim_free(void *ptr);
 
 
-
-#if defined (_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
+// Urho3D - allow to disable SIMD, allow MinGW to use SIMD
+#if defined(URHO3D_SSE) && defined(_WIN32) && !defined(__CYGWIN__)
     #define GIM_SIMD_MEMORY 1
 #endif
 
