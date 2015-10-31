@@ -40,8 +40,7 @@ matrix:
   fast_finish: true
 build_script:
   - rake cmake URHO3D_LIB_TYPE=%URHO3D_LIB_TYPE% URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 URHO3D_EXTRAS=1 URHO3D_TESTING=1
-  - rake make target=test
-test: off
+  - rake make
 deploy: off
 
 # vi: set ts=2 sw=2 expandtab:
