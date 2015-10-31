@@ -1,0 +1,43 @@
+WindowInfo
+	title TBWidgetValue connections
+TBLayout
+	axis y
+	TBTextField
+		text Numeric widgets sharing a connection
+	TBContainer
+		gravity all
+		TBLayout
+			TBInlineSelect
+				connection master-volume
+				min 0
+				max 100
+			TBSlider
+				connection master-volume
+				min 0
+				max 100
+			TBSlider
+				axis y
+				connection master-volume
+				min 0
+				max 100
+			TBButton
+				text Reset
+				id reset-master-volume
+	TBTextField
+		text Text widgets sharing a connection
+	TBContainer
+		gravity all
+		TBLayout
+			TBEditField
+				placeholder User name
+				connection user-name
+				min 0
+				max 100
+			TBEditField
+				placeholder User name
+				connection user-name
+				min 0
+				max 100
+			TBButton
+				text Reset
+				id reset-user-name

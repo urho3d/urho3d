@@ -1,0 +1,5 @@
+This is the default skin of Turbo Badger.
+The license of the skin is Public Domain.
+
+For more information about Turbo Badger and its license,
+see tb_core.h.

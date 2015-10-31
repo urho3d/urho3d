@@ -1,0 +1,8 @@
+
+# This test file will be included from test_tb_parser.tb.txt
+
+styles
+	Chocolate
+		skin: "DarkSkin"
+	Vanilla
+		skin: "LightSkin"

@@ -1,0 +1,208 @@
+TeX codes for various Unicode 3.2 characters
+--------------------------------------------
+
+Markus Kuhn -- 2002-07-25
+
+
+This UTF-8 example file lists the various characters supported by
+Donald Knuth's TeX, as listed in Appendix F and section 9 of
+the TeXbook and section 3.3.2 of Leslie Lamport's LaTeX User's Guide
+and Reference Manual.
+
+Math mode symbols:
+
+Lowercase Greek letters
+
+	α \alpha	ι \iota		ϱ \varrho
+	β \beta		κ \kappa	σ \sigma
+	γ \gamma	λ \lambda	ς \varsigma
+	δ \delta	μ \mu		τ \tau
+	ϵ \epsilon	ν \nu		υ \upsilon
+	ε \varepsilon	ξ \xi		ϕ \phi
+	ζ \zeta		ο o		φ \varphi
+	η \eta		π \pi 		χ \chi
+	θ \theta	ϖ \varpi	ψ \psi
+	ϑ \vartheta	ρ \rho		ω \omega
+
+Uppercase Greek letters
+
+	Γ \Gamma	Ξ \Xi		Φ \Phi
+	Δ \Delta	Π \Pi		Ψ \Psi
+	Θ \Theta	Σ \Sigma	Ω \Omega
+	Λ \Lambda	Υ \Upsilon
+
+Miscellaneous symbols
+
+	ℵ \aleph	′ \prime !	∀ \forall
+	ℏ \hbar		∅ \emptyset	∃ \exists
+	ı \imath	∇ \nabla	¬ \neg
+	j \jmath !	√ \surd		♭ \flat
+	ℓ \ell		⊤ \top		♮ \natural
+	℘ \wp		⊥ \bot		♯ \sharp
+	ℜ \Re		∥ \|		♣ \clubsuit
+	ℑ \Im		∠ \angle	♢ \diamondsuit
+	∂ \partial	△ \triangle	♡ \heartsuit
+	∞ \infty	\ \backslash	♠ \spadesuit
+	□ \Box		◇ \Diamond
+
+“Large” operators
+
+	∑ \sum		⋂ \bigcap	⨀ \bigodot
+	∏ \prod		⋃ \bigcup	⨂ \bigotimes
+	∐ \coprod	⨆ \bigsqcup	⨁ \bigoplus
+	∫ \int		⋁ \bigvee	⨄ \biguplus
+	∮ \oint		⋀ \bigwedge
+
+Binary operations
+
+	± \pm		∩ \cap		   ∨ \vee
+	∓ \mp		∪ \cup		   ∧ \wedge
+	∖ \setminus	⊎ \uplus	   ⊕ \oplus
+	⋅ \cdot		⊓ \sqcap	   ⊖ \ominus
+	× \times	⊔ \sqcup	   ⊗ \otimes
+	∗ \ast		◁ \triangleleft	   ⊘ \oslash
+	⋆ \star		▷ \triangleright   ⊙ \odot
+	⋄ \diamond	≀ \wr		   † \dagger
+	∘ \circ		◯ \bigcirc	   ‡ \ddagger
+	∙ \bullet	△ \bigtriangleup   ⨿ \amalg
+	÷ \div		▽ \bigtriangledown ⊴ \unlhd
+	⊲ \lhd		⊳ \rhd		   ⊵ \unrhd
+
+Relations
+
+	≤ \leq		≥ \geq		≡ \equiv
+	≺ \prec		≻ \succ		∼ \sim
+	≼ \preceq	≽ \succeq	≃ \simeq
+	≪ \ll		≫ \gg		≍ \asymp
+	⊂ \subset	⊃ \supset	≈ \approx
+	⊆ \subseteq	⊇ \supseteq	≅ \cong
+	⊑ \sqsubseteq	⊒ \sqsupseteq	⋈ \bowtie
+	∈ \in		∋ \ni		∝ \propto
+	⊢ \vdash	⊣ \dashv	⊨ \models
+	⌣ \smile	∣ \mid		≐ \doteq
+	⌢ \frown	∥ \parallel	⊥ \perp
+	⊏ \sqsubset	⊐ \sqsupset	⨝ \Join
+
+Negated relations
+
+	≮ \not<		  ≯ \not>	    ≠ \not=
+	≰ \not\leq	  ≱ \not\geq	    ≢ \not\equiv
+	⊀ \not\prec	  ⊁ \not\succ	    ≁ \not\sim
+	⋠ \not\preceq	  ⋡ \not\succeq	    ≄ \not\simeq
+	⊄ \not\subset	  ⊅ \not\supset	    ≉ \not\approx
+	⊈ \not\subseteq	  ⊉ \not\supseteq   ≇ \not\cong
+	⋢ \not\sqsubseteq ⋣ \not\sqsupseteq ≭ \not\asymp
+
+Arrows
+
+	← \leftarrow	      ⟵  \longleftarrow		↑ \uparrow
+	⇐ \Leftarrow	      ⟸  \Longleftarrow		⇑ \Uparrow
+	→ \rightarrow	      ⟶  \longrightarrow	↓ \downarrow
+	⇒ \Rightarrow	      ⟹  \Longrightarrow	⇓ \Downarrow
+	↔ \leftrightarrow     ⟷  \longleftrightarrow	↕ \updownarrow
+	⇔ \Leftrightarrow     ⟺  \Longleftrightarrow	⇕ \Updownarrow
+	↦ \mapsto	      ⟼  \longmapsto		↗ \nearrow
+	↩ \hookleftarrow      ↪ \hookrightarrow		↘ \searrow
+	↼ \leftharpoonup      ⇀ \rightharpoonup		↙ \swarrow
+	↽ \leftharpoondown    ⇁ \rightharpoondown	↖ \nwarrow
+	⇌ \rightleftharpoons  ↝ \leadsto
+
+Openings
+
+	[ \lbrack	⌊ \lfloor	⌈ \lceil	⟦ [\![
+	{ \lbrace	⟨ \langle	⟪ \langle\!\langle
+
+Closings
+
+	] \rbrack	⌋ \rfloor	⌉ \rceil	⟧ ]\!]
+	} \rbrace	⟩ \rangle	⟫ \rangle\!\rangle
+
+Alternate names
+
+	≠ \ne or \neq	(same as \not=)
+	≤ \le		(same as \leq)
+	≥ \ge		(same as \geq)
+	{ \{		(same as \lbrace)
+	} \}		(same as \rbrace)
+	→ \to		(same as \rightarrow)
+	← \gets		(same as \leftarrow)
+	∋ \owns		(same as \ni)
+	∧ \land		(same as \wedge)
+	∨ \lor		(same as \vee)
+	¬ \lnot		(same as \neg)
+	∣ \vert		(same as |)
+	∥ \Vert		(same as |\)
+
+Misc
+
+	⋮ \vdots
+	⋯ \cdots
+	⋱ \ddots
+
+Non-math mode symbols:
+
+Typographic symbols and ligatures
+
+	’ '
+	‘ `
+	” ''
+	“ ``
+	‐ -		(hyphen)
+	– --		(en dash)
+	— ---		(em dash)
+	− $-$		(minus)
+	′ $'$		(prime)
+	″ $''$		(double prime)
+	‴ $'''$		(triple prime)
+	⁗ $''''$	(quadruple prime)
+	ﬀ ff
+	ﬁ fi
+	ﬂ fl
+	ﬃ ffi
+	ﬄ ffl
+	¡ !`
+	¿ ?`
+	  ~		(no-break space)
+	  \thinspace
+	  $\,$
+	  \             (space)
+	œ \oe
+	Œ \OE
+	æ \ae
+	Æ \AE
+	å \aa
+	Å \AA
+	ø \o
+	Ø \O
+	ł \l
+	Ł \L
+	ß \ss
+	§ \S
+	¶ \P
+	† \dag
+	‡ \ddag
+	© \copyright
+	£ \pounds
+	… \ldots
+
+Combining characters
+
+	◌́  \'
+	◌̀  \`
+	◌̂  \^
+	◌̈  \"
+	◌̃  \~
+	◌̄  \=
+	◌̇  \.
+	◌̆  \u
+	◌̌  \v
+	◌̋  \H
+	◌͡  \t
+	◌̧  \c
+	◌̣  \d
+	◌̱  \b
+	◌̸  \not
+
+TeX names followed by ! indicate that there is no Unicode character
+available to encode this exact TeX character (Unicode 3.2 lacks a
+dot-less j and a non-superscript prime).

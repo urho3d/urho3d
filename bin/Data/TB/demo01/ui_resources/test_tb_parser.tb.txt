@@ -1,0 +1,136 @@
+# Test file for the text node system and its parser
+# Everything is a tree of nodes with a name and value.
+# The values may be strings, numbers or arrays.
+
+# If there is no colon, the entire line will be treated as a value and no quotes is needed around strings.
+# Any quotes will be part of the string.
+strings
+	string1 A string
+	string2 "A string"
+	string3 'A string'
+	string4 "'A string'"
+	string5 Foo\nBar
+
+# If there is a colon (compact mode), there must be quotes around strings.
+# First comes the value (optional)
+# Then comes other child nodes (separated by comma)
+strings_compact
+	string1: this should fail
+	string2: "A string"
+	string3: 'A string'
+	string4: "'A string'"
+	string5: '"A string"'
+	string6: "\"A string\""
+	string7: "\\"
+	string8: "\""
+	string9: "\\\\\\\\"
+	string10: "\\\\\""
+	string11: "\"\"\'\'"
+	string12: @language_string_token
+	string13: #ffdd00
+
+numbers
+	integer1 42
+	float1 1.1
+	# The following lines should have extra trailing white space
+	integer2 42 
+	float2 1.1 
+
+numbers_compact
+	integer1: -10
+	integer2: -10, something_else: "foo"
+	float1: 1.0
+	float2: -1.0
+	float3: -.2
+	float4: -.2, something_else: "foo"
+	# The following lines should have extra trailing white space after the numbers
+	float5: 1.1 
+	float6: 1.1 , something_else: "foo" 
+
+numbers_with_unit
+	number1 10px
+	number2 -10px
+	number3: 10px
+	number4: -10px
+	number5: -2.1px
+	number6: -.1px, something_else: "foo"
+	# The following line should have extra trailing white space
+	number7: 1px 
+
+compact_with_children
+	string: "A string", child1: "Child 1", child2: "Child 2"
+	integer: -10, child1: 1, child2: 2
+	float: 1.0, child1: 1.0, child2: 2.0
+
+compact_no_value: string: "A string", int: 42, float: 3.14
+	subgroup: string1: "A string, with \"comma\"", string2: "'Another string'"
+		string3: "And another string"
+
+arrays
+	numbers 1 2 .5 1.0E-8 1000000000
+	dimensions 1px 2px 
+# Not supported yet
+#	strings: "Foo" "'Foo'" 'Foo' '"Foo"' "Foo 'bar'"
+#	mixed: "foo" 2 "bar" 4.0
+
+# Strings can span over multiple lines by ending with a \
+strings_multiline
+	string1: "Line 1\nLine 2\nLine 3"
+	string2:	"a" \
+				"b" \
+				"c"
+	string3:	'A' \
+				'B'
+	string4:	'Line 1\n' \
+				'Line 2\n'\
+				'Line 3\n'
+	subgroup: first: "Foo", second:	"A" \
+									"B"
+	string5: "The last string"
+
+comments_and_space
+	# Testing indented comments
+	one 1
+
+	# There was a empty line before this line
+	two 2
+
+	# There was some dangling space before this line
+	three 3
+
+include_file
+	file1
+		@file test_tb_parser_included.tb.txt
+	file2
+		@file: "test_tb_parser_included.tb.txt"
+
+# Include a file with some definitions referenced below, as an example
+# of how to use f.ex a style file.
+@file test_tb_parser_definitions.tb.txt
+
+include_branch
+	# include the branch styles>Pretty that was included above.
+	test1
+		@include styles>Chocolate
+	test2: @include: "styles>Vanilla"
+	# It's also possible to include from named node trees, using "@treename>noderequest"
+
+# Some value defines, looked up from defines_test below
+defines
+	colors
+		highlight #ffdd00
+		recurse @>defines>colors>highlight
+
+# Reference values from defines above
+defines_test
+	test1 @>defines>colors>highlight
+	test2 @>defines>colors>recurse
+	broken @>defines>colors>broken
+	cycle @>defines_test>cycle
+
+conditions
+	@if 1
+		value 42
+	@else
+		value 43
+	# It's also possible to check condition from named node trees, using "@if @treename>noderequest"

@@ -1,0 +1,54 @@
+WindowInfo
+	title TBToggleContainer
+TBLayout: axis: y
+	TBEditField: gravity: all, adapt-to-content: 1, multiline: 1, readonly: 1, skin: 0, virtual-width: 400
+		text: "TBToggleContainer used with TBWidgetValue connections to automatically toggle a group of items (no programming needed)."
+
+	TBLayout: position: top left
+		TBContainer
+			TBLayout: axis: y
+				TBClickLabel: text: "Check to enable stuff:"
+					TBCheckBox: connection: toggle_demo_1
+
+				# == Toggle enabled =====================================================
+				TBToggleContainer: connection: toggle_demo_1, toggle: enabled
+					TBLayout: axis: y
+						TBClickLabel: text: "Option 1"
+							TBRadioButton: group-id: group1, value: 1
+						TBClickLabel: text: "Option 2"
+							TBRadioButton: group-id: group1
+
+				TBClickLabel: text: "Check to disable stuff:"
+					TBCheckBox: connection: toggle_demo_2
+
+				# == Toggle enabled, with the invert flag set ===========================
+				TBToggleContainer: connection: toggle_demo_2, toggle: enabled, invert: 1
+					TBLayout: axis: y
+						TBClickLabel: text: "Option 1"
+							TBRadioButton: group-id: group2, value: 1
+						TBClickLabel: text: "Option 2"
+							TBRadioButton: group-id: group2
+
+		TBContainer
+			TBLayout: axis: y
+				TBClickLabel: text: "Check to show stuff:"
+					TBCheckBox: connection: toggle_demo_3
+
+				# == Toggle opacity =====================================================
+				TBToggleContainer: connection: toggle_demo_3, toggle: opacity
+					TBLayout: axis: y
+						TBClickLabel: text: "Option 1"
+							TBRadioButton: group-id: group3, value: 1
+						TBClickLabel: text: "Option 2"
+							TBRadioButton: group-id: group3
+
+				TBClickLabel: text: "Check to expand stuff:"
+					TBCheckBox: connection: toggle_demo_4
+
+				# == Toggle expand ======================================================
+				TBToggleContainer: connection: toggle_demo_4, toggle: expanded
+					TBLayout: axis: y
+						TBClickLabel: text: "Option 1"
+							TBRadioButton: group-id: group4, value: 1
+						TBClickLabel: text: "Option 2"
+							TBRadioButton: group-id: group4

@@ -506,7 +506,7 @@ String patchInstructions =
         "                <attribute name=\"Horiz Alignment\" value=\"Center\" />" +
         "                <attribute name=\"Vert Alignment\" value=\"Center\" />" +
         "                <attribute name=\"Color\" value=\"0 0 0 1\" />" +
-        "                <attribute name=\"Text\" value=\"Spawn A jack\" />" +
+        "                <attribute name=\"Text\" value=\"Spawn\" />" +
         "            </element>" +
         "            <element type=\"Text\">" +
         "                <attribute name=\"Name\" value=\"KeyBinding\" />" +

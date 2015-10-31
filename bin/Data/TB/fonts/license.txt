@@ -1,0 +1,5 @@
+﻿This folder has some default fonts for demo purposes.
+
+The license of the files in this folder is Public Domain, however
+i can't guarantee that using rasterized graphics from copyrighted
+fonts as a bitmap font is ok. Use at your own risk!

@@ -1,0 +1,15 @@
+﻿info
+	glyph_str !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ¡¢£¤¥¦§¨©ª«¬®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ
+	name Segoe
+size 14
+	bitmap segoe_white_with_shadow_14.png
+	ascent 15
+	descent 5
+	advance_delta -3
+	space_advance 5
+size 28
+	bitmap segoe_white_with_shadow_28.png
+	ascent 31
+	descent 10
+	advance_delta -7
+	space_advance 10

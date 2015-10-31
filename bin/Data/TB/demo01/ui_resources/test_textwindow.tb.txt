@@ -1,0 +1,35 @@
+WindowInfo
+	title Text editing
+	position 280 50
+	size 450 630
+TBLayout: axis: y, distribution: available
+	TBLayout: distribution: gravity
+		TBButton: id: undo
+			TBSkinImage: skin: arrow.left
+		TBButton: id: redo
+			TBSkinImage: skin: arrow.right
+		TBButton: text: Clear, id: clear
+		TBLayout
+			gravity left right
+			distribution-position right bottom
+			TBTextField: id: info
+			TBButton: id: menu
+				TBSkinImage: skin: arrow.down
+				TBTextField: text: Menu
+				skin TBButton.flat
+	TBEditField: multiline: 1, styling: 1, gravity: all, id: editfield, autofocus: 1
+		text: "Turbo Badger - Fast UI toolkit\n\n" \
+				"<color #0794f8>Test zone</color>\n" \
+				"The menu to the left spawns some examples of features in turbo badger.\n\n" \
+				"The code in Demo/* is more like a developers test zone than organized tutorial-like samples. " \
+				"This would be good to fix of course (help is welcome! ;)\n\n" \
+				"<color #0794f8>Some things to try out</color>\n" \
+				" • All layouts provide panning of content automatically when squashed below the minimal size, so try resizing windows and pan.\n" \
+				" • Lines starting with a bullet sequence (like this one) should wrap in a smart way.\n" \
+				" • Message windows whose target is removed, are automatically removed. Close the menu window with open messages.\n" \
+				" • Keyboard navigation using tab.\n" \
+				" • <u>Underline</u>, <color #f44>Red</color>, <color #6f6>Green</color>, <color #aaf>Blue</color>\n\n" \
+				"<color #0794f8>Good to know</color>\n" \
+				" • The text widget handles styling and embedded content (Example: <widget TBSkinImage: skin: 'Icon16'> <widget TBButton: text: 'Nice!'>), but does not handle editing of those fully. Those features are only ment for read-only text widgets for now.\n" \
+				" • You can emulate touch input by holding down shift, ctrl or alt. Touch input behaves differently in some widgets (f.ex long click to open context menu in textfields), and only invoke movement when down.\n" \
+				" • All resources are UTF-8.\n"

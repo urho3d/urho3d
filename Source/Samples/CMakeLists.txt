@@ -62,6 +62,8 @@ add_sample_subdirectory (34_DynamicGeometry)
 add_sample_subdirectory (35_SignedDistanceFieldText)
 add_sample_subdirectory (37_UIDrag)
 add_sample_subdirectory (38_SceneAndUILoad)
+add_sample_subdirectory (42_TBDemo)
+
 if (URHO3D_PHYSICS)
     add_sample_subdirectory (11_Physics)
     add_sample_subdirectory (12_PhysicsStressTest)

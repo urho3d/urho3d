@@ -1,0 +1,11 @@
+﻿info
+	glyph_str !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~€£¥§•·©«»®¶ÅÄÖÆØåäöæø
+	rgb 1
+	name Orangutang
+size 48
+	bitmap orangutang_48.png
+	ascent 51
+	descent 15
+	x_ofs -2
+	advance_delta -4
+	space_advance 12

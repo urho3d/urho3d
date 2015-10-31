@@ -1,0 +1,6 @@
+TBCheckBox: id: check
+TBSkinImage: id: icon, skin: Icon48, ignore-input: 1
+TBLayout: axis: y, position: left, spacing: 0, ignore-input: 1, size: available, position: left top
+	TBTextField: id: name, text-align: left
+	TBTextField: id: info, text-align: left, state: disabled
+TBButton: id: delete, skin: TBWindow.close

@@ -1,0 +1,123 @@
+WindowInfo
+	title TBScrollContainer with misc widgets
+	size 500 500
+TBLayout
+	gravity all
+	distribution available
+	axis y
+	TBScrollContainer
+		TBLayout
+			position left top
+			axis y
+			TBTextField: text: Buttons with different fonts:
+			TBLayout
+				TBButton
+					text: "Orange"
+					font: name: Orange
+				TBButton
+					text: "Segoe 14"
+					font: size: 14px
+				TBButton
+					text: "Segoe 28"
+					font: size: 28px
+			TBTextField: text: TBButton containing TBSkinImage:
+			TBLayout
+				TBButton
+					text Click for image!
+					id add img
+					TBSkinImage
+						skin Icon16
+				TBButton
+					axis y
+					text Click for image!
+					id add img
+					TBSkinImage
+						skin Icon16
+			TBTextField: text: "TBButton containing TBEditField:"
+			TBLayout
+				TBButton
+					TBEditField: gravity: all, skin: 0, multiline: 1, readonly: 1, adapt-to-content: 1, styling: 1
+						text: "A <color #0794f8>TBButton</color> with styled text that is able to wrap to multiple lines."
+			TBTextField: text: "Showing menu manually, and TBSelectDropdown:"
+			TBLayout
+				TBButton
+					text Give me a popup menu!
+					id showpopupmenu1
+				TBSelectDropdown
+					text Dropdown
+					id name dropdown
+				TBSelectDropdown
+					text Customized items in Dropdown
+					id advanced dropdown
+			TBLayout
+				overflow scroll
+				TBRadioButton
+				TBCheckBox
+					value 1
+				TBSkinImage
+					skin Icon16
+				TBSkinImage
+					skin Icon48
+				TBButton
+				TBButton: toggle-mode: 1
+			TBTextField: text: "TBEditField:"
+			TBLayout
+				TBEditField
+					text Edit type text
+				TBEditField
+					type search
+					text Edit type search
+				TBEditField
+					type password
+					text pwd goes here
+				TBEditField
+					text In this field, multiple lines are enabled.
+					multiline 1
+			TBTextField: text: "TBSlider:"
+			TBLayout
+				TBSlider
+				TBSlider
+					min 100
+					max 200
+					value 150
+				TBSlider
+					axis y
+					min 0
+					max 100
+					connection master-volume
+			TBTextField: text: "TBScrollbar:"
+			TBLayout
+				TBScrollBar
+				TBScrollBar
+					axis y
+			TBTextField: text: Horizontal layout:
+			TBLayout
+				id horizontal_layout
+				TBButton
+					text "1 new button"
+					id new buttons
+					data 1
+				TBButton
+					text "100 new buttons!"
+					id new buttons
+					data 100
+				TBButton
+					text "10 new with delay!"
+					id new buttons delayed
+					data 10
+			TBTextField: text: Vertical layout:
+			TBLayout
+				id vertical_layout
+				axis y
+				TBButton
+					text "1 new button"
+					id new buttons
+					data 1
+				TBButton
+					text "100 new buttons!"
+					id new buttons
+					data 100
+				TBButton
+					text "10 new with delay!"
+					id new buttons delayed
+					data 10
