@@ -70,7 +70,7 @@ public:
 
     virtual void RenderBatch(Batch *batch);
 
-	virtual void SetClipRect(const TBRect &rect)
+    virtual void SetClipRect(const TBRect &rect)
     {
         m_clip_rect = rect;
     }

@@ -6,6 +6,7 @@
 
 #include "../Urho3D.h"
 #include "../Core/Object.h"
+#include "../UI/UIElement.h"
 #include <TurboBadger/tb_widgets_listener.h>
 
 using namespace tb;
@@ -16,9 +17,9 @@ class Object;
 
 //=============================================================================
 //=============================================================================
-class URHO3D_API UTBMain : public Object, TBWidgetListener
+class URHO3D_API UTBMain : public UIElement, TBWidgetListener
 {
-    URHO3D_OBJECT(UTBMain, Object);
+    URHO3D_OBJECT(UTBMain, UIElement);
 
 public:
     UTBMain(Context *_context, int _width, int _height); 

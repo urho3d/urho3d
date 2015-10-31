@@ -45,7 +45,7 @@ TBDemo::~TBDemo()
 {
     if ( pUTBMain_ )
     {
-        delete pUTBMain_;
+        pUTBMain_->Remove();
         pUTBMain_ = NULL;
     }
 }

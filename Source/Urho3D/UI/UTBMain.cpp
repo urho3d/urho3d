@@ -39,9 +39,9 @@ namespace Urho3D
 //=============================================================================
 //=============================================================================
 UTBMain::UTBMain(Context *_context, int _width, int _height)
-    : Object( _context )
+    : UIElement( _context )
 {
-    // only a single instance of UTBMain can be created
+    // only a single instance of UTBMain can be created, do this by checking the singleton ptr
     assert( &UTBRendererBatcher::Singleton() == NULL );
 
     UTBRendererBatcher::Create( _context, _width, _height );
@@ -59,10 +59,14 @@ UTBMain::~UTBMain()
 //=============================================================================
 void UTBMain::Init(const String &_strDataPath)
 {
+    GetSubsystem<UI>()->GetRoot()->AddChild( this );
+
     UTBRendererBatcher::Singleton().Init( _strDataPath );
 
-    // set language map
+    // store data path
     strDataPath_ = GetSubsystem<FileSystem>()->GetProgramDir() + _strDataPath;
+
+    // set language map
     InitLanguage();
 }
 
