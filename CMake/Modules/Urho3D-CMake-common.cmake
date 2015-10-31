@@ -1705,6 +1705,8 @@ elseif (EMSCRIPTEN)
         file (WRITE ${CMAKE_BINARY_DIR}/Source/shell.html "${SHELL_HTML}")
     endif ()
 else ()
+    # Ensure the output directory exist before creating the symlinks
+    file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     # Create symbolic links in the build tree
     foreach (I CoreData Data)
         if (NOT EXISTS ${CMAKE_BINARY_DIR}/bin/${I})
