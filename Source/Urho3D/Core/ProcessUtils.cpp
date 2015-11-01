@@ -143,18 +143,9 @@ void OpenConsoleWindow()
         return;
 
     AllocConsole();
-
-    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    int hCrt = _open_osfhandle((size_t)hOut, _O_TEXT);
-    FILE* outFile = _fdopen(hCrt, "w");
-    setvbuf(outFile, NULL, _IONBF, 1);
-    *stdout = *outFile;
-
-    HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
-    hCrt = _open_osfhandle((size_t)hIn, _O_TEXT);
-    FILE* inFile = _fdopen(hCrt, "r");
-    setvbuf(inFile, NULL, _IONBF, 128);
-    *stdin = *inFile;
+    
+    freopen("CONIN$", "r", stdin);
+    freopen("CONOUT$", "w", stdout);
 
     consoleOpened = true;
 #endif

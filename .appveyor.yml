@@ -1,0 +1,46 @@
+#
+# Copyright (c) 2008-2015 the Urho3D project.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
+version: '{build}'
+branches:
+  only: [master]
+skip_tags: true
+skip_commits:
+  message: /(?:\[ci skip\]|API documentation update)/
+os:
+  - Visual Studio 2015
+  - MinGW
+shallow_clone: true
+environment:
+  NUMJOBS: 4
+  matrix:
+    - URHO3D_LIB_TYPE: STATIC
+    - URHO3D_LIB_TYPE: SHARED
+platform: x86
+matrix:
+  fast_finish: true
+build_script:
+  - rake cmake URHO3D_LIB_TYPE=%URHO3D_LIB_TYPE% URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 URHO3D_EXTRAS=1 URHO3D_TESTING=1
+  - rake make
+deploy: off
+
+# vi: set ts=2 sw=2 expandtab:

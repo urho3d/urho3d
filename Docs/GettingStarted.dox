@@ -480,6 +480,10 @@ F2          Toggle debug HUD
 
 This page shows how to create a new C++ project linking against Urho3D library as external library. There are two approaches to do this. The first approach uses Urho3D library directly from the Urho3D project build tree. The second approach uses Urho3D SDK installation. It is imperative to clean the CMake cache when changing from one approach to the other. You should also clean the cache when you change the path in the URHO3D_HOME environment variable.
 
+> Migration note if you are migrating from Urho3D prior to release 1.4:
+>    - You are probably better of to regenerate your build tree from scratch due to some of the directory renaming in the project structure.
+>    - You must adjust the URHO3D_HOME environment variable in your build. In release 1.4 onward, the URHO3D_HOME environment variable is supposed to point to the build tree of the Urho3D project. In prior releases, the URHO3D_HOME was supposed to point to Urho3D project root itself.
+
 First of all, structure your project similar to Urho3D project as below. Although this is not mandatory, it should increase the chance the CMake modules designed for Urho3D project also works out of the box for your project too. CMake and our CMake modules are case-sensitive. It is recommended that your project adheres to the same naming convention as Urho3D project uses, even when the filesystem in your host system is not case-sensitive.
 
 \code

@@ -181,7 +181,7 @@ void Navigation::CreateUI()
     instructionText->SetText(
         "Use WASD keys to move, RMB to rotate view\n"
         "LMB to set destination, SHIFT+LMB to teleport\n"
-        "MMB to add or remove obstacles\n"
+        "MMB or O key to add or remove obstacles\n"
         "Space to toggle debug geometry"
     );
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
@@ -256,7 +256,7 @@ void Navigation::MoveCamera(float timeStep)
     if (input->GetMouseButtonPress(MOUSEB_LEFT))
         SetPathPoint();
     // Add or remove objects with middle mouse button, then rebuild navigation mesh partially
-    if (input->GetMouseButtonPress(MOUSEB_MIDDLE))
+    if (input->GetMouseButtonPress(MOUSEB_MIDDLE) || input->GetKeyPress('O'))
         AddOrRemoveObject();
 
     // Toggle debug geometry with space
