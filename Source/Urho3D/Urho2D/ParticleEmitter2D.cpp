@@ -237,10 +237,11 @@ void ParticleEmitter2D::UpdateSourceBatches()
         float add = (c + s) * p.size_ * 0.5f;
         float sub = (c - s) * p.size_ * 0.5f;
 
-        vertex0.position_ = Vector3(p.position_.x_ - sub, p.position_.y_ - add, 0.0f);
-        vertex1.position_ = Vector3(p.position_.x_ - add, p.position_.y_ + sub, 0.0f);
-        vertex2.position_ = Vector3(p.position_.x_ + sub, p.position_.y_ + add, 0.0f);
-        vertex3.position_ = Vector3(p.position_.x_ + add, p.position_.y_ - sub, 0.0f);
+        const Matrix3x4& worldTransform = node_->GetWorldTransform();
+        vertex0.position_ = worldTransform * Vector3(p.position_.x_ - sub, p.position_.y_ - add, 0.0f);
+        vertex1.position_ = worldTransform * Vector3(p.position_.x_ - add, p.position_.y_ + sub, 0.0f);
+        vertex2.position_ = worldTransform * Vector3(p.position_.x_ + sub, p.position_.y_ + add, 0.0f);
+        vertex3.position_ = worldTransform * Vector3(p.position_.x_ + add, p.position_.y_ - sub, 0.0f);
 
         vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = p.color_.ToUInt();
 
