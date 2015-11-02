@@ -88,8 +88,9 @@ void CreateInstructions()
 {
     // Construct new Text object, set string to display and font to use
     Text@ instructionText = ui.root.CreateChild("Text");
-    instructionText.text = "Drag on the buttons to move them around.\nMulti- button drag also supported.";
+    instructionText.text = "Drag on the buttons to move them around.\nTouch input allows also multi-drag.";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
+    instructionText.textAlignment = HA_CENTER;
 
     // Position the text relative to the screen center
     instructionText.horizontalAlignment = HA_CENTER;
