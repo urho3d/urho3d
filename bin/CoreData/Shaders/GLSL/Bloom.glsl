@@ -9,7 +9,7 @@ varying vec2 vScreenPos;
 #ifdef COMPILEPS
 uniform float cBloomThreshold;
 uniform vec2 cBloomMix;
-uniform vec2 cHBlurInvSize;
+uniform vec2 cBlurHInvSize;
 #endif
 
 void VS()
@@ -28,21 +28,21 @@ void PS()
     gl_FragColor = vec4((rgb - vec3(cBloomThreshold, cBloomThreshold, cBloomThreshold)) / (1.0 - cBloomThreshold), 1.0);
     #endif
 
-    #ifdef HBLUR
-    vec3 rgb = texture2D(sDiffMap, vTexCoord + vec2(-2.0, 0.0) * cHBlurInvSize).rgb * 0.1;
-    rgb += texture2D(sDiffMap, vTexCoord + vec2(-1.0, 0.0) * cHBlurInvSize).rgb * 0.25;
-    rgb += texture2D(sDiffMap, vTexCoord + vec2(0.0, 0.0) * cHBlurInvSize).rgb * 0.3;
-    rgb += texture2D(sDiffMap, vTexCoord + vec2(1.0, 0.0) * cHBlurInvSize).rgb * 0.25;
-    rgb += texture2D(sDiffMap, vTexCoord + vec2(2.0, 0.0) * cHBlurInvSize).rgb * 0.1;
+    #ifdef BLURH
+    vec3 rgb = texture2D(sDiffMap, vTexCoord + vec2(-2.0, 0.0) * cBlurHInvSize).rgb * 0.1;
+    rgb += texture2D(sDiffMap, vTexCoord + vec2(-1.0, 0.0) * cBlurHInvSize).rgb * 0.25;
+    rgb += texture2D(sDiffMap, vTexCoord + vec2(0.0, 0.0) * cBlurHInvSize).rgb * 0.3;
+    rgb += texture2D(sDiffMap, vTexCoord + vec2(1.0, 0.0) * cBlurHInvSize).rgb * 0.25;
+    rgb += texture2D(sDiffMap, vTexCoord + vec2(2.0, 0.0) * cBlurHInvSize).rgb * 0.1;
     gl_FragColor = vec4(rgb, 1.0);
     #endif
 
-    #ifdef VBLUR
-    vec3 rgb = texture2D(sDiffMap, vTexCoord + vec2(0.0, -2.0) * cHBlurInvSize).rgb * 0.1;
-    rgb += texture2D(sDiffMap, vTexCoord + vec2(0.0, -1.0) * cHBlurInvSize).rgb * 0.25;
-    rgb += texture2D(sDiffMap, vTexCoord + vec2(0.0, 0.0) * cHBlurInvSize).rgb * 0.3;
-    rgb += texture2D(sDiffMap, vTexCoord + vec2(0.0, 1.0) * cHBlurInvSize).rgb * 0.25;
-    rgb += texture2D(sDiffMap, vTexCoord + vec2(0.0, 2.0) * cHBlurInvSize).rgb * 0.1;
+    #ifdef BLURV
+    vec3 rgb = texture2D(sDiffMap, vTexCoord + vec2(0.0, -2.0) * cBlurHInvSize).rgb * 0.1;
+    rgb += texture2D(sDiffMap, vTexCoord + vec2(0.0, -1.0) * cBlurHInvSize).rgb * 0.25;
+    rgb += texture2D(sDiffMap, vTexCoord + vec2(0.0, 0.0) * cBlurHInvSize).rgb * 0.3;
+    rgb += texture2D(sDiffMap, vTexCoord + vec2(0.0, 1.0) * cBlurHInvSize).rgb * 0.25;
+    rgb += texture2D(sDiffMap, vTexCoord + vec2(0.0, 2.0) * cBlurHInvSize).rgb * 0.1;
     gl_FragColor = vec4(rgb, 1.0);
     #endif
 
