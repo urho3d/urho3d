@@ -22,6 +22,7 @@
 
 #include "../Precompiled.h"
 
+#include "../Container/ArrayPtr.h"
 #include "../Core/Context.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Texture2D.h"
@@ -370,7 +371,7 @@ bool AnimationSet2D::EndLoadSpriter()
                 if (!sprite)
                 {
                     URHO3D_LOGERROR("Could not load sprite " + file->name_);
-                    return false;                
+                    return false;
                 }
 
                 Vector2 hotSpot(file->pivotX_, file->pivotY_);
@@ -445,7 +446,7 @@ bool AnimationSet2D::EndLoadSpriter()
             {
                 SpriteInfo& info = spriteInfos[i];
                 Image* image = info.image_;
-                if (!allocator.Allocate(image->GetWidth(), image->GetHeight(), info.x, info.y))
+                if (!allocator.Allocate(image->GetWidth() + 1, image->GetHeight() + 1, info.x, info.y))
                 {
                     URHO3D_LOGERROR("Could not allocate area");
                     return false;
@@ -457,6 +458,10 @@ bool AnimationSet2D::EndLoadSpriter()
             texture->SetNumLevels(1);
             texture->SetSize(allocator.GetWidth(), allocator.GetHeight(), Graphics::GetRGBAFormat());
 
+            unsigned textureDataSize = allocator.GetWidth() * allocator.GetHeight() * 4;
+            SharedArrayPtr<unsigned char> textureData(new unsigned char[textureDataSize]);
+            memset(textureData.Get(), 0, textureDataSize);
+
             sprite_ = new Sprite2D(context_);
             sprite_->SetTexture(texture);
 
@@ -465,7 +470,11 @@ bool AnimationSet2D::EndLoadSpriter()
                 SpriteInfo& info = spriteInfos[i];
                 Image* image = info.image_;
 
-                texture->SetData(0, info.x, info.y, image->GetWidth(), image->GetHeight(), image->GetData());
+                for (int y = 0; y < image->GetHeight(); ++y)
+                {
+                    memcpy(textureData.Get() + ((info.y + y) * allocator.GetWidth() + info.x) * 4,
+                        image->GetData() + y * image->GetWidth() * 4, image->GetWidth() * 4);
+                }
 
                 SharedPtr<Sprite2D> sprite(new Sprite2D(context_));
                 sprite->SetTexture(texture);
@@ -475,10 +484,12 @@ bool AnimationSet2D::EndLoadSpriter()
                 int key = (info.file_->folder_->id_ << 16) + info.file_->id_;
                 spriterFileSprites_[key] = sprite;
             }
+
+            texture->SetData(0, 0, 0, allocator.GetWidth(), allocator.GetHeight(), textureData.Get());
         }
         else
         {
-            SharedPtr<Texture2D> texture(new Texture2D(context_));        
+            SharedPtr<Texture2D> texture(new Texture2D(context_));
             texture->SetMipsToSkip(QUALITY_LOW, 0);
             texture->SetNumLevels(1);
 
