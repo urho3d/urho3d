@@ -555,72 +555,79 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                     }
                 }
 
-                // Build obj indices for a triangle list
-                if (geo->GetPrimitiveType() == TRIANGLE_LIST)
+                // If we don't have UV but have normals then must write a double-slash to indicate the absence of UV coords, otherwise use a single slash
+                const String slashCharacter = hasNormals ? "//" : "/";
+
+                // Amount by which to offset indices in the OBJ vs their values in the Urho3D geometry, basically the lowest index value
+                // Compensates for the above vertex writing which doesn't write ALL vertices, just the used ones
+                int indexOffset = M_MAX_INT;
+                for (unsigned indexIdx = indexStart; indexIdx < indexStart + indexCount; indexIdx++)
                 {
-                    // If we don't have UV but have normals then must write a double-slash to indicate the absence of UV coords, otherwise use a single slash
-                    const String slashCharacter = hasNormals ? "//" : "/";
+                    if (indexSize == 2)
+                        indexOffset = Min(indexOffset, *((unsigned short*)(indexData + indexIdx * indexSize)));
+                    else
+                        indexOffset = Min(indexOffset, *((unsigned*)(indexData + indexIdx * indexSize)));
+                }
 
-                    for (unsigned indexIdx = indexStart; indexIdx < indexCount * indexSize; indexIdx += indexSize * 3)
+                for (unsigned indexIdx = indexStart; indexIdx < indexStart + indexCount; indexIdx += 3)
+                {
+                    // Deal with 16 or 32 bit indices, converting to long
+                    unsigned long longIndices[3];
+                    if (indexSize == 2)
                     {
-                        // Deal with 16 or 32 bit indices, converting to long
-                        unsigned long longIndices[3];
-                        if (indexSize == 2)
-                        {
-                            //16 bit indices
-                            unsigned short indices[3];
-                            memcpy(indices, indexData + indexIdx, indexSize * 3);
-                            longIndices[0] = indices[0];
-                            longIndices[1] = indices[1];
-                            longIndices[2] = indices[2];
-                        }
-                        else
-                        {
-                            //32 bit indices
-                            unsigned indices[3];
-                            memcpy(indices, indexData + indexIdx, indexSize * 3);
-                            longIndices[0] = indices[0];
-                            longIndices[1] = indices[1];
-                            longIndices[2] = indices[2];
-                        }
-
-                        String output = "f ";
-                        if (hasNormals)
-                        {
-                            output.AppendWithFormat("%l/%l/%l %l/%l/%l %l/%l/%l",
-                                currentPositionIndex + longIndices[0],
-                                currentUVIndex + longIndices[0],
-                                currentNormalIndex + longIndices[0],
-                                currentPositionIndex + longIndices[1],
-                                currentUVIndex + longIndices[1],
-                                currentNormalIndex + longIndices[1],
-                                currentPositionIndex + longIndices[2],
-                                currentUVIndex + longIndices[2],
-                                currentNormalIndex + longIndices[2]);
-                        }
-                        else if (hasNormals || hasUV)
-                        {
-                            const unsigned secondTraitIndex = hasNormals ? currentNormalIndex : currentUVIndex;
-                            output.AppendWithFormat("%l%s%l %l%s%l %l%s%l",
-                                currentPositionIndex + longIndices[0],
-                                slashCharacter.CString(),
-                                secondTraitIndex + longIndices[0],
-                                currentPositionIndex + longIndices[1],
-                                slashCharacter.CString(),
-                                secondTraitIndex + longIndices[1],
-                                currentPositionIndex + longIndices[2],
-                                slashCharacter.CString(),
-                                secondTraitIndex + longIndices[2]);
-                        }
-                        else
-                        {
-                            output.AppendWithFormat("%l %l %l",
-                                currentPositionIndex + longIndices[0],
-                                currentPositionIndex + longIndices[1],
-                                currentPositionIndex + longIndices[2]);
-                        }
-                        outputFile->WriteLine(output);
+                        //16 bit indices
+                        unsigned short indices[3];
+                        memcpy(indices, indexData + (indexIdx * indexSize), indexSize * 3);
+                        longIndices[0] = indices[0] - indexOffset;
+                        longIndices[1] = indices[1] - indexOffset;
+                        longIndices[2] = indices[2] - indexOffset;
                     }
+                    else
+                    {
+                        //32 bit indices
+                        unsigned indices[3];
+                        memcpy(indices, indexData + (indexIdx * indexSize), indexSize * 3);
+                        longIndices[0] = indices[0] - indexOffset;
+                        longIndices[1] = indices[1] - indexOffset;
+                        longIndices[2] = indices[2] - indexOffset;
+                    }
+
+                    String output = "f ";
+                    if (hasNormals)
+                    {
+                        output.AppendWithFormat("%l/%l/%l %l/%l/%l %l/%l/%l",
+                            currentPositionIndex + longIndices[0],
+                            currentUVIndex + longIndices[0],
+                            currentNormalIndex + longIndices[0],
+                            currentPositionIndex + longIndices[1],
+                            currentUVIndex + longIndices[1],
+                            currentNormalIndex + longIndices[1],
+                            currentPositionIndex + longIndices[2],
+                            currentUVIndex + longIndices[2],
+                            currentNormalIndex + longIndices[2]);
+                    }
+                    else if (hasNormals || hasUV)
+                    {
+                        const unsigned secondTraitIndex = hasNormals ? currentNormalIndex : currentUVIndex;
+                        output.AppendWithFormat("%l%s%l %l%s%l %l%s%l",
+                            currentPositionIndex + longIndices[0],
+                            slashCharacter.CString(),
+                            secondTraitIndex + longIndices[0],
+                            currentPositionIndex + longIndices[1],
+                            slashCharacter.CString(),
+                            secondTraitIndex + longIndices[1],
+                            currentPositionIndex + longIndices[2],
+                            slashCharacter.CString(),
+                            secondTraitIndex + longIndices[2]);
+                    }
+                    else
+                    {
+                        output.AppendWithFormat("%l %l %l",
+                            currentPositionIndex + longIndices[0],
+                            currentPositionIndex + longIndices[1],
+                            currentPositionIndex + longIndices[2]);
+                    }
+                    outputFile->WriteLine(output);
                 }
 
                 // Increment our positions based on what vertex attributes we have
