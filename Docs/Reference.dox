@@ -130,7 +130,7 @@ The full list of supported parameters, their datatypes and default values:
 - LogName (string) %Log filename. Default "Urho3D.log".
 - FrameLimiter (bool) Whether to cap maximum framerate to 200 (desktop) or 60 (Android/iOS.) Default true.
 - WorkerThreads (bool) Whether to create worker threads for the %WorkQueue subsystem according to available CPU cores. Default true.
-- ResourcePrefixPath (string) Override the resource prefix path to use. If not specified then the default prefix path is set to URHO3D_PREFIX_PATH environment variable (if defined) or executable path.
+- ResourcePrefixPaths (string) A semicolon-separated list of resource prefix paths to use. If not specified then the default prefix path is set to executable path. The resource prefix paths can also be defined using URHO3D_PREFIX_PATH env-var. When both are defined, the paths set by -pp takes higher precedence.
 - ResourcePaths (string) A semicolon-separated list of resource paths to use. If corresponding packages (ie. Data.pak for Data directory) exist they will be used instead. Default "Data;CoreData".
 - ResourcePackages (string) A semicolon-separated list of resource packages to use. Default empty.
 - AutoloadPaths (string) A semicolon-separated list of autoload paths to use. Any resource packages and subdirectories inside an autoload path will be added to the resource system. Default "Autoload".
@@ -2819,7 +2819,7 @@ The following sample demonstrates how to build a path from 2 points, assign a co
 
 	// Node to move along the path ('controlled node')
 	Node* movingNode =  scene_->CreateChild("MovingNode");
-	
+
 	// Spline path
 	Node* pathNode = scene_->CreateChild("PathNode");
 	SplinePath* path = pathNode->CreateComponent<SplinePath>();

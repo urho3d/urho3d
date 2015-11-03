@@ -139,7 +139,10 @@ bool ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
 
     // Do not add packages that failed to load
     if (!package || !package->GetNumFiles())
+    {
+        URHO3D_LOGERRORF("Could not add package file %s due to load failure", package->GetName().CString());
         return false;
+    }
 
     if (priority < packages_.Size())
         packages_.Insert(priority, SharedPtr<PackageFile>(package));

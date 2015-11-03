@@ -107,7 +107,10 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
         newEntry.size_ = file->ReadUInt();
         newEntry.checksum_ = file->ReadUInt();
         if (!compressed_ && newEntry.offset_ + newEntry.size_ > totalSize_)
+        {
             URHO3D_LOGERROR("File entry " + entryName + " outside package file");
+            return false;
+        }
         else
             entries_[entryName] = newEntry;
     }
