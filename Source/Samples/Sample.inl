@@ -63,7 +63,8 @@ void Sample::Setup()
     // Construct a search path to find the resource prefix with two entries:
     // The first entry is an empty path which will be substituted with program/bin directory -- this entry is for binary when it is still in build tree
     // The second entry is an relative path to the installed program/bin directory -- this entry is for binary when it is in the URho3D SDK installation location
-    engineParameters_["ResourcePrefixPaths"] = " ;../share/Urho3D/Resources";
+    if (engineParameters_["ResourcePrefixPaths"].GetString().Empty())
+        engineParameters_["ResourcePrefixPaths"] = " ;../share/Urho3D/Resources";
 }
 
 void Sample::Start()

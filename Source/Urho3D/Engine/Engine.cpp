@@ -212,17 +212,10 @@ bool Engine::Initialize(const VariantMap& parameters)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
-    Vector<String>
-        resourcePrefixPaths = GetParameter(parameters, "ResourcePrefixPaths", getenv("URHO3D_PREFIX_PATH")).GetString().Split(';');
-    if (resourcePrefixPaths.Empty())
-        resourcePrefixPaths.Push(String::EMPTY);
+    Vector<String> resourcePrefixPaths = GetParameter(parameters, "ResourcePrefixPaths", " ").GetString().Split(';');
     for (unsigned i = 0; i < resourcePrefixPaths.Size(); ++i)
-    {
-        if (resourcePrefixPaths[i].Empty())
-            resourcePrefixPaths[i] = fileSystem->GetProgramDir();
-        else if (!IsAbsolutePath(resourcePrefixPaths[i]))
-            resourcePrefixPaths[i] = AddTrailingSlash(fileSystem->GetProgramDir() + resourcePrefixPaths[i]);
-    }
+        resourcePrefixPaths[i] = AddTrailingSlash(
+            IsAbsolutePath(resourcePrefixPaths[i]) ? resourcePrefixPaths[i] : fileSystem->GetProgramDir() + resourcePrefixPaths[i]);
     Vector<String> resourcePaths = GetParameter(parameters, "ResourcePaths", "Data;CoreData").GetString().Split(';');
     Vector<String> resourcePackages = GetParameter(parameters, "ResourcePackages").GetString().Split(';');
     Vector<String> autoLoadPaths = GetParameter(parameters, "AutoloadPaths", "Autoload").GetString().Split(';');
@@ -741,6 +734,10 @@ void Engine::ApplyFrameLimit()
 VariantMap Engine::ParseParameters(const Vector<String>& arguments)
 {
     VariantMap ret;
+
+    // Pre-initialize the parameters with environment variable values when they are set
+    if (const char* paths = getenv("URHO3D_PREFIX_PATH"))
+        ret["ResourcePrefixPaths"] = paths;
 
     for (unsigned i = 0; i < arguments.Size(); ++i)
     {
