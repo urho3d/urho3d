@@ -34,6 +34,11 @@
 #include <STB/stb_image.h>
 #include <STB/stb_image_write.h>
 
+#ifdef URHO3D_WEBP
+#define WEBP_EXTERN(type) type
+#include <webp/decode.h>
+#endif
+
 #include "../DebugNew.h"
 
 extern "C" unsigned char* stbi_write_png_to_mem(unsigned char* pixels, int stride_bytes, int x, int y, int n, int* out_len);
@@ -732,19 +737,32 @@ bool Image::BeginLoad(Deserializer& source)
     }
     else
     {
-        // Not DDS, KTX or PVR, use STBImage to load other image formats as uncompressed
+        // Not DDS, KTX or PVR, use STBImage or libwebp to load other image formats as uncompressed
         source.Seek(0);
         int width, height;
         unsigned components;
-        unsigned char* pixelData = GetImageData(source, width, height, components);
+        Urho3D::String error;
+
+#if URHO3D_WEBP
+        bool isWEBP;
+        unsigned char* pixelData = GetImageData(source, width, height, components, error, isWEBP);
+#else
+        unsigned char* pixelData = GetImageData(source, width, height, components, error);
+#endif
+
         if (!pixelData)
         {
-            URHO3D_LOGERROR("Could not load image " + source.GetName() + ": " + String(stbi_failure_reason()));
+            URHO3D_LOGERROR("Could not load image " + source.GetName() + ": " + error);
             return false;
         }
         SetSize(width, height, components);
         SetData(pixelData);
+
+#if URHO3D_WEBP
+        FreeImageData(pixelData, isWEBP);
+#else
         FreeImageData(pixelData);
+#endif
     }
 
     return true;
@@ -874,10 +892,18 @@ bool Image::LoadColorLUT(Deserializer& source)
     source.Seek(0);
     int width, height;
     unsigned components;
-    unsigned char* pixelDataIn = GetImageData(source, width, height, components);
+    Urho3D::String error;
+    
+#if URHO3D_WEBP
+    bool isWEBP;
+    unsigned char* pixelDataIn = GetImageData(source, width, height, components, error, isWEBP);
+#else
+    unsigned char* pixelDataIn = GetImageData(source, width, height, components, error);
+#endif
+
     if (!pixelDataIn)
     {
-        URHO3D_LOGERROR("Could not load image " + source.GetName() + ": " + String(stbi_failure_reason()));
+        URHO3D_LOGERROR("Could not load image " + source.GetName() + ": " + error);
         return false;
     }
     if (components != 3)
@@ -907,7 +933,11 @@ bool Image::LoadColorLUT(Deserializer& source)
         }
     }
 
+#if URHO3D_WEBP
+    FreeImageData(pixelDataIn, isWEBP);
+#else
     FreeImageData(pixelDataIn);
+#endif
 
     return true;
 }
@@ -2028,20 +2058,95 @@ void Image::PrecalculateLevels()
     }
 }
 
-unsigned char* Image::GetImageData(Deserializer& source, int& width, int& height, unsigned& components)
+#ifdef URHO3D_WEBP
+unsigned char* Image::GetImageData(Deserializer& source, int& width, int& height, unsigned& components, Urho3D::String& error, bool& isWEBP)
+#else
+unsigned char* Image::GetImageData(Deserializer& source, int& width, int& height, unsigned& components, Urho3D::String& error)
+#endif
 {
+#ifdef URHO3D_WEBP
+    String fileID = source.ReadFileID();
+
+    if (fileID == "RIFF") // The WebP file format is based on the RIFF
+    {
+        /* unsigned fileSize = */source.ReadUInt();
+
+        if (source.ReadFileID() != "WEBP")
+        {
+            error = "Unknown image format";
+            return NULL;
+        }
+
+        source.Seek(0);
+
+        unsigned dataSize = source.GetSize();
+
+        SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
+        source.Read(buffer.Get(), dataSize);
+
+        if (WebPGetInfo(buffer.Get(), dataSize, NULL, NULL) == 0) // Validate header
+        {
+            error = "Detected damaged WEBP header";
+            return NULL;
+        }
+
+        WebPBitstreamFeatures features;
+        memset(&features, 0, sizeof(features));
+
+        if (WebPGetFeatures(buffer.Get(), dataSize, &features) != VP8_STATUS_OK)
+        {
+            error = "Cannot retrieve WEBP image features";
+            return NULL;
+        }
+
+        if (features.has_animation)
+        {
+            error = "Loading WEBP animations currently are not supported";
+            return NULL;
+        }
+
+        isWEBP = true;
+
+        if (features.has_alpha)
+        {
+            components = 4;
+            return WebPDecodeRGBA(buffer.Get(), dataSize, &width, &height);
+        }
+        else
+        {
+            components = 3;
+            return WebPDecodeRGB(buffer.Get(), dataSize, &width, &height);
+        }
+    }
+
+    isWEBP = false;
+    source.Seek(0);
+#endif
+
     unsigned dataSize = source.GetSize();
 
     SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
     source.Read(buffer.Get(), dataSize);
-    return stbi_load_from_memory(buffer.Get(), dataSize, &width, &height, (int*)&components, 0);
+
+    unsigned char* data = stbi_load_from_memory(buffer.Get(), dataSize, &width, &height, (int*)&components, 0);
+    error = stbi_failure_reason();
+    return data;
 }
 
+#ifdef URHO3D_WEBP
+void Image::FreeImageData(unsigned char* pixelData, bool isWEBP)
+#else
 void Image::FreeImageData(unsigned char* pixelData)
+#endif
 {
     if (!pixelData)
         return;
 
+#ifdef URHO3D_WEBP
+    if (isWEBP)
+        free(pixelData);
+    else
+#endif
     stbi_image_free(pixelData);
 }
 
