@@ -164,6 +164,10 @@ VariantMap& Context::GetEventDataMap()
 
 void Context::CopyBaseAttributes(StringHash baseType, StringHash derivedType)
 {
+    // Prevent endless loop if mistakenly copying attributes from same class as derived
+    if (baseType == derivedType)
+        return;
+
     const Vector<AttributeInfo>* baseAttributes = GetAttributes(baseType);
     if (baseAttributes)
     {
