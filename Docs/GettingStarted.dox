@@ -369,7 +369,9 @@ The engine can be configured using the following command line options.
 -q           Enable quiet mode which does not log to standard output stream
 -b <length>  Sound buffer length in milliseconds
 -r <freq>    Sound mixing frequency in Hz
--pp <path>   Resource prefix path, default to URHO3D_PREFIX_PATH env-var or executable path
+-pp <paths>  Resource prefix path(s), separated by semicolons, default to executable path
+             The resource prefix paths can also be defined using URHO3D_PREFIX_PATH env-var
+             When both are defined, the paths set by -pp takes higher precedence
 -p <paths>   Resource path(s) to use, separated by semicolons, default to 'Data;CoreData'
 -pf <files>  Resource package file to use, separated by semicolons, default to none
 -ap <paths>  Resource autoload path(s), separated by semicolons, default to 'AutoLoad'

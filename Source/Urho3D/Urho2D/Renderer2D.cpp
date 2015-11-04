@@ -430,8 +430,8 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
     if (viewBatchInfo.batchUpdatedFrameNumber_ == frame_.frameNumber_)
         return;
 
-    PODVector<const SourceBatch2D*>& soruceBatches = viewBatchInfo.sourceBatches_;
-    soruceBatches.Clear();
+    PODVector<const SourceBatch2D*>& sourceBatches = viewBatchInfo.sourceBatches_;
+    sourceBatches.Clear();
     for (unsigned d = 0; d < drawables_.Size(); ++d)
     {
         if (!drawables_[d]->IsInView(camera))
@@ -441,11 +441,11 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
         for (unsigned b = 0; b < batches.Size(); ++b)
         {
             if (batches[b].material_ && !batches[b].vertices_.Empty())
-                soruceBatches.Push(&batches[b]);
+                sourceBatches.Push(&batches[b]);
         }
     }
 
-    Sort(soruceBatches.Begin(), soruceBatches.End(), CompareSourceBatch2Ds);
+    Sort(sourceBatches.Begin(), sourceBatches.End(), CompareSourceBatch2Ds);
 
     viewBatchInfo.batchCount_ = 0;
     Material* currMaterial = 0;
@@ -454,10 +454,10 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
     unsigned vStart = 0;
     unsigned vCount = 0;
 
-    for (unsigned b = 0; b < soruceBatches.Size(); ++b)
+    for (unsigned b = 0; b < sourceBatches.Size(); ++b)
     {
-        Material* material = soruceBatches[b]->material_;
-        const Vector<Vertex2D>& vertices = soruceBatches[b]->vertices_;
+        Material* material = sourceBatches[b]->material_;
+        const Vector<Vertex2D>& vertices = sourceBatches[b]->vertices_;
 
         // When new material encountered, finish the current batch and start new
         if (currMaterial != material)
