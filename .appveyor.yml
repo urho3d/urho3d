@@ -24,13 +24,14 @@ version: '{build}'
 branches:
   only: [master]
 skip_commits:
-  message: /\[ci skip\]/
+  message: /\[ci skip.*\]/
 os:
   - Visual Studio 2015
-  - MinGW
+# - MinGW
 platform:
   - x86
   - x64
+configuration: Release
 clone_depth: 50
 environment:
   matrix:
@@ -43,7 +44,7 @@ build_script:
   - if "%PLATFORM%" == "x64" set "PLATFORM_OPT=URHO3D_64BIT=1"
   - set
   - rake cmake %OS_OPT% %PLATFORM_OPT% URHO3D_LIB_TYPE=%URHO3D_LIB_TYPE% URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 URHO3D_EXTRAS=1 URHO3D_TESTING=1
-  - rake make
+  - rake make config=%CONFIGURATION%
 deploy: off
 
 # vi: set ts=2 sw=2 expandtab:
