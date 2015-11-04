@@ -2071,9 +2071,9 @@ unsigned char* Image::GetImageData(Deserializer& source, int& width, int& height
     {
         /* unsigned fileSize = */source.ReadUInt();
 
-        if (source.ReadFileID() != "WEBP")
+        if ((fileID = source.ReadFileID()) != "WEBP")
         {
-            error = "Unknown image format";
+            error = "WEBP header expected but found " + fileID;
             return NULL;
         }
 
