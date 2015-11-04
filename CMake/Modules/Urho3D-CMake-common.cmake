@@ -46,37 +46,41 @@ include (CMakeDependentOption)
 option (URHO3D_C++11 "Enable C++11 standard")
 mark_as_advanced (URHO3D_C++11)
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
-if (NOT MSVC AND NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the initial configure step
-    # On non-MSVC compiler, default to build 64-bit when the chosen compiler toolchain in the build tree has a 64-bit build environment
-    execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
-    string (REGEX MATCH "#define +__(x86_64|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
-    if (matched)
-        set (URHO3D_DEFAULT_64BIT TRUE)
+if (NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the initial configure step
+    if (MSVC)
+        # On MSVC compiler, use the chosen CMake/VS generator to determine the ABI
+        if (CMAKE_GENERATOR MATCHES Win64)
+            set (URHO3D_DEFAULT_64BIT TRUE)
+        else ()
+            set (URHO3D_DEFAULT_64BIT FALSE)
+        endif ()
     else ()
-        set (URHO3D_DEFAULT_64BIT FALSE)
+        # On non-MSVC compiler, default to build 64-bit when the chosen compiler toolchain in the build tree has a 64-bit build environment
+        execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
+        string (REGEX MATCH "#define +__(x86_64|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
+        if (matched)
+            set (URHO3D_DEFAULT_64BIT TRUE)
+        else ()
+            set (URHO3D_DEFAULT_64BIT FALSE)
+        endif ()
+        # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
+        # When ANDROID is true and ARM is not then we are targeting Android on Intel Atom
+        string (REGEX MATCH "#define +__(arm|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
+        if (matched OR IOS)     # Assume iOS is always on ARM for now
+            set (ARM TRUE)
+        else ()
+            set (ARM FALSE)
+        endif ()
+        set (ARM ${ARM} CACHE INTERNAL "Targeting ARM platform")
+        # The other arm platform that Urho3D supports that is not Android/iOS is Raspberry Pi at the moment
+        if (ARM AND NOT ANDROID AND NOT IOS)
+            # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too on the Raspberry-Pi device itself
+            set (RPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
+        endif ()
     endif ()
     set (URHO3D_DEFAULT_64BIT ${URHO3D_DEFAULT_64BIT} CACHE INTERNAL "Default value for URHO3D_64BIT build option")
-    # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
-    # When ANDROID is true and ARM is not then we are targeting Android on Intel Atom
-    string (REGEX MATCH "#define +__(arm|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
-    if (matched OR IOS)     # Assume iOS is always on ARM for now
-        set (ARM TRUE)
-    else ()
-        set (ARM FALSE)
-    endif ()
-    set (ARM ${ARM} CACHE INTERNAL "Targeting ARM platform")
-    # The other arm platform that Urho3D supports that is not Android/iOS is Raspberry Pi at the moment
-    if (ARM AND NOT ANDROID AND NOT IOS)
-        # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too on the Raspberry-Pi device itself
-        set (RPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
-    endif ()
 endif ()
-if (MINGW OR ANDROID OR RPI OR EMSCRIPTEN)
-    # This build option is not available on MinGW, Android, Raspberry-Pi, and Emscripten platforms as its value is preset by the chosen compiler toolchain in the build tree
-    set (URHO3D_64BIT ${URHO3D_DEFAULT_64BIT})
-else ()
-    option (URHO3D_64BIT "Enable 64-bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system" ${URHO3D_DEFAULT_64BIT})
-endif ()
+cmake_dependent_option (URHO3D_64BIT "Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain" ${URHO3D_DEFAULT_64BIT} "NOT MSVC AND NOT MINGW AND NOT ANDROID AND NOT RPI AND NOT EMSCRIPTEN" ${URHO3D_DEFAULT_64BIT})
 cmake_dependent_option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE "NOT EMSCRIPTEN" FALSE)
 option (URHO3D_LUA "Enable additional Lua scripting support" TRUE)
 cmake_dependent_option (URHO3D_LUAJIT "Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)" FALSE "NOT EMSCRIPTEN" FALSE)
