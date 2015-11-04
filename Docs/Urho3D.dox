@@ -342,6 +342,8 @@ V1.5
 - Fix crash in 64bit build when opening the console window.
 - Fix potential edge artifacts in dynamically created spritesheets.
 - Fix Spine animation playback thread safety.
+- Fix mouse button release while cursor hidden not releasing drag elements.
+- Fix too heavy-handed skybox shader Z adjustment on GLES, which caused objects to be obscured by the skybox.
 
 V1.4
 
