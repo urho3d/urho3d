@@ -23,24 +23,28 @@
 version: '{build}'
 branches:
   only: [master]
-skip_tags: true
 skip_commits:
-  message: /(?:\[ci skip\]|API documentation update)/
+  message: /\[ci skip.*\]/
 os:
   - Visual Studio 2015
-  - MinGW
-shallow_clone: true
+# - MinGW
+platform:
+  - x86
+  - x64
+configuration: Release
+clone_depth: 50
 environment:
-  NUMJOBS: 4
   matrix:
     - URHO3D_LIB_TYPE: STATIC
     - URHO3D_LIB_TYPE: SHARED
-platform: x86
 matrix:
   fast_finish: true
 build_script:
-  - rake cmake URHO3D_LIB_TYPE=%URHO3D_LIB_TYPE% URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 URHO3D_EXTRAS=1 URHO3D_TESTING=1
-  - rake make
+  - if "%OS%" == "MinGW" (set "OS_OPT=mingw") else (set "OS_OPT=vs2015")
+  - if "%PLATFORM%" == "x64" set "PLATFORM_OPT=URHO3D_64BIT=1"
+  - set
+  - rake cmake %OS_OPT% %PLATFORM_OPT% URHO3D_LIB_TYPE=%URHO3D_LIB_TYPE% URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 URHO3D_EXTRAS=1 URHO3D_TESTING=1
+  - rake make config=%CONFIGURATION%
 deploy: off
 
 # vi: set ts=2 sw=2 expandtab:

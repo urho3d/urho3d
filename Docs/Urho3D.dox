@@ -194,6 +194,7 @@ V1.5
 - %Localization subsystem.
 - Improved the navigation / crowd navigation API and examples.
 - SSE and animation performance optimizations.
+- Enable BT_USE_SSE on Linux and MinGW platforms, enable BT_USE_NEON on Android and Raspberry-Pi platforms.
 - Urho3D macros such as OBJECT, EVENT, HANDLER renamed to have URHO3D_ prefix to prevent ambiguity with other libraries.
 - Double support to %Variant, %Deserializer, %Serializer & %JSONValue. Store Lua object attributes accurately as doubles.
 - Support for moving nodes & components between scenes, or creating components "sceneless" and moving into a scene later.
@@ -341,6 +342,8 @@ V1.5
 - Fix crash in 64bit build when opening the console window.
 - Fix potential edge artifacts in dynamically created spritesheets.
 - Fix Spine animation playback thread safety.
+- Fix mouse button release while cursor hidden not releasing drag elements.
+- Fix too heavy-handed skybox shader Z adjustment on GLES, which caused objects to be obscured by the skybox.
 
 V1.4
 

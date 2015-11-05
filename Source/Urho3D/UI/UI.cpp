@@ -1168,67 +1168,66 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
 
 void UI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible)
 {
+    WeakPtr<UIElement> element;
     if (cursorVisible)
+        element = GetElementAt(cursorPos);
+
+    // Handle end of drag
+    for (HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
     {
-        WeakPtr<UIElement> element(GetElementAt(cursorPos));
+        WeakPtr<UIElement> dragElement = i->first_;
+        UI::DragData* dragData = i->second_;
 
-        // Handle end of drag
-        for (HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
+        if (!dragElement || !cursorVisible)
         {
-            WeakPtr<UIElement> dragElement = i->first_;
-            UI::DragData* dragData = i->second_;
+            i = DragElementErase(i);
+            continue;
+        }
 
-            if (!dragElement)
+        if (dragData->dragButtons & button)
+        {
+            // Handle end of click
+            if (element)
+                element->OnClickEnd(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor,
+                    dragElement);
+
+            SendClickEvent(E_UIMOUSECLICKEND, dragElement, element, cursorPos, button, buttons, qualifiers);
+
+            if (dragElement && dragElement->IsEnabled() && dragElement->IsVisible() && !dragData->dragBeginPending)
             {
-                i = DragElementErase(i);
-                continue;
-            }
+                dragElement->OnDragEnd(dragElement->ScreenToElement(cursorPos), cursorPos, dragData->dragButtons, buttons,
+                    cursor);
+                SendDragOrHoverEvent(E_DRAGEND, dragElement, cursorPos, IntVector2::ZERO, dragData);
 
-            if (dragData->dragButtons & button)
-            {
-                // Handle end of click
-                if (element)
-                    element->OnClickEnd(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor,
-                        dragElement);
-
-                SendClickEvent(E_UIMOUSECLICKEND, dragElement, element, cursorPos, button, buttons, qualifiers);
-
-                if (dragElement && dragElement->IsEnabled() && dragElement->IsVisible() && !dragData->dragBeginPending)
+                bool dragSource = dragElement && (dragElement->GetDragDropMode() & DD_SOURCE) != 0;
+                if (dragSource)
                 {
-                    dragElement->OnDragEnd(dragElement->ScreenToElement(cursorPos), cursorPos, dragData->dragButtons, buttons,
-                        cursor);
-                    SendDragOrHoverEvent(E_DRAGEND, dragElement, cursorPos, IntVector2::ZERO, dragData);
+                    bool dragTarget = element && (element->GetDragDropMode() & DD_TARGET) != 0;
+                    bool dragDropFinish = dragSource && dragTarget && element != dragElement;
 
-                    bool dragSource = dragElement && (dragElement->GetDragDropMode() & DD_SOURCE) != 0;
-                    if (dragSource)
+                    if (dragDropFinish)
                     {
-                        bool dragTarget = element && (element->GetDragDropMode() & DD_TARGET) != 0;
-                        bool dragDropFinish = dragSource && dragTarget && element != dragElement;
+                        bool accept = element->OnDragDropFinish(dragElement);
 
-                        if (dragDropFinish)
+                        // OnDragDropFinish() may have caused destruction of the elements, so check the pointers again
+                        if (accept && dragElement && element)
                         {
-                            bool accept = element->OnDragDropFinish(dragElement);
+                            using namespace DragDropFinish;
 
-                            // OnDragDropFinish() may have caused destruction of the elements, so check the pointers again
-                            if (accept && dragElement && element)
-                            {
-                                using namespace DragDropFinish;
-
-                                VariantMap& eventData = GetEventDataMap();
-                                eventData[P_SOURCE] = dragElement.Get();
-                                eventData[P_TARGET] = element.Get();
-                                eventData[P_ACCEPT] = accept;
-                                SendEvent(E_DRAGDROPFINISH, eventData);
-                            }
+                            VariantMap& eventData = GetEventDataMap();
+                            eventData[P_SOURCE] = dragElement.Get();
+                            eventData[P_TARGET] = element.Get();
+                            eventData[P_ACCEPT] = accept;
+                            SendEvent(E_DRAGDROPFINISH, eventData);
                         }
                     }
                 }
-
-                i = DragElementErase(i);
             }
-            else
-                ++i;
+
+            i = DragElementErase(i);
         }
+        else
+            ++i;
     }
 }
 
