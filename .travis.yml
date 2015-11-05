@@ -325,10 +325,10 @@ env:
     - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED
     - MAKEFILE=1    URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
-    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.10 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
-    - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.10
-    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.10 URHO3D_64BIT=0
-    - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.10 URHO3D_64BIT=0
+    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.11 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
+    - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.11
+    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.11 URHO3D_64BIT=0
+    - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.11 URHO3D_64BIT=0
     - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=9.1  URHO3D_64BIT=0
     - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=9.1
 matrix:
@@ -339,10 +339,10 @@ before_script:
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - if [ $XCODE ] && ([ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
-  - travis_retry brew update >/dev/null && travis_retry brew install ccache
+  - travis_retry brew update >/dev/null && travis_retry brew install ccache cmake
   - if [ $PACKAGE_UPLOAD ]; then travis_retry brew install doxygen graphviz; fi
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
-  - if [ $XCODE ]; then cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && ln -s ccache $path; done; fi
+  - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done; fi
   - rake ci_setup_cache
 script: rake ci
 after_success: if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload || ! [ $RELEASE_TAG ]; fi
