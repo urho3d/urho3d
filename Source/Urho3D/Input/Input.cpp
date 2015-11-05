@@ -1988,11 +1988,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
 void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
-    // Reset input state on subsequent initializations
     if (!initialized_)
         Initialize();
-    else
-        ResetState();
 
     // Re-enable cursor clipping, and re-center the cursor (if needed) to the new screen size, so that there is no erroneous
     // mouse move event. Also get new window ID if it changed
