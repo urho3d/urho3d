@@ -245,11 +245,11 @@ matrix:
     - &cache5
       env: API=19 ABI=armeabi-v7a URHO3D_LIB_TYPE=SHARED AVD=test_19_armeabi-v7a               USE_CCACHE=1
 before_script:
-  - git clone --depth 1 --branch strip https://github.com/urho3d/android-ndk.git && export ANDROID_NDK=$(pwd)/android-ndk && if ([ $AVD ] || [ $PACKAGE_UPLOAD ]) && [ $INSTALL ]; then (while :; do echo 'y'; sleep 1; done) |android update sdk --no-ui --all --filter $INSTALL; fi
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - export COMMIT_MESSAGE=$(git log --format=%B -n1 $TRAVIS_COMMIT)
   - if [ ${TRAVIS_JOB_NUMBER##*.} -lt $PACKAGE_JOB_END ] && ([ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
+  - git clone --depth 1 --branch strip https://github.com/urho3d/android-ndk.git && export ANDROID_NDK=$(pwd)/android-ndk && if ([ $AVD ] || [ $PACKAGE_UPLOAD ]) && [ $INSTALL ]; then (while :; do echo 'y'; sleep 1; done) |android update sdk --no-ui --all --filter $INSTALL; fi
   - if [ "$ABI" == "x86_64" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/x86_64-4.9/prebuilt/linux-x86_64/bin C_PREFIX=x86_64-linux-android; fi
   - if [ "$ABI" == "x86" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/x86-4.9/prebuilt/linux-x86_64/bin C_PREFIX=i686-linux-android; fi
   - if [ "$ABI" == "arm64-v8a" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin C_PREFIX=aarch64-linux-android; fi
@@ -309,6 +309,7 @@ after_script: rake ci_teardown_cache
 
 branch: {name: OSX-CI, active: yes}
 language: objective-c
+osx_image: xcode7.1
 env:
   global:
     - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
@@ -324,12 +325,12 @@ env:
     - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED
     - MAKEFILE=1    URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
-    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.8 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
-    - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.8
-    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.8 URHO3D_64BIT=0
-    - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.8 URHO3D_64BIT=0
-    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=7.0  URHO3D_64BIT=0
-    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=7.0
+    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.11 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
+    - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.11
+    - XCODE=1       URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=10.11 URHO3D_64BIT=0
+    - XCODE=1       URHO3D_LIB_TYPE=SHARED DEPLOYMENT_TARGET=10.11 URHO3D_64BIT=0
+    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=9.1  URHO3D_64BIT=0
+    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC DEPLOYMENT_TARGET=9.1
 matrix:
   fast_finish: true
 before_script:
@@ -338,11 +339,10 @@ before_script:
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - if [ $XCODE ] && ([ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
-  - if [ $XCODE ]; then rvm gemset use global && travis_retry gem install xcpretty; fi
-  - travis_retry brew update >/dev/null && travis_retry brew install ccache
+  - travis_retry brew update >/dev/null && travis_retry brew install ccache cmake
   - if [ $PACKAGE_UPLOAD ]; then travis_retry brew install doxygen graphviz; fi
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
-  - if [ $XCODE ]; then cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && ln -s ccache $path; done; fi
+  - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done; fi
   - rake ci_setup_cache
 script: rake ci
 after_success: if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload || ! [ $RELEASE_TAG ]; fi
