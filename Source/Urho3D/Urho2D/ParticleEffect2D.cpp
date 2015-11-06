@@ -197,6 +197,8 @@ bool ParticleEffect2D::BeginLoad(Deserializer& source)
     rotationEnd_ = ReadFloat(rootElem, "rotationEnd");
     rotationEndVariance_ = ReadFloat(rootElem, "rotationEndVariance");
 
+    // Note: not accurate
+    SetMemoryUse(source.GetSize());
     return true;
 }
 
