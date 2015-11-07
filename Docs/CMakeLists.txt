@@ -66,7 +66,7 @@ if (DOXYGEN_FOUND)
         foreach (IDE XCODE MSVC Eclipse CodeBlocks)
             enable_help (${IDE})
         endforeach ()
-        if (MSVC_HELP)
+        if (MSVC_HELP AND NOT DEFINED ENV{APPVEYOR})    # Skip when generating MSVC help on AppVeyor due to similar issue to #910
             find_package (HTMLHelp)
             # It is not an error when HTML help compiler is not found, instead just switching off the Doxygen's HHC option
             find_package_handle_standard_args (HTMLHelp REQUIRED_VARS HTML_HELP_COMPILER)

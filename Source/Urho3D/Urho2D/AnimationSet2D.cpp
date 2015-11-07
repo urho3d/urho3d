@@ -233,7 +233,7 @@ bool AnimationSet2D::BeginLoadSpine(Deserializer& source)
     jsonData_ = new char[size + 1];
     source.Read(jsonData_, size);
     jsonData_[size] = '\0';
-
+    SetMemoryUse(size);
     return true;
 }
 
