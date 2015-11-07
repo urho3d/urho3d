@@ -232,12 +232,17 @@ void TBRendererBatcher::AddQuadInternal(const TBRect &dst_rect, const TBRect &sr
 
     if (bitmap)
     {
+        #ifdef URHO3D_OPENGL
+        float uvOffset = 0.0f;
+        #else
+        float uvOffset = 0.5f;
+        #endif
         int bitmap_w = bitmap->Width();
         int bitmap_h = bitmap->Height();
-        m_u = (float)src_rect.x / bitmap_w;
-        m_v = (float)src_rect.y / bitmap_h;
-        m_uu = (float)(src_rect.x + src_rect.w) / bitmap_w;
-        m_vv = (float)(src_rect.y + src_rect.h) / bitmap_h;
+        m_u  = (float)(src_rect.x + uvOffset)/ bitmap_w;
+        m_v  = (float)(src_rect.y + uvOffset)/ bitmap_h;
+        m_uu = (float)(src_rect.x + uvOffset + src_rect.w) / bitmap_w;
+        m_vv = (float)(src_rect.y + uvOffset + src_rect.h) / bitmap_h;
     }
 
     // change triangle winding order to clock-wise
