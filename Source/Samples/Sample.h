@@ -51,7 +51,7 @@ const float TOUCH_SENSITIVITY = 2.0f;
 class Sample : public Application
 {
     // Enable type information.
-    OBJECT(Sample);
+    URHO3D_OBJECT(Sample, Application);
 
 public:
     /// Construct.

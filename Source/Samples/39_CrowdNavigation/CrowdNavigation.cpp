@@ -51,7 +51,7 @@
 
 static const String INSTRUCTION("instructionText");
 
-DEFINE_APPLICATION_MAIN(CrowdNavigation)
+URHO3D_DEFINE_APPLICATION_MAIN(CrowdNavigation)
 
 CrowdNavigation::CrowdNavigation(Context* context) :
     Sample(context),
@@ -208,7 +208,7 @@ void CrowdNavigation::CreateUI()
     instructionText->SetText(
         "Use WASD keys to move, RMB to rotate view\n"
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"
-        "MMB to add obstacles or remove obstacles/agents\n"
+        "MMB or O key to add obstacles or remove obstacles/agents\n"
         "F5 to save scene, F7 to load\n"
         "Space to toggle debug geometry\n"
         "F12 to toggle this instruction text"
@@ -235,20 +235,20 @@ void CrowdNavigation::SetupViewport()
 void CrowdNavigation::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(CrowdNavigation, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(CrowdNavigation, HandleUpdate));
 
     // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(CrowdNavigation, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, URHO3D_HANDLER(CrowdNavigation, HandlePostRenderUpdate));
 
     // Subscribe HandleCrowdAgentFailure() function for resolving invalidation issues with agents, during which we
     // use a larger extents for finding a point on the navmesh to fix the agent's position
-    SubscribeToEvent(E_CROWD_AGENT_FAILURE, HANDLER(CrowdNavigation, HandleCrowdAgentFailure));
+    SubscribeToEvent(E_CROWD_AGENT_FAILURE, URHO3D_HANDLER(CrowdNavigation, HandleCrowdAgentFailure));
 
     // Subscribe HandleCrowdAgentReposition() function for controlling the animation
-    SubscribeToEvent(E_CROWD_AGENT_REPOSITION, HANDLER(CrowdNavigation, HandleCrowdAgentReposition));
+    SubscribeToEvent(E_CROWD_AGENT_REPOSITION, URHO3D_HANDLER(CrowdNavigation, HandleCrowdAgentReposition));
 
     // Subscribe HandleCrowdAgentFormation() function for positioning agent into a formation
-    SubscribeToEvent(E_CROWD_AGENT_FORMATION, HANDLER(CrowdNavigation, HandleCrowdAgentFormation));
+    SubscribeToEvent(E_CROWD_AGENT_FORMATION, URHO3D_HANDLER(CrowdNavigation, HandleCrowdAgentFormation));
 }
 
 void CrowdNavigation::SpawnJack(const Vector3& pos, Node* jackGroup)
@@ -443,7 +443,7 @@ void CrowdNavigation::MoveCamera(float timeStep)
     if (input->GetMouseButtonPress(MOUSEB_LEFT))
         SetPathPoint(input->GetQualifierDown(QUAL_SHIFT));
     // Add new obstacle or remove existing obstacle/agent with middle mouse button
-    else if (input->GetMouseButtonPress(MOUSEB_MIDDLE))
+    else if (input->GetMouseButtonPress(MOUSEB_MIDDLE) || input->GetKeyPress('O'))
         AddOrRemoveObject();
 
     // Check for loading/saving the scene from/to the file Data/Scenes/CrowdNavigation.xml relative to the executable directory

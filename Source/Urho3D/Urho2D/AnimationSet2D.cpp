@@ -22,6 +22,7 @@
 
 #include "../Precompiled.h"
 
+#include "../Container/ArrayPtr.h"
 #include "../Core/Context.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Texture2D.h"
@@ -139,7 +140,7 @@ bool AnimationSet2D::BeginLoad(Deserializer& source)
     if (extension == ".scml")
         return BeginLoadSpriter(source);
 
-    LOGERROR("Unsupport animation set file: " + source.GetName());
+    URHO3D_LOGERROR("Unsupport animation set file: " + source.GetName());
 
     return false;
 }
@@ -232,7 +233,7 @@ bool AnimationSet2D::BeginLoadSpine(Deserializer& source)
     jsonData_ = new char[size + 1];
     source.Read(jsonData_, size);
     jsonData_[size] = '\0';
-
+    SetMemoryUse(size);
     return true;
 }
 
@@ -244,7 +245,7 @@ bool AnimationSet2D::EndLoadSpine()
     atlas_ = spAtlas_createFromFile(atlasFileName.CString(), 0);
     if (!atlas_)
     {
-        LOGERROR("Create spine atlas failed");
+        URHO3D_LOGERROR("Create spine atlas failed");
         return false;
     }
 
@@ -258,7 +259,7 @@ bool AnimationSet2D::EndLoadSpine()
 
     if (numAtlasPages > 1)
     {
-        LOGERROR("Only one page is supported in Urho3D");
+        URHO3D_LOGERROR("Only one page is supported in Urho3D");
         return false;
     }
 
@@ -267,7 +268,7 @@ bool AnimationSet2D::EndLoadSpine()
     spSkeletonJson* skeletonJson = spSkeletonJson_create(atlas_);
     if (!skeletonJson)
     {
-        LOGERROR("Create skeleton Json failed");
+        URHO3D_LOGERROR("Create skeleton Json failed");
         return false;
     }
 
@@ -288,7 +289,7 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
     {
-        LOGERROR("Zero sized XML data in " + source.GetName());
+        URHO3D_LOGERROR("Zero sized XML data in " + source.GetName());
         return false;
     }
 
@@ -299,7 +300,7 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
     spriterData_ = new Spriter::SpriterData();
     if (!spriterData_->Load(buffer.Get(), dataSize))
     {
-        LOGERROR("Could not spriter data from " + source.GetName());
+        URHO3D_LOGERROR("Could not spriter data from " + source.GetName());
         return false;
     }
 
@@ -369,8 +370,8 @@ bool AnimationSet2D::EndLoadSpriter()
                 SharedPtr<Sprite2D> sprite(spriteSheet_->GetSprite(GetFileName(file->name_)));
                 if (!sprite)
                 {
-                    LOGERROR("Could not load sprite " + file->name_);
-                    return false;                
+                    URHO3D_LOGERROR("Could not load sprite " + file->name_);
+                    return false;
                 }
 
                 Vector2 hotSpot(file->pivotX_, file->pivotY_);
@@ -412,21 +413,23 @@ bool AnimationSet2D::EndLoadSpriter()
                 SharedPtr<Image> image(cache->GetResource<Image>(imagePath));
                 if (!image)
                 {
-                    LOGERROR("Could not load image");
+                    URHO3D_LOGERROR("Could not load image");
                     return false;
                 }
                 if (image->IsCompressed())
                 {
-                    LOGERROR("Compressed image is not support");
+                    URHO3D_LOGERROR("Compressed image is not support");
                     return false;
                 }
                 if (image->GetComponents() != 4)
                 {
-                    LOGERROR("Only support image with 4 components");
+                    URHO3D_LOGERROR("Only support image with 4 components");
                     return false;
                 }
 
                 SpriteInfo def;
+                def.x = 0;
+                def.y = 0;
                 def.file_ = file;
                 def.image_ = image;
                 spriteInfos.Push(def);
@@ -443,9 +446,9 @@ bool AnimationSet2D::EndLoadSpriter()
             {
                 SpriteInfo& info = spriteInfos[i];
                 Image* image = info.image_;
-                if (!allocator.Allocate(image->GetWidth(), image->GetHeight(), info.x, info.y))
+                if (!allocator.Allocate(image->GetWidth() + 1, image->GetHeight() + 1, info.x, info.y))
                 {
-                    LOGERROR("Could not allocate area");
+                    URHO3D_LOGERROR("Could not allocate area");
                     return false;
                 }
             }
@@ -455,6 +458,10 @@ bool AnimationSet2D::EndLoadSpriter()
             texture->SetNumLevels(1);
             texture->SetSize(allocator.GetWidth(), allocator.GetHeight(), Graphics::GetRGBAFormat());
 
+            unsigned textureDataSize = allocator.GetWidth() * allocator.GetHeight() * 4;
+            SharedArrayPtr<unsigned char> textureData(new unsigned char[textureDataSize]);
+            memset(textureData.Get(), 0, textureDataSize);
+
             sprite_ = new Sprite2D(context_);
             sprite_->SetTexture(texture);
 
@@ -463,7 +470,11 @@ bool AnimationSet2D::EndLoadSpriter()
                 SpriteInfo& info = spriteInfos[i];
                 Image* image = info.image_;
 
-                texture->SetData(0, info.x, info.y, image->GetWidth(), image->GetHeight(), image->GetData());
+                for (int y = 0; y < image->GetHeight(); ++y)
+                {
+                    memcpy(textureData.Get() + ((info.y + y) * allocator.GetWidth() + info.x) * 4,
+                        image->GetData() + y * image->GetWidth() * 4, image->GetWidth() * 4);
+                }
 
                 SharedPtr<Sprite2D> sprite(new Sprite2D(context_));
                 sprite->SetTexture(texture);
@@ -473,10 +484,12 @@ bool AnimationSet2D::EndLoadSpriter()
                 int key = (info.file_->folder_->id_ << 16) + info.file_->id_;
                 spriterFileSprites_[key] = sprite;
             }
+
+            texture->SetData(0, 0, 0, allocator.GetWidth(), allocator.GetHeight(), textureData.Get());
         }
         else
         {
-            SharedPtr<Texture2D> texture(new Texture2D(context_));        
+            SharedPtr<Texture2D> texture(new Texture2D(context_));
             texture->SetMipsToSkip(QUALITY_LOW, 0);
             texture->SetNumLevels(1);
 

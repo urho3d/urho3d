@@ -8,8 +8,8 @@
 // D3D9 uniforms
 uniform float cBloomThreshold;
 uniform float2 cBloomMix;
-uniform float2 cHBlurOffsets;
-uniform float2 cHBlurInvSize;
+uniform float2 cBlurHOffsets;
+uniform float2 cBlurHInvSize;
 
 #else
 
@@ -17,14 +17,14 @@ uniform float2 cHBlurInvSize;
 #ifdef COMPILEVS
 cbuffer CustomVS : register(b6)
 {
-    float2 cHBlurOffsets;
+    float2 cBlurHOffsets;
 }
 #else
 cbuffer CustomPS : register(b6)
 {
     float cBloomThreshold;
     float2 cBloomMix;
-    float2 cHBlurInvSize;
+    float2 cBlurHInvSize;
 }
 #endif
 
@@ -54,7 +54,7 @@ void VS(float4 iPos : POSITION,
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
-    oTexCoord = GetQuadTexCoord(oPos) + cHBlurOffsets;
+    oTexCoord = GetQuadTexCoord(oPos) + cBlurHOffsets;
     oScreenPos = GetScreenPosPreDiv(oPos);
 }
 
@@ -67,17 +67,17 @@ void PS(float2 iTexCoord : TEXCOORD0,
     oColor = float4((rgb - cBloomThreshold) / (1.0 - cBloomThreshold), 1.0);
     #endif
 
-    #ifdef HBLUR
+    #ifdef BLURH
     float3 rgb = 0.0;
     for (int i = 0; i < 5; ++i)
-        rgb += Sample2D(DiffMap, iTexCoord + (float2(offsets[i], 0.0)) * cHBlurInvSize).rgb * weights[i];
+        rgb += Sample2D(DiffMap, iTexCoord + (float2(offsets[i], 0.0)) * cBlurHInvSize).rgb * weights[i];
     oColor = float4(rgb, 1.0);
     #endif
 
-    #ifdef VBLUR
+    #ifdef BLURV
     float3 rgb = 0.0;
     for (int i = 0; i < 5; ++i)
-        rgb += Sample2D(DiffMap, iTexCoord + (float2(0.0, offsets[i])) * cHBlurInvSize).rgb * weights[i];
+        rgb += Sample2D(DiffMap, iTexCoord + (float2(0.0, offsets[i])) * cBlurHInvSize).rgb * weights[i];
     oColor = float4(rgb, 1.0);
     #endif
 

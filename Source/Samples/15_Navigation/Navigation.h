@@ -43,7 +43,7 @@ class Scene;
 ///     - Making a node follow the Detour path
 class Navigation : public Sample
 {
-    OBJECT(Navigation);
+    URHO3D_OBJECT(Navigation, Sample);
 
 public:
     /// Construct.

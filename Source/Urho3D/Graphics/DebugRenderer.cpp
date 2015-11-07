@@ -52,7 +52,7 @@ DebugRenderer::DebugRenderer(Context* context) :
 {
     vertexBuffer_ = new VertexBuffer(context_);
 
-    SubscribeToEvent(E_ENDFRAME, HANDLER(DebugRenderer, HandleEndFrame));
+    SubscribeToEvent(E_ENDFRAME, URHO3D_HANDLER(DebugRenderer, HandleEndFrame));
 }
 
 DebugRenderer::~DebugRenderer()
@@ -371,7 +371,7 @@ void DebugRenderer::AddCross(const Vector3& center, float size, const Color& col
         float end[3] = { center.x_, center.y_, center.z_ };
         start[i] -= halfSize;
         end[i] += halfSize;
-        AddLine(start, end, uintColor, depthTest);
+        AddLine(Vector3(start), Vector3(end), uintColor, depthTest);
     }
 }
 
@@ -398,7 +398,7 @@ void DebugRenderer::Render()
     // Engine does not render when window is closed or device is lost
     assert(graphics && graphics->IsInitialized() && !graphics->IsDeviceLost());
 
-    PROFILE(RenderDebugGeometry);
+    URHO3D_PROFILE(RenderDebugGeometry);
 
     ShaderVariation* vs = graphics->GetShader(VS, "Basic", "VERTEXCOLOR");
     ShaderVariation* ps = graphics->GetShader(PS, "Basic", "VERTEXCOLOR");

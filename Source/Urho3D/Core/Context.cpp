@@ -24,6 +24,7 @@
 
 #include "../Core/Context.h"
 #include "../Core/Thread.h"
+#include "../IO/Log.h"
 
 #include "../DebugNew.h"
 
@@ -129,7 +130,11 @@ void Context::RegisterAttribute(StringHash objectType, const AttributeInfo& attr
 {
     // None or pointer types can not be supported
     if (attr.type_ == VAR_NONE || attr.type_ == VAR_VOIDPTR || attr.type_ == VAR_PTR)
+    {
+        URHO3D_LOGWARNING("Attempt to register unsupported attribute type " + Variant::GetTypeName(attr.type_) + " to class " +
+            GetTypeName(objectType));
         return;
+    }
 
     attributes_[objectType].Push(attr);
 
@@ -164,6 +169,13 @@ VariantMap& Context::GetEventDataMap()
 
 void Context::CopyBaseAttributes(StringHash baseType, StringHash derivedType)
 {
+    // Prevent endless loop if mistakenly copying attributes from same class as derived
+    if (baseType == derivedType)
+    {
+        URHO3D_LOGWARNING("Attempt to copy base attributes to itself for class " + GetTypeName(baseType));
+        return;
+    }
+
     const Vector<AttributeInfo>* baseAttributes = GetAttributes(baseType);
     if (baseAttributes)
     {

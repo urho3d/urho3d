@@ -119,7 +119,7 @@ void Skeleton::SetRootBoneIndex(unsigned index)
     if (index < bones_.Size())
         rootBoneIndex_ = index;
     else
-        LOGERROR("Root bone index out of bounds");
+        URHO3D_LOGERROR("Root bone index out of bounds");
 }
 
 void Skeleton::ClearBones()

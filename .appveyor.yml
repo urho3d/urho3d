@@ -1,0 +1,74 @@
+#
+# Copyright (c) 2008-2015 the Urho3D project.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
+version: '{build}'
+branches:
+  only: [master]
+platform:
+  - x86
+  - x64
+configuration: Release
+clone_depth: 50
+environment:
+  matrix:
+    - URHO3D_LIB_TYPE: STATIC
+    - URHO3D_LIB_TYPE: SHARED
+matrix:
+  fast_finish: true
+install:
+  - ps: if ($env:APPVEYOR_REPO_TAG -eq "true" -or (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED)))
+        {
+          if ($env:APPVEYOR_REPO_TAG -eq "false")
+          {
+            $env:UPLOAD_DIR = "/home/frs/project/$env:APPVEYOR_PROJECT_SLUG/Snapshots";
+            git fetch -q --unshallow;
+          }
+          else
+          {
+            $env:UPLOAD_DIR = "/home/frs/project/$env:APPVEYOR_PROJECT_SLUG/$env:APPVEYOR_REPO_TAG_NAME";
+          }
+          $env:PACKAGE_UPLOAD = '1';
+          choco install doxygen.portable graphviz.portable >$null;
+        }
+build_script:
+  - if "%PLATFORM%" == "x64" set "OPTS=URHO3D_64BIT=1"
+  - rake cmake vs2015 %OPTS% URHO3D_LIB_TYPE=%URHO3D_LIB_TYPE% URHO3D_D3D11=1 URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 URHO3D_EXTRAS=1 URHO3D_TESTING=1
+  - rake make config=%CONFIGURATION%
+# Could run test target as AppVeyor does not have service similar to xvfb for headless GUI test run
+# - rake make config=%CONFIGURATION% target=RUN_TESTS
+  - if "%PACKAGE_UPLOAD%" == "1" (rake make config=%CONFIGURATION% target=doc
+                                  rake make config=%CONFIGURATION% target=package)
+test: off
+artifacts:
+  - path: ..\native-Build\*.zip
+deploy:
+  - provider: FTP
+    host: urho-travis-ci@frs.sourceforge.net
+    protocol: sftp
+    username: urho-travis-ci
+    password:
+      secure: M73OkL2xyHm3lpeeyJy+YT3udogoOyPkcd9TawNGwwA=
+    folder: $(UPLOAD_DIR)
+    on:
+      PACKAGE_UPLOAD: 1
+
+# vi: set ts=2 sw=2 expandtab:

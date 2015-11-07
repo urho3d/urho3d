@@ -77,13 +77,13 @@ ScrollView::ScrollView(Context* context) :
     scrollPanel_->SetEnabled(true);
     scrollPanel_->SetClipChildren(true);
 
-    SubscribeToEvent(horizontalScrollBar_, E_SCROLLBARCHANGED, HANDLER(ScrollView, HandleScrollBarChanged));
-    SubscribeToEvent(horizontalScrollBar_, E_VISIBLECHANGED, HANDLER(ScrollView, HandleScrollBarVisibleChanged));
-    SubscribeToEvent(verticalScrollBar_, E_SCROLLBARCHANGED, HANDLER(ScrollView, HandleScrollBarChanged));
-    SubscribeToEvent(verticalScrollBar_, E_VISIBLECHANGED, HANDLER(ScrollView, HandleScrollBarVisibleChanged));
-    SubscribeToEvent(E_TOUCHMOVE, HANDLER(ScrollView, HandleTouchMove));
-    SubscribeToEvent(E_TOUCHBEGIN, HANDLER(ScrollView, HandleTouchMove));
-    SubscribeToEvent(E_TOUCHEND, HANDLER(ScrollView, HandleTouchMove));
+    SubscribeToEvent(horizontalScrollBar_, E_SCROLLBARCHANGED, URHO3D_HANDLER(ScrollView, HandleScrollBarChanged));
+    SubscribeToEvent(horizontalScrollBar_, E_VISIBLECHANGED, URHO3D_HANDLER(ScrollView, HandleScrollBarVisibleChanged));
+    SubscribeToEvent(verticalScrollBar_, E_SCROLLBARCHANGED, URHO3D_HANDLER(ScrollView, HandleScrollBarChanged));
+    SubscribeToEvent(verticalScrollBar_, E_VISIBLECHANGED, URHO3D_HANDLER(ScrollView, HandleScrollBarVisibleChanged));
+    SubscribeToEvent(E_TOUCHMOVE, URHO3D_HANDLER(ScrollView, HandleTouchMove));
+    SubscribeToEvent(E_TOUCHBEGIN, URHO3D_HANDLER(ScrollView, HandleTouchMove));
+    SubscribeToEvent(E_TOUCHEND, URHO3D_HANDLER(ScrollView, HandleTouchMove));
 
 }
 
@@ -95,18 +95,18 @@ void ScrollView::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScrollView>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(UIElement);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
-    ACCESSOR_ATTRIBUTE("View Position", GetViewPosition, SetViewPositionAttr, IntVector2, IntVector2::ZERO, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Scroll Step", GetScrollStep, SetScrollStep, float, 0.1f, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Page Step", GetPageStep, SetPageStep, float, 1.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Auto Show/Hide Scrollbars", GetScrollBarsAutoVisible, SetScrollBarsAutoVisible, bool, true, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Scroll Deceleration", GetScrollDeceleration, SetScrollDeceleration, float, 30.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Scroll Snap Epsilon", GetScrollSnapEpsilon, SetScrollSnapEpsilon, float, 1.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Auto Disable Children", GetAutoDisableChildren, SetAutoDisableChildren, bool, false, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Auto Disable Threshold", GetAutoDisableThreshold, SetAutoDisableThreshold, float, 25.0f, AM_FILE);
+    URHO3D_COPY_BASE_ATTRIBUTES(UIElement);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
+    URHO3D_ACCESSOR_ATTRIBUTE("View Position", GetViewPosition, SetViewPositionAttr, IntVector2, IntVector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Scroll Step", GetScrollStep, SetScrollStep, float, 0.1f, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Page Step", GetPageStep, SetPageStep, float, 1.0f, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Auto Show/Hide Scrollbars", GetScrollBarsAutoVisible, SetScrollBarsAutoVisible, bool, true, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Scroll Deceleration", GetScrollDeceleration, SetScrollDeceleration, float, 30.0f, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Scroll Snap Epsilon", GetScrollSnapEpsilon, SetScrollSnapEpsilon, float, 1.0f, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Auto Disable Children", GetAutoDisableChildren, SetAutoDisableChildren, bool, false, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Auto Disable Threshold", GetAutoDisableThreshold, SetAutoDisableThreshold, float, 25.0f, AM_FILE);
 }
 
 void ScrollView::Update(float timeStep)
@@ -294,7 +294,7 @@ void ScrollView::SetContentElement(UIElement* element)
     if (contentElement_)
     {
         scrollPanel_->AddChild(contentElement_);
-        SubscribeToEvent(contentElement_, E_RESIZED, HANDLER(ScrollView, HandleElementResized));
+        SubscribeToEvent(contentElement_, E_RESIZED, URHO3D_HANDLER(ScrollView, HandleElementResized));
     }
 
     OnResize();

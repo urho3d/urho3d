@@ -59,15 +59,15 @@ void StaticSprite2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<StaticSprite2D>(URHO2D_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Drawable2D);
-    MIXED_ACCESSOR_ATTRIBUTE("Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_COPY_BASE_ATTRIBUTES(Drawable2D);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Sprite", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()),
         AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Flip X", GetFlipX, SetFlipX, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Flip Y", GetFlipY, SetFlipY, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Custom material", GetCustomMaterialAttr, SetCustomMaterialAttr, ResourceRef,
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Flip X", GetFlipX, SetFlipX, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Flip Y", GetFlipY, SetFlipY, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Custom material", GetCustomMaterialAttr, SetCustomMaterialAttr, ResourceRef,
         ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
 }
 
@@ -102,8 +102,6 @@ void StaticSprite2D::SetFlip(bool flipX, bool flipY)
     flipX_ = flipX;
     flipY_ = flipY;
     sourceBatchesDirty_ = true;
-
-    OnFlipChanged();
 
     MarkNetworkUpdate();
 }
@@ -211,27 +209,13 @@ ResourceRef StaticSprite2D::GetCustomMaterialAttr() const
 void StaticSprite2D::OnWorldBoundingBoxUpdate()
 {
     boundingBox_.Clear();
+    worldBoundingBox_.Clear();
 
-    if (sprite_)
-    {
-        const IntRect& rectangle_ = sprite_->GetRectangle();
-        float width = (float)rectangle_.Width() * PIXEL_SIZE;     // Compute width and height in pixels
-        float height = (float)rectangle_.Height() * PIXEL_SIZE;
+    const Vector<SourceBatch2D>& sourceBatches = GetSourceBatches();
+    for (unsigned i = 0; i < sourceBatches[0].vertices_.Size(); ++i)
+        worldBoundingBox_.Merge(sourceBatches[0].vertices_[i].position_);
 
-        const Vector2& hotSpot = sprite_->GetHotSpot();
-        float hotSpotX = flipX_ ? (1.0f - hotSpot.x_) : hotSpot.x_;
-        float hotSpotY = flipY_ ? (1.0f - hotSpot.y_) : hotSpot.y_;
-
-        float leftX = -width * hotSpotX;
-        float rightX = width * (1.0f - hotSpotX);
-        float bottomY = -height * hotSpotY;
-        float topY = height * (1.0f - hotSpotY);
-
-        boundingBox_.Merge(Vector3(leftX, bottomY, 0.0f));
-        boundingBox_.Merge(Vector3(rightX, topY, 0.0f));
-    }
-
-    worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
+    boundingBox_ = worldBoundingBox_.Transformed(node_->GetWorldTransform().Inverse());
 }
 
 void StaticSprite2D::OnDrawOrderChanged()
@@ -300,11 +284,6 @@ void StaticSprite2D::UpdateSourceBatches()
     vertices.Push(vertex3);
 
     sourceBatchesDirty_ = false;
-}
-
-void StaticSprite2D::OnFlipChanged()
-{
-
 }
 
 void StaticSprite2D::UpdateMaterial()

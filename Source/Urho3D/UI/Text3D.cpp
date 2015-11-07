@@ -55,7 +55,8 @@ Text3D::Text3D(Context* context) :
     faceCameraMode_(FC_NONE),
     textDirty_(true),
     geometryDirty_(true),
-    usingSDFShader_(false)
+    usingSDFShader_(false),
+    fontDataLost_(false)
 {
     text_.SetUsedInText3D(true);
     text_.SetEffectDepthBias(DEFAULT_EFFECT_DEPTH_BIAS);
@@ -69,32 +70,32 @@ void Text3D::RegisterObject(Context* context)
 {
     context->RegisterFactory<Text3D>(GEOMETRY_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
         AM_DEFAULT);
-    ATTRIBUTE("Font Size", int, text_.fontSize_, DEFAULT_FONT_SIZE, AM_DEFAULT);
-    ATTRIBUTE("Text", String, text_.text_, String::EMPTY, AM_DEFAULT);
-    ENUM_ATTRIBUTE("Text Alignment", text_.textAlignment_, horizontalAlignments, HA_LEFT, AM_DEFAULT);
-    ATTRIBUTE("Row Spacing", float, text_.rowSpacing_, 1.0f, AM_DEFAULT);
-    ATTRIBUTE("Word Wrap", bool, text_.wordWrap_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    ENUM_ATTRIBUTE("Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_NONE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Width", GetWidth, SetWidth, int, 0, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment,
+    URHO3D_ATTRIBUTE("Font Size", int, text_.fontSize_, DEFAULT_FONT_SIZE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Text", String, text_.text_, String::EMPTY, AM_DEFAULT);
+    URHO3D_ENUM_ATTRIBUTE("Text Alignment", text_.textAlignment_, horizontalAlignments, HA_LEFT, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Row Spacing", float, text_.rowSpacing_, 1.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Word Wrap", bool, text_.wordWrap_, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
+    URHO3D_ENUM_ATTRIBUTE("Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_NONE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Width", GetWidth, SetWidth, int, 0, AM_DEFAULT);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment,
         horizontalAlignments, HA_LEFT, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments,
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments,
         VA_TOP, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_DEFAULT);
-    ATTRIBUTE("Top Left Color", Color, text_.color_[0], Color::WHITE, AM_DEFAULT);
-    ATTRIBUTE("Top Right Color", Color, text_.color_[1], Color::WHITE, AM_DEFAULT);
-    ATTRIBUTE("Bottom Left Color", Color, text_.color_[2], Color::WHITE, AM_DEFAULT);
-    ATTRIBUTE("Bottom Right Color", Color, text_.color_[3], Color::WHITE, AM_DEFAULT);
-    ENUM_ATTRIBUTE("Text Effect", text_.textEffect_, textEffects, TE_NONE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_DEFAULT);
-    ATTRIBUTE("Effect Depth Bias", float, text_.effectDepthBias_, DEFAULT_EFFECT_DEPTH_BIAS, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Drawable);
+    URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Top Left Color", Color, text_.color_[0], Color::WHITE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Top Right Color", Color, text_.color_[1], Color::WHITE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Bottom Left Color", Color, text_.color_[2], Color::WHITE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Bottom Right Color", Color, text_.color_[3], Color::WHITE, AM_DEFAULT);
+    URHO3D_ENUM_ATTRIBUTE("Text Effect", text_.textEffect_, textEffects, TE_NONE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Effect Depth Bias", float, text_.effectDepthBias_, DEFAULT_EFFECT_DEPTH_BIAS, AM_DEFAULT);
+    URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
 }
 
 void Text3D::ApplyAttributes()
@@ -122,10 +123,27 @@ void Text3D::UpdateBatches(const FrameInfo& frame)
         batches_[i].distance_ = distance_;
         batches_[i].worldTransform_ = faceCameraMode_ != FC_NONE ? &customWorldTransform_ : &node_->GetWorldTransform();
     }
+
+    for (unsigned i = 0; i < uiBatches_.Size(); ++i)
+    {
+        if (uiBatches_[i].texture_ && uiBatches_[i].texture_->IsDataLost())
+        {
+            fontDataLost_ = true;
+            break;
+        }
+    }
 }
 
 void Text3D::UpdateGeometry(const FrameInfo& frame)
 {
+    if (fontDataLost_)
+    {
+        // Re-evaluation of the text triggers the font face to reload itself
+        UpdateTextBatches();
+        UpdateTextMaterials();
+        fontDataLost_ = false;
+    }
+
     if (geometryDirty_)
     {
         for (unsigned i = 0; i < batches_.Size(); ++i)
@@ -149,7 +167,7 @@ void Text3D::UpdateGeometry(const FrameInfo& frame)
 
 UpdateGeometryType Text3D::GetUpdateGeometryType()
 {
-    if (geometryDirty_ || vertexBuffer_->IsDataLost())
+    if (geometryDirty_ || fontDataLost_ || vertexBuffer_->IsDataLost())
         return UPDATE_MAIN_THREAD;
     else
         return UPDATE_NONE;
@@ -491,8 +509,7 @@ void Text3D::UpdateTextBatches()
         break;
     }
 
-    boundingBox_.defined_ = false;
-    boundingBox_.min_ = boundingBox_.max_ = Vector3::ZERO;
+    boundingBox_.Clear();
 
     for (unsigned i = 0; i < uiVertexData_.Size(); i += UI_VERTEX_SIZE)
     {

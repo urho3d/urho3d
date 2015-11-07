@@ -34,6 +34,7 @@ class BoundingBox
     void Transform(const Matrix3x4& transform);
     void Clear();
 
+    bool Defined() const;
     Vector3 Center() const;
     Vector3 Size() const;
     Vector3 HalfSize() const;
@@ -52,7 +53,6 @@ class BoundingBox
 
     Vector3 min_ @ min;
     Vector3 max_ @ max;
-    bool defined_ @ defined;
 
     tolua_readonly tolua_property__no_prefix Vector3 center;
     tolua_readonly tolua_property__no_prefix Vector3 size;

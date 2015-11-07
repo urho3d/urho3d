@@ -35,7 +35,7 @@ DbConnection::DbConnection(Context* context, const String& connectionString) :
 {
     if (sqlite3_open(connectionString.CString(), &connectionImpl_) != SQLITE_OK)
     {
-        LOGERRORF("Could not connect: %s", sqlite3_errmsg(connectionImpl_));
+        URHO3D_LOGERRORF("Could not connect: %s", sqlite3_errmsg(connectionImpl_));
         sqlite3_close(connectionImpl_);
         connectionImpl_ = 0;
     }
@@ -47,7 +47,7 @@ DbConnection::~DbConnection()
     if (sqlite3_close(connectionImpl_) != SQLITE_OK)
     {
         // This should not happen after finalizing the connection, log error in Release but assert in Debug
-        LOGERRORF("Could not disconnect: %s", sqlite3_errmsg(connectionImpl_));
+        URHO3D_LOGERRORF("Could not disconnect: %s", sqlite3_errmsg(connectionImpl_));
         assert(false);
     }
     connectionImpl_ = 0;
@@ -67,13 +67,13 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
     int rc = sqlite3_prepare_v2(connectionImpl_, sql.Trimmed().CString(), -1, &pStmt, &zLeftover);
     if (rc != SQLITE_OK)
     {
-        LOGERRORF("Could not execute: %s", sqlite3_errmsg(connectionImpl_));
+        URHO3D_LOGERRORF("Could not execute: %s", sqlite3_errmsg(connectionImpl_));
         assert(!pStmt);
         return result;
     }
     if (*zLeftover)
     {
-        LOGERROR("Could not execute: only one SQL statement is allowed");
+        URHO3D_LOGERROR("Could not execute: only one SQL statement is allowed");
         sqlite3_finalize(pStmt);
         return result;
     }
@@ -147,7 +147,7 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
             }
         }
         else if (rc != SQLITE_DONE)
-            LOGERRORF("Could not execute: %s", sqlite3_errmsg(connectionImpl_));
+            URHO3D_LOGERRORF("Could not execute: %s", sqlite3_errmsg(connectionImpl_));
         if (rc != SQLITE_ROW)
         {
             sqlite3_finalize(pStmt);

@@ -470,6 +470,8 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Viewport", "Scene@+ get_scene() const", asMETHOD(Viewport, GetScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void set_camera(Camera@+)", asMETHOD(Viewport, SetCamera), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "Camera@+ get_camera() const", asMETHOD(Viewport, GetCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "void set_cullCamera(Camera@+)", asMETHOD(Viewport, SetCullCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "Camera@+ get_cullCamera() const", asMETHOD(Viewport, GetCullCamera), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void set_renderPath(RenderPath@+)", asMETHODPR(Viewport, SetRenderPath, (RenderPath*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "RenderPath@+ get_renderPath() const", asMETHOD(Viewport, GetRenderPath), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void set_rect(const IntRect&in)", asMETHOD(Viewport, SetRect), asCALL_THISCALL);
@@ -1726,6 +1728,8 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "int get_occlusionBufferSize() const", asMETHOD(Renderer, GetOcclusionBufferSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_occluderSizeThreshold(float)", asMETHOD(Renderer, SetOccluderSizeThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "float get_occluderSizeThreshold() const", asMETHOD(Renderer, GetOccluderSizeThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void set_threadedOcclusion(bool)", asMETHOD(Renderer, SetThreadedOcclusion), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "bool get_threadedOcclusion() const", asMETHOD(Renderer, GetThreadedOcclusion), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_mobileShadowBiasMul(float)", asMETHOD(Renderer, SetMobileShadowBiasMul), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "float get_mobileShadowBiasMul() const", asMETHOD(Renderer, GetMobileShadowBiasMul), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_mobileShadowBiasAdd(float)", asMETHOD(Renderer, SetMobileShadowBiasAdd), asCALL_THISCALL);
@@ -1903,15 +1907,15 @@ static void RegisterOctree(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("Octree@+ get_octree()", asFUNCTION(GetOctree), asCALL_CDECL);
 }
 
-bool ObjWriteDrawablesToOBJ(CScriptArray* drawablesArray, File* file, bool writeLightmapUV)
+bool ObjWriteDrawablesToOBJ(CScriptArray* drawablesArray, File* file, bool asZUp, bool asRightHanded, bool writeLightmapUV)
 {
     PODVector<Drawable*> drawables = ArrayToPODVector<Drawable*>(drawablesArray);
-    return WriteDrawablesToOBJ(drawables, file, writeLightmapUV);
+    return WriteDrawablesToOBJ(drawables, file, asZUp, asRightHanded, writeLightmapUV);
 }
 
 static void RegisterOBJExport(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalFunction("bool WriteDrawablesToOBJ(Array<Drawable@>@, File@+, bool = false)", asFUNCTION(ObjWriteDrawablesToOBJ), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool WriteDrawablesToOBJ(Array<Drawable@>@, File@+, bool, bool, bool = false)", asFUNCTION(ObjWriteDrawablesToOBJ), asCALL_CDECL);
 }
 
 void RegisterGraphicsAPI(asIScriptEngine* engine)

@@ -78,7 +78,7 @@ bool Resource::EndLoad()
 
 bool Resource::Save(Serializer& dest) const
 {
-    LOGERROR("Save not supported for " + GetTypeName());
+    URHO3D_LOGERROR("Save not supported for " + GetTypeName());
     return false;
 }
 

@@ -117,7 +117,7 @@ SharedPtr<Texture2D> FontFace::LoadFaceTexture(SharedPtr<Image> image)
     SharedPtr<Texture2D> texture = CreateFaceTexture();
     if (!texture->SetData(image, true))
     {
-        LOGERROR("Could not load texture from image resource");
+        URHO3D_LOGERROR("Could not load texture from image resource");
         return SharedPtr<Texture2D>();
     }
     return texture;

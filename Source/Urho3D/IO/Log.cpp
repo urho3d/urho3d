@@ -70,7 +70,7 @@ Log::Log(Context* context) :
 {
     logInstance = this;
 
-    SubscribeToEvent(E_ENDFRAME, HANDLER(Log, HandleEndFrame));
+    SubscribeToEvent(E_ENDFRAME, URHO3D_HANDLER(Log, HandleEndFrame));
 }
 
 Log::~Log()

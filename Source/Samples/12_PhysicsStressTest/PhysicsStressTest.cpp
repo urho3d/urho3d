@@ -48,7 +48,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(PhysicsStressTest)
+URHO3D_DEFINE_APPLICATION_MAIN(PhysicsStressTest)
 
 PhysicsStressTest::PhysicsStressTest(Context* context) :
     Sample(context),
@@ -211,11 +211,11 @@ void PhysicsStressTest::SetupViewport()
 void PhysicsStressTest::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(PhysicsStressTest, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(PhysicsStressTest, HandleUpdate));
 
     // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request
     // debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(PhysicsStressTest, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, URHO3D_HANDLER(PhysicsStressTest, HandlePostRenderUpdate));
 }
 
 void PhysicsStressTest::MoveCamera(float timeStep)

@@ -42,7 +42,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(AnimatingScene)
+URHO3D_DEFINE_APPLICATION_MAIN(AnimatingScene)
 
 AnimatingScene::AnimatingScene(Context* context) :
     Sample(context)
@@ -152,7 +152,7 @@ void AnimatingScene::SetupViewport()
 void AnimatingScene::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(AnimatingScene, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(AnimatingScene, HandleUpdate));
 }
 
 void AnimatingScene::MoveCamera(float timeStep)

@@ -52,8 +52,9 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     velocityIterations_(DEFAULT_VELOCITY_ITERATIONS),
     positionIterations_(DEFAULT_POSITION_ITERATIONS),
     debugRenderer_(0),
-    physicsSteping_(false),
-    applyingTransforms_(false)
+    physicsStepping_(false),
+    applyingTransforms_(false),
+    updateEnabled_(true)
 {
     // Set default debug draw flags
     m_drawFlags = e_shapeBit;
@@ -83,20 +84,20 @@ void PhysicsWorld2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<PhysicsWorld2D>(SUBSYSTEM_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Draw Shape", GetDrawShape, SetDrawShape, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Draw Joint", GetDrawJoint, SetDrawJoint, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Draw Aabb", GetDrawAabb, SetDrawAabb, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Draw Pair", GetDrawPair, SetDrawPair, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Draw CenterOfMass", GetDrawCenterOfMass, SetDrawCenterOfMass, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Allow Sleeping", GetAllowSleeping, SetAllowSleeping, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Warm Starting", GetWarmStarting, SetWarmStarting, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Continuous Physics", GetContinuousPhysics, SetContinuousPhysics, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Sub Stepping", GetSubStepping, SetSubStepping, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Gravity", GetGravity, SetGravity, Vector2, DEFAULT_GRAVITY_2D, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Auto Clear Forces", GetAutoClearForces, SetAutoClearForces, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Velocity Iterations", GetVelocityIterations, SetVelocityIterations, int, DEFAULT_VELOCITY_ITERATIONS,
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Shape", GetDrawShape, SetDrawShape, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Joint", GetDrawJoint, SetDrawJoint, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Aabb", GetDrawAabb, SetDrawAabb, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Pair", GetDrawPair, SetDrawPair, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw CenterOfMass", GetDrawCenterOfMass, SetDrawCenterOfMass, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Allow Sleeping", GetAllowSleeping, SetAllowSleeping, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Warm Starting", GetWarmStarting, SetWarmStarting, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Continuous Physics", GetContinuousPhysics, SetContinuousPhysics, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Sub Stepping", GetSubStepping, SetSubStepping, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Gravity", GetGravity, SetGravity, Vector2, DEFAULT_GRAVITY_2D, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Auto Clear Forces", GetAutoClearForces, SetAutoClearForces, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Velocity Iterations", GetVelocityIterations, SetVelocityIterations, int, DEFAULT_VELOCITY_ITERATIONS,
         AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Position Iterations", GetPositionIterations, SetPositionIterations, int, DEFAULT_POSITION_ITERATIONS,
+    URHO3D_ACCESSOR_ATTRIBUTE("Position Iterations", GetPositionIterations, SetPositionIterations, int, DEFAULT_POSITION_ITERATIONS,
         AM_DEFAULT);
 }
 
@@ -104,7 +105,7 @@ void PhysicsWorld2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     if (debug)
     {
-        PROFILE(Physics2DDrawDebug);
+        URHO3D_PROFILE(Physics2DDrawDebug);
 
         debugRenderer_ = debug;
         debugDepthTest_ = depthTest;
@@ -115,8 +116,8 @@ void PhysicsWorld2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void PhysicsWorld2D::BeginContact(b2Contact* contact)
 {
-    // Only handle contact event when physics steping
-    if (!physicsSteping_)
+    // Only handle contact event while stepping the physics simulation
+    if (!physicsStepping_)
         return;
 
     b2Fixture* fixtureA = contact->GetFixtureA();
@@ -129,8 +130,7 @@ void PhysicsWorld2D::BeginContact(b2Contact* contact)
 
 void PhysicsWorld2D::EndContact(b2Contact* contact)
 {
-    // Only handle contact event when physics steping
-    if (!physicsSteping_)
+    if (!physicsStepping_)
         return;
 
     b2Fixture* fixtureA = contact->GetFixtureA();
@@ -226,7 +226,7 @@ void PhysicsWorld2D::DrawTransform(const b2Transform& xf)
 
 void PhysicsWorld2D::Update(float timeStep)
 {
-	PROFILE(UpdatePhysics2D);
+    URHO3D_PROFILE(UpdatePhysics2D);
 
     using namespace PhysicsPreStep2D;
 
@@ -235,9 +235,9 @@ void PhysicsWorld2D::Update(float timeStep)
     eventData[P_TIMESTEP] = timeStep;
     SendEvent(E_PHYSICSPRESTEP2D, eventData);
 
-    physicsSteping_ = true;
+    physicsStepping_ = true;
     world_->Step(timeStep, velocityIterations_, positionIterations_);
-    physicsSteping_ = false;
+    physicsStepping_ = false;
 
     for (unsigned i = 0; i < rigidBodies_.Size(); ++i)
         rigidBodies_[i]->ApplyWorldTransform();
@@ -254,6 +254,11 @@ void PhysicsWorld2D::DrawDebugGeometry()
     DebugRenderer* debug = GetComponent<DebugRenderer>();
     if (debug)
         DrawDebugGeometry(debug, false);
+}
+
+void PhysicsWorld2D::SetUpdateEnabled(bool enable)
+{
+    updateEnabled_ = enable;
 }
 
 void PhysicsWorld2D::SetDrawShape(bool drawShape)
@@ -613,13 +618,16 @@ void PhysicsWorld2D::OnSceneSet(Scene* scene)
 {
     // Subscribe to the scene subsystem update, which will trigger the physics simulation step
     if (scene)
-        SubscribeToEvent(scene, E_SCENESUBSYSTEMUPDATE, HANDLER(PhysicsWorld2D, HandleSceneSubsystemUpdate));
+        SubscribeToEvent(scene, E_SCENESUBSYSTEMUPDATE, URHO3D_HANDLER(PhysicsWorld2D, HandleSceneSubsystemUpdate));
     else
         UnsubscribeFromEvent(E_SCENESUBSYSTEMUPDATE);
 }
 
 void PhysicsWorld2D::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData)
 {
+    if (!updateEnabled_)
+        return;
+
     using namespace SceneSubsystemUpdate;
     Update(eventData[P_TIMESTEP].GetFloat());
 }

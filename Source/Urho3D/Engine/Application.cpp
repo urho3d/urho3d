@@ -57,7 +57,7 @@ Application::Application(Context* context) :
     engine_ = new Engine(context);
 
     // Subscribe to log messages so that can show errors if ErrorExit() is called with empty message
-    SubscribeToEvent(E_LOGMESSAGE, HANDLER(Application, HandleLogMessage));
+    SubscribeToEvent(E_LOGMESSAGE, URHO3D_HANDLER(Application, HandleLogMessage));
 }
 
 int Application::Run()

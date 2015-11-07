@@ -46,7 +46,7 @@ static const unsigned NUM_SPRITES = 200;
 static const StringHash VAR_MOVESPEED("MoveSpeed");
 static const StringHash VAR_ROTATESPEED("RotateSpeed");
 
-DEFINE_APPLICATION_MAIN(Urho2DSprite)
+URHO3D_DEFINE_APPLICATION_MAIN(Urho2DSprite)
 
 Urho2DSprite::Urho2DSprite(Context* context) :
     Sample(context)
@@ -194,7 +194,7 @@ void Urho2DSprite::MoveCamera(float timeStep)
 void Urho2DSprite::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Urho2DSprite, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Urho2DSprite, HandleUpdate));
 
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent(E_SCENEUPDATE);

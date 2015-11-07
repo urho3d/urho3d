@@ -39,7 +39,7 @@ class Scene;
 ///     - Examining rendering performance with a somewhat large object and light count
 class Billboards : public Sample
 {
-    OBJECT(Billboards);
+    URHO3D_OBJECT(Billboards, Sample);
 
 public:
     /// Construct.

@@ -65,7 +65,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
     // If device is lost, retry later
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Texture load while device is lost");
+        URHO3D_LOGWARNING("Texture load while device is lost");
         dataPending_ = true;
         return true;
     }
@@ -128,7 +128,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
         return true;
     }
 
-    LOGERROR("Texture3D XML data for " + GetName() + " did not contain either volume or colorlut element");
+    URHO3D_LOGERROR("Texture3D XML data for " + GetName() + " did not contain either volume or colorlut element");
     return false;
 }
 
@@ -227,7 +227,7 @@ bool Texture3D::SetSize(int width, int height, int depth, unsigned format, Textu
     }
 
     if (usage == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, HANDLER(Texture3D, HandleRenderSurfaceUpdate));
+        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture3D, HandleRenderSurfaceUpdate));
     else
         UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
 
@@ -241,29 +241,29 @@ bool Texture3D::SetSize(int width, int height, int depth, unsigned format, Textu
 
 bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data)
 {
-    PROFILE(SetTextureData);
+    URHO3D_PROFILE(SetTextureData);
 
     if (!object_)
     {
-        LOGERROR("No texture created, can not set data");
+        URHO3D_LOGERROR("No texture created, can not set data");
         return false;
     }
 
     if (!data)
     {
-        LOGERROR("Null source for setting data");
+        URHO3D_LOGERROR("Null source for setting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        LOGERROR("Illegal mip level for setting data");
+        URHO3D_LOGERROR("Illegal mip level for setting data");
         return false;
     }
 
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Texture data assignment while device is lost");
+        URHO3D_LOGWARNING("Texture data assignment while device is lost");
         dataPending_ = true;
         return true;
     }
@@ -280,7 +280,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || z < 0 || z + depth > levelDepth || width <= 0 ||
         height <= 0 || depth <= 0)
     {
-        LOGERROR("Illegal dimensions for setting data");
+        URHO3D_LOGERROR("Illegal dimensions for setting data");
         return false;
     }
 
@@ -300,7 +300,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
 
     if (FAILED(((IDirect3DVolumeTexture9*)object_)->LockBox(level, &d3dLockedBox, (flags & D3DLOCK_DISCARD) ? 0 : &d3dBox, flags)))
     {
-        LOGERROR("Could not lock texture");
+        URHO3D_LOGERROR("Could not lock texture");
         return false;
     }
 
@@ -380,7 +380,7 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
 {
     if (!image)
     {
-        LOGERROR("Null image, can not load texture");
+        URHO3D_LOGERROR("Null image, can not load texture");
         return false;
     }
 
@@ -507,25 +507,25 @@ bool Texture3D::GetData(unsigned level, void* dest) const
 {
     if (!object_)
     {
-        LOGERROR("No texture created, can not get data");
+        URHO3D_LOGERROR("No texture created, can not get data");
         return false;
     }
 
     if (!dest)
     {
-        LOGERROR("Null destination for getting data");
+        URHO3D_LOGERROR("Null destination for getting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        LOGERROR("Illegal mip level for getting data");
+        URHO3D_LOGERROR("Illegal mip level for getting data");
         return false;
     }
 
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Getting texture data while device is lost");
+        URHO3D_LOGWARNING("Getting texture data while device is lost");
         return false;
     }
 
@@ -544,7 +544,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
 
     if (FAILED(((IDirect3DVolumeTexture9*)object_)->LockBox(level, &d3dLockedBox, &d3dBox, D3DLOCK_READONLY)))
     {
-        LOGERROR("Could not lock texture");
+        URHO3D_LOGERROR("Could not lock texture");
         return false;
     }
 
@@ -623,7 +623,7 @@ bool Texture3D::Create()
 
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Texture creation while device is lost");
+        URHO3D_LOGWARNING("Texture creation while device is lost");
         return true;
     }
 
@@ -640,7 +640,7 @@ bool Texture3D::Create()
         (IDirect3DVolumeTexture9**)&object_,
         0)))
     {
-        LOGERROR("Could not create texture");
+        URHO3D_LOGERROR("Could not create texture");
         return false;
     }
 

@@ -48,7 +48,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(Physics)
+URHO3D_DEFINE_APPLICATION_MAIN(Physics)
 
 Physics::Physics(Context* context) :
     Sample(context),
@@ -205,11 +205,11 @@ void Physics::SetupViewport()
 void Physics::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Physics, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Physics, HandleUpdate));
 
     // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request
     // debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Physics, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, URHO3D_HANDLER(Physics, HandlePostRenderUpdate));
 }
 
 void Physics::MoveCamera(float timeStep)

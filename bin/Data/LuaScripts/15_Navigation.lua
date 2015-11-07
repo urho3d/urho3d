@@ -131,7 +131,7 @@ function CreateUI()
     local instructionText = ui.root:CreateChild("Text")
     instructionText.text = "Use WASD keys to move, RMB to rotate view\n"..
         "LMB to set destination, SHIFT+LMB to teleport\n"..
-        "MMB to add or remove obstacles\n"..
+        "MMB or O key to add or remove obstacles\n"..
         "Space to toggle debug geometry"
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
     -- The text has multiple rows. Center them in relation to each other
@@ -202,7 +202,7 @@ function MoveCamera(timeStep)
         SetPathPoint()
     end
     -- Add or remove objects with middle mouse button, then rebuild navigation mesh partially
-    if input:GetMouseButtonPress(MOUSEB_MIDDLE) then
+    if input:GetMouseButtonPress(MOUSEB_MIDDLE) or input:GetKeyPress(KEY_O) then
         AddOrRemoveObject()
     end
     -- Toggle debug geometry with space

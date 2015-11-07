@@ -553,7 +553,7 @@ void PostEditAttribute(Serializable@ serializable, uint index)
     if (serializable.typeName == "CollisionShape" && serializable.attributeInfos[index].name == "Shape Type")
     {
         int shapeType = serializable.GetAttribute("Shape Type").GetInt();
-        if ((shapeType == 6 || shapeType == 7) && serializable.GetAttribute("CustomGeometry NodeID").GetInt() == 0 &&
+        if ((shapeType == 6 || shapeType == 7) && serializable.GetAttribute("CustomGeometry ComponentID").GetInt() == 0 &&
             serializable.GetAttribute("Model").GetResourceRef().name.Trimmed().length == 0)
         {
             Node@ ownerNode = cast<Component>(serializable).node;

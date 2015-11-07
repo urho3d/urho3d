@@ -44,7 +44,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(AngelScriptIntegration)
+URHO3D_DEFINE_APPLICATION_MAIN(AngelScriptIntegration)
 
 AngelScriptIntegration::AngelScriptIntegration(Context* context) :
     Sample(context)
@@ -155,7 +155,7 @@ void AngelScriptIntegration::SetupViewport()
 void AngelScriptIntegration::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(AngelScriptIntegration, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(AngelScriptIntegration, HandleUpdate));
 }
 
 void AngelScriptIntegration::MoveCamera(float timeStep)

@@ -82,7 +82,7 @@ public:
     }
 
     /// Construct from a float array.
-    Color(const float* data) :
+    explicit Color(const float* data) :
         r_(data[0]),
         g_(data[1]),
         b_(data[2]),

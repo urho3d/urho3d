@@ -112,7 +112,7 @@ void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
         break;
 
     case RAY_TRIANGLE_UV:
-        LOGWARNING("RAY_TRIANGLE_UV query level is not supported for TerrainPatch component");
+        URHO3D_LOGWARNING("RAY_TRIANGLE_UV query level is not supported for TerrainPatch component");
         break;
     }
 }
@@ -204,7 +204,7 @@ bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
         return true;
 
     // Draw and check for running out of triangles
-    return buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, occlusionGeometry_->GetIndexStart(),
+    return buffer->AddTriangles(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, occlusionGeometry_->GetIndexStart(),
         occlusionGeometry_->GetIndexCount());
 }
 

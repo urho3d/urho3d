@@ -53,7 +53,7 @@ struct Particle
 /// %Particle emitter component.
 class URHO3D_API ParticleEmitter : public BillboardSet
 {
-    OBJECT(ParticleEmitter);
+    URHO3D_OBJECT(ParticleEmitter, BillboardSet);
 
 public:
     /// Construct.
@@ -86,7 +86,7 @@ public:
     void ApplyEffect();
 
     /// Return particle effect.
-    ParticleEffect* GetEffect() const { return effect_; }
+    ParticleEffect* GetEffect() const;
 
     /// Return maximum number of particles.
     unsigned GetNumParticles() const { return particles_.Size(); }

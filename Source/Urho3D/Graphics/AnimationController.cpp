@@ -64,12 +64,12 @@ void AnimationController::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimationController>(LOGIC_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Animations", GetAnimationsAttr, SetAnimationsAttr, VariantVector, Variant::emptyVariantVector,
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Animations", GetAnimationsAttr, SetAnimationsAttr, VariantVector, Variant::emptyVariantVector,
         AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE("Network Animations", GetNetAnimationsAttr, SetNetAnimationsAttr, PODVector<unsigned char>,
+    URHO3D_ACCESSOR_ATTRIBUTE("Network Animations", GetNetAnimationsAttr, SetNetAnimationsAttr, PODVector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
-    MIXED_ACCESSOR_ATTRIBUTE("Node Animation States", GetNodeAnimationStatesAttr, SetNodeAnimationStatesAttr, VariantVector,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Node Animation States", GetNodeAnimationStatesAttr, SetNodeAnimationStatesAttr, VariantVector,
         Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
 }
 
@@ -79,7 +79,7 @@ void AnimationController::OnSetEnabled()
     if (scene)
     {
         if (IsEnabledEffective())
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimationController, HandleScenePostUpdate));
+            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(AnimationController, HandleScenePostUpdate));
         else
             UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
     }
@@ -158,14 +158,19 @@ void AnimationController::Update(float timeStep)
 
 bool AnimationController::Play(const String& name, unsigned char layer, bool looped, float fadeInTime)
 {
+    // Get the animation resource first to be able to get the canonical resource name
+    // (avoids potential adding of duplicate animations)
+    Animation* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(name);
+    if (!newAnimation)
+        return false;
+
     // Check if already exists
     unsigned index;
     AnimationState* state;
-    FindAnimation(name, index, state);
+    FindAnimation(newAnimation->GetName(), index, state);
 
     if (!state)
     {
-        Animation* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(name);
         state = AddAnimationState(newAnimation);
         if (!state)
             return false;
@@ -174,9 +179,8 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
     if (index == M_MAX_UNSIGNED)
     {
         AnimationControl newControl;
-        Animation* animation = state->GetAnimation();
-        newControl.name_ = animation->GetName();
-        newControl.hash_ = animation->GetNameHash();
+        newControl.name_ = newAnimation->GetName();
+        newControl.hash_ = newAnimation->GetNameHash();
         animations_.Push(newControl);
         index = animations_.Size() - 1;
     }
@@ -591,7 +595,7 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
             state = AddAnimationState(newAnimation);
             if (!state)
             {
-                LOGERROR("Animation update applying aborted due to unknown animation");
+                URHO3D_LOGERROR("Animation update applying aborted due to unknown animation");
                 return;
             }
         }
@@ -794,7 +798,7 @@ VariantVector AnimationController::GetNodeAnimationStatesAttr() const
 void AnimationController::OnSceneSet(Scene* scene)
 {
     if (scene && IsEnabledEffective())
-        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimationController, HandleScenePostUpdate));
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(AnimationController, HandleScenePostUpdate));
     else if (!scene)
         UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
 }

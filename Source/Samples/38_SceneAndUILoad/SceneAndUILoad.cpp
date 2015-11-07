@@ -36,7 +36,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(SceneAndUILoad)
+URHO3D_DEFINE_APPLICATION_MAIN(SceneAndUILoad)
 
 SceneAndUILoad::SceneAndUILoad(Context* context) :
     Sample(context)
@@ -105,10 +105,10 @@ void SceneAndUILoad::CreateUI()
     // Subscribe to button actions (toggle scene lights when pressed then released)
     Button* button = static_cast<Button*>(layoutRoot->GetChild("ToggleLight1", true));
     if (button)
-        SubscribeToEvent(button, E_RELEASED, HANDLER(SceneAndUILoad, ToggleLight1));
+        SubscribeToEvent(button, E_RELEASED, URHO3D_HANDLER(SceneAndUILoad, ToggleLight1));
     button = static_cast<Button*>(layoutRoot->GetChild("ToggleLight2", true));
     if (button)
-        SubscribeToEvent(button, E_RELEASED, HANDLER(SceneAndUILoad, ToggleLight2));
+        SubscribeToEvent(button, E_RELEASED, URHO3D_HANDLER(SceneAndUILoad, ToggleLight2));
 }
 
 void SceneAndUILoad::SetupViewport()
@@ -123,7 +123,7 @@ void SceneAndUILoad::SetupViewport()
 void SceneAndUILoad::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for camera motion
-    SubscribeToEvent(E_UPDATE, HANDLER(SceneAndUILoad, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(SceneAndUILoad, HandleUpdate));
 }
 
 void SceneAndUILoad::MoveCamera(float timeStep)

@@ -59,7 +59,7 @@ Constraint2D::~Constraint2D()
 
 void Constraint2D::RegisterObject(Context* context)
 {
-    ACCESSOR_ATTRIBUTE("Collide Connected", GetCollideConnected, SetCollideConnected, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Collide Connected", GetCollideConnected, SetCollideConnected, bool, false, AM_DEFAULT);
 }
 
 void Constraint2D::OnSetEnabled()
@@ -130,7 +130,7 @@ void Constraint2D::OnNodeSet(Node* node)
         ownerBody_ = node->GetComponent<RigidBody2D>();
         if (!ownerBody_)
         {
-            LOGERROR("No right body component in node, can not create constraint");
+            URHO3D_LOGERROR("No right body component in node, can not create constraint");
             return;
         }
     }

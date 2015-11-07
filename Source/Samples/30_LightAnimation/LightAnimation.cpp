@@ -42,7 +42,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(LightAnimation)
+URHO3D_DEFINE_APPLICATION_MAIN(LightAnimation)
 
 LightAnimation::LightAnimation(Context* context) :
     Sample(context)
@@ -232,7 +232,7 @@ void LightAnimation::MoveCamera(float timeStep)
 void LightAnimation::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(LightAnimation, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(LightAnimation, HandleUpdate));
 }
 
 void LightAnimation::HandleUpdate(StringHash eventType, VariantMap& eventData)

@@ -47,7 +47,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(Water)
+URHO3D_DEFINE_APPLICATION_MAIN(Water)
 
 Water::Water(Context* context) :
     Sample(context)
@@ -227,7 +227,7 @@ void Water::SetupViewport()
 void Water::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Water, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Water, HandleUpdate));
 }
 
 void Water::MoveCamera(float timeStep)

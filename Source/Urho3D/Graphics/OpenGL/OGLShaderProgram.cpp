@@ -205,7 +205,7 @@ bool ShaderProgram::Link()
 
             if (group >= MAX_SHADER_PARAMETER_GROUPS)
             {
-                LOGWARNING("Skipping unrecognized uniform block " + name + " in shader program " + vertexShader_->GetFullName() +
+                URHO3D_LOGWARNING("Skipping unrecognized uniform block " + name + " in shader program " + vertexShader_->GetFullName() +
                            " " + pixelShader_->GetFullName());
                 continue;
             }

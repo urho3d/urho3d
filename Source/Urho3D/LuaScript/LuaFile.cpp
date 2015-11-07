@@ -103,12 +103,12 @@ bool LuaFile::LoadChunk(lua_State* luaState)
     if (luaL_loadbuffer(luaState, data_, size_, name.CString()))
     {
         const char* message = lua_tostring(luaState, -1);
-        LOGERRORF("Load Buffer failed for %s: %s", GetName().CString(), message);
+        URHO3D_LOGERRORF("Load Buffer failed for %s: %s", GetName().CString(), message);
         lua_pop(luaState, 1);
         return false;
     }
 
-    LOGINFO("Loaded Lua script " + GetName());
+    URHO3D_LOGINFO("Loaded Lua script " + GetName());
     hasLoaded_ = true;
 
     return true;
@@ -125,12 +125,12 @@ bool LuaFile::LoadAndExecute(lua_State* luaState)
     if (lua_pcall(luaState, 0, 0, 0))
     {
         const char* message = lua_tostring(luaState, -1);
-        LOGERRORF("Lua Execute failed for %s: %s", GetName().CString(), message);
+        URHO3D_LOGERRORF("Lua Execute failed for %s: %s", GetName().CString(), message);
         lua_pop(luaState, 1);
         return false;
     }
 
-    LOGINFO("Executed Lua script " + GetName());
+    URHO3D_LOGINFO("Executed Lua script " + GetName());
     hasExecuted_ = true;
 
     return true;

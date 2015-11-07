@@ -35,7 +35,7 @@ if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
     execute_process (COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/tool/lib/clang/${LLVM_VERSION})
     create_symlink (${LLVM_LIBDIR}/clang/${LLVM_VERSION}/include ${CMAKE_BINARY_DIR}/bin/tool/lib/clang/${LLVM_VERSION}/include FALLBACK_TO_COPY)
     # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS (ancient glibc header has incorrect defines)
-    if (DEFINED ENV{CI})
+    if (DEFINED ENV{TRAVIS})
         add_definitions (-D__extern_always_inline=inline)
     endif ()
 endif ()
@@ -112,7 +112,7 @@ if (URHO3D_BINDINGS)
     endif ()
     ExternalProject_Add (AutoBinder
             SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Clang-Tools
-            CMAKE_ARGS -DURHO3D_NOABI=1 -DURHO3D_CLANG_TOOLS=AutoBinder -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -DDEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${IOS_FIX})
+            CMAKE_ARGS -DURHO3D_CLANG_TOOLS=AutoBinder -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -DDEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${IOS_FIX})
     file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/generated)
     foreach (SCRIPT AngelScript LuaScript JavaScript)
         string (TOUPPER URHO3D_${SCRIPT} OPT)
@@ -139,7 +139,7 @@ if (URHO3D_LUA)
         endif ()
         ExternalProject_Add (tolua++
             SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
-            CMAKE_ARGS -DURHO3D_NOABI=1 -DURHO3D_LUAJIT=${URHO3D_LUAJIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${IOS_FIX})
+            CMAKE_ARGS -DURHO3D_LUAJIT=${URHO3D_LUAJIT} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${IOS_FIX})
     else ()
         # Otherwise, build it internally as per normal
         add_subdirectory (../ThirdParty/toluapp/src/bin ../ThirdParty/toluapp/src/bin)

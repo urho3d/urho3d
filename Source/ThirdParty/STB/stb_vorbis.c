@@ -1,3 +1,5 @@
+// Modified by Yao Wei Tjong
+
 #include "stb_vorbis.h"
 
 #ifndef STB_VORBIS_HEADER_ONLY
@@ -181,6 +183,8 @@
 
 #ifndef _MSC_VER
    #if __GNUC__
+      // Urho3D - undefine before redefining to suppress warning on MinGW build
+      #undef __forceinline
       #define __forceinline inline
    #else
       #define __forceinline

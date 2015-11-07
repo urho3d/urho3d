@@ -27,7 +27,7 @@ Classes that derive from Object contain type-identification, they can be created
 
 %Object factory registration and object creation through factories are directly accessible only in C++, not in script.
 
-The definition of an Object subclass must contain the OBJECT(className) macro. Type identification is available both as text (GetTypeName() or GetTypeNameStatic()) and as a 32-bit hash of the type name (GetType() or GetTypeStatic()).
+The definition of an Object subclass must contain the URHO3D_OBJECT(className, baseTypeName) macro. Type identification is available both as text (GetTypeName() or GetTypeNameStatic()) and as a 32-bit hash of the type name (GetType() or GetTypeStatic()).
 
 To register an object factory for a specific type, call the \ref Context::RegisterFactory "RegisterFactory()" template function on Context. You can get its pointer from any Object either via the \ref Object::context_ "context_" member variable, or by calling \ref Object::GetContext "GetContext()". An example:
 
@@ -77,12 +77,12 @@ time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, rende
 
 The Urho3D event system allows for data transport and function invocation without the sender and receiver having to explicitly know of each other. Both the event sender and receiver must derive from Object. An event receiver must subscribe to each event type it wishes to receive: one can either subscribe to the event coming from any sender, or from a specific sender. The latter is useful for example when handling events from the user interface elements.
 
-Events themselves do not need to be registered. They are identified by 32-bit hashes of their names. Event parameters (the data payload) are optional and are contained inside a VariantMap, identified by 32-bit parameter name hashes. For the inbuilt Urho3D events, event type (E_UPDATE, E_KEYDOWN, E_MOUSEMOVE etc.) and parameter hashes (P_TIMESTEP, P_DX, P_DY etc.) are defined as constants inside include files such as CoreEvents.h or InputEvents.h.
+Events themselves do not need to be registered. They are identified by 32-bit hashes of their names. Event parameters (the data payload) are optional and are contained inside a VariantMap, identified by 32-bit parameter name hashes. For the inbuilt Urho3D events, event type (E_UPDATE, E_KEYDOWN, E_MOUSEMOVE etc.) and parameter hashes (P_TIMESTEP, P_DX, P_DY etc.) are defined as namespaced constants inside include files such as CoreEvents.h or InputEvents.h, using the helper macros URHO3D_EVENT & URHO3D_PARAM.
 
-When subscribing to an event, a handler function must be specified. In C++ these must have the signature void HandleEvent(StringHash eventType, VariantMap& eventData). The HANDLER(className, function) macro helps in defining the required class-specific function pointers. For example:
+When subscribing to an event, a handler function must be specified. In C++ these must have the signature void HandleEvent(StringHash eventType, VariantMap& eventData). The URHO3D_HANDLER(className, function) macro helps in defining the required class-specific function pointers. For example:
 
 \code
-SubscribeToEvent(E_UPDATE, HANDLER(MyClass, MyEventHandler));
+SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(MyClass, MyEventHandler));
 \endcode
 
 In script events are identified by their string names instead of name hashes (though these are internally converted to hashes.) %Script event handlers can either have the same signature as in C++, or a simplified signature void HandleEvent() when event type and parameters are not required. The same event subscription would look like:
@@ -95,7 +95,7 @@ In C++ events must always be handled by a member function. In script procedural 
 
 Events can also be unsubscribed from. See \ref Object::UnsubscribeFromEvent "UnsubscribeFromEvent()" for details.
 
-To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Engine subsystem sends the Update event on each frame. Note how for the inbuilt Urho3D events, the parameter name hashes are always put inside a namespace (the event's name) to prevent name clashes:
+To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Engine subsystem sends the Update event on each frame. Note the parameter name hashes being inside a namespace which matches the event name:
 
 \code
 using namespace Update;
@@ -130,7 +130,7 @@ The full list of supported parameters, their datatypes and default values:
 - LogName (string) %Log filename. Default "Urho3D.log".
 - FrameLimiter (bool) Whether to cap maximum framerate to 200 (desktop) or 60 (Android/iOS.) Default true.
 - WorkerThreads (bool) Whether to create worker threads for the %WorkQueue subsystem according to available CPU cores. Default true.
-- ResourcePrefixPath (string) Override the resource prefix path to use. If not specified then the default prefix path is set to URHO3D_PREFIX_PATH environment variable (if defined) or executable path.
+- ResourcePrefixPaths (string) A semicolon-separated list of resource prefix paths to use. If not specified then the default prefix path is set to executable path. The resource prefix paths can also be defined using URHO3D_PREFIX_PATH env-var. When both are defined, the paths set by -pp takes higher precedence.
 - ResourcePaths (string) A semicolon-separated list of resource paths to use. If corresponding packages (ie. Data.pak for Data directory) exist they will be used instead. Default "Data;CoreData".
 - ResourcePackages (string) A semicolon-separated list of resource packages to use. Default empty.
 - AutoloadPaths (string) A semicolon-separated list of autoload paths to use. Any resource packages and subdirectories inside an autoload path will be added to the resource system. Default "Autoload".
@@ -231,7 +231,7 @@ public:
     virtual void Start()
     {
         // Called after engine initialization. Setup application & subscribe to events here
-        SubscribeToEvent(E_KEYDOWN, HANDLER(MyApp, HandleKeyDown));
+        SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(MyApp, HandleKeyDown));
     }
 
     virtual void Stop()
@@ -250,7 +250,7 @@ public:
     }
 };
 
-DEFINE_APPLICATION_MAIN(MyApp)
+URHO3D_DEFINE_APPLICATION_MAIN(MyApp)
 \endcode
 
 \page SceneModel Scene model
@@ -448,7 +448,7 @@ l10n->SetLanguage("language 2");
 When the language is changed, the E_CHANGELANGUAGE event will be sent. Subscribe to it to perform the necessary relocalization of your user interface (texts, sprites etc.)
 
 \code
-SubscribeToEvent(E_CHANGELANGUAGE, HANDLER(Game, HandleChangeLanguage));
+SubscribeToEvent(E_CHANGELANGUAGE, URHO3D_HANDLER(Game, HandleChangeLanguage));
 
 void Game::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
 {
@@ -909,13 +909,21 @@ Additionally there are 2D drawable components defined by the \ref Urho2D "Urho2D
 
 The following techniques will be used to reduce the amount of CPU and GPU work when rendering. By default they are all on:
 
-- Software rasterized occlusion: after the octree has been queried for visible objects, the objects that are marked as occluders are rendered on the CPU to a small hierarchical-depth buffer, and it will be used to test the non-occluders for visibility. Use \ref Renderer::SetMaxOccluderTriangles "SetMaxOccluderTriangles()" and \ref Renderer::SetOccluderSizeThreshold "SetOccluderSizeThreshold()" to configure the occlusion rendering.
+- Software rasterized occlusion: after the octree has been queried for visible objects, the objects that are marked as occluders are rendered on the CPU to a small hierarchical-depth buffer, and it will be used to test the non-occluders for visibility. Use \ref Renderer::SetMaxOccluderTriangles "SetMaxOccluderTriangles()" and \ref Renderer::SetOccluderSizeThreshold "SetOccluderSizeThreshold()" to configure the occlusion rendering. Occlusion testing will always be multithreaded, however occlusion rendering is by default singlethreaded, to allow rejecting subsequent occluders while rendering front-to-back.. Use \ref Renderer::SetThreadedOcclusion "SetThreadedOcclusion()" to enable threading also in rendering, however this can actually perform worse in e.g. terrain scenes where terrain patches act as occluders.
 
-- Hardware instancing: rendering operations with the same geometry, material and light will be grouped together and performed as one draw call. Objects with a large amount of triangles will not be rendered as instanced, as that could actually be detrimental to performance. Use \ref Renderer::SetMaxInstanceTriangles "SetMaxInstanceTriangles()" to set the threshold. Note that even when instancing is not available, or the triangle count of objects is too large, they still benefit from the grouping, as render state only needs to be set once before rendering each group, reducing the CPU cost.
+- Hardware instancing: rendering operations with the same geometry, material and light will be grouped together and performed as one draw call if supported. Note that even when instancing is not available, they still benefit from the grouping, as render state only needs to be checked & set once before rendering each group, reducing the CPU cost.
 
 - %Light stencil masking: in forward rendering, before objects lit by a spot or point light are re-rendered additively, the light's bounding shape is rendered to the stencil buffer to ensure pixels outside the light range are not processed.
 
 Note that many more optimization opportunities are possible at the content level, for example using geometry & material LOD, grouping many static objects into one object for less draw calls, minimizing the amount of subgeometries (submeshes) per object for less draw calls, using texture atlases to avoid render state changes, using compressed (and smaller) textures, and setting maximum draw distances for objects, lights and shadows.
+
+\section Rendering_ReuseView Reusing view preparation
+
+In some applications, like stereoscopic VR rendering, one needs to render a slightly different view of the world to separate viewports. Normally this results in the view preparation process (described above) being repeated for each view, which can be costly for CPU performance.
+
+To eliminate the duplicate view preparation cost, you can use \ref Viewport::SetCullCamera "SetCullCamera()" to instruct a Viewport to use a different camera for culling than rendering. When multiple viewports share the same culling camera, the view preparation will be performed only once.
+
+To work properly, the culling camera's frustum should cover all the views you are rendering using it, or else missing objects may be present. The culling camera should not be using the auto aspect ratio mode, to ensure you stay in full control of its view frustum.
 
 \section Rendering_GPUResourceLoss Handling GPU resource loss
 
@@ -1406,7 +1414,7 @@ Otherwise fully customized scene render passes can be specified, but there are a
 
 \section RenderPaths_PostProcess Post-processing effects special considerations
 
-Post-processing effects are usually implemented by using the quad command. When using intermediate rendertargets that are of different size than the viewport rendertarget, it is necessary in shaders to reference their (inverse) size and the half-pixel offset for Direct3D9. These shader uniforms are automatically generated for named rendertargets. For an example look at the bloom postprocess shaders: the rendertarget called HBlur will define the shader uniforms cHBlurInvSize and cHBlurOffsets (both Vector2.)
+Post-processing effects are usually implemented by using the quad command. When using intermediate rendertargets that are of different size than the viewport rendertarget, it is often necessary in shaders to reference their (inverse) size and the half-pixel offset for Direct3D9. These shader uniforms are automatically attempted to be assigned for named rendertargets. For an example look at the bloom postprocess shaders: because there is a rendertarget called BlurH, each quad command in the renderpath will attempt to set the shader uniforms cBlurHInvSize and cBlurHOffsets (both Vector2.) Note that setting shader uniforms is case insensitive.
 
 In OpenGL post-processing shaders it is important to distinguish between sampling a rendertarget texture and a regular texture resource, because intermediate rendertargets (such as the G-buffer) may be vertically inverted. Use the GetScreenPos() or GetQuadTexCoord() functions to get rendertarget UV coordinates from the clip coordinates; this takes flipping into account automatically. For sampling a regular texture, use GetQuadTexCoordNoFlip() function, which requires world coordinates instead of clip coordinates.
 
@@ -2394,7 +2402,7 @@ If need be you can access the grid id (relative to the tilesets used) of a Tile 
 
 Classes that derive from Serializable can perform automatic serialization to binary or XML format by defining \ref AttributeInfo "attributes". Attributes are stored to the Context per class. %Scene load/save and network replication are both implemented by having the Node and Component classes derive from Serializable.
 
-The supported attribute types are all those supported by Variant, excluding pointers. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
+The supported attribute types are all those supported by Variant, excluding pointers. Attributes can either refer to a variable at a memory offset in the object, or define setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
 
 To implement side effects to attributes, for example that a Node needs to dirty its world transform whenever the local transform changes, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
 
@@ -2408,6 +2416,8 @@ Each attribute can have a combination of the following flags:
 - AM_COMPONENTID: Is a component ID and may need rewriting when instantiating scene content.
 
 The default flags are AM_FILE and AM_NET. Note that it is legal to define neither AM_FILE or AM_NET, meaning the attribute has only run-time significance (perhaps for editing.)
+
+See the existing engine classes e.g. in the %Scene or %Graphics subdirectories for examples on registering attributes using the URHO3D_ATTRIBUTE family of helper macros.
 
 \page Network Networking
 
@@ -2809,7 +2819,7 @@ The following sample demonstrates how to build a path from 2 points, assign a co
 
 	// Node to move along the path ('controlled node')
 	Node* movingNode =  scene_->CreateChild("MovingNode");
-	
+
 	// Spline path
 	Node* pathNode = scene_->CreateChild("PathNode");
 	SplinePath* path = pathNode->CreateComponent<SplinePath>();
@@ -3232,9 +3242,19 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 
 - Mark all application-usable classes, structs and functions with the macro URHO3D_API so that they are exported correctly in a shared library build.
 
+- Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs.
+
+- Whenever you are creating a major new feature, its usage should be documented in the .dox pages in addition to the function documentation in the header files. Create a new page if necessary, and link from an appropriate place in the existing documentation. If it's for example a new rendering feature, it could be linked from the \ref Rendering page. If the feature introduces a completely new subsystem, it should be linked from the main page list in Urho3D.dox.
+
+\section ContributionThirdParty Third party library considerations
+
 - When you add a new third-party library, insert its license statement to the License.txt in the root directory. Only libraries with permissive licenses such as BSD/MIT/zlib are accepted, because complying for example with the LGPL is difficult on mobile platforms, and would leave the application in a legal grey area.
 
-- Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs.
+- Prefer small and well-focused libraries for the Urho3D runtime. For example we use stb_image instead of FreeImage to load images, as it's assumed that the application developer can control the data and do offline conversion to supported formats as necessary.
+
+- For libraries that would be mandatorily part of the Urho3D build (not switchable off via CMake options), use of C++11 features is not yet acceptable. The same applies to your own code.
+
+- Third-party libraries should not leak C++ exceptions or use of STL containers into the Urho3D public API. Do a wrapping for example on the subsystem level if necessary.
 */
 
 }

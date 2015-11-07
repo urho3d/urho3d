@@ -40,7 +40,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(Urho2DTileMap)
+URHO3D_DEFINE_APPLICATION_MAIN(Urho2DTileMap)
 
 Urho2DTileMap::Urho2DTileMap(Context* context) :
     Sample(context)
@@ -164,7 +164,7 @@ void Urho2DTileMap::MoveCamera(float timeStep)
 void Urho2DTileMap::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Urho2DTileMap, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Urho2DTileMap, HandleUpdate));
 
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent(E_SCENEUPDATE);

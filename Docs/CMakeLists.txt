@@ -66,7 +66,7 @@ if (DOXYGEN_FOUND)
         foreach (IDE XCODE MSVC Eclipse CodeBlocks)
             enable_help (${IDE})
         endforeach ()
-        if (MSVC_HELP)
+        if (MSVC_HELP AND NOT DEFINED ENV{APPVEYOR})    # Skip when generating MSVC help on AppVeyor due to similar issue to #910
             find_package (HTMLHelp)
             # It is not an error when HTML help compiler is not found, instead just switching off the Doxygen's HHC option
             find_package_handle_standard_args (HTMLHelp REQUIRED_VARS HTML_HELP_COMPILER)
@@ -75,7 +75,7 @@ if (DOXYGEN_FOUND)
     endif ()
 
     # Dump AngelScript and LuaScript API to Doxygen file if the corresponding host tool is available
-    if (TARGET ScriptCompiler)
+    if (TARGET ScriptCompiler AND NOT CMAKE_CROSSCOMPILING)
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/ScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/AngelScriptAPI.h
             COMMAND ${CMAKE_BINARY_DIR}/bin/tool/ScriptCompiler -dumpapi ${CMAKE_SOURCE_DIR} ScriptAPI.dox AngelScriptAPI.h
             DEPENDS ScriptCompiler     # ScriptCompiler implicitly depends on Urho3D already
@@ -87,7 +87,7 @@ if (DOXYGEN_FOUND)
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/AngelScriptAPI.h ${CMAKE_CURRENT_BINARY_DIR}/generated/AngelScriptAPI.h
             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ScriptAPI.dox ${CMAKE_CURRENT_SOURCE_DIR}/AngelScriptAPI.h)
     endif ()
-    if (TARGET tolua++)
+    if (TARGET tolua++ AND NOT CMAKE_CROSSCOMPILING)
         file (GLOB PKGS RELATIVE ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs/*.pkg)
         list (SORT PKGS)
         set (PKGLIST "// This is a generated file. DO NOT EDIT!\n\n")

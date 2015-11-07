@@ -148,11 +148,11 @@ void Texture::SetBackupTexture(Texture* texture)
     backupTexture_ = texture;
 }
 
-void Texture::SetMipsToSkip(int quality, int mips)
+void Texture::SetMipsToSkip(int quality, int toSkip)
 {
     if (quality >= QUALITY_LOW && quality < MAX_TEXTURE_QUALITY_LEVELS)
     {
-        mipsToSkip_[quality] = (unsigned)mips;
+        mipsToSkip_[quality] = (unsigned)toSkip;
 
         // Make sure a higher quality level does not actually skip more mips
         for (int i = 1; i < MAX_TEXTURE_QUALITY_LEVELS; ++i)
@@ -349,7 +349,7 @@ void Texture::UpdateParameters()
     graphics_->GetImpl()->GetDevice()->CreateSamplerState(&samplerDesc, (ID3D11SamplerState**)&sampler_);
 
     if (!sampler_)
-        LOGERROR("Failed to create sampler state");
+        URHO3D_LOGERROR("Failed to create sampler state");
 
     parametersDirty_ = false;
 }
@@ -429,8 +429,8 @@ unsigned Texture::GetSRGBFormat(unsigned format)
 void Texture::CheckTextureBudget(StringHash type)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    unsigned textureBudget = cache->GetMemoryBudget(type);
-    unsigned textureUse = cache->GetMemoryUse(type);
+    unsigned long long textureBudget = cache->GetMemoryBudget(type);
+    unsigned long long textureUse = cache->GetMemoryUse(type);
     if (!textureBudget)
         return;
 

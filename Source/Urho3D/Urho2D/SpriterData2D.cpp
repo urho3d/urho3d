@@ -416,7 +416,13 @@ bool Timeline::Load(const pugi::xml_node& node)
     id_ = node.attribute("id").as_int();
     name_ = node.attribute("name").as_string();
 
-    String typeString = node.attribute("type").as_string("sprite");
+    String typeString;
+    xml_attribute typeAttr = node.attribute("type");
+    if (typeAttr.empty())
+        typeString = node.attribute("object_type").as_string("sprite");
+    else
+        typeString = typeAttr.as_string("sprite");
+    
     if (typeString == "bone")
     {
         objectType_ = BONE;

@@ -41,6 +41,7 @@ Urho3D development, contributions and bugfixes by:
 - Nick Royer
 - Jonathan Sandusky
 - Miika Santala
+- Hualin Song
 - James Thomas
 - Joshua Tippetts
 - Daniel Wiberg
@@ -52,6 +53,7 @@ Urho3D development, contributions and bugfixes by:
 - Mike3D
 - Modanung
 - MonkeyFirst
+- Newb I the Newbd
 - OvermindDL1
 - Skrylar
 - 1vanK

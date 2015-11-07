@@ -118,16 +118,16 @@ FileSelector::FileSelector(Context* context) :
     ui->SetFocusElement(fileList_);
     window_->SetModal(true);
 
-    SubscribeToEvent(filterList_, E_ITEMSELECTED, HANDLER(FileSelector, HandleFilterChanged));
-    SubscribeToEvent(pathEdit_, E_TEXTFINISHED, HANDLER(FileSelector, HandlePathChanged));
-    SubscribeToEvent(fileNameEdit_, E_TEXTFINISHED, HANDLER(FileSelector, HandleOKPressed));
-    SubscribeToEvent(fileList_, E_ITEMSELECTED, HANDLER(FileSelector, HandleFileSelected));
-    SubscribeToEvent(fileList_, E_ITEMDOUBLECLICKED, HANDLER(FileSelector, HandleFileDoubleClicked));
-    SubscribeToEvent(fileList_, E_UNHANDLEDKEY, HANDLER(FileSelector, HandleFileListKey));
-    SubscribeToEvent(okButton_, E_RELEASED, HANDLER(FileSelector, HandleOKPressed));
-    SubscribeToEvent(cancelButton_, E_RELEASED, HANDLER(FileSelector, HandleCancelPressed));
-    SubscribeToEvent(closeButton_, E_RELEASED, HANDLER(FileSelector, HandleCancelPressed));
-    SubscribeToEvent(window_, E_MODALCHANGED, HANDLER(FileSelector, HandleCancelPressed));
+    SubscribeToEvent(filterList_, E_ITEMSELECTED, URHO3D_HANDLER(FileSelector, HandleFilterChanged));
+    SubscribeToEvent(pathEdit_, E_TEXTFINISHED, URHO3D_HANDLER(FileSelector, HandlePathChanged));
+    SubscribeToEvent(fileNameEdit_, E_TEXTFINISHED, URHO3D_HANDLER(FileSelector, HandleOKPressed));
+    SubscribeToEvent(fileList_, E_ITEMSELECTED, URHO3D_HANDLER(FileSelector, HandleFileSelected));
+    SubscribeToEvent(fileList_, E_ITEMDOUBLECLICKED, URHO3D_HANDLER(FileSelector, HandleFileDoubleClicked));
+    SubscribeToEvent(fileList_, E_UNHANDLEDKEY, URHO3D_HANDLER(FileSelector, HandleFileListKey));
+    SubscribeToEvent(okButton_, E_RELEASED, URHO3D_HANDLER(FileSelector, HandleOKPressed));
+    SubscribeToEvent(cancelButton_, E_RELEASED, URHO3D_HANDLER(FileSelector, HandleCancelPressed));
+    SubscribeToEvent(closeButton_, E_RELEASED, URHO3D_HANDLER(FileSelector, HandleCancelPressed));
+    SubscribeToEvent(window_, E_MODALCHANGED, URHO3D_HANDLER(FileSelector, HandleCancelPressed));
 }
 
 FileSelector::~FileSelector()

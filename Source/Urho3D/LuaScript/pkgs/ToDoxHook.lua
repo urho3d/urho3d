@@ -268,16 +268,16 @@ function isSameFunction(headerFunc, packageFunc, strict)
         --for _, decl in ipairs(headerFunc.declarations) do print("FuncHeader  Param: \""..decl.type.."\", \""..decl.ptr.."\", \""..decl.name.."\", \""..decl.def.."\"") end
         --for _, decl in ipairs(packageFunc.declarations) do print("FuncPackage Param: \""..decl.type.."\", \""..decl.ptr.."\", \""..decl.name.."\", \""..decl.def.."\"") end
         for i, headerDecl in ipairs(headerFunc.declarations) do
-		  if packageFunc.declarations[i] ~= nil then
-		    if not isTypeEquivalent(headerDecl.type, packageFunc.declarations[i].type) then
-		      return false
-		    end
-		  else
-		    if headerDecl.def == "" then
-		      return false
-		    end
-		  end
-		end
+      if packageFunc.declarations[i] ~= nil then
+        if not isTypeEquivalent(headerDecl.type, packageFunc.declarations[i].type) then
+          return false
+        end
+      else
+        if headerDecl.def == "" then
+          return false
+        end
+      end
+    end
         return true
       else
         return true

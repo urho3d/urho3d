@@ -12,7 +12,7 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
+// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
 
 #ifndef BT_SCALAR_H
@@ -41,9 +41,10 @@ inline int	btGetVersion()
 #endif
 
 
-#ifdef _WIN32
+// Urho3D - enable BT_USE_SSE for MinGW
+#if defined(_WIN32) && !defined(__MINGW32__)
 
-		#if defined(__MINGW32__) || defined(__CYGWIN__) || (defined (_MSC_VER) && _MSC_VER < 1300)
+		#if defined(__CYGWIN__) || (defined (_MSC_VER) && _MSC_VER < 1300)
 
 			#define SIMD_FORCE_INLINE inline
 			#define ATTRIBUTE_ALIGNED16(a) a
@@ -173,11 +174,11 @@ inline int	btGetVersion()
 		
 
 #else
-	//non-windows systems
+	//non-windows systems OR MinGW
 
-// Urho3D: allow to disable SSE
-#if (defined (URHO3D_SSE) && defined (__APPLE__) && (!defined (BT_USE_DOUBLE_PRECISION)))
-    #if defined (__i386__) || defined (__x86_64__)
+// Urho3D - allow to disable SSE/NEON and let Linux, MinGW, & Android platforms in besides Apple
+#if (!defined (BT_USE_DOUBLE_PRECISION))
+    #if defined (URHO3D_SSE) && (defined (__i386__) || defined (__x86_64__))
 		#define BT_USE_SIMD_VECTOR3
 		#define BT_USE_SSE
 		//BT_USE_SSE_IN_API is enabled on Mac OSX by default, because memory is automatically aligned on 16-byte boundaries
@@ -195,15 +196,13 @@ inline int	btGetVersion()
                 #include <emmintrin.h>
             #endif
         #endif //BT_USE_SSE
-    #elif defined( __ARM_NEON__ )
-        #ifdef __clang__
+    #elif defined (URHO3D_NEON) && defined( __ARM_NEON__ )
             #define BT_USE_NEON 1
 			#define BT_USE_SIMD_VECTOR3
 		
-            #if defined BT_USE_NEON && defined (__clang__)
+            #ifdef BT_USE_NEON
                 #include <arm_neon.h>
             #endif//BT_USE_NEON
-       #endif //__clang__
     #endif//__arm__
 
 	#define SIMD_FORCE_INLINE inline __attribute__ ((always_inline))
@@ -289,7 +288,7 @@ typedef __m128 btSimdFloat4;
 
 #if defined (BT_USE_SSE)
 //#if defined BT_USE_SSE_IN_API && defined (BT_USE_SSE)
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)	// Urho3D - enable BT_USE_SSE for MinGW
 
 #ifndef BT_NAN
 static int btNanMask = 0x7F800001;

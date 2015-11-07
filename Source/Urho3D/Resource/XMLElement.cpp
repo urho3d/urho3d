@@ -709,7 +709,6 @@ BoundingBox XMLElement::GetBoundingBox() const
 
     ret.min_ = GetVector3("min");
     ret.max_ = GetVector3("max");
-    ret.defined_ = true;
     return ret;
 }
 
@@ -965,7 +964,7 @@ XPathResultSet& XPathResultSet::operator =(const XPathResultSet& rhs)
 XMLElement XPathResultSet::operator [](unsigned index) const
 {
     if (!resultSet_)
-        LOGERRORF(
+        URHO3D_LOGERRORF(
             "Could not return result at index: %u. Most probably this is caused by the XPathResultSet not being stored in a lhs variable.",
             index);
 

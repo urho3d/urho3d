@@ -54,10 +54,10 @@ void CollisionEdge2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<CollisionEdge2D>(URHO2D_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Vertex 1", GetVertex1, SetVertex1, Vector2, DEFAULT_VERTEX1, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Vertex 2", GetVertex2, SetVertex2, Vector2, DEFAULT_VERTEX2, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(CollisionShape2D);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Vertex 1", GetVertex1, SetVertex1, Vector2, DEFAULT_VERTEX1, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Vertex 2", GetVertex2, SetVertex2, Vector2, DEFAULT_VERTEX2, AM_DEFAULT);
+    URHO3D_COPY_BASE_ATTRIBUTES(CollisionShape2D);
 }
 
 void CollisionEdge2D::SetVertex1(const Vector2& vertex)
