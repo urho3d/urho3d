@@ -36,6 +36,13 @@ static const int MATRIX_CONVERSION_BUFFER_LENGTH = 256;
 
 class WString;
 
+/// Mode for String::Split (default is to keep empty splits)
+enum StringSplit
+{
+    SPLIT_KEEP_EMPTY = 0,
+    SPLIT_OMIT_EMPTY
+};
+
 /// %String class.
 class URHO3D_API String
 {
@@ -388,7 +395,7 @@ public:
     /// Return string in lowercase.
     String ToLower() const;
     /// Return substrings split by a separator char.
-    Vector<String> Split(char separator) const;
+    Vector<String> Split(char separator, StringSplit splitMode = SPLIT_KEEP_EMPTY) const;
     /// Join substrings with a 'glue' string.
     void Join(const Vector<String>& subStrings, const String& glue);
     /// Return index to the first occurrence of a string, or NPOS if not found.
@@ -463,7 +470,7 @@ public:
     }
 
     /// Return substrings split by a separator char.
-    static Vector<String> Split(const char* str, char separator);
+    static Vector<String> Split(const char* str, char separator, StringSplit splitMode = SPLIT_KEEP_EMPTY);
     /// Return a string by joining substrings with a 'glue' string.
     static String Joined(const Vector<String>& subStrings, const String& glue);
     /// Encode Unicode character to UTF8. Pointer will be incremented.
