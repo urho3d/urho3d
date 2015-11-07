@@ -13,7 +13,7 @@
 
 using namespace Urho3D;
 
-/// Vertex struct for tail  
+/// Vertex struct for tail
 struct URHO3D_API TailVertex
 {
     Vector3 position_;
@@ -62,9 +62,9 @@ public:
     void SetTailLength(float length);
     /// Get tail segment length
     float GetTailLength();
-    /// Set count segments of all tail 
+    /// Set count segments of all tail
     void SetNumTails(unsigned num);
-    /// Get count segments of all tail 
+    /// Get count segments of all tail
     unsigned GetNumTails();
     /// Set width scale of the tail
     void SetWidthScale(float scale);
@@ -76,7 +76,7 @@ public:
     void SetMaterialAttr(const ResourceRef& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
-    
+
     /// Get whether to draw the vertical strip or not
     bool GetDrawVertical() const { return vertical_; }
     /// Get whether to draw the horizontal strip or not
@@ -104,7 +104,6 @@ protected:
     /// Mark vertex buffer to need an update.
     void MarkPositionsDirty();
     /// Tails.
-    PODVector<Tail> tails_;
     PODVector<Tail> fullPointPath;
 
 private:
