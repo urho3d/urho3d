@@ -53,23 +53,15 @@ static void RegisterCustomLibrary(Context* context)
 #ifdef URHO3D_ANGELSCRIPT
     Script* script = context->GetSubsystem<Script>();
     asIScriptEngine* engine = script->GetScriptEngine();
-    /*
-    Node *tailNode = modelNode->CreateChild();
-    tailNode->Translate(Vector3(0.0f, 1.0f, 0.1f), TransformSpace::TS_LOCAL); // translate a tail relatively a object
-    TailGenerator* tailGen = tailNode->CreateComponent<TailGenerator>();
-    tailGen->SetTailLength(0.1f); // set segment length
-    tailGen->SetNumTails(50);     // set num of segments
-    tailGen->SetWidthScale(4.0f); // side scale
-    tailGen->SetColorForHead(Color(1.0f, 1.0f, 1.0f));
-    tailGen->SetColorForTip(Color(0.0f, 0.0f, 1.0f));
-    */
     RegisterDrawable<TailGenerator>(engine, "TailGenerator");
     engine->RegisterObjectMethod("TailGenerator", "void set_material(Material@+)", asMETHOD(TailGenerator, SetMaterial), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TailGenerator", "void set_tailLength(float)", asMETHOD(TailGenerator, SetTailLength), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TailGenerator", "void set_numTails(uint)", asMETHOD(TailGenerator, SetNumTails), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TailGenerator", "void set_widthScale(float)", asMETHOD(TailGenerator, SetWidthScale), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TailGenerator", "void set_colorForTip(const Color&in)", asMETHOD(TailGenerator, SetColorForTip), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TailGenerator", "void set_colorForHead(const Color&in)", asMETHOD(TailGenerator, SetColorForHead), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TailGenerator", "void set_endNodeName(const String&in)", asMETHOD(TailGenerator, SetEndNodeName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TailGenerator", "void set_width(float)", asMETHOD(TailGenerator, SetWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TailGenerator", "void set_tailNum(int)", asMETHOD(TailGenerator, SetTailNum), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TailGenerator", "void SetStartColor(const Color&in, const Color&in)", asMETHOD(TailGenerator, SetStartColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TailGenerator", "void SetEndColor(const Color&in, const Color&in)", asMETHOD(TailGenerator, SetEndColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TailGenerator", "void SetArcValue(float, float)", asMETHOD(TailGenerator, SetArcValue), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TailGenerator", "void set_relativePosition(bool)", asMETHOD(TailGenerator, SetRelativePosition), asCALL_THISCALL);
 #endif
 }
 

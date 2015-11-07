@@ -1,430 +1,497 @@
 #include "TailGenerator.h"
+#include "ExtUtil.h"
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Scene/SceneEvents.h>
+#include <Urho3D/DebugNew.h>
 
-TailGenerator::TailGenerator(Context* context) :
-                Drawable(context, DRAWABLE_GEOMETRY)
+namespace Urho3D
 {
-
-    matchNode_ = false;
-
-    geometry_ = SharedPtr<Geometry>(new Geometry(context));
-	vertexBuffer_ = SharedPtr<VertexBuffer>(new VertexBuffer(context));
-	indexBuffer_ = SharedPtr<IndexBuffer>(new IndexBuffer(context));
-
-    geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1);
-    geometry_->SetIndexBuffer(indexBuffer_);
-
-    indexBuffer_->SetShadowed(false);
-
-	transforms_[0] = Matrix3x4::IDENTITY;
-	transforms_[1] = Matrix3x4(Vector3::ZERO, Quaternion(0, 0, 0), Vector3::ONE);
-
-    batches_.Resize(1);
-    batches_[0].geometry_ = geometry_;
-    batches_[0].geometryType_ = GEOM_BILLBOARD;
-    batches_[0].worldTransform_ = &transforms_[0];
-	batches_[0].numWorldTransforms_ = 2;
-
-    forceUpdateVertexBuffer_ = false;
-    previousPosition_ = Vector3::ZERO;
-
-    tailNum_ = 10;
-    // for debug
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetMaterial(cache->GetResource<Material>("Materials/TailGenerator.xml"));
-    tailLength_ = 0.25f;
-    scale_ = 1.0f; // default side scale
-    tailTipColor = Color(1.0f, 1.0f, 1.0f, 1.0f);
-    tailHeadColor = Color(1.0f, 1.0f, 1.0f, 1.0f);
-
-    forceUpdateVertexBuffer_ = false;
-
-    bbmax = Vector3::ZERO;
-    bbmin = Vector3::ZERO;
-    vertical_ = horizontal_ = true;
-
+TailGenerator::TailGenerator(Context *context)
+    :CustomMesh(context)
+    ,width_(2.0f)
+    ,maxSegmentCount_(50)
+    ,rNextSegmentUpdate_(0)
+    ,rCurrentArcLength_(0)
+    ,vLastLastStart_(Vector3::ZERO)
+    ,vLastLastEnd_(Vector3::ZERO)
+    ,iNumIterations_(0)
+    ,rArcInc_(0.5f)
+    ,rMaxArc_(5.0f)
+{
+    segmentStartInitialColor_ = Color(0.6f,0.5f,0.8f,1);
+    segmentEndInitialColor_ = Color(1.0f,0.2f,1.0f,1);
+    segmentStartColorChange_ = Color(5.0f,5.0f,5.0f,20.0f);
+    segmentEndColorChange_ = Color(5.0f,5.0f,5.0f,20.0f);
+    relativePosition_ = false;
 }
 
 TailGenerator::~TailGenerator()
 {
+
 }
 
-void TailGenerator::RegisterObject(Context* context)
+void TailGenerator::RegisterObject(Context *context)
 {
     context->RegisterFactory<TailGenerator>();
-
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
-	URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
-	URHO3D_ACCESSOR_ATTRIBUTE("Segments", GetNumTails, SetNumTails, unsigned int, 10, AM_DEFAULT);
-	URHO3D_ACCESSOR_ATTRIBUTE("Length", GetTailLength, SetTailLength, float, 0.25f, AM_DEFAULT);
-	URHO3D_ACCESSOR_ATTRIBUTE("Width", GetWidthScale, SetWidthScale, float, 1.0f, AM_DEFAULT);
-	URHO3D_ACCESSOR_ATTRIBUTE("Start Color", GetColorForHead, SetColorForHead, Color, Color::WHITE, AM_DEFAULT);
-	URHO3D_ACCESSOR_ATTRIBUTE("End Color", GetColorForTip, SetColorForTip, Color, Color::WHITE, AM_DEFAULT);
-	URHO3D_ACCESSOR_ATTRIBUTE("Draw Vertical", GetDrawVertical, SetDrawVertical, bool, true, AM_DEFAULT);
-	URHO3D_ACCESSOR_ATTRIBUTE("Draw Horizontal", GetDrawHorizontal, SetDrawHorizontal, bool, true, AM_DEFAULT);
-	URHO3D_ACCESSOR_ATTRIBUTE("Match Node Rotation", GetMatchNodeOrientation, SetMatchNodeOrientation, bool, false, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
+#if 0
+    URHO3D_ATTRIBUTE("Width", float, width_, 0.8f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("MaxSegmentCount", int, maxSegmentCount_, 50, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("StartInitColor", Color, segmentStartInitialColor_, Color(0.8f,0.8f,0.8f,1), AM_DEFAULT);
+    URHO3D_ATTRIBUTE("EndInitColor", Color, segmentEndInitialColor_, Color(0.6f,0.5f,0.0f,1), AM_DEFAULT);
+    URHO3D_ATTRIBUTE("StartColorDelta", float, segmentStartColorChange_, Color(5.0f,5.0f,5.0f,20.0f), AM_DEFAULT);
+    URHO3D_ATTRIBUTE("EndColorDelta", float, segmentEndColorChange_, Color(5.0f,5.0f,5.0f,20.0f), AM_DEFAULT);
+    URHO3D_ATTRIBUTE("ArcIncrement", float, rArcInc_, 0.1f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("MaxArc", float, rMaxArc_, 10.0f, AM_DEFAULT);
+#endif
 }
 
-void TailGenerator::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
+
+void TailGenerator::HandleScenePostUpdate(StringHash eventType, VariantMap &eventData)
 {
-    // If no billboard-level testing, use the Drawable test
-    if (query.level_ < RAY_TRIANGLE)
+    using namespace ScenePostUpdate;
+    Update(eventData[P_TIMESTEP].GetFloat());
+}
+
+void TailGenerator::Update(float dt)
+{
+    if(!IsEnabledEffective() && segmentList_.Empty())
+        return;
+
+    UpdatePosition(false);
+    UpdateSegmentColour(dt);
+    UpdateSegmentCount(dt);
+    MarkDirty();
+}
+
+void TailGenerator::OnSceneSet(Scene* scene)
+{
+	if (scene && IsEnabledEffective())
+		SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(TailGenerator, HandleScenePostUpdate));
+	else if (!scene)
+		UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
+    CustomMesh::OnSceneSet(scene);
+}
+
+
+void TailGenerator::OnSetEnabled()
+{
+	Scene* scene = GetScene();
+	if (scene)
+	{
+		if (IsEnabledEffective())
+        {
+            UpdatePosition(true);
+			SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(TailGenerator, HandleScenePostUpdate));
+        }
+		else
+        {
+            ClearTrail();
+			UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
+        }
+	}
+    CustomMesh::OnSetEnabled();
+}
+
+void TailGenerator::UpdateSegmentColour(const float dt)
+{
+    // iterate over the current segments, apply alpha change
+    for(TrailSegmentList::Iterator it = segmentList_.Begin();
+        it != segmentList_.End();)
     {
-        Drawable::ProcessRayQuery(query, results);
+        TrailSegment& seg = (*it);
+        seg.segmentStartColor = SubColor(seg.segmentStartColor, segmentStartColorChange_ * dt);
+        seg.segmentEndColor = SubColor(seg.segmentEndColor, segmentEndColorChange_ * dt);
+        seg.segmentStartColor = SaturateColor(seg.segmentStartColor);
+        seg.segmentEndColor = SaturateColor(seg.segmentEndColor);
+        if(seg.segmentStartColor == Color(0,0,0,0)
+          && seg.segmentEndColor == Color(0,0,0,0))
+        {
+            it = segmentList_.Erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}
+
+void TailGenerator::UpdateSegmentCount(const float dt)
+{
+    const Vector3& vStart0 = vLastStartPosition_;
+    const Vector3& vEnd0 = vLastEndPosition_;
+
+    const Vector3& vStart1 = vStartPosition_;
+    const Vector3& vEnd1 = vEndPosition_;
+
+    //in the first two ierations we do not have sufficient information
+    //about the path of the weapon, ignore curve-fitting
+    if ( iNumIterations_ <= 1 )
+    {
+        AddSegment( vStart1, vEnd1 );
+        rCurrentArcLength_ = 0.0f;
+        vLastLastStart_ = vStart0;
+        vLastLastEnd_ = vEnd0;
+        ++iNumIterations_;
         return;
     }
-}
 
-void TailGenerator::Update(const FrameInfo &frame)
-{
-	Drawable::Update(frame);
-}
+    //compute the direction of the weapon ( from hilt to tip )
+    //for both this and last frame
+    Vector3 vDir0 = vEnd0 - vStart0;
+    Vector3 vDir1 = vEnd1 - vStart1;
+    float rRadius = width_;
+    float rInvRadius = 1/rRadius;
 
-void TailGenerator::UpdateTail()
-{
-    Vector3 wordPosition = node_->GetWorldPosition();
-    float path = (previousPosition_ - wordPosition).Length();
+    //normalize directions
+    vDir0 *= rInvRadius;
+    vDir1 *= rInvRadius;
 
-    if (path > tailLength_)
+    //compute vector from last tip position to current
+    Vector3 vMoveEnd = vEnd1 - vEnd0;
+
+    //compute the distance the tip is going to move this frame
+    float rMoveEndDistance = vMoveEnd.Length();
+
+    //temp store our prev arc distance
+    float rPrevArcLength = rCurrentArcLength_;
+    //compute rough estimate of arc distance
+    rCurrentArcLength_ += rMoveEndDistance;
+
+    //if we exceed the max arc length, draw normally
+    if ( rCurrentArcLength_ > rMaxArc_ )
     {
-        // новая точка пути
-        Tail newPoint;
-        newPoint.position = wordPosition;
-
-        Vector3 forwardmotion = matchNode_ ? GetNode()->GetWorldDirection() : (previousPosition_ - wordPosition).Normalized();
-        Vector3 rightmotion = matchNode_ ? GetNode()->GetWorldRight() : forwardmotion.CrossProduct(Vector3::UP);
-        rightmotion.Normalize();
-        newPoint.worldRight = rightmotion;
-        newPoint.forward = forwardmotion;
-
-        //forceBuildMeshInWorkerThread_ = true;
-        forceUpdateVertexBuffer_ = true;
-        previousPosition_ = wordPosition;
-        fullPointPath.Push(newPoint);    // Весь путь, все точки за все время работы компонента.
-        //knots.Push(wordPosition);        // Для сплайна опорные
+        AddSegment( vStart1, vEnd1 );
+        vLastLastStart_ = vStart0;
+        vLastLastEnd_ = vEnd0;
+        ++iNumIterations_;
+        return;
     }
-}
 
-void  TailGenerator::DrawDebugGeometry(DebugRenderer *debug, bool depthTest)
-{
-    Drawable::DrawDebugGeometry(debug, depthTest);
+    //****pre-compute local parabola of movement
+    // for lagrange interpolating polynomial****
 
-    debug->AddNode(node_);
+    //compute the distance and direction the tip moved in the last 2 frames
+    // ( = base of triangle )
 
-	if (fullPointPath.Empty())
-		return;
+    Vector3 vMoveEndBaseDir = vEnd1 - vLastLastEnd_;
 
-    for (unsigned i = 0; i < fullPointPath.Size()-1; i++)
+    vMoveEndBaseDir.Normalize();
+    //compute length of projection of vEnd0 onto vMoveEndBase
+    float rMidBaseLength = (vMoveEndBaseDir).DotProduct( vMoveEnd );
+    //Real rMidBaseLength = (-vMoveEndBaseDir).dotProduct( -vMoveEnd );
+
+    //project point vEnd0 onto vMoveEndBase
+    Vector3 vMidBase = vEnd1 + vMoveEndBaseDir * -rMidBaseLength;
+
+    //compute local up vector
+    Vector3 vMidBaseUp = vEnd0 - vMidBase;
+
+    vMidBaseUp.Normalize();
+
+    //compute local right vector
+    // right = forward x up
+    Vector3 vMidBaseRight = vMoveEndBaseDir.CrossProduct( vMidBaseUp );
+    vMidBaseRight.Normalize(); //TODO: is norm necessary?
+
+    //compute local curve-space matrix
+    Matrix3 xCurveRot;
+    xCurveRot.m00_ = vMoveEndBaseDir.x_;
+    xCurveRot.m10_ = vMoveEndBaseDir.y_;
+    xCurveRot.m20_ = vMoveEndBaseDir.z_;
+
+    xCurveRot.m01_ = vMidBaseUp.x_;
+    xCurveRot.m11_ = vMidBaseUp.y_;
+    xCurveRot.m21_ = vMidBaseUp.z_;
+
+    xCurveRot.m02_ = vMidBaseRight.x_;
+    xCurveRot.m12_ = vMidBaseRight.y_;
+    xCurveRot.m22_ = vMidBaseRight.z_;
+
+    Matrix4 xCurveSpace = Matrix4( xCurveRot );
+    xCurveSpace.SetTranslation(vMidBase );
+
+    //transform points of the parabola into local space
+    //( because the parabola MUST be a 1-to-1 function for Lagrange interp )
+    Vector3 vLocalEnd0 = WorldToLocal( xCurveSpace, vLastLastEnd_ );
+    Vector3 vLocalEnd1 = WorldToLocal( xCurveSpace, vEnd0 );
+    Vector3 vLocalEnd2 = WorldToLocal( xCurveSpace, vEnd1 );
+
+    //store parabola so lagrange function can easily access the data
+    float pArrayX[3], pArrayY[3];
+    pArrayX[0] = vLocalEnd0.x_;
+    pArrayX[1] = vLocalEnd1.x_;
+    pArrayX[2] = vLocalEnd2.x_;
+
+    pArrayY[0] = vLocalEnd0.y_;
+    pArrayY[1] = vLocalEnd1.y_;
+    pArrayY[2] = vLocalEnd2.y_;
+
+    float rCurArcInc = rArcInc_ - rPrevArcLength;
+
+    while ( rCurrentArcLength_ >= rArcInc_ )
     {
-        debug->AddLine(fullPointPath[i].position, fullPointPath[i+1].position, Color(1,1,1).ToUInt(), false );
+        //compute the ratio that we have moved along the approximated arc
+        float rMoveRatio = rCurArcInc / rMoveEndDistance;
+
+        //compute the local x movement along the parabola
+        float rMoveX = rMoveRatio * rMidBaseLength;
+
+        //compute the local y movement along the parabola
+        float rMoveY = LagrangeInterpolatingPolynomial( pArrayX, pArrayY, 3, rMoveX );
+
+        if ( rMoveY > rMoveEndDistance ) return;
+
+        //compute the point of the motion trail at the tip
+        Vector3 vEndPoint = vMidBase
+                            +   vMoveEndBaseDir * rMoveX
+                            +   vMidBaseUp * rMoveY;
+
+        //interp between the direction of our weapon last frame and this frame
+        Vector3 vDir = vDir0 + ( vDir1 - vDir0 ) * rMoveRatio;
+
+        //compute the point of the motion trail at the hilt
+        Vector3 vStartPoint = vEndPoint - vDir * rRadius;
+
+        //add the segment
+        AddSegment( vStartPoint, vEndPoint );
+
+        //decrement our current arc length value
+        rCurrentArcLength_ -= rArcInc_;
+
+        //increment our arc interpolation value
+        rCurArcInc += rArcInc_;
     }
+
+    //store prev position data
+    vLastLastStart_ = vStart0;
+    vLastLastEnd_ = vEnd0;
+
+    //increment iteration count
+    ++iNumIterations_;
 }
 
-void TailGenerator::UpdateBatches(const FrameInfo& frame)
+void TailGenerator::AddSegment(const Vector3 &vStart, const Vector3 &vEnd)
 {
-	// Update tail's mesh if needed
-	UpdateTail();
+    // throw away the last element if the maximum number of segments is used
+    if( segmentList_.Size() >= maxSegmentCount_ )
+    {
+        segmentList_.Pop();
+    }
 
-	// Update information for renderer about this drawable
-    distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
-    batches_[0].distance_ = distance_;
-
-    //batches_[0].numWorldTransforms_ = 2;
-
-    // TailGenerator positioning
-    //transforms_[0] = Matrix3x4::IDENTITY;
-    // TailGenerator rotation
-    //transforms_[1] = Matrix3x4(Vector3::ZERO, Quaternion(0, 0, 0), Vector3::ONE);
+    //add the segment
+    TrailSegment pNewSegment(   vEnd,
+                                vStart,
+                                segmentStartInitialColor_,
+                                segmentEndInitialColor_ );
+    segmentList_.PushFront(pNewSegment );
 }
 
-void TailGenerator::UpdateGeometry(const FrameInfo& frame)
+void TailGenerator::ClearTrail()
 {
-    if (bufferSizeDirty_ || indexBuffer_->IsDataLost())
-        UpdateBufferSize();
-
-    if (bufferDirty_ || vertexBuffer_->IsDataLost() || forceUpdateVertexBuffer_)
-        UpdateVertexBuffer(frame);
+    segmentList_.Clear();
+    rCurrentArcLength_ = 0;
+    iNumIterations_ = 0;
+    bufferDirty_ = false;
 }
 
-UpdateGeometryType TailGenerator::GetUpdateGeometryType()
+void TailGenerator::UpdatePosition(bool bReset)
 {
-    if (bufferDirty_ || bufferSizeDirty_ || vertexBuffer_->IsDataLost() || indexBuffer_->IsDataLost()|| forceUpdateVertexBuffer_)
-        return UPDATE_MAIN_THREAD;
+    if(bReset)
+    {
+        vStartPosition_ = node_->GetWorldPosition();
+        if(endNode_.NotNull())
+        {
+            vEndPosition_ = endNode_->GetWorldPosition();
+        }
+        else
+        {
+            vEndPosition_ = node_->LocalToWorld(Vector3(0,width_,0));
+        }
+        vLastStartPosition_ = vStartPosition_;
+        vLastEndPosition_ = vEndPosition_;
+    }
     else
-        return UPDATE_NONE;
+    {
+        vLastStartPosition_ = vStartPosition_;
+        vLastEndPosition_ = vEndPosition_;
+        vStartPosition_ = node_->GetWorldPosition();
+        if(endNode_.NotNull())
+        {
+            vEndPosition_ = endNode_->GetWorldPosition();
+        }
+        else
+        {
+            vEndPosition_ = node_->LocalToWorld(Vector3(0,width_,0));
+        }
+    }
 }
 
-void TailGenerator::SetMaterial(Material* material)
+void TailGenerator::MarkDirty()
 {
-    batches_[0].material_ = material;
-    MarkNetworkUpdate();
+    bufferDirty_ = true;
+    MarkForUpdate();
 }
 
-void TailGenerator::OnNodeSet(Node* node)
+void TailGenerator::UpdateVertexBuffer( const FrameInfo& frame )
 {
-    Drawable::OnNodeSet(node);
+    UpdateGeometry();
 }
 
 void TailGenerator::OnWorldBoundingBoxUpdate()
 {
-    //worldBoundingBox_.Define(-M_LARGE_VALUE, M_LARGE_VALUE);
-    worldBoundingBox_.Merge(bbmin);
-    worldBoundingBox_.Merge(bbmax);
-    worldBoundingBox_.Merge(node_->GetWorldPosition());
-
+    if (IsEnabledEffective())
+    {
+        Sphere sphere(node_->GetWorldPosition(), 5.0f);
+        worldBoundingBox_.Define(sphere);
+    }
+    else {
+        worldBoundingBox_.Clear();
+        worldBoundingBox_.Merge(node_->GetWorldPosition());
+    }
 }
 
-/// Resize TailGenerator vertex and index buffers.
-void TailGenerator::UpdateBufferSize()
+void TailGenerator::UpdateGeometry()
 {
-    unsigned numTails = tailNum_;
+    bufferDirty_ = false;
+    bufferSizeDirty_ = false;
 
-    if (!numTails)
+    if(!IsEnabledEffective())
         return;
 
-    int vertsPerSegment = (vertical_ && horizontal_ ? 4 : (!vertical_ && !horizontal_ ? 0 : 2));
-    int degenerateVertCt = 0;
-    if (vertsPerSegment > 2)
-        degenerateVertCt += 2; //requires two degenerate triangles
+    unsigned    iSegmentCount = 0;
+    unsigned    iSegmentSize = segmentList_.Size();
+    float       rInvSegmentSize = 1/(float)(iSegmentSize);
+    if(iSegmentSize < 2)
+        return;
 
-    if (vertexBuffer_->GetVertexCount() != (numTails * vertsPerSegment))
-    {
-        vertexBuffer_->SetSize((numTails * vertsPerSegment), MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
+    unsigned vNum = iSegmentSize * 2;
+    unsigned iNum = (iSegmentSize - 1) * 2 * 3;
+    if (vertexBuffer_->GetVertexCount() != vNum)
+        vertexBuffer_->SetSize(vNum, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 , true);
+    if (indexBuffer_->GetIndexCount() != iNum)
+        indexBuffer_->SetSize(iNum, false);
 
-    }
-    if (indexBuffer_->GetIndexCount() != (numTails * vertsPerSegment) + degenerateVertCt)
-    {
-        indexBuffer_->SetSize((numTails * vertsPerSegment) + degenerateVertCt, false);
-    }
+    batches_[0].geometry_->SetDrawRange(TRIANGLE_LIST, 0, iNum, false);
 
-    bufferSizeDirty_ = false;
-    bufferDirty_ = true;
-
-    // Indices do not change for a given tail generator capacity
-    unsigned short* dest = (unsigned short*)indexBuffer_->Lock(0, (numTails * vertsPerSegment) + degenerateVertCt, true);
+    float* dest = (float*)vertexBuffer_->Lock(0, vNum, true);
     if (!dest)
         return;
 
-    unsigned vertexIndex = 0;
-    if (horizontal_)
+    unsigned vertexSize = vertexBuffer_->GetVertexSize();
+
+    for (TrailSegmentList::Iterator iter = segmentList_.Begin();
+        iter != segmentList_.End();
+        ++iter)
     {
-        unsigned stripsLen = numTails;
-        while (stripsLen--)
-        {
+        TrailSegment& seg = *iter;
+        float u = iSegmentCount * rInvSegmentSize;
 
-            dest[0] = vertexIndex;
-            dest[1] = vertexIndex + 1;
-            dest += 2;
+        float* v0 = dest + (2*iSegmentCount+0)*vertexSize/4;
+        float* v1 = dest + (2*iSegmentCount+1)*vertexSize/4;
 
-            // degenerate triangle vert on horizontal
-            if (vertical_ && stripsLen == 0)
-            {
-                dest[0] = vertexIndex + 1;
-                dest += 1;
-            }
-            vertexIndex += 2;
-        }
+        Vector3 worldPt0 = seg.segmentStart;
+        Vector3 worldPt1 = seg.segmentEnd;
+        Vector3 pt0 = relativePosition_ ? InverseTransformPoint(worldPt0, node_) : worldPt0;
+        Vector3 pt1 = relativePosition_ ? InverseTransformPoint(worldPt1, node_) : worldPt1;
+        Vector2 uv0(u, 0);
+        *v0++ = pt0.x_;
+        *v0++ = pt0.y_;
+        *v0++ = pt0.z_;
+        *((unsigned*)v0) = seg.segmentStartColor.ToUInt(); v0++;
+        *v0++ = uv0.x_;
+        *v0++ = uv0.y_;
+
+        Vector2 uv1(u, 1);
+        *v1++ = pt1.x_;
+        *v1++ = pt1.y_;
+        *v1++ = pt1.z_;
+        *((unsigned*)v1) = seg.segmentEndColor.ToUInt(); v1++;
+        *v1++ = uv1.x_;
+        *v1++ = uv1.y_;
+
+        ++iSegmentCount;
     }
-    if (vertical_)
-    {
-        unsigned stripsLen = numTails;
-        while (stripsLen--)
-        {
-            // degenerate triangle vert on vertical
-            if (horizontal_ && stripsLen == (numTails - 1))
-            {
-                dest[0] = vertexIndex;
-                dest += 1;
-            }
 
-            dest[0] = vertexIndex;
-            dest[1] = vertexIndex + 1;
-            dest += 2;
-            vertexIndex += 2;
-        }
+    vertexBuffer_->Unlock();
+    vertexBuffer_->ClearDataLost();
+
+
+    unsigned short* iDest = (unsigned short*)indexBuffer_->Lock(0, iNum, true);
+    if (!iDest)
+        return;
+
+    for (unsigned i=0;i<iNum/6;++i)
+    {
+        iDest[i * 6 + 0] = i * 2;
+        iDest[i * 6 + 1] = i * 2 + 1;
+        iDest[i * 6 + 2] = i * 2 + 2;
+        iDest[i * 6 + 3] = i * 2 + 2;
+        iDest[i * 6 + 4] = i * 2 + 1;
+        iDest[i * 6 + 5] = i * 2 + 3;
     }
 
     indexBuffer_->Unlock();
     indexBuffer_->ClearDataLost();
 
-
 }
 
-/// Rewrite TailGenerator vertex buffer.
-void TailGenerator::UpdateVertexBuffer(const FrameInfo& frame)
+void TailGenerator::SetEndNodeName(const String& name)
 {
-    unsigned fullPointPathSize = fullPointPath.Size();
-    unsigned currentVisiblePathSize = tailNum_;
-
-    // Clear previous mesh data
-    tailMesh.Clear();
-
-    // build tail
-
-    // if tail path is short and nothing to draw, exit
-    if (fullPointPathSize < 2) return;
-
-    activeTails.Clear();
-
-    unsigned min_i = fullPointPathSize < currentVisiblePathSize ? 0 : fullPointPathSize - currentVisiblePathSize;
-    // Step 1 : collect actual point's info for build tail path
-    for (unsigned i = min_i; i < fullPointPathSize - 1; i++)
-    {
-        activeTails.Push(fullPointPath[i]);
-
-        Vector3 &p = fullPointPath[i].position;
-
-        // Math BoundingBox based on actual point
-        if (p.x_ < bbmin.x_) bbmin.x_ = p.x_;
-        if (p.y_ < bbmin.y_) bbmin.y_ = p.y_;
-        if (p.z_ < bbmin.z_) bbmin.z_ = p.z_;
-
-        if (p.x_ > bbmax.x_) bbmax.x_ = p.x_;
-        if (p.y_ > bbmax.y_) bbmax.y_ = p.y_;
-        if (p.z_ > bbmax.z_) bbmax.z_ = p.z_;
-
-    }
-
-    if (activeTails.Size() < 2) return;
-
-    Vector<Tail> &t = activeTails;
-
-    // generate strips of tris
-    TailVertex v;
-
-    float mixFactor = 1.0f / activeTails.Size();
-
-
-    // Forward part of tail (strip in xz plane)
-    if (horizontal_)
-    {
-        for (unsigned i = 0; i < activeTails.Size() || i < tailNum_; ++i)
-        {
-            unsigned sub = i < activeTails.Size() ? i : activeTails.Size() - 1;
-            Color c = tailTipColor.Lerp(tailHeadColor, mixFactor * i);
-            v.color_ = c.ToUInt();
-            v.uv_ = Vector2(1.0f, 0.0f);
-            v.position_ = t[sub].position + t[sub].worldRight * scale_;
-            tailMesh.Push(v);
-
-            //v.color_ = c.ToUInt();
-            v.uv_ = Vector2(0.0f, 1.0f);
-            v.position_ = t[sub].position - t[sub].worldRight * scale_;
-            tailMesh.Push(v);
-        }
-    }
-
-    // Upper part of tail (strip in xy-plane)
-    if (vertical_)
-    {
-        for (unsigned i = 0; i < activeTails.Size() || i < tailNum_; ++i)
-        {
-            unsigned sub = i < activeTails.Size() ? i : activeTails.Size() - 1;
-            Color c = tailTipColor.Lerp(tailHeadColor, mixFactor * i);
-            v.color_ = c.ToUInt();
-            v.uv_ = Vector2(1.0f, 0.0f);
-            Vector3 up = t[sub].forward.CrossProduct(t[sub].worldRight);
-            up.Normalize();
-            v.position_ = t[sub].position + up * scale_;
-            tailMesh.Push(v);
-
-            //v.color_ = c.ToUInt();
-            v.uv_ = Vector2(0.0f, 1.0f);
-            v.position_ = t[sub].position - up * scale_;
-            tailMesh.Push(v);
-
-        }
-    }
-
-
-    // copy new mesh to vertex buffer
-    unsigned meshVertexCount = tailMesh.Size();
-    batches_[0].geometry_->SetDrawRange(TRIANGLE_STRIP, 0, meshVertexCount + (horizontal_ && vertical_ ? 2 : 0), false);
-    // get pointer
-    TailVertex* dest = (TailVertex*)vertexBuffer_->Lock(0, meshVertexCount, true);
-    if (!dest)
-        return;
-    // copy to vertex buffer
-    memcpy(dest, &tailMesh[0], tailMesh.Size() * sizeof(TailVertex));
-
-    vertexBuffer_->Unlock();
-    vertexBuffer_->ClearDataLost();
-
-    bufferDirty_ = false;
-
-    // unmark flag
-    forceUpdateVertexBuffer_ = false;
+    endNode_ = node_->GetChild(name, true);
 }
 
-
-void TailGenerator::SetTailLength(float length)
+void TailGenerator::SetWidth(float width)
 {
-
-    tailLength_ = length;
+    width_ = width;
 }
 
-void TailGenerator::SetColorForTip(const Color& c)
+void TailGenerator::SetTailNum(int num)
 {
-    tailTipColor = Color(c.r_, c.g_, c.b_, 0.0f);
+    maxSegmentCount_ = num;
 }
 
-void TailGenerator::SetColorForHead(const Color& c)
+void TailGenerator::SetStartColor(const Color& startInitColor, const Color& startDeltaColor)
 {
-    tailHeadColor = Color(c.r_, c.g_, c.b_, 1.0f);
+    segmentStartInitialColor_ = startInitColor;
+    segmentStartColorChange_ = startDeltaColor;
 }
 
-void TailGenerator::SetNumTails(unsigned num)
+void TailGenerator::SetEndColor(const Color& endInitColor, const Color& endDeltaColor)
 {
-    // Prevent negative value being assigned from the editor
-    if (num > M_MAX_INT)
-        num = 0;
-
-    if (num > MAX_TAILS)
-        num = MAX_TAILS;
-
-    bufferSizeDirty_ = true;
-    tailNum_ = num;
+    segmentEndInitialColor_ = endInitColor;
+    segmentEndColorChange_ = endDeltaColor;
 }
 
-unsigned TailGenerator::GetNumTails()
+void TailGenerator::SetArcValue(float arcInc, float maxArc)
 {
-    return tailNum_;
+    rArcInc_ = arcInc;
+    rMaxArc_ = maxArc;
 }
 
-void TailGenerator::SetDrawVertical(bool value)
+void TailGenerator::SetRelativePosition(bool b)
 {
-    vertical_ = value;
-    //SetupBatches();
+    relativePosition_ = b;
 }
 
-void TailGenerator::SetDrawHorizontal(bool value)
-{
-    horizontal_ = value;
-    //SetupBatches();
 }
 
-void TailGenerator::SetMatchNodeOrientation(bool value)
-{
-    matchNode_ = value;
-}
 
-void TailGenerator::MarkPositionsDirty()
-{
-    Drawable::OnMarkedDirty(node_);
-    bufferDirty_ = true;
-}
 
-void TailGenerator::SetMaterialAttr(const ResourceRef& value)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetMaterial(cache->GetResource<Material>(value.name_));
-}
 
-ResourceRef TailGenerator::GetMaterialAttr() const
-{
-    return GetResourceRef(batches_[0].material_, Material::GetTypeStatic());
-}
 
-void TailGenerator::SetWidthScale(float scale)
-{
-    scale_ = scale;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

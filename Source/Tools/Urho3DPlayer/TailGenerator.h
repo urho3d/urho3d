@@ -1,156 +1,105 @@
-#pragma once
-#include <Urho3D/Core/Context.h>
-#include <Urho3D/Scene/Node.h>
-#include <Urho3D/Resource/ResourceCache.h>
-#include <Urho3D/Graphics/OctreeQuery.h>
-#include <Urho3D/Graphics/VertexBuffer.h>
-#include <Urho3D/Graphics/IndexBuffer.h>
-#include <Urho3D/Graphics/Geometry.h>
-#include <Urho3D/Graphics/Drawable.h>
-#include <Urho3D/Graphics/DebugRenderer.h>
-#include <Urho3D/Graphics/Camera.h>
-#include <Urho3D/Graphics/Material.h>
+#include <Urho3D/Container/List.h>
+#include "CustomMesh.h"
 
-using namespace Urho3D;
-
-/// Vertex struct for tail
-struct URHO3D_API TailVertex
+namespace Urho3D
 {
-    Vector3 position_;
-    unsigned color_;
-    Vector2  uv_;
-};
-
-/// One billboard in the billboard set.
-struct URHO3D_API Tail
+class TailGenerator : public CustomMesh
 {
-    /// Position.
-    Vector3 position;
-    Vector3 worldRight;
-    Vector3 forward;
-};
-
-static const unsigned MAX_TAILS = 65536 / 6;
-
-/// Custom component that creates a tail
-class URHO3D_API TailGenerator : public Drawable
-{
-	URHO3D_OBJECT(TailGenerator, Drawable);
+    URHO3D_OBJECT(TailGenerator, Drawable);
 public:
-    /// Construct.
     TailGenerator(Context* context);
-    /// Destruct.
-    virtual ~TailGenerator();
-    /// Register object factory.
-    static void RegisterObject(Context* context);
-    /// Process octree raycast. May be called from a worker thread.
-    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
-    ///
-    virtual void Update(const FrameInfo &frame);
-    /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame);
-    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
-    virtual void UpdateGeometry(const FrameInfo& frame);
-    /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
-    virtual UpdateGeometryType GetUpdateGeometryType();
+    ~TailGenerator();
+    static void RegisterObject(Context *context);
 
-    virtual void  DrawDebugGeometry(DebugRenderer *debug, bool depthTest);
-
-    /// Set material.
-    void SetMaterial(Material* material);
-    /// Set tail segment length
-    void SetTailLength(float length);
-    /// Get tail segment length
-    float GetTailLength();
-    /// Set count segments of all tail
-    void SetNumTails(unsigned num);
-    /// Get count segments of all tail
-    unsigned GetNumTails();
-    /// Set width scale of the tail
-    void SetWidthScale(float scale);
-    /// Set vertex blended color for tip of all tail. The alpha-value of new color resets by default to zero.
-    void SetColorForTip(const Color& c);
-    // Set vertex blended color for head of all tail. The alpha-value of new color resets by default to one.
-    void SetColorForHead(const Color& c);
-    /// Set material attribute.
-    void SetMaterialAttr(const ResourceRef& value);
-    /// Return material attribute.
-    ResourceRef GetMaterialAttr() const;
-
-    /// Get whether to draw the vertical strip or not
-    bool GetDrawVertical() const { return vertical_; }
-    /// Get whether to draw the horizontal strip or not
-    bool GetDrawHorizontal() const { return horizontal_; }
-    /// Get whether or not this tail is matching node direction vectors
-    bool GetMatchNodeOrientation() const { return matchNode_; }
-    /// Set whether to draw the vertical strip or not
-    void SetDrawVertical(bool value);
-    /// Set whether to draw the horizontal strip or not
-    void SetDrawHorizontal(bool value);
-    /// Set whether or not this tail is matching node direction vectors
-    void SetMatchNodeOrientation(bool value);
-	///
-    float GetWidthScale() const { return scale_; }
-    unsigned  GetNumTails() const { return tailNum_; }
-    float GetTailLength() const { return tailLength_;  }
-    const Color& GetColorForHead() const { return tailHeadColor; }
-    const Color& GetColorForTip() const { return tailTipColor;  }
-
-protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
-    /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate();
-    /// Mark vertex buffer to need an update.
-    void MarkPositionsDirty();
-    /// Tails.
-    PODVector<Tail> fullPointPath;
+    void SetEndNodeName(const String& name);
+    void SetWidth(float width);
+    void SetTailNum(int num);
+    void SetStartColor(const Color& startInitColor, const Color& startDeltaColor);
+    void SetEndColor(const Color& endInitColor, const Color&endDeltaColor);
+    void SetArcValue(float arcInc, float maxArc);
+    void SetRelativePosition(bool b);
 
 private:
-    /// Resize TailGenerator vertex and index buffers.
-    void UpdateBufferSize();
-    /// Rewrite TailGenerator vertex buffer.
-    void UpdateVertexBuffer(const FrameInfo& frame);
-	/// Update/Rebuild tail mesh only if position changed (called by UpdateBatches())
-	void UpdateTail();
-    /// Geometry.
-    SharedPtr<Geometry> geometry_;
-    /// Vertex buffer.
-    SharedPtr<VertexBuffer> vertexBuffer_;
-    /// Index buffer.
-    SharedPtr<IndexBuffer> indexBuffer_;
-    /// Transform matrices for position and orientation.
-    Matrix3x4 transforms_[2];
-    /// Buffers need resize flag.
-    bool bufferSizeDirty_;
-    /// Vertex buffer needs rewrite flag.
-    bool bufferDirty_;
-	///
-	bool forceUpdateVertexBuffer_;
-	///
-	bool vertical_;
-	///
-	bool matchNode_;
-	///
-	bool horizontal_;
-    /// Previous position of tail
-    Vector3 previousPosition_;
-    ///
-	float tailLength_;
-    ///
-	float scale_;
-	///
-	unsigned tailNum_;
-	///
-    Vector<TailVertex> tailMesh;
-    ///
-	Vector<Tail> activeTails;
-	///
-	Vector3 bbmin;
-	///
-	Vector3 bbmax;
-	///
-    Color tailTipColor;
-    ///
-	Color tailHeadColor;
+    void Update(float dt);
+    void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
+    void UpdateGeometry();
+    void UpdateSegmentColour( const float dt );
+    void UpdateSegmentCount( const float dt );
+    void AddSegment( const Vector3& vStart, const Vector3& vEnd );
+    void UpdatePosition(bool bReset);
+    void MarkDirty();
+    void ClearTrail();
+
+    virtual void UpdateVertexBuffer(const FrameInfo& frame);
+    virtual void OnWorldBoundingBoxUpdate();
+	virtual void OnSetEnabled();
+	virtual void OnSceneSet(Scene* scene);
+
+private:
+    /// public attributes
+    float                           width_;
+
+    /// a trail segment
+    struct TrailSegment
+    {
+        /// start position
+        Vector3 segmentStart;
+        /// end position
+        Vector3 segmentEnd;
+        /// current segment start color
+        Color segmentStartColor;
+        /// current segment end color
+        Color segmentEndColor;
+        TrailSegment() {};
+        TrailSegment( const Vector3& v1,
+                      const Vector3& v2,
+                      const Color& ssc,
+                      const Color& sec )
+                    :
+                    segmentStart(v1),
+                    segmentEnd(v2),
+                    segmentStartColor(ssc),
+                    segmentEndColor(sec)
+                {
+                };
+    }; // end TrailSegment struct declaration
+    /// typedef for a list of trail segments
+    typedef List<TrailSegment> TrailSegmentList;
+
+    ///!< the maximum number of segments the trail will consist of
+    size_t                      maxSegmentCount_;
+    /// the list of currently active trail segments
+    TrailSegmentList            segmentList_;
+
+    /// the initial color of start segments
+    Color segmentStartInitialColor_;
+    /// the initial color of end segments
+    Color segmentEndInitialColor_;
+    /// how the color of start segments will change over time
+    Color segmentStartColorChange_;
+    /// how the color of end segments will change over time
+    Color segmentEndColorChange_;
+
+    ///when to add another segment
+    float   rNextSegmentUpdate_;
+    ///our arc-length rollover from the previous frame
+    float   rCurrentArcLength_;
+
+    ///weapon start two frames ago ( for lagrange poly )
+    Vector3 vLastLastStart_;
+    Vector3 vLastLastEnd_;
+    int     iNumIterations_;
+
+    float   rArcInc_;
+    float   rMaxArc_;
+
+
+    Vector3 vStartPosition_;
+    Vector3 vEndPosition_;
+    Vector3 vLastStartPosition_;
+    Vector3 vLastEndPosition_;
+
+    WeakPtr<Node>       endNode_;
+    String              endNodeName_;
 };
+}
