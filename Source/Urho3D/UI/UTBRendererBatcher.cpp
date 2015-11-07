@@ -53,8 +53,7 @@ UTBBitmap::UTBBitmap(Context *_context, int _width, int _height)
     texture_->SetNumLevels( 1 );
     texture_->SetSize( width_, height_, Graphics::GetRGBAFormat() );
 
-    // set color and uv modes
-    texture_->SetBorderColor( Color::TRANSPARENT );
+    // set uv modes
     texture_->SetAddressMode( COORD_U, ADDRESS_WRAP );
     texture_->SetAddressMode( COORD_V, ADDRESS_WRAP );
 }
@@ -118,70 +117,11 @@ void UTBRendererBatcher::Init(const String &_strDataPath)
     tb_core_init( this );
     TBWidgetsAnimationManager::Init();
 
-    // load resources
-    LoadDefaultResources();
-
     // map keys
     CreateKeyMap();
 
     // register handlers
     RegisterHandlers();
-}
-
-//=============================================================================
-//=============================================================================
-void UTBRendererBatcher::LoadDefaultResources()
-{
-    g_tb_lng->Load("resources/language/lng_en.tb.txt");
-
-    // Load the default skin, and override skin that contains the graphics specific to the demo.
-    g_tb_skin->Load("resources/default_skin/skin.tb.txt", "demo01/skin/skin.tb.txt");
-
-#ifdef TB_FONT_RENDERER_TBBF
-    void register_tbbf_font_renderer();
-    register_tbbf_font_renderer();
-#endif
-#ifdef TB_FONT_RENDERER_STB
-    void register_stb_font_renderer();
-    register_stb_font_renderer();
-#endif
-#ifdef TB_FONT_RENDERER_FREETYPE
-    void register_freetype_font_renderer();
-    register_freetype_font_renderer();
-#endif
-
-    // Add fonts we can use to the font manager.
-#if defined(TB_FONT_RENDERER_STB) || defined(TB_FONT_RENDERER_FREETYPE)
-    g_font_manager->AddFontInfo("resources/vera.ttf", "Vera");
-#endif
-#ifdef TB_FONT_RENDERER_TBBF
-    g_font_manager->AddFontInfo("resources/default_font/segoe_white_with_shadow.tb.txt", "Segoe");
-    g_font_manager->AddFontInfo("fonts/neon.tb.txt", "Neon");
-    g_font_manager->AddFontInfo("fonts/orangutang.tb.txt", "Orangutang");
-    g_font_manager->AddFontInfo("fonts/orange.tb.txt", "Orange");
-#endif
-
-    // Set the default font description for widgets to one of the fonts we just added
-    TBFontDescription fd;
-#ifdef TB_FONT_RENDERER_TBBF
-    fd.SetID(TBIDC("Segoe"));
-#else
-    fd.SetID(TBIDC("Vera"));
-#endif
-    fd.SetSize(g_tb_skin->GetDimensionConverter()->DpToPx(14));
-    g_font_manager->SetDefaultFontDescription(fd);
-
-    // Create the font now.
-    TBFontFace *font = g_font_manager->CreateFontFace(g_font_manager->GetDefaultFontDescription());
-
-    // Render some glyphs in one go now since we know we are going to use them. It would work fine
-    // without this since glyphs are rendered when needed, but with some extra updating of the glyph bitmap.
-    if ( font )
-    {
-        font->RenderGlyphs(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ХЈедц≈ƒ÷");
-    }
-
-    root_.SetSkinBg( TBIDC( "background" ) );
 }
 
 //=============================================================================

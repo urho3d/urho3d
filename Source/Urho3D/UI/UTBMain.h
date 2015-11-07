@@ -31,6 +31,9 @@ public:
     // demo - if configured as demo
     void RunDemo();
 
+    // tbwidget access
+    TBWidget& Root();
+
     // language methods
     virtual bool SetLanguage(const String &_strLang);
     virtual const String& GetLanguageSetting();
@@ -43,7 +46,8 @@ public:
     virtual bool SetSkinBackground(const String &_strSkinName);
 
 protected:
-    virtual void InitLanguage();
+    virtual void CreateLanguageMap();
+    virtual void LoadDefaultResources();
 
 protected:
     String                  strDataPath_;
