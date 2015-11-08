@@ -21,6 +21,8 @@
 //
 #include <Urho3D/Urho3D.h>
 #include <Urho3D/UI/UTBMain.h>
+#include <Urho3D/UI/UTBRendererBatcher.h>
+#include <TurboBadger/tb_message_window.h>
 
 #include "TBDemo.h"
 
@@ -36,6 +38,7 @@ URHO3D_DEFINE_APPLICATION_MAIN(TBDemo)
 TBDemo::TBDemo(Context* context)
     : Sample(context)
     , pUTBMain_( NULL )
+    , pTBListener_( NULL )
 {
 }
 
@@ -47,6 +50,12 @@ TBDemo::~TBDemo()
     {
         pUTBMain_->Remove();
         pUTBMain_ = NULL;
+    }
+
+    if ( pTBListener_ )
+    {
+        delete pTBListener_;
+        pTBListener_ = NULL;
     }
 }
 
@@ -82,7 +91,85 @@ void TBDemo::Start()
     Graphics *graphics = GetSubsystem<Graphics>();
     pUTBMain_ = new UTBMain( GetContext(), graphics->GetWidth(), graphics->GetHeight() );
     pUTBMain_->Init( "Data/TB/" );
-    pUTBMain_->RunDemo();
+
+    // create a msg win
+    pTBListener_ = new UTBListener( GetContext() );
+    pTBListener_->CreateMsgWindow();
+
+    SubscribeToEvent(E_TBMSG, URHO3D_HANDLER(TBDemo, HandleTBMessage));
 }
 
+void TBDemo::HandleTBMessage(StringHash eventType, VariantMap& eventData)
+{
+    using namespace TBMessageNamespace;
+
+    TBWidget *pTBWidget = (TBWidget*)eventData[P_TBWIDGET].GetVoidPtr();
+
+    if ( pTBListener_->GetTBMessageWidget() == pTBWidget )
+    {
+        pUTBMain_->RunDemo();
+    }
+}
+
+//=============================================================================
+//=============================================================================
+UTBListener::UTBListener(Context *context)
+    : Object( context )
+    , pTBMessageWindow_( NULL )
+{
+}
+
+UTBListener::~UTBListener()
+{
+    if ( pTBMessageWindow_ )
+    {
+        pTBMessageWindow_ = NULL;
+    }
+}
+
+void UTBListener::CreateMsgWindow()
+{
+#ifdef URHO3D_TB_DEMO
+    TBStr text("\nHellow World from Turbo Badger.\n\nClick OK to get started.");
+#else
+    TBStr text("\nHellow World\n\n-DURHO3D_TB_DEMO=1 missing in the build option\n");
+#endif
+    pTBMessageWindow_ = new TBMessageWindow( &UTBRendererBatcher::Singleton().Root(), TBIDC("") );
+    pTBMessageWindow_->Show("Start Message", text);
+
+    TBWidgetListener::AddGlobalListener( this );
+}
+
+void UTBListener::OnWidgetRemove(TBWidget *parent, TBWidget *child)
+{
+    if ( pTBMessageWindow_ == child )
+    {
+        TBWidgetListener::RemoveGlobalListener( this );
+    }
+}
+
+bool UTBListener::OnWidgetInvokeEvent(TBWidget *widget, const TBWidgetEvent &ev) 
+{ 
+    if ( pTBMessageWindow_ && pTBMessageWindow_ == ev.target )
+    {
+        if ( ev.type == EVENT_TYPE_CLICK )
+        {
+            TBWidgetListener::RemoveGlobalListener( this );
+
+            SendEventMsg();
+        }
+    }
+
+    return false; 
+}
+
+void UTBListener::SendEventMsg()
+{
+    using namespace TBMessageNamespace;
+
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_TBWIDGET] = GetTBMessageWidget();
+
+    SendEvent( E_TBMSG, eventData );
+}
 

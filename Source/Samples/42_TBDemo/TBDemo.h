@@ -29,6 +29,46 @@ namespace Urho3D
 class UTBMain;
 }
 
+namespace tb
+{
+class TBMessageWindow;
+}
+
+using namespace tb;
+using namespace Urho3D;
+
+//=============================================================================
+URHO3D_EVENT(E_TBMSG, TBMessageNamespace)
+{
+    URHO3D_PARAM(P_TBWIDGET, Widget);  // TBWidget pointer
+}
+
+//=============================================================================
+//=============================================================================
+class UTBListener : public Object, public TBWidgetListener
+{
+    URHO3D_OBJECT(UTBListener, Object);
+public:
+    UTBListener(Context *context);
+
+    ~UTBListener();
+
+    void CreateMsgWindow();
+	virtual void OnWidgetRemove(TBWidget *parent, TBWidget *child);
+	virtual bool OnWidgetInvokeEvent(TBWidget *widget, const TBWidgetEvent &ev);
+
+    TBWidget* GetTBMessageWidget()
+    {
+        return (TBWidget*)pTBMessageWindow_;
+    }
+protected:
+    void SendEventMsg();
+
+protected:
+    TBMessageWindow     *pTBMessageWindow_;
+
+};
+
 //=============================================================================
 //=============================================================================
 /// Database demo. This sample demonstrates how to use database subsystem to connect to a database and execute adhoc SQL statements.
@@ -47,6 +87,8 @@ public:
     virtual void Start();
 
 protected:
+    void HandleTBMessage(StringHash eventType, VariantMap& eventData);
+
     /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
     virtual String GetScreenJoystickPatchString() const { return
         "<patch>"
@@ -59,5 +101,6 @@ protected:
         "</patch>";
     }
 
-    SharedPtr<UTBMain> pUTBMain_;
+    SharedPtr<UTBMain>  pUTBMain_;
+    UTBListener         *pTBListener_;
 };
