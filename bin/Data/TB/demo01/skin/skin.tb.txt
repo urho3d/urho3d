@@ -1,0 +1,74 @@
+# Demo skin override (contains some additions for the demo)
+elements
+	Icon16
+		bitmap icon16.png
+		min-width 16
+		min-height 16
+	Icon48
+		bitmap icon48.png
+			cut 4
+		min-width 20
+		min-height 20
+	Icon128
+		bitmap icon128.png
+	background
+		bitmap bg_tile.png
+		type Tile
+	background_solid
+		background-color #3b3b3b
+		padding 10
+	SpecialButton
+		bitmap special_button.png
+		cut 17
+		expand 7
+		padding 6 8
+		overrides
+			element SpecialButton.pressed
+				state pressed
+		overlays
+			element generic_focus_r8
+				state focused
+			element Star
+				condition: target: ancestors, property: skin, value: "Starry buttons"
+	SpecialButton.pressed
+		bitmap special_button_pressed.png
+		cut 17
+		expand 7
+		content-ofs-x 1
+		content-ofs-y 1
+	ImageCaption
+		background-color #00000066
+	ImageFrame
+		overlays
+			element ImageFrame.overlay
+				state all
+	ImageFrame.overlay
+		bitmap image_frame.png
+		cut 22
+		expand 15
+	Remove
+		bitmap remove.png
+		type Image
+		padding 5
+	Star
+		bitmap star_gray.png
+		type Image
+		img-position-x 0
+		img-position-y 0
+		img-ofs-x -8
+		img-ofs-y -12
+		overrides
+			element Star.active
+				condition: target: this, property: "window active"
+				condition: target: parent, property: hover
+	Star.active
+		bitmap star_gold.png
+		type Image
+		img-position-x 0
+		img-position-y 0
+		img-ofs-x -10
+		img-ofs-y -14
+	generic_focus_r8
+		bitmap focus_r8.png
+		cut 14
+		expand 4

@@ -1,0 +1,464 @@
+# This is the default skin of Turbo Badger
+# The license of the skin is Public Domain.
+#
+# For more information about Turbo Badger and its license,
+# see tb_core.h.
+description
+	name Turbo Badger Default skin
+	# Dimensions in dp (the default unit for padding and such) and bitmaps are specified for this DPI.
+	base-dpi 96
+	# The skin also has graphics available in these DPI modes
+	supported-dpi 96 192 288 384
+defaults
+	spacing 5
+	text-color #fefefe
+	placeholder
+		opacity 0.2
+	disabled
+		opacity 0.3
+elements
+	TBButton
+		text-color #fefefe
+		bitmap button.png
+		cut 17
+		expand 7
+		padding 6 8
+		overrides
+			element TBButtonInGroup
+				condition: target: parent, property: skin, value: button_group
+				condition: target: parent, property: axis, value: x
+			element TBButton.pressed
+				state pressed
+	TBButton.pressed
+		text-color #fefefe
+		bitmap button_pressed.png
+		cut 17
+		expand 7
+		content-ofs-x 1
+		content-ofs-y 1
+
+	TBButton.flat
+		text-color #fefefe
+		padding 6 8
+		children
+			element TBButton.flat.hovered
+				state hovered
+			element TBButton.flat.pressed
+				state pressed
+	TBButton.flat.hovered
+		bitmap button_flat_outline.png
+		cut 15
+		expand 6
+	TBButton.flat.pressed
+		bitmap button_flat_pressed.png
+		cut 8
+
+	# == TBButtonInGroup is not a widget. It's only used as override for TBButton under a "button_group" ====
+	TBButtonInGroup
+		bitmap button_grouped_x_middle_up.png
+		cut 17
+		expand 7
+		padding 6 8
+		overrides
+			element TBButtonInGroup.first
+				condition: target: prev sibling, property: skin, value: TBButton, test: !=
+			element TBButtonInGroup.last
+				condition: target: next sibling, property: skin, value: TBButton, test: !=
+			element TBButtonInGroup.pressed
+				state pressed
+	TBButtonInGroup.pressed
+		clone TBButtonInGroup
+		bitmap button_grouped_x_middle_down.png
+		content-ofs-x 1
+		content-ofs-y 1
+		overrides
+	TBButtonInGroup.first
+		clone TBButtonInGroup
+		bitmap button_grouped_x_first_up.png
+		overrides
+			element TBButtonInGroup.first.pressed
+				state pressed
+	TBButtonInGroup.first.pressed
+		clone TBButtonInGroup.pressed
+		bitmap button_grouped_x_first_down.png
+		overrides
+	TBButtonInGroup.last
+		clone TBButtonInGroup
+		bitmap button_grouped_x_last_up.png
+		overrides
+			element TBButtonInGroup.last.pressed
+				state pressed
+	TBButtonInGroup.last.pressed
+		clone TBButtonInGroup.pressed
+		bitmap button_grouped_x_last_down.png
+		overrides
+
+	# == button_group is not a widget. It's specified on widgets that should group TBButton =======
+	button_group
+		spacing -1px
+
+	# == TBSection skins ==========================================================================
+	TBSection.layout
+		spacing -1px
+	TBSection.container
+		bitmap TBSectionContainer.png
+		type StretchBorder
+		cut 11
+		expand 6
+		padding 10
+	TBSectionHeader
+		bitmap window_mover_bg_tile.png
+		type Tile
+		expand -1
+		padding 3 16
+		children
+			element TBSectionHeader.icon_0
+				condition: target: this, property: value, value: 0
+				condition: target: this, property: capture, test: !=
+			element TBSectionHeader.icon_1
+				condition: target: this, property: value, value: 1
+				condition: target: this, property: capture, test: !=
+			element TBSectionHeader.icon_pressed
+				condition: target: this, property: capture
+		overlays
+			element TBSectionHeader.overlay
+				state all
+	TBSectionHeader.overlay
+		bitmap window_mover_overlay.png
+		type StretchBorder
+		cut 16
+		expand 3
+	TBSectionHeader.icon_0
+		bitmap toggle_section_icon_up.png
+		type Image
+		img-position-x 0
+		img-ofs-x 4
+	TBSectionHeader.icon_1
+		bitmap toggle_section_icon_down.png
+		type Image
+		img-position-x 0
+		img-ofs-x 4
+	TBSectionHeader.icon_pressed
+		bitmap toggle_section_icon_middle.png
+		type Image
+		img-position-x 0
+		img-ofs-x 4
+
+	# == TBTabContainer skins - Create strong overrides for the tab buttons four alignments ============
+	TBTabContainer.rootlayout
+		spacing -1px
+	TBTabContainer.tablayout_x
+		padding 0 10
+	TBTabContainer.tablayout_y
+		padding 10 0
+	TBTabContainer.container
+		clone TBContainer
+	TBTabContainer.tab
+		strong-overrides
+			element TBTabContainer.tab_top
+				condition: target: ancestors, property: align, value: top
+			element TBTabContainer.tab_bottom
+				condition: target: ancestors, property: align, value: bottom
+			element TBTabContainer.tab_left
+				condition: target: ancestors, property: align, value: left
+			element TBTabContainer.tab_right
+				condition: target: ancestors, property: align, value: right
+	# == Top tab button =============================
+	TBTabContainer.tab_top
+		bitmap tab_button_top_inactive.png
+		cut 12
+		expand 6
+		padding 6 6 3 6
+		min-width 50
+		overrides
+			element TBTabContainer.tab_top.pressed
+				state pressed
+		children
+			element tab_top_focus
+				state focused
+	tab_top_focus
+		type StretchBorder
+		bitmap focus_tabbutton_top.png
+		cut 12
+		expand 6
+	TBTabContainer.tab_top.pressed
+		bitmap tab_button_top_active.png
+		cut 13
+		expand 6
+	# == Bottom tab button =============================
+	TBTabContainer.tab_bottom
+		bitmap tab_button_bottom_inactive.png
+		cut 12
+		expand 6
+		padding 3 6 6 6
+		min-width 50
+		overrides
+			element TBTabContainer.tab_bottom.pressed
+				state pressed
+		children
+			element tab_bottom_focus
+				state focused
+	tab_bottom_focus
+		clone tab_top_focus
+		flip-y 1
+	TBTabContainer.tab_bottom.pressed
+		bitmap tab_button_bottom_active.png
+		cut 13
+		expand 6
+	# == Left tab button =============================
+	TBTabContainer.tab_left
+		bitmap tab_button_left_inactive.png
+		cut 12
+		expand 6
+		padding 6 3 6 6
+		min-width 50
+		overrides
+			element TBTabContainer.tab_left.pressed
+				state pressed
+		children
+			element tab_left_focus
+				state focused
+	tab_left_focus
+		type StretchBorder
+		bitmap focus_tabbutton_left.png
+		cut 12
+		expand 6
+	TBTabContainer.tab_left.pressed
+		bitmap tab_button_left_active.png
+		cut 13
+		expand 6
+	# == Right tab button =============================
+	TBTabContainer.tab_right
+		bitmap tab_button_right_inactive.png
+		cut 12
+		expand 6
+		padding 6 6 6 3
+		min-width 50
+		overrides
+			element TBTabContainer.tab_right.pressed
+				state pressed
+		children
+			element tab_right_focus
+				state focused
+	tab_right_focus
+		clone tab_left_focus
+		flip-x 1
+	TBTabContainer.tab_right.pressed
+		bitmap tab_button_right_active.png
+		cut 13
+		expand 6
+
+	# == TBEditField skin. Create strong overrides for the search type to add magnifier glass icon =====
+	TBEditField.selection
+		cut 2
+		bitmap selection.png
+	TBEditField
+		bitmap editfield.png
+		cut 12
+		expand 4
+		padding 4
+		strong-overrides
+			element TBEditField.search
+				condition: target: this, property: edit-type, value: "search"
+
+	TBEditField.search
+		clone TBEditField
+		padding 4 4 4 24
+		min-width 50
+		children
+			element TBEditField.search.icon
+	TBEditField.search.icon
+		bitmap search.png
+		type Image
+		img-position-x 0
+		img-ofs-x 5
+
+	# == TBWindow skin =================================================================================
+	TBWindow
+		bitmap window.png
+		cut 16
+		expand 12
+		padding 10
+		overrides
+			element TBWindow.selected
+				state selected
+	TBWindow.selected
+		bitmap window_active.png
+		cut 16
+		expand 12
+	TBWindow.close
+		bitmap window_close.png
+		type Image
+		children
+			element TBWindow.close.pressed
+				state pressed
+	TBWindow.close.pressed
+		bitmap window_close_pressed.png
+		type Image
+	TBWindow.mover
+		text-color #b8b8b8
+		bitmap window_mover_bg_tile.png
+		type Tile
+		expand -1
+		padding 4
+		overrides
+			element TBWindow.mover.active
+				state selected
+		children
+			element TBWindow.mover.overlay
+				state all
+	TBWindow.mover.overlay
+		bitmap window_mover_overlay.png
+		cut 12
+		expand 3
+	TBWindow.mover.active
+		clone TBWindow.mover
+		text-color #fefefe
+		overrides
+		overlays
+		children
+
+	# == Misc skins ====================================================================================
+	TBContainer
+		bitmap container.png
+		type StretchBorder
+		cut 12
+		expand 6
+		padding 10
+	TBCheckBox
+		bitmap checkbox.png
+		cut 19
+		expand 7
+		children
+			element TBCheckBox.selected
+				state selected
+			element TBCheckBox.pressed
+				state pressed
+	TBCheckBox.selected
+		bitmap checkbox_mark.png
+		type Image
+		expand 7
+	TBCheckBox.pressed
+		bitmap checkbox_pressed.png
+		type Image
+	TBRadioButton
+		bitmap radio.png
+		cut 19
+		expand 7
+		children
+			element TBRadioButton.selected
+				state selected
+			element TBRadioButton.pressed
+				state pressed
+	TBRadioButton.selected
+		bitmap radio_mark.png
+		type Image
+		expand 7
+	TBRadioButton.pressed
+		bitmap radio_pressed.png
+		type Image
+		expand 7
+	TBLayout.fadeout_x
+		bitmap fadeout_x.png
+	TBLayout.fadeout_y
+		bitmap fadeout_y.png
+	TBSelectList
+		clone TBEditField
+		padding 2
+	TBSelectDropdown
+		clone TBButton
+	TBSelectDropdown.arrow
+		clone arrow.down
+	TBSelectDropdown.window
+		clone TBPopupWindow
+	TBPopupWindow
+		clone TBWindow
+		padding 2
+	TBMenuWindow
+		clone TBPopupWindow
+	TBSelectItem
+		padding 4 10
+		children
+			element TBSelectItem.hovered
+				state hovered
+			element TBSelectItem.selected
+				state selected
+	TBSelectItem.selected
+		cut 7
+		bitmap item_selected.png
+	TBSelectItem.hovered
+		cut 7
+		bitmap item_hover.png
+	TBSelectItem.separator
+		clone TBSeparator
+
+	TBSeparator
+		bitmap item_separator_x.png
+		type Stretch Image
+		overrides
+			element TBSeparator.y
+				condition: target: parent, property: axis, value: x
+	TBSeparator.y
+		bitmap item_separator_y.png
+		type Stretch Image
+
+	TBScrollBarBgX
+		bitmap scroll_bg_x.png
+		cut 11
+		expand 5
+	TBScrollBarFgX
+		bitmap scroll_fg_x.png
+		cut 11
+		expand 5
+	TBScrollBarBgY
+		bitmap scroll_bg_y.png
+		cut 11
+		expand 5
+	TBScrollBarFgY
+		bitmap scroll_fg_y.png
+		cut 11
+		expand 5
+
+	TBSliderBgX
+		bitmap slider_bg_x.png
+		cut 9
+		min-height 19
+		max-height 19
+		min-width 50
+	TBSliderFgX
+		bitmap slider_handle.png
+		expand 5
+
+	TBSliderBgY
+		bitmap slider_bg_y.png
+		cut 9
+		min-width 19
+		max-width 19
+		min-height 50
+	TBSliderFgY
+		clone TBSliderFgX
+
+	TBResizer
+		bitmap resizer.png
+	TBInlineSelect
+		max-width 110
+	TBDimmer
+		background-color #00000088
+
+	TBProgressSpinner
+		min-width 28
+		min-height 28
+	TBProgressSpinner.fg
+		bitmap progress_spinner_strip.png
+
+	# The TBList header is always disabled, thus gets slightly less opacity default.
+	TBList.header
+
+	arrow.left: type: Image, bitmap: arrow_left.png, min-width: 5, min-height: 10
+	arrow.right: type: Image, bitmap: arrow_right.png, min-width: 5, min-height: 10
+	arrow.up: type: Image, bitmap: arrow_up.png, min-width: 10, min-height: 5
+	arrow.down: type: Image, bitmap: arrow_down.png, min-width: 10, min-height: 5
+	generic_focus
+		bitmap focus_r4.png
+		cut 11
+		expand 4

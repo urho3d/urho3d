@@ -1,0 +1,11 @@
+﻿info
+	glyph_str !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~€£¥§•·©«»®¶ÅÄÖÆØåäöæø
+	rgb 1
+	name Neon
+size 42
+	bitmap neon_42.png
+	ascent 50
+	descent 16
+	x_ofs -6
+	advance_delta -12
+	space_advance 12

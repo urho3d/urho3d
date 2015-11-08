@@ -1,0 +1,38 @@
+TBLayout
+	distribution gravity
+	size available
+	TBLayout
+		gravity top bottom
+		distribution available
+		distribution-position top left
+		size available
+		axis y
+		TBLayout
+			distribution available
+			TBButton
+				text @new
+				state disabled
+			TBButton
+				text @save
+				state disabled
+			TBButton
+				text Test
+				id test
+		TBEditField
+			placeholder @search
+			type search
+			id widget_list_search
+		TBSelectList
+			id widget_list
+	TBLayout
+		distribution available
+		TBEditField
+			id source_edit
+			multiline 1
+			gravity all
+		TBLayout: axis: y, distribution: available, position: left
+			TBScrollContainer
+				id scroll_container
+				gravity all
+			TBClickLabel: text: "Adapt to container"
+				TBCheckBox: id: "constrained"

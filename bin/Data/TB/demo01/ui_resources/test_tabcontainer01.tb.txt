@@ -1,0 +1,38 @@
+WindowInfo
+	title TBTabContainer & misc tests
+	position 770 430
+TBTabContainer
+	gravity all
+	id tabcontainer
+	tabs
+		TBButton: text: "Tab with long text"
+		TBButton: text: "Skin"
+		TBButton: text: "Spinner"
+			TBSkinImage: skin: Icon16
+	TBLayout: axis: y
+		TBTextField: text: "Tab alignment:"
+		TBLayout
+			TBClickLabel: text: Left
+				TBRadioButton: group-id: set_align, id: set_align, data: 0
+			TBClickLabel: text: Up
+				TBRadioButton: group-id: set_align, id: set_align, data: 1, value: 1
+			TBClickLabel: text: Right
+				TBRadioButton: group-id: set_align, id: set_align, data: 2
+			TBClickLabel: text: Bottom
+				TBRadioButton: group-id: set_align, id: set_align, data: 3
+		TBButton
+			text Toggle tab axis
+			id toggle_tab_axis
+	TBLayout
+		TBLayout: axis: y, position: right bottom
+			TBButton: text: Normal button
+			TBButton: text: Overridden skin, skin: SpecialButton
+			TBButton: text: Disabled button, state: disabled
+		TBEditField
+			text TBEditField
+			multiline 1
+	TBLayout
+		axis y
+		TBButton: id: start_spinner, text: Start spinner
+		TBButton: id: stop_spinner, text: Stop spinner
+		TBProgressSpinner: id: spinner

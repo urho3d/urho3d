@@ -1,0 +1,21 @@
+WindowInfo
+	title Default TBWidget positioning
+	size 350 350
+TBLayout: axis: y, distribution: gravity
+	TBLayout: distribution: available, gravity: left right
+		TBEditField: gravity: all, skin: 0, multiline: 1, readonly: 1
+			text: "Any widget may contain children and by default applies basic gravity positioning.\n" \
+					"To achieve more advanced layout, you would normally wrap a layouting " \
+					"widget (f.ex TBLayout) but sometimes the default is enough.\n" \
+					"The default preferred size is calculated to the largest child " \
+					"(or the skin if there are no children)."
+	TBContainer: gravity: all
+		TBTextField: text: "all", gravity: all
+		TBTextField: text: "top, left, right", gravity: top left right
+		TBTextField: text: "bottom, left, right", gravity: bottom left right
+		TBTextField: text: "left, top, bottom", gravity: left top bottom
+		TBTextField: text: "right, top, bottom", gravity: right top bottom
+		TBButton: text: Upper left
+		TBButton: text: Upper right, gravity: right
+		TBButton: text: Lower left, gravity: bottom
+		TBButton: text: Lower right, gravity: bottom right

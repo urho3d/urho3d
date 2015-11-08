@@ -1,0 +1,11 @@
+﻿info
+	glyph_str !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~€‚ƒ„…ˆŠ‹ŒŽ‘’“”•–—˜™š›œžŸ¡¢£¥¦§¨©«®´µ¶·¸¹º»¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüþÿ
+	name Orange
+	rgb 1
+size 30
+	bitmap orange_30.png
+	ascent 62
+	descent 25
+	x_ofs -7
+	advance_delta -20
+	space_advance 22

@@ -1,0 +1,58 @@
+WindowInfo
+	title Turbo Badger
+	position 10 50
+	size 250 630
+
+TBLayout: axis: y, distribution-position: "left top", distribution: "available"
+
+	TBSection: value: 1, text: "Misc features"
+		TBLayout: axis: y, spacing: 0, size: available
+			TBButton: skin: "TBButton.flat", text: "Radiobutton & Checkbox"
+				id: "test-layout"
+				data: "test_radio_checkbox.tb.txt"
+			TBButton: skin: "TBButton.flat", text: "TBSelectList", id: "test-list"
+			TBButton: skin: "TBButton.flat", text: "ScrollContainer & misc.", id: "test-scroll-container"
+			TBButton: skin: "TBButton.flat", text: "TBWidgetValue connections", id: "test-connections"
+			TBButton: skin: "TBButton.flat", text: "TBImage", id: "test-image"
+			TBButton: skin: "TBButton.flat", text: "TBScrollerSnapListener", id: "test-page"
+			TBButton: skin: "TBButton.flat", text: "Animations", id: "test-animations"
+			TBButton: skin: "TBButton.flat", text: "Skin conditions", id: "test-skin-conditions"
+			TBButton: skin: "TBButton.flat", text: "TBToggleContainer"
+				id: "test-layout"
+				data: "test_toggle_containers.tb.txt"
+			TBButton: skin: "TBButton.flat", text: "Close with dim & alert", id: "TBWindow.close"
+			TBButton: skin: "TBButton.flat", text: "ResourceEditWindow", id: "test-resource-edit"
+
+	TBSection: value: 0, text: "Layout tests"
+		TBLayout: axis: y, spacing: 0, size: available
+			TBButton: skin: "TBButton.flat", text: "Size, gravity, position"
+				id: "test-layout"
+				data: "test_layout01.tb.txt"
+			TBButton: skin: "TBButton.flat", text: "Distribution"
+				id: "test-layout"
+				data: "test_layout02.tb.txt"
+			TBButton: skin: "TBButton.flat", text: "TBWidget default"
+				id: "test-layout"
+				data: "test_layout03.tb.txt"
+
+	TBSection: value: 0, text: "Graphics tests"
+		TBLayout: axis: y, spacing: 0, size: available
+			TBClickLabel: text: "Continous repaint"
+				lp: max-width: 0
+				TBCheckBox: connection: continous-repaint
+			TBButton: skin: "TBButton.flat", text: "Reload skin bitmaps", id: "reload skin bitmaps"
+			TBButton: skin: "TBButton.flat", text: "Context lost & restore", id: "test context lost"
+
+	TBSection: value: 0, text: "Message tests"
+		TBLayout: axis: y, spacing: 0, size: available
+			TBButton: skin: "TBButton.flat", text: "PostMessage", id: "msg"
+			TBButton: skin: "TBButton.flat", text: "PostMessageDelayed", id: "delayedmsg"
+			TBClickLabel: text: "Busy message loop"
+				lp: max-width: 0
+				TBCheckBox: id: "busymsg"
+
+	# We want the debug button at the bottom if there is space over,
+	# so use an trailing layout which may expand a lot.
+	TBLayout: axis: y, distribution-position: bottom
+		lp: max-height: 10000
+		TBButton: id: "debug settings", text: "Runtime debug settings..."

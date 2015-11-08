@@ -1,0 +1,44 @@
+WindowInfo
+	title Skin conditions
+	position 500 170
+TBLayout
+	axis y
+	TBEditField: gravity: all, skin: 0, multiline: 1, readonly: 1, adapt-to-content: 1
+		text The TBButton skin has a condition to show a different skin when placed under a parent widget with skin "button_group". There is also conditions to use a different skin for the first and last button.
+	TBLayout
+		TBLayout: skin: button_group
+			TBButton
+				text <
+			TBButton
+				text >
+		TBLayout: skin: button_group
+			TBButton
+				text 1
+			TBButton
+				text 2
+			TBButton
+				text 3
+		TBLayout: skin: button_group
+			TBButton
+				text A
+			TBButton
+				text B
+			TBButton
+				text C
+	TBLayout: skin: button_group
+		TBButton
+			text Hello
+		TBButton
+			text World!
+	TBEditField: gravity: all, skin: 0, multiline: 1, readonly: 1, adapt-to-content: 1
+		text The "button_group" skin overrides default layout spacing. It can also be overridden in the UI resource.
+	TBLayout: skin: button_group
+		spacing 2
+		TBButton
+			text Group
+		TBButton
+			text with
+		TBButton
+			text spacing
+		TBButton
+			text 2

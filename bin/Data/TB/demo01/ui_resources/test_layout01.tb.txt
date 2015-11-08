@@ -1,0 +1,55 @@
+WindowInfo
+	title TBLayout size & gravity
+# Declare a branch of layout nodes that is included in all three containers below.
+test_layout_content
+	TBLayout
+		TBButton
+			text Default
+		TBCheckBox
+			value 1
+		TBButton
+			axis y
+			text Foo Bar
+			TBSkinImage
+				skin Icon16
+		TBButton
+			gravity all
+			text Gravity all
+		TBButton
+			gravity top
+			text Gravity top
+		TBButton
+			gravity bottom
+			text Gravity bottom
+TBLayout
+	axis y
+	TBLayout
+		TBSelectDropdown
+			text Select position
+			id select position
+			items
+				item: text: "LAYOUT_POSITION_CENTER"
+				item: text: "LAYOUT_POSITION_LEFT_TOP"
+				item: text: "LAYOUT_POSITION_RIGHT_BOTTOM"
+				item: text: "LAYOUT_POSITION_GRAVITY"
+		TBButton
+			text Toggle axis
+			id toggle axis
+	TBLayout
+		id switch_layout
+		axis y
+		TBTextField: text: "size: preferred"
+		TBContainer
+			@include test_layout_content
+				size preferred
+				id 1
+		TBTextField: text: "size: available"
+		TBContainer
+			@include test_layout_content
+				size available
+				id 2
+		TBTextField: text: "size: gravity"
+		TBContainer
+			@include test_layout_content
+				size gravity
+				id 3

@@ -1,0 +1,21 @@
+TBLayout
+	distribution available
+	axis y
+	TBLayout
+		TBButton
+			text Button 1
+		TBRadioButton
+		TBCheckBox
+	@if 1
+		TBContainer
+			TBLayout
+				TBSlider
+					value 0.5
+				TBScrollBar
+	TBEditField
+		multiline 1
+		readonly 1
+	TBEditField
+		text Hello world\nHello world
+		adapt-to-content 1
+		multiline 1

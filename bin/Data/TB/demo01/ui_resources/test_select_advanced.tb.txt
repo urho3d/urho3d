@@ -1,0 +1,30 @@
+WindowInfo
+	title Customized list items
+	position 770 50
+	size 300 300
+TBLayout
+	axis y
+	distribution gravity
+	gravity all
+	TBLayout
+		distribution gravity
+		TBEditField
+			id filter
+			gravity left right
+			placeholder @search
+			type search
+	TBSelectList
+		id list
+		gravity all
+	TBLayout
+		distribution gravity
+		TBEditField
+			id add_name
+			gravity left right
+			placeholder Name
+		TBButton
+			id add
+			text Add
+		TBButton
+			id delete all
+			text Delete all
