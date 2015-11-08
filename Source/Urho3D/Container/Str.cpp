@@ -558,9 +558,9 @@ String String::ToUpper() const
     return ret;
 }
 
-Vector<String> String::Split(char separator) const
+Vector<String> String::Split(char separator, StringSplit splitMode) const
 {
-    return Split(CString(), separator);
+    return Split(CString(), separator, splitMode);
 }
 
 void String::Join(const Vector<String>& subStrings, const String& glue)
@@ -1041,49 +1041,27 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
 }
 #endif
 
-Vector<String> String::Split(const char* str, char separator)
+Vector<String> String::Split(const char* str, char separator, StringSplit splitMode)
 {
     Vector<String> ret;
-    unsigned pos = 0;
-    unsigned length = CStringLength(str);
-
-    while (pos < length)
+    const char* strEnd = str + String::CStringLength(str);
+    for (const char* splitEnd = str; splitEnd != strEnd; ++splitEnd)
     {
-        if (str[pos] != separator)
-            break;
-        ++pos;
+        if (*splitEnd == separator)
+        {
+            const ptrdiff_t splitLen = splitEnd - str;
+            if (splitLen > 0 || splitMode == SPLIT_KEEP_EMPTY)
+            {
+                ret.Push(String(str, splitLen));
+            }
+            str = splitEnd + 1;
+        }
     }
 
-    while (pos < length)
+    const ptrdiff_t splitLen = strEnd - str;
+    if (splitLen > 0 || splitMode == SPLIT_KEEP_EMPTY)
     {
-        unsigned start = pos;
-
-        while (start < length)
-        {
-            if (str[start] == separator)
-                break;
-
-            ++start;
-        }
-
-        if (start == length)
-        {
-            ret.Push(String(&str[pos]));
-            break;
-        }
-
-        unsigned end = start;
-
-        while (end < length)
-        {
-            if (str[end] != separator)
-                break;
-
-            ++end;
-        }
-
-        ret.Push(String(&str[pos], start - pos));
-        pos = end;
+        ret.Push(String(str, splitLen));
     }
 
     return ret;
