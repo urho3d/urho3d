@@ -26,23 +26,26 @@ set (TARGET_NAME TurboBadger)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}" ../FreeType/include ../SDL/include)
 
 if(APPLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -Wall -Wextra -Wno-unused-parameter")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -Wall -Wextra -Wno-unused-parameter")
     add_definitions(-DMACOSX)
 endif(APPLE)
 
+SET ( Renderer_SRC renderers/tb_renderer_batcher.cpp )
+SET ( Renderer_HDR renderers/tb_renderer_batcher.h )
+
 if(NOT URHO3D_TB_DEMO)
     add_definitions(-DTB_FONT_RENDERER_FREETYPE)
-    file (GLOB CPP_FILES *.cpp image/*.cpp animation/*.cpp parser/*.cpp renderers/*.cpp utf8/*.cpp)
-    file (GLOB H_FILES *.h image/*.h animation/*.h parser/*.h renderers/*.h utf8/*.h)
+    file (GLOB CPP_FILES *.cpp image/*.cpp animation/*.cpp parser/*.cpp utf8/*.cpp)
+    file (GLOB H_FILES *.h image/*.h animation/*.h parser/*.h utf8/*.h)
     set (INCLUDE_DIRS . image animation parser renderers utf8)
 else ()
     add_definitions(-DTB_FONT_RENDERER_TBBF)
-    file (GLOB CPP_FILES *.cpp image/*.cpp animation/*.cpp parser/*.cpp renderers/*.cpp utf8/*.cpp tests/*.cpp)
-    file (GLOB H_FILES *.h image/*.h animation/*.h parser/*.h renderers/*.h utf8/*.h tests/*.h)
+    file (GLOB CPP_FILES *.cpp image/*.cpp animation/*.cpp parser/*.cpp utf8/*.cpp tests/*.cpp)
+    file (GLOB H_FILES *.h image/*.h animation/*.h parser/*.h utf8/*.h tests/*.h)
     set (INCLUDE_DIRS . image animation parser renderers utf8 tests)
 endif ()
 
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+set (SOURCE_FILES ${Renderer_SRC} ${Renderer_HDR} ${CPP_FILES} ${H_FILES})
 
 setup_library ()
 install_header_files (DIRECTORY . DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/TurboBadger FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant
