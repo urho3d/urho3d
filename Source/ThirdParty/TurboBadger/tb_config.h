@@ -101,11 +101,11 @@
 #elif defined(__linux) || defined(__linux__)
 #define TB_TARGET_LINUX
 #define TB_SYSTEM_LINUX
-#define TB_CLIPBOARD_GLFW
+#define TB_CLIPBOARD_DUMMY
 #elif MACOSX
 #define TB_TARGET_MACOSX
 #define TB_SYSTEM_LINUX
-#define TB_CLIPBOARD_GLFW
+#define TB_CLIPBOARD_DUMMY
 #elif defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
 #define TB_TARGET_WINDOWS
 #define TB_CLIPBOARD_WINDOWS
