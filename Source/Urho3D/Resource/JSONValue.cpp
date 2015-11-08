@@ -502,7 +502,7 @@ Variant JSONValue::GetVariantValue(VariantType type) const
     case VAR_RESOURCEREFLIST:
         {
             ResourceRefList refList;
-            Vector<String> values = GetString().Split(';');
+            Vector<String> values = GetString().Split(';', true);
             if (values.Size() >= 1)
             {
                 refList.type_ = values[0];

@@ -558,9 +558,9 @@ String String::ToUpper() const
     return ret;
 }
 
-Vector<String> String::Split(char separator, StringSplit splitMode) const
+Vector<String> String::Split(char separator, bool keepEmptyStrings) const
 {
-    return Split(CString(), separator, splitMode);
+    return Split(CString(), separator, keepEmptyStrings);
 }
 
 void String::Join(const Vector<String>& subStrings, const String& glue)
@@ -1041,29 +1041,26 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
 }
 #endif
 
-Vector<String> String::Split(const char* str, char separator, StringSplit splitMode)
+Vector<String> String::Split(const char* str, char separator, bool keepEmptyStrings)
 {
     Vector<String> ret;
     const char* strEnd = str + String::CStringLength(str);
+
     for (const char* splitEnd = str; splitEnd != strEnd; ++splitEnd)
     {
         if (*splitEnd == separator)
         {
             const ptrdiff_t splitLen = splitEnd - str;
-            if (splitLen > 0 || splitMode == SPLIT_KEEP_EMPTY)
-            {
+            if (splitLen > 0 || keepEmptyStrings)
                 ret.Push(String(str, splitLen));
-            }
             str = splitEnd + 1;
         }
     }
 
     const ptrdiff_t splitLen = strEnd - str;
-    if (splitLen > 0 || splitMode == SPLIT_KEEP_EMPTY)
-    {
+    if (splitLen > 0 || keepEmptyStrings)
         ret.Push(String(str, splitLen));
-    }
-
+    
     return ret;
 }
 
