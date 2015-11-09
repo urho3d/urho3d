@@ -222,9 +222,14 @@ void EditLanguageSelector(StringHash eventType, VariantMap& eventData)
 
 bool ShowEditorPreferencesDialog()
 {
-    UpdateEditorPreferencesDialog();
-    preferencesDialog.visible = true;
-    preferencesDialog.BringToFront();
+    if (preferencesDialog.visible == false)
+    {
+        UpdateEditorPreferencesDialog();
+        preferencesDialog.visible = true;
+        preferencesDialog.BringToFront();
+    }
+    else
+        preferencesDialog.visible = false;
     return true;
 }
 

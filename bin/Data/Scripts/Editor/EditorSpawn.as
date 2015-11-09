@@ -76,8 +76,13 @@ void CreateSpawnEditor()
 
 bool ShowSpawnEditor()
 {
-    spawnWindow.visible = true;
-    spawnWindow.BringToFront();
+    if (spawnWindow.visible == false)
+    {
+        spawnWindow.visible = true;
+        spawnWindow.BringToFront();
+    }
+    else
+        HideSpawnWindow();
     return true;
 }
 

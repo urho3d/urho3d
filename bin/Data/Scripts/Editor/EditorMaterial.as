@@ -54,9 +54,14 @@ void CreateMaterialEditor()
 
 bool ShowMaterialEditor()
 {
-    RefreshMaterialEditor();
-    materialWindow.visible = true;
-    materialWindow.BringToFront();
+    if (materialWindow.visible == false)
+    {
+        RefreshMaterialEditor();
+        materialWindow.visible = true;
+        materialWindow.BringToFront();
+    }
+    else
+        HideMaterialEditor();
     return true;
 }
 

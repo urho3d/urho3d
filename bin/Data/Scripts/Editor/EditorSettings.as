@@ -176,9 +176,14 @@ void UpdateEditorSettingsDialog()
 
 bool ShowEditorSettingsDialog()
 {
-    UpdateEditorSettingsDialog();
-    settingsDialog.visible = true;
-    settingsDialog.BringToFront();
+    if (settingsDialog.visible == false)
+    {
+        UpdateEditorSettingsDialog();
+        settingsDialog.visible = true;
+        settingsDialog.BringToFront();
+    }
+    else
+        HideEditorSettingsDialog();
     return true;
 }
 

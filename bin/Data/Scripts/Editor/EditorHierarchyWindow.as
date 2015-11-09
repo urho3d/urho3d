@@ -97,8 +97,13 @@ void CreateHierarchyWindow()
 
 bool ShowHierarchyWindow()
 {
-    hierarchyWindow.visible = true;
-    hierarchyWindow.BringToFront();
+    if (hierarchyWindow.visible == false)
+    {
+        hierarchyWindow.visible = true;
+        hierarchyWindow.BringToFront();
+    }
+    else
+        HideHierarchyWindow();
     return true;
 }
 
