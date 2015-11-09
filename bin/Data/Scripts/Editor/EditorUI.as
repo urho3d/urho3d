@@ -180,6 +180,40 @@ void HandleQuickSearchChange(StringHash eventType, VariantMap& eventData)
     PerformQuickMenuSearch(search.text.ToLower().Trimmed());
 }
 
+void HandleQuickSearchFinish(StringHash eventType, VariantMap& eventData)
+{
+    Menu@ menu = quickMenu.GetChild("ResultsMenu", true);
+    if (menu is null)
+        return;
+        
+    String query = eventData["Text"].GetString();
+    if (query.length <= 0)
+        return;
+    Array<QuickMenuItem@> filtered;
+    {
+        QuickMenuItem@ qi;
+        for (uint x=0; x < quickMenuItems.length; x++)
+        {
+            @qi = quickMenuItems[x];
+            int find = qi.action.Find(query, 0, false);
+            if (find > -1)
+            {
+                qi.sortScore = find;
+                filtered.Push(qi);
+            }
+        }
+    }
+
+    filtered.Sort();
+    if (!filtered.empty)
+    {
+        VariantMap data;
+        Menu@ item = CreateMenuItem(filtered[0].action, filtered[0].callback);
+        data["Element"] = item;
+        item.SendEvent("MenuSelected", data);
+    }
+}
+
 void PerformQuickMenuSearch(const String&in query)
 {
     Menu@ menu = quickMenu.GetChild("ResultsMenu", true);
@@ -265,6 +299,7 @@ void CreateQuickMenu()
     ui.root.AddChild(quickMenu);
     LineEdit@ search = quickMenu.GetChild("Search", true);
     SubscribeToEvent(search, "TextChanged", "HandleQuickSearchChange");
+    SubscribeToEvent(search, "TextFinished", "HandleQuickSearchFinish");
     UIElement@ closeButton = quickMenu.GetChild("CloseButton", true);
     SubscribeToEvent(closeButton, "Pressed", "ToggleQuickMenu");
 }
