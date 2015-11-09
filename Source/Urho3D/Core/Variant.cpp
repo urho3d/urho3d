@@ -307,7 +307,7 @@ void Variant::FromString(VariantType type, const char* value)
 
     case VAR_RESOURCEREFLIST:
     {
-        StringVector values = String::Split(value, ';');
+        StringVector values = String::Split(value, ';', true);
         if (values.Size() >= 1)
         {
             SetType(VAR_RESOURCEREFLIST);

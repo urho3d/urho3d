@@ -820,7 +820,7 @@ ResourceRefList XMLElement::GetResourceRefList() const
 {
     ResourceRefList ret;
 
-    Vector<String> values = GetAttribute("value").Split(';');
+    Vector<String> values = GetAttribute("value").Split(';', true);
     if (values.Size() >= 1)
     {
         ret.type_ = values[0];
