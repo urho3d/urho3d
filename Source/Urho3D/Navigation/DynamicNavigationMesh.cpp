@@ -49,7 +49,7 @@
 // DebugNew is deliberately not used because the macro 'free' conflicts with DetourTileCache's LinearAllocator interface
 //#include "../DebugNew.h"
 
-#define TILECACHE_MAXLAYERS 128
+#define TILECACHE_MAXLAYERS 255
 
 namespace Urho3D
 {
@@ -57,6 +57,7 @@ namespace Urho3D
 extern const char* NAVIGATION_CATEGORY;
 
 static const int DEFAULT_MAX_OBSTACLES = 1024;
+static const int DEFAULT_MAX_LAYERS = 16;
 
 struct DynamicNavigationMesh::TileCacheData
 {
@@ -211,6 +212,7 @@ DynamicNavigationMesh::DynamicNavigationMesh(Context* context) :
     NavigationMesh(context),
     tileCache_(0),
     maxObstacles_(1024),
+    maxLayers_(DEFAULT_MAX_LAYERS),
     drawObstacles_(false)
 {
     //64 is the largest tile-size that DetourTileCache will tolerate without silently failing
@@ -238,6 +240,7 @@ void DynamicNavigationMesh::RegisterObject(Context* context)
 
     URHO3D_COPY_BASE_ATTRIBUTES(NavigationMesh);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Obstacles", GetMaxObstacles, SetMaxObstacles, unsigned, DEFAULT_MAX_OBSTACLES, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Layers", GetMaxLayers, SetMaxLayers, unsigned, DEFAULT_MAX_LAYERS, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Draw Obstacles", GetDrawObstacles, SetDrawObstacles, bool, false, AM_DEFAULT);
 }
 
@@ -278,7 +281,7 @@ bool DynamicNavigationMesh::Build()
         numTilesZ_ = (gridH + tileSize_ - 1) / tileSize_;
 
         // Calculate max. number of tiles and polygons, 22 bits available to identify both tile & polygon within tile
-        unsigned maxTiles = NextPowerOfTwo((unsigned)(numTilesX_ * numTilesZ_)) * TILECACHE_MAXLAYERS;
+        unsigned maxTiles = NextPowerOfTwo((unsigned)(numTilesX_ * numTilesZ_)) * maxLayers_;
         unsigned tileBits = 0;
         unsigned temp = maxTiles;
         while (temp > 1)
@@ -318,7 +321,7 @@ bool DynamicNavigationMesh::Build()
         tileCacheParams.width = tileSize_;
         tileCacheParams.height = tileSize_;
         tileCacheParams.maxSimplificationError = edgeMaxError_;
-        tileCacheParams.maxTiles = numTilesX_ * numTilesZ_ * TILECACHE_MAXLAYERS;
+        tileCacheParams.maxTiles = numTilesX_ * numTilesZ_ * maxLayers_;
         tileCacheParams.maxObstacles = maxObstacles_;
         // Settings from NavigationMesh
         tileCacheParams.walkableClimb = agentMaxClimb_;
@@ -429,7 +432,7 @@ bool DynamicNavigationMesh::Build(const BoundingBox& boundingBox)
         for (int x = sx; x <= ex; ++x)
         {
             dtCompressedTileRef existing[TILECACHE_MAXLAYERS];
-            const int existingCt = tileCache_->getTilesAt(x, z, existing, TILECACHE_MAXLAYERS);
+            const int existingCt = tileCache_->getTilesAt(x, z, existing, maxLayers_);
             for (int i = 0; i < existingCt; ++i)
             {
                 unsigned char* data = 0x0;
@@ -644,7 +647,7 @@ PODVector<unsigned char> DynamicNavigationMesh::GetNavigationDataAttr() const
             for (int x = 0; x < numTilesX_; ++x)
             {
                 dtCompressedTileRef tiles[TILECACHE_MAXLAYERS];
-                const int ct = tileCache_->getTilesAt(x, z, tiles, TILECACHE_MAXLAYERS);
+                const int ct = tileCache_->getTilesAt(x, z, tiles, maxLayers_);
                 for (int i = 0; i < ct; ++i)
                 {
                     const dtCompressedTile* tile = tileCache_->getTileByRef(tiles[i]);
@@ -659,6 +662,13 @@ PODVector<unsigned char> DynamicNavigationMesh::GetNavigationDataAttr() const
         }
     }
     return ret.GetBuffer();
+}
+
+void DynamicNavigationMesh::SetMaxLayers(unsigned maxLayers)
+{
+    // Set 3 as a minimum due to the tendency of layers to be constructed inside the hollow space of stacked objects
+    // That behavior is unlikely to be expected by the end user
+    maxLayers_ = Max(3, Min(maxLayers, TILECACHE_MAXLAYERS));
 }
 
 int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int x, int z, TileCacheData* tiles)
