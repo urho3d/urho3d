@@ -344,6 +344,8 @@ V1.5
 - Fix Spine animation playback thread safety.
 - Fix mouse button release while cursor hidden not releasing drag elements.
 - Fix too heavy-handed skybox shader Z adjustment on GLES, which caused objects to be obscured by the skybox.
+- Fix protected AngelScript class variables showing up as serializable/editable.
+- Fix ResourceRefList serialization bug caused by String::Split() not returning empty strings.
 
 V1.4
 
