@@ -66,7 +66,7 @@ matrix:
     - &MinGW-64bit
       compiler: x86_64-w64-mingw32-gcc-static
       addons: {apt: {sources: *default_sources, packages: [*default_packages, gcc-mingw-w64-x86-64, g++-mingw-w64-x86-64, binutils-mingw-w64-x86-64]}}
-      env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC SF_DEFAULT=windows:Windows-64bit-STATIC.zip
+      env: WINDOWS=1 URHO3D_LIB_TYPE=STATIC
     - <<: *MinGW-64bit
       compiler: x86_64-w64-mingw32-gcc-shared
       env: WINDOWS=1 URHO3D_LIB_TYPE=SHARED
