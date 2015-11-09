@@ -242,6 +242,7 @@ V1.5
 - globalVars VariantMap for AngelScript to allow easy cross-ScriptFile parameter passing.
 - Improve ConvexCast() to return distance using the hit fraction.
 - Ensure normalized vertex weights in AssetImporter, and clamp to 4 weights maximum instead of error, by dropping the smallest weights.
+- Configurable layer count in %DynamicNavigationMesh to control memory usage.
 - Emscripten ETC1 & PVRTC extension support detection.
 - Emscripten hardware instancing support.
 - emscripten_get_now() for better timer precision and less CPU use.
@@ -345,7 +346,7 @@ V1.5
 - Fix mouse button release while cursor hidden not releasing drag elements.
 - Fix too heavy-handed skybox shader Z adjustment on GLES, which caused objects to be obscured by the skybox.
 - Fix protected AngelScript class variables showing up as serializable/editable.
-- Fix ResourceRefList serialization bug caused by String::Split() not returning empty strings.
+- Fix %ResourceRefList serialization bug caused by %String::Split() not returning empty strings.
 
 V1.4
 
