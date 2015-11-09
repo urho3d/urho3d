@@ -471,6 +471,34 @@ EOF" or abort 'Failed to create release directory remotely'
   end
 end
 
+# Usage: NOT intended to be used manually
+desc 'Make binary package and upload it to a designated central hosting server'
+task :ci_appveyor_package_upload do
+  # Generate the documentation
+  system 'echo Generating documentation...'
+  system "bash -c 'rake make config=$Configuration target=doc >/dev/null'"  # Ignore the exit status from 'make doc' as Doxygen on Windows host system does not return exit status correctly
+  # Make the package
+  system "bash -c 'rake make config=$Configuration target=package'" or abort 'Failed to make binary package'
+  # Determine the upload location
+  setup_digital_keys
+  unless ENV['RELEASE_TAG']
+    upload_dir = "/home/frs/project/#{ENV['APPVEYOR_REPO_NAME']}/Snapshots"
+  else
+    upload_dir = "/home/frs/project/#{ENV['APPVEYOR_REPO_NAME']}/#{ENV['RELEASE_TAG']}"
+    # Make sure the release directory exists remotely, do this in all the build jobs as we don't know which one would start uploading first
+    system "bash -c 'sftp urho-travis-ci@frs.sourceforge.net <<EOF >/dev/null 2>&1
+mkdir #{upload_dir}
+bye
+EOF'" or abort 'Failed to create release directory remotely'
+  end
+  # Upload the binary package
+  system "bash -c 'scp native-Build/Urho3D-* urho-travis-ci@frs.sourceforge.net:#{upload_dir}'" or abort 'Failed to upload binary package'
+  if ENV['RELEASE_TAG'] && ENV['SF_DEFAULT']
+    # Mark the corresponding binary package as default download for each Windows/Mac/Linux host systems
+    system "bash -c \"curl -H 'Accept: application/json' -X PUT -d 'default=%s' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-%s\"" % ENV['SF_DEFAULT'].split(':').insert(1, ENV['APPVEYOR_REPO_NAME'].split('/')).flatten or abort 'Failed to set binary tarball/zip as default download'
+  end
+end
+
 def scaffolding dir, project = 'Scaffolding', target = 'Main'
   build_script = <<EOF
 # Set project name
@@ -772,12 +800,10 @@ def bump_version version, index
 end
 
 def setup_digital_keys
-  system 'mkdir -p ~/.ssh && chmod 700 ~/.ssh' or abort 'Failed to create ~/.ssh directory'
-  system 'cat <<EOF >>~/.ssh/known_hosts
-frs.sourceforge.net,216.34.181.57 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA2uifHZbNexw6cXbyg1JnzDitL5VhYs0E65Hk/tLAPmcmm5GuiGeUoI/B0eUSNFsbqzwgwrttjnzKMKiGLN5CWVmlN1IXGGAfLYsQwK6wAu7kYFzkqP4jcwc5Jr9UPRpJdYIK733tSEmzab4qc5Oq8izKQKIaxXNe7FgmL15HjSpatFt9w/ot/CHS78FUAr3j3RwekHCm/jhPeqhlMAgC+jUgNJbFt3DlhDaRMa0NYamVzmX8D47rtmBbEDU3ld6AezWBPUR5Lh7ODOwlfVI58NAf/aYNlmvl2TZiauBCTa7OPYSyXJnIPbQXg6YQlDknNCr0K769EjeIlAfY87Z4tw==
-EOF' or abort 'Failed to append frs.sourceforge.net server public key to known_hosts'
+  system "bash -c 'mkdir -p ~/.ssh && chmod 700 ~/.ssh'" or abort 'Failed to create ~/.ssh directory'
+  system "bash -c 'ssh-keyscan frs.sourceforge.net >>~/.ssh/known_hosts 2>/dev/null'" or abort 'Failed to append frs.sourceforge.net server public key to known_hosts'
   # Workaround travis encryption key size limitation. Rather than using the solution in their FAQ (using AES to encrypt/decrypt the file and check in the encrypted file into repo), our solution is more pragmatic. The private key below is incomplete. Only the missing portion is encrypted. Much less secure than the original 2048-bit RSA has to offer but good enough for our case.
-  system 'cat <<EOF >~/.ssh/id_rsa
+  system "bash -c 'cat <<EOF >~/.ssh/id_rsa
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEAnZGzFEypdXKY3KDT0Q3NLY4Bv74yKgJ4LIgbXothx8w4CfM0
 VeWBL/AE2iRISEWGB07LruM9y+U/wt58WlCVu001GuJuvXwWenlljsvH8qQlErYi
@@ -805,8 +831,8 @@ cl9eTLchxLGr15b5SOeNrQ1TCO4qZM3M6Wgv+bRI0h2JW+c0ABpTIBzehOvXcwZq
 32a54xZxlsBw8T5P4BDy40OR7fu+6miUfL+WxUdII4fD3grlIPw6bpNE0bCDykv5
 RLq28S11hDrKf/ZetXNuIprfTlhl6ISBy+oWQibhXmFZSxEiXNV6hCQ=
 -----END RSA PRIVATE KEY-----
-EOF' or abort 'Failed to create user private key to id_rsa'
-  system 'chmod 600 ~/.ssh/id_rsa' or abort 'Failed to change id_rsa file permission'
+EOF'" or abort 'Failed to create user private key to id_rsa'
+  system "bash -c 'chmod 600 ~/.ssh/id_rsa'" or abort 'Failed to change id_rsa file permission'
 end
 
 # Load custom rake scripts

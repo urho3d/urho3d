@@ -70,9 +70,13 @@ public:
 
     /// Set the maximum number of obstacles allowed.
     void SetMaxObstacles(unsigned maxObstacles) { maxObstacles_ = maxObstacles; }
+    /// Set the maximum number of layers that navigation construction can create.
+    void SetMaxLayers(unsigned maxLayers);
 
     /// Return the maximum number of obstacles allowed.
     unsigned GetMaxObstacles() const { return maxObstacles_; }
+    /// Return the maximum number of layers permitted to build.
+    unsigned GetMaxLayers() const { return maxLayers_; }
 
     /// Draw debug geometry for Obstacles.
     void SetDrawObstacles(bool enable) { drawObstacles_ = enable; }
@@ -116,6 +120,8 @@ private:
     dtTileCacheMeshProcess* meshProcessor_;
     /// Maximum number of obstacle objects allowed.
     unsigned maxObstacles_;
+    /// Maximum number of layers that are allowed to be constructed.
+    unsigned maxLayers_;
     /// Debug draw Obstacles.
     bool drawObstacles_;
 };

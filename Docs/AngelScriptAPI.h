@@ -4494,6 +4494,7 @@ bool enabledEffective;
 uint id;
 /* readonly */
 bool initialized;
+bool maxLayers;
 uint maxObstacles;
 /* readonly */
 Node node;
