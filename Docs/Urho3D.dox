@@ -286,6 +286,7 @@ V1.5
 - Editor: cubemap generation support.
 - Editor: export scene to .obj.
 - Editor: accelerator keys for reset pos/rot/scale.
+- Editor: quickmenu quick select with Enter key.
 - Fix missing bindings in navigation / crowd navigation script API.
 - Fix missing Lua bindings for %Component class.
 - Fix %SplinePath AngelScript bindings.

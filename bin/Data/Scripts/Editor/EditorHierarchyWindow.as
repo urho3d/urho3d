@@ -95,16 +95,19 @@ void CreateHierarchyWindow()
     SubscribeToEvent("TemporaryChanged", "HandleTemporaryChanged");
 }
 
-bool ShowHierarchyWindow()
+bool ToggleHierarchyWindow()
 {
     if (hierarchyWindow.visible == false)
-    {
-        hierarchyWindow.visible = true;
-        hierarchyWindow.BringToFront();
-    }
+        ShowHierarchyWindow();
     else
         HideHierarchyWindow();
     return true;
+}
+
+void ShowHierarchyWindow()
+{
+    hierarchyWindow.visible = true;
+    hierarchyWindow.BringToFront();
 }
 
 void HideHierarchyWindow()

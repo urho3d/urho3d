@@ -530,15 +530,15 @@ void CreateMenuBar()
     {
         Menu@ menu = CreateMenu("View");
         Window@ popup = menu.popup;
-        popup.AddChild(CreateMenuItem("Hierarchy", @ShowHierarchyWindow, 'H', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Attribute inspector", @ShowAttributeInspectorWindow, 'I', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Resource browser", @ShowResourceBrowserWindow, 'B', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Material editor", @ShowMaterialEditor));
-        popup.AddChild(CreateMenuItem("Particle editor", @ShowParticleEffectEditor));
-        popup.AddChild(CreateMenuItem("Spawn editor", @ShowSpawnEditor));
-        popup.AddChild(CreateMenuItem("Sound Type editor", @ShowSoundTypeEditor));
-        popup.AddChild(CreateMenuItem("Editor settings", @ShowEditorSettingsDialog));
-        popup.AddChild(CreateMenuItem("Editor preferences", @ShowEditorPreferencesDialog));
+        popup.AddChild(CreateMenuItem("Hierarchy", @ToggleHierarchyWindow, 'H', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Attribute inspector", @ToggleAttributeInspectorWindow, 'I', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Resource browser", @ToggleResourceBrowserWindow, 'B', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Material editor", @ToggleMaterialEditor));
+        popup.AddChild(CreateMenuItem("Particle editor", @ToggleParticleEffectEditor));
+        popup.AddChild(CreateMenuItem("Spawn editor", @ToggleSpawnEditor));
+        popup.AddChild(CreateMenuItem("Sound Type editor", @ToggleSoundTypeEditor));
+        popup.AddChild(CreateMenuItem("Editor settings", @ToggleEditorSettingsDialog));
+        popup.AddChild(CreateMenuItem("Editor preferences", @ToggleEditorPreferencesDialog));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Hide editor", @ToggleUI, KEY_F12, QUAL_ANY));
         FinalizedPopupMenu(popup);

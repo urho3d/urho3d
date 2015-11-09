@@ -514,22 +514,25 @@ void ScanResourceDirFiles(String path, uint resourceDirIndex)
     }
 }
 
-void HideResourceBrowserWindow()
-{
-    browserWindow.visible = false;
-}
-
-bool ShowResourceBrowserWindow()
+bool ToggleResourceBrowserWindow()
 {
     if (browserWindow.visible == false)
-    {
-        browserWindow.visible = true;
-        browserWindow.BringToFront();
-        ui.focusElement = browserSearch;
-    }
+        ShowResourceBrowserWindow();
     else
         HideResourceBrowserWindow();
     return true;
+}
+
+void ShowResourceBrowserWindow()
+{
+    browserWindow.visible = true;
+    browserWindow.BringToFront();
+    ui.focusElement = browserSearch;
+}
+
+void HideResourceBrowserWindow()
+{
+    browserWindow.visible = false;
 }
 
 void ToggleResourceFilterWindow()

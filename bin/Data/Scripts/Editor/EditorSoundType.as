@@ -180,17 +180,20 @@ void EditGain(StringHash eventType, VariantMap& eventData)
     RefreshSoundTypeEditorWindow();
 }
 
-bool ShowSoundTypeEditor()
+bool ToggleSoundTypeEditor()
 {
     if (soundTypeEditorWindow.visible == false)
-    {
-        RefreshSoundTypeEditorWindow();
-        soundTypeEditorWindow.visible = true;
-        soundTypeEditorWindow.BringToFront();
-    }
+        ShowSoundTypeEditor();
     else
         HideSoundTypeEditor();
     return true;
+}
+
+void ShowSoundTypeEditor()
+{
+    RefreshSoundTypeEditorWindow();
+    soundTypeEditorWindow.visible = true;
+    soundTypeEditorWindow.BringToFront();
 }
 
 void HideSoundTypeEditor()

@@ -74,16 +74,19 @@ void CreateSpawnEditor()
     RefreshPickedObjects();
 }
 
-bool ShowSpawnEditor()
+bool ToggleSpawnEditor()
 {
     if (spawnWindow.visible == false)
-    {
-        spawnWindow.visible = true;
-        spawnWindow.BringToFront();
-    }
+        ShowSpawnEditor();
     else
         HideSpawnEditor();
     return true;
+}
+
+void ShowSpawnEditor()
+{
+    spawnWindow.visible = true;
+    spawnWindow.BringToFront();
 }
 
 void HideSpawnEditor()
