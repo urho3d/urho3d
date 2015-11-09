@@ -217,7 +217,7 @@ UIKit_CreateWindow(_THIS, SDL_Window *window)
     
     UIWindow *uiwindow;
     if (!urhoPlaceholderWindow){
-        UIWindow *uiwindow = [SDL_uikitwindow alloc];
+        uiwindow = [SDL_uikitwindow alloc];
         uiwindow = [uiwindow initWithFrame:[data->uiscreen bounds]];
     } else {
         uiwindow = urhoPlaceholderWindow;
