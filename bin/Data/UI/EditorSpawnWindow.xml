@@ -63,6 +63,59 @@
 						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+						<attribute name="Text" value="Local offset" />
+					</element>
+					<element type="LineEdit">
+						<attribute name="Name" value="PositionOffset.x" />
+						<attribute name="Min Size" value="40 0" />
+						<attribute name="Max Size" value="40 2147483647" />
+						<element type="Text" internal="true" style="none">
+							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
+							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
+							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
+							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+						</element>
+						<element type="BorderImage" internal="true" style="none">
+							<attribute name="Size" value="4 15" />
+						</element>
+					</element>
+					<element type="LineEdit">
+						<attribute name="Name" value="PositionOffset.y" />
+						<attribute name="Min Size" value="40 0" />
+						<attribute name="Max Size" value="40 2147483647" />
+						<element type="Text" internal="true" style="none">
+							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
+							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
+							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
+							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+						</element>
+						<element type="BorderImage" internal="true" style="none">
+							<attribute name="Size" value="4 15" />
+						</element>
+					</element>
+					<element type="LineEdit">
+						<attribute name="Name" value="PositionOffset.z" />
+						<attribute name="Min Size" value="40 0" />
+						<attribute name="Max Size" value="40 2147483647" />
+						<element type="Text" internal="true" style="none">
+							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
+							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
+							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
+							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+						</element>
+						<element type="BorderImage" internal="true" style="none">
+							<attribute name="Size" value="4 15" />
+						</element>
+					</element>
+				</element>
+				<element style="ListRow">
+					<attribute name="Min Size" value="270 17" />
+					<attribute name="Layout Spacing" value="10" />
+					<element type="Text">
+						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
 						<attribute name="Text" value="Random rotation" />
 					</element>
 					<element type="LineEdit">
