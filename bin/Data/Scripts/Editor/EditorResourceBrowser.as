@@ -521,9 +521,14 @@ void HideResourceBrowserWindow()
 
 bool ShowResourceBrowserWindow()
 {
-    browserWindow.visible = true;
-    browserWindow.BringToFront();
-    ui.focusElement = browserSearch;
+    if (browserWindow.visible == false)
+    {
+        browserWindow.visible = true;
+        browserWindow.BringToFront();
+        ui.focusElement = browserSearch;
+    }
+    else
+        HideResourceBrowserWindow();
     return true;
 }
 

@@ -182,9 +182,14 @@ void EditGain(StringHash eventType, VariantMap& eventData)
 
 bool ShowSoundTypeEditor()
 {
-    RefreshSoundTypeEditorWindow();
-    soundTypeEditorWindow.visible = true;
-    soundTypeEditorWindow.BringToFront();
+    if (soundTypeEditorWindow.visible == false)
+    {
+        RefreshSoundTypeEditorWindow();
+        soundTypeEditorWindow.visible = true;
+        soundTypeEditorWindow.BringToFront();
+    }
+    else
+        HideSoundTypeEditor();
     return true;
 }
 

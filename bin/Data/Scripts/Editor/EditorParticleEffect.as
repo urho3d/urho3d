@@ -794,9 +794,14 @@ void EditParticleEffectRelative(StringHash eventType, VariantMap& eventData)
 
 bool ShowParticleEffectEditor()
 {
-    RefreshParticleEffectEditor();
-    particleEffectWindow.visible = true;
-    particleEffectWindow.BringToFront();
+    if (particleEffectWindow.visible == false)
+    {
+        RefreshParticleEffectEditor();
+        particleEffectWindow.visible = true;
+        particleEffectWindow.BringToFront();
+    }
+    else
+        HideParticleEffectEditor();
     return true;
 }
 

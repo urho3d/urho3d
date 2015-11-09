@@ -168,8 +168,13 @@ void ToggleInspectorLock()
 
 bool ShowAttributeInspectorWindow()
 {
-    attributeInspectorWindow.visible = true;
-    attributeInspectorWindow.BringToFront();
+    if (attributeInspectorWindow.visible == false)
+    {
+        attributeInspectorWindow.visible = true;
+        attributeInspectorWindow.BringToFront();
+    }
+    else
+        HideAttributeInspectorWindow();
     return true;
 }
 
