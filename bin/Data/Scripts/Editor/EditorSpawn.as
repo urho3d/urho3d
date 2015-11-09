@@ -82,7 +82,7 @@ bool ShowSpawnEditor()
         spawnWindow.BringToFront();
     }
     else
-        HideSpawnWindow();
+        HideSpawnEditor();
     return true;
 }
 
