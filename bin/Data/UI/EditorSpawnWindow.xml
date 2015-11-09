@@ -1,297 +1,349 @@
-<?xml version="1.0"?>
-<element type="Window">
-	<attribute name="Name" value="EditorSpawnDialog" />
-	<attribute name="Position" value="500 300" />
-	<attribute name="Size" value="320 301" />
-	<attribute name="Max Size" value="470 2147483647" />
-	<attribute name="Layout Mode" value="Vertical" />
-	<attribute name="Layout Spacing" value="4" />
-	<attribute name="Layout Border" value="6 6 6 6" />
-	<attribute name="Resize Border" value="0 6 0 6" />
-	<attribute name="Is Movable" value="true" />
-	<attribute name="Is Resizable" value="true" />
+<?xml version="1.0" encoding="UTF-16"?><element type="Window">
+	<attribute name="Name" value="EditorSpawnDialog"></attribute>
+	<attribute name="Position" value="500 300"></attribute>
+	<attribute name="Size" value="320 301"></attribute>
+	<attribute name="Max Size" value="470 2147483647"></attribute>
+	<attribute name="Layout Mode" value="Vertical"></attribute>
+	<attribute name="Layout Spacing" value="4"></attribute>
+	<attribute name="Layout Border" value="6 6 6 6"></attribute>
+	<attribute name="Resize Border" value="0 6 0 6"></attribute>
+	<attribute name="Is Movable" value="true"></attribute>
+	<attribute name="Is Resizable" value="true"></attribute>
 	<element>
-		<attribute name="Min Size" value="128 16" />
-		<attribute name="Max Size" value="2147483647 16" />
-		<attribute name="Layout Mode" value="Horizontal" />
+		<attribute name="Min Size" value="128 16"></attribute>
+		<attribute name="Max Size" value="2147483647 16"></attribute>
+		<attribute name="Layout Mode" value="Horizontal"></attribute>
 		<element type="Text">
-			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
-			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
-			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
-			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
-			<attribute name="Text" value="Spawn settings" />
-			<attribute name="Auto Localizable" value="true" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1"></attribute>
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1"></attribute>
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1"></attribute>
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1"></attribute>
+			<attribute name="Text" value="Spawn settings"></attribute>
+			<attribute name="Auto Localizable" value="true"></attribute>
 		</element>
 		<element type="Button" style="CloseButton">
-			<attribute name="Name" value="CloseButton" />
+			<attribute name="Name" value="CloseButton"></attribute>
 		</element>
 	</element>
-	<element type="BorderImage" style="EditorDivider" />
+	<element type="BorderImage" style="EditorDivider"></element>
 	<element type="ListView" style="PanelView">
-		<attribute name="Min Size" value="0 60" />
+		<attribute name="Min Size" value="0 60"></attribute>
 		<element type="ScrollBar" internal="true" style="none">
-			<attribute name="Size" value="308 16" />
-			<element type="Button" internal="true" style="none" />
+			<attribute name="Size" value="308 16"></attribute>
+			<element type="Button" internal="true" style="none"></element>
 			<element type="Slider" internal="true" style="none">
-				<attribute name="Position" value="16 0" />
-				<attribute name="Size" value="276 16" />
-				<element type="BorderImage" internal="true" style="none" />
+				<attribute name="Position" value="16 0"></attribute>
+				<attribute name="Size" value="276 16"></attribute>
+				<element type="BorderImage" internal="true" style="none"></element>
 			</element>
 			<element type="Button" internal="true" style="none">
-				<attribute name="Position" value="292 0" />
+				<attribute name="Position" value="292 0"></attribute>
 			</element>
 		</element>
 		<element type="ScrollBar" internal="true" style="none">
-			<attribute name="Size" value="16 254" />
-			<element type="Button" internal="true" style="none" />
+			<attribute name="Size" value="16 254"></attribute>
+			<element type="Button" internal="true" style="none"></element>
 			<element type="Slider" internal="true" style="none">
-				<attribute name="Position" value="0 16" />
-				<attribute name="Size" value="16 222" />
-				<element type="BorderImage" internal="true" style="none" />
+				<attribute name="Position" value="0 16"></attribute>
+				<attribute name="Size" value="16 222"></attribute>
+				<element type="BorderImage" internal="true" style="none"></element>
 			</element>
 			<element type="Button" internal="true" style="none">
-				<attribute name="Position" value="0 238" />
+				<attribute name="Position" value="0 238"></attribute>
 			</element>
 		</element>
-		<element type="BorderImage" internal="true" style="none">
-			<element internal="true" style="none">
+		
+	<element type="BorderImage" internal="true" style="none">
+			
+		<element internal="true" style="none">
 				<element style="ListRow">
-					<attribute name="Min Size" value="270 17" />
-					<attribute name="Layout Spacing" value="10" />
+					<attribute name="Min Size" value="270 17"></attribute>
+					<attribute name="Layout Spacing" value="10"></attribute>
 					<element type="Text">
-						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Text" value="Random rotation" />
+						<attribute name="Top Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Top Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Text" value="Local offset"></attribute>
 					</element>
 					<element type="LineEdit">
-						<attribute name="Name" value="RandomRotation.x" />
-						<attribute name="Min Size" value="40 0" />
-						<attribute name="Max Size" value="40 2147483647" />
+						<attribute name="Name" value="PositionOffset.x"></attribute>
+						<attribute name="Min Size" value="40 0"></attribute>
+						<attribute name="Max Size" value="40 2147483647"></attribute>
 						<element type="Text" internal="true" style="none">
-							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+							<attribute name="Top Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Top Right Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Right Color" value="0.9 1 0.9 1"></attribute>
 						</element>
 						<element type="BorderImage" internal="true" style="none">
-							<attribute name="Size" value="4 15" />
-						</element>
-					</element>
-					<element type="LineEdit">
-						<attribute name="Name" value="RandomRotation.y" />
-						<attribute name="Min Size" value="40 0" />
-						<attribute name="Max Size" value="40 2147483647" />
-						<element type="Text" internal="true" style="none">
-							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
-						</element>
-						<element type="BorderImage" internal="true" style="none">
-							<attribute name="Size" value="4 15" />
+							<attribute name="Size" value="4 15"></attribute>
 						</element>
 					</element>
 					<element type="LineEdit">
-						<attribute name="Name" value="RandomRotation.z" />
-						<attribute name="Min Size" value="40 0" />
-						<attribute name="Max Size" value="40 2147483647" />
+						<attribute name="Name" value="PositionOffset.y"></attribute>
+						<attribute name="Min Size" value="40 0"></attribute>
+						<attribute name="Max Size" value="40 2147483647"></attribute>
 						<element type="Text" internal="true" style="none">
-							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+							<attribute name="Top Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Top Right Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Right Color" value="0.9 1 0.9 1"></attribute>
 						</element>
 						<element type="BorderImage" internal="true" style="none">
-							<attribute name="Size" value="4 15" />
+							<attribute name="Size" value="4 15"></attribute>
+						</element>
+					</element>
+					<element type="LineEdit">
+						<attribute name="Name" value="PositionOffset.z"></attribute>
+						<attribute name="Min Size" value="40 0"></attribute>
+						<attribute name="Max Size" value="40 2147483647"></attribute>
+						<element type="Text" internal="true" style="none">
+							<attribute name="Top Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Top Right Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Right Color" value="0.9 1 0.9 1"></attribute>
+						</element>
+						<element type="BorderImage" internal="true" style="none">
+							<attribute name="Size" value="4 15"></attribute>
 						</element>
 					</element>
 				</element>
 				<element style="ListRow">
-					<attribute name="Min Size" value="260 17" />
-					<attribute name="Layout Spacing" value="10" />
+					<attribute name="Min Size" value="270 17"></attribute>
+					<attribute name="Layout Spacing" value="10"></attribute>
 					<element type="Text">
-						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Text" value="Random scale min/max" />
+						<attribute name="Top Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Top Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Text" value="Random rotation"></attribute>
 					</element>
 					<element type="LineEdit">
-						<attribute name="Name" value="RandomScaleMin" />
-						<attribute name="Min Size" value="40 0" />
-						<attribute name="Max Size" value="40 2147483647" />
+						<attribute name="Name" value="RandomRotation.x"></attribute>
+						<attribute name="Min Size" value="40 0"></attribute>
+						<attribute name="Max Size" value="40 2147483647"></attribute>
 						<element type="Text" internal="true" style="none">
-							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+							<attribute name="Top Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Top Right Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Right Color" value="0.9 1 0.9 1"></attribute>
 						</element>
 						<element type="BorderImage" internal="true" style="none">
-							<attribute name="Size" value="4 15" />
+							<attribute name="Size" value="4 15"></attribute>
 						</element>
 					</element>
 					<element type="LineEdit">
-						<attribute name="Name" value="RandomScaleMax" />
-						<attribute name="Min Size" value="40 0" />
-						<attribute name="Max Size" value="40 2147483647" />
+						<attribute name="Name" value="RandomRotation.y"></attribute>
+						<attribute name="Min Size" value="40 0"></attribute>
+						<attribute name="Max Size" value="40 2147483647"></attribute>
 						<element type="Text" internal="true" style="none">
-							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+							<attribute name="Top Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Top Right Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Right Color" value="0.9 1 0.9 1"></attribute>
 						</element>
 						<element type="BorderImage" internal="true" style="none">
-							<attribute name="Size" value="4 15" />
+							<attribute name="Size" value="4 15"></attribute>
+						</element>
+					</element>
+					<element type="LineEdit">
+						<attribute name="Name" value="RandomRotation.z"></attribute>
+						<attribute name="Min Size" value="40 0"></attribute>
+						<attribute name="Max Size" value="40 2147483647"></attribute>
+						<element type="Text" internal="true" style="none">
+							<attribute name="Top Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Top Right Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Right Color" value="0.9 1 0.9 1"></attribute>
+						</element>
+						<element type="BorderImage" internal="true" style="none">
+							<attribute name="Size" value="4 15"></attribute>
 						</element>
 					</element>
 				</element>
 				<element style="ListRow">
-					<attribute name="Min Size" value="200 17" />
-					<attribute name="Layout Spacing" value="8" />
+					<attribute name="Min Size" value="260 17"></attribute>
+					<attribute name="Layout Spacing" value="10"></attribute>
+					<element type="Text">
+						<attribute name="Top Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Top Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Text" value="Random scale min/max"></attribute>
+					</element>
+					<element type="LineEdit">
+						<attribute name="Name" value="RandomScaleMin"></attribute>
+						<attribute name="Min Size" value="40 0"></attribute>
+						<attribute name="Max Size" value="40 2147483647"></attribute>
+						<element type="Text" internal="true" style="none">
+							<attribute name="Top Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Top Right Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Right Color" value="0.9 1 0.9 1"></attribute>
+						</element>
+						<element type="BorderImage" internal="true" style="none">
+							<attribute name="Size" value="4 15"></attribute>
+						</element>
+					</element>
+					<element type="LineEdit">
+						<attribute name="Name" value="RandomScaleMax"></attribute>
+						<attribute name="Min Size" value="40 0"></attribute>
+						<attribute name="Max Size" value="40 2147483647"></attribute>
+						<element type="Text" internal="true" style="none">
+							<attribute name="Top Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Top Right Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Right Color" value="0.9 1 0.9 1"></attribute>
+						</element>
+						<element type="BorderImage" internal="true" style="none">
+							<attribute name="Size" value="4 15"></attribute>
+						</element>
+					</element>
+				</element>
+				<element style="ListRow">
+					<attribute name="Min Size" value="200 17"></attribute>
+					<attribute name="Layout Spacing" value="8"></attribute>
 					<element type="CheckBox">
-						<attribute name="Name" value="UseNormal" />
+						<attribute name="Name" value="UseNormal"></attribute>
 					</element>
 					<element type="Text">
-						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Text" value="Normal vector oriented" />
+						<attribute name="Top Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Top Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Text" value="Normal vector oriented"></attribute>
 					</element>
 				</element>
 				<element style="ListRow">
-					<attribute name="Min Size" value="200 17" />
-					<attribute name="Layout Spacing" value="8" />
+					<attribute name="Min Size" value="200 17"></attribute>
+					<attribute name="Layout Spacing" value="8"></attribute>
 					<element type="CheckBox">
-						<attribute name="Name" value="AlignToAABBBottom" />
+						<attribute name="Name" value="AlignToAABBBottom"></attribute>
 					</element>
 					<element type="Text">
-						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Text" value="Align to AABB bottom" />
+						<attribute name="Top Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Top Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Text" value="Align to AABB bottom"></attribute>
 					</element>
 				</element>
 				<element style="ListRow">
-					<attribute name="Min Size" value="220 17" />
-					<attribute name="Layout Spacing" value="20" />
+					<attribute name="Min Size" value="220 17"></attribute>
+					<attribute name="Layout Spacing" value="20"></attribute>
 					<element type="Text">
-						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Text" value="Radius" />
+						<attribute name="Top Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Top Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Text" value="Radius"></attribute>
 					</element>
 					<element type="LineEdit">
-						<attribute name="Name" value="SpawnRadius" />
-						<attribute name="Min Size" value="50 0" />
-						<attribute name="Max Size" value="50 2147483647" />
+						<attribute name="Name" value="SpawnRadius"></attribute>
+						<attribute name="Min Size" value="50 0"></attribute>
+						<attribute name="Max Size" value="50 2147483647"></attribute>
 						<element type="Text" internal="true" style="none">
-							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+							<attribute name="Top Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Top Right Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Right Color" value="0.9 1 0.9 1"></attribute>
 						</element>
 						<element type="BorderImage" internal="true" style="none">
-							<attribute name="Size" value="4 15" />
+							<attribute name="Size" value="4 15"></attribute>
 						</element>
 					</element>
 					<element type="Text">
-						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Text" value="Count" />
+						<attribute name="Top Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Top Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Text" value="Count"></attribute>
 					</element>
 					<element type="LineEdit">
-						<attribute name="Name" value="SpawnCount" />
-						<attribute name="Min Size" value="50 0" />
-						<attribute name="Max Size" value="50 2147483647" />
+						<attribute name="Name" value="SpawnCount"></attribute>
+						<attribute name="Min Size" value="50 0"></attribute>
+						<attribute name="Max Size" value="50 2147483647"></attribute>
 						<element type="Text" internal="true" style="none">
-							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+							<attribute name="Top Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Top Right Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Right Color" value="0.9 1 0.9 1"></attribute>
 						</element>
 						<element type="BorderImage" internal="true" style="none">
-							<attribute name="Size" value="4 15" />
+							<attribute name="Size" value="4 15"></attribute>
 						</element>
 					</element>
 				</element>
 				<element type="Button">
-						<attribute name="Name" value="SetSpawnMode" />
-						<attribute name="Layout Mode" value="Horizontal" />
-						<attribute name="Layout Border" value="1 1 1 1" />
+						<attribute name="Name" value="SetSpawnMode"></attribute>
+						<attribute name="Layout Mode" value="Horizontal"></attribute>
+						<attribute name="Layout Border" value="1 1 1 1"></attribute>
 						<element type="Text">
-							<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
-							<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
-							<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
-							<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
-							<attribute name="Text" value="Spawn mode" />
-							<attribute name="Text Alignment" value="Center" />
+							<attribute name="Top Left Color" value="0.85 0.85 0.85 1"></attribute>
+							<attribute name="Top Right Color" value="0.85 0.85 0.85 1"></attribute>
+							<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1"></attribute>
+							<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1"></attribute>
+							<attribute name="Text" value="Spawn mode"></attribute>
+							<attribute name="Text Alignment" value="Center"></attribute>
 						</element>
 				</element>
-				<element type="BorderImage" style="EditorDivider" />
+				<element type="BorderImage" style="EditorDivider"></element>
 				<element style="ListRow">
-					<attribute name="Min Size" value="270 17" />
-					<attribute name="Layout Spacing" value="20" />
+					<attribute name="Min Size" value="270 17"></attribute>
+					<attribute name="Layout Spacing" value="20"></attribute>
 					<element type="Text">
-						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
-						<attribute name="Text" value="Number of spawned objects" />
+						<attribute name="Top Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Top Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1"></attribute>
+						<attribute name="Text" value="Number of spawned objects"></attribute>
 					</element>
 					<element type="LineEdit">
-						<attribute name="Name" value="NumberSpawnedObjects" />
-						<attribute name="Min Size" value="50 0" />
-						<attribute name="Max Size" value="50 2147483647" />
+						<attribute name="Name" value="NumberSpawnedObjects"></attribute>
+						<attribute name="Min Size" value="50 0"></attribute>
+						<attribute name="Max Size" value="50 2147483647"></attribute>
 						<element type="Text" internal="true" style="none">
-							<attribute name="Top Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Top Right Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
-							<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+							<attribute name="Top Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Top Right Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Left Color" value="0.9 1 0.9 1"></attribute>
+							<attribute name="Bottom Right Color" value="0.9 1 0.9 1"></attribute>
 						</element>
 						<element type="BorderImage" internal="true" style="none">
-							<attribute name="Size" value="4 15" />
+							<attribute name="Size" value="4 15"></attribute>
 						</element>
 					</element>
 				</element>
 				<element type="ListView">
-					<attribute name="Name" value="SpawnedObjects" />
-					<attribute name="Min Size" value="0 120" />
+					<attribute name="Name" value="SpawnedObjects"></attribute>
+					<attribute name="Min Size" value="0 120"></attribute>
 					<element type="ScrollBar" internal="true" style="none">
-						<attribute name="Size" value="296 16" />
-						<element type="Button" internal="true" style="none" />
+						<attribute name="Size" value="296 16"></attribute>
+						<element type="Button" internal="true" style="none"></element>
 						<element type="Slider" internal="true" style="none">
-							<attribute name="Position" value="16 0" />
-							<attribute name="Size" value="264 16" />
-							<element type="BorderImage" internal="true" style="none" />
+							<attribute name="Position" value="16 0"></attribute>
+							<attribute name="Size" value="264 16"></attribute>
+							<element type="BorderImage" internal="true" style="none"></element>
 						</element>
 						<element type="Button" internal="true" style="none">
-							<attribute name="Position" value="280 0" />
+							<attribute name="Position" value="280 0"></attribute>
 						</element>
 					</element>
 					<element type="ScrollBar" internal="true" style="none">
-						<attribute name="Size" value="16 120" />
-						<element type="Button" internal="true" style="none" />
+						<attribute name="Size" value="16 120"></attribute>
+						<element type="Button" internal="true" style="none"></element>
 						<element type="Slider" internal="true" style="none">
-							<attribute name="Position" value="0 16" />
-							<attribute name="Size" value="16 88" />
-							<element type="BorderImage" internal="true" style="none" />
+							<attribute name="Position" value="0 16"></attribute>
+							<attribute name="Size" value="16 88"></attribute>
+							<element type="BorderImage" internal="true" style="none"></element>
 						</element>
 						<element type="Button" internal="true" style="none">
-							<attribute name="Position" value="0 104" />
+							<attribute name="Position" value="0 104"></attribute>
 						</element>
 					</element>
 					<element type="BorderImage" internal="true" style="none">
-						<element internal="true" style="none" />
+						<element internal="true" style="none"></element>
 					</element>
 				</element>
-			</element>
-		</element>
-	</element>
+			</element></element></element>
 </element>
