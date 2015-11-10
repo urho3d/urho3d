@@ -18,6 +18,7 @@ public:
     void SetEndColor(const Color& endInitColor, const Color&endDeltaColor);
     void SetArcValue(float arcInc, float maxArc);
     void SetRelativePosition(bool b);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
 private:
     void Update(float dt);
@@ -50,6 +51,7 @@ private:
         Color segmentStartColor;
         /// current segment end color
         Color segmentEndColor;
+
         TrailSegment() {};
         TrailSegment( const Vector3& v1,
                       const Vector3& v2,

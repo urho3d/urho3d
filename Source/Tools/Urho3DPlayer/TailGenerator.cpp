@@ -2,6 +2,7 @@
 #include "ExtUtil.h"
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/Scene/SceneEvents.h>
+#include <Urho3D/Graphics/DebugRenderer.h>
 #include <Urho3D/DebugNew.h>
 
 namespace Urho3D
@@ -46,7 +47,6 @@ void TailGenerator::RegisterObject(Context *context)
     URHO3D_ATTRIBUTE("MaxArc", float, rMaxArc_, 10.0f, AM_DEFAULT);
 #endif
 }
-
 
 void TailGenerator::HandleScenePostUpdate(StringHash eventType, VariantMap &eventData)
 {
@@ -473,6 +473,18 @@ void TailGenerator::SetArcValue(float arcInc, float maxArc)
 void TailGenerator::SetRelativePosition(bool b)
 {
     relativePosition_ = b;
+}
+
+void TailGenerator::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    for (TrailSegmentList::ConstIterator i=segmentList_.Begin(); i!=segmentList_.End(); ++i)
+    {
+        Vector3 worldPt0 = i->segmentStart;
+        Vector3 worldPt1 = i->segmentEnd;
+        Vector3 pt0 = relativePosition_ ? TransformPoint(worldPt0, node_) : worldPt0;
+        Vector3 pt1 = relativePosition_ ? TransformPoint(worldPt1, node_) : worldPt1;
+        debug->AddLine(pt0, pt1, i->segmentStartColor, depthTest);
+    }
 }
 
 }
