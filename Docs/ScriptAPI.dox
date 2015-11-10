@@ -1300,6 +1300,7 @@ namespace Urho3D
 - %Draw %OffMeshConnections : bool
 - %Draw %NavAreas : bool
 - %Max %Obstacles : int
+- %Max %Layers : int
 - %Draw %Obstacles : bool
 
 ### Light
@@ -6341,6 +6342,7 @@ Properties:
 - bool enabledEffective // readonly
 - uint id // readonly
 - bool initialized // readonly
+- bool maxLayers
 - uint maxObstacles
 - Node@ node // readonly
 - uint numAttributes // readonly
@@ -11497,7 +11499,7 @@ Methods:
 - String Replaced(uint8, uint8, bool = true) const
 - void Resize(uint)
 - void SetUTF8FromLatin1(const String&)
-- String[]@ Split(uint8) const
+- String[]@ Split(uint8, bool = false) const
 - bool StartsWith(const String&, bool = true) const
 - String Substring(uint) const
 - String Substring(uint, uint) const

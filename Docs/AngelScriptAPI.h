@@ -4494,6 +4494,7 @@ bool enabledEffective;
 uint id;
 /* readonly */
 bool initialized;
+bool maxLayers;
 uint maxObstacles;
 /* readonly */
 Node node;
@@ -10369,7 +10370,7 @@ String Replaced(const String&, const String&, bool = true) const;
 String Replaced(uint8, uint8, bool = true) const;
 void Resize(uint);
 void SetUTF8FromLatin1(const String&);
-Array<String> Split(uint8) const;
+Array<String> Split(uint8, bool = false) const;
 bool StartsWith(const String&, bool = true) const;
 String Substring(uint) const;
 String Substring(uint, uint) const;

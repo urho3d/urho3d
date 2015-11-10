@@ -174,6 +174,8 @@ void RegisterDynamicNavigationMesh(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DynamicNavigationMesh", "Array<Vector3>@ FindPath(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(DynamicNavigationMeshFindPath), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("DynamicNavigationMesh", "void set_drawObstacles(bool)", asMETHOD(DynamicNavigationMesh, SetDrawObstacles), asCALL_THISCALL);
     engine->RegisterObjectMethod("DynamicNavigationMesh", "bool get_drawObstacles() const", asMETHOD(DynamicNavigationMesh, GetDrawObstacles), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DynamicNavigationMesh", "void set_maxLayers(uint)", asMETHOD(DynamicNavigationMesh, SetMaxLayers), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DynamicNavigationMesh", "bool get_maxLayers() const", asMETHOD(DynamicNavigationMesh, GetMaxLayers), asCALL_THISCALL);
     engine->RegisterObjectMethod("DynamicNavigationMesh", "void set_maxObstacles(uint)", asMETHOD(DynamicNavigationMesh, SetMaxObstacles), asCALL_THISCALL);
     engine->RegisterObjectMethod("DynamicNavigationMesh", "uint get_maxObstacles() const", asMETHOD(DynamicNavigationMesh, GetMaxObstacles), asCALL_THISCALL);
 }

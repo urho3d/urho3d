@@ -193,7 +193,6 @@ void EditParticleEffectColorFrameRemove(StringHash eventType, VariantMap& eventD
 
 }
 
-
 void EditParticleEffectTextureFrameRemove(StringHash eventType, VariantMap& eventData)
 {
     if (inParticleEffectRefresh)
@@ -792,12 +791,20 @@ void EditParticleEffectRelative(StringHash eventType, VariantMap& eventData)
     EndParticleEffectEdit();
 }
 
-bool ShowParticleEffectEditor()
+bool ToggleParticleEffectEditor()
+{
+    if (particleEffectWindow.visible == false)
+        ShowParticleEffectEditor();
+    else
+        HideParticleEffectEditor();
+    return true;
+}
+
+void ShowParticleEffectEditor()
 {
     RefreshParticleEffectEditor();
     particleEffectWindow.visible = true;
     particleEffectWindow.BringToFront();
-    return true;
 }
 
 void HideParticleEffectEditor()

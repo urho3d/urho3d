@@ -220,12 +220,20 @@ void EditLanguageSelector(StringHash eventType, VariantMap& eventData)
     localization.SetLanguage(edit.selection);
 }
 
-bool ShowEditorPreferencesDialog()
+bool ToggleEditorPreferencesDialog()
+{
+    if (preferencesDialog.visible == false)
+        ShowEditorPreferencesDialog();
+    else
+        HideEditorPreferencesDialog();
+    return true;
+}
+
+void ShowEditorPreferencesDialog()
 {
     UpdateEditorPreferencesDialog();
     preferencesDialog.visible = true;
     preferencesDialog.BringToFront();
-    return true;
 }
 
 void HideEditorPreferencesDialog()
