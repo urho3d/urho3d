@@ -174,12 +174,20 @@ void UpdateEditorSettingsDialog()
     }
 }
 
-bool ShowEditorSettingsDialog()
+bool ToggleEditorSettingsDialog()
+{
+    if (settingsDialog.visible == false)
+        ShowEditorSettingsDialog();
+    else
+        HideEditorSettingsDialog();
+    return true;
+}
+
+void ShowEditorSettingsDialog()
 {
     UpdateEditorSettingsDialog();
     settingsDialog.visible = true;
     settingsDialog.BringToFront();
-    return true;
 }
 
 void HideEditorSettingsDialog()

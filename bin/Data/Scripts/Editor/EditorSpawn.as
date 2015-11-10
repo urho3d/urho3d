@@ -1,5 +1,8 @@
 // Urho3D spawn editor
 
+LineEdit@ positionOffsetX;
+LineEdit@ positionOffsetY;
+LineEdit@ positionOffsetZ;
 LineEdit@ randomRotationX;
 LineEdit@ randomRotationY;
 LineEdit@ randomRotationZ;
@@ -10,6 +13,7 @@ LineEdit@ spawnRadiusEdit;
 LineEdit@ spawnCountEdit;
 
 Window@ spawnWindow;
+Vector3 positionOffset = Vector3(0, 0, 0);
 Vector3 randomRotation = Vector3(0, 0, 0);
 float randomScaleMin = 1;
 float randomScaleMax = 1;
@@ -36,6 +40,12 @@ void CreateSpawnEditor()
 
     HideSpawnEditor();
     SubscribeToEvent(spawnWindow.GetChild("CloseButton", true), "Released", "HideSpawnEditor");
+    positionOffsetX = spawnWindow.GetChild("PositionOffset.x", true);
+    positionOffsetY = spawnWindow.GetChild("PositionOffset.y", true);
+    positionOffsetZ = spawnWindow.GetChild("PositionOffset.z", true);
+    positionOffsetX.text = String(positionOffset.x);
+    positionOffsetY.text = String(positionOffset.y);
+    positionOffsetZ.text = String(positionOffset.z);
     randomRotationX = spawnWindow.GetChild("RandomRotation.x", true);
     randomRotationY = spawnWindow.GetChild("RandomRotation.y", true);
     randomRotationZ = spawnWindow.GetChild("RandomRotation.z", true);
@@ -60,6 +70,9 @@ void CreateSpawnEditor()
     spawnRadiusEdit.text = String(spawnRadius);
     spawnCountEdit.text = String(spawnCount);
 
+    SubscribeToEvent(positionOffsetX, "TextChanged", "EditPositionOffset");
+    SubscribeToEvent(positionOffsetY, "TextChanged", "EditPositionOffset");
+    SubscribeToEvent(positionOffsetZ, "TextChanged", "EditPositionOffset");
     SubscribeToEvent(randomRotationX, "TextChanged", "EditRandomRotation");
     SubscribeToEvent(randomRotationY, "TextChanged", "EditRandomRotation");
     SubscribeToEvent(randomRotationZ, "TextChanged", "EditRandomRotation");
@@ -74,11 +87,19 @@ void CreateSpawnEditor()
     RefreshPickedObjects();
 }
 
-bool ShowSpawnEditor()
+bool ToggleSpawnEditor()
+{
+    if (spawnWindow.visible == false)
+        ShowSpawnEditor();
+    else
+        HideSpawnEditor();
+    return true;
+}
+
+void ShowSpawnEditor()
 {
     spawnWindow.visible = true;
     spawnWindow.BringToFront();
-    return true;
 }
 
 void HideSpawnEditor()
@@ -97,6 +118,13 @@ void PickSpawnObject()
         lastPath = sceneResourcePath;
     CreateFileSelector(localization.Get("Pick ") + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter, false);
     SubscribeToEvent(uiFileSelector, "FileSelected", "PickSpawnObjectDone");
+}
+
+void EditPositionOffset(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ edit = eventData["Element"].GetPtr();
+    positionOffset = Vector3(positionOffsetX.text.ToFloat(), positionOffsetY.text.ToFloat(), positionOffsetZ.text.ToFloat());
+    UpdateHierarchyItem(editorScene);
 }
 
 void EditRandomRotation(StringHash eventType, VariantMap& eventData)
@@ -229,7 +257,7 @@ void PlaceObject(Vector3 spawnPosition, Vector3 normal)
 
     int number = RandomInt(0, spawnedObjectsNames.length);
     File@ file = cache.GetFile(spawnedObjectsNames[number]);
-    Node@ spawnedObject = InstantiateNodeFromFile(file, spawnPosition, spawnRotation, Random(randomScaleMin, randomScaleMax));
+    Node@ spawnedObject = InstantiateNodeFromFile(file, spawnPosition + (spawnRotation * positionOffset), spawnRotation, Random(randomScaleMin, randomScaleMax));
     if (spawnedObject is null)
     {
         spawnedObjectsNames[number] = spawnedObjectsNames[spawnedObjectsNames.length - 1];
