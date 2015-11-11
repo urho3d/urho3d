@@ -229,6 +229,20 @@
 					</element>
 				</element>
 				<element style="ListRow">
+					<attribute name="Min Size" value="200 17" />
+					<attribute name="Layout Spacing" value="8" />
+					<element type="CheckBox">
+						<attribute name="Name" value="SpawnOnSelected" />
+					</element>
+					<element type="Text">
+						<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+						<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+						<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+						<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+						<attribute name="Text" value="Spawn on selected node" />
+					</element>
+				</element>
+				<element style="ListRow">
 					<attribute name="Min Size" value="220 17" />
 					<attribute name="Layout Spacing" value="20" />
 					<element type="Text">
