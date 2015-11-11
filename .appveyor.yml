@@ -21,8 +21,6 @@
 #
 
 version: '{build}'
-branches:
-  only: [master]
 platform:
   - x86
   - x64
