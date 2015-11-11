@@ -44,7 +44,7 @@ install:
   - ps: if ($env:APPVEYOR_REPO_TAG -eq "true" -or (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED)))
         {
           if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME } else { git fetch -q --unshallow };
-          if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC.zip" };
+          if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC-3D11.zip" };
           $env:PACKAGE_UPLOAD = "1";
           choco install doxygen.portable graphviz.portable >$null;
         }
