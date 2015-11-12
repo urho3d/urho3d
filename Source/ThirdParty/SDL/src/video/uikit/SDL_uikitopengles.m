@@ -113,10 +113,14 @@ SDL_GLContext UIKit_GL_CreateContext(_THIS, SDL_Window * window)
 
     /* construct our view, passing in SDL's OpenGL configuration data */
     CGRect frame;
-    if (window->flags & (SDL_WINDOW_FULLSCREEN|SDL_WINDOW_BORDERLESS)) {
-        frame = [displaydata->uiscreen bounds];
+    if (!urhoPlaceholderView){
+        if (window->flags & (SDL_WINDOW_FULLSCREEN|SDL_WINDOW_BORDERLESS)) {
+            frame = [displaydata->uiscreen bounds];
+        } else {
+            frame = [displaydata->uiscreen applicationFrame];
+        }
     } else {
-        frame = [displaydata->uiscreen applicationFrame];
+        frame = [urhoPlaceholderView bounds];
     }
     view = [[SDL_uikitopenglview alloc] initWithFrame: frame
                                     scale: displaymodedata->scale
@@ -139,7 +143,12 @@ SDL_GLContext UIKit_GL_CreateContext(_THIS, SDL_Window * window)
         [view->viewcontroller setView:view];
         [view->viewcontroller retain];
     }
-    [uiwindow addSubview: view];
+    
+    if (!urhoPlaceholderView) {
+        [uiwindow addSubview: view];
+    } else {
+        [urhoPlaceholderView addSubview:view];
+    }
 
     /* The view controller needs to be the root in order to control rotation on iOS 6.0 */
     if (uiwindow.rootViewController == nil) {

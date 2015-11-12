@@ -44,6 +44,20 @@
 namespace Urho3D
 {
 
+//MONO: callbacks for SaveXML/LoadXML/Attached to node. TODO: binary Save/Load
+//TODO: re-implement it via Urho events system (add new custom events)
+enum MonoComponentCallbackType { SaveXml, LoadXml, AttachedToNode };
+typedef void(*MonoComponentCallback)(Component *, XMLElement * element, MonoComponentCallbackType);
+MonoComponentCallback monoComponentCallback;
+extern "C"
+#ifdef _MSC_VER
+__declspec(dllexport)
+#endif
+void RegisterMonoComponentCallback(MonoComponentCallback callback)
+{
+	monoComponentCallback = callback;
+}
+
 Node::Node(Context* context) :
     Animatable(context),
     networkUpdate_(false),
@@ -189,6 +203,8 @@ bool Node::SaveXML(XMLElement& dest) const
         XMLElement compElem = dest.CreateChild("component");
         if (!component->SaveXML(compElem))
             return false;
+        if (monoComponentCallback)
+            monoComponentCallback(component, &compElem, SaveXml);
     }
 
     // Write child nodes
@@ -1329,6 +1345,8 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
             resolver.AddComponent(compID, newComponent);
             if (!newComponent->LoadXML(compElem))
                 return false;
+            if (monoComponentCallback)
+                monoComponentCallback(newComponent, &compElem, LoadXml);
         }
 
         compElem = compElem.GetNext("component");
@@ -1544,6 +1562,8 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
 
         scene_->SendEvent(E_COMPONENTADDED, eventData);
     }
+    if (monoComponentCallback)
+        monoComponentCallback(component, NULL, AttachedToNode);
 }
 
 unsigned Node::GetNumPersistentChildren() const

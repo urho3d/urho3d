@@ -36,12 +36,15 @@ RefCounted::RefCounted() :
     (refCount_->weakRefs_)++;
 }
 
+//MonoUrho: we need these events to control objects lifecycle
+extern "C" void HandleRefCountedEvent(void* ptr, RefCountedEvent rcEvent);
+
 RefCounted::~RefCounted()
 {
     assert(refCount_);
     assert(refCount_->refs_ == 0);
     assert(refCount_->weakRefs_ > 0);
-
+    HandleRefCountedEvent(this, RCE_DELETE);
     // Mark object as expired, release the self weak ref and delete the refcount if no other weak refs exist
     refCount_->refs_ = -1;
     (refCount_->weakRefs_)--;
@@ -55,6 +58,7 @@ void RefCounted::AddRef()
 {
     assert(refCount_->refs_ >= 0);
     (refCount_->refs_)++;
+    HandleRefCountedEvent(this, RCE_ADDREF);
 }
 
 void RefCounted::ReleaseRef()

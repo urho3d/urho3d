@@ -64,7 +64,7 @@
 @end
 
 // Urho3D: use subclass for iOS 8 window size hack
-static int SetupWindowData(_THIS, SDL_Window *window, SDL_uikitwindow *uiwindow, SDL_bool created)
+static int SetupWindowData(_THIS, SDL_Window *window, UIWindow *uiwindow, SDL_bool created)
 {
     SDL_VideoDisplay *display = SDL_GetDisplayForWindow(window);
     SDL_DisplayModeData *displaymodedata = (SDL_DisplayModeData *) display->current_mode.driverdata;
@@ -214,8 +214,14 @@ UIKit_CreateWindow(_THIS, SDL_Window *window)
     /* ignore the size user requested, and make a fullscreen window */
     /* !!! FIXME: can we have a smaller view? */
     // Urho3D: create subclass for iOS 8 window size hack
-    SDL_uikitwindow *uiwindow = [SDL_uikitwindow alloc];
-    uiwindow = [uiwindow initWithFrame:[data->uiscreen bounds]];
+    
+    UIWindow *uiwindow;
+    if (!urhoPlaceholderWindow){
+        uiwindow = [SDL_uikitwindow alloc];
+        uiwindow = [uiwindow initWithFrame:[data->uiscreen bounds]];
+    } else {
+        uiwindow = urhoPlaceholderWindow;
+    }
 
     /* put the window on an external display if appropriate. This implicitly
      * does [uiwindow setframe:[uiscreen bounds]], so don't do it on the
@@ -350,5 +356,12 @@ SDL_iPhoneSetAnimationCallback(SDL_Window * window, int interval, void (*callbac
 }
 
 #endif /* SDL_VIDEO_DRIVER_UIKIT */
+
+// UrhoSharp:
+void SDL_SetExternalViewPlaceholder(UIView* view, UIWindow* window){
+    urhoPlaceholderView = view;
+    urhoPlaceholderWindow = window;
+    //TODO: cleanup?
+}
 
 /* vi: set ts=4 sw=4 expandtab: */

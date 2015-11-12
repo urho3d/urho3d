@@ -28,6 +28,10 @@
 #import "SDL_uikitvideo.h"
 #import "SDL_uikitopenglview.h"
 #import "SDL_uikitviewcontroller.h"
+#import <UIKit/UIKit.h>
+
+UIView *urhoPlaceholderView;
+UIWindow *urhoPlaceholderWindow;
 
 typedef struct SDL_WindowData SDL_WindowData;
 
@@ -50,7 +54,7 @@ extern SDL_bool UIKit_GetWindowWMInfo(_THIS, SDL_Window * window,
 struct SDL_WindowData
 {
     // Urho3D: subclass for iOS 8 window size hack
-    SDL_uikitwindow *uiwindow;
+    UIWindow *uiwindow;
     SDL_uikitopenglview *view;
     SDL_uikitviewcontroller *viewcontroller;
 };

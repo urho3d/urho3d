@@ -55,6 +55,8 @@ struct RefCount
     int weakRefs_;
 };
 
+enum RefCountedEvent { RCE_DELETE, RCE_ADDREF };
+
 /// Base class for intrusively reference-counted objects. These are noncopyable and non-assignable.
 class URHO3D_API RefCounted
 {
