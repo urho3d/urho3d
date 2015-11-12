@@ -34,7 +34,6 @@ if (NOT WIN32 OR URHO3D_OPENGL OR DIRECT3D_FOUND)
     return ()
 endif ()
 
-# Prefer to use MS Windows SDK, so search for it first
 if (MINGW)
     # Assume that 'libd3dcompiler.a' is a symlink pointing to 'libd3dcompiler_46.a' (See this discussion http://urho3d.prophpbb.com/topic504.html)
     # Anyway, we could not do anything else in the build system automation with version lower than 46 and libd3dcompiler_46.a is the latest supported version
@@ -47,14 +46,15 @@ if (CMAKE_CL_64)
 else ()
     set (PATH_SUFFIX x86)
 endif ()
-# Only need to search the DLL as a proxy for the presence of the MS Windows SDK
+# Try to find the compiler DLL from the Microsoft SDK
 # Note: do not use default paths such as the PATH variable, to potentially avoid using a wrong architecture DLL
 find_file (DIRECT3D_DLL NAMES ${DLL_NAMES} PATHS
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v10.0;InstallationFolder]/Redist/D3D/${PATH_SUFFIX}"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v8.1;InstallationFolder]/Redist/D3D/${PATH_SUFFIX}"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v8.0;InstallationFolder]/Redist/D3D/${PATH_SUFFIX}"
     NO_DEFAULT_PATH)
-if (DIRECT3D_DLL OR MINGW)  # MinGW compiler toolchain is assumed to come with its own necessary headers and libraries for Direct3D
+# Microsoft SDK can be used on VS2012 and above; else fallback to search for the DirectX SDK
+if ((DIRECT3D_DLL AND MSVC_VERSION GREATER 1600) OR MINGW)  # MinGW compiler toolchain is assumed to come with its own necessary headers and libraries for Direct3D
     if (NOT URHO3D_D3D11)
         set (DIRECT3D_LIBRARIES d3d9 d3dcompiler)
     else ()
@@ -62,9 +62,9 @@ if (DIRECT3D_DLL OR MINGW)  # MinGW compiler toolchain is assumed to come with i
     endif ()
     unset (DIRECT3D_INCLUDE_DIRS)
     set (DIRECT3D_FOUND 1)
-elseif (MSVC_VERSION LESS 1700 OR NOT URHO3D_D3D11)
-    # To avoid incompatibility between DirectX SDK and Windows SDK defines and the resulting warning spam,
-    # only search for the DirectX SDK when using Visual Studion lower than VS2012 or when using D3D9
+else ()
+    # The DLL from Microsoft SDK is not usable with DirectX SDK
+    unset (DIRECT3D_DLL CACHE)
     set (DIRECTX_INC_SEARCH_PATH
         "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include"
         "C:/Program Files/Microsoft DirectX SDK (June 2010)/Include"
