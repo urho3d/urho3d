@@ -352,9 +352,9 @@ bool GetSpawnPositionOnNode(const Ray&in cameraRay, float maxDistance, Vector3&o
         {
             RayQueryResult result = results[0];
 
-            for(int i=0; i<results.length; i++)
+            for(uint i = 0; i < results.length; i++)
             {
-                if (results[i].node.id == node.id)
+                if (results[i].node is node)
                 {
                     result = results[i];
                     break;
@@ -376,10 +376,10 @@ bool GetSpawnPositionOnNode(const Ray&in cameraRay, float maxDistance, Vector3&o
 
                 result = randomResults[0];
 
-                // find node in results
-                for(int i=0; i<randomResults.length; i++)
+                // Find node in results
+                for(uint i = 0; i < randomResults.length; i++)
                 {
-                    if (randomResults[i].node.id == node.id)
+                    if (randomResults[i].node is node)
                     {
                         result = randomResults[i];
                         break;
