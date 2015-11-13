@@ -56,6 +56,11 @@ void Mutex::Acquire()
     EnterCriticalSection((CRITICAL_SECTION*)handle_);
 }
 
+bool Mutex::TryAcquire()
+{
+    return TryEnterCriticalSection((CRITICAL_SECTION*)handle_) != FALSE;
+}
+
 void Mutex::Release()
 {
     LeaveCriticalSection((CRITICAL_SECTION*)handle_);
@@ -84,6 +89,11 @@ Mutex::~Mutex()
 void Mutex::Acquire()
 {
     pthread_mutex_lock((pthread_mutex_t*)handle_);
+}
+
+bool Mutex::TryAcquire()
+{
+    return pthread_mutex_trylock((pthread_mutex_t*)handle_) == 0;
 }
 
 void Mutex::Release()
