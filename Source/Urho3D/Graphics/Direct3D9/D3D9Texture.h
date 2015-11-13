@@ -52,7 +52,7 @@ public:
     void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
 
     /// Set shadow compare mode. No-op on D3D9.
-    void SetShadowCompare(bool enable) { }
+    void SetShadowCompare(bool enable);
 
     /// Set border color for border addressing mode.
     void SetBorderColor(const Color& color);
