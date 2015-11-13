@@ -122,7 +122,7 @@ bool PackageFile::Exists(const String& fileName) const
 {
     bool found = entries_.Find(fileName) != entries_.End();
 
-#ifdef WIN32
+#ifdef _WIN32
     // On Windows perform a fallback case-insensitive search
     if (!found)
     {
@@ -146,7 +146,7 @@ const PackageEntry* PackageFile::GetEntry(const String& fileName) const
     if (i != entries_.End())
         return &i->second_;
 
-#ifdef WIN32
+#ifdef _WIN32
     // On Windows perform a fallback case-insensitive search
     else
     {

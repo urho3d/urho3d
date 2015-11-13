@@ -78,7 +78,7 @@ private:
     /// Watch subdirectories flag.
     bool watchSubDirs_;
 
-#ifdef WIN32
+#ifdef _WIN32
 
     /// Directory handle for the path being watched.
     void* dirHandle_;

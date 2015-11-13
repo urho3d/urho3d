@@ -24,7 +24,7 @@
 
 #include "../Core/Mutex.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <pthread.h>
@@ -35,7 +35,7 @@
 namespace Urho3D
 {
 
-#ifdef WIN32
+#ifdef _WIN32
 
 Mutex::Mutex() :
     handle_(new CRITICAL_SECTION)

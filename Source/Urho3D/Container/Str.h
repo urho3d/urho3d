@@ -470,7 +470,7 @@ public:
     static void EncodeUTF8(char*& dest, unsigned unicodeChar);
     /// Decode Unicode character from UTF8. Pointer will be incremented.
     static unsigned DecodeUTF8(const char*& src);
-#ifdef WIN32
+#ifdef _WIN32
     /// Encode Unicode character to UTF16. Pointer will be incremented.
     static void EncodeUTF16(wchar_t*& dest, unsigned unicodeChar);
     /// Decode Unicode character from UTF16. Pointer will be incremented.
