@@ -296,7 +296,8 @@ void Input::Update()
         if (focusedThisFrame_)
             GainFocus();
 
-        if (inputFocus_ && (flags & SDL_WINDOW_INPUT_FOCUS) == 0)
+        // Check for losing focus. The window flags are not reliable when using an external window, so prevent losing focus in that case
+        if (inputFocus_ && !graphics_->GetExternalWindow() && (flags & SDL_WINDOW_INPUT_FOCUS) == 0)
             LoseFocus();
     }
     else
