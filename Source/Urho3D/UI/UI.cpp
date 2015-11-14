@@ -92,7 +92,7 @@ UI::UI(Context* context) :
     maxFontTextureSize_(DEFAULT_FONT_TEXTURE_MAX_SIZE),
     initialized_(false),
     usingTouchInput_(false),
-#ifdef WIN32
+#ifdef _WIN32
     nonFocusedMouseWheel_(false),    // Default MS Windows behaviour
 #else
     nonFocusedMouseWheel_(true),     // Default Mac OS X and Linux behaviour

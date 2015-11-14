@@ -757,7 +757,7 @@ void String::SetUTF8FromWChar(const wchar_t* str)
     if (!str)
         return;
 
-#ifdef WIN32
+#ifdef _WIN32
     while (*str)
     {
         unsigned unicodeChar = DecodeUTF16(str);
@@ -996,7 +996,7 @@ unsigned String::DecodeUTF8(const char*& src)
     }
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 void String::EncodeUTF16(wchar_t*& dest, unsigned unicodeChar)
 {
     if (unicodeChar < 0x10000)
@@ -1245,7 +1245,7 @@ WString::WString(const String& str) :
     length_(0),
     buffer_(0)
 {
-#ifdef WIN32
+#ifdef _WIN32
     unsigned neededSize = 0;
     wchar_t temp[3];
     

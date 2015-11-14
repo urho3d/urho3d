@@ -96,6 +96,10 @@ void Texture::SetAddressMode(TextureCoordinate coord, TextureAddressMode mode)
     addressMode_[coord] = mode;
 }
 
+void Texture::SetShadowCompare(bool /*enable*/)
+{
+}
+
 void Texture::SetBorderColor(const Color& color)
 {
     borderColor_ = color;

@@ -16,7 +16,11 @@ float GetVertexLight(int index, vec3 worldPos, vec3 normal)
     // Directional light
     if (invRange == 0.0)
     {
-        float NdotL = max(dot(normal, lightDir), 0.0);
+        #ifdef TRANSLUCENT
+            float NdotL = abs(dot(normal, lightDir));
+        #else
+            float NdotL = max(dot(normal, lightDir), 0.0);
+        #endif
         return NdotL;
     }
     // Point/spot light
@@ -25,7 +29,11 @@ float GetVertexLight(int index, vec3 worldPos, vec3 normal)
         vec3 lightVec = (lightPos - worldPos) * invRange;
         float lightDist = length(lightVec);
         vec3 localDir = lightVec / lightDist;
-        float NdotL = max(dot(normal, localDir), 0.0);
+        #ifdef TRANSLUCENT
+            float NdotL = abs(dot(normal, localDir));
+        #else
+            float NdotL = max(dot(normal, localDir), 0.0);
+        #endif
         float atten = clamp(1.0 - lightDist * lightDist, 0.0, 1.0);
         float spotEffect = dot(localDir, lightDir);
         float spotAtten = clamp((spotEffect - cutoff) * invCutoff, 0.0, 1.0);
@@ -85,12 +93,20 @@ float GetDiffuse(vec3 normal, vec3 worldPos, out vec3 lightDir)
 {
     #ifdef DIRLIGHT
         lightDir = cLightDirPS;
-        return max(dot(normal, lightDir), 0.0);
+        #ifdef TRANSLUCENT
+            return abs(dot(normal, lightDir));
+        #else
+            return max(dot(normal, lightDir), 0.0);
+        #endif
     #else
         vec3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
         float lightDist = length(lightVec);
         lightDir = lightVec / lightDist;
-        return max(dot(normal, lightDir), 0.0) * texture2D(sLightRampMap, vec2(lightDist, 0.0)).r;
+        #ifdef TRANSLUCENT
+            return abs(dot(normal, lightDir)) * texture2D(sLightRampMap, vec2(lightDist, 0.0)).r;
+        #else
+            return max(dot(normal, lightDir), 0.0) * texture2D(sLightRampMap, vec2(lightDist, 0.0)).r;
+        #endif
     #endif
 }
 
@@ -107,7 +123,7 @@ float GetDiffuseVolumetric(vec3 worldPos)
 
 float GetSpecular(vec3 normal, vec3 eyeVec, vec3 lightDir, float specularPower)
 {
-    vec3 halfVec = normalize(normalize(eyeVec) + lightDir);
+    vec3 halfVec = normalize(normalize(eyeVec) + lightDir);  
     return pow(max(dot(normal, halfVec), 0.0), specularPower);
 }
 

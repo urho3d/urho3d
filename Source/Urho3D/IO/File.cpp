@@ -37,7 +37,7 @@
 namespace Urho3D
 {
 
-#ifdef WIN32
+#ifdef _WIN32
 static const wchar_t* openMode[] =
 {
     L"rb",
@@ -167,7 +167,7 @@ bool File::Open(const String& fileName, FileMode mode)
         return false;
     }
 
-#ifdef WIN32
+#ifdef _WIN32
     handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode]);
 #else
     handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode]);
@@ -176,7 +176,7 @@ bool File::Open(const String& fileName, FileMode mode)
     // If file did not exist in readwrite mode, retry with write-update mode
     if (mode == FILE_READWRITE && !handle_)
     {
-#ifdef WIN32
+#ifdef _WIN32
         handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode + 1]);
 #else
         handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode + 1]);
@@ -223,7 +223,7 @@ bool File::Open(PackageFile* package, const String& fileName)
     if (!entry)
         return false;
 
-#ifdef WIN32
+#ifdef _WIN32
     handle_ = _wfopen(GetWideNativePath(package->GetName()).CString(), L"rb");
 #else
     handle_ = fopen(GetNativePath(package->GetName()).CString(), "rb");
