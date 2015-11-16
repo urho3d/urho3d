@@ -45,25 +45,8 @@ namespace Urho3D
 
 static const float DEFAULT_OCTREE_SIZE = 1000.0f;
 static const int DEFAULT_OCTREE_LEVELS = 8;
-static const int RAYCASTS_PER_WORK_ITEM = 4;
 
 extern const char* SUBSYSTEM_CATEGORY;
-
-void RaycastDrawablesWork(const WorkItem* item, unsigned threadIndex)
-{
-    Octree* octree = reinterpret_cast<Octree*>(item->aux_);
-    Drawable** start = reinterpret_cast<Drawable**>(item->start_);
-    Drawable** end = reinterpret_cast<Drawable**>(item->end_);
-    const RayOctreeQuery& query = *octree->rayQuery_;
-    PODVector<RayQueryResult>& results = octree->rayQueryResults_[threadIndex];
-
-    while (start != end)
-    {
-        Drawable* drawable = *start;
-        drawable->ProcessRayQuery(query, results);
-        ++start;
-    }
-}
 
 void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex)
 {
@@ -334,10 +317,6 @@ Octree::Octree(Context* context) :
     Octant(BoundingBox(-DEFAULT_OCTREE_SIZE, DEFAULT_OCTREE_SIZE), 0, 0, this),
     numLevels_(DEFAULT_OCTREE_LEVELS)
 {
-    // Resize threaded ray query intermediate result vector according to number of worker threads
-    WorkQueue* workQueue = GetSubsystem<WorkQueue>();
-    rayQueryResults_.Resize(workQueue ? workQueue->GetNumThreads() + 1 : 1);
-
     // If the engine is running headless, subscribe to RenderUpdate events for manually updating the octree
     // to allow raycasts and animation update
     if (!GetSubsystem<Graphics>())
@@ -512,56 +491,7 @@ void Octree::Raycast(RayOctreeQuery& query) const
     URHO3D_PROFILE(Raycast);
 
     query.result_.Clear();
-
-    WorkQueue* queue = GetSubsystem<WorkQueue>();
-
-    // If no worker threads or no triangle-level testing, or we are being called from a worker thread do not create work items
-    if (query.level_ < RAY_TRIANGLE || !queue->GetNumThreads() || !Thread::IsMainThread() || queue->IsCompleting())
-        GetDrawablesInternal(query);
-    else
-    {
-        // Threaded ray query: first get the drawables
-        rayQuery_ = &query;
-        rayQueryDrawables_.Clear();
-        GetDrawablesOnlyInternal(query, rayQueryDrawables_);
-
-        // Check that amount of drawables is large enough to justify threading
-        if (rayQueryDrawables_.Size() >= RAYCASTS_PER_WORK_ITEM * 2)
-        {
-            for (unsigned i = 0; i < rayQueryResults_.Size(); ++i)
-                rayQueryResults_[i].Clear();
-
-            PODVector<Drawable*>::Iterator start = rayQueryDrawables_.Begin();
-            while (start != rayQueryDrawables_.End())
-            {
-                SharedPtr<WorkItem> item = queue->GetFreeItem();
-                item->priority_ = M_MAX_UNSIGNED;
-                item->workFunction_ = RaycastDrawablesWork;
-                item->aux_ = const_cast<Octree*>(this);
-
-                PODVector<Drawable*>::Iterator end = rayQueryDrawables_.End();
-                if (end - start > RAYCASTS_PER_WORK_ITEM)
-                    end = start + RAYCASTS_PER_WORK_ITEM;
-
-                item->start_ = &(*start);
-                item->end_ = &(*end);
-                queue->AddWorkItem(item);
-
-                start = end;
-            }
-
-            // Merge per-thread results
-            queue->Complete(M_MAX_UNSIGNED);
-            for (unsigned i = 0; i < rayQueryResults_.Size(); ++i)
-                query.result_.Insert(query.result_.End(), rayQueryResults_[i].Begin(), rayQueryResults_[i].End());
-        }
-        else
-        {
-            for (PODVector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
-                (*i)->ProcessRayQuery(query, query.result_);
-        }
-    }
-
+    GetDrawablesInternal(query);
     Sort(query.result_.Begin(), query.result_.End(), CompareRayQueryResults);
 }
 

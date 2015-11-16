@@ -344,6 +344,8 @@ before_script:
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
   - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done; fi
   - rake ci_setup_cache
+  # Ensure the deployment target is being controlled by our script intead of by Travis-CI or by-product from brew install
+  - unset MACOSX_DEPLOYMENT_TARGET
 script: rake ci
 after_success: if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload || ! [ $RELEASE_TAG ]; fi
 after_script: rake ci_teardown_cache
