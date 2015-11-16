@@ -40,6 +40,7 @@ enum LuaScriptObjectMethod
 {
     LSOM_START = 0,
     LSOM_STOP,
+    LSOM_DELAYEDSTART,
     LSOM_UPDATE,
     LSOM_POSTUPDATE,
     LSOM_FIXEDUPDATE,
