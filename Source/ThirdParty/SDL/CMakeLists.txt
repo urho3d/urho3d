@@ -127,13 +127,12 @@ else ()
     # end todo
     include_directories (${ALSA_INCLUDE_DIRS})
 
-    pkg_check_modules(PKG_PULSEAUDIO libpulse-simple)
-    if(PKG_PULSEAUDIO_FOUND)
-      add_definitions(-DSDL_AUDIO_DRIVER_PULSEAUDIO=1)
-      add_definitions(-DSDL_AUDIO_DRIVER_PULSEAUDIO_DYNAMIC="libpulse-simple.so.0")
-      file(GLOB PULSEAUDIO_SOURCES src/audio/pulseaudio/*.c)
+    pkg_check_modules (PKG_PULSEAUDIO libpulse-simple)
+    if (PKG_PULSEAUDIO_FOUND)
+      add_definitions (-DSDL_AUDIO_DRIVER_PULSEAUDIO=1)
+      add_definitions (-DSDL_AUDIO_DRIVER_PULSEAUDIO_DYNAMIC="libpulse-simple.so.0")
+      file (GLOB PULSEAUDIO_SOURCES src/audio/pulseaudio/*.c)
     endif()
-
 
     file (GLOB SYS_C_FILES
         src/audio/alsa/*.c src/audio/dma/*.c src/audio/dsp/*.c src/haptic/linux/*.c src/joystick/linux/*.c src/loadso/dlopen/*.c
