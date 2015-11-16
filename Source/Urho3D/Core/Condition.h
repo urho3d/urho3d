@@ -48,7 +48,7 @@ public:
     void Wait();
 
 private:
-#ifndef WIN32
+#ifndef _WIN32
     /// Mutex for the event, necessary for pthreads-based implementation.
     void* mutex_;
 #endif

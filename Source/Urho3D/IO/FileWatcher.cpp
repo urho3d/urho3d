@@ -27,7 +27,7 @@
 #include "../IO/FileWatcher.h"
 #include "../IO/Log.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #elif __linux__
 #include <sys/inotify.h>
@@ -55,8 +55,8 @@ FileWatcher::FileWatcher(Context* context) :
     delay_(1.0f),
     watchSubDirs_(false)
 {
-#if defined(URHO3D_FILEWATCHER)
-#if defined(__linux__)
+#ifdef URHO3D_FILEWATCHER
+#ifdef __linux__
     watchHandle_ = inotify_init();
 #elif defined(__APPLE__) && !defined(IOS)
     supported_ = IsFileWatcherSupported();
@@ -67,8 +67,8 @@ FileWatcher::FileWatcher(Context* context) :
 FileWatcher::~FileWatcher()
 {
     StopWatching();
-#if defined(URHO3D_FILEWATCHER)
-#if defined(__linux__)
+#ifdef URHO3D_FILEWATCHER
+#ifdef __linux__
     close(watchHandle_);
 #endif
 #endif
@@ -86,7 +86,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     StopWatching();
 
 #if defined(URHO3D_FILEWATCHER) && defined(URHO3D_THREADING)
-#if defined(WIN32)
+#ifdef _WIN32
     String nativePath = GetNativePath(RemoveTrailingSlash(pathName));
     
     dirHandle_ = (void*)CreateFileW(
@@ -203,7 +203,7 @@ void FileWatcher::StopWatching()
 
         Stop();
 
-#if defined(WIN32)
+#ifdef _WIN32
         CloseHandle((HANDLE)dirHandle_);
 #elif defined(__linux__)
         for (HashMap<int, String>::Iterator i = dirHandle_.Begin(); i != dirHandle_.End(); ++i)
@@ -225,8 +225,8 @@ void FileWatcher::SetDelay(float interval)
 
 void FileWatcher::ThreadFunction()
 {
-#if defined(URHO3D_FILEWATCHER)
-#if defined(WIN32)
+#ifdef URHO3D_FILEWATCHER
+#ifdef _WIN32
     unsigned char buffer[BUFFERSIZE];
     DWORD bytesFilled = 0;
     
