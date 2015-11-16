@@ -1247,13 +1247,13 @@ void MessageConnection::DumpStatus() const
 		MsgsInPerSec(), MsgsOutPerSec(), 
 		FormatBytes(BytesInPerSec()).c_str(), FormatBytes(BytesOutPerSec()).c_str(),
 		(int)eventMsgsOutAvailable.Test(), 
-#ifdef WIN32
+#ifdef _WIN32
 		socket ? socket->NumOverlappedReceivesInProgress() : -1,
 #else
 		-1,
 #endif
 		(socket && socket->GetOverlappedReceiveEvent().Test()) ? "true" : "false",
-#ifdef WIN32
+#ifdef _WIN32
 		socket ? socket->NumOverlappedSendsInProgress() : -1,
 #else
 		-1,

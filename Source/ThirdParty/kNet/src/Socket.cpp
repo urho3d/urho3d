@@ -42,7 +42,7 @@ using namespace std;
 #include <unistd.h>
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 const int numConcurrentReceiveBuffers = 4;
 const int numConcurrentSendBuffers = 4;
 #endif
@@ -100,7 +100,7 @@ type(InvalidSocketType),
 maxSendSize(0),
 writeOpen(false),
 readOpen(false)
-#ifdef WIN32
+#ifdef _WIN32
 ,queuedReceiveBuffers(numConcurrentReceiveBuffers)
 ,queuedSendBuffers(numConcurrentSendBuffers)
 #endif
@@ -114,7 +114,7 @@ Socket::~Socket()
 	// We cannot Close() the socket here, since the same underlying BSD SOCKET handle can be shared
 	// between multiple Socket objects. We rely instead to non-RAII behavior and manually remembering to 
 	// Close().
-#ifdef WIN32
+#ifdef _WIN32
 	FreeOverlappedTransferBuffers();
 #endif
 }
@@ -126,7 +126,7 @@ Socket::Socket(SOCKET connection, const EndPoint &localEndPoint_, const char *lo
 remoteEndPoint(remoteEndPoint_), remoteHostName(remoteHostName_), 
 transport(transport_), type(type_), maxSendSize(maxSendSize_),
 writeOpen(true), readOpen(true)
-#ifdef WIN32
+#ifdef _WIN32
 ,queuedReceiveBuffers(numConcurrentReceiveBuffers)
 ,queuedSendBuffers(numConcurrentSendBuffers)
 #endif
@@ -137,7 +137,7 @@ writeOpen(true), readOpen(true)
 }
 
 Socket::Socket(const Socket &rhs)
-#ifdef WIN32
+#ifdef _WIN32
 :queuedReceiveBuffers(numConcurrentReceiveBuffers)
 ,queuedSendBuffers(numConcurrentSendBuffers)
 #endif
@@ -147,7 +147,7 @@ Socket::Socket(const Socket &rhs)
 
 Socket &Socket::operator=(const Socket &rhs)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	// We would be losing data if Socket is copied from old to new when data is present in the receive buffers,
 	// since the receive buffers are not moved or copied to the new Socket.
 	assert(queuedReceiveBuffers.Size() == 0);
@@ -184,7 +184,7 @@ OverlappedTransferBuffer *AllocateOverlappedTransferBuffer(int bytes)
 	buffer->buffer.len = bytes;
 	buffer->bytesContains = 0;
     buffer->bytesAllocated = bytes;
-#ifdef WIN32
+#ifdef _WIN32
 	buffer->overlapped.hEvent = WSACreateEvent();
 	if (buffer->overlapped.hEvent == WSA_INVALID_EVENT)
 	{
@@ -203,7 +203,7 @@ void DeleteOverlappedTransferBuffer(OverlappedTransferBuffer *buffer)
 	if (!buffer)
 		return;
 	delete[] buffer->buffer.buf;
-#ifdef WIN32
+#ifdef _WIN32
 	BOOL success = WSACloseEvent(buffer->overlapped.hEvent);
 	if (success == FALSE)
 		KNET_LOG(LogError, "Socket.cpp:DeleteOverlappedTransferBuffer: WSACloseEvent failed!");
@@ -251,7 +251,7 @@ int Socket::ReceiveBufferSize() const
 	return bytes;
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 void Socket::EnqueueNewReceiveBuffer(OverlappedTransferBuffer *buffer)
 {
 	if (!readOpen || queuedReceiveBuffers.CapacityLeft() == 0 || IsUDPSlaveSocket())
@@ -433,7 +433,7 @@ bool Socket::IsOverlappedReceiveReady() const
 	if (IsUDPSlaveSocket()) // UDP slave sockets are never read directly. For these sockets, act as if they're never ready for reads.
 		return false;
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (queuedReceiveBuffers.Size() == 0)
 		return false;
 	return Event((*queuedReceiveBuffers.Front())->overlapped.hEvent, EventWaitRead).Test();
@@ -452,7 +452,7 @@ Event Socket::GetOverlappedReceiveEvent()
 	if (IsUDPSlaveSocket()) // UDP slave sockets are never read directly. For these sockets, return a null event that never fires.
 		return Event();
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (readOpen)
 	{
 		/// Prime the receive buffers to the full capacity if they weren't so yet.
@@ -478,7 +478,7 @@ Event Socket::GetOverlappedSendEvent()
 	if (!writeOpen)
 		return Event();
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (queuedSendBuffers.Size() == 0)
 		return Event();
 
@@ -497,13 +497,13 @@ OverlappedTransferBuffer *Socket::BeginReceive()
 	// The slave sockets don't receive data directly, but the server socket is used instead to receive data for them.
 	if (IsUDPSlaveSocket())
 	{
-#ifdef WIN32
+#ifdef _WIN32
 		assert(queuedReceiveBuffers.Size() == 0); // We shouldn't ever have queued a single receive buffer for this Socket.
 #endif
 		return 0; // If we happen to come here, act as if the socket never received any data.
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (readOpen)
 	{
 		// Insert new empty receive buffers to the Overlapped Transfer receive queue until we have a full capacity queue primed.
@@ -595,7 +595,7 @@ OverlappedTransferBuffer *Socket::BeginReceive()
 
 void Socket::EndReceive(OverlappedTransferBuffer *buffer)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	if (readOpen)
 	{
 		EnqueueNewReceiveBuffer(buffer);
@@ -662,12 +662,12 @@ void Socket::Close()
 	readOpen = false;
 	writeOpen = false;
 
-#ifdef WIN32
+#ifdef _WIN32
 	FreeOverlappedTransferBuffers();
 #endif
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 void Socket::FreeOverlappedTransferBuffers()
 {
 	KNET_LOG(LogVerbose, "Socket::FreeOverlappedTransferBuffers(), this: %p.", this);
@@ -685,7 +685,7 @@ void Socket::SetBlocking(bool isBlocking)
 	if (connectSocket == INVALID_SOCKET)
 		return;
 
-#ifdef WIN32
+#ifdef _WIN32
 	u_long nonBlocking = (isBlocking == false) ? 1 : 0;
 	if (ioctlsocket(connectSocket, FIONBIO, &nonBlocking))
 		KNET_LOG(LogError, "Socket::SetBlocking: ioctlsocket failed with error %s!", Network::GetLastErrorString().c_str());
@@ -778,7 +778,7 @@ bool Socket::Send(const char *data, size_t numBytes)
 
 bool Socket::WaitForSendReady(int msecs)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	fd_set writeSet;
 	FD_ZERO(&writeSet);
 	FD_SET(connectSocket, &writeSet);
@@ -796,7 +796,7 @@ bool Socket::IsOverlappedSendReady()
 	if (!writeOpen)
 		return false;
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (queuedSendBuffers.CapacityLeft() > 0)
 		return true;
 
@@ -819,7 +819,7 @@ OverlappedTransferBuffer *Socket::BeginSend(int maxBytesToSend)
 
 	// See if the oldest one of the previously submitted transfers has now finished,
 	// and reuse that buffer without allocating a new one, if so.
-#ifdef WIN32
+#ifdef _WIN32
 	if (queuedSendBuffers.Size() > 0)
 	{
 		OverlappedTransferBuffer *sentData = *queuedSendBuffers.Front();
@@ -873,7 +873,7 @@ bool Socket::EndSend(OverlappedTransferBuffer *sendBuffer)
 	// number of bytes the user had filled into the buffer.
 	sendBuffer->buffer.len = sendBuffer->bytesContains;
 
-#ifdef WIN32
+#ifdef _WIN32
 	// Clear the event flag so that the completion of WSASend can trigger this and signal us.
 	WSAResetEvent(sendBuffer->overlapped.hEvent);
 
@@ -925,7 +925,7 @@ void Socket::AbortSend(OverlappedTransferBuffer *send)
 		return;
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	// Set the event flag so as to signal that this buffer is completed immediately.
 	if (WSASetEvent(send->overlapped.hEvent) != TRUE)
 	{
@@ -979,7 +979,7 @@ void Socket::SetNaglesAlgorithmEnabled(bool enabled)
 		return;
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	BOOL nagleEnabled = enabled ? TRUE : FALSE;
 	int ret = setsockopt(connectSocket, IPPROTO_TCP, TCP_NODELAY, (const char *)&nagleEnabled, sizeof(nagleEnabled));
 #else

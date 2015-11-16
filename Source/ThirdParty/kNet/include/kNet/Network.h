@@ -175,7 +175,7 @@ private:
 	void Init();
 	void DeInit();
 
-#ifdef WIN32
+#ifdef _WIN32
 	WSADATA wsaData;
 #endif
 };

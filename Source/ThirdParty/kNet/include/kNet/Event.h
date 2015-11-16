@@ -16,7 +16,7 @@
 /** @file Event.h
 	@brief The class \ref kNet::Event Event. Provides a mechanism for inter-thread signalling. */
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "win32/WS2Include.h"
 #endif
 
@@ -92,7 +92,7 @@ public:
 private:
 	EventWaitType type;
 
-#ifdef WIN32
+#ifdef _WIN32
 public:
 	WSAEVENT wsaEvent;
 

@@ -16,7 +16,7 @@
 /** @file Socket.h
 	@brief The Socket class. */
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #include "kNetBuildConfig.h"
 #include "win32/WS2Include.h"
@@ -92,7 +92,7 @@ std::string SocketTypeToString(SocketType type);
 
 typedef int OverlappedTransferTag;
 
-#ifdef WIN32
+#ifdef _WIN32
 typedef WSABUF kNetBuffer;
 #else
 struct kNetBuffer
@@ -109,7 +109,7 @@ struct kNetBuffer
 struct OverlappedTransferBuffer
 {
 	kNetBuffer buffer;
-#ifdef WIN32
+#ifdef _WIN32
 	WSAOVERLAPPED overlapped;
 #endif
 
@@ -205,7 +205,7 @@ public:
 	/// This frees the given buffer, do not dereference it after calling this function.
 	void AbortSend(OverlappedTransferBuffer *send);
 
-#ifdef WIN32
+#ifdef _WIN32
 	/// Returns the number of sends in the send queue.
 	int NumOverlappedSendsInProgress() const { return queuedSendBuffers.Size(); }
 	/// Returns the maximum number of sends that can be queued up simultaneously.
@@ -234,7 +234,7 @@ public:
 	OverlappedTransferBuffer *BeginReceive();
 	/// Finishes a read operation on the socket. Frees the given buffer to be re-queued for a future socket read operation.
 	void EndReceive(OverlappedTransferBuffer *buffer);
-#ifdef WIN32
+#ifdef _WIN32
 	/// Returns the number of receive buffers that have been queued for the socket.
 	int NumOverlappedReceivesInProgress() const { return queuedReceiveBuffers.Size(); }
 	/// Returns the maximum number of receive buffers that can be queued for the socket.
@@ -336,7 +336,7 @@ private:
 	/// Tracks whether the socket is open for receiving data (doesn't mean that there necessarily exists new data to be read).
 	bool readOpen;
 
-#ifdef WIN32
+#ifdef _WIN32
 	WaitFreeQueue<OverlappedTransferBuffer*> queuedReceiveBuffers;
 	WaitFreeQueue<OverlappedTransferBuffer*> queuedSendBuffers;
 
