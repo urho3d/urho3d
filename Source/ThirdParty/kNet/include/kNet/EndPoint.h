@@ -16,7 +16,8 @@
 /** @file EndPoint.h
 	@brief The class \ref kNet::EndPoint Endpoint. Represents an endpoint of a network connection. */
 
-#if defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#ifndef _WIN32
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

@@ -34,7 +34,8 @@
 
 using namespace std;
 
-#if defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#ifndef _WIN32
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -910,7 +911,8 @@ bool Socket::EndSend(OverlappedTransferBuffer *sendBuffer)
 	}
 	return true;
 
-#elif defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#else
 	bool success = Send(sendBuffer->buffer.buf, sendBuffer->buffer.len);
 	DeleteOverlappedTransferBuffer(sendBuffer);
 	return success;

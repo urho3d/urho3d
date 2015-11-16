@@ -98,7 +98,8 @@ public:
 
 	/// Wraps the given WSAEVENT into this event.
 	explicit Event(WSAEVENT wsaEvent, EventWaitType eventType);
-#elif defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#else
 public:
 	int fd[2]; // fd[0] is used for reading, fd[1] for writing.
 

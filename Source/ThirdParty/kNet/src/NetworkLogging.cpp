@@ -33,7 +33,8 @@
 #include "kNet/Lockable.h"
 #include "kNet/Clock.h"
 
-#if defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#ifndef _WIN32
 #define _snprintf snprintf
 #endif
 

@@ -44,7 +44,7 @@ elseif (UNIX)
    list (APPEND kNetSourceFiles ${kNetUnixSourceFiles})
    list (APPEND kNetHeaderFiles ${kNetUnixHeaderFiles})
 
-   add_definitions (-DKNET_UNIX)
+   # Urho3D: KNET_UNIX definition removed
 endif ()
 
 # Urho3D: set DEBUG_CPP_NAME only on Windows, Xcode project file can not be opened if this is included

@@ -18,7 +18,8 @@
 
 #include <vector>
 
-#if defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#ifndef _WIN32
 #include <sys/select.h>
 #endif
 
@@ -63,7 +64,8 @@ private:
 #ifdef _WIN32
 	WSAEVENT events[maxEvents]; 
 
-#elif defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#else
 	fd_set readfds;
 	fd_set writefds;
 	int nfds;

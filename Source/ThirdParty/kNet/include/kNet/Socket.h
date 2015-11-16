@@ -29,7 +29,8 @@ namespace kNet
 typedef int socklen_t;
 }
 
-#elif defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#else
 
 #include <sys/types.h>
 #include <sys/socket.h>
