@@ -212,12 +212,8 @@ private:
     PODVector<Drawable*> drawableReinsertions_;
     /// Mutex for octree reinsertions.
     Mutex octreeMutex_;
-    /// Current threaded ray query.
-    mutable RayOctreeQuery* rayQuery_;
-    /// Drawable list for threaded ray query.
+    /// Ray query temporary list of drawables.
     mutable PODVector<Drawable*> rayQueryDrawables_;
-    /// Threaded ray query intermediate results.
-    mutable Vector<PODVector<RayQueryResult> > rayQueryResults_;
     /// Subdivision level.
     unsigned numLevels_;
 };
