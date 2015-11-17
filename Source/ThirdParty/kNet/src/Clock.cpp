@@ -27,7 +27,7 @@
 #include <sys/time.h>
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #define NOMINMAX
 #include <windows.h>
 #endif
@@ -42,7 +42,7 @@
 namespace kNet
 {
 
-#ifdef WIN32
+#ifdef _WIN32
 LARGE_INTEGER Clock::ddwTimerFrequency;
 #endif
 
@@ -55,7 +55,7 @@ void Clock::InitClockData()
 	if (appStartTime == 0)
 		appStartTime = Tick();
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (!QueryPerformanceFrequency(&ddwTimerFrequency))
 	{
 		KNET_LOG(LogError, "The system doesn't support high-resolution timers!");
@@ -88,7 +88,7 @@ void Clock::Sleep(int milliseconds)
 {
 #ifdef WIN8RT
 #pragma WARNING(Clock::Sleep has not been implemented!)
-#elif defined(WIN32)
+#elif defined(_WIN32)
 	::Sleep(milliseconds);
 #elif !defined(__native_client__) && !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
 	// http://linux.die.net/man/2/nanosleep
@@ -105,7 +105,7 @@ void Clock::Sleep(int milliseconds)
 
 int Clock::Year()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	SYSTEMTIME s;
 	GetSystemTime(&s);
 	return s.wYear;
@@ -117,7 +117,7 @@ int Clock::Year()
 
 int Clock::Month()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	SYSTEMTIME s;
 	GetSystemTime(&s);
 	return s.wMonth;
@@ -129,7 +129,7 @@ int Clock::Month()
 
 int Clock::Day()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	SYSTEMTIME s;
 	GetSystemTime(&s);
 	return s.wDay;
@@ -141,7 +141,7 @@ int Clock::Day()
 
 int Clock::Hour()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	SYSTEMTIME s;
 	GetSystemTime(&s);
 	return s.wHour;
@@ -153,7 +153,7 @@ int Clock::Hour()
 
 int Clock::Min()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	SYSTEMTIME s;
 	GetSystemTime(&s);
 	return s.wMinute;
@@ -165,7 +165,7 @@ int Clock::Min()
 
 int Clock::Sec()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	SYSTEMTIME s;
 	GetSystemTime(&s);
 	return s.wSecond;
@@ -177,7 +177,7 @@ int Clock::Sec()
 
 unsigned long Clock::SystemTime()
 {
-#ifdef WIN32
+#ifdef _WIN32
 #if WINVER >= 0x0600 && !defined(KNET_ENABLE_WINXP_SUPPORT)
 	return (unsigned long)GetTickCount64();
 #else
@@ -209,7 +209,7 @@ tick_t Clock::Tick()
 	// scale it to microseconds (1e-6) and return as a tick.
 	return (tick_t)(((double)emscripten_get_now()) * 1e3);
 //	return (tick_t)clock();
-#elif defined(WIN32)
+#elif defined(_WIN32)
 	LARGE_INTEGER ddwTimer;
 	QueryPerformanceCounter(&ddwTimer);
 	return ddwTimer.QuadPart;
@@ -228,7 +228,7 @@ tick_t Clock::Tick()
 
 unsigned long Clock::TickU32()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	LARGE_INTEGER ddwTimer;
 	QueryPerformanceCounter(&ddwTimer);
 	return ddwTimer.LowPart;
@@ -244,7 +244,7 @@ tick_t Clock::TicksPerSec()
 #elif defined(__EMSCRIPTEN__)
 	return 1000000ULL; // 1e6 == microseconds.
 //	return CLOCKS_PER_SEC;
-#elif defined(WIN32)
+#elif defined(_WIN32)
 	return ddwTimerFrequency.QuadPart;
 #elif defined(_POSIX_MONOTONIC_CLOCK)
 	return 1000 * 1000 * 1000;

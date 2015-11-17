@@ -15,7 +15,8 @@
 /** @file UnixThread.cpp
 	@brief */
 
-#ifdef KNET_UNIX
+// Urho3D: removed the KNET_UNIX definition
+#ifndef _WIN32
 
 #include <cassert>
 #include <exception>
@@ -166,4 +167,4 @@ ThreadId Thread::NullThreadId()
 
 } // ~kNet
 
-#endif // ~KNET_UNIX
+#endif

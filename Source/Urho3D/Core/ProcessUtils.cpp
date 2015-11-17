@@ -38,7 +38,7 @@
 #include <LibCpuId/libcpuid.h>
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #include <io.h>
 #else
@@ -81,7 +81,7 @@ inline void SetFPUState(unsigned control)
 namespace Urho3D
 {
 
-#ifdef WIN32
+#ifdef _WIN32
 static bool consoleOpened = false;
 #endif
 static String currentLine;
@@ -138,23 +138,14 @@ void ErrorExit(const String& message, int exitCode)
 
 void OpenConsoleWindow()
 {
-#ifdef WIN32
+#ifdef _WIN32
     if (consoleOpened)
         return;
 
     AllocConsole();
-
-    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    int hCrt = _open_osfhandle((size_t)hOut, _O_TEXT);
-    FILE* outFile = _fdopen(hCrt, "w");
-    setvbuf(outFile, NULL, _IONBF, 1);
-    *stdout = *outFile;
-
-    HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
-    hCrt = _open_osfhandle((size_t)hIn, _O_TEXT);
-    FILE* inFile = _fdopen(hCrt, "r");
-    setvbuf(inFile, NULL, _IONBF, 128);
-    *stdin = *inFile;
+    
+    freopen("CONIN$", "r", stdin);
+    freopen("CONOUT$", "w", stdout);
 
     consoleOpened = true;
 #endif
@@ -163,7 +154,7 @@ void OpenConsoleWindow()
 void PrintUnicode(const String& str, bool error)
 {
 #if !defined(ANDROID) && !defined(IOS)
-#ifdef WIN32
+#ifdef _WIN32
     // If the output stream has been redirected, use fprintf instead of WriteConsoleW,
     // though it means that proper Unicode output will not work
     FILE* out = error ? stderr : stdout;
@@ -281,7 +272,7 @@ String GetConsoleInput()
     return ret;
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
     HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
     HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
     if (input == INVALID_HANDLE_VALUE || output == INVALID_HANDLE_VALUE)
@@ -352,7 +343,7 @@ String GetPlatform()
     return "Android";
 #elif defined(IOS)
     return "iOS";
-#elif defined(WIN32)
+#elif defined(_WIN32)
     return "Windows";
 #elif defined(__APPLE__)
     return "Mac OS X";

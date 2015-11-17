@@ -313,6 +313,8 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "int get_numIterations() const", asMETHOD(PhysicsWorld, GetNumIterations), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_fps(int)", asMETHOD(PhysicsWorld, SetFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "int get_fps() const", asMETHOD(PhysicsWorld, GetFps), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_updateEnabled(bool)", asMETHOD(PhysicsWorld, SetUpdateEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "bool get_updateEnabled() const", asMETHOD(PhysicsWorld, IsUpdateEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_interpolation(bool)", asMETHOD(PhysicsWorld, SetInterpolation), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "bool get_interpolation() const", asMETHOD(PhysicsWorld, GetInterpolation), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_internalEdge(bool)", asMETHOD(PhysicsWorld, SetInternalEdge), asCALL_THISCALL);

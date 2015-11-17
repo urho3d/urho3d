@@ -138,11 +138,6 @@ void CreateAttributeInspectorWindow()
     SubscribeToEvent(attributeInspectorWindow, "LayoutUpdated", "HandleWindowLayoutUpdated");
 }
 
-void HideAttributeInspectorWindow()
-{
-    attributeInspectorWindow.visible = false;
-}
-
 void DisableInspectorLock()
 {
     inspectorLocked = false;
@@ -166,12 +161,26 @@ void ToggleInspectorLock()
         EnableInspectorLock();
 }
 
-bool ShowAttributeInspectorWindow()
+bool ToggleAttributeInspectorWindow()
+{
+    if (attributeInspectorWindow.visible == false)
+        ShowAttributeInspectorWindow();
+    else
+        HideAttributeInspectorWindow();
+    return true;
+}
+
+void ShowAttributeInspectorWindow()
 {
     attributeInspectorWindow.visible = true;
     attributeInspectorWindow.BringToFront();
-    return true;
 }
+
+void HideAttributeInspectorWindow()
+{
+    attributeInspectorWindow.visible = false;
+}
+
 
 /// Handle main window layout updated event by positioning elements that needs manually-positioning (elements that are children of UI-element container with "Free" layout-mode).
 void HandleWindowLayoutUpdated()
@@ -553,7 +562,7 @@ void PostEditAttribute(Serializable@ serializable, uint index)
     if (serializable.typeName == "CollisionShape" && serializable.attributeInfos[index].name == "Shape Type")
     {
         int shapeType = serializable.GetAttribute("Shape Type").GetInt();
-        if ((shapeType == 6 || shapeType == 7) && serializable.GetAttribute("CustomGeometry NodeID").GetInt() == 0 &&
+        if ((shapeType == 6 || shapeType == 7) && serializable.GetAttribute("CustomGeometry ComponentID").GetInt() == 0 &&
             serializable.GetAttribute("Model").GetResourceRef().name.Trimmed().length == 0)
         {
             Node@ ownerNode = cast<Component>(serializable).node;

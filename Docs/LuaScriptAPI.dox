@@ -691,7 +691,6 @@ Methods:
 - void Define(const Frustum& frustum)
 - void Define(const Polyhedron& poly)
 - void Define(const Sphere& sphere)
-- bool Defined() const
 - void Merge(const Vector3& point)
 - void Merge(const BoundingBox& box)
 - void Merge(const Frustum& frustum)
@@ -701,6 +700,7 @@ Methods:
 - void Transform(const Matrix3& transform)
 - void Transform(const Matrix3x4& transform)
 - void Clear()
+- bool Defined() const
 - Vector3 Center() const
 - Vector3 Size() const
 - Vector3 HalfSize() const
@@ -2116,14 +2116,17 @@ Properties:
 Methods:
 
 - void SetDrawObstacles(bool enable)
+- void SetMaxLayers(unsigned maxLayers)
 - void SetMaxObstacles(unsigned maxObstacles)
 - bool GetDrawObstacles() const
+- unsigned GetMaxLayers() const
 - unsigned GetMaxObstacles() const
 
 Properties:
 
 - bool drawObstacles
 - int maxObstacles
+- unsigned maxLayers
 
 <a name="Class_Engine"></a>
 ### Engine : Object
@@ -4197,6 +4200,7 @@ Methods:
 - void SetGravity(const Vector3& gravity)
 - void SetMaxSubSteps(int num)
 - void SetNumIterations(int num)
+- void SetUpdateEnabled(bool enable)
 - void SetInterpolation(bool enable)
 - void SetInternalEdge(bool enable)
 - void SetSplitImpulse(bool enable)
@@ -4213,6 +4217,7 @@ Methods:
 - Vector3 GetGravity() const
 - int GetMaxSubSteps() const
 - int GetNumIterations() const
+- bool IsUpdateEnabled() const
 - bool GetInterpolation() const
 - bool GetInternalEdge() const
 - bool GetSplitImpulse() const
@@ -4224,6 +4229,7 @@ Properties:
 - Vector3 gravity
 - int maxSubSteps
 - int numIterations
+- bool updateEnabled
 - bool interpolation
 - bool internalEdge
 - bool splitImpulse
@@ -4237,6 +4243,7 @@ Properties:
 Methods:
 
 - void DrawDebugGeometry()
+- void SetUpdateEnabled(bool enable)
 - void SetDrawShape(bool drawShape)
 - void SetDrawJoint(bool drawJoint)
 - void SetDrawAabb(bool drawAabb)
@@ -4255,6 +4262,7 @@ Methods:
 - RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = M_MAX_UNSIGNED)
 - RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED)
 - const PODVector<RigidBody2D*>& GetRigidBodies(const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED)
+- bool IsUpdateEnabled() const
 - bool GetDrawShape() const
 - bool GetDrawJoint() const
 - bool GetDrawAabb() const
@@ -4271,6 +4279,7 @@ Methods:
 
 Properties:
 
+- bool updateEnabled
 - bool drawShape
 - bool drawJoint
 - bool drawAabb
@@ -4507,6 +4516,7 @@ Methods:
 - void Merge(const Rect& rect)
 - void Clear()
 - void Clip(const Rect& rect)
+- bool Defined() const
 - Vector2 Center() const
 - Vector2 Size() const
 - Vector2 HalfSize() const
@@ -4697,6 +4707,7 @@ Methods:
 - void SetMaxOccluderTriangles(int triangles)
 - void SetOcclusionBufferSize(int size)
 - void SetOccluderSizeThreshold(float screenSize)
+- void SetThreadedOcclusion(bool enable)
 - void SetMobileShadowBiasMul(float mul)
 - void SetMobileShadowBiasAdd(float add)
 - void ReloadShaders()
@@ -4720,6 +4731,7 @@ Methods:
 - int GetMaxOccluderTriangles() const
 - int GetOcclusionBufferSize() const
 - float GetOccluderSizeThreshold() const
+- bool GetThreadedOcclusion() const
 - float GetMobileShadowBiasMul() const
 - float GetMobileShadowBiasAdd() const
 - unsigned GetNumViews() const
@@ -4756,6 +4768,7 @@ Properties:
 - int maxOccluderTriangles
 - int occlusionBufferSize
 - float occluderSizeThreshold
+- bool threadedOcclusion
 - float mobileShadowBiasMul
 - float mobileShadowBiasAdd
 - unsigned numViews (readonly)
@@ -5437,6 +5450,7 @@ Methods:
 - void Merge(const Polyhedron& poly)
 - void Merge(const Sphere& sphere)
 - void Clear()
+- bool Defined() const
 - Intersection IsInside(const Vector3& point) const
 - Intersection IsInside(const Sphere& sphere) const
 - Intersection IsInsideFast(const Sphere& sphere) const
@@ -5448,7 +5462,6 @@ Properties:
 
 - Vector3 center
 - float radius
-- bool defined
 
 <a name="Class_Spline"></a>
 ### Spline
@@ -5964,7 +5977,7 @@ Methods:
 - void SetBorderColor(const Color& color)
 - void SetSRGB(bool enable)
 - void SetBackupTexture(Texture* texture)
-- void SetMipsToSkip(int quality, int mips)
+- void SetMipsToSkip(int quality, int toSkip)
 - unsigned GetFormat() const
 - bool IsCompressed() const
 - unsigned GetLevels() const

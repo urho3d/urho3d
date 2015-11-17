@@ -72,7 +72,7 @@ A number of build options can be defined when invoking the build scripts or when
 |WIN32                |0|Configure project using MinGW (32-bit or 64-bit) cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify MinGW toolchain file for cross-compiling explicitly|
 |EMSCRIPTEN           |0|Configure project using Emscripten cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify Emscripten toolchain file for cross-compiling explicitly|
 |IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only)|
-|URHO3D_64BIT         |*|Enable 64-bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system|
+|URHO3D_64BIT         |*|Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain|
 |URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
 |URHO3D_LUA           |0|Enable Lua scripting support|
 |URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)|
@@ -369,7 +369,9 @@ The engine can be configured using the following command line options.
 -q           Enable quiet mode which does not log to standard output stream
 -b <length>  Sound buffer length in milliseconds
 -r <freq>    Sound mixing frequency in Hz
--pp <path>   Resource prefix path, default to URHO3D_PREFIX_PATH env-var or executable path
+-pp <paths>  Resource prefix path(s), separated by semicolons, default to executable path
+             The resource prefix paths can also be defined using URHO3D_PREFIX_PATH env-var
+             When both are defined, the paths set by -pp takes higher precedence
 -p <paths>   Resource path(s) to use, separated by semicolons, default to 'Data;CoreData'
 -pf <files>  Resource package file to use, separated by semicolons, default to none
 -ap <paths>  Resource autoload path(s), separated by semicolons, default to 'AutoLoad'
@@ -479,6 +481,10 @@ F2          Toggle debug HUD
 \tableofcontents
 
 This page shows how to create a new C++ project linking against Urho3D library as external library. There are two approaches to do this. The first approach uses Urho3D library directly from the Urho3D project build tree. The second approach uses Urho3D SDK installation. It is imperative to clean the CMake cache when changing from one approach to the other. You should also clean the cache when you change the path in the URHO3D_HOME environment variable.
+
+> Migration note if you are migrating from Urho3D prior to release 1.4:
+>    - You are probably better of to regenerate your build tree from scratch due to some of the directory renaming in the project structure.
+>    - You must adjust the URHO3D_HOME environment variable in your build. In release 1.4 onward, the URHO3D_HOME environment variable is supposed to point to the build tree of the Urho3D project. In prior releases, the URHO3D_HOME was supposed to point to Urho3D project root itself.
 
 First of all, structure your project similar to Urho3D project as below. Although this is not mandatory, it should increase the chance the CMake modules designed for Urho3D project also works out of the box for your project too. CMake and our CMake modules are case-sensitive. It is recommended that your project adheres to the same naming convention as Urho3D project uses, even when the filesystem in your host system is not case-sensitive.
 

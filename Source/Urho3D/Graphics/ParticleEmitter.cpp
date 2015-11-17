@@ -46,6 +46,8 @@ ParticleEmitter::ParticleEmitter(Context* context) :
     emissionTimer_(0.0f),
     lastTimeStep_(0.0f),
     lastUpdateFrameNumber_(M_MAX_UNSIGNED),
+    emitting_(true),
+    needUpdate_(false),
     serializeParticles_(true)
 {
     SetNumParticles(DEFAULT_NUM_PARTICLES);
@@ -332,6 +334,11 @@ void ParticleEmitter::ApplyEffect()
     SetScaled(effect_->IsScaled());
     SetSorted(effect_->IsSorted());
     SetAnimationLodBias(effect_->GetAnimationLodBias());
+}
+
+ParticleEffect* ParticleEmitter::GetEffect() const
+{
+    return effect_;
 }
 
 void ParticleEmitter::SetEffectAttr(const ResourceRef& value)

@@ -161,7 +161,7 @@ static const D3D11_FILL_MODE d3dFillMode[] =
 {
     D3D11_FILL_SOLID,
     D3D11_FILL_WIREFRAME,
-    D3D11_FILL_WIREFRAME // Point mode not supported
+    D3D11_FILL_WIREFRAME // Point fill mode not supported
 };
 
 static unsigned GetD3DColor(const Color& color)
@@ -821,6 +821,9 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
     unsigned primitiveCount;
     D3D_PRIMITIVE_TOPOLOGY d3dPrimitiveType;
 
+    if (fillMode_ == FILL_POINT)
+        type = POINT_LIST;
+
     GetD3DPrimitiveType(vertexCount, type, primitiveCount, d3dPrimitiveType);
     if (d3dPrimitiveType != primitiveType_)
     {
@@ -842,6 +845,9 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 
     unsigned primitiveCount;
     D3D_PRIMITIVE_TOPOLOGY d3dPrimitiveType;
+
+    if (fillMode_ == FILL_POINT)
+        type = POINT_LIST;
 
     GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
     if (d3dPrimitiveType != primitiveType_)
@@ -865,6 +871,9 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 
     unsigned primitiveCount;
     D3D_PRIMITIVE_TOPOLOGY d3dPrimitiveType;
+
+    if (fillMode_ == FILL_POINT)
+        type = POINT_LIST;
 
     GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
     if (d3dPrimitiveType != primitiveType_)

@@ -52,7 +52,7 @@ public:
     void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
 
     /// Set shadow compare mode. No-op on D3D9.
-    void SetShadowCompare(bool enable) { }
+    void SetShadowCompare(bool enable);
 
     /// Set border color for border addressing mode.
     void SetBorderColor(const Color& color);
@@ -61,7 +61,7 @@ public:
     /// Set backup texture to use when rendering to this texture.
     void SetBackupTexture(Texture* texture);
     /// Set mip levels to skip on a quality setting when loading. Ensures higher quality levels do not skip more.
-    void SetMipsToSkip(int quality, int mips);
+    void SetMipsToSkip(int quality, int toSkip);
 
     /// Return texture format.
     unsigned GetFormat() const { return format_; }

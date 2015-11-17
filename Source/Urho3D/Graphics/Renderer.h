@@ -200,6 +200,8 @@ public:
     void SetOcclusionBufferSize(int size);
     /// Set required screen size (1.0 = full screen) for occluders.
     void SetOccluderSizeThreshold(float screenSize);
+    /// Set whether to thread occluder rendering. Default false.
+    void SetThreadedOcclusion(bool enable);
     /// Set shadow depth bias multiplier for mobile platforms (OpenGL ES.) No effect on desktops. Default 2.
     void SetMobileShadowBiasMul(float mul);
     /// Set shadow depth bias addition for mobile platforms (OpenGL ES.)  No effect on desktops. Default 0.0001.
@@ -265,6 +267,9 @@ public:
 
     /// Return occluder screen size threshold.
     float GetOccluderSizeThreshold() const { return occluderSizeThreshold_; }
+
+    /// Return whether occlusion rendering is threaded.
+    bool GetThreadedOcclusion() const { return threadedOcclusion_; }
 
     /// Return shadow depth bias multiplier for mobile platforms.
     float GetMobileShadowBiasMul() const { return mobileShadowBiasMul_; }
@@ -511,6 +516,8 @@ private:
     bool reuseShadowMaps_;
     /// Dynamic instancing flag.
     bool dynamicInstancing_;
+    /// Threaded occlusion rendering flag.
+    bool threadedOcclusion_;
     /// Shaders need reloading flag.
     bool shadersDirty_;
     /// Initialized flag.

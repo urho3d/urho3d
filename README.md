@@ -53,6 +53,7 @@ Urho3D development, contributions and bugfixes by:
 - Mike3D
 - Modanung
 - MonkeyFirst
+- Newb I the Newbd
 - OvermindDL1
 - Skrylar
 - 1vanK

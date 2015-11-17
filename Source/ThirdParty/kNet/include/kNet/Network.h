@@ -18,7 +18,8 @@
 
 // Modified by Lasse Oorni for Urho3D
 
-#if defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#ifndef _WIN32
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -175,7 +176,7 @@ private:
 	void Init();
 	void DeInit();
 
-#ifdef WIN32
+#ifdef _WIN32
 	WSADATA wsaData;
 #endif
 };

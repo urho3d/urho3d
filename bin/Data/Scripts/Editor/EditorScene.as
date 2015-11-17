@@ -1425,6 +1425,8 @@ void CreateModelWithStaticModel(String filepath, Node@ parent)
 
     StaticModel@ staticModel = parent.GetOrCreateComponent("StaticModel");
     staticModel.model = model;
+    if (applyMaterialList)
+        staticModel.ApplyMaterialList();
     CreateLoadedComponent(staticModel);
 }
 
@@ -1442,6 +1444,8 @@ void CreateModelWithAnimatedModel(String filepath, Node@ parent)
 
     AnimatedModel@ animatedModel = parent.GetOrCreateComponent("AnimatedModel");
     animatedModel.model = model;
+    if (applyMaterialList)
+        animatedModel.ApplyMaterialList();
     CreateLoadedComponent(animatedModel);
 }
 

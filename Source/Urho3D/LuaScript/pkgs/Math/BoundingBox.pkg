@@ -23,8 +23,6 @@ class BoundingBox
     void Define(const Polyhedron& poly);
     void Define(const Sphere& sphere);
 
-    bool Defined() const;
-
     void Merge(const Vector3& point);
     void Merge(const BoundingBox& box);
     void Merge(const Frustum& frustum);
@@ -36,6 +34,7 @@ class BoundingBox
     void Transform(const Matrix3x4& transform);
     void Clear();
 
+    bool Defined() const;
     Vector3 Center() const;
     Vector3 Size() const;
     Vector3 HalfSize() const;

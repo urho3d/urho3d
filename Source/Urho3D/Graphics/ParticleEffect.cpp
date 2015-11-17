@@ -279,6 +279,8 @@ bool ParticleEffect::BeginLoad(Deserializer& source)
         SetTextureFrames(animations);
     }
 
+    // Note: not accurate
+    SetMemoryUse(source.GetSize());
     return true;
 }
 

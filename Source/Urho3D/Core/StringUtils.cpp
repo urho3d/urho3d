@@ -679,8 +679,8 @@ String GetFileSizeString(unsigned long long memorySize)
     }
     else
     {
-        const int exponent = (int)(log(memorySize) / log(1024));
-        const double majorValue = ((double)memorySize) / pow(1024, exponent);
+        const int exponent = (int)(log((double)memorySize) / log(1024.0));
+        const double majorValue = ((double)memorySize) / pow(1024.0, exponent);
         char buffer[64];
         memset(buffer, 0, 64);
         sprintf(buffer, "%.1f", majorValue);

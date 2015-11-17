@@ -48,7 +48,7 @@
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char* name);
 
 // Use a "click inside window to focus" mechanism on desktop platforms when the mouse cursor is hidden
-#if defined(WIN32) || (defined(__APPLE__) && !defined(IOS)) || (defined(__linux__) && !defined(ANDROID) && !defined(RPI))
+#if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS)) || (defined(__linux__) && !defined(ANDROID) && !defined(RPI))
 #define REQUIRE_CLICK_TO_FOCUS
 #endif
 
@@ -296,7 +296,8 @@ void Input::Update()
         if (focusedThisFrame_)
             GainFocus();
 
-        if (inputFocus_ && (flags & SDL_WINDOW_INPUT_FOCUS) == 0)
+        // Check for losing focus. The window flags are not reliable when using an external window, so prevent losing focus in that case
+        if (inputFocus_ && !graphics_->GetExternalWindow() && (flags & SDL_WINDOW_INPUT_FOCUS) == 0)
             LoseFocus();
     }
     else
@@ -1988,11 +1989,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
 void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
-    // Reset input state on subsequent initializations
     if (!initialized_)
         Initialize();
-    else
-        ResetState();
 
     // Re-enable cursor clipping, and re-center the cursor (if needed) to the new screen size, so that there is no erroneous
     // mouse move event. Also get new window ID if it changed

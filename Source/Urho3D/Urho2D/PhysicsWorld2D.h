@@ -97,6 +97,8 @@ public:
     void Update(float timeStep);
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry();
+    /// Enable or disable automatic physics simulation during scene update. Enabled by default.
+    void SetUpdateEnabled(bool enable);
     /// Set draw shape.
     void SetDrawShape(bool drawShape);
     /// Set draw joint.
@@ -140,6 +142,9 @@ public:
     RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies by a box query.
     void GetRigidBodies(PODVector<RigidBody2D*>& result, const Rect& aabb, unsigned collisionMask = M_MAX_UNSIGNED);
+
+    /// Return whether physics world will automatically simulate during scene update.
+    bool IsUpdateEnabled() const { return updateEnabled_; }
 
     /// Return draw shape.
     bool GetDrawShape() const { return (m_drawFlags & e_shapeBit) != 0; }
@@ -213,8 +218,10 @@ private:
     /// Debug draw depth test mode.
     bool debugDepthTest_;
 
-    /// Physics steping.
-    bool physicsSteping_;
+    /// Automatic simulation update enabled flag.
+    bool updateEnabled_;
+    /// Whether is currently stepping the world. Used internally.
+    bool physicsStepping_;
     /// Applying transforms.
     bool applyingTransforms_;
     /// Rigid bodies.

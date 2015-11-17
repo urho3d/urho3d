@@ -26,15 +26,14 @@ class Sphere
 
     void Clear();
 
+    bool Defined() const;
     Intersection IsInside(const Vector3& point) const;
     Intersection IsInside(const Sphere& sphere) const;
     Intersection IsInsideFast(const Sphere& sphere) const;
     Intersection IsInside(const BoundingBox& box) const;
     Intersection IsInsideFast(const BoundingBox& box) const;
-
     float Distance(const Vector3& point) const;
 
     Vector3 center_ @ center;
     float radius_ @ radius;
-    bool defined_ @ defined;
 };

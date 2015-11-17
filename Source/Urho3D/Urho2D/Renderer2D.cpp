@@ -390,6 +390,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     batches_.Resize(viewBatchInfo.batchCount_);
     for (unsigned i = 0; i < viewBatchInfo.batchCount_; ++i)
     {
+        batches_[i].distance_ = viewBatchInfo.distances_[i];
         batches_[i].material_ = viewBatchInfo.materials_[i];
         batches_[i].geometry_ = viewBatchInfo.geometries_[i];
     }
@@ -415,6 +416,9 @@ void Renderer2D::GetDrawables(PODVector<Drawable2D*>& dest, Node* node)
 
 static inline bool CompareSourceBatch2Ds(const SourceBatch2D* lhs, const SourceBatch2D* rhs)
 {
+    if (lhs->distance_ != rhs->distance_)
+        return lhs->distance_ > rhs->distance_;
+
     if (lhs->drawOrder_ != rhs->drawOrder_)
         return lhs->drawOrder_ < rhs->drawOrder_;
 
@@ -430,8 +434,8 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
     if (viewBatchInfo.batchUpdatedFrameNumber_ == frame_.frameNumber_)
         return;
 
-    PODVector<const SourceBatch2D*>& soruceBatches = viewBatchInfo.sourceBatches_;
-    soruceBatches.Clear();
+    PODVector<const SourceBatch2D*>& sourceBatches = viewBatchInfo.sourceBatches_;
+    sourceBatches.Clear();
     for (unsigned d = 0; d < drawables_.Size(); ++d)
     {
         if (!drawables_[d]->IsInView(camera))
@@ -441,11 +445,18 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
         for (unsigned b = 0; b < batches.Size(); ++b)
         {
             if (batches[b].material_ && !batches[b].vertices_.Empty())
-                soruceBatches.Push(&batches[b]);
+                sourceBatches.Push(&batches[b]);
         }
     }
 
-    Sort(soruceBatches.Begin(), soruceBatches.End(), CompareSourceBatch2Ds);
+    for (unsigned i = 0; i < sourceBatches.Size(); ++i)
+    {
+        const SourceBatch2D* sourceBatch = sourceBatches[i];
+        Vector3 worldPos = sourceBatch->owner_->GetNode()->GetWorldPosition();
+        sourceBatch->distance_ = camera->GetDistance(worldPos);
+    }
+    
+    Sort(sourceBatches.Begin(), sourceBatches.End(), CompareSourceBatch2Ds);
 
     viewBatchInfo.batchCount_ = 0;
     Material* currMaterial = 0;
@@ -453,22 +464,25 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
     unsigned iCount = 0;
     unsigned vStart = 0;
     unsigned vCount = 0;
+    float distance = M_INFINITY;
 
-    for (unsigned b = 0; b < soruceBatches.Size(); ++b)
+    for (unsigned b = 0; b < sourceBatches.Size(); ++b)
     {
-        Material* material = soruceBatches[b]->material_;
-        const Vector<Vertex2D>& vertices = soruceBatches[b]->vertices_;
+        distance = Min(distance, sourceBatches[b]->distance_);
+        Material* material = sourceBatches[b]->material_;
+        const Vector<Vertex2D>& vertices = sourceBatches[b]->vertices_;
 
         // When new material encountered, finish the current batch and start new
         if (currMaterial != material)
         {
             if (currMaterial)
             {
-                AddViewBatch(viewBatchInfo, currMaterial, iStart, iCount, vStart, vCount);
+                AddViewBatch(viewBatchInfo, currMaterial, iStart, iCount, vStart, vCount, distance);
                 iStart += iCount;
                 iCount = 0;
                 vStart += vCount;
                 vCount = 0;
+                distance = M_INFINITY;
             }
 
             currMaterial = material;
@@ -480,18 +494,22 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
 
     // Add the final batch if necessary
     if (currMaterial && vCount)
-        AddViewBatch(viewBatchInfo, currMaterial, iStart, iCount, vStart, vCount);
+        AddViewBatch(viewBatchInfo, currMaterial, iStart, iCount, vStart, vCount,distance);
 
     viewBatchInfo.indexCount_ = iStart + iCount;
     viewBatchInfo.vertexCount_ = vStart + vCount;
     viewBatchInfo.batchUpdatedFrameNumber_ = frame_.frameNumber_;
 }
 
-void Renderer2D::AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material, unsigned indexStart, unsigned indexCount,
-    unsigned vertexStart, unsigned vertexCount)
+void Renderer2D::AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material, 
+    unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount, float distance)
 {
     if (!material || indexCount == 0 || vertexCount == 0)
         return;
+
+    if (viewBatchInfo.distances_.Size() <= viewBatchInfo.batchCount_)
+        viewBatchInfo.distances_.Resize(viewBatchInfo.batchCount_ + 1);
+    viewBatchInfo.distances_[viewBatchInfo.batchCount_] = distance;
 
     if (viewBatchInfo.materials_.Size() <= viewBatchInfo.batchCount_)
         viewBatchInfo.materials_.Resize(viewBatchInfo.batchCount_ + 1);

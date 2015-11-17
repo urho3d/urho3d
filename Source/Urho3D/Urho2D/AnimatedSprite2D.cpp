@@ -107,7 +107,7 @@ void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
 
     Dispose();
 
-    animationSet_ = animationSet;    
+    animationSet_ = animationSet;
     if (!animationSet_)
         return;
 
@@ -177,7 +177,7 @@ void AnimatedSprite2D::SetAnimation(const String& name, LoopMode2D loopMode)
 
 #ifdef URHO3D_SPINE
     if (skeleton_)
-        SetSpineAnimation();    
+        SetSpineAnimation();
 #endif
     if (spriterInstance_)
         SetSpriterAnimation();
@@ -240,7 +240,7 @@ void AnimatedSprite2D::UpdateSourceBatches()
     if (spriterInstance_ && spriterInstance_->GetAnimation())
         UpdateSourceBatchesSpriter();
 
-    sourceBatchesDirty_ = false;   
+    sourceBatchesDirty_ = false;
 }
 
 void AnimatedSprite2D::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
@@ -314,8 +314,8 @@ void AnimatedSprite2D::UpdateSourceBatchesSpine()
     SourceBatch2D& sourceBatch = sourceBatches_[0];
     sourceBatches_[0].vertices_.Clear();
 
-    static const int SLOT_VERTEX_COUNT_MAX = 1024;
-    static float slotVertices[SLOT_VERTEX_COUNT_MAX];
+    const int SLOT_VERTEX_COUNT_MAX = 1024;
+    float slotVertices[SLOT_VERTEX_COUNT_MAX];
 
     for (int i = 0; i < skeleton_->slotsCount; ++i)
     {
@@ -459,7 +459,7 @@ void AnimatedSprite2D::UpdateSourceBatchesSpriter()
 
         Spriter::SpriteTimelineKey* timelineKey = (Spriter::SpriteTimelineKey*)timelineKeys[i];
 
-        Spriter::SpatialInfo& info = timelineKey->info_;        
+        Spriter::SpatialInfo& info = timelineKey->info_;
         Vector3 position(info.x_, info.y_, 0.0f);
         if (flipX_)
             position.x_ = -position.x_;

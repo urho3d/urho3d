@@ -280,6 +280,7 @@ Renderer::Renderer(Context* context) :
     drawShadows_(true),
     reuseShadowMaps_(true),
     dynamicInstancing_(true),
+    threadedOcclusion_(false),
     shadersDirty_(true),
     initialized_(false),
     resetViews_(false)
@@ -473,6 +474,15 @@ void Renderer::SetOccluderSizeThreshold(float screenSize)
     occluderSizeThreshold_ = Max(screenSize, 0.0f);
 }
 
+void Renderer::SetThreadedOcclusion(bool enable)
+{
+    if (enable != threadedOcclusion_)
+    {
+        threadedOcclusion_ = enable;
+        occlusionBuffers_.Clear();
+    }
+}
+
 void Renderer::ReloadShaders()
 {
     shadersDirty_ = true;
@@ -556,7 +566,7 @@ unsigned Renderer::GetNumOccluders(bool allViews) const
         if (!view)
             continue;
 
-        numOccluders += view->GetOccluders().Size();
+        numOccluders += view->GetNumActiveOccluders();
     }
 
     return numOccluders;
@@ -1047,7 +1057,7 @@ OcclusionBuffer* Renderer::GetOcclusionBuffer(Camera* camera)
     int height = (int)((float)occlusionBufferSize_ / camera->GetAspectRatio() + 0.5f);
 
     OcclusionBuffer* buffer = occlusionBuffers_[numOcclusionBuffers_++];
-    buffer->SetSize(width, height);
+    buffer->SetSize(width, height, threadedOcclusion_);
     buffer->SetView(camera);
     buffer->ResetUseTimer();
 

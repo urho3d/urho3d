@@ -55,6 +55,8 @@ struct ViewBatchInfo2D
     PODVector<const SourceBatch2D*> sourceBatches_;
     /// Batch count;
     unsigned batchCount_;
+    /// Distances.
+    PODVector<float> distances_;
     /// Materials.
     Vector<SharedPtr<Material> > materials_;
     /// Geometries.
@@ -107,9 +109,8 @@ private:
     /// Update view batch info.
     void UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* camera);
     /// Add view batch.
-    void AddViewBatch
-        (ViewBatchInfo2D& viewBatchInfo, Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart,
-            unsigned vertexCount);
+    void AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material, 
+        unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount, float distance);
 
     /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;

@@ -49,6 +49,7 @@ StaticSprite2D::StaticSprite2D(Context* context) :
     hotSpot_(0.5f, 0.5f)
 {
     sourceBatches_.Resize(1);
+    sourceBatches_[0].owner_ = this;
 }
 
 StaticSprite2D::~StaticSprite2D()

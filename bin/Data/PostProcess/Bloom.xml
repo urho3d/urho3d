@@ -1,19 +1,19 @@
 <renderpath>
-    <rendertarget name="vblur" tag="Bloom" sizedivisor="4 4" format="rgb" filter="true" />
-    <rendertarget name="hblur" tag="Bloom" sizedivisor="4 4" format="rgb" filter="true" />
-    <command type="quad" tag="Bloom" vs="Bloom" ps="Bloom" psdefines="BRIGHT" output="vblur">
+    <rendertarget name="blurv" tag="Bloom" sizedivisor="4 4" format="rgb" filter="true" />
+    <rendertarget name="blurh" tag="Bloom" sizedivisor="4 4" format="rgb" filter="true" />
+    <command type="quad" tag="Bloom" vs="Bloom" ps="Bloom" psdefines="BRIGHT" output="blurv">
         <parameter name="BloomThreshold" value="0.3" />
         <texture unit="diffuse" name="viewport" />
     </command>
-    <command type="quad" tag="Bloom" vs="Bloom" ps="Bloom" psdefines="HBLUR" output="hblur">
-        <texture unit="diffuse" name="vblur" />
+    <command type="quad" tag="Bloom" vs="Bloom" ps="Bloom" psdefines="BLURH" output="blurh">
+        <texture unit="diffuse" name="blurv" />
     </command>
-    <command type="quad" tag="Bloom" vs="Bloom" ps="Bloom" psdefines="VBLUR" output="vblur">
-        <texture unit="diffuse" name="hblur" />
+    <command type="quad" tag="Bloom" vs="Bloom" ps="Bloom" psdefines="BLURV" output="blurv">
+        <texture unit="diffuse" name="blurh" />
     </command>
     <command type="quad" tag="Bloom" vs="Bloom" ps="Bloom" psdefines="COMBINE" output="viewport">
         <parameter name="BloomMix" value="0.9 0.4" />
         <texture unit="diffuse" name="viewport" />
-        <texture unit="normal" name="vblur" />
+        <texture unit="normal" name="blurv" />
     </command>
 </renderpath>

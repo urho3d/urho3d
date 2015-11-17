@@ -107,7 +107,7 @@ void HelloGUI::InitWindow()
     uiRoot_->AddChild(window_);
 
     // Set Window size and layout settings
-    window_->SetMinSize(384, 192);
+    window_->SetMinWidth(384);
     window_->SetLayout(LM_VERTICAL, 6, IntRect(6, 6, 6, 6));
     window_->SetAlignment(HA_CENTER, VA_CENTER);
     window_->SetName("Window");

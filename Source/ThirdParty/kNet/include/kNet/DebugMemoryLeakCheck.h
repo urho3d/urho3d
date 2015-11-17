@@ -34,22 +34,23 @@
 #define _CRTDBG_MAP_ALLOC
 #endif
 
-__forceinline static void *operator new(size_t size, const char *file, int line)
+// Urho3D: omit static to allow compilation on VS2015 Update 1
+__forceinline void *operator new(size_t size, const char *file, int line)
 {
 	return _malloc_dbg(size, _NORMAL_BLOCK, file, line);
 }
 
-__forceinline static void *operator new[](size_t size, const char *file, int line)
+__forceinline void *operator new[](size_t size, const char *file, int line)
 {
 	return _malloc_dbg(size, _NORMAL_BLOCK, file, line);
 }
 
-__forceinline static void operator delete(void *ptr, const char *, int)
+__forceinline void operator delete(void *ptr, const char *, int)
 {
 	_free_dbg(ptr, _NORMAL_BLOCK);
 }
 
-__forceinline static void operator delete[](void *ptr, const char *, int)
+__forceinline void operator delete[](void *ptr, const char *, int)
 {
 	_free_dbg(ptr, _NORMAL_BLOCK);
 }

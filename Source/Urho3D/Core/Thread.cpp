@@ -24,7 +24,7 @@
 
 #include "../Core/Thread.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <pthread.h>
@@ -36,7 +36,7 @@ namespace Urho3D
 {
 
 #ifdef URHO3D_THREADING
-#ifdef WIN32
+#ifdef _WIN32
 
 DWORD WINAPI ThreadFunctionStatic(void* data)
 {
@@ -79,7 +79,7 @@ bool Thread::Run()
         return false;
 
     shouldRun_ = true;
-#ifdef WIN32
+#ifdef _WIN32
     handle_ = CreateThread(0, 0, ThreadFunctionStatic, this, 0, 0);
 #else
     handle_ = new pthread_t;
@@ -102,7 +102,7 @@ void Thread::Stop()
         return;
 
     shouldRun_ = false;
-#ifdef WIN32
+#ifdef _WIN32
     WaitForSingleObject((HANDLE)handle_, INFINITE);
     CloseHandle((HANDLE)handle_);
 #else
@@ -118,7 +118,7 @@ void Thread::Stop()
 void Thread::SetPriority(int priority)
 {
 #ifdef URHO3D_THREADING
-#ifdef WIN32
+#ifdef _WIN32
     if (handle_)
         SetThreadPriority((HANDLE)handle_, priority);
 #endif
@@ -137,7 +137,7 @@ void Thread::SetMainThread()
 
 ThreadID Thread::GetCurrentThreadID()
 {
-#ifdef WIN32
+#ifdef _WIN32
     return GetCurrentThreadId();
 #else
     return pthread_self();

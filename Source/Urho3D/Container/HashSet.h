@@ -358,6 +358,9 @@ public:
     /// Clear the set.
     void Clear()
     {
+        // Prevent Find() from returning anything while the map is being cleared
+        ResetPtrs();
+
         if (Size())
         {
             for (Iterator i = Begin(); i != End();)
@@ -369,8 +372,6 @@ public:
             head_ = tail_;
             SetSize(0);
         }
-
-        ResetPtrs();
     }
 
     /// Sort keys. After sorting the set can be iterated in order until new elements are inserted.

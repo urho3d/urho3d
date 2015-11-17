@@ -560,6 +560,7 @@ void View::Update(const FrameInfo& frame)
     lights_.Clear();
     zones_.Clear();
     occluders_.Clear();
+    activeOccluders_ = 0;
     vertexLightQueues_.Clear();
     for (HashMap<unsigned, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
         i->second_.Clear(maxSortedInstances);
@@ -2154,22 +2155,44 @@ void View::DrawOccluders(OcclusionBuffer* buffer, const PODVector<Drawable*>& oc
 {
     buffer->SetMaxTriangles((unsigned)maxOccluderTriangles_);
     buffer->Clear();
-
-    for (unsigned i = 0; i < occluders.Size(); ++i)
+    
+    if (!buffer->IsThreaded())
     {
-        Drawable* occluder = occluders[i];
-        if (i > 0)
+        // If not threaded, draw occluders one by one and test the next occluder against already rasterized depth
+        for (unsigned i = 0; i < occluders.Size(); ++i)
         {
-            // For subsequent occluders, do a test against the pixel-level occlusion buffer to see if rendering is necessary
-            if (!buffer->IsVisible(occluder->GetWorldBoundingBox()))
-                continue;
+            Drawable* occluder = occluders[i];
+            if (i > 0)
+            {
+                // For subsequent occluders, do a test against the pixel-level occlusion buffer to see if rendering is necessary
+                if (!buffer->IsVisible(occluder->GetWorldBoundingBox()))
+                    continue;
+            }
+
+            // Check for running out of triangles
+            ++activeOccluders_;
+            bool success = occluder->DrawOcclusion(buffer);
+            // Draw triangles submitted by this occluder
+            buffer->DrawTriangles();
+            if (!success)
+                break;
+        }
+    }
+    else
+    {
+        // In threaded mode submit all triangles first, then render (cannot test in this case)
+        for (unsigned i = 0; i < occluders.Size(); ++i)
+        {
+            // Check for running out of triangles
+            ++activeOccluders_;
+            if (!occluders[i]->DrawOcclusion(buffer))
+                break;
         }
 
-        // Check for running out of triangles
-        if (!occluder->DrawOcclusion(buffer))
-            break;
+        buffer->DrawTriangles();
     }
 
+    // Finally build the depth mip levels
     buffer->BuildDepthHierarchy();
 }
 

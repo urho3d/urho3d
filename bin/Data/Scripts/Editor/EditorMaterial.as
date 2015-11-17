@@ -52,12 +52,20 @@ void CreateMaterialEditor()
     SubscribeToEvent(materialWindow.GetChild("FillModeEdit", true), "ItemSelected", "EditFillMode");
 }
 
-bool ShowMaterialEditor()
+bool ToggleMaterialEditor()
+{
+    if (materialWindow.visible == false)
+        ShowMaterialEditor();
+    else
+        HideMaterialEditor();
+    return true;
+}
+
+void ShowMaterialEditor()
 {
     RefreshMaterialEditor();
     materialWindow.visible = true;
     materialWindow.BringToFront();
-    return true;
 }
 
 void HideMaterialEditor()

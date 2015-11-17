@@ -14,7 +14,7 @@
 
 /** @file W32Event.cpp
 	@brief */
-#ifdef WIN32
+#ifdef _WIN32
 
 #include <cassert>
 
@@ -103,4 +103,4 @@ bool Event::IsValid() const
 
 } // ~kNet
 
-#endif // ~WIN32
+#endif // ~_WIN32

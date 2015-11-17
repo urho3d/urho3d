@@ -514,17 +514,25 @@ void ScanResourceDirFiles(String path, uint resourceDirIndex)
     }
 }
 
-void HideResourceBrowserWindow()
+bool ToggleResourceBrowserWindow()
 {
-    browserWindow.visible = false;
+    if (browserWindow.visible == false)
+        ShowResourceBrowserWindow();
+    else
+        HideResourceBrowserWindow();
+    return true;
 }
 
-bool ShowResourceBrowserWindow()
+void ShowResourceBrowserWindow()
 {
     browserWindow.visible = true;
     browserWindow.BringToFront();
     ui.focusElement = browserSearch;
-    return true;
+}
+
+void HideResourceBrowserWindow()
+{
+    browserWindow.visible = false;
 }
 
 void ToggleResourceFilterWindow()
@@ -1235,7 +1243,7 @@ bool GetBinaryType(String path, StringHash &out fileType, bool useCache = false)
 bool GetXmlType(String path, StringHash &out fileType, bool useCache = false)
 {
     String extension = GetExtension(path);
-    if (extension == ".txt" || extension == ".json" || extension == ".icns")
+    if (extension == ".txt" || extension == ".json" || extension == ".icns" || extension == ".atlas")
         return false;
 
     String name;
