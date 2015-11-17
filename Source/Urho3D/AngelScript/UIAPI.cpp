@@ -735,6 +735,9 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "bool get_useMutableGlyphs() const", asMETHOD(UI, GetUseMutableGlyphs), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_forceAutoHint(bool)", asMETHOD(UI, SetForceAutoHint), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "bool get_forceAutoHint() const", asMETHOD(UI, GetForceAutoHint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void SetWidth(float value)", asMETHOD(UI, SetWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void SetHeight(float value)", asMETHOD(UI, SetHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void SetScale(float value)", asMETHOD(UI, SetScale), asCALL_THISCALL);
     engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);
 }
 

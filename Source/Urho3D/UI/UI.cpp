@@ -405,7 +405,7 @@ void UI::RenderUpdate()
     batches_.Clear();
     vertexData_.Clear();
     const IntVector2& rootSize = rootElement_->GetSize();
-    IntRect currentScissor = IntRect(0, 0, rootSize.x_, rootSize.y_);
+    IntRect currentScissor = IntRect(0, 0, (int)(rootSize.x_ / uiScale_), (int)(rootSize.y_ / uiScale_));
     if (rootElement_->IsVisible())
         GetBatches(rootElement_, currentScissor);
 
