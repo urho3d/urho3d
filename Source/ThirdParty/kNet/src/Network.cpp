@@ -20,7 +20,8 @@
 
 #include <cassert>
 
-#if defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#ifndef _WIN32
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -49,7 +50,7 @@ const int cMaxUDPSendSize = 1400;
 
 std::string Network::GetErrorString(int error)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	void *lpMsgBuf = 0;
 
 	HRESULT hresult = HRESULT_FROM_WIN32(error);
@@ -70,7 +71,7 @@ std::string Network::GetErrorString(int error)
 
 int Network::GetLastError()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	return WSAGetLastError();
 #else
 	return errno;
@@ -105,7 +106,7 @@ std::string FormatBytes(double numBytes)
 
 Network::Network()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	memset(&wsaData, 0, sizeof(wsaData));
 #endif
 	Init();
@@ -163,7 +164,7 @@ void Network::PrintAddrInfo(const addrinfo *ptr)
 	case AF_INET6:
 		KNET_LOG(LogInfo, "AF_INET6 (IPv6)\n");
 		break;
-#ifdef WIN32
+#ifdef _WIN32
 	case AF_NETBIOS:
 		KNET_LOG(LogInfo, "AF_NETBIOS (NetBIOS)\n");
 		break;
@@ -267,7 +268,7 @@ void Network::PrintHostNameInfo(const char *hostname, const char *port)
 
 void Network::Init()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	// Initialize Winsock
 	int result = WSAStartup(MAKEWORD(2,2), &wsaData);
 	if (result != 0)
@@ -528,7 +529,7 @@ void Network::DeInit()
 	}
 
 	// Deinitialize network subsystem.
-#ifdef WIN32
+#ifdef _WIN32
 	WSACleanup();
 #endif
 
@@ -575,7 +576,7 @@ Socket *Network::OpenListenSocket(unsigned short port, SocketTransportLayer tran
 		// Allow other sockets to be bound to this address after this. 
 		// (Possibly unsecure, only enable for development purposes - to avoid having to wait for the server listen socket 
 		//  to time out if the server crashes.)
-#ifdef WIN32
+#ifdef _WIN32
 		BOOL val = TRUE;
 		ret = setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, (const char *)&val, sizeof(val));
 #else
@@ -649,7 +650,7 @@ Socket *Network::ConnectSocket(const char *address, unsigned short port, SocketT
 		return 0;
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	SOCKET connectSocket = WSASocket(result->ai_family, result->ai_socktype, result->ai_protocol,
 		NULL, 0, WSA_FLAG_OVERLAPPED);
 #else
@@ -664,7 +665,7 @@ Socket *Network::ConnectSocket(const char *address, unsigned short port, SocketT
 	}
 
 	// Connect to server.
-#ifdef WIN32
+#ifdef _WIN32
 	ret = WSAConnect(connectSocket, result->ai_addr, (int)result->ai_addrlen, 0, 0, 0, 0);
 #else
 	ret = connect(connectSocket, result->ai_addr, (int)result->ai_addrlen);

@@ -18,7 +18,8 @@
 
 #include <vector>
 
-#if defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#ifndef _WIN32
 #include <sys/select.h>
 #endif
 
@@ -60,10 +61,11 @@ private:
 	static const int maxEvents = 64; ///< WSAWaitForMultipleEvents has a built-in limit of 64 items, hence this value.
 	int numAdded;
 
-#ifdef WIN32
+#ifdef _WIN32
 	WSAEVENT events[maxEvents]; 
 
-#elif defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#else
 	fd_set readfds;
 	fd_set writefds;
 	int nfds;

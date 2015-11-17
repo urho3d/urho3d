@@ -370,11 +370,6 @@ if (URHO3D_THREADING)
     add_definitions (-DURHO3D_THREADING)
 endif ()
 
-# If not on Windows platform, enable Unix mode for kNet library
-if (NOT WIN32)
-    add_definitions (-DKNET_UNIX)
-endif ()
-
 # Add definitions for Emscripten
 if (EMSCRIPTEN)
     add_definitions (-DNO_POPEN)

@@ -22,6 +22,7 @@
 
 # Define target name
 set (TARGET_NAME SDL)
+include (FindPkgConfig)
 
 if (EMSCRIPTEN)
     # Emscripten has its own SDL2 port, so just create a custom target to:
@@ -126,11 +127,18 @@ else ()
     # end todo
     include_directories (${ALSA_INCLUDE_DIRS})
 
+    pkg_check_modules (PKG_PULSEAUDIO libpulse-simple)
+    if (PKG_PULSEAUDIO_FOUND)
+      add_definitions (-DSDL_AUDIO_DRIVER_PULSEAUDIO=1)
+      add_definitions (-DSDL_AUDIO_DRIVER_PULSEAUDIO_DYNAMIC="libpulse-simple.so.0")
+      file (GLOB PULSEAUDIO_SOURCES src/audio/pulseaudio/*.c)
+    endif()
+
     file (GLOB SYS_C_FILES
         src/audio/alsa/*.c src/audio/dma/*.c src/audio/dsp/*.c src/haptic/linux/*.c src/joystick/linux/*.c src/loadso/dlopen/*.c
         src/power/linux/*.c src/thread/pthread/*.c src/timer/unix/*.c src/filesystem/unix/*.c
     )
-    set (SYS_C_FILES ${SYS_C_FILES} ${VIDEO_DRIVER_C_FILES})
+    set (SYS_C_FILES ${SYS_C_FILES} ${VIDEO_DRIVER_C_FILES} ${PULSEAUDIO_SOURCES})
 endif ()
 
 file (GLOB H_FILES include/*.h)

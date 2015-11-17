@@ -89,7 +89,7 @@ void Thread::CheckHold()
 }
 
 // This code adapted from http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx "How to: Set a Thread Name in Native Code":
-#ifdef WIN32
+#ifdef _WIN32
 const DWORD MS_VC_EXCEPTION=0x406D1388;
 
 #pragma pack(push,8)
