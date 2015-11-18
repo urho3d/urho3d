@@ -4235,7 +4235,6 @@ Properties:
 - bool splitImpulse
 - int fps
 - float maxNetworkAngularVelocity
-- bool applyingTransforms
 
 <a name="Class_PhysicsWorld2D"></a>
 ### PhysicsWorld2D : Component

@@ -393,24 +393,17 @@ void RigidBody2D::ReleaseBody()
 
 void RigidBody2D::ApplyWorldTransform()
 {
-    if (!body_)
-        return;
-
-    if (!body_->IsActive())
-        return; 
-    
-    if (body_->GetType() == b2_staticBody)
-        return;
-
-    if (!body_->IsAwake())
+    if (!body_ || !body_->IsActive() || body_->GetType() == b2_staticBody || !body_->IsAwake())
         return;
 
     physicsWorld_->SetApplyingTransforms(true);
 
-    Node* node = GetNode();
     const b2Transform& transform = body_->GetTransform();
-    node->SetWorldPosition(ToVector3(transform.p));
-    node->SetWorldRotation(Quaternion(transform.q.GetAngle() * M_RADTODEG, Vector3::FORWARD));
+    Vector3 worldPos = node_->GetWorldPosition();
+    worldPos.x_ = transform.p.x;
+    worldPos.y_ = transform.p.y;
+    node_->SetWorldPosition(worldPos);
+    node_->SetWorldRotation(Quaternion(transform.q.GetAngle() * M_RADTODEG, Vector3::FORWARD));
 
     physicsWorld_->SetApplyingTransforms(false);
 }
