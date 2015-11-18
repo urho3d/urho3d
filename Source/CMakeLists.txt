@@ -20,6 +20,14 @@
 # THE SOFTWARE.
 #
 
+# TODO: temporary debug print to troubleshoot iOS build tree configuration issue on Travis CI
+if (DEFINED ENV{TRAVIS})
+    message ("CMAKE_REQUIRED_DEFINITIONS = ${CMAKE_REQUIRED_DEFINITIONS}")
+    if (IOS)
+        unset (CMAKE_REQUIRED_DEFINITIONS)
+    endif ()
+endif ()
+
 # Check existence of stdint.h for LibCpuId
 include (CheckIncludeFiles)
 CHECK_INCLUDE_FILES (stdint.h HAVE_STDINT_H)
