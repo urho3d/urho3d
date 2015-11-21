@@ -709,9 +709,12 @@ Urho3D uses the following conventions and principles:
 
 - Path names use slash instead of backslash. Paths will be converted internally into the necessary format when calling into the operating system.
 
-- In the script API, properties are used whenever appropriate instead of %Set... and Get... functions. If the setter and getter require index parameters, the property will use array-style indexing, and its name will be in plural. For example model->SetMaterial(0, myMaterial) in C++ would become model.materials[0] = myMaterial in script.
+- In the script API, properties are used whenever appropriate instead of %Set...() and Get...() functions. If the setter and getter require index parameters, the property will use array-style indexing, and its name will be in plural. For example model->SetMaterial(0, myMaterial) in C++ would become model.materials[0] = myMaterial in script.
 
 - Raw pointers are used whenever possible in the classes' public API. This simplifies exposing functions & classes to script, and is relatively safe, because SharedPtr & WeakPtr use intrusive reference counting.
+
+- When an object's public API allows assigning a reference counted object to it through a %Set...() function, this implies ownership through a SharedPtr. For example assigning a Material to a Drawable. To end
+the assignment and free the reference counted object, call the Set...() function again with a null argument.
 
 - No C++ exceptions. Error return values (false / null pointer / dummy reference) are used instead. %Script exceptions are used when there is no other sensible way, such as with out of bounds array access.
 
