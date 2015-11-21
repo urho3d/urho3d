@@ -1,2 +1,0 @@
-Materials/BruceWayne_Suit_Torso_MIC.xml
-Materials/BruceWayne_Suit_Legs_MIC.xml
