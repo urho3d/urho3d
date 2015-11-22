@@ -21,10 +21,10 @@
 #
 
 # TODO: temporary debug print to troubleshoot iOS build tree configuration issue on Travis CI
-if (DEFINED ENV{TRAVIS})
-    message ("CMAKE_REQUIRED_DEFINITIONS = ${CMAKE_REQUIRED_DEFINITIONS}")
+if (XCODE AND DEFINED ENV{TRAVIS})
+    message ("CMAKE_OSX_DEPLOYMENT_TARGET = ${CMAKE_OSX_DEPLOYMENT_TARGET}")
     if (IOS)
-        unset (CMAKE_REQUIRED_DEFINITIONS)
+        unset (CMAKE_OSX_DEPLOYMENT_TARGET)
     endif ()
 endif ()
 

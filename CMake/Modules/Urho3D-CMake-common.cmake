@@ -506,6 +506,8 @@ if (IOS)
     set (CMAKE_OSX_SYSROOT iphoneos)    # Set Base SDK to "Latest iOS"
     execute_process (COMMAND xcodebuild -version -sdk ${CMAKE_OSX_SYSROOT} Path OUTPUT_VARIABLE IOS_SYSROOT OUTPUT_STRIP_TRAILING_WHITESPACE)   # Obtain iOS sysroot path
     set (CMAKE_FIND_ROOT_PATH ${IOS_SYSROOT})
+    # TODO: temporary debug print to troubleshoot iOS build tree configuration issue on Travis CI
+    message ("IOS - CMAKE_OSX_SYSROOT = ${CMAKE_OSX_SYSROOT}, CMAKE_OSX_DEPLOYMENT_TARGET = ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 elseif (XCODE)
     # MacOSX-Xcode-specific setup
     if (NOT URHO3D_64BIT)
@@ -517,6 +519,7 @@ elseif (XCODE)
         execute_process (COMMAND sw_vers -productVersion OUTPUT_VARIABLE CURRENT_OSX_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
         string (REGEX REPLACE ^\([^.]+\\.[^.]+\).* \\1 CMAKE_OSX_DEPLOYMENT_TARGET ${CURRENT_OSX_VERSION})
     endif ()
+    message ("OSX - CMAKE_OSX_SYSROOT = ${CMAKE_OSX_SYSROOT}, CMAKE_OSX_DEPLOYMENT_TARGET = ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 endif ()
 if (IOS OR URHO3D_MACOSX_BUNDLE)
     # Common MacOSX and iOS bundle setup
