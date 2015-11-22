@@ -420,7 +420,7 @@ task :ci_package_upload do
       if !ENV['NO_SDK_SYSIMG']
         system "cd ../Build && android update project -p . -t $(android list target |grep android-$API |cut -d ' ' -f2) && ant debug" or abort 'Failed to make Urho3D Samples APK'
       end
-      system 'rm -rf $ANDROID_NDK' if ENV['TRAVIS']   # Clean up some disk space before packaging on Travis CI
+      system 'rm -rf ../Build/generated ~/usr/local' if ENV['TRAVIS']   # Clean up some disk space before packaging on Travis CI
     end
     if ENV['URHO3D_USE_LIB64_RPM']
       system "cd ../Build && cmake . -DURHO3D_USE_LIB64_RPM=#{ENV['URHO3D_USE_LIB64_RPM']}" or abort 'Failed to reconfigure to generate 64-bit RPM package'
