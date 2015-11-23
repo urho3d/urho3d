@@ -5,14 +5,37 @@
 #include "Lighting.hlsl"
 #include "Fog.hlsl"
 
+#ifndef D3D11
+
+// D3D9 uniforms
 uniform float cWindHeightFactor;
 uniform float cWindHeightPivot;
 uniform float cWindPeriod;
 uniform float2 cWindWorldSpacing;
 
+#else
+
+// D3D11 constant buffer
+cbuffer CustomVS : register(b6)
+{
+    float cWindHeightFactor;
+    float cWindHeightPivot;
+    float cWindPeriod;
+    float2 cWindWorldSpacing;
+}
+
+#endif
+
 void VS(float4 iPos : POSITION,
-    float3 iNormal : NORMAL,
-    float2 iTexCoord : TEXCOORD0,
+    #ifndef BILLBOARD
+        float3 iNormal : NORMAL,
+    #endif
+    #ifndef NOUV
+        float2 iTexCoord : TEXCOORD0,
+    #endif
+    #ifdef VERTEXCOLOR
+        float4 iColor : COLOR0,
+    #endif
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
@@ -57,11 +80,19 @@ void VS(float4 iPos : POSITION,
             out float2 oTexCoord2 : TEXCOORD7,
         #endif
     #endif
+    #ifdef VERTEXCOLOR
+        out float4 oColor : COLOR0,
+    #endif
     #if defined(D3D11) && defined(CLIPPLANE)
         out float oClip : SV_CLIPDISTANCE0,
     #endif
     out float4 oPos : OUTPOSITION)
 {
+    // Define a 0,0 UV coord if not expected from the vertex data
+    #ifdef NOUV
+    float2 iTexCoord = float2(0.0, 0.0);
+    #endif
+
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
     float height = worldPos.y - cModel._m31;
@@ -78,7 +109,11 @@ void VS(float4 iPos : POSITION,
     #if defined(D3D11) && defined(CLIPPLANE)
         oClip = dot(oPos, cClipPlane);
     #endif
-    
+
+    #ifdef VERTEXCOLOR
+        oColor = iColor;
+    #endif
+
     #ifdef NORMALMAP
         float3 tangent = GetWorldTangent(modelMatrix);
         float3 bitangent = cross(tangent, oNormal) * iTangent.w;
@@ -103,7 +138,7 @@ void VS(float4 iPos : POSITION,
         #endif
 
         #ifdef POINTLIGHT
-            oCubeMaskVec = mul(cLightPos.xyz - worldPos, (float3x3)cLightMatrices[0]);
+            oCubeMaskVec = mul(worldPos - cLightPos.xyz, (float3x3)cLightMatrices[0]);
         #endif
     #else
         // Ambient & per-vertex lighting

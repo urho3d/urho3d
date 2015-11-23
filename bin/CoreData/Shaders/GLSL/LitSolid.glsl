@@ -70,7 +70,7 @@ void VS()
 
         #ifdef SPOTLIGHT
             // Spotlight projection: transform from world space to projector texture coordinates
-            vSpotPos =  projWorldPos * cLightMatrices[0];
+            vSpotPos = projWorldPos * cLightMatrices[0];
         #endif
     
         #ifdef POINTLIGHT
