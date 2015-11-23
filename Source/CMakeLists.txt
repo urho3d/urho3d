@@ -22,7 +22,7 @@
 
 # Check existence of stdint.h for LibCpuId
 include (CheckIncludeFiles)
-CHECK_INCLUDE_FILES (stdint.h HAVE_STDINT_H)
+check_include_files (stdint.h HAVE_STDINT_H)
 if (HAVE_STDINT_H)
     add_definitions (-DHAVE_STDINT_H)
 endif ()

@@ -98,7 +98,7 @@ post_cmake() {
     elif [ -e "$BUILD"/*.xcodeproj/project.pbxproj ] && perl -v >/dev/null 2>&1; then
         echo -- post_cmake: Fix generated Xcode project
         # Temporary workaround to fix file references being added into multiple groups warnings (CMake bug http://www.cmake.org/Bug/view.php?id=15272, stil exists in 3.1)
-        perl -i -pe 'BEGIN {$/=undef} s/(Begin PBXGroup section.*?,).*?,/\1/s' "$BUILD"/*.xcodeproj/project.pbxproj
+        perl -i -pe 'BEGIN {$/=undef} s/(Begin PBXGroup section.*?\/\* Sources \*\/,).*?,/\1/s' "$BUILD"/*.xcodeproj/project.pbxproj
         # Set Xcode build settings to skip dSYM file generation for Debug configuration (other configurations still use the default dwarf-with-dsym)
         if [ $IOS ]; then
             perl -i -pe 'BEGIN {$/=undef} s/(Begin XCBuildConfiguration.*?Debug.*?Settings = {\n)/\1DEBUG_INFORMATION_FORMAT = dwarf;\n/s' "$BUILD"/*.xcodeproj/project.pbxproj

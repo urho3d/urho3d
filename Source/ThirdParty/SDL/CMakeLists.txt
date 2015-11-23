@@ -22,7 +22,6 @@
 
 # Define target name
 set (TARGET_NAME SDL)
-include (FindPkgConfig)
 
 if (EMSCRIPTEN)
     # Emscripten has its own SDL2 port, so just create a custom target to:
@@ -117,6 +116,7 @@ else ()
 
         file (GLOB VIDEO_DRIVER_C_FILES src/video/x11/*.c)
     endif ()
+
     find_package (ALSA REQUIRED)
     # todo: remove this fix when the minimum CMake version has been raised to higher than 2.8.7
     # There is a bug in older version of FindALSA.cmake module where it erroneously include 'alsa' directory component into the variable
@@ -127,12 +127,12 @@ else ()
     # end todo
     include_directories (${ALSA_INCLUDE_DIRS})
 
+    include (FindPkgConfig)
     pkg_check_modules (PKG_PULSEAUDIO libpulse-simple)
     if (PKG_PULSEAUDIO_FOUND)
-      add_definitions (-DSDL_AUDIO_DRIVER_PULSEAUDIO=1)
-      add_definitions (-DSDL_AUDIO_DRIVER_PULSEAUDIO_DYNAMIC="libpulse-simple.so.0")
+      add_definitions (-DSDL_AUDIO_DRIVER_PULSEAUDIO=1 -DSDL_AUDIO_DRIVER_PULSEAUDIO_DYNAMIC="libpulse-simple.so")
       file (GLOB PULSEAUDIO_SOURCES src/audio/pulseaudio/*.c)
-    endif()
+    endif ()
 
     file (GLOB SYS_C_FILES
         src/audio/alsa/*.c src/audio/dma/*.c src/audio/dsp/*.c src/haptic/linux/*.c src/joystick/linux/*.c src/loadso/dlopen/*.c
