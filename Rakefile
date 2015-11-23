@@ -406,7 +406,7 @@ task :ci_package_upload do
       elapsed_time = (Time.now - Time.at(ENV['CI_START_TIME'].to_i)) / 60
       puts "\niOS checkpoint reached, elapsed time: #{elapsed_time}\n\n"
     end
-    if !ENV['CI_START_TIME'] || elapsed_time < 25 # minutes
+    if !ENV['CI_START_TIME'] || elapsed_time < 20 # minutes
       # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
       system 'echo Rebuilding Urho3D library as Mach-O universal binary...'
       xcode_build(0, '../Build/Urho3D.xcodeproj', 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
@@ -420,7 +420,7 @@ task :ci_package_upload do
       if !ENV['NO_SDK_SYSIMG']
         system "cd ../Build && android update project -p . -t $(android list target |grep android-$API |cut -d ' ' -f2) && ant debug" or abort 'Failed to make Urho3D Samples APK'
       end
-      system 'rm -rf ../Build/generated ~/usr/local' if ENV['TRAVIS']   # Clean up some disk space before packaging on Travis CI
+      system 'rm -rf ../Build/generated ~/usr/local $(dirname $(which android))/..' if ENV['TRAVIS']   # Clean up some disk space before packaging on Travis CI
     end
     if ENV['URHO3D_USE_LIB64_RPM']
       system "cd ../Build && cmake . -DURHO3D_USE_LIB64_RPM=#{ENV['URHO3D_USE_LIB64_RPM']}" or abort 'Failed to reconfigure to generate 64-bit RPM package'
