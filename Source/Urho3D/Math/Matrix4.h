@@ -236,7 +236,7 @@ public:
         c0 = _mm_and_ps(c0, hi);
         hi = _mm_shuffle_ps(c0, c0, _MM_SHUFFLE(1, 1, 1, 1));
         c0 = _mm_and_ps(c0, hi);
-        return !_mm_ucomige_ss(c0, c0);
+        return _mm_cvtsi128_si32(_mm_castps_si128(c0)) == -1;
 #else
         const float* leftData = Data();
         const float* rightData = rhs.Data();
