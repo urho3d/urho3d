@@ -51,17 +51,18 @@ public:
 
     /// Copy-construct from another quaternion.
     Quaternion(const Quaternion& quat)
-#ifndef URHO3D_SSE
+#if defined(URHO3D_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
+    {
+        _mm_storeu_ps(&w_, _mm_loadu_ps(&quat.w_));
+    }
+#else
        :w_(quat.w_),
         x_(quat.x_),
         y_(quat.y_),
         z_(quat.z_)
-#endif
     {
-#ifdef URHO3D_SSE
-        _mm_storeu_ps(&w_, _mm_loadu_ps(&quat.w_));
-#endif
     }
+#endif
 
     /// Construct from values.
     Quaternion(float w, float x, float y, float z)
@@ -137,7 +138,7 @@ public:
     /// Assign from another quaternion.
     Quaternion& operator =(const Quaternion& rhs)
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
         _mm_storeu_ps(&w_, _mm_loadu_ps(&rhs.w_));
 #else
         w_ = rhs.w_;
