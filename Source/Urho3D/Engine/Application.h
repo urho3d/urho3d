@@ -24,7 +24,7 @@
 
 #include "../Core/Context.h"
 #include "../Core/Main.h"
-#include "../Core/Object.h"
+#include "../Engine/Engine.h"
 
 namespace Urho3D
 {

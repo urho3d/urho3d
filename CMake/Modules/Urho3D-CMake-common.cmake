@@ -371,11 +371,6 @@ if (URHO3D_THREADING)
     add_definitions (-DURHO3D_THREADING)
 endif ()
 
-# If not on Windows platform, enable Unix mode for kNet library
-if (NOT WIN32)
-    add_definitions (-DKNET_UNIX)
-endif ()
-
 # Add definitions for Emscripten
 if (EMSCRIPTEN)
     add_definitions (-DNO_POPEN)
@@ -538,6 +533,8 @@ if (IOS)
     set (CMAKE_OSX_SYSROOT iphoneos)    # Set Base SDK to "Latest iOS"
     execute_process (COMMAND xcodebuild -version -sdk ${CMAKE_OSX_SYSROOT} Path OUTPUT_VARIABLE IOS_SYSROOT OUTPUT_STRIP_TRAILING_WHITESPACE)   # Obtain iOS sysroot path
     set (CMAKE_FIND_ROOT_PATH ${IOS_SYSROOT})
+    # Ensure the CMAKE_OSX_DEPLOYMENT_TARGET is set to empty
+    unset (CMAKE_OSX_DEPLOYMENT_TARGET CACHE)
 elseif (XCODE)
     # MacOSX-Xcode-specific setup
     if (NOT URHO3D_64BIT)
@@ -609,9 +606,11 @@ else ()
         else ()
             if (NOT XCODE AND NOT EMSCRIPTEN)
                 # This may influence the effective SSE level when URHO3D_SSE is on as well
-                set (URHO3D_DEPLOYMENT_TARGET native CACHE STRING "Specify the minimum CPU type on which the target binaries are to be deployed (Linux, MinGW, and non-Xcode OSX native build only), see GCC/Clang's -march option for possible values")
-                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=${URHO3D_DEPLOYMENT_TARGET}")
-                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${URHO3D_DEPLOYMENT_TARGET}")
+                set (URHO3D_DEPLOYMENT_TARGET native CACHE STRING "Specify the minimum CPU type on which the target binaries are to be deployed (Linux, MinGW, and non-Xcode OSX native build only), see GCC/Clang's -march option for possible values; Use 'generic' for targeting a wide range of generic processors")
+                if (NOT URHO3D_DEPLOYMENT_TARGET STREQUAL generic)
+                    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=${URHO3D_DEPLOYMENT_TARGET}")
+                    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${URHO3D_DEPLOYMENT_TARGET}")
+                endif ()
             endif ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
@@ -1251,6 +1250,10 @@ macro (setup_main_executable)
                 set (SHARED_RESOURCE_JS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.js)
                 list (APPEND SOURCE_FILES ${SHARED_RESOURCE_JS} ${SHARED_RESOURCE_JS}.data)
                 set_source_files_properties (${SHARED_RESOURCE_JS} PROPERTIES GENERATED TRUE EMCC_OPTION pre-js)
+                # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
+                if (DEST_BUNDLE_DIR)
+                    install (FILES ${SHARED_RESOURCE_JS} ${SHARED_RESOURCE_JS}.data DESTINATION ${DEST_BUNDLE_DIR})
+                endif ()
             endif ()
         endif ()
     endif ()

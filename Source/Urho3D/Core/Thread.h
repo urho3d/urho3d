@@ -28,7 +28,7 @@
 #include <Urho3D/Urho3D.h>
 #endif
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <pthread.h>
 typedef pthread_t ThreadID;
 #else

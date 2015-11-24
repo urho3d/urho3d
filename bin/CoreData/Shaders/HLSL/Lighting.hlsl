@@ -18,7 +18,11 @@ float GetVertexLight(int index, float3 worldPos, float3 normal)
     // Directional light
     if (invRange == 0.0)
     {
-        float NdotL = max(dot(normal, lightDir), 0.0);
+        #ifdef TRANSLUCENT
+            float NdotL = abs(dot(normal, lightDir));
+        #else
+            float NdotL = max(dot(normal, lightDir), 0.0);
+        #endif
         return NdotL;
     }
     // Point/spot light
@@ -27,7 +31,11 @@ float GetVertexLight(int index, float3 worldPos, float3 normal)
         float3 lightVec = (lightPos - worldPos) * invRange;
         float lightDist = length(lightVec);
         float3 localDir = lightVec / lightDist;
-        float NdotL = max(dot(normal, localDir), 0.0);
+        #ifdef TRANSLUCENT
+            float NdotL = abs(dot(normal, localDir));
+        #else
+            float NdotL = max(dot(normal, localDir), 0.0);
+        #endif
         float atten = saturate(1.0 - lightDist * lightDist);
         float spotEffect = dot(localDir, lightDir);
         float spotAtten = saturate((spotEffect - cutoff) * invCutoff);
@@ -92,12 +100,20 @@ float GetDiffuse(float3 normal, float3 worldPos, out float3 lightDir)
 {
     #ifdef DIRLIGHT
         lightDir = cLightDirPS;
-        return saturate(dot(normal, lightDir));
+        #ifdef TRANSLUCENT
+            return abs(dot(normal, lightDir));
+        #else
+            return saturate(dot(normal, lightDir));
+        #endif
     #else
         float3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
         float lightDist = length(lightVec);
         lightDir = lightVec / lightDist;
-        return saturate(dot(normal, lightDir)) * Sample2D(LightRampMap, float2(lightDist, 0.0)).r;
+        #ifdef TRANSLUCENT
+            return abs(dot(normal, lightDir)) * Sample2D(LightRampMap, float2(lightDist, 0.0)).r;
+        #else
+            return saturate(dot(normal, lightDir)) * Sample2D(LightRampMap, float2(lightDist, 0.0)).r;
+        #endif
     #endif
 }
 

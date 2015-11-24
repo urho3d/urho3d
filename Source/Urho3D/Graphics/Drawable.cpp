@@ -80,6 +80,7 @@ SourceBatch& SourceBatch::operator =(const SourceBatch& rhs)
 
 Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     Component(context),
+    boundingBox_(0.0f, 0.0f),
     drawableFlags_(drawableFlags),
     worldBoundingBoxDirty_(true),
     castShadows_(false),

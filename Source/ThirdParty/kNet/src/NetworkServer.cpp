@@ -18,7 +18,8 @@
 #ifdef KNET_USE_BOOST
 #include <boost/thread/thread.hpp>
 #endif
-#ifdef KNET_UNIX
+// Urho3D: removed the KNET_UNIX definition
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 #include "kNet/DebugMemoryLeakCheck.h"

@@ -693,8 +693,8 @@ bool ScenePaste(bool pasteRoot = false, bool duplication = false)
                 newNode = editorScene.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
             else
             {
-                // If we are duplicating, paste into the selected nodes parent
-                if (duplication)
+                // If we are duplicating or have the original node selected, paste into the selected nodes parent
+                if (duplication || editNode is null || editNode.id == rootElem.GetUInt("id"))
                 {
                     if (editNode !is null && editNode.parent !is null)
                         newNode = editNode.parent.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);

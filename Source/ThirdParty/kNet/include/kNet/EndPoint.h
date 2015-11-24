@@ -16,7 +16,8 @@
 /** @file EndPoint.h
 	@brief The class \ref kNet::EndPoint Endpoint. Represents an endpoint of a network connection. */
 
-#if defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#ifndef _WIN32
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -69,7 +70,7 @@ struct EndPoint
 	static EndPoint FromSockAddrIn(const sockaddr_in &addr)
 	{
 		EndPoint endPoint;
-#ifdef WIN32
+#ifdef _WIN32
 		endPoint.ip[0] = addr.sin_addr.S_un.S_un_b.s_b1;
 		endPoint.ip[1] = addr.sin_addr.S_un.S_un_b.s_b2;
 		endPoint.ip[2] = addr.sin_addr.S_un.S_un_b.s_b3;
@@ -94,7 +95,7 @@ struct EndPoint
 		memset(&address, 0, sizeof(address));
 		address.sin_family = AF_INET;
 		address.sin_port = htons(port);
-#ifdef WIN32
+#ifdef _WIN32
 		address.sin_addr.S_un.S_un_b.s_b1 = ip[0];
 		address.sin_addr.S_un.S_un_b.s_b2 = ip[1];
 		address.sin_addr.S_un.S_un_b.s_b3 = ip[2];

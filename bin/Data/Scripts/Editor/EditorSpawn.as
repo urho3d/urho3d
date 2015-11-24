@@ -21,7 +21,7 @@ uint spawnCount = 1;
 float spawnRadius = 0;
 bool useNormal = true;
 bool alignToAABBBottom = true;
-
+bool spawnOnSelection = false;
 uint numberSpawnedObjects = 1;
 Array<String> spawnedObjectsNames;
 
@@ -61,6 +61,8 @@ void CreateSpawnEditor()
     useNormalToggle.checked = useNormal;
     CheckBox@ alignToAABBBottomToggle = spawnWindow.GetChild("AlignToAABBBottom", true);
     alignToAABBBottomToggle.checked = alignToAABBBottom;
+    CheckBox@ spawnOnSelectionToggle = spawnWindow.GetChild("SpawnOnSelected", true);
+    spawnOnSelectionToggle.checked = spawnOnSelection;    
 
     numberSpawnedObjectsEdit = spawnWindow.GetChild("NumberSpawnedObjects", true);
     numberSpawnedObjectsEdit.text = String(numberSpawnedObjects);
@@ -82,6 +84,7 @@ void CreateSpawnEditor()
     SubscribeToEvent(spawnCountEdit, "TextChanged", "EditSpawnCount");
     SubscribeToEvent(useNormalToggle, "Toggled", "ToggleUseNormal");
     SubscribeToEvent(alignToAABBBottomToggle, "Toggled", "ToggleAlignToAABBBottom");
+    SubscribeToEvent(spawnOnSelectionToggle, "Toggled", "ToggleSpawnOnSelected");
     SubscribeToEvent(numberSpawnedObjectsEdit, "TextFinished", "UpdateNumberSpawnedObjects");
     SubscribeToEvent(spawnWindow.GetChild("SetSpawnMode", true), "Released", "SetSpawnMode");
     RefreshPickedObjects();
@@ -150,6 +153,11 @@ void ToggleUseNormal(StringHash eventType, VariantMap& eventData)
 void ToggleAlignToAABBBottom(StringHash eventType, VariantMap& eventData)
 {
     alignToAABBBottom = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
+}
+
+void ToggleSpawnOnSelected(StringHash eventType, VariantMap& eventData)
+{
+    spawnOnSelection = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
 }
 
 void UpdateNumberSpawnedObjects(StringHash eventType, VariantMap& eventData)
@@ -333,6 +341,69 @@ bool GetSpawnPosition(const Ray&in cameraRay, float maxDistance, Vector3&out pos
     return allowNoHit;
 }
 
+bool GetSpawnPositionOnNode(const Ray&in cameraRay, float maxDistance, Vector3&out position, Vector3&out normal, Node@ node, float randomRadius = 0.0,
+    bool allowNoHit = true)
+{
+    if (pickMode < PICK_RIGIDBODIES && editorScene.octree !is null)
+    {
+        Array<RayQueryResult> results = editorScene.octree.Raycast(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY, 0x7fffffff);
+        
+        if (!results.empty)
+        {
+            RayQueryResult result = results[0];
+
+            for(uint i = 0; i < results.length; i++)
+            {
+                if (results[i].node is node)
+                {
+                    result = results[i];
+                    break;
+                }
+            }
+
+            if (randomRadius > 0)
+            {
+                Vector3 basePosition = RandomizeSpawnPosition(result.position, randomRadius);
+                basePosition.y += randomRadius;
+                Array<RayQueryResult> randomResults = editorScene.octree.Raycast(Ray(basePosition, Vector3(0, -1, 0)), RAY_TRIANGLE, randomRadius * 2.0, DRAWABLE_GEOMETRY, 0x7fffffff);
+
+                if (randomResults.length == 0)
+                {
+                    position = result.position;
+                    normal = result.normal;
+                    return true;
+                }
+
+                result = randomResults[0];
+
+                // Find node in results
+                for(uint i = 0; i < randomResults.length; i++)
+                {
+                    if (randomResults[i].node is node)
+                    {
+                        result = randomResults[i];
+                        break;
+                    }
+                }
+
+                position = result.position;
+                normal = result.normal;
+                return true;
+            }
+            else
+            {
+                position = result.position;
+                normal = result.normal;
+                return true;
+            }
+        }
+    }
+
+    position = cameraRay.origin + cameraRay.direction * maxDistance;
+    normal = Vector3(0, 1, 0);
+    return allowNoHit;
+}
+
 Vector3 RandomizeSpawnPosition(const Vector3&in position, float randomRadius)
 {
     float angle = Random() * 360.0;
@@ -342,16 +413,29 @@ Vector3 RandomizeSpawnPosition(const Vector3&in position, float randomRadius)
 
 void SpawnObject()
 {
+    Node@ selectedNode = null;
+    
+    if (spawnOnSelection)
+    if (selectedNodes.length > 0)
+        selectedNode = selectedNodes[0];
+        
     if (spawnedObjectsNames.length == 0)
         return;
+        
     IntRect view = activeViewport.viewport.rect;
-
+    
     for (uint i = 0; i < spawnCount; ++i)
     {
         Ray cameraRay = GetActiveViewportCameraRay();
-
         Vector3 position, normal;
-        if (GetSpawnPosition(cameraRay, camera.farClip, position, normal, spawnRadius, false))
+        bool result = false;
+        
+        if (spawnOnSelection && selectedNode != null)
+            result = GetSpawnPositionOnNode(cameraRay, camera.farClip, position, normal, selectedNode, spawnRadius, false);
+        else
+            result = GetSpawnPosition(cameraRay, camera.farClip, position, normal, spawnRadius, false);        
+        
+        if (result)
             PlaceObject(position, normal);
     }
 }

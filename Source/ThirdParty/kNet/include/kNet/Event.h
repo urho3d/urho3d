@@ -16,7 +16,7 @@
 /** @file Event.h
 	@brief The class \ref kNet::Event Event. Provides a mechanism for inter-thread signalling. */
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "win32/WS2Include.h"
 #endif
 
@@ -92,13 +92,14 @@ public:
 private:
 	EventWaitType type;
 
-#ifdef WIN32
+#ifdef _WIN32
 public:
 	WSAEVENT wsaEvent;
 
 	/// Wraps the given WSAEVENT into this event.
 	explicit Event(WSAEVENT wsaEvent, EventWaitType eventType);
-#elif defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#else
 public:
 	int fd[2]; // fd[0] is used for reading, fd[1] for writing.
 

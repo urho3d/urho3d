@@ -101,7 +101,7 @@ public:
     /// Release body.
     void ReleaseBody();
 
-    /// Apply world transform.
+    /// Apply world transform. Called by PhysicsWorld2D.
     void ApplyWorldTransform();
     /// Add collision shape.
     void AddCollisionShape2D(CollisionShape2D* collisionShape);

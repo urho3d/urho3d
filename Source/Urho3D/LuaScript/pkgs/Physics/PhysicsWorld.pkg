@@ -63,7 +63,6 @@ class PhysicsWorld : public Component
     tolua_property__get_set bool splitImpulse;
     tolua_property__get_set int fps;
     tolua_property__get_set float maxNetworkAngularVelocity;
-    tolua_property__is_set bool applyingTransforms;
 };
 
 ${

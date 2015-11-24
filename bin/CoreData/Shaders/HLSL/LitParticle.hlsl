@@ -103,7 +103,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #ifdef SPOTLIGHT
             float4 iSpotPos : TEXCOORD5,
         #endif
-        #ifdef CUBEMASK
+        #ifdef POINTLIGHT
             float3 iCubeMaskVec : TEXCOORD5,
         #endif
     #else

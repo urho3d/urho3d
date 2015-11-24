@@ -24,7 +24,7 @@
 
 #include "../Core/Condition.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <pthread.h>
@@ -33,7 +33,7 @@
 namespace Urho3D
 {
 
-#ifdef WIN32
+#ifdef _WIN32
 
 Condition::Condition() :
     event_(0)
