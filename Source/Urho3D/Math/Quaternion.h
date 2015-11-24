@@ -183,7 +183,7 @@ public:
         __m128 c = _mm_cmpeq_ps(_mm_loadu_ps(&w_), _mm_loadu_ps(&rhs.w_));
         c = _mm_and_ps(c, _mm_movehl_ps(c, c));
         c = _mm_and_ps(c, _mm_shuffle_ps(c, c, _MM_SHUFFLE(1, 1, 1, 1)));
-        return !_mm_ucomige_ss(c, c);
+        return _mm_cvtsi128_si32(_mm_castps_si128(c)) == -1;
 #else
         return w_ == rhs.w_ && x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_;
 #endif
