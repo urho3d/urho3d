@@ -1727,7 +1727,7 @@ For purposes of volume control, each SoundSource can be classified into a user d
 
 To control the category volumes, use \ref Audio::SetMasterGain "SetMasterGain()", which defines the category if it didn't already exist.
 
-The SoundSource components support automatic removal from the node they belong to, once playback is finished. To use, call \ref SoundSource::SetAutoRemove "SetAutoRemove()" on them. This may be useful when a game object plays several "fire and forget" sound effects.
+Note that the Audio subsystem is always instantiated, but in headless mode the playback of sounds is simulated, taking the sound length and frequency into account. This allows basing logic on whether a specific sound is still playing or not, even in server code.
 
 \section Audio_Parameters Sound parameters
 
@@ -1742,14 +1742,15 @@ A standard WAV file can not tell whether it should loop, and raw audio does not 
 
 The frequency is in Hz, and loop start and end are bytes from the start of audio data. If a loop is enabled without specifying the start and end, it is assumed to be the whole sound. Ogg Vorbis compressed sounds do not support specifying the loop range, only whether whole sound looping is enabled or disabled.
 
-The Audio subsystem is always instantiated, but in headless mode it is not active. In headless mode the playback of sounds is simulated, taking the sound length and frequency into account. This allows basing logic on whether a specific sound is still playing or not, even in server code.
-
 \section Audio_Stream Sound streaming
 
 In addition to playing existing sound resources, sound can be generated during runtime using the SoundStream class and its subclasses. To start playback of a stream on a SoundSource, call \ref SoundSource::Play(SoundStream* stream) "Play(SoundStream* stream)".
 
 %Sound streaming is used internally to implement on-the-fly Ogg Vorbis decoding. It is only available in C++ code and not scripting due to its low-level nature. See the SoundSynthesis C++ sample for an example of using the BufferedSoundStream subclass, which allows the sound data to be queued for playback from the main thread.
 
+\section Audio_Events Audio events
+
+A sound source will send the E_SOUNDFINISHED event through its scene node when the playback of a sound has ended. This can be used for example to know when to remove a temporary node created just for playing a sound effect, or for tying game events to sound playback.
 
 \page Physics Physics
 

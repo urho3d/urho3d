@@ -70,13 +70,19 @@ class GameObject : ScriptObject
 
     void PlaySound(const String&in soundName)
     {
-        // Create the sound channel
         SoundSource3D@ source = node.CreateComponent("SoundSource3D");
         Sound@ sound = cache.GetResource("Sound", soundName);
+        // Subscribe to sound finished for cleaning up the source
+        SubscribeToEvent(node, "SoundFinished", "HandleSoundFinished");
 
         source.SetDistanceAttenuation(2, 50, 1);
         source.Play(sound);
-        source.autoRemove = true;
+    }
+    
+    void HandleSoundFinished(StringHash eventType, VariantMap& eventData)
+    {
+        SoundSource3D@ source = eventData["SoundSource"].GetPtr();
+        source.Remove();
     }
 
     void HandleNodeCollision(StringHash eventType, VariantMap& eventData)
