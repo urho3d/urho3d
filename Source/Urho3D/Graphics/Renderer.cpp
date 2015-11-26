@@ -175,22 +175,6 @@ static const unsigned short spotLightIndexData[] =
     7, 6, 5
 };
 
-static const char* shadowVariations[] =
-{
-#ifdef URHO3D_OPENGL
-    // No specific hardware shadow compare variation on OpenGL, it is always supported
-    "LQSHADOW ",
-    "LQSHADOW ",
-    "",
-    ""
-#else
-    "LQSHADOW SHADOWCMP ",
-    "LQSHADOW ",
-    "SHADOWCMP ",
-    ""
-#endif
-};
-
 static const char* geometryVSVariations[] =
 {
     "",
@@ -263,7 +247,7 @@ Renderer::Renderer(Context* context) :
     textureQuality_(QUALITY_HIGH),
     materialQuality_(QUALITY_HIGH),
     shadowMapSize_(1024),
-    shadowQuality_(SHADOWQUALITY_HIGH_16BIT),
+    shadowQuality_(SHADOWQUALITY_PCF_16BIT),
     maxShadowMaps_(1),
     minInstances_(2),
     maxSortedInstances_(1000),
@@ -388,19 +372,35 @@ void Renderer::SetShadowMapSize(int size)
     }
 }
 
-void Renderer::SetShadowQuality(int quality)
+void Renderer::SetShadowQuality(ShadowQuality quality)
 {
     if (!graphics_)
         return;
 
-    quality &= SHADOWQUALITY_HIGH_24BIT;
-
     // If no hardware PCF, do not allow to select one-sample quality
     if (!graphics_->GetHardwareShadowSupport())
-        quality |= SHADOWQUALITY_HIGH_16BIT;
+    {
+        if (quality == SHADOWQUALITY_PCF_16BIT)
+        {
+            quality = SHADOWQUALITY_SIMPLE_16BIT;
+        }
+        if (quality == SHADOWQUALITY_PCF_24BIT)
+        {
+            quality = SHADOWQUALITY_SIMPLE_24BIT;
+        }
+    }
+    // if high resolution is not allowed
     if (!graphics_->GetHiresShadowMapFormat())
-        quality &= SHADOWQUALITY_HIGH_16BIT;
-
+    {
+        if (quality == SHADOWQUALITY_SIMPLE_24BIT)
+        {
+            quality = SHADOWQUALITY_SIMPLE_16BIT;
+        }
+        if (quality == SHADOWQUALITY_PCF_24BIT)
+        {
+            quality = SHADOWQUALITY_PCF_16BIT;
+        }
+    }
     if (quality != shadowQuality_)
     {
         shadowQuality_ = quality;
@@ -891,8 +891,29 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         }
     }
 
-    unsigned shadowMapFormat =
-        (shadowQuality_ & SHADOWQUALITY_LOW_24BIT) ? graphics_->GetHiresShadowMapFormat() : graphics_->GetShadowMapFormat();
+    // Find format and usage of the shadow map
+    unsigned shadowMapFormat = 0;
+    TextureUsage shadowMapUsage = TEXTURE_DEPTHSTENCIL;
+
+    switch (shadowQuality_)
+    {
+    case SHADOWQUALITY_SIMPLE_16BIT:
+    case SHADOWQUALITY_PCF_16BIT:
+        shadowMapFormat = graphics_->GetShadowMapFormat();
+        break;
+
+    case SHADOWQUALITY_SIMPLE_24BIT:
+    case SHADOWQUALITY_PCF_24BIT:
+        shadowMapFormat = graphics_->GetHiresShadowMapFormat();
+        break;
+
+    case SHADOWQUALITY_VSM:
+    case SHADOWQUALITY_BLUR_VSM:
+        shadowMapFormat = graphics_->GetRGFloat32Format();
+        shadowMapUsage = TEXTURE_RENDERTARGET;
+        break;
+    }
+
     if (!shadowMapFormat)
         return 0;
 
@@ -902,7 +923,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
 
     while (retries)
     {
-        if (!newShadowMap->SetSize(width, height, shadowMapFormat, TEXTURE_DEPTHSTENCIL))
+        if (!newShadowMap->SetSize(width, height, shadowMapFormat, shadowMapUsage))
         {
             width >>= 1;
             height >>= 1;
@@ -913,7 +934,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
 #ifndef GL_ES_VERSION_2_0
             // OpenGL (desktop) and D3D11: shadow compare mode needs to be specifically enabled for the shadow map
             newShadowMap->SetFilterMode(FILTER_BILINEAR);
-            newShadowMap->SetShadowCompare(true);
+            newShadowMap->SetShadowCompare(shadowMapUsage == TEXTURE_DEPTHSTENCIL);
 #endif
 #ifndef URHO3D_OPENGL
             // Direct3D9: when shadow compare must be done manually, use nearest filtering so that the filtering of point lights
@@ -1515,12 +1536,12 @@ void Renderer::LoadShaders()
 
     // Construct new names for deferred light volume pixel shaders based on rendering options
     deferredLightPSVariations_.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
-    unsigned shadows = (unsigned)((graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT));
+    
     for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_PS_VARIATIONS; ++i)
     {
         deferredLightPSVariations_[i] = lightPSVariations[i % DLPS_ORTHO];
         if (i & DLPS_SHADOW)
-            deferredLightPSVariations_[i] += shadowVariations[shadows];
+            deferredLightPSVariations_[i] += GetShadowVariations();
         if (i & DLPS_ORTHO)
             deferredLightPSVariations_[i] += "ORTHO ";
     }
@@ -1531,8 +1552,6 @@ void Renderer::LoadShaders()
 void Renderer::LoadPassShaders(Pass* pass)
 {
     URHO3D_PROFILE(LoadPassShaders);
-
-    unsigned shadows = (unsigned)((graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT));
 
     Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
     Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();
@@ -1563,7 +1582,7 @@ void Renderer::LoadPassShaders(Pass* pass)
             if (l & LPS_SHADOW)
             {
                 pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(),
-                    pass->GetPixelShaderDefines() + " " + lightPSVariations[l] + shadowVariations[shadows] +
+                    pass->GetPixelShaderDefines() + " " + lightPSVariations[l] + GetShadowVariations() +
                     heightFogVariations[h]);
             }
             else
@@ -1775,6 +1794,35 @@ void Renderer::ResetBuffers()
     screenBuffers_.Clear();
     screenBufferAllocations_.Clear();
 }
+
+String Renderer::GetShadowVariations() const
+{
+    String result;
+
+    switch (shadowQuality_)
+    {
+        case SHADOWQUALITY_SIMPLE_16BIT:
+        #ifdef URHO3D_OPENGL
+            return "SIMPLE_SHADOW ";
+        #else
+            return "SIMPLE_SHADOW SHADOWCMP ";
+        #endif
+        case SHADOWQUALITY_SIMPLE_24BIT:
+            return "SIMPLE_SHADOW ";
+        case SHADOWQUALITY_PCF_16BIT:
+        #ifdef URHO3D_OPENGL
+            return "PCF_SHADOW";
+        #else
+            return "PCF_SHADOW SHADOWCMP ";
+        #endif
+        case SHADOWQUALITY_PCF_24BIT:
+            return "PCF_SHADOW ";
+        case SHADOWQUALITY_VSM:
+            return "VSM_SHADOW ";
+        case SHADOWQUALITY_BLUR_VSM:
+            return "VSM_SHADOW ";
+    }
+};
 
 void Renderer::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {

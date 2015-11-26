@@ -183,7 +183,7 @@ public:
     /// Set shadow map resolution.
     void SetShadowMapSize(int size);
     /// Set shadow quality mode. See the SHADOWQUALITY constants in GraphicsDefs.h.
-    void SetShadowQuality(int quality);
+    void SetShadowQuality(ShadowQuality quality);
     /// Set reuse of shadow maps. Default is true. If disabled, also transparent geometry can be shadowed.
     void SetReuseShadowMaps(bool enable);
     /// Set maximum number of shadow maps created for one resolution. Only has effect if reuse of shadow maps is disabled.
@@ -401,6 +401,8 @@ private:
     void ResetShadowMaps();
     /// Remove all occlusion and screen buffers.
     void ResetBuffers();
+    /// Find variations for shadow shaders
+    String GetShadowVariations() const;
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
@@ -477,7 +479,7 @@ private:
     /// Shadow map resolution.
     int shadowMapSize_;
     /// Shadow quality.
-    int shadowQuality_;
+    ShadowQuality shadowQuality_;
     /// Maximum number of shadow maps per resolution.
     int maxShadowMaps_;
     /// Minimum number of instances required in a batch group to render as instanced.

@@ -140,53 +140,81 @@ float GetIntensity(vec3 color)
     #define NUMCASCADES 1
 #endif
 
+float ReduceLightBleeding(float p_max, float Amount)  
+{  
+  // Remove the [0, Amount] tail and linearly rescale (Amount, 1].  
+   return smoothstep(Amount, 1.0, p_max);  
+}  
+
+
+float Chebyshev(vec2 Moments, float depth)  
+{  
+   //One-tailed inequality valid if depth > Moments.x  
+   float p = float(depth <= Moments.x);  
+   //Compute variance.  
+   float Variance = Moments.y - (Moments.x * Moments.x); 
+   
+   float minVariance = 0.000001;
+   Variance = max(Variance, minVariance);  
+   //Compute probabilistic upper bound.  
+   float d = depth - Moments.x;  
+   float p_max = Variance / (Variance + d*d); 
+   p_max = ReduceLightBleeding(p_max, 0.6);
+	
+
+   return max(p, p_max);
+}
+
+
 float GetShadow(vec4 shadowPos)
 {
-    #ifndef GL_ES
-        #ifndef LQSHADOW
-            // Take four samples and average them
-            // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
-            #ifndef POINTLIGHT
-                vec2 offsets = cShadowMapInvSize * shadowPos.w;
-            #else
-                vec2 offsets = cShadowMapInvSize;
-            #endif
-            #ifndef GL3
-                return cShadowIntensity.y + cShadowIntensity.x * (shadow2DProj(sShadowMap, shadowPos).r +
-                    shadow2DProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)).r +
-                    shadow2DProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r +
-                    shadow2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r);
-            #else
-                return cShadowIntensity.y + cShadowIntensity.x * (textureProj(sShadowMap, shadowPos) +
-                    textureProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)) +
-                    textureProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)) +
-                    textureProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)));
-            #endif
-        #else
-            // Take one sample
-            #ifndef GL3
-                float inLight = shadow2DProj(sShadowMap, shadowPos).r;
-            #else
-                float inLight = textureProj(sShadowMap, shadowPos);
-            #endif
-            return cShadowIntensity.y + cShadowIntensity.x * inLight;
-        #endif
-    #else
-        #ifndef LQSHADOW
-            // Take four samples and average them
-            vec2 offsets = cShadowMapInvSize * shadowPos.w;
-            vec4 inLight = vec4(
-                texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z,
-                texture2DProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)).r * shadowPos.w > shadowPos.z,
-                texture2DProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r * shadowPos.w > shadowPos.z,
-                texture2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r * shadowPos.w > shadowPos.z
-            );
-            return cShadowIntensity.y + dot(inLight, vec4(cShadowIntensity.x));
-        #else
-            // Take one sample
-            return cShadowIntensity.y + (texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z ? cShadowIntensity.x : 0.0);
-        #endif
-    #endif
+    // #ifndef GL_ES
+        // #ifndef LQSHADOW
+            // // Take four samples and average them
+            // // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
+            // #ifndef POINTLIGHT
+                // vec2 offsets = cShadowMapInvSize * shadowPos.w;
+            // #else
+                // vec2 offsets = cShadowMapInvSize;
+            // #endif
+            // #ifndef GL3
+                // return cShadowIntensity.y + cShadowIntensity.x * (shadow2DProj(sShadowMap, shadowPos).r +
+                    // shadow2DProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)).r +
+                    // shadow2DProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r +
+                    // shadow2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r);
+            // #else
+                // return cShadowIntensity.y + cShadowIntensity.x * (textureProj(sShadowMap, shadowPos) +
+                    // textureProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)) +
+                    // textureProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)) +
+                    // textureProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)));
+            // #endif
+        // #else
+            // // Take one sample
+            // #ifndef GL3
+                // float inLight = shadow2DProj(sShadowMap, shadowPos).r;
+            // #else
+                // float inLight = textureProj(sShadowMap, shadowPos);
+            // #endif
+            // return cShadowIntensity.y + cShadowIntensity.x * inLight;
+        // #endif
+    // #else
+        // #ifndef LQSHADOW
+            // // Take four samples and average them
+            // vec2 offsets = cShadowMapInvSize * shadowPos.w;
+            // vec4 inLight = vec4(
+                // texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z,
+                // texture2DProj(sShadowMap, vec4(shadowPos.x + offsets.x, shadowPos.yzw)).r * shadowPos.w > shadowPos.z,
+                // texture2DProj(sShadowMap, vec4(shadowPos.x, shadowPos.y + offsets.y, shadowPos.zw)).r * shadowPos.w > shadowPos.z,
+                // texture2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r * shadowPos.w > shadowPos.z
+            // );
+            // return cShadowIntensity.y + dot(inLight, vec4(cShadowIntensity.x));
+        // #else
+            // // Take one sample
+            // return cShadowIntensity.y + (texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z ? cShadowIntensity.x : 0.0);
+        // #endif
+    // #endif
+	float d = texture(sShadowMap, vec2(shadowPos.xy));
+	return cShadowIntensity.y + cShadowIntensity.x * Chebyshev(vec2(d, d*d), shadowPos.z/shadowPos.w);
 }
 
 #ifdef POINTLIGHT

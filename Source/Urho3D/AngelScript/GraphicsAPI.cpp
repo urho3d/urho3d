@@ -1675,10 +1675,13 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int QUALITY_HIGH", (void*)&QUALITY_HIGH);
     engine->RegisterGlobalProperty("const int QUALITY_MAX", (void*)&QUALITY_MAX);
 
-    engine->RegisterGlobalProperty("const int SHADOWQUALITY_LOW_16BIT", (void*)&SHADOWQUALITY_LOW_16BIT);
-    engine->RegisterGlobalProperty("const int SHADOWQUALITY_LOW_24BIT", (void*)&SHADOWQUALITY_LOW_24BIT);
-    engine->RegisterGlobalProperty("const int SHADOWQUALITY_HIGH_16BIT", (void*)&SHADOWQUALITY_HIGH_16BIT);
-    engine->RegisterGlobalProperty("const int SHADOWQUALITY_HIGH_24BIT", (void*)&SHADOWQUALITY_HIGH_24BIT);
+    engine->RegisterEnum("ShadowQuality");
+    engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_SIMPLE_16BIT", SHADOWQUALITY_SIMPLE_16BIT);
+    engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_SIMPLE_24BIT", SHADOWQUALITY_SIMPLE_24BIT);
+    engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_PCF_16BIT", SHADOWQUALITY_PCF_16BIT);
+    engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_PCF_24BIT", SHADOWQUALITY_PCF_24BIT);
+    engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_VSM", SHADOWQUALITY_VSM);
+    engine->RegisterEnumValue("ShadowQuality", "SHADOWQUALITY_BLUR_VSM", SHADOWQUALITY_BLUR_VSM);
 
     RegisterObject<Renderer>(engine, "Renderer");
     engine->RegisterObjectMethod("Renderer", "void DrawDebugGeometry(bool) const", asMETHOD(Renderer, DrawDebugGeometry), asCALL_THISCALL);
