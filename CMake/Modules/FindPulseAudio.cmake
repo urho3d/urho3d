@@ -25,7 +25,6 @@
 #  PA_FOUND
 #  PA_INCLUDE_DIRS
 #  PA_LIBRARIES
-#  PA_VERSION
 #
 
 find_path (PA_INCLUDE_DIRS NAMES pulse/pulseaudio.h DOC "PulseAudio include directories")
@@ -36,9 +35,9 @@ if (PA_INCLUDE_DIRS AND PA_LIBRARIES)
 endif ()
 if (PA_FOUND)
     include (FindPackageMessage)
-    find_package_message (BCM_VC "Found PulseAudio: ${PA_LIBRARIES} ${PA_INCLUDE_DIRS}" "[${PA_LIBRARIES}][${PA_INCLUDE_DIRS}]")
+    find_package_message (PulseAudio "Found PulseAudio: ${PA_LIBRARIES} ${PA_INCLUDE_DIRS}" "[${PA_LIBRARIES}][${PA_INCLUDE_DIRS}]")
 elseif (PulseAudio_FIND_REQUIRED)
     message (FATAL_ERROR "Could not find PulseAudio")
 endif ()
 
-mark_as_advanced (PA_INCLUDE_DIRS PA_LIBRARIES PA_VERSION)
+mark_as_advanced (PA_INCLUDE_DIRS PA_LIBRARIES)
