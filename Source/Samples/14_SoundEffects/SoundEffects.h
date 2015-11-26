@@ -80,6 +80,8 @@ private:
     void HandleSoundVolume(StringHash eventType, VariantMap& eventData);
     /// Handle music volume slider change.
     void HandleMusicVolume(StringHash eventType, VariantMap& eventData);
+    /// Handle sound effect finished.
+    void HandleSoundFinished(StringHash eventType, VariantMap& eventData);
 };
 
 

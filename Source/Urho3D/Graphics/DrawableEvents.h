@@ -37,6 +37,7 @@ URHO3D_EVENT(E_BONEHIERARCHYCREATED, BoneHierarchyCreated)
 URHO3D_EVENT(E_ANIMATIONTRIGGER, AnimationTrigger)
 {
     URHO3D_PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_ANIMATION, Animation);          // Animation pointer
     URHO3D_PARAM(P_NAME, Name);                    // String
     URHO3D_PARAM(P_TIME, Time);                    // Float
     URHO3D_PARAM(P_DATA, Data);                    // User-defined data type

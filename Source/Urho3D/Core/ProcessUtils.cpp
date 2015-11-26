@@ -74,7 +74,9 @@ inline void SetFPUState(unsigned control)
 
 #endif
 
+#ifndef MINI_URHO
 #include <SDL/SDL.h>
+#endif
 
 #include "../DebugNew.h"
 
@@ -125,7 +127,9 @@ void InitFPU()
 
 void ErrorDialog(const String& title, const String& message)
 {
+#ifndef MINI_URHO
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.CString(), message.CString(), 0);
+#endif
 }
 
 void ErrorExit(const String& message, int exitCode)

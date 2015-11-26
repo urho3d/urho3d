@@ -220,7 +220,7 @@ public:
     void CleanupConnection(Connection* connection);
     /// Mark a node for attribute check on the next network update.
     void MarkNetworkUpdate(Node* node);
-    /// Mark a comoponent for attribute check on the next network update.
+    /// Mark a component for attribute check on the next network update.
     void MarkNetworkUpdate(Component* component);
     /// Mark a node dirty in scene replication states. The node does not need to have own replication state yet.
     void MarkReplicationDirty(Node* node);
