@@ -12,7 +12,7 @@ Although all required third-party libraries are included as source code, there a
 
 - For Windows, the June 2010 DirectX SDK needs to be installed. This is not necessary if building on Visual Studio 2012 or newer, which install the Windows SDK with the necessary DirectX files.
 
-- For Linux, the following development packages need to be installed: libx11-dev, libxrandr-dev, libasound2-dev on Debian-based distros; libX11-devel, libXrandr-devel, alsa-lib-devel on RedHat-based distros. Also install the package libgl1-mesa-dev (Debian) or mesa-libGL-devel (RH) if your GPU driver does not include OpenGL headers & libs, but in most of the case it usually does and has better performance than Mesa's OpenGL implementation. Building as 32-bit on a 64-bit system requires installing also the 32-bit versions of the development libraries.
+- For Linux, the following development packages need to be installed: libx11-dev, libxrandr-dev, libasound2-dev on Debian-based distros; libX11-devel, libXrandr-devel, alsa-lib-devel on RedHat-based distros. Optionally install libpulse-dev (Deb) or pulseaudio-libs-devel (RH) to enable SDL support for PulseAudio. Building as 32-bit on a 64-bit system requires installing also the 32-bit versions of the development libraries.
 
 - For Raspberry Pi, the following development packages need to be installed. On Raspbian: libasound2-dev, libudev-dev. On Pidora: alsa-lib-devel, systemd-devel.
 
