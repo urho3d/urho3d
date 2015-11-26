@@ -1,0 +1,290 @@
+<?xml version="1.0"?>
+<element type="Window">
+	<attribute name="Position" value="30 -25" />
+	<attribute name="Size" value="300 170" />
+	<attribute name="Vert Alignment" value="Bottom" />
+	<attribute name="Layout Mode" value="Vertical" />
+	<attribute name="Layout Spacing" value="4" />
+	<attribute name="Layout Border" value="6 6 6 6" />
+	<element>
+		<attribute name="Min Size" value="184 16" />
+		<attribute name="Max Size" value="2147483647 16" />
+		<attribute name="Layout Mode" value="Horizontal" />
+		<element type="Text">
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Text" value="Viewport Properties" />
+		</element>
+		<element type="Button">
+			<attribute name="Name" value="Refresh" />
+			<attribute name="Min Size" value="16 16" />
+			<attribute name="Max Size" value="16 16" />
+			<attribute name="Layout Mode" value="Horizontal" />
+			<element type="BorderImage">
+				<attribute name="Image Rect" value="128 32 144 48" />
+			</element>
+		</element>
+		<element type="Button" style="CloseButton">
+			<attribute name="Name" value="CloseButton" />
+		</element>
+	</element>
+	<element type="BorderImage" style="EditorDivider" />
+	<element>
+		<attribute name="Name" value="CameraPosition" />
+		<attribute name="Layout Mode" value="Horizontal" />
+		<element type="Text" style="EditorAttributeText">
+			<attribute name="Name" value="Label" />
+			<attribute name="Min Size" value="80 14" />
+			<attribute name="Max Size" value="80 14" />
+			<attribute name="Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Text" value="Position" />
+		</element>
+		<element type="LineEdit" style="EditorAttributeEdit">
+			<attribute name="Name" value="PositionX" />
+			<attribute name="Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<element type="Text" internal="true" style="none">
+				<attribute name="Top Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Top Right Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+			</element>
+			<element type="BorderImage" internal="true" style="none">
+				<attribute name="Size" value="4 15" />
+			</element>
+		</element>
+		<element type="LineEdit" style="EditorAttributeEdit">
+			<attribute name="Name" value="PositionY" />
+			<attribute name="Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<element type="Text" internal="true" style="none">
+				<attribute name="Top Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Top Right Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+			</element>
+			<element type="BorderImage" internal="true" style="none">
+				<attribute name="Size" value="4 15" />
+			</element>
+		</element>
+		<element type="LineEdit" style="EditorAttributeEdit">
+			<attribute name="Name" value="PositionZ" />
+			<attribute name="Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<element type="Text" internal="true" style="none">
+				<attribute name="Top Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Top Right Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+			</element>
+			<element type="BorderImage" internal="true" style="none">
+				<attribute name="Size" value="4 15" />
+			</element>
+		</element>
+	</element>
+	<element>
+		<attribute name="Name" value="CameraRotation" />
+		<attribute name="Layout Mode" value="Horizontal" />
+		<element type="Text" style="EditorAttributeText">
+			<attribute name="Name" value="Label" />
+			<attribute name="Min Size" value="80 14" />
+			<attribute name="Max Size" value="80 14" />
+			<attribute name="Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Text" value="Rotation" />
+		</element>
+		<element type="LineEdit" style="EditorAttributeEdit">
+			<attribute name="Name" value="RotationX" />
+			<attribute name="Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<element type="Text" internal="true" style="none">
+				<attribute name="Top Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Top Right Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+			</element>
+			<element type="BorderImage" internal="true" style="none">
+				<attribute name="Size" value="4 15" />
+			</element>
+		</element>
+		<element type="LineEdit" style="EditorAttributeEdit">
+			<attribute name="Name" value="RotationY" />
+			<attribute name="Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<element type="Text" internal="true" style="none">
+				<attribute name="Top Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Top Right Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+			</element>
+			<element type="BorderImage" internal="true" style="none">
+				<attribute name="Size" value="4 15" />
+			</element>
+		</element>
+		<element type="LineEdit" style="EditorAttributeEdit">
+			<attribute name="Name" value="RotationZ" />
+			<attribute name="Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<element type="Text" internal="true" style="none">
+				<attribute name="Top Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Top Right Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+			</element>
+			<element type="BorderImage" internal="true" style="none">
+				<attribute name="Size" value="4 15" />
+			</element>
+		</element>
+	</element>
+	<element>
+		<attribute name="Name" value="CameraZoom" />
+		<attribute name="Layout Mode" value="Horizontal" />
+		<element type="Text" style="EditorAttributeText">
+			<attribute name="Name" value="Label" />
+			<attribute name="Min Size" value="80 14" />
+			<attribute name="Max Size" value="80 14" />
+			<attribute name="Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Text" value="Zoom" />
+		</element>
+		<element type="LineEdit" style="EditorAttributeEdit">
+			<attribute name="Name" value="Zoom" />
+			<attribute name="Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<element type="Text" internal="true" style="none">
+				<attribute name="Top Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Top Right Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+			</element>
+			<element type="BorderImage" internal="true" style="none">
+				<attribute name="Size" value="4 15" />
+			</element>
+		</element>
+	</element>
+	<element>
+		<attribute name="Name" value="CameraOrthographic" />
+		<attribute name="Layout Mode" value="Horizontal" />
+		<element type="Text" style="EditorAttributeText">
+			<attribute name="Name" value="Label" />
+			<attribute name="Min Size" value="80 14" />
+			<attribute name="Max Size" value="80 14" />
+			<attribute name="Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Text" value="Orthographic" />
+		</element>
+		<element type="CheckBox">
+			<attribute name="Name" value="Orthographic" />
+			<attribute name="Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+		</element>
+	</element>
+	<element>
+		<attribute name="Name" value="CameraOrthoSize" />
+		<attribute name="Layout Mode" value="Horizontal" />
+		<element type="Text" style="EditorAttributeText">
+			<attribute name="Name" value="Label" />
+			<attribute name="Min Size" value="80 14" />
+			<attribute name="Max Size" value="80 14" />
+			<attribute name="Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Text" value="Ortho Size" />
+		</element>
+		<element type="LineEdit" style="EditorAttributeEdit">
+			<attribute name="Name" value="OrthoSize" />
+			<attribute name="Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<element type="Text" internal="true" style="none">
+				<attribute name="Top Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Top Right Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+			</element>
+			<element type="BorderImage" internal="true" style="none">
+				<attribute name="Size" value="4 15" />
+			</element>
+		</element>
+	</element>
+	<element type="BorderImage" style="EditorDivider" />
+	<element>
+		<attribute name="Min Size" value="220 16" />
+		<element type="Button">
+			<attribute name="Name" value="ResetCamera" />
+			<attribute name="Size" value="110 16" />
+			<attribute name="Min Size" value="110 16" />
+			<attribute name="Max Size" value="110 16" />
+			<element type="Text">
+				<attribute name="Horiz Alignment" value="Center" />
+				<attribute name="Vert Alignment" value="Center" />
+				<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Text" value="Reset Camera" />
+				<attribute name="Text Alignment" value="Center" />
+			</element>
+		</element>
+		<element type="Button">
+			<attribute name="Name" value="CopyTransform" />
+			<attribute name="Position" value="120 0" />
+			<attribute name="Size" value="130 16" />
+			<attribute name="Min Size" value="130 16" />
+			<attribute name="Max Size" value="130 16" />
+			<element type="Text">
+				<attribute name="Horiz Alignment" value="Center" />
+				<attribute name="Vert Alignment" value="Center" />
+				<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Text" value="Copy Transform" />
+				<attribute name="Text Alignment" value="Center" />
+			</element>
+		</element>
+	</element>
+</element>

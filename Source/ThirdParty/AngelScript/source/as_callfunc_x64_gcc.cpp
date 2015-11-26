@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -73,14 +73,18 @@ static asQWORD __attribute__((noinline)) X64_CallFunction(const asQWORD *args, i
 
 	__asm__ __volatile__ (
 
-		"  movq %0, %%rcx \n" 	// rcx = cnt
+		"  movq %0, %%rcx \n"	// rcx = cnt
 		"  movq %1, %%r10 \n"	// r10 = args
 		"  movq %2, %%r11 \n"	// r11 = func
 
 	// Backup stack pointer in R15 that is guaranteed to maintain its value over function calls
 		"  movq %%rsp, %%r15 \n"
+#ifdef __OPTIMIZE__
 	// Make sure the stack unwind logic knows we've backed up the stack pointer in register r15
+	// This should only be done if any optimization is done. If no optimization (-O0) is used,
+	// then the compiler already backups the rsp before entering the inline assembler code
 		" .cfi_def_cfa_register r15 \n"
+#endif
 
 	// Skip the first 128 bytes on the stack frame, called "red zone",  
 	// that might be used by the compiler to store temporary values
@@ -100,7 +104,7 @@ static asQWORD __attribute__((noinline)) X64_CallFunction(const asQWORD *args, i
 		"  jle endstack \n"
 		"  subl $1, %%esi \n"
 		"  xorl %%edx, %%edx \n"
-		"  leaq	8(, %%rsi, 8), %%rcx \n"
+		"  leaq 8(, %%rsi, 8), %%rcx \n"
 		"loopstack: \n"
 		"  movq 112(%%r10, %%rdx), %%rax \n"
 		"  pushq %%rax \n"
@@ -128,12 +132,16 @@ static asQWORD __attribute__((noinline)) X64_CallFunction(const asQWORD *args, i
 		"  movsd 56(%%rax), %%xmm7 \n"
 
 	// Call the function
-		"  call	*%%r11 \n"
+		"  call *%%r11 \n"
 
 	// Restore stack pointer
 		"  mov %%r15, %%rsp \n"
+#ifdef __OPTIMIZE__
 	// Inform the stack unwind logic that the stack pointer has been restored
+	// This should only be done if any optimization is done. If no optimization (-O0) is used,
+	// then the compiler already backups the rsp before entering the inline assembler code
 		" .cfi_def_cfa_register rsp \n"
+#endif
 
 	// Put return value in retQW1 and retQW2, using either RAX:RDX or XMM0:XMM1 depending on type of return value
 		"  movl %5, %%ecx \n"
@@ -162,7 +170,7 @@ static inline bool IsVariableArgument( asCDataType type )
 	return ( type.GetTokenType() == ttQuestion ) ? true : false;
 }
 
-asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &retQW2)
+asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &retQW2, void *secondObject)
 {
 	asCScriptEngine            *engine             = context->m_engine;
 	asSSystemFunctionInterface *sysFunc            = descr->sysFuncIntf;
@@ -181,16 +189,6 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		// The return is made in memory
 		callConv++;
 	}
-
-#ifndef AS_NO_THISCALL_FUNCTOR_METHOD
-	// Unpack the two object pointers
-	void **objectsPtrs  = (void**)obj;
-	void  *secondObject = objectsPtrs[1];
-	obj                 = objectsPtrs[0];
-
-	// param_post has value 2 if is an THISCALL_OBJLAST
-#endif
-
 
 #ifdef AS_NO_THISCALL_FUNCTOR_METHOD
 	// Determine the real function pointer in case of virtual method

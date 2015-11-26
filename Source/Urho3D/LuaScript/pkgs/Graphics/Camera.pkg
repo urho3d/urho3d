@@ -1,0 +1,91 @@
+$#include "Graphics/Camera.h"
+
+enum FillMode {};
+
+static const unsigned VO_NONE;
+static const unsigned VO_LOW_MATERIAL_QUALITY;
+static const unsigned VO_DISABLE_SHADOWS;
+static const unsigned VO_DISABLE_OCCLUSION;
+
+class Camera : public Component
+{
+    void SetNearClip(float nearClip);
+    void SetFarClip(float farClip);
+    void SetFov(float fov);
+    void SetOrthoSize(float orthoSize);
+    void SetOrthoSize(const Vector2& orthoSize);
+    void SetAspectRatio(float aspectRatio);
+    void SetFillMode(FillMode mode);
+    void SetZoom(float zoom);
+    void SetLodBias(float bias);
+    void SetViewMask(unsigned mask);
+    void SetViewOverrideFlags(unsigned flags);
+    void SetOrthographic(bool enable);
+    void SetAutoAspectRatio(bool enable);
+    void SetProjectionOffset(const Vector2& offset);
+    void SetUseReflection(bool enable);
+    void SetReflectionPlane(const Plane& reflectionPlane);
+    void SetUseClipping(bool enable);
+    void SetClipPlane(const Plane& clipPlane);
+
+    float GetFarClip() const;
+    float GetNearClip() const;
+    float GetFov() const;
+    float GetOrthoSize() const;
+    float GetAspectRatio() const;
+    float GetZoom() const;
+    float GetLodBias() const;
+    unsigned GetViewMask() const;
+    unsigned GetViewOverrideFlags() const;
+    FillMode GetFillMode() const;
+    bool IsOrthographic() const;
+    bool GetAutoAspectRatio() const;
+    const Frustum& GetFrustum() const;
+    const Matrix4& GetProjection() const;
+    const Matrix3x4& GetView() const;
+    void GetFrustumSize(Vector3& near, Vector3& far) const;
+    float GetHalfViewSize() const;
+    Frustum GetSplitFrustum(float nearClip, float farClip) const;
+    Frustum GetViewSpaceFrustum() const;
+    Frustum GetViewSpaceSplitFrustum(float nearClip, float farClip) const;
+    Ray GetScreenRay(float x, float y) const;
+    Vector2 WorldToScreenPoint(const Vector3& worldPos) const;
+    Vector3 ScreenToWorldPoint(const Vector3& screenPos) const;
+    const Vector2& GetProjectionOffset() const;
+    bool GetUseReflection() const;
+    const Plane& GetReflectionPlane() const;
+    bool GetUseClipping() const;
+    const Plane& GetClipPlane() const;
+
+    float GetDistance(const Vector3& worldPos) const;
+    float GetDistanceSquared(const Vector3& worldPos) const;
+    float GetLodDistance(float distance, float scale, float bias) const;
+    bool IsProjectionValid() const;
+    Matrix3x4 GetEffectiveWorldTransform() const;
+    
+    tolua_property__get_set float farClip;
+    tolua_property__get_set float nearClip;
+    tolua_property__get_set float fov;
+    tolua_property__get_set float orthoSize;
+    tolua_property__get_set float aspectRatio;
+    tolua_property__get_set float zoom;
+    tolua_property__get_set float lodBias;
+    tolua_property__get_set unsigned viewMask;
+    tolua_property__get_set unsigned viewOverrideFlags;
+    tolua_property__get_set FillMode fillMode;
+    tolua_property__is_set bool orthographic;
+    tolua_property__get_set bool autoAspectRatio;
+    tolua_readonly tolua_property__get_set Frustum& frustum;
+    tolua_readonly tolua_property__get_set Matrix4& projection;
+    tolua_readonly tolua_property__get_set Matrix3x4& view;
+    tolua_readonly tolua_property__get_set float halfViewSize;
+    tolua_readonly tolua_property__get_set Frustum viewSpaceFrustum;
+    tolua_property__get_set Vector2& projectionOffset;
+    tolua_property__get_set bool useReflection;
+    tolua_property__get_set Plane& reflectionPlane;
+    tolua_property__get_set bool useClipping;
+    tolua_property__get_set Plane& clipPlane;
+    tolua_readonly tolua_property__is_set bool projectionValid;
+    tolua_readonly tolua_property__get_set Matrix3x4 effectiveWorldTransform;
+};
+

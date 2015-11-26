@@ -16,7 +16,10 @@
 /** @file Clock.h
 	@brief The Clock class. Supplies timing facilities. */
 
-#ifdef WIN32
+// Modifed by Lasse Oorni for Urho3D
+
+#ifdef _WIN32
+// Urho3D: windows.h in lowercase to fix MinGW cross-compiling on a case-sensitive system
 #include <windows.h>
 #endif
 
@@ -110,7 +113,7 @@ private:
 	/// Initializes clock tick frequency and marks the application startup time.
 	static void InitClockData();
 
-#ifdef WIN32
+#ifdef _WIN32
 	static LARGE_INTEGER ddwTimerFrequency; ///< Ticks per second.
 	static LARGE_INTEGER ddwTimer;          ///< Temporary storage for Win32 function calls.
 #endif

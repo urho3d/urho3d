@@ -1,0 +1,6 @@
+$#include "Math/Random.h"
+
+void SetRandomSeed(unsigned seed);
+unsigned GetRandomSeed();
+int Rand();
+float RandStandardNormal();

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,25 +20,25 @@
 // THE SOFTWARE.
 //
 
-#include "Application.h"
-#include "Camera.h"
-#include "Console.h"
-#include "Cursor.h"
-#include "DebugHud.h"
-#include "Engine.h"
-#include "FileSystem.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "InputEvents.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "Sprite.h"
-#include "Texture2D.h"
-#include "Timer.h"
-#include "UI.h"
-#include "XMLFile.h"
+#include <Urho3D/Engine/Application.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Engine/Console.h>
+#include <Urho3D/UI/Cursor.h>
+#include <Urho3D/Engine/DebugHud.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Input/InputEvents.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Scene/SceneEvents.h>
+#include <Urho3D/UI/Sprite.h>
+#include <Urho3D/Graphics/Texture2D.h>
+#include <Urho3D/Core/Timer.h>
+#include <Urho3D/UI/UI.h>
+#include <Urho3D/Resource/XMLFile.h>
 
 Sample::Sample(Context* context) :
     Application(context),
@@ -58,6 +58,13 @@ void Sample::Setup()
     engineParameters_["LogName"]     = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs") + GetTypeName() + ".log";
     engineParameters_["FullScreen"]  = false;
     engineParameters_["Headless"]    = false;
+    engineParameters_["Sound"]       = false;
+
+    // Construct a search path to find the resource prefix with two entries:
+    // The first entry is an empty path which will be substituted with program/bin directory -- this entry is for binary when it is still in build tree
+    // The second entry is a relative path from the installed program/bin directory to the asset directory -- this entry is for binary when it is in the Urho3D SDK installation location
+    if (!engineParameters_.Contains("ResourcePrefixPaths"))
+        engineParameters_["ResourcePrefixPaths"] = ";../share/Urho3D/Resources";
 }
 
 void Sample::Start()
@@ -67,7 +74,7 @@ void Sample::Start()
         InitTouchInput();
     else if (GetSubsystem<Input>()->GetNumJoysticks() == 0)
         // On desktop platform, do not detect touch when we already got a joystick
-        SubscribeToEvent(E_TOUCHBEGIN, HANDLER(Sample, HandleTouchBegin));
+        SubscribeToEvent(E_TOUCHBEGIN, URHO3D_HANDLER(Sample, HandleTouchBegin));
 
     // Create logo
     CreateLogo();
@@ -79,9 +86,9 @@ void Sample::Start()
     CreateConsoleAndDebugHud();
 
     // Subscribe key down event
-    SubscribeToEvent(E_KEYDOWN, HANDLER(Sample, HandleKeyDown));
+    SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(Sample, HandleKeyDown));
     // Subscribe scene update event
-    SubscribeToEvent(E_SCENEUPDATE, HANDLER(Sample, HandleSceneUpdate));
+    SubscribeToEvent(E_SCENEUPDATE, URHO3D_HANDLER(Sample, HandleSceneUpdate));
 }
 
 void Sample::Stop()
@@ -143,10 +150,10 @@ void Sample::CreateLogo()
 
     // Set logo sprite alignment
     logoSprite_->SetAlignment(HA_LEFT, VA_BOTTOM);
-    
+
     // Make logo not fully opaque to show the scene underneath
     logoSprite_->SetOpacity(0.75f);
-    
+
     // Set a low priority for the logo so that other UI elements can be drawn on top
     logoSprite_->SetPriority(-100);
 }
@@ -195,16 +202,30 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     // Toggle console with F1
     else if (key == KEY_F1)
         GetSubsystem<Console>()->Toggle();
-    
+
     // Toggle debug HUD with F2
     else if (key == KEY_F2)
-        GetSubsystem<DebugHud>()->ToggleAll();
-    
+    {
+        DebugHud* debugHud = GetSubsystem<DebugHud>();
+        if (debugHud->GetMode() == 0 || debugHud->GetMode() == DEBUGHUD_SHOW_ALL_MEMORY)
+            debugHud->SetMode(DEBUGHUD_SHOW_ALL);
+        else
+            debugHud->SetMode(DEBUGHUD_SHOW_NONE);
+    }
+    else if (key == KEY_F3)
+    {
+        DebugHud* debugHud = GetSubsystem<DebugHud>();
+        if (debugHud->GetMode() == 0 || debugHud->GetMode() == DEBUGHUD_SHOW_ALL)
+            debugHud->SetMode(DEBUGHUD_SHOW_ALL_MEMORY);
+        else
+            debugHud->SetMode(DEBUGHUD_SHOW_NONE);
+    }
+
     // Common rendering quality controls, only when UI has no focused element
     else if (!GetSubsystem<UI>()->GetFocusElement())
     {
         Renderer* renderer = GetSubsystem<Renderer>();
-        
+
         // Preferences / Pause
         if (key == KEY_SELECT && touchEnabled_)
         {
@@ -230,7 +251,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 quality = QUALITY_LOW;
             renderer->SetTextureQuality(quality);
         }
-        
+
         // Material quality
         else if (key == '2')
         {
@@ -240,15 +261,15 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 quality = QUALITY_LOW;
             renderer->SetMaterialQuality(quality);
         }
-        
+
         // Specular lighting
         else if (key == '3')
             renderer->SetSpecularLighting(!renderer->GetSpecularLighting());
-        
+
         // Shadow rendering
         else if (key == '4')
             renderer->SetDrawShadows(!renderer->GetDrawShadows());
-        
+
         // Shadow map resolution
         else if (key == '5')
         {
@@ -258,7 +279,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 shadowMapSize = 512;
             renderer->SetShadowMapSize(shadowMapSize);
         }
-        
+
         // Shadow depth and filtering quality
         else if (key == '6')
         {
@@ -268,7 +289,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 quality = SHADOWQUALITY_LOW_16BIT;
             renderer->SetShadowQuality(quality);
         }
-        
+
         // Occlusion culling
         else if (key == '7')
         {
@@ -276,11 +297,11 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             occlusion = !occlusion;
             renderer->SetMaxOccluderTriangles(occlusion ? 5000 : 0);
         }
-        
+
         // Instancing
         else if (key == '8')
             renderer->SetDynamicInstancing(!renderer->GetDynamicInstancing());
-        
+
         // Take screenshot
         else if (key == '9')
         {

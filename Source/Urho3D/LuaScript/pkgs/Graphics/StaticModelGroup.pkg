@@ -1,0 +1,13 @@
+$#include "Graphics/StaticModelGroup.h"
+
+class StaticModelGroup : public StaticModel
+{
+    void AddInstanceNode(Node* node);
+    void RemoveInstanceNode(Node* node);
+    void RemoveAllInstanceNodes();
+
+    unsigned GetNumInstanceNodes() const;
+    Node* GetInstanceNode(unsigned index) const;
+    
+    tolua_readonly tolua_property__get_set unsigned numInstanceNodes;
+};

@@ -21,7 +21,7 @@
 #include "kNetBuildConfig.h"
 #include "kNetFwd.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "kNet/win32/WS2Include.h"
 #endif
 

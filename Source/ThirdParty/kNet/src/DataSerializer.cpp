@@ -73,7 +73,7 @@ DataSerializer::DataSerializer(std::vector<char> &data_, size_t maxBytes_)
 {
 	if (data_.size() < maxBytes_)
 		data_.resize(maxBytes_);
-	if (data_.size() == 0 || maxBytes_ == 0)
+	if (data_.empty() || maxBytes_ == 0)
 		throw NetException("Cannot instantiate a DataSerializer object to a zero-sized std::vector-based buffer!");
 	data = &data_[0];
 	maxBytes = maxBytes_;
@@ -85,7 +85,7 @@ DataSerializer::DataSerializer(std::vector<char> &data_, size_t maxBytes_, const
 {
 	if (data_.size() < maxBytes_)
 		data_.resize(maxBytes_);
-	if (data_.size() == 0 || maxBytes_ == 0)
+	if (data_.empty() || maxBytes_ == 0)
 		throw NetException("Cannot instantiate a DataSerializer object to a zero-sized std::vector-based buffer!");
 	data = &data_[0];
 	maxBytes = maxBytes_;
@@ -290,7 +290,7 @@ int DataSerializer::AddVector2D(float x, float y, int magnitudeIntegerBits, int 
 	{
 		// Call atan2() to get the aimed angle of the 2D vector in the range [-PI, PI], then quantize the 1D result to the desired precision.
 		float angle = atan2(y, x);
-		AddQuantizedFloat(-PI, PI, directionBits, atan2(y, x));
+		AddQuantizedFloat(-PI, PI, directionBits, angle);
 		return magnitudeIntegerBits + magnitudeDecimalBits + directionBits;
 	}
 	else
@@ -421,7 +421,7 @@ void DataSerializer::AddString(const char *str)
 	if (iter)
 		SetVaryingElemSize((u32)len);
 	else
-		Add<u8>(len);
+		AddVLE<VLE8_16_32>(len);
 
 	AddArray<s8>((const s8*)str, len);
 }

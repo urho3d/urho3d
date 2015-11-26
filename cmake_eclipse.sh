@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2008-2014 the Urho3D project.
+# Copyright (c) 2008-2015 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 #
 
-$( dirname $0 )/cmake_gcc.sh eclipse $@
+$(dirname $0)/cmake_generic.sh "$@" -G "Eclipse CDT4 - Unix Makefiles"
 
 # After importing the generated project into Eclipse workspace, set the [Build], [Subprojects], and [Targets] linked resources property as 'Derived'
 # to exclude the derived resources in those folders from being listed in the Open Resource and Search Result list

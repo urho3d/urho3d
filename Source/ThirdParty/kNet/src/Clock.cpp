@@ -1,4 +1,4 @@
-/* Copyright 2010 Jukka Jyl‰nki
+/* Copyright 2010 Jukka Jyl√§nki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,30 +15,34 @@
 /** @file Clock.cpp
 	@brief */
 
-#if defined(__unix__) || defined(__native_client__) || defined(EMSCRIPTEN) || defined(ANDROID) || defined(__APPLE__) || defined (__CYGWIN__)
+// Modified by Lasse Oorni for Urho3D
+
+// Urho3D: ensure that kNetBuildConfig.h is included for WinXP compatibility
+#include "kNetBuildConfig.h"
+
+#if defined(__unix__) || defined(__native_client__) || defined(__EMSCRIPTEN__) || defined(ANDROID) || defined(__APPLE__) || defined (__CYGWIN__)
 #include <time.h>
 #include <errno.h>
 #include <string.h>
 #include <sys/time.h>
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #define NOMINMAX
 #include <windows.h>
 #endif
 
-#ifdef EMSCRIPTEN
-#include <emscripten.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
 #endif
 
-#include "kNetBuildConfig.h"
 #include "kNet/Clock.h"
 #include "kNet/NetworkLogging.h"
 
 namespace kNet
 {
 
-#ifdef WIN32
+#ifdef _WIN32
 LARGE_INTEGER Clock::ddwTimerFrequency;
 #endif
 
@@ -51,16 +55,16 @@ void Clock::InitClockData()
 	if (appStartTime == 0)
 		appStartTime = Tick();
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (!QueryPerformanceFrequency(&ddwTimerFrequency))
 	{
-		LOG(LogError, "The system doesn't support high-resolution timers!");
+		KNET_LOG(LogError, "The system doesn't support high-resolution timers!");
 		ddwTimerFrequency.HighPart = (unsigned long)-1;
 		ddwTimerFrequency.LowPart = (unsigned long)-1;
 	}
 
 	if (ddwTimerFrequency.HighPart > 0)
-		LOG(LogError, "Warning: Clock::TicksPerSec will yield invalid timing data!");
+		KNET_LOG(LogError, "Warning: Clock::TicksPerSec will yield invalid timing data!");
 
 	if (appStartTime == 0)
 	{
@@ -68,7 +72,7 @@ void Clock::InitClockData()
 		appStartTime = (tick_t)GetTickCount64();
 #else
 		appStartTime = (tick_t)GetTickCount();
-#endif		
+#endif
 	}
 
 	///\todo Test here that the return values of QueryPerformanceCounter is nondecreasing.
@@ -84,16 +88,16 @@ void Clock::Sleep(int milliseconds)
 {
 #ifdef WIN8RT
 #pragma WARNING(Clock::Sleep has not been implemented!)
-#elif defined(WIN32)
+#elif defined(_WIN32)
 	::Sleep(milliseconds);
-#elif !defined(__native_client__) && !defined(EMSCRIPTEN) && !defined(__APPLE__)
+#elif !defined(__native_client__) && !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
 	// http://linux.die.net/man/2/nanosleep
 	timespec ts;
 	ts.tv_sec = milliseconds / 1000;
 	ts.tv_nsec = (milliseconds - ts.tv_sec * 1000) * 1000 * 1000;
 	int ret = nanosleep(&ts, NULL);
 	if (ret == -1)
-		LOG(LogError, "nanosleep returned -1! Reason: %s(%d).", strerror(errno), (int)errno);
+		KNET_LOG(LogError, "nanosleep returned -1! Reason: %s(%d).", strerror(errno), (int)errno);
 #else
 #warning Clock::Sleep has not been implemented!
 #endif
@@ -101,7 +105,7 @@ void Clock::Sleep(int milliseconds)
 
 int Clock::Year()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	SYSTEMTIME s;
 	GetSystemTime(&s);
 	return s.wYear;
@@ -113,7 +117,7 @@ int Clock::Year()
 
 int Clock::Month()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	SYSTEMTIME s;
 	GetSystemTime(&s);
 	return s.wMonth;
@@ -125,7 +129,7 @@ int Clock::Month()
 
 int Clock::Day()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	SYSTEMTIME s;
 	GetSystemTime(&s);
 	return s.wDay;
@@ -137,7 +141,7 @@ int Clock::Day()
 
 int Clock::Hour()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	SYSTEMTIME s;
 	GetSystemTime(&s);
 	return s.wHour;
@@ -149,7 +153,7 @@ int Clock::Hour()
 
 int Clock::Min()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	SYSTEMTIME s;
 	GetSystemTime(&s);
 	return s.wMinute;
@@ -161,7 +165,7 @@ int Clock::Min()
 
 int Clock::Sec()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	SYSTEMTIME s;
 	GetSystemTime(&s);
 	return s.wSecond;
@@ -173,12 +177,12 @@ int Clock::Sec()
 
 unsigned long Clock::SystemTime()
 {
-#ifdef WIN32
+#ifdef _WIN32
 #if WINVER >= 0x0600 && !defined(KNET_ENABLE_WINXP_SUPPORT)
 	return (unsigned long)GetTickCount64();
 #else
 	return (unsigned long)GetTickCount();
-#endif		
+#endif
 #else
 	return TickU32();
 #endif
@@ -200,12 +204,12 @@ tick_t Clock::Tick()
 	struct timespec res;
 	clock_gettime(CLOCK_REALTIME, &res);
 	return 1000000000ULL*res.tv_sec + (tick_t)res.tv_nsec;
-#elif defined(EMSCRIPTEN)
+#elif defined(__EMSCRIPTEN__)
 	// emscripten_get_now() returns a wallclock time as a float in milliseconds (1e-3).
 	// scale it to microseconds (1e-6) and return as a tick.
 	return (tick_t)(((double)emscripten_get_now()) * 1e3);
 //	return (tick_t)clock();
-#elif defined(WIN32)
+#elif defined(_WIN32)
 	LARGE_INTEGER ddwTimer;
 	QueryPerformanceCounter(&ddwTimer);
 	return ddwTimer.QuadPart;
@@ -224,7 +228,7 @@ tick_t Clock::Tick()
 
 unsigned long Clock::TickU32()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	LARGE_INTEGER ddwTimer;
 	QueryPerformanceCounter(&ddwTimer);
 	return ddwTimer.LowPart;
@@ -237,10 +241,10 @@ tick_t Clock::TicksPerSec()
 {
 #if defined(ANDROID)
 	return 1000000000ULL; // 1e9 == nanoseconds.
-#elif defined(EMSCRIPTEN)
+#elif defined(__EMSCRIPTEN__)
 	return 1000000ULL; // 1e6 == microseconds.
 //	return CLOCKS_PER_SEC;
-#elif defined(WIN32)
+#elif defined(_WIN32)
 	return ddwTimerFrequency.QuadPart;
 #elif defined(_POSIX_MONOTONIC_CLOCK)
 	return 1000 * 1000 * 1000;

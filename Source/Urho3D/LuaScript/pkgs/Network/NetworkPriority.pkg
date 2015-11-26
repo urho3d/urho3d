@@ -1,0 +1,21 @@
+$#include "Network/NetworkPriority.h"
+
+class NetworkPriority : public Component
+{
+    void SetBasePriority(float priority);
+    void SetDistanceFactor(float factor);
+    void SetMinPriority(float priority);
+    void SetAlwaysUpdateOwner(bool enable);
+
+    float GetBasePriority() const;
+    float GetDistanceFactor() const;
+    float GetMinPriority() const;
+    bool GetAlwaysUpdateOwner() const;
+    
+    bool CheckUpdate(float distance, float& accumulator);
+    
+    tolua_property__get_set float basePriority;
+    tolua_property__get_set float distanceFactor;
+    tolua_property__get_set float minPriority;
+    tolua_property__get_set bool alwaysUpdateOwner;
+};

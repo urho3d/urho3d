@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ class Scene;
 ///     - Adding post processing effects to a viewport's render path and toggling them
 class MultipleViewports : public Sample
 {
-    OBJECT(MultipleViewports);
+    URHO3D_OBJECT(MultipleViewports, Sample);
 
 public:
     /// Construct.

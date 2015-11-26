@@ -1,0 +1,14 @@
+$#include "Navigation/NavArea.h"
+
+class NavArea : public Component
+{
+    unsigned GetAreaID() const;
+    void SetAreaID(unsigned);
+    BoundingBox GetBoundingBox();
+    void SetBoundingBox(const BoundingBox& bnds);
+    BoundingBox GetWorldBoundingBox() const;
+    
+    tolua_property__get_set unsigned areaID;
+    tolua_property__get_set BoundingBox boundingBox;
+    tolua_readonly tolua_property__get_set BoundingBox worldBoundingBox;
+};

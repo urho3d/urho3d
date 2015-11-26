@@ -1,0 +1,34 @@
+$#include "Core/Timer.h"
+
+
+class Time : public Object
+{
+    unsigned GetFrameNumber() const;
+    float GetTimeStep() const;
+    unsigned GetTimerPeriod() const;
+    float GetElapsedTime();
+
+    static unsigned GetSystemTime();
+    static unsigned GetTimeSinceEpoch();
+    static String GetTimeStamp();
+    static void Sleep(unsigned mSec);
+    
+    tolua_readonly tolua_property__get_set unsigned frameNumber;
+    tolua_readonly tolua_property__get_set float timeStep;
+    tolua_readonly tolua_property__get_set unsigned timerPeriod;
+    tolua_readonly tolua_property__get_set float elapsedTime;
+};
+
+Time* GetTime();
+tolua_readonly tolua_property__get_set Time* time;
+
+${
+#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetTime00
+static int tolua_CoreLuaAPI_GetTime00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Time>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_time_ptr
+#define tolua_get_time_ptr tolua_CoreLuaAPI_GetTime00
+$}

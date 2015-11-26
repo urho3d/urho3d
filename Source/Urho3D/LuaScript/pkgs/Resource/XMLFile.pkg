@@ -1,0 +1,42 @@
+$#include "Resource/XMLFile.h"
+
+class XMLFile : public Resource
+{
+    XMLFile();
+    ~XMLFile();
+
+    bool FromString(const String source);
+    XMLElement CreateRoot(const String name = String::EMPTY);
+    XMLElement GetRoot(const String name = String::EMPTY);
+    String ToString(const String indentation = "\t") const;
+
+    void Patch(XMLFile* patchFile);
+    void Patch(XMLElement patchElement);
+
+    tolua_outside bool XMLFileSave @ Save(const String fileName, const String indentation = "\t") const;
+};
+
+${
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_XMLFile_new00
+static int tolua_ResourceLuaAPI_XMLFile_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<XMLFile>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_XMLFile_new00_local
+static int tolua_ResourceLuaAPI_XMLFile_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<XMLFile>(tolua_S);
+}
+$}
+
+${
+static bool XMLFileSave(const XMLFile* resource, const String& fileName, const String& indentation)
+{
+    if (!resource)
+        return false;
+
+    File file(resource->GetContext());
+    return file.Open(fileName, FILE_WRITE) && resource->Save(file, indentation);
+}
+$}

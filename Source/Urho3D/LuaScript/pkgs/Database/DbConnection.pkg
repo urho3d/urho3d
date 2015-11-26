@@ -1,0 +1,12 @@
+$#include "Database/DbConnection.h"
+
+class DbConnection : public Object
+{
+    void Finalize();
+    DbResult Execute(const String sql, bool useCursorEvent = false);
+    const String GetConnectionString() const;
+    bool IsConnected() const;
+
+    tolua_readonly tolua_property__get_set const String connectionString;
+    tolua_readonly tolua_property__is_set bool connected;
+};

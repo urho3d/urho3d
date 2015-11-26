@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,28 +20,26 @@
 // THE SOFTWARE.
 //
 
-#include "Button.h"
-#include "BorderImage.h"
-#include "CheckBox.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "LineEdit.h"
-#include "ResourceCache.h"
-#include "Text.h"
-#include "Texture2D.h"
-#include "ToolTip.h"
-#include "UI.h"
-#include "UIElement.h"
-#include "UIEvents.h"
-#include "Window.h"
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Graphics/Texture2D.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/UI/Button.h>
+#include <Urho3D/UI/CheckBox.h>
+#include <Urho3D/UI/LineEdit.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/ToolTip.h>
+#include <Urho3D/UI/UI.h>
+#include <Urho3D/UI/UIEvents.h>
+#include <Urho3D/UI/Window.h>
 
 #include "HelloGUI.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(HelloGUI)
+URHO3D_DEFINE_APPLICATION_MAIN(HelloGUI)
 
 HelloGUI::HelloGUI(Context* context) :
     Sample(context),
@@ -67,7 +65,7 @@ void HelloGUI::Start()
 
     // Initialize Window
     InitWindow();
-    
+
     // Create and add some controls to the Window
     InitControls();
 
@@ -109,7 +107,7 @@ void HelloGUI::InitWindow()
     uiRoot_->AddChild(window_);
 
     // Set Window size and layout settings
-    window_->SetMinSize(384, 192);
+    window_->SetMinWidth(384);
     window_->SetLayout(LM_VERTICAL, 6, IntRect(6, 6, 6, 6));
     window_->SetAlignment(HA_CENTER, VA_CENTER);
     window_->SetName("Window");
@@ -142,10 +140,10 @@ void HelloGUI::InitWindow()
     buttonClose->SetStyle("CloseButton");
 
     // Subscribe to buttonClose release (following a 'press') events
-    SubscribeToEvent(buttonClose, E_RELEASED, HANDLER(HelloGUI, HandleClosePressed));
-    
+    SubscribeToEvent(buttonClose, E_RELEASED, URHO3D_HANDLER(HelloGUI, HandleClosePressed));
+
     // Subscribe also to all UI mouse clicks just to see where we have clicked
-    SubscribeToEvent(E_UIMOUSECLICK, HANDLER(HelloGUI, HandleControlClicked));
+    SubscribeToEvent(E_UIMOUSECLICK, URHO3D_HANDLER(HelloGUI, HandleControlClicked));
 }
 
 void HelloGUI::CreateDraggableFish()
@@ -176,9 +174,9 @@ void HelloGUI::CreateDraggableFish()
 
     // Subscribe draggableFish to Drag Events (in order to make it draggable)
     // See "Event list" in documentation's Main Page for reference on available Events and their eventData
-    SubscribeToEvent(draggableFish, E_DRAGBEGIN, HANDLER(HelloGUI, HandleDragBegin));
-    SubscribeToEvent(draggableFish, E_DRAGMOVE, HANDLER(HelloGUI, HandleDragMove));
-    SubscribeToEvent(draggableFish, E_DRAGEND, HANDLER(HelloGUI, HandleDragEnd));
+    SubscribeToEvent(draggableFish, E_DRAGBEGIN, URHO3D_HANDLER(HelloGUI, HandleDragBegin));
+    SubscribeToEvent(draggableFish, E_DRAGMOVE, URHO3D_HANDLER(HelloGUI, HandleDragMove));
+    SubscribeToEvent(draggableFish, E_DRAGEND, URHO3D_HANDLER(HelloGUI, HandleDragEnd));
 }
 
 void HelloGUI::HandleDragBegin(StringHash eventType, VariantMap& eventData)

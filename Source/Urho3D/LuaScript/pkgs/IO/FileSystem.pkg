@@ -1,0 +1,68 @@
+$#include "IO/FileSystem.h"
+
+static const unsigned SCAN_FILES;
+static const unsigned SCAN_DIRS;
+static const unsigned SCAN_HIDDEN;
+
+class FileSystem : public Object
+{
+    bool SetCurrentDir(const String pathName);
+    bool CreateDir(const String pathName);
+    void SetExecuteConsoleCommands(bool enable);
+    int SystemCommand(const String commandLine, bool redirectStdOutToLog = false);
+    int SystemRun(const String fileName, const Vector<String>& arguments);
+    unsigned SystemCommandAsync(const String commandLine);
+    unsigned SystemRunAsync(const String fileName, const Vector<String>& arguments);
+    bool SystemOpen(const String fileName, const String mode = String::EMPTY);
+    bool Copy(const String srcFileName, const String destFileName);
+    bool Rename(const String srcFileName, const String destFileName);
+    bool Delete(const String fileName);
+    bool SetLastModifiedTime(const String fileName, unsigned newTime);
+    String GetCurrentDir() const;
+    bool GetExecuteConsoleCommands() const;
+    bool HasRegisteredPaths() const;
+    bool CheckAccess(const String pathName) const;
+    unsigned GetLastModifiedTime(const String fileName) const;
+    bool FileExists(const String fileName) const;
+    bool DirExists(const String pathName) const;
+    
+    tolua_outside const Vector<String>& FileSystemScanDir @ ScanDir(const String pathName, const String filter, unsigned flags, bool recursive) const;
+    
+    String GetProgramDir() const;
+    String GetUserDocumentsDir() const;
+    String GetAppPreferencesDir(const String org, const String app) const;
+};
+
+String GetPath(const String fullPath);
+String GetFileName(const String fullPath);
+String GetExtension(const String fullPath, bool lowercaseExtension = true);
+String GetFileNameAndExtension(const String fullPath, bool lowercaseExtension = false);
+String ReplaceExtension(const String fullPath, const String newExtension);
+String AddTrailingSlash(const String pathName);
+String RemoveTrailingSlash(const String pathName);
+String GetParentPath(const String pathName);
+String GetInternalPath(const String pathName);
+String GetNativePath(const String pathName);
+bool IsAbsolutePath(const String pathName);
+String GetFileSizeString(unsigned long long memorySize);
+
+FileSystem * GetFileSystem();
+tolua_readonly tolua_property__get_set FileSystem* fileSystem;
+
+${
+#define TOLUA_DISABLE_tolua_IOLuaAPI_GetFileSystem00
+static int tolua_IOLuaAPI_GetFileSystem00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<FileSystem>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_fileSystem_ptr
+#define tolua_get_fileSystem_ptr tolua_IOLuaAPI_GetFileSystem00
+
+static const Vector<String>& FileSystemScanDir(const FileSystem* fileSystem, const String pathName, const String filter, unsigned flags, bool recursive)
+{
+    static Vector<String> result;
+    fileSystem->ScanDir(result, pathName, filter, flags, recursive);
+    return result;
+}
+$}

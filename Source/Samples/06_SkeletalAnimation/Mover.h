@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,14 @@
 
 #pragma once
 
-#include "LogicComponent.h"
+#include <Urho3D/Scene/LogicComponent.h>
 
 using namespace Urho3D;
 
 /// Custom logic component for moving the animated model and rotating at area edges.
 class Mover : public LogicComponent
 {
-    OBJECT(Mover);
+    URHO3D_OBJECT(Mover, LogicComponent);
     
 public:
     /// Construct.

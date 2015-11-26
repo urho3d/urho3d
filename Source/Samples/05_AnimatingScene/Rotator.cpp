@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,11 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "Rotator.h"
-#include "Scene.h"
-#include "SceneEvents.h"
+#include <Urho3D/Scene/Scene.h>
 
-#include "DebugNew.h"
+#include "Rotator.h"
+
+#include <Urho3D/DebugNew.h>
 
 Rotator::Rotator(Context* context) :
     LogicComponent(context),

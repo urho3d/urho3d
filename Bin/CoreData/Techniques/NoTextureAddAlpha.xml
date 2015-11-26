@@ -1,3 +1,0 @@
-<technique vs="Unlit" ps="Unlit">
-    <pass name="alpha" depthwrite="false" blend="addalpha" />
-</technique>

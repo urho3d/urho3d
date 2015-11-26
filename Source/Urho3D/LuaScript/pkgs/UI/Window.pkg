@@ -1,0 +1,68 @@
+$#include "UI/Window.h"
+
+enum WindowDragMode
+{
+    DRAG_NONE,
+    DRAG_MOVE,
+    DRAG_RESIZE_TOPLEFT,
+    DRAG_RESIZE_TOP,
+    DRAG_RESIZE_TOPRIGHT,
+    DRAG_RESIZE_RIGHT,
+    DRAG_RESIZE_BOTTOMRIGHT,
+    DRAG_RESIZE_BOTTOM,
+    DRAG_RESIZE_BOTTOMLEFT,
+    DRAG_RESIZE_LEFT
+};
+
+class Window : public BorderImage
+{
+    Window();
+    virtual ~Window();
+    
+    void SetMovable(bool enable);
+    void SetResizable(bool enable);
+    void SetFixedWidthResizing(bool enable);
+    void SetFixedHeightResizing(bool enable);
+    void SetResizeBorder(const IntRect& rect);
+    void SetModal(bool modal);
+    void SetModalShadeColor(const Color& color);
+    void SetModalFrameColor(const Color& color);
+    void SetModalFrameSize(const IntVector2& size);
+    void SetModalAutoDismiss(bool enable);
+
+    bool IsMovable() const;
+    bool IsResizable() const;
+    bool GetFixedWidthResizing() const;
+    bool GetFixedHeightResizing() const;
+    const IntRect& GetResizeBorder() const;
+    bool IsModal() const;
+    const Color& GetModalShadeColor() const;
+    const Color& GetModalFrameColor() const;
+    const IntVector2& GetModalFrameSize() const;
+    bool GetModalAutoDismiss() const;
+
+    tolua_property__is_set bool movable;
+    tolua_property__is_set bool resizable;
+    tolua_property__get_set bool fixedWidthResizing;
+    tolua_property__get_set bool fixedHeightResizing;
+    tolua_property__get_set IntRect& resizeBorder;
+    tolua_property__is_set bool modal;
+    tolua_property__get_set Color& modalShadeColor;
+    tolua_property__get_set Color& modalFrameColor;
+    tolua_property__get_set IntVector2& modalFrameSize;
+    tolua_property__get_set bool modalAutoDismiss;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_Window_new00
+static int tolua_UILuaAPI_Window_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Window>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_Window_new00_local
+static int tolua_UILuaAPI_Window_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Window>(tolua_S);
+}
+$}

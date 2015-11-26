@@ -34,8 +34,8 @@ public:
 	// For compatibility when inter-using with VLEType3
 	static const int numBits3 = 0;
 
-	static const u32 maxValue1 = LSBT<numBits1>::val;
-	static const u32 maxValue2 = LSBT<numBits1+numBits2>::val;
+	static const u32 maxValue1 = static_cast<u32>(LSBT<numBits1>::val);
+	static const u32 maxValue2 = static_cast<u32>(LSBT<numBits1+numBits2>::val);
 
 	static const u32 maxValue = maxValue2;
 
@@ -44,8 +44,8 @@ public:
 
 	static const u32 maxBits = bitsValue2;
 
-	static const u32 bitMask1 = BitMaskT<0, numBits1>::val;
-	static const u32 bitMask2 = BitMaskT<bitsValue1, numBits2>::val;// == ((1 << numBits2) - 1) << bitsValue1;
+	static const u32 bitMask1 = static_cast<u32>(BitMaskT<0, numBits1>::val);
+	static const u32 bitMask2 = static_cast<u32>(BitMaskT<bitsValue1, numBits2>::val);// == ((1 << numBits2) - 1) << bitsValue1;
 
 	static int GetEncodedBitLength(u32 value)
 	{
@@ -96,9 +96,9 @@ public:
 	static const int numBits2 = bits2;
 	static const int numBits3 = bits3;
 
-	static const u32 maxValue1 = LSBT<numBits1>::val;
-	static const u32 maxValue2 = LSBT<numBits1+numBits2>::val;
-	static const u32 maxValue3 = LSBT<numBits1+numBits2+numBits3>::val;
+	static const u32 maxValue1 = static_cast<u32>(LSBT<numBits1>::val);
+	static const u32 maxValue2 = static_cast<u32>(LSBT<numBits1+numBits2>::val);
+	static const u32 maxValue3 = static_cast<u32>(LSBT<numBits1+numBits2+numBits3>::val);
 
 	static const u32 maxValue = maxValue3;
 
@@ -108,9 +108,9 @@ public:
 
 	static const u32 maxBits = bitsValue3;
 
-	static const u32 bitMask1 = BitMaskT<0, numBits1>::val;
-	static const u32 bitMask2 = BitMaskT<bitsValue1, numBits2>::val; // == ((1 << numBits2) - 1) << bitsValue1;
-	static const u32 bitMask3 = BitMaskT<bitsValue2, numBits3>::val; // == ((1 << numBits3) - 1) << bitsValue2;
+	static const u32 bitMask1 = static_cast<u32>(BitMaskT<0, numBits1>::val);
+	static const u32 bitMask2 = static_cast<u32>(BitMaskT<bitsValue1, numBits2>::val); // == ((1 << numBits2) - 1) << bitsValue1;
+	static const u32 bitMask3 = static_cast<u32>(BitMaskT<bitsValue2, numBits3>::val); // == ((1 << numBits3) - 1) << bitsValue2;
 
 	static int GetEncodedBitLength(u32 value)
 	{

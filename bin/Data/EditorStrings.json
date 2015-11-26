@@ -1,0 +1,1394 @@
+{
+	"Language":{
+		"en":"Language",
+		"ru":"Язык",
+		"fr":"Langage",
+		"it":"Lingua"
+	},
+	"Open scene...":{
+		"en":"Open scene...",
+		"ru":"Открыть сцену...",
+		"fr":"Ouvrir une scène...",
+		"it":"Apri scena..."
+	},
+	"Save scene":{
+		"en":"Save scene",
+		"ru":"Сохранить сцену",
+		"fr":"Sauvegarder la scène",
+		"it":"Salva scena"
+	},
+	"Save scene as...":{
+		"en":"Save scene as...",
+		"ru":"Сохранить сцену как...",
+		"fr":"Sauvegarder la scène comme...",
+		"it":"Salva scena come..."
+	},
+	"Open recent scene":{
+		"en":"Open recent scene",
+		"ru":"Открыть прежнюю сцену",
+		"fr":"Ouvrir la scène récente",
+		"it":"Apri scena recente"
+	},
+	"menu Load node":{
+		"en":"Load node",
+		"ru":"Загрузить ноду",
+		"fr":"Charger la node",
+		"it":"Carica nodo"
+	},
+	"As replicated...":{
+		"en":"As replicated...",
+		"ru":"Реплицируемую...",
+		"fr":"Duplicata...",
+		"it":"Come duplicato..."
+	},
+	"As local...":{
+		"en":"As local...",
+		"ru":"Локальную...",
+		"fr":"Comme local...",
+		"it":"Come locale..."
+	},
+	"Save node as...":{
+		"en":"Save node as...",
+		"ru":"Сохранить ноду как...",
+		"fr":"Sauvegarder la node comme...",
+		"it":"Salva nodo come..."
+	},
+	"Import model...":{
+		"en":"Import model...",
+		"ru":"Импортировать модель...",
+		"fr":"Importer un modèle...",
+		"it":"Importa modello..."
+	},
+	"Import scene...":{
+		"en":"Import scene...",
+		"ru":"Импортировать сцену...",
+		"fr":"Importer une scène...",
+		"it":"Importa scena..."
+	},
+	"Run script...":{
+		"en":"Run script...",
+		"ru":"Запустить скрипт...",
+		"fr":"Exécuter un script...",
+		"it":"Esegui script..."
+	},
+	"Set resource path...":{
+		"en":"Set resource path...",
+		"ru":"Указать путь к ресурсам...",
+		"fr":"Fixer le chemin des ressources...",
+		"it":"Imposta percorso risorse..."
+	},
+	"Exit":{
+		"en":"Exit",
+		"ru":"Выход",
+		"fr":"Quitter",
+		"it":"Esci"
+	},
+	"Edit":{
+		"en":"Edit",
+		"ru":"Редактирование",
+		"fr":"Éditer",
+		"it":"Modifica"
+	},
+	"Undo":{
+		"en":"Undo",
+		"ru":"Отменить",
+		"fr":"Annuler",
+		"it":"Annulla"
+	},
+	"Redo":{
+		"en":"Redo",
+		"ru":"Повторить",
+		"fr":"Refaire",
+		"it":"Rifare"
+	},
+	"Cut":{
+		"en":"Cut",
+		"ru":"Вырезать",
+		"fr":"Couper",
+		"it":"Taglia"
+	},
+	"Duplicate":{
+		"en":"Duplicate",
+		"ru":"Дублировать",
+		"fr":"Dupliquer",
+		"it":"Duplica"
+	},
+	"Copy":{
+		"en":"Copy",
+		"ru":"Копировать",
+		"fr":"Copier",
+		"it":"Copia"
+	},
+	"Paste":{
+		"en":"Paste",
+		"ru":"Вставить",
+		"fr":"Coller",
+		"it":"Incolla"
+	},
+	"Delete":{
+		"en":"Delete",
+		"ru":"Удалить",
+		"fr":"Effacer",
+		"it":"Elimina"
+	},
+	"Select all":{
+		"en":"Select all",
+		"ru":"Выделить всё",
+		"fr":"Tout sélectionner",
+		"it":"Seleziona tutto"
+	},
+	"Deselect all":{
+		"en":"Deselect all",
+		"ru":"Снять все выделения",
+		"fr":"Tout désélectionner",
+		"it":"Deseleziona tutto"
+	},
+	"Reset to default":{
+		"en":"Reset to default",
+		"ru":"Сбросить",
+		"fr":"Ré-initiliser par défaut",
+		"it":"Reimposta condizioni iniziali"
+	},
+	"Reset position":{
+		"en":"Reset position",
+		"ru":"Сбросить положение",
+		"fr":"Ré-initiliser la position",
+		"it":"Reimposta posizione"
+	},
+	"Reset rotation":{
+		"en":"Reset rotation",
+		"ru":"Сбросить поворот",
+		"fr":"Ré-initiliser la rotation",
+		"it":"Reimposta rotazione"
+	},
+	"Reset scale":{
+		"en":"Reset scale",
+		"ru":"Сбросить масштаб",
+		"fr":"Ré-initialiser l'échelle",
+		"it":"Reimposta dimensione"
+	},
+	"Enable/disable":{
+		"en":"Enable/disable",
+		"ru":"Включить/Отключить",
+		"fr":"Activer/Désactiver",
+		"it":"Attiva/Disattiva"
+	},
+	"Unparent":{
+		"en":"Unparent",
+		"ru":"Разорвать родительскую связь",
+		"fr":"Dé-parenter",
+		"it":"Rimuovi parentela"
+	},
+	"Toggle update":{
+		"en":"Toggle update",
+		"ru":"Вкл/откл обновление",
+		"fr":"Basculer la mise à jour",
+		"it":"On/off aggiornamento"
+	},
+	"Stop test animation":{
+		"en":"Stop test animation",
+		"ru":"Остановить тестовую анимацию",
+		"fr":"Arrêt du test d'animation",
+		"it":"Ferma test animazione"
+	},
+	"Rebuild navigation data":{
+		"en":"Rebuild navigation data",
+		"ru":"Реконструировать навигационные данные",
+		"fr":"Recontruire les données de navigation",
+		"it":"Ricostruisci dati navigazione"
+	},
+	"Add children to SM-group":{
+		"en":"Add children to SM-group",
+		"ru":"Добавить потомка к StaticModelGroup",
+		"fr":"Ajouter l'enfant au groupe de modèle statique",
+		"it":"Aggiungi figlio al gruppo di modelli statici"
+	},
+	"Set children as spline path":{
+		"en":"Set children as spline path",
+		"ru":"Установить потомка как сплайновый путь",
+		"fr":"Fixer l'enfant comme un chemin spline",
+		"it":"Imposta figlio come percorso spline"
+	},
+	"Non-cyclic":{
+		"en":"Non-cyclic",
+		"ru":"Нецикличный",
+		"fr":"Non-cyclique",
+		"it":"Non ciclico"
+	},
+	"Cyclic":{
+		"en":"Cyclic",
+		"ru":"Цикличный",
+		"fr":"Cyclique",
+		"it":"Ciclico"
+	},
+	"Create":{
+		"en":"Create",
+		"ru":"Создать",
+		"fr":"Créer",
+		"it":"Crea"
+	},
+	"Replicated node":{
+		"en":"Replicated node",
+		"ru":"Реплицируемая нода",
+		"fr":"Node répliquée",
+		"it":"Nodo duplicato"
+	},
+	"Local node":{
+		"en":"Local node",
+		"ru":"Локальная нода",
+		"fr":"Node locale",
+		"it":"Nodo locale"
+	},
+	"Component":{
+		"en":"Component",
+		"ru":"Компонент",
+		"fr":"Composant",
+		"it":"Componente"
+	},
+	"Audio":{
+		"en":"Audio",
+		"ru":"Аудио",
+		"fr":"Audio",
+		"it":"Audio"
+	},
+	"Geometry":{
+		"en":"Geometry",
+		"ru":"Геометрия",
+		"fr":"Géométrie",
+		"it":"Geometria"
+	},
+	"Logic":{
+		"en":"Logic",
+		"ru":"Логика",
+		"fr":"Logique",
+		"it":"Logica"
+	},
+	"Navigation":{
+		"en":"Navigation",
+		"ru":"Навигация",
+		"fr":"Navigation",
+		"it":"Navigazione"
+	},
+	"Network":{
+		"en":"Network",
+		"ru":"Сеть",
+		"fr":"Réseau",
+		"it":"Rete"
+	},
+	"Physics":{
+		"en":"Physics",
+		"ru":"Физика",
+		"fr":"Physique",
+		"it":"Fisica"
+	},
+	"Scene":{
+		"en":"Scene",
+		"ru":"Сцена",
+		"fr":"Scène",
+		"it":"Scena"
+	},
+	"Subsystem":{
+		"en":"Subsystem",
+		"ru":"Подсистема",
+		"fr":"Sous-système",
+		"it":"Sotto-sistema"
+	},
+	"Urho2D":{
+		"en":"Urho2D",
+		"ru":"Urho2D",
+		"fr":"Urho2D",
+		"it":"Urho2D"
+	},
+	"Builtin object":{
+		"en":"Builtin object",
+		"ru":"Встроенный объект",
+		"fr":"Objet pré-assemblé",
+		"it":"Oggetti integrati"
+	},
+	"UI-element":{
+		"en":"UI-element",
+		"ru":"Элемент интерфейса",
+		"fr":"Élément interface utilisateur",
+		"it":"Elemento UI"
+	},
+	"UI-layout":{
+		"en":"UI-layout",
+		"ru":"Разметка интерфейса",
+		"fr":"Disposition d'interface utilisateur",
+		"it":"Schema UI"
+	},
+	"Open UI-layout...":{
+		"en":"Open UI-layout...",
+		"ru":"Открыть разметку...",
+		"fr":"Ouvrir une disposition d'interface utilisateur...",
+		"it":"Apri schema UI..."
+	},
+	"Save UI-layout":{
+		"en":"Save UI-layout",
+		"ru":"Сохранить разметку",
+		"fr":"Sauvegarder la disposition d'interface utilisateur",
+		"it":"Salva schema UI"
+	},
+	"Save UI-layout as...":{
+		"en":"Save UI-layout as...",
+		"ru":"Сохранить разметку как...",
+		"fr":"Sauvegarder la disposition d'interface utilisateur comme...",
+		"it":"Salva schema UI come..."
+	},
+	"Close UI-layout":{
+		"en":"Close UI-layout",
+		"ru":"Закрыть разметку",
+		"fr":"Fermer la disposition d'interface utilisateur",
+		"it":"Chiudi schema UI"
+	},
+	"Close all UI-layouts":{
+		"en":"Close all UI-layouts",
+		"ru":"Закрыть все разметки",
+		"fr":"Fermer toutes les disposition IU",
+		"it":"Chiudi tutti gli schemi UI"
+	},
+	"Load child element...":{
+		"en":"Load child element...",
+		"ru":"Загрузить дочерний элемент...",
+		"fr":"Charger l'élément enfant...",
+		"it":"Carica elemento figlio..."
+	},
+	"Save child element as...":{
+		"en":"Save child element as...",
+		"ru":"Сохранить дочерний элемент как...",
+		"fr":"Sauvegarde l'élément enfant comme...",
+		"it":"Salva elemento figlio come..."
+	},
+	"Set default style...":{
+		"en":"Set default style...",
+		"ru":"Установить стандартный стиль...",
+		"fr":"Régler le style par défaut...",
+		"it":"Imposta stile predefinito..."
+	},
+	"View":{
+		"en":"View",
+		"ru":"Вид",
+		"fr":"Affichage",
+		"it":"Visualizza"
+	},
+	"Hierarchy":{
+		"en":"Hierarchy",
+		"ru":"Иерархия",
+		"fr":"Hiéarchie",
+		"it":"Gerarchia"
+	},
+	"Attribute inspector":{
+		"en":"Attribute inspector",
+		"ru":"Аттрибуты",
+		"fr":"Inspecteur d'attributs",
+		"it":"Ispettore attributi"
+	},
+	"Material editor":{
+		"en":"Material editor",
+		"ru":"Редактор материалов",
+		"fr":"Éditeur de matériaux",
+		"it":"Editor materiali"
+	},
+	"Particle editor":{
+		"en":"Particle editor",
+		"ru":"Редактор частиц",
+		"fr":"Éditeur de particules",
+		"it":"Editor particelle"
+	},
+	"Spawn editor":{
+		"en":"Spawn editor",
+		"ru":"Редактор спауна",
+		"fr":"Éditeur de progéniture",
+		"it":"Editor spawn"
+	},
+	"Spawn settings":{
+		"en":"Spawn settings",
+		"ru":"Настройки спауна",
+		"fr":"Paramètres de reproduction",
+		"it":"Impostazioni spawn"
+	},
+	"Sound Type editor":{
+		"en":"Sound Type editor",
+		"ru":"Тип звука",
+		"fr":"Éditeur de types de son",
+		"it":"Editor tipo di suono"
+	},
+	"Expand":{
+		"en":"Expand",
+		"ru":"Развернуть",
+		"fr":"Agrandir",
+		"it":"Espandi"
+	},
+	"Collapse":{
+		"en":"Collapse",
+		"ru":"Свернуть",
+		"fr":"Rétrécir",
+		"it":"Riduci"
+	},
+	"All":{
+		"en":"All",
+		"ru":"Все",
+		"fr":"Tous",
+		"it":"Tutto"
+	},
+	"Mode: ":{
+		"en":"Mode: ",
+		"ru":"Режим: ",
+		"fr":"Mode: ",
+		"it":"Modalità: "
+	},
+	"  Axis: ":{
+		"en":"  Axis: ",
+		"ru":"  Оси: ",
+		"fr":"  Axe: ",
+		"it":"  Asse: "
+	},
+	"  Pick: ":{
+		"en":"  Pick: ",
+		"ru":"  Выбор: ",
+		"fr":"  Sélection: ",
+		"it":"  Selezione: "
+	},
+	"  Fill: ":{
+		"en":"  Fill: ",
+		"ru":"  Отображение: ",
+		"fr":"  Remplissage: ",
+		"it":"  Riempimento: "
+	},
+	"  Updates: ":{
+		"en":"  Updates: ",
+		"ru":"  Обновления: ",
+		"fr":"  Mises à jour: ",
+		"it":"  Aggiornamenti: "
+	},
+	"Running":{
+		"en":"Running",
+		"ru":"Запущены",
+		"fr":"En marche",
+		"it":"Esecuzione"
+	},
+	"Paused":{
+		"en":"Paused",
+		"ru":"На паузе",
+		"fr":"Mis en pause",
+		"it":"In pausa"
+	},
+	"Tris: ":{
+		"en":"Tris: ",
+		"ru":"Треуг-в: ",
+		"fr":"Tris: ",
+		"it":"Tris: "
+	},
+	"  Batches: ":{
+		"en":"  Batches: ",
+		"ru":"  Батчей: ",
+		"fr":"  Lots: ",
+		"it":"  Lotti: "
+	},
+	"  Lights: ":{
+		"en":"  Lights: ",
+		"ru":"  Ист-в света: ",
+		"fr":"  Lumières: ",
+		"it":"  Luci: "
+	},
+	"  Shadowmaps: ":{
+		"en":"  Shadowmaps: ",
+		"ru":"  Теневых карт: ",
+		"fr":"  Textures d'ombre: ",
+		"it":"  Textures ombra: "
+	},
+	"  Occluders: ":{
+		"en":"  Occluders: ",
+		"ru":"  Окклюдеров: ",
+		"fr":"  Objets d'occlusion: ",
+		"it":"  Occlusori: "
+	},
+	"Move":{
+		"en":"Move",
+		"ru":"Перемещение",
+		"fr":"Déplacer",
+		"it":"Muovi"
+	},
+	"Rotate":{
+		"en":"Rotate",
+		"ru":"Вращение",
+		"fr":"Tourner",
+		"it":"Ruota"
+	},
+	"Scale":{
+		"en":"Scale",
+		"ru":"Масштабирование",
+		"fr":"Échelle",
+		"it":"Ridimensiona"
+	},
+	"Select":{
+		"en":"Select",
+		"ru":"Выделение",
+		"fr":"Sél.",
+		"it":"Seleziona"
+	},
+	"Spawn":{
+		"en":"Spawn",
+		"ru":"Спаун",
+		"fr":"Reproduire",
+		"it":"Spawn"
+	},
+	"World":{
+		"en":"World",
+		"ru":"Мировые",
+		"fr":"Global",
+		"it":"Mondo"
+	},
+	"Local":{
+		"en":"Local",
+		"ru":"Локальные",
+		"fr":"Local",
+		"it":"Locale"
+	},
+	"Geometries":{
+		"en":"Geometries",
+		"ru":"Геометрия",
+		"fr":"Géométries",
+		"it":"Geometrie"
+	},
+	"Lights":{
+		"en":"Lights",
+		"ru":"Источники света",
+		"fr":"Lumières",
+		"it":"Luci"
+	},
+	"Zones":{
+		"en":"Zones",
+		"ru":"Зоны",
+		"fr":"Zones",
+		"it":"Zone"
+	},
+	"Rigidbodies":{
+		"en":"Rigidbodies",
+		"ru":"Твердые тела",
+		"fr":"Corps rigide",
+		"it":"Corpi rigidi"
+	},
+	"UI-elements":{
+		"en":"UI-elements",
+		"ru":"Элементы интерфейса",
+		"fr":"Élément d'interface utilisateur",
+		"it":"Elementi UI"
+	},
+	"Solid":{
+		"en":"Solid",
+		"ru":"Материал",
+		"fr":"Solide",
+		"it":"Solido"
+	},
+	"Wire":{
+		"en":"Wire",
+		"ru":"Сетка",
+		"fr":"Fil de fer",
+		"it":"Fil di ferro"
+	},
+	"Point":{
+		"en":"Point",
+		"ru":"Вершины",
+		"fr":"Point",
+		"it":"Punto"
+	},
+	"Editor settings":{
+		"en":"Editor settings",
+		"ru":"Настройки редактора",
+		"fr":"Réglages de l'éditeur",
+		"it":"Impostazioni editor"
+	},
+	"Editor preferences":{
+		"en":"Editor preferences",
+		"ru":"Установки редактора",
+		"fr":"Préférences de l'éditeur",
+		"it":"Preferenze editor"
+	},
+	"Hide editor":{
+		"en":"Hide editor",
+		"ru":"Скрыть редактор",
+		"fr":"Cacher l'éditeur",
+		"it":"Nascondi editor"
+	},
+	"Resource Browser":{
+		"en":"Resource Browser",
+		"ru":"Браузер ресурсов",
+		"fr":"Navigateur de ressources",
+		"it":"Navigatore risorse"
+	},
+	"New scene":{
+		"en":"New scene",
+		"ru":"Создать новую сцену",
+		"fr":"Nouvelle scène",
+		"it":"Nuova scena"
+	},
+	"Files left to scan: ":{
+		"en":"Files left to scan: ",
+		"ru":"Файлов до конца сканирования: ",
+		"fr":"Fichiers restant à analyser: ",
+		"it":"File rimasti per la scansione: "
+	},
+	"Scan complete":{
+		"en":"Scan complete",
+		"ru":"Сканирование окончено",
+		"fr":"Analyse complétée",
+		"it":"Scansione completa"
+	},
+	"Root":{
+		"en":"Root",
+		"ru":"Корень",
+		"fr":"Racine",
+		"it":"Radice"
+	},
+	"Showing files: ":{
+		"en":"Showing files: ",
+		"ru":"Показано файлов: ",
+		"fr":"Affiche les fichiers: ",
+		"it":"Files visualizzati: "
+	},
+	"Camera":{
+		"en":"Camera",
+		"ru":"Камера",
+		"fr":"Caméra",
+		"it":"Camera"
+	},
+	"RunUpdatePlay":{
+		"en":"RunUpdatePlay",
+		"ru":"Запустить",
+		"fr":"Démarre, met à jour et joue",
+		"it":"Avvio"
+	},
+	"RunUpdatePause":{
+		"en":"RunUpdatePause",
+		"ru":"Пауза",
+		"fr":"Démarre, met à jour et pause",
+		"it":"Pausa"
+	},
+	"RevertOnPause":{
+		"en":"RevertOnPause",
+		"ru":"Вернуться на паузе",
+		"fr":"Annule en pause",
+		"it":"Ricomincia in pausa"
+	},
+	"EditMove":{
+		"en":"EditMove",
+		"ru":"Перемещение",
+		"fr":"Éditer le déplacement",
+		"it":"Modifica posizione"
+	},
+	"EditRotate":{
+		"en":"EditRotate",
+		"ru":"Вращение",
+		"fr":"Éditer la rotation",
+		"it":"Modifica rotazione"
+	},
+	"EditScale":{
+		"en":"EditScale",
+		"ru":"Масштабирование",
+		"fr":"Éditer l'échelle",
+		"it":"Modifica dimensione"
+	},
+	"EditSelect":{
+		"en":"EditSelect",
+		"ru":"Выделение",
+		"fr":"Éditer la sélection",
+		"it":"Modifica selezione"
+	},
+	"AxisWorld":{
+		"en":"AxisWorld",
+		"ru":"Мировые оси",
+		"fr":"Axe global",
+		"it":"Asse mondo"
+	},
+	"AxisLocal":{
+		"en":"AxisLocal",
+		"ru":"Локальные оси",
+		"fr":"Axe local",
+		"it":"Asse locale"
+	},
+	"MoveSnap":{
+		"en":"MoveSnap",
+		"ru":"Дискретное перемещение",
+		"fr":"Magnétisme",
+		"it":"Muovi a scatto"
+	},
+	"RotateSnap":{
+		"en":"RotateSnap",
+		"ru":"Дискретное вращение",
+		"fr":"Magnétisme de rotation",
+		"it":"Ruota a scatto"
+	},
+	"ScaleSnap":{
+		"en":"ScaleSnap",
+		"ru":"Дискретное масштабирование",
+		"fr":"Magnétisme d'échelle",
+		"it":"Ridimensiona a scatto"
+	},
+	"SnapScaleHalf":{
+		"en":"SnapScaleHalf",
+		"ru":"Половина дискретного масштабирования",
+		"fr":"Échelle de magnétisme de moitié",
+		"it":"Ridimensiona a metà scatto"
+	},
+	"SnapScaleQuarter":{
+		"en":"SnapScaleQuarter",
+		"ru":"Четверть дискретного масштабирования",
+		"fr":"Échelle de magnétisme du quart",
+		"it":"Ridimensiona ad un quarto di scatto"
+	},
+	"PickGeometries":{
+		"en":"PickGeometries",
+		"ru":"Выделении геометрии",
+		"fr":"Sélection géométrie",
+		"it":"Seleziona geometrie"
+	},
+	"PickLights":{
+		"en":"PickLights",
+		"ru":"Выделение источников света",
+		"fr":"Sélection lumières",
+		"it":"Seleziona luci"
+	},
+	"PickZones":{
+		"en":"PickZones",
+		"ru":"Выделение зон",
+		"fr":"Sélection de zones",
+		"it":"Seleziona zone"
+	},
+	"PickRigidBodies":{
+		"en":"PickRigidBodies",
+		"ru":"Выделение твердых тел",
+		"fr":"Sélection de corps rigides",
+		"it":"Seleziona corpi rigidi"
+	},
+	"PickUIElements":{
+		"en":"PickUIElements",
+		"ru":"Выделение элементов интерфейса",
+		"fr":"Sélection d'interface utilisateur",
+		"it":"Seleziona elementi UI"
+	},
+	"FillPoint":{
+		"en":"FillPoint",
+		"ru":"Отображать вершины",
+		"fr":"Remplissage en points",
+		"it":"Riempimento a punti"
+	},
+	"FillWireFrame":{
+		"en":"FillWireFrame",
+		"ru":"Отображать сетку",
+		"fr":"Remplissage en fil de fer",
+		"it":"Riempimento a fil di ferro"
+	},
+	"FillSolid":{
+		"en":"FillSolid",
+		"ru":"Отображать материалы",
+		"fr":"Remplissage solide",
+		"it":"Riempimento solido"
+	},
+	"Light":{
+		"en":"Light",
+		"ru":"Источник света",
+		"fr":"Lumière",
+		"it":"Luce"
+	},
+	"Zone":{
+		"en":"Zone",
+		"ru":"Зона",
+		"fr":"Zone",
+		"it":"Zona"
+	},
+	"StaticModel":{
+		"en":"StaticModel",
+		"ru":"Статическая модель",
+		"fr":"Modèle statique",
+		"it":"Modello statico"
+	},
+	"AnimatedModel":{
+		"en":"AnimatedModel",
+		"ru":"Анимированная модель",
+		"fr":"Modèle animé",
+		"it":"Modello animato"
+	},
+	"BillboardSet":{
+		"en":"BillboardSet",
+		"ru":"Набор билбордов",
+		"fr":"Groupe de panneaux",
+		"it":"Set di cartelloni"
+	},
+	"ParticleEmitter":{
+		"en":"ParticleEmitter",
+		"ru":"Излучатель частиц",
+		"fr":"Émetteur de particule",
+		"it":"Emettitore di particelle"
+	},
+	"Skybox":{
+		"en":"Skybox",
+		"ru":"Скайбокс",
+		"fr":"Boîte de ciel",
+		"it":"Cielo a scatola"
+	},
+	"Terrain":{
+		"en":"Terrain",
+		"ru":"Ландшафт",
+		"fr":"Terrain",
+		"it":"Terreno"
+	},
+	"Text3D":{
+		"en":"Text3D",
+		"ru":"Текст 3D",
+		"fr":"Texte 3D",
+		"it":"Testo 3D"
+	},
+	"SoundListener":{
+		"en":"SoundListener",
+		"ru":"Звукоприемник",
+		"fr":"Écouteur de son",
+		"it":"Ascoltatore suono"
+	},
+	"SoundSource3D":{
+		"en":"SoundSource3D",
+		"ru":"Источник звука 3D",
+		"fr":"Source de son 3D",
+		"it":"Sorgente suono 3D"
+	},
+	"SoundSource":{
+		"en":"SoundSource",
+		"ru":"Источник звука",
+		"fr":"Source de son",
+		"it":"Sorgente suono"
+	},
+	"RigidBody":{
+		"en":"RigidBody",
+		"ru":"Твердое тело",
+		"fr":"Corp rigide",
+		"it":"Corpo rigido"
+	},
+	"CollisionShape":{
+		"en":"CollisionShape",
+		"ru":"КолижнШейп",
+		"fr":"Forme de collision",
+		"it":"Forma collisione"
+	},
+	"Constraint":{
+		"en":"Constraint",
+		"ru":"Ограничитель",
+		"fr":"Contrainte",
+		"it":"Vincolo"
+	},
+	"AnimationController":{
+		"en":"AnimationController",
+		"ru":"Контроллер анимации",
+		"fr":"Contrôleur d'animation",
+		"it":"Controller animazione"
+	},
+	"ScriptInstance":{
+		"en":"ScriptInstance",
+		"ru":"Скрипт",
+		"fr":"Instance de script",
+		"it":"Istanza script"
+	},
+	"Navigable":{
+		"en":"Navigable",
+		"ru":"Navigable",
+		"fr":"Naviguable",
+		"it":"Navigabile"
+	},
+	"NavigationMesh":{
+		"en":"NavigationMesh",
+		"ru":"NavigationMesh",
+		"fr":"Maillage de navigation",
+		"it":"Mesh di navigazione"
+	},
+	"OffMeshConnection":{
+		"en":"OffMeshConnection",
+		"ru":"OffMeshConnection",
+		"fr":"Connection hors maillage",
+		"it":"Connessione off-mesh"
+	},
+	"NetworkPriority":{
+		"en":"NetworkPriority",
+		"ru":"Сетевой приоритет",
+		"fr":"Priorité du réseau",
+		"it":"Priorità rete"
+	},
+	"File":{
+		"en":"File",
+		"ru":"Файл",
+		"fr":"Fichier",
+		"it":"File"
+	},
+	"Settings":{
+		"en":"Settings",
+		"ru":"Настройки",
+		"fr":"Réglagles",
+		"it":"Impostazioni"
+	},
+	"Enable all":{
+		"en":"Enable all",
+		"ru":"Включить все",
+		"fr":"Activer tout",
+		"it":"Attiva tutto"
+	},
+	"Pick ":{
+		"en":"Pick ",
+		"ru":"Выбрать ",
+		"fr":"Activer tout ",
+		"it":"Seleziona "
+	},
+	"OK":{
+		"en":"OK",
+		"ru":"OK",
+		"fr":"OK",
+		"it":"OK"
+	},
+	"Cancel":{
+		"en":"Cancel",
+		"ru":"Отмена",
+		"fr":"Annuler",
+		"it":"Annulla"
+	},
+	"Save":{
+		"en":"Save",
+		"ru":"Сохранить",
+		"fr":"Sauvegarder",
+		"it":"Salva"
+	},
+	"Save material as":{
+		"en":"Save material as",
+		"ru":"Сохранить материал как",
+		"fr":"Sauvegarder le matériel comme",
+		"it":"Salva materiale come"
+	},
+	"Save particle effect as":{
+		"en":"Save particle effect as",
+		"ru":"Сохранить эффект из частиц как",
+		"fr":"Sauvegarder l'effêt de particule comme",
+		"it":"Salva effetto particellare come"
+	},
+	"Load":{
+		"en":"Load",
+		"ru":"Загрузить",
+		"fr":"Charger",
+		"it":"Carica"
+	},
+	"Load render path":{
+		"en":"Load render path",
+		"ru":"Загрузить render path",
+		"fr":"Charger le type de chemin de rendu",
+		"it":"Carica percorso rendering"
+	},
+	"Pick spawned object":{
+		"en":"Pick spawned object",
+		"ru":"Выбрать спаунищийся объект",
+		"fr":"Sélectionner l'objet reproduit",
+		"it":"Seleziona oggetto spawnato"
+	},
+	"Pick":{
+		"en":"Pick",
+		"ru":"Выбрать",
+		"fr":"Sélectionner",
+		"it":"Seleziona"
+	},
+	"Set":{
+		"en":"Set",
+		"ru":"Установить",
+		"fr":"Ajuster",
+		"it":"Imposta"
+	},
+	"Run":{
+		"en":"Run",
+		"ru":"Запустить",
+		"fr":"Démarrer",
+		"it":"Esegui"
+	},
+	"Open":{
+		"en":"Open",
+		"ru":"Открыть",
+		"fr":"Ouvrir",
+		"it":"Apri"
+	},
+	"Import":{
+		"en":"Import",
+		"ru":"Импорт",
+		"fr":"Importer",
+		"it":"Importa"
+	},
+	"Open scene":{
+		"en":"Open scene",
+		"ru":"Открыть сцену",
+		"fr":"Ouvrir la scène",
+		"it":"Apri scena"
+	},
+	"Save scene as":{
+		"en":"Save scene as",
+		"ru":"Сохранить сцену как...",
+		"fr":"Sauvegarder la scene comme",
+		"it":"Salva scena come"
+	},
+	"fileSelector Load node":{
+		"en":"Load node",
+		"ru":"Загрузка ноды",
+		"fr":"Charger la node",
+		"it":"Carica nodo"
+	},
+	"Save node":{
+		"en":"Save node",
+		"ru":"Сохранение ноды",
+		"fr":"Sauver la node",
+		"it":"Salva nodo"
+	},
+	"Import model":{
+		"en":"Import model",
+		"ru":"Импорт модели",
+		"fr":"Importer un modèle",
+		"it":"Importa modello"
+	},
+	"Import scene":{
+		"en":"Import scene",
+		"ru":"Импорт сцены",
+		"fr":"Importer une scène",
+		"it":"Importa scena"
+	},
+	"Run script":{
+		"en":"Run script",
+		"ru":"Запуск скрипта",
+		"fr":"Exécuter un script",
+		"it":"Esegui script"
+	},
+	"Set resource path":{
+		"en":"Set resource path",
+		"ru":"Путь к ресурсам",
+		"fr":"Définir le chemin des ressources",
+		"it":"Imposta percorso risorse"
+	},
+	"Open UI-layout":{
+		"en":"Open UI-layout",
+		"ru":"Открытие разметки интерфейса",
+		"fr":"Ouvrir la disposition d'interface utilisateur",
+		"it":"Apri schema UI"
+	},
+	"Save UI-layout as":{
+		"en":"Save UI-layout as",
+		"ru":"Сохранить разметку интерфейса как",
+		"fr":"Sauvegarder la disposition d'interface utilisateur",
+		"it":"Salva schema UI come"
+	},
+	"Load child element":{
+		"en":"Load child element",
+		"ru":"Загрузка дочернего элемента",
+		"fr":"Charger l'élément enfant",
+		"it":"Carica elemento figlio"
+	},
+	"Save child element":{
+		"en":"Save child element",
+		"ru":"Сохранение дочернего элемента",
+		"fr":"Sauvegarde de l'élément enfant",
+		"it":"Salva elemento figlio"
+	},
+	"Set default style":{
+		"en":"Set default style",
+		"ru":"Выбор стиля по умолчанию",
+		"fr":"Définir le style par défaut",
+		"it":"Imposta stile predefinito"
+	},
+	"Parent to last":{
+		"en":"Parent to last",
+		"ru":"Сделать дочерним для последнего",
+		"fr":"Parenter au dernier",
+		"it":"Imparenta con l'ultimo"
+	},
+	"Style":{
+		"en":"Style",
+		"ru":"Стиль",
+		"fr":"Style",
+		"it":"Stile"
+	},
+	"New":{
+		"en":"New",
+		"ru":"Нов.",
+		"fr":"Nouv.",
+		"it":"Nuovo"
+	},
+	"Del":{
+		"en":"Del",
+		"ru":"Удал.",
+		"fr":"Eff.",
+		"it":"Rim."
+	},
+	"smallButtonPick":{
+		"en":"Pick",
+		"ru":"Выбр.",
+		"fr":"Sél.",
+		"it":"Sel."
+	},
+	"smallButtonOpen":{
+		"en":"Open",
+		"ru":"Откр.",
+		"fr":"Ouv.",
+		"it":"Apri"
+	},
+	"smallButtonEdit":{
+		"en":"Edit",
+		"ru":"Ред.",
+		"fr":"Éditer",
+		"it":"Modif."
+	},
+	"smallButtonTest":{
+		"en":"Test",
+		"ru":"Тест",
+		"fr":"Test",
+		"it":"Test"
+	},
+	"Select editable objects":{
+		"en":"Select editable objects",
+		"ru":"Выберите редактируемый объект",
+		"fr":"Sélection objets éditables",
+		"it":"Seleziona oggetti modificabili"
+	},
+	"Box":{
+		"en":"Box",
+		"ru":"Куб",
+		"fr":"Boite",
+		"it":"Scatola"
+	},
+	"Sphere":{
+		"en":"Sphere",
+		"ru":"Сфера",
+		"fr":"Sphère",
+		"it":"Sfera"
+	},
+	"Plane":{
+		"en":"Plane",
+		"ru":"Плоскость",
+		"fr":"Plan",
+		"it":"Piano"
+	},
+	"Cylinder":{
+		"en":"Cylinder",
+		"ru":"Цилиндр",
+		"fr":"Cylindre",
+		"it":"Cilindro"
+	},
+	"Cone":{
+		"en":"Cone",
+		"ru":"Конус",
+		"fr":"Cône",
+		"it":"Cono"
+	},
+	"TeaPot":{
+		"en":"TeaPot",
+		"ru":"Чайник",
+		"fr":"Théière",
+		"it":"Teiera"
+	},
+	"Techniques":{
+		"en":"Techniques",
+		"ru":"Техники",
+		"fr":"Techniques",
+		"it":"Tecniche"
+	},
+	"Sort":{
+		"en":"Sort",
+		"ru":"Сортировать",
+		"fr":"Trier",
+		"it":"Ordina"
+	},
+	"Textures":{
+		"en":"Textures",
+		"ru":"Текстуры",
+		"fr":"Textures",
+		"it":"Textures"
+	},
+	"Shader parameters":{
+		"en":"Shader parameters",
+		"ru":"Параметры шейдера",
+		"fr":"Paramètres du shader",
+		"it":"Parameteri shader"
+	},
+	"Revert":{
+		"en":"Revert",
+		"ru":"Вернуть",
+		"fr":"Annuler",
+		"it":"Annulla"
+	},
+	"Save as":{
+		"en":"Save as",
+		"ru":"Сохранить как",
+		"fr":"Sauvegarder sous",
+		"it":"Salva come"
+	},
+	"Color":{
+		"en":"Color",
+		"ru":"Цвет",
+		"fr":"Couleur",
+		"it":"Colore"
+	},
+	"Texture":{
+		"en":"Texture",
+		"ru":"Текстура",
+		"fr":"Texture",
+		"it":"Texture"
+	},
+	"Reset Viewport":{
+		"en":"Reset Viewport",
+		"ru":"Сбросить вьюпорт",
+		"fr":"Mise à zéro de la fenêtre",
+		"it":"Reimposta regione di visualizzazione"
+	},
+	"Show Axes":{
+		"en":"Show Axes",
+		"ru":"Показывать оси",
+		"fr":"Montrer les axes",
+		"it":"Visualizza assi"
+	},
+	"Initial":{
+		"en":"Initial",
+		"ru":"Начальные",
+		"fr":"Initiale",
+		"it":"Iniziale"
+	},
+	"Variation":{
+		"en":"Variation",
+		"ru":"Изменения",
+		"fr":"Variation",
+		"it":"Variazione"
+	},
+	"Color Frames":{
+		"en":"Color Frames",
+		"ru":"Изменение цвета",
+		"fr":"Couleur de cadres",
+		"it":"Colore cornici"
+	},
+	"Remove":{
+		"en":"Remove",
+		"ru":"Удалить",
+		"fr":"Enlever",
+		"it":"Rimuovi"
+	},
+	"Texture Frames":{
+		"en":"Texture Frames",
+		"ru":"Изменение текстуры",
+		"fr":"Texture des cadres",
+		"it":"Texture cornici"
+	},
+	"Emitter":{
+		"en":"Emitter",
+		"ru":"Излучатель",
+		"fr":"Émetteur",
+		"it":"Emettitore"
+	},
+	"Renderer":{
+		"en":"Renderer",
+		"ru":"Рендерер",
+		"fr":"Renderer",
+		"it":"Renderer"
+	},
+	"Please, use only nodes with one StaticModel for instansing":{
+		"en":"Please, use only nodes with one StaticModel for instansing",
+		"ru":"Пожалуйста, используйте только ноду с одной статической моделью для инстансинга",
+		"fr":"S'il-vous-plaît, n'utilisez qu'un seul modèle statique par node pour l'instantiation",
+		"it":"Si prega di utilizzare i nodi solo con un StaticModel per instanza"
+	},
+	"  CameraFlyMode: ":{
+		"en":"  CameraFlyMode: ",
+		"ru":"  Камера в режиме полета: ",
+		"fr":"  Mode vol caméra: ",
+		"it":"  Modalità volo camera: "
+	},
+	"Light color":{
+		"en":"Light color",
+		"ru":"Цвет источника света",
+		"fr":"Couleur de la lumière",
+		"it":"Colore luce"
+	},
+	"Specular intensity":{
+		"en":"Specular intensity",
+		"ru":"Интенсивность бликов",
+		"fr":"Intensité spéculaire",
+		"it":"Intensità speculare"
+	},
+	"Brightness multiplier":{
+		"en":"Brightness multiplier",
+		"ru":"Мультипликатор яркости",
+		"fr":"Multiplicateur de luminosité",
+		"it":"Moltiplicatore luminosità"
+	},
+	"Ambient color":{
+		"en":"Ambient color",
+		"ru":"Цвет окружения",
+		"fr":"Couleur ambiante",
+		"it":"Colore ambiente"
+	},
+	"Fog color":{
+		"en":"Fog color",
+		"ru":"Цвет тумана",
+		"fr":"Couleur du brouillard",
+		"it":"Colore nebbia"
+	},
+	"Move to layer":{
+		"en":"Move to layer",
+		"ru":"Переместить на слой",
+		"fr":"Déplacer sur un calque",
+		"it":"Sposta allo strato"
+	},
+	"Smart Duplicate":{
+		"en":"Smart Duplicate",
+		"ru":"Дублирование со смещением",
+		"fr":"Duplication intelligente",
+		"it":"Duplicazione intelligente"
+	},
+	"View closer":{
+		"en":"View closer",
+		"ru":"Показать поближе",
+		"fr":"Voir plus près",
+		"it":"Visualizza più da vicino"
+	},
+	"Color wheel":{
+		"en":"Color wheel",
+		"ru":"Цветовое колесо",
+		"fr":"Palette de couleurs",
+		"it":"Ruota dei colori"
+	},
+	"Diffuse color":{
+		"en":"Diffuse color",
+		"ru":"Диффузный цвет",
+		"fr":"Couleur diffuse",
+		"it":"Colore diffuso"
+	},
+	"Specular color":{
+		"en":"Specular color",
+		"ru":"Цвет бликов",
+		"fr":"Couleur spéculaire",
+		"it":"Colore speculare"
+	},
+	"Emissive color":{
+		"en":"Emissive color",
+		"ru":"Цвет самосвечения",
+		"fr":"Couleur émissive",
+		"it":"Colore emissivo"
+	},
+	"Environment map color":{
+		"en":"Environment map color",
+		"ru":"Цвет карты окружения",
+		"fr":"Couleur map d'environement",
+		"it":"Colore mappa ambientale"
+	},
+	"Delete?":{
+		"en":"Delete?",
+		"ru":"Удалить?",
+		"fr":"Effacer?",
+		"it":"Elimina?"
+	},
+	"Opacity":{
+		"en":"Opacity",
+		"ru":"Непрозрачность",
+		"fr":"Opacité",
+		"it":"Opacità"
+	},
+	"Color":{
+		"en":"Color",
+		"ru":"Цвет",
+		"fr":"Couleur",
+		"it":"Colore"
+	}
+}

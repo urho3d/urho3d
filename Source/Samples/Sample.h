@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Application.h"
+#include <Urho3D/Engine/Application.h>
 
 namespace Urho3D
 {
@@ -51,7 +51,7 @@ const float TOUCH_SENSITIVITY = 2.0f;
 class Sample : public Application
 {
     // Enable type information.
-    OBJECT(Sample);
+    URHO3D_OBJECT(Sample, Application);
 
 public:
     /// Construct.

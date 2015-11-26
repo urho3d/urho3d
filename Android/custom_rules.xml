@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2008-2015 the Urho3D project.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+-->
+<project name="Urho3D_custom_rules" default="help">
+
+    <!--
+        Optionally patch assets directories to have a trailing indicator character(s) in their names for easy identification
+        The patch is done when ASSET_DIR_INDICATOR environment variable is set
+        Without the patch, the FileSystem::DirExist() reduces its accuracy and the FileSystem::ScanDir() only scans for files
+    -->
+    <property environment="env"/>
+    <condition property="patched-asset.dir" value="assets${env.ASSET_DIR_INDICATOR}" else="assets">
+        <isset property="env.ASSET_DIR_INDICATOR"/>
+    </condition>
+    <property name="asset.absolute.dir" location="${patched-asset.dir}"/>
+
+    <target name="-pre-build" if="env.ASSET_DIR_INDICATOR">
+        <delete dir="${patched-asset.dir}"/>
+        <mkdir dir="${patched-asset.dir}"/>
+        <apply executable="mkdir" dest="${patched-asset.dir}" addsourcefile="false">
+            <targetfile/>
+            <dirset dir="${asset.dir}"/>
+            <chainedmapper>
+                <regexpmapper from="(.+)" to="\1${env.ASSET_DIR_INDICATOR}"/>
+                <firstmatchmapper>
+                    <filtermapper>
+                        <replacestring from="/" to="${env.ASSET_DIR_INDICATOR}/"/>
+                    </filtermapper>
+                    <filtermapper>
+                        <replacestring from="\\" to="${env.ASSET_DIR_INDICATOR}\\"/>
+                    </filtermapper>
+                </firstmatchmapper>
+            </chainedmapper>
+        </apply>
+        <copy todir="${patched-asset.dir}">
+            <fileset dir="${asset.dir}">
+                <type type="file"/>
+            </fileset>
+            <firstmatchmapper>
+                <filtermapper>
+                    <replacestring from="/" to="${env.ASSET_DIR_INDICATOR}/"/>
+                </filtermapper>
+                <filtermapper>
+                    <replacestring from="\\" to="${env.ASSET_DIR_INDICATOR}\\"/>
+                </filtermapper>
+            </firstmatchmapper>
+        </copy>
+    </target>
+
+    <target name="-post-build" if="env.ASSET_DIR_INDICATOR">
+        <delete dir="${patched-asset.dir}"/>
+    </target>
+
+</project>

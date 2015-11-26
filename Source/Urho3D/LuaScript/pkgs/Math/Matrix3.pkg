@@ -1,0 +1,43 @@
+$#include "Math/Matrix3.h"
+
+class Matrix3
+{
+    Matrix3();
+    Matrix3(const Matrix3& matrix);
+    Matrix3(float v00, float v01, float v02,
+            float v10, float v11, float v12,
+            float v20, float v21, float v22);
+    ~Matrix3();
+
+    bool operator ==(const Matrix3& rhs) const;
+
+    Vector3 operator * (const Vector3& rhs) const;
+    Matrix3 operator + (const Matrix3& rhs) const;
+    Matrix3 operator - (const Matrix3& rhs) const;
+    Matrix3 operator * (float rhs) const;
+    Matrix3 operator * (const Matrix3& rhs) const;
+
+    void SetScale(const Vector3& scale);
+    void SetScale(float scale);
+
+    Vector3 Scale() const;
+    Matrix3 Transpose() const;
+    Matrix3 Scaled(const Vector3& scale) const;
+    bool Equals(const Matrix3& rhs) const;
+    Matrix3 Inverse() const;
+
+    String ToString() const;
+
+    float m00_ @ m00;
+    float m01_ @ m01;
+    float m02_ @ m02;
+    float m10_ @ m10;
+    float m11_ @ m11;
+    float m12_ @ m12;
+    float m20_ @ m20;
+    float m21_ @ m21;
+    float m22_ @ m22;
+
+    static const Matrix3 ZERO;
+    static const Matrix3 IDENTITY;
+};

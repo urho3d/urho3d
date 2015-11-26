@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ namespace Urho3D
 ///     - Handling keyboard to move and zoom 2D camera
 class Urho2DTileMap : public Sample
 {
-    OBJECT(Urho2DTileMap);
+    URHO3D_OBJECT(Urho2DTileMap, Sample);
 
 public:
     /// Construct.

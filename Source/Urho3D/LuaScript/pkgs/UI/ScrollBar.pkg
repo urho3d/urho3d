@@ -1,0 +1,50 @@
+$#include "UI/ScrollBar.h"
+
+class ScrollBar : public UIElement
+{
+    ScrollBar();
+    virtual ~ScrollBar();
+    
+    void SetOrientation(Orientation orientation);
+    void SetRange(float range);
+    void SetValue(float value);
+    void ChangeValue(float delta);
+    void SetScrollStep(float step);
+    void SetStepFactor(float factor);
+    void StepBack();
+    void StepForward();
+    
+    Orientation GetOrientation() const;
+    float GetRange() const;
+    float GetValue() const;
+    float GetScrollStep() const;
+    float GetStepFactor() const;
+    float GetEffectiveScrollStep() const;
+    Button* GetBackButton() const;
+    Button* GetForwardButton() const;
+    Slider* GetSlider() const;
+    
+    tolua_property__get_set Orientation orientation;
+    tolua_property__get_set float range;
+    tolua_property__get_set float value;
+    tolua_property__get_set float scrollStep;
+    tolua_property__get_set float stepFactor;
+    tolua_readonly tolua_property__get_set float effectiveScrollStep;
+    tolua_readonly tolua_property__get_set Button* backButton;
+    tolua_readonly tolua_property__get_set Button* forwardButton;
+    tolua_readonly tolua_property__get_set Slider* slider;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_ScrollBar_new00
+static int tolua_UILuaAPI_ScrollBar_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<ScrollBar>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_ScrollBar_new00_local
+static int tolua_UILuaAPI_ScrollBar_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<ScrollBar>(tolua_S);
+}
+$}

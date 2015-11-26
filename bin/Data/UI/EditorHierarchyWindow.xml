@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<element type="Window">
+	<attribute name="Name" value="HierarchyWindow" />
+	<attribute name="Layout Mode" value="Vertical" />
+	<attribute name="Layout Spacing" value="4" />
+	<attribute name="Layout Border" value="6 6 6 6" />
+	<attribute name="Resize Border" value="6 6 6 6" />
+	<attribute name="Is Movable" value="true" />
+	<attribute name="Is Resizable" value="true" />
+	<element>
+		<attribute name="Min Size" value="88 16" />
+		<attribute name="Max Size" value="2147483647 16" />
+		<attribute name="Layout Mode" value="Horizontal" />
+		<element type="Text">
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Text" value="Hierarchy" />
+			<attribute name="Auto Localizable" value="true" />
+		</element>
+		<element type="Button" style="CloseButton">
+			<attribute name="Name" value="CloseButton" />
+		</element>
+	</element>
+	<element type="BorderImage" style="EditorDivider" />
+	<element>
+		<attribute name="Min Size" value="332 17" />
+		<attribute name="Max Size" value="2147483647 17" />
+		<attribute name="Layout Spacing" value="4" />
+		<element type="Button">
+			<attribute name="Name" value="ExpandButton" />
+			<attribute name="Size" value="100 17" />
+			<attribute name="Min Size" value="100 17" />
+			<attribute name="Max Size" value="100 17" />
+			<attribute name="Layout Mode" value="Horizontal" />
+			<attribute name="Layout Border" value="1 1 1 1" />
+			<element type="Text">
+				<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Text" value="Expand" />
+				<attribute name="Text Alignment" value="Center" />
+				<attribute name="Auto Localizable" value="true" />
+			</element>
+		</element>
+		<element type="Button">
+			<attribute name="Name" value="CollapseButton" />
+			<attribute name="Position" value="104 0" />
+			<attribute name="Size" value="100 17" />
+			<attribute name="Min Size" value="100 17" />
+			<attribute name="Max Size" value="100 17" />
+			<attribute name="Layout Mode" value="Horizontal" />
+			<attribute name="Layout Border" value="1 1 1 1" />
+			<element type="Text">
+				<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Text" value="Collapse" />
+				<attribute name="Text Alignment" value="Center" />
+				<attribute name="Auto Localizable" value="true" />
+			</element>
+		</element>
+		<element type="CheckBox">
+			<attribute name="Name" value="AllCheckBox" />
+			<attribute name="Position" value="208 0" />
+			<attribute name="Size" value="45 15" />
+			<attribute name="Min Size" value="45 15" />
+			<attribute name="Max Size" value="45 15" />
+			<attribute name="Layout Border" value="5 1 1 1" />
+			<attribute name="Indent" value="1" />
+			<attribute name="Indent Spacing" value="30" />
+			<element type="Text">
+				<attribute name="Position" value="5 1" />
+				<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Text" value="All" />
+				<attribute name="Auto Localizable" value="true" />
+			</element>
+		</element>
+		<element type="CheckBox">
+			<attribute name="Name" value="ShowID" />
+			<attribute name="Position" value="258 0" />
+			<attribute name="Size" value="40 16" />
+			<attribute name="Min Size" value="40 16" />
+			<attribute name="Max Size" value="40 16" />
+			<attribute name="Layout Border" value="5 0 0 0" />
+			<attribute name="Indent" value="1" />
+			<attribute name="Indent Spacing" value="25" />
+			<attribute name="Is Checked" value="true" />
+			<element type="Text">
+				<attribute name="Position" value="5 0" />
+				<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+				<attribute name="Text" value="ID" />
+			</element>
+		</element>
+		<element type="Button">
+			<attribute name="Name" value="ResetButton" />
+			<attribute name="Position" value="308 0" />
+			<attribute name="Min Size" value="16 16" />
+			<attribute name="Max Size" value="16 16" />
+			<attribute name="Image Rect" value="242 1 4 4" />
+			<attribute name="Pressed Image Offset" value="0 0" />
+			<element type="BorderImage">
+				<attribute name="Size" value="16 16" />
+				<attribute name="Min Size" value="16 16" />
+				<attribute name="Max Size" value="16 16" />
+				<attribute name="Image Rect" value="192 64 16 16" />
+			</element>
+		</element>
+	</element>
+	<element type="ListView" style="HierarchyListView">
+		<attribute name="Name" value="HierarchyList" />
+		<attribute name="Scroll Snap Epsilon" value="1e-006" />
+		<attribute name="Highlight Mode" value="Always" />
+		<attribute name="Multiselect" value="true" />
+		<element type="ScrollBar" internal="true" style="none">
+			<attribute name="Size" value="332 16" />
+			<element type="Button" internal="true" style="none" />
+			<element type="Slider" internal="true" style="none">
+				<attribute name="Position" value="16 0" />
+				<attribute name="Size" value="300 16" />
+				<element type="BorderImage" internal="true" style="none" />
+			</element>
+			<element type="Button" internal="true" style="none">
+				<attribute name="Position" value="316 0" />
+			</element>
+		</element>
+		<element type="ScrollBar" internal="true" style="none">
+			<attribute name="Size" value="16 394" />
+			<element type="Button" internal="true" style="none" />
+			<element type="Slider" internal="true" style="none">
+				<attribute name="Position" value="0 16" />
+				<attribute name="Size" value="16 362" />
+				<element type="BorderImage" internal="true" style="none" />
+			</element>
+			<element type="Button" internal="true" style="none">
+				<attribute name="Position" value="0 378" />
+			</element>
+		</element>
+		<element type="BorderImage" internal="true" style="none">
+			<element type="HierarchyContainer" internal="true" style="HierarchyContainer" />
+		</element>
+		<element internal="true" style="none" />
+	</element>
+</element>

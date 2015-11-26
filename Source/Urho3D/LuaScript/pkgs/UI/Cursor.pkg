@@ -1,0 +1,50 @@
+$#include "UI/Cursor.h"
+
+enum CursorShape
+{
+    CS_NORMAL = 0,
+    CS_IBEAM,
+    CS_CROSS,
+    CS_RESIZEVERTICAL,
+    CS_RESIZEDIAGONAL_TOPRIGHT,
+    CS_RESIZEHORIZONTAL,
+    CS_RESIZEDIAGONAL_TOPLEFT,
+    CS_RESIZE_ALL,
+    CS_ACCEPTDROP,
+    CS_REJECTDROP,
+    CS_BUSY,
+    CS_BUSY_ARROW,
+    CS_MAX_SHAPES
+};
+
+class Cursor : public BorderImage
+{
+    Cursor();
+    virtual ~Cursor();
+
+    void DefineShape(const String shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
+    void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
+    
+    void SetShape(CursorShape shape);
+    void SetShape(const String shape);
+    void SetUseSystemShapes(bool enable);
+    String GetShape() const;
+    bool GetUseSystemShapes() const;
+
+    tolua_property__get_set String shape;
+    tolua_property__get_set bool useSystemShapes;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_Cursor_new00
+static int tolua_UILuaAPI_Cursor_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Cursor>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_Cursor_new00_local
+static int tolua_UILuaAPI_Cursor_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Cursor>(tolua_S);
+}
+$}

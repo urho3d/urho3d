@@ -16,10 +16,13 @@
 /** @file Lockable.h
 	@brief The Lock<T> and Lockable<T> template classes. */
 
+// Modified by Lasse Oorni for Urho3D
+
 #ifdef KNET_USE_BOOST
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/thread.hpp>
-#elif defined(WIN32)
+#elif defined(_WIN32)
+// Urho3D: windows.h in lowercase to fix MinGW cross-compiling on a case-sensitive system
 #include <windows.h>
 #else
 #include <pthread.h>
@@ -62,6 +65,7 @@ public:
 		value = rhs.value;
 
 		rhs.TearDown();
+		return *this;       // Urho3D
 	}
 
 	~Lock()
@@ -117,6 +121,7 @@ public:
 		value = rhs.value;
 
 		rhs.TearDown();
+		return *this;       // Urho3D
 	}
 
 	~ConstLock()
@@ -149,7 +154,7 @@ public:
 	Lockable()
 	{
 #ifndef KNET_USE_BOOST
-#ifdef WIN32
+#ifdef _WIN32
 		InitializeCriticalSection(&lockObject);
 #else
 		pthread_mutexattr_t attr;
@@ -171,7 +176,7 @@ public:
 	:value(value_)
 	{
 #ifndef KNET_USE_BOOST
-#ifdef WIN32
+#ifdef _WIN32
 		InitializeCriticalSection(&lockObject);
 #else
 		pthread_mutexattr_t attr;
@@ -185,7 +190,7 @@ public:
 	~Lockable()
 	{
 #ifndef KNET_USE_BOOST
-#ifdef WIN32
+#ifdef _WIN32
 		DeleteCriticalSection(&lockObject);
 #else
 		pthread_mutex_destroy(&mutex);
@@ -208,7 +213,7 @@ public:
 	{
 #ifdef KNET_USE_BOOST
 		boostMutex.lock();
-#elif defined(WIN32)
+#elif defined(_WIN32)
 		EnterCriticalSection(&lockObject);
 #else
 		pthread_mutex_lock(&mutex);
@@ -220,7 +225,7 @@ public:
 	{
 #ifdef KNET_USE_BOOST
 		boostMutex.lock();
-#elif defined(WIN32)
+#elif defined(_WIN32)
 		EnterCriticalSection(&lockObject);
 #else
 		pthread_mutex_lock(&mutex);
@@ -232,7 +237,7 @@ public:
 	{
 #ifdef KNET_USE_BOOST
 		boostMutex.unlock();
-#elif defined(WIN32)
+#elif defined(_WIN32)
 		LeaveCriticalSection(&lockObject);
 #else
 		pthread_mutex_unlock(&mutex);
@@ -269,7 +274,7 @@ public:
 
 #ifdef KNET_USE_BOOST
 	mutable boost::recursive_mutex boostMutex;
-#elif defined(WIN32)
+#elif defined(_WIN32)
 	mutable CRITICAL_SECTION lockObject;
 #else
 	mutable pthread_mutex_t mutex;

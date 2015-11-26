@@ -1,6 +1,0 @@
-$pfile "Navigation/Navigable.pkg"
-$pfile "Navigation/NavigationMesh.pkg"
-$pfile "Navigation/OffMeshConnection.pkg"
-
-$using namespace Urho3D;
-$#pragma warning(disable:4800)

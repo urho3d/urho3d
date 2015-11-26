@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,30 @@
 // THE SOFTWARE.
 //
 
-#include "Camera.h"
-#include "CollisionBox2D.h"
-#include "CollisionEdge2D.h"
-#include "ConstraintRevolute2D.h"
-#include "ConstraintRope2D.h"
-#include "CoreEvents.h"
-#include "DebugRenderer.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "Octree.h"
-#include "PhysicsWorld2D.h"
-#include "Renderer.h"
-#include "RigidBody2D.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "Text.h"
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Graphics/DebugRenderer.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Scene/SceneEvents.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/Urho2D/CollisionBox2D.h>
+#include <Urho3D/Urho2D/CollisionEdge2D.h>
+#include <Urho3D/Urho2D/ConstraintRevolute2D.h>
+#include <Urho3D/Urho2D/ConstraintRope2D.h>
+#include <Urho3D/Urho2D/PhysicsWorld2D.h>
+#include <Urho3D/Urho2D/RigidBody2D.h>
+
 #include "Urho2DPhysicsRope.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(Urho2DPhysicsRope)
+URHO3D_DEFINE_APPLICATION_MAIN(Urho2DPhysicsRope)
 
 static const unsigned NUM_OBJECTS = 10;
 
@@ -84,6 +85,7 @@ void Urho2DPhysicsRope::CreateScene()
 
     Graphics* graphics = GetSubsystem<Graphics>();
     camera->SetOrthoSize((float)graphics->GetHeight() * 0.05f);
+    camera->SetZoom(1.5f * Min((float)graphics->GetWidth() / 1280.0f, (float)graphics->GetHeight() / 800.0f)); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.5) is set for full visibility at 1280x800 resolution)
 
     // Create 2D physics world component
     PhysicsWorld2D* physicsWorld = scene_->CreateComponent<PhysicsWorld2D>();
@@ -207,7 +209,7 @@ void Urho2DPhysicsRope::MoveCamera(float timeStep)
 void Urho2DPhysicsRope::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Urho2DPhysicsRope, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Urho2DPhysicsRope, HandleUpdate));
 
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent(E_SCENEUPDATE);

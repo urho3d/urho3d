@@ -1,0 +1,130 @@
+$#include "Graphics/RenderPath.h"
+
+enum RenderCommandType
+{
+    CMD_NONE = 0,
+    CMD_CLEAR,
+    CMD_SCENEPASS,
+    CMD_QUAD,
+    CMD_FORWARDLIGHTS,
+    CMD_LIGHTVOLUMES,
+    CMD_RENDERUI
+};
+
+enum RenderCommandSortMode
+{
+    SORT_FRONTTOBACK = 0,
+    SORT_BACKTOFRONT
+};
+
+enum RenderTargetSizeMode
+{
+    SIZE_ABSOLUTE = 0,
+    SIZE_VIEWPORTDIVISOR,
+    SIZE_VIEWPORTMULTIPLIER
+};
+
+struct RenderTargetInfo
+{
+    RenderTargetInfo();
+
+    void Load(const XMLElement& element);
+
+    String name_ @ name;
+    String tag_ @ tag;
+    unsigned format_ @ format;
+    Vector2 size_ @ size;
+    RenderTargetSizeMode sizeMode_ @ sizeMode;
+    bool enabled_ @ enabled;
+    bool cubemap_ @ cubemap;
+    bool filtered_ @ filtered;
+    bool sRGB_ @ sRGB;
+    bool persistent_ @ persistent;
+};
+
+struct RenderPathCommand
+{
+    RenderPathCommand();
+    
+    void Load(const XMLElement& element);
+    void SetTextureName(TextureUnit unit, const String name);
+    void SetShaderParameter(const String name, const Variant& value);
+    void RemoveShaderParameter(const String name);
+    void SetNumOutputs(unsigned num);
+    void SetOutput(unsigned index, const String name, CubeMapFace face);
+    void SetOutputName(unsigned index, const String name);
+    void SetOutputFace(unsigned index, CubeMapFace face);
+    void SetDepthStencilName(const String name);
+
+    const String GetTextureName(TextureUnit unit) const;
+    const Variant& GetShaderParameter(const String name) const;
+    unsigned GetNumOutputs() const;
+    const String GetOutputName(unsigned index) const;
+    CubeMapFace GetOutputFace(unsigned index) const;
+    const String GetDepthStencilName() const;
+
+    String tag_ @ tag;
+    RenderCommandType type_ @ type;
+    RenderCommandSortMode sortMode_ @ sortMode;
+    String pass_ @ pass;
+    String metadata_ @ metadata;
+    String vertexShaderName_ @ vertexShaderName;
+    String pixelShaderName_ @ pixelShaderName;
+    String vertexShaderDefines_ @ vertexShaderDefines;
+    String pixelShaderDefines_ @ pixelShaderDefines;
+    unsigned clearFlags_ @ clearFlags;
+    Color clearColor_ @ clearColor;
+    float clearDepth_ @ clearDepth;
+    unsigned clearStencil_ @ clearStencil;
+    BlendMode blendMode_ @ blendMode;
+    bool enabled_ @ enabled;
+    bool useFogColor_ @ useFogColor;
+    bool markToStencil_ @ markToStencil;
+    bool useLitBase_ @ useLitBase;
+    bool vertexLights_ @ vertexLights;
+};
+
+class RenderPath
+{
+    // SharedPtr<RenderPath> Clone();
+    tolua_outside RenderPath* RenderPathClone @ Clone();
+
+    bool Load(XMLFile* file);
+    bool Append(XMLFile* file);
+
+    void SetEnabled(const String tag, bool active);
+    void ToggleEnabled(const String tag);
+    void SetRenderTarget(unsigned index, const RenderTargetInfo& info);
+    void AddRenderTarget(const RenderTargetInfo& info);
+
+    void RemoveRenderTarget(const String name);
+    void RemoveRenderTarget(unsigned index);
+    void RemoveRenderTargets(const String tag);
+    
+    void SetCommand(unsigned index, const RenderPathCommand& command);
+    void AddCommand(const RenderPathCommand& command);
+    void InsertCommand(unsigned index, const RenderPathCommand& command);
+    void RemoveCommand(unsigned index);
+
+    void RemoveCommands(const String tag);
+    void SetShaderParameter(const String name, const Variant& value);
+
+    unsigned GetNumRenderTargets() const;
+    unsigned GetNumCommands() const;
+    RenderPathCommand* GetCommand(unsigned index); 
+    const Variant& GetShaderParameter(const String name) const;
+};
+
+${
+static RenderPath* RenderPathClone(RenderPath* renderPath)
+{
+    if (!renderPath)
+        return 0;
+    
+    SharedPtr<RenderPath> clonedRenderPathPtr = renderPath->Clone();
+    RenderPath* clonedRenderPath = clonedRenderPathPtr.Get();
+    clonedRenderPathPtr.Detach();
+    
+    return clonedRenderPath;
+}
+$}

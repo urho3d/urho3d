@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,25 +20,25 @@
 // THE SOFTWARE.
 //
 
-#include "Context.h"
-#include "Engine.h"
-#include "File.h"
-#include "FileSystem.h"
-#include "Log.h"
-#include "ProcessUtils.h"
-#include "ResourceCache.h"
-#include "Script.h"
-#include "ScriptFile.h"
+#include <Urho3D/AngelScript/Script.h>
+#include <Urho3D/AngelScript/ScriptFile.h>
+#include <Urho3D/Core/Context.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/IO/File.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/IO/Log.h>
+#include <Urho3D/Resource/ResourceCache.h>
 
 #ifdef URHO3D_LUA
-#include "LuaScript.h"
+#include <Urho3D/LuaScript/LuaScript.h>
 #endif
 
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 using namespace Urho3D;
 
@@ -53,11 +53,12 @@ int main(int argc, char** argv)
     #endif
 
     bool dumpApiMode = false;
+    String sourceTree;
     String outputFile;
 
     if (arguments.Size() < 1)
         ErrorExit("Usage: ScriptCompiler <input file> [resource path for includes]\n"
-                  "       ScriptCompiler -dumpapi <Doxygen output file> [C header output file]");
+                  "       ScriptCompiler -dumpapi <source tree> <Doxygen output file> [C header output file]");
     else
     {
         if (arguments[0] != "-dumpapi")
@@ -65,15 +66,20 @@ int main(int argc, char** argv)
         else
         {
             dumpApiMode = true;
-            if (arguments.Size() > 1)
-                outputFile = arguments[1];
+            if (arguments.Size() > 2)
+            {
+                sourceTree = arguments[1];
+                outputFile = arguments[2];
+            }
+            else
+                ErrorExit("Usage: ScriptCompiler -dumpapi <source tree> <Doxygen output file> [C header output file]");
         }
     }
 
     SharedPtr<Context> context(new Context());
     SharedPtr<Engine> engine(new Engine(context));
     context->RegisterSubsystem(new Script(context));
-    
+
     // In API dumping mode initialize the engine and instantiate LuaScript system if available so that we
     // can dump attributes from as many classes as possible
     if (dumpApiMode)
@@ -82,12 +88,14 @@ int main(int argc, char** argv)
         engineParameters["Headless"] = true;
         engineParameters["WorkerThreads"] = false;
         engineParameters["LogName"] = String::EMPTY;
+        engineParameters["ResourcePaths"] = String::EMPTY;
+        engineParameters["AutoloadPaths"] = String::EMPTY;
         engine->Initialize(engineParameters);
     #ifdef URHO3D_LUA
         context->RegisterSubsystem(new LuaScript(context));
     #endif
     }
-    
+
     Log* log = context->GetSubsystem<Log>();
     // Register Log subsystem manually if compiled without logging support
     if (!log)
@@ -130,14 +138,14 @@ int main(int argc, char** argv)
             log->Open(outputFile);
         }
         // If without output file, dump to stdout instead
-        context->GetSubsystem<Script>()->DumpAPI(DOXYGEN);
+        context->GetSubsystem<Script>()->DumpAPI(DOXYGEN, sourceTree);
 
         // Only dump API as C Header when an output file name is explicitly given
-        if (arguments.Size() > 2)
+        if (arguments.Size() > 3)
         {
-            outputFile = arguments[2];
+            outputFile = arguments[3];
             log->Open(outputFile);
-            context->GetSubsystem<Script>()->DumpAPI(C_HEADER);
+            context->GetSubsystem<Script>()->DumpAPI(C_HEADER, sourceTree);
         }
     }
 

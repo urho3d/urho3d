@@ -1,0 +1,58 @@
+$#include "Physics/CollisionShape.h"
+
+enum ShapeType
+{
+    SHAPE_BOX = 0,
+    SHAPE_SPHERE,
+    SHAPE_STATICPLANE,
+    SHAPE_CYLINDER,
+    SHAPE_CAPSULE,
+    SHAPE_CONE,
+    SHAPE_TRIANGLEMESH,
+    SHAPE_CONVEXHULL,
+    SHAPE_TERRAIN
+};
+
+class CollisionShape : public Component
+{
+    void SetBox(const Vector3& size, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetSphere(float diameter, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetStaticPlane(const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCylinder(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCapsule(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCone(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetTriangleMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCustomTriangleMesh(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetConvexHull(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetTerrain(unsigned lodLevel = 0);
+    void SetShapeType(ShapeType type);
+    void SetSize(const Vector3& size);
+    void SetPosition(const Vector3& position);
+    void SetRotation(const Quaternion& rotation);
+    void SetTransform(const Vector3& position, const Quaternion& rotation);
+    void SetMargin(float margin);
+    void SetModel(Model* model);
+    void SetLodLevel(unsigned lodLevel);
+
+    PhysicsWorld* GetPhysicsWorld() const;
+    ShapeType GetShapeType() const;
+    const Vector3& GetSize() const;
+    const Vector3& GetPosition() const;
+    const Quaternion& GetRotation() const;
+    float GetMargin() const;
+    Model* GetModel() const;
+    unsigned GetLodLevel() const;
+    BoundingBox GetWorldBoundingBox() const;
+
+    tolua_readonly tolua_property__get_set PhysicsWorld* physicsWorld;
+    tolua_property__get_set ShapeType shapeType;
+    tolua_property__get_set Vector3& size;
+    tolua_property__get_set Vector3& position;
+    tolua_property__get_set Quaternion& rotation;
+    tolua_property__get_set float margin;
+    tolua_property__get_set Model* model;
+    tolua_property__get_set unsigned lodLevel;
+    tolua_readonlytolua_property__get_set BoundingBox worldBoundingBox;
+    tolua_property__get_set ResourceRef modelAttr;
+};

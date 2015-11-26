@@ -1,0 +1,99 @@
+$#include "UI/Text3D.h"
+
+// Duplicated here from GraphicsDefs.pkg to so that enum is bound correctly to Text3D
+enum FaceCameraMode
+{
+    FC_NONE = 0,
+    FC_ROTATE_XYZ,
+    FC_ROTATE_Y,
+    FC_LOOKAT_XYZ,
+    FC_LOOKAT_Y
+};
+
+class Text3D : public Drawable
+{
+    Text3D();
+    ~Text3D();
+    
+    bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    
+    void SetMaterial(Material* material);
+    
+    void SetText(const String text);
+    
+    void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign);
+    void SetHorizontalAlignment(HorizontalAlignment align);
+    void SetVerticalAlignment(VerticalAlignment align);
+    void SetTextAlignment(HorizontalAlignment align);
+    void SetRowSpacing(float spacing);
+    void SetWordwrap(bool enable);
+    void SetTextEffect(TextEffect textEffect);
+    void SetEffectColor(const Color& effectColor);
+    void SetEffectDepthBias(float bias);
+    void SetWidth(int width);
+    void SetColor(const Color& color);
+    void SetColor(Corner corner, const Color& color);
+    void SetOpacity(float opacity);
+    void SetFaceCameraMode(FaceCameraMode mode);
+    
+    Font* GetFont() const;
+    Material* GetMaterial() const;
+    int GetFontSize() const;
+    const String GetText() const;
+    HorizontalAlignment GetTextAlignment() const;
+    HorizontalAlignment GetHorizontalAlignment() const;
+    VerticalAlignment GetVerticalAlignment() const;
+    float GetRowSpacing() const;
+    bool GetWordwrap() const;
+    TextEffect GetTextEffect() const;
+    const Color& GetEffectColor() const;
+    float GetEffectDepthBias() const;
+    int GetWidth() const;
+    int GetRowHeight() const;
+    unsigned GetNumRows() const;
+    unsigned GetNumChars() const;
+    int GetRowWidth(unsigned index) const;
+    IntVector2 GetCharPosition(unsigned index);
+    IntVector2 GetCharSize(unsigned index);
+    const Color& GetColor(Corner corner) const;
+    float GetOpacity() const;
+    FaceCameraMode GetFaceCameraMode() const;
+    
+    tolua_property__get_set Font* font;
+    tolua_property__get_set Material* material;
+    tolua_readonly tolua_property__get_set int fontSize;
+    tolua_property__get_set String text;
+    tolua_property__get_set HorizontalAlignment textAlignment;
+    tolua_property__get_set HorizontalAlignment horizontalAlignment;
+    tolua_property__get_set VerticalAlignment verticalAlignment;
+    tolua_property__get_set float rowSpacing;
+    tolua_property__get_set bool wordwrap;
+    tolua_property__get_set TextEffect textEffect;
+    tolua_property__get_set Color& effectColor;
+    tolua_property__get_set float effectDepthBias;
+    tolua_property__get_set int width;
+    tolua_property__get_set Color& color; // Write only property.
+    tolua_readonly tolua_property__get_set int rowHeight;
+    tolua_readonly tolua_property__get_set unsigned numRows;
+    tolua_readonly tolua_property__get_set unsigned numChars;
+    tolua_property__get_set float opacity;
+    tolua_property__get_set FaceCameraMode faceCameraMode;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_Text3D_new00
+static int tolua_UILuaAPI_Text3D_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Text3D>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_Text3D_new00_local
+static int tolua_UILuaAPI_Text3D_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Text3D>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_Text3D_color_ref
+#define tolua_get_Text3D_color_ref NULL
+$}

@@ -1,0 +1,21 @@
+<renderpath>
+    <rendertarget name="light" sizedivisor="1 1"  format="rgba" />
+    <rendertarget name="normal" sizedivisor="1 1" format="rgba" />
+    <rendertarget name="depth" sizedivisor="1 1"  format="readabledepth" />
+    <command type="clear" color="fog" depth="1.0" stencil="0" depthstencil="depth" />
+    <command type="scenepass" pass="prepass" marktostencil="true" metadata="gbuffer" output="normal" depthstencil="depth" />
+    <command type="clear" color="0 0 0 0" output="light" depthstencil="depth" />
+    <command type="lightvolumes" vs="PrepassLight" ps="PrepassLight" psdefines="HWDEPTH" output="light" depthstencil="depth" >
+        <texture unit="normal" name="normal" />
+        <texture unit="depth" name="depth" />
+    </command>
+    <command type="scenepass" pass="material" vertexlights="true" depthstencil="depth">
+        <texture unit="light" name="light" />
+    </command>
+    <command type="scenepass" pass="postopaque" depthstencil="depth" />
+    <command type="scenepass" pass="refract" depthstencil="depth">
+        <texture unit="environment" name="viewport" />
+    </command>
+    <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" depthstencil="depth" />
+    <command type="scenepass" pass="postalpha" sort="backtofront" depthstencil="depth" />
+</renderpath>

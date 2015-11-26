@@ -12,6 +12,8 @@
 ** enhancements, or modifications.
 */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #include "tolua++.h"
 #include "tolua_event.h"
 #include "lauxlib.h"
@@ -25,7 +27,7 @@
 /* Create metatable
 	* Create and register new metatable
 */
-static int tolua_newmetatable (lua_State* L, char* name)
+static int tolua_newmetatable (lua_State* L, const char* name)	// Urho3D - const correctness
 {
 	int r = luaL_newmetatable(L,name);
 
@@ -257,7 +259,7 @@ static int tolua_bnd_setpeer(lua_State* L) {
 		lua_pushstring(L, "Invalid argument #1 to setpeer: userdata expected.");
 		lua_error(L);
 	};
-	
+
 	if (lua_isnil(L, -1)) {
 
 		lua_pop(L, 1);
@@ -395,8 +397,7 @@ TOLUA_API void tolua_usertype (lua_State* L, const char* type)
  strncat(ctype,type,120);
 
  /* create both metatables */
- // Modified by Aster Jian for Urho3D.
- if (tolua_newmetatable(L,ctype) && tolua_newmetatable(L,(char*)type))
+ if (tolua_newmetatable(L,ctype) && tolua_newmetatable(L,type))
 	 mapsuper(L,type,ctype);             /* 'type' is also a 'const type' */
 }
 
@@ -533,7 +534,7 @@ TOLUA_API void tolua_cclass (lua_State* L, const char* lname, const char* name, 
 	mapsuper(L,name,base);
 
 	lua_pushstring(L,lname);
-	
+
 	push_collector(L, name, col);
 	/*
 	luaL_getmetatable(L,name);
@@ -542,7 +543,7 @@ TOLUA_API void tolua_cclass (lua_State* L, const char* lname, const char* name, 
 
 	lua_rawset(L,-3);
 	*/
-	
+
 	luaL_getmetatable(L,name);
 	lua_rawset(L,-3);              /* assign class metatable to module */
 
@@ -556,7 +557,7 @@ TOLUA_API void tolua_cclass (lua_State* L, const char* lname, const char* name, 
 	lua_rawset(L,-3);
 	lua_pop(L,1);
 	*/
-	
+
 
 }
 

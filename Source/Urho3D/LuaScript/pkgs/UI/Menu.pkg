@@ -1,0 +1,41 @@
+$#include "UI/Menu.h"
+
+class Menu : public Button
+{
+    Menu();
+    virtual ~Menu();
+    
+    void SetPopup(UIElement* element);
+    void SetPopupOffset(const IntVector2& offset);
+    void SetPopupOffset(int x, int y);
+    void ShowPopup(bool enable);
+    void SetAccelerator(int key, int qualifiers);
+
+    UIElement* GetPopup() const;
+    const IntVector2& GetPopupOffset() const;
+    bool GetShowPopup() const;
+    int GetAcceleratorKey() const;
+    int GetAcceleratorQualifiers() const;
+    
+    tolua_property__get_set UIElement* popup;
+    tolua_property__get_set IntVector2& popupOffset;
+    tolua_property__get_set bool showPopup;
+    tolua_readonly tolua_property__get_set int acceleratorKey;
+    tolua_readonly tolua_property__get_set int acceleratorQualifiers;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_Menu_new00
+static int tolua_UILuaAPI_Menu_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Menu>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_Menu_new00_local
+static int tolua_UILuaAPI_Menu_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Menu>(tolua_S);
+}
+
+#define SetShowPopup ShowPopup
+$}

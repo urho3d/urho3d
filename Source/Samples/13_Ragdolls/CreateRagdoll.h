@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include "CollisionShape.h"
-#include "Constraint.h"
+#include <Urho3D/Physics/CollisionShape.h>
+#include <Urho3D/Physics/Constraint.h>
 
 using namespace Urho3D;
 
 /// Custom component that creates a ragdoll upon collision.
 class CreateRagdoll : public Component
 {
-    OBJECT(CreateRagdoll);
+    URHO3D_OBJECT(CreateRagdoll, Component);
     
 public:
     /// Construct.

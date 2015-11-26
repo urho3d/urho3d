@@ -125,7 +125,7 @@ public:
 
 		//backup
 		btTransform	orgTrans = m_compoundColObjWrap->getWorldTransform();
-		btTransform	orgInterpolationTrans = m_compoundColObjWrap->getWorldTransform();
+		
 		const btTransform& childTrans = compoundShape->getChildTransform(index);
 		btTransform	newChildWorldTrans = orgTrans*childTrans ;
 
@@ -235,9 +235,12 @@ void btCompoundCollisionAlgorithm::processCollision (const btCollisionObjectWrap
 		removeChildAlgorithms();
 		
 		preallocateChildAlgorithms(body0Wrap,body1Wrap);
+		m_compoundShapeRevision = compoundShape->getUpdateRevision();
 	}
 
-
+    if (m_childCollisionAlgorithms.size()==0)
+        return;
+    
 	const btDbvt* tree = compoundShape->getDynamicAabbTree();
 	//use a dynamic aabb tree to cull potential child-overlaps
 	btCompoundLeafCallback  callback(colObjWrap,otherObjWrap,m_dispatcher,dispatchInfo,resultOut,&m_childCollisionAlgorithms[0],m_sharedManifold);
@@ -297,7 +300,7 @@ void btCompoundCollisionAlgorithm::processCollision (const btCollisionObjectWrap
 		btManifoldArray	manifoldArray;
         const btCollisionShape* childShape = 0;
         btTransform	orgTrans;
-        btTransform	orgInterpolationTrans;
+        
         btTransform	newChildWorldTrans;
         btVector3 aabbMin0,aabbMax0,aabbMin1,aabbMax1;        
         
@@ -307,8 +310,8 @@ void btCompoundCollisionAlgorithm::processCollision (const btCollisionObjectWrap
 			{
 				childShape = compoundShape->getChildShape(i);
 			//if not longer overlapping, remove the algorithm
-                orgTrans = colObjWrap->getWorldTransform();
-                orgInterpolationTrans = colObjWrap->getWorldTransform();
+				orgTrans = colObjWrap->getWorldTransform();
+                
 				const btTransform& childTrans = compoundShape->getChildTransform(i);
                 newChildWorldTrans = orgTrans*childTrans ;
 

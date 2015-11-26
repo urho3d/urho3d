@@ -16,19 +16,23 @@
 /** @file Thread.h
 	@brief The Thread class. Implements threading either using Boost, native Win32 or pthreads constructs. */
 
+// Modified by Lasse Oorni for Urho3D
+
 #include <string>
 
 #ifdef KNET_USE_BOOST
 #include <boost/thread.hpp>
 #else
 
-#ifdef WIN32
+// Urho3D: include Event.h first to make sure WS2Include.h is included before windows.h / winsock.h
+#include "Event.h"
+
+#ifdef _WIN32
+// Urho3D: windows.h in lowercase to fix MinGW cross-compiling on a case-sensitive system
 #include <windows.h>
 #else
 #include <pthread.h>
 #endif
-
-#include "Event.h"
 
 namespace kNet
 {
@@ -39,7 +43,6 @@ typedef void (*ThreadEntryFunc)(void *threadStartData);
 
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
-#include "kNetBuildConfig.h"
 #include "SharedPtr.h"
 
 namespace kNet
@@ -47,7 +50,7 @@ namespace kNet
 
 #if defined(KNET_USE_BOOST) && defined(KNET_ENABLE_WINXP_SUPPORT)
 typedef boost::thread::id ThreadId;
-#elif defined(WIN32)
+#elif defined(_WIN32)
 typedef DWORD ThreadId; // Don't use boost::thread::id on Windows even if KNET_USE_BOOST is #defined, since it has issues identifying threads across dll boundaries.
 #elif defined(KNET_USE_BOOST)
 typedef boost::thread::id ThreadId;
@@ -199,7 +202,7 @@ private:
 
 #ifdef KNET_USE_BOOST
 	boost::thread thread;
-#elif defined(WIN32)
+#elif defined(_WIN32)
 	HANDLE threadHandle;
 	ThreadId threadId;
 

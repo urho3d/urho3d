@@ -12,6 +12,8 @@
 ** enhancements, or modifications.
 */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #include "tolua++.h"
 #include "lauxlib.h"
 
@@ -230,9 +232,7 @@ TOLUA_API int tolua_isnumber (lua_State* L, int lo, int def, tolua_Error* err)
 {
 	if (def && lua_gettop(L)<abs(lo))
 		return 1;
-    // Modified by Aster Jian for Urho3D.
-    // if (lua_isnumber(L,lo))
-    if (lua_type(L, lo) == LUA_TNUMBER)
+    if (lua_isnumber(L,lo))
 		return 1;
 	err->index = lo;
 	err->array = 0;
@@ -244,9 +244,7 @@ TOLUA_API int tolua_isstring (lua_State* L, int lo, int def, tolua_Error* err)
 {
     if (def && lua_gettop(L)<abs(lo))
         return 1;
-    // Modified by Aster Jian for Urho3D.
-    // if (lua_isnil(L,lo) || lua_isstring(L,lo))
-    if (lua_isnil(L,lo) || lua_type(L,lo) == LUA_TSTRING)
+    if (lua_isnil(L,lo) || lua_isstring(L,lo))
         return 1;
     err->index = lo;
     err->array = 0;
@@ -297,7 +295,7 @@ TOLUA_API int tolua_isvaluenil (lua_State* L, int lo, tolua_Error* err) {
 		return 0; /* somebody else should chack this */
 	if (!lua_isnil(L, lo))
 		return 0;
-	
+
 	err->index = lo;
 	err->array = 0;
 	err->type = "value";
@@ -343,6 +341,8 @@ TOLUA_API int tolua_isbooleanarray
 	else
 	{
 		int i;
+		if (dim == -1)		// Urho3D - auto detect the array size if -1 is given
+			dim = (int)lua_objlen(L, lo);
 		for (i=1; i<=dim; ++i)
 		{
 			lua_pushnumber(L,i);
@@ -370,6 +370,8 @@ TOLUA_API int tolua_isnumberarray
 	else
 	{
 		int i;
+		if (dim == -1)		// Urho3D - auto detect the array size if -1 is given
+			dim = (int)lua_objlen(L, lo);
 		for (i=1; i<=dim; ++i)
 		{
 			lua_pushnumber(L,i);
@@ -397,6 +399,8 @@ TOLUA_API int tolua_isstringarray
 	else
 	{
 		int i;
+		if (dim == -1)		// Urho3D - auto detect the array size if -1 is given
+			dim = (int)lua_objlen(L, lo);
 		for (i=1; i<=dim; ++i)
 		{
 			lua_pushnumber(L,i);
@@ -424,6 +428,8 @@ TOLUA_API int tolua_istablearray
 	else
 	{
 		int i;
+		if (dim == -1)		// Urho3D - auto detect the array size if -1 is given
+			dim = (int)lua_objlen(L, lo);
 		for (i=1; i<=dim; ++i)
 		{
 			lua_pushnumber(L,i);
@@ -451,6 +457,8 @@ TOLUA_API int tolua_isuserdataarray
 	else
 	{
 		int i;
+		if (dim == -1)		// Urho3D - auto detect the array size if -1 is given
+			dim = (int)lua_objlen(L, lo);
 		for (i=1; i<=dim; ++i)
 		{
 			lua_pushnumber(L,i);
@@ -478,11 +486,13 @@ TOLUA_API int tolua_isusertypearray
 	else
 	{
 		int i;
+		if (dim == -1)		// Urho3D - auto detect the array size if -1 is given
+			dim = (int)lua_objlen(L, lo);
 		for (i=1; i<=dim; ++i)
 		{
 			lua_pushnumber(L,i);
 			lua_gettable(L,lo);
-	  if (!(lua_isnil(L,-1) || lua_isuserdata(L,-1)) &&
+	  if (!(lua_isnil(L,-1) || lua_isusertype(L,-1, type)) &&	// Urho3D - bug fix to check user type instead of user data
 			    !(def && lua_isnil(L,-1))
 						)
 			{

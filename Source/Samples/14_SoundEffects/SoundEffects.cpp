@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,24 +20,25 @@
 // THE SOFTWARE.
 //
 
-#include "Audio.h"
-#include "Button.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Input.h"
-#include "Log.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "Slider.h"
-#include "Sound.h"
-#include "SoundSource.h"
-#include "Text.h"
-#include "UI.h"
-#include "UIEvents.h"
+#include <Urho3D/Audio/Audio.h>
+#include <Urho3D/Audio/AudioEvents.h>
+#include <Urho3D/Audio/Sound.h>
+#include <Urho3D/Audio/SoundSource.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/IO/Log.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/UI/Button.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/UI/Slider.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/UI.h>
+#include <Urho3D/UI/UIEvents.h>
 
 #include "SoundEffects.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 // Custom variable identifier for storing sound effect name within the UI element
 static const StringHash VAR_SOUNDRESOURCE("SoundResource");
@@ -55,11 +56,18 @@ static String soundResourceNames[] = {
     "Sounds/Powerup.wav"
 };
 
-DEFINE_APPLICATION_MAIN(SoundEffects)
+URHO3D_DEFINE_APPLICATION_MAIN(SoundEffects)
 
 SoundEffects::SoundEffects(Context* context) :
     Sample(context)
 {
+}
+
+void SoundEffects::Setup()
+{
+    // Modify engine startup parameters
+    Sample::Setup();
+    engineParameters_["Sound"] = true;
 }
 
 void SoundEffects::Start()
@@ -78,39 +86,39 @@ void SoundEffects::CreateUI()
 {
     // Create a scene which will not be actually rendered, but is used to hold SoundSource components while they play sounds
     scene_ = new Scene(context_);
-    
+
     UIElement* root = GetSubsystem<UI>()->GetRoot();
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     XMLFile* uiStyle = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
     // Set style to the UI root so that elements will inherit it
     root->SetDefaultStyle(uiStyle);
-    
+
     // Create buttons for playing back sounds
     for (unsigned i = 0; i < NUM_SOUNDS; ++i)
     {
         Button* button = CreateButton(i * 140 + 20, 20, 120, 40, soundNames[i]);
         // Store the sound effect resource name as a custom variable into the button
         button->SetVar(VAR_SOUNDRESOURCE, soundResourceNames[i]);
-        SubscribeToEvent(button, E_PRESSED, HANDLER(SoundEffects, HandlePlaySound));
+        SubscribeToEvent(button, E_PRESSED, URHO3D_HANDLER(SoundEffects, HandlePlaySound));
     }
-    
+
     // Create buttons for playing/stopping music
     Button* button = CreateButton(20, 80, 120, 40, "Play Music");
-    SubscribeToEvent(button, E_RELEASED, HANDLER(SoundEffects, HandlePlayMusic));
-    
+    SubscribeToEvent(button, E_RELEASED, URHO3D_HANDLER(SoundEffects, HandlePlayMusic));
+
     button = CreateButton(160, 80, 120, 40, "Stop Music");
-    SubscribeToEvent(button, E_RELEASED, HANDLER(SoundEffects, HandleStopMusic));
-    
+    SubscribeToEvent(button, E_RELEASED, URHO3D_HANDLER(SoundEffects, HandleStopMusic));
+
     Audio* audio = GetSubsystem<Audio>();
-    
+
     // Create sliders for controlling sound and music master volume
     Slider* slider = CreateSlider(20, 140, 200, 20, "Sound Volume");
     slider->SetValue(audio->GetMasterGain(SOUND_EFFECT));
-    SubscribeToEvent(slider, E_SLIDERCHANGED, HANDLER(SoundEffects, HandleSoundVolume));
-    
+    SubscribeToEvent(slider, E_SLIDERCHANGED, URHO3D_HANDLER(SoundEffects, HandleSoundVolume));
+
     slider = CreateSlider(20, 200, 200, 20, "Music Volume");
     slider->SetValue(audio->GetMasterGain(SOUND_MUSIC));
-    SubscribeToEvent(slider, E_SLIDERCHANGED, HANDLER(SoundEffects, HandleMusicVolume));
+    SubscribeToEvent(slider, E_SLIDERCHANGED, URHO3D_HANDLER(SoundEffects, HandleMusicVolume));
 }
 
 Button* SoundEffects::CreateButton(int x, int y, int xSize, int ySize, const String& text)
@@ -118,18 +126,18 @@ Button* SoundEffects::CreateButton(int x, int y, int xSize, int ySize, const Str
     UIElement* root = GetSubsystem<UI>()->GetRoot();
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Font* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
-    
+
     // Create the button and center the text onto it
     Button* button = root->CreateChild<Button>();
     button->SetStyleAuto();
     button->SetPosition(x, y);
     button->SetSize(xSize, ySize);
-    
+
     Text* buttonText = button->CreateChild<Text>();
     buttonText->SetAlignment(HA_CENTER, VA_CENTER);
     buttonText->SetFont(font, 12);
     buttonText->SetText(text);
-    
+
     return button;
 }
 
@@ -138,20 +146,20 @@ Slider* SoundEffects::CreateSlider(int x, int y, int xSize, int ySize, const Str
     UIElement* root = GetSubsystem<UI>()->GetRoot();
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Font* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
-    
+
     // Create text and slider below it
     Text* sliderText = root->CreateChild<Text>();
     sliderText->SetPosition(x, y);
     sliderText->SetFont(font, 12);
     sliderText->SetText(text);
-    
+
     Slider* slider = root->CreateChild<Slider>();
     slider->SetStyleAuto();
     slider->SetPosition(x, y + 20);
     slider->SetSize(xSize, ySize);
     // Use 0-1 range for controlling sound/music master volume
     slider->SetRange(1.0f);
-    
+
     return slider;
 }
 
@@ -159,11 +167,11 @@ void SoundEffects::HandlePlaySound(StringHash eventType, VariantMap& eventData)
 {
     Button* button = static_cast<Button*>(GetEventSender());
     const String& soundResourceName = button->GetVar(VAR_SOUNDRESOURCE).GetString();
-    
+
     // Get the sound resource
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Sound* sound = cache->GetResource<Sound>(soundResourceName);
-    
+
     if (sound)
     {
         // Create a scene node with a SoundSource component for playing the sound. The SoundSource component plays
@@ -174,8 +182,11 @@ void SoundEffects::HandlePlaySound(StringHash eventType, VariantMap& eventData)
         soundSource->Play(sound);
         // In case we also play music, set the sound volume below maximum so that we don't clip the output
         soundSource->SetGain(0.75f);
-        // Set the sound component to automatically remove its scene node from the scene when the sound is done playing
-        soundSource->SetAutoRemove(true);
+
+        // Subscribe to the "sound finished" event generated by the SoundSource for removing the node once the sound has played
+        // Note: the event is sent through the Node (similar to e.g. node physics collision and animation trigger events)
+        // to not require subscribing to the particular component
+        SubscribeToEvent(soundNode, E_SOUNDFINISHED, URHO3D_HANDLER(SoundEffects, HandleSoundFinished));
     }
 }
 
@@ -184,12 +195,12 @@ void SoundEffects::HandlePlayMusic(StringHash eventType, VariantMap& eventData)
     // Check if the music player node/component already exist
     if (scene_->GetChild("Music"))
         return;
-    
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Sound* music = cache->GetResource<Sound>("Music/Ninja Gods.ogg");
     // Set the song to loop
     music->SetLooped(true);
-    
+
     // Create a scene node and a sound source for the music
     Node* musicNode = scene_->CreateChild("Music");
     SoundSource* musicSource = musicNode->CreateComponent<SoundSource>();
@@ -207,7 +218,7 @@ void SoundEffects::HandleStopMusic(StringHash eventType, VariantMap& eventData)
 void SoundEffects::HandleSoundVolume(StringHash eventType, VariantMap& eventData)
 {
     using namespace SliderChanged;
-    
+
     float newVolume = eventData[P_VALUE].GetFloat();
     GetSubsystem<Audio>()->SetMasterGain(SOUND_EFFECT, newVolume);
 }
@@ -215,7 +226,16 @@ void SoundEffects::HandleSoundVolume(StringHash eventType, VariantMap& eventData
 void SoundEffects::HandleMusicVolume(StringHash eventType, VariantMap& eventData)
 {
     using namespace SliderChanged;
-    
+
     float newVolume = eventData[P_VALUE].GetFloat();
     GetSubsystem<Audio>()->SetMasterGain(SOUND_MUSIC, newVolume);
+}
+
+void SoundEffects::HandleSoundFinished(StringHash eventType, VariantMap& eventData)
+{
+    using namespace SoundFinished;
+
+    Node* soundNode = static_cast<Node*>(eventData[P_NODE].GetPtr());
+    if (soundNode)
+        soundNode->Remove();
 }

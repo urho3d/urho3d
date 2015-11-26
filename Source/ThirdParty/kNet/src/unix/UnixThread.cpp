@@ -15,6 +15,9 @@
 /** @file UnixThread.cpp
 	@brief */
 
+// Urho3D: removed the KNET_UNIX definition
+#ifndef _WIN32
+
 #include <cassert>
 #include <exception>
 
@@ -72,7 +75,7 @@ void Thread::Stop()
 	pthread_join(thread, 0);
 	thread = 0;
 
-	LOG(LogInfo, "Thread::Stop() called.");
+	KNET_LOG(LogInfo, "Thread::Stop() called.");
 
 	delete invoker;
 	invoker = 0;
@@ -84,12 +87,12 @@ void Thread::Stop()
 
 void* ThreadEntryPoint(void* data)
 {
-	LOG(LogInfo, "ThreadEntryPoint: Thread started with param 0x%p.", data);
+	KNET_LOG(LogInfo, "ThreadEntryPoint: Thread started with param 0x%p.", data);
 
 	Thread *thread = reinterpret_cast<Thread*>(data);
 	if (!thread)
 	{
-		LOG(LogError, "Invalid thread start parameter 0!");
+		KNET_LOG(LogError, "Invalid thread start parameter 0!");
 		return 0;
 	}
 	thread->_ThreadRun();
@@ -103,20 +106,20 @@ void Thread::_ThreadRun()
 	{
 		if (!threadEnabled)
 		{
-			LOG(LogError, "ThreadEntryPoint: Thread immediately requested to quit.");
+			KNET_LOG(LogError, "ThreadEntryPoint: Thread immediately requested to quit.");
 			return;
 		}
 
 		invoker->Invoke();
 	} catch(NetException &e)
 	{
-		LOG(LogError, "NetException thrown in thread: %s.", e.what());
+		KNET_LOG(LogError, "NetException thrown in thread: %s.", e.what());
 	} catch(std::exception &e)
 	{
-		LOG(LogError, "std::exception thrown in thread: %s.", e.what());
+		KNET_LOG(LogError, "std::exception thrown in thread: %s.", e.what());
 	} catch(...)
 	{
-		LOG(LogError, "Unknown exception thrown in thread.");
+		KNET_LOG(LogError, "Unknown exception thrown in thread.");
 	}
 }
 
@@ -136,7 +139,7 @@ void Thread::StartThread()
 	if (pthread_create(&thread, &type, ThreadEntryPoint, this))
 		throw NetException("Failed to create thread!");
 	else
-		LOG(LogInfo, "Thread::Run(): Thread created.");
+		KNET_LOG(LogInfo, "Thread::Run(): Thread created.");
 
     SetName("kNet Thread");
 }
@@ -163,3 +166,5 @@ ThreadId Thread::NullThreadId()
 }
 
 } // ~kNet
+
+#endif

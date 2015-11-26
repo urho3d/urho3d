@@ -1,0 +1,65 @@
+#
+# Copyright (c) 2008-2015 the Urho3D project.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
+version: '{build}'
+platform:
+  - x86
+  - x64
+configuration: Release
+clone_depth: 50
+environment:
+  SF_KEY:
+    secure: JgsjFoVAP5yjNxyS/+S+4byhtnTKCWfI3bkCmHws3P1MwSaUS5+0C6WV1pHIJTVW00Qvo3+JsgVqMYUJ7fo2m/bXvUPNCoSa4BifXZlS6bE=
+  SF_API:
+    secure: cc1q9CXo5BwIYqtgigHpkCGG90zEVM45xx/YzXTOjVp512oQNUzTJq0AmxEYXP78
+  build_tree: native-Build
+  matrix:
+    - URHO3D_LIB_TYPE: STATIC
+    - URHO3D_LIB_TYPE: SHARED
+matrix:
+  fast_finish: true
+# Uncomment the init script below in order to get the RDP connection details to login into the worker box remotely while it is running
+#init:
+# - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+install:
+  - ps: if ($env:APPVEYOR_REPO_TAG -eq "true" -or (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED)))
+        {
+          if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME } else { git fetch -q --unshallow };
+          if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC-3D11.zip" };
+          $env:PACKAGE_UPLOAD = "1";
+          choco install doxygen.portable graphviz.portable >$null;
+        }
+build_script:
+  - if "%PLATFORM%" == "x64" set "OPTS=URHO3D_64BIT=1"
+# Our free AppVeyor account is slow for normal daily CI, speed up the build a little bit by excluding Assimp and other tools in the normal build and use the Debug build configuration instead
+  - if "%PACKAGE_UPLOAD%" == "" set "OPTS=%OPTS% URHO3D_TOOLS=0" && set "Configuration=Debug"
+  - rake cmake vs2015 %OPTS% URHO3D_LIB_TYPE=%URHO3D_LIB_TYPE% URHO3D_D3D11=1 URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 URHO3D_EXTRAS=1 URHO3D_TESTING=1
+  - rake make config=%Configuration%
+# Could not run test target yet as AppVeyor does not currently allow its service to interact with desktop
+# - rake make config=%Configuration% target=RUN_TESTS
+  - if "%PACKAGE_UPLOAD%" == "1" rake ci_appveyor_package_upload
+test: off
+artifacts:
+  - path: native-Build\*.zip
+deploy: off
+
+# vi: set ts=2 sw=2 expandtab:

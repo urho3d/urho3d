@@ -56,7 +56,7 @@ void EventArray::AddEvent(const Event &e)
 {
 	if (e.IsNull())
 	{
-		LOG(LogError, "Error: Tried to add a null event to event array at index %d!", numAdded);
+		KNET_LOG(LogError, "Error: Tried to add a null event to event array at index %d!", numAdded);
 		return;
 	}
 	assert(numAdded < maxEvents);
@@ -64,7 +64,7 @@ void EventArray::AddEvent(const Event &e)
 	switch(e.Type())
 	{
 	case EventWaitInvalid:
-		LOG(LogError, "Error: Tried to add an invalid event to a wait event array!");
+		KNET_LOG(LogError, "Error: Tried to add an invalid event to a wait event array!");
 		return;
 	case EventWaitRead:
 	case EventWaitSignal:
@@ -90,7 +90,7 @@ int EventArray::Wait(int msecs)
 {
 	if (numAdded == 0)
 	{
-		LOG(LogError, "EventArray::Wait failed! Tried to wait for an empty array of events! (EventArray=0x%p)", this);
+		KNET_LOG(LogError, "EventArray::Wait failed! Tried to wait for an empty array of events! (EventArray=0x%p)", this);
 		return WaitFailed;
 	}
 
@@ -111,7 +111,7 @@ int EventArray::Wait(int msecs)
 	int ret = select(nfds, &readfds, &writefds, NULL, &tv); // http://linux.die.net/man/2/select
 	if (ret == -1)
 	{
-		LOG(LogError, "EventArray::Wait(%d, %p, %p, NULL, {%d, %d}: select() failed on an array of %d events: %s(%d)", 
+		KNET_LOG(LogError, "EventArray::Wait(%d, %p, %p, NULL, {%d, %d}: select() failed on an array of %d events: %s(%d)", 
 			(int)nfds, &readfds, &writefds, (int)tv.tv_sec, (int)tv.tv_usec,
 			numAdded,
 			strerror(errno), (int)errno);
@@ -124,7 +124,7 @@ int EventArray::Wait(int msecs)
 		return WaitTimedOut;
 	else if (ret < 0)
 	{
-		LOG(LogError, "EventArray::Wait: select() returned a negative value, which it shouldn't!");
+		KNET_LOG(LogError, "EventArray::Wait: select() returned a negative value, which it shouldn't!");
 		return WaitFailed;
 	}
 
@@ -143,7 +143,7 @@ int EventArray::Wait(int msecs)
 			break; // The dummy events are skipped over.
 		}
 
-	LOG(LogError, "EventArray::Wait error! No events were set, but select() returned a positive value!");
+	KNET_LOG(LogError, "EventArray::Wait error! No events were set, but select() returned a positive value!");
 	return WaitFailed;
 }
 

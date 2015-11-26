@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2014 the Urho3D project.
+# Copyright (c) 2008-2015 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,122 +20,15 @@
 # THE SOFTWARE.
 #
 
-# Set project name
-project (Urho3D)
-
-# Set minimum version
-cmake_minimum_required (VERSION 2.8.6)
-
-if (COMMAND cmake_policy)
-    cmake_policy (SET CMP0003 NEW)
-    if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
-        cmake_policy (SET CMP0022 NEW) # INTERFACE_LINK_LIBRARIES defines the link interface
-    endif ()
-    if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-        cmake_policy (SET CMP0026 OLD) # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
-        cmake_policy (SET CMP0042 NEW) # MACOSX_RPATH is enabled by default
-    endif ()
-endif ()
-
-# Set CMake modules search path
-set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
-
-# Include Urho3D cmake common module
-include (Urho3D-CMake-common)
-
 # Check existence of stdint.h for LibCpuId
 include (CheckIncludeFiles)
-CHECK_INCLUDE_FILES (stdint.h HAVE_STDINT_H)
+check_include_files (stdint.h HAVE_STDINT_H)
 if (HAVE_STDINT_H)
     add_definitions (-DHAVE_STDINT_H)
 endif ()
 
-# Setup SDK install destinations
-if (CMAKE_HOST_WIN32)
-    # CMake already automatically appends "Urho3D" to CMAKE_INSTALL_PREFIX on Windows platform
-    set (SCRIPT_PATTERN *.bat)
-else ()
-    set (PATH_SUFFIX /Urho3D)
-    if (URHO3D_64BIT)
-        if (NOT CMAKE_CROSSCOMPILING AND EXISTS /usr/lib64)
-            # Probably target system is a RedHat-based distro
-            set (LIB_SUFFIX 64)
-        endif ()
-    endif ()
-    if (IOS)
-        # Use 'ios' arch subdirectory to differentiate, in case both Mac OS X and iOS build are installed at the same destination
-        set (LIB_SUFFIX ${LIB_SUFFIX}/ios)
-    endif ()
-    set (SCRIPT_PATTERN *.sh)
-endif ()
-set (DEST_INCLUDE_DIR include${PATH_SUFFIX})
-set (DEST_SHARE_DIR share${PATH_SUFFIX})
-set (DEST_RUNTIME_DIR ${DEST_SHARE_DIR}/Bin)
-# Note: ${PATH_SUFFIX} for library could be removed if the extra path is not desirable, but if so then the RPATH setting below needs to be adjusted accordingly
-set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})
-set (SYSROOT ${ANDROID_TOOLCHAIN_ROOT} ${RASPI_SYSROOT} ${MINGW_SYSROOT})       # SYSROOT is empty for native build
-string (REPLACE "${SYSROOT}" "" DEST_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})    # Our CMAKE_INSTALL_PREFIX is rooted, use DEST_INSTALL_PREFIX for the non-rooted version
-set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
-set (DEST_PERMISSIONS FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ DIRECTORY_PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-# Install application launcher scripts
-file (GLOB APP_SCRIPTS ${PROJECT_ROOT_DIR}/Bin/${SCRIPT_PATTERN})
-install (FILES ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR} PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)   # 755
-# Install resource directories required by applications built with Urho3D library
-install (DIRECTORY ${PROJECT_ROOT_DIR}/Bin/CoreData ${PROJECT_ROOT_DIR}/Bin/Data DESTINATION ${DEST_RUNTIME_DIR} ${DEST_PERMISSIONS})
-# Install CMake modules and toolchains provided by and for Urho3D
-install (DIRECTORY ${PROJECT_ROOT_DIR}/Source/CMake/ DESTINATION ${DEST_SHARE_DIR}/CMake ${DEST_PERMISSIONS})    # Note: the trailing slash is significant
-# Install CMake launcher scripts
-file (GLOB CMAKE_SCRIPTS ${PROJECT_ROOT_DIR}/${SCRIPT_PATTERN})
-install (FILES ${CMAKE_SCRIPTS} DESTINATION ${DEST_SHARE_DIR}/Scripts PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-
-# Setup package variables
-set (URHO3D_DESCRIPTION "Urho3D is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D (http://www.horde3d.org).")
-set (CPACK_PACKAGE_DESCRIPTION_SUMMARY ${URHO3D_DESCRIPTION})
-set (URHO3D_URL "https://github.com/urho3d/Urho3D")
-set (CPACK_PACKAGE_VENDOR ${URHO3D_URL})
-set (CPACK_PACKAGE_CONTACT ${URHO3D_URL})
-execute_process (COMMAND ${CMAKE_COMMAND} -P ${PROJECT_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake OUTPUT_VARIABLE URHO3D_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-set (CPACK_PACKAGE_VERSION ${URHO3D_VERSION})
-string (REGEX MATCH "([^.]+)\\.([^.]+)\\.(.+)" MATCHED ${URHO3D_VERSION})
-if (MATCHED)
-    set (CPACK_PACKAGE_VERSION_MAJOR ${CMAKE_MATCH_1})
-    set (CPACK_PACKAGE_VERSION_MINOR ${CMAKE_MATCH_2})
-    set (CPACK_PACKAGE_VERSION_PATCH ${CMAKE_MATCH_3})
-endif ()
-set (CPACK_RESOURCE_FILE_LICENSE ${PROJECT_ROOT_DIR}/License.txt)
-set (CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
-set (CPACK_GENERATOR TGZ)
-if (ANDROID)
-    set (CPACK_SYSTEM_NAME Android)
-elseif (IOS)
-    set (CPACK_SYSTEM_NAME iOS)
-elseif (APPLE)
-    set (CPACK_SYSTEM_NAME OSX)
-elseif (WIN32)
-    set (CPACK_GENERATOR ZIP)
-elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
-    if (RASPI)
-        set (CPACK_SYSTEM_NAME Raspberry-Pi)
-    endif ()
-    list (APPEND CPACK_GENERATOR RPM DEB)
-    set (CPACK_PACKAGING_INSTALL_PREFIX ${DEST_INSTALL_PREFIX})
-endif ()
-if (URHO3D_64BIT)
-    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-64bit)
-endif ()
-set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-${URHO3D_LIB_TYPE})
-if (WIN32 AND NOT URHO3D_OPENGL)
-    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-D3D)    # Stands for Direct 3D
-elseif (ANDROID AND X86)    # Take advantage of Android toolchain setting X86 variable to true for both 'x86' and 'x86_64' ABIs
-    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-IA)     # Stands for Intel Architecture
-endif ()
-if (NOT DEFINED ENV{RELEASE_TAG})
-    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-snapshot)
-endif ()
-include (CPack)
-
 # Setup RPATH settings
-if (NOT WIN32 AND NOT ANDROID)
+if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS AND NOT EMSCRIPTEN)
     # Add RPATH entries when building
     set (CMAKE_SKIP_BUILD_RPATH FALSE)
     # But don't set them yet in the build tree
@@ -149,8 +42,10 @@ if (NOT WIN32 AND NOT ANDROID)
         set (ORIGIN $ORIGIN)
     endif ()
     # When installing/packaging set the first RPATH entry to the library location relative to the executable
-    set (CMAKE_INSTALL_RPATH ${ORIGIN}/../../../lib${LIB_SUFFIX}${PATH_SUFFIX})    # The library location is based on SDK install destination as defined above
-    # The second entry to the install destination of the library, if the destination location is not in the system default search path
+    set (CMAKE_INSTALL_RPATH ${ORIGIN}/../lib${LIB_SUFFIX}/${PATH_SUFFIX})    # The library location is based on SDK install destination
+    # The second entry to the library location relative to the executable in the tool directory
+    list (APPEND CMAKE_INSTALL_RPATH ${ORIGIN}/../../lib${LIB_SUFFIX}/${PATH_SUFFIX})    # The tools are installed one directory further down from normal executable
+    # The last entry to the install destination of the library, if the destination location is not in the system default search path
     list (FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX} isSystemDir)
     if (isSystemDir STREQUAL -1)
         list (APPEND CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${DEST_LIBRARY_DIR})
@@ -158,7 +53,7 @@ if (NOT WIN32 AND NOT ANDROID)
 endif ()
 
 # Add targets
-foreach (TARGET FreeType JO LZ4 PugiXml SDL StanHull STB)
+foreach (TARGET FreeType JO LZ4 PugiXml rapidjson SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
 
@@ -167,7 +62,6 @@ if (URHO3D_ANGELSCRIPT)
 endif ()
 
 if (URHO3D_LUA)
-    add_subdirectory (Engine/LuaScript)
     add_subdirectory (ThirdParty/Lua${JIT})
     add_subdirectory (ThirdParty/toluapp/src/lib)
 endif ()
@@ -177,30 +71,49 @@ if (URHO3D_NETWORK)
     add_subdirectory (ThirdParty/kNet)
 endif ()
 
+if (URHO3D_DATABASE_ODBC)
+    add_subdirectory (ThirdParty/nanodbc)
+endif ()
+if (URHO3D_DATABASE_SQLITE)
+    add_subdirectory (ThirdParty/SQLite)
+endif ()
+
 if (URHO3D_NAVIGATION)
     add_subdirectory (ThirdParty/Detour)
+    add_subdirectory (ThirdParty/DetourCrowd)
+    add_subdirectory (ThirdParty/DetourTileCache)
     add_subdirectory (ThirdParty/Recast)
+endif ()
+
+if (URHO3D_URHO2D)
+    add_subdirectory (ThirdParty/Box2D)
+    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/spine)
+        add_subdirectory (ThirdParty/spine)
+        # Add definition for Spine
+        add_definitions (-DURHO3D_SPINE)
+    endif ()
 endif ()
 
 if (URHO3D_PHYSICS)
     add_subdirectory (ThirdParty/Bullet)
 endif ()
 
-if (URHO3D_URHO2D)
-    add_subdirectory (ThirdParty/Box2D)
-endif ()
-
-if (NOT IOS AND NOT ANDROID AND NOT RASPI)
+if (NOT IOS AND NOT ANDROID AND NOT RPI AND NOT EMSCRIPTEN)
     if (URHO3D_OPENGL)
         add_subdirectory (ThirdParty/GLEW)
-    else ()
+    elseif (NOT URHO3D_D3D11)
         add_subdirectory (ThirdParty/MojoShader)
     endif ()
     add_subdirectory (ThirdParty/LibCpuId)
 endif ()
 
 # Urho3D game engine library
-add_subdirectory (Engine)
+add_subdirectory (Urho3D)
+
+# Urho3D Clang tools
+if (URHO3D_CLANG_TOOLS)
+    add_subdirectory (Clang-Tools)
+endif ()
 
 # Urho3D tools
 add_subdirectory (Tools)
@@ -213,10 +126,6 @@ if (URHO3D_SAMPLES)
 endif ()
 
 # Urho3D extras
-# Do not build extras for iOS and Android
-if (NOT IOS AND NOT ANDROID AND URHO3D_EXTRAS)
+if (URHO3D_EXTRAS)
     add_subdirectory (Extras)
 endif ()
-
-# Urho3D documentation
-add_subdirectory (../Docs ${PROJECT_BINARY_DIR}/Docs)
