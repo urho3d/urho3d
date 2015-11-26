@@ -214,7 +214,7 @@ float GetShadow(vec4 shadowPos)
         // #endif
     // #endif
 	float d = texture(sShadowMap, vec2(shadowPos.xy));
-	return cShadowIntensity.y + cShadowIntensity.x * Chebyshev(vec2(d, d*d), shadowPos.z/shadowPos.w);
+	return 0.0;//cShadowIntensity.y + cShadowIntensity.x * Chebyshev(vec2(d, d*d), shadowPos.z/shadowPos.w);
 }
 
 #ifdef POINTLIGHT
