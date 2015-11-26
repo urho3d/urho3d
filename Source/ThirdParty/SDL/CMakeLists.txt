@@ -127,14 +127,12 @@ else ()
     # end todo
     include_directories (${ALSA_INCLUDE_DIRS})
 
-    # FIXME: There is a flaw in the current detection logic for PulseAudio development library as it actually only detects its presense in the host/build system which does not mean anything when we are cross-compiling
-    if (NOT CMAKE_CROSSCOMPILING)
-        include (FindPkgConfig)
-        pkg_check_modules (PKG_PULSEAUDIO libpulse-simple)
-        if (PKG_PULSEAUDIO_FOUND)
-          add_definitions (-DSDL_AUDIO_DRIVER_PULSEAUDIO=1 -DSDL_AUDIO_DRIVER_PULSEAUDIO_DYNAMIC="libpulse-simple.so")
-          file (GLOB PULSEAUDIO_SOURCES src/audio/pulseaudio/*.c)
-        endif ()
+    find_package (PulseAudio)
+    if (PA_FOUND)
+      include_directories (${PA_INCLUDE_DIRS})
+      get_filename_component (PA_SIMPLE ${PA_LIBRARIES} NAME)
+      add_definitions (-DSDL_AUDIO_DRIVER_PULSEAUDIO=1 -DSDL_AUDIO_DRIVER_PULSEAUDIO_DYNAMIC="${PA_SIMPLE}")
+      file (GLOB PULSEAUDIO_SOURCES src/audio/pulseaudio/*.c)
     endif ()
 
     file (GLOB SYS_C_FILES
