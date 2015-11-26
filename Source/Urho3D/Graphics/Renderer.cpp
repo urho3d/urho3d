@@ -1797,8 +1797,6 @@ void Renderer::ResetBuffers()
 
 String Renderer::GetShadowVariations() const
 {
-    String result;
-
     switch (shadowQuality_)
     {
         case SHADOWQUALITY_SIMPLE_16BIT:
@@ -1822,6 +1820,7 @@ String Renderer::GetShadowVariations() const
         case SHADOWQUALITY_BLUR_VSM:
             return "VSM_SHADOW ";
     }
+    return "";
 };
 
 void Renderer::HandleScreenMode(StringHash eventType, VariantMap& eventData)

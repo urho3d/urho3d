@@ -242,7 +242,7 @@ public:
     int GetShadowMapSize() const { return shadowMapSize_; }
 
     /// Return shadow quality.
-    int GetShadowQuality() const { return shadowQuality_; }
+    ShadowQuality GetShadowQuality() const { return shadowQuality_; }
 
     /// Return whether shadow maps are reused.
     bool GetReuseShadowMaps() const { return reuseShadowMaps_; }
