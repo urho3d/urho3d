@@ -25,7 +25,7 @@
 language: cpp
 cache: ccache
 sudo: false
-addons: {apt: {packages: &native_deps [libasound2-dev]}}
+addons: {apt: {packages: &native_deps [libasound2-dev, libpulse-dev]}}
 env:
   global:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
@@ -130,7 +130,7 @@ cache: ccache
 sudo: false
 addons:
   apt:
-    packages: libasound2-dev
+    packages: [libasound2-dev, libpulse-dev]
   coverity_scan:
     project:
       name: weitjong/Urho3D
@@ -163,7 +163,7 @@ language: cpp
 compiler: gcc
 cache: ccache
 sudo: false
-addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, libasound2-dev]}}
+addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, libasound2-dev, libpulse-dev]}}
 env:
   global:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
@@ -190,7 +190,7 @@ language: android
 android: {components: [build-tools-22.0.1]}
 cache: {directories: $HOME/.ccache}
 sudo: false
-addons: {apt: {packages: &native_deps [libasound2-dev, g++-multilib]}}
+addons: {apt: {packages: &native_deps [g++-multilib]}}
 env:
   global:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
@@ -261,7 +261,7 @@ branch: {name: RPI-CI, active: yes}
 language: cpp
 cache: ccache
 sudo: false
-addons: {apt: {packages: &native_deps [libasound2-dev, g++-multilib]}}
+addons: {apt: {packages: &native_deps [g++-multilib]}}
 env:
   global:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
@@ -343,7 +343,7 @@ branch: {name: Emscripten-CI, active: yes}
 language: cpp
 cache: ccache
 sudo: false
-addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, libasound2-dev]}}
+addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9]}}
 env:
   global:
     - secure: EwMMVLbHCvh2AMvRrcEI7atNCeUFxk5iLOBH9+dFHyIc0c1XRH3vR0vXMTmr3WEpoZ5AaRhCrT0TTW9knZPYrqSd6deZML4pjksBAOOcs043cAo2WttCQGgvT8PF3DVWivdWmGommZXf7wHz0s9sb1Iynwt2uY/P+307ZWko3Fg=
