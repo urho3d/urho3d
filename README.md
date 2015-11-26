@@ -44,6 +44,7 @@ Urho3D development, contributions and bugfixes by:
 - Hualin Song
 - James Thomas
 - Joshua Tippetts
+- Yusuf Umar
 - Daniel Wiberg
 - Steven Zhang
 - AGreatFish

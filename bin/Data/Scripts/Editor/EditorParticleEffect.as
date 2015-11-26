@@ -21,9 +21,9 @@ Vector3 particleViewCamDir;
 Vector3 particleViewCamRot;
 float particleViewCamDist;
 
-float gizmo_offset = 0.1f;
-float gizmo_offset_x;
-float gizmo_offset_y;
+float gizmoOffset = 0.1f;
+float gizmoOffsetX;
+float gizmoOffsetY;
 
 void CreateParticleEffectEditor()
 {
@@ -135,9 +135,9 @@ void CreateParticleEffectEditor()
 
 void SetGizmoPosition()
 {
-    Vector3 screen_pos = Vector3(gizmo_offset_x, gizmo_offset_y, 25.0);
-    Vector3 new_pos = particlePreviewCamera.ScreenToWorldPoint(screen_pos);
-    particleEffectPreviewGizmoNode.position = new_pos;
+    Vector3 screenPos = Vector3(gizmoOffsetX, gizmoOffsetY, 25.0);
+    Vector3 newPos = particlePreviewCamera.ScreenToWorldPoint(screenPos);
+    particleEffectPreviewGizmoNode.position = newPos;
 }
 
 void ResetCameraTransformation()
@@ -147,8 +147,7 @@ void ResetCameraTransformation()
     particleViewCamDir = -particlePreviewCameraNode.position;
     
     // Manually set initial rotation because eulerAngle always return 0 on first frame
-    particleViewCamRot = Vector3(0.0, 180.0, 0.0); 
-    //particleViewCamRot = particlePreviewCameraNode.rotation.eulerAngles;
+    particleViewCamRot = Vector3(0.0, 180.0, 0.0);
 
     particleViewCamDist = particleViewCamDir.length;
     particleViewCamDir.Normalize();
@@ -165,7 +164,6 @@ void ParticleEffectShowGrid(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ element = eventData["Element"].GetPtr();
     showParticlePreviewAxes = element.checked;
-    //particleEffectPreviewGizmoNode.enabled = showParticlePreviewAxes;
     particleEffectPreviewGridNode.enabled = showParticlePreviewAxes;
     particleEffectPreview.QueueUpdate();
 }
@@ -213,7 +211,7 @@ void EditParticleEffectColorFrameRemove(StringHash eventType, VariantMap& eventD
         return;
 
     ListView@ lv = particleEffectWindow.GetChild("ColorFrameListView", true);
-    if (lv !is null && lv.selection != M_MAX_UNSIGNED )
+    if (lv !is null && lv.selection != M_MAX_UNSIGNED)
     {
         BeginParticleEffectEdit();
         
@@ -234,7 +232,7 @@ void EditParticleEffectTextureFrameRemove(StringHash eventType, VariantMap& even
         return;
 
     ListView@ lv = particleEffectWindow.GetChild("TextureFrameListView", true);
-    if (lv !is null && lv.selection != M_MAX_UNSIGNED )
+    if (lv !is null && lv.selection != M_MAX_UNSIGNED)
     {
         BeginParticleEffectEdit();
         
@@ -1483,14 +1481,14 @@ void ResizeParticleEffectPreview(StringHash eventType, VariantMap& eventData)
     float aspectRatio = width / height;
     particlePreviewCamera.aspectRatio = aspectRatio;
 
-    gizmo_offset_x = gizmo_offset;
-    gizmo_offset_y = 1.0f - gizmo_offset * aspectRatio;
+    gizmoOffsetX = gizmoOffset;
+    gizmoOffsetY = 1.0f - gizmoOffset * aspectRatio;
 
     if(width > height)
     {
         aspectRatio = height / width;
-        gizmo_offset_y = 1.0f - gizmo_offset;
-        gizmo_offset_x = gizmo_offset * aspectRatio;
+        gizmoOffsetY = 1.0f - gizmoOffset;
+        gizmoOffsetX = gizmoOffset * aspectRatio;
     }
 
     SetGizmoPosition();
