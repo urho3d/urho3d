@@ -68,6 +68,7 @@ static void RegisterCustomLibrary(Context* context)
 Urho3DPlayer::Urho3DPlayer(Context* context) :
     Application(context)
 {
+    engineParameters_["WindowTitle"] = "Game";
 }
 
 void Urho3DPlayer::Setup()
