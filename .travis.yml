@@ -34,7 +34,6 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
-    - URHO3D_C++11=0
     - URHO3D_AMALG=0
     - URHO3D_DEPLOYMENT_TARGET=generic
 matrix:
@@ -200,7 +199,6 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
-    - URHO3D_C++11=0
     - URHO3D_AMALG=0
 matrix:
   fast_finish: true
@@ -272,7 +270,6 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
-    - URHO3D_C++11=0
     - URHO3D_AMALG=0
 matrix:
   fast_finish: true
@@ -313,7 +310,6 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=300M
-    - URHO3D_C++11=0
     - URHO3D_AMALG=0
   matrix:
     - XCODE=1       URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.11 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
@@ -354,7 +350,6 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
-    - URHO3D_C++11=0
     - URHO3D_AMALG=0
 matrix:
   fast_finish: true
