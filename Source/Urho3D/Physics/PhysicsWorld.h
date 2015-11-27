@@ -244,6 +244,9 @@ public:
     /// Return whether node dirtying should be disregarded.
     bool IsApplyingTransforms() const { return applyingTransforms_; }
 
+    /// Return whether is currently inside the Bullet substep loop.
+    bool IsSimulating() const { return simulating_; }
+
 protected:
     /// Handle scene being assigned.
     virtual void OnSceneSet(Scene* scene);
@@ -308,12 +311,14 @@ private:
     bool internalEdge_;
     /// Applying transforms flag.
     bool applyingTransforms_;
+    /// Simulating flag.
+    bool simulating_;
+    /// Debug draw depth test mode.
+    bool debugDepthTest_;
     /// Debug renderer.
     DebugRenderer* debugRenderer_;
     /// Debug draw flags.
     int debugMode_;
-    /// Debug draw depth test mode.
-    bool debugDepthTest_;
 };
 
 /// Register Physics library objects.
