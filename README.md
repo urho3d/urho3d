@@ -77,6 +77,7 @@ Urho3D development, contributions and bugfixes by:
 - skaiware
 - szamq
 - thebluefish
+- tommy3
 - yushli
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
