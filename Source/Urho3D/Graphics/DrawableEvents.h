@@ -52,6 +52,13 @@ URHO3D_EVENT(E_ANIMATIONFINISHED, AnimationFinished)
     URHO3D_PARAM(P_LOOPED, Looped);                // Bool
 }
 
+/// Particle effect finished.
+URHO3D_EVENT(E_PARTICLEEFFECTFINISHED, ParticleEffectFinished)
+{
+    URHO3D_PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_EFFECT, Effect);                // ParticleEffect pointer
+}
+
 /// Terrain geometry created.
 URHO3D_EVENT(E_TERRAINCREATED, TerrainCreated)
 {

@@ -141,6 +141,8 @@ private:
     bool needUpdate_;
     /// Serialize particles flag.
     bool serializeParticles_;
+    /// Ready to send effect finish event flag.
+    bool sendFinishEvent_;
 };
 
 }
