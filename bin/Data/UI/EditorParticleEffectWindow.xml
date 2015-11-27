@@ -50,7 +50,7 @@
                     <attribute name="Layout Mode" value="Horizontal" />
                     <attribute name="Layout Spacing" value="10" />
                     <element type="Text" style="EditorAttributeText">
-                        <attribute name="Text" value="Show Axes" />
+                        <attribute name="Text" value="Show Grid" />
                         <attribute name="Auto Localizable" value="true" />
                     </element>
                     <element>
@@ -59,7 +59,7 @@
                         <attribute name="Layout Mode" value="Horizontal" />
                         <attribute name="Layout Spacing" value="1" />
                         <element type="CheckBox">
-                            <attribute name="Name" value="ShowAxes" />
+                            <attribute name="Name" value="ShowGrid" />
                         </element>
                     </element>
                 </element>
