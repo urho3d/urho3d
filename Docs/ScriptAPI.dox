@@ -56,6 +56,16 @@ namespace Urho3D
 - %Time : Float
 - %Data : User-defined data type
 
+### AnimationFinished
+- %Node : Node pointer
+- %Animation : Animation pointer
+- %Name : String
+- %Looped : Bool
+
+### ParticleEffectFinished
+- %Node : Node pointer
+- %Effect : ParticleEffect pointer
+
 ### TerrainCreated
 - %Node : Node pointer
 
