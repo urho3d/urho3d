@@ -363,7 +363,10 @@ void UI::Update(float timeStep)
     for (unsigned i = 0; i < numTouches; ++i)
     {
         TouchState* touch = input->GetTouch(i);
-        ProcessHover(touch->position_, TOUCHID_MASK(touch->touchID_), 0, 0);
+        IntVector2 touchPos = touch->position_;
+        touchPos.x_ = (int)(touchPos.x_ / uiScale_);
+        touchPos.y_ = (int)(touchPos.y_ / uiScale_);
+        ProcessHover(touchPos, TOUCHID_MASK(touch->touchID_), 0, 0);
     }
 
     // End hovers that expired without refreshing
@@ -1516,6 +1519,8 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     using namespace TouchBegin;
 
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
+    pos.x_ = int(pos.x_ / uiScale_);
+    pos.y_ = int(pos.y_ / uiScale_);
     usingTouchInput_ = true;
 
     int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
@@ -1535,6 +1540,8 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     using namespace TouchEnd;
 
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
+    pos.x_ = int(pos.x_ / uiScale_);
+    pos.y_ = int(pos.y_ / uiScale_);
 
     // Get the touch index
     int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
@@ -1564,6 +1571,10 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
 
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
     IntVector2 deltaPos(eventData[P_DX].GetInt(), eventData[P_DY].GetInt());
+    pos.x_ = int(pos.x_ / uiScale_);
+    pos.y_ = int(pos.y_ / uiScale_);
+    deltaPos.x_ = int(deltaPos.x_ / uiScale_);
+    deltaPos.y_ = int(deltaPos.y_ / uiScale_);
     usingTouchInput_ = true;
 
     int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
@@ -1686,6 +1697,9 @@ void UI::HandleDropFile(StringHash eventType, VariantMap& eventData)
     if (input->IsMouseVisible())
     {
         IntVector2 screenPos = input->GetMousePosition();
+        screenPos.x_ = int(screenPos.x_ / uiScale_);
+        screenPos.y_ = int(screenPos.y_ / uiScale_);
+
         UIElement* element = GetElementAt(screenPos);
 
         using namespace UIDropFile;
@@ -1769,8 +1783,8 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
                 if (!ts)
                     break;
                 IntVector2 pos = ts->position_;
-                dragData->sumPos.x_ += pos.x_;
-                dragData->sumPos.y_ += pos.y_;
+                dragData->sumPos.x_ += (int)(pos.x_ / uiScale_);
+                dragData->sumPos.y_ += (int)(pos.y_ / uiScale_);
             }
         }
         sendPos.x_ = dragData->sumPos.x_ / dragData->numDragButtons;

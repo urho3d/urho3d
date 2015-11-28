@@ -2039,7 +2039,7 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
 
     // Only interested in events from screen joystick(s)
     TouchState& state = touches_[eventData[P_TOUCHID].GetInt()];
-    IntVector2 position(state.position_.x_, state.position_.y_);
+    IntVector2 position(int(state.position_.x_ / GetSubsystem<UI>()->GetScale()), int(state.position_.y_ / GetSubsystem<UI>()->GetScale()));
     UIElement* element = eventType == E_TOUCHBEGIN ? GetSubsystem<UI>()->GetElementAt(position) : state.touchedElement_;
     if (!element)
         return;
