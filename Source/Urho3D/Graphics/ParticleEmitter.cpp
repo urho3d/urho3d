@@ -163,37 +163,6 @@ void ParticleEmitter::Update(const FrameInfo& frame)
                 break;
         }
     }
-    else if (sendFinishEvent_)
-    {
-        // Send finished event only once all billboards are gone
-        bool hasEnabledBillboards = false;
-
-        for (unsigned i = 0; i < billboards_.Size(); ++i)
-        {
-            if (billboards_[i].enabled_)
-            {
-                hasEnabledBillboards = true;
-                break;
-            }
-        }
-
-        if (!hasEnabledBillboards)
-        {
-            sendFinishEvent_ = false;
-
-            using namespace ParticleEffectFinished;
-
-            WeakPtr<ParticleEmitter> self(this);
-            VariantMap& eventData = GetEventDataMap();
-            eventData[P_NODE] = node_;
-            eventData[P_EFFECT] = effect_;
-
-            // Note: this may cause deletion of self
-            node_->SendEvent(E_PARTICLEEFFECTFINISHED, eventData);
-            if (self.Expired())
-                return;
-        }
-    }
 
     // Update existing particles
     Vector3 relativeConstantForce = node_->GetWorldRotation().Inverse() * effect_->GetConstantForce();
@@ -558,6 +527,34 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
         lastUpdateFrameNumber_ = viewFrameNumber_;
         needUpdate_ = true;
         MarkForUpdate();
+    }
+
+    if (node_ && !emitting_ && sendFinishEvent_)
+    {
+        // Send finished event only once all billboards are gone
+        bool hasEnabledBillboards = false;
+
+        for (unsigned i = 0; i < billboards_.Size(); ++i)
+        {
+            if (billboards_[i].enabled_)
+            {
+                hasEnabledBillboards = true;
+                break;
+            }
+        }
+
+        if (!hasEnabledBillboards)
+        {
+            sendFinishEvent_ = false;
+
+            using namespace ParticleEffectFinished;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_NODE] = node_;
+            eventData[P_EFFECT] = effect_;
+
+            node_->SendEvent(E_PARTICLEEFFECTFINISHED, eventData);
+        }
     }
 }
 
