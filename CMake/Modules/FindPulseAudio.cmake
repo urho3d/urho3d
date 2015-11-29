@@ -25,19 +25,19 @@
 #  PA_FOUND
 #  PA_INCLUDE_DIRS
 #  PA_LIBRARIES
+#  PA_VERSION
 #
 
-find_path (PA_INCLUDE_DIRS NAMES pulse/pulseaudio.h DOC "PulseAudio include directories")
-find_library (PA_LIBRARIES NAMES pulse-simple DOC "PulseAudio libraries")
+find_path (PA_INCLUDE_DIRS NAMES pulse/pulseaudio.h DOC "PulseAudio include directory")
+find_library (PA_LIBRARIES NAMES pulse-simple DOC "PulseAudio library")
 
-if (PA_INCLUDE_DIRS AND PA_LIBRARIES)
-    set (PA_FOUND 1)
+if (NOT PA_VERSION AND PA_INCLUDE_DIRS AND EXISTS ${PA_INCLUDE_DIRS}/pulse/version.h)   # Only do this once
+    file (STRINGS "${PA_INCLUDE_DIRS}/pulse/version.h" PA_VERSION REGEX "^.*pa_get_headers_version.+\"[^\"]*\".*$")
+    string (REGEX REPLACE "^.*pa_get_headers_version.+\"([^\"]*)\".*$" \\1 PA_VERSION "${PA_VERSION}")      # Stringify to guard against empty variable
+    set (PA_VERSION "${PA_VERSION}" CACHE INTERNAL "PulseAudio version")
 endif ()
-if (PA_FOUND)
-    include (FindPackageMessage)
-    find_package_message (PulseAudio "Found PulseAudio: ${PA_LIBRARIES} ${PA_INCLUDE_DIRS}" "[${PA_LIBRARIES}][${PA_INCLUDE_DIRS}]")
-elseif (PulseAudio_FIND_REQUIRED)
-    message (FATAL_ERROR "Could not find PulseAudio")
-endif ()
+
+include (FindPackageHandleStandardArgs)
+find_package_handle_standard_args (PA REQUIRED_VARS PA_LIBRARIES PA_INCLUDE_DIRS VERSION_VAR PA_VERSION FAIL_MESSAGE "Could NOT find PulseAudio development library")
 
 mark_as_advanced (PA_INCLUDE_DIRS PA_LIBRARIES)
