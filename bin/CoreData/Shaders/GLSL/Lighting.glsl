@@ -159,9 +159,8 @@ float Chebyshev(vec2 Moments, float depth)
    //Compute probabilistic upper bound.  
    float d = depth - Moments.x;  
    float p_max = Variance / (Variance + d*d); 
-   p_max = ReduceLightBleeding(p_max, 0.6);
+   //p_max = ReduceLightBleeding(p_max, 0.6);
 	
-
    return max(p, p_max);
 }
 
@@ -213,8 +212,9 @@ float GetShadow(vec4 shadowPos)
             // return cShadowIntensity.y + (texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z ? cShadowIntensity.x : 0.0);
         // #endif
     // #endif
-	float d = texture(sShadowMap, vec2(shadowPos.xy));
-	return 0.0;//cShadowIntensity.y + cShadowIntensity.x * Chebyshev(vec2(d, d*d), shadowPos.z/shadowPos.w);
+    
+	vec2 samples = texture(sShadowMap, shadowPos.xy).rg;
+	return Chebyshev(samples, shadowPos.z/shadowPos.w);//depth);//cShadowIntensity.y + cShadowIntensity.x * Chebyshev(vec2(d, d*d), shadowPos.z/shadowPos.w);
 }
 
 #ifdef POINTLIGHT

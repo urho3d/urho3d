@@ -2946,16 +2946,31 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     Texture2D* shadowMap = queue.shadowMap_;
     graphics_->SetTexture(TU_SHADOWMAP, 0);
 
-    graphics_->SetColorWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetClipPlane(false);
     graphics_->SetStencilTest(false);
-    graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
+
+    // the shadow map is a depth stencil map
+    if (shadowMap->GetUsage() == TEXTURE_DEPTHSTENCIL)
+    {
+        graphics_->SetColorWrite(false);
+        graphics_->SetDepthStencil(shadowMap);
+        graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
+        graphics_->Clear(CLEAR_DEPTH);
+        graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
+    }
+    else // if the shadow map is a render texture
+    {
+        graphics_->SetColorWrite(true);
+        graphics_->SetRenderTarget(0, shadowMap);
+        graphics_->SetDepthStencil(shadowMap->GetRenderSurface()->GetLinkedDepthStencil());
+        graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
+        graphics_->Clear(CLEAR_DEPTH | CLEAR_COLOR, Color::WHITE);
+    }
+
+    // disable other render targets
     for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
-        graphics_->SetRenderTarget(i, (RenderSurface*)0);
-    graphics_->SetDepthStencil(shadowMap);
-    graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
-    graphics_->Clear(CLEAR_DEPTH);
+        graphics_->SetRenderTarget(i, (RenderSurface*) 0);
 
     // Set shadow depth bias
     const BiasParameters& parameters = queue.light_->GetShadowBias();
