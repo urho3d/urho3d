@@ -108,6 +108,6 @@ endif ()
 
 # DIRECT3D_INCLUDE_DIRS is not required for Windows SDK, it is required for DirectX SDK but it is implied when DIRECT3D_LIBRARIES can be set
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (Direct3D FOUND_VAR DIRECT3D_FOUND REQUIRED_VARS DIRECT3D_LIBRARIES FAIL_MESSAGE ${FAIL_MESSAGE})
+find_package_handle_standard_args (Direct3D REQUIRED_VARS DIRECT3D_LIBRARIES FAIL_MESSAGE ${FAIL_MESSAGE})
 
 mark_as_advanced (DIRECT3D_INCLUDE_DIRS DIRECT3D_LIBRARIES)
