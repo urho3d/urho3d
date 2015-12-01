@@ -181,6 +181,18 @@ public:
         IntVector2 dragBeginSumPos;
     };
 
+    /// Return current UI scale.
+    float GetScale() const { return uiScale_; }
+
+    /// Set current UI scale.
+    void SetScale(float scale) { uiScale_ = scale; }
+
+    /// Set UI width.
+    void SetWidth(float size);
+
+    /// Set UI height.
+    void SetHeight(float size);
+
 private:
     /// Initialize when screen mode initially set.
     void Initialize();
@@ -331,6 +343,8 @@ private:
     HashMap<WeakPtr<UIElement>, int> touchDragElements_;
     /// Confirmed drag elements cache.
     Vector<UIElement*> dragElementsConfirmed_;
+    /// Current scale of UI
+    float uiScale_;
 };
 
 /// Register UI library objects.
