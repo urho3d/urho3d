@@ -738,8 +738,6 @@ void DeleteNodeVariable(StringHash eventType, VariantMap& eventData)
     if (delName.empty)
         return;
 
-    // Note: intentionally do not unregister the variable name here as the same variable name may still be used by other attribute list
-
     bool erased = false;
     for (uint i = 0; i < editNodes.length; ++i)
     {
@@ -747,7 +745,27 @@ void DeleteNodeVariable(StringHash eventType, VariantMap& eventData)
         erased = editNodes[i].vars.Erase(delName) || erased;
     }
     if (erased)
+    {
         attributesDirty = true;
+        // If the attribute is not defined in any other node, unregister from the scene
+        // to prevent it from being unnecessarily saved; the global var list will still hold it
+        // to keep the hash-name mapping known in case it's in use in other scenes
+        Array<Node@>@ allChildren = editorScene.GetChildren(true);
+        StringHash delNameHash(delName);
+        bool inUse = false;
+
+        for (uint i = 0; i < allChildren.length; ++i)
+        {
+            if (allChildren[i].vars.Contains(delNameHash))
+            {
+                inUse = true;
+                break;
+            }
+        }
+        
+        if (!inUse)
+            editorScene.UnregisterVar(delName);
+    }
 }
 
 /// Handle create new user-defined variable event for ui-element target.
