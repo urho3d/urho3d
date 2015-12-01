@@ -2950,6 +2950,9 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     graphics_->SetClipPlane(false);
     graphics_->SetStencilTest(false);
 
+    // Set shadow depth bias
+    BiasParameters parameters = queue.light_->GetShadowBias();
+
     // the shadow map is a depth stencil map
     if (shadowMap->GetUsage() == TEXTURE_DEPTHSTENCIL)
     {
@@ -2966,14 +2969,13 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         graphics_->SetDepthStencil(shadowMap->GetRenderSurface()->GetLinkedDepthStencil());
         graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
         graphics_->Clear(CLEAR_DEPTH | CLEAR_COLOR, Color::WHITE);
+
+        parameters = BiasParameters(0.0f, 0.0f);
     }
 
     // disable other render targets
     for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
         graphics_->SetRenderTarget(i, (RenderSurface*) 0);
-
-    // Set shadow depth bias
-    const BiasParameters& parameters = queue.light_->GetShadowBias();
 
     // Render each of the splits
     for (unsigned i = 0; i < queue.shadowSplits_.Size(); ++i)
