@@ -408,7 +408,8 @@ void UI::RenderUpdate()
     batches_.Clear();
     vertexData_.Clear();
     const IntVector2& rootSize = rootElement_->GetSize();
-    IntRect currentScissor = IntRect(0, 0, (int)(rootSize.x_ / uiScale_), (int)(rootSize.y_ / uiScale_));
+    // Note: the scissors operate on unscaled coordinates. Scissor scaling is only performed during render
+    IntRect currentScissor = IntRect(0, 0, rootSize.x_, rootSize.y_);
     if (rootElement_->IsVisible())
         GetBatches(rootElement_, currentScissor);
 
@@ -702,8 +703,8 @@ void UI::Initialize()
     graphics_ = graphics;
     UIBatch::posAdjust = Vector3(Graphics::GetPixelUVOffset(), 0.0f);
 
-    rootElement_->SetSize(graphics->GetWidth(), graphics->GetHeight());
-    rootModalElement_->SetSize(rootElement_->GetSize());
+    // Apply initial UI scale to set the root elements size
+    SetScale(uiScale_);
 
     vertexBuffer_ = new VertexBuffer(context_);
     debugVertexBuffer_ = new VertexBuffer(context_);
@@ -1380,8 +1381,8 @@ void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         Initialize();
     else
     {
-        rootElement_->SetSize(eventData[P_WIDTH].GetInt(), eventData[P_HEIGHT].GetInt());
-        rootModalElement_->SetSize(rootElement_->GetSize());
+        // Reapply UI scale to resize the root elements
+        SetScale(uiScale_);
     }
 }
 
@@ -1793,22 +1794,30 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
     return sendPos;
 }
 
+void UI::SetScale(float scale)
+{
+    uiScale_ = Max(scale, M_EPSILON);
+    Graphics* graphics = GetSubsystem<Graphics>();
+    if (graphics)
+    {
+        rootElement_->SetSize((int)((float)graphics->GetWidth() / uiScale_ + 0.5f), (int)((float)graphics_->GetHeight() /
+            uiScale_ + 0.5));
+        rootModalElement_->SetSize(rootElement_->GetSize());
+    }
+}
+
 void UI::SetWidth(float size)
 {
-    Graphics* g = GetSubsystem<Graphics>();
-    if (g)
-    {
-        uiScale_ = g->GetWidth() / size;
-    }
+    Graphics* graphics = GetSubsystem<Graphics>();
+    if (graphics)
+        SetScale((float)graphics->GetWidth() / size);
 }
 
 void UI::SetHeight(float size)
 {
-    Graphics* g = GetSubsystem<Graphics>();
-    if (g)
-    {
-        uiScale_ = g->GetHeight() / size;
-    }
+    Graphics* graphics = GetSubsystem<Graphics>();
+    if (graphics)
+        SetScale((float)graphics->GetHeight() / size);
 }
 
 void RegisterUILibrary(Context* context)

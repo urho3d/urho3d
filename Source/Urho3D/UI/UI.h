@@ -95,6 +95,12 @@ public:
     void SetUseMutableGlyphs(bool enable);
     /// Set whether to force font autohinting instead of using FreeType's TTF bytecode interpreter.
     void SetForceAutoHint(bool enable);
+    /// Set %UI scale. 1.0 is default (pixel perfect). Resize the root element to match.
+    void SetScale(float scale);
+    /// Scale %UI to the specified width in pixels.
+    void SetWidth(float size);
+    /// Scale %UI to the specified height in pixels.
+    void SetHeight(float size);
 
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
@@ -183,15 +189,6 @@ public:
 
     /// Return current UI scale.
     float GetScale() const { return uiScale_; }
-
-    /// Set current UI scale.
-    void SetScale(float scale) { uiScale_ = scale; }
-
-    /// Set UI width.
-    void SetWidth(float size);
-
-    /// Set UI height.
-    void SetHeight(float size);
 
 private:
     /// Initialize when screen mode initially set.

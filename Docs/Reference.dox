@@ -2063,6 +2063,12 @@ Angelcode:
 	ui.SetCursor(cursor);
 \endcode
 
+\section UI_Scaling Scaling
+
+By default the %UI is pixel perfect: the root element is sized equal to the application window size.
+
+The pixel scaling can be changed with the functions \ref UI::SetScale "SetScale()", \ref UI::SetWidth "SetWidth()" and \ref UI::SetHeight "SetHeight()".
+
 \page Urho2D Urho2D
 In order to make 2D games in Urho3D, the Urho2D sublibrary is provided. Urho2D includes 2D graphics and 2D physics.
 
