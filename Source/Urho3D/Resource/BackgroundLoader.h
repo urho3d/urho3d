@@ -56,6 +56,9 @@ public:
     /// Construct.
     BackgroundLoader(ResourceCache* owner);
 
+    /// Destruct. Forcibly clear the load queue.
+    ~BackgroundLoader();
+
     /// Resource background loading loop.
     virtual void ThreadFunction();
 
