@@ -12641,6 +12641,8 @@ Methods:
 - bool SaveLayout(VectorBuffer&, UIElement@)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetFocusElement(UIElement@, bool = false)
+- void SetHeight(float)
+- void SetWidth(float)
 - const UIElement@[]@ GetDragElements()
 
 Properties:
@@ -12661,6 +12663,7 @@ Properties:
 - bool nonFocusedMouseWheel
 - int refs // readonly
 - UIElement@ root // readonly
+- float scale
 - StringHash type // readonly
 - String typeName // readonly
 - bool useMutableGlyphs

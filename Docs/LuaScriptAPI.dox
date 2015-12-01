@@ -6242,6 +6242,9 @@ Methods:
 - void SetUseScreenKeyboard(bool enable)
 - void SetUseMutableGlyphs(bool enable)
 - void SetForceAutoHint(bool enable)
+- void SetScale(float scale)
+- void SetWidth(float size)
+- void SetHeight(float size)
 - UIElement* GetRoot() const
 - UIElement* GetRootModalElement() const
 - Cursor* GetCursor() const
@@ -6264,6 +6267,7 @@ Methods:
 - bool GetForceAutoHint() const
 - bool HasModalElement() const
 - bool IsDragging() const
+- float GetScale() const
 
 Properties:
 
@@ -6285,6 +6289,7 @@ Properties:
 - bool useMutableGlyphs
 - bool forceAutoHint
 - bool modalElement (readonly)
+- float scale
 
 <a name="Class_UIElement"></a>
 ### UIElement : Animatable

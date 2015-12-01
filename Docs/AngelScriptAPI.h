@@ -11701,6 +11701,8 @@ bool SaveLayout(File, UIElement);
 bool SaveLayout(VectorBuffer&, UIElement);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetFocusElement(UIElement, bool = false);
+void SetHeight(float);
+void SetWidth(float);
 const Array<UIElement> GetDragElements();
 
 // Properties:
@@ -11726,6 +11728,7 @@ bool nonFocusedMouseWheel;
 int refs;
 /* readonly */
 UIElement root;
+float scale;
 /* readonly */
 StringHash type;
 /* readonly */
