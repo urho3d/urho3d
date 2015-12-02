@@ -1103,8 +1103,6 @@ void UpdateGrid(bool updateGridGeometry = true)
 
 void CreateStatsBar()
 {
-    Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
-
     editorModeText = Text();
     ui.root.AddChild(editorModeText);
     renderStatsText = Text();
@@ -1148,7 +1146,7 @@ void UpdateStats(float timeStep)
 
     // Relayout stats bar
     Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
-    if (graphics.width >= editorModeText.size.x + renderStatsText.size.x + 35)
+    if (graphics.width >= editorModeText.size.x + renderStatsText.size.x + 45)
     {
         SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
         SetupStatsBarText(renderStatsText, font, -4, 64, HA_RIGHT, VA_TOP);
