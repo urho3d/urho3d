@@ -63,6 +63,7 @@ DropDownList::DropDownList(Context* context) :
 
     SubscribeToEvent(listView_, E_ITEMCLICKED, URHO3D_HANDLER(DropDownList, HandleItemClicked));
     SubscribeToEvent(listView_, E_UNHANDLEDKEY, URHO3D_HANDLER(DropDownList, HandleListViewKey));
+    SubscribeToEvent(listView_, E_SELECTIONCHANGED, URHO3D_HANDLER(DropDownList, HandleSelectionChanged));
 }
 
 DropDownList::~DropDownList()
@@ -162,8 +163,8 @@ void DropDownList::InsertItem(unsigned index, UIElement* item)
     listView_->InsertItem(index, item);
 
     // If there was no selection, set to the first
-    if (listView_->GetSelection() == M_MAX_UNSIGNED)
-        listView_->SetSelection(0);
+    if (GetSelection() == M_MAX_UNSIGNED)
+        SetSelection(0);
 }
 
 void DropDownList::RemoveItem(UIElement* item)
@@ -184,9 +185,6 @@ void DropDownList::RemoveAllItems()
 void DropDownList::SetSelection(unsigned index)
 {
     listView_->SetSelection(index);
-
-    // Display the place holder text when there is no selection, however, the place holder text is only visible when the place holder itself is set to visible
-    placeholder_->GetChild(0)->SetVisible(index == M_MAX_UNSIGNED);
 }
 
 void DropDownList::SetPlaceholderText(const String& text)
@@ -338,6 +336,12 @@ void DropDownList::HandleListViewKey(StringHash eventType, VariantMap& eventData
     int key = eventData[P_KEY].GetInt();
     if (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER)
         HandleItemClicked(eventType, eventData);
+}
+
+void DropDownList::HandleSelectionChanged(StringHash eventType, VariantMap& eventData)
+{
+    // Display the place holder text when there is no selection, however, the place holder text is only visible when the place holder itself is set to visible
+    placeholder_->GetChild(0)->SetVisible(GetSelection() == M_MAX_UNSIGNED);
 }
 
 }
