@@ -799,6 +799,9 @@ void UIElement::SetColor(Corner corner, const Color& color)
 
 void UIElement::SetPriority(int priority)
 {
+    if (priority_ == priority)
+        return;
+    
     priority_ = priority;
     if (parent_)
         parent_->sortOrderDirty_ = true;
@@ -1623,6 +1626,7 @@ void UIElement::SortChildren()
     if (sortChildren_ && sortOrderDirty_)
     {
         // Only sort when there is no layout
+        /// \todo Order is not stable when children have same priorities
         if (layoutMode_ == LM_FREE)
             Sort(children_.Begin(), children_.End(), CompareUIElements);
         sortOrderDirty_ = false;
