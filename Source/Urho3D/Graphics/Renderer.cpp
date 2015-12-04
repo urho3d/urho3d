@@ -411,9 +411,6 @@ void Renderer::SetShadowQuality(int quality)
 
 void Renderer::SetReuseShadowMaps(bool enable)
 {
-    if (enable == reuseShadowMaps_)
-        return;
-
     reuseShadowMaps_ = enable;
 }
 

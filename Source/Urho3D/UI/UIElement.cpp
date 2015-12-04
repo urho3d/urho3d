@@ -799,6 +799,9 @@ void UIElement::SetColor(Corner corner, const Color& color)
 
 void UIElement::SetPriority(int priority)
 {
+    if (priority_ == priority)
+        return;
+    
     priority_ = priority;
     if (parent_)
         parent_->sortOrderDirty_ = true;
