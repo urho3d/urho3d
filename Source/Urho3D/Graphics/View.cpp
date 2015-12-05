@@ -2966,7 +2966,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     {
         graphics_->SetColorWrite(true);
         graphics_->SetRenderTarget(0, shadowMap);
-        graphics_->SetDepthStencil(shadowMap->GetRenderSurface()->GetLinkedDepthStencil());
+        graphics_->SetDepthStencil(renderer_->GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight()));
         graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
         graphics_->Clear(CLEAR_DEPTH | CLEAR_COLOR, Color::WHITE);
 
@@ -3009,6 +3009,10 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         }
     }
 
+    renderer_->ApplyShadowMapFilter(this, shadowMap);
+
+
+    // reset some parameters
     graphics_->SetColorWrite(true);
     graphics_->SetDepthBias(0.0f, 0.0f);
 }

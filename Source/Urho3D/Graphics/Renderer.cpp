@@ -242,6 +242,8 @@ static const unsigned MAX_BUFFER_AGE = 1000;
 Renderer::Renderer(Context* context) :
     Object(context),
     defaultZone_(new Zone(context)),
+    shadowMapFilterInstance_(0),
+    shadowMapFilter_(0),
     textureAnisotropy_(4),
     textureFilterMode_(FILTER_TRILINEAR),
     textureQuality_(QUALITY_HIGH),
@@ -405,8 +407,23 @@ void Renderer::SetShadowQuality(ShadowQuality quality)
     {
         shadowQuality_ = quality;
         shadersDirty_ = true;
+        if (quality == SHADOWQUALITY_BLUR_VSM)
+        {
+            SetShadowMapFilter(this, static_cast<ShadowMapFilter>(&Renderer::BlurShadowMap));
+        }
+        else
+        {
+            SetShadowMapFilter(0, 0);
+        }
+
         ResetShadowMaps();
     }
+}
+
+void Renderer::SetShadowMapFilter(Object* instance, ShadowMapFilter functionPtr)
+{
+    shadowMapFilterInstance_ = instance;
+    shadowMapFilter_ = functionPtr;
 }
 
 void Renderer::SetReuseShadowMaps(bool enable)
@@ -486,6 +503,14 @@ void Renderer::SetThreadedOcclusion(bool enable)
 void Renderer::ReloadShaders()
 {
     shadersDirty_ = true;
+}
+
+void Renderer::ApplyShadowMapFilter(View* view, Texture2D* shadowMap)
+{
+    if (shadowMapFilterInstance_ && shadowMapFilter_)
+    {
+        (shadowMapFilterInstance_->*shadowMapFilter_)(view, shadowMap);
+    }
 }
 
 Viewport* Renderer::GetViewport(unsigned index) const
@@ -953,14 +978,6 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
                 }
                 // Link the color rendertarget to the shadow map
                 newShadowMap->GetRenderSurface()->SetLinkedRenderTarget(colorShadowMaps_[searchKey]->GetRenderSurface());
-            }
-            // add a depth stencil texture to the render target
-            else if (shadowMapUsage == TEXTURE_RENDERTARGET)
-            {
-                //todo reuse texture
-                Texture2D* newDepthStencil = new Texture2D(context_);
-                newDepthStencil->SetSize(width, height, graphics_->GetShadowMapFormat(), TEXTURE_DEPTHSTENCIL);
-                newShadowMap->GetRenderSurface()->SetLinkedDepthStencil(newDepthStencil->GetRenderSurface());
             }
             break;
         }
@@ -1853,4 +1870,43 @@ void Renderer::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
     Update(eventData[P_TIMESTEP].GetFloat());
 }
 
+
+void Renderer::BlurShadowMap(View* view, Texture2D* shadowMap)
+{
+    graphics_->SetBlendMode(BLEND_REPLACE);
+    graphics_->SetDepthTest(CMP_ALWAYS);
+    graphics_->SetClipPlane(false);
+    graphics_->SetScissorTest(false);
+
+    // Get a temporary render buffer
+    Texture2D* tmpBuffer = static_cast<Texture2D*>(GetScreenBuffer(shadowMap->GetWidth(), shadowMap->GetHeight(), shadowMap->GetFormat(), false, false, false));
+    graphics_->SetRenderTarget(0, tmpBuffer->GetRenderSurface());
+    graphics_->SetDepthStencil(GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight()));
+    graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
+
+    // Get shaders
+    static const String shaderName("ShadowBlur");
+    ShaderVariation* vs = graphics_->GetShader(VS, shaderName);
+    ShaderVariation* ps = graphics_->GetShader(PS, shaderName);
+    graphics_->SetShaders(vs, ps);
+
+    view->SetGBufferShaderParameters(IntVector2(shadowMap->GetWidth(), shadowMap->GetHeight()), IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
+
+    // Horizontal blur of the shadow map
+    float shadowSoftness = 2.f;
+    static const StringHash blurOffsetParam("BlurOffsets");
+    graphics_->SetShaderParameter(blurOffsetParam, Vector2(shadowSoftness / shadowMap->GetWidth(), 0.0f));
+
+    graphics_->SetTexture(TU_DIFFUSE, shadowMap);
+    view->DrawFullscreenQuad(false);
+
+    // Vertical blur
+    graphics_->SetRenderTarget(0, shadowMap);
+    graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
+
+    graphics_->SetShaderParameter(blurOffsetParam, Vector2(0.0f, shadowSoftness / shadowMap->GetHeight()));
+
+    graphics_->SetTexture(TU_DIFFUSE, tmpBuffer);
+    view->DrawFullscreenQuad(false);
+}
 }

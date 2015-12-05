@@ -181,6 +181,9 @@ public:
     /// Set G-buffer offset and inverse size shader parameters. Called by Batch and internally by View.
     void SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& viewRect);
 
+    /// Draw a fullscreen quad. Shaders and renderstates must have been set beforehand.
+    void DrawFullscreenQuad(bool nearQuad);
+
 private:
     /// Query the octree for drawable objects.
     void GetDrawables();
@@ -216,8 +219,6 @@ private:
     void AllocateScreenBuffers();
     /// Blit the viewport from one surface to another.
     void BlitFramebuffer(Texture* source, RenderSurface* destination, bool depthWrite);
-    /// Draw a fullscreen quad. Shaders and renderstates must have been set beforehand.
-    void DrawFullscreenQuad(bool nearQuad);
     /// Query for occluders as seen from a camera.
     void UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera);
     /// Draw occluders to occlusion buffer.
