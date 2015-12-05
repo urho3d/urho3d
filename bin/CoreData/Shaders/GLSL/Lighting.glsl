@@ -140,6 +140,7 @@ float GetIntensity(vec3 color)
     #define NUMCASCADES 1
 #endif
 
+#ifdef VSM_SHADOW
 float linstep(float min, float max, float v)  
 {  
     return clamp((v - min) / (max - min), 0.0, 1.0);  
@@ -148,9 +149,8 @@ float linstep(float min, float max, float v)
 float ReduceLightBleeding(float p_max, float Amount)  
 {  
     // Remove the [0, Amount] tail and linearly rescale (Amount, 1].  
-    return linstep(Amount, 1.0, p_max); //smoothstep(Amount, 1.0, p_max);  
+    return linstep(Amount, 1.0, p_max); 
 }  
-
 
 float Chebyshev(vec2 Moments, float depth)  
 {  
@@ -168,7 +168,7 @@ float Chebyshev(vec2 Moments, float depth)
 
     return max(p, p_max);
 }
-
+#endif
 
 float GetShadow(vec4 shadowPos)
 {
@@ -203,11 +203,15 @@ float GetShadow(vec4 shadowPos)
             #endif
 
         #elif defined(VSM_SHADOW)
-            vec2 samples = texture(sShadowMap, shadowPos.xy).rg;
+            vec2 samples = texture2D(sShadowMap, shadowPos.xy).rg;
             return cShadowIntensity.y + cShadowIntensity.x * Chebyshev(samples, shadowPos.z/shadowPos.w);
         #endif
     #else
-        #ifndef LQSHADOW
+        #if defined(SIMPLE_SHADOW)
+            // Take one sample
+            return cShadowIntensity.y + (texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z ? cShadowIntensity.x : 0.0);
+        
+        #elif defined(PCF_SHADOW)
             // Take four samples and average them
             vec2 offsets = cShadowMapInvSize * shadowPos.w;
             vec4 inLight = vec4(
@@ -217,9 +221,9 @@ float GetShadow(vec4 shadowPos)
                 texture2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r * shadowPos.w > shadowPos.z
             );
             return cShadowIntensity.y + dot(inLight, vec4(cShadowIntensity.x));
-        #else
-            // Take one sample
-            return cShadowIntensity.y + (texture2DProj(sShadowMap, shadowPos).r * shadowPos.w > shadowPos.z ? cShadowIntensity.x : 0.0);
+        #elif defined(VSM_SHADOW)
+            vec2 samples = texture2D(sShadowMap, shadowPos.xy).rg;
+            return cShadowIntensity.y + cShadowIntensity.x * Chebyshev(samples, shadowPos.z/shadowPos.w);
         #endif
     #endif
 }
