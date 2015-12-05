@@ -2958,24 +2958,26 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     {
         graphics_->SetColorWrite(false);
         graphics_->SetDepthStencil(shadowMap);
+        graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
+        // disable other render targets
+        for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+            graphics_->SetRenderTarget(i, (RenderSurface*) 0);
         graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
         graphics_->Clear(CLEAR_DEPTH);
-        graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
     }
     else // if the shadow map is a render texture
     {
         graphics_->SetColorWrite(true);
         graphics_->SetRenderTarget(0, shadowMap);
+        // disable other render targets
+        for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+            graphics_->SetRenderTarget(i, (RenderSurface*) 0);
         graphics_->SetDepthStencil(renderer_->GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight()));
         graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
         graphics_->Clear(CLEAR_DEPTH | CLEAR_COLOR, Color::WHITE);
 
         parameters = BiasParameters(0.0f, 0.0f);
     }
-
-    // disable other render targets
-    for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
-        graphics_->SetRenderTarget(i, (RenderSurface*) 0);
 
     // Render each of the splits
     for (unsigned i = 0; i < queue.shadowSplits_.Size(); ++i)
