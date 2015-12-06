@@ -953,6 +953,7 @@ void InitParticleEffectPreview()
 
     particleEffectPreview = particleEffectWindow.GetChild("ParticleEffectPreview", true);
     particleEffectPreview.SetView(particlePreviewScene, particlePreviewCamera);
+    particleEffectPreview.viewport.renderPath = renderPath;
 
     SubscribeToEvent(particleEffectPreview, "DragMove", "NavigateParticleEffectPreview");
     SubscribeToEvent(particleEffectPreview, "Resized", "ResizeParticleEffectPreview");

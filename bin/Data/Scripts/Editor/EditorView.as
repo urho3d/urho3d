@@ -463,6 +463,9 @@ void SetRenderPath(const String&in newRenderPathName)
 
     if (materialPreview !is null && materialPreview.viewport !is null)
         materialPreview.viewport.renderPath = renderPath;
+        
+    if (particleEffectPreview !is null && particleEffectPreview.viewport !is null)
+        particleEffectPreview.viewport.renderPath = renderPath;
 }
 
 void CreateCamera()
