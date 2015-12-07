@@ -63,6 +63,9 @@ public:
     /// Return Direct3D rendertarget or depth-stencil view.
     void* GetRenderTargetView() const { return renderTargetView_; }
 
+    /// Return Direct3D read-only depth-stencil view. May be null if not applicable
+    void* GetReadOnlyView() const { return readOnlyView_; }
+
     /// Return width.
     int GetWidth() const;
     /// Return height.
@@ -93,6 +96,8 @@ private:
     Texture* parentTexture_;
     /// Direct3D rendertarget or depth-stencil view.
     void* renderTargetView_;
+    /// Direct3D read-only depth-stencil view. Present only on depth-stencil surfaces.
+    void* readOnlyView_;
     /// Viewports.
     Vector<SharedPtr<Viewport> > viewports_;
     /// Linked color buffer.
