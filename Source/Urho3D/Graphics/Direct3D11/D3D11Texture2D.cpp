@@ -531,6 +531,17 @@ bool Texture2D::Create()
             URHO3D_LOGERROR("Failed to create depth-stencil view for texture");
             return false;
         }
+
+        // Create also a read-only version of the view for simultaneous depth testing and sampling in shader
+        depthStencilViewDesc.Flags = D3D11_DSV_READ_ONLY_DEPTH;
+        graphics_->GetImpl()->GetDevice()->CreateDepthStencilView((ID3D11Resource*)object_, &depthStencilViewDesc,
+            (ID3D11DepthStencilView**)&renderSurface_->readOnlyView_);
+
+        if (!renderSurface_->readOnlyView_)
+        {
+            URHO3D_LOGERROR("Failed to create read-only depth-stencil view for texture");
+            return false;
+        }
     }
 
     return true;

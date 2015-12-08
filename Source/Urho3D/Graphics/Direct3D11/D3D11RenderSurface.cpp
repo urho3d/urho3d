@@ -37,6 +37,7 @@ namespace Urho3D
 RenderSurface::RenderSurface(Texture* parentTexture) :
     parentTexture_(parentTexture),
     renderTargetView_(0),
+    readOnlyView_(0),
     updateMode_(SURFACE_UPDATEVISIBLE),
     updateQueued_(false)
 {
@@ -124,6 +125,11 @@ void RenderSurface::Release()
 
         ((ID3D11View*)renderTargetView_)->Release();
         renderTargetView_ = 0;
+        if (readOnlyView_)
+        {
+            ((ID3D11View*)readOnlyView_)->Release();
+            readOnlyView_ = 0;
+        }
     }
 }
 
