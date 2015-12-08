@@ -119,4 +119,12 @@ static const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesBody(PhysicsWorld*
     return result;
 }
 
+static const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesBodyInstantaneous(PhysicsWorld* physicsWorld, const RigidBody* body)
+{
+    static PODVector<RigidBody*> result;
+    result.Clear();
+    physicsWorld->GetRigidBodiesInstantaneous(result, body);
+    return result;
+}
+
 $}

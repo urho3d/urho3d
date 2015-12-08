@@ -129,7 +129,6 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     interpolation_(true),
     internalEdge_(true),
     applyingTransforms_(false),
-    simulating_(false),
     debugRenderer_(0),
     debugMode_(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawConstraints | btIDebugDraw::DBG_DrawConstraintLimits)
 {
@@ -250,7 +249,6 @@ void PhysicsWorld::Update(float timeStep)
         maxSubSteps = Min(maxSubSteps, maxSubSteps_);
 
     delayedWorldTransforms_.Clear();
-    simulating_ = true;
 
     if (interpolation_)
         world_->stepSimulation(timeStep, maxSubSteps, internalTimeStep);
@@ -264,8 +262,6 @@ void PhysicsWorld::Update(float timeStep)
             --maxSubSteps;
         }
     }
-
-    simulating_ = false;
 
     // Apply delayed (parented) world transforms now
     while (!delayedWorldTransforms_.Empty())
@@ -603,6 +599,26 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody
         {
             if (i->first_.first_)
                 result.Push(i->first_.first_);
+        }
+    }
+}
+
+void PhysicsWorld::GetRigidBodiesInstantaneous(PODVector<RigidBody*>& result, const RigidBody* body)
+{
+    URHO3D_PROFILE(PhysicsBoxQuery);
+
+    result.Clear();
+
+    PhysicsQueryCallback callback(result, body->GetCollisionMask());
+    world_->contactTest(body->GetBody(), callback);
+
+    // Remove the body itself from the returned list
+    for (unsigned i = 0; i < result.Size(); i++)
+    {
+        if (result[i] == body)
+        {
+            result.Erase(i);
+            break;
         }
     }
 }
