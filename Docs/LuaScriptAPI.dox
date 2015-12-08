@@ -4212,6 +4212,7 @@ Methods:
 - const PODVector<RigidBody*>& GetRigidBodies(const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED)
 - const PODVector<RigidBody*>& GetRigidBodies(const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED)
 - const PODVector<RigidBody*>& GetRigidBodies(const RigidBody* body)
+- const PODVector<RigidBody*>& GetCollidingBodies(const RigidBody* body)
 - void DrawDebugGeometry(bool depthTest)
 - void RemoveCachedGeometry(Model* model)
 - Vector3 GetGravity() const

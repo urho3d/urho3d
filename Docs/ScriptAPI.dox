@@ -8962,6 +8962,7 @@ Methods:
 - float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- RigidBody@[]@ GetCollidingBodies(RigidBody@)
 - bool GetInterceptNetworkUpdate(const String&) const
 - RigidBody@[]@ GetRigidBodies(RigidBody@)
 - RigidBody@[]@ GetRigidBodies(const BoundingBox&, uint = 0xffff)
