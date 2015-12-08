@@ -23,6 +23,7 @@ class Node : public Animatable
     virtual ~Node();
 
     tolua_outside bool NodeSaveXML @ SaveXML(File* dest, const String indentation = "\t") const;
+    tolua_outside bool NodeSaveJSON @ SaveJSON(File* dest, const String indentation = "\t") const;
     void SetName(const String name);
 
     void SetPosition(const Vector3& position);
@@ -186,6 +187,7 @@ class Node : public Animatable
 
     bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED);
     bool LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED);
+    bool LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED);
 
     Node* CreateChild(unsigned id, CreateMode mode);
     void AddComponent(Component* component, unsigned id, CreateMode mode);
@@ -239,6 +241,11 @@ static int tolua_SceneLuaAPI_Node_new00_local(lua_State* tolua_S)
 static bool NodeSaveXML(const Node* node, File* file, const String& indentation)
 {
     return file ? node->SaveXML(*file, indentation) : false;
+}
+
+static bool NodeSaveJSON(const Node* node, File* file, const String& indentation)
+{
+    return file ? node->SaveJSON(*file, indentation) : false;
 }
 
 #define TOLUA_DISABLE_tolua_SceneLuaAPI_Node_CreateScriptObject00
