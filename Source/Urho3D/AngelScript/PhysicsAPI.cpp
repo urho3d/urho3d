@@ -280,6 +280,13 @@ static CScriptArray* PhysicsWorldGetRigidBodiesBody(RigidBody* body, PhysicsWorl
     return VectorToHandleArray<RigidBody>(result, "Array<RigidBody@>");
 }
 
+static CScriptArray* PhysicsWorldGetCollidingBodies(RigidBody* body, PhysicsWorld* ptr)
+{
+    PODVector<RigidBody*> result;
+    ptr->GetCollidingBodies(result, body);
+    return VectorToHandleArray<RigidBody>(result, "Array<RigidBody@>");
+}
+
 static void RegisterPhysicsWorld(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("PhysicsRaycastResult", sizeof(PhysicsRaycastResult), asOBJ_VALUE | asOBJ_APP_CLASS_C);
@@ -303,6 +310,7 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetRigidBodies(const Sphere&in, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldGetRigidBodiesSphere), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetRigidBodies(const BoundingBox&in, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldGetRigidBodiesBox), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetRigidBodies(RigidBody@+)", asFUNCTION(PhysicsWorldGetRigidBodiesBody), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetCollidingBodies(RigidBody@+)", asFUNCTION(PhysicsWorldGetCollidingBodies), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "void DrawDebugGeometry(bool)", asMETHODPR(PhysicsWorld, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void RemoveCachedGeometry(Model@+)", asMETHOD(PhysicsWorld, RemoveCachedGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_gravity(const Vector3&in)", asMETHOD(PhysicsWorld, SetGravity), asCALL_THISCALL);

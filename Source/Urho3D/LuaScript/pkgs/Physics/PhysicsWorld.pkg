@@ -40,6 +40,8 @@ class PhysicsWorld : public Component
     tolua_outside const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesBox @ GetRigidBodies(const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
     // void GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body);
     tolua_outside const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesBody @ GetRigidBodies(const RigidBody* body);
+    // void GetCollidingBodies(PODVector<RigidBody*>& result, const RigidBody* body);
+    tolua_outside const PODVector<RigidBody*>& PhysicsWorldGetCollidingBodies @ GetCollidingBodies(const RigidBody* body);
 
     void DrawDebugGeometry(bool depthTest);
     void RemoveCachedGeometry(Model* model);
@@ -116,6 +118,14 @@ static const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesBody(PhysicsWorld*
     static PODVector<RigidBody*> result;
     result.Clear();
     physicsWorld->GetRigidBodies(result, body);
+    return result;
+}
+
+static const PODVector<RigidBody*>& PhysicsWorldGetCollidingBodies(PhysicsWorld* physicsWorld, const RigidBody* body)
+{
+    static PODVector<RigidBody*> result;
+    result.Clear();
+    physicsWorld->GetCollidingBodies(result, body);
     return result;
 }
 

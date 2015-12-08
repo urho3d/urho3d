@@ -587,6 +587,29 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingB
 
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body)
 {
+    URHO3D_PROFILE(PhysicsBodyQuery);
+    
+    result.Clear();
+    
+    if (!body || !body->GetBody())
+        return;
+
+    PhysicsQueryCallback callback(result, body->GetCollisionMask());
+    world_->contactTest(body->GetBody(), callback);
+    
+    // Remove the body itself from the returned list
+    for (unsigned i = 0; i < result.Size(); i++)
+    {
+        if (result[i] == body)
+        {
+            result.Erase(i);
+            break;
+        }
+    }
+}
+
+void PhysicsWorld::GetCollidingBodies(PODVector<RigidBody*>& result, const RigidBody* body)
+{
     URHO3D_PROFILE(GetCollidingBodies);
 
     result.Clear();
