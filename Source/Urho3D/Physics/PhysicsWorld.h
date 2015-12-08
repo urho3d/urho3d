@@ -177,7 +177,8 @@ public:
     void GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies that have been in collision with a specific body on the last simulation step.
     void GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body);
-
+    /// Return rigid bodies that are in collision with a specific body as an instantaneous check.
+    void GetRigidBodiesInstantaneous(PODVector<RigidBody*>& result, const RigidBody* body);
     /// Return gravity.
     Vector3 GetGravity() const;
 
@@ -244,9 +245,6 @@ public:
     /// Return whether node dirtying should be disregarded.
     bool IsApplyingTransforms() const { return applyingTransforms_; }
 
-    /// Return whether is currently inside the Bullet substep loop.
-    bool IsSimulating() const { return simulating_; }
-
 protected:
     /// Handle scene being assigned.
     virtual void OnSceneSet(Scene* scene);
@@ -311,14 +309,12 @@ private:
     bool internalEdge_;
     /// Applying transforms flag.
     bool applyingTransforms_;
-    /// Simulating flag.
-    bool simulating_;
-    /// Debug draw depth test mode.
-    bool debugDepthTest_;
     /// Debug renderer.
     DebugRenderer* debugRenderer_;
     /// Debug draw flags.
     int debugMode_;
+    /// Debug draw depth test mode.
+    bool debugDepthTest_;
 };
 
 /// Register Physics library objects.
