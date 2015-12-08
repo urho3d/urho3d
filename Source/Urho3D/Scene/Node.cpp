@@ -305,6 +305,17 @@ bool Node::SaveXML(Serializer& dest, const String& indentation) const
     return xml->Save(dest, indentation);
 }
 
+bool Node::SaveJSON(Serializer& dest, const String& indentation) const
+{
+    SharedPtr<JSONFile> json(new JSONFile(context_));
+    JSONValue& rootElem = json->GetRoot();
+
+    if (!SaveJSON(rootElem))
+        return false;
+
+    return json->Save(dest, indentation);
+}
+
 void Node::SetName(const String& name)
 {
     if (name != name_)
