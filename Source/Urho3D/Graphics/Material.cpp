@@ -198,49 +198,55 @@ bool Material::BeginLoad(Deserializer& source)
     if (!graphics)
         return true;
 
-    loadXMLFile_ = new XMLFile(context_);    
-    if (loadXMLFile_->Load(source))
+    String extension = GetExtension(source.GetName());
+
+    if (extension == ".xml")
     {
-        // If async loading, scan the XML content beforehand for technique & texture resources
-        // and request them to also be loaded. Can not do anything else at this point
-        if (GetAsyncLoadState() == ASYNC_LOADING)
+        ResetToDefaults();
+        loadXMLFile_ = new XMLFile(context_);
+        if (loadXMLFile_->Load(source))
         {
-            ResourceCache* cache = GetSubsystem<ResourceCache>();
-            XMLElement rootElem = loadXMLFile_->GetRoot();
-            XMLElement techniqueElem = rootElem.GetChild("technique");
-            while (techniqueElem)
+            // If async loading, scan the XML content beforehand for technique & texture resources
+            // and request them to also be loaded. Can not do anything else at this point
+            if (GetAsyncLoadState() == ASYNC_LOADING)
             {
-                cache->BackgroundLoadResource<Technique>(techniqueElem.GetAttribute("name"), true, this);
-                techniqueElem = techniqueElem.GetNext("technique");
-            }
-
-            XMLElement textureElem = rootElem.GetChild("texture");
-            while (textureElem)
-            {
-                String name = textureElem.GetAttribute("name");
-                // Detect cube maps by file extension: they are defined by an XML file
-                /// \todo Differentiate with 3D textures by actually reading the XML content
-                if (GetExtension(name) == ".xml")
+                ResourceCache* cache = GetSubsystem<ResourceCache>();
+                XMLElement rootElem = loadXMLFile_->GetRoot();
+                XMLElement techniqueElem = rootElem.GetChild("technique");
+                while (techniqueElem)
                 {
-#ifdef DESKTOP_GRAPHICS
-                    TextureUnit unit = TU_DIFFUSE;
-                    if (textureElem.HasAttribute("unit"))
-                        unit = ParseTextureUnitName(textureElem.GetAttribute("unit"));
-                    if (unit == TU_VOLUMEMAP)
-                        cache->BackgroundLoadResource<Texture3D>(name, true, this);
-                    else
-#endif
-                        cache->BackgroundLoadResource<TextureCube>(name, true, this);
+                    cache->BackgroundLoadResource<Technique>(techniqueElem.GetAttribute("name"), true, this);
+                    techniqueElem = techniqueElem.GetNext("technique");
                 }
-                else
-                    cache->BackgroundLoadResource<Texture2D>(name, true, this);
-                textureElem = textureElem.GetNext("texture");
-            }
-        }
 
-        return true;
+                XMLElement textureElem = rootElem.GetChild("texture");
+                while (textureElem)
+                {
+                    String name = textureElem.GetAttribute("name");
+                    // Detect cube maps by file extension: they are defined by an XML file
+                    /// \todo Differentiate with 3D textures by actually reading the XML content
+                    if (GetExtension(name) == ".xml")
+                    {
+    #ifdef DESKTOP_GRAPHICS
+                        TextureUnit unit = TU_DIFFUSE;
+                        if (textureElem.HasAttribute("unit"))
+                            unit = ParseTextureUnitName(textureElem.GetAttribute("unit"));
+                        if (unit == TU_VOLUMEMAP)
+                            cache->BackgroundLoadResource<Texture3D>(name, true, this);
+                        else
+    #endif
+                            cache->BackgroundLoadResource<TextureCube>(name, true, this);
+                    }
+                    else
+                        cache->BackgroundLoadResource<Texture2D>(name, true, this);
+                    textureElem = textureElem.GetNext("texture");
+                }
+            }
+
+            return true;
+        }
     }
-    else
+    else // Load JSON file
     {
         // Attempt to load a JSON file
         ResetToDefaults();
@@ -317,7 +323,14 @@ bool Material::EndLoad()
         success = Load(rootElem);
     }
 
+    if (loadJSONFile_)
+    {
+        JSONValue rootVal = loadJSONFile_->GetRoot();
+        success = Load(rootVal);
+    }
+
     loadXMLFile_.Reset();
+    loadJSONFile_.Reset();
     return success;
 }
 

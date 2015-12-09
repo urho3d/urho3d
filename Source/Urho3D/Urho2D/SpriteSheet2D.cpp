@@ -30,6 +30,7 @@
 #include "../Resource/PListFile.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
+#include "../Resource/JSONFile.h"
 #include "../Urho2D/Sprite2D.h"
 #include "../Urho2D/SpriteSheet2D.h"
 
@@ -66,6 +67,10 @@ bool SpriteSheet2D::BeginLoad(Deserializer& source)
 
     if (extension == ".xml")
         return BeginLoadFromXMLFile(source);
+
+    if (extension == ".json")
+        return BeginLoadFromJSONFile(source);
+
 
     URHO3D_LOGERROR("Unsupported file type");
     return false;
