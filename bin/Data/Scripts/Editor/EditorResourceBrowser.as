@@ -1575,10 +1575,10 @@ void RotateResourceBrowserPreview(StringHash eventType, VariantMap& eventData)
     
     if (resourceBrowserPreview.height > 0 && resourceBrowserPreview.width > 0)
     {
-        float yaw = ((resourceBrowserPreview.height / 2) - elemY) * (90.0 / resourceBrowserPreview.height);
-        float pitch = ((resourceBrowserPreview.width / 2) - elemX) * (90.0 / resourceBrowserPreview.width);
+        float yaw = ((resourceBrowserPreview.height / 2) - elemY) * (9.0 / resourceBrowserPreview.height);
+        float pitch = ((resourceBrowserPreview.width / 2) - elemX) * (9.0 / resourceBrowserPreview.width);
 
-        resourcePreviewNode.rotation = resourcePreviewNode.rotation.Slerp(Quaternion(yaw, pitch, 0), 0.1);
+        resourcePreviewNode.Rotate(Quaternion(yaw, pitch, 0),TS_WORLD);
         RefreshBrowserPreview();
     }
 }
