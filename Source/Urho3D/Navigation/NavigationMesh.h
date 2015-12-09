@@ -70,8 +70,8 @@ enum NavigationPathPointFlag
 {
     NAVPATHFLAG_NONE = 0,
     NAVPATHFLAG_START = 0x01,
-    NAVPATHFLAG__END = 0x02,
-    NAVPATHFLAG__OFF_MESH = 0x04
+    NAVPATHFLAG_END = 0x02,
+    NAVPATHFLAG_OFF_MESH = 0x04
 };
 
 struct NavigationPathPoint
