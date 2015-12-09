@@ -618,8 +618,9 @@ void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector
     {
         NavigationPathPoint pt;
         pt.position_ = transform * pathData_->pathPoints_[i];
-        pt.flag_ = pathData_->pathFlags_[i];
+        pt.flag_ = (NavigationPathPointFlag) pathData_->pathFlags_[i];
         pt.areaID_ = pathData_->pathAreras_[i];
+
         dest.Push(pt);
     }
 }
