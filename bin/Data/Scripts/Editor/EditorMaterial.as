@@ -357,7 +357,6 @@ void RotateMaterialPreview(StringHash eventType, VariantMap& eventData)
     {
         float yaw = ((materialPreview.height / 2) - elemY) * (9.0 / materialPreview.height);
         float pitch = ((materialPreview.width / 2) - elemX) * (9.0 / materialPreview.width);
-        
         previewModelNode.Rotate(Quaternion(yaw, pitch, 0),TS_WORLD);
         materialPreview.QueueUpdate();
     }
