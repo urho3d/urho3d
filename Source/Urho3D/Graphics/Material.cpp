@@ -200,112 +200,30 @@ bool Material::BeginLoad(Deserializer& source)
 
     String extension = GetExtension(source.GetName());
 
+    bool success = false;
     if (extension == ".xml")
     {
-        ResetToDefaults();
-        loadXMLFile_ = new XMLFile(context_);
-        if (loadXMLFile_->Load(source))
-        {
-            // If async loading, scan the XML content beforehand for technique & texture resources
-            // and request them to also be loaded. Can not do anything else at this point
-            if (GetAsyncLoadState() == ASYNC_LOADING)
-            {
-                ResourceCache* cache = GetSubsystem<ResourceCache>();
-                XMLElement rootElem = loadXMLFile_->GetRoot();
-                XMLElement techniqueElem = rootElem.GetChild("technique");
-                while (techniqueElem)
-                {
-                    cache->BackgroundLoadResource<Technique>(techniqueElem.GetAttribute("name"), true, this);
-                    techniqueElem = techniqueElem.GetNext("technique");
-                }
+        success = BeginLoadXML(source);
+        if (!success)
+            success = BeginLoadJSON(source);
 
-                XMLElement textureElem = rootElem.GetChild("texture");
-                while (textureElem)
-                {
-                    String name = textureElem.GetAttribute("name");
-                    // Detect cube maps by file extension: they are defined by an XML file
-                    /// \todo Differentiate with 3D textures by actually reading the XML content
-                    if (GetExtension(name) == ".xml")
-                    {
-    #ifdef DESKTOP_GRAPHICS
-                        TextureUnit unit = TU_DIFFUSE;
-                        if (textureElem.HasAttribute("unit"))
-                            unit = ParseTextureUnitName(textureElem.GetAttribute("unit"));
-                        if (unit == TU_VOLUMEMAP)
-                            cache->BackgroundLoadResource<Texture3D>(name, true, this);
-                        else
-    #endif
-                            cache->BackgroundLoadResource<TextureCube>(name, true, this);
-                    }
-                    else
-                        cache->BackgroundLoadResource<Texture2D>(name, true, this);
-                    textureElem = textureElem.GetNext("texture");
-                }
-            }
-
+        if (success)
             return true;
-        }
     }
     else // Load JSON file
     {
-        // Attempt to load a JSON file
-        ResetToDefaults();
-        loadXMLFile_.Reset();
+        success = BeginLoadJSON(source);
+        if (!success)
+            success = BeginLoadXML(source);
 
-        // Attempt to load from JSON file instead
-        loadJSONFile_ = new JSONFile(context_);
-        if (loadJSONFile_->Load(source))
-        {
-            // If async loading, scan the XML content beforehand for technique & texture resources
-            // and request them to also be loaded. Can not do anything else at this point
-            if (GetAsyncLoadState() == ASYNC_LOADING)
-            {
-                ResourceCache* cache = GetSubsystem<ResourceCache>();
-                const JSONValue& rootVal = loadJSONFile_->GetRoot();
-
-                JSONArray techniqueArray = rootVal.Get("techniques").GetArray();
-                for (unsigned i = 0; i < techniqueArray.Size(); i++)
-                {
-                    const JSONValue& techVal = techniqueArray[i];
-                    cache->BackgroundLoadResource<Technique>(techVal.Get("name").GetString(), true, this);
-                }
-
-                JSONObject textureObject = rootVal.Get("textures").GetObject();
-                for (JSONObject::ConstIterator it = textureObject.Begin(); it != textureObject.End(); it++)
-                {
-                    String unitString = it->first_;
-                    String name = it->second_.GetString();
-                    // Detect cube maps by file extension: they are defined by an XML file
-                    /// \todo Differentiate with 3D textures by actually reading the XML content
-                    if (GetExtension(name) == ".xml")
-                    {
-    #ifdef DESKTOP_GRAPHICS
-                        TextureUnit unit = TU_DIFFUSE;
-                        unit = ParseTextureUnitName(unitString);
-
-                        if (unit == TU_VOLUMEMAP)
-                            cache->BackgroundLoadResource<Texture3D>(name, true, this);
-                        else
-    #endif
-                            cache->BackgroundLoadResource<TextureCube>(name, true, this);
-                    }
-                    else
-                        cache->BackgroundLoadResource<Texture2D>(name, true, this);
-                }
-            }
-
-            // JSON material was successfully loaded
+        if (success)
             return true;
-        }
-        else
-        {
-            // All loading failed
-            ResetToDefaults();
-            loadJSONFile_.Reset();
-            return false;
-        }
     }
 
+    // All loading failed
+    ResetToDefaults();
+    loadJSONFile_.Reset();
+    return false;
 }
 
 bool Material::EndLoad()
@@ -334,6 +252,109 @@ bool Material::EndLoad()
     return success;
 }
 
+bool Material::BeginLoadXML(Deserializer& source)
+{
+    ResetToDefaults();
+    loadXMLFile_ = new XMLFile(context_);
+    if (loadXMLFile_->Load(source))
+    {
+        // If async loading, scan the XML content beforehand for technique & texture resources
+        // and request them to also be loaded. Can not do anything else at this point
+        if (GetAsyncLoadState() == ASYNC_LOADING)
+        {
+            ResourceCache* cache = GetSubsystem<ResourceCache>();
+            XMLElement rootElem = loadXMLFile_->GetRoot();
+            XMLElement techniqueElem = rootElem.GetChild("technique");
+            while (techniqueElem)
+            {
+                cache->BackgroundLoadResource<Technique>(techniqueElem.GetAttribute("name"), true, this);
+                techniqueElem = techniqueElem.GetNext("technique");
+            }
+
+            XMLElement textureElem = rootElem.GetChild("texture");
+            while (textureElem)
+            {
+                String name = textureElem.GetAttribute("name");
+                // Detect cube maps by file extension: they are defined by an XML file
+                /// \todo Differentiate with 3D textures by actually reading the XML content
+                if (GetExtension(name) == ".xml")
+                {
+#ifdef DESKTOP_GRAPHICS
+                    TextureUnit unit = TU_DIFFUSE;
+                    if (textureElem.HasAttribute("unit"))
+                        unit = ParseTextureUnitName(textureElem.GetAttribute("unit"));
+                    if (unit == TU_VOLUMEMAP)
+                        cache->BackgroundLoadResource<Texture3D>(name, true, this);
+                    else
+#endif
+                        cache->BackgroundLoadResource<TextureCube>(name, true, this);
+                }
+                else
+                    cache->BackgroundLoadResource<Texture2D>(name, true, this);
+                textureElem = textureElem.GetNext("texture");
+            }
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool Material::BeginLoadJSON(Deserializer& source)
+{
+    // Attempt to load a JSON file
+    ResetToDefaults();
+    loadXMLFile_.Reset();
+
+    // Attempt to load from JSON file instead
+    loadJSONFile_ = new JSONFile(context_);
+    if (loadJSONFile_->Load(source))
+    {
+        // If async loading, scan the XML content beforehand for technique & texture resources
+        // and request them to also be loaded. Can not do anything else at this point
+        if (GetAsyncLoadState() == ASYNC_LOADING)
+        {
+            ResourceCache* cache = GetSubsystem<ResourceCache>();
+            const JSONValue& rootVal = loadJSONFile_->GetRoot();
+
+            JSONArray techniqueArray = rootVal.Get("techniques").GetArray();
+            for (unsigned i = 0; i < techniqueArray.Size(); i++)
+            {
+                const JSONValue& techVal = techniqueArray[i];
+                cache->BackgroundLoadResource<Technique>(techVal.Get("name").GetString(), true, this);
+            }
+
+            JSONObject textureObject = rootVal.Get("textures").GetObject();
+            for (JSONObject::ConstIterator it = textureObject.Begin(); it != textureObject.End(); it++)
+            {
+                String unitString = it->first_;
+                String name = it->second_.GetString();
+                // Detect cube maps by file extension: they are defined by an XML file
+                /// \todo Differentiate with 3D textures by actually reading the XML content
+                if (GetExtension(name) == ".xml")
+                {
+    #ifdef DESKTOP_GRAPHICS
+                    TextureUnit unit = TU_DIFFUSE;
+                    unit = ParseTextureUnitName(unitString);
+
+                    if (unit == TU_VOLUMEMAP)
+                        cache->BackgroundLoadResource<Texture3D>(name, true, this);
+                    else
+    #endif
+                        cache->BackgroundLoadResource<TextureCube>(name, true, this);
+                }
+                else
+                    cache->BackgroundLoadResource<Texture2D>(name, true, this);
+            }
+        }
+
+        // JSON material was successfully loaded
+        return true;
+    }
+
+    return false;
+}
 
 bool Material::Save(Serializer& dest) const
 {
