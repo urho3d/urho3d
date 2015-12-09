@@ -355,10 +355,10 @@ void RotateMaterialPreview(StringHash eventType, VariantMap& eventData)
     
     if (materialPreview.height > 0 && materialPreview.width > 0)
     {
-        float yaw = ((materialPreview.height / 2) - elemY) * (90.0 / materialPreview.height);
-        float pitch = ((materialPreview.width / 2) - elemX) * (90.0 / materialPreview.width);
-
-        previewModelNode.rotation = previewModelNode.rotation.Slerp(Quaternion(yaw, pitch, 0), 0.1);
+        float yaw = ((materialPreview.height / 2) - elemY) * (9.0 / materialPreview.height);
+        float pitch = ((materialPreview.width / 2) - elemX) * (9.0 / materialPreview.width);
+        
+        previewModelNode.Rotate(Quaternion(yaw, pitch, 0),TS_WORLD);
         materialPreview.QueueUpdate();
     }
 }
