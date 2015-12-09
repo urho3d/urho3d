@@ -238,6 +238,11 @@ public:
     static Variant ParseShaderParameterValue(const String& value);
 
 private:
+    /// Helper function for loading JSON files
+    bool BeginLoadJSON(Deserializer& source);
+    /// Helper function for loading XML files
+    bool BeginLoadXML(Deserializer& source);
+
     /// Re-evaluate occlusion rendering.
     void CheckOcclusion();
     /// Reset to defaults.
