@@ -175,8 +175,10 @@ public:
     void GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies by a box query.
     void GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
-    /// Return rigid bodies that have been in collision with a specific body on the last simulation step.
+    /// Return rigid bodies by contact test with the specified body. It needs to be active to return all contacts reliably.
     void GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body);
+    /// Return rigid bodies that have been in collision with the specified body on the last simulation step. Only returns collisions that were sent as events (depends on collision event mode) and excludes e.g. static-static collisions.
+    void GetCollidingBodies(PODVector<RigidBody*>& result, const RigidBody* body);
 
     /// Return gravity.
     Vector3 GetGravity() const;

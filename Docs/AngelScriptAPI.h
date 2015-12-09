@@ -7497,6 +7497,7 @@ float GetAttributeAnimationSpeed(const String&) const;
 float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+Array<RigidBody> GetCollidingBodies(RigidBody);
 bool GetInterceptNetworkUpdate(const String&) const;
 Array<RigidBody> GetRigidBodies(RigidBody);
 Array<RigidBody> GetRigidBodies(const BoundingBox&, uint = 0xffff);

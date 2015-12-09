@@ -30,8 +30,8 @@ if [ "$BUILD" == "." ]; then BUILD=$(pwd); fi
 . "$SOURCE"/.bash_helpers.sh
 
 # Detect CMake toolchains directory if it is not provided explicitly
-[ "$TOOLCHAINS" == "" ] && TOOLCHAINS=$SOURCE/CMake/Toolchains
-[ ! -d "$TOOLCHAINS" -a -d $URHO3D_HOME/share/Urho3D/CMake/Toolchains ] && TOOLCHAINS=$URHO3D_HOME/share/Urho3D/CMake/Toolchains
+[ "$TOOLCHAINS" == "" ] && TOOLCHAINS="$SOURCE"/CMake/Toolchains
+[ ! -d "$TOOLCHAINS" -a -d "$URHO3D_HOME"/share/Urho3D/CMake/Toolchains ] && TOOLCHAINS="$URHO3D_HOME"/share/Urho3D/CMake/Toolchains
 
 # Default to native generator and toolchain if none is specified explicitly
 IFS=#

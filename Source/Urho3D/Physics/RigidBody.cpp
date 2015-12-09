@@ -711,7 +711,7 @@ bool RigidBody::IsActive() const
 void RigidBody::GetCollidingBodies(PODVector<RigidBody*>& result) const
 {
     if (physicsWorld_)
-        physicsWorld_->GetRigidBodies(result, this);
+        physicsWorld_->GetCollidingBodies(result, this);
     else
         result.Clear();
 }
