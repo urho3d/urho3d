@@ -574,7 +574,6 @@ void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector
     const dtQueryFilter* filter)
 {
     URHO3D_PROFILE(FindPath);
-
     dest.Clear();
 
 
