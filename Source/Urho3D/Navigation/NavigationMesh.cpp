@@ -570,6 +570,60 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
         dest.Push(transform * pathData_->pathPoints_[i]);
 }
 
+void NavigationMesh::FindPath(NavigationPathData& dest, const Vector3& start, const Vector3& end, const Vector3& extents,
+    const dtQueryFilter* filter)
+{
+    URHO3D_PROFILE(FindPath);
+
+    dest.pathPoints_.Clear();
+    dest.pathFlags_.Clear();
+    dest.pathAreas_.Clear();
+
+    if (!InitializeQuery())
+        return;
+
+    // Navigation data is in local space. Transform path points from world to local
+    const Matrix3x4& transform = node_->GetWorldTransform();
+    Matrix3x4 inverse = transform.Inverse();
+
+    Vector3 localStart = inverse * start;
+    Vector3 localEnd = inverse * end;
+
+    const dtQueryFilter* queryFilter = filter ? filter : queryFilter_;
+    dtPolyRef startRef;
+    dtPolyRef endRef;
+    navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter, &startRef, 0);
+    navMeshQuery_->findNearestPoly(&localEnd.x_, &extents.x_, queryFilter, &endRef, 0);
+
+    if (!startRef || !endRef)
+        return;
+
+    int numPolys = 0;
+    int numPathPoints = 0;
+
+    navMeshQuery_->findPath(startRef, endRef, &localStart.x_, &localEnd.x_, queryFilter, pathData_->polys_, &numPolys,
+        MAX_POLYS);
+    if (!numPolys)
+        return;
+
+    Vector3 actualLocalEnd = localEnd;
+
+    // If full path was not found, clamp end point to the end polygon
+    if (pathData_->polys_[numPolys - 1] != endRef)
+        navMeshQuery_->closestPointOnPoly(pathData_->polys_[numPolys - 1], &localEnd.x_, &actualLocalEnd.x_, 0);
+
+    navMeshQuery_->findStraightPath(&localStart.x_, &actualLocalEnd.x_, pathData_->polys_, numPolys,
+        &pathData_->pathPoints_[0].x_, pathData_->pathFlags_, pathData_->pathPolys_, &numPathPoints, MAX_POLYS);
+
+    // Transform path result back to world space
+    for (int i = 0; i < numPathPoints; ++i)
+    {
+        dest.pathPoints_.Push(transform * pathData_->pathPoints_[i]);
+        dest.pathAreas_.Push(pathData_->pathAreras_[i]);
+        dest.pathFlags_.Push(pathData_->pathFlags_[i]);
+    }
+}
+
 Vector3 NavigationMesh::GetRandomPoint(const dtQueryFilter* filter, dtPolyRef* randomRef)
 {
     if (!InitializeQuery())
