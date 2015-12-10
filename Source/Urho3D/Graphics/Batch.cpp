@@ -492,7 +492,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
 
                 float sizeX = 1.0f / (float)shadowMap->GetWidth();
                 float sizeY = 1.0f / (float)shadowMap->GetHeight();
-                graphics->SetShaderParameter(PSP_SHADOWMAPINVSIZE, Vector4(sizeX, sizeY, 0.0f, 0.0f));
+                graphics->SetShaderParameter(PSP_SHADOWMAPINVSIZE, Vector2(sizeX, sizeY));
 
                 Vector4 lightSplits(M_LARGE_VALUE, M_LARGE_VALUE, M_LARGE_VALUE, M_LARGE_VALUE);
                 if (lightQueue_->shadowSplits_.Size() > 1)
