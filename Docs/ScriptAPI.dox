@@ -275,7 +275,22 @@ namespace Urho3D
 - %Size : unsigned
 - %Position : Vector3 [in/out]
 
+### CrowdAgentNodeFormation
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Index : unsigned
+- %Size : unsigned
+- %Position : Vector3 [in/out]
+
 ### CrowdAgentReposition
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %Arrived : bool
+- %TimeStep : float
+
+### CrowdAgentNodeReposition
 - %Node : Node pointer
 - %CrowdAgent : CrowdAgent pointer
 - %Position : Vector3
@@ -291,7 +306,23 @@ namespace Urho3D
 - %CrowdAgentState : int
 - %CrowdTargetState : int
 
+### CrowdAgentNodeFailure
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %CrowdAgentState : int
+- %CrowdTargetState : int
+
 ### CrowdAgentStateChanged
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %CrowdAgentState : int
+- %CrowdTargetState : int
+
+### CrowdAgentNodeStateChanged
 - %Node : Node pointer
 - %CrowdAgent : CrowdAgent pointer
 - %Position : Vector3

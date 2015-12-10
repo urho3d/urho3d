@@ -290,6 +290,9 @@ int CrowdAgent::AddAgentToCrowd(bool force)
             map[P_POSITION] = GetPosition();
             map[P_VELOCITY] = GetActualVelocity();
             crowdManager_->SendEvent(E_CROWD_AGENT_FAILURE, map);
+            Node* node = GetNode();
+            if (node)
+                node->SendEvent(E_CROWD_AGENT_NODE_FAILURE, map);
 
             // Reevaluate states as handling of event may have resulted in changes
             previousAgentState_ = GetAgentState();
@@ -526,6 +529,7 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
             map[P_ARRIVED] = HasArrived();
             map[P_TIMESTEP] = dt;
             crowdManager_->SendEvent(E_CROWD_AGENT_REPOSITION, map);
+            node_->SendEvent(E_CROWD_AGENT_NODE_REPOSITION, map);
 
             if (updateNodePosition_)
             {
@@ -550,6 +554,7 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
             map[P_POSITION] = newPos;
             map[P_VELOCITY] = newVel;
             crowdManager_->SendEvent(E_CROWD_AGENT_STATE_CHANGED, map);
+            node_->SendEvent(E_CROWD_AGENT_NODE_STATE_CHANGED, map);
 
             // Send a failure event if either state is a failed status
             if (newAgentState == CA_STATE_INVALID || newTargetState == CA_TARGET_FAILED)
@@ -562,6 +567,7 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
                 map[P_POSITION] = newPos;
                 map[P_VELOCITY] = newVel;
                 crowdManager_->SendEvent(E_CROWD_AGENT_FAILURE, map);
+                node_->SendEvent(E_CROWD_AGENT_NODE_FAILURE, map);
             }
 
             // State may have been altered during the handling of the event
