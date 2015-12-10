@@ -577,6 +577,7 @@ void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector
 
     dest.Clear();
 
+
     if (!InitializeQuery())
         return;
 
