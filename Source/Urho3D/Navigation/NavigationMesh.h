@@ -79,7 +79,7 @@ struct NavigationPathPoint
     /// World-space position of the path point
     Vector3 position_;
     /// Detour flag
-    unsigned char flag_;
+    NavigationPathPointFlag flag_;
     /// Detour area ID
     unsigned char areaID_;
 };
