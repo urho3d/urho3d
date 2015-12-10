@@ -66,6 +66,7 @@ struct NavigationGeometryInfo
 
 };
 
+/// A flag representing the type of path point- none, the start of a path segment, the end of one, or an off-mesh connection.
 enum NavigationPathPointFlag
 {
     NAVPATHFLAG_NONE = 0,
