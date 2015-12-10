@@ -43,11 +43,22 @@
 # For example: set URHO3D_HOME=/home/john/usr/local, if the SDK is installed using DESTDIR=/home/john and CMAKE_INSTALL_PREFIX=/usr/local
 #
 
-# If the URHO3D_LIB_TYPE build option changes then invalidate the found library cache
-if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_FOUND_LIB_TYPE)
-    unset (URHO3D_LIBRARIES CACHE)
-    set (URHO3D_FOUND_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE INTERNAL "Lib type when Urho3D library was last found")
+# Library location would be searched (based on URHO3D_HOME variable if provided and in system-wide default location)
+if (NOT URHO3D_HOME AND DEFINED ENV{URHO3D_HOME})
+    file (TO_CMAKE_PATH "$ENV{URHO3D_HOME}" URHO3D_HOME)
+endif ()
 
+# If either of the URHO3D_LIB_TYPE or URHO3D_HOME build options changes then invalidate all the caches
+set (PATH_SUFFIX Urho3D)
+if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_FOUND_LIB_TYPE OR (DEFINED URHO3D_BASE_INCLUDE_DIR AND NOT URHO3D_BASE_INCLUDE_DIR MATCHES "^${URHO3D_HOME}/include/${PATH_SUFFIX}"))
+    unset (URHO3D_BASE_INCLUDE_DIR CACHE)
+    unset (URHO3D_LIBRARIES CACHE)
+    if (WIN32)
+        unset (URHO3D_LIBRARIES_DBG CACHE)
+        unset (URHO3D_DLL_REL CACHE)
+        unset (URHO3D_DLL_DBG CACHE)
+    endif ()
+    set (URHO3D_FOUND_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE INTERNAL "Lib type when Urho3D library was last found")
     # Urho3D prefers static library type by default while CMake prefers shared one, so we need to change CMake preference to agree with Urho3D
     if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
         list (REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
@@ -58,9 +69,8 @@ if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_FOUND_LIB_TYPE)
     endif ()
 endif ()
 
-set (PATH_SUFFIX Urho3D)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
-    # Library location is already known to be in the build tree
+    # A special case where library location is already known to be in the build tree
     set (URHO3D_HOME ${CMAKE_BINARY_DIR})
     set (URHO3D_INCLUDE_DIRS ${URHO3D_HOME}/include ${URHO3D_HOME}/include/${PATH_SUFFIX}/ThirdParty)
     if (URHO3D_PHYSICS)
@@ -75,10 +85,6 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
     set (URHO3D_LIBRARIES Urho3D)
     set (FOUND_MESSAGE "Found Urho3D: as CMake target")
 else ()
-    # Library location would be searched (based on URHO3D_HOME variable if provided and in system-wide default location)
-    if (NOT URHO3D_HOME AND DEFINED ENV{URHO3D_HOME})
-        file (TO_CMAKE_PATH "$ENV{URHO3D_HOME}" URHO3D_HOME)
-    endif ()
     # URHO3D_HOME variable should be an absolute path, so use a non-rooted search even when we are cross-compiling
     if (URHO3D_HOME)
         list (APPEND CMAKE_PREFIX_PATH ${URHO3D_HOME})
@@ -99,24 +105,22 @@ else ()
         # For 64-bit, force to search in 'lib64' path even when the Windows platform is not defaulted to use it
         set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)
     endif ()
-    find_path (URHO3D_INCLUDE_DIRS Urho3D.h PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT} DOC "Urho3D include directory")
-    if (URHO3D_INCLUDE_DIRS)
-        set (BASE_INCLUDE_DIR ${URHO3D_INCLUDE_DIRS})   # Preserve the base include dir because the original variable will be turned into a list below
-        get_filename_component (PATH ${URHO3D_INCLUDE_DIRS} PATH)
-        set (URHO3D_INCLUDE_DIRS ${PATH} ${URHO3D_INCLUDE_DIRS}/ThirdParty)
-        if (URHO3D_PHYSICS)
-            list (APPEND URHO3D_INCLUDE_DIRS ${BASE_INCLUDE_DIR}/ThirdParty/Bullet)
-        endif ()
-        if (URHO3D_LUA)
-            list (APPEND URHO3D_INCLUDE_DIRS ${BASE_INCLUDE_DIR}/ThirdParty/Lua${JIT})
-        endif ()
+    find_path (URHO3D_BASE_INCLUDE_DIR Urho3D.h PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT} DOC "Urho3D include directory")
+    if (URHO3D_BASE_INCLUDE_DIR)
+        get_filename_component (URHO3D_INCLUDE_DIRS ${URHO3D_BASE_INCLUDE_DIR} PATH)
         if (NOT URHO3D_HOME)
             # URHO3D_HOME is not set when using SDK installed on system-wide default location, so set it now
-            get_filename_component (PATH ${PATH} PATH)
-            set (URHO3D_HOME ${PATH})
+            get_filename_component (URHO3D_HOME ${URHO3D_INCLUDE_DIRS} PATH)
+        endif ()
+        list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_BASE_INCLUDE_DIR}/ThirdParty)
+        if (URHO3D_PHYSICS)
+            list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_BASE_INCLUDE_DIR}/ThirdParty/Bullet)
+        endif ()
+        if (URHO3D_LUA)
+            list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_BASE_INCLUDE_DIR}/ThirdParty/Lua${JIT})
         endif ()
         # Intentionally do no cache the URHO3D_VERSION as it has potential to change frequently
-        file (STRINGS "${BASE_INCLUDE_DIR}/librevision.h" URHO3D_VERSION REGEX "^const char\\* revision=\"[^\"]*\".*$")
+        file (STRINGS "${URHO3D_BASE_INCLUDE_DIR}/librevision.h" URHO3D_VERSION REGEX "^const char\\* revision=\"[^\"]*\".*$")
         string (REGEX REPLACE "^const char\\* revision=\"([^\"]*)\".*$" \\1 URHO3D_VERSION "${URHO3D_VERSION}")      # Stringify to guard against empty variable
     endif ()
     find_library (URHO3D_LIBRARIES NAMES Urho3D ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT} DOC "Urho3D library directory")
@@ -167,4 +171,4 @@ elseif (Urho3D_FIND_REQUIRED)
         "Use URHO3D_HOME environment variable or build option to specify the location of the build tree or SDK installation. ${NOT_FOUND_MESSAGE}")
 endif ()
 
-mark_as_advanced (URHO3D_INCLUDE_DIRS URHO3D_LIBRARIES URHO3D_LIBRARIES_REL URHO3D_LIBRARIES_DBG URHO3D_DLL URHO3D_DLL_REL URHO3D_DLL_DBG URHO3D_HOME)
+mark_as_advanced (URHO3D_BASE_INCLUDE_DIR URHO3D_LIBRARIES URHO3D_LIBRARIES_DBG URHO3D_DLL_REL URHO3D_DLL_DBG URHO3D_HOME)

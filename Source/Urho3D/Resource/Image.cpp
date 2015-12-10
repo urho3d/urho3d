@@ -371,7 +371,7 @@ bool Image::BeginLoad(Deserializer& source)
             unsigned x = ddsd.dwWidth_ / 2;
             unsigned y = ddsd.dwHeight_ / 2;
             unsigned z = ddsd.dwDepth_ / 2;
-            for (unsigned level = ddsd.dwMipMapCount_; level > 0; x /= 2, y /= 2, z /= 2, level -= 1)
+            for (unsigned level = ddsd.dwMipMapCount_; level > 1; x /= 2, y /= 2, z /= 2, --level)
             {
                 blocksWide = (Max(x, 1) + 3) / 4;
                 blocksHeight = (Max(y, 1) + 3) / 4;
@@ -385,7 +385,7 @@ bool Image::BeginLoad(Deserializer& source)
             unsigned x = ddsd.dwWidth_ / 2;
             unsigned y = ddsd.dwHeight_ / 2;
             unsigned z = ddsd.dwDepth_ / 2;
-            for (unsigned level = ddsd.dwMipMapCount_; level > 0; x /= 2, y /= 2, z /= 2, level -= 1)
+            for (unsigned level = ddsd.dwMipMapCount_; level > 1; x /= 2, y /= 2, z /= 2, --level)
                 dataSize += (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * Max(x, 1) * Max(y, 1) * Max(z, 1);
         }
 
@@ -428,23 +428,24 @@ bool Image::BeginLoad(Deserializer& source)
         {
             URHO3D_PROFILE(ConvertDDSToRGBA);
 
-            SharedPtr<Image> currentImage(this);
-            while (currentImage.NotNull())
+            currentImage = this;
+
+            while (currentImage)
             {
                 unsigned sourcePixelByteSize = ddsd.ddpfPixelFormat_.dwRGBBitCount_ >> 3;
                 unsigned numPixels = dataSize / sourcePixelByteSize;
 
 #define ADJUSTSHIFT(mask, l, r) \
                 if (mask && mask >= 0x100) \
-                                { \
-                                                    while ((mask >> r) >= 0x100) \
-                        ++r; \
-                                } \
-                        else if (mask && mask < 0x80) \
-                                { \
-                                                    while ((mask << l) < 0x80) \
-                        ++l; \
-                                }
+                { \
+                    while ((mask >> r) >= 0x100) \
+                    ++r; \
+                } \
+                else if (mask && mask < 0x80) \
+                { \
+                    while ((mask << l) < 0x80) \
+                    ++l; \
+                }
 
                 unsigned rShiftL = 0, gShiftL = 0, bShiftL = 0, aShiftL = 0;
                 unsigned rShiftR = 0, gShiftR = 0, bShiftR = 0, aShiftR = 0;
@@ -458,7 +459,6 @@ bool Image::BeginLoad(Deserializer& source)
                 ADJUSTSHIFT(aMask, aShiftL, aShiftR)
                 
                 SharedArrayPtr<unsigned char> rgbaData(new unsigned char[numPixels * 4]);
-                SetMemoryUse(numPixels * 4);
 
                 switch (sourcePixelByteSize)
                 {
@@ -514,6 +514,7 @@ bool Image::BeginLoad(Deserializer& source)
 
                 // Replace with converted data
                 currentImage->data_ = rgbaData;
+                currentImage->SetMemoryUse(numPixels * 4);
                 currentImage = currentImage->GetNextSibling();
             }
         }

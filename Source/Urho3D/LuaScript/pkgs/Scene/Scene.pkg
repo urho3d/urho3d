@@ -25,6 +25,10 @@ class Scene : public Node
     tolua_outside bool SceneSaveXML @ SaveXML(File* dest, const String indentation = "\t") const;
     tolua_outside bool SceneLoadXML @ LoadXML(const String fileName);
     tolua_outside bool SceneSaveXML @ SaveXML(const String fileName, const String indentation = "\t") const;
+    tolua_outside bool SceneLoadJSON @ LoadJSON(File* source);
+    tolua_outside bool SceneSaveJSON @ SaveJSON(File* dest, const String indentation = "\t") const;
+    tolua_outside bool SceneLoadJSON @ LoadJSON(const String fileName);
+    tolua_outside bool SceneSaveJSON @ SaveJSON(const String fileName, const String indentation = "\t") const;
     tolua_outside Node* SceneInstantiate @ Instantiate(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
     tolua_outside Node* SceneInstantiate @ Instantiate(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
     tolua_outside Node* SceneInstantiateXML @ InstantiateXML(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
@@ -150,6 +154,30 @@ static bool SceneSaveXML(const Scene* scene, const String& fileName, const Strin
     if (!file.IsOpen())
         return false;
     return scene->SaveXML(file, indentation);
+}
+
+static bool SceneLoadJSON(Scene* scene, File* file)
+{
+    return file ? scene->LoadJSON(*file) : false;
+}
+
+static bool SceneSaveJSON(const Scene* scene, File* file, const String& indentation)
+{
+    return file ? scene->SaveJSON(*file, indentation) : false;
+}
+
+static bool SceneLoadJSON(Scene* scene, const String& fileName)
+{
+    File file(scene->GetContext(), fileName, FILE_READ);
+    return file.IsOpen() && scene->LoadJSON(file);
+}
+
+static bool SceneSaveJSON(const Scene* scene, const String& fileName, const String& indentation)
+{
+    File file(scene->GetContext(), fileName, FILE_WRITE);
+    if (!file.IsOpen())
+        return false;
+    return scene->SaveJSON(file, indentation);
 }
 
 static bool SceneLoadAsync(Scene* scene, const String& fileName, LoadMode mode)

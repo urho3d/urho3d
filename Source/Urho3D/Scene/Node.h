@@ -70,10 +70,14 @@ public:
     virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
     /// Load from XML data. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    /// Load from JSON data. Return true if successful.
+    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false);
     /// Save as binary data. Return true if successful.
     virtual bool Save(Serializer& dest) const;
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest) const;
+    /// Save as JSON data. Return true if successful.
+    virtual bool SaveJSON(JSONValue& dest) const;
     /// Apply attribute changes that can not be applied immediately recursively to child nodes and components.
     virtual void ApplyAttributes();
 
@@ -87,6 +91,8 @@ public:
 
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest, const String& indentation = "\t") const;
+    /// Save to a JSON file. Return true if successful.
+    bool SaveJSON(Serializer& dest, const String& indentation = "\t") const;
     /// Set name of the scene node. Names are not required to be unique.
     void SetName(const String& name);
     /// Set position in parent space. If the scene node is on the root level (is child of the scene itself), this is same as world space.
@@ -530,7 +536,9 @@ public:
     /// Load components from XML data and optionally load child nodes.
     bool LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false,
         CreateMode mode = REPLICATED);
-
+    /// Load components from XML data and optionally load child nodes.
+    bool LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false,
+        CreateMode mode = REPLICATED);
     /// Return the depended on nodes to order network updates.
     const PODVector<Node*>& GetDependencyNodes() const { return dependencyNodes_; }
 

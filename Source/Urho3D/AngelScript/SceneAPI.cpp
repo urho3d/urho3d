@@ -100,9 +100,19 @@ static bool NodeSaveXML(File* file, const String& indentation, Node* ptr)
     return file && ptr->SaveXML(*file, indentation);
 }
 
+static bool NodeSaveJSON(File* file, Node* ptr)
+{
+    return file && ptr->SaveJSON(*file);
+}
+
 static bool NodeSaveXMLVectorBuffer(VectorBuffer& buffer, const String& indentation, Node* ptr)
 {
     return ptr->SaveXML(buffer, indentation);
+}
+
+static bool NodeSaveJSONVectorBuffer(VectorBuffer& buffer, Node* ptr)
+{
+    return ptr->SaveJSON(buffer);
 }
 
 static void RegisterNode(asIScriptEngine* engine)
@@ -129,6 +139,8 @@ static void RegisterNode(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Node", "bool get_enabledSelf() const", asMETHOD(Node, IsEnabledSelf), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "bool SaveXML(File@+, const String&in indentation = \"\t\")", asFUNCTION(NodeSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Node", "bool SaveXML(VectorBuffer&, const String&in indentation = \"\t\")", asFUNCTION(NodeSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Node", "bool SaveJSON(File@+)", asFUNCTION(NodeSaveJSON), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Node", "bool SaveJSON(VectorBuffer&)", asFUNCTION(NodeSaveJSONVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Node", "Node@+ Clone(CreateMode mode = REPLICATED)", asMETHOD(Node, Clone), asCALL_THISCALL);
     RegisterObjectConstructor<Node>(engine, "Node");
     RegisterNamedObjectConstructor<Node>(engine, "Node");
@@ -153,14 +165,34 @@ static bool SceneLoadXMLVectorBuffer(VectorBuffer& buffer, Scene* ptr)
     return ptr->LoadXML(buffer);
 }
 
+static bool SceneLoadJSONVectorBuffer(VectorBuffer& buffer, Scene* ptr)
+{
+    return ptr->LoadJSON(buffer);
+}
+
+static bool SceneLoadJSON(File* file, Scene* ptr)
+{
+    return file && ptr->LoadJSON(*file);
+}
+
 static bool SceneSaveXML(File* file, const String& indentation, Scene* ptr)
 {
     return file && ptr->SaveXML(*file, indentation);
 }
 
+static bool SceneSaveJSON(File* file, const String& indentation, Scene* ptr)
+{
+    return file && ptr->SaveJSON(*file, indentation);
+}
+
 static bool SceneSaveXMLVectorBuffer(VectorBuffer& buffer, const String& indentation, Scene* ptr)
 {
     return ptr->SaveXML(buffer, indentation);
+}
+
+static bool SceneSaveJSONVectorBuffer(VectorBuffer& buffer, const String& indentation, Scene* ptr)
+{
+    return ptr->SaveJSON(buffer, indentation);
 }
 
 static Node* SceneInstantiate(File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
@@ -178,14 +210,29 @@ static Node* SceneInstantiateXML(File* file, const Vector3& position, const Quat
     return file ? ptr->InstantiateXML(*file, position, rotation, mode) : 0;
 }
 
+static Node* SceneInstantiateJSON(File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
+{
+    return file ? ptr->InstantiateJSON(*file, position, rotation, mode) : 0;
+}
+
 static Node* SceneInstantiateXMLVectorBuffer(VectorBuffer& buffer, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
 {
     return ptr->InstantiateXML(buffer, position, rotation, mode);
 }
 
+static Node* SceneInstantiateJSONVectorBuffer(VectorBuffer& buffer, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
+{
+    return ptr->InstantiateJSON(buffer, position, rotation, mode);
+}
+
 static Node* SceneInstantiateXMLFile(XMLFile* xml, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
 {
     return xml ? ptr->InstantiateXML(xml->GetRoot(), position, rotation, mode) : 0;
+}
+
+static Node* SceneInstantiateJSONFile(JSONFile* json, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
+{
+    return json ? ptr->InstantiateJSON(json->GetRoot(), position, rotation, mode) : 0;
 }
 
 static CScriptArray* SceneGetRequiredPackageFiles(Scene* ptr)
@@ -279,15 +326,26 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "bool LoadXML(VectorBuffer&)", asFUNCTION(SceneLoadXMLVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "bool SaveXML(File@+, const String&in indentation = \"\t\")", asFUNCTION(SceneSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "bool SaveXML(VectorBuffer&, const String&in indentation = \"\t\")", asFUNCTION(SceneSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "bool LoadJSON(File@+)", asFUNCTION(SceneLoadJSON), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "bool LoadJSON(VectorBuffer&)", asFUNCTION(SceneLoadJSONVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "bool SaveJSON(File@+, const String&in indentation = \"\t\")", asFUNCTION(SceneSaveJSON), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "bool SaveJSON(VectorBuffer&, const String&in indentation = \"\t\")", asFUNCTION(SceneSaveJSONVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "bool LoadAsync(File@+, LoadMode mode = LOAD_SCENE_AND_RESOURCES)", asMETHOD(Scene, LoadAsync), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool LoadAsyncXML(File@+, LoadMode mode = LOAD_SCENE_AND_RESOURCES)", asMETHOD(Scene, LoadAsyncXML), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void StopAsyncLoading()", asMETHOD(Scene, StopAsyncLoading), asCALL_THISCALL);
+
     engine->RegisterObjectMethod("Scene", "Node@+ Instantiate(File@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiate), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "Node@+ Instantiate(VectorBuffer&, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "Node@+ InstantiateXML(File@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "Node@+ InstantiateXML(VectorBuffer&, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateXMLVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "Node@+ InstantiateXML(XMLFile@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateXMLFile), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "Node@+ InstantiateXML(const XMLElement&in, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asMETHODPR(Scene, InstantiateXML, (const XMLElement&, const Vector3&, const Quaternion&, CreateMode), Node*), asCALL_THISCALL);
+
+    engine->RegisterObjectMethod("Scene", "Node@+ InstantiateJSON(File@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateJSON), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "Node@+ InstantiateJSON(VectorBuffer&, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateJSONVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "Node@+ InstantiateJSON(JSONFile@+, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asFUNCTION(SceneInstantiateJSONFile), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "Node@+ InstantiateJSON(const JSONValue&in, const Vector3&in, const Quaternion&in, CreateMode mode = REPLICATED)", asMETHODPR(Scene, InstantiateJSON, (const JSONValue&, const Vector3&, const Quaternion&, CreateMode), Node*), asCALL_THISCALL);
+
     engine->RegisterObjectMethod("Scene", "void Clear(bool clearReplicated = true, bool clearLocal = true)", asMETHOD(Scene, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void AddRequiredPackageFile(PackageFile@+)", asMETHOD(Scene, AddRequiredPackageFile), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void ClearRequiredPackageFiles()", asMETHOD(Scene, ClearRequiredPackageFiles), asCALL_THISCALL);

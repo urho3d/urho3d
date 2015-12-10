@@ -25,6 +25,7 @@
 #include "../Container/HashSet.h"
 #include "../Core/Mutex.h"
 #include "../Resource/XMLElement.h"
+#include "../Resource/JSONFile.h"
 #include "../Scene/Node.h"
 #include "../Scene/SceneResolver.h"
 
@@ -57,8 +58,15 @@ struct AsyncProgress
     SharedPtr<File> file_;
     /// XML file for XML mode.
     SharedPtr<XMLFile> xmlFile_;
+    /// JSON file for JSON mode
+    SharedPtr<JSONFile> jsonFile_;
+
     /// Current XML element for XML mode.
     XMLElement xmlElement_;
+
+    /// Current JSON child array and for JSON mode
+    unsigned jsonIndex_;
+
     /// Current load mode.
     LoadMode mode_;
     /// Resource name hashes left to load.
@@ -80,6 +88,7 @@ class URHO3D_API Scene : public Node
 
     using Node::GetComponent;
     using Node::SaveXML;
+    using Node::SaveJSON;
 
 public:
     /// Construct.
@@ -95,6 +104,8 @@ public:
     virtual bool Save(Serializer& dest) const;
     /// Load from XML data. Removes all existing child nodes and components first. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    /// Load from JSON data. Removes all existing child nodes and components first. Return true if successful.
+    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false);
     /// Mark for attribute check on the next network update.
     virtual void MarkNetworkUpdate();
     /// Add a replication state that is tracking this scene.
@@ -102,12 +113,18 @@ public:
 
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
+    /// Load from a JSON file. Return true if successful.
+    bool LoadJSON(Deserializer& source);
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest, const String& indentation = "\t") const;
+    /// Save to a JSON file. Return true if successful.
+    bool SaveJSON(Serializer& dest, const String& indentation = "\t") const;
     /// Load from a binary file asynchronously. Return true if started successfully. The LOAD_RESOURCES_ONLY mode can also be used to preload resources from object prefab files.
     bool LoadAsync(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
     /// Load from an XML file asynchronously. Return true if started successfully. The LOAD_RESOURCES_ONLY mode can also be used to preload resources from object prefab files.
     bool LoadAsyncXML(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
+    /// Load from a JSON file asynchronously. Return true if started successfully. The LOAD_RESOURCES_ONLY mode can also be used to preload resources from object prefab files.
+    bool LoadAsyncJSON(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
     /// Stop asynchronous loading.
     void StopAsyncLoading();
     /// Instantiate scene content from binary data. Return root node if successful.
@@ -117,6 +134,13 @@ public:
         (const XMLElement& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
     /// Instantiate scene content from XML data. Return root node if successful.
     Node* InstantiateXML(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+    /// Instantiate scene content from JSON data. Return root node if successful.
+    Node* InstantiateJSON
+        (const JSONValue& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+    /// Instantiate scene content from XML data. Return root node if successful.
+    Node* InstantiateJSON(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+
+
     /// Clear scene completely of either replicated, local or all nodes and components.
     void Clear(bool clearReplicated = true, bool clearLocal = true);
     /// Enable or disable scene update.
@@ -242,6 +266,8 @@ private:
     void PreloadResources(File* file, bool isSceneFile);
     /// Preload resources from an XML scene or object prefab file.
     void PreloadResourcesXML(const XMLElement& element);
+    /// Preload resources from a JSON scene or object prefab file.
+    void PreloadResourcesJSON(const JSONValue& value);
 
     /// Replicated scene nodes by ID.
     HashMap<unsigned, Node*> replicatedNodes_;

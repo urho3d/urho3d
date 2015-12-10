@@ -31,6 +31,7 @@ namespace Urho3D
 class ValueAnimation;
 class ValueAnimationInfo;
 class XMLElement;
+class JSONValue;
 
 /// Object animation class, an object animation include one or more attribute animations and theirs wrap mode and speed for an Animatable object.
 class URHO3D_API ObjectAnimation : public Resource
@@ -53,6 +54,10 @@ public:
     bool LoadXML(const XMLElement& source);
     /// Save as XML data. Return true if successful.
     bool SaveXML(XMLElement& dest) const;
+    /// Load from JSON data. Return true if successful.
+    bool LoadJSON(const JSONValue& source);
+    /// Save as JSON data. Return true if successful.
+    bool SaveJSON(JSONValue& dest) const;
 
     /// Add attribute animation, attribute name can in following format: "attribute" or "#0/#1/attribute" or ""#0/#1/@component#1/attribute.
     void AddAttributeAnimation
