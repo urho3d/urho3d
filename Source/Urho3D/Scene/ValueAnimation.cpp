@@ -27,6 +27,7 @@
 #include "../IO/Log.h"
 #include "../IO/Serializer.h"
 #include "../Resource/XMLFile.h"
+#include "../Resource/JSONFile.h"
 #include "../Scene/Animatable.h"
 #include "../Scene/ObjectAnimation.h"
 #include "../Scene/ValueAnimation.h"
@@ -151,6 +152,89 @@ bool ValueAnimation::SaveXML(XMLElement& dest) const
         eventFrameElem.SetUInt("eventtype", eventFrame.eventType_.Value());
         eventFrameElem.CreateChild("eventdata").SetVariantMap(eventFrame.eventData_);
     }
+
+    return true;
+}
+
+bool ValueAnimation::LoadJSON(const JSONValue& source)
+{
+    valueType_ = VAR_NONE;
+    eventFrames_.Clear();
+
+    String interpMethodString = source.Get("interpolationmethod").GetString();
+    InterpMethod method = IM_LINEAR;
+    for (int i = 0; i <= IM_SPLINE; ++i)
+    {
+        if (interpMethodString == interpMethodNames[i])
+        {
+            method = (InterpMethod)i;
+            break;
+        }
+    }
+
+    SetInterpolationMethod(method);
+    if (interpolationMethod_ == IM_SPLINE)
+        splineTension_ = source.Get("splinetension").GetFloat();
+
+    // Load keyframes
+    JSONArray keyFramesArray = source.Get("keyframes").GetArray();
+    for (unsigned i = 0; i < keyFramesArray.Size(); i++)
+    {
+        const JSONValue& val = keyFramesArray[i];
+        float time = val.Get("time").GetFloat();
+        Variant value = val.Get("value").GetVariant();
+        SetKeyFrame(time, value);
+    }
+
+    // Load event frames
+    JSONArray eventFramesArray = source.Get("eventframes").GetArray();
+    for (unsigned i = 0; i < eventFramesArray.Size(); i++)
+    {
+        const JSONValue& eventFrameVal = eventFramesArray[i];
+        float time = eventFrameVal.Get("time").GetFloat();
+        unsigned eventType = eventFrameVal.Get("eventtype").GetUInt();
+        VariantMap eventData = eventFrameVal.Get("eventdata").GetVariantMap();
+        SetEventFrame(time, StringHash(eventType), eventData);
+    }
+
+    return true;
+}
+
+bool ValueAnimation::SaveJSON(JSONValue& dest) const
+{
+    dest.Set("interpolationmethod", interpMethodNames[interpolationMethod_]);
+    if (interpolationMethod_ == IM_SPLINE)
+        dest.Set("splinetension", (float) splineTension_);
+
+    JSONArray keyFramesArray;
+    keyFramesArray.Reserve(keyFrames_.Size());
+    for (unsigned i = 0; i < keyFrames_.Size(); ++i)
+    {
+        const VAnimKeyFrame& keyFrame = keyFrames_[i];
+        JSONValue keyFrameVal;
+        keyFrameVal.Set("time", keyFrame.time_);
+        JSONValue valueVal;
+        valueVal.SetVariant(keyFrame.value_);
+        keyFrameVal.Set("value", valueVal);
+        keyFramesArray.Push(keyFrameVal);
+    }
+    dest.Set("keyframes", keyFramesArray);
+
+    JSONArray eventFramesArray;
+    eventFramesArray.Reserve(eventFrames_.Size());
+    for (unsigned i = 0; i < eventFrames_.Size(); ++i)
+    {
+        const VAnimEventFrame& eventFrame = eventFrames_[i];
+        JSONValue eventFrameVal;
+        eventFrameVal.Set("time", eventFrame.time_);
+        eventFrameVal.Set("eventtype", eventFrame.eventType_.Value());
+        JSONValue eventDataVal;
+        eventDataVal.SetVariantMap(eventFrame.eventData_);
+        eventFrameVal.Set("eventdata", eventDataVal);
+
+        eventFramesArray.Push(eventFrameVal);
+    }
+    dest.Set("eventframes", eventFramesArray);
 
     return true;
 }

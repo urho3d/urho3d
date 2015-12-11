@@ -50,10 +50,14 @@ public:
     virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
     /// Load from XML data. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    /// Load from JSON data. Return true if successful.
+    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false);
     /// Save as binary data. Return true if successful.
     virtual bool Save(Serializer& dest) const;
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest) const;
+    /// Save as JSON data. Return true if successful.
+    virtual bool SaveJSON(JSONValue& dest) const;
 
     /// Initialize the type name. Called by Node when loading.
     void SetTypeName(const String& typeName);
@@ -93,8 +97,9 @@ private:
     Vector<String> xmlAttributes_;
     /// Binary attributes.
     PODVector<unsigned char> binaryAttributes_;
-    /// Flag of whether was loaded using XML data.
+    /// Flag of whether was loaded using XML/JSON data.
     bool useXML_;
+
 };
 
 }

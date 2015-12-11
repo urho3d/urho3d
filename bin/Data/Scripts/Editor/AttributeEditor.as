@@ -1175,7 +1175,7 @@ void InitResourcePicker()
     Array<String> scriptFilters = {"*.as", "*.asc"};
     Array<String> soundFilters = {"*.wav","*.ogg"};
     Array<String> textureFilters = {"*.dds", "*.png", "*.jpg", "*.bmp", "*.tga", "*.ktx", "*.pvr"};
-    Array<String> materialFilters = {"*.xml", "*.material"};
+    Array<String> materialFilters = {"*.xml", "*.material", "*.json"};
     Array<String> anmSetFilters = {"*.scml"};
     Array<String> pexFilters = {"*.pex"};
     Array<String> tmxFilters = {"*.tmx"};
@@ -1193,6 +1193,7 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("TextureCube", "*.xml"));
     resourcePickers.Push(ResourcePicker("Texture3D", "*.xml"));
     resourcePickers.Push(ResourcePicker("XMLFile", "*.xml"));
+    resourcePickers.Push(ResourcePicker("JSONFile", "*.json"));
     resourcePickers.Push(ResourcePicker("Sprite2D", textureFilters, ACTION_PICK | ACTION_OPEN));
     resourcePickers.Push(ResourcePicker("AnimationSet2D", anmSetFilters, ACTION_PICK | ACTION_OPEN));
     resourcePickers.Push(ResourcePicker("ParticleEffect2D", pexFilters, ACTION_PICK | ACTION_OPEN));

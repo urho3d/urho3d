@@ -72,6 +72,23 @@ const StringHash XML_TYPE_TEXTURE_3D("texture3d");
 const StringHash XML_TYPE_CUBEMAP("cubemap");
 const StringHash XML_TYPE_SPRITER_DATA("spriter_data");
 
+const StringHash JSON_TYPE_SCENE("scene");
+const StringHash JSON_TYPE_NODE("node");
+const StringHash JSON_TYPE_MATERIAL("material");
+const StringHash JSON_TYPE_TECHNIQUE("technique");
+const StringHash JSON_TYPE_PARTICLEEFFECT("particleeffect");
+const StringHash JSON_TYPE_PARTICLEEMITTER("particleemitter");
+const StringHash JSON_TYPE_TEXTURE("texture");
+const StringHash JSON_TYPE_ELEMENT("element");
+const StringHash JSON_TYPE_ELEMENTS("elements");
+const StringHash JSON_TYPE_ANIMATION_SETTINGS("animation");
+const StringHash JSON_TYPE_RENDERPATH("renderpath");
+const StringHash JSON_TYPE_TEXTURE_ATLAS("TextureAtlas");
+const StringHash JSON_TYPE_2D_PARTICLE_EFFECT("particleEmitterConfig");
+const StringHash JSON_TYPE_TEXTURE_3D("texture3d");
+const StringHash JSON_TYPE_CUBEMAP("cubemap");
+const StringHash JSON_TYPE_SPRITER_DATA("spriter_data");
+
 const StringHash BINARY_TYPE_SCENE("USCN");
 const StringHash BINARY_TYPE_PACKAGE("UPAK");
 const StringHash BINARY_TYPE_COMPRESSED_PACKAGE("ULZ4");
@@ -1029,7 +1046,7 @@ int GetResourceType(String path)
 
 int GetResourceType(String path, StringHash &out fileType, bool useCache = false)
 {
-    if (GetExtensionType(path, fileType) || GetBinaryType(path, fileType, useCache) || GetXmlType(path, fileType, useCache))
+    if (GetExtensionType(path, fileType) || GetBinaryType(path, fileType, useCache) || GetXmlType(path, fileType, useCache) || GetJsonType(path, fileType, useCache))
         return GetResourceType(fileType);
 
     return RESOURCE_TYPE_UNKNOWN;
@@ -1086,6 +1103,40 @@ int GetResourceType(StringHash fileType)
     else if (fileType == XML_TYPE_CUBEMAP)
         return RESOURCE_TYPE_CUBEMAP;
     else if (fileType == XML_TYPE_SPRITER_DATA)
+        return RESOURCE_TYPE_2D_ANIMATION_SET;
+   
+    // JSON fileTypes
+    else if (fileType == JSON_TYPE_SCENE)
+        return RESOURCE_TYPE_SCENE;
+    else if (fileType == JSON_TYPE_NODE)
+        return RESOURCE_TYPE_PREFAB;
+    else if(fileType == JSON_TYPE_MATERIAL)
+        return RESOURCE_TYPE_MATERIAL;
+    else if(fileType == JSON_TYPE_TECHNIQUE)
+        return RESOURCE_TYPE_TECHNIQUE;
+    else if(fileType == JSON_TYPE_PARTICLEEFFECT)
+        return RESOURCE_TYPE_PARTICLEEFFECT;
+    else if(fileType == JSON_TYPE_PARTICLEEMITTER)
+        return RESOURCE_TYPE_PARTICLEEMITTER;
+    else if(fileType == JSON_TYPE_TEXTURE)
+        return RESOURCE_TYPE_TEXTURE;
+    else if(fileType == JSON_TYPE_ELEMENT)
+        return RESOURCE_TYPE_UIELEMENT;
+    else if(fileType == JSON_TYPE_ELEMENTS)
+        return RESOURCE_TYPE_UIELEMENTS;
+    else if (fileType == JSON_TYPE_ANIMATION_SETTINGS)
+        return RESOURCE_TYPE_ANIMATION_SETTINGS;
+    else if (fileType == JSON_TYPE_RENDERPATH)
+        return RESOURCE_TYPE_RENDERPATH;
+    else if (fileType == JSON_TYPE_TEXTURE_ATLAS)
+        return RESOURCE_TYPE_TEXTURE_ATLAS;
+    else if (fileType == JSON_TYPE_2D_PARTICLE_EFFECT)
+        return RESOURCE_TYPE_2D_PARTICLE_EFFECT;
+    else if (fileType == JSON_TYPE_TEXTURE_3D)
+        return RESOURCE_TYPE_TEXTURE_3D;
+    else if (fileType == JSON_TYPE_CUBEMAP)
+        return RESOURCE_TYPE_CUBEMAP;
+    else if (fileType == JSON_TYPE_SPRITER_DATA)
         return RESOURCE_TYPE_2D_ANIMATION_SET;
 
     // extension fileTypes
@@ -1254,6 +1305,80 @@ bool GetXmlType(String path, StringHash &out fileType, bool useCache = false)
             return false;
 
         name = xml.root.name;
+    }
+    else
+    {
+        File@ file = File();
+        if (!file.Open(path))
+            return false;
+
+        if (file.size == 0)
+            return false;
+
+        XMLFile@ xml = XMLFile();
+        if (xml.Load(file))
+            name = xml.root.name;
+        else 
+            return false;
+    }
+
+    bool found = false;
+    if (!name.empty)
+    {
+        found = true;
+        StringHash type = StringHash(name);
+        if (type == XML_TYPE_SCENE)
+            fileType = XML_TYPE_SCENE;
+        else if (type == XML_TYPE_NODE)
+            fileType = XML_TYPE_NODE;
+        else if(type == XML_TYPE_MATERIAL)
+            fileType = XML_TYPE_MATERIAL;
+        else if(type == XML_TYPE_TECHNIQUE)
+            fileType = XML_TYPE_TECHNIQUE;
+        else if(type == XML_TYPE_PARTICLEEFFECT)
+            fileType = XML_TYPE_PARTICLEEFFECT;
+        else if(type == XML_TYPE_PARTICLEEMITTER)
+            fileType = XML_TYPE_PARTICLEEMITTER;
+        else if(type == XML_TYPE_TEXTURE)
+            fileType = XML_TYPE_TEXTURE;
+        else if(type == XML_TYPE_ELEMENT)
+            fileType = XML_TYPE_ELEMENT;
+        else if(type == XML_TYPE_ELEMENTS)
+            fileType = XML_TYPE_ELEMENTS;
+        else if (type == XML_TYPE_ANIMATION_SETTINGS)
+            fileType = XML_TYPE_ANIMATION_SETTINGS;
+        else if (type == XML_TYPE_RENDERPATH)
+            fileType = XML_TYPE_RENDERPATH;
+        else if (type == XML_TYPE_TEXTURE_ATLAS)
+            fileType = XML_TYPE_TEXTURE_ATLAS;
+        else if (type == XML_TYPE_2D_PARTICLE_EFFECT)
+            fileType = XML_TYPE_2D_PARTICLE_EFFECT;
+        else if (type == XML_TYPE_TEXTURE_3D)
+            fileType = XML_TYPE_TEXTURE_3D;
+        else if (type == XML_TYPE_CUBEMAP)
+            fileType = XML_TYPE_CUBEMAP;
+        else if (type == XML_TYPE_SPRITER_DATA)
+            fileType = XML_TYPE_SPRITER_DATA;
+        else
+            found = false;
+    }
+    return found;
+}
+
+bool GetJsonType(String path, StringHash &out fileType, bool useCache = false)
+{
+    String extension = GetExtension(path);
+    if (extension == ".txt" || extension == ".xml" || extension == ".icns" || extension == ".atlas")
+        return false;
+
+    String name;
+    if (useCache)
+    {
+        JSONFile@ json = cache.GetResource("JSONFile", path);
+        if (json is null)
+            return false;
+
+        name = json.root.name;
     }
     else
     {
