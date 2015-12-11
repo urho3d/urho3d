@@ -701,12 +701,6 @@ bool Material::Save(XMLElement& dest) const
 
 bool Material::Save(JSONValue& dest) const
 {
-    if (dest.IsNull())
-    {
-        URHO3D_LOGERROR("Can not save material to null JSON value");
-        return false;
-    }
-
     // Write techniques
     JSONArray techniquesArray;
     techniquesArray.Reserve(techniques_.Size());

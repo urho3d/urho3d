@@ -835,7 +835,9 @@ static void RegisterMaterial(asIScriptEngine* engine)
 
     RegisterResource<Material>(engine, "Material");
     engine->RegisterObjectMethod("Material", "bool Load(const XMLElement&in)", asMETHODPR(Material, Load, (const XMLElement&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "bool Save(XMLElement&in) const", asMETHODPR(Material, Save, (XMLElement&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "bool Load(const JSONValue&in)", asMETHODPR(Material, Load, (const JSONValue&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "bool Save(XMLElement&) const", asMETHODPR(Material, Save, (XMLElement&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "bool Save(JSONValue&) const", asMETHODPR(Material, Save, (JSONValue&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void SetTechnique(uint, Technique@+, uint qualityLevel = 0, float lodDistance = 0.0)", asMETHOD(Material, SetTechnique), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2&in, float, const Vector2&in)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2&in, float, float)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, float), void), asCALL_THISCALL);
@@ -1368,7 +1370,7 @@ static void RegisterParticleEffect(asIScriptEngine* engine)
 
     RegisterResource<ParticleEffect>(engine, "ParticleEffect");
     engine->RegisterObjectMethod("ParticleEffect", "bool Load(const XMLElement&in)", asMETHODPR(ParticleEffect, Load, (const XMLElement&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEffect", "bool Save(XMLElement&in) const", asMETHODPR(ParticleEffect, Save, (XMLElement&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "bool Save(XMLElement&) const", asMETHODPR(ParticleEffect, Save, (XMLElement&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void set_material(Material@+)", asMETHOD(ParticleEffect, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "Material@+ get_material() const", asMETHOD(ParticleEffect, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void set_numParticles(uint) const", asMETHOD(ParticleEffect, SetNumParticles), asCALL_THISCALL);
