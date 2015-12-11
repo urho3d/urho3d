@@ -169,7 +169,10 @@ endif ()
 
 # Generate platform specific export header file
 if (MSVC)
-    set (PRE_EXPORT_HEADER "\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)\n")
+    if (URHO3D_LIB_TYPE STREQUAL STATIC)
+        set (BAKED_IN_DEFINE "\n#define URHO3D_STATIC_DEFINE\n")
+    endif ()
+    set (PRE_EXPORT_HEADER "\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)\n${BAKED_IN_DEFINE}")
 endif ()
 if (URHO3D_CLANG_TOOLS)
     set (POST_EXPORT_HEADER "\n#define NONSCRIPTABLE __attribute__((annotate(\"nonscriptable\")))\n")
