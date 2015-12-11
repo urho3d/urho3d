@@ -53,8 +53,29 @@ URHO3D_EVENT(E_CROWD_AGENT_FORMATION, CrowdAgentFormation)
     URHO3D_PARAM(P_POSITION, Position); // Vector3 [in/out]
 }
 
+/// Crowd agent formation specific to a node.
+URHO3D_EVENT(E_CROWD_AGENT_NODE_FORMATION, CrowdAgentNodeFormation)
+{
+    URHO3D_PARAM(P_NODE, Node); // Node pointer
+    URHO3D_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    URHO3D_PARAM(P_INDEX, Index); // unsigned
+    URHO3D_PARAM(P_SIZE, Size); // unsigned
+    URHO3D_PARAM(P_POSITION, Position); // Vector3 [in/out]
+}
+
 /// Crowd agent has been repositioned.
 URHO3D_EVENT(E_CROWD_AGENT_REPOSITION, CrowdAgentReposition)
+{
+    URHO3D_PARAM(P_NODE, Node); // Node pointer
+    URHO3D_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    URHO3D_PARAM(P_POSITION, Position); // Vector3
+    URHO3D_PARAM(P_VELOCITY, Velocity); // Vector3
+    URHO3D_PARAM(P_ARRIVED, Arrived); // bool
+    URHO3D_PARAM(P_TIMESTEP, TimeStep); // float
+}
+
+/// Crowd agent has been repositioned, specific to a node
+URHO3D_EVENT(E_CROWD_AGENT_NODE_REPOSITION, CrowdAgentNodeReposition)
 {
     URHO3D_PARAM(P_NODE, Node); // Node pointer
     URHO3D_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
@@ -75,8 +96,30 @@ URHO3D_EVENT(E_CROWD_AGENT_FAILURE, CrowdAgentFailure)
     URHO3D_PARAM(P_CROWD_TARGET_STATE, CrowdTargetState); // int
 }
 
+/// Crowd agent's internal state has become invalidated. This is a special case of CrowdAgentStateChanged event.
+URHO3D_EVENT(E_CROWD_AGENT_NODE_FAILURE, CrowdAgentNodeFailure)
+{
+    URHO3D_PARAM(P_NODE, Node); // Node pointer
+    URHO3D_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    URHO3D_PARAM(P_POSITION, Position); // Vector3
+    URHO3D_PARAM(P_VELOCITY, Velocity); // Vector3
+    URHO3D_PARAM(P_CROWD_AGENT_STATE, CrowdAgentState); // int
+    URHO3D_PARAM(P_CROWD_TARGET_STATE, CrowdTargetState); // int
+}
+
 /// Crowd agent's state has been changed.
 URHO3D_EVENT(E_CROWD_AGENT_STATE_CHANGED, CrowdAgentStateChanged)
+{
+    URHO3D_PARAM(P_NODE, Node); // Node pointer
+    URHO3D_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
+    URHO3D_PARAM(P_POSITION, Position); // Vector3
+    URHO3D_PARAM(P_VELOCITY, Velocity); // Vector3
+    URHO3D_PARAM(P_CROWD_AGENT_STATE, CrowdAgentState); // int
+    URHO3D_PARAM(P_CROWD_TARGET_STATE, CrowdTargetState); // int
+}
+
+/// Crowd agent's state has been changed.
+URHO3D_EVENT(E_CROWD_AGENT_NODE_STATE_CHANGED, CrowdAgentNodeStateChanged)
 {
     URHO3D_PARAM(P_NODE, Node); // Node pointer
     URHO3D_PARAM(P_CROWD_AGENT, CrowdAgent); // CrowdAgent pointer
