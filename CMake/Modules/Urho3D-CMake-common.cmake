@@ -397,7 +397,9 @@ if (URHO3D_LIB_TYPE)
 endif ()
 if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
     set (URHO3D_LIB_TYPE STATIC)
-    add_definitions (-DURHO3D_STATIC_DEFINE)
+    if (NOT MSVC)   # This define will be baked into the export header for MSVC compiler
+        add_definitions (-DURHO3D_STATIC_DEFINE)
+    endif ()
 endif ()
 
 # Add definition for AngelScript
