@@ -32,7 +32,7 @@ const uint MAX_QUICK_MENU_ITEMS = 10;
 
 const uint maxRecentSceneCount = 5;
 
-Array<String> uiSceneFilters = {"*.xml", "*.bin", "*.*"};
+Array<String> uiSceneFilters = {"*.xml", "*.json", "*.bin", "*.*"};
 Array<String> uiElementFilters = {"*.xml"};
 Array<String> uiAllFilters = {"*.*"};
 Array<String> uiScriptFilters = {"*.as", "*.*"};

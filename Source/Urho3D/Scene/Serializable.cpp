@@ -443,7 +443,7 @@ bool Serializable::LoadJSON(const JSONValue& source, bool setInstanceDefault)
         String name = it->first_;
         const JSONValue& value = it->second_;
         unsigned i = startIndex;
-        unsigned attempts = attributesObject.Size();
+        unsigned attempts = attributes->Size();
 
         while (attempts)
         {
@@ -582,7 +582,7 @@ bool Serializable::SaveJSON(JSONValue& dest) const
             attrVal = attr.enumNames_[enumValue];
         }
         else
-            attrVal.SetVariantValue(value);
+            attrVal.SetVariantValue(value, context_);
 
         attributesValue.Set(attr.name_, attrVal);
     }

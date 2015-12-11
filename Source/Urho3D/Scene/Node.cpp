@@ -265,6 +265,7 @@ bool Node::SaveJSON(JSONValue& dest) const
             return false;
         childrenArray.Push(childVal);
     }
+    dest.Set("children", childrenArray);
 
     return true;
 }

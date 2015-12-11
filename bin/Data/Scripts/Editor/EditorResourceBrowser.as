@@ -1046,7 +1046,7 @@ int GetResourceType(String path)
 
 int GetResourceType(String path, StringHash &out fileType, bool useCache = false)
 {
-    if (GetExtensionType(path, fileType) || GetBinaryType(path, fileType, useCache) || GetXmlType(path, fileType, useCache) || GetJsonType(path, fileType, useCache))
+    if (GetExtensionType(path, fileType) || GetBinaryType(path, fileType, useCache) || GetXmlType(path, fileType, useCache))
         return GetResourceType(fileType);
 
     return RESOURCE_TYPE_UNKNOWN;
@@ -1318,81 +1318,7 @@ bool GetXmlType(String path, StringHash &out fileType, bool useCache = false)
         XMLFile@ xml = XMLFile();
         if (xml.Load(file))
             name = xml.root.name;
-        else 
-            return false;
-    }
-
-    bool found = false;
-    if (!name.empty)
-    {
-        found = true;
-        StringHash type = StringHash(name);
-        if (type == XML_TYPE_SCENE)
-            fileType = XML_TYPE_SCENE;
-        else if (type == XML_TYPE_NODE)
-            fileType = XML_TYPE_NODE;
-        else if(type == XML_TYPE_MATERIAL)
-            fileType = XML_TYPE_MATERIAL;
-        else if(type == XML_TYPE_TECHNIQUE)
-            fileType = XML_TYPE_TECHNIQUE;
-        else if(type == XML_TYPE_PARTICLEEFFECT)
-            fileType = XML_TYPE_PARTICLEEFFECT;
-        else if(type == XML_TYPE_PARTICLEEMITTER)
-            fileType = XML_TYPE_PARTICLEEMITTER;
-        else if(type == XML_TYPE_TEXTURE)
-            fileType = XML_TYPE_TEXTURE;
-        else if(type == XML_TYPE_ELEMENT)
-            fileType = XML_TYPE_ELEMENT;
-        else if(type == XML_TYPE_ELEMENTS)
-            fileType = XML_TYPE_ELEMENTS;
-        else if (type == XML_TYPE_ANIMATION_SETTINGS)
-            fileType = XML_TYPE_ANIMATION_SETTINGS;
-        else if (type == XML_TYPE_RENDERPATH)
-            fileType = XML_TYPE_RENDERPATH;
-        else if (type == XML_TYPE_TEXTURE_ATLAS)
-            fileType = XML_TYPE_TEXTURE_ATLAS;
-        else if (type == XML_TYPE_2D_PARTICLE_EFFECT)
-            fileType = XML_TYPE_2D_PARTICLE_EFFECT;
-        else if (type == XML_TYPE_TEXTURE_3D)
-            fileType = XML_TYPE_TEXTURE_3D;
-        else if (type == XML_TYPE_CUBEMAP)
-            fileType = XML_TYPE_CUBEMAP;
-        else if (type == XML_TYPE_SPRITER_DATA)
-            fileType = XML_TYPE_SPRITER_DATA;
         else
-            found = false;
-    }
-    return found;
-}
-
-bool GetJsonType(String path, StringHash &out fileType, bool useCache = false)
-{
-    String extension = GetExtension(path);
-    if (extension == ".txt" || extension == ".xml" || extension == ".icns" || extension == ".atlas")
-        return false;
-
-    String name;
-    if (useCache)
-    {
-        JSONFile@ json = cache.GetResource("JSONFile", path);
-        if (json is null)
-            return false;
-
-        name = json.root.name;
-    }
-    else
-    {
-        File@ file = File();
-        if (!file.Open(path))
-            return false;
-
-        if (file.size == 0)
-            return false;
-
-        XMLFile@ xml = XMLFile();
-        if (xml.Load(file))
-            name = xml.root.name;
-        else 
             return false;
     }
 
