@@ -36,6 +36,7 @@
 #include "../IO/VectorBuffer.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
+#include "../Resource/JSONFile.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/ValueAnimation.h"
@@ -197,6 +198,63 @@ bool Material::BeginLoad(Deserializer& source)
     if (!graphics)
         return true;
 
+    String extension = GetExtension(source.GetName());
+
+    bool success = false;
+    if (extension == ".xml")
+    {
+        success = BeginLoadXML(source);
+        if (!success)
+            success = BeginLoadJSON(source);
+
+        if (success)
+            return true;
+    }
+    else // Load JSON file
+    {
+        success = BeginLoadJSON(source);
+        if (!success)
+            success = BeginLoadXML(source);
+
+        if (success)
+            return true;
+    }
+
+    // All loading failed
+    ResetToDefaults();
+    loadJSONFile_.Reset();
+    return false;
+}
+
+bool Material::EndLoad()
+{
+    // In headless mode, do not actually load the material, just return success
+    Graphics* graphics = GetSubsystem<Graphics>();
+    if (!graphics)
+        return true;
+
+    bool success = false;
+    if (loadXMLFile_)
+    {
+        // If async loading, get the techniques / textures which should be ready now
+        XMLElement rootElem = loadXMLFile_->GetRoot();
+        success = Load(rootElem);
+    }
+
+    if (loadJSONFile_)
+    {
+        JSONValue rootVal = loadJSONFile_->GetRoot();
+        success = Load(rootVal);
+    }
+
+    loadXMLFile_.Reset();
+    loadJSONFile_.Reset();
+    return success;
+}
+
+bool Material::BeginLoadXML(Deserializer& source)
+{
+    ResetToDefaults();
     loadXMLFile_ = new XMLFile(context_);
     if (loadXMLFile_->Load(source))
     {
@@ -239,33 +297,64 @@ bool Material::BeginLoad(Deserializer& source)
 
         return true;
     }
-    else
-    {
-        ResetToDefaults();
-        loadXMLFile_.Reset();
-        return false;
-    }
+
+    return false;
 }
 
-bool Material::EndLoad()
+bool Material::BeginLoadJSON(Deserializer& source)
 {
-    // In headless mode, do not actually load the material, just return success
-    Graphics* graphics = GetSubsystem<Graphics>();
-    if (!graphics)
-        return true;
+    // Attempt to load a JSON file
+    ResetToDefaults();
+    loadXMLFile_.Reset();
 
-    bool success = false;
-    if (loadXMLFile_)
+    // Attempt to load from JSON file instead
+    loadJSONFile_ = new JSONFile(context_);
+    if (loadJSONFile_->Load(source))
     {
-        // If async loading, get the techniques / textures which should be ready now
-        XMLElement rootElem = loadXMLFile_->GetRoot();
-        success = Load(rootElem);
+        // If async loading, scan the XML content beforehand for technique & texture resources
+        // and request them to also be loaded. Can not do anything else at this point
+        if (GetAsyncLoadState() == ASYNC_LOADING)
+        {
+            ResourceCache* cache = GetSubsystem<ResourceCache>();
+            const JSONValue& rootVal = loadJSONFile_->GetRoot();
+
+            JSONArray techniqueArray = rootVal.Get("techniques").GetArray();
+            for (unsigned i = 0; i < techniqueArray.Size(); i++)
+            {
+                const JSONValue& techVal = techniqueArray[i];
+                cache->BackgroundLoadResource<Technique>(techVal.Get("name").GetString(), true, this);
+            }
+
+            JSONObject textureObject = rootVal.Get("textures").GetObject();
+            for (JSONObject::ConstIterator it = textureObject.Begin(); it != textureObject.End(); it++)
+            {
+                String unitString = it->first_;
+                String name = it->second_.GetString();
+                // Detect cube maps by file extension: they are defined by an XML file
+                /// \todo Differentiate with 3D textures by actually reading the XML content
+                if (GetExtension(name) == ".xml")
+                {
+    #ifdef DESKTOP_GRAPHICS
+                    TextureUnit unit = TU_DIFFUSE;
+                    unit = ParseTextureUnitName(unitString);
+
+                    if (unit == TU_VOLUMEMAP)
+                        cache->BackgroundLoadResource<Texture3D>(name, true, this);
+                    else
+    #endif
+                        cache->BackgroundLoadResource<TextureCube>(name, true, this);
+                }
+                else
+                    cache->BackgroundLoadResource<Texture2D>(name, true, this);
+            }
+        }
+
+        // JSON material was successfully loaded
+        return true;
     }
 
-    loadXMLFile_.Reset();
-    return success;
+    return false;
 }
-
 
 bool Material::Save(Serializer& dest) const
 {
@@ -400,6 +489,137 @@ bool Material::Load(const XMLElement& source)
     return true;
 }
 
+bool Material::Load(const JSONValue& source)
+{
+    ResetToDefaults();
+
+    if (source.IsNull())
+    {
+        URHO3D_LOGERROR("Can not load material from null JSON element");
+        return false;
+    }
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    // Load techniques
+    JSONArray techniquesArray = source.Get("techniques").GetArray();
+    techniques_.Clear();
+    techniques_.Reserve(techniquesArray.Size());
+
+    for (unsigned i = 0; i < techniquesArray.Size(); i++)
+    {
+        const JSONValue& techVal = techniquesArray[i];
+        Technique* tech = cache->GetResource<Technique>(techVal.Get("name").GetString());
+        if (tech)
+        {
+            TechniqueEntry newTechnique;
+            newTechnique.technique_ = tech;
+            JSONValue qualityVal = techVal.Get("quality");
+            if (!qualityVal.IsNull())
+                newTechnique.qualityLevel_ = qualityVal.GetInt();
+            JSONValue lodDistanceVal = techVal.Get("loddistance");
+            if (!lodDistanceVal.IsNull())
+                newTechnique.lodDistance_ = lodDistanceVal.GetFloat();
+            techniques_.Push(newTechnique);
+        }
+    }
+
+    SortTechniques();
+
+    // Load textures
+    JSONObject textureObject = source.Get("textures").GetObject();
+    for (JSONObject::ConstIterator it = textureObject.Begin(); it != textureObject.End(); it++)
+    {
+        String textureUnit = it->first_;
+        String textureName = it->second_.GetString();
+
+        TextureUnit unit = TU_DIFFUSE;
+        unit = ParseTextureUnitName(textureUnit);
+
+        if (unit < MAX_TEXTURE_UNITS)
+        {
+            // Detect cube maps by file extension: they are defined by an XML file
+            /// \todo Differentiate with 3D textures by actually reading the XML content
+            if (GetExtension(textureName) == ".xml")
+            {
+#ifdef DESKTOP_GRAPHICS
+                if (unit == TU_VOLUMEMAP)
+                    SetTexture(unit, cache->GetResource<Texture3D>(textureName));
+                else
+#endif
+                    SetTexture(unit, cache->GetResource<TextureCube>(textureName));
+            }
+            else
+                SetTexture(unit, cache->GetResource<Texture2D>(textureName));
+        }
+    }
+
+    // Get shader parameters
+    batchedParameterUpdate_ = true;
+    JSONObject parameterObject = source.Get("shaderParameters").GetObject();
+
+    for (JSONObject::ConstIterator it = parameterObject.Begin(); it != parameterObject.End(); it++)
+    {
+        String name = it->first_;
+        SetShaderParameter(name, ParseShaderParameterValue(it->second_.GetString()));
+    }
+    batchedParameterUpdate_ = false;
+
+    // Load shader parameter animationss
+    JSONObject paramAnimationsObject = source.Get("shaderParameterAnimations").GetObject();
+    for (JSONObject::ConstIterator it = paramAnimationsObject.Begin(); it != paramAnimationsObject.End(); it++)
+    {
+        String name = it->first_;
+        JSONValue paramAnimVal = it->second_;
+
+        SharedPtr<ValueAnimation> animation(new ValueAnimation(context_));
+        if (!animation->LoadJSON(paramAnimVal))
+        {
+            URHO3D_LOGERROR("Could not load parameter animation");
+            return false;
+        }
+
+        String wrapModeString = paramAnimVal.Get("wrapmode").GetString();
+        WrapMode wrapMode = WM_LOOP;
+        for (int i = 0; i <= WM_CLAMP; ++i)
+        {
+            if (wrapModeString == wrapModeNames[i])
+            {
+                wrapMode = (WrapMode)i;
+                break;
+            }
+        }
+
+        float speed = paramAnimVal.Get("speed").GetFloat();
+        SetShaderParameterAnimation(name, animation, wrapMode, speed);
+    }
+
+    JSONValue cullVal = source.Get("cull");
+    if (!cullVal.IsNull())
+        SetCullMode((CullMode)GetStringListIndex(cullVal.GetString().CString(), cullModeNames, CULL_CCW));
+
+    JSONValue shadowCullVal = source.Get("shadowcull");
+    if (!shadowCullVal.IsNull())
+        SetShadowCullMode((CullMode)GetStringListIndex(shadowCullVal.GetString().CString(), cullModeNames, CULL_CCW));
+
+    JSONValue fillVal = source.Get("fill");
+    if (!fillVal.IsNull())
+        SetFillMode((FillMode)GetStringListIndex(fillVal.GetString().CString(), fillModeNames, FILL_SOLID));
+
+    JSONValue depthBiasVal = source.Get("depthbias");
+    if (!depthBiasVal.IsNull())
+        SetDepthBias(BiasParameters(depthBiasVal.Get("constant").GetFloat(), depthBiasVal.Get("slopescaled").GetFloat()));
+
+    JSONValue renderOrderVal = source.Get("renderorder");
+    if (!renderOrderVal.IsNull())
+        SetRenderOrder((unsigned char)renderOrderVal.Get("value").GetUInt());
+
+    RefreshShaderParameterHash();
+    RefreshMemoryUse();
+    CheckOcclusion();
+    return true;
+}
+
 bool Material::Save(XMLElement& dest) const
 {
     if (dest.IsNull())
@@ -475,6 +695,78 @@ bool Material::Save(XMLElement& dest) const
     // Write render order
     XMLElement renderOrderElem = dest.CreateChild("renderorder");
     renderOrderElem.SetUInt("value", renderOrder_);
+
+    return true;
+}
+
+bool Material::Save(JSONValue& dest) const
+{
+    // Write techniques
+    JSONArray techniquesArray;
+    techniquesArray.Reserve(techniques_.Size());
+    for (unsigned i = 0; i < techniques_.Size(); ++i)
+    {
+        const TechniqueEntry& entry = techniques_[i];
+        if (!entry.technique_)
+            continue;
+
+        JSONValue techniqueVal;
+        techniqueVal.Set("name", entry.technique_->GetName());
+        techniqueVal.Set("quality", (int) entry.qualityLevel_);
+        techniqueVal.Set("loddistance", entry.lodDistance_);
+        techniquesArray.Push(techniqueVal);
+    }
+    dest.Set("techniques", techniquesArray);
+
+    // Write texture units
+    JSONValue texturesValue;
+    for (unsigned j = 0; j < MAX_TEXTURE_UNITS; ++j)
+    {
+        Texture* texture = GetTexture((TextureUnit)j);
+        if (texture)
+            texturesValue.Set(textureUnitNames[j], texture->GetName());
+    }
+    dest.Set("textures", texturesValue);
+
+    // Write shader parameters
+    JSONValue shaderParamsVal;
+    for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator j = shaderParameters_.Begin();
+         j != shaderParameters_.End(); ++j)
+    {
+        shaderParamsVal.Set(j->second_.name_, j->second_.value_.ToString());
+    }
+    dest.Set("shaderParameters", shaderParamsVal);
+
+    // Write shader parameter animations
+    JSONValue shaderParamAnimationsVal;
+    for (HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> >::ConstIterator j = shaderParameterAnimationInfos_.Begin();
+         j != shaderParameterAnimationInfos_.End(); ++j)
+    {
+        ShaderParameterAnimationInfo* info = j->second_;
+        JSONValue paramAnimationVal;
+        if (!info->GetAnimation()->SaveJSON(paramAnimationVal))
+            return false;
+
+        paramAnimationVal.Set("wrapmode", wrapModeNames[info->GetWrapMode()]);
+        paramAnimationVal.Set("speed", info->GetSpeed());
+        shaderParamAnimationsVal.Set(info->GetName(), paramAnimationVal);
+    }
+    dest.Set("shaderParameterAnimations", shaderParamAnimationsVal);
+
+    // Write culling modes
+    dest.Set("cull", cullModeNames[cullMode_]);
+    dest.Set("shadowcull", cullModeNames[shadowCullMode_]);
+
+    // Write fill mode
+    dest.Set("fill", fillModeNames[fillMode_]);
+
+    // Write depth bias
+    JSONValue depthBiasValue;
+    depthBiasValue.Set("constant", depthBias_.constantBias_);
+    depthBiasValue.Set("slopescaled", depthBias_.slopeScaledBias_);
+
+    // Write render order
+    dest.Set("renderorder", (unsigned) renderOrder_);
 
     return true;
 }

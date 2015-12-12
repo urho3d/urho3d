@@ -367,7 +367,7 @@ void JSONValue::SetVariant(const Variant& variant, Context* context)
 Variant JSONValue::GetVariant() const
 {
     VariantType type = Variant::GetTypeFromName((*this)["type"].GetString());
-    return (*this)["value"].GetVariantValue(type);    
+    return (*this)["value"].GetVariantValue(type);
 }
 
 void JSONValue::SetVariantValue(const Variant& variant, Context* context)
@@ -411,7 +411,7 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
         {
             if (!context)
             {
-                URHO3D_LOGERROR("Context must not null for ResourceRef");
+                URHO3D_LOGERROR("Context must not be null for ResourceRef");
                 return;
             }
 
@@ -424,7 +424,7 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
         {
             if (!context)
             {
-                URHO3D_LOGERROR("Context must not null for ResourceRefList");
+                URHO3D_LOGERROR("Context must not be null for ResourceRefList");
                 return;
             }
 

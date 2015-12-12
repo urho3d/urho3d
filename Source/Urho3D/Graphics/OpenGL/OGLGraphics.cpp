@@ -642,6 +642,10 @@ bool Graphics::BeginFrame()
             SetMode(width, height);
     }
 
+    // Re-enable depth test and depth func in case a third party program has modified it
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(glCmpFunc[depthTestMode_]);
+
     // Set default rendertarget and depth buffer
     ResetRenderTargets();
 

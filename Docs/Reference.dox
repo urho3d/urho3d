@@ -313,7 +313,7 @@ Unless you have extremely serious reasons for doing so, you should not subclass 
 
 \section SceneModel_LoadSave Loading and saving scenes
 
-Scenes can be loaded and saved in either binary or XML format; see the functions \ref Scene::Load "Load()", \ref Scene::LoadXML "LoadXML()", \ref Scene::Save "Save()" and \ref Scene::SaveXML "SaveXML()". See \ref Serialization
+Scenes can be loaded and saved in either binary, JSON, or XML formats; see the functions \ref Scene::Load "Load()", \ref Scene::LoadXML "LoadXML()", \ref Scene::LoadJSON "LoadJSON", \ref Scene::Save "Save()" and \ref Scene::SaveXML "SaveXML()", and \ref Scene::SaveJSON "SaveJSON()". See \ref Serialization
 "Serialization" for the technical details on how this works. When a scene is loaded, all existing content in it (child nodes and components) is removed first.
 
 Nodes and components that are marked temporary will not be saved. See \ref Serializable::SetTemporary "SetTemporary()".
@@ -322,13 +322,13 @@ To be able to track the progress of loading a (large) scene without having the p
 
 \section SceneModel_Instantiation Object prefabs
 
-Just loading or saving whole scenes is not flexible enough for eg. games where new objects need to be dynamically created. On the other hand, creating complex objects and setting their properties in code will also be tedious. For this reason, it is also possible to save a scene node (and its child nodes, components and attributes) to either binary or XML to be able to instantiate it later into a scene. Such a saved object is often referred to as a prefab. There are three ways to do this:
+Just loading or saving whole scenes is not flexible enough for eg. games where new objects need to be dynamically created. On the other hand, creating complex objects and setting their properties in code will also be tedious. For this reason, it is also possible to save a scene node (and its child nodes, components and attributes) to either binary, JSON, or XML to be able to instantiate it later into a scene. Such a saved object is often referred to as a prefab. There are three ways to do this:
 
-- In code by calling \ref Node::Save "Save()" or \ref Node::SaveXML "SaveXML()" on the Node in question.
+- In code by calling \ref Node::Save "Save()", \ref Node::SaveJSON "SaveJSON()", or \ref Node::SaveXML "SaveXML()" on the Node in question.
 - In the editor, by selecting the node in the hierarchy window and choosing "Save node as" from the "File" menu.
 - Using the "node" command in AssetImporter, which will save the scene node hierarchy and any models contained in the input asset (eg. a Collada file)
 
-To instantiate the saved node into a scene, call \ref Scene::Instantiate "Instantiate()" or \ref Scene::InstantiateXML "InstantiateXML()" depending on the format. The node will be created as a child of the Scene but can be freely reparented after that. Position and rotation for placing the node need to be specified. The NinjaSnowWar example uses XML format for its object prefabs; these exist in the bin/Data/Objects directory.
+To instantiate the saved node into a scene, call \ref Scene::Instantiate "Instantiate()", \ref Scene::InstantiateJSON() or \ref Scene::InstantiateXML "InstantiateXML()" depending on the format. The node will be created as a child of the Scene but can be freely reparented after that. Position and rotation for placing the node need to be specified. The NinjaSnowWar example uses XML format for its object prefabs; these exist in the bin/Data/Objects directory.
 
 \section SceneModel_FurtherInformation Further information
 
@@ -351,6 +351,7 @@ Resources include most things in Urho3D that are loaded from mass storage during
 - Texture3D
 - TextureCube
 - XMLFile
+- JSONFile
 
 They are managed and loaded by the ResourceCache subsystem. Like with all other \ref ObjectTypes "typed objects", resource types are identified by 32-bit type name hashes (C++) or type names (script). An object factory must be registered for each resource type.
 
@@ -381,7 +382,7 @@ parse data, upload to GPU if necessary) and can therefore result in framerate dr
 
 If you know in advance what resources you need, you can request them to be loaded in a background thread by calling \ref ResourceCache::BackgroundLoadResource "BackgroundLoadResource()". The event E_RESOURCEBACKGROUNDLOADED will be sent after the loading is complete; it will tell if the loading actually was a success or a failure. Depending on the resource, only a part of the loading process may be moved to a background thread, for example the finishing GPU upload step always needs to happen in the main thread. Note that if you call GetResource() for a resource that is queued for background loading, the main thread will stall until its loading is complete.
 
-The asynchronous scene loading functionality \ref Scene::LoadAsync "LoadAsync()" and \ref Scene::LoadAsyncXML "LoadAsyncXML()" has the option to background load the resources first before proceeding to load the scene content. It can also be used to only load the resources without modifying the scene, by specifying the LOAD_RESOURCES_ONLY mode. This allows to prepare a scene or object prefab file for fast instantiation.
+The asynchronous scene loading functionality \ref Scene::LoadAsync "LoadAsync()", \ref Scene::LoadAsyncJSON "LoadAsyncJSON()" and \ref Scene::LoadAsyncXML "LoadAsyncXML()" have the option to background load the resources first before proceeding to load the scene content. It can also be used to only load the resources without modifying the scene, by specifying the LOAD_RESOURCES_ONLY mode. This allows to prepare a scene or object prefab file for fast instantiation.
 
 Finally the maximum time (in milliseconds) spent each frame on finishing background loaded resources can be configured, see \ref ResourceCache::SetFinishBackgroundResourcesMs "SetFinishBackgroundResourcesMs()".
 
@@ -1031,7 +1032,7 @@ OpenGL ES 2.0 has further limitations:
 
 \page Materials Materials
 
-Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. Default and example materials exist in the bin/CoreData/Materials & bin/Data/Materials subdirectories, and techniques exist in the bin/CoreData/Techniques subdirectory.
+Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML or JSON data. Default and example materials exist in the bin/CoreData/Materials & bin/Data/Materials subdirectories, and techniques exist in the bin/CoreData/Techniques subdirectory.
 
 A material defines the textures, shader parameters and culling & fill mode to use, and refers to one or several techniques. A technique defines the actual rendering passes, the shaders to use in each, and all other rendering states such as depth test, depth write, and blending.
 
