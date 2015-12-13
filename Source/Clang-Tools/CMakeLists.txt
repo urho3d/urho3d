@@ -24,7 +24,7 @@
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     project (Urho3D-Clang-Tools)
 else ()
-    project (ExternalProject-${URHO3D_CLANG_TOOLS})
+    project (Urho3D-ExternalProject-${URHO3D_CLANG_TOOLS})
 
     # Set minimum version
     cmake_minimum_required (VERSION 2.8.6)

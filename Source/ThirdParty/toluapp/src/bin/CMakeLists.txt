@@ -22,7 +22,7 @@
 
 if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set project name
-    project (ExternalProject-tolua++)
+    project (Urho3D-ExternalProject-tolua++)
 
     # Set minimum version
     cmake_minimum_required (VERSION 2.8.6)

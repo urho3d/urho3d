@@ -26,7 +26,7 @@ if (CMAKE_PROJECT_NAME STREQUAL ExternalProject-tolua++)
     set (DEST_RUNTIME_DIR "")   # In this particular case, it is not equivalent to unset() the variable
 elseif (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set project name
-    project (ExternalProject-buildvm)
+    project (Urho3D-ExternalProject-buildvm)
 
     # Set minimum version
     cmake_minimum_required (VERSION 2.8.6)

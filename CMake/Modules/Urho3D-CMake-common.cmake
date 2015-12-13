@@ -145,8 +145,10 @@ else ()
         # Just reference it to suppress "unused variable" CMake warning on downstream projects using this CMake module
     endif ()
     # All Urho3D downstream projects require Urho3D library, so find Urho3D library here now
-    find_package (Urho3D REQUIRED)
-    include_directories (${URHO3D_INCLUDE_DIRS})
+    if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
+        find_package (Urho3D REQUIRED)
+        include_directories (${URHO3D_INCLUDE_DIRS})
+    endif ()
 endif ()
 option (URHO3D_PACKAGING "Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0" ${EMSCRIPTEN})
 option (URHO3D_PROFILING "Enable profiling support" TRUE)
