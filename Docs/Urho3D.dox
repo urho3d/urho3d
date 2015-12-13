@@ -387,7 +387,7 @@ V1.4
 - Fill mode added to materials.
 - AngelScript script objects can be stored in a %Variant.
 - Improved attribute registration: class name and variant type not needed.
-- Add new rake tasks to facilitate configuring/generating and building Urho3D project, including external project using Urho3D library.
+- Add new rake tasks to facilitate configuring/generating and building Urho3D project, including downstream project using Urho3D library.
 - Update PugiXml to 1.5.
 - Update STB libraries to latest.
 - Editor: particle effect editor window.
@@ -608,7 +608,7 @@ V1.32
 
 V1.31
 
-- Extensive build system improvements, especially for using Urho3D as a library in an external project.
+- Extensive build system improvements, especially for using Urho3D as a library in an downstream project.
 - LuaJIT support.
 - Improved Lua bindings, Lua coroutine support, automatic loading of compiled Lua scripts (.luc) if they exist.
 - HDR rendering, 3D textures, height fog and several new post process shaders.
