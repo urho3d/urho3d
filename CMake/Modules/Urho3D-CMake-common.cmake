@@ -141,7 +141,7 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
 else ()
     set (URHO3D_LIB_TYPE "" CACHE STRING "Specify Urho3D library type, possible values are STATIC and SHARED")
     set (URHO3D_HOME "" CACHE PATH "Path to Urho3D build tree or SDK installation location (downstream project only)")
-    if (URHO3D_PCH OR URHO3D_UPDATE_SOURCE_TREE)
+    if (URHO3D_PCH OR URHO3D_UPDATE_SOURCE_TREE OR URHO3D_TOOLS OR URHO3D_EXTRAS)
         # Just reference it to suppress "unused variable" CMake warning on downstream projects using this CMake module
     endif ()
     # All Urho3D downstream projects require Urho3D library, so find Urho3D library here now
@@ -401,7 +401,7 @@ endif ()
 if (URHO3D_LIB_TYPE)
     string (TOUPPER ${URHO3D_LIB_TYPE} URHO3D_LIB_TYPE)
 endif ()
-if (NOT URHO3D_LIB_TYPE STREQUAL "" AND NOT URHO3D_LIB_TYPE STREQUAL SHARED)
+if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
     set (URHO3D_LIB_TYPE STATIC)
     if (NOT MSVC)   # This define will be baked into the export header for MSVC compiler
         add_definitions (-DURHO3D_STATIC_DEFINE)
