@@ -570,14 +570,12 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
         dest.Push(transform * pathData_->pathPoints_[i]);
 }
 
-void NavigationMesh::FindPath(NavigationPathData& dest, const Vector3& start, const Vector3& end, const Vector3& extents,
+void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector3& start, const Vector3& end, const Vector3& extents,
     const dtQueryFilter* filter)
 {
     URHO3D_PROFILE(FindPath);
+    dest.Clear();
 
-    dest.pathPoints_.Clear();
-    dest.pathFlags_.Clear();
-    dest.pathAreas_.Clear();
 
     if (!InitializeQuery())
         return;
@@ -618,9 +616,12 @@ void NavigationMesh::FindPath(NavigationPathData& dest, const Vector3& start, co
     // Transform path result back to world space
     for (int i = 0; i < numPathPoints; ++i)
     {
-        dest.pathPoints_.Push(transform * pathData_->pathPoints_[i]);
-        dest.pathAreas_.Push(pathData_->pathAreras_[i]);
-        dest.pathFlags_.Push(pathData_->pathFlags_[i]);
+        NavigationPathPoint pt;
+        pt.position_ = transform * pathData_->pathPoints_[i];
+        pt.flag_ = (NavigationPathPointFlag) pathData_->pathFlags_[i];
+        pt.areaID_ = pathData_->pathAreras_[i];
+
+        dest.Push(pt);
     }
 }
 
