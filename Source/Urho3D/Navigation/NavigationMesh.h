@@ -75,7 +75,7 @@ enum NavigationPathPointFlag
     NAVPATHFLAG_OFF_MESH = 0x04
 };
 
-struct NavigationPathPoint
+struct URHO3D_API NavigationPathPoint
 {
     /// World-space position of the path point
     Vector3 position_;
