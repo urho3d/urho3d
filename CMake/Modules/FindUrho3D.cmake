@@ -178,9 +178,8 @@ else ()
         endif ()
     endif ()
     # Ensure the module has found the library with the right ABI for the chosen compiler and URHO3D_64BIT build option
-    if (NOT IOS)
-        try_compile (COMPILE_RESULT ${CMAKE_BINARY_DIR}/generated/FindUrho3D
-            SOURCES ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
+    if (NOT IOS AND NOT MSVC)
+        try_compile (COMPILE_RESULT ${CMAKE_BINARY_DIR}/generated/FindUrho3D ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
             CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS}
             LINK_LIBRARIES ${URHO3D_LIBRARIES})
     endif ()
