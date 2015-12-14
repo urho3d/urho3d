@@ -178,10 +178,12 @@ else ()
         endif ()
     endif ()
     # Ensure the module has found the library with the right ABI for the chosen compiler and URHO3D_64BIT build option
-    try_compile (COMPILE_RESULT ${CMAKE_BINARY_DIR}
-        SOURCES ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
-        CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS}
-        LINK_LIBRARIES ${URHO3D_LIBRARIES})
+    if (NOT IOS)
+        try_compile (COMPILE_RESULT ${CMAKE_BINARY_DIR}/generated/FindUrho3D
+            SOURCES ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
+            CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS}
+            LINK_LIBRARIES ${URHO3D_LIBRARIES})
+    endif ()
     # For shared library type, also initialize the URHO3D_DLL variable for later use
     if (WIN32)
         if (URHO3D_LIB_TYPE STREQUAL SHARED AND URHO3D_HOME)
