@@ -29,6 +29,8 @@ class PhysicsWorld : public Component
     tolua_outside const PODVector<PhysicsRaycastResult>& PhysicsWorldRaycast @ Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     // void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     tolua_outside PhysicsRaycastResult PhysicsWorldRaycastSingle @ RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    // void RaycastSingleSegmented(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    tolua_outside PhysicsRaycastResult PhysicsWorldRaycastSingleSegmented @ RaycastSingleSegmented(const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     // void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     tolua_outside PhysicsRaycastResult PhysicsWorldSphereCast @ SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     // void ConvexCast(PhysicsRaycastResult& result, CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED);
@@ -80,6 +82,13 @@ static PhysicsRaycastResult PhysicsWorldRaycastSingle(PhysicsWorld* physicsWorld
 {
     PhysicsRaycastResult result;
     physicsWorld->RaycastSingle(result, ray, maxDistance, collisionMask);
+    return result;
+}
+
+static PhysicsRaycastResult PhysicsWorldRaycastSingleSegmented(PhysicsWorld* physicsWorld, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+{
+    PhysicsRaycastResult result;
+    physicsWorld->RaycastSingleSegmented(result, ray, maxDistance, segmentDistance, collisionMask);
     return result;
 }
 
