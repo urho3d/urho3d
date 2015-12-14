@@ -2501,7 +2501,7 @@ void Graphics::PrepareDraw()
             depthStencil_ ? (ID3D11DepthStencilView*)depthStencil_->GetRenderTargetView() : impl_->defaultDepthStencilView_;
 
         // If possible, bind a read-only depth stencil view to allow reading depth in shader
-        if (!depthWrite_ && depthStencil_)
+        if (!depthWrite_ && depthStencil_ && depthStencil_->GetReadOnlyView())
             impl_->depthStencilView_ = (ID3D11DepthStencilView*)depthStencil_->GetReadOnlyView();
 
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
