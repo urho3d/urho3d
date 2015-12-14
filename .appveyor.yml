@@ -43,10 +43,10 @@ matrix:
 install:
   - ps: if ($env:APPVEYOR_REPO_TAG -eq "true" -or (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED)))
         {
-          if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME } else { git fetch -q --unshallow };
+          if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME } else { "Unshallowing git repository..."; git fetch -q --unshallow };
           if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC-3D11.zip" };
           $env:PACKAGE_UPLOAD = "1";
-          choco install doxygen.portable graphviz.portable >$null;
+          do { "Installing doxygen and graphviz..."; choco install doxygen.portable graphviz.portable >$null } until ($?);
         }
 build_script:
   - if "%PLATFORM%" == "x64" set "OPTS=URHO3D_64BIT=1"
@@ -56,7 +56,7 @@ build_script:
   - rake make config=%Configuration%
 # Could not run test target yet as AppVeyor does not currently allow its service to interact with desktop
 # - rake make config=%Configuration% target=RUN_TESTS
-  - if "%PACKAGE_UPLOAD%" == "1" rake ci_appveyor_package_upload
+  - if "%PACKAGE_UPLOAD%" == "1" (rake ci_appveyor_package_upload) else (rake scaffolding dir=MyProject project=MyProject && cd MyProject && rake cmake vs2015 %OPTS% URHO3D_HOME=..\..\native-Build URHO3D_D3D11=1 && rake make config=%Configuration%)
 test: off
 artifacts:
   - path: native-Build\*.zip

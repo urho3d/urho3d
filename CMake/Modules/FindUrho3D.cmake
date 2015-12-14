@@ -31,7 +31,8 @@
 #  URHO3D_FOUND
 #  URHO3D_INCLUDE_DIRS
 #  URHO3D_LIBRARIES
-#  URHO3D_VERSION (when using it as an external library)
+#  URHO3D_VERSION
+#  URHO3D_LIB_TYPE (use as input variable if specified; or as output variable if it is set based on module's search result)
 #
 # WIN32 only:
 #  URHO3D_LIBRARIES_REL
@@ -72,6 +73,7 @@ else ()
             unset (URHO3D_DLL_DBG CACHE)
         endif ()
         # Urho3D prefers static library type by default while CMake prefers shared one, so we need to change CMake preference to agree with Urho3D
+        set (CMAKE_FIND_LIBRARY_SUFFIXES_SAVED ${CMAKE_FIND_LIBRARY_SUFFIXES})
         if (NOT CMAKE_FIND_LIBRARY_SUFFIXES MATCHES ^\\.\(a|lib\))
             list (REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
         endif ()
@@ -131,8 +133,12 @@ else ()
             list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_BASE_INCLUDE_DIR}/ThirdParty/Lua${JIT})
         endif ()
         # Intentionally do no cache the URHO3D_VERSION as it has potential to change frequently
-        file (STRINGS "${URHO3D_BASE_INCLUDE_DIR}/librevision.h" URHO3D_VERSION REGEX "^const char\\* revision=\"[^\"]*\".*$")
+        file (STRINGS ${URHO3D_BASE_INCLUDE_DIR}/librevision.h URHO3D_VERSION REGEX "^const char\\* revision=\"[^\"]*\".*$")
         string (REGEX REPLACE "^const char\\* revision=\"([^\"]*)\".*$" \\1 URHO3D_VERSION "${URHO3D_VERSION}")      # Stringify to guard against empty variable
+        # The library type is baked into export header only for MSVC as it has no other way to differentiate them, fortunately both types cannot coexist for MSVC anyway unlike other compilers
+        if (MSVC)
+            file (STRINGS ${URHO3D_BASE_INCLUDE_DIR}/Urho3D.h MSVC_STATIC_LIB REGEX "^#define URHO3D_STATIC_DEFINE$")
+        endif ()
     endif ()
     find_library (URHO3D_LIBRARIES NAMES Urho3D ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT} DOC "Urho3D library directory")
     if (WIN32)
@@ -151,8 +157,6 @@ else ()
     endif ()
     # Ensure the module has found the right one if the library type is specified
     if (MSVC)
-        # The library type is baked into export header only for MSVC as it has no other way to differentiate them, i.e. both types cannot coexist on MSVC unlike other compilers
-        file (STRINGS "${URHO3D_BASE_INCLUDE_DIR}/Urho3D.h" MSVC_STATIC_LIB REGEX "^#define URHO3D_STATIC_DEFINE$")
         if (URHO3D_LIB_TYPE)
             if (NOT ((URHO3D_LIB_TYPE STREQUAL STATIC AND MSVC_STATIC_LIB) OR (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT MSVC_STATIC_LIB)))
                 unset (URHO3D_LIB_TYPE)
@@ -164,16 +168,17 @@ else ()
                 set (URHO3D_LIB_TYPE SHARED)
             endif ()
         endif ()
-    elseif (NOT URHO3D_LIB_TYPE)
-        if (URHO3D_LIBRARIES MATCHES \\.\(so|dll\\.a|dylib\)$)
-            set (URHO3D_LIB_TYPE SHARED)
-        elseif (URHO3D_LIBRARIES MATCHES \\.a$)
+    elseif (NOT URHO3D_LIB_TYPE AND URHO3D_LIBRARIES)
+        get_filename_component (EXT ${URHO3D_LIBRARIES} EXT)
+        if (EXT STREQUAL .a)
             set (URHO3D_LIB_TYPE STATIC)
-            add_definitions (-DURHO3D_STATIC_DEFINE)
+        else ()
+            set (URHO3D_LIB_TYPE SHARED)
         endif ()
     endif ()
+    # TODO: Ensure the module has found the library with the right ABI for the chosen compiler and URHO3D_64BIT build option
+    # For shared library type, also initialize the URHO3D_DLL variable for later use
     if (WIN32)
-        # For shared library type, also initialize the URHO3D_DLL variable for later use
         if (URHO3D_LIB_TYPE STREQUAL SHARED AND URHO3D_HOME)
             find_file (URHO3D_DLL_REL Urho3D.dll HINTS ${URHO3D_HOME}/bin NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH DOC "Urho3D release DLL")
             if (URHO3D_DLL_REL)
@@ -184,6 +189,9 @@ else ()
                 list (APPEND URHO3D_DLL ${URHO3D_DLL_DBG})
             endif ()
         endif ()
+    endif ()
+    if (CMAKE_FIND_LIBRARY_SUFFIXES_SAVED)
+        set (CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES_SAVED})
     endif ()
 endif ()
 
