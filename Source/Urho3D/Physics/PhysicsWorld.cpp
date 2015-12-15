@@ -406,6 +406,52 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
     }
 }
 
+void PhysicsWorld::RaycastSingleSegmented(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask)
+{
+    URHO3D_PROFILE(PhysicsRaycastSingleSegmented);
+
+    if (maxDistance >= M_INFINITY)
+        URHO3D_LOGWARNING("Infinite maxDistance in physics raycast is not supported");
+
+    btVector3 start = ToBtVector3(ray.origin_);
+    btVector3 end;
+    btVector3 direction = ToBtVector3(ray.direction_);
+    float distance;
+
+    for (float remainingDistance = maxDistance; remainingDistance > 0; remainingDistance -= segmentDistance)
+    {
+        distance = Min(remainingDistance, segmentDistance);
+
+        end = start + distance * direction;
+
+        btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
+        rayCallback.m_collisionFilterGroup = (short)0xffff;
+        rayCallback.m_collisionFilterMask = (short)collisionMask;
+
+        world_->rayTest(rayCallback.m_rayFromWorld, rayCallback.m_rayToWorld, rayCallback);
+
+        if (rayCallback.hasHit())
+        {
+            result.position_ = ToVector3(rayCallback.m_hitPointWorld);
+            result.normal_ = ToVector3(rayCallback.m_hitNormalWorld);
+            result.distance_ = (result.position_ - ray.origin_).Length();
+            result.body_ = static_cast<RigidBody*>(rayCallback.m_collisionObject->getUserPointer());
+
+            // No need to cast the rest of the segments
+            return;
+        }
+
+        // Use the end position as the new start position
+        start = end;
+    }
+
+    // Didn't hit anything
+    result.position_ = Vector3::ZERO;
+    result.normal_ = Vector3::ZERO;
+    result.distance_ = M_INFINITY;
+    result.body_ = 0;
+}
+
 void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask)
 {
     URHO3D_PROFILE(PhysicsSphereCast);
