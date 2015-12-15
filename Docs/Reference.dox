@@ -410,16 +410,16 @@ JSON files must be in UTF8 encoding without BOM. Sample files are in the bin/Dat
 
 \code
 {
-	"string id 1":{
-		"language 1":"value11",
-		"language 2":"value12",
-		"language 3":"value13"
-	},
-	"string id 2":{
-		"language 1":"value21",
-		"language 2":"value22",
-		"language 3":"value23"
-	}
+    "string id 1":{
+        "language 1":"value11",
+        "language 2":"value12",
+        "language 3":"value13"
+    },
+    "string id 2":{
+        "language 1":"value21",
+        "language 2":"value22",
+        "language 3":"value23"
+    }
 }
 \endcode
 
@@ -940,7 +940,7 @@ See also \ref Materials "Materials", \ref Shaders "Shaders", \ref Lights "Lights
 
 See \ref RenderingModes "Rendering modes" for detailed discussion on the forward, light pre-pass and deferred rendering modes.
 
-See \ref APIDifferences "Differences between Direct3D and OpenGL" for what to watch out for when using the low-level rendering functionality directly.
+See \ref APIDifferences "Differences between rendering APIs" for what to watch out for when using the low-level rendering functionality directly.
 
 
 \page RenderingModes Rendering modes
@@ -990,7 +990,7 @@ Forward rendering makes it possible to use hardware multisampling and different 
 Finally note that due to OpenGL framebuffer object limitations an extra framebuffer blit has to happen at the end in both light pre-pass and deferred rendering, which costs some performance. Also, because multiple rendertargets on OpenGL must have the same format, an R32F texture can not be used for linear depth, but instead 24-bit depth is manually encoded and decoded into RGB channels.
 
 
-\page APIDifferences Differences between Direct3D and OpenGL
+\page APIDifferences Differences between rendering APIs
 
 These differences need to be observed when using the low-level rendering functionality directly. The high-level rendering architecture, including the Renderer and UI subsystems and the Drawable subclasses already handle most of them transparently to the user.
 
@@ -1009,6 +1009,8 @@ These differences need to be observed when using the low-level rendering functio
 - %Shader resources are stored in different locations depending on the API: bin/CoreData/Shaders/HLSL for Direct3D, and bin/CoreData/Shaders/GLSL for OpenGL.
 
 - To ensure similar UV addressing for render-to-texture viewports on both APIs, on OpenGL texture viewports will be rendered upside down.
+
+- Direct3D11 is strict about vertex attributes referenced by shaders. A model will not render (input layout fails to create) if the shader for example asks for UV coordinates and the model does not have them. For this particular case, see the NOUV define in LitSolid shader, which is defined in the NoTexture family of techniques to prevent the attempted reading of UV coords.
 
 OpenGL ES 2.0 has further limitations:
 
@@ -2017,22 +2019,22 @@ Cursor Shapes can be define in a number of different ways:
 
 XML:
 \code
-	<element type="Cursor">
-		<attribute name="Shapes">
-			<variant type="VariantVector" >
-				<variant type="String" value="Normal" />
-				<variant type="ResourceRef" value="Image;Textures/UI.png" />
-				<variant type="IntRect" value="0 0 12 24" />
-				<variant type="IntVector2" value="0 0" />
-			</variant>
-			<variant type="VariantVector" >
-				<variant type="String" value="Custom" />
-				<variant type="ResourceRef" value="Image;Textures/UI.png" />
-				<variant type="IntRect" value="12 0 12 36" />
-				<variant type="IntVector2" value="0 0" />
-			</variant>
-		</atrribute>
-	</element>
+    <element type="Cursor">
+        <attribute name="Shapes">
+            <variant type="VariantVector" >
+                <variant type="String" value="Normal" />
+                <variant type="ResourceRef" value="Image;Textures/UI.png" />
+                <variant type="IntRect" value="0 0 12 24" />
+                <variant type="IntVector2" value="0 0" />
+            </variant>
+            <variant type="VariantVector" >
+                <variant type="String" value="Custom" />
+                <variant type="ResourceRef" value="Image;Textures/UI.png" />
+                <variant type="IntRect" value="12 0 12 36" />
+                <variant type="IntVector2" value="0 0" />
+            </variant>
+        </atrribute>
+    </element>
 \endcode
 
 C++:
@@ -2043,25 +2045,25 @@ C++:
     Cursor* cursor = new Cursor(context_);
     Image* image = rc->GetResource<Image>("Textures/UI.png");
     if (image)
-	{
+    {
         cursor->DefineShape(CS_NORMAL, image, IntRect(0, 0, 12, 24), IntVector2(0, 0));
-		cursor->DefineShape("Custom", image, IntRect(12, 0, 12, 36), IntVector2(0, 0));
-	}
+        cursor->DefineShape("Custom", image, IntRect(12, 0, 12, 36), IntVector2(0, 0));
+    }
 
     ui->SetCursor(cursor);
 \endcode
 
 Angelcode:
 \code
-	Cursor@ cursor = new Cursor();
-	Image@ image = cache.GetResource("Image", "Textures/UI.png");
-	if (image !is null)
-	{
-		cursor.DefineShape(CS_NORMAL, image, IntRect(0, 0, 12, 24), IntVector2(0, 0));
-		cursor.DefineShape("Custom", image, IntRect(12, 0, 12, 36), IntVector2(0, 0));
-	}
+    Cursor@ cursor = new Cursor();
+    Image@ image = cache.GetResource("Image", "Textures/UI.png");
+    if (image !is null)
+    {
+        cursor.DefineShape(CS_NORMAL, image, IntRect(0, 0, 12, 24), IntVector2(0, 0));
+        cursor.DefineShape("Custom", image, IntRect(12, 0, 12, 36), IntVector2(0, 0));
+    }
 
-	ui.SetCursor(cursor);
+    ui.SetCursor(cursor);
 \endcode
 
 \section UI_Scaling Scaling
@@ -2817,25 +2819,25 @@ As for any component, a \ref SplinePath::DrawDebugGeometry "debugging function" 
 
 The following sample demonstrates how to build a path from 2 points, assign a controlled node and move it along the path according to speed and interpolation mode.
 \code
-	// Initial point
-	Node* startNode = scene_->CreateChild("Start");
-	startNode->SetPosition(Vector3(-20.0f, 0.0f, -20.0f));
+    // Initial point
+    Node* startNode = scene_->CreateChild("Start");
+    startNode->SetPosition(Vector3(-20.0f, 0.0f, -20.0f));
 
-	// Target point
-	Node* targetNode = scene_->CreateChild("Target");
-	targetNode->SetPosition(Vector3(20.0f, 2.0f, 20.0f));
+    // Target point
+    Node* targetNode = scene_->CreateChild("Target");
+    targetNode->SetPosition(Vector3(20.0f, 2.0f, 20.0f));
 
-	// Node to move along the path ('controlled node')
-	Node* movingNode =  scene_->CreateChild("MovingNode");
+    // Node to move along the path ('controlled node')
+    Node* movingNode =  scene_->CreateChild("MovingNode");
 
-	// Spline path
-	Node* pathNode = scene_->CreateChild("PathNode");
-	SplinePath* path = pathNode->CreateComponent<SplinePath>();
-	path->AddControlPoint(startNode, 0);
-	path->AddControlPoint(targetNode, 1);
-	path->SetInterpolationMode(LINEAR_CURVE);
-	path->SetSpeed(10.0f);
-	path->SetControlledNode(movingNode);
+    // Spline path
+    Node* pathNode = scene_->CreateChild("PathNode");
+    SplinePath* path = pathNode->CreateComponent<SplinePath>();
+    path->AddControlPoint(startNode, 0);
+    path->AddControlPoint(targetNode, 1);
+    path->SetInterpolationMode(LINEAR_CURVE);
+    path->SetSpeed(10.0f);
+    path->SetControlledNode(movingNode);
 \endcode
 
 In your update function, move the controlled node using \ref SplinePath::Move "Move()":
