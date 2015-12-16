@@ -32,7 +32,6 @@ environment:
     secure: cc1q9CXo5BwIYqtgigHpkCGG90zEVM45xx/YzXTOjVp512oQNUzTJq0AmxEYXP78
   build_tree: native-Build
   config: Release
-  PreferredToolArchitecture: x64
   matrix:
     - URHO3D_LIB_TYPE: STATIC
     - URHO3D_LIB_TYPE: SHARED

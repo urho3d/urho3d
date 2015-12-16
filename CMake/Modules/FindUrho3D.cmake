@@ -181,14 +181,18 @@ else ()
         get_filename_component (EXT ${URHO3D_LIBRARIES} EXT)
         if (EXT STREQUAL .a)
             set (URHO3D_LIB_TYPE STATIC)
+            set (COMPILE_DEFINITIONS COMPILE_DEFINITIONS -DURHO3D_STATIC_DEFINE)
         else ()
             set (URHO3D_LIB_TYPE SHARED)
         endif ()
     endif ()
     # Ensure the module has found the library with the right ABI for the chosen compiler and URHO3D_64BIT build option
     if (URHO3D_LIBRARIES AND NOT IOS)
+        if (NOT URHO3D_64BIT AND NOT MSVC AND NOT MINGW AND NOT ANDROID AND NOT RPI AND NOT EMSCRIPTEN)
+            set (COMPILE_LINKER_DEFINITIONS -DCOMPILE_DEFINITIONS:STRING=-m32)
+        endif ()
         try_compile (COMPILE_RESULT ${CMAKE_BINARY_DIR}/generated/FindUrho3D ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
-            CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS}
+            CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILE_LINKER_DEFINITIONS} ${COMPILE_DEFINITIONS}
             LINK_LIBRARIES ${URHO3D_LIBRARIES})
     endif ()
     # For shared library type, also initialize the URHO3D_DLL variable for later use
