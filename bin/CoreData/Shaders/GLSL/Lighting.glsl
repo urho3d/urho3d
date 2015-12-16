@@ -203,8 +203,8 @@ float GetShadow(vec4 shadowPos)
             #endif
 
         #elif defined(VSM_SHADOW)
-            vec2 samples = texture2D(sShadowMap, shadowPos.xy).rg;
-            return cShadowIntensity.y + cShadowIntensity.x * Chebyshev(samples, shadowPos.z/shadowPos.w);
+            vec2 samples = texture2D(sShadowMap, shadowPos.xy / shadowPos.w).rg; 
+            return cShadowIntensity.y + cShadowIntensity.x * Chebyshev(samples, shadowPos.z / shadowPos.w);
         #endif
     #else
         #if defined(SIMPLE_SHADOW)
@@ -221,9 +221,10 @@ float GetShadow(vec4 shadowPos)
                 texture2DProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)).r * shadowPos.w > shadowPos.z
             );
             return cShadowIntensity.y + dot(inLight, vec4(cShadowIntensity.x));
+            
         #elif defined(VSM_SHADOW)
-            vec2 samples = texture2D(sShadowMap, shadowPos.xy).rg;
-            return cShadowIntensity.y + cShadowIntensity.x * Chebyshev(samples, shadowPos.z/shadowPos.w);
+            vec2 samples = texture2D(sShadowMap, shadowPos.xy / shadowPos.w).rg; 
+            return cShadowIntensity.y + cShadowIntensity.x * Chebyshev(samples, shadowPos.z / shadowPos.w);
         #endif
     #endif
 }

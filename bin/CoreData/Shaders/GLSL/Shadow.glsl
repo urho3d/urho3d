@@ -14,7 +14,7 @@ void VS()
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
     #ifdef VSM_SHADOW
-        vTexCoord = vec3(GetTexCoord(iTexCoord), GetDepth(gl_Position));
+        vTexCoord = vec3(GetTexCoord(iTexCoord), gl_Position.z / gl_Position.w * 0.5 + 0.5);
     #else
         vTexCoord = GetTexCoord(iTexCoord);
     #endif
