@@ -22,7 +22,7 @@ void VS(float4 iPos : POSITION,
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
     #ifdef VSM_SHADOW
-        oTexCoord = float3(GetTexCoord(iTexCoord), GetDepth(oPos));
+        oTexCoord = float3(GetTexCoord(iTexCoord), oPos.z/oPos.w);
     #else
         oTexCoord = GetTexCoord(iTexCoord);
     #endif
