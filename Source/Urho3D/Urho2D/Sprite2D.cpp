@@ -106,6 +106,15 @@ bool Sprite2D::EndLoad()
 void Sprite2D::SetTexture(Texture2D* texture)
 {
     texture_ = texture;
+    // Ensure the texture doesn't have wrap addressing as that will cause bleeding bugs on the edges.
+    // Could also choose border mode, but in that case a universally good border color (without alpha bugs)
+    // would be hard to choose. Ideal is for the user to configure the texture parameters in its parameter
+    // XML file.
+    if (texture_->GetAddressMode(COORD_U) == ADDRESS_WRAP)
+    {
+        texture_->SetAddressMode(COORD_U, ADDRESS_CLAMP);
+        texture_->SetAddressMode(COORD_V, ADDRESS_CLAMP);
+    }
 }
 
 void Sprite2D::SetRectangle(const IntRect& rectangle)
