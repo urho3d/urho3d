@@ -249,7 +249,7 @@ Renderer::Renderer(Context* context) :
     textureQuality_(QUALITY_HIGH),
     materialQuality_(QUALITY_HIGH),
     shadowMapSize_(1024),
-    shadowQuality_(SHADOWQUALITY_VSM),
+    shadowQuality_(SHADOWQUALITY_PCF_16BIT),
     maxShadowMaps_(1),
     minInstances_(2),
     maxSortedInstances_(1000),
@@ -1835,15 +1835,21 @@ String Renderer::GetShadowVariations() const
         #ifdef URHO3D_OPENGL
             return "SIMPLE_SHADOW ";
         #else
-            return "SIMPLE_SHADOW SHADOWCMP ";
+            if (graphics_->GetHardwareShadowSupport())
+                return "SIMPLE_SHADOW ";
+            else
+                return "SIMPLE_SHADOW SHADOWCMP ";
         #endif
         case SHADOWQUALITY_SIMPLE_24BIT:
             return "SIMPLE_SHADOW ";
         case SHADOWQUALITY_PCF_16BIT:
         #ifdef URHO3D_OPENGL
-            return "PCF_SHADOW";
+            return "PCF_SHADOW ";
         #else
-            return "PCF_SHADOW SHADOWCMP ";
+            if (graphics_->GetHardwareShadowSupport())
+                return "PCF_SHADOW ";
+            else
+                return "PCF_SHADOW SHADOWCMP ";
         #endif
         case SHADOWQUALITY_PCF_24BIT:
             return "PCF_SHADOW ";
