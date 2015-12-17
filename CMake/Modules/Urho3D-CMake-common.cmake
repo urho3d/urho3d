@@ -414,15 +414,6 @@ if (URHO3D_ANGELSCRIPT)
     add_definitions (-DURHO3D_ANGELSCRIPT)
 endif ()
 
-# Default library type is STATIC
-if (URHO3D_LIB_TYPE)
-    string (TOUPPER ${URHO3D_LIB_TYPE} URHO3D_LIB_TYPE)
-endif ()
-if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
-    set (URHO3D_LIB_TYPE STATIC)
-    add_definitions (-DURHO3D_STATIC_DEFINE)
-endif ()
-
 # Add definition for amalgamated build
 if (MSVC)
     if (URHO3D_LIB_TYPE STREQUAL SHARED)
