@@ -506,6 +506,11 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                     lightSplits.z_ = lightQueue_->shadowSplits_[2].farSplit_ / camera->GetFarClip();
 
                 graphics->SetShaderParameter(PSP_SHADOWSPLITS, lightSplits);
+
+                if (graphics->HasShaderParameter(PSP_VSMSHADOWPARAMS))
+                {
+                    graphics->SetShaderParameter(PSP_VSMSHADOWPARAMS, renderer->GetVsmShadowParameters());
+                }
             }
         }
         else if (lightQueue_->vertexLights_.Size() && graphics->HasShaderParameter(VSP_VERTEXLIGHTS) &&

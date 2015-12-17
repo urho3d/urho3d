@@ -250,6 +250,8 @@ Renderer::Renderer(Context* context) :
     materialQuality_(QUALITY_HIGH),
     shadowMapSize_(1024),
     shadowQuality_(SHADOWQUALITY_PCF_16BIT),
+    shadowSoftness_(2.0f),
+    vsmShadowParams_(0.0000001f, 0.2f),
     maxShadowMaps_(1),
     minInstances_(2),
     maxSortedInstances_(1000),
@@ -408,6 +410,17 @@ void Renderer::SetShadowQuality(ShadowQuality quality)
 
         ResetShadowMaps();
     }
+}
+
+void Renderer::SetShadowSoftness(float shadowSoftness)
+{
+    shadowSoftness_ = Max(shadowSoftness, 0.0f);
+}
+
+void Renderer::SetVsmShadowParameters(float minVariance, float lightBleedingReduction)
+{
+    vsmShadowParams_.x_ = Max(minVariance, 0.0f);
+    vsmShadowParams_.y_ = Clamp(lightBleedingReduction, 0.0f, 1.0f);
 }
 
 void Renderer::SetShadowMapFilter(Object* instance, ShadowMapFilter functionPtr)
@@ -1887,9 +1900,8 @@ void Renderer::BlurShadowMap(View* view, Texture2D* shadowMap)
     view->SetGBufferShaderParameters(IntVector2(shadowMap->GetWidth(), shadowMap->GetHeight()), IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
 
     // Horizontal blur of the shadow map
-    float shadowSoftness = 2.f;
     static const StringHash blurOffsetParam("BlurOffsets");
-    graphics_->SetShaderParameter(blurOffsetParam, Vector2(shadowSoftness / shadowMap->GetWidth(), 0.0f));
+    graphics_->SetShaderParameter(blurOffsetParam, Vector2(shadowSoftness_ / shadowMap->GetWidth(), 0.0f));
 
     graphics_->SetTexture(TU_DIFFUSE, shadowMap);
     view->DrawFullscreenQuad(false);
@@ -1898,7 +1910,7 @@ void Renderer::BlurShadowMap(View* view, Texture2D* shadowMap)
     graphics_->SetRenderTarget(0, shadowMap);
     graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
 
-    graphics_->SetShaderParameter(blurOffsetParam, Vector2(0.0f, shadowSoftness / shadowMap->GetHeight()));
+    graphics_->SetShaderParameter(blurOffsetParam, Vector2(0.0f, shadowSoftness_ / shadowMap->GetHeight()));
 
     graphics_->SetTexture(TU_DIFFUSE, tmpBuffer);
     view->DrawFullscreenQuad(false);

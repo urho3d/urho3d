@@ -186,6 +186,10 @@ public:
     void SetShadowMapSize(int size);
     /// Set shadow quality mode. See the SHADOWQUALITY constants in GraphicsDefs.h.
     void SetShadowQuality(ShadowQuality quality);
+    /// Set shadow softness, only works when SHADOWQUALITY_BLUR_VSM is used.
+    void SetShadowSoftness(float shadowSoftness);
+    /// Set shadow parameters when VSM is used, they help to reduce light bleeding. LightBleeding must be in [0, 1[
+    void SetVsmShadowParameters(float minVariance, float lightBleedingReduction);
     /// Set post processing filter to the shadow map
     void SetShadowMapFilter(Object* instance, ShadowMapFilter functionPtr);
     /// Set reuse of shadow maps. Default is true. If disabled, also transparent geometry can be shadowed.
@@ -250,6 +254,12 @@ public:
 
     /// Return shadow quality.
     ShadowQuality GetShadowQuality() const { return shadowQuality_; }
+
+    /// Return shadow softness.
+    float GetShadowSoftness() const { return shadowSoftness_; }
+
+    /// Return VSM shadow parameters
+    Vector2 GetVsmShadowParameters() const { return vsmShadowParams_; };
 
     /// Return whether shadow maps are reused.
     bool GetReuseShadowMaps() const { return reuseShadowMaps_; }
@@ -493,6 +503,10 @@ private:
     int shadowMapSize_;
     /// Shadow quality.
     ShadowQuality shadowQuality_;
+    /// Shadow softness, only works when SHADOWQUALITY_BLUR_VSM is used.
+    float shadowSoftness_;
+    /// Shadow parameters when VSM is used, they help to reduce light bleeding.
+    Vector2 vsmShadowParams_;
     /// Maximum number of shadow maps per resolution.
     int maxShadowMaps_;
     /// Minimum number of instances required in a batch group to render as instanced.

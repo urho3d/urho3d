@@ -141,16 +141,10 @@ float GetIntensity(vec3 color)
 #endif
 
 #ifdef VSM_SHADOW
-float linstep(float min, float max, float v)  
+float ReduceLightBleeding(float min, float p_max)  
 {  
-    return clamp((v - min) / (max - min), 0.0, 1.0);  
-}  
-
-float ReduceLightBleeding(float p_max, float Amount)  
-{  
-    // Remove the [0, Amount] tail and linearly rescale (Amount, 1].  
-    return linstep(Amount, 1.0, p_max); 
-}  
+    return clamp((p_max - min) / (1.0 - min), 0.0, 1.0);  
+}
 
 float Chebyshev(vec2 Moments, float depth)  
 {  
@@ -159,12 +153,13 @@ float Chebyshev(vec2 Moments, float depth)
     //Compute variance.  
     float Variance = Moments.y - (Moments.x * Moments.x); 
 
-    float minVariance = 0.0000001;
+    float minVariance = cVsmShadowParams.x;
     Variance = max(Variance, minVariance);  
     //Compute probabilistic upper bound.  
     float d = depth - Moments.x;  
     float p_max = Variance / (Variance + d*d); 
-    p_max = ReduceLightBleeding(p_max, 0.2);
+    // Prevent light bleeding
+    p_max = ReduceLightBleeding(cVsmShadowParams.y, p_max);
 
     return max(p, p_max);
 }
