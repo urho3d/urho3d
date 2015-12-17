@@ -240,7 +240,7 @@ elseif (Urho3D_FIND_REQUIRED)
     endif ()
     message (FATAL_ERROR
         "Could NOT find compatible Urho3D library in Urho3D SDK installation or build tree. "
-        "Use URHO3D_HOME environment variable or build option to specify the location of the non-default SDK installation or build tree. ${NOT_FOUND_MESSAGE}")
+        "Use URHO3D_HOME environment variable or build option to specify the location of the non-default SDK installation or build tree. ${NOT_FOUND_MESSAGE} ${TRY_COMPILE_OUT}")
 endif ()
 
 mark_as_advanced (URHO3D_BASE_INCLUDE_DIR URHO3D_LIBRARIES URHO3D_LIBRARIES_DBG URHO3D_DLL_REL URHO3D_DLL_DBG URHO3D_HOME)
