@@ -46,15 +46,15 @@ set (PATH_SUFFIX Urho3D)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
     # A special case where library location is already known to be in the build tree of Urho3D project
     set (URHO3D_HOME ${CMAKE_BINARY_DIR})
-    set (URHO3D_INCLUDE_DIRS ${URHO3D_HOME}/include ${URHO3D_HOME}/include/${PATH_SUFFIX}/ThirdParty)
+    set (URHO3D_INCLUDE_DIRS ${URHO3D_HOME}/include ${URHO3D_HOME}/include/Urho3D/ThirdParty)
     if (URHO3D_PHYSICS)
         # Bullet library depends on its own include dir to be added in the header search path
         # This is more practical than patching its header files in many places to make them work with relative path
-        list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_HOME}/include/${PATH_SUFFIX}/ThirdParty/Bullet)
+        list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_HOME}/include/Urho3D/ThirdParty/Bullet)
     endif ()
     if (URHO3D_LUA)
         # ditto for Lua/LuaJIT
-        list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_HOME}/include/${PATH_SUFFIX}/ThirdParty/Lua${JIT})
+        list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_HOME}/include/Urho3D/ThirdParty/Lua${JIT})
     endif ()
     set (URHO3D_LIBRARIES Urho3D)
     set (COMPILE_RESULT TRUE)
@@ -65,7 +65,7 @@ else ()
         file (TO_CMAKE_PATH "$ENV{URHO3D_HOME}" URHO3D_HOME)
     endif ()
     # If either of the URHO3D_LIB_TYPE or URHO3D_HOME build options changes then invalidate all the caches
-    if ((URHO3D_LIB_TYPE AND NOT URHO3D_LIB_TYPE STREQUAL URHO3D_FOUND_LIB_TYPE) OR NOT URHO3D_BASE_INCLUDE_DIR MATCHES "^${URHO3D_HOME}/include/${PATH_SUFFIX}$")
+    if ((URHO3D_LIB_TYPE AND NOT URHO3D_LIB_TYPE STREQUAL URHO3D_FOUND_LIB_TYPE) OR NOT URHO3D_BASE_INCLUDE_DIR MATCHES "^${URHO3D_HOME}/include/Urho3D$")
         unset (URHO3D_BASE_INCLUDE_DIR CACHE)
         unset (URHO3D_LIBRARIES CACHE)
         if (WIN32)
@@ -98,6 +98,14 @@ else ()
         if (EMSCRIPTEN)
             string (REPLACE .so .bc CMAKE_FIND_LIBRARY_SUFFIXES "${CMAKE_FIND_LIBRARY_SUFFIXES}")   # Stringify for string replacement
         endif ()
+        # The PATH_SUFFIX does not work for CMake on Windows host system, it actually needs a prefix instead
+        if (CMAKE_HOST_WIN32)
+            set (CMAKE_SYSTEM_PREFIX_PATH_SAVED ${CMAKE_SYSTEM_PREFIX_PATH})
+	    string (REPLACE ";" "\\Urho3D;" CMAKE_SYSTEM_PREFIX_PATH "${CMAKE_SYSTEM_PREFIX_PATH_SAVED};")    # Stringify for string replacement
+	    if (NOT URHO3D_64BIT)
+	        list (REVERSE CMAKE_SYSTEM_PREFIX_PATH)
+	    endif ()
+        endif ()
     endif ()
     # URHO3D_HOME variable should be an absolute path, so use a non-rooted search even when we are cross-compiling
     if (URHO3D_HOME)
@@ -115,8 +123,8 @@ else ()
     if (NOT URHO3D_64BIT)
         # For 32-bit, force to search in 'lib' path even when the host system defaulted to use 'lib64'
         set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS FALSE)
-    elseif (WIN32)
-        # For 64-bit, force to search in 'lib64' path even when the Windows platform is not defaulted to use it
+    elseif (MINGW AND CMAKE_CROSSCOMPILING)
+        # For 64-bit MinGW on Linux host system, force to search in 'lib64' path even when the Windows platform is not defaulted to use it
         set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)
     endif ()
     find_path (URHO3D_BASE_INCLUDE_DIR Urho3D.h PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT} DOC "Urho3D include directory")
@@ -173,17 +181,20 @@ else ()
         get_filename_component (EXT ${URHO3D_LIBRARIES} EXT)
         if (EXT STREQUAL .a)
             set (URHO3D_LIB_TYPE STATIC)
+            set (COMPILE_DEFINITIONS COMPILE_DEFINITIONS -DURHO3D_STATIC_DEFINE)
         else ()
             set (URHO3D_LIB_TYPE SHARED)
         endif ()
     endif ()
-    # TODO: Ensure the module has found the library with the right ABI for the chosen compiler and URHO3D_64BIT build option
-    #if (NOT IOS AND NOT MSVC)
-    #    try_compile (COMPILE_RESULT ${CMAKE_BINARY_DIR}/generated/FindUrho3D ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
-    #        CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS}
-    #        LINK_LIBRARIES ${URHO3D_LIBRARIES})
-    #endif ()
-    set (COMPILE_RESULT TRUE)
+    # Ensure the module has found the library with the right ABI for the chosen compiler and URHO3D_64BIT build option
+    if (URHO3D_LIBRARIES AND NOT IOS)
+        if (NOT URHO3D_64BIT AND NOT MSVC AND NOT MINGW AND NOT ANDROID AND NOT RPI AND NOT EMSCRIPTEN)
+            set (COMPILE_LINKER_DEFINITIONS -DCOMPILE_DEFINITIONS:STRING=-m32)
+        endif ()
+        try_compile (COMPILE_RESULT ${CMAKE_BINARY_DIR}/generated/FindUrho3D ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
+            CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILE_LINKER_DEFINITIONS} ${COMPILE_DEFINITIONS}
+            LINK_LIBRARIES ${URHO3D_LIBRARIES})
+    endif ()
     # For shared library type, also initialize the URHO3D_DLL variable for later use
     if (WIN32)
         if (URHO3D_LIB_TYPE STREQUAL SHARED AND URHO3D_HOME)
@@ -197,8 +208,12 @@ else ()
             endif ()
         endif ()
     endif ()
+    # Restore CMake global settings
     if (CMAKE_FIND_LIBRARY_SUFFIXES_SAVED)
         set (CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES_SAVED})
+    endif ()
+    if (CMAKE_SYSTEM_PREFIX_PATH_SAVED)
+        set (CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_PATH_SAVED})
     endif ()
 endif ()
 
@@ -222,7 +237,7 @@ elseif (Urho3D_FIND_REQUIRED)
         set (NOT_FOUND_MESSAGE "Ensure the specified location contains the Urho3D library of the requested library type. ${NOT_FOUND_MESSAGE}")
     endif ()
     message (FATAL_ERROR
-        "Could NOT find Urho3D library in Urho3D SDK installation or build tree. "
+        "Could NOT find compatible Urho3D library in Urho3D SDK installation or build tree. "
         "Use URHO3D_HOME environment variable or build option to specify the location of the non-default SDK installation or build tree. ${NOT_FOUND_MESSAGE}")
 endif ()
 
