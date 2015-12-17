@@ -3660,6 +3660,7 @@ Methods:
 - Node* new()
 - void delete()
 - bool SaveXML(File* dest, const String indentation = "\t") const
+- bool SaveJSON(File* dest, const String indentation = "\t") const
 - void SetName(const String name)
 - void SetPosition(const Vector3& position)
 - void SetPosition2D(const Vector2& position)
@@ -3790,6 +3791,7 @@ Methods:
 - const PODVector<Node*>& GetChildrenWithComponent(const String type, bool recursive = false)
 - bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
 - bool LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
+- bool LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
 - Node* CreateChild(unsigned id, CreateMode mode)
 - void AddComponent(Component* component, unsigned id, CreateMode mode)
 
@@ -4207,11 +4209,13 @@ Methods:
 - void SetMaxNetworkAngularVelocity(float velocity)
 - const PODVector<PhysicsRaycastResult>& Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- PhysicsRaycastResult RaycastSingleSegmented(const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult ConvexCast(CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED)
 - const PODVector<RigidBody*>& GetRigidBodies(const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED)
 - const PODVector<RigidBody*>& GetRigidBodies(const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED)
 - const PODVector<RigidBody*>& GetRigidBodies(const RigidBody* body)
+- const PODVector<RigidBody*>& GetCollidingBodies(const RigidBody* body)
 - void DrawDebugGeometry(bool depthTest)
 - void RemoveCachedGeometry(Model* model)
 - Vector3 GetGravity() const
@@ -5057,6 +5061,10 @@ Methods:
 - bool SaveXML(File* dest, const String indentation = "\t") const
 - bool LoadXML(const String fileName)
 - bool SaveXML(const String fileName, const String indentation = "\t") const
+- bool LoadJSON(File* source)
+- bool SaveJSON(File* dest, const String indentation = "\t") const
+- bool LoadJSON(const String fileName)
+- bool SaveJSON(const String fileName, const String indentation = "\t") const
 - Node* Instantiate(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - Node* Instantiate(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - Node* InstantiateXML(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
@@ -6242,6 +6250,9 @@ Methods:
 - void SetUseScreenKeyboard(bool enable)
 - void SetUseMutableGlyphs(bool enable)
 - void SetForceAutoHint(bool enable)
+- void SetScale(float scale)
+- void SetWidth(float size)
+- void SetHeight(float size)
 - UIElement* GetRoot() const
 - UIElement* GetRootModalElement() const
 - Cursor* GetCursor() const
@@ -6264,6 +6275,7 @@ Methods:
 - bool GetForceAutoHint() const
 - bool HasModalElement() const
 - bool IsDragging() const
+- float GetScale() const
 
 Properties:
 
@@ -6285,6 +6297,7 @@ Properties:
 - bool useMutableGlyphs
 - bool forceAutoHint
 - bool modalElement (readonly)
+- float scale
 
 <a name="Class_UIElement"></a>
 ### UIElement : Animatable

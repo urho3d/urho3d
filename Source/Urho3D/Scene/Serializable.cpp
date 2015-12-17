@@ -27,6 +27,7 @@
 #include "../IO/Log.h"
 #include "../IO/Serializer.h"
 #include "../Resource/XMLElement.h"
+#include "../Resource/JSONValue.h"
 #include "../Scene/ReplicationState.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/Serializable.h"
@@ -410,6 +411,99 @@ bool Serializable::LoadXML(const XMLElement& source, bool setInstanceDefault)
     return true;
 }
 
+bool Serializable::LoadJSON(const JSONValue& source, bool setInstanceDefault)
+{
+    if (source.IsNull())
+    {
+        URHO3D_LOGERROR("Could not load " + GetTypeName() + ", null JSON source element");
+        return false;
+    }
+
+    const Vector<AttributeInfo>* attributes = GetAttributes();
+    if (!attributes)
+        return true;
+
+    // Get attributes value
+    JSONValue attributesValue = source.Get("attributes");
+    if (attributesValue.IsNull())
+        return true;
+    // Warn if the attributes value isn't an object
+    if (!attributesValue.IsObject())
+    {
+        URHO3D_LOGWARNING("'attributes' object is present in " + GetTypeName() + " but is not a JSON object; skipping load");
+        return true;
+    }
+
+    const JSONObject& attributesObject = attributesValue.GetObject();
+
+    unsigned startIndex = 0;
+
+    for (JSONObject::ConstIterator it = attributesObject.Begin(); it != attributesObject.End();)
+    {
+        String name = it->first_;
+        const JSONValue& value = it->second_;
+        unsigned i = startIndex;
+        unsigned attempts = attributes->Size();
+
+        while (attempts)
+        {
+            const AttributeInfo& attr = attributes->At(i);
+            if ((attr.mode_ & AM_FILE) && !attr.name_.Compare(name, true))
+            {
+                Variant varValue;
+
+                // If enums specified, do enum lookup ad int assignment. Otherwise assign variant directly
+                if (attr.enumNames_)
+                {
+                    String valueStr = value.GetString();
+                    bool enumFound = false;
+                    int enumValue = 0;
+                    const char** enumPtr = attr.enumNames_;
+                    while (*enumPtr)
+                    {
+                        if (!valueStr.Compare(*enumPtr, false))
+                        {
+                            enumFound = true;
+                            break;
+                        }
+                        ++enumPtr;
+                        ++enumValue;
+                    }
+                    if (enumFound)
+                        varValue = enumValue;
+                    else
+                        URHO3D_LOGWARNING("Unknown enum value " + valueStr + " in attribute " + attr.name_);
+                }
+                else
+                    varValue = value.GetVariantValue(attr.type_);
+
+                if (!varValue.IsEmpty())
+                {
+                    OnSetAttribute(attr, varValue);
+
+                    if (setInstanceDefault)
+                        SetInstanceDefault(attr.name_, varValue);
+                }
+
+                startIndex = (i + 1) % attributes->Size();
+                break;
+            }
+            else
+            {
+                i = (i + 1) % attributes->Size();
+                --attempts;
+            }
+        }
+
+        if (!attempts)
+            URHO3D_LOGWARNING("Unknown attribute " + name + " in JSON data");
+
+        it++;
+    }
+
+    return true;
+}
+
 bool Serializable::SaveXML(XMLElement& dest) const
 {
     if (dest.IsNull())
@@ -448,6 +542,51 @@ bool Serializable::SaveXML(XMLElement& dest) const
         else
             attrElem.SetVariantValue(value);
     }
+
+    return true;
+}
+
+bool Serializable::SaveJSON(JSONValue& dest) const
+{
+    if (dest.IsNull())
+    {
+        URHO3D_LOGERROR("Could not save " + GetTypeName() + ", null destination JSON value");
+        return false;
+    }
+
+    const Vector<AttributeInfo>* attributes = GetAttributes();
+    if (!attributes)
+        return true;
+
+    Variant value;
+    JSONValue attributesValue;
+
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (!(attr.mode_ & AM_FILE))
+            continue;
+
+        OnGetAttribute(attr, value);
+        Variant defaultValue(GetAttributeDefault(i));
+
+        // In JSON serialization default values can be skipped. This will make the file easier to read or edit manually
+        if (value == defaultValue && !SaveDefaultAttributes())
+            continue;
+
+        JSONValue attrVal;
+        // If enums specified, set as an enum string. Otherwise set directly as a Variant
+        if (attr.enumNames_)
+        {
+            int enumValue = value.GetInt();
+            attrVal = attr.enumNames_[enumValue];
+        }
+        else
+            attrVal.SetVariantValue(value, context_);
+
+        attributesValue.Set(attr.name_, attrVal);
+    }
+    dest.Set("attributes", attributesValue);
 
     return true;
 }

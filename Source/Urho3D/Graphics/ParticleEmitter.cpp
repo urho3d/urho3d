@@ -24,6 +24,7 @@
 
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
+#include "../Graphics/DrawableEvents.h"
 #include "../Graphics/ParticleEffect.h"
 #include "../Graphics/ParticleEmitter.h"
 #include "../Resource/ResourceCache.h"
@@ -48,7 +49,8 @@ ParticleEmitter::ParticleEmitter(Context* context) :
     lastUpdateFrameNumber_(M_MAX_UNSIGNED),
     emitting_(true),
     needUpdate_(false),
-    serializeParticles_(true)
+    serializeParticles_(true),
+    sendFinishEvent_(true)
 {
     SetNumParticles(DEFAULT_NUM_PARTICLES);
 }
@@ -127,6 +129,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
         if (inactiveTime && periodTimer_ >= inactiveTime)
         {
             emitting_ = true;
+            sendFinishEvent_ = true;
             periodTimer_ -= inactiveTime;
         }
         // If emitter has an indefinite stop interval, keep period timer reset to allow restarting emission in the editor
@@ -292,6 +295,7 @@ void ParticleEmitter::SetEmitting(bool enable)
     if (enable != emitting_)
     {
         emitting_ = enable;
+        sendFinishEvent_ = enable;
         periodTimer_ = 0.0f;
         // Note: network update does not need to be marked as this is a file only attribute
     }
@@ -523,6 +527,34 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
         lastUpdateFrameNumber_ = viewFrameNumber_;
         needUpdate_ = true;
         MarkForUpdate();
+    }
+
+    if (node_ && !emitting_ && sendFinishEvent_)
+    {
+        // Send finished event only once all billboards are gone
+        bool hasEnabledBillboards = false;
+
+        for (unsigned i = 0; i < billboards_.Size(); ++i)
+        {
+            if (billboards_[i].enabled_)
+            {
+                hasEnabledBillboards = true;
+                break;
+            }
+        }
+
+        if (!hasEnabledBillboards)
+        {
+            sendFinishEvent_ = false;
+
+            using namespace ParticleEffectFinished;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_NODE] = node_;
+            eventData[P_EFFECT] = effect_;
+
+            node_->SendEvent(E_PARTICLEEFFECTFINISHED, eventData);
+        }
     }
 }
 

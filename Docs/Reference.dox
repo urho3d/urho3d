@@ -313,7 +313,7 @@ Unless you have extremely serious reasons for doing so, you should not subclass 
 
 \section SceneModel_LoadSave Loading and saving scenes
 
-Scenes can be loaded and saved in either binary or XML format; see the functions \ref Scene::Load "Load()", \ref Scene::LoadXML "LoadXML()", \ref Scene::Save "Save()" and \ref Scene::SaveXML "SaveXML()". See \ref Serialization
+Scenes can be loaded and saved in either binary, JSON, or XML formats; see the functions \ref Scene::Load "Load()", \ref Scene::LoadXML "LoadXML()", \ref Scene::LoadJSON "LoadJSON", \ref Scene::Save "Save()" and \ref Scene::SaveXML "SaveXML()", and \ref Scene::SaveJSON "SaveJSON()". See \ref Serialization
 "Serialization" for the technical details on how this works. When a scene is loaded, all existing content in it (child nodes and components) is removed first.
 
 Nodes and components that are marked temporary will not be saved. See \ref Serializable::SetTemporary "SetTemporary()".
@@ -322,13 +322,13 @@ To be able to track the progress of loading a (large) scene without having the p
 
 \section SceneModel_Instantiation Object prefabs
 
-Just loading or saving whole scenes is not flexible enough for eg. games where new objects need to be dynamically created. On the other hand, creating complex objects and setting their properties in code will also be tedious. For this reason, it is also possible to save a scene node (and its child nodes, components and attributes) to either binary or XML to be able to instantiate it later into a scene. Such a saved object is often referred to as a prefab. There are three ways to do this:
+Just loading or saving whole scenes is not flexible enough for eg. games where new objects need to be dynamically created. On the other hand, creating complex objects and setting their properties in code will also be tedious. For this reason, it is also possible to save a scene node (and its child nodes, components and attributes) to either binary, JSON, or XML to be able to instantiate it later into a scene. Such a saved object is often referred to as a prefab. There are three ways to do this:
 
-- In code by calling \ref Node::Save "Save()" or \ref Node::SaveXML "SaveXML()" on the Node in question.
+- In code by calling \ref Node::Save "Save()", \ref Node::SaveJSON "SaveJSON()", or \ref Node::SaveXML "SaveXML()" on the Node in question.
 - In the editor, by selecting the node in the hierarchy window and choosing "Save node as" from the "File" menu.
 - Using the "node" command in AssetImporter, which will save the scene node hierarchy and any models contained in the input asset (eg. a Collada file)
 
-To instantiate the saved node into a scene, call \ref Scene::Instantiate "Instantiate()" or \ref Scene::InstantiateXML "InstantiateXML()" depending on the format. The node will be created as a child of the Scene but can be freely reparented after that. Position and rotation for placing the node need to be specified. The NinjaSnowWar example uses XML format for its object prefabs; these exist in the bin/Data/Objects directory.
+To instantiate the saved node into a scene, call \ref Scene::Instantiate "Instantiate()", \ref Scene::InstantiateJSON() or \ref Scene::InstantiateXML "InstantiateXML()" depending on the format. The node will be created as a child of the Scene but can be freely reparented after that. Position and rotation for placing the node need to be specified. The NinjaSnowWar example uses XML format for its object prefabs; these exist in the bin/Data/Objects directory.
 
 \section SceneModel_FurtherInformation Further information
 
@@ -351,6 +351,7 @@ Resources include most things in Urho3D that are loaded from mass storage during
 - Texture3D
 - TextureCube
 - XMLFile
+- JSONFile
 
 They are managed and loaded by the ResourceCache subsystem. Like with all other \ref ObjectTypes "typed objects", resource types are identified by 32-bit type name hashes (C++) or type names (script). An object factory must be registered for each resource type.
 
@@ -381,7 +382,7 @@ parse data, upload to GPU if necessary) and can therefore result in framerate dr
 
 If you know in advance what resources you need, you can request them to be loaded in a background thread by calling \ref ResourceCache::BackgroundLoadResource "BackgroundLoadResource()". The event E_RESOURCEBACKGROUNDLOADED will be sent after the loading is complete; it will tell if the loading actually was a success or a failure. Depending on the resource, only a part of the loading process may be moved to a background thread, for example the finishing GPU upload step always needs to happen in the main thread. Note that if you call GetResource() for a resource that is queued for background loading, the main thread will stall until its loading is complete.
 
-The asynchronous scene loading functionality \ref Scene::LoadAsync "LoadAsync()" and \ref Scene::LoadAsyncXML "LoadAsyncXML()" has the option to background load the resources first before proceeding to load the scene content. It can also be used to only load the resources without modifying the scene, by specifying the LOAD_RESOURCES_ONLY mode. This allows to prepare a scene or object prefab file for fast instantiation.
+The asynchronous scene loading functionality \ref Scene::LoadAsync "LoadAsync()", \ref Scene::LoadAsyncJSON "LoadAsyncJSON()" and \ref Scene::LoadAsyncXML "LoadAsyncXML()" have the option to background load the resources first before proceeding to load the scene content. It can also be used to only load the resources without modifying the scene, by specifying the LOAD_RESOURCES_ONLY mode. This allows to prepare a scene or object prefab file for fast instantiation.
 
 Finally the maximum time (in milliseconds) spent each frame on finishing background loaded resources can be configured, see \ref ResourceCache::SetFinishBackgroundResourcesMs "SetFinishBackgroundResourcesMs()".
 
@@ -409,16 +410,16 @@ JSON files must be in UTF8 encoding without BOM. Sample files are in the bin/Dat
 
 \code
 {
-	"string id 1":{
-		"language 1":"value11",
-		"language 2":"value12",
-		"language 3":"value13"
-	},
-	"string id 2":{
-		"language 1":"value21",
-		"language 2":"value22",
-		"language 3":"value23"
-	}
+    "string id 1":{
+        "language 1":"value11",
+        "language 2":"value12",
+        "language 3":"value13"
+    },
+    "string id 2":{
+        "language 1":"value21",
+        "language 2":"value22",
+        "language 3":"value23"
+    }
 }
 \endcode
 
@@ -939,7 +940,7 @@ See also \ref Materials "Materials", \ref Shaders "Shaders", \ref Lights "Lights
 
 See \ref RenderingModes "Rendering modes" for detailed discussion on the forward, light pre-pass and deferred rendering modes.
 
-See \ref APIDifferences "Differences between Direct3D and OpenGL" for what to watch out for when using the low-level rendering functionality directly.
+See \ref APIDifferences "Differences between rendering APIs" for what to watch out for when using the low-level rendering functionality directly.
 
 
 \page RenderingModes Rendering modes
@@ -989,7 +990,7 @@ Forward rendering makes it possible to use hardware multisampling and different 
 Finally note that due to OpenGL framebuffer object limitations an extra framebuffer blit has to happen at the end in both light pre-pass and deferred rendering, which costs some performance. Also, because multiple rendertargets on OpenGL must have the same format, an R32F texture can not be used for linear depth, but instead 24-bit depth is manually encoded and decoded into RGB channels.
 
 
-\page APIDifferences Differences between Direct3D and OpenGL
+\page APIDifferences Differences between rendering APIs
 
 These differences need to be observed when using the low-level rendering functionality directly. The high-level rendering architecture, including the Renderer and UI subsystems and the Drawable subclasses already handle most of them transparently to the user.
 
@@ -1008,6 +1009,8 @@ These differences need to be observed when using the low-level rendering functio
 - %Shader resources are stored in different locations depending on the API: bin/CoreData/Shaders/HLSL for Direct3D, and bin/CoreData/Shaders/GLSL for OpenGL.
 
 - To ensure similar UV addressing for render-to-texture viewports on both APIs, on OpenGL texture viewports will be rendered upside down.
+
+- Direct3D11 is strict about vertex attributes referenced by shaders. A model will not render (input layout fails to create) if the shader for example asks for UV coordinates and the model does not have them. For this particular case, see the NOUV define in LitSolid shader, which is defined in the NoTexture family of techniques to prevent the attempted reading of UV coords.
 
 OpenGL ES 2.0 has further limitations:
 
@@ -1031,7 +1034,7 @@ OpenGL ES 2.0 has further limitations:
 
 \page Materials Materials
 
-Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. Default and example materials exist in the bin/CoreData/Materials & bin/Data/Materials subdirectories, and techniques exist in the bin/CoreData/Techniques subdirectory.
+Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML or JSON data. Default and example materials exist in the bin/CoreData/Materials & bin/Data/Materials subdirectories, and techniques exist in the bin/CoreData/Techniques subdirectory.
 
 A material defines the textures, shader parameters and culling & fill mode to use, and refers to one or several techniques. A technique defines the actual rendering passes, the shaders to use in each, and all other rendering states such as depth test, depth write, and blending.
 
@@ -1727,7 +1730,7 @@ For purposes of volume control, each SoundSource can be classified into a user d
 
 To control the category volumes, use \ref Audio::SetMasterGain "SetMasterGain()", which defines the category if it didn't already exist.
 
-The SoundSource components support automatic removal from the node they belong to, once playback is finished. To use, call \ref SoundSource::SetAutoRemove "SetAutoRemove()" on them. This may be useful when a game object plays several "fire and forget" sound effects.
+Note that the Audio subsystem is always instantiated, but in headless mode the playback of sounds is simulated, taking the sound length and frequency into account. This allows basing logic on whether a specific sound is still playing or not, even in server code.
 
 \section Audio_Parameters Sound parameters
 
@@ -1742,14 +1745,15 @@ A standard WAV file can not tell whether it should loop, and raw audio does not 
 
 The frequency is in Hz, and loop start and end are bytes from the start of audio data. If a loop is enabled without specifying the start and end, it is assumed to be the whole sound. Ogg Vorbis compressed sounds do not support specifying the loop range, only whether whole sound looping is enabled or disabled.
 
-The Audio subsystem is always instantiated, but in headless mode it is not active. In headless mode the playback of sounds is simulated, taking the sound length and frequency into account. This allows basing logic on whether a specific sound is still playing or not, even in server code.
-
 \section Audio_Stream Sound streaming
 
 In addition to playing existing sound resources, sound can be generated during runtime using the SoundStream class and its subclasses. To start playback of a stream on a SoundSource, call \ref SoundSource::Play(SoundStream* stream) "Play(SoundStream* stream)".
 
 %Sound streaming is used internally to implement on-the-fly Ogg Vorbis decoding. It is only available in C++ code and not scripting due to its low-level nature. See the SoundSynthesis C++ sample for an example of using the BufferedSoundStream subclass, which allows the sound data to be queued for playback from the main thread.
 
+\section Audio_Events Audio events
+
+A sound source will send the E_SOUNDFINISHED event through its scene node when the playback of a sound has ended. This can be used for example to know when to remove a temporary node created just for playing a sound effect, or for tying game events to sound playback.
 
 \page Physics Physics
 
@@ -2015,22 +2019,22 @@ Cursor Shapes can be define in a number of different ways:
 
 XML:
 \code
-	<element type="Cursor">
-		<attribute name="Shapes">
-			<variant type="VariantVector" >
-				<variant type="String" value="Normal" />
-				<variant type="ResourceRef" value="Image;Textures/UI.png" />
-				<variant type="IntRect" value="0 0 12 24" />
-				<variant type="IntVector2" value="0 0" />
-			</variant>
-			<variant type="VariantVector" >
-				<variant type="String" value="Custom" />
-				<variant type="ResourceRef" value="Image;Textures/UI.png" />
-				<variant type="IntRect" value="12 0 12 36" />
-				<variant type="IntVector2" value="0 0" />
-			</variant>
-		</atrribute>
-	</element>
+    <element type="Cursor">
+        <attribute name="Shapes">
+            <variant type="VariantVector" >
+                <variant type="String" value="Normal" />
+                <variant type="ResourceRef" value="Image;Textures/UI.png" />
+                <variant type="IntRect" value="0 0 12 24" />
+                <variant type="IntVector2" value="0 0" />
+            </variant>
+            <variant type="VariantVector" >
+                <variant type="String" value="Custom" />
+                <variant type="ResourceRef" value="Image;Textures/UI.png" />
+                <variant type="IntRect" value="12 0 12 36" />
+                <variant type="IntVector2" value="0 0" />
+            </variant>
+        </atrribute>
+    </element>
 \endcode
 
 C++:
@@ -2041,26 +2045,32 @@ C++:
     Cursor* cursor = new Cursor(context_);
     Image* image = rc->GetResource<Image>("Textures/UI.png");
     if (image)
-	{
+    {
         cursor->DefineShape(CS_NORMAL, image, IntRect(0, 0, 12, 24), IntVector2(0, 0));
-		cursor->DefineShape("Custom", image, IntRect(12, 0, 12, 36), IntVector2(0, 0));
-	}
+        cursor->DefineShape("Custom", image, IntRect(12, 0, 12, 36), IntVector2(0, 0));
+    }
 
     ui->SetCursor(cursor);
 \endcode
 
 Angelcode:
 \code
-	Cursor@ cursor = new Cursor();
-	Image@ image = cache.GetResource("Image", "Textures/UI.png");
-	if (image !is null)
-	{
-		cursor.DefineShape(CS_NORMAL, image, IntRect(0, 0, 12, 24), IntVector2(0, 0));
-		cursor.DefineShape("Custom", image, IntRect(12, 0, 12, 36), IntVector2(0, 0));
-	}
+    Cursor@ cursor = new Cursor();
+    Image@ image = cache.GetResource("Image", "Textures/UI.png");
+    if (image !is null)
+    {
+        cursor.DefineShape(CS_NORMAL, image, IntRect(0, 0, 12, 24), IntVector2(0, 0));
+        cursor.DefineShape("Custom", image, IntRect(12, 0, 12, 36), IntVector2(0, 0));
+    }
 
-	ui.SetCursor(cursor);
+    ui.SetCursor(cursor);
 \endcode
+
+\section UI_Scaling Scaling
+
+By default the %UI is pixel perfect: the root element is sized equal to the application window size.
+
+The pixel scaling can be changed with the functions \ref UI::SetScale "SetScale()", \ref UI::SetWidth "SetWidth()" and \ref UI::SetHeight "SetHeight()".
 
 \page Urho2D Urho2D
 In order to make 2D games in Urho3D, the Urho2D sublibrary is provided. Urho2D includes 2D graphics and 2D physics.
@@ -2809,25 +2819,25 @@ As for any component, a \ref SplinePath::DrawDebugGeometry "debugging function" 
 
 The following sample demonstrates how to build a path from 2 points, assign a controlled node and move it along the path according to speed and interpolation mode.
 \code
-	// Initial point
-	Node* startNode = scene_->CreateChild("Start");
-	startNode->SetPosition(Vector3(-20.0f, 0.0f, -20.0f));
+    // Initial point
+    Node* startNode = scene_->CreateChild("Start");
+    startNode->SetPosition(Vector3(-20.0f, 0.0f, -20.0f));
 
-	// Target point
-	Node* targetNode = scene_->CreateChild("Target");
-	targetNode->SetPosition(Vector3(20.0f, 2.0f, 20.0f));
+    // Target point
+    Node* targetNode = scene_->CreateChild("Target");
+    targetNode->SetPosition(Vector3(20.0f, 2.0f, 20.0f));
 
-	// Node to move along the path ('controlled node')
-	Node* movingNode =  scene_->CreateChild("MovingNode");
+    // Node to move along the path ('controlled node')
+    Node* movingNode =  scene_->CreateChild("MovingNode");
 
-	// Spline path
-	Node* pathNode = scene_->CreateChild("PathNode");
-	SplinePath* path = pathNode->CreateComponent<SplinePath>();
-	path->AddControlPoint(startNode, 0);
-	path->AddControlPoint(targetNode, 1);
-	path->SetInterpolationMode(LINEAR_CURVE);
-	path->SetSpeed(10.0f);
-	path->SetControlledNode(movingNode);
+    // Spline path
+    Node* pathNode = scene_->CreateChild("PathNode");
+    SplinePath* path = pathNode->CreateComponent<SplinePath>();
+    path->AddControlPoint(startNode, 0);
+    path->AddControlPoint(targetNode, 1);
+    path->SetInterpolationMode(LINEAR_CURVE);
+    path->SetSpeed(10.0f);
+    path->SetControlledNode(movingNode);
 \endcode
 
 In your update function, move the controlled node using \ref SplinePath::Move "Move()":

@@ -25,12 +25,8 @@ if (CMAKE_PROJECT_NAME STREQUAL ExternalProject-tolua++)
     # We only want to keep the buildvm host tool which is built for cross-compiling target (the one built from internal LuaJIT CMake-target)
     set (DEST_RUNTIME_DIR "")   # In this particular case, it is not equivalent to unset() the variable
 elseif (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
-    # Set project name
-    project (ExternalProject-buildvm)
-
-    # Set minimum version
+    # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
     cmake_minimum_required (VERSION 2.8.6)
-
     if (COMMAND cmake_policy)
         cmake_policy (SET CMP0003 NEW)
         if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
@@ -44,6 +40,9 @@ elseif (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
             cmake_policy (SET CMP0042 NEW)
         endif ()
     endif ()
+
+    # Set project name
+    project (Urho3D-ExternalProject-buildvm)
 
     # Set CMake modules search path
     set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/CMake/Modules)

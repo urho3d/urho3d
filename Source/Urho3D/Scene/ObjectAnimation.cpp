@@ -24,6 +24,7 @@
 
 #include "../Core/Context.h"
 #include "../Resource/XMLFile.h"
+#include "../Resource/JSONFile.h"
 #include "../Scene/ObjectAnimation.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/ValueAnimation.h"
@@ -126,6 +127,68 @@ bool ObjectAnimation::SaveXML(XMLElement& dest) const
         animElem.SetFloat("speed", info->GetSpeed());
     }
 
+    return true;
+}
+
+bool ObjectAnimation::LoadJSON(const JSONValue& source)
+{
+    attributeAnimationInfos_.Clear();
+
+    JSONValue attributeAnimationsValue = source.Get("attributeanimations");
+    if (attributeAnimationsValue.IsNull())
+        return true;
+    if (!attributeAnimationsValue.IsObject())
+        return true;
+
+    const JSONObject& attributeAnimationsObject = attributeAnimationsValue.GetObject();
+
+    for (JSONObject::ConstIterator it = attributeAnimationsObject.Begin(); it != attributeAnimationsObject.End(); it++)
+    {
+        String name = it->first_;
+        JSONValue value = it->second_;
+        SharedPtr<ValueAnimation> animation(new ValueAnimation(context_));
+        if (!animation->LoadJSON(value))
+            return false;
+
+        String wrapModeString = value.Get("wrapmode").GetString();
+        WrapMode wrapMode = WM_LOOP;
+        for (int i = 0; i <= WM_CLAMP; ++i)
+        {
+            if (wrapModeString == wrapModeNames[i])
+            {
+                wrapMode = (WrapMode)i;
+                break;
+            }
+        }
+
+        float speed = value.Get("speed").GetFloat();
+        AddAttributeAnimation(name, animation, wrapMode, speed);
+    }
+
+    return true;
+}
+
+bool ObjectAnimation::SaveJSON(JSONValue& dest) const
+{
+    JSONValue attributeAnimationsValue;
+
+    for (HashMap<String, SharedPtr<ValueAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin();
+         i != attributeAnimationInfos_.End(); ++i)
+    {
+        JSONValue animValue;
+        animValue.Set("name", i->first_);
+
+        const ValueAnimationInfo* info = i->second_;
+        if (!info->GetAnimation()->SaveJSON(animValue))
+            return false;
+
+        animValue.Set("wrapmode", wrapModeNames[info->GetWrapMode()]);
+        animValue.Set("speed", (float) info->GetSpeed());
+
+        attributeAnimationsValue.Set(i->first_, animValue);
+    }
+
+    dest.Set("attributeanimations", attributeAnimationsValue);
     return true;
 }
 

@@ -70,8 +70,8 @@ public:
     void SetAttenuation(float attenuation);
     /// Set stereo panning. -1.0 is full left and 1.0 is full right.
     void SetPanning(float panning);
-    /// Set whether sound source will be automatically removed from the scene node when playback stops.
-    void SetAutoRemove(bool enable);
+    /// Set whether sound source will be automatically removed from the scene node when playback stops. Note: this is deprecated, consider subscribing to the SoundFinished event instead.
+    URHO3D_DEPRECATED void SetAutoRemove(bool enable);
     /// Set new playback position.
     void SetPlayPosition(signed char* pos);
 
@@ -100,7 +100,7 @@ public:
     float GetPanning() const { return panning_; }
 
     /// Return autoremove mode.
-    bool GetAutoRemove() const { return autoRemove_; }
+    URHO3D_DEPRECATED bool GetAutoRemove() const { return autoRemove_; }
 
     /// Return whether is playing.
     bool IsPlaying() const;
@@ -144,6 +144,8 @@ protected:
     float masterGain_;
     /// Autoremove flag.
     bool autoRemove_;
+    /// Whether finished event should be sent on playback stop.
+    bool sendFinishedEvent_;
 
 private:
     /// Play a sound without locking the audio mutex. Called internally.

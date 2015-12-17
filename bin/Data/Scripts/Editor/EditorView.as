@@ -463,6 +463,9 @@ void SetRenderPath(const String&in newRenderPathName)
 
     if (materialPreview !is null && materialPreview.viewport !is null)
         materialPreview.viewport.renderPath = renderPath;
+        
+    if (particleEffectPreview !is null && particleEffectPreview.viewport !is null)
+        particleEffectPreview.viewport.renderPath = renderPath;
 }
 
 void CreateCamera()
@@ -1103,23 +1106,10 @@ void UpdateGrid(bool updateGridGeometry = true)
 
 void CreateStatsBar()
 {
-    Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
-
     editorModeText = Text();
     ui.root.AddChild(editorModeText);
     renderStatsText = Text();
     ui.root.AddChild(renderStatsText);
-
-    if (ui.root.width >= 1200)
-    {
-        SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
-        SetupStatsBarText(renderStatsText, font, -4, 64, HA_RIGHT, VA_TOP);
-    }
-    else
-    {
-        SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
-        SetupStatsBarText(renderStatsText, font, 35, 78, HA_LEFT, VA_TOP);
-    }
 }
 
 void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment hAlign, VerticalAlignment vAlign)
@@ -1156,6 +1146,19 @@ void UpdateStats(float timeStep)
 
     editorModeText.size = editorModeText.minSize;
     renderStatsText.size = renderStatsText.minSize;
+
+    // Relayout stats bar
+    Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
+    if (graphics.width >= editorModeText.size.x + renderStatsText.size.x + 45)
+    {
+        SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, -4, 64, HA_RIGHT, VA_TOP);
+    }
+    else
+    {
+        SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, 35, 78, HA_LEFT, VA_TOP);
+    }
 }
 
 void UpdateViewports(float timeStep)

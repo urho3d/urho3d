@@ -129,6 +129,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     interpolation_(true),
     internalEdge_(true),
     applyingTransforms_(false),
+    simulating_(false),
     debugRenderer_(0),
     debugMode_(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawConstraints | btIDebugDraw::DBG_DrawConstraintLimits)
 {
@@ -249,6 +250,7 @@ void PhysicsWorld::Update(float timeStep)
         maxSubSteps = Min(maxSubSteps, maxSubSteps_);
 
     delayedWorldTransforms_.Clear();
+    simulating_ = true;
 
     if (interpolation_)
         world_->stepSimulation(timeStep, maxSubSteps, internalTimeStep);
@@ -262,6 +264,8 @@ void PhysicsWorld::Update(float timeStep)
             --maxSubSteps;
         }
     }
+
+    simulating_ = false;
 
     // Apply delayed (parented) world transforms now
     while (!delayedWorldTransforms_.Empty())
@@ -400,6 +404,52 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
         result.distance_ = M_INFINITY;
         result.body_ = 0;
     }
+}
+
+void PhysicsWorld::RaycastSingleSegmented(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask)
+{
+    URHO3D_PROFILE(PhysicsRaycastSingleSegmented);
+
+    if (maxDistance >= M_INFINITY)
+        URHO3D_LOGWARNING("Infinite maxDistance in physics raycast is not supported");
+
+    btVector3 start = ToBtVector3(ray.origin_);
+    btVector3 end;
+    btVector3 direction = ToBtVector3(ray.direction_);
+    float distance;
+
+    for (float remainingDistance = maxDistance; remainingDistance > 0; remainingDistance -= segmentDistance)
+    {
+        distance = Min(remainingDistance, segmentDistance);
+
+        end = start + distance * direction;
+
+        btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
+        rayCallback.m_collisionFilterGroup = (short)0xffff;
+        rayCallback.m_collisionFilterMask = (short)collisionMask;
+
+        world_->rayTest(rayCallback.m_rayFromWorld, rayCallback.m_rayToWorld, rayCallback);
+
+        if (rayCallback.hasHit())
+        {
+            result.position_ = ToVector3(rayCallback.m_hitPointWorld);
+            result.normal_ = ToVector3(rayCallback.m_hitNormalWorld);
+            result.distance_ = (result.position_ - ray.origin_).Length();
+            result.body_ = static_cast<RigidBody*>(rayCallback.m_collisionObject->getUserPointer());
+
+            // No need to cast the rest of the segments
+            return;
+        }
+
+        // Use the end position as the new start position
+        start = end;
+    }
+
+    // Didn't hit anything
+    result.position_ = Vector3::ZERO;
+    result.normal_ = Vector3::ZERO;
+    result.distance_ = M_INFINITY;
+    result.body_ = 0;
 }
 
 void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask)
@@ -582,6 +632,29 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingB
 }
 
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body)
+{
+    URHO3D_PROFILE(PhysicsBodyQuery);
+    
+    result.Clear();
+    
+    if (!body || !body->GetBody())
+        return;
+
+    PhysicsQueryCallback callback(result, body->GetCollisionMask());
+    world_->contactTest(body->GetBody(), callback);
+    
+    // Remove the body itself from the returned list
+    for (unsigned i = 0; i < result.Size(); i++)
+    {
+        if (result[i] == body)
+        {
+            result.Erase(i);
+            break;
+        }
+    }
+}
+
+void PhysicsWorld::GetCollidingBodies(PODVector<RigidBody*>& result, const RigidBody* body)
 {
     URHO3D_PROFILE(GetCollidingBodies);
 

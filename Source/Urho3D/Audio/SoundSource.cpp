@@ -23,11 +23,15 @@
 #include "../Precompiled.h"
 
 #include "../Audio/Audio.h"
+#include "../Audio/AudioEvents.h"
 #include "../Audio/Sound.h"
 #include "../Audio/SoundSource.h"
 #include "../Audio/SoundStream.h"
 #include "../Core/Context.h"
+#include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
+#include "../Scene/Node.h"
+#include "../Scene/ReplicationState.h"
 
 #include "../DebugNew.h"
 
@@ -106,6 +110,7 @@ SoundSource::SoundSource(Context* context) :
     panning_(0.0f),
     autoRemoveTimer_(0.0f),
     autoRemove_(false),
+    sendFinishedEvent_(false),
     position_(0),
     fractPosition_(0),
     timePosition_(0.0f),
@@ -158,6 +163,20 @@ void SoundSource::Play(Sound* sound)
     }
     else
         PlayLockless(sound);
+
+    // Forget the Sound & Is Playing attribute previous values so that they will be sent again, triggering
+    // the sound correctly on network clients even after the initial playback
+    if (networkState_ && networkState_->attributes_ && networkState_->previousValues_.Size())
+    {
+        for (unsigned i = 1; i < networkState_->previousValues_.Size(); ++i)
+        {
+            // The indexing is different for SoundSource & SoundSource3D, as SoundSource3D removes two attributes,
+            // so go by attribute types
+            VariantType type = networkState_->attributes_->At(i).type_;
+            if (type == VAR_RESOURCEREF || type == VAR_BOOL)
+                networkState_->previousValues_[i] = Variant::EMPTY;
+        }
+    }
 
     MarkNetworkUpdate();
 }
@@ -266,6 +285,9 @@ void SoundSource::SetPanning(float panning)
 
 void SoundSource::SetAutoRemove(bool enable)
 {
+    if (enable == true)
+        URHO3D_LOGWARNING("SoundSource::SetAutoRemove is deprecated. Consider using the SoundFinished event instead");
+
     autoRemove_ = enable;
 }
 
@@ -297,10 +319,31 @@ void SoundSource::Update(float timeStep)
     if (soundStream_ && !position_)
         StopLockless();
 
+    bool playing = IsPlaying();
+
+    if (!playing && sendFinishedEvent_)
+    {
+        sendFinishedEvent_ = false;
+
+        // Make a weak pointer to self to check for destruction during event handling
+        WeakPtr<SoundSource> self(this);
+
+        using namespace SoundFinished;
+
+        VariantMap& eventData = context_->GetEventDataMap();
+        eventData[P_NODE] = node_;
+        eventData[P_SOUNDSOURCE] = this;
+        eventData[P_SOUND] = sound_;
+        node_->SendEvent(E_SOUNDFINISHED, eventData);
+
+        if (self.Expired())
+            return;
+    }
+
     // Check for autoremove
     if (autoRemove_)
     {
-        if (!IsPlaying())
+        if (!playing)
         {
             autoRemoveTimer_ += timeStep;
             if (autoRemoveTimer_ > AUTOREMOVE_DELAY)
@@ -479,6 +522,7 @@ void SoundSource::PlayLockless(Sound* sound)
                 sound_ = sound;
                 position_ = start;
                 fractPosition_ = 0;
+                sendFinishedEvent_ = true;
                 return;
             }
         }
@@ -516,6 +560,7 @@ void SoundSource::PlayLockless(SharedPtr<SoundStream> stream)
         unusedStreamSize_ = 0;
         position_ = streamBuffer_->GetStart();
         fractPosition_ = 0;
+        sendFinishedEvent_ = true;
         return;
     }
 

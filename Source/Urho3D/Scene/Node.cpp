@@ -27,6 +27,7 @@
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Resource/XMLFile.h"
+#include "../Resource/JSONFile.h"
 #include "../Scene/Component.h"
 #include "../Scene/ObjectAnimation.h"
 #include "../Scene/ReplicationState.h"
@@ -169,6 +170,25 @@ bool Node::LoadXML(const XMLElement& source, bool setInstanceDefault)
     return success;
 }
 
+bool Node::LoadJSON(const JSONValue& source, bool setInstanceDefault)
+{
+    SceneResolver resolver;
+
+    // Read own ID. Will not be applied, only stored for resolving possible references
+    unsigned nodeID = source.Get("id").GetUInt();
+    resolver.AddNode(nodeID, this);
+
+    // Read attributes, components and child nodes
+    bool success = LoadJSON(source, resolver);
+    if (success)
+    {
+        resolver.Resolve();
+        ApplyAttributes();
+    }
+
+    return success;
+}
+
 bool Node::SaveXML(XMLElement& dest) const
 {
     // Write node ID
@@ -202,6 +222,50 @@ bool Node::SaveXML(XMLElement& dest) const
         if (!node->SaveXML(childElem))
             return false;
     }
+
+    return true;
+}
+
+bool Node::SaveJSON(JSONValue& dest) const
+{
+    // Write node ID
+    dest.Set("id", (unsigned) id_);
+
+    // Write attributes
+    if (!Animatable::SaveJSON(dest))
+        return false;
+
+    // Write components
+    JSONArray componentsArray;
+    componentsArray.Reserve(components_.Size());
+    for (unsigned i = 0; i < components_.Size(); ++i)
+    {
+        Component* component = components_[i];
+        if (component->IsTemporary())
+            continue;
+
+        JSONValue compVal;
+        if (!component->SaveJSON(compVal))
+            return false;
+        componentsArray.Push(compVal);
+    }
+    dest.Set("components", componentsArray);
+
+    // Write child nodes
+    JSONArray childrenArray;
+    childrenArray.Reserve(children_.Size());
+    for (unsigned i = 0; i < children_.Size(); ++i)
+    {
+        Node* node = children_[i];
+        if (node->IsTemporary())
+            continue;
+
+        JSONValue childVal;
+        if (!node->SaveJSON(childVal))
+            return false;
+        childrenArray.Push(childVal);
+    }
+    dest.Set("children", childrenArray);
 
     return true;
 }
@@ -240,6 +304,17 @@ bool Node::SaveXML(Serializer& dest, const String& indentation) const
         return false;
 
     return xml->Save(dest, indentation);
+}
+
+bool Node::SaveJSON(Serializer& dest, const String& indentation) const
+{
+    SharedPtr<JSONFile> json(new JSONFile(context_));
+    JSONValue& rootElem = json->GetRoot();
+
+    if (!SaveJSON(rootElem))
+        return false;
+
+    return json->Save(dest, indentation);
 }
 
 void Node::SetName(const String& name)
@@ -1353,6 +1428,50 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     return true;
 }
 
+bool Node::LoadJSON(const JSONValue& source, SceneResolver& resolver, bool readChildren, bool rewriteIDs, CreateMode mode)
+{
+    // Remove all children and components first in case this is not a fresh load
+    RemoveAllChildren();
+    RemoveAllComponents();
+
+    if (!Animatable::LoadJSON(source))
+        return false;
+
+    const JSONArray& componentsArray = source.Get("components").GetArray();
+
+    for (unsigned i = 0; i < componentsArray.Size(); i++)
+    {
+        const JSONValue& compVal = componentsArray.At(i);
+        String typeName = compVal.Get("type").GetString();
+        unsigned compID = compVal.Get("id").GetUInt();
+        Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
+            (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
+        if (newComponent)
+        {
+            resolver.AddComponent(compID, newComponent);
+            if (!newComponent->LoadJSON(compVal))
+                return false;
+        }
+    }
+
+    if (!readChildren)
+        return true;
+
+    const JSONArray& childrenArray = source.Get("children").GetArray();
+    for (unsigned i = 0; i < childrenArray.Size(); i++)
+    {
+        const JSONValue& childVal = childrenArray.At(i);
+
+        unsigned nodeID = childVal.Get("id").GetUInt();
+        Node* newNode = CreateChild(rewriteIDs ? 0 : nodeID, (mode == REPLICATED && nodeID < FIRST_LOCAL_ID) ? REPLICATED :
+            LOCAL);
+        resolver.AddNode(nodeID, newNode);
+        if (!newNode->LoadJSON(childVal, resolver, readChildren, rewriteIDs, mode))
+            return false;
+    }
+
+    return true;
+}
 
 void Node::PrepareNetworkUpdate()
 {

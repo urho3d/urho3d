@@ -127,10 +127,11 @@ else ()
     # end todo
     include_directories (${ALSA_INCLUDE_DIRS})
 
-    include (FindPkgConfig)
-    pkg_check_modules (PKG_PULSEAUDIO libpulse-simple)
-    if (PKG_PULSEAUDIO_FOUND)
-      add_definitions (-DSDL_AUDIO_DRIVER_PULSEAUDIO=1 -DSDL_AUDIO_DRIVER_PULSEAUDIO_DYNAMIC="libpulse-simple.so")
+    find_package (PulseAudio)
+    if (PA_FOUND)
+      include_directories (${PA_INCLUDE_DIRS})
+      get_filename_component (PA_SIMPLE ${PA_LIBRARIES} NAME)
+      add_definitions (-DSDL_AUDIO_DRIVER_PULSEAUDIO=1 -DSDL_AUDIO_DRIVER_PULSEAUDIO_DYNAMIC="${PA_SIMPLE}")
       file (GLOB PULSEAUDIO_SOURCES src/audio/pulseaudio/*.c)
     endif ()
 

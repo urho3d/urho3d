@@ -54,6 +54,8 @@ public:
     virtual bool Save(Serializer& dest) const;
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest) const;
+    /// Save as JSON data. Return true if successful.
+    virtual bool SaveJSON(JSONValue& dest) const;
     /// Mark for attribute check on the next network update.
     virtual void MarkNetworkUpdate();
     /// Return the depended on nodes to order network updates.

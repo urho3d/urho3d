@@ -113,6 +113,7 @@ if (IOS OR (RPI AND "${RPI_ABI}" MATCHES NEON))    # Stringify in case RPI_ABI i
 endif ()
 cmake_dependent_option (URHO3D_NEON "Enable NEON instruction set (ARM platforms with NEON only)" TRUE "NEON" FALSE)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
+    set (URHO3D_LIB_TYPE STATIC CACHE STRING "Specify Urho3D library type, possible values are STATIC (default) and SHARED")
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
     cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
     if (CMAKE_BUILD_TYPE STREQUAL Release OR CMAKE_CONFIGURATION_TYPES)
@@ -139,9 +140,15 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
         cmake_dependent_option (URHO3D_USE_LIB_DEB "Enable 64-bit DEB CPack generator using /usr/lib and disable all other generators (Redhat-based host only)" FALSE "URHO3D_64BIT AND HAS_LIB64" FALSE)
     endif ()
 else ()
-    set (URHO3D_HOME "" CACHE PATH "Path to Urho3D build tree or SDK installation location (external project only)")
-    if (URHO3D_PCH OR URHO3D_UPDATE_SOURCE_TREE)
-        # Just reference it to suppress "unused variable" CMake warning on external projects using this CMake module
+    set (URHO3D_LIB_TYPE "" CACHE STRING "Specify Urho3D library type, possible values are STATIC and SHARED")
+    set (URHO3D_HOME "" CACHE PATH "Path to Urho3D build tree or SDK installation location (downstream project only)")
+    if (URHO3D_PCH OR URHO3D_UPDATE_SOURCE_TREE OR URHO3D_TOOLS OR URHO3D_EXTRAS)
+        # Just reference it to suppress "unused variable" CMake warning on downstream projects using this CMake module
+    endif ()
+    # All Urho3D downstream projects require Urho3D library, so find Urho3D library here now
+    if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
+        find_package (Urho3D REQUIRED)
+        include_directories (${URHO3D_INCLUDE_DIRS})
     endif ()
 endif ()
 option (URHO3D_PACKAGING "Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0" ${EMSCRIPTEN})
@@ -207,7 +214,6 @@ endif ()
 cmake_dependent_option (URHO3D_STATIC_RUNTIME "Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)" FALSE "MSVC" FALSE)
 cmake_dependent_option (URHO3D_WIN32_CONSOLE "Use console main() as entry point when setting up Windows executable targets (Windows platform only)" FALSE "WIN32" FALSE)
 cmake_dependent_option (URHO3D_MACOSX_BUNDLE "Use MACOSX_BUNDLE when setting up Mac OS X executable targets (Xcode native build only)" FALSE "XCODE AND NOT IOS" FALSE)
-set (URHO3D_LIB_TYPE STATIC CACHE STRING "Specify Urho3D library type, possible values are STATIC (default) and SHARED")
 if (CMAKE_CROSSCOMPILING AND NOT ANDROID)
     set (URHO3D_SCP_TO_TARGET "" CACHE STRING "Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc")
 else ()
@@ -398,7 +404,9 @@ if (URHO3D_LIB_TYPE)
 endif ()
 if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
     set (URHO3D_LIB_TYPE STATIC)
-    add_definitions (-DURHO3D_STATIC_DEFINE)
+    if (NOT MSVC)   # This define will be baked into the export header for MSVC compiler
+        add_definitions (-DURHO3D_STATIC_DEFINE)
+    endif ()
 endif ()
 
 # Add definition for AngelScript
@@ -503,7 +511,7 @@ if (URHO3D_C++11)
     if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
         # Use gnu++11/gnu++0x instead of c++11/c++0x as the latter does not work as expected when cross compiling
         foreach (STANDARD gnu++11 gnu++0x)  # Fallback to gnu++0x on older GCC version
-            execute_process (COMMAND echo COMMAND ${CMAKE_CXX_COMPILER} -E - RESULT_VARIABLE GCC_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+            execute_process (COMMAND echo COMMAND ${CMAKE_CXX_COMPILER} -std=${STANDARD} -E - RESULT_VARIABLE GCC_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
             if (GCC_EXIT_CODE EQUAL 0)
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=${STANDARD}")
                 break ()
@@ -1061,7 +1069,7 @@ macro (setup_executable)
             endforeach ()
         endif ()
     endif ()
-    # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
+    # Need to check if the destination variable is defined first because this macro could be called by downstream project that does not wish to install anything
     if (DEST_RUNTIME_DIR)
         if (EMSCRIPTEN)
             # todo: Just use generator-expression when CMake minimum version is 3.0
@@ -1202,7 +1210,7 @@ macro (setup_main_executable)
     if (NOT RESOURCE_DIRS)
         # If the macro caller has not defined the resource dirs then set them based on Urho3D project convention
         foreach (DIR ${CMAKE_SOURCE_DIR}/bin/CoreData ${CMAKE_SOURCE_DIR}/bin/Data)
-            # Do not assume external project always follows Urho3D project convention, so double check if this directory exists before using it
+            # Do not assume downstream project always follows Urho3D project convention, so double check if this directory exists before using it
             if (IS_DIRECTORY ${DIR})
                 list (APPEND RESOURCE_DIRS ${DIR})
             endif ()
@@ -1219,7 +1227,7 @@ macro (setup_main_executable)
                 set_source_files_properties (${RESOURCE_${DIR}_PATHNAME} PROPERTIES EMCC_OPTION preload-file EMCC_FILE_ALIAS "@/${NAME}.pak --use-preload-cache")
             endif ()
         endforeach ()
-        # Urho3D project builds the PackageTool as required; external project uses PackageTool found in the Urho3D build tree or Urho3D SDK
+        # Urho3D project builds the PackageTool as required; downstream project uses PackageTool found in the Urho3D build tree or Urho3D SDK
         find_Urho3d_tool (PACKAGE_TOOL PackageTool
             HINTS ${CMAKE_BINARY_DIR}/bin/tool ${URHO3D_HOME}/bin/tool
             DOC "Path to PackageTool" MSG_MODE WARNING)
@@ -1229,7 +1237,7 @@ macro (setup_main_executable)
         set (PACKAGING_COMMENT " and packaging")
         set_property (SOURCE ${RESOURCE_PAKS} PROPERTY GENERATED TRUE)
         if (EMSCRIPTEN)
-            # Check if shell-file is already added in source files list by external project
+            # Check if shell-file is already added in source files list by downstream project
             if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
                 foreach (FILE ${SOURCE_FILES})
                     get_property (EMCC_OPTION SOURCE ${FILE} PROPERTY EMCC_OPTION)
@@ -1250,7 +1258,7 @@ macro (setup_main_executable)
                 set (SHARED_RESOURCE_JS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.js)
                 list (APPEND SOURCE_FILES ${SHARED_RESOURCE_JS} ${SHARED_RESOURCE_JS}.data)
                 set_source_files_properties (${SHARED_RESOURCE_JS} PROPERTIES GENERATED TRUE EMCC_OPTION pre-js)
-                # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
+                # Need to check if the destination variable is defined first because this macro could be called by downstream project that does not wish to install anything
                 if (DEST_BUNDLE_DIR)
                     install (FILES ${SHARED_RESOURCE_JS} ${SHARED_RESOURCE_JS}.data DESTINATION ${DEST_BUNDLE_DIR})
                 endif ()
@@ -1284,7 +1292,7 @@ macro (setup_main_executable)
         endif ()
         # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES}
         find_Urho3D_file (ANDROID_MAIN_C_PATH SDL_android_main.c
-            HINTS ${URHO3D_HOME}/include/${PATH_SUFFIX}/ThirdParty/SDL/android ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
+            HINTS ${URHO3D_HOME}/include/Urho3D/ThirdParty/SDL/android ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
             DOC "Path to SDL_android_main.c" MSG_MODE FATAL_ERROR)
         list (APPEND SOURCE_FILES ${ANDROID_MAIN_C_PATH})
         # Setup shared library output path
@@ -1441,7 +1449,7 @@ endmacro ()
 
 # Macro for defining external library dependencies
 # The purpose of this macro is emulate CMake to set the external library dependencies transitively
-# It works for both targets setup within Urho3D project and outside Urho3D project that uses Urho3D as external static/shared library
+# It works for both targets setup within Urho3D project and downstream projects that uses Urho3D as external static/shared library
 macro (define_dependency_libs TARGET)
     # ThirdParty/SDL external dependency
     if (${TARGET} MATCHES SDL|Urho3D)
@@ -1635,7 +1643,7 @@ endmacro ()
 #  BASE <value> - An absolute base path to be prepended to the destination path when installing to build tree, default to build tree
 #  DESTINATION <value> - A relative destination path to be installed to
 macro (install_header_files)
-    # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
+    # Need to check if the destination variable is defined first because this macro could be called by downstream project that does not wish to install anything
     if (DEST_INCLUDE_DIR)
         # Parse the arguments for the underlying install command for the SDK
         cmake_parse_arguments (ARG "FILES_MATCHING;USE_FILE_SYMLINK;BUILD_TREE_ONLY" "BASE;DESTINATION" "FILES;DIRECTORY;PATTERN" ${ARGN})
