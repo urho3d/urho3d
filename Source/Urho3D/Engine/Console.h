@@ -126,8 +126,8 @@ private:
     void HandleLineEditKey(StringHash eventType, VariantMap& eventData);
     /// Handle close button being pressed.
     void HandleCloseButtonPressed(StringHash eventType, VariantMap& eventData);
-    /// Handle rendering window resize.
-    void HandleScreenMode(StringHash eventType, VariantMap& eventData);
+    /// Handle UI root resize.
+    void HandleRootElementResized(StringHash eventType, VariantMap& eventData);
     /// Handle a log message.
     void HandleLogMessage(StringHash eventType, VariantMap& eventData);
     /// Handle the application post-update.

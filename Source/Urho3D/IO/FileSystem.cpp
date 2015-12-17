@@ -32,7 +32,11 @@
 #include "../IO/IOEvents.h"
 #include "../IO/Log.h"
 
+#ifndef MINI_URHO
 #include <SDL/SDL_filesystem.h>
+#else
+#include <stdio.h>
+#endif
 
 #include <sys/stat.h>
 
@@ -79,12 +83,12 @@ namespace Urho3D
 
 int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* context)
 {
-#if !defined(NO_POPEN)
+#if !defined(NO_POPEN) && !defined(MINI_URHO)
     if (!redirectToLog)
 #endif
         return system(commandLine.CString());
 
-#if !defined(NO_POPEN)
+#if !defined(NO_POPEN) && !defined(MINI_URHO)
     // Get a platform-agnostic temporary file name for stderr redirection
     String stderrFilename;
     String adjustedCommandLine(commandLine);
@@ -748,6 +752,7 @@ String FileSystem::GetUserDocumentsDir() const
 String FileSystem::GetAppPreferencesDir(const String& org, const String& app) const
 {
     String dir;
+#ifndef MINI_URHO
     char* prefPath = SDL_GetPrefPath(org.CString(), app.CString());
     if (prefPath)
     {
@@ -755,6 +760,7 @@ String FileSystem::GetAppPreferencesDir(const String& org, const String& app) co
         SDL_free(prefPath);
     }
     else
+#endif
         URHO3D_LOGWARNING("Could not get application preferences directory");
 
     return dir;

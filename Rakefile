@@ -35,6 +35,7 @@ desc 'Create a new project using Urho3D as external library'
 task :scaffolding do
   abort 'Usage: rake scaffolding dir=/path/to/new/project/root [project=Scaffolding] [target=Main]' unless ENV['dir']
   abs_path = (ENV['OS'] ? ENV['dir'][1, 1] == ':' : ENV['dir'][0, 1] == '/') ? ENV['dir'] : "#{Dir.pwd}/#{ENV['dir']}"
+  abs_path.gsub!(/\//, '\\') if ENV['OS']
   project = ENV['project'] || 'Scaffolding'
   target = ENV['target'] || 'Main'
   scaffolding(abs_path, project, target)
@@ -99,6 +100,7 @@ task :make do
   cmake_build_options = ''
   build_options = ''
   unfilter = false
+  ['config', 'target', 'sdk'].each { |var| ARGV << "#{var}=\"#{ENV[var]}\"" if ENV[var] and !ARGV.include? var }
   ARGV.each { |option|
     task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
     case option
@@ -129,7 +131,7 @@ task :make do
       build_options = "-jobs #{numjobs}#{build_options}"
     end
     filter = !unfilter && system('xcpretty -v >/dev/null 2>&1') ? '|xcpretty -c && exit ${PIPESTATUS[0]}' : ''
-  elsif !Dir.glob("#{build_tree}/*.sln").empty?
+  elsif !Dir.glob("#{build_tree}\\*.sln".gsub(/\\/, '/')).empty?
     # msbuild
     numjobs = ":#{numjobs}" unless numjobs.empty?
     build_options = "/maxcpucount#{numjobs}#{build_options}"
@@ -297,7 +299,7 @@ task :ci_site_update do
   # Update credits from README.md to about.yml
   system "ruby -lne 'BEGIN { credits = false }; puts $_ if credits; credits = true if /bugfixes by:/; credits = false if /^$/' README.md |ruby -i -le 'credits = STDIN.read; puts ARGF.read.gsub(/(?<=contributors:\n).*?\n\n/m, credits)' ../doc-Build/_data/about.yml" or abort 'Failed to update credits'
   # Setup doxygen to use minimal theme
-  system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' ../Build/Docs/generated/Doxyfile" or abort 'Failed to setup doxygen configuration file'
+  system "ruby -i -pe 'BEGIN { a = {%q{HTML_HEADER} => %q{minimal-header.html}, %q{HTML_FOOTER} => %q{minimal-footer.html}, %q{HTML_STYLESHEET} => %q{minimal-doxygen.css}, %q{HTML_COLORSTYLE_HUE} => 200, %q{HTML_COLORSTYLE_SAT} => 0, %q{HTML_COLORSTYLE_GAMMA} => 20, %q{DOT_IMAGE_FORMAT} => %q{svg}, %q{INTERACTIVE_SVG} => %q{YES}, %q{COLS_IN_ALPHA_INDEX} => 3} }; a.each {|k, v| gsub(/\#{k}\s*?=.*?\n/, %Q{\#{k} = \#{v}\n}) }' ../Build/Docs/generated/Doxyfile" or abort 'Failed to setup doxygen configuration file'
   system 'cp ../doc-Build/_includes/Doxygen/minimal-* ../Build/Docs' or abort 'Failed to copy minimal-themed template'
   release = ENV['RELEASE_TAG'] || 'HEAD'
   unless release == 'HEAD'
@@ -506,12 +508,8 @@ end
 
 def scaffolding dir, project = 'Scaffolding', target = 'Main'
   build_script = <<EOF
-# Set project name
-project (#{project})
-
-# Set minimum version
+# Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
 cmake_minimum_required (VERSION 2.8.6)
-
 if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
     if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
@@ -526,15 +524,14 @@ if (COMMAND cmake_policy)
     endif ()
 endif ()
 
+# Set project name
+project (#{project})
+
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
 # Include Urho3D CMake common module
 include (Urho3D-CMake-common)
-
-# Find Urho3D library
-find_package (Urho3D REQUIRED)
-include_directories (${URHO3D_INCLUDE_DIRS})
 
 # Define target name
 set (TARGET_NAME #{target})
@@ -555,7 +552,7 @@ endif ()
 EOF
   # TODO: Rewrite in pure Ruby when it supports symlink creation on Windows platform
   if ENV['OS']
-    system("@echo off && mkdir '#{dir}'\\bin && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* '#{dir}' >nul && (for %f in (*.bat Rakefile) do mklink '#{dir}'\\%f %cd%\\%f >nul) && mklink /D '#{dir}'\\CMake %cd%\\CMake && (for %d in (CoreData,Data) do mklink /D '#{dir}'\\bin\\%d %cd%\\bin\\%d >nul)") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
+    system("@echo off && mkdir \"#{dir}\"\\bin && copy Source\\Tools\\Urho3DPlayer\\Urho3DPlayer.* \"#{dir}\" >nul && (for %f in (*.bat Rakefile) do mklink \"#{dir}\"\\%f %cd%\\%f >nul) && mklink /D \"#{dir}\"\\CMake %cd%\\CMake && (for %d in (CoreData,Data) do mklink /D \"#{dir}\"\\bin\\%d %cd%\\bin\\%d >nul)") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
   else
     system("bash -c \"mkdir -p '#{dir}'/bin && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* '#{dir}' && for f in {.,}*.sh Rakefile CMake; do ln -sf `pwd`/\\$f '#{dir}'; done && ln -sf `pwd`/bin/{Core,}Data '#{dir}'/bin\"") && File.write("#{dir}/CMakeLists.txt", build_script) or abort 'Failed to create new project using Urho3D as external library'
   end
@@ -589,13 +586,13 @@ def makefile_ci
   unless ENV['CI'] && ENV['HTML5'] && ENV['PACKAGE_UPLOAD']  # For Emscripten, skip scaffolding test when packaging
     # Create a new project on the fly that uses newly built Urho3D library in the build tree
     scaffolding "../Build/generated/UsingBuildTree"
-    system "cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_generic.sh . #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
+    system "cd ../Build/generated/UsingBuildTree && echo '\nConfiguring downstream project using Urho3D library in its build tree...' && ./cmake_generic.sh . #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
     ENV['DESTDIR'] = ENV['HOME'] || Dir.home
     puts "\nInstalling Urho3D SDK to #{ENV['DESTDIR']}/usr/local...\n"  # The default CMAKE_INSTALL_PREFIX is /usr/local
     system 'cd ../Build && make -j$NUMJOBS install >/dev/null' or abort 'Failed to install Urho3D SDK'
     # Create a new project on the fly that uses newly installed Urho3D SDK
     scaffolding "../Build/generated/UsingSDK"
-    system "export URHO3D_HOME=~/usr/local && cd ../Build/generated/UsingSDK && echo '\nExternal project referencing Urho3D SDK' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary project using Urho3D as external library'
+    system "export URHO3D_HOME=~/usr/local && cd ../Build/generated/UsingSDK && echo '\nConfiguring downstream project using Urho3D SDK...' && ./cmake_generic.sh . #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing} -DCMAKE_BUILD_TYPE=#{$configuration} && make -j$NUMJOBS #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
   end
   # Make, deploy, and test run Android APK in an Android (virtual) device
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']
@@ -736,14 +733,14 @@ def xcode_ci
   unless ENV['CI'] && ENV['IOS'] && ENV['PACKAGE_UPLOAD']   # Skip scaffolding test when packaging for iOS
     # Create a new project on the fly that uses newly built Urho3D library in the build tree
     scaffolding "../Build/generated/UsingBuildTree"
-    system "cd ../Build/generated/UsingBuildTree && echo '\nExternal project referencing Urho3D library in its build tree' && ./cmake_macosx.sh . -DIOS=$IOS #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
-    xcode_build(ENV['IOS'], '../Build/generated/UsingBuildTree/Scaffolding.xcodeproj') or abort 'Failed to build/test temporary project using Urho3D as external library'
+    system "cd ../Build/generated/UsingBuildTree && echo '\nConfiguring downstream project using Urho3D library in its build tree...' && ./cmake_macosx.sh . -DIOS=$IOS #{$build_options} -DURHO3D_HOME=../.. -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
+    xcode_build(ENV['IOS'], '../Build/generated/UsingBuildTree/Scaffolding.xcodeproj') or abort 'Failed to build/test temporary downstream project using Urho3D as external library'
     ENV['DESTDIR'] = ENV['HOME'] || Dir.home
     wait_for_block("\nInstalling Urho3D SDK to #{ENV['DESTDIR']}/usr/local...") { Thread.current[:exit_code] = xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj', 'install', '>/dev/null') } or abort 'Failed to install Urho3D SDK'
     # Create a new project on the fly that uses newly installed Urho3D SDK
     scaffolding "../Build/generated/UsingSDK"
-    system "export URHO3D_HOME=~/usr/local && cd ../Build/generated/UsingSDK && echo '\nExternal project referencing Urho3D SDK' && ./cmake_macosx.sh . -DIOS=$IOS #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary project using Urho3D as external library'
-    xcode_build(ENV['IOS'], '../Build/generated/UsingSDK/Scaffolding.xcodeproj') or abort 'Failed to build/test temporary project using Urho3D as external library'
+    system "export URHO3D_HOME=~/usr/local && cd ../Build/generated/UsingSDK && echo '\nConfiguring downstream project using Urho3D SDK...' && ./cmake_macosx.sh . -DIOS=$IOS #{$build_options} -DURHO3D_LUA#{jit}=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure temporary downstream project using Urho3D as external library'
+    xcode_build(ENV['IOS'], '../Build/generated/UsingSDK/Scaffolding.xcodeproj') or abort 'Failed to build/test temporary downstream project using Urho3D as external library'
   end
 end
 

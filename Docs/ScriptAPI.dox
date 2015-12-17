@@ -5,6 +5,13 @@ namespace Urho3D
 
 \page EventList Event list
 
+## %Audio events
+
+### SoundFinished
+- %Node : Node pointer
+- %SoundSource : SoundSource pointer
+- %Sound : Sound pointer
+
 ## %Core events
 
 ### BeginFrame
@@ -44,9 +51,20 @@ namespace Urho3D
 
 ### AnimationTrigger
 - %Node : Node pointer
+- %Animation : Animation pointer
 - %Name : String
 - %Time : Float
 - %Data : User-defined data type
+
+### AnimationFinished
+- %Node : Node pointer
+- %Animation : Animation pointer
+- %Name : String
+- %Looped : Bool
+
+### ParticleEffectFinished
+- %Node : Node pointer
+- %Effect : ParticleEffect pointer
 
 ### TerrainCreated
 - %Node : Node pointer
@@ -257,7 +275,22 @@ namespace Urho3D
 - %Size : unsigned
 - %Position : Vector3 [in/out]
 
+### CrowdAgentNodeFormation
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Index : unsigned
+- %Size : unsigned
+- %Position : Vector3 [in/out]
+
 ### CrowdAgentReposition
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %Arrived : bool
+- %TimeStep : float
+
+### CrowdAgentNodeReposition
 - %Node : Node pointer
 - %CrowdAgent : CrowdAgent pointer
 - %Position : Vector3
@@ -273,7 +306,23 @@ namespace Urho3D
 - %CrowdAgentState : int
 - %CrowdTargetState : int
 
+### CrowdAgentNodeFailure
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %CrowdAgentState : int
+- %CrowdTargetState : int
+
 ### CrowdAgentStateChanged
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %CrowdAgentState : int
+- %CrowdTargetState : int
+
+### CrowdAgentNodeStateChanged
 - %Node : Node pointer
 - %CrowdAgent : CrowdAgent pointer
 - %Position : Vector3
@@ -2420,6 +2469,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void RemoveAttributeAnimation(const String&)
@@ -2428,6 +2478,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -2476,6 +2527,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -2491,6 +2543,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -2566,6 +2619,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -2575,6 +2629,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimation(const String&, LoopMode2D = LM_DEFAULT)
@@ -2707,6 +2762,7 @@ Methods:
 - bool IsPlaying(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - bool Play(const String&, uint8, bool, float = 0.0f)
@@ -2718,6 +2774,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -2965,6 +3022,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -2974,6 +3032,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -3074,6 +3133,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -3091,6 +3151,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -3280,6 +3341,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -3297,6 +3359,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -3441,6 +3504,7 @@ Methods:
 - Frustum GetSplitFrustum(float, float) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -3450,6 +3514,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - Vector3 ScreenToWorldPoint(const Vector3&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -3551,6 +3616,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -3568,6 +3634,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -3703,6 +3770,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -3712,6 +3780,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -3774,6 +3843,7 @@ Methods:
 - Vector2[]@ GetVertices() const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -3783,6 +3853,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -3844,6 +3915,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -3853,6 +3925,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -3912,6 +3985,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -3921,6 +3995,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -3981,6 +4056,7 @@ Methods:
 - Vector2[]@ GetVertices() const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -3990,6 +4066,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4050,6 +4127,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4059,6 +4137,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4125,6 +4204,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4134,6 +4214,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4239,6 +4320,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4248,6 +4330,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4370,6 +4453,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4379,6 +4463,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4440,6 +4525,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4449,6 +4535,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4498,6 +4585,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4507,6 +4595,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4560,6 +4649,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4569,6 +4659,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4621,6 +4712,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4630,6 +4722,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4682,6 +4775,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4691,6 +4785,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4745,6 +4840,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4754,6 +4850,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4807,6 +4904,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4816,6 +4914,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4873,6 +4972,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4882,6 +4982,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4936,6 +5037,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4945,6 +5047,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5001,6 +5104,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5010,6 +5114,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5062,6 +5167,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5071,6 +5177,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5123,6 +5230,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5132,6 +5240,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5207,6 +5316,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5217,6 +5327,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5293,6 +5404,7 @@ Methods:
 - Vector3 GetRandomPointInCircle(const Vector3&, float, int)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, int, uint = 3)
@@ -5305,6 +5417,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5398,6 +5511,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -5415,6 +5529,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -5562,6 +5677,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5571,6 +5687,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5743,6 +5860,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5752,6 +5870,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5800,6 +5919,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5811,6 +5931,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5953,6 +6074,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5962,6 +6084,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -6023,6 +6146,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -6032,6 +6156,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -6113,6 +6238,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -6133,6 +6259,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -6295,6 +6422,7 @@ Methods:
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3)
@@ -6306,6 +6434,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -6946,7 +7075,7 @@ Properties:
 
 Methods:
 
-- const JSONValue& GetRoot() const
+- JSONValue& GetRoot()
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -6960,6 +7089,7 @@ Properties:
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
+- JSONValue root // readonly
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
@@ -7034,6 +7164,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -7043,6 +7174,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -7142,6 +7274,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -7159,6 +7292,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -7328,6 +7462,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -7349,6 +7484,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -7551,9 +7687,11 @@ Methods:
 - WrapMode GetShaderParameterAnimationWrapMode(const String&) const
 - bool Load(File@)
 - bool Load(VectorBuffer&)
+- bool Load(const JSONValue&)
 - bool Load(const XMLElement&)
 - void RemoveShaderParameter(const String&)
 - bool Save(File@) const
+- bool Save(JSONValue&) const
 - bool Save(VectorBuffer&) const
 - bool Save(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -7725,6 +7863,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -7742,6 +7881,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -7940,6 +8080,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -7949,6 +8090,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -7998,6 +8140,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -8007,6 +8150,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8063,6 +8207,7 @@ Methods:
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3)
@@ -8074,6 +8219,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8179,6 +8325,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -8188,6 +8335,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8258,6 +8406,7 @@ Methods:
 - bool HasComponent(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - Vector3 LocalToWorld(const Vector3&) const
 - Vector3 LocalToWorld(const Vector4&) const
@@ -8287,6 +8436,9 @@ Methods:
 - void RotateAround2D(const Vector2&, float, TransformSpace = TS_LOCAL)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(File@)
+- bool SaveJSON(JSONValue&) const
+- bool SaveJSON(VectorBuffer&)
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -8440,6 +8592,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -8449,6 +8602,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8505,6 +8659,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - RayQueryResult[]@ Raycast(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const
@@ -8517,6 +8672,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8566,6 +8722,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -8575,6 +8732,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8744,6 +8902,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -8756,6 +8915,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8830,6 +8990,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -8839,6 +9000,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8944,16 +9106,19 @@ Methods:
 - float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- RigidBody@[]@ GetCollidingBodies(RigidBody@)
 - bool GetInterceptNetworkUpdate(const String&) const
 - RigidBody@[]@ GetRigidBodies(RigidBody@)
 - RigidBody@[]@ GetRigidBodies(const BoundingBox&, uint = 0xffff)
 - RigidBody@[]@ GetRigidBodies(const Sphere&, uint = 0xffff)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - PhysicsRaycastResult[]@ Raycast(const Ray&, float, uint = 0xffff)
 - PhysicsRaycastResult RaycastSingle(const Ray&, float, uint = 0xffff)
+- PhysicsRaycastResult RaycastSingleSegmented(const Ray&, float, float, uint = 0xffff)
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveCachedGeometry(Model@)
@@ -8962,6 +9127,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -9023,6 +9189,7 @@ Methods:
 - RigidBody2D@ GetRigidBody(int, int, uint = 0xffff)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - PhysicsRaycastResult2D[]@ Raycast(const Vector2&, const Vector2&, uint = 0xffff)
@@ -9034,6 +9201,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -9531,6 +9699,7 @@ Methods:
 - Vector3 GetVelocityAtPoint(const Vector3&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void ReAddBodyToWorld()
@@ -9542,6 +9711,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -9623,6 +9793,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -9632,6 +9803,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -9715,6 +9887,10 @@ Methods:
 - bool HasComponent(const String&) const
 - Node@ Instantiate(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ Instantiate(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- Node@ InstantiateJSON(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- Node@ InstantiateJSON(JSONFile@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- Node@ InstantiateJSON(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- Node@ InstantiateJSON(const JSONValue&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateXML(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateXML(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateXML(XMLFile@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
@@ -9723,6 +9899,9 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadAsync(File@, LoadMode = LOAD_SCENE_AND_RESOURCES)
 - bool LoadAsyncXML(File@, LoadMode = LOAD_SCENE_AND_RESOURCES)
+- bool LoadJSON(File@)
+- bool LoadJSON(VectorBuffer&)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -9753,6 +9932,9 @@ Methods:
 - void RotateAround2D(const Vector2&, float, TransformSpace = TS_LOCAL)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(File@, const String& = "\t")
+- bool SaveJSON(JSONValue&) const
+- bool SaveJSON(VectorBuffer&, const String& = "\t")
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -9926,6 +10108,7 @@ Methods:
 - bool IsA(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -9935,6 +10118,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -10005,6 +10189,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -10022,6 +10207,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -10172,6 +10358,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -10189,6 +10376,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -10321,12 +10509,14 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -10418,6 +10608,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -10427,6 +10618,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -10509,6 +10701,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -10526,6 +10719,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -10663,6 +10857,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -10672,6 +10867,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -10754,6 +10950,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -10763,6 +10960,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -10809,6 +11007,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Play(Sound@)
@@ -10822,6 +11021,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -10878,6 +11078,7 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Play(Sound@)
@@ -10891,6 +11092,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAngleAttenuation(float, float)
@@ -11006,6 +11208,7 @@ Methods:
 - Vector3 GetPosition() const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Move(float)
@@ -11018,6 +11221,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -11081,6 +11285,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -11097,6 +11302,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -11251,6 +11457,7 @@ Methods:
 - bool IsInsideLocal(const Vector3&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -11260,6 +11467,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -11328,6 +11536,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -11339,6 +11548,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -11408,6 +11618,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -11417,6 +11628,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -11607,6 +11819,7 @@ Methods:
 - TerrainPatch@ GetPatch(int, int) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -11616,6 +11829,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -11685,6 +11899,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -11694,6 +11909,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -11771,6 +11987,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -11788,6 +12005,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -11934,6 +12152,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -11943,6 +12162,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
@@ -12229,6 +12449,7 @@ Methods:
 - TileMapLayer2D@ GetLayer(uint) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - bool PositionToTileIndex(int&, int&, const Vector2&) const
@@ -12239,6 +12460,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -12308,6 +12530,7 @@ Methods:
 - bool HasProperty(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -12317,6 +12540,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -12464,6 +12688,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -12481,6 +12706,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -12623,6 +12849,8 @@ Methods:
 - bool SaveLayout(VectorBuffer&, UIElement@)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetFocusElement(UIElement@, bool = false)
+- void SetHeight(float)
+- void SetWidth(float)
 - const UIElement@[]@ GetDragElements()
 
 Properties:
@@ -12643,6 +12871,7 @@ Properties:
 - bool nonFocusedMouseWheel
 - int refs // readonly
 - UIElement@ root // readonly
+- float scale
 - StringHash type // readonly
 - String typeName // readonly
 - bool useMutableGlyphs
@@ -12683,6 +12912,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -12700,6 +12930,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -13109,6 +13340,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -13127,6 +13359,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -13333,6 +13566,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -13350,6 +13584,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -13493,6 +13728,8 @@ Methods:
 - double GetDouble(const String&) const
 - float GetFloat(const String&) const
 - int GetInt(const String&) const
+- IntRect GetIntRect(const String&) const
+- IntVector2 GetIntVector2(const String&) const
 - Matrix3 GetMatrix3(const String&) const
 - Matrix3x4 GetMatrix3x4(const String&) const
 - Matrix4 GetMatrix4(const String&) const
@@ -13527,6 +13764,8 @@ Methods:
 - bool SetDouble(const String&, double)
 - bool SetFloat(const String&, float)
 - bool SetInt(const String&, int)
+- bool SetIntRect(const String&, const IntRect&)
+- bool SetIntVector2(const String&, const IntVector2&)
 - bool SetMatrix3(const String&, const Matrix3&)
 - bool SetMatrix3x4(const String&, const Matrix3x4&)
 - bool SetMatrix4(const String&, const Matrix4&)
@@ -13635,6 +13874,7 @@ Methods:
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -13644,6 +13884,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)

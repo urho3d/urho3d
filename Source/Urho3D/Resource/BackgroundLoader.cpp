@@ -41,6 +41,13 @@ BackgroundLoader::BackgroundLoader(ResourceCache* owner) :
 {
 }
 
+BackgroundLoader::~BackgroundLoader()
+{
+    MutexLock lock(backgroundLoadMutex_);
+
+    backgroundLoadQueue_.Clear();
+}
+
 void BackgroundLoader::ThreadFunction()
 {
     while (shouldRun_)

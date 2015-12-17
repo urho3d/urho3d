@@ -24,7 +24,6 @@ version: '{build}'
 platform:
   - x86
   - x64
-configuration: Release
 clone_depth: 50
 environment:
   SF_KEY:
@@ -32,6 +31,7 @@ environment:
   SF_API:
     secure: cc1q9CXo5BwIYqtgigHpkCGG90zEVM45xx/YzXTOjVp512oQNUzTJq0AmxEYXP78
   build_tree: native-Build
+  config: Release
   matrix:
     - URHO3D_LIB_TYPE: STATIC
     - URHO3D_LIB_TYPE: SHARED
@@ -43,20 +43,19 @@ matrix:
 install:
   - ps: if ($env:APPVEYOR_REPO_TAG -eq "true" -or (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED)))
         {
-          if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME } else { git fetch -q --unshallow };
+          if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME } else { "Unshallowing git repository..."; git fetch -q --unshallow };
           if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC-3D11.zip" };
           $env:PACKAGE_UPLOAD = "1";
-          choco install doxygen.portable graphviz.portable >$null;
+          do { "Installing doxygen and graphviz..."; choco install doxygen.portable graphviz.portable >$null } until ($?);
         }
 build_script:
   - if "%PLATFORM%" == "x64" set "OPTS=URHO3D_64BIT=1"
 # Our free AppVeyor account is slow for normal daily CI, speed up the build a little bit by excluding Assimp and other tools in the normal build and use the Debug build configuration instead
-  - if "%PACKAGE_UPLOAD%" == "" set "OPTS=%OPTS% URHO3D_TOOLS=0" && set "Configuration=Debug"
-  - rake cmake vs2015 %OPTS% URHO3D_LIB_TYPE=%URHO3D_LIB_TYPE% URHO3D_D3D11=1 URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 URHO3D_EXTRAS=1 URHO3D_TESTING=1
-  - rake make config=%Configuration%
+  - if "%PACKAGE_UPLOAD%" == "" set "OPTS=%OPTS% URHO3D_TOOLS=0" && set "config=Debug"
+  - rake cmake vs2015 %OPTS% URHO3D_LIB_TYPE=%URHO3D_LIB_TYPE% URHO3D_D3D11=1 URHO3D_LUAJIT=1 URHO3D_LUAJIT_AMALG=1 URHO3D_EXTRAS=1 URHO3D_TESTING=1 && rake make
 # Could not run test target yet as AppVeyor does not currently allow its service to interact with desktop
-# - rake make config=%Configuration% target=RUN_TESTS
-  - if "%PACKAGE_UPLOAD%" == "1" rake ci_appveyor_package_upload
+# - rake make target=RUN_TESTS
+  - if "%PACKAGE_UPLOAD%" == "1" (echo "Packaging the build artifact..." && rake ci_appveyor_package_upload) else (echo Configuring downstream project using Urho3D library in its build tree... && rake scaffolding dir=UsingBuildTree >nul && cd UsingBuildTree && rake cmake vs2015 %OPTS% URHO3D_HOME=..\..\native-Build URHO3D_D3D11=1 && rake make && echo Installing Urho3D SDK to default system-wide location... && cd .. && rake make target=install >nul && echo Configuring downstream project using Urho3D SDK... && rake scaffolding dir=UsingSDK >null && cd UsingSDK && rake cmake vs2015 %OPTS% URHO3D_D3D11=1 && rake make)
 test: off
 artifacts:
   - path: native-Build\*.zip

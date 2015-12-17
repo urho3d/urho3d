@@ -40,7 +40,7 @@ matrix:
   fast_finish: true
   include:
     - &Linux-64bit
-      addons: {apt: {sources: [*default_sources, kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, &linux_packages [*default_packages, libasound2-dev, rpm]]}}
+      addons: {apt: {sources: [*default_sources, kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, &linux_packages [*default_packages, libasound2-dev, libpulse-dev, rpm]]}}
       compiler: gcc-64bit-static
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_UPDATE_SOURCE_TREE=1 COVERITY_SCAN_THRESHOLD=100 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
     - &Linux-64bit-shared
@@ -132,7 +132,7 @@ cache: ccache
 sudo: false
 addons:
   apt:
-    packages: libasound2-dev
+    packages: [libasound2-dev, libpulse-dev]
   coverity_scan:
     project:
       name: urho3d/Urho3D
@@ -165,7 +165,7 @@ language: cpp
 compiler: gcc
 cache: ccache
 sudo: false
-addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, libasound2-dev]}}
+addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, libasound2-dev, libpulse-dev]}}
 env:
   global:
     - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
@@ -192,7 +192,7 @@ language: android
 android: {components: [build-tools-22.0.1]}
 cache: {directories: $HOME/.ccache}
 sudo: false
-addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz, libasound2-dev, g++-multilib]}}
+addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz, g++-multilib]}}
 env:
   global:
     - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
@@ -263,7 +263,7 @@ branch: {name: RPI-CI, active: yes}
 language: cpp
 cache: ccache
 sudo: false
-addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz, libasound2-dev, g++-multilib, rpm]}}
+addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz, g++-multilib, rpm]}}
 env:
   global:
     - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=
@@ -291,7 +291,7 @@ matrix:
     - compiler: gcc-armeabi-v7a-with-NEON-shared
       env: URHO3D_LIB_TYPE=SHARED RPI_ABI='armeabi-v7a with NEON'
 before_script:
-  - git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export RPI_PREFIX=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf && git clone --depth 1 --branch strip https://github.com/urho3d/rpi-sysroot.git && export RPI_SYSROOT=$(pwd)/rpi-sysroot && for f in $RPI_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
+  - git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export RPI_PREFIX=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf && git clone --depth 1 https://github.com/urho3d/rpi-sysroot.git && export RPI_SYSROOT=$(pwd)/rpi-sysroot && for f in $RPI_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
@@ -317,11 +317,11 @@ env:
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=300M
   matrix:
+    - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
     - XCODE=1       URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.11 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
     - XCODE=1       URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.11
     - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=9.1 URHO3D_64BIT=0
     - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=9.1
-    - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
 matrix:
   fast_finish: true
 before_script:
@@ -331,8 +331,9 @@ before_script:
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - if [ $XCODE ] && ([ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
   # travis_retry brew update >/dev/null   # Intentionally do not update homebrew formulas to avoid pulling in CMake 3.4 which has caused unexplained iOS build tree configuration problem on Travis CI
-  - travis_retry brew install ccache cmake
-  - if [ $PACKAGE_UPLOAD ]; then travis_retry brew install doxygen graphviz; fi
+  - which cmake >/dev/null 2>&1 || cmake=cmake
+  - if [ $PACKAGE_UPLOAD ]; then doxygen='doxygen graphviz'; fi
+  - travis_retry brew install ccache $cmake $doxygen
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
   - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done; fi
   - rake ci_setup_cache
@@ -345,7 +346,7 @@ branch: {name: Emscripten-CI, active: yes}
 language: cpp
 cache: ccache
 sudo: false
-addons: {apt: {sources: [george-edison55-precise-backports, kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, doxygen, graphviz, g++-4.9, libasound2-dev]}}
+addons: {apt: {sources: [george-edison55-precise-backports, kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, doxygen, graphviz, g++-4.9]}}
 env:
   global:
     - secure: DE9IUM+pIV757GU0ccfDJhA752442pKu3DyBthrzHW9+GbsqbfuJOx045CYNN5vOWutFPC0A51B9WxhLNpXXqD3mfU8MhP1gkF7SskrHvcAPrCyfdqZf1Q8XDP5phm2KbHhhwxQMYmmicd6yj8DPNy2wRoSgPSDp/ZUDk51XZDU=

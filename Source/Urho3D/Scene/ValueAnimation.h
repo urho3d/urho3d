@@ -29,6 +29,7 @@ namespace Urho3D
 {
 
 class XMLElement;
+class JSONValue;
 
 /// Interpolation method.
 enum InterpMethod
@@ -80,6 +81,10 @@ public:
     bool LoadXML(const XMLElement& source);
     /// Save as XML data. Return true if successful.
     bool SaveXML(XMLElement& dest) const;
+    /// Load from JSON data. Return true if successful.
+    bool LoadJSON(const JSONValue& source);
+    /// Save as XML data. Return true if successful.
+    bool SaveJSON(JSONValue& dest) const;
 
     /// Set owner.
     void SetOwner(void* owner);

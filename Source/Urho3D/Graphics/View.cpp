@@ -779,7 +779,7 @@ void View::SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& 
 
     float invSizeX = 1.0f / texWidth;
     float invSizeY = 1.0f / texHeight;
-    graphics_->SetShaderParameter(PSP_GBUFFERINVSIZE, Vector4(invSizeX, invSizeY, 0.0f, 0.0f));
+    graphics_->SetShaderParameter(PSP_GBUFFERINVSIZE, Vector2(invSizeX, invSizeY));
 }
 
 void View::GetDrawables()

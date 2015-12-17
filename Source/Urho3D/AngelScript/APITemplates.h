@@ -437,6 +437,8 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "bool Save(VectorBuffer&) const", asFUNCTION(SerializableSaveVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&, bool setInstanceDefault = false)", asMETHODPR(T, LoadXML, (const XMLElement&, bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SaveXML(XMLElement&) const", asMETHODPR(T, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool LoadJSON(const JSONValue&, bool setInstanceDefault = false)", asMETHODPR(T, LoadJSON, (const JSONValue&, bool), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool SaveJSON(JSONValue&) const", asMETHODPR(T, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void MarkNetworkUpdate() const", asMETHODPR(T, MarkNetworkUpdate, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void ApplyAttributes()", asMETHODPR(T, ApplyAttributes, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(T, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);

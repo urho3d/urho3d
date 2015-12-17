@@ -249,17 +249,53 @@ void AnimationState::AddTime(float delta)
     if (delta == 0.0f || length == 0.0f)
         return;
 
+    bool sendFinishEvent = false;
+
     float oldTime = GetTime();
     float time = oldTime + delta;
     if (looped_)
     {
         while (time >= length)
+        {
             time -= length;
+            sendFinishEvent = true;
+        }
         while (time < 0.0f)
+        {
             time += length;
+            sendFinishEvent = true;
+        }
     }
 
     SetTime(time);
+
+    if (!looped_)
+    {
+        if (delta > 0.0f && oldTime < length && GetTime() == length)
+            sendFinishEvent = true;
+        else if (delta < 0.0f && oldTime > 0.0f && GetTime() == 0.0f)
+            sendFinishEvent = true;
+    }
+
+    // Process finish event
+    if (sendFinishEvent)
+    {
+        using namespace AnimationFinished;
+
+        WeakPtr<AnimationState> self(this);
+        WeakPtr<Node> senderNode(model_ ? model_->GetNode() : node_);
+
+        VariantMap& eventData = senderNode->GetEventDataMap();
+        eventData[P_NODE] = senderNode;
+        eventData[P_ANIMATION] = animation_;
+        eventData[P_NAME] = animation_->GetAnimationName();
+        eventData[P_LOOPED] = looped_;
+
+        // Note: this may cause arbitrary deletion of animation states, including the one we are currently processing
+        senderNode->SendEvent(E_ANIMATIONFINISHED, eventData);
+        if (senderNode.Expired() || self.Expired())
+            return;
+    }
 
     // Process animation triggers
     if (animation_->GetNumTriggers())
@@ -301,6 +337,7 @@ void AnimationState::AddTime(float delta)
 
                 VariantMap& eventData = senderNode->GetEventDataMap();
                 eventData[P_NODE] = senderNode;
+                eventData[P_ANIMATION] = animation_;
                 eventData[P_NAME] = animation_->GetAnimationName();
                 eventData[P_TIME] = i->time_;
                 eventData[P_DATA] = i->data_;

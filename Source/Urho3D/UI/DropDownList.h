@@ -65,7 +65,7 @@ public:
     void RemoveAllItems();
     /// Set selection.
     void SetSelection(unsigned index);
-    /// Set place holder text. This is the text shown when there is no selection in drop down list.
+    /// Set place holder text. This is the text shown when there is no selection (-1) in drop down list. Note that if the list has items, the default is to show the first item, so the "no selection" state has to be set explicitly.
     void SetPlaceholderText(const String& text);
     /// Set whether popup should be automatically resized to match the dropdown button width.
     void SetResizePopup(bool enable);
@@ -112,8 +112,10 @@ protected:
 private:
     /// Handle listview item click event.
     void HandleItemClicked(StringHash eventType, VariantMap& eventData);
-    /// Handle a key press from the listview
+    /// Handle a key press from the listview.
     void HandleListViewKey(StringHash eventType, VariantMap& eventData);
+    /// Handle the listview selection change. Set placeholder text hidden/visible as necessary.
+    void HandleSelectionChanged(StringHash eventType, VariantMap& eventData);
 
     /// Selected item index attribute.
     unsigned selectionAttr_;

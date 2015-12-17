@@ -111,62 +111,6 @@ if (IOS OR (RPI AND "${RPI_ABI}" MATCHES NEON))    # Stringify in case RPI_ABI i
     set (NEON TRUE)
 endif ()
 cmake_dependent_option (URHO3D_NEON "Enable NEON instruction set (ARM platforms with NEON only)" TRUE "NEON" FALSE)
-if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
-    cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
-    cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
-    if (CMAKE_BUILD_TYPE STREQUAL Release OR CMAKE_CONFIGURATION_TYPES)
-        set (URHO3D_DEFAULT_LUA_RAW FALSE)
-    else ()
-        set (URHO3D_DEFAULT_LUA_RAW TRUE)
-    endif ()
-    cmake_dependent_option (URHO3D_LUA_RAW_SCRIPT_LOADER "Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)" ${URHO3D_DEFAULT_LUA_RAW} "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
-    option (URHO3D_SAMPLES "Build sample applications" TRUE)
-    option (URHO3D_UPDATE_SOURCE_TREE "Enable commands to copy back some of the generated build artifacts from build tree to source tree to facilitate devs to push them as part of a commit (for library devs with push right only)")
-    option (URHO3D_BINDINGS "Enable API binding generation support for script subystems")
-    cmake_dependent_option (URHO3D_CLANG_TOOLS "Build Clang tools (native only)" FALSE "NOT RPI AND NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
-    mark_as_advanced (URHO3D_UPDATE_SOURCE_TREE URHO3D_BINDINGS URHO3D_CLANG_TOOLS)
-    cmake_dependent_option (URHO3D_TOOLS "Build tools (native and RPI only)" TRUE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
-    cmake_dependent_option (URHO3D_EXTRAS "Build extras (native and RPI only)" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
-    option (URHO3D_DOCS "Generate documentation as part of normal build")
-    option (URHO3D_DOCS_QUIET "Generate documentation as part of normal build, suppress generation process from sending anything to stdout")
-    option (URHO3D_PCH "Enable PCH support" TRUE)
-    option (URHO3D_DATABASE_SQLITE "Enable Database support with SQLite embedded")
-    cmake_dependent_option (URHO3D_MINIDUMPS "Enable minidumps on crash (VS only)" TRUE "MSVC" FALSE)
-    option (URHO3D_FILEWATCHER "Enable filewatcher support" TRUE)
-    if (CPACK_SYSTEM_NAME STREQUAL Linux)
-        cmake_dependent_option (URHO3D_USE_LIB64_RPM "Enable 64-bit RPM CPack generator using /usr/lib64 and disable all other generators (Debian-based host only)" FALSE "URHO3D_64BIT AND NOT HAS_LIB64" FALSE)
-        cmake_dependent_option (URHO3D_USE_LIB_DEB "Enable 64-bit DEB CPack generator using /usr/lib and disable all other generators (Redhat-based host only)" FALSE "URHO3D_64BIT AND HAS_LIB64" FALSE)
-    endif ()
-else ()
-    set (URHO3D_HOME "" CACHE PATH "Path to Urho3D build tree or SDK installation location (external project only)")
-    if (URHO3D_PCH OR URHO3D_UPDATE_SOURCE_TREE)
-        # Just reference it to suppress "unused variable" CMake warning on external projects using this CMake module
-    endif ()
-endif ()
-option (URHO3D_PACKAGING "Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0" ${EMSCRIPTEN})
-option (URHO3D_PROFILING "Enable profiling support" TRUE)
-option (URHO3D_LOGGING "Enable logging support" TRUE)
-# Emscripten thread support is yet experimental; default false
-if (NOT EMSCRIPTEN)
-    option (URHO3D_THREADING "Enable threading support" TRUE)
-else ()
-    option (URHO3D_THREADING "Enable threading support" FALSE)
-endif ()
-option (URHO3D_TESTING "Enable testing support")
-if (URHO3D_TESTING)
-    if (EMSCRIPTEN)
-        set (DEFAULT_TIMEOUT 10)
-        set (EMSCRIPTEN_EMRUN_BROWSER firefox CACHE STRING "Specify the particular browser to be spawned by emrun during testing (Emscripten cross-compiling build only), use 'emrun --list_browsers' command to get the list of possible values")
-    else ()
-        set (DEFAULT_TIMEOUT 5)
-    endif ()
-    set (URHO3D_TEST_TIMEOUT ${DEFAULT_TIMEOUT} CACHE STRING "Number of seconds to test run the executables (when testing support is enabled only), default to 10 on Emscripten platform and 5 on other platforms")
-else ()
-    unset (URHO3D_TEST_TIMEOUT CACHE)
-    if (EMSCRIPTEN_EMRUN_BROWSER)   # Suppress unused variable warning at the same time
-        unset (EMSCRIPTEN_EMRUN_BROWSER CACHE)
-    endif ()
-endif ()
 # The URHO3D_OPENGL option is not defined on non-Windows platforms as they should always use OpenGL
 if (MSVC)
     # On MSVC compiler, default to false (i.e. prefers Direct3D)
@@ -203,10 +147,84 @@ if (CMAKE_HOST_WIN32)
 else ()
     set (NULL_DEVICE /dev/null)
 endif ()
+# Find Direct3D include & library directories in MS Windows SDK or DirectX SDK when not using OpenGL.
+if (WIN32 AND NOT URHO3D_OPENGL)
+    find_package (Direct3D REQUIRED)
+    if (DIRECT3D_INCLUDE_DIRS)
+        include_directories (${DIRECT3D_INCLUDE_DIRS})
+    endif ()
+endif ()
+# For Raspbery Pi, find Broadcom VideoCore IV firmware
+if (RPI)
+    find_package (BCM_VC REQUIRED)
+    include_directories (${BCM_VC_INCLUDE_DIRS})
+endif ()
+if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
+    set (URHO3D_LIB_TYPE STATIC CACHE STRING "Specify Urho3D library type, possible values are STATIC (default) and SHARED")
+    cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
+    cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
+    if (CMAKE_BUILD_TYPE STREQUAL Release OR CMAKE_CONFIGURATION_TYPES)
+        set (URHO3D_DEFAULT_LUA_RAW FALSE)
+    else ()
+        set (URHO3D_DEFAULT_LUA_RAW TRUE)
+    endif ()
+    cmake_dependent_option (URHO3D_LUA_RAW_SCRIPT_LOADER "Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)" ${URHO3D_DEFAULT_LUA_RAW} "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
+    option (URHO3D_SAMPLES "Build sample applications" TRUE)
+    option (URHO3D_UPDATE_SOURCE_TREE "Enable commands to copy back some of the generated build artifacts from build tree to source tree to facilitate devs to push them as part of a commit (for library devs with push right only)")
+    option (URHO3D_BINDINGS "Enable API binding generation support for script subystems")
+    cmake_dependent_option (URHO3D_CLANG_TOOLS "Build Clang tools (native only)" FALSE "NOT RPI AND NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
+    mark_as_advanced (URHO3D_UPDATE_SOURCE_TREE URHO3D_BINDINGS URHO3D_CLANG_TOOLS)
+    cmake_dependent_option (URHO3D_TOOLS "Build tools (native and RPI only)" TRUE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
+    cmake_dependent_option (URHO3D_EXTRAS "Build extras (native and RPI only)" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
+    option (URHO3D_DOCS "Generate documentation as part of normal build")
+    option (URHO3D_DOCS_QUIET "Generate documentation as part of normal build, suppress generation process from sending anything to stdout")
+    option (URHO3D_PCH "Enable PCH support" TRUE)
+    option (URHO3D_DATABASE_SQLITE "Enable Database support with SQLite embedded")
+    cmake_dependent_option (URHO3D_MINIDUMPS "Enable minidumps on crash (VS only)" TRUE "MSVC" FALSE)
+    option (URHO3D_FILEWATCHER "Enable filewatcher support" TRUE)
+    if (CPACK_SYSTEM_NAME STREQUAL Linux)
+        cmake_dependent_option (URHO3D_USE_LIB64_RPM "Enable 64-bit RPM CPack generator using /usr/lib64 and disable all other generators (Debian-based host only)" FALSE "URHO3D_64BIT AND NOT HAS_LIB64" FALSE)
+        cmake_dependent_option (URHO3D_USE_LIB_DEB "Enable 64-bit DEB CPack generator using /usr/lib and disable all other generators (Redhat-based host only)" FALSE "URHO3D_64BIT AND HAS_LIB64" FALSE)
+    endif ()
+else ()
+    set (URHO3D_LIB_TYPE "" CACHE STRING "Specify Urho3D library type, possible values are STATIC and SHARED")
+    set (URHO3D_HOME "" CACHE PATH "Path to Urho3D build tree or SDK installation location (downstream project only)")
+    if (URHO3D_PCH OR URHO3D_UPDATE_SOURCE_TREE OR URHO3D_TOOLS OR URHO3D_EXTRAS)
+        # Just reference it to suppress "unused variable" CMake warning on downstream projects using this CMake module
+    endif ()
+    # All Urho3D downstream projects require Urho3D library, so find Urho3D library here now
+    if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
+        find_package (Urho3D REQUIRED)
+        include_directories (${URHO3D_INCLUDE_DIRS})
+    endif ()
+endif ()
+option (URHO3D_PACKAGING "Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0" ${EMSCRIPTEN})
+option (URHO3D_PROFILING "Enable profiling support" TRUE)
+option (URHO3D_LOGGING "Enable logging support" TRUE)
+# Emscripten thread support is yet experimental; default false
+if (NOT EMSCRIPTEN)
+    option (URHO3D_THREADING "Enable threading support" TRUE)
+else ()
+    option (URHO3D_THREADING "Enable threading support" FALSE)
+endif ()
+option (URHO3D_TESTING "Enable testing support")
+if (URHO3D_TESTING)
+    if (EMSCRIPTEN)
+        set (DEFAULT_TIMEOUT 10)
+        set (EMSCRIPTEN_EMRUN_BROWSER firefox CACHE STRING "Specify the particular browser to be spawned by emrun during testing (Emscripten cross-compiling build only), use 'emrun --list_browsers' command to get the list of possible values")
+    else ()
+        set (DEFAULT_TIMEOUT 5)
+    endif ()
+    set (URHO3D_TEST_TIMEOUT ${DEFAULT_TIMEOUT} CACHE STRING "Number of seconds to test run the executables (when testing support is enabled only), default to 10 on Emscripten platform and 5 on other platforms")
+else ()
+    unset (URHO3D_TEST_TIMEOUT CACHE)
+    if (EMSCRIPTEN_EMRUN_BROWSER)   # Suppress unused variable warning at the same time
+        unset (EMSCRIPTEN_EMRUN_BROWSER CACHE)
+    endif ()
+endif ()
 cmake_dependent_option (URHO3D_STATIC_RUNTIME "Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)" FALSE "MSVC" FALSE)
 cmake_dependent_option (URHO3D_WIN32_CONSOLE "Use console main() as entry point when setting up Windows executable targets (Windows platform only)" FALSE "WIN32" FALSE)
 cmake_dependent_option (URHO3D_MACOSX_BUNDLE "Use MACOSX_BUNDLE when setting up Mac OS X executable targets (Xcode native build only)" FALSE "XCODE AND NOT IOS" FALSE)
-set (URHO3D_LIB_TYPE STATIC CACHE STRING "Specify Urho3D library type, possible values are STATIC (default) and SHARED")
 if (CMAKE_CROSSCOMPILING AND NOT ANDROID)
     set (URHO3D_SCP_TO_TARGET "" CACHE STRING "Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc")
 else ()
@@ -397,7 +415,9 @@ if (URHO3D_LIB_TYPE)
 endif ()
 if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
     set (URHO3D_LIB_TYPE STATIC)
-    add_definitions (-DURHO3D_STATIC_DEFINE)
+    if (NOT MSVC)   # This define will be baked into the export header for MSVC compiler
+        add_definitions (-DURHO3D_STATIC_DEFINE)
+    endif ()
 endif ()
 
 # Add definition for AngelScript
@@ -456,27 +476,13 @@ if (URHO3D_DATABASE_SQLITE)
     add_definitions (-DURHO3D_DATABASE -DURHO3D_DATABASE_SQLITE)
 endif ()
 
-# Find Direct3D include & library directories in MS Windows SDK or DirectX SDK when not using OpenGL.
-if (WIN32 AND NOT URHO3D_OPENGL)
-    find_package (Direct3D REQUIRED)
-    if (DIRECT3D_INCLUDE_DIRS)
-        include_directories (${DIRECT3D_INCLUDE_DIRS})
-    endif ()
-endif ()
-
-# For Raspbery Pi, find Broadcom VideoCore IV firmware
-if (RPI)
-    find_package (BCM_VC REQUIRED)
-    include_directories (${BCM_VC_INCLUDE_DIRS})
-endif ()
-
 # Platform and compiler specific options
 if (URHO3D_C++11)
     add_definitions (-DURHO3D_CPP11)   # Note the define is NOT 'URHO3D_C++11'!
     if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
         # Use gnu++11/gnu++0x instead of c++11/c++0x as the latter does not work as expected when cross compiling
         foreach (STANDARD gnu++11 gnu++0x)  # Fallback to gnu++0x on older GCC version
-            execute_process (COMMAND echo COMMAND ${CMAKE_CXX_COMPILER} -E - RESULT_VARIABLE GCC_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+            execute_process (COMMAND echo COMMAND ${CMAKE_CXX_COMPILER} -std=${STANDARD} -E - RESULT_VARIABLE GCC_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
             if (GCC_EXIT_CODE EQUAL 0)
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=${STANDARD}")
                 break ()
@@ -1028,7 +1034,7 @@ macro (setup_executable)
             endforeach ()
         endif ()
     endif ()
-    # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
+    # Need to check if the destination variable is defined first because this macro could be called by downstream project that does not wish to install anything
     if (DEST_RUNTIME_DIR)
         if (EMSCRIPTEN)
             # todo: Just use generator-expression when CMake minimum version is 3.0
@@ -1169,7 +1175,7 @@ macro (setup_main_executable)
     if (NOT RESOURCE_DIRS)
         # If the macro caller has not defined the resource dirs then set them based on Urho3D project convention
         foreach (DIR ${CMAKE_SOURCE_DIR}/bin/CoreData ${CMAKE_SOURCE_DIR}/bin/Data)
-            # Do not assume external project always follows Urho3D project convention, so double check if this directory exists before using it
+            # Do not assume downstream project always follows Urho3D project convention, so double check if this directory exists before using it
             if (IS_DIRECTORY ${DIR})
                 list (APPEND RESOURCE_DIRS ${DIR})
             endif ()
@@ -1186,7 +1192,7 @@ macro (setup_main_executable)
                 set_source_files_properties (${RESOURCE_${DIR}_PATHNAME} PROPERTIES EMCC_OPTION preload-file EMCC_FILE_ALIAS "@/${NAME}.pak --use-preload-cache")
             endif ()
         endforeach ()
-        # Urho3D project builds the PackageTool as required; external project uses PackageTool found in the Urho3D build tree or Urho3D SDK
+        # Urho3D project builds the PackageTool as required; downstream project uses PackageTool found in the Urho3D build tree or Urho3D SDK
         find_Urho3d_tool (PACKAGE_TOOL PackageTool
             HINTS ${CMAKE_BINARY_DIR}/bin/tool ${URHO3D_HOME}/bin/tool
             DOC "Path to PackageTool" MSG_MODE WARNING)
@@ -1196,7 +1202,7 @@ macro (setup_main_executable)
         set (PACKAGING_COMMENT " and packaging")
         set_property (SOURCE ${RESOURCE_PAKS} PROPERTY GENERATED TRUE)
         if (EMSCRIPTEN)
-            # Check if shell-file is already added in source files list by external project
+            # Check if shell-file is already added in source files list by downstream project
             if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
                 foreach (FILE ${SOURCE_FILES})
                     get_property (EMCC_OPTION SOURCE ${FILE} PROPERTY EMCC_OPTION)
@@ -1217,7 +1223,7 @@ macro (setup_main_executable)
                 set (SHARED_RESOURCE_JS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.js)
                 list (APPEND SOURCE_FILES ${SHARED_RESOURCE_JS} ${SHARED_RESOURCE_JS}.data)
                 set_source_files_properties (${SHARED_RESOURCE_JS} PROPERTIES GENERATED TRUE EMCC_OPTION pre-js)
-                # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
+                # Need to check if the destination variable is defined first because this macro could be called by downstream project that does not wish to install anything
                 if (DEST_BUNDLE_DIR)
                     install (FILES ${SHARED_RESOURCE_JS} ${SHARED_RESOURCE_JS}.data DESTINATION ${DEST_BUNDLE_DIR})
                 endif ()
@@ -1251,7 +1257,7 @@ macro (setup_main_executable)
         endif ()
         # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES}
         find_Urho3D_file (ANDROID_MAIN_C_PATH SDL_android_main.c
-            HINTS ${URHO3D_HOME}/include/${PATH_SUFFIX}/ThirdParty/SDL/android ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
+            HINTS ${URHO3D_HOME}/include/Urho3D/ThirdParty/SDL/android ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
             DOC "Path to SDL_android_main.c" MSG_MODE FATAL_ERROR)
         list (APPEND SOURCE_FILES ${ANDROID_MAIN_C_PATH})
         # Setup shared library output path
@@ -1400,7 +1406,7 @@ endmacro ()
 
 # Macro for defining external library dependencies
 # The purpose of this macro is emulate CMake to set the external library dependencies transitively
-# It works for both targets setup within Urho3D project and outside Urho3D project that uses Urho3D as external static/shared library
+# It works for both targets setup within Urho3D project and downstream projects that uses Urho3D as external static/shared library
 macro (define_dependency_libs TARGET)
     # ThirdParty/SDL external dependency
     if (${TARGET} MATCHES SDL|Urho3D)
@@ -1594,7 +1600,7 @@ endmacro ()
 #  BASE <value> - An absolute base path to be prepended to the destination path when installing to build tree, default to build tree
 #  DESTINATION <value> - A relative destination path to be installed to
 macro (install_header_files)
-    # Need to check if the destination variable is defined first because this macro could be called by external project that does not wish to install anything
+    # Need to check if the destination variable is defined first because this macro could be called by downstream project that does not wish to install anything
     if (DEST_INCLUDE_DIR)
         # Parse the arguments for the underlying install command for the SDK
         cmake_parse_arguments (ARG "FILES_MATCHING;USE_FILE_SYMLINK;BUILD_TREE_ONLY" "BASE;DESTINATION" "FILES;DIRECTORY;PATTERN" ${ARGN})
@@ -1686,6 +1692,7 @@ if (ANDROID)
         file (REMOVE ${ANDROID_LIBRARY_OUTPUT_PATH}/gdbserver)
     endif ()
     # Create symbolic links in the build tree
+    file (MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Android/assets)
     foreach (I CoreData Data)
         if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Android/assets/${I})
             create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)

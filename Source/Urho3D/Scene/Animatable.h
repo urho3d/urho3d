@@ -76,6 +76,10 @@ public:
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest) const;
+    /// Load from JSON data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
+    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false);
+    /// Save as JSON data. Return true if successful.
+    virtual bool SaveJSON(JSONValue& dest) const;
 
     /// Set automatic update of animation, default true.
     void SetAnimationEnabled(bool enable);

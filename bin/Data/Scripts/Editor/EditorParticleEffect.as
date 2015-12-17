@@ -5,15 +5,25 @@ ParticleEffect@ editParticleEffect;
 XMLFile@ oldParticleEffectState;
 bool inParticleEffectRefresh = false;
 View3D@ particleEffectPreview;
+Camera@ particlePreviewCamera;
 Scene@ particlePreviewScene;
 Node@ particleEffectPreviewNode;
 Node@ particleEffectPreviewGizmoNode;
+Node@ particleEffectPreviewGridNode;
+CustomGeometry@ particleEffectPreviewGrid;
 Node@ particlePreviewCameraNode;
 Node@ particlePreviewLightNode;
 Light@ particlePreviewLight;
 ParticleEmitter@ particleEffectEmitter;
 float particleResetTimer;
 bool showParticlePreviewAxes = true;
+Vector3 particleViewCamDir;
+Vector3 particleViewCamRot;
+float particleViewCamDist;
+
+float gizmoOffset = 0.1f;
+float gizmoOffsetX;
+float gizmoOffsetY;
 
 void CreateParticleEffectEditor()
 {
@@ -120,21 +130,41 @@ void CreateParticleEffectEditor()
     SubscribeToEvent(particleEffectWindow.GetChild("Relative", true), "Toggled", "EditParticleEffectRelative");
     
     SubscribeToEvent(particleEffectWindow.GetChild("ResetViewport", true), "Released", "ParticleEffectResetViewport");
-    SubscribeToEvent(particleEffectWindow.GetChild("ShowAxes", true), "Toggled", "ParticleEffectShowAxes");
+    SubscribeToEvent(particleEffectWindow.GetChild("ShowGrid", true), "Toggled", "ParticleEffectShowGrid");
+}
+
+void SetGizmoPosition()
+{
+    Vector3 screenPos = Vector3(gizmoOffsetX, gizmoOffsetY, 25.0);
+    Vector3 newPos = particlePreviewCamera.ScreenToWorldPoint(screenPos);
+    particleEffectPreviewGizmoNode.position = newPos;
+}
+
+void ResetCameraTransformation()
+{
+    particlePreviewCameraNode.position = Vector3(0, 0, -5);
+    particlePreviewCameraNode.LookAt(Vector3(0, 0, 0));
+    particleViewCamDir = -particlePreviewCameraNode.position;
+    
+    // Manually set initial rotation because eulerAngle always return 0 on first frame
+    particleViewCamRot = Vector3(0.0, 180.0, 0.0);
+
+    particleViewCamDist = particleViewCamDir.length;
+    particleViewCamDir.Normalize();
 }
 
 void ParticleEffectResetViewport(StringHash eventType, VariantMap& eventData)
 {
-    particleEffectPreviewNode.rotation = Quaternion(0, 0, 0);
-    particleEffectPreviewNode.worldPosition = Vector3(0, 0, 0);
+    ResetCameraTransformation();
+    SetGizmoPosition();
     particleEffectPreview.QueueUpdate();
 }
 
-void ParticleEffectShowAxes(StringHash eventType, VariantMap& eventData)
+void ParticleEffectShowGrid(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ element = eventData["Element"].GetPtr();
     showParticlePreviewAxes = element.checked;
-    particleEffectPreviewGizmoNode.enabled = showParticlePreviewAxes;
+    particleEffectPreviewGridNode.enabled = showParticlePreviewAxes;
     particleEffectPreview.QueueUpdate();
 }
 
@@ -181,7 +211,7 @@ void EditParticleEffectColorFrameRemove(StringHash eventType, VariantMap& eventD
         return;
 
     ListView@ lv = particleEffectWindow.GetChild("ColorFrameListView", true);
-    if (lv !is null && lv.selection != M_MAX_UNSIGNED )
+    if (lv !is null && lv.selection != M_MAX_UNSIGNED)
     {
         BeginParticleEffectEdit();
         
@@ -202,7 +232,7 @@ void EditParticleEffectTextureFrameRemove(StringHash eventType, VariantMap& even
         return;
 
     ListView@ lv = particleEffectWindow.GetChild("TextureFrameListView", true);
-    if (lv !is null && lv.selection != M_MAX_UNSIGNED )
+    if (lv !is null && lv.selection != M_MAX_UNSIGNED)
     {
         BeginParticleEffectEdit();
         
@@ -813,6 +843,63 @@ void HideParticleEffectEditor()
         particleEffectWindow.visible = false;
 }
 
+void UpdateParticleEffectPreviewGrid()
+{
+    uint gridSize = 8;
+    uint gridSubdivisions = 3;
+
+    //particleEffectPreviewGridNode.scale = Vector3(gridScale, gridScale, gridScale);
+    uint size = uint(Floor(gridSize / 2) * 2);
+    float halfSizeScaled = size / 2;
+    float scale = 1.0;
+    uint subdivisionSize = uint(Pow(2.0f, float(gridSubdivisions)));
+
+    if (subdivisionSize > 0)
+    {
+        size *= subdivisionSize;
+        scale /= subdivisionSize;
+    }
+
+    uint halfSize = size / 2;
+
+    particleEffectPreviewGrid.BeginGeometry(0, LINE_LIST);
+    float lineOffset = -halfSizeScaled;
+    for (uint i = 0; i <= size; ++i)
+    {
+        bool lineCenter = i == halfSize;
+        bool lineSubdiv = !Equals(Mod(i, subdivisionSize), 0.0);
+
+        if (!grid2DMode)
+        {
+            particleEffectPreviewGrid.DefineVertex(Vector3(lineOffset, 0.0, halfSizeScaled));
+            particleEffectPreviewGrid.DefineColor(lineCenter ? gridZColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+            particleEffectPreviewGrid.DefineVertex(Vector3(lineOffset, 0.0, -halfSizeScaled));
+            particleEffectPreviewGrid.DefineColor(lineCenter ? gridZColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+
+            particleEffectPreviewGrid.DefineVertex(Vector3(-halfSizeScaled, 0.0, lineOffset));
+            particleEffectPreviewGrid.DefineColor(lineCenter ? gridXColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+            particleEffectPreviewGrid.DefineVertex(Vector3(halfSizeScaled, 0.0, lineOffset));
+            particleEffectPreviewGrid.DefineColor(lineCenter ? gridXColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+        }
+        else
+        {
+            particleEffectPreviewGrid.DefineVertex(Vector3(lineOffset, halfSizeScaled, 0.0));
+            particleEffectPreviewGrid.DefineColor(lineCenter ? gridYColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+            particleEffectPreviewGrid.DefineVertex(Vector3(lineOffset, -halfSizeScaled, 0.0));
+            particleEffectPreviewGrid.DefineColor(lineCenter ? gridYColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+
+            particleEffectPreviewGrid.DefineVertex(Vector3(-halfSizeScaled, lineOffset, 0.0));
+            particleEffectPreviewGrid.DefineColor(lineCenter ? gridXColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+            particleEffectPreviewGrid.DefineVertex(Vector3(halfSizeScaled, lineOffset, 0.0));
+            particleEffectPreviewGrid.DefineColor(lineCenter ? gridXColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+        }
+
+        lineOffset  += scale;
+    }
+    particleEffectPreviewGrid.Commit();
+    
+}
+
 void InitParticleEffectPreview()
 {
     particlePreviewScene = Scene("particlePreviewScene");
@@ -827,10 +914,10 @@ void InitParticleEffectPreview()
     zone.fogEnd = 1000.0;
 
     particlePreviewCameraNode = particlePreviewScene.CreateChild("PreviewCamera");
-    particlePreviewCameraNode.position = Vector3(0, 0, -5);
-    Camera@ camera = particlePreviewCameraNode.CreateComponent("Camera");
-    camera.nearClip = 0.1f;
-    camera.farClip = 1000.0f;
+    particlePreviewCamera = particlePreviewCameraNode.CreateComponent("Camera");
+    particlePreviewCamera.nearClip = 0.1f;
+    particlePreviewCamera.farClip = 1000.0f;
+    particlePreviewCamera.fov = 45.0f;
 
     particlePreviewLightNode = particlePreviewScene.CreateChild("particlePreviewLight");
     particlePreviewLightNode.direction = Vector3(0.5, -0.5, 0.5);
@@ -840,7 +927,10 @@ void InitParticleEffectPreview()
 
     particleEffectPreviewNode = particlePreviewScene.CreateChild("PreviewEmitter");
     particleEffectPreviewNode.rotation = Quaternion(0, 0, 0);
-    particleEffectPreviewGizmoNode = particleEffectPreviewNode.CreateChild("Gizmo");
+    
+    ResetCameraTransformation();
+
+    particleEffectPreviewGizmoNode = particlePreviewScene.CreateChild("Gizmo");
     StaticModel@ gizmo = particleEffectPreviewGizmoNode.CreateComponent("StaticModel");
     gizmo.model = cache.GetResource("Model", "Models/Editor/Axes.mdl");
     gizmo.materials[0] = cache.GetResource("Material", "Materials/Editor/RedUnlit.xml");
@@ -848,14 +938,25 @@ void InitParticleEffectPreview()
     gizmo.materials[2] = cache.GetResource("Material", "Materials/Editor/BlueUnlit.xml");
     gizmo.occludee = false;
 
+    particleEffectPreviewGridNode = particlePreviewScene.CreateChild("Grid");
+    particleEffectPreviewGrid = particleEffectPreviewGridNode.CreateComponent("CustomGeometry");
+    particleEffectPreviewGrid.numGeometries = 1;
+    particleEffectPreviewGrid.material = cache.GetResource("Material", "Materials/VColUnlit.xml");
+    particleEffectPreviewGrid.viewMask = 0x80000000; // Editor raycasts use viewmask 0x7fffffff
+    particleEffectPreviewGrid.occludee = false;
+
+    UpdateParticleEffectPreviewGrid();
+
     particleEffectEmitter = particleEffectPreviewNode.CreateComponent("ParticleEmitter");
     editParticleEffect = CreateNewParticleEffect();
     particleEffectEmitter.effect = editParticleEffect;
 
     particleEffectPreview = particleEffectWindow.GetChild("ParticleEffectPreview", true);
-    particleEffectPreview.SetView(particlePreviewScene, camera);
+    particleEffectPreview.SetView(particlePreviewScene, particlePreviewCamera);
+    particleEffectPreview.viewport.renderPath = renderPath;
 
     SubscribeToEvent(particleEffectPreview, "DragMove", "NavigateParticleEffectPreview");
+    SubscribeToEvent(particleEffectPreview, "Resized", "ResizeParticleEffectPreview");
 }
 
 ParticleEffect@ CreateNewParticleEffect()
@@ -1224,7 +1325,7 @@ void RefreshParticleEffectPreview()
 {
     if (particleEffectEmitter is null || editParticleEffect is null)
         return;
-    cast<CheckBox>(particleEffectWindow.GetChild("ShowAxes", true)).checked = showParticlePreviewAxes;
+    cast<CheckBox>(particleEffectWindow.GetChild("ShowGrid", true)).checked = showParticlePreviewAxes;
     particleEffectEmitter.effect = editParticleEffect;
     particleEffectEmitter.Reset();
     particleEffectPreview.QueueUpdate();
@@ -1346,22 +1447,53 @@ void NavigateParticleEffectPreview(StringHash eventType, VariantMap& eventData)
 {
     int dx = eventData["DX"].GetInt();
     int dy = eventData["DY"].GetInt();
-    
+
     if (particleEffectPreview.height > 0 && particleEffectPreview.width > 0)
     {
         if (!input.keyDown[KEY_LSHIFT])
         {
-            float yaw = dy * 20 * time.timeStep;
-            float pitch = dx * 20 * time.timeStep;
-            particleEffectPreviewNode.Rotate(Quaternion(yaw, pitch, 0));
+            particleViewCamRot.x -= dy * 20 * time.timeStep;
+            particleViewCamRot.y += dx * 20 * time.timeStep;
+            particleViewCamRot.x = Clamp(particleViewCamRot.x, -89.5, 89.5);
         }
         else
         {
-            particleEffectPreviewNode.Translate(Vector3(0, 0, 1) * dx * 1.5 * time.timeStep, TS_WORLD);
-            particleEffectPreviewNode.Translate(Vector3(0, 0, 1) * dy * 1.5 * time.timeStep, TS_WORLD);
+            particleViewCamDist += dy * 1.5 * time.timeStep;
+            particleViewCamDist -= dx * 1.5 * time.timeStep;
+            particleViewCamDist = Max(particleViewCamDist, 0.2);
         }
+        particlePreviewCameraNode.position = particleEffectPreviewNode.position + 
+            Quaternion(particleViewCamRot.x, particleViewCamRot.y, 0) * particleViewCamDir * particleViewCamDist;
+        particlePreviewCameraNode.LookAt(particleEffectPreviewNode.position);
+
+        SetGizmoPosition();
         particleEffectPreview.QueueUpdate();
     }
+
+}
+
+void ResizeParticleEffectPreview(StringHash eventType, VariantMap& eventData)
+{
+    
+    float width = float(particleEffectPreview.width);
+    float height = float(particleEffectPreview.height);
+    
+    // Manually set aspect ratio because first frame is always returning aspect ratio of 1
+    float aspectRatio = width / height;
+    particlePreviewCamera.aspectRatio = aspectRatio;
+
+    gizmoOffsetX = gizmoOffset;
+    gizmoOffsetY = 1.0f - gizmoOffset * aspectRatio;
+
+    if(width > height)
+    {
+        aspectRatio = height / width;
+        gizmoOffsetY = 1.0f - gizmoOffset;
+        gizmoOffsetX = gizmoOffset * aspectRatio;
+    }
+
+    SetGizmoPosition();
+    particleEffectPreview.QueueUpdate();
 }
 
 void EditParticleEffectName(StringHash eventType, VariantMap& eventData)

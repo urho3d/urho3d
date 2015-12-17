@@ -12,7 +12,7 @@ Although all required third-party libraries are included as source code, there a
 
 - For Windows, the June 2010 DirectX SDK needs to be installed. This is not necessary if building on Visual Studio 2012 or newer, which install the Windows SDK with the necessary DirectX files.
 
-- For Linux, the following development packages need to be installed: libx11-dev, libxrandr-dev, libasound2-dev on Debian-based distros; libX11-devel, libXrandr-devel, alsa-lib-devel on RedHat-based distros. Also install the package libgl1-mesa-dev (Debian) or mesa-libGL-devel (RH) if your GPU driver does not include OpenGL headers & libs, but in most of the case it usually does and has better performance than Mesa's OpenGL implementation. Building as 32-bit on a 64-bit system requires installing also the 32-bit versions of the development libraries.
+- For Linux, the following development packages need to be installed: libx11-dev, libxrandr-dev, libasound2-dev on Debian-based distros; libX11-devel, libXrandr-devel, alsa-lib-devel on RedHat-based distros. Optionally install libpulse-dev (Deb) or pulseaudio-libs-devel (RH) to enable SDL support for PulseAudio. Building as 32-bit on a 64-bit system requires installing also the 32-bit versions of the development libraries.
 
 - For Raspberry Pi, the following development packages need to be installed. On Raspbian: libasound2-dev, libudev-dev. On Pidora: alsa-lib-devel, systemd-devel.
 
@@ -111,7 +111,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_UPDATE_SOURCE_TREE|0|Enable commands to copy back some of the generated build artifacts from build tree to source tree to facilitate devs to push them as part of a commit (for library devs with push right only)|
 |URHO3D_USE_LIB64_RPM |0|Enable 64-bit RPM CPack generator using /usr/lib64 and disable all other generators (Debian-based host only, which uses /usr/lib by default)|
 |URHO3D_USE_LIB_DEB   |0|Enable 64-bit DEB CPack generator using /usr/lib and disable all other generators (Redhat-based host only, which uses /usr/lib64 by default)|
-|URHO3D_HOME          |-|Path to Urho3D build tree or SDK installation location (external project only)|
+|URHO3D_HOME          |-|Path to Urho3D build tree or SDK installation location (downstream project only)|
 |URHO3D_DEPLOYMENT_TARGET|native|Specify the minimum CPU type on which the target binaries are to be deployed (Linux, MinGW, and non-Xcode OSX native build only), see GCC/Clang's -march option for possible values; Use 'generic' for targeting a wide range of generic processors|
 |CMAKE_BUILD_TYPE     |Release|Specify CMake build configuration (single-configuration generator only), possible values are Release (default), RelWithDebInfo, and Debug|
 |CMAKE_INSTALL_PREFIX |*|Install path prefix, prepended onto install directories; default to 'c:/Program Files/Urho3D' on Windows host and '/usr/local' on all other non-Windows hosts|
@@ -265,7 +265,7 @@ The build process first builds the Urho3D library target (either static or share
 
 To install the Urho3D library as an SDK, use the usual 'make install' command. There is an equivalent built-in target called "install" in Visual Studio solution and Xcode project to perform the SDK installation. This could be useful when you want your application to always link against a 'stable' installed version of the Urho3D library, while keeping your Urho3D project root tree in sync with origin/master; or when you want other users in the same host system to use the installed Urho3D SDK instead of them building from source again.
 
-The default install prefix is 'c:/Program Files/Urho3D' on Windows host and '/usr/local' on all other non-Windows hosts. You can use the CMAKE_INSTALL_PREFIX build option to alter this prefix path. However, when cross-compiling you may actually want to alter the final installation destination by supplying DESDIR environment variable instead of altering the CMAKE_INSTALL_PREFIX variable directly, especially when using Urho3D library as shared library type because the installed executables have their RPATH adjusted relative to CMAKE_INSTALL_PREFIX. The DESTDIR environment variable is not applicable for installation on Windows host, i.e. it can only use CMAKE_INSTALL_PREFIX variable to alter the final installation destination. This is not a lost, however, because there is no RPATH adjustment for Windows platform, but as the result the Urho3D.dll will be installed in a same directory as the installed executables.
+The default install prefix is 'c:/Program Files/Urho3D' on Windows host and '/usr/local' on all other non-Windows hosts. You can use the CMAKE_INSTALL_PREFIX build option to alter this prefix path. However, when cross-compiling you may actually want to alter the final installation destination by supplying DESTDIR environment variable instead of altering the CMAKE_INSTALL_PREFIX variable directly, especially when using Urho3D library as shared library type because the installed executables have their RPATH adjusted relative to CMAKE_INSTALL_PREFIX. The DESTDIR environment variable is not applicable for installation on Windows host, i.e. it can only use CMAKE_INSTALL_PREFIX variable to alter the final installation destination. This is not a lost, however, because there is no RPATH adjustment for Windows platform, but as the result the Urho3D.dll will be installed in a same directory as the installed executables.
 
 If the Urho3D SDK is installed to a system-wide default location then the Urho3D library can be found by FindUrho3D CMake module automatically without the help of URHO3D_HOME environment variable or build option. When cross-compiling, the system-wide default location is usually in the system root of the cross-compiling target. To get a corresponding system root path for a cross-compiling build tree, you can use SYSROOT internal variable stored in the CMake cache. You can then use the system root path to set the DESTDIR environment variable in order to stage the Urho3D SDK installation in the corresponding system root. For example:
 
@@ -480,11 +480,11 @@ F2          Toggle debug HUD
 
 \tableofcontents
 
-This page shows how to create a new C++ project linking against Urho3D library as external library. There are two approaches to do this. The first approach uses Urho3D library directly from the Urho3D project build tree. The second approach uses Urho3D SDK installation. It is imperative to clean the CMake cache when changing from one approach to the other. You should also clean the cache when you change the path in the URHO3D_HOME environment variable.
+This page shows how to create a new downstream C++ project linking against Urho3D library as external library. There are two approaches to do this. The first approach uses Urho3D library directly from the Urho3D project build tree. The second approach uses Urho3D SDK installation. It is imperative to clean the CMake cache when changing from one approach to the other, or simply delete and recreate your project build tree from scratch.
 
 > Migration note if you are migrating from Urho3D prior to release 1.4:
 >    - You are probably better of to regenerate your build tree from scratch due to some of the directory renaming in the project structure.
->    - You must adjust the URHO3D_HOME environment variable in your build. In release 1.4 onward, the URHO3D_HOME environment variable is supposed to point to the build tree of the Urho3D project. In prior releases, the URHO3D_HOME was supposed to point to Urho3D project root itself.
+>    - You must adjust the URHO3D_HOME environment variable in your build because we have changed the meaning of this variable. In release 1.4 onward, the URHO3D_HOME environment variable is supposed to point to the build tree of the Urho3D project. In prior releases, the URHO3D_HOME was supposed to point to Urho3D project root itself.
 
 First of all, structure your project similar to Urho3D project as below. Although this is not mandatory, it should increase the chance the CMake modules designed for Urho3D project also works out of the box for your project too. CMake and our CMake modules are case-sensitive. It is recommended that your project adheres to the same naming convention as Urho3D project uses, even when the filesystem in your host system is not case-sensitive.
 
@@ -501,17 +501,13 @@ First of all, structure your project similar to Urho3D project as below. Althoug
  └ *.bat or *.sh
 \endcode
 
-The physical project root directory is also the logical project source tree in CMake terminology where your project main CMakeLists.txt should reside. The 'bin' directory should contain the 'Data' and 'CoreData' resource subdirs for your own assets. You may want to copy (or symlink) the 'CMake' subdir from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/CMake') to your project root directory. You may also want to copy (or symlink) the build scripts from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/Scripts') to your project root directory. Alternatively, you can add the Urho3D project root directory into the PATH environment variable in your host system in order to make the build scripts available everwhere. The build scripts work together with the Urho3D CMake modules to configure and generate your initial project build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are supported. Note that when you configure your project (either via one of the build script or via cmake-gui), you can also pass most of the \ref Build_Options supported by Urho3D project. In fact, you probably have to pass a compatible build options with the Urho3D library that you intend to use to avoid any conflict.
+The physical project root directory is also the logical project source tree in CMake terminology where your project main CMakeLists.txt should reside. The 'bin' directory should contain the 'Data' and 'CoreData' resource subdirs for your own assets. You must copy (or symlink) the 'CMake' subdir from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/CMake') to your project root directory. You may also want to copy (or symlink) the build scripts from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/Scripts') to your project root directory, unless you just want to use cmake-gui for your own project configuration and generation. Alternatively, you can add the Urho3D project root directory into the PATH environment variable in your host system in order to make the build scripts available everywhere. The build scripts work together with the Urho3D CMake modules to configure and generate your initial project build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are supported. Note that when you configure your project (either via one of the build script or via cmake-gui), you can also pass most of the \ref Build_Options supported by Urho3D project. In fact, you probably have to pass a compatible build options with the Urho3D library that you intend to use to avoid any conflict. Although this may change in the near future as we will enhance our modules to be smart enough to auto-discover the original build options used by the Urho3D library, but until then it is still your responsibility to supply the compatible build options.
 
 In your own project root directory, create a main CMakeLists.txt file and add the following lines: (replace MyProjectName and MyExecutableName with the actual names you want)
 
 \code
-# Set project name
-project (MyProjectName)
-
-# Set minimum version
+# Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
 cmake_minimum_required (VERSION 2.8.6)
-
 if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
     if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
@@ -526,15 +522,14 @@ if (COMMAND cmake_policy)
     endif ()
 endif ()
 
+# Set project name
+project (MyProjectName)
+
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
 # Include Urho3D Cmake common module
 include (Urho3D-CMake-common)
-
-# Find Urho3D library
-find_package (Urho3D REQUIRED)
-include_directories (${URHO3D_INCLUDE_DIRS})
 
 # Define target name
 set (TARGET_NAME MyExecutableName)
@@ -546,9 +541,9 @@ define_source_files ()
 setup_main_executable ()
 \endcode
 
-The CMAKE_MODULE_PATH is setup so that CMake can find the Urho3D-specific CMake modules provided by Urho3D project inside your own project. The Urho3D-CMake-common.cmake is the module where all the reusable commands and macros are defined. It also gives your project cross-platform build capability similar to Urho3D project.
+The CMAKE_MODULE_PATH is setup so that CMake can find the Urho3D-specific CMake modules provided by Urho3D project inside your own project. The Urho3D-CMake-common.cmake is the module where all the reusable commands and macros are defined. It also gives your project cross-platform build capability similar to Urho3D project. It does this by automatically finding the required software library components specific for your target platform and configuring your project to use them together with the platform-specific compiler flags and definitions. It utilizes CMake-provided as well as Urho3D custom-made FindXXX modules to get the work done. So, it is important to get the CMAKE_MODULE_PATH setup correctly in your project early on.
 
-When both Urho3D static and shared library are built and available in the Urho3D project's library output directory in its build tree, the FindUrho3D.cmake module has precedence to first select static library type over over shared library type. However, you can use URHO3D_LIB_TYPE build option to explicitly specify which Urho3D library type to be selected. When linking statically against Urho3D static library, Urho3D-CMake-common.cmake module automatically set "URHO3D_STATIC_DEFINE" compiler define for your project. This compiler define is crucial for static linking, especially on MSVC. If you do not use our CMake modules to configure your project then you have to ensure you manually set this compiler define in your project.
+Your own project naturally depends on Urho3D project, or to be more precise it depends on Urho3D library. The Urho3D library needs to be built first so that it can be found later by your own project. When using GCC/Clang or one of its derivatives, both Urho3D static and shared libraries could be potentially built/installed at a same location and coexist. In such cases the FindUrho3D.cmake module, the module responsible to find Urho3D software library component, has precedence to first find the static library type over over shared library type. However, you can use URHO3D_LIB_TYPE build option to override this precedence. When using MSVC compiler, both static and shared libraries could not be built/installed at a same location because both the static library and import library have a same file extension. However, for MSVC, it is possible to have both Release and Debug versions of either static or shared library type built/installed at a same location. In such cases the FindUrho3D.cmake module would automatically utilize both of Release and Debug versions as appropriate in your project for Release and Debug build configuration, respectively, without user intervention.
 
 As described earlier there are two approaches on how to find the Urho3D library. The FindUrho3D.cmake module is designed not only able to find Urho3D library from the Urho3D SDK installation, but also from any Urho3D project build tree directly. When searching in Urho3D SDK installed in a system-wide default location then no additional variable need to be set. When searching in a non-default SDK installation or when searching in any Urho3D project build tree then the actual location need to be provided via URHO3D_HOME environment variable (set in the host system) or URHO3D_HOME build option (set using -D at command line or in cmake-gui).
 
@@ -634,8 +629,6 @@ export native_build_tree=~/custom-native-Build rpi_build_tree=~/custom-rpi-Build
 rake cmake URHO3D_LUAJIT=1 && rake make
 rake cmake rpi URHO3D_LUAJIT=1 && rake make rpi
 \endcode
-
-You can in fact set and export any other key/value pair build options as environment variables to avoid repeating yourself when invoking any of our Rake tasks.
 
 
 \page Structure Overall structure

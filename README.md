@@ -38,12 +38,13 @@ Urho3D development, contributions and bugfixes by:
 - Alex Parlett
 - Jordan Patterson
 - Vladimir Pobedinsky
+- Pranjal Raihan
 - Nick Royer
-- Jonathan Sandusky
 - Miika Santala
 - Hualin Song
 - James Thomas
 - Joshua Tippetts
+- Yusuf Umar
 - Daniel Wiberg
 - Steven Zhang
 - AGreatFish
@@ -76,6 +77,7 @@ Urho3D development, contributions and bugfixes by:
 - skaiware
 - szamq
 - thebluefish
+- tommy3
 - yushli
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
