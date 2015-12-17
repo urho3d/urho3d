@@ -383,38 +383,28 @@ void Renderer::SetShadowQuality(ShadowQuality quality)
     if (!graphics_->GetHardwareShadowSupport())
     {
         if (quality == SHADOWQUALITY_PCF_16BIT)
-        {
             quality = SHADOWQUALITY_SIMPLE_16BIT;
-        }
+        
         if (quality == SHADOWQUALITY_PCF_24BIT)
-        {
             quality = SHADOWQUALITY_SIMPLE_24BIT;
-        }
     }
     // if high resolution is not allowed
     if (!graphics_->GetHiresShadowMapFormat())
     {
         if (quality == SHADOWQUALITY_SIMPLE_24BIT)
-        {
             quality = SHADOWQUALITY_SIMPLE_16BIT;
-        }
+
         if (quality == SHADOWQUALITY_PCF_24BIT)
-        {
             quality = SHADOWQUALITY_PCF_16BIT;
-        }
     }
     if (quality != shadowQuality_)
     {
         shadowQuality_ = quality;
         shadersDirty_ = true;
         if (quality == SHADOWQUALITY_BLUR_VSM)
-        {
             SetShadowMapFilter(this, static_cast<ShadowMapFilter>(&Renderer::BlurShadowMap));
-        }
         else
-        {
             SetShadowMapFilter(0, 0);
-        }
 
         ResetShadowMaps();
     }
@@ -508,9 +498,7 @@ void Renderer::ReloadShaders()
 void Renderer::ApplyShadowMapFilter(View* view, Texture2D* shadowMap)
 {
     if (shadowMapFilterInstance_ && shadowMapFilter_)
-    {
         (shadowMapFilterInstance_->*shadowMapFilter_)(view, shadowMap);
-    }
 }
 
 Viewport* Renderer::GetViewport(unsigned index) const
