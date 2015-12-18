@@ -43,6 +43,7 @@
 #
 
 set (PATH_SUFFIX Urho3D)
+set (COMPILE_RESULT TRUE)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
     # A special case where library location is already known to be in the build tree of Urho3D project
     set (URHO3D_HOME ${CMAKE_BINARY_DIR})
@@ -57,7 +58,6 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
         list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_HOME}/include/Urho3D/ThirdParty/Lua${JIT})
     endif ()
     set (URHO3D_LIBRARIES Urho3D)
-    set (COMPILE_RESULT TRUE)
     set (FOUND_MESSAGE "Found Urho3D: as CMake target")
 else ()
     # Library location would be searched (based on URHO3D_HOME variable if provided and in system-wide default location)
@@ -101,10 +101,10 @@ else ()
         # The PATH_SUFFIX does not work for CMake on Windows host system, it actually needs a prefix instead
         if (CMAKE_HOST_WIN32)
             set (CMAKE_SYSTEM_PREFIX_PATH_SAVED ${CMAKE_SYSTEM_PREFIX_PATH})
-	    string (REPLACE ";" "\\Urho3D;" CMAKE_SYSTEM_PREFIX_PATH "${CMAKE_SYSTEM_PREFIX_PATH_SAVED};")    # Stringify for string replacement
-	    if (NOT URHO3D_64BIT)
-	        list (REVERSE CMAKE_SYSTEM_PREFIX_PATH)
-	    endif ()
+            string (REPLACE ";" "\\Urho3D;" CMAKE_SYSTEM_PREFIX_PATH "${CMAKE_SYSTEM_PREFIX_PATH_SAVED};")    # Stringify for string replacement
+            if (NOT URHO3D_64BIT)
+                list (REVERSE CMAKE_SYSTEM_PREFIX_PATH)
+            endif ()
         endif ()
     endif ()
     # URHO3D_HOME variable should be an absolute path, so use a non-rooted search even when we are cross-compiling
@@ -177,23 +177,25 @@ else ()
                 set (URHO3D_LIB_TYPE SHARED)
             endif ()
         endif ()
-    elseif (NOT URHO3D_LIB_TYPE AND URHO3D_LIBRARIES)
+    elseif (URHO3D_LIBRARIES)
         get_filename_component (EXT ${URHO3D_LIBRARIES} EXT)
         if (EXT STREQUAL .a)
             set (URHO3D_LIB_TYPE STATIC)
-            set (COMPILE_DEFINITIONS COMPILE_DEFINITIONS -DURHO3D_STATIC_DEFINE)
+            # For Non-MSVC compiler the static define is not baked into the export header file so we need to define it for the try_compile below
+            set (COMPILER_STATIC_FLAG COMPILE_DEFINITIONS -DURHO3D_STATIC_DEFINE)
         else ()
             set (URHO3D_LIB_TYPE SHARED)
         endif ()
     endif ()
     # Ensure the module has found the library with the right ABI for the chosen compiler and URHO3D_64BIT build option
-    if (URHO3D_LIBRARIES AND NOT IOS)
+    if (URHO3D_LIBRARIES AND NOT IOS AND NOT ANDROID)
         if (NOT URHO3D_64BIT AND NOT MSVC AND NOT MINGW AND NOT ANDROID AND NOT RPI AND NOT EMSCRIPTEN)
-            set (COMPILE_LINKER_DEFINITIONS -DCOMPILE_DEFINITIONS:STRING=-m32)
+            set (COMPILER_32BIT_FLAG -DCOMPILE_DEFINITIONS:STRING=-m32)
         endif ()
+        # BCM_VC_LIBRARIES variable is only populated when targeting RPI and empty otherwise, so it is safe to always append the variable
         try_compile (COMPILE_RESULT ${CMAKE_BINARY_DIR}/generated/FindUrho3D ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
-            CMAKE_FLAGS -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILE_LINKER_DEFINITIONS} ${COMPILE_DEFINITIONS}
-            LINK_LIBRARIES ${URHO3D_LIBRARIES})
+            CMAKE_FLAGS -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES}\;${BCM_VC_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_32BIT_FLAG} ${COMPILER_STATIC_FLAG}
+            OUTPUT_VARIABLE TRY_COMPILE_OUT)
     endif ()
     # For shared library type, also initialize the URHO3D_DLL variable for later use
     if (WIN32)
@@ -238,7 +240,7 @@ elseif (Urho3D_FIND_REQUIRED)
     endif ()
     message (FATAL_ERROR
         "Could NOT find compatible Urho3D library in Urho3D SDK installation or build tree. "
-        "Use URHO3D_HOME environment variable or build option to specify the location of the non-default SDK installation or build tree. ${NOT_FOUND_MESSAGE}")
+        "Use URHO3D_HOME environment variable or build option to specify the location of the non-default SDK installation or build tree. ${NOT_FOUND_MESSAGE} ${TRY_COMPILE_OUT}")
 endif ()
 
 mark_as_advanced (URHO3D_BASE_INCLUDE_DIR URHO3D_LIBRARIES URHO3D_LIBRARIES_DBG URHO3D_DLL_REL URHO3D_DLL_DBG URHO3D_HOME)
