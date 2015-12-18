@@ -62,6 +62,9 @@ uniform float2 cShadowIntensity;
 uniform float2 cShadowMapInvSize;
 uniform float4 cShadowSplits;
 uniform float4x4 cLightMatricesPS[4];
+#ifdef VSM_SHADOW
+uniform float2 cVsmShadowParams;
+#endif
 #endif
 
 #else
