@@ -385,7 +385,7 @@ void EditShadowResolution(StringHash eventType, VariantMap& eventData)
 void EditShadowQuality(StringHash eventType, VariantMap& eventData)
 {
     DropDownList@ edit = eventData["Element"].GetPtr();
-    renderer.shadowQuality = edit.selection;
+    renderer.shadowQuality = ShadowQuality(edit.selection);
 }
 
 void EditMaxOccluderTriangles(StringHash eventType, VariantMap& eventData)

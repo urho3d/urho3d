@@ -176,15 +176,22 @@ enum FaceCameraMode
     FC_LOOKAT_Y
 };
 
+/// Shadow type
+enum ShadowQuality
+{
+    SHADOWQUALITY_SIMPLE_16BIT = 0,
+    SHADOWQUALITY_SIMPLE_24BIT,
+    SHADOWQUALITY_PCF_16BIT,
+    SHADOWQUALITY_PCF_24BIT,
+    SHADOWQUALITY_VSM,
+    SHADOWQUALITY_BLUR_VSM
+};
+
+
 static const int QUALITY_LOW;
 static const int QUALITY_MEDIUM;
 static const int QUALITY_HIGH;
 static const int QUALITY_MAX;
-
-static const int SHADOWQUALITY_LOW_16BIT;
-static const int SHADOWQUALITY_LOW_24BIT;
-static const int SHADOWQUALITY_HIGH_16BIT;
-static const int SHADOWQUALITY_HIGH_24BIT;
 
 static const unsigned CLEAR_COLOR;
 static const unsigned CLEAR_DEPTH;
