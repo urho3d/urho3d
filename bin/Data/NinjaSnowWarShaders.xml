@@ -17,12 +17,12 @@
 	<shader vs="LitSolid" vsdefines="INSTANCED PERPIXEL POINTLIGHT SHADOW" ps="LitSolid" psdefines="DIFFMAP PERPIXEL POINTLIGHT SHADOW" />
 	<shader vs="LitSolid" vsdefines="DIRLIGHT PERPIXEL SHADOW" ps="LitSolid" psdefines="AMBIENT DIRLIGHT PERPIXEL SHADOW" />
 	<shader vs="LitSolid" vsdefines="PERPIXEL POINTLIGHT SHADOW" ps="LitSolid" psdefines="PERPIXEL POINTLIGHT SHADOW" />
-	<shader vs="LitSolid" vsdefines="DIRLIGHT PERPIXEL SHADOW" ps="LitSolid" psdefines="AMBIENT DIFFMAP DIRLIGHT LQSHADOW PERPIXEL SHADOW" />
-	<shader vs="LitSolid" vsdefines="DIRLIGHT PERPIXEL SHADOW SKINNED" ps="LitSolid" psdefines="AMBIENT DIFFMAP DIRLIGHT LQSHADOW PERPIXEL SHADOW" />
-	<shader vs="LitSolid" vsdefines="DIRLIGHT INSTANCED PERPIXEL SHADOW" ps="LitSolid" psdefines="AMBIENT DIFFMAP DIRLIGHT LQSHADOW PERPIXEL SHADOW" />
-	<shader vs="LitSolid" vsdefines="PERPIXEL POINTLIGHT SHADOW" ps="LitSolid" psdefines="DIFFMAP LQSHADOW PERPIXEL POINTLIGHT SHADOW" />
-	<shader vs="LitSolid" vsdefines="PERPIXEL POINTLIGHT SHADOW SKINNED" ps="LitSolid" psdefines="DIFFMAP LQSHADOW PERPIXEL POINTLIGHT SHADOW" />
-	<shader vs="LitSolid" vsdefines="DIRLIGHT PERPIXEL SHADOW" ps="LitSolid" psdefines="AMBIENT DIRLIGHT LQSHADOW PERPIXEL SHADOW" />
-	<shader vs="LitSolid" vsdefines="PERPIXEL POINTLIGHT SHADOW" ps="LitSolid" psdefines="LQSHADOW PERPIXEL POINTLIGHT SHADOW" />
-	<shader vs="LitSolid" vsdefines="INSTANCED PERPIXEL POINTLIGHT SHADOW" ps="LitSolid" psdefines="DIFFMAP LQSHADOW PERPIXEL POINTLIGHT SHADOW" />
+	<shader vs="LitSolid" vsdefines="DIRLIGHT PERPIXEL SHADOW" ps="LitSolid" psdefines="AMBIENT DIFFMAP DIRLIGHT SIMPLE_SHADOW PERPIXEL SHADOW" />
+	<shader vs="LitSolid" vsdefines="DIRLIGHT PERPIXEL SHADOW SKINNED" ps="LitSolid" psdefines="AMBIENT DIFFMAP DIRLIGHT SIMPLE_SHADOW PERPIXEL SHADOW" />
+	<shader vs="LitSolid" vsdefines="DIRLIGHT INSTANCED PERPIXEL SHADOW" ps="LitSolid" psdefines="AMBIENT DIFFMAP DIRLIGHT SIMPLE_SHADOW PERPIXEL SHADOW" />
+	<shader vs="LitSolid" vsdefines="PERPIXEL POINTLIGHT SHADOW" ps="LitSolid" psdefines="DIFFMAP SIMPLE_SHADOW PERPIXEL POINTLIGHT SHADOW" />
+	<shader vs="LitSolid" vsdefines="PERPIXEL POINTLIGHT SHADOW SKINNED" ps="LitSolid" psdefines="DIFFMAP SIMPLE_SHADOW PERPIXEL POINTLIGHT SHADOW" />
+	<shader vs="LitSolid" vsdefines="DIRLIGHT PERPIXEL SHADOW" ps="LitSolid" psdefines="AMBIENT DIRLIGHT SIMPLE_SHADOW PERPIXEL SHADOW" />
+	<shader vs="LitSolid" vsdefines="PERPIXEL POINTLIGHT SHADOW" ps="LitSolid" psdefines="SIMPLE_SHADOW PERPIXEL POINTLIGHT SHADOW" />
+	<shader vs="LitSolid" vsdefines="INSTANCED PERPIXEL POINTLIGHT SHADOW" ps="LitSolid" psdefines="DIFFMAP SIMPLE_SHADOW PERPIXEL POINTLIGHT SHADOW" />
 </shaders>

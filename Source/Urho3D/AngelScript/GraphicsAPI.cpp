@@ -1716,7 +1716,7 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "void set_shadowMapSize(int)", asMETHOD(Renderer, SetShadowMapSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "int get_shadowMapSize() const", asMETHOD(Renderer, GetShadowMapSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_shadowQuality(ShadowQuality)", asMETHOD(Renderer, SetShadowQuality), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "int get_shadowQuality() const", asMETHOD(Renderer, GetShadowQuality), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "ShadowQuality get_shadowQuality() const", asMETHOD(Renderer, GetShadowQuality), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_shadowSoftness(float)", asMETHOD(Renderer, SetShadowSoftness), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "float get_shadowSoftness() const", asMETHOD(Renderer, GetShadowSoftness), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_vsmShadowParameters(float, float)", asMETHOD(Renderer, SetVsmShadowParameters), asCALL_THISCALL);
