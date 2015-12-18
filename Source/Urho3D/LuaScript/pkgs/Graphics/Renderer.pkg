@@ -16,7 +16,7 @@ class Renderer
     void SetShadowMapSize(int size);
     void SetShadowQuality(ShadowQuality quality);
     void SetShadowSoftness(float shadowSoftness);
-    void SetVsmShadowParameters(float minVariance, float lightBleedingReduction);
+    void SetVSMShadowParameters(float minVariance, float lightBleedingReduction);
     void SetReuseShadowMaps(bool enable);
     void SetMaxShadowMaps(int shadowMaps);
     void SetDynamicInstancing(bool enable);
@@ -43,7 +43,7 @@ class Renderer
     int GetShadowMapSize() const;
     ShadowQuality GetShadowQuality() const;
     float GetShadowSoftness() const;
-    Vector2 GetVsmShadowParameters() const;
+    Vector2 GetVSMShadowParameters() const;
     bool GetReuseShadowMaps() const;
     int GetMaxShadowMaps() const;
     bool GetDynamicInstancing() const;
@@ -80,6 +80,7 @@ class Renderer
     tolua_property__get_set int materialQuality;
     tolua_property__get_set int shadowMapSize;
     tolua_property__get_set ShadowQuality shadowQuality;
+    tolua_property__get_set float shadowSoftness;
     tolua_property__get_set bool reuseShadowMaps;
     tolua_property__get_set int maxShadowMaps;
     tolua_property__get_set bool dynamicInstancing;

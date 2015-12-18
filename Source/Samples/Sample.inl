@@ -284,7 +284,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         else if (key == '6')
         {
             ShadowQuality quality = renderer->GetShadowQuality();
-            quality = static_cast<ShadowQuality>(quality + 1);
+            quality = (ShadowQuality)(quality + 1);
             if (quality > SHADOWQUALITY_BLUR_VSM)
                 quality = SHADOWQUALITY_SIMPLE_16BIT;
             renderer->SetShadowQuality(quality);

@@ -160,13 +160,13 @@ float Chebyshev(float2 Moments, float depth)
     //Compute variance.  
     float Variance = Moments.y - (Moments.x * Moments.x); 
 
-    float minVariance = cVsmShadowParams.x;
+    float minVariance = cVSMShadowParams.x;
     Variance = max(Variance, minVariance);  
     //Compute probabilistic upper bound.  
     float d = depth - Moments.x;  
     float p_max = Variance / (Variance + d*d); 
     // Prevent light bleeding
-    p_max = ReduceLightBleeding(cVsmShadowParams.y, p_max);
+    p_max = ReduceLightBleeding(cVSMShadowParams.y, p_max);
 
     return max(p, p_max);
 }

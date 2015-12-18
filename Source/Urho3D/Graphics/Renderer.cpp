@@ -417,7 +417,7 @@ void Renderer::SetShadowSoftness(float shadowSoftness)
     shadowSoftness_ = Max(shadowSoftness, 0.0f);
 }
 
-void Renderer::SetVsmShadowParameters(float minVariance, float lightBleedingReduction)
+void Renderer::SetVSMShadowParameters(float minVariance, float lightBleedingReduction)
 {
     vsmShadowParams_.x_ = Max(minVariance, 0.0f);
     vsmShadowParams_.y_ = Clamp(lightBleedingReduction, 0.0f, 1.0f);

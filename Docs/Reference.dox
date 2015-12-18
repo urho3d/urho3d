@@ -1026,7 +1026,7 @@ OpenGL ES 2.0 has further limitations:
 
 - To reduce fillrate, the stencil buffer is not reserved and the stencil test is not available. As a consequence, the light stencil masking optimization is not used.
 
-- For improved performance, shadow mapping quality is reduced: there is no smooth PCF filtering and directional lights do not support shadow cascades. Consider also using the low shadow quality (1 sample) to avoid dependent texture reads in the pixel shader, which have an especially high performance cost on iOS hardware.
+- For improved performance, shadow mapping quality is reduced: there is no smooth PCF filtering and directional lights do not support shadow cascades. Consider also using the simple shadow quality (1 sample) to avoid dependent texture reads in the pixel shader, which have an especially high performance cost on iOS hardware.
 
 - Custom clip planes are not currently supported.
 
@@ -1215,7 +1215,7 @@ Pixel shader:
 - CUBEMASK: the point light has a cube map mask
 - SPEC: the per-pixel forward light has specular calculations
 - SHADOW: the per-pixel forward light has shadowing
-- LQSHADOW: use low-quality shadowing (1 hardware PCF sample instead of 4)
+- SIMPLE_SHADOW, PCF_SHADOW, VSM_SHADOW: the shadow sampling quality that is to be used
 - SHADOWCMP: use manual shadow depth compare, Direct3D9 only for DF16 & DF24 shadow map formats
 - HEIGHTFOG: object's zone has height fog mode
 
@@ -1314,7 +1314,7 @@ For OpenGL, the define GL3 is present when GLSL shaders are being compiled for O
 
 The shader variations that are potentially used by a material technique in different lighting conditions and rendering passes are enumerated at material load time, but because of their large amount, they are not actually compiled or loaded from bytecode before being used in rendering. Especially on OpenGL the compiling of shaders just before rendering can cause hitches in the framerate. To avoid this, used shader combinations can be dumped out to an XML file, then preloaded. See \ref Graphics::BeginDumpShaders "BeginDumpShaders()", \ref Graphics::EndDumpShaders "EndDumpShaders()" and \ref Graphics::PrecacheShaders "PrecacheShaders()" in the Graphics subsystem. The command line parameters -ds <file> can be used to instruct the Engine to begin dumping shaders automatically on startup.
 
-Note that the used shader variations will vary with graphics settings, for example shadow quality high/low or instancing on/off.
+Note that the used shader variations will vary with graphics settings, for example shadow quality simple/PCF/VSM or instancing on/off.
 
 \page RenderPaths Render path
 

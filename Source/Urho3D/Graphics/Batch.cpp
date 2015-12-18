@@ -487,9 +487,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                     float pcfValues = (1.0f - intensity);
                     float samples = 1.0f;
                     if (renderer->GetShadowQuality() == SHADOWQUALITY_PCF_16BIT || renderer->GetShadowQuality() == SHADOWQUALITY_PCF_24BIT)
-                    {
                         samples = 4.0f;
-                    }
                     graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues / samples, intensity, 0.0f, 0.0f));
                 }
 
@@ -508,9 +506,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                 graphics->SetShaderParameter(PSP_SHADOWSPLITS, lightSplits);
 
                 if (graphics->HasShaderParameter(PSP_VSMSHADOWPARAMS))
-                {
-                    graphics->SetShaderParameter(PSP_VSMSHADOWPARAMS, renderer->GetVsmShadowParameters());
-                }
+                    graphics->SetShaderParameter(PSP_VSMSHADOWPARAMS, renderer->GetVSMShadowParameters());
             }
         }
         else if (lightQueue_->vertexLights_.Size() && graphics->HasShaderParameter(VSP_VERTEXLIGHTS) &&
