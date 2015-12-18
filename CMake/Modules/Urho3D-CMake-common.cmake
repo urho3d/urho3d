@@ -478,11 +478,11 @@ endif ()
 
 # Platform and compiler specific options
 if (URHO3D_C++11)
-    add_definitions (-DURHO3D_CPP11)   # Note the define is NOT 'URHO3D_C++11'!
+    add_definitions (-DURHO3D_CXX11)   # Note the define is NOT 'URHO3D_C++11'!
     if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
         # Use gnu++11/gnu++0x instead of c++11/c++0x as the latter does not work as expected when cross compiling
         foreach (STANDARD gnu++11 gnu++0x)  # Fallback to gnu++0x on older GCC version
-            execute_process (COMMAND echo COMMAND ${CMAKE_CXX_COMPILER} -std=${STANDARD} -E - RESULT_VARIABLE GCC_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+            execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_CXX_COMPILER} -std=${STANDARD} -E - RESULT_VARIABLE GCC_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
             if (GCC_EXIT_CODE EQUAL 0)
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=${STANDARD}")
                 break ()
