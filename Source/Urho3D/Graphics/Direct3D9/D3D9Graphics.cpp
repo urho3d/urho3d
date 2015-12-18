@@ -1314,6 +1314,14 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
         SetShaderParameter(param, value.GetMatrix4());
         break;
 
+    case VAR_BUFFER:
+        {
+            const PODVector<unsigned char>& buffer = value.GetBuffer();
+            if (buffer.Size() >= sizeof(float))
+                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
+        }
+        break;
+
     default:
         // Unsupported parameter type, do nothing
         break;
