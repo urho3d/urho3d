@@ -4701,7 +4701,9 @@ Methods:
 - void SetMaterialQuality(int quality)
 - void SetDrawShadows(bool enable)
 - void SetShadowMapSize(int size)
-- void SetShadowQuality(int quality)
+- void SetShadowQuality(ShadowQuality quality)
+- void SetShadowSoftness(float shadowSoftness)
+- void SetVSMShadowParameters(float minVariance, float lightBleedingReduction)
 - void SetReuseShadowMaps(bool enable)
 - void SetMaxShadowMaps(int shadowMaps)
 - void SetDynamicInstancing(bool enable)
@@ -4725,7 +4727,9 @@ Methods:
 - int GetTextureQuality() const
 - int GetMaterialQuality() const
 - int GetShadowMapSize() const
-- int GetShadowQuality() const
+- ShadowQuality GetShadowQuality() const
+- float GetShadowSoftness() const
+- Vector2 GetVSMShadowParameters() const
 - bool GetReuseShadowMaps() const
 - int GetMaxShadowMaps() const
 - bool GetDynamicInstancing() const
@@ -4762,7 +4766,8 @@ Properties:
 - int textureQuality
 - int materialQuality
 - int shadowMapSize
-- int shadowQuality
+- ShadowQuality shadowQuality
+- float shadowSoftness
 - bool reuseShadowMaps
 - int maxShadowMaps
 - bool dynamicInstancing
@@ -7499,6 +7504,15 @@ Properties:
 - int VS
 - int PS
 
+### ShadowQuality
+
+- int SHADOWQUALITY_SIMPLE_16BIT
+- int SHADOWQUALITY_SIMPLE_24BIT
+- int SHADOWQUALITY_PCF_16BIT
+- int SHADOWQUALITY_PCF_24BIT
+- int SHADOWQUALITY_VSM
+- int SHADOWQUALITY_BLUR_VSM
+
 ### ShapeType
 
 - int SHAPE_BOX
@@ -8270,10 +8284,6 @@ Properties:
 - unsigned SCAN_DIRS
 - unsigned SCAN_FILES
 - unsigned SCAN_HIDDEN
-- int SHADOWQUALITY_HIGH_16BIT
-- int SHADOWQUALITY_HIGH_24BIT
-- int SHADOWQUALITY_LOW_16BIT
-- int SHADOWQUALITY_LOW_24BIT
 - String SOUND_AMBIENT
 - String SOUND_EFFECT
 - String SOUND_MASTER

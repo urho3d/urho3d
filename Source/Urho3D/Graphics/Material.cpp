@@ -430,7 +430,10 @@ bool Material::Load(const XMLElement& source)
     while (parameterElem)
     {
         String name = parameterElem.GetAttribute("name");
-        SetShaderParameter(name, ParseShaderParameterValue(parameterElem.GetAttribute("value")));
+        if (!parameterElem.HasAttribute("type"))
+            SetShaderParameter(name, ParseShaderParameterValue(parameterElem.GetAttribute("value")));
+        else
+            SetShaderParameter(name, Variant(parameterElem.GetAttribute("type"), parameterElem.GetAttribute("value")));
         parameterElem = parameterElem.GetNext("parameter");
     }
     batchedParameterUpdate_ = false;
@@ -561,7 +564,13 @@ bool Material::Load(const JSONValue& source)
     for (JSONObject::ConstIterator it = parameterObject.Begin(); it != parameterObject.End(); it++)
     {
         String name = it->first_;
-        SetShaderParameter(name, ParseShaderParameterValue(it->second_.GetString()));
+        if (it->second_.IsString())
+            SetShaderParameter(name, ParseShaderParameterValue(it->second_.GetString()));
+        else if (it->second_.IsObject())
+        {
+            JSONObject valueObj = it->second_.GetObject();
+            SetShaderParameter(name, Variant(valueObj["type"].GetString(), valueObj["value"].GetString()));
+        }
     }
     batchedParameterUpdate_ = false;
 
@@ -659,7 +668,13 @@ bool Material::Save(XMLElement& dest) const
     {
         XMLElement parameterElem = dest.CreateChild("parameter");
         parameterElem.SetString("name", j->second_.name_);
-        parameterElem.SetVectorVariant("value", j->second_.value_);
+        if (j->second_.value_.GetType() != VAR_BUFFER)
+            parameterElem.SetVectorVariant("value", j->second_.value_);
+        else
+        {
+            parameterElem.SetAttribute("type", j->second_.value_.GetTypeName());
+            parameterElem.SetAttribute("value", j->second_.value_.ToString());
+        }
     }
 
     // Write shader parameter animations
@@ -733,7 +748,15 @@ bool Material::Save(JSONValue& dest) const
     for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator j = shaderParameters_.Begin();
          j != shaderParameters_.End(); ++j)
     {
-        shaderParamsVal.Set(j->second_.name_, j->second_.value_.ToString());
+        if (j->second_.value_.GetType() != VAR_BUFFER)
+            shaderParamsVal.Set(j->second_.name_, j->second_.value_.ToString());
+        else
+        {
+            JSONObject valueObj;
+            valueObj["type"] = j->second_.value_.GetTypeName();
+            valueObj["value"] = j->second_.value_.ToString();
+            shaderParamsVal.Set(j->second_.name_, valueObj);
+        }
     }
     dest.Set("shaderParameters", shaderParamsVal);
 

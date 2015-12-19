@@ -147,15 +147,55 @@ float GetIntensity(float3 color)
     #define NUMCASCADES 1
 #endif
 
+#ifdef VSM_SHADOW
+float ReduceLightBleeding(float min, float p_max)  
+{  
+    return clamp((p_max - min) / (1.0 - min), 0.0, 1.0);  
+}
+
+float Chebyshev(float2 Moments, float depth)  
+{  
+    //One-tailed inequality valid if depth > Moments.x  
+    float p = float(depth <= Moments.x);  
+    //Compute variance.  
+    float Variance = Moments.y - (Moments.x * Moments.x); 
+
+    float minVariance = cVSMShadowParams.x;
+    Variance = max(Variance, minVariance);  
+    //Compute probabilistic upper bound.  
+    float d = depth - Moments.x;  
+    float p_max = Variance / (Variance + d*d); 
+    // Prevent light bleeding
+    p_max = ReduceLightBleeding(cVSMShadowParams.y, p_max);
+
+    return max(p, p_max);
+}
+#endif
+
 float GetShadow(float4 shadowPos)
 {
-    #ifdef D3D11
-        shadowPos.xyz /= shadowPos.w;
-    #endif
-
-    #ifndef LQSHADOW
+    #if defined(SIMPLE_SHADOW)
+        // Take one sample
+        #ifdef D3D11
+            shadowPos.xyz /= shadowPos.w;
+        #endif
+        float inLight = SampleShadow(ShadowMap, shadowPos).r;
+        #ifndef SHADOWCMP
+            return cShadowIntensity.y + cShadowIntensity.x * inLight;
+        #else
+            #ifndef POINTLIGHT
+                return cShadowIntensity.y + cShadowIntensity.x * (inLight * shadowPos.w > shadowPos.z);
+            #else
+                return cShadowIntensity.y + cShadowIntensity.x * (inLight > shadowPos.z);
+            #endif
+        #endif
+    
+    #elif defined(PCF_SHADOW)
         // Take four samples and average them
         // Note: in case of sampling a point light cube shadow, we optimize out the w divide as it has already been performed
+        #ifdef D3D11
+            shadowPos.xyz /= shadowPos.w;
+        #endif
         #if !defined(POINTLIGHT) && !defined(D3D11)
             float2 offsets = cShadowMapInvSize * shadowPos.w;
         #else
@@ -180,18 +220,10 @@ float GetShadow(float4 shadowPos)
                 return cShadowIntensity.y + dot(inLight > shadowPos.z, cShadowIntensity.x);
             #endif
         #endif
-    #else
-        // Take one sample
-        float inLight = SampleShadow(ShadowMap, shadowPos).r;
-        #ifndef SHADOWCMP
-            return cShadowIntensity.y + cShadowIntensity.x * inLight;
-        #else
-            #ifndef POINTLIGHT
-                return cShadowIntensity.y + cShadowIntensity.x * (inLight * shadowPos.w > shadowPos.z);
-            #else
-                return cShadowIntensity.y + cShadowIntensity.x * (inLight > shadowPos.z);
-            #endif
-        #endif
+    
+    #elif defined(VSM_SHADOW)
+        float2 samples = Sample2D(ShadowMap, shadowPos.xy / shadowPos.w).rg;
+        return cShadowIntensity.y + cShadowIntensity.x * Chebyshev(samples, shadowPos.z/shadowPos.w);
     #endif
 }
 
