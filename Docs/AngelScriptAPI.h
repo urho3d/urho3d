@@ -8045,6 +8045,7 @@ void DrawDebugGeometry(bool) const;
 void ReloadShaders() const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetDefaultRenderPath(XMLFile);
+void SetVSMShadowParameters(float, float);
 
 // Properties:
 /* readonly */
@@ -8089,7 +8090,8 @@ int occlusionBufferSize;
 int refs;
 bool reuseShadowMaps;
 int shadowMapSize;
-int shadowQuality;
+ShadowQuality shadowQuality;
+float shadowSoftness;
 bool specularLighting;
 int textureAnisotropy;
 TextureFilterMode textureFilterMode;
@@ -8100,6 +8102,7 @@ StringHash type;
 /* readonly */
 String typeName;
 Array<Viewport> viewports;
+Vector2 vsmShadowParameters;
 /* readonly */
 int weakRefs;
 };
@@ -13462,6 +13465,16 @@ SIZE_VIEWPORTDIVISOR,
 SIZE_VIEWPORTMULTIPLIER,
 };
 
+enum ShadowQuality
+{
+SHADOWQUALITY_SIMPLE_16BIT,
+SHADOWQUALITY_SIMPLE_24BIT,
+SHADOWQUALITY_PCF_16BIT,
+SHADOWQUALITY_PCF_24BIT,
+SHADOWQUALITY_VSM,
+SHADOWQUALITY_BLUR_VSM,
+};
+
 enum ShapeType
 {
 SHAPE_BOX,
@@ -14221,10 +14234,6 @@ int SCANCODE_Z;
 uint SCAN_DIRS;
 uint SCAN_FILES;
 uint SCAN_HIDDEN;
-int SHADOWQUALITY_HIGH_16BIT;
-int SHADOWQUALITY_HIGH_24BIT;
-int SHADOWQUALITY_LOW_16BIT;
-int SHADOWQUALITY_LOW_24BIT;
 String SOUND_AMBIENT;
 String SOUND_EFFECT;
 String SOUND_MASTER;

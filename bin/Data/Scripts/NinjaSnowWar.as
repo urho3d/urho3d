@@ -150,7 +150,7 @@ void InitScene()
     if (platform == "Android" || platform == "iOS" || platform == "Raspberry Pi")
     {
         renderer.reuseShadowMaps = false;
-        renderer.shadowQuality = SHADOWQUALITY_LOW_16BIT;
+        renderer.shadowQuality = SHADOWQUALITY_SIMPLE_16BIT;
         // Adjust the directional light shadow range slightly further, as only the first
         // cascade is supported
         Node@ dirLightNode = gameScene.GetChild("GlobalLight", true);

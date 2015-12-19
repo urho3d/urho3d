@@ -199,8 +199,8 @@ function HandleKeyDown(eventType, eventData)
         elseif key == KEY_6 then
             local quality = renderer.shadowQuality
             quality = quality + 1
-            if quality > SHADOWQUALITY_HIGH_24BIT then
-                quality = SHADOWQUALITY_LOW_16BIT
+            if quality > SHADOWQUALITY_BLUR_VSM then
+                quality = SHADOWQUALITY_SIMPLE_16BIT
             end
             renderer.shadowQuality = quality
 
