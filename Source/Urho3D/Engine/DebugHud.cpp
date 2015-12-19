@@ -48,10 +48,12 @@ static const char* qualityTexts[] =
 
 static const char* shadowQualityTexts[] =
 {
-    "16bit Low",
-    "24bit Low",
-    "16bit High",
-    "24bit High"
+    "16bit Simple",
+    "24bit Simple",
+    "16bit PCF",
+    "24bit PCF",
+    "VSM",
+    "Blurred VSM"
 };
 
 DebugHud::DebugHud(Context* context) :

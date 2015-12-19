@@ -123,7 +123,7 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
 #endif
 
     // If using 4 shadow samples, offset the position diagonally by half pixel
-    if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
+    if (renderer->GetShadowQuality() == SHADOWQUALITY_PCF_16BIT || renderer->GetShadowQuality() == SHADOWQUALITY_PCF_24BIT)
     {
         offset.x_ -= 0.5f / width;
         offset.y_ -= 0.5f / height;
@@ -450,7 +450,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                     float addY = 2.5f / height;
 #endif
                     // If using 4 shadow samples, offset the position diagonally by half pixel
-                    if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
+                    if (renderer->GetShadowQuality() == SHADOWQUALITY_PCF_16BIT || renderer->GetShadowQuality() == SHADOWQUALITY_PCF_24BIT)
                     {
                         addX -= 0.5f / width;
                         addY -= 0.5f / height;
@@ -485,8 +485,9 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         intensity =
                             Lerp(intensity, 1.0f, Clamp((light->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 0.0f, 1.0f));
                     float pcfValues = (1.0f - intensity);
-                    float samples = renderer->GetShadowQuality() >= SHADOWQUALITY_HIGH_16BIT ? 4.0f : 1.0f;
-
+                    float samples = 1.0f;
+                    if (renderer->GetShadowQuality() == SHADOWQUALITY_PCF_16BIT || renderer->GetShadowQuality() == SHADOWQUALITY_PCF_24BIT)
+                        samples = 4.0f;
                     graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues / samples, intensity, 0.0f, 0.0f));
                 }
 
@@ -503,6 +504,9 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                     lightSplits.z_ = lightQueue_->shadowSplits_[2].farSplit_ / camera->GetFarClip();
 
                 graphics->SetShaderParameter(PSP_SHADOWSPLITS, lightSplits);
+
+                if (graphics->HasShaderParameter(PSP_VSMSHADOWPARAMS))
+                    graphics->SetShaderParameter(PSP_VSMSHADOWPARAMS, renderer->GetVSMShadowParameters());
             }
         }
         else if (lightQueue_->vertexLights_.Size() && graphics->HasShaderParameter(VSP_VERTEXLIGHTS) &&

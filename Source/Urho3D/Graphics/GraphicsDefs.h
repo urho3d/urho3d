@@ -274,6 +274,18 @@ enum FaceCameraMode
     FC_LOOKAT_Y
 };
 
+/// Shadow type
+enum ShadowQuality
+{
+    SHADOWQUALITY_SIMPLE_16BIT = 0,
+    SHADOWQUALITY_SIMPLE_24BIT,
+    SHADOWQUALITY_PCF_16BIT,
+    SHADOWQUALITY_PCF_24BIT,
+    SHADOWQUALITY_VSM,
+    SHADOWQUALITY_BLUR_VSM
+};
+
+
 // Inbuilt shader parameters.
 extern URHO3D_API const StringHash VSP_AMBIENTSTARTCOLOR;
 extern URHO3D_API const StringHash VSP_AMBIENTENDCOLOR;
@@ -321,6 +333,7 @@ extern URHO3D_API const StringHash PSP_SHADOWINTENSITY;
 extern URHO3D_API const StringHash PSP_SHADOWMAPINVSIZE;
 extern URHO3D_API const StringHash PSP_SHADOWSPLITS;
 extern URHO3D_API const StringHash PSP_LIGHTMATRICES;
+extern URHO3D_API const StringHash PSP_VSMSHADOWPARAMS;
 
 // Scale calculation from bounding box diagonal.
 extern URHO3D_API const Vector3 DOT_SCALE;
@@ -329,11 +342,6 @@ static const int QUALITY_LOW = 0;
 static const int QUALITY_MEDIUM = 1;
 static const int QUALITY_HIGH = 2;
 static const int QUALITY_MAX = 15;
-
-static const int SHADOWQUALITY_LOW_16BIT = 0;
-static const int SHADOWQUALITY_LOW_24BIT = 1;
-static const int SHADOWQUALITY_HIGH_16BIT = 2;
-static const int SHADOWQUALITY_HIGH_24BIT = 3;
 
 static const unsigned CLEAR_COLOR = 0x1;
 static const unsigned CLEAR_DEPTH = 0x2;

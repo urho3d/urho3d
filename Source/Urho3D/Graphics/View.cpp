@@ -2946,19 +2946,38 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     Texture2D* shadowMap = queue.shadowMap_;
     graphics_->SetTexture(TU_SHADOWMAP, 0);
 
-    graphics_->SetColorWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetClipPlane(false);
     graphics_->SetStencilTest(false);
-    graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
-    for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
-        graphics_->SetRenderTarget(i, (RenderSurface*)0);
-    graphics_->SetDepthStencil(shadowMap);
-    graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
-    graphics_->Clear(CLEAR_DEPTH);
 
     // Set shadow depth bias
-    const BiasParameters& parameters = queue.light_->GetShadowBias();
+    BiasParameters parameters = queue.light_->GetShadowBias();
+
+    // the shadow map is a depth stencil map
+    if (shadowMap->GetUsage() == TEXTURE_DEPTHSTENCIL)
+    {
+        graphics_->SetColorWrite(false);
+        graphics_->SetDepthStencil(shadowMap);
+        graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
+        // disable other render targets
+        for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+            graphics_->SetRenderTarget(i, (RenderSurface*) 0);
+        graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
+        graphics_->Clear(CLEAR_DEPTH);
+    }
+    else // if the shadow map is a render texture
+    {
+        graphics_->SetColorWrite(true);
+        graphics_->SetRenderTarget(0, shadowMap);
+        // disable other render targets
+        for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
+            graphics_->SetRenderTarget(i, (RenderSurface*) 0);
+        graphics_->SetDepthStencil(renderer_->GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight()));
+        graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
+        graphics_->Clear(CLEAR_DEPTH | CLEAR_COLOR, Color::WHITE);
+
+        parameters = BiasParameters(0.0f, 0.0f);
+    }
 
     // Render each of the splits
     for (unsigned i = 0; i < queue.shadowSplits_.Size(); ++i)
@@ -2992,6 +3011,10 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         }
     }
 
+    renderer_->ApplyShadowMapFilter(this, shadowMap);
+
+
+    // reset some parameters
     graphics_->SetColorWrite(true);
     graphics_->SetDepthBias(0.0f, 0.0f);
 }

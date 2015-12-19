@@ -112,6 +112,54 @@ if (IOS OR (RPI AND "${RPI_ABI}" MATCHES NEON))    # Stringify in case RPI_ABI i
     set (NEON TRUE)
 endif ()
 cmake_dependent_option (URHO3D_NEON "Enable NEON instruction set (ARM platforms with NEON only)" TRUE "NEON" FALSE)
+# The URHO3D_OPENGL option is not defined on non-Windows platforms as they should always use OpenGL
+if (MSVC)
+    # On MSVC compiler, default to false (i.e. prefers Direct3D)
+    # OpenGL can be manually enabled with -DURHO3D_OPENGL=1, but Windows graphics card drivers are usually better optimized for Direct3D
+    set (DEFAULT_OPENGL FALSE)
+else ()
+    # On non-MSVC compiler on Windows platform, default to true to enable use of OpenGL instead of Direct3D
+    # Direct3D can be manually enabled with -DURHO3D_OPENGL=0, but it is likely to fail unless the MinGW-w64 distribution is used due to dependency to Direct3D headers and libs
+    set (DEFAULT_OPENGL TRUE)
+endif ()
+cmake_dependent_option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)" ${DEFAULT_OPENGL} "WIN32" TRUE)      # Force the variable to TRUE when not WIN32
+# On Windows platform Direct3D11 can be optionally chosen
+# Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
+cmake_dependent_option (URHO3D_D3D11 "Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option" FALSE "WIN32" FALSE)
+if (CMAKE_HOST_WIN32)
+    if (NOT DEFINED URHO3D_MKLINK)
+        # Test whether the host system is capable of setting up symbolic link
+        execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+        if (MKLINK_EXIT_CODE EQUAL 0)
+            set (URHO3D_MKLINK TRUE)
+            file (REMOVE ${CMAKE_BINARY_DIR}/test-link)
+        else ()
+            set (URHO3D_MKLINK FALSE)
+            message (WARNING "Could not use MKLINK to setup symbolic links as this Windows user account does not have the privilege to do so. "
+                "When MKLINK is not available then the build system will fallback to use file/directory copy of the library headers from source tree to build tree. "
+                "In order to prevent stale headers being used in the build, this file/directory copy will be redone also as a post-build step for each library targets. "
+                "This may slow down the build unnecessarily or even cause other unforseen issues due to incomplete or stale headers in the build tree. "
+                "Request your Windows Administrator to grant your user account to have privilege to create symlink via MKLINK command. "
+                "You are NOT advised to use the Administrator account directly to generate build tree in all cases.")
+        endif ()
+        set (URHO3D_MKLINK ${URHO3D_MKLINK} CACHE INTERNAL "MKLINK capability on the Windows host system")
+    endif ()
+    set (NULL_DEVICE nul)
+else ()
+    set (NULL_DEVICE /dev/null)
+endif ()
+# Find Direct3D include & library directories in MS Windows SDK or DirectX SDK when not using OpenGL.
+if (WIN32 AND NOT URHO3D_OPENGL)
+    find_package (Direct3D REQUIRED)
+    if (DIRECT3D_INCLUDE_DIRS)
+        include_directories (${DIRECT3D_INCLUDE_DIRS})
+    endif ()
+endif ()
+# For Raspbery Pi, find Broadcom VideoCore IV firmware
+if (RPI)
+    find_package (BCM_VC REQUIRED)
+    include_directories (${BCM_VC_INCLUDE_DIRS})
+endif ()
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     set (URHO3D_LIB_TYPE STATIC CACHE STRING "Specify Urho3D library type, possible values are STATIC (default) and SHARED")
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
@@ -174,42 +222,6 @@ else ()
     if (EMSCRIPTEN_EMRUN_BROWSER)   # Suppress unused variable warning at the same time
         unset (EMSCRIPTEN_EMRUN_BROWSER CACHE)
     endif ()
-endif ()
-# The URHO3D_OPENGL option is not defined on non-Windows platforms as they should always use OpenGL
-if (MSVC)
-    # On MSVC compiler, default to false (i.e. prefers Direct3D)
-    # OpenGL can be manually enabled with -DURHO3D_OPENGL=1, but Windows graphics card drivers are usually better optimized for Direct3D
-    set (DEFAULT_OPENGL FALSE)
-else ()
-    # On non-MSVC compiler on Windows platform, default to true to enable use of OpenGL instead of Direct3D
-    # Direct3D can be manually enabled with -DURHO3D_OPENGL=0, but it is likely to fail unless the MinGW-w64 distribution is used due to dependency to Direct3D headers and libs
-    set (DEFAULT_OPENGL TRUE)
-endif ()
-cmake_dependent_option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)" ${DEFAULT_OPENGL} "WIN32" TRUE)      # Force the variable to TRUE when not WIN32
-# On Windows platform Direct3D11 can be optionally chosen
-# Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
-cmake_dependent_option (URHO3D_D3D11 "Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option" FALSE "WIN32" FALSE)
-if (CMAKE_HOST_WIN32)
-    if (NOT DEFINED URHO3D_MKLINK)
-        # Test whether the host system is capable of setting up symbolic link
-        execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
-        if (MKLINK_EXIT_CODE EQUAL 0)
-            set (URHO3D_MKLINK TRUE)
-            file (REMOVE ${CMAKE_BINARY_DIR}/test-link)
-        else ()
-            set (URHO3D_MKLINK FALSE)
-            message (WARNING "Could not use MKLINK to setup symbolic links as this Windows user account does not have the privilege to do so. "
-                "When MKLINK is not available then the build system will fallback to use file/directory copy of the library headers from source tree to build tree. "
-                "In order to prevent stale headers being used in the build, this file/directory copy will be redone also as a post-build step for each library targets. "
-                "This may slow down the build unnecessarily or even cause other unforseen issues due to incomplete or stale headers in the build tree. "
-                "Request your Windows Administrator to grant your user account to have privilege to create symlink via MKLINK command. "
-                "You are NOT advised to use the Administrator account directly to generate build tree in all cases.")
-        endif ()
-        set (URHO3D_MKLINK ${URHO3D_MKLINK} CACHE INTERNAL "MKLINK capability on the Windows host system")
-    endif ()
-    set (NULL_DEVICE nul)
-else ()
-    set (NULL_DEVICE /dev/null)
 endif ()
 cmake_dependent_option (URHO3D_STATIC_RUNTIME "Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)" FALSE "MSVC" FALSE)
 cmake_dependent_option (URHO3D_WIN32_CONSOLE "Use console main() as entry point when setting up Windows executable targets (Windows platform only)" FALSE "WIN32" FALSE)
@@ -482,27 +494,13 @@ if (URHO3D_DATABASE_SQLITE)
     add_definitions (-DURHO3D_DATABASE -DURHO3D_DATABASE_SQLITE)
 endif ()
 
-# Find Direct3D include & library directories in MS Windows SDK or DirectX SDK when not using OpenGL.
-if (WIN32 AND NOT URHO3D_OPENGL)
-    find_package (Direct3D REQUIRED)
-    if (DIRECT3D_INCLUDE_DIRS)
-        include_directories (${DIRECT3D_INCLUDE_DIRS})
-    endif ()
-endif ()
-
-# For Raspbery Pi, find Broadcom VideoCore IV firmware
-if (RPI)
-    find_package (BCM_VC REQUIRED)
-    include_directories (${BCM_VC_INCLUDE_DIRS})
-endif ()
-
 # Platform and compiler specific options
 if (URHO3D_C++11)
-    add_definitions (-DURHO3D_CPP11)   # Note the define is NOT 'URHO3D_C++11'!
+    add_definitions (-DURHO3D_CXX11)   # Note the define is NOT 'URHO3D_C++11'!
     if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
         # Use gnu++11/gnu++0x instead of c++11/c++0x as the latter does not work as expected when cross compiling
         foreach (STANDARD gnu++11 gnu++0x)  # Fallback to gnu++0x on older GCC version
-            execute_process (COMMAND echo COMMAND ${CMAKE_CXX_COMPILER} -std=${STANDARD} -E - RESULT_VARIABLE GCC_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+            execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_CXX_COMPILER} -std=${STANDARD} -E - RESULT_VARIABLE GCC_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
             if (GCC_EXIT_CODE EQUAL 0)
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=${STANDARD}")
                 break ()
@@ -1822,6 +1820,7 @@ if (ANDROID)
         file (REMOVE ${ANDROID_LIBRARY_OUTPUT_PATH}/gdbserver)
     endif ()
     # Create symbolic links in the build tree
+    file (MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Android/assets)
     foreach (I CoreData Data)
         if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Android/assets/${I})
             create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
