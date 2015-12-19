@@ -820,13 +820,13 @@ macro (enable_pch HEADER_PATHNAME)
                     # At the moment it seems using the function is the "only way" to get the export flags into a CMake variable
                     # Additionally, CMake implementation of 'VISIBILITY_INLINES_HIDDEN' has a bug (tested in 2.8.12.2) that it erroneously sets the flag for C compiler too
                     add_compiler_export_flags (COMPILER_EXPORT_FLAGS)
-                    # To cater for Android/CMake toolchain which already adds -fPIC flags into the CMake C and CXX compiler flags and MinGW which already uses PIC for all codes
-                    if (NOT ANDROID AND NOT MINGW)
+                    # To cater for MinGW which already uses PIC for all codes
+                    if (NOT MINGW)
                         set (COMPILER_EXPORT_FLAGS "${COMPILER_EXPORT_FLAGS} -fPIC")
                     endif ()
                 elseif (PROJECT_NAME STREQUAL Urho3D AND NOT ${TARGET_NAME} STREQUAL Urho3D AND URHO3D_LIB_TYPE STREQUAL SHARED)
                     # If it is one of the Urho3D library dependency then use the same PIC flag as Urho3D library
-                    if (NOT ANDROID AND NOT MINGW)
+                    if (NOT MINGW)
                         set (COMPILER_EXPORT_FLAGS -fPIC)
                     endif ()
                 endif ()

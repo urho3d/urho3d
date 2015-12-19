@@ -1463,15 +1463,9 @@ if( MIPS AND BUILD_WITH_ANDROID_NDK AND ANDROID_NDK_RELEASE STREQUAL "r8" )
  set( CMAKE_EXE_LINKER_FLAGS    "-Wl,-T,${ANDROID_NDK_TOOLCHAINS_PATH}/${ANDROID_GCC_TOOLCHAIN_NAME}/mipself.x ${CMAKE_EXE_LINKER_FLAGS}" )
 endif()
 
-# pie/pic
-if( NOT (ANDROID_NATIVE_API_LEVEL LESS 16) AND (NOT DEFINED ANDROID_APP_PIE OR ANDROID_APP_PIE) AND (CMAKE_VERSION VERSION_GREATER 2.8.8) )
- set( CMAKE_POSITION_INDEPENDENT_CODE TRUE )
+# Urho3D: CMake is able to take care of the PIC flag by itself, so we only need to worry about the PIE flag for executable target targeting API level 16+ (Android 4.1+)
+if( NOT ANDROID_NATIVE_API_LEVEL LESS 16 )
  set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fPIE -pie")
-else()
- set( CMAKE_POSITION_INDEPENDENT_CODE FALSE )
- # Urho3D: Use upper case flags to be consistent with CMake (avoid both PIC and pic being added which may cause problem with suitabiblity selection of precompiled header)
- set( CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS}" )
- set( CMAKE_C_FLAGS   "-fPIC ${CMAKE_C_FLAGS}" )
 endif()
 
 # configure rtti
