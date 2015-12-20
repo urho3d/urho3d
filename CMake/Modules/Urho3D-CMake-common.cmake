@@ -481,16 +481,21 @@ if (URHO3D_C++11)
     add_definitions (-DURHO3D_CXX11)   # Note the define is NOT 'URHO3D_C++11'!
     if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
         # Use gnu++11/gnu++0x instead of c++11/c++0x as the latter does not work as expected when cross compiling
-        foreach (STANDARD gnu++11 gnu++0x)  # Fallback to gnu++0x on older GCC version
-            execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_CXX_COMPILER} -std=${STANDARD} -E - RESULT_VARIABLE GCC_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
-            if (GCC_EXIT_CODE EQUAL 0)
-                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=${STANDARD}")
-                break ()
+        if (VERIFIED_SUPPORTED_STANDARD)
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=${VERIFIED_SUPPORTED_STANDARD}")
+        else ()
+            foreach (STANDARD gnu++11 gnu++0x)  # Fallback to gnu++0x on older GCC version
+                execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_CXX_COMPILER} -std=${STANDARD} -E - RESULT_VARIABLE GCC_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+                if (GCC_EXIT_CODE EQUAL 0)
+                    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=${STANDARD}")
+                    set (VERIFIED_SUPPORTED_STANDARD ${STANDARD} CACHE INTERNAL "GNU extension of C++11 standard that is verified to be supported by the chosen compiler")
+                    break ()
+                endif ()
+            endforeach ()
+            if (NOT GCC_EXIT_CODE EQUAL 0)
+                execute_process (COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+                message (FATAL_ERROR "Your GCC version ${GCC_VERSION} is too old to enable C++11 standard")
             endif ()
-        endforeach ()
-        if (NOT GCC_EXIT_CODE EQUAL 0)
-            execute_process (COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION ERROR_QUIET)
-            message (FATAL_ERROR "Your GCC version ${GCC_VERSION} is too old to enable C++11 standard")
         endif ()
     elseif (CMAKE_CXX_COMPILER_ID MATCHES Clang)
         # Cannot set CMAKE_CXX_FLAGS here directly because CMake uses the same flags for both C++ and Object-C languages, the latter does not support c++11 standard
@@ -623,7 +628,6 @@ else ()
             # MinGW-specific setup
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static -static-libgcc -fno-keep-inline-dllexport")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libstdc++ -static-libgcc -fno-keep-inline-dllexport")
-            set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static")
             if (NOT URHO3D_64BIT)
                 # Prevent auto-vectorize optimization when using -O3, unless stack realign is being enforced globally
                 if (URHO3D_SSE)
