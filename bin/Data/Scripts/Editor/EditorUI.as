@@ -322,6 +322,7 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Open scene...", @PickFile, 'O', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Save scene", @SaveSceneWithExistingName, 'S', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Save scene as...", @PickFile, 'S', QUAL_SHIFT | QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Save scene as default", @SaveSceneAsDefault, 0, 0, false, "", true));
         recentSceneMenu = CreateMenuItem("Open recent scene", null, SHOW_POPUP_INDICATOR);
         popup.AddChild(recentSceneMenu);
         mruScenesPopup = CreatePopup(recentSceneMenu);

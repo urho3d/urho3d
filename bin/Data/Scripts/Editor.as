@@ -1,5 +1,6 @@
 // Urho3D editor
 
+#include "Scripts/Editor/DefaultScene.as"
 #include "Scripts/Editor/EditorHierarchyWindow.as"
 #include "Scripts/Editor/EditorView.as"
 #include "Scripts/Editor/EditorScene.as"

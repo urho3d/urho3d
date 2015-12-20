@@ -89,10 +89,7 @@ bool ResetScene()
 
     suppressSceneChanges = true;
 
-    // Create a scene with default values, these will be overridden when loading scenes
-    editorScene.Clear();
-    editorScene.CreateComponent("Octree");
-    editorScene.CreateComponent("DebugRenderer");
+    GetDefaultScene();
 
     // Release resources that became unused after the scene clear
     cache.ReleaseAllResources(false);
