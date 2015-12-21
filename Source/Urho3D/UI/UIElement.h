@@ -653,6 +653,8 @@ protected:
 private:
     /// Return child elements recursively.
     void GetChildrenRecursive(PODVector<UIElement*>& dest) const;
+    /// Recursively apply style to a child element hierarchy when adding to an element.
+    void ApplyStyleRecursive(UIElement* element);
     /// Calculate layout width for resizing the parent element.
     int CalculateLayoutParentSize(const PODVector<int>& sizes, int begin, int end, int spacing);
     /// Calculate child widths/positions in the layout.
@@ -698,6 +700,8 @@ private:
     bool colorGradient_;
     /// Default style file.
     SharedPtr<XMLFile> defaultStyle_;
+    /// Last applied style file.
+    WeakPtr<XMLFile> appliedStyleFile_;
     /// Traversal mode for rendering.
     TraversalMode traversalMode_;
     /// Flag whether node should send child added / removed events by itself.
