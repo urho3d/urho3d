@@ -1,0 +1,143 @@
+{
+	"id": 1,
+	"attributes": {
+		"Name": "",
+		"Time Scale": 1,
+		"Smoothing Constant": 50,
+		"Snap Threshold": 5,
+		"Elapsed Time": 0,
+		"Next Replicated Node ID": 7,
+		"Next Replicated Component ID": 7,
+		"Next Local Node ID": 16777217,
+		"Next Local Component ID": 16777228,
+		"Variables": {},
+		"Variable Names": ""
+	},
+	"components": [
+		{
+			"type": "Octree",
+			"id": 1,
+			"attributes": null
+		},
+		{
+			"type": "DebugRenderer",
+			"id": 2
+		}
+	],
+	"children": [
+		{
+			"id": 2,
+			"attributes": {
+				"Is Enabled": true,
+				"Name": "Sample",
+				"Position": "0 0.1 0",
+				"Rotation": "1 0 0 0",
+				"Scale": "1 1 1",
+				"Variables": {}
+			},
+			"components": [],
+			"children": [
+				{
+					"id": 3,
+					"attributes": {
+						"Is Enabled": true,
+						"Name": "Zone",
+						"Position": "0 0 0",
+						"Rotation": "1 0 0 0",
+						"Scale": "1 1 1",
+						"Variables": {}
+					},
+					"components": [
+						{
+							"type": "Zone",
+							"id": 3,
+							"attributes": {
+								"Bounding Box Min": "-1000 -1000 -1000",
+								"Bounding Box Max": "1000 1000 1000",
+								"Ambient Color": "0.5 0.5 0.5 1",
+								"Fog Color": "0.7 0.8 0.9 1",
+								"Fog Start": 10,
+								"Fog End": 100,
+								"Fog Height": -0.5,
+								"Fog Height Scale": 1,
+								"Height Fog Mode": true
+							}
+						}
+					],
+					"children": []
+				},
+				{
+					"id": 4,
+					"attributes": {
+						"Is Enabled": true,
+						"Name": "Plane",
+						"Position": "0 0 0",
+						"Rotation": "1 0 0 0",
+						"Scale": "1000 1000 1000",
+						"Variables": {}
+					},
+					"components": [
+						{
+							"type": "StaticModel",
+							"id": 4,
+							"attributes": {
+								"Model": "Model;Models/Plane.mdl",
+								"Material": "Material;",
+								"Cast Shadows": true
+							}
+						}
+					],
+					"children": []
+				},
+				{
+					"id": 5,
+					"attributes": {
+						"Is Enabled": true,
+						"Name": "Box",
+						"Position": "0 1 0",
+						"Rotation": "1 0 0 0",
+						"Scale": "2 2 2",
+						"Variables": {}
+					},
+					"components": [
+						{
+							"type": "StaticModel",
+							"id": 5,
+							"attributes": {
+								"Model": "Model;Models/Box.mdl",
+								"Material": "Material;Materials/Stone.xml",
+								"Cast Shadows": true
+							}
+						}
+					],
+					"children": []
+				},
+				{
+					"id": 6,
+					"attributes": {
+						"Is Enabled": true,
+						"Name": "Light",
+						"Position": "0 0 0",
+						"Rotation": "0.816497 0.408248 0.408248 -0",
+						"Scale": "1 1 1",
+						"Variables": {}
+					},
+					"components": [
+						{
+							"type": "Light",
+							"id": 6,
+							"attributes": {
+								"Light Type": "Directional",
+								"Color": "0.8 0.8 0.8 1",
+								"Cast Shadows": true,
+								"CSM Splits": "10 50 100 0",
+								"Depth Constant Bias": 5e-05
+							}
+						}
+					],
+					"children": []
+				}
+			]
+		}
+	]
+}

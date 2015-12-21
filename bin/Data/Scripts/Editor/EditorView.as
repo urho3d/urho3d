@@ -131,9 +131,8 @@ class ViewportContext
 
     void ResetCamera()
     {
-        cameraNode.position = Vector3(0, 5, -10);
-        // Look at the origin so user can see the scene.
-        cameraNode.rotation = Quaternion(Vector3(0, 0, 1), -cameraNode.position);
+        cameraNode.position = Vector3(5, 5, -5);
+        cameraNode.LookAt(Vector3(0, 0, 0));
         ReacquireCameraYawPitch();
         UpdateSettingsUI();
     }
