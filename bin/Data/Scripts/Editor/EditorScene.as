@@ -12,6 +12,8 @@ const int PICK_UI_ELEMENTS = 4;
 const int MAX_PICK_MODES = 5;
 const int MAX_UNDOSTACK_SIZE = 256;
 
+String customDefaultSceneFileName = fileSystem.GetAppPreferencesDir("urho3d", "Editor") + "DefaultScene.json";
+
 Scene@ editorScene;
 
 String instantiateFileName;
@@ -52,6 +54,26 @@ void ClearSceneSelection()
     HideGizmo();
 }
 
+void GetDefaultScene()
+{
+    editorScene.Clear();
+
+    if (!fileSystem.FileExists(customDefaultSceneFileName))
+    {
+        editorScene.LoadJSON(cache.GetFile("Scenes/DefaultScene.json"));
+        return;
+    }
+
+    editorScene.LoadJSON(cache.GetFile(customDefaultSceneFileName));
+}
+
+bool SaveSceneAsDefault()
+{
+    File file(customDefaultSceneFileName, FILE_WRITE);
+    editorScene.SaveJSON(file);
+    return true;
+}
+
 void CreateScene()
 {
     // Create a scene only once here
@@ -89,10 +111,7 @@ bool ResetScene()
 
     suppressSceneChanges = true;
 
-    // Create a scene with default values, these will be overridden when loading scenes
-    editorScene.Clear();
-    editorScene.CreateComponent("Octree");
-    editorScene.CreateComponent("DebugRenderer");
+    GetDefaultScene();
 
     // Release resources that became unused after the scene clear
     cache.ReleaseAllResources(false);
