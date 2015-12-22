@@ -45,6 +45,10 @@
 #include <unistd.h>
 #endif
 
+#if defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__)
+#include <emscripten/threading.h>
+#endif
+
 #if defined(_MSC_VER)
 #include <float.h>
 #elif !defined(ANDROID) && !defined(IOS) && !defined(RPI) && !defined(__EMSCRIPTEN__)
@@ -399,13 +403,16 @@ unsigned GetNumPhysicalCPUs()
 #endif
 #elif defined(ANDROID) || defined(RPI)
     return GetArmCPUCount();
-#elif !defined(__EMSCRIPTEN__)
+#elif defined(__EMSCRIPTEN__)
+#ifdef __EMSCRIPTEN_PTHREADS__
+    return emscripten_num_logical_cores();
+#else
+    return 1; // Targeting a single-threaded Emscripten build.
+#endif
+#else
     struct cpu_id_t data;
     GetCPUData(&data);
     return (unsigned)data.num_cores;
-#else
-    /// \todo Implement properly
-    return 1;
 #endif
 }
 
@@ -421,13 +428,16 @@ unsigned GetNumLogicalCPUs()
 #endif
 #elif defined(ANDROID) || defined (RPI)
     return GetArmCPUCount();
-#elif !defined(__EMSCRIPTEN__)
+#elif defined(__EMSCRIPTEN__)
+#ifdef __EMSCRIPTEN_PTHREADS__
+    return emscripten_num_logical_cores();
+#else
+    return 1; // Targeting a single-threaded Emscripten build.
+#endif
+#else
     struct cpu_id_t data;
     GetCPUData(&data);
     return (unsigned)data.num_logical_cpus;
-#else
-    /// \todo Implement properly
-    return 1;
 #endif
 }
 
