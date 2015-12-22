@@ -330,7 +330,7 @@ task :ci_emscripten_samples_update do
   # Pull or clone
   system 'cd ../doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../doc-Build' or abort 'Failed to pull/clone'
   # Sync Emscripten samples
-  system "rsync -a --delete --exclude tool ../Build/bin/ ../doc-Build/samples" or abort 'Failed to rsync Emscripten samples'
+  system "rsync -a --delete --exclude tool --exclude *.pak ../Build/bin/ ../doc-Build/samples" or abort 'Failed to rsync Emscripten samples'
   # Update Emscripten json data file
   update_emscripten_data or abort 'Failed to update Emscripten json data file'
   root_commit, _ = get_root_commit_and_recipients
