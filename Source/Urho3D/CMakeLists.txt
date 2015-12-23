@@ -243,7 +243,10 @@ endif ()
 set_output_directories (${OUTPUT_PATH} ARCHIVE LIBRARY)
 
 # Setup target
-setup_library (${URHO3D_LIB_TYPE})
+if (IOS)
+    set (EXCLUDE_FROM_ALL EXCLUDE_FROM_ALL)
+endif ()
+setup_library (${URHO3D_LIB_TYPE} ${EXCLUDE_FROM_ALL})
 if (NOT ANDROID AND NOT EMSCRIPTEN)
     file (READ .soversion SOVERSION)
     string (STRIP ${SOVERSION} SOVERSION)
@@ -257,7 +260,9 @@ elseif (EMSCRIPTEN)
     # Emscripten does not support generation of shared library in a conventional sense, it just produces "linked" LLVM bitcode
     set (CMAKE_SHARED_LIBRARY_SUFFIX ".bc")
 endif ()
-install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
+if (NOT IOS)
+    install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
+endif ()
 if (WIN32 AND URHO3D_LIB_TYPE STREQUAL SHARED)
     set (URHO3D_DLL_INSTALLED TRUE)
 endif ()
@@ -267,10 +272,11 @@ if (APPLE)
     if (IOS)
         setup_ios_linker_flags (LINKER_FLAGS)
         # Add a custom target to build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
-        add_custom_target (${TARGET_NAME}_universal
+        add_custom_target (${TARGET_NAME}_universal ALL
             COMMAND if lipo -info $<TARGET_FILE:${TARGET_NAME}> 2>/dev/null |grep -cq 'i386.*armv7'\; then echo $<TARGET_FILE:${TARGET_NAME}> is already a Mach-O universal binary consisting of both iphoneos and iphonesimulator archs\; else mv $<TARGET_FILE:${TARGET_NAME}>{,.ori} && if lipo -info $<TARGET_FILE:${TARGET_NAME}>.ori 2>/dev/null |grep -cq i386\; then sdk=iphoneos\; else sdk=iphonesimulator\; fi && xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk $$sdk 2>&1 && mv $<TARGET_FILE:${TARGET_NAME}>{,.new} && lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{,.ori,.new} && rm $<TARGET_FILE:${TARGET_NAME}>{.ori,.new}\; fi
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Creating Mach-O universal binary library consisting of both iphoneos and iphonesimulator archs")
+        install (FILES $<TARGET_FILE:${TARGET_NAME}> DESTINATION ${DEST_LIBRARY_DIR})
     else ()
         # Intentionally use built-in CMAKE_EXE_LINKER_FLAGS here although CMake does not use it when building library, but the variable would be used later when configuring Urho3D.pc for MacOSX platform
         setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
