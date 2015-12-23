@@ -201,7 +201,7 @@ end
 desc 'Build and run the Annotate tool (temporary)'
 task :ci_annotate do
   system 'rake cmake URHO3D_CLANG_TOOLS=1 && rake make annotate' or abort 'Failed to annotate'
-  system "git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && if git fetch origin clang-tools:clang-tools 2>/dev/null; then git push -qf origin --delete clang-tools; fi && git checkout -B clang-tools && git stash -q && git reset --hard HEAD~ && git stash pop -q && sed -i \"s/COVERITY_SCAN_THRESHOLD/URHO3D_PCH=0 URHO3D_BINDINGS=1 COVERITY_SCAN_THRESHOLD/g\" .travis.yml && git add -A .travis.yml Source/Urho3D && if git commit -qm 'Result of Annotator tool. [ci only: clang-tools]'; then git push -q -u origin clang-tools >/dev/null 2>&1; fi" or abort 'Failed to push clang-tools branch'
+  system "git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && if git fetch origin clang-tools:clang-tools 2>/dev/null; then git push -qf origin --delete clang-tools; fi && git checkout -B clang-tools && git stash -q && git reset --hard HEAD~ && git stash pop -q && sed -i \"s/COVERITY_SCAN_THRESHOLD/URHO3D_PCH=0 URHO3D_BINDINGS=1 COVERITY_SCAN_THRESHOLD/g\" .travis.yml && git add -A .travis.yml Source/Urho3D && if git commit -qm 'Result of Annotator tool. [skip appveyor] [ci only: clang-tools]'; then git push -q -u origin clang-tools >/dev/null 2>&1; fi" or abort 'Failed to push clang-tools branch'
 end
 
 # Usage: NOT intended to be used manually
