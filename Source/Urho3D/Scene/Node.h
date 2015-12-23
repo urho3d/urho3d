@@ -97,6 +97,8 @@ public:
     void SetName(const String& name);
 	/// Set tag for the scene node. 
 	void SetTag(const StringHash& tag);
+	/// Set tag string for the scene node. 
+	void SetTagString(const String& tag);
 	/// Set position in parent space. If the scene node is on the root level (is child of the scene itself), this is same as world space.
     void SetPosition(const Vector3& position);
 
@@ -309,7 +311,8 @@ public:
 
 	/// Return the tag.
 	const StringHash& GetTag() const;
-
+	/// Return the tag as a string.
+	const String& GetTagString() const;
     /// Return parent scene node.
     Node* GetParent() const { return parent_; }
 
@@ -651,6 +654,8 @@ private:
     String name_;
 	/// Tag.
 	StringHash tag_;
+	/// Tag String.
+	String tagString_;
     /// Name hash.
     StringHash nameHash_;
     /// Attribute buffer for network updates.
