@@ -11269,7 +11269,7 @@ bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetData(Image, bool = false);
 void SetNumLevels(uint);
-bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC);
+bool SetSize(int, int, int, uint, TextureUsage = TEXTURE_STATIC);
 
 // Properties:
 Array<TextureAddressMode> addressMode;
@@ -11300,8 +11300,6 @@ Array<int> mipsToSkip;
 String name;
 /* readonly */
 int refs;
-/* readonly */
-RenderSurface renderSurface;
 bool sRGB;
 /* readonly */
 StringHash type;

@@ -185,6 +185,7 @@ namespace Urho3D
 <a href="#Class_Text3D"><b>Text3D</b></a>
 <a href="#Class_Texture"><b>Texture</b></a>
 <a href="#Class_Texture2D"><b>Texture2D</b></a>
+<a href="#Class_Texture3D"><b>Texture3D</b></a>
 <a href="#Class_TextureCube"><b>TextureCube</b></a>
 <a href="#Class_TextureFrame"><b>TextureFrame</b></a>
 <a href="#Class_Tile2D"><b>Tile2D</b></a>
@@ -6037,6 +6038,17 @@ Methods:
 Properties:
 
 - RenderSurface* renderSurface (readonly)
+
+<a name="Class_Texture3D"></a>
+### Texture3D : Texture
+
+Methods:
+
+- Texture3D() (GC)
+- Texture3D* new()
+- void delete()
+- bool SetSize(int width, int height, int depth, unsigned format, TextureUsage usage = TEXTURE_STATIC)
+- bool SetData(Image* image, bool useAlpha = false)
 
 <a name="Class_TextureCube"></a>
 ### TextureCube : Texture

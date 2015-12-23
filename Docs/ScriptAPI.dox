@@ -12335,7 +12335,7 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetData(Image@, bool = false)
 - void SetNumLevels(uint)
-- bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC)
+- bool SetSize(int, int, int, uint, TextureUsage = TEXTURE_STATIC)
 
 Properties:
 
@@ -12356,7 +12356,6 @@ Properties:
 - int[] mipsToSkip
 - String name
 - int refs // readonly
-- RenderSurface@ renderSurface // readonly
 - bool sRGB
 - StringHash type // readonly
 - String typeName // readonly
