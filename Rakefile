@@ -720,11 +720,6 @@ def xcode_ci
   end
   system "./cmake_macosx.sh ../Build -DIOS=$IOS #{$build_options} -DURHO3D_DATABASE_SQLITE=1 -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
   xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj') or abort 'Failed to build or test Urho3D library'
-  if ENV['IOS']
-    # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
-    system 'echo Rebuilding Urho3D library as Mach-O universal binary...'
-    xcode_build(0, '../Build/Urho3D.xcodeproj', 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
-  end
   unless ENV['CI'] && ENV['IOS'] && ENV['PACKAGE_UPLOAD']   # Skip scaffolding test when packaging for iOS
     # Create a new project on the fly that uses newly built Urho3D library in the build tree
     scaffolding "../Build/generated/UsingBuildTree"
