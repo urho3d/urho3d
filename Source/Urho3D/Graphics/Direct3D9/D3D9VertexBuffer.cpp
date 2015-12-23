@@ -46,7 +46,8 @@ const unsigned VertexBuffer::elementSize[] =
     4 * sizeof(unsigned char), // Blendindices
     4 * sizeof(float), // Instancematrix1
     4 * sizeof(float), // Instancematrix2
-    4 * sizeof(float) // Instancematrix3
+    4 * sizeof(float), // Instancematrix3
+    sizeof(int) // Object index, not supported on D3D9 but allowed for vertex data compatibility
 };
 
 VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :

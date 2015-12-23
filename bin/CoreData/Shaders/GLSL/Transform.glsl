@@ -21,6 +21,7 @@ attribute vec4 iCubeTexCoord2;
     attribute vec4 iInstanceMatrix2;
     attribute vec4 iInstanceMatrix3;
 #endif
+attribute float iObjectIndex;
 
 #ifdef SKINNED
 mat4 GetSkinMatrix(vec4 blendWeights, vec4 blendIndices)

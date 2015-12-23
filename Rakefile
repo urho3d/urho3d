@@ -100,7 +100,7 @@ task :make do
   cmake_build_options = ''
   build_options = ''
   unfilter = false
-  ['config', 'target', 'sdk'].each { |var| ARGV << "#{var}=\"#{ENV[var]}\"" if ENV[var] and !ARGV.include? var }
+  ['config', 'target', 'sdk'].each { |var| ARGV << "#{var}=\"#{ENV[var]}\"" if ENV[var] and !ARGV.find { |arg| /#{var}=/ =~ arg } }
   ARGV.each { |option|
     task option.to_sym do ; end; Rake::Task[option].clear   # No-op hack
     case option
@@ -330,7 +330,7 @@ task :ci_emscripten_samples_update do
   # Pull or clone
   system 'cd ../doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../doc-Build' or abort 'Failed to pull/clone'
   # Sync Emscripten samples
-  system "rsync -a --delete --exclude tool ../Build/bin/ ../doc-Build/samples" or abort 'Failed to rsync Emscripten samples'
+  system "rsync -a --delete --exclude tool --exclude *.pak ../Build/bin/ ../doc-Build/samples" or abort 'Failed to rsync Emscripten samples'
   # Update Emscripten json data file
   update_emscripten_data or abort 'Failed to update Emscripten json data file'
   root_commit, _ = get_root_commit_and_recipients
@@ -403,16 +403,6 @@ task :ci_package_upload do
   end
   # Make the package
   if ENV['IOS']
-    # Skip Mach-O universal binary build if Travis-CI VM took too long to get here, as otherwise overall build time may exceed 50 minutes time limit
-    if ENV['CI_START_TIME'] then
-      elapsed_time = (Time.now - Time.at(ENV['CI_START_TIME'].to_i)) / 60
-      puts "\niOS checkpoint reached, elapsed time: #{elapsed_time}\n\n"
-    end
-    if !ENV['CI_START_TIME'] || elapsed_time < 20 # minutes
-      # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
-      system 'echo Rebuilding Urho3D library as Mach-O universal binary...'
-      xcode_build(0, '../Build/Urho3D.xcodeproj', 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
-    end
     # There is a bug in CMake/CPack that causes the 'package' target failed to build for IOS platform, workaround by calling cpack directly
     system 'cd ../Build && cpack -G TGZ 2>/dev/null' or abort 'Failed to make binary package'
   elsif ENV['XCODE']
@@ -730,6 +720,11 @@ def xcode_ci
   end
   system "./cmake_macosx.sh ../Build -DIOS=$IOS #{$build_options} -DURHO3D_DATABASE_SQLITE=1 -DURHO3D_LUA#{jit}=1 #{amalg} -DURHO3D_SAMPLES=1 -DURHO3D_TOOLS=1 -DURHO3D_EXTRAS=1 -DURHO3D_TESTING=#{$testing}" or abort 'Failed to configure Urho3D library build'
   xcode_build(ENV['IOS'], '../Build/Urho3D.xcodeproj') or abort 'Failed to build or test Urho3D library'
+  if ENV['IOS']
+    # Build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
+    system 'echo Rebuilding Urho3D library as Mach-O universal binary...'
+    xcode_build(0, '../Build/Urho3D.xcodeproj', 'Urho3D_universal') or abort 'Failed to build Mach-O universal binary'
+  end
   unless ENV['CI'] && ENV['IOS'] && ENV['PACKAGE_UPLOAD']   # Skip scaffolding test when packaging for iOS
     # Create a new project on the fly that uses newly built Urho3D library in the build tree
     scaffolding "../Build/generated/UsingBuildTree"

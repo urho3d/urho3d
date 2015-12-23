@@ -7650,6 +7650,7 @@ Properties:
 - int ELEMENT_INSTANCEMATRIX1
 - int ELEMENT_INSTANCEMATRIX2
 - int ELEMENT_INSTANCEMATRIX3
+- int ELEMENT_OBJECTINDEX
 - int MAX_VERTEX_ELEMENTS
 
 ### VerticalAlignment
@@ -8002,6 +8003,7 @@ Properties:
 - unsigned MASK_INSTANCEMATRIX3
 - unsigned MASK_NONE
 - unsigned MASK_NORMAL
+- unsigned MASK_OBJECTINDEX
 - unsigned MASK_POSITION
 - unsigned MASK_TANGENT
 - unsigned MASK_TEXCOORD1
