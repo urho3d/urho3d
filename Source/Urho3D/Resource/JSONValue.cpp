@@ -559,8 +559,13 @@ VariantMap JSONValue::GetVariantMap() const
 void JSONValue::SetVariantVector(const VariantVector& variantVector, Context* context)
 {
     SetType(JSON_ARRAY);
+    arrayValue_->Reserve(variantVector.Size());
     for (unsigned i = 0; i < variantVector.Size(); ++i)
-        (*this)[i].SetVariant(variantVector[i]);
+    {
+        JSONValue val;
+        val.SetVariant(variantVector[i]);
+        arrayValue_->Push(val);
+    }
 }
 
 VariantVector JSONValue::GetVariantVector() const
