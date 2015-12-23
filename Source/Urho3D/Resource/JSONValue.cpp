@@ -563,7 +563,7 @@ void JSONValue::SetVariantVector(const VariantVector& variantVector, Context* co
     for (unsigned i = 0; i < variantVector.Size(); ++i)
     {
         JSONValue val;
-        val.SetVariant(variantVector[i]);
+        val.SetVariant(variantVector[i], context);
         arrayValue_->Push(val);
     }
 }
