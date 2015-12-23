@@ -1036,7 +1036,7 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
             return '?';
         }
         else
-            return ((word1 & 0x3ff) << 10) | (word2 & 0x3ff) | 0x10000;
+            return (((word1 & 0x3ff) << 10) | (word2 & 0x3ff)) + 0x10000;
     }
 }
 #endif
