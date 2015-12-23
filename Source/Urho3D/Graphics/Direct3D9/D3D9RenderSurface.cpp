@@ -108,10 +108,7 @@ void RenderSurface::QueueUpdate()
 void RenderSurface::Release()
 {
     Graphics* graphics = parentTexture_->GetGraphics();
-    if (!graphics)
-        return;
-
-    if (surface_)
+    if (graphics)
     {
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         {
@@ -121,10 +118,9 @@ void RenderSurface::Release()
 
         if (graphics->GetDepthStencil() == this)
             graphics->ResetDepthStencil();
-
-        ((IDirect3DSurface9*)surface_)->Release();
-        surface_ = 0;
     }
+
+    URHO3D_SAFE_RELEASE(surface_);
 }
 
 int RenderSurface::GetWidth() const
