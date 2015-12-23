@@ -27,5 +27,14 @@ using namespace Urho3D;
 
 int main(int argc, char* argv[])
 {
-    std::cout << GetRevision();
+    std::cout << GetRevision() << "\n";
+
+#ifdef URHO3D_OPENGL
+    std::cout << "#define URHO3D_OPENGL\n";
+#elif defined(URHO3D_D3D11)
+    std::cout << "#define URHO3D_D3D11\n";
+#endif
+#ifdef URHO3D_SSE
+    std::cout << "#define URHO3D_SSE\n";
+#endif
 }
