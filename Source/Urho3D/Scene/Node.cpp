@@ -79,7 +79,8 @@ void Node::RegisterObject(Context* context)
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_DEFAULT);
-	URHO3D_ACCESSOR_ATTRIBUTE("Tag", GetTag, SetTag, StringHash, StringHash::ZERO, AM_DEFAULT);
+	URHO3D_ACCESSOR_ATTRIBUTE("Tag", GetTag, SetTag, StringHash, StringHash::ZERO, AM_DEFAULT | AM_NOEDIT);
+	URHO3D_ACCESSOR_ATTRIBUTE("TagString", GetTagString, SetTagString, String, String::EMPTY, AM_FILE | AM_EDIT);
 	URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Scale", GetScale, SetScale, Vector3, Vector3::ONE, AM_DEFAULT);
@@ -366,6 +367,13 @@ void Node::SetTag(const StringHash& tag)
 			scene_->SendEvent(E_NODETAGCHANGED, eventData);
 		}
 	}
+}
+
+void Node::SetTagString(const String & tag)
+{
+	StringHash id(tag);
+	tagString_ = tag;
+	SetTag(id);
 }
 
 void Node::SetPosition(const Vector3& position)
@@ -1235,6 +1243,13 @@ bool Node::HasTag(StringHash tag) const
 const StringHash& Node::GetTag() const
 {
 	return tag_;
+}
+
+const String & Node::GetTagString() const
+{
+	if (tagString_.Empty() && scene_)
+		return scene_->GetTagName(tag_);
+	return tagString_;
 }
 
 const Variant& Node::GetVar(StringHash key) const

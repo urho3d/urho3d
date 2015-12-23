@@ -761,7 +761,8 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
 	engine->RegisterObjectMethod(className, "bool HasTag(const StringHash&in)", asMETHOD(T, HasTag), asCALL_THISCALL);
 	engine->RegisterObjectMethod(className, "StringHash get_tag()", asMETHOD(T, GetTag), asCALL_THISCALL);
 	engine->RegisterObjectMethod(className, "void set_tag(const StringHash&in)", asMETHOD(T, SetTag), asCALL_THISCALL);
-
+	engine->RegisterObjectMethod(className, "const String& get_tagString()", asMETHOD(T, GetTagString), asCALL_THISCALL);
+	engine->RegisterObjectMethod(className, "void set_tagName(const String&in)", asMETHOD(T, SetTagString), asCALL_THISCALL);
 }
 
 static bool ResourceLoad(File* file, XMLFile* ptr)
