@@ -139,6 +139,8 @@ enum VertexElement
     ELEMENT_INSTANCEMATRIX1,
     ELEMENT_INSTANCEMATRIX2,
     ELEMENT_INSTANCEMATRIX3,
+    // Custom 32-bit integer object index. Due to API limitations, not supported on D3D9
+    ELEMENT_OBJECTINDEX,
     MAX_VERTEX_ELEMENTS
 };
 
@@ -361,6 +363,7 @@ static const unsigned MASK_BLENDINDICES = 0x200;
 static const unsigned MASK_INSTANCEMATRIX1 = 0x400;
 static const unsigned MASK_INSTANCEMATRIX2 = 0x800;
 static const unsigned MASK_INSTANCEMATRIX3 = 0x1000;
+static const unsigned MASK_OBJECTINDEX = 0x2000;
 static const unsigned MASK_DEFAULT = 0xffffffff;
 static const unsigned NO_ELEMENT = 0xffffffff;
 

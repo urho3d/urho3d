@@ -188,16 +188,19 @@ else ()
         endif ()
     endif ()
     # Ensure the module has found the library with the right ABI for the chosen compiler and URHO3D_64BIT build option
-    if (URHO3D_LIBRARIES AND NOT IOS)
+    if (URHO3D_LIBRARIES)
         if (NOT URHO3D_64BIT AND NOT MSVC AND NOT MINGW AND NOT ANDROID AND NOT RPI AND NOT EMSCRIPTEN)
             set (COMPILER_32BIT_FLAG -DCOMPILE_DEFINITIONS:STRING=-m32)
         endif ()
-        if (ANDROID)
+        if (IOS)
+            set (CMAKE_OSX_SYSROOT iphoneos)   # Since this is anyway the correct sysroot setting for IOS platform, we do not revert the setting back after we are done
+            set (IOS_FLAGS -DCMAKE_MACOSX_BUNDLE=1 -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=0)
+        elseif (ANDROID)
             set (ANDROID_LIBRARIES "log\;android\;GLESv1_CM\;GLESv2")
         endif ()
-        # xxx_LIBRARIES variable is only populated when targeting respective platform and empty otherwise, so it is safe to always append the variable
+        # BCM_VC_LIBRARIES variable is already set by FindBCM_VC module on RPI platform
         try_compile (COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
-            CMAKE_FLAGS -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES}\;${BCM_VC_LIBRARIES}\;${ANDROID_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_32BIT_FLAG} ${COMPILER_STATIC_FLAG}
+            CMAKE_FLAGS ${IOS_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES}\;${BCM_VC_LIBRARIES}\;${ANDROID_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_32BIT_FLAG} ${COMPILER_STATIC_FLAG}
             OUTPUT_VARIABLE TRY_COMPILE_OUT)
     endif ()
     # For shared library type, also initialize the URHO3D_DLL variable for later use

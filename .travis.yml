@@ -325,7 +325,7 @@ env:
 matrix:
   fast_finish: true
 before_script:
-  - if [ $IOS ]; then export CI_START_TIME=$(date +%s); fi
+  - SECONDS=0
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
@@ -337,7 +337,7 @@ before_script:
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
   - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done; fi
   - rake ci_setup_cache
-script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
+script: rake ci && if [ $PACKAGE_UPLOAD ] && (($SECONDS / 60 < 40)); then rake ci_package_upload; fi
 after_script: rake ci_teardown_cache
 
 ---
