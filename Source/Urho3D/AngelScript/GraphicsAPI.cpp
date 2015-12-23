@@ -703,6 +703,7 @@ static void RegisterBuffers(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX1", (void*)&MASK_INSTANCEMATRIX1);
     engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX2", (void*)&MASK_INSTANCEMATRIX2);
     engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX3", (void*)&MASK_INSTANCEMATRIX3);
+    engine->RegisterGlobalProperty("const uint MASK_OBJECTINDEX", (void*)&MASK_OBJECTINDEX);
     engine->RegisterGlobalProperty("const uint MASK_DEFAULT", (void*)&MASK_DEFAULT);
 
     engine->RegisterEnum("PrimitiveType");

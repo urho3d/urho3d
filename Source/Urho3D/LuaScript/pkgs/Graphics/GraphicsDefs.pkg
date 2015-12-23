@@ -93,6 +93,7 @@ enum VertexElement
     ELEMENT_INSTANCEMATRIX1,
     ELEMENT_INSTANCEMATRIX2,
     ELEMENT_INSTANCEMATRIX3,
+    ELEMENT_OBJECTINDEX,
     MAX_VERTEX_ELEMENTS
 };
 
@@ -211,4 +212,5 @@ static const unsigned MASK_BLENDINDICES;
 static const unsigned MASK_INSTANCEMATRIX1;
 static const unsigned MASK_INSTANCEMATRIX2;
 static const unsigned MASK_INSTANCEMATRIX3;
+static const unsigned MASK_OBJECTINDEX;
 static const unsigned MASK_DEFAULT;
