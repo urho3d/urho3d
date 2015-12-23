@@ -1,6 +1,7 @@
 <elements>
     <element type="BorderImage" >
         <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Blend Mode" value="alpha" />
     </element>
     <element type="Button" style="BorderImage">
         <attribute name="Image Rect" value="16 0 32 16" />
