@@ -310,31 +310,12 @@ Graphics::~Graphics()
 
     vertexDeclarations_.Clear();
 
-    if (impl_->defaultColorSurface_)
-    {
-        impl_->defaultColorSurface_->Release();
-        impl_->defaultColorSurface_ = 0;
-    }
-    if (impl_->defaultDepthStencilSurface_)
-    {
-        impl_->defaultDepthStencilSurface_->Release();
-        impl_->defaultDepthStencilSurface_ = 0;
-    }
-    if (impl_->frameQuery_)
-    {
-        impl_->frameQuery_->Release();
-        impl_->frameQuery_ = 0;
-    }
-    if (impl_->device_)
-    {
-        impl_->device_->Release();
-        impl_->device_ = 0;
-    }
-    if (impl_->interface_)
-    {
-        impl_->interface_->Release();
-        impl_->interface_ = 0;
-    }
+    URHO3D_SAFE_RELEASE(impl_->defaultColorSurface_);
+    URHO3D_SAFE_RELEASE(impl_->defaultDepthStencilSurface_);
+    URHO3D_SAFE_RELEASE(impl_->frameQuery_);
+    URHO3D_SAFE_RELEASE(impl_->device_);
+    URHO3D_SAFE_RELEASE(impl_->interface_);
+
     if (impl_->window_)
     {
         SDL_ShowCursor(SDL_TRUE);
