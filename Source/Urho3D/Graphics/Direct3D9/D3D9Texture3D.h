@@ -65,17 +65,10 @@ public:
     /// Get data from a mip level. The destination buffer must be big enough. Return true if successful.
     bool GetData(unsigned level, void* dest) const;
 
-    /// Return render surface.
-    RenderSurface* GetRenderSurface() const { return renderSurface_; }
-
 private:
     /// Create texture.
     bool Create();
-    /// Handle render surface update event.
-    void HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData);
 
-    /// Render surface.
-    SharedPtr<RenderSurface> renderSurface_;
     /// Image file acquired during BeginLoad.
     SharedPtr<Image> loadImage_;
     /// Parameter file acquired during BeginLoad.

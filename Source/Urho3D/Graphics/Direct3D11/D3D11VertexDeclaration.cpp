@@ -68,25 +68,21 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertex
     if (elementDescs.Empty())
         return;
 
-    ID3D11InputLayout* d3dInputLayout = 0;
     const PODVector<unsigned char>& byteCode = vertexShader->GetByteCode();
 
-    graphics->GetImpl()->GetDevice()->CreateInputLayout(&elementDescs[0], (UINT)elementDescs.Size(), &byteCode[0],
-        byteCode.Size(), &d3dInputLayout);
-    if (d3dInputLayout)
-        inputLayout_ = d3dInputLayout;
-    else
-        URHO3D_LOGERRORF("Failed to create input layout for shader %s, missing element mask %d",
-            vertexShader->GetFullName().CString(), vertexShader->GetElementMask() & ~vbElementMask);
+    HRESULT hr = graphics->GetImpl()->GetDevice()->CreateInputLayout(&elementDescs[0], (UINT)elementDescs.Size(), &byteCode[0],
+        byteCode.Size(), (ID3D11InputLayout**)&inputLayout_);
+    if (FAILED(hr))
+    {
+        URHO3D_SAFE_RELEASE(inputLayout_);
+        URHO3D_LOGERRORF("Failed to create input layout for shader %s, missing element mask %d (HRESULT %x)",
+            vertexShader->GetFullName().CString(), vertexShader->GetElementMask() & ~vbElementMask, (unsigned)hr);
+    }
 }
 
 VertexDeclaration::~VertexDeclaration()
 {
-    if (inputLayout_)
-    {
-        ((ID3D11InputLayout*)inputLayout_)->Release();
-        inputLayout_ = 0;
-    }
+    URHO3D_SAFE_RELEASE(inputLayout_);
 }
 
 }
