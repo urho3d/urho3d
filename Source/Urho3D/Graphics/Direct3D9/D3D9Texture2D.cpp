@@ -133,32 +133,29 @@ void Texture2D::OnDeviceReset()
 
 void Texture2D::Release()
 {
-    if (object_)
+    if (graphics_)
     {
-        if (!graphics_)
-            return;
-
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
             if (graphics_->GetTexture(i) == this)
                 graphics_->SetTexture(i, 0);
         }
-
-        if (renderSurface_)
-            renderSurface_->Release();
-
-        ((IDirect3DTexture9*)object_)->Release();
-        object_ = 0;
     }
-    else
-    {
-        if (renderSurface_)
-            renderSurface_->Release();
-    }
+
+    if (renderSurface_)
+        renderSurface_->Release();
+
+    URHO3D_SAFE_RELEASE(object_);
 }
 
 bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usage)
 {
+    if (width <= 0 || height <= 0)
+    {
+        URHO3D_LOGERROR("Zero or negative texture dimensions");
+        return false;
+    }
+
     // Delete the old rendersurface if any
     renderSurface_.Reset();
     pool_ = D3DPOOL_MANAGED;
@@ -251,9 +248,10 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && pool_ == D3DPOOL_DEFAULT)
         flags |= D3DLOCK_DISCARD;
 
-    if (FAILED(((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags)))
+    HRESULT hr = ((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Could not lock texture");
+        URHO3D_LOGD3DERROR("Could not lock texture", hr);
         return false;
     }
 
@@ -486,26 +484,35 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         }
 
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
-        device->CreateOffscreenPlainSurface((UINT)width_, (UINT)height_, (D3DFORMAT)format_,
+        HRESULT hr = device->CreateOffscreenPlainSurface((UINT)width_, (UINT)height_, (D3DFORMAT)format_,
             D3DPOOL_SYSTEMMEM, &offscreenSurface, 0);
-        if (!offscreenSurface)
+        if (FAILED(hr))
         {
-            URHO3D_LOGERROR("Could not create surface for getting rendertarget data");
+            URHO3D_SAFE_RELEASE(offscreenSurface);
+            URHO3D_LOGD3DERROR("Could not create surface for getting rendertarget data", hr);
             return false;
         }
-        device->GetRenderTargetData((IDirect3DSurface9*)renderSurface_->GetSurface(), offscreenSurface);
-        if (FAILED(offscreenSurface->LockRect(&d3dLockedRect, &d3dRect, D3DLOCK_READONLY)))
+        hr = device->GetRenderTargetData((IDirect3DSurface9*)renderSurface_->GetSurface(), offscreenSurface);
+        if (FAILED(hr))
         {
-            URHO3D_LOGERROR("Could not lock surface for getting rendertarget data");
+            URHO3D_LOGD3DERROR("Could not get rendertarget data", hr);
+            offscreenSurface->Release();
+            return false;
+        }
+        hr = offscreenSurface->LockRect(&d3dLockedRect, &d3dRect, D3DLOCK_READONLY);
+        if (FAILED(hr))
+        {
+            URHO3D_LOGD3DERROR("Could not lock surface for getting rendertarget data", hr);
             offscreenSurface->Release();
             return false;
         }
     }
     else
     {
-        if (FAILED(((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, &d3dRect, D3DLOCK_READONLY)))
+        HRESULT hr = ((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, &d3dRect, D3DLOCK_READONLY);
+        if (FAILED(hr))
         {
-            URHO3D_LOGERROR("Could not lock texture");
+            URHO3D_LOGD3DERROR("Could not lock texture", hr);
             return false;
         }
     }
@@ -591,7 +598,7 @@ bool Texture2D::Create()
     // If creating a depth-stencil texture, and it is not supported, create a depth-stencil surface instead
     if (usage_ & D3DUSAGE_DEPTHSTENCIL && !graphics_->GetImpl()->CheckFormatSupport((D3DFORMAT)format_, usage_, D3DRTYPE_TEXTURE))
     {
-        if (!device || FAILED(device->CreateDepthStencilSurface(
+        HRESULT hr = device->CreateDepthStencilSurface(
             (UINT)width_,
             (UINT)height_,
             (D3DFORMAT)format_,
@@ -599,9 +606,11 @@ bool Texture2D::Create()
             0,
             FALSE,
             (IDirect3DSurface9**)&renderSurface_->surface_,
-            0)))
+            0);
+        if (FAILED(hr))
         {
-            URHO3D_LOGERROR("Could not create depth-stencil surface");
+            URHO3D_SAFE_RELEASE(renderSurface_->surface_);
+            URHO3D_LOGD3DERROR("Could not create depth-stencil surface", hr);
             return false;
         }
 
@@ -609,7 +618,7 @@ bool Texture2D::Create()
     }
     else
     {
-        if (!device || FAILED(graphics_->GetImpl()->GetDevice()->CreateTexture(
+        HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture(
             (UINT)width_,
             (UINT)height_,
             requestedLevels_,
@@ -617,16 +626,22 @@ bool Texture2D::Create()
             (D3DFORMAT)format_,
             (D3DPOOL)pool_,
             (IDirect3DTexture9**)&object_,
-            0)))
+            0);
+        if (FAILED(hr))
         {
-            URHO3D_LOGERROR("Could not create texture");
+            URHO3D_SAFE_RELEASE(object_);
+            URHO3D_LOGD3DERROR("Could not create texture", hr);
             return false;
         }
 
         levels_ = ((IDirect3DTexture9*)object_)->GetLevelCount();
 
         if (usage_ & (D3DUSAGE_RENDERTARGET | D3DUSAGE_DEPTHSTENCIL))
-            ((IDirect3DTexture9*)object_)->GetSurfaceLevel(0, (IDirect3DSurface9**)&renderSurface_->surface_);
+        {
+            hr = ((IDirect3DTexture9*)object_)->GetSurfaceLevel(0, (IDirect3DSurface9**)&renderSurface_->surface_);
+            if (FAILED(hr))
+                URHO3D_LOGD3DERROR("Could not get rendertarget surface", hr);
+        }
     }
 
     return true;

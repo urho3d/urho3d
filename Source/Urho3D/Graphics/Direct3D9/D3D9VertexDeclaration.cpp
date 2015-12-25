@@ -231,19 +231,17 @@ void VertexDeclaration::Create(Graphics* graphics, const PODVector<VertexDeclara
     dest->UsageIndex = 0;
 
     IDirect3DDevice9* device = graphics->GetImpl()->GetDevice();
-    if (!device)
-        return;
-
-    device->CreateVertexDeclaration(elementArray, &declaration_);
+    HRESULT hr = device->CreateVertexDeclaration(elementArray, &declaration_);
+    if (FAILED(hr))
+    {
+        URHO3D_SAFE_RELEASE(declaration_);
+        URHO3D_LOGD3DERROR("Failed to create vertex declaration", hr);
+    }
 }
 
 void VertexDeclaration::Release()
 {
-    if (declaration_)
-    {
-        declaration_->Release();
-        declaration_ = 0;
-    }
+    URHO3D_SAFE_RELEASE(declaration_);
 }
 
 }

@@ -2868,21 +2868,22 @@ lod         Combine several Urho3D models as LOD levels of the output model
 
 Options:
 -b          Save scene in binary format, default format is XML
--h          Generate hard instead of smooth normals if input file has no normals
+-j          Save scene in JSON format, default format is XML
+-h          Generate hard instead of smooth normals if input has no normals
 -i          Use local ID's for scene nodes
 -l          Output a material list file for models
 -na         Do not output animations
 -nm         Do not output materials
 -nt         Do not output material textures
 -nc         Do not use material diffuse color value, instead output white
--nh         Do not save full node hierarchy (scene mode only)\n"
+-nh         Do not save full node hierarchy (scene mode only)
 -ns         Do not create subdirectories for resources
 -nz         Do not create a zone and a directional light (scene mode only)
 -nf         Do not fix infacing normals
 -ne         Do not save empty nodes (scene mode only)
 -mb <x>     Maximum number of bones per submesh. Default 64
 -p <path>   Set path for scene resources. Default is output file path
--r <name>   Use the named scene node as root node\n"
+-r <name>   Use the named scene node as root node
 -f <freq>   Animation tick frequency to use if unspecified. Default 4800
 -o          Optimize redundant submeshes. Loses scene hierarchy and animations
 -s <filter> Include non-skinning bones in the model's skeleton. Can be given a

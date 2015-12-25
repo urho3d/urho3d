@@ -131,7 +131,7 @@ if (URHO3D_BINDINGS)
 endif ()
 if (URHO3D_LUA)
     # The host tool must be built natively
-    if (CMAKE_CROSSCOMPILING OR IOS)
+    if (CMAKE_CROSSCOMPILING)
         # When cross-compiling, build the host tool as external project
         include (ExternalProject)
         if (IOS)
@@ -169,15 +169,10 @@ endif ()
 
 # Generate platform specific export header file
 if (MSVC)
-    if (URHO3D_LIB_TYPE STREQUAL STATIC)
-        set (BAKED_IN_DEFINE "\n#define URHO3D_STATIC_DEFINE\n")
-    endif ()
-    set (PRE_EXPORT_HEADER "\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)\n${BAKED_IN_DEFINE}")
+    set (PRE_EXPORT_HEADER "\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)\n")
 endif ()
 if (URHO3D_CLANG_TOOLS)
-    set (POST_EXPORT_HEADER "\n#define NONSCRIPTABLE __attribute__((annotate(\"nonscriptable\")))\n")
-else ()
-    set (POST_EXPORT_HEADER "\n#define NONSCRIPTABLE\n")
+    set (ANNOTATE_NONSCRIPTABLE "__attribute__((annotate(\"nonscriptable\")))")
 endif ()
 generate_export_header (${TARGET_NAME} ${URHO3D_LIB_TYPE} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h.new)
 execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
@@ -243,7 +238,10 @@ endif ()
 set_output_directories (${OUTPUT_PATH} ARCHIVE LIBRARY)
 
 # Setup target
-setup_library (${URHO3D_LIB_TYPE})
+if (IOS)
+    set (EXCLUDE_FROM_ALL EXCLUDE_FROM_ALL)
+endif ()
+setup_library (${URHO3D_LIB_TYPE} ${EXCLUDE_FROM_ALL})
 if (NOT ANDROID AND NOT EMSCRIPTEN)
     file (READ .soversion SOVERSION)
     string (STRIP ${SOVERSION} SOVERSION)
@@ -257,7 +255,9 @@ elseif (EMSCRIPTEN)
     # Emscripten does not support generation of shared library in a conventional sense, it just produces "linked" LLVM bitcode
     set (CMAKE_SHARED_LIBRARY_SUFFIX ".bc")
 endif ()
-install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
+if (NOT IOS)
+    install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
+endif ()
 if (WIN32 AND URHO3D_LIB_TYPE STREQUAL SHARED)
     set (URHO3D_DLL_INSTALLED TRUE)
 endif ()
@@ -267,10 +267,11 @@ if (APPLE)
     if (IOS)
         setup_ios_linker_flags (LINKER_FLAGS)
         # Add a custom target to build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
-        add_custom_target (${TARGET_NAME}_universal
+        add_custom_target (${TARGET_NAME}_universal ALL
             COMMAND if lipo -info $<TARGET_FILE:${TARGET_NAME}> 2>/dev/null |grep -cq 'i386.*armv7'\; then echo $<TARGET_FILE:${TARGET_NAME}> is already a Mach-O universal binary consisting of both iphoneos and iphonesimulator archs\; else mv $<TARGET_FILE:${TARGET_NAME}>{,.ori} && if lipo -info $<TARGET_FILE:${TARGET_NAME}>.ori 2>/dev/null |grep -cq i386\; then sdk=iphoneos\; else sdk=iphonesimulator\; fi && xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk $$sdk 2>&1 && mv $<TARGET_FILE:${TARGET_NAME}>{,.new} && lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{,.ori,.new} && rm $<TARGET_FILE:${TARGET_NAME}>{.ori,.new}\; fi
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Creating Mach-O universal binary library consisting of both iphoneos and iphonesimulator archs")
+        install (FILES $<TARGET_FILE:${TARGET_NAME}> DESTINATION ${DEST_LIBRARY_DIR})
     else ()
         # Intentionally use built-in CMAKE_EXE_LINKER_FLAGS here although CMake does not use it when building library, but the variable would be used later when configuring Urho3D.pc for MacOSX platform
         setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
@@ -381,7 +382,7 @@ endif ()
 # Use PIC on platforms that support it (shared library type has this property set to true by default, so we only have to deal with those static ones that the shared library links against)
 if (URHO3D_LIB_TYPE STREQUAL SHARED)
     set_target_properties (${STATIC_LIBRARY_TARGETS} PROPERTIES POSITION_INDEPENDENT_CODE true)
-    if (NOT MSVC AND NOT (CMAKE_CROSSCOMPILING AND MINGW) AND CMAKE_VERSION VERSION_LESS 2.8.9)  # todo: Remove this when CMake minimum version is 2.8.9
+    if (NOT MSVC AND NOT (MINGW AND CMAKE_CROSSCOMPILING) AND CMAKE_VERSION VERSION_LESS 2.8.9)  # todo: Remove this when CMake minimum version is 2.8.9
         set_property (TARGET ${STATIC_LIBRARY_TARGETS} APPEND PROPERTY COMPILE_FLAGS -fPIC)
     endif ()
 endif ()

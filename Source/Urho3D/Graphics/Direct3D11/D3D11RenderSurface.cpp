@@ -109,28 +109,20 @@ void RenderSurface::QueueUpdate()
 void RenderSurface::Release()
 {
     Graphics* graphics = parentTexture_->GetGraphics();
-    if (!graphics)
-        return;
-
-    if (renderTargetView_)
+    if (graphics && renderTargetView_)
     {
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         {
             if (graphics->GetRenderTarget(i) == this)
                 graphics->ResetRenderTarget(i);
         }
-
+        
         if (graphics->GetDepthStencil() == this)
             graphics->ResetDepthStencil();
-
-        ((ID3D11View*)renderTargetView_)->Release();
-        renderTargetView_ = 0;
-        if (readOnlyView_)
-        {
-            ((ID3D11View*)readOnlyView_)->Release();
-            readOnlyView_ = 0;
-        }
     }
+
+    URHO3D_SAFE_RELEASE(renderTargetView_);
+    URHO3D_SAFE_RELEASE(readOnlyView_);
 }
 
 int RenderSurface::GetWidth() const

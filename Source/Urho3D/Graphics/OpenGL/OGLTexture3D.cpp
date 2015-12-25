@@ -159,9 +159,6 @@ bool Texture3D::EndLoad()
 void Texture3D::OnDeviceLost()
 {
     GPUObject::OnDeviceLost();
-
-    if (renderSurface_)
-        renderSurface_->OnDeviceLost();
 }
 
 void Texture3D::OnDeviceReset()
@@ -196,41 +193,25 @@ void Texture3D::Release()
                 graphics_->SetTexture(i, 0);
         }
 
-        if (renderSurface_)
-            renderSurface_->Release();
-
         glDeleteTextures(1, &object_);
         object_ = 0;
-    }
-    else
-    {
-        if (renderSurface_)
-            renderSurface_->Release();
     }
 }
 
 bool Texture3D::SetSize(int width, int height, int depth, unsigned format, TextureUsage usage)
 {
-    // Delete the old rendersurface if any
-    renderSurface_.Reset();
-
-    usage_ = usage;
-
+    if (width <= 0 || height <= 0 || depth <= 0)
+    {
+        URHO3D_LOGERROR("Zero or negative 3D texture dimensions");
+        return false;
+    }
     if (usage >= TEXTURE_RENDERTARGET)
     {
-        renderSurface_ = new RenderSurface(this);
-
-        // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
-        addressMode_[COORD_U] = ADDRESS_CLAMP;
-        addressMode_[COORD_V] = ADDRESS_CLAMP;
-        filterMode_ = FILTER_NEAREST;
-        requestedLevels_ = 1;
+        URHO3D_LOGERROR("Rendertarget or depth-stencil usage not supported for 3D textures");
+        return false;
     }
 
-    if (usage == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture3D, HandleRenderSurfaceUpdate));
-    else
-        UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
+    usage_ = usage;
 
     width_ = width;
     height_ = height;
@@ -553,12 +534,6 @@ bool Texture3D::Create()
 
     return success;
 #endif
-}
-
-void Texture3D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
-{
-    if (renderSurface_ && renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS)
-        renderSurface_->QueueUpdate();
 }
 
 }
