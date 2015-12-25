@@ -34,6 +34,8 @@
 #  URHO3D_VERSION
 #  URHO3D_64BIT (may be used as input variable for multilib-capable compilers; must be anyway specified for MSVC due to CMake/VS generator limitation)
 #  URHO3D_LIB_TYPE (may be used as input variable as well to limit the search of library type)
+#  URHO3D_OPENGL
+#  URHO3D_SSE
 #
 # WIN32 only:
 #  URHO3D_LIBRARIES_REL
@@ -41,6 +43,7 @@
 #  URHO3D_DLL
 #  URHO3D_DLL_REL
 #  URHO3D_DLL_DBG
+#  URHO3D_D3D11
 #
 
 set (PATH_SUFFIX Urho3D)
