@@ -98,6 +98,7 @@ String outPath_;
 bool useSubdirs_ = true;
 bool localIDs_ = false;
 bool saveBinary_ = false;
+bool saveJson_ = false;
 bool createZone_ = true;
 bool noAnimations_ = false;
 bool noHierarchy_ = false;
@@ -205,16 +206,17 @@ void Run(const Vector<String>& arguments)
             "Usage: AssetImporter <command> <input file> <output file> [options]\n"
             "See http://assimp.sourceforge.net/main_features_formats.html for input formats\n\n"
             "Commands:\n"
-            "model      Output a model\n"
-            "scene      Output a scene\n"
-            "node       Output a node and its children (prefab)\n"
-            "dump       Dump scene node structure. No output file is generated\n"
-            "lod        Combine several Urho3D models as LOD levels of the output model\n"
-            "           Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
+            "model       Output a model\n"
+            "scene       Output a scene\n"
+            "node        Output a node and its children (prefab)\n"
+            "dump        Dump scene node structure. No output file is generated\n"
+            "lod         Combine several Urho3D models as LOD levels of the output model\n"
+            "            Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
             "\n"
             "Options:\n"
             "-b          Save scene in binary format, default format is XML\n"
-            "-h          Generate hard instead of smooth normals if input file has no normals\n"
+            "-j          Save scene in JSON format, default format is XML\n"
+            "-h          Generate hard instead of smooth normals if input has no normals\n"
             "-i          Use local ID's for scene nodes\n"
             "-l          Output a material list file for models\n"
             "-na         Do not output animations\n"
@@ -281,6 +283,8 @@ void Run(const Vector<String>& arguments)
 
             if (argument == "b")
                 saveBinary_ = true;
+            else if(argument == "j")
+                saveJson_ = true;
             else if (argument == "h")
             {
                 flags &= ~aiProcess_GenSmoothNormals;
@@ -1525,17 +1529,21 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
         ErrorExit("Could not open output file " + scene.outName_);
     if (!asPrefab)
     {
-        if (!saveBinary_)
-            outScene->SaveXML(file);
-        else
+        if (saveBinary_)
             outScene->Save(file);
+        else if (saveJson_)
+            outScene->SaveJSON(file);
+        else
+            outScene->SaveXML(file);
     }
     else
     {
-        if (!saveBinary_)
-            outRootNode->SaveXML(file);
-        else
+        if (saveBinary_)
             outRootNode->Save(file);
+        else if (saveJson_)
+            outRootNode->SaveJSON(file);
+        else
+            outRootNode->SaveXML(file);
     }
 }
 
