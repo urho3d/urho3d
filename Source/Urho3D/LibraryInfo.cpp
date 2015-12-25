@@ -35,7 +35,7 @@ const char* GetRevision()
 
 const char* GetCompilerDefines()
 {
-    return
+    return ""
 #ifdef URHO3D_OPENGL
     "#define URHO3D_OPENGL\n"
 #elif defined(URHO3D_D3D11)
