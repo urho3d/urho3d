@@ -20,18 +20,31 @@
 // THE SOFTWARE.
 //
 
-#pragma once
+#include "Precompiled.h"
 
-#ifdef URHO3D_IS_BUILDING
-#include "Urho3D.h"
-#else
-#include <Urho3D/Urho3D.h>
-#endif
+#include "LibraryInfo.h"
+#include "librevision.h"
 
 namespace Urho3D
 {
 
-/// Return subversion revision number as of the library build time.
-URHO3D_API const char* GetRevision();
+const char* GetRevision()
+{
+    return revision;
+}
+
+const char* GetCompilerDefines()
+{
+    return
+#ifdef URHO3D_OPENGL
+    "#define URHO3D_OPENGL\n"
+#elif defined(URHO3D_D3D11)
+    "#define URHO3D_D3D11\n"
+#endif
+#ifdef URHO3D_SSE
+    "#define URHO3D_SSE\n"
+#endif
+    ;
+}
 
 }

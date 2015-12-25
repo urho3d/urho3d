@@ -134,7 +134,7 @@ if (IOS OR (RPI AND "${RPI_ABI}" MATCHES NEON))    # Stringify in case RPI_ABI i
     set (NEON TRUE)
 endif ()
 cmake_dependent_option (URHO3D_NEON "Enable NEON instruction set (ARM platforms with NEON only)" TRUE "NEON" FALSE)
-# The URHO3D_OPENGL option is not defined on non-Windows platforms as they should always use OpenGL
+# The URHO3D_OPENGL option is not available on non-Windows platforms as they should always use OpenGL, i.e. URHO3D_OPENGL variable will always be forced to TRUE
 if (MSVC)
     # On MSVC compiler, default to false (i.e. prefers Direct3D)
     # OpenGL can be manually enabled with -DURHO3D_OPENGL=1, but Windows graphics card drivers are usually better optimized for Direct3D

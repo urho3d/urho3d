@@ -20,12 +20,21 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/LibraryInfo.h>
-#include <iostream>
+#pragma once
 
-using namespace Urho3D;
+#ifdef URHO3D_IS_BUILDING
+#include "Urho3D.h"
+#else
+#include <Urho3D/Urho3D.h>
+#endif
 
-int main(int argc, char* argv[])
+namespace Urho3D
 {
-    std::cout << GetRevision() << "\n" << GetCompilerDefines();
+
+/// Return git description of the HEAD when building the library.
+URHO3D_API const char* GetRevision();
+
+/// Return baked-in compiler defines used when building the library.
+URHO3D_API const char* GetCompilerDefines();
+
 }
