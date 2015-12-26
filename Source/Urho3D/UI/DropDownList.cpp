@@ -289,28 +289,29 @@ bool DropDownList::FilterPopupImplicitAttributes(XMLElement& dest) const
         return false;
 
     // Horizontal scroll bar
-    childElem = childElem.GetChild("element");
-    if (childElem && !childElem.GetParent().RemoveChild(childElem))
-        return false;
-
+    XMLElement hScrollElem = childElem.GetChild("element");
     // Vertical scroll bar
-    childElem = childElem.GetNext("element");
-    if (childElem && !childElem.GetParent().RemoveChild(childElem))
-        return false;
-
+    XMLElement vScrollElem = hScrollElem.GetNext("element");
     // Scroll panel
-    childElem = childElem.GetNext("element");
-    if (!childElem)
+    XMLElement panelElem = vScrollElem.GetNext("element");
+
+    if (hScrollElem && !hScrollElem.GetParent().RemoveChild(hScrollElem))
         return false;
-    if (childElem.GetAttribute("style").Empty() && !childElem.SetAttribute("style", "none"))
+    if (vScrollElem && !vScrollElem.GetParent().RemoveChild(vScrollElem))
         return false;
 
-    // Item container
-    childElem = childElem.GetChild("element");
-    if (!childElem)
-        return false;
-    if (childElem.GetAttribute("style").Empty() && !childElem.SetAttribute("style", "none"))
-        return false;
+    if (panelElem)
+    {
+        if (panelElem.GetAttribute("style").Empty() && !panelElem.SetAttribute("style", "none"))
+            return false;
+        // Item container
+        XMLElement containerElem = panelElem.GetChild("element");
+        if (containerElem)
+        {
+            if (containerElem.GetAttribute("style").Empty() && !containerElem.SetAttribute("style", "none"))
+                return false;
+        }
+    }
 
     return true;
 }
