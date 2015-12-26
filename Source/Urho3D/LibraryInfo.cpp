@@ -20,12 +20,31 @@
 // THE SOFTWARE.
 //
 
-#include <Urho3D/LibraryInfo.h>
-#include <iostream>
+#include "Precompiled.h"
 
-using namespace Urho3D;
+#include "LibraryInfo.h"
+#include "librevision.h"
 
-int main(int argc, char* argv[])
+namespace Urho3D
 {
-    std::cout << GetRevision() << "\n" << GetCompilerDefines();
+
+const char* GetRevision()
+{
+    return revision;
+}
+
+const char* GetCompilerDefines()
+{
+    return ""
+#ifdef URHO3D_OPENGL
+    "#define URHO3D_OPENGL\n"
+#elif defined(URHO3D_D3D11)
+    "#define URHO3D_D3D11\n"
+#endif
+#ifdef URHO3D_SSE
+    "#define URHO3D_SSE\n"
+#endif
+    ;
+}
+
 }

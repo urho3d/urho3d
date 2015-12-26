@@ -33,7 +33,7 @@ if (NOT EMSCRIPTEN)
 endif ()
 
 # Build PackageTool using host compiler toolchain
-if ((CMAKE_CROSSCOMPILING OR IOS) AND URHO3D_PACKAGING)
+if (CMAKE_CROSSCOMPILING AND URHO3D_PACKAGING)
     # When cross-compiling, build the host tool as external project
     include (ExternalProject)
     if (IOS)
@@ -55,15 +55,14 @@ set_tool_output_directories ()
 if (URHO3D_TOOLS)
     # Urho3D tools
     add_subdirectory (AssetImporter)
-    #add_subdirectory (OgreImporter)
+    add_subdirectory (OgreImporter)
     add_subdirectory (PackageTool)
     add_subdirectory (RampGenerator)
-    #add_subdirectory (SpritePacker)
+    add_subdirectory (SpritePacker)
     if (URHO3D_ANGELSCRIPT)
         add_subdirectory (ScriptCompiler)
     endif ()
-    #add_subdirectory (TestGame)
-elseif ((NOT CMAKE_CROSSCOMPILING AND NOT IOS) AND URHO3D_PACKAGING)
+elseif (NOT CMAKE_CROSSCOMPILING AND URHO3D_PACKAGING)
     # PackageTool target is required but we are not cross-compiling, so build it as per normal
     add_subdirectory (PackageTool)
 endif ()

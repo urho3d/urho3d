@@ -41,6 +41,29 @@ if (CMAKE_GENERATOR STREQUAL Xcode)
     set (XCODE TRUE)
 endif ()
 
+# Rightfully we could have performed this inside a CMake/iOS toolchain file but we don't have one nor need for one
+if (IOS)
+    set (CMAKE_CROSSCOMPILING TRUE)
+    set (CMAKE_XCODE_EFFECTIVE_PLATFORMS -iphoneos -iphonesimulator)
+    set (CMAKE_OSX_SYSROOT iphoneos)    # Set Base SDK to "Latest iOS"
+    if (NOT IOS_SYSROOT)
+        execute_process (COMMAND xcodebuild -version -sdk ${CMAKE_OSX_SYSROOT} Path OUTPUT_VARIABLE IOS_SYSROOT OUTPUT_STRIP_TRAILING_WHITESPACE)   # Obtain iOS sysroot path
+        set (IOS_SYSROOT ${IOS_SYSROOT} CACHE INTERNAL "Path to iOS system root")
+    endif ()
+    set (CMAKE_FIND_ROOT_PATH ${IOS_SYSROOT})
+    # Ensure the CMAKE_OSX_DEPLOYMENT_TARGET is set to empty
+    set (CMAKE_OSX_DEPLOYMENT_TARGET)
+    unset (CMAKE_OSX_DEPLOYMENT_TARGET CACHE)
+elseif (XCODE)
+    set (CMAKE_OSX_SYSROOT macosx)    # Set Base SDK to "Latest OS X"
+    if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+        # If not set, set to current running build system OS version by default
+        execute_process (COMMAND sw_vers -productVersion OUTPUT_VARIABLE CURRENT_OSX_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+        string (REGEX REPLACE ^\([^.]+\\.[^.]+\).* \\1 CMAKE_OSX_DEPLOYMENT_TARGET ${CURRENT_OSX_VERSION})
+        set (CMAKE_OSX_DEPLOYMENT_TARGET ${CMAKE_OSX_DEPLOYMENT_TARGET} CACHE INTERNAL "OSX deployment target")
+    endif ()
+endif ()
+
 # Define all supported build options
 include (CMakeDependentOption)
 option (URHO3D_C++11 "Enable C++11 standard")
@@ -50,18 +73,18 @@ if (NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the initial config
     if (MSVC)
         # On MSVC compiler, use the chosen CMake/VS generator to determine the ABI
         if (CMAKE_GENERATOR MATCHES Win64)
-            set (URHO3D_DEFAULT_64BIT TRUE)
+            set (URHO3D_DEFAULT_64BIT 1)
         else ()
-            set (URHO3D_DEFAULT_64BIT FALSE)
+            set (URHO3D_DEFAULT_64BIT 0)
         endif ()
     else ()
         # On non-MSVC compiler, default to build 64-bit when the chosen compiler toolchain in the build tree has a 64-bit build environment
         execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
         string (REGEX MATCH "#define +__(x86_64|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
         if (matched)
-            set (URHO3D_DEFAULT_64BIT TRUE)
+            set (URHO3D_DEFAULT_64BIT 1)
         else ()
-            set (URHO3D_DEFAULT_64BIT FALSE)
+            set (URHO3D_DEFAULT_64BIT 0)
         endif ()
         # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
         # When ANDROID is true and ARM is not then we are targeting Android on Intel Atom
@@ -111,7 +134,7 @@ if (IOS OR (RPI AND "${RPI_ABI}" MATCHES NEON))    # Stringify in case RPI_ABI i
     set (NEON TRUE)
 endif ()
 cmake_dependent_option (URHO3D_NEON "Enable NEON instruction set (ARM platforms with NEON only)" TRUE "NEON" FALSE)
-# The URHO3D_OPENGL option is not defined on non-Windows platforms as they should always use OpenGL
+# The URHO3D_OPENGL option is not available on non-Windows platforms as they should always use OpenGL, i.e. URHO3D_OPENGL variable will always be forced to TRUE
 if (MSVC)
     # On MSVC compiler, default to false (i.e. prefers Direct3D)
     # OpenGL can be manually enabled with -DURHO3D_OPENGL=1, but Windows graphics card drivers are usually better optimized for Direct3D
@@ -146,13 +169,6 @@ if (CMAKE_HOST_WIN32)
     set (NULL_DEVICE nul)
 else ()
     set (NULL_DEVICE /dev/null)
-endif ()
-# Find Direct3D include & library directories in MS Windows SDK or DirectX SDK when not using OpenGL.
-if (WIN32 AND NOT URHO3D_OPENGL)
-    find_package (Direct3D REQUIRED)
-    if (DIRECT3D_INCLUDE_DIRS)
-        include_directories (${DIRECT3D_INCLUDE_DIRS})
-    endif ()
 endif ()
 # For Raspbery Pi, find Broadcom VideoCore IV firmware
 if (RPI)
@@ -189,7 +205,7 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
 else ()
     set (URHO3D_LIB_TYPE "" CACHE STRING "Specify Urho3D library type, possible values are STATIC and SHARED")
     set (URHO3D_HOME "" CACHE PATH "Path to Urho3D build tree or SDK installation location (downstream project only)")
-    if (URHO3D_PCH OR URHO3D_UPDATE_SOURCE_TREE OR URHO3D_TOOLS OR URHO3D_EXTRAS)
+    if (URHO3D_PCH OR URHO3D_UPDATE_SOURCE_TREE OR URHO3D_TOOLS)
         # Just reference it to suppress "unused variable" CMake warning on downstream projects using this CMake module
     endif ()
     # All Urho3D downstream projects require Urho3D library, so find Urho3D library here now
@@ -225,7 +241,7 @@ endif ()
 cmake_dependent_option (URHO3D_STATIC_RUNTIME "Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)" FALSE "MSVC" FALSE)
 cmake_dependent_option (URHO3D_WIN32_CONSOLE "Use console main() as entry point when setting up Windows executable targets (Windows platform only)" FALSE "WIN32" FALSE)
 cmake_dependent_option (URHO3D_MACOSX_BUNDLE "Use MACOSX_BUNDLE when setting up Mac OS X executable targets (Xcode native build only)" FALSE "XCODE AND NOT IOS" FALSE)
-if (CMAKE_CROSSCOMPILING AND NOT ANDROID)
+if (CMAKE_CROSSCOMPILING AND NOT ANDROID AND NOT IOS)
     set (URHO3D_SCP_TO_TARGET "" CACHE STRING "Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc")
 else ()
     unset (URHO3D_SCP_TO_TARGET CACHE)
@@ -335,11 +351,6 @@ if ($ENV{COVERITY_SCAN_BRANCH})
     add_definitions (-DCOVERITY_SCAN_MODEL)
 endif ()
 
-# Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
-if (URHO3D_SSE)
-    add_definitions (-DURHO3D_SSE)
-endif ()
-
 # Enable NEON instruction set.
 if (URHO3D_NEON)
     add_definitions (-DURHO3D_NEON -DSTBI_NEON)     # BT_USE_NEON is already being self-defined by Bullet library as appropriate
@@ -393,15 +404,9 @@ if (EMSCRIPTEN)
     add_definitions (-DNO_POPEN)
 endif ()
 
-# Add definition for Direct3D11
+# URHO3D_D3D11 overrides URHO3D_OPENGL option
 if (URHO3D_D3D11)
     set (URHO3D_OPENGL 0)
-    add_definitions (-DURHO3D_D3D11)
-endif ()
-
-# Add definition for OpenGL
-if (URHO3D_OPENGL)
-    add_definitions (-DURHO3D_OPENGL)
 endif ()
 
 # Add definitions for GLEW
@@ -415,7 +420,10 @@ if (URHO3D_LIB_TYPE)
 endif ()
 if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
     set (URHO3D_LIB_TYPE STATIC)
-    if (NOT MSVC)   # This define will be baked into the export header for MSVC compiler
+    if (MSVC)
+        # This define will be baked into the export header for MSVC compiler
+        set (URHO3D_STATIC_DEFINE 1)
+    else ()
         add_definitions (-DURHO3D_STATIC_DEFINE)
     endif ()
 endif ()
@@ -476,6 +484,19 @@ if (URHO3D_DATABASE_SQLITE)
     add_definitions (-DURHO3D_DATABASE -DURHO3D_DATABASE_SQLITE)
 endif ()
 
+# Find Direct3D include & library directories in MS Windows SDK or DirectX SDK. They may also be required by SDL
+# even if using OpenGL instead of Direct3D, but do not make Direct3D REQUIRED in that case
+if (WIN32)
+    if (NOT URHO3D_OPENGL)
+        find_package (Direct3D REQUIRED)
+    else ()
+        find_package (Direct3D)
+    endif ()
+    if (DIRECT3D_INCLUDE_DIRS)
+        include_directories (${DIRECT3D_INCLUDE_DIRS})
+    endif ()
+endif ()
+
 # Platform and compiler specific options
 if (URHO3D_C++11)
     add_definitions (-DURHO3D_CXX11)   # Note the define is NOT 'URHO3D_C++11'!
@@ -513,26 +534,14 @@ if (IOS)
     else ()
         set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
     endif ()
-    set (CMAKE_XCODE_EFFECTIVE_PLATFORMS -iphoneos -iphonesimulator)
-    set (CMAKE_OSX_SYSROOT iphoneos)    # Set Base SDK to "Latest iOS"
-    execute_process (COMMAND xcodebuild -version -sdk ${CMAKE_OSX_SYSROOT} Path OUTPUT_VARIABLE IOS_SYSROOT OUTPUT_STRIP_TRAILING_WHITESPACE)   # Obtain iOS sysroot path
-    set (CMAKE_FIND_ROOT_PATH ${IOS_SYSROOT})
-    # Ensure the CMAKE_OSX_DEPLOYMENT_TARGET is set to empty
-    unset (CMAKE_OSX_DEPLOYMENT_TARGET CACHE)
 elseif (XCODE)
-    # MacOSX-Xcode-specific setup
+    # OSX-specific setup
     if (NOT URHO3D_64BIT)
         set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
     endif ()
-    set (CMAKE_OSX_SYSROOT macosx)    # Set Base SDK to "Latest OS X"
-    if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-        # If not set, set to current running build system OS version by default
-        execute_process (COMMAND sw_vers -productVersion OUTPUT_VARIABLE CURRENT_OSX_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-        string (REGEX REPLACE ^\([^.]+\\.[^.]+\).* \\1 CMAKE_OSX_DEPLOYMENT_TARGET ${CURRENT_OSX_VERSION})
-    endif ()
 endif ()
 if (IOS OR URHO3D_MACOSX_BUNDLE)
-    # Common MacOSX and iOS bundle setup
+    # Common OSX and iOS bundle setup
     if (NOT MACOSX_BUNDLE_GUI_IDENTIFIER)
         set (MACOSX_BUNDLE_GUI_IDENTIFIER com.github.urho3d.\${PRODUCT_NAME:bundleIdentifier:lower})
     endif ()
@@ -541,7 +550,7 @@ if (IOS OR URHO3D_MACOSX_BUNDLE)
     endif ()
 endif ()
 if (MSVC)
-    # Visual Studio-specific setup
+    # VS-specific setup
     add_definitions (-D_CRT_SECURE_NO_WARNINGS)
     # Note: All CMAKE_xxx_FLAGS variables are not in list context (although they should be)
     set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${DEBUG_RUNTIME}")
@@ -1024,7 +1033,7 @@ macro (setup_executable)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
             COMMENT "Scp-ing ${TARGET_NAME} executable to target system")
     endif ()
-    if (DIRECT3D_DLL)
+    if (DIRECT3D_DLL AND NOT URHO3D_OPENGL)
         # Make a copy of the D3D DLL to the runtime directory in the build tree
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DIRECT3D_DLL} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     endif ()

@@ -316,7 +316,7 @@ set (DASM_FLAGS ${DASM_XFLAGS} ${DASM_AFLAGS})
 
 # Makefile: Make targets
 # The host tool must be built natively
-if (CMAKE_CROSSCOMPILING OR IOS)
+if (CMAKE_CROSSCOMPILING)
     # Escape the variables
     foreach (ESCAPED_VAR HOST_XCFLAGS TARGET_ARCH DASM_FLAGS DASM_ARCH)
         string (REPLACE -D +D ${ESCAPED_VAR} "${${ESCAPED_VAR}}")
