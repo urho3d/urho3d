@@ -476,10 +476,10 @@ if (URHO3D_DATABASE_ODBC)
     set (URHO3D_DATABASE_SQLITE 0)
     find_package (ODBC REQUIRED)
     set (URHO3D_C++11 1)
-    set (URHO3D_DATABASE 1)
 endif ()
-if (URHO3D_DATABASE_SQLITE)
+if (URHO3D_DATABASE_SQLITE OR URHO3D_DATABASE_ODBC)
     set (URHO3D_DATABASE 1)
+    add_definitions (-DURHO3D_DATABASE)
 endif ()
 
 # Find Direct3D include & library directories in MS Windows SDK or DirectX SDK. They may also be required by SDL

@@ -36,7 +36,6 @@
 #  URHO3D_LIB_TYPE (may be used as input variable as well to limit the search of library type)
 #  URHO3D_OPENGL
 #  URHO3D_SSE
-#  URHO3D_DATABASE
 #  URHO3D_DATABASE_ODBC
 #  URHO3D_DATABASE_SQLITE
 #
@@ -164,7 +163,7 @@ else ()
     if (NOT URHO3D_LIB_TYPE)
         set (URHO3D_LIB_TYPE_WAS_UNDEFINED TRUE)    # We need this to undefine the auto-discovered URHO3D_LIB_TYPE variable before looping
     endif ()
-    set (AUTO_DISCOVER_VARS URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE)
+    set (AUTO_DISCOVER_VARS URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE)
     foreach (ABI_64BIT RANGE ${URHO3D_64BIT} 0)
         # Break if the compiler is not multilib-capable and the ABI is not its native
         if ((MSVC OR MINGW OR ANDROID OR RPI OR EMSCRIPTEN) AND NOT ABI_64BIT EQUAL URHO3D_DEFAULT_64BIT)
