@@ -109,45 +109,13 @@ option (URHO3D_LUA "Enable additional Lua scripting support" TRUE)
 cmake_dependent_option (URHO3D_LUAJIT "Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)" FALSE "NOT EMSCRIPTEN" FALSE)
 option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
 cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT EMSCRIPTEN" FALSE)
-cmake_dependent_option (URHO3D_DATABASE_ODBC "Enable Database support with ODBC, requires vendor-specific ODBC driver" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
 option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
-if (NOT DEFINED URHO3D_DEFAULT_SSE)
-    # Set the default to true for all the platforms that support SSE except the following
-    set (URHO3D_DEFAULT_SSE TRUE)
-    if (MINGW)
-        # Certain MinGW versions fail to compile SSE code. This is the initial guess for known "bad" version range, and can be tightened later
-        execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION ERROR_QUIET)
-        if (GCC_VERSION VERSION_LESS 4.9.1)
-            message (WARNING "Disabling SSE by default due to MinGW version. It is recommended to upgrade to MinGW with GCC >= 4.9.1. You can also try to re-enable SSE with CMake option -DURHO3D_SSE=1, but this may result in compile errors.")
-            set (URHO3D_DEFAULT_SSE FALSE)
-        endif ()
-    elseif (EMSCRIPTEN)
-        # In Emscripten, default to false for targeting SSE2, since the SIMD.js specification is not yet widely adopted in browsers
-        set (URHO3D_DEFAULT_SSE FALSE)
-    endif ()
-    set (URHO3D_DEFAULT_SSE ${URHO3D_DEFAULT_SSE} CACHE INTERNAL "Default value for URHO3D_SSE build option")
-endif ()
-cmake_dependent_option (URHO3D_SSE "Enable SSE2 instruction set (HTML5 and Intel platforms only including Android on Intel Atom); default to true on Intel and false on HTML5; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options" ${URHO3D_DEFAULT_SSE} "NOT ARM" FALSE)
 if (IOS OR (RPI AND "${RPI_ABI}" MATCHES NEON))    # Stringify in case RPI_ABI is not set explicitly
     # The 'NEON' CMake variable is already set by android.toolchain.cmake when the chosen ANDROID_ABI uses NEON
     set (NEON TRUE)
 endif ()
 cmake_dependent_option (URHO3D_NEON "Enable NEON instruction set (ARM platforms with NEON only)" TRUE "NEON" FALSE)
-# The URHO3D_OPENGL option is not available on non-Windows platforms as they should always use OpenGL, i.e. URHO3D_OPENGL variable will always be forced to TRUE
-if (MSVC)
-    # On MSVC compiler, default to false (i.e. prefers Direct3D)
-    # OpenGL can be manually enabled with -DURHO3D_OPENGL=1, but Windows graphics card drivers are usually better optimized for Direct3D
-    set (DEFAULT_OPENGL FALSE)
-else ()
-    # On non-MSVC compiler on Windows platform, default to true to enable use of OpenGL instead of Direct3D
-    # Direct3D can be manually enabled with -DURHO3D_OPENGL=0, but it is likely to fail unless the MinGW-w64 distribution is used due to dependency to Direct3D headers and libs
-    set (DEFAULT_OPENGL TRUE)
-endif ()
-cmake_dependent_option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)" ${DEFAULT_OPENGL} "WIN32" TRUE)      # Force the variable to TRUE when not WIN32
-# On Windows platform Direct3D11 can be optionally chosen
-# Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
-cmake_dependent_option (URHO3D_D3D11 "Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option" FALSE "WIN32" FALSE)
 if (CMAKE_HOST_WIN32)
     if (NOT DEFINED URHO3D_MKLINK)
         # Test whether the host system is capable of setting up symbolic link
@@ -177,6 +145,37 @@ if (RPI)
 endif ()
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     set (URHO3D_LIB_TYPE STATIC CACHE STRING "Specify Urho3D library type, possible values are STATIC (default) and SHARED")
+    # The URHO3D_OPENGL option is not available on non-Windows platforms as they should always use OpenGL, i.e. URHO3D_OPENGL variable will always be forced to TRUE
+    if (MSVC)
+        # On MSVC compiler, default to false (i.e. prefers Direct3D)
+        # OpenGL can be manually enabled with -DURHO3D_OPENGL=1, but Windows graphics card drivers are usually better optimized for Direct3D
+        set (DEFAULT_OPENGL FALSE)
+    else ()
+        # On non-MSVC compiler on Windows platform, default to true to enable use of OpenGL instead of Direct3D
+        # Direct3D can be manually enabled with -DURHO3D_OPENGL=0, but it is likely to fail unless the MinGW-w64 distribution is used due to dependency to Direct3D headers and libs
+        set (DEFAULT_OPENGL TRUE)
+    endif ()
+    cmake_dependent_option (URHO3D_OPENGL "Use OpenGL instead of Direct3D (Windows platform only)" ${DEFAULT_OPENGL} "WIN32" TRUE)      # Force the variable to TRUE when not WIN32
+    # On Windows platform Direct3D11 can be optionally chosen
+    # Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
+    cmake_dependent_option (URHO3D_D3D11 "Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option" FALSE "WIN32" FALSE)
+    if (NOT DEFINED URHO3D_DEFAULT_SSE)
+        # Set the default to true for all the platforms that support SSE except the following
+        set (URHO3D_DEFAULT_SSE TRUE)
+        if (MINGW)
+            # Certain MinGW versions fail to compile SSE code. This is the initial guess for known "bad" version range, and can be tightened later
+            execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION ERROR_QUIET)
+            if (GCC_VERSION VERSION_LESS 4.9.1)
+                message (WARNING "Disabling SSE by default due to MinGW version. It is recommended to upgrade to MinGW with GCC >= 4.9.1. You can also try to re-enable SSE with CMake option -DURHO3D_SSE=1, but this may result in compile errors.")
+                set (URHO3D_DEFAULT_SSE FALSE)
+            endif ()
+        elseif (EMSCRIPTEN)
+            # In Emscripten, default to false for targeting SSE2, since the SIMD.js specification is not yet widely adopted in browsers
+            set (URHO3D_DEFAULT_SSE FALSE)
+        endif ()
+        set (URHO3D_DEFAULT_SSE ${URHO3D_DEFAULT_SSE} CACHE INTERNAL "Default value for URHO3D_SSE build option")
+    endif ()
+    cmake_dependent_option (URHO3D_SSE "Enable SSE2 instruction set (HTML5 and Intel platforms only including Android on Intel Atom); default to true on Intel and false on HTML5; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options" ${URHO3D_DEFAULT_SSE} "NOT ARM" FALSE)
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
     cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
     if (CMAKE_BUILD_TYPE STREQUAL Release OR CMAKE_CONFIGURATION_TYPES)
@@ -195,6 +194,7 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     option (URHO3D_DOCS "Generate documentation as part of normal build")
     option (URHO3D_DOCS_QUIET "Generate documentation as part of normal build, suppress generation process from sending anything to stdout")
     option (URHO3D_PCH "Enable PCH support" TRUE)
+    cmake_dependent_option (URHO3D_DATABASE_ODBC "Enable Database support with ODBC, requires vendor-specific ODBC driver" FALSE "NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN" FALSE)
     option (URHO3D_DATABASE_SQLITE "Enable Database support with SQLite embedded")
     cmake_dependent_option (URHO3D_MINIDUMPS "Enable minidumps on crash (VS only)" TRUE "MSVC" FALSE)
     option (URHO3D_FILEWATCHER "Enable filewatcher support" TRUE)
@@ -476,12 +476,10 @@ if (URHO3D_DATABASE_ODBC)
     set (URHO3D_DATABASE_SQLITE 0)
     find_package (ODBC REQUIRED)
     set (URHO3D_C++11 1)
-    set (URHO3D_DATABASE 1)
-    add_definitions (-DURHO3D_DATABASE -DURHO3D_DATABASE_ODBC)
 endif ()
-if (URHO3D_DATABASE_SQLITE)
+if (URHO3D_DATABASE_SQLITE OR URHO3D_DATABASE_ODBC)
     set (URHO3D_DATABASE 1)
-    add_definitions (-DURHO3D_DATABASE -DURHO3D_DATABASE_SQLITE)
+    add_definitions (-DURHO3D_DATABASE)
 endif ()
 
 # Find Direct3D include & library directories in MS Windows SDK or DirectX SDK. They may also be required by SDL

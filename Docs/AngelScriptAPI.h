@@ -7583,6 +7583,7 @@ class PhysicsRaycastResult
 /* readonly */
 RigidBody body;
 float distance;
+float hitFraction;
 Vector3 normal;
 Vector3 position;
 };

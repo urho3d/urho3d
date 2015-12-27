@@ -4173,6 +4173,7 @@ Properties:
 - Vector3 position
 - Vector3 normal
 - float distance
+- float hitFraction
 - RigidBody* body
 
 <a name="Class_PhysicsRaycastResult2D"></a>
