@@ -110,7 +110,7 @@ public class SDLActivity extends Activity {
         mSingleton = this;
 
         // Urho3D: auto load all the shared libraries available in the library path
-        String libraryPath = getApplicationInfo() nativeLibraryDir;
+        String libraryPath = getApplicationInfo().nativeLibraryDir;
         //Log v(TAG, "library path " + libraryPath);
         if (!mIsSharedLibraryLoaded) {
             File[] files = new File(libraryPath).listFiles(new FilenameFilter() {

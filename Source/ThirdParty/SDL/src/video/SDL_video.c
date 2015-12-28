@@ -289,11 +289,14 @@ SDL_VideoInit(const char *driver_name)
     }
 
     /* Add the renderer framebuffer emulation if desired */
+    // Urho3D: renderer disabled
+    /*
     if (ShouldUseTextureFramebuffer()) {
         _this->CreateWindowFramebuffer = SDL_CreateWindowTexture;
         _this->UpdateWindowFramebuffer = SDL_UpdateWindowTexture;
         _this->DestroyWindowFramebuffer = SDL_DestroyWindowTexture;
     }
+    */
 
     /* Disable the screen saver by default. This is a change from <= 2.0.1,
        but most things using SDL are games or media players; you wouldn't
