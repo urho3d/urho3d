@@ -1039,7 +1039,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         mWidth = width;
         mHeight = height;
         SDLActivity.onNativeResize(width, height, sdlFormat, mDisplay.getRefreshRate());
-        Log.v(TAG, "Window size: " + width + "x" + height);
+        Log.v("SDL", "Window size: " + width + "x" + height);
 
  
         boolean skip = false;
