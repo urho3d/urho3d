@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2015 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -33,6 +33,8 @@
 // Urho3D: choose from prebuilt config files on all platforms
 #if defined(__WIN32__)
 #include "SDL_config_windows.h"
+#elif defined(__WINRT__)
+#include "SDL_config_winrt.h"
 #elif defined(__MACOSX__)
 #include "SDL_config_macosx.h"
 #elif defined(__IPHONEOS__)

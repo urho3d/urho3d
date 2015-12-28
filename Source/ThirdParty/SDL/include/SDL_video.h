@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2015 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -109,7 +109,8 @@ typedef enum
     SDL_WINDOW_MOUSE_FOCUS = 0x00000400,        /**< window has mouse focus */
     SDL_WINDOW_FULLSCREEN_DESKTOP = ( SDL_WINDOW_FULLSCREEN | 0x00001000 ),
     SDL_WINDOW_FOREIGN = 0x00000800,            /**< window not created by SDL */
-    SDL_WINDOW_ALLOW_HIGHDPI = 0x00002000       /**< window should be created in high-DPI mode if supported */
+    SDL_WINDOW_ALLOW_HIGHDPI = 0x00002000,      /**< window should be created in high-DPI mode if supported */
+    SDL_WINDOW_MOUSE_CAPTURE = 0x00004000       /**< window has mouse captured (unrelated to INPUT_GRABBED) */
 } SDL_WindowFlags;
 
 /**
@@ -189,7 +190,8 @@ typedef enum
     SDL_GL_CONTEXT_FLAGS,
     SDL_GL_CONTEXT_PROFILE_MASK,
     SDL_GL_SHARE_WITH_CURRENT_CONTEXT,
-    SDL_GL_FRAMEBUFFER_SRGB_CAPABLE
+    SDL_GL_FRAMEBUFFER_SRGB_CAPABLE,
+    SDL_GL_CONTEXT_RELEASE_BEHAVIOR
 } SDL_GLattr;
 
 typedef enum
@@ -206,6 +208,12 @@ typedef enum
     SDL_GL_CONTEXT_ROBUST_ACCESS_FLAG      = 0x0004,
     SDL_GL_CONTEXT_RESET_ISOLATION_FLAG    = 0x0008
 } SDL_GLcontextFlag;
+
+typedef enum
+{
+    SDL_GL_CONTEXT_RELEASE_BEHAVIOR_NONE   = 0x0000,
+    SDL_GL_CONTEXT_RELEASE_BEHAVIOR_FLUSH  = 0x0001
+} SDL_GLcontextReleaseFlag;
 
 
 /* Function prototypes */
@@ -288,6 +296,18 @@ extern DECLSPEC const char * SDLCALL SDL_GetDisplayName(int displayIndex);
  *  \sa SDL_GetNumVideoDisplays()
  */
 extern DECLSPEC int SDLCALL SDL_GetDisplayBounds(int displayIndex, SDL_Rect * rect);
+
+/**
+ *  \brief Get the dots/pixels-per-inch for a display
+ *
+ *  \note Diagonal, horizontal and vertical DPI can all be optionally
+ *        returned if the parameter is non-NULL.
+ *
+ *  \return 0 on success, or -1 if no DPI information is available or the index is out of range.
+ *
+ *  \sa SDL_GetNumVideoDisplays()
+ */
+extern DECLSPEC int SDLCALL SDL_GetDisplayDPI(int displayIndex, float * ddpi, float * hdpi, float * vdpi);
 
 /**
  *  \brief Returns the number of available display modes.
@@ -716,6 +736,9 @@ extern DECLSPEC int SDLCALL SDL_UpdateWindowSurfaceRects(SDL_Window * window,
  *  \param window The window for which the input grab mode should be set.
  *  \param grabbed This is SDL_TRUE to grab input, and SDL_FALSE to release input.
  *
+ *  If the caller enables a grab while another window is currently grabbed,
+ *  the other window loses its grab in favor of the caller's window.
+ *
  *  \sa SDL_GetWindowGrab()
  */
 extern DECLSPEC void SDLCALL SDL_SetWindowGrab(SDL_Window * window,
@@ -729,6 +752,15 @@ extern DECLSPEC void SDLCALL SDL_SetWindowGrab(SDL_Window * window,
  *  \sa SDL_SetWindowGrab()
  */
 extern DECLSPEC SDL_bool SDLCALL SDL_GetWindowGrab(SDL_Window * window);
+
+/**
+ *  \brief Get the window that currently has an input grab enabled.
+ *
+ *  \return This returns the window if input is grabbed, and NULL otherwise.
+ *
+ *  \sa SDL_SetWindowGrab()
+ */
+extern DECLSPEC SDL_Window * SDLCALL SDL_GetGrabbedWindow(void);
 
 /**
  *  \brief Set the brightness (gamma correction) for a window.
@@ -791,6 +823,75 @@ extern DECLSPEC int SDLCALL SDL_GetWindowGammaRamp(SDL_Window * window,
                                                    Uint16 * red,
                                                    Uint16 * green,
                                                    Uint16 * blue);
+
+/**
+ *  \brief Possible return values from the SDL_HitTest callback.
+ *
+ *  \sa SDL_HitTest
+ */
+typedef enum
+{
+    SDL_HITTEST_NORMAL,  /**< Region is normal. No special properties. */
+    SDL_HITTEST_DRAGGABLE,  /**< Region can drag entire window. */
+    SDL_HITTEST_RESIZE_TOPLEFT,
+    SDL_HITTEST_RESIZE_TOP,
+    SDL_HITTEST_RESIZE_TOPRIGHT,
+    SDL_HITTEST_RESIZE_RIGHT,
+    SDL_HITTEST_RESIZE_BOTTOMRIGHT,
+    SDL_HITTEST_RESIZE_BOTTOM,
+    SDL_HITTEST_RESIZE_BOTTOMLEFT,
+    SDL_HITTEST_RESIZE_LEFT
+} SDL_HitTestResult;
+
+/**
+ *  \brief Callback used for hit-testing.
+ *
+ *  \sa SDL_SetWindowHitTest
+ */
+typedef SDL_HitTestResult (SDLCALL *SDL_HitTest)(SDL_Window *win,
+                                                 const SDL_Point *area,
+                                                 void *data);
+
+/**
+ *  \brief Provide a callback that decides if a window region has special properties.
+ *
+ *  Normally windows are dragged and resized by decorations provided by the
+ *  system window manager (a title bar, borders, etc), but for some apps, it
+ *  makes sense to drag them from somewhere else inside the window itself; for
+ *  example, one might have a borderless window that wants to be draggable
+ *  from any part, or simulate its own title bar, etc.
+ *
+ *  This function lets the app provide a callback that designates pieces of
+ *  a given window as special. This callback is run during event processing
+ *  if we need to tell the OS to treat a region of the window specially; the
+ *  use of this callback is known as "hit testing."
+ *
+ *  Mouse input may not be delivered to your application if it is within
+ *  a special area; the OS will often apply that input to moving the window or
+ *  resizing the window and not deliver it to the application.
+ *
+ *  Specifying NULL for a callback disables hit-testing. Hit-testing is
+ *  disabled by default.
+ *
+ *  Platforms that don't support this functionality will return -1
+ *  unconditionally, even if you're attempting to disable hit-testing.
+ *
+ *  Your callback may fire at any time, and its firing does not indicate any
+ *  specific behavior (for example, on Windows, this certainly might fire
+ *  when the OS is deciding whether to drag your window, but it fires for lots
+ *  of other reasons, too, some unrelated to anything you probably care about
+ *  _and when the mouse isn't actually at the location it is testing_).
+ *  Since this can fire at any time, you should try to keep your callback
+ *  efficient, devoid of allocations, etc.
+ *
+ *  \param window The window to set hit-testing on.
+ *  \param callback The callback to call when doing a hit-test.
+ *  \param callback_data An app-defined void pointer passed to the callback.
+ *  \return 0 on success, -1 on error (including unsupported).
+ */
+extern DECLSPEC int SDLCALL SDL_SetWindowHitTest(SDL_Window * window,
+                                                 SDL_HitTest callback,
+                                                 void *callback_data);
 
 /**
  *  \brief Destroy a window.
@@ -916,7 +1017,7 @@ extern DECLSPEC SDL_GLContext SDLCALL SDL_GL_GetCurrentContext(void);
  *  \param w        Pointer to variable for storing the width, may be NULL
  *  \param h        Pointer to variable for storing the height, may be NULL
  *
- * This may differ from SDL_GetWindowSize if we're rendering to a high-DPI
+ * This may differ from SDL_GetWindowSize() if we're rendering to a high-DPI
  * drawable, i.e. the window was created with SDL_WINDOW_ALLOW_HIGHDPI on a
  * platform with high-DPI support (Apple calls this "Retina"), and not disabled
  * by the SDL_HINT_VIDEO_HIGHDPI_DISABLED hint.
