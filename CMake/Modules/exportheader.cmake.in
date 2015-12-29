@@ -23,12 +23,21 @@
 #ifndef @INCLUDE_GUARD_NAME@
 #define @INCLUDE_GUARD_NAME@
 @PRE_EXPORT_HEADER@
-#cmakedefine URHO3D_STATIC_DEFINE
-#cmakedefine URHO3D_OPENGL
+#cmakedefine URHO3D_ANGELSCRIPT
 #cmakedefine URHO3D_D3D11
-#cmakedefine URHO3D_SSE
 #cmakedefine URHO3D_DATABASE_ODBC
 #cmakedefine URHO3D_DATABASE_SQLITE
+#cmakedefine URHO3D_FILEWATCHER
+#cmakedefine URHO3D_LOGGING
+#cmakedefine URHO3D_NAVIGATION
+#cmakedefine URHO3D_NETWORK
+#cmakedefine URHO3D_OPENGL
+#cmakedefine URHO3D_PHYSICS
+#cmakedefine URHO3D_PROFILING
+#cmakedefine URHO3D_SSE
+#cmakedefine URHO3D_STATIC_DEFINE
+#cmakedefine URHO3D_THREADING
+#cmakedefine URHO3D_URHO2D
 
 #ifdef @STATIC_DEFINE@
 #  define @EXPORT_MACRO_NAME@

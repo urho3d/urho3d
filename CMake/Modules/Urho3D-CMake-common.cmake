@@ -379,26 +379,6 @@ if (URHO3D_WIN32_CONSOLE)
     add_definitions (-DURHO3D_WIN32_CONSOLE)
 endif ()
 
-# Enable file watcher support for automatic resource reloads by default.
-if (URHO3D_FILEWATCHER)
-    add_definitions (-DURHO3D_FILEWATCHER)
-endif ()
-
-# Enable profiling by default. If disabled, autoprofileblocks become no-ops and the Profiler subsystem is not instantiated.
-if (URHO3D_PROFILING)
-    add_definitions (-DURHO3D_PROFILING)
-endif ()
-
-# Enable logging by default. If disabled, LOGXXXX macros become no-ops and the Log subsystem is not instantiated.
-if (URHO3D_LOGGING)
-    add_definitions (-DURHO3D_LOGGING)
-endif ()
-
-# Enable threading by default, except for Emscripten.
-if (URHO3D_THREADING)
-    add_definitions (-DURHO3D_THREADING)
-endif ()
-
 # Add definitions for Emscripten
 if (EMSCRIPTEN)
     add_definitions (-DNO_POPEN)
@@ -428,11 +408,6 @@ if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
     endif ()
 endif ()
 
-# Add definition for AngelScript
-if (URHO3D_ANGELSCRIPT)
-    add_definitions (-DURHO3D_ANGELSCRIPT)
-endif ()
-
 # Add definition for Lua and LuaJIT
 if (URHO3D_LUAJIT)
     add_definitions (-DURHO3D_LUAJIT)
@@ -449,26 +424,6 @@ if (URHO3D_LUA)
 endif ()
 if (URHO3D_LUA_RAW_SCRIPT_LOADER)
     add_definitions (-DURHO3D_LUA_RAW_SCRIPT_LOADER)
-endif ()
-
-# Add definition for Navigation
-if (URHO3D_NAVIGATION)
-    add_definitions (-DURHO3D_NAVIGATION)
-endif ()
-
-# Add definition for Network
-if (URHO3D_NETWORK)
-    add_definitions (-DURHO3D_NETWORK)
-endif ()
-
-# Add definition for Physics
-if (URHO3D_PHYSICS)
-    add_definitions (-DURHO3D_PHYSICS)
-endif ()
-
-# Add definition for Urho2D
-if (URHO3D_URHO2D)
-    add_definitions (-DURHO3D_URHO2D)
 endif ()
 
 # Add definition for Database
