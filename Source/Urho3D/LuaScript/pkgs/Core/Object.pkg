@@ -7,6 +7,8 @@ class Object : public RefCounted
     const String GetCategory() const;
 
     tolua_outside void ObjectSendEvent @ SendEvent(const String eventName, VariantMap* eventData = 0);
+    tolua_outside bool ObjectHasSubscribedToEvent @ HasSubscribedToEvent(const String eventName) const;
+    tolua_outside bool ObjectHasSubscribedToSenderEvent @ HasSubscribedToEvent(Object* sender, const String eventName) const;
     
     tolua_readonly tolua_property__get_set StringHash type;
     tolua_readonly tolua_property__get_set const String typeName;
@@ -21,4 +23,15 @@ static void ObjectSendEvent(Object* object, const String eventName, VariantMap* 
     else
         object->SendEvent(StringHash(eventName));
 }
+
+static bool ObjectHasSubscribedToEvent(const Object* object, const String eventName)
+{
+    return object->HasSubscribedToEvent(StringHash(eventName));
+}
+
+static bool ObjectHasSubscribedToSenderEvent(const Object* object, Object* sender, const String eventName)
+{
+    return object->HasSubscribedToEvent(sender, StringHash(eventName));
+}
+
 $}

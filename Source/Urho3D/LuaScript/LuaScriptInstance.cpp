@@ -362,6 +362,16 @@ void LuaScriptInstance::RemoveEventHandlersExcept(const Vector<String>& exceptio
     eventInvoker_->UnsubscribeFromAllEventsExcept(exceptionTypes, true);
 }
 
+bool LuaScriptInstance::HasEventHandler(const String& eventName) const
+{
+    return eventInvoker_->HasSubscribedToEvent(eventName);
+}
+
+bool LuaScriptInstance::HasEventHandler(Object* sender, const String& eventName) const
+{
+    return eventInvoker_->HasSubscribedToEvent(sender, eventName);
+}
+
 bool LuaScriptInstance::CreateObject(const String& scriptObjectType)
 {
     SetScriptFile(0);

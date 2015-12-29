@@ -218,6 +218,16 @@ void LuaScript::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
     eventInvoker_->UnsubscribeFromAllEventsExcept(exceptionTypes, true);
 }
 
+bool LuaScript::HasEventHandler(const String& eventName) const
+{
+    return eventInvoker_->HasSubscribedToEvent(eventName);
+}
+
+bool LuaScript::HasEventHandler(Object* sender, const String& eventName) const
+{
+    return eventInvoker_->HasSubscribedToEvent(sender, eventName);
+}
+
 bool LuaScript::ExecuteFile(const String& fileName)
 {
     URHO3D_PROFILE(ExecuteFile);
