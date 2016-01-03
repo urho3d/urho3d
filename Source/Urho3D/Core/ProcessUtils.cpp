@@ -151,7 +151,7 @@ void OpenConsoleWindow()
         return;
 
     AllocConsole();
-    
+
     freopen("CONIN$", "r", stdin);
     freopen("CONOUT$", "w", stdout);
 
@@ -358,7 +358,7 @@ String GetPlatform()
 #elif defined(RPI)
     return "Raspberry Pi";
 #elif defined(__EMSCRIPTEN__)
-    return "HTML5";
+    return "Web";
 #elif defined(__linux__)
     return "Linux";
 #else
