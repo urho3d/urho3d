@@ -32,7 +32,7 @@ if "%ARG1:~0,1%" equ "-" goto :continue
 set "BUILD=%~1"
 shift
 :continue
-if "%BUILD%" == "" if exist "%cd%\CMakeCache.txt" (set "BUILD=%cd%") else (goto :error)
+if "%BUILD%" == "" if exist "%cd%\CMakeCache.txt" (set "BUILD=%cd%") else (echo Usage: %~nx0 \path\to\build-tree [build-options] && exit /B 1)
 
 :: Detect CMake toolchains directory if it is not provided explicitly
 if "%TOOLCHAINS%" == "" set "TOOLCHAINS=%SOURCE%\CMake\Toolchains"
@@ -62,9 +62,3 @@ if exist "%BUILD%\CMakeCache.txt" set "OPTS="
 
 :: Create project with the chosen CMake generator and toolchain
 cmake -E make_directory "%BUILD%" && cmake -E chdir "%BUILD%" cmake %OPTS% %BUILD_OPTS% "%SOURCE%"
-
-goto :eof
-:error
-echo Usage: %~nx0 \path\to\build-tree [build-options]
-exit /B 1
-:eof
