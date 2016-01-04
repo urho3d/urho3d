@@ -258,7 +258,7 @@ else ()
                 # Auto-discover build options used by the found library
                 if (IOS)
                     # Since Urho3D library for iOS is a universal binary, we need another way to find out the compiler ABI when the library was built
-                    execute_process (COMMAND lipo -info ${URHO3D_LIBRARIES} 2>/dev/null COMMAND grep -cq 'arm64' RESULT_VARIABLE GREP_RESULT OUTPUT_QUIET ERROR_QUIET)
+                    execute_process (COMMAND lipo -info ${URHO3D_LIBRARIES} COMMAND grep -cq 'arm64' RESULT_VARIABLE GREP_RESULT OUTPUT_QUIET ERROR_QUIET)
                     math (EXPR ABI_64BIT "1 - ${GREP_RESULT}")
                 endif ()
                 set (URHO3D_64BIT ${ABI_64BIT} CACHE BOOL "Enable 64-bit build, the value is auto-discovered based on the found Urho3D library" FORCE) # Force it as it is more authoritative than user-specified option
