@@ -77,6 +77,8 @@ struct URHO3D_API PhysicsRaycastResult
     Vector3 normal_;
     /// Hit distance from ray origin.
     float distance_;
+    /// Hit fraction.
+    float hitFraction_;
     /// Rigid body that was hit.
     RigidBody* body_;
 };

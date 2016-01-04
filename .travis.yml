@@ -335,7 +335,7 @@ before_script:
   - if [ $PACKAGE_UPLOAD ]; then doxygen='doxygen graphviz'; fi
   - travis_retry brew install ccache $cmake $doxygen
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
-  - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done; fi
+  - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done; sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{AppleTV,Watch}{OS,Simulator}.platform; fi
   - rake ci_setup_cache
 script: rake ci && if [ $PACKAGE_UPLOAD ] && (($SECONDS / 60 < 40)); then rake ci_package_upload; fi
 after_script: rake ci_teardown_cache

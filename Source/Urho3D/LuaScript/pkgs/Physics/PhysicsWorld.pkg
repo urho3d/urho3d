@@ -8,6 +8,7 @@ struct PhysicsRaycastResult
     Vector3 position_ @ position;
     Vector3 normal_ @ normal;
     float distance_ @ distance;
+    float hitFraction_ @ hitFraction;
     RigidBody* body_ @ body;
 };
 

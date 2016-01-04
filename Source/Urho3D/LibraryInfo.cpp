@@ -44,6 +44,11 @@ const char* GetCompilerDefines()
 #ifdef URHO3D_SSE
     "#define URHO3D_SSE\n"
 #endif
+#ifdef URHO3D_DATABASE_ODBC
+    "#define URHO3D_DATABASE_ODBC\n"
+#elif defined(URHO3D_DATABASE_SQLITE)
+    "#define URHO3D_DATABASE_SQLITE\n"
+#endif
     ;
 }
 

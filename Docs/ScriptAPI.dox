@@ -2467,6 +2467,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -2524,6 +2526,8 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - float GetMorphWeight(uint) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -2616,6 +2620,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -2700,6 +2706,8 @@ Methods:
 - void AddTrigger(const AnimationTriggerPoint&)
 - void AddTrigger(float, bool, const Variant&)
 - AnimationTrack@ CreateTrack(const String&)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool RemoveAllTracks()
@@ -2756,6 +2764,8 @@ Methods:
 - float GetSpeed(const String&) const
 - float GetTime(const String&) const
 - float GetWeight(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsAtEnd(const String&) const
 - bool IsFadingIn(const String&) const
 - bool IsFadingOut(const String&) const
@@ -2834,6 +2844,8 @@ Properties:
 Methods:
 
 - String GetAnimation(uint) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -2960,6 +2972,8 @@ Properties:
 Methods:
 
 - bool HasMasterGain(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Play()
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetMode(int, int, bool, bool = true)
@@ -3019,6 +3033,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -3126,6 +3142,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -3334,6 +3352,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -3502,6 +3522,8 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Ray GetScreenRay(float, float) const
 - Frustum GetSplitFrustum(float, float) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -3609,6 +3631,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -3768,6 +3792,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -3841,6 +3867,8 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector2[]@ GetVertices() const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -3913,6 +3941,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -3983,6 +4013,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -4054,6 +4086,8 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector2[]@ GetVertices() const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -4125,6 +4159,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -4202,6 +4238,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -4318,6 +4356,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -4367,6 +4407,8 @@ Properties:
 Methods:
 
 - void Disconnect(int = 0)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SendMessage(int, bool, bool, const VectorBuffer&, uint = 0)
 - void SendPackageToClient(PackageFile@)
@@ -4411,6 +4453,8 @@ Properties:
 Methods:
 
 - void CopySelectedRows() const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void Toggle()
 - void UpdateElements()
@@ -4451,6 +4495,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -4523,6 +4569,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -4583,6 +4631,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -4647,6 +4697,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -4710,6 +4762,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -4773,6 +4827,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -4838,6 +4894,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -4902,6 +4960,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -4970,6 +5030,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -5035,6 +5097,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -5102,6 +5166,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -5165,6 +5231,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -5228,6 +5296,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -5314,6 +5384,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -5402,6 +5474,8 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetRandomPoint(int)
 - Vector3 GetRandomPointInCircle(const Vector3&, float, int)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -5504,6 +5578,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -5674,6 +5750,8 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - CustomGeometryVertex@ GetVertex(uint, uint)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -5757,6 +5835,8 @@ Methods:
 
 - DbConnection@ Connect(const String&)
 - void Disconnect(DbConnection@)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -5776,6 +5856,8 @@ Properties:
 Methods:
 
 - DbResult Execute(const String&, bool = false)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -5807,6 +5889,8 @@ Properties:
 Methods:
 
 - void ClearAppStats()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void ResetAppStats(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAppStats(const String&, const String&)
@@ -5858,6 +5942,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -5916,6 +6002,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -6071,6 +6159,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -6143,6 +6233,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -6230,6 +6322,8 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - UIElement@[]@ GetItems() const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - void InsertItem(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
@@ -6420,6 +6514,8 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -6501,6 +6597,8 @@ Methods:
 - void DumpProfiler()
 - void DumpResources(bool = false)
 - void Exit()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void RunFrame()
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
@@ -6528,6 +6626,8 @@ Properties:
 Methods:
 
 - void Close()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Open(const String&, FileMode = FILE_READ)
 - uint8[]@ Read(uint)
 - bool ReadBool()
@@ -6618,6 +6718,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetButtonTexts(const String&, const String&)
 - void SetFilters(String[]@, uint)
@@ -6659,6 +6761,8 @@ Methods:
 - bool FileExists(const String&) const
 - String GetAppPreferencesDir(const String&, const String&) const
 - uint GetLastModifiedTime(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Rename(const String&, const String&)
 - String[]@ ScanDir(const String&, const String&, uint, bool) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -6700,6 +6804,8 @@ Properties:
 Methods:
 
 - IntVector2 GetTotalGlyphOffset(int) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -6753,6 +6859,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetDrawRange(PrimitiveType, uint, uint, bool = true)
 - bool SetDrawRange(PrimitiveType, uint, uint, uint, uint, bool = true)
@@ -6787,6 +6895,8 @@ Methods:
 - void BeginDumpShaders(const String&)
 - void Close()
 - void EndDumpShaders()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void Maximize()
 - void Minimize()
 - void PrecacheShaders(File@)
@@ -6908,6 +7018,8 @@ Methods:
 - uint GetPixelInt(int, int, int) const
 - Color GetPixelTrilinear(float, float, float) const
 - Image@ GetSubimage(const IntRect&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool LoadColorLUT(File@)
@@ -6955,6 +7067,8 @@ Properties:
 Methods:
 
 - VectorBuffer GetData()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetData(VectorBuffer&)
 - bool SetDataRange(VectorBuffer&, uint, uint, bool = false)
@@ -6985,6 +7099,8 @@ Methods:
 - int GetScancodeFromKey(int) const
 - int GetScancodeFromName(const String&) const
 - String GetScancodeName(int) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - uint LoadGestures(File@)
 - uint LoadGestures(VectorBuffer&)
 - bool RecordGesture()
@@ -7076,6 +7192,8 @@ Properties:
 Methods:
 
 - JSONValue& GetRoot()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -7161,6 +7279,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -7267,6 +7387,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -7452,6 +7574,8 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - UIElement@[]@ GetItems() const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - void InsertItem(uint, UIElement@, UIElement@ = null)
 - bool IsExpanded(uint) const
@@ -7629,6 +7753,8 @@ Methods:
 - String Get(const String&)
 - String GetLanguage(int)
 - int GetLanguageIndex(const String&)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void LoadJSON(const JSONValue&)
 - void LoadJSONFile(const String&)
 - void Reset()
@@ -7656,6 +7782,8 @@ Methods:
 - void Close()
 - void Debug(const String&)
 - void Error(const String&)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void Info(const String&)
 - void Open(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -7685,6 +7813,8 @@ Methods:
 - ValueAnimation@ GetShaderParameterAnimation(const String&) const
 - float GetShaderParameterAnimationSpeed(const String&) const
 - WrapMode GetShaderParameterAnimationWrapMode(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const JSONValue&)
@@ -7856,6 +7986,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -8018,6 +8150,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -8039,6 +8173,8 @@ Methods:
 
 - Model@ Clone(const String& = String ( )) const
 - Geometry@ GetGeometry(uint, uint) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -8078,6 +8214,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -8138,6 +8276,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -8205,6 +8345,8 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -8284,6 +8426,8 @@ Methods:
 - bool CheckRemoteEvent(const String&) const
 - bool Connect(const String&, uint16, Scene@, const VariantMap& = VariantMap ( ))
 - void Disconnect(int = 0)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - HttpRequest@ MakeHttpRequest(const String&, const String& = String ( ), String[]@ = null, const String& = String ( ))
 - void RegisterRemoteEvent(const String&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -8323,6 +8467,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -8404,6 +8550,8 @@ Methods:
 - ScriptObject@ GetScriptObject() const
 - ScriptObject@ GetScriptObject(const String&) const
 - bool HasComponent(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -8532,6 +8680,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -8552,6 +8702,8 @@ Methods:
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - void RemoveAttributeAnimation(ValueAnimation@)
@@ -8590,6 +8742,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -8657,6 +8811,8 @@ Methods:
 - Drawable@[]@ GetDrawables(const Sphere&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
 - Drawable@[]@ GetDrawables(const Vector3&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -8720,6 +8876,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -8775,6 +8933,8 @@ Methods:
 
 - bool Exists(const String&) const
 - String[]@ GetEntryNames() const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Open(const String&, uint = 0) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool compressed() const
@@ -8803,6 +8963,8 @@ Methods:
 - void AddTextureTime(Rect&, float)
 - ColorFrame@ GetColorFrame(uint) const
 - TextureFrame@ GetTextureFrame(uint) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const XMLElement&)
@@ -8865,6 +9027,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -8899,6 +9063,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -8987,6 +9153,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -9076,6 +9244,7 @@ Properties:
 
 - RigidBody@ body // readonly
 - float distance
+- float hitFraction
 - Vector3 normal
 - Vector3 position
 
@@ -9111,6 +9280,8 @@ Methods:
 - RigidBody@[]@ GetRigidBodies(RigidBody@)
 - RigidBody@[]@ GetRigidBodies(const BoundingBox&, uint = 0xffff)
 - RigidBody@[]@ GetRigidBodies(const Sphere&, uint = 0xffff)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -9187,6 +9358,8 @@ Methods:
 - RigidBody2D@[]@ GetRigidBodies(const Rect&, uint = 0xffff)
 - RigidBody2D@ GetRigidBody(const Vector2&, uint = 0xffff)
 - RigidBody2D@ GetRigidBody(int, int, uint = 0xffff)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -9527,6 +9700,8 @@ Properties:
 Methods:
 
 - void DrawDebugGeometry(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void ReloadShaders() const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetDefaultRenderPath(XMLFile@)
@@ -9582,6 +9757,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -9618,6 +9795,8 @@ Methods:
 - Resource@ GetResource(StringHash, const String&, bool = true)
 - Resource@ GetResource(const String&, const String&, bool = true)
 - String GetResourceFileName(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void ReleaseAllResources(bool = false)
 - void ReleaseResource(const String&, const String&, bool = false)
 - void ReleaseResources(StringHash, bool = false)
@@ -9700,6 +9879,8 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetVelocityAtPoint(const Vector3&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -9794,6 +9975,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -9888,6 +10071,8 @@ Methods:
 - ScriptObject@ GetScriptObject() const
 - ScriptObject@ GetScriptObject(const String&) const
 - bool HasComponent(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - Node@ Instantiate(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ Instantiate(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateJSON(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
@@ -10048,6 +10233,8 @@ Methods:
 
 - void DumpAPI(DumpMode = DOXYGEN, const String& = String ( ))
 - bool Execute(const String&)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -10070,6 +10257,8 @@ Methods:
 - void ClearDelayedExecute(const String& = String ( ))
 - void DelayedExecute(float, bool, const String&, const Variant[]@ = null)
 - bool Execute(const String&, const Variant[]@ = null)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -10108,6 +10297,8 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasMethod(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsA(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -10185,6 +10376,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -10354,6 +10547,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -10510,6 +10705,8 @@ Methods:
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -10608,6 +10805,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -10697,6 +10896,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -10858,6 +11059,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -10912,6 +11115,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -10951,6 +11156,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -11008,6 +11215,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -11079,6 +11288,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -11209,6 +11420,8 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetPoint(float) const
 - Vector3 GetPosition() const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -11283,6 +11496,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -11392,6 +11607,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -11421,6 +11638,8 @@ Methods:
 
 - void DefineSprite(const String&, const IntRect&, const Vector2& = Vector2 ( 0.5f , 0.5f ), const IntVector2& = IntVector2 :: ZERO)
 - Sprite2D@ GetSprite(const String&)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -11455,6 +11674,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool IsInside(const Vector3&) const
 - bool IsInsideLocal(const Vector3&) const
@@ -11536,6 +11757,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -11618,6 +11841,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -11768,6 +11993,8 @@ Methods:
 - Pass@ GetPass(const String&)
 - Pass@ GetSupportedPass(const String&)
 - bool HasPass(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - void RemovePass(const String&)
@@ -11820,6 +12047,8 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetNormal(const Vector3&) const
 - TerrainPatch@ GetPatch(int, int) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -11899,6 +12128,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -11983,6 +12214,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -12152,6 +12385,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -12242,6 +12477,8 @@ Properties:
 Methods:
 
 - void ClearDataLost()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -12284,6 +12521,8 @@ Methods:
 
 - void ClearDataLost()
 - Image@ GetImage() const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -12328,6 +12567,8 @@ Properties:
 Methods:
 
 - void ClearDataLost()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -12371,6 +12612,8 @@ Properties:
 Methods:
 
 - void ClearDataLost()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -12449,6 +12692,8 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - TileMapLayer2D@ GetLayer(uint) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -12530,6 +12775,8 @@ Methods:
 - Tile2D@ GetTile(int, int) const
 - Node@ GetTileNode(int, int) const
 - bool HasProperty(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -12609,6 +12856,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -12640,6 +12889,8 @@ Methods:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -12683,6 +12934,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -12840,6 +13093,8 @@ Methods:
 - UIElement@ GetElementAt(const IntVector2&, bool = true)
 - UIElement@ GetElementAt(int, int, bool = true)
 - bool HasModalElement() const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsDragging() const
 - UIElement@ LoadLayout(File@)
 - UIElement@ LoadLayout(File@, XMLFile@)
@@ -12907,6 +13162,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -13045,6 +13302,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -13291,6 +13550,8 @@ Properties:
 Methods:
 
 - VectorBuffer GetData()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetData(VectorBuffer&)
 - bool SetDataRange(VectorBuffer&, uint, uint, bool = false)
@@ -13335,6 +13596,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -13502,6 +13765,8 @@ Properties:
 Methods:
 
 - Ray GetScreenRay(int, int) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - Vector3 ScreenToWorldPoint(int, int, float) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetRenderPath(XMLFile@)
@@ -13561,6 +13826,8 @@ Methods:
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -13804,6 +14071,8 @@ Methods:
 - XMLElement CreateRoot(const String&)
 - bool FromString(const String&)
 - XMLElement GetRoot(const String& = String ( ))
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - void Patch(XMLElement)
@@ -13873,6 +14142,8 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -14523,6 +14794,8 @@ Properties:
 - uint GetRandomSeed()
 - uint GetReadableDepthFormat()
 - String GetTextureUnitName(TextureUnit)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsAbsolutePath(const String&)
 - bool IsAlpha(uint)
 - bool IsDigit(uint)

@@ -384,11 +384,11 @@ void Renderer::SetShadowQuality(ShadowQuality quality)
     // If no hardware PCF, do not allow to select one-sample quality
     if (!graphics_->GetHardwareShadowSupport())
     {
-        if (quality == SHADOWQUALITY_PCF_16BIT)
-            quality = SHADOWQUALITY_SIMPLE_16BIT;
+        if (quality == SHADOWQUALITY_SIMPLE_16BIT)
+            quality = SHADOWQUALITY_PCF_16BIT;
         
-        if (quality == SHADOWQUALITY_PCF_24BIT)
-            quality = SHADOWQUALITY_SIMPLE_24BIT;
+        if (quality == SHADOWQUALITY_SIMPLE_24BIT)
+            quality = SHADOWQUALITY_PCF_24BIT;
     }
     // if high resolution is not allowed
     if (!graphics_->GetHiresShadowMapFormat())

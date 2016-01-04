@@ -93,6 +93,10 @@ public:
     virtual void RemoveEventHandlers();
     /// Remove all scripted event handlers, except those listed.
     virtual void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions);
+    /// Return whether has subscribed to an event.
+    virtual bool HasEventHandler(StringHash eventType) const;
+    /// Return whether has subscribed to a specific sender's event.
+    virtual bool HasEventHandler(Object* sender, StringHash eventType) const;
 
     /// Create object of certain class from the script file. Return true if successful.
     bool CreateObject(ScriptFile* scriptFile, const String& className);
