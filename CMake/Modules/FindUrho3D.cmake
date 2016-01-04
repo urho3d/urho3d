@@ -217,7 +217,9 @@ else ()
             endif ()
         endif ()
         # Ensure the module has found the library with the right ABI for the chosen compiler and URHO3D_64BIT build option (if specified)
-        if (URHO3D_LIBRARIES AND NOT URHO3D_COMPILE_RESULT)
+        if (URHO3D_COMPILE_RESULT)
+            break ()    # Use the cached result instead of redoing try_run() each time
+        elseif (URHO3D_LIBRARIES)
             if (NOT (MSVC OR MINGW OR ANDROID OR RPI OR WEB) AND NOT ABI_64BIT)
                 set (COMPILER_32BIT_FLAG -DCOMPILE_DEFINITIONS:STRING=-m32)
             endif ()
@@ -254,6 +256,11 @@ else ()
             set (URHO3D_COMPILE_RESULT ${URHO3D_COMPILE_RESULT} CACHE INTERNAL "FindUrho3D module's compile result")
             if (URHO3D_COMPILE_RESULT AND URHO3D_RUN_RESULT EQUAL 0)
                 # Auto-discover build options used by the found library
+                if (IOS)
+                    # Since Urho3D library for iOS is a universal binary, we need another way to find out the compiler ABI when the library was built
+                    execute_process (COMMAND lipo -info ${URHO3D_LIBRARIES} 2>/dev/null COMMAND grep -cq 'arm64' RESULT_VARIABLE GREP_RESULT OUTPUT_QUIET ERROR_QUIET)
+                    math (EXPR ABI_64BIT "1 - ${GREP_RESULT}")
+                endif ()
                 set (URHO3D_64BIT ${ABI_64BIT} CACHE BOOL "Enable 64-bit build, the value is auto-discovered based on the found Urho3D library" FORCE) # Force it as it is more authoritative than user-specified option
                 set (URHO3D_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE BOOL "Urho3D library type, the value is auto-discovered based on the found Urho3D library" FORCE) # Use the Force, Luke
                 foreach (VAR ${AUTO_DISCOVER_VARS})
