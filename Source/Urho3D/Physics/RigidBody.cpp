@@ -173,8 +173,7 @@ void RigidBody::getWorldTransform(btTransform& worldTrans) const
         worldTrans.setRotation(ToBtQuaternion(lastRotation_));
     }
 
-    if (kinematic_)
-        hasSimulated_ = true;
+    hasSimulated_ = true;
 }
 
 void RigidBody::setWorldTransform(const btTransform& worldTrans)
@@ -900,7 +899,8 @@ void RigidBody::OnMarkedDirty(Node* node)
     // is in use, because in that case the node transform will be constantly updated into smoothed, possibly non-physical
     // states; rather follow the SmoothedTransform target transform directly
     // Also, for kinematic objects Bullet asks the position from us, so we do not need to apply ourselves
-    if (!kinematic_ && (!physicsWorld_ || !physicsWorld_->IsApplyingTransforms()) && !smoothedTransform_)
+    // (exception: initial setting of transform)
+    if ((!kinematic_ || !hasSimulated_) && (!physicsWorld_ || !physicsWorld_->IsApplyingTransforms()) && !smoothedTransform_)
     {
         // Physics operations are not safe from worker threads
         Scene* scene = GetScene();
