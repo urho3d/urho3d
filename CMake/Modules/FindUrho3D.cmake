@@ -38,6 +38,7 @@
 #  URHO3D_SSE
 #  URHO3D_DATABASE_ODBC
 #  URHO3D_DATABASE_SQLITE
+#  URHO3D_LUAJIT
 #
 # WIN32 only:
 #  URHO3D_LIBRARIES_REL
@@ -161,10 +162,8 @@ else ()
         # For 64-bit MinGW on Linux host system, force to search in 'lib64' path even when the Windows platform is not defaulted to use it
         set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)
     endif ()
-    if (NOT URHO3D_LIB_TYPE)
-        set (URHO3D_LIB_TYPE_WAS_UNDEFINED TRUE)    # We need this to undefine the auto-discovered URHO3D_LIB_TYPE variable before looping
-    endif ()
-    set (AUTO_DISCOVER_VARS URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE)
+    set (URHO3D_LIB_TYPE_SAVED ${URHO3D_LIB_TYPE})  # We need this to reset the auto-discovered URHO3D_LIB_TYPE variable before looping
+    set (AUTO_DISCOVER_VARS URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT)
     foreach (ABI_64BIT RANGE ${URHO3D_64BIT} 0)
         # Break if the compiler is not multilib-capable and the ABI is not its native
         if ((MSVC OR MINGW OR ANDROID OR RPI OR WEB) AND NOT ABI_64BIT EQUAL URHO3D_DEFAULT_64BIT)
@@ -274,9 +273,7 @@ else ()
                 break ()
             else ()
                 # Prepare for the second attempt by resetting the variables as necessary
-                if (URHO3D_LIB_TYPE_WAS_UNDEFINED)
-                    unset (URHO3D_LIB_TYPE)
-                endif ()
+                set (URHO3D_LIB_TYPE ${URHO3D_LIB_TYPE_SAVED})
                 unset (URHO3D_LIBRARIES CACHE)
             endif ()
         endif ()

@@ -47,6 +47,11 @@ if (NOT IOS AND NOT WEB)
     # Define source files
     set (SOURCE_FILES src/shell.c src/sqlite3.c src/sqlite3.h)
 
+    # Define dependency libs
+    if (NOT WIN32)
+        set (LIBS dl)
+    endif ()
+
     # Setup target
     setup_executable (NODEPS)
 endif ()
