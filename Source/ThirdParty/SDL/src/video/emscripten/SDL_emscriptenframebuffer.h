@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2015 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,11 +18,15 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+#include "../../SDL_internal.h"
 
-extern int DirectInputHaptic_MaybeAddDevice(const DIDEVICEINSTANCE *pdidInstance);
-extern int DirectInputHaptic_MaybeRemoveDevice(const DIDEVICEINSTANCE *pdidInstance);
-extern int XInputHaptic_MaybeAddDevice(const DWORD dwUserid);
-extern int XInputHaptic_MaybeRemoveDevice(const DWORD dwUserid);
+#ifndef _SDL_emscriptenframebuffer_h
+#define _SDL_emscriptenframebuffer_h
+
+extern int Emscripten_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format, void ** pixels, int *pitch);
+extern int Emscripten_UpdateWindowFramebuffer(_THIS, SDL_Window * window, const SDL_Rect * rects, int numrects);
+extern void Emscripten_DestroyWindowFramebuffer(_THIS, SDL_Window * window);
+
+#endif /* _SDL_emscriptenframebuffer_h */
 
 /* vi: set ts=4 sw=4 expandtab: */
-

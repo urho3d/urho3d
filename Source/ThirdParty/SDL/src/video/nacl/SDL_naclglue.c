@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2015 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,27 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+#include "../../SDL_internal.h"
 
-#import <UIKit/UIKit.h>
-#import <SDL_types.h>
-
-/* *INDENT-OFF* */
-@interface SDLUIAccelerationDelegate: NSObject <UIAccelerometerDelegate> {
-
-	UIAccelerationValue x, y, z;
-	BOOL isRunning;
-	BOOL hasNewData;
-	
-}
-
-+(SDLUIAccelerationDelegate *)sharedDelegate;
--(void)accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration;
--(void)getLastOrientation:(Sint16 *)data;
--(void)startup;
--(void)shutdown;
--(BOOL)isRunning;
--(BOOL)hasNewData;
--(void)setHasNewData:(BOOL)value;
-
-@end
-/* *INDENT-ON* */
+#if SDL_VIDEO_DRIVER_NACL
+#endif /* SDL_VIDEO_DRIVER_NACL */

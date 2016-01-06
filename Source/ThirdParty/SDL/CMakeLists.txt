@@ -78,6 +78,7 @@ elseif (ANDROID)
     file (GLOB SYS_C_FILES
         src/audio/android/*.c src/core/android/*.c src/joystick/android/*.c src/loadso/dlopen/*.c src/power/android/*.c
         src/thread/pthread/*.c src/timer/unix/*.c src/video/android/*.c src/haptic/dummy/*.c src/filesystem/dummy/*.c
+        src/filesystem/android/*.c
     )
 else ()
     # On Linux, make sure development libraries exist, and use their include file directories

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2015 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,29 +20,13 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef SDL_JOYSTICK_DINPUT_H
+#ifndef _SDL_xinput_h
+#define _SDL_xinput_h
 
-/* DirectInput joystick driver; written by Glenn Maynard, based on Andrei de
- * A. Formiga's WINMM driver.
- *
- * Hats and sliders are completely untested; the app I'm writing this for mostly
- * doesn't use them and I don't own any joysticks with them.
- *
- * We don't bother to use event notification here.  It doesn't seem to work
- * with polled devices, and it's fine to call IDirectInputDevice2_GetDeviceData and
- * let it return 0 events. */
+#ifdef HAVE_XINPUT_H
 
-#include "../../core/windows/SDL_windows.h"
-
-#define DIRECTINPUT_VERSION 0x0800      /* Need version 7 for force feedback. Need version 8 so IDirectInput8_EnumDevices doesn't leak like a sieve... */
-#include <dinput.h>
-#define COBJMACROS
-#include <wbemcli.h>
-#include <oleauto.h>
+#include "SDL_windows.h"
 #include <xinput.h>
-#include <devguid.h>
-#include <dbt.h>
-
 
 #ifndef XUSER_MAX_COUNT
 #define XUSER_MAX_COUNT 4
@@ -54,6 +38,66 @@
 #define XINPUT_CAPS_FFB_SUPPORTED 0x0001
 #endif
 
+#ifndef XINPUT_DEVSUBTYPE_UNKNOWN
+#define XINPUT_DEVSUBTYPE_UNKNOWN 0x00
+#endif
+#ifndef XINPUT_DEVSUBTYPE_GAMEPAD
+#define XINPUT_DEVSUBTYPE_GAMEPAD 0x01
+#endif
+#ifndef XINPUT_DEVSUBTYPE_WHEEL
+#define XINPUT_DEVSUBTYPE_WHEEL 0x02
+#endif
+#ifndef XINPUT_DEVSUBTYPE_ARCADE_STICK
+#define XINPUT_DEVSUBTYPE_ARCADE_STICK 0x03
+#endif
+#ifndef XINPUT_DEVSUBTYPE_FLIGHT_STICK
+#define XINPUT_DEVSUBTYPE_FLIGHT_STICK 0x04
+#endif
+#ifndef XINPUT_DEVSUBTYPE_DANCE_PAD
+#define XINPUT_DEVSUBTYPE_DANCE_PAD 0x05
+#endif
+#ifndef XINPUT_DEVSUBTYPE_GUITAR
+#define XINPUT_DEVSUBTYPE_GUITAR 0x06
+#endif
+#ifndef XINPUT_DEVSUBTYPE_GUITAR_ALTERNATE
+#define XINPUT_DEVSUBTYPE_GUITAR_ALTERNATE 0x07
+#endif
+#ifndef XINPUT_DEVSUBTYPE_DRUM_KIT
+#define XINPUT_DEVSUBTYPE_DRUM_KIT 0x08
+#endif
+#ifndef XINPUT_DEVSUBTYPE_GUITAR_BASS
+#define XINPUT_DEVSUBTYPE_GUITAR_BASS 0x0B
+#endif
+#ifndef XINPUT_DEVSUBTYPE_ARCADE_PAD
+#define XINPUT_DEVSUBTYPE_ARCADE_PAD 0x13
+#endif
+
+#ifndef XINPUT_GAMEPAD_GUIDE
+#define XINPUT_GAMEPAD_GUIDE 0x0400
+#endif
+
+#ifndef BATTERY_DEVTYPE_GAMEPAD
+#define BATTERY_DEVTYPE_GAMEPAD         0x00
+#endif
+#ifndef BATTERY_TYPE_WIRED
+#define BATTERY_TYPE_WIRED              0x01
+#endif
+
+#ifndef BATTERY_TYPE_UNKNOWN
+#define BATTERY_TYPE_UNKNOWN            0xFF
+#endif
+#ifndef BATTERY_LEVEL_EMPTY
+#define BATTERY_LEVEL_EMPTY             0x00
+#endif
+#ifndef BATTERY_LEVEL_LOW
+#define BATTERY_LEVEL_LOW               0x01
+#endif
+#ifndef BATTERY_LEVEL_MEDIUM
+#define BATTERY_LEVEL_MEDIUM            0x02
+#endif
+#ifndef BATTERY_LEVEL_FULL
+#define BATTERY_LEVEL_FULL              0x03
+#endif
 
 /* typedef's for XInput structs we use */
 typedef struct
@@ -73,6 +117,12 @@ typedef struct
     DWORD dwPacketNumber;
     XINPUT_GAMEPAD_EX Gamepad;
 } XINPUT_STATE_EX;
+
+typedef struct
+{
+    BYTE BatteryType;
+    BYTE BatteryLevel;
+} XINPUT_BATTERY_INFORMATION_EX;
 
 /* Forward decl's for XInput API's we load dynamically and use if available */
 typedef DWORD (WINAPI *XInputGetState_t)
@@ -94,57 +144,29 @@ typedef DWORD (WINAPI *XInputGetCapabilities_t)
     XINPUT_CAPABILITIES* pCapabilities  /* [out] Receives the capabilities */
     );
 
+typedef DWORD (WINAPI *XInputGetBatteryInformation_t)
+    (
+    DWORD                         dwUserIndex,
+    BYTE                          devType,
+    XINPUT_BATTERY_INFORMATION_EX *pBatteryInformation
+    );
+
 extern int WIN_LoadXInputDLL(void);
 extern void WIN_UnloadXInputDLL(void);
 
 extern XInputGetState_t SDL_XInputGetState;
 extern XInputSetState_t SDL_XInputSetState;
 extern XInputGetCapabilities_t SDL_XInputGetCapabilities;
+extern XInputGetBatteryInformation_t SDL_XInputGetBatteryInformation;
 extern DWORD SDL_XInputVersion;  /* ((major << 16) & 0xFF00) | (minor & 0xFF) */
 
 #define XINPUTGETSTATE          SDL_XInputGetState
 #define XINPUTSETSTATE          SDL_XInputSetState
 #define XINPUTGETCAPABILITIES   SDL_XInputGetCapabilities
-#define INVALID_XINPUT_USERID   XUSER_INDEX_ANY
-#define SDL_XINPUT_MAX_DEVICES  XUSER_MAX_COUNT
+#define XINPUTGETBATTERYINFORMATION   SDL_XInputGetBatteryInformation
 
-#define MAX_INPUTS  256     /* each joystick can have up to 256 inputs */
+#endif /* HAVE_XINPUT_H */
 
+#endif /* _SDL_xinput_h */
 
-/* local types */
-typedef enum Type
-{ BUTTON, AXIS, HAT } Type;
-
-typedef struct input_t
-{
-    /* DirectInput offset for this input type: */
-    DWORD ofs;
-
-    /* Button, axis or hat: */
-    Type type;
-
-    /* SDL input offset: */
-    Uint8 num;
-} input_t;
-
-/* The private structure used to keep track of a joystick */
-struct joystick_hwdata
-{
-    LPDIRECTINPUTDEVICE8 InputDevice;
-    DIDEVCAPS Capabilities;
-    int buffered;
-    SDL_JoystickGUID guid;
-
-    input_t Inputs[MAX_INPUTS];
-    int NumInputs;
-    int NumSliders;
-    Uint8 removed;
-    Uint8 send_remove_event;
-    Uint8 bXInputDevice; /* 1 if this device supports using the xinput API rather than DirectInput */
-    Uint8 bXInputHaptic; /* Supports force feedback via XInput. */
-    Uint8 userid; /* XInput userid index for this joystick */
-    Uint8 currentXInputSlot; /* the current position to write to in XInputState below, used so we can compare old and new values */
-    XINPUT_STATE_EX XInputState[2];
-};
-
-#endif /* SDL_JOYSTICK_DINPUT_H */
+/* vi: set ts=4 sw=4 expandtab: */
