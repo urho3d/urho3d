@@ -95,12 +95,12 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_NEON          |1|Enable NEON instruction set (ARM platforms with NEON only)|
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
-|URHO3D_PACKAGING     |*|Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0|
+|URHO3D_PACKAGING     |*|Enable resources packaging support, on Web platform default to 1, on other platforms default to 0|
 |URHO3D_PROFILING     |1|Enable profiling support|
 |URHO3D_LOGGING       |1|Enable logging support|
-|URHO3D_THREADING     |*|Enable thread support, on Emscripten default to 0, on other platforms default to 1|
+|URHO3D_THREADING     |*|Enable thread support, on Web platform default to 0, on other platforms default to 1|
 |URHO3D_TESTING       |0|Enable testing support|
-|URHO3D_TEST_TIMEOUT  |*|Number of seconds to test run the executables (when testing support is enabled only), default to 10 on Emscripten platform and 5 on other platforms|
+|URHO3D_TEST_TIMEOUT  |*|Number of seconds to test run the executables (when testing support is enabled only), default to 10 on Web platform and 5 on other platforms|
 |URHO3D_OPENGL        |0|Use OpenGL instead of Direct3D (Windows platform only)|
 |URHO3D_D3D11         |0|Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option|
 |URHO3D_STATIC_RUNTIME|0|Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
@@ -515,7 +515,7 @@ if (COMMAND cmake_policy)
         cmake_policy (SET CMP0022 NEW)
     endif ()
     if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-        # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
+        # Disallow use of the LOCATION target property - so we set to OLD as we still need it
         cmake_policy (SET CMP0026 OLD)
         # MACOSX_RPATH is enabled by default
         cmake_policy (SET CMP0042 NEW)
