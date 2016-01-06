@@ -1102,7 +1102,7 @@ private:
 /// Return variant type from type.
 template <typename T> VariantType GetVariantType();
 
-// Return variant type from concrete types.
+// Return variant type from concrete types
 template <> inline VariantType GetVariantType<int>() { return VAR_INT; }
 
 template <> inline VariantType GetVariantType<unsigned>() { return VAR_INT; }
@@ -1135,7 +1135,7 @@ template <> inline VariantType GetVariantType<ResourceRefList>() { return VAR_RE
 
 template <> inline VariantType GetVariantType<VariantVector>() { return VAR_VARIANTVECTOR; }
 
-template <> inline VariantType GetVariantType<StringVector >() { return VAR_STRINGVECTOR; }
+template <> inline VariantType GetVariantType<StringVector>() { return VAR_STRINGVECTOR; }
 
 template <> inline VariantType GetVariantType<VariantMap>() { return VAR_VARIANTMAP; }
 
@@ -1196,7 +1196,7 @@ template <> URHO3D_API ResourceRefList Variant::Get<ResourceRefList>() const;
 
 template <> URHO3D_API VariantVector Variant::Get<VariantVector>() const;
 
-template <> URHO3D_API StringVector Variant::Get<StringVector >() const;
+template <> URHO3D_API StringVector Variant::Get<StringVector>() const;
 
 template <> URHO3D_API VariantMap Variant::Get<VariantMap>() const;
 
