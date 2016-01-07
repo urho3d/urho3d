@@ -316,7 +316,7 @@ set (DASM_FLAGS ${DASM_XFLAGS} ${DASM_AFLAGS})
 
 # Makefile: Make targets
 # The host tool must be built natively
-if (CMAKE_CROSSCOMPILING OR IOS)
+if (CMAKE_CROSSCOMPILING)
     # Escape the variables
     foreach (ESCAPED_VAR HOST_XCFLAGS TARGET_ARCH DASM_FLAGS DASM_ARCH)
         string (REPLACE -D +D ${ESCAPED_VAR} "${${ESCAPED_VAR}}")
@@ -408,7 +408,7 @@ setup_library ()
 install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/LuaJIT FILES_MATCHING PATTERN *.h *.hpp)  # Note: the trailing slash is significant
 
 # Setup additional Lua standalone target (this target can be transfered and executed on an embedded device, such as Raspberry Pi and Android)
-if (NOT IOS AND NOT EMSCRIPTEN)     # LuaJIT library on Emscripten is not possible anyway but just in case it could be in the future, exclude it to build standalone target
+if (NOT IOS AND NOT WEB)     # LuaJIT library on Emscripten is not possible anyway but just in case it could be in the future, exclude it to build standalone target
     # Define target name for LuaJIT interpreter cum compiler
     set (TARGET_NAME luajit_interpreter)   # Note: intended target name is 'luajit' which clashes with 'LuaJIT' library target above for case-insensitive platform
 

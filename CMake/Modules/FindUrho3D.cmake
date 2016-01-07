@@ -32,7 +32,13 @@
 #  URHO3D_INCLUDE_DIRS
 #  URHO3D_LIBRARIES
 #  URHO3D_VERSION
-#  URHO3D_LIB_TYPE (use as input variable if specified; or as output variable if it is set based on module's search result)
+#  URHO3D_64BIT (may be used as input variable for multilib-capable compilers; must be anyway specified as input variable for MSVC due to CMake/VS generator limitation)
+#  URHO3D_LIB_TYPE (may be used as input variable as well to limit the search of library type)
+#  URHO3D_OPENGL
+#  URHO3D_SSE
+#  URHO3D_DATABASE_ODBC
+#  URHO3D_DATABASE_SQLITE
+#  URHO3D_LUAJIT
 #
 # WIN32 only:
 #  URHO3D_LIBRARIES_REL
@@ -40,10 +46,10 @@
 #  URHO3D_DLL
 #  URHO3D_DLL_REL
 #  URHO3D_DLL_DBG
+#  URHO3D_D3D11
 #
 
 set (PATH_SUFFIX Urho3D)
-set (COMPILE_RESULT TRUE)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
     # A special case where library location is already known to be in the build tree of Urho3D project
     set (URHO3D_HOME ${CMAKE_BINARY_DIR})
@@ -59,15 +65,25 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
     endif ()
     set (URHO3D_LIBRARIES Urho3D)
     set (FOUND_MESSAGE "Found Urho3D: as CMake target")
+    set (URHO3D_COMPILE_RESULT TRUE)
 else ()
     # Library location would be searched (based on URHO3D_HOME variable if provided and in system-wide default location)
     if (NOT URHO3D_HOME AND DEFINED ENV{URHO3D_HOME})
         file (TO_CMAKE_PATH "$ENV{URHO3D_HOME}" URHO3D_HOME)
     endif ()
-    # If either of the URHO3D_LIB_TYPE or URHO3D_HOME build options changes then invalidate all the caches
-    if ((URHO3D_LIB_TYPE AND NOT URHO3D_LIB_TYPE STREQUAL URHO3D_FOUND_LIB_TYPE) OR NOT URHO3D_BASE_INCLUDE_DIR MATCHES "^${URHO3D_HOME}/include/Urho3D$")
+    # Convert to integer literal to match it with our internal cache representation; it also will be used as foreach loop control variable
+    if (URHO3D_64BIT)
+        set (URHO3D_64BIT 1)
+    else ()
+        set (URHO3D_64BIT 0)
+    endif ()
+    # If either of the URHO3D_64BIT or URHO3D_LIB_TYPE or URHO3D_HOME build options changes then invalidate all the caches
+    if (NOT URHO3D_64BIT EQUAL URHO3D_FOUND_64BIT OR NOT URHO3D_LIB_TYPE STREQUAL URHO3D_FOUND_LIB_TYPE OR NOT URHO3D_BASE_INCLUDE_DIR MATCHES "^${URHO3D_HOME}/include/Urho3D$")
         unset (URHO3D_BASE_INCLUDE_DIR CACHE)
         unset (URHO3D_LIBRARIES CACHE)
+        unset (URHO3D_FOUND_64BIT CACHE)
+        unset (URHO3D_FOUND_LIB_TYPE CACHE)
+        unset (URHO3D_COMPILE_RESULT CACHE)
         if (WIN32)
             unset (URHO3D_LIBRARIES_DBG CACHE)
             unset (URHO3D_DLL_REL CACHE)
@@ -95,7 +111,7 @@ else ()
             endif ()
         endif ()
         # Cater for the shared library extension in Emscripten build which is ".bc" instead of ".so"
-        if (EMSCRIPTEN)
+        if (WEB)
             string (REPLACE .so .bc CMAKE_FIND_LIBRARY_SUFFIXES "${CMAKE_FIND_LIBRARY_SUFFIXES}")   # Stringify for string replacement
         endif ()
         # The PATH_SUFFIX does not work for CMake on Windows host system, it actually needs a prefix instead
@@ -111,21 +127,6 @@ else ()
     if (URHO3D_HOME)
         list (APPEND CMAKE_PREFIX_PATH ${URHO3D_HOME})
         set (SEARCH_OPT NO_CMAKE_FIND_ROOT_PATH)
-    endif ()
-    # For Android platform, search in path similar to ANDROID_LIBRARY_OUTPUT_PATH variable
-    if (ANDROID)
-        if (URHO3D_HOME)
-            set (URHO3D_LIB_SEARCH_HINT HINTS ${URHO3D_HOME}/libs/${ANDROID_NDK_ABI_NAME})
-        else ()
-            set (URHO3D_LIB_SEARCH_HINT HINTS /usr/local/libs/${ANDROID_NDK_ABI_NAME})
-        endif ()
-    endif ()
-    if (NOT URHO3D_64BIT)
-        # For 32-bit, force to search in 'lib' path even when the host system defaulted to use 'lib64'
-        set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS FALSE)
-    elseif (MINGW AND CMAKE_CROSSCOMPILING)
-        # For 64-bit MinGW on Linux host system, force to search in 'lib64' path even when the Windows platform is not defaulted to use it
-        set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)
     endif ()
     find_path (URHO3D_BASE_INCLUDE_DIR Urho3D.h PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT} DOC "Urho3D include directory")
     if (URHO3D_BASE_INCLUDE_DIR)
@@ -149,63 +150,62 @@ else ()
             file (STRINGS ${URHO3D_BASE_INCLUDE_DIR}/Urho3D.h MSVC_STATIC_LIB REGEX "^#define URHO3D_STATIC_DEFINE$")
         endif ()
     endif ()
-    find_library (URHO3D_LIBRARIES NAMES Urho3D ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT} DOC "Urho3D library directory")
-    if (WIN32)
-        # For Windows platform, give a second chance to search for a debug version of the library
-        find_library (URHO3D_LIBRARIES_DBG NAMES Urho3D_d ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT})
-        # If both the non-debug and debug version of the libraries are found then use them both
-        set (URHO3D_LIBRARIES_REL ${URHO3D_LIBRARIES})
-        # Otherwise, URHO3D_LIBRARIES variable should have the path to either one of the version
-        if (URHO3D_LIBRARIES)
-            if (URHO3D_LIBRARIES_DBG)
-                list (APPEND URHO3D_LIBRARIES ${URHO3D_LIBRARIES_DBG})
-            endif ()
+    # For Android platform, search in path similar to ANDROID_LIBRARY_OUTPUT_PATH variable
+    if (ANDROID)
+        if (URHO3D_HOME)
+            set (URHO3D_LIB_SEARCH_HINT HINTS ${URHO3D_HOME}/libs/${ANDROID_NDK_ABI_NAME})
         else ()
-            set (URHO3D_LIBRARIES ${URHO3D_LIBRARIES_DBG})
+            set (URHO3D_LIB_SEARCH_HINT HINTS /usr/local/libs/${ANDROID_NDK_ABI_NAME})
         endif ()
     endif ()
-    # Ensure the module has found the right one if the library type is specified
-    if (MSVC)
-        if (URHO3D_LIB_TYPE)
-            if (NOT ((URHO3D_LIB_TYPE STREQUAL STATIC AND MSVC_STATIC_LIB) OR (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT MSVC_STATIC_LIB)))
-                unset (URHO3D_LIB_TYPE)
+    if (URHO3D_64BIT AND MINGW AND CMAKE_CROSSCOMPILING)
+        # For 64-bit MinGW on Linux host system, force to search in 'lib64' path even when the Windows platform is not defaulted to use it
+        set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)
+    endif ()
+    set (URHO3D_LIB_TYPE_SAVED ${URHO3D_LIB_TYPE})  # We need this to reset the auto-discovered URHO3D_LIB_TYPE variable before looping
+    set (AUTO_DISCOVER_VARS URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT)
+    foreach (ABI_64BIT RANGE ${URHO3D_64BIT} 0)
+        # Break if the compiler is not multilib-capable and the ABI is not its native
+        if ((MSVC OR MINGW OR ANDROID OR RPI OR WEB) AND NOT ABI_64BIT EQUAL URHO3D_DEFAULT_64BIT)
+            break ()
+        endif ()
+        # Set to search in 'lib' or 'lib64' based on the ABI being tested
+        set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS ${ABI_64BIT})
+        find_library (URHO3D_LIBRARIES NAMES Urho3D ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT} DOC "Urho3D library directory")
+        if (WIN32)
+            # For Windows platform, give a second chance to search for a debug version of the library
+            find_library (URHO3D_LIBRARIES_DBG NAMES Urho3D_d ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT})
+            set (URHO3D_LIBRARIES_REL ${URHO3D_LIBRARIES})
+            if (NOT URHO3D_LIBRARIES)
+                set (URHO3D_LIBRARIES ${URHO3D_LIBRARIES_DBG})
             endif ()
-        else ()
-            if (MSVC_STATIC_LIB)
+        endif ()
+        # Ensure the module has found the right one if the library type is specified
+        if (MSVC)
+            if (URHO3D_LIB_TYPE)
+                if (NOT ((URHO3D_LIB_TYPE STREQUAL STATIC AND MSVC_STATIC_LIB) OR (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT MSVC_STATIC_LIB)))
+                    unset (URHO3D_LIBRARIES)    # Not a right type, so nullify the search result
+                endif ()
+            else ()
+                if (MSVC_STATIC_LIB)
+                    set (URHO3D_LIB_TYPE STATIC)
+                else ()
+                    set (URHO3D_LIB_TYPE SHARED)
+                endif ()
+            endif ()
+        elseif (URHO3D_LIBRARIES)
+            get_filename_component (EXT ${URHO3D_LIBRARIES} EXT)
+            if (EXT STREQUAL .a)
                 set (URHO3D_LIB_TYPE STATIC)
+                # For Non-MSVC compiler the static define is not baked into the export header file so we need to define it for the try_run below
+                set (COMPILER_STATIC_FLAG COMPILE_DEFINITIONS -DURHO3D_STATIC_DEFINE)
             else ()
                 set (URHO3D_LIB_TYPE SHARED)
+                unset (COMPILER_STATIC_FLAG)
             endif ()
         endif ()
-    elseif (URHO3D_LIBRARIES)
-        get_filename_component (EXT ${URHO3D_LIBRARIES} EXT)
-        if (EXT STREQUAL .a)
-            set (URHO3D_LIB_TYPE STATIC)
-            # For Non-MSVC compiler the static define is not baked into the export header file so we need to define it for the try_compile below
-            set (COMPILER_STATIC_FLAG COMPILE_DEFINITIONS -DURHO3D_STATIC_DEFINE)
-        else ()
-            set (URHO3D_LIB_TYPE SHARED)
-        endif ()
-    endif ()
-    # Ensure the module has found the library with the right ABI for the chosen compiler and URHO3D_64BIT build option
-    if (URHO3D_LIBRARIES)
-        if (NOT URHO3D_64BIT AND NOT MSVC AND NOT MINGW AND NOT ANDROID AND NOT RPI AND NOT EMSCRIPTEN)
-            set (COMPILER_32BIT_FLAG -DCOMPILE_DEFINITIONS:STRING=-m32)
-        endif ()
-        if (IOS)
-            set (CMAKE_OSX_SYSROOT iphoneos)   # Since this is anyway the correct sysroot setting for IOS platform, we do not revert the setting back after we are done
-            set (IOS_FLAGS -DCMAKE_MACOSX_BUNDLE=1 -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=0)
-        elseif (ANDROID)
-            set (ANDROID_LIBRARIES "log\;android\;GLESv1_CM\;GLESv2")
-        endif ()
-        # BCM_VC_LIBRARIES variable is already set by FindBCM_VC module on RPI platform
-        try_compile (COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
-            CMAKE_FLAGS ${IOS_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES}\;${BCM_VC_LIBRARIES}\;${ANDROID_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_32BIT_FLAG} ${COMPILER_STATIC_FLAG}
-            OUTPUT_VARIABLE TRY_COMPILE_OUT)
-    endif ()
-    # For shared library type, also initialize the URHO3D_DLL variable for later use
-    if (WIN32)
-        if (URHO3D_LIB_TYPE STREQUAL SHARED AND URHO3D_HOME)
+        # For shared library type, also initialize the URHO3D_DLL variable for later use
+        if (WIN32 AND URHO3D_LIB_TYPE STREQUAL SHARED AND URHO3D_HOME)
             find_file (URHO3D_DLL_REL Urho3D.dll HINTS ${URHO3D_HOME}/bin NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH DOC "Urho3D release DLL")
             if (URHO3D_DLL_REL)
                 list (APPEND URHO3D_DLL ${URHO3D_DLL_REL})
@@ -215,7 +215,83 @@ else ()
                 list (APPEND URHO3D_DLL ${URHO3D_DLL_DBG})
             endif ()
         endif ()
+        # Ensure the module has found the library with the right ABI for the chosen compiler and URHO3D_64BIT build option (if specified)
+        if (URHO3D_COMPILE_RESULT)
+            break ()    # Use the cached result instead of redoing try_run() each time
+        elseif (URHO3D_LIBRARIES)
+            if (NOT (MSVC OR MINGW OR ANDROID OR RPI OR WEB) AND NOT ABI_64BIT)
+                set (COMPILER_32BIT_FLAG -DCOMPILE_DEFINITIONS:STRING=-m32)
+            endif ()
+            # Below variables are loop invariant but there is no harm to keep them here
+            if (IOS)
+                set (IOS_FLAGS -DCMAKE_MACOSX_BUNDLE=1 -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=0)
+            elseif (ANDROID)
+                set (ANDROID_LIBRARIES "log\;android\;GLESv1_CM\;GLESv2")
+            elseif (WIN32)
+                set (CMAKE_TRY_COMPILE_CONFIGURATION_SAVED ${CMAKE_TRY_COMPILE_CONFIGURATION})
+                if (URHO3D_LIBRARIES_REL)
+                    set (CMAKE_TRY_COMPILE_CONFIGURATION Release)
+                else ()
+                    set (CMAKE_TRY_COMPILE_CONFIGURATION Debug)
+                endif ()
+                if (MSVC AND URHO3D_DLL)
+                    # This is a hack as it relies on internal implementation of try_run
+                    foreach (DLL ${URHO3D_DLL})
+                        get_filename_component (NAME ${DLL} NAME)
+                        execute_process (COMMAND ${CMAKE_COMMAND} -E copy ${DLL} ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeTmp/${CMAKE_TRY_COMPILE_CONFIGURATION}/${NAME})
+                    endforeach ()
+                endif ()
+            endif ()
+            # Since in cross-compiling mode we cannot run the test target executable and auto-discover the build options used by the found library,
+            # the next best thing is to evaluate the found export header indirectly (assuming the found library was built using the same export header)
+            if (CMAKE_CROSSCOMPILING)
+                set (URHO3D_RUN_RESULT 0)
+                file (READ ${URHO3D_BASE_INCLUDE_DIR}/Urho3D.h URHO3D_RUN_RESULT__TRYRUN_OUTPUT)
+            endif ()
+            # BCM_VC_LIBRARIES variable is already set by FindBCM_VC module on RPI platform
+            try_run (URHO3D_RUN_RESULT URHO3D_COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
+                CMAKE_FLAGS ${IOS_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES}\;${BCM_VC_LIBRARIES}\;${ANDROID_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_32BIT_FLAG} ${COMPILER_STATIC_FLAG}
+                COMPILE_OUTPUT_VARIABLE TRY_COMPILE_OUT RUN_OUTPUT_VARIABLE TRY_RUN_OUT)
+            set (URHO3D_COMPILE_RESULT ${URHO3D_COMPILE_RESULT} CACHE INTERNAL "FindUrho3D module's compile result")
+            if (URHO3D_COMPILE_RESULT AND URHO3D_RUN_RESULT EQUAL 0)
+                # Auto-discover build options used by the found library
+                if (IOS)
+                    # Since Urho3D library for iOS is a universal binary, we need another way to find out the compiler ABI when the library was built
+                    execute_process (COMMAND lipo -info ${URHO3D_LIBRARIES} COMMAND grep -cq 'arm64' RESULT_VARIABLE GREP_RESULT OUTPUT_QUIET ERROR_QUIET)
+                    math (EXPR ABI_64BIT "1 - ${GREP_RESULT}")
+                endif ()
+                set (URHO3D_64BIT ${ABI_64BIT} CACHE BOOL "Enable 64-bit build, the value is auto-discovered based on the found Urho3D library" FORCE) # Force it as it is more authoritative than user-specified option
+                set (URHO3D_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE BOOL "Urho3D library type, the value is auto-discovered based on the found Urho3D library" FORCE) # Use the Force, Luke
+                foreach (VAR ${AUTO_DISCOVER_VARS})
+                    if (TRY_RUN_OUT MATCHES "#define ${VAR}")
+                        set (AUTO_DISCOVERED_${VAR} 1)
+                    else ()
+                        set (AUTO_DISCOVERED_${VAR} 0)
+                    endif ()
+                    set (AUTO_DISCOVERED_${VAR} ${AUTO_DISCOVERED_${VAR}} CACHE INTERNAL "Auto-discovered ${VAR} build option")
+                endforeach ()
+                break ()
+            else ()
+                # Prepare for the second attempt by resetting the variables as necessary
+                set (URHO3D_LIB_TYPE ${URHO3D_LIB_TYPE_SAVED})
+                unset (URHO3D_LIBRARIES CACHE)
+            endif ()
+        endif ()
+    endforeach ()
+    # If both the non-debug and debug version of the libraries are found on Windows platform then use them both
+    if (URHO3D_LIBRARIES_REL AND URHO3D_LIBRARIES_DBG)
+        set (URHO3D_LIBRARIES ${URHO3D_LIBRARIES_REL} ${URHO3D_LIBRARIES_DBG})
     endif ()
+    # Ensure auto-discovered variables always prefail over user settings in all the subsequent cmake rerun (even without redoing try_run)
+    foreach (VAR ${AUTO_DISCOVER_VARS})
+        if (DEFINED ${VAR} AND DEFINED AUTO_DISCOVERED_${VAR})  # Cannot combine these two ifs due to variable expansion error when it is not defined
+            if ((${VAR} AND NOT ${AUTO_DISCOVERED_${VAR}}) OR (NOT ${VAR} AND ${AUTO_DISCOVERED_${VAR}}))
+                message (WARNING "Conflicting ${VAR} build option is ignored.")
+                unset (${VAR} CACHE)
+            endif ()
+        endif ()
+        set (${VAR} ${AUTO_DISCOVERED_${VAR}})
+    endforeach ()
     # Restore CMake global settings
     if (CMAKE_FIND_LIBRARY_SUFFIXES_SAVED)
         set (CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES_SAVED})
@@ -223,9 +299,12 @@ else ()
     if (CMAKE_SYSTEM_PREFIX_PATH_SAVED)
         set (CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_PATH_SAVED})
     endif ()
+    if (CMAKE_TRY_COMPILE_CONFIGURATION_SAVED)
+        set (CMAKE_TRY_COMPILE_CONFIGURATION ${CMAKE_TRY_COMPILE_CONFIGURATION_SAVED})
+    endif ()
 endif ()
 
-if (URHO3D_INCLUDE_DIRS AND URHO3D_LIBRARIES AND URHO3D_LIB_TYPE AND COMPILE_RESULT)
+if (URHO3D_INCLUDE_DIRS AND URHO3D_LIBRARIES AND URHO3D_LIB_TYPE AND URHO3D_COMPILE_RESULT)
     set (URHO3D_FOUND 1)
     if (NOT FOUND_MESSAGE)
         set (FOUND_MESSAGE "Found Urho3D: ${URHO3D_LIBRARIES}")
@@ -236,6 +315,7 @@ if (URHO3D_INCLUDE_DIRS AND URHO3D_LIBRARIES AND URHO3D_LIB_TYPE AND COMPILE_RES
     include (FindPackageMessage)
     find_package_message (Urho3D ${FOUND_MESSAGE} "[${URHO3D_LIBRARIES}][${URHO3D_INCLUDE_DIRS}]")
     set (URHO3D_HOME ${URHO3D_HOME} CACHE PATH "Path to Urho3D build tree or SDK installation location" FORCE)
+    set (URHO3D_FOUND_64BIT ${URHO3D_64BIT} CACHE INTERNAL "True when 64-bit ABI was being used when test compiling Urho3D library")
     set (URHO3D_FOUND_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE INTERNAL "Lib type (if specified) when Urho3D library was last found")
 elseif (Urho3D_FIND_REQUIRED)
     if (ANDROID)

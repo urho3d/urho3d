@@ -370,6 +370,7 @@ void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& r
         newResult.position_ = ToVector3(rayCallback.m_hitPointWorld[i]);
         newResult.normal_ = ToVector3(rayCallback.m_hitNormalWorld[i]);
         newResult.distance_ = (newResult.position_ - ray.origin_).Length();
+        newResult.hitFraction_ = rayCallback.m_closestHitFraction;
         result.Push(newResult);
     }
 
@@ -395,6 +396,7 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
         result.position_ = ToVector3(rayCallback.m_hitPointWorld);
         result.normal_ = ToVector3(rayCallback.m_hitNormalWorld);
         result.distance_ = (result.position_ - ray.origin_).Length();
+        result.hitFraction_ = rayCallback.m_closestHitFraction;
         result.body_ = static_cast<RigidBody*>(rayCallback.m_collisionObject->getUserPointer());
     }
     else
@@ -402,6 +404,7 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
         result.distance_ = M_INFINITY;
+        result.hitFraction_ = 0.0f;
         result.body_ = 0;
     }
 }
@@ -435,8 +438,8 @@ void PhysicsWorld::RaycastSingleSegmented(PhysicsRaycastResult& result, const Ra
             result.position_ = ToVector3(rayCallback.m_hitPointWorld);
             result.normal_ = ToVector3(rayCallback.m_hitNormalWorld);
             result.distance_ = (result.position_ - ray.origin_).Length();
+            result.hitFraction_ = rayCallback.m_closestHitFraction;
             result.body_ = static_cast<RigidBody*>(rayCallback.m_collisionObject->getUserPointer());
-
             // No need to cast the rest of the segments
             return;
         }
@@ -449,6 +452,7 @@ void PhysicsWorld::RaycastSingleSegmented(PhysicsRaycastResult& result, const Ra
     result.position_ = Vector3::ZERO;
     result.normal_ = Vector3::ZERO;
     result.distance_ = M_INFINITY;
+    result.hitFraction_ = 0.0f;
     result.body_ = 0;
 }
 
@@ -460,9 +464,10 @@ void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, floa
         URHO3D_LOGWARNING("Infinite maxDistance in physics sphere cast is not supported");
 
     btSphereShape shape(radius);
+    Vector3 endPos = ray.origin_ + maxDistance * ray.direction_;
 
     btCollisionWorld::ClosestConvexResultCallback
-        convexCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ + maxDistance * ray.direction_));
+        convexCallback(ToBtVector3(ray.origin_), ToBtVector3(endPos));
     convexCallback.m_collisionFilterGroup = (short)0xffff;
     convexCallback.m_collisionFilterMask = (short)collisionMask;
 
@@ -474,7 +479,8 @@ void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, floa
         result.body_ = static_cast<RigidBody*>(convexCallback.m_hitCollisionObject->getUserPointer());
         result.position_ = ToVector3(convexCallback.m_hitPointWorld);
         result.normal_ = ToVector3(convexCallback.m_hitNormalWorld);
-        result.distance_ = (result.position_ - ray.origin_).Length();
+        result.distance_ = convexCallback.m_closestHitFraction * (endPos - ray.origin_).Length();
+        result.hitFraction_ = convexCallback.m_closestHitFraction;
     }
     else
     {
@@ -482,6 +488,7 @@ void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, floa
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
         result.distance_ = M_INFINITY;
+        result.hitFraction_ = 0.0f;
     }
 }
 
@@ -495,6 +502,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, CollisionShape* shap
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
         result.distance_ = M_INFINITY;
+        result.hitFraction_ = 0.0f;
         return;
     }
 
@@ -535,6 +543,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
         result.distance_ = M_INFINITY;
+        result.hitFraction_ = 0.0f;
         return;
     }
 
@@ -545,6 +554,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
         result.distance_ = M_INFINITY;
+        result.hitFraction_ = 0.0f;
         return;
     }
 
@@ -564,6 +574,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
         result.position_ = ToVector3(convexCallback.m_hitPointWorld);
         result.normal_ = ToVector3(convexCallback.m_hitNormalWorld);
         result.distance_ = convexCallback.m_closestHitFraction * (endPos - startPos).Length();
+        result.hitFraction_ = convexCallback.m_closestHitFraction;
     }
     else
     {
@@ -571,6 +582,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
         result.distance_ = M_INFINITY;
+        result.hitFraction_ = 0.0f;
     }
 }
 

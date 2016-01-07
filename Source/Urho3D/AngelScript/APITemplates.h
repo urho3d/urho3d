@@ -346,8 +346,17 @@ template <class T> void RegisterRefCounted(asIScriptEngine* engine, const char* 
 
 template <class T> void ObjectSendEvent(const String& eventType, VariantMap& eventData, T* ptr)
 {
-    if (ptr)
-        ptr->SendEvent(StringHash(eventType), eventData);
+    ptr->SendEvent(StringHash(eventType), eventData);
+}
+
+template <class T> bool ObjectHasSubscribedToEvent(const String& eventType, T* ptr)
+{
+    return ptr->HasSubscribedToEvent(StringHash(eventType));
+}
+
+template <class T> bool ObjectHasSubscribedToSenderEvent(Object* sender, const String& eventType, T* ptr)
+{
+    return ptr->HasSubscribedToEvent(sender, StringHash(eventType));
 }
 
 /// Template function for registering a class derived from Object.
@@ -358,6 +367,8 @@ template <class T> void RegisterObject(asIScriptEngine* engine, const char* clas
     engine->RegisterObjectMethod(className, "const String& get_typeName() const", asMETHODPR(T, GetTypeName, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_category() const", asMETHODPR(T, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SendEvent(const String&in, VariantMap& eventData = VariantMap())", asFUNCTION(ObjectSendEvent<T>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool HasSubscribedToEvent(const String&in)", asFUNCTION(ObjectHasSubscribedToEvent<T>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool HasSubscribedToEvent(Object@+, const String&in)", asFUNCTION(ObjectHasSubscribedToSenderEvent<T>), asCALL_CDECL_OBJLAST);
     RegisterSubclass<Object, T>(engine, "Object", className);
 }
 

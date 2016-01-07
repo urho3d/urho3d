@@ -30,7 +30,7 @@ namespace Urho3D
 
 class Vector3;
 
-/// Graphics capability support level. HTML5 (Emscripten) also uses OpenGL ES, but is considered a desktop platform capability-wise
+/// Graphics capability support level. Web platform (Emscripten) also uses OpenGL ES, but is considered a desktop platform capability-wise
 #if defined(ANDROID) || defined(IOS) || defined(RPI)
 #define MOBILE_GRAPHICS
 #else

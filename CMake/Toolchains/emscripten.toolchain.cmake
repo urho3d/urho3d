@@ -128,4 +128,4 @@ if (CMAKE_HOST_WIN32)
     endforeach ()
 endif ()
 
-set (EMSCRIPTEN 1)
+set (WEB 1)

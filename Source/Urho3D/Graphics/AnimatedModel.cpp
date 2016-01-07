@@ -738,6 +738,8 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
                 Node* boneNode = node_->CreateChild(i->name_, LOCAL);
                 boneNode->AddListener(this);
                 boneNode->SetTransform(i->initialPosition_, i->initialRotation_, i->initialScale_);
+                // Copy the model component's temporary status
+                boneNode->SetTemporary(IsTemporary());
                 i->node_ = boneNode;
             }
 

@@ -166,6 +166,12 @@ void Texture2D::Release()
 
 bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usage)
 {
+    if (width <= 0 || height <= 0)
+    {
+        URHO3D_LOGERROR("Zero or negative texture dimensions");
+        return false;
+    }
+
     // Delete the old rendersurface if any
     renderSurface_.Reset();
 

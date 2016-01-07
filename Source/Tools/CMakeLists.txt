@@ -28,12 +28,12 @@ find_package (Urho3D REQUIRED)
 include_directories (${URHO3D_INCLUDE_DIRS})
 
 # Urho3DPlayer target is rather special, although it is here, it is not a tool because it is built into target platform binary as opposed to host platform
-if (NOT EMSCRIPTEN)
+if (NOT WEB)
     add_subdirectory (Urho3DPlayer)
 endif ()
 
 # Build PackageTool using host compiler toolchain
-if ((CMAKE_CROSSCOMPILING OR IOS) AND URHO3D_PACKAGING)
+if (CMAKE_CROSSCOMPILING AND URHO3D_PACKAGING)
     # When cross-compiling, build the host tool as external project
     include (ExternalProject)
     if (IOS)
@@ -62,7 +62,7 @@ if (URHO3D_TOOLS)
     if (URHO3D_ANGELSCRIPT)
         add_subdirectory (ScriptCompiler)
     endif ()
-elseif ((NOT CMAKE_CROSSCOMPILING AND NOT IOS) AND URHO3D_PACKAGING)
+elseif (NOT CMAKE_CROSSCOMPILING AND URHO3D_PACKAGING)
     # PackageTool target is required but we are not cross-compiling, so build it as per normal
     add_subdirectory (PackageTool)
 endif ()
