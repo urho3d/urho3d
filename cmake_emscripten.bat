@@ -20,4 +20,4 @@
 :: THE SOFTWARE.
 ::
 
-@"%~dp0cmake_generic.bat" %* -DEMSCRIPTEN=1
+@"%~dp0cmake_generic.bat" %* -DWEB=1

@@ -407,7 +407,7 @@ setup_library ()
 install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/LuaJIT FILES_MATCHING PATTERN *.h *.hpp)  # Note: the trailing slash is significant
 
 # Setup additional Lua standalone target (this target can be transfered and executed on an embedded device, such as Raspberry Pi and Android)
-if (NOT IOS AND NOT EMSCRIPTEN)     # LuaJIT library on Emscripten is not possible anyway but just in case it could be in the future, exclude it to build standalone target
+if (NOT IOS AND NOT WEB)     # LuaJIT library on Emscripten is not possible anyway but just in case it could be in the future, exclude it to build standalone target
     # Define target name for LuaJIT interpreter cum compiler
     set (TARGET_NAME luajit_interpreter)   # Note: intended target name is 'luajit' which clashes with 'LuaJIT' library target above for case-insensitive platform
 

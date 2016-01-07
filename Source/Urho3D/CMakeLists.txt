@@ -242,7 +242,7 @@ if (IOS)
     set (EXCLUDE_FROM_ALL EXCLUDE_FROM_ALL)
 endif ()
 setup_library (${URHO3D_LIB_TYPE} ${EXCLUDE_FROM_ALL})
-if (NOT ANDROID AND NOT EMSCRIPTEN)
+if (NOT ANDROID AND NOT WEB)
     file (READ .soversion SOVERSION)
     string (STRIP ${SOVERSION} SOVERSION)
     string (REGEX MATCH "([^.]+)\\.([^.]+)\\.(.+)" MATCHED ${SOVERSION})
@@ -251,7 +251,7 @@ if (NOT ANDROID AND NOT EMSCRIPTEN)
     else ()
         message (FATAL_ERROR "The .soversion file is corrupted. It should contain a version number with this format major(0xFFFF).minor(0xFF).patch-level(0xFF). e.g.: 0.1.2")
     endif ()
-elseif (EMSCRIPTEN)
+elseif (WEB)
     # Emscripten does not support generation of shared library in a conventional sense, it just produces "linked" LLVM bitcode
     set (CMAKE_SHARED_LIBRARY_SUFFIX ".bc")
 endif ()
@@ -265,20 +265,13 @@ endif ()
 # Setup dependency frameworks and libraries
 if (APPLE)
     if (IOS)
-        setup_ios_linker_flags (LINKER_FLAGS)
         # Add a custom target to build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
         add_custom_target (${TARGET_NAME}_universal ALL
             COMMAND if lipo -info $<TARGET_FILE:${TARGET_NAME}> 2>/dev/null |grep -cq 'i386.*armv7'\; then echo $<TARGET_FILE:${TARGET_NAME}> is already a Mach-O universal binary consisting of both iphoneos and iphonesimulator archs\; else mv $<TARGET_FILE:${TARGET_NAME}>{,.ori} && if lipo -info $<TARGET_FILE:${TARGET_NAME}>.ori 2>/dev/null |grep -cq i386\; then sdk=iphoneos\; else sdk=iphonesimulator\; fi && xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk $$sdk 2>&1 && mv $<TARGET_FILE:${TARGET_NAME}>{,.new} && lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{,.ori,.new} && rm $<TARGET_FILE:${TARGET_NAME}>{.ori,.new}\; fi
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Creating Mach-O universal binary library consisting of both iphoneos and iphonesimulator archs")
         install (FILES $<TARGET_FILE:${TARGET_NAME}> DESTINATION ${DEST_LIBRARY_DIR})
-    else ()
-        # Intentionally use built-in CMAKE_EXE_LINKER_FLAGS here although CMake does not use it when building library, but the variable would be used later when configuring Urho3D.pc for MacOSX platform
-        setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
-        # LuaJIT 64-bit specific - replace EXE linker flags with flags for building shared library (adapted from LuaJIT's original Makefile)
-        string (REPLACE "-pagezero_size 10000 -image_base 100000000" "-image_base 7fff04c4a000" LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
     endif ()
-    set_target_properties (${TARGET_NAME} PROPERTIES LINK_FLAGS ${LINKER_FLAGS})
     set (FORCE_LOAD -force_load)
 elseif (NOT MSVC)
     set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--whole-archive)
@@ -316,7 +309,7 @@ if (NOT XCODE AND NOT MSVC)
                 COMMAND libtool -static $<TARGET_FILE:${TARGET_NAME}>.engine ${ARCHIVES} -o $<TARGET_FILE:${TARGET_NAME}>
                 COMMAND rm $<TARGET_FILE:${TARGET_NAME}>.engine
                 COMMENT "Merging all archives into a single static library using libtool")
-        elseif (EMSCRIPTEN OR CMAKE_BINARY_DIR MATCHES " ")
+        elseif (WEB OR CMAKE_BINARY_DIR MATCHES " ")
             # Do it the hard way by first extracting the object (bitcode) files and appending them to final archive:
             # a) For Emscripten build as Emscripten emar (llvm-ar) neither takes archives directly as input nor supports MRI-style script
             # b) When the build tree path contains spaces because MRI script does not support spaces in path even with proper escape
@@ -434,7 +427,7 @@ if (URHO3D_LUA)
     # ditto for Lua/LuaJIT
     set (ENGINE_INCLUDE_DIRS "${ENGINE_INCLUDE_DIRS} ${DASH}I\"\${includedir}/Urho3D/ThirdParty/Lua${JIT}\"")
 endif ()
-# todo: Reevaluate the command below when the CMake minimum required version is set to 2.8.12 (and remove only when the deprected add_compiler_export_flags() is not used anymore)
+# todo: Reevaluate the command below when the CMake minimum required version is set to 2.8.12 (and remove only when the deprecated add_compiler_export_flags() is not used anymore)
 string (REGEX REPLACE " -fvisibility[^ ]+" "" CLEANED_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})   # Remove visibility compiler options that are only used for building the library
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc${PC_SUFFIX} @ONLY)
 if (MSVC)
