@@ -683,11 +683,11 @@ def append_new_release release, filename = '../doc-Build/_data/urho3d.json'
   end
 end
 
-def update_web_samples_data dir = '../doc-Build/samples', filename = '../doc-Build/_data/web-samples.json'
+def update_web_samples_data dir = '../doc-Build/samples', filename = '../doc-Build/_data/web.json'
   begin
-    samples = JSON.parse File.read filename
-    Dir.chdir(dir) { samples['samples'] = Dir['*.html'].sort }
-    File.open(filename, 'w') { |file| file.puts samples.to_json }
+    web = JSON.parse File.read filename
+    Dir.chdir(dir) { web['samples'] = Dir['*.html'].sort }
+    File.open(filename, 'w') { |file| file.puts web.to_json }
     return 0
   rescue
     nil
