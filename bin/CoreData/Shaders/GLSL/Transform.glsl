@@ -87,6 +87,18 @@ vec3 GetBillboardNormal()
 }
 #endif
 
+#ifdef DIRBILLBOARD
+vec3 GetBillboardPos(vec4 iPos, vec3 iOffset, mat4 modelMatrix)
+{
+    return (iPos * modelMatrix).xyz + iOffset;
+}
+
+vec3 GetBillboardNormal()
+{
+    return iNormal;
+}
+#endif
+
 #if defined(SKINNED)
     #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices)
 #elif defined(INSTANCED)
@@ -99,6 +111,8 @@ vec3 GetWorldPos(mat4 modelMatrix)
 {
     #if defined(BILLBOARD)
         return GetBillboardPos(iPos, iTexCoord2, modelMatrix);
+    #elif defined(DIRBILLBOARD)
+        return GetBillboardPos(iPos, iTangent.xyz, modelMatrix);
     #else
         return (iPos * modelMatrix).xyz;
     #endif
@@ -106,7 +120,7 @@ vec3 GetWorldPos(mat4 modelMatrix)
 
 vec3 GetWorldNormal(mat4 modelMatrix)
 {
-    #if defined(BILLBOARD)
+    #if defined(BILLBOARD) || defined(DIRBILLBOARD)
         return GetBillboardNormal();
     #else
         return normalize(iNormal * GetNormalMatrix(modelMatrix));

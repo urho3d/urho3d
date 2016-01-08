@@ -128,6 +128,7 @@ void CreateParticleEffectEditor()
     SubscribeToEvent(particleEffectWindow.GetChild("Scaled", true), "Toggled", "EditParticleEffectScaled");
     SubscribeToEvent(particleEffectWindow.GetChild("Sorted", true), "Toggled", "EditParticleEffectSorted");
     SubscribeToEvent(particleEffectWindow.GetChild("Relative", true), "Toggled", "EditParticleEffectRelative");
+    SubscribeToEvent(particleEffectWindow.GetChild("FaceCameraMode", true), "ItemSelected", "EditParticleEffectFaceCameraMode");
     
     SubscribeToEvent(particleEffectWindow.GetChild("ResetViewport", true), "Released", "ParticleEffectResetViewport");
     SubscribeToEvent(particleEffectWindow.GetChild("ShowGrid", true), "Toggled", "ParticleEffectShowGrid");
@@ -692,6 +693,50 @@ void EditParticleEffectEmitterShape(StringHash eventType, VariantMap& eventData)
             editParticleEffect.emitterType = EMITTER_SPHERE;
             break;
     }
+
+    EndParticleEffectEdit();
+}
+
+void EditParticleEffectFaceCameraMode(StringHash eventType, VariantMap& eventData)
+{
+    if (inParticleEffectRefresh)
+        return;
+
+    if (editParticleEffect is null)
+        return;
+
+    BeginParticleEffectEdit();
+
+    DropDownList@ element = eventData["Element"].GetPtr();
+
+    switch (element.selection)
+    {
+        case 0:
+            editParticleEffect.faceCameraMode = FC_NONE;
+            break;
+
+        case 1:
+            editParticleEffect.faceCameraMode = FC_ROTATE_XYZ;
+            break;
+
+        case 2:
+            editParticleEffect.faceCameraMode = FC_ROTATE_Y;
+            break;
+
+        case 3:
+            editParticleEffect.faceCameraMode = FC_LOOKAT_XYZ;
+            break;
+
+        case 4:
+            editParticleEffect.faceCameraMode = FC_LOOKAT_Y;
+            break;
+
+        case 5:
+            editParticleEffect.faceCameraMode = FC_DIRECTION;
+            break;
+    }
+
+    particleEffectEmitter.ApplyEffect();
 
     EndParticleEffectEdit();
 }
@@ -1407,6 +1452,28 @@ void RefreshParticleEffectBasicAttributes()
             break;
         case EMITTER_SPHERE:
             cast<DropDownList>(particleEffectWindow.GetChild("EmitterShape", true)).selection = 1;
+            break;
+    }
+
+    switch (editParticleEffect.faceCameraMode)
+    {
+        case FC_NONE:
+            cast<DropDownList>(particleEffectWindow.GetChild("FaceCameraMode", true)).selection = 0;
+            break;
+        case FC_ROTATE_XYZ:
+            cast<DropDownList>(particleEffectWindow.GetChild("FaceCameraMode", true)).selection = 1;
+            break;
+        case FC_ROTATE_Y:
+            cast<DropDownList>(particleEffectWindow.GetChild("FaceCameraMode", true)).selection = 2;
+            break;
+        case FC_LOOKAT_XYZ:
+            cast<DropDownList>(particleEffectWindow.GetChild("FaceCameraMode", true)).selection = 3;
+            break;
+        case FC_LOOKAT_Y:
+            cast<DropDownList>(particleEffectWindow.GetChild("FaceCameraMode", true)).selection = 4;
+            break;
+        case FC_DIRECTION:
+            cast<DropDownList>(particleEffectWindow.GetChild("FaceCameraMode", true)).selection = 5;
             break;
     }
 

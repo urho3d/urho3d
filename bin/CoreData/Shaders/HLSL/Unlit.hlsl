@@ -20,6 +20,10 @@ void VS(float4 iPos : POSITION,
     #ifdef BILLBOARD
         float2 iSize : TEXCOORD1,
     #endif
+    #ifdef DIRBILLBOARD
+        float3 iNormal : NORMAL,
+        float4 iTangent : TANGENT,
+    #endif
     out float2 oTexCoord : TEXCOORD0,
     out float4 oWorldPos : TEXCOORD2,
     #ifdef VERTEXCOLOR

@@ -25,6 +25,7 @@
 #include "../Core/Context.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/ParticleEffect.h"
+#include "../Graphics/BillboardSet.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
@@ -33,6 +34,8 @@
 
 namespace Urho3D
 {
+
+extern const char* faceCameraModeNames[];
 
 static const char* emitterTypeNames[] =
 {
@@ -78,7 +81,8 @@ ParticleEffect::ParticleEffect(Context* context) :
     rotationSpeedMin_(0.0f),
     rotationSpeedMax_(0.0f),
     sizeAdd_(0.0f),
-    sizeMul_(1.0f)
+    sizeMul_(1.0f),
+    faceCameraMode_(FC_ROTATE_XYZ)
 {
 }
 
@@ -141,6 +145,7 @@ bool ParticleEffect::BeginLoad(Deserializer& source)
     sizeMul_ = 1.0f;
     colorFrames_.Clear();
     textureFrames_.Clear();
+    faceCameraMode_ = FC_ROTATE_XYZ;
 
     if (rootElem.HasChild("material"))
     {
@@ -262,6 +267,25 @@ bool ParticleEffect::BeginLoad(Deserializer& source)
         SetColorFrames(fades);
     }
 
+    if (rootElem.HasChild("faceCameraMode"))
+    {
+        String type = rootElem.GetChild("faceCameraMode").GetAttributeLower("value");
+        if (type == "none")
+            faceCameraMode_ = FC_NONE;
+        else if (type == "rotate xyz")
+            faceCameraMode_ = FC_ROTATE_XYZ;
+        else if (type == "rotate y")
+            faceCameraMode_ = FC_ROTATE_Y;
+        else if (type == "lookat xyz")
+            faceCameraMode_ = FC_LOOKAT_XYZ;
+        else if (type == "lookat y")
+            faceCameraMode_ = FC_LOOKAT_Y;
+        else if (type == "rotate along direction")
+            faceCameraMode_ = FC_DIRECTION;
+        else
+            URHO3D_LOGERROR("Unknown face camera mode " + type);
+    }
+
     if (colorFrames_.Empty())
         colorFrames_.Push(ColorFrame(Color::WHITE));
 
@@ -330,6 +354,7 @@ bool ParticleEffect::Load(const XMLElement& source)
     sizeMul_ = 1.0f;
     colorFrames_.Clear();
     textureFrames_.Clear();
+    faceCameraMode_ = FC_ROTATE_XYZ;
 
     if (source.IsNull())
     {
@@ -428,6 +453,25 @@ bool ParticleEffect::Load(const XMLElement& source)
 
     if (source.HasChild("rotationspeed"))
         GetFloatMinMax(source.GetChild("rotationspeed"), rotationSpeedMin_, rotationSpeedMax_);
+
+    if (source.HasChild("faceCameraMode"))
+    {
+        String type = source.GetChild("faceCameraMode").GetAttributeLower("value");
+        if (type == "none")
+            faceCameraMode_ = FC_NONE;
+        else if (type == "rotate xyz")
+            faceCameraMode_ = FC_ROTATE_XYZ;
+        else if (type == "rotate y")
+            faceCameraMode_ = FC_ROTATE_Y;
+        else if (type == "lookat xyz")
+            faceCameraMode_ = FC_LOOKAT_XYZ;
+        else if (type == "lookat y")
+            faceCameraMode_ = FC_LOOKAT_Y;
+        else if (type == "rotate along direction")
+            faceCameraMode_ = FC_DIRECTION;
+        else
+            URHO3D_LOGERROR("Unknown face camera mode " + type);
+    }
 
     if (source.HasChild("sizedelta"))
     {
@@ -561,6 +605,9 @@ bool ParticleEffect::Save(XMLElement& dest) const
     childElem = dest.CreateChild("sizedelta");
     childElem.SetFloat("add", sizeAdd_);
     childElem.SetFloat("mul", sizeMul_);
+
+    childElem = dest.CreateChild("faceCameraMode");
+    childElem.SetAttribute("value", faceCameraModeNames[faceCameraMode_]);
 
     if (colorFrames_.Size() == 1)
     {
@@ -794,6 +841,11 @@ void ParticleEffect::SetNumColorFrames(unsigned number)
     unsigned s = colorFrames_.Size();
     if (s != number)
         colorFrames_.Resize(number);
+}
+
+void ParticleEffect::SetFaceCameraMode(FaceCameraMode mode)
+{
+    faceCameraMode_ = mode;
 }
 
 void ParticleEffect::SortColorFrames()

@@ -48,6 +48,13 @@ float3 GetBillboardNormal()
 }
 #endif
 
+#ifdef DIRBILLBOARD
+float3 GetBillboardPos(float4 iPos, float3 iOffset, float4x3 modelMatrix)
+{
+    return mul(iPos, modelMatrix) + iOffset;
+}
+#endif
+
 #if defined(SKINNED)
     #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices);
 #elif defined(INSTANCED)
@@ -56,14 +63,18 @@ float3 GetBillboardNormal()
     #define iModelMatrix cModel
 #endif
 
-#ifdef BILLBOARD
+#if defined(BILLBOARD)
     #define GetWorldPos(modelMatrix) GetBillboardPos(iPos, iSize, modelMatrix)
+#elif defined(DIRBILLBOARD)
+    #define GetWorldPos(modelMatrix) GetBillboardPos(iPos, iTangent.xyz, modelMatrix)
 #else
     #define GetWorldPos(modelMatrix) mul(iPos, modelMatrix)
 #endif
 
-#ifdef BILLBOARD
+#if defined(BILLBOARD)
     #define GetWorldNormal(modelMatrix) GetBillboardNormal()
+#elif defined(DIRBILLBOARD)
+    #define GetWorldNormal(modelMatrix) iNormal
 #else
     #define GetWorldNormal(modelMatrix) normalize(mul(iNormal, (float3x3)modelMatrix))
 #endif

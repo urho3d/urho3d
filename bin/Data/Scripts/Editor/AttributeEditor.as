@@ -1512,6 +1512,7 @@ void InitVectorStructs()
         "   UV Coordinates",
         "   Color",
         "   Rotation",
+        "   Direction",
         "   Is Enabled"
     };
     vectorStructs.Push(VectorStruct("BillboardSet", "Billboards", billboardVariables, 1));
