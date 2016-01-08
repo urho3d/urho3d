@@ -708,7 +708,7 @@ Urho3D uses the following conventions and principles:
 
 - Raw pointers are used whenever possible in the classes' public API. This simplifies exposing functions & classes to script, and is relatively safe, because SharedPtr & WeakPtr use intrusive reference counting.
 
-- When an object's public API allows assigning a reference counted object to it through a %Set...() function, this implies ownership through a SharedPtr. For example assigning a Material to a Drawable. To end
+- When an object's public API allows assigning a reference counted object to it through a %Set...() function, this implies ownership through a SharedPtr. For example assigning a Material to a StaticModel, or a Viewport to Renderer. To end
 the assignment and free the reference counted object, call the Set...() function again with a null argument.
 
 - No C++ exceptions. Error return values (false / null pointer / dummy reference) are used instead. %Script exceptions are used when there is no other sensible way, such as with out of bounds array access.
