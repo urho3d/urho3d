@@ -326,7 +326,7 @@ public:
     /// Return whether sRGB conversion on rendertarget writing is supported.
     bool GetSRGBWriteSupport() const { return sRGBWriteSupport_; }
 
-    /// Return supported fullscreen resolutions. Will be empty if listing the resolutions is not supported on the platform (e.g. HTML5.)
+    /// Return supported fullscreen resolutions. Will be empty if listing the resolutions is not supported on the platform (e.g. Web).
     PODVector<IntVector2> GetResolutions() const;
     /// Return supported multisampling levels.
     PODVector<int> GetMultiSampleLevels() const;

@@ -28,7 +28,7 @@ find_package (Urho3D REQUIRED)
 include_directories (${URHO3D_INCLUDE_DIRS})
 
 # Urho3DPlayer target is rather special, although it is here, it is not a tool because it is built into target platform binary as opposed to host platform
-if (NOT EMSCRIPTEN)
+if (NOT WEB)
     add_subdirectory (Urho3DPlayer)
 endif ()
 

@@ -38,6 +38,7 @@
 #  URHO3D_SSE
 #  URHO3D_DATABASE_ODBC
 #  URHO3D_DATABASE_SQLITE
+#  URHO3D_LUAJIT
 #
 # WIN32 only:
 #  URHO3D_LIBRARIES_REL
@@ -70,12 +71,13 @@ else ()
     if (NOT URHO3D_HOME AND DEFINED ENV{URHO3D_HOME})
         file (TO_CMAKE_PATH "$ENV{URHO3D_HOME}" URHO3D_HOME)
     endif ()
-    # If either of the URHO3D_64BIT or URHO3D_LIB_TYPE or URHO3D_HOME build options changes then invalidate all the caches
+    # Convert to integer literal to match it with our internal cache representation; it also will be used as foreach loop control variable
     if (URHO3D_64BIT)
-        set (URHO3D_64BIT 1)    # Convert to integer literal to match it with our internal cache representation
+        set (URHO3D_64BIT 1)
     else ()
         set (URHO3D_64BIT 0)
     endif ()
+    # If either of the URHO3D_64BIT or URHO3D_LIB_TYPE or URHO3D_HOME build options changes then invalidate all the caches
     if (NOT URHO3D_64BIT EQUAL URHO3D_FOUND_64BIT OR NOT URHO3D_LIB_TYPE STREQUAL URHO3D_FOUND_LIB_TYPE OR NOT URHO3D_BASE_INCLUDE_DIR MATCHES "^${URHO3D_HOME}/include/Urho3D$")
         unset (URHO3D_BASE_INCLUDE_DIR CACHE)
         unset (URHO3D_LIBRARIES CACHE)
@@ -109,7 +111,7 @@ else ()
             endif ()
         endif ()
         # Cater for the shared library extension in Emscripten build which is ".bc" instead of ".so"
-        if (EMSCRIPTEN)
+        if (WEB)
             string (REPLACE .so .bc CMAKE_FIND_LIBRARY_SUFFIXES "${CMAKE_FIND_LIBRARY_SUFFIXES}")   # Stringify for string replacement
         endif ()
         # The PATH_SUFFIX does not work for CMake on Windows host system, it actually needs a prefix instead
@@ -160,13 +162,11 @@ else ()
         # For 64-bit MinGW on Linux host system, force to search in 'lib64' path even when the Windows platform is not defaulted to use it
         set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)
     endif ()
-    if (NOT URHO3D_LIB_TYPE)
-        set (URHO3D_LIB_TYPE_WAS_UNDEFINED TRUE)    # We need this to undefine the auto-discovered URHO3D_LIB_TYPE variable before looping
-    endif ()
-    set (AUTO_DISCOVER_VARS URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE)
+    set (URHO3D_LIB_TYPE_SAVED ${URHO3D_LIB_TYPE})  # We need this to reset the auto-discovered URHO3D_LIB_TYPE variable before looping
+    set (AUTO_DISCOVER_VARS URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT)
     foreach (ABI_64BIT RANGE ${URHO3D_64BIT} 0)
         # Break if the compiler is not multilib-capable and the ABI is not its native
-        if ((MSVC OR MINGW OR ANDROID OR RPI OR EMSCRIPTEN) AND NOT ABI_64BIT EQUAL URHO3D_DEFAULT_64BIT)
+        if ((MSVC OR MINGW OR ANDROID OR RPI OR WEB) AND NOT ABI_64BIT EQUAL URHO3D_DEFAULT_64BIT)
             break ()
         endif ()
         # Set to search in 'lib' or 'lib64' based on the ABI being tested
@@ -216,8 +216,10 @@ else ()
             endif ()
         endif ()
         # Ensure the module has found the library with the right ABI for the chosen compiler and URHO3D_64BIT build option (if specified)
-        if (URHO3D_LIBRARIES AND NOT URHO3D_COMPILE_RESULT)
-            if (NOT (MSVC OR MINGW OR ANDROID OR RPI OR EMSCRIPTEN) AND NOT ABI_64BIT)
+        if (URHO3D_COMPILE_RESULT)
+            break ()    # Use the cached result instead of redoing try_run() each time
+        elseif (URHO3D_LIBRARIES)
+            if (NOT (MSVC OR MINGW OR ANDROID OR RPI OR WEB) AND NOT ABI_64BIT)
                 set (COMPILER_32BIT_FLAG -DCOMPILE_DEFINITIONS:STRING=-m32)
             endif ()
             # Below variables are loop invariant but there is no harm to keep them here
@@ -253,6 +255,11 @@ else ()
             set (URHO3D_COMPILE_RESULT ${URHO3D_COMPILE_RESULT} CACHE INTERNAL "FindUrho3D module's compile result")
             if (URHO3D_COMPILE_RESULT AND URHO3D_RUN_RESULT EQUAL 0)
                 # Auto-discover build options used by the found library
+                if (IOS)
+                    # Since Urho3D library for iOS is a universal binary, we need another way to find out the compiler ABI when the library was built
+                    execute_process (COMMAND lipo -info ${URHO3D_LIBRARIES} COMMAND grep -cq 'x86_64' RESULT_VARIABLE GREP_RESULT OUTPUT_QUIET ERROR_QUIET)
+                    math (EXPR ABI_64BIT "1 - ${GREP_RESULT}")
+                endif ()
                 set (URHO3D_64BIT ${ABI_64BIT} CACHE BOOL "Enable 64-bit build, the value is auto-discovered based on the found Urho3D library" FORCE) # Force it as it is more authoritative than user-specified option
                 set (URHO3D_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE BOOL "Urho3D library type, the value is auto-discovered based on the found Urho3D library" FORCE) # Use the Force, Luke
                 foreach (VAR ${AUTO_DISCOVER_VARS})
@@ -266,9 +273,7 @@ else ()
                 break ()
             else ()
                 # Prepare for the second attempt by resetting the variables as necessary
-                if (URHO3D_LIB_TYPE_WAS_UNDEFINED)
-                    unset (URHO3D_LIB_TYPE)
-                endif ()
+                set (URHO3D_LIB_TYPE ${URHO3D_LIB_TYPE_SAVED})
                 unset (URHO3D_LIBRARIES CACHE)
             endif ()
         endif ()

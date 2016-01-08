@@ -30,7 +30,7 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
             cmake_policy (SET CMP0022 NEW)
         endif ()
         if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-            # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
+            # Disallow use of the LOCATION target property - so we set to OLD as we still need it
             cmake_policy (SET CMP0026 OLD)
             # MACOSX_RPATH is enabled by default
             cmake_policy (SET CMP0042 NEW)
@@ -80,7 +80,4 @@ set (INCLUDE_DIRS ../../include ../../../../ThirdParty/Lua${JIT}/src)
 set_tool_output_directories ()
 
 # Setup target
-if (APPLE)
-    setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
-endif ()
 setup_executable (NODEPS)
