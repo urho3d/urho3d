@@ -234,9 +234,6 @@ if (NOT HOST_SYS STREQUAL TARGET_SYS)
 endif ()
 
 # Makefile: Files and pathnames
-if (NOT BAKED_CMAKE_SOURCE_DIR)
-    set (BAKED_CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR})
-endif ()
 set (DASM_ARCH ${TARGET_LJARCH})
 
 # Below regex is a workaround for "LJ_ARCH_BITS (.*?)\\n" as CMake does not understand non-greedy quantifier
