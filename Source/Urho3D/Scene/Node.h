@@ -300,6 +300,19 @@ public:
     /// Template version of removing all components of specific type.
     template <class T> void RemoveComponents();
 
+	///	Return true if all tags are registered. Add all registered tags to node.
+	bool AddTags(const String& tags,char split=',');
+	/// Return true if tag is registered. Add registered tag to node.
+	bool AddTag(const String& tag);
+	/// Return true if tag is registered. Remove registered tag from node.
+	bool RemoveTag(const String& tag);
+	/// Used by scene to set the tag mask. no checking and no events are send. 
+	void SetTagMask(unsigned mask);
+	/// Return tag mask.
+	unsigned GetTagMask() const { return tagMask_; }
+	/// Return true if node has all specified tags set. Fast. 
+	bool HasTags(unsigned mask) const { return ((tagMask_ & mask) == mask); }
+
     /// Return ID.
     unsigned GetID() const { return id_; }
 
@@ -656,6 +669,8 @@ private:
 	StringHash tag_;
 	/// Tag String.
 	String tagString_;
+	/// Tag Mask.
+	unsigned tagMask_;
     /// Name hash.
     StringHash nameHash_;
     /// Attribute buffer for network updates.

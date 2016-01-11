@@ -172,6 +172,11 @@ public:
 	/// Clear all registered node Tag.
 	void UnregisterAllTags();
 
+
+	bool AddNodeTags(Node* node,const String& tags, char split = ',');
+	bool AddNodeTag(Node* node,const String& tag);
+	bool RemoveNodeTag(Node* node,const String& tag);
+
     /// Return node from the whole scene by ID, or null if not found.
     Node* GetNode(unsigned id) const;
     /// Return component from the whole scene by ID, or null if not found.
@@ -307,6 +312,9 @@ private:
     HashMap<StringHash, String> varNames_;
 	/// Registered node tag reverse mappings.
 	HashMap<StringHash, String> tagNames_;
+
+	Vector<String> tagMaskNames_;
+
     /// Nodes to check for attribute changes on the next network update.
     HashSet<unsigned> networkUpdateNodes_;
     /// Components to check for attribute changes on the next network update.

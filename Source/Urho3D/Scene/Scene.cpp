@@ -719,6 +719,77 @@ void Scene::UnregisterAllTags()
 	tagNames_.Clear();
 }
 
+bool Scene::AddNodeTags(Node * node, const String & tags, char split)
+{
+	// paranoia check needed ? 
+	if(!node && node->GetScene() == this)
+		return false;
+
+	bool allset = true;
+	Vector<String> ts = tags.Split(split);
+
+	for (unsigned i = 0; i < ts.Size(); i++)
+		allset |= AddNodeTag(node,ts[i]);
+
+	return allset;
+}
+
+bool Scene::AddNodeTag(Node * node, const String & tag)
+{
+	// paranoia check needed ? 
+	if (!node && node->GetScene() == this)
+		return false;
+	// check if tag is registered
+	// TODO auto register tag
+	Vector<String>::Iterator it = tagMaskNames_.Find(tag);
+	if (it == tagMaskNames_.End())
+		return false;
+
+	// change node tag mask
+	unsigned mask = node->GetTagMask();
+	mask |= 1 << ((unsigned)(it - tagMaskNames_.Begin()) + 1);
+	node->SetTagMask(mask);
+
+	// cache taged node 
+	tagedNodes_[tag].Push(node);
+
+	// send event
+	using namespace NodeTagAdded;
+	VariantMap& eventData = GetEventDataMap();
+	eventData[P_SCENE] = this;
+	eventData[P_NODE] = node;
+	eventData[P_TAG] = tag;
+	SendEvent(E_NODETAGADDED, eventData);
+}
+
+bool Scene::RemoveNodeTag(Node * node, const String & tag)
+{
+	// paranoia check needed ? 
+	if (!node && node->GetScene() == this)
+		return false;
+
+	// check if tag is registered
+	Vector<String>::Iterator it = tagMaskNames_.Find(tag);
+	if (it == tagMaskNames_.End())
+		return false;
+
+	// change node tag mask
+	unsigned mask = node->GetTagMask();
+	mask &= ~( 1 << ((unsigned)(it - tagMaskNames_.Begin()) + 1));
+	node->SetTagMask(mask);
+
+	// remove untaged node from cache
+	tagedNodes_[tag].Remove(node);
+
+	// send event
+	using namespace NodeTagRemoved;
+	VariantMap& eventData = GetEventDataMap();
+	eventData[P_SCENE] = this;
+	eventData[P_NODE] = node;
+	eventData[P_TAG] = tag;
+	SendEvent(E_NODETAGREMOVED, eventData);
+}
+
 Node* Scene::GetNode(unsigned id) const
 {
     if (id < FIRST_LOCAL_ID)
