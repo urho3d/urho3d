@@ -91,6 +91,8 @@ void Run(const Vector<String>& arguments)
             "Options:\n"
             "-c      Enable package file LZ4 compression\n"
             "-q      Enable quiet mode\n"
+            "\n"
+            "Basepath is an optional prefix that will be added to the file entries.\n"
         );
 
     const String& dirName = arguments[0];
@@ -180,7 +182,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
         // Write entry (correct offset is still unknown, will be filled in later)
-        dest.WriteString(entries_[i].name_);
+        dest.WriteString(basePath_ + entries_[i].name_);
         dest.WriteUInt(entries_[i].offset_);
         dest.WriteUInt(entries_[i].size_);
         dest.WriteUInt(entries_[i].checksum_);
@@ -258,7 +260,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
 
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
-        dest.WriteString(entries_[i].name_);
+        dest.WriteString(basePath_ + entries_[i].name_);
         dest.WriteUInt(entries_[i].offset_);
         dest.WriteUInt(entries_[i].size_);
         dest.WriteUInt(entries_[i].checksum_);

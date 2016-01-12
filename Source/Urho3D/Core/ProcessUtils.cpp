@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/ProcessUtils.h"
+#include "../IO/FileSystem.h"
 
 #include <cstdio>
 #include <fcntl.h>
@@ -92,6 +93,7 @@ static bool consoleOpened = false;
 #endif
 static String currentLine;
 static Vector<String> arguments;
+static String miniDumpDir;
 
 #if defined(IOS)
 static void GetCPUData(host_basic_info_data_t* data)
@@ -439,6 +441,29 @@ unsigned GetNumLogicalCPUs()
     GetCPUData(&data);
     return (unsigned)data.num_logical_cpus;
 #endif
+}
+
+void SetMiniDumpDir(const String& pathName)
+{
+    miniDumpDir = AddTrailingSlash(pathName);
+}
+
+String GetMiniDumpDir()
+{
+#ifndef MINI_URHO
+    if (miniDumpDir.Empty())
+    {
+        char* pathName = SDL_GetPrefPath("urho3d", "crashdumps");
+        if (pathName)
+        {
+            String ret(pathName);
+            SDL_free(pathName);
+            return ret;
+        }
+    }
+#endif
+
+    return miniDumpDir;
 }
 
 }
