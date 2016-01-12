@@ -68,7 +68,7 @@ bool Component::SaveXML(XMLElement& dest) const
     // Write type and ID
     if (!dest.SetString("type", GetTypeName()))
         return false;
-    if (!dest.SetInt("id", id_))
+    if (!dest.SetUInt("id", id_))
         return false;
 
     // Write attributes
@@ -79,7 +79,7 @@ bool Component::SaveJSON(JSONValue& dest) const
 {
     // Write type and ID
     dest.Set("type", GetTypeName());
-    dest.Set("id", (int) id_);
+    dest.Set("id", id_);
 
     // Write attributes
     return Animatable::SaveJSON(dest);
