@@ -1,6 +1,6 @@
 /*
 ** Definitions for MIPS CPUs.
-** Copyright (C) 2005-2014 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2015 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #ifndef _LJ_TARGET_MIPS_H
@@ -169,6 +169,9 @@ typedef enum MIPSIns {
   MIPSI_SLTU = 0x0000002b,
   MIPSI_MOVZ = 0x0000000a,
   MIPSI_MOVN = 0x0000000b,
+  MIPSI_MFHI = 0x00000010,
+  MIPSI_MFLO = 0x00000012,
+  MIPSI_MULT = 0x00000018,
 
   MIPSI_SLL = 0x00000000,
   MIPSI_SRL = 0x00000002,
