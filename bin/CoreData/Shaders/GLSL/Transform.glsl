@@ -88,14 +88,29 @@ vec3 GetBillboardNormal()
 #endif
 
 #ifdef DIRBILLBOARD
-vec3 GetBillboardPos(vec4 iPos, vec3 iOffset, mat4 modelMatrix)
+mat3 GetFaceCameraRotation(vec3 cameraPos, vec3 position, vec3 direction)
 {
-    return (iPos * modelMatrix).xyz + iOffset;
+    vec3 cameraDir = normalize(position - cameraPos);
+    vec3 front = normalize(direction);
+    vec3 right = normalize(cross(front, cameraDir));
+    vec3 up = normalize(cross(front, right));
+
+    return mat3(
+        right.x, up.x, front.x,
+        right.y, up.y, front.y,
+        right.z, up.z, front.z
+    );
 }
 
-vec3 GetBillboardNormal()
+vec3 GetBillboardPos(vec4 iPos, vec3 iDirection, vec3 iCameraPos, mat4 modelMatrix)
 {
-    return iNormal;
+    return (iPos * modelMatrix).xyz + 
+        vec3(iTexCoord2.x, 0.0, iTexCoord2.y) * GetFaceCameraRotation(iCameraPos, iPos.xyz, iDirection);
+}
+
+vec3 GetBillboardNormal(vec4 iPos, vec3 iDirection, vec3 iCameraPos)
+{
+    return vec3(0.0, 1.0, 0.0) * GetFaceCameraRotation(iCameraPos, iPos.xyz, iDirection);
 }
 #endif
 
@@ -112,7 +127,7 @@ vec3 GetWorldPos(mat4 modelMatrix)
     #if defined(BILLBOARD)
         return GetBillboardPos(iPos, iTexCoord2, modelMatrix);
     #elif defined(DIRBILLBOARD)
-        return GetBillboardPos(iPos, iTangent.xyz, modelMatrix);
+        return GetBillboardPos(iPos, iNormal, iTangent.xyz, modelMatrix);
     #else
         return (iPos * modelMatrix).xyz;
     #endif
@@ -120,8 +135,10 @@ vec3 GetWorldPos(mat4 modelMatrix)
 
 vec3 GetWorldNormal(mat4 modelMatrix)
 {
-    #if defined(BILLBOARD) || defined(DIRBILLBOARD)
+    #if defined(BILLBOARD)
         return GetBillboardNormal();
+    #elif defined(DIRBILLBOARD)
+        return GetBillboardNormal(iPos, iNormal, iTangent.xyz);
     #else
         return normalize(iNormal * GetNormalMatrix(modelMatrix));
     #endif

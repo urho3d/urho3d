@@ -576,20 +576,6 @@ Quaternion Camera::GetFaceCameraRotation(const Vector3& position, const Quaterni
     }
 }
 
-Quaternion Camera::GetFaceCameraRotationAlongDirection(const Vector3& position, const Vector3& direction)
-{
-    const Vector3& cameraPos = node_ ? node_->GetWorldPosition() : Vector3::ZERO;
-    Vector3 cameraDir = (position - cameraPos).Normalized();
-
-    Vector3 front = direction.Normalized();
-    Vector3 right = front.CrossProduct(cameraDir).Normalized();
-    Vector3 up = front.CrossProduct(right).Normalized();
-
-    Quaternion rot;
-    rot.FromAxes(right, up, front);
-    return rot;
-}
-
 Matrix3x4 Camera::GetEffectiveWorldTransform() const
 {
     Matrix3x4 worldTransform = node_ ? Matrix3x4(node_->GetWorldPosition(), node_->GetWorldRotation(), 1.0f) : Matrix3x4::IDENTITY;

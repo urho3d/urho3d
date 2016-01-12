@@ -459,8 +459,8 @@ void BillboardSet::UpdateBufferSize()
     {
         if (faceCameraMode_ == FC_DIRECTION)
         {
-            geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_COLOR | MASK_TEXCOORD1 | MASK_TANGENT);
-            vertexBuffer_->SetSize(numBillboards * 4, MASK_POSITION | MASK_NORMAL | MASK_COLOR | MASK_TEXCOORD1 | MASK_TANGENT, true);
+            geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2 | MASK_TANGENT);
+            vertexBuffer_->SetSize(numBillboards * 4, MASK_POSITION | MASK_NORMAL | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2 | MASK_TANGENT, true);
         } else {
             geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2);
             vertexBuffer_->SetSize(numBillboards * 4, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2, true);
@@ -618,8 +618,6 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         }
     } else
     {
-        Vector3 offset;
-        Vector2 vert;
         for (unsigned i = 0; i < enabledBillboards; ++i)
         {
             Billboard& billboard = *sortedBillboards_[i];
@@ -627,84 +625,77 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
             Vector2 size(billboard.size_.x_ * billboardScale.x_, billboard.size_.y_ * billboardScale.y_);
             unsigned color = billboard.color_.ToUInt();
 
-            Quaternion rot3D = frame.camera_->GetFaceCameraRotationAlongDirection(node_->GetWorldTransform() * billboard.position_, billboard.direction_);
-            Vector3 normal = rot3D * Vector3::UP;
-
             float rot2D[2][2];
             rot2D[0][0] = Cos(billboard.rotation_);
             rot2D[0][1] = Sin(billboard.rotation_);
             rot2D[1][0] = -rot2D[0][1];
             rot2D[1][1] = rot2D[0][0];
 
-            vert.x_ = -size.x_ * rot2D[0][0] + size.y_ * rot2D[0][1];
-            vert.y_ = -size.x_ * rot2D[1][0] + size.y_ * rot2D[1][1];
-            offset = rot3D * Vector3(vert.x_, 0.0f, vert.y_);
             dest[0] = billboard.position_.x_;
             dest[1] = billboard.position_.y_;
             dest[2] = billboard.position_.z_;
-            dest[3] = normal.x_;
-            dest[4] = normal.y_;
-            dest[5] = normal.z_;
+            dest[3] = billboard.direction_.x_;
+            dest[4] = billboard.direction_.y_;
+            dest[5] = billboard.direction_.z_;
             ((unsigned&)dest[6]) = color;
             dest[7] = billboard.uv_.min_.x_;
             dest[8] = billboard.uv_.min_.y_;
-            dest[9] = offset.x_;
-            dest[10] = offset.y_;
-            dest[11] = offset.z_;
-            dest[12] = 1.0f;
+            dest[9] = -size.x_ * rot2D[0][0] + size.y_ * rot2D[0][1];
+            dest[10] = -size.x_ * rot2D[1][0] + size.y_ * rot2D[1][1];
+            dest[11] = frame.camera_->GetNode()->GetWorldPosition().x_;
+            dest[12] = frame.camera_->GetNode()->GetWorldPosition().y_;
+            dest[13] = frame.camera_->GetNode()->GetWorldPosition().z_;
+            dest[14] = 1.0f;
 
-            vert.x_ = size.x_ * rot2D[0][0] + size.y_ * rot2D[0][1];
-            vert.y_ = size.x_ * rot2D[1][0] + size.y_ * rot2D[1][1];
-            offset = rot3D * Vector3(vert.x_, 0.0f, vert.y_);
-            dest[13] = billboard.position_.x_;
-            dest[14] = billboard.position_.y_;
-            dest[15] = billboard.position_.z_;
-            dest[16] = normal.x_;
-            dest[17] = normal.y_;
-            dest[18] = normal.z_;
-            ((unsigned&)dest[19]) = color;
-            dest[20] = billboard.uv_.max_.x_;
-            dest[21] = billboard.uv_.min_.y_;
-            dest[22] = offset.x_;
-            dest[23] = offset.y_;
-            dest[24] = offset.z_;
-            dest[25] = 1.0f;
+            dest[15] = billboard.position_.x_;
+            dest[16] = billboard.position_.y_;
+            dest[17] = billboard.position_.z_;
+            dest[18] = billboard.direction_.x_;
+            dest[19] = billboard.direction_.y_;
+            dest[20] = billboard.direction_.z_;
+            ((unsigned&)dest[21]) = color;
+            dest[22] = billboard.uv_.max_.x_;
+            dest[23] = billboard.uv_.min_.y_;
+            dest[24] = size.x_ * rot2D[0][0] + size.y_ * rot2D[0][1];
+            dest[25] = size.x_ * rot2D[1][0] + size.y_ * rot2D[1][1];
+            dest[26] = frame.camera_->GetNode()->GetWorldPosition().x_;
+            dest[27] = frame.camera_->GetNode()->GetWorldPosition().y_;
+            dest[28] = frame.camera_->GetNode()->GetWorldPosition().z_;
+            dest[29] = 1.0f;
 
-            vert.x_ = size.x_ * rot2D[0][0] - size.y_ * rot2D[0][1];
-            vert.y_ = size.x_ * rot2D[1][0] - size.y_ * rot2D[1][1];
-            offset = rot3D * Vector3(vert.x_, 0.0f, vert.y_);
-            dest[26] = billboard.position_.x_;
-            dest[27] = billboard.position_.y_;
-            dest[28] = billboard.position_.z_;
-            dest[29] = normal.x_;
-            dest[30] = normal.y_;
-            dest[31] = normal.z_;
-            ((unsigned&)dest[32]) = color;
-            dest[33] = billboard.uv_.max_.x_;
-            dest[34] = billboard.uv_.max_.y_;
-            dest[35] = offset.x_;
-            dest[36] = offset.y_;
-            dest[37] = offset.z_;
-            dest[38] = 1.0f;
+            dest[30] = billboard.position_.x_;
+            dest[31] = billboard.position_.y_;
+            dest[32] = billboard.position_.z_;
+            dest[33] = billboard.direction_.x_;
+            dest[34] = billboard.direction_.y_;
+            dest[35] = billboard.direction_.z_;
+            ((unsigned&)dest[36]) = color;
+            dest[37] = billboard.uv_.max_.x_;
+            dest[38] = billboard.uv_.max_.y_;
+            dest[39] = size.x_ * rot2D[0][0] - size.y_ * rot2D[0][1];
+            dest[40] = size.x_ * rot2D[1][0] - size.y_ * rot2D[1][1];
+            dest[41] = frame.camera_->GetNode()->GetWorldPosition().x_;
+            dest[42] = frame.camera_->GetNode()->GetWorldPosition().y_;
+            dest[43] = frame.camera_->GetNode()->GetWorldPosition().z_;
+            dest[44] = 1.0f;
 
-            vert.x_ = -size.x_ * rot2D[0][0] - size.y_ * rot2D[0][1];
-            vert.y_ = -size.x_ * rot2D[1][0] - size.y_ * rot2D[1][1];
-            offset = rot3D * Vector3(vert.x_, 0.0f, vert.y_);
-            dest[39] = billboard.position_.x_;
-            dest[40] = billboard.position_.y_;
-            dest[41] = billboard.position_.z_;
-            dest[42] = normal.x_;
-            dest[43] = normal.y_;
-            dest[44] = normal.z_;
-            ((unsigned&)dest[45]) = color;
-            dest[46] = billboard.uv_.min_.x_;
-            dest[47] = billboard.uv_.max_.y_;
-            dest[48] = offset.x_;
-            dest[49] = offset.y_;
-            dest[50] = offset.z_;
-            dest[51] = 1.0f;
+            dest[45] = billboard.position_.x_;
+            dest[46] = billboard.position_.y_;
+            dest[47] = billboard.position_.z_;
+            dest[48] = billboard.direction_.x_;
+            dest[49] = billboard.direction_.y_;
+            dest[50] = billboard.direction_.z_;
+            ((unsigned&)dest[51]) = color;
+            dest[52] = billboard.uv_.min_.x_;
+            dest[53] = billboard.uv_.max_.y_;
+            dest[54] = -size.x_ * rot2D[0][0] - size.y_ * rot2D[0][1];
+            dest[55] = -size.x_ * rot2D[1][0] - size.y_ * rot2D[1][1];
+            dest[56] = frame.camera_->GetNode()->GetWorldPosition().x_;
+            dest[57] = frame.camera_->GetNode()->GetWorldPosition().y_;
+            dest[58] = frame.camera_->GetNode()->GetWorldPosition().z_;
+            dest[59] = 1.0f;
 
-            dest += 52;
+            dest += 60;
         }
     }
 
