@@ -162,7 +162,7 @@ After the build is complete, the programs can be run from the bin subdirectory i
 - Or even better, use the 'resource prefix path' \ref Running_Commandline "engine parameter" by setting URHO3D_PREFIX_PATH variable in your host environment. The prefix variable must be set to an absolute path which contains the resource directories.
 - Or use the URHO3D_PACKAGING build option which would package the resource directories as *.pak files in the bin subdirectory in the build tree.
 
-The Mac OS X executables can be built with all the resources bundled into a single app directory. In order to enable this, set the URHO3D_MACOSX_BUNDLE build option when configuring the build tree for the Mac OS X platform. The bundled app can be launched just by double-clicking from the Finder without worrying about setting the 'resource prefix path'. This is because the URHO3D_PREFIX_PATH environment variable has been set internally to point to the resources directory that is already bundled in the app. Note, however, if you do not launch the app via the Apple "Launch Services" (such as when you are debugging or by calling the executable directly inside the bundled app directory via CLI) then you still need to set the 'resource prefix path' manually as described in the previous paragraph.
+The Mac OS X executables can be built with all the resources bundled into a single app directory. In order to enable this, set the URHO3D_MACOSX_BUNDLE build option when configuring the build tree for the Mac OS X platform. The bundled app can be launched just by double-clicking from the Finder without worrying about setting the 'resource prefix path'. This is because the URHO3D_PREFIX_PATH environment variable has been set internally to point to the resources directory that is already bundled in the app. Note, however, if you do not launch the app via the Apple "Launch Services" (such as when you are debugging or by calling the executable directly inside the bundled app directory via CLI) then you still need to set the 'resource prefix path' manually as described in the previous paragraph. Note that the Mach-O universal binary targets can only be built when Xcode generator is used. All the other generators only build single-arch binary targets.
 
 The Windows executables are by default built as Windows application instead of console application. You can set the URHO3D_WIN32_CONSOLE build option to override this. As console application, the standard output and standard error streams of the executable are redirected to console.
 
@@ -329,14 +329,14 @@ cd $(dirname $(xcodebuild -find-executable clang))
 for compiler in clang clang++; do mv $compiler{,.orig} && ln -sf $(which ccache) $compiler; done
 \endverbatim
 
-On Xcode 6:
+On Xcode 6 or above:
 \verbatim
 cd $(dirname $(xcodebuild -find-executable clang))
 cp -p $(which ccache) .
-for compiler in clang clang++; do mv $compiler{,.orig} && sudo mv /usr/bin/$compiler{,.orig} && sudo ln -sf $(pwd)/$compiler.orig /usr/bin/$compiler && ln -sf ccache $compiler; done
+for compiler in clang clang++; do mv $compiler{,.orig} && sudo mv /usr/bin/$compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/bin/$compiler && ln -sf ccache $compiler; done
 \endverbatim
 
-Xcode 6 has done something funky internally. It won't build unless the symlink resolves to an executable within its own rooted-'/usr/bin' in Xcode.app package. The 'ccache' executable is physically copied to this location for this reason. But as the result, you have to manually keep this copy up to date when upgrading 'ccache'.
+Starting since version 6, Xcode has done something funky internally. It won't build unless the symlink resolves to an executable within its own rooted-'/usr/bin' in Xcode.app package. The 'ccache' executable is physically copied to this location for this reason. But as the result, you have to manually keep this copy up to date when upgrading 'ccache'.
 
 \page Running Running Urho3D player application
 

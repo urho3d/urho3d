@@ -20,11 +20,7 @@
 # THE SOFTWARE.
 #
 
-if (CMAKE_PROJECT_NAME STREQUAL Urho3D-ExternalProject-tolua++)
-    # Do not install the buildvm host tool from tolua++ external project because it is built for targeting host system itself
-    # We only want to keep the buildvm host tool which is built for cross-compiling target (the one built from internal LuaJIT CMake-target)
-    set (DEST_RUNTIME_DIR "")   # In this particular case, it is not equivalent to unset() the variable
-elseif (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
+if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
     cmake_minimum_required (VERSION 2.8.6)
     if (COMMAND cmake_policy)
@@ -55,6 +51,8 @@ elseif (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
         string (REPLACE +D -D ${ESCAPED_VAR} "${${ESCAPED_VAR}}")       # Stringify against empty variable
         string (REPLACE , ";" ${ESCAPED_VAR} "${${ESCAPED_VAR}}")
     endforeach ()
+else ()
+    set (PRIVATE PRIVATE)
 endif ()
 
 # Add dependency target
@@ -73,7 +71,7 @@ set (DASM ${DASM_DIR}/dynasm.lua)
 set (DASM_DASC ${CMAKE_CURRENT_SOURCE_DIR}/../vm_${DASM_ARCH}.dasc)
 file (GLOB DASM_LUA ${DASM_DIR}/*.lua)
 add_custom_command (OUTPUT ${GEN_ARCH_H}
-    COMMAND ${CMAKE_BINARY_DIR}/bin/tool/minilua ${DASM} ${DASM_FLAGS} -o ${GEN_ARCH_H} ${DASM_DASC}
+    COMMAND minilua ${DASM} ${DASM_FLAGS} -o ${GEN_ARCH_H} ${DASM_DASC}
     DEPENDS minilua ${DASM_LUA} ${DASM_DASC}
     WORKING_DIRECTORY ${DASM_DIR}
     COMMENT "Generating buildvm arch header file")
@@ -85,8 +83,5 @@ set (SOURCE_FILES ${C_FILES} ${GEN_ARCH_H})
 # Define dependency libs
 set (INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR} ..)
 
-# All tools must be natively built and output to bin/tool subdir to differentiate them from target platfrom binaries in the bin directory
-set_tool_output_directories ()
-
 # Setup target
-setup_executable (NODEPS)
+setup_executable (${PRIVATE} TOOL NODEPS)

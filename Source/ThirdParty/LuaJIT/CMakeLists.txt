@@ -23,6 +23,35 @@
 # Based on src/Makefile from http://luajit.org
 # The cross-compiling logic is ported to CMake as faithful as possible although currently Urho3D does not support all target archs supported by LuaJIT
 
+if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
+    # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
+    cmake_minimum_required (VERSION 2.8.6)
+    if (COMMAND cmake_policy)
+        cmake_policy (SET CMP0003 NEW)
+        if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
+            # INTERFACE_LINK_LIBRARIES defines the link interface
+            cmake_policy (SET CMP0022 NEW)
+        endif ()
+        if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
+            # Disallow use of the LOCATION target property - so we set to OLD as we still need it
+            cmake_policy (SET CMP0026 OLD)
+            # MACOSX_RPATH is enabled by default
+            cmake_policy (SET CMP0042 NEW)
+        endif ()
+    endif ()
+
+    # Set project name
+    project (Urho3D-ExternalProject-LuaJIT-${ARCH})
+
+    # Set CMake modules search path
+    set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/CMake/Modules)
+
+    # Include Urho3D Cmake common module
+    include (Urho3D-CMake-common)
+elseif (CMAKE_CROSSCOMPILING)
+    set (TOOL_PATH ${CMAKE_BINARY_DIR}/bin/tool/)
+endif ()
+
 # Makefile: Compiler options
 if (NOT MSVC)
     # Since the assembler part does NOT maintain a frame pointer, it's pointless
@@ -165,11 +194,18 @@ if (NOT LUAJIT_CACHE STREQUAL "${URHO3D_64BIT}-${LUAJIT_DISABLE_FFI}-${LUAJIT_DI
         string (REPLACE " " ";" TARGET_TCFLAGS "${CMAKE_C_FLAGS}")   # Convert string of flags to list of flags
         get_directory_property (COMPILE_DEFINITIONS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMPILE_DEFINITIONS)
         string (REPLACE ";" ";-D" COMPILE_DEFINITIONS "-D${COMPILE_DEFINITIONS}")    # Prefix defines with -D
+        if (XCODE)
+            if (ARCH)    # The ARCH variable is defined only when we are building LuaJIT for non-native archs using external project
+                set (ARCH_FLAGS -arch ${ARCH})
+            elseif (URHO3D_DEFAULT_64BIT AND NOT URHO3D_64BIT)
+                set (ARCH_FLAGS -arch i386)
+            endif ()
+        endif ()
         execute_process (COMMAND egrep -V RESULT_VARIABLE EGREP_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
         if (EGREP_EXIT_CODE EQUAL 0)
             set (FILTER COMMAND egrep "LJ_|MIPSEL")
         endif ()
-        execute_process (COMMAND ${CMAKE_C_COMPILER} ${COMPILE_DEFINITIONS} ${TARGET_TCFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/src/lj_arch.h -E -dM
+        execute_process (COMMAND ${CMAKE_C_COMPILER} ${COMPILE_DEFINITIONS} ${TARGET_TCFLAGS} ${ARCH_FLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/src/lj_arch.h -E -dM
             ${FILTER} OUTPUT_VARIABLE TARGET_TESTARCH ERROR_QUIET)
     endif ()
     find_string ("LJ_TARGET_(X64|X86|ARM|ARM64|PS3|PPC|MIPS) 1" TARGET_LJARCH)
@@ -352,7 +388,7 @@ macro (generate_source name mode)
     set (GEN_SRC ${CMAKE_CURRENT_BINARY_DIR}/generated/${name})
     set (GEN_SRCS ${GEN_SRCS} ${GEN_SRC})
     add_custom_command (OUTPUT ${GEN_SRC}
-        COMMAND ${CMAKE_BINARY_DIR}/bin/tool/buildvm -m ${mode} -o ${GEN_SRC} ${ARGN}
+        COMMAND ${TOOL_PATH}buildvm -m ${mode} -o ${GEN_SRC} ${ARGN}
         DEPENDS buildvm ${ARGN}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating buildvm output: ${name}")
@@ -366,7 +402,9 @@ if (WIN32)
 else ()
     set (LJVM_BOUT lj_vm.S)
     enable_language (ASM)
-    set (CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} ${DASH_MBIT}")
+    if (URHO3D_DEFAULT_64BIT AND NOT URHO3D_64BIT)  # Not the compiler native ABI, this could only happen on multilib-capable compilers
+        set (CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -m32")
+    endif ()
     if (APPLE)
         set (LJVM_MODE machasm)
     else ()
@@ -406,13 +444,38 @@ set (SOURCE_FILES ${LJCORE_C} ${GEN_SRCS})
 set (INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
 # Setup target
-setup_library ()
+if (XCODE AND URHO3D_64BIT)
+    set (EXCLUDE_FROM_ALL EXCLUDE_FROM_ALL)
+    list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH YES)
+endif ()
+setup_library (${EXCLUDE_FROM_ALL})
+if (XCODE AND URHO3D_64BIT)
+    # Add external and custom targets to build Mach-O universal binary LuaJIT sub-library
+    include (ExternalProject)
+    foreach (LUAJIT_OPT LUAJIT_ENABLE_GC64 LUAJIT_DISABLE_FFI LUAJIT_ENABLE_LUA52COMPAT LUAJIT_DISABLE_JIT LUAJIT_NUMMODE LUAJIT_USE_SYSMALLOC LUAJIT_USE_VALGRIND LUAJIT_USE_GDBJIT LUA_USE_APICHECK LUA_USE_ASSERT LUAJIT_NO_STACK_PROTECTION)
+        if (DEFINED ${LUAJIT_OPT})
+            list (APPEND LUAJIT_PASSTHRU_OPTS -D${LUAJIT_OPT}=${${LUAJIT_OPT}})
+        endif ()
+    endforeach ()
+    if (IOS)
+        set (IOS_FIX CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
+    endif ()
+    ExternalProject_Add (${TARGET_NAME}_i386
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
+        CMAKE_ARGS -DARCH=i386 -DINSTALL_ARCHIVE_DIR=${CMAKE_CURRENT_BINARY_DIR} -DURHO3D_64BIT=0 -DURHO3D_LUAJIT_AMALG=${URHO3D_LUAJIT_AMALG} -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${LUAJIT_PASSTHRU_OPTS} ${IOS_FIX})
+    add_custom_target (${TARGET_NAME}_universal ALL
+        COMMAND if lipo -info $<TARGET_FILE:${TARGET_NAME}> 2>/dev/null |grep -cq 'i386.*x86_64'\; then echo $<TARGET_FILE:${TARGET_NAME}> is already a Mach-O universal binary library\; else xcodebuild -target ${TARGET_NAME}_i386 -configuration $(CONFIGURATION) -arch i386 && lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{.new,.i386,} && mv $<TARGET_FILE:${TARGET_NAME}>{.new,}\; fi
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Creating Mach-O universal binary LuaJIT library")
+elseif (INSTALL_ARCHIVE_DIR)
+    install (FILES $<TARGET_FILE:${TARGET_NAME}> DESTINATION ${INSTALL_ARCHIVE_DIR}/$<CONFIG> RENAME lib${TARGET_NAME}.a.${ARCH})   # Workaround CMake limitation as it does not support generator-expression for RENAME option
+endif ()
 
 # Install headers for building and using the Urho3D library (no direct dependencies but library user may need them)
 install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/LuaJIT FILES_MATCHING PATTERN *.h *.hpp)  # Note: the trailing slash is significant
 
 # Setup additional Lua standalone target (this target can be transfered and executed on an embedded device, such as Raspberry Pi and Android)
-if (NOT IOS AND NOT WEB)     # LuaJIT library on Emscripten is not possible anyway but just in case it could be in the future, exclude it to build standalone target
+if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-LuaJIT AND NOT IOS AND NOT WEB)
     # Define target name for LuaJIT interpreter cum compiler
     set (TARGET_NAME luajit_interpreter)   # Note: intended target name is 'luajit' which clashes with 'LuaJIT' library target above for case-insensitive platform
 
@@ -428,6 +491,9 @@ if (NOT IOS AND NOT WEB)     # LuaJIT library on Emscripten is not possible anyw
     # Setup target
     setup_executable (NODEPS)
     adjust_target_name ()   # Adjust to intended target output name
+    if (TARGET LuaJIT_universal)
+        add_dependencies (${TARGET_NAME} LuaJIT_universal)
+    endif ()
 
     # Define post build steps
     set (LUAJIT_DEP_DIR ${CMAKE_BINARY_DIR}/bin/jit)
@@ -437,7 +503,9 @@ if (NOT IOS AND NOT WEB)     # LuaJIT library on Emscripten is not possible anyw
         COMMENT "Copying dependency files for luajit standalone executable")
 
     # Install dependency files required by luajit
-    install (DIRECTORY ${LUAJIT_DEP_DIR} DESTINATION ${DEST_RUNTIME_DIR})
+    if (DEST_RUNTIME_DIR)
+        install (DIRECTORY ${LUAJIT_DEP_DIR} DESTINATION ${DEST_RUNTIME_DIR})
+    endif ()
 endif ()
 
 # Add directory containing the dependency files into the LuaJIT module search path

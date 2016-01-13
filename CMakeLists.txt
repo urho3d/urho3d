@@ -69,7 +69,6 @@ elseif (URHO3D_64BIT)
 endif ()
 set (DEST_INCLUDE_DIR include/Urho3D)    # The include directory path contains the 'Urho3D' suffix regardless of PATH_SUFFIX variable
 set (DEST_SHARE_DIR share/${PATH_SUFFIX})
-set (DEST_RUNTIME_DIR bin)
 set (DEST_BUNDLE_DIR ${DEST_SHARE_DIR}/Applications)
 # Note to package maintainer: ${PATH_SUFFIX} for library could be removed if the extra path is not desired, but if so then the RPATH setting in Source's CMakeLists.txt needs to be adjusted accordingly
 set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/${PATH_SUFFIX})

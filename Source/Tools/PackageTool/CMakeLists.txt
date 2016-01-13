@@ -116,5 +116,5 @@ define_source_files (EXTRA_CPP_FILES ${MINI_URHO_CPP_FILES})
 list (APPEND LIBS LZ4)
 
 # Setup target
-setup_executable ()
+setup_executable (TOOL)
 adjust_target_name ()   # Remove postfix from the executable/binary name

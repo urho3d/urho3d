@@ -68,7 +68,7 @@ else ()
 endif ()
 
 # All Clang-tools must be natively built and output to bin/tool/clang subdir to differentiate them from the rest
-set_tool_output_directories (clang)
+set_output_directories (${CMAKE_BINARY_DIR}/bin/tool/clang RUNTIME PDB)
 
 # Define common dependency libs
 set (LIBS clangTooling clangFrontend clangDriver clangParse clangSerialization clangSema clangEdit clangAnalysis clangToolingCore
