@@ -229,9 +229,11 @@ matrix:
       env: ANDROID_NATIVE_API_LEVEL=21 ANDROID_ABI=x86         URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21        USE_CCACHE=2
     - &cache3
       jdk: openjdk6
+      addons: &newer_gcc {apt: {sources: [*default_sources, ubuntu-toolchain-r-test], packages: [*default_packages, g++-4.9]}}
       # ANDROID_ANDROID_ABI=arm64-v8a uses NEON by default, so the following two CI jobs also test NEON code path in the build
       env: ANDROID_NATIVE_API_LEVEL=21 ANDROID_ABI=arm64-v8a   URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1                       USE_CCACHE=1
     - <<: *alternative-cache
+      addons: {<<: *newer_gcc}
       env: ANDROID_NATIVE_API_LEVEL=21 ANDROID_ABI=arm64-v8a   URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1                       USE_CCACHE=2
     - <<: *alternative-cache
       env: ANDROID_NATIVE_API_LEVEL=21 ANDROID_ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC                                       USE_CCACHE=2
@@ -250,7 +252,7 @@ before_script:
   - git clone --depth 1 --branch strip https://github.com/urho3d/android-ndk.git && export ANDROID_NDK=$(pwd)/android-ndk && if ([ $AVD ] || [ $PACKAGE_UPLOAD ]) && [ $INSTALL ]; then (while :; do echo 'y'; sleep 1; done) |android update sdk --no-ui --all --filter $INSTALL; fi
   - if [ "$ANDROID_ABI" == "x86_64" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/x86_64-4.9/prebuilt/linux-x86_64/bin C_PREFIX=x86_64-linux-android; fi
   - if [ "$ANDROID_ABI" == "x86" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/x86-4.9/prebuilt/linux-x86_64/bin C_PREFIX=i686-linux-android; fi
-  - if [ "$ANDROID_ABI" == "arm64-v8a" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin C_PREFIX=aarch64-linux-android; fi
+  - if [ "$ANDROID_ABI" == "arm64-v8a" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin C_PREFIX=aarch64-linux-android PATH=$HOME:$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH CXX=g++-4.9 CC=gcc-4.9 && for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done; fi
   - if [ "$ANDROID_ABI" == "armeabi-v7a" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin C_PREFIX=arm-linux-androideabi; fi
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$C_PATH:$PATH; for f in $C_PATH/$C_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
   - rake ci_setup_cache
