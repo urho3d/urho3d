@@ -14,6 +14,7 @@ Urho3D development, contributions and bugfixes by:
 - Lasse Öörni (loorni@gmail.com, AgentC at GameDev.net)
 - Wei Tjong Yao
 - Aster Jian
+- Vivienne Anthony
 - Colin Barrett
 - Erik Beran
 - Danny Boisvert
