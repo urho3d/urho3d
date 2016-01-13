@@ -607,12 +607,14 @@ else ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
             if (URHO3D_64BIT)
-                set (DASH_MBIT -m64)    # This variable is intentionally not defined on Android and RPI platform, it is used again in LuaJIT library build
+                set (DASH_MBIT -m64)    # This variable is intentionally not defined on Android and RPI platform, it is used again in LuaJIT sub-library build
             else ()
                 set (DASH_MBIT -m32)
                 if (URHO3D_SSE)
-                    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse2")
-                    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
+                    # The effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options
+                    # The -mfpmath=sse is not set in global scope but it may be set in local scope when building LuaJIT sub-library for x86 arch
+                    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse -msse2")
+                    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -msse2")
                 endif ()
             endif ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DASH_MBIT}")
