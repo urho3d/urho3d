@@ -204,12 +204,8 @@ bool ParticleEffect::Load(const XMLElement& source)
             emitterType_ = EMITTER_SPHERE;
             emitterSize_ = Vector3::ZERO;
         }
-        else if (type == "box")
-            emitterType_ = EMITTER_BOX;
-        else if (type == "sphere")
-            emitterType_ = EMITTER_SPHERE;
         else
-            URHO3D_LOGERROR("Unknown particle emitter type " + type);
+            emitterType_ = (EmitterType)GetStringListIndex(type.CString(), emitterTypeNames, EMITTER_SPHERE);
     }
 
     if (source.HasChild("emittersize"))
