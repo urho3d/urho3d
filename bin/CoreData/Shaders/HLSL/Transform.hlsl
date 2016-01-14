@@ -48,6 +48,33 @@ float3 GetBillboardNormal()
 }
 #endif
 
+#ifdef DIRBILLBOARD
+float3x3 GetFaceCameraRotation(float3 cameraPos, float3 position, float3 direction)
+{
+    float3 cameraDir = normalize(position - cameraPos);
+    float3 front = normalize(direction);
+    float3 right = normalize(cross(front, cameraDir));
+    float3 up = normalize(cross(front, right));
+
+    return float3x3(
+        right.x, right.y, right.z,
+        up.x, up.y, up.z,
+        front.x, front.y, front.z
+    );
+}
+
+float3 GetBillboardPos(float4 iPos, float2 iSize, float3 iDirection, float3 iCameraPos, float4x3 modelMatrix)
+{
+    return mul(iPos, modelMatrix) + 
+        mul(float3(iSize.x, 0.0, iSize.y), GetFaceCameraRotation(iCameraPos, iPos.xyz, iDirection));
+}
+
+float3 GetBillboardNormal(float4 iPos, float3 iDirection, float3 iCameraPos)
+{
+    return mul(float3(0.0, 1.0, 0.0), GetFaceCameraRotation(iCameraPos, iPos.xyz, iDirection));
+}
+#endif
+
 #if defined(SKINNED)
     #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices);
 #elif defined(INSTANCED)
@@ -56,14 +83,18 @@ float3 GetBillboardNormal()
     #define iModelMatrix cModel
 #endif
 
-#ifdef BILLBOARD
+#if defined(BILLBOARD)
     #define GetWorldPos(modelMatrix) GetBillboardPos(iPos, iSize, modelMatrix)
+#elif defined(DIRBILLBOARD)
+    #define GetWorldPos(modelMatrix) GetBillboardPos(iPos, iSize, iNormal, iTangent.xyz, modelMatrix)
 #else
     #define GetWorldPos(modelMatrix) mul(iPos, modelMatrix)
 #endif
 
-#ifdef BILLBOARD
+#if defined(BILLBOARD)
     #define GetWorldNormal(modelMatrix) GetBillboardNormal()
+#elif defined(DIRBILLBOARD)
+    #define GetWorldNormal(modelMatrix) GetBillboardNormal(iPos, iNormal, iTangent.xyz)
 #else
     #define GetWorldNormal(modelMatrix) normalize(mul(iNormal, (float3x3)modelMatrix))
 #endif

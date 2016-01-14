@@ -55,8 +55,9 @@ enum GeometryType
     GEOM_SKINNED = 1,
     GEOM_INSTANCED = 2,
     GEOM_BILLBOARD = 3,
-    GEOM_STATIC_NOINSTANCING = 4,
-    MAX_GEOMETRYTYPES = 4,
+    GEOM_DIRBILLBOARD = 4,
+    GEOM_STATIC_NOINSTANCING = 5,
+    MAX_GEOMETRYTYPES = 5,
 };
 
 /// Blending mode.
@@ -273,7 +274,8 @@ enum FaceCameraMode
     FC_ROTATE_XYZ,
     FC_ROTATE_Y,
     FC_LOOKAT_XYZ,
-    FC_LOOKAT_Y
+    FC_LOOKAT_Y,
+    FC_DIRECTION
 };
 
 /// Shadow type
