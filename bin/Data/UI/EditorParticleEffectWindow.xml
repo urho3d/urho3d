@@ -746,7 +746,7 @@
                                                         <attribute name="Text" value="LookAt Y" />
                                                     </element>
                                                     <element type="Text" style="FileSelectorFilterText">
-                                                        <attribute name="Text" value="Rotate Along Direction" />
+                                                        <attribute name="Text" value="Direction" />
                                                     </element>
                                                 </element>
                                             </element>

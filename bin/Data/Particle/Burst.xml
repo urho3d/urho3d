@@ -21,7 +21,7 @@
 	<rotation min="0" max="0" />
 	<rotationspeed min="0" max="0" />
 	<sizedelta add="0" mul="0.01" />
-	<faceCameraMode value="Rotate Along Direction" />
+	<faceCameraMode value="Direction" />
 	<colorfade color="1 1 1 1" time="0" />
 	<colorfade color="0.5 0.75 1 1" time="0.5" />
 	<colorfade color="0 0 0 0" time="1" />
