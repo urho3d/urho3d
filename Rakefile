@@ -236,9 +236,8 @@ task :ci do
   # When not explicitly specified then use generic generator
   generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] ? 'vs2015' : '')
   # LuaJIT on MinGW build is not possible on Travis-CI with Ubuntu LTS 12.04 as its GCC cross-compiler version is too old, wait until we have Ubuntu LTS 14.04
-  # The upstream LuaJIT library does not support Android arm64-v8a ABI at the moment but it should be technically possible
   # LuaJIT on Web platform is not possible and LuaJIT on iOS platform is not allowed
-  jit = (ENV['WIN32'] && ENV['TRAVIS']) || (ENV['ANDROID'] && ENV['ANDROID_ABI'] == 'arm64-v8a') || ENV['WEB'] || ENV['IOS'] ? '' : 'JIT=1 URHO3D_LUAJIT_AMALG='
+  jit = (ENV['WIN32'] && ENV['TRAVIS']) || ENV['WEB'] || ENV['IOS'] ? '' : 'JIT=1 URHO3D_LUAJIT_AMALG='
   system "bash -c 'rake cmake #{generator} URHO3D_LUA#{jit}=1 URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1'" or abort 'Failed to configure Urho3D library build'
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
     # Prepare a new AVD in another process to avoid busy waiting
