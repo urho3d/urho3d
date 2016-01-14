@@ -80,6 +80,7 @@ BillboardSet::BillboardSet(Context* context) :
     sortFrameNumber_(0),
     previousOffset_(Vector3::ZERO)
 {
+    // Vertex buffer doesn't have its format defined yet, so manually define the elements into Geometry now
     geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2);
     geometry_->SetIndexBuffer(indexBuffer_);
 
@@ -282,16 +283,19 @@ void BillboardSet::SetSorted(bool enable)
 
 void BillboardSet::SetFaceCameraMode(FaceCameraMode mode)
 {
-    if((faceCameraMode_ != FC_DIRECTION && mode == FC_DIRECTION) || (faceCameraMode_ == FC_DIRECTION && mode != FC_DIRECTION))
+    if ((faceCameraMode_ != FC_DIRECTION && mode == FC_DIRECTION) || (faceCameraMode_ == FC_DIRECTION && mode != FC_DIRECTION))
     {
         faceCameraMode_ = mode;
-        if(faceCameraMode_ == FC_DIRECTION)
+        if (faceCameraMode_ == FC_DIRECTION)
             batches_[0].geometryType_ = GEOM_DIRBILLBOARD;
-        else batches_[0].geometryType_ = GEOM_BILLBOARD;
+        else
+            batches_[0].geometryType_ = GEOM_BILLBOARD;
         geometryTypeUpdate_ = true;
         bufferSizeDirty_ = true;
         Commit();
-    } else {
+    }
+    else
+    {
         faceCameraMode_ = mode;
         MarkNetworkUpdate();
     }
@@ -332,7 +336,8 @@ void BillboardSet::SetBillboardsAttr(const VariantVector& value)
     SetNumBillboards(numBillboards);
 
     // Dealing with old billboard format
-    if(value.Size() == billboards_.Size() * 6 + 1)
+    if (value.Size() == billboards_.Size() * 6 + 1)
+    {
         for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End() && index < value.Size(); ++i)
         {
             i->position_ = value[index++].GetVector3();
@@ -343,8 +348,10 @@ void BillboardSet::SetBillboardsAttr(const VariantVector& value)
             i->rotation_ = value[index++].GetFloat();
             i->enabled_ = value[index++].GetBool();
         }
+    }
     // New billboard format
     else
+    {
         for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End() && index < value.Size(); ++i)
         {
             i->position_ = value[index++].GetVector3();
@@ -356,6 +363,7 @@ void BillboardSet::SetBillboardsAttr(const VariantVector& value)
             i->direction_ = value[index++].GetVector3();
             i->enabled_ = value[index++].GetBool();
         }
+    }
 
     Commit();
 }
@@ -459,11 +467,14 @@ void BillboardSet::UpdateBufferSize()
     {
         if (faceCameraMode_ == FC_DIRECTION)
         {
-            geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2 | MASK_TANGENT);
             vertexBuffer_->SetSize(numBillboards * 4, MASK_POSITION | MASK_NORMAL | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2 | MASK_TANGENT, true);
-        } else {
-            geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2);
+            geometry_->SetVertexBuffer(0, vertexBuffer_);
+
+        } 
+        else 
+        {
             vertexBuffer_->SetSize(numBillboards * 4, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2, true);
+            geometry_->SetVertexBuffer(0, vertexBuffer_);
         }
         geometryTypeUpdate_ = false;
     }
@@ -563,7 +574,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     if (!dest)
         return;
 
-    if(faceCameraMode_ != FC_DIRECTION)
+    if (faceCameraMode_ != FC_DIRECTION)
     {
         for (unsigned i = 0; i < enabledBillboards; ++i)
         {
@@ -616,7 +627,8 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
 
             dest += 32;
         }
-    } else
+    } 
+    else
     {
         for (unsigned i = 0; i < enabledBillboards; ++i)
         {

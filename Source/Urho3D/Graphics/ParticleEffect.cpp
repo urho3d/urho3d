@@ -876,7 +876,7 @@ void ParticleEffect::AddTextureTime(const Rect& uv, const float time)
         }
     }
 
-    // highest time, add last:
+    // Highest time, add last
     textureFrames_[s].uv_ = uv;
     textureFrames_[s].time_ = time;
 }
