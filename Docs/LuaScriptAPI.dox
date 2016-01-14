@@ -7317,6 +7317,7 @@ Properties:
 - int FC_ROTATE_Y
 - int FC_LOOKAT_XYZ
 - int FC_LOOKAT_Y
+- int FC_DIRECTION
 
 ### FileMode
 
