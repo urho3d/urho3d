@@ -31,7 +31,7 @@ namespace Urho3D
 /// Particle emitter shapes.
 enum EmitterType
 {
-    EMITTER_SPHERE,
+    EMITTER_SPHERE = 0,
     EMITTER_BOX
 };
 

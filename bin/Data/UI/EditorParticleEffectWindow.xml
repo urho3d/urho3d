@@ -618,10 +618,10 @@
                                         <element type="BorderImage" internal="true" style="none">
                                             <element internal="true" style="none">
                                                 <element type="Text" style="FileSelectorFilterText">
-                                                    <attribute name="Text" value="Box" />
+                                                    <attribute name="Text" value="Sphere" />
                                                 </element>
                                                 <element type="Text" style="FileSelectorFilterText">
-                                                    <attribute name="Text" value="Sphere" />
+                                                    <attribute name="Text" value="Box" />
                                                 </element>
                                             </element>
                                         </element>

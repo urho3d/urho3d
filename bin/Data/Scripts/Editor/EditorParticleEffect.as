@@ -686,11 +686,11 @@ void EditParticleEffectEmitterShape(StringHash eventType, VariantMap& eventData)
     switch (element.selection)
     {
         case 0:
-            editParticleEffect.emitterType = EMITTER_BOX;
+            editParticleEffect.emitterType = EMITTER_SPHERE;
             break;
 
         case 1:
-            editParticleEffect.emitterType = EMITTER_SPHERE;
+            editParticleEffect.emitterType = EMITTER_BOX;
             break;
     }
 
@@ -1447,10 +1447,10 @@ void RefreshParticleEffectBasicAttributes()
 
     switch (editParticleEffect.emitterType)
     {
-        case EMITTER_BOX:
+        case EMITTER_SPHERE:
             cast<DropDownList>(particleEffectWindow.GetChild("EmitterShape", true)).selection = 0;
             break;
-        case EMITTER_SPHERE:
+        case EMITTER_BOX:
             cast<DropDownList>(particleEffectWindow.GetChild("EmitterShape", true)).selection = 1;
             break;
     }
