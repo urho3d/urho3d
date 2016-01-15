@@ -180,7 +180,8 @@ static const char* geometryVSVariations[] =
     "",
     "SKINNED ",
     "INSTANCED ",
-    "BILLBOARD "
+    "BILLBOARD ",
+    "DIRBILLBOARD "
 };
 
 static const char* lightVSVariations[] =
