@@ -296,21 +296,23 @@ if (NOT LUAJIT_CACHE STREQUAL "${URHO3D_64BIT}-${LUAJIT_DISABLE_FFI}-${LUAJIT_DI
 endif ()
 
 # Note that we have intentionally deviated from original Makefile for the following cases
-if (NOT MSVC AND LUAJIT_NO_STACK_PROTECTION)
-    # Original Makefile attempts to set -fno-stack-protector for non-MSVC compiler whenever it supports this flag, but we decided not to use this flag by default (use LUAJIT_NO_STACK_PROTECTION build option to override)
-    execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -fno-stack-protector -E - RESULT_VARIABLE EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
-    if (EXIT_CODE STREQUAL 0)
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-stack-protector")
+if (NOT MSVC)
+    if (LUAJIT_NO_STACK_PROTECTION)
+        # Original Makefile attempts to set -fno-stack-protector for non-MSVC compiler whenever it supports this flag, but we decided not to use this flag by default (use LUAJIT_NO_STACK_PROTECTION build option to override)
+        execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -fno-stack-protector -E - RESULT_VARIABLE EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+        if (EXIT_CODE STREQUAL 0)
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-stack-protector")
+        endif ()
     endif ()
-endif ()
-if (TARGET_LJARCH STREQUAL x86)
-    # Original Makefile enables the SSE when targeting x86 regardless, but we only enable it when URHO3D_SSE build option is also set
-    if (URHO3D_SSE)
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpmath=sse")     # When URHO3D_SSE is set then -msse -msse2 should be already configured at the global scope
+    if (TARGET_LJARCH STREQUAL x86)
+        # Original Makefile enables the SSE when targeting x86 regardless, but we only enable it when URHO3D_SSE build option is also set
+        if (URHO3D_SSE)
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpmath=sse")     # When URHO3D_SSE is set then -msse -msse2 should be already configured at the global scope
+        endif ()
+    elseif (TARGET_LJARCH STREQUAL arm64)
+        # Original Makefile only sets this flags for 64-bit iOS, but we set it for arm64 in general instead
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer")
     endif ()
-elseif (TARGET_LJARCH STREQUAL arm64)
-    # Original Makefile only sets this flags for 64-bit iOS, but we set it for arm64 in general instead
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer")
 endif ()
 
 # Makefile: Build mode handling
