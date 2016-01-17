@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <cppformat/format.h>
+
 #include "../Container/HashMap.h"
 #include "../Container/Ptr.h"
 #include "../Math/Color.h"
@@ -863,6 +865,11 @@ public:
     /// Test for inequality with a Matrix4.
     bool operator !=(const Matrix4& rhs) const { return !(*this == rhs); }
 
+    /// std::ostream << insertion operator inserts cstring used by String::Format
+    friend std::ostream &operator<<(std::ostream &os, const Variant &var) {
+        return os << var.ToString().CString();
+    }
+
     /// Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
     void FromString(const String& type, const String& value);
     /// Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
@@ -1223,5 +1230,36 @@ template <> URHO3D_API Matrix3 Variant::Get<Matrix3>() const;
 template <> URHO3D_API Matrix3x4 Variant::Get<Matrix3x4>() const;
 
 template <> URHO3D_API Matrix4 Variant::Get<Matrix4>() const;
+
+/// String::Format Arguments struct
+struct StringArg
+{
+    /// Name of this named argument. Can be empty.
+    String name;
+    /// The value of this argument, should always be supplied.
+    Variant value;
+
+    /// Default constructor
+    StringArg() : name(""), value(0) {}
+    /// Named argument constructor
+    StringArg(const String &name, const Variant &value) : name(name), value(value) {}
+    /// Value argument constructor
+    StringArg(const Variant &value) : name(""), value(value) {}
+    /// Copy constructor
+    StringArg(const StringArg& arg) : name(arg.name), value(arg.value) {}
+    /// Copy assignment
+    StringArg& operator=(const StringArg& rhs)
+    {
+        name = rhs.name;
+        value = rhs.value;
+        return *this;
+    }
+
+    /// Named argument used by String::Format, eg: String::Format("Hello {name}!", String::Arg::Named("name", "Link"))
+    template <typename T>
+    static inline fmt::internal::NamedArg<char> Named(const String& str, const T &arg) {
+        return fmt::arg(str.CString(), arg);
+    }
+};
 
 }

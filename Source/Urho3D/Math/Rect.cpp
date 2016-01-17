@@ -46,9 +46,9 @@ String Rect::ToString() const
 
 String IntRect::ToString() const
 {
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%d %d %d %d", left_, top_, right_, bottom_);
-    return String(tempBuffer);
+    fmt::MemoryWriter tempBuffer;
+    tempBuffer << left_ << " " << top_ << " " << right_ << " " << bottom_;
+    return String(tempBuffer.c_str());
 }
 
 void Rect::Clip(const Rect& rect)

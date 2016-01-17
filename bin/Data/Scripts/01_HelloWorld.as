@@ -23,8 +23,13 @@ void CreateText()
     // Construct new Text object
     Text@ helloText = Text();
 
+    Array<StringArg> args;
+    args.Push(StringArg(Variant("Hello")));
+    args.Push(StringArg("who", Variant("World")));
+    args.Push(StringArg("urho", Variant("Urho3D")));
+
     // Set String to display
-    helloText.text = "Hello World from Urho3D!";
+    helloText.text = "{0} {who} from {urho}!".Format(args);
 
     // Set font and text color
     helloText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 30);

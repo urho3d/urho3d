@@ -26,6 +26,8 @@
 #include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/UI.h>
+#include <Urho3D/Container/Str.h>
+#include <Urho3D/Core/Variant.h>
 
 #include "HelloWorld.h"
 
@@ -61,7 +63,10 @@ void HelloWorld::CreateText()
     SharedPtr<Text> helloText(new Text(context_));
 
     // Set String to display
-    helloText->SetText("Hello World from Urho3D!");
+     helloText->SetText(String::Format("{0}, {who} from {urho}!",
+         "Hello",
+         String::Arg::Named("who", "World"),
+         String::Arg::Named("urho", "Urho3D")));
 
     // Set font and text color
     helloText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 30);

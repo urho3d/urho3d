@@ -57,7 +57,12 @@ function CreateGUI()
     -- Localization:Get returns String.EMPTY if the id is empty.
     -- Localization:Get returns the id if translation is not found and will be added a warning into the log.
 
-    windowTitle.text = localizedString .. " (" .. langIndex .. " " .. langName .. ")"
+    local args = {};
+    table.insert(args, StringArg("langName", Variant(langName)))
+    table.insert(args, StringArg("langIndex", Variant(langIndex)))
+    table.insert(args, StringArg("title", Variant(localizedString)))
+
+    windowTitle.text = ToString("{title} ([{langIndex}] {langName})", args)
 
     local b = Button:new()
     window:AddChild(b)
@@ -160,10 +165,13 @@ end
 
 -- You can manually change texts, sprites and other aspects of the game when language is changed
 function HandleChangeLanguage(eventType, eventData)
+    local args = {};
+    table.insert(args, StringArg("langName", Variant(localization.language)))
+    table.insert(args, StringArg("langIndex", Variant(localization.languageIndex)))
+    table.insert(args, StringArg("title", Variant(localization:Get("title"))))
+
     local windowTitle = ui.root:GetChild("WindowTitle", true);
-    windowTitle.text = localization:Get("title") .. " (" ..
-                           localization.languageIndex .. " " ..
-                           localization.language .. ")"
+    windowTitle.text = ToString("{title} ([{langIndex}] {langName})", args)
 
     local buttonText = ui.root:GetChild("ButtonTextQuit", true)
     buttonText.text = localization:Get("quit")

@@ -59,8 +59,11 @@ void CreateGUI()
     String localizedString = localization.Get("title");
     // Localization.Get returns String::EMPTY if the id is empty.
     // Localization.Get returns the id if translation is not found and will be added a warning into the log.
-
-    windowTitle.text = localizedString + " (" + String(langIndex) + " " + langName + ")";
+    Array<StringArg> args;
+    args.Push(StringArg("title", Variant(localizedString)));
+    args.Push(StringArg("langIndex", Variant(langIndex)));
+    args.Push(StringArg("language", Variant(langName)));
+    windowTitle.text = "{title} ([{langIndex}] {language})".Format(args);
 
     Button@ b = Button();
     window.AddChild(b);
@@ -168,9 +171,11 @@ void HandleQuitButtonPressed(StringHash eventType, VariantMap& eventData)
 void HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
 {
     Text@ windowTitle = ui.root.GetChild("WindowTitle", true);
-    windowTitle.text = localization.Get("title") + " (" +
-                           String(localization.languageIndex) + " " +
-                           localization.language + ")";
+    Array<StringArg> args;
+    args.Push(StringArg("title", Variant(localization.Get("title"))));
+    args.Push(StringArg("langIndex", Variant(localization.languageIndex)));
+    args.Push(StringArg("language", Variant(localization.language)));
+    windowTitle.text = "{title} ([{langIndex}] {language})".Format(args);
 
     Text@ buttonText = ui.root.GetChild("ButtonTextQuit", true);
     buttonText.text = localization.Get("quit");

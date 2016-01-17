@@ -504,9 +504,9 @@ String ToString(void* value)
 
 String ToStringHex(unsigned value)
 {
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%08x", value);
-    return String(tempBuffer);
+    fmt::MemoryWriter tempBuffer;
+    tempBuffer << fmt::pad(fmt::hexu(value), 8, '0');
+    return String(tempBuffer.c_str());
 }
 
 void BufferToString(String& dest, const void* data, unsigned size)
@@ -645,6 +645,11 @@ String ToString(const char* formatString, ...)
     ret.AppendWithFormatArgs(formatString, args);
     va_end(args);
     return ret;
+}
+
+String ToString(const String& formatString, const Vector<StringArg>& args)
+{
+    return String::Format(formatString, args);
 }
 
 bool IsAlpha(unsigned ch)

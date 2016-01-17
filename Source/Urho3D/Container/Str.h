@@ -24,6 +24,8 @@
 
 #include "../Container/Vector.h"
 
+#include <cppformat/format.h>
+
 #include <cstdarg>
 #include <cstring>
 #include <cctype>
@@ -35,6 +37,7 @@ static const int CONVERSION_BUFFER_LENGTH = 128;
 static const int MATRIX_CONVERSION_BUFFER_LENGTH = 256;
 
 class WString;
+struct StringArg;
 
 /// %String class.
 class URHO3D_API String
@@ -42,6 +45,7 @@ class URHO3D_API String
 public:
     typedef RandomAccessIterator<char> Iterator;
     typedef RandomAccessConstIterator<char> ConstIterator;
+    typedef StringArg Arg;
 
     /// Construct empty.
     String() :
@@ -136,7 +140,7 @@ public:
     /// Construct from a character and fill length.
     explicit String(char value, unsigned length);
 
-    /// Construct from a convertable value.
+    /// Construct from a convertible value.
     template <class T> explicit String(const T& value) :
         length_(0),
         capacity_(0),
@@ -492,6 +496,13 @@ public:
 #endif
     }
 
+    /// Python style string formatting, eg: String::Format("{0}, {1}!", "Hello", "World");
+    FMT_VARIADIC(static String, Format, const String&)
+
+    /// Python style string formatting static method
+    static String Format(const String& formatString, const Vector<Arg>& args);
+    /// Python style string formatting class method
+    String Format(const Vector<Arg>& args) const;
     /// Append to string using formatting.
     String& AppendWithFormat(const char* formatString, ...);
     /// Append to string using variable arguments.
@@ -506,6 +517,11 @@ public:
     static const unsigned MIN_CAPACITY = 8;
     /// Empty string.
     static const String EMPTY;
+
+    /// std::ostream << insertion operator inserts cstring used by String::Format
+    friend std::ostream &operator<<(std::ostream &os, const String &str) {
+        return os << str.CString();
+    }
 
 private:
     /// Move a range of characters within the string.
@@ -534,6 +550,9 @@ private:
 
     /// Replace a substring with another substring.
     void Replace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength);
+
+    /// Internal format static method
+    static String Format(const String& formatString, fmt::ArgList args);
 
     /// String length.
     unsigned length_;

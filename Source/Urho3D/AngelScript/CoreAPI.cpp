@@ -424,6 +424,31 @@ static CScriptArray* VariantMapGetValues(const VariantMap& map)
     return VectorToArray<Variant>(map.Values(), "Array<Variant>");
 }
 
+static void ConstructStringArg(StringArg* ptr)
+{
+    new(ptr) StringArg();
+}
+
+static void ConstructStringArgCopy(const StringArg& arg, StringArg* ptr)
+{
+    new(ptr) StringArg(arg);
+}
+
+static void ConstructStringArgNamed(const String &name, const Variant& value, StringArg* ptr)
+{
+    new(ptr) StringArg(name, value);
+}
+
+static void ConstructStringArgValue(const Variant& value, StringArg* ptr)
+{
+    new(ptr) StringArg(value);
+}
+
+static void DestructStringArg(StringArg* ptr)
+{
+    ptr->~StringArg();
+}
+
 static void RegisterVariant(asIScriptEngine* engine)
 {
     engine->RegisterEnum("VariantType");
@@ -480,6 +505,7 @@ static void RegisterVariant(asIScriptEngine* engine)
 
     engine->RegisterObjectType("Variant", sizeof(Variant), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectType("VariantMap", sizeof(VariantMap), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
+    engine->RegisterObjectType("StringArg", sizeof(StringArg), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVariant), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Variant&in)", asFUNCTION(ConstructVariantCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(int)", asFUNCTION(ConstructVariantInt), asCALL_CDECL_OBJLAST);
@@ -608,6 +634,13 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VariantMap", "uint get_length() const", asMETHOD(VariantMap, Size), asCALL_THISCALL);
     engine->RegisterObjectMethod("VariantMap", "Array<StringHash>@ get_keys() const", asFUNCTION(VariantMapGetKeys), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "Array<Variant>@ get_values() const", asFUNCTION(VariantMapGetValues), asCALL_CDECL_OBJLAST);
+
+    engine->RegisterObjectBehaviour("StringArg", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructStringArg), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("StringArg", asBEHAVE_CONSTRUCT, "void f(const StringArg&in)", asFUNCTION(ConstructStringArgCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("StringArg", asBEHAVE_CONSTRUCT, "void f(const String &in, const Variant& in)", asFUNCTION(ConstructStringArgNamed), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("StringArg", asBEHAVE_CONSTRUCT, "void f(const Variant& in)", asFUNCTION(ConstructStringArgValue), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("StringArg", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructStringArg), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("StringArg", "StringArg& opAssign(const StringArg&in)", asMETHODPR(StringArg, operator =, (const StringArg&), StringArg&), asCALL_THISCALL);
 }
 
 static void ConstructSpline(Spline* ptr)
@@ -693,6 +726,18 @@ static String StringJoined(CScriptArray* arr, const String& glue)
     return String::Joined(subStrings, glue);
 }
 
+static String StringFormat(const String& formatString, CScriptArray* arr)
+{
+    Vector<StringArg> args = ArrayToVector<StringArg>(arr);
+    return String::Format(formatString.CString(), args);
+}
+
+static String StringFormatM(CScriptArray* arr, String* formatString)
+{
+    Vector<StringArg> args = ArrayToVector<StringArg>(arr);
+    return formatString->Format(args);
+}
+
 static void RegisterStringUtils(asIScriptEngine* engine)
 {
     engine->RegisterObjectMethod("String", "Array<String>@ Split(uint8, bool keepEmptyStrings = false) const", asFUNCTION(StringSplit), asCALL_CDECL_OBJLAST);
@@ -713,6 +758,7 @@ static void RegisterStringUtils(asIScriptEngine* engine)
     engine->RegisterObjectMethod("String", "Matrix3 ToMatrix3() const", asFUNCTIONPR(ToMatrix3, (const String&), Matrix3), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "Matrix3x4 ToMatrix3x4() const", asFUNCTIONPR(ToMatrix3x4, (const String&), Matrix3x4), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "Matrix4 ToMatrix4() const", asFUNCTIONPR(ToMatrix4, (const String&), Matrix4), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "String Format(StringArg[]&) const", asFUNCTION(StringFormatM), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("String ToStringHex(int)", asFUNCTION(ToStringHex), asCALL_CDECL);
     engine->RegisterGlobalFunction("String Join(String[]&, const String&in glue)", asFUNCTION(StringJoined), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool IsDigit(uint)", asFUNCTION(IsDigit), asCALL_CDECL);
@@ -720,6 +766,7 @@ static void RegisterStringUtils(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("uint ToUpper(uint)", asFUNCTION(ToUpper), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint ToLower(uint)", asFUNCTION(ToLower), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetFileSizeString(uint64)", asFUNCTION(GetFileSizeString), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String Format(const String&, StringArg[]&)", asFUNCTIONPR(StringFormat, (const String&, CScriptArray*), String), asCALL_CDECL);
 }
 
 static void ConstructTimer(Timer* ptr)
