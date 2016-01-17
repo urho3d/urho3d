@@ -22,7 +22,11 @@ function CreateText()
     local helloText = Text:new()
 
     -- Set String to display
-    helloText.text = "Hello World from Urho3D!"
+    local args = {}
+    table.insert(args, StringArg("", Variant("Hello")))
+    table.insert(args, StringArg("who", Variant("World")))
+    table.insert(args, StringArg("urho", Variant("Urho3D")))
+    helloText.text = ToString("{0} {who} from {urho}!", args)
 
     -- Set font and text color
     helloText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 30)

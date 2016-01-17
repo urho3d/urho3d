@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "../Core/Variant.h"
 #include "../Precompiled.h"
 
 #include "../IO/Log.h"
@@ -52,9 +53,8 @@ String::String(int value) :
     capacity_(0),
     buffer_(&endZero)
 {
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%d", value);
-    *this = tempBuffer;
+    fmt::FormatInt temp(value);
+    *this = temp.c_str();
 }
 
 String::String(short value) :
@@ -62,9 +62,8 @@ String::String(short value) :
     capacity_(0),
     buffer_(&endZero)
 {
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%d", value);
-    *this = tempBuffer;
+    fmt::FormatInt temp((int)value);
+    *this = temp.c_str();
 }
 
 String::String(long value) :
@@ -72,9 +71,8 @@ String::String(long value) :
     capacity_(0),
     buffer_(&endZero)
 {
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%ld", value);
-    *this = tempBuffer;
+    fmt::FormatInt temp(value);
+    *this = temp.c_str();
 }
 
 String::String(long long value) :
@@ -82,9 +80,8 @@ String::String(long long value) :
     capacity_(0),
     buffer_(&endZero)
 {
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%lld", value);
-    *this = tempBuffer;
+    fmt::FormatInt temp(value);
+    *this = temp.c_str();
 }
 
 String::String(unsigned value) :
@@ -92,9 +89,8 @@ String::String(unsigned value) :
     capacity_(0),
     buffer_(&endZero)
 {
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%u", value);
-    *this = tempBuffer;
+    fmt::FormatInt temp(value);
+    *this = temp.c_str();
 }
 
 String::String(unsigned short value) :
@@ -102,9 +98,8 @@ String::String(unsigned short value) :
     capacity_(0),
     buffer_(&endZero)
 {
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%u", value);
-    *this = tempBuffer;
+    fmt::FormatInt temp((unsigned)value);
+    *this = temp.c_str();
 }
 
 String::String(unsigned long value) :
@@ -112,9 +107,8 @@ String::String(unsigned long value) :
     capacity_(0),
     buffer_(&endZero)
 {
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%lu", value);
-    *this = tempBuffer;
+    fmt::FormatInt temp(value);
+    *this = temp.c_str();
 }
 
 String::String(unsigned long long value) :
@@ -122,9 +116,8 @@ String::String(unsigned long long value) :
     capacity_(0),
     buffer_(&endZero)
 {
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%llu", value);
-    *this = tempBuffer;
+    fmt::FormatInt temp(value);
+    *this = temp.c_str();
 }
 
 String::String(float value) :
@@ -1013,9 +1006,9 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
 {
     if (src == 0)
         return 0;
-    
+
     unsigned short word1 = *src;
-    
+
     // Check if we are at a low surrogate
     word1 = *src++;
     if (word1 >= 0xdc00 && word1 < 0xe000)
@@ -1024,7 +1017,7 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
             ++src;
         return '?';
     }
-    
+
     if (word1 < 0xd800 || word1 >= 0xe00)
         return word1;
     else
@@ -1060,7 +1053,7 @@ Vector<String> String::Split(const char* str, char separator, bool keepEmptyStri
     const ptrdiff_t splitLen = strEnd - str;
     if (splitLen > 0 || keepEmptyStrings)
         ret.Push(String(str, splitLen));
-    
+
     return ret;
 }
 
@@ -1074,6 +1067,269 @@ String String::Joined(const Vector<String>& subStrings, const String& glue)
         joinedString.Append(glue).Append(subStrings[i]);
 
     return joinedString;
+}
+
+String String::Format(const String& formatString, fmt::ArgList args)
+{
+    fmt::MemoryWriter temp;
+    temp.write(formatString.CString(), args);
+    return String(temp.c_str());
+}
+
+Urho3D::String String::Format(const String& formatString, const Vector<Arg>& args)
+{
+    // if there was a failure to format the string, return the unformatted string and log an error.
+    String result = formatString;
+    const size_t count = args.Size();
+    uint64_t types = 0;
+
+    Vector<String> tempStrings;
+    size_t tempStringsCount = 0;
+    tempStrings.Resize(count);
+    tempStrings.Reserve(count);
+
+    if (count < fmt::ArgList::MAX_PACKED_ARGS)
+    {
+        // cppformat ArgList uses an optimization when format arguments less than 16 are stored in the
+        // fmt::internal::Value structure with the types represented in the bits of a types member.
+
+        fmt::internal::Value* val = new fmt::internal::Value[count];
+
+        for (size_t i = 0; i < count ; ++i)
+        {
+            const Arg& arg = args[i];
+
+            const uint64_t shift = i * 4;
+
+            if (arg.name.Length() > 0)
+            {
+                // Case: A named argument was supplied
+                // cppformat expects to read named arguments in the  fmt::internal::Value.pointer variable,
+                // with the type set to fmt::internal::Value::Type::NAMED_ARG
+                switch (arg.value.GetType())
+                {
+                    case VAR_INT:
+                        types |= ((uint64_t)fmt::internal::Value::NAMED_ARG << shift);
+                        val[i].pointer = new fmt::internal::NamedArg<char>((const char*)arg.name.CString(), arg.value.GetInt());
+                        break;
+                    case VAR_FLOAT:
+                        types |= ((uint64_t)fmt::internal::Value::NAMED_ARG << shift);
+                        val[i].pointer = new fmt::internal::NamedArg<char>((const char*)arg.name.CString(), (double)arg.value.GetFloat());
+                        break;
+                    case VAR_DOUBLE:
+                        types |= ((uint64_t)fmt::internal::Value::NAMED_ARG << shift);
+                        val[i].pointer = new fmt::internal::NamedArg<char>((const char*)arg.name.CString(), arg.value.GetDouble());
+                        break;
+                    case VAR_STRING:
+                        types |= ((uint64_t)fmt::internal::Value::NAMED_ARG << shift);
+                        val[i].pointer = new fmt::internal::NamedArg<char>((const char*)arg.name.CString(), arg.value.GetString().CString());
+                        break;
+                    case VAR_NONE:
+                        types |= ((uint64_t)fmt::internal::Value::NONE << shift);
+                        val[i].int_value = 0;
+                        break;
+                    default:
+                        // Convert other variant types to string
+                        types |= ((uint64_t)fmt::internal::Value::NAMED_ARG << shift);
+                        tempStrings[tempStringsCount] = arg.value.ToString();
+                        val[i].pointer = new fmt::internal::NamedArg<char>((const char*)arg.name.CString(), tempStrings[tempStringsCount++].CString());
+                }
+            }
+            else
+            {
+                // Case: No named argument was supplied
+                // for the basic case of no named argument, the value can be stored directly in fmt::internal::Value
+                switch (arg.value.GetType())
+                {
+                    case VAR_INT:
+                        types |= ((uint64_t)fmt::internal::Value::INT << shift);
+                        val[i] = fmt::internal::MakeValue< fmt::BasicFormatter<char> >(arg.value.GetInt());
+                        break;
+                    case VAR_FLOAT:
+                        types |= ((uint64_t)fmt::internal::Value::DOUBLE << shift);
+                        val[i] = fmt::internal::MakeValue< fmt::BasicFormatter<char> >((double)arg.value.GetFloat());
+                        break;
+                    case VAR_DOUBLE:
+                        types |= ((uint64_t)fmt::internal::Value::DOUBLE << shift);
+                        val[i] = fmt::internal::MakeValue< fmt::BasicFormatter<char> >(arg.value.GetDouble());
+                        break;
+                    case VAR_STRING:
+                        types |= ((uint64_t)fmt::internal::Value::CSTRING << shift);
+                        val[i] = fmt::internal::MakeValue< fmt::BasicFormatter<char> >(arg.value.GetString().CString());
+                        break;
+                    case VAR_NONE:
+                        types |= ((uint64_t)fmt::internal::Value::NONE << shift);
+                        val[i].int_value = 0;
+                        break;
+                    default:
+                        // Convert other variant types to string
+                        types |= ((uint64_t)fmt::internal::Value::CSTRING << shift);
+                        tempStrings[tempStringsCount] = arg.value.ToString();
+                        val[i] = fmt::internal::MakeValue< fmt::BasicFormatter<char> >(tempStrings[tempStringsCount++].CString());
+                        break;
+                }
+            }
+        }
+
+        fmt::ArgList arglist(types, val);
+        try {
+            fmt::MemoryWriter temp;
+            temp.write(formatString.CString(), arglist);
+            result = temp.c_str();
+        }
+        catch(const std::exception &e)
+        {
+            URHO3D_LOGERRORF("String::Format failed. Message: %s", e.what());
+        }
+
+        // Clean up the memory allocated for named arguments:
+        for (size_t i = 0; i < count; ++i)
+        {
+            int shift = i * 4;
+            if ((fmt::internal::Value::Type)((types & (0xf << shift)) >> shift) == fmt::internal::Value::NAMED_ARG)
+                delete (fmt::internal::Value*)val[i].pointer;
+        }
+
+        // Clean up the memory allocated for fmt::internal::Value*
+        delete[] val;
+    }
+    else
+    {
+        // cppformat ArgList uses an optimization when format arguments are greater than 16 are stored in the
+        // fmt::internal::Args structure.
+
+        fmt::internal::Arg* val = new fmt::internal::Arg[count+1];
+
+        // add a final argument to prevent overflow
+        val[count].type = fmt::internal::Value::NONE;
+
+        for (size_t i = 0; i < count; ++i)
+        {
+            const Arg& arg = args[i];
+
+            const uint64_t shift = i * 4;
+
+            if (arg.name.Length() > 0)
+            {
+                // Case: A named argument was supplied
+                // cppformat expects to read named arguments in the fmt::internal::Arg.pointer variable,
+                // with the type set to fmt::internal::Value::Type::NAMED_ARG
+                switch (arg.value.GetType())
+                {
+                    case VAR_INT:
+                        if (i < fmt::ArgList::MAX_PACKED_ARGS)
+                            types |= ((uint64_t)fmt::internal::Value::NAMED_ARG << shift);
+                        val[i].type = fmt::internal::Value::NAMED_ARG;
+                        val[i].pointer = new fmt::internal::NamedArg<char>((const char*)arg.name.CString(), arg.value.GetInt());
+                        break;
+                    case VAR_FLOAT:
+                        if (i < fmt::ArgList::MAX_PACKED_ARGS)
+                            types |= ((uint64_t)fmt::internal::Value::NAMED_ARG << shift);
+                        val[i].type = fmt::internal::Value::NAMED_ARG;
+                        val[i].pointer = new fmt::internal::NamedArg<char>((const char*)arg.name.CString(), (double)arg.value.GetFloat());
+                        break;
+                    case VAR_DOUBLE:
+                        if (i < fmt::ArgList::MAX_PACKED_ARGS)
+                            types |= ((uint64_t)fmt::internal::Value::NAMED_ARG << shift);
+                        val[i].type = fmt::internal::Value::NAMED_ARG;
+                        val[i].pointer = new fmt::internal::NamedArg<char>((const char*)arg.name.CString(), arg.value.GetDouble());
+                        break;
+                    case VAR_STRING:
+                        if (i < fmt::ArgList::MAX_PACKED_ARGS)
+                            types |= ((uint64_t)fmt::internal::Value::NAMED_ARG << shift);
+                        val[i].type = fmt::internal::Value::NAMED_ARG;
+                        val[i].pointer = new fmt::internal::NamedArg<char>((const char*)arg.name.CString(), arg.value.GetString().CString());
+                        break;
+                    case VAR_NONE:
+                        if (i < fmt::ArgList::MAX_PACKED_ARGS)
+                            types |= ((uint64_t)fmt::internal::Value::NONE << shift);
+                        val[i].type = fmt::internal::Value::NONE;
+                        val[i].int_value = 0;
+                        break;
+                    default:
+                        // Convert other variant types to string
+                        if (i < fmt::ArgList::MAX_PACKED_ARGS)
+                            types |= ((uint64_t)fmt::internal::Value::NAMED_ARG << shift);
+                        val[i].type = fmt::internal::Value::NAMED_ARG;
+                        tempStrings[tempStringsCount] = arg.value.ToString();
+                        val[i].pointer = new fmt::internal::NamedArg<char>((const char*)arg.name.CString(), tempStrings[tempStringsCount++].CString());
+                }
+            }
+            else
+            {
+                // Case: No named argument was supplied
+                // for the basic case of no named argument, the value can be stored directly in fmt::internal::Arg
+                switch (arg.value.GetType())
+                {
+                    case VAR_INT:
+                        if (i < fmt::ArgList::MAX_PACKED_ARGS)
+                            types |= ((uint64_t)fmt::internal::Value::INT << shift);
+                        val[i] = fmt::internal::MakeArg< fmt::BasicFormatter<char> >(arg.value.GetInt());
+                        break;
+                    case VAR_FLOAT:
+                        if (i < fmt::ArgList::MAX_PACKED_ARGS)
+                            types |= ((uint64_t)fmt::internal::Value::DOUBLE << shift);
+                        val[i] = fmt::internal::MakeArg< fmt::BasicFormatter<char> >((double)arg.value.GetFloat());
+                        break;
+                    case VAR_DOUBLE:
+                        if (i < fmt::ArgList::MAX_PACKED_ARGS)
+                            types |= ((uint64_t)fmt::internal::Value::DOUBLE << shift);
+                        val[i] = fmt::internal::MakeArg< fmt::BasicFormatter<char> >(arg.value.GetDouble());
+                        break;
+                    case VAR_STRING:
+                        if (i < fmt::ArgList::MAX_PACKED_ARGS)
+                            types |= ((uint64_t)fmt::internal::Value::CSTRING << shift);
+                        val[i] = fmt::internal::MakeArg< fmt::BasicFormatter<char> >(arg.value.GetString().CString());
+                        break;
+                    case VAR_NONE:
+                        if (i < fmt::ArgList::MAX_PACKED_ARGS)
+                            types |= ((uint64_t)fmt::internal::Value::NONE << shift);
+                        val[i].type = fmt::internal::Value::NONE;
+                        val[i].int_value = 0;
+                        break;
+                    default:
+                        // Convert other variant types to string
+                        if (i < fmt::ArgList::MAX_PACKED_ARGS)
+                            types |= ((uint64_t)fmt::internal::Value::CSTRING << shift);
+                        tempStrings[tempStringsCount] = arg.value.ToString();
+                        val[i] = fmt::internal::MakeArg< fmt::BasicFormatter<char> >(tempStrings[tempStringsCount++].CString());
+                        break;
+                }
+            }
+        }
+
+        fmt::ArgList arglist(types, val);
+        try {
+            fmt::MemoryWriter temp;
+            temp.write(formatString.CString(), arglist);
+            result = temp.c_str();
+        }
+        catch (const std::exception &e)
+        {
+            URHO3D_LOGERRORF("String::Format failed. Message: %s", e.what());
+        }
+
+        // Clean up the memory allocated for named arguments:
+        for (size_t i = 0; i < count; ++i)
+        {
+             uint64_t shift = i * 4;
+            if ((fmt::internal::Value::Type)((types & (0xf << shift)) >> shift) == fmt::internal::Value::NAMED_ARG)
+                delete (fmt::internal::Arg*)val[i].pointer;
+        }
+
+        // Clean up the memory allocated for fmt::internal::Arg*
+        delete[] val;
+    }
+    for (unsigned int i = 0; i < tempStringsCount; ++i)
+    {
+        URHO3D_LOGINFO(tempStrings[i]);
+    }
+    return result;
+}
+
+String String::Format(const Vector<Arg>& args) const
+{
+    return Format(*this, args);
 }
 
 String& String::AppendWithFormat(const char* formatString, ...)
@@ -1248,7 +1504,7 @@ WString::WString(const String& str) :
 #ifdef _WIN32
     unsigned neededSize = 0;
     wchar_t temp[3];
-    
+
     unsigned byteOffset = 0;
     while (byteOffset < str.Length())
     {
@@ -1256,9 +1512,9 @@ WString::WString(const String& str) :
         String::EncodeUTF16(dest, str.NextUTF8Char(byteOffset));
         neededSize += dest - temp;
     }
-    
+
     Resize(neededSize);
-    
+
     byteOffset = 0;
     wchar_t* dest = buffer_;
     while (byteOffset < str.Length())

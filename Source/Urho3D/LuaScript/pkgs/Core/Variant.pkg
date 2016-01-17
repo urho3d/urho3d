@@ -112,6 +112,14 @@ class Variant
     tolua_readonly tolua_property__is_set bool empty;
 };
 
+struct StringArg
+{
+    StringArg();
+    StringArg(const String &name, const Variant &value);
+    StringArg(const Variant &value);
+    StringArg(const StringArg& arg);
+};
+
 $[
     -- Call the setup method and then hide it immediately
     Variant:_Setup("Variant")

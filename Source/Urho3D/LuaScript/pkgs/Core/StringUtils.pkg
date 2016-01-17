@@ -18,6 +18,7 @@ Matrix3x4 ToMatrix3x4(const String source);
 Matrix4 ToMatrix4(const String source);
 
 String ToString(void* value);
+String ToString(const String formatString, Vector<StringArg> args);
 String ToStringHex(unsigned value);
 
 bool IsAlpha(unsigned ch);

@@ -25,7 +25,7 @@
 #include "../Math/MathDefs.h"
 #include "../Math/StringHash.h"
 
-#include <cstdio>
+#include <cppformat/format.h>
 
 #include "../DebugNew.h"
 
@@ -64,9 +64,9 @@ unsigned StringHash::Calculate(const char* str)
 
 String StringHash::ToString() const
 {
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%08X", value_);
-    return String(tempBuffer);
+    fmt::MemoryWriter tempBuffer;
+    tempBuffer << fmt::pad(fmt::hexu(value_), 8, '0');
+    return String(tempBuffer.c_str());
 }
 
 }

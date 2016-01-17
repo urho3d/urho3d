@@ -106,7 +106,11 @@ void L10n::CreateGUI()
     // Localization::Get returns String::EMPTY if the id is empty.
     // Localization::Get returns the id if translation is not found and will be added a warning into the log.
 
-    windowTitle->SetText(localizedString + " (" + String(langIndex) + " " + langName + ")");
+    windowTitle->SetText(String::Format("{title} ([{langIndex}] {language})",
+        String::Arg::Named("title", localizedString),
+        String::Arg::Named("langIndex", langIndex),
+        String::Arg::Named("language", langName)
+        ));
 
     Button* b = new Button(context_);
     window->AddChild(b);
@@ -225,7 +229,11 @@ void L10n::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
     UIElement* uiRoot = GetSubsystem<UI>()->GetRoot();
 
     Text* windowTitle = static_cast<Text*>(uiRoot->GetChild("WindowTitle", true));
-    windowTitle->SetText(l10n->Get("title") + " (" + String(l10n->GetLanguageIndex()) + " " + l10n->GetLanguage() + ")");
+    windowTitle->SetText(String::Format("{title} ([{langIndex}] {language})",
+        String::Arg::Named("title", l10n->Get("title")),
+        String::Arg::Named("langIndex", l10n->GetLanguageIndex()),
+        String::Arg::Named("language", l10n->GetLanguage())
+        ));
 
     Text* buttonText = static_cast<Text*>(uiRoot->GetChild("ButtonTextQuit", true));
     buttonText->SetText(l10n->Get("quit"));

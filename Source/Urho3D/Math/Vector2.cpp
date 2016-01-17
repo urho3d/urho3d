@@ -49,9 +49,9 @@ String Vector2::ToString() const
 
 String IntVector2::ToString() const
 {
-    char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%d %d", x_, y_);
-    return String(tempBuffer);
+    fmt::MemoryWriter tempBuffer;
+    tempBuffer << x_ << " " << y_;
+    return String(tempBuffer.c_str());
 }
 
 }
