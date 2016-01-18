@@ -22,7 +22,11 @@
 
 if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
-    cmake_minimum_required (VERSION 2.8.6)
+    if (APPLE)
+        cmake_minimum_required (VERSION 3.4.1)
+    else ()
+        cmake_minimum_required (VERSION 2.8.6)
+    endif ()
     if (COMMAND cmake_policy)
         cmake_policy (SET CMP0003 NEW)
         if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
@@ -51,12 +55,16 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
         string (REPLACE +D -D ${ESCAPED_VAR} "${${ESCAPED_VAR}}")       # Stringify against empty variable
         string (REPLACE , ";" ${ESCAPED_VAR} "${${ESCAPED_VAR}}")
     endforeach ()
-else ()
-    set (PRIVATE PRIVATE)
 endif ()
 
 # Add dependency target
-add_subdirectory (minilua)
+set (TARGET_NAME minilua)
+set (SOURCE_FILES minilua.c)
+if (NOT MSVC)
+    set (LIBS m)
+endif ()
+setup_executable (PRIVATE TOOL NODEPS)
+unset (LIBS)
 
 # Define target name
 set (TARGET_NAME buildvm)

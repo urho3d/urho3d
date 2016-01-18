@@ -51,6 +51,9 @@ if (IOS)
         set (IOS_SYSROOT ${IOS_SYSROOT} CACHE INTERNAL "Path to iOS system root")
     endif ()
     set (CMAKE_FIND_ROOT_PATH ${IOS_SYSROOT})
+    if (IPHONEOS_DEPLOYMENT_TARGET)
+        set (CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET ${IPHONEOS_DEPLOYMENT_TARGET})
+    endif ()
     # Ensure the CMAKE_OSX_DEPLOYMENT_TARGET is set to empty
     set (CMAKE_OSX_DEPLOYMENT_TARGET)
     unset (CMAKE_OSX_DEPLOYMENT_TARGET CACHE)
@@ -527,7 +530,7 @@ if (APPLE)
         # IOS-specific setup
         add_definitions (-DIOS)
         if (URHO3D_64BIT)
-            set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_INCLUDING_64_BIT))
+            set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD))
         else ()
             set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
         endif ()
@@ -536,7 +539,7 @@ if (APPLE)
         if (XCODE)
             # OSX-specific setup
             if (URHO3D_64BIT)
-                set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_64_BIT))   # Build Mach-O universal binary containing both x86_64 and i386 archs
+                set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_64_BIT))
             else ()
                 set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
             endif ()
@@ -982,11 +985,6 @@ macro (setup_target)
         list (APPEND TARGET_PROPERTIES LINK_DEPENDS "${LINK_DEPENDS}")  # Stringify with semicolons already escaped
         unset (LINK_DEPENDS)
     endif ()
-    # CMake does not support IPHONEOS_DEPLOYMENT_TARGET the same manner as it supports CMAKE_OSX_DEPLOYMENT_TARGET
-    # The iOS deployment target is set using the corresponding Xcode attribute as target property instead
-    if (IOS AND IPHONEOS_DEPLOYMENT_TARGET)
-        list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET ${IPHONEOS_DEPLOYMENT_TARGET})
-    endif ()
     # Extra compiler flags for Xcode which are dynamically changed based on active arch in order to support Mach-O universal binary targets
     # When targeting x86 with SSE enabled; or when targeting iOS with NEON enabled as universal binary includes iPhoneSimulator x86 arch too
     if (XCODE AND (URHO3D_SSE OR URHO3D_NEON))
@@ -1144,7 +1142,7 @@ macro (setup_executable)
                 list (APPEND FILES ${LOCATION}/${TARGET_NAME}.${EXT})
             endforeach ()
             install (FILES ${FILES} DESTINATION ${DEST_BUNDLE_DIR} OPTIONAL)    # We get html.map or html.mem depend on the build configuration
-        elseif (DEST_RUNTIME_DIR AND DEST_BUNDLE_DIR)
+        elseif (DEST_RUNTIME_DIR AND (DEST_BUNDLE_DIR OR NOT IOS))
             install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_BUNDLE_DIR})
             if (WIN32 AND NOT ARG_NODEPS AND URHO3D_LIB_TYPE STREQUAL SHARED AND NOT URHO3D_DLL_INSTALLED)
                 if (TARGET Urho3D)
