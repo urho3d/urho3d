@@ -1961,7 +1961,7 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
         if (mesh->mNumBones > maxBones_)
         {
             ErrorExit(
-                "Geometry (submesh) has over " + String(maxBones_) + " bone influences. Try splitting to more submeshes\n"
+                "Geometry (submesh) has " + String(mesh->mNumBones) + " bones over " + String(maxBones_) + " bone influences. Try splitting to more submeshes\n"
                 "that each stay at " + String(maxBones_) + " bones or below."
             );
         }
