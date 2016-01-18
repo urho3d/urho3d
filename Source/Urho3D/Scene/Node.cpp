@@ -229,7 +229,7 @@ bool Node::SaveXML(XMLElement& dest) const
 bool Node::SaveJSON(JSONValue& dest) const
 {
     // Write node ID
-    dest.Set("id", (unsigned) id_);
+    dest.Set("id", id_);
 
     // Write attributes
     if (!Animatable::SaveJSON(dest))

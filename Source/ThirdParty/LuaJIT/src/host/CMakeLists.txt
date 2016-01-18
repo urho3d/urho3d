@@ -20,8 +20,8 @@
 # THE SOFTWARE.
 #
 
-if (CMAKE_PROJECT_NAME STREQUAL ExternalProject-tolua++)
-    # Do not install the buildvm host tool from tolua++ external project because it is built for targetting host system itself
+if (CMAKE_PROJECT_NAME STREQUAL Urho3D-ExternalProject-tolua++)
+    # Do not install the buildvm host tool from tolua++ external project because it is built for targeting host system itself
     # We only want to keep the buildvm host tool which is built for cross-compiling target (the one built from internal LuaJIT CMake-target)
     set (DEST_RUNTIME_DIR "")   # In this particular case, it is not equivalent to unset() the variable
 elseif (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)

@@ -625,6 +625,7 @@ class Billboard
 
 // Properties:
 Color color;
+Vector3 direction;
 bool enabled;
 Vector3 position;
 float rotation;
@@ -7460,6 +7461,7 @@ Vector3 constantForce;
 float dampingForce;
 Vector3 emitterSize;
 EmitterType emitterType;
+FaceCameraMode faceCameraMode;
 float inactiveTime;
 Material material;
 Vector3 maxDirection;
@@ -13532,6 +13534,7 @@ FC_ROTATE_XYZ,
 FC_ROTATE_Y,
 FC_LOOKAT_XYZ,
 FC_LOOKAT_Y,
+FC_DIRECTION,
 };
 
 enum FileMode
@@ -13929,6 +13932,7 @@ uint GetLinearDepthFormat();
 uint GetLuminanceAlphaFormat();
 uint GetLuminanceFormat();
 uint GetMaxBones();
+String GetMiniDumpDir();
 uint GetNumLogicalCPUs();
 uint GetNumPhysicalCPUs();
 Array<String> GetObjectCategories();
@@ -13984,6 +13988,7 @@ String RemoveTrailingSlash(const String&);
 String ReplaceExtension(const String&, const String&);
 uint SDBMHash(uint, uint8);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetMiniDumpDir(const String&);
 void SetRandomSeed(uint);
 float Sign(float);
 float Sin(float);

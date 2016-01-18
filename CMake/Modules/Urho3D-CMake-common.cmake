@@ -607,12 +607,14 @@ else ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
             if (URHO3D_64BIT)
-                set (DASH_MBIT -m64)    # This variable is intentionally not defined on Android and RPI platform, it is used again in LuaJIT library build
+                set (DASH_MBIT -m64)    # This variable is intentionally not defined on Android and RPI platform, it is used again in LuaJIT sub-library build
             else ()
                 set (DASH_MBIT -m32)
                 if (URHO3D_SSE)
-                    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse2")
-                    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
+                    # The effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options
+                    # The -mfpmath=sse is not set in global scope but it may be set in local scope when building LuaJIT sub-library for x86 arch
+                    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse -msse2")
+                    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -msse2")
                 endif ()
             endif ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DASH_MBIT}")
@@ -973,7 +975,7 @@ macro (setup_target)
     endif ()
 
     # Workaround CMake/Xcode generator bug where it always appends '/build' path element to SYMROOT attribute and as such the items in Products are always rendered as red as if they are not yet built
-    if (XCODE AND NOT CMAKE_PROJECT_NAME MATCHES ^ExternalProject-)
+    if (XCODE AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
         file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/build)
         get_target_property (LOCATION ${TARGET_NAME} LOCATION)
         string (REGEX REPLACE "^.*\\$\\(CONFIGURATION\\)" $(CONFIGURATION) SYMLINK ${LOCATION})
@@ -1633,7 +1635,7 @@ macro (install_header_files)
         if (NOT ARG_DESTINATION)
             message (FATAL_ERROR "Couldn't setup install command because the install destination is not specified.")
         endif ()
-        if (NOT ARG_BUILD_TREE_ONLY AND NOT CMAKE_PROJECT_NAME MATCHES ^ExternalProject-)
+        if (NOT ARG_BUILD_TREE_ONLY AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
             install (${INSTALL_TYPE} ${INSTALL_SOURCES} DESTINATION ${ARG_DESTINATION} ${INSTALL_MATCHING})
         endif ()
 

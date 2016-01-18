@@ -38,9 +38,6 @@ environment:
   matrix:
     - URHO3D_LIB_TYPE: STATIC
     - URHO3D_LIB_TYPE: SHARED
-# Uncomment the init script below in order to get the RDP connection details to login into the worker box remotely while it is running
-#init:
-# - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 install:
   - ps: if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
         if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED))))
@@ -53,6 +50,7 @@ build_script:
   - if "%PLATFORM%" == "x64" set "URHO3D_64BIT=1"
 # Our free AppVeyor account is slow for normal daily CI, speed up the build a little bit by excluding Assimp and other tools in the normal build and use the Debug build configuration instead
   - if "%PACKAGE_UPLOAD%" == "" set "URHO3D_TOOLS=0" && set "config=Debug"
+  - ps: if ($env:PACKAGE_UPLOAD -ne "1") { iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1')) }
   - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload
 test: off
 artifacts:

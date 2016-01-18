@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "../Graphics/GraphicsDefs.h"
 #include "../Resource/Resource.h"
 
 namespace Urho3D
@@ -30,7 +31,7 @@ namespace Urho3D
 /// Particle emitter shapes.
 enum EmitterType
 {
-    EMITTER_SPHERE,
+    EMITTER_SPHERE = 0,
     EMITTER_BOX
 };
 
@@ -180,6 +181,8 @@ public:
     void SetSizeAdd(float sizeAdd);
     /// Set particle size multiplicative modifier.
     void SetSizeMul(float sizeMul);
+    /// Set how the particles should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ.)
+    void SetFaceCameraMode(FaceCameraMode mode);
 
     /// Add a color frame sorted in the correct position based on time.
     void AddColorTime(const Color& color, const float time);
@@ -316,6 +319,9 @@ public:
     /// Return a texture animation frame, or null if outside range.
     const TextureFrame* GetTextureFrame(unsigned index) const;
 
+    /// Return how the particles rotate in relation to the camera.
+    FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
+
     /// Return random direction.
     Vector3 GetRandomDirection() const;
     /// Return random size.
@@ -401,6 +407,8 @@ private:
     Vector<TextureFrame> textureFrames_;
     /// Material name acquired during BeginLoad().
     String loadMaterialName_;
+    /// Particle rotation mode in relation to the camera.
+    FaceCameraMode faceCameraMode_;
 };
 
 }
