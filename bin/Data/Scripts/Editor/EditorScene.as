@@ -216,10 +216,12 @@ bool LoadScene(const String&in fileName)
 
     String extension = GetExtension(fileName);
     bool loaded;
-    if (extension != ".xml")
-        loaded = editorScene.Load(file);
-    else
+    if (extension == ".xml")
         loaded = editorScene.LoadXML(file);
+    else if (extension == ".json")
+        loaded = editorScene.LoadJSON(file);
+    else
+        loaded = editorScene.Load(file);
 
     // Release resources which are not used by the new scene
     cache.ReleaseAllResources(false);
@@ -265,7 +267,13 @@ bool SaveScene(const String&in fileName)
     MakeBackup(fileName);
     File file(fileName, FILE_WRITE);
     String extension = GetExtension(fileName);
-    bool success = (extension != ".xml" ? editorScene.Save(file) : editorScene.SaveXML(file));
+    bool success;
+    if (extension == ".xml")
+        editorScene.SaveXML(file);
+    else if (extension == ".json")
+        editorScene.SaveJSON(file);
+    else
+        editorScene.Save(file);
     RemoveBackup(success, fileName);
 
     editorScene.updateEnabled = false;
@@ -400,10 +408,12 @@ Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quatern
     suppressSceneChanges = true;
 
     String extension = GetExtension(file.name);
-    if (extension != ".xml")
-        newNode = editorScene.Instantiate(file, position, rotation, mode);
-    else
+    if (extension == ".xml")
         newNode = editorScene.InstantiateXML(file, position, rotation, mode);
+    else if (extension == ".json")
+        newNode = editorScene.InstantiateJSON(file, position, rotation, mode);
+    else
+        newNode = editorScene.Instantiate(file, position, rotation, mode);
 
     suppressSceneChanges = false;
 
@@ -456,7 +466,13 @@ bool SaveNode(const String&in fileName)
     }
 
     String extension = GetExtension(fileName);
-    bool success = (extension != ".xml" ? editNode.Save(file) : editNode.SaveXML(file));
+    bool success;
+    if (extension == ".xml")
+        success = editNode.SaveXML(file);
+    else if (extension == ".json")
+        success = editNode.SaveJSON(file);
+    else
+        success = editNode.Save(file);
     RemoveBackup(success, fileName);
 
     if (success)
@@ -484,7 +500,7 @@ void StopSceneUpdate()
     {
         suppressSceneChanges = true;
         editorScene.Clear();
-        editorScene.LoadXML(revertData.GetRoot());
+        editorScene.LoadXML(revertData.root);
         CreateGrid();
         UpdateHierarchyItem(editorScene, true);
         ClearEditActions();
@@ -633,7 +649,7 @@ bool SceneCopy()
             sceneCopyBuffer.Push(xml);
         }
     }
-    // Copy nodes.
+    // Copy nodes
     else
     {
         for (uint i = 0; i < selectedNodes.length; ++i)

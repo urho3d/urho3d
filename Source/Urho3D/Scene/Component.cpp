@@ -29,6 +29,7 @@
 #include "../Scene/SceneEvents.h"
 
 #include "../DebugNew.h"
+#include "./Resource/JSONValue.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:6293)
@@ -67,11 +68,21 @@ bool Component::SaveXML(XMLElement& dest) const
     // Write type and ID
     if (!dest.SetString("type", GetTypeName()))
         return false;
-    if (!dest.SetInt("id", id_))
+    if (!dest.SetUInt("id", id_))
         return false;
 
     // Write attributes
     return Animatable::SaveXML(dest);
+}
+
+bool Component::SaveJSON(JSONValue& dest) const
+{
+    // Write type and ID
+    dest.Set("type", GetTypeName());
+    dest.Set("id", id_);
+
+    // Write attributes
+    return Animatable::SaveJSON(dest);
 }
 
 void Component::MarkNetworkUpdate()

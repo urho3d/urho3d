@@ -175,28 +175,13 @@ static const unsigned short spotLightIndexData[] =
     7, 6, 5
 };
 
-static const char* shadowVariations[] =
-{
-#ifdef URHO3D_OPENGL
-    // No specific hardware shadow compare variation on OpenGL, it is always supported
-    "LQSHADOW ",
-    "LQSHADOW ",
-    "",
-    ""
-#else
-    "LQSHADOW SHADOWCMP ",
-    "LQSHADOW ",
-    "SHADOWCMP ",
-    ""
-#endif
-};
-
 static const char* geometryVSVariations[] =
 {
     "",
     "SKINNED ",
     "INSTANCED ",
-    "BILLBOARD "
+    "BILLBOARD ",
+    "DIRBILLBOARD "
 };
 
 static const char* lightVSVariations[] =
@@ -258,12 +243,16 @@ static const unsigned MAX_BUFFER_AGE = 1000;
 Renderer::Renderer(Context* context) :
     Object(context),
     defaultZone_(new Zone(context)),
+    shadowMapFilterInstance_(0),
+    shadowMapFilter_(0),
     textureAnisotropy_(4),
     textureFilterMode_(FILTER_TRILINEAR),
     textureQuality_(QUALITY_HIGH),
     materialQuality_(QUALITY_HIGH),
     shadowMapSize_(1024),
-    shadowQuality_(SHADOWQUALITY_HIGH_16BIT),
+    shadowQuality_(SHADOWQUALITY_PCF_16BIT),
+    shadowSoftness_(2.0f),
+    vsmShadowParams_(0.0000001f, 0.2f),
     maxShadowMaps_(1),
     minInstances_(2),
     maxSortedInstances_(1000),
@@ -388,32 +377,61 @@ void Renderer::SetShadowMapSize(int size)
     }
 }
 
-void Renderer::SetShadowQuality(int quality)
+void Renderer::SetShadowQuality(ShadowQuality quality)
 {
     if (!graphics_)
         return;
 
-    quality &= SHADOWQUALITY_HIGH_24BIT;
-
     // If no hardware PCF, do not allow to select one-sample quality
     if (!graphics_->GetHardwareShadowSupport())
-        quality |= SHADOWQUALITY_HIGH_16BIT;
+    {
+        if (quality == SHADOWQUALITY_SIMPLE_16BIT)
+            quality = SHADOWQUALITY_PCF_16BIT;
+        
+        if (quality == SHADOWQUALITY_SIMPLE_24BIT)
+            quality = SHADOWQUALITY_PCF_24BIT;
+    }
+    // if high resolution is not allowed
     if (!graphics_->GetHiresShadowMapFormat())
-        quality &= SHADOWQUALITY_HIGH_16BIT;
+    {
+        if (quality == SHADOWQUALITY_SIMPLE_24BIT)
+            quality = SHADOWQUALITY_SIMPLE_16BIT;
 
+        if (quality == SHADOWQUALITY_PCF_24BIT)
+            quality = SHADOWQUALITY_PCF_16BIT;
+    }
     if (quality != shadowQuality_)
     {
         shadowQuality_ = quality;
         shadersDirty_ = true;
+        if (quality == SHADOWQUALITY_BLUR_VSM)
+            SetShadowMapFilter(this, static_cast<ShadowMapFilter>(&Renderer::BlurShadowMap));
+        else
+            SetShadowMapFilter(0, 0);
+
         ResetShadowMaps();
     }
 }
 
+void Renderer::SetShadowSoftness(float shadowSoftness)
+{
+    shadowSoftness_ = Max(shadowSoftness, 0.0f);
+}
+
+void Renderer::SetVSMShadowParameters(float minVariance, float lightBleedingReduction)
+{
+    vsmShadowParams_.x_ = Max(minVariance, 0.0f);
+    vsmShadowParams_.y_ = Clamp(lightBleedingReduction, 0.0f, 1.0f);
+}
+
+void Renderer::SetShadowMapFilter(Object* instance, ShadowMapFilter functionPtr)
+{
+    shadowMapFilterInstance_ = instance;
+    shadowMapFilter_ = functionPtr;
+}
+
 void Renderer::SetReuseShadowMaps(bool enable)
 {
-    if (enable == reuseShadowMaps_)
-        return;
-
     reuseShadowMaps_ = enable;
 }
 
@@ -486,6 +504,12 @@ void Renderer::SetThreadedOcclusion(bool enable)
 void Renderer::ReloadShaders()
 {
     shadersDirty_ = true;
+}
+
+void Renderer::ApplyShadowMapFilter(View* view, Texture2D* shadowMap)
+{
+    if (shadowMapFilterInstance_ && shadowMapFilter_)
+        (shadowMapFilterInstance_->*shadowMapFilter_)(view, shadowMap);
 }
 
 Viewport* Renderer::GetViewport(unsigned index) const
@@ -891,8 +915,29 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         }
     }
 
-    unsigned shadowMapFormat =
-        (shadowQuality_ & SHADOWQUALITY_LOW_24BIT) ? graphics_->GetHiresShadowMapFormat() : graphics_->GetShadowMapFormat();
+    // Find format and usage of the shadow map
+    unsigned shadowMapFormat = 0;
+    TextureUsage shadowMapUsage = TEXTURE_DEPTHSTENCIL;
+
+    switch (shadowQuality_)
+    {
+    case SHADOWQUALITY_SIMPLE_16BIT:
+    case SHADOWQUALITY_PCF_16BIT:
+        shadowMapFormat = graphics_->GetShadowMapFormat();
+        break;
+
+    case SHADOWQUALITY_SIMPLE_24BIT:
+    case SHADOWQUALITY_PCF_24BIT:
+        shadowMapFormat = graphics_->GetHiresShadowMapFormat();
+        break;
+
+    case SHADOWQUALITY_VSM:
+    case SHADOWQUALITY_BLUR_VSM:
+        shadowMapFormat = graphics_->GetRGFloat32Format();
+        shadowMapUsage = TEXTURE_RENDERTARGET;
+        break;
+    }
+
     if (!shadowMapFormat)
         return 0;
 
@@ -902,7 +947,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
 
     while (retries)
     {
-        if (!newShadowMap->SetSize(width, height, shadowMapFormat, TEXTURE_DEPTHSTENCIL))
+        if (!newShadowMap->SetSize(width, height, shadowMapFormat, shadowMapUsage))
         {
             width >>= 1;
             height >>= 1;
@@ -913,7 +958,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
 #ifndef GL_ES_VERSION_2_0
             // OpenGL (desktop) and D3D11: shadow compare mode needs to be specifically enabled for the shadow map
             newShadowMap->SetFilterMode(FILTER_BILINEAR);
-            newShadowMap->SetShadowCompare(true);
+            newShadowMap->SetShadowCompare(shadowMapUsage == TEXTURE_DEPTHSTENCIL);
 #endif
 #ifndef URHO3D_OPENGL
             // Direct3D9: when shadow compare must be done manually, use nearest filtering so that the filtering of point lights
@@ -922,7 +967,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
 #endif
             // Create dummy color texture for the shadow map if necessary: Direct3D9, or OpenGL when working around an OS X +
             // Intel driver bug
-            if (dummyColorFormat)
+            if (shadowMapUsage == TEXTURE_DEPTHSTENCIL && dummyColorFormat)
             {
                 // If no dummy color rendertarget for this size exists yet, create one now
                 if (!colorShadowMaps_.Contains(searchKey))
@@ -1515,12 +1560,12 @@ void Renderer::LoadShaders()
 
     // Construct new names for deferred light volume pixel shaders based on rendering options
     deferredLightPSVariations_.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
-    unsigned shadows = (unsigned)((graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT));
+    
     for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_PS_VARIATIONS; ++i)
     {
         deferredLightPSVariations_[i] = lightPSVariations[i % DLPS_ORTHO];
         if (i & DLPS_SHADOW)
-            deferredLightPSVariations_[i] += shadowVariations[shadows];
+            deferredLightPSVariations_[i] += GetShadowVariations();
         if (i & DLPS_ORTHO)
             deferredLightPSVariations_[i] += "ORTHO ";
     }
@@ -1532,14 +1577,19 @@ void Renderer::LoadPassShaders(Pass* pass)
 {
     URHO3D_PROFILE(LoadPassShaders);
 
-    unsigned shadows = (unsigned)((graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT));
-
     Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
     Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();
 
     // Forget all the old shaders
     vertexShaders.Clear();
     pixelShaders.Clear();
+
+    String extraShaderDefines = " ";
+    if (pass->GetName() == "shadow"
+        && (shadowQuality_ == SHADOWQUALITY_VSM || shadowQuality_ == SHADOWQUALITY_BLUR_VSM))
+    {
+        extraShaderDefines = " VSM_SHADOW ";
+    }
 
     if (pass->GetLightingMode() == LIGHTING_PERPIXEL)
     {
@@ -1553,7 +1603,7 @@ void Renderer::LoadPassShaders(Pass* pass)
             unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
 
             vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(),
-                pass->GetVertexShaderDefines() + " " + lightVSVariations[l] + geometryVSVariations[g]);
+                pass->GetVertexShaderDefines() + extraShaderDefines + lightVSVariations[l] + geometryVSVariations[g]);
         }
         for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS * 2; ++j)
         {
@@ -1563,12 +1613,12 @@ void Renderer::LoadPassShaders(Pass* pass)
             if (l & LPS_SHADOW)
             {
                 pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(),
-                    pass->GetPixelShaderDefines() + " " + lightPSVariations[l] + shadowVariations[shadows] +
+                    pass->GetPixelShaderDefines() + extraShaderDefines + lightPSVariations[l] + GetShadowVariations() +
                     heightFogVariations[h]);
             }
             else
                 pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(),
-                    pass->GetPixelShaderDefines() + " " + lightPSVariations[l] + heightFogVariations[h]);
+                    pass->GetPixelShaderDefines() + extraShaderDefines + lightPSVariations[l] + heightFogVariations[h]);
         }
     }
     else
@@ -1582,7 +1632,7 @@ void Renderer::LoadPassShaders(Pass* pass)
                 unsigned g = j / MAX_VERTEXLIGHT_VS_VARIATIONS;
                 unsigned l = j % MAX_VERTEXLIGHT_VS_VARIATIONS;
                 vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(),
-                    pass->GetVertexShaderDefines() + " " + vertexLightVSVariations[l] + geometryVSVariations[g]);
+                    pass->GetVertexShaderDefines() + extraShaderDefines + vertexLightVSVariations[l] + geometryVSVariations[g]);
             }
         }
         else
@@ -1591,7 +1641,7 @@ void Renderer::LoadPassShaders(Pass* pass)
             for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
             {
                 vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(),
-                    pass->GetVertexShaderDefines() + " " + geometryVSVariations[j]);
+                    pass->GetVertexShaderDefines() + extraShaderDefines + geometryVSVariations[j]);
             }
         }
 
@@ -1599,7 +1649,7 @@ void Renderer::LoadPassShaders(Pass* pass)
         for (unsigned j = 0; j < 2; ++j)
         {
             pixelShaders[j] =
-                graphics_->GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " + heightFogVariations[j]);
+                graphics_->GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + extraShaderDefines + heightFogVariations[j]);
         }
     }
 
@@ -1776,6 +1826,40 @@ void Renderer::ResetBuffers()
     screenBufferAllocations_.Clear();
 }
 
+String Renderer::GetShadowVariations() const
+{
+    switch (shadowQuality_)
+    {
+        case SHADOWQUALITY_SIMPLE_16BIT:
+        #ifdef URHO3D_OPENGL
+            return "SIMPLE_SHADOW ";
+        #else
+            if (graphics_->GetHardwareShadowSupport())
+                return "SIMPLE_SHADOW ";
+            else
+                return "SIMPLE_SHADOW SHADOWCMP ";
+        #endif
+        case SHADOWQUALITY_SIMPLE_24BIT:
+            return "SIMPLE_SHADOW ";
+        case SHADOWQUALITY_PCF_16BIT:
+        #ifdef URHO3D_OPENGL
+            return "PCF_SHADOW ";
+        #else
+            if (graphics_->GetHardwareShadowSupport())
+                return "PCF_SHADOW ";
+            else
+                return "PCF_SHADOW SHADOWCMP ";
+        #endif
+        case SHADOWQUALITY_PCF_24BIT:
+            return "PCF_SHADOW ";
+        case SHADOWQUALITY_VSM:
+            return "VSM_SHADOW ";
+        case SHADOWQUALITY_BLUR_VSM:
+            return "VSM_SHADOW ";
+    }
+    return "";
+};
+
 void Renderer::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
     if (!initialized_)
@@ -1791,4 +1875,42 @@ void Renderer::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
     Update(eventData[P_TIMESTEP].GetFloat());
 }
 
+
+void Renderer::BlurShadowMap(View* view, Texture2D* shadowMap)
+{
+    graphics_->SetBlendMode(BLEND_REPLACE);
+    graphics_->SetDepthTest(CMP_ALWAYS);
+    graphics_->SetClipPlane(false);
+    graphics_->SetScissorTest(false);
+
+    // Get a temporary render buffer
+    Texture2D* tmpBuffer = static_cast<Texture2D*>(GetScreenBuffer(shadowMap->GetWidth(), shadowMap->GetHeight(), shadowMap->GetFormat(), false, false, false));
+    graphics_->SetRenderTarget(0, tmpBuffer->GetRenderSurface());
+    graphics_->SetDepthStencil(GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight()));
+    graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
+
+    // Get shaders
+    static const String shaderName("ShadowBlur");
+    ShaderVariation* vs = graphics_->GetShader(VS, shaderName);
+    ShaderVariation* ps = graphics_->GetShader(PS, shaderName);
+    graphics_->SetShaders(vs, ps);
+
+    view->SetGBufferShaderParameters(IntVector2(shadowMap->GetWidth(), shadowMap->GetHeight()), IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
+
+    // Horizontal blur of the shadow map
+    static const StringHash blurOffsetParam("BlurOffsets");
+    graphics_->SetShaderParameter(blurOffsetParam, Vector2(shadowSoftness_ / shadowMap->GetWidth(), 0.0f));
+
+    graphics_->SetTexture(TU_DIFFUSE, shadowMap);
+    view->DrawFullscreenQuad(false);
+
+    // Vertical blur
+    graphics_->SetRenderTarget(0, shadowMap);
+    graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
+
+    graphics_->SetShaderParameter(blurOffsetParam, Vector2(0.0f, shadowSoftness_ / shadowMap->GetHeight()));
+
+    graphics_->SetTexture(TU_DIFFUSE, tmpBuffer);
+    view->DrawFullscreenQuad(false);
+}
 }

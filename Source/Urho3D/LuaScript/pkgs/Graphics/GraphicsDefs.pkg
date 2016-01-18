@@ -93,6 +93,7 @@ enum VertexElement
     ELEMENT_INSTANCEMATRIX1,
     ELEMENT_INSTANCEMATRIX2,
     ELEMENT_INSTANCEMATRIX3,
+    ELEMENT_OBJECTINDEX,
     MAX_VERTEX_ELEMENTS
 };
 
@@ -173,18 +174,26 @@ enum FaceCameraMode
     FC_ROTATE_XYZ,
     FC_ROTATE_Y,
     FC_LOOKAT_XYZ,
-    FC_LOOKAT_Y
+    FC_LOOKAT_Y,
+    FC_DIRECTION
 };
+
+/// Shadow type
+enum ShadowQuality
+{
+    SHADOWQUALITY_SIMPLE_16BIT = 0,
+    SHADOWQUALITY_SIMPLE_24BIT,
+    SHADOWQUALITY_PCF_16BIT,
+    SHADOWQUALITY_PCF_24BIT,
+    SHADOWQUALITY_VSM,
+    SHADOWQUALITY_BLUR_VSM
+};
+
 
 static const int QUALITY_LOW;
 static const int QUALITY_MEDIUM;
 static const int QUALITY_HIGH;
 static const int QUALITY_MAX;
-
-static const int SHADOWQUALITY_LOW_16BIT;
-static const int SHADOWQUALITY_LOW_24BIT;
-static const int SHADOWQUALITY_HIGH_16BIT;
-static const int SHADOWQUALITY_HIGH_24BIT;
 
 static const unsigned CLEAR_COLOR;
 static const unsigned CLEAR_DEPTH;
@@ -204,4 +213,5 @@ static const unsigned MASK_BLENDINDICES;
 static const unsigned MASK_INSTANCEMATRIX1;
 static const unsigned MASK_INSTANCEMATRIX2;
 static const unsigned MASK_INSTANCEMATRIX3;
+static const unsigned MASK_OBJECTINDEX;
 static const unsigned MASK_DEFAULT;

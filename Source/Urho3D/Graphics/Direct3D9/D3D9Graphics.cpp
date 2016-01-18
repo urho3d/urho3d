@@ -310,31 +310,12 @@ Graphics::~Graphics()
 
     vertexDeclarations_.Clear();
 
-    if (impl_->defaultColorSurface_)
-    {
-        impl_->defaultColorSurface_->Release();
-        impl_->defaultColorSurface_ = 0;
-    }
-    if (impl_->defaultDepthStencilSurface_)
-    {
-        impl_->defaultDepthStencilSurface_->Release();
-        impl_->defaultDepthStencilSurface_ = 0;
-    }
-    if (impl_->frameQuery_)
-    {
-        impl_->frameQuery_->Release();
-        impl_->frameQuery_ = 0;
-    }
-    if (impl_->device_)
-    {
-        impl_->device_->Release();
-        impl_->device_ = 0;
-    }
-    if (impl_->interface_)
-    {
-        impl_->interface_->Release();
-        impl_->interface_ = 0;
-    }
+    URHO3D_SAFE_RELEASE(impl_->defaultColorSurface_);
+    URHO3D_SAFE_RELEASE(impl_->defaultDepthStencilSurface_);
+    URHO3D_SAFE_RELEASE(impl_->frameQuery_);
+    URHO3D_SAFE_RELEASE(impl_->device_);
+    URHO3D_SAFE_RELEASE(impl_->interface_);
+
     if (impl_->window_)
     {
         SDL_ShowCursor(SDL_TRUE);
@@ -644,17 +625,24 @@ bool Graphics::TakeScreenShot(Image& destImage)
     }
 
     IDirect3DSurface9* surface = 0;
-    impl_->device_->CreateOffscreenPlainSurface(surfaceWidth, surfaceHeight, surfaceDesc.Format, D3DPOOL_SYSTEMMEM, &surface, 0);
-    if (!surface)
+    HRESULT hr = impl_->device_->CreateOffscreenPlainSurface(surfaceWidth, surfaceHeight, surfaceDesc.Format, D3DPOOL_SYSTEMMEM, &surface, 0);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Could not create surface for taking a screenshot");
+        URHO3D_SAFE_RELEASE(surface);
+        URHO3D_LOGD3DERROR("Could not create surface for taking a screenshot", hr);
         return false;
     }
 
     if (useBackBuffer)
-        impl_->device_->GetRenderTargetData(impl_->defaultColorSurface_, surface);
+        hr = impl_->device_->GetRenderTargetData(impl_->defaultColorSurface_, surface);
     else
-        impl_->device_->GetFrontBufferData(0, surface);
+        hr = impl_->device_->GetFrontBufferData(0, surface);
+    if (FAILED(hr))
+    {
+        URHO3D_SAFE_RELEASE(surface);
+        URHO3D_LOGD3DERROR("Could not get rendertarget data for taking a screenshot", hr);
+        return false;
+    }
 
     // If capturing the whole screen, determine the window rect
     RECT sourceRect;
@@ -674,11 +662,11 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
     D3DLOCKED_RECT lockedRect;
     lockedRect.pBits = 0;
-    surface->LockRect(&lockedRect, &sourceRect, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY);
-    if (!lockedRect.pBits)
+    hr = surface->LockRect(&lockedRect, &sourceRect, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY);
+    if (FAILED(hr) || !lockedRect.pBits)
     {
-        URHO3D_LOGERROR("Could not lock surface for taking a screenshot");
-        surface->Release();
+        URHO3D_SAFE_RELEASE(surface);
+        URHO3D_LOGD3DERROR("Could not lock surface for taking a screenshot", hr);
         return false;
     }
 
@@ -869,8 +857,10 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     destRect.right = destination->GetWidth();
     destRect.bottom = destination->GetHeight();
 
-    return SUCCEEDED(impl_->device_->StretchRect(impl_->defaultColorSurface_, &rect,
-        (IDirect3DSurface9*)destination->GetRenderSurface()->GetSurface(), &destRect, D3DTEXF_NONE));
+    HRESULT hr = impl_->device_->StretchRect(impl_->defaultColorSurface_, &rect,
+        (IDirect3DSurface9*)destination->GetRenderSurface()->GetSurface(), &destRect, D3DTEXF_NONE);
+    if (FAILED(hr))
+        URHO3D_LOGD3DERROR("Failed to resolve to texture", hr);
 }
 
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
@@ -976,10 +966,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
         {
             SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers, elementMasks));
             if (!newDeclaration->GetDeclaration())
-            {
-                URHO3D_LOGERROR("Failed to create vertex declaration");
                 return false;
-            }
 
             vertexDeclarations_[hash] = newDeclaration;
         }
@@ -1312,6 +1299,14 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 
     case VAR_MATRIX4:
         SetShaderParameter(param, value.GetMatrix4());
+        break;
+
+    case VAR_BUFFER:
+        {
+            const PODVector<unsigned char>& buffer = value.GetBuffer();
+            if (buffer.Size() >= sizeof(float))
+                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
+        }
         break;
 
     default:
@@ -2434,15 +2429,17 @@ bool Graphics::CreateInterface()
         return false;
     }
 
-    if (FAILED(impl_->interface_->GetDeviceCaps(impl_->adapter_, impl_->deviceType_, &impl_->deviceCaps_)))
+    HRESULT hr = impl_->interface_->GetDeviceCaps(impl_->adapter_, impl_->deviceType_, &impl_->deviceCaps_);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Could not get Direct3D capabilities");
+        URHO3D_LOGD3DERROR("Could not get Direct3D capabilities", hr);
         return false;
     }
 
-    if (FAILED(impl_->interface_->GetAdapterIdentifier(impl_->adapter_, 0, &impl_->adapterIdentifier_)))
+    hr = impl_->interface_->GetAdapterIdentifier(impl_->adapter_, 0, &impl_->adapterIdentifier_);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Could not get Direct3D adapter identifier");
+        URHO3D_LOGD3DERROR("Could not get Direct3D adapter identifier", hr);
         return false;
     }
 
@@ -2471,15 +2468,16 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
     else
         behaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 
-    if (FAILED(impl_->interface_->CreateDevice(
+    HRESULT hr = impl_->interface_->CreateDevice(
         adapter,
         (D3DDEVTYPE)deviceType,
         GetWindowHandle(impl_->window_),
         behaviorFlags,
         &impl_->presentParams_,
-        &impl_->device_)))
+        &impl_->device_);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Could not create Direct3D9 device");
+        URHO3D_LOGD3DERROR("Could not create Direct3D9 device", hr);
         return false;
     }
 

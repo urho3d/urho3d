@@ -220,8 +220,6 @@ static HWND GetWindowHandle(SDL_Window* window)
     return sysInfo.info.win.window;
 }
 
-static unsigned readableDepthFormat = 0;
-
 const Vector2 Graphics::pixelUVOffset(0.0f, 0.0f);
 
 Graphics::Graphics(Context* context) :
@@ -281,61 +279,31 @@ Graphics::~Graphics()
 
     for (HashMap<unsigned, ID3D11BlendState*>::Iterator i = impl_->blendStates_.Begin(); i != impl_->blendStates_.End(); ++i)
     {
-        if (i->second_)
-            i->second_->Release();
+        URHO3D_SAFE_RELEASE(i->second_);
     }
     impl_->blendStates_.Clear();
 
     for (HashMap<unsigned, ID3D11DepthStencilState*>::Iterator i = impl_->depthStates_.Begin(); i != impl_->depthStates_.End(); ++i)
     {
-        if (i->second_)
-            i->second_->Release();
+        URHO3D_SAFE_RELEASE(i->second_);
     }
     impl_->depthStates_.Clear();
 
     for (HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Begin();
          i != impl_->rasterizerStates_.End(); ++i)
     {
-        if (i->second_)
-            i->second_->Release();
+        URHO3D_SAFE_RELEASE(i->second_);
     }
     impl_->rasterizerStates_.Clear();
 
-    if (impl_->defaultRenderTargetView_)
-    {
-        impl_->defaultRenderTargetView_->Release();
-        impl_->defaultRenderTargetView_ = 0;
-    }
-    if (impl_->defaultDepthStencilView_)
-    {
-        impl_->defaultDepthStencilView_->Release();
-        impl_->defaultDepthStencilView_ = 0;
-    }
-    if (impl_->defaultDepthTexture_)
-    {
-        impl_->defaultDepthTexture_->Release();
-        impl_->defaultDepthTexture_ = 0;
-    }
-    if (impl_->resolveTexture_)
-    {
-        impl_->resolveTexture_->Release();
-        impl_->resolveTexture_ = 0;
-    }
-    if (impl_->swapChain_)
-    {
-        impl_->swapChain_->Release();
-        impl_->swapChain_ = 0;
-    }
-    if (impl_->deviceContext_)
-    {
-        impl_->deviceContext_->Release();
-        impl_->deviceContext_ = 0;
-    }
-    if (impl_->device_)
-    {
-        impl_->device_->Release();
-        impl_->device_ = 0;
-    }
+    URHO3D_SAFE_RELEASE(impl_->defaultRenderTargetView_);
+    URHO3D_SAFE_RELEASE(impl_->defaultDepthStencilView_);
+    URHO3D_SAFE_RELEASE(impl_->defaultDepthTexture_);
+    URHO3D_SAFE_RELEASE(impl_->resolveTexture_);
+    URHO3D_SAFE_RELEASE(impl_->swapChain_);
+    URHO3D_SAFE_RELEASE(impl_->deviceContext_);
+    URHO3D_SAFE_RELEASE(impl_->device_);
+
     if (impl_->window_)
     {
         SDL_ShowCursor(SDL_TRUE);
@@ -582,10 +550,11 @@ bool Graphics::TakeScreenShot(Image& destImage)
     textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
     ID3D11Texture2D* stagingTexture = 0;
-    impl_->device_->CreateTexture2D(&textureDesc, 0, &stagingTexture);
-    if (!stagingTexture)
+    HRESULT hr = impl_->device_->CreateTexture2D(&textureDesc, 0, &stagingTexture);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Could not create staging texture for screenshot");
+        URHO3D_SAFE_RELEASE(stagingTexture);
+        URHO3D_LOGD3DERROR("Could not create staging texture for screenshot", hr);
         return false;
     }
 
@@ -599,7 +568,6 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
         if (!impl_->resolveTexture_)
         {
-            URHO3D_LOGERROR("Could not create intermediate texture for multisampled screenshot");
             stagingTexture->Release();
             source->Release();
             return false;
@@ -615,33 +583,31 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
     D3D11_MAPPED_SUBRESOURCE mappedData;
     mappedData.pData = 0;
-    impl_->deviceContext_->Map(stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
-
-    destImage.SetSize(width_, height_, 3);
-    unsigned char* destData = destImage.GetData();
-    if (mappedData.pData)
+    hr = impl_->deviceContext_->Map(stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
+    if (FAILED(hr) || !mappedData.pData)
     {
-        for (int y = 0; y < height_; ++y)
-        {
-            unsigned char* src = (unsigned char*)mappedData.pData + y * mappedData.RowPitch;
-            for (int x = 0; x < width_; ++x)
-            {
-                *destData++ = *src++;
-                *destData++ = *src++;
-                *destData++ = *src++;
-                ++src;
-            }
-        }
-        impl_->deviceContext_->Unmap(stagingTexture, 0);
-        stagingTexture->Release();
-        return true;
-    }
-    else
-    {
-        URHO3D_LOGERROR("Could not map staging texture for screenshot");
+        URHO3D_LOGD3DERROR("Could not map staging texture for screenshot", hr);
         stagingTexture->Release();
         return false;
     }
+
+    destImage.SetSize(width_, height_, 3);
+    unsigned char* destData = destImage.GetData();
+    for (int y = 0; y < height_; ++y)
+    {
+        unsigned char* src = (unsigned char*)mappedData.pData + y * mappedData.RowPitch;
+        for (int x = 0; x < width_; ++x)
+        {
+            *destData++ = *src++;
+            *destData++ = *src++;
+            *destData++ = *src++;
+            ++src;
+        }
+    }
+
+    impl_->deviceContext_->Unmap(stagingTexture, 0);
+    stagingTexture->Release();
+    return true;
 }
 
 bool Graphics::BeginFrame()
@@ -677,7 +643,6 @@ bool Graphics::BeginFrame()
     numBatches_ = 0;
 
     SendEvent(E_BEGINRENDERING);
-
     return true;
 }
 
@@ -690,7 +655,6 @@ void Graphics::EndFrame()
         URHO3D_PROFILE(Present);
 
         SendEvent(E_ENDRENDERING);
-
         impl_->swapChain_->Present(vsync_ ? 1 : 0, 0);
     }
 
@@ -702,10 +666,15 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
 {
     IntVector2 rtSize = GetRenderTargetDimensions();
 
+    bool oldColorWrite = colorWrite_;
+    bool oldDepthWrite = depthWrite_;
+
     // D3D11 clear always clears the whole target regardless of viewport or scissor test settings
     // Emulate partial clear by rendering a quad
     if (!viewport_.left_ && !viewport_.top_ && viewport_.right_ == rtSize.x_ && viewport_.bottom_ == rtSize.y_)
     {
+        // Make sure we use the read-write version of the depth stencil
+        SetDepthWrite(true);
         PrepareDraw();
 
         if ((flags & CLEAR_COLOR) && impl_->renderTargetViews_[0])
@@ -748,11 +717,13 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
 
         geometry->Draw(this);
 
-        SetColorWrite(true);
-        SetDepthWrite(true);
         SetStencilTest(false);
         ClearParameterSources();
     }
+
+    // Restore color & depth write state now
+    SetColorWrite(oldColorWrite);
+    SetDepthWrite(oldDepthWrite);
 }
 
 bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
@@ -1258,6 +1229,14 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
         SetShaderParameter(param, value.GetMatrix4());
         break;
 
+    case VAR_BUFFER:
+        {
+            const PODVector<unsigned char>& buffer = value.GetBuffer();
+            if (buffer.Size() >= sizeof(float))
+                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
+        }
+        break;
+
     default:
         // Unsupported parameter type, do nothing
         break;
@@ -1523,6 +1502,8 @@ void Graphics::SetDepthWrite(bool enable)
     {
         depthWrite_ = enable;
         depthStateDirty_ = true;
+        // Also affects whether a read-only version of depth-stencil should be bound, to allow sampling
+        renderTargetsDirty_ = true;
     }
 }
 
@@ -2242,7 +2223,7 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     // Device needs only to be created once
     if (!impl_->device_)
     {
-        D3D11CreateDevice(
+        HRESULT hr = D3D11CreateDevice(
             0,
             D3D_DRIVER_TYPE_HARDWARE,
             0,
@@ -2255,9 +2236,11 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
             &impl_->deviceContext_
         );
 
-        if (!impl_->device_ || !impl_->deviceContext_)
+        if (FAILED(hr))
         {
-            URHO3D_LOGERROR("Failed to create D3D11 device");
+            URHO3D_SAFE_RELEASE(impl_->device_);
+            URHO3D_SAFE_RELEASE(impl_->deviceContext_);
+            URHO3D_LOGD3DERROR("Failed to create D3D11 device", hr);
             return false;
         }
 
@@ -2297,7 +2280,7 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     dxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&dxgiAdapter);
     IDXGIFactory* dxgiFactory = 0;
     dxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&dxgiFactory);
-    dxgiFactory->CreateSwapChain(impl_->device_, &swapChainDesc, &impl_->swapChain_);
+    HRESULT hr = dxgiFactory->CreateSwapChain(impl_->device_, &swapChainDesc, &impl_->swapChain_);
     // After creating the swap chain, disable automatic Alt-Enter fullscreen/windowed switching
     // (the application will switch manually if it wants to)
     dxgiFactory->MakeWindowAssociation(GetWindowHandle(impl_->window_), DXGI_MWA_NO_ALT_ENTER);
@@ -2306,15 +2289,16 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     dxgiAdapter->Release();
     dxgiDevice->Release();
 
-    if (impl_->swapChain_)
+    if (FAILED(hr))
+    {
+        URHO3D_SAFE_RELEASE(impl_->swapChain_);
+        URHO3D_LOGD3DERROR("Failed to create D3D11 swap chain", hr);
+        return false;
+    }
+    else if (impl_->swapChain_)
     {
         multiSample_ = multiSample;
         return true;
-    }
-    else
-    {
-        URHO3D_LOGERROR("Failed to create D3D11 swap chain");
-        return false;
     }
 }
 
@@ -2354,16 +2338,23 @@ bool Graphics::UpdateSwapChain(int width, int height)
 
     // Create default rendertarget view representing the backbuffer
     ID3D11Texture2D* backbufferTexture;
-    impl_->swapChain_->GetBuffer(0, IID_ID3D11Texture2D, (void**)&backbufferTexture);
-    if (backbufferTexture)
+    HRESULT hr = impl_->swapChain_->GetBuffer(0, IID_ID3D11Texture2D, (void**)&backbufferTexture);
+    if (FAILED(hr))
     {
-        impl_->device_->CreateRenderTargetView(backbufferTexture, 0, &impl_->defaultRenderTargetView_);
-        backbufferTexture->Release();
+        URHO3D_SAFE_RELEASE(backbufferTexture);
+        URHO3D_LOGD3DERROR("Failed to get backbuffer texture", hr);
+        success = false;
     }
     else
     {
-        URHO3D_LOGERROR("Failed to get backbuffer texture");
-        success = false;
+        hr = impl_->device_->CreateRenderTargetView(backbufferTexture, 0, &impl_->defaultRenderTargetView_);
+        backbufferTexture->Release();
+        if (FAILED(hr))
+        {
+            URHO3D_SAFE_RELEASE(impl_->defaultRenderTargetView_);
+            URHO3D_LOGD3DERROR("Failed to create backbuffer rendertarget view", hr);
+            success = false;
+        }
     }
 
     // Create default depth-stencil texture and view
@@ -2380,13 +2371,22 @@ bool Graphics::UpdateSwapChain(int width, int height)
     depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     depthDesc.CPUAccessFlags = 0;
     depthDesc.MiscFlags = 0;
-    impl_->device_->CreateTexture2D(&depthDesc, 0, &impl_->defaultDepthTexture_);
-    if (impl_->defaultDepthTexture_)
-        impl_->device_->CreateDepthStencilView(impl_->defaultDepthTexture_, 0, &impl_->defaultDepthStencilView_);
+    hr = impl_->device_->CreateTexture2D(&depthDesc, 0, &impl_->defaultDepthTexture_);
+    if (FAILED(hr))
+    {
+        URHO3D_SAFE_RELEASE(impl_->defaultDepthTexture_);
+        URHO3D_LOGD3DERROR("Failed to create backbuffer depth-stencil texture", hr);
+        success = false;
+    }
     else
     {
-        URHO3D_LOGERROR("Failed to create backbuffer depth-stencil texture");
-        success = false;
+        hr = impl_->device_->CreateDepthStencilView(impl_->defaultDepthTexture_, 0, &impl_->defaultDepthStencilView_);
+        if (FAILED(hr))
+        {
+            URHO3D_SAFE_RELEASE(impl_->defaultDepthStencilView_);
+            URHO3D_LOGD3DERROR("Failed to create backbuffer depth-stencil view", hr);
+            success = false;
+        }
     }
 
     // Update internally held backbuffer size
@@ -2493,6 +2493,10 @@ void Graphics::PrepareDraw()
         impl_->depthStencilView_ =
             depthStencil_ ? (ID3D11DepthStencilView*)depthStencil_->GetRenderTargetView() : impl_->defaultDepthStencilView_;
 
+        // If possible, bind a read-only depth stencil view to allow reading depth in shader
+        if (!depthWrite_ && depthStencil_ && depthStencil_->GetReadOnlyView())
+            impl_->depthStencilView_ = (ID3D11DepthStencilView*)depthStencil_->GetReadOnlyView();
+
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
             impl_->renderTargetViews_[i] =
                 renderTargets_[i] ? (ID3D11RenderTargetView*)renderTargets_[i]->GetRenderTargetView() : 0;
@@ -2584,9 +2588,12 @@ void Graphics::PrepareDraw()
                 stateDesc.RenderTarget[0].RenderTargetWriteMask = colorWrite_ ? D3D11_COLOR_WRITE_ENABLE_ALL : 0x0;
 
                 ID3D11BlendState* newBlendState = 0;
-                impl_->device_->CreateBlendState(&stateDesc, &newBlendState);
-                if (!newBlendState)
-                    URHO3D_LOGERROR("Failed to create blend state");
+                HRESULT hr = impl_->device_->CreateBlendState(&stateDesc, &newBlendState);
+                if (FAILED(hr))
+                {
+                    URHO3D_SAFE_RELEASE(newBlendState);
+                    URHO3D_LOGD3DERROR("Failed to create blend state", hr);
+                }
 
                 i = impl_->blendStates_.Insert(MakePair(newBlendStateHash, newBlendState));
             }
@@ -2629,9 +2636,12 @@ void Graphics::PrepareDraw()
                 stateDesc.BackFace.StencilFunc = d3dCmpFunc[stencilTestMode_];
 
                 ID3D11DepthStencilState* newDepthState = 0;
-                impl_->device_->CreateDepthStencilState(&stateDesc, &newDepthState);
-                if (!newDepthState)
-                    URHO3D_LOGERROR("Failed to create depth state");
+                HRESULT hr = impl_->device_->CreateDepthStencilState(&stateDesc, &newDepthState);
+                if (FAILED(hr))
+                {
+                    URHO3D_SAFE_RELEASE(newDepthState);
+                    URHO3D_LOGD3DERROR("Failed to create depth state", hr);
+                }
 
                 i = impl_->depthStates_.Insert(MakePair(newDepthStateHash, newDepthState));
             }
@@ -2675,9 +2685,12 @@ void Graphics::PrepareDraw()
                 stateDesc.AntialiasedLineEnable = FALSE;
 
                 ID3D11RasterizerState* newRasterizerState = 0;
-                impl_->device_->CreateRasterizerState(&stateDesc, &newRasterizerState);
-                if (!newRasterizerState)
-                    URHO3D_LOGERROR("Failed to create rasterizer state");
+                HRESULT hr = impl_->device_->CreateRasterizerState(&stateDesc, &newRasterizerState);
+                if (FAILED(hr))
+                {
+                    URHO3D_SAFE_RELEASE(newRasterizerState);
+                    URHO3D_LOGD3DERROR("Failed to create rasterizer state", hr);
+                }
 
                 i = impl_->rasterizerStates_.Insert(MakePair(newRasterizerStateHash, newRasterizerState));
             }
@@ -2722,7 +2735,12 @@ void Graphics::CreateResolveTexture()
     textureDesc.Usage = D3D11_USAGE_DEFAULT;
     textureDesc.CPUAccessFlags = 0;
 
-    impl_->device_->CreateTexture2D(&textureDesc, 0, &impl_->resolveTexture_);
+    HRESULT hr = impl_->device_->CreateTexture2D(&textureDesc, 0, &impl_->resolveTexture_);
+    if (FAILED(hr))
+    {
+        URHO3D_SAFE_RELEASE(impl_->resolveTexture_);
+        URHO3D_LOGD3DERROR("Could not create resolve texture", hr);
+    }
 }
 
 void Graphics::SetTextureUnitMappings()

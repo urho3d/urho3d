@@ -16,8 +16,12 @@ void VS(float4 iPos : POSITION,
     #ifdef INSTANCED
         float4x3 iModelInstance : TEXCOORD2,
     #endif
-    #ifdef BILLBOARD
+    #if defined(BILLBOARD) || defined(DIRBILLBOARD)
         float2 iSize : TEXCOORD1,
+    #endif
+    #ifdef DIRBILLBOARD
+        float3 iNormal : NORMAL,
+        float4 iTangent : TANGENT,
     #endif
     #ifdef DIFFMAP
         out float2 oTexCoord : TEXCOORD0,

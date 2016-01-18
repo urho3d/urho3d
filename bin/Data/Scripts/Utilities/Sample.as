@@ -216,10 +216,10 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         // Shadow depth and filtering quality
         else if (key == '6')
         {
-            int quality = renderer.shadowQuality;
-            ++quality;
-            if (quality > SHADOWQUALITY_HIGH_24BIT)
-                quality = SHADOWQUALITY_LOW_16BIT;
+            ShadowQuality quality = renderer.shadowQuality;
+            quality = ShadowQuality(quality + 1);
+            if (quality > SHADOWQUALITY_BLUR_VSM)
+                quality = SHADOWQUALITY_SIMPLE_16BIT;
             renderer.shadowQuality = quality;
         }
 

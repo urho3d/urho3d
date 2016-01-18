@@ -799,6 +799,9 @@ void UIElement::SetColor(Corner corner, const Color& color)
 
 void UIElement::SetPriority(int priority)
 {
+    if (priority_ == priority)
+        return;
+    
     priority_ = priority;
     if (parent_)
         parent_->sortOrderDirty_ = true;
@@ -965,6 +968,9 @@ bool UIElement::SetStyle(const String& styleName, XMLFile* file)
         // If a custom style file specified, remember it
         defaultStyle_ = file;
     }
+
+    // Remember the effectively applied style file, either custom or default
+    appliedStyleFile_ = file;
 
     styleXPathQuery_.SetVariable("typeName", actualStyleName);
     XMLElement styleElem = file->GetRoot().SelectSinglePrepared(styleXPathQuery_);
@@ -1250,8 +1256,6 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
     else
         children_.Insert(children_.Begin() + index, SharedPtr<UIElement>(element));
 
-    XMLFile* previousStyleFile = element->GetDefaultStyle();
-
     element->Remove();
 
     if (sortChildren_)
@@ -1260,9 +1264,8 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
     element->parent_ = this;
     element->MarkDirty();
 
-    // If child element did not already have a style file, but has specified a style name, apply it now
-    if (!previousStyleFile && !element->appliedStyle_.Empty() && GetDefaultStyle())
-        element->SetStyle(element->appliedStyle_);
+    // Apply style now if child element (and its children) has it defined
+    ApplyStyleRecursive(element);
 
     VerifyChildAlignment();
     UpdateLayout();
@@ -1623,6 +1626,7 @@ void UIElement::SortChildren()
     if (sortChildren_ && sortOrderDirty_)
     {
         // Only sort when there is no layout
+        /// \todo Order is not stable when children have same priorities
         if (layoutMode_ == LM_FREE)
             Sort(children_.Begin(), children_.End(), CompareUIElements);
         sortOrderDirty_ = false;
@@ -1867,6 +1871,17 @@ void UIElement::GetChildrenRecursive(PODVector<UIElement*>& dest) const
         dest.Push(element);
         if (!element->children_.Empty())
             element->GetChildrenRecursive(dest);
+    }
+}
+
+void UIElement::ApplyStyleRecursive(UIElement* element)
+{
+    // If child element style file changes as result of being (re)parented and it has a defined style, apply it now
+    if (!element->appliedStyle_.Empty() && element->appliedStyleFile_.Get() != element->GetDefaultStyle())
+    {
+        element->SetStyle(element->appliedStyle_);
+        for (Vector<SharedPtr<UIElement> >::ConstIterator i = element->children_.Begin(); i != element->children_.End(); ++i)
+            element->ApplyStyleRecursive(*i);
     }
 }
 

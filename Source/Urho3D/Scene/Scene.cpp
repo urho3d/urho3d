@@ -32,6 +32,7 @@
 #include "../Resource/ResourceCache.h"
 #include "../Resource/ResourceEvents.h"
 #include "../Resource/XMLFile.h"
+#include "../Resource/JSONFile.h"
 #include "../Scene/Component.h"
 #include "../Scene/ObjectAnimation.h"
 #include "../Scene/ReplicationState.h"
@@ -178,6 +179,23 @@ bool Scene::LoadXML(const XMLElement& source, bool setInstanceDefault)
         return false;
 }
 
+bool Scene::LoadJSON(const JSONValue& source, bool setInstanceDefault)
+{
+    URHO3D_PROFILE(LoadSceneJSON);
+
+    StopAsyncLoading();
+
+    // Load the whole scene, then perform post-load if successfully loaded
+    // Note: the scene filename and checksum can not be set, as we only used an XML element
+    if (Node::LoadJSON(source, setInstanceDefault))
+    {
+        FinishLoading(0);
+        return true;
+    }
+    else
+        return false;
+}
+
 void Scene::MarkNetworkUpdate()
 {
     if (!networkUpdate_)
@@ -219,6 +237,29 @@ bool Scene::LoadXML(Deserializer& source)
         return false;
 }
 
+bool Scene::LoadJSON(Deserializer& source)
+{
+    URHO3D_PROFILE(LoadSceneJSON);
+
+    StopAsyncLoading();
+
+    SharedPtr<JSONFile> json(new JSONFile(context_));
+    if (!json->Load(source))
+        return false;
+
+    URHO3D_LOGINFO("Loading scene from " + source.GetName());
+
+    Clear();
+
+    if (Node::LoadJSON(json->GetRoot()))
+    {
+        FinishLoading(&source);
+        return true;
+    }
+    else
+        return false;
+}
+
 bool Scene::SaveXML(Serializer& dest, const String& indentation) const
 {
     URHO3D_PROFILE(SaveSceneXML);
@@ -233,6 +274,30 @@ bool Scene::SaveXML(Serializer& dest, const String& indentation) const
         URHO3D_LOGINFO("Saving scene to " + ptr->GetName());
 
     if (xml->Save(dest, indentation))
+    {
+        FinishSaving(&dest);
+        return true;
+    }
+    else
+        return false;
+}
+
+bool Scene::SaveJSON(Serializer& dest, const String& indentation) const
+{
+    URHO3D_PROFILE(SaveSceneJSON);
+
+    SharedPtr<JSONFile> json(new JSONFile(context_));
+    JSONValue rootVal;
+    if (!SaveJSON(rootVal))
+        return false;
+
+    Deserializer* ptr = dynamic_cast<Deserializer*>(&dest);
+    if (ptr)
+        URHO3D_LOGINFO("Saving scene to " + ptr->GetName());
+
+    json->GetRoot() = rootVal;
+
+    if (json->Save(dest, indentation))
     {
         FinishSaving(&dest);
         return true;
@@ -383,12 +448,79 @@ bool Scene::LoadAsyncXML(File* file, LoadMode mode)
     return true;
 }
 
+bool Scene::LoadAsyncJSON(File* file, LoadMode mode)
+{
+    if (!file)
+    {
+        URHO3D_LOGERROR("Null file for async loading");
+        return false;
+    }
+
+    StopAsyncLoading();
+
+    SharedPtr<JSONFile> json(new JSONFile(context_));
+    if (!json->Load(*file))
+        return false;
+
+    if (mode > LOAD_RESOURCES_ONLY)
+    {
+        URHO3D_LOGINFO("Loading scene from " + file->GetName());
+        Clear();
+    }
+
+    asyncLoading_ = true;
+    asyncProgress_.jsonFile_ = json;
+    asyncProgress_.file_ = file;
+    asyncProgress_.mode_ = mode;
+    asyncProgress_.loadedNodes_ = asyncProgress_.totalNodes_ = asyncProgress_.loadedResources_ = asyncProgress_.totalResources_ = 0;
+    asyncProgress_.resources_.Clear();
+
+    if (mode > LOAD_RESOURCES_ONLY)
+    {
+        JSONValue rootVal = json->GetRoot();
+
+        // Preload resources if appropriate
+        if (mode != LOAD_SCENE)
+        {
+            URHO3D_PROFILE(FindResourcesToPreload);
+
+            PreloadResourcesJSON(rootVal);
+        }
+
+        // Store own old ID for resolving possible root node references
+        unsigned nodeID = rootVal.Get("id").GetUInt();
+        resolver_.AddNode(nodeID, this);
+
+        // Load the root level components first
+        if (!Node::LoadJSON(rootVal, resolver_, false))
+            return false;
+
+        // Then prepare for loading all root level child nodes in the async update
+        JSONArray childrenArray = rootVal.Get("children").GetArray();
+        asyncProgress_.jsonIndex_ = 0;
+
+        // Count the amount of child nodes
+        asyncProgress_.totalNodes_ = childrenArray.Size();
+    }
+    else
+    {
+        URHO3D_PROFILE(FindResourcesToPreload);
+
+        URHO3D_LOGINFO("Preloading resources from " + file->GetName());
+        PreloadResourcesJSON(json->GetRoot());
+    }
+
+    return true;
+}
+
 void Scene::StopAsyncLoading()
 {
     asyncLoading_ = false;
     asyncProgress_.file_.Reset();
     asyncProgress_.xmlFile_.Reset();
+    asyncProgress_.jsonFile_.Reset();
     asyncProgress_.xmlElement_ = XMLElement::EMPTY;
+    asyncProgress_.jsonIndex_ = 0;
     asyncProgress_.resources_.Clear();
     resolver_.Reset();
 }
@@ -439,6 +571,29 @@ Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, c
     }
 }
 
+Node* Scene::InstantiateJSON(const JSONValue& source, const Vector3& position, const Quaternion& rotation, CreateMode mode)
+{
+    URHO3D_PROFILE(InstantiateJSON);
+
+    SceneResolver resolver;
+    unsigned nodeID = source.Get("id").GetUInt();
+    // Rewrite IDs when instantiating
+    Node* node = CreateChild(0, mode);
+    resolver.AddNode(nodeID, node);
+    if (node->LoadJSON(source, resolver, true, true, mode))
+    {
+        resolver.Resolve();
+        node->ApplyAttributes();
+        node->SetTransform(position, rotation);
+        return node;
+    }
+    else
+    {
+        node->Remove();
+        return 0;
+    }
+}
+
 Node* Scene::InstantiateXML(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode)
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
@@ -446,6 +601,15 @@ Node* Scene::InstantiateXML(Deserializer& source, const Vector3& position, const
         return 0;
 
     return InstantiateXML(xml->GetRoot(), position, rotation, mode);
+}
+
+Node* Scene::InstantiateJSON(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode)
+{
+    SharedPtr<JSONFile> json(new JSONFile(context_));
+    if (!json->Load(source))
+        return 0;
+
+    return InstantiateJSON(json->GetRoot(), position, rotation, mode);
 }
 
 void Scene::Clear(bool clearReplicated, bool clearLocal)
@@ -1001,22 +1165,33 @@ void Scene::UpdateAsyncLoading()
             return;
         }
 
-        // Read one child node with its full sub-hierarchy either from binary or XML
+
+        // Read one child node with its full sub-hierarchy either from binary, JSON, or XML
         /// \todo Works poorly in scenes where one root-level child node contains all content
-        if (!asyncProgress_.xmlFile_)
-        {
-            unsigned nodeID = asyncProgress_.file_->ReadUInt();
-            Node* newNode = CreateChild(nodeID, nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
-            resolver_.AddNode(nodeID, newNode);
-            newNode->Load(*asyncProgress_.file_, resolver_);
-        }
-        else
+        if (asyncProgress_.xmlFile_)
         {
             unsigned nodeID = asyncProgress_.xmlElement_.GetUInt("id");
             Node* newNode = CreateChild(nodeID, nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
             resolver_.AddNode(nodeID, newNode);
             newNode->LoadXML(asyncProgress_.xmlElement_, resolver_);
             asyncProgress_.xmlElement_ = asyncProgress_.xmlElement_.GetNext("node");
+        }
+        else if (asyncProgress_.jsonFile_) // Load from JSON
+        {
+            const JSONValue& childValue = asyncProgress_.jsonFile_->GetRoot().Get("children").GetArray().At(asyncProgress_.jsonIndex_);
+
+            unsigned nodeID =childValue.Get("id").GetUInt();
+            Node* newNode = CreateChild(nodeID, nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+            resolver_.AddNode(nodeID, newNode);
+            newNode->LoadJSON(childValue, resolver_);
+            ++asyncProgress_.jsonIndex_;
+        }
+        else // Load from binary
+        {
+            unsigned nodeID = asyncProgress_.file_->ReadUInt();
+            Node* newNode = CreateChild(nodeID, nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+            resolver_.AddNode(nodeID, newNode);
+            newNode->Load(*asyncProgress_.file_, resolver_);
         }
 
         ++asyncProgress_.loadedNodes_;
@@ -1227,6 +1402,89 @@ void Scene::PreloadResourcesXML(const XMLElement& element)
     {
         PreloadResourcesXML(childElem);
         childElem = childElem.GetNext("node");
+    }
+#endif
+}
+
+void Scene::PreloadResourcesJSON(const JSONValue& value)
+{
+    // If not threaded, can not background load resources, so rather load synchronously later when needed
+#ifdef URHO3D_THREADING
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    // Node or Scene attributes do not include any resources; therefore skip to the components
+    JSONArray componentArray = value.Get("components").GetArray();
+
+    for (unsigned i = 0; i < componentArray.Size(); i++)
+    {
+        const JSONValue& compValue = componentArray.At(i);
+        String typeName = compValue.Get("type").GetString();
+
+        const Vector<AttributeInfo>* attributes = context_->GetAttributes(StringHash(typeName));
+        if (attributes)
+        {
+            JSONArray attributesArray = compValue.Get("attributes").GetArray();
+
+            unsigned startIndex = 0;
+
+            for (unsigned j = 0; j < attributesArray.Size(); j++)
+            {
+                const JSONValue& attrVal = attributesArray.At(j);
+                String name = attrVal.Get("name").GetString();
+                unsigned i = startIndex;
+                unsigned attempts = attributes->Size();
+
+                while (attempts)
+                {
+                    const AttributeInfo& attr = attributes->At(i);
+                    if ((attr.mode_ & AM_FILE) && !attr.name_.Compare(name, true))
+                    {
+                        if (attr.type_ == VAR_RESOURCEREF)
+                        {
+                            ResourceRef ref = attrVal.Get("value").GetVariantValue(attr.type_).GetResourceRef();
+                            String name = cache->SanitateResourceName(ref.name_);
+                            bool success = cache->BackgroundLoadResource(ref.type_, name);
+                            if (success)
+                            {
+                                ++asyncProgress_.totalResources_;
+                                asyncProgress_.resources_.Insert(StringHash(name));
+                            }
+                        }
+                        else if (attr.type_ == VAR_RESOURCEREFLIST)
+                        {
+                            ResourceRefList refList = attrVal.Get("value").GetVariantValue(attr.type_).GetResourceRefList();
+                            for (unsigned k = 0; k < refList.names_.Size(); ++k)
+                            {
+                                String name = cache->SanitateResourceName(refList.names_[k]);
+                                bool success = cache->BackgroundLoadResource(refList.type_, name);
+                                if (success)
+                                {
+                                    ++asyncProgress_.totalResources_;
+                                    asyncProgress_.resources_.Insert(StringHash(name));
+                                }
+                            }
+                        }
+
+                        startIndex = (i + 1) % attributes->Size();
+                        break;
+                    }
+                    else
+                    {
+                        i = (i + 1) % attributes->Size();
+                        --attempts;
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    JSONArray childrenArray = value.Get("children").GetArray();
+    for (unsigned i = 0; i < childrenArray.Size(); i++)
+    {
+        const JSONValue& childVal = childrenArray.At(i);
+        PreloadResourcesJSON(childVal);
     }
 #endif
 }

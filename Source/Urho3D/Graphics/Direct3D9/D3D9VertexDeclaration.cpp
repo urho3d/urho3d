@@ -26,6 +26,7 @@
 #include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/VertexBuffer.h"
 #include "../../Graphics/VertexDeclaration.h"
+#include "../../IO/Log.h"
 
 #include "../../DebugNew.h"
 
@@ -89,7 +90,10 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, unsigned elementMask) :
     PODVector<VertexDeclarationElement> elements;
     unsigned offset = 0;
 
-    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
+    if (elementMask & MASK_OBJECTINDEX)
+        URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
+
+    for (unsigned i = 0; i < ELEMENT_OBJECTINDEX; ++i)
     {
         VertexElement element = (VertexElement)i;
 
@@ -129,7 +133,10 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexB
                     return;
             }
 
-            for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
+            if (elementMask & MASK_OBJECTINDEX)
+                URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
+
+            for (unsigned j = 0; j < ELEMENT_OBJECTINDEX; ++j)
             {
                 VertexElement element = (VertexElement)j;
 
@@ -170,6 +177,9 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<
                 if ((buffers[i]->GetElementMask() & elementMask) != elementMask)
                     return;
             }
+
+            if (elementMask & MASK_OBJECTINDEX)
+                URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
 
             for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
             {
@@ -221,19 +231,17 @@ void VertexDeclaration::Create(Graphics* graphics, const PODVector<VertexDeclara
     dest->UsageIndex = 0;
 
     IDirect3DDevice9* device = graphics->GetImpl()->GetDevice();
-    if (!device)
-        return;
-
-    device->CreateVertexDeclaration(elementArray, &declaration_);
+    HRESULT hr = device->CreateVertexDeclaration(elementArray, &declaration_);
+    if (FAILED(hr))
+    {
+        URHO3D_SAFE_RELEASE(declaration_);
+        URHO3D_LOGD3DERROR("Failed to create vertex declaration", hr);
+    }
 }
 
 void VertexDeclaration::Release()
 {
-    if (declaration_)
-    {
-        declaration_->Release();
-        declaration_ = 0;
-    }
+    URHO3D_SAFE_RELEASE(declaration_);
 }
 
 }

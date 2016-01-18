@@ -62,6 +62,7 @@ Urho3D development, contributions and bugfixes by:
 - Lasse &Ouml;&ouml;rni (loorni@gmail.com, AgentC at GameDev.net)
 - Wei Tjong Yao
 - Aster Jian
+- Vivienne Anthony
 - Colin Barrett
 - Erik Beran
 - Danny Boisvert
@@ -80,14 +81,15 @@ Urho3D development, contributions and bugfixes by:
 - Ali K&auml;m&auml;r&auml;inen
 - Pete Leigh
 - Thorbjørn Lindeijer
+- Xavier Maupeu
 - Jonne Nauha
 - Paul Noome
 - David Palacios
 - Alex Parlett
 - Jordan Patterson
 - Vladimir Pobedinsky
+- Pranjal Raihan
 - Nick Royer
-- Jonathan Sandusky
 - Miika Santala
 - Hualin Song
 - James Thomas
@@ -152,7 +154,7 @@ Urho3D uses the following third-party libraries:
 - kNet (https://github.com/juj/kNet)
 - libcpuid 0.2.0 (http://libcpuid.sourceforge.net/)
 - Lua 5.1 (http://www.lua.org)
-- LuaJIT 2.0.3 (http://www.luajit.org)
+- LuaJIT 2.1.0 (http://www.luajit.org)
 - LZ4 (http://code.google.com/p/lz4/)
 - MojoShader (http://icculus.org/mojoshader/)
 - Mustache 1.0 (http://mustache.github.io/, https://github.com/kainjow/Mustache)
@@ -387,7 +389,7 @@ V1.4
 - Fill mode added to materials.
 - AngelScript script objects can be stored in a %Variant.
 - Improved attribute registration: class name and variant type not needed.
-- Add new rake tasks to facilitate configuring/generating and building Urho3D project, including external project using Urho3D library.
+- Add new rake tasks to facilitate configuring/generating and building Urho3D project, including downstream project using Urho3D library.
 - Update PugiXml to 1.5.
 - Update STB libraries to latest.
 - Editor: particle effect editor window.
@@ -608,7 +610,7 @@ V1.32
 
 V1.31
 
-- Extensive build system improvements, especially for using Urho3D as a library in an external project.
+- Extensive build system improvements, especially for using Urho3D as a library in an downstream project.
 - LuaJIT support.
 - Improved Lua bindings, Lua coroutine support, automatic loading of compiled Lua scripts (.luc) if they exist.
 - HDR rendering, 3D textures, height fog and several new post process shaders.
@@ -766,8 +768,6 @@ Related projects:
 - Blender to Urho3D mesh exporter (https://github.com/reattiva/Urho3D-Blender)
 
 - ParticleEditor2D for Urho3D (https://github.com/aster2013/ParticleEditor2D)
-
-- Urho3D Launcher (https://github.com/Hevedy/Urho3DLauncher)
 
 - Urho3D libRocket Integration (https://github.com/realrunner/urho3d-librocket)
 

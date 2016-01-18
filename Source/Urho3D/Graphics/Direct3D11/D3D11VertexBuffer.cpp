@@ -46,7 +46,8 @@ const unsigned VertexBuffer::elementSize[] =
     4 * sizeof(unsigned char), // Blendindices
     4 * sizeof(float), // Instancematrix1
     4 * sizeof(float), // Instancematrix2
-    4 * sizeof(float) // Instancematrix3
+    4 * sizeof(float), // Instancematrix3
+    sizeof(int) // Objectindex
 };
 
 const char* VertexBuffer::elementSemantics[] =
@@ -63,7 +64,8 @@ const char* VertexBuffer::elementSemantics[] =
     "BLENDINDICES",
     "TEXCOORD",
     "TEXCOORD",
-    "TEXCOORD"
+    "TEXCOORD",
+    "OBJECTINDEX"
 };
 
 const unsigned VertexBuffer::elementSemanticIndices[] =
@@ -80,7 +82,8 @@ const unsigned VertexBuffer::elementSemanticIndices[] =
     0,
     2,
     3,
-    4
+    4,
+    0
 };
 
 const unsigned VertexBuffer::elementFormats[] =
@@ -97,7 +100,8 @@ const unsigned VertexBuffer::elementFormats[] =
     DXGI_FORMAT_R8G8B8A8_UINT,
     DXGI_FORMAT_R32G32B32A32_FLOAT,
     DXGI_FORMAT_R32G32B32A32_FLOAT,
-    DXGI_FORMAT_R32G32B32A32_FLOAT
+    DXGI_FORMAT_R32G32B32A32_FLOAT,
+    DXGI_FORMAT_R32_SINT
 };
 
 VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
@@ -128,20 +132,16 @@ void VertexBuffer::Release()
 {
     Unlock();
 
-    if (object_)
+    if (graphics_)
     {
-        if (!graphics_)
-            return;
-
         for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
         {
             if (graphics_->GetVertexBuffer(i) == this)
                 graphics_->SetVertexBuffer(0);
         }
-
-        ((ID3D11Buffer*)object_)->Release();
-        object_ = 0;
     }
+
+    URHO3D_SAFE_RELEASE(object_);
 }
 
 void VertexBuffer::SetShadowed(bool enable)
@@ -430,11 +430,11 @@ bool VertexBuffer::Create()
         bufferDesc.Usage = dynamic_ ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
         bufferDesc.ByteWidth = (UINT)(vertexCount_ * vertexSize_);
 
-        graphics_->GetImpl()->GetDevice()->CreateBuffer(&bufferDesc, 0, (ID3D11Buffer**)&object_);
-
-        if (!object_)
+        HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateBuffer(&bufferDesc, 0, (ID3D11Buffer**)&object_);
+        if (FAILED(hr))
         {
-            URHO3D_LOGERROR("Failed to create vertex buffer");
+            URHO3D_SAFE_RELEASE(object_);
+            URHO3D_LOGD3DERROR("Failed to create vertex buffer", hr);
             return false;
         }
     }
@@ -459,13 +459,15 @@ void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
         D3D11_MAPPED_SUBRESOURCE mappedData;
         mappedData.pData = 0;
 
-        graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Buffer*)object_, 0, discard ? D3D11_MAP_WRITE_DISCARD :
+        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Buffer*)object_, 0, discard ? D3D11_MAP_WRITE_DISCARD :
             D3D11_MAP_WRITE, 0, &mappedData);
-        hwData = mappedData.pData;
-        if (!hwData)
-            URHO3D_LOGERROR("Failed to map vertex buffer");
+        if (FAILED(hr) || !mappedData.pData)
+            URHO3D_LOGD3DERROR("Failed to map vertex buffer", hr);
         else
+        {
+            hwData = mappedData.pData;
             lockState_ = LOCK_HARDWARE;
+        }
     }
 
     return hwData;

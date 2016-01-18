@@ -363,6 +363,16 @@ void ScriptInstance::RemoveEventHandlersExcept(const PODVector<StringHash>& exce
     UnsubscribeFromAllEventsExcept(exceptions, true);
 }
 
+bool ScriptInstance::HasEventHandler(StringHash eventType) const
+{
+    return HasSubscribedToEvent(eventType);
+}
+
+bool ScriptInstance::HasEventHandler(Object* sender, StringHash eventType) const
+{
+    return HasSubscribedToEvent(sender, eventType);
+}
+
 bool ScriptInstance::IsA(const String& className) const
 {
     // Early out for the easiest case where that's what we are

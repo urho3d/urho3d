@@ -46,7 +46,8 @@ const unsigned VertexBuffer::elementSize[] =
     4 * sizeof(unsigned char), // Blendindices
     4 * sizeof(float), // Instancematrix1
     4 * sizeof(float), // Instancematrix2
-    4 * sizeof(float) // Instancematrix3
+    4 * sizeof(float), // Instancematrix3
+    sizeof(int) // Object index, not supported on D3D9 but allowed for vertex data compatibility
 };
 
 VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
@@ -97,20 +98,16 @@ void VertexBuffer::Release()
 {
     Unlock();
 
-    if (object_)
+    if (graphics_)
     {
-        if (!graphics_)
-            return;
-
         for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
         {
             if (graphics_->GetVertexBuffer(i) == this)
                 graphics_->SetVertexBuffer(0);
         }
-
-        ((IDirect3DVertexBuffer9*)object_)->Release();
-        object_ = 0;
     }
+
+    URHO3D_SAFE_RELEASE(object_);
 }
 
 void VertexBuffer::SetShadowed(bool enable)
@@ -399,15 +396,17 @@ bool VertexBuffer::Create()
         }
 
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
-        if (!device || FAILED(device->CreateVertexBuffer(
+        HRESULT hr = device->CreateVertexBuffer(
             vertexCount_ * vertexSize_,
             usage_,
             0,
             (D3DPOOL)pool_,
             (IDirect3DVertexBuffer9**)&object_,
-            0)))
+            0);
+        if (FAILED(hr))
         {
-            URHO3D_LOGERROR("Could not create vertex buffer");
+            URHO3D_SAFE_RELEASE(object_);
+            URHO3D_LOGD3DERROR("Could not create vertex buffer", hr);
             return false;
         }
     }
@@ -434,8 +433,9 @@ void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
         if (discard && usage_ & D3DUSAGE_DYNAMIC)
             flags = D3DLOCK_DISCARD;
 
-        if (FAILED(((IDirect3DVertexBuffer9*)object_)->Lock(start * vertexSize_, count * vertexSize_, &hwData, flags)))
-            URHO3D_LOGERROR("Could not lock vertex buffer");
+        HRESULT hr = ((IDirect3DVertexBuffer9*)object_)->Lock(start * vertexSize_, count * vertexSize_, &hwData, flags);
+        if (FAILED(hr))
+            URHO3D_LOGD3DERROR("Could not lock vertex buffer", hr);
         else
             lockState_ = LOCK_HARDWARE;
     }

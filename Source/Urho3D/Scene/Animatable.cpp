@@ -25,6 +25,7 @@
 #include "../Core/Context.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
+#include "../Resource/JSONValue.h"
 #include "../Resource/XMLElement.h"
 #include "../Scene/Animatable.h"
 #include "../Scene/ObjectAnimation.h"
@@ -127,6 +128,64 @@ bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
     return true;
 }
 
+bool Animatable::LoadJSON(const JSONValue& source, bool setInstanceDefault)
+{
+    if (!Serializable::LoadJSON(source, setInstanceDefault))
+        return false;
+
+    SetObjectAnimation(0);
+    attributeAnimationInfos_.Clear();
+
+    JSONValue value = source.Get("objectanimation");
+    if (!value.IsNull())
+    {
+        SharedPtr<ObjectAnimation> objectAnimation(new ObjectAnimation(context_));
+        if (!objectAnimation->LoadJSON(value))
+            return false;
+
+        SetObjectAnimation(objectAnimation);
+    }
+
+    JSONValue attributeAnimationValue = source.Get("attributeanimation");
+
+    if (attributeAnimationValue.IsNull())
+        return true;
+
+    if (!attributeAnimationValue.IsObject())
+    {
+        URHO3D_LOGWARNING("'attributeanimation' value is present in JSON data, but is not a JSON object; skipping it");
+        return true;
+    }
+
+    const JSONObject& attributeAnimationObject = attributeAnimationValue.GetObject();
+    for (JSONObject::ConstIterator it = attributeAnimationObject.Begin(); it != attributeAnimationObject.End(); it++)
+    {
+        String name = it->first_;
+        JSONValue value = it->second_;
+        SharedPtr<ValueAnimation> attributeAnimation(new ValueAnimation(context_));
+        if (!attributeAnimation->LoadJSON(it->second_))
+            return false;
+
+        String wrapModeString = source.Get("wrapmode").GetString();
+        WrapMode wrapMode = WM_LOOP;
+        for (int i = 0; i <= WM_CLAMP; ++i)
+        {
+            if (wrapModeString == wrapModeNames[i])
+            {
+                wrapMode = (WrapMode)i;
+                break;
+            }
+        }
+
+        float speed = value.Get("speed").GetFloat();
+        SetAttributeAnimation(name, attributeAnimation, wrapMode, speed);
+
+        it++;
+    }
+
+    return true;
+}
+
 bool Animatable::SaveXML(XMLElement& dest) const
 {
     if (!Serializable::SaveXML(dest))
@@ -139,6 +198,7 @@ bool Animatable::SaveXML(XMLElement& dest) const
         if (!objectAnimation_->SaveXML(elem))
             return false;
     }
+
 
     for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin();
          i != attributeAnimationInfos_.End(); ++i)
@@ -155,6 +215,44 @@ bool Animatable::SaveXML(XMLElement& dest) const
 
         elem.SetAttribute("wrapmode", wrapModeNames[i->second_->GetWrapMode()]);
         elem.SetFloat("speed", i->second_->GetSpeed());
+    }
+
+    return true;
+}
+
+bool Animatable::SaveJSON(JSONValue& dest) const
+{
+    if (!Serializable::SaveJSON(dest))
+        return false;
+
+    // Object animation without name
+    if (objectAnimation_ && objectAnimation_->GetName().Empty())
+    {
+        JSONValue objectAnimationValue;
+        if (!objectAnimation_->SaveJSON(objectAnimationValue))
+            return false;
+        dest.Set("objectanimation", objectAnimationValue);
+    }
+
+    JSONValue attributeAnimationValue;
+
+    for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin();
+         i != attributeAnimationInfos_.End(); ++i)
+    {
+        ValueAnimation* attributeAnimation = i->second_->GetAnimation();
+        if (attributeAnimation->GetOwner())
+            continue;
+
+        const AttributeInfo& attr = i->second_->GetAttributeInfo();
+        JSONValue attributeValue;
+        attributeValue.Set("name", attr.name_);
+        if (!attributeAnimation->SaveJSON(attributeValue))
+            return false;
+
+        attributeValue.Set("wrapmode", wrapModeNames[i->second_->GetWrapMode()]);
+        attributeValue.Set("speed", (float) i->second_->GetSpeed());
+
+        attributeAnimationValue.Set(attr.name_, attributeValue);
     }
 
     return true;

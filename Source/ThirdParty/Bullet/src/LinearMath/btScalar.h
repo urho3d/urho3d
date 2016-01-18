@@ -182,8 +182,10 @@ inline int	btGetVersion()
 		#define BT_USE_SIMD_VECTOR3
 		#define BT_USE_SSE
 		//BT_USE_SSE_IN_API is enabled on Mac OSX by default, because memory is automatically aligned on 16-byte boundaries
-		//if apps run into issues, we will disable the next line
-		#define BT_USE_SSE_IN_API
+		// Urho3D - in debug mode memory may not be aligned, so disable in that case
+        #if !defined(DEBUG) && !defined(_DEBUG)
+		    #define BT_USE_SSE_IN_API
+        #endif
         #ifdef BT_USE_SSE
             // include appropriate SSE level
             #if defined (__SSE4_1__)

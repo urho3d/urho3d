@@ -166,7 +166,7 @@ static const unsigned glStencilOps[] =
 // This avoids a skinning bug on GLES2 devices which only support 8.
 static const unsigned glVertexAttrIndex[] =
 {
-    0, 1, 2, 3, 4, 8, 9, 5, 6, 7, 10, 11, 12
+    0, 1, 2, 3, 4, 8, 9, 5, 6, 7, 10, 11, 12, 13
 };
 
 #ifdef GL_ES_VERSION_2_0
@@ -642,6 +642,10 @@ bool Graphics::BeginFrame()
             SetMode(width, height);
     }
 
+    // Re-enable depth test and depth func in case a third party program has modified it
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(glCmpFunc[depthTestMode_]);
+
     // Set default rendertarget and depth buffer
     ResetRenderTargets();
 
@@ -905,7 +909,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
                 }
 
                 // Set the attribute pointer. Add instance offset for the instance matrix pointers
-                unsigned offset = j >= ELEMENT_INSTANCEMATRIX1 ? instanceOffset * vertexSize : 0;
+                unsigned offset = (j >= ELEMENT_INSTANCEMATRIX1 && j < ELEMENT_OBJECTINDEX) ? instanceOffset * vertexSize : 0;
                 glVertexAttribPointer(attrIndex, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
                     (GLboolean)VertexBuffer::elementNormalize[j], vertexSize,
                     reinterpret_cast<const GLvoid*>(buffer->GetElementOffset((VertexElement)j) + offset));
@@ -1378,6 +1382,14 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 
     case VAR_MATRIX4:
         SetShaderParameter(param, value.GetMatrix4());
+        break;
+
+    case VAR_BUFFER:
+        {
+            const PODVector<unsigned char>& buffer = value.GetBuffer();
+            if (buffer.Size() >= sizeof(float))
+                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
+        }
         break;
 
     default:

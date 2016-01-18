@@ -77,7 +77,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#if LJ_64
+#if LJ_64 && !LJ_GC64
 
 /* Undocumented, but hey, that's what we all love so much about Windows. */
 typedef long (*PNTAVM)(HANDLE handle, void **addr, ULONG zbits,
@@ -174,28 +174,36 @@ static LJ_AINLINE int CALL_MUNMAP(void *ptr, size_t size)
 #endif
 #define MMAP_FLAGS		(MAP_PRIVATE|MAP_ANONYMOUS)
 
-#if LJ_64
-/* 64 bit mode needs special support for allocating memory in the lower 2GB. */
+#if LJ_64 && !LJ_GC64
+/* 64 bit mode with 32 bit pointers needs special support for allocating
+** memory in the lower 2GB.
+*/
 
 #if defined(MAP_32BIT)
 
+#if defined(__sun__)
+#define MMAP_REGION_START	((uintptr_t)0x1000)
+#else
 /* Actually this only gives us max. 1GB in current Linux kernels. */
+#define MMAP_REGION_START	((uintptr_t)0)
+#endif
+
 static LJ_AINLINE void *CALL_MMAP(size_t size)
 {
   int olderr = errno;
-  void *ptr = mmap(NULL, size, MMAP_PROT, MAP_32BIT|MMAP_FLAGS, -1, 0);
+  void *ptr = mmap((void *)MMAP_REGION_START, size, MMAP_PROT, MAP_32BIT|MMAP_FLAGS, -1, 0);
   errno = olderr;
   return ptr;
 }
 
-#elif LJ_TARGET_OSX || LJ_TARGET_PS4 || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__sun__)
+#elif LJ_TARGET_OSX || LJ_TARGET_PS4 || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__sun__) || defined(__CYGWIN__)
 
 /* OSX and FreeBSD mmap() use a naive first-fit linear search.
 ** That's perfect for us. Except that -pagezero_size must be set for OSX,
 ** otherwise the lower 4GB are blocked. And the 32GB RLIMIT_DATA needs
 ** to be reduced to 250MB on FreeBSD.
 */
-#if LJ_TARGET_OSX
+#if LJ_TARGET_OSX || defined(__DragonFly__)
 #define MMAP_REGION_START	((uintptr_t)0x10000)
 #elif LJ_TARGET_PS4
 #define MMAP_REGION_START	((uintptr_t)0x4000)
@@ -232,7 +240,7 @@ static LJ_AINLINE void *CALL_MMAP(size_t size)
       return p;
     }
     if (p != CMFAIL) munmap(p, size);
-#ifdef __sun__
+#if defined(__sun__) || defined(__DragonFly__)
     alloc_hint += 0x1000000;  /* Need near-exhaustive linear scan. */
     if (alloc_hint + size < MMAP_REGION_END) continue;
 #endif
@@ -252,7 +260,7 @@ static LJ_AINLINE void *CALL_MMAP(size_t size)
 
 #else
 
-/* 32 bit mode is easy. */
+/* 32 bit mode and GC64 mode is easy. */
 static LJ_AINLINE void *CALL_MMAP(size_t size)
 {
   int olderr = errno;
@@ -288,7 +296,7 @@ static LJ_AINLINE void *CALL_MREMAP_(void *ptr, size_t osz, size_t nsz,
 #define CALL_MREMAP(addr, osz, nsz, mv) CALL_MREMAP_((addr), (osz), (nsz), (mv))
 #define CALL_MREMAP_NOMOVE	0
 #define CALL_MREMAP_MAYMOVE	1
-#if LJ_64
+#if LJ_64 && !LJ_GC64
 #define CALL_MREMAP_MV		CALL_MREMAP_NOMOVE
 #else
 #define CALL_MREMAP_MV		CALL_MREMAP_MAYMOVE

@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Resource/XMLElement.h"
+#include "../Resource/JSONFile.h"
 #include "../Urho2D/TileMapDefs2D.h"
 
 #include "../DebugNew.h"

@@ -27,7 +27,6 @@
 #include "../Engine/Console.h"
 #include "../Engine/EngineEvents.h"
 #include "../Graphics/Graphics.h"
-#include "../Graphics/GraphicsEvents.h"
 #include "../Input/Input.h"
 #include "../IO/IOEvents.h"
 #include "../IO/Log.h"
@@ -93,7 +92,7 @@ Console::Console(Context* context) :
     SubscribeToEvent(lineEdit_, E_TEXTFINISHED, URHO3D_HANDLER(Console, HandleTextFinished));
     SubscribeToEvent(lineEdit_, E_UNHANDLEDKEY, URHO3D_HANDLER(Console, HandleLineEditKey));
     SubscribeToEvent(closeButton_, E_RELEASED, URHO3D_HANDLER(Console, HandleCloseButtonPressed));
-    SubscribeToEvent(E_SCREENMODE, URHO3D_HANDLER(Console, HandleScreenMode));
+    SubscribeToEvent(uiRoot, E_RESIZED, URHO3D_HANDLER(Console, HandleRootElementResized));
     SubscribeToEvent(E_LOGMESSAGE, URHO3D_HANDLER(Console, HandleLogMessage));
     SubscribeToEvent(E_POSTUPDATE, URHO3D_HANDLER(Console, HandlePostUpdate));
 }
@@ -223,7 +222,7 @@ void Console::SetFocusOnShow(bool enable)
 
 void Console::UpdateElements()
 {
-    int width = GetSubsystem<Graphics>()->GetWidth();
+    int width = GetSubsystem<UI>()->GetRoot()->GetWidth();
     const IntRect& border = background_->GetLayoutBorder();
     const IntRect& panelBorder = rowContainer_->GetScrollPanel()->GetClipBorder();
     rowContainer_->SetFixedWidth(width - border.left_ - border.right_);
@@ -378,7 +377,7 @@ void Console::HandleCloseButtonPressed(StringHash eventType, VariantMap& eventDa
     SetVisible(false);
 }
 
-void Console::HandleScreenMode(StringHash eventType, VariantMap& eventData)
+void Console::HandleRootElementResized(StringHash eventType, VariantMap& eventData)
 {
     UpdateElements();
 }

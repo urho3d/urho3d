@@ -90,16 +90,30 @@ bool ShaderVariation::Create()
     if (type_ == VS)
     {
         if (device && byteCode_.Size())
-            device->CreateVertexShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11VertexShader**)&object_);
-        if (!object_)
-            compilerOutput_ = "Could not create vertex shader";
+        {
+            HRESULT hr = device->CreateVertexShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11VertexShader**)&object_);
+            if (FAILED(hr))
+            {
+                URHO3D_SAFE_RELEASE(object_);
+                compilerOutput_ = "Could not create vertex shader (HRESULT " + ToStringHex((unsigned)hr) + ")";
+            }
+        }
+        else
+            compilerOutput_ = "Could not create vertex shader, empty bytecode";
     }
     else
     {
         if (device && byteCode_.Size())
-            device->CreatePixelShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11PixelShader**)&object_);
-        if (!object_)
-            compilerOutput_ = "Could not create pixel shader";
+        {
+            HRESULT hr = device->CreatePixelShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11PixelShader**)&object_);
+            if (FAILED(hr))
+            {
+                URHO3D_SAFE_RELEASE(object_);
+                compilerOutput_ = "Could not create pixel shader (HRESULT " + ToStringHex((unsigned)hr) + ")";
+            }
+        }
+        else
+            compilerOutput_ = "Could not create pixel shader, empty bytecode";
     }
 
     return object_ != 0;
@@ -118,18 +132,14 @@ void ShaderVariation::Release()
         {
             if (graphics_->GetVertexShader() == this)
                 graphics_->SetShaders(0, 0);
-
-            ((ID3D11VertexShader*)object_)->Release();
         }
         else
         {
             if (graphics_->GetPixelShader() == this)
                 graphics_->SetShaders(0, 0);
-
-            ((ID3D11PixelShader*)object_)->Release();
         }
 
-        object_ = 0;
+        URHO3D_SAFE_RELEASE(object_);
     }
 
     compilerOutput_.Clear();
@@ -292,9 +302,13 @@ bool ShaderVariation::Compile()
     ID3DBlob* shaderCode = 0;
     ID3DBlob* errorMsgs = 0;
 
-    if (FAILED(D3DCompile(sourceCode.CString(), sourceCode.Length(), owner_->GetName().CString(), &macros.Front(), 0,
-        entryPoint, profile, flags, 0, &shaderCode, &errorMsgs)))
-        compilerOutput_ = String((const char*)errorMsgs->GetBufferPointer(), (unsigned)errorMsgs->GetBufferSize());
+    HRESULT hr = D3DCompile(sourceCode.CString(), sourceCode.Length(), owner_->GetName().CString(), &macros.Front(), 0,
+        entryPoint, profile, flags, 0, &shaderCode, &errorMsgs);
+    if (FAILED(hr))
+    {
+        // Do not include end zero unnecessarily
+        compilerOutput_ = String((const char*)errorMsgs->GetBufferPointer(), (unsigned)errorMsgs->GetBufferSize() - 1);
+    }
     else
     {
         if (type_ == VS)
@@ -317,11 +331,9 @@ bool ShaderVariation::Compile()
         strippedCode->Release();
     }
 
-    if (shaderCode)
-        shaderCode->Release();
-    if (errorMsgs)
-        errorMsgs->Release();
-
+    URHO3D_SAFE_RELEASE(shaderCode);
+    URHO3D_SAFE_RELEASE(errorMsgs);
+    
     return !byteCode_.Empty();
 }
 
@@ -330,10 +342,11 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
     ID3D11ShaderReflection* reflection = 0;
     D3D11_SHADER_DESC shaderDesc;
 
-    D3DReflect(bufData, bufSize, IID_ID3D11ShaderReflection, (void**)&reflection);
-    if (!reflection)
+    HRESULT hr = D3DReflect(bufData, bufSize, IID_ID3D11ShaderReflection, (void**)&reflection);
+    if (FAILED(hr) || !reflection)
     {
-        URHO3D_LOGERROR("Failed to reflect vertex shader's input signature");
+        URHO3D_SAFE_RELEASE(reflection);
+        URHO3D_LOGD3DERROR("Failed to reflect vertex shader's input signature", hr);
         return;
     }
 

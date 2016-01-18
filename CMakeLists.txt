@@ -20,12 +20,8 @@
 # THE SOFTWARE.
 #
 
-# Set project name
-project (Urho3D)
-
-# Set minimum version
+# Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
 cmake_minimum_required (VERSION 2.8.6)
-
 if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
     if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
@@ -33,12 +29,15 @@ if (COMMAND cmake_policy)
         cmake_policy (SET CMP0022 NEW)
     endif ()
     if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-        # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
+        # Disallow use of the LOCATION target property - so we set to OLD as we still need it
         cmake_policy (SET CMP0026 OLD)
         # MACOSX_RPATH is enabled by default
         cmake_policy (SET CMP0042 NEW)
     endif ()
 endif ()
+
+# Set project name
+project (Urho3D)
 
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
@@ -47,12 +46,15 @@ set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 include (Urho3D-CMake-common)
 
 # Setup SDK install destinations
+set (PATH_SUFFIX Urho3D)
 if (WIN32)
     set (SCRIPT_EXT .bat)
+    if (CMAKE_HOST_WIN32)
+        set (PATH_SUFFIX .)
+    endif ()
 else ()
     set (SCRIPT_EXT .sh)
 endif ()
-set (PATH_SUFFIX Urho3D)
 if (ANDROID)
     # For Android platform, install to a path similar to ANDROID_LIBRARY_OUTPUT_PATH variable, e.g. libs/armeabi-v7a
     set (LIB_SUFFIX s/${ANDROID_NDK_ABI_NAME})
@@ -61,11 +63,11 @@ elseif (URHO3D_64BIT)
         set (HAS_LIB64 TRUE)
     endif ()
     # Install to 'lib64' when one of these conditions is true
-    if (WIN32 OR URHO3D_USE_LIB64_RPM OR (HAS_LIB64 AND NOT URHO3D_USE_LIB_DEB))
+    if ((MINGW AND CMAKE_CROSSCOMPILING) OR URHO3D_USE_LIB64_RPM OR (HAS_LIB64 AND NOT URHO3D_USE_LIB_DEB))
         set (LIB_SUFFIX 64)
     endif ()
 endif ()
-set (DEST_INCLUDE_DIR include/${PATH_SUFFIX})
+set (DEST_INCLUDE_DIR include/Urho3D)    # The include directory path contains the 'Urho3D' suffix regardless of PATH_SUFFIX variable
 set (DEST_SHARE_DIR share/${PATH_SUFFIX})
 set (DEST_RUNTIME_DIR bin)
 set (DEST_BUNDLE_DIR ${DEST_SHARE_DIR}/Applications)
@@ -110,8 +112,8 @@ elseif (APPLE)
     set (CPACK_SYSTEM_NAME OSX)
 elseif (WIN32)
     set (CPACK_GENERATOR ZIP)
-elseif (EMSCRIPTEN)
-    set (CPACK_SYSTEM_NAME HTML5)
+elseif (WEB)
+    set (CPACK_SYSTEM_NAME Web)
 elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
     if (RPI)
         set (CPACK_SYSTEM_NAME Raspberry-Pi)

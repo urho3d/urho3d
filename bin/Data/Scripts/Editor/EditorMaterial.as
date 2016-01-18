@@ -436,7 +436,15 @@ void SaveMaterial()
 
     MakeBackup(fullName);
     File saveFile(fullName, FILE_WRITE);
-    bool success = editMaterial.Save(saveFile);
+    bool success;
+    if (GetExtension(fullName) == ".json")
+    {
+        JSONFile json;
+        editMaterial.Save(json.root);
+        success = json.Save(saveFile);
+    }
+    else
+        success = editMaterial.Save(saveFile);
     RemoveBackup(success, fullName);
 }
 
@@ -480,7 +488,17 @@ void SaveMaterialAsDone(StringHash eventType, VariantMap& eventData)
 
     MakeBackup(fullName);
     File saveFile(fullName, FILE_WRITE);
-    if (editMaterial.Save(saveFile))
+    bool success;
+    if (GetExtension(fullName) == ".json")
+    {
+        JSONFile json;
+        editMaterial.Save(json.root);
+        success = json.Save(saveFile);
+    }
+    else
+        success = editMaterial.Save(saveFile);
+
+    if (success)
     {
         saveFile.Close();
         RemoveBackup(true, fullName);

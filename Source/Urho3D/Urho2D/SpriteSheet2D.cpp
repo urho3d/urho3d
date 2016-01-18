@@ -30,6 +30,7 @@
 #include "../Resource/PListFile.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
+#include "../Resource/JSONFile.h"
 #include "../Urho2D/Sprite2D.h"
 #include "../Urho2D/SpriteSheet2D.h"
 
@@ -67,6 +68,10 @@ bool SpriteSheet2D::BeginLoad(Deserializer& source)
     if (extension == ".xml")
         return BeginLoadFromXMLFile(source);
 
+    if (extension == ".json")
+        return BeginLoadFromJSONFile(source);
+
+
     URHO3D_LOGERROR("Unsupported file type");
     return false;
 }
@@ -78,6 +83,9 @@ bool SpriteSheet2D::EndLoad()
 
     if (loadXMLFile_)
         return EndLoadFromXMLFile();
+
+    if (loadJSONFile_)
+        return EndLoadFromJSONFile();
 
     return false;
 }
@@ -252,6 +260,84 @@ bool SpriteSheet2D::EndLoadFromXMLFile()
     }
 
     loadXMLFile_.Reset();
+    loadTextureName_.Clear();
+    return true;
+}
+
+bool SpriteSheet2D::BeginLoadFromJSONFile(Deserializer& source)
+{
+    loadJSONFile_ = new JSONFile(context_);
+    if (!loadJSONFile_->Load(source))
+    {
+        URHO3D_LOGERROR("Could not load sprite sheet");
+        loadJSONFile_.Reset();
+        return false;
+    }
+
+    SetMemoryUse(source.GetSize());
+
+    JSONValue rootElem = loadJSONFile_->GetRoot();
+    if (rootElem.IsNull())
+    {
+        URHO3D_LOGERROR("Invalid sprite sheet");
+        loadJSONFile_.Reset();
+        return false;
+    }
+
+    // If we're async loading, request the texture now. Finish during EndLoad().
+    loadTextureName_ = GetParentPath(GetName()) + rootElem.Get("imagePath").GetString();
+    if (GetAsyncLoadState() == ASYNC_LOADING)
+        GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(loadTextureName_, true, this);
+
+    return true;
+}
+
+bool SpriteSheet2D::EndLoadFromJSONFile()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    texture_ = cache->GetResource<Texture2D>(loadTextureName_);
+    if (!texture_)
+    {
+        URHO3D_LOGERROR("Could not load texture " + loadTextureName_);
+        loadJSONFile_.Reset();
+        loadTextureName_.Clear();
+        return false;
+    }
+
+    JSONValue rootVal = loadJSONFile_->GetRoot();
+    JSONArray subTextureArray = rootVal.Get("subtextures").GetArray();
+
+    for (unsigned i = 0; i < subTextureArray.Size(); i++)
+    {
+        const JSONValue& subTextureVal = subTextureArray.At(i);
+        String name = subTextureVal.Get("name").GetString();
+
+        int x = subTextureVal.Get("x").GetInt();
+        int y = subTextureVal.Get("y").GetInt();
+        int width = subTextureVal.Get("width").GetInt();
+        int height = subTextureVal.Get("height").GetInt();
+        IntRect rectangle(x, y, x + width, y + height);
+
+        Vector2 hotSpot(0.5f, 0.5f);
+        IntVector2 offset(0, 0);
+        JSONValue frameWidthVal = subTextureVal.Get("frameWidth");
+        JSONValue frameHeightVal = subTextureVal.Get("frameHeight");
+
+        if (!frameHeightVal.IsNull() && !frameHeightVal.IsNull())
+        {
+            offset.x_ = subTextureVal.Get("frameX").GetInt();
+            offset.y_ = subTextureVal.Get("frameY").GetInt();
+            int frameWidth = frameWidthVal.GetInt();
+            int frameHeight = frameHeightVal.GetInt();
+            hotSpot.x_ = ((float)offset.x_ + frameWidth / 2) / width;
+            hotSpot.y_ = 1.0f - ((float)offset.y_ + frameHeight / 2) / height;
+        }
+
+        DefineSprite(name, rectangle, hotSpot, offset);
+
+    }
+
+    loadJSONFile_.Reset();
     loadTextureName_.Clear();
     return true;
 }

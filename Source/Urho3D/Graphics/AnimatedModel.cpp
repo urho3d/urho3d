@@ -131,6 +131,15 @@ bool AnimatedModel::LoadXML(const XMLElement& source, bool setInstanceDefault)
     return success;
 }
 
+bool AnimatedModel::LoadJSON(const JSONValue& source, bool setInstanceDefault)
+{
+    loading_ = true;
+    bool success = Component::LoadJSON(source, setInstanceDefault);
+    loading_ = false;
+
+    return success;
+}
+
 void AnimatedModel::ApplyAttributes()
 {
     if (assignBonesPending_)
@@ -729,6 +738,8 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
                 Node* boneNode = node_->CreateChild(i->name_, LOCAL);
                 boneNode->AddListener(this);
                 boneNode->SetTransform(i->initialPosition_, i->initialRotation_, i->initialScale_);
+                // Copy the model component's temporary status
+                boneNode->SetTemporary(IsTemporary());
                 i->node_ = boneNode;
             }
 

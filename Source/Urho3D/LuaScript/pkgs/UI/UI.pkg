@@ -23,6 +23,9 @@ class UI : public Object
     void SetUseScreenKeyboard(bool enable);
     void SetUseMutableGlyphs(bool enable);
     void SetForceAutoHint(bool enable);
+    void SetScale(float scale);
+    void SetWidth(float size);
+    void SetHeight(float size);
 
     UIElement* GetRoot() const;
     UIElement* GetRootModalElement() const;
@@ -47,6 +50,7 @@ class UI : public Object
     bool GetForceAutoHint() const;
     bool HasModalElement() const;
     bool IsDragging() const;
+    float GetScale() const;
 
     tolua_readonly tolua_property__get_set UIElement* root;
     tolua_readonly tolua_property__get_set UIElement* rootModalElement;
@@ -67,6 +71,7 @@ class UI : public Object
     tolua_property__get_set bool useMutableGlyphs;
     tolua_property__get_set bool forceAutoHint;
     tolua_readonly tolua_property__has_set bool modalElement;
+    tolua_property__get_set float scale;
 };
 
 UI* GetUI();

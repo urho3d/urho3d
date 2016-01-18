@@ -46,7 +46,8 @@ const unsigned VertexBuffer::elementSize[] =
     4 * sizeof(unsigned char), // Blendindices
     4 * sizeof(float), // Instancematrix1
     4 * sizeof(float), // Instancematrix2
-    4 * sizeof(float) // Instancematrix3
+    4 * sizeof(float), // Instancematrix3
+    sizeof(int) // Object index
 };
 
 const unsigned VertexBuffer::elementType[] =
@@ -63,7 +64,8 @@ const unsigned VertexBuffer::elementType[] =
     GL_UNSIGNED_BYTE, // Blendindices
     GL_FLOAT, // Instancematrix1
     GL_FLOAT, // Instancematrix2
-    GL_FLOAT // Instancematrix3
+    GL_FLOAT, // Instancematrix3
+    GL_INT // Object index
 };
 
 const unsigned VertexBuffer::elementComponents[] =
@@ -80,7 +82,8 @@ const unsigned VertexBuffer::elementComponents[] =
     4, // Blendindices
     4, // Instancematrix1
     4, // Instancematrix2
-    4 // Instancematrix3
+    4, // Instancematrix3
+    1 // Object index
 };
 
 const unsigned VertexBuffer::elementNormalize[] =
@@ -97,7 +100,8 @@ const unsigned VertexBuffer::elementNormalize[] =
     GL_FALSE, // Blendindices
     GL_FALSE, // Instancematrix1
     GL_FALSE, // Instancematrix2
-    GL_FALSE // Instancematrix3
+    GL_FALSE, // Instancematrix3
+    GL_FALSE // Object index
 };
 
 VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :

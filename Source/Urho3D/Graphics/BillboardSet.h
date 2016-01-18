@@ -47,6 +47,8 @@ struct URHO3D_API Billboard
     Color color_;
     /// Rotation.
     float rotation_;
+    /// Direction (For direction based billboard only).
+    Vector3 direction_;
     /// Enabled flag.
     bool enabled_;
     /// Sort distance.
@@ -177,6 +179,8 @@ private:
     bool bufferDirty_;
     /// Force update flag (ignore animation LOD momentarily.)
     bool forceUpdate_;
+    /// Update billboard geometry type
+    bool geometryTypeUpdate_;
     /// Sorting flag. Triggers a vertex buffer rewrite for each view this billboard set is rendered from.
     bool sortThisFrame_;
     /// Frame number on which was last sorted.

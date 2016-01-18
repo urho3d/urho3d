@@ -240,7 +240,7 @@ void LoadConfig()
         if (renderingElem.HasAttribute("texturequality")) renderer.textureQuality = renderingElem.GetInt("texturequality");
         if (renderingElem.HasAttribute("materialquality")) renderer.materialQuality = renderingElem.GetInt("materialquality");
         if (renderingElem.HasAttribute("shadowresolution")) SetShadowResolution(renderingElem.GetInt("shadowresolution"));
-        if (renderingElem.HasAttribute("shadowquality")) renderer.shadowQuality = renderingElem.GetInt("shadowquality");
+        if (renderingElem.HasAttribute("shadowquality")) renderer.shadowQuality = ShadowQuality(renderingElem.GetInt("shadowquality"));
         if (renderingElem.HasAttribute("maxoccludertriangles")) renderer.maxOccluderTriangles = renderingElem.GetInt("maxoccludertriangles");
         if (renderingElem.HasAttribute("specularlighting")) renderer.specularLighting = renderingElem.GetBool("specularlighting");
         if (renderingElem.HasAttribute("dynamicinstancing")) renderer.dynamicInstancing = renderingElem.GetBool("dynamicinstancing");
@@ -367,7 +367,7 @@ void SaveConfig()
         renderingElem.SetInt("shadowresolution", GetShadowResolution());
         renderingElem.SetInt("maxoccludertriangles", renderer.maxOccluderTriangles);
         renderingElem.SetBool("specularlighting", renderer.specularLighting);
-        renderingElem.SetInt("shadowquality", renderer.shadowQuality);
+        renderingElem.SetInt("shadowquality", int(renderer.shadowQuality));
         renderingElem.SetBool("dynamicinstancing", renderer.dynamicInstancing);
     }
 
