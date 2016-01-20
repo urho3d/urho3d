@@ -185,6 +185,7 @@ void UIElement::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Indent", GetIndent, SetIndent, int, 0, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Indent Spacing", GetIndentSpacing, SetIndentSpacing, int, 16, AM_FILE);
     URHO3D_ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE);
+    URHO3D_ATTRIBUTE("Tags", StringVector, tags_, Variant::emptyStringVector, AM_FILE);
 }
 
 void UIElement::ApplyAttributes()
@@ -2051,6 +2052,55 @@ void UIElement::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     using namespace PostUpdate;
 
     UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
+}
+
+void UIElement::AddTag(const String& tag)
+{
+    tags_.Push(tag);
+}
+
+void UIElement::ClearTags()
+{
+    tags_.Clear();
+}
+
+bool UIElement::RemoveTag(const String& tag)
+{
+    return tags_.Remove(tag);
+}
+
+bool UIElement::IsTagged(const String& tag) const
+{
+    return tags_.Contains(tag);
+}
+
+void UIElement::GetChildrenWithTag(PODVector<UIElement*>& dest, const String& tag, bool recursive) const
+{
+    dest.Clear();
+
+    if (!recursive)
+    {
+        for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        {
+            UIElement* element = *i;
+            if (element->IsTagged(tag))
+                dest.Push(element);
+        }
+    }
+    else
+        GetChildrenWithTagRecursive(dest, tag);
+}
+
+void UIElement::GetChildrenWithTagRecursive(PODVector<UIElement*>& dest, const String& tag) const
+{
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+    {
+        UIElement* element = *i;
+        if (element->IsTagged(tag))
+            dest.Push(element);
+        if (!element->children_.Empty())
+            element->GetChildrenWithTagRecursive(dest, tag);
+    }
 }
 
 }

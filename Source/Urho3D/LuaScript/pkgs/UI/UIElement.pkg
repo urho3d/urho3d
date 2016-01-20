@@ -221,6 +221,14 @@ class UIElement : public Animatable
     TraversalMode GetTraversalMode() const;
     bool IsElementEventSender() const;
     UIElement* GetElementEventSender() const;
+    void AddTag(const String& tag);
+    void ClearTags();
+    bool RemoveTag(const String& tag);
+    bool IsTagged(const String& tag) const;
+    const StringVector& GetTags() const;
+
+    // void GetChildrenWithTag(PODVector<UIElement*>& dest, const String& tag, bool recursive = false) const;
+    tolua_outside const PODVector<UIElement*>& UIElementGetChildrenWithTag @ GetChildrenWithTag(const String& tag, bool recursive = false) const; 
 
     tolua_readonly tolua_property__get_set IntVector2& screenPosition;
     tolua_property__get_set String name;
@@ -315,6 +323,13 @@ static bool UIElementSaveXML(const UIElement* element, const String& fileName, c
         return false;
 
     return element->SaveXML(file, indentation);
+}
+
+static const PODVector<UIElement*>& UIElementGetChildrenWithTag(const UIElement* element, const String& tag, bool recursive = false)
+{
+    static PODVector<UIElement*> dest;
+    element->GetChildrenWithTag(dest, tag, recursive);
+    return dest;
 }
 
 #define GetStyle GetAppliedStyle

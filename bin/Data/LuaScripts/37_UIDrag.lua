@@ -30,7 +30,9 @@ end
 function CreateInstructions()
     -- Construct new Text object, set string to display and font to use
     local instructionText = ui.root:CreateChild("Text")
-    instructionText:SetText("Drag on the buttons to move them around.\nTouch input allows also multi-drag.")
+    instructionText:SetText("Drag on the buttons to move them around.\n"..
+                            "Touch input allows also multi-drag.\n"..
+                            "Press SPACE to show/hide tagged UI elements.")
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
     instructionText.textAlignment = HA_CENTER
 
@@ -51,6 +53,10 @@ function CreateGUI()
         b:SetStyle("Button")
         b:SetMinSize(IntVector2(300, 100))
         b:SetPosition(IntVector2(50*i, 50*i))
+
+        if i % 2 == 0 then
+             b:AddTag("SomeTag")
+        end
 
         SubscribeToEvent(b, "DragMove", "HandleDragMove")
         SubscribeToEvent(b, "DragBegin", "HandleDragBegin")
@@ -154,6 +160,13 @@ function HandleUpdate(eventType, eventData)
         local t = tolua.cast(ui.root:GetChild("Touch " .. i), 'Text')
         t:SetVisible(false)
         i = i + 1
+    end
+    
+    if input:GetKeyPress(KEY_SPACE) then
+        elements = ui.root:GetChildrenWithTag("SomeTag")
+        for i, element in ipairs(elements) do
+            element.visible = not element.visible
+        end
     end
 end
 
