@@ -299,6 +299,8 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
         filterMode_ = FILTER_NEAREST;
         requestedLevels_ = 1;
     }
+    else if (usage_ == TEXTURE_DYNAMIC)
+        requestedLevels_ = 1;
 
     if (usage_ == TEXTURE_RENDERTARGET)
         SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(TextureCube, HandleRenderSurfaceUpdate));

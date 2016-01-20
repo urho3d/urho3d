@@ -170,6 +170,8 @@ bool Texture3D::SetSize(int width, int height, int depth, unsigned format, Textu
         URHO3D_LOGERROR("Rendertarget or depth-stencil usage not supported for 3D textures");
         return false;
     }
+    if (usage_ == TEXTURE_DYNAMIC)
+        requestedLevels_ = 1;
 
     usage_ = usage;
 

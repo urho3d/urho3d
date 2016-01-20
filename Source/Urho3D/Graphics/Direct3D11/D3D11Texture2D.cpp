@@ -139,6 +139,8 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
         filterMode_ = FILTER_NEAREST;
         requestedLevels_ = 1;
     }
+    else if (usage_ == TEXTURE_DYNAMIC)
+        requestedLevels_ = 1;
 
     if (usage_ == TEXTURE_RENDERTARGET)
         SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture2D, HandleRenderSurfaceUpdate));
