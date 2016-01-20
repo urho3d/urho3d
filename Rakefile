@@ -211,9 +211,21 @@ task :ci_push_bindings do
   system "rm -rf fastcomp-clang && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git add -A Source/Urho3D && if git commit -qm 'Result of AutoBinder tool. [ci skip]'; then git push -q origin HEAD:#{ENV['TRAVIS_BRANCH']} >/dev/null 2>&1; fi" or abort "Failed to push #{ENV['TRAVIS_BRANCH']} branch"
 end
 
+def timeup
+  unless $start_time
+    puts; $stdout.flush
+    return nil
+  end
+  elapsed_time = (Time.now - $start_time) / 60
+  puts "\nCheckpoint reached, elapsed time: #{elapsed_time.to_i} minutes\n\n" unless $already_timeup
+  $stdout.flush
+  return $already_timeup = elapsed_time > 40
+end
+
 # Usage: NOT intended to be used manually
 desc 'Configure, build, and test Urho3D project'
 task :ci do
+  $start_time = Time.now - ENV['ELAPSED'].to_i + 30 if ENV['ELAPSED']   # Plus 30 seconds for rounding up to the next nearest minute
   # Skip if only performing CI for selected branches and the current branch is not in the list
   unless ENV['RELEASE_TAG']
     matched = /\[ci only:(.*?)\]/.match(ENV['COMMIT_MESSAGE'])
@@ -227,7 +239,7 @@ task :ci do
     system "bash -c 'git fetch --unshallow'" or abort 'Failed to unshallow cloned repository'
   end
   # Show CMake version
-  system "bash -c 'cmake --version'" or abort 'Failed to find CMake'
+  system "bash -c 'echo && cmake --version && echo'" or abort 'Could not find CMake'
   # Using out-of-source build tree when using Travis-CI; 'build_tree' environment variable is already set when on AppVeyor
   ENV['build_tree'] = '../Build' unless ENV['APPVEYOR']
   # Always use a same build configuration to keep ccache's cache size small; single-config generator needs the option when configuring, while multi-config when building
@@ -237,8 +249,8 @@ task :ci do
   # When not explicitly specified then use generic generator
   generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] ? 'vs2015' : '')
   # LuaJIT on MinGW build is not possible on Travis-CI with Ubuntu LTS 12.04 as its GCC cross-compiler version is too old, wait until we have Ubuntu LTS 14.04
-  # LuaJIT on Web platform is not possible and LuaJIT on iOS platform is not allowed
-  jit = (ENV['WIN32'] && ENV['TRAVIS']) || ENV['WEB'] || ENV['IOS'] ? '' : 'JIT=1 URHO3D_LUAJIT_AMALG='
+  # LuaJIT on Web platform is not possible
+  jit = (ENV['WIN32'] && ENV['TRAVIS']) || ENV['WEB'] ? '' : 'JIT=1 URHO3D_LUAJIT_AMALG='
   system "bash -c 'rake cmake #{generator} URHO3D_LUA#{jit}=1 URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1'" or abort 'Failed to configure Urho3D library build'
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
     # Prepare a new AVD in another process to avoid busy waiting
@@ -250,13 +262,19 @@ task :ci do
     system 'rake ci_push_bindings' or abort
     next
   end
-  # Multi-config CMake generators use different target name than single-config ones for no good reason
-  test = ENV['URHO3D_TESTING'] ? "&& rake make target=#{ENV['OS'] || ENV['XCODE'] ? 'RUN_TESTS' : 'test'}" : ''
-  system "bash -c 'rake make #{test}'" or abort 'Failed to build or test Urho3D library'
-  unless ENV['CI'] && (ENV['IOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD']  # Skip scaffolding test when packaging for iOS and Web platform
+  system "bash -c 'rake make'" or abort 'Failed to build Urho3D library'
+  if ENV['URHO3D_TESTING'] && !timeup
+    # Multi-config CMake generators use different test target name than single-config ones for no good reason
+    test = "rake make target=#{ENV['OS'] || ENV['XCODE'] ? 'RUN_TESTS' : 'test'}"
+    system "bash -c '#{test}'" or abort 'Failed to test Urho3D library'
+    test = "&& echo && #{test}"
+  else
+    test = ''
+  end
+  unless ENV['CI'] && (ENV['IOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD'] || timeup  # Skip scaffolding test when packaging for iOS and Web platform
     # Staged-install Urho3D SDK when on Travis-CI; normal install when on AppVeyor
     ENV['DESTDIR'] = ENV['HOME'] || Dir.home unless ENV['APPVEYOR']
-    puts "\nInstalling Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}..."; $stdout.flush
+    puts "Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}..."; $stdout.flush
     system "bash -c 'rake make target=install >/dev/null'" or abort 'Failed to install Urho3D SDK'
     # Alternate to use in-the-source build tree for test coverage
     ENV['build_tree'] = '.' unless ENV['APPVEYOR']
@@ -267,13 +285,13 @@ task :ci do
     prefix = ENV['APPVEYOR'] ? '' : '../Build/generated/'
     # Create a new project on the fly that uses newly installed Urho3D SDK
     Dir.chdir scaffolding "#{prefix}UsingSDK" do
-      puts "\nConfiguring downstream project using Urho3D SDK..."; $stdout.flush
+      puts "\nConfiguring downstream project using Urho3D SDK...\n\n"; $stdout.flush
       # SDK installation to a system-wide location does not need URHO3D_HOME to be defined, staged-installation does
       system "bash -c '#{ENV['DESTDIR'] ? 'URHO3D_HOME=~/usr/local' : ''} rake cmake #{generator} URHO3D_LUA=1 && rake make #{test}'" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
     end
     # Create a new project on the fly that uses newly built Urho3D library in the build tree
     Dir.chdir scaffolding "#{prefix}UsingBuildTree" do
-      puts "\nConfiguring downstream project using Urho3D library in its build tree..."; $stdout.flush
+      puts "\nConfiguring downstream project using Urho3D library in its build tree...\n\n"; $stdout.flush
       system "bash -c 'rake cmake #{generator} URHO3D_HOME=../..#{ENV['APPVEYOR'] ? '/Build' : ''} URHO3D_LUA=1 && rake make #{test}'" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
     end
   end
@@ -420,6 +438,8 @@ end
 # Usage: NOT intended to be used manually
 desc 'Make binary package and upload it to a designated central hosting server'
 task :ci_package_upload do
+  $start_time = Time.now - ENV['ELAPSED'].to_i + 30 if ENV['ELAPSED']   # Plus 30 seconds for rounding up to the next nearest minute
+  next if timeup
   # Using out-of-source build tree when using Travis-CI; 'build_tree' environment variable is already set when on AppVeyor
   ENV['build_tree'] = '../Build' unless ENV['APPVEYOR']
   # Always use Release build configuration when using Xcode; 'config' environment variable is already set when on AppVeyor
@@ -433,7 +453,7 @@ task :ci_package_upload do
       ENV['SITE_UPDATE'] = nil
     end
   elsif !File.exists?("#{ENV['build_tree']}/Docs/html/index.html")
-    puts "\nGenerating documentation..."
+    puts "Generating documentation..."
     # Ignore the exit status from 'make doc' on Windows host system only due to Doxygen may not return exit status correctly on Windows
     system "bash -c 'rake make target=doc >/dev/null'" or ENV['OS'] or abort 'Failed to generate documentation'
   end
