@@ -963,6 +963,18 @@ static CScriptArray* UIElementGetChildren(bool recursive, UIElement* ptr)
     return VectorToHandleArray<UIElement>(elements, "Array<UIElement@>");
 }
 
+static CScriptArray* UIElementGetChildrenWithTag(const String& tag, bool recursive, UIElement* ptr)
+{
+    PODVector<UIElement*> elements;
+    ptr->GetChildrenWithTag(elements, tag, recursive);
+    return VectorToHandleArray<UIElement>(elements, "Array<UIElement@>");
+}
+
+static CScriptArray* UIElementGetTags(UIElement* ptr)
+{
+    return VectorToArray<String>(ptr->GetTags(), "Array<String>");
+}
+
 static unsigned UIElementGetNumChildrenNonRecursive(UIElement* ptr)
 {
     return ptr->GetNumChildren(false);
@@ -1189,6 +1201,12 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     }
     engine->RegisterObjectMethod(className, "float get_derivedOpacity()", asMETHOD(T, GetDerivedOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VariantMap& get_vars()", asFUNCTION(UIElementGetVars), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "void AddTag(const String&in)", asMETHOD(T, AddTag), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void ClearTags()", asMETHOD(T, ClearTags), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool RemoveTag(const String&in)", asMETHOD(T, RemoveTag), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool IsTagged(const String&in) const", asMETHOD(T, IsTagged), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetChildrenWithTag(const String&in, bool recursive = false) const", asFUNCTION(UIElementGetChildrenWithTag), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Array<String>@ get_tags() const", asFUNCTION(UIElementGetTags), asCALL_CDECL_OBJLAST);
 }
 
 /// Template function for registering a class derived from BorderImage.
