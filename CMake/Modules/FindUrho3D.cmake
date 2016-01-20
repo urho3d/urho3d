@@ -39,6 +39,7 @@
 #  URHO3D_DATABASE_ODBC
 #  URHO3D_DATABASE_SQLITE
 #  URHO3D_LUAJIT
+#  URHO3D_TESTING
 #
 # WIN32 only:
 #  URHO3D_LIBRARIES_REL
@@ -49,6 +50,7 @@
 #  URHO3D_D3D11
 #
 
+set (AUTO_DISCOVER_VARS URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT URHO3D_TESTING)
 set (PATH_SUFFIX Urho3D)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
     # A special case where library location is already known to be in the build tree of Urho3D project
@@ -163,7 +165,6 @@ else ()
         set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)
     endif ()
     set (URHO3D_LIB_TYPE_SAVED ${URHO3D_LIB_TYPE})  # We need this to reset the auto-discovered URHO3D_LIB_TYPE variable before looping
-    set (AUTO_DISCOVER_VARS URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT)
     foreach (ABI_64BIT RANGE ${URHO3D_64BIT} 0)
         # Break if the compiler is not multilib-capable and the ABI is not its native
         if ((MSVC OR MINGW OR ANDROID OR RPI OR WEB) AND NOT ABI_64BIT EQUAL URHO3D_DEFAULT_64BIT)

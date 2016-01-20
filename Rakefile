@@ -262,7 +262,7 @@ task :ci do
     ENV['build_tree'] = '.' unless ENV['APPVEYOR']
     # Ensure the following variables are auto-discovered during scaffolding test
     ENV['URHO3D_64BIT'] = nil unless ENV['APPVEYOR']    # AppVeyor uses VS generator which always requires URHO3D_64BIT as input variable
-    ['URHO3D_LIB_TYPE', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_SSE', 'URHO3D_DATABASE_ODBC', 'URHO3D_DATABASE_SQLITE', 'URHO3D_LUAJIT'].each { |var| ENV[var] = nil }
+    ['URHO3D_LIB_TYPE', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_SSE', 'URHO3D_DATABASE_ODBC', 'URHO3D_DATABASE_SQLITE', 'URHO3D_LUAJIT', 'URHO3D_TESTING'].each { |var| ENV[var] = nil }
     # Alternate the scaffolding location between Travis CI and AppVeyor for test coverage; Travis CI uses build tree while AppVeyor using source tree
     prefix = ENV['APPVEYOR'] ? '' : '../Build/generated/'
     # Create a new project on the fly that uses newly installed Urho3D SDK
