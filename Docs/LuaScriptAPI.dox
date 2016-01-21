@@ -6476,6 +6476,12 @@ Methods:
 - TraversalMode GetTraversalMode() const
 - bool IsElementEventSender() const
 - UIElement* GetElementEventSender() const
+- void AddTag(const String tag)
+- void ClearTags()
+- bool RemoveTag(const String tag)
+- bool HasTag(const String tag) const
+- const StringVector& GetTags() const
+- const PODVector<UIElement*>& GetChildrenWithTag(const String tag, bool recursive = false) const
 
 Properties:
 
