@@ -26,6 +26,13 @@ set (TARGET_NAME Lua)
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS src/*.h EXCLUDE_PATTERNS src/lua.c src/luac.c)
 
+# Define dependency libs
+if (READLINE_FOUND)
+    add_definitions (-DLUA_USE_READLINE)
+    list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIR})
+    list (APPEND LIBS ${READLINE_LIBRARIES})
+endif ()
+
 # Setup target
 setup_library ()
 

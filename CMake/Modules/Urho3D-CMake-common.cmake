@@ -483,9 +483,9 @@ if (URHO3D_DATABASE_SQLITE OR URHO3D_DATABASE_ODBC)
     add_definitions (-DURHO3D_DATABASE)
 endif ()
 
-# Find Direct3D include & library directories in MS Windows SDK or DirectX SDK. They may also be required by SDL
-# even if using OpenGL instead of Direct3D, but do not make Direct3D REQUIRED in that case
 if (WIN32)
+    # Find Direct3D include & library directories in MS Windows SDK or DirectX SDK. They may also be required by SDL
+    # even if using OpenGL instead of Direct3D, but do not make Direct3D REQUIRED in that case
     if (NOT URHO3D_OPENGL)
         find_package (Direct3D REQUIRED)
     else ()
@@ -494,6 +494,9 @@ if (WIN32)
     if (DIRECT3D_INCLUDE_DIRS)
         include_directories (${DIRECT3D_INCLUDE_DIRS})
     endif ()
+else ()
+    # Find GNU Readline development library for Lua interpreter and SQLite's isql
+    find_package (Readline)
 endif ()
 
 # Platform and compiler specific options
