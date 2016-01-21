@@ -91,8 +91,8 @@ cbuffer CameraVS : register(b1)
     float4 cDepthMode;
     float3 cFrustumSize;
     float4 cGBufferOffsets;
-    float3x4 cView;
-    float3x4 cViewInv;
+    float4x3 cView;
+    float4x3 cViewInv;
     float4x4 cViewProj;
     float4 cClipPlane;
 }
