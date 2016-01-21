@@ -568,7 +568,7 @@ public:
     void ClearTags();
         
     /// Return whether element is tagged by a specific tag.
-    bool IsTagged(const String& tag) const;
+    bool HasTag(const String& tag) const;
 
     /// Return tags.
     const StringVector& GetTags() const { return tags_; }

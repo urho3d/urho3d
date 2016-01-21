@@ -2069,7 +2069,7 @@ bool UIElement::RemoveTag(const String& tag)
     return tags_.Remove(tag);
 }
 
-bool UIElement::IsTagged(const String& tag) const
+bool UIElement::HasTag(const String& tag) const
 {
     return tags_.Contains(tag);
 }
@@ -2083,7 +2083,7 @@ void UIElement::GetChildrenWithTag(PODVector<UIElement*>& dest, const String& ta
         for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
         {
             UIElement* element = *i;
-            if (element->IsTagged(tag))
+            if (element->HasTag(tag))
                 dest.Push(element);
         }
     }
@@ -2096,7 +2096,7 @@ void UIElement::GetChildrenWithTagRecursive(PODVector<UIElement*>& dest, const S
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
         UIElement* element = *i;
-        if (element->IsTagged(tag))
+        if (element->HasTag(tag))
             dest.Push(element);
         if (!element->children_.Empty())
             element->GetChildrenWithTagRecursive(dest, tag);

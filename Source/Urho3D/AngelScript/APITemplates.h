@@ -1204,7 +1204,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void AddTag(const String&in)", asMETHOD(T, AddTag), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void ClearTags()", asMETHOD(T, ClearTags), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool RemoveTag(const String&in)", asMETHOD(T, RemoveTag), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool IsTagged(const String&in) const", asMETHOD(T, IsTagged), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool HasTag(const String&in) const", asMETHOD(T, HasTag), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetChildrenWithTag(const String&in, bool recursive = false) const", asFUNCTION(UIElementGetChildrenWithTag), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<String>@ get_tags() const", asFUNCTION(UIElementGetTags), asCALL_CDECL_OBJLAST);
 }

@@ -221,10 +221,10 @@ class UIElement : public Animatable
     TraversalMode GetTraversalMode() const;
     bool IsElementEventSender() const;
     UIElement* GetElementEventSender() const;
-    void AddTag(const String& tag);
+    void AddTag(const String tag);
     void ClearTags();
-    bool RemoveTag(const String& tag);
-    bool IsTagged(const String& tag) const;
+    bool RemoveTag(const String tag);
+    bool HasTag(const String tag) const;
     const StringVector& GetTags() const;
 
     // void GetChildrenWithTag(PODVector<UIElement*>& dest, const String& tag, bool recursive = false) const;
