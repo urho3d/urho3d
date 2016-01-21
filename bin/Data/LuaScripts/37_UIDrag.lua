@@ -2,7 +2,8 @@
 -- This sample demonstrates:
 --     - Creating GUI elements from AngelScript
 --     - Loading GUI Style from xml
---     - Subscribing to GUI drag events and handling them.
+--     - Subscribing to GUI drag events and handling them
+--     - Working with GUI elements with specific tags.
 
 require "LuaScripts/Utilities/Sample"
 VAR_BUTTONS = StringHash("BUTTONS")
