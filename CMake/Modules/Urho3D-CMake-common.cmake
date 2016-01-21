@@ -530,8 +530,8 @@ if (APPLE)
         # IOS-specific setup
         add_definitions (-DIOS)
         if (URHO3D_64BIT)
-            if (DEFINED ENV{IOS_HALF_ARCH_HACK})                # This environment variable is set when ccache is just being cleared in Travis CI VM
-                set (CMAKE_OSX_ARCHITECTURES "arm64 x86_64")    # This is a hack used in Travis-CI iOS build only (it only builds 2 out of 4 archs)
+            if (DEFINED ENV{XCODE_64BIT_ONLY})                  # This environment variable is set automatically when ccache is just being cleared in Travis CI VM
+                set (CMAKE_OSX_ARCHITECTURES "arm64 x86_64")    # This is a hack to temporarily only build 64-bit archs to reduce overall build time
             else ()
                 set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD))
             endif ()
@@ -543,7 +543,11 @@ if (APPLE)
         if (XCODE)
             # OSX-specific setup
             if (URHO3D_64BIT)
-                set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_64_BIT))
+                if (DEFINED ENV{XCODE_64BIT_ONLY})
+                    set (CMAKE_OSX_ARCHITECTURES x86_64)        # This is a hack
+                else ()
+                    set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_64_BIT))
+                endif ()
             else ()
                 set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
             endif ()

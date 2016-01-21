@@ -263,7 +263,7 @@ task :ci do
     next
   end
   system "bash -c 'rake make'" or abort 'Failed to build Urho3D library'
-  if ENV['URHO3D_TESTING'] && !timeup
+  if !timeup && ENV['URHO3D_TESTING']
     # Multi-config CMake generators use different test target name than single-config ones for no good reason
     test = "rake make target=#{ENV['OS'] || ENV['XCODE'] ? 'RUN_TESTS' : 'test'}"
     system "bash -c '#{test}'" or abort 'Failed to test Urho3D library'
@@ -271,7 +271,8 @@ task :ci do
   else
     test = ''
   end
-  unless ENV['CI'] && (ENV['IOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD'] || timeup  # Skip scaffolding test when packaging for iOS and Web platform
+  # Skip scaffolding test when time up or packaging for iOS and Web platform
+  unless timeup || ENV['XCODE_64BIT_ONLY'] || ENV['CI'] && (ENV['IOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD']
     # Staged-install Urho3D SDK when on Travis-CI; normal install when on AppVeyor
     ENV['DESTDIR'] = ENV['HOME'] || Dir.home unless ENV['APPVEYOR']
     puts "Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}..."; $stdout.flush

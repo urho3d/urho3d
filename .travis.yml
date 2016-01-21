@@ -335,7 +335,7 @@ before_script:
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - if [ $XCODE ] && ([ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
-  - if [ $IOS ] && echo $COMMIT_MESSAGE |grep -cq '\[ccache clear\]'; then export IOS_HALF_ARCH_HACK=1; fi
+  - if [ $XCODE ] && echo $COMMIT_MESSAGE |egrep -cq '\[(ccache clear|xcode 64bit only)\]'; then export XCODE_64BIT_ONLY=1; fi
   - travis_retry brew update >/dev/null
   - which cmake >/dev/null 2>&1 || cmake=cmake
   - if [ $PACKAGE_UPLOAD ]; then doxygen='doxygen graphviz'; fi
