@@ -76,6 +76,7 @@ BillboardSet::BillboardSet(Context* context) :
     bufferSizeDirty_(true),
     bufferDirty_(true),
     forceUpdate_(false),
+    geometryTypeUpdate_(false),
     sortThisFrame_(false),
     sortFrameNumber_(0),
     previousOffset_(Vector3::ZERO)
@@ -195,11 +196,8 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
     // Billboard positioning
     transforms_[0] = relative_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
     // Billboard rotation
-    if (faceCameraMode_ != FC_DIRECTION)
-    {
-        transforms_[1] = Matrix3x4(Vector3::ZERO, faceCameraMode_ != FC_NONE ? frame.camera_->GetFaceCameraRotation(
-            node_->GetWorldPosition(), node_->GetWorldRotation(), faceCameraMode_) : node_->GetWorldRotation(), Vector3::ONE);
-    }
+    transforms_[1] = Matrix3x4(Vector3::ZERO, faceCameraMode_ != FC_NONE ? frame.camera_->GetFaceCameraRotation(
+        node_->GetWorldPosition(), node_->GetWorldRotation(), faceCameraMode_) : node_->GetWorldRotation(), Vector3::ONE);
 }
 
 void BillboardSet::UpdateGeometry(const FrameInfo& frame)
@@ -211,7 +209,7 @@ void BillboardSet::UpdateGeometry(const FrameInfo& frame)
         UpdateVertexBuffer(frame);
 
     // If using camera facing, re-update the rotation for the current view now
-    if (faceCameraMode_ != FC_NONE || faceCameraMode_ != FC_DIRECTION)
+    if (faceCameraMode_ != FC_NONE)
     {
         transforms_[1] = Matrix3x4(Vector3::ZERO, frame.camera_->GetFaceCameraRotation(node_->GetWorldPosition(),
             node_->GetWorldRotation(), faceCameraMode_), Vector3::ONE);
