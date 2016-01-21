@@ -756,7 +756,7 @@ void View::SetCameraShaderParameters(Camera* camera, bool setProjection)
         projection.m23_ += projection.m33_ * constantBias;
 #endif
 
-        graphics_->SetShaderParameter(VSP_VIEWINV, camera->GetView().Inverse());
+        graphics_->SetShaderParameter(VSP_VIEWINV, camera->GetEffectiveWorldTransform());
         graphics_->SetShaderParameter(VSP_VIEW, camera->GetView());
         graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * camera->GetView());
     }
