@@ -20,6 +20,7 @@ Array<XMLFile@> xmlResources;
 const uint ATTRIBUTE_RES = 0;
 const uint VARIABLE_RES = 1;
 const uint STYLE_RES = 2;
+const uint TAGS_RES = 3;
 
 uint nodeContainerIndex = M_MAX_UNSIGNED;
 uint componentContainerStartIndex = 0;
@@ -37,7 +38,8 @@ bool inspectorLocked = false;
 
 void InitXMLResources()
 {
-    String[] resources = { "UI/EditorInspector_Attribute.xml", "UI/EditorInspector_Variable.xml", "UI/EditorInspector_Style.xml" };
+    String[] resources = { "UI/EditorInspector_Attribute.xml", "UI/EditorInspector_Variable.xml",
+                           "UI/EditorInspector_Style.xml", "UI/EditorInspector_Tags.xml" };
     for (uint i = 0; i < resources.length; ++i)
         xmlResources.Push(cache.GetResource("XMLFile", resources[i]));
 }
@@ -98,6 +100,8 @@ UIElement@ GetUIElementContainer()
 
     elementContainerIndex = parentContainer.numChildren;
     parentContainer.LoadChildXML(xmlResources[ATTRIBUTE_RES], uiStyle);
+    parentContainer.LoadChildXML(xmlResources[TAGS_RES], uiStyle);
+    parentContainer.GetChild("TagsLabel", true).SetFixedWidth(LABEL_WIDTH);
     UIElement@ container = GetContainer(elementContainerIndex);
     container.LoadChildXML(xmlResources[VARIABLE_RES], uiStyle);
     container.LoadChildXML(xmlResources[STYLE_RES], uiStyle);
@@ -109,6 +113,8 @@ UIElement@ GetUIElementContainer()
     SubscribeToEvent(container.GetChild("NewVarDropDown", true), "ItemSelected", "CreateUIElementVariable");
     SubscribeToEvent(container.GetChild("DeleteVarButton", true), "Released", "DeleteUIElementVariable");
     SubscribeToEvent(styleList, "ItemSelected", "HandleStyleItemSelected");
+    LineEdit@ tagEdit = parentContainer.GetChild("TagsEdit", true);
+    SubscribeToEvent(tagEdit, "TextChanged", "HandleTagsEdit");
     return container;
 }
 
@@ -327,6 +333,8 @@ void UpdateAttributeInspector(bool fullUpdate = true)
             elementType = editUIElement.typeName;
             titleText.text = elementType + " [ID " + GetUIElementID(editUIElement).ToString() + "]";
             SetStyleListSelection(styleList, editUIElement.style);
+            LineEdit@ tagEdit = parentContainer.GetChild("TagsEdit", true);
+            tagEdit.text = Join(editUIElement.tags, ";");
         }
         else
         {
@@ -658,6 +666,15 @@ Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit)
     }
 
     return ret;
+}
+
+void HandleTagsEdit(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ lineEdit = eventData["Element"].GetPtr();
+    Array<String> tags = lineEdit.text.Split(';');
+    editUIElement.ClearTags();
+    for (uint i = 0; i < tags.length; i++)
+        editUIElement.AddTag(tags[i]);
 }
 
 /// Handle reset to default event, sent when reset icon in the icon-panel is clicked.
