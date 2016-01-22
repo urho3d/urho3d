@@ -5,7 +5,7 @@
 void VS(float4 iPos : POSITION, 
     float2 iTexCoord: TEXCOORD0,
     out float2 oTexCoord : TEXCOORD0, 
-    out float4 oPos : SV_POSITION)
+    out float4 oPos : OUTPOSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
