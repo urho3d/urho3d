@@ -22,7 +22,7 @@
 
 # Find PulseAudio development library
 #
-#  PA_FOUND
+#  PULSEAUDIO_FOUND
 #  PA_INCLUDE_DIRS
 #  PA_LIBRARIES
 #  PA_VERSION
@@ -38,6 +38,6 @@ if (NOT PA_VERSION AND PA_INCLUDE_DIRS AND EXISTS ${PA_INCLUDE_DIRS}/pulse/versi
 endif ()
 
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (PA REQUIRED_VARS PA_LIBRARIES PA_INCLUDE_DIRS VERSION_VAR PA_VERSION FAIL_MESSAGE "Could NOT find PulseAudio development library")
+find_package_handle_standard_args (PulseAudio REQUIRED_VARS PA_LIBRARIES PA_INCLUDE_DIRS VERSION_VAR PA_VERSION FAIL_MESSAGE "Could NOT find PulseAudio development library")
 
 mark_as_advanced (PA_INCLUDE_DIRS PA_LIBRARIES)

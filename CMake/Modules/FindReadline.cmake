@@ -36,6 +36,6 @@ find_path (READLINE_INCLUDE_DIRS NAMES readline.h HINTS ${INC_HINTS} PATH_SUFFIX
 find_library (READLINE_LIBRARIES NAMES readline HINTS ${LIB_HINTS} DOC "Readline library")
 
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (READLINE REQUIRED_VARS READLINE_LIBRARIES READLINE_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find Readline development library")
+find_package_handle_standard_args (Readline REQUIRED_VARS READLINE_LIBRARIES READLINE_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find Readline development library")
 
 mark_as_advanced (READLINE_INCLUDE_DIRS READLINE_LIBRARIES)

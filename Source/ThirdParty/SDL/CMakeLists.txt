@@ -128,7 +128,7 @@ else ()
     include_directories (${ALSA_INCLUDE_DIRS})
 
     find_package (PulseAudio)
-    if (PA_FOUND)
+    if (PULSEAUDIO_FOUND)
       include_directories (${PA_INCLUDE_DIRS})
       get_filename_component (PA_SIMPLE ${PA_LIBRARIES} NAME)
       add_definitions (-DSDL_AUDIO_DRIVER_PULSEAUDIO=1 -DSDL_AUDIO_DRIVER_PULSEAUDIO_DYNAMIC="${PA_SIMPLE}")
