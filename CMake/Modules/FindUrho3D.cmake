@@ -49,8 +49,11 @@
 #  URHO3D_DLL_DBG
 #  URHO3D_D3D11
 #
+# MSVC only:
+#  URHO3D_STATIC_RUNTIME
+#
 
-set (AUTO_DISCOVER_VARS URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT URHO3D_TESTING)
+set (AUTO_DISCOVER_VARS URHO3D_OPENGL URHO3D_D3D11 URHO3D_SSE URHO3D_DATABASE_ODBC URHO3D_DATABASE_SQLITE URHO3D_LUAJIT URHO3D_TESTING URHO3D_STATIC_RUNTIME)
 set (PATH_SUFFIX Urho3D)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND TARGET Urho3D)
     # A special case where library location is already known to be in the build tree of Urho3D project
@@ -199,10 +202,10 @@ else ()
             if (EXT STREQUAL .a)
                 set (URHO3D_LIB_TYPE STATIC)
                 # For Non-MSVC compiler the static define is not baked into the export header file so we need to define it for the try_run below
-                set (COMPILER_STATIC_FLAG COMPILE_DEFINITIONS -DURHO3D_STATIC_DEFINE)
+                set (COMPILER_STATIC_DEFINE COMPILE_DEFINITIONS -DURHO3D_STATIC_DEFINE)
             else ()
                 set (URHO3D_LIB_TYPE SHARED)
-                unset (COMPILER_STATIC_FLAG)
+                unset (COMPILER_STATIC_DEFINE)
             endif ()
         endif ()
         # For shared library type, also initialize the URHO3D_DLL variable for later use
@@ -249,10 +252,22 @@ else ()
                 set (URHO3D_RUN_RESULT 0)
                 file (READ ${URHO3D_BASE_INCLUDE_DIR}/Urho3D.h URHO3D_RUN_RESULT__TRYRUN_OUTPUT)
             endif ()
-            # VIDEOCORE_LIBRARIES variable is already set by FindVideoCore module on RPI platform
-            try_run (URHO3D_RUN_RESULT URHO3D_COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
-                CMAKE_FLAGS ${IOS_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES}\;${VIDEOCORE_LIBRARIES}\;${ANDROID_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_32BIT_FLAG} ${COMPILER_STATIC_FLAG}
-                COMPILE_OUTPUT_VARIABLE TRY_COMPILE_OUT RUN_OUTPUT_VARIABLE TRY_RUN_OUT)
+            while (NOT URHO3D_COMPILE_RESULT)
+                # VIDEOCORE_LIBRARIES variable is already set by FindVideoCore module on RPI platform
+                try_run (URHO3D_RUN_RESULT URHO3D_COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
+                    CMAKE_FLAGS ${IOS_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES}\;${VIDEOCORE_LIBRARIES}\;${ANDROID_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_32BIT_FLAG} ${COMPILER_STATIC_DEFINE} ${COMPILER_STATIC_RUNTIME_FLAGS}
+                        COMPILE_OUTPUT_VARIABLE TRY_COMPILE_OUT RUN_OUTPUT_VARIABLE TRY_RUN_OUT)
+                if (MSVC AND NOT URHO3D_COMPILE_RESULT AND NOT COMPILER_STATIC_RUNTIME_FLAGS)
+                    # Give a second chance for MSVC to use static runtime flag
+                    if (URHO3D_LIBRARIES_REL)
+                        set (COMPILER_STATIC_RUNTIME_FLAGS COMPILE_DEFINITIONS /MT)
+                    else ()
+                        set (COMPILER_STATIC_RUNTIME_FLAGS COMPILE_DEFINITIONS /MTd)
+                    endif ()
+                else ()
+                    break ()    # Other compilers break immediately rendering the while-loop a no-ops
+                endif ()
+            endwhile ()
             set (URHO3D_COMPILE_RESULT ${URHO3D_COMPILE_RESULT} CACHE INTERNAL "FindUrho3D module's compile result")
             if (URHO3D_COMPILE_RESULT AND URHO3D_RUN_RESULT EQUAL 0)
                 # Auto-discover build options used by the found library
@@ -260,6 +275,10 @@ else ()
                     # Since Urho3D library for iOS is a universal binary, we need another way to find out the compiler ABI when the library was built
                     execute_process (COMMAND lipo -info ${URHO3D_LIBRARIES} COMMAND grep -cq 'x86_64' RESULT_VARIABLE GREP_RESULT OUTPUT_QUIET ERROR_QUIET)
                     math (EXPR ABI_64BIT "1 - ${GREP_RESULT}")
+                elseif (MSVC)
+                    if (COMPILER_STATIC_RUNTIME_FLAGS)
+                        set (TRY_RUN_OUT "${TRY_RUN_OUT}#define URHO3D_STATIC_RUNTIME\n")
+                    endif ()
                 endif ()
                 set (URHO3D_64BIT ${ABI_64BIT} CACHE BOOL "Enable 64-bit build, the value is auto-discovered based on the found Urho3D library" FORCE) # Force it as it is more authoritative than user-specified option
                 set (URHO3D_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE BOOL "Urho3D library type, the value is auto-discovered based on the found Urho3D library" FORCE) # Use the Force, Luke

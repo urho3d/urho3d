@@ -60,7 +60,7 @@ task :cmake do
   platform = 'native'
   build_options = ''
   # TODO: Need to find a way to automatically populate the array with all the Urho3D supported build options, at the moment it only contains those being used in CI
-  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_PCH', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TESTING', 'URHO3D_TEST_TIMEOUT', 'URHO3D_UPDATE_SOURCE_TREE', 'URHO3D_TOOLS', 'URHO3D_DEPLOYMENT_TARGET', 'URHO3D_USE_LIB64_RPM', 'CMAKE_BUILD_TYPE', 'CMAKE_OSX_DEPLOYMENT_TARGET', 'IOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'WIN32', 'ANDROID', 'ANDROID_ABI', 'ANDROID_NATIVE_API_LEVEL', 'RPI', 'RPI_ABI', 'WEB', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
+  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_PCH', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TESTING', 'URHO3D_TEST_TIMEOUT', 'URHO3D_UPDATE_SOURCE_TREE', 'URHO3D_TOOLS', 'URHO3D_DEPLOYMENT_TARGET', 'URHO3D_USE_LIB64_RPM', 'CMAKE_BUILD_TYPE', 'CMAKE_OSX_DEPLOYMENT_TARGET', 'IOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'WIN32', 'ANDROID', 'ANDROID_ABI', 'ANDROID_NATIVE_API_LEVEL', 'RPI', 'RPI_ABI', 'WEB', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
     ARGV << "#{var}=\"#{ENV[var]}\"" if ENV[var] && !ARGV.find { |arg| /#{var}=/ =~ arg }
   }
   ARGV.each { |option|
@@ -282,7 +282,7 @@ task :ci do
     ENV['build_tree'] = '.' unless ENV['APPVEYOR']
     # Ensure the following variables are auto-discovered during scaffolding test
     ENV['URHO3D_64BIT'] = nil unless ENV['APPVEYOR']    # AppVeyor uses VS generator which always requires URHO3D_64BIT as input variable
-    ['URHO3D_LIB_TYPE', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_SSE', 'URHO3D_DATABASE_ODBC', 'URHO3D_DATABASE_SQLITE', 'URHO3D_LUAJIT', 'URHO3D_TESTING'].each { |var| ENV[var] = nil }
+    ['URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_SSE', 'URHO3D_DATABASE_ODBC', 'URHO3D_DATABASE_SQLITE', 'URHO3D_LUAJIT', 'URHO3D_TESTING'].each { |var| ENV[var] = nil }
     # Alternate the scaffolding location between Travis CI and AppVeyor for test coverage; Travis CI uses build tree while AppVeyor using source tree
     prefix = ENV['APPVEYOR'] ? '' : '../Build/generated/'
     # Create a new project on the fly that uses newly installed Urho3D SDK
