@@ -109,7 +109,6 @@ void Scene::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Next Local Component ID", unsigned, localComponentID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
     URHO3D_ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Variable Names", GetVarNamesAttr, SetVarNamesAttr, String, String::EMPTY, AM_FILE | AM_NOEDIT);
-	URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Tag Names", GetTagNamesAttr, SetTagNamesAttr, String, String::EMPTY, AM_FILE | AM_NOEDIT);
 }
 
 bool Scene::Load(Deserializer& source, bool setInstanceDefault)
@@ -704,21 +703,6 @@ void Scene::UnregisterAllVars()
     varNames_.Clear();
 }
 
-void Scene::RegisterTag(const String& name)
-{
-	tagNames_[name] = name;
-}
-
-void Scene::UnregisterTag(const String& name)
-{
-	tagNames_.Erase(name);
-}
-
-void Scene::UnregisterAllTags()
-{
-	tagNames_.Clear();
-}
-
 Node* Scene::GetNode(unsigned id) const
 {
     if (id < FIRST_LOCAL_ID)
@@ -733,7 +717,7 @@ Node* Scene::GetNode(unsigned id) const
     }
 }
 
-bool Scene::GetNodesWithTag(PODVector<Node*>& dest, StringHash tag) const
+bool Scene::GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const
 {
 	dest.Clear();
 	HashMap<StringHash, PODVector<Node*> >::ConstIterator it = tagedNodes_.Find(tag);
@@ -771,12 +755,6 @@ const String& Scene::GetVarName(StringHash hash) const
 {
     HashMap<StringHash, String>::ConstIterator i = varNames_.Find(hash);
     return i != varNames_.End() ? i->second_ : String::EMPTY;
-}
-
-const String& Scene::GetTagName(StringHash tag) const
-{
-	HashMap<StringHash, String>::ConstIterator i = tagNames_.Find(tag);
-	return i != tagNames_.End() ? i->second_ : String::EMPTY;
 }
 
 void Scene::Update(float timeStep)
@@ -971,9 +949,15 @@ void Scene::NodeAdded(Node* node)
         localNodes_[id] = node;
     }
 
-	// cache tag if already taged.
-	if (node->GetTag() != StringHash::ZERO)
-		tagedNodes_[node->GetTag()].Push(node);
+	// cache tag if already tagged.
+	if (!node->GetTags().Empty())
+	{
+		const StringVector& tags = node->GetTags();
+		for (unsigned i = 0; i < tags.Size(); ++i)
+		{
+			tagedNodes_[tags[i]].Push(node);
+		}
+	}
 
     // Add already created components and child nodes now
     const Vector<SharedPtr<Component> >& components = node->GetComponents();
@@ -984,12 +968,14 @@ void Scene::NodeAdded(Node* node)
         NodeAdded(*i);
 }
 
-void Scene::NodeTagChanged(Node* node, StringHash oldTag)
+void Scene::NodeTagAdded(Node* node, const String& tag)
 {
-	if (oldTag != StringHash::ZERO)
-		tagedNodes_[oldTag].Remove(node);
-	if (node->GetTag() != StringHash::ZERO)
-		tagedNodes_[node->GetTag()].Push(node);
+	tagedNodes_[tag].Push(node);
+}
+
+void Scene::NodeTagRemoved(Node* node, const String& tag)
+{
+	tagedNodes_[tag].Remove(node);
 }
 
 void Scene::NodeRemoved(Node* node)
@@ -1008,10 +994,16 @@ void Scene::NodeRemoved(Node* node)
 
     node->ResetScene();
 
-	// Remove cached taged node 
-	if(node->GetTag() != StringHash::ZERO)
-		tagedNodes_[node->GetTag()].Remove(node);
-
+	// Remove node from tag cache 
+	if (!node->GetTags().Empty())
+	{
+		const StringVector& tags = node->GetTags();
+		for (unsigned i = 0; i < tags.Size(); ++i)
+		{
+			tagedNodes_[tags[i]].Remove(node);
+		}
+	}
+		
     // Remove components and child nodes as well
     const Vector<SharedPtr<Component> >& components = node->GetComponents();
     for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
@@ -1538,30 +1530,6 @@ void Scene::PreloadResourcesJSON(const JSONValue& value)
         PreloadResourcesJSON(childVal);
     }
 #endif
-}
-
-void Scene::SetTagNamesAttr(const String& value)
-{
-	Vector<String> tagNames = value.Split(';');
-
-	tagNames_.Clear();
-	for (Vector<String>::ConstIterator i = tagNames.Begin(); i != tagNames.End(); ++i)
-		tagNames_[*i] = *i;
-}
-
-Urho3D::String Scene::GetTagNamesAttr() const
-{
-	String ret;
-
-	if (!tagNames_.Empty())
-	{
-		for (HashMap<StringHash, String>::ConstIterator i = tagNames_.Begin(); i != tagNames_.End(); ++i)
-			ret += i->second_ + ';';
-
-		ret.Resize(ret.Length() - 1);
-	}
-
-	return ret;
 }
 
 void RegisterSceneLibrary(Context* context)
