@@ -581,6 +581,18 @@ static CScriptArray* NodeGetChildrenWithComponent(const String& typeName, bool r
     return VectorToHandleArray<Node>(nodes, "Array<Node@>");
 }
 
+static CScriptArray* NodeGetChildrenWithTag(const String& typeName, bool recursive, Node* ptr)
+{
+	PODVector<Node*> nodes;
+	ptr->GetChildrenWithTag(nodes, typeName, recursive);
+	return VectorToHandleArray<Node>(nodes, "Array<Node@>");
+}
+
+static CScriptArray* NodeGetTags(Node* ptr)
+{
+	return VectorToArray<String>(ptr->GetTags(), "Array<String>");
+}
+
 static unsigned NodeGetNumChildrenNonRecursive(Node* ptr)
 {
     return ptr->GetNumChildren(false);
@@ -691,7 +703,8 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void RemoveAllComponents()", asMETHOD(T, RemoveAllComponents), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildren(bool recursive = false) const", asFUNCTION(NodeGetChildren), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithComponent(const String&in, bool recursive = false) const", asFUNCTION(NodeGetChildrenWithComponent), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(bool recursive = false) const", asFUNCTION(NodeGetChildrenWithScript), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithTag(const String&in, bool recursive = false) const", asFUNCTION(NodeGetChildrenWithTag), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(bool recursive = false) const", asFUNCTION(NodeGetChildrenWithScript), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(const String&in, bool recursive = false) const", asFUNCTION(NodeGetChildrenWithClassName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Node@+ GetChild(const String&in, bool recursive = false) const", asMETHODPR(T, GetChild, (const String&, bool) const, Node*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents() const", asFUNCTION(NodeGetComponents), asCALL_CDECL_OBJLAST);
@@ -750,6 +763,11 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void set_parent(Node@+)", asMETHOD(T, SetParent), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Node@+ get_parent() const", asMETHOD(T, GetParent), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VariantMap& get_vars()", asFUNCTION(NodeGetVars), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod(className, "bool HasTag(const String&in)", asMETHOD(T, HasTag), asCALL_THISCALL);
+	engine->RegisterObjectMethod(className, "Array<String>@ get_tags()", asFUNCTION(NodeGetTags), asCALL_CDECL_OBJLAST);
+	engine->RegisterObjectMethod(className, "void AddTag(const String&in)", asMETHOD(T, AddTag), asCALL_THISCALL);
+	engine->RegisterObjectMethod(className, "void RemoveTag(const String&in)", asMETHOD(T, RemoveTag), asCALL_THISCALL);
+	engine->RegisterObjectMethod(className, "void RemoveAllTags()", asMETHOD(T, RemoveAllTags), asCALL_THISCALL);
 }
 
 static bool ResourceLoad(File* file, XMLFile* ptr)

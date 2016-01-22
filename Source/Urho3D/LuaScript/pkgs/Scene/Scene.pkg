@@ -82,6 +82,9 @@ class Scene : public Node
     void MarkNetworkUpdate(Component* component);
     void MarkReplicationDirty(Node* node);
     
+	// bool GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const;
+    tolua_outside const PODVector<Node*>&  SceneGetNodesWithTag @ GetNodesWithTag( const String& tag) const; 
+
     tolua_property__is_set bool updateEnabled;
     tolua_readonly tolua_property__is_set bool asyncLoading;
     tolua_readonly tolua_property__get_set float asyncProgress;
@@ -146,6 +149,14 @@ static bool SceneLoadXML(Scene* scene, const String& fileName)
 {
     File file(scene->GetContext(), fileName, FILE_READ);
     return file.IsOpen() && scene->LoadXML(file);
+}
+
+static const PODVector<Node*>& SceneGetNodesWithTag(const Scene* scene, const String& tag)
+{
+    static PODVector<Node*> result;
+    result.Clear();
+    scene->GetNodesWithTag(result, tag);
+    return result;
 }
 
 static bool SceneSaveXML(const Scene* scene, const String& fileName, const String& indentation)

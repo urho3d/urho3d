@@ -79,7 +79,9 @@ void Node::RegisterObject(Context* context)
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE);
+	URHO3D_ATTRIBUTE("Tags", StringVector, tags_, Variant::emptyStringVector, AM_DEFAULT);
+	URHO3D_ACCESSOR_ATTRIBUTE("Tags", GetTags, SetTags, StringVector, Variant::emptyStringVector, AM_DEFAULT );
+	URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Scale", GetScale, SetScale, Vector3, Vector3::ONE, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
@@ -338,6 +340,130 @@ void Node::SetName(const String& name)
             scene_->SendEvent(E_NODENAMECHANGED, eventData);
         }
     }
+}
+
+void Node::SetTags(const StringVector& tags)
+{
+	RemoveAllTags();
+	AddTags(tags);
+	// sync
+	// MarkNetworkUpdate(); already called in RemoveAllTags() / AddTags()
+}
+
+void Node::AddTag(const String& tag)
+{
+	// check if tag already added. 
+	StringVector::Iterator it = tags_.Find(tag);
+	if (it != tags_.End())
+		return;
+	
+		// add tag 
+		tags_.Push(tag);
+
+		// cache 
+		scene_->NodeTagAdded(this, tag);
+
+		// send event
+		using namespace NodeTagAdded;
+		VariantMap& eventData = GetEventDataMap();
+		eventData[P_SCENE] = scene_;
+		eventData[P_NODE] = this;
+		eventData[P_TAG] = tag;
+		scene_->SendEvent(E_NODETAGADDED, eventData);
+		
+	// sync
+	MarkNetworkUpdate();
+}
+
+void Node::AddTags(const String& tags, char s /*= ','*/)
+{
+	if (tags.Empty())
+		return;
+	StringVector tags_temp = tags.Split(s);
+	AddTags(tags_temp);
+}
+
+void Node::AddTags(const StringVector& tags)
+{
+	bool added = false;
+
+	for (unsigned i = 0; i < tags.Size(); ++i)
+	{
+		// check if tag already added. 
+		StringVector::Iterator it = tags_.Find(tags[i]);
+		if (it != tags_.End())
+		{
+			// add tag 
+			tags_.Push(tags[i]);
+
+			// cache 
+			scene_->NodeTagAdded(this, tags[i]);
+			// send event
+			using namespace NodeTagAdded;
+			VariantMap& eventData = GetEventDataMap();
+			eventData[P_SCENE] = scene_;
+			eventData[P_NODE] = this;
+			eventData[P_TAG] = tags[i];
+			scene_->SendEvent(E_NODETAGADDED, eventData);
+			added = true;
+		}
+	}
+
+	// sync
+	if (added)
+		MarkNetworkUpdate();
+}
+
+void Node::RemoveTag(const String& tag)
+{
+	// early out
+	if (tags_.Empty())
+		return;
+	bool removed = tags_.Remove(tag);
+
+	// nothing to do
+	if (!removed)
+		return;
+	
+	// scene cache update
+	if (scene_)
+	{
+		scene_->NodeTagRemoved(this, tag);
+		// send event
+		using namespace NodeTagRemoved;
+		VariantMap& eventData = GetEventDataMap();
+		eventData[P_SCENE] = scene_;
+		eventData[P_NODE] = this;
+		eventData[P_TAG] = tag;
+		scene_->SendEvent(E_NODETAGREMOVED, eventData);
+	}
+	// sync
+	MarkNetworkUpdate();
+}
+
+void Node::RemoveAllTags()
+{
+	// clear old scene cache
+	if (scene_)
+	{
+		for (unsigned i = 0; i < tags_.Size(); ++i)
+		{
+			scene_->NodeTagRemoved(this, tags_[i]);
+
+			// send event
+			using namespace NodeTagRemoved;
+			VariantMap& eventData = GetEventDataMap();
+			eventData[P_SCENE] = scene_;
+			eventData[P_NODE] = this;
+			eventData[P_TAG] = tags_[i];
+			scene_->SendEvent(E_NODETAGREMOVED, eventData);
+		}
+	}
+
+	tags_.Clear();
+
+	// sync
+	MarkNetworkUpdate();
 }
 
 void Node::SetPosition(const Vector3& position)
@@ -1112,6 +1238,22 @@ void Node::GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, boo
         GetChildrenWithComponentRecursive(dest, type);
 }
 
+void Node::GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive /*= true*/) const
+{
+	dest.Clear();
+
+	if (!recursive)
+	{
+		for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+		{
+			if ((*i)->HasTag(tag))
+				dest.Push(*i);
+		}
+	}
+	else
+		GetChildrenWithTagRecursive(dest, tag);
+}
+
 Node* Node::GetChild(unsigned index) const
 {
     return index < children_.Size() ? children_[index].Get() : 0;
@@ -1181,6 +1323,11 @@ bool Node::HasComponent(StringHash type) const
             return true;
     }
     return false;
+}
+
+bool Node::HasTag(const String& tag) const
+{
+	return tags_.Empty() ? false : tags_.Contains(tag);
 }
 
 const Variant& Node::GetVar(StringHash key) const
@@ -1951,6 +2098,18 @@ void Node::GetComponentsRecursive(PODVector<Component*>& dest, StringHash type) 
     }
     for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
         (*i)->GetComponentsRecursive(dest, type);
+}
+
+void Node::GetChildrenWithTagRecursive(PODVector<Node*>& dest, const String& tag) const
+{
+	for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+	{
+		Node* node = *i;
+		if (node->HasTag(tag))
+			dest.Push(node);
+		if (!node->children_.Empty())
+			node->GetChildrenWithTagRecursive(dest, tag);
+	}
 }
 
 Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode)

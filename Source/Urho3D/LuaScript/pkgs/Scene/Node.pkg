@@ -192,6 +192,15 @@ class Node : public Animatable
     Node* CreateChild(unsigned id, CreateMode mode);
     void AddComponent(Component* component, unsigned id, CreateMode mode);
 
+	void AddTag(const String& tag);
+    void RemoveTag(const String& tag);
+	void RemoveAllTags();
+    bool HasTag(const String& tag) const;
+    const StringVector& GetTags() const;
+
+	// void GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive = false) const;
+    tolua_outside const PODVector<Node*>& NodeGetChildrenWithTag @ GetChildrenWithTag(const String& tag, bool recursive = false) const; 
+
     tolua_readonly tolua_property__get_set unsigned ID;
     tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set StringHash nameHash;
@@ -430,6 +439,14 @@ static const PODVector<Node*>& NodeGetChildrenWithComponent(Node* node, String t
     static PODVector<Node*> result;
     result.Clear();
     node->GetChildrenWithComponent(result, type, recursive);
+    return result;
+}
+
+static const PODVector<Node*>& NodeGetChildrenWithTag(const Node* node, const String& tag, bool recursive)
+{
+    static PODVector<Node*> result;
+    result.Clear();
+    node->GetChildrenWithTag(result, tag, recursive);
     return result;
 }
 $}
