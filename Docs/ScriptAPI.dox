@@ -382,14 +382,6 @@ namespace Urho3D
 
 ## %Physics2D events
 
-### PhysicsPreStep2D
-- %World : PhysicsWorld2D pointer
-- %TimeStep : float
-
-### PhysicsPostStep2D
-- %World : PhysicsWorld2D pointer
-- %TimeStep : float
-
 ### PhysicsBeginContact2D
 - %World : PhysicsWorld2D pointer
 - %BodyA : RigidBody2D pointer
