@@ -73,6 +73,13 @@ UIElement@ GetNodeContainer()
     SubscribeToEvent(container.GetChild("NewVarDropDown", true), "ItemSelected", "CreateNodeVariable");
     SubscribeToEvent(container.GetChild("DeleteVarButton", true), "Released", "DeleteNodeVariable");
     ++componentContainerStartIndex;
+
+    parentContainer.LoadChildXML(xmlResources[TAGS_RES], uiStyle);
+    parentContainer.GetChild("TagsLabel", true).SetFixedWidth(LABEL_WIDTH);
+    LineEdit@ tagEdit = parentContainer.GetChild("TagsEdit", true);
+    SubscribeToEvent(tagEdit, "TextChanged", "HandleTagsEdit");
+    ++componentContainerStartIndex;
+
     return container;
 }
 
@@ -268,6 +275,8 @@ void UpdateAttributeInspector(bool fullUpdate = true)
                 idStr = " (ID " + String(editNode.id) + ")";
             nodeType = editNode.typeName;
             nodeTitle.text = nodeType + idStr;
+            LineEdit@ tagEdit = parentContainer.GetChild("TagsEdit", true);
+            tagEdit.text = Join(editNode.tags, ";");
         }
         else
         {
@@ -672,9 +681,18 @@ void HandleTagsEdit(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ lineEdit = eventData["Element"].GetPtr();
     Array<String> tags = lineEdit.text.Split(';');
-    editUIElement.RemoveAllTags();
-    for (uint i = 0; i < tags.length; i++)
-        editUIElement.AddTag(tags[i]);
+    if (editUIElement !is null)
+    {
+        editUIElement.RemoveAllTags();
+        for (uint i = 0; i < tags.length; i++)
+            editUIElement.AddTag(tags[i]);
+    }
+    else if (editNode !is null)
+    {
+        editNode.RemoveAllTags();
+        for (uint i = 0; i < tags.length; i++)
+            editNode.AddTag(tags[i]);
+    }
 }
 
 /// Handle reset to default event, sent when reset icon in the icon-panel is clicked.
