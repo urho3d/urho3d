@@ -285,8 +285,8 @@ private:
     HashMap<unsigned, Component*> replicatedComponents_;
     /// Local components by ID.
     HashMap<unsigned, Component*> localComponents_;
-	/// Cached taged nodes by tag.
-	HashMap<StringHash, PODVector<Node*> > tagedNodes_;
+    /// Cached tagged nodes by tag.
+    HashMap<StringHash, PODVector<Node*> > taggedNodes_;
     /// Asynchronous loading progress.
     AsyncProgress asyncProgress_;
     /// Node and component ID resolver for asynchronous loading.

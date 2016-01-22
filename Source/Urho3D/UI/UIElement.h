@@ -338,6 +338,19 @@ public:
     /// Set element event sender flag. When child element is added or deleted, the event would be sent using UIElement found in the parental chain having this flag set. If not set, the event is sent using UI's root as per normal.
     void SetElementEventSender(bool flag);
 
+    /// Set tags. Old tags are overwritten.
+    void SetTags(const StringVector& tags);
+    /// Add a tag.
+    void AddTag(const String& tag);
+    /// Add tags with the specified separator, by default ;
+    void AddTags(const String& tags, char separator = ';');
+    /// Add tags.
+    void AddTags(const StringVector& tags);
+    // Remove specific tag. Return true if existed.
+    bool RemoveTag(const String& tag);
+    // Remove all tags.
+    void RemoveAllTags();
+
     /// Template version of creating a child element.
     template <class T> T* CreateChild(const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
 
@@ -503,6 +516,15 @@ public:
     /// Return all user variables.
     const VariantMap& GetVars() const { return vars_; }
 
+    /// Return whether element is tagged by a specific tag.
+    bool HasTag(const String& tag) const;
+
+    /// Return all tags.
+    const StringVector& GetTags() const { return tags_; }
+
+    /// Return child elements with a specific tag either recursively or non-recursively.
+    void GetChildrenWithTag(PODVector<UIElement*>& dest, const String& tag, bool recursive = false) const;
+
     /// Return the drag button combo if this element is being dragged.
     int GetDragButtonCombo() const { return dragButtonCombo_; }
 
@@ -557,24 +579,6 @@ public:
 
     /// Return effective minimum size, also considering layout. Used internally.
     IntVector2 GetEffectiveMinSize() const;
-    
-    /// Add tag.
-    void AddTag(const String& tag);
-    
-    // Remove tag if found.
-    bool RemoveTag(const String& tag);
-
-    // Remove all tags.
-    void ClearTags();
-        
-    /// Return whether element is tagged by a specific tag.
-    bool HasTag(const String& tag) const;
-
-    /// Return tags.
-    const StringVector& GetTags() const { return tags_; }
-
-    /// Return child elements with a specific tag either recursively or non-recursively.
-    void GetChildrenWithTag(PODVector<UIElement*>& dest, const String& tag, bool recursive = false) const;
     
 protected:
     /// Handle attribute animation added.

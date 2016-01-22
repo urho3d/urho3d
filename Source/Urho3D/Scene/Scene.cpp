@@ -719,15 +719,15 @@ Node* Scene::GetNode(unsigned id) const
 
 bool Scene::GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const
 {
-	dest.Clear();
-	HashMap<StringHash, PODVector<Node*> >::ConstIterator it = tagedNodes_.Find(tag);
-	if (it != tagedNodes_.End())
-	{
-		dest = it->second_;
-		return true;
-	}
-	else
-		return false;
+    dest.Clear();
+    HashMap<StringHash, PODVector<Node*> >::ConstIterator it = taggedNodes_.Find(tag);
+    if (it != taggedNodes_.End())
+    {
+        dest = it->second_;
+        return true;
+    }
+    else
+        return false;
 }
 
 Component* Scene::GetComponent(unsigned id) const
@@ -949,15 +949,13 @@ void Scene::NodeAdded(Node* node)
         localNodes_[id] = node;
     }
 
-	// cache tag if already tagged.
-	if (!node->GetTags().Empty())
-	{
-		const StringVector& tags = node->GetTags();
-		for (unsigned i = 0; i < tags.Size(); ++i)
-		{
-			tagedNodes_[tags[i]].Push(node);
-		}
-	}
+    // Cache tag if already tagged.
+    if (!node->GetTags().Empty())
+    {
+        const StringVector& tags = node->GetTags();
+        for (unsigned i = 0; i < tags.Size(); ++i)
+            taggedNodes_[tags[i]].Push(node);
+    }
 
     // Add already created components and child nodes now
     const Vector<SharedPtr<Component> >& components = node->GetComponents();
@@ -970,12 +968,12 @@ void Scene::NodeAdded(Node* node)
 
 void Scene::NodeTagAdded(Node* node, const String& tag)
 {
-	tagedNodes_[tag].Push(node);
+    taggedNodes_[tag].Push(node);
 }
 
 void Scene::NodeTagRemoved(Node* node, const String& tag)
 {
-	tagedNodes_[tag].Remove(node);
+    taggedNodes_[tag].Remove(node);
 }
 
 void Scene::NodeRemoved(Node* node)
@@ -994,16 +992,14 @@ void Scene::NodeRemoved(Node* node)
 
     node->ResetScene();
 
-	// Remove node from tag cache 
-	if (!node->GetTags().Empty())
-	{
-		const StringVector& tags = node->GetTags();
-		for (unsigned i = 0; i < tags.Size(); ++i)
-		{
-			tagedNodes_[tags[i]].Remove(node);
-		}
-	}
-		
+    // Remove node from tag cache
+    if (!node->GetTags().Empty())
+    {
+        const StringVector& tags = node->GetTags();
+        for (unsigned i = 0; i < tags.Size(); ++i)
+            taggedNodes_[tags[i]].Remove(node);
+    }
+
     // Remove components and child nodes as well
     const Vector<SharedPtr<Component> >& components = node->GetComponents();
     for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)

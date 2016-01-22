@@ -147,6 +147,10 @@ class UIElement : public Animatable
     void SetInternal(bool enable);
     void SetTraversalMode(TraversalMode traversalMode);
     void SetElementEventSender(bool flag);
+    void AddTag(const String tag);
+    void AddTags(const String tags, char separator);
+    bool RemoveTag(const String tag);
+    void RemoveAllTags();
 
     const String GetName() const;
     const IntVector2& GetPosition() const;
@@ -205,6 +209,12 @@ class UIElement : public Animatable
     const Color& GetDerivedColor() const;
     const Variant& GetVar(StringHash key) const;
     const VariantMap& GetVars() const;
+
+    bool HasTag(const String tag) const;
+    const StringVector& GetTags() const;
+    // void GetChildrenWithTag(PODVector<UIElement*>& dest, const String& tag, bool recursive = false) const;
+    tolua_outside const PODVector<UIElement*>& UIElementGetChildrenWithTag @ GetChildrenWithTag(const String& tag, bool recursive = false) const;
+
     IntVector2 ScreenToElement(const IntVector2& screenPosition);
     IntVector2 ElementToScreen(const IntVector2& position);
     bool IsInside(IntVector2 position, bool isScreen);
@@ -221,14 +231,6 @@ class UIElement : public Animatable
     TraversalMode GetTraversalMode() const;
     bool IsElementEventSender() const;
     UIElement* GetElementEventSender() const;
-    void AddTag(const String tag);
-    void ClearTags();
-    bool RemoveTag(const String tag);
-    bool HasTag(const String tag) const;
-    const StringVector& GetTags() const;
-
-    // void GetChildrenWithTag(PODVector<UIElement*>& dest, const String& tag, bool recursive = false) const;
-    tolua_outside const PODVector<UIElement*>& UIElementGetChildrenWithTag @ GetChildrenWithTag(const String& tag, bool recursive = false) const; 
 
     tolua_readonly tolua_property__get_set IntVector2& screenPosition;
     tolua_property__get_set String name;

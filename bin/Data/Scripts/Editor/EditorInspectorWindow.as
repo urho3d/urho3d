@@ -672,7 +672,7 @@ void HandleTagsEdit(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ lineEdit = eventData["Element"].GetPtr();
     Array<String> tags = lineEdit.text.Split(';');
-    editUIElement.ClearTags();
+    editUIElement.RemoveAllTags();
     for (uint i = 0; i < tags.length; i++)
         editUIElement.AddTag(tags[i]);
 }
