@@ -95,10 +95,20 @@ public:
     bool SaveJSON(Serializer& dest, const String& indentation = "\t") const;
     /// Set name of the scene node. Names are not required to be unique.
     void SetName(const String& name);
-	/// Set tag for the scene node. 
-	void SetTag(const StringHash& tag);
-	/// Set tag string for the scene node. 
-	void SetTagString(const String& tag);
+
+	/// Set Tags, overrites old tags.
+	void SetTags(const StringVector& tags);
+	/// Add tag. 
+	void AddTag(const String& tag);
+	/// Add tags. 
+	void AddTags(const String& tags, char s = ',');
+	/// Add tags.
+	void AddTags(const StringVector& tags);
+	/// Remove Tag.
+	void RemoveTag(const String& tag);
+	/// Remove all Tags.
+	void RemoveAllTags();
+
 	/// Set position in parent space. If the scene node is on the root level (is child of the scene itself), this is same as world space.
     void SetPosition(const Vector3& position);
 
@@ -309,10 +319,8 @@ public:
     /// Return name hash.
     StringHash GetNameHash() const { return nameHash_; }
 
-	/// Return the tag.
-	const StringHash& GetTag() const;
-	/// Return the tag as a string.
-	const String& GetTagString() const;
+	/// Return the tags.
+	const StringVector& GetTags() const { return tags_; }
     /// Return parent scene node.
     Node* GetParent() const { return parent_; }
 
@@ -468,7 +476,7 @@ public:
     /// Return child scene nodes with a specific component.
     void GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive = false) const;
 	/// Return child scene nodes with a specific tag.
-	void GetChildrenWithTag(PODVector<Node*>& dest, StringHash tag, bool recursive = false) const;
+	void GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive = false) const;
 
 	/// Return child scene node by index.
     Node* GetChild(unsigned index) const;
@@ -497,7 +505,7 @@ public:
     /// Return whether has a specific component.
     bool HasComponent(StringHash type) const;
 	/// Return whether has a specific tag.
-	bool HasTag(StringHash tag) const;
+	bool HasTag(const String& tag) const;
     /// Return listener components.
     const Vector<WeakPtr<Component> > GetListeners() const { return listeners_; }
 
@@ -608,7 +616,7 @@ private:
     /// Return child nodes with a specific component recursively.
     void GetChildrenWithComponentRecursive(PODVector<Node*>& dest, StringHash type) const;
 	/// Return child nodes with a specific tag recursively.
-	void GetChildrenWithTagRecursive(PODVector<Node*>& dest, StringHash tag) const;
+	void GetChildrenWithTagRecursive(PODVector<Node*>& dest, const String& tag) const;
 	/// Return specific components recursively.
     void GetComponentsRecursive(PODVector<Component*>& dest, StringHash type) const;
     /// Clone node recursively.
@@ -652,10 +660,8 @@ private:
     Connection* owner_;
     /// Name.
     String name_;
-	/// Tag.
-	StringHash tag_;
 	/// Tag String.
-	String tagString_;
+	StringVector tags_;
     /// Name hash.
     StringHash nameHash_;
     /// Attribute buffer for network updates.

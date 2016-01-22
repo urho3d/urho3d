@@ -165,19 +165,13 @@ public:
     void UnregisterVar(const String& name);
     /// Clear all registered node user variable hash reverse mappings.
     void UnregisterAllVars();
-	/// Register a node Tag.
-	void RegisterTag(const String& name);
-	/// Unregister a node Tag and if set remove Tag from nodes.
-	void UnregisterTag(const String& name);
-	/// Clear all registered node Tag.
-	void UnregisterAllTags();
 
     /// Return node from the whole scene by ID, or null if not found.
     Node* GetNode(unsigned id) const;
     /// Return component from the whole scene by ID, or null if not found.
     Component* GetComponent(unsigned id) const;
 	/// Get nodes with specific tag from the whole scene, return false if empty.
-	bool GetNodesWithTag(PODVector<Node*>& dest, StringHash tag)  const;
+	bool GetNodesWithTag(PODVector<Node*>& dest, const String& tag)  const;
 	
 	/// Return whether updates are enabled.
 	bool IsUpdateEnabled() const { return updateEnabled_; }
@@ -217,8 +211,6 @@ public:
 
 	/// Return a node user variable name, or empty if not registered.
 	const String& GetVarName(StringHash hash) const;
-	/// Return a node tag name, or empty if not registered.
-	const String& GetTagName(StringHash tag) const;
 
     /// Update scene. Called by HandleUpdate.
     void Update(float timeStep);
@@ -236,8 +228,12 @@ public:
     unsigned GetFreeNodeID(CreateMode mode);
     /// Get free component ID, either non-local or local.
     unsigned GetFreeComponentID(CreateMode mode);
+
+	/// Cache node by tag if tag not zero, no checking if already added. Used internaly in Node::AddTag.
+	void NodeTagAdded(Node* node, const String& tag);
 	/// Cache node by tag if tag not zero.
-	void NodeTagChanged(Node* node, StringHash oldTag);
+	void NodeTagRemoved(Node* node, const String& tag);
+
     /// Node added. Assign scene pointer and add to ID map.
     void NodeAdded(Node* node);
     /// Node removed. Remove from ID map.
@@ -250,10 +246,6 @@ public:
     void SetVarNamesAttr(const String& value);
     /// Return node user variable reverse mappings.
     String GetVarNamesAttr() const;
-	/// Set node tag reverse mappings.
-	void SetTagNamesAttr(const String& value);
-	/// Return node tag reverse mappings.
-	String GetTagNamesAttr() const;
     /// Prepare network update by comparing attributes and marking replication states dirty as necessary.
     void PrepareNetworkUpdate();
     /// Clean up all references to a network connection that is about to be removed.
@@ -305,8 +297,6 @@ private:
     Vector<SharedPtr<PackageFile> > requiredPackageFiles_;
     /// Registered node user variable reverse mappings.
     HashMap<StringHash, String> varNames_;
-	/// Registered node tag reverse mappings.
-	HashMap<StringHash, String> tagNames_;
     /// Nodes to check for attribute changes on the next network update.
     HashSet<unsigned> networkUpdateNodes_;
     /// Components to check for attribute changes on the next network update.
