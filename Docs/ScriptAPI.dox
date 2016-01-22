@@ -553,6 +553,16 @@ namespace Urho3D
 - %Scene : Scene pointer
 - %Node : Node pointer
 
+### NodeTagAdded
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %Tag : String tag
+
+### NodeTagRemoved
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %Tag : String tag
+
 ### ComponentEnabledChanged
 - %Scene : Scene pointer
 - %Node : Node pointer
@@ -1569,6 +1579,7 @@ namespace Urho3D
 ### Node
 - %Is %Enabled : bool
 - %Name : String
+- %Tags : StringVector
 - %Position : Vector3
 - %Rotation : Quaternion
 - %Scale : Vector3
@@ -3132,9 +3143,9 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -3172,6 +3183,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -3348,9 +3360,9 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -3388,6 +3400,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -3633,9 +3646,9 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -3673,6 +3686,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -5584,9 +5598,9 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DefineShape(CursorShape, Texture@, const IntRect&, const IntVector2&)
 - void DefineShape(const String&, Texture@, const IntRect&, const IntVector2&)
@@ -5626,6 +5640,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -6335,9 +6350,9 @@ Methods:
 - void AddChild(UIElement@)
 - void AddItem(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -6378,6 +6393,7 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllItems()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -7407,9 +7423,9 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -7447,6 +7463,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -7594,11 +7611,11 @@ Methods:
 - void AddItem(UIElement@)
 - void AddSelection(uint)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - void ChangeSelection(int, bool)
 - void ClearSelection()
-- void ClearTags()
 - void CopySelectedItemsToClipboard()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
@@ -7644,6 +7661,7 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllItems()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -8018,9 +8036,9 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -8058,6 +8076,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -8578,6 +8597,8 @@ Properties:
 Methods:
 
 - void AddChild(Node@, uint = M_MAX_UNSIGNED)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - Node@ Clone(CreateMode = REPLICATED)
 - Component@ CloneComponent(Component@, CreateMode, uint = 0)
@@ -8597,6 +8618,7 @@ Methods:
 - Node@[]@ GetChildrenWithComponent(const String&, bool = false) const
 - Node@[]@ GetChildrenWithScript(bool = false) const
 - Node@[]@ GetChildrenWithScript(const String&, bool = false) const
+- Node@[]@ GetChildrenWithTag(const String&, bool = false) const
 - Component@ GetComponent(const String&, bool = false) const
 - Component@[]@ GetComponents() const
 - Component@[]@ GetComponents(const String&, bool = false) const
@@ -8608,6 +8630,7 @@ Methods:
 - bool HasComponent(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -8622,6 +8645,7 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllComponents()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(Node@)
 - void RemoveChildren(bool, bool, bool)
@@ -8631,6 +8655,7 @@ Methods:
 - void RemoveComponents(const String&)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - void Roll(float, TransformSpace = TS_LOCAL)
@@ -8712,6 +8737,7 @@ Properties:
 - Vector2 scale2D
 - Scene@ scene // readonly
 - ScriptObject@ scriptObject // readonly
+- String[]@ tags // readonly
 - bool temporary
 - Matrix3x4 transform // readonly
 - StringHash type // readonly
@@ -10097,6 +10123,8 @@ Methods:
 
 - void AddChild(Node@, uint = M_MAX_UNSIGNED)
 - void AddRequiredPackageFile(PackageFile@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void Clear(bool = true, bool = true)
 - void ClearRequiredPackageFiles()
@@ -10117,12 +10145,14 @@ Methods:
 - Node@[]@ GetChildrenWithComponent(const String&, bool = false) const
 - Node@[]@ GetChildrenWithScript(bool = false) const
 - Node@[]@ GetChildrenWithScript(const String&, bool = false) const
+- Node@[]@ GetChildrenWithTag(const String&, bool = false) const
 - Component@ GetComponent(const String&, bool = false) const
 - Component@ GetComponent(uint) const
 - Component@[]@ GetComponents() const
 - Component@[]@ GetComponents(const String&, bool = false) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - Node@ GetNode(uint) const
+- Node@[]@ GetNodesWithTag(const String&) const
 - Component@ GetOrCreateComponent(const String&, CreateMode = REPLICATED, uint = 0)
 - Component@ GetParentComponent(const String&, bool = false) const
 - ScriptObject@ GetScriptObject() const
@@ -10130,6 +10160,7 @@ Methods:
 - bool HasComponent(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&)
 - Node@ Instantiate(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ Instantiate(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateJSON(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
@@ -10160,6 +10191,7 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllComponents()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(Node@)
 - void RemoveChildren(bool, bool, bool)
@@ -10169,6 +10201,7 @@ Methods:
 - void RemoveComponents(const String&)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetToDefault()
 - void Roll(float, TransformSpace = TS_LOCAL)
 - void Rotate(const Quaternion&, TransformSpace = TS_LOCAL)
@@ -10262,6 +10295,7 @@ Properties:
 - ScriptObject@ scriptObject // readonly
 - float smoothingConstant
 - float snapThreshold
+- String[]@ tags // readonly
 - bool temporary
 - float timeScale
 - Matrix3x4 transform // readonly
@@ -10414,10 +10448,10 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - void ChangeValue(float)
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -10455,6 +10489,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -10592,9 +10627,9 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -10632,6 +10667,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -10946,10 +10982,10 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - void ChangeValue(float)
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -10987,6 +11023,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -11556,9 +11593,9 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
@@ -11591,6 +11628,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -12276,10 +12314,10 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - void ClearSelection()
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -12317,6 +12355,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -13003,9 +13042,9 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -13043,6 +13082,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -13237,9 +13277,9 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -13277,6 +13317,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -13677,9 +13718,9 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -13718,6 +13759,7 @@ Methods:
 - void QueueUpdate()
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -13913,9 +13955,9 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
-- void ClearTags()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void DisableLayoutUpdate()
 - IntVector2 ElementToScreen(const IntVector2&)
@@ -13953,6 +13995,7 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
