@@ -157,22 +157,6 @@ URHO3D_EVENT(E_NODEENABLEDCHANGED, NodeEnabledChanged)
 }
 
 /// A node's tag has changed.
-URHO3D_EVENT(E_NODETAGADDED, NodeTagAdded)
-{
-	URHO3D_PARAM(P_SCENE, Scene);					// Scene pointer
-	URHO3D_PARAM(P_NODE, Node);						// Node pointer
-	URHO3D_PARAM(P_TAG, Tag);						// String
-}
-
-/// A node's tag has changed.
-URHO3D_EVENT(E_NODETAGREMOVED, NodeTagRemoved)
-{
-	URHO3D_PARAM(P_SCENE, Scene);					// Scene pointer
-	URHO3D_PARAM(P_NODE, Node);						// Node pointer
-	URHO3D_PARAM(P_TAG, Tag);						// String
-}
-
-/// A node's tag has changed.
 URHO3D_EVENT(E_NODETAGCHANGED, NodeTagChanged)
 {
 	URHO3D_PARAM(P_SCENE, Scene);					// Scene pointer
@@ -180,6 +164,7 @@ URHO3D_EVENT(E_NODETAGCHANGED, NodeTagChanged)
 	URHO3D_PARAM(P_TAG, Tag);						// StringHash tag
 	URHO3D_PARAM(P_OLDTAG, Tag);					// StringHash tag
 }
+
 /// A component's enabled state has changed.
 URHO3D_EVENT(E_COMPONENTENABLEDCHANGED, ComponentEnabledChanged)
 {

@@ -59,8 +59,7 @@ Node::Node(Context* context) :
     rotation_(Quaternion::IDENTITY),
     scale_(Vector3::ONE),
     worldRotation_(Quaternion::IDENTITY),
-    owner_(0),
-	tagMask_(0)
+    owner_(0)
 {
 }
 
@@ -80,7 +79,6 @@ void Node::RegisterObject(Context* context)
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_DEFAULT);
-	URHO3D_ACCESSOR_ATTRIBUTE("TagMask", GetTagMask, SetTagMask, unsigned, 0, AM_DEFAULT | AM_NOEDIT);
 	URHO3D_ACCESSOR_ATTRIBUTE("Tag", GetTag, SetTag, StringHash, StringHash::ZERO, AM_DEFAULT | AM_NOEDIT);
 	URHO3D_ACCESSOR_ATTRIBUTE("TagString", GetTagString, SetTagString, String, String::EMPTY, AM_FILE | AM_EDIT);
 	URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE);
@@ -1240,35 +1238,6 @@ bool Node::HasComponent(StringHash type) const
 bool Node::HasTag(StringHash tag) const
 {
 	return tag_ == tag;
-}
-
-bool Node::AddTags(const String & tags, char split)
-{
-	if(!scene_)
-		return false;
-	return scene_->AddNodeTags(this,tags,split);
-}
-
-bool Node::AddTag(const String & tag)
-{
-	if (!scene_)
-		return false;
-	return scene_->AddNodeTag(this, tag);
-}
-
-bool Node::RemoveTag(const String & tag)
-{
-	if (!scene_)
-		return false;
-	return scene_->RemoveNodeTag(this, tag);
-}
-
-void Node::SetTagMask(unsigned mask)
-{
-	if (tagMask_ != mask)
-		return;
-	tagMask_ = mask;
-	MarkNetworkUpdate();
 }
 
 const StringHash& Node::GetTag() const
