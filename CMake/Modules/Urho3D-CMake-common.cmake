@@ -520,9 +520,7 @@ if (URHO3D_C++11)
             endif ()
         endif ()
     elseif (CMAKE_CXX_COMPILER_ID MATCHES Clang)
-        # Cannot set CMAKE_CXX_FLAGS here directly because CMake uses the same flags for both C++ and Object-C languages, the latter does not support c++11 standard
-        # Workaround the problem by setting the compiler flags in the source properties for C++ language only in the setup_target() macro
-        set (CLANG_CXX_FLAGS -std=c++11)
+        set (CMAKE_CXX_FLAGS -std=c++11)
     elseif (MSVC80)
         message (FATAL_ERROR "Your MSVC version is too told to enable C++11 standard")
     endif ()
@@ -1015,15 +1013,6 @@ macro (setup_target)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND mkdir -p ${DIRECTORY} && ln -sf $<TARGET_FILE:${TARGET_NAME}> ${DIRECTORY}/$<TARGET_FILE_NAME:${TARGET_NAME}>
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/build)
-    endif ()
-
-    # Workaround CMake problem of sharing CMAKE_CXX_FLAGS for both C++ and Objective-C languages
-    if (CLANG_CXX_FLAGS)
-        foreach (FILE ${SOURCE_FILES})
-            if (FILE MATCHES \\.cpp$|\\.cc$)
-                set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " ${CLANG_CXX_FLAGS}")
-            endif ()
-        endforeach ()
     endif ()
 endmacro ()
 
