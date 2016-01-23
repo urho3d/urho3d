@@ -118,10 +118,11 @@ before_script:
   # For some reason clang compiler toolchain installation in Travis CI VM does not have symlink in the ccache symlinks directory, so workaround it
   - if [ "$CC"  == "clang" ]; then ln -s $(which ccache) $HOME/clang && ln -s $(which ccache) $HOME/clang++ && export PATH=$HOME:$PATH; fi
   - rake ci_setup_cache
-script: ELAPSED=$SECONDS rake ci && if [ $SITE_UPDATE ]; then rake ci_site_update; fi && if [ $PACKAGE_UPLOAD ]; then ELAPSED=$SECONDS rake ci_package_upload && if [ $LINUX ] && [ ! "$URHO3D_64BIT" == "0" ]; then ELAPSED=$SECONDS rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi
-after_script:
-  - rake ci_teardown_cache
+script:
+  - ELAPSED=$SECONDS rake ci && if [ $PACKAGE_UPLOAD ]; then ELAPSED=$SECONDS rake ci_package_upload && if [ $LINUX ] && [ ! "$URHO3D_64BIT" == "0" ]; then ELAPSED=$SECONDS rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi
   - if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_create_mirrors; fi
+  - if [ $SITE_UPDATE ]; then ELAPSED=$SECONDS rake ci_site_update; fi
+after_script: rake ci_teardown_cache
 notifications: {email: {on_success: never, on_failure: change}}
 
 ---
