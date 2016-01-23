@@ -126,7 +126,7 @@ notifications: {email: {on_success: never, on_failure: change}}
 
 ---
 
-branch: {name: Coverity-Scan, active: no}
+branch: {name: Coverity-Scan, active: no, mandatory: yes}
 language: cpp
 compiler: gcc
 cache: ccache
@@ -308,7 +308,7 @@ after_script: rake ci_teardown_cache
 
 ---
 
-branch: {name: OSX-CI, active: yes}
+branch: {name: OSX-CI, active: yes, mandatory: yes}
 language: objective-c
 osx_image: xcode7.1
 env:
