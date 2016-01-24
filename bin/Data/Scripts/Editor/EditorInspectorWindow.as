@@ -35,7 +35,9 @@ const uint LUASCRIPTINSTANCE_ATTRIBUTE_IGNORE = 4;
 VariantMap globalVarNames;
 Array<String> tagsMenuSelection = { "Player", 
                                     "MainCamera", 
-                                    "Respawn", 
+                                    "Respawn",
+                                    "Start",
+                                    "Finish", 
                                     "Trigger", 
                                     "Enemy", 
                                     "Movable", 
@@ -43,15 +45,14 @@ Array<String> tagsMenuSelection = { "Player",
                                     "Animation",
                                     "Sound",
                                     "Logic",
-                                    "Empty",
-                                    "Dummy",
                                     "AnimatedMaterial",
-                                    "InitThis",
                                     "Path",
                                     "Checkpoint",
                                     "Group",
                                     "InstantiatePlace",
                                     "Effect",
+                                    "Ignored",
+                                    "Empty",
                                     "NonTagged"};
 
 bool inspectorLocked = false;
