@@ -729,11 +729,12 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
         
         Array<String> tags = editorScene.tags; 
         Array<UIElement@> actions;
-        
         // At first add tags from Scene.tags (In this scenario Scene.tags used as storage for frequently used tags in whole Scene)
         for (int i =0; i < tags.length; i++) 
         {
-            actions.Push(CreateContextMenuItem(tags[i], "HandleTagsMenuSelection", tags[i]));
+            bool isHasTag = editNode.HasTag(tags[i]);
+            String taggegIndicator = (isHasTag ? "! " : "   ");
+            actions.Push(CreateContextMenuItem(taggegIndicator + tags[i], "HandleTagsMenuSelection", tags[i]));
         }
 
         if (tags.length > 0)        
@@ -742,7 +743,9 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
         // At the second pass add std tags names
         for (int i=0; i<tagsMenuSelection.length; i++) 
         {
-            actions.Push(CreateContextMenuItem(tagsMenuSelection[i], "HandleTagsMenuSelection", tagsMenuSelection[i]));
+            bool isHasTag = editNode.HasTag(tagsMenuSelection[i]);
+            String taggegIndicator = (isHasTag ? "! " : "");
+            actions.Push(CreateContextMenuItem(taggegIndicator + tagsMenuSelection[i], "HandleTagsMenuSelection", tagsMenuSelection[i]));
         }
 
         actions.Push(CreateContextMenuItem(" ", "HandleTagsMenuSelectionDivisor"));
@@ -781,7 +784,7 @@ void HandleTagsMenuSelection()
             if (editNode.HasTag(menuSelectedTag)) 
             {
                 editNode.RemoveTag(menuSelectedTag.Trimmed());
-                MessageBox("" + menuSelectedTag.Trimmed() + " has been removed from " + editNode.name);
+                MessageBox("" + menuSelectedTag.Trimmed() + " has been removed from " + editNode.name, "Info");
             }
         }
         else
@@ -789,11 +792,11 @@ void HandleTagsMenuSelection()
             if (!editNode.HasTag(menuSelectedTag)) 
             {
                 editNode.AddTag(menuSelectedTag.Trimmed());
-                MessageBox("" + menuSelectedTag.Trimmed() + " added into " + editNode.name);
+                MessageBox("" + menuSelectedTag.Trimmed() + " added into " + editNode.name, "Info");
             }
             else 
             {
-                MessageBox("Already tagged with " + menuSelectedTag);
+                MessageBox("Already tagged with " + menuSelectedTag, "Info");
             }
         }
         UpdateAttributeInspector();
