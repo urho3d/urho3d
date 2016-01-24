@@ -27,8 +27,5 @@ project (Urho3D-Extras)
 find_package (Urho3D REQUIRED)
 include_directories (${URHO3D_INCLUDE_DIRS})
 
-# All tools must be natively built and output to bin/tool subdir to differentiate them from target platfrom binaries in the bin directory
-set_tool_output_directories ()
-
 # Urho3D extras
 add_subdirectory (OgreBatchConverter)

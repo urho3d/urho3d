@@ -27,4 +27,4 @@ set (TARGET_NAME Annotator)
 define_source_files ()
 
 # Setup target
-setup_executable (NODEPS)
+setup_executable (TOOL NODEPS)

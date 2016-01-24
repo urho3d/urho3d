@@ -27,4 +27,4 @@ set (TARGET_NAME ScriptCompiler)
 define_source_files ()
 
 # Setup target
-setup_executable ()
+setup_executable (TOOL)

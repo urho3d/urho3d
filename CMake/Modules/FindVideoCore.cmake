@@ -22,9 +22,9 @@
 
 # Find Broadcom VideoCore firmware installation
 #
-#  BCM_VC_FOUND
-#  BCM_VC_INCLUDE_DIRS
-#  BCM_VC_LIBRARIES
+#  VIDEOCORE_FOUND
+#  VIDEOCORE_INCLUDE_DIRS
+#  VIDEOCORE_LIBRARIES
 #
 
 # Only need to cater for raspbian as they are not in CMAKE_SYSTEM_PATH
@@ -32,7 +32,7 @@ set (BCM_VC_INC_SEARCH_PATH /opt/vc/include)
 set (BCM_VC_LIB_SEARCH_PATH /opt/vc/lib)
 
 # Assume all the other headers are installed at same relative path as bcm_host.h
-find_path (BCM_VC_INCLUDE_DIRS bcm_host.h PATHS ${BCM_VC_INC_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore include directory")
+find_path (VIDEOCORE_INCLUDE_DIRS bcm_host.h PATHS ${BCM_VC_INC_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore include directory")
 
 # Assume all the other libs are installed at the same relative path as libbcm_host.so
 find_library (BCM_VC_LIB_BCM_HOST bcm_host PATHS ${BCM_VC_LIB_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore BCM_HOST library directory")
@@ -40,10 +40,10 @@ find_library (BCM_VC_LIB_EGL EGL PATHS ${BCM_VC_LIB_SEARCH_PATH} PATH_SUFFIXES v
 find_library (BCM_VC_LIB_GLES2 GLESv2 PATHS ${BCM_VC_LIB_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore GLESv2 library directory")
 
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (BCM_VC REQUIRED_VARS BCM_VC_LIB_BCM_HOST BCM_VC_LIB_EGL BCM_VC_LIB_GLES2 BCM_VC_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find Broadcom VideoCore firmware")
-if (BCM_VC_FOUND)
-    list (APPEND BCM_VC_INCLUDE_DIRS ${BCM_VC_INCLUDE_DIRS}/interface/vcos/pthreads)  # Note: variable change to list context after this
-    set (BCM_VC_LIBRARIES ${BCM_VC_LIB_BCM_HOST} ${BCM_VC_LIB_EGL} ${BCM_VC_LIB_GLES2})
+find_package_handle_standard_args (VideoCore REQUIRED_VARS BCM_VC_LIB_BCM_HOST BCM_VC_LIB_EGL BCM_VC_LIB_GLES2 VIDEOCORE_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find Broadcom VideoCore firmware")
+if (VIDEOCORE_FOUND)
+    list (APPEND VIDEOCORE_INCLUDE_DIRS ${VIDEOCORE_INCLUDE_DIRS}/interface/vcos/pthreads)  # Note: variable change to list context after this
+    set (VIDEOCORE_LIBRARIES ${BCM_VC_LIB_BCM_HOST} ${BCM_VC_LIB_EGL} ${BCM_VC_LIB_GLES2})
 endif ()
 
-mark_as_advanced (BCM_VC_INCLUDE_DIRS BCM_VC_LIBRARIES BCM_VC_LIB_BCM_HOST BCM_VC_LIB_EGL BCM_VC_LIB_GLES2)
+mark_as_advanced (VIDEOCORE_INCLUDE_DIRS VIDEOCORE_LIBRARIES BCM_VC_LIB_BCM_HOST BCM_VC_LIB_EGL BCM_VC_LIB_GLES2)

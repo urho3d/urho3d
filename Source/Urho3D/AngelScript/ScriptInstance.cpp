@@ -29,9 +29,8 @@
 #include "../Core/Profiler.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
 #include "../Physics/PhysicsEvents.h"
-#include "../Physics/PhysicsWorld.h"
 #endif
 #include "../Resource/ResourceCache.h"
 #include "../Resource/ResourceEvents.h"
@@ -501,7 +500,7 @@ void ScriptInstance::OnSceneSet(Scene* scene)
     {
         UnsubscribeFromEvent(E_SCENEUPDATE);
         UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
         UnsubscribeFromEvent(E_PHYSICSPRESTEP);
         UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
 #endif
@@ -700,10 +699,11 @@ void ScriptInstance::UpdateEventSubscription()
             if (methods_[METHOD_POSTUPDATE])
                 SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(ScriptInstance, HandleScenePostUpdate));
 
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
             if (methods_[METHOD_FIXEDUPDATE] || methods_[METHOD_FIXEDPOSTUPDATE])
             {
-                PhysicsWorld* world = scene->GetOrCreateComponent<PhysicsWorld>();
+                Component* world = GetFixedUpdateSource();
+
                 if (world)
                 {
                     if (methods_[METHOD_FIXEDUPDATE])
@@ -732,8 +732,9 @@ void ScriptInstance::UpdateEventSubscription()
         if (subscribedPostFixed_)
         {
             UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
-#ifdef URHO3D_PHYSICS
-            PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
+
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
+            Component* world = GetFixedUpdateSource();
             if (world)
             {
                 UnsubscribeFromEvent(world, E_PHYSICSPRESTEP);
@@ -808,7 +809,7 @@ void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
     scriptFile_->Execute(scriptObject_, methods_[METHOD_POSTUPDATE], parameters);
 }
 
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
 
 void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
 {

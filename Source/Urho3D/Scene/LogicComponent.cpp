@@ -23,9 +23,8 @@
 #include "../Precompiled.h"
 
 #include "../IO/Log.h"
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
 #include "../Physics/PhysicsEvents.h"
-#include "../Physics/PhysicsWorld.h"
 #endif
 #include "../Scene/LogicComponent.h"
 #include "../Scene/Scene.h"
@@ -98,7 +97,7 @@ void LogicComponent::OnSceneSet(Scene* scene)
     {
         UnsubscribeFromEvent(E_SCENEUPDATE);
         UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
         UnsubscribeFromEvent(E_PHYSICSPRESTEP);
         UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
 #endif
@@ -138,8 +137,8 @@ void LogicComponent::UpdateEventSubscription()
         currentEventMask_ &= ~USE_POSTUPDATE;
     }
 
-#ifdef URHO3D_PHYSICS
-    PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
+    Component* world = GetFixedUpdateSource();
     if (!world)
         return;
 
@@ -200,7 +199,7 @@ void LogicComponent::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
     PostUpdate(eventData[P_TIMESTEP].GetFloat());
 }
 
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
 
 void LogicComponent::HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
 {

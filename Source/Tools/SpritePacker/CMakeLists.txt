@@ -29,4 +29,4 @@ define_source_files ()
 include_directories(../../ThirdParty/STB)
 
 # Setup target
-setup_executable ()
+setup_executable (TOOL)

@@ -3665,6 +3665,10 @@ Methods:
 - bool SaveXML(File* dest, const String indentation = "\t") const
 - bool SaveJSON(File* dest, const String indentation = "\t") const
 - void SetName(const String name)
+- void AddTag(const String tag)
+- void AddTags(const String tags, char separator)
+- bool RemoveTag(const String tag)
+- void RemoveAllTags()
 - void SetPosition(const Vector3& position)
 - void SetPosition2D(const Vector2& position)
 - void SetPosition2D(float x, float y)
@@ -3797,6 +3801,9 @@ Methods:
 - bool LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
 - Node* CreateChild(unsigned id, CreateMode mode)
 - void AddComponent(Component* component, unsigned id, CreateMode mode)
+- bool HasTag(const String tag) const
+- const StringVector& GetTags() const
+- const PODVector<Node*>& GetChildrenWithTag(const String tag, bool recursive = false) const
 
 Properties:
 
@@ -5123,6 +5130,7 @@ Methods:
 - void MarkNetworkUpdate(Node* node)
 - void MarkNetworkUpdate(Component* component)
 - void MarkReplicationDirty(Node* node)
+- const PODVector<Node*>& GetNodesWithTag(const String tag) const
 
 Properties:
 
@@ -6406,6 +6414,10 @@ Methods:
 - void SetInternal(bool enable)
 - void SetTraversalMode(TraversalMode traversalMode)
 - void SetElementEventSender(bool flag)
+- void AddTag(const String tag)
+- void AddTags(const String tags, char separator)
+- bool RemoveTag(const String tag)
+- void RemoveAllTags()
 - const String GetName() const
 - const IntVector2& GetPosition() const
 - const IntVector2& GetSize() const
@@ -6461,6 +6473,9 @@ Methods:
 - const Color& GetDerivedColor() const
 - const Variant& GetVar(StringHash key) const
 - const VariantMap& GetVars() const
+- bool HasTag(const String tag) const
+- const StringVector& GetTags() const
+- const PODVector<UIElement*>& GetChildrenWithTag(const String tag, bool recursive = false) const
 - IntVector2 ScreenToElement(const IntVector2& screenPosition)
 - IntVector2 ElementToScreen(const IntVector2& position)
 - bool IsInside(IntVector2 position, bool isScreen)

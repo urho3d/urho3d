@@ -76,8 +76,5 @@ if (NOT MSVC)
 endif ()
 set (INCLUDE_DIRS ../../include ../../../../ThirdParty/Lua${JIT}/src)
 
-# All tools must be natively built and output to bin/tool subdir to differentiate them from target platfrom binaries in the bin directory
-set_tool_output_directories ()
-
 # Setup target
-setup_executable (NODEPS)
+setup_executable (TOOL NODEPS)

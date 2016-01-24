@@ -30,6 +30,7 @@
 #cmakedefine URHO3D_DATABASE_ODBC
 #cmakedefine URHO3D_DATABASE_SQLITE
 #cmakedefine URHO3D_LUAJIT
+#cmakedefine URHO3D_TESTING
 
 #ifdef @STATIC_DEFINE@
 #  define @EXPORT_MACRO_NAME@

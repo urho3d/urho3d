@@ -24,22 +24,12 @@
 
 #include "../Core/Object.h"
 
+// For prestep / poststep events, which are the same for 2D and 3D physics. The events themselves don't depend
+// on whether 3D physics support or Bullet has been compiled in.
+#include "../Physics/PhysicsEvents.h"
+
 namespace Urho3D
 {
-
-/// Physics world is about to be stepped.
-URHO3D_EVENT(E_PHYSICSPRESTEP2D, PhysicsPreStep2D)
-{
-    URHO3D_PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
-    URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
-}
-
-/// Physics world has been stepped.
-URHO3D_EVENT(E_PHYSICSPOSTSTEP2D, PhysicsPostStep2D)
-{
-    URHO3D_PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
-    URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
-}
 
 /// Physics begin contact.
 URHO3D_EVENT(E_PHYSICSBEGINCONTACT2D, PhysicsBeginContact2D)

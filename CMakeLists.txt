@@ -69,7 +69,6 @@ elseif (URHO3D_64BIT)
 endif ()
 set (DEST_INCLUDE_DIR include/Urho3D)    # The include directory path contains the 'Urho3D' suffix regardless of PATH_SUFFIX variable
 set (DEST_SHARE_DIR share/${PATH_SUFFIX})
-set (DEST_RUNTIME_DIR bin)
 set (DEST_BUNDLE_DIR ${DEST_SHARE_DIR}/Applications)
 # Note to package maintainer: ${PATH_SUFFIX} for library could be removed if the extra path is not desired, but if so then the RPATH setting in Source's CMakeLists.txt needs to be adjusted accordingly
 set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/${PATH_SUFFIX})
@@ -78,7 +77,7 @@ set (SYSROOT ${ANDROID_TOOLCHAIN_ROOT} ${RPI_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYS
 set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 # Install application launcher scripts
 file (GLOB APP_SCRIPTS ${CMAKE_SOURCE_DIR}/bin/*${SCRIPT_EXT})
-install (PROGRAMS ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR})
+install (PROGRAMS ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR})   # DEST_RUNTIME_DIR variable is set by the set_output_directories() macro call in the Urho3D-CMake-common module
 # Install resource directories required by applications built with Urho3D library
 install (DIRECTORY ${CMAKE_SOURCE_DIR}/bin/CoreData ${CMAKE_SOURCE_DIR}/bin/Data DESTINATION ${DEST_SHARE_DIR}/Resources)
 # Install CMake modules and toolchains provided by and for Urho3D
