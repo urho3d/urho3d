@@ -733,7 +733,7 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
         for (int i =0; i < tags.length; i++) 
         {
             bool isHasTag = editNode.HasTag(tags[i]);
-            String taggedIndicator = (isHasTag ? "! " : "   ");
+            String taggedIndicator = (isHasTag ? "! " : "");
             actions.Push(CreateContextMenuItem(taggedIndicator + tags[i], "HandleTagsMenuSelection", tags[i]));
         }
 
