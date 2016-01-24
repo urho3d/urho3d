@@ -33,6 +33,26 @@ const uint LUASCRIPTINSTANCE_ATTRIBUTE_IGNORE = 4;
 
 // Node or UIElement hash-to-varname reverse mapping
 VariantMap globalVarNames;
+Array<String> tagsMenuSelection = { "Player", 
+                                    "MainCamera", 
+                                    "Respawn", 
+                                    "Trigger", 
+                                    "Enemy", 
+                                    "Movable", 
+                                    "Static", 
+                                    "Animation",
+                                    "Sound",
+                                    "Logic",
+                                    "Empty",
+                                    "Dummy",
+                                    "AnimatedMaterial",
+                                    "InitThis",
+                                    "Path",
+                                    "Checkpoint",
+                                    "Group",
+                                    "InstantiatePlace",
+                                    "Effect",
+                                    "NonTagged"};
 
 bool inspectorLocked = false;
 
@@ -78,6 +98,8 @@ UIElement@ GetNodeContainer()
     parentContainer.GetChild("TagsLabel", true).SetFixedWidth(LABEL_WIDTH);
     LineEdit@ tagEdit = parentContainer.GetChild("TagsEdit", true);
     SubscribeToEvent(tagEdit, "TextChanged", "HandleTagsEdit");
+    UIElement@ tagSelect = parentContainer.GetChild("TagsSelect", true);
+    SubscribeToEvent(tagSelect, "Released", "HandleTagsSelect");
     ++componentContainerStartIndex;
 
     return container;
@@ -122,6 +144,8 @@ UIElement@ GetUIElementContainer()
     SubscribeToEvent(styleList, "ItemSelected", "HandleStyleItemSelected");
     LineEdit@ tagEdit = parentContainer.GetChild("TagsEdit", true);
     SubscribeToEvent(tagEdit, "TextChanged", "HandleTagsEdit");
+    UIElement@ tagSelect = parentContainer.GetChild("TagsSelect", true);
+    SubscribeToEvent(tagSelect, "Released", "HandleTagsSelect");
     return container;
 }
 
@@ -681,17 +705,98 @@ void HandleTagsEdit(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ lineEdit = eventData["Element"].GetPtr();
     Array<String> tags = lineEdit.text.Split(';');
+    
     if (editUIElement !is null)
     {
         editUIElement.RemoveAllTags();
         for (uint i = 0; i < tags.length; i++)
-            editUIElement.AddTag(tags[i]);
+            editUIElement.AddTag(tags[i].Trimmed());
     }
     else if (editNode !is null)
     {
         editNode.RemoveAllTags();
         for (uint i = 0; i < tags.length; i++)
-            editNode.AddTag(tags[i]);
+            editNode.AddTag(tags[i].Trimmed());
+    }
+}
+
+void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
+{
+    UIElement@ tagSelect = eventData["Element"].GetPtr();
+    
+    if (editNode !is null)
+    {
+        
+        Array<String> tags = editorScene.tags; 
+        Array<UIElement@> actions;
+        
+        // At first add tags from Scene.tags (In this scenario Scene.tags used as storage for frequently used tags in whole Scene)
+        for (int i =0; i < tags.length; i++) 
+        {
+            actions.Push(CreateContextMenuItem(tags[i], "HandleTagsMenuSelection", tags[i]));
+        }
+
+        if (tags.length > 0)        
+            actions.Push(CreateContextMenuItem(" ", "HandleTagsMenuSelectionDivisor"));
+        
+        // At the second pass add std tags names
+        for (int i=0; i<tagsMenuSelection.length; i++) 
+        {
+            actions.Push(CreateContextMenuItem(tagsMenuSelection[i], "HandleTagsMenuSelection", tagsMenuSelection[i]));
+        }
+
+        actions.Push(CreateContextMenuItem(" ", "HandleTagsMenuSelectionDivisor"));
+        actions.Push(CreateContextMenuItem("Cancel", "HandleTagsMenuSelectionDivisor"));
+        
+        if (actions.length > 0) 
+        {
+            ActivateContextMenu(actions);
+        }
+    }
+}
+void HandleTagsMenuSelectionDivisor() 
+{
+    //do nothing
+}
+void HandleTagsMenuSelection() 
+{
+    if (editNode !is null)
+    {
+        Menu@ menu = GetEventSender();
+        if (menu is null)
+            return;
+            
+        String menuSelectedTag = menu.name;
+        bool isThisDeleteOp = input.keyDown[KEY_LALT];
+        
+        if (menuSelectedTag == "NonTagged")
+        {
+            editNode.RemoveAllTags();
+            UpdateAttributeInspector();
+            return;
+        }
+        
+        if (isThisDeleteOp) 
+        {
+            if (editNode.HasTag(menuSelectedTag)) 
+            {
+                editNode.RemoveTag(menuSelectedTag.Trimmed());
+                MessageBox("" + menuSelectedTag.Trimmed() + " has been removed from " + editNode.name);
+            }
+        }
+        else
+        {
+            if (!editNode.HasTag(menuSelectedTag)) 
+            {
+                editNode.AddTag(menuSelectedTag.Trimmed());
+                MessageBox("" + menuSelectedTag.Trimmed() + " added into " + editNode.name);
+            }
+            else 
+            {
+                MessageBox("Already tagged with " + menuSelectedTag);
+            }
+        }
+        UpdateAttributeInspector();
     }
 }
 
