@@ -33,28 +33,6 @@ const uint LUASCRIPTINSTANCE_ATTRIBUTE_IGNORE = 4;
 
 // Node or UIElement hash-to-varname reverse mapping
 VariantMap globalVarNames;
-Array<String> tagsMenuSelection = { "Player", 
-                                    "MainCamera", 
-                                    "Respawn",
-                                    "Start",
-                                    "Finish", 
-                                    "Trigger", 
-                                    "Enemy", 
-                                    "Movable", 
-                                    "Static", 
-                                    "Animation",
-                                    "Sound",
-                                    "Logic",
-                                    "AnimatedMaterial",
-                                    "Path",
-                                    "Checkpoint",
-                                    "Group",
-                                    "InstantiatePlace",
-                                    "Effect",
-                                    "Ignored",
-                                    "Empty",
-                                    "NonTagged"};
-
 bool inspectorLocked = false;
 
 void InitXMLResources()
@@ -727,28 +705,43 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
     
     if (editNode !is null)
     {
-        Array<String> tags = editorScene.tags; 
         Array<UIElement@> actions;
-        // At first add tags from Scene.tags (In this scenario Scene.tags used as storage for frequently used tags in whole Scene)
-        for (int i =0; i < tags.length; i++) 
-        {
-            bool isHasTag = editNode.HasTag(tags[i]);
-            String taggedIndicator = (isHasTag ? "! " : "");
-            actions.Push(CreateContextMenuItem(taggedIndicator + tags[i], "HandleTagsMenuSelection", tags[i]));
-        }
-
-        if (tags.length > 0)
-            actions.Push(CreateContextMenuItem(" ", "HandleTagsMenuSelectionDivisor"));
+        String Indicator = "* ";
         
-        // At the second pass add std tags names
-        for (int i=0; i<tagsMenuSelection.length; i++) 
+        // 1. Add established tags from Node to menu
+        Array<String> nodeTags = editNode.tags;
+        
+        for (int i =0; i < nodeTags.length; i++) 
         {
-            bool isHasTag = editNode.HasTag(tagsMenuSelection[i]);
-            String taggedIndicator = (isHasTag ? "! " : "");
-            actions.Push(CreateContextMenuItem(taggedIndicator + tagsMenuSelection[i], "HandleTagsMenuSelection", tagsMenuSelection[i]));
+            bool isHasTag = editNode.HasTag(nodeTags[i]);
+            String taggedIndicator = (isHasTag ? Indicator : "");
+            actions.Push(CreateContextMenuItem(taggedIndicator + nodeTags[i], "HandleTagsMenuSelection", nodeTags[i]));
+        }
+    
+        Array<String> sceneTags = editorScene.tags; 
+        
+        // 2. Add tags from Scene.tags (In this scenario Scene.tags used as storage for frequently used tags in current Scene only)
+        for (int i =0; i < sceneTags.length; i++) 
+        {
+            bool isHasTag = editNode.HasTag(sceneTags[i]);
+            String taggedIndicator = (isHasTag ? Indicator : "");
+            actions.Push(CreateContextMenuItem(taggedIndicator + sceneTags[i], "HandleTagsMenuSelection", sceneTags[i]));
         }
 
-        actions.Push(CreateContextMenuItem(" ", "HandleTagsMenuSelectionDivisor"));
+        // 3. Add default tags
+        Array<String> stdTags = defaultTags.Split(';');
+        for (int i=0; i<stdTags.length; i++) 
+        {
+            bool isHasTag = editNode.HasTag(stdTags[i]);
+            // Add this tag into menu if only Node not tadded with it yet, otherwise it showed on step 1.
+            if (!isHasTag) 
+            {
+                String taggedIndicator = (isHasTag ? Indicator : "");
+                actions.Push(CreateContextMenuItem(taggedIndicator + stdTags[i], "HandleTagsMenuSelection", stdTags[i]));
+            }
+        }
+
+        actions.Push(CreateContextMenuItem("Reset", "HandleTagsMenuSelection", "Reset"));
         actions.Push(CreateContextMenuItem("Cancel", "HandleTagsMenuSelectionDivisor"));
         
         if (actions.length > 0) 
@@ -772,7 +765,7 @@ void HandleTagsMenuSelection()
         String menuSelectedTag = menu.name;
         bool isThisDeleteOp = input.keyDown[KEY_LALT];
         
-        if (menuSelectedTag == "NonTagged")
+        if (menuSelectedTag == "Reset")
         {
             editNode.RemoveAllTags();
             UpdateAttributeInspector();
@@ -784,7 +777,6 @@ void HandleTagsMenuSelection()
             if (editNode.HasTag(menuSelectedTag)) 
             {
                 editNode.RemoveTag(menuSelectedTag.Trimmed());
-                //MessageBox("" + menuSelectedTag.Trimmed() + " has been removed from " + editNode.name, "Info");
             }
         }
         else
@@ -792,12 +784,10 @@ void HandleTagsMenuSelection()
             if (!editNode.HasTag(menuSelectedTag)) 
             {
                 editNode.AddTag(menuSelectedTag.Trimmed());
-                //MessageBox("" + menuSelectedTag.Trimmed() + " added into " + editNode.name, "Info");
             }
             else 
             {
                 editNode.RemoveTag(menuSelectedTag.Trimmed());
-                //MessageBox("Already tagged with " + menuSelectedTag, "Info");
             }
         }
         UpdateAttributeInspector();

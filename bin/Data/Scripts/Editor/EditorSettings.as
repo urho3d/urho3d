@@ -1,7 +1,7 @@
 // Urho3D editor settings dialog
-
 bool subscribedToEditorSettings = false;
 Window@ settingsDialog;
+String defaultTags;
 
 void CreateEditorSettingsDialog()
 {
@@ -117,6 +117,10 @@ void UpdateEditorSettingsDialog()
     cubemapName.text = cubeMapGen_Name;
     LineEdit@ cubemapSize = settingsDialog.GetChild("CubeMapGenSize", true);
     cubemapSize.text = String(cubeMapGen_Size);
+    
+    LineEdit@ defaultTagsEdit = settingsDialog.GetChild("DefaultTagsEdit", true);
+    defaultTagsEdit.text = defaultTags.Trimmed();
+    
 
     if (!subscribedToEditorSettings)
     {
@@ -170,6 +174,8 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(cubemapSize, "TextChanged",  "EditCubemapSize");
         SubscribeToEvent(cubemapSize, "TextFinished", "EditCubemapSize");
         
+        SubscribeToEvent(defaultTagsEdit, "TextFinished", "EditDefaultTags");
+              
         subscribedToEditorSettings = true;
     }
 }
@@ -430,4 +436,10 @@ void EditCubemapSize(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
     cubeMapGen_Size = edit.text.ToInt();
+}
+
+void EditDefaultTags(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ edit = eventData["Element"].GetPtr();
+    defaultTags = edit.text;
 }
