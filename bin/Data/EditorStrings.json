@@ -1390,5 +1390,8 @@
 		"ru":"Цвет",
 		"fr":"Couleur",
 		"it":"Colore"
+	},
+	"Tags":{
+		"en":"Tags"
 	}
 }

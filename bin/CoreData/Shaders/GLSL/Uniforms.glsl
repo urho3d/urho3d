@@ -23,6 +23,8 @@ uniform vec4 cGBufferOffsets;
 uniform vec3 cLightDir;
 uniform vec4 cLightPos;
 uniform mat4 cModel;
+uniform mat4 cView;
+uniform mat4 cViewInv;
 uniform mat4 cViewProj;
 uniform vec4 cUOffset;
 uniform vec4 cVOffset;
@@ -99,6 +101,8 @@ uniform CameraVS
     vec4 cDepthMode;
     vec3 cFrustumSize;
     vec4 cGBufferOffsets;
+    mat4 cView;
+    mat4 cViewInv;
     mat4 cViewProj;
     vec4 cClipPlane;
 };

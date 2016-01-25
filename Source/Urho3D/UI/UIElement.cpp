@@ -185,6 +185,7 @@ void UIElement::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Indent", GetIndent, SetIndent, int, 0, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Indent Spacing", GetIndentSpacing, SetIndentSpacing, int, 16, AM_FILE);
     URHO3D_ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE);
+    URHO3D_ATTRIBUTE("Tags", StringVector, tags_, Variant::emptyStringVector, AM_FILE);
 }
 
 void UIElement::ApplyAttributes()
@@ -1402,6 +1403,42 @@ void UIElement::SetElementEventSender(bool flag)
     elementEventSender_ = flag;
 }
 
+void UIElement::SetTags(const StringVector& tags)
+{
+    RemoveAllTags();
+    AddTags(tags);
+}
+
+void UIElement::AddTag(const String& tag)
+{
+    if (tag.Empty() || HasTag(tag))
+        return;
+
+    tags_.Push(tag);
+}
+
+void UIElement::AddTags(const String& tags, char separator)
+{
+    StringVector tagVector = tags.Split(separator);
+    AddTags(tagVector);
+}
+
+void UIElement::AddTags(const StringVector& tags)
+{
+    for (unsigned i = 0; i < tags.Size(); ++i)
+        AddTag(tags[i]);
+}
+
+bool UIElement::RemoveTag(const String& tag)
+{
+    return tags_.Remove(tag);
+}
+
+void UIElement::RemoveAllTags()
+{
+    tags_.Clear();
+}
+
 float UIElement::GetDerivedOpacity() const
 {
     if (!useDerivedOpacity_)
@@ -1563,6 +1600,40 @@ const Variant& UIElement::GetVar(const StringHash& key) const
 {
     VariantMap::ConstIterator i = vars_.Find(key);
     return i != vars_.End() ? i->second_ : Variant::EMPTY;
+}
+
+bool UIElement::HasTag(const String& tag) const
+{
+    return tags_.Contains(tag);
+}
+
+void UIElement::GetChildrenWithTag(PODVector<UIElement*>& dest, const String& tag, bool recursive) const
+{
+    dest.Clear();
+
+    if (!recursive)
+    {
+        for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        {
+            UIElement* element = *i;
+            if (element->HasTag(tag))
+                dest.Push(element);
+        }
+    }
+    else
+        GetChildrenWithTagRecursive(dest, tag);
+}
+
+void UIElement::GetChildrenWithTagRecursive(PODVector<UIElement*>& dest, const String& tag) const
+{
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+    {
+        UIElement* element = *i;
+        if (element->HasTag(tag))
+            dest.Push(element);
+        if (!element->children_.Empty())
+            element->GetChildrenWithTagRecursive(dest, tag);
+    }
 }
 
 IntVector2 UIElement::ScreenToElement(const IntVector2& screenPosition)
