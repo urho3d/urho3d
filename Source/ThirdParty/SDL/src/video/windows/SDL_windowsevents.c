@@ -419,7 +419,7 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_MBUTTONDOWN:
     case WM_XBUTTONDOWN:
         {
-			SDL_Mouse *mouse;
+            SDL_Mouse *mouse;
 
             // Urho3D: in_title_click may be erroneously left on with non-Aero styles, causing the hidden mouse centering to stop working.
             // To work around, reset whenever a normal mouse button up/down event is received
