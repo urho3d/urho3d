@@ -33,7 +33,6 @@ const uint LUASCRIPTINSTANCE_ATTRIBUTE_IGNORE = 4;
 
 // Node or UIElement hash-to-varname reverse mapping
 VariantMap globalVarNames;
-
 bool inspectorLocked = false;
 
 void InitXMLResources()
@@ -78,6 +77,8 @@ UIElement@ GetNodeContainer()
     parentContainer.GetChild("TagsLabel", true).SetFixedWidth(LABEL_WIDTH);
     LineEdit@ tagEdit = parentContainer.GetChild("TagsEdit", true);
     SubscribeToEvent(tagEdit, "TextChanged", "HandleTagsEdit");
+    UIElement@ tagSelect = parentContainer.GetChild("TagsSelect", true);
+    SubscribeToEvent(tagSelect, "Released", "HandleTagsSelect");
     ++componentContainerStartIndex;
 
     return container;
@@ -122,6 +123,8 @@ UIElement@ GetUIElementContainer()
     SubscribeToEvent(styleList, "ItemSelected", "HandleStyleItemSelected");
     LineEdit@ tagEdit = parentContainer.GetChild("TagsEdit", true);
     SubscribeToEvent(tagEdit, "TextChanged", "HandleTagsEdit");
+    UIElement@ tagSelect = parentContainer.GetChild("TagsSelect", true);
+    SubscribeToEvent(tagSelect, "Released", "HandleTagsSelect");
     return container;
 }
 
@@ -681,17 +684,113 @@ void HandleTagsEdit(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ lineEdit = eventData["Element"].GetPtr();
     Array<String> tags = lineEdit.text.Split(';');
+    
     if (editUIElement !is null)
     {
         editUIElement.RemoveAllTags();
         for (uint i = 0; i < tags.length; i++)
-            editUIElement.AddTag(tags[i]);
+            editUIElement.AddTag(tags[i].Trimmed());
     }
     else if (editNode !is null)
     {
         editNode.RemoveAllTags();
         for (uint i = 0; i < tags.length; i++)
-            editNode.AddTag(tags[i]);
+            editNode.AddTag(tags[i].Trimmed());
+    }
+}
+
+void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
+{
+    UIElement@ tagSelect = eventData["Element"].GetPtr();
+    
+    if (editNode !is null)
+    {
+        Array<UIElement@> actions;
+        String Indicator = "* ";
+        
+        // 1. Add established tags from Node to menu
+        Array<String> nodeTags = editNode.tags;
+        
+        for (int i =0; i < nodeTags.length; i++) 
+        {
+            bool isHasTag = editNode.HasTag(nodeTags[i]);
+            String taggedIndicator = (isHasTag ? Indicator : "");
+            actions.Push(CreateContextMenuItem(taggedIndicator + nodeTags[i], "HandleTagsMenuSelection", nodeTags[i]));
+        }
+    
+        Array<String> sceneTags = editorScene.tags; 
+        
+        // 2. Add tags from Scene.tags (In this scenario Scene.tags used as storage for frequently used tags in current Scene only)
+        for (int i =0; i < sceneTags.length; i++) 
+        {
+            bool isHasTag = editNode.HasTag(sceneTags[i]);
+            String taggedIndicator = (isHasTag ? Indicator : "");
+            actions.Push(CreateContextMenuItem(taggedIndicator + sceneTags[i], "HandleTagsMenuSelection", sceneTags[i]));
+        }
+
+        // 3. Add default tags
+        Array<String> stdTags = defaultTags.Split(';');
+        for (int i=0; i<stdTags.length; i++) 
+        {
+            bool isHasTag = editNode.HasTag(stdTags[i]);
+            // Add this tag into menu if only Node not tadded with it yet, otherwise it showed on step 1.
+            if (!isHasTag) 
+            {
+                String taggedIndicator = (isHasTag ? Indicator : "");
+                actions.Push(CreateContextMenuItem(taggedIndicator + stdTags[i], "HandleTagsMenuSelection", stdTags[i]));
+            }
+        }
+
+        actions.Push(CreateContextMenuItem("Reset", "HandleTagsMenuSelection", "Reset"));
+        actions.Push(CreateContextMenuItem("Cancel", "HandleTagsMenuSelectionDivisor"));
+        
+        if (actions.length > 0) 
+        {
+            ActivateContextMenu(actions);
+        }
+    }
+}
+void HandleTagsMenuSelectionDivisor() 
+{
+    //do nothing
+}
+void HandleTagsMenuSelection() 
+{
+    if (editNode !is null)
+    {
+        Menu@ menu = GetEventSender();
+        if (menu is null)
+            return;
+            
+        String menuSelectedTag = menu.name;
+        bool isThisDeleteOp = input.keyDown[KEY_LALT];
+        
+        if (menuSelectedTag == "Reset")
+        {
+            editNode.RemoveAllTags();
+            UpdateAttributeInspector();
+            return;
+        }
+        
+        if (isThisDeleteOp) 
+        {
+            if (editNode.HasTag(menuSelectedTag)) 
+            {
+                editNode.RemoveTag(menuSelectedTag.Trimmed());
+            }
+        }
+        else
+        {
+            if (!editNode.HasTag(menuSelectedTag)) 
+            {
+                editNode.AddTag(menuSelectedTag.Trimmed());
+            }
+            else 
+            {
+                editNode.RemoveTag(menuSelectedTag.Trimmed());
+            }
+        }
+        UpdateAttributeInspector();
     }
 }
 
