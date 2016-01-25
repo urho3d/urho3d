@@ -137,9 +137,8 @@ public:
     /// Instantiate scene content from JSON data. Return root node if successful.
     Node* InstantiateJSON
         (const JSONValue& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
-    /// Instantiate scene content from XML data. Return root node if successful.
+    /// Instantiate scene content from JSON data. Return root node if successful.
     Node* InstantiateJSON(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
-
 
     /// Clear scene completely of either replicated, local or all nodes and components.
     void Clear(bool clearReplicated = true, bool clearLocal = true);
@@ -170,11 +169,11 @@ public:
     Node* GetNode(unsigned id) const;
     /// Return component from the whole scene by ID, or null if not found.
     Component* GetComponent(unsigned id) const;
-	/// Get nodes with specific tag from the whole scene, return false if empty.
-	bool GetNodesWithTag(PODVector<Node*>& dest, const String& tag)  const;
-	
-	/// Return whether updates are enabled.
-	bool IsUpdateEnabled() const { return updateEnabled_; }
+    /// Get nodes with specific tag from the whole scene, return false if empty.
+    bool GetNodesWithTag(PODVector<Node*>& dest, const String& tag)  const;
+
+    /// Return whether updates are enabled.
+    bool IsUpdateEnabled() const { return updateEnabled_; }
 
     /// Return whether an asynchronous loading operation is in progress.
     bool IsAsyncLoading() const { return asyncLoading_; }
@@ -209,8 +208,8 @@ public:
     /// Return required package files.
     const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
 
-	/// Return a node user variable name, or empty if not registered.
-	const String& GetVarName(StringHash hash) const;
+    // Return a node user variable name, or empty if not registered.
+    const String& GetVarName(StringHash hash) const;
 
     /// Update scene. Called by HandleUpdate.
     void Update(float timeStep);
@@ -229,10 +228,10 @@ public:
     /// Get free component ID, either non-local or local.
     unsigned GetFreeComponentID(CreateMode mode);
 
-	/// Cache node by tag if tag not zero, no checking if already added. Used internaly in Node::AddTag.
-	void NodeTagAdded(Node* node, const String& tag);
-	/// Cache node by tag if tag not zero.
-	void NodeTagRemoved(Node* node, const String& tag);
+    /// Cache node by tag if tag not zero, no checking if already added. Used internaly in Node::AddTag.
+    void NodeTagAdded(Node* node, const String& tag);
+    /// Cache node by tag if tag not zero.
+    void NodeTagRemoved(Node* node, const String& tag);
 
     /// Node added. Assign scene pointer and add to ID map.
     void NodeAdded(Node* node);
