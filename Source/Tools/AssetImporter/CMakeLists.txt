@@ -32,4 +32,4 @@ set (LIBS Assimp)
 set (INCLUDE_DIRS ../../ThirdParty/Assimp/include)
 
 # Setup target
-setup_executable ()
+setup_executable (TOOL)

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 # Copyright (c) 2008-2015 the Urho3D project.
 #
@@ -20,19 +21,6 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME minilua)
+$(dirname $0)/cmake_generic.sh "$@" -G "CodeLite - Unix Makefiles"
 
-# Define source files
-set (SOURCE_FILES ../minilua.c)
-
-# Define dependency libs
-if (NOT MSVC)
-    set (LIBS m)
-endif ()
-
-# All tools must be natively built and output to bin/tool subdir to differentiate them from target platfrom binaries in the bin directory
-set_tool_output_directories ()
-
-# Setup target
-setup_executable (NODEPS)
+# vi: set ts=4 sw=4 expandtab:

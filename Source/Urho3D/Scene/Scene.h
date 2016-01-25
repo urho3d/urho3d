@@ -170,9 +170,11 @@ public:
     Node* GetNode(unsigned id) const;
     /// Return component from the whole scene by ID, or null if not found.
     Component* GetComponent(unsigned id) const;
-
-    /// Return whether updates are enabled.
-    bool IsUpdateEnabled() const { return updateEnabled_; }
+	/// Get nodes with specific tag from the whole scene, return false if empty.
+	bool GetNodesWithTag(PODVector<Node*>& dest, const String& tag)  const;
+	
+	/// Return whether updates are enabled.
+	bool IsUpdateEnabled() const { return updateEnabled_; }
 
     /// Return whether an asynchronous loading operation is in progress.
     bool IsAsyncLoading() const { return asyncLoading_; }
@@ -207,8 +209,8 @@ public:
     /// Return required package files.
     const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
 
-    /// Return a node user variable name, or empty if not registered.
-    const String& GetVarName(StringHash hash) const;
+	/// Return a node user variable name, or empty if not registered.
+	const String& GetVarName(StringHash hash) const;
 
     /// Update scene. Called by HandleUpdate.
     void Update(float timeStep);
@@ -226,6 +228,12 @@ public:
     unsigned GetFreeNodeID(CreateMode mode);
     /// Get free component ID, either non-local or local.
     unsigned GetFreeComponentID(CreateMode mode);
+
+	/// Cache node by tag if tag not zero, no checking if already added. Used internaly in Node::AddTag.
+	void NodeTagAdded(Node* node, const String& tag);
+	/// Cache node by tag if tag not zero.
+	void NodeTagRemoved(Node* node, const String& tag);
+
     /// Node added. Assign scene pointer and add to ID map.
     void NodeAdded(Node* node);
     /// Node removed. Remove from ID map.
@@ -277,6 +285,8 @@ private:
     HashMap<unsigned, Component*> replicatedComponents_;
     /// Local components by ID.
     HashMap<unsigned, Component*> localComponents_;
+    /// Cached tagged nodes by tag.
+    HashMap<StringHash, PODVector<Node*> > taggedNodes_;
     /// Asynchronous loading progress.
     AsyncProgress asyncProgress_;
     /// Node and component ID resolver for asynchronous loading.

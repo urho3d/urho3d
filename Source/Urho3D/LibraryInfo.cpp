@@ -52,6 +52,9 @@ const char* GetCompilerDefines()
 #ifdef URHO3D_LUAJIT
     "#define URHO3D_LUAJIT\n"
 #endif
+#ifdef URHO3D_TESTING
+    "#define URHO3D_TESTING\n"
+#endif
     ;
 }
 

@@ -51,6 +51,11 @@ if (NOT IOS AND NOT WEB)
     if (NOT WIN32)
         set (LIBS dl)
     endif ()
+    if (READLINE_FOUND)
+        add_definitions (-DHAVE_READLINE)
+        list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIR})
+        list (APPEND LIBS ${READLINE_LIBRARIES})
+    endif ()
 
     # Setup target
     setup_executable (NODEPS)

@@ -117,6 +117,8 @@ protected:
     void SetNode(Node* node);
     /// Handle scene attribute animation update event.
     void HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData);
+    /// Return a component from the scene root that sends out fixed update events (either PhysicsWorld or PhysicsWorld2D). Return null if neither exists.
+    Component* GetFixedUpdateSource();
 
     /// Scene node.
     Node* node_;

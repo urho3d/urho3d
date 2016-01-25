@@ -382,14 +382,6 @@ namespace Urho3D
 
 ## %Physics2D events
 
-### PhysicsPreStep2D
-- %World : PhysicsWorld2D pointer
-- %TimeStep : float
-
-### PhysicsPostStep2D
-- %World : PhysicsWorld2D pointer
-- %TimeStep : float
-
 ### PhysicsBeginContact2D
 - %World : PhysicsWorld2D pointer
 - %BodyA : RigidBody2D pointer
@@ -560,6 +552,16 @@ namespace Urho3D
 ### NodeEnabledChanged
 - %Scene : Scene pointer
 - %Node : Node pointer
+
+### NodeTagAdded
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %Tag : String tag
+
+### NodeTagRemoved
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %Tag : String tag
 
 ### ComponentEnabledChanged
 - %Scene : Scene pointer
@@ -894,6 +896,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -935,6 +938,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -1000,6 +1004,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -1243,6 +1248,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -1315,6 +1321,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -1419,6 +1426,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -1466,6 +1474,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %View %Position : IntVector2
 - %Scroll %Step : float
 - %Page %Step : float
@@ -1519,6 +1528,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -1569,6 +1579,7 @@ namespace Urho3D
 ### Node
 - %Is %Enabled : bool
 - %Name : String
+- %Tags : StringVector
 - %Position : Vector3
 - %Rotation : Quaternion
 - %Scale : Vector3
@@ -1730,6 +1741,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Orientation : int
 - %Range : float
 - %Value : float
@@ -1773,6 +1785,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %View %Position : IntVector2
 - %Scroll %Step : float
 - %Page %Step : float
@@ -1832,6 +1845,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -2004,6 +2018,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Font : ResourceRef
 - %Font %Size : int
 - %Text : String
@@ -2077,6 +2092,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Delay : float
 
 ### UIElement
@@ -2112,6 +2128,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 
 ### View3D
 - %Name : String
@@ -2146,6 +2163,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -2196,6 +2214,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -3123,6 +3142,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -3139,11 +3160,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -3160,11 +3183,13 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -3271,6 +3296,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -3333,6 +3359,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -3349,11 +3377,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -3370,11 +3400,13 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -3489,6 +3521,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -3612,6 +3645,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -3628,11 +3663,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -3649,11 +3686,13 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -3763,6 +3802,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -5557,6 +5597,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -5575,11 +5617,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -5596,11 +5640,13 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -5710,6 +5756,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -6302,6 +6349,8 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddItem(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -6318,12 +6367,14 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - UIElement@[]@ GetItems() const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - void InsertItem(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
@@ -6342,6 +6393,7 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllItems()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -6349,6 +6401,7 @@ Methods:
 - void RemoveItem(UIElement@)
 - void RemoveItem(uint)
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -6476,6 +6529,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -7368,6 +7422,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -7384,11 +7440,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -7405,11 +7463,13 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -7522,6 +7582,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - String text
 - bool textCopyable
@@ -7549,6 +7610,8 @@ Methods:
 - void AddChild(UIElement@)
 - void AddItem(UIElement@)
 - void AddSelection(uint)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - void ChangeSelection(int, bool)
@@ -7570,12 +7633,14 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - UIElement@[]@ GetItems() const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - void InsertItem(uint, UIElement@, UIElement@ = null)
 - bool IsExpanded(uint) const
@@ -7596,6 +7661,7 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllItems()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -7604,6 +7670,7 @@ Methods:
 - void RemoveItem(uint)
 - void RemoveObjectAnimation()
 - void RemoveSelection(uint)
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -7730,6 +7797,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - TraversalMode traversalMode
 - StringHash type // readonly
@@ -7967,6 +8035,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -7983,11 +8053,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -8004,11 +8076,13 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -8130,6 +8204,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -8522,6 +8597,8 @@ Properties:
 Methods:
 
 - void AddChild(Node@, uint = M_MAX_UNSIGNED)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - Node@ Clone(CreateMode = REPLICATED)
 - Component@ CloneComponent(Component@, CreateMode, uint = 0)
@@ -8541,6 +8618,7 @@ Methods:
 - Node@[]@ GetChildrenWithComponent(const String&, bool = false) const
 - Node@[]@ GetChildrenWithScript(bool = false) const
 - Node@[]@ GetChildrenWithScript(const String&, bool = false) const
+- Node@[]@ GetChildrenWithTag(const String&, bool = false) const
 - Component@ GetComponent(const String&, bool = false) const
 - Component@[]@ GetComponents() const
 - Component@[]@ GetComponents(const String&, bool = false) const
@@ -8552,6 +8630,7 @@ Methods:
 - bool HasComponent(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -8566,6 +8645,7 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllComponents()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(Node@)
 - void RemoveChildren(bool, bool, bool)
@@ -8575,6 +8655,7 @@ Methods:
 - void RemoveComponents(const String&)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - void Roll(float, TransformSpace = TS_LOCAL)
@@ -8656,6 +8737,7 @@ Properties:
 - Vector2 scale2D
 - Scene@ scene // readonly
 - ScriptObject@ scriptObject // readonly
+- String[]@ tags // readonly
 - bool temporary
 - Matrix3x4 transform // readonly
 - StringHash type // readonly
@@ -10041,6 +10123,8 @@ Methods:
 
 - void AddChild(Node@, uint = M_MAX_UNSIGNED)
 - void AddRequiredPackageFile(PackageFile@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void Clear(bool = true, bool = true)
 - void ClearRequiredPackageFiles()
@@ -10061,12 +10145,14 @@ Methods:
 - Node@[]@ GetChildrenWithComponent(const String&, bool = false) const
 - Node@[]@ GetChildrenWithScript(bool = false) const
 - Node@[]@ GetChildrenWithScript(const String&, bool = false) const
+- Node@[]@ GetChildrenWithTag(const String&, bool = false) const
 - Component@ GetComponent(const String&, bool = false) const
 - Component@ GetComponent(uint) const
 - Component@[]@ GetComponents() const
 - Component@[]@ GetComponents(const String&, bool = false) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - Node@ GetNode(uint) const
+- Node@[]@ GetNodesWithTag(const String&) const
 - Component@ GetOrCreateComponent(const String&, CreateMode = REPLICATED, uint = 0)
 - Component@ GetParentComponent(const String&, bool = false) const
 - ScriptObject@ GetScriptObject() const
@@ -10074,6 +10160,7 @@ Methods:
 - bool HasComponent(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&)
 - Node@ Instantiate(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ Instantiate(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateJSON(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
@@ -10104,6 +10191,7 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllComponents()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(Node@)
 - void RemoveChildren(bool, bool, bool)
@@ -10113,6 +10201,7 @@ Methods:
 - void RemoveComponents(const String&)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetToDefault()
 - void Roll(float, TransformSpace = TS_LOCAL)
 - void Rotate(const Quaternion&, TransformSpace = TS_LOCAL)
@@ -10206,6 +10295,7 @@ Properties:
 - ScriptObject@ scriptObject // readonly
 - float smoothingConstant
 - float snapThreshold
+- String[]@ tags // readonly
 - bool temporary
 - float timeScale
 - Matrix3x4 transform // readonly
@@ -10357,6 +10447,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - void ChangeValue(float)
@@ -10374,11 +10466,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -10395,11 +10489,13 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -10509,6 +10605,7 @@ Properties:
 - bool sortChildren
 - float stepFactor
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - TraversalMode traversalMode
 - StringHash type // readonly
@@ -10529,6 +10626,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -10545,11 +10644,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -10566,11 +10667,13 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -10682,6 +10785,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - TraversalMode traversalMode
 - StringHash type // readonly
@@ -10877,6 +10981,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - void ChangeValue(float)
@@ -10894,11 +11000,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -10915,11 +11023,13 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -11030,6 +11140,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -11481,6 +11592,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -11494,11 +11607,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
@@ -11513,11 +11628,13 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -11590,6 +11707,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - StringHash type // readonly
@@ -12195,6 +12313,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - void ClearSelection()
@@ -12212,11 +12332,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -12233,11 +12355,13 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -12355,6 +12479,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - String text
 - HorizontalAlignment textAlignment
@@ -12916,6 +13041,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -12932,11 +13059,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -12953,11 +13082,13 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -13058,6 +13189,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - TraversalMode traversalMode
 - StringHash type // readonly
@@ -13144,6 +13276,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -13160,11 +13294,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -13181,11 +13317,13 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -13285,6 +13423,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - TraversalMode traversalMode
 - StringHash type // readonly
@@ -13578,6 +13717,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -13594,11 +13735,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -13616,11 +13759,13 @@ Methods:
 - void QueueUpdate()
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -13744,6 +13889,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -13808,6 +13954,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -13824,11 +13972,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -13845,11 +13995,13 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
@@ -13966,6 +14118,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
