@@ -860,7 +860,12 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     HRESULT hr = impl_->device_->StretchRect(impl_->defaultColorSurface_, &rect,
         (IDirect3DSurface9*)destination->GetRenderSurface()->GetSurface(), &destRect, D3DTEXF_NONE);
     if (FAILED(hr))
+    {
         URHO3D_LOGD3DERROR("Failed to resolve to texture", hr);
+        return false;
+    }
+    else
+        return true;
 }
 
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)

@@ -30,8 +30,8 @@
 #
 
 if (WIN32)
-    set (ODBC_INCLUDE_DIRS)     # The headers should be available in the default include search path
-    set (ODBC_LIBRARIES odbc32) # This should be also the case for MinGW cross-compiler toolchain
+    set (ODBC_INCLUDE_DIRS " ")     # The headers should be available in the default include search path
+    set (ODBC_LIBRARIES odbc32 odbccp32 ws2_32) # This should be also the case for MinGW cross-compiler toolchain
     set (ODBC_DEFINES)
     set (ODBC_VERSION 3)        # Assume it is 3
 else ()

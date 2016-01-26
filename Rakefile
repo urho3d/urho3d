@@ -24,11 +24,7 @@ require 'pathname'
 require 'json'
 require 'yaml'
 
-# Usage: rake sync (only intended to be used in a fork with remote 'upstream' set to urho3d/Urho3D)
-desc 'Fetch and merge upstream urho3d/Urho3D to a Urho3D fork'
-task :sync do
-  system "git fetch upstream && git checkout master && git pull && git merge -m 'Sync at #{Time.now.localtime}.' upstream/master && git push && git checkout -" or abort
-end
+### Tasks for general users ###
 
 # Usage: rake scaffolding dir=/path/to/new/project/root [project=Scaffolding] [target=Main]
 desc 'Create a new project using Urho3D as external library'
@@ -197,6 +193,79 @@ task :android do
   android_test_run parameter, intent, package, success_indicator, payload or abort "Failed to test run #{package}/#{intent}"
 end
 
+### Tasks for Urho3D maintainers ###
+
+# Usage: rake git remote_add|sync|subtree
+desc 'Collections of convenience git commands, multiple git commands may be executed in one rake command'
+task :git do
+  success = true
+  consumed = false
+  ARGV.each_with_index { |command, index|
+    task command.to_sym do ; end; Rake::Task[command].clear   # No-op hack
+    next if consumed
+    case command
+    when 'remote_add', 'sync', 'subtree'
+      success = system "rake git_#{ARGV[index, ARGV.length - index].delete_if { |arg| /=/ =~ arg }.join ' '}"
+      consumed = true
+    else
+      abort 'Usage: rake git remote_add|sync|subtree' unless command == 'git' && ARGV.length > 1
+    end
+  }
+  abort unless success
+end
+
+# Usage: rake git remote_add [remote=<local-name>] url=<remote-url>'
+desc 'Add a new remote and configure it so that its tags will be fetched into a unique namespace'
+task :git_remote_add do
+  abort 'Usage: rake git remote_add [remote=<name>] url=<remote-url>' unless ENV['url']
+  remote = ENV['remote'] || /\/(.*?)\.git/.match(ENV['url'])[1]
+  system "git remote add #{remote} #{ENV['url']} && git config --add remote.#{remote}.fetch +refs/tags/*:refs/tags/#{remote}/* && git config remote.#{remote}.tagopt --no-tags && git fetch #{remote}" or abort
+end
+
+# Usage: rake git sync [master=master] [upstream=upstream]
+desc "Fetch and merge an upstream's remote branch to a fork's local branch then pushing the local branch to the fork's corresponding remote branch"
+task :git_sync do
+  master = ENV['master'] || 'master'
+  upstream = ENV['upstream'] || 'upstream'
+  system "git fetch #{upstream} && git checkout #{master} && git merge -m 'Sync at #{Time.now.localtime}.' #{upstream}/#{master} && git push && git checkout -" or abort
+end
+
+# Usage: rake git subtree split|rebase|add|push|pull
+desc 'Misc. sub-commands for git subtree operations'
+task :git_subtree do
+  ARGV.each { |subcommand|
+    task subcommand.to_sym do ; end; Rake::Task[subcommand].clear   # No-op hack
+    case subcommand
+    when 'split'
+      abort 'Usage: rake git subtree split subdir=</path/to/subdir/to/be/split> [split_branch=<name>]' unless ENV['subdir']
+      ENV['split_branch'] = "#{Pathname.new(ENV['subdir']).basename}-split" unless ENV['split_branch']
+      system "git subtree split --prefix #{ENV['subdir']} -b #{ENV['split_branch']}" or abort
+    when 'rebase'
+      abort 'Usage: rake git subtree rebase baseline=<commit|branch|tag> split_branch=<name>' unless ENV['baseline'] && ENV['split_branch']
+      ENV['rebased_branch'] = "#{Pathname.new(ENV['baseline']).basename}-#{ENV['rebased_branch_suffix'] || 'modified-for-urho3d'}"
+      head = `git log --pretty=format:'%H' #{ENV['split_branch']} |head -1`.chomp
+      tail = `git log --reverse --pretty=format:'%H' #{ENV['split_branch']} |head -1`.chomp
+      system "git rebase --onto #{ENV['baseline']} #{tail} #{head} && git checkout -b #{ENV['rebased_branch']}" or abort "After resolving all the conflicts, issue this command manually:\ngit checkout -b #{ENV['rebased_branch']}"
+    when 'add'
+      abort 'Usage: rake git subtree add subdir=</path/to/subdir/to/be/split> remote=<name> baseline=<commit|branch|tag>' unless ENV['subdir'] && ENV['remote'] && ENV['baseline']
+      ENV['rebased_branch'] = "#{Pathname.new(ENV['baseline']).basename}-#{ENV['rebased_branch_suffix'] || 'modified-for-urho3d'}"
+      system "git push -u #{ENV['remote']} #{ENV['rebased_branch']}:#{ENV['rebased_branch']} && git rm -r #{ENV['subdir']} && git commit -qm 'Replace #{ENV['subdir']} subdirectory with subtree.' && git subtree add --prefix #{ENV['subdir']} #{ENV['remote']} #{ENV['rebased_branch']} --squash" or abort
+    when 'push'
+      abort 'Usage: rake git subtree push subdir=</path/to/subdir/to/be/split> remote=<name> baseline=<commit|branch|tag>' unless ENV['subdir'] && ENV['remote'] && ENV['baseline']
+      ENV['rebased_branch'] = "#{Pathname.new(ENV['baseline']).basename}-#{ENV['rebased_branch_suffix'] || 'modified-for-urho3d'}"
+      system "git subtree push --prefix #{ENV['subdir']} #{ENV['remote']} #{ENV['rebased_branch']}" or abort
+    when 'pull'
+      abort 'Usage: rake git subtree pull subdir=</path/to/subdir/to/be/split> remote=<name> baseline=<commit|branch|tag>' unless ENV['subdir'] && ENV['remote'] && ENV['baseline']
+      ENV['rebased_branch'] = "#{Pathname.new(ENV['baseline']).basename}-#{ENV['rebased_branch_suffix'] || 'modified-for-urho3d'}"
+      system "git subtree pull --prefix #{ENV['subdir']} #{ENV['remote']} #{ENV['rebased_branch']} --squash" or abort
+    else
+      abort 'Usage: rake git subtree split|rebase|add|push|pull' unless subcommand == 'git_subtree' && ARGV.length > 1
+    end
+  }
+end
+
+### Tasks for CI builds and tests ###
+
 # Usage: NOT intended to be used manually
 desc 'Build and run the Annotate tool (temporary)'
 task :ci_annotate do
@@ -209,18 +278,6 @@ desc 'Push the generated binding source files to clang-tools branch (temporary)'
 task :ci_push_bindings do
   abort "Skipped pushing to #{ENV['TRAVIS_BRANCH']} branch due to moving HEAD" unless `git fetch -qf origin #{ENV['TRAVIS_PULL_REQUEST'] == 'false' ? ENV['TRAVIS_BRANCH'] : %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST']}/head'}}; git log -1 --pretty=format:'%H' FETCH_HEAD` == ENV['TRAVIS_COMMIT']
   system "rm -rf fastcomp-clang && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && git add -A Source/Urho3D && if git commit -qm 'Result of AutoBinder tool. [ci skip]'; then git push -q origin HEAD:#{ENV['TRAVIS_BRANCH']} >/dev/null 2>&1; fi" or abort "Failed to push #{ENV['TRAVIS_BRANCH']} branch"
-end
-
-# Always call this function last in the multiple conditional check so that the checkpoint message does not being echoed unnecessarily
-def timeup
-  unless $start_time
-    puts; $stdout.flush
-    return nil
-  end
-  elapsed_time = (Time.now - $start_time) / 60
-  puts "\nCheckpoint reached, elapsed time: #{elapsed_time.to_i} minutes\n\n" unless $already_timeup
-  $stdout.flush
-  return $already_timeup = elapsed_time > 40
 end
 
 # Usage: NOT intended to be used manually
@@ -387,7 +444,9 @@ end
 # Usage: NOT intended to be used manually
 desc 'Update web samples to GitHub Pages'
 task :ci_emscripten_samples_update do
-  puts "\nUpdating Web samples in main website..."
+  $start_time = Time.now - ENV['ELAPSED'].to_i + 30 if ENV['ELAPSED']   # Plus 30 seconds for rounding up to the next nearest minute
+  next if timeup
+  puts '"Updating Web samples in main website...'
   # Pull or clone
   system 'cd ../doc-Build 2>/dev/null && git pull -q -r || git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../doc-Build' or abort 'Failed to pull/clone'
   # Sync Web samples
@@ -401,13 +460,13 @@ end
 # Usage: NOT intended to be used manually
 desc 'Create all CI mirror branches'
 task :ci_create_mirrors do
-  # Skip if there are more commits since this one unless the CI mirror branch is mandatory
+  # Skip all CI branches creation if there are more commits externally
+  abort 'Skipped creating mirror branches due to moving remote HEAD' unless `git fetch -qf origin #{ENV['TRAVIS_PULL_REQUEST'] == 'false' ? ENV['TRAVIS_BRANCH'] : %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST']}/head'}}; git log -1 --pretty=format:'%H' FETCH_HEAD` == ENV['TRAVIS_COMMIT']     # This HEAD movement detection logic is more complex than usual as the original intention was to allow mirror creation on PR, however, we have scaled it back for now
+  # Skip non-mandatory branches if there are pending commits internally
   head = `git log -1 --pretty=format:'%H' HEAD`
-  local_head_moved = head != ENV['TRAVIS_COMMIT']   # Local head may be moved because of API documentation update
-  fetch_head_moved = `git fetch -qf origin #{ENV['TRAVIS_PULL_REQUEST'] == 'false' ? ENV['TRAVIS_BRANCH'] : %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST']}/head'}}; git log -1 --pretty=format:'%H' FETCH_HEAD` != ENV['TRAVIS_COMMIT']    # Original intention was to allow mirror creation on PR, however, we have scaled it back for now
-  head_moved = local_head_moved || fetch_head_moved
+  head_moved = head != ENV['TRAVIS_COMMIT']   # Local head may be moved because of API documentation update
   # Reset the head to the original commit position for mirror creation
-  system 'git checkout -qf $TRAVIS_COMMIT' if local_head_moved
+  system 'git checkout -qf $TRAVIS_COMMIT' if head_moved
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git' or abort 'Failed to re-checkout commit'
   # Limit the scanning to only master branch and limit the frequency of scanning
   scan = ENV['TRAVIS_BRANCH'] == 'master' && ((/\[ccache clear\]/ !~ ENV['COMMIT_MESSAGE'] && `ccache -s |grep 'cache miss'`.split.last.to_i >= ENV['COVERITY_SCAN_THRESHOLD'].to_i) || /\[ci scan\]/ =~ ENV['COMMIT_MESSAGE']) && /\[ci only:.*?\]/ !~ ENV['COMMIT_MESSAGE']
@@ -431,8 +490,8 @@ task :ci_create_mirrors do
   notifications = stream[0]['notifications']
   notifications['email']['recipients'] = get_root_commit_and_recipients().last unless notifications['email']['recipients']
   stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; ci_branch = ENV['RELEASE_TAG'] || (ENV['TRAVIS_BRANCH'] == 'master' && ENV['TRAVIS_PULL_REQUEST'] == 'false') ? ci : (ENV['TRAVIS_PULL_REQUEST'] == 'false' ? "#{ENV['TRAVIS_BRANCH']}-#{ci}" : "PR ##{ENV['TRAVIS_PULL_REQUEST']}-#{ci}"); unless (branch['mandatory'] || !head_moved) && ((ci_only && ci_only.map { |i| /#{i}/ =~ ci }.any?) || (!ci_only && (branch['active'] || (scan && /Scan/ =~ ci) || (annotate && /Annotate/ =~ ci)))); system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch}; fi"; puts "Skipped creating #{ci_branch} mirror branch due to moving HEAD" if branch['active'] && head_moved; next; end; lastjob = doc['matrix'] && doc['matrix']['include'] ? doc['matrix']['include'].length : (doc['env']['matrix'] ? doc['env']['matrix'].length : 1); doc['after_script'] = [*doc['after_script']] << (lastjob == 1 ? '%s' : "if [ ${TRAVIS_JOB_NUMBER##*.} == #{lastjob} ]; then %s; fi") % 'rake ci_delete_mirror'; doc['notifications'] = notifications unless doc['notifications']; File.open('.travis.yml.doc', 'w') { |file| file.write doc.to_yaml }; system "git checkout -B #{ci_branch} && rm .appveyor.yml .travis.yml && mv .travis.yml.doc .travis.yml && git add -A . && git commit -qm \"#{escaped_commit_message}\" && git push -qf -u origin #{ci_branch} >/dev/null 2>&1 && git checkout -q -" or abort "Failed to create #{ci_branch} mirror branch" }
-  # Push pending commits in the local head (if any)
-  system "git push origin #{head}:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1" or abort "Failed to push pending commits to #{ENV['TRAVIS_BRANCH']}" if local_head_moved
+  # Push pending commits if any
+  system "git push origin #{head}:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1" or abort "Failed to push pending commits to #{ENV['TRAVIS_BRANCH']}" if head_moved
 end
 
 # Usage: NOT intended to be used manually
@@ -533,6 +592,18 @@ EOF'" or abort 'Failed to create release directory remotely'
     # Mark the corresponding binary package as default download for each Windows/Mac/Linux host systems
     system "bash -c \"curl -H 'Accept: application/json' -X PUT -d 'default=%s' -d \"api_key=$SF_API\" https://sourceforge.net/projects/%s/files/%s/#{ENV['RELEASE_TAG']}/Urho3D-#{ENV['RELEASE_TAG']}-%s\"" % ENV['SF_DEFAULT'].split(':').insert(1, repo.split('/')).flatten or abort 'Failed to set binary tarball/zip as default download'
   end
+end
+
+# Always call this function last in the multiple conditional check so that the checkpoint message does not being echoed unnecessarily
+def timeup
+  unless $start_time
+    puts; $stdout.flush
+    return nil
+  end
+  elapsed_time = (Time.now - $start_time) / 60
+  puts "\nCheckpoint reached, elapsed time: #{elapsed_time.to_i} minutes\n\n" unless $already_timeup
+  $stdout.flush
+  return $already_timeup = elapsed_time > 40
 end
 
 def scaffolding dir, project = 'Scaffolding', target = 'Main'
