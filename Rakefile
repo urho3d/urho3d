@@ -291,7 +291,7 @@ task :ci do
   end
   # Obtain our custom data, if any
   data = YAML::load(File.open('.travis.yml'))['data']
-  data['excluded_sample'].each { |name| ENV["EXCLUDE_SAMPLE_#{name}"] = '1' } if data && data['excluded_sample']
+  data['excluded_sample']["##{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"].each { |name| ENV["EXCLUDE_SAMPLE_#{name}"] = '1' } if data && data['excluded_sample'] && data['excluded_sample']["##{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"]
   # Unshallow the clone's history when necessary
   if ENV['CI'] && ENV['PACKAGE_UPLOAD'] && !ENV['RELEASE_TAG']
     system "bash -c 'git fetch --unshallow'" or abort 'Failed to unshallow cloned repository'
@@ -428,7 +428,7 @@ task :ci_site_update do
   # Generate and sync doxygen pages
   system "cd ../Build && make -j$numjobs doc >/dev/null 2>&1 && ruby -i -pe 'gsub(/(<\\/?h)3([^>]*?>)/, %q{\\14\\2}); gsub(/(<\\/?h)2([^>]*?>)/, %q{\\13\\2}); gsub(/(<\\/?h)1([^>]*?>)/, %q{\\12\\2})' Docs/html/_*.html && rsync -a --delete Docs/html/ ../urho3d.github.io/documentation/#{release}" or abort 'Failed to generate/rsync doxygen pages'
   # Supply GIT credentials to push site documentation changes to urho3d/urho3d.github.io.git
-  system "cd ../urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && if git commit -qm \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\"; then git push -q >/dev/null 2>&1; fi && echo Site updated successfully" or abort 'Failed to update site'
+  system "cd ../urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && if git commit -qm \"Travis CI: site documentation update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/$TRAVIS_COMMIT\n\nMessage: $COMMIT_MESSAGE\"; then git push -q >/dev/null 2>&1 && echo Site updated successfully; fi" or abort 'Failed to update site'
   next if timeup
   # Skip detecting source tree changes when HEAD has moved or it is too late already as a release tag has just been pushed
   unless ENV['RELEASE_TAG'] || `git fetch -qf origin #{ENV['TRAVIS_BRANCH']}; git log -1 --pretty=format:'%H' FETCH_HEAD` != ENV['TRAVIS_COMMIT']
@@ -438,7 +438,7 @@ task :ci_site_update do
     system "git add Source && git commit -qm 'Travis CI: source tree update at #{Time.now.utc}.' >/dev/null 2>&1"   # Use extra quiet mode as there could be no changes at all
     if /2008-([0-9]{4}) the Urho3D project/.match(File.read('Rakefile'))[1].to_i != Time.now.year
       # Automatically bump copyright when crossing a new year and give instruction to clear the cache if so since the cache is of no use anyway because of massive changes
-      system "git add #{bump_copyright_year.join ' '} && if git commit -qm 'Travis CI: bump copyright to #{Time.now.year}.\n[ccache clear]'; then git push origin HEAD:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1; fi && echo Bumped copyright - Happy New Year!" or abort "Failed to push copyright update for #{ENV['TRAVIS_BRANCH']}"
+      system "git add #{bump_copyright_year.join ' '} && if git commit -qm 'Travis CI: bump copyright to #{Time.now.year}.\n[ccache clear]'; then git push origin HEAD:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1 && echo Bumped copyright - Happy New Year!; fi" or abort "Failed to push copyright update for #{ENV['TRAVIS_BRANCH']}"
       ['urho3d.github.io master', 'android-ndk ndk-update-trigger', 'rpi-sysroot sysroot-update-trigger', 'emscripten-sdk sdk-update-trigger'].each { |var| pair = var.split; system "if [ ! -d ../#{pair.first} ]; then git clone -q --depth 1 --branch #{pair.last} https://github.com/urho3d/#{pair.first} ../#{pair.first}; fi" or abort "Failed to clone urho3d/#{pair.first}"; system "cd ../#{pair.first} && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/#{pair.first} && git add #{bump_copyright_year("../#{pair.first}").join ' '} && if git commit -qm 'Travis CI: bump copyright to #{Time.now.year}.\n[ci skip]'; then git push -q >/dev/null 2>&1; fi" or abort "Failed to push copyright update for urho3d/#{pair.first}"; }
     elsif system("git add Docs/*API* && git commit -qm 'Test commit to detect API documentation changes'")
       # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
