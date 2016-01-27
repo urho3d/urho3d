@@ -680,14 +680,6 @@ void Renderer::Update(float timeStep)
         view->Update(frame_);
     }
 
-    // Reset update flag from queued render surfaces. At this point no new views can be added on this frame
-    for (unsigned i = 0; i < queuedViewports_.Size(); ++i)
-    {
-        WeakPtr<RenderSurface>& renderTarget = queuedViewports_[i].first_;
-        if (renderTarget)
-            renderTarget->WasUpdated();
-    }
-
     queuedViewports_.Clear();
     resetViews_ = false;
 }
@@ -814,8 +806,12 @@ void Renderer::QueueViewport(RenderSurface* renderTarget, Viewport* viewport)
 {
     if (viewport)
     {
-        queuedViewports_.Push(Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> >(WeakPtr<RenderSurface>(renderTarget),
-            WeakPtr<Viewport>(viewport)));
+        Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> > newView = 
+            MakePair(WeakPtr<RenderSurface>(renderTarget), WeakPtr<Viewport>(viewport));
+
+        // Prevent double add of the same rendertarget/viewport combination
+        if (!queuedViewports_.Contains(newView))
+            queuedViewports_.Push(newView);
     }
 }
 
