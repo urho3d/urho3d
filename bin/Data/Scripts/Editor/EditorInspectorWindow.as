@@ -702,26 +702,47 @@ void HandleTagsEdit(StringHash eventType, VariantMap& eventData)
 void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
 {
     UIElement@ tagSelect = eventData["Element"].GetPtr();
-    
-    if (editNode !is null)
+    Array<UIElement@> actions;
+    String Indicator = "* ";
+    // In first priority changes to UIElement
+    if (editUIElement !is null)
     {
-        Array<UIElement@> actions;
-        String Indicator = "* ";
-        
+        // 1. Add established tags from current editable UIElement to menu
+        Array<String> elementTags = editUIElement.tags;
+        for (int i =0; i < elementTags.length; i++) 
+        {
+            bool isHasTag = editUIElement.HasTag(elementTags[i]);
+            String taggedIndicator = (isHasTag ? Indicator : "");
+            actions.Push(CreateContextMenuItem(taggedIndicator + elementTags[i], "HandleTagsMenuSelection", elementTags[i]));
+        }
+
+        // 2. Add default tags
+        Array<String> stdTags = defaultTags.Split(';');
+        for (int i=0; i < stdTags.length; i++) 
+        {
+            bool isHasTag = editUIElement.HasTag(stdTags[i]);
+            // Add this tag into menu if only Node not tadded with it yet, otherwise it showed on step 1.
+            if (!isHasTag)
+            {
+                String taggedIndicator = (isHasTag ? Indicator : "");
+                actions.Push(CreateContextMenuItem(taggedIndicator + stdTags[i], "HandleTagsMenuSelection", stdTags[i]));
+            }
+        }
+    }
+    else if (editNode !is null)
+    {
         // 1. Add established tags from Node to menu
         Array<String> nodeTags = editNode.tags;
-        
         for (int i =0; i < nodeTags.length; i++) 
         {
             bool isHasTag = editNode.HasTag(nodeTags[i]);
             String taggedIndicator = (isHasTag ? Indicator : "");
             actions.Push(CreateContextMenuItem(taggedIndicator + nodeTags[i], "HandleTagsMenuSelection", nodeTags[i]));
         }
-    
-        Array<String> sceneTags = editorScene.tags; 
-        
+
+        Array<String> sceneTags = editorScene.tags;
         // 2. Add tags from Scene.tags (In this scenario Scene.tags used as storage for frequently used tags in current Scene only)
-        for (int i =0; i < sceneTags.length; i++) 
+        for (int i =0; i < sceneTags.length; i++)
         {
             bool isHasTag = editNode.HasTag(sceneTags[i]);
             String taggedIndicator = (isHasTag ? Indicator : "");
@@ -730,68 +751,78 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
 
         // 3. Add default tags
         Array<String> stdTags = defaultTags.Split(';');
-        for (int i=0; i<stdTags.length; i++) 
+        for (int i=0; i<stdTags.length; i++)
         {
             bool isHasTag = editNode.HasTag(stdTags[i]);
             // Add this tag into menu if only Node not tadded with it yet, otherwise it showed on step 1.
-            if (!isHasTag) 
+            if (!isHasTag)
             {
                 String taggedIndicator = (isHasTag ? Indicator : "");
                 actions.Push(CreateContextMenuItem(taggedIndicator + stdTags[i], "HandleTagsMenuSelection", stdTags[i]));
             }
         }
-
+    }
+    
+    // if any action has been added, add also Reset and Cancel and show menu
+    if (actions.length > 0)
+    {
         actions.Push(CreateContextMenuItem("Reset", "HandleTagsMenuSelection", "Reset"));
         actions.Push(CreateContextMenuItem("Cancel", "HandleTagsMenuSelectionDivisor"));
-        
-        if (actions.length > 0) 
-        {
-            ActivateContextMenu(actions);
-        }
+        ActivateContextMenu(actions);
     }
+    
 }
-void HandleTagsMenuSelectionDivisor() 
+void HandleTagsMenuSelectionDivisor()
 {
     //do nothing
 }
 void HandleTagsMenuSelection() 
 {
-    if (editNode !is null)
+    Menu@ menu = GetEventSender();
+    if (menu is null)
+        return;
+
+    String menuSelectedTag = menu.name;
+
+    // In first priority changes to UIElement
+    if (editUIElement !is null)
     {
-        Menu@ menu = GetEventSender();
-        if (menu is null)
+        if (menuSelectedTag == "Reset")
+        {
+            editUIElement.RemoveAllTags();
+            UpdateAttributeInspector();
             return;
-            
-        String menuSelectedTag = menu.name;
-        bool isThisDeleteOp = input.keyDown[KEY_LALT];
+        }
         
+        if (!editUIElement.HasTag(menuSelectedTag))
+        {
+            editUIElement.AddTag(menuSelectedTag.Trimmed());
+        }
+        else
+        {
+            editUIElement.RemoveTag(menuSelectedTag.Trimmed());
+        }
+    }
+    else if (editNode !is null)
+    {
         if (menuSelectedTag == "Reset")
         {
             editNode.RemoveAllTags();
             UpdateAttributeInspector();
             return;
         }
-        
-        if (isThisDeleteOp) 
+
+        if (!editNode.HasTag(menuSelectedTag))
         {
-            if (editNode.HasTag(menuSelectedTag)) 
-            {
-                editNode.RemoveTag(menuSelectedTag.Trimmed());
-            }
+            editNode.AddTag(menuSelectedTag.Trimmed());
         }
         else
         {
-            if (!editNode.HasTag(menuSelectedTag)) 
-            {
-                editNode.AddTag(menuSelectedTag.Trimmed());
-            }
-            else 
-            {
-                editNode.RemoveTag(menuSelectedTag.Trimmed());
-            }
+            editNode.RemoveTag(menuSelectedTag.Trimmed());
         }
-        UpdateAttributeInspector();
     }
+
+    UpdateAttributeInspector();
 }
 
 /// Handle reset to default event, sent when reset icon in the icon-panel is clicked.
