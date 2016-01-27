@@ -19,6 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 #ifndef _SDL_dynapi_h
 #define _SDL_dynapi_h
 
@@ -39,22 +41,8 @@
 #error Nope, you have to edit this file to force this off.
 #endif
 
-#ifdef __APPLE__
-#include "TargetConditionals.h"
-#endif
-
-#if TARGET_OS_IPHONE || __native_client__ || __EMSCRIPTEN__  /* probably not useful on iOS, NACL or Emscripten. */
+// Urho3D: disabled dynamic API
 #define SDL_DYNAMIC_API 0
-#elif SDL_BUILDING_WINRT /* probaly not useful on WinRT, given current .dll loading restrictions */
-#define SDL_DYNAMIC_API 0
-#elif defined(__clang_analyzer__)
-#define SDL_DYNAMIC_API 0  /* Turn off for static analysis, so reports are more clear. */
-#endif
-
-/* everyone else. This is where we turn on the API if nothing forced it off. */
-#ifndef SDL_DYNAMIC_API
-#define SDL_DYNAMIC_API 1
-#endif
 
 #endif
 

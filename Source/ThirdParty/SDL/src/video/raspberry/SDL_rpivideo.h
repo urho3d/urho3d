@@ -19,13 +19,16 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #ifndef __SDL_RPIVIDEO_H__
 #define __SDL_RPIVIDEO_H__
 
 #include "../../SDL_internal.h"
 #include "../SDL_sysvideo.h"
 
-#include "bcm_host.h"
+// Urho3D
+//#include "bcm_host.h"
 #include "GLES/gl.h"
 #include "EGL/egl.h"
 #include "EGL/eglext.h"
@@ -45,9 +48,9 @@ typedef struct SDL_DisplayData
 typedef struct SDL_WindowData
 {
     EGL_DISPMANX_WINDOW_T dispman_window;
-#if SDL_VIDEO_OPENGL_EGL  
+#if SDL_VIDEO_OPENGL_EGL
     EGLSurface egl_surface;
-#endif    
+#endif
 } SDL_WindowData;
 
 #define SDL_RPI_VIDEOLAYER 10000 /* High enough so to occlude everything */

@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_COCOA
@@ -657,7 +660,7 @@ SetWindowStyle(SDL_Window * window, unsigned int style)
 
     isFullscreenSpace = NO;
     inFullscreenTransition = NO;
-    
+
     [self windowDidExitFullScreen:nil];
 }
 
@@ -701,16 +704,16 @@ SetWindowStyle(SDL_Window * window, unsigned int style)
 - (void)windowDidFailToExitFullScreen:(NSNotification *)aNotification
 {
     SDL_Window *window = _data->window;
-    
+
     if (window->is_destroying) {
         return;
     }
 
     SetWindowStyle(window, (NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask));
-    
+
     isFullscreenSpace = YES;
     inFullscreenTransition = NO;
-    
+
     [self windowDidEnterFullScreen:nil];
 }
 
@@ -1046,16 +1049,18 @@ SetWindowStyle(SDL_Window * window, unsigned int style)
         /* Make the origin the upper left instead of the lower left */
         y = 1.0f - y;
 
+        // Urho3D: disable touch events from the touchpad, as touch in Urho3D is understood
+        // to originate from absolute positioning devices like touch screens
         switch (phase) {
         case NSTouchPhaseBegan:
-            SDL_SendTouch(touchId, fingerId, SDL_TRUE, x, y, 1.0f);
+            // SDL_SendTouch(touchId, fingerId, SDL_TRUE, x, y, 1.0f);
             break;
         case NSTouchPhaseEnded:
         case NSTouchPhaseCancelled:
-            SDL_SendTouch(touchId, fingerId, SDL_FALSE, x, y, 1.0f);
+            // SDL_SendTouch(touchId, fingerId, SDL_FALSE, x, y, 1.0f);
             break;
         case NSTouchPhaseMoved:
-            SDL_SendTouchMotion(touchId, fingerId, x, y, 1.0f);
+            // SDL_SendTouchMotion(touchId, fingerId, x, y, 1.0f);
             break;
         default:
             break;
@@ -1686,7 +1691,7 @@ Cocoa_DestroyWindow(_THIS, SDL_Window * window)
 
         NSArray *contexts = [[data->nscontexts copy] autorelease];
         for (SDLOpenGLContext *context in contexts) {
-            /* Calling setWindow:NULL causes the context to remove itself from the context list. */            
+            /* Calling setWindow:NULL causes the context to remove itself from the context list. */
             [context setWindow:NULL];
         }
         [data->nscontexts release];

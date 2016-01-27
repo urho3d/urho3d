@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
@@ -260,8 +263,8 @@
 
     if (len == 0) {
         /* it wants to replace text with nothing, ie a delete */
-        SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_BACKSPACE);
-        SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_BACKSPACE);
+        SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(SDL_SCANCODE_BACKSPACE), SDL_SCANCODE_BACKSPACE);
+        SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(SDL_SCANCODE_BACKSPACE), SDL_SCANCODE_BACKSPACE);
     } else {
         /* go through all the characters in the string we've been sent and
          * convert them to key presses */
@@ -283,16 +286,16 @@
 
             if (mod & KMOD_SHIFT) {
                 /* If character uses shift, press shift down */
-                SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_LSHIFT);
+                SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(SDL_SCANCODE_LSHIFT), SDL_SCANCODE_LSHIFT);
             }
 
             /* send a keydown and keyup even for the character */
-            SDL_SendKeyboardKey(SDL_PRESSED, code);
-            SDL_SendKeyboardKey(SDL_RELEASED, code);
+            SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(code), code);
+            SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(code), code);
 
             if (mod & KMOD_SHIFT) {
                 /* If character uses shift, press shift back up */
-                SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_LSHIFT);
+                SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(SDL_SCANCODE_LSHIFT), SDL_SCANCODE_LSHIFT);
             }
         }
 
@@ -305,8 +308,8 @@
 /* Terminates the editing session */
 - (BOOL)textFieldShouldReturn:(UITextField*)_textField
 {
-    SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_RETURN);
-    SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_RETURN);
+    SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(SDL_SCANCODE_RETURN), SDL_SCANCODE_RETURN);
+    SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(SDL_SCANCODE_RETURN), SDL_SCANCODE_RETURN);
     SDL_StopTextInput();
     return YES;
 }

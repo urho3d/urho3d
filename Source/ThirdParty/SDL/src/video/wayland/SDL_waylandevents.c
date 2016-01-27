@@ -19,6 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Alex Fuller for Urho3D
+
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_WAYLAND
@@ -55,7 +57,7 @@ struct SDL_WaylandInput {
     /* Last motion location */
     wl_fixed_t sx_w;
     wl_fixed_t sy_w;
-    
+
     struct {
         struct xkb_keymap *keymap;
         struct xkb_state *state;
@@ -90,7 +92,7 @@ pointer_handle_enter(void *data, struct wl_pointer *pointer,
         /* enter event for a window we've just destroyed */
         return;
     }
-    
+
     /* This handler will be called twice in Wayland 1.4
      * Once for the window surface which has valid user data
      * and again for the mouse cursor surface which does not have valid user data
@@ -98,7 +100,7 @@ pointer_handle_enter(void *data, struct wl_pointer *pointer,
      */
 
     window = (SDL_WindowData *)wl_surface_get_user_data(surface);
-    
+
     if (window) {
         input->pointer_focus = window;
         SDL_SetMouseFocus(window->sdlwindow);
@@ -178,7 +180,7 @@ pointer_handle_button(void *data, struct wl_pointer *pointer, uint32_t serial,
     SDL_WindowData *window = input->pointer_focus;
     enum wl_pointer_button_state state = state_w;
     uint32_t sdl_button;
-    
+
     if  (input->pointer_focus) {
         switch (button) {
             case BTN_LEFT:
@@ -299,7 +301,7 @@ keyboard_handle_enter(void *data, struct wl_keyboard *keyboard,
         /* enter event for a window we've just destroyed */
         return;
     }
- 
+
     window = wl_surface_get_user_data(surface);
 
     input->keyboard_focus = window;
@@ -335,7 +337,7 @@ keyboard_handle_key(void *data, struct wl_keyboard *keyboard,
         // TODO when do we get WL_KEYBOARD_KEY_STATE_REPEAT?
         if (scancode != SDL_SCANCODE_UNKNOWN)
             SDL_SendKeyboardKey(state == WL_KEYBOARD_KEY_STATE_PRESSED ?
-                                SDL_PRESSED : SDL_RELEASED, scancode);
+                                SDL_PRESSED : SDL_RELEASED, (Uint32)(key), scancode);
     }
 
     if (!window || window->keyboard_device != input || !input->xkb.state)

@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "./SDL_internal.h"
 
 #if defined(__WIN32__)
@@ -452,26 +455,7 @@ SDL_GetPlatform()
 #endif
 }
 
-#if defined(__WIN32__)
-
-#if !defined(HAVE_LIBC) || (defined(__WATCOMC__) && defined(BUILD_DLL))
-/* Need to include DllMain() on Watcom C for some reason.. */
-
-BOOL APIENTRY
-_DllMainCRTStartup(HANDLE hModule,
-                   DWORD ul_reason_for_call, LPVOID lpReserved)
-{
-    switch (ul_reason_for_call) {
-    case DLL_PROCESS_ATTACH:
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-    case DLL_PROCESS_DETACH:
-        break;
-    }
-    return TRUE;
-}
-#endif /* building DLL with Watcom C */
-
-#endif /* __WIN32__ */
+// Urho3D: removed offending _DllMainCRTStartup function which interfered with CRT initialization
+// when building as a shared library
 
 /* vi: set sts=4 ts=4 sw=4 expandtab: */

@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #ifndef _SDL_uikitwindow_h
 #define _SDL_uikitwindow_h
 
@@ -41,9 +44,15 @@ extern NSUInteger UIKit_GetSupportedOrientations(SDL_Window * window);
 
 @class UIWindow;
 
+// Urho3D: subclass for iOS 8 window size hack
+@interface SDL_uikitwindow : UIWindow
+
+@end
+
 @interface SDL_WindowData : NSObject
 
-@property (nonatomic, strong) UIWindow *uiwindow;
+// Urho3D: subclass for iOS 8 window size hack
+@property (nonatomic, strong) SDL_uikitwindow *uiwindow;
 @property (nonatomic, strong) SDL_uikitviewcontroller *viewcontroller;
 
 /* Array of SDL_uikitviews owned by this window. */

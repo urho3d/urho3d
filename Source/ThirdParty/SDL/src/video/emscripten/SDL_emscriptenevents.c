@@ -19,6 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Alex Fuller for Urho3D
 
 #include "../../SDL_internal.h"
 
@@ -432,7 +433,7 @@ Emscripten_HandleKey(int eventType, const EmscriptenKeyboardEvent *keyEvent, voi
                 }
             }
             SDL_SendKeyboardKey(eventType == EMSCRIPTEN_EVENT_KEYDOWN ?
-                                SDL_PRESSED : SDL_RELEASED, scancode);
+                                SDL_PRESSED : SDL_RELEASED, (Uint32)(keyEvent->keyCode), scancode);
         }
     }
 

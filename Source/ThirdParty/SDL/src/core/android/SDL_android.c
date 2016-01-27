@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni, and Yao Wei Tjong for Urho3D
+
 #include "../../SDL_internal.h"
 #include "SDL_stdinc.h"
 #include "SDL_assert.h"
@@ -81,6 +84,9 @@ static jmethodID midPollInputDevices;
 static float fLastAccelerometer[3];
 static SDL_bool bHasNewData;
 
+// Urho3D: application files dir
+static char* mFilesDir = 0;
+
 /*******************************************************************************
                  Functions called by JNI
 *******************************************************************************/
@@ -107,12 +113,33 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
     return JNI_VERSION_1_4;
 }
 
+// Urho3D: added function
+const char* SDL_Android_GetFilesDir()
+{
+    return mFilesDir;
+}
+
 /* Called before SDL_main() to initialize JNI bindings */
-JNIEXPORT void JNICALL SDL_Android_Init(JNIEnv* mEnv, jclass cls)
+// Urho3D: added passing user files directory from SDLActivity on startup
+JNIEXPORT void JNICALL SDL_Android_Init(JNIEnv* mEnv, jclass cls, jstring filesDir)
 {
     __android_log_print(ANDROID_LOG_INFO, "SDL", "SDL_Android_Init()");
 
     Android_JNI_SetupThread();
+
+    // Copy the files dir
+    const char *str;
+    str = (*mEnv)->GetStringUTFChars(mEnv, filesDir, 0);
+    if (str)
+    {
+        if (mFilesDir)
+            free(mFilesDir);
+
+        size_t length = strlen(str) + 1;
+        mFilesDir = (char*)malloc(length);
+        memcpy(mFilesDir, str, length);
+        (*mEnv)->ReleaseStringUTFChars(mEnv, filesDir, str);
+    }
 
     mActivityClass = (jclass)((*mEnv)->NewGlobalRef(mEnv, cls));
 
@@ -191,7 +218,7 @@ JNIEXPORT void JNICALL Java_org_libsdl_app_SDLActivity_onNativeHat(
 
 JNIEXPORT jint JNICALL Java_org_libsdl_app_SDLActivity_nativeAddJoystick(
     JNIEnv* env, jclass jcls,
-    jint device_id, jstring device_name, jint is_accelerometer, 
+    jint device_id, jstring device_name, jint is_accelerometer,
     jint nbuttons, jint naxes, jint nhats, jint nballs)
 {
     int retval;
@@ -200,7 +227,7 @@ JNIEXPORT jint JNICALL Java_org_libsdl_app_SDLActivity_nativeAddJoystick(
     retval = Android_AddJoystick(device_id, name, (SDL_bool) is_accelerometer, nbuttons, naxes, nhats, nballs);
 
     (*env)->ReleaseStringUTFChars(env, device_name, name);
-    
+
     return retval;
 }
 
@@ -220,10 +247,10 @@ JNIEXPORT void JNICALL Java_org_libsdl_app_SDLActivity_onNativeSurfaceChanged(JN
     if (Android_Window == NULL || Android_Window->driverdata == NULL ) {
         return;
     }
-    
+
     _this =  SDL_GetVideoDevice();
     data =  (SDL_WindowData *) Android_Window->driverdata;
-    
+
     /* If the surface has been previously destroyed by onNativeSurfaceDestroyed, recreate it here */
     if (data->egl_surface == EGL_NO_SURFACE) {
         if(data->native_window) {
@@ -232,9 +259,9 @@ JNIEXPORT void JNICALL Java_org_libsdl_app_SDLActivity_onNativeSurfaceChanged(JN
         data->native_window = Android_JNI_GetNativeWindow();
         data->egl_surface = SDL_EGL_CreateSurface(_this, (NativeWindowType) data->native_window);
     }
-    
+
     /* GL Context handling is done in the event loop because this function is run from the Java thread */
-    
+
 }
 
 /* Surface Destroyed */
@@ -246,20 +273,20 @@ JNIEXPORT void JNICALL Java_org_libsdl_app_SDLActivity_onNativeSurfaceDestroyed(
      */
     SDL_WindowData *data;
     SDL_VideoDevice *_this;
-    
+
     if (Android_Window == NULL || Android_Window->driverdata == NULL ) {
         return;
     }
-    
+
     _this =  SDL_GetVideoDevice();
     data = (SDL_WindowData *) Android_Window->driverdata;
-    
+
     if (data->egl_surface != EGL_NO_SURFACE) {
         SDL_EGL_MakeCurrent(_this, NULL, NULL);
         SDL_EGL_DestroySurface(_this, data->egl_surface);
         data->egl_surface = EGL_NO_SURFACE;
     }
-    
+
     /* GL Context handling is done in the event loop because this function is run from the Java thread */
 
 }
@@ -326,6 +353,9 @@ JNIEXPORT void JNICALL Java_org_libsdl_app_SDLActivity_nativeLowMemory(
 JNIEXPORT void JNICALL Java_org_libsdl_app_SDLActivity_nativeQuit(
                                     JNIEnv* env, jclass cls)
 {
+    // Urho3D: added log print
+    __android_log_print(ANDROID_LOG_VERBOSE, "SDL", "nativeQuit()");
+
     /* Discard previous events. The user should have handled state storage
      * in SDL_APP_WILLENTERBACKGROUND. After nativeQuit() is called, no
      * events other than SDL_QUIT and SDL_APP_TERMINATING should fire */
@@ -348,8 +378,8 @@ JNIEXPORT void JNICALL Java_org_libsdl_app_SDLActivity_nativePause(
         SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_MINIMIZED, 0, 0);
         SDL_SendAppEvent(SDL_APP_WILLENTERBACKGROUND);
         SDL_SendAppEvent(SDL_APP_DIDENTERBACKGROUND);
-    
-        /* *After* sending the relevant events, signal the pause semaphore 
+
+        /* *After* sending the relevant events, signal the pause semaphore
          * so the event loop knows to pause and (optionally) block itself */
         if (!SDL_SemValue(Android_PauseSem)) SDL_SemPost(Android_PauseSem);
     }
@@ -466,7 +496,7 @@ ANativeWindow* Android_JNI_GetNativeWindow(void)
     s = (*env)->CallStaticObjectMethod(env, mActivityClass, midGetNativeSurface);
     anw = ANativeWindow_fromSurface(env, s);
     (*env)->DeleteLocalRef(env, s);
-  
+
     return anw;
 }
 
@@ -796,7 +826,7 @@ fallback:
          * android/apis/content/ReadAsset.java imply that Android's
          * AssetInputStream.available() /will/ always return the total file size
         */
-        
+
         /* size = inputStream.available(); */
         mid = (*mEnv)->GetMethodID(mEnv, (*mEnv)->GetObjectClass(mEnv, inputStream),
                 "available", "()I");
@@ -844,7 +874,7 @@ failure:
         }
 
     }
-    
+
     LocalReferenceHolder_Cleanup(&refs);
     return result;
 }
@@ -857,7 +887,7 @@ int Android_JNI_FileOpen(SDL_RWops* ctx,
     int retval;
 
     if (!LocalReferenceHolder_Init(&refs, mEnv)) {
-        LocalReferenceHolder_Cleanup(&refs);        
+        LocalReferenceHolder_Cleanup(&refs);
         return -1;
     }
 
@@ -906,7 +936,7 @@ size_t Android_JNI_FileRead(SDL_RWops* ctx, void* buffer,
 
         JNIEnv *mEnv = Android_JNI_GetEnv();
         if (!LocalReferenceHolder_Init(&refs, mEnv)) {
-            LocalReferenceHolder_Cleanup(&refs);            
+            LocalReferenceHolder_Cleanup(&refs);
             return 0;
         }
 
@@ -919,7 +949,7 @@ size_t Android_JNI_FileRead(SDL_RWops* ctx, void* buffer,
             int result = (*mEnv)->CallIntMethod(mEnv, readableByteChannel, readMethod, byteBuffer);
 
             if (Android_JNI_ExceptionOccurred(SDL_FALSE)) {
-                LocalReferenceHolder_Cleanup(&refs);            
+                LocalReferenceHolder_Cleanup(&refs);
                 return 0;
             }
 
@@ -931,7 +961,7 @@ size_t Android_JNI_FileRead(SDL_RWops* ctx, void* buffer,
             bytesRead += result;
             ctx->hidden.androidio.position += result;
         }
-        LocalReferenceHolder_Cleanup(&refs);                    
+        LocalReferenceHolder_Cleanup(&refs);
         return bytesRead / size;
     }
 }
@@ -1166,7 +1196,7 @@ char* Android_JNI_GetClipboardText(void)
         }
     }
 
-    CLEANUP_CLIPBOARD();    
+    CLEANUP_CLIPBOARD();
 
     return SDL_strdup("");
 }
@@ -1180,7 +1210,7 @@ SDL_bool Android_JNI_HasClipboardText(void)
     (*env)->DeleteGlobalRef(env, clipboard);
 
     CLEANUP_CLIPBOARD();
-    
+
     return has ? SDL_TRUE : SDL_FALSE;
 }
 
@@ -1310,7 +1340,7 @@ int Android_JNI_GetTouchDeviceIds(int **ids) {
 void Android_JNI_PollInputDevices(void)
 {
     JNIEnv *env = Android_JNI_GetEnv();
-    (*env)->CallStaticVoidMethod(env, mActivityClass, midPollInputDevices);    
+    (*env)->CallStaticVoidMethod(env, mActivityClass, midPollInputDevices);
 }
 
 /* See SDLActivity.java for constants. */
@@ -1456,12 +1486,73 @@ int Android_JNI_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *bu
 //////////////////////////////////////////////////////////////////////////////
 */
 
+// Urho3D - function to return a list of files under a given path in "assets" directory (caller is responsible to free the C string array)
+char** SDL_Android_GetFileList(const char* path, int* count)
+{
+    struct LocalReferenceHolder refs = LocalReferenceHolder_Setup(__FUNCTION__);
+    JNIEnv* mEnv = Android_JNI_GetEnv();
+    if (!LocalReferenceHolder_Init(&refs, mEnv))
+    {
+        LocalReferenceHolder_Cleanup(&refs);
+        return NULL;
+    }
+
+    jstring pathJString = (*mEnv)->NewStringUTF(mEnv, path);
+
+    /* context = SDLActivity.getContext(); */
+    jmethodID mid = (*mEnv)->GetStaticMethodID(mEnv, mActivityClass,
+            "getContext","()Landroid/content/Context;");
+    jobject context = (*mEnv)->CallStaticObjectMethod(mEnv, mActivityClass, mid);
+
+    /* assetManager = context.getAssets(); */
+    mid = (*mEnv)->GetMethodID(mEnv, (*mEnv)->GetObjectClass(mEnv, context),
+            "getAssets", "()Landroid/content/res/AssetManager;");
+    jobject assetManager = (*mEnv)->CallObjectMethod(mEnv, context, mid);
+
+    /* stringArray = assetManager.list(path) */
+    mid = (*mEnv)->GetMethodID(mEnv, (*mEnv)->GetObjectClass(mEnv, assetManager), "list", "(Ljava/lang/String;)[Ljava/lang/String;");
+    jobjectArray stringArray = (*mEnv)->CallObjectMethod(mEnv, assetManager, mid, pathJString);
+    if (Android_JNI_ExceptionOccurred(true))
+    {
+        LocalReferenceHolder_Cleanup(&refs);
+        return NULL;
+    }
+
+    jsize arrayLength = (*mEnv)->GetArrayLength(mEnv, stringArray);
+    char** cStringArray = (char**)SDL_malloc(arrayLength * sizeof(char*));
+    jint i;
+    for (i = 0; i < arrayLength; ++i)
+    {
+        jstring string = (jstring)(*mEnv)->GetObjectArrayElement(mEnv, stringArray, i);
+        const char* cString = (*mEnv)->GetStringUTFChars(mEnv, string, 0);
+        cStringArray[i] = cString ? SDL_strdup(cString) : NULL;
+        (*mEnv)->ReleaseStringUTFChars(mEnv, string, cString);
+    }
+
+    *count = arrayLength;
+
+    LocalReferenceHolder_Cleanup(&refs);
+    return cStringArray;
+}
+
+// Urho3D - helper function to free the file list returned by SDL_Android_GetFileList()
+void SDL_Android_FreeFileList(char*** array, int* count)
+{
+    int i = *count;
+    if ((i > 0) && (*array != NULL))
+    {
+        while (i--)
+            SDL_free((*array)[i]);
+    }
+    SDL_free(*array);
+    *array = NULL;
+    *count = 0;
+}
+
 void *SDL_AndroidGetJNIEnv()
 {
     return Android_JNI_GetEnv();
 }
-
-
 
 void *SDL_AndroidGetActivity()
 {
@@ -1621,4 +1712,3 @@ jclass Android_JNI_GetActivityClass(void)
 #endif /* __ANDROID__ */
 
 /* vi: set ts=4 sw=4 expandtab: */
-

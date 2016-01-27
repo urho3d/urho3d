@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by OvermindDL1 for Urho3D
+
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_X11
@@ -356,9 +359,9 @@ X11_ReconcileKeyboardState(_THIS)
 
     for (keycode = 0; keycode < 256; ++keycode) {
         if (keys[keycode / 8] & (1 << (keycode % 8))) {
-            SDL_SendKeyboardKey(SDL_PRESSED, viddata->key_layout[keycode]);
+            SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(keycode), viddata->key_layout[keycode]);
         } else {
-            SDL_SendKeyboardKey(SDL_RELEASED, viddata->key_layout[keycode]);
+            SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(keycode), viddata->key_layout[keycode]);
         }
     }
 }
@@ -767,7 +770,8 @@ X11_DispatchEvent(_THIS)
             }
 #endif
             if (!handled_by_ime) {
-                SDL_SendKeyboardKey(SDL_PRESSED, videodata->key_layout[keycode]);
+                // Urho3D: send also the original keycode
+                SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(keycode), videodata->key_layout[keycode]);
                 if(*text) {
                     SDL_SendKeyboardText(text);
                 }
@@ -787,7 +791,7 @@ X11_DispatchEvent(_THIS)
                 /* We're about to get a repeated key down, ignore the key up */
                 break;
             }
-            SDL_SendKeyboardKey(SDL_RELEASED, videodata->key_layout[keycode]);
+            SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(keycode), videodata->key_layout[keycode]);
         }
         break;
 
@@ -874,7 +878,7 @@ X11_DispatchEvent(_THIS)
                 printf("Protocol version to use : %d\n", xdnd_version);
                 printf("More then 3 data types : %d\n", (int) use_list);
 #endif
- 
+
                 if (use_list) {
                     /* fetch conversion targets */
                     SDL_x11Prop p;
@@ -888,7 +892,7 @@ X11_DispatchEvent(_THIS)
                 }
             }
             else if (xevent.xclient.message_type == videodata->XdndPosition) {
-            
+
 #ifdef DEBUG_XEVENTS
                 Atom act= videodata->XdndActionCopy;
                 if(xdnd_version >= 2) {
@@ -896,7 +900,7 @@ X11_DispatchEvent(_THIS)
                 }
                 printf("Action requested by user is : %s\n", X11_XGetAtomName(display , act));
 #endif
-                
+
 
                 /* reply with status */
                 memset(&m, 0, sizeof(XClientMessageEvent));

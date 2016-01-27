@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni & OvermindDL1 for Urho3D
+
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_WINDOWS
@@ -296,7 +299,7 @@ WIN_CheckAsyncMouseRelease(SDL_WindowData *data)
     data->mouse_button_flags = 0;
 }
 
-BOOL 
+BOOL
 WIN_ConvertUTF32toUTF8(UINT32 codepoint, char * text)
 {
     if (codepoint <= 0x7F) {
@@ -327,7 +330,7 @@ static SDL_bool
 ShouldGenerateWindowCloseOnAltF4(void)
 {
     const char *hint;
-    
+
     hint = SDL_GetHint(SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4);
     if (hint) {
         if (*hint == '0') {
@@ -344,6 +347,11 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     SDL_WindowData *data;
     LRESULT returnCode = -1;
+
+    // Urho3D: detect emulated mouse events
+    // Note: if we move mouse cursor manually (relative mouse motion with hidden cursor) we may get emulated mouse
+    // events with zero extra info, so we should only center the cursor when it has actually moved
+    BOOL emulatedMouse = (GetMessageExtraInfo() & 0xffffff00) == 0xff515700;
 
     /* Send a SDL_SYSWMEVENT if the application wants them */
     if (SDL_GetEventState(SDL_SYSWMEVENT) == SDL_ENABLE) {
@@ -404,11 +412,11 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 if (SDL_GetKeyboardFocus() != data->window) {
                     SDL_SetKeyboardFocus(data->window);
                 }
-                
+
                 GetCursorPos(&cursorPos);
                 ScreenToClient(hwnd, &cursorPos);
                 SDL_SendMouseMotion(data->window, 0, 0, cursorPos.x, cursorPos.y);
-                
+
                 WIN_CheckAsyncMouseRelease(data);
 
                 /*
@@ -436,7 +444,7 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_MOUSEMOVE:
         {
             SDL_Mouse *mouse = SDL_GetMouse();
-            if (!mouse->relative_mode || mouse->relative_mode_warp) {
+            if (!emulatedMouse && (!mouse->relative_mode || mouse->relative_mode_warp)) {
                 SDL_MouseID mouseID = (((GetMessageExtraInfo() & MOUSEEVENTF_FROMTOUCH) == MOUSEEVENTF_FROMTOUCH) ? SDL_TOUCH_MOUSEID : 0);
                 SDL_SendMouseMotion(data->window, mouseID, 0, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             }
@@ -455,8 +463,14 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_XBUTTONDOWN:
     case WM_XBUTTONDBLCLK:
         {
-            SDL_Mouse *mouse = SDL_GetMouse();
-            if (!mouse->relative_mode || mouse->relative_mode_warp) {
+            SDL_Mouse *mouse;
+
+            // Urho3D: in_title_click may be erroneously left on with non-Aero styles, causing the hidden mouse centering to stop working.
+            // To work around, reset whenever a normal mouse button up/down event is received
+            data->in_title_click = SDL_FALSE;
+
+            mouse = SDL_GetMouse();
+            if (!emulatedMouse && (!mouse->relative_mode || mouse->relative_mode_warp)) {
                 SDL_MouseID mouseID = (((GetMessageExtraInfo() & MOUSEEVENTF_FROMTOUCH) == MOUSEEVENTF_FROMTOUCH) ? SDL_TOUCH_MOUSEID : 0);
                 WIN_CheckWParamMouseButtons(wParam, data, mouseID);
             }
@@ -589,10 +603,10 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
 
             if (code != SDL_SCANCODE_UNKNOWN) {
-                SDL_SendKeyboardKey(SDL_PRESSED, code);
+                SDL_SendKeyboardKey(SDL_PRESSED, 0, code);
             }
         }
- 
+
         returnCode = 0;
         break;
 
@@ -605,9 +619,9 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             if (code != SDL_SCANCODE_UNKNOWN) {
                 if (code == SDL_SCANCODE_PRINTSCREEN &&
                     keyboardState[code] == SDL_RELEASED) {
-                    SDL_SendKeyboardKey(SDL_PRESSED, code);
+                    SDL_SendKeyboardKey(SDL_PRESSED, 0, code);
                 }
-                SDL_SendKeyboardKey(SDL_RELEASED, code);
+                SDL_SendKeyboardKey(SDL_RELEASED, 0, code);
             }
         }
         returnCode = 0;
@@ -742,7 +756,7 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             RECT rect;
             int x, y;
             int w, h;
-            
+
             if (data->initializing || data->in_border_change) {
                 break;
             }
@@ -996,10 +1010,10 @@ WIN_PumpEvents(_THIS)
        and if we think a key is pressed when Windows doesn't, unstick it in SDL's state. */
     keystate = SDL_GetKeyboardState(NULL);
     if ((keystate[SDL_SCANCODE_LSHIFT] == SDL_PRESSED) && !(GetKeyState(VK_LSHIFT) & 0x8000)) {
-        SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_LSHIFT);
+        SDL_SendKeyboardKey(SDL_RELEASED, 0, SDL_SCANCODE_LSHIFT);
     }
     if ((keystate[SDL_SCANCODE_RSHIFT] == SDL_PRESSED) && !(GetKeyState(VK_RSHIFT) & 0x8000)) {
-        SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_RSHIFT);
+        SDL_SendKeyboardKey(SDL_RELEASED, 0, SDL_SCANCODE_RSHIFT);
     }
 }
 

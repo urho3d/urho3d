@@ -19,6 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Alex Fuller for Urho3D
+
 /*
   Contributed by Brandon Schaefer, <brandon.schaefer@canonical.com>
 */
@@ -79,7 +81,7 @@ HandleKeyEvent(MirKeyEvent const ev, SDL_Window* window)
         scancode = xfree86_scancode_table2[ev.scan_code];
 
     if (scancode != SDL_SCANCODE_UNKNOWN)
-        SDL_SendKeyboardKey(key_state, scancode);
+        SDL_SendKeyboardKey(key_state, (Uint32)(ev.scan_code), scancode);
 
     if (key_state == SDL_PRESSED)
         HandleKeyText(ev.key_code);

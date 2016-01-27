@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by OvermindDL1 for Urho3D
+
 #include "../SDL_internal.h"
 
 /* General keyboard handling code for SDL */
@@ -571,7 +574,7 @@ SDL_ResetKeyboard(void)
 #endif
     for (scancode = 0; scancode < SDL_NUM_SCANCODES; ++scancode) {
         if (keyboard->keystate[scancode] == SDL_PRESSED) {
-            SDL_SendKeyboardKey(SDL_RELEASED, scancode);
+            SDL_SendKeyboardKey(SDL_RELEASED, 0, scancode);
         }
     }
 }
@@ -658,7 +661,7 @@ SDL_SetKeyboardFocus(SDL_Window * window)
 }
 
 int
-SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode)
+SDL_SendKeyboardKey(Uint8 state, Uint32 raw_keycode, SDL_Scancode scancode)
 {
     SDL_Keyboard *keyboard = &SDL_keyboard;
     int posted;
@@ -668,9 +671,11 @@ SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode)
     Uint32 type;
     Uint8 repeat;
 
+#if 0
     if (!scancode) {
         return 0;
     }
+#endif
 #ifdef DEBUG_KEYBOARD
     printf("The '%s' key has been %s\n", SDL_GetScancodeName(scancode),
            state == SDL_PRESSED ? "pressed" : "released");
@@ -764,6 +769,7 @@ SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode)
         event.key.keysym.scancode = scancode;
         event.key.keysym.sym = keycode;
         event.key.keysym.mod = modstate;
+        event.key.keysym.raw = raw_keycode;
         event.key.windowID = keyboard->focus ? keyboard->focus->id : 0;
         posted = (SDL_PushEvent(&event) > 0);
     }

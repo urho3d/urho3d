@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_COCOA
@@ -146,8 +149,10 @@ Cocoa_VideoInit(_THIS)
     Cocoa_InitKeyboard(_this);
     Cocoa_InitMouse(_this);
 
-    const char *hint = SDL_GetHint(SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES);
-    data->allow_spaces = ( (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6) && (!hint || (*hint != '0')) );
+    // Urho3D: disable fullscreen space due to black screen on switch
+    //const char *hint = SDL_GetHint(SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES);
+    //data->allow_spaces = ( (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6) && (!hint || (*hint != '0')) );
+    data->allow_spaces = SDL_FALSE;
 
     /* The IOPM assertion API can disable the screensaver as of 10.7. */
     data->screensaver_use_iopm = floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6;

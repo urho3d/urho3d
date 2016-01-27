@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
@@ -41,6 +44,25 @@
 #import "SDL_uikitopenglview.h"
 
 #include <Foundation/Foundation.h>
+
+// Urho3D: iOS 8 window size hack based on work of Alex Szpakowski
+// https://bitbucket.org/slime73/sdl-experiments
+@implementation SDL_uikitwindow
+
+(void)layoutSubviews
+{
+    [super layoutSubviews];
+
+    // Forcibly set window frame based on screen bounds, which follow the orientation on iOS 8
+    // Note: we compile this hack only when the version define exists (iOS SDK 8.1); Urho3D compiled
+    // on earlier iOS SDK's did not need this behavior, even when running on an iOS 8 device
+#ifdef NSFoundationVersionNumber_iOS_7_1
+    if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1) {
+        self.frame = self.screen.bounds;
+    }
+#endif
+}
+@end
 
 @implementation SDL_WindowData
 
@@ -76,8 +98,8 @@
 
 @end
 
-
-static int SetupWindowData(_THIS, SDL_Window *window, UIWindow *uiwindow, SDL_bool created)
+// Urho3D: use subclass for iOS 8 window size hack
+static int SetupWindowData(_THIS, SDL_Window *window, SDL_uikitwindow *uiwindow, SDL_bool created)
 {
     SDL_VideoDisplay *display = SDL_GetDisplayForWindow(window);
     SDL_DisplayData *displaydata = (__bridge SDL_DisplayData *) display->driverdata;
@@ -200,7 +222,9 @@ UIKit_CreateWindow(_THIS, SDL_Window *window)
 
         /* ignore the size user requested, and make a fullscreen window */
         /* !!! FIXME: can we have a smaller view? */
-        UIWindow *uiwindow = [[SDL_uikitwindow alloc] initWithFrame:data.uiscreen.bounds];
+        //UIWindow *uiwindow = [[SDL_uikitwindow alloc] initWithFrame:data.uiscreen.bounds];
+        // Urho3D: create subclass for iOS 8 window size hack
+        SDL_uikitwindow *uiwindow = [[SDL_uikitwindow alloc] initWithFrame:data.uiscreen.bounds];
 
         /* put the window on an external display if appropriate. */
         if (data.uiscreen != [UIScreen mainScreen]) {

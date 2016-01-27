@@ -18,12 +18,15 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by OvermindDL1 for Urho3D
+
 #include "../../SDL_internal.h"
 
 #ifdef SDL_INPUT_LINUXEV
 
 /* This is based on the linux joystick driver */
-/* References: https://www.kernel.org/doc/Documentation/input/input.txt 
+/* References: https://www.kernel.org/doc/Documentation/input/input.txt
  *             https://www.kernel.org/doc/Documentation/input/event-codes.txt
  *             /usr/include/linux/input.h
  *             The evtest application is also useful to debug the protocol
@@ -361,9 +364,9 @@ static int SDL_EVDEV_get_console_fd(void)
 {
     int fd, i;
     char arg = 0;
-    
+
     /* Try a few consoles to see which one we have read access to */
-    
+
     for(i = 0; i < SDL_arraysize(EVDEV_consoles); i++) {
         fd = open(EVDEV_consoles[i], O_RDONLY);
         if (fd >= 0) {
@@ -371,13 +374,13 @@ static int SDL_EVDEV_get_console_fd(void)
             close(fd);
         }
     }
-    
+
     /* Try stdin, stdout, stderr */
-    
+
     for(fd = 0; fd < 3; fd++) {
         if (IS_CONSOLE(fd)) return fd;
     }
-    
+
     /* We won't be able to send SDL_TEXTINPUT events */
     return -1;
 }
@@ -386,7 +389,7 @@ static int SDL_EVDEV_get_console_fd(void)
 static int SDL_EVDEV_mute_keyboard(int tty, int *kb_mode)
 {
     char arg;
-    
+
     *kb_mode = 0; /* FIXME: Is this a sane default in case KDGKBMODE fails? */
     if (!IS_CONSOLE(tty)) {
         return SDL_SetError("Tried to mute an invalid tty");
@@ -395,8 +398,8 @@ static int SDL_EVDEV_mute_keyboard(int tty, int *kb_mode)
     if (ioctl(tty, KDSKBMUTE, 1) && ioctl(tty, KDSKBMODE, K_OFF)) {
         return SDL_SetError("EVDEV: Failed muting keyboard");
     }
-    
-    return 0;  
+
+    return 0;
 }
 
 /* Restore the keyboard mode for given tty */
@@ -414,47 +417,47 @@ static int SDL_EVDEV_get_active_tty()
     char ttyname[NAME_MAX + 1];
     char ttypath[PATH_MAX+1] = "/dev/";
     char arg;
-    
+
     fd = open("/sys/class/tty/tty0/active", O_RDONLY);
     if (fd < 0) {
         return SDL_SetError("Could not determine which tty is active");
     }
-    
+
     len = read(fd, ttyname, NAME_MAX);
     close(fd);
-    
+
     if (len <= 0) {
         return SDL_SetError("Could not read which tty is active");
     }
-    
+
     if (ttyname[len-1] == '\n') {
         ttyname[len-1] = '\0';
     }
     else {
         ttyname[len] = '\0';
     }
-    
+
     SDL_strlcat(ttypath, ttyname, PATH_MAX);
     fd = open(ttypath, O_RDWR | O_NOCTTY);
     if (fd < 0) {
         return SDL_SetError("Could not open tty: %s", ttypath);
     }
-    
+
     if (!IS_CONSOLE(fd)) {
         close(fd);
         return SDL_SetError("Invalid tty obtained: %s", ttypath);
     }
 
-    return fd;  
+    return fd;
 }
 
 int
 SDL_EVDEV_Init(void)
 {
     int retval = 0;
-    
+
     if (_this == NULL) {
-        
+
         _this = (SDL_EVDEV_PrivateData *) SDL_calloc(1, sizeof(*_this));
         if(_this == NULL) {
             return SDL_OutOfMemory();
@@ -472,16 +475,16 @@ SDL_EVDEV_Init(void)
             SDL_EVDEV_Quit();
             return -1;
         }
-        
+
         /* Force a scan to build the initial device list */
         SDL_UDEV_Scan();
 #else
         /* TODO: Scan the devices manually, like a caveman */
 #endif /* SDL_USE_LIBUDEV */
-        
+
         /* We need a physical terminal (not PTS) to be able to translate key code to symbols via the kernel tables */
         _this->console_fd = SDL_EVDEV_get_console_fd();
-        
+
         /* Mute the keyboard so keystrokes only generate evdev events and do not leak through to the console */
         _this->tty = STDIN_FILENO;
         if (SDL_EVDEV_mute_keyboard(_this->tty, &_this->kb_mode) < 0) {
@@ -495,9 +498,9 @@ SDL_EVDEV_Init(void)
             }
         }
     }
-    
+
     _this->ref_count += 1;
-    
+
     return retval;
 }
 
@@ -507,34 +510,34 @@ SDL_EVDEV_Quit(void)
     if (_this == NULL) {
         return;
     }
-    
+
     _this->ref_count -= 1;
-    
+
     if (_this->ref_count < 1) {
-        
+
 #if SDL_USE_LIBUDEV
         SDL_UDEV_DelCallback(SDL_EVDEV_udev_callback);
         SDL_UDEV_Quit();
 #endif /* SDL_USE_LIBUDEV */
-       
+
         if (_this->console_fd >= 0) {
             close(_this->console_fd);
         }
-        
+
         if (_this->tty >= 0) {
             SDL_EVDEV_unmute_keyboard(_this->tty, _this->kb_mode);
             close(_this->tty);
         }
-        
+
         /* Remove existing devices */
         while(_this->first != NULL) {
             SDL_EVDEV_device_removed(_this->first->path);
         }
-        
+
         SDL_assert(_this->first == NULL);
         SDL_assert(_this->last == NULL);
         SDL_assert(_this->numdevices == 0);
-        
+
         SDL_free(_this);
         _this = NULL;
     }
@@ -546,7 +549,7 @@ void SDL_EVDEV_udev_callback(SDL_UDEV_deviceevent udev_type, int udev_class, con
     if (devpath == NULL) {
         return;
     }
-    
+
     switch(udev_type) {
     case SDL_UDEV_DEVICEADDED:
         if (!(udev_class & (SDL_UDEV_DEVICE_MOUSE|SDL_UDEV_DEVICE_KEYBOARD))) {
@@ -554,11 +557,11 @@ void SDL_EVDEV_udev_callback(SDL_UDEV_deviceevent udev_type, int udev_class, con
         }
         SDL_EVDEV_device_added(devpath);
         break;
-            
+
     case SDL_UDEV_DEVICEREMOVED:
         SDL_EVDEV_device_removed(devpath);
         break;
-            
+
     default:
         break;
     }
@@ -566,7 +569,7 @@ void SDL_EVDEV_udev_callback(SDL_UDEV_deviceevent udev_type, int udev_class, con
 
 #endif /* SDL_USE_LIBUDEV */
 
-void 
+void
 SDL_EVDEV_Poll(void)
 {
     struct input_event events[32];
@@ -613,9 +616,9 @@ SDL_EVDEV_Poll(void)
                     scan_code = SDL_EVDEV_translate_keycode(events[i].code);
                     if (scan_code != SDL_SCANCODE_UNKNOWN) {
                         if (events[i].value == 0) {
-                            SDL_SendKeyboardKey(SDL_RELEASED, scan_code);
+                            SDL_SendKeyboardKey(SDL_RELEASED, (Uint32)(events[i].code), scan_code);
                         } else if (events[i].value == 1 || events[i].value == 2 /* Key repeated */) {
-                            SDL_SendKeyboardKey(SDL_PRESSED, scan_code);
+                            SDL_SendKeyboardKey(SDL_PRESSED, (Uint32)(events[i].code), scan_code);
 #ifdef SDL_INPUT_LINUXKD
                             if (_this->console_fd >= 0) {
                                 kbe.kb_index = events[i].code;
@@ -623,7 +626,7 @@ SDL_EVDEV_Poll(void)
                                 /* Ref: http://www.linuxjournal.com/article/2783 */
                                 modstate = SDL_GetModState();
                                 kbe.kb_table = 0;
-                                
+
                                 /* Ref: http://graphics.stanford.edu/~seander/bithacks.html#ConditionalSetOrClearBitsWithoutBranching */
                                 kbe.kb_table |= -((modstate & KMOD_LCTRL) != 0) & (1 << KG_CTRLL | 1 << KG_CTRL);
                                 kbe.kb_table |= -((modstate & KMOD_RCTRL) != 0) & (1 << KG_CTRLR | 1 << KG_CTRL);
@@ -632,13 +635,13 @@ SDL_EVDEV_Poll(void)
                                 kbe.kb_table |= -((modstate & KMOD_LALT) != 0) & (1 << KG_ALT);
                                 kbe.kb_table |= -((modstate & KMOD_RALT) != 0) & (1 << KG_ALTGR);
 
-                                if (ioctl(_this->console_fd, KDGKBENT, (unsigned long)&kbe) == 0 && 
-                                    ((KTYP(kbe.kb_value) == KT_LATIN) || (KTYP(kbe.kb_value) == KT_ASCII) || (KTYP(kbe.kb_value) == KT_LETTER))) 
+                                if (ioctl(_this->console_fd, KDGKBENT, (unsigned long)&kbe) == 0 &&
+                                    ((KTYP(kbe.kb_value) == KT_LATIN) || (KTYP(kbe.kb_value) == KT_ASCII) || (KTYP(kbe.kb_value) == KT_LETTER)))
                                 {
                                     kval = KVAL(kbe.kb_value);
-                                    
+
                                     /* While there's a KG_CAPSSHIFT symbol, it's not useful to build the table index with it
-                                     * because 1 << KG_CAPSSHIFT overflows the 8 bits of kb_table 
+                                     * because 1 << KG_CAPSSHIFT overflows the 8 bits of kb_table
                                      * So, we do the CAPS LOCK logic here. Note that isalpha depends on the locale!
                                      */
                                     if (modstate & KMOD_CAPS && isalpha(kval)) {
@@ -648,7 +651,7 @@ SDL_EVDEV_Poll(void)
                                             kval = toupper(kval);
                                         }
                                     }
-                                     
+
                                     /* Convert to UTF-8 and send */
                                     end = SDL_UCS4ToUTF8(kval, keysym);
                                     *end = '\0';
@@ -700,7 +703,7 @@ SDL_EVDEV_Poll(void)
                     break;
                 }
             }
-        }    
+        }
     }
 }
 
@@ -719,7 +722,7 @@ SDL_EVDEV_translate_keycode(int keycode)
 }
 
 static void
-SDL_EVDEV_sync_device(SDL_evdevlist_item *item) 
+SDL_EVDEV_sync_device(SDL_evdevlist_item *item)
 {
     /* TODO: get full state of device and report whatever is required */
 }
@@ -736,7 +739,7 @@ SDL_EVDEV_device_added(const char *devpath)
             return -1;  /* already have this one */
         }
     }
-    
+
     item = (SDL_evdevlist_item *) SDL_calloc(1, sizeof (SDL_evdevlist_item));
     if (item == NULL) {
         return SDL_OutOfMemory();
@@ -747,26 +750,26 @@ SDL_EVDEV_device_added(const char *devpath)
         SDL_free(item);
         return SDL_SetError("Unable to open %s", devpath);
     }
-    
+
     item->path = SDL_strdup(devpath);
     if (item->path == NULL) {
         close(item->fd);
         SDL_free(item);
         return SDL_OutOfMemory();
     }
-    
+
     /* Non blocking read mode */
     fcntl(item->fd, F_SETFL, O_NONBLOCK);
-    
+
     if (_this->last == NULL) {
         _this->first = _this->last = item;
     } else {
         _this->last->next = item;
         _this->last = item;
     }
-    
+
     SDL_EVDEV_sync_device(item);
-    
+
     return _this->numdevices++;
 }
 #endif /* SDL_USE_LIBUDEV */
@@ -805,4 +808,3 @@ SDL_EVDEV_device_removed(const char *devpath)
 #endif /* SDL_INPUT_LINUXEV */
 
 /* vi: set ts=4 sw=4 expandtab: */
-

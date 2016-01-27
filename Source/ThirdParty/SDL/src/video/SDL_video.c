@@ -20,6 +20,8 @@
 */
 #include "../SDL_internal.h"
 
+// Modified by Lasse Oorni, and Yao Wei Tjong for Urho3D
+
 /* The high-level video driver subsystem */
 
 #include "SDL.h"
@@ -98,7 +100,7 @@ static VideoBootStrap *bootstrap[] = {
 #endif
 #if SDL_VIDEO_DRIVER_RPI
     &RPI_bootstrap,
-#endif 
+#endif
 #if SDL_VIDEO_DRIVER_NACL
     &NACL_bootstrap,
 #endif
@@ -156,243 +158,7 @@ typedef struct {
     int bytes_per_pixel;
 } SDL_WindowTextureData;
 
-static SDL_bool
-ShouldUseTextureFramebuffer()
-{
-    const char *hint;
-
-    /* If there's no native framebuffer support then there's no option */
-    if (!_this->CreateWindowFramebuffer) {
-        return SDL_TRUE;
-    }
-
-    /* If the user has specified a software renderer we can't use a
-       texture framebuffer, or renderer creation will go recursive.
-     */
-    hint = SDL_GetHint(SDL_HINT_RENDER_DRIVER);
-    if (hint && SDL_strcasecmp(hint, "software") == 0) {
-        return SDL_FALSE;
-    }
-
-    /* See if the user or application wants a specific behavior */
-    hint = SDL_GetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION);
-    if (hint) {
-        if (*hint == '0') {
-            return SDL_FALSE;
-        } else {
-            return SDL_TRUE;
-        }
-    }
-
-    /* Each platform has different performance characteristics */
-#if defined(__WIN32__)
-    /* GDI BitBlt() is way faster than Direct3D dynamic textures right now.
-     */
-    return SDL_FALSE;
-
-#elif defined(__MACOSX__)
-    /* Mac OS X uses OpenGL as the native fast path */
-    return SDL_TRUE;
-
-#elif defined(__LINUX__)
-    /* Properly configured OpenGL drivers are faster than MIT-SHM */
-#if SDL_VIDEO_OPENGL
-    /* Ugh, find a way to cache this value! */
-    {
-        SDL_Window *window;
-        SDL_GLContext context;
-        SDL_bool hasAcceleratedOpenGL = SDL_FALSE;
-
-        window = SDL_CreateWindow("OpenGL test", -32, -32, 32, 32, SDL_WINDOW_OPENGL|SDL_WINDOW_HIDDEN);
-        if (window) {
-            context = SDL_GL_CreateContext(window);
-            if (context) {
-                const GLubyte *(APIENTRY * glGetStringFunc) (GLenum);
-                const char *vendor = NULL;
-
-                glGetStringFunc = SDL_GL_GetProcAddress("glGetString");
-                if (glGetStringFunc) {
-                    vendor = (const char *) glGetStringFunc(GL_VENDOR);
-                }
-                /* Add more vendors here at will... */
-                if (vendor &&
-                    (SDL_strstr(vendor, "ATI Technologies") ||
-                     SDL_strstr(vendor, "NVIDIA"))) {
-                    hasAcceleratedOpenGL = SDL_TRUE;
-                }
-                SDL_GL_DeleteContext(context);
-            }
-            SDL_DestroyWindow(window);
-        }
-        return hasAcceleratedOpenGL;
-    }
-#elif SDL_VIDEO_OPENGL_ES || SDL_VIDEO_OPENGL_ES2
-    /* Let's be optimistic about this! */
-    return SDL_TRUE;
-#else
-    return SDL_FALSE;
-#endif
-
-#else
-    /* Play it safe, assume that if there is a framebuffer driver that it's
-       optimized for the current platform.
-    */
-    return SDL_FALSE;
-#endif
-}
-
-static int
-SDL_CreateWindowTexture(SDL_VideoDevice *unused, SDL_Window * window, Uint32 * format, void ** pixels, int *pitch)
-{
-    SDL_WindowTextureData *data;
-
-    data = SDL_GetWindowData(window, SDL_WINDOWTEXTUREDATA);
-    if (!data) {
-        SDL_Renderer *renderer = NULL;
-        int i;
-        const char *hint = SDL_GetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION);
-
-        /* Check to see if there's a specific driver requested */
-        if (hint && *hint != '0' && *hint != '1' &&
-            SDL_strcasecmp(hint, "software") != 0) {
-            for (i = 0; i < SDL_GetNumRenderDrivers(); ++i) {
-                SDL_RendererInfo info;
-                SDL_GetRenderDriverInfo(i, &info);
-                if (SDL_strcasecmp(info.name, hint) == 0) {
-                    renderer = SDL_CreateRenderer(window, i, 0);
-                    break;
-                }
-            }
-        }
-        
-        if (!renderer) {
-            for (i = 0; i < SDL_GetNumRenderDrivers(); ++i) {
-                SDL_RendererInfo info;
-                SDL_GetRenderDriverInfo(i, &info);
-                if (SDL_strcmp(info.name, "software") != 0) {
-                    renderer = SDL_CreateRenderer(window, i, 0);
-                    if (renderer) {
-                        break;
-                    }
-                }
-            }
-        }
-        if (!renderer) {
-            return SDL_SetError("No hardware accelerated renderers available");
-        }
-
-        /* Create the data after we successfully create the renderer (bug #1116) */
-        data = (SDL_WindowTextureData *)SDL_calloc(1, sizeof(*data));
-        if (!data) {
-            SDL_DestroyRenderer(renderer);
-            return SDL_OutOfMemory();
-        }
-        SDL_SetWindowData(window, SDL_WINDOWTEXTUREDATA, data);
-
-        data->renderer = renderer;
-    }
-
-    /* Free any old texture and pixel data */
-    if (data->texture) {
-        SDL_DestroyTexture(data->texture);
-        data->texture = NULL;
-    }
-    SDL_free(data->pixels);
-    data->pixels = NULL;
-
-    {
-        SDL_RendererInfo info;
-        Uint32 i;
-
-        if (SDL_GetRendererInfo(data->renderer, &info) < 0) {
-            return -1;
-        }
-
-        /* Find the first format without an alpha channel */
-        *format = info.texture_formats[0];
-
-        for (i = 0; i < info.num_texture_formats; ++i) {
-            if (!SDL_ISPIXELFORMAT_FOURCC(info.texture_formats[i]) &&
-                    !SDL_ISPIXELFORMAT_ALPHA(info.texture_formats[i])) {
-                *format = info.texture_formats[i];
-                break;
-            }
-        }
-    }
-
-    data->texture = SDL_CreateTexture(data->renderer, *format,
-                                      SDL_TEXTUREACCESS_STREAMING,
-                                      window->w, window->h);
-    if (!data->texture) {
-        return -1;
-    }
-
-    /* Create framebuffer data */
-    data->bytes_per_pixel = SDL_BYTESPERPIXEL(*format);
-    data->pitch = (((window->w * data->bytes_per_pixel) + 3) & ~3);
-    data->pixels = SDL_malloc(window->h * data->pitch);
-    if (!data->pixels) {
-        return SDL_OutOfMemory();
-    }
-
-    *pixels = data->pixels;
-    *pitch = data->pitch;
-
-    /* Make sure we're not double-scaling the viewport */
-    SDL_RenderSetViewport(data->renderer, NULL);
-
-    return 0;
-}
-
-static int
-SDL_UpdateWindowTexture(SDL_VideoDevice *unused, SDL_Window * window, const SDL_Rect * rects, int numrects)
-{
-    SDL_WindowTextureData *data;
-    SDL_Rect rect;
-    void *src;
-
-    data = SDL_GetWindowData(window, SDL_WINDOWTEXTUREDATA);
-    if (!data || !data->texture) {
-        return SDL_SetError("No window texture data");
-    }
-
-    /* Update a single rect that contains subrects for best DMA performance */
-    if (SDL_GetSpanEnclosingRect(window->w, window->h, numrects, rects, &rect)) {
-        src = (void *)((Uint8 *)data->pixels +
-                        rect.y * data->pitch +
-                        rect.x * data->bytes_per_pixel);
-        if (SDL_UpdateTexture(data->texture, &rect, src, data->pitch) < 0) {
-            return -1;
-        }
-
-        if (SDL_RenderCopy(data->renderer, data->texture, NULL, NULL) < 0) {
-            return -1;
-        }
-
-        SDL_RenderPresent(data->renderer);
-    }
-    return 0;
-}
-
-static void
-SDL_DestroyWindowTexture(SDL_VideoDevice *unused, SDL_Window * window)
-{
-    SDL_WindowTextureData *data;
-
-    data = SDL_SetWindowData(window, SDL_WINDOWTEXTUREDATA, NULL);
-    if (!data) {
-        return;
-    }
-    if (data->texture) {
-        SDL_DestroyTexture(data->texture);
-    }
-    if (data->renderer) {
-        SDL_DestroyRenderer(data->renderer);
-    }
-    SDL_free(data->pixels);
-    SDL_free(data);
-}
-
+// Urho3D: renderer disabled
 
 static int
 cmpmodes(const void *A, const void *B)
@@ -522,11 +288,14 @@ SDL_VideoInit(const char *driver_name)
     }
 
     /* Add the renderer framebuffer emulation if desired */
+    // Urho3D: renderer disabled
+    /*
     if (ShouldUseTextureFramebuffer()) {
         _this->CreateWindowFramebuffer = SDL_CreateWindowTexture;
         _this->UpdateWindowFramebuffer = SDL_UpdateWindowTexture;
         _this->DestroyWindowFramebuffer = SDL_DestroyWindowTexture;
     }
+    */
 
     /* Disable the screen saver by default. This is a change from <= 2.0.1,
        but most things using SDL are games or media players; you wouldn't
@@ -1147,7 +916,7 @@ SDL_UpdateFullscreenMode(SDL_Window * window, SDL_bool fullscreen)
      */
     if (window->is_destroying && (window->last_fullscreen_flags & FULLSCREEN_MASK) == SDL_WINDOW_FULLSCREEN_DESKTOP)
         return 0;
-    
+
     /* If we're switching between a fullscreen Space and "normal" fullscreen, we need to get back to normal first. */
     if (fullscreen && ((window->last_fullscreen_flags & FULLSCREEN_MASK) == SDL_WINDOW_FULLSCREEN_DESKTOP) && ((window->flags & FULLSCREEN_MASK) == SDL_WINDOW_FULLSCREEN)) {
         if (!Cocoa_SetWindowFullscreenSpace(window, SDL_FALSE)) {
@@ -1428,8 +1197,9 @@ SDL_CreateWindow(const char *title, int x, int y, int w, int h, Uint32 flags)
     return window;
 }
 
+// Urho3D: added flags parameter
 SDL_Window *
-SDL_CreateWindowFrom(const void *data)
+SDL_CreateWindowFrom(const void *data, Uint32 flags)
 {
     SDL_Window *window;
 
@@ -1457,6 +1227,16 @@ SDL_CreateWindowFrom(const void *data)
         _this->windows->prev = window;
     }
     _this->windows = window;
+
+    // Urho3D: load OpenGL if initializing an external OpenGL window
+    if (flags & SDL_WINDOW_OPENGL) {
+        if (!_this->GL_CreateContext) {
+            SDL_SetError("No OpenGL support in video driver");
+            return NULL;
+        }
+        SDL_GL_LoadLibrary(NULL);
+        window->flags |= SDL_WINDOW_OPENGL;
+    }
 
     if (_this->CreateWindowFrom(_this, window, data) < 0) {
         SDL_DestroyWindow(window);
@@ -1743,7 +1523,7 @@ SDL_GetWindowPosition(SDL_Window * window, int *x, int *y)
     /* Fullscreen windows are always at their display's origin */
     if (window->flags & SDL_WINDOW_FULLSCREEN) {
         int displayIndex;
-        
+
         if (x) {
             *x = 0;
         }
@@ -2044,7 +1824,7 @@ SDL_SetWindowFullscreen(SDL_Window * window, Uint32 flags)
     if (SDL_UpdateFullscreenMode(window, FULLSCREEN_VISIBLE(window)) == 0) {
         return 0;
     }
-    
+
     window->flags &= ~FULLSCREEN_MASK;
     window->flags |= oldflags;
     return -1;
@@ -3652,7 +3432,7 @@ float SDL_ComputeDiagonalDPI(int hpix, int vpix, float hinches, float vinches)
 	if ( den2 <= 0.0f ) {
 		return 0.0f;
 	}
-		
+
 	return (float)(SDL_sqrt((double)hpix * (double)hpix + (double)vpix * (double)vpix) /
 				   SDL_sqrt((double)den2));
 }

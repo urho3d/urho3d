@@ -19,6 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 #include "../../SDL_internal.h"
 
 #ifdef SDL_JOYSTICK_ANDROID
@@ -83,7 +85,7 @@ keycode_to_SDL(int keycode)
 {
     /* FIXME: If this function gets too unwiedly in the future, replace with a lookup table */
     int button = 0;
-    switch(keycode) 
+    switch(keycode)
     {
         /* Some gamepad buttons (API 9) */
         case AKEYCODE_BUTTON_A:
@@ -131,7 +133,7 @@ keycode_to_SDL(int keycode)
         case AKEYCODE_BUTTON_Z:
             button = SDL_CONTROLLER_BUTTON_MAX+3; /* Not supported by GameController */
             break;
-                        
+
         /* D-Pad key codes (API 1) */
         case AKEYCODE_DPAD_UP:
             button = SDL_CONTROLLER_BUTTON_DPAD_UP;
@@ -168,18 +170,18 @@ keycode_to_SDL(int keycode)
         case AKEYCODE_BUTTON_16:
             button = keycode - AKEYCODE_BUTTON_1 + SDL_CONTROLLER_BUTTON_MAX + 5;
             break;
-            
+
         default:
             return -1;
             break;
     }
-    
-    /* This is here in case future generations, probably with six fingers per hand, 
-     * happily add new cases up above and forget to update the max number of buttons. 
+
+    /* This is here in case future generations, probably with six fingers per hand,
+     * happily add new cases up above and forget to update the max number of buttons.
      */
     SDL_assert(button < ANDROID_MAX_NBUTTONS);
     return button;
-    
+
 }
 
 int
@@ -194,7 +196,7 @@ Android_OnPadDown(int device_id, int keycode)
             return 0;
         }
     }
-    
+
     return -1;
 }
 
@@ -210,7 +212,7 @@ Android_OnPadUp(int device_id, int keycode)
             return 0;
         }
     }
-    
+
     return -1;
 }
 
@@ -222,7 +224,7 @@ Android_OnJoy(int device_id, int axis, float value)
     if (item && item->joystick) {
         SDL_PrivateJoystickAxis(item->joystick, axis, (Sint16) (32767.*value) );
     }
-    
+
     return 0;
 }
 
@@ -255,11 +257,11 @@ Android_AddJoystick(int device_id, const char *name, SDL_bool is_accelerometer, 
 #if !SDL_EVENTS_DISABLED
     SDL_Event event;
 #endif
-    
+
     if(JoystickByDeviceId(device_id) != NULL || name == NULL) {
         return -1;
     }
-    
+
     /* the GUID is just the first 16 chars of the name for now */
     SDL_zero( guid );
     SDL_memcpy( &guid, name, SDL_min( sizeof(guid), SDL_strlen( name ) ) );
@@ -277,7 +279,7 @@ Android_AddJoystick(int device_id, const char *name, SDL_bool is_accelerometer, 
          SDL_free(item);
          return -1;
     }
-    
+
     item->is_accelerometer = is_accelerometer;
     if (nbuttons > -1) {
         item->nbuttons = nbuttons;
@@ -318,7 +320,7 @@ Android_AddJoystick(int device_id, const char *name, SDL_bool is_accelerometer, 
     return numjoysticks;
 }
 
-int 
+int
 Android_RemoveJoystick(int device_id)
 {
     SDL_joylist_item *item = SDL_joylist;
@@ -326,7 +328,7 @@ Android_RemoveJoystick(int device_id)
 #if !SDL_EVENTS_DISABLED
     SDL_Event event;
 #endif
-    
+
     /* Don't call JoystickByDeviceId here or there'll be an infinite loop! */
     while (item != NULL) {
         if (item->device_id == device_id) {
@@ -335,7 +337,7 @@ Android_RemoveJoystick(int device_id)
         prev = item;
         item = item->next;
     }
-    
+
     if (item == NULL) {
         return -1;
     }
@@ -344,7 +346,7 @@ Android_RemoveJoystick(int device_id)
     if (item->joystick) {
         item->joystick->hwdata = NULL;
     }
-        
+
     if (prev != NULL) {
         prev->next = item->next;
     } else {
@@ -373,7 +375,7 @@ Android_RemoveJoystick(int device_id)
 #ifdef DEBUG_JOYSTICK
     SDL_Log("Removed joystick with device_id %d", device_id);
 #endif
-    
+
     SDL_free(item->name);
     SDL_free(item);
     return retval;
@@ -385,13 +387,13 @@ SDL_SYS_JoystickInit(void)
 {
     const char *hint;
     SDL_SYS_JoystickDetect();
-    
+
     hint = SDL_GetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK);
     if (!hint || SDL_atoi(hint)) {
         /* Default behavior, accelerometer as joystick */
         Android_AddJoystick(ANDROID_ACCELEROMETER_DEVICE_ID, ANDROID_ACCELEROMETER_NAME, SDL_TRUE, 0, 3, 0, 0);
     }
-   
+
     return (numjoysticks);
 
 }
@@ -443,10 +445,10 @@ JoystickByDeviceId(int device_id)
         }
         item = item->next;
     }
-    
+
     /* Joystick not found, try adding it */
     SDL_SYS_JoystickDetect();
-    
+
     while (item != NULL) {
         if (item->device_id == device_id) {
             return item;
@@ -483,7 +485,7 @@ SDL_SYS_JoystickOpen(SDL_Joystick * joystick, int device_index)
     if (item == NULL ) {
         return SDL_SetError("No such device");
     }
-    
+
     if (item->joystick != NULL) {
         return SDL_SetError("Joystick already opened");
     }
@@ -518,11 +520,11 @@ SDL_SYS_JoystickUpdate(SDL_Joystick * joystick)
             if (item->joystick) {
                 if (Android_JNI_GetAccelerometerValues(values)) {
                     for ( i = 0; i < 3; i++ ) {
-                        if (values[i] > 1.0f) {
-                            values[i] = 1.0f;
-                        } else if (values[i] < -1.0f) {
+                        // Urho3D: clamp values to avoid short integer overflow
+                        if (values[i] < -1.0f)
                             values[i] = -1.0f;
-                        }
+                        else if (values[i] > 1.0f)
+                            values[i] = 1.0f;
 
                         value = (Sint16)(values[i] * 32767.0f);
                         SDL_PrivateJoystickAxis(item->joystick, i, value);
@@ -568,11 +570,11 @@ SDL_JoystickGUID SDL_SYS_JoystickGetDeviceGUID( int device_index )
 SDL_JoystickGUID SDL_SYS_JoystickGetGUID(SDL_Joystick * joystick)
 {
     SDL_JoystickGUID guid;
-    
+
     if (joystick->hwdata != NULL) {
         return ((SDL_joylist_item*)joystick->hwdata)->guid;
     }
-    
+
     SDL_zero(guid);
     return guid;
 }

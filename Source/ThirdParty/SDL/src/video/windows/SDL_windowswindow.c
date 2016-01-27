@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_WINDOWS
@@ -308,11 +311,11 @@ WIN_CreateWindow(_THIS, SDL_Window * window)
 #if SDL_VIDEO_OPENGL_ES2
     if ((window->flags & SDL_WINDOW_OPENGL) &&
         _this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_ES
-#if SDL_VIDEO_OPENGL_WGL           
+#if SDL_VIDEO_OPENGL_WGL
         && (!_this->gl_data || !_this->gl_data->HAS_WGL_EXT_create_context_es2_profile)
-#endif  
+#endif
         ) {
-#if SDL_VIDEO_OPENGL_EGL  
+#if SDL_VIDEO_OPENGL_EGL
         if (WIN_GLES_SetupWindow(_this, window) < 0) {
             WIN_DestroyWindow(_this, window);
             return -1;
@@ -320,7 +323,7 @@ WIN_CreateWindow(_THIS, SDL_Window * window)
 #else
         return SDL_SetError("Could not create GLES window surface (no EGL support available)");
 #endif /* SDL_VIDEO_OPENGL_EGL */
-    } else 
+    } else
 #endif /* SDL_VIDEO_OPENGL_ES2 */
 
 #if SDL_VIDEO_OPENGL_WGL
@@ -359,6 +362,13 @@ WIN_CreateWindowFrom(_THIS, SDL_Window * window, const void *data)
 
     if (SetupWindowData(_this, window, hwnd, SDL_FALSE) < 0) {
         return -1;
+    }
+
+    // Urho3D: if window will be used for OpenGL, choose pixel format
+    if (window->flags & SDL_WINDOW_OPENGL) {
+        if (WIN_GL_SetupWindow(_this, window) < 0) {
+            return -1;
+        }
     }
 
 #if SDL_VIDEO_OPENGL_WGL

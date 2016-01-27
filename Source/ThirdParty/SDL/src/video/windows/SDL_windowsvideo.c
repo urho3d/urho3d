@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_WINDOWS
@@ -113,6 +116,11 @@ WIN_CreateDevice(int devindex)
         data->CloseTouchInputHandle = (BOOL (WINAPI *)(HTOUCHINPUT)) SDL_LoadFunction(data->userDLL, "CloseTouchInputHandle");
         data->GetTouchInputInfo = (BOOL (WINAPI *)(HTOUCHINPUT, UINT, PTOUCHINPUT, int)) SDL_LoadFunction(data->userDLL, "GetTouchInputInfo");
         data->RegisterTouchWindow = (BOOL (WINAPI *)(HWND, ULONG)) SDL_LoadFunction(data->userDLL, "RegisterTouchWindow");
+
+        // Urho3D: call SetProcessDPIAware if available to prevent Windows 8.1 from performing unwanted scaling
+        data->SetProcessDPIAware = (BOOL (WINAPI *)()) SDL_LoadFunction(data->userDLL, "SetProcessDPIAware");
+        if (data->SetProcessDPIAware)
+            data->SetProcessDPIAware();
     }
 
     data->shcoreDLL = SDL_LoadObject("SHCORE.DLL");
@@ -169,7 +177,7 @@ WIN_CreateDevice(int devindex)
     device->GL_GetSwapInterval = WIN_GL_GetSwapInterval;
     device->GL_SwapWindow = WIN_GL_SwapWindow;
     device->GL_DeleteContext = WIN_GL_DeleteContext;
-#elif SDL_VIDEO_OPENGL_EGL        
+#elif SDL_VIDEO_OPENGL_EGL
     /* Use EGL based functions */
     device->GL_LoadLibrary = WIN_GLES_LoadLibrary;
     device->GL_GetProcAddress = WIN_GLES_GetProcAddress;
@@ -227,7 +235,7 @@ WIN_VideoQuit(_THIS)
 #define D3D_DEBUG_INFO
 #include <d3d9.h>
 
-SDL_bool 
+SDL_bool
 D3D_LoadDLL(void **pD3DDLL, IDirect3D9 **pDirect3D9Interface)
 {
     *pD3DDLL = SDL_LoadObject("D3D9.DLL");
@@ -309,7 +317,8 @@ SDL_Direct3D9GetAdapterIndex(int displayIndex)
     }
 }
 
-#if HAVE_DXGI_H
+// Urho3D: dxgi may not be available on MinGW
+#ifdef _MSC_VER
 #define CINTERFACE
 #define COBJMACROS
 #include <dxgi.h>
@@ -344,11 +353,10 @@ DXGI_LoadDLL(void **pDXGIDLL, IDXGIFactory **pDXGIFactory)
 }
 #endif
 
-
 SDL_bool
 SDL_DXGIGetOutputInfo(int displayIndex, int *adapterIndex, int *outputIndex)
 {
-#if !HAVE_DXGI_H
+#ifndef _MSC_VER
     if (adapterIndex) *adapterIndex = -1;
     if (outputIndex) *outputIndex = -1;
     SDL_SetError("SDL was compiled without DXGI support due to missing dxgi.h header");
