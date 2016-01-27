@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -53,6 +53,7 @@ typedef struct {
     struct wl_surface  *surface;
 
     int                hot_x, hot_y;
+    int                w, h;
 
     /* Either a preloaded cursor, or one we created ourselves */
     struct wl_cursor   *cursor;
@@ -105,6 +106,7 @@ create_buffer_from_shm(Wayland_CursorData *d,
 {
     SDL_VideoDevice *vd = SDL_GetVideoDevice();
     SDL_VideoData *data = (SDL_VideoData *) vd->driverdata;
+    struct wl_shm_pool *shm_pool;
 
     int stride = width * 4;
     int size = stride * height;
@@ -124,15 +126,13 @@ create_buffer_from_shm(Wayland_CursorData *d,
                        MAP_SHARED,
                        shm_fd,
                        0);
-    if (data == MAP_FAILED) {
+    if (d->shm_data == MAP_FAILED) {
         d->shm_data = NULL;
         fprintf (stderr, "mmap () failed\n");
         close (shm_fd);
     }
 
-    struct wl_shm_pool *shm_pool = wl_shm_create_pool(data->shm,
-                                                      shm_fd,
-                                                      size);
+    shm_pool = wl_shm_create_pool(data->shm, shm_fd, size);
     d->buffer = wl_shm_pool_create_buffer(shm_pool,
                                           0,
                                           width,
@@ -182,19 +182,11 @@ Wayland_CreateCursor(SDL_Surface *surface, int hot_x, int hot_y)
 
         data->surface = wl_compositor_create_surface(wd->compositor);
         wl_surface_set_user_data(data->surface, NULL);
-        wl_surface_attach(data->surface,
-                          data->buffer,
-                          0,
-                          0);
-        wl_surface_damage(data->surface,
-                          0,
-                          0,
-                          surface->w,
-                          surface->h);
-        wl_surface_commit(data->surface);
 
         data->hot_x = hot_x;
         data->hot_y = hot_y;
+        data->w = surface->w;
+        data->h = surface->h;
     }
 
     return cursor;
@@ -210,24 +202,13 @@ CreateCursorFromWlCursor(SDL_VideoData *d, struct wl_cursor *wlcursor)
         Wayland_CursorData *data = calloc (1, sizeof (Wayland_CursorData));
         cursor->driverdata = (void *) data;
 
-        /* The wl_buffer here will be destroyed from wl_cursor_theme_destroy
-         * if we are fetching this from a wl_cursor_theme, so don't store a
-         * reference to it here */
-        data->buffer = NULL;
+        data->buffer = WAYLAND_wl_cursor_image_get_buffer(wlcursor->images[0]);
         data->surface = wl_compositor_create_surface(d->compositor);
         wl_surface_set_user_data(data->surface, NULL);
-        wl_surface_attach(data->surface,
-                          WAYLAND_wl_cursor_image_get_buffer(wlcursor->images[0]),
-                          0,
-                          0);
-        wl_surface_damage(data->surface,
-                          0,
-                          0,
-                          wlcursor->images[0]->width,
-                          wlcursor->images[0]->height);
-        wl_surface_commit(data->surface);
         data->hot_x = wlcursor->images[0]->hotspot_x;
         data->hot_y = wlcursor->images[0]->hotspot_y;
+        data->w = wlcursor->images[0]->width;
+        data->h = wlcursor->images[0]->height;
         data->cursor= wlcursor;
     } else {
         SDL_OutOfMemory ();
@@ -267,13 +248,13 @@ Wayland_CreateSystemCursor(SDL_SystemCursor id)
         cursor = WAYLAND_wl_cursor_theme_get_cursor(d->cursor_theme, "xterm");
         break;
     case SDL_SYSTEM_CURSOR_WAIT:
-        cursor = WAYLAND_wl_cursor_theme_get_cursor(d->cursor_theme, "wait");
+        cursor = WAYLAND_wl_cursor_theme_get_cursor(d->cursor_theme, "watch");
         break;
     case SDL_SYSTEM_CURSOR_CROSSHAIR:
         cursor = WAYLAND_wl_cursor_theme_get_cursor(d->cursor_theme, "hand1");
         break;
     case SDL_SYSTEM_CURSOR_WAITARROW:
-        cursor = WAYLAND_wl_cursor_theme_get_cursor(d->cursor_theme, "wait");
+        cursor = WAYLAND_wl_cursor_theme_get_cursor(d->cursor_theme, "watch");
         break;
     case SDL_SYSTEM_CURSOR_SIZENWSE:
         cursor = WAYLAND_wl_cursor_theme_get_cursor(d->cursor_theme, "hand1");
@@ -298,24 +279,24 @@ Wayland_CreateSystemCursor(SDL_SystemCursor id)
         break;
     }
 
-    SDL_Cursor *sdl_cursor = CreateCursorFromWlCursor (d, cursor);
-
-    return sdl_cursor;
+    return CreateCursorFromWlCursor(d, cursor);
 }
 
 static void
 Wayland_FreeCursor(SDL_Cursor *cursor)
 {
+    Wayland_CursorData *d;
+
     if (!cursor)
         return;
 
-    Wayland_CursorData *d = cursor->driverdata;
+    d = cursor->driverdata;
 
     /* Probably not a cursor we own */
     if (!d)
         return;
 
-    if (d->buffer)
+    if (d->buffer && !d->cursor)
         wl_buffer_destroy(d->buffer);
 
     if (d->surface)
@@ -341,6 +322,9 @@ Wayland_ShowCursor(SDL_Cursor *cursor)
     {
         Wayland_CursorData *data = cursor->driverdata;
 
+        wl_surface_attach(data->surface, data->buffer, 0, 0);
+        wl_surface_damage(data->surface, 0, 0, data->w, data->h);
+        wl_surface_commit(data->surface);
         wl_pointer_set_cursor (pointer, 0,
                                data->surface,
                                data->hot_x,
@@ -361,14 +345,18 @@ static void
 Wayland_WarpMouse(SDL_Window *window, int x, int y)
 {
     SDL_Unsupported();
-    return;
+}
+
+static int
+Wayland_WarpMouseGlobal(int x, int y)
+{
+    return SDL_Unsupported();
 }
 
 static int
 Wayland_SetRelativeMouseMode(SDL_bool enabled)
 {
-    SDL_Unsupported();
-    return -1;
+    return SDL_Unsupported();
 }
 
 void
@@ -381,6 +369,7 @@ Wayland_InitMouse(void)
     mouse->ShowCursor = Wayland_ShowCursor;
     mouse->FreeCursor = Wayland_FreeCursor;
     mouse->WarpMouse = Wayland_WarpMouse;
+    mouse->WarpMouseGlobal = Wayland_WarpMouseGlobal;
     mouse->SetRelativeMouseMode = Wayland_SetRelativeMouseMode;
 
     SDL_SetDefaultCursor(Wayland_CreateDefaultCursor());

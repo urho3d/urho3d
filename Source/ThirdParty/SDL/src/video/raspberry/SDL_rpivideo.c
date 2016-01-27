@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -284,15 +284,14 @@ RPI_CreateWindow(_THIS, SDL_Window * window)
 void
 RPI_DestroyWindow(_THIS, SDL_Window * window)
 {
-    SDL_WindowData *data;
-        
-    if(window->driverdata) {
-        data = (SDL_WindowData *) window->driverdata;
+    SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
+    if(data) {
+#if SDL_VIDEO_OPENGL_EGL
         if (data->egl_surface != EGL_NO_SURFACE) {
             SDL_EGL_DestroySurface(_this, data->egl_surface);
-            data->egl_surface = EGL_NO_SURFACE;
         }
-        SDL_free(window->driverdata);
+#endif
+        SDL_free(data);
         window->driverdata = NULL;
     }
 }

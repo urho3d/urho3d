@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,8 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Oorni for Urho3D
 
 #include "../../SDL_internal.h"
 
@@ -193,8 +191,8 @@ Android_OnPadDown(int device_id, int keycode)
         item = JoystickByDeviceId(device_id);
         if (item && item->joystick) {
             SDL_PrivateJoystickButton(item->joystick, button , SDL_PRESSED);
+            return 0;
         }
-        return 0;
     }
     
     return -1;
@@ -209,8 +207,8 @@ Android_OnPadUp(int device_id, int keycode)
         item = JoystickByDeviceId(device_id);
         if (item && item->joystick) {
             SDL_PrivateJoystickButton(item->joystick, button, SDL_RELEASED);
+            return 0;
         }
-        return 0;
     }
     
     return -1;
@@ -313,7 +311,9 @@ Android_AddJoystick(int device_id, const char *name, SDL_bool is_accelerometer, 
     }
 #endif /* !SDL_EVENTS_DISABLED */
 
+#ifdef DEBUG_JOYSTICK
     SDL_Log("Added joystick %s with device_id %d", name, device_id);
+#endif
 
     return numjoysticks;
 }
@@ -370,7 +370,9 @@ Android_RemoveJoystick(int device_id)
     }
 #endif /* !SDL_EVENTS_DISABLED */
 
+#ifdef DEBUG_JOYSTICK
     SDL_Log("Removed joystick with device_id %d", device_id);
+#endif
     
     SDL_free(item->name);
     SDL_free(item);
@@ -410,11 +412,6 @@ void SDL_SYS_JoystickDetect()
         timeout = SDL_GetTicks() + 3000;
         Android_JNI_PollInputDevices();
     }
-}
-
-SDL_bool SDL_SYS_JoystickNeedsPolling()
-{
-    return SDL_TRUE;
 }
 
 static SDL_joylist_item *
@@ -474,7 +471,7 @@ SDL_JoystickID SDL_SYS_GetInstanceIdOfDeviceIndex(int device_index)
 }
 
 /* Function to open a joystick for use.
-   The joystick to open is specified by the index field of the joystick.
+   The joystick to open is specified by the device index.
    This should fill the nbuttons and naxes fields of the joystick structure.
    It returns 0, or -1 if there is an error.
  */
@@ -502,10 +499,10 @@ SDL_SYS_JoystickOpen(SDL_Joystick * joystick, int device_index)
     return (0);
 }
 
-/* Function to determine is this joystick is attached to the system right now */
+/* Function to determine if this joystick is attached to the system right now */
 SDL_bool SDL_SYS_JoystickAttached(SDL_Joystick *joystick)
 {
-    return !joystick->closed && (joystick->hwdata != NULL);
+    return joystick->hwdata != NULL;
 }
 
 void
@@ -521,11 +518,12 @@ SDL_SYS_JoystickUpdate(SDL_Joystick * joystick)
             if (item->joystick) {
                 if (Android_JNI_GetAccelerometerValues(values)) {
                     for ( i = 0; i < 3; i++ ) {
-                        // Urho3D: clamp values to avoid short integer overflow
-                        if (values[i] < -1.0f)
-                            values[i] = -1.0f;
-                        else if (values[i] > 1.0f)
+                        if (values[i] > 1.0f) {
                             values[i] = 1.0f;
+                        } else if (values[i] < -1.0f) {
+                            values[i] = -1.0f;
+                        }
+
                         value = (Sint16)(values[i] * 32767.0f);
                         SDL_PrivateJoystickAxis(item->joystick, i, value);
                     }
@@ -541,11 +539,6 @@ SDL_SYS_JoystickUpdate(SDL_Joystick * joystick)
 void
 SDL_SYS_JoystickClose(SDL_Joystick * joystick)
 {
-    if (joystick->hwdata) {
-        ((SDL_joylist_item*)joystick->hwdata)->joystick = NULL;
-        joystick->hwdata = NULL;
-    }
-    joystick->closed = 1;
 }
 
 /* Function to perform any system-specific joystick related cleanup */

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -33,7 +33,6 @@
 #define OPEN_FLAGS_INPUT (O_RDONLY|O_NONBLOCK)
 #endif
 
-void SDL_EnumUnixAudioDevices(int iscapture, int classic,
-                              int (*test) (int fd), SDL_AddAudioDevice addfn);
+extern void SDL_EnumUnixAudioDevices(const int classic, int (*test)(int));
 
 /* vi: set ts=4 sw=4 expandtab: */

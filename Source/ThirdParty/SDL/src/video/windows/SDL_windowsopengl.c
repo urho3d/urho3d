@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -72,6 +72,13 @@
 #ifndef WGL_ARB_framebuffer_sRGB
 #define WGL_ARB_framebuffer_sRGB
 #define WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB                0x20A9
+#endif
+
+#ifndef WGL_ARB_context_flush_control
+#define WGL_ARB_context_flush_control
+#define WGL_CONTEXT_RELEASE_BEHAVIOR_ARB   0x2097
+#define WGL_CONTEXT_RELEASE_BEHAVIOR_NONE_ARB           0x0000
+#define WGL_CONTEXT_RELEASE_BEHAVIOR_FLUSH_ARB          0x2098
 #endif
 
 typedef HGLRC(APIENTRYP PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC,
@@ -334,6 +341,10 @@ WIN_GL_InitExtensions(_THIS)
     HGLRC hglrc;
     PIXELFORMATDESCRIPTOR pfd;
 
+    if (!_this->gl_data) {
+        return;
+    }
+
     hwnd =
         CreateWindow(SDL_Appname, SDL_Appname, (WS_POPUP | WS_DISABLED), 0, 0,
         10, 10, NULL, NULL, SDL_Instance, NULL);
@@ -399,6 +410,11 @@ WIN_GL_InitExtensions(_THIS)
     _this->gl_data->HAS_WGL_EXT_create_context_es2_profile = SDL_FALSE;
     if (HasExtension("WGL_EXT_create_context_es2_profile", extensions)) {
         _this->gl_data->HAS_WGL_EXT_create_context_es2_profile = SDL_TRUE;
+    }
+
+    /* Check for GLX_ARB_context_flush_control */
+    if (HasExtension("WGL_ARB_context_flush_control", extensions)) {
+        _this->gl_data->HAS_WGL_ARB_context_flush_control = SDL_TRUE;
     }
 
     _this->gl_data->wglMakeCurrent(hdc, NULL);
@@ -644,27 +660,35 @@ WIN_GL_CreateContext(_THIS, SDL_Window * window)
             SDL_SetError("GL 3.x is not supported");
             context = temp_context;
         } else {
-        /* max 8 attributes plus terminator */
-            int attribs[9] = {
+        /* max 10 attributes plus terminator */
+            int attribs[11] = {
                 WGL_CONTEXT_MAJOR_VERSION_ARB, _this->gl_config.major_version,
                 WGL_CONTEXT_MINOR_VERSION_ARB, _this->gl_config.minor_version,
                 0
             };
-        int iattr = 4;
+            int iattr = 4;
 
-        /* SDL profile bits match WGL profile bits */
-        if( _this->gl_config.profile_mask != 0 ) {
-            attribs[iattr++] = WGL_CONTEXT_PROFILE_MASK_ARB;
-        attribs[iattr++] = _this->gl_config.profile_mask;
-        }
+            /* SDL profile bits match WGL profile bits */
+            if (_this->gl_config.profile_mask != 0) {
+                attribs[iattr++] = WGL_CONTEXT_PROFILE_MASK_ARB;
+                attribs[iattr++] = _this->gl_config.profile_mask;
+            }
 
-        /* SDL flags match WGL flags */
-        if( _this->gl_config.flags != 0 ) {
-            attribs[iattr++] = WGL_CONTEXT_FLAGS_ARB;
-        attribs[iattr++] = _this->gl_config.flags;
-        }
+            /* SDL flags match WGL flags */
+            if (_this->gl_config.flags != 0) {
+                attribs[iattr++] = WGL_CONTEXT_FLAGS_ARB;
+                attribs[iattr++] = _this->gl_config.flags;
+            }
 
-        attribs[iattr++] = 0;
+            /* only set if wgl extension is available */
+            if (_this->gl_data->HAS_WGL_ARB_context_flush_control) {
+                attribs[iattr++] = WGL_CONTEXT_RELEASE_BEHAVIOR_ARB;
+                attribs[iattr++] = _this->gl_config.release_behavior ?
+                                    WGL_CONTEXT_RELEASE_BEHAVIOR_FLUSH_ARB :
+                                    WGL_CONTEXT_RELEASE_BEHAVIOR_NONE_ARB;
+            }
+
+            attribs[iattr++] = 0;
 
             /* Create the GL 3.x context */
             context = wglCreateContextAttribsARB(hdc, share_context, attribs);

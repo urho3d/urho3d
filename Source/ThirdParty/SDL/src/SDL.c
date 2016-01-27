@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Oorni for Urho3D
-
 #include "./SDL_internal.h"
 
 #if defined(__WIN32__)
@@ -408,6 +405,8 @@ SDL_GetPlatform()
     return "BSDI";
 #elif __DREAMCAST__
     return "Dreamcast";
+#elif __EMSCRIPTEN__
+    return "Emscripten";
 #elif __FREEBSD__
     return "FreeBSD";
 #elif __HAIKU__
@@ -424,6 +423,8 @@ SDL_GetPlatform()
     return "MacOS Classic";
 #elif __MACOSX__
     return "Mac OS X";
+#elif __NACL__
+    return "NaCl";
 #elif __NETBSD__
     return "NetBSD";
 #elif __OPENBSD__
@@ -440,6 +441,8 @@ SDL_GetPlatform()
     return "Solaris";
 #elif __WIN32__
     return "Windows";
+#elif __WINRT__
+    return "WinRT";
 #elif __IPHONEOS__
     return "iOS";
 #elif __PSP__
@@ -449,7 +452,26 @@ SDL_GetPlatform()
 #endif
 }
 
-// Urho3D: removed offending _DllMainCRTStartup function which interfered with CRT initialization
-// when building as a shared library
+#if defined(__WIN32__)
+
+#if !defined(HAVE_LIBC) || (defined(__WATCOMC__) && defined(BUILD_DLL))
+/* Need to include DllMain() on Watcom C for some reason.. */
+
+BOOL APIENTRY
+_DllMainCRTStartup(HANDLE hModule,
+                   DWORD ul_reason_for_call, LPVOID lpReserved)
+{
+    switch (ul_reason_for_call) {
+    case DLL_PROCESS_ATTACH:
+    case DLL_THREAD_ATTACH:
+    case DLL_THREAD_DETACH:
+    case DLL_PROCESS_DETACH:
+        break;
+    }
+    return TRUE;
+}
+#endif /* building DLL with Watcom C */
+
+#endif /* __WIN32__ */
 
 /* vi: set sts=4 ts=4 sw=4 expandtab: */

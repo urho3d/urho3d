@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -45,7 +45,11 @@ SDL_CreateSemaphore(Uint32 initial_value)
     sem = (SDL_sem *) SDL_malloc(sizeof(*sem));
     if (sem) {
         /* Create the semaphore, with max value 32K */
+#if __WINRT__
+        sem->id = CreateSemaphoreEx(NULL, initial_value, 32 * 1024, NULL, 0, SEMAPHORE_ALL_ACCESS);
+#else
         sem->id = CreateSemaphore(NULL, initial_value, 32 * 1024, NULL);
+#endif
         sem->count = initial_value;
         if (!sem->id) {
             SDL_SetError("Couldn't create semaphore");
@@ -86,7 +90,11 @@ SDL_SemWaitTimeout(SDL_sem * sem, Uint32 timeout)
     } else {
         dwMilliseconds = (DWORD) timeout;
     }
+#if __WINRT__
+    switch (WaitForSingleObjectEx(sem->id, dwMilliseconds, FALSE)) {
+#else
     switch (WaitForSingleObject(sem->id, dwMilliseconds)) {
+#endif
     case WAIT_OBJECT_0:
         InterlockedDecrement(&sem->count);
         retval = 0;

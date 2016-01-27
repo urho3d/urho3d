@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -34,6 +34,7 @@
 #define UINT32_MAX  ~(Uint32)0
 #define UINT64_MAX  ~(Uint64)0
 #else
+#define _GNU_SOURCE
 #include <stdint.h>
 #endif
 #include <stdio.h>

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,13 +21,10 @@
 
 #include "../SDL_internal.h"
 
+#ifndef _SDL_syshaptic_h
+#define _SDL_syshaptic_h
+
 #include "SDL_haptic.h"
-
-
-/*
- * Number of haptic devices on the system.
- */
-extern Uint8 SDL_numhaptics;
 
 
 struct haptic_effect
@@ -206,5 +203,6 @@ extern int SDL_SYS_HapticUnpause(SDL_Haptic * haptic);
  */
 extern int SDL_SYS_HapticStopAll(SDL_Haptic * haptic);
 
-/* vi: set ts=4 sw=4 expandtab: */
+#endif /* _SDL_syshaptic_h */
 
+/* vi: set ts=4 sw=4 expandtab: */

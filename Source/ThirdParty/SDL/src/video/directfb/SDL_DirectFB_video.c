@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -156,7 +156,7 @@ DirectFB_CreateDevice(int devindex)
     return device;
   error:
     if (device)
-        free(device);
+        SDL_free(device);
     return (0);
 }
 
@@ -238,7 +238,7 @@ DirectFB_VideoInit(_THIS)
 
     if (!devdata->use_linux_input)
     {
-        SDL_DFB_LOG("Disabling linxu input\n");
+        SDL_DFB_LOG("Disabling linux input\n");
         DirectFBSetOption("disable-module", "linux_input");
     }
 

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -35,11 +35,14 @@ struct SDL_GLDriverData
     SDL_bool HAS_GLX_EXT_visual_info;
     SDL_bool HAS_GLX_EXT_swap_control_tear;
     SDL_bool HAS_GLX_EXT_create_context_es2_profile;
+    SDL_bool HAS_GLX_ARB_context_flush_control;
 
     Bool (*glXQueryExtension) (Display*,int*,int*);
     void *(*glXGetProcAddress) (const GLubyte*);
     XVisualInfo *(*glXChooseVisual) (Display*,int,int*);
     GLXContext (*glXCreateContext) (Display*,XVisualInfo*,GLXContext,Bool);
+    GLXContext (*glXCreateContextAttribsARB) (Display*,GLXFBConfig,GLXContext,Bool,const int *);
+    GLXFBConfig *(*glXChooseFBConfig) (Display*,int,const int *,int *);
     void (*glXDestroyContext) (Display*, GLXContext);
     Bool(*glXMakeCurrent) (Display*,GLXDrawable,GLXContext);
     void (*glXSwapBuffers) (Display*, GLXDrawable);

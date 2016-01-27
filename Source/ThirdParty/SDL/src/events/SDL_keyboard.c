@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by OvermindDL1 for Urho3D
-
 #include "../SDL_internal.h"
 
 /* General keyboard handling code for SDL */
@@ -28,6 +25,7 @@
 #include "SDL_timer.h"
 #include "SDL_events.h"
 #include "SDL_events_c.h"
+#include "SDL_assert.h"
 #include "../video/SDL_sysvideo.h"
 
 
@@ -573,7 +571,7 @@ SDL_ResetKeyboard(void)
 #endif
     for (scancode = 0; scancode < SDL_NUM_SCANCODES; ++scancode) {
         if (keyboard->keystate[scancode] == SDL_PRESSED) {
-            SDL_SendKeyboardKey(SDL_RELEASED, 0, scancode);
+            SDL_SendKeyboardKey(SDL_RELEASED, scancode);
         }
     }
 }
@@ -622,6 +620,16 @@ SDL_SetKeyboardFocus(SDL_Window * window)
 
     /* See if the current window has lost focus */
     if (keyboard->focus && keyboard->focus != window) {
+
+        /* new window shouldn't think it has mouse captured. */
+        SDL_assert(!window || !(window->flags & SDL_WINDOW_MOUSE_CAPTURE));
+
+        /* old window must lose an existing mouse capture. */
+        if (keyboard->focus->flags & SDL_WINDOW_MOUSE_CAPTURE) {
+            SDL_CaptureMouse(SDL_FALSE);  /* drop the capture. */
+            SDL_assert(!(keyboard->focus->flags & SDL_WINDOW_MOUSE_CAPTURE));
+        }
+
         SDL_SendWindowEvent(keyboard->focus, SDL_WINDOWEVENT_FOCUS_LOST,
                             0, 0);
 
@@ -650,99 +658,23 @@ SDL_SetKeyboardFocus(SDL_Window * window)
 }
 
 int
-SDL_SendKeyboardKey(Uint8 state, Uint32 keycode, SDL_Scancode scancode)
+SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode)
 {
     SDL_Keyboard *keyboard = &SDL_keyboard;
     int posted;
+    SDL_Keymod modifier;
+    SDL_Keycode keycode;
     Uint16 modstate;
     Uint32 type;
     Uint8 repeat;
 
-#if 0
     if (!scancode) {
         return 0;
     }
-#endif
 #ifdef DEBUG_KEYBOARD
     printf("The '%s' key has been %s\n", SDL_GetScancodeName(scancode),
            state == SDL_PRESSED ? "pressed" : "released");
 #endif
-    if (state == SDL_PRESSED) {
-        modstate = keyboard->modstate;
-        switch (scancode) {
-        case SDL_SCANCODE_NUMLOCKCLEAR:
-            keyboard->modstate ^= KMOD_NUM;
-            break;
-        case SDL_SCANCODE_CAPSLOCK:
-            keyboard->modstate ^= KMOD_CAPS;
-            break;
-        case SDL_SCANCODE_LCTRL:
-            keyboard->modstate |= KMOD_LCTRL;
-            break;
-        case SDL_SCANCODE_RCTRL:
-            keyboard->modstate |= KMOD_RCTRL;
-            break;
-        case SDL_SCANCODE_LSHIFT:
-            keyboard->modstate |= KMOD_LSHIFT;
-            break;
-        case SDL_SCANCODE_RSHIFT:
-            keyboard->modstate |= KMOD_RSHIFT;
-            break;
-        case SDL_SCANCODE_LALT:
-            keyboard->modstate |= KMOD_LALT;
-            break;
-        case SDL_SCANCODE_RALT:
-            keyboard->modstate |= KMOD_RALT;
-            break;
-        case SDL_SCANCODE_LGUI:
-            keyboard->modstate |= KMOD_LGUI;
-            break;
-        case SDL_SCANCODE_RGUI:
-            keyboard->modstate |= KMOD_RGUI;
-            break;
-        case SDL_SCANCODE_MODE:
-            keyboard->modstate |= KMOD_MODE;
-            break;
-        default:
-            break;
-        }
-    } else {
-        switch (scancode) {
-        case SDL_SCANCODE_NUMLOCKCLEAR:
-        case SDL_SCANCODE_CAPSLOCK:
-            break;
-        case SDL_SCANCODE_LCTRL:
-            keyboard->modstate &= ~KMOD_LCTRL;
-            break;
-        case SDL_SCANCODE_RCTRL:
-            keyboard->modstate &= ~KMOD_RCTRL;
-            break;
-        case SDL_SCANCODE_LSHIFT:
-            keyboard->modstate &= ~KMOD_LSHIFT;
-            break;
-        case SDL_SCANCODE_RSHIFT:
-            keyboard->modstate &= ~KMOD_RSHIFT;
-            break;
-        case SDL_SCANCODE_LALT:
-            keyboard->modstate &= ~KMOD_LALT;
-            break;
-        case SDL_SCANCODE_RALT:
-            keyboard->modstate &= ~KMOD_RALT;
-            break;
-        case SDL_SCANCODE_LGUI:
-            keyboard->modstate &= ~KMOD_LGUI;
-            break;
-        case SDL_SCANCODE_RGUI:
-            keyboard->modstate &= ~KMOD_RGUI;
-            break;
-        case SDL_SCANCODE_MODE:
-            keyboard->modstate &= ~KMOD_MODE;
-            break;
-        default:
-            break;
-        }
-        modstate = keyboard->modstate;
-    }
 
     /* Figure out what type of event this is */
     switch (state) {
@@ -769,6 +701,59 @@ SDL_SendKeyboardKey(Uint8 state, Uint32 keycode, SDL_Scancode scancode)
     /* Update internal keyboard state */
     keyboard->keystate[scancode] = state;
 
+    keycode = keyboard->keymap[scancode];
+
+    /* Update modifiers state if applicable */
+    switch (keycode) {
+    case SDLK_LCTRL:
+        modifier = KMOD_LCTRL;
+        break;
+    case SDLK_RCTRL:
+        modifier = KMOD_RCTRL;
+        break;
+    case SDLK_LSHIFT:
+        modifier = KMOD_LSHIFT;
+        break;
+    case SDLK_RSHIFT:
+        modifier = KMOD_RSHIFT;
+        break;
+    case SDLK_LALT:
+        modifier = KMOD_LALT;
+        break;
+    case SDLK_RALT:
+        modifier = KMOD_RALT;
+        break;
+    case SDLK_LGUI:
+        modifier = KMOD_LGUI;
+        break;
+    case SDLK_RGUI:
+        modifier = KMOD_RGUI;
+        break;
+    case SDLK_MODE:
+        modifier = KMOD_MODE;
+        break;
+    default:
+        modifier = KMOD_NONE;
+        break;
+    }
+    if (SDL_KEYDOWN == type) {
+        modstate = keyboard->modstate;
+        switch (keycode) {
+        case SDLK_NUMLOCKCLEAR:
+            keyboard->modstate ^= KMOD_NUM;
+            break;
+        case SDLK_CAPSLOCK:
+            keyboard->modstate ^= KMOD_CAPS;
+            break;
+        default:
+            keyboard->modstate |= modifier;
+            break;
+        }
+    } else {
+        keyboard->modstate &= ~modifier;
+        modstate = keyboard->modstate;
+    }
+
     /* Post the event, if desired */
     posted = 0;
     if (SDL_GetEventState(type) == SDL_ENABLE) {
@@ -777,9 +762,8 @@ SDL_SendKeyboardKey(Uint8 state, Uint32 keycode, SDL_Scancode scancode)
         event.key.state = state;
         event.key.repeat = repeat;
         event.key.keysym.scancode = scancode;
-        event.key.keysym.sym = keyboard->keymap[scancode];
+        event.key.keysym.sym = keycode;
         event.key.keysym.mod = modstate;
-        event.key.keysym.raw = keycode;
         event.key.windowID = keyboard->focus ? keyboard->focus->id : 0;
         posted = (SDL_PushEvent(&event) > 0);
     }
@@ -860,6 +844,19 @@ SDL_SetModState(SDL_Keymod modstate)
 
     keyboard->modstate = modstate;
 }
+
+/* Note that SDL_ToggleModState() is not a public API. SDL_SetModState() is. */
+void
+SDL_ToggleModState(const SDL_Keymod modstate, const SDL_bool toggle)
+{
+    SDL_Keyboard *keyboard = &SDL_keyboard;
+    if (toggle) {
+        keyboard->modstate |= modstate;
+    } else {
+        keyboard->modstate &= ~modstate;
+    }
+}
+
 
 SDL_Keycode
 SDL_GetKeyFromScancode(SDL_Scancode scancode)

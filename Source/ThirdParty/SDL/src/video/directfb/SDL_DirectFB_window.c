@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -90,7 +90,7 @@ DirectFB_CreateWindow(_THIS, SDL_Window * window)
     desc.height = windata->size.h;
     desc.pixelformat = dispdata->pixelformat;
     desc.surface_caps = DSCAPS_PREMULTIPLIED;
-#if DIRECTFB_MAJOR_VERSION == 1 && DIRECTFB_MINOR_VERSION >= 4
+#if DIRECTFB_MAJOR_VERSION == 1 && DIRECTFB_MINOR_VERSION >= 6
     if (window->flags & SDL_WINDOW_OPENGL) {
         desc.surface_caps |= DSCAPS_GL;
     }

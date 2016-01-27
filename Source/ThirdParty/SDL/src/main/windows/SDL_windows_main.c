@@ -10,9 +10,6 @@
 /* Include this so we define UNICODE properly */
 #include "../../core/windows/SDL_windows.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
 /* Include the SDL main definition header */
 #include "SDL.h"
 #include "SDL_main.h"
@@ -103,48 +100,62 @@ ParseCommandLine(char *cmdline, char **argv)
     return (argc);
 }
 
-/* Show an error message */
-static void
-ShowError(const char *title, const char *message)
-{
-/* If USE_MESSAGEBOX is defined, you need to link with user32.lib */
-#ifdef USE_MESSAGEBOX
-    MessageBox(NULL, message, title, MB_ICONEXCLAMATION | MB_OK);
-#else
-    fprintf(stderr, "%s: %s\n", title, message);
-#endif
-}
-
 /* Pop up an out of memory message, returns to Windows */
 static BOOL
 OutOfMemory(void)
 {
-    ShowError("Fatal Error", "Out of memory - aborting");
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal Error", "Out of memory - aborting", NULL);
     return FALSE;
 }
 
 #if defined(_MSC_VER)
-/* The VC++ compiler needs main defined */
-#define console_main main
+/* The VC++ compiler needs main/wmain defined */
+# define console_ansi_main main
+# if UNICODE
+#  define console_wmain wmain
+# endif
 #endif
 
-/* This is where execution begins [console apps] */
-int
-console_main(int argc, char *argv[])
+/* WinMain, main, and wmain eventually call into here. */
+static int
+main_utf8(int argc, char *argv[])
 {
-    int status;
-
     SDL_SetMainReady();
 
     /* Run the application main() code */
-    status = SDL_main(argc, argv);
-
-    /* Exit cleanly, calling atexit() functions */
-    exit(status);
-
-    /* Hush little compiler, don't you cry... */
-    return 0;
+    return SDL_main(argc, argv);
 }
+
+/* This is where execution begins [console apps, ansi] */
+int
+console_ansi_main(int argc, char *argv[])
+{
+    /* !!! FIXME: are these in the system codepage? We need to convert to UTF-8. */
+    return main_utf8(argc, argv);
+}
+
+
+#if UNICODE
+/* This is where execution begins [console apps, unicode] */
+int
+console_wmain(int argc, wchar_t *wargv[], wchar_t *wenvp)
+{
+    int retval = 0;
+    char **argv = SDL_stack_alloc(char*, argc);
+    int i;
+
+    for (i = 0; i < argc; ++i) {
+        argv[i] = WIN_StringToUTF8(wargv[i]);
+    }
+
+    retval = main_utf8(argc, argv);
+
+    /* !!! FIXME: we are leaking all the elements of argv we allocated. */
+    SDL_stack_free(argv);
+
+    return retval;
+}
+#endif
 
 /* This is where execution begins [windowed apps] */
 int WINAPI
@@ -157,8 +168,9 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
     /* Grab the command line */
     TCHAR *text = GetCommandLine();
 #if UNICODE
-    cmdline = SDL_iconv_string("UTF-8", "UCS-2-INTERNAL", (char *)(text), (SDL_wcslen(text)+1)*sizeof(WCHAR));
+    cmdline = WIN_StringToUTF8(text);
 #else
+    /* !!! FIXME: are these in the system codepage? We need to convert to UTF-8. */
     cmdline = SDL_strdup(text);
 #endif
     if (cmdline == NULL) {
@@ -174,7 +186,7 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
     ParseCommandLine(cmdline, argv);
 
     /* Run the main program */
-    console_main(argc, argv);
+    main_utf8(argc, argv);
 
     SDL_stack_free(argv);
 

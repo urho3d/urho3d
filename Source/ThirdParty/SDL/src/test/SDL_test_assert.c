@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -44,9 +44,9 @@ static Uint32 SDLTest_AssertsPassed = 0;
 /*
  *  Assert that logs and break execution flow on failures (i.e. for harness errors).
  */
-void SDLTest_Assert(int assertCondition, const char *assertDescription, ...)
+void SDLTest_Assert(int assertCondition, SDL_PRINTF_FORMAT_STRING const char *assertDescription, ...)
 {
-        va_list list;
+    va_list list;
     char logMessage[SDLTEST_MAX_LOGMESSAGE_LENGTH];
 
     /* Print assert description into a buffer */
@@ -56,13 +56,13 @@ void SDLTest_Assert(int assertCondition, const char *assertDescription, ...)
     va_end(list);
 
     /* Log, then assert and break on failure */
-    SDL_assert((SDLTest_AssertCheck(assertCondition, logMessage)));
+    SDL_assert((SDLTest_AssertCheck(assertCondition, "%s", logMessage)));
 }
 
 /*
  * Assert that logs but does not break execution flow on failures (i.e. for test cases).
  */
-int SDLTest_AssertCheck(int assertCondition, const char *assertDescription, ...)
+int SDLTest_AssertCheck(int assertCondition, SDL_PRINTF_FORMAT_STRING const char *assertDescription, ...)
 {
     va_list list;
     char logMessage[SDLTEST_MAX_LOGMESSAGE_LENGTH];
@@ -91,7 +91,7 @@ int SDLTest_AssertCheck(int assertCondition, const char *assertDescription, ...)
 /*
  * Explicitly passing Assert that logs (i.e. for test cases).
  */
-void SDLTest_AssertPass(const char *assertDescription, ...)
+void SDLTest_AssertPass(SDL_PRINTF_FORMAT_STRING const char *assertDescription, ...)
 {
     va_list list;
     char logMessage[SDLTEST_MAX_LOGMESSAGE_LENGTH];

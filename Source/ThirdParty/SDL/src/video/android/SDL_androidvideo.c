@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Yao Wei Tjong for Urho3D
-
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_ANDROID
@@ -67,6 +64,8 @@ extern int Android_GLES_LoadLibrary(_THIS, const char *path);
 int Android_ScreenWidth = 0;
 int Android_ScreenHeight = 0;
 Uint32 Android_ScreenFormat = SDL_PIXELFORMAT_UNKNOWN;
+int Android_ScreenRate = 0;
+
 SDL_sem *Android_PauseSem = NULL, *Android_ResumeSem = NULL;
 
 /* Currently only one window */
@@ -79,10 +78,15 @@ Android_Available(void)
 }
 
 static void
+Android_SuspendScreenSaver(_THIS)
+{
+    Android_JNI_SuspendScreenSaver(_this->suspend_screensaver);
+}
+
+static void
 Android_DeleteDevice(SDL_VideoDevice * device)
 {
-	// Urho3D: bug fix
-	SDL_free(device->driverdata);
+    SDL_free(device->driverdata);
     SDL_free(device);
 }
 
@@ -116,6 +120,7 @@ Android_CreateDevice(int devindex)
     device->CreateWindow = Android_CreateWindow;
     device->SetWindowTitle = Android_SetWindowTitle;
     device->DestroyWindow = Android_DestroyWindow;
+    device->GetWindowWMInfo = Android_GetWindowWMInfo;
 
     device->free = Android_DeleteDevice;
 
@@ -129,6 +134,9 @@ Android_CreateDevice(int devindex)
     device->GL_GetSwapInterval = Android_GLES_GetSwapInterval;
     device->GL_SwapWindow = Android_GLES_SwapWindow;
     device->GL_DeleteContext = Android_GLES_DeleteContext;
+
+    /* Screensaver */
+    device->SuspendScreenSaver = Android_SuspendScreenSaver;
 
     /* Text input */
     device->StartTextInput = Android_StartTextInput;
@@ -161,34 +169,8 @@ Android_VideoInit(_THIS)
     mode.format = Android_ScreenFormat;
     mode.w = Android_ScreenWidth;
     mode.h = Android_ScreenHeight;
-    mode.refresh_rate = 0;
+    mode.refresh_rate = Android_ScreenRate;
     mode.driverdata = NULL;
-
-    // Urho3D: merge patch found in https://bugzilla.libsdl.org/show_bug.cgi?id=2291 submitted by Thomas Faller
-    SDL_PixelFormat pixelFormat;
-    Uint32 mask;
-    int bitCount;
-
-    /* We need to set color sizes */
-    if(!SDL_InitFormat(&pixelFormat, mode.format)){
-        for(mask = pixelFormat.Rmask >> pixelFormat.Rshift,
-            bitCount = 0; mask > 0; mask >>= 1)
-            bitCount += 1;
-        SDL_GL_SetAttribute(SDL_GL_RED_SIZE, bitCount);
-        for(mask = pixelFormat.Gmask >> pixelFormat.Gshift,
-            bitCount = 0; mask > 0; mask >>= 1)
-            bitCount += 1;
-        SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, bitCount);
-        for(mask = pixelFormat.Bmask >> pixelFormat.Bshift,
-            bitCount = 0; mask > 0; mask >>= 1)
-            bitCount += 1;
-        SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, bitCount);
-        for(mask = pixelFormat.Amask >> pixelFormat.Ashift,
-            bitCount = 0; mask > 0; mask >>= 1)
-            bitCount += 1;
-        SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, bitCount);
-    }
-
     if (SDL_AddBasicVideoDisplay(&mode) < 0) {
         return -1;
     }
@@ -206,15 +188,17 @@ Android_VideoInit(_THIS)
 void
 Android_VideoQuit(_THIS)
 {
+    Android_QuitTouch();
 }
 
 /* This function gets called before VideoInit() */
 void
-Android_SetScreenResolution(int width, int height, Uint32 format)
+Android_SetScreenResolution(int width, int height, Uint32 format, float rate)
 {
     Android_ScreenWidth = width;
     Android_ScreenHeight = height;
     Android_ScreenFormat = format;
+    Android_ScreenRate = rate;
 
     if (Android_Window) {
         SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_RESIZED, width, height);

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,8 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Yao Wei Tjong for Urho3D
 
 /**
  *  \file begin_code.h
@@ -43,9 +41,15 @@
 #  endif
 #endif
 
+#ifndef SDL_UNUSED
+#  ifdef __GNUC__
+#    define SDL_UNUSED __attribute__((unused))
+#  else
+#    define SDL_UNUSED
+#  endif
+#endif
+
 /* Some compilers use a special export keyword */
-// Urho3D: Only export when it is being requested
-#ifdef SDL_EXPORTS
 #ifndef DECLSPEC
 # if defined(__WIN32__) || defined(__WINRT__)
 #  ifdef __BORLANDC__
@@ -60,15 +64,10 @@
 # else
 #  if defined(__GNUC__) && __GNUC__ >= 4
 #   define DECLSPEC __attribute__ ((visibility("default")))
-#  elif defined(__GNUC__) && __GNUC__ >= 2
-#   define DECLSPEC __declspec(dllexport)
 #  else
 #   define DECLSPEC
 #  endif
 # endif
-#endif
-#else
-# define DECLSPEC
 #endif
 
 /* By default SDL uses the C calling convention */

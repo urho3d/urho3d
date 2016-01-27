@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -82,7 +82,6 @@ MIR_Available()
         /* !!! FIXME: try to make a MirConnection here. */
         available = 1;
         SDL_MIR_UnloadSymbols();
-
     }
 
     return available;
@@ -274,6 +273,7 @@ MIR_VideoInit(_THIS)
     MIR_Data* mir_data = _this->driverdata;
 
     mir_data->connection = MIR_mir_connect_sync(NULL, __PRETTY_FUNCTION__);
+    mir_data->software = SDL_FALSE;
 
     if (!MIR_mir_connection_is_valid(mir_data->connection))
         return SDL_SetError("Failed to connect to the Mir Server");

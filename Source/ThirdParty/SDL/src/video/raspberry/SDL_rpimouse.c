@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -48,6 +48,7 @@ static int RPI_ShowCursor(SDL_Cursor * cursor);
 static void RPI_MoveCursor(SDL_Cursor * cursor);
 static void RPI_FreeCursor(SDL_Cursor * cursor);
 static void RPI_WarpMouse(SDL_Window * window, int x, int y);
+static int RPI_WarpMouseGlobal(int x, int y);
 
 static SDL_Cursor *
 RPI_CreateDefaultCursor(void)
@@ -211,15 +212,22 @@ RPI_FreeCursor(SDL_Cursor * cursor)
 static void
 RPI_WarpMouse(SDL_Window * window, int x, int y)
 {
+    RPI_WarpMouseGlobal(x, y);
+}
+
+/* Warp the mouse to (x,y) */
+static int
+RPI_WarpMouseGlobal(int x, int y)
+{
     RPI_CursorData *curdata;
     DISPMANX_UPDATE_HANDLE_T update;
-    int ret;
     VC_RECT_T dst_rect;
     SDL_Mouse *mouse = SDL_GetMouse();
     
     if (mouse != NULL && mouse->cur_cursor != NULL && mouse->cur_cursor->driverdata != NULL) {
         curdata = (RPI_CursorData *) mouse->cur_cursor->driverdata;
         if (curdata->element != DISPMANX_NO_HANDLE) {
+            int ret;
             update = vc_dispmanx_update_start( 10 );
             SDL_assert( update );
             vc_dispmanx_rect_set( &dst_rect, x, y, curdata->w, curdata->h);
@@ -237,8 +245,11 @@ RPI_WarpMouse(SDL_Window * window, int x, int y)
             /* Submit asynchronously, otherwise the peformance suffers a lot */
             ret = vc_dispmanx_update_submit( update, 0, NULL );
             SDL_assert( ret == DISPMANX_SUCCESS );
+            return (ret == DISPMANX_SUCCESS) ? 0 : -1;
         }
     }    
+
+    return -1;  /* !!! FIXME: this should SDL_SetError() somewhere. */
 }
 
 void
@@ -254,6 +265,7 @@ RPI_InitMouse(_THIS)
     mouse->MoveCursor = RPI_MoveCursor;
     mouse->FreeCursor = RPI_FreeCursor;
     mouse->WarpMouse = RPI_WarpMouse;
+    mouse->WarpMouseGlobal = RPI_WarpMouseGlobal;
 
     SDL_SetDefaultCursor(RPI_CreateDefaultCursor());
 }

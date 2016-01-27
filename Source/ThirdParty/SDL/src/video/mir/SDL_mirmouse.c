@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -111,6 +111,12 @@ MIR_WarpMouse(SDL_Window* window, int x, int y)
 }
 
 static int
+MIR_WarpMouseGlobal(int x, int y)
+{
+    return SDL_Unsupported();
+}
+
+static int
 MIR_SetRelativeMouseMode(SDL_bool enabled)
 {
     return SDL_Unsupported();
@@ -126,6 +132,7 @@ MIR_InitMouse()
     mouse->ShowCursor           = MIR_ShowCursor;
     mouse->FreeCursor           = MIR_FreeCursor;
     mouse->WarpMouse            = MIR_WarpMouse;
+    mouse->WarpMouseGlobal      = MIR_WarpMouseGlobal;
     mouse->CreateSystemCursor   = MIR_CreateSystemCursor;
     mouse->SetRelativeMouseMode = MIR_SetRelativeMouseMode;
 
