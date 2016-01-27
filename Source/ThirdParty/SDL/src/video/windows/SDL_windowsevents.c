@@ -327,7 +327,7 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     // Note: if we move mouse cursor manually (relative mouse motion with hidden cursor) we may get emulated mouse
     // events with zero extra info, so we should only center the cursor when it has actually moved
     BOOL emulatedMouse = (GetMessageExtraInfo() & 0xffffff00) == 0xff515700;
-    
+
     /* Send a SDL_SYSWMEVENT if the application wants them */
     if (SDL_GetEventState(SDL_SYSWMEVENT) == SDL_ENABLE) {
         SDL_SysWMmsg wmmsg;
@@ -423,21 +423,12 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             // Urho3D: in_title_click may be erroneously left on with non-Aero styles, causing the hidden mouse centering to stop working.
             // To work around, reset whenever a normal mouse button up/down event is received
-<<<<<<< HEAD
-			// data->in_title_click  = SDL_FALSE;
-			
-			SDL_Mouse *mouse = SDL_GetMouse();
-			if (!emulatedMouse && (!mouse->relative_mode || mouse->relative_mode_warp)) {
-				WIN_CheckWParamMouseButtons(wParam, data);
-			}
-=======
             data->in_title_click = SDL_FALSE;
 
             mouse = SDL_GetMouse();
             if (!emulatedMouse && (!mouse->relative_mode || mouse->relative_mode_warp)) {
                 WIN_CheckWParamMouseButtons(wParam, data);
             }
->>>>>>> upstream/master
         }
         break;
 
