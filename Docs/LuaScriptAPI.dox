@@ -274,6 +274,7 @@ Methods:
 - float GetMorphWeight(StringHash nameHash) const
 - float GetMorphWeight(unsigned index) const
 - bool IsMaster() const
+- void UpdateBoneBoundingBox()
 
 Properties:
 
