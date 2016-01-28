@@ -341,7 +341,7 @@ task :ci do
     # Alternate the scaffolding location between Travis CI and AppVeyor for test coverage; Travis CI uses build tree while AppVeyor using source tree
     # First scaffolding test uses absolute path while second test uses relative path, also for test converage
     # First test - create a new project on the fly that uses newly installed Urho3D SDK
-    Dir.chdir scaffolding "#{ENV['APPVEYOR'] ? 'C:/projects/urho3d/' : (ENV['TRAVIS'] ? '/home/travis/build/urho3d/Build/' : '../Build/')}UsingSDK" do   # Just in case user invokes 'ci'
+    Dir.chdir scaffolding "#{ENV['APPVEYOR'] ? 'C:/projects/urho3d/' : (ENV['TRAVIS'] ? "#{ENV['HOME']}/build/urho3d/Build/" : '../Build/')}UsingSDK" do   # The last rel path is for non-CI users, just in case
       puts "\nConfiguring downstream project using Urho3D SDK...\n\n"; $stdout.flush
       # SDK installation to a system-wide location does not need URHO3D_HOME to be defined, staged-installation does
       system "bash -c '#{ENV['DESTDIR'] ? 'URHO3D_HOME=~/usr/local' : ''} rake cmake #{generator} URHO3D_LUA=1 && rake make #{test}'" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
