@@ -537,8 +537,13 @@ bool Texture2D::Create()
 
 void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (renderSurface_ && renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS)
-        renderSurface_->QueueUpdate();
+    if (renderSurface_ && (renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurface_->IsUpdateQueued()))
+    {
+        Renderer* renderer = GetSubsystem<Renderer>();
+        if (renderer)
+            renderer->QueueRenderSurface(renderSurface_);
+        renderSurface_->ResetUpdateQueued();
+    }
 }
 
 }

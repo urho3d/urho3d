@@ -44,7 +44,7 @@ URHO3D_EVENT(E_WINDOWPOS, WindowPos)
     URHO3D_PARAM(P_Y, Y);                          // int
 }
 
-/// Request for queuing autoupdated rendersurfaces.
+/// Request for queuing rendersurfaces either in manual or always-update mode.
 URHO3D_EVENT(E_RENDERSURFACEUPDATE, RenderSurfaceUpdate)
 {
 }

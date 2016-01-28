@@ -88,8 +88,10 @@ public:
     /// Return linked depth-stencil surface.
     RenderSurface* GetLinkedDepthStencil() const { return linkedDepthStencil_; }
 
-    /// Clear update flag. Called by Renderer.
-    void WasUpdated();
+    /// Return whether manual update queued. Called internally.
+    bool IsUpdateQueued() const { return updateQueued_; }
+    /// Reset update queued flag. Called internally.
+    void ResetUpdateQueued();
 
 private:
     /// Parent texture.

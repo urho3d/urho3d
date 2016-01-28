@@ -80,30 +80,12 @@ void RenderSurface::SetLinkedDepthStencil(RenderSurface* depthStencil)
 
 void RenderSurface::QueueUpdate()
 {
-    if (!updateQueued_)
-    {
-        bool hasValidView = false;
+    updateQueued_ = true;
+}
 
-        // Verify that there is at least 1 non-null viewport, as otherwise Renderer will not accept the surface and the update flag
-        // will be left on
-        for (unsigned i = 0; i < viewports_.Size(); ++i)
-        {
-            if (viewports_[i])
-            {
-                hasValidView = true;
-                break;
-            }
-        }
-
-        if (hasValidView)
-        {
-            Renderer* renderer = parentTexture_->GetSubsystem<Renderer>();
-            if (renderer)
-                renderer->QueueRenderSurface(this);
-
-            updateQueued_ = true;
-        }
-    }
+void RenderSurface::ResetUpdateQueued()
+{
+    updateQueued_ = false;
 }
 
 void RenderSurface::Release()
@@ -143,11 +125,6 @@ TextureUsage RenderSurface::GetUsage() const
 Viewport* RenderSurface::GetViewport(unsigned index) const
 {
     return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
-}
-
-void RenderSurface::WasUpdated()
-{
-    updateQueued_ = false;
 }
 
 }
