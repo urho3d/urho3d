@@ -612,7 +612,7 @@ end
 
 def scaffolding dir, project = 'Scaffolding', target = 'Main'
   begin
-    dir = Pathname.new(dir).realdirpath
+    dir = Pathname.new(dir).realdirpath.to_s
   rescue
     abort "Failed to scaffolding due to invalid parent directory in '#{dir}'"
   end
