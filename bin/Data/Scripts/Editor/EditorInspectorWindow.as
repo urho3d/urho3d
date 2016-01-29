@@ -745,8 +745,12 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
         for (int i =0; i < sceneTags.length; i++)
         {
             bool isHasTag = editNode.HasTag(sceneTags[i]);
-            String taggedIndicator = (isHasTag ? Indicator : "");
-            actions.Push(CreateContextMenuItem(taggedIndicator + sceneTags[i], "HandleTagsMenuSelection", sceneTags[i]));
+            // Add this tag into menu if only Node not tadded with it yet, otherwise it showed on step 1.
+            if (!isHasTag)
+            {
+                String taggedIndicator = (isHasTag ? Indicator : "");
+                actions.Push(CreateContextMenuItem(taggedIndicator + sceneTags[i], "HandleTagsMenuSelection", sceneTags[i]));
+            }
         }
 
         // 3. Add default tags
