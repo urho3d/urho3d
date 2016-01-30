@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -180,7 +180,8 @@ static const char* geometryVSVariations[] =
     "",
     "SKINNED ",
     "INSTANCED ",
-    "BILLBOARD "
+    "BILLBOARD ",
+    "DIRBILLBOARD "
 };
 
 static const char* lightVSVariations[] =
@@ -679,14 +680,6 @@ void Renderer::Update(float timeStep)
         view->Update(frame_);
     }
 
-    // Reset update flag from queued render surfaces. At this point no new views can be added on this frame
-    for (unsigned i = 0; i < queuedViewports_.Size(); ++i)
-    {
-        WeakPtr<RenderSurface>& renderTarget = queuedViewports_[i].first_;
-        if (renderTarget)
-            renderTarget->WasUpdated();
-    }
-
     queuedViewports_.Clear();
     resetViews_ = false;
 }
@@ -813,8 +806,12 @@ void Renderer::QueueViewport(RenderSurface* renderTarget, Viewport* viewport)
 {
     if (viewport)
     {
-        queuedViewports_.Push(Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> >(WeakPtr<RenderSurface>(renderTarget),
-            WeakPtr<Viewport>(viewport)));
+        Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> > newView = 
+            MakePair(WeakPtr<RenderSurface>(renderTarget), WeakPtr<Viewport>(viewport));
+
+        // Prevent double add of the same rendertarget/viewport combination
+        if (!queuedViewports_.Contains(newView))
+            queuedViewports_.Push(newView);
     }
 }
 
@@ -1418,6 +1415,8 @@ void Renderer::OptimizeLightByStencil(Light* light, Camera* camera)
         graphics_->SetDepthWrite(false);
         graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, lightStencilValue_);
         graphics_->SetShaders(graphics_->GetShader(VS, "Stencil"), graphics_->GetShader(PS, "Stencil"));
+        graphics_->SetShaderParameter(VSP_VIEW, view);
+        graphics_->SetShaderParameter(VSP_VIEWINV, camera->GetEffectiveWorldTransform());
         graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
         graphics_->SetShaderParameter(VSP_MODEL, light->GetVolumeTransform(camera));
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -498,6 +498,8 @@ void DebugRenderer::Render()
     graphics->SetStencilTest(false);
     graphics->SetShaders(vs, ps);
     graphics->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
+    graphics->SetShaderParameter(VSP_VIEW, view_);
+    graphics->SetShaderParameter(VSP_VIEWINV, view_.Inverse());
     graphics->SetShaderParameter(VSP_VIEWPROJ, projection_ * view_);
     graphics->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
     graphics->SetVertexBuffer(vertexBuffer_);

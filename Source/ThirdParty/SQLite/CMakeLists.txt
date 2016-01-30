@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,11 @@ if (NOT IOS AND NOT WEB)
     # Define dependency libs
     if (NOT WIN32)
         set (LIBS dl)
+    endif ()
+    if (READLINE_FOUND)
+        add_definitions (-DHAVE_READLINE)
+        list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIR})
+        list (APPEND LIBS ${READLINE_LIBRARIES})
     endif ()
 
     # Setup target

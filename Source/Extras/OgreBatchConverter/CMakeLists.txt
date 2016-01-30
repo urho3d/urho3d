@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,4 +27,4 @@ set (TARGET_NAME OgreBatchConverter)
 define_source_files ()
 
 # Setup target
-setup_executable ()
+setup_executable (TOOL)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -843,10 +843,16 @@ bool TextureCube::Create()
 
 void TextureCube::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
 {
+    Renderer* renderer = GetSubsystem<Renderer>();
+
     for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
     {
-        if (renderSurfaces_[i] && renderSurfaces_[i]->GetUpdateMode() == SURFACE_UPDATEALWAYS)
-            renderSurfaces_[i]->QueueUpdate();
+        if (renderSurfaces_[i] && (renderSurfaces_[i]->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurfaces_[i]->IsUpdateQueued()))
+        {
+            if (renderer)
+                renderer->QueueRenderSurface(renderSurfaces_[i]);
+            renderSurfaces_[i]->ResetUpdateQueued();
+        }
     }
 }
 

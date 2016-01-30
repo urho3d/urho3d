@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -1961,7 +1961,7 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
         if (mesh->mNumBones > maxBones_)
         {
             ErrorExit(
-                "Geometry (submesh) has over " + String(maxBones_) + " bone influences. Try splitting to more submeshes\n"
+                "Geometry (submesh) has " + String(mesh->mNumBones) + " bones over " + String(maxBones_) + " bone influences. Try splitting to more submeshes\n"
                 "that each stay at " + String(maxBones_) + " bones or below."
             );
         }

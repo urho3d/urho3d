@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -97,8 +97,10 @@ public:
     /// Return surface's OpenGL target.
     unsigned GetTarget() const { return target_; }
 
-    /// Clear update flag. Called by Renderer.
-    void WasUpdated();
+    /// Return whether manual update queued. Called internally.
+    bool IsUpdateQueued() const { return updateQueued_; }
+    /// Reset update queued flag. Called internally.
+    void ResetUpdateQueued();
 
 private:
     /// Parent texture.

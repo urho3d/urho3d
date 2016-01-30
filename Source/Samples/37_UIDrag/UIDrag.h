@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,8 @@ namespace Urho3D
 /// This sample demonstrates:
 ///     - Creating GUI elements from C++
 ///     - Loading GUI Style from xml
-///     - Subscribing to GUI drag events and handling them.
+///     - Subscribing to GUI drag events and handling them
+///     - Working with GUI elements with specific tags.
 class UIDrag : public Sample
 {
     URHO3D_OBJECT(UIDrag, Sample);

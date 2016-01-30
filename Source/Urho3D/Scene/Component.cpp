@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,12 @@
 #include "../Scene/ReplicationState.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
+#ifdef URHO3D_PHYSICS
+#include "../Physics/PhysicsWorld.h"
+#endif
+#ifdef URHO3D_URHO2D
+#include "../Urho2D/PhysicsWorld2D.h"
+#endif
 
 #include "../DebugNew.h"
 #include "./Resource/JSONValue.h"
@@ -280,4 +286,24 @@ void Component::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap&
 
     UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
 }
+
+Component* Component::GetFixedUpdateSource()
+{
+    Component* ret = 0;
+    Scene* scene = GetScene();
+
+    if (scene)
+    {
+#ifdef URHO3D_PHYSICS
+        ret = scene->GetComponent<PhysicsWorld>();
+#endif
+#ifdef URHO3D_URHO2D
+        if (!ret)
+            ret = scene->GetComponent<PhysicsWorld2D>();
+#endif
+    }
+
+    return ret;
+}
+
 }

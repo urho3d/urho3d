@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -860,7 +860,12 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     HRESULT hr = impl_->device_->StretchRect(impl_->defaultColorSurface_, &rect,
         (IDirect3DSurface9*)destination->GetRenderSurface()->GetSurface(), &destRect, D3DTEXF_NONE);
     if (FAILED(hr))
+    {
         URHO3D_LOGD3DERROR("Failed to resolve to texture", hr);
+        return false;
+    }
+    else
+        return true;
 }
 
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)

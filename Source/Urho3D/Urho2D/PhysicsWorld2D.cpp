@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -228,12 +228,12 @@ void PhysicsWorld2D::Update(float timeStep)
 {
     URHO3D_PROFILE(UpdatePhysics2D);
 
-    using namespace PhysicsPreStep2D;
+    using namespace PhysicsPreStep;
 
     VariantMap& eventData = GetEventDataMap();
     eventData[P_WORLD] = this;
     eventData[P_TIMESTEP] = timeStep;
-    SendEvent(E_PHYSICSPRESTEP2D, eventData);
+    SendEvent(E_PHYSICSPRESTEP, eventData);
 
     physicsStepping_ = true;
     world_->Step(timeStep, velocityIterations_, positionIterations_);
@@ -245,8 +245,8 @@ void PhysicsWorld2D::Update(float timeStep)
     SendBeginContactEvents();
     SendEndContactEvents();
 
-    using namespace PhysicsPostStep2D;
-    SendEvent(E_PHYSICSPOSTSTEP2D, eventData);
+    using namespace PhysicsPostStep;
+    SendEvent(E_PHYSICSPOSTSTEP, eventData);
 }
 
 void PhysicsWorld2D::DrawDebugGeometry()

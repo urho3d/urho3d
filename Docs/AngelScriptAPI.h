@@ -117,6 +117,7 @@ void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetMorphWeight(uint, float);
+void UpdateBoneBoundingBox();
 
 // Properties:
 bool animationEnabled;
@@ -625,6 +626,7 @@ class Billboard
 
 // Properties:
 Color color;
+Vector3 direction;
 bool enabled;
 Vector3 position;
 float rotation;
@@ -747,6 +749,8 @@ class BorderImage
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -763,11 +767,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -784,11 +790,13 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -917,6 +925,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -982,6 +992,8 @@ class Button
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -998,11 +1010,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -1019,11 +1033,13 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -1161,6 +1177,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -1300,6 +1318,8 @@ class CheckBox
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -1316,11 +1336,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -1337,11 +1359,13 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -1473,6 +1497,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -3519,6 +3545,8 @@ class Cursor
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -3537,11 +3565,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -3558,11 +3588,13 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -3694,6 +3726,8 @@ String shape;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -4366,6 +4400,8 @@ class DropDownList
 // Methods:
 void AddChild(UIElement);
 void AddItem(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -4382,12 +4418,14 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 Array<UIElement> GetItems() const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 void InsertItem(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -4406,6 +4444,7 @@ void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
 void RemoveAllItems();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
@@ -4413,6 +4452,7 @@ void RemoveInstanceDefault();
 void RemoveItem(UIElement);
 void RemoveItem(uint);
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -4570,6 +4610,8 @@ bool showPopup;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -5630,6 +5672,8 @@ class LineEdit
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -5646,11 +5690,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -5667,11 +5713,13 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -5807,6 +5855,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 String text;
 bool textCopyable;
@@ -5838,6 +5888,8 @@ class ListView
 void AddChild(UIElement);
 void AddItem(UIElement);
 void AddSelection(uint);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 void ChangeSelection(int, bool);
@@ -5859,12 +5911,14 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 Array<UIElement> GetItems() const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 void InsertItem(uint, UIElement, UIElement = null);
 bool IsExpanded(uint) const;
@@ -5885,6 +5939,7 @@ void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
 void RemoveAllItems();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
@@ -5893,6 +5948,7 @@ void RemoveItem(UIElement, uint = 0);
 void RemoveItem(uint);
 void RemoveObjectAnimation();
 void RemoveSelection(uint);
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -6049,6 +6105,8 @@ Array<uint> selections;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
@@ -6297,6 +6355,8 @@ class Menu
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -6313,11 +6373,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -6334,11 +6396,13 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -6485,6 +6549,8 @@ bool showPopup;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -6931,6 +6997,8 @@ class Node
 {
 // Methods:
 void AddChild(Node, uint = M_MAX_UNSIGNED);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 Node Clone(CreateMode = REPLICATED);
 Component CloneComponent(Component, CreateMode, uint = 0);
@@ -6950,6 +7018,7 @@ Array<Node> GetChildren(bool = false) const;
 Array<Node> GetChildrenWithComponent(const String&, bool = false) const;
 Array<Node> GetChildrenWithScript(bool = false) const;
 Array<Node> GetChildrenWithScript(const String&, bool = false) const;
+Array<Node> GetChildrenWithTag(const String&, bool = false) const;
 Component GetComponent(const String&, bool = false) const;
 Array<Component> GetComponents() const;
 Array<Component> GetComponents(const String&, bool = false) const;
@@ -6961,6 +7030,7 @@ ScriptObject GetScriptObject(const String&) const;
 bool HasComponent(const String&) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadJSON(const JSONValue&, bool = false);
@@ -6975,6 +7045,7 @@ void Pitch(float, TransformSpace = TS_LOCAL);
 void Remove();
 void RemoveAllChildren();
 void RemoveAllComponents();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(Node);
 void RemoveChildren(bool, bool, bool);
@@ -6984,6 +7055,7 @@ void RemoveComponents(bool, bool);
 void RemoveComponents(const String&);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 void Roll(float, TransformSpace = TS_LOCAL);
@@ -7079,6 +7151,8 @@ Vector2 scale2D;
 Scene scene;
 /* readonly */
 ScriptObject scriptObject;
+/* readonly */
+Array<String> tags;
 bool temporary;
 /* readonly */
 Matrix3x4 transform;
@@ -7460,6 +7534,7 @@ Vector3 constantForce;
 float dampingForce;
 Vector3 emitterSize;
 EmitterType emitterType;
+FaceCameraMode faceCameraMode;
 float inactiveTime;
 Material material;
 Vector3 maxDirection;
@@ -8006,15 +8081,18 @@ int weakRefs;
 class Quaternion
 {
 // Methods:
+Quaternion Conjugate() const;
 float DotProduct(const Quaternion&) const;
 bool Equals(const Quaternion&) const;
 void FromAngleAxis(float, const Vector3&);
 void FromAxes(const Vector3&, const Vector3&, const Vector3&);
 void FromEulerAngles(float, float, float);
-bool FromLookRotation(const Vector3&, const Vector3&);
+bool FromLookRotation(const Vector3&, const Vector3& = Vector3 ( 0.0 , 1.0 , 0.0 ));
+void FromRotationMatrix(const Matrix3&);
 void FromRotationTo(const Vector3&, const Vector3&);
 Quaternion Inverse() const;
 bool IsNaN() const;
+float LengthSquared() const;
 Quaternion Nlerp(Quaternion, float, bool) const;
 void Normalize();
 Quaternion Normalized() const;
@@ -8028,6 +8106,8 @@ Vector3 eulerAngles;
 float pitch;
 /* readonly */
 float roll;
+/* readonly */
+Matrix3 rotationMatrix;
 float w;
 float x;
 float y;
@@ -8598,6 +8678,8 @@ class Scene
 // Methods:
 void AddChild(Node, uint = M_MAX_UNSIGNED);
 void AddRequiredPackageFile(PackageFile);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void Clear(bool = true, bool = true);
 void ClearRequiredPackageFiles();
@@ -8618,12 +8700,14 @@ Array<Node> GetChildren(bool = false) const;
 Array<Node> GetChildrenWithComponent(const String&, bool = false) const;
 Array<Node> GetChildrenWithScript(bool = false) const;
 Array<Node> GetChildrenWithScript(const String&, bool = false) const;
+Array<Node> GetChildrenWithTag(const String&, bool = false) const;
 Component GetComponent(const String&, bool = false) const;
 Component GetComponent(uint) const;
 Array<Component> GetComponents() const;
 Array<Component> GetComponents(const String&, bool = false) const;
 bool GetInterceptNetworkUpdate(const String&) const;
 Node GetNode(uint) const;
+Array<Node> GetNodesWithTag(const String&) const;
 Component GetOrCreateComponent(const String&, CreateMode = REPLICATED, uint = 0);
 Component GetParentComponent(const String&, bool = false) const;
 ScriptObject GetScriptObject() const;
@@ -8631,6 +8715,7 @@ ScriptObject GetScriptObject(const String&) const;
 bool HasComponent(const String&) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&);
 Node Instantiate(File, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
 Node Instantiate(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
 Node InstantiateJSON(File, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
@@ -8661,6 +8746,7 @@ void RegisterVar(const String&);
 void Remove();
 void RemoveAllChildren();
 void RemoveAllComponents();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(Node);
 void RemoveChildren(bool, bool, bool);
@@ -8670,6 +8756,7 @@ void RemoveComponents(bool, bool);
 void RemoveComponents(const String&);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetToDefault();
 void Roll(float, TransformSpace = TS_LOCAL);
 void Rotate(const Quaternion&, TransformSpace = TS_LOCAL);
@@ -8785,6 +8872,8 @@ Vector2 scale2D;
 ScriptObject scriptObject;
 float smoothingConstant;
 float snapThreshold;
+/* readonly */
+Array<String> tags;
 bool temporary;
 float timeScale;
 /* readonly */
@@ -8959,6 +9048,8 @@ class ScrollBar
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 void ChangeValue(float);
@@ -8976,11 +9067,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -8997,11 +9090,13 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -9137,6 +9232,8 @@ Slider slider;
 bool sortChildren;
 float stepFactor;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
@@ -9160,6 +9257,8 @@ class ScrollView
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -9176,11 +9275,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -9197,11 +9298,13 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -9337,6 +9440,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
@@ -9553,6 +9658,8 @@ class Slider
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 void ChangeValue(float);
@@ -9570,11 +9677,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -9591,11 +9700,13 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -9729,6 +9840,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -10238,6 +10351,8 @@ class Sprite
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -10251,11 +10366,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
@@ -10270,11 +10387,13 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -10360,6 +10479,8 @@ Vector2 scale;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 /* readonly */
@@ -11044,6 +11165,8 @@ class Text
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 void ClearSelection();
@@ -11061,11 +11184,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -11082,11 +11207,13 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -11236,6 +11363,8 @@ uint selectionStart;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 String text;
 HorizontalAlignment textAlignment;
@@ -11919,6 +12048,8 @@ class ToolTip
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -11935,11 +12066,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -11956,11 +12089,13 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -12083,6 +12218,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
@@ -12178,6 +12315,8 @@ class UIElement
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -12194,11 +12333,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -12215,11 +12356,13 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -12341,6 +12484,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
@@ -12648,6 +12793,8 @@ class View3D
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -12664,11 +12811,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -12686,11 +12835,13 @@ void MarkNetworkUpdate() const;
 void QueueUpdate();
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -12840,6 +12991,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -12910,6 +13063,8 @@ class Window
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -12926,11 +13081,13 @@ Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
 bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -12947,11 +13104,13 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
 void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
@@ -13090,6 +13249,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -13532,6 +13693,7 @@ FC_ROTATE_XYZ,
 FC_ROTATE_Y,
 FC_LOOKAT_XYZ,
 FC_LOOKAT_Y,
+FC_DIRECTION,
 };
 
 enum FileMode

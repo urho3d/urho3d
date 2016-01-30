@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,9 @@
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set project name
     project (Urho3D-Clang-Tools)
+
+    # All Clang-tools must be natively built and output to bin/tool/clang subdir to differentiate them from the rest
+    set_output_directories (${CMAKE_BINARY_DIR}/bin/tool/clang RUNTIME PDB)
 else ()
     # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
     cmake_minimum_required (VERSION 2.8.6)
@@ -66,9 +69,6 @@ if (MSVC)
 else ()
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti")
 endif ()
-
-# All Clang-tools must be natively built and output to bin/tool/clang subdir to differentiate them from the rest
-set_tool_output_directories (clang)
 
 # Define common dependency libs
 set (LIBS clangTooling clangFrontend clangDriver clangParse clangSerialization clangSema clangEdit clangAnalysis clangToolingCore

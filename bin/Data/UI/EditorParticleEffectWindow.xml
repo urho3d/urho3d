@@ -618,10 +618,10 @@
                                         <element type="BorderImage" internal="true" style="none">
                                             <element internal="true" style="none">
                                                 <element type="Text" style="FileSelectorFilterText">
-                                                    <attribute name="Text" value="Box" />
+                                                    <attribute name="Text" value="Sphere" />
                                                 </element>
                                                 <element type="Text" style="FileSelectorFilterText">
-                                                    <attribute name="Text" value="Sphere" />
+                                                    <attribute name="Text" value="Box" />
                                                 </element>
                                             </element>
                                         </element>
@@ -710,6 +710,47 @@
                                     <attribute name="Layout Spacing" value="1" />
                                     <element type="CheckBox">
                                         <attribute name="Name" value="Relative" />
+                                    </element>
+                                </element>
+                            </element>
+                            <element>
+                                <!-- Face Camera Mode -->
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="10" />
+                                <element type="Text" style="EditorAttributeText">
+                                    <attribute name="Text" value="Face Camera Mode" />
+                                </element>
+                                <element type="DropDownList">
+                                    <attribute name="Name" value="FaceCameraMode" />
+                                    <attribute name="Resize Popup" value="true" />
+                                    <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                                    <element type="Window" internal="true" popup="true" style="none">
+                                        <element type="ListView" internal="true" style="none">
+                                            <element type="BorderImage" internal="true" style="none">
+                                                <element internal="true" style="none">
+                                                    <element type="Text" style="FileSelectorFilterText">
+                                                        <attribute name="Text" value="None" />
+                                                    </element>
+                                                    <element type="Text" style="FileSelectorFilterText">
+                                                        <attribute name="Text" value="Rotate XYZ" />
+                                                    </element>
+                                                    <element type="Text" style="FileSelectorFilterText">
+                                                        <attribute name="Text" value="Rotate Y" />
+                                                    </element>
+                                                    <element type="Text" style="FileSelectorFilterText">
+                                                        <attribute name="Text" value="LookAt XYZ" />
+                                                    </element>
+                                                    <element type="Text" style="FileSelectorFilterText">
+                                                        <attribute name="Text" value="LookAt Y" />
+                                                    </element>
+                                                    <element type="Text" style="FileSelectorFilterText">
+                                                        <attribute name="Text" value="Direction" />
+                                                    </element>
+                                                </element>
+                                            </element>
+                                        </element>
                                     </element>
                                 </element>
                             </element>

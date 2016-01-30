@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,8 +55,9 @@ enum GeometryType
     GEOM_SKINNED = 1,
     GEOM_INSTANCED = 2,
     GEOM_BILLBOARD = 3,
-    GEOM_STATIC_NOINSTANCING = 4,
-    MAX_GEOMETRYTYPES = 4,
+    GEOM_DIRBILLBOARD = 4,
+    GEOM_STATIC_NOINSTANCING = 5,
+    MAX_GEOMETRYTYPES = 5,
 };
 
 /// Blending mode.
@@ -273,7 +274,8 @@ enum FaceCameraMode
     FC_ROTATE_XYZ,
     FC_ROTATE_Y,
     FC_LOOKAT_XYZ,
-    FC_LOOKAT_Y
+    FC_LOOKAT_Y,
+    FC_DIRECTION
 };
 
 /// Shadow type
@@ -305,6 +307,8 @@ extern URHO3D_API const StringHash VSP_GBUFFEROFFSETS;
 extern URHO3D_API const StringHash VSP_LIGHTDIR;
 extern URHO3D_API const StringHash VSP_LIGHTPOS;
 extern URHO3D_API const StringHash VSP_MODEL;
+extern URHO3D_API const StringHash VSP_VIEW;
+extern URHO3D_API const StringHash VSP_VIEWINV;
 extern URHO3D_API const StringHash VSP_VIEWPROJ;
 extern URHO3D_API const StringHash VSP_UOFFSET;
 extern URHO3D_API const StringHash VSP_VOFFSET;

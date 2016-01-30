@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,6 +47,8 @@ struct URHO3D_API Billboard
     Color color_;
     /// Rotation.
     float rotation_;
+    /// Direction (For direction based billboard only).
+    Vector3 direction_;
     /// Enabled flag.
     bool enabled_;
     /// Sort distance.
@@ -177,6 +179,8 @@ private:
     bool bufferDirty_;
     /// Force update flag (ignore animation LOD momentarily.)
     bool forceUpdate_;
+    /// Update billboard geometry type
+    bool geometryTypeUpdate_;
     /// Sorting flag. Triggers a vertex buffer rewrite for each view this billboard set is rendered from.
     bool sortThisFrame_;
     /// Frame number on which was last sorted.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -889,6 +889,34 @@ const PODVector<unsigned char>& AnimatedModel::GetMorphsAttr() const
     return attrBuffer_.GetBuffer();
 }
 
+void AnimatedModel::UpdateBoneBoundingBox()
+{
+    if (skeleton_.GetNumBones())
+    {
+        // The bone bounding box is in local space, so need the node's inverse transform
+        boneBoundingBox_.Clear();
+        Matrix3x4 inverseNodeTransform = node_->GetWorldTransform().Inverse();
+
+        const Vector<Bone>& bones = skeleton_.GetBones();
+        for (Vector<Bone>::ConstIterator i = bones.Begin(); i != bones.End(); ++i)
+        {
+            Node* boneNode = i->node_;
+            if (!boneNode)
+                continue;
+
+            // Use hitbox if available. If not, use only half of the sphere radius
+            /// \todo The sphere radius should be multiplied with bone scale
+            if (i->collisionMask_ & BONECOLLISION_BOX)
+                boneBoundingBox_.Merge(i->boundingBox_.Transformed(inverseNodeTransform * boneNode->GetWorldTransform()));
+            else if (i->collisionMask_ & BONECOLLISION_SPHERE)
+                boneBoundingBox_.Merge(Sphere(inverseNodeTransform * boneNode->GetWorldPosition(), i->radius_ * 0.5f));
+        }
+    }
+
+    boneBoundingBoxDirty_ = false;
+    worldBoundingBoxDirty_ = true;
+}
+
 void AnimatedModel::OnNodeSet(Node* node)
 {
     Drawable::OnNodeSet(node);
@@ -904,11 +932,13 @@ void AnimatedModel::OnMarkedDirty(Node* node)
 {
     Drawable::OnMarkedDirty(node);
 
-    // If the scene node or any of the bone nodes move, mark skinning and the bone bounding box dirty
+    // If the scene node or any of the bone nodes move, mark skinning dirty
     if (skeleton_.GetNumBones())
     {
         skinningDirty_ = true;
-        boneBoundingBoxDirty_ = true;
+        // Bone bounding box doesn't need to be marked dirty when only the base scene node moves
+        if (node != node_)
+            boneBoundingBoxDirty_ = true;
     }
 }
 
@@ -1187,34 +1217,6 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
     }
 
     animationDirty_ = false;
-}
-
-void AnimatedModel::UpdateBoneBoundingBox()
-{
-    if (skeleton_.GetNumBones())
-    {
-        // The bone bounding box is in local space, so need the node's inverse transform
-        boneBoundingBox_.Clear();
-        Matrix3x4 inverseNodeTransform = node_->GetWorldTransform().Inverse();
-
-        const Vector<Bone>& bones = skeleton_.GetBones();
-        for (Vector<Bone>::ConstIterator i = bones.Begin(); i != bones.End(); ++i)
-        {
-            Node* boneNode = i->node_;
-            if (!boneNode)
-                continue;
-
-            // Use hitbox if available. If not, use only half of the sphere radius
-            /// \todo The sphere radius should be multiplied with bone scale
-            if (i->collisionMask_ & BONECOLLISION_BOX)
-                boneBoundingBox_.Merge(i->boundingBox_.Transformed(inverseNodeTransform * boneNode->GetWorldTransform()));
-            else if (i->collisionMask_ & BONECOLLISION_SPHERE)
-                boneBoundingBox_.Merge(Sphere(inverseNodeTransform * boneNode->GetWorldPosition(), i->radius_ * 0.5f));
-        }
-    }
-
-    boneBoundingBoxDirty_ = false;
-    worldBoundingBoxDirty_ = true;
 }
 
 void AnimatedModel::UpdateSkinning()

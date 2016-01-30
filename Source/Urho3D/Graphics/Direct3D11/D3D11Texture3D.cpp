@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -170,6 +170,8 @@ bool Texture3D::SetSize(int width, int height, int depth, unsigned format, Textu
         URHO3D_LOGERROR("Rendertarget or depth-stencil usage not supported for 3D textures");
         return false;
     }
+    if (usage_ == TEXTURE_DYNAMIC)
+        requestedLevels_ = 1;
 
     usage_ = usage;
 

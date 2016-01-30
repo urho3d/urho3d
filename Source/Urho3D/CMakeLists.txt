@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -96,9 +96,18 @@ if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/librevision.h)
     execute_process (COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrho3DRevision.cmake
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_QUIET ERROR_QUIET)
 endif ()
+set (URHO3D_DEPS ${STATIC_LIBRARY_TARGETS})
+if (TARGET LuaJIT_universal)
+    list (REMOVE_ITEM URHO3D_DEPS LuaJIT)
+    set (LuaJIT_universal_symbolic LuaJIT_universal_symbolic)
+    add_custom_command (OUTPUT ${LuaJIT_universal_symbolic}
+        COMMAND xcodebuild -target LuaJIT_universal -configuration $(CONFIGURATION)
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    set_source_files_properties (${LuaJIT_universal_symbolic} PROPERTIES SYMBOLIC TRUE)
+endif ()
 add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrho3DRevision.cmake
-    DEPENDS ${STATIC_LIBRARY_TARGETS} ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake
+    DEPENDS ${URHO3D_DEPS} ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
 
@@ -137,9 +146,14 @@ if (URHO3D_LUA)
         if (IOS)
             set (IOS_FIX CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
         endif ()
+        if (URHO3D_LUAJIT)
+            set (LUAJIT_WITH_AMALG ${URHO3D_LUAJIT} -DURHO3D_LUAJIT_AMALG=${URHO3D_LUAJIT_AMALG})
+        else ()
+            set (LUAJIT_WITH_AMALG 0)
+        endif ()
         ExternalProject_Add (tolua++
             SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
-            CMAKE_ARGS -DURHO3D_LUAJIT=${URHO3D_LUAJIT} -DURHO3D_LUAJIT_AMALG=${URHO3D_LUAJIT_AMALG} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${IOS_FIX})
+            CMAKE_ARGS -DURHO3D_LUAJIT=${LUAJIT_WITH_AMALG} -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${IOS_FIX})
     else ()
         # Otherwise, build it internally as per normal
         add_subdirectory (../ThirdParty/toluapp/src/bin ../ThirdParty/toluapp/src/bin)
@@ -209,7 +223,7 @@ if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have forc
 endif ()
 
 # Aggregate all source files
-list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${ALL_OBJ_FILES} librevision.h Urho3D.h)
+list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${ALL_OBJ_FILES} librevision.h Urho3D.h ${LuaJIT_universal_symbolic})
 
 # Define dependency libs
 # Add include directories to find the precompiled header, export header, and installed headers from thirdparty libs
@@ -255,7 +269,15 @@ elseif (WEB)
     # Emscripten does not support generation of shared library in a conventional sense, it just produces "linked" LLVM bitcode
     set (CMAKE_SHARED_LIBRARY_SUFFIX ".bc")
 endif ()
-if (NOT IOS)
+if (IOS)
+    # Add a custom target to build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
+    add_custom_target (${TARGET_NAME}_universal ALL
+        COMMAND if lipo -info $<TARGET_FILE:${TARGET_NAME}> 2>/dev/null |egrep -cq 'i386.*armv7|armv7.*i386|x86_64.*arm64|arm64.*x86_64'\; then echo $<TARGET_FILE:${TARGET_NAME}> is already a Mach-O universal binary consisting of both iphoneos and iphonesimulator archs\; else mv $<TARGET_FILE:${TARGET_NAME}>{,.ori} && if lipo -info $<TARGET_FILE:${TARGET_NAME}>.ori 2>/dev/null |egrep -cq 'i386|x86_64'\; then sdk=iphoneos\; else sdk=iphonesimulator\; fi && xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk $$sdk 2>&1 && mv $<TARGET_FILE:${TARGET_NAME}>{,.new} && lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{,.ori,.new} && rm $<TARGET_FILE:${TARGET_NAME}>{.ori,.new}\; fi
+        DEPENDS ${TARGET_NAME}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Creating Mach-O universal binary library consisting of both iphoneos and iphonesimulator archs")
+    install (FILES $<TARGET_FILE:${TARGET_NAME}> DESTINATION ${DEST_LIBRARY_DIR})
+else ()
     install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
 endif ()
 if (WIN32 AND URHO3D_LIB_TYPE STREQUAL SHARED)
@@ -264,14 +286,6 @@ endif ()
 
 # Setup dependency frameworks and libraries
 if (APPLE)
-    if (IOS)
-        # Add a custom target to build Mach-O universal binary consisting of iphoneos (universal ARM archs including 'arm64' if 64-bit is enabled) and iphonesimulator (i386 arch and also x86_64 arch if 64-bit is enabled)
-        add_custom_target (${TARGET_NAME}_universal ALL
-            COMMAND if lipo -info $<TARGET_FILE:${TARGET_NAME}> 2>/dev/null |grep -cq 'i386.*armv7'\; then echo $<TARGET_FILE:${TARGET_NAME}> is already a Mach-O universal binary consisting of both iphoneos and iphonesimulator archs\; else mv $<TARGET_FILE:${TARGET_NAME}>{,.ori} && if lipo -info $<TARGET_FILE:${TARGET_NAME}>.ori 2>/dev/null |grep -cq i386\; then sdk=iphoneos\; else sdk=iphonesimulator\; fi && xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk $$sdk 2>&1 && mv $<TARGET_FILE:${TARGET_NAME}>{,.new} && lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{,.ori,.new} && rm $<TARGET_FILE:${TARGET_NAME}>{.ori,.new}\; fi
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            COMMENT "Creating Mach-O universal binary library consisting of both iphoneos and iphonesimulator archs")
-        install (FILES $<TARGET_FILE:${TARGET_NAME}> DESTINATION ${DEST_LIBRARY_DIR})
-    endif ()
     set (FORCE_LOAD -force_load)
 elseif (NOT MSVC)
     set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--whole-archive)

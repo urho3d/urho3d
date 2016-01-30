@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,8 @@
 #
 
 if (WIN32)
-    set (ODBC_INCLUDE_DIRS)     # The headers should be available in the default include search path
-    set (ODBC_LIBRARIES odbc32) # This should be also the case for MinGW cross-compiler toolchain
+    set (ODBC_INCLUDE_DIRS " ")     # The headers should be available in the default include search path
+    set (ODBC_LIBRARIES odbc32 odbccp32 ws2_32) # This should be also the case for MinGW cross-compiler toolchain
     set (ODBC_DEFINES)
     set (ODBC_VERSION 3)        # Assume it is 3
 else ()

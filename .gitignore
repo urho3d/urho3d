@@ -48,8 +48,12 @@ generated/
 # JetBrains IDE project settings
 /.idea/
 
-# Custom rake tasks
-/.rake/
+# Code::Blocks project settings
+/*.cbp
+
+# Codelite project settings
+/*.project
+/*.workspace
 
 # Android project settings
 /Android/project.properties
@@ -79,6 +83,9 @@ CTestTestfile.cmake
 *.pch/
 *.pch.*
 
+# Custom rake tasks
+/.rake/
+
 # Misc.
 configure*
 *~
@@ -87,3 +94,4 @@ configure*
 *.log
 *.bak
 Thumbs.db
+.build
