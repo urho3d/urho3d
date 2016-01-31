@@ -42,7 +42,7 @@ find_library (BCM_VC_LIB_GLES2 GLESv2 PATHS ${BCM_VC_LIB_SEARCH_PATH} PATH_SUFFI
 include (FindPackageHandleStandardArgs)
 find_package_handle_standard_args (VideoCore REQUIRED_VARS BCM_VC_LIB_BCM_HOST BCM_VC_LIB_EGL BCM_VC_LIB_GLES2 VIDEOCORE_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find Broadcom VideoCore firmware")
 if (VIDEOCORE_FOUND)
-    list (APPEND VIDEOCORE_INCLUDE_DIRS ${VIDEOCORE_INCLUDE_DIRS}/interface/vcos/pthreads)  # Note: variable change to list context after this
+    list (APPEND VIDEOCORE_INCLUDE_DIRS ${VIDEOCORE_INCLUDE_DIRS}/interface/vcos/pthreads ${VIDEOCORE_INCLUDE_DIRS}/interface/vmcs_host/linux)  # Note: variable change to list context after this
     set (VIDEOCORE_LIBRARIES ${BCM_VC_LIB_BCM_HOST} ${BCM_VC_LIB_EGL} ${BCM_VC_LIB_GLES2})
 endif ()
 

@@ -230,7 +230,9 @@ Input::Input(Context* context) :
 
     SubscribeToEvent(E_SCREENMODE, URHO3D_HANDLER(Input, HandleScreenMode));
 
-#ifdef __EMSCRIPTEN__
+#if defined(ANDROID)
+    SDL_SetHint(SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH, "1");
+#elif defined(__EMSCRIPTEN__)
     emscriptenInput_ = new EmscriptenInput(this);
 #endif
 
@@ -1393,7 +1395,7 @@ void Input::SetMouseButton(int button, bool newState)
     SendEvent(newState ? E_MOUSEBUTTONDOWN : E_MOUSEBUTTONUP, eventData);
 }
 
-void Input::SetKey(int key, int scancode, unsigned raw, bool newState)
+void Input::SetKey(int key, int scancode, bool newState)
 {
     bool repeat = false;
 
@@ -1423,7 +1425,6 @@ void Input::SetKey(int key, int scancode, unsigned raw, bool newState)
     VariantMap& eventData = GetEventDataMap();
     eventData[P_KEY] = key;
     eventData[P_SCANCODE] = scancode;
-    eventData[P_RAW] = raw;
     eventData[P_BUTTONS] = mouseButtonDown_;
     eventData[P_QUALIFIERS] = GetQualifiers();
     if (newState)
@@ -1491,17 +1492,17 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_KEYDOWN:
         // Convert to uppercase to match Win32 virtual key codes
 #ifdef __EMSCRIPTEN__
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, 0, true);
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, true);
 #else
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.raw, true);
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, true);
 #endif
         break;
 
     case SDL_KEYUP:
 #ifdef __EMSCRIPTEN__
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, 0, false);
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, false);
 #else
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, evt.key.keysym.raw, false);
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, false);
 #endif
         break;
 

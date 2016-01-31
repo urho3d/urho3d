@@ -321,7 +321,7 @@ private:
     /// Handle a mouse button change.
     void SetMouseButton(int button, bool newState);
     /// Handle a key change.
-    void SetKey(int key, int scancode, unsigned raw, bool newState);
+    void SetKey(int key, int scancode, bool newState);
 #ifdef __EMSCRIPTEN__
     /// Set whether the operating system mouse cursor is visible (Emscripten platform only).
     void SetMouseVisibleEmscripten(bool enable);

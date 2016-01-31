@@ -464,7 +464,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     if (maximize)
     {
         Maximize();
-        SDL_GetWindowSize(impl_->window_, &width, &height);
+        SDL_GL_GetDrawableSize(impl_->window_, &width, &height);
     }
 
     if (fullscreen)
@@ -728,7 +728,7 @@ bool Graphics::BeginFrame()
     {
         int width, height;
 
-        SDL_GetWindowSize(impl_->window_, &width, &height);
+        SDL_GL_GetDrawableSize(impl_->window_, &width, &height);
         if (width != width_ || height != height_)
             SetMode(width, height);
     }
@@ -2048,7 +2048,7 @@ void Graphics::WindowResized()
 
     int newWidth, newHeight;
 
-    SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
+    SDL_GL_GetDrawableSize(impl_->window_, &newWidth, &newHeight);
     if (newWidth == width_ && newHeight == height_)
         return;
 
@@ -2409,7 +2409,7 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
         if (!newWidth || !newHeight)
         {
             SDL_MaximizeWindow(impl_->window_);
-            SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
+            SDL_GL_GetDrawableSize(impl_->window_, &newWidth, &newHeight);
         }
         else
             SDL_SetWindowSize(impl_->window_, newWidth, newHeight);
@@ -2420,7 +2420,7 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
     else
     {
         // If external window, must ask its dimensions instead of trying to set them
-        SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
+        SDL_GL_GetDrawableSize(impl_->window_, &newWidth, &newHeight);
         newFullscreen = false;
     }
 }
