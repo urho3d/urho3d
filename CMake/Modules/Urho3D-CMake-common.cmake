@@ -493,7 +493,7 @@ if (WIN32)
     if (DIRECT3D_INCLUDE_DIRS)
         include_directories (${DIRECT3D_INCLUDE_DIRS})
     endif ()
-elseif ((URHO3D_LUA AND NOT URHO3D_LUAJIT) OR URHO3D_DATABASE_SQLITE)
+elseif (((URHO3D_LUA AND NOT URHO3D_LUAJIT) OR URHO3D_DATABASE_SQLITE) AND NOT ANDROID AND NOT IOS AND NOT WEB)
     # Find GNU Readline development library for Lua interpreter and SQLite's isql
     find_package (Readline)
 endif ()
