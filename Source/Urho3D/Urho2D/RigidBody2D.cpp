@@ -50,6 +50,7 @@ static const char* bodyTypeNames[] =
 RigidBody2D::RigidBody2D(Context* context) :
     Component(context),
     useFixtureMass_(true),
+    volatilePosition_(false),
     body_(0)
 {
     // Make sure the massData members are zero-initialized.
@@ -181,6 +182,10 @@ void RigidBody2D::SetUseFixtureMass(bool useFixtureMass)
     }
 
     MarkNetworkUpdate();
+}
+
+void RigidBody2D::SetVolatilePosition(bool volatilePosition) {
+    volatilePosition_ = volatilePosition;
 }
 
 void RigidBody2D::SetLinearDamping(float linearDamping)
@@ -527,7 +532,7 @@ void RigidBody2D::OnSceneSet(Scene* scene)
 
 void RigidBody2D::OnMarkedDirty(Node* node)
 {
-    if (physicsWorld_ && physicsWorld_->IsApplyingTransforms())
+    if (physicsWorld_ && physicsWorld_->IsApplyingTransforms() && !volatilePosition_)
         return;
 
     // Physics operations are not safe from worker threads

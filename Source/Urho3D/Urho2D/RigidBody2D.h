@@ -67,6 +67,8 @@ public:
     void SetMassCenter(const Vector2& center);
     /// Set whether to automatically calculate mass and inertia from collision shapes. Default true.
     void SetUseFixtureMass(bool useFixtureMass);
+    /// Set whether position of the body can be changed by non physics related sources. Default false.
+    void SetVolatilePosition(bool volatilePosition);
     /// Set linear damping.
     void SetLinearDamping(float linearDamping);
     /// Set angular damping.
@@ -125,6 +127,9 @@ public:
     /// Return whether to calculate mass and inertia from collision shapes automatically.
     bool GetUseFixtureMass() const { return useFixtureMass_; }
 
+    /// Return whether we need to eagerly update position of the object.
+    bool IsVolatilePosition() const { return volatilePosition_; }
+
     /// Return linear damping.
     float GetLinearDamping() const { return bodyDef_.linearDamping; }
 
@@ -169,6 +174,8 @@ private:
     b2MassData massData_;
     /// Use fixture mass (calculate mass & inertia from collision shapes automatically.)
     bool useFixtureMass_;
+    /// The position of the body can be changed indirectly by non Physics sources.
+    bool volatilePosition_;
     /// Box2D body.
     b2Body* body_;
     /// Collision shapes.
