@@ -92,7 +92,7 @@ task :make do
   cmake_build_options = ''
   build_options = ''
   unfilter = false
-  ['config', 'target', 'sdk'].each { |var|
+  ['config', 'target', 'sdk', 'ARCHS'].each { |var|
     ARGV << "#{var}=\"#{ENV[var]}\"" if ENV[var] && !ARGV.find { |arg| /#{var}=/ =~ arg }
   }
   ARGV.each { |option|
@@ -109,6 +109,8 @@ task :make do
     else
       if /(?:config|target)=.*/ =~ option
         cmake_build_options = "#{cmake_build_options} --#{option.gsub(/=/, ' ')}"
+      elsif /ARCHS=.*/ =~ option    # This option is only applicable for xcodebuild, useful to specify a non-default arch to build when in Debug build configuration where ONLY_ACTIVE_ARCH is set to YES
+        build_options = "#{build_options} #{option}"
       elsif /(?:build_tree|numjobs)=.*/ !~ option
         build_options = "#{build_options} #{/=/ =~ option ? '-' + option.gsub(/=/, ' ') : option}"
       end
