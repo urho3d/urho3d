@@ -54,6 +54,12 @@ if (IOS)
     if (IPHONEOS_DEPLOYMENT_TARGET)
         set (CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET ${IPHONEOS_DEPLOYMENT_TARGET})
     endif ()
+    if (DEFINED ENV{TRAVIS})
+        # TODO: recheck this again later
+        # Ensure the CMAKE_OSX_DEPLOYMENT_TARGET is set to empty, something is wrong with Travis-CI OSX worker
+        set (CMAKE_OSX_DEPLOYMENT_TARGET)
+        unset (CMAKE_OSX_DEPLOYMENT_TARGET CACHE)
+    endif ()
 elseif (XCODE)
     set (CMAKE_OSX_SYSROOT macosx)    # Set Base SDK to "Latest OS X"
     if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
@@ -1116,11 +1122,11 @@ macro (setup_executable)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
             COMMENT "Scp-ing ${TARGET_NAME} executable to target system")
     endif ()
-    if (DIRECT3D_DLL AND NOT URHO3D_OPENGL)
+    if (DIRECT3D_DLL AND NOT URHO3D_OPENGL AND NOT ARG_NODEPS AND CMAKE_RUNTIME_OUTPUT_DIRECTORY)
         # Make a copy of the D3D DLL to the runtime directory in the build tree
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DIRECT3D_DLL} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     endif ()
-    if (WIN32 AND NOT ARG_NODEPS AND URHO3D_LIB_TYPE STREQUAL SHARED)
+    if (WIN32 AND NOT ARG_NODEPS AND URHO3D_LIB_TYPE STREQUAL SHARED AND CMAKE_RUNTIME_OUTPUT_DIRECTORY)
         # Make a copy of the Urho3D DLL to the runtime directory in the build tree
         if (TARGET Urho3D)
             add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Urho3D> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
