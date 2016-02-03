@@ -42,7 +42,7 @@ for a in $@; do
             FIX_SCM=1
             ;;
         Eclipse\ CDT4\ -\ Unix\ Makefiles)
-            ECLIPSE=1 && if xmlstarlet --version >/dev/null 2>&1; then HAS_XMLSTARLET=1; fi
+            ECLIPSE=1
             ;;
         -DIOS=1)
             IOS=1

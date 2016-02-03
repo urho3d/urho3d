@@ -177,6 +177,8 @@ protected:
 private:
     /// Assign skeleton and animation bone node references as a postprocess. Called by ApplyAttributes.
     void AssignBoneNodes();
+    /// Finalize master model bone bounding boxes by merging from matching non-master bones.. Performed whenever any of the AnimatedModels in the same node changes its model.
+    void FinalizeBoneBoundingBoxes();
     /// Remove (old) skeleton root bone.
     void RemoveRootBone();
     /// Mark animation and skinning to require an update.

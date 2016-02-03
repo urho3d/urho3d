@@ -54,9 +54,12 @@ if (IOS)
     if (IPHONEOS_DEPLOYMENT_TARGET)
         set (CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET ${IPHONEOS_DEPLOYMENT_TARGET})
     endif ()
-    # Ensure the CMAKE_OSX_DEPLOYMENT_TARGET is set to empty
-    set (CMAKE_OSX_DEPLOYMENT_TARGET)
-    unset (CMAKE_OSX_DEPLOYMENT_TARGET CACHE)
+    if (DEFINED ENV{TRAVIS})
+        # TODO: recheck this again later
+        # Ensure the CMAKE_OSX_DEPLOYMENT_TARGET is set to empty, something is wrong with Travis-CI OSX worker
+        set (CMAKE_OSX_DEPLOYMENT_TARGET)
+        unset (CMAKE_OSX_DEPLOYMENT_TARGET CACHE)
+    endif ()
 elseif (XCODE)
     set (CMAKE_OSX_SYSROOT macosx)    # Set Base SDK to "Latest OS X"
     if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
@@ -493,7 +496,7 @@ if (WIN32)
     if (DIRECT3D_INCLUDE_DIRS)
         include_directories (${DIRECT3D_INCLUDE_DIRS})
     endif ()
-elseif ((URHO3D_LUA AND NOT URHO3D_LUAJIT) OR URHO3D_DATABASE_SQLITE)
+elseif (((URHO3D_LUA AND NOT URHO3D_LUAJIT) OR URHO3D_DATABASE_SQLITE) AND NOT ANDROID AND NOT IOS AND NOT WEB)
     # Find GNU Readline development library for Lua interpreter and SQLite's isql
     find_package (Readline)
 endif ()
@@ -520,9 +523,7 @@ if (URHO3D_C++11)
             endif ()
         endif ()
     elseif (CMAKE_CXX_COMPILER_ID MATCHES Clang)
-        # Cannot set CMAKE_CXX_FLAGS here directly because CMake uses the same flags for both C++ and Object-C languages, the latter does not support c++11 standard
-        # Workaround the problem by setting the compiler flags in the source properties for C++ language only in the setup_target() macro
-        set (CLANG_CXX_FLAGS -std=c++11)
+        set (CMAKE_CXX_FLAGS -std=c++11)
     elseif (MSVC80)
         message (FATAL_ERROR "Your MSVC version is too told to enable C++11 standard")
     endif ()
@@ -996,10 +997,17 @@ macro (setup_target)
         unset (LINK_DEPENDS)
     endif ()
     # Extra compiler flags for Xcode which are dynamically changed based on active arch in order to support Mach-O universal binary targets
-    # When targeting x86 with SSE enabled; or when targeting iOS with NEON enabled as universal binary includes iPhoneSimulator x86 arch too
-    if (XCODE AND (URHO3D_SSE OR URHO3D_NEON))
-        list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CFLAGS[arch=i386] "-msse -msse2 $(OTHER_CFLAGS)")
-        list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=i386] "-msse -msse2 $(OTHER_CPLUSPLUSFLAGS)")
+    if (XCODE)
+        # Speed up build when in Debug configuration by building active arch only
+        list (FIND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH ATTRIBUTE_ALREADY_SET)
+        if (ATTRIBUTE_ALREADY_SET EQUAL -1)
+            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
+        endif ()
+        # When targeting x86 with SSE enabled; or when targeting iOS with NEON enabled as universal binary includes iPhoneSimulator x86 arch too
+        if (URHO3D_SSE OR URHO3D_NEON)
+            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CFLAGS[arch=i386] "-msse -msse2 $(OTHER_CFLAGS)")
+            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=i386] "-msse -msse2 $(OTHER_CPLUSPLUSFLAGS)")
+        endif ()
     endif ()
     if (TARGET_PROPERTIES)
         set_target_properties (${TARGET_NAME} PROPERTIES ${TARGET_PROPERTIES})
@@ -1015,15 +1023,6 @@ macro (setup_target)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND mkdir -p ${DIRECTORY} && ln -sf $<TARGET_FILE:${TARGET_NAME}> ${DIRECTORY}/$<TARGET_FILE_NAME:${TARGET_NAME}>
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/build)
-    endif ()
-
-    # Workaround CMake problem of sharing CMAKE_CXX_FLAGS for both C++ and Objective-C languages
-    if (CLANG_CXX_FLAGS)
-        foreach (FILE ${SOURCE_FILES})
-            if (FILE MATCHES \\.cpp$|\\.cc$)
-                set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " ${CLANG_CXX_FLAGS}")
-            endif ()
-        endforeach ()
     endif ()
 endmacro ()
 
@@ -1123,11 +1122,11 @@ macro (setup_executable)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
             COMMENT "Scp-ing ${TARGET_NAME} executable to target system")
     endif ()
-    if (DIRECT3D_DLL AND NOT URHO3D_OPENGL)
+    if (DIRECT3D_DLL AND NOT URHO3D_OPENGL AND NOT ARG_NODEPS AND CMAKE_RUNTIME_OUTPUT_DIRECTORY)
         # Make a copy of the D3D DLL to the runtime directory in the build tree
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DIRECT3D_DLL} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     endif ()
-    if (WIN32 AND NOT ARG_NODEPS AND URHO3D_LIB_TYPE STREQUAL SHARED)
+    if (WIN32 AND NOT ARG_NODEPS AND URHO3D_LIB_TYPE STREQUAL SHARED AND CMAKE_RUNTIME_OUTPUT_DIRECTORY)
         # Make a copy of the Urho3D DLL to the runtime directory in the build tree
         if (TARGET Urho3D)
             add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Urho3D> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
