@@ -64,6 +64,8 @@ uniform float2 cShadowIntensity;
 uniform float2 cShadowMapInvSize;
 uniform float4 cShadowSplits;
 uniform float4x4 cLightMatricesPS[4];
+uniform float cRoughness;
+uniform float cMetalic;
 #ifdef VSM_SHADOW
 uniform float2 cVSMShadowParams;
 #endif
@@ -181,6 +183,8 @@ cbuffer MaterialPS : register(b4)
     float3 cMatEmissiveColor;
     float3 cMatEnvMapColor;
     float4 cMatSpecColor;
+	float cRoughness;
+	float cMetalic;
 }
 #endif
 

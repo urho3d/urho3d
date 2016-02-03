@@ -4,6 +4,7 @@
 #define Sample2DProj(tex, uv) t##tex.Sample(s##tex, uv.xy / uv.w)
 #define Sample2DLod0(tex, uv) t##tex.SampleLevel(s##tex, uv, 0.0)
 #define SampleCube(tex, uv) t##tex.Sample(s##tex, uv)
+#define SampleCubeLOD(tex, uv) t##tex.SampleLevel(s##tex, uv.xyz, uv.w)
 #define SampleShadow(tex, uv) t##tex.SampleCmpLevelZero(s##tex, uv.xy, uv.z)
 #endif
 
@@ -37,6 +38,7 @@ sampler3D sZoneVolumeMap : register(s15);
 #define Sample2DProj(tex, uv) tex2Dproj(s##tex, uv)
 #define Sample2DLod0(tex, uv) tex2Dlod(s##tex, float4(uv, 0.0, 0.0))
 #define SampleCube(tex, uv) texCUBE(s##tex, uv)
+#define SampleCubeLOD(tex, uv) texCUBElod(s##tex, uv)
 #define SampleShadow(tex, uv) tex2Dproj(s##tex, uv)
 
 #else

@@ -1,9 +1,9 @@
 <cubemap>
-    <face name="BrightDay1_PosX.dds" />
-    <face name="BrightDay1_NegX.dds" />
-    <face name="BrightDay1_PosY.dds" />
-    <face name="BrightDay1_NegY.dds" />
-    <face name="BrightDay1_PosZ.dds" />
-    <face name="BrightDay1_NegZ.dds" />
+    <face name="OutdoorScene_right.PNG" />
+    <face name="OutdoorScene_left.PNG" />
+    <face name="OutdoorScene_top.PNG" />
+    <face name="OutdoorScene_bottom.PNG" />
+    <face name="OutdoorScene_front.PNG" />
+    <face name="OutdoorScene_back.PNG" />
     <quality low="0" />
 </cubemap>

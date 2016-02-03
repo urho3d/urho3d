@@ -117,6 +117,241 @@ float GetDiffuse(float3 normal, float3 worldPos, out float3 lightDir)
     #endif
 }
 
+float3 LinearToSRGB(float3 c)
+{
+	return pow(c, 2.2);
+}
+
+float3 LinearFromSRGB(float3 c)
+{
+	return pow(c, 1.0 / 2.2);
+}
+
+float3 GetLambertDiffuse(float3 diffuse)
+{
+	return diffuse * (1 / 3.141596);
+}
+
+float3 GetBurlyDiffuse(float3 diffuse, float roughness, float ndv, float NoL, float vdh)
+{
+	float FD90 = (0.5 + 2 * vdh * vdh) * roughness;
+	float FdV = 1 + (FD90 - 1) * pow(1 - ndv, 5);
+	float FdL = 1 + (FD90 - 1) * pow(1 - NoL, 5);
+	return diffuse * (1 / 3.14159 * FdV * FdL) * (1 - 0.3333 * roughness);
+}
+
+float GetGGXDistrabution(float roughness, float ndh)
+{
+	float m = roughness * roughness;
+	float m2 = m * m;
+	float d = (ndh * m2 - ndh) * ndh + 1; // 2 mad
+	return m2 / (3.141596*d*d);
+}
+
+float3 GetSchlickGaussianFresnel(float roughness, float3 specular, float vdh)
+{
+	float Fc = pow(1 - vdh, 5);
+	return saturate(50.0 * specular.g) * Fc + (1 - Fc) * specular;
+}
+
+float GetSmithGGXVisability(float roughness, float ndl, float ndv)
+{
+	float a = roughness * roughness;
+	float a2 = a*a;
+
+	float Vis_SmithV = ndv + sqrt(ndv * (ndv - ndv * a2) + a2);
+	float Vis_SmithL = ndl + sqrt(ndl * (ndl - ndl * a2) + a2);
+	return rcp(Vis_SmithV * Vis_SmithL);
+}
+
+
+// Karis '13
+float3 ImportanceSampleGGX(float2 Xi, float Roughness, float3 N)
+{
+	float a = Roughness * Roughness;
+	float Phi = 2 * 3.141596 * Xi.x;
+	float CosTheta = sqrt((1.0 - Xi.y) / (1 + (a*a - 1) * Xi.y));
+	float SinTheta = sqrt(1.0 - CosTheta * CosTheta);
+
+	float3 H;
+	H.x = SinTheta * cos(Phi);
+	H.y = SinTheta * sin(Phi);
+	H.z = CosTheta;
+
+	float3 UpVector = abs(N.z) < 0.999 ? float3(0, 0, 1) : float3(1, 0, 0);
+	float3 TangentX = normalize(cross(UpVector, N));
+	float3 TangentY = cross(N, TangentX);
+	return TangentX * H.x + TangentY * H.y + N * H.z;
+}
+
+
+//////Testing
+
+float radicalInverse_VdC(uint bits)
+{
+	bits = (bits << 16u) | (bits >> 16u);
+	bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
+	bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
+	bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
+	bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
+
+	return float(bits) * 2.3283064365386963e-10; // / 0x100000000
+}
+
+float2 Hammersley(uint i, uint n)
+{
+	return float2(i / n, radicalInverse_VdC(i));
+}
+
+float3 ImportanceSampleGGX2(float2 Xi, float Roughness, float3 N)
+{
+
+	float a = pow(Roughness + 1, 2);
+	float Phi = 2 * 3.14159 * Xi.x;
+	float CosTheta = sqrt((1 - Xi.y) / (1 + (a*a - 1) * Xi.y));
+	float SinTheta = sqrt(1 - CosTheta * CosTheta);
+	float3 H = 0;
+	H.x = SinTheta * cos(Phi);
+	H.y = SinTheta * sin(Phi);
+	H.z = CosTheta;
+
+	float3 UpVector = abs(N.z) < 0.999 ? float3(0, 0, 1) : float3(1, 0, 0);
+	float3 TangentX = normalize(cross(UpVector, N));
+	float3 TangentY = cross(N, TangentX);
+	// Tangent to world space
+	return TangentX * H.x + TangentY * H.y + N * H.z;
+}
+
+float GGX(float nDotV, float a)
+{
+	float aa = a*a;
+	float oneMinusAa = 1 - aa;
+	float nDotV2 = 2 * nDotV;
+	float root = aa + oneMinusAa * nDotV * nDotV;
+	return nDotV2 / (nDotV + sqrt(root));
+}
+
+float G_Smith(float a, float nDotV, float nDotL)
+{
+
+	return GGX(nDotL, a) * GGX(nDotV, a);
+}
+
+float2 IntegrateBRDF(float Roughness, float NoV)
+{
+	float3 V;
+	V.x = sqrt(1.0f - NoV * NoV); // sin
+	V.y = 0;
+	V.z = NoV;
+	// cos
+	float A = 0;
+	float B = 0;
+#if defined(PERPIXEL)
+	const uint NumSamples = 16;
+#else
+	const uint NumSamples = 128;
+#endif
+	for (uint i = 0; i < NumSamples; i++)
+	{
+		float2 Xi = Hammersley(i, NumSamples);
+		float3 H = ImportanceSampleGGX(Xi, Roughness, float3(0.0,0.0,1.0));
+		float3 L = 2 * dot(V, H) * H - V;
+		float NoL = saturate(L.z);
+		float NoH = saturate(H.z);
+		float VoH = saturate(dot(V, H));
+		if (NoL > 0)
+		{
+			float G = G_Smith(Roughness, NoV, NoL);
+			float G_Vis = G * VoH / (NoH * NoV);
+			float Fc = pow(1 - VoH, 5);
+			A += (1 - Fc) * G_Vis;
+			B += Fc * G_Vis;
+		}
+	}
+	return float2(A, B) / NumSamples;
+}
+
+float3 PrefilterEnvMap(float Roughness, float3 R)
+{
+	float3 N = R;
+	float3 V = R;
+	float3 PrefilteredColor = 0;
+#if defined(PERPIXEL)
+	const uint NumSamples = 16;
+#else
+	const uint NumSamples = 128;
+#endif
+	float TotalWeight = 0;
+
+	for (uint i = 0; i < NumSamples; i++)
+	{
+		float2 Xi = Hammersley(i, NumSamples);
+		float3 H = ImportanceSampleGGX(Xi, Roughness, N);
+		float3 L = 2 * dot(V, H) * H - V;
+		float NoL = saturate(dot(N, L));
+		if (NoL > 0)
+		{
+			PrefilteredColor += SampleCubeLOD(ZoneCubeMap, float4(L, Roughness)).rgb * NoL;
+			TotalWeight += NoL;
+		}
+	}
+	return PrefilteredColor / TotalWeight;
+}
+
+float3 SpecularIBL(float3 SpecularColor, float Roughness, float3 N, float3 V)
+{
+	float3 SpecularLighting = 0;
+#if defined(PERPIXEL)
+	const uint NumSamples = 16;
+#else
+	const uint NumSamples = 128;
+#endif
+	for (uint i = 0; i < NumSamples; i++)
+	{
+		float2 Xi = Hammersley(i, NumSamples);
+	
+		float3 H = ImportanceSampleGGX(Xi, Roughness, N);
+		float3 L = 2 * dot(V, H) * H - V;
+		float NoV = saturate(dot(N, V));
+		float NoL = saturate(dot(N, L));
+		float NoH = saturate(dot(N, H));
+		float VoH = saturate(dot(V, H));
+		if (NoL > 0)
+		{
+			float3 SampleColor = SampleCubeLOD(ZoneCubeMap, float4(L, Roughness)).rgb;
+			float G = G_Smith(Roughness, NoV, NoL);
+			float Fc = pow(1 - VoH, 5);
+			float3 F = (1 - Fc) * SpecularColor + Fc;
+			// Incident light = SampleColor * NoL
+			// Microfacet specular = D*G*F / (4*NoL*NoV)
+			// pdf = D * NoH / (4 * VoH)
+			SpecularLighting += SampleColor * F * G * VoH / (NoH * NoV);
+		}
+	}
+	return SpecularLighting / NumSamples;
+}
+
+
+float3 ApproximateSpecularIBL(float3 SpecularColor, float Roughness, float3 N, float3 V)
+{
+	float NoV = saturate(dot(N, V));
+	float3 R = 2 * dot(V, N) * N - V;
+	//R.x = -R.x;
+	//R.z = -R.z;
+//#if defined(PERPIXEL)
+//	float3 reflection = reflect(N, V);
+//	return LinearToSRGB(ImageBasedLighting(reflection, N, V, SpecularColor, Roughness));
+//#else
+	float3 PrefilteredColor = PrefilterEnvMap(Roughness, R);
+	float2 envBRDF = IntegrateBRDF(Roughness, NoV);
+	float3 specIBL = SpecularIBL(SpecularColor, Roughness, N, V);
+	return  PrefilteredColor * (specIBL * envBRDF.x + envBRDF.y);
+//#endif
+}
+
+//////
+
+
 float GetDiffuseVolumetric(float3 worldPos)
 {
     #ifdef DIRLIGHT
