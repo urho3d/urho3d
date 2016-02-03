@@ -359,6 +359,11 @@ if (NOT MSVC)
         # Original Makefile only sets this flags for 64-bit iOS, but we set it for arm64 in general instead
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer")
     endif ()
+    if (XCODE)
+        # We need to nullify the color-diagnostics flag configured earlier in our CMake common module to prevent Clang erroneously considered warnings in building LuaJIT_universal custom target as error markers
+        # Even though without this correction the LuaJIT_universal custom target would build just fine, the error markers in Xcode may give a wrong signal to user
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-color-diagnostics")
+    endif ()
 endif ()
 
 # Makefile: Build mode handling
