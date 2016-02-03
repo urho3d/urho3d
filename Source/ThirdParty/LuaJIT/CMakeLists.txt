@@ -540,7 +540,9 @@ if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-LuaJIT AND NOT IOS AN
     set (SOURCE_FILES src/luajit.c)
 
     # Define dependency libs
-    set (LIBS LuaJIT)
+    if (NOT TARGET LuaJIT_universal)
+        set (LIBS LuaJIT)
+    endif ()
     if (NOT MSVC)
         list (APPEND LIBS m)
     endif ()
@@ -550,6 +552,7 @@ if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-LuaJIT AND NOT IOS AN
     adjust_target_name ()   # Adjust to intended target output name
     if (TARGET LuaJIT_universal)
         add_dependencies (${TARGET_NAME} LuaJIT_universal)
+        target_link_libraries (${TARGET_NAME} ${CMAKE_BINARY_DIR}/Source/ThirdParty/LuaJIT/$<CONFIG>/libLuaJIT.a)   # This is a hack as CMake does not allow custom target in generator-expression, like $<TARGET_FILE:LuaJIT_universal>
     endif ()
 
     # Define post build steps
