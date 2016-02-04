@@ -236,6 +236,7 @@ static void RegisterVector2(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector2", "void Normalize()", asMETHOD(Vector2, Normalize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "float DotProduct(const Vector2&in) const", asMETHOD(Vector2, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "float AbsDotProduct(const Vector2&in) const", asMETHOD(Vector2, AbsDotProduct), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector2", "float Angle(const Vector2&in) const", asMETHOD(Vector2, Angle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 Abs() const", asMETHOD(Vector2, Abs), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 Lerp(const Vector2&in, float) const", asMETHOD(Vector2, Lerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "bool Equals(const Vector2&in) const", asMETHOD(Vector2, Equals), asCALL_THISCALL);
