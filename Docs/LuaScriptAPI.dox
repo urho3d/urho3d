@@ -6671,6 +6671,7 @@ Methods:
 - float LengthSquared() const
 - float DotProduct(const Vector2& rhs) const
 - float AbsDotProduct(const Vector2& rhs) const
+- float Angle(const Vector2& rhs) const
 - Vector2 Abs() const
 - Vector2 Lerp(const Vector2& rhs, float t) const
 - bool Equals(const Vector2& rhs) const

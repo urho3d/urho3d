@@ -6257,6 +6257,25 @@ uint useTimer;
 int weakRefs;
 };
 
+class Matrix2
+{
+// Methods:
+bool Equals(const Matrix2&) const;
+Matrix2 Inverse() const;
+Vector2 Scale() const;
+Matrix2 Scaled(const Vector2&) const;
+void SetScale(const Vector2&);
+void SetScale(float);
+String ToString() const;
+Matrix2 Transpose() const;
+
+// Properties:
+float m00;
+float m01;
+float m10;
+float m11;
+};
+
 class Matrix3
 {
 // Methods:
@@ -12605,6 +12624,7 @@ class Vector2
 // Methods:
 Vector2 Abs() const;
 float AbsDotProduct(const Vector2&) const;
+float Angle(const Vector2&) const;
 float DotProduct(const Vector2&) const;
 bool Equals(const Vector2&) const;
 bool IsNaN() const;
