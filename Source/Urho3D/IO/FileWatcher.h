@@ -90,7 +90,7 @@ private:
     /// Linux inotify needs a handle.
     int watchHandle_;
 
-#elif defined(__APPLE__) && !defined(IOS)
+#elif defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
     
     /// Flag indicating whether the running OS supports individual file watching.
     bool supported_;

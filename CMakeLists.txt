@@ -97,8 +97,10 @@ if (ANDROID)
     set (CPACK_SYSTEM_NAME Android)
 elseif (IOS)
     set (CPACK_SYSTEM_NAME iOS)
+elseif (TVOS)
+    set (CPACK_SYSTEM_NAME tvOS)
 elseif (APPLE)
-    set (CPACK_SYSTEM_NAME OSX)
+    set (CPACK_SYSTEM_NAME macOS)
 elseif (WIN32)
     if (MINGW)
         set (CPACK_SYSTEM_NAME MinGW)   # MinGW implies Windows platform
@@ -164,8 +166,8 @@ if (NOT DEFINED ENV{RELEASE_TAG})
 endif ()
 include (CPack)
 
-# Setup MacOSX and iOS bundle variables
-if (IOS OR URHO3D_MACOSX_BUNDLE)
+# Setup MacOSX and iOS/tvOS bundle variables
+if (IOS OR TVOS OR URHO3D_MACOSX_BUNDLE)
     if (NOT MACOSX_BUNDLE_ICON_FILE)
         set (MACOSX_BUNDLE_ICON_FILE UrhoIcon)
     endif ()

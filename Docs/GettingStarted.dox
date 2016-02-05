@@ -100,6 +100,7 @@ A number of build options can be defined when invoking the build scripts or when
 |WIN32                |0|Configure project using MinGW (32-bit or 64-bit) cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify MinGW toolchain file for cross-compiling explicitly|
 |WEB                  |0|Configure project using Emscripten cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify Emscripten toolchain file for cross-compiling explicitly|
 |IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only)|
+|TVOS                 |0|Configure project for targeting tvOS platform (cmake_generic.sh and cmake-gui only)|
 |URHO3D_64BIT         |*|Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain|
 |URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
 |URHO3D_LUA           |1|Enable Lua scripting support|
@@ -148,6 +149,7 @@ A number of build options can be defined when invoking the build scripts or when
 |CMAKE_INSTALL_PREFIX |*|Install path prefix, prepended onto install directories; default to 'c:/Program Files/Urho3D' on Windows host and '/usr/local' on all other non-Windows hosts|
 |CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify macOS deployment target (macOS platform only); default to current running macOS if not specified, the minimum supported target is 10.5 due to constraint from SDL library|
 |IPHONEOS_DEPLOYMENT_TARGET|-|Specify iOS deployment target (iOS platform only); default to latest installed iOS SDK if not specified, the minimum supported target is 3.0 due to constraint from SDL library|
+|APPLETVOS_DEPLOYMENT_TARGET|-|Specify AppleTV OS deployment target (tvOS platform only); default to latest installed tvOS SDK if not specified, the minimum spported target is 9.0|
 |ANDROID_NDK          |-|Path to Android NDK (Android platform only)|
 |ANDROID_TOOLCHAIN_NAME|*|Specify the name of compiler toolchain (Android platform only), possible values depends on installed Android NDK, default to Clang compiler toolchain|
 |ANDROID_ABI          |*|Specify target ABI (Android platform only), possible values depends on the target arch of the chosen Android compiler toolchain, default to first ABI of each target arch|

@@ -53,7 +53,7 @@ static const char* shapeNames[] =
 };
 
 /// OS cursor shape lookup table matching cursor shape enumeration
-#if !defined(__ANDROID__) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS) && !defined(TVOS)
 static const int osCursorLookup[CS_MAX_SHAPES] =
 {
     SDL_SYSTEM_CURSOR_ARROW,    // CS_NORMAL
@@ -256,7 +256,7 @@ VariantVector Cursor::GetShapesAttr() const
 void Cursor::ApplyOSCursorShape()
 {
     // Mobile platforms do not support applying OS cursor shapes: comment out to avoid log error messages
-#if !defined(__ANDROID__) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS) && !defined(TVOS)
     if (!osShapeDirty_ || !GetSubsystem<Input>()->IsMouseVisible() || GetSubsystem<UI>()->GetCursor() != this)
         return;
 

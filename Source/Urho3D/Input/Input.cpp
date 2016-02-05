@@ -49,8 +49,7 @@
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char* name);
 
 // Use a "click inside window to focus" mechanism on desktop platforms when the mouse cursor is hidden
-// TODO: For now, in this particular case only, treat all the ARM on Linux as "desktop" (e.g. RPI, odroid, etc), revisit this again when we support "mobile" ARM on Linux
-#if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS)) || (defined(__linux__) && !defined(__ANDROID__))
+#if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS) && !defined(TVOS)) || (defined(__linux__) && !defined(__ANDROID__))
 #define REQUIRE_CLICK_TO_FOCUS
 #endif
 
@@ -1158,7 +1157,7 @@ void Input::SetScreenKeyboardVisible(bool enable)
 
 void Input::SetTouchEmulation(bool enable)
 {
-#if !defined(__ANDROID__) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS) && !defined(TVOS)
     if (enable != touchEmulation_)
     {
         if (enable)
@@ -2305,7 +2304,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             case SDL_WINDOWEVENT_MAXIMIZED:
             case SDL_WINDOWEVENT_RESTORED:
-#if defined(IOS) || defined (__ANDROID__)
+#if defined(IOS) || defined(TVOS) || defined (__ANDROID__)
                 // On iOS we never lose the GL context, but may have done GPU object changes that could not be applied yet. Apply them now
                 // On Android the old GL context may be lost already, restore GPU objects to the new GL context
                 graphics_->Restore();

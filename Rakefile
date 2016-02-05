@@ -54,7 +54,7 @@ task :cmake do
   platform = 'native'
   build_options = ''
   # TODO: Need to find a way to automatically populate the array with all the Urho3D supported build options, at the moment it only contains those being used in CI
-  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_PCH', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TESTING', 'URHO3D_TEST_TIMEOUT', 'URHO3D_UPDATE_SOURCE_TREE', 'URHO3D_TOOLS', 'URHO3D_DEPLOYMENT_TARGET', 'URHO3D_USE_LIB64_RPM', 'CMAKE_BUILD_TYPE', 'CMAKE_OSX_DEPLOYMENT_TARGET', 'IOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'WIN32', 'MINGW', 'DIRECTX_INC_SEARCH_PATHS', 'DIRECTX_LIB_SEARCH_PATHS', 'ANDROID', 'ANDROID_ABI', 'ANDROID_NATIVE_API_LEVEL', 'ANDROID_TOOLCHAIN_NAME', 'RPI', 'RPI_ABI', 'ARM', 'ARM_ABI_FLAGS', 'WEB', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_WASM', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
+  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_PCH', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TESTING', 'URHO3D_TEST_TIMEOUT', 'URHO3D_UPDATE_SOURCE_TREE', 'URHO3D_TOOLS', 'URHO3D_DEPLOYMENT_TARGET', 'URHO3D_USE_LIB64_RPM', 'CMAKE_BUILD_TYPE', 'CMAKE_OSX_DEPLOYMENT_TARGET', 'IOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'TVOS', 'APPLETVOS_DEPLOYMENT_TARGET', 'WIN32', 'MINGW', 'DIRECTX_INC_SEARCH_PATHS', 'DIRECTX_LIB_SEARCH_PATHS', 'ANDROID', 'ANDROID_ABI', 'ANDROID_NATIVE_API_LEVEL', 'ANDROID_TOOLCHAIN_NAME', 'RPI', 'RPI_ABI', 'ARM', 'ARM_ABI_FLAGS', 'WEB', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_WASM', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
     ARGV << "#{var}=\"#{ENV[var]}\"" if ENV[var] && !ARGV.find { |arg| /#{var}=/ =~ arg }
   }
   ARGV.each { |option|
@@ -64,11 +64,11 @@ task :cmake do
       # do nothing
     when 'clean', 'codeblocks', 'codelite', 'eclipse', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013', 'vs2015', 'xcode'
       script = "cmake_#{option}" unless script == 'cmake_clean'
-    when 'android', 'arm', 'ios', 'mingw', 'rpi', 'web'
+    when 'android', 'arm', 'ios', 'tvos', 'mingw', 'rpi', 'web'
       platform = option
       build_options = "#{build_options} -D#{option == 'mingw' ? 'WIN32' : option.upcase}=1" unless script == 'cmake_clean'
-      script = 'cmake_xcode' if option == 'ios'
-      script = 'cmake_mingw' if option == 'mingw' && ENV['OS']
+      script = 'cmake_xcode' if /(?:i|tv)os/ =~ option && script != 'cmake_clean'
+      script = 'cmake_mingw' if option == 'mingw' && ENV['OS'] && script != 'cmake_clean'
     when 'fix_scm'
       build_options = "#{build_options} --fix-scm" if script == 'cmake_eclipse'
     else
@@ -105,7 +105,7 @@ task :make do
     case option
     when 'codeblocks', 'codelite', 'eclipse', 'generic', 'make', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013', 'vs2015', 'xcode'
       # do nothing
-    when 'android', 'arm', 'ios', 'mingw', 'rpi', 'web'
+    when 'android', 'arm', 'ios', 'tvos', 'mingw', 'rpi', 'web'
       platform = option
     when 'clean_first'
       cmake_build_options = "#{cmake_build_options} --clean-first"
@@ -347,7 +347,7 @@ task :ci do
   # Always use a same build configuration to keep ccache's cache size small; single-config generator needs the option when configuring, while multi-config when building
   ENV[ENV['XCODE'] ? 'config' : 'CMAKE_BUILD_TYPE'] = 'Release' if ENV['USE_CCACHE']
   # Currently we don't have the infra to test run all the platforms; also skip when doing packaging build due to time constraint
-  ENV['URHO3D_TESTING'] = '1' if (((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS']) || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']) || ENV['WEB']
+  ENV['URHO3D_TESTING'] = '1' if (((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS'] && !ENV['TVOS']) || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']) || ENV['WEB']
   # When not explicitly specified then use generic generator
   generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] && !ENV['MINGW'] ? 'vs2015' : '')
   # LuaJIT on MinGW build is not possible on Travis-CI with Ubuntu 14.04 LTS still as its GCC cross-compiler does not have native exception handling
@@ -378,8 +378,8 @@ task :ci do
   else
     test = ''
   end
-  # Skip scaffolding test when time up or packaging for iOS and Web platform
-  unless ENV['CI'] && (ENV['IOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD'] || ENV['XCODE_64BIT_ONLY'] || timeup
+  # Skip scaffolding test when time up or packaging for iOS, tvOS, and Web platform
+  unless ENV['CI'] && (ENV['IOS'] || ENV['TVOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD'] || ENV['XCODE_64BIT_ONLY'] || timeup
     # Staged-install Urho3D SDK when on Travis-CI; normal install when on AppVeyor
     ENV['DESTDIR'] = ENV['HOME'] || Dir.home unless ENV['APPVEYOR']
     if !wait_for_block("Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}...") { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "rake make target=install >#{ENV['OS'] ? 'nul' : '/dev/null'}" }
@@ -616,8 +616,8 @@ task :ci_package_upload do
   end
   # Make the package
   puts "Packaging artifacts...\n\n"; $stdout.flush
-  if ENV['IOS']
-    # There is a bug in CMake/CPack that causes the 'package' target failed to build for IOS platform, workaround by calling cpack directly; CMake 3.4 runs the target successfully, however, the result tarball is incomplete (somehow it misses packaging the library itself, another bug?)
+  if ENV['IOS'] || ENV['TVOS']
+    # There is a bug in CMake/CPack that causes the 'package' target failed to build for iOS and tvOS platforms, workaround by calling cpack directly; CMake 3.4 runs the target successfully, however, the result tarball is incomplete (somehow it misses packaging the library itself, another bug?)
     system 'cd ../Build && cpack -G TGZ 2>/dev/null' or abort 'Failed to make binary package'
   else
     if ENV['ANDROID']

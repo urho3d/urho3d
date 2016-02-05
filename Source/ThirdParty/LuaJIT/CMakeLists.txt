@@ -203,7 +203,7 @@ if (NOT LUAJIT_CACHE STREQUAL "${URHO3D_64BIT}-${LUAJIT_DISABLE_FFI}-${LUAJIT_DI
         if (XCODE)
             if (ARCH)    # The ARCH variable is defined only when we are building LuaJIT for non-native archs using external project
                 set (ARCH_FLAGS -arch ${ARCH})
-            elseif (IOS)
+            elseif (IOS OR TVOS)
                 if (URHO3D_64BIT)
                     set (ARCH_FLAGS -arch arm64)
                 else ()
@@ -245,7 +245,7 @@ if (NOT LUAJIT_CACHE STREQUAL "${URHO3D_64BIT}-${LUAJIT_DISABLE_FFI}-${LUAJIT_DI
     set (TARGET_ARCH ${TARGET_ARCH} -DLUAJIT_TARGET=LUAJIT_ARCH_${TARGET_LJARCH})
 
     # Makefile: Target system detection
-    if (IOS)
+    if (IOS OR TVOS)
         set (TARGET_SYS iOS)
     elseif (CMAKE_SYSTEM_NAME STREQUAL Linux)
         set (TARGET_SYS Linux)
@@ -383,9 +383,10 @@ if (CMAKE_CROSSCOMPILING)
     endforeach ()
     # When cross-compiling, build the host tool as external project
     include (ExternalProject)
-    if (IOS)
-        # For iOS target, ensure the host environment is cleared first; Also workaround a known CMake/Xcode generator bug which prevents it from installing binaries correctly
-        set (ALTERNATE_COMMAND CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} CC=${SAVED_CC} CXX=${SAVED_CXX} CI=$ENV{CI} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
+    if (IOS OR TVOS)
+        # When cross-compiling for iOS/tvOS the host environment has been altered by xcodebuild for the said platform, the following fix is required to reset the host environment before spawning another process to configure/generate project file for external project
+        # Also workaround a known CMake/Xcode generator bug which prevents it from installing native tool binaries correctly
+        set (ALTERNATE_COMMAND CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} CC=${SAVED_CC} CXX=${SAVED_CXX} CI=$ENV{CI} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/\$$\(EFFECTIVE_PLATFORM_NAME\)//g' CMakeScripts/install_postBuildPhase.make*")
     else ()
         set (ALTERNATE_COMMAND CMAKE_COMMAND ${CMAKE_COMMAND} -E env CC=${SAVED_CC} CXX=${SAVED_CXX} CI=$ENV{CI} ${CMAKE_COMMAND})
     endif ()
@@ -475,10 +476,10 @@ set (INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/generated)
 if (XCODE)
     if (ARCH)
         list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_ARCHS ${ARCH})
-    elseif (URHO3D_64BIT OR IOS)
+    elseif (URHO3D_64BIT OR IOS OR TVOS)
         set (EXCLUDE_FROM_ALL EXCLUDE_FROM_ALL)
         list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH YES)
-        if (URHO3D_64BIT AND IOS)
+        if (URHO3D_64BIT AND (IOS OR TVOS))
             list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_ARCHS arm64)     # The ARCHS_STANDARD builds armv7 first, but we have setup LuaJIT target detection to detect arm64 as the default arch so we override Xcode to build arm64 first
         endif ()
     endif ()
@@ -487,12 +488,12 @@ setup_library (${EXCLUDE_FROM_ALL})
 if (XCODE AND NOT ARCH)    # These variables are used to control the recursion as this script is recursive in nature on Xcode
     # Add external and custom targets to build Mach-O universal binary LuaJIT sub-library
     include (ExternalProject)
-    foreach (LUAJIT_OPT LUAJIT_ENABLE_GC64 LUAJIT_DISABLE_FFI LUAJIT_ENABLE_LUA52COMPAT LUAJIT_DISABLE_JIT LUAJIT_NUMMODE LUAJIT_USE_SYSMALLOC LUAJIT_USE_VALGRIND LUAJIT_USE_GDBJIT LUA_USE_APICHECK LUA_USE_ASSERT LUAJIT_NO_STACK_PROTECTION IOS IPHONEOS_DEPLOYMENT_TARGET URHO3D_LUAJIT_AMALG BAKED_CMAKE_SOURCE_DIR)
+    foreach (LUAJIT_OPT LUAJIT_ENABLE_GC64 LUAJIT_DISABLE_FFI LUAJIT_ENABLE_LUA52COMPAT LUAJIT_DISABLE_JIT LUAJIT_NUMMODE LUAJIT_USE_SYSMALLOC LUAJIT_USE_VALGRIND LUAJIT_USE_GDBJIT LUA_USE_APICHECK LUA_USE_ASSERT LUAJIT_NO_STACK_PROTECTION IOS IPHONEOS_DEPLOYMENT_TARGET TVOS APPLETVOS_DEPLOYMENT_TARGET URHO3D_LUAJIT_AMALG BAKED_CMAKE_SOURCE_DIR)
         if (DEFINED ${LUAJIT_OPT})
             list (APPEND LUAJIT_PASSTHRU_OPTS -D${LUAJIT_OPT}=${${LUAJIT_OPT}})
         endif ()
     endforeach ()
-    if (IOS)
+    if (IOS OR TVOS)
         set (ALTERNATE_COMMAND CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} CI=$ENV{CI} ${CMAKE_COMMAND})
     else ()
         set (ALTERNATE_COMMAND CMAKE_COMMAND ${CMAKE_COMMAND} -E env CI=$ENV{CI} ${CMAKE_COMMAND})
@@ -503,7 +504,7 @@ if (XCODE AND NOT ARCH)    # These variables are used to control the recursion a
             SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
             CMAKE_ARGS -DARCH=i386 -DINSTALL_ARCHIVE_DIR=${CMAKE_CURRENT_BINARY_DIR} -DURHO3D_64BIT=0 ${LUAJIT_PASSTHRU_OPTS} ${ALTERNATE_COMMAND} BUILD_COMMAND "" INSTALL_COMMAND ${CMAKE_COMMAND} --build . --target install --config $<CONFIG> -- -sdk iphonesimulator)
         if (URHO3D_64BIT)
-            # 64-bit iOS universal binary contains all the archs: arm64 and armv7 (iPhoneOS), and x86_64 and i386 (iPhoneSimulator)
+            # 64-bit iOS universal binaries: for iPhoneOS SDK contains arm64 and armv7 archs, and for iPhoneSimulator SDK contains x86_64 and i386 archs
             ExternalProject_Add (${TARGET_NAME}_x86_64
                 SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
                 CMAKE_ARGS -DARCH=x86_64 -DINSTALL_ARCHIVE_DIR=${CMAKE_CURRENT_BINARY_DIR} ${LUAJIT_PASSTHRU_OPTS} ${ALTERNATE_COMMAND} BUILD_COMMAND "" INSTALL_COMMAND ${CMAKE_COMMAND} --build . --target install --config $<CONFIG> -- -sdk iphonesimulator)
@@ -530,6 +531,22 @@ if (XCODE AND NOT ARCH)    # These variables are used to control the recursion a
             COMMAND if [ '$(CONFIGURATION)' != 'Debug' ] || echo '$(ARCHS)' |grep -cq 86\; then xcodebuild ARCHS="$(ARCHS)" -target ${TARGET_NAME}_universal-iphonesimulator -configuration $(CONFIGURATION)\; fi
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Creating Mach-O universal binary LuaJIT library")
+    elseif (TVOS)
+        # 64-bit tvOS universal binary contains both arm64 (AppleTVOS) and x86_64 (AppleTVSimulator) archs
+        ExternalProject_Add (${TARGET_NAME}_x86_64
+            SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
+            CMAKE_ARGS -DARCH=x86_64 -DINSTALL_ARCHIVE_DIR=${CMAKE_CURRENT_BINARY_DIR} ${LUAJIT_PASSTHRU_OPTS} ${ALTERNATE_COMMAND} BUILD_COMMAND "" INSTALL_COMMAND ${CMAKE_COMMAND} --build . --target install --config $<CONFIG> -- -sdk appletvsimulator)
+        add_custom_target (${TARGET_NAME}_universal-appletvsimulator
+            COMMAND xcodebuild -target ${TARGET_NAME}_x86_64 -configuration $(CONFIGURATION) && cp -p ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-appletvsimulator/lib${TARGET_NAME}.a{.x86_64,}
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+        add_custom_target (${TARGET_NAME}_universal-appletvos
+            COMMAND xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION)
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+        add_custom_target (${TARGET_NAME}_universal ALL
+            COMMAND if [ '$(CONFIGURATION)' != 'Debug' ] || echo '$(ARCHS)' |grep -cq arm\; then xcodebuild ARCHS="$(ARCHS)" -target ${TARGET_NAME}_universal-appletvos -configuration $(CONFIGURATION)\; fi
+            COMMAND if [ '$(CONFIGURATION)' != 'Debug' ] || echo '$(ARCHS)' |grep -cq 86\; then xcodebuild ARCHS="$(ARCHS)" -target ${TARGET_NAME}_universal-appletvsimulator -configuration $(CONFIGURATION)\; fi
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            COMMENT "Creating Mach-O universal binary LuaJIT library")
     elseif (URHO3D_UNIVERSAL)
         # macOS universal binary contains both x86_86 and i386 archs
         ExternalProject_Add (${TARGET_NAME}_i386
@@ -541,14 +558,15 @@ if (XCODE AND NOT ARCH)    # These variables are used to control the recursion a
             COMMENT "Creating Mach-O universal binary LuaJIT library")
     endif ()
 elseif (INSTALL_ARCHIVE_DIR)
-    install (FILES $<TARGET_FILE:${TARGET_NAME}> DESTINATION ${INSTALL_ARCHIVE_DIR}/$<CONFIG>\${EFFECTIVE_PLATFORM_NAME} RENAME lib${TARGET_NAME}.a.${ARCH})   # This is a hack to workaround CMake (current) limitation
+    # This is a hack as it relies on CMake internal implementation
+    install (FILES $<TARGET_FILE:${TARGET_NAME}> DESTINATION ${INSTALL_ARCHIVE_DIR}/$<CONFIG>\${EFFECTIVE_PLATFORM_NAME} RENAME lib${TARGET_NAME}.a.${ARCH})
 endif ()
 
 # Install headers for building and using the Urho3D library (no direct dependencies but library user may need them)
 install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/LuaJIT FILES_MATCHING PATTERN *.h *.hpp)  # Note: the trailing slash is significant
 
 # Setup additional Lua standalone target (this target can be transfered and executed on an embedded device, such as Raspberry Pi and Android)
-if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-LuaJIT AND NOT IOS AND NOT WEB)
+if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-LuaJIT AND NOT IOS AND NOT TVOS AND NOT WEB)
     # Define target name for LuaJIT interpreter cum compiler
     set (TARGET_NAME luajit_interpreter)   # Note: intended target name is 'luajit' which clashes with 'LuaJIT' library target above for case-insensitive platform
 

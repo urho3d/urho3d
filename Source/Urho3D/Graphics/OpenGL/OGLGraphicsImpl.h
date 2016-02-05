@@ -29,7 +29,7 @@
 #include "../../Graphics/Texture2D.h"
 #include "../../Math/Color.h"
 
-#if defined(IOS)
+#if defined(IOS) || defined(TVOS)
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #elif defined(__ANDROID__) || defined (__arm__) || defined(__aarch64__) || defined (__EMSCRIPTEN__)
@@ -114,7 +114,7 @@ public:
 private:
     /// SDL OpenGL context.
     SDL_GLContext context_;
-    /// IOS system framebuffer handle.
+    /// iOS/tvOS system framebuffer handle.
     unsigned systemFBO_;
     /// Active texture unit.
     unsigned activeTexture_;

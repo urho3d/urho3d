@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
+// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
 #include "../../SDL_internal.h"
 
@@ -112,6 +112,14 @@ const char* SDL_IOS_GetDocumentsDir()
     
     return documents_dir;
 }
+
+// Urho3D: added function
+#if TARGET_OS_TV
+unsigned SDL_TVOS_GetActiveProcessorCount()
+{
+    return [NSProcessInfo class] ? (unsigned)[[NSProcessInfo processInfo] activeProcessorCount] : 1;
+}
+#endif
 
 static void
 SDL_IdleTimerDisabledChanged(void *userdata, const char *name, const char *oldValue, const char *hint)

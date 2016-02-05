@@ -59,7 +59,7 @@ if (IOS)
     # This is a CMake hack in order to make standard CMake check modules that use try_compile() internally work on iOS platform
     # The injected "flags" are not compiler flags, they are actually CMake variables meant for another CMake subprocess that builds the source file being passed in the try_compile() command
     # CAVEAT: these injected "flags" must always be kept at the end of the string variable, i.e. when adding more compiler flags later on then those new flags must be prepended in front of these flags instead
-    set (CMAKE_REQUIRED_FLAGS ";-DSmileyHack=byYaoWT;-DCMAKE_MACOSX_BUNDLE=1;-DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=0")
+    set (CMAKE_REQUIRED_FLAGS ";-DSmileyHack=byYaoWT;-DCMAKE_MACOSX_BUNDLE=1;-DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=0;-DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=")
     if (NOT IOS_SYSROOT)
         execute_process (COMMAND xcodebuild -version -sdk ${CMAKE_OSX_SYSROOT} Path OUTPUT_VARIABLE IOS_SYSROOT OUTPUT_STRIP_TRAILING_WHITESPACE)   # Obtain iOS sysroot path
         set (IOS_SYSROOT ${IOS_SYSROOT} CACHE INTERNAL "Path to iOS system root")
@@ -76,6 +76,22 @@ if (IOS)
     set (DEPLOYMENT_TARGET_SAVED ${IPHONEOS_DEPLOYMENT_TARGET}: CACHE INTERNAL "Last known deployment target")    # with sentinel so it does not appear empty even when the default target is used
     set (CMAKE_XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES)
     # Workaround what appears to be a bug in CMake/Xcode generator, ensure the CMAKE_OSX_DEPLOYMENT_TARGET is set to empty for iOS build
+    set (CMAKE_OSX_DEPLOYMENT_TARGET)
+    unset (CMAKE_OSX_DEPLOYMENT_TARGET CACHE)
+elseif (TVOS)
+    set (CMAKE_CROSSCOMPILING TRUE)
+    set (CMAKE_XCODE_EFFECTIVE_PLATFORMS -appletvos -appletvsimulator)
+    set (CMAKE_OSX_SYSROOT appletvos)    # Set Base SDK to "Latest tvOS"
+    set (CMAKE_REQUIRED_FLAGS ";-DSmileyHack=byYaoWT;-DCMAKE_MACOSX_BUNDLE=1;-DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=0;-DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=")
+    if (NOT TVOS_SYSROOT)
+        execute_process (COMMAND xcodebuild -version -sdk ${CMAKE_OSX_SYSROOT} Path OUTPUT_VARIABLE TVOS_SYSROOT OUTPUT_STRIP_TRAILING_WHITESPACE)   # Obtain tvOS sysroot path
+        set (TVOS_SYSROOT ${TVOS_SYSROOT} CACHE INTERNAL "Path to tvOS system root")
+    endif ()
+    set (CMAKE_FIND_ROOT_PATH ${TVOS_SYSROOT})
+    set (APPLETVOS_DEPLOYMENT_TARGET "" CACHE STRING "Specify tvOS deployment target (tvOS platform only); default to latest installed tvOS SDK if not specified")
+    set (CMAKE_XCODE_ATTRIBUTE_APPLETVOS_DEPLOYMENT_TARGET ${APPLETVOS_DEPLOYMENT_TARGET})
+    set (CMAKE_XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES)
+    # Just in case it has similar bug for tvOS build
     set (CMAKE_OSX_DEPLOYMENT_TARGET)
     unset (CMAKE_OSX_DEPLOYMENT_TARGET CACHE)
 elseif (XCODE)
@@ -115,6 +131,7 @@ set (CMAKE_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} ${CMAKE_EXE_LINKE
 include (CMakeDependentOption)
 option (URHO3D_C++11 "Enable C++11 standard")
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
+cmake_dependent_option (TVOS "Setup build for tvOS platform" FALSE "XCODE" FALSE)
 cmake_dependent_option (URHO3D_64BIT "Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain" "${NATIVE_64BIT}" "NOT MSVC AND NOT ANDROID AND NOT (ARM AND NOT IOS) AND NOT WEB AND NOT POWERPC" "${NATIVE_64BIT}")     # Intentionally only enable the option for iOS but not for tvOS as the latter is 64-bit only
 option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE)
 option (URHO3D_IK "Enable inverse kinematics support" TRUE)
@@ -127,7 +144,7 @@ option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
 if (ARM AND NOT ANDROID AND NOT RPI AND NOT IOS AND NOT TVOS)
     set (ARM_ABI_FLAGS "" CACHE STRING "Specify ABI compiler flags (ARM on Linux platform only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'")
 endif ()
-if (IOS OR (RPI AND "${RPI_ABI}" MATCHES NEON) OR (ARM AND (URHO3D_64BIT OR "${ARM_ABI_FLAGS}" MATCHES neon)))    # Stringify in case RPI_ABI/ARM_ABI_FLAGS is not set explicitly
+if (IOS OR TVOS OR (RPI AND "${RPI_ABI}" MATCHES NEON) OR (ARM AND (URHO3D_64BIT OR "${ARM_ABI_FLAGS}" MATCHES neon)))    # Stringify in case RPI_ABI/ARM_ABI_FLAGS is not set explicitly
     # TODO: remove this logic when the compiler flags are set in each toolchain file, such that the CheckCompilerToolchain can perform the check automatically
     set (NEON 1)
 endif ()
@@ -176,19 +193,19 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     option (URHO3D_BINDINGS "Enable API binding generation support for script subystems")
     cmake_dependent_option (URHO3D_CLANG_TOOLS "Build Clang tools (native on host system only)" FALSE "NOT CMAKE_CROSSCOMPILING" FALSE)
     mark_as_advanced (URHO3D_UPDATE_SOURCE_TREE URHO3D_BINDINGS URHO3D_CLANG_TOOLS)
-    cmake_dependent_option (URHO3D_TOOLS "Build tools (native, RPI, and ARM on Linux only)" TRUE "NOT IOS AND NOT ANDROID AND NOT WEB" FALSE)
-    cmake_dependent_option (URHO3D_EXTRAS "Build extras (native, RPI, and ARM on Linux only)" FALSE "NOT IOS AND NOT ANDROID AND NOT WEB" FALSE)
+    cmake_dependent_option (URHO3D_TOOLS "Build tools (native, RPI, and ARM on Linux only)" TRUE "NOT IOS AND NOT TVOS AND NOT ANDROID AND NOT WEB" FALSE)
+    cmake_dependent_option (URHO3D_EXTRAS "Build extras (native, RPI, and ARM on Linux only)" FALSE "NOT IOS AND NOT TVOS AND NOT ANDROID AND NOT WEB" FALSE)
     option (URHO3D_DOCS "Generate documentation as part of normal build")
     option (URHO3D_DOCS_QUIET "Generate documentation as part of normal build, suppress generation process from sending anything to stdout")
     option (URHO3D_PCH "Enable PCH support" TRUE)
-    cmake_dependent_option (URHO3D_DATABASE_ODBC "Enable Database support with ODBC, requires vendor-specific ODBC driver" FALSE "NOT IOS AND NOT ANDROID AND NOT WEB;NOT MSVC OR NOT MSVC_VERSION VERSION_LESS 1900" FALSE)
+    cmake_dependent_option (URHO3D_DATABASE_ODBC "Enable Database support with ODBC, requires vendor-specific ODBC driver" FALSE "NOT IOS AND NOT TVOS AND NOT ANDROID AND NOT WEB;NOT MSVC OR NOT MSVC_VERSION VERSION_LESS 1900" FALSE)
     option (URHO3D_DATABASE_SQLITE "Enable Database support with SQLite embedded")
     # Enable file watcher support for automatic resource reloads by default.
     option (URHO3D_FILEWATCHER "Enable filewatcher support" TRUE)
     option (URHO3D_TESTING "Enable testing support")
     # By default this option is off (i.e. we use the MSVC dynamic runtime), this can be switched on if using Urho3D as a STATIC library
     cmake_dependent_option (URHO3D_STATIC_RUNTIME "Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)" FALSE "MSVC" FALSE)
-    if (((URHO3D_LUA AND NOT URHO3D_LUAJIT) OR URHO3D_DATABASE_SQLITE) AND NOT ANDROID AND NOT IOS AND NOT WEB AND NOT WIN32)
+    if (((URHO3D_LUA AND NOT URHO3D_LUAJIT) OR URHO3D_DATABASE_SQLITE) AND NOT ANDROID AND NOT IOS AND NOT TVOS AND NOT WEB AND NOT WIN32)
         # Find GNU Readline development library for Lua interpreter and SQLite's isql
         find_package (Readline)
     endif ()
@@ -244,8 +261,8 @@ endif ()
 cmake_dependent_option (URHO3D_MINIDUMPS "Enable minidumps on crash (VS only)" TRUE "MSVC" FALSE)
 # By default Windows platform setups main executable as Windows application with WinMain() as entry point
 cmake_dependent_option (URHO3D_WIN32_CONSOLE "Use console main() instead of WinMain() as entry point when setting up Windows executable targets (Windows platform only)" FALSE "WIN32" FALSE)
-cmake_dependent_option (URHO3D_MACOSX_BUNDLE "Use MACOSX_BUNDLE when setting up macOS executable targets (Xcode/macOS platform only)" FALSE "XCODE AND NOT IOS" FALSE)
-if (CMAKE_CROSSCOMPILING AND NOT ANDROID AND NOT IOS)
+cmake_dependent_option (URHO3D_MACOSX_BUNDLE "Use MACOSX_BUNDLE when setting up macOS executable targets (Xcode/macOS platform only)" FALSE "XCODE AND NOT IOS AND NOT TVOS" FALSE)
+if (CMAKE_CROSSCOMPILING AND NOT ANDROID AND NOT IOS AND NOT TVOS)
     set (URHO3D_SCP_TO_TARGET "" CACHE STRING "Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc")
 else ()
     unset (URHO3D_SCP_TO_TARGET CACHE)
@@ -345,7 +362,7 @@ if (URHO3D_LUAJIT)
 endif ()
 
 # Union all the sysroot variables into one so it can be referred to generically later
-set (SYSROOT ${CMAKE_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYSROOT} CACHE INTERNAL "Path to system root of the cross-compiling target")  # SYSROOT is empty for native build
+set (SYSROOT ${CMAKE_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYSROOT} ${TVOS_SYSROOT} CACHE INTERNAL "Path to system root of the cross-compiling target")  # SYSROOT is empty for native build
 
 # Clang tools building
 if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
@@ -478,7 +495,7 @@ if (URHO3D_C++11)
 endif ()
 if (APPLE)
     if (IOS)
-        # IOS-specific setup
+        # iOS-specific setup
         add_definitions (-DIOS)
         if (URHO3D_64BIT)
             if (DEFINED ENV{XCODE_64BIT_ONLY})                  # This environment variable is set automatically when ccache is just being cleared in Travis CI VM
@@ -490,9 +507,13 @@ if (APPLE)
             # This is a legacy option and should not be used as we are phasing out 32-bit only mode
             set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
         endif ()
+    elseif (TVOS)
+        # tvOS-specific setup
+        add_definitions (-DTVOS)
+        set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD))
     else ()
         if (XCODE)
-            # OSX-specific setup
+            # macOS-specific setup
             if (URHO3D_64BIT)
                 if (URHO3D_UNIVERSAL)
                     # This is a legacy option and should not be used as we are phasing out macOS universal binary mode
@@ -506,8 +527,8 @@ if (APPLE)
             endif ()
         endif ()
     endif ()
-    # Common OSX and iOS bundle setup
-    if (IOS OR URHO3D_MACOSX_BUNDLE)
+    # Common OSX and iOS/tvOS bundle setup
+    if (IOS OR TVOS OR URHO3D_MACOSX_BUNDLE)
         # Only set the bundle properties to its default when they are not explicitly specified by user
         if (NOT MACOSX_BUNDLE_GUI_IDENTIFIER)
             set (MACOSX_BUNDLE_GUI_IDENTIFIER com.github.urho3d.\${PRODUCT_NAME:rfc1034identifier:lower})
@@ -714,8 +735,8 @@ else ()
 endif ()
 # LuaJIT specific - extra linker flags for linking against LuaJIT (adapted from LuaJIT's original Makefile)
 if (URHO3D_LUAJIT)
-    if (URHO3D_64BIT AND APPLE AND NOT IOS)
-        # 64-bit Mac OS X: it simply won't work without these flags; if you are reading this comment then you may want to know the following also
+    if (URHO3D_64BIT AND APPLE AND NOT IOS AND NOT TVOS)
+        # 64-bit macOS: it simply won't work without these flags; if you are reading this comment then you may want to know the following also
         # it's recommended to rebase all (self-compiled) shared libraries which are loaded at runtime on OSX/x64 (e.g. C extension modules for Lua), see: man rebase
         set (LUAJIT_EXE_LINKER_FLAGS_APPLE "-pagezero_size 10000 -image_base 100000000")
         set (LUAJIT_SHARED_LINKER_FLAGS_APPLE "-image_base 7fff04c4a000")
@@ -1032,8 +1053,8 @@ macro (define_resource_dirs)
         if (NOT RESOURCE_FILES)
             # Default app bundle icon
             set (RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.icns)
-            if (IOS)
-                # Default app icon on the iOS home screen
+            if (IOS OR TVOS)
+                # Default app icon on the iOS/tvOS home screen
                 list (APPEND RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.png)
             endif ()
         endif ()
@@ -1455,7 +1476,7 @@ macro (setup_executable)
                 list (APPEND FILES ${LOCATION}/${TARGET_NAME}.${EXT})
             endforeach ()
             install (FILES ${FILES} DESTINATION ${DEST_BUNDLE_DIR} OPTIONAL)
-        elseif (DEST_RUNTIME_DIR AND (DEST_BUNDLE_DIR OR NOT IOS))
+        elseif (DEST_RUNTIME_DIR AND (DEST_BUNDLE_DIR OR NOT IOS OR NOT TVOS))
             install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_BUNDLE_DIR})
             if (WIN32 AND NOT ARG_NODEPS AND URHO3D_LIB_TYPE STREQUAL SHARED AND NOT URHO3D_DLL_INSTALLED)
                 if (TARGET Urho3D)
@@ -1585,6 +1606,9 @@ macro (setup_main_executable)
         elseif (IOS)
             set (EXE_TYPE MACOSX_BUNDLE)
             list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY 1,2 MACOSX_BUNDLE_INFO_PLIST iOSBundleInfo.plist.template)
+        elseif (TVOS)
+            set (EXE_TYPE MACOSX_BUNDLE)
+            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY 3 MACOSX_BUNDLE_INFO_PLIST tvOSBundleInfo.plist.template)
         elseif (APPLE)
             if ((URHO3D_MACOSX_BUNDLE OR ARG_MACOSX_BUNDLE) AND NOT ARG_NOBUNDLE)
                 set (EXE_TYPE MACOSX_BUNDLE)
@@ -1904,8 +1928,12 @@ if (IOS)
         # Due to a bug in the CMake/Xcode generator (fixed in 3.4) that prevents iOS targets (library and bundle) to be installed correctly
         # (see http://public.kitware.com/Bug/bug_relationship_graph.php?bug_id=12506&graph=dependency),
         # below temporary fix is required to work around the bug
-        list (APPEND POST_CMAKE_FIXES COMMAND sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' ${CMAKE_BINARY_DIR}/CMakeScripts/install_postBuildPhase.make* || exit 0)
+        list (APPEND POST_CMAKE_FIXES COMMAND sed -i '' 's/\$$\(EFFECTIVE_PLATFORM_NAME\)//g' ${CMAKE_BINARY_DIR}/CMakeScripts/install_postBuildPhase.make* || exit 0)
     endif ()
+elseif (TVOS)
+    # Almost the same bug as iOS one above but not quite, most probably because CMake does not support AppleTV platform yet
+    list (APPEND POST_CMAKE_FIXES COMMAND sed -i '' 's/\)\$$\(EFFECTIVE_PLATFORM_NAME\)/\) -DEFFECTIVE_PLATFORM_NAME=$$\(EFFECTIVE_PLATFORM_NAME\)/g' ${CMAKE_BINARY_DIR}/CMakeScripts/install_postBuildPhase.make* || exit 0)
+    add_custom_target (APPLETV_POST_CMAKE_FIX COMMAND sed -i '' -E 's,\(Debug|RelWithDebInfo|Release\)/,$$\(CONFIGURATION\)$$\(EFFECTIVE_PLATFORM_NAME\)/,g' ${CMAKE_BINARY_DIR}/Source/Urho3D/CMakeScripts/Urho3D_cmakeRulesBuildPhase.make* || exit 0)
 endif ()
 if (POST_CMAKE_FIXES)
     add_custom_target (POST_CMAKE_FIXES ALL ${POST_CMAKE_FIXES} COMMENT "Applying post-cmake fixes")

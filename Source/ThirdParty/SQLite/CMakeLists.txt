@@ -48,7 +48,7 @@ setup_library ()
 install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SQLite FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant
 
 # Setup additional SQLite CLI standalone target (this target can be transfered and executed on an embedded device, such as Raspberry Pi and Android)
-if (NOT IOS AND NOT WEB)
+if (NOT IOS AND NOT TVOS AND NOT WEB)
     # Define target name for SQLite shell
     set (TARGET_NAME isql)
 

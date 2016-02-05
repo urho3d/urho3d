@@ -99,7 +99,7 @@ UI::UI(Context* context) :
     nonFocusedMouseWheel_(true),     // Default Mac OS X and Linux behaviour
 #endif
     useSystemClipboard_(false),
-#if defined(__ANDROID__) || defined(IOS)
+#if defined(__ANDROID__) || defined(IOS) || defined(TVOS)
     useScreenKeyboard_(true),
 #else
     useScreenKeyboard_(false),
