@@ -26,6 +26,7 @@
 #include "../Math/Frustum.h"
 #include "../Math/Polyhedron.h"
 #include "../Math/Ray.h"
+#include "../Math/Matrix2.h"
 
 namespace Urho3D
 {
@@ -235,6 +236,7 @@ static void RegisterVector2(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector2", "void Normalize()", asMETHOD(Vector2, Normalize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "float DotProduct(const Vector2&in) const", asMETHOD(Vector2, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "float AbsDotProduct(const Vector2&in) const", asMETHOD(Vector2, AbsDotProduct), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector2", "float Angle(const Vector2&in) const", asMETHOD(Vector2, Angle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 Abs() const", asMETHOD(Vector2, Abs), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 Lerp(const Vector2&in, float) const", asMETHOD(Vector2, Lerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "bool Equals(const Vector2&in) const", asMETHOD(Vector2, Equals), asCALL_THISCALL);
@@ -543,6 +545,48 @@ static void RegisterMatrix3(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Matrix3", "float m20", offsetof(Matrix3, m20_));
     engine->RegisterObjectProperty("Matrix3", "float m21", offsetof(Matrix3, m21_));
     engine->RegisterObjectProperty("Matrix3", "float m22", offsetof(Matrix3, m22_));
+}
+
+static void ConstructMatrix2(Matrix2* ptr)
+{
+    new(ptr) Matrix2();
+}
+
+static void ConstructMatrix2Copy(const Matrix2& mat, Matrix2* ptr)
+{
+    new(ptr) Matrix2(mat);
+}
+
+static void ConstructMatrix2Init(float v00, float v01, float v10, float v11, Matrix2* ptr)
+{
+    new(ptr) Matrix2(v00, v01, v10, v11);
+}
+
+static void RegisterMatrix2(asIScriptEngine* engine)
+{
+    engine->RegisterObjectType("Matrix2", sizeof(Matrix2), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectBehaviour("Matrix2", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructMatrix2), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Matrix2", asBEHAVE_CONSTRUCT, "void f(const Matrix2&in)", asFUNCTION(ConstructMatrix2Copy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Matrix2", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(ConstructMatrix2Init), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2 opMul(const Matrix2&in) const", asMETHODPR(Matrix2, operator *, (const Matrix2&) const, Matrix2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2 opMul(float) const", asMETHODPR(Matrix2, operator *, (float) const, Matrix2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Vector2 opMul(const Vector2&in) const", asMETHODPR(Matrix2, operator *, (const Vector2&) const, Vector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2 opAdd(const Matrix2&in) const", asMETHODPR(Matrix2, operator +, (const Matrix2 &) const, Matrix2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2 opSub(const Matrix2&in) const", asMETHODPR(Matrix2, operator -, (const Matrix2 &) const, Matrix2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2& opAssign(const Matrix2&in)", asMETHODPR(Matrix2, operator =, (const Matrix2 &), Matrix2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "bool opEquals(const Matrix2&in) const", asMETHOD(Matrix2, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Vector2 Scale() const", asMETHODPR(Matrix2, Scale, () const, Vector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2 Scaled(const Vector2&in) const", asMETHODPR(Matrix2, Scaled, (const Vector2 &) const, Matrix2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "void SetScale(const Vector2&in)", asMETHODPR(Matrix2,SetScale, (const Vector2 &), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "void SetScale(float)", asMETHODPR(Matrix2,SetScale, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2 Transpose() const", asMETHODPR(Matrix2, Transpose, () const, Matrix2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2 Inverse() const", asMETHODPR(Matrix2, Inverse, () const, Matrix2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "bool Equals(const Matrix2&in) const", asMETHOD(Matrix2, Equals), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "String ToString() const", asMETHOD(Matrix2, ToString), asCALL_THISCALL);
+    engine->RegisterObjectProperty("Matrix2", "float m00", offsetof(Matrix2, m00_));
+    engine->RegisterObjectProperty("Matrix2", "float m01", offsetof(Matrix2, m01_));
+    engine->RegisterObjectProperty("Matrix2", "float m10", offsetof(Matrix2, m10_));
+    engine->RegisterObjectProperty("Matrix2", "float m11", offsetof(Matrix2, m11_));
 }
 
 static void ConstructMatrix4(Matrix4* ptr)
@@ -1216,6 +1260,7 @@ void RegisterMathAPI(asIScriptEngine* engine)
     RegisterVector2(engine);
     RegisterVector3(engine);
     RegisterVector4(engine);
+    RegisterMatrix2(engine);
     RegisterMatrix3(engine);
     RegisterQuaternion(engine);
     RegisterMatrix4(engine);
