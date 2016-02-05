@@ -341,28 +341,10 @@ before_script:
   - if [ $PACKAGE_UPLOAD ]; then doxygen='doxygen graphviz'; fi
   - travis_retry brew install ccache $cmake $doxygen
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
-  - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done; fi
+  - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done && if [ $IOS ]; then redundant=AppleTV,Watch; elif [ $TVOS ]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; fi
   - rake ci_setup_cache
 script: ELAPSED=$SECONDS rake ci && if [ $PACKAGE_UPLOAD ]; then ELAPSED=$SECONDS rake ci_package_upload; fi
 after_script: rake ci_teardown_cache
-
-# Below samples are excluded from iOS build due to build time and space constraint
-data:
-  excluded_sample:
-    '#5':
-      - 01_HelloWorld
-      - 02_HelloGUI
-      - 03_Sprites
-      - 04_StaticScene
-      - 05_AnimatingScene
-      - 26_ConsoleInput
-      - 29_SoundSynthesis
-      - 30_LightAnimation
-      - 31_MaterialAnimation
-      - 34_DynamicGeometry
-      - 35_SignedDistanceFieldText
-      - 37_UIDrag
-      - 38_SceneAndUILoad
 
 ---
 
