@@ -223,10 +223,6 @@ public:
     float m02_;
     float m10_;
     float m11_;
-    float m12_;
-    float m20_;
-    float m21_;
-    float m22_;
 
     /// Bulk transpose matrices.
     static void BulkTranspose(float* dest, const float* src, unsigned count)
@@ -249,7 +245,7 @@ public:
     static const Matrix2 IDENTITY;
 };
 
-/// Multiply a 3x3 matrix with a scalar.
+/// Multiply a 2x2 matrix with a scalar.
 inline Matrix2 operator *(float lhs, const Matrix2& rhs) { return rhs * lhs; }
 
 }
