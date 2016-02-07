@@ -1364,17 +1364,17 @@ void HandleHotKeysBlender( VariantMap& eventData)
         activeViewport.camera.zoom = 1;
         activeViewport.ToggleOrthographic();
     }
-    else if (key == '4')
+    else if (key == '4' && ui.focusElement is null)
         editMode = EDIT_SELECT;
-    else if (key == '5')
+    else if (key == '5' && ui.focusElement is null)
         axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
-    else if (key == '6')
+    else if (key == '6' && ui.focusElement is null)
     {
         --pickMode;
         if (pickMode < PICK_GEOMETRIES)
                 pickMode = MAX_PICK_MODES - 1;
     }
-    else if (key == '7')
+    else if (key == '7' && ui.focusElement is null)
     {
         ++pickMode;
         if (pickMode >= MAX_PICK_MODES)
@@ -1382,12 +1382,15 @@ void HandleHotKeysBlender( VariantMap& eventData)
     }
     else if (key == 'Z' && eventData["Qualifiers"].GetInt() != QUAL_CTRL)
     {
-        fillMode = FillMode(fillMode + 1);
-        if (fillMode > FILL_POINT)
-            fillMode = FILL_SOLID;
+        if (ui.focusElement is null) 
+        {
+            fillMode = FillMode(fillMode + 1);
+            if (fillMode > FILL_POINT)
+                fillMode = FILL_SOLID;
 
-        // Update camera fill mode
-        SetFillMode(fillMode);
+            // Update camera fill mode
+            SetFillMode(fillMode);
+        }
     }
     else if (key == KEY_SPACE)
     {
