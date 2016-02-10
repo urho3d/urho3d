@@ -448,10 +448,9 @@ void Drawable::RemoveFromOctree()
 bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
 {
     // Must track indices independently to deal with potential mismatching of drawables vertex attributes (ie. one with UV, another without, then another with)
-    // Using long because 65,535 isn't enough as OBJ indices do not reset the count with each new object
-    unsigned long currentPositionIndex = 1;
-    unsigned long currentUVIndex = 1;
-    unsigned long currentNormalIndex = 1;
+    unsigned currentPositionIndex = 1;
+    unsigned currentUVIndex = 1;
+    unsigned currentNormalIndex = 1;
     bool anythingWritten = false;
 
     // Write the common "I came from X" comment
@@ -575,8 +574,8 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
 
                 for (unsigned indexIdx = indexStart; indexIdx < indexStart + indexCount; indexIdx += 3)
                 {
-                    // Deal with 16 or 32 bit indices, converting to long
-                    unsigned long longIndices[3];
+                    // Deal with 16 or 32 bit indices
+                    unsigned longIndices[3];
                     if (indexSize == 2)
                     {
                         //16 bit indices
