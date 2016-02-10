@@ -467,6 +467,9 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
 
         Node* node = drawable->GetNode();
         Matrix3x4 transMat = drawable->GetNode()->GetWorldTransform();
+        Matrix3x4 n = transMat.Inverse();
+        Matrix3 normalMat = Matrix3(n.m00_, n.m01_, n.m02_, n.m10_, n.m11_, n.m12_, n.m20_, n.m21_, n.m22_);
+        normalMat = normalMat.Transpose();
 
         const Vector<SourceBatch>& batches = drawable->GetBatches();
         for (unsigned geoIndex = 0; geoIndex < batches.Size(); ++geoIndex)
@@ -527,8 +530,8 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                     const unsigned normalOffset = VertexBuffer::GetElementOffset(elementMask, ELEMENT_NORMAL);
                     for (unsigned j = 0; j < vertexCount; ++j)
                     {
-                        Vector3 vertexNormal = *((const Vector3*)(&vertexData[(vertexStart + j) * elementSize + positionOffset]));
-                        vertexNormal = transMat * vertexNormal;
+                        Vector3 vertexNormal = *((const Vector3*)(&vertexData[(vertexStart + j) * elementSize + normalOffset]));
+                        vertexNormal = normalMat * vertexNormal;
                         vertexNormal.Normalize();
 
                         if (asRightHanded)
