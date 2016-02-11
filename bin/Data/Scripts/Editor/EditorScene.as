@@ -269,11 +269,11 @@ bool SaveScene(const String&in fileName)
     String extension = GetExtension(fileName);
     bool success;
     if (extension == ".xml")
-        editorScene.SaveXML(file);
+        success = editorScene.SaveXML(file);
     else if (extension == ".json")
-        editorScene.SaveJSON(file);
+        success = editorScene.SaveJSON(file);
     else
-        editorScene.Save(file);
+        success = editorScene.Save(file);
     RemoveBackup(success, fileName);
 
     editorScene.updateEnabled = false;
