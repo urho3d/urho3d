@@ -78,7 +78,8 @@ public class SDLActivity extends Activity {
      * @return arguments for the native application.
      */
     protected String[] getArguments() {
-        return new String[0];
+        // Urho3D: always return the "app_process" as the first argument instead of empty array
+        return new String[]{"app_process"};
     }
 
     public static void initialize() {

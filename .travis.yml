@@ -242,7 +242,7 @@ after_script: rake ci_teardown_cache
 branch: {name: Android-CI, active: yes}
 language: android
 android: {components: [build-tools-22.0.1]}
-cache: {directories: $HOME/.ccache}
+jdk: oraclejdk8
 sudo: false
 addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz, g++-multilib]}}
 env:
@@ -252,56 +252,32 @@ env:
     - numjobs=4
     - ANDROID=1
     - ANDROID_TMP=~/tmp
-    - PACKAGE_JOB_END=9
+    - USE_CCACHE=2
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
+  matrix:
+    # x86 and x86_64 emulation currently requires hardware acceleration which Travis-CI cannot provide, so skip testing using AVD for now
+    - ANDROID_ABI=x86_64 URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21   # Using default native API level 21
+    - ANDROID_ABI=x86_64 URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21
+    - ANDROID_ABI=x86    URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=21  # 9 is the default but at least 12 is needed when LuaJIT is enabled
+    - ANDROID_ABI=x86    URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=21
+    - ANDROID_ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC          # Using default native API Level 9
+    - ANDROID_ABI=armeabi-v7a URHO3D_LIB_TYPE=SHARED AVD=21
 matrix:
   fast_finish: true
   include:
-    # x86 and x86_64 emulation currently requires hardware acceleration which Travis-CI cannot provide, so skip AVD for now
-    # env: ANDROID_NATIVE_API_LEVEL=21 ANDROID_ABI=x86_64      URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21 AVD=test_21_x86_64 USE_CCACHE=2
-    # env: ANDROID_NATIVE_API_LEVEL=21 ANDROID_ABI=x86         URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21 AVD=test_21_x86       USE_CCACHE=2
-
-    # Travis CI does not create one cache per job at the moment, so workaround it to have still high cache hit/miss ratio
-    # We use jdk key as the cache storage differentiator! Our library is compiled using NDK so it should not be affected by JDK version
-    # We have to ensure those jobs with AVD test are run using the correct JDK version, i.e. Oracle JDK 7 which is the default
-    # We can only cache 5 jobs due to limited supply of valid JDK versions when using Travis CI native ccache support
-    # The other 5 jobs are cached using our own cache store (originally designed for Travis CI legacy build infra)
-    - &cache1
-      jdk: oraclejdk8
-      env: ANDROID_NATIVE_API_LEVEL=21 ANDROID_ABI=x86_64      URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21     USE_CCACHE=1
-    - &alternative-cache
-      cache: false
-      env: ANDROID_NATIVE_API_LEVEL=21 ANDROID_ABI=x86_64      URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21     USE_CCACHE=2
-    - &cache2
-      jdk: openjdk7
-      env: ANDROID_NATIVE_API_LEVEL=21 ANDROID_ABI=x86         URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86-android-21        USE_CCACHE=1
-    - <<: *alternative-cache
-      env: ANDROID_NATIVE_API_LEVEL=21 ANDROID_ABI=x86         URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21        USE_CCACHE=2
-    - &cache3
-      jdk: openjdk6
-      addons: &newer_gcc {apt: {sources: [*default_sources, ubuntu-toolchain-r-test], packages: [*default_packages, g++-4.9]}}
-      # ANDROID_ANDROID_ABI=arm64-v8a uses NEON by default, so the following two CI jobs also test NEON code path in the build
-      env: ANDROID_NATIVE_API_LEVEL=21 ANDROID_ABI=arm64-v8a   URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1                       USE_CCACHE=1
-    - <<: *alternative-cache
-      addons: {<<: *newer_gcc}
-      env: ANDROID_NATIVE_API_LEVEL=21 ANDROID_ABI=arm64-v8a   URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1                       USE_CCACHE=2
-    - <<: *alternative-cache
-      env: ANDROID_NATIVE_API_LEVEL=21 ANDROID_ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC                                       USE_CCACHE=2
-    - &cache4
-      jdk: oraclejdk7
-      env: ANDROID_NATIVE_API_LEVEL=21 ANDROID_ABI=armeabi-v7a URHO3D_LIB_TYPE=SHARED AVD=test_21_armeabi-v7a               USE_CCACHE=1
-    - <<: *alternative-cache
-      env: ANDROID_NATIVE_API_LEVEL=19 ANDROID_ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC                                       USE_CCACHE=2
-    - &cache5
-      env: ANDROID_NATIVE_API_LEVEL=19 ANDROID_ABI=armeabi-v7a URHO3D_LIB_TYPE=SHARED AVD=test_19_armeabi-v7a               USE_CCACHE=1
+    # ANDROID_ANDROID_ABI=arm64-v8a uses NEON by default, so the following two CI jobs also test NEON code path in the build
+    - addons: &newer_gcc {apt: {sources: [*default_sources, ubuntu-toolchain-r-test], packages: [*default_packages, g++-4.9]}}
+      env: ANDROID_ABI=arm64-v8a URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1   # Using default native API level 21
+    - addons: {<<: *newer_gcc}
+      env: ANDROID_ABI=arm64-v8a URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1
 before_script:
   - SECONDS=0
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
-  - if [ ${TRAVIS_JOB_NUMBER##*.} -lt $PACKAGE_JOB_END ] && ([ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
+  - if [ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
   - git clone --depth 1 --branch strip https://github.com/urho3d/android-ndk.git && export ANDROID_NDK=$(pwd)/android-ndk && if ([ $AVD ] || [ $PACKAGE_UPLOAD ]) && [ $INSTALL ]; then (while :; do echo 'y'; sleep 1; done) |android update sdk --no-ui --all --filter $INSTALL; fi
   - if [ "$ANDROID_ABI" == "x86_64" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/x86_64-4.9/prebuilt/linux-x86_64/bin C_PREFIX=x86_64-linux-android; fi
   - if [ "$ANDROID_ABI" == "x86" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/x86-4.9/prebuilt/linux-x86_64/bin C_PREFIX=i686-linux-android; fi

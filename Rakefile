@@ -170,15 +170,15 @@ task :make do
   system "cd \"#{build_tree}\" && #{ccache_envvar} cmake --build . #{cmake_build_options} -- #{build_options} #{filter}" or abort
 end
 
-# Usage: rake android [parameter='--es pickedLibrary Urho3DPlayer'] [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='sleep 30'] [api=19] [abi=armeabi-v7a] [avd=test_#{api}_#{abi}] [retries=10] [retry_interval=10] [install]
+# Usage: rake android [parameter='--es pickedLibrary Urho3DPlayer:Scripts/NinjaSnowWar.as'] [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='sleep 30'] [api=21] [abi=armeabi-v7a] [avd=test_#{api}_#{abi}] [retries=10] [retry_interval=10] [install]
 desc 'Test run APK in Android (virtual) device, default to Urho3D Samples APK if no parameter is given'
 task :android do
-  parameter = ENV['parameter'] || '--es pickedLibrary Urho3DPlayer'
+  parameter = ENV['parameter'] || '--es pickedLibrary Urho3DPlayer:Scripts/NinjaSnowWar.as'
   intent = ENV['intent'] || '.SampleLauncher'
   package = ENV['package'] || 'com.github.urho3d'
   success_indicator = ENV['success_indicator'] || 'Initialized engine'
   payload = ENV['payload'] || 'sleep 30'
-  api = ENV['api'] || 19
+  api = ENV['api'] || 21
   abi = ENV['abi'] || 'armeabi-v7a'
   avd = ENV['avd'] || "test_#{api}_#{abi}"
   retries = ENV['retries'] || 10 # minutes
@@ -194,7 +194,10 @@ task :android do
   }
   android_prepare_device api, abi, avd or abort 'Failed to prepare Android (virtual) device for test run'
   if install
-    system "cd \"#{build_tree}\" && android update project -p . -t $(android list target |grep android-#{api} |cut -d ' ' -f2) && ant debug" or abort 'Failed to generate APK'
+    Dir.chdir build_tree do
+      system 'android update project -p .' unless File.exist? 'local.properties'
+      system 'ant debug' or abort 'Failed to generate APK'
+    end
   end
   android_wait_for_device retries, retry_interval or abort 'Failed to start Android (virtual) device'
   if install
@@ -337,7 +340,7 @@ task :ci do
   system "bash -c 'rake cmake #{generator} URHO3D_LUA#{jit}=1 URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1'" or abort 'Failed to configure Urho3D library build'
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
     # Prepare a new AVD in another process to avoid busy waiting
-    android_prepare_device ENV['ANDROID_NATIVE_API_LEVEL'], ENV['ANDROID_ABI'], ENV['AVD'] or abort 'Failed to prepare Android (virtual) device for test run'
+    android_prepare_device ENV['AVD'], ENV['ANDROID_ABI'] or abort 'Failed to prepare Android (virtual) device for test run'
   end
   # Temporarily put the logic here for clang-tools migration until everything else are in their places
   if ENV['URHO3D_BINDINGS']
@@ -384,7 +387,7 @@ task :ci do
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']
     puts "\nTest deploying and running Urho3D Samples APK..."
     Dir.chdir '../Build' do
-      system "android update project -p . -t $(android list target |grep android-$ANDROID_NATIVE_API_LEVEL |cut -d ' ' -f2) && ant debug" or abort 'Failed to make Urho3D Samples APK'
+      system 'android update project -p . && ant debug' or abort 'Failed to make Urho3D Samples APK'
       if android_wait_for_device
         system "ant -Dadb.device.arg='-s #{$specific_device}' installd" or abort 'Failed to deploy Urho3D Samples APK'
         android_test_run or abort 'Failed to test run Urho3D Samples APK'
@@ -522,7 +525,7 @@ task :ci_create_mirrors do
   stream = YAML::load_stream(File.open('.travis.yml'))
   notifications = stream[0]['notifications']
   notifications['email']['recipients'] = get_root_commit_and_recipients().last unless notifications['email']['recipients']
-  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; ci_branch = ENV['RELEASE_TAG'] || (ENV['TRAVIS_BRANCH'] == 'master' && ENV['TRAVIS_PULL_REQUEST'] == 'false') ? ci : (ENV['TRAVIS_PULL_REQUEST'] == 'false' ? "#{ENV['TRAVIS_BRANCH']}-#{ci}" : "PR ##{ENV['TRAVIS_PULL_REQUEST']}-#{ci}"); is_appveyor_ci = branch['appveyor']; next if skip_travis && !is_appveyor_ci; unless (branch['mandatory'] || !head_moved) && ((ci_only && ci_only.map { |i| /#{i}/ =~ ci }.any?) || (!ci_only && (branch['active'] || (scan && /Scan/ =~ ci) || (annotate && /Annotate/ =~ ci)))); system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch}; fi"; puts "Skipped creating #{ci_branch} mirror branch due to moving HEAD" if !ci_only && branch['active'] && head_moved; next; end; unless is_appveyor_ci; lastjob = doc['matrix'] && doc['matrix']['include'] ? doc['matrix']['include'].length : (doc['env']['matrix'] ? doc['env']['matrix'].length : 1); doc['after_script'] = [*doc['after_script']] << (lastjob == 1 ? '%s' : "if [ ${TRAVIS_JOB_NUMBER##*.} == #{lastjob} ]; then %s; fi") % 'rake ci_delete_mirror'; doc['notifications'] = notifications unless doc['notifications']; doc_name = '.travis.yml'; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml } else doc['on_finish'] = [*doc['on_finish']] << "if \"%PLATFORM%:%URHO3D_LIB_TYPE%\" == \"#{branch['last_job']}\" rake ci_delete_mirror"; doc_name = '.appveyor.yml'; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml }; if ENV['TRAVIS']; replaced_content = File.read("#{doc_name}.new").gsub(/! /, ''); File.open("#{doc_name}.new", 'w') { |file| file.puts replaced_content }; end; end; puts "Creating #{ci_branch} mirror branch..."; system "git checkout -qB #{ci_branch} && rm .appveyor.yml .travis.yml && mv #{doc_name}.new #{doc_name} && git add -A . && git commit -qm \"#{escaped_commit_message}\" && git push -qf -u origin #{ci_branch} >/dev/null 2>&1 && git checkout -q -" or abort "Failed to create #{ci_branch} mirror branch" }
+  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; ci_branch = ENV['RELEASE_TAG'] || (ENV['TRAVIS_BRANCH'] == 'master' && ENV['TRAVIS_PULL_REQUEST'] == 'false') ? ci : (ENV['TRAVIS_PULL_REQUEST'] == 'false' ? "#{ENV['TRAVIS_BRANCH']}-#{ci}" : "PR ##{ENV['TRAVIS_PULL_REQUEST']}-#{ci}"); is_appveyor_ci = branch['appveyor']; next if skip_travis && !is_appveyor_ci; unless (branch['mandatory'] || !head_moved) && ((ci_only && ci_only.map { |i| /#{i}/ =~ ci }.any?) || (!ci_only && (branch['active'] || (scan && /Scan/ =~ ci) || (annotate && /Annotate/ =~ ci)))); system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch}; fi"; puts "Skipped creating #{ci_branch} mirror branch due to moving HEAD" if !ci_only && branch['active'] && head_moved; next; end; unless is_appveyor_ci; lastjob = [(doc['env']['matrix'] ? doc['env']['matrix'].length : 0) + (doc['matrix'] && doc['matrix']['include'] ? doc['matrix']['include'].length : 0), 1].max; doc['after_script'] = [*doc['after_script']] << (lastjob == 1 ? '%s' : "if [ ${TRAVIS_JOB_NUMBER##*.} == #{lastjob} ]; then %s; fi") % 'rake ci_delete_mirror'; doc['notifications'] = notifications unless doc['notifications']; doc_name = '.travis.yml'; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml } else doc['on_finish'] = [*doc['on_finish']] << "if \"%PLATFORM%:%URHO3D_LIB_TYPE%\" == \"#{branch['last_job']}\" rake ci_delete_mirror"; doc_name = '.appveyor.yml'; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml }; if ENV['TRAVIS']; replaced_content = File.read("#{doc_name}.new").gsub(/! /, ''); File.open("#{doc_name}.new", 'w') { |file| file.puts replaced_content }; end; end; puts "Creating #{ci_branch} mirror branch..."; system "git checkout -qB #{ci_branch} && rm .appveyor.yml .travis.yml && mv #{doc_name}.new #{doc_name} && git add -A . && git commit -qm \"#{escaped_commit_message}\" && git push -qf -u origin #{ci_branch} >/dev/null 2>&1 && git checkout -q -" or abort "Failed to create #{ci_branch} mirror branch" }
   # Push pending commits if any
   system "git push origin #{head}:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1" or abort "Failed to push pending commits to #{ENV['TRAVIS_BRANCH']}" if head_moved
 end
@@ -571,7 +574,7 @@ task :ci_package_upload do
   else
     if ENV['ANDROID']
       if !ENV['NO_SDK_SYSIMG']
-        system "cd ../Build && android update project -p . -t $(android list target |grep android-$ANDROID_NATIVE_API_LEVEL |cut -d ' ' -f2) && ant debug" or abort 'Failed to make Urho3D Samples APK'
+        system 'cd ../Build && android update project -p . && ant debug' or abort 'Failed to make Urho3D Samples APK'
       end
       system 'rm -rf ~/usr/local $(dirname $(which android))/../*' if ENV['TRAVIS']   # Clean up some disk space before packaging on Travis CI
     end
@@ -765,7 +768,7 @@ def android_wait_for_device retries = -1, retry_interval = 10, package = 'androi
   return retries == 0 ? nil : 0
 end
 
-def android_test_run parameter = '--es pickedLibrary Urho3DPlayer', intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Added resource path /apk/CoreData/', payload = 'sleep 30'
+def android_test_run parameter = '--es pickedLibrary Urho3DPlayer:Scripts/NinjaSnowWar.as', intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Added resource path /apk/CoreData/', payload = 'sleep 30'
   # The device should have been found at this point
   return nil unless $specific_device
   # Capture adb's stdout and interpret it because adb neither uses stderr nor returns proper exit code on error

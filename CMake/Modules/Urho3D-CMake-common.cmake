@@ -591,11 +591,7 @@ if (MSVC)
 else ()
     # GCC/Clang-specific setup
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof")
-    if (ANDROID)
-        # Most of the flags are already setup in android.toolchain.cmake module
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector")
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstack-protector")
-    else ()
+    if (NOT ANDROID)    # Most of the flags are already setup in android.toolchain.cmake module
         if (RPI)
             add_definitions (-DRPI)
             set (RPI_CFLAGS "-pipe -mfloat-abi=hard -Wno-psabi")    # We only support armhf distros, so turn on hard-float by default
@@ -1758,7 +1754,7 @@ if (ANDROID)
             create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
         endif ()
     endforeach ()
-    foreach (I AndroidManifest.xml build.xml custom_rules.xml src res assets jni)
+    foreach (I AndroidManifest.xml build.xml custom_rules.xml project.properties src res assets jni)
         if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
             create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
         endif ()

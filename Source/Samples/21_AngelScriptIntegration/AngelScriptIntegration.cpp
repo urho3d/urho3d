@@ -108,7 +108,7 @@ void AngelScriptIntegration::CreateScene()
         // Add our custom Rotator script object (using the ScriptInstance C++ component to instantiate / store it) which will
         // rotate the scene node each frame, when the scene sends its update event
         ScriptInstance* instance = boxNode->CreateComponent<ScriptInstance>();
-        instance->CreateObject(cache->GetResource<ScriptFile>("Scripts/Rotator.as"), "Rotator");
+        instance->CreateObject(cache->GetResource<ScriptFile>("Scripts/Utilities/Rotator.as"), "Rotator");
         // Call the script object's "SetRotationSpeed" function. Function arguments need to be passed in a VariantVector
         VariantVector parameters;
         parameters.Push(Vector3(10.0f, 20.0f, 30.0f));

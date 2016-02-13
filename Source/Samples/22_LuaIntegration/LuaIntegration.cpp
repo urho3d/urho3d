@@ -94,7 +94,7 @@ void LuaIntegration::CreateScene()
     zone->SetFogStart(10.0f);
     zone->SetFogEnd(100.0f);
 
-    LuaFile* scriptFile = cache->GetResource<LuaFile>("LuaScripts/Rotator.lua");
+    LuaFile* scriptFile = cache->GetResource<LuaFile>("LuaScripts/Utilities/Rotator.lua");
     if (!scriptFile)
         return;
 

@@ -711,7 +711,7 @@ By using the LuaScriptInstance component, Lua script objects can be added to sce
 
 \code
 LuaScriptInstance* instance = node->CreateComponent<LuaScriptInstance>();
-instance->CreateObject("LuaScripts/Rotator.lua", "Rotator");
+instance->CreateObject("LuaScripts/Utilities/Rotator.lua", "Rotator");
 \endcode
 
 After instantiation, use \ref LuaScriptInstance::GetScriptObjectFunction "GetScriptObjectFunction()" to get the object's functions by name; calling happens like above.
