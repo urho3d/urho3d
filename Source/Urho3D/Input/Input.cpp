@@ -1938,21 +1938,14 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             case SDL_WINDOWEVENT_MAXIMIZED:
             case SDL_WINDOWEVENT_RESTORED:
+#if defined(IOS) || defined (ANDROID)
+                // On iOS we never lose the GL context, but may have done GPU object changes that could not be applied yet. Apply them now
+                // On Android the old GL context may be lost already, restore GPU objects to the new GL context
+                graphics_->Restore();
+#endif
                 minimized_ = false;
                 SendInputFocusEvent();
-#ifdef IOS
-                // On iOS we never lose the GL context, but may have done GPU object changes that could not be applied yet.
-                // Apply them now
-                graphics_->Restore();
-#endif
                 break;
-
-#ifdef ANDROID
-            case SDL_WINDOWEVENT_FOCUS_GAINED:
-                // Restore GPU objects to the new GL context
-                graphics_->Restore();
-                break;
-#endif
 
             case SDL_WINDOWEVENT_RESIZED:
                 inResize_ = true;
