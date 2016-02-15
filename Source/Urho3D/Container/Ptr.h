@@ -192,7 +192,7 @@ public:
     unsigned ToHash() const { return (unsigned)((size_t)ptr_ / sizeof(T)); }
 
 private:
-	template <class U> friend class SharedPtr;
+    template <class U> friend class SharedPtr;
 
     /// Add a reference to the object pointed to.
     void AddRef()
