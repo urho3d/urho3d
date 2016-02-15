@@ -52,6 +52,7 @@ Urho3D development, contributions and bugfixes by:
 - AGreatFish
 - Enhex
 - Firegorilla
+- Lumak
 - Magic.Lixin
 - Mike3D
 - Modanung

@@ -481,12 +481,12 @@ IntVector2 Terrain::WorldToHeightMap(const Vector3& worldPosition) const
         return IntVector2::ZERO;
 
     Vector3 position = node_->GetWorldTransform().Inverse() * worldPosition;
-    int xPos = (int)((position.x_ - patchWorldOrigin_.x_) / spacing_.x_);
-    int zPos = (int)((position.z_ - patchWorldOrigin_.y_) / spacing_.z_);
-    Clamp(xPos, 0, numVertices_.x_);
-    Clamp(zPos, 0, numVertices_.y_);
+    int xPos = (int)((position.x_ - patchWorldOrigin_.x_) / spacing_.x_ + 0.5f);
+    int zPos = (int)((position.z_ - patchWorldOrigin_.y_) / spacing_.z_ + 0.5f);
+    xPos = Clamp(xPos, 0, numVertices_.x_ - 1);
+    zPos = Clamp(zPos, 0, numVertices_.y_ - 1);
 
-    return IntVector2(xPos, numVertices_.y_ - zPos);
+    return IntVector2(xPos, numVertices_.y_ - 1 - zPos);
 }
 
 void Terrain::CreatePatchGeometry(TerrainPatch* patch)
