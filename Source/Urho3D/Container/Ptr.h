@@ -47,6 +47,13 @@ public:
         AddRef();
     }
 
+    /// Copy-construct from another shared pointer allowing implicit upcasting.
+    template <class U> SharedPtr(const SharedPtr<U>& rhs) :
+        ptr_(rhs.ptr_)
+    {
+        AddRef();
+    }
+
     /// Construct from a raw pointer.
     explicit SharedPtr(T* ptr) :
         ptr_(ptr)
@@ -62,6 +69,19 @@ public:
 
     /// Assign from another shared pointer.
     SharedPtr<T>& operator =(const SharedPtr<T>& rhs)
+    {
+        if (ptr_ == rhs.ptr_)
+            return *this;
+
+        ReleaseRef();
+        ptr_ = rhs.ptr_;
+        AddRef();
+
+        return *this;
+    }
+
+    /// Assign from another shared pointer allowing implicit upcasting.
+    template <class U> SharedPtr<T>& operator =(const SharedPtr<U>& rhs)
     {
         if (ptr_ == rhs.ptr_)
             return *this;
@@ -108,13 +128,13 @@ public:
     }
 
     /// Test for less than with another shared pointer.
-    bool operator <(const SharedPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
+    template <class U> bool operator <(const SharedPtr<U>& rhs) const { return ptr_ < rhs.ptr_; }
 
     /// Test for equality with another shared pointer.
-    bool operator ==(const SharedPtr<T>& rhs) const { return ptr_ == rhs.ptr_; }
+    template <class U> bool operator ==(const SharedPtr<U>& rhs) const { return ptr_ == rhs.ptr_; }
 
     /// Test for inequality with another shared pointer.
-    bool operator !=(const SharedPtr<T>& rhs) const { return ptr_ != rhs.ptr_; }
+    template <class U> bool operator !=(const SharedPtr<U>& rhs) const { return ptr_ != rhs.ptr_; }
 
     /// Convert to a raw pointer.
     operator T*() const { return ptr_; }
@@ -172,8 +192,7 @@ public:
     unsigned ToHash() const { return (unsigned)((size_t)ptr_ / sizeof(T)); }
 
 private:
-    /// Prevent direct assignment from a shared pointer of another type.
-    template <class U> SharedPtr<T>& operator =(const SharedPtr<U>& rhs);
+	template <class U> friend class SharedPtr;
 
     /// Add a reference to the object pointed to.
     void AddRef()

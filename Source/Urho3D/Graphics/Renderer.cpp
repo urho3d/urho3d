@@ -1046,14 +1046,14 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool 
             }
 #endif
 
-            newBuffer = StaticCast<Texture>(newTex2D);
+            newBuffer = newTex2D;
         }
         else
         {
             SharedPtr<TextureCube> newTexCube(new TextureCube(context_));
             newTexCube->SetSize(width, format, TEXTURE_RENDERTARGET);
 
-            newBuffer = StaticCast<Texture>(newTexCube);
+            newBuffer = newTexCube;
         }
 
         newBuffer->SetSRGB(srgb);
