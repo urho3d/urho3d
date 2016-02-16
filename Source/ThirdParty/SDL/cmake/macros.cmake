@@ -29,10 +29,16 @@ macro(MESSAGE_ERROR _TEXT)
 endmacro()
 
 macro(MESSAGE_BOOL_OPTION _NAME _VALUE)
+  # Urho3D - accept extra paddding argument
+  if (NOT ${ARGN} STREQUAL \t)
+    set(_PAD ${ARGN})
+  else ()
+    set(_PAD \t)
+  endif ()
   if(${_VALUE})
-    message(STATUS "  ${_NAME}:\tON")
+    message(STATUS "  ${_NAME}:${_PAD}ON")
   else()
-    message(STATUS "  ${_NAME}:\tOFF")
+    message(STATUS "  ${_NAME}:${_PAD}OFF")
   endif()
 endmacro()
 

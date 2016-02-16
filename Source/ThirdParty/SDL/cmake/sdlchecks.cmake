@@ -24,7 +24,11 @@ macro(FindLibraryAndSONAME _LIB)
       message_warn("DYNLIB REGEX'd LIB: ${_LIB} ... ${_LIB_REGEXD}")
     endif()
 
-    message(STATUS "dynamic lib${_LIB} -> ${_LIB_REGEXD}")
+    # Urho3D - only echo the status once during initial configuration
+    if (NOT ${_LIB}_ECHOED_STATUS)
+      set (${_LIB}_ECHOED_STATUS TRUE CACHE INTERNAL "${_LIB} echoed status")
+      message(STATUS "dynamic lib${_LIB} -> ${_LIB_REGEXD}")
+    endif ()
     set(${_LNAME}_LIB_SONAME ${_LIB_REGEXD})
   endif()
 endmacro()
@@ -139,6 +143,8 @@ macro(CheckPulseAudio)
       file(GLOB PULSEAUDIO_SOURCES ${SDL2_SOURCE_DIR}/src/audio/pulseaudio/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${PULSEAUDIO_SOURCES})
       set(SDL_AUDIO_DRIVER_PULSEAUDIO 1)
+      # Urho3D - remove redundant -D_REENTRANT compiler define as the usage of -pthread compiler flag would auto emit this compiler define
+      string (REPLACE -D_REENTRANT "" PKG_PULSEAUDIO_CFLAGS "${PKG_PULSEAUDIO_CFLAGS}")   # Stringify to guard against empty variable
       list(APPEND EXTRA_CFLAGS ${PKG_PULSEAUDIO_CFLAGS})
       if(PULSEAUDIO_SHARED)
         if(NOT HAVE_DLOPEN)
@@ -781,10 +787,11 @@ macro(CheckPTHREAD)
     endif()
     if(HAVE_PTHREADS)
       set(SDL_THREAD_PTHREAD 1)
-      list(APPEND EXTRA_CFLAGS ${PTHREAD_CFLAGS})
-      list(APPEND EXTRA_LDFLAGS ${PTHREAD_LDFLAGS})
-      set(SDL_CFLAGS "${SDL_CFLAGS} ${PTHREAD_CFLAGS}")
-      list(APPEND SDL_LIBS ${PTHREAD_LDFLAGS})
+      # Urho3D - we only use "-pthread" compiler flags and expect the respective compiler toolchains to do the right things automatically
+#      list(APPEND EXTRA_CFLAGS ${PTHREAD_CFLAGS})
+#      list(APPEND EXTRA_LDFLAGS ${PTHREAD_LDFLAGS})
+#      set(SDL_CFLAGS "${SDL_CFLAGS} ${PTHREAD_CFLAGS}")
+#      list(APPEND SDL_LIBS ${PTHREAD_LDFLAGS})
 
       check_c_source_compiles("
         #include <pthread.h>

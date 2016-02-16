@@ -1486,7 +1486,7 @@ macro (define_dependency_libs TARGET)
         else ()
             # Linux
             if (NOT WEB)
-                list (APPEND LIBS dl rt)
+                list (APPEND LIBS dl m)
             endif ()
             if (RPI)
                 list (APPEND ABSOLUTE_PATH_LIBS ${VIDEOCORE_LIBRARIES})

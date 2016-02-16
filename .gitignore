@@ -74,6 +74,7 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 CTestTestfile.cmake
 /Source/**/*.cmake
+!/Source/ThirdParty/SDL/cmake/*.cmake
 /Docs/**/*.cmake
 
 # Precompiled header files
