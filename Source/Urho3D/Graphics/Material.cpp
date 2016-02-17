@@ -998,6 +998,7 @@ SharedPtr<Material> Material::Clone(const String& cloneName) const
     ret->SetName(cloneName);
     ret->techniques_ = techniques_;
     ret->shaderParameters_ = shaderParameters_;
+    ret->shaderParameterHash_ = shaderParameterHash_;
     ret->textures_ = textures_;
     ret->occlusion_ = occlusion_;
     ret->specular_ = specular_;
