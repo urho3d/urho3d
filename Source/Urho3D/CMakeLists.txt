@@ -280,6 +280,10 @@ if (WIN32 AND URHO3D_LIB_TYPE STREQUAL SHARED)
 endif ()
 
 # Setup dependency frameworks and libraries
+if (MINGW)
+    set (CMAKE_C_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES_INIT} -lwinmm")
+    set (CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES_INIT} -lwinmm")
+endif ()
 if (APPLE)
     set (FORCE_LOAD -force_load)
 elseif (NOT MSVC)

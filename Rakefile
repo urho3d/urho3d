@@ -194,9 +194,10 @@ task :android do
   }
   android_prepare_device api, abi, avd or abort 'Failed to prepare Android (virtual) device for test run'
   if install
+    system 'rake make android' or abort 'Failed to build shared library using Android NDK'
     Dir.chdir build_tree do
       system 'android update project -p .' unless File.exist? 'local.properties'
-      system 'ant debug' or abort 'Failed to generate APK'
+      system 'ant debug' or abort 'Failed to generate APK using Android SDK'
     end
   end
   android_wait_for_device retries, retry_interval or abort 'Failed to start Android (virtual) device'

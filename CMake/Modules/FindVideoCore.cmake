@@ -25,25 +25,28 @@
 #  VIDEOCORE_FOUND
 #  VIDEOCORE_INCLUDE_DIRS
 #  VIDEOCORE_LIBRARIES
+#  VIDEOCORE_BCM_HOST
+#  VIDEOCORE_EGL
+#  VIDEOCORE_GLES2
 #
 
 # Only need to cater for raspbian as they are not in CMAKE_SYSTEM_PATH
-set (BCM_VC_INC_SEARCH_PATH /opt/vc/include)
-set (BCM_VC_LIB_SEARCH_PATH /opt/vc/lib)
+set (VIDEOCORE_INC_SEARCH_PATH /opt/vc/include)
+set (VIDEOCORE_LIB_SEARCH_PATH /opt/vc/lib)
 
 # Assume all the other headers are installed at same relative path as bcm_host.h
-find_path (VIDEOCORE_INCLUDE_DIRS bcm_host.h PATHS ${BCM_VC_INC_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore include directory")
+find_path (VIDEOCORE_INCLUDE_DIRS bcm_host.h PATHS ${VIDEOCORE_INC_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore include directory")
 
 # Assume all the other libs are installed at the same relative path as libbcm_host.so
-find_library (BCM_VC_LIB_BCM_HOST bcm_host PATHS ${BCM_VC_LIB_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore BCM_HOST library directory")
-find_library (BCM_VC_LIB_EGL EGL PATHS ${BCM_VC_LIB_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore EGL library directory")
-find_library (BCM_VC_LIB_GLES2 GLESv2 PATHS ${BCM_VC_LIB_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore GLESv2 library directory")
+find_library (VIDEOCORE_BCM_HOST bcm_host PATHS ${VIDEOCORE_LIB_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore BCM_HOST library")
+find_library (VIDEOCORE_EGL EGL PATHS ${VIDEOCORE_LIB_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore EGL library")
+find_library (VIDEOCORE_GLES2 GLESv2 PATHS ${VIDEOCORE_LIB_SEARCH_PATH} PATH_SUFFIXES vc DOC "Broadcom VideoCore GLESv2 library")
 
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (VideoCore REQUIRED_VARS BCM_VC_LIB_BCM_HOST BCM_VC_LIB_EGL BCM_VC_LIB_GLES2 VIDEOCORE_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find Broadcom VideoCore firmware")
+find_package_handle_standard_args (VideoCore REQUIRED_VARS VIDEOCORE_BCM_HOST VIDEOCORE_EGL VIDEOCORE_GLES2 VIDEOCORE_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find Broadcom VideoCore firmware")
 if (VIDEOCORE_FOUND)
     list (APPEND VIDEOCORE_INCLUDE_DIRS ${VIDEOCORE_INCLUDE_DIRS}/interface/vcos/pthreads ${VIDEOCORE_INCLUDE_DIRS}/interface/vmcs_host/linux)  # Note: variable change to list context after this
-    set (VIDEOCORE_LIBRARIES ${BCM_VC_LIB_BCM_HOST} ${BCM_VC_LIB_EGL} ${BCM_VC_LIB_GLES2})
+    set (VIDEOCORE_LIBRARIES ${VIDEOCORE_BCM_HOST} ${VIDEOCORE_EGL} ${VIDEOCORE_GLES2})
 endif ()
 
-mark_as_advanced (VIDEOCORE_INCLUDE_DIRS VIDEOCORE_LIBRARIES BCM_VC_LIB_BCM_HOST BCM_VC_LIB_EGL BCM_VC_LIB_GLES2)
+mark_as_advanced (VIDEOCORE_INCLUDE_DIRS VIDEOCORE_LIBRARIES VIDEOCORE_BCM_HOST VIDEOCORE_EGL VIDEOCORE_GLES2)
