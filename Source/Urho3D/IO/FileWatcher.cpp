@@ -195,14 +195,17 @@ void FileWatcher::StopWatching()
         shouldRun_ = false;
 
         // Create and delete a dummy file to make sure the watcher loop terminates
+        // This is not required with iNotify
+#if !defined(__linux__)
         String dummyFileName = path_ + "dummy.tmp";
         File file(context_, dummyFileName, FILE_WRITE);
         file.Close();
         if (fileSystem_)
             fileSystem_->Delete(dummyFileName);
+#endif
 
-        Stop();
-
+        // Remove watch - On linux this will cause read() to return with
+        // the IN_IGNORED flag set
 #ifdef _WIN32
         CloseHandle((HANDLE)dirHandle_);
 #elif defined(__linux__)
@@ -212,6 +215,9 @@ void FileWatcher::StopWatching()
 #elif defined(__APPLE__) && !defined(IOS)
         CloseFileWatcher(watcher_);
 #endif
+        // Join thread *after* removing watch as to avoid getting stuck in
+        // read()
+        Stop();
 
         URHO3D_LOGDEBUG("Stopped watching path " + path_);
         path_.Clear();
