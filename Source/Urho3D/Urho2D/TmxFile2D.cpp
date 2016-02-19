@@ -449,6 +449,7 @@ bool TmxFile2D::SetInfo(Orientation2D orientation, int width, int height, float 
     info_.height_ = height;
     info_.tileWidth_ = tileWidth * PIXEL_SIZE;
     info_.tileHeight_ = tileHeight * PIXEL_SIZE;
+    return true;
 }
 
 Sprite2D* TmxFile2D::GetTileSprite(int gid) const
