@@ -187,10 +187,10 @@ public:
     const TmxLayer2D* GetLayer(unsigned index) const;
 
     /// Add Layer at index, if index>GetNumLayers() then append to end.
-    void AddLayer(unsigned index, TmxLayer2D layer);
+    void AddLayer(unsigned index, TmxLayer2D *layer);
 
     /// Append layer to end.
-    void AddLayer(TmxLayer2D layer);
+    void AddLayer(Urho3D::TmxLayer2D* layer);
 
 private:
     /// Load TSX file.

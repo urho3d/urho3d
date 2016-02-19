@@ -476,7 +476,7 @@ const TmxLayer2D* TmxFile2D::GetLayer(unsigned index) const
     return layers_[index];
 }
 
-void TmxFile2D::AddLayer(unsigned index, TmxLayer2D layer)
+void TmxFile2D::AddLayer(unsigned index, TmxLayer2D *layer)
 {
     if(index > layers_.Size())
     {
@@ -488,7 +488,7 @@ void TmxFile2D::AddLayer(unsigned index, TmxLayer2D layer)
     }
 }
 
-void TmxFile2D::AddLayer(TmxLayer2D layer)
+void TmxFile2D::AddLayer(TmxLayer2D *layer)
 {
     layers_.Push(layer);
 }
