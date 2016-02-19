@@ -444,6 +444,7 @@ bool TmxFile2D::EndLoad()
 
 bool TmxFile2D::SetInfo(Orientation2D orientation, int width, int height, float tileWidth, float tileHeight)
 {
+    if(layers_.Size()>0) return false;
     info_.orientation_ = orientation;
     info_.width_ = width;
     info_.height_ = height;
